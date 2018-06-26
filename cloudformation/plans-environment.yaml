@@ -1,0 +1,96 @@
+# A template that creates a Plans service
+# Version: da39a3ee5e6b4b0d3255bfef95601890afd80709
+#
+# Copyright 2018 Melon Software Ltd (UK), all rights reserved.  Used under license.
+#
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "Creates a Plans service environment"
+
+Parameters:
+
+    Environment:
+        Type: "String"
+        Description: "The name of the environment"
+
+Mappings:
+    TemplateVersion:
+        Self: { Commit: "da39a3ee5e6b4b0d3255bfef95601890afd80709" }
+        Infrastructure: { Commit: "2d222e78ee364e58b7db1709f89effdf4d1d4c7d" }
+
+Metadata:
+    "AWS::CloudFormation::Interface":
+        ParameterGroups:
+          - Label: { default: "Definition" }
+            Parameters:
+              - "Environment"
+
+        ParameterLabels:
+            Environment: { default: "Environment" }
+
+Resources:
+
+    ##########################################################################################################
+    ##  API GATEWAY
+    ##########################################################################################################
+
+    ApiGatewayLambdaExecutionRole:
+        Type: "AWS::IAM::Role"
+        Properties:
+            AssumeRolePolicyDocument:
+                Version: "2012-10-17"
+                Statement:
+                  - Effect: "Allow"
+                    Principal: { Service: [ "lambda.amazonaws.com" ] }
+                    Action: "sts:AssumeRole"
+            ManagedPolicyArns:
+              - "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+              - "arn:aws:iam::aws:policy/AWSXrayWriteOnlyAccess"
+            RoleName: { "Fn::Sub": "plans-${Environment}-apigateway-${AWS::Region}" }
+
+    ApiGatewayLambda:
+        Type: "AWS::Lambda::Function"
+        Properties:
+            Code:
+                S3Bucket: { "Fn::ImportValue": "InfrastructureBucketName" }
+                S3Key: { "Fn::Sub": [ "lambdas/plans/${TemplateVersion}/apigateway.zip", {
+                    TemplateVersion: { "Fn::FindInMap": [ "TemplateVersion", "Self", "Commit" ] }
+                } ] }
+            Environment:
+                Variables:
+                    ENVIRONMENT: { Ref: 'Environment' }
+                    AWS_ACCOUNT_ID: { Ref: "AWS::AccountId" }
+            Handler: "apigateway.handler"
+            Runtime: "python3.6"
+            Timeout: "30"
+            Role: { "Fn::GetAtt" : [ "ApiGatewayLambdaExecutionRole", "Arn" ] }
+            FunctionName: { "Fn::Sub": "plans-${Environment}-apigateway-execute" }
+            Tags:
+              - { Key: "Name", Value: { "Fn::Sub": "plans-${Environment}-apigateway-execute" } }
+              - { Key: "Management", Value: "managed" }
+              - { Key: "Project", Value: "plans" }
+              - { Key: "Environment", Value: { Ref: "Environment" } }
+              - { Key: "Service", Value: "apigateway" }
+            TracingConfig:
+                Mode: "Active"
+
+    ApigatewayStack:
+        Type: "AWS::CloudFormation::Stack"
+        Properties:
+            Parameters:
+                Project: "plans"
+                Environment: { Ref: "Environment" }
+                Service: "apigateway"
+                LambdaArn: { "Fn::GetAtt": [ "ApiGatewayLambda", "Arn" ] }
+                CustomAuthLambdaArn: { "Fn::ImportValue": { "Fn::Sub": "users-${Environment}-CustomAuthLambdaArn" } }
+                CreateCustomDomain: "true"
+            Tags:
+              - { Key: "Name", Value: { "Fn::Sub": "plans-${Environment}-apigateway" } }
+              - { Key: "Management", Value: "managed" }
+              - { Key: "Project", Value: "plans" }
+              - { Key: "Environment", Value: { Ref: "Environment" } }
+              - { Key: "Service", Value: "apigateway" }
+            TemplateURL: { "Fn::Sub": [ "https://s3.amazonaws.com/${InfrastructureBucketName}/cloudformation/infrastructure/${TemplateVersion}/apigateway.yaml", {
+                InfrastructureBucketName: { "Fn::ImportValue": "InfrastructureBucketName" },
+                TemplateVersion: { "Fn::FindInMap": [ "TemplateVersion", "Infrastructure", "Commit" ] }
+            } ] }
+            TimeoutInMinutes: 30
