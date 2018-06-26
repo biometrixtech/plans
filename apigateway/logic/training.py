@@ -1,0 +1,728 @@
+import numpy as np
+from decimal import Decimal, getcontext
+import session
+
+
+class TrainingCycle(object):
+
+    def __init__(self):
+        self.calculator = Calculator()
+        self.start_date = None
+        self.end_date = None
+        self.sessions = []  # store all sessions here. if needed, create session arrays as methods that query on type
+        self.long_term_recovery = None
+        # self.practice_sessions = []
+        # self.strength_conditioning_sessions = []  # includes cross training
+        # self.games = []
+        # self.tournaments = []
+        # self.long_term_recovery_sessions = []
+        # self.corrective_sessions = []
+        # self.bump_up_sessions = []
+
+    def internal_monotony(self):
+        return self.calculator.get_monotony("internal_load", self.sessions)
+
+    def external_total_monotony(self):
+        return self.calculator.get_monotony("external_load", self.sessions)
+
+    def external_high_monotony(self):
+        return self.calculator.get_monotony("high_intensity_load", self.sessions)
+
+    def external_mod_monotony(self):
+        return self.calculator.get_monotony("mod_intensity_load", self.sessions)
+
+    def external_low_monotony(self):
+        return self.calculator.get_monotony("low_intensity_load", self.sessions)
+
+    def internal_strain(self):
+        return self.calculator.get_strain("internal_load", self.sessions)
+
+    def external_total_strain(self):
+        return self.calculator.get_strain("external_load", self.sessions)
+
+    def external_high_strain(self):
+        return self.calculator.get_strain("high_intensity_load", self.sessions)
+
+    def external_mod_strain(self):
+        return self.calculator.get_strain("mod_intensity_load", self.sessions)
+
+    def external_low_strain(self):
+        return self.calculator.get_strain("low_intensity_load", self.sessions)
+
+    def estimated_internal_external_load_ratio(self):
+        internal_load = list(x.internal_load for x in self.sessions if x.internal_load is not None
+                             and x.external_load is not None)
+        external_load = list(x.external_load for x in self.sessions if x.internal_load is not None
+                             and x.external_load is not None)
+        if internal_load is not None and external_load is not None:
+            internal_load_sum = np.sum(internal_load)
+            external_load_sum = np.sum(external_load)
+
+            return internal_load_sum / external_load_sum
+        else:
+            return None
+
+    def actual_internal_external_load_ratio(self):
+        internal_load = list(x.internal_load for x in self.sessions if x.internal_load is not None
+                             and x.external_load is not None and not x.estimated)
+        external_load = list(x.external_load for x in self.sessions if x.internal_load is not None
+                             and x.external_load is not None and not x.estimated)
+        if internal_load is not None and external_load is not None:
+            internal_load_sum = np.sum(internal_load)
+            external_load_sum = np.sum(external_load)
+
+            return internal_load_sum / external_load_sum
+        else:
+            return None
+
+    def total_hours_training_wtd(self):
+        total_minutes = list(x.duration_minutes for x in self.sessions if x.duration_minutes is not None)
+        total_minutes_sum = np.sum(total_minutes)
+        return total_minutes_sum / 60
+
+
+class TrainingHistory(object):
+
+    def __init__(self):
+        self.calculator = Calculator()
+
+        self.training_cycles = []   # in reverse order where training_cycle = 0 is current, assuming max 5
+
+    def internal_strain_spiking(self):
+        return self.calculator.is_strain_spiking("internal_strain", self.training_cycles)
+
+    def external_total_strain_spiking(self):
+        return self.calculator.is_strain_spiking("external_total_strain", self.training_cycles)
+
+    def external_high_strain_spiking(self):
+        return self.calculator.is_strain_spiking("external_high_strain", self.training_cycles)
+
+    def external_mod_strain_spiking(self):
+        return self.calculator.is_strain_spiking("external_mod_strain", self.training_cycles)
+
+    def external_low_strain_spiking(self):
+        return self.calculator.is_strain_spiking("external_low_strain", self.training_cycles)
+
+    def actual_internal_ACWR(self):
+        return self.calculator.get_ACWR("internal_load", self.training_cycles, False)
+
+    def estimated_internal_ACWR(self):
+        return self.calculator.get_ACWR("internal_load", self.training_cycles, True)
+
+    def actual_external_total_ACWR(self):
+        return self.calculator.get_ACWR("external_load", self.training_cycles, False)
+
+    def estimated_external_total_ACWR(self):
+        return self.calculator.get_ACWR("external_load", self.training_cycles, True)
+
+    def actual_external_high_ACWR(self):
+        return self.calculator.get_ACWR("high_intensity_load", self.training_cycles, False)
+
+    def estimated_external_high_ACWR(self):
+        return self.calculator.get_ACWR("high_intensity_load", self.training_cycles, True)
+
+    def actual_external_mod_ACWR(self):
+        return self.calculator.get_ACWR("mod_intensity_load", self.training_cycles, False)
+
+    def estimated_external_mod_ACWR(self):
+        return self.calculator.get_ACWR("mod_intensity_load", self.training_cycles, True)
+
+    def actual_external_low_ACWR(self):
+        return self.calculator.get_ACWR("low_intensity_load", self.training_cycles, False)
+
+    def estimated_external_low_ACWR(self):
+        return self.calculator.get_ACWR("low_intensity_load", self.training_cycles, True)
+
+    def actual_internal_ramp(self):
+        return self.calculator.get_ramp("internal_load", self.training_cycles, False)
+
+    def estimated_internal_ramp(self):
+        return self.calculator.get_ramp("internal_load", self.training_cycles, True)
+
+    def actual_external_total_ramp(self):
+        return self.calculator.get_ramp("external_load", self.training_cycles, False)
+
+    def estimated_external_total_ramp(self):
+        return self.calculator.get_ramp("external_load", self.training_cycles, True)
+
+    def actual_external_high_ramp(self):
+        return self.calculator.get_ramp("high_intensity_load", self.training_cycles, False)
+
+    def estimated_external_high_ramp(self):
+        return self.calculator.get_ramp("high_intensity_load", self.training_cycles, True)
+
+    def actual_external_mod_ramp(self):
+        return self.calculator.get_ramp("mod_intensity_load", self.training_cycles, False)
+
+    def estimated_external_mod_ramp(self):
+        return self.calculator.get_ramp("mod_intensity_load", self.training_cycles, True)
+
+    def actual_external_low_ramp(self):
+        return self.calculator.get_ramp("low_intensity_load", self.training_cycles, False)
+
+    def estimated_external_low_ramp(self):
+        return self.calculator.get_ramp("low_intensity_load", self.training_cycles, True)
+
+    def weighted_internal_external_load_ratio(self):
+
+        ratios = []
+
+        for t in range(0, len(self.training_cycles) + 1):
+            weighting_factor = 1 / (t + 1)
+            ratio = self.training_cycles[t].actual_internal_external_load_ratio()
+            if ratio is not None:
+                ratios.append(ratio * weighting_factor)
+
+        if len(ratios) > 0:
+            return np.mean(ratios)
+        else:
+            return None
+
+    def is_athlete_fatiguing(self):
+        actual_ratios = list(x.actual_internal_external_load_ratio() for x in self.training_cycles
+                             if x.actual_internal_external_load_ratio() is not None)
+        training_history_ratio = np.mean(actual_ratios)
+        current_ratio = self.training_cycles[0].actual_internal_external_load_ratio()
+
+        if training_history_ratio is None or current_ratio is None:
+            return None
+
+        if training_history_ratio < current_ratio:
+            return True
+        else:
+            return False
+
+    def global_load_estimation_parameters(self):
+
+        sessions = []
+
+        for training_cycle in self.training_cycles:
+            # we do not want to include estimated sessions from the current training cycle in our calculations
+            filtered_sessions = list(c for c in training_cycle.sessions if c.estimated is not False)
+            sessions.extend(filtered_sessions)
+
+        parameter = session.GlobalLoadEstimationParameters()
+
+        total_load = list(s.external_load for s in sessions if s.external_load is not None)
+        total_load_minutes = list(s.duration_minutes for s in sessions if s.duration_minutes is not None)
+        parameter.external_load_per_minute = total_load / total_load_minutes
+
+        high_load = list(s.high_intensity_load for s in sessions if s.high_intensity_load is not None)
+        high_load_minutes = list(s.high_intensity_minutes for s in sessions if s.high_intensity_load is not None)
+        parameter.high_intensity_load_per_minute = high_load / high_load_minutes
+
+        mod_load = list(s.mod_intensity_load for s in sessions if s.mod_intensity_load is not None)
+        mod_load_minutes = list(s.mod_intensity_minutes for s in sessions if s.mod_intensity_load is not None)
+        parameter.moderate_intensity_avg_load_per_minute = mod_load / mod_load_minutes
+
+        low_load = list(s.low_intensity_load for s in sessions if s.low_intensity_load is not None)
+        low_load_minutes = list(s.low_intensity_minutes for s in sessions if s.low_intensity_load is not None)
+        parameter.low_intensity_avg_load_per_minute = low_load / low_load_minutes
+
+        parameter.high_intensity_percentage = \
+            high_load_minutes / (high_load_minutes + mod_load_minutes + low_load_minutes)
+
+        parameter.moderate_intensity_percentage = \
+            mod_load_minutes / (high_load_minutes + mod_load_minutes + low_load_minutes)
+
+        parameter.low_intensity_percentage = \
+            low_load_minutes / (high_load_minutes + mod_load_minutes + low_load_minutes)
+
+        return parameter
+
+    def session_load_estimation_parameters(self):
+
+        parameters = []
+
+        for session_type in session.SessionType:
+            sessions = []
+            for training_cycle in self.training_cycles:
+                # we do not want to include estimated sessions from the current training cycle in our calculations
+                filtered_sessions = list(c for c in training_cycle.sessions if c.session_type is session_type and
+                                         c.estimated is not False)
+                sessions.extend(filtered_sessions)
+            parameter = session.SessionLoadEstimationParameter()
+            parameter.session_type = session_type
+
+            total_load = list(s.external_load for s in sessions if s.external_load is not None)
+            total_load_minutes = list(s.duration_minutes for s in sessions if s.duration_minutes is not None)
+            parameter.total_avg_external_load_per_minute = total_load / total_load_minutes
+
+            high_load = list(s.high_intensity_load for s in sessions if s.high_intensity_load is not None)
+            parameter.high_intensity_avg_load_per_minute = high_load / total_load_minutes
+
+            mod_load = list(s.mod_intensity_load for s in sessions if s.mod_intensity_load is not None)
+            parameter.moderate_intensity_avg_load_per_minute = mod_load / total_load_minutes
+
+            low_load = list(s.low_intensity_load for s in sessions if s.low_intensity_load is not None)
+            parameter.low_intensity_avg_load_per_minute = low_load / total_load_minutes
+
+            # intensity minutes are NOT used to calculate average but are used to calculate percentage of time
+            high_load_minutes = list(s.high_intensity_minutes for s in sessions if s.high_intensity_load is not None)
+            mod_load_minutes = list(s.mod_intensity_minutes for s in sessions if s.mod_intensity_load is not None)
+            low_load_minutes = list(s.low_intensity_minutes for s in sessions if s.low_intensity_load is not None)
+
+            parameter.high_intensity_percentage = \
+                high_load_minutes / (high_load_minutes + mod_load_minutes + low_load_minutes)
+
+            parameter.moderate_intensity_percentage = \
+                mod_load_minutes / (high_load_minutes + mod_load_minutes + low_load_minutes)
+
+            parameter.low_intensity_percentage = \
+                low_load_minutes / (high_load_minutes + mod_load_minutes + low_load_minutes)
+
+            parameters.append(parameter)
+
+        return parameters
+
+    def current_load_gap(self):
+
+        calc = Calculator()
+        load_gap = calc.get_load_gap(self.training_cycles, True)
+
+        return load_gap
+
+    def impute_load(self):
+
+        training_cycle = self.training_cycles[0]
+
+        internal_external_load_ratio = self.weighted_internal_external_load_ratio()
+
+        for s in range(0, len(training_cycle.sessions)):
+            if not training_cycle.sessions[s].estimated:
+                if training_cycle.sessions[s].internal_load() is None:
+                    if (training_cycle.sessions[s].external_load is not None
+                            and training_cycle.sessions[s].duration_minutes is not None
+                            and training_cycle.sessions[s].internal_load_imputed):
+                        training_cycle.sessions[s].session_RPE = \
+                            (internal_external_load_ratio * training_cycle.sessions[s].external_load) / \
+                            training_cycle.sessions[s].duration_minutes
+
+                elif training_cycle.sessions[s].external_load is None:
+                    if (training_cycle.sessions[s].internal_load() is not None
+                            and training_cycle.sessions[s].external_load_imputed):
+                        training_cycle.sessions[s].external_load = \
+                            (internal_external_load_ratio / training_cycle.sessions[s].internal_load())
+
+                        training_cycle.sessions[s] = self.impute_intensity(training_cycle.sessions[s])
+
+            else:   # estimated session
+                if training_cycle.sessions[s].internal_load() is not None:  # should always be populated
+                    training_cycle.sessions[s].external_load = \
+                        (internal_external_load_ratio / training_cycle.sessions[s].internal_load())
+                    training_cycle.sessions[s].external_load_imputed = True
+
+                    training_cycle.sessions[s] = self.impute_intensity(training_cycle.sessions[s])
+
+    def impute_intensity(self, training_session):
+        estimation_parameters = self.session_load_estimation_parameters()
+
+        # now estimate high, moderate and low
+        estimation_parameter = (p for p in estimation_parameters if p.session_type == training_session.session_type)
+
+        if estimation_parameter is None:
+            estimation_parameter = self.global_load_estimation_parameters()
+
+        if estimation_parameter is not None:
+            training_session.high_intensity_load = \
+                estimation_parameter.high_intensity_avg_load_per_minute * \
+                training_session.duration_minutes
+
+            training_session.high_intensity_minutes = \
+                estimation_parameter.high_intensity_percentage * \
+                training_session.duration_minutes
+
+            training_session.mod_intensity_load = \
+                estimation_parameter.mod_intensity_avg_load_per_minute * \
+                training_session.duration_minutes
+
+            training_session.mod_intensity_minutes = \
+                estimation_parameter.mod_intensity_percentage * \
+                training_session.duration_minutes
+
+            training_session.low_intensity_load = \
+                estimation_parameter.low_intensity_avg_load_per_minute * \
+                training_session.duration_minutes
+
+            training_session.low_intensity_minutes = \
+                estimation_parameter.low_intensity_percentage * \
+                training_session.duration_minutes
+
+        return training_session
+
+    def recalculate_current_training_cycle(self):
+
+        calc = Calculator()
+
+        training_cycle = self.training_cycles[0]
+
+        # update expected load, etc for the week
+        self.impute_load()
+
+        # add any training modifications?
+
+        # do we need to add, change or delete long-term recovery modalities?
+        # if fatiguing, certainly need to add certain modalities
+        if self.is_athlete_fatiguing():
+            j = 0
+
+        # do we need to add, change or delete corrective exercises?
+
+        # do we need to add, change or delete bump-up sessions?
+
+        load_gap = self.current_load_gap()
+        if load_gap.exists():
+
+            # TODO: what if the user has already seleceted exercises for a bump-up session?  should we preserve?
+            bump_up_sessions = calc.get_bump_up_sessions(self.training_cycles, load_gap)
+
+            # ^ do we need to replace existing? add to the list or blow out all estimated and redo?
+
+
+class LoadGap(object):
+
+    def __init__(self):
+        self.external_total_load = None
+        self.external_high_intensity_load = None
+        self.external_moderate_intensity_load = None
+        self.external_low_intensity_load = None
+        self.internal_total_load = None
+
+        # actual minutes is tied to session type and cannot be discerned from load itself
+        # in theory, we could use past bump up sessions, but that's not too reliable until we have a history
+
+        # self.total_external_minutes = None
+        # self.high_intensity_minutes = None
+        # self.moderate_intensity_minutes = None
+        # self.low_intensity_minutes = None
+        # self.total_internal_minutes = None
+
+    def exists(self):
+        if (self.external_total_load is None and
+                self.external_high_intensity_load is None and
+                self.external_moderate_intensity_load is None and
+                self.external_low_intensity_load is None and
+                self.internal_total_load is None):
+                # self.total_external_minutes is None and
+                # self.high_intensity_minutes is None and
+                # self.moderate_intensity_minutes is None and
+                # self.low_intensity_minutes is None and
+                # self.total_internal_minutes is None
+
+            return True
+        else:
+            return False
+
+
+class Calculator(object):
+
+    def get_ramp(self, attribute_name, training_cycles, included_estimated=True):
+
+        current_training_cycle = training_cycles[0]
+        previous_training_cycle = training_cycles[1]
+
+        if included_estimated:
+            current_load = list(getattr(c, attribute_name) for c in current_training_cycle.sessions
+                                if getattr(c, attribute_name) is not None)
+            previous_load = list(getattr(c, attribute_name) for c in previous_training_cycle.sessions
+                                 if getattr(c, attribute_name) is not None)
+        else:
+            current_load = list(getattr(c, attribute_name) for c in current_training_cycle.sessions
+                                if getattr(c, attribute_name) is not None and not c.estimated)
+            previous_load = list(getattr(c, attribute_name) for c in previous_training_cycle.sessions
+                                 if getattr(c, attribute_name) is not None and not c.estimated)
+
+        if current_load is not None and previous_load is not None:
+            current_load_sum = np.sum(current_load)
+            previous_load_sum = np.sum(previous_load)
+            ramp = ((current_load_sum - previous_load_sum) / previous_load_sum) * 100
+            return ramp
+        else:
+            return None
+
+    def get_acute_chronic_load(self, attribute_name, training_cycles, included_estimated=True,
+                               exclude_bump_up_sessions=False):
+
+        current_training_cycle = training_cycles[0]
+
+        if exclude_bump_up_sessions:
+            if included_estimated:
+                acute_load = list(getattr(c, attribute_name) for c in current_training_cycle.sessions
+                                  if getattr(c, attribute_name) is not None
+                                  and c.session_type is not session.SessionType.bump_up)
+            else:
+                acute_load = list(getattr(c, attribute_name) for c in current_training_cycle.sessions
+                                  if getattr(c, attribute_name) is not None and not c.estimated
+                                  and c.session_type is not session.SessionType.bump_up)
+        else:
+            if included_estimated:
+                acute_load = list(getattr(c, attribute_name) for c in current_training_cycle.sessions
+                                  if getattr(c, attribute_name) is not None)
+            else:
+                acute_load = list(getattr(c, attribute_name) for c in current_training_cycle.sessions
+                                  if getattr(c, attribute_name) is not None and not c.estimated)
+
+        chronic_load = []
+
+        # loop through past training history and calculate chronic load
+        for training_cycle in training_cycles[1:]:
+            if included_estimated:
+                load = list(getattr(c, attribute_name) for c in training_cycle.sessions
+                            if getattr(c, attribute_name) is not None)
+            else:
+                load = list(getattr(c, attribute_name) for c in training_cycle.sessions
+                            if getattr(c, attribute_name) is not None and not c.estimated)
+            load_sum = np.sum(load)
+            chronic_load.append(load_sum)
+
+        return acute_load, chronic_load
+
+    def get_ACWR(self, attribute_name, training_cycles, include_estimated):
+
+        acute_load, chronic_load = self.get_acute_chronic_load(attribute_name, training_cycles, include_estimated)
+
+        if acute_load is not None and chronic_load is not None:
+            acute_load_sum = np.sum(acute_load)
+            chronic_load_avg = np.mean(chronic_load)
+            return acute_load_sum / chronic_load_avg
+        else:
+            return None
+
+    def get_monotony(self, attribute_name, sessions):
+
+        load = list(getattr(c, attribute_name) for c in sessions
+                    if getattr(c, attribute_name) is not None)
+
+        if load is not None:
+            load_mean = np.mean(load).item()
+            load_stddev = np.std(load).item()
+            return load_mean / load_stddev
+        else:
+            return None
+
+    def get_strain(self, attribute_name, sessions):
+
+        load = list(getattr(c, attribute_name) for c in sessions
+                    if getattr(c, attribute_name) is not None)
+
+        if load is not None:
+            load_mean = np.mean(load).item()
+            load_stddev = np.std(load).item()
+            load_sum = np.sum(load).item()
+            return (load_mean / load_stddev) * load_sum
+        else:
+            return None
+
+    def is_strain_spiking(self, attribute_name, training_cycles):
+        strain_list = list(getattr(c, attribute_name) for c in training_cycles
+                           if getattr(c, attribute_name) is not None)
+        if strain_list is not None:
+            strain_stddev = np.std(strain_list)
+            strain_mean = np.mean(strain_list)
+            if (training_cycles[0].strain - strain_mean) / strain_stddev > 1.2:
+                return True
+            else:
+                return False
+        else:
+            return False
+
+    def adjust_bump_up_session_intensity(self, bump_up_session, load_gap):
+
+        # assuming RPE and minutes have already been set
+        if (load_gap.external_high_intensity_load is None
+                and load_gap.external_mod_intensity_load is None
+                and load_gap.external_low_intensity_load is None):
+            return bump_up_session
+        else:
+            high_percent = (load_gap.external_high_intensity_load /
+                            (load_gap.external_high_intensity_load +
+                             load_gap.external_mod_intensity_load +
+                             load_gap.external_low_intensity_load))
+            mod_percent = (load_gap.external_mod_intensity_load /
+                           (load_gap.external_high_intensity_load +
+                            load_gap.external_mod_intensity_load +
+                            load_gap.external_low_intensity_load))
+            low_percent = (load_gap.external_low_intensity_load /
+                           (load_gap.external_high_intensity_load +
+                            load_gap.external_mod_intensity_load +
+                            load_gap.external_low_intensity_load))
+
+            temp_rpe = (high_percent * 8) + (mod_percent * 5) + (low_percent * 2)
+
+            current_internal_load = bump_up_session.session_RPE * bump_up_session.duration_minutes
+
+            bump_up_session.session_RPE = temp_rpe
+            bump_up_session.duration_minutes = current_internal_load / temp_rpe
+
+            # TODO: test this math!
+            bump_up_session.high_intensity_load = bump_up_session.external_load * high_percent
+            bump_up_session.mod_intensity_load = bump_up_session.external_load * mod_percent
+            bump_up_session.low_intensity_load = bump_up_session.external_load * low_percent
+            bump_up_session.high_intensity_minutes = bump_up_session.duration_minutes * high_percent
+            bump_up_session.mod_intensity_minutes = bump_up_session.duration_minutes * mod_percent
+            bump_up_session.low_intensity_minutes = bump_up_session.duration_minutes * low_percent
+            bump_up_session.high_intensity_RPE = 8
+            bump_up_session.mod_intensity_RPE = 5
+            bump_up_session.low_intensity_RPE = 2
+
+            return bump_up_session
+
+    def get_bump_up_sessions(self, training_history, load_gap):
+
+        bump_up_sessions = []  # returns an array of bump up sessions
+        training_sessions = training_history.training_cycles[0].sessions
+
+        # monotony = weekly mean total load/weekly standard deviation of load
+        # In order to increase the standard deviation of a set of numbers, you must add a value that is more than
+        # one standard deviation away from the mean
+
+        internal_load_available = load_gap.internal_total_load
+
+        if internal_load_available <= 0:
+            return None
+
+        internal_external_load_ratio = training_history.weighted_internal_external_load_ratio()
+
+        # we can adjust/replace the existing bump-up session since it hasn't been completed yet
+        current_bump_up_count = len(
+            [t for t in training_sessions if t.session_type is session.SessionType.bump_up and t.estimated])
+
+        max_sessions = 4 - current_bump_up_count
+
+        internal_load_values = list(x.internal_load() for x in training_sessions if x.internal_load() is not None)
+        internal_load_mean = np.mean(internal_load_values).item()
+        internal_load_median = np.median(internal_load_values).item()
+        internal_load_stddev = np.std(internal_load_values).item()
+
+        for s in range(0, max_sessions):
+
+            if internal_load_median > internal_load_mean:  # if it's biased toward higher loads
+                internal_target_value = min(internal_load_mean - (internal_load_stddev * 1.10), internal_load_available)
+            else:
+                internal_target_value = min(internal_load_stddev * 1.05, internal_load_available)
+
+            bump_up_session = session.BumpUpSession()
+
+            # let's begin with a max RPE allowed of 5
+            target_rpe = 5
+            target_minutes = internal_target_value / target_rpe
+
+            if target_minutes < 10:
+                # scale up the minutes
+                target_minutes = 10
+                target_rpe = max(internal_target_value / target_minutes, 2)  # we don't want target RPE < 2
+                target_rpe = min(target_rpe, 8)  # we don't want target RPE > 8
+            elif target_minutes > 30:
+                target_minutes = 30
+                target_rpe = min(internal_target_value / target_minutes, 8)  # we don't want target RPE > 8
+
+            internal_target_value = target_minutes * target_rpe
+
+            bump_up_session.session_RPE = target_rpe
+            bump_up_session.duration_minutes = target_minutes
+
+            bump_up_session.external_load = internal_target_value / internal_external_load_ratio
+
+            bump_up_session.estimated = True
+            bump_up_session.internal_load_imputed = False
+            bump_up_session.external_load_imputed = True
+
+            bump_up_session = self.adjust_bump_up_session_intensity(bump_up_session, load_gap)
+
+            bump_up_sessions.append(bump_up_session)
+
+            internal_load_values.append(max(internal_target_value, 0))
+
+            internal_load_available = internal_load_available - internal_target_value
+
+            internal_load_mean = np.mean(internal_load_values).item()
+            internal_load_median = np.median(internal_load_values).item()
+            internal_load_stddev = np.std(internal_load_values).item()
+            monotony = internal_load_mean / internal_load_stddev
+            if monotony < 2 and internal_load_available == 0:
+                break
+
+        return bump_up_sessions
+
+    def get_load_gap(self, training_cycles, exclude_bump_up_sessions):
+
+        load_gap = LoadGap()
+
+        acute_external_load, chronic_external_load = \
+            self.get_acute_chronic_load("external_load", training_cycles, True, exclude_bump_up_sessions)
+        load_gap.external_total_load = \
+            self.get_acute_load_gap(acute_external_load, chronic_external_load)
+
+        acute_external_high_load, chronic_external_high_load = \
+            self.get_acute_chronic_load("high_intensity_load", training_cycles, True, exclude_bump_up_sessions)
+        load_gap.external_high_intensity_load = \
+            self.get_acute_load_gap(acute_external_high_load, chronic_external_high_load)
+
+        acute_external_mod_load, chronic_external_mod_load = \
+            self.get_acute_chronic_load("mod_intensity_load", training_cycles, True, exclude_bump_up_sessions)
+        load_gap.external_mod_intensity_load = \
+            self.get_acute_load_gap(acute_external_mod_load, chronic_external_mod_load)
+
+        acute_external_low_load, chronic_external_low_load = \
+            self.get_acute_chronic_load("low_intensity_load", training_cycles, True, exclude_bump_up_sessions)
+        load_gap.external_low_intensity_load = \
+            self.get_acute_load_gap(acute_external_low_load, chronic_external_low_load)
+
+        acute_internal_load, chronic_internal_load = \
+            self.get_acute_chronic_load("internal_load", training_cycles, True, exclude_bump_up_sessions)
+        load_gap.internal_total_load = \
+            self.get_acute_load_gap(acute_internal_load, chronic_internal_load)
+
+        return load_gap
+
+    def get_acute_load_gap(self, acute_load, chronic_load):
+
+        """
+        returns positive or negative load gaps for the athlete for a given week.
+
+        If positive, the athlete should add load, if negative, the athlete is overreaching or over exerting and should
+        taper load
+
+        we use UNCOUPLED ACWR formula where the period of time used in the acute calculation is not included in the
+        period of time for the chronic calculation
+
+        acute_load = array of actual load values this week
+        chronic_load = array of previous 4 week averages of load (if contains Nones then acute_load represents totality of data)
+        REMOVED: expected_remaining_load = array of expected load amounts remaining this week
+
+        if we don't have at least 2 weeks of past data, we don't calculate load gap
+
+        acwr = acute_load/chronic_load
+        expected_acwr = (acute_load + expected_load) / chronic_load
+        target_acwr = 1.45 = (acute_load + expected_load + target_load) / chronic_load
+
+        1.45 = (acute_load + expected_load + target_load) / chronic_load
+        (chronic_load * 1.45) = (acute_load + expected_load + x)
+        1.45 * chronic_load = (acute_load + expected_load + x)
+        (1.45 * chronic_load) - acute_load - expected_load =  x
+        """
+        getcontext().prec = 3
+        # acute_load.extend(expected_remaining_load)
+
+        adjusted_acute_load = list(a for a in acute_load if a is not None)
+
+        acute_load_sum = Decimal(np.sum(adjusted_acute_load).item())
+
+        adjusted_chronic_load = list(c for c in chronic_load if c is not None)
+
+        if len(adjusted_chronic_load) < 2:
+            return None
+
+        else:
+            previous_weeks_load = adjusted_chronic_load[-1]
+
+            chronic_load_average = Decimal(np.mean(adjusted_chronic_load).item())
+
+            target_load = (Decimal(1.45) * chronic_load_average) - acute_load_sum
+
+            # ensure ramp does exceed 10%
+            target_max = max((Decimal(1.10) * previous_weeks_load) - acute_load_sum, 0)
+
+            target_load = min(target_max, target_load)
+
+        return target_load

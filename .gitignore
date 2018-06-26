@@ -2,6 +2,7 @@
 
 apigateway/*
 !apigateway/*.py
+!apigateway/logic/
 !apigateway/models
 !apigateway/pip_requirements
 !apigateway/routes
