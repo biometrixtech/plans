@@ -1,7 +1,14 @@
 {
     "templates": [
+        { "s3_filename": "plans-environment.yaml", "src": "cloudformation/plans-environment.yaml" }
     ],
     "lambdas": [
+        {
+            "name": "plans-{ENVIRONMENT}-apigateway-execute",
+            "s3_filename": "apigateway.zip",
+            "src": "apigateway",
+            "pip": true
+        }
     ],
     "datastores": [
     ]

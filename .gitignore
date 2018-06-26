@@ -1,1 +1,7 @@
 *.zip
+
+apigateway/*
+!apigateway/*.py
+!apigateway/models
+!apigateway/pip_requirements
+!apigateway/routes
