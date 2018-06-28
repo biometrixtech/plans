@@ -1,6 +1,6 @@
 import abc
 from enum import Enum
-
+import uuid
 
 class SessionType(Enum):
     practice = 0
@@ -14,6 +14,7 @@ class SessionType(Enum):
 
 class Session(metaclass=abc.ABCMeta):
     def __init__(self):
+        self.id = None
         self.duration_minutes = None
         self.external_load = None
         self.high_intensity_load = None
@@ -25,15 +26,16 @@ class Session(metaclass=abc.ABCMeta):
         self.high_intensity_RPE = None
         self.mod_intensity_RPE = None
         self.low_intensity_RPE = None
-        self.readiness = None
-        self.pre_session_soreness = []  # pre_session_soreness object array
         self.post_session_soreness = []     # post_session_soreness object array
-        self.sleep_quality = None
         self.date = None
         self.time = None
+        self.day_of_week = None
         self.estimated = False
         self.internal_load_imputed = False
         self.external_load_imputed = False
+        self.data_transferred = False
+        self.movement_limited = False
+        self.same_muscle_discomfort_over_72_hrs = False
 
         # post-session
         self.session_RPE = None
@@ -45,11 +47,37 @@ class Session(metaclass=abc.ABCMeta):
     def session_type(self):
         return SessionType.practice
 
+    @abc.abstractmethod
+    def create(self):
+        return None
+
+    @abc.abstractmethod
+    def missing_post_session_survey(self):
+        if self.session_RPE is None:
+            return True
+        elif self.post_session_soreness is None and (self.movement_limited or self.same_muscle_discomfort_over_72_hrs):
+            return True
+        else:
+            return False
+
+    @abc.abstractmethod
+    def in_daily_plan(self, date):
+        if self.date == date:
+            return True
+        else:
+            return False
+
     def internal_load(self):
         if self.session_RPE is not None and self.duration_minutes is not None:
             return self.session_RPE * self.duration_minutes
         else:
             return None
+
+    def missing_sensor_data(self):
+        if self.data_transferred:
+            return False
+        else:
+            return True
 
 
 class BumpUpSession(Session):
@@ -60,6 +88,20 @@ class BumpUpSession(Session):
     def session_type(self):
         return SessionType.bump_up
 
+    def create(self):
+        new_session = BumpUpSession()
+        new_session.id = uuid.uuid4()
+        return new_session
+
+    def missing_post_session_survey(self):
+        return Session.missing_post_session_survey()
+
+    def in_daily_plan(self, date):
+        if self.date >= date:
+            return True
+        else:
+            return False
+
 
 class PracticeSession(Session):
     def __init__(self):
@@ -67,6 +109,17 @@ class PracticeSession(Session):
 
     def session_type(self):
         return SessionType.practice
+
+    def create(self):
+        new_session = PracticeSession()
+        new_session.id = uuid.uuid4()
+        return new_session
+
+    def missing_post_session_survey(self):
+        return Session.missing_post_session_survey()
+
+    def in_daily_plan(self, date):
+        return Session.in_daily_plan(date)
 
 
 class StrengthConditioningSession(Session):
@@ -76,6 +129,17 @@ class StrengthConditioningSession(Session):
     def session_type(self):
         return SessionType.strength_and_conditioning
 
+    def create(self):
+        new_session = StrengthConditioningSession()
+        new_session.id = uuid.uuid4()
+        return new_session
+
+    def missing_post_session_survey(self):
+        return Session.missing_post_session_survey()
+
+    def in_daily_plan(self, date):
+        return Session.in_daily_plan(date)
+
 
 class Game(Session):
     def __init__(self):
@@ -84,15 +148,41 @@ class Game(Session):
     def session_type(self):
         return SessionType.game
 
+    def create(self):
+        new_session = Game()
+        new_session.id = uuid.uuid4()
+        return new_session
+
+    def missing_post_session_survey(self):
+        return Session.missing_post_session_survey()
+
+    def in_daily_plan(self, date):
+        return Session.in_daily_plan(date)
+
 
 class Tournament(Session):
     def __init__(self):
         Session.__init__(self)
+        self.start_date = None
+        self.end_date = None
         self.games = []
 
     def session_type(self):
         return SessionType.tournament
 
+    def create(self):
+        new_session = Tournament()
+        new_session.id = uuid.uuid4()
+        return new_session
+
+    def missing_post_session_survey(self):
+        return Session.missing_post_session_survey()
+
+    def in_daily_plan(self, date):
+        if self.start_date <= date <= self.end_date:
+            return True
+        else:
+            return False
 
 class CorrectiveSession(Session):
     def __init__(self):
@@ -101,6 +191,23 @@ class CorrectiveSession(Session):
 
     def session_type(self):
         return SessionType.corrective
+
+    def create(self):
+        new_session = CorrectiveSession()
+        new_session.id = uuid.uuid4()
+        return new_session
+
+    def missing_post_session_survey(self):
+        if self.session_RPE is None:
+            return True
+        else:
+            return False
+
+    def in_daily_plan(self, date):
+        if self.date >= date:
+            return True
+        else:
+            return False
 
 
 class GlobalLoadEstimationParameters(object):
@@ -120,5 +227,3 @@ class SessionLoadEstimationParameter(GlobalLoadEstimationParameters):
     def __init__(self):
         GlobalLoadEstimationParameters.__init__()
         self.session_type = SessionType.practice
-
-

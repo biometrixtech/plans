@@ -1,6 +1,29 @@
 import numpy as np
 from decimal import Decimal, getcontext
+from datetime import datetime
 import session
+
+
+class DailyPlan(object):
+
+    def __init__(self, date):
+        self.date = date
+        self.practice_sessions = []
+        self.strength_conditioning_sessions = []  # includes cross training
+        self.games = []
+        self.tournaments = []
+        self.long_term_recovery_modalities = []
+        self.corrective_sessions = []
+        self.bump_up_sessions = []
+        self.daily_readiness_survey = None
+        self.updated = False
+        self.last_updated = None
+
+    def daily_readiness_survey_completed(self):
+        if self.daily_readiness_survey is not None:
+            return True
+        else:
+            return False
 
 
 class TrainingCycle(object):
@@ -10,14 +33,8 @@ class TrainingCycle(object):
         self.start_date = None
         self.end_date = None
         self.sessions = []  # store all sessions here. if needed, create session arrays as methods that query on type
-        self.long_term_recovery = None
-        # self.practice_sessions = []
-        # self.strength_conditioning_sessions = []  # includes cross training
-        # self.games = []
-        # self.tournaments = []
-        # self.long_term_recovery_sessions = []
-        # self.corrective_sessions = []
-        # self.bump_up_sessions = []
+        self.long_term_recovery_modalities = []
+        self.daily_readiness_surveys = []
 
     def internal_monotony(self):
         return self.calculator.get_monotony("internal_load", self.sessions)
@@ -79,6 +96,30 @@ class TrainingCycle(object):
         total_minutes = list(x.duration_minutes for x in self.sessions if x.duration_minutes is not None)
         total_minutes_sum = np.sum(total_minutes)
         return total_minutes_sum / 60
+
+    def get_daily_plan(self, date):
+        daily_plan = DailyPlan(date)
+        sessions = list(s for s in self.sessions if s.in_daily_plan(date))  # assumes these are datetimes
+
+        recovery_modalities = list(r for r in self.long_term_recovery_modalities if r.in_daily_plan(date))
+
+        for s in sessions:
+            if isinstance(s, session.PracticeSession):
+                daily_plan.practice_sessions.append(s)
+            elif isinstance(s, session.BumpUpSession):
+                daily_plan.bump_up_sessions.append(s)
+            elif isinstance(s, session.Game):
+                daily_plan.games.append(s)
+            elif isinstance(s, session.CorrectiveSession):
+                daily_plan.corrective_sessions.append(s)
+            elif isinstance(s, session.StrengthConditioningSession):
+                daily_plan.strength_conditioning_sessions.append(s)
+            elif isinstance(s, session.Tournament):
+                daily_plan.tournaments.append(s)
+
+        daily_plan.long_term_recovery_modalities.extend(recovery_modalities)
+
+        return daily_plan
 
 
 class TrainingHistory(object):
@@ -350,33 +391,13 @@ class TrainingHistory(object):
 
         return training_session
 
-    def recalculate_current_training_cycle(self):
 
-        calc = Calculator()
+class DailyReadinessSurvey(object):
 
-        training_cycle = self.training_cycles[0]
-
-        # update expected load, etc for the week
-        self.impute_load()
-
-        # add any training modifications?
-
-        # do we need to add, change or delete long-term recovery modalities?
-        # if fatiguing, certainly need to add certain modalities
-        if self.is_athlete_fatiguing():
-            j = 0
-
-        # do we need to add, change or delete corrective exercises?
-
-        # do we need to add, change or delete bump-up sessions?
-
-        load_gap = self.current_load_gap()
-        if load_gap.exists():
-
-            # TODO: what if the user has already seleceted exercises for a bump-up session?  should we preserve?
-            bump_up_sessions = calc.get_bump_up_sessions(self.training_cycles, load_gap)
-
-            # ^ do we need to replace existing? add to the list or blow out all estimated and redo?
+    def __init__(self):
+        self.pre_session_soreness = []  # pre_session_soreness object array
+        self.sleep_quality = None
+        self.readiness = None
 
 
 class LoadGap(object):
