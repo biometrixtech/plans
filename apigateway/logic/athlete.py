@@ -2,11 +2,11 @@ import abc
 from enum import Enum, IntEnum
 import soreness_and_injury
 import exercise
+import session
 
 
 class Athlete(metaclass=abc.ABCMeta):
     def __init__(self):
-        self.level = AthleteLevel.recreational
         self.goals = AthleteGoals.improved_performance
         self.full_name = ""
         self.email = ""
@@ -15,7 +15,7 @@ class Athlete(metaclass=abc.ABCMeta):
         self.height = 0
         self.weight = 0
         self.sports = []
-        self.injuries = []  # collection of Injury objects
+        self.injury_history = []  # collection of Injury objects
 
     @abc.abstractmethod
     def max_exercise_technical_difficulty(self):
@@ -29,7 +29,7 @@ class AgeGroup(Enum):
     Adult = 3
 
 
-class AthleteLevel(IntEnum):
+class SportLevel(IntEnum):
     recreational = 0
     high_school = 1
     club_travel = 2
@@ -46,7 +46,17 @@ class AthleteGoals(Enum):
     return_from_injury = 2
 
 
-class Sport(Enum):
+class Sport(object):
+
+    def __init__(self):
+        self.name = None
+        self.level = SportLevel.recreational
+        self.season_start_date = None
+        self.season_end_date = None
+        self.typical_schedule = session.Schedule()
+
+
+class SportName(Enum):
     basketball = 0
     baseball_softball = 1
     cross_country = 2
@@ -69,25 +79,25 @@ class Sport(Enum):
     weightlifting = 19
 
 
-class YouthAthlete(athlete):
+class YouthAthlete(Athlete):
     def __init(self, level=None):
-        athlete.__init__(self, level)
+        Athlete.__init__(self, level)
 
     def max_exercise_technical_difficulty(self):
         return exercise.TechnicalDifficulty.beginner
 
 
-class CollegeAthlete(athlete):
+class CollegeAthlete(Athlete):
     def __init(self, level=None):
-        athlete.__init__(self, level)
+        Athlete.__init__(self, level)
     
     def max_exercise_technical_difficulty(self):
         return exercise.TechnicalDifficulty.beginner
 
 
-class AdultAthlete(athlete):
+class AdultAthlete(Athlete):
     def __init(self, level=None):
-        athlete.__init__(self, level)
+        Athlete.__init__(self, level)
 
     def max_exercise_technical_difficulty(self):
         return exercise.TechnicalDifficulty.beginner

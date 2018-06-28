@@ -12,7 +12,7 @@ class DailyPlan(object):
         self.strength_conditioning_sessions = []  # includes cross training
         self.games = []
         self.tournaments = []
-        self.long_term_recovery_modalities = []
+        self.recovery_modalities = []
         self.corrective_sessions = []
         self.bump_up_sessions = []
         self.daily_readiness_survey = None
@@ -33,7 +33,7 @@ class TrainingCycle(object):
         self.start_date = None
         self.end_date = None
         self.sessions = []  # store all sessions here. if needed, create session arrays as methods that query on type
-        self.long_term_recovery_modalities = []
+        self.recovery_modalities = []
         self.daily_readiness_surveys = []
 
     def internal_monotony(self):
@@ -101,7 +101,7 @@ class TrainingCycle(object):
         daily_plan = DailyPlan(date)
         sessions = list(s for s in self.sessions if s.in_daily_plan(date))  # assumes these are datetimes
 
-        recovery_modalities = list(r for r in self.long_term_recovery_modalities if r.in_daily_plan(date))
+        recovery_modalities = list(r for r in self.recovery_modalities if r.in_daily_plan(date))
 
         for s in sessions:
             if isinstance(s, session.PracticeSession):
@@ -117,9 +117,17 @@ class TrainingCycle(object):
             elif isinstance(s, session.Tournament):
                 daily_plan.tournaments.append(s)
 
-        daily_plan.long_term_recovery_modalities.extend(recovery_modalities)
+        daily_plan.recovery_modalities.extend(recovery_modalities)
 
         return daily_plan
+
+    def get_last_daily_readiness_survey(self):
+
+        readiness_count = len(self.daily_readiness_surveys)
+        if readiness_count == 0:
+            return  None
+        else:
+            return self.daily_readiness_surveys[readiness_count - 1]
 
 
 class TrainingHistory(object):
@@ -395,7 +403,8 @@ class TrainingHistory(object):
 class DailyReadinessSurvey(object):
 
     def __init__(self):
-        self.pre_session_soreness = []  # pre_session_soreness object array
+        self.date = None
+        self.soreness = []  # pre_session_soreness object array
         self.sleep_quality = None
         self.readiness = None
 
@@ -546,124 +555,6 @@ class Calculator(object):
                 return False
         else:
             return False
-
-    def adjust_bump_up_session_intensity(self, bump_up_session, load_gap):
-
-        # assuming RPE and minutes have already been set
-        if (load_gap.external_high_intensity_load is None
-                and load_gap.external_mod_intensity_load is None
-                and load_gap.external_low_intensity_load is None):
-            return bump_up_session
-        else:
-            high_percent = (load_gap.external_high_intensity_load /
-                            (load_gap.external_high_intensity_load +
-                             load_gap.external_mod_intensity_load +
-                             load_gap.external_low_intensity_load))
-            mod_percent = (load_gap.external_mod_intensity_load /
-                           (load_gap.external_high_intensity_load +
-                            load_gap.external_mod_intensity_load +
-                            load_gap.external_low_intensity_load))
-            low_percent = (load_gap.external_low_intensity_load /
-                           (load_gap.external_high_intensity_load +
-                            load_gap.external_mod_intensity_load +
-                            load_gap.external_low_intensity_load))
-
-            temp_rpe = (high_percent * 8) + (mod_percent * 5) + (low_percent * 2)
-
-            current_internal_load = bump_up_session.session_RPE * bump_up_session.duration_minutes
-
-            bump_up_session.session_RPE = temp_rpe
-            bump_up_session.duration_minutes = current_internal_load / temp_rpe
-
-            # TODO: test this math!
-            bump_up_session.high_intensity_load = bump_up_session.external_load * high_percent
-            bump_up_session.mod_intensity_load = bump_up_session.external_load * mod_percent
-            bump_up_session.low_intensity_load = bump_up_session.external_load * low_percent
-            bump_up_session.high_intensity_minutes = bump_up_session.duration_minutes * high_percent
-            bump_up_session.mod_intensity_minutes = bump_up_session.duration_minutes * mod_percent
-            bump_up_session.low_intensity_minutes = bump_up_session.duration_minutes * low_percent
-            bump_up_session.high_intensity_RPE = 8
-            bump_up_session.mod_intensity_RPE = 5
-            bump_up_session.low_intensity_RPE = 2
-
-            return bump_up_session
-
-    def get_bump_up_sessions(self, training_history, load_gap):
-
-        bump_up_sessions = []  # returns an array of bump up sessions
-        training_sessions = training_history.training_cycles[0].sessions
-
-        # monotony = weekly mean total load/weekly standard deviation of load
-        # In order to increase the standard deviation of a set of numbers, you must add a value that is more than
-        # one standard deviation away from the mean
-
-        internal_load_available = load_gap.internal_total_load
-
-        if internal_load_available <= 0:
-            return None
-
-        internal_external_load_ratio = training_history.weighted_internal_external_load_ratio()
-
-        # we can adjust/replace the existing bump-up session since it hasn't been completed yet
-        current_bump_up_count = len(
-            [t for t in training_sessions if t.session_type is session.SessionType.bump_up and t.estimated])
-
-        max_sessions = 4 - current_bump_up_count
-
-        internal_load_values = list(x.internal_load() for x in training_sessions if x.internal_load() is not None)
-        internal_load_mean = np.mean(internal_load_values).item()
-        internal_load_median = np.median(internal_load_values).item()
-        internal_load_stddev = np.std(internal_load_values).item()
-
-        for s in range(0, max_sessions):
-
-            if internal_load_median > internal_load_mean:  # if it's biased toward higher loads
-                internal_target_value = min(internal_load_mean - (internal_load_stddev * 1.10), internal_load_available)
-            else:
-                internal_target_value = min(internal_load_stddev * 1.05, internal_load_available)
-
-            bump_up_session = session.BumpUpSession()
-
-            # let's begin with a max RPE allowed of 5
-            target_rpe = 5
-            target_minutes = internal_target_value / target_rpe
-
-            if target_minutes < 10:
-                # scale up the minutes
-                target_minutes = 10
-                target_rpe = max(internal_target_value / target_minutes, 2)  # we don't want target RPE < 2
-                target_rpe = min(target_rpe, 8)  # we don't want target RPE > 8
-            elif target_minutes > 30:
-                target_minutes = 30
-                target_rpe = min(internal_target_value / target_minutes, 8)  # we don't want target RPE > 8
-
-            internal_target_value = target_minutes * target_rpe
-
-            bump_up_session.session_RPE = target_rpe
-            bump_up_session.duration_minutes = target_minutes
-
-            bump_up_session.external_load = internal_target_value / internal_external_load_ratio
-
-            bump_up_session.estimated = True
-            bump_up_session.internal_load_imputed = False
-            bump_up_session.external_load_imputed = True
-
-            bump_up_session = self.adjust_bump_up_session_intensity(bump_up_session, load_gap)
-
-            bump_up_sessions.append(bump_up_session)
-
-            internal_load_values.append(max(internal_target_value, 0))
-
-            internal_load_available = internal_load_available - internal_target_value
-
-            internal_load_mean = np.mean(internal_load_values).item()
-            internal_load_median = np.median(internal_load_values).item()
-            internal_load_stddev = np.std(internal_load_values).item()
-            monotony = internal_load_mean / internal_load_stddev
-            if monotony < 2 and internal_load_available == 0:
-                break
-
-        return bump_up_sessions
 
     def get_load_gap(self, training_cycles, exclude_bump_up_sessions):
 

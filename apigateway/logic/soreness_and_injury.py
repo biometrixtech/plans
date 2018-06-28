@@ -32,22 +32,25 @@ class InjuryDescriptor(Enum):
     other = 6
 
 
-class PreSessionSoreness(object):
+class Soreness(object):
+    def __init__(self):
+        self.type = None  # soreness_type
+        self.body_part = None
+
+
+class DailySoreness(Soreness):
 
     def __init__(self):
-        self.type = None    # soreness_type
         self.severity = None    # muscle_soreness_severity or joint_soreness_severity
-        self.body_part = None
+
         # self.descriptor = None  # soreness_descriptor
 
 
-class PostSessionSoreness(object):
+class PostSessionSoreness(Soreness):
 
     def __init__(self):
-        self.body_part = None
         self.discomfort_level = 0
         self.sustained_in_practice = False
-        self.type = None    # soreness_type
         self.limited_performance = 0
         self.limited_how_much_i_could_do = 0
 
@@ -97,5 +100,6 @@ class Injury(object):
     def __init__(self):
         self.body_part = None
         self.injury_type = None
+        self.injury_descriptor = None
         self.date = None
         self.days_missed = DaysMissedDueToInjury.less_than_7_days

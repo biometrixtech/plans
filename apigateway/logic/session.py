@@ -2,6 +2,7 @@ import abc
 from enum import Enum
 import uuid
 
+
 class SessionType(Enum):
     practice = 0
     strength_and_conditioning = 1
@@ -9,7 +10,16 @@ class SessionType(Enum):
     tournament = 3
     bump_up = 4
     corrective = 5
-    long_term_recovery = 6
+
+
+class DayOfWeek(Enum):
+    monday = 0
+    tuesday = 1
+    wednesday = 2
+    thursday = 3
+    friday = 4
+    saturday = 5
+    sunday = 6
 
 
 class Session(metaclass=abc.ABCMeta):
@@ -29,7 +39,7 @@ class Session(metaclass=abc.ABCMeta):
         self.post_session_soreness = []     # post_session_soreness object array
         self.date = None
         self.time = None
-        self.day_of_week = None
+        self.day_of_week = DayOfWeek.monday
         self.estimated = False
         self.internal_load_imputed = False
         self.external_load_imputed = False
@@ -227,3 +237,27 @@ class SessionLoadEstimationParameter(GlobalLoadEstimationParameters):
     def __init__(self):
         GlobalLoadEstimationParameters.__init__()
         self.session_type = SessionType.practice
+
+
+class Schedule(object):
+
+    def __init__(self):
+        self.athlete_id = ""
+        self.sessions = []
+
+    def add_sessions(self, sessions):
+        for new_session in sessions:
+            self.sessions.append(new_session)       # just placeholder logic
+
+    def delete_sessions(self, sessions):
+        for session_to_delete in sessions:
+            self.sessions.remove(session_to_delete)     # just placeholder logic
+
+    def update_session(self, updated_session):
+        self.sessions.remove(updated_session)  # just placeholder logic
+
+
+class ScheduleManager(object):
+
+    def get_typical_schedule(self, athlete_id, sport_id):
+        return Schedule

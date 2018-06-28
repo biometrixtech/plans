@@ -3,7 +3,7 @@ from enum import IntEnum
 import exercise
 
 
-class LongTermRecoveryModality(metaclass=abc.ABCMeta):
+class RecoveryModality(metaclass=abc.ABCMeta):
     def __init__(self):
         self.start_date_time = None
         self.end_date_time = None
@@ -21,9 +21,9 @@ class LongTermRecoveryModality(metaclass=abc.ABCMeta):
             return False
 
 
-class ActiveRecoveryExercise(LongTermRecoveryModality, exercise.Exercise):
+class ActiveRecoveryExercise(RecoveryModality, exercise.Exercise):
     def __init__(self):
-        LongTermRecoveryModality.__init__(self)
+        RecoveryModality.__init__(self)
         exercise.Exercise.__init__(self)
         self.soreness_triggers = []     # body parts triggering this exercise
         self.injury_history_triggers = []   # injuries triggering this exercise
@@ -34,9 +34,9 @@ class CompressionLevel(IntEnum):
     compression_sleeve_or_garment = 1
 
 
-class ActiveRecoveryCompression(LongTermRecoveryModality):
+class ActiveRecoveryCompression(RecoveryModality):
     def __init__(self):
-        LongTermRecoveryModality.__init__(self)
+        RecoveryModality.__init__(self)
         self.soreness_triggers = []     # body parts triggering this exercise
         self.injury_history_triggers = []   # injuries triggering this exercise
         self.compression_level = CompressionLevel.ace_bandage
@@ -47,32 +47,32 @@ class ColdTherapyLevel(IntEnum):
     tub_with_ice = 1
 
 
-class ActiveRecoveryColdTherapy(LongTermRecoveryModality):
+class ActiveRecoveryColdTherapy(RecoveryModality):
     def __init__(self):
-        LongTermRecoveryModality.__init__(self)
+        RecoveryModality.__init__(self)
         self.soreness_triggers = []
         self.cold_therapy_level = ColdTherapyLevel.ice_bag_ice_pack
 
 
-class NutritionRecommendation(LongTermRecoveryModality):
+class NutritionRecommendation(RecoveryModality):
     def __init__(self):
-        LongTermRecoveryModality.__init__(self)
+        RecoveryModality.__init__(self)
         self.acwr_triggered = False
         self.upcoming_sessions_triggered = False    # sessions = practices or competitions
         self.recommendation = ""
 
 
-class HydrationRecommendation(LongTermRecoveryModality):
+class HydrationRecommendation(RecoveryModality):
     def __init__(self):
-        LongTermRecoveryModality.__init__(self)
+        RecoveryModality.__init__(self)
         self.upcoming_sessions_triggered = False
         self.session_intensity_RPE_triggered = False
         self.recommendation = ""
 
 
-class SleepRecommendation(LongTermRecoveryModality):
+class SleepRecommendation(RecoveryModality):
     def __init__(self):
-        LongTermRecoveryModality.__init__(self)
+        RecoveryModality.__init__(self)
         self.upcoming_sessions_triggered = False
         self.session_intensity_RPE_triggered = False
         self.sleep_quality_triggered = False
