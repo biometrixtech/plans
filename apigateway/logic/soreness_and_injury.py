@@ -1,4 +1,4 @@
-from enum import Enum, IntEnum, auto
+from enum import Enum, IntEnum
 
 
 class SorenessType(Enum):
@@ -21,7 +21,7 @@ class JointSorenessSeverity(IntEnum):
     sharp_pain = 4
     inability_to_move = 5
 
-
+'''Deprecating
 class InjuryDescriptor(Enum):
     contusion = 0
     sprain = 1
@@ -30,12 +30,13 @@ class InjuryDescriptor(Enum):
     fracture = 4
     pain = 5
     other = 6
-
+'''
 
 class Soreness(object):
     def __init__(self):
         self.type = None  # soreness_type
         self.body_part = None
+        self.reported_date = None
 
 
 class DailySoreness(Soreness):
@@ -62,44 +63,48 @@ class InjuryStatus(Enum):
 
 
 class BodyPart(Enum):
-    head = auto()
-    shoulder = auto()
-    chest = auto()
-    abdominals = auto()
-    hip_flexor = auto()
-    groin = auto()
-    quads = auto()
-    knee = auto()
-    shin = auto()
-    ankle = auto()
-    foot = auto()
-    neck = auto()
-    upper_back = auto()
-    lower_back = auto()
-    glutes = auto()
-    hamstrings = auto()
-    calves = auto()
-    achilles = auto()
-
-
-class InjuryType(Enum):
-    muscle = auto()
-    ligament = auto()
-    tendon = auto()
-    bone = auto()
-
-
-class DaysMissedDueToInjury(IntEnum):
-    less_than_7_days = 0
-    one_four_weeks = 1
-    one_three_months = 2
+    head = 0
+    shoulder = 1
+    chest = 2
+    abdominals = 3
+    hip_flexor = 4
+    groin = 5
+    quads = 6
+    knee = 7
+    shin = 8
+    ankle = 9
+    foot = 10
+    neck = 11
+    upper_back = 12
+    lower_back = 13
+    glutes = 14
+    hamstrings = 15
+    calves = 16
+    achilles = 17
 
 
 class Injury(object):
 
     def __init__(self):
         self.body_part = None
-        self.injury_type = None
-        self.injury_descriptor = None
+        # self.injury_type = None
+        # self.injury_descriptor = None
         self.date = None
-        self.days_missed = DaysMissedDueToInjury.less_than_7_days
+        # self.days_missed = DaysMissedDueToInjury.less_than_7_days
+        self.still_have_symptoms = False
+        self.medically_cleared = True
+
+
+'''Deprecating
+class InjuryType(Enum):
+    muscle = auto()
+    ligament = auto()
+    tendon = auto()
+    bone = auto()
+'''
+'''Deprecating
+class DaysMissedDueToInjury(IntEnum):
+    less_than_7_days = 0
+    one_four_weeks = 1
+    one_three_months = 2
+'''

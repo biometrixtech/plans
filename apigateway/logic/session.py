@@ -23,6 +23,7 @@ class DayOfWeek(Enum):
 
 
 class Session(metaclass=abc.ABCMeta):
+
     def __init__(self):
         self.id = None
         self.duration_minutes = None

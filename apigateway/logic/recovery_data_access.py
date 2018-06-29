@@ -5,11 +5,10 @@ import soreness_and_injury
 
 class RecoveryDataAccess(object):
 
-    def get_exercises_for_soreness(self, soreness_list):
+    def get_exercises_for_soreness(self, soreness):
         exercises = []
-        for soreness in soreness_list:
-            body_part_exercises = self.get_exericses_for_soreness(soreness)
-            exercises.extend(body_part_exercises)
+        body_part_exercises = self.get_exericses_for_soreness(soreness)
+        exercises.extend(body_part_exercises)
         return exercises
 
     def get_exercises_for_injury_history(self, injury_history):

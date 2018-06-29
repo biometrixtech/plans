@@ -16,6 +16,7 @@ class Athlete(metaclass=abc.ABCMeta):
         self.weight = 0
         self.sports = []
         self.injury_history = []  # collection of Injury objects
+        self.assigned_exercises = []
 
     @abc.abstractmethod
     def max_exercise_technical_difficulty(self):
@@ -23,10 +24,10 @@ class Athlete(metaclass=abc.ABCMeta):
 
 
 class AgeGroup(Enum):
-    Unclassified = 0
-    Youth = 1
-    College = 2
-    Adult = 3
+    unclassified = 0
+    youth = 1
+    college = 2
+    adult = 3
 
 
 class SportLevel(IntEnum):

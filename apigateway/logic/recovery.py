@@ -4,10 +4,10 @@ import exercise
 
 
 class RecoveryModality(metaclass=abc.ABCMeta):
+
     def __init__(self):
         self.start_date_time = None
         self.end_date_time = None
-        self.expire_date_time = None
         # self.active_recovery_exercises = []
         # self.active_recovery_compressions = []
         # self.nutrition_recommendation = None

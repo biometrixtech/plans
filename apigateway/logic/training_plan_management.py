@@ -2,15 +2,15 @@ import recovery
 import athlete_data_access
 import recovery_data_access
 import training
-import schedule
 import session
 import numpy as np
+import datetime
 
 
 class TrainingPlanManager(object):
 
     def create_training_cycle(self, athlete_schedule, athlete_injury_history):
-        schedule_manager = schedule.ScheduleManager()
+        # schedule_manager = schedule.ScheduleManager()
         # athlete_schedule = schedule_manager.get_typical_schedule(athlete_id)
         training_cycle = training.TrainingCycle()
         # TODO set start and end dates of training_cycle
@@ -21,21 +21,47 @@ class TrainingPlanManager(object):
         # add recovery sessions based on athlete status and history
         training_cycle.recovery_modalities = self.get_recovery_sessions(athlete_injury_history, training_cycle)
 
-    def get_recovery_sessions(self, injury_history, training_cycle):
+    def get_recovery_start_end_times(self, trigger_date_time, recovery_number):
 
-        daily_readiness_survey = training_cycle.get_last_daily_readiness_survey()
+        start_time = None
+        end_time = None
+
+        if recovery_number == 0:
+
+            if trigger_date_time.hour < 12:
+
+                start_time = datetime.datetime(trigger_date_time.year, trigger_date_time.month, trigger_date_time.day,
+                                               0, 0, 0)
+                end_time = datetime.datetime(trigger_date_time.year, trigger_date_time.month, trigger_date_time.day,
+                                             12, 0, 0)
+            if trigger_date_time.hour >= 12:
+                start_time = datetime.datetime(trigger_date_time.year, trigger_date_time.month,
+                                               trigger_date_time.day,
+                                               19, 0, 0)
+                end_time = datetime.datetime(trigger_date_time.year, trigger_date_time.month, trigger_date_time.day,
+                                             24, 0, 0)
+        return start_time, end_time
+
+    def get_recovery_sessions(self, trigger_date_time, soreness_list):
+
+        # daily_readiness_survey = training_cycle.get_last_daily_readiness_survey()
         recovery_exercises = []
 
         # ACTIVE RECOVERY EXERCISES
         # pre session soreness
-        soreness_exercises = recovery_data_access.RecoveryDataAccess.get_exercises_for_soreness(daily_readiness_survey.pre_session_soreness)
-        recovery_exercises.extend(soreness_exercises)
+
+        # need to treat each soreness report separately because it could have different report dates, etc
+        for soreness in soreness_list:
+            soreness_exercises = recovery_data_access.RecoveryDataAccess.get_exercises_for_soreness(soreness)
+            recovery_exercises.extend(soreness_exercises)
+
+
 
         # post session soreness??
 
         # injury history
-        injury_exercises = recovery_data_access.RecoveryDataAccess.get_exercises_for_injury_history(injury_history)
-        recovery_exercises.extend(injury_exercises)
+        # injury_exercises = recovery_data_access.RecoveryDataAccess.get_exercises_for_injury_history(injury_history)
+        # recovery_exercises.extend(injury_exercises)
 
         # COMPRESSION
 

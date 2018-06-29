@@ -40,21 +40,31 @@ class Exercise(object):
         self.max_reps = None
         self.min_sets = None
         self.max_sets = None
-        self.number_assigned = 0
-        self.number_completed = 0
+        self.bilateral = False
+        self.progression_interval = 0
+        self.exposure_target = 0
+        self.unit_of_measure = UnitOfMeasure.seconds
+        self.seconds_rest_between_sets = 0
+        self.time_per_set = 0
+        self.progresses_to = None   # another exercise if it progresses to another
+
         self.technical_difficulty = TechnicalDifficulty.beginner
         self.program_type = ProgramType.comprehensive_warm_up
         self.exercise_phase = Phase.inhibit
-        self.bilateral = False
-        self.progression_interval = 0
-        self.progression_cadence = 0
-        self.unit_of_measure = UnitOfMeasure.seconds
-        self.seconds_rest_between_sets = 0
-        self.progresses_to = None   # another exercise if it progresses to another
-        self.tempo = eTempo.controlled
+
+        self.tempo = Tempo.controlled
         self.cues = ""
         self.procedure = ""
         self.goal = ""
-        self.selected = False   # athlete is given many optional exercises, this is true if they select a specific one
 
 
+class AssignedExercise(Exercise):
+
+    def __init__(self):
+        Exercise.__init__()
+        self.athlete_id = ""
+        self.reps_assigned = 0
+        self.sets_assigned = 0
+        self.exposures_completed = 0
+        self.last_completed_date = None
+        self.expire_date_time = None
