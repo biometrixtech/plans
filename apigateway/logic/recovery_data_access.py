@@ -58,19 +58,23 @@ class RecoveryDataAccess(object):
 
             # Follow NASM recommended inhibit -> lengthen -> activate -> integrate
             exercise_1 = exercise.Exercise()
-            exercise_1.name = "SMR - Gastrocnemius/Soleus"
+            exercise_1.name = "SMR - Calves"
+            exercise_1.exercise_phase = exercise.Phase.inhibit
             exercises.append(exercise_1)
 
             exercise_2 = exercise.Exercise()
             exercise_2.name = "Gastrocnemius Static Stretch"
+            exercise_2.exercise_phase = exercise.Phase.lengthen
             exercises.append(exercise_2)
 
             exercise_3 = exercise.Exercise()
             exercise_3.name = "Resisted Ankle Dorsiflexion"
+            exercise_3.exercise_phase = exercise.Phase.activate
             exercises.append(exercise_3)
 
             exercise_4 = exercise.Exercise()
             exercise_4.name = "Ball Squats"    # progression!
+            exercise_4.exercise_phase = exercise.Phase.integrate
             exercises.append(exercise_4)
 
             return exercises

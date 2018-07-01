@@ -5,6 +5,7 @@ import training
 import session
 import numpy as np
 import datetime
+import exercise
 
 
 class TrainingPlanManager(object):
@@ -38,14 +39,74 @@ class TrainingPlanManager(object):
                 start_time = datetime.datetime(trigger_date_time.year, trigger_date_time.month,
                                                trigger_date_time.day,
                                                19, 0, 0)
-                end_time = datetime.datetime(trigger_date_time.year, trigger_date_time.month, trigger_date_time.day,
-                                             24, 0, 0)
+                next_date = trigger_date_time + datetime.timedelta(days=1)
+                end_time = datetime.datetime(trigger_date_time.year, trigger_date_time.month,
+                                             next_date.day,
+                                             0, 0, 0)
+
+        elif recovery_number == 1:
+
+            if trigger_date_time.hour < 12:
+                start_time = datetime.datetime(trigger_date_time.year, trigger_date_time.month,
+                                               trigger_date_time.day,
+                                               19, 0, 0)
+                next_date = trigger_date_time + datetime.timedelta(days=1)
+                end_time = datetime.datetime(trigger_date_time.year, trigger_date_time.month,
+                                             next_date.day,
+                                             0, 0, 0)
+            if trigger_date_time.hour >= 12:
+                next_date = trigger_date_time + datetime.timedelta(days=1)
+                start_time = datetime.datetime(trigger_date_time.year, trigger_date_time.month, next_date.day,
+                                               0, 0, 0)
+                end_time = datetime.datetime(trigger_date_time.year, trigger_date_time.month, next_date.day,
+                                             12, 0, 0)
+
+        elif recovery_number == 2:
+            next_date = trigger_date_time + datetime.timedelta(days=1)
+            if trigger_date_time.hour < 12:
+
+                start_time = datetime.datetime(trigger_date_time.year, trigger_date_time.month, next_date.day,
+                                               0, 0, 0)
+                end_time = datetime.datetime(trigger_date_time.year, trigger_date_time.month, next_date.day,
+                                             12, 0, 0)
+
+            if trigger_date_time.hour >= 12:
+
+                start_time = datetime.datetime(trigger_date_time.year, trigger_date_time.month,
+                                               next_date.day,
+                                               19, 0, 0)
+                next_date = next_date + datetime.timedelta(days=1)
+                end_time = datetime.datetime(trigger_date_time.year, trigger_date_time.month,
+                                             next_date.day,
+                                             0, 0, 0)
+
+        elif recovery_number == 3:
+            next_date = trigger_date_time + datetime.timedelta(days=1)
+            if trigger_date_time.hour < 12:
+                start_time = datetime.datetime(trigger_date_time.year, trigger_date_time.month, next_date.day,
+                                               19, 0, 0)
+                next_date = next_date + datetime.timedelta(days=1)
+                end_time = datetime.datetime(trigger_date_time.year, trigger_date_time.month, next_date.day,
+                                             0, 0, 0)
+
+            if trigger_date_time.hour >= 12:
+                next_date = trigger_date_time + datetime.timedelta(days=2)
+                start_time = datetime.datetime(trigger_date_time.year, trigger_date_time.month,
+                                               next_date.day,
+                                               0, 0, 0)
+                end_time = datetime.datetime(trigger_date_time.year, trigger_date_time.month,
+                                             next_date.day,
+                                             12, 0, 0)
+
         return start_time, end_time
 
     def get_recovery_sessions(self, trigger_date_time, soreness_list):
 
         # daily_readiness_survey = training_cycle.get_last_daily_readiness_survey()
-        recovery_exercises = []
+        inhibit_exercise_assignments = []
+        lengthen_exercise_assignments = []
+        activate_exercise_assignments = []
+        integrate_exercise_assignments = []
 
         # ACTIVE RECOVERY EXERCISES
         # pre session soreness
@@ -53,7 +114,8 @@ class TrainingPlanManager(object):
         # need to treat each soreness report separately because it could have different report dates, etc
         for soreness in soreness_list:
             soreness_exercises = recovery_data_access.RecoveryDataAccess.get_exercises_for_soreness(soreness)
-            recovery_exercises.extend(soreness_exercises)
+
+            # recovery_exercises.extend(soreness_exercises)
 
 
 
@@ -71,7 +133,8 @@ class TrainingPlanManager(object):
 
         # HYDRATION
 
-        return recovery_exercises
+        # return recovery_exercises
+
 
     def recalculate_current_training_cycle(self, training_history):
 

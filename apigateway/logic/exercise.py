@@ -1,4 +1,6 @@
+import abc
 from enum import Enum, IntEnum
+import soreness_and_injury
 
 
 class TechnicalDifficulty(IntEnum):
@@ -32,7 +34,13 @@ class Tempo(Enum):
     controlled = 0
 
 
-class Exercise(object):
+class ExercisePriority(IntEnum):
+    present = 0
+    high = 1
+    avoid = 2
+
+
+class Exercise(metaclass=abc.ABCMeta):
     def __init__(self):
         self.name = ""
         self.body_parts_targeted = []
@@ -50,21 +58,116 @@ class Exercise(object):
 
         self.technical_difficulty = TechnicalDifficulty.beginner
         self.program_type = ProgramType.comprehensive_warm_up
-        self.exercise_phase = Phase.inhibit
 
         self.tempo = Tempo.controlled
         self.cues = ""
         self.procedure = ""
         self.goal = ""
 
+    @abc.abstractmethod
+    def exercise_phase(self):
+        return Phase.inhibit
 
-class AssignedExercise(Exercise):
 
+class InhibitExercise(Exercise):
     def __init__(self):
         Exercise.__init__()
+
+    def exercise_phase(self):
+        return Phase.inhibit
+
+
+class LengthenExercise(Exercise):
+    def __init__(self):
+        Exercise.__init__()
+
+    def exercise_phase(self):
+        return Phase.lengthen
+
+
+class ActivateExercise(Exercise):
+    def __init__(self):
+        Exercise.__init__()
+
+    def exercise_phase(self):
+        return Phase.activate
+
+
+class IntegrateExercise(Exercise):
+    def __init__(self):
+        Exercise.__init__()
+
+    def exercise_phase(self):
+        return Phase.integrate
+
+
+class RecommendedExercise(object):
+
+    def __init__(self):
+        self.exercise = None
         self.athlete_id = ""
         self.reps_assigned = 0
         self.sets_assigned = 0
         self.exposures_completed = 0
         self.last_completed_date = None
         self.expire_date_time = None
+        self.priority = ExercisePriority.neutral
+
+
+class ExerciseRecommendations(object):
+
+    def __init__(self):
+        self.recommended_inhibit_exercises = []
+        self.recommended_lengthen_exercises = []
+        self.recommended_activate_exercises = []
+        self.recommended_integrate_exercises = []
+
+    def update(self, soreness_severity, soreness_exercises):
+        for soreness_exercise in soreness_exercises:
+            exercise_assignment = RecommendedExercise()
+            exercise_assignment.exercise = soreness_exercise
+            exercise_assignment.priority = \
+                self.get_exercise_priority_from_soreness_level(soreness_severity,
+                                                               soreness_exercise.exercise_phase())
+
+            # TODO expand to accommodate if exercise already exists or if others already exist
+            if isinstance(soreness_exercise, InhibitExercise):
+                self.recommended_inhibit_exercises.append(exercise_assignment)
+            elif isinstance(soreness_exercise, LengthenExercise):
+                    self.recommended_lengthen_exercises.append(exercise_assignment)
+            elif isinstance(soreness_exercise, ActivateExercise):
+                    self.recommended_activate_exercises.append(exercise_assignment)
+            elif isinstance(soreness_exercise, IntegrateExercise):
+                    self.recommended_integrate_exercises.append(exercise_assignment)
+
+    def get_exercise_priority_from_soreness_level(self, soreness_level, exercise_phase):
+
+        exercise_priority = ExercisePriority
+
+        if exercise_phase == Phase.inhibit or exercise_phase == Phase.lengthen:
+
+            if soreness_level is None or soreness_level <= 1:
+                return exercise_priority.present
+            elif 2 <= soreness_level < 4:
+                return exercise_priority.high
+            else:
+                return exercise_priority.avoid
+
+        elif exercise_phase == Phase.activate:
+
+            if soreness_level is None or soreness_level <= 1:
+                return exercise_priority.present
+            elif soreness_level == 2:
+                return exercise_priority.high
+            elif soreness_level == 3:
+                return exercise_priority.present
+            else:
+                return exercise_priority.avoid
+
+        elif exercise_phase == Phase.integrate:
+
+            if soreness_level is None or soreness_level <= 3:
+                return exercise_priority.present
+            else:
+                return exercise_priority.avoid
+

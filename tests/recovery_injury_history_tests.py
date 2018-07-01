@@ -15,26 +15,184 @@ import training_plan_management as tpm
 
 # > 1 soreness
 
+# need to include days of no reporting by athlete within 72 hour window
+# need to include prioritization of exercises based on injury
 # date of update
 
-def test_get_morning_start_time():
-    date_time_trigger = datetime.datetime(2018, 6, 27, 11, 0, 0)
-    mgr = tpm.TrainingPlanManager()
-    start_time, end_time = mgr.get_recovery_start_end_times(date_time_trigger, 0)
-    assert start_time == datetime.datetime(2018, 6, 27, 0, 0, 0)
 
-def test_get_morning_end_time():
+def test_get_start_time_from_morning_trigger_recovery_0():
     date_time_trigger = datetime.datetime(2018, 6, 27, 11, 0, 0)
     mgr = tpm.TrainingPlanManager()
     start_time, end_time = mgr.get_recovery_start_end_times(date_time_trigger, 0)
-    assert end_time == datetime.datetime(2018, 6, 27, 12, 0, 0)
+    assert datetime.datetime(2018, 6, 27, 0, 0, 0) == start_time
+
+
+def test_get_end_time_from_morning_trigger_recovery_0():
+    date_time_trigger = datetime.datetime(2018, 6, 27, 11, 0, 0)
+    mgr = tpm.TrainingPlanManager()
+    start_time, end_time = mgr.get_recovery_start_end_times(date_time_trigger, 0)
+    assert datetime.datetime(2018, 6, 27, 12, 0, 0) == end_time
+
+
+def test_get_start_time_from_afternoon_trigger_recovery_0():
+    date_time_trigger = datetime.datetime(2018, 6, 27, 14, 0, 0)
+    mgr = tpm.TrainingPlanManager()
+    start_time, end_time = mgr.get_recovery_start_end_times(date_time_trigger, 0)
+    assert datetime.datetime(2018, 6, 27, 19, 0, 0) == start_time
+
+
+def test_get_end_time_from_afternoon_trigger_recovery_0():
+    date_time_trigger = datetime.datetime(2018, 6, 27, 14, 0, 0)
+    mgr = tpm.TrainingPlanManager()
+    start_time, end_time = mgr.get_recovery_start_end_times(date_time_trigger, 0)
+    assert datetime.datetime(2018, 6, 28, 0, 0, 0) == end_time
+
+
+def test_get_start_time_from_evening_trigger_recovery_0():
+    date_time_trigger = datetime.datetime(2018, 6, 27, 20, 0, 0)
+    mgr = tpm.TrainingPlanManager()
+    start_time, end_time = mgr.get_recovery_start_end_times(date_time_trigger, 0)
+    assert datetime.datetime(2018, 6, 27, 19, 0, 0) == start_time
+
+
+def test_get_end_time_from_evening_trigger_recovery_0():
+    date_time_trigger = datetime.datetime(2018, 6, 27, 20, 0, 0)
+    mgr = tpm.TrainingPlanManager()
+    start_time, end_time = mgr.get_recovery_start_end_times(date_time_trigger, 0)
+    assert datetime.datetime(2018, 6, 28, 0, 0, 0) == end_time
+
+
+def test_get_start_time_from_morning_trigger_recovery_1():
+    date_time_trigger = datetime.datetime(2018, 6, 27, 11, 0, 0)
+    mgr = tpm.TrainingPlanManager()
+    start_time, end_time = mgr.get_recovery_start_end_times(date_time_trigger, 1)
+    assert datetime.datetime(2018, 6, 27, 19, 0, 0) == start_time
+
+
+def test_get_end_time_from_morning_trigger_recovery_1():
+    date_time_trigger = datetime.datetime(2018, 6, 27, 11, 0, 0)
+    mgr = tpm.TrainingPlanManager()
+    start_time, end_time = mgr.get_recovery_start_end_times(date_time_trigger, 1)
+    assert datetime.datetime(2018, 6, 28, 0, 0, 0) == end_time
+
+
+def test_get_start_time_from_afternoon_trigger_recovery_1():
+    date_time_trigger = datetime.datetime(2018, 6, 27, 14, 0, 0)
+    mgr = tpm.TrainingPlanManager()
+    start_time, end_time = mgr.get_recovery_start_end_times(date_time_trigger, 1)
+    assert datetime.datetime(2018, 6, 28, 0, 0, 0) == start_time
+
+
+def test_get_end_time_from_afternoon_trigger_recovery_1():
+    date_time_trigger = datetime.datetime(2018, 6, 27, 14, 0, 0)
+    mgr = tpm.TrainingPlanManager()
+    start_time, end_time = mgr.get_recovery_start_end_times(date_time_trigger, 1)
+    assert datetime.datetime(2018, 6, 28, 12, 0, 0) == end_time
+
+
+def test_get_start_time_from_evening_trigger_recovery_1():
+    date_time_trigger = datetime.datetime(2018, 6, 27, 20, 0, 0)
+    mgr = tpm.TrainingPlanManager()
+    start_time, end_time = mgr.get_recovery_start_end_times(date_time_trigger, 1)
+    assert datetime.datetime(2018, 6, 28, 0, 0, 0) == start_time
+
+
+def test_get_end_time_from_evening_trigger_recovery_1():
+    date_time_trigger = datetime.datetime(2018, 6, 27, 20, 0, 0)
+    mgr = tpm.TrainingPlanManager()
+    start_time, end_time = mgr.get_recovery_start_end_times(date_time_trigger, 1)
+    assert datetime.datetime(2018, 6, 28, 12, 0, 0) == end_time
+
+
+def test_get_start_time_from_morning_trigger_recovery_2():
+    date_time_trigger = datetime.datetime(2018, 6, 27, 11, 0, 0)
+    mgr = tpm.TrainingPlanManager()
+    start_time, end_time = mgr.get_recovery_start_end_times(date_time_trigger, 2)
+    assert datetime.datetime(2018, 6, 28, 0, 0, 0) == start_time
+
+
+def test_get_end_time_from_morning_trigger_recovery_2():
+    date_time_trigger = datetime.datetime(2018, 6, 27, 11, 0, 0)
+    mgr = tpm.TrainingPlanManager()
+    start_time, end_time = mgr.get_recovery_start_end_times(date_time_trigger, 2)
+    assert datetime.datetime(2018, 6, 28, 12, 0, 0) == end_time
+
+
+def test_get_start_time_from_afternoon_trigger_recovery_2():
+    date_time_trigger = datetime.datetime(2018, 6, 27, 14, 0, 0)
+    mgr = tpm.TrainingPlanManager()
+    start_time, end_time = mgr.get_recovery_start_end_times(date_time_trigger, 2)
+    assert datetime.datetime(2018, 6, 28, 19, 0, 0) == start_time
+
+
+def test_get_end_time_from_afternoon_trigger_recovery_2():
+    date_time_trigger = datetime.datetime(2018, 6, 27, 14, 0, 0)
+    mgr = tpm.TrainingPlanManager()
+    start_time, end_time = mgr.get_recovery_start_end_times(date_time_trigger, 2)
+    assert datetime.datetime(2018, 6, 29, 0, 0, 0) == end_time
+
+
+def test_get_start_time_from_evening_trigger_recovery_2():
+    date_time_trigger = datetime.datetime(2018, 6, 27, 20, 0, 0)
+    mgr = tpm.TrainingPlanManager()
+    start_time, end_time = mgr.get_recovery_start_end_times(date_time_trigger, 2)
+    assert datetime.datetime(2018, 6, 28, 19, 0, 0) == start_time
+
+
+def test_get_end_time_from_evening_trigger_recovery_2():
+    date_time_trigger = datetime.datetime(2018, 6, 27, 20, 0, 0)
+    mgr = tpm.TrainingPlanManager()
+    start_time, end_time = mgr.get_recovery_start_end_times(date_time_trigger, 2)
+    assert datetime.datetime(2018, 6, 29, 0, 0, 0) == end_time
+
+
+def test_get_start_time_from_morning_trigger_recovery_3():
+    date_time_trigger = datetime.datetime(2018, 6, 27, 11, 0, 0)
+    mgr = tpm.TrainingPlanManager()
+    start_time, end_time = mgr.get_recovery_start_end_times(date_time_trigger, 3)
+    assert datetime.datetime(2018, 6, 28, 19, 0, 0) == start_time
+
+
+def test_get_end_time_from_morning_trigger_recovery_3():
+    date_time_trigger = datetime.datetime(2018, 6, 27, 11, 0, 0)
+    mgr = tpm.TrainingPlanManager()
+    start_time, end_time = mgr.get_recovery_start_end_times(date_time_trigger, 3)
+    assert datetime.datetime(2018, 6, 29, 0, 0, 0) == end_time
+
+
+def test_get_start_time_from_afternoon_trigger_recovery_3():
+    date_time_trigger = datetime.datetime(2018, 6, 27, 14, 0, 0)
+    mgr = tpm.TrainingPlanManager()
+    start_time, end_time = mgr.get_recovery_start_end_times(date_time_trigger, 3)
+    assert datetime.datetime(2018, 6, 29, 0, 0, 0) == start_time
+
+
+def test_get_end_time_from_afternoon_trigger_recovery_3():
+    date_time_trigger = datetime.datetime(2018, 6, 27, 14, 0, 0)
+    mgr = tpm.TrainingPlanManager()
+    start_time, end_time = mgr.get_recovery_start_end_times(date_time_trigger, 3)
+    assert datetime.datetime(2018, 6, 29, 12, 0, 0) == end_time
+
+
+def test_get_start_time_from_evening_trigger_recovery_3():
+    date_time_trigger = datetime.datetime(2018, 6, 27, 20, 0, 0)
+    mgr = tpm.TrainingPlanManager()
+    start_time, end_time = mgr.get_recovery_start_end_times(date_time_trigger, 3)
+    assert datetime.datetime(2018, 6, 29, 0, 0, 0) == start_time
+
+
+def test_get_end_time_from_evening_trigger_recovery_3():
+    date_time_trigger = datetime.datetime(2018, 6, 27, 20, 0, 0)
+    mgr = tpm.TrainingPlanManager()
+    start_time, end_time = mgr.get_recovery_start_end_times(date_time_trigger, 3)
+    assert datetime.datetime(2018, 6, 29, 12, 0, 0) == end_time
 
 
 '''Business related tests
 
 # am tests
 
-def get_recovery_for_no_injury_no_soreness():
+def get_recovery_for_no_injury_no_soreness():   # everyone should get some recovery, should be general in nature
 
 def get_recovery_for_no_injury_1_day_soreness():
 
