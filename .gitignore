@@ -1,6 +1,9 @@
 *.zip
 
 apigateway/*
+.idea/*
+apigateway/logic/__pycache__/*
+tests/.pytest_cache/
 !apigateway/*.py
 !apigateway/logic/
 !apigateway/models
