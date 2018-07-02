@@ -19,6 +19,10 @@ import training_plan_management as tpm
 # need to include prioritization of exercises based on injury
 # date of update
 
+# how does marking complete affect scoring?
+# how does the prioritization of exercise by body part play a role?
+# need to include short term events (7 days) and long term events (28 days)
+
 
 def test_get_start_time_from_morning_trigger_recovery_0():
     date_time_trigger = datetime.datetime(2018, 6, 27, 11, 0, 0)
