@@ -1,6 +1,5 @@
 import numpy as np
 from decimal import Decimal, getcontext
-from datetime import datetime
 import session
 
 
@@ -398,15 +397,6 @@ class TrainingHistory(object):
                 training_session.duration_minutes
 
         return training_session
-
-
-class DailyReadinessSurvey(object):
-
-    def __init__(self):
-        self.date = None
-        self.soreness = []  # pre_session_soreness object array
-        self.sleep_quality = None
-        self.readiness = None
 
 
 class LoadGap(object):

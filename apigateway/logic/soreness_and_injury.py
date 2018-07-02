@@ -108,3 +108,30 @@ class DaysMissedDueToInjury(IntEnum):
     one_four_weeks = 1
     one_three_months = 2
 '''
+
+
+class DailyReadinessSurvey(object):
+
+    def __init__(self):
+        self.date = None
+        self.soreness = []  # dailysoreness object array
+        self.sleep_quality = None
+        self.readiness = None
+
+
+class DailyReadinessSurveyHistory(object):
+
+    def __init__(self):
+        self.surveys = []
+
+    def get_soreness_summary(self):
+
+        soreness_list = []
+
+        # TODO add logic to create a ranked list of soreness by body part with a severity ranking/average
+
+        return soreness_list
+
+
+
+

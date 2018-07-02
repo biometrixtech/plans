@@ -103,21 +103,13 @@ class TrainingPlanManager(object):
     def get_recovery_sessions(self, trigger_date_time, soreness_list):
 
         # daily_readiness_survey = training_cycle.get_last_daily_readiness_survey()
-        inhibit_exercise_assignments = []
-        lengthen_exercise_assignments = []
-        activate_exercise_assignments = []
-        integrate_exercise_assignments = []
+        recommendations = exercise.ExerciseRecommendations()
 
         # ACTIVE RECOVERY EXERCISES
-        # pre session soreness
-
         # need to treat each soreness report separately because it could have different report dates, etc
         for soreness in soreness_list:
             soreness_exercises = recovery_data_access.RecoveryDataAccess.get_exercises_for_soreness(soreness)
-
-            # recovery_exercises.extend(soreness_exercises)
-
-
+            recommendations.update(soreness.severity, soreness_exercises)
 
         # post session soreness??
 

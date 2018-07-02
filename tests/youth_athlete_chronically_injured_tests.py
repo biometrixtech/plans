@@ -143,7 +143,7 @@ def create_athlete():
     test_athlete.injury_history.append(injury1)
     test_athlete.injury_history.append(injury2)
 
-    daily_readiness_survey = training.DailyReadinessSurvey()
+    daily_readiness_survey = soreness_and_injury.DailyReadinessSurvey()
     daily_readiness_survey.readiness = 4
     daily_readiness_survey.sleep_quality = 6
     daily_readiness_survey.date = todays_date
