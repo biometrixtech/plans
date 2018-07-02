@@ -16,7 +16,7 @@ from aws_xray_sdk.core.models.trace_header import TraceHeader
 patch_all()
 os.environ['LAMBDA_TASK_ROOT'] = lambda_task_root_key
 
-from exceptions import ApplicationException
+# from exceptions import ApplicationException
 from serialisable import json_serialise
 
 
