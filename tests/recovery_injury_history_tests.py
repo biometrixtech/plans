@@ -8,16 +8,12 @@ import training_plan_management as tpm
 # 10, 20, 30 min sessions, limit to 15 min
 
 # limit only to exercise library
-# maybe exclude unscheduled
+# unscheduled
 # maybe exclude injury altogether (maybe just include ACL later?) then > 1 injury
-
-# severity ranking
-
-# > 1 soreness
+# excluded 72 hour monitoring
 
 # need to include days of no reporting by athlete within 72 hour window
 # need to include prioritization of exercises based on injury
-# date of update
 
 # how does marking complete affect scoring?
 # how does the prioritization of exercise by body part play a role?

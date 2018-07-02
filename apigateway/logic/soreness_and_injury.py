@@ -36,7 +36,7 @@ class Soreness(object):
     def __init__(self):
         self.type = None  # soreness_type
         self.body_part = None
-        self.reported_date = None
+        self.reported_date_time = None
 
 
 class DailySoreness(Soreness):
@@ -113,22 +113,52 @@ class DaysMissedDueToInjury(IntEnum):
 class DailyReadinessSurvey(object):
 
     def __init__(self):
-        self.date = None
+        self.report_date_time = None
         self.soreness = []  # dailysoreness object array
         self.sleep_quality = None
         self.readiness = None
 
 
-class DailyReadinessSurveyHistory(object):
+class PostSessionSurvey(object):
+
+    def __init__(self):
+        self.report_date_time = None
+        self.soreness = []  # dailysoreness object array
+        self.session_rpe = None
+
+
+class SorenessCalculator(object):
 
     def __init__(self):
         self.surveys = []
 
-    def get_soreness_summary(self):
+    def get_soreness_summary_from_surveys(self, last_daily_readiness_survey, last_post_session_survey,
+                                          trigger_date_time):
 
         soreness_list = []
 
-        # TODO add logic to create a ranked list of soreness by body part with a severity ranking/average
+        if last_daily_readiness_survey is not None:
+
+            daily_readiness_survey_age = trigger_date_time - last_daily_readiness_survey.report_date_time
+
+            if daily_readiness_survey_age.total_seconds() <= 172800:  # within 48 hours so valid
+                for s in last_daily_readiness_survey.soreness:
+                    soreness_list.append(s)
+
+        if last_post_session_survey is not None:
+
+            last_post_session_survey_age = trigger_date_time - last_post_session_survey.report_date_time
+
+            if last_post_session_survey_age.total_seconds() <= 172800:  # within 48 hours so valid
+
+                for s in last_post_session_survey.soreness:
+                    updated = False
+                    for r in range(0, len(soreness_list)):
+                        if soreness_list[r].body_part == s.body_part:
+                            soreness_list[r].severity = max(soreness_list[r].severity, s.severity)
+                            updated = True
+                    if not updated:
+                        soreness_list.append(s)
 
         return soreness_list
 

@@ -195,6 +195,7 @@ class Tournament(Session):
         else:
             return False
 
+
 class CorrectiveSession(Session):
     def __init__(self):
         Session.__init__(self)
