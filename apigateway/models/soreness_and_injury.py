@@ -1,10 +1,10 @@
 from serialisable import Serialisable
-import uuid
+#import uuid
 
 
 class SorenessAndInjury(Serialisable):
-
-    def __init__(self, *,
+    
+    def __init__(self,
                  date,
                  user_id,
                  soreness,
@@ -19,6 +19,8 @@ class SorenessAndInjury(Serialisable):
 
         # self.s3_files = s3_files
         # self.sensor_ids = set()
+    def get_id(self):
+        return self.user_id
 
     def json_serialise(self):
         ret = {
