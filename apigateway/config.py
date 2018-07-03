@@ -6,8 +6,8 @@ from botocore.exceptions import ClientError
 from exceptions import ApplicationException
 
 
-def get_mongo_database():
-    keys = ['host', 'replicaset', 'user', 'password', 'database']
+def get_mongo_collection():
+    keys = ['host', 'replicaset', 'user', 'password', 'database', 'collection']
     config = get_secret('mongo')
     mongo_client = MongoClient(
         config['host'],
@@ -16,8 +16,9 @@ def get_mongo_database():
     )
     database = mongo_client[config['database']]
     database.authenticate(config['user'], config['password'], mechanism='SCRAM-SHA-1', source='admin')
+    collection = database['collection']
 
-    return database
+    return collection
 
 
 def get_secret(secret_name):

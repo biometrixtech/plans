@@ -1,6 +1,6 @@
 from abc import abstractmethod, ABCMeta
 from aws_xray_sdk.core import xray_recorder
-from config import get_mongo_database
+from config import get_mongo_collection
 
 
 class Datastore(object):
@@ -20,13 +20,11 @@ class MongodbDatastore(Datastore):
             for item in items:
                 self._put_mongodb(item, allow_patch)
         except Exception as e:
-            print(e)
             raise e
 
     def _put_mongodb(self, item, allow_patch=False):
         item = self.item_to_mongodb(item)
-        mongo_database = get_mongo_database()
-        mongo_collection= mongo_database['soreness']
+        mongo_collection = get_mongo_collection()
         query = {'user_id': item['user_id'], 'date_time': item['date_time']}
         mongo_collection.replace_one(query, item, upsert=True)
 
