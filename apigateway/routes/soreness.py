@@ -17,14 +17,14 @@ from models.soreness_and_injury import SorenessAndInjury
 app = Blueprint('soreness', __name__)
 
 
-@app.route('/soreness', methods=['POST'])
 # @authentication_required
 # @xray_recorder.capture('routes.session.create')
+@app.route('/soreness', methods=['POST'])
 def handle_soreness_create():
     if not isinstance(request.json, dict):
         raise InvalidSchemaException('Request body must be a dictionary')
     if 'date' not in request.json:
-        raise InvalidSchemaException('Missing required parameter event_date')
+        raise InvalidSchemaException('Missing required parameter date')
 
     # now = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
     soreness = SorenessAndInjury(
@@ -35,7 +35,7 @@ def handle_soreness_create():
         readiness=request.json['readiness']
 
     )
-
+    print(soreness)
     store = SorenessDatastore()
     try:
         store.put(soreness)
