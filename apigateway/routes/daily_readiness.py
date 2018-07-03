@@ -13,6 +13,8 @@ from datastore import DailyReadinessDatastore
 # from decorators import authentication_required
 from exceptions import InvalidSchemaException, ApplicationException, NoSuchEntityException, DuplicateEntityException
 from models.daily_readiness import DailyReadiness
+from logic.soreness_and_injury import SorenessType, MuscleSorenessSeverity, JointSorenessSeverity, BodyPart
+
 
 app = Blueprint('daily_readiness', __name__)
 
@@ -25,6 +27,43 @@ def handle_daily_readiness_create():
         raise InvalidSchemaException('Request body must be a dictionary')
     if 'date_time' not in request.json:
         raise InvalidSchemaException('Missing required parameter date_time')
+    if 'user_id' not in request.json:
+        raise InvalidSchemaException('Missing required parameter user_id')
+
+    # validate soreness
+    if 'soreness' not in request.json:
+        raise InvalidSchemaException('Missing required parameter soreness')
+    elif not isinstance(request.json['soreness'], list):
+        raise InvalidSchemaException('soreness must be a list')
+    else:
+        for soreness in request.json['soreness']:
+            if not BodyPart(soreness['body_part']):
+                raise InvalidSchemaException('body_part not recognized')
+            else:
+                soreness['body_part'] = int(soreness['body_part'])
+            if not SorenessType(soreness['soreness_type']):
+                raise InvalidSchemaException('soreness_type not recognized')
+            else:
+                if SorenessType(soreness['soreness_type']) == SorenessType.muscle_related:
+                    if not MuscleSorenessSeverity(soreness['severity']):
+                        raise InvalidSchemaException('severity not recognized')
+                elif SorenessType(soreness['soreness_type']) == SorenessType.joint_related:
+                    if not JointSorenessSeverity(soreness['severity']):
+                        raise InvalidSchemaException('severity not recognized')
+
+    # validate sleep_quality
+    if 'sleep_quality' not in request.json:
+        raise InvalidSchemaException('Missing required parameter sleep_quality')
+    elif request.json['sleep_quality'] not in [1,2,3,4,5,6,7,8,9,10]:
+        raise InvalidSchemaException('sleep_quality need to be between 1 and 10')
+
+    # vlaidate readiness
+    if 'readiness' not in request.json:
+        raise InvalidSchemaException('Missing required parameter readiness')
+    elif request.json['readiness'] not in [1,2,3,4,5,6,7,8,9,10]:
+        raise InvalidSchemaException('readiness need to be between 1 and 10')
+
+
 
     # now = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
     daily_readiness = DailyReadiness(
