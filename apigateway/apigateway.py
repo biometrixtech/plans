@@ -39,7 +39,7 @@ app.register_blueprint(hello_routes, url_prefix='/plans/hello')
 
 
 from routes.soreness import app as soreness_routes
-app.register_blueprint(soreness_routes, url_prefix='/plans/soreness')
+app.register_blueprint(soreness_routes, url_prefix='/plans')
 
 
 @app.errorhandler(500)
