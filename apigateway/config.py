@@ -3,8 +3,9 @@ import os
 
 
 def get_mongo_config(instance):
-    keys = ['host', 'replicaset', 'user', 'password', 'database', 'collection']
-    config = {k.lower(): os.environ.get('MONGO_{}_{}'.format(k.upper(), instance.upper()), None) for k in keys}
+    keys = ['host', 'replicaset', 'user', 'password', 'database']
+    config = get_secret('mongo')
+    # config = {k.lower(): os.environ.get('MONGO_{}_{}'.format(k.upper(), instance.upper()), None) for k in keys}
     return config
 
 
@@ -25,3 +26,17 @@ def get_mongo_collection(instance, collection_override=None):
     config = get_mongo_config(instance)
     database = get_mongo_database(instance)
     return database[collection_override if collection_override is not None else config['collection']]
+
+
+def get_secret(secret_name):
+    client = boto3.client('secretsmanager')
+    try:
+        secret_name = '/'.join(['plans', os.environ['ENVIRONMENT'], secret_name])
+        get_secret_value_response = client.get_secret_value(SecretId=secret_name)
+    except ClientError as e:
+        raise ApplicationException('SecretsManagerError', json.dumps(e.response), 500)
+    else:
+        if 'SecretString' in get_secret_value_response:
+            return json.loads(get_secret_value_response['SecretString'])
+        else:
+            return get_secret_value_response['SecretBinary']
