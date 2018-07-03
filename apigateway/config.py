@@ -1,7 +1,8 @@
 from pymongo import MongoClient
 import os
 import boto3
-
+from botocore.exceptions import ClientError
+from exceptions import ApplicationException
 
 def get_mongo_config(instance):
     keys = ['host', 'replicaset', 'user', 'password', 'database']
