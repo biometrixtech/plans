@@ -1,4 +1,5 @@
 *.zip
+*.pyc
 
 apigateway/*
 .idea/*
