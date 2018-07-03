@@ -16,7 +16,7 @@ from aws_xray_sdk.core.models.trace_header import TraceHeader
 patch_all()
 os.environ['LAMBDA_TASK_ROOT'] = lambda_task_root_key
 
-# from exceptions import ApplicationException
+from exceptions import ApplicationException
 from serialisable import json_serialise
 
 
@@ -36,6 +36,10 @@ app.url_map.strict_slashes = False
 
 from routes.hello import app as hello_routes
 app.register_blueprint(hello_routes, url_prefix='/plans/hello')
+
+
+from routes.soreness import app as soreness_routes
+app.register_blueprint(soreness_routes, url_prefix='/plans/soreness')
 
 
 @app.errorhandler(500)
