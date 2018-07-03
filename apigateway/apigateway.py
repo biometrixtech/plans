@@ -38,8 +38,8 @@ from routes.hello import app as hello_routes
 app.register_blueprint(hello_routes, url_prefix='/plans/hello')
 
 
-from routes.soreness import app as soreness_routes
-app.register_blueprint(soreness_routes, url_prefix='/plans')
+from routes.daily_readiness import app as daily_readiness_routes
+app.register_blueprint(daily_readiness_routes, url_prefix='/plans')
 
 
 @app.errorhandler(500)

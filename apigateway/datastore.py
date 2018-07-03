@@ -16,7 +16,7 @@ class Datastore(object):
     __metaclass__ = ABCMeta
 
     @abstractmethod
-    def get(self, date=None, user_id=None, soreness=None, sleep_quality=None, readiness=None):
+    def get(self, date_time=None, user_id=None, soreness=None, sleep_quality=None, readiness=None):
         pass
 
 #    @abstractmethod
@@ -41,7 +41,7 @@ class MongodbDatastore(Datastore):
         mongo_database = get_mongo_database('SESSION')
         # mongo_collection= mongo_database[os.environ['MONGO_COLLECTION_SESSION']]
         mongo_collection= mongo_database['soreness']
-        query = {'user_id': item['user_id'], 'date': item['date']}
+        query = {'user_id': item['user_id'], 'date_time': item['date_time']}
         mongo_collection.replace_one(query, item, upsert=True)
 
 
@@ -51,17 +51,17 @@ class MongodbDatastore(Datastore):
         pass
 
 
-class SorenessDatastore(MongodbDatastore):
-    def get(self, date=None, user_id=None, soreness=None, sleep_quality=None, readiness=None):
+class DailyReadinessDatastore(MongodbDatastore):
+    def get(self, date_time=None, user_id=None, soreness=None, sleep_quality=None, readiness=None):
         return self
 
     @staticmethod
-    def item_to_mongodb(soreness_and_injury):
+    def item_to_mongodb(dailyreadiness):
         item = {
-            'date': soreness_and_injury.date,
-            'user_id': soreness_and_injury.user_id,
-            'soreness': soreness_and_injury.soreness,
-            'sleep_quality': soreness_and_injury.sleep_quality,
-            'readiness': soreness_and_injury.readiness,
+            'date_time': dailyreadiness.date_time,
+            'user_id': dailyreadiness.user_id,
+            'soreness': dailyreadiness.soreness,
+            'sleep_quality': dailyreadiness.sleep_quality,
+            'readiness': dailyreadiness.readiness,
         }
         return {k: v for k, v in item.items() if v}

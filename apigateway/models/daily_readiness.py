@@ -2,16 +2,16 @@ from serialisable import Serialisable
 #import uuid
 
 
-class SorenessAndInjury(Serialisable):
+class DailyReadiness(Serialisable):
     
     def __init__(self,
-                 date,
+                 date_time,
                  user_id,
                  soreness,
                  sleep_quality,
                  readiness
                  ):
-        self.date = date
+        self.date_time = date_time
         self.user_id = user_id
         self.soreness = soreness
         self.sleep_quality = sleep_quality
@@ -24,7 +24,7 @@ class SorenessAndInjury(Serialisable):
 
     def json_serialise(self):
         ret = {
-            'date': self.date,
+            'date_time': self.date_time,
             'user_id': self.user_id,
             'soreness': self.soreness,
             'sleep_quality': self.sleep_quality,
