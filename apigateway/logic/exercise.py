@@ -112,6 +112,7 @@ class RecommendedExercise(object):
         self.last_completed_date = None
         self.expire_date_time = None
         self.priority = ExercisePriority.neutral
+        self.position_order = 0
 
 
 class ExerciseRecommendations(object):

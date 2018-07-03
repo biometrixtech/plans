@@ -38,7 +38,7 @@ def test_get_start_time_from_afternoon_trigger_recovery_0():
     date_time_trigger = datetime.datetime(2018, 6, 27, 14, 0, 0)
     mgr = tpm.TrainingPlanManager()
     start_time, end_time = mgr.get_recovery_start_end_times(date_time_trigger, 0)
-    assert datetime.datetime(2018, 6, 27, 19, 0, 0) == start_time
+    assert datetime.datetime(2018, 6, 27, 12, 0, 0) == start_time
 
 
 def test_get_end_time_from_afternoon_trigger_recovery_0():
@@ -52,7 +52,7 @@ def test_get_start_time_from_evening_trigger_recovery_0():
     date_time_trigger = datetime.datetime(2018, 6, 27, 20, 0, 0)
     mgr = tpm.TrainingPlanManager()
     start_time, end_time = mgr.get_recovery_start_end_times(date_time_trigger, 0)
-    assert datetime.datetime(2018, 6, 27, 19, 0, 0) == start_time
+    assert datetime.datetime(2018, 6, 27, 12, 0, 0) == start_time
 
 
 def test_get_end_time_from_evening_trigger_recovery_0():
@@ -66,7 +66,7 @@ def test_get_start_time_from_morning_trigger_recovery_1():
     date_time_trigger = datetime.datetime(2018, 6, 27, 11, 0, 0)
     mgr = tpm.TrainingPlanManager()
     start_time, end_time = mgr.get_recovery_start_end_times(date_time_trigger, 1)
-    assert datetime.datetime(2018, 6, 27, 19, 0, 0) == start_time
+    assert datetime.datetime(2018, 6, 27, 12, 0, 0) == start_time
 
 
 def test_get_end_time_from_morning_trigger_recovery_1():
@@ -122,7 +122,7 @@ def test_get_start_time_from_afternoon_trigger_recovery_2():
     date_time_trigger = datetime.datetime(2018, 6, 27, 14, 0, 0)
     mgr = tpm.TrainingPlanManager()
     start_time, end_time = mgr.get_recovery_start_end_times(date_time_trigger, 2)
-    assert datetime.datetime(2018, 6, 28, 19, 0, 0) == start_time
+    assert datetime.datetime(2018, 6, 28, 12, 0, 0) == start_time
 
 
 def test_get_end_time_from_afternoon_trigger_recovery_2():
@@ -136,7 +136,7 @@ def test_get_start_time_from_evening_trigger_recovery_2():
     date_time_trigger = datetime.datetime(2018, 6, 27, 20, 0, 0)
     mgr = tpm.TrainingPlanManager()
     start_time, end_time = mgr.get_recovery_start_end_times(date_time_trigger, 2)
-    assert datetime.datetime(2018, 6, 28, 19, 0, 0) == start_time
+    assert datetime.datetime(2018, 6, 28, 12, 0, 0) == start_time
 
 
 def test_get_end_time_from_evening_trigger_recovery_2():
@@ -150,7 +150,7 @@ def test_get_start_time_from_morning_trigger_recovery_3():
     date_time_trigger = datetime.datetime(2018, 6, 27, 11, 0, 0)
     mgr = tpm.TrainingPlanManager()
     start_time, end_time = mgr.get_recovery_start_end_times(date_time_trigger, 3)
-    assert datetime.datetime(2018, 6, 28, 19, 0, 0) == start_time
+    assert datetime.datetime(2018, 6, 28, 12, 0, 0) == start_time
 
 
 def test_get_end_time_from_morning_trigger_recovery_3():

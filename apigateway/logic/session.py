@@ -222,6 +222,15 @@ class CorrectiveSession(Session):
             return False
 
 
+class RecoverySession(object):
+
+    def __init__(self):
+        self.recommended_inhibit_exercises = []
+        self.recommended_lengthen_exercises = []
+        self.recommended_activate_exercises = []
+        self.recommended_integrate_exercises = []
+
+
 class GlobalLoadEstimationParameters(object):
 
     def __init__(self):

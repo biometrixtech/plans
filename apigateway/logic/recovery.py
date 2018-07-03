@@ -21,10 +21,10 @@ class RecoveryModality(metaclass=abc.ABCMeta):
             return False
 
 
-class ActiveRecoveryExercise(RecoveryModality, exercise.Exercise):
+class ActiveRecoveryRecommendedExercise(RecoveryModality, exercise.RecommendedExercise):
     def __init__(self):
         RecoveryModality.__init__(self)
-        exercise.Exercise.__init__(self)
+        exercise.RecommendedExercise.__init__(self)
         self.soreness_triggers = []     # body parts triggering this exercise
         self.injury_history_triggers = []   # injuries triggering this exercise
 
