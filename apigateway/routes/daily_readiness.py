@@ -1,10 +1,6 @@
 from aws_xray_sdk.core import xray_recorder
 from flask import request, Blueprint
-import base64
-# import boto3
-# import datetime
 import json
-import re
 import os
 # import uuid
 
@@ -20,7 +16,7 @@ app = Blueprint('daily_readiness', __name__)
 
 
 # @authentication_required
-# @xray_recorder.capture('routes.session.create')
+@xray_recorder.capture('routes.daily_readiness.create')
 @app.route('/daily_readiness', methods=['POST'])
 def handle_daily_readiness_create():
     if not isinstance(request.json, dict):
@@ -56,18 +52,15 @@ def handle_daily_readiness_create():
     # validate sleep_quality
     if 'sleep_quality' not in request.json:
         raise InvalidSchemaException('Missing required parameter sleep_quality')
-    elif request.json['sleep_quality'] not in [1,2,3,4,5,6,7,8,9,10]:
+    elif request.json['sleep_quality'] not in range(1, 11):
         raise InvalidSchemaException('sleep_quality need to be between 1 and 10')
 
     # vlaidate readiness
     if 'readiness' not in request.json:
         raise InvalidSchemaException('Missing required parameter readiness')
-    elif request.json['readiness'] not in [1,2,3,4,5,6,7,8,9,10]:
+    elif request.json['readiness'] not in range(1, 11):
         raise InvalidSchemaException('readiness need to be between 1 and 10')
 
-
-
-    # now = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
     daily_readiness = DailyReadiness(
         user_id=request.json['user_id'],
         date_time=request.json['date_time'],

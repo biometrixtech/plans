@@ -1,14 +1,5 @@
 from abc import abstractmethod, ABCMeta
-#from aws_xray_sdk.core import xray_recorder
-# from boto3.dynamodb.conditions import Key, Attr
-#from botocore.exceptions import ClientError
-#from decimal import Decimal
-#from datetime import datetime
-#from pymongo import MongoClient
-#import os
-
-#from exceptions import DuplicateEntityException
-#from models.soreness_and_injury import SorenessAndInjury
+from aws_xray_sdk.core import xray_recorder
 from config import get_mongo_database
 
 
@@ -18,10 +9,6 @@ class Datastore(object):
     @abstractmethod
     def get(self, date_time=None, user_id=None, soreness=None, sleep_quality=None, readiness=None):
         pass
-
-#    @abstractmethod
-#    def put(self, alerts):
-#        pass
 
 
 class MongodbDatastore(Datastore):
@@ -38,8 +25,7 @@ class MongodbDatastore(Datastore):
 
     def _put_mongodb(self, item, allow_patch=False):
         item = self.item_to_mongodb(item)
-        mongo_database = get_mongo_database('SESSION')
-        # mongo_collection= mongo_database[os.environ['MONGO_COLLECTION_SESSION']]
+        mongo_database = get_mongo_database()
         mongo_collection= mongo_database['soreness']
         query = {'user_id': item['user_id'], 'date_time': item['date_time']}
         mongo_collection.replace_one(query, item, upsert=True)
@@ -52,6 +38,7 @@ class MongodbDatastore(Datastore):
 
 
 class DailyReadinessDatastore(MongodbDatastore):
+    @xray_recorder.capture('datastore.DailyReadinessDatastore.get')
     def get(self, date_time=None, user_id=None, soreness=None, sleep_quality=None, readiness=None):
         return self
 

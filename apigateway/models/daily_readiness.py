@@ -1,5 +1,4 @@
 from serialisable import Serialisable
-#import uuid
 
 
 class DailyReadiness(Serialisable):
@@ -17,8 +16,6 @@ class DailyReadiness(Serialisable):
         self.sleep_quality = int(sleep_quality)
         self.readiness = int(readiness)
 
-        # self.s3_files = s3_files
-        # self.sensor_ids = set()
     def get_id(self):
         return self.user_id
 
