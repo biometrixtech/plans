@@ -12,22 +12,130 @@ Parameters:
         Type: "String"
         Description: "The name of the environment"
 
+    # The second part of the CIDR block for the VPN (10.xx.0.0/24).
+    VpnCidr:
+        Type: "Number"
+        MinValue: 0
+        MaxValue: 255
+        Default: "1"
+        Description: "The second digit in the IP range (10.xx.0.0/16).  VPNs with overlapping address spaces cannot be peered."
+#    MultiAz:
+#        Type: "String"
+#        AllowedValues: [ "true", "false" ]
+#        Description: "Whether to create instances in multiple AZs.  This has an additional cost."
+    MongoDbPeeringVpc:
+        Type: "String"
+        Default: ""
+        Description: "The ID of the VPC to peer to for MongoDB connections"
+    MongoDbPeeringCidr:
+        Type: "String"
+        Description: "The CIDR range in the peered VPC to route"
+        Default: ""
+        AllowedPattern: "^((\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2}))|$"
+        ConstraintDescription: "Must be a valid IP CIDR range of the form x.x.x.x/x."
+
+    MongodbHost:
+        Description: "The MongoDB host"
+        Type: "String"
+    MongodbUser:
+        Description: "The MongoDB user"
+        Type: "String"
+    MongodbPassword:
+        Description: "The MongoDB password"
+        Type: "String"
+        NoEcho: true
+    MongodbReplicaset:
+        Description: "The MongoDB replica set"
+        Type: "String"
+        Default: "---"
+    MongodbCollectionSuffix:
+        Description: "The suffix for mongodb collections"
+        Type: "String"
+        Default: "_test"
+
 Mappings:
     TemplateVersion:
         Self: { Commit: "da39a3ee5e6b4b0d3255bfef95601890afd80709" }
         Infrastructure: { Commit: "2d222e78ee364e58b7db1709f89effdf4d1d4c7d" }
 
+# Metadata:
+#     "AWS::CloudFormation::Interface":
+#         ParameterGroups:
+#           - Label: { default: "Definition" }
+#             Parameters:
+#               - "Environment"
+
+#         ParameterLabels:
+#             Environment: { default: "Environment" }
+
+
+
+
 Metadata:
     "AWS::CloudFormation::Interface":
         ParameterGroups:
-          - Label: { default: "Definition" }
+          - Label: { default: "Environment" }
             Parameters:
               - "Environment"
+          - Label: { default: "Networking" }
+            Parameters:
+              - "VpnCidr"
+              - "MongoDbPeeringVpc"
+              - "MongoDbPeeringCidr"
+          - Label: { default: "Configuration" }
+            Parameters:
+              - "MongodbHostSession"
+              - "MongodbHostTwomin"
+              - "MongodbUser"
+              - "MongodbPassword"
+              - "MongodbReplicasetSession"
+              - "MongodbReplicasetTwomin"
+              - "MongodbCollectionSuffix"
 
         ParameterLabels:
             Environment: { default: "Environment" }
+            VpnCidr: { default: "VPN CIDR block" }
+            MongoDbPeeringVpc: { default: "MongoDB peering VPC ID" }
+            MongoDbPeeringCidr: { default: "MongoDB peering CIDR" }
+            MongodbHostSession: { default: "MongoDB host (session)" }
+            MongodbHostTwomin: { default: "MongoDB host (twomin)" }
+            MongodbUser: { default: "MongoDB user" }
+            MongodbPassword: { default: "MongoDB password" }
+            MongodbReplicasetSession: { default: "MongoDB replicaset (session)" }
+            MongodbReplicasetTwomin: { default: "MongoDB replicaset (twomin)" }
+            MongodbCollectionSuffix: { default: "MongoDB collection suffix" }
+
+Conditions:
+    CreateVpc: { "Fn::Not": [ { "Fn::Equals": [ { Ref: "MongoDbPeeringVpc" }, "" ] } ] }
 
 Resources:
+
+    ##########################################################################################################
+    ## VPC & NETWORKING
+    ##########################################################################################################
+
+    VpcStack:
+        Type: "AWS::CloudFormation::Stack"
+        Properties:
+            Parameters:
+                Environment: { Ref: "Environment" }
+                MultiAz: "true"
+                PeeringCidr: { Ref: "MongoDbPeeringCidr" }
+                PeeringVpc: { Ref: "MongoDbPeeringVpc" }
+                Project: "plans"
+                Service: "vpc"
+                VpnCidr: { Ref: "VpnCidr" }
+            Tags:
+              - { Key: "Name", Value: { "Fn::Sub": "plans-${Environment}-apigateway-execute" } }
+              - { Key: "Management", Value: "managed" }
+              - { Key: "Project", Value: "plans" }
+              - { Key: "Environment", Value: { Ref: "Environment" } }
+              - { Key: "Service", Value: "vpc" }
+            TemplateURL: { "Fn::Sub": [ "https://s3.amazonaws.com/${InfrastructureBucketName}/cloudformation/infrastructure-${Environment}/vpc.yaml",
+                { InfrastructureBucketName: { "Fn::ImportValue": "InfrastructureBucketName" } }
+            ] }
+            TimeoutInMinutes: 10
+        Condition: "CreateVpc"
 
     ##########################################################################################################
     ##  API GATEWAY
@@ -59,6 +167,18 @@ Resources:
                 Variables:
                     ENVIRONMENT: { Ref: 'Environment' }
                     AWS_ACCOUNT_ID: { Ref: "AWS::AccountId" }
+                    MONGO_COLLECTION_DATE: { "Fn::Sub": "dateStats${MongodbCollectionSuffix}" }
+                    MONGO_COLLECTION_DATETEAM: { "Fn::Sub": "dateStatsTeam${MongodbCollectionSuffix}" }
+                    MONGO_COLLECTION_DATETRAININGGROUP: { "Fn::Sub": "dateStatsTG${MongodbCollectionSuffix}" }
+                    MONGO_COLLECTION_PROGCOMPDATE: { "Fn::Sub": "progCompDateStats${MongodbCollectionSuffix}" }
+                    MONGO_COLLECTION_TWOMINUTE: { "Fn::Sub": "twoMinuteStats${MongodbCollectionSuffix}" }
+                    MONGO_COLLECTION_TWOMINUTETEAM: { "Fn::Sub": "twoMinuteStatsTeam${MongodbCollectionSuffix}" }
+                    MONGO_COLLECTION_TWOMINUTETRAININGGROUP: { "Fn::Sub": "twoMinuteStatsTG${MongodbCollectionSuffix}" }
+                    MONGO_DATABASE: "movementStats"
+                    MONGO_HOST_SESSION: { Ref: "MongodbHost" }
+                    MONGO_PASSWORD_SESSION: { Ref: "MongodbPassword" }
+                    MONGO_REPLICASET_SESSION: { Ref: "MongodbReplicaset" }
+                    MONGO_USER_SESSION: { Ref: "MongodbUser" }
             Handler: "apigateway.handler"
             Runtime: "python3.6"
             Timeout: "30"
