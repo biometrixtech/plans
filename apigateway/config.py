@@ -1,10 +1,12 @@
 from pymongo import MongoClient
 import os
+import boto3
 
 
 def get_mongo_config(instance):
     keys = ['host', 'replicaset', 'user', 'password', 'database']
     config = get_secret('mongo')
+    print(config)
     # config = {k.lower(): os.environ.get('MONGO_{}_{}'.format(k.upper(), instance.upper()), None) for k in keys}
     return config
 
