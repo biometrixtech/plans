@@ -16,7 +16,7 @@ def get_mongo_collection():
     )
     database = mongo_client[config['database']]
     database.authenticate(config['user'], config['password'], mechanism='SCRAM-SHA-1', source='admin')
-    collection = database['collection']
+    collection = database[config['collection']]
 
     return collection
 
