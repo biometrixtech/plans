@@ -14,8 +14,8 @@ class DailyReadiness(Serialisable):
         self.date_time = date_time
         self.user_id = user_id
         self.soreness = soreness
-        self.sleep_quality = sleep_quality
-        self.readiness = readiness
+        self.sleep_quality = int(sleep_quality)
+        self.readiness = int(readiness)
 
         # self.s3_files = s3_files
         # self.sensor_ids = set()

@@ -39,8 +39,6 @@ def handle_daily_readiness_create():
         for soreness in request.json['soreness']:
             if not BodyPart(soreness['body_part']):
                 raise InvalidSchemaException('body_part not recognized')
-            else:
-                soreness['body_part'] = int(soreness['body_part'])
             if not SorenessType(soreness['soreness_type']):
                 raise InvalidSchemaException('soreness_type not recognized')
             else:
@@ -50,6 +48,10 @@ def handle_daily_readiness_create():
                 elif SorenessType(soreness['soreness_type']) == SorenessType.joint_related:
                     if not JointSorenessSeverity(soreness['severity']):
                         raise InvalidSchemaException('severity not recognized')
+            # for valid ones, force values to be integer
+            soreness['soreness_type'] = int(soreness['soreness_type'])
+            soreness['body_part'] = int(soreness['body_part'])
+            soreness['severity'] = int(soreness['severity'])
 
     # validate sleep_quality
     if 'sleep_quality' not in request.json:
