@@ -19,6 +19,9 @@ class DailyReadiness(Serialisable):
     def get_id(self):
         return self.user_id
 
+    def get_date(self):
+        return self.date_time
+
     def json_serialise(self):
         ret = {
             'date_time': self.date_time,

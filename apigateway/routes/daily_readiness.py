@@ -15,9 +15,9 @@ from logic.soreness_and_injury import SorenessType, MuscleSorenessSeverity, Join
 app = Blueprint('daily_readiness', __name__)
 
 
+@app.route('/daily_readiness', methods=['POST'])
 @authentication_required
 @xray_recorder.capture('routes.daily_readiness.create')
-@app.route('/daily_readiness', methods=['POST'])
 def handle_daily_readiness_create():
     if not isinstance(request.json, dict):
         raise InvalidSchemaException('Request body must be a dictionary')
