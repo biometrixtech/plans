@@ -2,6 +2,7 @@ from aws_xray_sdk.core import xray_recorder
 from flask import request, Blueprint
 import json
 import os
+import datetime
 # import uuid
 
 # from auth import get_accessory_id_from_auth
@@ -45,6 +46,15 @@ def validate_data(request):
         raise InvalidSchemaException('Request body must be a dictionary')
     if 'date_time' not in request.json:
         raise InvalidSchemaException('Missing required parameter date_time')
+    else:
+        try:
+            datetime.datetime.strptime(request.json['date_time'], "%Y-%m-%d %H:%M:%S.%f")
+        except:
+            try:
+                datetime.datetime.strptime(request.json['date_time'], "%Y-%m-%d %H:%M:%S")
+            except:
+                raise InvalidSchemaException('date_time needs to be in format yyyy-mm-dd hh:mm:ss.xxxx or yyyy-mm-dd hh:mm:ss')
+
 
 # check to make sure date_time is date and time
     if 'user_id' not in request.json:
