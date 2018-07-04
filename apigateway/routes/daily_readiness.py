@@ -19,6 +19,28 @@ app = Blueprint('daily_readiness', __name__)
 @authentication_required
 @xray_recorder.capture('routes.daily_readiness.create')
 def handle_daily_readiness_create():
+    validate_data(request)
+
+    daily_readiness = DailyReadiness(
+        user_id=request.json['user_id'],
+        date_time=request.json['date_time'],
+        soreness=request.json['soreness'],  # dailysoreness object array
+        sleep_quality=request.json['sleep_quality'],
+        readiness=request.json['readiness']
+
+    )
+    store = DailyReadinessDatastore()
+    try:
+        store.put(daily_readiness)
+        return 'success', 201
+        # return {'daily_readiness': daily_readiness}, 201
+    except DuplicateEntityException:
+        print(json.dumps({'message': 'daily_readiness already created for user {}'.format(daily_readiness.get_id())}))
+        return {'duplicate daily_readiness record'}, 201
+
+
+@xray_recorder.capture('routes.daily_readiness.validate')
+def validate_data(request):
     if not isinstance(request.json, dict):
         raise InvalidSchemaException('Request body must be a dictionary')
     if 'date_time' not in request.json:
@@ -62,20 +84,3 @@ def handle_daily_readiness_create():
         raise InvalidSchemaException('Missing required parameter readiness')
     elif request.json['readiness'] not in range(1, 11):
         raise InvalidSchemaException('readiness need to be between 1 and 10')
-
-    daily_readiness = DailyReadiness(
-        user_id=request.json['user_id'],
-        date_time=request.json['date_time'],
-        soreness=request.json['soreness'],  # dailysoreness object array
-        sleep_quality=request.json['sleep_quality'],
-        readiness=request.json['readiness']
-
-    )
-    store = DailyReadinessDatastore()
-    try:
-        store.put(daily_readiness)
-        return 'success', 201
-        # return {'daily_readiness': daily_readiness}, 201
-    except DuplicateEntityException:
-        print(json.dumps({'message': 'daily_readiness already created for user {}'.format(daily_readiness.get_id())}))
-        return {'duplicate daily_readiness record'}, 201
