@@ -6,7 +6,7 @@ import os
 
 # from auth import get_accessory_id_from_auth
 from datastore import DailyReadinessDatastore
-# from decorators import authentication_required
+from decorators import authentication_required
 from exceptions import InvalidSchemaException, ApplicationException, NoSuchEntityException, DuplicateEntityException
 from models.daily_readiness import DailyReadiness
 from logic.soreness_and_injury import SorenessType, MuscleSorenessSeverity, JointSorenessSeverity, BodyPart
@@ -15,7 +15,7 @@ from logic.soreness_and_injury import SorenessType, MuscleSorenessSeverity, Join
 app = Blueprint('daily_readiness', __name__)
 
 
-# @authentication_required
+@authentication_required
 @xray_recorder.capture('routes.daily_readiness.create')
 @app.route('/daily_readiness', methods=['POST'])
 def handle_daily_readiness_create():
@@ -23,6 +23,8 @@ def handle_daily_readiness_create():
         raise InvalidSchemaException('Request body must be a dictionary')
     if 'date_time' not in request.json:
         raise InvalidSchemaException('Missing required parameter date_time')
+
+# check to make sure date_time is date and time
     if 'user_id' not in request.json:
         raise InvalidSchemaException('Missing required parameter user_id')
 
