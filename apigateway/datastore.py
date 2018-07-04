@@ -21,7 +21,7 @@ class MongodbDatastore(Datastore):
                 self._put_mongodb(item, allow_patch)
         except Exception as e:
             raise e
-
+    @xray_recorder.capture('datastore.MongodbDatastore.put')
     def _put_mongodb(self, item, allow_patch=False):
         item = self.item_to_mongodb(item)
         mongo_collection = get_mongo_collection()

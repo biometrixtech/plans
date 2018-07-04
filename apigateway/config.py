@@ -2,10 +2,12 @@ from pymongo import MongoClient
 import os
 import boto3
 import json
+from aws_xray_sdk.core import xray_recorder
 from botocore.exceptions import ClientError
 from exceptions import ApplicationException
 
 
+@xray_recorder.capture('config.get_mongo')
 def get_mongo_collection():
     keys = ['host', 'replicaset', 'user', 'password', 'database', 'collection']
     config = get_secret('mongo')
@@ -20,7 +22,7 @@ def get_mongo_collection():
 
     return collection
 
-
+@xray_recorder.capture('config.get_secret')
 def get_secret(secret_name):
     client = boto3.client('secretsmanager')
     try:
