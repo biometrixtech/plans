@@ -65,7 +65,7 @@ The client __must__ submit a request body containing a JSON object with the foll
 ```
 * `date_time` __should__ reflect the local time that survey was taken
 * `soreness` __should__ reflect the number of body part that the user indicated soreness. Length __could__ be 0.
-* `body_part` __should__ be an integer between 1 and 10
+* `body_part` __should__ be an integer between 0 and 17
 * `severity` __should__ be an integer between 1 and 5
 * `sleep_quality` __should__ be an integer between 1 and 10
 * `readiness` __should__ be an integer between 1 and 10
@@ -84,10 +84,9 @@ Authorization: eyJraWQ...ajBc4VQ
 			{"body_part": 14, "severity": 3}
 		   ],
 	"sleep_quality":4,
-	"readiness":10}
-
+	"readiness":10
+}
 ```
-
 ##### Responses
  
  If the write was successful, the Service __will__ respond with HTTP Status `201 Created`, with a body with the following syntax:
@@ -97,6 +96,39 @@ Authorization: eyJraWQ...ajBc4VQ
     "message": "success"
 }
 ```
+
+
+#### Soreness from previous survey
+
+This endpoint can be called to get the body parts where soreness was reported in the last report.
+
+##### Query String
+ 
+The client __must__ submit a request to the endpoint `/plans/daily_readiness/previous`. The request method __must__ be `GET`.
+
+##### Request
+
+The request does not require a body.
+```
+GET /plans/daily_readiness/previous HTTPS/1.1
+Host: apis.env.fathomai.com
+Content-Type: application/json
+Authorization: eyJraWQ...ajBc4VQ
+
+```
+Authentication is required for this endpoint
+
+##### Responses
+ 
+ The Service __will__ respond with HTTP Status `200 OK`, with a body with the following syntax:
+ 
+```
+{
+    "body_part": [8, 15]
+}
+```
+* body_part will be a list of enumerated body parts (potentially empty).
+
 
 ### Hello
 
@@ -108,16 +140,12 @@ This endpoint serves as a demonstration of the service
  
 The client __must__ submit a request to the endpoint `/hello/world`. The request method __must__ be `GET`.
 
-
-
 ```
 GET /plans/hello/world HTTP/1.1
 Host: apis.env.fathomai.com
 Content-Type: application/json
 
-
 ```
-
 Authentication is not required for this endpoint.
 
 ##### Responses
