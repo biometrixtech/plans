@@ -24,8 +24,13 @@ class MongodbDatastore(Datastore):
 
     def _query_mongodb(self, user_id, date_time):
         mongo_collection = get_mongo_collection()
-        query = {'user_id': user_id}
-        ret = mongo_collection.find(query).sort({'date_time': -1}).limit(1)
+        query0 = {'user_id': user_id}
+        query1 = {'soreness': 1, '_id': 0}
+        ret = mongo_collection.find(query0, query1).sort([('date_time': -1)]).limit(1)
+        ret = []
+        for soreness in ret:
+            if soreness['severity'] > 1:
+                ret.append(soreness['body_part'])
 
         return ret
 
