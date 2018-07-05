@@ -72,75 +72,78 @@ The Service __will__ respond with HTTP Status `200 Ok`, and with a body with the
     "message": String
 }
 ```
-### Session
+### Daily Readiness
 
-A `Session` object __will__ have the following schema:
+A `Daily Readiness` object __will__ have the following schema:
 
 ```
 {
-	"session_id": Uuid,
-	"event_date": Datetime,
-	"created_date": Datetime,
-	"updated_date": Datetime,
-	"session_status": string
+	"date_time": Datetime,
+	"user_id": Uuid,
+	"soreness": [{"body_part": number, "severity": number}],
+	"sleep_quality": number,
+	"readines": number
 }
 ```
 
 The following constraints __will__ apply:
 
-* `session_status` __will__ be one of the strings `CREATE_COMPLETE`, `UPLOAD_IN_PROGRESS`, `UPLOAD_COMPLETE`, `PROCESSING_IN_PROGRESS`, `PROCESSING_COMPLETE` or `PROCESSING_FAILED`.  For a newly-created session, the status __should__ be `CREATE_COMPLETE`.
+* `body_part` __will__ be an integer between 1 and 10
+* `severity` __will__ be an integer between 1 and 5
+* `sleep_quality` __will__ be an integer between 1 and 10
+* `readiness` __will__ be an integer between 1 and 10
 
-## Endpoints
-
-### Session
+### Daily Readiness
 
 #### Create
 
-This endpoint can be called to register a new session.
+This endpoint can be called to register a new daily readiness survey.
 
 ##### Query String
  
-The client __must__ submit a request to the endpoint `/session`.
+The client __must__ submit a request to the endpoint `/plans/daily_readiness`.
 
 ##### Request
 
 The client __must__ submit a request body containing a JSON object with the following schema:
-
 ```
 {
-    "sensors": [ MacAddress, MacAddress, MacAddress ],
-    "event_date": Datetime,
-    "end_date": Datetime
+	"date_time": Datetime,
+	"user_id": Uuid,
+	"soreness": [{"body_part": number, "severity": number}],
+	"sleep_quality": number,
+	"readines": number
 }
 ```
 
 * `sensors` __must__ be a list of exactly three MacAddresses, each of which is the ID of a sensor from which data is being collected.
-* `event_date` __should__ reflect the time that the practice session began.
-* `end_date` __should__ reflect the time that the practice session ended.
+* `date_time` __should__ reflect the local time that survey was taken
+* `soreness` __should__ reflect the number of body part that the user indicated soreness. Length __could__ be 0.
 
 ```
-POST /v1/session HTTP/1.1
-Host: preprocessing.env.fathomai.com
+POST /plans/daily_readiness HTTPS/1.1
+Host: apis.env.fathomai.com
 Content-Type: application/json
 Authorization: eyJraWQ...ajBc4VQ
 
 {
-    "sensors": [
-        "11:22:33:44:55:66",
-        "22:33:44:55:66:77",
-        "55:22:33:44:55:66"
-    ],
-    "event_date": "2016-12-09T08:21:15.123Z"
-}
+	"date_time": "2018-07-03 10:42:20.1234",
+	"user_id":"02cb7965-7921-493a-80d4-6b278c928fad",
+	"soreness":[
+			{"body_part": 8, "severity": 2},
+			{"body_part": 14, "severity": 3}
+		   ],
+	"sleep_quality":4,
+	"readiness":10}
 
 ```
 
 ##### Responses
  
- If the registration was successful, the Service __will__ respond with HTTP Status `200 Ok` or `201 Created`, with a body with the following syntax:
+ If the write was successful, the Service __will__ respond with HTTP Status `201 Created`, with a body with the following syntax:
  
 ```
 {
-    "session": Session
+    "message": "success"
 }
 ```
