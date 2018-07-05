@@ -52,8 +52,8 @@ def handle_get_previous_soreness():
         user_id = jwt.decode(request.headers['Authorization'], verify=False)['user_id']
     elif request.method == 'POST':
         user_id = request.json['user_id']
-    soreness = store.get(user_id=user_id)
-    return {'body_part': soreness}, 200
+    body_part = store.get(user_id=user_id)
+    return {'body_part': body_part}, 200
 
 
 
