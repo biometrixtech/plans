@@ -25,6 +25,17 @@ class DailyPlan(object):
         else:
             return False
 
+    def add_scheduled_session(self, scheduled_session):
+
+        if isinstance(scheduled_session, session.PracticeSession()):
+            self.practice_sessions.append(scheduled_session)
+        elif isinstance(scheduled_session, session.StrengthConditioningSession()):
+            self.strength_conditioning_sessions.append(scheduled_session)
+        elif isinstance(scheduled_session, session.Game()):
+            self.games.append(scheduled_session)
+        elif isinstance(scheduled_session, session.Tournament()):
+            self.tournaments.append(scheduled_session)
+
 
 class TrainingCycle(object):
 

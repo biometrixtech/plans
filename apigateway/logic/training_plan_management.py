@@ -10,9 +10,24 @@ import exercise
 
 class TrainingPlanManager(object):
 
-    def create_daily_plan(self, trigger_date_time):
-        daily_plan = training.DailyPlan(trigger_date_time.date())
-        daily_plan = self.add_recovery_times(trigger_date_time, daily_plan)
+    def __init__(self, athlete_id, athlete_dao):
+        self.athlete_id = athlete_id
+        self.athlete_dao = athlete_dao
+
+    def create_daily_plan(self):
+        # TODO base this off of daily readiness survey (update plan based on post-session survey)
+        daily_readiness_survey = self.athlete_dao.get_last_daily_readiness_survey(self.athlete_id)
+
+        # << get yesterday's post session survey >>
+
+        scheduled_sessions = self.athlete_dao.get_scheduled_sessions(self.athlete_id,
+                                                                     daily_readiness_survey.report_date_time.date())
+        daily_plan = training.DailyPlan(daily_readiness_survey.report_date_time.date())
+        daily_plan = self.add_recovery_times(daily_readiness_survey.report_date_time, daily_plan)
+
+        for scheduled_session in scheduled_sessions:
+            daily_plan.add_scheduled_session(scheduled_session)
+
         return daily_plan
 
     def create_training_cycle(self, athlete_schedule, athlete_injury_history):
