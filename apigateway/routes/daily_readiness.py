@@ -3,6 +3,7 @@ from flask import request, Blueprint
 import json
 import os
 import datetime
+import jwt
 # import uuid
 
 # from auth import get_accessory_id_from_auth
@@ -47,7 +48,8 @@ def handle_daily_readiness_create():
 def handle_get_previous_soreness():
     current_time = datetime.datetime.now()
     store = DailyReadinessDatastore()
-    soreness = store.get(user_id=request.json['user_id'])
+    user_id = jwt.decode(request.headers['Authorization'], verify=False)['user_id']
+    soreness = store.get(user_id=user_id)
     return {'body_part': soreness}, 200
 
 
