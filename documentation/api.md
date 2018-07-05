@@ -72,26 +72,7 @@ The Service __will__ respond with HTTP Status `200 Ok`, and with a body with the
     "message": String
 }
 ```
-### Daily Readiness
 
-A `Daily Readiness` object __will__ have the following schema:
-
-```
-{
-	"date_time": Datetime,
-	"user_id": Uuid,
-	"soreness": [{"body_part": number, "severity": number}],
-	"sleep_quality": number,
-	"readines": number
-}
-```
-
-The following constraints __will__ apply:
-
-* `body_part` __will__ be an integer between 1 and 10
-* `severity` __will__ be an integer between 1 and 5
-* `sleep_quality` __will__ be an integer between 1 and 10
-* `readiness` __will__ be an integer between 1 and 10
 
 ### Daily Readiness
 
@@ -115,10 +96,12 @@ The client __must__ submit a request body containing a JSON object with the foll
 	"readines": number
 }
 ```
-
-* `sensors` __must__ be a list of exactly three MacAddresses, each of which is the ID of a sensor from which data is being collected.
 * `date_time` __should__ reflect the local time that survey was taken
 * `soreness` __should__ reflect the number of body part that the user indicated soreness. Length __could__ be 0.
+* `body_part` __should__ be an integer between 1 and 10
+* `severity` __should__ be an integer between 1 and 5
+* `sleep_quality` __should__ be an integer between 1 and 10
+* `readiness` __should__ be an integer between 1 and 10
 
 ```
 POST /plans/daily_readiness HTTPS/1.1
