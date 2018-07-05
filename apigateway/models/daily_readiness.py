@@ -12,7 +12,7 @@ class DailyReadiness(Serialisable):
                  ):
         self.date_time = date_time
         self.user_id = user_id
-        self.soreness = soreness
+        self.soreness = get_soreness(soreness)
         self.sleep_quality = int(sleep_quality)
         self.readiness = int(readiness)
 
@@ -31,3 +31,12 @@ class DailyReadiness(Serialisable):
             'readiness': self.readiness,
         }
         return ret
+
+    def get_soreness(soreness):
+        soreness_filt= []
+        for body_part in soreness:
+            body_part_filt = {'body_part': body_part['body_part'],
+                              'severity': body_part['severity']}
+            soreness_filt.append(body_part_filt)
+        return soreness_filt
+

@@ -69,17 +69,9 @@ def validate_data(request):
         for soreness in request.json['soreness']:
             if not BodyPart(soreness['body_part']):
                 raise InvalidSchemaException('body_part not recognized')
-            if not SorenessType(soreness['soreness_type']):
-                raise InvalidSchemaException('soreness_type not recognized')
-            else:
-                if SorenessType(soreness['soreness_type']) == SorenessType.muscle_related:
-                    if not MuscleSorenessSeverity(soreness['severity']):
-                        raise InvalidSchemaException('severity not recognized')
-                elif SorenessType(soreness['soreness_type']) == SorenessType.joint_related:
-                    if not JointSorenessSeverity(soreness['severity']):
-                        raise InvalidSchemaException('severity not recognized')
+            elif not MuscleSorenessSeverity(soreness['severity']):
+                raise InvalidSchemaException('severity not recognized')
             # for valid ones, force values to be integer
-            soreness['soreness_type'] = int(soreness['soreness_type'])
             soreness['body_part'] = int(soreness['body_part'])
             soreness['severity'] = int(soreness['severity'])
 
