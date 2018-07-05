@@ -4,7 +4,7 @@
 
 #### Terminology
 
-The terminology of [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt) (specifically __must__, __should__, __may__ and their negatives) applies.  The word __will__, when applied to the Hardware Service API ("the API"), has the same meaning as __must__.
+The terminology of [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt) (specifically __must__, __should__, __may__ and their negatives) applies.  The word __will__, when applied to the Plans API ("the API"), has the same meaning as __must__.
 
 #### Protocol
 
@@ -41,6 +41,63 @@ The following simple types __may__ be used in responses:
 
 ## Endpoints
 
+### Daily Readiness
+
+#### Create
+
+This endpoint can be called to register a new daily readiness survey.
+
+##### Query String
+ 
+The client __must__ submit a request to the endpoint `/plans/daily_readiness`.
+
+##### Request
+
+The client __must__ submit a request body containing a JSON object with the following schema:
+```
+{
+	"date_time": Datetime,
+	"user_id": Uuid,
+	"soreness": [{"body_part": number, "severity": number}],
+	"sleep_quality": number,
+	"readines": number
+}
+```
+* `date_time` __should__ reflect the local time that survey was taken
+* `soreness` __should__ reflect the number of body part that the user indicated soreness. Length __could__ be 0.
+* `body_part` __should__ be an integer between 1 and 10
+* `severity` __should__ be an integer between 1 and 5
+* `sleep_quality` __should__ be an integer between 1 and 10
+* `readiness` __should__ be an integer between 1 and 10
+
+```
+POST /plans/daily_readiness HTTPS/1.1
+Host: apis.env.fathomai.com
+Content-Type: application/json
+Authorization: eyJraWQ...ajBc4VQ
+
+{
+	"date_time": "2018-07-03 10:42:20.1234",
+	"user_id":"02cb7965-7921-493a-80d4-6b278c928fad",
+	"soreness":[
+			{"body_part": 8, "severity": 2},
+			{"body_part": 14, "severity": 3}
+		   ],
+	"sleep_quality":4,
+	"readiness":10}
+
+```
+
+##### Responses
+ 
+ If the write was successful, the Service __will__ respond with HTTP Status `201 Created`, with a body with the following syntax:
+ 
+```
+{
+    "message": "success"
+}
+```
+
 ### Hello
 
 #### World
@@ -72,3 +129,5 @@ The Service __will__ respond with HTTP Status `200 Ok`, and with a body with the
     "message": String
 }
 ```
+
+

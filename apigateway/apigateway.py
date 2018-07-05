@@ -38,6 +38,10 @@ from routes.hello import app as hello_routes
 app.register_blueprint(hello_routes, url_prefix='/plans/hello')
 
 
+from routes.daily_readiness import app as daily_readiness_routes
+app.register_blueprint(daily_readiness_routes, url_prefix='/plans')
+
+
 @app.errorhandler(500)
 def handle_server_error(e):
     tb = sys.exc_info()[2]
