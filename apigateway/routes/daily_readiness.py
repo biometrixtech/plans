@@ -40,6 +40,16 @@ def handle_daily_readiness_create():
         return {'duplicate daily_readiness record'}, 201
 
 
+
+@app.route('/previous_soreness', methods=['GET'])
+@authentication_required
+@xray_recorder.capture('routes.daily_readiness.previous_soreness')
+def handle_previous_soreness_get():
+    soreness = [1, 5, 15]
+    return {'soreness': soreness}, 200
+
+
+
 @xray_recorder.capture('routes.daily_readiness.validate')
 def validate_data(request):
     if not isinstance(request.json, dict):
