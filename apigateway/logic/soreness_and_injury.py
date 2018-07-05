@@ -146,6 +146,7 @@ class SorenessCalculator(object):
 
         body_parts = []
 
+        # lower back
         lower_back = BodyPart(BodyPartLocation.lower_back, 1)
         lower_back.inhibit_exercises.append(exercise.InhibitExercise(55, 1))
         lower_back.inhibit_exercises.append(exercise.InhibitExercise(54, 2))
@@ -175,8 +176,98 @@ class SorenessCalculator(object):
         lower_back.activate_exercises.append(core_strength_progression)
 
         body_parts.append(lower_back)
-        body_parts.append(BodyPart(BodyPartLocation.hip_flexor), 2)
-        body_parts.append(BodyPart(BodyPartLocation.glutes), 3)
+
+        # hip
+
+        hip = BodyPart(BodyPartLocation.hip_flexor, 2)
+
+        hip.inhibit_exercises.append(exercise.InhibitExercise(3, 1))
+        hip.inhibit_exercises.append(exercise.InhibitExercise(48, 2))
+        hip.inhibit_exercises.append(exercise.InhibitExercise(54, 3))
+        hip.inhibit_exercises.append(exercise.InhibitExercise(1, 4))
+        hip.inhibit_exercises.append(exercise.InhibitExercise(44, 5))
+        hip.inhibit_exercises.append(exercise.InhibitExercise(4, 6))
+        hip.inhibit_exercises.append(exercise.InhibitExercise(5, 7))
+        hip.inhibit_exercises.append(exercise.InhibitExercise(2, 8))
+
+        hip.lengthen_exercises.append(exercise.LengthenExercise(49, 1))
+        hip.lengthen_exercises.append(exercise.LengthenExercise(9, 2))
+        hip.lengthen_exercises.append(exercise.LengthenExercise(46, 3))
+        hip.lengthen_exercises.append(exercise.LengthenExercise(28, 4))
+
+        posterior_pelvic_tilt = exercise.ActivateExercise(79, 1)
+        posterior_pelvic_tilt.progressions = [80]
+
+        hip.activate_exercises.append(posterior_pelvic_tilt)
+
+        hip_bridge_progression = exercise.ActivateExercise(10, 2)
+        hip_bridge_progression.progressions = [12, 11, 13]
+
+        hip.activate_exercises.append(hip_bridge_progression)
+
+        hip.activate_exercises.append(exercise.ActivateExercise(50, 3))
+        hip.activate_exercises.append(exercise.ActivateExercise(84, 4))
+
+        glute_activation = exercise.ActivateExercise(34, 5)
+        glute_activation.progressions = [35]
+        hip.activate_exercises.append(glute_activation)
+
+        body_parts.append(hip)
+
+        # glutes
+
+        glutes = BodyPart(BodyPartLocation.glutes, 3)
+
+        glutes.inhibit_exercises.append(exercise.InhibitExercise(44, 1))
+        glutes.inhibit_exercises.append(exercise.InhibitExercise(3, 2))
+
+        it_band = exercise.InhibitExercise(4, 3)
+        it_band.progressions = [5]
+        glutes.InhibitExercise.append(it_band)
+
+        glutes.inhibit_exercises.append(exercise.InhibitExercise(54, 4))
+        glutes.inhibit_exercises.append(exercise.InhibitExercise(2, 5))
+
+        glutes.lengthen_exercises.append(exercise.LengthenExercise(9, 1))
+        glutes.lengthen_exercises.append(exercise.LengthenExercise(46, 2))
+
+        stretching_erectors = exercise.lengthen_exercises(103, 3)
+        stretching_erectors.progressions = [104]
+        glutes.lengthen_exercises.append(stretching_erectors)
+
+        glutes.lengthen_exercises.append(exercise.LengthenExercise(28, 4))
+
+        gastroc_soleus = exercise.lengthen_exercises(25, 5)
+        gastroc_soleus.progressions = [26]
+        glutes.lengthen_exercises.append(gastroc_soleus)
+
+        hip_bridge_progression = exercise.ActivateExercise(10, 1)
+        hip_bridge_progression.progressions = [12, 11, 13]
+
+        glutes.activate_exercises.append(hip_bridge_progression)
+
+        glute_activation = exercise.ActivateExercise(81, 2)
+        glute_activation.progressions = [82, 83]
+
+        glutes.activate_exercises.append(glute_activation)
+
+        glute_activation_2 = exercise.ActivateExercise(34, 3)
+        glute_activation_2.progressions = [35]
+        glutes.activate_exercises.append(glute_activation_2)
+
+        core_strength_progression = exercise.ActivateExercise(85, 4)
+        core_strength_progression.progressions = [86, 87, 88]
+
+        glutes.activate_exercises.append(core_strength_progression)
+
+        core_strength_progression_2 = exercise.ActivateExercise(89, 5)
+        core_strength_progression_2.progressions = [90, 91, 92]
+
+        glutes.activate_exercises.append(core_strength_progression_2)
+
+        body_parts.append(glutes)
+
+        '''
         body_parts.append(BodyPart(BodyPartLocation.abdominals), 4)
         body_parts.append(BodyPart(BodyPartLocation.hamstrings), 5)
         body_parts.append(BodyPart(BodyPartLocation.outer_thigh), 6)
@@ -187,6 +278,7 @@ class SorenessCalculator(object):
         body_parts.append(BodyPart(BodyPartLocation.shin), 11)
         body_parts.append(BodyPart(BodyPartLocation.ankle), 12)
         body_parts.append(BodyPart(BodyPartLocation.foot), 13)
+        '''
 
         return body_parts
 

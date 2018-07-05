@@ -162,15 +162,14 @@ class ExerciseRecommendations(object):
                 return exercise_priority.present
             elif soreness_level == 2:
                 return exercise_priority.high
-            elif soreness_level == 3:
-                return exercise_priority.present
             else:
                 return exercise_priority.avoid
 
+        ''' not doing integrate now
         elif exercise_phase == Phase.integrate:
-
-            if soreness_level is None or soreness_level <= 3:
+            if soreness_level is None or soreness_level < 2:
                 return exercise_priority.present
             else:
                 return exercise_priority.avoid
+        '''
 

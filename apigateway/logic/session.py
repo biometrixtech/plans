@@ -229,6 +229,7 @@ class RecoverySession(object):
         self.recommended_lengthen_exercises = []
         self.recommended_activate_exercises = []
         self.recommended_integrate_exercises = []
+        self.duration_minutes = 0
 
 
 class GlobalLoadEstimationParameters(object):

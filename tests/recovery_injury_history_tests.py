@@ -188,6 +188,37 @@ def test_get_end_time_from_evening_trigger_recovery_3():
     assert datetime.datetime(2018, 6, 29, 12, 0, 0) == end_time
 
 
+'''
+one body part
+if soreness=3 (no more than 60% of time on inhibit exercises, no more than 60% of time on lengthen exercises, 
+total no more than 15 minutes)
+if soreness=2 (no more than 40% of time on inhibit exercises, no more than 40% of time on lengthen exercises, 
+no more than 40% on activate exercises, total no more than 15 minutes)
+if soreness =1 (no more than 30% of time on inhibit exercises, no more than 30% of time on lengthen exercises, 
+no more than 60% on activate exercises, total no more than 15 minutes)
+if no soreness, due general program (no more than 30% of time on inhibit exercises, 
+no more than 30% of time on lengthen exercises, no more than 60% on activate exercises, total no more than 15 minutes)
+
+dosage
+
+start at max dosage, scale down to min dosage until all exercises are at min (lowest priority to highest), 
+if still too much, drop least priority, etc
+
+
+> 1 body part
+no activate if any body part soreness = 3 or more
+if 1s and 2s, follow most severe case
+
+dosage: 
+two body parts, same severity: merge list and then drop off by priority like with 1 body part (pick which one is first 
+based on body part ranking
+
+if not same severity: find difference in time % and allocate that net gain to the more server part(s); then follow
+normal protocol for the lower severity portion of time
+'''
+
+
+
 '''Business related tests
 
 # am tests
