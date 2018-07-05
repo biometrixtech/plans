@@ -42,13 +42,16 @@ def handle_daily_readiness_create():
 
 
 
-@app.route('daily_readiness/previous', methods=['GET'])
+@app.route('daily_readiness/previous', methods=['GET', 'POST'])
 @authentication_required
 @xray_recorder.capture('routes.daily_readiness.previous')
 def handle_get_previous_soreness():
-    current_time = datetime.datetime.now()
     store = DailyReadinessDatastore()
-    user_id = jwt.decode(request.headers['Authorization'], verify=False)['user_id']
+    print(request)
+    if request.method == 'GET':
+        user_id = jwt.decode(request.headers['Authorization'], verify=False)['user_id']
+    elif request.method == 'POST':
+        user_id = request.json['user_id']
     soreness = store.get(user_id=user_id)
     return {'body_part': soreness}, 200
 
