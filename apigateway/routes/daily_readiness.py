@@ -41,11 +41,13 @@ def handle_daily_readiness_create():
 
 
 
-@app.route('/previous_soreness', methods=['GET'])
+@app.route('daily_readiness/previous', methods=['GET'])
 @authentication_required
-@xray_recorder.capture('routes.daily_readiness.previous_soreness')
-def handle_previous_soreness_get():
-    soreness = [1, 5, 15]
+@xray_recorder.capture('routes.daily_readiness.previous')
+def handle_get_previous_soreness():
+    current_time = datetime.datetime.now()
+    store = DailyReadinessDatastore()
+    soreness = store.get()
     return {'soreness': soreness}, 200
 
 
