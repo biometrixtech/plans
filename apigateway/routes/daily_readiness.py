@@ -33,7 +33,7 @@ def handle_daily_readiness_create():
     store = DailyReadinessDatastore()
     try:
         store.put(daily_readiness)
-        return 'success', 201
+        return {'message': 'success'}, 201
         # return {'daily_readiness': daily_readiness}, 201
     except DuplicateEntityException:
         print(json.dumps({'message': 'daily_readiness already created for user {}'.format(daily_readiness.get_id())}))
