@@ -42,7 +42,7 @@ def handle_daily_readiness_create():
 
 
 
-@app.route('daily_readiness/previous', methods=['POST'])
+@app.route('daily_readiness/previous', methods=['GET'])
 @authentication_required
 @xray_recorder.capture('routes.daily_readiness.previous')
 def handle_get_previous_soreness():
