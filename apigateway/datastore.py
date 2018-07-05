@@ -45,7 +45,7 @@ class DailyReadinessDatastore(MongodbDatastore):
         item = {
             'date_time': dailyreadiness.date_time,
             'user_id': dailyreadiness.user_id,
-            'soreness': dailyreadiness.soreness,
+            'soreness': dailyreadiness.get_soreness(),
             'sleep_quality': dailyreadiness.sleep_quality,
             'readiness': dailyreadiness.readiness,
         }
