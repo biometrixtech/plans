@@ -72,3 +72,75 @@ The Service __will__ respond with HTTP Status `200 Ok`, and with a body with the
     "message": String
 }
 ```
+### Session
+
+A `Session` object __will__ have the following schema:
+
+```
+{
+	"session_id": Uuid,
+	"event_date": Datetime,
+	"created_date": Datetime,
+	"updated_date": Datetime,
+	"session_status": string
+}
+```
+
+The following constraints __will__ apply:
+
+* `session_status` __will__ be one of the strings `CREATE_COMPLETE`, `UPLOAD_IN_PROGRESS`, `UPLOAD_COMPLETE`, `PROCESSING_IN_PROGRESS`, `PROCESSING_COMPLETE` or `PROCESSING_FAILED`.  For a newly-created session, the status __should__ be `CREATE_COMPLETE`.
+
+## Endpoints
+
+### Session
+
+#### Create
+
+This endpoint can be called to register a new session.
+
+##### Query String
+ 
+The client __must__ submit a request to the endpoint `/session`.
+
+##### Request
+
+The client __must__ submit a request body containing a JSON object with the following schema:
+
+```
+{
+    "sensors": [ MacAddress, MacAddress, MacAddress ],
+    "event_date": Datetime,
+    "end_date": Datetime
+}
+```
+
+* `sensors` __must__ be a list of exactly three MacAddresses, each of which is the ID of a sensor from which data is being collected.
+* `event_date` __should__ reflect the time that the practice session began.
+* `end_date` __should__ reflect the time that the practice session ended.
+
+```
+POST /v1/session HTTP/1.1
+Host: preprocessing.env.fathomai.com
+Content-Type: application/json
+Authorization: eyJraWQ...ajBc4VQ
+
+{
+    "sensors": [
+        "11:22:33:44:55:66",
+        "22:33:44:55:66:77",
+        "55:22:33:44:55:66"
+    ],
+    "event_date": "2016-12-09T08:21:15.123Z"
+}
+
+```
+
+##### Responses
+ 
+ If the registration was successful, the Service __will__ respond with HTTP Status `200 Ok` or `201 Created`, with a body with the following syntax:
+ 
+```
+{
+    "session": Session
+}
+```
