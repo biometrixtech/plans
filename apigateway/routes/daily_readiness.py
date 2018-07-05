@@ -48,7 +48,7 @@ def handle_get_previous_soreness():
     current_time = datetime.datetime.now()
     store = DailyReadinessDatastore()
     soreness = store.get(user_id=request.json['user_id'])
-    return {'soreness': soreness}, 200
+    return {'body_part': soreness}, 200
 
 
 
