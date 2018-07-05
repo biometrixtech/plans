@@ -22,7 +22,8 @@ class MongodbDatastore(Datastore):
         except Exception as e:
             raise e
 
-    def _query_mongodb(self, user_id, date_time):
+    @xray_recorder.capture('datastore.MongodbDatastore.put')
+    def _query_mongodb(self, user_id):
         mongo_collection = get_mongo_collection()
         query0 = {'user_id': user_id}
         query1 = {'soreness': 1, '_id': 0}
@@ -51,7 +52,7 @@ class MongodbDatastore(Datastore):
 class DailyReadinessDatastore(MongodbDatastore):
     @xray_recorder.capture('datastore.DailyReadinessDatastore.get')
     def get(self, date_time=None, user_id=None, soreness=None, sleep_quality=None, readiness=None):
-        return self._query_mongodb(user_id, date_time)
+        return self._query_mongodb(user_id)
 
     @staticmethod
     def item_to_mongodb(dailyreadiness):
