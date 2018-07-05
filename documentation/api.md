@@ -41,39 +41,6 @@ The following simple types __may__ be used in responses:
 
 ## Endpoints
 
-### Hello
-
-#### World
-
-This endpoint serves as a demonstration of the service
-
-##### Query String
- 
-The client __must__ submit a request to the endpoint `/hello/world`. The request method __must__ be `GET`.
-
-
-
-```
-GET /plans/hello/world HTTP/1.1
-Host: apis.env.fathomai.com
-Content-Type: application/json
-
-
-```
-
-Authentication is not required for this endpoint.
-
-##### Responses
- 
-The Service __will__ respond with HTTP Status `200 Ok`, and with a body with the following syntax:
- 
-```
-{
-    "message": String
-}
-```
-
-
 ### Daily Readiness
 
 #### Create
@@ -130,3 +97,37 @@ Authorization: eyJraWQ...ajBc4VQ
     "message": "success"
 }
 ```
+
+### Hello
+
+#### World
+
+This endpoint serves as a demonstration of the service
+
+##### Query String
+ 
+The client __must__ submit a request to the endpoint `/hello/world`. The request method __must__ be `GET`.
+
+
+
+```
+GET /plans/hello/world HTTP/1.1
+Host: apis.env.fathomai.com
+Content-Type: application/json
+
+
+```
+
+Authentication is not required for this endpoint.
+
+##### Responses
+ 
+The Service __will__ respond with HTTP Status `200 Ok`, and with a body with the following syntax:
+ 
+```
+{
+    "message": String
+}
+```
+
+
