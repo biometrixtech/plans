@@ -41,9 +41,10 @@ class ExercisePriority(IntEnum):
 
 
 class Exercise(metaclass=abc.ABCMeta):
-    def __init__(self):
+    def __init__(self, library_id, body_part_priority=0):
+        self.id = library_id
         self.name = ""
-        self.body_parts_targeted = []
+        # self.body_parts_targeted = []
         self.min_reps = None
         self.max_reps = None
         self.min_sets = None
@@ -54,8 +55,7 @@ class Exercise(metaclass=abc.ABCMeta):
         self.unit_of_measure = UnitOfMeasure.seconds
         self.seconds_rest_between_sets = 0
         self.time_per_set = 0
-        self.progresses_to = None   # another exercise if it progresses to another
-
+        self.progressions = []
         self.technical_difficulty = TechnicalDifficulty.beginner
         self.program_type = ProgramType.comprehensive_warm_up
 
@@ -64,38 +64,40 @@ class Exercise(metaclass=abc.ABCMeta):
         self.procedure = ""
         self.goal = ""
 
+        self.body_part_priority = body_part_priority
+
     @abc.abstractmethod
     def exercise_phase(self):
         return Phase.inhibit
 
 
 class InhibitExercise(Exercise):
-    def __init__(self):
-        Exercise.__init__()
+    def __init__(self, library_id, body_part_priority=0):
+        Exercise.__init__(library_id, body_part_priority)
 
     def exercise_phase(self):
         return Phase.inhibit
 
 
 class LengthenExercise(Exercise):
-    def __init__(self):
-        Exercise.__init__()
+    def __init__(self, library_id, body_part_priority=0):
+        Exercise.__init__(library_id, body_part_priority)
 
     def exercise_phase(self):
         return Phase.lengthen
 
 
 class ActivateExercise(Exercise):
-    def __init__(self):
-        Exercise.__init__()
+    def __init__(self, library_id, body_part_priority=0):
+        Exercise.__init__(library_id, body_part_priority)
 
     def exercise_phase(self):
         return Phase.activate
 
 
 class IntegrateExercise(Exercise):
-    def __init__(self):
-        Exercise.__init__()
+    def __init__(self, library_id, body_part_priority=0):
+        Exercise.__init__(library_id, body_part_priority)
 
     def exercise_phase(self):
         return Phase.integrate

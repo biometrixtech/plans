@@ -1,5 +1,5 @@
 from enum import Enum, IntEnum
-
+import exercise
 
 class SorenessType(Enum):
     muscle_related = 0
@@ -62,7 +62,7 @@ class InjuryStatus(Enum):
     returning_from_injury = 2
 
 
-class BodyPart(Enum):
+class BodyPartLocation(Enum):
     head = 0
     shoulder = 1
     chest = 2
@@ -74,13 +74,23 @@ class BodyPart(Enum):
     shin = 8
     ankle = 9
     foot = 10
-    neck = 11
-    upper_back = 12
-    lower_back = 13
+    outer_thigh = 11
+    lower_back = 12
     glutes = 14
     hamstrings = 15
     calves = 16
     achilles = 17
+
+
+class BodyPart(object):
+
+    def __init__(self, body_part_location, treatment_priority):
+        self.location = body_part_location
+        self.treatment_priority = treatment_priority
+        self.inhibit_exercises = []
+        self.lengthen_exercises = []
+        self.activate_exercises = []
+        self.integrate_exercises = []
 
 
 class Injury(object):
@@ -131,6 +141,54 @@ class SorenessCalculator(object):
 
     def __init__(self):
         self.surveys = []
+
+    def get_body_parts(self):
+
+        body_parts = []
+
+        lower_back = BodyPart(BodyPartLocation.lower_back, 1)
+        lower_back.inhibit_exercises.append(exercise.InhibitExercise(55, 1))
+        lower_back.inhibit_exercises.append(exercise.InhibitExercise(54, 2))
+        lower_back.inhibit_exercises.append(exercise.InhibitExercise(4, 3))
+        lower_back.inhibit_exercises.append(exercise.InhibitExercise(5, 4))
+        lower_back.inhibit_exercises.append(exercise.InhibitExercise(48, 5))
+        lower_back.inhibit_exercises.append(exercise.InhibitExercise(3, 6))
+
+        lower_back.lengthen_exercises.append(exercise.LengthenExercise(49, 1))
+        lower_back.lengthen_exercises.append(exercise.LengthenExercise(57, 2))
+        lower_back.lengthen_exercises.append(exercise.LengthenExercise(56, 3))
+        lower_back.lengthen_exercises.append(exercise.LengthenExercise(8, 4))
+
+        posterior_pelvic_tilt = exercise.ActivateExercise(79, 1)
+        posterior_pelvic_tilt.progressions = [80]
+
+        lower_back.activate_exercises.append(posterior_pelvic_tilt)
+
+        hip_bridge_progression = exercise.ActivateExercise(10, 2)
+        hip_bridge_progression.progressions = [12, 11, 13]
+
+        lower_back.activate_exercises.append(hip_bridge_progression)
+
+        core_strength_progression = exercise.ActivateExercise(85, 3)
+        core_strength_progression.progressions = [86, 87, 88, 89, 90, 91, 92]
+
+        lower_back.activate_exercises.append(core_strength_progression)
+
+        body_parts.append(lower_back)
+        body_parts.append(BodyPart(BodyPartLocation.hip_flexor), 2)
+        body_parts.append(BodyPart(BodyPartLocation.glutes), 3)
+        body_parts.append(BodyPart(BodyPartLocation.abdominals), 4)
+        body_parts.append(BodyPart(BodyPartLocation.hamstrings), 5)
+        body_parts.append(BodyPart(BodyPartLocation.outer_thigh), 6)
+        body_parts.append(BodyPart(BodyPartLocation.groin), 7)
+        body_parts.append(BodyPart(BodyPartLocation.quads), 8)
+        body_parts.append(BodyPart(BodyPartLocation.knee), 9)
+        body_parts.append(BodyPart(BodyPartLocation.calves), 10)
+        body_parts.append(BodyPart(BodyPartLocation.shin), 11)
+        body_parts.append(BodyPart(BodyPartLocation.ankle), 12)
+        body_parts.append(BodyPart(BodyPartLocation.foot), 13)
+
+        return body_parts
 
     def get_soreness_summary_from_surveys(self, last_daily_readiness_survey, last_post_session_survey,
                                           trigger_date_time):
