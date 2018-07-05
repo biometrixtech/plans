@@ -23,7 +23,9 @@ class MongodbDatastore(Datastore):
             raise e
 
     def _query_mongodb(self, user_id, date_time):
-        ret = [1, 5, 10]
+        mongo_collection = get_mongo_collection()
+        query = {'user_id': user_id}
+        ret = mongo_collection.find(query).sort({'date_time': -1}).limit(1)
 
         return ret
 
@@ -44,7 +46,6 @@ class MongodbDatastore(Datastore):
 class DailyReadinessDatastore(MongodbDatastore):
     @xray_recorder.capture('datastore.DailyReadinessDatastore.get')
     def get(self, date_time=None, user_id=None, soreness=None, sleep_quality=None, readiness=None):
-
         return self._query_mongodb(user_id, date_time)
 
     @staticmethod
