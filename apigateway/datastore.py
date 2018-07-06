@@ -21,6 +21,20 @@ class MongodbDatastore(Datastore):
                 self._put_mongodb(item, allow_patch)
         except Exception as e:
             raise e
+
+    @xray_recorder.capture('datastore.MongodbDatastore.put')
+    def _query_mongodb(self, user_id):
+        mongo_collection = get_mongo_collection()
+        query0 = {'user_id': user_id}
+        query1 = {'soreness': 1, '_id': 0}
+        mongo_result = list(mongo_collection.find(query0, query1).sort([('date_time', -1)]).limit(1))
+        ret = []
+        for soreness in mongo_result[0]['soreness']:
+            if soreness['severity'] > 1:
+                ret.append(soreness['body_part'])
+
+        return ret
+
     @xray_recorder.capture('datastore.MongodbDatastore.put')
     def _put_mongodb(self, item, allow_patch=False):
         item = self.item_to_mongodb(item)
@@ -38,7 +52,7 @@ class MongodbDatastore(Datastore):
 class DailyReadinessDatastore(MongodbDatastore):
     @xray_recorder.capture('datastore.DailyReadinessDatastore.get')
     def get(self, date_time=None, user_id=None, soreness=None, sleep_quality=None, readiness=None):
-        return self
+        return self._query_mongodb(user_id)
 
     @staticmethod
     def item_to_mongodb(dailyreadiness):

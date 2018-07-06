@@ -3,6 +3,7 @@ from flask import request, Blueprint
 import json
 import os
 import datetime
+import jwt
 # import uuid
 
 # from auth import get_accessory_id_from_auth
@@ -38,6 +39,22 @@ def handle_daily_readiness_create():
     except DuplicateEntityException:
         print(json.dumps({'message': 'daily_readiness already created for user {}'.format(daily_readiness.get_id())}))
         return {'duplicate daily_readiness record'}, 201
+
+
+
+@app.route('daily_readiness/previous', methods=['GET', 'POST'])
+@authentication_required
+@xray_recorder.capture('routes.daily_readiness.previous')
+def handle_get_previous_soreness():
+    store = DailyReadinessDatastore()
+    print(request)
+    if request.method == 'GET':
+        user_id = jwt.decode(request.headers['Authorization'], verify=False)['user_id']
+    elif request.method == 'POST':
+        user_id = request.json['user_id']
+    body_part = store.get(user_id=user_id)
+    return {'body_part': body_part}, 200
+
 
 
 @xray_recorder.capture('routes.daily_readiness.validate')
