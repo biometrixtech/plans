@@ -40,8 +40,8 @@ class ExercisePriority(IntEnum):
     avoid = 2
 
 
-class Exercise(metaclass=abc.ABCMeta):
-    def __init__(self, library_id, body_part_priority=0):
+class Exercise(object):
+    def __init__(self, library_id):
         self.id = library_id
         self.name = ""
         # self.body_parts_targeted = []
@@ -55,7 +55,9 @@ class Exercise(metaclass=abc.ABCMeta):
         self.unit_of_measure = UnitOfMeasure.seconds
         self.seconds_rest_between_sets = 0
         self.time_per_set = 0
+        self.time_per_rep = 0
         self.progressions = []
+        self.progresses_to = None
         self.technical_difficulty = TechnicalDifficulty.beginner
         self.program_type = ProgramType.comprehensive_warm_up
 
@@ -63,44 +65,33 @@ class Exercise(metaclass=abc.ABCMeta):
         self.cues = ""
         self.procedure = ""
         self.goal = ""
+        self.equipment_required = None
 
+
+class AssignedExercise(Exercise):
+    def __init__(self, library_id, body_part_priority=0):
+        Exercise.__init__(library_id)
         self.body_part_priority = body_part_priority
 
-    @abc.abstractmethod
-    def exercise_phase(self):
-        return Phase.inhibit
 
-
-class InhibitExercise(Exercise):
+class InhibitExercise(AssignedExercise):
     def __init__(self, library_id, body_part_priority=0):
         Exercise.__init__(library_id, body_part_priority)
 
-    def exercise_phase(self):
-        return Phase.inhibit
 
-
-class LengthenExercise(Exercise):
+class LengthenExercise(AssignedExercise):
     def __init__(self, library_id, body_part_priority=0):
         Exercise.__init__(library_id, body_part_priority)
 
-    def exercise_phase(self):
-        return Phase.lengthen
 
-
-class ActivateExercise(Exercise):
+class ActivateExercise(AssignedExercise):
     def __init__(self, library_id, body_part_priority=0):
         Exercise.__init__(library_id, body_part_priority)
 
-    def exercise_phase(self):
-        return Phase.activate
 
-
-class IntegrateExercise(Exercise):
+class IntegrateExercise(AssignedExercise):
     def __init__(self, library_id, body_part_priority=0):
         Exercise.__init__(library_id, body_part_priority)
-
-    def exercise_phase(self):
-        return Phase.integrate
 
 
 class RecommendedExercise(object):
@@ -130,8 +121,7 @@ class ExerciseRecommendations(object):
             exercise_assignment = RecommendedExercise()
             exercise_assignment.exercise = soreness_exercise
             exercise_assignment.priority = \
-                self.get_exercise_priority_from_soreness_level(soreness_severity,
-                                                               soreness_exercise.exercise_phase())
+                self.get_exercise_priority_from_soreness_level(soreness_severity, soreness_exercise)
 
             # TODO expand to accommodate if exercise already exists or if others already exist
             if isinstance(soreness_exercise, InhibitExercise):
@@ -143,11 +133,11 @@ class ExerciseRecommendations(object):
             elif isinstance(soreness_exercise, IntegrateExercise):
                     self.recommended_integrate_exercises.append(exercise_assignment)
 
-    def get_exercise_priority_from_soreness_level(self, soreness_level, exercise_phase):
+    def get_exercise_priority_from_soreness_level(self, soreness_level, soreness_exercise):
 
         exercise_priority = ExercisePriority
 
-        if exercise_phase == Phase.inhibit or exercise_phase == Phase.lengthen:
+        if isinstance(soreness_exercise, InhibitExercise) or isinstance(soreness_exercise, LengthenExercise):
 
             if soreness_level is None or soreness_level <= 1:
                 return exercise_priority.present
@@ -156,7 +146,7 @@ class ExerciseRecommendations(object):
             else:
                 return exercise_priority.avoid
 
-        elif exercise_phase == Phase.activate:
+        elif isinstance(soreness_exercise, ActivateExercise):
 
             if soreness_level is None or soreness_level <= 1:
                 return exercise_priority.present
