@@ -49,7 +49,7 @@ This endpoint can be called to register a new daily readiness survey.
 
 ##### Query String
  
-The client __must__ submit a request to the endpoint `/plans/daily_readiness`.
+The client __must__ submit a request to the endpoint `/plans/daily_readiness`. The request method __must__ be `POST`.
 
 ##### Request
 
@@ -104,16 +104,22 @@ This endpoint can be called to get the body parts where soreness was reported in
 
 ##### Query String
  
-The client __must__ submit a request to the endpoint `/plans/daily_readiness/previous`. The request method __must__ be `GET`.
+The client __must__ submit a request to the endpoint `/plans/daily_readiness/previous`. The request method __must__ be `POST`.
 
 ##### Request
-
-The request does not require a body.
+The client __must__ submit a request body containing a JSON object with the following schema:
 ```
-GET /plans/daily_readiness/previous HTTPS/1.1
+{
+	"user_id": Uuid
+}
+```
+POST /plans/daily_readiness/previous HTTPS/1.1
 Host: apis.env.fathomai.com
 Content-Type: application/json
 Authorization: eyJraWQ...ajBc4VQ
+{
+	"user_id":"02cb7965-7921-493a-80d4-6b278c928fad"
+}
 
 ```
 Authentication is required for this endpoint
@@ -124,7 +130,7 @@ Authentication is required for this endpoint
  
 ```
 {
-    "body_part": [8, 15]
+    "body_part": [number, number]
 }
 ```
 * body_part will be a list of enumerated body parts (potentially empty).
