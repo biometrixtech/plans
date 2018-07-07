@@ -3,7 +3,7 @@ import training
 import datetime
 import training_plan_management
 import athlete_data_access_mocks
-
+import exercise_data_access
 
 '''
 
@@ -97,7 +97,15 @@ def test_daily_plan_has_pm_recovery_pm_end():
     athlete_id = "1"
     assert blank_plan(athlete_id, athlete_afternoon_dao()).recovery_pm.end_time == get_evening_midnight()
 
+
 def test_daily_plan_am_recovery_has_practice_session():
     athlete_id = "1"
     athlete_dao = athlete_data_access_mocks.AthleteDataAccessMorningPractice()
     assert len(blank_plan(athlete_id, athlete_dao).practice_sessions) == 1
+
+def test_get_exercises():
+    exercise_dao = exercise_data_access.ExerciseDataAccess()
+    exercises = exercise_dao.get_exercises_by_ids([2, 3])
+    assert len(exercises) > 0
+
+
