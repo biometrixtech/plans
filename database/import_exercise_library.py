@@ -28,13 +28,13 @@ with open('Exercise_Library.csv', newline='') as csvfile:
                 exercise_item.unit_of_measure = row[22]
                 exercise_item.seconds_rest_between_sets = int(row[23])
                 if row[24] == "-" or row[25] == "":
-                    exercise_item.time_per_set = None
+                    exercise_item.seconds_per_set = None
                 else:
-                    exercise_item.time_per_set = int(row[24])
+                    exercise_item.seconds_per_set = int(row[24])
                 if row[25] == "-" or row[25] == "":
-                    exercise_item.time_per_rep = None
+                    exercise_item.seconds_per_rep = None
                 else:
-                    exercise_item.time_per_rep = int(row[25])
+                    exercise_item.seconds_per_rep = int(row[25])
                 exercise_item.progresses_to = row[26]
                 exercise_item.technical_difficulty = row[28]
                 exercise_item.equipment_required = row[29]
@@ -57,8 +57,8 @@ for exercise_item in exercises:
                            'exposureTarget': exercise_item.exposure_target,
                            'unitOfMeasure': exercise_item.unit_of_measure,
                            'secondsRestBetweenSets': exercise_item.seconds_rest_between_sets,
-                           'timePerSet': exercise_item.time_per_set,
-                           'timePerRep': exercise_item.time_per_rep,
+                           'timePerSet': exercise_item.seconds_per_set,
+                           'timePerRep': exercise_item.seconds_per_rep,
                            'progressesTo': exercise_item.progresses_to,
                            'technicalDifficulty': exercise_item.technical_difficulty,
                            'equipmentRequired': exercise_item.equipment_required
