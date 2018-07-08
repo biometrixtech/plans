@@ -241,32 +241,33 @@ class RecoverySession(object):
 
     def set_exercise_target_minutes(self, soreness_list, total_minutes_target):
         max_severity = 0
-        for soreness in soreness_list:
-            max_severity = max(max_severity, soreness.severity)
+        if soreness_list is not None:
+            for soreness in soreness_list:
+                max_severity = max(max_severity, soreness.severity)
 
-        if max_severity >= 3:
+        if max_severity == 3:
             self.integrate_target_minutes = None
             self.activate_target_minutes = None
-            self.lengthen_target_minutes = .5 * total_minutes_target
-            self.inhibit_target_minutes = .5 * total_minutes_target
+            self.lengthen_target_minutes = total_minutes_target / 2
+            self.inhibit_target_minutes = total_minutes_target / 2
             self.integrate_max_percentage = None
             self.activate_max_percentage = None
             self.lengthen_max_percentage = .6
             self.inhibit_max_percentage = .6
         elif max_severity == 2:
             self.integrate_target_minutes = None
-            self.activate_target_minutes = .33 * total_minutes_target
-            self.lengthen_target_minutes = .33 * total_minutes_target
-            self.inhibit_target_minutes = .33 * total_minutes_target
+            self.activate_target_minutes = total_minutes_target / 3
+            self.lengthen_target_minutes = total_minutes_target / 3
+            self.inhibit_target_minutes = total_minutes_target / 3
             self.integrate_max_percentage = None
             self.activate_max_percentage = .4
             self.lengthen_max_percentage = .4
             self.inhibit_max_percentage = .4
         elif max_severity <= 1:
             self.integrate_target_minutes = None
-            self.activate_target_minutes = .50 * total_minutes_target
-            self.lengthen_target_minutes = .25 * total_minutes_target
-            self.inhibit_target_minutes = .25 * total_minutes_target
+            self.activate_target_minutes = total_minutes_target / 2
+            self.lengthen_target_minutes = total_minutes_target / 4
+            self.inhibit_target_minutes = total_minutes_target / 4
             self.integrate_max_percentage = None
             self.activate_max_percentage = .6
             self.lengthen_max_percentage = .3
