@@ -134,3 +134,44 @@ class WeeklyCrossTrainingDatastore(object):
         }
         return item
 
+
+
+class WeeklyTrainingDatastore(object):
+    # @xray_recorder.capture('datastore.WeeklyCrossTrainingDatastore.get')
+    def get(self, user_id=None, week_start=None, collection=None):
+        return self._query_mongodb(user_id, week_start, collection)
+
+    # @xray_recorder.capture('datastore.WeeklyCrossTrainingDatastore.put')
+    def put(self, items, collection):
+        if not isinstance(items, list):
+            items = [items]
+        try:
+            for item in items:
+                self._put_mongodb(item, collection)
+        except Exception as e:
+            raise e
+
+    @xray_recorder.capture('datastore.WeeklyTrainingDatastore._query_mongodb')
+    def _query_mongodb(self, user_id, week_start, collection):
+        mongo_collection = get_mongo_collection(collection)
+        query = {'user_id': user_id, 'week_start': week_start}
+        return list(mongo_collection.find(query))
+
+    @xray_recorder.capture('datastore.WeeklyTrainingDatastore._put_mongodb')
+    def _put_mongodb(self, item, collection):
+        item = self.item_to_mongodb(item)
+        mongo_collection = get_mongo_collection(collection)
+        query = {'user_id': item['user_id'], 'week_start': item['week_start']}
+        mongo_collection.replace_one(query, item, upsert=True)
+
+    @staticmethod
+    def item_to_mongodb(weeklytraining):
+        item = {
+            'user_id': weeklytraining.user_id,
+            'week_start': weeklytraining.week_start,
+            'sport': weeklytraining.sport,
+            'practice': weeklytraining.practice,
+            'competition': weeklytraining.competition
+        }
+        return item
+

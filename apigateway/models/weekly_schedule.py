@@ -64,3 +64,35 @@ class WeeklyCrossTrainingSchedule(Serialisable):
         }
         return ret
 
+
+class WeeklyTrainingSchedule(Serialisable):
+    
+    def __init__(self,
+                 user_id,
+                 week_start,
+                 sport,
+                 practice,
+                 competition
+                 ):
+        self.user_id = user_id
+        self.week_start = week_start
+        self.sport = sport
+        self.practice = practice
+        self.competition = competition
+
+    def get_id(self):
+        return self.user_id
+
+    def get_start_date(self):
+        return self.week_start
+
+    def json_serialise(self):
+        ret = {
+            'user_id': self.user_id,
+            'week_start': self.week_start,
+            'sport': self.sport,
+            'practice': self.practice,
+            'competition': self.competition
+        }
+        return ret
+
