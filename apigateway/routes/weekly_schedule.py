@@ -11,7 +11,7 @@ from datastore import WeeklyCrossTrainingDatastore, WeeklyTrainingDatastore
 from decorators import authentication_required
 from exceptions import InvalidSchemaException, ApplicationException, NoSuchEntityException, DuplicateEntityException
 from models.weekly_schedule import WeeklyCrossTrainingSchedule, WeeklyTrainingSchedule
-# from logic.athlete import SportName
+from logic.athlete import SportName
 
 
 app = Blueprint('weekly_schedule', __name__)

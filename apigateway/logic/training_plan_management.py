@@ -1,11 +1,11 @@
-import recovery
-import athlete_data_access
-import recovery_data_access
-import training
-import session
+import logic.recovery
+import logic.athlete_data_access
+import logic.recovery_data_access
+import logic.training
+import logic.session
 import numpy as np
 import datetime
-import exercise
+import logic.exercise
 import soreness_and_injury
 
 

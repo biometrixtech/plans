@@ -1,6 +1,6 @@
-import recovery
-import exercise
-import soreness_and_injury
+import logic.recovery
+import logic.exercise
+import logic.soreness_and_injury
 
 
 class RecoveryDataAccess(object):

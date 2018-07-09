@@ -1,8 +1,8 @@
 import abc
 from enum import Enum, IntEnum
-import soreness_and_injury
-import exercise
-import session
+import logic.soreness_and_injury
+import logic.exercise
+import logic.session
 
 
 class Athlete(metaclass=abc.ABCMeta):
