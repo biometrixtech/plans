@@ -51,8 +51,8 @@ from config import get_mongo_collection
 
 class DailyReadinessDatastore(object):
     @xray_recorder.capture('datastore.DailyReadinessDatastore.get')
-    def get(self, date_time=None, user_id=None, soreness=None, sleep_quality=None, readiness=None):
-        return self._query_mongodb(user_id)
+    def get(self, date_time=None, user_id=None, collection=None):
+        return self._query_mongodb(user_id, collection)
 
     def put(self, items, collection):
         if not isinstance(items, list):
@@ -64,7 +64,7 @@ class DailyReadinessDatastore(object):
             raise e
 
     @xray_recorder.capture('datastore.DailyReadinessDatastore._query_mongodb')
-    def _query_mongodb(self, user_id, collection, query):
+    def _query_mongodb(self, user_id, collection):
         mongo_collection = get_mongo_collection(collection)
         query0 = {'user_id': user_id}
         query1 = {'soreness': 1, '_id': 0}
