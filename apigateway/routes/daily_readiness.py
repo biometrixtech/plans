@@ -86,12 +86,12 @@ def validate_data(request):
         for soreness in request.json['soreness']:
             try:
                 BodyPart(soreness['body_part'])
-            except KeyError:
+            except ValueError:
                 raise InvalidSchemaException('body_part not recognized')
             else:
                 try:
                     MuscleSorenessSeverity(soreness['severity'])
-                except KeyError:
+                except ValueError:
                     raise InvalidSchemaException('severity not recognized')
             # for valid ones, force values to be integer
             soreness['body_part'] = int(soreness['body_part'])
