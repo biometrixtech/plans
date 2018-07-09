@@ -71,36 +71,26 @@ def handle_training_schedule_create():
     validate_data(request)
     today = datetime.datetime.today()
     today_weekday = today.weekday()
-    # if today_weekday < 4:
-    #     delta = today_weekday
-    # elif today_weekday >=4:
-    #     delta = 7 - today_weekday
-
-    # dates = []
-    # for day in days:
-    #     dates.append((today + datetime.timedelta(days=day-delta)).strftime("%Y-%m-%d"))
+    if today_weekday < 4:
+        delta = today_weekday
+    elif today_weekday >=4:
+        delta = 7 - today_weekday
 
     monday_delta = -today_weekday
     week_start = (today + datetime.timedelta(days=monday_delta)).strftime("%Y-%m-%d")
 
-    # schedules = []
-    # for sport in request.json['schedules']:
-    #     schedule = WeeklyTrainingSchedule(
-    #         user_id=request.json['user_id'],
-    #         week_start=week_start,
-    #         sport=sport['sport'],
-    #         practice=sport['practice'],
-    #         competition=sport['competition']
-    #     )
-    #     schedules.append(schedule)
-
+    for sport in request.json['sports']:
+        practice_days = sport['practice']['days']
+        practice_dates = convert_date(practice_days)
+        sport['practice']['days'] = practice_dates
+        competition_days = sport['competition']['days']
+        competition_dates = convert_date(competition_days)
+        sport['competition']['days'] = competition_dates
 
     schedule = WeeklyTrainingSchedule(
         user_id=request.json['user_id'],
         week_start=week_start,
         sports=request.json['sports'],
-        # practice=sport['practice'],
-        # competition=sport['competition']
     )
     store = WeeklyTrainingDatastore()
 
@@ -127,3 +117,12 @@ def validate_data(request):
         raise InvalidSchemaException('Request body must be a dictionary')
     if 'user_id' not in request.json:
         raise InvalidSchemaException('Missing required parameter user_id')
+
+
+def convert_date(days):
+    today = datetime.datetime.today()
+    dates = []
+    for day in days:
+        day = today + datetime.timedelta(days=day)
+        dates.append(day.strftime("%Y-%m-%d"))
+    return dates
