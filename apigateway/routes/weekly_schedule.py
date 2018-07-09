@@ -25,22 +25,25 @@ def handle_crosstraining_schedule_create():
     days = request.json['days']
     today = datetime.datetime.today()
     today_weekday = today.weekday()
+    # if today_weekday < 4:
+    #     delta = today_weekday
+    # elif today_weekday >=4:
+    #     delta = 7 - today_weekday
+
+    # dates = []
+    # for day in days:
+    #     dates.append((today + datetime.timedelta(days=day-delta)).strftime("%Y-%m-%d"))
+
     if today_weekday < 4:
-        delta = today_weekday
-    elif today_weekday >=4:
-        delta = 7 - today_weekday
-
-    dates = []
-    for day in days:
-        dates.append((today + datetime.timedelta(days=day-delta)).strftime("%Y-%m-%d"))
-
-    monday_delta = -today_weekday
+        monday_delta = -today_weekday
+    elif today_weekday >= 4:
+        monday_delta =  7 - today_weekday
     week_start = (today + datetime.timedelta(days=monday_delta)).strftime("%Y-%m-%d")
 
     schedule = WeeklyCrossTrainingSchedule(
         user_id=request.json['user_id'],
         week_start=week_start,
-        dates=dates,
+        dates=request.json['days'],
         activities=request.json['activities'],
         duration=request.json['durations'],
     )
@@ -71,21 +74,24 @@ def handle_training_schedule_create():
     validate_data(request)
     today = datetime.datetime.today()
     today_weekday = today.weekday()
-    if today_weekday < 4:
-        delta = today_weekday
-    elif today_weekday >=4:
-        delta = 7 - today_weekday
+    # if today_weekday < 4:
+    #     delta = today_weekday
+    # elif today_weekday >= 4:
+    #     delta = 7 - today_weekday
 
-    monday_delta = -today_weekday
+    if today_weekday < 4:
+        monday_delta = -today_weekday
+    elif today_weekday >= 4:
+        monday_delta =  7 - today_weekday
     week_start = (today + datetime.timedelta(days=monday_delta)).strftime("%Y-%m-%d")
 
-    for sport in request.json['sports']:
-        practice_days = sport['practice']['days']
-        practice_dates = convert_date(practice_days)
-        sport['practice']['days'] = practice_dates
-        competition_days = sport['competition']['days']
-        competition_dates = convert_date(competition_days)
-        sport['competition']['days'] = competition_dates
+    # for sport in request.json['sports']:
+    #     practice_days = sport['practice']['days']
+    #     practice_dates = convert_date(practice_days)
+    #     sport['practice']['days'] = practice_dates
+    #     competition_days = sport['competition']['days']
+    #     competition_dates = convert_date(competition_days)
+    #     sport['competition']['days'] = competition_dates
 
     schedule = WeeklyTrainingSchedule(
         user_id=request.json['user_id'],
