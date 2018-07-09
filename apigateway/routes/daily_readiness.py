@@ -33,7 +33,7 @@ def handle_daily_readiness_create():
     )
     store = DailyReadinessDatastore()
     try:
-        store.put(daily_readiness)
+        store.put(daily_readiness, collection='readiness')
         return {'message': 'success'}, 201
         # return {'daily_readiness': daily_readiness}, 201
     except DuplicateEntityException:
@@ -52,7 +52,7 @@ def handle_get_previous_soreness():
         user_id = jwt.decode(request.headers['Authorization'], verify=False)['user_id']
     elif request.method == 'POST':
         user_id = request.json['user_id']
-    body_part = store.get(user_id=user_id)
+    body_part = store.get(user_id=user_id, collection='readiness')
     return {'body_part': body_part}, 200
 
 
