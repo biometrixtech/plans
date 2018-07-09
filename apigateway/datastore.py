@@ -128,9 +128,9 @@ class WeeklyCrossTrainingDatastore(object):
         item = {
             'user_id': weeklycrosstraining.user_id,
             'week_start': weeklycrosstraining.week_start,
-            'dates': weeklycrosstraining.dates,
+            'days_of_week': weeklycrosstraining.days_of_week,
             'activities': weeklycrosstraining.activities,
-            'duration': weeklycrosstraining.duration
+            'durations': weeklycrosstraining.durations
         }
         return item
 

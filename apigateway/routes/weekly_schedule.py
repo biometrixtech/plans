@@ -22,9 +22,9 @@ app = Blueprint('weekly_schedule', __name__)
 @xray_recorder.capture('routes.weekly_schedule.cross_training.create')
 def handle_crosstraining_schedule_create():
     validate_data(request)
-    days = request.json['days']
     today = datetime.datetime.today()
     today_weekday = today.weekday()
+    days = request.json['days_of_week']
     # if today_weekday < 4:
     #     delta = today_weekday
     # elif today_weekday >=4:
@@ -43,9 +43,9 @@ def handle_crosstraining_schedule_create():
     schedule = WeeklyCrossTrainingSchedule(
         user_id=request.json['user_id'],
         week_start=week_start,
-        dates=request.json['days'],
+        days_of_week=request.json['days_of_week'],
         activities=request.json['activities'],
-        duration=request.json['durations'],
+        durations=request.json['durations'],
     )
 
     store = WeeklyCrossTrainingDatastore()

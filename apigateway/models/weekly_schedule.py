@@ -1,52 +1,20 @@
 from serialisable import Serialisable
 
 
-class WeeklySchedule(Serialisable):
-    
-    def __init__(self,
-                 user_id,
-                 date,
-                 activity,
-                 duration=None,
-                 sport=None
-                 ):
-        self.user_id = user_id
-        self.date = date
-        self.activity = activity
-        self.duration = duration
-        self.sport = sport
-
-    def get_id(self):
-        return self.user_id
-
-    def get_date(self):
-        return self.date
-
-    def json_serialise(self):
-        ret = {
-            'user_id': self.user_id,
-            'date': self.date,
-            'activity': self.activity,
-            'duration': self.duration,
-            'sport': self.sport
-        }
-        return ret
-
-
 class WeeklyCrossTrainingSchedule(Serialisable):
     
     def __init__(self,
                  user_id,
                  week_start,
-                 dates,
+                 days_of_week,
                  activities,
-                 duration
+                 durations
                  ):
         self.user_id = user_id
         self.week_start = week_start
-        self.dates = dates
+        self.days_of_week = days_of_week
         self.activities = activities
-        self.duration = duration
+        self.durations = durations
 
     def get_id(self):
         return self.user_id
@@ -58,9 +26,9 @@ class WeeklyCrossTrainingSchedule(Serialisable):
         ret = {
             'user_id': self.user_id,
             'week_start': self.week_start,
-            'dates': self.date,
-            'activities': self.activity,
-            'duration': self.duration,
+            'days_of_week': self.days_of_week,
+            'activities': self.activities,
+            'durations': self.durations,
         }
         return ret
 
