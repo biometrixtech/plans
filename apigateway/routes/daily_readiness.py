@@ -17,7 +17,7 @@ from logic.soreness_and_injury import SorenessType, MuscleSorenessSeverity, Join
 app = Blueprint('daily_readiness', __name__)
 
 
-@app.route('/daily_readiness', methods=['POST'])
+@app.route('/', methods=['POST'])
 @authentication_required
 @xray_recorder.capture('routes.daily_readiness.create')
 def handle_daily_readiness_create():
@@ -42,7 +42,7 @@ def handle_daily_readiness_create():
 
 
 
-@app.route('daily_readiness/previous', methods=['GET', 'POST'])
+@app.route('/previous', methods=['GET', 'POST'])
 @authentication_required
 @xray_recorder.capture('routes.daily_readiness.previous')
 def handle_get_previous_soreness():
