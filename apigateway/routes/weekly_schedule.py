@@ -7,10 +7,10 @@ import jwt
 # import uuid
 
 # from auth import get_accessory_id_from_auth
-from datastore import WeeklyScheduleDatastore
+from datastore import WeeklyCrossTrainingDatastore
 from decorators import authentication_required
 from exceptions import InvalidSchemaException, ApplicationException, NoSuchEntityException, DuplicateEntityException
-from models.weekly_schedule import WeeklySchedule
+from models.weekly_schedule import WeeklyCrossTrainingSchedule
 from logic.soreness_and_injury import SorenessType, MuscleSorenessSeverity, JointSorenessSeverity, BodyPart
 
 
