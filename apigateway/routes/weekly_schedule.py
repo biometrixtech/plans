@@ -11,7 +11,7 @@ from datastore import WeeklyCrossTrainingDatastore, WeeklyTrainingDatastore
 from decorators import authentication_required
 from exceptions import InvalidSchemaException, ApplicationException, NoSuchEntityException, DuplicateEntityException
 from models.weekly_schedule import WeeklyCrossTrainingSchedule, WeeklyTrainingSchedule
-from logic.athlete import SportName
+# from logic.athlete import SportName
 
 
 app = Blueprint('weekly_schedule', __name__)
@@ -46,7 +46,7 @@ def handle_crosstraining_schedule_create():
         week_start=week_start,
         days_of_week=request.json['days_of_week'],
         activities=request.json['activities'],
-        durations=request.json['durations'],
+        duration=request.json['duration'],
     )
 
     store = WeeklyCrossTrainingDatastore()
@@ -128,11 +128,12 @@ def validate_data(request):
 
 @xray_recorder.capture('routes.weekly_schedule.validate_crosstraining')
 def validate_crosstraining_data(request):
-    for sport in request.json['sports']:
-        try:
-            SportName[sport['sport']]
-        except KeyError:
-            raise InvalidSchemaException('sport not identified')
+    pass
+    # for sport in request.json['sports']:
+    #     try:
+    #         SportName[sport['sport']]
+    #     except KeyError:
+    #         raise InvalidSchemaException('sport not identified')
 
 
 @xray_recorder.capture('routes.weekly_schedule.validate_crosstraining')

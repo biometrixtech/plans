@@ -130,7 +130,7 @@ class WeeklyCrossTrainingDatastore(object):
             'week_start': weeklycrosstraining.week_start,
             'days_of_week': weeklycrosstraining.days_of_week,
             'activities': weeklycrosstraining.activities,
-            'durations': weeklycrosstraining.durations
+            'duration': weeklycrosstraining.duration
         }
         return item
 

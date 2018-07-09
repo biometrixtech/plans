@@ -8,13 +8,13 @@ class WeeklyCrossTrainingSchedule(Serialisable):
                  week_start,
                  days_of_week,
                  activities,
-                 durations
+                 duration
                  ):
         self.user_id = user_id
         self.week_start = week_start
         self.days_of_week = days_of_week
         self.activities = activities
-        self.durations = durations
+        self.duration = duration
 
     def get_id(self):
         return self.user_id
@@ -28,7 +28,7 @@ class WeeklyCrossTrainingSchedule(Serialisable):
             'week_start': self.week_start,
             'days_of_week': self.days_of_week,
             'activities': self.activities,
-            'durations': self.durations,
+            'duration': self.duration,
         }
         return ret
 
