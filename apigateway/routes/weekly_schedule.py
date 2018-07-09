@@ -83,20 +83,28 @@ def handle_training_schedule_create():
     monday_delta = -today_weekday
     week_start = (today + datetime.timedelta(days=monday_delta)).strftime("%Y-%m-%d")
 
-    schedules = []
-    for sport in request.json['schedules']:
-        schedule = WeeklyTrainingSchedule(
-            user_id=request.json['user_id'],
-            week_start=week_start,
-            sport=sport['sport'],
-            practice=sport['practice'],
-            competition=sport['competition']
-        )
-        schedules.append(schedule)
+    # schedules = []
+    # for sport in request.json['schedules']:
+    #     schedule = WeeklyTrainingSchedule(
+    #         user_id=request.json['user_id'],
+    #         week_start=week_start,
+    #         sport=sport['sport'],
+    #         practice=sport['practice'],
+    #         competition=sport['competition']
+    #     )
+    #     schedules.append(schedule)
 
+
+    schedule = WeeklyTrainingSchedule(
+        user_id=request.json['user_id'],
+        week_start=week_start,
+        sports=request.json['sports'],
+        # practice=sport['practice'],
+        # competition=sport['competition']
+    )
     store = WeeklyTrainingDatastore()
 
-    store.put(schedules, collection='training')
+    store.put(schedule, collection='training')
     return {'message': 'success'}, 201
 
 @app.route('/training/get_schedule', methods=['POST'])

@@ -70,15 +70,15 @@ class WeeklyTrainingSchedule(Serialisable):
     def __init__(self,
                  user_id,
                  week_start,
-                 sport,
-                 practice,
-                 competition
+                 sports,
+                 # practice,
+                 # competition
                  ):
         self.user_id = user_id
         self.week_start = week_start
-        self.sport = sport
-        self.practice = practice
-        self.competition = competition
+        self.sports = sports
+        # self.practice = practice
+        # self.competition = competition
 
     def get_id(self):
         return self.user_id
@@ -90,9 +90,9 @@ class WeeklyTrainingSchedule(Serialisable):
         ret = {
             'user_id': self.user_id,
             'week_start': self.week_start,
-            'sport': self.sport,
-            'practice': self.practice,
-            'competition': self.competition
+            'sports': self.sports,
+            # 'practice': self.practice,
+            # 'competition': self.competition
         }
         return ret
 
