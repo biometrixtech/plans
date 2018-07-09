@@ -8,8 +8,8 @@ from exceptions import ApplicationException
 
 
 @xray_recorder.capture('config.get_mongo')
-def get_mongo_collection():
-    keys = ['host', 'replicaset', 'user', 'password', 'database', 'collection']
+def get_mongo_collection(collection):
+    # keys = ['host', 'replicaset', 'user', 'password', 'database', 'collection_'+collection]
     config = get_secret('mongo')
     mongo_client = MongoClient(
         config['host'],
@@ -18,7 +18,7 @@ def get_mongo_collection():
     )
     database = mongo_client[config['database']]
     database.authenticate(config['user'], config['password'], mechanism='SCRAM-SHA-1', source='admin')
-    collection = database[config['collection']]
+    collection = database[config['collection_'+collection]]
 
     return collection
 
