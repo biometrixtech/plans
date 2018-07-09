@@ -1,4 +1,4 @@
- from serialisable import Serialisable
+from serialisable import Serialisable
 
 
 class WeeklySchedule(Serialisable):
