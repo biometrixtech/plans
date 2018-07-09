@@ -69,17 +69,16 @@ def handle_crosstraining_schedule_update():
 @xray_recorder.capture('routes.weekly_schedule.training.create')
 def handle_training_schedule_create():
     validate_data(request)
-    days = request.json['days']
     today = datetime.datetime.today()
     today_weekday = today.weekday()
-    if today_weekday < 4:
-        delta = today_weekday
-    elif today_weekday >=4:
-        delta = 7 - today_weekday
+    # if today_weekday < 4:
+    #     delta = today_weekday
+    # elif today_weekday >=4:
+    #     delta = 7 - today_weekday
 
-    dates = []
-    for day in days:
-        dates.append((today + datetime.timedelta(days=day-delta)).strftime("%Y-%m-%d"))
+    # dates = []
+    # for day in days:
+    #     dates.append((today + datetime.timedelta(days=day-delta)).strftime("%Y-%m-%d"))
 
     monday_delta = -today_weekday
     week_start = (today + datetime.timedelta(days=monday_delta)).strftime("%Y-%m-%d")
