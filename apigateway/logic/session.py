@@ -1,6 +1,7 @@
 import abc
 from enum import Enum
 import uuid
+import exercise
 
 
 class SessionType(Enum):
@@ -238,6 +239,27 @@ class RecoverySession(object):
         self.lengthen_max_percentage = None
         self.activate_max_percentage = None
         self.integrate_max_percentage = None
+        self.start_time = None
+        self.end_time = None
+
+    def recommended_exercises(self):
+        exercise_list = []
+        exercise_list.extend(self.recommended_inhibit_exercises)
+        exercise_list.extend(self.recommended_lengthen_exercises)
+        exercise_list.extend(self.recommended_activate_exercises)
+        exercise_list.extend(self.recommended_integrate_exercises)
+
+        return exercise_list
+
+    def update_from_exercise_assignments(self, exercise_assignments):
+        self.recommended_inhibit_exercises = exercise_assignments.inhibit_exercises
+        self.recommended_lengthen_exercises = exercise_assignments.lengthen_exercises
+        self.recommended_activate_exercises = exercise_assignments.activate_exercises
+        self.recommended_integrate_exercises = exercise_assignments.integrate_exercises
+        self.duration_minutes = (exercise_assignments.inhibit_minutes +
+                                 exercise_assignments.lengthen_minutes +
+                                 exercise_assignments.activate_minutes +
+                                 exercise_assignments.integrate_minutes)
 
     def set_exercise_target_minutes(self, soreness_list, total_minutes_target):
         max_severity = 0

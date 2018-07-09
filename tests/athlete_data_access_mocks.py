@@ -1,6 +1,7 @@
 import datetime
 import soreness_and_injury
 import session
+import uuid
 
 
 class AthleteDataAccessMorning(object):
@@ -58,19 +59,39 @@ class AthleteDataAccessAfternoon(object):
 
 class AthleteDataAccessMorningPractice(object):
 
-    def get_last_daily_readiness_survey(self, athlete_id):
+    def __init__(self, athlete_id):
+        self.athlete_id = athlete_id
+
+    def get_last_daily_readiness_survey(self):
 
         daily_readiness = soreness_and_injury.DailyReadinessSurvey()
+        daily_readiness_soreness = soreness_and_injury.DailySoreness()
+        daily_readiness_soreness.body_part = soreness_and_injury.BodyPart(soreness_and_injury.BodyPartLocation(12), 1)
+        daily_readiness_soreness.severity = 2
+        daily_readiness.soreness.append(daily_readiness_soreness)
+
         daily_readiness.report_date_time = datetime.datetime(2018, 6, 27, 11, 0, 0)
 
         return daily_readiness
 
-    def get_scheduled_sessions(self, athlete_id, date):
+    def get_last_post_session_survey(self):
+
+        post_session_survey = soreness_and_injury.PostSessionSurvey()
+        post_session_soreness = soreness_and_injury.PostSessionSoreness()
+        post_session_soreness.body_part = soreness_and_injury.BodyPart(soreness_and_injury.BodyPartLocation(12), 1)
+        post_session_soreness.severity = 2
+        post_session_survey.soreness.append(post_session_soreness)
+        post_session_survey.report_date_time = datetime.datetime(2018, 6, 26, 17, 0, 0)
+
+        return post_session_survey
+
+    def get_scheduled_sessions(self, date):
 
         scheduled_sessions = []
 
         practice_session = session.PracticeSession()
         practice_session.date = datetime.date(2018, 6, 27)
+        practice_session.id = uuid.uuid4()
 
         scheduled_sessions.append(practice_session)
 

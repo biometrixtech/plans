@@ -2,6 +2,8 @@ import pytest
 import exercise
 import session
 import soreness_and_injury
+import exercise_data_access
+import athlete_data_access_mocks
 
 
 @pytest.fixture(scope="module")
@@ -12,12 +14,34 @@ def recovery_session(soreness_list, target_minutes):
 
 
 @pytest.fixture(scope="module")
-def soreness_one_body_part(body_enum, severity_score):
+def soreness_one_body_part(body_enum, severity_score, treatment_priority=1):
     soreness_list = []
     soreness_item = soreness_and_injury.DailySoreness()
     soreness_item.severity = severity_score
-    soreness_item.body_part = soreness_and_injury.BodyPartLocation(body_enum)
+    soreness_body_part = soreness_and_injury.BodyPart(soreness_and_injury.BodyPartLocation(body_enum),
+                                                      treatment_priority)
+    soreness_item.body_part = soreness_body_part
     soreness_list.append(soreness_item)
+    return soreness_list
+
+
+@pytest.fixture(scope="module")
+def soreness_two_body_parts(body_enum_1, severity_score_1, body_enum_2, severity_score_2,
+                            treatment_priority_1=1, treatment_priority_2=1):
+    soreness_list = []
+    soreness_item_1 = soreness_and_injury.DailySoreness()
+    soreness_item_1.severity = severity_score_1
+    soreness_body_part_1 = soreness_and_injury.BodyPart(soreness_and_injury.BodyPartLocation(body_enum_1),
+                                                      treatment_priority_1)
+    soreness_item_1.body_part = soreness_body_part_1
+    soreness_list.append(soreness_item_1)
+    soreness_item_2 = soreness_and_injury.DailySoreness()
+    soreness_item_2.severity = severity_score_2
+    soreness_body_part_2 = soreness_and_injury.BodyPart(soreness_and_injury.BodyPartLocation(body_enum_2),
+                                                        treatment_priority_2)
+    soreness_item_2.body_part = soreness_body_part_2
+    soreness_list.append(soreness_item_2)
+
     return soreness_list
 '''
 one body part
@@ -212,6 +236,19 @@ def test_recovery_session_ankle_4_soreness_integrate_minutes():
     assert None is recovery_session(soreness_one_body_part(9, 4), 15).integrate_target_minutes
 
 
+def test_recovery_session_exercises_assigned():
+    calc = exercise.ExerciseAssignmentCalculator("test_user", None, exercise_data_access.ExerciseDataAccess())
+    soreness_list = soreness_one_body_part(12, 1)    # lower back
+    target_recovery_session = recovery_session(soreness_one_body_part(12, 1), 15)
+    exercise_assignments = calc.create_exercise_assignments(target_recovery_session, soreness_list)
+    j = 0
+
+def test_recovery_session_exercises_assigned_2_body_parts():
+    calc = exercise.ExerciseAssignmentCalculator("test_user", None, exercise_data_access.ExerciseDataAccess())
+    soreness_list = soreness_two_body_parts(12, 1, 4, 1, 1, 2)    # lower back
+    target_recovery_session = recovery_session(soreness_two_body_parts(12, 1, 4, 1, 1, 2), 15)
+    exercise_assignments = calc.create_exercise_assignments(target_recovery_session, soreness_list)
+    j = 0
 '''
 def test_get_priority_no_severity_inhibit():
     recs = exercise.ExerciseRecommendations()

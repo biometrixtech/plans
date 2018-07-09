@@ -50,7 +50,7 @@ class DailySoreness(Soreness):
 class PostSessionSoreness(Soreness):
 
     def __init__(self):
-        self.discomfort_level = 0
+        self.severity = 0
         self.sustained_in_practice = False
         self.limited_performance = 0
         self.limited_how_much_i_could_do = 0
@@ -141,7 +141,6 @@ class SorenessCalculator(object):
 
     def __init__(self):
         self.surveys = []
-
 
     def get_soreness_summary_from_surveys(self, last_daily_readiness_survey, last_post_session_survey,
                                           trigger_date_time):

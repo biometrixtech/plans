@@ -6,24 +6,45 @@ import session
 import numpy as np
 import datetime
 import exercise
+import soreness_and_injury
 
 
 class TrainingPlanManager(object):
 
-    def __init__(self, athlete_id, athlete_dao):
+    def __init__(self, athlete_id, athlete_dao, exercise_dao):
         self.athlete_id = athlete_id
         self.athlete_dao = athlete_dao
+        self.exercise_dao = exercise_dao
 
     def create_daily_plan(self):
-        # TODO base this off of daily readiness survey (update plan based on post-session survey)
-        daily_readiness_survey = self.athlete_dao.get_last_daily_readiness_survey(self.athlete_id)
+        last_daily_readiness_survey = self.athlete_dao.get_last_daily_readiness_survey()
 
-        # << get yesterday's post session survey >>
+        last_post_session_survey = self.athlete_dao.get_last_post_session_survey()
 
-        scheduled_sessions = self.athlete_dao.get_scheduled_sessions(self.athlete_id,
-                                                                     daily_readiness_survey.report_date_time.date())
-        daily_plan = training.DailyPlan(daily_readiness_survey.report_date_time.date())
-        daily_plan = self.add_recovery_times(daily_readiness_survey.report_date_time, daily_plan)
+        soreness_calc = soreness_and_injury.SorenessCalculator()
+
+        soreness_list = \
+            soreness_calc.get_soreness_summary_from_surveys(last_daily_readiness_survey, last_post_session_survey,
+                                                            last_daily_readiness_survey.report_date_time)
+
+        # TODO: convert day of week to session and add session id
+        scheduled_sessions = \
+            self.athlete_dao.get_scheduled_sessions(last_daily_readiness_survey.report_date_time.date())
+
+        daily_plan = training.DailyPlan(last_daily_readiness_survey.report_date_time.date())
+        daily_plan = self.add_recovery_times(last_daily_readiness_survey.report_date_time, daily_plan)
+
+        calc = exercise.ExerciseAssignmentCalculator(self.athlete_id, None, self.exercise_dao)
+
+        if daily_plan.recovery_am.start_time is not None:
+            daily_plan.recovery_am.set_exercise_target_minutes(soreness_list, 15)
+            am_exercise_assignments = calc.create_exercise_assignments(daily_plan.recovery_am,
+                                                                       soreness_list)
+            daily_plan.recovery_am.update_from_exercise_assignments(am_exercise_assignments)
+        daily_plan.recovery_pm.set_exercise_target_minutes(soreness_list, 15)
+        pm_exercise_assignments = calc.create_exercise_assignments(daily_plan.recovery_pm,
+                                                                   soreness_list)
+        daily_plan.recovery_pm.update_from_exercise_assignments(pm_exercise_assignments)
 
         for scheduled_session in scheduled_sessions:
             daily_plan.add_scheduled_session(scheduled_session)

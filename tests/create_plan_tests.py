@@ -2,6 +2,7 @@ import pytest
 import training
 import datetime
 import training_plan_management
+import athlete_data_access
 import athlete_data_access_mocks
 import exercise_data_access
 
@@ -103,9 +104,16 @@ def test_daily_plan_am_recovery_has_practice_session():
     athlete_dao = athlete_data_access_mocks.AthleteDataAccessMorningPractice()
     assert len(blank_plan(athlete_id, athlete_dao).practice_sessions) == 1
 
-def test_get_exercises():
-    exercise_dao = exercise_data_access.ExerciseDataAccess()
-    exercises = exercise_dao.get_exercises_by_ids([2, 3])
-    assert len(exercises) > 0
+
+def test_create_plan():
+    manager = \
+        training_plan_management.TrainingPlanManager("test_user",
+                                                     athlete_data_access_mocks.AthleteDataAccessMorningPractice("test_user"),
+                                                     exercise_data_access.ExerciseDataAccess())
+    daily_plan = manager.create_daily_plan()
+    daily_plan.last_updated = datetime.datetime(2018, 6, 27, 11, 30, 0)
+    athlete_dao = athlete_data_access.AthleteDataAccess("test_user")
+    athlete_dao.write_daily_plan(daily_plan)
+    assert None is not daily_plan
 
 

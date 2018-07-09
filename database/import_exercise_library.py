@@ -27,7 +27,7 @@ with open('Exercise_Library.csv', newline='') as csvfile:
                 exercise_item.exposure_target = int(row[21])
                 exercise_item.unit_of_measure = row[22]
                 exercise_item.seconds_rest_between_sets = int(row[23])
-                if row[24] == "-" or row[25] == "":
+                if row[24] == "-" or row[24] == "":
                     exercise_item.seconds_per_set = None
                 else:
                     exercise_item.seconds_per_set = int(row[24])
