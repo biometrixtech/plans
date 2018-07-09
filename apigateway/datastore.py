@@ -161,7 +161,7 @@ class WeeklyTrainingDatastore(object):
     def _put_mongodb(self, item, collection):
         item = self.item_to_mongodb(item)
         mongo_collection = get_mongo_collection(collection)
-        query = {'user_id': item['user_id'], 'week_start': item['week_start']}
+        query = {'user_id': item['user_id'], 'week_start': item['week_start'], 'sport': item['sport']}
         mongo_collection.replace_one(query, item, upsert=True)
 
     @staticmethod
