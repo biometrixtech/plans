@@ -11,7 +11,7 @@ from datastore import DailyReadinessDatastore
 from decorators import authentication_required
 from exceptions import InvalidSchemaException, ApplicationException, NoSuchEntityException, DuplicateEntityException
 from models.daily_readiness import DailyReadiness
-from logic.soreness_and_injury import SorenessType, MuscleSorenessSeverity, JointSorenessSeverity, BodyPart
+from logic.soreness_and_injury import MuscleSorenessSeverity, BodyPart
 
 
 app = Blueprint('daily_readiness', __name__)
@@ -84,10 +84,15 @@ def validate_data(request):
         raise InvalidSchemaException('soreness must be a list')
     else:
         for soreness in request.json['soreness']:
-            if not BodyPart(soreness['body_part']):
+            try:
+                BodyPart(soreness['body_part'])
+            except KeyError:
                 raise InvalidSchemaException('body_part not recognized')
-            elif not MuscleSorenessSeverity(soreness['severity']):
-                raise InvalidSchemaException('severity not recognized')
+            else:
+                try:
+                    MuscleSorenessSeverity(soreness['severity'])
+                except KeyError:
+                    raise InvalidSchemaException('severity not recognized')
             # for valid ones, force values to be integer
             soreness['body_part'] = int(soreness['body_part'])
             soreness['severity'] = int(soreness['severity'])

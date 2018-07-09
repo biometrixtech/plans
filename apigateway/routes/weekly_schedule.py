@@ -11,7 +11,7 @@ from datastore import WeeklyCrossTrainingDatastore, WeeklyTrainingDatastore
 from decorators import authentication_required
 from exceptions import InvalidSchemaException, ApplicationException, NoSuchEntityException, DuplicateEntityException
 from models.weekly_schedule import WeeklyCrossTrainingSchedule, WeeklyTrainingSchedule
-from logic.soreness_and_injury import SorenessType, MuscleSorenessSeverity, JointSorenessSeverity, BodyPart
+from logic.athlete import SportName
 
 
 app = Blueprint('weekly_schedule', __name__)
@@ -22,6 +22,7 @@ app = Blueprint('weekly_schedule', __name__)
 @xray_recorder.capture('routes.weekly_schedule.cross_training.create')
 def handle_crosstraining_schedule_create():
     validate_data(request)
+    validate_crosstraining_data(request)
     today = datetime.datetime.today()
     today_weekday = today.weekday()
     days = request.json['days_of_week']
@@ -72,6 +73,7 @@ def handle_crosstraining_schedule_update():
 @xray_recorder.capture('routes.weekly_schedule.training.create')
 def handle_training_schedule_create():
     validate_data(request)
+    validate_training_data(request)
     today = datetime.datetime.today()
     today_weekday = today.weekday()
     # if today_weekday < 4:
@@ -124,11 +126,23 @@ def validate_data(request):
     if 'user_id' not in request.json:
         raise InvalidSchemaException('Missing required parameter user_id')
 
+@xray_recorder.capture('routes.weekly_schedule.validate_crosstraining')
+def validate_crosstraining_data(request):
+    for sport in request.json['sports']:
+        try:
+            SportName[sport['sport']]
+        except KeyError:
+            raise InvalidSchemaException('sport not identified')
 
-def convert_date(days):
-    today = datetime.datetime.today()
-    dates = []
-    for day in days:
-        day = today + datetime.timedelta(days=day)
-        dates.append(day.strftime("%Y-%m-%d"))
-    return dates
+
+@xray_recorder.capture('routes.weekly_schedule.validate_crosstraining')
+def validate_training_data(request):
+    pass
+
+# def convert_date(days):
+#     today = datetime.datetime.today()
+#     dates = []
+#     for day in days:
+#         day = today + datetime.timedelta(days=day)
+#         dates.append(day.strftime("%Y-%m-%d"))
+#     return dates
