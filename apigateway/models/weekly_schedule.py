@@ -39,7 +39,8 @@ class WeeklyCrossTrainingSchedule(Serialisable):
                  user_id,
                  week_start,
                  dates,
-                 activities
+                 activities,
+                 duration
                  ):
         self.user_id = user_id
         self.week_start = week_start
