@@ -10,7 +10,7 @@ import jwt
 from datastore import WeeklyCrossTrainingDatastore, WeeklyTrainingDatastore
 from decorators import authentication_required
 from exceptions import InvalidSchemaException, ApplicationException, NoSuchEntityException, DuplicateEntityException
-from models.weekly_schedule import WeeklyCrossTrainingSchedule, WeeklyTrainingSchedule
+from models.weekly_schedule import WeeklyCrossTrainingSchedule, WeeklyTrainingSchedule, WeeklySchedule
 from logic.athlete import SportName
 
 
@@ -41,17 +41,19 @@ def handle_crosstraining_schedule_create():
         monday_delta =  7 - today_weekday
     week_start = (today + datetime.timedelta(days=monday_delta)).strftime("%Y-%m-%d")
 
-    schedule = WeeklyCrossTrainingSchedule(
-        user_id=request.json['user_id'],
-        week_start=week_start,
+    cross_training = WeeklyCrossTrainingSchedule(
         days_of_week=request.json['days_of_week'],
         activities=request.json['activities'],
         duration=request.json['duration'],
     )
 
+    schedule = WeeklySchedule(
+        user_id=request.json['user_id'],
+        week_start=week_start,
+        cross_training=cross_training.json_serialise())
     store = WeeklyCrossTrainingDatastore()
 
-    store.put(schedule, collection='crosstraining')
+    store.put(schedule, collection='training')
     return {'message': 'success'}, 201
 
 @app.route('/cross_training/get_schedule', methods=['POST'])
@@ -95,7 +97,7 @@ def handle_training_schedule_create():
     #     competition_dates = convert_date(competition_days)
     #     sport['competition']['days'] = competition_dates
 
-    schedule = WeeklyTrainingSchedule(
+    schedule = WeeklySchedule(
         user_id=request.json['user_id'],
         week_start=week_start,
         sports=request.json['sports'],

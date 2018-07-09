@@ -121,16 +121,19 @@ class WeeklyCrossTrainingDatastore(object):
         item = self.item_to_mongodb(item)
         mongo_collection = get_mongo_collection(collection)
         query = {'user_id': item['user_id'], 'week_start': item['week_start']}
-        mongo_collection.replace_one(query, item, upsert=True)
+        record = self.get(item['user_id'], item['week_start'], collection)
+        if len(record) == 0:
+            mongo_collection.insert_one(item)
+        elif len(record) == 1:
+            mongo_collection.update_one(query, {'$set': {'cross_training': item['cross_training']}}, upsert=False)
 
     @staticmethod
-    def item_to_mongodb(weeklycrosstraining):
+    def item_to_mongodb(weeklytraining):
         item = {
-            'user_id': weeklycrosstraining.user_id,
-            'week_start': weeklycrosstraining.week_start,
-            'days_of_week': weeklycrosstraining.days_of_week,
-            'activities': weeklycrosstraining.activities,
-            'duration': weeklycrosstraining.duration
+            'user_id': weeklytraining.user_id,
+            'week_start': weeklytraining.week_start,
+            'cross_training': weeklytraining.cross_training,
+            'sports': weeklytraining.sports,
         }
         return item
 
@@ -162,13 +165,18 @@ class WeeklyTrainingDatastore(object):
         item = self.item_to_mongodb(item)
         mongo_collection = get_mongo_collection(collection)
         query = {'user_id': item['user_id'], 'week_start': item['week_start']}
-        mongo_collection.replace_one(query, item, upsert=True)
+        record = self.get(item['user_id'], item['week_start'], collection)
+        if len(record) == 0:
+            mongo_collection.insert_one(item)
+        elif len(record) == 1:
+            mongo_collection.update_one(query, {'$set': {'sports': item['sports']}}, upsert=False)
 
     @staticmethod
     def item_to_mongodb(weeklytraining):
         item = {
             'user_id': weeklytraining.user_id,
             'week_start': weeklytraining.week_start,
+            'cross_training': weeklytraining.cross_training,
             'sports': weeklytraining.sports,
             # 'sport': weeklytraining.sport,
             # 'practice': weeklytraining.practice,
