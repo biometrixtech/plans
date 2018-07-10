@@ -1,5 +1,5 @@
 import pytest
-import soreness_and_injury
+import logic.soreness_and_injury as soreness_and_injury
 import datetime
 
 # 1 body part

@@ -46,21 +46,21 @@ client = pymongo.MongoClient(database_config.mongodb_dev)
 db = client.movementStats
 collection = db.exerciseLibrary
 for exercise_item in exercises:
-    collection.insert_one({'libraryId': exercise_item.id,
+    collection.insert_one({'library_id': exercise_item.id,
                            'name': exercise_item.name,
-                           'minSets': exercise_item.min_sets,
-                           'maxSets': exercise_item.max_sets,
-                           'minReps': exercise_item.min_reps,
-                           'maxReps': exercise_item.max_reps,
+                           'min_sets': exercise_item.min_sets,
+                           'max_sets': exercise_item.max_sets,
+                           'min_reps': exercise_item.min_reps,
+                           'max_reps': exercise_item.max_reps,
                            'bilateral': exercise_item.bilateral,
-                           'progressionInterval': exercise_item.progression_interval,
-                           'exposureTarget': exercise_item.exposure_target,
-                           'unitOfMeasure': exercise_item.unit_of_measure,
-                           'secondsRestBetweenSets': exercise_item.seconds_rest_between_sets,
-                           'timePerSet': exercise_item.seconds_per_set,
-                           'timePerRep': exercise_item.seconds_per_rep,
-                           'progressesTo': exercise_item.progresses_to,
-                           'technicalDifficulty': exercise_item.technical_difficulty,
-                           'equipmentRequired': exercise_item.equipment_required
+                           'progression_interval': exercise_item.progression_interval,
+                           'exposure_target': exercise_item.exposure_target,
+                           'unit_of_measure': exercise_item.unit_of_measure,
+                           'seconds_rest_between_sets': exercise_item.seconds_rest_between_sets,
+                           'time_per_set': exercise_item.seconds_per_set,
+                           'time_per_rep': exercise_item.seconds_per_rep,
+                           'progresses_to': exercise_item.progresses_to,
+                           'technical_difficulty': exercise_item.technical_difficulty,
+                           'equipment_required': exercise_item.equipment_required
                            })
 

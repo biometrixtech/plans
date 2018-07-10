@@ -55,6 +55,7 @@ class Session(metaclass=abc.ABCMeta):
         self.performance_level = 100  # only answered if there is discomfort
         self.completion_percentage = 100    # only answered if there is discomfort
         self.sustained_injury_or_pain = False
+        self.description = ""
 
     @abc.abstractmethod
     def session_type(self):

@@ -1,6 +1,6 @@
 import pytest
 import datetime
-import training_plan_management as tpm
+import logic.training_plan_management as tpm
 
 # => deprioritize: readiness, sleep quality, RPE, freshness index?, prior completed recovery sessions?
 # => deprioritize: heightened priority relative to bed time

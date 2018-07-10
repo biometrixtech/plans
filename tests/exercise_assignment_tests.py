@@ -1,8 +1,8 @@
 import pytest
-import exercise
-import session
-import soreness_and_injury
-import exercise_data_access
+import logic.exercise as exercise
+import logic.session as session
+import logic.soreness_and_injury as soreness_and_injury
+import logic.exercise_data_access as exercise_data_access
 import athlete_data_access_mocks
 
 

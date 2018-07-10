@@ -1,6 +1,6 @@
 import datetime
-import soreness_and_injury
-import session
+import logic.soreness_and_injury as soreness_and_injury
+import logic.session as session
 import uuid
 
 

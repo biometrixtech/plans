@@ -3,7 +3,6 @@ import logic.athlete_data_access as athlete_data_access
 import logic.recovery_data_access as recovery_data_access
 import logic.training as training
 import logic.session as session
-# import numpy as np
 import datetime
 import logic.exercise as exercise
 import logic.soreness_and_injury as soreness_and_injury
@@ -27,7 +26,6 @@ class TrainingPlanManager(object):
             soreness_calc.get_soreness_summary_from_surveys(last_daily_readiness_survey, last_post_session_survey,
                                                             last_daily_readiness_survey.report_date_time)
 
-        # TODO: convert day of week to session and add session id
         scheduled_sessions = \
             self.athlete_dao.get_scheduled_sessions(last_daily_readiness_survey.report_date_time.date())
 

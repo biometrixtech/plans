@@ -1,10 +1,10 @@
 import pytest
-import training
+import logic.training as training
 import datetime
-import training_plan_management
-import athlete_data_access
+import logic.training_plan_management as training_plan_management
+import logic.athlete_data_access as athlete_data_access
 import athlete_data_access_mocks
-import exercise_data_access
+import logic.exercise_data_access as exercise_data_access
 
 '''
 

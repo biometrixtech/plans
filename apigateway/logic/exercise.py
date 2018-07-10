@@ -303,6 +303,7 @@ class ExerciseAssignmentCalculator(object):
         self.athlete_dao = athlete_data_access
         self.exercise_dao = exercise_data_access
         self.exercise_library = exercise_data_access.get_exercise_library()
+        self.exercises_for_body_parts = exercise_data_access.get_exercises_for_body_parts()
 
     # def create_assigned_exercise(self, target_exercise, body_part_priority, body_part_exercise_priority, body_part_soreness_level):
 
@@ -351,12 +352,11 @@ class ExerciseAssignmentCalculator(object):
 
         # completed_exercises = self.athlete_dao.get_completed_exercises()
         completed_exercises = None
-        body_part_exercises = self.get_exercises_for_body_parts()
+        body_part_exercises = self.exercises_for_body_parts()
         exercise_list = self.exercise_library
 
         for soreness in soreness_list:
-            body_part = [b for b in body_part_exercises
-                         if b.location == soreness.body_part.location]
+            body_part = [b for b in body_part_exercises if b.location.value == soreness.body_part.location.value]
 
             if exercise_session.inhibit_target_minutes is not None and exercise_session.inhibit_target_minutes > 0:
                 exercise_assignments.inhibit_exercises.extend(
@@ -373,145 +373,5 @@ class ExerciseAssignmentCalculator(object):
         exercise_assignments.scale_to_targets()
 
         return exercise_assignments
-
-    def get_exercises_for_body_parts(self):
-
-        body_parts = []
-
-        # lower back
-        lower_back = soreness_and_injury.BodyPart(soreness_and_injury.BodyPartLocation.lower_back, 1)
-        lower_back.inhibit_exercises.append(AssignedExercise("55", lower_back.treatment_priority, 1))
-        lower_back.inhibit_exercises.append(AssignedExercise("54", lower_back.treatment_priority, 2))
-        lower_back.inhibit_exercises.append(AssignedExercise("4", lower_back.treatment_priority, 3))
-        lower_back.inhibit_exercises.append(AssignedExercise("5", lower_back.treatment_priority, 4))
-        lower_back.inhibit_exercises.append(AssignedExercise("48", lower_back.treatment_priority, 5))
-        lower_back.inhibit_exercises.append(AssignedExercise("3", lower_back.treatment_priority, 6))
-
-        lower_back.lengthen_exercises.append(AssignedExercise("49", lower_back.treatment_priority, 1))
-        lower_back.lengthen_exercises.append(AssignedExercise("57", lower_back.treatment_priority, 2))
-        lower_back.lengthen_exercises.append(AssignedExercise("56", lower_back.treatment_priority, 3))
-        lower_back.lengthen_exercises.append(AssignedExercise("8", lower_back.treatment_priority, 4))
-
-        posterior_pelvic_tilt = AssignedExercise("79", lower_back.treatment_priority, 1)
-        posterior_pelvic_tilt.progressions = ["80"]
-
-        lower_back.activate_exercises.append(posterior_pelvic_tilt)
-
-        hip_bridge_progression = AssignedExercise("10", lower_back.treatment_priority, 2)
-        hip_bridge_progression.progressions = ["12", "11", "13"]
-
-        lower_back.activate_exercises.append(hip_bridge_progression)
-
-        core_strength_progression = AssignedExercise("85", lower_back.treatment_priority, 3)
-        core_strength_progression.progressions = ["86", "87", "88", "89", "90", "91", "92"]
-
-        lower_back.activate_exercises.append(core_strength_progression)
-
-        body_parts.append(lower_back)
-
-        # hip
-
-        hip = soreness_and_injury.BodyPart(soreness_and_injury.BodyPartLocation.hip_flexor, 2)
-
-        hip.inhibit_exercises.append(AssignedExercise("3", hip.treatment_priority, 1))
-        hip.inhibit_exercises.append(AssignedExercise("48", hip.treatment_priority, 2))
-        hip.inhibit_exercises.append(AssignedExercise("54", hip.treatment_priority, 3))
-        hip.inhibit_exercises.append(AssignedExercise("1", hip.treatment_priority, 4))
-        hip.inhibit_exercises.append(AssignedExercise("44", hip.treatment_priority, 5))
-        hip.inhibit_exercises.append(AssignedExercise("4", hip.treatment_priority, 6))
-        hip.inhibit_exercises.append(AssignedExercise("5", hip.treatment_priority, 7))
-        hip.inhibit_exercises.append(AssignedExercise("2", hip.treatment_priority, 8))
-
-        hip.lengthen_exercises.append(AssignedExercise("49", hip.treatment_priority, 1))
-        hip.lengthen_exercises.append(AssignedExercise("9", hip.treatment_priority, 2))
-        hip.lengthen_exercises.append(AssignedExercise("46", hip.treatment_priority, 3))
-        hip.lengthen_exercises.append(AssignedExercise("28", hip.treatment_priority, 4))
-
-        posterior_pelvic_tilt = AssignedExercise("79", hip.treatment_priority, 1)
-        posterior_pelvic_tilt.progressions = ["80"]
-
-        hip.activate_exercises.append(posterior_pelvic_tilt)
-
-        hip_bridge_progression = AssignedExercise("10", hip.treatment_priority, 2)
-        hip_bridge_progression.progressions = ["12", "11", "13"]
-
-        hip.activate_exercises.append(hip_bridge_progression)
-
-        hip.activate_exercises.append(AssignedExercise("50", hip.treatment_priority, 3))
-        hip.activate_exercises.append(AssignedExercise("84", hip.treatment_priority, 4))
-
-        glute_activation = AssignedExercise("34", hip.treatment_priority, 5)
-        glute_activation.progressions = ["35"]
-        hip.activate_exercises.append(glute_activation)
-
-        body_parts.append(hip)
-
-        # glutes
-
-        glutes = soreness_and_injury.BodyPart(soreness_and_injury.BodyPartLocation.glutes, 3)
-
-        glutes.inhibit_exercises.append(AssignedExercise("44", glutes.treatment_priority, 1))
-        glutes.inhibit_exercises.append(AssignedExercise("3", glutes.treatment_priority, 2))
-
-        it_band = AssignedExercise("4", glutes.treatment_priority, 3)
-        it_band.progressions = ["5"]
-        glutes.inhibit_exercises.append(it_band)
-
-        glutes.inhibit_exercises.append(AssignedExercise("54", glutes.treatment_priority, 4))
-        glutes.inhibit_exercises.append(AssignedExercise("2", glutes.treatment_priority, 5))
-
-        glutes.lengthen_exercises.append(AssignedExercise("9", glutes.treatment_priority, 1))
-        glutes.lengthen_exercises.append(AssignedExercise("46", glutes.treatment_priority, 2))
-
-        stretching_erectors = AssignedExercise("103", glutes.treatment_priority, 3)
-        stretching_erectors.progressions = ["104"]
-        glutes.lengthen_exercises.append(stretching_erectors)
-
-        glutes.lengthen_exercises.append(AssignedExercise("28", glutes.treatment_priority, 4))
-
-        gastroc_soleus = AssignedExercise("25", glutes.treatment_priority, 5)
-        gastroc_soleus.progressions = ["26"]
-        glutes.lengthen_exercises.append(gastroc_soleus)
-
-        hip_bridge_progression = AssignedExercise("10", glutes.treatment_priority, 1)
-        hip_bridge_progression.progressions = ["12", "11", "13"]
-
-        glutes.activate_exercises.append(hip_bridge_progression)
-
-        glute_activation = AssignedExercise("81", glutes.treatment_priority, 2)
-        glute_activation.progressions = ["82", "83"]
-
-        glutes.activate_exercises.append(glute_activation)
-
-        glute_activation_2 = AssignedExercise("34", glutes.treatment_priority, 3)
-        glute_activation_2.progressions = ["35"]
-        glutes.activate_exercises.append(glute_activation_2)
-
-        core_strength_progression = AssignedExercise("85", glutes.treatment_priority, 4)
-        core_strength_progression.progressions = ["86", "87", "88"]
-
-        glutes.activate_exercises.append(core_strength_progression)
-
-        core_strength_progression_2 = AssignedExercise("89", glutes.treatment_priority, 5)
-        core_strength_progression_2.progressions = ["90", "91", "92"]
-
-        glutes.activate_exercises.append(core_strength_progression_2)
-
-        body_parts.append(glutes)
-
-        '''
-        body_parts.append(BodyPart(BodyPartLocation.abdominals), 4)
-        body_parts.append(BodyPart(BodyPartLocation.hamstrings), 5)
-        body_parts.append(BodyPart(BodyPartLocation.outer_thigh), 6)
-        body_parts.append(BodyPart(BodyPartLocation.groin), 7)
-        body_parts.append(BodyPart(BodyPartLocation.quads), 8)
-        body_parts.append(BodyPart(BodyPartLocation.knee), 9)
-        body_parts.append(BodyPart(BodyPartLocation.calves), 10)
-        body_parts.append(BodyPart(BodyPartLocation.shin), 11)
-        body_parts.append(BodyPart(BodyPartLocation.ankle), 12)
-        body_parts.append(BodyPart(BodyPartLocation.foot), 13)
-        '''
-
-        return body_parts
 
 

@@ -1,8 +1,8 @@
-import athlete
-import soreness_and_injury
-import training
+import logic.athlete as athlete
+import logic.soreness_and_injury as soreness_and_injury
+import logic.training as training
 import datetime
-import session
+import logic.session as session
 
 
 '''
