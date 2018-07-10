@@ -178,9 +178,6 @@ class WeeklyTrainingDatastore(object):
             'week_start': weeklytraining.week_start,
             'cross_training': weeklytraining.cross_training,
             'sports': weeklytraining.sports,
-            # 'sport': weeklytraining.sport,
-            # 'practice': weeklytraining.practice,
-            # 'competition': weeklytraining.competition
         }
         return item
 
