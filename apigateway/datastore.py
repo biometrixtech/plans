@@ -135,3 +135,35 @@ class WeeklyTrainingDatastore(object):
         }
         return item
 
+
+
+
+class DailyPlanDatastore(object):
+    # @xray_recorder.capture('datastore.WeeklyCrossTrainingDatastore.get')
+    def get(self, user_id=None, date=none, collection=None):
+        pass
+
+    # @xray_recorder.capture('datastore.WeeklyCrossTrainingDatastore.put')
+    def put(self, items, collection):
+        pass
+
+    # @xray_recorder.capture('datastore.WeeklyCrossTrainingDatastore.get')
+    @xray_recorder.capture('datastore.DailyPlanDatastore._query_mongodb')
+    def _query_mongodb(self, user_id, date, collection):
+        pass
+
+    # @xray_recorder.capture('datastore.WeeklyCrossTrainingDatastore.put')
+    @xray_recorder.capture('datastore.DailyPlanDatastore._put_mongodb')
+        pass
+
+    @staticmethod
+    def item_to_mobile(dailyplan):
+        pass
+        # item = {
+        #     'user_id': weeklytraining.user_id,
+        #     'week_start': weeklytraining.week_start,
+        #     'cross_training': weeklytraining.cross_training,
+        #     'sports': weeklytraining.sports,
+        # }
+        # return item
+
