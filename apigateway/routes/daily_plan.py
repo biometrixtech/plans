@@ -22,6 +22,7 @@ app = Blueprint('daily_plan', __name__)
 def handle_daily_plan_get():
 
     user_id = request.json['user_id']
+    date = datetime.datetime.today().strftime("%Y-%m-%d")
     store = DailyPlanDatastore()
     daily_plan = store.get(user_id, date, collection='dailyplan')
     return {'daily_plan': daily_plan}, 200

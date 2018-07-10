@@ -146,7 +146,7 @@ class DailyPlanDatastore(object):
     @xray_recorder.capture('datastore.DailyPlanDatastore._query_mongodb')
     def _query_mongodb(self, user_id, date, collection):
         mongo_collection = get_mongo_collection(collection)
-        output = list(mongo_collction.find({'user_id': user_id, 'date': date}).limit(1))[0]
+        output = list(mongo_collection.find({'user_id': user_id, 'date': date}).limit(1))[0]
         if len(output) == 1:
             return self.item_to_output(output)
 
