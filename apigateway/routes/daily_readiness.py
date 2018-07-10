@@ -11,7 +11,7 @@ from datastore import DailyReadinessDatastore
 from decorators import authentication_required
 from exceptions import InvalidSchemaException
 from models.daily_readiness import DailyReadiness
-from logic.soreness_and_injury import MuscleSorenessSeverity, BodyPart
+from logic.soreness_and_injury import MuscleSorenessSeverity, BodyPartLocation
 
 
 app = Blueprint('daily_readiness', __name__)
@@ -81,7 +81,7 @@ def validate_data(request):
     else:
         for soreness in request.json['soreness']:
             try:
-                BodyPart(soreness['body_part'])
+                BodyPartLocation(soreness['body_part'])
             except ValueError:
                 raise InvalidSchemaException('body_part not recognized')
             else:
