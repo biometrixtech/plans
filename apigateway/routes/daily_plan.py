@@ -7,10 +7,10 @@ import jwt
 # import uuid
 
 # from auth import get_accessory_id_from_auth
-from datastore import DailyPlanDataStore
+from datastore import DailyPlanDatastore
 from decorators import authentication_required
 from exceptions import InvalidSchemaException
-from models.daily_plan import daily_plan
+from models.daily_plan import DailyPlan
 
 
 app = Blueprint('daily_plan', __name__)
@@ -21,7 +21,7 @@ app = Blueprint('daily_plan', __name__)
 @xray_recorder.capture('routes.daily_plan.get')
 def handle_daily_plan_get():
 
-    store = DailyPlanDataStore()
+    store = DailyPlanDatastore()
     daily_plan = store.get(user_id, date, collection='dailyplan')
     return {'daily_plan': daily_plan}, 200
 
