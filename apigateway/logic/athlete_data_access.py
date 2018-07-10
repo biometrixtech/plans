@@ -1,5 +1,4 @@
 import pymongo
-# import database_config
 import datetime
 import logic.training as training
 import logic.session as session
