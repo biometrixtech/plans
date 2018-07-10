@@ -1,8 +1,8 @@
 import pymongo
 import database_config
-import soreness_and_injury
-import training
-import session
+import logic.soreness_and_injury
+import logic.training
+import logic.session
 
 
 class AthleteDataAccess(object):

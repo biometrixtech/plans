@@ -6,7 +6,7 @@ import logic.session
 import numpy as np
 import datetime
 import logic.exercise
-import soreness_and_injury
+import logic.soreness_and_injury
 
 
 class TrainingPlanManager(object):
