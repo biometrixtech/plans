@@ -6,15 +6,15 @@ class DailyPlan(Serialisable):
     def __init__(self,
                  date,
                  user_id,
-                 soreness,
-                 sleep_quality,
-                 readiness
+                 practice=None,
+                 recovery_am=None,
+                 recovery_pm=None
                  ):
-        self.date_time = date
-        self.date = user_id
+        self.date = date
+        self.use_id = user_id
         self.practice = practice
-        self.recoveryAM = recoveryAM
-        self.recoveryPM = recoveryPM
+        self.recovery_am = recovery_am
+        self.recovery_mp = recovery_pm
 
     def get_id(self):
         return self.user_id
