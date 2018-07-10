@@ -1,6 +1,6 @@
 import numpy as np
 from decimal import Decimal, getcontext
-import logic.session
+import logic.session as session
 
 
 class DailyPlan(object):

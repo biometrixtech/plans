@@ -1,6 +1,6 @@
 import abc
 from enum import IntEnum
-import logic.exercise
+import logic.exercise as exercise
 
 
 class RecoveryModality(metaclass=abc.ABCMeta):

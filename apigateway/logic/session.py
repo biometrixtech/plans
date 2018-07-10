@@ -1,7 +1,7 @@
 import abc
 from enum import Enum
 import uuid
-import logic.exercise
+import logic.exercise as exercise
 
 
 class SessionType(Enum):

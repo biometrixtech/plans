@@ -1,8 +1,8 @@
 import abc
 from enum import Enum, IntEnum
 import datetime
-import numpy as np
-import logic.soreness_and_injury
+# import numpy as np
+import logic.soreness_and_injury as soreness_and_injury
 
 
 class TechnicalDifficulty(IntEnum):
@@ -232,13 +232,13 @@ class ExerciseAssignments(object):
 
     def calculate_durations(self):
         inhibit_duration_list = list(ex.duration() for ex in self.inhibit_exercises if ex.duration() is not None)
-        self.inhibit_minutes = np.sum(inhibit_duration_list) / 60
+        self.inhibit_minutes = sum(inhibit_duration_list) / 60
 
         lengthen_duration_list = list(ex.duration() for ex in self.lengthen_exercises if ex.duration() is not None)
-        self.lengthen_minutes = np.sum(lengthen_duration_list) / 60
+        self.lengthen_minutes = sum(lengthen_duration_list) / 60
 
         activate_duration_list = list(ex.duration() for ex in self.activate_exercises if ex.duration() is not None)
-        self.activate_minutes = np.sum(activate_duration_list) / 60
+        self.activate_minutes = sum(activate_duration_list) / 60
 
         self.integrate_minutes = 0
 

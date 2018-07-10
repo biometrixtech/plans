@@ -1,12 +1,12 @@
-import logic.recovery
-import logic.athlete_data_access
-import logic.recovery_data_access
-import logic.training
-import logic.session
-import numpy as np
+import logic.recovery as recovery
+import logic.athlete_data_access as athlete_data_access
+import logic.recovery_data_access as recovery_data_access
+import logic.training as training
+import logic.session as session
+# import numpy as np
 import datetime
-import logic.exercise
-import logic.soreness_and_injury
+import logic.exercise as exercise
+import logic.soreness_and_injury as soreness_and_injury
 
 
 class TrainingPlanManager(object):
@@ -237,16 +237,16 @@ class TrainingPlanManager(object):
         max_sessions = 4 - current_bump_up_count
 
         internal_load_values = list(x.internal_load() for x in training_sessions if x.internal_load() is not None)
-        internal_load_mean = np.mean(internal_load_values).item()
-        internal_load_median = np.median(internal_load_values).item()
-        internal_load_stddev = np.std(internal_load_values).item()
+        # internal_load_mean = np.mean(internal_load_values).item()
+        # internal_load_median = np.median(internal_load_values).item()
+        # internal_load_stddev = np.std(internal_load_values).item()
 
         for s in range(0, max_sessions):
 
-            if internal_load_median > internal_load_mean:  # if it's biased toward higher loads
-                internal_target_value = min(internal_load_mean - (internal_load_stddev * 1.10), internal_load_available)
-            else:
-                internal_target_value = min(internal_load_stddev * 1.05, internal_load_available)
+            # if internal_load_median > internal_load_mean:  # if it's biased toward higher loads
+            #    internal_target_value = min(internal_load_mean - (internal_load_stddev * 1.10), internal_load_available)
+            # else:
+            #    internal_target_value = min(internal_load_stddev * 1.05, internal_load_available)
 
             bump_up_session = session.BumpUpSession()
 
@@ -282,12 +282,12 @@ class TrainingPlanManager(object):
 
             internal_load_available = internal_load_available - internal_target_value
 
-            internal_load_mean = np.mean(internal_load_values).item()
-            internal_load_median = np.median(internal_load_values).item()
-            internal_load_stddev = np.std(internal_load_values).item()
-            monotony = internal_load_mean / internal_load_stddev
-            if monotony < 2 and internal_load_available == 0:
-                break
+            # internal_load_mean = np.mean(internal_load_values).item()
+            # internal_load_median = np.median(internal_load_values).item()
+            # internal_load_stddev = np.std(internal_load_values).item()
+            #monotony = internal_load_mean / internal_load_stddev
+            #if monotony < 2 and internal_load_available == 0:
+            #    break
 
         return bump_up_sessions
 

@@ -1,5 +1,5 @@
 import pytest
-import training
+import logic.training as training
 
 # athlete has 28 days of data plus has data in current week
 

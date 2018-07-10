@@ -1,6 +1,6 @@
 import pytest
-import athlete_data_access
-import soreness_and_injury
+import logic.athlete_data_access as athlete_data_access
+import logic.soreness_and_injury as soreness_and_injury
 
 
 def test_get_readiness_survey_test_data():

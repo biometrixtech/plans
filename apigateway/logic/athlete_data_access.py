@@ -1,23 +1,23 @@
 import pymongo
 import database_config
-import logic.soreness_and_injury
-import logic.training
-import logic.session
-
+import logic.training as training
+import logic.session as session
+import config
+import logic.soreness_and_injury as soreness_and_injury
 
 class AthleteDataAccess(object):
 
     def __init__(self, athlete_id):
         self.athlete_id = athlete_id
-        self.mongo_client = pymongo.MongoClient(database_config.mongodb_dev)
+        # self.mongo_client = pymongo.MongoClient(database_config.mongodb_dev)
 
     def get_last_daily_readiness_survey(self):
 
         daily_readiness = soreness_and_injury.DailyReadinessSurvey()
 
-        db = self.mongo_client.movementStats
-
-        readiness_cursor = db.dailyReadiness.find({"user_id": self.athlete_id}).limit(1).sort("date_time",
+        # db = self.mongo_client.movementStats
+        collection = config.get_mongo_collection('dailyreadiness')
+        readiness_cursor = collection.find({"user_id": self.athlete_id}).limit(1).sort("date_time",
                                                                                               pymongo.DESCENDING)
         for record in readiness_cursor:
             daily_readiness.report_date_time = record["date_time"]

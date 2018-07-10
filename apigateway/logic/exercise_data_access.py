@@ -1,18 +1,19 @@
 import pymongo
 import database_config
-import logic.exercise
+import logic.exercise as exercise
+import config
 
 class ExerciseDataAccess(object):
 
-    def __init__(self):
-        self.mongo_client = pymongo.MongoClient(database_config.mongodb_dev)
+    # def __init__(self):
+    # self.mongo_client = pymongo.MongoClient(database_config.mongodb_dev)
 
     def get_exercise_library(self):
         exercise_list = []
 
-        db = self.mongo_client.movementStats
-
-        exercise_cursor = db.exerciseLibrary.find()
+        # db = self.mongo_client.movementStats
+        collection = config.get_mongo_collection('dailyplan')
+        exercise_cursor = collection.find()
 
         for record in exercise_cursor:
             exercise_item = exercise.Exercise(record["libraryId"])
