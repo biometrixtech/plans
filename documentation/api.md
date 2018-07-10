@@ -113,6 +113,8 @@ The client __must__ submit a request body containing a JSON object with the foll
 	"user_id": Uuid
 }
 ```
+
+```
 POST /plans/daily_readiness/previous HTTPS/1.1
 Host: apis.env.fathomai.com
 Content-Type: application/json
@@ -134,6 +136,119 @@ Authentication is required for this endpoint
 }
 ```
 * body_part will be a list of enumerated body parts (potentially empty).
+
+### Weekly Training
+
+#### Cross-Training
+
+##### Query String
+The client __must__ submit a request to the endpoint `/plans/weekly_schedule/cross_training`. The request method __must__ be `POST`.
+
+##### Request
+The client __must__ submit a request body containing a JSON object with the following schema:
+```
+{
+	"user_id": Uuid,
+	"activities": [string, string],
+	"days_of_week": [number, number]
+	"duration": number
+}
+```
+* `activities` __should__ reflect the list of cross-training activities user performs in the week
+* `days_of_week` __should__ be a list of days of the week that the user plans to perform the activities encoded 0-Monday ... 6-Sunday
+* `duration` __should__ be an integer representing average minutes per session
+
+```
+POST /plans/weekly_schedule/cross_training HTTPS/1.1
+Host: apis.env.fathomai.com
+Content-Type: application/json
+Authorization: eyJraWQ...ajBc4VQ
+
+{
+    "user_id": "02cb7965-7921-493a-80d4-6b278c928fad",
+    "activities": ["cycling", "weightlifting", "yoga"],
+    "days_of_week": [0,1,4],
+    "duration": 50
+}
+```
+##### Responses
+ 
+ If the write was successful, the Service __will__ respond with HTTP Status `201 Created`, with a body with the following syntax:
+ 
+```
+{
+    "message": "success"
+}
+```
+
+#### Training
+
+##### Query String
+The client __must__ submit a request to the endpoint `/plans/weekly_schedule/cross_training`. The request method __must__ be `POST`.
+
+##### Request
+The client __must__ submit a request body containing a JSON object with the following schema:
+```
+{
+	"user_id": Uuid,
+	"sports": [sport1, sport2]
+}
+```
+Where sports is the weekly schedule for a sport of the following schema:
+```
+{
+	"sport": string,
+	"practice": {
+		"days_of_week": [number, number],
+		"duration": number
+		},
+	"competition": {
+		"days_of_week": [number]
+	}
+}
+
+```
+###### Example
+```
+POST /plans/weekly_schedule/training HTTPS/1.1
+Host: apis.env.fathomai.com
+Content-Type: application/json
+Authorization: eyJraWQ...ajBc4VQ
+
+{
+    "user_id": "02cb7965-7921-493a-80d4-6b278c928fad",
+	"sports": [
+        {"sport": "sportX",
+		"practice": {
+			"days_of_week": [0, 1, 2, 3, 4, 5],
+			"duration": 90
+		},
+		"competition": {
+			"days_of_week": [6]
+		}
+	},
+    { "sport": "sportY",
+		"practice": {
+			"days_of_week": [0, 1, 2, 3, 4, 5],
+			"duration": 90
+		},
+		"competition": {
+			"days_of_week": [6]
+		}
+	}
+        ]
+}
+```
+##### Responses
+ 
+ If the write was successful, the Service __will__ respond with HTTP Status `201 Created`, with a body with the following syntax:
+ 
+```
+{
+    "message": "success"
+}
+```
+
 
 
 ### Hello
