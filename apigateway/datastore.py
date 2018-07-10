@@ -146,9 +146,9 @@ class DailyPlanDatastore(object):
     @xray_recorder.capture('datastore.DailyPlanDatastore._query_mongodb')
     def _query_mongodb(self, user_id, date, collection):
         mongo_collection = get_mongo_collection(collection)
-        output = list(mongo_collection.find({'user_id': user_id, 'date': date}).limit(1))[0]
+        output = list(mongo_collection.find({'user_id': user_id, 'date': date}).limit(1))
         if len(output) == 1:
-            return self.item_to_output(output)
+            return self.item_to_output(output[0])
 
     @xray_recorder.capture('datastore.DailyPlanDatastore._put_mongodb')
     def _put_mongodb(self, item, collection):
@@ -157,11 +157,11 @@ class DailyPlanDatastore(object):
     @staticmethod
     def item_to_oputput(dailyplan):
         item = {
-            'user_id': dailyplan.user_id,
-            'date': dailyplan.date,
-            'practice': dailyplan.practiceSessions,
-            'recoveryAM': dailyplan.recoveryAM,
-            'recoveryPM': dailyplan.recoveryPM
+            'user_id': dailyplan['user_id'],
+            'date': dailyplan['date'],
+            'practice': dailyplan['practice_sessions'],
+            'recovery_am': dailyplan['recovery_am'],
+            'recovery_pm': dailyplan['recovery_pm']
         }
         return item
 
