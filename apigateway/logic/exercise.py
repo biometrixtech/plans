@@ -145,6 +145,14 @@ class ExerciseAssignments(object):
 
         return sorted_list
 
+    def sort_priority(self, assigned_exercise_list):
+        # rank all exercise by priority, assumes all body parts have same level of severity
+        sorted_list = sorted(assigned_exercise_list,
+                             key=lambda x: (x.body_part_exercise_priority, x.body_part_priority),
+                             reverse=False)
+
+        return sorted_list
+
     def reduce_assigned_exercises(self, seconds_reduction_needed, assigned_exercise_list):
         assigned_exercise_list = self.sort_reverse_priority(assigned_exercise_list)
         while seconds_reduction_needed >= 0:
@@ -167,6 +175,7 @@ class ExerciseAssignments(object):
 
         assigned_exercise_list = list(ex for ex in assigned_exercise_list if ex.reps_assigned > 0
                                       and ex.sets_assigned > 0)
+        assigned_exercise_list = self.sort_priority(assigned_exercise_list)
 
         return assigned_exercise_list
 

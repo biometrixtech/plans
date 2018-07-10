@@ -1,6 +1,6 @@
 *.zip
 *.pyc
-*config.py
+*_config.py
 
 apigateway/*
 .idea/*

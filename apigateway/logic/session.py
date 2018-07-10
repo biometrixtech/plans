@@ -50,6 +50,7 @@ class Session(metaclass=abc.ABCMeta):
         self.same_muscle_discomfort_over_72_hrs = False
 
         # post-session
+        self.post_session_survey = None
         self.session_RPE = None
         self.performance_level = 100  # only answered if there is discomfort
         self.completion_percentage = 100    # only answered if there is discomfort

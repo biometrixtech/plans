@@ -96,7 +96,9 @@ class AthleteDataAccess(object):
             pm_recovery_bson = self.get_recovery_bson(daily_plan.recovery_pm)
 
         for practice_session in daily_plan.practice_sessions:
-            practice_session_bson += ({'sessionId': str(practice_session.id)},)
+            practice_session_bson += ({'sessionId': str(practice_session.id),
+                                       'postSessionSurvey': practice_session.post_session_survey
+                                       },)
 
         collection.insert_one({'userId': self.athlete_id,
                                'date': daily_plan.date.strftime('%Y-%m-%d'),
