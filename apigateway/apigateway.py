@@ -39,7 +39,11 @@ app.register_blueprint(hello_routes, url_prefix='/plans/hello')
 
 
 from routes.daily_readiness import app as daily_readiness_routes
-app.register_blueprint(daily_readiness_routes, url_prefix='/plans')
+app.register_blueprint(daily_readiness_routes, url_prefix='/plans/daily_readiness')
+
+
+from routes.weekly_schedule import app as weekly_schedule_routes
+app.register_blueprint(weekly_schedule_routes, url_prefix='/plans/weekly_schedule')
 
 
 @app.errorhandler(500)

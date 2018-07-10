@@ -1,6 +1,6 @@
 import pymongo
 import database_config
-import exercise
+import logic.exercise
 
 class ExerciseDataAccess(object):
 

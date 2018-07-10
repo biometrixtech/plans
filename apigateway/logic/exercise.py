@@ -2,7 +2,7 @@ import abc
 from enum import Enum, IntEnum
 import datetime
 import numpy as np
-import soreness_and_injury
+import logic.soreness_and_injury
 
 
 class TechnicalDifficulty(IntEnum):
