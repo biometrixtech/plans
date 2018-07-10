@@ -89,9 +89,15 @@ class AssignedExercise(object):
     '''
     def duration(self):
         if self.exercise.unit_of_measure == "count":
-            return self.exercise.seconds_per_rep * self.reps_assigned * self.sets_assigned
+            if not self.exercise.bilateral:
+                return self.exercise.seconds_per_rep * self.reps_assigned * self.sets_assigned
+            else:
+                return (self.exercise.seconds_per_rep * self.reps_assigned * self.sets_assigned) * 2
         elif self.exercise.unit_of_measure == "seconds":
-            return self.exercise.seconds_per_set * self.sets_assigned
+            if not self.exercise.bilateral:
+                return self.exercise.seconds_per_set * self.sets_assigned
+            else:
+                return (self.exercise.seconds_per_set * self.sets_assigned) * 2
         else:
             return None
 
@@ -139,9 +145,25 @@ class ExerciseAssignments(object):
 
     def sort_reverse_priority(self, assigned_exercise_list):
         # rank all exercise by reverse priority, assumes all body parts have same level of severity
-        sorted_list = sorted(assigned_exercise_list,
-                             key=lambda x: (x.body_part_exercise_priority, x.body_part_priority),
-                             reverse=True)
+        sorted_list = []
+
+        severity_3_list = [a for a in assigned_exercise_list if a.body_part_soreness_level == 3]
+        severity_2_list = [a for a in assigned_exercise_list if a.body_part_soreness_level == 2]
+        severity_1_list = [a for a in assigned_exercise_list if a.body_part_soreness_level == 1]
+
+        sorted_1_list = sorted(severity_1_list,
+                               key=lambda x: (x.body_part_exercise_priority, x.body_part_priority),
+                               reverse=True)
+        sorted_2_list = sorted(severity_2_list,
+                               key=lambda x: (x.body_part_exercise_priority, x.body_part_priority),
+                               reverse=True)
+        sorted_3_list = sorted(severity_3_list,
+                               key=lambda x: (x.body_part_exercise_priority, x.body_part_priority),
+                               reverse=True)
+
+        sorted_list.extend(sorted_1_list)
+        sorted_list.extend(sorted_2_list)
+        sorted_list.extend(sorted_3_list)
 
         return sorted_list
 
@@ -158,11 +180,17 @@ class ExerciseAssignments(object):
         while seconds_reduction_needed >= 0:
             for i in range(0, len(assigned_exercise_list)):
                 if assigned_exercise_list[i].reps_assigned > assigned_exercise_list[i].exercise.min_reps:
-                    assigned_exercise_list[i].reps_assigned = assigned_exercise_list[i].reps_assigned -1
-                    seconds_reduction_needed -= assigned_exercise_list[i].exercise.seconds_per_rep
+                    assigned_exercise_list[i].reps_assigned = assigned_exercise_list[i].reps_assigned - 1
+                    if assigned_exercise_list[i].exercise.bilateral:
+                        seconds_reduction_needed -= (assigned_exercise_list[i].exercise.seconds_per_rep * 2)
+                    else:
+                        seconds_reduction_needed -= assigned_exercise_list[i].exercise.seconds_per_rep
                 elif assigned_exercise_list[i].sets_assigned > assigned_exercise_list[i].exercise.min_sets:
                     assigned_exercise_list[i].sets_assigned = assigned_exercise_list[i].sets_assigned - 1
-                    seconds_reduction_needed -= assigned_exercise_list[i].exercise.seconds_per_set
+                    if assigned_exercise_list[i].exercise.bilateral:
+                        seconds_reduction_needed -= (assigned_exercise_list[i].exercise.seconds_per_set * 2)
+                    else:
+                        seconds_reduction_needed -= assigned_exercise_list[i].exercise.seconds_per_set
                 else:
                     # set it to zero for deletion later
                     seconds_reduction_needed -= assigned_exercise_list[i].duration()
@@ -352,7 +380,7 @@ class ExerciseAssignmentCalculator(object):
 
         # completed_exercises = self.athlete_dao.get_completed_exercises()
         completed_exercises = None
-        body_part_exercises = self.exercises_for_body_parts()
+        body_part_exercises = self.exercises_for_body_parts
         exercise_list = self.exercise_library
 
         for soreness in soreness_list:

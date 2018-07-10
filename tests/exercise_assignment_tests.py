@@ -249,6 +249,13 @@ def test_recovery_session_exercises_assigned_2_body_parts():
     target_recovery_session = recovery_session(soreness_two_body_parts(12, 1, 4, 1, 1, 2), 15)
     exercise_assignments = calc.create_exercise_assignments(target_recovery_session, soreness_list)
     j = 0
+
+def test_recovery_session_exercises_assigned_2_body_parts_diff_severity():
+    calc = exercise.ExerciseAssignmentCalculator("test_user", None, exercise_data_access.ExerciseDataAccess())
+    soreness_list = soreness_two_body_parts(12, 1, 4, 2, 1, 2)    # lower back
+    target_recovery_session = recovery_session(soreness_two_body_parts(12, 1, 4, 1, 1, 2), 15)
+    exercise_assignments = calc.create_exercise_assignments(target_recovery_session, soreness_list)
+    j = 0
 '''
 def test_get_priority_no_severity_inhibit():
     recs = exercise.ExerciseRecommendations()
