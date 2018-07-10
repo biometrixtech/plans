@@ -23,7 +23,7 @@ class RecoveryDataAccess(object):
         exercises = []
 
         if (injury.injury_type == soreness_and_injury.InjuryType.ligament
-                and injury.body_part == soreness_and_injury.BodyPart.ankle
+                and injury.body_part == soreness_and_injury.BodyPartLocation.ankle
                 and injury.injury_descriptor == soreness_and_injury.InjuryDescriptor.sprain):
             # injury ankle sprain/instability or body part soreness = ankle
 
@@ -53,7 +53,7 @@ class RecoveryDataAccess(object):
         exercises = []
 
         if (soreness.type == soreness_and_injury.SorenessType.joint_related
-                and soreness.body_part == soreness_and_injury.BodyPart.knee):
+                and soreness.body_part == soreness_and_injury.BodyPartLocation.knee):
             # body part soreness = knee
 
             # Follow NASM recommended inhibit -> lengthen -> activate -> integrate

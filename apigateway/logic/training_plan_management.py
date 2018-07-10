@@ -6,9 +6,50 @@ import session
 import numpy as np
 import datetime
 import exercise
+import soreness_and_injury
 
 
 class TrainingPlanManager(object):
+
+    def __init__(self, athlete_id, athlete_dao, exercise_dao):
+        self.athlete_id = athlete_id
+        self.athlete_dao = athlete_dao
+        self.exercise_dao = exercise_dao
+
+    def create_daily_plan(self):
+        last_daily_readiness_survey = self.athlete_dao.get_last_daily_readiness_survey()
+
+        last_post_session_survey = self.athlete_dao.get_last_post_session_survey()
+
+        soreness_calc = soreness_and_injury.SorenessCalculator()
+
+        soreness_list = \
+            soreness_calc.get_soreness_summary_from_surveys(last_daily_readiness_survey, last_post_session_survey,
+                                                            last_daily_readiness_survey.report_date_time)
+
+        # TODO: convert day of week to session and add session id
+        scheduled_sessions = \
+            self.athlete_dao.get_scheduled_sessions(last_daily_readiness_survey.report_date_time.date())
+
+        daily_plan = training.DailyPlan(last_daily_readiness_survey.report_date_time.date())
+        daily_plan = self.add_recovery_times(last_daily_readiness_survey.report_date_time, daily_plan)
+
+        calc = exercise.ExerciseAssignmentCalculator(self.athlete_id, None, self.exercise_dao)
+
+        if daily_plan.recovery_am.start_time is not None:
+            daily_plan.recovery_am.set_exercise_target_minutes(soreness_list, 15)
+            am_exercise_assignments = calc.create_exercise_assignments(daily_plan.recovery_am,
+                                                                       soreness_list)
+            daily_plan.recovery_am.update_from_exercise_assignments(am_exercise_assignments)
+        daily_plan.recovery_pm.set_exercise_target_minutes(soreness_list, 15)
+        pm_exercise_assignments = calc.create_exercise_assignments(daily_plan.recovery_pm,
+                                                                   soreness_list)
+        daily_plan.recovery_pm.update_from_exercise_assignments(pm_exercise_assignments)
+
+        for scheduled_session in scheduled_sessions:
+            daily_plan.add_scheduled_session(scheduled_session)
+
+        return daily_plan
 
     def create_training_cycle(self, athlete_schedule, athlete_injury_history):
         # schedule_manager = schedule.ScheduleManager()
@@ -21,6 +62,23 @@ class TrainingPlanManager(object):
 
         # add recovery sessions based on athlete status and history
         training_cycle.recovery_modalities = self.get_recovery_sessions(athlete_injury_history, training_cycle)
+
+    def add_recovery_times(self, trigger_date_time, daily_plan):
+
+        if trigger_date_time.hour < 12:
+            daily_plan.recovery_am.start_time = datetime.datetime(trigger_date_time.year, trigger_date_time.month,
+                                                                  trigger_date_time.day, 0, 0, 0)
+            daily_plan.recovery_am.end_time = datetime.datetime(trigger_date_time.year, trigger_date_time.month,
+                                                                trigger_date_time.day, 12, 0, 0)
+        else:
+            daily_plan.recovery_am = None
+
+        daily_plan.recovery_pm.start_time = datetime.datetime(trigger_date_time.year, trigger_date_time.month,
+                                                              trigger_date_time.day, 12, 0, 0)
+        next_date = trigger_date_time + datetime.timedelta(days=1)
+        daily_plan.recovery_pm.end_time = datetime.datetime(trigger_date_time.year, trigger_date_time.month,
+                                                            next_date.day, 0, 0, 0)
+        return daily_plan
 
     def get_recovery_start_end_times(self, trigger_date_time, recovery_number):
 
@@ -38,7 +96,7 @@ class TrainingPlanManager(object):
             if trigger_date_time.hour >= 12:
                 start_time = datetime.datetime(trigger_date_time.year, trigger_date_time.month,
                                                trigger_date_time.day,
-                                               19, 0, 0)
+                                               12, 0, 0)
                 next_date = trigger_date_time + datetime.timedelta(days=1)
                 end_time = datetime.datetime(trigger_date_time.year, trigger_date_time.month,
                                              next_date.day,
@@ -49,7 +107,7 @@ class TrainingPlanManager(object):
             if trigger_date_time.hour < 12:
                 start_time = datetime.datetime(trigger_date_time.year, trigger_date_time.month,
                                                trigger_date_time.day,
-                                               19, 0, 0)
+                                               12, 0, 0)
                 next_date = trigger_date_time + datetime.timedelta(days=1)
                 end_time = datetime.datetime(trigger_date_time.year, trigger_date_time.month,
                                              next_date.day,
@@ -74,7 +132,7 @@ class TrainingPlanManager(object):
 
                 start_time = datetime.datetime(trigger_date_time.year, trigger_date_time.month,
                                                next_date.day,
-                                               19, 0, 0)
+                                               12, 0, 0)
                 next_date = next_date + datetime.timedelta(days=1)
                 end_time = datetime.datetime(trigger_date_time.year, trigger_date_time.month,
                                              next_date.day,
@@ -84,7 +142,7 @@ class TrainingPlanManager(object):
             next_date = trigger_date_time + datetime.timedelta(days=1)
             if trigger_date_time.hour < 12:
                 start_time = datetime.datetime(trigger_date_time.year, trigger_date_time.month, next_date.day,
-                                               19, 0, 0)
+                                               12, 0, 0)
                 next_date = next_date + datetime.timedelta(days=1)
                 end_time = datetime.datetime(trigger_date_time.year, trigger_date_time.month, next_date.day,
                                              0, 0, 0)

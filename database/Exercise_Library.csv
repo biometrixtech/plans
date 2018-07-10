@@ -1,0 +1,99 @@
+Numeric ID,Exercise,Program Type,,,,,,PHASE,Muscle Group / Joint,Inhibit,Lengthen,Activate,Integrate,DOSAGE,min Sets,max Sets,min Reps,max Reps,Bilateral (Y/N),Progression Interval (e.g. 2 reps),Progression Cadence (e.g. 2 exposures),Unit of Measure for Reps,Rest Between Sets (seconds),Time Per Set (seconds),Time Per Rep (seconds),Progresses To,,Technical Difficulty,Equipment Required
+1,SMR - Adductors,,,,,x,,,Adductor,x,,,,,1,3,30,30,Y,0,0,seconds,0,30,-,-,,Beginner,SMR
+2,SMR - Calves,,,,,x,x,,Calves,x,,,,,1,3,30,30,Y,0,0,seconds,0,30,-,-,,Beginner,SMR
+3,SMR - Hamstrings,,,,,x,x,,Hamstring,x,,,,,1,3,30,30,Y,0,0,seconds,0,30,-,-,,Beginner,SMR
+4,SMR - IT-Band,,,,,x,x,,IT-Band,x,,,,,1,3,30,30,Y,0,0,seconds,0,30,-,-,,Beginner,SMR
+5,SMR - Tensor Fascia Latae,,,,,x,x,,Tensor Fascia Latae,x,,,,,1,3,30,30,Y,0,0,seconds,0,30,-,-,,Beginner,SMR
+6,Hip Flexor Static Stretch (Standing),,,,,x,,,Hip,,x,,,,1,3,30,30,Y,0,0,seconds,0,30,-,-,,Beginner,Floor
+7,Calves Static Stretch,,,,,x,,,Calf,,x,,,,1,3,30,30,Y,0,0,seconds,0,30,-,-,,Beginner,Floor
+8,Adductors Static Stretch,,,,,x,,,Adductor,,x,,,,1,3,30,30,Y,0,0,seconds,0,30,-,-,,Beginner,Floor
+9,Hamstrings Static Stretch ,,,,,x,,,Hamstring,,x,,,,1,3,30,30,Y,0,0,seconds,0,30,-,-,,Beginner,Floor
+10,Hip Bridge (double leg),,,,,x,,,Hips; Hamstrings; Glutes; Core; Lower back,,,x,,,1,2,10,14,N,2,3,count,0,-,2,12,,Beginner,Floor
+11,Hip Bridge (single leg),,,,,x,,,Hips; Hamstrings; Glutes; Core; Lower back,,,x,,,1,2,10,14,Y,2,3,count,0,-,2,13,,Beginner,Floor
+12,Hip Bridge (double leg) on unstable surface,,,,,x,,,Hips; Hamstrings; Glutes; Core; Lower back,,,x,,,1,2,10,14,N,2,3,count,0,-,2,11,,Intermediate,Pillow; Half Bosu Ball
+13,Hip Bridge (single leg) on unstable surface,,,,,x,,,Hips; Hamstrings; Glutes; Core; Lower back,,,x,,,1,2,10,14,Y,2,3,count,0,-,2,-,,Intermediate,Pillow; Half Bosu Ball
+14,Single Leg Balance (multiplanar) with Reach,,,,,x,,,Glutes; Core; Adductor; Abductor,,,x,,,1,2,10,14,Y,2,3,count,0,-,5,-,,Beginner,Floor
+15,Double Leg Squat,,,,,x,,,Glute; Quad; Core; Hamstring,,,x,,,1,2,10,14,N,2,3,count,0,-,2,39,,Beginner,Floor
+16,High Knees,,,,,,x,,quads core,,,,x,,1,1,10,10,N,0,0,seconds,0,10,,,,Beginner,Field; Open Space
+17,Back Pedal,,,,,,x,,lower body,,,,x,,1,1,10,10,N,0,0,seconds,0,10,,,,Beginner,Field; Open Space
+18,Side Shuffle,,,,,,x,,lower body,,,,x,,1,1,10,10,N,0,0,seconds,0,10,,,,Beginner,Field; Open Space
+19,A-Skips,,,,,,x,,lower body,,,,x,,1,1,10,10,N,0,0,seconds,0,10,,,,Beginner,Field; Open Space
+20,Carioca,,,,,,x,,lower body,,,,x,,1,1,10,10,N,0,0,seconds,0,10,,,,Beginner,Field; Open Space
+25,Gastrocnemius Static Stretch,,,,,x,x,,Calves,,x,,,,1,3,30,30,Y,0,0,seconds,0,30,,,,Beginner,Floor
+26,Soleus Static Stretch,,,,,x,x,,Calves,,x,,,,1,3,30,30,Y,0,0,seconds,0,30,,,,Beginner,Floor
+28,Standing TFL Static Stretch,,,,,x,x,,TFL ,,x,,,,1,3,30,30,Y,0,0,seconds,0,30,,,,Beginner,Floor
+29,Resisted Ankle Dorsiflexion,,,,,x,x,,Ankle,,,x,,,1,2,10,14,Y,2,2,count,0,-,2,65,,Beginner,Band
+30,Resisted Ankle Plantarflexion,,,,,x,x,,Ankle,,,x,,,1,2,10,14,Y,2,2,count,0,-,2,66,,Beginner,Band
+31,Single - Leg Calf Raise,,,,,,x,,Calf,,,x,,,1,2,10,14,Y,2,2,count,0,-,2,,,Beginner,Floor
+32,Resisted Knee Flexion with Hip Interally Rotated,,,,,,x,,Knee; Hamstrings,,,x,,,1,2,10,14,Y,2,2,count,0,-,2,,,Beginner,Band
+33,Multiplanar Single-Leg Balance Reach (Firm Surface),,,,,,x,,Glutes; Core; Adductor; Abductor,,,,x,,1,2,10,14,Y,2,2,count,0,5,,69,,Beginner,Floor
+34,Resisted Hip Abduction,,,,,x,x,,Glutes; TFL,,,x,,,1,2,10,14,Y,2,2,count,0,-,2,,,Beginner,Band
+35,Resisted Hip Extension,,,,,x,x,,Glutes; hamstrings,,,x,,,1,2,10,14,Y,2,2,count,0,-,2,,,Beginner,Band
+36,Ball Squats,,,,,,x,,Glutes; Quads; Core,,,,x,,1,2,10,14,N,2,2,count,30,30,,37,,Beginner,Ball
+37,Step-Ups,,,,,,x,,Glutes; Quads; Core,,,,x,,1,2,10,14,Y,2,2,count,30,30,,38,,Beginner,Box
+38,Lunges,,,,,,x,,Glutes; Quads; Core,,,,x,,1,2,10,14,N,2,2,count,30,30,,39,,Beginner,Floor
+39,Single-Leg Squat,,,,,,x,,Glutes; Quads; Core,,,,x,,1,2,10,14,Y,2,2,count,30,30,,,,Intermediate,Floor
+40,Wall Jumps,,,,,,x,,Quads; Hamstring,,,,x,,1,2,10,14,N,2,2,count,30,30,,41,,Beginner,Floor
+41,Tuck Jump,,,,,,x,,Quads; Hamstring,,,,x,,1,2,6,10,N,2,2,count,30,30,,42,,Intermediate,Floor
+42,Long Jump with Stabilization,,,,,,x,,Quads; Hamstring,,,,x,,1,4,1,1,N,0,4,count,30,10,,43,,Intermediate,Floor
+43,Single-Leg Hop with Stabilization,,,,,,x,,Quads; Hamstring,,,,x,,1,4,1,1,Y,0,4,count,10,10,,70,,Intermediate,Floor
+44,SMR - Piriformis,,,,,x,x,,Glutes,x,,,,,1,3,30,30,Y,0,0,seconds,0,30,,,,Beginner,SMR
+46,Supine Piriformis Static Stretch,,,,,x,x,,Hip,,x,,,,1,3,30,30,Y,0,0,seconds,0,30,,,,Beginner,Floor
+47,Resisted Hip Adduction and Internal Rotation,,,,,,x,,Hip,,,x,,,1,2,10,14,Y,2,2,count,0,-,2,,,Beginner,Band
+48,SMR Quadriceps,,,,,x,x,,Quads,x,,,,,1,3,30,30,Y,0,0,seconds,0,30,,,,Beginner,SMR
+49,Kneeling Hip Flexor Static Stretch,,,,,x,x,,Hip,,x,,,,1,3,30,30,Y,0,0,seconds,0,30,,,,Beginner,Floor
+50,Quadruped Arm/Opposite Leg Raise,,,,,,x,,Abdominals,,,x,,,1,2,10,14,Y,2,2,count,0,-,3,,,Beginner,Floor
+51,Floor Prone Cobra,,,,,x,x,,Erector Spinae,,,x,,,1,2,10,14,N,2,2,count,0,-,3,,,Beginner,Floor
+52,Ball Squats with Overheard Press,,,,,,x,,Glutes; Quads; Abdominals,,,,x,,1,2,10,14,N,2,2,count,30,30,,,,Intermediate,Ball; Dumbbell
+53,Towel scrunches (Intrinsic Foot Muscles),,,,,x,,,Foot,,,x,,,1,2,10,14,Y,2,2,count,0,-,2,,,Beginner,Towel
+54,SMR - Hip Flexor,,,,,x,x,,IT Band,x,,,,,1,3,30,30,Y,0,0,seconds,0,30,,,,Beginner,SMR
+55,SMR - Latissimus Dorsi,,,,,x,x,,Upper Back,x,,,,,1,3,30,30,Y,0,0,seconds,0,30,,,,Beginner,SMR
+56,Erector Spinae Static Stretch,,,,,x,x,,Upper Back,,x,,,,1,3,30,30,Y,0,0,seconds,0,30,,,,Beginner,Floor
+57,Latissimus Dorsi Static Stretch,,,,,x,x,,Upper Back,,x,,,,1,3,30,30,Y,0,0,seconds,0,30,,,,Beginner,Floor
+58,B-Skips,,,,,,x,,Lower Body,,,,x,,1,1,10,10,N,0,0,seconds,0,10,,,,Beginner,Field; Open Space
+59,Isometric Ankle Dorsiflexion,,,,,,x,,Ankle,,,x,,,1,2,30,30,Y,0,6,seconds,0,30,-,29,,Beginner,Towel; Band
+60,Isometric Ankle Plantarflexion,,,,,,x,,Ankle,,,x,,,1,2,30,30,Y,0,6,seconds,0,30,-,30,,Beginner,Towel; Band
+61,Isometric Ankle Inversion,,,,,,x,,Ankle,,,x,,,1,2,30,30,Y,0,6,seconds,0,30,-,63,,Beginner,Towel; Band
+62,Isometric Ankle Eversion,,,,,,x,,Ankle,,,x,,,1,2,30,30,Y,0,6,seconds,0,30,-,64,,Beginner,Towel; Band
+63,Resisted Ankle Inversion,,,,,x,,,Ankle,,,x,,,1,2,10,14,Y,2,2,count,0,-,2,66,,Beginner,Band
+64,Resisted Ankle Eversion,,,,,x,,,Ankle,,,x,,,1,2,10,14,Y,2,2,count,0,-,2,65,,Beginner,Band
+65,Resisted Ankle Dorsiflexion and Eversion,,,,,x,,,Ankle,,,x,,,1,2,10,14,Y,2,2,count,0,-,2,,,Intermediate,Band
+66,Resisted Ankle Plantarflexion and Inversion,,,,,x,,,Ankle,,,x,,,1,2,10,14,Y,2,2,count,0,-,2,,,Intermediate,Band
+67,Double Leg Calf Raise,,,,,,x,,Calf,,,x,,,1,2,10,14,N,2,2,count,0,-,2,68,,Beginner,Floor
+68,Double Leg (up); Single leg (down) calf raise,,,,,,x,,Calf,,,x,,,1,2,10,14,Y,2,2,count,0,-,2,31,,Beginner,Floor
+69,Multiplanar Single-Leg Balance Reach (Uneven Surface),,,,,,x,,Glutes; Abdominals; Hips,,,,x,,1,2,10,14,Y,2,2,count,30,30,,,,Intermediate,Pillow; Foam Pad; Half Bosu Ball
+70,Triple-hop to stabilization (distance),,,,,,x,,Lower Body; Abdominals,,,,x,,1,4,3,3,Y,0,4,count,30,15,,,,Intermediate,Floor
+71,SMR - Peroneals,,,,,x,x,,Calf,x,,,,,1,3,30,30,Y,0,0,seconds,0,30,,,,Beginner,SMR
+72,SMR - Tibialis Anterior,,,,,x,x,,Shin,x,,,,,1,3,30,30,Y,0,0,seconds,0,30,,,,Beginner,SMR
+73,SMR - Tibialis Posterior,,,,,x,x,,Shin,x,,,,,1,3,30,30,Y,0,0,seconds,0,30,,,,Beginner,SMR
+74,SMR- Bottom of Foot,,,,,x,x,,Foot,x,,,,,1,3,30,30,Y,0,0,seconds,0,30,,,,Beginner,SMR
+75,Toe Lifts,,,,,x,,,Foot,,,x,,,1,2,10,14,N,2,2,count,0,-,2,,,Beginner,Floor
+76,Banded A-march,,,,,,x,,Lower Body,,,,x,,1,2,,,,,,count,,,,,,Beginner,Band
+77,Wall Sit,,,,,,x,,Lower Body; Abdominals,,,,x,,1,3,20,60,N,,,seconds,,,,,,Beginner,Wall
+78,Calf Raise on Raised Surface,,,,,x,,,Calves,,,x,,,1,2,10,14,N,2,2,count,0,-,2,,,Beginner,Step; Stair
+79,Posterior Pelvic Tilt,,,,,x,,,Lower Back; Abdominals,,,x,,,1,2,10,14,N,2,2,count,0,-,2,,,Beginner,Floor
+80,Posterior Pelvic Tilt with Hip Bridge,,,,,x,,,Lower Back; Abdominals; Hamstring; Glutes,,,x,,,1,2,10,14,N,2,2,count,0,-,2,,,Beginner,Floor
+81,Banded Clams (On Side),,,,,x,,,Glutes,,,x,,,1,2,10,14,Y,2,2,count,0,-,2,,,Beginner,Band
+82,Banded Lateral Walks,,,,,x,,,Glutes,,,x,,,1,2,10,14,Y,2,2,count,0,-,2,,,Beginner,Band
+83,Banded Monster Walks,,,,,x,,,Glutes,,,x,,,1,2,10,14,Y,2,2,count,0,-,2,,,Beginner,Band
+84,Supine Arm/Leg Raise - Dying Bugs,,,,,x,,,Abdominals; Hips; Glutes,,,x,,,1,2,10,14,N,2,2,count,0,-,2,,,Beginner,Floor
+85,Prone Plank on Knees,,,,,x,,,Abdominals,,,x,,,1,3,30,30,N,2,2,seconds,0,30,-,86,,Beginner,Floor
+86,Prone Plank on Toes,,,,,x,,,Abdominals,,,x,,,1,3,30,30,N,2,2,seconds,0,30,-,87,,Beginner,Floor
+87,Prone Plank Leg Lift,,,,,x,,,Abdominals,,,x,,,1,2,10,14,Y,2,2,count,0,-,3,88,,Beginner,Floor
+88,Prone Plank Knee to Chest,,,,,x,,,Abdominals,,,x,,,1,2,10,14,Y,2,2,count,0,-,3,89,,Beginner,Floor
+89,Side Plank Knees Bent,,,,,x,,,Abdominals,,,x,,,1,3,30,30,Y,2,2,seconds,0,30,-,90,,Beginner,Floor
+90,Side Plank Knees Straight,,,,,x,,,Abdominals,,,x,,,1,3,30,30,Y,2,2,seconds,0,30,-,91,,Beginner,Floor
+91,Side Plank Knees Bent Leg Lifts,,,,,x,,,Abdominals,,,x,,,1,2,10,14,Y,2,2,count,0,-,3,92,,Beginner,Floor
+92,Side Plank Knees Straight Leg Lifts,,,,,x,,,Abdominals,,,x,,,1,2,10,14,Y,2,2,count,0,-,3,,,Beginner,Floor
+93,Wall Sit With Resistance,,,,,,,,Quads; Abdominals,,,,x,,1,2,30,60,N,0,2,seconds,0,30,-,,,Intermediate,Band
+94,Wall Sit With Weight,,,,,,,,Quads; Abdominals,,,,x,,1,2,30,60,N,0,2,seconds,0,30,-,,,Intermediate,Dumbells; Weighted Plate; Kettle Bell
+95,Step-ups to overhead press,,,,,,,,quads; hamstrings; glutes; upper extremity,,,,x,,1,2,10,15,Y,2-3,2,count,0,,,,,Intermediate,Dumbells
+96,Lunges to overhead press,,,,,,,,quads; hamstrings; glutes; upper extremity,,,,x,,1,2,10,15,Y,2-3,2,count,0,,,,,Intermediate,Dumbells
+97,Single-leg squat to overhead press,,,,,,,,quads; hamstrings; glutes; upper extremity,,,,x,,1,2,10,15,Y,2-3,2,count,0,,,,,Advanced,Dumbells
+98,Cobra Abdominal Stretch,,,,,,,,Abdominals,,x,,,,1,3,30,30,N,0,0,seconds,0,30,-,,,Beginner,Floor
+99,Double leg squat with overhead press,,,,,,,,Glute; Quad; Core; Hamstring,,,,x,,1,2,10,15,Y,2-3,2,count,0,,,,,Intermediate,Dumbells
+100,Double leg RDL,,,,,,,,Glute; Quad; Core; Hamstring,,,,x,,1,2,10,15,Y,2-3,2,count,0,,,,,Intermediate,Dumbells
+101,Single leg RDL,,,,,,,,Glute; Quad; Core; Hamstring; Adductors,,,,x,,1,2,10,15,Y,2-3,2,count,0,,,,,Intermediate,Dumbells
+102,SMR - Erector Spinae,,,,,,,,Upper Back; Abdominals,x,,,,,1,3,30,30,N,0,0,seconds,0,30,-,,,Beginner,SMR
+103,Child's Pose Arms Straight,,,,,,,,Upper Back; Abdominals,,x,,,,1,3,30,30,N,0,0,seconds,0,30,-,,,Beginner,Floor
+104,Child's Pose to Side,,,,,,,,Upper Back; Abdominals,,x,,,,1,3,30,30,Y,0,0,seconds,0,30,-,,,Beginner,Floor

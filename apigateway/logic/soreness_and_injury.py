@@ -50,7 +50,7 @@ class DailySoreness(Soreness):
 class PostSessionSoreness(Soreness):
 
     def __init__(self):
-        self.discomfort_level = 0
+        self.severity = 0
         self.sustained_in_practice = False
         self.limited_performance = 0
         self.limited_how_much_i_could_do = 0
@@ -62,7 +62,7 @@ class InjuryStatus(Enum):
     returning_from_injury = 2
 
 
-class BodyPart(Enum):
+class BodyPartLocation(Enum):
     head = 0
     shoulder = 1
     chest = 2
@@ -74,13 +74,23 @@ class BodyPart(Enum):
     shin = 8
     ankle = 9
     foot = 10
-    neck = 11
-    upper_back = 12
-    lower_back = 13
+    outer_thigh = 11
+    lower_back = 12
     glutes = 14
     hamstrings = 15
     calves = 16
     achilles = 17
+
+
+class BodyPart(object):
+
+    def __init__(self, body_part_location, treatment_priority):
+        self.location = body_part_location
+        self.treatment_priority = treatment_priority
+        self.inhibit_exercises = []
+        self.lengthen_exercises = []
+        self.activate_exercises = []
+        self.integrate_exercises = []
 
 
 class Injury(object):

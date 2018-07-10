@@ -11,7 +11,8 @@ class DailyPlan(object):
         self.strength_conditioning_sessions = []  # includes cross training
         self.games = []
         self.tournaments = []
-        self.recovery_modalities = []
+        self.recovery_am = session.RecoverySession()
+        self.recovery_pm = session.RecoverySession()
         self.corrective_sessions = []
         self.bump_up_sessions = []
         self.daily_readiness_survey = None
@@ -23,6 +24,17 @@ class DailyPlan(object):
             return True
         else:
             return False
+
+    def add_scheduled_session(self, scheduled_session):
+
+        if isinstance(scheduled_session, session.PracticeSession):
+            self.practice_sessions.append(scheduled_session)
+        elif isinstance(scheduled_session, session.StrengthConditioningSession):
+            self.strength_conditioning_sessions.append(scheduled_session)
+        elif isinstance(scheduled_session, session.Game):
+            self.games.append(scheduled_session)
+        elif isinstance(scheduled_session, session.Tournament):
+            self.tournaments.append(scheduled_session)
 
 
 class TrainingCycle(object):

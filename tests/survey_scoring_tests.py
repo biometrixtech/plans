@@ -23,7 +23,7 @@ def readiness_survey_0_hours_ankle(severity_score):
 
     soreness_item = soreness_and_injury.DailySoreness()
     soreness_item.severity = severity_score
-    soreness_item.body_part = soreness_and_injury.BodyPart(9)
+    soreness_item.body_part = soreness_and_injury.BodyPartLocation(9)
     survey.soreness.append(soreness_item)
     return survey
 
@@ -35,12 +35,12 @@ def readiness_survey_0_hours_ankle_foot(severity_score_1, severity_score_2):
 
     soreness_item_1 = soreness_and_injury.DailySoreness()
     soreness_item_1.severity = severity_score_1
-    soreness_item_1.body_part = soreness_and_injury.BodyPart(9)
+    soreness_item_1.body_part = soreness_and_injury.BodyPartLocation(9)
     survey.soreness.append(soreness_item_1)
 
     soreness_item_2 = soreness_and_injury.DailySoreness()
     soreness_item_2.severity = severity_score_2
-    soreness_item_2.body_part = soreness_and_injury.BodyPart(10)
+    soreness_item_2.body_part = soreness_and_injury.BodyPartLocation(10)
     survey.soreness.append(soreness_item_2)
     return survey
 
@@ -52,7 +52,7 @@ def post_session_survey_24_hours_ankle(severity_score):
 
     soreness_item = soreness_and_injury.DailySoreness()
     soreness_item.severity = severity_score
-    soreness_item.body_part = soreness_and_injury.BodyPart(9)
+    soreness_item.body_part = soreness_and_injury.BodyPartLocation(9)
     survey.soreness.append(soreness_item)
     return survey
 
@@ -64,7 +64,7 @@ def post_session_survey_24_hours_foot(severity_score):
 
     soreness_item = soreness_and_injury.DailySoreness()
     soreness_item.severity = severity_score
-    soreness_item.body_part = soreness_and_injury.BodyPart(10)
+    soreness_item.body_part = soreness_and_injury.BodyPartLocation(10)
     survey.soreness.append(soreness_item)
     return survey
 
@@ -76,12 +76,12 @@ def post_session_survey_24_hrs_ankle_foot(severity_score_1, severity_score_2):
 
     soreness_item_1 = soreness_and_injury.DailySoreness()
     soreness_item_1.severity = severity_score_1
-    soreness_item_1.body_part = soreness_and_injury.BodyPart(9)
+    soreness_item_1.body_part = soreness_and_injury.BodyPartLocation(9)
     survey.soreness.append(soreness_item_1)
 
     soreness_item_2 = soreness_and_injury.DailySoreness()
     soreness_item_2.severity = severity_score_2
-    soreness_item_2.body_part = soreness_and_injury.BodyPart(10)
+    soreness_item_2.body_part = soreness_and_injury.BodyPartLocation(10)
     survey.soreness.append(soreness_item_2)
     return survey
 
@@ -93,7 +93,7 @@ def post_session_survey_48_hours_ankle(severity_score):
 
     soreness_item = soreness_and_injury.DailySoreness()
     soreness_item.severity = severity_score
-    soreness_item.body_part = soreness_and_injury.BodyPart(9)
+    soreness_item.body_part = soreness_and_injury.BodyPartLocation(9)
     survey.soreness.append(soreness_item)
     return survey
 
@@ -105,7 +105,7 @@ def post_session_survey_49_hours_ankle(severity_score):
 
     soreness_item = soreness_and_injury.DailySoreness()
     soreness_item.severity = severity_score
-    soreness_item.body_part = soreness_and_injury.BodyPart(9)
+    soreness_item.body_part = soreness_and_injury.BodyPartLocation(9)
     survey.soreness.append(soreness_item)
     return survey
 
@@ -122,7 +122,7 @@ def post_session_survey_24_hours_no_soreness():
 def body_part(body_enum, severity_score):
     soreness_item = soreness_and_injury.DailySoreness()
     soreness_item.severity = severity_score
-    soreness_item.body_part = soreness_and_injury.BodyPart(body_enum)
+    soreness_item.body_part = soreness_and_injury.BodyPartLocation(body_enum)
     return soreness_item
 
 
@@ -225,7 +225,7 @@ def test_soreness_2_body_parts_from_readiness_survey_post_session_1_day_only_dif
     assert body_part(10, 3).body_part == soreness_list[1].body_part
 
 
-def test_soreness_2_body_parts_from_readiness_survey_post_session_1_day_only_same_severity():
+def test_soreness_2_body_parts_from_readiness_survey_post_session_1_day_only_same_severity_between_surveys():
     soreness_list = soreness_calculator().get_soreness_summary_from_surveys(readiness_survey_0_hours_ankle(2),
                                                                             post_session_survey_24_hrs_ankle_foot(2, 3),
                                                                             trigger_date_time())
@@ -235,7 +235,7 @@ def test_soreness_2_body_parts_from_readiness_survey_post_session_1_day_only_sam
     assert body_part(10, 3).body_part == soreness_list[1].body_part
 
 
-def test_soreness_2_body_parts_from_readiness_survey_post_session_1_day_only_diff_severity():
+def test_soreness_2_body_parts_from_readiness_survey_post_session_1_day_only_diff_severity_between_surveys():
     soreness_list = soreness_calculator().get_soreness_summary_from_surveys(readiness_survey_0_hours_ankle(2),
                                                                             post_session_survey_24_hrs_ankle_foot(3, 3),
                                                                             trigger_date_time())

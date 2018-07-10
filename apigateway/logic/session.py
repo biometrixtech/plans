@@ -1,6 +1,7 @@
 import abc
 from enum import Enum
 import uuid
+import exercise
 
 
 class SessionType(Enum):
@@ -49,6 +50,7 @@ class Session(metaclass=abc.ABCMeta):
         self.same_muscle_discomfort_over_72_hrs = False
 
         # post-session
+        self.post_session_survey = None
         self.session_RPE = None
         self.performance_level = 100  # only answered if there is discomfort
         self.completion_percentage = 100    # only answered if there is discomfort
@@ -220,6 +222,79 @@ class CorrectiveSession(Session):
             return True
         else:
             return False
+
+
+class RecoverySession(object):
+
+    def __init__(self):
+        self.recommended_inhibit_exercises = []
+        self.recommended_lengthen_exercises = []
+        self.recommended_activate_exercises = []
+        self.recommended_integrate_exercises = []
+        self.duration_minutes = 0
+        self.inhibit_target_minutes = None
+        self.lengthen_target_minutes = None
+        self.activate_target_minutes = None
+        self.integrate_target_minutes = None
+        self.inhibit_max_percentage = None
+        self.lengthen_max_percentage = None
+        self.activate_max_percentage = None
+        self.integrate_max_percentage = None
+        self.start_time = None
+        self.end_time = None
+
+    def recommended_exercises(self):
+        exercise_list = []
+        exercise_list.extend(self.recommended_inhibit_exercises)
+        exercise_list.extend(self.recommended_lengthen_exercises)
+        exercise_list.extend(self.recommended_activate_exercises)
+        exercise_list.extend(self.recommended_integrate_exercises)
+
+        return exercise_list
+
+    def update_from_exercise_assignments(self, exercise_assignments):
+        self.recommended_inhibit_exercises = exercise_assignments.inhibit_exercises
+        self.recommended_lengthen_exercises = exercise_assignments.lengthen_exercises
+        self.recommended_activate_exercises = exercise_assignments.activate_exercises
+        self.recommended_integrate_exercises = exercise_assignments.integrate_exercises
+        self.duration_minutes = (exercise_assignments.inhibit_minutes +
+                                 exercise_assignments.lengthen_minutes +
+                                 exercise_assignments.activate_minutes +
+                                 exercise_assignments.integrate_minutes)
+
+    def set_exercise_target_minutes(self, soreness_list, total_minutes_target):
+        max_severity = 0
+        if soreness_list is not None:
+            for soreness in soreness_list:
+                max_severity = max(max_severity, soreness.severity)
+
+        if max_severity == 3:
+            self.integrate_target_minutes = None
+            self.activate_target_minutes = None
+            self.lengthen_target_minutes = total_minutes_target / 2
+            self.inhibit_target_minutes = total_minutes_target / 2
+            self.integrate_max_percentage = None
+            self.activate_max_percentage = None
+            self.lengthen_max_percentage = .6
+            self.inhibit_max_percentage = .6
+        elif max_severity == 2:
+            self.integrate_target_minutes = None
+            self.activate_target_minutes = total_minutes_target / 3
+            self.lengthen_target_minutes = total_minutes_target / 3
+            self.inhibit_target_minutes = total_minutes_target / 3
+            self.integrate_max_percentage = None
+            self.activate_max_percentage = .4
+            self.lengthen_max_percentage = .4
+            self.inhibit_max_percentage = .4
+        elif max_severity <= 1:
+            self.integrate_target_minutes = None
+            self.activate_target_minutes = total_minutes_target / 2
+            self.lengthen_target_minutes = total_minutes_target / 4
+            self.inhibit_target_minutes = total_minutes_target / 4
+            self.integrate_max_percentage = None
+            self.activate_max_percentage = .6
+            self.lengthen_max_percentage = .3
+            self.inhibit_max_percentage = .3
 
 
 class GlobalLoadEstimationParameters(object):
