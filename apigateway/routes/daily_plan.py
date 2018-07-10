@@ -21,6 +21,7 @@ app = Blueprint('daily_plan', __name__)
 @xray_recorder.capture('routes.daily_plan.get')
 def handle_daily_plan_get():
 
+    user_id = request.json['user_id']
     store = DailyPlanDatastore()
     daily_plan = store.get(user_id, date, collection='dailyplan')
     return {'daily_plan': daily_plan}, 200
