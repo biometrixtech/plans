@@ -9,7 +9,7 @@ import jwt
 # from auth import get_accessory_id_from_auth
 from datastore import DailyReadinessDatastore
 from decorators import authentication_required
-from exceptions import InvalidSchemaException, ApplicationException, NoSuchEntityException, DuplicateEntityException
+from exceptions import InvalidSchemaException
 from models.daily_readiness import DailyReadiness
 from logic.soreness_and_injury import MuscleSorenessSeverity, BodyPart
 
@@ -32,13 +32,9 @@ def handle_daily_readiness_create():
 
     )
     store = DailyReadinessDatastore()
-    try:
-        store.put(daily_readiness, collection='readiness')
-        return {'message': 'success'}, 201
-        # return {'daily_readiness': daily_readiness}, 201
-    except DuplicateEntityException:
-        print(json.dumps({'message': 'daily_readiness already created for user {}'.format(daily_readiness.get_id())}))
-        return {'duplicate daily_readiness record'}, 201
+    store.put(daily_readiness, collection='readiness')
+    return {'message': 'success'}, 201
+
 
 
 

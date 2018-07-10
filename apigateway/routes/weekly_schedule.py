@@ -9,7 +9,7 @@ import jwt
 # from auth import get_accessory_id_from_auth
 from datastore import WeeklyCrossTrainingDatastore, WeeklyTrainingDatastore
 from decorators import authentication_required
-from exceptions import InvalidSchemaException, ApplicationException, NoSuchEntityException, DuplicateEntityException
+from exceptions import InvalidSchemaException
 from models.weekly_schedule import WeeklyCrossTrainingSchedule, WeeklyTrainingSchedule, WeeklySchedule
 from logic.athlete import SportName
 
@@ -26,14 +26,6 @@ def handle_crosstraining_schedule_create():
     today = datetime.datetime.today()
     today_weekday = today.weekday()
     days = request.json['days_of_week']
-    # if today_weekday < 4:
-    #     delta = today_weekday
-    # elif today_weekday >=4:
-    #     delta = 7 - today_weekday
-
-    # dates = []
-    # for day in days:
-    #     dates.append((today + datetime.timedelta(days=day-delta)).strftime("%Y-%m-%d"))
 
     if today_weekday < 4:
         monday_delta = -today_weekday
@@ -78,24 +70,12 @@ def handle_training_schedule_create():
     validate_training_data(request)
     today = datetime.datetime.today()
     today_weekday = today.weekday()
-    # if today_weekday < 4:
-    #     delta = today_weekday
-    # elif today_weekday >= 4:
-    #     delta = 7 - today_weekday
 
     if today_weekday < 4:
         monday_delta = -today_weekday
     elif today_weekday >= 4:
         monday_delta =  7 - today_weekday
     week_start = (today + datetime.timedelta(days=monday_delta)).strftime("%Y-%m-%d")
-
-    # for sport in request.json['sports']:
-    #     practice_days = sport['practice']['days']
-    #     practice_dates = convert_date(practice_days)
-    #     sport['practice']['days'] = practice_dates
-    #     competition_days = sport['competition']['days']
-    #     competition_dates = convert_date(competition_days)
-    #     sport['competition']['days'] = competition_dates
 
     schedule = WeeklySchedule(
         user_id=request.json['user_id'],
@@ -131,21 +111,13 @@ def validate_data(request):
 @xray_recorder.capture('routes.weekly_schedule.validate_crosstraining')
 def validate_crosstraining_data(request):
     pass
-    # for sport in request.json['sports']:
-    #     try:
-    #         SportName[sport['sport']]
-    #     except KeyError:
-    #         raise InvalidSchemaException('sport not identified')
 
 
 @xray_recorder.capture('routes.weekly_schedule.validate_crosstraining')
 def validate_training_data(request):
-    pass
+    for sport in request.json['sports']:
+        try:
+            SportName[sport['sport']]
+        except KeyError:
+            raise InvalidSchemaException('sport not identified')
 
-# def convert_date(days):
-#     today = datetime.datetime.today()
-#     dates = []
-#     for day in days:
-#         day = today + datetime.timedelta(days=day)
-#         dates.append(day.strftime("%Y-%m-%d"))
-#     return dates
