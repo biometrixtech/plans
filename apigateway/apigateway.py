@@ -1,11 +1,12 @@
 from flask import Response, jsonify
 from flask_lambda import FlaskLambda
-from werkzeug.routing import BaseConverter
+from werkzeug.routing import BaseConverter, ValidationError
 import json
 import os
 import re
 import sys
 import traceback
+from utils import validate_uuid4
 
 
 # Break out of Lambda's X-Ray sandbox so we can define our own segments and attach metadata, annotations, etc, to them
@@ -30,12 +31,23 @@ class ApiResponse(Response):
         return super().force_type(rv, environ)
 
 
+class UuidConverter(BaseConverter):
+    def to_python(self, value):
+        return value
+
+    def to_url(self, value):
+        if validate_uuid4(value):
+            return value
+        raise ValidationError()
+
+
 app = FlaskLambda(__name__)
 app.response_class = ApiResponse
+app.url_map.converters['uuid'] = UuidConverter
 app.url_map.strict_slashes = False
 
-from routes.hello import app as hello_routes
-app.register_blueprint(hello_routes, url_prefix='/plans/hello')
+from routes.athlete import app as athlete_routes
+app.register_blueprint(athlete_routes, url_prefix='/plans/athlete')
 
 
 from routes.daily_readiness import app as daily_readiness_routes
