@@ -16,6 +16,7 @@ class AthleteSeasonDatastore(object):
                 self._put_mongodb(item, collection)
         except Exception as e:
             raise e
+
     @xray_recorder.capture('datastore.AthleteSeasonDatastore._query_mongodb')
     def _query_mongodb(self, user_id, week_start, collection):
         mongo_collection = get_mongo_collection(collection)
@@ -26,12 +27,13 @@ class AthleteSeasonDatastore(object):
         item = self.item_to_mongodb(item)
         mongo_collection.insert_one(item)
 
-
-
     @staticmethod
     def item_to_mongodb(season):
+        sports = []
+        for sport in season.sports:
+            sports.append(sport.json_serialise())
         item = {
             'user_id': season.user_id,
-            'sports': season.sports,
+            'sports': sports,
         }
         return item

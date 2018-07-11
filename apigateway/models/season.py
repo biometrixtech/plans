@@ -1,6 +1,5 @@
 from serialisable import Serialisable
 
-
 class AthleteSeason(Serialisable):
     def __init__(self,
                  user_id,
@@ -15,14 +14,30 @@ class AthleteSeason(Serialisable):
     def get_start_date(self):
         return self.week_start
 
-    def get_sports(self):
-        sports = []
-        for sport in self.sports:
-            sport = {'name': sport['name'],
-                     'competition_level': sport['competition_level'],
-                     'positions': sport['positions'],
-                     'start_date': sport['start_date'],
-                     'end_date': sport['end_date']
-                     }
-            sports.append(sport)
-        return sports
+    def json_serialise(self):
+        ret = {"user_id": self.user_id,
+               "sports": self.sports}
+        return ret
+
+class Sport(Serialisable):
+    def __init__(self,
+                 name,
+                 competition_level,
+                 positions,
+                 start_date,
+                 end_date):
+        self.name = name
+        self.competition_level = competition_level
+        self.positions = positions
+        self.start_date = start_date
+        self.end_date = end_date
+
+    def json_serialise(self):
+        ret = {
+                "name": self.name,
+                "competition_level" : self.competition_level,
+                "positions" : self.positions,
+                "start_date" : self.start_date,
+                "end_date" : self.end_date
+               }
+        return ret
