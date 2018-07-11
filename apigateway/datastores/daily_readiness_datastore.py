@@ -1,6 +1,6 @@
 from aws_xray_sdk.core import xray_recorder
 from config import get_mongo_collection
-from logic.soreness_and_injury import DailySoreness
+from logic.soreness_and_injury import DailySoreness, BodyPart, BodyPartLocation
 from models.daily_readiness import DailyReadiness
 from utils import format_datetime
 
@@ -67,7 +67,7 @@ class DailyReadinessDatastore(object):
 
 def _soreness_from_mongodb(soreness_mongo_result, parent_mongo_result):
     soreness = DailySoreness()
-    soreness.body_part = soreness_mongo_result['body_part']
+    soreness.body_part = BodyPart(BodyPartLocation(soreness_mongo_result['body_part']), None)
     soreness.severity = soreness_mongo_result['severity']
     soreness.reported_date_time = parent_mongo_result['event_date']
     return soreness
