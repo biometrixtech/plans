@@ -3,8 +3,9 @@ import datetime
 import logic.training as training
 import logic.session as session
 import config
-import logic.soreness_and_injury as soreness_and_injury
+from logic.soreness_and_injury import DailySoreness, DailyReadinessSurvey, PostSessionSoreness
 import uuid
+
 
 class AthleteDataAccess(object):
 
@@ -13,7 +14,7 @@ class AthleteDataAccess(object):
 
     def get_last_daily_readiness_survey(self):
 
-        daily_readiness = soreness_and_injury.DailyReadinessSurvey()
+        daily_readiness = DailyReadinessSurvey()
 
         collection = config.get_mongo_collection('dailyreadiness')
         readiness_cursor = collection.find({"user_id": self.athlete_id}).limit(1).sort("date_time",
@@ -23,7 +24,7 @@ class AthleteDataAccess(object):
             daily_readiness.sleep_quality = record["sleep_quality"]
             daily_readiness.readiness = record["readiness"]
             for soreness in record["soreness"]:
-                daily_soreness = soreness_and_injury.DailySoreness()
+                daily_soreness = DailySoreness()
                 daily_soreness.body_part = soreness["body_part"]
                 daily_soreness.severity = soreness["severity"]
                 daily_readiness.soreness.append(daily_soreness)
@@ -32,7 +33,7 @@ class AthleteDataAccess(object):
 
     def get_last_post_session_surveys(self, start_date_time, end_date_time):
 
-        post_session_survey = soreness_and_injury.PostSessionSoreness()
+        post_session_survey = PostSessionSoreness()
 
         return post_session_survey
 
