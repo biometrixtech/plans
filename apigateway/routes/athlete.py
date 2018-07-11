@@ -1,7 +1,7 @@
 from aws_xray_sdk.core import xray_recorder
 from decorators import authentication_required
 from flask import Blueprint
-from logic.athlete_data_access import AthleteDataAccess
+from datastores.daily_plan_datastore import DailyPlanDatastore
 from logic.exercise_data_access import ExerciseDataAccess
 from logic.training_plan_management import TrainingPlanManager
 from utils import format_datetime
@@ -24,7 +24,7 @@ def create_weekly_plan(athlete_id):
     daily_plan = TrainingPlanManager(athlete_id, athlete_dao, ExerciseDataAccess()).create_daily_plan()
     daily_plan.last_updated = format_datetime(datetime.datetime.now())
 
-    athlete_dao.write_daily_plan(daily_plan)
+    DailyPlanDatastore().put(daily_plan)
     push_plan_update(athlete_id, daily_plan)
     return {'message': 'Update requested'}, 202
 

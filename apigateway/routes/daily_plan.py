@@ -3,7 +3,7 @@ from flask import request, Blueprint
 import json
 import datetime
 
-from datastores.athlete_datastore import DailyPlanDatastore
+from datastores.daily_plan_datastore import DailyPlanDatastore
 from decorators import authentication_required
 from exceptions import InvalidSchemaException
 
