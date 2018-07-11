@@ -38,7 +38,7 @@ def handle_crosstraining_schedule_create():
     schedule = WeeklySchedule(
         user_id=request.json['user_id'],
         week_start=week_start,
-        cross_training=cross_training.json_serialise())
+        cross_training=cross_training)
     store = WeeklyCrossTrainingDatastore()
 
     store.put(schedule, collection='training')
