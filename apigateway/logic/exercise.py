@@ -138,7 +138,7 @@ class ExerciseAssignments(object):
         self.lengthen_max_percentage = None
         self.activate_max_percentage = None
         self.integrate_max_percentage = None
-        self.duration_minutes_target = None
+        self.duration_minutes_target = 0
 
     def duration_minutes(self):
         return self.inhibit_minutes + self.lengthen_minutes + self.activate_minutes + self.integrate_minutes
