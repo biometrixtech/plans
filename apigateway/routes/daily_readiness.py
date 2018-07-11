@@ -28,14 +28,14 @@ def handle_daily_readiness_create():
 
     )
     store = DailyReadinessDatastore()
-    store.put(daily_readiness, collection='readiness')
+    store.put(daily_readiness)
     return {'message': 'success'}, 201
 
 
 @app.route('/previous', methods=['GET'])
 @authentication_required
 @xray_recorder.capture('routes.daily_readiness.previous')
-def handle_get_previous_soreness():
+def handle_daily_readiness_get():
     store = DailyReadinessDatastore()
     user_id = jwt.decode(request.headers['Authorization'], verify=False)['user_id']
     daily_readiness = store.get(user_id=user_id)
