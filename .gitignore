@@ -7,6 +7,7 @@ apigateway/*
 apigateway/logic/__pycache__/*
 tests/.pytest_cache/
 !apigateway/*.py
+!apigateway/datastores/
 !apigateway/logic/
 !apigateway/models
 !apigateway/pip_requirements
