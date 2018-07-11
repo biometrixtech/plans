@@ -17,7 +17,7 @@ iotd_client = boto3.client('iot-data')
 @app.route('/<uuid:athlete_id>/daily_plan', methods=['POST'])
 @authentication_required
 @xray_recorder.capture('routes.athlete.daily_plan.create')
-def create_weekly_plan(athlete_id):
+def create_daily_plan(athlete_id):
     daily_plan = TrainingPlanManager(athlete_id).create_daily_plan()
     daily_plan.last_updated = format_datetime(datetime.datetime.now())
 
