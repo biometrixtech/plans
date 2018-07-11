@@ -24,9 +24,9 @@ def handle_daily_plan_get():
         end_date = start_date
     store = DailyPlanDatastore()
     daily_plan = store.get(user_id, start_date, end_date, collection='dailyplan')
-    daily_plans = []
-    for plan in daily_plan:
-        daily_plans.append(plan.item_to_response())
+    # daily_plans = []
+    # for plan in daily_plan:
+    #     daily_plans.append(plan)
 
     return {'daily_plan': daily_plan}, 200
 
