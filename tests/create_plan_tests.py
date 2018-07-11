@@ -5,6 +5,7 @@ import logic.training_plan_management as training_plan_management
 import logic.athlete_data_access as athlete_data_access
 import athlete_data_access_mocks
 import datastores.exercise_datastore as exercise_datastore
+import datastores.athlete_datastore as athlete_datastore
 
 '''
 
@@ -112,8 +113,8 @@ def test_create_plan():
                                                      exercise_datastore)
     daily_plan = manager.create_daily_plan()
     daily_plan.last_updated = datetime.datetime(2018, 6, 27, 11, 30, 0)
-    athlete_dao = athlete_data_access.AthleteDataAccess("test_user")
-    athlete_dao.write_daily_plan(daily_plan)
+    athlete_dao = athlete_datastore.DailyPlanDatastore()
+    athlete_dao.put(daily_plan)
     assert None is not daily_plan
 
 

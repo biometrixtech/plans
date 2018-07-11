@@ -6,11 +6,14 @@ class DailyPlanDatastore(object):
     def get(self, user_id=None, start_date=None, end_date=None, collection=None):
         return self._query_mongodb(user_id, start_date, end_date, collection)
 
-    def put(self, items, collection):
+    def put(self, items, collection='dailyplan'):
         if not isinstance(items, list):
             items = [items]
-        for item in items:
-            self._put_dynamodb(item, collection)
+        try:
+            for item in items:
+                self._put_mongodb(item, collection)
+        except Exception as e:
+            raise e
 
     @xray_recorder.capture('datastore.DailyPlanDatastore._query_mongodb')
     def _query_mongodb(self, user_id, start_date, end_date, collection):
@@ -38,7 +41,50 @@ class DailyPlanDatastore(object):
 
     @xray_recorder.capture('datastore.DailyPlanDatastore._put_mongodb')
     def _put_mongodb(self, item, collection):
-        pass
+        collection = get_mongo_collection(collection)
+
+        practice_session_bson = ()
+        cross_training_session_bson = ()
+        game_session_bson = ()
+        bump_up_session_bson = ()
+        am_recovery_bson = ()
+        pm_recovery_bson = ()
+
+        if item.recovery_am is not None:
+            am_recovery_bson = self.get_recovery_bson(item.recovery_am)
+
+        if item.recovery_pm is not None:
+            pm_recovery_bson = self.get_recovery_bson(item.recovery_pm)
+
+        for practice_session in item.practice_sessions:
+            practice_session_bson += ({'session_id': str(practice_session.id),
+                                       'post_session_survey': practice_session.post_session_survey
+                                       },)
+
+        for cross_training_session in item.strength_conditioning_sessions:
+            cross_training_session_bson += ({'session_id': str(cross_training_session.id),
+                                             'post_session_survey': cross_training_session.post_session_survey
+                                             },)
+
+        for game_session in item.games:
+            game_session_bson += ({'session_id': str(game_session.id),
+                                   'post_session_survey': game_session.post_session_survey
+                                   },)
+
+        for bump_up_session in item.bump_up_sessions:
+            bump_up_session_bson += ({'session_id': str(bump_up_session.id),
+                                      'post_session_survey': bump_up_session.post_session_survey
+                                      },)
+
+        collection.insert_one({'user_id': item.athlete_id,
+                               'date': item.date.strftime('%Y-%m-%d'),
+                               'practice_sessions': practice_session_bson,
+                               'bump_up_sessions': bump_up_session_bson,
+                               'cross_training_sessions': cross_training_session_bson,
+                               'game_sessions': game_session_bson,
+                               'recovery_am': am_recovery_bson,
+                               'recovery_pm': pm_recovery_bson,
+                               'last_updated': item.last_updated})
 
     @staticmethod
     def item_to_response(daily_plan):
@@ -54,3 +100,19 @@ class DailyPlanDatastore(object):
             'bump_up_sessions': daily_plan.get('bump_up_sessions', []),
         }
         return item
+
+    def get_recovery_bson(self, recovery_session):
+        exercise_bson = ()
+        for recovery_exercise in recovery_session.recommended_exercises():
+            exercise_bson += ({'name': recovery_exercise.exercise.name,
+                               'reps_assigned': recovery_exercise.reps_assigned,
+                               'sets_assigned': recovery_exercise.sets_assigned,
+                               'seconds_duration': recovery_exercise.duration()
+                               },)
+        recovery_bson = ({'minutes_duration': recovery_session.duration_minutes,
+                          'start_time': str(recovery_session.start_time),
+                          'end_time': str(recovery_session.end_time),
+                          'exercises': exercise_bson
+                          })
+
+        return recovery_bson

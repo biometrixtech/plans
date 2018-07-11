@@ -31,6 +31,7 @@ class TrainingPlanManager(object):
             self.athlete_dao.get_scheduled_sessions(last_daily_readiness_survey.report_date_time.date())
 
         daily_plan = training.DailyPlan(last_daily_readiness_survey.report_date_time.date())
+        daily_plan.athlete_id = self.athlete_id
         daily_plan = self.add_recovery_times(last_daily_readiness_survey.report_date_time, daily_plan)
 
         calc = exercise_mapping.ExerciseAssignmentCalculator(self.athlete_id, None, self.exercise_dao)

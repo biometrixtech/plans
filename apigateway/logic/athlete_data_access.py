@@ -103,7 +103,7 @@ class AthleteDataAccess(object):
         completed_exercises = []
 
         return completed_exercises
-
+'''moved to athlete_datastore
     def get_recovery_bson(self, recovery_session):
         exercise_bson = ()
         for recovery_exercise in recovery_session.recommended_exercises():
@@ -169,3 +169,4 @@ class AthleteDataAccess(object):
                                'recovery_am': am_recovery_bson,
                                'recovery_pm': pm_recovery_bson,
                                'last_updated': daily_plan.last_updated})
+'''

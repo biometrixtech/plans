@@ -6,6 +6,7 @@ import logic.session as session
 class DailyPlan(object):
 
     def __init__(self, date):
+        self.athlete_id = ""
         self.date = date
         self.practice_sessions = []
         self.strength_conditioning_sessions = []  # includes cross training
