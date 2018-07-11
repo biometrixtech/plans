@@ -57,7 +57,7 @@ class TrainingPlanManager(object):
         daily_plan.athlete_id = self.athlete_id
         daily_plan = self.add_recovery_times(last_daily_readiness_survey.report_date_time, daily_plan)
 
-        calc = exercise_mapping.ExerciseAssignmentCalculator(self.athlete_id, None, self.exercise_dao)
+        calc = exercise_mapping.ExerciseAssignmentCalculator(self.athlete_id)
 
         soreness_values = [s.severity for s in soreness_list if s.severity is not None]
         if soreness_values is not None and len(soreness_values) > 0:

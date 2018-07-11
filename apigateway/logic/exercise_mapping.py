@@ -1,16 +1,13 @@
 import logic.exercise as exercise
 import logic.soreness_and_injury as soreness_and_injury
-import datastores.exercise_datastore as exercise_datastore
+from datastores.exercise_datastore import ExerciseLibraryDatastore
 
 
 class ExerciseAssignmentCalculator(object):
 
-    def __init__(self, athlete_id, athlete_data_access, exercise_dao: exercise_datastore):
+    def __init__(self, athlete_id):
         self.athlete_id = athlete_id
-        self.athlete_dao = athlete_data_access
-        # self.exercise_dao = exercise_dao
-        library_datastore = exercise_dao.ExerciseLibraryDatastore()
-        self.exercise_library = library_datastore.get()
+        self.exercise_library = ExerciseLibraryDatastore().get()
         self.exercises_for_body_parts = self.get_exercises_for_body_parts()
 
     # def create_assigned_exercise(self, target_exercise, body_part_priority, body_part_exercise_priority, body_part_soreness_level):
@@ -58,7 +55,6 @@ class ExerciseAssignmentCalculator(object):
         exercise_assignments.lengthen_max_percentage = exercise_session.lengthen_max_percentage
         exercise_assignments.lengthen_target_minutes = exercise_session.lengthen_target_minutes
 
-        # completed_exercises = self.athlete_dao.get_completed_exercises()
         completed_exercises = None
         body_part_exercises = self.exercises_for_body_parts
         exercise_list = self.exercise_library
