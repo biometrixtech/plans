@@ -247,7 +247,6 @@ class ExerciseAssignments(object):
             return
 
         else:
-
             self.inhibit_exercises = self.reduce_assigned_exercises(
                 (self.inhibit_minutes * 60) - (self.inhibit_target_minutes * 60), self.inhibit_exercises)
             self.calculate_durations()
@@ -259,25 +258,19 @@ class ExerciseAssignments(object):
             self.calculate_durations()
 
     def calculate_durations(self):
-        inhibit_duration_list = list(ex.duration() for ex in self.inhibit_exercises if ex.duration() is not None)
-        self.inhibit_minutes = sum(inhibit_duration_list) / 60
-
-        lengthen_duration_list = list(ex.duration() for ex in self.lengthen_exercises if ex.duration() is not None)
-        self.lengthen_minutes = sum(lengthen_duration_list) / 60
-
-        activate_duration_list = list(ex.duration() for ex in self.activate_exercises if ex.duration() is not None)
-        self.activate_minutes = sum(activate_duration_list) / 60
-
+        self.inhibit_minutes = sum(filter(None, [ex.duration() for ex in self.inhibit_exercises])) / 60
+        self.lengthen_minutes = sum(filter(None, [ex.duration() for ex in self.lengthen_exercises])) / 60
+        self.activate_minutes = sum(filter(None, [ex.duration() for ex in self.activate_exercises])) / 60
         self.integrate_minutes = 0
 
-        self.inhibit_percentage = self.inhibit_minutes / (self.inhibit_minutes + self.lengthen_minutes +
-                                                          self.activate_minutes + self.integrate_minutes)
-        self.lengthen_percentage = self.lengthen_minutes / (self.inhibit_minutes + self.lengthen_minutes +
-                                                            self.activate_minutes + self.integrate_minutes)
-        self.activate_percentage = self.activate_minutes / (self.inhibit_minutes + self.lengthen_minutes +
-                                                            self.activate_minutes + self.integrate_minutes)
-        self.integrate_percentage = self.integrate_minutes / (self.inhibit_minutes + self.lengthen_minutes +
-                                                              self.activate_minutes + self.integrate_minutes)
+        total_minutes = self.inhibit_minutes + self.lengthen_minutes + self.activate_minutes + self.integrate_minutes
+        if total_minutes == 0:
+            self.inhibit_percentage = self.lengthen_percentage = self.activate_percentage = self.integrate_percentage = 0
+        else:
+            self.inhibit_percentage = self.inhibit_minutes / total_minutes
+            self.lengthen_percentage = self.lengthen_minutes / total_minutes
+            self.activate_percentage = self.activate_minutes / total_minutes
+            self.integrate_percentage = self.integrate_minutes / total_minutes
     '''
     def update(self, soreness_severity, soreness_exercises):
 
