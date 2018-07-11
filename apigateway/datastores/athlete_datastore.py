@@ -23,20 +23,20 @@ class DailyPlanDatastore(object):
         mongo_cursor = mongo_collection.find(query0)
         ret = []
         for plan in mongo_cursor:
-            ret.append(self.item_to_response(plan))
-            # daily_plan = DailyPlan(date=plan['date'])
-            # daily_plan.practice_sessions = plan.get('practice_sessions', [])
-            # daily_plan.strength_conditioning_sessions = plan.get('cross_training_sessions', [])
-            # daily_plan.games = plan.get('game_sessions', [])
-            # daily_plan.tournaments = plan.get('tournament_sessions', [])
-            # daily_plan.recovery_am = plan.get('recovery_am', [])
-            # daily_plan.recovery_pm = plan.get('recovery_pm', [])
-            # daily_plan.corrective_sessions = plan.get('corrective_sessions', [])
-            # daily_plan.bump_up_sessions = plan['bump_up_sessions']
-            # daily_plan.daily_readiness_survey = plan.get('daily_readiness_survey', None)
-            # daily_plan.updated = plan.get('updated', None)
-            # daily_plan.last_updated = plan.get('last_update', None)
-            # ret.append(daily_plan)
+            # ret.append(self.item_to_response(plan))
+            daily_plan = DailyPlan(date=plan['date'])
+            daily_plan.practice_sessions = plan.get('practice_sessions', [])
+            daily_plan.strength_conditioning_sessions = plan.get('cross_training_sessions', [])
+            daily_plan.games = plan.get('game_sessions', [])
+            daily_plan.tournaments = plan.get('tournament_sessions', [])
+            daily_plan.recovery_am = plan.get('recovery_am', [])
+            daily_plan.recovery_pm = plan.get('recovery_pm', [])
+            daily_plan.corrective_sessions = plan.get('corrective_sessions', [])
+            daily_plan.bump_up_sessions = plan['bump_up_sessions']
+            daily_plan.daily_readiness_survey = plan.get('daily_readiness_survey', None)
+            daily_plan.updated = plan.get('updated', None)
+            daily_plan.last_updated = plan.get('last_update', None)
+            ret.append(daily_plan)
         return ret
 
     @xray_recorder.capture('datastore.DailyPlanDatastore._put_mongodb')
@@ -85,21 +85,6 @@ class DailyPlanDatastore(object):
                                'recovery_am': am_recovery_bson,
                                'recovery_pm': pm_recovery_bson,
                                'last_updated': item.last_updated})
-
-    @staticmethod
-    def item_to_response(daily_plan):
-        item = {
-            'date': daily_plan['date'],
-            'practice_sessions': daily_plan.get('practice_sessions', []),
-            'recovery_am': daily_plan.get('recovery_am',[]),
-            'recovery_pm': daily_plan.get('recovery_pm', []),
-            'games': daily_plan.get('game_sessions', []),
-            'tournaments': daily_plan.get('tournament_sessions', []),
-            'strength_conditioning_sessions': daily_plan.get('cross_training_sessions', []),
-            'corrective_sessions': daily_plan.get('corrective_sessions', []),
-            'bump_up_sessions': daily_plan.get('bump_up_sessions', []),
-        }
-        return item
 
     def get_recovery_bson(self, recovery_session):
         exercise_bson = ()

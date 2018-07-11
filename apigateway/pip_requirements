@@ -4,4 +4,3 @@ aws_xray_sdk==0.95
 flask-lambda==0.0.4
 pymongo==3.4.0
 pyjwt==1.5.3
-numpy==1.14.5

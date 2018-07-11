@@ -23,12 +23,12 @@ def handle_daily_plan_get():
     else:
         end_date = start_date
     store = DailyPlanDatastore()
-    daily_plan = store.get(user_id, start_date, end_date, collection='dailyplan')
-    # daily_plans = []
-    # for plan in daily_plan:
-    #     daily_plans.append(plan)
+    items = store.get(user_id, start_date, end_date, collection='dailyplan')
+    daily_plans = []
+    for plan in items:
+        daily_plans.append(item_to_json(plan))
 
-    return {'daily_plan': daily_plan}, 200
+    return {'daily_plans': daily_plans}, 200
 
 
 def validate_input(request):
@@ -45,8 +45,20 @@ def validate_input(request):
             raise InvalidSchemaException('start_date needs to be in format yyyy-mm-dd')
     if 'end_date' in request.json:
         try:
-            datetime.datetime.strptime(request.json['end_date'], "%Y-%m-%d ")
+            datetime.datetime.strptime(request.json['end_date'], "%Y-%m-%d")
         except:
             raise InvalidSchemaException('end_date needs to be in format yyyy-mm-dd')
 
-
+def item_to_json(daily_plan):
+    item = {
+        'date': daily_plan.date,
+        'practice_sessions': daily_plan.practice_sessions,
+        'recovery_am': daily_plan.recovery_am,
+        'recovery_pm': daily_plan.recovery_pm,
+        'games': daily_plan.games,
+        'tournaments': daily_plan.tournaments,
+        'strength_conditioning_sessions': daily_plan.strength_conditioning_sessions,
+        'corrective_sessions': daily_plan.corrective_sessions,
+        'bump_up_sessions': daily_plan.bump_up_sessions
+    }
+    return item
