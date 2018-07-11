@@ -40,7 +40,7 @@ def validate_input(request):
         raise InvalidSchemaException('Missing required parameter start_date')
     else:
         try:
-            datetime.datetime.strptime(request.json['start_date'], "%Y-%m-%d ")
+            datetime.datetime.strptime(request.json['start_date'], "%Y-%m-%d")
         except:
             raise InvalidSchemaException('start_date needs to be in format yyyy-mm-dd')
     if 'end_date' in request.json:

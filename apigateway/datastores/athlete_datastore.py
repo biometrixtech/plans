@@ -22,7 +22,7 @@ class DailyPlanDatastore(object):
         for plan in mongo_cursor:
             daily_plan = DailyPlan(date=plan['date'])
             daily_plan.practice_sessions = plan['practice_sessions']
-            daily_plan.strength_conditioning_sessions = plan['cross_training_session']
+            daily_plan.strength_conditioning_sessions = plan['cross_training_sessions']
             daily_plan.games = plan['games']
             daily_plan.tournaments = plan['tournaments']
             daily_plan.recovery_am = plan['recovery_am']
