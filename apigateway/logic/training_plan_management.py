@@ -38,11 +38,11 @@ class TrainingPlanManager(object):
     def create_daily_plan(self):
         last_daily_readiness_survey = DailyReadinessDatastore().get(self.athlete_id)
 
-        last_post_session_surveys = \
-            self.athlete_dao.get_last_post_session_surveys(last_daily_readiness_survey.get_event_date(),
-                                                           last_daily_readiness_survey.get_event_date()
-                                                           - datetime.timedelta(hours=48, minutes=0)
-                                                           )
+        last_post_session_surveys = []
+        #    self.athlete_dao.get_last_post_session_surveys(last_daily_readiness_survey.get_event_date(),
+        #                                                   last_daily_readiness_survey.get_event_date()
+        #                                                   - datetime.timedelta(hours=48, minutes=0)
+        #                                                   )
 
         soreness_list = SorenessCalculator().get_soreness_summary_from_surveys(
             last_daily_readiness_survey,
