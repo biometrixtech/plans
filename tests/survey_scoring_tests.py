@@ -47,6 +47,8 @@ def readiness_survey_0_hours_ankle_foot(severity_score_1, severity_score_2):
 
 @pytest.fixture(scope="module")
 def post_session_survey_24_hours_ankle(severity_score):
+    surveys = []
+
     survey = soreness_and_injury.PostSessionSurvey()
     survey.report_date_time = datetime.datetime(2018, 6, 26, 17, 0, 0)
 
@@ -54,11 +56,16 @@ def post_session_survey_24_hours_ankle(severity_score):
     soreness_item.severity = severity_score
     soreness_item.body_part = soreness_and_injury.BodyPartLocation(9)
     survey.soreness.append(soreness_item)
-    return survey
+
+    surveys.append(survey)
+
+    return surveys
 
 
 @pytest.fixture(scope="module")
 def post_session_survey_24_hours_foot(severity_score):
+    surveys = []
+
     survey = soreness_and_injury.PostSessionSurvey()
     survey.report_date_time = datetime.datetime(2018, 6, 26, 17, 0, 0)
 
@@ -66,11 +73,14 @@ def post_session_survey_24_hours_foot(severity_score):
     soreness_item.severity = severity_score
     soreness_item.body_part = soreness_and_injury.BodyPartLocation(10)
     survey.soreness.append(soreness_item)
-    return survey
+
+    surveys.append(survey)
+    return surveys
 
 
 @pytest.fixture(scope="module")
 def post_session_survey_24_hrs_ankle_foot(severity_score_1, severity_score_2):
+    surveys = []
     survey = soreness_and_injury.PostSessionSurvey()
     survey.report_date_time = datetime.datetime(2018, 6, 26, 17, 0, 0)
 
@@ -83,11 +93,15 @@ def post_session_survey_24_hrs_ankle_foot(severity_score_1, severity_score_2):
     soreness_item_2.severity = severity_score_2
     soreness_item_2.body_part = soreness_and_injury.BodyPartLocation(10)
     survey.soreness.append(soreness_item_2)
-    return survey
+
+    surveys.append(survey)
+    return surveys
 
 
 @pytest.fixture(scope="module")
 def post_session_survey_48_hours_ankle(severity_score):
+    surveys = []
+
     survey = soreness_and_injury.PostSessionSurvey()
     survey.report_date_time = datetime.datetime(2018, 6, 25, 17, 0, 0)
 
@@ -95,11 +109,16 @@ def post_session_survey_48_hours_ankle(severity_score):
     soreness_item.severity = severity_score
     soreness_item.body_part = soreness_and_injury.BodyPartLocation(9)
     survey.soreness.append(soreness_item)
-    return survey
+
+    surveys.append(survey)
+
+    return surveys
 
 
 @pytest.fixture(scope="module")
 def post_session_survey_49_hours_ankle(severity_score):
+    surveys = []
+
     survey = soreness_and_injury.PostSessionSurvey()
     survey.report_date_time = datetime.datetime(2018, 6, 25, 14, 0, 0)
 
@@ -107,15 +126,22 @@ def post_session_survey_49_hours_ankle(severity_score):
     soreness_item.severity = severity_score
     soreness_item.body_part = soreness_and_injury.BodyPartLocation(9)
     survey.soreness.append(soreness_item)
-    return survey
+
+    surveys.append(survey)
+
+    return surveys
 
 
 @pytest.fixture(scope="module")
 def post_session_survey_24_hours_no_soreness():
+    surveys = []
+
     survey = soreness_and_injury.PostSessionSurvey()
     survey.report_date_time = datetime.datetime(2018, 6, 26, 17, 0, 0)
 
-    return survey
+    surveys.append(survey)
+
+    return surveys
 
 
 @pytest.fixture(scope="module")

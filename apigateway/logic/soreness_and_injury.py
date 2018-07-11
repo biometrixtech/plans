@@ -167,7 +167,7 @@ class SorenessCalculator(object):
 
                         for r in range(0, len(soreness_list)):
                             updated = False
-                            if soreness_list[r].body_part.location == s.body_part.location:
+                            if soreness_list[r].body_part == s.body_part:
                                 soreness_list[r].severity = max(soreness_list[r].severity, s.severity)
                                 updated = True
                             if not updated:
