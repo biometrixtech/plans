@@ -1,50 +1,89 @@
-import pymongo
-# import database_config
 import logic.exercise as exercise
 import logic.soreness_and_injury as soreness_and_injury
-import config
+import datastores.exercise_datastore as exercise_datastore
 
-class ExerciseDataAccess(object):
 
-    # def __init__(self):
-    # self.mongo_client = pymongo.MongoClient(database_config.mongodb_dev)
+class ExerciseAssignmentCalculator(object):
 
-    def get_exercise_library(self):
-        exercise_list = []
+    def __init__(self, athlete_id, athlete_data_access, exercise_dao: exercise_datastore):
+        self.athlete_id = athlete_id
+        self.athlete_dao = athlete_data_access
+        # self.exercise_dao = exercise_dao
+        library_datastore = exercise_dao.ExerciseLibraryDatastore()
+        self.exercise_library = library_datastore.get()
+        self.exercises_for_body_parts = self.get_exercises_for_body_parts()
 
-        # db = self.mongo_client.movementStats
-        collection = config.get_mongo_collection('exerciselibrary')
-        exercise_cursor = collection.find()
+    # def create_assigned_exercise(self, target_exercise, body_part_priority, body_part_exercise_priority, body_part_soreness_level):
 
-        for record in exercise_cursor:
-            exercise_item = exercise.Exercise(record["library_id"])
-            exercise_item.min_sets = record["min_sets"]
-            exercise_item.seconds_per_rep = record["time_per_rep"]
-            exercise_item.min_reps = record["min_reps"]
-            exercise_item.unit_of_measure = record["unit_of_measure"]
-            exercise_item.equipment_required = record["equipment_required"]
-            exercise_item.technical_difficulty = record["technical_difficulty"]
-            exercise_item.progresses_to = record["progresses_to"]
-            exercise_item.seconds_rest_between_sets = record["seconds_rest_between_sets"]
-            exercise_item.exposure_target = record["exposure_target"]
-            exercise_item.progression_interval = record["progression_interval"]
-            exercise_item.bilateral = record["bilateral"]
-            exercise_item.max_reps = record["max_reps"]
-            exercise_item.max_sets = record["max_sets"]
-            exercise_item.name = record["name"]
-            # exercise_item.progressions = record["progressions"]
-            # exercise_item.cues = record["cues"]
-            # exercise_item.goal = record["goal"]
-            # exercise_item.procedure = record["procedure"]
-            # exercise_item.program_type = record["programType"]
-            exercise_item.seconds_per_set = record["time_per_set"]
-            # exercise_item.tempo = record["tempo"]
-            exercise_list.append(exercise_item)
+    def get_exercise_list_for_body_part(self, body_part_exercises, exercise_list, completed_exercises, soreness_severity):
 
-        return exercise_list
+        assigned_exercise_list = []
+
+        for body_part_exercise in body_part_exercises:
+            # get details from library
+            target_exercise = [ex for ex in exercise_list if ex.id == body_part_exercise.exercise.id]
+
+            # did athlete already complete this exercise
+            if completed_exercises is not None:
+                completed_exercise = [ex for ex in completed_exercises if
+                                      ex.id == target_exercise.id]
+
+            # if completed_exercise is not None:
+            # do stuff
+
+            # determine reps and sets
+
+            assigned_exercise = exercise.AssignedExercise(target_exercise[0].id,
+                                                 body_part_exercise.body_part_priority,
+                                                 body_part_exercise.body_part_exercise_priority,
+                                                 soreness_severity)
+            assigned_exercise.exercise = target_exercise[0]
+
+            assigned_exercise.reps_assigned = target_exercise[0].max_reps
+            assigned_exercise.sets_assigned = target_exercise[0].max_sets
+
+            assigned_exercise_list.append(assigned_exercise)
+
+        return assigned_exercise_list
+
+    def create_exercise_assignments(self, exercise_session, soreness_list):
+
+        # TODO: handle progressions
+
+        exercise_assignments = exercise.ExerciseAssignments()
+        exercise_assignments.inhibit_max_percentage = exercise_session.inhibit_max_percentage
+        exercise_assignments.inhibit_target_minutes = exercise_session.inhibit_target_minutes
+        exercise_assignments.activate_max_percentage = exercise_session.activate_max_percentage
+        exercise_assignments.activate_target_minutes = exercise_session.activate_target_minutes
+        exercise_assignments.lengthen_max_percentage = exercise_session.lengthen_max_percentage
+        exercise_assignments.lengthen_target_minutes = exercise_session.lengthen_target_minutes
+
+        # completed_exercises = self.athlete_dao.get_completed_exercises()
+        completed_exercises = None
+        body_part_exercises = self.exercises_for_body_parts
+        exercise_list = self.exercise_library
+
+        for soreness in soreness_list:
+            body_part = [b for b in body_part_exercises if b.location.value == soreness.body_part.location.value]
+
+            if exercise_session.inhibit_target_minutes is not None and exercise_session.inhibit_target_minutes > 0:
+                exercise_assignments.inhibit_exercises.extend(
+                    self.get_exercise_list_for_body_part(body_part[0].inhibit_exercises, exercise_list,
+                                                         completed_exercises, soreness.severity))
+            if exercise_session.lengthen_target_minutes is not None and exercise_session.lengthen_target_minutes > 0:
+                exercise_assignments.lengthen_exercises.extend(
+                    self.get_exercise_list_for_body_part(body_part[0].lengthen_exercises, exercise_list,
+                                                         completed_exercises, soreness.severity))
+            if exercise_session.activate_target_minutes is not None and exercise_session.activate_target_minutes > 0:
+                exercise_assignments.activate_exercises.extend(
+                    self.get_exercise_list_for_body_part(body_part[0].activate_exercises, exercise_list,
+                                                         completed_exercises, soreness.severity))
+        exercise_assignments.scale_to_targets()
+
+        return exercise_assignments
+
 
     def get_exercises_for_body_parts(self):
-
         body_parts = []
 
         # lower back

@@ -4,7 +4,7 @@ import datetime
 import logic.training_plan_management as training_plan_management
 import logic.athlete_data_access as athlete_data_access
 import athlete_data_access_mocks
-import logic.exercise_data_access as exercise_data_access
+import datastores.exercise_datastore as exercise_datastore
 
 '''
 
@@ -109,7 +109,7 @@ def test_create_plan():
     manager = \
         training_plan_management.TrainingPlanManager("test_user",
                                                      athlete_data_access_mocks.AthleteDataAccessMorningPractice("test_user"),
-                                                     exercise_data_access.ExerciseDataAccess())
+                                                     exercise_datastore)
     daily_plan = manager.create_daily_plan()
     daily_plan.last_updated = datetime.datetime(2018, 6, 27, 11, 30, 0)
     athlete_dao = athlete_data_access.AthleteDataAccess("test_user")

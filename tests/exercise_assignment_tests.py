@@ -1,8 +1,9 @@
 import pytest
 import logic.exercise as exercise
+import logic.exercise_mapping as exercise_mapping
 import logic.session as session
 import logic.soreness_and_injury as soreness_and_injury
-import logic.exercise_data_access as exercise_data_access
+import datastores.exercise_datastore as exercise_datastore
 import athlete_data_access_mocks
 
 
@@ -237,21 +238,21 @@ def test_recovery_session_ankle_4_soreness_integrate_minutes():
 
 
 def test_recovery_session_exercises_assigned():
-    calc = exercise.ExerciseAssignmentCalculator("test_user", None, exercise_data_access.ExerciseDataAccess())
+    calc = exercise_mapping.ExerciseAssignmentCalculator("test_user", None, exercise_datastore.ExerciseLibraryDatastore())
     soreness_list = soreness_one_body_part(12, 1)    # lower back
     target_recovery_session = recovery_session(soreness_one_body_part(12, 1), 15)
     exercise_assignments = calc.create_exercise_assignments(target_recovery_session, soreness_list)
     j = 0
 
 def test_recovery_session_exercises_assigned_2_body_parts():
-    calc = exercise.ExerciseAssignmentCalculator("test_user", None, exercise_data_access.ExerciseDataAccess())
+    calc = exercise_mapping.ExerciseAssignmentCalculator("test_user", None, exercise_datastore.ExerciseLibraryDatastore())
     soreness_list = soreness_two_body_parts(12, 1, 4, 1, 1, 2)    # lower back
     target_recovery_session = recovery_session(soreness_two_body_parts(12, 1, 4, 1, 1, 2), 15)
     exercise_assignments = calc.create_exercise_assignments(target_recovery_session, soreness_list)
     j = 0
 
 def test_recovery_session_exercises_assigned_2_body_parts_diff_severity():
-    calc = exercise.ExerciseAssignmentCalculator("test_user", None, exercise_data_access.ExerciseDataAccess())
+    calc = exercise_mapping.ExerciseAssignmentCalculator("test_user", None, exercise_datastore.ExerciseLibraryDatastore())
     soreness_list = soreness_two_body_parts(12, 1, 4, 2, 1, 2)    # lower back
     target_recovery_session = recovery_session(soreness_two_body_parts(12, 1, 4, 1, 1, 2), 15)
     exercise_assignments = calc.create_exercise_assignments(target_recovery_session, soreness_list)

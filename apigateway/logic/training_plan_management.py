@@ -5,6 +5,7 @@ import logic.training as training
 import logic.session as session
 import datetime
 import logic.exercise as exercise
+import logic.exercise_mapping as exercise_mapping
 import logic.soreness_and_injury as soreness_and_injury
 
 
@@ -32,7 +33,7 @@ class TrainingPlanManager(object):
         daily_plan = training.DailyPlan(last_daily_readiness_survey.report_date_time.date())
         daily_plan = self.add_recovery_times(last_daily_readiness_survey.report_date_time, daily_plan)
 
-        calc = exercise.ExerciseAssignmentCalculator(self.athlete_id, None, self.exercise_dao)
+        calc = exercise_mapping.ExerciseAssignmentCalculator(self.athlete_id, None, self.exercise_dao)
 
         if daily_plan.recovery_am.start_time is not None:
             daily_plan.recovery_am.set_exercise_target_minutes(soreness_list, 15)
