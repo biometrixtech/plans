@@ -21,13 +21,13 @@ class DailyPlanDatastore(object):
         ret = []
         for plan in mongo_cursor:
             daily_plan = DailyPlan(date=plan['date'])
-            daily_plan.practice_sessions = plan['practice_sessions']
-            daily_plan.strength_conditioning_sessions = plan['cross_training_sessions']
-            daily_plan.games = plan['games']
-            daily_plan.tournaments = plan['tournaments']
-            daily_plan.recovery_am = plan['recovery_am']
-            daily_plan.recovery_pm = plan['recovery_pm']
-            daily_plan.corrective_sessions = plan['corrective_sessions']
+            daily_plan.practice_sessions = plan.get('practice_sessions', [])
+            daily_plan.strength_conditioning_sessions = plan.get('cross_training_sessions', [])
+            daily_plan.games = plan.get('game_sessions', [])
+            daily_plan.tournaments = plan.get('tournament_sessions', [])
+            daily_plan.recovery_am = plan.get('recovery_am', [])
+            daily_plan.recovery_pm = plan.get('recovery_pm', [])
+            daily_plan.corrective_sessions = plan.get('corrective_sessions', [])
             daily_plan.bump_up_sessions = plan['bump_up_sessions']
             daily_plan.daily_readiness_survey = plan.get('daily_readiness_survey', None)
             daily_plan.updated = plan.get('updated', None)
