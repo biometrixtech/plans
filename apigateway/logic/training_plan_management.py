@@ -8,6 +8,7 @@ import logic.exercise as exercise
 import logic.exercise_mapping as exercise_mapping
 from logic.soreness_and_injury import SorenessCalculator
 from datastores.daily_readiness_datastore import DailyReadinessDatastore
+from utils import parse_datetime
 
 
 class TrainingPlanManager(object):
@@ -38,23 +39,22 @@ class TrainingPlanManager(object):
         last_daily_readiness_survey = DailyReadinessDatastore().get(self.athlete_id)
 
         last_post_session_surveys = \
-            self.athlete_dao.get_last_post_session_surveys(last_daily_readiness_survey.report_date_time,
-                                                           last_daily_readiness_survey.report_date_time
+            self.athlete_dao.get_last_post_session_surveys(last_daily_readiness_survey.get_event_date(),
+                                                           last_daily_readiness_survey.get_event_date()
                                                            - datetime.timedelta(hours=48, minutes=0)
                                                            )
 
         soreness_list = SorenessCalculator().get_soreness_summary_from_surveys(
             last_daily_readiness_survey,
             last_post_session_surveys,
-            last_daily_readiness_survey.date_time
+            last_daily_readiness_survey.get_event_date()
         )
 
-        scheduled_sessions = \
-            self.athlete_dao.get_scheduled_sessions(last_daily_readiness_survey.report_date_time.date())
+        scheduled_sessions = self.athlete_dao.get_scheduled_sessions(last_daily_readiness_survey.get_event_date())
 
-        daily_plan = training.DailyPlan(last_daily_readiness_survey.report_date_time.date())
+        daily_plan = training.DailyPlan(last_daily_readiness_survey.get_event_date())
         daily_plan.athlete_id = self.athlete_id
-        daily_plan = self.add_recovery_times(last_daily_readiness_survey.report_date_time, daily_plan)
+        daily_plan = self.add_recovery_times(last_daily_readiness_survey.get_event_date(), daily_plan)
 
         calc = exercise_mapping.ExerciseAssignmentCalculator(self.athlete_id)
 

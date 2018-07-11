@@ -1,6 +1,5 @@
 from aws_xray_sdk.core import xray_recorder
 from flask import request, Blueprint
-import datetime
 import jwt
 
 from datastores.daily_readiness_datastore import DailyReadinessDatastore
@@ -8,6 +7,7 @@ from decorators import authentication_required
 from exceptions import InvalidSchemaException
 from models.daily_readiness import DailyReadiness
 from logic.soreness_and_injury import MuscleSorenessSeverity, BodyPartLocation
+from utils import parse_datetime
 
 
 app = Blueprint('daily_readiness', __name__)
@@ -21,7 +21,7 @@ def handle_daily_readiness_create():
 
     daily_readiness = DailyReadiness(
         user_id=request.json['user_id'],
-        date_time=request.json['date_time'],
+        event_date=request.json['date_time'],
         soreness=request.json['soreness'],  # dailysoreness object array
         sleep_quality=request.json['sleep_quality'],
         readiness=request.json['readiness']
@@ -49,10 +49,7 @@ def validate_data():
 
     if 'date_time' not in request.json:
         raise InvalidSchemaException('Missing required parameter date_time')
-    try:
-        datetime.datetime.strptime(request.json['date_time'], "%Y-%m-%dT%H:%M:%SZ")
-    except ValueError:
-        raise InvalidSchemaException('date_time must be in ISO8601 format')
+    parse_datetime(request.json['date_time'])
 
     # validate soreness
     if 'soreness' not in request.json:

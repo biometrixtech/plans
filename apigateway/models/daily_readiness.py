@@ -1,16 +1,19 @@
 from serialisable import Serialisable
+import datetime
+
+from utils import parse_datetime
 
 
 class DailyReadiness(Serialisable):
     
     def __init__(self,
-                 date_time,
+                 event_date,
                  user_id,
                  soreness,
                  sleep_quality,
                  readiness
                  ):
-        self.date_time = date_time
+        self.event_date = event_date
         self.user_id = user_id
         self.soreness = soreness
         self.sleep_quality = int(sleep_quality)
@@ -19,12 +22,12 @@ class DailyReadiness(Serialisable):
     def get_id(self):
         return self.user_id
 
-    def get_date(self):
-        return self.date_time
+    def get_event_date(self):
+        return parse_datetime(self.event_date)
 
     def json_serialise(self):
         ret = {
-            'date_time': self.date_time,
+            'event_date': self.event_date,
             'user_id': self.user_id,
             'soreness': self.soreness,
             'sleep_quality': self.sleep_quality,

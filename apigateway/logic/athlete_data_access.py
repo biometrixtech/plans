@@ -54,7 +54,7 @@ class AthleteDataAccess(object):
 
         collection = config.get_mongo_collection('training')
         schedule_cursor = collection.find({"user_id": self.athlete_id})
-        day_of_week = datetime.datetime.strptime(date, '%Y-%m-%d').weekday()
+        day_of_week = date.weekday()
 
         for schedule in schedule_cursor:
 
@@ -64,7 +64,7 @@ class AthleteDataAccess(object):
                 if day_of_week in cross_training_days_of_week:
                     cross_training_session = session.StrengthConditioningSession()
                     cross_training_session.day_of_week = session.DayOfWeek(day_of_week)
-                    cross_training_session.date = date
+                    cross_training_session.date = date.strftime('%Y-%m-%d')
                     cross_training_session.id = uuid.uuid4()
                     cross_training_session.duration_minutes = cross_training["duration"]
                     cross_training_session.description = ",".join(cross_training["activities"])
@@ -79,7 +79,7 @@ class AthleteDataAccess(object):
                     if day_of_week in practice_days_of_week:
                         practice_session = session.PracticeSession()
                         practice_session.day_of_week = session.DayOfWeek(day_of_week)
-                        practice_session.date = date
+                        practice_session.date = date.strftime('%Y-%m-%d')
                         practice_session.id = uuid.uuid4()
                         practice_session.duration_minutes = practice["duration"]
                         practice_session.description = "Practice (" + sport["sport"] + ")"
@@ -89,7 +89,7 @@ class AthleteDataAccess(object):
                     if day_of_week in competition_days_of_week:
                         game_session = session.Game()
                         game_session.day_of_week = session.DayOfWeek(day_of_week)
-                        game_session.date = date
+                        game_session.date = date.strftime('%Y-%m-%d')
                         game_session.id = uuid.uuid4()
                         game_session.duration_minutes = 0   # TODO: look up from internal data
                         game_session.description = "Competition (" + sport["sport"] + ")"

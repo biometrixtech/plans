@@ -1,6 +1,8 @@
 import datetime
 import uuid
 
+from exceptions import InvalidSchemaException
+
 
 def format_date(date_input):
     """
@@ -36,6 +38,13 @@ def format_datetime(date_input):
     if not isinstance(date_input, datetime.datetime):
         date_input = datetime.datetime.strptime(date_input, "%Y-%m-%dT%H:%M:%S.%f")
     return date_input.strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def parse_datetime(date_input):
+    try:
+        return datetime.datetime.strptime(date_input, "%Y-%m-%dT%H:%M:%SZ")
+    except ValueError:
+        raise InvalidSchemaException('date_time must be in ISO8601 format')
 
 
 def validate_uuid4(uuid_string):
