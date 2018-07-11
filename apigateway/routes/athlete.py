@@ -4,6 +4,7 @@ from flask import Blueprint
 from datastores.daily_plan_datastore import DailyPlanDatastore
 from logic.training_plan_management import TrainingPlanManager
 from utils import format_datetime
+from serialisable import json_serialise
 import boto3
 import datetime
 import json
@@ -30,5 +31,5 @@ def create_daily_plan(athlete_id):
 def push_plan_update(user_id, daily_plan):
     iotd_client.publish(
         topic='plans/{}/athlete/{}/daily_plan'.format(os.environ['ENVIRONMENT'], user_id),
-        payload=json.dumps({'daily_plan': daily_plan}).encode()
+        payload=json.dumps({'daily_plan': 'TODO'}, default=json_serialise).encode()
     )
