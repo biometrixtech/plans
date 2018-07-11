@@ -2,7 +2,6 @@ from aws_xray_sdk.core import xray_recorder
 from decorators import authentication_required
 from flask import Blueprint
 from datastores.daily_plan_datastore import DailyPlanDatastore
-from logic.exercise_data_access import ExerciseDataAccess
 from logic.training_plan_management import TrainingPlanManager
 from utils import format_datetime
 import boto3
@@ -19,9 +18,7 @@ iotd_client = boto3.client('iot-data')
 @authentication_required
 @xray_recorder.capture('routes.athlete.daily_plan.create')
 def create_weekly_plan(athlete_id):
-    athlete_dao = AthleteDataAccess(athlete_id)
-
-    daily_plan = TrainingPlanManager(athlete_id, athlete_dao, ExerciseDataAccess()).create_daily_plan()
+    daily_plan = TrainingPlanManager(athlete_id).create_daily_plan()
     daily_plan.last_updated = format_datetime(datetime.datetime.now())
 
     DailyPlanDatastore().put(daily_plan)
