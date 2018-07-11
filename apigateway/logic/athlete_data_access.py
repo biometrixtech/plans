@@ -31,7 +31,7 @@ class AthleteDataAccess(object):
 
         return daily_readiness
 
-    def get_last_post_session_survey(self):
+    def get_last_post_session_surveys(self, start_date_time, end_date_time):
 
         post_session_survey = soreness_and_injury.PostSessionSoreness()
 

@@ -173,9 +173,6 @@ class ExerciseAssignments(object):
                              key=lambda x: (x.body_part_exercise_priority, x.body_part_priority),
                              reverse=False)
 
-        for s in range(0, len(sorted_list)):
-            sorted_list[0].position_order = s
-
         return sorted_list
 
     def reduce_assigned_exercises(self, seconds_reduction_needed, assigned_exercise_list):

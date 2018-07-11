@@ -252,6 +252,9 @@ class RecoverySession(object):
         exercise_list.extend(self.recommended_activate_exercises)
         exercise_list.extend(self.recommended_integrate_exercises)
 
+        for s in range(0, len(exercise_list)):
+            exercise_list[s].position_order = s
+
         return exercise_list
 
     def update_from_exercise_assignments(self, exercise_assignments):

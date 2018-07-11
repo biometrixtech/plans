@@ -37,12 +37,16 @@ class TrainingPlanManager(object):
     def create_daily_plan(self):
         last_daily_readiness_survey = self.athlete_dao.get_last_daily_readiness_survey()
 
-        last_post_session_survey = self.athlete_dao.get_last_post_session_survey()
+        last_post_session_surveys = \
+            self.athlete_dao.get_last_post_session_surveys(last_daily_readiness_survey.report_date_time,
+                                                           last_daily_readiness_survey.report_date_time
+                                                           - datetime.timedelta(hours=48, minutes=0)
+                                                           )
 
         soreness_calc = soreness_and_injury.SorenessCalculator()
 
         soreness_list = \
-            soreness_calc.get_soreness_summary_from_surveys(last_daily_readiness_survey, last_post_session_survey,
+            soreness_calc.get_soreness_summary_from_surveys(last_daily_readiness_survey, last_post_session_surveys,
                                                             last_daily_readiness_survey.report_date_time)
 
         scheduled_sessions = \
@@ -55,17 +59,27 @@ class TrainingPlanManager(object):
         calc = exercise_mapping.ExerciseAssignmentCalculator(self.athlete_id, None, self.exercise_dao)
 
         soreness_values = [s.severity for s in soreness_list if s.severity is not None]
-        max_soreness = max(soreness_values)
+        if soreness_values is not None and len(soreness_values) > 0:
+            max_soreness = max(soreness_values)
+        else:
+            max_soreness = 0
+
+        rpe_values = [s.session_rpe for s in last_post_session_surveys if s.session_rpe is not None]
+
+        if rpe_values is not None and len(rpe_values) > 0:
+            max_rpe = max(rpe_values)
+        else:
+            max_rpe = 0
 
         am_impact_score = self.calculate_am_impact_score(
-                            last_post_session_survey.session_rpe,
+                            max_rpe,
                             last_daily_readiness_survey.readiness,
                             last_daily_readiness_survey.sleep_quality,
                             max_soreness
                             )
 
         pm_impact_score = self.calculate_pm_impact_score(
-            last_post_session_survey.session_rpe,
+            max_rpe,
             last_daily_readiness_survey.readiness,
             last_daily_readiness_survey.sleep_quality,
             max_soreness

@@ -142,7 +142,7 @@ class SorenessCalculator(object):
     def __init__(self):
         self.surveys = []
 
-    def get_soreness_summary_from_surveys(self, last_daily_readiness_survey, last_post_session_survey,
+    def get_soreness_summary_from_surveys(self, last_daily_readiness_survey, last_post_session_surveys,
                                           trigger_date_time):
 
         soreness_list = []
@@ -155,20 +155,23 @@ class SorenessCalculator(object):
                 for s in last_daily_readiness_survey.soreness:
                     soreness_list.append(s)
 
-        if last_post_session_survey is not None:
+        if last_post_session_surveys is not None:
 
-            last_post_session_survey_age = trigger_date_time - last_post_session_survey.report_date_time
+            for last_post_session_survey in last_post_session_surveys:
 
-            if last_post_session_survey_age.total_seconds() <= 172800:  # within 48 hours so valid
+                last_post_session_survey_age = trigger_date_time - last_post_session_survey.report_date_time
 
-                for s in last_post_session_survey.soreness:
-                    updated = False
-                    for r in range(0, len(soreness_list)):
-                        if soreness_list[r].body_part == s.body_part:
-                            soreness_list[r].severity = max(soreness_list[r].severity, s.severity)
-                            updated = True
-                    if not updated:
-                        soreness_list.append(s)
+                if last_post_session_survey_age.total_seconds() <= 172800:  # within 48 hours so valid
+
+                    for s in last_post_session_survey.soreness:
+
+                        for r in range(0, len(soreness_list)):
+                            updated = False
+                            if soreness_list[r].body_part.location == s.body_part.location:
+                                soreness_list[r].severity = max(soreness_list[r].severity, s.severity)
+                                updated = True
+                            if not updated:
+                                soreness_list.append(s)
 
         return soreness_list
 
