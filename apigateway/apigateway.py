@@ -46,6 +46,10 @@ from routes.weekly_schedule import app as weekly_schedule_routes
 app.register_blueprint(weekly_schedule_routes, url_prefix='/plans/weekly_schedule')
 
 
+from routes.daily_plan import app as daily_plan_routes
+app.register_blueprint(daily_plan_routes, url_prefix='/plans/daily_plan')
+
+
 @app.errorhandler(500)
 def handle_server_error(e):
     tb = sys.exc_info()[2]

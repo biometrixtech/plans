@@ -1,5 +1,5 @@
-import numpy as np
 from decimal import Decimal, getcontext
+from statistics import mean, stdev
 import logic.session as session
 
 
@@ -83,8 +83,8 @@ class TrainingCycle(object):
         external_load = list(x.external_load for x in self.sessions if x.internal_load is not None
                              and x.external_load is not None)
         if internal_load is not None and external_load is not None:
-            internal_load_sum = np.sum(internal_load)
-            external_load_sum = np.sum(external_load)
+            internal_load_sum = sum(internal_load)
+            external_load_sum = sum(external_load)
 
             return internal_load_sum / external_load_sum
         else:
@@ -96,8 +96,8 @@ class TrainingCycle(object):
         external_load = list(x.external_load for x in self.sessions if x.internal_load is not None
                              and x.external_load is not None and not x.estimated)
         if internal_load is not None and external_load is not None:
-            internal_load_sum = np.sum(internal_load)
-            external_load_sum = np.sum(external_load)
+            internal_load_sum = sum(internal_load)
+            external_load_sum = sum(external_load)
 
             return internal_load_sum / external_load_sum
         else:
@@ -105,7 +105,7 @@ class TrainingCycle(object):
 
     def total_hours_training_wtd(self):
         total_minutes = list(x.duration_minutes for x in self.sessions if x.duration_minutes is not None)
-        total_minutes_sum = np.sum(total_minutes)
+        total_minutes_sum = sum(total_minutes)
         return total_minutes_sum / 60
 
     def get_daily_plan(self, date):
@@ -136,7 +136,7 @@ class TrainingCycle(object):
 
         readiness_count = len(self.daily_readiness_surveys)
         if readiness_count == 0:
-            return  None
+            return None
         else:
             return self.daily_readiness_surveys[readiness_count - 1]
 
@@ -234,14 +234,14 @@ class TrainingHistory(object):
                 ratios.append(ratio * weighting_factor)
 
         if len(ratios) > 0:
-            return np.mean(ratios)
+            return mean(ratios)
         else:
             return None
 
     def is_athlete_fatiguing(self):
         actual_ratios = list(x.actual_internal_external_load_ratio() for x in self.training_cycles
                              if x.actual_internal_external_load_ratio() is not None)
-        training_history_ratio = np.mean(actual_ratios)
+        training_history_ratio = mean(actual_ratios)
         current_ratio = self.training_cycles[0].actual_internal_external_load_ratio()
 
         if training_history_ratio is None or current_ratio is None:
@@ -465,8 +465,8 @@ class Calculator(object):
                                  if getattr(c, attribute_name) is not None and not c.estimated)
 
         if current_load is not None and previous_load is not None:
-            current_load_sum = np.sum(current_load)
-            previous_load_sum = np.sum(previous_load)
+            current_load_sum = sum(current_load)
+            previous_load_sum = sum(previous_load)
             ramp = ((current_load_sum - previous_load_sum) / previous_load_sum) * 100
             return ramp
         else:
@@ -504,7 +504,7 @@ class Calculator(object):
             else:
                 load = list(getattr(c, attribute_name) for c in training_cycle.sessions
                             if getattr(c, attribute_name) is not None and not c.estimated)
-            load_sum = np.sum(load)
+            load_sum = sum(load)
             chronic_load.append(load_sum)
 
         return acute_load, chronic_load
@@ -514,9 +514,7 @@ class Calculator(object):
         acute_load, chronic_load = self.get_acute_chronic_load(attribute_name, training_cycles, include_estimated)
 
         if acute_load is not None and chronic_load is not None:
-            acute_load_sum = np.sum(acute_load)
-            chronic_load_avg = np.mean(chronic_load)
-            return acute_load_sum / chronic_load_avg
+            return sum(acute_load) / mean(chronic_load)
         else:
             return None
 
@@ -526,9 +524,7 @@ class Calculator(object):
                     if getattr(c, attribute_name) is not None)
 
         if load is not None:
-            load_mean = np.mean(load).item()
-            load_stddev = np.std(load).item()
-            return load_mean / load_stddev
+            return mean(load) / stdev(load)
         else:
             return None
 
@@ -538,10 +534,7 @@ class Calculator(object):
                     if getattr(c, attribute_name) is not None)
 
         if load is not None:
-            load_mean = np.mean(load).item()
-            load_stddev = np.std(load).item()
-            load_sum = np.sum(load).item()
-            return (load_mean / load_stddev) * load_sum
+            return (mean(load) / stdev(load)) * sum(load)
         else:
             return None
 
@@ -549,9 +542,7 @@ class Calculator(object):
         strain_list = list(getattr(c, attribute_name) for c in training_cycles
                            if getattr(c, attribute_name) is not None)
         if strain_list is not None:
-            strain_stddev = np.std(strain_list)
-            strain_mean = np.mean(strain_list)
-            if (training_cycles[0].strain - strain_mean) / strain_stddev > 1.2:
+            if (training_cycles[0].strain - mean(strain_list)) / stdev(strain_list) > 1.2:
                 return True
             else:
                 return False
@@ -620,7 +611,7 @@ class Calculator(object):
 
         adjusted_acute_load = list(a for a in acute_load if a is not None)
 
-        acute_load_sum = Decimal(np.sum(adjusted_acute_load).item())
+        acute_load_sum = Decimal(sum(adjusted_acute_load).item())
 
         adjusted_chronic_load = list(c for c in chronic_load if c is not None)
 
@@ -630,7 +621,7 @@ class Calculator(object):
         else:
             previous_weeks_load = adjusted_chronic_load[-1]
 
-            chronic_load_average = Decimal(np.mean(adjusted_chronic_load).item())
+            chronic_load_average = Decimal(mean(adjusted_chronic_load))
 
             target_load = (Decimal(1.45) * chronic_load_average) - acute_load_sum
 
