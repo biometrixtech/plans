@@ -7,6 +7,7 @@ import datetime
 import logic.exercise as exercise
 import logic.exercise_mapping as exercise_mapping
 import logic.soreness_and_injury as soreness_and_injury
+from datastores.daily_readiness_datastore import DailyReadinessDatastore
 
 
 class TrainingPlanManager(object):
@@ -35,7 +36,7 @@ class TrainingPlanManager(object):
         return max(max_soreness_score, sleep_quality_score, readiness_score, rpe_score)
 
     def create_daily_plan(self):
-        last_daily_readiness_survey = self.athlete_dao.get_last_daily_readiness_survey()
+        last_daily_readiness_survey = DailyReadinessDatastore().get(self.athlete_id)
 
         last_post_session_surveys = \
             self.athlete_dao.get_last_post_session_surveys(last_daily_readiness_survey.report_date_time,

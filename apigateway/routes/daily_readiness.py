@@ -7,7 +7,7 @@ import jwt
 # import uuid
 
 # from auth import get_accessory_id_from_auth
-from datastore import DailyReadinessDatastore
+from datastores.daily_readiness_datastore import DailyReadinessDatastore
 from decorators import authentication_required
 from exceptions import InvalidSchemaException
 from models.daily_readiness import DailyReadiness
@@ -99,7 +99,7 @@ def validate_data(request):
     elif request.json['sleep_quality'] not in range(1, 11):
         raise InvalidSchemaException('sleep_quality need to be between 1 and 10')
 
-    # vlaidate readiness
+    # validate readiness
     if 'readiness' not in request.json:
         raise InvalidSchemaException('Missing required parameter readiness')
     elif request.json['readiness'] not in range(1, 11):
