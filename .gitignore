@@ -12,4 +12,3 @@ tests/.pytest_cache/
 !apigateway/models
 !apigateway/pip_requirements
 !apigateway/routes
-!apigateway/datastores
