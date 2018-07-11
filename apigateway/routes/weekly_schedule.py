@@ -5,7 +5,7 @@ import datetime
 
 from decorators import authentication_required
 from exceptions import InvalidSchemaException
-from datastores.athlete_datastore import WeeklyCrossTrainingDatastore, WeeklyTrainingDatastore
+from datastores.weekly_schedule_datastore import WeeklyCrossTrainingDatastore, WeeklyTrainingDatastore
 from models.weekly_schedule import WeeklySchedule
 from logic.athlete import SportName
 
