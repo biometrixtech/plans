@@ -1,25 +1,26 @@
 from aws_xray_sdk.core import xray_recorder
 from config import get_mongo_collection
 from logic.training import DailyPlan
-from models.weekly_schedule import WeeklySchedule
 
 
 class DailyPlanDatastore(object):
-    def get(self, user_id=None, start_date=None, end_date=None, collection=None):
-        return self._query_mongodb(user_id, start_date, end_date, collection)
+    mongo_collection = 'dailyplan'
 
-    def put(self, items, collection='dailyplan'):
+    def get(self, user_id=None, start_date=None, end_date=None):
+        return self._query_mongodb(user_id, start_date, end_date)
+
+    def put(self, items):
         if not isinstance(items, list):
             items = [items]
         try:
             for item in items:
-                self._put_mongodb(item, collection)
+                self._put_mongodb(item)
         except Exception as e:
             raise e
 
     @xray_recorder.capture('datastore.DailyPlanDatastore._query_mongodb')
-    def _query_mongodb(self, user_id, start_date, end_date, collection):
-        mongo_collection = get_mongo_collection(collection)
+    def _query_mongodb(self, user_id, start_date, end_date):
+        mongo_collection = get_mongo_collection(self.mongo_collection)
         query0 = {'user_id': user_id, 'date': {'$gte': start_date, '$lte': end_date}}
         # query1 = {'_id': 0, 'last_updated': 0, 'user_id': 0}
         mongo_cursor = mongo_collection.find(query0)
@@ -42,8 +43,8 @@ class DailyPlanDatastore(object):
         return ret
 
     @xray_recorder.capture('datastore.DailyPlanDatastore._put_mongodb')
-    def _put_mongodb(self, item, collection):
-        collection = get_mongo_collection(collection)
+    def _put_mongodb(self, item):
+        collection = get_mongo_collection(self.mongo_collection)
 
         practice_session_bson = ()
         cross_training_session_bson = ()
