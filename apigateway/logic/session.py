@@ -243,6 +243,7 @@ class RecoverySession(object):
         self.integrate_max_percentage = None
         self.start_time = None
         self.end_time = None
+        self.impact_score = 0
 
     def recommended_exercises(self):
         exercise_list = []

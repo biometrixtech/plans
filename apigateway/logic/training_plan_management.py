@@ -16,6 +16,24 @@ class TrainingPlanManager(object):
         self.athlete_dao = athlete_dao
         self.exercise_dao = exercise_dao
 
+    def calculate_am_impact_score(self, rpe, readiness, sleep_quality, max_soreness):
+
+        max_soreness_score = min(max_soreness, 5)
+        sleep_quality_score = min((sleep_quality / 10) * 3, 3)
+        readiness_score = min((readiness / 10) * 5, 5)
+        rpe_score = min((rpe / 10) * 4, 4)
+
+        return max(max_soreness_score, sleep_quality_score, readiness_score, rpe_score)
+
+    def calculate_pm_impact_score(self, rpe, readiness, sleep_quality, max_soreness):
+
+        max_soreness_score = min(max_soreness, 5)
+        sleep_quality_score = min((sleep_quality / 10) * 3, 3)
+        readiness_score = min((readiness / 10) * 3, 3)
+        rpe_score = min((rpe / 10) * 5, 5)
+
+        return max(max_soreness_score, sleep_quality_score, readiness_score, rpe_score)
+
     def create_daily_plan(self):
         last_daily_readiness_survey = self.athlete_dao.get_last_daily_readiness_survey()
 
@@ -36,15 +54,36 @@ class TrainingPlanManager(object):
 
         calc = exercise_mapping.ExerciseAssignmentCalculator(self.athlete_id, None, self.exercise_dao)
 
-        if daily_plan.recovery_am.start_time is not None:
+        soreness_values = [s.severity for s in soreness_list if s.severity is not None]
+        max_soreness = max(soreness_values)
+
+        am_impact_score = self.calculate_am_impact_score(
+                            last_post_session_survey.session_rpe,
+                            last_daily_readiness_survey.readiness,
+                            last_daily_readiness_survey.sleep_quality,
+                            max_soreness
+                            )
+
+        pm_impact_score = self.calculate_pm_impact_score(
+            last_post_session_survey.session_rpe,
+            last_daily_readiness_survey.readiness,
+            last_daily_readiness_survey.sleep_quality,
+            max_soreness
+        )
+
+        if daily_plan.recovery_am.start_time is not None and am_impact_score >= 0.5:
             daily_plan.recovery_am.set_exercise_target_minutes(soreness_list, 15)
             am_exercise_assignments = calc.create_exercise_assignments(daily_plan.recovery_am,
                                                                        soreness_list)
             daily_plan.recovery_am.update_from_exercise_assignments(am_exercise_assignments)
-        daily_plan.recovery_pm.set_exercise_target_minutes(soreness_list, 15)
-        pm_exercise_assignments = calc.create_exercise_assignments(daily_plan.recovery_pm,
-                                                                   soreness_list)
-        daily_plan.recovery_pm.update_from_exercise_assignments(pm_exercise_assignments)
+            daily_plan.recovery_am.impact_score = am_impact_score
+
+        if pm_impact_score >= 0.5:
+            daily_plan.recovery_pm.set_exercise_target_minutes(soreness_list, 15)
+            pm_exercise_assignments = calc.create_exercise_assignments(daily_plan.recovery_pm,
+                                                                       soreness_list)
+            daily_plan.recovery_pm.update_from_exercise_assignments(pm_exercise_assignments)
+            daily_plan.recovery_pm.impact_score = pm_impact_score
 
         for scheduled_session in scheduled_sessions:
             daily_plan.add_scheduled_session(scheduled_session)

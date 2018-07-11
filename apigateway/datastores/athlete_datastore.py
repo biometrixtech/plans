@@ -105,6 +105,7 @@ class DailyPlanDatastore(object):
         exercise_bson = ()
         for recovery_exercise in recovery_session.recommended_exercises():
             exercise_bson += ({'name': recovery_exercise.exercise.name,
+                               'position_order': recovery_exercise.position_order,
                                'reps_assigned': recovery_exercise.reps_assigned,
                                'sets_assigned': recovery_exercise.sets_assigned,
                                'seconds_duration': recovery_exercise.duration()
@@ -112,6 +113,7 @@ class DailyPlanDatastore(object):
         recovery_bson = ({'minutes_duration': recovery_session.duration_minutes,
                           'start_time': str(recovery_session.start_time),
                           'end_time': str(recovery_session.end_time),
+                          'impact_score': recovery_session.impact_score,
                           'exercises': exercise_bson
                           })
 
