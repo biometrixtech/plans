@@ -136,35 +136,3 @@ class WeeklyTrainingDatastore(object):
         return item
 
 
-class DailyPlanDatastore(object):
-    def get(self, user_id=None, start_date=None, end_date=None, collection=None):
-        return self._query_mongodb(user_id, start_date, end_date, collection)
-
-    def put(self, items, collection):
-        pass
-
-    @xray_recorder.capture('datastore.DailyPlanDatastore._query_mongodb')
-    def _query_mongodb(self, user_id, start_date, end_date, collection):
-        mongo_collection = get_mongo_collection(collection)
-        query0 = {'user_id': user_id, 'date': {'$gte': start_date, '$lte': end_date}}
-        query1 = {'_id': 0, 'last_updated': 0, 'user_id': 0}
-        mongo_cursor = mongo_collection.find(query0, query1)
-        ret = []
-        for plan in mongo_cursor:
-            ret.append(self.item_to_output(plan))
-        return ret
-
-    @xray_recorder.capture('datastore.DailyPlanDatastore._put_mongodb')
-    def _put_mongodb(self, item, collection):
-        pass
-
-    @staticmethod
-    def item_to_output(dailyplan):
-        item = {
-            'date': dailyplan['date'],
-            'practice': dailyplan['practice_sessions'],
-            'recovery_am': dailyplan['recovery_am'],
-            'recovery_pm': dailyplan['recovery_pm']
-        }
-        return item
-
