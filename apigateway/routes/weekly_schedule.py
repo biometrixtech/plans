@@ -1,16 +1,12 @@
 from aws_xray_sdk.core import xray_recorder
 from flask import request, Blueprint
 import json
-import os
 import datetime
-import jwt
-# import uuid
 
-# from auth import get_accessory_id_from_auth
-from datastore import WeeklyCrossTrainingDatastore, WeeklyTrainingDatastore
 from decorators import authentication_required
 from exceptions import InvalidSchemaException
-from models.weekly_schedule import WeeklyCrossTrainingSchedule, WeeklyTrainingSchedule, WeeklySchedule
+from datastores.athlete_datastore import WeeklyCrossTrainingDatastore, WeeklyTrainingDatastore
+from models.weekly_schedule import WeeklySchedule
 from logic.athlete import SportName
 
 
@@ -33,16 +29,16 @@ def handle_crosstraining_schedule_create():
         monday_delta =  7 - today_weekday
     week_start = (today + datetime.timedelta(days=monday_delta)).strftime("%Y-%m-%d")
 
-    cross_training = WeeklyCrossTrainingSchedule(
-        days_of_week=request.json['days_of_week'],
-        activities=request.json['activities'],
-        duration=request.json['duration'],
-    )
+    cross_training = {
+                        "days_of_week": request.json['days_of_week'],
+                        "activities": request.json['activities'],
+                        "duration": request.json['duration'],
+                    }
 
     schedule = WeeklySchedule(
         user_id=request.json['user_id'],
         week_start=week_start,
-        cross_training=cross_training.json_serialise())
+        cross_training=cross_training)
     store = WeeklyCrossTrainingDatastore()
 
     store.put(schedule, collection='training')

@@ -250,6 +250,83 @@ Authorization: eyJraWQ...ajBc4VQ
 ```
 
 
+### Daily Plans
+
+#### Get daily plan
+
+##### Query String
+The client __must__ submit a request to the endpoint `/plans/daily_plan`. The request method __must__ be `POST`.
+
+##### Request
+The client __must__ submit a request body containing a JSON object with the following schema:
+```
+{
+	"user_id": Uuid,
+	"start_date": string,
+	"end_date": string
+}
+```
+* `start_date` __should__ should be of format `yyyy-mm-dd`
+* `end_date` __should__ should be of format `yyyy-mm-dd` but is __optional__
+
+```
+POST /plans/daily_plan HTTPS/1.1
+Host: apis.env.fathomai.com
+Content-Type: application/json
+Authorization: eyJraWQ...ajBc4VQ
+
+{
+	"user_id": "test_user",
+	"start_date": "2018-06-26",
+	"end_date": "2018-06-27"
+}
+```
+##### Responses
+ 
+ If the write was successful, the Service __will__ respond with HTTP Status `200 OK`, with a body with the following syntax:
+ 
+```
+{
+    "daily_plans": [daily_plan1, daily_plan2]
+}
+```
+* `daily_plans` __could__ be emply list
+* each `daily_plan*` will be of following syntax:
+```
+{
+    "date": "2018-06-27",
+    "practice_sessions": [
+        practice1,
+        practice2
+    ],
+    "recovery_am": {
+        "minutes_duration": 13.366666666666667,
+        "start_time": "2018-06-27 00:00:00",
+        "end_time": "2018-06-27 12:00:00",
+        "exercises": [
+            exercise1,
+            exercise2,
+        ],
+    },
+    "recovery_pm": {
+        "start_time": "2018-06-27 12:00:00",
+        "end_time": "2018-06-28 00:00:00",
+        "minutes_duration": 13.366666666666667,
+        "exercises": [
+            exercise1,
+            exercise2,
+        ],
+    },
+    "strength_conditioning_sessions": [],
+    "games": [],
+    "tournaments": [],
+    "bump_up_sessions": [],
+    "corrective_sessions": []
+}
+```
+
+
+
 
 ### Hello
 

@@ -1,6 +1,7 @@
 from aws_xray_sdk.core import xray_recorder
 from config import get_mongo_collection
 from logic.training import DailyPlan
+from models.weekly_schedule import WeeklySchedule
 
 class DailyPlanDatastore(object):
     def get(self, user_id=None, start_date=None, end_date=None, collection=None):
@@ -23,20 +24,20 @@ class DailyPlanDatastore(object):
         mongo_cursor = mongo_collection.find(query0)
         ret = []
         for plan in mongo_cursor:
-            ret.append(self.item_to_response(plan))
-            # daily_plan = DailyPlan(date=plan['date'])
-            # daily_plan.practice_sessions = plan.get('practice_sessions', [])
-            # daily_plan.strength_conditioning_sessions = plan.get('cross_training_sessions', [])
-            # daily_plan.games = plan.get('game_sessions', [])
-            # daily_plan.tournaments = plan.get('tournament_sessions', [])
-            # daily_plan.recovery_am = plan.get('recovery_am', [])
-            # daily_plan.recovery_pm = plan.get('recovery_pm', [])
-            # daily_plan.corrective_sessions = plan.get('corrective_sessions', [])
-            # daily_plan.bump_up_sessions = plan['bump_up_sessions']
-            # daily_plan.daily_readiness_survey = plan.get('daily_readiness_survey', None)
-            # daily_plan.updated = plan.get('updated', None)
-            # daily_plan.last_updated = plan.get('last_update', None)
-            # ret.append(daily_plan)
+            # ret.append(self.item_to_response(plan))
+            daily_plan = DailyPlan(date=plan['date'])
+            daily_plan.practice_sessions = plan.get('practice_sessions', [])
+            daily_plan.strength_conditioning_sessions = plan.get('cross_training_sessions', [])
+            daily_plan.games = plan.get('game_sessions', [])
+            daily_plan.tournaments = plan.get('tournament_sessions', [])
+            daily_plan.recovery_am = plan.get('recovery_am', [])
+            daily_plan.recovery_pm = plan.get('recovery_pm', [])
+            daily_plan.corrective_sessions = plan.get('corrective_sessions', [])
+            daily_plan.bump_up_sessions = plan['bump_up_sessions']
+            daily_plan.daily_readiness_survey = plan.get('daily_readiness_survey', None)
+            daily_plan.updated = plan.get('updated', None)
+            daily_plan.last_updated = plan.get('last_update', None)
+            ret.append(daily_plan)
         return ret
 
     @xray_recorder.capture('datastore.DailyPlanDatastore._put_mongodb')
@@ -86,21 +87,6 @@ class DailyPlanDatastore(object):
                                'recovery_pm': pm_recovery_bson,
                                'last_updated': item.last_updated})
 
-    @staticmethod
-    def item_to_response(daily_plan):
-        item = {
-            'date': daily_plan['date'],
-            'practice_sessions': daily_plan.get('practice_sessions', []),
-            'recovery_am': daily_plan.get('recovery_am',[]),
-            'recovery_pm': daily_plan.get('recovery_pm', []),
-            'games': daily_plan.get('game_sessions', []),
-            'tournaments': daily_plan.get('tournament_sessions', []),
-            'strength_conditioning_sessions': daily_plan.get('cross_training_sessions', []),
-            'corrective_sessions': daily_plan.get('corrective_sessions', []),
-            'bump_up_sessions': daily_plan.get('bump_up_sessions', []),
-        }
-        return item
-
     def get_recovery_bson(self, recovery_session):
         exercise_bson = ()
         for recovery_exercise in recovery_session.recommended_exercises():
@@ -118,3 +104,68 @@ class DailyPlanDatastore(object):
                           })
 
         return recovery_bson
+
+
+class WeeklyScheduleDatastore(object):
+    @xray_recorder.capture('datastore.WeeklyScheduleDatastore.get')
+    def get(self, user_id=None, week_start=None, collection=None):
+        return self._query_mongodb(user_id, week_start, collection)
+
+    @xray_recorder.capture('datastore.WeeklyScheduleDatastore.put')
+    def put(self, items, collection):
+        if not isinstance(items, list):
+            items = [items]
+        try:
+            for item in items:
+                self._put_mongodb(item, collection)
+        except Exception as e:
+            raise e
+    @xray_recorder.capture('datastore.WeeklyScheduleDatastore._query_mongodb')
+    def _query_mongodb(self, user_id, week_start, collection):
+        mongo_collection = get_mongo_collection(collection)
+        query = {'user_id': user_id, 'week_start': week_start}
+        cursor = mongo_collection.find(query)
+        ret = []
+        for schedule in cursor:
+            weekly_schedule = WeeklySchedule(user_id=schedule['user_id'],
+                                             week_start=schedule['week_start'],
+                                             cross_training=schedule['cross_training'],
+                                             sports=schedule['sports'])
+            ret.append(weekly_schedule)
+        return ret
+
+    @staticmethod
+    def item_to_mongodb(weeklytraining):
+        item = {
+            'user_id': weeklytraining.user_id,
+            'week_start': weeklytraining.week_start,
+            'cross_training': weeklytraining.cross_training,
+            'sports': weeklytraining.sports,
+        }
+        return item
+
+
+class WeeklyCrossTrainingDatastore(WeeklyScheduleDatastore):
+    @xray_recorder.capture('datastore.WeeklyCrossTrainingDatastore._put_mongodb')
+    def _put_mongodb(self, item, collection):
+        item = self.item_to_mongodb(item)
+        mongo_collection = get_mongo_collection(collection)
+        query = {'user_id': item['user_id'], 'week_start': item['week_start']}
+        record = self.get(item['user_id'], item['week_start'], collection)
+        if len(record) == 0:
+            mongo_collection.insert_one(item)
+        elif len(record) == 1:
+            mongo_collection.update_one(query, {'$set': {'cross_training': item['cross_training']}}, upsert=False)
+
+
+class WeeklyTrainingDatastore(WeeklyScheduleDatastore):
+    @xray_recorder.capture('datastore.WeeklyTrainingDatastore._put_mongodb')
+    def _put_mongodb(self, item, collection):
+        item = self.item_to_mongodb(item)
+        mongo_collection = get_mongo_collection(collection)
+        query = {'user_id': item['user_id'], 'week_start': item['week_start']}
+        record = self.get(item['user_id'], item['week_start'], collection)
+        if len(record) == 0:
+            mongo_collection.insert_one(item)
+        elif len(record) == 1:
+            mongo_collection.update_one(query, {'$set': {'sports': item['sports']}}, upsert=False)
