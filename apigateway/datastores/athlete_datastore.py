@@ -1,6 +1,7 @@
 from aws_xray_sdk.core import xray_recorder
 from config import get_mongo_collection
 from logic.training import DailyPlan
+from models.weekly_schedule import WeeklySchedule
 
 class DailyPlanDatastore(object):
     def get(self, user_id=None, start_date=None, end_date=None, collection=None):
