@@ -2,7 +2,7 @@ from aws_xray_sdk.core import xray_recorder
 from config import get_mongo_collection
 from datastores.daily_plan_datastore import DailyPlanDatastore
 from logic.training import DailyPlan
-from logic.session import SessionType
+from logic.session import SessionType, SessionFactory
 
 class PostSessionSurveyDatastore(object):
     mongo_collection = 'dailyplan'
@@ -30,7 +30,6 @@ class PostSessionSurveyDatastore(object):
         daily_plan = daily_plan_store.get(user_id=item.user_id,
                                           start_date=item.event_date,
                                           end_date=item.event_date)
-
         session_type = item.session_type
         if session_type == 0:
             session_type_name = 'practice_sessions'
@@ -46,17 +45,27 @@ class PostSessionSurveyDatastore(object):
             session_type_name = 'corrective_sessions'
 
         plan = daily_plan[0]
-#        print(dir(plan))
         sessions = getattr(plan, session_type_name)
-#        match = False
-        for session in sessions:
-            if session['session_id'] == item.session_id:
-                session['post_session_survey'] = item.survey.json_serialise()
+        if item.session_id is not None:
+            for session in sessions:
+                if session['session_id'] == item.session_id:
+                    session['post_session_survey'] = item.survey.json_serialise()
+                    break
+        else:
+            session = SessionFactory()
+            session = session.create(SessionType(item.session_type))
+            session_json = {'session_id': str(session.id),
+                            'post_session_survey': item.survey.json_serialise()
+                           }
+            sessions.append(session_json)
+
+        if session_type == 1:
+            session_type_name = 'cross_training_sessions'
+        elif session_type == 2:
+            session_type_name = 'game_sessions'
+        elif session_type == 3:
+            session_type_name = 'tournament_sessions'
         
         mongo_collection = get_mongo_collection(self.mongo_collection)
         query = {"user_id": item.user_id, "date": item.event_date}
         mongo_collection.update_one(query, {'$set': {session_type_name: sessions}})
-#        setattr(plan, session_type_name, sessions)
-#        daily_plan_store.put(daily_plan)
-#        return daily_plan
-

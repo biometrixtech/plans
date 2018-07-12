@@ -51,7 +51,7 @@ class PostSurvey(Serialisable):
     def json_serialise(self):
         ret = {
             'RPE': self.RPE,
-            'sorness': [self.soreness_to_dict(item) for item in self.soreness]
+            'soreness': [self.soreness_to_dict(item) for item in self.soreness]
         }
         return ret
 
