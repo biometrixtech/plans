@@ -94,6 +94,26 @@ class Session(metaclass=abc.ABCMeta):
             return True
 
 
+class SessionFactory(object):
+
+    def create(self, session_type: SessionType):
+
+        if session_type == SessionType.practice:
+            session_object = PracticeSession()
+        elif session_type == SessionType.game:
+            session_object = Game()
+        elif session_type == SessionType.bump_up:
+            session_object = BumpUpSession()
+        elif session_type == SessionType.strength_and_conditioning:
+            session_object = StrengthConditioningSession()
+        elif session_type == SessionType.tournament:
+            session_object = Tournament()
+
+        session_object.id = uuid.uuid4()
+
+        return session_object
+
+
 class BumpUpSession(Session):
     def __init__(self):
         Session.__init__(self)
