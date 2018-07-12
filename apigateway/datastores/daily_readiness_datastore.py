@@ -44,6 +44,8 @@ class DailyReadinessDatastore(object):
         item = {
             'event_date': dailyreadiness.event_date,
             'user_id': dailyreadiness.user_id,
+            # TODO: this needs to be reconciled so that soreness if input is the same as soreness in output
+            # currently there's discrepency in what the two objects are.
             'soreness': dailyreadiness.soreness, #[s.json_serialise() for s in dailyreadiness.soreness],
             'sleep_quality': dailyreadiness.sleep_quality,
             'readiness': dailyreadiness.readiness,
