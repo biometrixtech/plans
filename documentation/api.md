@@ -325,6 +325,61 @@ Authorization: eyJraWQ...ajBc4VQ
 }
 ```
 
+### Training Seasons
+
+#### athlete seasons
+
+##### Query String
+The client __must__ submit a request to the endpoint `/plans/athlete_seasons`. The request method __must__ be `POST`.
+
+##### Request
+The client __must__ submit a request body containing a JSON object with the following schema:
+```
+{
+	"user_id": Uuid,
+	"seasons": [season1, season2]
+}
+```
+* `season` object __should__ be of following shcema:
+```
+{
+	"sport": string,
+	"competition_level": string,
+	"start_date": string,
+	"end_date": string,
+	"positions": [string, string]
+}
+```
+* `start_date` and `end_date` __should__ be of format `yyyy-mm`
+
+
+```
+POST /plans/athlete_seasons HTTPS/1.1
+Host: apis.env.fathomai.com
+Content-Type: application/json
+Authorization: eyJraWQ...ajBc4VQ
+
+{
+    "user_id": "02cb7965-7921-493a-80d4-6b278c928fad",
+    "seasons": [
+            {
+               "sport": "soccer",
+               "competition_level":  "NCAA div 1",
+               "start_date": "2018-06",
+               "end_date": "2018-09",
+               "positions": ["forward"]
+               }
+            ]
+}
+```
+##### Responses
+ If the write was successful, the Service __will__ respond with HTTP Status `201 Created`, with a body with the following syntax:
+ 
+```
+{
+    "message": "success"
+}
+```
 
 
 

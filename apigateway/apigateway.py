@@ -50,6 +50,10 @@ from routes.daily_plan import app as daily_plan_routes
 app.register_blueprint(daily_plan_routes, url_prefix='/plans/daily_plan')
 
 
+from routes.athlete_season import app as athlete_season_routes
+app.register_blueprint(athlete_season_routes, url_prefix='/plans/athlete_season')
+
+
 @app.errorhandler(500)
 def handle_server_error(e):
     tb = sys.exc_info()[2]
