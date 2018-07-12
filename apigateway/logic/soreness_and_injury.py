@@ -1,6 +1,6 @@
 from enum import Enum, IntEnum
 from utils import parse_datetime
-
+import datetime
 
 class SorenessType(Enum):
     muscle_related = 0
@@ -128,6 +128,9 @@ class DailyReadinessSurvey(object):
         self.soreness = []  # dailysoreness object array
         self.sleep_quality = None
         self.readiness = None
+
+    def get_event_date(self):
+        return datetime.datetime.strptime(self.report_date_time, "%Y-%m-%dT%H:%M:%S.%fZ")
 
 
 class PostSessionSurvey(object):

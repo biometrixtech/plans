@@ -3,8 +3,10 @@ import logic.training as training
 import datetime
 import logic.training_plan_management as training_plan_management
 import athlete_data_access_mocks
-import datastores.exercise_datastore as exercise_datastore
-from datastores.daily_plan_datastore import DailyPlanDatastore
+#import datastores.exercise_datastore as exercise_datastore
+from mocks.mock_daily_plan_datastore import DailyPlanDatastore
+from mocks.mock_daily_readiness_datastore import DailyReadinessDatastore
+from mocks.mock_daily_schedule_datastore import DailyScheduleDatastore
 
 '''
 
@@ -107,13 +109,9 @@ def test_daily_plan_am_recovery_has_practice_session():
 
 def test_create_plan():
     manager = \
-        training_plan_management.TrainingPlanManager("test_user",
-                                                     athlete_data_access_mocks.AthleteDataAccessMorningPractice("test_user"),
-                                                     exercise_datastore)
-    daily_plan = manager.create_daily_plan()
-    daily_plan.last_updated = datetime.datetime(2018, 6, 27, 11, 30, 0)
-    athlete_dao = DailyPlanDatastore()
-    athlete_dao.put(daily_plan)
-    assert None is not daily_plan
+        training_plan_management.TrainingPlanManager("morning_practice", DailyReadinessDatastore(),
+                                                     DailyScheduleDatastore(), DailyPlanDatastore())
+    success = manager.create_daily_plan()
+    assert True is success
 
 

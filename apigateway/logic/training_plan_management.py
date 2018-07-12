@@ -5,16 +5,18 @@ import datetime
 import logic.exercise as exercise
 import logic.exercise_mapping as exercise_mapping
 from logic.soreness_and_injury import SorenessCalculator
-from datastores.daily_readiness_datastore import DailyReadinessDatastore
-from datastores.daily_schedule_datastore import DailyScheduleDatastore
+#from datastores.daily_readiness_datastore import DailyReadinessDatastore
+#from datastores.daily_schedule_datastore import DailyScheduleDatastore
 from utils import parse_datetime
 
 
 class TrainingPlanManager(object):
 
-    def __init__(self, athlete_id):
+    def __init__(self, athlete_id, daily_readiness_datastore, daily_schedule_datastore, daily_plan_datastore):
         self.athlete_id = athlete_id
-        # self.athlete_dao = AthleteDataAccess(athlete_id)
+        self.daily_readiness_datastore = daily_readiness_datastore
+        self.daily_schedule_datastore = daily_schedule_datastore
+        self.daily_plan_datastore = daily_plan_datastore
 
     def calculate_am_impact_score(self, rpe, readiness, sleep_quality, max_soreness):
 
@@ -35,7 +37,7 @@ class TrainingPlanManager(object):
         return max(max_soreness_score, sleep_quality_score, readiness_score, rpe_score)
 
     def create_daily_plan(self):
-        last_daily_readiness_survey = DailyReadinessDatastore().get(self.athlete_id)
+        last_daily_readiness_survey = self.daily_readiness_datastore.get(self.athlete_id)
 
         last_post_session_surveys = []
         #    self.athlete_dao.get_last_post_session_surveys(last_daily_readiness_survey.get_event_date(),
@@ -49,7 +51,7 @@ class TrainingPlanManager(object):
             last_daily_readiness_survey.get_event_date()
         )
 
-        scheduled_sessions = DailyScheduleDatastore.get(last_daily_readiness_survey.get_event_date())
+        scheduled_sessions = self.daily_schedule_datastore.get(self.athlete_id, last_daily_readiness_survey.get_event_date())
 
         daily_plan = training.DailyPlan(last_daily_readiness_survey.get_event_date())
         daily_plan.athlete_id = self.athlete_id
@@ -101,7 +103,11 @@ class TrainingPlanManager(object):
         for scheduled_session in scheduled_sessions:
             daily_plan.add_scheduled_session(scheduled_session)
 
-        return daily_plan
+        daily_plan.last_updated = parse_datetime(datetime.datetime.utcnow())
+
+        self.daily_plan_datastore.put(daily_plan)
+
+        return True
 
     def create_training_cycle(self, athlete_schedule, athlete_injury_history):
         # schedule_manager = schedule.ScheduleManager()
