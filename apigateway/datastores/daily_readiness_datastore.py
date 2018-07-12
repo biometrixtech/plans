@@ -71,5 +71,6 @@ def _soreness_from_mongodb(soreness_mongo_result, parent_mongo_result):
     soreness = DailySoreness()
     soreness.body_part = BodyPart(BodyPartLocation(soreness_mongo_result['body_part']), None)
     soreness.severity = soreness_mongo_result['severity']
+    soreness.side = soreness_mongo_result['side']
     soreness.reported_date_time = parent_mongo_result['event_date']
     return soreness
