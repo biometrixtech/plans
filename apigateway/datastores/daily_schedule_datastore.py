@@ -3,11 +3,10 @@ from config import get_mongo_collection
 from datetime import date, datetime, timedelta
 import logic.session as session
 import uuid
-from models.weekly_schedule import WeeklySchedule
 
 
 class DailyScheduleDatastore(object):
-    #@xray_recorder.capture('datastore.DailyScheduleDatastore.get')
+    @xray_recorder.capture('datastore.DailyScheduleDatastore.get')
     def get(self, user_id=None, target_date=date.today().strftime('%Y-%m-%d'), collection='training'):
         return self._query_mongodb(user_id, target_date, collection)
 
@@ -15,7 +14,7 @@ class DailyScheduleDatastore(object):
     def put(self, items, collection):
         pass
 
-    #@xray_recorder.capture('datastore.DailyScheduleDatastore._query_mongodb')
+    @xray_recorder.capture('datastore.DailyScheduleDatastore._query_mongodb')
     def _query_mongodb(self, user_id, target_date, collection):
 
         scheduled_sessions = []
