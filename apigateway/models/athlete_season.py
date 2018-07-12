@@ -41,3 +41,8 @@ class Season(Serialisable):
                 "end_date" : self.end_date
                }
         return ret
+
+    def is_similar(self, season):
+        return self.sport == season.sport and \
+               self.competition_level==season.competition_level and \
+               self.start_date == season.start_date

@@ -6,7 +6,7 @@ import datetime
 from decorators import authentication_required
 from exceptions import InvalidSchemaException
 from datastores.season_datastore import AthleteSeasonDatastore
-from models.season import AthleteSeason, Season
+from models.athlete_season import AthleteSeason, Season
 
 
 app = Blueprint('athlete_season', __name__)
