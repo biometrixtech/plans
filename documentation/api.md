@@ -77,7 +77,7 @@ Content-Type: application/json
 Authorization: eyJraWQ...ajBc4VQ
 
 {
-	"date_time": "2018-07-03 10:42:20.1234",
+	"date_time": "2018-07-03T10:42:20Z",
 	"user_id":"02cb7965-7921-493a-80d4-6b278c928fad",
 	"soreness":[
 			{"body_part": 8, "severity": 2},
@@ -104,24 +104,17 @@ This endpoint can be called to get the body parts where soreness was reported in
 
 ##### Query String
  
-The client __must__ submit a request to the endpoint `/plans/daily_readiness/previous`. The request method __must__ be `POST`.
+The client __must__ submit a request to the endpoint `/plans/daily_readiness/previous`. The request method __must__ be `GET`.
 
 ##### Request
-The client __must__ submit a request body containing a JSON object with the following schema:
-```
-{
-	"user_id": Uuid
-}
-```
+This request does not require a body.
+
 
 ```
-POST /plans/daily_readiness/previous HTTPS/1.1
+GET /plans/daily_readiness/previous HTTPS/1.1
 Host: apis.env.fathomai.com
 Content-Type: application/json
 Authorization: eyJraWQ...ajBc4VQ
-{
-	"user_id":"02cb7965-7921-493a-80d4-6b278c928fad"
-}
 
 ```
 Authentication is required for this endpoint
