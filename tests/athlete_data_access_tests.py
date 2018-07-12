@@ -1,15 +1,16 @@
 import pytest
-import logic.athlete_data_access as athlete_data_access
+from datastores.daily_readiness_datastore import DailyReadinessDatastore
+from datastores.daily_schedule_datastore import DailyScheduleDatastore
 import logic.soreness_and_injury as soreness_and_injury
 
 
 def test_get_readiness_survey_test_data():
-    athlete_dao = athlete_data_access.AthleteDataAccess("02cb7965-7921-493a-80d4-6b278c928fad")
-    last_daily_readiness_survey = athlete_dao.get_last_daily_readiness_survey()
+    athlete_dao = DailyReadinessDatastore()
+    last_daily_readiness_survey = athlete_dao.get("02cb7965-7921-493a-80d4-6b278c928fad")
     assert None is not last_daily_readiness_survey
 
 
 def test_get_training_schedule_test_data():
-    athlete_dao = athlete_data_access.AthleteDataAccess("02cb7965-7921-493a-80d4-6b278c928fad")
-    scheduled_sessions = athlete_dao.get_scheduled_sessions("2018-06-27")
+    athlete_dao = DailyScheduleDatastore()
+    scheduled_sessions = athlete_dao.get("02cb7965-7921-493a-80d4-6b278c928fad", "2018-07-10")
     assert None is not scheduled_sessions

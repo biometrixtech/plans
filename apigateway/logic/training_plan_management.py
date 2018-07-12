@@ -1,6 +1,4 @@
 import logic.recovery as recovery
-from logic.athlete_data_access import AthleteDataAccess
-import logic.recovery_data_access as recovery_data_access
 import logic.training as training
 import logic.session as session
 import datetime
@@ -8,6 +6,7 @@ import logic.exercise as exercise
 import logic.exercise_mapping as exercise_mapping
 from logic.soreness_and_injury import SorenessCalculator
 from datastores.daily_readiness_datastore import DailyReadinessDatastore
+from datastores.daily_schedule_datastore import DailyScheduleDatastore
 from utils import parse_datetime
 
 
@@ -15,7 +14,7 @@ class TrainingPlanManager(object):
 
     def __init__(self, athlete_id):
         self.athlete_id = athlete_id
-        self.athlete_dao = AthleteDataAccess(athlete_id)
+        # self.athlete_dao = AthleteDataAccess(athlete_id)
 
     def calculate_am_impact_score(self, rpe, readiness, sleep_quality, max_soreness):
 
@@ -50,7 +49,7 @@ class TrainingPlanManager(object):
             last_daily_readiness_survey.get_event_date()
         )
 
-        scheduled_sessions = self.athlete_dao.get_scheduled_sessions(last_daily_readiness_survey.get_event_date())
+        scheduled_sessions = DailyScheduleDatastore.get(last_daily_readiness_survey.get_event_date())
 
         daily_plan = training.DailyPlan(last_daily_readiness_survey.get_event_date())
         daily_plan.athlete_id = self.athlete_id
@@ -211,6 +210,7 @@ class TrainingPlanManager(object):
 
         return start_time, end_time
 
+    '''Deprecated
     def get_recovery_sessions(self, trigger_date_time, soreness_list):
 
         # daily_readiness_survey = training_cycle.get_last_daily_readiness_survey()
@@ -238,6 +238,7 @@ class TrainingPlanManager(object):
 
         # return recovery_exercises
 
+    '''
 
     def recalculate_current_training_cycle(self, training_history):
 

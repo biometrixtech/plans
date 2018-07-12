@@ -8,7 +8,7 @@ from utils import format_datetime
 class DailyReadinessDatastore(object):
     mongo_collection = 'readiness'
 
-    @xray_recorder.capture('datastore.DailyReadinessDatastore.get')
+    #@xray_recorder.capture('datastore.DailyReadinessDatastore.get')
     def get(self, user_id):
         return self._query_mongodb(user_id)
 
@@ -21,7 +21,7 @@ class DailyReadinessDatastore(object):
         except Exception as e:
             raise e
 
-    @xray_recorder.capture('datastore.DailyReadinessDatastore._query_mongodb')
+    #@xray_recorder.capture('datastore.DailyReadinessDatastore._query_mongodb')
     def _query_mongodb(self, user_id):
         mongo_collection = get_mongo_collection(self.mongo_collection)
         query = {'user_id': user_id}

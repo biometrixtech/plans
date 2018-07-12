@@ -2,7 +2,6 @@ import pytest
 import logic.training as training
 import datetime
 import logic.training_plan_management as training_plan_management
-import logic.athlete_data_access as athlete_data_access
 import athlete_data_access_mocks
 import datastores.exercise_datastore as exercise_datastore
 from datastores.daily_plan_datastore import DailyPlanDatastore
