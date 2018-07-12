@@ -3,10 +3,10 @@ from serialisable import Serialisable
 class AthleteSeason(Serialisable):
     def __init__(self,
                  user_id,
-                 sports
+                 seasons
                  ):
         self.user_id = user_id
-        self.sports = sports
+        self.seasons = seasons
 
     def get_id(self):
         return self.user_id
@@ -16,17 +16,17 @@ class AthleteSeason(Serialisable):
 
     def json_serialise(self):
         ret = {"user_id": self.user_id,
-               "sports": self.sports}
+               "seasons": self.seasons}
         return ret
 
-class Sport(Serialisable):
+class Season(Serialisable):
     def __init__(self,
-                 name,
+                 sport,
                  competition_level,
                  positions,
                  start_date,
                  end_date):
-        self.name = name
+        self.sport = sport
         self.competition_level = competition_level
         self.positions = positions
         self.start_date = start_date
@@ -34,7 +34,7 @@ class Sport(Serialisable):
 
     def json_serialise(self):
         ret = {
-                "name": self.name,
+                "sport": self.sport,
                 "competition_level" : self.competition_level,
                 "positions" : self.positions,
                 "start_date" : self.start_date,

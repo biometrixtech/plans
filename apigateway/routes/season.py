@@ -6,7 +6,7 @@ import datetime
 from decorators import authentication_required
 from exceptions import InvalidSchemaException
 from datastores.season_datastore import AthleteSeasonDatastore
-from models.season import AthleteSeason, Sport
+from models.season import AthleteSeason, Season
 
 
 app = Blueprint('athlete_season', __name__)
@@ -16,19 +16,19 @@ app = Blueprint('athlete_season', __name__)
 @authentication_required
 @xray_recorder.capture('routes.athlete_season.create')
 def handle_season_create():
-    sports = []
-    for sport in request.json['sports']:
-        sports.append(Sport(name=sport['name'],
-                      competition_level=sport['competition_level'],
-                      positions=sport['positions'],
-                      start_date=sport['start_date'],
-                      end_date=sport['end_date'])
+    seasons = []
+    for season in request.json['seasons']:
+        seasons.append(Season(sport=season['sport'],
+                             competition_level=season['competition_level'],
+                             positions=season['positions'],
+                             start_date=season['start_date'],
+                             end_date=season['end_date'])
                      )       
-    season = AthleteSeason(user_id=request.json['user_id'],
-                           sports=sports)
+    athlete_season = AthleteSeason(user_id=request.json['user_id'],
+                                   seasons=seasons)
     store = AthleteSeasonDatastore()
 
-    store.put(season)
+    store.put(athlete_season)
 
     return {'message': 'success'}, 201
 
