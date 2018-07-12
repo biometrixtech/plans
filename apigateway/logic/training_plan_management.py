@@ -1,20 +1,21 @@
 import logic.recovery as recovery
-import logic.athlete_data_access as athlete_data_access
+from logic.athlete_data_access import AthleteDataAccess
 import logic.recovery_data_access as recovery_data_access
 import logic.training as training
 import logic.session as session
 import datetime
 import logic.exercise as exercise
 import logic.exercise_mapping as exercise_mapping
-import logic.soreness_and_injury as soreness_and_injury
+from logic.soreness_and_injury import SorenessCalculator
+from datastores.daily_readiness_datastore import DailyReadinessDatastore
+from utils import parse_datetime
 
 
 class TrainingPlanManager(object):
 
-    def __init__(self, athlete_id, athlete_dao, exercise_dao):
+    def __init__(self, athlete_id):
         self.athlete_id = athlete_id
-        self.athlete_dao = athlete_dao
-        self.exercise_dao = exercise_dao
+        self.athlete_dao = AthleteDataAccess(athlete_id)
 
     def calculate_am_impact_score(self, rpe, readiness, sleep_quality, max_soreness):
 
@@ -35,28 +36,27 @@ class TrainingPlanManager(object):
         return max(max_soreness_score, sleep_quality_score, readiness_score, rpe_score)
 
     def create_daily_plan(self):
-        last_daily_readiness_survey = self.athlete_dao.get_last_daily_readiness_survey()
+        last_daily_readiness_survey = DailyReadinessDatastore().get(self.athlete_id)
 
-        last_post_session_surveys = \
-            self.athlete_dao.get_last_post_session_surveys(last_daily_readiness_survey.report_date_time,
-                                                           last_daily_readiness_survey.report_date_time
-                                                           - datetime.timedelta(hours=48, minutes=0)
-                                                           )
+        last_post_session_surveys = []
+        #    self.athlete_dao.get_last_post_session_surveys(last_daily_readiness_survey.get_event_date(),
+        #                                                   last_daily_readiness_survey.get_event_date()
+        #                                                   - datetime.timedelta(hours=48, minutes=0)
+        #                                                   )
 
-        soreness_calc = soreness_and_injury.SorenessCalculator()
+        soreness_list = SorenessCalculator().get_soreness_summary_from_surveys(
+            last_daily_readiness_survey,
+            last_post_session_surveys,
+            last_daily_readiness_survey.get_event_date()
+        )
 
-        soreness_list = \
-            soreness_calc.get_soreness_summary_from_surveys(last_daily_readiness_survey, last_post_session_surveys,
-                                                            last_daily_readiness_survey.report_date_time)
+        scheduled_sessions = self.athlete_dao.get_scheduled_sessions(last_daily_readiness_survey.get_event_date())
 
-        scheduled_sessions = \
-            self.athlete_dao.get_scheduled_sessions(last_daily_readiness_survey.report_date_time.date())
-
-        daily_plan = training.DailyPlan(last_daily_readiness_survey.report_date_time.date())
+        daily_plan = training.DailyPlan(last_daily_readiness_survey.get_event_date())
         daily_plan.athlete_id = self.athlete_id
-        daily_plan = self.add_recovery_times(last_daily_readiness_survey.report_date_time, daily_plan)
+        daily_plan = self.add_recovery_times(last_daily_readiness_survey.get_event_date(), daily_plan)
 
-        calc = exercise_mapping.ExerciseAssignmentCalculator(self.athlete_id, None, self.exercise_dao)
+        calc = exercise_mapping.ExerciseAssignmentCalculator(self.athlete_id)
 
         soreness_values = [s.severity for s in soreness_list if s.severity is not None]
         if soreness_values is not None and len(soreness_values) > 0:

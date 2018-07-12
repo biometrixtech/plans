@@ -1,4 +1,5 @@
 from enum import Enum, IntEnum
+from utils import parse_datetime
 
 
 class SorenessType(Enum):
@@ -144,12 +145,18 @@ class SorenessCalculator(object):
 
     def get_soreness_summary_from_surveys(self, last_daily_readiness_survey, last_post_session_surveys,
                                           trigger_date_time):
+        """
+        :param last_daily_readiness_survey: DailyReadiness
+        :param last_post_session_survey:
+        :param trigger_date_time: datetime
+        :return:
+        """
 
         soreness_list = []
 
         if last_daily_readiness_survey is not None:
 
-            daily_readiness_survey_age = trigger_date_time - last_daily_readiness_survey.report_date_time
+            daily_readiness_survey_age = trigger_date_time - last_daily_readiness_survey.get_event_date()
 
             if daily_readiness_survey_age.total_seconds() <= 172800:  # within 48 hours so valid
                 for s in last_daily_readiness_survey.soreness:
@@ -159,7 +166,7 @@ class SorenessCalculator(object):
 
             for last_post_session_survey in last_post_session_surveys:
 
-                last_post_session_survey_age = trigger_date_time - last_post_session_survey.report_date_time
+                last_post_session_survey_age = trigger_date_time - last_post_session_survey.get_event_date()
 
                 if last_post_session_survey_age.total_seconds() <= 172800:  # within 48 hours so valid
 

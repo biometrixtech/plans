@@ -3,7 +3,7 @@ from flask import request, Blueprint
 import json
 import datetime
 
-from datastores.athlete_datastore import DailyPlanDatastore
+from datastores.daily_plan_datastore import DailyPlanDatastore
 from decorators import authentication_required
 from exceptions import InvalidSchemaException
 
@@ -23,7 +23,7 @@ def handle_daily_plan_get():
     else:
         end_date = start_date
     store = DailyPlanDatastore()
-    items = store.get(user_id, start_date, end_date, collection='dailyplan')
+    items = store.get(user_id, start_date, end_date)
     daily_plans = []
     for plan in items:
         daily_plans.append(item_to_json(plan))
