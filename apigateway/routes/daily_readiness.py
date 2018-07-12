@@ -17,7 +17,7 @@ app = Blueprint('daily_readiness', __name__)
 @authentication_required
 @xray_recorder.capture('routes.daily_readiness.create')
 def handle_daily_readiness_create():
-    validate_data(request)
+    validate_data()
 
     daily_readiness = DailyReadiness(
         user_id=request.json['user_id'],
@@ -39,7 +39,7 @@ def handle_daily_readiness_get():
     store = DailyReadinessDatastore()
     user_id = jwt.decode(request.headers['Authorization'], verify=False)['user_id']
     daily_readiness = store.get(user_id=user_id)
-    return {'daily_readiness': daily_readiness}, 200
+    return {'body_parts': daily_readiness.json_serialise()['sore_body_parts']}, 200
 
 
 @xray_recorder.capture('routes.daily_readiness.validate')
