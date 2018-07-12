@@ -2,6 +2,8 @@ from aws_xray_sdk.core import xray_recorder
 from decorators import authentication_required
 from flask import Blueprint
 from datastores.daily_plan_datastore import DailyPlanDatastore
+from datastores.daily_schedule_datastore import DailyScheduleDatastore
+from datastores.daily_readiness_datastore import DailyReadinessDatastore
 from logic.training_plan_management import TrainingPlanManager
 from utils import format_datetime
 from serialisable import json_serialise
@@ -19,10 +21,10 @@ iotd_client = boto3.client('iot-data')
 @authentication_required
 @xray_recorder.capture('routes.athlete.daily_plan.create')
 def create_daily_plan(athlete_id):
-    daily_plan = TrainingPlanManager(athlete_id).create_daily_plan()
+    daily_plan = TrainingPlanManager(athlete_id, DailyReadinessDatastore(), DailyScheduleDatastore(),
+                                     DailyPlanDatastore()).create_daily_plan()
     daily_plan.last_updated = format_datetime(datetime.datetime.now())
 
-    DailyPlanDatastore().put(daily_plan)
     push_plan_update(athlete_id, daily_plan)
     return {'message': 'Update requested'}, 202
 
