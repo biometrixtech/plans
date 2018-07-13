@@ -66,6 +66,10 @@ from routes.athlete_season import app as athlete_season_routes
 app.register_blueprint(athlete_season_routes, url_prefix='/plans/athlete_season')
 
 
+from routes.post_session_survey import app as post_session_survey_routes
+app.register_blueprint(post_session_survey_routes, url_prefix='/plans/post_session_survey')
+
+
 @app.errorhandler(500)
 def handle_server_error(e):
     tb = sys.exc_info()[2]
