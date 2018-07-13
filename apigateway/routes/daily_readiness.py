@@ -2,6 +2,8 @@ from aws_xray_sdk.core import xray_recorder
 from flask import request, Blueprint
 import jwt
 import os
+import requests
+import asyncio
 
 from datastores.daily_readiness_datastore import DailyReadinessDatastore
 from decorators import authentication_required
@@ -9,7 +11,6 @@ from exceptions import InvalidSchemaException
 from models.daily_readiness import DailyReadiness
 from logic.soreness_and_injury import MuscleSorenessSeverity, BodyPartLocation
 from utils import parse_datetime
-import requests
 
 app = Blueprint('daily_readiness', __name__)
 
@@ -30,12 +31,7 @@ def handle_daily_readiness_create():
     store = DailyReadinessDatastore()
     store.put(daily_readiness)
 
-    endpoint = "https://apis.{}.fathomai.com/plans/athlete/{}/daily_plan".format(os.environ['ENVIRONMENT'], request.json['user_id'])
-    headers = {'Authorization': request.headers['Authorization'],
-                'Content-Type': 'applicaiton/json'}
- 
-    r = requests.post(url=endpoint, headers=headers)
-
+    asyncio.run(create_plan())
 
     return {'message': 'success'}, 201
 
@@ -88,3 +84,10 @@ def validate_data():
         raise InvalidSchemaException('Missing required parameter readiness')
     elif request.json['readiness'] not in range(1, 11):
         raise InvalidSchemaException('readiness need to be between 1 and 10')
+
+def create_plan():
+    endpoint = "https://apis.{}.fathomai.com/plans/athlete/{}/daily_plan".format(os.environ['ENVIRONMENT'], request.json['user_id'])
+    headers = {'Authorization': request.headers['Authorization'],
+                'Content-Type': 'applicaiton/json'}
+    r = requests.post(url=endpoint, headers=headers)
+
