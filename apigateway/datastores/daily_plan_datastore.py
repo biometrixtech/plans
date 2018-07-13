@@ -20,7 +20,7 @@ class DailyPlanDatastore(object):
         except Exception as e:
             raise e
 
-    #@xray_recorder.capture('datastore.DailyPlanDatastore._query_mongodb')
+    @xray_recorder.capture('datastore.DailyPlanDatastore._query_mongodb')
     def _query_mongodb(self, user_id, start_date, end_date):
         mongo_collection = get_mongo_collection(self.mongo_collection)
         query0 = {'user_id': user_id, 'date': {'$gte': start_date, '$lte': end_date}}
@@ -111,7 +111,8 @@ class DailyPlanDatastore(object):
                                'recovery_pm': pm_recovery_bson,
                                'last_updated': item.last_updated})
         '''
-        collection.insert_one(item.json_serialise())
+        query = {'user_id': item['user_id'], 'event_date': format_datetime(item['event_date'])}
+        collection.replace_one(query, item.json_serialise(), upsert=True)
 
     '''Deprecated
     def get_recovery_bson(self, recovery_session):
