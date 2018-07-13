@@ -51,7 +51,7 @@ def validate_input(request):
 
 def item_to_json(daily_plan):
     item = {
-        'date': daily_plan.date,
+        'date': daily_plan.event_date,
         'practice_sessions': daily_plan.practice_sessions,
         'recovery_am': daily_plan.recovery_am,
         'recovery_pm': daily_plan.recovery_pm,
