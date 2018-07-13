@@ -33,5 +33,5 @@ def create_daily_plan(athlete_id):
 def push_plan_update(user_id, daily_plan_outcome):
     iotd_client.publish(
         topic='plans/{}/athlete/{}/daily_plan'.format(os.environ['ENVIRONMENT'], user_id),
-        payload=json.dumps({'daily_plan': 'Plan Outcome:' + daily_plan_outcome}, default=json_serialise).encode()
+        payload=json.dumps({'daily_plan': 'Plan Outcome: ' + str(daily_plan_outcome)}, default=json_serialise).encode()
     )
