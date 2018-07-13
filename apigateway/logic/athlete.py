@@ -2,7 +2,7 @@ import abc
 from enum import Enum, IntEnum
 import logic.soreness_and_injury as soreness_and_injury
 import logic.exercise as exercise
-import logic.session as sesssion
+import models.exercise
 
 
 class Athlete(metaclass=abc.ABCMeta):
@@ -20,7 +20,7 @@ class Athlete(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def max_exercise_technical_difficulty(self):
-        return exercise.TechnicalDifficulty.beginner
+        return models.exercise.TechnicalDifficulty.beginner
 
 
 class AgeGroup(Enum):
@@ -54,7 +54,7 @@ class Sport(object):
         self.level = SportLevel.recreational
         self.season_start_date = None
         self.season_end_date = None
-        self.typical_schedule = session.Schedule()
+        # self.typical_schedule = session.Schedule()
 
 
 class SportName(Enum):
@@ -85,7 +85,7 @@ class YouthAthlete(Athlete):
         Athlete.__init__(self, level)
 
     def max_exercise_technical_difficulty(self):
-        return exercise.TechnicalDifficulty.beginner
+        return models.exercise.TechnicalDifficulty.beginner
 
 
 class CollegeAthlete(Athlete):
@@ -93,7 +93,7 @@ class CollegeAthlete(Athlete):
         Athlete.__init__(self, level)
     
     def max_exercise_technical_difficulty(self):
-        return exercise.TechnicalDifficulty.beginner
+        return models.exercise.TechnicalDifficulty.beginner
 
 
 class AdultAthlete(Athlete):
@@ -101,5 +101,5 @@ class AdultAthlete(Athlete):
         Athlete.__init__(self, level)
 
     def max_exercise_technical_difficulty(self):
-        return exercise.TechnicalDifficulty.beginner
+        return models.exercise.TechnicalDifficulty.beginner
 

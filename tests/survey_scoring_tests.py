@@ -1,5 +1,6 @@
 import pytest
 import logic.soreness_and_injury as soreness_and_injury
+from models.daily_readiness import DailyReadiness
 import datetime
 
 # 1 body part
@@ -18,7 +19,7 @@ def soreness_calculator():
 
 @pytest.fixture(scope="module")
 def readiness_survey_0_hours_ankle(severity_score):
-    survey = soreness_and_injury.DailyReadinessSurvey()
+    survey = DailyReadiness()
     survey.report_date_time = datetime.datetime(2018, 6, 27, 14, 30, 0)
 
     soreness_item = soreness_and_injury.DailySoreness()
@@ -30,7 +31,7 @@ def readiness_survey_0_hours_ankle(severity_score):
 
 @pytest.fixture(scope="module")
 def readiness_survey_0_hours_ankle_foot(severity_score_1, severity_score_2):
-    survey = soreness_and_injury.DailyReadinessSurvey()
+    survey = DailyReadiness()
     survey.report_date_time = datetime.datetime(2018, 6, 27, 14, 30, 0)
 
     soreness_item_1 = soreness_and_injury.DailySoreness()

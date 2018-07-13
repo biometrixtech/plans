@@ -2,6 +2,7 @@ import csv
 import pymongo
 import exercise
 import database_config  # not committed to source code, contains connection string
+import models.exercise
 
 exercises = []
 with open('Exercise_Library.csv', newline='') as csvfile:
@@ -10,7 +11,7 @@ with open('Exercise_Library.csv', newline='') as csvfile:
     for row in exercise_reader:
         if row_count > 0:
             if row[13] != "x":
-                exercise_item = exercise.Exercise(row[0])
+                exercise_item = models.exercise.Exercise(row[0])
                 exercise_item.name = row[1]
                 exercise_item.min_sets = int(row[15])
                 exercise_item.max_sets = int(row[16])

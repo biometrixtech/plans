@@ -1,4 +1,4 @@
-from logic.training import DailyPlan
+from models.daily_plan import DailyPlan
 
 
 class DailyPlanDatastore(object):

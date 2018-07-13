@@ -1,7 +1,7 @@
 from aws_xray_sdk.core import xray_recorder
 from config import get_mongo_collection
 from datetime import date, datetime, timedelta
-import logic.session as session
+import models.session as session
 import uuid
 
 
@@ -38,7 +38,7 @@ class DailyScheduleDatastore(object):
                     cross_training_session = session.StrengthConditioningSession()
                     cross_training_session.day_of_week = session.DayOfWeek(day_of_week)
                     cross_training_session.date = target_date
-                    cross_training_session.id = uuid.uuid4()
+                    cross_training_session.id = str(uuid.uuid4())
                     cross_training_session.duration_minutes = cross_training["duration"]
                     cross_training_session.description = ",".join(cross_training["activities"])
                     scheduled_sessions.append(cross_training_session)
@@ -53,7 +53,7 @@ class DailyScheduleDatastore(object):
                         practice_session = session.PracticeSession()
                         practice_session.day_of_week = session.DayOfWeek(day_of_week)
                         practice_session.date = target_date
-                        practice_session.id = uuid.uuid4()
+                        practice_session.id = str(uuid.uuid4())
                         practice_session.duration_minutes = practice["duration"]
                         practice_session.description = "Practice (" + sport["sport"] + ")"
                         scheduled_sessions.append(practice_session)
@@ -63,7 +63,7 @@ class DailyScheduleDatastore(object):
                         game_session = session.Game()
                         game_session.day_of_week = session.DayOfWeek(day_of_week)
                         game_session.date = target_date
-                        game_session.id = uuid.uuid4()
+                        game_session.id = str(uuid.uuid4())
                         game_session.duration_minutes = 0  # TODO: look up from internal data
                         game_session.description = "Competition (" + sport["sport"] + ")"
                         scheduled_sessions.append(game_session)

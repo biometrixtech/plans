@@ -1,6 +1,6 @@
 from aws_xray_sdk.core import xray_recorder
 from config import get_mongo_collection
-from logic.training import DailyPlan
+from models.daily_plan import DailyPlan
 
 
 class DailyPlanDatastore(object):
@@ -27,7 +27,7 @@ class DailyPlanDatastore(object):
         ret = []
         for plan in mongo_cursor:
             # ret.append(self.item_to_response(plan))
-            daily_plan = DailyPlan(date=plan['date'])
+            daily_plan = DailyPlan(event_date=plan['date'])
             daily_plan.practice_sessions = plan.get('practice_sessions', [])
             daily_plan.strength_conditioning_sessions = plan.get('cross_training_sessions', [])
             daily_plan.games = plan.get('game_sessions', [])
@@ -42,10 +42,11 @@ class DailyPlanDatastore(object):
             ret.append(daily_plan)
         return ret
 
-    @xray_recorder.capture('datastore.DailyPlanDatastore._put_mongodb')
+    #@xray_recorder.capture('datastore.DailyPlanDatastore._put_mongodb')
     def _put_mongodb(self, item):
         collection = get_mongo_collection(self.mongo_collection)
 
+        '''Deprecated
         practice_session_bson = ()
         cross_training_session_bson = ()
         game_session_bson = ()
@@ -88,7 +89,10 @@ class DailyPlanDatastore(object):
                                'recovery_am': am_recovery_bson,
                                'recovery_pm': pm_recovery_bson,
                                'last_updated': item.last_updated})
+        '''
+        collection.insert_one(item.json_serialise())
 
+    '''Deprecated
     def get_recovery_bson(self, recovery_session):
         exercise_bson = ()
         for recovery_exercise in recovery_session.recommended_exercises():
@@ -106,3 +110,4 @@ class DailyPlanDatastore(object):
                           })
 
         return recovery_bson
+    '''

@@ -120,7 +120,7 @@ class DaysMissedDueToInjury(IntEnum):
     one_three_months = 2
 '''
 
-
+''' Deprecated
 class DailyReadinessSurvey(object):
 
     def __init__(self):
@@ -131,7 +131,7 @@ class DailyReadinessSurvey(object):
 
     def get_event_date(self):
         return datetime.datetime.strptime(self.report_date_time, "%Y-%m-%dT%H:%M:%S.%fZ")
-
+'''
 
 class PostSessionSurvey(object):
 
