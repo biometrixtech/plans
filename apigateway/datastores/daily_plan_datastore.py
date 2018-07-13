@@ -1,6 +1,7 @@
 from aws_xray_sdk.core import xray_recorder
 from config import get_mongo_collection
 from models.daily_plan import DailyPlan
+import models.session as session
 from utils import  format_datetime, parse_datetime
 
 class DailyPlanDatastore(object):
@@ -18,7 +19,7 @@ class DailyPlanDatastore(object):
         except Exception as e:
             raise e
 
-    @xray_recorder.capture('datastore.DailyPlanDatastore._query_mongodb')
+    #@xray_recorder.capture('datastore.DailyPlanDatastore._query_mongodb')
     def _query_mongodb(self, user_id, start_date, end_date):
         mongo_collection = get_mongo_collection(self.mongo_collection)
         query0 = {'user_id': user_id, 'date': {'$gte': start_date, '$lte': end_date}}
@@ -30,17 +31,28 @@ class DailyPlanDatastore(object):
             # ret.append(self.item_to_response(plan))
             daily_plan = DailyPlan(event_date=plan['date'])
             daily_plan.user_id = plan.get('user_id', None)
-            daily_plan.practice_sessions = plan.get('practice_sessions', [])
-            daily_plan.strength_conditioning_sessions = plan.get('cross_training_sessions', [])
-            daily_plan.games = plan.get('game_sessions', [])
-            daily_plan.tournaments = plan.get('tournament_sessions', [])
+            daily_plan.practice_sessions = \
+                [_external_session_from_mongodb(s, session.SessionType.practice) for s in plan['practice_sessions']]
+            daily_plan.strength_conditioning_sessions = \
+                [_external_session_from_mongodb(s, session.SessionType.strength_and_conditioning)
+                 for s in plan['cross_training_sessions']]
+            daily_plan.games = \
+                [_external_session_from_mongodb(s, session.SessionType.game)
+                 for s in plan['game_sessions']]
+            # daily_plan.tournaments = \
+            #     [_external_session_from_mongodb(s, session.SessionType.tournament)
+            #      for s in plan['tournament_sessions']]
             daily_plan.recovery_am = plan.get('recovery_am', [])
             daily_plan.recovery_pm = plan.get('recovery_pm', [])
-            daily_plan.corrective_sessions = plan.get('corrective_sessions', [])
-            daily_plan.bump_up_sessions = plan['bump_up_sessions']
+            # daily_plan.corrective_sessions = \
+            #    [_external_session_from_mongodb(s, session.SessionType.corrective)
+            #     for s in plan['corrective_sessions']]
+            daily_plan.bump_up_sessions = \
+                [_external_session_from_mongodb(s, session.SessionType.bump_up)
+                 for s in plan['bump_up_sessions']]
             daily_plan.daily_readiness_survey = plan.get('daily_readiness_survey', None)
             daily_plan.updated = plan.get('updated', None)
-            daily_plan.last_updated = plan.get('last_update', None)
+            daily_plan.last_updated = plan.get('last_updated', None)
             ret.append(daily_plan)
 
         if len(ret) == 0:
@@ -119,3 +131,20 @@ class DailyPlanDatastore(object):
 
         return recovery_bson
     '''
+def _external_session_from_mongodb(mongo_result, session_type):
+
+    factory = session.SessionFactory()
+    mongo_session = factory.create(session_type)
+    mongo_session.id = mongo_result["session_id"]
+    mongo_session.description = _key_present("description", mongo_result)
+    mongo_session.data_transferred = _key_present("data_transferred", mongo_result)
+    mongo_session.duration_minutes = _key_present("duration_minutes", mongo_result)
+    mongo_session.post_session_survey = _key_present("post_session_survey", mongo_result)
+
+    return mongo_session
+
+def _key_present(key_name, dictionary):
+    if key_name in dictionary:
+        return dictionary[key_name]
+    else:
+        return ""
