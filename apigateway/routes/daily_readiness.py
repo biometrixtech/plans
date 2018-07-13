@@ -1,6 +1,7 @@
 from aws_xray_sdk.core import xray_recorder
 from flask import request, Blueprint
 import jwt
+import os
 
 from datastores.daily_readiness_datastore import DailyReadinessDatastore
 from decorators import authentication_required
