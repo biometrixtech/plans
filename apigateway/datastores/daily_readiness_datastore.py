@@ -27,6 +27,7 @@ class DailyReadinessDatastore(object):
         mongo_collection = get_mongo_collection(self.mongo_collection)
         query = {'user_id': user_id}
         mongo_result = mongo_collection.find_one(query, sort=[('event_date', -1)])
+        print(list(mongo_result))
         if len(mongo_result) == 1:
             return self.item_from_mongodb(mongo_result)
         else:

@@ -8,10 +8,9 @@ from exceptions import InvalidSchemaException
 from models.daily_readiness import DailyReadiness
 from logic.soreness_and_injury import MuscleSorenessSeverity, BodyPartLocation
 from utils import parse_datetime
-
+import requests
 
 app = Blueprint('daily_readiness', __name__)
-
 
 @app.route('/', methods=['POST'])
 @authentication_required
@@ -29,6 +28,14 @@ def handle_daily_readiness_create():
     )
     store = DailyReadinessDatastore()
     store.put(daily_readiness)
+
+    # endpoint = "https://apis.{}.fathomai.com/plans/athlete/{}/daily_plan".format(os.environ['ENVIRONMENT'], request.json['user_id'])
+    # headers = {'Authorization': request.headers['Authorization'],
+    #             'Content-Type': 'applicaiton/json'}
+ 
+    # r = requests.post(url=endpoint, headers=headers)
+
+
     return {'message': 'success'}, 201
 
 
