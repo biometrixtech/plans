@@ -7,8 +7,8 @@ from models.session import SessionType, SessionFactory
 class PostSessionSurveyDatastore(object):
     mongo_collection = 'dailyplan'
 
-    def get(self, user_id=None, event_date=None):
-        return self._query_mongodb(user_id, event_date)
+    def get(self, user_id=None, start_date=None, end_date=None):
+        return self._query_mongodb(user_id, start_date, end_date)
 
     def put(self, items):
         if not isinstance(items, list):
@@ -20,7 +20,7 @@ class PostSessionSurveyDatastore(object):
             raise e
 
     @xray_recorder.capture('datastore.PostSessionSurveyDatastore._query_mongodb')
-    def _query_mongodb(self, user_id, event_date):
+    def _query_mongodb(self, user_id, start_date, end_date):
         mongo_collection = get_mongo_collection(self.mongo_collection)
         pass
 
