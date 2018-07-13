@@ -23,9 +23,9 @@ iotd_client = boto3.client('iot-data')
 def create_daily_plan(athlete_id):
     daily_plan = TrainingPlanManager(athlete_id, DailyReadinessDatastore(), DailyScheduleDatastore(),
                                      DailyPlanDatastore()).create_daily_plan()
-    daily_plan.last_updated = format_datetime(datetime.datetime.now())
+    # daily_plan.last_updated = format_datetime(datetime.datetime.now())
 
-    push_plan_update(athlete_id, daily_plan)
+    # push_plan_update(athlete_id, daily_plan)
     return {'message': 'Update requested'}, 202
 
 
