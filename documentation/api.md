@@ -58,7 +58,7 @@ The client __must__ submit a request body containing a JSON object with the foll
 {
 	"date_time": Datetime,
 	"user_id": Uuid,
-	"soreness": [{"body_part": number, "severity": number}],
+	"soreness": [{"body_part": number, "severity": number, "side": number}],
 	"sleep_quality": number,
 	"readines": number
 }
@@ -67,6 +67,7 @@ The client __must__ submit a request body containing a JSON object with the foll
 * `soreness` __should__ reflect the number of body part that the user indicated soreness. Length __could__ be 0.
 * `body_part` __should__ be an integer between 0 and 17
 * `severity` __should__ be an integer between 1 and 5
+* `side` __should__ be an integer between 0 and 2
 * `sleep_quality` __should__ be an integer between 1 and 10
 * `readiness` __should__ be an integer between 1 and 10
 
@@ -80,8 +81,8 @@ Authorization: eyJraWQ...ajBc4VQ
 	"date_time": "2018-07-03T10:42:20Z",
 	"user_id":"02cb7965-7921-493a-80d4-6b278c928fad",
 	"soreness":[
-			{"body_part": 8, "severity": 2},
-			{"body_part": 14, "severity": 3}
+			{"body_part": 8, "severity": 2, "side": 0},
+			{"body_part": 14, "severity": 3, "side": 0}
 		   ],
 	"sleep_quality":4,
 	"readiness":10
@@ -125,10 +126,141 @@ Authentication is required for this endpoint
  
 ```
 {
-    "body_part": [number, number]
+    "body_parts": [
+    				{"body_part": number,
+    				 "side": number},
+    				{"body_part": number,
+    				 "side": number}
+    			  ]
 }
 ```
 * body_part will be a list of enumerated body parts (potentially empty).
+
+
+
+### Post-Session Survey
+
+#### Create
+
+This endpoint can be called to register a a post-session survey.
+
+##### Query String
+ 
+The client __must__ submit a request to the endpoint `/plans/post_session_survey`. The request method __must__ be `POST`.
+
+##### Request
+
+The client __must__ submit a request body containing a JSON object with the following schema:
+```
+{
+	"user_id": Uuid,
+	"event_date": Datetime,
+	"session_id": Uuid,
+	"session_type": number,
+	"survey": { "RPE": number,
+				"soreness": [
+							 {"body_part": number,
+							  "severity": number,
+							  "side": number}
+							 ]
+			  }
+}
+```
+* `event_date` __should__ reflect the date which the session happened (could be previous day)
+* `session_id` __should__ be id of the session associated. It's optional if the survey is associated with new session that doesn't exist in daily_plan
+* `session_type` __should__ be an integer reflecting enumeration of different session type (0-5)
+* `RPE` __should__ be an integer between 1 and 10
+* `soreness` __should__ follow the same definition as in readiness_survey
+
+```
+POST /plans/post_session_survey HTTPS/1.1
+Host: apis.env.fathomai.com
+Content-Type: application/json
+Authorization: eyJraWQ...ajBc4VQ
+
+{
+    "user_id": "02cb7965-7921-493a-80d4-6b278c928fad",
+    "event_date": "2018-07-03",
+    "session_id": "69223f69-08b2-4e61-be2a-0e9b38787cec",
+    "session_type": 1,
+    "survey": 
+            {
+               "RPE": 4,
+               "soreness": [
+               				{"body_part": 17.0, "severity": 5, "side": 0},
+							{"body_part": 14, "severity": 3, "side": 0}
+					       ]
+            }
+            
+}
+```
+##### Responses
+ 
+ If the write was successful, the Service __will__ respond with HTTP Status `201 Created`, with a body with the following syntax:
+ 
+```
+{
+    "message": "success"
+}
+```
+
+
+### Daily Readiness
+
+#### Create
+
+This endpoint can be called to register a new daily readiness survey.
+
+##### Query String
+ 
+The client __must__ submit a request to the endpoint `/plans/daily_readiness`. The request method __must__ be `POST`.
+
+##### Request
+
+The client __must__ submit a request body containing a JSON object with the following schema:
+```
+{
+	"date_time": Datetime,
+	"user_id": Uuid,
+	"soreness": [{"body_part": number, "severity": number}],
+	"sleep_quality": number,
+	"readines": number
+}
+```
+* `date_time` __should__ reflect the local time that survey was taken
+* `soreness` __should__ reflect the number of body part that the user indicated soreness. Length __could__ be 0.
+* `body_part` __should__ be an integer between 0 and 17
+* `severity` __should__ be an integer between 1 and 5
+* `sleep_quality` __should__ be an integer between 1 and 10
+* `readiness` __should__ be an integer between 1 and 10
+
+```
+POST /plans/daily_readiness HTTPS/1.1
+Host: apis.env.fathomai.com
+Content-Type: application/json
+Authorization: eyJraWQ...ajBc4VQ
+
+{
+	"date_time": "2018-07-03T10:42:20Z",
+	"user_id":"02cb7965-7921-493a-80d4-6b278c928fad",
+	"soreness":[
+			{"body_part": 8, "severity": 2},
+			{"body_part": 14, "severity": 3}
+		   ],
+	"sleep_quality":4,
+	"readiness":10
+}
+```
+##### Responses
+ 
+ If the write was successful, the Service __will__ respond with HTTP Status `201 Created`, with a body with the following syntax:
+ 
+```
+{
+    "message": "success"
+}
+```
+
 
 ### Weekly Training
 
