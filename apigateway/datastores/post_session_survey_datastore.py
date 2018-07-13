@@ -54,9 +54,9 @@ class PostSessionSurveyDatastore(object):
         else:
             session = SessionFactory()
             session = session.create(SessionType(item.session_type))
-            session_json = {'session_id': str(session.id),
-                            'post_session_survey': item.survey.json_serialise()
-                           }
+            session_json = session.json_serialise()
+            session_json['post_session_survey'] = item.survey.json_serialise()
+           
             sessions.append(session_json)
 
         if session_type == 1:
