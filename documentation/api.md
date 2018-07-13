@@ -127,11 +127,9 @@ Authentication is required for this endpoint
 ```
 {
     "body_parts": [
-    				{"body_part": number,
-    				 "side": number},
-    				{"body_part": number,
-    				 "side": number}
-    			  ]
+    		{"body_part": number, "side": number},
+    		{"body_part": number,"side": number}
+    		]
 }
 ```
 * body_part will be a list of enumerated body parts (potentially empty).
@@ -157,13 +155,10 @@ The client __must__ submit a request body containing a JSON object with the foll
 	"event_date": Datetime,
 	"session_id": Uuid,
 	"session_type": number,
-	"survey": { "RPE": number,
-				"soreness": [
-							 {"body_part": number,
-							  "severity": number,
-							  "side": number}
-							 ]
-			  }
+	"survey": {
+		"RPE": number,
+		"soreness": [{"body_part": number, "severity": number, "side": number}]
+	}
 }
 ```
 * `event_date` __should__ reflect the date which the session happened (could be previous day)
@@ -187,9 +182,9 @@ Authorization: eyJraWQ...ajBc4VQ
             {
                "RPE": 4,
                "soreness": [
-               				{"body_part": 17.0, "severity": 5, "side": 0},
-							{"body_part": 14, "severity": 3, "side": 0}
-					       ]
+               		{"body_part": 17.0, "severity": 5, "side": 0},
+               		{"body_part": 14, "severity": 3, "side": 0}
+               		]
             }
             
 }
