@@ -18,7 +18,7 @@ class DailyScheduleDatastore(object):
 
             practice_session = session.PracticeSession()
             practice_session.date = datetime.strftime(target_date, "%Y-%m-%dT%H:%M:%S.%fZ")
-            practice_session.id = uuid.uuid4()
+            practice_session.id = str(uuid.uuid4())
 
             scheduled_sessions.append(practice_session)
 

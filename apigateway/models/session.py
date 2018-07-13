@@ -137,7 +137,7 @@ class BumpUpSession(Session):
 
     def create(self):
         new_session = BumpUpSession()
-        new_session.id = uuid.uuid4()
+        new_session.id = str(uuid.uuid4())
         return new_session
 
     def missing_post_session_survey(self):
@@ -159,7 +159,7 @@ class PracticeSession(Session):
 
     def create(self):
         new_session = PracticeSession()
-        new_session.id = uuid.uuid4()
+        new_session.id = str(uuid.uuid4())
         return new_session
 
     def missing_post_session_survey(self):
@@ -178,7 +178,7 @@ class StrengthConditioningSession(Session):
 
     def create(self):
         new_session = StrengthConditioningSession()
-        new_session.id = uuid.uuid4()
+        new_session.id = str(uuid.uuid4())
         return new_session
 
     def missing_post_session_survey(self):
@@ -197,7 +197,7 @@ class Game(Session):
 
     def create(self):
         new_session = Game()
-        new_session.id = uuid.uuid4()
+        new_session.id = str(uuid.uuid4())
         return new_session
 
     def missing_post_session_survey(self):
@@ -219,7 +219,7 @@ class Tournament(Session):
 
     def create(self):
         new_session = Tournament()
-        new_session.id = uuid.uuid4()
+        new_session.id = str(uuid.uuid4())
         return new_session
 
     def missing_post_session_survey(self):
@@ -242,7 +242,7 @@ class CorrectiveSession(Session):
 
     def create(self):
         new_session = CorrectiveSession()
-        new_session.id = uuid.uuid4()
+        new_session.id = str(uuid.uuid4())
         return new_session
 
     def missing_post_session_survey(self):
