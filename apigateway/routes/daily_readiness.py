@@ -85,7 +85,7 @@ def validate_data():
     elif request.json['readiness'] not in range(1, 11):
         raise InvalidSchemaException('readiness need to be between 1 and 10')
 
-def create_plan():
+async def create_plan():
     endpoint = "https://apis.{}.fathomai.com/plans/athlete/{}/daily_plan".format(os.environ['ENVIRONMENT'], request.json['user_id'])
     headers = {'Authorization': request.headers['Authorization'],
                 'Content-Type': 'applicaiton/json'}
