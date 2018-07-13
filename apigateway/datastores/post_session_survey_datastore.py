@@ -1,8 +1,8 @@
 from aws_xray_sdk.core import xray_recorder
 from config import get_mongo_collection
 from datastores.daily_plan_datastore import DailyPlanDatastore
-from logic.training import DailyPlan
-from logic.session import SessionType, SessionFactory
+from models.daily_plan import DailyPlan
+from models.session import SessionType, SessionFactory
 
 class PostSessionSurveyDatastore(object):
     mongo_collection = 'dailyplan'
