@@ -1,10 +1,3 @@
-import logic.athlete as athlete
-import logic.soreness_and_injury as soreness_and_injury
-import logic.training as training
-import datetime
-import logic.session as session
-
-
 '''
 academy schedule: M,W,F - 90 minutes
 strength and conditioning coach - wed am for 1 hr
@@ -71,7 +64,7 @@ but she does tell us about s and c, enters an RPE,
 
 
 
-'''
+
 
 
 def create_athlete():
@@ -156,4 +149,4 @@ def create_athlete():
     daily_readiness_survey.soreness.append(daily_soreness)
 
 
-
+'''

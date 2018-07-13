@@ -1,13 +1,12 @@
-import logic.recovery as recovery
 import logic.training as training
-import logic.session as session
+import models.session as session
+from models.daily_plan import DailyPlan
 import datetime
-import logic.exercise as exercise
 import logic.exercise_mapping as exercise_mapping
 from logic.soreness_and_injury import SorenessCalculator
 #from datastores.daily_readiness_datastore import DailyReadinessDatastore
 #from datastores.daily_schedule_datastore import DailyScheduleDatastore
-from utils import parse_datetime
+from utils import format_datetime
 
 
 class TrainingPlanManager(object):
@@ -53,8 +52,8 @@ class TrainingPlanManager(object):
 
         scheduled_sessions = self.daily_schedule_datastore.get(self.athlete_id, last_daily_readiness_survey.get_event_date())
 
-        daily_plan = training.DailyPlan(last_daily_readiness_survey.get_event_date())
-        daily_plan.athlete_id = self.athlete_id
+        daily_plan = DailyPlan(last_daily_readiness_survey.get_event_date())
+        daily_plan.user_id = self.athlete_id
         daily_plan = self.add_recovery_times(last_daily_readiness_survey.get_event_date(), daily_plan)
 
         calc = exercise_mapping.ExerciseAssignmentCalculator(self.athlete_id)
@@ -103,7 +102,7 @@ class TrainingPlanManager(object):
         for scheduled_session in scheduled_sessions:
             daily_plan.add_scheduled_session(scheduled_session)
 
-        daily_plan.last_updated = parse_datetime(datetime.datetime.utcnow())
+        daily_plan.last_updated = format_datetime(datetime.datetime.utcnow())
 
         self.daily_plan_datastore.put(daily_plan)
 

@@ -1,4 +1,4 @@
-from logic.soreness_and_injury import DailySoreness, BodyPart, BodyPartLocation, DailyReadinessSurvey
+from logic.soreness_and_injury import DailySoreness, BodyPart, BodyPartLocation
 from models.daily_readiness import DailyReadiness
 from utils import format_datetime
 import datetime
@@ -20,26 +20,24 @@ class DailyReadinessDatastore(object):
 
     def _query_mongodb(self, user_id):
         if user_id == "morning":
-            daily_readiness = DailyReadinessSurvey()
-            daily_readiness.report_date_time = "2018-06-27T11:00:00.00Z"
+            daily_readiness = DailyReadiness("2018-06-27T11:00:00Z", user_id, None, 4, 5)
 
             return daily_readiness
         elif user_id == "afternoon":
-            daily_readiness = DailyReadinessSurvey()
-            daily_readiness.report_date_time = "2018-06-27T15:00:00.00Z"
+            daily_readiness = DailyReadiness("2018-06-27T15:00:00Z", user_id, None, 4, 5)
 
             return daily_readiness
         elif user_id == "morning_practice":
-            daily_readiness = DailyReadinessSurvey()
+
+            soreness_list = []
+
             daily_readiness_soreness = DailySoreness()
             daily_readiness_soreness.body_part = BodyPart(BodyPartLocation(12),
                                                                               1)
             daily_readiness_soreness.severity = 2
-            daily_readiness.sleep_quality = 7
-            daily_readiness.readiness = 8
-            daily_readiness.soreness.append(daily_readiness_soreness)
+            soreness_list.append(daily_readiness_soreness)
 
-            daily_readiness.report_date_time = "2018-06-27T11:00:00.00Z"
+            daily_readiness = DailyReadiness("2018-06-27T11:00:00Z", user_id, soreness_list, 7, 8)
 
             return daily_readiness
 

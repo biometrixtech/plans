@@ -1,6 +1,7 @@
 import datetime
 import logic.soreness_and_injury as soreness_and_injury
-import logic.session as session
+import models.session as session
+from models.daily_readiness import DailyReadiness
 import uuid
 
 
@@ -8,7 +9,7 @@ class AthleteDataAccessMorning(object):
 
     def get_last_daily_readiness_survey(self, athlete_id):
 
-        daily_readiness = soreness_and_injury.DailyReadinessSurvey()
+        daily_readiness = DailyReadiness()
         daily_readiness.report_date_time = datetime.datetime(2018, 6, 27, 11, 0, 0)
 
         return daily_readiness
@@ -45,7 +46,7 @@ class AthleteDataAccessAfternoon(object):
 
     def get_last_daily_readiness_survey(self, athlete_id):
 
-        daily_readiness = soreness_and_injury.DailyReadinessSurvey()
+        daily_readiness = DailyReadiness()
         daily_readiness.report_date_time = datetime.datetime(2018, 6, 27, 15, 0, 0)
 
         return daily_readiness
@@ -64,7 +65,7 @@ class AthleteDataAccessMorningPractice(object):
 
     def get_last_daily_readiness_survey(self):
 
-        daily_readiness = soreness_and_injury.DailyReadinessSurvey()
+        daily_readiness = DailyReadiness()
         daily_readiness_soreness = soreness_and_injury.DailySoreness()
         daily_readiness_soreness.body_part = soreness_and_injury.BodyPart(soreness_and_injury.BodyPartLocation(12), 1)
         daily_readiness_soreness.severity = 2

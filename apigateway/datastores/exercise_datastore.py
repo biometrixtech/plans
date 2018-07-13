@@ -1,5 +1,7 @@
 # from abc import abstractmethod, ABCMeta
 from aws_xray_sdk.core import xray_recorder
+
+import models.exercise
 from config import get_mongo_collection
 import logic.exercise as exercise
 
@@ -28,7 +30,7 @@ class ExerciseLibraryDatastore(object):
         exercise_cursor = mongo_collection.find()
 
         for record in exercise_cursor:
-            exercise_item = exercise.Exercise(record["library_id"])
+            exercise_item = models.exercise.Exercise(record["library_id"])
             exercise_item.min_sets = record["min_sets"]
             exercise_item.seconds_per_rep = record["time_per_rep"]
             exercise_item.min_reps = record["min_reps"]
@@ -63,6 +65,8 @@ class ExerciseLibraryDatastore(object):
 
     @staticmethod
     def item_to_mongodb(exercise_item):
+
+        ''' Deprecated
         item = {'library_id': exercise_item.id,
                 'name': exercise_item.name,
                 'min_sets': exercise_item.min_sets,
@@ -80,6 +84,9 @@ class ExerciseLibraryDatastore(object):
                 'technical_difficulty': exercise_item.technical_difficulty,
                 'equipment_required': exercise_item.equipment_required
                 }
+        '''
+
+        item = exercise_item.json_deserialise()
 
         return {k: v for k, v in item.items() if v}
 

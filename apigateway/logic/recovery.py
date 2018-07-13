@@ -1,6 +1,7 @@
 import abc
 from enum import IntEnum
 import logic.exercise as exercise
+import models.exercise
 
 
 class RecoveryModality(metaclass=abc.ABCMeta):
@@ -21,10 +22,10 @@ class RecoveryModality(metaclass=abc.ABCMeta):
             return False
 
 
-class ActiveRecoveryRecommendedExercise(RecoveryModality, exercise.AssignedExercise):
+class ActiveRecoveryRecommendedExercise(RecoveryModality, models.exercise.AssignedExercise):
     def __init__(self, exercise_library_id, body_part_priority):
         RecoveryModality.__init__(self)
-        exercise.AssignedExercise.__init__(self, exercise_library_id, body_part_priority)
+        models.exercise.AssignedExercise.__init__(self, exercise_library_id, body_part_priority)
         self.soreness_triggers = []     # body parts triggering this exercise
         self.injury_history_triggers = []   # injuries triggering this exercise
 

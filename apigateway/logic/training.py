@@ -1,13 +1,14 @@
 from decimal import Decimal, getcontext
 from statistics import mean, stdev
-import logic.session as session
+import models.session as session
 
 
+'''Deprecated
 class DailyPlan(object):
 
-    def __init__(self, date):
-        self.athlete_id = ""
-        self.date = date
+    def __init__(self, event_date):
+        self.user_id = ""
+        self.event_date = event_date
         self.practice_sessions = []
         self.strength_conditioning_sessions = []  # includes cross training
         self.games = []
@@ -36,7 +37,7 @@ class DailyPlan(object):
             self.games.append(scheduled_session)
         elif isinstance(scheduled_session, session.Tournament):
             self.tournaments.append(scheduled_session)
-
+'''
 
 class TrainingCycle(object):
 

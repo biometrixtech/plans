@@ -1,10 +1,8 @@
 import pytest
-import logic.exercise as exercise
 import logic.exercise_mapping as exercise_mapping
-import logic.session as session
+import models.session as session
 import logic.soreness_and_injury as soreness_and_injury
 import datastores.exercise_datastore as exercise_datastore
-import athlete_data_access_mocks
 
 
 @pytest.fixture(scope="module")

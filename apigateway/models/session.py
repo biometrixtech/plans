@@ -1,6 +1,7 @@
 import abc
 from enum import Enum
 import uuid
+from serialisable import Serialisable
 import logic.exercise as exercise
 
 
@@ -23,7 +24,7 @@ class DayOfWeek(Enum):
     sunday = 6
 
 
-class Session(metaclass=abc.ABCMeta):
+class Session(Serialisable, metaclass=abc.ABCMeta):
 
     def __init__(self):
         self.id = None
@@ -81,6 +82,16 @@ class Session(metaclass=abc.ABCMeta):
         else:
             return False
 
+    def json_serialise(self):
+        ret = {
+            'session_id': self.id,
+            'description': self.description,
+            'data_transferred': self.data_transferred,
+            'duration_minutes': self.duration_minutes,
+            'post_session_survey': self.post_session_survey
+        }
+        return ret
+
     def internal_load(self):
         if self.session_RPE is not None and self.duration_minutes is not None:
             return self.session_RPE * self.duration_minutes
@@ -108,8 +119,10 @@ class SessionFactory(object):
             session_object = StrengthConditioningSession()
         elif session_type == SessionType.tournament:
             session_object = Tournament()
+        else:
+            session_object = CorrectiveSession()
 
-        session_object.id = uuid.uuid4()
+        session_object.id = str(uuid.uuid4())
 
         return session_object
 
@@ -124,7 +137,7 @@ class BumpUpSession(Session):
 
     def create(self):
         new_session = BumpUpSession()
-        new_session.id = uuid.uuid4()
+        new_session.id = str(uuid.uuid4())
         return new_session
 
     def missing_post_session_survey(self):
@@ -146,7 +159,7 @@ class PracticeSession(Session):
 
     def create(self):
         new_session = PracticeSession()
-        new_session.id = uuid.uuid4()
+        new_session.id = str(uuid.uuid4())
         return new_session
 
     def missing_post_session_survey(self):
@@ -165,7 +178,7 @@ class StrengthConditioningSession(Session):
 
     def create(self):
         new_session = StrengthConditioningSession()
-        new_session.id = uuid.uuid4()
+        new_session.id = str(uuid.uuid4())
         return new_session
 
     def missing_post_session_survey(self):
@@ -184,7 +197,7 @@ class Game(Session):
 
     def create(self):
         new_session = Game()
-        new_session.id = uuid.uuid4()
+        new_session.id = str(uuid.uuid4())
         return new_session
 
     def missing_post_session_survey(self):
@@ -206,7 +219,7 @@ class Tournament(Session):
 
     def create(self):
         new_session = Tournament()
-        new_session.id = uuid.uuid4()
+        new_session.id = str(uuid.uuid4())
         return new_session
 
     def missing_post_session_survey(self):
@@ -229,7 +242,7 @@ class CorrectiveSession(Session):
 
     def create(self):
         new_session = CorrectiveSession()
-        new_session.id = uuid.uuid4()
+        new_session.id = str(uuid.uuid4())
         return new_session
 
     def missing_post_session_survey(self):
@@ -245,7 +258,7 @@ class CorrectiveSession(Session):
             return False
 
 
-class RecoverySession(object):
+class RecoverySession(Serialisable):
 
     def __init__(self):
         self.recommended_inhibit_exercises = []
@@ -264,6 +277,15 @@ class RecoverySession(object):
         self.start_time = None
         self.end_time = None
         self.impact_score = 0
+
+    def json_serialise(self):
+        ret = {'minutes_duration': self.duration_minutes,
+               'start_time': str(self.start_time),
+               'end_time': str(self.end_time),
+               'impact_score': self.impact_score,
+               'exercises': [ex.json_serialise() for ex in self.recommended_exercises()]
+               }
+        return ret
 
     def recommended_exercises(self):
         exercise_list = []
