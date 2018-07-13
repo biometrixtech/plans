@@ -29,11 +29,11 @@ def handle_daily_readiness_create():
     store = DailyReadinessDatastore()
     store.put(daily_readiness)
 
-    # endpoint = "https://apis.{}.fathomai.com/plans/athlete/{}/daily_plan".format(os.environ['ENVIRONMENT'], request.json['user_id'])
-    # headers = {'Authorization': request.headers['Authorization'],
-    #             'Content-Type': 'applicaiton/json'}
+    endpoint = "https://apis.{}.fathomai.com/plans/athlete/{}/daily_plan".format(os.environ['ENVIRONMENT'], request.json['user_id'])
+    headers = {'Authorization': request.headers['Authorization'],
+                'Content-Type': 'applicaiton/json'}
  
-    # r = requests.post(url=endpoint, headers=headers)
+    r = requests.post(url=endpoint, headers=headers)
 
 
     return {'message': 'success'}, 201
