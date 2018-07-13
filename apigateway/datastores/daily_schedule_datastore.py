@@ -7,7 +7,7 @@ import uuid
 
 class DailyScheduleDatastore(object):
     @xray_recorder.capture('datastore.DailyScheduleDatastore.get')
-    def get(self, user_id=None, target_date=date.today().strftime('%Y-%m-%d'), collection='training'):
+    def get(self, user_id=None, target_date=date.today(), collection='training'):
         return self._query_mongodb(user_id, target_date, collection)
 
     @xray_recorder.capture('datastore.DailyScheduleDatastore.put')
