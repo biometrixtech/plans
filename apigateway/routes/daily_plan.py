@@ -59,6 +59,7 @@ def item_to_json(daily_plan):
         'tournaments': daily_plan.tournaments,
         'strength_conditioning_sessions': daily_plan.strength_conditioning_sessions,
         'corrective_sessions': daily_plan.corrective_sessions,
-        'bump_up_sessions': daily_plan.bump_up_sessions
+        'bump_up_sessions': daily_plan.bump_up_sessions,
+        'daily_readiness_survey_completed': daily_plan.daily_readiness_survey_completed()
     }
     return item

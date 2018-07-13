@@ -3,6 +3,7 @@ from config import get_mongo_collection
 from logic.soreness_and_injury import DailySoreness, BodyPart, BodyPartLocation
 from models.daily_readiness import DailyReadiness
 from utils import format_datetime
+from exceptions import NoSuchEntityException
 
 
 class DailyReadinessDatastore(object):
@@ -26,7 +27,10 @@ class DailyReadinessDatastore(object):
         mongo_collection = get_mongo_collection(self.mongo_collection)
         query = {'user_id': user_id}
         mongo_result = mongo_collection.find_one(query, sort=[('event_date', -1)])
-        return self.item_from_mongodb(mongo_result)
+        if len(mongo_result) == 1:
+            return self.item_from_mongodb(mongo_result)
+        else:
+            raise NoSuchEntityException("readiness survey does not exist for the user")
 
     @xray_recorder.capture('datastore.DailyReadinessDatastore._put_mongodb')
     def _put_mongodb(self, item):
