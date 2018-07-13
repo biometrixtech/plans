@@ -52,15 +52,39 @@ class DailyPlan(Serialisable):
 
         # first add any that are already completed
 
-        practice_sessions = [s for s in scheduled_sessions if isinstance(s, session.PracticeSession)]
-        cross_training_sessions = [s for s in scheduled_sessions if isinstance(s, session.StrengthConditioningSession)]
-        game_sessions = [s for s in scheduled_sessions if isinstance(s, session.Game)]
-        tournament_sessions = [s for s in scheduled_sessions if isinstance(s, session.Tournament)]
+        practice_sessions = [s for s in self.practice_sessions if isinstance(s, session.PracticeSession)
+                             and (s.data_transferred or s.post_session_survey is not None)]
+        cross_training_sessions = [s for s in self.strength_conditioning_sessions if isinstance(s, session.StrengthConditioningSession)
+                                   and (s.data_transferred or s.post_session_survey is not None)]
+        game_sessions = [s for s in self.games if isinstance(s, session.Game)
+                         and (s.data_transferred or s.post_session_survey is not None)]
+        tournament_sessions = [s for s in self.tournaments if isinstance(s, session.Tournament)
+                               and (s.data_transferred or s.post_session_survey is not None)]
 
-        self.practice_sessions = practice_sessions
-        self.strength_conditioning_sessions = cross_training_sessions
-        self.games = game_sessions
-        self.tournaments = tournament_sessions
+        new_practice_sessions = [s for s in scheduled_sessions if isinstance(s, session.PracticeSession)]
+        new_cross_training_sessions = [s for s in scheduled_sessions if isinstance(s, session.StrengthConditioningSession)]
+        new_game_sessions = [s for s in scheduled_sessions if isinstance(s, session.Game)]
+        new_tournament_sessions = [s for s in scheduled_sessions if isinstance(s, session.Tournament)]
+
+        if len(practice_sessions) < len(new_practice_sessions):
+            self.practice_sessions = practice_sessions
+            for p in range(len(practice_sessions), len(new_practice_sessions)):
+                self.practice_sessions.append(new_practice_sessions[p])
+
+        if len(cross_training_sessions) < len(new_cross_training_sessions):
+            self.strength_conditioning_sessions = cross_training_sessions
+            for p in range(len(cross_training_sessions), len(new_cross_training_sessions)):
+                self.strength_conditioning_sessions.append(new_cross_training_sessions[p])
+
+        if len(game_sessions) < len(new_game_sessions):
+            self.games = game_sessions
+            for p in range(len(game_sessions), len(new_game_sessions)):
+                self.games.append(new_game_sessions[p])
+
+        if len(tournament_sessions) < len(new_tournament_sessions):
+            self.tournaments = tournament_sessions
+            for p in range(len(tournament_sessions), len(new_tournament_sessions)):
+                self.tournaments.append(new_tournament_sessions[p])
 
         #if isinstance(scheduled_session, session.PracticeSession):
         #    self.practice_sessions.append(scheduled_session)

@@ -119,9 +119,7 @@ class TrainingPlanManager(object):
         else:
             daily_plan.recovery_pm is None
 
-        #TODO make sure this includes existing sessions and any newly expected ones, but not dups
-        for scheduled_session in scheduled_sessions:
-            daily_plan.add_scheduled_sessions(scheduled_session)
+        daily_plan.add_scheduled_sessions(scheduled_sessions)
 
         daily_plan.last_updated = format_datetime(datetime.datetime.utcnow())
 

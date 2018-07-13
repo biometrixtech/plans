@@ -20,7 +20,7 @@ class DailyPlanDatastore(object):
         except Exception as e:
             raise e
 
-    @xray_recorder.capture('datastore.DailyPlanDatastore._query_mongodb')
+    #@xray_recorder.capture('datastore.DailyPlanDatastore._query_mongodb')
     def _query_mongodb(self, user_id, start_date, end_date):
         mongo_collection = get_mongo_collection(self.mongo_collection)
         query0 = {'user_id': user_id, 'date': {'$gte': start_date, '$lte': end_date}}
