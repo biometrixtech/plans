@@ -65,10 +65,11 @@ class TrainingPlanManager(object):
 
         if daily_plans is None or len(daily_plans) == 0:
             daily_plan = DailyPlan(trigger_date_time_string)
-            daily_plan.user_id = self.athlete_id
-            daily_plan.daily_readiness_survey = trigger_date_time_string
         else:
             daily_plan = daily_plans[len(daily_plans) - 1]
+
+        daily_plan.user_id = self.athlete_id
+        daily_plan.daily_readiness_survey = last_daily_readiness_survey.get_event_date().strftime('%Y-%m-%d')
 
         daily_plan = self.add_recovery_times(trigger_date_time, daily_plan)
 
