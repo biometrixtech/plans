@@ -1,7 +1,7 @@
 from aws_xray_sdk.core import xray_recorder
 from config import get_mongo_collection
 from models.daily_plan import DailyPlan
-
+from utils import  format_datetime, parse_datetime
 
 class DailyPlanDatastore(object):
     mongo_collection = 'dailyplan'
@@ -25,9 +25,11 @@ class DailyPlanDatastore(object):
         # query1 = {'_id': 0, 'last_updated': 0, 'user_id': 0}
         mongo_cursor = mongo_collection.find(query0)
         ret = []
+
         for plan in mongo_cursor:
             # ret.append(self.item_to_response(plan))
             daily_plan = DailyPlan(event_date=plan['date'])
+            daily_plan.user_id = plan.get('user_id', None)
             daily_plan.practice_sessions = plan.get('practice_sessions', [])
             daily_plan.strength_conditioning_sessions = plan.get('cross_training_sessions', [])
             daily_plan.games = plan.get('game_sessions', [])
@@ -40,9 +42,15 @@ class DailyPlanDatastore(object):
             daily_plan.updated = plan.get('updated', None)
             daily_plan.last_updated = plan.get('last_update', None)
             ret.append(daily_plan)
+
+        if len(ret) == 0:
+            plan = DailyPlan(event_date=end_date)
+            plan.user_id = user_id
+            ret.append(plan)
+
         return ret
 
-    #@xray_recorder.capture('datastore.DailyPlanDatastore._put_mongodb')
+    @xray_recorder.capture('datastore.DailyPlanDatastore._put_mongodb')
     def _put_mongodb(self, item):
         collection = get_mongo_collection(self.mongo_collection)
 

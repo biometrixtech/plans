@@ -44,17 +44,32 @@ class TrainingPlanManager(object):
         #                                                   - datetime.timedelta(hours=48, minutes=0)
         #                                                   )
 
+        trigger_date_time = last_daily_readiness_survey.get_event_date()
+
+        survey_event_dates = [s.get_event_date() for s in last_post_session_surveys]
+
+        if survey_event_dates is not None:
+            trigger_date_time = max(trigger_date_time, max(survey_event_dates))
+
         soreness_list = SorenessCalculator().get_soreness_summary_from_surveys(
             last_daily_readiness_survey,
             last_post_session_surveys,
-            last_daily_readiness_survey.get_event_date()
+            trigger_date_time
         )
 
-        scheduled_sessions = self.daily_schedule_datastore.get(self.athlete_id, last_daily_readiness_survey.get_event_date())
+        scheduled_sessions = self.daily_schedule_datastore.get(self.athlete_id, trigger_date_time)
 
-        daily_plan = DailyPlan(last_daily_readiness_survey.get_event_date())
-        daily_plan.user_id = self.athlete_id
-        daily_plan = self.add_recovery_times(last_daily_readiness_survey.get_event_date(), daily_plan)
+        trigger_date_time_string = trigger_date_time.date().strftime('%Y-%m-%d')
+
+        daily_plans = self.daily_plan_datastore.get(self.athlete_id, trigger_date_time_string, trigger_date_time_string)
+
+        if daily_plans is None or len(daily_plans) == 0:
+            daily_plan = DailyPlan(trigger_date_time_string)
+            daily_plan.user_id = self.athlete_id
+        else:
+            daily_plan = daily_plans[len(daily_plans) - 1]
+
+        daily_plan = self.add_recovery_times(trigger_date_time, daily_plan)
 
         calc = exercise_mapping.ExerciseAssignmentCalculator(self.athlete_id)
 
@@ -91,6 +106,8 @@ class TrainingPlanManager(object):
                                                                        soreness_list)
             daily_plan.recovery_am.update_from_exercise_assignments(am_exercise_assignments)
             daily_plan.recovery_am.impact_score = am_impact_score
+        else:
+            daily_plan.recovery_am is None
 
         if pm_impact_score >= 0.5:
             daily_plan.recovery_pm.set_exercise_target_minutes(soreness_list, 15)
@@ -98,7 +115,10 @@ class TrainingPlanManager(object):
                                                                        soreness_list)
             daily_plan.recovery_pm.update_from_exercise_assignments(pm_exercise_assignments)
             daily_plan.recovery_pm.impact_score = pm_impact_score
+        else:
+            daily_plan.recovery_pm is None
 
+        #TODO make sure this includes existing sessions and any newly expected ones, but not dups
         for scheduled_session in scheduled_sessions:
             daily_plan.add_scheduled_session(scheduled_session)
 
