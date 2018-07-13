@@ -19,8 +19,10 @@ class DailyScheduleDatastore(object):
 
         scheduled_sessions = []
 
+        target_date = target_date.strftime('%Y-%m-%d')
         dt = datetime.strptime(target_date, '%Y-%m-%d')
         start = dt - timedelta(days=dt.weekday())
+        # start = target_date - timedelta(days=dt.weekday())
         week_start = start.strftime('%Y-%m-%d')
 
         mongo_collection = get_mongo_collection(collection)
