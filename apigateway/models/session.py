@@ -261,10 +261,10 @@ class CorrectiveSession(Session):
 class RecoverySession(Serialisable):
 
     def __init__(self):
-        self.recommended_inhibit_exercises = []
-        self.recommended_lengthen_exercises = []
-        self.recommended_activate_exercises = []
-        self.recommended_integrate_exercises = []
+        self.inhibit_exercises = []
+        self.lengthen_exercises = []
+        self.activate_exercises = []
+        self.integrate_exercises = []
         self.duration_minutes = 0
         self.inhibit_target_minutes = 0
         self.lengthen_target_minutes = 0
@@ -283,31 +283,53 @@ class RecoverySession(Serialisable):
                'start_time': str(self.start_time),
                'end_time': str(self.end_time),
                'impact_score': self.impact_score,
-               'exercises': [ex.json_serialise() for ex in self.recommended_exercises()]
+               'inhibit_exercises': [ex.json_serialise() for ex in self.inhibit_exercises],
+               'lengthen_exercises': [ex.json_serialise() for ex in self.lengthen_exercises],
+               'activate_exercises': [ex.json_serialise() for ex in self.activate_exercises],
+               'integrate_exercises': [ex.json_serialise() for ex in self.integrate_exercises],
                }
         return ret
 
     def recommended_exercises(self):
         exercise_list = []
-        exercise_list.extend(self.recommended_inhibit_exercises)
-        exercise_list.extend(self.recommended_lengthen_exercises)
-        exercise_list.extend(self.recommended_activate_exercises)
-        exercise_list.extend(self.recommended_integrate_exercises)
+        exercise_list.extend(self.inhibit_exercises)
+        exercise_list.extend(self.lengthen_exercises)
+        exercise_list.extend(self.activate_exercises)
+        exercise_list.extend(self.integrate_exercises)
 
-        for s in range(0, len(exercise_list)):
-            exercise_list[s].position_order = s
+        #for s in range(0, len(exercise_list)):
+        #    exercise_list[s].position_order = s
 
         return exercise_list
 
     def update_from_exercise_assignments(self, exercise_assignments):
-        self.recommended_inhibit_exercises = exercise_assignments.inhibit_exercises
-        self.recommended_lengthen_exercises = exercise_assignments.lengthen_exercises
-        self.recommended_activate_exercises = exercise_assignments.activate_exercises
-        self.recommended_integrate_exercises = exercise_assignments.integrate_exercises
+        self.inhibit_exercises = exercise_assignments.inhibit_exercises
+        self.lengthen_exercises = exercise_assignments.lengthen_exercises
+        self.activate_exercises = exercise_assignments.activate_exercises
+        self.integrate_exercises = exercise_assignments.integrate_exercises
         self.duration_minutes = (exercise_assignments.inhibit_minutes +
                                  exercise_assignments.lengthen_minutes +
                                  exercise_assignments.activate_minutes +
                                  exercise_assignments.integrate_minutes)
+
+        num = 0
+
+        for s in range(0, len(self.inhibit_exercises)):
+            self.inhibit_exercises[s].position_order = num
+            num = num + 1
+
+        for s in range(0, len(self.lengthen_exercises)):
+            self.lengthen_exercises[s].position_order = num
+            num = num + 1
+
+        for s in range(0, len(self.activate_exercises)):
+            self.activate_exercises[s].position_order = num
+            num = num + 1
+
+        for s in range(0, len(self.integrate_exercises)):
+            self.integrate_exercises[s].position_order = num
+            num = num + 1
+
 
     def set_exercise_target_minutes(self, soreness_list, total_minutes_target):
         max_severity = 0

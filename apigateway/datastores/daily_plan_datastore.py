@@ -2,6 +2,7 @@ from aws_xray_sdk.core import xray_recorder
 from config import get_mongo_collection
 from models.daily_plan import DailyPlan
 import models.session as session
+import models.exercise as exercise
 from utils import  format_datetime, parse_datetime
 
 class DailyPlanDatastore(object):
@@ -19,7 +20,7 @@ class DailyPlanDatastore(object):
         except Exception as e:
             raise e
 
-    #@xray_recorder.capture('datastore.DailyPlanDatastore._query_mongodb')
+    @xray_recorder.capture('datastore.DailyPlanDatastore._query_mongodb')
     def _query_mongodb(self, user_id, start_date, end_date):
         mongo_collection = get_mongo_collection(self.mongo_collection)
         query0 = {'user_id': user_id, 'date': {'$gte': start_date, '$lte': end_date}}
@@ -42,8 +43,8 @@ class DailyPlanDatastore(object):
             # daily_plan.tournaments = \
             #     [_external_session_from_mongodb(s, session.SessionType.tournament)
             #      for s in plan['tournament_sessions']]
-            daily_plan.recovery_am = plan.get('recovery_am', [])
-            daily_plan.recovery_pm = plan.get('recovery_pm', [])
+            daily_plan.recovery_am = _recovery_session_from_mongodb(plan['recovery_am'])
+            daily_plan.recovery_pm = _recovery_session_from_mongodb(plan['recovery_am'])
             # daily_plan.corrective_sessions = \
             #    [_external_session_from_mongodb(s, session.SessionType.corrective)
             #     for s in plan['corrective_sessions']]
@@ -142,6 +143,39 @@ def _external_session_from_mongodb(mongo_result, session_type):
     mongo_session.post_session_survey = _key_present("post_session_survey", mongo_result)
 
     return mongo_session
+
+
+def _recovery_session_from_mongodb(mongo_result):
+
+    recovery_session = session.RecoverySession()
+    recovery_session.start_time = _key_present("start_time", mongo_result)
+    recovery_session.end_time = _key_present("end_time", mongo_result)
+    recovery_session.impact_score = _key_present("impact_score", mongo_result)
+    recovery_session.duration_minutes = _key_present("minutes_duration", mongo_result)
+    recovery_session.inhibit_exercises = [_assigned_exercises_from_mongodb(s)
+                                          for s in mongo_result['inhibit_exercises']]
+    recovery_session.lengthen_exercises = [_assigned_exercises_from_mongodb(s)
+                                         for s in mongo_result['lengthen_exercises']]
+    recovery_session.activate_exercises = [_assigned_exercises_from_mongodb(s)
+                                           for s in mongo_result['activate_exercises']]
+    recovery_session.integrate_exercises = [_assigned_exercises_from_mongodb(s)
+                                            for s in mongo_result['integrate_exercises']]
+    return recovery_session
+
+
+def _assigned_exercises_from_mongodb(mongo_result):
+
+    assigned_exercise = exercise.AssignedExercise(_key_present("library_id", mongo_result))
+    assigned_exercise.exercise.name = _key_present("name", mongo_result)
+    assigned_exercise.exercise.bilateral = _key_present("bilateral", mongo_result)
+    assigned_exercise.exercise.unit_of_measure = _key_present("unit_of_measure", mongo_result)
+    assigned_exercise.position_order = _key_present("position_order", mongo_result)
+    assigned_exercise.reps_assigned = _key_present("reps_assigned", mongo_result)
+    assigned_exercise.sets_assigned = _key_present("sets_assigned", mongo_result)
+    assigned_exercise.exercise.seconds_per_set = _key_present("seconds_per_set", mongo_result)
+    assigned_exercise.exercise.seconds_per_rep = _key_present("seconds_per_rep", mongo_result)
+
+    return assigned_exercise
 
 def _key_present(key_name, dictionary):
     if key_name in dictionary:

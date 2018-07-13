@@ -48,7 +48,7 @@ class TrainingPlanManager(object):
 
         survey_event_dates = [s.get_event_date() for s in last_post_session_surveys]
 
-        if survey_event_dates is not None:
+        if survey_event_dates is not None and len(survey_event_dates) > 0:
             trigger_date_time = max(trigger_date_time, max(survey_event_dates))
 
         soreness_list = SorenessCalculator().get_soreness_summary_from_surveys(
@@ -66,6 +66,7 @@ class TrainingPlanManager(object):
         if daily_plans is None or len(daily_plans) == 0:
             daily_plan = DailyPlan(trigger_date_time_string)
             daily_plan.user_id = self.athlete_id
+            daily_plan.daily_readiness_survey = trigger_date_time_string
         else:
             daily_plan = daily_plans[len(daily_plans) - 1]
 
@@ -120,7 +121,7 @@ class TrainingPlanManager(object):
 
         #TODO make sure this includes existing sessions and any newly expected ones, but not dups
         for scheduled_session in scheduled_sessions:
-            daily_plan.add_scheduled_session(scheduled_session)
+            daily_plan.add_scheduled_sessions(scheduled_session)
 
         daily_plan.last_updated = format_datetime(datetime.datetime.utcnow())
 

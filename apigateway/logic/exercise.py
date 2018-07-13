@@ -168,13 +168,13 @@ class ExerciseAssignments(object):
 
             # TODO expand to accommodate if exercise already exists or if others already exist
             if isinstance(soreness_exercise, InhibitExercise):
-                self.recommended_inhibit_exercises.append(exercise_assignment)
+                self.inhibit_exercises.append(exercise_assignment)
             elif isinstance(soreness_exercise, LengthenExercise):
-                    self.recommended_lengthen_exercises.append(exercise_assignment)
+                    self.lengthen_exercises.append(exercise_assignment)
             elif isinstance(soreness_exercise, ActivateExercise):
-                    self.recommended_activate_exercises.append(exercise_assignment)
+                    self.activate_exercises.append(exercise_assignment)
             elif isinstance(soreness_exercise, IntegrateExercise):
-                    self.recommended_integrate_exercises.append(exercise_assignment)
+                    self.integrate_exercises.append(exercise_assignment)
 
     def get_exercise_priority_from_soreness_level(self, soreness_level, soreness_exercise):
 
