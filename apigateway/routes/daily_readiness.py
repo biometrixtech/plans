@@ -32,7 +32,7 @@ def handle_daily_readiness_create():
     store.put(daily_readiness)
 
     # asyncio.run(create_plan())
-    create_plan()
+    # create_plan()
 
     return {'message': 'success'}, 201
 
@@ -87,9 +87,9 @@ def validate_data():
         raise InvalidSchemaException('readiness need to be between 1 and 10')
 
 # async def create_plan():
-def create_plan():
-    endpoint = "https://apis.{}.fathomai.com/plans/athlete/{}/daily_plan".format(os.environ['ENVIRONMENT'], request.json['user_id'])
-    headers = {'Authorization': request.headers['Authorization'],
-                'Content-Type': 'applicaiton/json'}
-    r = requests.post(url=endpoint, headers=headers)
+# def create_plan():
+#     endpoint = "https://apis.{}.fathomai.com/plans/athlete/{}/daily_plan".format(os.environ['ENVIRONMENT'], request.json['user_id'])
+#     headers = {'Authorization': request.headers['Authorization'],
+#                 'Content-Type': 'applicaiton/json'}
+#     r = requests.post(url=endpoint, headers=headers)
 
