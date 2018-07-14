@@ -111,7 +111,7 @@ class DailyPlanDatastore(object):
                                'recovery_pm': pm_recovery_bson,
                                'last_updated': item.last_updated})
         '''
-        query = {'user_id': item['user_id'], 'event_date': format_datetime(item['event_date'])}
+        query = {'user_id': item.user_id, 'date': item.event_date}
         collection.replace_one(query, item.json_serialise(), upsert=True)
 
     '''Deprecated

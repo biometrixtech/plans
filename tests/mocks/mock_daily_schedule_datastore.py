@@ -23,6 +23,16 @@ class DailyScheduleDatastore(object):
             scheduled_sessions.append(practice_session)
 
             return scheduled_sessions
+        elif user_id == "morning_practice_2":
+            scheduled_sessions = []
+
+            practice_session = session.PracticeSession()
+            practice_session.date = datetime.strftime(target_date, "%Y-%m-%dT%H:%M:%S.%fZ")
+            practice_session.id = str(uuid.uuid4())
+
+            scheduled_sessions.append(practice_session)
+
+            return scheduled_sessions
         else:
             scheduled_sessions = []
 
