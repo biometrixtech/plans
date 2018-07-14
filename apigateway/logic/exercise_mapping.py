@@ -321,7 +321,7 @@ class ExerciseAssignmentCalculator(object):
         hip_bridge_progression.progressions = ["12", "11", "13"]
         outer_thigh.activate_exercises.append(hip_bridge_progression)
 
-        outer_thigh.activate_exercises.append(models.exercise.AssignedExercise("77", outer_thigh.treatment_priority, 4))
+        # outer_thigh.activate_exercises.append(models.exercise.AssignedExercise("77", outer_thigh.treatment_priority, 4))
 
         body_parts.append(outer_thigh)
 

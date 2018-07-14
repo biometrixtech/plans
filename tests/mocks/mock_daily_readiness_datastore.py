@@ -41,6 +41,21 @@ class DailyReadinessDatastore(object):
 
             return daily_readiness
 
+        elif user_id == "morning_practice_2":
+
+            soreness_list = []
+
+            daily_readiness_soreness = DailySoreness()
+            daily_readiness_soreness.body_part = BodyPart(BodyPartLocation(11),
+                                                                              1)
+            daily_readiness_soreness.severity = 2
+            soreness_list.append(daily_readiness_soreness)
+
+            daily_readiness = DailyReadiness("2018-07-11T11:00:00Z", user_id, soreness_list, 7, 8)
+
+            return daily_readiness
+
+
     def _put_mongodb(self, item):
         item = self.item_to_mongodb(item)
         query = {'user_id': item['user_id'], 'event_date': format_datetime(item['event_date'])}
