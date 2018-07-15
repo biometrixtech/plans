@@ -46,6 +46,7 @@ class PostSurvey(Serialisable):
             soreness = DailySoreness()
             soreness.body_part = BodyPart(BodyPartLocation(sore['body_part']), None)
             soreness.severity = sore['severity']
+            soreness.side = sore['side']
             self.soreness.append(soreness)
 
     def json_serialise(self):
@@ -58,5 +59,6 @@ class PostSurvey(Serialisable):
     def soreness_to_dict(self, soreness):
         return  {
                  "body_part": soreness.body_part.location.value,
-                 "severity": soreness.severity
+                 "severity": soreness.severity,
+                 "side": soreness.side
                  }
