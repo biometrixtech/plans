@@ -22,7 +22,7 @@ class PostSessionSurveyDatastore(object):
         except Exception as e:
             raise e
 
-    #@xray_recorder.capture('datastore.PostSessionSurveyDatastore._query_mongodb')
+    @xray_recorder.capture('datastore.PostSessionSurveyDatastore._query_mongodb')
     def _query_mongodb(self, user_id, start_date, end_date):
         mongo_collection = get_mongo_collection(self.mongo_collection)
         query0 = {'user_id': user_id, 'date': {'$gte': start_date, '$lte': end_date}}
@@ -119,6 +119,12 @@ def _soreness_from_mongodb(soreness_mongo_result):
     soreness_body_part = soreness_mongo_result['body_part']
     soreness.body_part = BodyPart(BodyPartLocation(soreness_body_part), None)
     soreness.severity = soreness_mongo_result['severity']
-    # soreness.side = soreness_mongo_result['side']
+    soreness.side = _key_present('side', soreness_mongo_result)
 
     return soreness
+
+def _key_present(key_name, dictionary):
+    if key_name in dictionary:
+        return dictionary[key_name]
+    else:
+        return ""
