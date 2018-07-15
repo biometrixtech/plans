@@ -3,6 +3,9 @@ from config import get_mongo_collection
 from datastores.daily_plan_datastore import DailyPlanDatastore
 from models.daily_plan import DailyPlan
 from models.session import SessionType, SessionFactory
+from models.post_session_survey import PostSessionSurvey, PostSurvey
+from logic.soreness_and_injury import DailySoreness, BodyPart, BodyPartLocation
+
 
 class PostSessionSurveyDatastore(object):
     mongo_collection = 'dailyplan'
@@ -19,10 +22,35 @@ class PostSessionSurveyDatastore(object):
         except Exception as e:
             raise e
 
-    @xray_recorder.capture('datastore.PostSessionSurveyDatastore._query_mongodb')
+    #@xray_recorder.capture('datastore.PostSessionSurveyDatastore._query_mongodb')
     def _query_mongodb(self, user_id, start_date, end_date):
         mongo_collection = get_mongo_collection(self.mongo_collection)
-        pass
+        query0 = {'user_id': user_id, 'date': {'$gte': start_date, '$lte': end_date}}
+        # query1 = {'_id': 0, 'last_updated': 0, 'user_id': 0}
+        mongo_cursor = mongo_collection.find(query0)
+        ret = []
+
+        for plan in mongo_cursor:
+            practice_session_surveys = \
+                [_post_session_survey_from_mongodb(s, user_id, s["session_id"], SessionType.practice, plan["date"])
+                 for s in plan['practice_sessions'] if s is not None]
+            strength_conditioning_session_surveys = \
+                [_post_session_survey_from_mongodb(s, user_id, s["session_id"], SessionType.strength_and_conditioning, plan["date"])
+                 for s in plan['cross_training_sessions'] if s is not None]
+            game_surveys = \
+                [_post_session_survey_from_mongodb(s, user_id, s["session_id"], SessionType.game, plan["date"])
+                 for s in plan['game_sessions'] if s is not None]
+            bump_up_session_surveys = \
+                [_post_session_survey_from_mongodb(s, user_id, s["session_id"], SessionType.bump_up, plan["date"])
+                 for s in plan['bump_up_sessions'] if s is not None]
+
+            ret.extend(practice_session_surveys)
+            ret.extend(strength_conditioning_session_surveys)
+            ret.extend(game_surveys)
+            ret.extend(bump_up_session_surveys)
+
+        return ret
+
 
     @xray_recorder.capture('datastore.PostSessionSurveyDatastore._put_mongodb')
     def _put_mongodb(self, item):
@@ -70,3 +98,27 @@ class PostSessionSurveyDatastore(object):
         mongo_collection = get_mongo_collection(self.mongo_collection)
         query = {"user_id": item.user_id, "date": item.event_date}
         mongo_collection.update_one(query, {'$set': {session_type_name: sessions}})
+
+def _post_session_survey_from_mongodb(mongo_result, user_id, session_id, session_type, event_date):
+
+    post_session_survey = PostSessionSurvey(event_date, user_id, session_id, session_type)
+    survey_result = mongo_result["post_session_survey"]
+    if survey_result is not None:
+
+        survey = PostSurvey()
+        survey.RPE = survey_result["RPE"]
+        survey.soreness = [_soreness_from_mongodb(s) for s in survey_result["soreness"]]
+        post_session_survey.survey = survey
+
+        return post_session_survey
+    else:
+        return None
+
+def _soreness_from_mongodb(soreness_mongo_result):
+    soreness = DailySoreness()
+    soreness_body_part = soreness_mongo_result['body_part']
+    soreness.body_part = BodyPart(BodyPartLocation(soreness_body_part), None)
+    soreness.severity = soreness_mongo_result['severity']
+    # soreness.side = soreness_mongo_result['side']
+
+    return soreness

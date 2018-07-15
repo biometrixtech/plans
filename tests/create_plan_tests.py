@@ -8,6 +8,7 @@ from mocks.mock_daily_plan_datastore import DailyPlanDatastore
 from mocks.mock_daily_readiness_datastore import DailyReadinessDatastore
 from mocks.mock_daily_schedule_datastore import DailyScheduleDatastore
 from datastores.daily_plan_datastore import DailyPlanDatastore as MongoDailyPlanDatastore
+from datastores.post_session_survey_datastore import PostSessionSurveyDatastore as MongoPostSessionSurveyDataStore
 '''
 
 get a training plan for the week
@@ -110,7 +111,9 @@ def test_daily_plan_am_recovery_has_practice_session():
 def test_create_plan():
     manager = \
         training_plan_management.TrainingPlanManager("morning_practice_2", DailyReadinessDatastore(),
-                                                     DailyScheduleDatastore(), MongoDailyPlanDatastore())
+                                                     DailyScheduleDatastore(),
+                                                     MongoPostSessionSurveyDataStore(),
+                                                     MongoDailyPlanDatastore())
     success = manager.create_daily_plan()
     assert True is success
 

@@ -36,17 +36,18 @@ class PostSessionSurvey(Serialisable):
 
 
 class PostSurvey(Serialisable):
-    def __init__(self, survey):
+    def __init__(self, survey=None):
         """
         :param dict survey:
         """
-        self.RPE = survey['RPE']
-        self.soreness = []
-        for sore in survey['soreness']:
-            soreness = DailySoreness()
-            soreness.body_part = BodyPart(BodyPartLocation(sore['body_part']), None)
-            soreness.severity = sore['severity']
-            self.soreness.append(soreness)
+        if survey is not None:
+            self.RPE = survey['RPE']
+            self.soreness = []
+            for sore in survey['soreness']:
+                soreness = DailySoreness()
+                soreness.body_part = BodyPart(BodyPartLocation(sore['body_part']), None)
+                soreness.severity = sore['severity']
+                self.soreness.append(soreness)
 
     def json_serialise(self):
         ret = {
