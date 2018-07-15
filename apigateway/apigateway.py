@@ -70,6 +70,10 @@ from routes.post_session_survey import app as post_session_survey_routes
 app.register_blueprint(post_session_survey_routes, url_prefix='/plans/post_session_survey')
 
 
+from routes.session import app as add_delete_session_routes
+app.register_blueprint(add_delete_session_routes, url_prefix='/plans/session')
+
+
 @app.errorhandler(500)
 def handle_server_error(e):
     tb = sys.exc_info()[2]

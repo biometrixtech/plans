@@ -38,6 +38,7 @@ class Soreness(object):
         self.type = None  # soreness_type
         self.body_part = None
         self.reported_date_time = None
+        self.side = None
 
 
 class DailySoreness(Soreness):

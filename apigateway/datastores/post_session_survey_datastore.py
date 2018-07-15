@@ -101,14 +101,14 @@ class PostSessionSurveyDatastore(object):
 
 def _post_session_survey_from_mongodb(mongo_result, user_id, session_id, session_type, event_date):
 
-    post_session_survey = PostSessionSurvey(event_date, user_id, session_id, session_type)
+
     survey_result = mongo_result["post_session_survey"]
     if survey_result is not None:
 
         survey = PostSurvey()
         survey.RPE = survey_result["RPE"]
         survey.soreness = [_soreness_from_mongodb(s) for s in survey_result["soreness"]]
-        post_session_survey.survey = survey
+        post_session_survey = PostSessionSurvey(event_date, user_id, session_id, session_type, survey)
 
         return post_session_survey
     else:
