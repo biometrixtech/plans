@@ -20,8 +20,8 @@ class TrainingPlanManager(object):
     def calculate_am_impact_score(self, rpe, readiness, sleep_quality, max_soreness):
 
         max_soreness_score = min(max_soreness, 5)
-        sleep_quality_score = min((sleep_quality / 10) * 3, 3)
-        readiness_score = min((readiness / 10) * 5, 5)
+        sleep_quality_score = min(((10 - sleep_quality) / 10) * 3, 3)
+        readiness_score = min(((10 - readiness) / 10) * 5, 5)
         rpe_score = min((rpe / 10) * 4, 4)
 
         return max(max_soreness_score, sleep_quality_score, readiness_score, rpe_score)
@@ -29,8 +29,8 @@ class TrainingPlanManager(object):
     def calculate_pm_impact_score(self, rpe, readiness, sleep_quality, max_soreness):
 
         max_soreness_score = min(max_soreness, 5)
-        sleep_quality_score = min((sleep_quality / 10) * 3, 3)
-        readiness_score = min((readiness / 10) * 3, 3)
+        sleep_quality_score = min(((10 - sleep_quality) / 10) * 3, 3)
+        readiness_score = min(((10 - readiness) / 10) * 3, 3)
         rpe_score = min((rpe / 10) * 5, 5)
 
         return max(max_soreness_score, sleep_quality_score, readiness_score, rpe_score)
