@@ -133,15 +133,18 @@ class ExerciseAssignments(object):
             return
 
         else:
-            self.inhibit_exercises = self.reduce_assigned_exercises(
-                (self.inhibit_minutes * 60) - (self.inhibit_target_minutes * 60), self.inhibit_exercises)
-            self.calculate_durations()
-            self.lengthen_exercises = self.reduce_assigned_exercises(
-                (self.lengthen_minutes * 60) - (self.lengthen_target_minutes * 60), self.lengthen_exercises)
-            self.calculate_durations()
-            self.activate_exercises = self.reduce_assigned_exercises(
-                (self.activate_minutes * 60) - (self.activate_target_minutes * 60), self.activate_exercises)
-            self.calculate_durations()
+            if self.inhibit_exercises is not None and len(self.inhibit_exercises) > 0:
+                self.inhibit_exercises = self.reduce_assigned_exercises(
+                    (self.inhibit_minutes * 60) - (self.inhibit_target_minutes * 60), self.inhibit_exercises)
+                self.calculate_durations()
+            if self.lengthen_exercises is not None and len(self.lengthen_exercises) > 0:
+                self.lengthen_exercises = self.reduce_assigned_exercises(
+                    (self.lengthen_minutes * 60) - (self.lengthen_target_minutes * 60), self.lengthen_exercises)
+                self.calculate_durations()
+            if self.activate_exercises is not None and len(self.activate_exercises) > 0:
+                self.activate_exercises = self.reduce_assigned_exercises(
+                    (self.activate_minutes * 60) - (self.activate_target_minutes * 60), self.activate_exercises)
+                self.calculate_durations()
 
     def calculate_durations(self):
         self.inhibit_minutes = sum(filter(None, [ex.duration() for ex in self.inhibit_exercises])) / 60
