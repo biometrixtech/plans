@@ -32,9 +32,9 @@ def handle_post_session_survey_create():
         except ValueError:
             raise InvalidSchemaException('session_type not recognized')
 
-    session_id = request.json.get('session_id', None)
+    session_id = request.json.get('session_id', '')
     if len(session_id) == 0:
-        session_id = 0
+        session_id = None
 
     survey = PostSessionSurvey(event_date=event_date,
     						   user_id=request.json['user_id'],
