@@ -33,8 +33,8 @@ class DailyPlan(Serialisable):
                'bump_up_sessions': [b.json_serialise() for b in self.bump_up_sessions],
                'cross_training_sessions': [c.json_serialise() for c in self.strength_conditioning_sessions],
                'game_sessions': [g.json_serialise() for g in self.games],
-               'recovery_am': self.recovery_am.json_serialise(),
-               'recovery_pm': self.recovery_pm.json_serialise(),
+               'recovery_am': self.recovery_am.json_serialise() if self.recovery_am is not None else None,
+               'recovery_pm': self.recovery_pm.json_serialise() if self.recovery_pm is not None else None,
                'last_updated': self.last_updated,
                'daily_readiness_survey': self.daily_readiness_survey
                }

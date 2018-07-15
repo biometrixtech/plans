@@ -102,7 +102,7 @@ class TrainingPlanManager(object):
             max_soreness
         )
 
-        if daily_plan.recovery_am.start_time is not None and am_impact_score >= 0.5:
+        if daily_plan.recovery_am is not None and am_impact_score >= 0.5:
             daily_plan.recovery_am.set_exercise_target_minutes(soreness_list, 15)
             am_exercise_assignments = calc.create_exercise_assignments(daily_plan.recovery_am,
                                                                        soreness_list)

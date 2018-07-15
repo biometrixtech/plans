@@ -43,8 +43,8 @@ class DailyPlanDatastore(object):
             # daily_plan.tournaments = \
             #     [_external_session_from_mongodb(s, session.SessionType.tournament)
             #      for s in plan['tournament_sessions']]
-            daily_plan.recovery_am = _recovery_session_from_mongodb(plan['recovery_am'])
-            daily_plan.recovery_pm = _recovery_session_from_mongodb(plan['recovery_am'])
+            daily_plan.recovery_am = _recovery_session_from_mongodb(plan['recovery_am']) if plan['recovery_am'] is not None else None
+            daily_plan.recovery_pm = _recovery_session_from_mongodb(plan['recovery_pm']) if plan['recovery_pm'] is not None else None
             # daily_plan.corrective_sessions = \
             #    [_external_session_from_mongodb(s, session.SessionType.corrective)
             #     for s in plan['corrective_sessions']]

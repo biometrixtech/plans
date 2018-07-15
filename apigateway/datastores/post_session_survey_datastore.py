@@ -46,6 +46,7 @@ class PostSessionSurveyDatastore(object):
 
         plan = daily_plan[0]
         sessions = getattr(plan, session_type_name)
+        sessions = [s.json_serialise() for s in sessions]
         if item.session_id is not None:
             for session in sessions:
                 if session['session_id'] == item.session_id:
