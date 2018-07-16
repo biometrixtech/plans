@@ -32,33 +32,45 @@ class SessionDatastore(object):
         daily_plan = daily_plan_store.get(user_id=user_id,
                                           start_date=event_date,
                                           end_date=event_date)
-        session_type = session_type
-        if session_type == 0:
-            session_type_name = 'practice_sessions'
-        elif session_type == 1:
-            session_type_name = 'strength_conditioning_sessions'
-        elif session_type == 2:
-            session_type_name = 'games'
-        elif session_type == 3:
-            session_type_name = 'tournaments'
-        elif session_type == 4:
-            session_type_name = 'bump_up_sessions'
-        elif session_type == 5:
-            session_type_name = 'corrective_sessions'
-
         plan = daily_plan[0]
+        session_type_name = self._get_session_type_name(session_type, 'object')
         sessions = getattr(plan, session_type_name)
         return [s.json_serialise() for s in sessions]
 
 
     def _update_sessions_mongo(self, user_id, event_date, session_type, sessions):
-        if session_type == 1:
-            session_type_name = 'cross_training_sessions'
-        elif session_type == 2:
-            session_type_name = 'game_sessions'
-        elif session_type == 3:
-            session_type_name = 'tournament_sessions'
-
+        session_type_name = self._get_session_type_name(session_type, 'mongo')
         mongo_collection = get_mongo_collection(self.mongo_collection)
         query = {"user_id": user_id, "date": event_date}
         mongo_collection.update_one(query, {'$set': {session_type_name: sessions}})
+
+    @staticmethod
+    def _get_session_type_name(session_type, destination):
+        if destination == 'mongo':
+            if session_type == 0:
+                session_type_name = 'practice_sessions'
+            elif session_type == 1:
+                session_type_name = 'cross_training_sessions'
+            elif session_type == 2:
+                session_type_name = 'game_sessions'
+            elif session_type == 3:
+                session_type_name = 'tournament_sessions'
+            elif session_type == 4:
+                session_type_name = 'bump_up_sessions'
+            elif session_type == 5:
+                session_type_name = 'corrective_sessions'
+        elif destination == 'object':
+            if session_type == 0:
+                session_type_name = 'practice_sessions'
+            elif session_type == 1:
+                session_type_name = 'strength_conditioning_sessions'
+            elif session_type == 2:
+                session_type_name = 'games'
+            elif session_type == 3:
+                session_type_name = 'tournaments'
+            elif session_type == 4:
+                session_type_name = 'bump_up_sessions'
+            elif session_type == 5:
+                session_type_name = 'corrective_sessions'
+
+        return session_type_name
