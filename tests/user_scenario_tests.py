@@ -56,11 +56,11 @@ def write_file(file_name, daily_plan):
     if not os.path.exists(directory):
         os.makedirs(directory)
     file = open(directory + file_name + ".json", "w")
-    json_string = json.dumps(daily_plan.json_serialise(),sort_keys=True, indent=4)
+    json_string = json.dumps(daily_plan.json_serialise(), indent=4)
     file.write(json_string)
     file.close()
 
-def generate_plan_a(user_id, readiness_survey, plan_date, file_name):
+def generate_plan(user_id, readiness_survey, plan_date, file_name, plan_letter):
 
     plan_datastore = DailyPlanDatastore()
     readiness_store = DailyReadinessDatastore()
@@ -76,59 +76,12 @@ def generate_plan_a(user_id, readiness_survey, plan_date, file_name):
 
     if success:
 
-        plan_a = plan_datastore.get(user_id, plan_date, plan_date)
+        plan = plan_datastore.get(user_id, plan_date, plan_date)
 
-        write_file(file_name + plan_date.replace('-', '') + "a", plan_a[0])
-
-    return success
-
-
-def generate_plan_b(user_id, post_session_survey, plan_date, file_name):
-
-    plan_datastore = DailyPlanDatastore()
-    readiness_store = DailyReadinessDatastore()
-    post_session_store = PostSessionSurveyDataStore()
-
-    post_session_store.put([post_session_survey])
-
-    manager = training_plan_management.TrainingPlanManager(user_id,
-                                                           readiness_store,
-                                                           DailyScheduleDatastore(),
-                                                           post_session_store,
-                                                           plan_datastore)
-    success = manager.create_daily_plan()
-
-    if success:
-
-        plan_b = plan_datastore.get(user_id, plan_date, plan_date)
-
-        write_file(file_name + plan_date.replace('-', '') + "b", plan_b[0])
+        write_file(file_name + plan_date.replace('-', '') + plan_letter, plan[0])
 
     return success
 
-
-def generate_plan_c(user_id, post_session_survey, plan_date, file_name):
-
-    plan_datastore = DailyPlanDatastore()
-    readiness_store = DailyReadinessDatastore()
-    post_session_store = PostSessionSurveyDataStore()
-
-    post_session_store.put([post_session_survey])
-
-    manager = training_plan_management.TrainingPlanManager(user_id,
-                                                           readiness_store,
-                                                           DailyScheduleDatastore(),
-                                                           post_session_store,
-                                                           plan_datastore)
-    success = manager.create_daily_plan()
-
-    if success:
-
-        plan_c = plan_datastore.get(user_id, plan_date, plan_date)
-
-        write_file(file_name + plan_date.replace('-', '') + "c", plan_c[0])
-
-    return success
 
 # Ryan Robbins
 
@@ -144,7 +97,7 @@ def test_robbins_create_daily_july_12():
     july_12_survey = DailyReadiness(datetime.datetime(2018, 7, 12, 11, 30, 0).strftime("%Y-%m-%dT%H:%M:%SZ"), user_id,
                                     july_12_soreness_list, 7, 9)
 
-    success = generate_plan_a(user_id, july_12_survey, "2018-07-12", file_user_id)
+    success = generate_plan(user_id, july_12_survey, "2018-07-12", file_user_id, "a")
 
     assert True is success
 
@@ -155,7 +108,7 @@ def test_robbins_create_daily_july_12():
         PostSessionSurvey(datetime.datetime(2018, 7, 12, 17, 30, 0).strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, None,
                           1, july_12_post_survey)
 
-    success = generate_plan_b(user_id, july_12_post_session_survey, "2018-07-12", file_user_id)
+    success = generate_plan(user_id, july_12_post_session_survey, "2018-07-12", file_user_id, "b")
 
     assert True is success
 
@@ -170,7 +123,7 @@ def test_robbins_create_daily_july_13():
 
     july_13_survey = DailyReadiness(datetime.datetime(2018, 7, 13, 8, 30, 0).strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, july_13_soreness_list, 6, 7)
 
-    success = generate_plan_a(user_id, july_13_survey, "2018-07-13", file_user_id)
+    success = generate_plan(user_id, july_13_survey, "2018-07-13", file_user_id, "a")
 
     assert True is success
 
@@ -181,7 +134,7 @@ def test_robbins_create_daily_july_13():
         PostSessionSurvey(datetime.datetime(2018, 7, 13, 17, 30, 0).strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, None,
                           0, july_13_post_survey)
 
-    success = generate_plan_b(user_id, july_13_post_session_survey, "2018-07-13", file_user_id)
+    success = generate_plan(user_id, july_13_post_session_survey, "2018-07-13", file_user_id, "b")
 
     assert True is success
 
@@ -196,7 +149,7 @@ def test_robbins_create_daily_july_14():
 
     july_14_survey = DailyReadiness(datetime.datetime(2018, 7, 14, 14, 15, 0).strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, july_14_soreness_list, 3, 1)
 
-    success = generate_plan_a(user_id, july_14_survey, "2018-07-14", file_user_id)
+    success = generate_plan(user_id, july_14_survey, "2018-07-14", file_user_id, "a")
 
     assert True is success
 
@@ -207,7 +160,7 @@ def test_robbins_create_daily_july_14():
         PostSessionSurvey(datetime.datetime(2018, 7, 14, 17, 30, 0).strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, None,
                           2, july_14_post_survey)
 
-    success = generate_plan_b(user_id, july_14_post_session_survey, "2018-07-14", file_user_id)
+    success = generate_plan(user_id, july_14_post_session_survey, "2018-07-14", file_user_id, "b")
 
     assert True is success
 
@@ -222,7 +175,7 @@ def test_robbins_create_daily_july_15():
 
     july_15_survey = DailyReadiness(datetime.datetime(2018, 7, 15, 7, 20, 0).strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, july_15_soreness_list, 6, 6)
 
-    success = generate_plan_a(user_id, july_15_survey, "2018-07-15", file_user_id)
+    success = generate_plan(user_id, july_15_survey, "2018-07-15", file_user_id, "a")
 
     assert True is success
 
@@ -233,7 +186,7 @@ def test_robbins_create_daily_july_15():
         PostSessionSurvey(datetime.datetime(2018, 7, 15, 16, 20, 0).strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, None,
                           2, july_15_post_survey)
 
-    success = generate_plan_b(user_id, july_15_post_session_survey, "2018-07-15", file_user_id)
+    success = generate_plan(user_id, july_15_post_session_survey, "2018-07-15", file_user_id, "b")
 
     assert True is success
 
@@ -247,7 +200,7 @@ def test_robbins_create_daily_july_16():
 
     july_16_survey = DailyReadiness(datetime.datetime(2018, 7, 16, 6, 0, 0).strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, july_16_soreness_list, 4, 3)
 
-    success = generate_plan_a(user_id, july_16_survey, "2018-07-16", file_user_id)
+    success = generate_plan(user_id, july_16_survey, "2018-07-16", file_user_id, "a")
 
     assert True is success
 
@@ -258,7 +211,7 @@ def test_robbins_create_daily_july_16():
         PostSessionSurvey(datetime.datetime(2018, 7, 16, 19, 0, 0).strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, None,
                           0, july_16_post_survey)
 
-    success = generate_plan_b(user_id, july_16_post_session_survey, "2018-07-16", file_user_id)
+    success = generate_plan(user_id, july_16_post_session_survey, "2018-07-16", file_user_id, "b")
 
     assert True is success
 
@@ -273,7 +226,7 @@ def test_robbins_create_daily_july_17():
 
     july_17_survey = DailyReadiness(datetime.datetime(2018, 7, 17, 6, 0, 0).strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, july_17_soreness_list, 4, 5)
 
-    success = generate_plan_a(user_id, july_17_survey, "2018-07-17", file_user_id)
+    success = generate_plan(user_id, july_17_survey, "2018-07-17", file_user_id, "a")
 
     assert True is success
 
@@ -284,7 +237,7 @@ def test_robbins_create_daily_july_17():
         PostSessionSurvey(datetime.datetime(2018, 7, 17, 19, 4, 0).strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, None,
                           1, july_17_post_survey)
 
-    success = generate_plan_b(user_id, july_17_post_session_survey, "2018-07-17", file_user_id)
+    success = generate_plan(user_id, july_17_post_session_survey, "2018-07-17", file_user_id, "b")
 
     assert True is success
 
@@ -299,7 +252,7 @@ def test_robbins_create_daily_july_18():
 
     july_18_survey = DailyReadiness(datetime.datetime(2018, 7, 18, 12, 0, 0).strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, july_18_soreness_list, 4, 2)
 
-    success = generate_plan_a(user_id, july_18_survey, "2018-07-18", file_user_id)
+    success = generate_plan(user_id, july_18_survey, "2018-07-18", file_user_id, "a")
 
     assert True is success
 
@@ -310,7 +263,7 @@ def test_robbins_create_daily_july_18():
         PostSessionSurvey(datetime.datetime(2018, 7, 18, 20, 0, 0).strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, None,
                           0, july_18_post_survey)
 
-    success = generate_plan_b(user_id, july_18_post_session_survey, "2018-07-18", file_user_id)
+    success = generate_plan(user_id, july_18_post_session_survey, "2018-07-18", file_user_id, "b")
 
     assert True is success
 
@@ -328,7 +281,7 @@ def test_jones_create_daily_july_12():
     july_12_survey = DailyReadiness(datetime.datetime(2018, 7, 12, 11, 0, 0).strftime("%Y-%m-%dT%H:%M:%SZ"), user_id,
                                     july_12_soreness_list, 6, 7)
 
-    success = generate_plan_a(user_id, july_12_survey, "2018-07-12", file_user_id)
+    success = generate_plan(user_id, july_12_survey, "2018-07-12", file_user_id, "a")
 
     assert True is success
 
@@ -339,7 +292,7 @@ def test_jones_create_daily_july_12():
         PostSessionSurvey(datetime.datetime(2018, 7, 12, 13, 54, 0).strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, None,
                           0, july_12_post_survey)
 
-    success = generate_plan_b(user_id, july_12_post_session_survey, "2018-07-12", file_user_id)
+    success = generate_plan(user_id, july_12_post_session_survey, "2018-07-12", file_user_id, "b")
 
     assert True is success
 
@@ -354,7 +307,7 @@ def test_jones_create_daily_july_13():
 
     july_13_survey = DailyReadiness(datetime.datetime(2018, 7, 13, 8, 30, 0).strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, july_13_soreness_list, 4, 4)
 
-    success = generate_plan_a(user_id, july_13_survey, "2018-07-13", file_user_id)
+    success = generate_plan(user_id, july_13_survey, "2018-07-13", file_user_id, "a")
 
     assert True is success
 
@@ -365,7 +318,7 @@ def test_jones_create_daily_july_13():
         PostSessionSurvey(datetime.datetime(2018, 7, 13, 13, 51, 0).strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, None,
                           0, july_13_post_survey)
 
-    success = generate_plan_b(user_id, july_13_post_session_survey, "2018-07-13", file_user_id)
+    success = generate_plan(user_id, july_13_post_session_survey, "2018-07-13", file_user_id, "b")
 
     assert True is success
 
@@ -380,7 +333,7 @@ def test_jones_create_daily_july_14():
 
     july_14_survey = DailyReadiness(datetime.datetime(2018, 7, 14, 14, 15, 0).strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, july_14_soreness_list, 9, 7)
 
-    success = generate_plan_a(user_id, july_14_survey, "2018-07-14", file_user_id)
+    success = generate_plan(user_id, july_14_survey, "2018-07-14", file_user_id, "a")
 
     assert True is success
 
@@ -391,7 +344,7 @@ def test_jones_create_daily_july_14():
         PostSessionSurvey(datetime.datetime(2018, 7, 14, 14, 2, 0).strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, None,
                           0, july_14_post_survey)
 
-    success = generate_plan_b(user_id, july_14_post_session_survey, "2018-07-14", file_user_id)
+    success = generate_plan(user_id, july_14_post_session_survey, "2018-07-14", file_user_id, "b")
 
     assert True is success
 
@@ -406,7 +359,7 @@ def test_jones_create_daily_july_15():
 
     july_15_survey = DailyReadiness(datetime.datetime(2018, 7, 15, 11, 1, 0).strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, july_15_soreness_list, 8, 9)
 
-    success = generate_plan_a(user_id, july_15_survey, "2018-07-15", file_user_id)
+    success = generate_plan(user_id, july_15_survey, "2018-07-15", file_user_id, "a")
 
     assert True is success
 
@@ -417,7 +370,7 @@ def test_jones_create_daily_july_15():
         PostSessionSurvey(datetime.datetime(2018, 7, 15, 13, 47, 0).strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, None,
                           0, july_15_post_survey)
 
-    success = generate_plan_b(user_id, july_15_post_session_survey, "2018-07-15", file_user_id)
+    success = generate_plan(user_id, july_15_post_session_survey, "2018-07-15", file_user_id, "b")
 
     assert True is success
 
@@ -432,7 +385,7 @@ def test_jones_create_daily_july_16():
 
     july_16_survey = DailyReadiness(datetime.datetime(2018, 7, 16, 10, 27, 0).strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, july_16_soreness_list, 5, 5)
 
-    success = generate_plan_a(user_id, july_16_survey, "2018-07-16", file_user_id)
+    success = generate_plan(user_id, july_16_survey, "2018-07-16", file_user_id, "a")
 
     assert True is success
 
@@ -443,7 +396,7 @@ def test_jones_create_daily_july_16():
         PostSessionSurvey(datetime.datetime(2018, 7, 16, 13, 55, 0).strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, None,
                           0, july_16_post_survey)
 
-    success = generate_plan_b(user_id, july_16_post_session_survey, "2018-07-16", file_user_id)
+    success = generate_plan(user_id, july_16_post_session_survey, "2018-07-16", file_user_id, "b")
 
     assert True is success
 
@@ -457,7 +410,7 @@ def test_jones_create_daily_july_17():
 
     july_17_survey = DailyReadiness(datetime.datetime(2018, 7, 17, 10, 35, 0).strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, july_17_soreness_list, 7, 7)
 
-    success = generate_plan_a(user_id, july_17_survey, "2018-07-17", file_user_id)
+    success = generate_plan(user_id, july_17_survey, "2018-07-17", file_user_id, "a")
 
     assert True is success
 
@@ -468,7 +421,7 @@ def test_jones_create_daily_july_17():
         PostSessionSurvey(datetime.datetime(2018, 7, 17, 15, 3, 0).strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, None,
                           0, july_17_post_survey)
 
-    success = generate_plan_b(user_id, july_17_post_session_survey, "2018-07-17", file_user_id)
+    success = generate_plan(user_id, july_17_post_session_survey, "2018-07-17", file_user_id, "b")
 
     assert True is success
 
@@ -479,7 +432,7 @@ def test_jones_create_daily_july_17():
         PostSessionSurvey(datetime.datetime(2018, 7, 17, 16, 4, 0).strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, None,
                           1, july_17_post_survey)
 
-    success = generate_plan_c(user_id, july_17_post_session_survey, "2018-07-17", file_user_id)
+    success = generate_plan(user_id, july_17_post_session_survey, "2018-07-17", file_user_id, "c")
 
     assert True is success
 
@@ -494,7 +447,7 @@ def test_jones_create_daily_july_18():
 
     july_18_survey = DailyReadiness(datetime.datetime(2018, 7, 18, 11, 7, 0).strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, july_18_soreness_list, 8, 7)
 
-    success = generate_plan_a(user_id, july_18_survey, "2018-07-18", file_user_id)
+    success = generate_plan(user_id, july_18_survey, "2018-07-18", file_user_id, "a")
 
     assert True is success
 
@@ -505,6 +458,6 @@ def test_jones_create_daily_july_18():
         PostSessionSurvey(datetime.datetime(2018, 7, 18, 13, 46, 0).strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, None,
                           0, july_18_post_survey)
 
-    success = generate_plan_b(user_id, july_18_post_session_survey, "2018-07-18", file_user_id)
+    success = generate_plan(user_id, july_18_post_session_survey, "2018-07-18", file_user_id, "b")
 
     assert True is success
