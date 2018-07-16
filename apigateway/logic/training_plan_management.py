@@ -128,7 +128,7 @@ class TrainingPlanManager(object):
 
         self.daily_plan_datastore.put(daily_plan)
 
-        return True
+        return daily_plan
 
     def create_training_cycle(self, athlete_schedule, athlete_injury_history):
         # schedule_manager = schedule.ScheduleManager()

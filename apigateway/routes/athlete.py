@@ -22,17 +22,17 @@ iotd_client = boto3.client('iot-data')
 @authentication_required
 @xray_recorder.capture('routes.athlete.daily_plan.create')
 def create_daily_plan(athlete_id):
-    daily_plan_outcome = TrainingPlanManager(athlete_id, DailyReadinessDatastore(), DailyScheduleDatastore(),
-                                             PostSessionSurveyDatastore(), DailyPlanDatastore()).create_daily_plan()
+    daily_plan = TrainingPlanManager(athlete_id, DailyReadinessDatastore(), DailyScheduleDatastore(),
+                                     PostSessionSurveyDatastore(), DailyPlanDatastore()).create_daily_plan()
     # daily_plan.last_updated = format_datetime(datetime.datetime.now())
 
-    push_plan_update(athlete_id, daily_plan_outcome)
+    push_plan_update(athlete_id, daily_plan)
     return {'message': 'Update requested'}, 202
 
 
 @xray_recorder.capture('routes.athlete.daily_plan.push')
-def push_plan_update(user_id, daily_plan_outcome):
+def push_plan_update(user_id, daily_plan):
     iotd_client.publish(
         topic='plans/{}/athlete/{}/daily_plan'.format(os.environ['ENVIRONMENT'], user_id),
-        payload=json.dumps({'daily_plan': 'Plan Outcome: ' + str(daily_plan_outcome)}, default=json_serialise).encode()
+        payload=json.dumps({'daily_plan': daily_plan}, default=json_serialise).encode()
     )
