@@ -461,3 +461,75 @@ def test_jones_create_daily_july_18():
     success = generate_plan(user_id, july_18_post_session_survey, "2018-07-18", file_user_id, "b")
 
     assert True is success
+
+# AK
+
+
+def test_ak_create_daily_july_12():
+
+    user_id = "khan@email.com"
+
+    file_user_id = "ak"
+
+    july_12_soreness_list = []
+
+    july_12_survey = DailyReadiness(datetime.datetime(2018, 7, 12, 11, 0, 0).strftime("%Y-%m-%dT%H:%M:%SZ"), user_id,
+                                    july_12_soreness_list, 8, 7)
+
+    success = generate_plan(user_id, july_12_survey, "2018-07-12", file_user_id, "a")
+
+    assert True is success
+
+    july_12_soreness_list = []
+
+    july_12_post_survey = get_post_survey(4, july_12_soreness_list)
+    july_12_post_session_survey = \
+        PostSessionSurvey(datetime.datetime(2018, 7, 12, 12, 3, 0).strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, None,
+                          0, july_12_post_survey)
+
+    success = generate_plan(user_id, july_12_post_session_survey, "2018-07-12", file_user_id, "b")
+
+    assert True is success
+
+
+def test_ak_create_daily_july_13():
+
+    user_id = "khan@email.com"
+
+    file_user_id = "ak"
+
+    july_13_soreness_list = [body_part_soreness(6, 2), body_part_soreness(16,1), body_part_soreness(17, 1)]
+
+    july_13_survey = DailyReadiness(datetime.datetime(2018, 7, 13, 9, 4, 0).strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, july_13_soreness_list, 7, 7)
+
+    success = generate_plan(user_id, july_13_survey, "2018-07-13", file_user_id, "a")
+
+    assert True is success
+
+    july_13_soreness_list = [body_part_soreness(6, 2), body_part_soreness(17, 1), body_part_soreness(7, 2)]
+
+    july_13_post_survey = get_post_survey(5, july_13_soreness_list)
+    july_13_post_session_survey = \
+        PostSessionSurvey(datetime.datetime(2018, 7, 13, 11, 47, 0).strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, None,
+                          0, july_13_post_survey)
+
+    success = generate_plan(user_id, july_13_post_session_survey, "2018-07-13", file_user_id, "b")
+
+    assert True is success
+
+
+def test_ak_create_daily_july_14():
+
+    user_id = "khan@email.com"
+
+    file_user_id = "ak"
+
+    july_14_soreness_list = [body_part_soreness(6, 1), body_part_soreness(7, 2)]
+
+    july_14_survey = DailyReadiness(datetime.datetime(2018, 7, 14, 12, 12, 0).strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, july_14_soreness_list, 10, 9)
+
+    success = generate_plan(user_id, july_14_survey, "2018-07-14", file_user_id, "a")
+
+    assert True is success
+
+    
