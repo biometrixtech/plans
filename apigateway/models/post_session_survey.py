@@ -1,6 +1,7 @@
 from serialisable import Serialisable
 
 from logic.soreness_and_injury import BodyPart, DailySoreness, BodyPartLocation
+from models.session import SessionType
 
 class PostSessionSurvey(Serialisable):
     
@@ -14,8 +15,8 @@ class PostSessionSurvey(Serialisable):
         self.event_date = event_date
         self.user_id = user_id
         self.session_id = session_id
-        self.session_type = session_type
-        self.survey = PostSurvey(survey)
+        self.session_type = SessionType(session_type)
+        self.survey = PostSurvey(survey, event_date)
 
 
     def get_id(self):
@@ -28,7 +29,7 @@ class PostSessionSurvey(Serialisable):
         ret = {
             'event_date': self.event_date,
             'user_id': self.user_id,
-            'session_type': self.session_type,
+            'session_type': self.session_type.value,
             'session_id': self.session_id,
             'survey': self.survey.json_serialise()
         }
@@ -36,33 +37,28 @@ class PostSessionSurvey(Serialisable):
 
 
 class PostSurvey(Serialisable):
-    def __init__(self, survey=None):
+    def __init__(self, survey=None, event_date=None):
         """
         :param dict survey:
         """
         if survey is not None:
             self.RPE = survey['RPE']
-            self.soreness = []
-            for sore in survey['soreness']:
-                soreness = DailySoreness()
-                soreness.body_part = BodyPart(BodyPartLocation(sore['body_part']), None)
-                soreness.severity = sore['severity']
-                soreness.side = self._key_present('side', sore)
-                self.soreness.append(soreness)
+            self.soreness = [self._soreness_from_dict(s, event_date) for s in survey['soreness']]
 
     def json_serialise(self):
         ret = {
             'RPE': self.RPE,
-            'soreness': [self.soreness_to_dict(item) for item in self.soreness]
+            'soreness': [item.json_serialise() for item in self.soreness]
         }
         return ret
 
-    def soreness_to_dict(self, soreness):
-        return  {
-                 "body_part": soreness.body_part.location.value,
-                 "severity": soreness.severity,
-                 "side": soreness.side
-                 }
+    def _soreness_from_dict(self, soreness_dict, event_date):
+        soreness = DailySoreness()
+        soreness.body_part = BodyPart(BodyPartLocation(soreness_dict['body_part']), None)
+        soreness.severity = soreness_dict['severity']
+        soreness.side = self._key_present('side', soreness_dict)
+        soreness.reported_date_time = event_date
+        return soreness
 
     def _key_present(self, key_name, dictionary):
         if key_name in dictionary:
