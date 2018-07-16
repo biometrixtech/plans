@@ -265,10 +265,10 @@ class ExerciseAssignmentCalculator(object):
         hamstrings.lengthen_exercises.append(models.exercise.AssignedExercise("28", hamstrings.treatment_priority, 3))
         hamstrings.lengthen_exercises.append(models.exercise.AssignedExercise("49", hamstrings.treatment_priority, 4))
         hamstrings.lengthen_exercises.append(models.exercise.AssignedExercise("8", hamstrings.treatment_priority, 5))
-        hamstrings.lengthen_exercises.append(models.exercise.AssignedExercise("55", hamstrings.treatment_priority, 6))
-        hamstrings.lengthen_exercises.append(models.exercise.AssignedExercise("98", hamstrings.treatment_priority, 7))
+        # hamstrings.lengthen_exercises.append(models.exercise.AssignedExercise("55", hamstrings.treatment_priority, 6))
+        hamstrings.lengthen_exercises.append(models.exercise.AssignedExercise("98", hamstrings.treatment_priority, 6))
 
-        gastroc_soleus = models.exercise.AssignedExercise("25", hamstrings.treatment_priority, 8)
+        gastroc_soleus = models.exercise.AssignedExercise("25", hamstrings.treatment_priority, 7)
         gastroc_soleus.progressions = ["26"]
         hamstrings.lengthen_exercises.append(gastroc_soleus)
 
@@ -343,15 +343,15 @@ class ExerciseAssignmentCalculator(object):
         groin.inhibit_exercises.append(models.exercise.AssignedExercise("2", groin.treatment_priority, 8))
 
         groin.lengthen_exercises.append(models.exercise.AssignedExercise("103", groin.treatment_priority, 1))
-        groin.lengthen_exercises.append(models.exercise.AssignedExercise("55", groin.treatment_priority, 2))
-        groin.lengthen_exercises.append(models.exercise.AssignedExercise("8", groin.treatment_priority, 3))
-        groin.lengthen_exercises.append(models.exercise.AssignedExercise("28", groin.treatment_priority, 4))
-        groin.lengthen_exercises.append(models.exercise.AssignedExercise("49", groin.treatment_priority, 5))
-        groin.lengthen_exercises.append(models.exercise.AssignedExercise("98", groin.treatment_priority, 6))
-        groin.lengthen_exercises.append(models.exercise.AssignedExercise("46", groin.treatment_priority, 7))
-        groin.lengthen_exercises.append(models.exercise.AssignedExercise("9", groin.treatment_priority, 8))
+        # groin.lengthen_exercises.append(models.exercise.AssignedExercise("55", groin.treatment_priority, 2))
+        groin.lengthen_exercises.append(models.exercise.AssignedExercise("8", groin.treatment_priority, 2))
+        groin.lengthen_exercises.append(models.exercise.AssignedExercise("28", groin.treatment_priority, 3))
+        groin.lengthen_exercises.append(models.exercise.AssignedExercise("49", groin.treatment_priority, 4))
+        groin.lengthen_exercises.append(models.exercise.AssignedExercise("98", groin.treatment_priority, 5))
+        groin.lengthen_exercises.append(models.exercise.AssignedExercise("46", groin.treatment_priority, 6))
+        groin.lengthen_exercises.append(models.exercise.AssignedExercise("9", groin.treatment_priority, 7))
 
-        gastroc_soleus = models.exercise.AssignedExercise("25", groin.treatment_priority, 9)
+        gastroc_soleus = models.exercise.AssignedExercise("25", groin.treatment_priority, 8)
         gastroc_soleus.progressions = ["26"]
         groin.lengthen_exercises.append(gastroc_soleus)
 
