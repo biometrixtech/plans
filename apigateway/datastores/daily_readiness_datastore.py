@@ -77,7 +77,6 @@ def _soreness_from_mongodb(soreness_mongo_result, parent_mongo_result):
     soreness.severity = soreness_mongo_result['severity']
     soreness.side = _key_present('side', soreness_mongo_result)
     soreness.reported_date_time = parent_mongo_result['event_date']
-    soreness.side = _key_present('side', soreness_mongo_result)
 
     return soreness
 
