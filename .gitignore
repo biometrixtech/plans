@@ -1,6 +1,7 @@
 *.zip
 *.pyc
 *_config.py
+*.DS_Store
 
 apigateway/*
 .idea/*
