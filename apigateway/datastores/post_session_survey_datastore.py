@@ -58,7 +58,7 @@ class PostSessionSurveyDatastore(object):
         daily_plan = daily_plan_store.get(user_id=item.user_id,
                                           start_date=item.event_date,
                                           end_date=item.event_date)
-        session_type = item.session_type
+        session_type = item.session_type.value
         if session_type == 0:
             session_type_name = 'practice_sessions'
         elif session_type == 1:
@@ -94,37 +94,16 @@ class PostSessionSurveyDatastore(object):
             session_type_name = 'game_sessions'
         elif session_type == 3:
             session_type_name = 'tournament_sessions'
-        
+
         mongo_collection = get_mongo_collection(self.mongo_collection)
         query = {"user_id": item.user_id, "date": item.event_date}
         mongo_collection.update_one(query, {'$set': {session_type_name: sessions}})
 
 def _post_session_survey_from_mongodb(mongo_result, user_id, session_id, session_type, event_date):
 
-
     survey_result = mongo_result["post_session_survey"]
     if survey_result is not None:
-
-        survey = PostSurvey()
-        survey.RPE = survey_result["RPE"]
-        survey.soreness = [_soreness_from_mongodb(s) for s in survey_result["soreness"]]
-        post_session_survey = PostSessionSurvey(event_date, user_id, session_id, session_type, survey)
-
+        post_session_survey = PostSessionSurvey(event_date, user_id, session_id, session_type, survey_result)
         return post_session_survey
     else:
         return None
-
-def _soreness_from_mongodb(soreness_mongo_result):
-    soreness = DailySoreness()
-    soreness_body_part = soreness_mongo_result['body_part']
-    soreness.body_part = BodyPart(BodyPartLocation(soreness_body_part), None)
-    soreness.severity = soreness_mongo_result['severity']
-    soreness.side = _key_present('side', soreness_mongo_result)
-
-    return soreness
-
-def _key_present(key_name, dictionary):
-    if key_name in dictionary:
-        return dictionary[key_name]
-    else:
-        return ""

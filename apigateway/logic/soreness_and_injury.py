@@ -48,6 +48,13 @@ class DailySoreness(Soreness):
 
         # self.descriptor = None  # soreness_descriptor
 
+    def json_serialise(self):
+        ret = {
+            'body_part': self.body_part.location.value,
+            'severity': self.severity,
+            'side': self.side
+        }
+        return ret
 
 class PostSessionSoreness(Soreness):
 
