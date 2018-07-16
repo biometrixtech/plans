@@ -60,25 +60,91 @@ class ExerciseAssignmentCalculator(object):
         body_part_exercises = self.exercises_for_body_parts
         exercise_list = self.exercise_library
 
-        for soreness in soreness_list:
-            body_part = [b for b in body_part_exercises if b.location.value == soreness.body_part.location.value]
+        if soreness_list is not None and len(soreness_list) > 0:
+            for soreness in soreness_list:
+                body_part = [b for b in body_part_exercises if b.location.value == soreness.body_part.location.value]
+
+                if exercise_session.inhibit_target_minutes is not None and exercise_session.inhibit_target_minutes > 0:
+                    exercise_assignments.inhibit_exercises.extend(
+                        self.get_exercise_list_for_body_part(body_part[0].inhibit_exercises, exercise_list,
+                                                             completed_exercises, soreness.severity))
+                if exercise_session.lengthen_target_minutes is not None and exercise_session.lengthen_target_minutes > 0:
+                    exercise_assignments.lengthen_exercises.extend(
+                        self.get_exercise_list_for_body_part(body_part[0].lengthen_exercises, exercise_list,
+                                                             completed_exercises, soreness.severity))
+                if exercise_session.activate_target_minutes is not None and exercise_session.activate_target_minutes > 0:
+                    exercise_assignments.activate_exercises.extend(
+                        self.get_exercise_list_for_body_part(body_part[0].activate_exercises, exercise_list,
+                                                             completed_exercises, soreness.severity))
+
+        else:
+            body_part = self.get_general_exercises()
 
             if exercise_session.inhibit_target_minutes is not None and exercise_session.inhibit_target_minutes > 0:
                 exercise_assignments.inhibit_exercises.extend(
                     self.get_exercise_list_for_body_part(body_part[0].inhibit_exercises, exercise_list,
-                                                         completed_exercises, soreness.severity))
+                                                         completed_exercises, 0))
             if exercise_session.lengthen_target_minutes is not None and exercise_session.lengthen_target_minutes > 0:
                 exercise_assignments.lengthen_exercises.extend(
                     self.get_exercise_list_for_body_part(body_part[0].lengthen_exercises, exercise_list,
-                                                         completed_exercises, soreness.severity))
+                                                         completed_exercises, 0))
             if exercise_session.activate_target_minutes is not None and exercise_session.activate_target_minutes > 0:
                 exercise_assignments.activate_exercises.extend(
                     self.get_exercise_list_for_body_part(body_part[0].activate_exercises, exercise_list,
-                                                         completed_exercises, soreness.severity))
+                                                         completed_exercises, 0))
+
         exercise_assignments.scale_to_targets()
 
         return exercise_assignments
 
+    def get_general_exercises(self):
+
+        body_parts = []
+
+        general = soreness_and_injury.BodyPart(soreness_and_injury.BodyPartLocation.general, 15)
+
+        general.inhibit_exercises.append(models.exercise.AssignedExercise("48", general.treatment_priority, 1))
+        general.inhibit_exercises.append(models.exercise.AssignedExercise("3", general.treatment_priority, 2))
+
+        it_band = models.exercise.AssignedExercise("4", general.treatment_priority, 3)
+        it_band.progressions = ["5"]
+        general.inhibit_exercises.append(it_band)
+
+        general.inhibit_exercises.append(models.exercise.AssignedExercise("2", general.treatment_priority, 4))
+        general.inhibit_exercises.append(models.exercise.AssignedExercise("44", general.treatment_priority, 5))
+        general.inhibit_exercises.append(models.exercise.AssignedExercise("55", general.treatment_priority, 6))
+
+        general.lengthen_exercises.append(models.exercise.AssignedExercise("9", general.treatment_priority, 1))
+        general.lengthen_exercises.append(models.exercise.AssignedExercise("6", general.treatment_priority, 2))
+        general.lengthen_exercises.append(models.exercise.AssignedExercise("28", general.treatment_priority, 3))
+        general.lengthen_exercises.append(models.exercise.AssignedExercise("56", general.treatment_priority, 4))
+        general.lengthen_exercises.append(models.exercise.AssignedExercise("103", general.treatment_priority, 5))
+        general.lengthen_exercises.append(models.exercise.AssignedExercise("7", general.treatment_priority, 6))
+        general.lengthen_exercises.append(models.exercise.AssignedExercise("46", general.treatment_priority, 7))
+
+        glute_activation = models.exercise.AssignedExercise("81", general.treatment_priority, 1)
+        glute_activation.progressions = ["82", "83"]
+        general.activate_exercises.append(glute_activation)
+
+        hip_bridge_progression = models.exercise.AssignedExercise("10", general.treatment_priority, 2)
+        hip_bridge_progression.progressions = ["12", "11", "13"]
+        general.activate_exercises.append(hip_bridge_progression)
+
+        core_strength_progression = models.exercise.AssignedExercise("85", general.treatment_priority, 3)
+        core_strength_progression.progressions = ["86", "87", "88"]
+        general.activate_exercises.append(core_strength_progression)
+
+        posterior_pelvic_tilt = models.exercise.AssignedExercise("79", general.treatment_priority, 4)
+        posterior_pelvic_tilt.progressions = ["80"]
+        general.activate_exercises.append(posterior_pelvic_tilt)
+
+        core_strength_progression_2 = models.exercise.AssignedExercise("89", general.treatment_priority, 5)
+        core_strength_progression_2.progressions = ["90", "91", "92"]
+        general.activate_exercises.append(core_strength_progression_2)
+
+        body_parts.append(general)
+
+        return body_parts
 
     def get_exercises_for_body_parts(self):
         body_parts = []

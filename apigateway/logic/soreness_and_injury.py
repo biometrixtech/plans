@@ -78,6 +78,7 @@ class BodyPartLocation(Enum):
     foot = 10
     outer_thigh = 11
     lower_back = 12
+    general = 13
     glutes = 14
     hamstrings = 15
     calves = 16

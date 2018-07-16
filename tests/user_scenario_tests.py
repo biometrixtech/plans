@@ -2,6 +2,7 @@ import pytest
 import logic.training as training
 import datetime
 import logic.training_plan_management as training_plan_management
+from aws_xray_sdk.core import xray_recorder
 import athlete_data_access_mocks
 #import datastores.exercise_datastore as exercise_datastore
 from datastores.daily_plan_datastore import DailyPlanDatastore
@@ -14,6 +15,11 @@ import models.session as session
 from soreness_and_injury import DailySoreness, BodyPart, BodyPartLocation
 import os
 import json
+
+
+@pytest.fixture(scope="session", autouse=True)
+def add_xray_support(request):
+    xray_recorder.begin_segment(name='test')
 
 
 @pytest.fixture(scope="module")
@@ -97,6 +103,30 @@ def generate_plan_b(user_id, post_session_survey, plan_date, file_name):
         plan_b = plan_datastore.get(user_id, plan_date, plan_date)
 
         write_file(file_name + plan_date.replace('-', '') + "b", plan_b[0])
+
+    return success
+
+
+def generate_plan_c(user_id, post_session_survey, plan_date, file_name):
+
+    plan_datastore = DailyPlanDatastore()
+    readiness_store = DailyReadinessDatastore()
+    post_session_store = PostSessionSurveyDataStore()
+
+    post_session_store.put([post_session_survey])
+
+    manager = training_plan_management.TrainingPlanManager(user_id,
+                                                           readiness_store,
+                                                           DailyScheduleDatastore(),
+                                                           post_session_store,
+                                                           plan_datastore)
+    success = manager.create_daily_plan()
+
+    if success:
+
+        plan_c = plan_datastore.get(user_id, plan_date, plan_date)
+
+        write_file(file_name + plan_date.replace('-', '') + "c", plan_c[0])
 
     return success
 
@@ -284,3 +314,197 @@ def test_robbins_create_daily_july_18():
 
     assert True is success
 
+# Julie Jones
+
+
+def test_jones_create_daily_july_12():
+
+    user_id = "jjones@email.com"
+
+    file_user_id = "juliejones"
+
+    july_12_soreness_list = [body_part_soreness(5, 2)]
+
+    july_12_survey = DailyReadiness(datetime.datetime(2018, 7, 12, 11, 0, 0).strftime("%Y-%m-%dT%H:%M:%SZ"), user_id,
+                                    july_12_soreness_list, 6, 7)
+
+    success = generate_plan_a(user_id, july_12_survey, "2018-07-12", file_user_id)
+
+    assert True is success
+
+    july_12_soreness_list = [body_part_soreness(5, 2)]
+
+    july_12_post_survey = get_post_survey(4, july_12_soreness_list)
+    july_12_post_session_survey = \
+        PostSessionSurvey(datetime.datetime(2018, 7, 12, 13, 54, 0).strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, None,
+                          0, july_12_post_survey)
+
+    success = generate_plan_b(user_id, july_12_post_session_survey, "2018-07-12", file_user_id)
+
+    assert True is success
+
+
+def test_jones_create_daily_july_13():
+
+    user_id = "jjones@email.com"
+
+    file_user_id = "juliejones"
+
+    july_13_soreness_list = [body_part_soreness(5, 2)]
+
+    july_13_survey = DailyReadiness(datetime.datetime(2018, 7, 13, 8, 30, 0).strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, july_13_soreness_list, 4, 4)
+
+    success = generate_plan_a(user_id, july_13_survey, "2018-07-13", file_user_id)
+
+    assert True is success
+
+    july_13_soreness_list = [body_part_soreness(5, 3)]
+
+    july_13_post_survey = get_post_survey(7, july_13_soreness_list)
+    july_13_post_session_survey = \
+        PostSessionSurvey(datetime.datetime(2018, 7, 13, 13, 51, 0).strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, None,
+                          0, july_13_post_survey)
+
+    success = generate_plan_b(user_id, july_13_post_session_survey, "2018-07-13", file_user_id)
+
+    assert True is success
+
+
+def test_jones_create_daily_july_14():
+
+    user_id = "jjones@email.com"
+
+    file_user_id = "juliejones"
+
+    july_14_soreness_list = [body_part_soreness(5, 2), body_part_soreness(12, 2)]
+
+    july_14_survey = DailyReadiness(datetime.datetime(2018, 7, 14, 14, 15, 0).strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, july_14_soreness_list, 9, 7)
+
+    success = generate_plan_a(user_id, july_14_survey, "2018-07-14", file_user_id)
+
+    assert True is success
+
+    july_14_soreness_list = [body_part_soreness(5, 2), body_part_soreness(12, 1)]
+
+    july_14_post_survey = get_post_survey(4, july_14_soreness_list)
+    july_14_post_session_survey = \
+        PostSessionSurvey(datetime.datetime(2018, 7, 14, 14, 2, 0).strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, None,
+                          0, july_14_post_survey)
+
+    success = generate_plan_b(user_id, july_14_post_session_survey, "2018-07-14", file_user_id)
+
+    assert True is success
+
+
+def test_jones_create_daily_july_15():
+
+    user_id = "jjones@email.com"
+
+    file_user_id = "juliejones"
+
+    july_15_soreness_list = [body_part_soreness(5, 3), body_part_soreness(12, 1)]
+
+    july_15_survey = DailyReadiness(datetime.datetime(2018, 7, 15, 11, 1, 0).strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, july_15_soreness_list, 8, 9)
+
+    success = generate_plan_a(user_id, july_15_survey, "2018-07-15", file_user_id)
+
+    assert True is success
+
+    july_15_soreness_list = [body_part_soreness(5, 3)]
+
+    july_15_post_survey = get_post_survey(1, july_15_soreness_list)
+    july_15_post_session_survey = \
+        PostSessionSurvey(datetime.datetime(2018, 7, 15, 13, 47, 0).strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, None,
+                          0, july_15_post_survey)
+
+    success = generate_plan_b(user_id, july_15_post_session_survey, "2018-07-15", file_user_id)
+
+    assert True is success
+
+
+def test_jones_create_daily_july_16():
+
+    user_id = "jjones@email.com"
+
+    file_user_id = "juliejones"
+
+    july_16_soreness_list = [body_part_soreness(5, 2)]
+
+    july_16_survey = DailyReadiness(datetime.datetime(2018, 7, 16, 10, 27, 0).strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, july_16_soreness_list, 5, 5)
+
+    success = generate_plan_a(user_id, july_16_survey, "2018-07-16", file_user_id)
+
+    assert True is success
+
+    july_16_soreness_list = [body_part_soreness(5, 2)]
+
+    july_16_post_survey = get_post_survey(4, july_16_soreness_list)
+    july_16_post_session_survey = \
+        PostSessionSurvey(datetime.datetime(2018, 7, 16, 13, 55, 0).strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, None,
+                          0, july_16_post_survey)
+
+    success = generate_plan_b(user_id, july_16_post_session_survey, "2018-07-16", file_user_id)
+
+    assert True is success
+
+def test_jones_create_daily_july_17():
+
+    user_id = "jjones@email.com"
+
+    file_user_id = "juliejones"
+
+    july_17_soreness_list = [body_part_soreness(5, 2)]
+
+    july_17_survey = DailyReadiness(datetime.datetime(2018, 7, 17, 10, 35, 0).strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, july_17_soreness_list, 7, 7)
+
+    success = generate_plan_a(user_id, july_17_survey, "2018-07-17", file_user_id)
+
+    assert True is success
+
+    july_17_soreness_list = [body_part_soreness(5, 2)]
+
+    july_17_post_survey = get_post_survey(5, july_17_soreness_list)
+    july_17_post_session_survey = \
+        PostSessionSurvey(datetime.datetime(2018, 7, 17, 15, 3, 0).strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, None,
+                          0, july_17_post_survey)
+
+    success = generate_plan_b(user_id, july_17_post_session_survey, "2018-07-17", file_user_id)
+
+    assert True is success
+
+    july_17_soreness_list = [body_part_soreness(5, 2), body_part_soreness(12, 1)]
+
+    july_17_post_survey = get_post_survey(3, july_17_soreness_list)
+    july_17_post_session_survey = \
+        PostSessionSurvey(datetime.datetime(2018, 7, 17, 16, 4, 0).strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, None,
+                          1, july_17_post_survey)
+
+    success = generate_plan_c(user_id, july_17_post_session_survey, "2018-07-17", file_user_id)
+
+    assert True is success
+
+
+def test_jones_create_daily_july_18():
+
+    user_id = "jjones@email.com"
+
+    file_user_id = "juliejones"
+
+    july_18_soreness_list = [body_part_soreness(5, 1)]
+
+    july_18_survey = DailyReadiness(datetime.datetime(2018, 7, 18, 11, 7, 0).strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, july_18_soreness_list, 8, 7)
+
+    success = generate_plan_a(user_id, july_18_survey, "2018-07-18", file_user_id)
+
+    assert True is success
+
+    july_18_soreness_list = [body_part_soreness(5, 1)]
+
+    july_18_post_survey = get_post_survey(6, july_18_soreness_list)
+    july_18_post_session_survey = \
+        PostSessionSurvey(datetime.datetime(2018, 7, 18, 13, 46, 0).strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, None,
+                          0, july_18_post_survey)
+
+    success = generate_plan_b(user_id, july_18_post_session_survey, "2018-07-18", file_user_id)
+
+    assert True is success
