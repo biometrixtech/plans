@@ -47,7 +47,7 @@ class PostSurvey(Serialisable):
                 soreness = DailySoreness()
                 soreness.body_part = BodyPart(BodyPartLocation(sore['body_part']), None)
                 soreness.severity = sore['severity']
-                soreness.side = sore['side']
+                soreness.side = self._key_present('side', sore)
                 self.soreness.append(soreness)
 
     def json_serialise(self):
@@ -63,3 +63,9 @@ class PostSurvey(Serialisable):
                  "severity": soreness.severity,
                  "side": soreness.side
                  }
+
+    def _key_present(self, key_name, dictionary):
+        if key_name in dictionary:
+            return dictionary[key_name]
+        else:
+            return None

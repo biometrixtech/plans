@@ -73,10 +73,16 @@ class ExerciseAssignments(object):
                         seconds_reduction_needed -= assigned_exercise_list[i].exercise.seconds_per_rep
                 elif assigned_exercise_list[i].sets_assigned > assigned_exercise_list[i].exercise.min_sets:
                     assigned_exercise_list[i].sets_assigned = assigned_exercise_list[i].sets_assigned - 1
+                    bilateral_factor = 1
                     if assigned_exercise_list[i].exercise.bilateral:
-                        seconds_reduction_needed -= (assigned_exercise_list[i].exercise.seconds_per_set * 2)
+                        bilateral_factor = 2
+
+                    if assigned_exercise_list[i].exercise.unit_of_measure == "seconds":
+                        seconds_reduction_needed -= (assigned_exercise_list[i].exercise.seconds_per_set *
+                                                     bilateral_factor)
                     else:
-                        seconds_reduction_needed -= assigned_exercise_list[i].exercise.seconds_per_set
+                        seconds_reduction_needed -= assigned_exercise_list[i].exercise.seconds_per_rep * \
+                                                    bilateral_factor
                 else:
                     # set it to zero for deletion later
                     seconds_reduction_needed -= assigned_exercise_list[i].duration()

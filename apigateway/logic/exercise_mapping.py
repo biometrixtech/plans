@@ -435,7 +435,7 @@ class ExerciseAssignmentCalculator(object):
 
         knee.activate_exercises.append(models.exercise.AssignedExercise("29", knee.treatment_priority, 1))
         knee.activate_exercises.append(models.exercise.AssignedExercise("30", knee.treatment_priority, 2))
-        knee.activate_exercises.append(models.exercise.AssignedExercise("77", knee.treatment_priority, 3))
+        # knee.activate_exercises.append(models.exercise.AssignedExercise("77", knee.treatment_priority, 3))
         knee.activate_exercises.append(models.exercise.AssignedExercise("32", knee.treatment_priority, 4))
 
         body_parts.append(knee)
