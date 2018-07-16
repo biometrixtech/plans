@@ -14,7 +14,7 @@ class SessionDatastore(object):
         session_json['description'] = description
         sessions.append(session_json)
 
-        self._update_daily_plan_mongo(user_id, event_date, session_type, sessions)
+        self._update_sessions_mongo(user_id, event_date, session_type, sessions)
 
 
     def delete(self, user_id, event_date, session_type, session_id):
@@ -24,7 +24,7 @@ class SessionDatastore(object):
                 sessions.remove(session)
                 break
 
-        self._update_daily_plan_mongo(user_id, event_date, session_type, sessions)
+        self._update_sessions_mongo(user_id, event_date, session_type, sessions)
 
 
     def _get_sessions_from_mongo(self, user_id, event_date, session_type):
@@ -51,7 +51,7 @@ class SessionDatastore(object):
         return [s.json_serialise() for s in sessions]
 
 
-    def _update_daily_plan_mongo(self, user_id, event_date, session_type, sessions):
+    def _update_sessions_mongo(self, user_id, event_date, session_type, sessions):
         if session_type == 1:
             session_type_name = 'cross_training_sessions'
         elif session_type == 2:
