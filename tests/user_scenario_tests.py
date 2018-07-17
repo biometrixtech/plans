@@ -79,15 +79,19 @@ def generate_plan(user_id, survey, plan_date, file_name, plan_letter):
                                                            DailyScheduleDatastore(),
                                                            PostSessionSurveyDataStore(),
                                                            plan_datastore)
-    success = manager.create_daily_plan()
+    plan = manager.create_daily_plan()
 
-    if success:
+    if plan is not None:
 
         plan = plan_datastore.get(user_id, plan_date, plan_date)
 
         write_file(file_name + plan_date.replace('-', '') + plan_letter, plan[0])
 
-    return success
+        return True
+
+    else:
+
+        return False
 
 
 # Ryan Robbins
