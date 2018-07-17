@@ -161,8 +161,8 @@ The client __must__ submit a request body containing a JSON object with the foll
 	}
 }
 ```
-* `event_date` __should__ reflect the date which the session happened (could be previous day)
-* `session_id` __should__ be id of the session associated. It's optional if the survey is associated with new session that doesn't exist in daily_plan
+* `event_date` __should__ reflect the date which the session happened and should be of format `yyyy-mm-dd`
+* `session_id` __should__ be id of the session associated. It's __optional__ if the survey is associated with new session that doesn't exist in daily_plan
 * `session_type` __should__ be an integer reflecting enumeration of different session type (0-5)
 * `RPE` __should__ be an integer between 1 and 10
 * `soreness` __should__ follow the same definition as in readiness_survey
@@ -221,9 +221,9 @@ The client __must__ submit a request body containing a JSON object with the foll
 	"description": string
 }
 ```
-* `event_date` __should__ reflect the date the session should be created for and should be of format `YYYY-MM-DD`.
+* `event_date` __should__ reflect the date the session should be created for and should be of format `yyyy-yy-yy`.
 * `session_type` __should__ be an integer reflecting SessionType enumeration.
-* `description` is optional parameter to provide short description of the session they're adding
+* `description` is __optional__ parameter to provide short description of the session they're adding
 
 ```
 POST /plans/session HTTPS/1.1
@@ -267,8 +267,9 @@ The client __must__ submit a request body containing a JSON object with the foll
 	"session_id": Uuid
 }
 ```
-* `event_date` __should__ reflect the date the session should be created for and should be of format `YYYY-MM-DD`.
+* `event_date` __should__ reflect the date the session should be created for and should be of format `yyyy-mm-dd`.
 * `session_type` __should__ be an integer reflecting SessionType enumeration.
+* `session_id` __should__ be id of the session to be deleted
 
 ```
 POST /plans/session/delete HTTPS/1.1
@@ -451,34 +452,90 @@ The Service __will__ respond with HTTP Status `200 OK`, with a body with the fol
 * each `daily_plan*` will be of following syntax:
 ```
 {
-    "date": "2018-06-27",
-    "practice_sessions": [
-        practice1,
-        practice2
-    ],
-    "recovery_am": {
-        "minutes_duration": 13.366666666666667,
-        "start_time": "2018-06-27 00:00:00",
-        "end_time": "2018-06-27 12:00:00",
-        "exercises": [
-            exercise1,
-            exercise2,
-        ],
-    },
-    "recovery_pm": {
-        "start_time": "2018-06-27 12:00:00",
-        "end_time": "2018-06-28 00:00:00",
-        "minutes_duration": 13.366666666666667,
-        "exercises": [
-            exercise1,
-            exercise2,
-        ],
-    },
-    "strength_conditioning_sessions": [],
-    "games": [],
-    "tournaments": [],
-    "bump_up_sessions": [],
-    "corrective_sessions": []
+    "daily_plans": [
+        {
+            "date": "2018-07-17",
+            "practice_sessions": [],
+            "bump_up_sessions": [],
+            "strength_conditioning_sessions": [],
+            "games": [],
+            "corrective_sessions": [],
+            "tournaments": [],
+            "daily_readiness_survey_completed": true,
+            "recovery_am": {
+                "minutes_duration": 14,
+                "start_time": "2018-07-17 00:00:00",
+                "end_time": "2018-07-17 12:00:00",
+                "impact_score": 3,
+                "activate_exercises": [],
+                "inhibit_exercises": [
+                    {
+                        "bilateral": true,
+                        "library_id": "3",
+                        "name": "SMR - Hamstrings",
+                        "position_order": 0,
+                        "reps_assigned": 30,
+                        "seconds_duration": 60,
+                        "seconds_per_rep": null,
+                        "seconds_per_set": 30,
+                        "sets_assigned": 1,
+                        "unit_of_measure": "seconds"
+                    }
+                ],
+                "integrate_exercises": [],
+                "lengthen_exercises": [
+                    {
+                        "bilateral": true,
+                        "library_id": "49",
+                        "name": "Kneeling Hip Flexor Static Stretch",
+                        "position_order": 7,
+                        "reps_assigned": 30,
+                        "seconds_duration": 60,
+                        "seconds_per_rep": null,
+                        "seconds_per_set": 30,
+                        "sets_assigned": 1,
+                        "unit_of_measure": "seconds"
+                    }
+                ]
+            },
+            "recovery_pm": {
+                "minutes_duration": 14,
+                "start_time": "2018-07-17 12:00:00",
+                "end_time": "2018-07-18 00:00:00",
+                "impact_score": 3,
+                "inhibit_exercises": [
+                    {
+                        "bilateral": true,
+                        "library_id": "3",
+                        "name": "SMR - Hamstrings",
+                        "position_order": 0,
+                        "reps_assigned": 30,
+                        "seconds_duration": 60,
+                        "seconds_per_rep": null,
+                        "seconds_per_set": 30,
+                        "sets_assigned": 1,
+                        "unit_of_measure": "seconds"
+                    }
+                ],
+                "activate_exercises": [],
+                "integrate_exercises": [],
+                "lengthen_exercises": [
+                    {
+                        "bilateral": true,
+                        "library_id": "49",
+                        "name": "Kneeling Hip Flexor Static Stretch",
+                        "position_order": 7,
+                        "reps_assigned": 30,
+                        "seconds_duration": 60,
+                        "seconds_per_rep": null,
+                        "seconds_per_set": 30,
+                        "sets_assigned": 1,
+                        "unit_of_measure": "seconds"
+                    }
+                ]
+            }
+        }
+    ]
 }
 ```
 
@@ -535,36 +592,6 @@ Authorization: eyJraWQ...ajBc4VQ
 ```
 {
     "message": "success"
-}
-```
-
-
-
-### Hello
-
-#### World
-
-This endpoint serves as a demonstration of the service
-
-##### Query String
- 
-The client __must__ submit a request to the endpoint `/hello/world`. The request method __must__ be `GET`.
-
-```
-GET /plans/hello/world HTTP/1.1
-Host: apis.env.fathomai.com
-Content-Type: application/json
-
-```
-Authentication is not required for this endpoint.
-
-##### Responses
- 
-The Service __will__ respond with HTTP Status `200 Ok`, and with a body with the following syntax:
- 
-```
-{
-    "message": String
 }
 ```
 
