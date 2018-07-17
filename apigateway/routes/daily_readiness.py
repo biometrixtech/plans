@@ -3,14 +3,13 @@ from flask import request, Blueprint
 import jwt
 import os
 import requests
-# import asyncio
 
 from datastores.daily_readiness_datastore import DailyReadinessDatastore
 from decorators import authentication_required
 from exceptions import InvalidSchemaException
 from models.daily_readiness import DailyReadiness
 from logic.soreness_and_injury import MuscleSorenessSeverity, BodyPartLocation
-from utils import parse_datetime
+from utils import parse_datetime, run_async
 
 app = Blueprint('daily_readiness', __name__)
 
@@ -31,8 +30,10 @@ def handle_daily_readiness_create():
     store = DailyReadinessDatastore()
     store.put(daily_readiness)
 
-    # asyncio.run(create_plan())
-    # create_plan()
+    endpoint = "athlete/{}/daily_plan".format(request.json['user_id'])
+    headers = {'Authorization': request.headers['Authorization'],
+                'Content-Type': 'applicaiton/json'}
+    run_async(endpoint, method='POST', body=None, headers=headers)
 
     return {'message': 'success'}, 201
 
@@ -85,11 +86,3 @@ def validate_data():
         raise InvalidSchemaException('Missing required parameter readiness')
     elif request.json['readiness'] not in range(1, 11):
         raise InvalidSchemaException('readiness need to be between 1 and 10')
-
-# async def create_plan():
-# def create_plan():
-#     endpoint = "https://apis.{}.fathomai.com/plans/athlete/{}/daily_plan".format(os.environ['ENVIRONMENT'], request.json['user_id'])
-#     headers = {'Authorization': request.headers['Authorization'],
-#                 'Content-Type': 'applicaiton/json'}
-#     r = requests.post(url=endpoint, headers=headers)
-
