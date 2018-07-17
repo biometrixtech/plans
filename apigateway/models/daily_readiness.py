@@ -23,7 +23,7 @@ class DailyReadiness(Serialisable):
         return self.user_id
 
     def get_event_date(self):
-        return parse_datetime(self.event_date)
+        return self.event_date
 
     def json_serialise(self):
         ret = {

@@ -30,7 +30,6 @@ class ExerciseAssignmentCalculator(object):
             # do stuff
 
             # determine reps and sets
-
             assigned_exercise = models.exercise.AssignedExercise(target_exercise[0].id,
                                                                  body_part_exercise.body_part_priority,
                                                                  body_part_exercise.body_part_exercise_priority,
@@ -469,7 +468,7 @@ class ExerciseAssignmentCalculator(object):
         quads.lengthen_exercises.append(gastroc_soleus)
 
         quads.activate_exercises.append(models.exercise.AssignedExercise("84", quads.treatment_priority, 1))
-        quads.activate_exercises.append(models.exercise.AssignedExercise("76", quads.treatment_priority, 2))
+        # quads.activate_exercises.append(models.exercise.AssignedExercise("76", quads.treatment_priority, 2))
         quads.activate_exercises.append(models.exercise.AssignedExercise("47", quads.treatment_priority, 3))
 
         glute_max_activation = models.exercise.AssignedExercise("34", quads.treatment_priority, 4)
@@ -603,6 +602,28 @@ class ExerciseAssignmentCalculator(object):
         foot.activate_exercises.append(ankle_progression_3)
 
         body_parts.append(foot)
+
+        # achilles
+
+        achilles = soreness_and_injury.BodyPart(soreness_and_injury.BodyPartLocation.achilles, 14)
+
+        achilles.inhibit_exercises.append(models.exercise.AssignedExercise("2", achilles.treatment_priority, 2))
+        achilles.inhibit_exercises.append(models.exercise.AssignedExercise("71", achilles.treatment_priority, 3))
+        achilles.inhibit_exercises.append(models.exercise.AssignedExercise("3", achilles.treatment_priority, 3))
+
+        achilles.lengthen_exercises.append(models.exercise.AssignedExercise("7", achilles.treatment_priority, 1))
+        achilles.lengthen_exercises.append(models.exercise.AssignedExercise("9", achilles.treatment_priority, 2))
+
+        achilles.activate_exercises.append(models.exercise.AssignedExercise("29", achilles.treatment_priority, 1))
+        achilles.activate_exercises.append(models.exercise.AssignedExercise("78", achilles.treatment_priority, 2))
+
+        glute_max_activation = models.exercise.AssignedExercise("34", achilles.treatment_priority, 3)
+        glute_max_activation.progressions = ["35"]
+        achilles.activate_exercises.append(glute_max_activation)
+
+        # achilles.activate_exercises.append(models.exercise.AssignedExercise("77", achilles.treatment_priority, 4))
+
+        body_parts.append(achilles)
 
         return body_parts
 

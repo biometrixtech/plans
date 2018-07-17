@@ -35,7 +35,7 @@ class ExerciseAssignments(object):
 
         severity_3_list = [a for a in assigned_exercise_list if a.body_part_soreness_level == 3]
         severity_2_list = [a for a in assigned_exercise_list if a.body_part_soreness_level == 2]
-        severity_1_list = [a for a in assigned_exercise_list if a.body_part_soreness_level == 1]
+        severity_1_list = [a for a in assigned_exercise_list if a.body_part_soreness_level <= 1]
 
         sorted_1_list = sorted(severity_1_list,
                                key=lambda x: (x.body_part_exercise_priority, x.body_part_priority),
@@ -63,7 +63,8 @@ class ExerciseAssignments(object):
 
     def reduce_assigned_exercises(self, seconds_reduction_needed, assigned_exercise_list):
         assigned_exercise_list = self.sort_reverse_priority(assigned_exercise_list)
-        while seconds_reduction_needed >= 0:
+        iterations = 0
+        while seconds_reduction_needed >= 0 and iterations < 50:
             for i in range(0, len(assigned_exercise_list)):
                 if assigned_exercise_list[i].reps_assigned > assigned_exercise_list[i].exercise.min_reps:
                     assigned_exercise_list[i].reps_assigned = assigned_exercise_list[i].reps_assigned - 1
@@ -82,12 +83,13 @@ class ExerciseAssignments(object):
                                                      bilateral_factor)
                     else:
                         seconds_reduction_needed -= assigned_exercise_list[i].exercise.seconds_per_rep * \
-                                                    bilateral_factor
+                                                    bilateral_factor * assigned_exercise_list[i].reps_assigned
                 else:
                     # set it to zero for deletion later
                     seconds_reduction_needed -= assigned_exercise_list[i].duration()
                     assigned_exercise_list[i].reps_assigned = 0
                     assigned_exercise_list[i].sets_assigned = 0
+                iterations = iterations + 1
                 if seconds_reduction_needed <= 0:
                     break
             if seconds_reduction_needed <= 0:
