@@ -486,8 +486,8 @@ class ExerciseAssignmentCalculator(object):
         it_band.progressions = ["5"]
         knee.inhibit_exercises.append(it_band)
 
-        knee.inhibit_exercises.append(models.exercise.AssignedExercise("54", knee.treatment_priority, 2))
-        knee.inhibit_exercises.append(models.exercise.AssignedExercise("1", knee.treatment_priority, 3))
+        knee.inhibit_exercises.append(models.exercise.AssignedExercise("48", knee.treatment_priority, 2))
+        knee.inhibit_exercises.append(models.exercise.AssignedExercise("2", knee.treatment_priority, 3))
 
         knee.lengthen_exercises.append(models.exercise.AssignedExercise("28", knee.treatment_priority, 1))
         knee.lengthen_exercises.append(models.exercise.AssignedExercise("6", knee.treatment_priority, 2))

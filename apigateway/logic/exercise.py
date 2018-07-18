@@ -61,17 +61,28 @@ class ExerciseAssignments(object):
 
         return sorted_list
 
+    def get_reduced_rep_value(self, current_reps_assigned):
+
+        if current_reps_assigned == 15:
+            return 3
+        elif current_reps_assigned == 12:
+            return 2
+        else:
+            return 0
+
     def reduce_assigned_exercises(self, seconds_reduction_needed, assigned_exercise_list):
         assigned_exercise_list = self.sort_reverse_priority(assigned_exercise_list)
         iterations = 0
         while seconds_reduction_needed >= 0 and iterations < 50:
             for i in range(0, len(assigned_exercise_list)):
                 if assigned_exercise_list[i].reps_assigned > assigned_exercise_list[i].exercise.min_reps:
-                    assigned_exercise_list[i].reps_assigned = assigned_exercise_list[i].reps_assigned - 1
+                    rep_reducer = self.get_reduced_rep_value(assigned_exercise_list[i].reps_assigned)
+                    assigned_exercise_list[i].reps_assigned = assigned_exercise_list[i].reps_assigned - rep_reducer
                     if assigned_exercise_list[i].exercise.bilateral:
-                        seconds_reduction_needed -= (assigned_exercise_list[i].exercise.seconds_per_rep * 2)
+                        seconds_reduction_needed -= (assigned_exercise_list[i].exercise.seconds_per_rep
+                                                     * 2 * rep_reducer)
                     else:
-                        seconds_reduction_needed -= assigned_exercise_list[i].exercise.seconds_per_rep
+                        seconds_reduction_needed -= assigned_exercise_list[i].exercise.seconds_per_rep * rep_reducer
                 elif assigned_exercise_list[i].sets_assigned > assigned_exercise_list[i].exercise.min_sets:
                     assigned_exercise_list[i].sets_assigned = assigned_exercise_list[i].sets_assigned - 1
                     bilateral_factor = 1
