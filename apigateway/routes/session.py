@@ -42,10 +42,10 @@ def handle_session_create():
     return {'message': 'success'}, 201
 
 
-@app.route('/delete', methods=['POST'])
+@app.route('/<uuid:session_id>', methods=['DELETE'])
 @authentication_required
 @xray_recorder.capture('routes.session.delete')
-def handle_session_delete():
+def handle_session_delete(session_id):
     if not isinstance(request.json, dict):
         raise InvalidSchemaException('Request body must be a dictionary')
     if 'event_date' not in request.json:
@@ -61,16 +61,12 @@ def handle_session_delete():
             session_type = SessionType(request.json['session_type']).value
         except ValueError:
             raise InvalidSchemaException('session_type not recognized')
-    if 'session_id' not in request.json:
-        raise InvalidSchemaException('Missing required parameter session_id')
-
-    session_id = request.json.get('session_id')
-
+ 
     store = SessionDatastore()
-
+ 
     store.delete(user_id=request.json['user_id'],
                  event_date=event_date,
                  session_type=session_type,
                  session_id=session_id)
-
+ 
     return {'message': 'success'}, 200
