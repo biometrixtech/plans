@@ -6,7 +6,7 @@ from decorators import authentication_required
 from exceptions import InvalidSchemaException
 from models.post_session_survey import PostSessionSurvey
 from models.session import SessionType
-from utils import format_date
+from utils import format_datetime, run_async
 
 
 app = Blueprint('post_session_survey', __name__)
@@ -21,7 +21,7 @@ def handle_post_session_survey_create():
     if 'event_date' not in request.json:
         raise InvalidSchemaException('Missing required parameter event_date')
     else:
-        event_date = format_date(request.json['event_date'])
+        event_date = format_datetime(request.json['event_date'])
         if event_date is None:
             raise InvalidSchemaException('event_date is not formatted correctly')
     if 'session_type' not in request.json:
@@ -36,7 +36,7 @@ def handle_post_session_survey_create():
     if len(session_id) == 0:
         session_id = None
 
-    survey = PostSessionSurvey(event_date=event_date,
+    survey = PostSessionSurvey(event_date_time=event_date,
     						   user_id=request.json['user_id'],
     						   session_id=session_id,
     						   session_type=session_type,
@@ -44,4 +44,10 @@ def handle_post_session_survey_create():
                                )
     store = PostSessionSurveyDatastore()
     store.put(survey)
+
+    endpoint = "athlete/{}/daily_plan".format(request.json['user_id'])
+    headers = {'Authorization': request.headers['Authorization'],
+                'Content-Type': 'applicaiton/json'}
+    run_async(endpoint, method='POST', body=None, headers=headers)
+
     return {'message': 'success'}, 201
