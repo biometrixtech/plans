@@ -2,28 +2,31 @@ from serialisable import Serialisable
 
 from logic.soreness_and_injury import BodyPart, DailySoreness, BodyPartLocation
 from models.session import SessionType
+import datetime
+from utils import parse_datetime
 
 class PostSessionSurvey(Serialisable):
     
     def __init__(self,
-                 event_date,
+                 event_date_time,
                  user_id,
                  session_id,
                  session_type,
                  survey=None
                  ):
-        self.event_date = event_date
+        self.event_date_time = datetime.datetime.strptime(event_date_time, "%Y-%m-%dT%H:%M:%SZ")
+        self.event_date = self.event_date_time.strftime("%Y-%m-%d")
         self.user_id = user_id
         self.session_id = session_id
         self.session_type = SessionType(session_type)
-        self.survey = PostSurvey(survey, event_date)
+        self.survey = PostSurvey(survey, event_date_time)
 
 
     def get_id(self):
         return self.user_id
 
     def get_event_date(self):
-        return self.event_date
+        return self.event_date_time
 
     def json_serialise(self):
         ret = {
@@ -44,11 +47,13 @@ class PostSurvey(Serialisable):
         if survey is not None:
             self.RPE = survey['RPE']
             self.soreness = [self._soreness_from_dict(s, event_date) for s in survey['soreness']]
+            self.event_date = event_date
 
     def json_serialise(self):
         ret = {
             'RPE': self.RPE,
-            'soreness': [item.json_serialise() for item in self.soreness]
+            'soreness': [item.json_serialise() for item in self.soreness],
+            'event_date': self.event_date
         }
         return ret
 

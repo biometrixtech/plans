@@ -5,6 +5,8 @@ from models.daily_plan import DailyPlan
 from models.session import SessionType, SessionFactory
 from models.post_session_survey import PostSessionSurvey, PostSurvey
 from logic.soreness_and_injury import DailySoreness, BodyPart, BodyPartLocation
+from utils import format_datetime
+import datetime
 
 
 class PostSessionSurveyDatastore(object):
@@ -24,8 +26,15 @@ class PostSessionSurveyDatastore(object):
 
     @xray_recorder.capture('datastore.PostSessionSurveyDatastore._query_mongodb')
     def _query_mongodb(self, user_id, start_date, end_date):
+
+        if start_date is not None and end_date is not None:
+            start_time = start_date.strftime("%Y-%m-%d")
+            end_time = end_date.strftime("%Y-%m-%d")
+        else:
+            start_time = None
+            end_time = None
         mongo_collection = get_mongo_collection(self.mongo_collection)
-        query0 = {'user_id': user_id, 'date': {'$gte': start_date, '$lte': end_date}}
+        query0 = {'user_id': user_id, 'date': {'$gte': start_time, '$lte': end_time}}
         # query1 = {'_id': 0, 'last_updated': 0, 'user_id': 0}
         mongo_cursor = mongo_collection.find(query0)
         ret = []
@@ -103,7 +112,10 @@ def _post_session_survey_from_mongodb(mongo_result, user_id, session_id, session
 
     survey_result = mongo_result["post_session_survey"]
     if survey_result is not None:
-        post_session_survey = PostSessionSurvey(event_date, user_id, session_id, session_type, survey_result)
+        if "event_date" in survey_result:
+            post_session_survey = PostSessionSurvey(survey_result["event_date"], user_id, session_id, session_type, survey_result)
+        else:
+            post_session_survey = PostSessionSurvey(event_date, user_id, session_id, session_type, survey_result)
         return post_session_survey
     else:
         return None

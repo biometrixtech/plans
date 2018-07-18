@@ -150,6 +150,17 @@ class PostSessionSurvey(object):
         self.session_rpe = None
 
 
+class BodyPartMapping(object):
+
+    def get_soreness_type(self, body_part_location):
+
+        if (body_part_location == BodyPartLocation.hip_flexor or body_part_location == BodyPartLocation.knee
+                or body_part_location == BodyPartLocation.ankle or body_part_location == BodyPartLocation.foot
+                or body_part_location == BodyPartLocation.lower_back):
+            return SorenessType.joint_related
+        else:
+            return SorenessType.muscle_related
+
 class SorenessCalculator(object):
 
     def __init__(self):
@@ -182,15 +193,15 @@ class SorenessCalculator(object):
 
                 if last_post_session_survey_age.total_seconds() <= 172800:  # within 48 hours so valid
 
-                    for s in last_post_session_survey.soreness:
-
+                    for s in last_post_session_survey.survey.soreness:
+                        updated = False
                         for r in range(0, len(soreness_list)):
-                            updated = False
-                            if soreness_list[r].body_part == s.body_part:
+
+                            if soreness_list[r].body_part.location.value == s.body_part.location.value:
                                 soreness_list[r].severity = max(soreness_list[r].severity, s.severity)
                                 updated = True
-                            if not updated:
-                                soreness_list.append(s)
+                        if not updated:
+                            soreness_list.append(s)
 
         return soreness_list
 

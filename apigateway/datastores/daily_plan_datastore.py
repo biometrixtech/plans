@@ -152,6 +152,8 @@ def _recovery_session_from_mongodb(mongo_result):
     recovery_session.start_time = _key_present("start_time", mongo_result)
     recovery_session.end_time = _key_present("end_time", mongo_result)
     recovery_session.impact_score = _key_present("impact_score", mongo_result)
+    recovery_session.goal_text = _key_present("goal_text", mongo_result)
+    recovery_session.why_text = _key_present("why_text", mongo_result)
     recovery_session.duration_minutes = _key_present("minutes_duration", mongo_result)
     recovery_session.inhibit_exercises = [_assigned_exercises_from_mongodb(s)
                                           for s in mongo_result['inhibit_exercises']]
@@ -175,7 +177,7 @@ def _assigned_exercises_from_mongodb(mongo_result):
     assigned_exercise.sets_assigned = _key_present("sets_assigned", mongo_result)
     assigned_exercise.exercise.seconds_per_set = _key_present("seconds_per_set", mongo_result)
     assigned_exercise.exercise.seconds_per_rep = _key_present("seconds_per_rep", mongo_result)
-
+    assigned_exercise.goal_text = _key_present("goal_text", mongo_result)
     return assigned_exercise
 
 def _key_present(key_name, dictionary):

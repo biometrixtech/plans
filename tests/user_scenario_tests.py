@@ -11,6 +11,7 @@ from datastores.daily_schedule_datastore import DailyScheduleDatastore
 from datastores.post_session_survey_datastore import PostSessionSurveyDatastore as PostSessionSurveyDataStore
 from models.daily_readiness import DailyReadiness
 from models.post_session_survey import PostSurvey, PostSessionSurvey
+from models.daily_plan import DailyPlan
 import models.session as session
 from soreness_and_injury import DailySoreness, BodyPart, BodyPartLocation
 import os
@@ -60,6 +61,13 @@ def write_file(file_name, daily_plan):
     file.write(json_string)
     file.close()
 
+def wipe_out_plan(user_id, plan_date):
+
+    daily_plan = DailyPlan(plan_date)
+    daily_plan.user_id = user_id
+    plan_datastore = DailyPlanDatastore()
+    plan_datastore.put(daily_plan)
+
 def generate_plan(user_id, survey, plan_date, file_name, plan_letter):
 
     plan_datastore = DailyPlanDatastore()
@@ -79,7 +87,7 @@ def generate_plan(user_id, survey, plan_date, file_name, plan_letter):
                                                            DailyScheduleDatastore(),
                                                            PostSessionSurveyDataStore(),
                                                            plan_datastore)
-    plan = manager.create_daily_plan()
+    plan = manager.create_daily_plan(plan_date)
 
     if plan is not None:
 
@@ -102,6 +110,8 @@ def test_robbins_create_daily_july_12():
     user_id = "rrobbins@fakemail.com"
 
     file_user_id = "ryanrobbins"
+
+    wipe_out_plan(user_id, "2018-07-12")
 
     july_12_soreness_list = [body_part_soreness(12, 1)]
 
@@ -130,6 +140,8 @@ def test_robbins_create_daily_july_13():
 
     file_user_id = "ryanrobbins"
 
+    wipe_out_plan(user_id, "2018-07-13")
+
     july_13_soreness_list = [body_part_soreness(12, 1), body_part_soreness(9, 2)]
 
     july_13_survey = DailyReadiness(datetime.datetime(2018, 7, 13, 8, 30, 0).strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, july_13_soreness_list, 6, 7)
@@ -155,6 +167,8 @@ def test_robbins_create_daily_july_14():
     user_id = "rrobbins@fakemail.com"
 
     file_user_id = "ryanrobbins"
+
+    wipe_out_plan(user_id, "2018-07-14")
 
     july_14_soreness_list = [body_part_soreness(9, 1), body_part_soreness(7, 2)]
 
@@ -182,6 +196,8 @@ def test_robbins_create_daily_july_15():
 
     file_user_id = "ryanrobbins"
 
+    wipe_out_plan(user_id, "2018-07-15")
+
     july_15_soreness_list = [body_part_soreness(7, 2)]
 
     july_15_survey = DailyReadiness(datetime.datetime(2018, 7, 15, 7, 20, 0).strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, july_15_soreness_list, 6, 6)
@@ -206,6 +222,8 @@ def test_robbins_create_daily_july_16():
     user_id = "rrobbins@fakemail.com"
 
     file_user_id = "ryanrobbins"
+
+    wipe_out_plan(user_id, "2018-07-16")
 
     july_16_soreness_list = [body_part_soreness(7, 3)]
 
@@ -233,6 +251,8 @@ def test_robbins_create_daily_july_17():
 
     file_user_id = "ryanrobbins"
 
+    wipe_out_plan(user_id, "2018-07-17")
+
     july_17_soreness_list = [body_part_soreness(7, 4)]
 
     july_17_survey = DailyReadiness(datetime.datetime(2018, 7, 17, 6, 0, 0).strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, july_17_soreness_list, 4, 5)
@@ -258,6 +278,8 @@ def test_robbins_create_daily_july_18():
     user_id = "rrobbins@fakemail.com"
 
     file_user_id = "ryanrobbins"
+
+    wipe_out_plan(user_id, "2018-07-18")
 
     july_18_soreness_list = [body_part_soreness(7, 2), body_part_soreness(11, 1)]
 
@@ -287,6 +309,8 @@ def test_jones_create_daily_july_12():
 
     file_user_id = "juliejones"
 
+    wipe_out_plan(user_id, "2018-07-12")
+
     july_12_soreness_list = [body_part_soreness(5, 2)]
 
     july_12_survey = DailyReadiness(datetime.datetime(2018, 7, 12, 11, 0, 0).strftime("%Y-%m-%dT%H:%M:%SZ"), user_id,
@@ -314,6 +338,8 @@ def test_jones_create_daily_july_13():
 
     file_user_id = "juliejones"
 
+    wipe_out_plan(user_id, "2018-07-13")
+
     july_13_soreness_list = [body_part_soreness(5, 2)]
 
     july_13_survey = DailyReadiness(datetime.datetime(2018, 7, 13, 8, 30, 0).strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, july_13_soreness_list, 4, 4)
@@ -339,6 +365,8 @@ def test_jones_create_daily_july_14():
     user_id = "jjones@email.com"
 
     file_user_id = "juliejones"
+
+    wipe_out_plan(user_id, "2018-07-14")
 
     july_14_soreness_list = [body_part_soreness(5, 2), body_part_soreness(12, 2)]
 
@@ -366,6 +394,8 @@ def test_jones_create_daily_july_15():
 
     file_user_id = "juliejones"
 
+    wipe_out_plan(user_id, "2018-07-15")
+
     july_15_soreness_list = [body_part_soreness(5, 3), body_part_soreness(12, 1)]
 
     july_15_survey = DailyReadiness(datetime.datetime(2018, 7, 15, 11, 1, 0).strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, july_15_soreness_list, 8, 9)
@@ -392,6 +422,8 @@ def test_jones_create_daily_july_16():
 
     file_user_id = "juliejones"
 
+    wipe_out_plan(user_id, "2018-07-16")
+
     july_16_soreness_list = [body_part_soreness(5, 2)]
 
     july_16_survey = DailyReadiness(datetime.datetime(2018, 7, 16, 10, 27, 0).strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, july_16_soreness_list, 5, 5)
@@ -416,6 +448,8 @@ def test_jones_create_daily_july_17():
     user_id = "jjones@email.com"
 
     file_user_id = "juliejones"
+
+    wipe_out_plan(user_id, "2018-07-17")
 
     july_17_soreness_list = [body_part_soreness(5, 2)]
 
@@ -448,17 +482,19 @@ def test_jones_create_daily_july_17():
     assert True is success
 
 
-def test_jones_create_daily_july_18():
+def test_jones_create_daily_july_19():
 
     user_id = "jjones@email.com"
 
     file_user_id = "juliejones"
 
+    wipe_out_plan(user_id, "2018-07-19")
+
     july_18_soreness_list = [body_part_soreness(5, 1)]
 
-    july_18_survey = DailyReadiness(datetime.datetime(2018, 7, 18, 11, 7, 0).strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, july_18_soreness_list, 8, 7)
+    july_18_survey = DailyReadiness(datetime.datetime(2018, 7, 19, 11, 7, 0).strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, july_18_soreness_list, 8, 7)
 
-    success = generate_plan(user_id, july_18_survey, "2018-07-18", file_user_id, "a")
+    success = generate_plan(user_id, july_18_survey, "2018-07-19", file_user_id, "a")
 
     assert True is success
 
@@ -466,10 +502,10 @@ def test_jones_create_daily_july_18():
 
     july_18_post_survey = get_post_survey(6, july_18_soreness_list)
     july_18_post_session_survey = \
-        PostSessionSurvey(datetime.datetime(2018, 7, 18, 13, 46, 0).strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, None,
+        PostSessionSurvey(datetime.datetime(2018, 7, 19, 13, 46, 0).strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, None,
                           0, july_18_post_survey)
 
-    success = generate_plan(user_id, july_18_post_session_survey, "2018-07-18", file_user_id, "b")
+    success = generate_plan(user_id, july_18_post_session_survey, "2018-07-19", file_user_id, "b")
 
     assert True is success
 
@@ -481,6 +517,8 @@ def test_ak_create_daily_july_12():
     user_id = "khan@email.com"
 
     file_user_id = "ak"
+
+    wipe_out_plan(user_id, "2018-07-12")
 
     july_12_soreness_list = []
 
@@ -509,6 +547,8 @@ def test_ak_create_daily_july_13():
 
     file_user_id = "ak"
 
+    wipe_out_plan(user_id, "2018-07-13")
+
     july_13_soreness_list = [body_part_soreness(6, 2), body_part_soreness(16,1), body_part_soreness(17, 1)]
 
     july_13_survey = DailyReadiness(datetime.datetime(2018, 7, 13, 9, 4, 0).strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, july_13_soreness_list, 7, 7)
@@ -535,6 +575,8 @@ def test_ak_create_daily_july_14():
 
     file_user_id = "ak"
 
+    wipe_out_plan(user_id, "2018-07-14")
+
     july_14_soreness_list = [body_part_soreness(6, 1), body_part_soreness(7, 2)]
 
     july_14_survey = DailyReadiness(datetime.datetime(2018, 7, 14, 12, 12, 0).strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, july_14_soreness_list, 10, 9)
@@ -550,6 +592,8 @@ def test_ak_create_daily_july_15():
 
     file_user_id = "ak"
 
+    wipe_out_plan(user_id, "2018-07-15")
+
     july_15_soreness_list = [body_part_soreness(7, 2), body_part_soreness(17, 1)]
 
     july_15_survey = DailyReadiness(datetime.datetime(2018, 7, 15, 14, 27, 0).strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, july_15_soreness_list, 5, 4)
@@ -564,6 +608,8 @@ def test_ak_create_daily_july_16():
     user_id = "khan@email.com"
 
     file_user_id = "ak"
+
+    wipe_out_plan(user_id, "2018-07-16")
 
     soreness_list = [body_part_soreness(7, 1), body_part_soreness(8, 1)]
 
@@ -592,6 +638,8 @@ def test_ak_create_daily_july_17():
 
     file_user_id = "ak"
 
+    wipe_out_plan(user_id, "2018-07-17")
+
     soreness_list = [body_part_soreness(6, 1), body_part_soreness(14, 1), body_part_soreness(15, 2), body_part_soreness(7, 1)]
 
     survey = DailyReadiness(datetime.datetime(2018, 7, 17, 11, 7, 0).strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, soreness_list, 6, 7)
@@ -618,6 +666,8 @@ def test_ak_create_daily_july_18():
     user_id = "khan@email.com"
 
     file_user_id = "ak"
+
+    wipe_out_plan(user_id, "2018-07-18")
 
     soreness_list = [body_part_soreness(15, 1), body_part_soreness(7, 2)]
 

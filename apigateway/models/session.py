@@ -277,9 +277,13 @@ class RecoverySession(Serialisable):
         self.start_time = None
         self.end_time = None
         self.impact_score = 0
+        self.why_text = ""
+        self.goal_text = ""
 
     def json_serialise(self):
         ret = {'minutes_duration': self.duration_minutes,
+               'why_text': self.why_text,
+               'goal_text': self.goal_text,
                'start_time': str(self.start_time),
                'end_time': str(self.end_time),
                'impact_score': self.impact_score,

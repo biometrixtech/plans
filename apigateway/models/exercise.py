@@ -1,6 +1,7 @@
 import datetime
 from enum import IntEnum, Enum
 from serialisable import Serialisable
+from logic.soreness_and_injury import BodyPartLocation
 
 
 class TechnicalDifficulty(IntEnum):
@@ -91,17 +92,19 @@ class Exercise(Serialisable):
 
 
 class AssignedExercise(Serialisable):
-    def __init__(self, library_id, body_part_priority=0, body_part_exercise_priority=0, body_part_soreness_level=0):
+    def __init__(self, library_id, body_part_priority=0, body_part_exercise_priority=0, body_part_soreness_level=0,
+                 body_part_location=BodyPartLocation.general):
         self.exercise = Exercise(library_id)
         self.body_part_priority = body_part_priority
         self.body_part_exercise_priority = body_part_exercise_priority
         self.body_part_soreness_level = body_part_soreness_level
-
+        self.body_part_location = body_part_location
         self.athlete_id = ""
         self.reps_assigned = 0
         self.sets_assigned = 0
         self.expire_date_time = None
         self.position_order = 0
+        self.goal_text = ""
 
     '''
     def soreness_priority(self):
@@ -131,7 +134,8 @@ class AssignedExercise(Serialisable):
                'position_order': self.position_order,
                'reps_assigned': self.reps_assigned,
                'sets_assigned': self.sets_assigned,
-               'seconds_duration': self.duration()
+               'seconds_duration': self.duration(),
+               'goal_text': self.goal_text
               }
         return ret
 

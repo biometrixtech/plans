@@ -3,7 +3,8 @@ import models.session as session
 from models.daily_plan import DailyPlan
 import datetime
 import logic.exercise_mapping as exercise_mapping
-from logic.soreness_and_injury import SorenessCalculator
+from logic.soreness_and_injury import SorenessCalculator, BodyPartLocation
+from logic.goal_focus_text_generator import RecoveryTextGenerator
 #from datastores.daily_readiness_datastore import DailyReadinessDatastore
 #from datastores.daily_schedule_datastore import DailyScheduleDatastore
 from utils import format_datetime
@@ -37,11 +38,10 @@ class TrainingPlanManager(object):
 
         return max(max_soreness_score, sleep_quality_score, readiness_score, rpe_score)
 
-    def create_daily_plan(self):
-        last_daily_readiness_survey = self.daily_readiness_datastore.get(self.athlete_id)
+    def create_daily_plan(self, event_date=None):
+        last_daily_readiness_survey = self.daily_readiness_datastore.get(self.athlete_id, event_date)
 
-        last_post_session_surveys = []
-        self.post_session_survey_datastore.get(self.athlete_id,
+        last_post_session_surveys = self.post_session_survey_datastore.get(self.athlete_id,
                                                last_daily_readiness_survey.get_event_date()
                                                - datetime.timedelta(hours=48, minutes=0),
                                                last_daily_readiness_survey.get_event_date())
@@ -78,12 +78,17 @@ class TrainingPlanManager(object):
         calc = exercise_mapping.ExerciseAssignmentCalculator(self.athlete_id)
 
         soreness_values = [s.severity for s in soreness_list if s.severity is not None]
+
+        body_part_list = []
+
         if soreness_values is not None and len(soreness_values) > 0:
             max_soreness = max(soreness_values)
+            body_part_list = [s.body_part for s in soreness_list if s.severity == max_soreness
+                              and s.body_part.location.name != BodyPartLocation.general]
         else:
             max_soreness = 0
 
-        rpe_values = [s.session_rpe for s in last_post_session_surveys if s.session_rpe is not None]
+        rpe_values = [s.survey.RPE for s in last_post_session_surveys if s.survey is not None and s.survey.RPE is not None]
 
         if rpe_values is not None and len(rpe_values) > 0:
             max_rpe = max(rpe_values)
@@ -104,21 +109,30 @@ class TrainingPlanManager(object):
             max_soreness
         )
 
+        text_generator = RecoveryTextGenerator()
+        body_part_text = text_generator.get_text_from_body_part_list(soreness_list)
+
         if daily_plan.recovery_am is not None and am_impact_score >= 0.5:
+            rpe_impact_score = min((max_rpe / 10) * 4, 4)
             daily_plan.recovery_am.set_exercise_target_minutes(soreness_list, 15)
             am_exercise_assignments = calc.create_exercise_assignments(daily_plan.recovery_am,
                                                                        soreness_list)
             daily_plan.recovery_am.update_from_exercise_assignments(am_exercise_assignments)
             daily_plan.recovery_am.impact_score = am_impact_score
+            daily_plan.recovery_am.why_text = text_generator.get_why_text(rpe_impact_score, max_soreness)
+            daily_plan.recovery_am.goal_text = text_generator.get_goal_text(rpe_impact_score, max_soreness, body_part_text)
         else:
             daily_plan.recovery_am is None
 
         if pm_impact_score >= 0.5:
+            rpe_impact_score = min((max_rpe / 10) * 5, 5)
             daily_plan.recovery_pm.set_exercise_target_minutes(soreness_list, 15)
             pm_exercise_assignments = calc.create_exercise_assignments(daily_plan.recovery_pm,
                                                                        soreness_list)
             daily_plan.recovery_pm.update_from_exercise_assignments(pm_exercise_assignments)
             daily_plan.recovery_pm.impact_score = pm_impact_score
+            daily_plan.recovery_pm.why_text = text_generator.get_why_text(rpe_impact_score, max_soreness)
+            daily_plan.recovery_pm.goal_text = text_generator.get_goal_text(rpe_impact_score, max_soreness, body_part_text)
         else:
             daily_plan.recovery_pm is None
 

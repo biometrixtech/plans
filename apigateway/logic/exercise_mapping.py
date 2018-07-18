@@ -2,6 +2,7 @@ import logic.exercise as exercise
 import logic.soreness_and_injury as soreness_and_injury
 import models.exercise
 from datastores.exercise_datastore import ExerciseLibraryDatastore
+from logic.goal_focus_text_generator import RecoveryTextGenerator
 
 
 class ExerciseAssignmentCalculator(object):
@@ -33,7 +34,8 @@ class ExerciseAssignmentCalculator(object):
             assigned_exercise = models.exercise.AssignedExercise(target_exercise[0].id,
                                                                  body_part_exercise.body_part_priority,
                                                                  body_part_exercise.body_part_exercise_priority,
-                                                                 soreness_severity)
+                                                                 soreness_severity
+                                                                 )
             assigned_exercise.exercise = target_exercise[0]
 
             assigned_exercise.reps_assigned = target_exercise[0].max_reps
@@ -46,6 +48,8 @@ class ExerciseAssignmentCalculator(object):
     def create_exercise_assignments(self, exercise_session, soreness_list):
 
         # TODO: handle progressions
+
+        text_generator = RecoveryTextGenerator()
 
         exercise_assignments = exercise.ExerciseAssignments()
         exercise_assignments.inhibit_max_percentage = exercise_session.inhibit_max_percentage
@@ -64,33 +68,67 @@ class ExerciseAssignmentCalculator(object):
                 body_part = [b for b in body_part_exercises if b.location.value == soreness.body_part.location.value]
 
                 if exercise_session.inhibit_target_minutes is not None and exercise_session.inhibit_target_minutes > 0:
-                    exercise_assignments.inhibit_exercises.extend(
-                        self.get_exercise_list_for_body_part(body_part[0].inhibit_exercises, exercise_list,
-                                                             completed_exercises, soreness.severity))
+                    new_assignments = self.get_exercise_list_for_body_part(body_part[0].inhibit_exercises, exercise_list,
+                                                                           completed_exercises, soreness.severity)
+                    for e in range(0, len(new_assignments)):
+                        new_assignments[e].goal_text = text_generator.get_recovery_exercise_text(soreness.severity,
+                                                                                                 models.exercise.Phase.inhibit,
+                                                                                                 soreness.body_part.location.value)
+
+                    exercise_assignments.inhibit_exercises.extend(new_assignments)
+
                 if exercise_session.lengthen_target_minutes is not None and exercise_session.lengthen_target_minutes > 0:
-                    exercise_assignments.lengthen_exercises.extend(
-                        self.get_exercise_list_for_body_part(body_part[0].lengthen_exercises, exercise_list,
-                                                             completed_exercises, soreness.severity))
+                    new_assignments = self.get_exercise_list_for_body_part(body_part[0].lengthen_exercises, exercise_list,
+                                                                           completed_exercises, soreness.severity)
+
+                    for e in range(0, len(new_assignments)):
+                        new_assignments[e].goal_text = text_generator.get_recovery_exercise_text(soreness.severity,
+                                                                                                 models.exercise.Phase.lengthen,
+                                                                                                 soreness.body_part.location.value)
+
+                    exercise_assignments.lengthen_exercises.extend(new_assignments)
                 if exercise_session.activate_target_minutes is not None and exercise_session.activate_target_minutes > 0:
-                    exercise_assignments.activate_exercises.extend(
-                        self.get_exercise_list_for_body_part(body_part[0].activate_exercises, exercise_list,
-                                                             completed_exercises, soreness.severity))
+                    new_assignments = self.get_exercise_list_for_body_part(body_part[0].activate_exercises, exercise_list,
+                                                                           completed_exercises, soreness.severity)
+                    for e in range(0, len(new_assignments)):
+                        new_assignments[e].goal_text = text_generator.get_recovery_exercise_text(soreness.severity,
+                                                                                                 models.exercise.Phase.activate,
+                                                                                                 soreness.body_part.location.value)
+
+                    exercise_assignments.activate_exercises.extend(new_assignments)
 
         else:
             body_part = self.get_general_exercises()
 
             if exercise_session.inhibit_target_minutes is not None and exercise_session.inhibit_target_minutes > 0:
-                exercise_assignments.inhibit_exercises.extend(
-                    self.get_exercise_list_for_body_part(body_part[0].inhibit_exercises, exercise_list,
-                                                         completed_exercises, 0))
+                new_assignments = self.get_exercise_list_for_body_part(body_part[0].inhibit_exercises, exercise_list,
+                                                         completed_exercises, 0)
+
+                for e in range(0, len(new_assignments)):
+                    new_assignments[e].goal_text = text_generator.get_recovery_exercise_text(0,
+                                                                                             models.exercise.Phase.inhibit,
+                                                                                             soreness_and_injury.BodyPartLocation.general.value)
+
+                exercise_assignments.inhibit_exercises.extend(new_assignments)
             if exercise_session.lengthen_target_minutes is not None and exercise_session.lengthen_target_minutes > 0:
-                exercise_assignments.lengthen_exercises.extend(
-                    self.get_exercise_list_for_body_part(body_part[0].lengthen_exercises, exercise_list,
-                                                         completed_exercises, 0))
+                new_assignments = self.get_exercise_list_for_body_part(body_part[0].lengthen_exercises, exercise_list,
+                                                         completed_exercises, 0)
+                for e in range(0, len(new_assignments)):
+                    new_assignments[e].goal_text = text_generator.get_recovery_exercise_text(0,
+                                                                                             models.exercise.Phase.lengthen,
+                                                                                             soreness_and_injury.BodyPartLocation.general.value)
+
+                exercise_assignments.lengthen_exercises.extend(new_assignments)
             if exercise_session.activate_target_minutes is not None and exercise_session.activate_target_minutes > 0:
-                exercise_assignments.activate_exercises.extend(
-                    self.get_exercise_list_for_body_part(body_part[0].activate_exercises, exercise_list,
-                                                         completed_exercises, 0))
+                new_assignments = self.get_exercise_list_for_body_part(body_part[0].activate_exercises, exercise_list,
+                                                         completed_exercises, 0)
+
+                for e in range(0, len(new_assignments)):
+                    new_assignments[e].goal_text = text_generator.get_recovery_exercise_text(0,
+                                                                                             models.exercise.Phase.activate,
+                                                                                             soreness_and_injury.BodyPartLocation.general.value)
+
+                exercise_assignments.activate_exercises.extend(new_assignments)
 
         exercise_assignments.scale_to_targets()
 
