@@ -89,7 +89,7 @@ def handle_session_sensor_data():
         if event_date is None:
             raise InvalidSchemaException('event_date is not formatted correctly')
     if 'session_type' not in request.json:
-        raise InvalidSchemaException('Missing required parameter session_type')
+        session_type = 0
     else:
         try:
             session_type = SessionType(request.json['session_type']).value
@@ -99,6 +99,7 @@ def handle_session_sensor_data():
     store = SessionDatastore()
 
     sensor_data = request.json['sensor_data']
+    sensor_data['data_transferred'] = True
 
     # we're assuming that the session does not exist
     store.upsert(user_id=request.json['user_id'],
