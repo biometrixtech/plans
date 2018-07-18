@@ -154,7 +154,7 @@ def test_robbins_create_daily_july_13():
 
     july_13_post_survey = get_post_survey(3, july_13_soreness_list)
     july_13_post_session_survey = \
-        PostSessionSurvey(datetime.datetime(2018, 7, 13, 17, 30, 0).strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, None,
+        PostSessionSurvey(datetime.datetime(2018, 7, 13, 11, 30, 0).strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, None,
                           0, july_13_post_survey)
 
     success = generate_plan(user_id, july_13_post_session_survey, "2018-07-13", file_user_id, "b")
