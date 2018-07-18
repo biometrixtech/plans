@@ -99,6 +99,7 @@ def handle_session_sensor_data():
     store = SessionDatastore()
 
     sensor_data = request.json('sensor_data')
+    print(request.json)
 
     # we're assuming that the session does not exist
     store.upsert(user_id=request.json[user_id],

@@ -51,7 +51,7 @@ class SessionDatastore(object):
 
     def upsert(self, user_id, event_date, session_type, item=None, data=None):
         if item is None:
-            session = _create_session(user_id, event_date, session_type, data)
+            session = _create_session(user_id, session_type, data)
             self.insert(session, user_id, event_date)
         else:
             if data is None:
@@ -77,7 +77,8 @@ class SessionDatastore(object):
         query = {"user_id": user_id, "date": event_date}
         mongo_collection.update_one(query, {'$set': {session_type_name: sessions}})
 
-def _create_session(user_id, event_date, session_type, data):
+def _create_session(user_id, session_type, data):
+    print(data)
     session = SessionFactory()
     session = session.create(SessionType(session_type))
     for key, value in data.items():
