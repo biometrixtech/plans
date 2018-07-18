@@ -168,16 +168,12 @@ class ExerciseAssignmentCalculator(object):
         general.activate_exercises.append(hip_bridge_progression)
 
         core_strength_progression = models.exercise.AssignedExercise("85", general.treatment_priority, 3)
-        core_strength_progression.progressions = ["86", "87", "88"]
+        core_strength_progression.progressions = ["86", "87", "88", "89", "90", "91", "92"]
         general.activate_exercises.append(core_strength_progression)
 
         posterior_pelvic_tilt = models.exercise.AssignedExercise("79", general.treatment_priority, 4)
         posterior_pelvic_tilt.progressions = ["80"]
         general.activate_exercises.append(posterior_pelvic_tilt)
-
-        core_strength_progression_2 = models.exercise.AssignedExercise("89", general.treatment_priority, 5)
-        core_strength_progression_2.progressions = ["90", "91", "92"]
-        general.activate_exercises.append(core_strength_progression_2)
 
         body_parts.append(general)
 
@@ -237,12 +233,10 @@ class ExerciseAssignmentCalculator(object):
 
         posterior_pelvic_tilt = models.exercise.AssignedExercise("79", hip.treatment_priority, 1)
         posterior_pelvic_tilt.progressions = ["80"]
-
         hip.activate_exercises.append(posterior_pelvic_tilt)
 
         hip_bridge_progression = models.exercise.AssignedExercise("10", hip.treatment_priority, 2)
         hip_bridge_progression.progressions = ["12", "11", "13"]
-
         hip.activate_exercises.append(hip_bridge_progression)
 
         hip.activate_exercises.append(models.exercise.AssignedExercise("50", hip.treatment_priority, 3))
@@ -276,19 +270,14 @@ class ExerciseAssignmentCalculator(object):
         glutes.lengthen_exercises.append(stretching_erectors)
 
         glutes.lengthen_exercises.append(models.exercise.AssignedExercise("28", glutes.treatment_priority, 4))
-
-        gastroc_soleus = models.exercise.AssignedExercise("25", glutes.treatment_priority, 5)
-        gastroc_soleus.progressions = ["26"]
-        glutes.lengthen_exercises.append(gastroc_soleus)
+        glutes.lengthen_exercises.append(models.exercise.AssignedExercise("7", glutes.treatment_priority, 5))
 
         hip_bridge_progression = models.exercise.AssignedExercise("10", glutes.treatment_priority, 1)
         hip_bridge_progression.progressions = ["12", "11", "13"]
-
         glutes.activate_exercises.append(hip_bridge_progression)
 
         glute_activation = models.exercise.AssignedExercise("81", glutes.treatment_priority, 2)
         glute_activation.progressions = ["82", "83"]
-
         glutes.activate_exercises.append(glute_activation)
 
         glute_activation_2 = models.exercise.AssignedExercise("34", glutes.treatment_priority, 3)
@@ -296,14 +285,8 @@ class ExerciseAssignmentCalculator(object):
         glutes.activate_exercises.append(glute_activation_2)
 
         core_strength_progression = models.exercise.AssignedExercise("85", glutes.treatment_priority, 4)
-        core_strength_progression.progressions = ["86", "87", "88"]
-
+        core_strength_progression.progressions = ["86", "87", "88", "89", "90", "91", "92"]
         glutes.activate_exercises.append(core_strength_progression)
-
-        core_strength_progression_2 = models.exercise.AssignedExercise("89", glutes.treatment_priority, 5)
-        core_strength_progression_2.progressions = ["90", "91", "92"]
-
-        glutes.activate_exercises.append(core_strength_progression_2)
 
         body_parts.append(glutes)
 
@@ -330,12 +313,8 @@ class ExerciseAssignmentCalculator(object):
         abdominals.lengthen_exercises.append(models.exercise.AssignedExercise("98", glutes.treatment_priority, 5))
 
         core_strength_progression = models.exercise.AssignedExercise("85", abdominals.treatment_priority, 1)
-        core_strength_progression.progressions = ["86", "87", "88"]
+        core_strength_progression.progressions = ["86", "87", "88", "89", "90", "91", "92"]
         abdominals.activate_exercises.append(core_strength_progression)
-
-        core_strength_progression_2 = models.exercise.AssignedExercise("89", abdominals.treatment_priority, 2)
-        core_strength_progression_2.progressions = ["90", "91", "92"]
-        abdominals.activate_exercises.append(core_strength_progression_2)
 
         hip_bridge_progression = models.exercise.AssignedExercise("10", abdominals.treatment_priority, 3)
         hip_bridge_progression.progressions = ["12", "11", "13"]
@@ -343,7 +322,6 @@ class ExerciseAssignmentCalculator(object):
 
         glute_activation = models.exercise.AssignedExercise("81", abdominals.treatment_priority, 4)
         glute_activation.progressions = ["82", "83"]
-
         abdominals.activate_exercises.append(glute_activation)
 
         body_parts.append(abdominals)
@@ -370,10 +348,7 @@ class ExerciseAssignmentCalculator(object):
         hamstrings.lengthen_exercises.append(models.exercise.AssignedExercise("8", hamstrings.treatment_priority, 5))
         # hamstrings.lengthen_exercises.append(models.exercise.AssignedExercise("55", hamstrings.treatment_priority, 6))
         hamstrings.lengthen_exercises.append(models.exercise.AssignedExercise("98", hamstrings.treatment_priority, 6))
-
-        gastroc_soleus = models.exercise.AssignedExercise("25", hamstrings.treatment_priority, 7)
-        gastroc_soleus.progressions = ["26"]
-        hamstrings.lengthen_exercises.append(gastroc_soleus)
+        hamstrings.lengthen_exercises.append(models.exercise.AssignedExercise("7", hamstrings.treatment_priority, 7))
 
         glute_max_activation = models.exercise.AssignedExercise("34", hamstrings.treatment_priority, 1)
         glute_max_activation.progressions = ["35"]
@@ -387,12 +362,8 @@ class ExerciseAssignmentCalculator(object):
         hamstrings.activate_exercises.append(models.exercise.AssignedExercise("29", hamstrings.treatment_priority, 4))
 
         core_strength_progression = models.exercise.AssignedExercise("85", hamstrings.treatment_priority, 5)
-        core_strength_progression.progressions = ["86", "87", "88"]
+        core_strength_progression.progressions = ["86", "87", "88", "89", "90", "91", "92"]
         hamstrings.activate_exercises.append(core_strength_progression)
-
-        core_strength_progression_2 = models.exercise.AssignedExercise("89", hamstrings.treatment_priority, 6)
-        core_strength_progression_2.progressions = ["90", "91", "92"]
-        hamstrings.activate_exercises.append(core_strength_progression_2)
 
         body_parts.append(hamstrings)
 
@@ -453,10 +424,7 @@ class ExerciseAssignmentCalculator(object):
         groin.lengthen_exercises.append(models.exercise.AssignedExercise("98", groin.treatment_priority, 5))
         groin.lengthen_exercises.append(models.exercise.AssignedExercise("46", groin.treatment_priority, 6))
         groin.lengthen_exercises.append(models.exercise.AssignedExercise("9", groin.treatment_priority, 7))
-
-        gastroc_soleus = models.exercise.AssignedExercise("25", groin.treatment_priority, 8)
-        gastroc_soleus.progressions = ["26"]
-        groin.lengthen_exercises.append(gastroc_soleus)
+        groin.lengthen_exercises.append(models.exercise.AssignedExercise("7", groin.treatment_priority, 8))
 
         groin.activate_exercises.append(models.exercise.AssignedExercise("50", groin.treatment_priority, 1))
         groin.activate_exercises.append(models.exercise.AssignedExercise("84", groin.treatment_priority, 2))
@@ -470,12 +438,8 @@ class ExerciseAssignmentCalculator(object):
         groin.activate_exercises.append(glute_activation)
 
         core_strength_progression = models.exercise.AssignedExercise("85", groin.treatment_priority, 5)
-        core_strength_progression.progressions = ["86", "87", "88"]
+        core_strength_progression.progressions = ["86", "87", "88", "89", "90", "91", "92"]
         groin.activate_exercises.append(core_strength_progression)
-
-        core_strength_progression_2 = models.exercise.AssignedExercise("89", groin.treatment_priority, 6)
-        core_strength_progression_2.progressions = ["90", "91", "92"]
-        groin.activate_exercises.append(core_strength_progression_2)
 
         body_parts.append(groin)
 
@@ -500,10 +464,7 @@ class ExerciseAssignmentCalculator(object):
         quads.lengthen_exercises.append(models.exercise.AssignedExercise("98", quads.treatment_priority, 4))
         quads.lengthen_exercises.append(models.exercise.AssignedExercise("46", quads.treatment_priority, 5))
         quads.lengthen_exercises.append(models.exercise.AssignedExercise("9", quads.treatment_priority, 6))
-
-        gastroc_soleus = models.exercise.AssignedExercise("25", quads.treatment_priority, 7)
-        gastroc_soleus.progressions = ["26"]
-        quads.lengthen_exercises.append(gastroc_soleus)
+        quads.lengthen_exercises.append(models.exercise.AssignedExercise("7", quads.treatment_priority, 7))
 
         quads.activate_exercises.append(models.exercise.AssignedExercise("84", quads.treatment_priority, 1))
         # quads.activate_exercises.append(models.exercise.AssignedExercise("76", quads.treatment_priority, 2))
@@ -531,10 +492,7 @@ class ExerciseAssignmentCalculator(object):
         knee.lengthen_exercises.append(models.exercise.AssignedExercise("28", knee.treatment_priority, 1))
         knee.lengthen_exercises.append(models.exercise.AssignedExercise("6", knee.treatment_priority, 2))
         knee.lengthen_exercises.append(models.exercise.AssignedExercise("9", knee.treatment_priority, 3))
-
-        gastroc_soleus = models.exercise.AssignedExercise("25", knee.treatment_priority, 4)
-        gastroc_soleus.progressions = ["26"]
-        knee.lengthen_exercises.append(gastroc_soleus)
+        knee.lengthen_exercises.append(models.exercise.AssignedExercise("7", knee.treatment_priority, 4))
 
         knee.activate_exercises.append(models.exercise.AssignedExercise("29", knee.treatment_priority, 1))
         knee.activate_exercises.append(models.exercise.AssignedExercise("30", knee.treatment_priority, 2))
@@ -551,10 +509,7 @@ class ExerciseAssignmentCalculator(object):
         calves.inhibit_exercises.append(models.exercise.AssignedExercise("71", calves.treatment_priority, 2))
         calves.inhibit_exercises.append(models.exercise.AssignedExercise("3", calves.treatment_priority, 3))
 
-        gastroc_soleus = models.exercise.AssignedExercise("25", calves.treatment_priority, 1)
-        gastroc_soleus.progressions = ["26"]
-        calves.lengthen_exercises.append(gastroc_soleus)
-
+        calves.lengthen_exercises.append(models.exercise.AssignedExercise("7", calves.treatment_priority, 1))
         calves.lengthen_exercises.append(models.exercise.AssignedExercise("9", calves.treatment_priority, 2))
 
         ankle_plantarflexion = models.exercise.AssignedExercise("30", calves.treatment_priority, 1)
@@ -575,10 +530,7 @@ class ExerciseAssignmentCalculator(object):
         shin.inhibit_exercises.append(models.exercise.AssignedExercise("2", shin.treatment_priority, 2))
 
         shin.lengthen_exercises.append(models.exercise.AssignedExercise("73", shin.treatment_priority, 1))
-
-        gastroc_soleus = models.exercise.AssignedExercise("25", shin.treatment_priority, 2)
-        gastroc_soleus.progressions = ["26"]
-        shin.lengthen_exercises.append(gastroc_soleus)
+        shin.lengthen_exercises.append(models.exercise.AssignedExercise("7", shin.treatment_priority, 2))
 
         shin.lengthen_exercises.append(models.exercise.AssignedExercise("28", shin.treatment_priority, 3))
         shin.lengthen_exercises.append(models.exercise.AssignedExercise("9", shin.treatment_priority, 4))
@@ -602,16 +554,8 @@ class ExerciseAssignmentCalculator(object):
         ankle.lengthen_exercises.append(models.exercise.AssignedExercise("73", ankle.treatment_priority, 3))
 
         ankle_progression = models.exercise.AssignedExercise("59", ankle.treatment_priority, 1)
-        ankle_progression.progressions = ["60", "61", "62"]
+        ankle_progression.progressions = ["60", "61", "62", "29", "30", "63", "64", "65", "66"]
         ankle.activate_exercises.append(ankle_progression)
-
-        ankle_progression_2 = models.exercise.AssignedExercise("29", ankle.treatment_priority, 2)
-        ankle_progression_2.progressions = ["30", "63", "64"]
-        ankle.activate_exercises.append(ankle_progression_2)
-
-        ankle_progression_3 = models.exercise.AssignedExercise("65", ankle.treatment_priority, 3)
-        ankle_progression_3.progressions = ["66"]
-        ankle.activate_exercises.append(ankle_progression_3)
 
         body_parts.append(ankle)
 
@@ -631,13 +575,9 @@ class ExerciseAssignmentCalculator(object):
         foot.activate_exercises.append(models.exercise.AssignedExercise("53", foot.treatment_priority, 1))
         foot.activate_exercises.append(models.exercise.AssignedExercise("75", foot.treatment_priority, 2))
 
-        ankle_progression_2 = models.exercise.AssignedExercise("29", foot.treatment_priority, 3)
-        ankle_progression_2.progressions = ["30", "63", "64"]
-        foot.activate_exercises.append(ankle_progression_2)
-
-        ankle_progression_3 = models.exercise.AssignedExercise("65", foot.treatment_priority, 4)
-        ankle_progression_3.progressions = ["66"]
-        foot.activate_exercises.append(ankle_progression_3)
+        ankle_progression = models.exercise.AssignedExercise("29", foot.treatment_priority, 3)
+        ankle_progression.progressions = ["30", "63", "64", "65", "66"]
+        foot.activate_exercises.append(ankle_progression)
 
         body_parts.append(foot)
 
