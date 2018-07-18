@@ -85,7 +85,7 @@ def handle_session_sensor_data():
     if 'event_date' not in request.json:
         raise InvalidSchemaException('Missing required parameter event_date')
     else:
-        event_date = format_datetime(request.json['event_date'])
+        event_date = format_date(request.json['event_date'])
         if event_date is None:
             raise InvalidSchemaException('event_date is not formatted correctly')
     if 'session_type' not in request.json:
@@ -98,11 +98,10 @@ def handle_session_sensor_data():
  
     store = SessionDatastore()
 
-    sensor_data = request.json('sensor_data')
-    print(request.json)
+    sensor_data = request.json['sensor_data']
 
     # we're assuming that the session does not exist
-    store.upsert(user_id=request.json[user_id],
+    store.upsert(user_id=request.json['user_id'],
                  event_date=event_date,
                  session_type=session_type,
                  data=sensor_data)
