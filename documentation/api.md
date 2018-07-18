@@ -254,7 +254,7 @@ This endpoint can be called to delete existing externally regimented session fro
 
 ##### Query String
  
-The client __must__ submit a request to the endpoint `/plans/session/delete`. The request method __must__ be `POST`.
+The client __must__ submit a request to the endpoint `/plans/session/{session_id}`. The request method __must__ be `DELETE`.
 
 ##### Request
 
@@ -263,16 +263,14 @@ The client __must__ submit a request body containing a JSON object with the foll
 {
 	"user_id": Uuid,
 	"event_date": Datetime,
-	"session_type": number,
-	"session_id": Uuid
+	"session_type": number
 }
 ```
 * `event_date` __should__ reflect the date the session should be created for and should be of format `yyyy-mm-dd`.
 * `session_type` __should__ be an integer reflecting SessionType enumeration.
-* `session_id` __should__ be id of the session to be deleted
 
 ```
-POST /plans/session/delete HTTPS/1.1
+DELETE /plans/session/73e8f603-d2d5-423a-b2b6-fe0996a373c8 HTTPS/1.1
 Host: apis.env.fathomai.com
 Content-Type: application/json
 Authorization: eyJraWQ...ajBc4VQ
@@ -280,8 +278,7 @@ Authorization: eyJraWQ...ajBc4VQ
 {
     "user_id": "morning_practice_2",
     "event_date": "2018-07-11",
-    "session_type": 1,
-    "session_id": "73e8f603-d2d5-423a-b2b6-fe0996a373c8"
+    "session_type": 1
 }
 ```
 ##### Responses
