@@ -159,6 +159,8 @@ class TrainingPlanManager(object):
     def add_recovery_times(self, trigger_date_time, daily_plan):
 
         if trigger_date_time.hour < 12:
+            if daily_plan.recovery_am is None:
+                daily_plan.recovery_am = session.RecoverySession()
             daily_plan.recovery_am.start_time = datetime.datetime(trigger_date_time.year, trigger_date_time.month,
                                                                   trigger_date_time.day, 0, 0, 0)
             daily_plan.recovery_am.end_time = datetime.datetime(trigger_date_time.year, trigger_date_time.month,

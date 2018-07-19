@@ -183,6 +183,7 @@ class SorenessCalculator(object):
 
             if daily_readiness_survey_age.total_seconds() <= 172800:  # within 48 hours so valid
                 for s in last_daily_readiness_survey.soreness:
+                    s.reported_date_time = last_daily_readiness_survey.get_event_date()
                     soreness_list.append(s)
 
         if last_post_session_surveys is not None:
@@ -193,13 +194,19 @@ class SorenessCalculator(object):
 
                 if last_post_session_survey_age.total_seconds() <= 172800:  # within 48 hours so valid
 
+                    last_post_session_survey_datetime = last_post_session_survey.event_date_time
+
                     for s in last_post_session_survey.survey.soreness:
                         updated = False
                         for r in range(0, len(soreness_list)):
 
-                            if soreness_list[r].body_part.location.value == s.body_part.location.value:
-                                soreness_list[r].severity = max(soreness_list[r].severity, s.severity)
-                                updated = True
+                            if (soreness_list[r].body_part.location.value == s.body_part.location.value and
+                                    soreness_list[r].side == s.side and
+                                    soreness_list[r].reported_date_time < last_post_session_survey_datetime):
+                                # soreness_list[r].severity = max(soreness_list[r].severity, s.severity)
+                                soreness_list[r].severity = s.severity
+                                soreness_list[r].reported_date_time = last_post_session_survey_datetime
+                            updated = True
                         if not updated:
                             soreness_list.append(s)
 
