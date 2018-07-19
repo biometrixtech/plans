@@ -100,18 +100,51 @@ def handle_session_sensor_data():
 
     store = SessionDatastore()
 
-    sensor_data = request.json['sensor_data']
-    sensor_data['data_transferred'] = True
+    sessions = request.json['sessions']
+    for session in sessions:
+        sensor = get_sensor_data(session)
+        sensor_data['data_transferred'] = True
 
-    # we're assuming that the session does not exist
-    store.upsert(user_id=request.json['user_id'],
-                 event_date=event_date,
-                 session_type=session_type,
-                 data=sensor_data)
+        # we're assuming that the session does not exist
+        store.upsert(user_id=request.json['user_id'],
+                     event_date=event_date,
+                     session_type=session_type,
+                     data=sensor_data)
 
     update_plan()
 
     return {'message': 'success'}, 200
+
+
+def get_sensor_data(session):
+    start_time = format_datetime(session['start_time'])
+    end_time = format_datetime(session['end_time'])
+    event_date = session.get('event_date', "")
+    if event_date == "":
+        event_date = datetime.datetime.strftime(datetime.datetime.strptime(start_time, "%Y-%m-%dT%H:%M:%SZ").day(), "%Y-%m-%d")
+        
+    low_duration = session['low_duration'] / 60
+    mod_duration = session['mod_duration'] / 60
+    high_duration = session['high_duration'] / 60
+    duration = low_duration + mod_duration + high_duration
+    
+    
+    low_accel = session['low_accel'] * 1000
+    mod_accel = session['mod_accel'] * 1000
+    high_accel = session['high_accel'] * 1000
+    total_accel = low_accel + mod_accel + high_accel
+    
+    sensor_data = {"sensor_start_date_time": start_time,
+                   "sensor_end_date_time": end_time,
+                   "duration_minutes": duration,
+                   "low_intensity_minutes": low_duration,
+                   "mod_intensity_minutes": mod_duration,
+                   "high_intensity_minutes": high_duration,
+                   "external_load": total_accel,
+                   "low_intensity_load": low_accel,
+                   "mod_intensity_load": mod_accel,
+                   "high_intensity_load": high_accel
+                   }
 
 
 def update_plan():
