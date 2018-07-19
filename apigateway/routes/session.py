@@ -6,7 +6,7 @@ from decorators import authentication_required
 from exceptions import InvalidSchemaException
 from models.post_session_survey import PostSessionSurvey
 from models.session import SessionType, SessionFactory
-from utils import format_date
+from utils import format_date, run_async
 
 
 app = Blueprint('session', __name__)
@@ -65,14 +65,16 @@ def handle_session_delete(session_id):
             session_type = SessionType(request.json['session_type']).value
         except ValueError:
             raise InvalidSchemaException('session_type not recognized')
- 
+
     store = SessionDatastore()
- 
+
     store.delete(user_id=request.json['user_id'],
                  event_date=event_date,
                  session_type=session_type,
                  session_id=session_id)
- 
+
+    update_plan()
+
     return {'message': 'success'}, 200
 
 
@@ -95,7 +97,7 @@ def handle_session_sensor_data():
             session_type = SessionType(request.json['session_type']).value
         except ValueError:
             raise InvalidSchemaException('session_type not recognized')
- 
+
     store = SessionDatastore()
 
     sensor_data = request.json['sensor_data']
@@ -106,6 +108,15 @@ def handle_session_sensor_data():
                  event_date=event_date,
                  session_type=session_type,
                  data=sensor_data)
- 
+
+    update_plan()
+
     return {'message': 'success'}, 200
 
+
+def update_plan():
+    endpoint = "athlete/{}/daily_plan".format(request.json['user_id'])
+    headers = {'Authorization': request.headers['Authorization'],
+                'Content-Type': 'applicaiton/json'}
+    run_async(endpoint, method='POST', body=None, headers=headers)
+ 
