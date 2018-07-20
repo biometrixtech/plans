@@ -7,27 +7,26 @@ import logic.exercise as exercise
 
 
 class ExerciseLibraryDatastore(object):
+    mongo_collection = get_mongo_collection('exerciselibrary')
     # @xray_recorder.capture('datastores.ExerciseLibraryDatastore.get')
-    def get(self, collection='exerciselibrary'):
-        return self._query_mongodb(collection)
+    def get(self):
+        return self._query_mongodb()
 
     def put(self, items, collection):
         if not isinstance(items, list):
             items = [items]
         try:
             for item in items:
-                self._put_mongodb(item, collection)
+                self._put_mongodb(item)
         except Exception as e:
             raise e
 
     # @xray_recorder.capture('datastores.ExerciseLibraryDatastore._query_mongodb')
-    def _query_mongodb(self, collection):
+    def _query_mongodb(self):
 
         exercise_list = []
 
-        mongo_collection = get_mongo_collection(collection)
-
-        exercise_cursor = mongo_collection.find()
+        exercise_cursor = self.mongo_collection.find()
 
         for record in exercise_cursor:
             exercise_item = models.exercise.Exercise(record["library_id"])
@@ -59,11 +58,10 @@ class ExerciseLibraryDatastore(object):
         return exercise_list
 
     # @xray_recorder.capture('datastores.ExerciseLibraryDatastore._put_mongodb')
-    def _put_mongodb(self, item, collection):
+    def _put_mongodb(self, item):
         item = self.item_to_mongodb(item)
-        mongo_collection = get_mongo_collection(collection)
         query = {'library_id': item['library_id']}
-        mongo_collection.replace_one(query, item, upsert=True)
+        self.mongo_collection.replace_one(query, item, upsert=True)
 
     @staticmethod
     def item_to_mongodb(exercise_item):

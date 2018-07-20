@@ -6,7 +6,7 @@ import uuid
 
 
 class DailyScheduleDatastore(object):
-    mongo_collection = 'trainingschedule'
+    mongo_collection = get_mongo_collection('trainingschedule')
     @xray_recorder.capture('datastore.DailyScheduleDatastore.get')
     def get(self, user_id=None, target_date=date.today()):
         return self._query_mongodb(user_id, target_date)
@@ -26,10 +26,9 @@ class DailyScheduleDatastore(object):
         # start = target_date - timedelta(days=dt.weekday())
         week_start = start.strftime('%Y-%m-%d')
 
-        mongo_collection = get_mongo_collection(self.mongo_collection)
         query = {'user_id': user_id, 'week_start': week_start}
 
-        schedule_cursor = mongo_collection.find(query)
+        schedule_cursor = self.mongo_collection.find(query)
         day_of_week = dt.weekday()
 
         for schedule in schedule_cursor:

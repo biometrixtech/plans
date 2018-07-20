@@ -9,6 +9,7 @@ import datetime
 
 class DailyReadinessDatastore(object):
     mongo_collection = 'dailyreadiness'
+    # mongo_collection = get_mongo_collection('dailyreadiness')
 
     @xray_recorder.capture('datastore.DailyReadinessDatastore.get')
     def get(self, user_id, event_date=None):
@@ -32,13 +33,12 @@ class DailyReadinessDatastore(object):
 
     @xray_recorder.capture('datastore.DailyReadinessDatastore._query_mongodb')
     def _query_mongodb(self, user_id, start_time, end_time):
-        mongo_collection = get_mongo_collection(self.mongo_collection)
         if start_time is None and end_time is None:
             query = {'user_id': user_id}
         else:
             query = {'user_id': user_id, 'event_date': {'$gte': start_time, '$lte': end_time}}
 
-        mongo_result = mongo_collection.find_one(query, sort=[('event_date', -1)])
+        mongo_result = self.mongo_collection.find_one(query, sort=[('event_date', -1)])
         if mongo_result is not None:
             return DailyReadiness(
                                   event_date=mongo_result['event_date'],
@@ -53,6 +53,6 @@ class DailyReadinessDatastore(object):
     def _put_mongodb(self, item):
         item = item.json_serialise()
         del item['sore_body_parts']
-        mongo_collection = get_mongo_collection(self.mongo_collection)
         query = {'user_id': item['user_id'], 'event_date': format_datetime(item['event_date'])}
+        mongo_collection = get_mongo_collection(self.mongo_collection)
         mongo_collection.replace_one(query, item, upsert=True)

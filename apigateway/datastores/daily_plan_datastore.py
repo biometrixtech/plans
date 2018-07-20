@@ -6,7 +6,7 @@ import models.exercise as exercise
 from utils import  format_datetime, parse_datetime
 
 class DailyPlanDatastore(object):
-    mongo_collection = 'dailyplan'
+    mongo_collection = get_mongo_collection('dailyplan')
 
     def get(self, user_id=None, start_date=None, end_date=None):
         return self._query_mongodb(user_id, start_date, end_date)
@@ -22,7 +22,7 @@ class DailyPlanDatastore(object):
 
     @xray_recorder.capture('datastore.DailyPlanDatastore._query_mongodb')
     def _query_mongodb(self, user_id, start_date, end_date):
-        mongo_collection = get_mongo_collection(self.mongo_collection)
+        mongo_collection = self.mongo_collection
         query0 = {'user_id': user_id, 'date': {'$gte': start_date, '$lte': end_date}}
         # query1 = {'_id': 0, 'last_updated': 0, 'user_id': 0}
         mongo_cursor = mongo_collection.find(query0)
@@ -65,7 +65,7 @@ class DailyPlanDatastore(object):
 
     @xray_recorder.capture('datastore.DailyPlanDatastore._put_mongodb')
     def _put_mongodb(self, item):
-        collection = get_mongo_collection(self.mongo_collection)
+        collection = self.mongo_collection
 
         '''Deprecated
         practice_session_bson = ()
