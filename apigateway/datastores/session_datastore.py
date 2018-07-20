@@ -7,6 +7,7 @@ from exceptions import NoSuchEntityException
 class SessionDatastore(object):
     mongo_collection = get_mongo_collection('dailyplan')
 
+
     def get(self, user_id, event_date, session_type, session_id=None):
         sessions = _get_sessions_from_mongo(self, user_id, event_date, session_type)
         if session_id is None:
