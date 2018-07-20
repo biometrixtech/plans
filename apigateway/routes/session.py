@@ -6,7 +6,7 @@ from decorators import authentication_required
 from exceptions import InvalidSchemaException
 from models.post_session_survey import PostSessionSurvey
 from models.session import SessionType, SessionFactory
-from utils import parse_datetime, format_date, run_async
+from utils import parse_datetime, format_date, format_datetime, run_async
 
 
 app = Blueprint('session', __name__)
