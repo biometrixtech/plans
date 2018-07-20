@@ -48,7 +48,7 @@ class TrainingPlanManager(object):
 
         trigger_date_time = last_daily_readiness_survey.get_event_date()
 
-        survey_event_dates = [s.get_event_date() for s in last_post_session_surveys]
+        survey_event_dates = [s.get_event_date() for s in last_post_session_surveys if s is not None]
 
         if survey_event_dates is not None and len(survey_event_dates) > 0:
             trigger_date_time = max(trigger_date_time, max(survey_event_dates))
