@@ -47,6 +47,8 @@ class Exercise(Serialisable):
     def __init__(self, library_id):
         self.id = library_id
         self.name = ""
+        self.display_name = ""
+        self.youtube_id = ""
         # self.body_parts_targeted = []
         self.min_reps = None
         self.max_reps = None
@@ -73,6 +75,8 @@ class Exercise(Serialisable):
     def json_serialise(self):
         ret = {'library_id': self.id,
                'name': self.name,
+               'display_name': self.display_name,
+               'youtube_id': self.youtube_id,
                'min_sets': self.min_sets,
                'max_sets': self.max_sets,
                'min_reps': self.min_reps,
@@ -126,7 +130,9 @@ class AssignedExercise(Serialisable):
 
     def json_serialise(self):
         ret = {'name': self.exercise.name,
+               'display_name': self.exercise.display_name,
                'library_id': self.exercise.id,
+               'youtube_id': self.exercise.youtube_id,
                'bilateral': self.exercise.bilateral,
                'seconds_per_rep': self.exercise.seconds_per_rep,
                'seconds_per_set': self.exercise.seconds_per_set,
