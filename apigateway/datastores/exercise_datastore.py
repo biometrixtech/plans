@@ -45,6 +45,8 @@ class ExerciseLibraryDatastore(object):
             exercise_item.max_reps = record["max_reps"]
             exercise_item.max_sets = record["max_sets"]
             exercise_item.name = record["name"]
+            exercise_item.display_name = record["display_name"]
+            exercise_item.youtube_id = record["youtube_id"]
             # exercise_item.progressions = record["progressions"]
             # exercise_item.cues = record["cues"]
             # exercise_item.goal = record["goal"]
