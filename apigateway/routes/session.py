@@ -1,10 +1,10 @@
 from aws_xray_sdk.core import xray_recorder
 from flask import request, Blueprint
+import datetime
 
 from datastores.session_datastore import SessionDatastore
 from decorators import authentication_required
 from exceptions import InvalidSchemaException
-from models.post_session_survey import PostSessionSurvey
 from models.session import SessionType, SessionFactory
 from utils import parse_datetime, format_date, format_datetime, run_async
 
@@ -89,8 +89,12 @@ def handle_session_sensor_data():
 
     sessions = request.json['sessions']
     for session in sessions:
-        sensor = get_sensor_data(session)
+        sensor_data = get_sensor_data(session)
         sensor_data['data_transferred'] = True
+        event_date = session.get('event_date', "")
+        if event_date == "":
+            event_date = datetime.datetime.strptime(sensor_data['sensor_start_date_time'], "%Y-%m-%dT%H:%M:%SZ").date()
+            event_date = datetime.datetime.strftime(event_date, "%Y-%m-%d")
 
         # For now we're assuming session does not exist and just inserting a new session
         # without trying to match (upsert is essentially insert)
@@ -105,13 +109,9 @@ def handle_session_sensor_data():
 
 
 def get_sensor_data(session):
-    parse_datetime(session['start_time'])
     start_time = format_datetime(session['start_time'])
     end_time = format_datetime(session['end_time'])
-    event_date = session.get('event_date', "")
-    if event_date == "":
-        event_date = datetime.datetime.strftime(datetime.datetime.strptime(start_time, "%Y-%m-%dT%H:%M:%SZ").day(), "%Y-%m-%d")
-        
+
     low_duration = session['low_duration'] / 60
     mod_duration = session['mod_duration'] / 60
     high_duration = session['high_duration'] / 60
@@ -134,6 +134,8 @@ def get_sensor_data(session):
                    "mod_intensity_load": mod_accel,
                    "high_intensity_load": high_accel
                    }
+    return sensor_data
+#
 
 
 def update_plan():
