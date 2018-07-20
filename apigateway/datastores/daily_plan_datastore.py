@@ -170,6 +170,8 @@ def _assigned_exercises_from_mongodb(mongo_result):
 
     assigned_exercise = exercise.AssignedExercise(_key_present("library_id", mongo_result))
     assigned_exercise.exercise.name = _key_present("name", mongo_result)
+    assigned_exercise.exercise.display_name = _key_present("display_name", mongo_result)
+    assigned_exercise.exercise.youtube_id = _key_present("youtube_id", mongo_result)
     assigned_exercise.exercise.bilateral = _key_present("bilateral", mongo_result)
     assigned_exercise.exercise.unit_of_measure = _key_present("unit_of_measure", mongo_result)
     assigned_exercise.position_order = _key_present("position_order", mongo_result)
