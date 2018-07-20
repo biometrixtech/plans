@@ -5,8 +5,7 @@ from models.session import SessionType, SessionFactory
 from exceptions import NoSuchEntityException
 
 class SessionDatastore(object):
-    mongo_collection = get_mongo_collection('dailyplan')
-
+    mongo_collection = 'dailyplan'
 
     def get(self, user_id, event_date, session_type, session_id=None):
         sessions = _get_sessions_from_mongo(self, user_id, event_date, session_type)
@@ -24,24 +23,27 @@ class SessionDatastore(object):
         session_type_name = _get_session_type_name(session_type, 'mongo')
         session = item.json_serialise()
         query = {"user_id": user_id, "date": event_date}
-        self.mongo_collection.update_one(query, {'$push': {session_type_name: session}})
+        mongo_collection = get_mongo_collection(self.mongo_collection)
+        mongo_collection.update_one(query, {'$push': {session_type_name: session}})
 
     def update(self, item, user_id, event_date):
         session_type = item.session_type().value
         session = item.json_serialise()
         session_type_name = _get_session_type_name(session_type, 'mongo')
         query = {"user_id": user_id, "date": event_date}
-        result = self.mongo_collection.update_one(query, {'$pull': {session_type_name: {'session_id': item.id}}})
+        mongo_collection = get_mongo_collection(self.mongo_collection)
+        result = mongo_collection.update_one(query, {'$pull': {session_type_name: {'session_id': item.id}}})
         if result.modified_count == 0:
             raise NoSuchEntityException('No session could be found for the session_id: {} of session_type: {}'.format(session_id, SessionType(session_type)))
         else:
-            self.mongo_collection.update_one(query, {'$push': {session_type_name: session}})
+            mongo_collection.update_one(query, {'$push': {session_type_name: session}})
 
 
     def delete(self, user_id, event_date, session_type, session_id):
         session_type_name = _get_session_type_name(session_type, 'mongo')
         query = {"user_id": user_id, "date": event_date}
-        self.mongo_collection.update_one(query, {'$pull': {session_type_name: {'session_id': session_id}}})
+        mongo_collection = get_mongo_collection(self.mongo_collection)
+        mongo_collection.update_one(query, {'$pull': {session_type_name: {'session_id': session_id}}})
 
 
     def upsert(self, user_id, event_date, session_type, item=None, data=None):
@@ -69,7 +71,8 @@ class SessionDatastore(object):
     def _update_sessions_mongo(self, user_id, event_date, session_type, sessions):
         session_type_name = _get_session_type_name(session_type, 'mongo')
         query = {"user_id": user_id, "date": event_date}
-        self.mongo_collection.update_one(query, {'$set': {session_type_name: sessions}})
+        mongo_collection = get_mongo_collection(self.mongo_collection)
+        mongo_collection.update_one(query, {'$set': {session_type_name: sessions}})
 
 def _create_session(user_id, session_type, data):
     session = SessionFactory()
