@@ -292,6 +292,82 @@ Authorization: eyJraWQ...ajBc4VQ
 ```
 
 
+#### Send sensor data
+
+This endpoint can be called to write sensor data for sessions(s)
+
+##### Query String
+ 
+The client __must__ submit a request to the endpoint `/plans/session/sensor_data`. The request method __must__ be `POST`.
+
+##### Request
+
+The client __must__ submit a request body containing a JSON object with the following schema:
+```
+{
+    "user_id": Uuid,
+    "sessions": [Session]
+}
+```
+A `Session` object __will__ have the following schema:
+
+```
+{
+    "session_id": Uuid,
+    "session_type": number,
+    "event_date": Datetime
+    "start_time": Datetime,
+    "end_time": Datetime,
+    "inactive_duration": number,
+    "low_duration": number, 
+    "mod_duration": number,
+    "high_duration": number,
+    "inactive_accel": number,
+    "low_accel": number, 
+    "mod_accel": number,
+    "high_accel": number
+
+}
+```
+* `session_id` , `session_type` and `event_date` are optional arguments
+
+
+```
+POST /plans/session/sensor_data HTTPS/1.1
+Host: apis.env.fathomai.com
+Content-Type: application/json
+Authorization: eyJraWQ...ajBc4VQ
+
+{
+    "user_id": "e8514489-8de9-47e0-b3d5-b15da244783f",
+    "sessions":
+    [
+        {
+            "start_time": "2018-07-18T13:40:20Z",
+            "end_time": "2018-07-18T14:40:20Z",
+            "inactive_duration": 1500,
+            "low_duration": 500, 
+            "mod_duration": 200,
+            "high_duration": 60,
+            "inactive_accel": 1500,
+            "low_accel": 500, 
+            "mod_accel": 200,
+            "high_accel": 60
+        }
+    ]
+}
+```
+##### Responses
+ 
+ If all sessions were updated successfully, the Service __will__ respond with HTTP Status `200 OK`, with a body with the following syntax:
+ 
+```
+{
+    "message": "success"
+}
+```
+
+
 ### Weekly Training
 
 #### Cross-Training

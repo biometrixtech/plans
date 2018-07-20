@@ -6,7 +6,7 @@ from decorators import authentication_required
 from exceptions import InvalidSchemaException
 from models.post_session_survey import PostSessionSurvey
 from models.session import SessionType, SessionFactory
-from utils import format_date, run_async
+from utils import parse_datetime, format_date, run_async
 
 
 app = Blueprint('session', __name__)
@@ -84,19 +84,6 @@ def handle_session_delete(session_id):
 def handle_session_sensor_data():
     if not isinstance(request.json, dict):
         raise InvalidSchemaException('Request body must be a dictionary')
-    if 'event_date' not in request.json:
-        raise InvalidSchemaException('Missing required parameter event_date')
-    else:
-        event_date = format_date(request.json['event_date'])
-        if event_date is None:
-            raise InvalidSchemaException('event_date is not formatted correctly')
-    if 'session_type' not in request.json:
-        session_type = 0
-    else:
-        try:
-            session_type = SessionType(request.json['session_type']).value
-        except ValueError:
-            raise InvalidSchemaException('session_type not recognized')
 
     store = SessionDatastore()
 
@@ -105,10 +92,11 @@ def handle_session_sensor_data():
         sensor = get_sensor_data(session)
         sensor_data['data_transferred'] = True
 
-        # we're assuming that the session does not exist
+        # For now we're assuming session does not exist and just inserting a new session
+        # without trying to match (upsert is essentially insert)
         store.upsert(user_id=request.json['user_id'],
                      event_date=event_date,
-                     session_type=session_type,
+                     session_type=0,
                      data=sensor_data)
 
     update_plan()
@@ -117,6 +105,7 @@ def handle_session_sensor_data():
 
 
 def get_sensor_data(session):
+    parse_datetime(session['start_time'])
     start_time = format_datetime(session['start_time'])
     end_time = format_datetime(session['end_time'])
     event_date = session.get('event_date', "")
