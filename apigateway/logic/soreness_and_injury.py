@@ -212,10 +212,10 @@ class SorenessCalculator(object):
                                 updated = True
                             if not updated:
                                 soreness_list.append(s)
-                        else:
-                            # clear out any soreness to date
-                            soreness_list = [s for s in soreness_list if s.reported_date_time >=
-                                             last_post_session_survey_datetime]
+                    else:
+                        # clear out any soreness to date
+                        soreness_list = [s for s in soreness_list if s.reported_date_time >=
+                                         last_post_session_survey_datetime]
 
         return soreness_list
 
