@@ -55,7 +55,7 @@ Metadata:
             MongoDbPeeringCidr: { default: "MongoDB peering CIDR" }
 
 Conditions:
-    CreateVpc: { "Fn::Not": [ { "Fn::Equals": [ { Ref: "MongoDbPeeringId" }, "" ] } ] }
+    CreateVpc: { "Fn::Not": [ { "Fn::Equals": [ { Ref: "MongoDbPeeringCidr" }, "" ] } ] }
 
 Resources:
 
