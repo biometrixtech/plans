@@ -4,7 +4,7 @@ import boto3
 import json
 from aws_xray_sdk.core import xray_recorder
 from botocore.exceptions import ClientError
-# from exceptions import ApplicationException
+from exceptions import ApplicationException
 
 
 @xray_recorder.capture('config.get_mongo')
