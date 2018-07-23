@@ -45,13 +45,13 @@ Metadata:
           - Label: { default: "Networking" }
             Parameters:
               - "VpnCidr"
-              - "MongoDbPeeringVpc"
+              - "MongoDbPeeringId"
               - "MongoDbPeeringCidr"
 
         ParameterLabels:
             Environment: { default: "Environment" }
             VpnCidr: { default: "VPN CIDR block" }
-            MongoDbPeeringVpc: { default: "MongoDB peering VPC ID" }
+            MongoDbPeeringId: { default: "MongoDB peering VPC ID" }
             MongoDbPeeringCidr: { default: "MongoDB peering CIDR" }
 
 Conditions:
@@ -191,7 +191,7 @@ Resources:
                 Service: "apigateway"
                 LambdaArn: { "Fn::GetAtt": [ "ApiGatewayLambda", "Arn" ] }
                 CustomAuthLambdaArn: { "Fn::ImportValue": { "Fn::Sub": "users-${Environment}-CustomAuthLambdaArn" } }
-                CreateCustomDomain: "true"
+                CreateCustomDomain: "false"
             Tags:
               - { Key: "Name", Value: { "Fn::Sub": "plans-${Environment}-apigateway" } }
               - { Key: "Management", Value: "managed" }
