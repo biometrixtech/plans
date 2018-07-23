@@ -42,7 +42,8 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         self.post_session_soreness = []     # post_session_soreness object array
         self.date = None
         self.time = None
-        self.sensor_date_time = None
+        self.sensor_start_date_time = None
+        self.sensor_end_date_time = None
         self.day_of_week = DayOfWeek.monday
         self.estimated = False
         self.internal_load_imputed = False
@@ -96,7 +97,8 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
             'high_intensity_load': self.high_intensity_load,
             'mod_intensity_load': self.mod_intensity_load,
             'low_intensity_load': self.low_intensity_load,
-            'sensor_date_time': self.sensor_date_time,
+            'sensor_start_date_time': self.sensor_start_date_time,
+            'sensor_end_date_time': self.sensor_end_date_time,
             'post_session_survey': self.post_session_survey
         }
         return ret

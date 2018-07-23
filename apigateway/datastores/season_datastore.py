@@ -3,24 +3,25 @@ from config import get_mongo_collection
 from models.athlete_season import AthleteSeason, Season
 
 class AthleteSeasonDatastore(object):
+    mongo_collection = 'athleteseason'
     # mongo_collection = get_mongo_collection('athleteseason')
     @xray_recorder.capture('datastore.AthleteSeasonDatastore.get')
-    def get(self, user_id=None, collection='athleteseason'):
-        return self._query_mongodb(user_id, collection)
+    def get(self, user_id=None):
+        return self._query_mongodb(user_id)
 
     @xray_recorder.capture('datastore.AthleteSeasonDatastore.put')
-    def put(self, items, collection='athleteseason'):
+    def put(self, items):
         if not isinstance(items, list):
             items = [items]
         try:
             for item in items:
-                self._put_mongodb(item, collection)
+                self._put_mongodb(item)
         except Exception as e:
             raise e
 
     @xray_recorder.capture('datastore.AthleteSeasonDatastore._query_mongodb')
-    def _query_mongodb(self, user_id, collection):
-        mongo_collection = get_mongo_collection(collection)
+    def _query_mongodb(self, user_id):
+        mongo_collection = get_mongo_collection(self.mongo_collection)
         # mongo_collection = self.mongo_collection
         cursor = mongo_collection.find({'user_id': user_id})
         ret = []
@@ -38,9 +39,9 @@ class AthleteSeasonDatastore(object):
         return ret
         
     @xray_recorder.capture('datastore.AthleteSeasonDatastore._put_mongodb')
-    def _put_mongodb(self, item, collection):
+    def _put_mongodb(self, item):
         athlete_seasons = self.get(user_id=item.user_id)
-        mongo_collection = get_mongo_collection(collection)
+        mongo_collection = get_mongo_collection(self.mongo_collection)
         # mongo_collection = self.mongo_collection
         if len(athlete_seasons) == 0:
             item = self.item_to_mongodb(item)

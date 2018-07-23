@@ -20,33 +20,30 @@ class SessionDatastore(object):
 
     def insert(self, item, user_id, event_date):
         session_type = item.session_type().value
-        sessions = self._get_sessions_from_mongo(user_id, event_date, session_type)
-        sessions.append(item)
-        sessions = [s.json_serialise() for s in sessions]
-        self._update_sessions_mongo(user_id, event_date, session_type, sessions)
-
+        session_type_name = _get_session_type_name(session_type, 'mongo')
+        session = item.json_serialise()
+        query = {"user_id": user_id, "date": event_date}
+        mongo_collection = get_mongo_collection(self.mongo_collection)
+        mongo_collection.update_one(query, {'$push': {session_type_name: session}})
 
     def update(self, item, user_id, event_date):
         session_type = item.session_type().value
-        sessions = self._get_sessions_from_mongo(user_id, event_date, session_type)
-        for session in sessions:
-            if session.id == item.id:
-                sessions.remove(session)
-                sessions.append(item)
-                break
-        sessions = [s.json_serialise() for s in sessions]
-        self._update_sessions_mongo(user_id, event_date, session_type, sessions)
+        session = item.json_serialise()
+        session_type_name = _get_session_type_name(session_type, 'mongo')
+        query = {"user_id": user_id, "date": event_date}
+        mongo_collection = get_mongo_collection(self.mongo_collection)
+        result = mongo_collection.update_one(query, {'$pull': {session_type_name: {'session_id': item.id}}})
+        if result.modified_count == 0:
+            raise NoSuchEntityException('No session could be found for the session_id: {} of session_type: {}'.format(session_id, SessionType(session_type)))
+        else:
+            mongo_collection.update_one(query, {'$push': {session_type_name: session}})
 
 
     def delete(self, user_id, event_date, session_type, session_id):
-        sessions = self._get_sessions_from_mongo(user_id, event_date, session_type)
-        for session in sessions:
-            if session.id == session_id:
-                sessions.remove(session)
-                break
-        sessions = [s.json_serialise() for s in sessions]
-
-        self._update_sessions_mongo(user_id, event_date, session_type, sessions)
+        session_type_name = _get_session_type_name(session_type, 'mongo')
+        query = {"user_id": user_id, "date": event_date}
+        mongo_collection = get_mongo_collection(self.mongo_collection)
+        mongo_collection.update_one(query, {'$pull': {session_type_name: {'session_id': session_id}}})
 
 
     def upsert(self, user_id, event_date, session_type, item=None, data=None):
@@ -57,7 +54,7 @@ class SessionDatastore(object):
             if data is None:
                 self.insert(item, user_id, event_date)
             else:
-                update_item(item, data)
+                _update_session(item, data)
                 self.update(item, user_id, event_date)
 
 
@@ -71,14 +68,7 @@ class SessionDatastore(object):
         sessions = getattr(plan, session_type_name)
         return sessions
 
-    def _update_sessions_mongo(self, user_id, event_date, session_type, sessions):
-        session_type_name = _get_session_type_name(session_type, 'mongo')
-        mongo_collection = get_mongo_collection(self.mongo_collection)
-        query = {"user_id": user_id, "date": event_date}
-        mongo_collection.update_one(query, {'$set': {session_type_name: sessions}})
-
 def _create_session(user_id, session_type, data):
-    print(data)
     session = SessionFactory()
     session = session.create(SessionType(session_type))
     for key, value in data.items():
