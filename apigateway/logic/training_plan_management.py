@@ -47,7 +47,9 @@ class TrainingPlanManager(object):
         end_time = format_datetime(
             datetime.datetime(end_date_time.year, end_date_time.month, end_date_time.day + 1, 0, 0, 0))
 
-        last_daily_readiness_survey = self.daily_readiness_datastore.get(self.athlete_id, start_time, end_time)
+        readiness_surveys = self.daily_readiness_datastore.get(self.athlete_id, start_time, end_time)
+
+        last_daily_readiness_survey = readiness_surveys[0]
 
         last_post_session_surveys = self.post_session_survey_datastore.get(self.athlete_id,
                                                last_daily_readiness_survey.get_event_date()

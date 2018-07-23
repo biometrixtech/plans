@@ -29,8 +29,8 @@ class DailyReadinessDatastore(object):
         if start_date is None and end_date is None:
             query = {'user_id': user_id}
         else:
-            start_date_time = datetime.datetime.strptime(start_date, "%Y-%m-%d")
-            end_date_time = datetime.datetime.strptime(end_date, "%Y-%m-%d")
+            start_date_time = datetime.datetime.strptime(start_date, "%Y-%m-%dT%H:%M:%SZ")
+            end_date_time = datetime.datetime.strptime(end_date, "%Y-%m-%dT%H:%M:%SZ")
             start_time = format_datetime(
                 datetime.datetime(start_date_time.year, start_date_time.month, start_date_time.day, 0, 0, 0))
             end_time = format_datetime(
