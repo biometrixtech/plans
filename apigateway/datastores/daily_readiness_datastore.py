@@ -29,11 +29,7 @@ class DailyReadinessDatastore(object):
         if start_date_time is None and end_date_time is None:
             query = {'user_id': user_id}
         else:
-            start_time = format_datetime(
-                datetime.datetime(start_date_time.year, start_date_time.month, start_date_time.day, 0, 0, 0))
-            end_time = format_datetime(
-                datetime.datetime(end_date_time.year, end_date_time.month, end_date_time.day, 0, 0, 0))
-            query = {'user_id': user_id, 'event_date': {'$gte': start_time, '$lte': end_time}}
+            query = {'user_id': user_id, 'event_date': {'$gte': start_date_time, '$lte': end_date_time}}
         if last_only:
             mongo_result = mongo_collection.find_one(query, sort=[('event_date', -1)])
 

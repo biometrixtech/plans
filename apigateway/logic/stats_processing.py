@@ -23,60 +23,78 @@ class StatsProcessing(object):
         self.load_acute_chronic_data()
 
         athlete_stats = AthleteStats(self.athlete_id)
-        acute_RPE_values = [x.RPE for x in self.acute_post_session_surveys if x is not None]
-        acute_readiness_values = [x.readiness for x in self.acute_readiness_surveys if x is not None]
-        acute_sleep_quality_values = [x.sleep_quality for x in self.acute_readiness_surveys if x is not None]
 
-        chronic_RPE_values = [x.RPE for x in self.chronic_post_session_surveys if x is not None]
-        chronic_readiness_values = [x.readiness for x in self.chronic_readiness_surveys if x is not None]
-        chronic_sleep_quality_values = [x.sleep_quality for x in self.chronic_readiness_surveys if x is not None]
+        if len(self.acute_readiness_surveys) > 0:
 
-        dates_difference = self.end_date_time - self.start_date_time
+            acute_readiness_values = [x.readiness for x in self.acute_readiness_surveys if x is not None]
+            acute_sleep_quality_values = [x.sleep_quality for x in self.acute_readiness_surveys if x is not None]
 
-        max_acute_soreness_values = []
-        max_chronic_soreness_values = []
+            chronic_readiness_values = [x.readiness for x in self.chronic_readiness_surveys if x is not None]
+            chronic_sleep_quality_values = [x.sleep_quality for x in self.chronic_readiness_surveys if x is not None]
 
-        for d in range(dates_difference.days + 1):
+            acute_RPE_values = [x.RPE for x in self.acute_post_session_surveys if x is not None]
+            chronic_RPE_values = [x.RPE for x in self.chronic_post_session_surveys if x is not None]
 
-            acute_post_soreness_values = [x.survey.soreness.severity for x in self.acute_post_session_surveys
-                                          if x.survey.soreness is not None and len(x.survey.soreness) > 0
-                                          and x.event_date == d]
-            acute_readiness_soreness_values = [x.soreness.severity for x in self.acute_readiness_surveys
-                                               if x.soreness is not None and len(x.soreness) > 0
-                                               and x.event_date == d]
+            dates_difference = self.end_date_time - self.start_date_time
 
-            acute_soreness_values = []
+            max_acute_soreness_values = []
+            max_chronic_soreness_values = []
 
-            acute_soreness_values.extend(acute_post_soreness_values)
-            acute_soreness_values.extend(acute_readiness_soreness_values)
+            for d in range(dates_difference.days + 1):
 
-            if len(acute_soreness_values) > 0:
-                max_acute_soreness_values.append(max(acute_soreness_values))
+                acute_post_soreness_values = [x.survey.soreness.severity for x in self.acute_post_session_surveys
+                                              if x.survey.soreness is not None and len(x.survey.soreness) > 0
+                                              and x.event_date == d]
+                acute_readiness_soreness_values = [x.soreness.severity for x in self.acute_readiness_surveys
+                                                   if x.soreness is not None and len(x.soreness) > 0
+                                                   and x.event_date == d]
 
-            chronic_post_soreness_values = [x.survey.soreness.severity for x in self.chronic_post_session_surveys
-                                            if x.survey.soreness is not None and len(x.survey.soreness) > 0
-                                            and x.event_date == d]
-            chronic_readiness_soreness_values = [x.soreness.severity for x in self.chronic_readiness_surveys
-                                                 if x.soreness is not None and len(x.soreness) > 0
-                                                 and x.event_date == d]
+                acute_soreness_values = []
 
-            chronic_soreness_values = []
+                acute_soreness_values.extend(acute_post_soreness_values)
+                acute_soreness_values.extend(acute_readiness_soreness_values)
 
-            chronic_soreness_values.extend(chronic_post_soreness_values)
-            chronic_soreness_values.extend(chronic_readiness_soreness_values)
+                if len(acute_soreness_values) > 0:
+                    max_acute_soreness_values.append(max(acute_soreness_values))
 
-            if len(chronic_soreness_values) > 0:
-                max_chronic_soreness_values.append(max(chronic_soreness_values))
+                chronic_post_soreness_values = [x.survey.soreness.severity for x in self.chronic_post_session_surveys
+                                                if x.survey.soreness is not None and len(x.survey.soreness) > 0
+                                                and x.event_date == d]
+                chronic_readiness_soreness_values = [x.soreness.severity for x in self.chronic_readiness_surveys
+                                                     if x.soreness is not None and len(x.soreness) > 0
+                                                     and x.event_date == d]
 
-        athlete_stats.acute_avg_RPE = statistics.mean(acute_RPE_values)
-        athlete_stats.acute_avg_readiness = statistics.mean(acute_readiness_values)
-        athlete_stats.acute_avg_sleep_quality = statistics.mean(acute_sleep_quality_values)
-        athlete_stats.acute_avg_max_soreness = statistics.mean(max_acute_soreness_values)
+                chronic_soreness_values = []
 
-        athlete_stats.chronic_avg_RPE = statistics.mean(chronic_RPE_values)
-        athlete_stats.chronic_avg_readiness = statistics.mean(chronic_readiness_values)
-        athlete_stats.chronic_avg_sleep_quality = statistics.mean(chronic_sleep_quality_values)
-        athlete_stats.chronic_avg_max_soreness = statistics.mean(max_chronic_soreness_values)
+                chronic_soreness_values.extend(chronic_post_soreness_values)
+                chronic_soreness_values.extend(chronic_readiness_soreness_values)
+
+                if len(chronic_soreness_values) > 0:
+                    max_chronic_soreness_values.append(max(chronic_soreness_values))
+
+            if len(acute_RPE_values) > 0:
+                athlete_stats.acute_avg_RPE = statistics.mean(acute_RPE_values)
+
+            if len(acute_readiness_values) > 0:
+                athlete_stats.acute_avg_readiness = statistics.mean(acute_readiness_values)
+
+            if len(acute_sleep_quality_values) > 0:
+                athlete_stats.acute_avg_sleep_quality = statistics.mean(acute_sleep_quality_values)
+
+            if len(max_acute_soreness_values) > 0:
+                athlete_stats.acute_avg_max_soreness = statistics.mean(max_acute_soreness_values)
+
+            if len(chronic_RPE_values) > 0:
+                athlete_stats.chronic_avg_RPE = statistics.mean(chronic_RPE_values)
+
+            if len(chronic_readiness_values) > 0:
+                athlete_stats.chronic_avg_readiness = statistics.mean(chronic_readiness_values)
+
+            if len(chronic_sleep_quality_values) > 0:
+                athlete_stats.chronic_avg_sleep_quality = statistics.mean(chronic_sleep_quality_values)
+
+            if len(max_chronic_soreness_values) > 0:
+                athlete_stats.chronic_avg_max_soreness = statistics.mean(max_chronic_soreness_values)
 
         return athlete_stats
 
