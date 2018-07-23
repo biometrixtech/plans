@@ -40,12 +40,15 @@ class TrainingPlanManager(object):
 
     def create_daily_plan(self, event_date=None):
 
-        start_date_time = datetime.datetime.strptime(event_date, "%Y-%m-%d")
-        end_date_time = datetime.datetime.strptime(event_date, "%Y-%m-%d")
-        start_time = datetime.datetime(start_date_time.year, start_date_time.month, start_date_time.day, 0, 0, 0)
-        end_time = end_date_time + datetime.timedelta(days=1)
+        if event_date is not None:
+            start_date_time = datetime.datetime.strptime(event_date, "%Y-%m-%d")
+            end_date_time = datetime.datetime.strptime(event_date, "%Y-%m-%d")
+            start_time = datetime.datetime(start_date_time.year, start_date_time.month, start_date_time.day, 0, 0, 0)
+            end_time = end_date_time + datetime.timedelta(days=1)
 
-        readiness_surveys = self.daily_readiness_datastore.get(self.athlete_id, start_time, end_time)
+            readiness_surveys = self.daily_readiness_datastore.get(self.athlete_id, start_time, end_time)
+        else:
+            readiness_surveys = self.daily_readiness_datastore.get(self.athlete_id)
 
         last_daily_readiness_survey = readiness_surveys[0]
 

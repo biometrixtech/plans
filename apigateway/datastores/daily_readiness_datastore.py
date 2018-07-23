@@ -24,7 +24,7 @@ class DailyReadinessDatastore(object):
             raise e
 
     @xray_recorder.capture('datastore.DailyReadinessDatastore._query_mongodb')
-    def _query_mongodb(self, user_id, start_date_time, end_date_time, last_only=True):
+    def _query_mongodb(self, user_id, start_date_time, end_date_time, last_only):
         mongo_collection = get_mongo_collection(self.mongo_collection)
         if start_date_time is None and end_date_time is None:
             query = {'user_id': user_id}

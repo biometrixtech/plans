@@ -36,6 +36,7 @@ def add_xray_support(request):
     os.environ["MONGO_COLLECTION_EXERCISELIBRARY"] = config['collection_exerciselibrary']
     os.environ["MONGO_COLLECTION_TRAININGSCHEDULE"] = config['collection_trainingschedule']
     os.environ["MONGO_COLLECTION_ATHLETESEASON"] = config['collection_athleteseason']
+    os.environ["MONGO_COLLECTION_ATHLETESTATS"] = config['collection_athletestats']
 
 
 @pytest.fixture(scope="module")
