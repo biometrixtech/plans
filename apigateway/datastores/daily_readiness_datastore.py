@@ -8,7 +8,7 @@ import datetime
 
 
 class DailyReadinessDatastore(object):
-    mongo_collection = 'readiness'
+    mongo_collection = 'dailyreadiness'
 
     @xray_recorder.capture('datastore.DailyReadinessDatastore.get')
     def get(self, user_id, event_date=None):
