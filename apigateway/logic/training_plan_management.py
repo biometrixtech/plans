@@ -39,7 +39,15 @@ class TrainingPlanManager(object):
         return max(max_soreness_score, sleep_quality_score, readiness_score, rpe_score)
 
     def create_daily_plan(self, event_date=None):
-        last_daily_readiness_survey = self.daily_readiness_datastore.get(self.athlete_id, event_date)
+
+        start_date_time = datetime.datetime.strptime(event_date, "%Y-%m-%d")
+        end_date_time = datetime.datetime.strptime(event_date, "%Y-%m-%d")
+        start_time = format_datetime(
+            datetime.datetime(start_date_time.year, start_date_time.month, start_date_time.day, 0, 0, 0))
+        end_time = format_datetime(
+            datetime.datetime(end_date_time.year, end_date_time.month, end_date_time.day + 1, 0, 0, 0))
+
+        last_daily_readiness_survey = self.daily_readiness_datastore.get(self.athlete_id, start_time, end_time)
 
         last_post_session_surveys = self.post_session_survey_datastore.get(self.athlete_id,
                                                last_daily_readiness_survey.get_event_date()
