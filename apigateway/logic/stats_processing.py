@@ -11,8 +11,8 @@ class StatsProcessing(object):
         self.post_session_survey_datastore = post_session_survey_datastore
         self.start_date = datetime.strptime(event_date, "%Y-%m-%d")
         self.end_date = datetime.strptime(event_date, "%Y-%m-%d")
-        self.start_date_time = datetime(self.start_date.year, self.start_date.month, self.start_date.day - 28, 0, 0, 0)
-        self.end_date_time = datetime(self.end_date.year, self.end_date.month, self.end_date.day + 1, 0, 0, 0)
+        self.start_date_time = self.start_date - timedelta(days=28)
+        self.end_date_time = self.end_date + timedelta(days=1)
         self.acute_readiness_surveys = []
         self.chronic_readiness_surveys = []
         self.acute_post_session_surveys = []
@@ -32,24 +32,36 @@ class StatsProcessing(object):
             chronic_readiness_values = [x.readiness for x in self.chronic_readiness_surveys if x is not None]
             chronic_sleep_quality_values = [x.sleep_quality for x in self.chronic_readiness_surveys if x is not None]
 
-            acute_RPE_values = [x.RPE for x in self.acute_post_session_surveys if x is not None]
-            chronic_RPE_values = [x.RPE for x in self.chronic_post_session_surveys if x is not None]
+            acute_RPE_values = [x.survey.RPE for x in self.acute_post_session_surveys if x.survey.RPE is not None]
+            chronic_RPE_values = [x.survey.RPE for x in self.chronic_post_session_surveys if x.survey.RPE is not None]
 
             dates_difference = self.end_date_time - self.start_date_time
 
             max_acute_soreness_values = []
             max_chronic_soreness_values = []
 
+            acute_soreness_values = []
+            chronic_soreness_values = []
+
             for d in range(dates_difference.days + 1):
 
-                acute_post_soreness_values = [x.survey.soreness.severity for x in self.acute_post_session_surveys
-                                              if x.survey.soreness is not None and len(x.survey.soreness) > 0
-                                              and x.event_date == d]
-                acute_readiness_soreness_values = [x.soreness.severity for x in self.acute_readiness_surveys
-                                                   if x.soreness is not None and len(x.soreness) > 0
-                                                   and x.event_date == d]
+                acute_post_surveys = [x.survey for x in self.acute_post_session_surveys if x.survey is not None and
+                                      x.event_date == (self.start_date_time + timedelta(d)).strftime("%Y-%m-%d")]
 
-                acute_soreness_values = []
+                acute_post_soreness_values = []
+
+                for s in acute_post_surveys:
+                    soreness_values = [x.severity for x in s.soreness if x.severity is not None]
+                    acute_post_soreness_values.extend(soreness_values)
+
+                readiness_surveys = [x for x in self.acute_readiness_surveys if x is not None and
+                                     x.event_date == (self.start_date_time + timedelta(d)).strftime("%Y-%m-%d")]
+
+                acute_readiness_soreness_values = []
+
+                for s in readiness_surveys:
+                    soreness_values = [x.severity for x in s.soreness if x.severity is not None]
+                    acute_readiness_values.extend(soreness_values)
 
                 acute_soreness_values.extend(acute_post_soreness_values)
                 acute_soreness_values.extend(acute_readiness_soreness_values)
@@ -57,14 +69,23 @@ class StatsProcessing(object):
                 if len(acute_soreness_values) > 0:
                     max_acute_soreness_values.append(max(acute_soreness_values))
 
-                chronic_post_soreness_values = [x.survey.soreness.severity for x in self.chronic_post_session_surveys
-                                                if x.survey.soreness is not None and len(x.survey.soreness) > 0
-                                                and x.event_date == d]
-                chronic_readiness_soreness_values = [x.soreness.severity for x in self.chronic_readiness_surveys
-                                                     if x.soreness is not None and len(x.soreness) > 0
-                                                     and x.event_date == d]
+                chronic_post_surveys = [x.survey for x in self.chronic_post_session_surveys if x.survey is not None and
+                                      x.event_date == (self.start_date_time + timedelta(d)).strftime("%Y-%m-%d")]
 
-                chronic_soreness_values = []
+                chronic_post_soreness_values = []
+
+                for s in chronic_post_surveys:
+                    soreness_values = [x.severity for x in s.soreness if x.severity is not None]
+                    chronic_post_soreness_values.extend(soreness_values)
+
+                chronic_readiness_surveys = [x for x in self.chronic_readiness_surveys if x is not None and
+                                     x.event_date == (self.start_date_time + timedelta(d)).strftime("%Y-%m-%d")]
+
+                chronic_readiness_soreness_values = []
+
+                for s in chronic_readiness_surveys:
+                    soreness_values = [x.severity for x in s.soreness if x.severity is not None]
+                    chronic_readiness_soreness_values.extend(soreness_values)
 
                 chronic_soreness_values.extend(chronic_post_soreness_values)
                 chronic_soreness_values.extend(chronic_readiness_soreness_values)
@@ -107,13 +128,13 @@ class StatsProcessing(object):
                                                                       self.end_date_time)
 
         if daily_readiness_surveys is not None and len(daily_readiness_surveys) > 0:
-            daily_readiness_surveys.sort(key=lambda x: x.event_date, reverse=True)
+            daily_readiness_surveys.sort(key=lambda x: x.event_date, reverse=False)
             earliest_survey_date_time = daily_readiness_surveys[0].event_date
         else:
             return
 
-        if post_session_surveys is not None and len(daily_readiness_surveys) > 0:
-            post_session_surveys.sort(key=lambda x: x.event_date_time, reverse=True)
+        if post_session_surveys is not None and len(post_session_surveys) > 0:
+            post_session_surveys.sort(key=lambda x: x.event_date_time, reverse=False)
             earliest_survey_date_time = min(earliest_survey_date_time, post_session_surveys[0].event_date_time)
 
         days_difference = (self.end_date_time - earliest_survey_date_time).days
@@ -136,9 +157,9 @@ class StatsProcessing(object):
             chronic_start_date_time = self.end_date_time - timedelta(days=chronic_days)
 
             self.acute_post_session_surveys = [p for p in post_session_surveys
-                                               if p.event_date >= acute_start_date_time]
+                                               if p.event_date_time >= acute_start_date_time]
             self.chronic_post_session_surveys = [p for p in post_session_surveys
-                                                 if p.event_date >= chronic_start_date_time]
+                                                 if p.event_date_time >= chronic_start_date_time]
             self.acute_readiness_surveys = [p for p in daily_readiness_surveys
                                             if p.event_date >= acute_start_date_time]
             self.chronic_readiness_surveys = [p for p in daily_readiness_surveys
