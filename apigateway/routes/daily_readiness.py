@@ -9,7 +9,7 @@ from decorators import authentication_required
 from exceptions import InvalidSchemaException, NoSuchEntityException
 from models.daily_readiness import DailyReadiness
 from logic.soreness_and_injury import MuscleSorenessSeverity, BodyPartLocation
-from utils import parse_datetime, run_async
+from utils import parse_datetime, format_datetime, run_async
 
 app = Blueprint('daily_readiness', __name__)
 
@@ -42,13 +42,13 @@ def handle_daily_readiness_create():
 @authentication_required
 @xray_recorder.capture('routes.daily_readiness.previous')
 def handle_daily_readiness_get():
-    store = DailyReadinessDatastore()
+    daily_readiness_store = DailyReadinessDatastore()
     user_id = jwt.decode(request.headers['Authorization'], verify=False)['user_id']
     current_time = datetime.datetime.now()
     start_time = current_time - datetime.timedelta(hours=48)
     sore_body_parts = []
     try:
-        daily_readiness = store.get(user_id, start_date=start_time, end_date=current_time)
+        daily_readiness = daily_readiness_store.get(user_id, start_date=start_time, end_date=current_time)
         if len(daily_readiness) != 0:
             sore_body_parts = daily_readiness[0].json_serialise()['sore_body_parts']
     except NoSuchEntityException:
@@ -56,7 +56,7 @@ def handle_daily_readiness_get():
 
     post_session_store = PostSessionSurveyDatastore()
     post_session_surveys = post_session_store.get(user_id=user_id, start_date=start_time, end_date=current_time)
-    post_session_surveys = [s for s in post_session_surveys if s is not None]
+    post_session_surveys = [s for s in post_session_surveys if s is not None and s.event_date < format_datetime(current_time) and s.event_date > format_datetime(start_time)]
     if len(post_session_surveys) != 0:
         post_session_surveys = sorted(post_session_surveys, key=lambda k: k.survey.event_date, reverse=True)
         sore_body_parts += [{"body_part": s.body_part.location.value, "side": s.side} for s in post_session_surveys[0].survey.soreness if s.severity > 1]
