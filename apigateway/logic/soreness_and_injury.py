@@ -196,19 +196,26 @@ class SorenessCalculator(object):
 
                     last_post_session_survey_datetime = last_post_session_survey.event_date_time
 
-                    for s in last_post_session_survey.survey.soreness:
-                        updated = False
-                        for r in range(0, len(soreness_list)):
+                    if (last_post_session_survey.survey.soreness is not None and
+                            len(last_post_session_survey.survey.soreness) > 0):
 
-                            if (soreness_list[r].body_part.location.value == s.body_part.location.value and
-                                    soreness_list[r].side == s.side and
-                                    soreness_list[r].reported_date_time < last_post_session_survey_datetime):
-                                # soreness_list[r].severity = max(soreness_list[r].severity, s.severity)
-                                soreness_list[r].severity = s.severity
-                                soreness_list[r].reported_date_time = last_post_session_survey_datetime
-                            updated = True
-                        if not updated:
-                            soreness_list.append(s)
+                        for s in last_post_session_survey.survey.soreness:
+                            updated = False
+                            for r in range(0, len(soreness_list)):
+
+                                if (soreness_list[r].body_part.location.value == s.body_part.location.value and
+                                        soreness_list[r].side == s.side and
+                                        soreness_list[r].reported_date_time < last_post_session_survey_datetime):
+                                    # soreness_list[r].severity = max(soreness_list[r].severity, s.severity)
+                                    soreness_list[r].severity = s.severity
+                                    soreness_list[r].reported_date_time = last_post_session_survey_datetime
+                                updated = True
+                            if not updated:
+                                soreness_list.append(s)
+                    else:
+                        # clear out any soreness to date
+                        soreness_list = [s for s in soreness_list if s.reported_date_time >=
+                                         last_post_session_survey_datetime]
 
         return soreness_list
 
