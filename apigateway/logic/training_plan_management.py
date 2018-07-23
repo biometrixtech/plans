@@ -59,7 +59,7 @@ class TrainingPlanManager(object):
             trigger_date_time
         )
 
-        scheduled_sessions = self.daily_schedule_datastore.get(self.athlete_id, trigger_date_time)
+        # scheduled_sessions = self.daily_schedule_datastore.get(self.athlete_id, trigger_date_time)
 
         trigger_date_time_string = trigger_date_time.date().strftime('%Y-%m-%d')
 
@@ -136,7 +136,7 @@ class TrainingPlanManager(object):
         else:
             daily_plan.recovery_pm is None
 
-        daily_plan.add_scheduled_sessions(scheduled_sessions)
+        # daily_plan.add_scheduled_sessions(scheduled_sessions)
 
         daily_plan.last_updated = format_datetime(datetime.datetime.utcnow())
 
