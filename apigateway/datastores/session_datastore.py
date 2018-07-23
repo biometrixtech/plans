@@ -54,7 +54,7 @@ class SessionDatastore(object):
             if data is None:
                 self.insert(item, user_id, event_date)
             else:
-                update_item(item, data)
+                _update_session(item, data)
                 self.update(item, user_id, event_date)
 
 
@@ -67,12 +67,6 @@ class SessionDatastore(object):
         session_type_name = _get_session_type_name(session_type, 'object')
         sessions = getattr(plan, session_type_name)
         return sessions
-
-    def _update_sessions_mongo(self, user_id, event_date, session_type, sessions):
-        session_type_name = _get_session_type_name(session_type, 'mongo')
-        query = {"user_id": user_id, "date": event_date}
-        mongo_collection = get_mongo_collection(self.mongo_collection)
-        mongo_collection.update_one(query, {'$set': {session_type_name: sessions}})
 
 def _create_session(user_id, session_type, data):
     session = SessionFactory()
