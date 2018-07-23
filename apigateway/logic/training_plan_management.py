@@ -42,10 +42,8 @@ class TrainingPlanManager(object):
 
         start_date_time = datetime.datetime.strptime(event_date, "%Y-%m-%d")
         end_date_time = datetime.datetime.strptime(event_date, "%Y-%m-%d")
-        start_time = format_datetime(
-            datetime.datetime(start_date_time.year, start_date_time.month, start_date_time.day, 0, 0, 0))
-        end_time = format_datetime(
-            datetime.datetime(end_date_time.year, end_date_time.month, end_date_time.day + 1, 0, 0, 0))
+        start_time = datetime.datetime(start_date_time.year, start_date_time.month, start_date_time.day, 0, 0, 0)
+        end_time = datetime.datetime(end_date_time.year, end_date_time.month, end_date_time.day + 1, 0, 0, 0)
 
         readiness_surveys = self.daily_readiness_datastore.get(self.athlete_id, start_time, end_time)
 
