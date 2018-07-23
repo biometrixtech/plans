@@ -15,12 +15,14 @@ def get_mongo_collection(collection):
         config['host'],
         replicaset=config['replicaset'] if config['replicaset'] != '---' else None,
         ssl=True,
+        serverSelectionTimeoutMS=10000,
     )
     database = mongo_client[config['database']]
     database.authenticate(config['user'], config['password'], mechanism='SCRAM-SHA-1', source='admin')
     collection = database[config['collection_'+collection]]
 
     return collection
+
 
 @xray_recorder.capture('config.get_secret')
 def get_secret(secret_name):
