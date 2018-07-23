@@ -12,7 +12,7 @@ class DailyReadinessDatastore(object):
 
     @xray_recorder.capture('datastore.DailyReadinessDatastore.get')
     def get(self, user_id, start_date=None, end_date=None, last_only=True):
-        return self._query_mongodb(user_id, start_date, end_date)
+        return self._query_mongodb(user_id, start_date, end_date, last_only)
 
     def put(self, items):
         if not isinstance(items, list):
