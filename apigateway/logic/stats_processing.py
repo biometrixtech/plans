@@ -7,6 +7,7 @@ class StatsProcessing(object):
 
     def __init__(self, athlete_id, event_date, daily_readiness_datastore, post_session_survey_datastore):
         self.athlete_id = athlete_id
+        self.event_date = event_date
         self.daily_readiness_datastore = daily_readiness_datastore
         self.post_session_survey_datastore = post_session_survey_datastore
         self.start_date = datetime.strptime(event_date, "%Y-%m-%d")
@@ -23,6 +24,7 @@ class StatsProcessing(object):
         self.load_acute_chronic_data()
 
         athlete_stats = AthleteStats(self.athlete_id)
+        athlete_stats.event_date = self.event_date
 
         if len(self.acute_readiness_surveys) > 0:
 

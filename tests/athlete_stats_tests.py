@@ -7,6 +7,7 @@ from logic.stats_processing import StatsProcessing
 from models.stats import AthleteStats
 from datastores.post_session_survey_datastore import PostSessionSurveyDatastore
 from datastores.daily_readiness_datastore import DailyReadinessDatastore
+from datastores.athlete_stats_datastore import AthleteStatsDatastore
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -26,12 +27,17 @@ def add_xray_support(request):
     os.environ["MONGO_COLLECTION_EXERCISELIBRARY"] = config['collection_exerciselibrary']
     os.environ["MONGO_COLLECTION_TRAININGSCHEDULE"] = config['collection_trainingschedule']
     os.environ["MONGO_COLLECTION_ATHLETESEASON"] = config['collection_athleteseason']
+    os.environ["MONGO_COLLECTION_ATHLETESTATS"] = config['collection_athletestats']
 
 def test_ryan_robbins_athlete_stats_day_after_week():
     user_id = "rrobbins@fakemail.com"
     calc = StatsProcessing(user_id, "2018-07-19", DailyReadinessDatastore(), PostSessionSurveyDatastore())
     athlete_stats = calc.calc_athlete_stats()
-    assert None is not athlete_stats
+    athlete_stats_data_store = AthleteStatsDatastore()
+    athlete_stats_data_store.put(athlete_stats)
+    athlete_stats_retrieved = athlete_stats_data_store.get(user_id)
+    assert None is not athlete_stats_retrieved
+
 
 def test_ryan_robbins_athlete_stats_last_day_of_week():
     user_id = "rrobbins@fakemail.com"
