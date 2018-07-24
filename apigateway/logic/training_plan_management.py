@@ -8,6 +8,7 @@ from logic.goal_focus_text_generator import RecoveryTextGenerator
 #from datastores.daily_readiness_datastore import DailyReadinessDatastore
 #from datastores.daily_schedule_datastore import DailyScheduleDatastore
 from utils import format_datetime
+from stats_processing import StatsProcessing
 
 
 class TrainingPlanManager(object):
@@ -149,6 +150,12 @@ class TrainingPlanManager(object):
             max_rpe = max(rpe_values)
         else:
             max_rpe = 0
+
+        '''To be implemented later, athlete_stats will then be passed to both am_impact_score and pm_impact_score
+        stats_processing = StatsProcessing(self.athlete_id,trigger_date_time_string, self.daily_readiness_datastore,
+                                           self.post_session_survey_datastore)
+        athlete_stats = stats_processing.calc_athlete_stats()
+        '''
 
         am_impact_score = self.calculate_am_impact_score(
                             max_rpe,
