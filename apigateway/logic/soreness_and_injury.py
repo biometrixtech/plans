@@ -209,7 +209,7 @@ class SorenessCalculator(object):
                                     # soreness_list[r].severity = max(soreness_list[r].severity, s.severity)
                                     soreness_list[r].severity = s.severity
                                     soreness_list[r].reported_date_time = last_post_session_survey_datetime
-                                updated = True
+                                    updated = True
                             if not updated:
                                 soreness_list.append(s)
                     else:
