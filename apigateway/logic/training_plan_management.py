@@ -47,17 +47,19 @@ class TrainingPlanManager(object):
             end_time = end_date_time + datetime.timedelta(days=1)
 
             readiness_surveys = self.daily_readiness_datastore.get(self.athlete_id, start_time, end_time)
+            last_daily_readiness_survey = readiness_surveys[0]
+            trigger_date_time = last_daily_readiness_survey.get_event_date()
         else:
             readiness_surveys = self.daily_readiness_datastore.get(self.athlete_id)
+            last_daily_readiness_survey = readiness_surveys[0]
+            trigger_date_time = last_daily_readiness_survey.get_event_date()
 
-        last_daily_readiness_survey = readiness_surveys[0]
+            end_time = datetime.datetime.combine(trigger_date_time + datetime.timedelta(days=1), datetime.datetime.min.time())
 
         last_post_session_surveys = self.post_session_survey_datastore.get(self.athlete_id,
-                                               last_daily_readiness_survey.get_event_date()
-                                               - datetime.timedelta(hours=48, minutes=0),
-                                               last_daily_readiness_survey.get_event_date())
-
-        trigger_date_time = last_daily_readiness_survey.get_event_date()
+                                                                           trigger_date_time -
+                                                                           datetime.timedelta(hours=48, minutes=0),
+                                                                           end_time)
 
         survey_event_dates = [s.get_event_date() for s in last_post_session_surveys if s is not None]
 
