@@ -8,7 +8,7 @@ class SessionDatastore(object):
     mongo_collection = 'dailyplan'
 
     def get(self, user_id, event_date, session_type, session_id=None):
-        sessions = _get_sessions_from_mongo(self, user_id, event_date, session_type)
+        sessions = self._get_sessions_from_mongo(user_id, event_date, session_type)
         if session_id is None:
             return sessions
         else:
@@ -34,7 +34,7 @@ class SessionDatastore(object):
         mongo_collection = get_mongo_collection(self.mongo_collection)
         result = mongo_collection.update_one(query, {'$pull': {session_type_name: {'session_id': item.id}}})
         if result.modified_count == 0:
-            raise NoSuchEntityException('No session could be found for the session_id: {} of session_type: {}'.format(session_id, SessionType(session_type)))
+            raise NoSuchEntityException('No session could be found for the session_id: {} of session_type: {}'.format(item.id, SessionType(session_type)))
         else:
             mongo_collection.update_one(query, {'$push': {session_type_name: session}})
 
