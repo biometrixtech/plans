@@ -49,7 +49,7 @@ client = pymongo.MongoClient(database_config.mongodb_dev)
 db = client.movementStats
 collection = db.exerciseLibrary
 for exercise_item in exercises:
-    collection.replace_one({'library_id': exercise_item.id}, {'library_id': exercise_item.id,
+    collection.insert_one({'library_id': exercise_item.id,
                            'name': exercise_item.name,
                            'display_name': exercise_item.display_name,
                            'youtube_id': exercise_item.youtube_id,

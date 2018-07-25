@@ -39,7 +39,18 @@ class TrainingPlanManager(object):
         return max(max_soreness_score, sleep_quality_score, readiness_score, rpe_score)
 
     def create_daily_plan(self, event_date=None):
-        last_daily_readiness_survey = self.daily_readiness_datastore.get(self.athlete_id, event_date)
+
+        if event_date is not None:
+            start_date_time = datetime.datetime.strptime(event_date, "%Y-%m-%d")
+            end_date_time = datetime.datetime.strptime(event_date, "%Y-%m-%d")
+            start_time = datetime.datetime(start_date_time.year, start_date_time.month, start_date_time.day, 0, 0, 0)
+            end_time = end_date_time + datetime.timedelta(days=1)
+
+            readiness_surveys = self.daily_readiness_datastore.get(self.athlete_id, start_time, end_time)
+        else:
+            readiness_surveys = self.daily_readiness_datastore.get(self.athlete_id)
+
+        last_daily_readiness_survey = readiness_surveys[0]
 
         last_post_session_surveys = self.post_session_survey_datastore.get(self.athlete_id,
                                                last_daily_readiness_survey.get_event_date()
@@ -48,7 +59,7 @@ class TrainingPlanManager(object):
 
         trigger_date_time = last_daily_readiness_survey.get_event_date()
 
-        survey_event_dates = [s.get_event_date() for s in last_post_session_surveys]
+        survey_event_dates = [s.get_event_date() for s in last_post_session_surveys if s is not None]
 
         if survey_event_dates is not None and len(survey_event_dates) > 0:
             trigger_date_time = max(trigger_date_time, max(survey_event_dates))
@@ -59,7 +70,7 @@ class TrainingPlanManager(object):
             trigger_date_time
         )
 
-        scheduled_sessions = self.daily_schedule_datastore.get(self.athlete_id, trigger_date_time)
+        # scheduled_sessions = self.daily_schedule_datastore.get(self.athlete_id, trigger_date_time)
 
         trigger_date_time_string = trigger_date_time.date().strftime('%Y-%m-%d')
 
@@ -136,7 +147,7 @@ class TrainingPlanManager(object):
         else:
             daily_plan.recovery_pm is None
 
-        daily_plan.add_scheduled_sessions(scheduled_sessions)
+        # daily_plan.add_scheduled_sessions(scheduled_sessions)
 
         daily_plan.last_updated = format_datetime(datetime.datetime.utcnow())
 

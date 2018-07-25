@@ -118,6 +118,23 @@ def handler(event, context):
     xray_recorder.current_segment().put_http_meta('user_agent', event['headers']['User-Agent'])
     xray_recorder.current_segment().put_annotation('environment', os.environ['ENVIRONMENT'])
 
+
+    # Load mongo details from secrets manager
+    from config import get_secret
+    config = get_secret('mongo')
+    os.environ["MONGO_HOST"] = config['host']
+    os.environ["MONGO_REPLICASET"] = config['replicaset']
+    os.environ["MONGO_DATABASE"] = config['database']
+    os.environ["MONGO_USER"] = config['user']
+    os.environ["MONGO_PASSWORD"] = config['password']
+    os.environ["MONGO_COLLECTION_DAILYREADINESS"] = config['collection_dailyreadiness']
+    os.environ["MONGO_COLLECTION_READINESS"] = config['collection_readiness']
+    os.environ["MONGO_COLLECTION_DAILYPLAN"] = config['collection_dailyplan']
+    os.environ["MONGO_COLLECTION_EXERCISELIBRARY"] = config['collection_exerciselibrary']
+    os.environ["MONGO_COLLECTION_TRAINING"] = config['collection_training']
+    os.environ["MONGO_COLLECTION_TRAININGSCHEDULE"] = config['collection_trainingschedule']
+    os.environ["MONGO_COLLECTION_ATHLETESEASON"] = config['collection_athleteseason']
+
     ret = app(event, context)
     ret['headers'].update({
         'Access-Control-Allow-Methods': 'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT',

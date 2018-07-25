@@ -14,13 +14,29 @@ from models.post_session_survey import PostSurvey, PostSessionSurvey
 from models.daily_plan import DailyPlan
 import models.session as session
 from soreness_and_injury import DailySoreness, BodyPart, BodyPartLocation
+from config import get_secret
 import os
 import json
 
 
 @pytest.fixture(scope="session", autouse=True)
 def add_xray_support(request):
-    xray_recorder.begin_segment(name='test')
+    os.environ["ENVIRONMENT"] = "dev"
+
+    xray_recorder.begin_segment(name="test")
+
+    config = get_secret('mongo')
+    os.environ["MONGO_HOST"] = config['host']
+    os.environ["MONGO_REPLICASET"] = config['replicaset']
+    os.environ["MONGO_DATABASE"] = config['database']
+    os.environ["MONGO_USER"] = config['user']
+    os.environ["MONGO_PASSWORD"] = config['password']
+    os.environ["MONGO_COLLECTION_DAILYREADINESS"] = config['collection_dailyreadiness']
+    os.environ["MONGO_COLLECTION_DAILYPLAN"] = config['collection_dailyplan']
+    os.environ["MONGO_COLLECTION_EXERCISELIBRARY"] = config['collection_exerciselibrary']
+    os.environ["MONGO_COLLECTION_TRAININGSCHEDULE"] = config['collection_trainingschedule']
+    os.environ["MONGO_COLLECTION_ATHLETESEASON"] = config['collection_athleteseason']
+    os.environ["MONGO_COLLECTION_ATHLETESTATS"] = config['collection_athletestats']
 
 
 @pytest.fixture(scope="module")
@@ -36,7 +52,7 @@ def get_post_survey(RPE, soreness_list):
         "soreness": soreness_list
     }
 
-    return  survey
+    return survey
 
 def body_part_soreness(location_enum, severity):
     # soreness = DailySoreness()
