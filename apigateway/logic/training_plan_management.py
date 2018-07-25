@@ -8,7 +8,7 @@ from logic.goal_focus_text_generator import RecoveryTextGenerator
 #from datastores.daily_readiness_datastore import DailyReadinessDatastore
 #from datastores.daily_schedule_datastore import DailyScheduleDatastore
 from utils import format_datetime
-from stats_processing import StatsProcessing
+from logic.stats_processing import StatsProcessing
 
 
 class TrainingPlanManager(object):
