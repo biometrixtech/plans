@@ -8,6 +8,7 @@ from logic.goal_focus_text_generator import RecoveryTextGenerator
 #from datastores.daily_readiness_datastore import DailyReadinessDatastore
 #from datastores.daily_schedule_datastore import DailyScheduleDatastore
 from utils import format_datetime
+from logic.stats_processing import StatsProcessing
 
 
 class TrainingPlanManager(object):
@@ -20,23 +21,67 @@ class TrainingPlanManager(object):
         self.post_session_survey_datastore = post_session_survey_datastore
         self.daily_plan_datastore = daily_plan_datastore
 
-    def calculate_am_impact_score(self, rpe, readiness, sleep_quality, max_soreness):
+    def calculate_am_impact_score(self, rpe, readiness, sleep_quality, max_soreness, athlete_stats=None):
 
-        max_soreness_score = min(max_soreness, 5)
-        sleep_quality_score = min(((10 - sleep_quality) / 10) * 3, 3)
-        readiness_score = min(((10 - readiness) / 10) * 5, 5)
-        rpe_score = min((rpe / 10) * 4, 4)
+        scores = []
 
-        return max(max_soreness_score, sleep_quality_score, readiness_score, rpe_score)
+        scores.append(min(max_soreness, 5))
+        scores.append(min(((10 - sleep_quality) / 10) * 3, 3))
+        scores.append(min(((10 - readiness) / 10) * 5, 5))
+        scores.append(min((rpe / 10) * 4, 4))
 
-    def calculate_pm_impact_score(self, rpe, readiness, sleep_quality, max_soreness):
+        if athlete_stats is not None:
+            if athlete_stats.acute_avg_RPE is not None:
+                scores.append(min((athlete_stats.acute_avg_RPE/10) * 3, 3))
+            if athlete_stats.acute_avg_readiness is not None:
+                scores.append(min(((10 - athlete_stats.acute_avg_readiness) / 10) * 4, 4))
+            if athlete_stats.acute_avg_sleep_quality is not None:
+                scores.append(min(((10 - athlete_stats.acute_avg_sleep_quality) / 10) * 2, 2))
+            if athlete_stats.acute_avg_max_soreness is not None:
+                scores.append(min(athlete_stats.acute_avg_max_soreness, 5))
+            if athlete_stats.chronic_avg_RPE is not None:
+                scores.append(min((athlete_stats.chronic_avg_RPE/10) * 2, 2))
+            if athlete_stats.chronic_avg_readiness is not None:
+                scores.append(min(((10 - athlete_stats.chronic_avg_readiness) / 10) * 3, 3))
+            if athlete_stats.chronic_avg_sleep_quality is not None:
+                scores.append(min(((10 - athlete_stats.chronic_avg_sleep_quality) / 10) * 1, 1))
+            if athlete_stats.chronic_avg_max_soreness is not None:
+                scores.append(min(athlete_stats.chronic_avg_max_soreness, 5))
 
-        max_soreness_score = min(max_soreness, 5)
-        sleep_quality_score = min(((10 - sleep_quality) / 10) * 3, 3)
-        readiness_score = min(((10 - readiness) / 10) * 3, 3)
-        rpe_score = min((rpe / 10) * 5, 5)
+        max_scores = max(scores)
 
-        return max(max_soreness_score, sleep_quality_score, readiness_score, rpe_score)
+        return max_scores
+
+    def calculate_pm_impact_score(self, rpe, readiness, sleep_quality, max_soreness, athlete_stats=None):
+
+        scores = []
+
+        scores.append(min(max_soreness, 5))
+        scores.append(min(((10 - sleep_quality) / 10) * 3, 3))
+        scores.append(min(((10 - readiness) / 10) * 3, 3))
+        scores.append(min((rpe / 10) * 5, 5))
+
+        if athlete_stats is not None:
+            if athlete_stats.acute_avg_RPE is not None:
+                scores.append(min((athlete_stats.acute_avg_RPE/10) * 4, 4))
+            if athlete_stats.acute_avg_readiness is not None:
+                scores.append(min(((10 - athlete_stats.acute_avg_readiness) / 10) * 2, 2))
+            if athlete_stats.acute_avg_sleep_quality is not None:
+                scores.append(min(((10 - athlete_stats.acute_avg_sleep_quality) / 10) * 2, 2))
+            if athlete_stats.acute_avg_max_soreness is not None:
+                scores.append(min(athlete_stats.acute_avg_max_soreness, 5))
+            if athlete_stats.chronic_avg_RPE is not None:
+                scores.append(min((athlete_stats.chronic_avg_RPE/10) * 3, 3))
+            if athlete_stats.chronic_avg_readiness is not None:
+                scores.append(min(((10 - athlete_stats.chronic_avg_readiness) / 10) * 1, 1))
+            if athlete_stats.chronic_avg_sleep_quality is not None:
+                scores.append(min(((10 - athlete_stats.chronic_avg_sleep_quality) / 10) * 1, 1))
+            if athlete_stats.chronic_avg_max_soreness is not None:
+                scores.append(min(athlete_stats.chronic_avg_max_soreness, 5))
+
+        max_scores = max(scores)
+
+        return max_scores
 
     def create_daily_plan(self, event_date=None):
 
@@ -105,6 +150,12 @@ class TrainingPlanManager(object):
             max_rpe = max(rpe_values)
         else:
             max_rpe = 0
+
+        '''To be implemented later, athlete_stats will then be passed to both am_impact_score and pm_impact_score
+        stats_processing = StatsProcessing(self.athlete_id,trigger_date_time_string, self.daily_readiness_datastore,
+                                           self.post_session_survey_datastore)
+        athlete_stats = stats_processing.calc_athlete_stats()
+        '''
 
         am_impact_score = self.calculate_am_impact_score(
                             max_rpe,

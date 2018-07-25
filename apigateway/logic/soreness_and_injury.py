@@ -182,6 +182,7 @@ class SorenessCalculator(object):
             daily_readiness_survey_age = trigger_date_time - last_daily_readiness_survey.get_event_date()
 
             if daily_readiness_survey_age.total_seconds() <= 172800:  # within 48 hours so valid
+
                 for s in last_daily_readiness_survey.soreness:
                     s.reported_date_time = last_daily_readiness_survey.get_event_date()
                     soreness_list.append(s)
@@ -203,12 +204,27 @@ class SorenessCalculator(object):
                             updated = False
                             for r in range(0, len(soreness_list)):
 
+                                soreness_within_24_hours = False
+
+                                soreness_age = trigger_date_time - soreness_list[r].reported_date_time
+
+                                if soreness_age.total_seconds() <= 86400: # within 24 hours
+                                    soreness_within_24_hours = True
+
                                 if (soreness_list[r].body_part.location.value == s.body_part.location.value and
                                         soreness_list[r].side == s.side and
                                         soreness_list[r].reported_date_time < last_post_session_survey_datetime):
-                                    # soreness_list[r].severity = max(soreness_list[r].severity, s.severity)
-                                    soreness_list[r].severity = s.severity
-                                    soreness_list[r].reported_date_time = last_post_session_survey_datetime
+                                    if soreness_list[r].severity <= s.severity:
+                                        soreness_list[r].severity = s.severity
+                                        soreness_list[r].reported_date_time = last_post_session_survey_datetime
+                                    elif soreness_within_24_hours and soreness_list[r].severity > s.severity:
+                                        # do nothing
+                                        soreness_list[r].severity = soreness_list[r].severity
+                                        soreness_list[r].reported_date_time = soreness_list[r].reported_date_time
+                                    else:   #just take the latest
+                                        soreness_list[r].severity = s.severity
+                                        soreness_list[r].reported_date_time = last_post_session_survey_datetime
+
                                     updated = True
                             if not updated:
                                 soreness_list.append(s)
