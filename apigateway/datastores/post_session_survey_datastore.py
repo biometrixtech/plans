@@ -1,12 +1,8 @@
 from aws_xray_sdk.core import xray_recorder
 from config import get_mongo_collection
 from datastores.daily_plan_datastore import DailyPlanDatastore
-from models.daily_plan import DailyPlan
 from models.session import SessionType, SessionFactory
 from models.post_session_survey import PostSessionSurvey, PostSurvey
-from logic.soreness_and_injury import DailySoreness, BodyPart, BodyPartLocation
-from utils import format_datetime
-import datetime
 
 
 class PostSessionSurveyDatastore(object):

@@ -1,10 +1,7 @@
 from aws_xray_sdk.core import xray_recorder
 from config import get_mongo_collection
-from logic.soreness_and_injury import DailySoreness, BodyPart, BodyPartLocation
 from models.stats import AthleteStats
-from utils import format_datetime, parse_datetime
 from exceptions import NoSuchEntityException
-import datetime
 
 
 class AthleteStatsDatastore(object):

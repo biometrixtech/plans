@@ -1,7 +1,7 @@
 import datetime
 from enum import IntEnum, Enum
 from serialisable import Serialisable
-from logic.soreness_and_injury import BodyPartLocation
+from models.soreness import BodyPartLocation
 
 
 class TechnicalDifficulty(IntEnum):
@@ -145,20 +145,6 @@ class AssignedExercise(Serialisable):
               }
         return ret
 
-
-class ExerciseDeserialiser(object):
-
-    def get_assigned_exercise(self, json_data):
-        assigned_exercise = AssignedExercise(json_data["library_id"])
-        assigned_exercise.exercise.name = json_data["name"]
-        assigned_exercise.exercise.bilateral = json_data["bilateral"]
-        assigned_exercise.exercise.seconds_per_rep = json_data["seconds_per_rep"]
-        assigned_exercise.exercise.seconds_per_set = json_data["seconds_per_set"]
-        assigned_exercise.exercise.unit_of_measure = json_data["unit_of_measure"]
-        assigned_exercise.position_order = json_data["position_order"]
-        assigned_exercise.reps_assigned = json_data["reps_assigned"]
-        assigned_exercise.sets_assigned = json_data["sets_assigned"]
-        return assigned_exercise
 
 class CompletedExercise(object):
 

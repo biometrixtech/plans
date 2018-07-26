@@ -8,7 +8,7 @@ from datastores.post_session_survey_datastore import PostSessionSurveyDatastore
 from decorators import authentication_required
 from exceptions import InvalidSchemaException, NoSuchEntityException
 from models.daily_readiness import DailyReadiness
-from logic.soreness_and_injury import MuscleSorenessSeverity, BodyPartLocation
+from models.soreness import MuscleSorenessSeverity, BodyPartLocation
 from utils import parse_datetime, format_datetime, run_async
 
 app = Blueprint('daily_readiness', __name__)

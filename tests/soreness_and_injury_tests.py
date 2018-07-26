@@ -1,4 +1,4 @@
-from logic.soreness_and_injury import SorenessCalculator
+from logic.soreness_processing import SorenessCalculator
 from models.daily_readiness import DailyReadiness
 from models.post_session_survey import PostSessionSurvey
 import datetime

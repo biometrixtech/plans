@@ -1,4 +1,4 @@
-from logic.soreness_and_injury import DailySoreness, BodyPart, BodyPartLocation
+from models.soreness import Soreness, BodyPartLocation, BodyPart
 from models.daily_readiness import DailyReadiness
 from utils import format_datetime
 import datetime
@@ -31,7 +31,7 @@ class DailyReadinessDatastore(object):
 
             soreness_list = []
 
-            daily_readiness_soreness = DailySoreness()
+            daily_readiness_soreness = Soreness()
             daily_readiness_soreness.body_part = BodyPart(BodyPartLocation(12),
                                                                               1)
             daily_readiness_soreness.severity = 2
@@ -45,7 +45,7 @@ class DailyReadinessDatastore(object):
 
             soreness_list = []
 
-            daily_readiness_soreness = DailySoreness()
+            daily_readiness_soreness = Soreness()
             daily_readiness_soreness.body_part = BodyPart(BodyPartLocation(11),
                                                                               1)
             daily_readiness_soreness.severity = 2
