@@ -69,8 +69,8 @@ class SessionDatastore(object):
         return sessions
 
 def _create_session(user_id, session_type, data):
-    session = SessionFactory()
-    session = session.create(SessionType(session_type))
+    factory = SessionFactory()
+    session = factory.create(SessionType(session_type))
     for key, value in data.items():
         setattr(session, key, value)
     return session
