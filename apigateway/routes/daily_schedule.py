@@ -6,7 +6,7 @@ from decorators import authentication_required
 from exceptions import InvalidSchemaException
 from config import get_mongo_collection
 from datastores.daily_plan_datastore import DailyPlanDatastore
-from datastores.session_datastore import SessionDatastore, _create_session
+from datastores.session_datastore import SessionDatastore
 from models.daily_plan import DailyPlan
 from utils import format_date, format_datetime, parse_datetime
 app = Blueprint('daily_schedule', __name__)
@@ -61,3 +61,15 @@ def _get_session_data(session):
                    "duration_minutes": session['duration']
                    }
     return session_data
+
+
+def _create_session(user_id, session_type, data):
+    factory = SessionFactory()
+    session = factory.create(SessionType(session_type))
+    for key, value in data.items():
+        setattr(session, key, value)
+    return session
+
+def _update_session(session, data):
+    for key, value in data.items():
+        setattr(session, key, value)
