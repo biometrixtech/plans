@@ -46,18 +46,6 @@ class SessionDatastore(object):
         mongo_collection.update_one(query, {'$pull': {session_type_name: {'session_id': session_id}}})
 
 
-    def upsert(self, user_id, event_date, session_type, item=None, data=None):
-        if item is None:
-            session = _create_session(user_id, session_type, data)
-            self.insert(session, user_id, event_date)
-        else:
-            if data is None:
-                self.insert(item, user_id, event_date)
-            else:
-                _update_session(item, data)
-                self.update(item, user_id, event_date)
-
-
     def _get_sessions_from_mongo(self, user_id, event_date, session_type):
         daily_plan_store = DailyPlanDatastore()
         daily_plan = daily_plan_store.get(user_id=user_id,
@@ -67,18 +55,6 @@ class SessionDatastore(object):
         session_type_name = _get_session_type_name(session_type, 'object')
         sessions = getattr(plan, session_type_name)
         return sessions
-
-def _create_session(user_id, session_type, data):
-    factory = SessionFactory()
-    session = factory.create(SessionType(session_type))
-    for key, value in data.items():
-        setattr(session, key, value)
-    return session
-
-def _update_session(session, data):
-    for key, value in data.items():
-        setattr(session, key, value)
-
 
 def _get_session_type_name(session_type, destination):
     if destination == 'mongo':
