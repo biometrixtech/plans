@@ -1,5 +1,6 @@
 from aws_xray_sdk.core import xray_recorder
 from flask import request, Blueprint
+import datetime
 
 from decorators import authentication_required
 from exceptions import InvalidSchemaException
@@ -28,6 +29,7 @@ def handle_daily_schedule_create():
     if not _check_plan_exists():
         plan = DailyPlan(event_date=event_date)
         plan.user_id = user_id
+        plan.last_updated = format_datetime(datetime.datetime.utcnow())
         DailyPlanDatastore().put(plan)
 
     sessions = request.json['sessions']
