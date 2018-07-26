@@ -58,6 +58,6 @@ def _get_session_data(session):
 
     session_data = {"date": date,
                    "time": time,
-                   "duration": session['duration']
+                   "duration_minutes": session['duration']
                    }
     return session_data

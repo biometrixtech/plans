@@ -28,7 +28,7 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
 
     def __init__(self):
         self.id = None
-        self.duration_minutes = None
+        self.duration_sensor = None
         self.external_load = None
         self.high_intensity_load = None
         self.mod_intensity_load = None
@@ -42,7 +42,7 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         self.post_session_soreness = []     # post_session_soreness object array
         self.date = None
         self.time = None
-        self.duration_sensor = None
+        self.duration_minutes = None
         self.sensor_start_date_time = None
         self.sensor_end_date_time = None
         self.day_of_week = DayOfWeek.monday
