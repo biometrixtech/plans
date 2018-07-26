@@ -49,7 +49,6 @@ def get_mongo_database():
     return database
 
 def get_secret(secret_name):
-    print('getting secret')
     client = boto3.client('secretsmanager')
     try:
         secret_name = '/'.join(['plans', os.environ['ENVIRONMENT'], secret_name])
