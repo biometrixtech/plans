@@ -2,13 +2,13 @@ from aws_xray_sdk.core import xray_recorder
 from flask import request, Blueprint
 import datetime
 
-from datastores.DailyPlanDatastore import DailyPlanDatastore
+from datastores.daily_plan_datastore import DailyPlanDatastore
 from datastores.session_datastore import SessionDatastore
 from decorators import authentication_required
 from exceptions import InvalidSchemaException
 from models.session import SessionType, SessionFactory
 from utils import parse_datetime, format_date, format_datetime, run_async
-from config imort get_mongo_collection
+from config import get_mongo_collection
 
 app = Blueprint('session', __name__)
 
@@ -32,17 +32,17 @@ def handle_session_create():
             session_type = SessionType(request.json['session_type']).value
         except ValueError:
             raise InvalidSchemaException('session_type not recognized')
+    user_id = request.json['user_id']
     description = request.json.get('description', "")
 
-    session = SessionFactory()
-    session = session.create(SessionType(session_type))
-    session.description = description
+    session = _create_session(user_id, session_type, {"description": description})
 
     store = SessionDatastore()
 
-    store.insert(user_id=request.json['user_id'],
-                 event_date=event_date,
-                 item=session)
+    store.insert(item=session,
+                 user_id=user_id,
+                 event_date=event_date
+                 )
 
     return {'message': 'success'}, 201
 

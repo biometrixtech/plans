@@ -28,7 +28,7 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
 
     def __init__(self):
         self.id = None
-        self.duration_minutes = None
+        self.duration_sensor = None
         self.external_load = None
         self.high_intensity_load = None
         self.mod_intensity_load = None
