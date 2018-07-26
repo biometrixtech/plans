@@ -101,7 +101,7 @@ class TrainingPlanManager(object):
                                                last_daily_readiness_survey.get_event_date()
                                                - datetime.timedelta(hours=48, minutes=0),
                                                last_daily_readiness_survey.get_event_date())
-        last_post_session_surveys = [s for s in last_post_session_surveys if s is not None]
+
         trigger_date_time = last_daily_readiness_survey.get_event_date()
 
         survey_event_dates = [s.get_event_date() for s in last_post_session_surveys if s is not None]
