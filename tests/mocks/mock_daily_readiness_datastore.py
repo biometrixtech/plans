@@ -6,6 +6,12 @@ import datetime
 class DailyReadinessDatastore(object):
     mongo_collection = 'readiness'
 
+    def __init__(self):
+        self.surveys = []
+
+    def side_load_surveys(self, surveys):
+        self.surveys = surveys
+
     def get(self, user_id):
         return self._query_mongodb(user_id)
 
