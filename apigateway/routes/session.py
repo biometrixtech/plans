@@ -125,7 +125,7 @@ def get_sensor_data(session):
     
     sensor_data = {"sensor_start_date_time": start_time,
                    "sensor_end_date_time": end_time,
-                   "duration_minutes": duration,
+                   "duration_sensor": duration,
                    "low_intensity_minutes": low_duration,
                    "mod_intensity_minutes": mod_duration,
                    "high_intensity_minutes": high_duration,
