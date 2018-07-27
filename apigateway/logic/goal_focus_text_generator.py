@@ -1,6 +1,6 @@
 from models.exercise import Phase
 from models.soreness import SorenessType, BodyPartLocation
-from soreness_processing import BodyPartMapping
+from logic.soreness_processing import BodyPartMapping
 
 
 class RecoveryTextGenerator(object):
