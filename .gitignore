@@ -7,6 +7,9 @@ apigateway/*
 .idea/*
 apigateway/logic/__pycache__/*
 tests/.pytest_cache/
+tests/database_tests/.pytest_cache
+tests/future_tests/.pytest_cache
+tests/mock_tests/.pyteste_cache
 !apigateway/*.py
 !apigateway/datastores/
 !apigateway/logic/
