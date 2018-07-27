@@ -143,6 +143,32 @@ def post_session_survey_48_hours_ankle(severity_score):
 
 
 @pytest.fixture(scope="module")
+def post_session_surveys_24_48_hours_foot(severity_score_1, severity_score_2):
+    surveys = []
+
+    soreness_list_1 = [body_part_soreness(10, severity_score_1)]
+
+    post_survey_1 = get_post_survey(6, soreness_list_1)
+
+    post_session_survey = PostSessionSurvey(datetime.datetime(2018, 6, 25, 17, 0, 0).strftime("%Y-%m-%dT%H:%M:%SZ"),
+                                            "tester",
+                                            "test_session", 0, post_survey_1)
+
+    surveys.append(post_session_survey)
+
+    soreness_list_2 = [body_part_soreness(10, severity_score_2)]
+
+    post_survey_2 = get_post_survey(6, soreness_list_2)
+
+    post_session_survey_2 = PostSessionSurvey(datetime.datetime(2018, 6, 26, 17, 0, 0).strftime("%Y-%m-%dT%H:%M:%SZ"),
+                                            "tester",
+                                            "test_session", 0, post_survey_2)
+
+    surveys.append(post_session_survey_2)
+
+    return surveys
+
+@pytest.fixture(scope="module")
 def post_session_survey_49_hours_ankle(severity_score):
     surveys = []
 
@@ -330,3 +356,15 @@ def test_soreness_2_body_parts_from_2_readiness_survey_post_session_after_diff_s
     assert body_part(9, 3).body_part == soreness_list[0].body_part.location
     assert body_part(10, 3).severity == soreness_list[1].severity
     assert body_part(10, 3).body_part == soreness_list[1].body_part.location
+
+
+def test_soreness_2_body_parts_from_2_post_session_one_readienss_diff_severity():
+    soreness_list = soreness_calculator().get_soreness_summary_from_surveys(readiness_survey_0_hours_ankle(2),
+                                                                            post_session_surveys_24_48_hours_foot(4, 1),
+                                                                            trigger_date_time())
+
+    assert body_part(9, 2).severity == soreness_list[0].severity
+    assert body_part(9, 2).body_part == soreness_list[0].body_part.location
+    assert body_part(10, 1).severity == soreness_list[1].severity
+    assert body_part(10, 1).body_part == soreness_list[1].body_part.location
+

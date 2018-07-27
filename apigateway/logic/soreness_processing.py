@@ -44,27 +44,39 @@ class SorenessCalculator(object):
                             updated = False
                             for r in range(0, len(soreness_list)):
 
-                                soreness_within_24_hours = False
+                                post_soreness_within_24_hours = False
+                                soreness_list_item_within_24_hours = False
 
-                                soreness_age = trigger_date_time - last_post_session_survey_datetime
+                                post_soreness_age = trigger_date_time - last_post_session_survey_datetime
+                                soreness_list_age = trigger_date_time - soreness_list[r].reported_date_time
 
-                                if soreness_age.total_seconds() <= 86400: # within 24 hours
-                                    soreness_within_24_hours = True
+                                if post_soreness_age.total_seconds() <= 86400: # within 24 hours
+                                    post_soreness_within_24_hours = True
+
+                                if soreness_list_age.total_seconds() <= 86400: # within 24 hours
+                                    soreness_list_item_within_24_hours = True
 
                                 if (soreness_list[r].body_part.location.value == s.body_part.location.value and
                                         soreness_list[r].side == s.side):
-                                        if soreness_list[r].reported_date_time < last_post_session_survey_datetime:
+                                        if soreness_list_item_within_24_hours and post_soreness_within_24_hours:
                                             if soreness_list[r].severity <= s.severity:
                                                 soreness_list[r].severity = s.severity
                                                 soreness_list[r].reported_date_time = last_post_session_survey_datetime
-                                        elif soreness_within_24_hours and soreness_list[r].severity > s.severity:
-                                            # do nothing
-                                            soreness_list[r].severity = soreness_list[r].severity
-                                            soreness_list[r].reported_date_time = soreness_list[r].reported_date_time
-                                        elif soreness_within_24_hours and soreness_list[r].severity < s.severity:
-                                            # do nothing
+                                            else:
+                                                # keep existing soreness
+                                                soreness_list[r].severity = soreness_list[r].severity
+                                                soreness_list[r].reported_date_time = soreness_list[r].reported_date_time
+                                        elif not soreness_list_item_within_24_hours and post_soreness_within_24_hours:
                                             soreness_list[r].severity = s.severity
                                             soreness_list[r].reported_date_time = last_post_session_survey_datetime
+                                        elif soreness_list_item_within_24_hours and not post_soreness_within_24_hours:
+                                            # keep existing soreness
+                                            soreness_list[r].severity = soreness_list[r].severity
+                                            soreness_list[r].reported_date_time = soreness_list[r].reported_date_time
+                                        elif not soreness_list_item_within_24_hours and not post_soreness_within_24_hours:
+                                            if soreness_list[r].reported_date_time < last_post_session_survey_datetime:
+                                                soreness_list[r].severity = s.severity
+                                                soreness_list[r].reported_date_time = last_post_session_survey_datetime
 
                                         updated = True
                             if not updated:
