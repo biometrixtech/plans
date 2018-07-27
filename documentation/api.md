@@ -385,7 +385,7 @@ The client __must__ submit a request body containing a JSON object with the foll
     "sessions": [Session, Session]
 }
 ```
-* `event_date` __should__ be of format `yyyy-mm-dd`
+* `event_date` __should__ be reflect the time when the daily_schedule was completed
 * `Session` object __should__ have the following schema
 ```
     {
@@ -430,9 +430,11 @@ Authorization: eyJraWQ...ajBc4VQ
  
 ```
 {
-    "message": "success"
+    "sessions": [Session, Session]
 }
 ```
+If there were no session scheduled/created for time prior to the schedule being created by the user __sessions__ will be an empty list.
+Each session will have __uuid__, __date__, __time__ to be used to ask user for post-session survey.
 
 ### Weekly Training
 
