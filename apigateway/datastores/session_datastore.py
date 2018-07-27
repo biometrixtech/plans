@@ -9,10 +9,8 @@ class SessionDatastore(object):
 
     @xray_recorder.capture('datastore.SessionDatastore.get')
     def get(self, user_id, event_date, session_type=None, session_id=None):
-        if session_type is None:
-            sessions = self._get_sessions_from_mongo(user_id, event_date)
-        else:
-            sessions = self._get_sessions_from_mongo(user_id, event_date, session_type)
+        sessions = self._get_sessions_from_mongo(user_id, event_date, session_type)
+
         if session_id is None:
             return sessions
         else:
