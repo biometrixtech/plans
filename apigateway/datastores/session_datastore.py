@@ -1,14 +1,18 @@
 from aws_xray_sdk.core import xray_recorder
 from config import get_mongo_collection
 from datastores.daily_plan_datastore import DailyPlanDatastore
-from models.session import SessionType, SessionFactory
+from models.session import SessionType
 from exceptions import NoSuchEntityException
 
 class SessionDatastore(object):
     mongo_collection = 'dailyplan'
 
-    def get(self, user_id, event_date, session_type, session_id=None):
-        sessions = self._get_sessions_from_mongo(user_id, event_date, session_type)
+    @xray_recorder.capture('datastore.SessionDatastore.get')
+    def get(self, user_id, event_date, session_type=None, session_id=None):
+        if session_type is None:
+            sessions = self._get_sessions_from_mongo(user_id, event_date)
+        else:
+            sessions = self._get_sessions_from_mongo(user_id, event_date, session_type)
         if session_id is None:
             return sessions
         else:
@@ -17,7 +21,7 @@ class SessionDatastore(object):
                     return [session]
             raise NoSuchEntityException('No session could be found for the session_id: {} of session_type: {}'.format(session_id, SessionType(session_type)))
 
-
+    @xray_recorder.capture('datastore.SessionDatastore.insert')
     def insert(self, item, user_id, event_date):
         session_type = item.session_type().value
         session_type_name = _get_session_type_name(session_type, 'mongo')
@@ -26,6 +30,7 @@ class SessionDatastore(object):
         mongo_collection = get_mongo_collection(self.mongo_collection)
         mongo_collection.update_one(query, {'$push': {session_type_name: session}})
 
+    @xray_recorder.capture('datastore.SessionDatastore.update')
     def update(self, item, user_id, event_date):
         session_type = item.session_type().value
         session = item.json_serialise()
@@ -38,7 +43,7 @@ class SessionDatastore(object):
         else:
             mongo_collection.update_one(query, {'$push': {session_type_name: session}})
 
-
+    @xray_recorder.capture('datastore.SessionDatastore.delete')
     def delete(self, user_id, event_date, session_type, session_id):
         session_type_name = _get_session_type_name(session_type, 'mongo')
         query = {"user_id": user_id, "date": event_date}
@@ -46,15 +51,22 @@ class SessionDatastore(object):
         mongo_collection.update_one(query, {'$pull': {session_type_name: {'session_id': session_id}}})
 
 
-    def _get_sessions_from_mongo(self, user_id, event_date, session_type):
+    def _get_sessions_from_mongo(self, user_id, event_date, session_type=None):
         daily_plan_store = DailyPlanDatastore()
-        daily_plan = daily_plan_store.get(user_id=user_id,
-                                          start_date=event_date,
-                                          end_date=event_date)
-        plan = daily_plan[0]
-        session_type_name = _get_session_type_name(session_type, 'object')
-        sessions = getattr(plan, session_type_name)
-        return sessions
+        plan = daily_plan_store.get(user_id=user_id,
+                                    start_date=event_date,
+                                    end_date=event_date)
+        plan = plan[0]
+        if session_type is None:
+            external_sessions = []
+            external_sessions.extend(getattr(plan, 'practice_sessions'))
+            external_sessions.extend(getattr(plan, 'strength_conditioning_sessions'))
+            external_sessions.extend(getattr(plan, 'games'))
+        else:
+            session_type_name = _get_session_type_name(session_type, 'object')
+            external_sessions = getattr(plan, session_type_name)
+
+        return external_sessions
 
 def _get_session_type_name(session_type, destination):
     if destination == 'mongo':
@@ -85,3 +97,4 @@ def _get_session_type_name(session_type, destination):
             session_type_name = 'corrective_sessions'
 
     return session_type_name
+
