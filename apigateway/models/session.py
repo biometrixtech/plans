@@ -1,8 +1,10 @@
 import abc
 from enum import Enum
 import uuid
+import datetime
 from serialisable import Serialisable
 import logic.exercise_generator as exercise
+from utils import format_datetime, parse_datetime
 
 
 class SessionType(Enum):
@@ -28,7 +30,7 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
 
     def __init__(self):
         self.id = None
-        self.duration_minutes = None
+        self.duration_sensor = None
         self.external_load = None
         self.high_intensity_load = None
         self.mod_intensity_load = None
@@ -42,7 +44,7 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         self.post_session_soreness = []     # post_session_soreness object array
         self.date = None
         self.time = None
-        self.duration_sensor = None
+        self.duration_minutes = None
         self.sensor_start_date_time = None
         self.sensor_end_date_time = None
         self.day_of_week = DayOfWeek.monday
@@ -60,6 +62,12 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         self.completion_percentage = 100    # only answered if there is discomfort
         self.sustained_injury_or_pain = False
         self.description = ""
+
+    def __setattr__(self, name, value):
+        if name in ['time', 'sensor_start_date_time', 'sensor_end_date_time']:
+            if not isinstance(value, datetime.datetime) and value is not None:
+                value = parse_datetime(value)
+        super().__setattr__(name, value)
 
     @abc.abstractmethod
     def session_type(self):
@@ -90,7 +98,7 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
             'session_id': self.id,
             'description': self.description,
             'date': self.date,
-            'time': self.time,
+            'time': format_datetime(self.time),
             'duration_minutes': self.duration_minutes,
             'data_transferred': self.data_transferred,
             'duration_sensor': self.duration_sensor,
@@ -101,8 +109,8 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
             'high_intensity_load': self.high_intensity_load,
             'mod_intensity_load': self.mod_intensity_load,
             'low_intensity_load': self.low_intensity_load,
-            'sensor_start_date_time': self.sensor_start_date_time,
-            'sensor_end_date_time': self.sensor_end_date_time,
+            'sensor_start_date_time': format_datetime(self.sensor_start_date_time),
+            'sensor_end_date_time': format_datetime(self.sensor_end_date_time),
             'post_session_survey': self.post_session_survey
         }
         return ret

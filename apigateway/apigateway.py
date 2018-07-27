@@ -74,6 +74,9 @@ app.register_blueprint(post_session_survey_routes, url_prefix='/plans/post_sessi
 from routes.session import app as add_delete_session_routes
 app.register_blueprint(add_delete_session_routes, url_prefix='/plans/session')
 
+from routes.daily_schedule import app as daily_schedule_routes
+app.register_blueprint(daily_schedule_routes, url_prefix='/plans/schedule')
+
 
 @app.errorhandler(500)
 def handle_server_error(e):
