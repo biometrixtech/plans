@@ -138,13 +138,25 @@ def _external_session_from_mongodb(mongo_result, session_type):
     factory = session.SessionFactory()
     mongo_session = factory.create(session_type)
     mongo_session.id = mongo_result["session_id"]
-    mongo_session.description = _key_present("description", mongo_result)
-    mongo_session.data_transferred = _key_present("data_transferred", mongo_result)
-    mongo_session.duration_minutes = _key_present("duration_minutes", mongo_result)
-    mongo_session.post_session_survey = _key_present("post_session_survey", mongo_result)
-
+    attrs_from_mongo = ["description",
+                        "date",
+                        "time",
+                        "duration",
+                        "data_transferred",
+                        "duration_minutes",
+                        "external_load",
+                        "high_intensity_minutes",
+                        "mod_intensity_minutes",
+                        "low_intensity_minutes",
+                        "high_intensity_load",
+                        "mod_intensity_load",
+                        "low_intensity_load",
+                        "sensor_start_date_time",
+                        "sensor_end_date_time",
+                        "post_session_survey"]
+    for key in attrs_from_mongo:
+        setattr(mongo_session, key, _key_present(key, mongo_result))
     return mongo_session
-
 
 def _recovery_session_from_mongodb(mongo_result):
 
