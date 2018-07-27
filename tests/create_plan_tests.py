@@ -111,7 +111,6 @@ def test_daily_plan_am_recovery_has_practice_session():
 def test_create_plan():
     manager = \
         training_plan_management.TrainingPlanManager("morning_practice_2", DailyReadinessDatastore(),
-                                                     DailyScheduleDatastore(),
                                                      MongoPostSessionSurveyDataStore(),
                                                      MongoDailyPlanDatastore())
     success = manager.create_daily_plan()

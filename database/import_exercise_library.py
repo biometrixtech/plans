@@ -1,6 +1,6 @@
 import csv
 import pymongo
-import exercise
+import exercise_generator
 import database_config  # not committed to source code, contains connection string
 import models.exercise
 

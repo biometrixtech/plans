@@ -3,7 +3,7 @@ from aws_xray_sdk.core import xray_recorder
 
 import models.exercise
 from config import get_mongo_collection
-import logic.exercise as exercise
+import logic.exercise_generator as exercise
 
 
 class ExerciseLibraryDatastore(object):

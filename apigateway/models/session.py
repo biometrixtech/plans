@@ -2,7 +2,7 @@ import abc
 from enum import Enum
 import uuid
 from serialisable import Serialisable
-import logic.exercise as exercise
+import logic.exercise_generator as exercise
 
 
 class SessionType(Enum):

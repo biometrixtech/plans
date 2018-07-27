@@ -1,19 +1,14 @@
 import pytest
-import logic.training as training
 import datetime
 import logic.training_plan_management as training_plan_management
 from aws_xray_sdk.core import xray_recorder
-import athlete_data_access_mocks
-#import datastores.exercise_datastore as exercise_datastore
 from datastores.daily_plan_datastore import DailyPlanDatastore
 from datastores.daily_readiness_datastore import DailyReadinessDatastore
-from datastores.daily_schedule_datastore import DailyScheduleDatastore
 from datastores.post_session_survey_datastore import PostSessionSurveyDatastore as PostSessionSurveyDataStore
 from models.daily_readiness import DailyReadiness
-from models.post_session_survey import PostSurvey, PostSessionSurvey
+from models.post_session_survey import PostSessionSurvey
 from models.daily_plan import DailyPlan
-import models.session as session
-from soreness_and_injury import DailySoreness, BodyPart, BodyPartLocation
+from models.soreness import BodyPartLocation
 from config import get_secret
 import os
 import json
@@ -45,6 +40,7 @@ def body_part_location(location_enum):
 
     return location
 
+
 def get_post_survey(RPE, soreness_list):
 
     survey = {
@@ -54,11 +50,8 @@ def get_post_survey(RPE, soreness_list):
 
     return survey
 
+
 def body_part_soreness(location_enum, severity):
-    # soreness = DailySoreness()
-    # body_part = BodyPart(body_part_location(location_enum), 0)
-    # soreness.body_part = body_part
-    # soreness.severity = severity
 
     soreness = {
         "body_part": location_enum,
@@ -97,10 +90,8 @@ def generate_plan(user_id, survey, plan_date, file_name, plan_letter):
     else:
         post_session_store.put([survey])
 
-
     manager = training_plan_management.TrainingPlanManager(user_id,
                                                            readiness_store,
-                                                           DailyScheduleDatastore(),
                                                            PostSessionSurveyDataStore(),
                                                            plan_datastore)
     plan = manager.create_daily_plan(plan_date)

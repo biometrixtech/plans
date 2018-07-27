@@ -3,7 +3,8 @@ import models.session as session
 from models.daily_plan import DailyPlan
 import datetime
 import logic.exercise_mapping as exercise_mapping
-from logic.soreness_and_injury import SorenessCalculator, BodyPartLocation
+from logic.soreness_processing import SorenessCalculator
+from models.soreness import BodyPartLocation
 from logic.goal_focus_text_generator import RecoveryTextGenerator
 #from datastores.daily_readiness_datastore import DailyReadinessDatastore
 #from datastores.daily_schedule_datastore import DailyScheduleDatastore
@@ -13,11 +14,11 @@ from logic.stats_processing import StatsProcessing
 
 class TrainingPlanManager(object):
 
-    def __init__(self, athlete_id, daily_readiness_datastore, daily_schedule_datastore, post_session_survey_datastore,
+    def __init__(self, athlete_id, daily_readiness_datastore, post_session_survey_datastore,
                  daily_plan_datastore):
         self.athlete_id = athlete_id
         self.daily_readiness_datastore = daily_readiness_datastore
-        self.daily_schedule_datastore = daily_schedule_datastore
+        # self.daily_schedule_datastore = daily_schedule_datastore
         self.post_session_survey_datastore = post_session_survey_datastore
         self.daily_plan_datastore = daily_plan_datastore
 
@@ -135,12 +136,8 @@ class TrainingPlanManager(object):
 
         soreness_values = [s.severity for s in soreness_list if s.severity is not None]
 
-        body_part_list = []
-
         if soreness_values is not None and len(soreness_values) > 0:
             max_soreness = max(soreness_values)
-            body_part_list = [s.body_part for s in soreness_list if s.severity == max_soreness
-                              and s.body_part.location.name != BodyPartLocation.general]
         else:
             max_soreness = 0
 

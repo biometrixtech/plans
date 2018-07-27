@@ -1,8 +1,9 @@
 import pytest
 import logic.exercise_mapping as exercise_mapping
 import models.session as session
-import logic.soreness_and_injury as soreness_and_injury
+import logic.soreness_processing as soreness_and_injury
 import datastores.exercise_datastore as exercise_datastore
+from models.soreness import Soreness, BodyPart, BodyPartLocation
 
 
 @pytest.fixture(scope="module")
@@ -15,10 +16,10 @@ def recovery_session(soreness_list, target_minutes):
 @pytest.fixture(scope="module")
 def soreness_one_body_part(body_enum, severity_score, treatment_priority=1):
     soreness_list = []
-    soreness_item = soreness_and_injury.DailySoreness()
+    soreness_item = Soreness()
     soreness_item.severity = severity_score
-    soreness_body_part = soreness_and_injury.BodyPart(soreness_and_injury.BodyPartLocation(body_enum),
-                                                      treatment_priority)
+    soreness_body_part = BodyPart(BodyPartLocation(body_enum),
+                                                  treatment_priority)
     soreness_item.body_part = soreness_body_part
     soreness_list.append(soreness_item)
     return soreness_list
@@ -28,16 +29,15 @@ def soreness_one_body_part(body_enum, severity_score, treatment_priority=1):
 def soreness_two_body_parts(body_enum_1, severity_score_1, body_enum_2, severity_score_2,
                             treatment_priority_1=1, treatment_priority_2=1):
     soreness_list = []
-    soreness_item_1 = soreness_and_injury.DailySoreness()
+    soreness_item_1 = Soreness()
     soreness_item_1.severity = severity_score_1
-    soreness_body_part_1 = soreness_and_injury.BodyPart(soreness_and_injury.BodyPartLocation(body_enum_1),
-                                                      treatment_priority_1)
+    soreness_body_part_1 = BodyPart(BodyPartLocation(body_enum_1), treatment_priority_1)
     soreness_item_1.body_part = soreness_body_part_1
     soreness_list.append(soreness_item_1)
-    soreness_item_2 = soreness_and_injury.DailySoreness()
+    soreness_item_2 = Soreness()
     soreness_item_2.severity = severity_score_2
-    soreness_body_part_2 = soreness_and_injury.BodyPart(soreness_and_injury.BodyPartLocation(body_enum_2),
-                                                        treatment_priority_2)
+    soreness_body_part_2 = BodyPart(BodyPartLocation(body_enum_2),
+                                                    treatment_priority_2)
     soreness_item_2.body_part = soreness_body_part_2
     soreness_list.append(soreness_item_2)
 
