@@ -161,7 +161,7 @@ The client __must__ submit a request body containing a JSON object with the foll
 	}
 }
 ```
-* `event_date` __should__ reflect the date which the session happened and should be of format `yyyy-mm-dd`
+* `event_date` __should__ reflect the date and time when the survey happened
 * `session_id` __should__ be id of the session associated. It's __optional__ if the survey is associated with new session that doesn't exist in daily_plan
 * `session_type` __should__ be an integer reflecting enumeration of different session type (0-5)
 * `RPE` __should__ be an integer between 1 and 10
@@ -367,6 +367,72 @@ Authorization: eyJraWQ...ajBc4VQ
 }
 ```
 
+
+### Schedule
+
+#### Daily Schedule
+This API can be used to submit athlete's daily schedule when they first open the app.
+
+##### Query String
+The client __must__ submit a request to the endpoint `/plans/daily_schedule`. The request method __must__ be `POST`.
+
+##### Request
+The client __must__ submit a request body containing a JSON object with the following schema:
+```
+{
+    "user_id": Uuid,
+    "event_date": Datetime
+    "sessions": [Session, Session]
+}
+```
+* `event_date` __should__ be of format `yyyy-mm-dd`
+* `Session` object __should__ have the following schema
+```
+    {
+        "session_type": number,
+        "start_time": Datetime,
+        "duration": number,
+        "description": string
+    }
+```
+* `start_time` should reflect the date and time when the session is scheduled
+* `duration` should be in minutes
+
+```
+POST /plans/daily_schedule HTTPS/1.1
+Host: apis.env.fathomai.com
+Content-Type: application/json
+Authorization: eyJraWQ...ajBc4VQ
+
+{
+    "user_id": "dipesh",
+    "event_date": "2018-07-26",
+    "sessions":
+    [
+        {
+            "session_type": 0,
+            "start_time": "2018-07-26T07:30:00Z",
+            "duration": 90,
+            "descrption": "Morning Practice"
+        },
+        {
+            "session_type": 1,
+            "start_time": "2018-07-26T19:30:00Z",
+            "duration": 30,
+            "description": "Evening Biking"
+        }
+        ]
+}
+```
+##### Responses
+ 
+ If the write was successful, the Service __will__ respond with HTTP Status `201 Created`, with a body with the following syntax:
+ 
+```
+{
+    "message": "success"
+}
+```
 
 ### Weekly Training
 
