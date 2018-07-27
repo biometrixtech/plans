@@ -156,6 +156,7 @@ def _external_session_from_mongodb(mongo_result, session_type):
                         "post_session_survey"]
     for key in attrs_from_mongo:
         setattr(mongo_session, key, _key_present(key, mongo_result))
+    return mongo_session
 
 def _recovery_session_from_mongodb(mongo_result):
 
