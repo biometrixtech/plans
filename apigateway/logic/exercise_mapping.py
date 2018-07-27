@@ -2,16 +2,17 @@ import models.soreness
 from logic.exercise_generator import ExerciseAssignments
 import logic.soreness_processing as soreness_and_injury
 import models.exercise
-from datastores.exercise_datastore import ExerciseLibraryDatastore
 from logic.goal_focus_text_generator import RecoveryTextGenerator
 
 
 class ExerciseAssignmentCalculator(object):
 
-    def __init__(self, athlete_id):
+    def __init__(self, athlete_id, exercise_library_datastore):
         self.athlete_id = athlete_id
-        self.exercise_library = ExerciseLibraryDatastore().get()
+        self.exercise_library_datastore = exercise_library_datastore
+        self.exercise_library = self.exercise_library_datastore.get()
         self.exercises_for_body_parts = self.get_exercises_for_body_parts()
+
 
     # def create_assigned_exercise(self, target_exercise, body_part_priority, body_part_exercise_priority, body_part_soreness_level):
 
