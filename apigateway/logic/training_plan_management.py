@@ -6,21 +6,19 @@ import logic.exercise_mapping as exercise_mapping
 from logic.soreness_processing import SorenessCalculator
 from models.soreness import BodyPartLocation
 from logic.goal_focus_text_generator import RecoveryTextGenerator
-#from datastores.daily_readiness_datastore import DailyReadinessDatastore
-#from datastores.daily_schedule_datastore import DailyScheduleDatastore
 from utils import format_datetime
 from logic.stats_processing import StatsProcessing
 
 
 class TrainingPlanManager(object):
 
-    def __init__(self, athlete_id, daily_readiness_datastore, post_session_survey_datastore,
+    def __init__(self, athlete_id, exercise_library_datastore, daily_readiness_datastore, post_session_survey_datastore,
                  daily_plan_datastore):
         self.athlete_id = athlete_id
         self.daily_readiness_datastore = daily_readiness_datastore
-        # self.daily_schedule_datastore = daily_schedule_datastore
         self.post_session_survey_datastore = post_session_survey_datastore
         self.daily_plan_datastore = daily_plan_datastore
+        self.exercise_library_datastore = exercise_library_datastore
 
     def calculate_am_impact_score(self, rpe, readiness, sleep_quality, max_soreness, athlete_stats=None):
 
@@ -132,7 +130,7 @@ class TrainingPlanManager(object):
 
         daily_plan = self.add_recovery_times(trigger_date_time, daily_plan)
 
-        calc = exercise_mapping.ExerciseAssignmentCalculator(self.athlete_id)
+        calc = exercise_mapping.ExerciseAssignmentCalculator(self.athlete_id, self.exercise_library_datastore)
 
         soreness_values = [s.severity for s in soreness_list if s.severity is not None]
 

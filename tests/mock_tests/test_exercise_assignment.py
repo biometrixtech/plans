@@ -2,8 +2,16 @@ import pytest
 import logic.exercise_mapping as exercise_mapping
 import models.session as session
 import logic.soreness_processing as soreness_and_injury
-import datastores.exercise_datastore as exercise_datastore
+from pathlib import Path
+from tests.mocks.mock_exercise_datastore import ExerciseLibraryDatastore
 from models.soreness import Soreness, BodyPart, BodyPartLocation
+
+exercise_library_datastore = ExerciseLibraryDatastore()
+
+
+@pytest.fixture(scope="session", autouse=True)
+def load_exercises():
+    exercise_library_datastore.side_load_exericse_list_from_csv(Path(__file__).resolve().parent.parent.parent / 'database/Exercise_Library.csv')
 
 
 @pytest.fixture(scope="module")
@@ -42,6 +50,8 @@ def soreness_two_body_parts(body_enum_1, severity_score_1, body_enum_2, severity
     soreness_list.append(soreness_item_2)
 
     return soreness_list
+
+
 '''
 one body part
 NEED: SORENESS = 4, 5
@@ -204,57 +214,63 @@ def test_recovery_session_ankle_3_soreness_integrate_minutes():
 
 
 def test_recovery_session_ankle_4_soreness_inhibit_max_percentage():
-    assert None is recovery_session(soreness_one_body_part(9, 4), 15).inhibit_max_percentage
+    assert 0 is recovery_session(soreness_one_body_part(9, 4), 15).inhibit_max_percentage
 
 
 def test_recovery_session_ankle_4_soreness_lengthen_max_percentage():
-    assert None is recovery_session(soreness_one_body_part(9, 4), 15).lengthen_max_percentage
+    assert 0 is recovery_session(soreness_one_body_part(9, 4), 15).lengthen_max_percentage
 
 
 def test_recovery_session_ankle_4_soreness_activate_max_percentage():
-    assert None is recovery_session(soreness_one_body_part(9, 4), 15).activate_max_percentage
+    assert 0 is recovery_session(soreness_one_body_part(9, 4), 15).activate_max_percentage
 
 
 def test_recovery_session_ankle_4_soreness_integrate_max_percentage():
-    assert None is recovery_session(soreness_one_body_part(9, 4), 15).integrate_max_percentage
+    assert 0 is recovery_session(soreness_one_body_part(9, 4), 15).integrate_max_percentage
 
 
 def test_recovery_session_ankle_4_soreness_inhibit_minutes():
-    assert None is recovery_session(soreness_one_body_part(9, 4), 15).inhibit_target_minutes
+    assert 0 is recovery_session(soreness_one_body_part(9, 4), 15).inhibit_target_minutes
 
 
 def test_recovery_session_ankle_4_soreness_lengthen_minutes():
-    assert None is recovery_session(soreness_one_body_part(9, 4), 15).lengthen_target_minutes
+    assert 0 is recovery_session(soreness_one_body_part(9, 4), 15).lengthen_target_minutes
 
 
 def test_recovery_session_ankle_4_soreness_activate_minutes():
-    assert None is recovery_session(soreness_one_body_part(9, 4), 15).activate_target_minutes
+    assert 0 is recovery_session(soreness_one_body_part(9, 4), 15).activate_target_minutes
 
 
 def test_recovery_session_ankle_4_soreness_integrate_minutes():
-    assert None is recovery_session(soreness_one_body_part(9, 4), 15).integrate_target_minutes
+    assert 0 is recovery_session(soreness_one_body_part(9, 4), 15).integrate_target_minutes
 
 
 def test_recovery_session_exercises_assigned():
-    calc = exercise_mapping.ExerciseAssignmentCalculator("test_user", None, exercise_datastore.ExerciseLibraryDatastore())
+    calc = exercise_mapping.ExerciseAssignmentCalculator("test_user", exercise_library_datastore)
     soreness_list = soreness_one_body_part(12, 1)    # lower back
     target_recovery_session = recovery_session(soreness_one_body_part(12, 1), 15)
     exercise_assignments = calc.create_exercise_assignments(target_recovery_session, soreness_list)
-    j = 0
+    assert True is (len(exercise_assignments.inhibit_exercises) > 0)
+    assert True is (len(exercise_assignments.lengthen_exercises) > 0)
+    assert True is (len(exercise_assignments.activate_exercises) > 0)
 
 def test_recovery_session_exercises_assigned_2_body_parts():
-    calc = exercise_mapping.ExerciseAssignmentCalculator("test_user", None, exercise_datastore.ExerciseLibraryDatastore())
+    calc = exercise_mapping.ExerciseAssignmentCalculator("test_user", exercise_library_datastore)
     soreness_list = soreness_two_body_parts(12, 1, 4, 1, 1, 2)    # lower back
     target_recovery_session = recovery_session(soreness_two_body_parts(12, 1, 4, 1, 1, 2), 15)
     exercise_assignments = calc.create_exercise_assignments(target_recovery_session, soreness_list)
-    j = 0
+    assert True is (len(exercise_assignments.inhibit_exercises) > 0)
+    assert True is (len(exercise_assignments.lengthen_exercises) > 0)
+    assert True is (len(exercise_assignments.activate_exercises) > 0)
 
 def test_recovery_session_exercises_assigned_2_body_parts_diff_severity():
-    calc = exercise_mapping.ExerciseAssignmentCalculator("test_user", None, exercise_datastore.ExerciseLibraryDatastore())
+    calc = exercise_mapping.ExerciseAssignmentCalculator("test_user", exercise_library_datastore)
     soreness_list = soreness_two_body_parts(12, 1, 4, 2, 1, 2)    # lower back
     target_recovery_session = recovery_session(soreness_two_body_parts(12, 1, 4, 1, 1, 2), 15)
     exercise_assignments = calc.create_exercise_assignments(target_recovery_session, soreness_list)
-    j = 0
+    assert True is (len(exercise_assignments.inhibit_exercises) > 0)
+    assert True is (len(exercise_assignments.lengthen_exercises) > 0)
+    assert True is (len(exercise_assignments.activate_exercises) > 0)
 '''
 def test_get_priority_no_severity_inhibit():
     recs = exercise.ExerciseRecommendations()

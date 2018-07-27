@@ -4,6 +4,12 @@ from models.daily_plan import DailyPlan
 class DailyPlanDatastore(object):
     mongo_collection = 'dailyplan'
 
+    def __init__(self):
+        self.daily_plans = []
+
+    def side_load_plans(self, daily_plans):
+        self.daily_plans = daily_plans
+
     def get(self, user_id=None, start_date=None, end_date=None):
         return self._query_mongodb(user_id, start_date, end_date)
 
@@ -17,7 +23,7 @@ class DailyPlanDatastore(object):
             raise e
 
     def _query_mongodb(self, user_id, start_date, end_date):
-        pass
+        return self.daily_plans
 
     def _put_mongodb(self, item):
 

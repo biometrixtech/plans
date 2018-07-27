@@ -1,6 +1,10 @@
 import pytest
 import datetime
 import logic.training_plan_management as tpm
+from tests.mocks.mock_daily_plan_datastore import DailyPlanDatastore
+from tests.mocks.mock_daily_readiness_datastore import DailyReadinessDatastore
+from tests.mocks.mock_post_session_survey_datastore import PostSessionSurveyDatastore
+from tests.mocks.mock_exercise_datastore import ExerciseLibraryDatastore
 
 # => deprioritize: readiness, sleep quality, RPE, freshness index?, prior completed recovery sessions?
 # => deprioritize: heightened priority relative to bed time
@@ -19,171 +23,175 @@ import logic.training_plan_management as tpm
 # how does the prioritization of exercise by body part play a role?
 # need to include short term events (7 days) and long term events (28 days)
 
+def training_plan_manager():
+    mgr = tpm.TrainingPlanManager("test", ExerciseLibraryDatastore(), DailyReadinessDatastore(),
+                                  PostSessionSurveyDatastore(), DailyPlanDatastore())
+    return mgr
 
 def test_get_start_time_from_morning_trigger_recovery_0():
     date_time_trigger = datetime.datetime(2018, 6, 27, 11, 0, 0)
-    mgr = tpm.TrainingPlanManager()
+    mgr = training_plan_manager()
     start_time, end_time = mgr.get_recovery_start_end_times(date_time_trigger, 0)
     assert datetime.datetime(2018, 6, 27, 0, 0, 0) == start_time
 
 
 def test_get_end_time_from_morning_trigger_recovery_0():
     date_time_trigger = datetime.datetime(2018, 6, 27, 11, 0, 0)
-    mgr = tpm.TrainingPlanManager()
+    mgr = training_plan_manager()
     start_time, end_time = mgr.get_recovery_start_end_times(date_time_trigger, 0)
     assert datetime.datetime(2018, 6, 27, 12, 0, 0) == end_time
 
 
 def test_get_start_time_from_afternoon_trigger_recovery_0():
     date_time_trigger = datetime.datetime(2018, 6, 27, 14, 0, 0)
-    mgr = tpm.TrainingPlanManager()
+    mgr = training_plan_manager()
     start_time, end_time = mgr.get_recovery_start_end_times(date_time_trigger, 0)
     assert datetime.datetime(2018, 6, 27, 12, 0, 0) == start_time
 
 
 def test_get_end_time_from_afternoon_trigger_recovery_0():
     date_time_trigger = datetime.datetime(2018, 6, 27, 14, 0, 0)
-    mgr = tpm.TrainingPlanManager()
+    mgr = training_plan_manager()
     start_time, end_time = mgr.get_recovery_start_end_times(date_time_trigger, 0)
     assert datetime.datetime(2018, 6, 28, 0, 0, 0) == end_time
 
 
 def test_get_start_time_from_evening_trigger_recovery_0():
     date_time_trigger = datetime.datetime(2018, 6, 27, 20, 0, 0)
-    mgr = tpm.TrainingPlanManager()
+    mgr = training_plan_manager()
     start_time, end_time = mgr.get_recovery_start_end_times(date_time_trigger, 0)
     assert datetime.datetime(2018, 6, 27, 12, 0, 0) == start_time
 
 
 def test_get_end_time_from_evening_trigger_recovery_0():
     date_time_trigger = datetime.datetime(2018, 6, 27, 20, 0, 0)
-    mgr = tpm.TrainingPlanManager()
+    mgr = training_plan_manager()
     start_time, end_time = mgr.get_recovery_start_end_times(date_time_trigger, 0)
     assert datetime.datetime(2018, 6, 28, 0, 0, 0) == end_time
 
 
 def test_get_start_time_from_morning_trigger_recovery_1():
     date_time_trigger = datetime.datetime(2018, 6, 27, 11, 0, 0)
-    mgr = tpm.TrainingPlanManager()
+    mgr = training_plan_manager()
     start_time, end_time = mgr.get_recovery_start_end_times(date_time_trigger, 1)
     assert datetime.datetime(2018, 6, 27, 12, 0, 0) == start_time
 
 
 def test_get_end_time_from_morning_trigger_recovery_1():
     date_time_trigger = datetime.datetime(2018, 6, 27, 11, 0, 0)
-    mgr = tpm.TrainingPlanManager()
+    mgr = training_plan_manager()
     start_time, end_time = mgr.get_recovery_start_end_times(date_time_trigger, 1)
     assert datetime.datetime(2018, 6, 28, 0, 0, 0) == end_time
 
 
 def test_get_start_time_from_afternoon_trigger_recovery_1():
     date_time_trigger = datetime.datetime(2018, 6, 27, 14, 0, 0)
-    mgr = tpm.TrainingPlanManager()
+    mgr = training_plan_manager()
     start_time, end_time = mgr.get_recovery_start_end_times(date_time_trigger, 1)
     assert datetime.datetime(2018, 6, 28, 0, 0, 0) == start_time
 
 
 def test_get_end_time_from_afternoon_trigger_recovery_1():
     date_time_trigger = datetime.datetime(2018, 6, 27, 14, 0, 0)
-    mgr = tpm.TrainingPlanManager()
+    mgr = training_plan_manager()
     start_time, end_time = mgr.get_recovery_start_end_times(date_time_trigger, 1)
     assert datetime.datetime(2018, 6, 28, 12, 0, 0) == end_time
 
 
 def test_get_start_time_from_evening_trigger_recovery_1():
     date_time_trigger = datetime.datetime(2018, 6, 27, 20, 0, 0)
-    mgr = tpm.TrainingPlanManager()
+    mgr = training_plan_manager()
     start_time, end_time = mgr.get_recovery_start_end_times(date_time_trigger, 1)
     assert datetime.datetime(2018, 6, 28, 0, 0, 0) == start_time
 
 
 def test_get_end_time_from_evening_trigger_recovery_1():
     date_time_trigger = datetime.datetime(2018, 6, 27, 20, 0, 0)
-    mgr = tpm.TrainingPlanManager()
+    mgr = training_plan_manager()
     start_time, end_time = mgr.get_recovery_start_end_times(date_time_trigger, 1)
     assert datetime.datetime(2018, 6, 28, 12, 0, 0) == end_time
 
 
 def test_get_start_time_from_morning_trigger_recovery_2():
     date_time_trigger = datetime.datetime(2018, 6, 27, 11, 0, 0)
-    mgr = tpm.TrainingPlanManager()
+    mgr = training_plan_manager()
     start_time, end_time = mgr.get_recovery_start_end_times(date_time_trigger, 2)
     assert datetime.datetime(2018, 6, 28, 0, 0, 0) == start_time
 
 
 def test_get_end_time_from_morning_trigger_recovery_2():
     date_time_trigger = datetime.datetime(2018, 6, 27, 11, 0, 0)
-    mgr = tpm.TrainingPlanManager()
+    mgr = training_plan_manager()
     start_time, end_time = mgr.get_recovery_start_end_times(date_time_trigger, 2)
     assert datetime.datetime(2018, 6, 28, 12, 0, 0) == end_time
 
 
 def test_get_start_time_from_afternoon_trigger_recovery_2():
     date_time_trigger = datetime.datetime(2018, 6, 27, 14, 0, 0)
-    mgr = tpm.TrainingPlanManager()
+    mgr = training_plan_manager()
     start_time, end_time = mgr.get_recovery_start_end_times(date_time_trigger, 2)
     assert datetime.datetime(2018, 6, 28, 12, 0, 0) == start_time
 
 
 def test_get_end_time_from_afternoon_trigger_recovery_2():
     date_time_trigger = datetime.datetime(2018, 6, 27, 14, 0, 0)
-    mgr = tpm.TrainingPlanManager()
+    mgr = training_plan_manager()
     start_time, end_time = mgr.get_recovery_start_end_times(date_time_trigger, 2)
     assert datetime.datetime(2018, 6, 29, 0, 0, 0) == end_time
 
 
 def test_get_start_time_from_evening_trigger_recovery_2():
     date_time_trigger = datetime.datetime(2018, 6, 27, 20, 0, 0)
-    mgr = tpm.TrainingPlanManager()
+    mgr = training_plan_manager()
     start_time, end_time = mgr.get_recovery_start_end_times(date_time_trigger, 2)
     assert datetime.datetime(2018, 6, 28, 12, 0, 0) == start_time
 
 
 def test_get_end_time_from_evening_trigger_recovery_2():
     date_time_trigger = datetime.datetime(2018, 6, 27, 20, 0, 0)
-    mgr = tpm.TrainingPlanManager()
+    mgr = training_plan_manager()
     start_time, end_time = mgr.get_recovery_start_end_times(date_time_trigger, 2)
     assert datetime.datetime(2018, 6, 29, 0, 0, 0) == end_time
 
 
 def test_get_start_time_from_morning_trigger_recovery_3():
     date_time_trigger = datetime.datetime(2018, 6, 27, 11, 0, 0)
-    mgr = tpm.TrainingPlanManager()
+    mgr = training_plan_manager()
     start_time, end_time = mgr.get_recovery_start_end_times(date_time_trigger, 3)
     assert datetime.datetime(2018, 6, 28, 12, 0, 0) == start_time
 
 
 def test_get_end_time_from_morning_trigger_recovery_3():
     date_time_trigger = datetime.datetime(2018, 6, 27, 11, 0, 0)
-    mgr = tpm.TrainingPlanManager()
+    mgr = training_plan_manager()
     start_time, end_time = mgr.get_recovery_start_end_times(date_time_trigger, 3)
     assert datetime.datetime(2018, 6, 29, 0, 0, 0) == end_time
 
 
 def test_get_start_time_from_afternoon_trigger_recovery_3():
     date_time_trigger = datetime.datetime(2018, 6, 27, 14, 0, 0)
-    mgr = tpm.TrainingPlanManager()
+    mgr = training_plan_manager()
     start_time, end_time = mgr.get_recovery_start_end_times(date_time_trigger, 3)
     assert datetime.datetime(2018, 6, 29, 0, 0, 0) == start_time
 
 
 def test_get_end_time_from_afternoon_trigger_recovery_3():
     date_time_trigger = datetime.datetime(2018, 6, 27, 14, 0, 0)
-    mgr = tpm.TrainingPlanManager()
+    mgr = training_plan_manager()
     start_time, end_time = mgr.get_recovery_start_end_times(date_time_trigger, 3)
     assert datetime.datetime(2018, 6, 29, 12, 0, 0) == end_time
 
 
 def test_get_start_time_from_evening_trigger_recovery_3():
     date_time_trigger = datetime.datetime(2018, 6, 27, 20, 0, 0)
-    mgr = tpm.TrainingPlanManager()
+    mgr = training_plan_manager()
     start_time, end_time = mgr.get_recovery_start_end_times(date_time_trigger, 3)
     assert datetime.datetime(2018, 6, 29, 0, 0, 0) == start_time
 
 
 def test_get_end_time_from_evening_trigger_recovery_3():
     date_time_trigger = datetime.datetime(2018, 6, 27, 20, 0, 0)
-    mgr = tpm.TrainingPlanManager()
+    mgr = training_plan_manager()
     start_time, end_time = mgr.get_recovery_start_end_times(date_time_trigger, 3)
     assert datetime.datetime(2018, 6, 29, 12, 0, 0) == end_time
 
