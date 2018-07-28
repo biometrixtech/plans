@@ -25,6 +25,7 @@ class DailyReadinessDatastore(object):
             raise e
 
     def _query_mongodb(self, user_id):
+        '''
         if user_id == "morning":
             daily_readiness = DailyReadiness("2018-06-27T11:00:00Z", user_id, None, 4, 5)
 
@@ -60,7 +61,8 @@ class DailyReadinessDatastore(object):
             daily_readiness = DailyReadiness("2018-07-11T11:00:00Z", user_id, soreness_list, 7, 8)
 
             return daily_readiness
-
+        '''
+        return self.surveys
 
     def _put_mongodb(self, item):
         item = self.item_to_mongodb(item)
