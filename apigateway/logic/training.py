@@ -13,8 +13,8 @@ class DailyPlan(object):
         self.strength_conditioning_sessions = []  # includes cross training
         self.games = []
         self.tournaments = []
-        self.recovery_am = session.RecoverySession()
-        self.recovery_pm = session.RecoverySession()
+        self.pre_recovery = session.RecoverySession()
+        self.post_recovery = session.RecoverySession()
         self.corrective_sessions = []
         self.bump_up_sessions = []
         self.daily_readiness_survey = None
