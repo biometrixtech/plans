@@ -6,22 +6,6 @@ from tests.mocks.mock_daily_readiness_datastore import DailyReadinessDatastore
 from tests.mocks.mock_post_session_survey_datastore import PostSessionSurveyDatastore
 from tests.mocks.mock_exercise_datastore import ExerciseLibraryDatastore
 
-# => deprioritize: readiness, sleep quality, RPE, freshness index?, prior completed recovery sessions?
-# => deprioritize: heightened priority relative to bed time
-
-# 10, 20, 30 min sessions, limit to 15 min
-
-# limit only to exercise library
-# unscheduled
-# maybe exclude injury altogether (maybe just include ACL later?) then > 1 injury
-# excluded 72 hour monitoring
-
-# need to include days of no reporting by athlete within 72 hour window
-# need to include prioritization of exercises based on injury
-
-# how does marking complete affect scoring?
-# how does the prioritization of exercise by body part play a role?
-# need to include short term events (7 days) and long term events (28 days)
 
 def training_plan_manager():
     mgr = tpm.TrainingPlanManager("test", ExerciseLibraryDatastore(), DailyReadinessDatastore(),

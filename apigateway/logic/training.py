@@ -110,6 +110,7 @@ class TrainingCycle(object):
         total_minutes_sum = sum(total_minutes)
         return total_minutes_sum / 60
 
+    '''
     def get_daily_plan(self, date):
         daily_plan = DailyPlan(date)
         sessions = list(s for s in self.sessions if s.in_daily_plan(date))  # assumes these are datetimes
@@ -133,7 +134,7 @@ class TrainingCycle(object):
         daily_plan.recovery_modalities.extend(recovery_modalities)
 
         return daily_plan
-
+    '''
     def get_last_daily_readiness_survey(self):
 
         readiness_count = len(self.daily_readiness_surveys)

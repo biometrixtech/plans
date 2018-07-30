@@ -169,7 +169,7 @@ class TrainingPlanManager(object):
         text_generator = RecoveryTextGenerator()
         body_part_text = text_generator.get_text_from_body_part_list(soreness_list)
 
-        if daily_plan.recovery_am is not None and am_impact_score >= 0.5:
+        if daily_plan.recovery_am is not None and am_impact_score >= 1.5:
             rpe_impact_score = min((max_rpe / 10) * 4, 4)
             daily_plan.recovery_am.set_exercise_target_minutes(soreness_list, 15)
             am_exercise_assignments = calc.create_exercise_assignments(daily_plan.recovery_am,
@@ -181,7 +181,7 @@ class TrainingPlanManager(object):
         else:
             daily_plan.recovery_am is None
 
-        if pm_impact_score >= 0.5:
+        if pm_impact_score >= 1.5:
             rpe_impact_score = min((max_rpe / 10) * 5, 5)
             daily_plan.recovery_pm.set_exercise_target_minutes(soreness_list, 15)
             pm_exercise_assignments = calc.create_exercise_assignments(daily_plan.recovery_pm,

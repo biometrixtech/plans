@@ -27,6 +27,8 @@ class DailyPlanDatastore(object):
 
     def _put_mongodb(self, item):
 
+        pass
+        '''
         practice_session_bson = ()
         cross_training_session_bson = ()
         game_session_bson = ()
@@ -69,6 +71,8 @@ class DailyPlanDatastore(object):
                         'recovery_am': am_recovery_bson,
                         'recovery_pm': pm_recovery_bson,
                         'last_updated': item.last_updated})
+                        
+        '''
 
     def get_recovery_bson(self, recovery_session):
         exercise_bson = ()

@@ -40,8 +40,7 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         self.mod_intensity_RPE = None
         self.low_intensity_RPE = None
         self.post_session_soreness = []     # post_session_soreness object array
-        self.date = None
-        self.time = None
+        self.event_date = None
         self.duration_sensor = None
         self.sensor_start_date_time = None
         self.sensor_end_date_time = None
@@ -78,19 +77,11 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         else:
             return False
 
-    @abc.abstractmethod
-    def in_daily_plan(self, date):
-        if self.date == date:
-            return True
-        else:
-            return False
-
     def json_serialise(self):
         ret = {
             'session_id': self.id,
             'description': self.description,
-            'date': self.date,
-            'time': self.time,
+            'event_date': self.event_date,
             'duration_minutes': self.duration_minutes,
             'data_transferred': self.data_transferred,
             'duration_sensor': self.duration_sensor,
@@ -158,12 +149,6 @@ class BumpUpSession(Session):
     def missing_post_session_survey(self):
         return Session.missing_post_session_survey()
 
-    def in_daily_plan(self, date):
-        if self.date >= date:
-            return True
-        else:
-            return False
-
 
 class PracticeSession(Session):
     def __init__(self):
@@ -179,9 +164,6 @@ class PracticeSession(Session):
 
     def missing_post_session_survey(self):
         return Session.missing_post_session_survey()
-
-    def in_daily_plan(self, date):
-        return Session.in_daily_plan(date)
 
 
 class StrengthConditioningSession(Session):
@@ -199,9 +181,6 @@ class StrengthConditioningSession(Session):
     def missing_post_session_survey(self):
         return Session.missing_post_session_survey()
 
-    def in_daily_plan(self, date):
-        return Session.in_daily_plan(date)
-
 
 class Game(Session):
     def __init__(self):
@@ -217,9 +196,6 @@ class Game(Session):
 
     def missing_post_session_survey(self):
         return Session.missing_post_session_survey()
-
-    def in_daily_plan(self, date):
-        return Session.in_daily_plan(date)
 
 
 class Tournament(Session):
@@ -240,12 +216,6 @@ class Tournament(Session):
     def missing_post_session_survey(self):
         return Session.missing_post_session_survey()
 
-    def in_daily_plan(self, date):
-        if self.start_date <= date <= self.end_date:
-            return True
-        else:
-            return False
-
 
 class CorrectiveSession(Session):
     def __init__(self):
@@ -262,12 +232,6 @@ class CorrectiveSession(Session):
 
     def missing_post_session_survey(self):
         if self.session_RPE is None:
-            return True
-        else:
-            return False
-
-    def in_daily_plan(self, date):
-        if self.date >= date:
             return True
         else:
             return False
