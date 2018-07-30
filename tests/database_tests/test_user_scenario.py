@@ -35,8 +35,6 @@ def add_xray_support(request):
     os.environ["MONGO_COLLECTION_ATHLETESTATS"] = config['collection_athletestats']
 
 
-
-
 def write_file(file_name, daily_plan):
     directory = os.path.expanduser("~/test_plan_output/")
     if not os.path.exists(directory):

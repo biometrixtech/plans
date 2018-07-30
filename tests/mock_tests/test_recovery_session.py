@@ -5,6 +5,8 @@ from tests.mocks.mock_daily_plan_datastore import DailyPlanDatastore
 from tests.mocks.mock_daily_readiness_datastore import DailyReadinessDatastore
 from tests.mocks.mock_post_session_survey_datastore import PostSessionSurveyDatastore
 from tests.mocks.mock_exercise_datastore import ExerciseLibraryDatastore
+from tests.testing_utilities import TestUtilities
+from models.post_session_survey import PostSessionSurvey
 
 
 def training_plan_manager():
@@ -12,6 +14,59 @@ def training_plan_manager():
                                   PostSessionSurveyDatastore(), DailyPlanDatastore())
     return mgr
 
+
+def test_no_surveys_available_with_date():
+
+    mgr = training_plan_manager()
+    surveys_today = mgr.post_session_surveys_today([], "2018-07-01")
+
+    assert False is surveys_today
+
+
+def test_one_survey_available_with_date():
+    user_id = "tester"
+
+    mgr = training_plan_manager()
+
+    soreness_list = [TestUtilities().body_part_soreness(12, 1)]
+
+    post_survey = TestUtilities().get_post_survey(4, soreness_list)
+    post_session_survey = \
+        PostSessionSurvey(datetime.datetime(2018, 7, 12, 17, 30, 0).strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, None,
+                          1, post_survey)
+
+    surveys_today = mgr.post_session_surveys_today([post_session_survey], "2018-07-12")
+
+    assert True is surveys_today
+
+def test_no_surveys_available_no_date():
+
+    mgr = training_plan_manager()
+    surveys_today = mgr.post_session_surveys_today([], None)
+
+    assert False is surveys_today
+
+
+def test_one_survey_available_no_date():
+    user_id = "tester"
+
+    mgr = training_plan_manager()
+
+    soreness_list = [TestUtilities().body_part_soreness(12, 1)]
+
+    post_survey = TestUtilities().get_post_survey(4, soreness_list)
+    post_session_survey = \
+        PostSessionSurvey(datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, None,
+                          1, post_survey)
+
+    surveys_today = mgr.post_session_surveys_today([post_session_survey], None)
+
+    assert True is surveys_today
+
+
+
+
+'''
 def test_get_start_time_from_morning_trigger_recovery_0():
     date_time_trigger = datetime.datetime(2018, 6, 27, 11, 0, 0)
     mgr = training_plan_manager()
@@ -180,7 +235,7 @@ def test_get_end_time_from_evening_trigger_recovery_3():
     assert datetime.datetime(2018, 6, 29, 12, 0, 0) == end_time
 
 
-'''Business related tests
+Business related tests
 
 # am tests
 
