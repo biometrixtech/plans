@@ -110,6 +110,7 @@ class TrainingCycle(object):
         total_minutes_sum = sum(total_minutes)
         return total_minutes_sum / 60
 
+    '''
     def get_daily_plan(self, date):
         daily_plan = DailyPlan(date)
         sessions = list(s for s in self.sessions if s.in_daily_plan(date))  # assumes these are datetimes
@@ -133,7 +134,7 @@ class TrainingCycle(object):
         daily_plan.recovery_modalities.extend(recovery_modalities)
 
         return daily_plan
-
+    '''
     def get_last_daily_readiness_survey(self):
 
         readiness_count = len(self.daily_readiness_surveys)
@@ -319,7 +320,7 @@ class TrainingHistory(object):
             low_load = list(s.low_intensity_load for s in sessions if s.low_intensity_load is not None)
             parameter.low_intensity_avg_load_per_minute = low_load / total_load_minutes
 
-            # intensity minutes are NOT used to calculate average but are used to calculate percentage of event_date
+            # intensity minutes are NOT used to calculate average but are used to calculate percentage of time
             high_load_minutes = list(s.high_intensity_minutes for s in sessions if s.high_intensity_load is not None)
             mod_load_minutes = list(s.mod_intensity_minutes for s in sessions if s.mod_intensity_load is not None)
             low_load_minutes = list(s.low_intensity_minutes for s in sessions if s.low_intensity_load is not None)
@@ -590,8 +591,8 @@ class Calculator(object):
         If positive, the athlete should add load, if negative, the athlete is overreaching or over exerting and should
         taper load
 
-        we use UNCOUPLED ACWR formula where the period of event_date used in the acute calculation is not included in the
-        period of event_date for the chronic calculation
+        we use UNCOUPLED ACWR formula where the period of time used in the acute calculation is not included in the
+        period of time for the chronic calculation
 
         acute_load = array of actual load values this week
         chronic_load = array of previous 4 week averages of load (if contains Nones then acute_load represents totality of data)

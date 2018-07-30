@@ -77,13 +77,6 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         else:
             return False
 
-    @abc.abstractmethod
-    def in_daily_plan(self, date):
-        if self.event_date == date:
-            return True
-        else:
-            return False
-
     def json_serialise(self):
         ret = {
             'session_id': self.id,
@@ -156,12 +149,6 @@ class BumpUpSession(Session):
     def missing_post_session_survey(self):
         return Session.missing_post_session_survey()
 
-    def in_daily_plan(self, date):
-        if self.event_date >= date:
-            return True
-        else:
-            return False
-
 
 class PracticeSession(Session):
     def __init__(self):
@@ -177,9 +164,6 @@ class PracticeSession(Session):
 
     def missing_post_session_survey(self):
         return Session.missing_post_session_survey()
-
-    def in_daily_plan(self, date):
-        return Session.in_daily_plan(date)
 
 
 class StrengthConditioningSession(Session):
@@ -197,9 +181,6 @@ class StrengthConditioningSession(Session):
     def missing_post_session_survey(self):
         return Session.missing_post_session_survey()
 
-    def in_daily_plan(self, date):
-        return Session.in_daily_plan(date)
-
 
 class Game(Session):
     def __init__(self):
@@ -215,9 +196,6 @@ class Game(Session):
 
     def missing_post_session_survey(self):
         return Session.missing_post_session_survey()
-
-    def in_daily_plan(self, date):
-        return Session.in_daily_plan(date)
 
 
 class Tournament(Session):
@@ -238,12 +216,6 @@ class Tournament(Session):
     def missing_post_session_survey(self):
         return Session.missing_post_session_survey()
 
-    def in_daily_plan(self, date):
-        if self.start_date <= date <= self.end_date:
-            return True
-        else:
-            return False
-
 
 class CorrectiveSession(Session):
     def __init__(self):
@@ -260,12 +232,6 @@ class CorrectiveSession(Session):
 
     def missing_post_session_survey(self):
         if self.session_RPE is None:
-            return True
-        else:
-            return False
-
-    def in_daily_plan(self, date):
-        if self.event_date >= date:
             return True
         else:
             return False
