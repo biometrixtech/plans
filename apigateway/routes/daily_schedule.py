@@ -38,8 +38,9 @@ def handle_daily_schedule_create():
         plan.last_updated = format_datetime(datetime.datetime.utcnow())
         DailyPlanDatastore().put(plan)
     else:
-        sessions = session_store.get(user_id=user_id, event_date=event_date)
-        past_sessions.extend([s.json_serialise() for s in sessions if s.event_date < current_time])
+        daily_plan = DailyPlanDatastore().get(user_id, start_date=event_date, end_date=event_date)[0]
+        sessions = daily_plan.get_past_sessions(current_time)
+        past_sessions.extend([s.json_serialise() for s in sessions])
         
 
     sessions = request.json['sessions']
