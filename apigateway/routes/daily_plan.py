@@ -2,6 +2,7 @@ from aws_xray_sdk.core import xray_recorder
 from flask import request, Blueprint
 import json
 import datetime
+from utils import format_date, format_datetime, parse_datetime
 
 from datastores.daily_plan_datastore import DailyPlanDatastore
 from decorators import authentication_required
@@ -17,11 +18,25 @@ def handle_daily_plan_get():
     validate_input(request)
 
     user_id = request.json['user_id']
+    event_date = request.json.get('event_date', format_datetime(datetime.datetime.utcnow()))
+    event_date = parse_datetime(event_date)
+
+
     start_date = request.json['start_date']
     if 'end_date' in request.json:
         end_date = request.json['end_date']
     else:
+        cutoff_time = datetime.datetime(
+                            year=event_date.year, 
+                            month=event_date.month,
+                            day=event_date.day,
+                            hour=3
+                            )
+        if event_date < cutoff_time:
+            start_date = datetime.datetime.strptime(start_date, "%Y-%m-%d") - datetime.timedelta(days=1)
+            start_date = format_date(start_date)
         end_date = start_date
+
     store = DailyPlanDatastore()
     items = store.get(user_id, start_date, end_date)
     daily_plans = []
