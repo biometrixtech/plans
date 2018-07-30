@@ -39,7 +39,7 @@ def handle_daily_schedule_create():
         DailyPlanDatastore().put(plan)
     else:
         sessions = session_store.get(user_id=user_id, event_date=event_date)
-        past_sessions.extend([s.json_serialise() for s in sessions if s.time < current_time])
+        past_sessions.extend([s.json_serialise() for s in sessions if s.event_date < current_time])
         
 
     sessions = request.json['sessions']
@@ -48,7 +48,7 @@ def handle_daily_schedule_create():
         item = _create_session(user_id=user_id,
                                session_type=session['session_type'],
                                data=session_data)
-        if item.time < current_time:
+        if item.event_date < current_time:
             past_sessions.append(item.json_serialise())
         session_store.insert(item, user_id=user_id, event_date=event_date)
 
@@ -64,14 +64,12 @@ def _check_plan_exists(user_id, event_date):
         return False
 
 def _get_session_data(session):
-    date = format_date(parse_datetime(session['start_time']))
-    time = parse_datetime(session['start_time'])
+    event_date = parse_datetime(session['event_date'])
     duration_minutes = session.get('duration', None)
     if duration_minutes is None:
         raise InvalidSchemaException("duration is missing for the session")
 
-    session_data = {"date": date,
-                    "time": time,
+    session_data = {"event_date": event_date,
                     "duration_minutes": duration_minutes,
                     "description": session.get("description", "")
                    }

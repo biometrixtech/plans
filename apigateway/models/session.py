@@ -42,8 +42,8 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         self.mod_intensity_RPE = None
         self.low_intensity_RPE = None
         self.post_session_soreness = []     # post_session_soreness object array
+        self.duration_minutes = None
         self.event_date = None
-        self.duration_sensor = None
         self.sensor_start_date_time = None
         self.sensor_end_date_time = None
         self.day_of_week = DayOfWeek.monday
@@ -63,7 +63,7 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         self.description = ""
 
     def __setattr__(self, name, value):
-        if name in ['time', 'sensor_start_date_time', 'sensor_end_date_time']:
+        if name in ['event_date', 'sensor_start_date_time', 'sensor_end_date_time']:
             if not isinstance(value, datetime.datetime) and value is not None:
                 value = parse_datetime(value)
         super().__setattr__(name, value)
@@ -89,8 +89,8 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         ret = {
             'session_id': self.id,
             'description': self.description,
-            'date': self.date,
-            'time': format_datetime(self.time),
+            # 'date': self.date,
+            'event_date': format_datetime(self.event_date),
             'duration_minutes': self.duration_minutes,
             'data_transferred': self.data_transferred,
             'duration_sensor': self.duration_sensor,
