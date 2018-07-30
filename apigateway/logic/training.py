@@ -319,7 +319,7 @@ class TrainingHistory(object):
             low_load = list(s.low_intensity_load for s in sessions if s.low_intensity_load is not None)
             parameter.low_intensity_avg_load_per_minute = low_load / total_load_minutes
 
-            # intensity minutes are NOT used to calculate average but are used to calculate percentage of time
+            # intensity minutes are NOT used to calculate average but are used to calculate percentage of event_date
             high_load_minutes = list(s.high_intensity_minutes for s in sessions if s.high_intensity_load is not None)
             mod_load_minutes = list(s.mod_intensity_minutes for s in sessions if s.mod_intensity_load is not None)
             low_load_minutes = list(s.low_intensity_minutes for s in sessions if s.low_intensity_load is not None)
@@ -590,8 +590,8 @@ class Calculator(object):
         If positive, the athlete should add load, if negative, the athlete is overreaching or over exerting and should
         taper load
 
-        we use UNCOUPLED ACWR formula where the period of time used in the acute calculation is not included in the
-        period of time for the chronic calculation
+        we use UNCOUPLED ACWR formula where the period of event_date used in the acute calculation is not included in the
+        period of event_date for the chronic calculation
 
         acute_load = array of actual load values this week
         chronic_load = array of previous 4 week averages of load (if contains Nones then acute_load represents totality of data)

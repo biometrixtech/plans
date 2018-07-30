@@ -1,6 +1,8 @@
 from serialisable import Serialisable
 from utils import parse_datetime
+from datetime import datetime
 import models.session as session
+from utils import format_datetime
 
 
 class DailyPlan(Serialisable):
@@ -45,6 +47,38 @@ class DailyPlan(Serialisable):
             return True
         else:
             return False
+
+    def get_past_sessions(self, trigger_date_time):
+
+        sessions = []
+        practice_sessions = [x for x in self.practice_sessions if x.event_date is not None and
+                             datetime.strptime(x.event_date, "%Y-%m-%dT%H:%M:%SZ") < trigger_date_time]
+        game_sessions = [x for x in self.games if x.event_date is not None and
+                         datetime.strptime(x.event_date, "%Y-%m-%dT%H:%M:%SZ") < trigger_date_time]
+        cross_training_sessions = [x for x in self.strength_conditioning_sessions if x.event_date is not None and
+                                   datetime.strptime(x.event_date, "%Y-%m-%dT%H:%M:%SZ") < trigger_date_time]
+
+        sessions.extend(practice_sessions)
+        sessions.extend(game_sessions)
+        sessions.extend(cross_training_sessions)
+
+        return sessions
+
+    def get_future_sessions(self, trigger_date_time):
+
+        sessions = []
+        practice_sessions = [x for x in self.practice_sessions if x.event_date is not None and
+                             datetime.strptime(x.event_date, "%Y-%m-%dT%H:%M:%SZ") > trigger_date_time]
+        game_sessions = [x for x in self.games if x.event_date is not None and
+                         datetime.strptime(x.event_date, "%Y-%m-%dT%H:%M:%SZ") > trigger_date_time]
+        cross_training_sessions = [x for x in self.strength_conditioning_sessions if x.event_date is not None and
+                                   datetime.strptime(x.event_date, "%Y-%m-%dT%H:%M:%SZ") > trigger_date_time]
+
+        sessions.extend(practice_sessions)
+        sessions.extend(game_sessions)
+        sessions.extend(cross_training_sessions)
+
+        return sessions
 
     def add_scheduled_sessions(self, scheduled_sessions):
 

@@ -7,7 +7,7 @@ from tests.mocks.mock_post_session_survey_datastore import PostSessionSurveyData
 from tests.mocks.mock_exercise_datastore import ExerciseLibraryDatastore
 
 # => deprioritize: readiness, sleep quality, RPE, freshness index?, prior completed recovery sessions?
-# => deprioritize: heightened priority relative to bed time
+# => deprioritize: heightened priority relative to bed event_date
 
 # 10, 20, 30 min sessions, limit to 15 min
 

@@ -139,8 +139,7 @@ def _external_session_from_mongodb(mongo_result, session_type):
     mongo_session = factory.create(session_type)
     mongo_session.id = mongo_result["session_id"]
     attrs_from_mongo = ["description",
-                        "date",
-                        "time",
+                        "event_date",
                         "duration",
                         "data_transferred",
                         "duration_minutes",

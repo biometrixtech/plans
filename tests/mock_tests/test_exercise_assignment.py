@@ -55,14 +55,14 @@ def soreness_two_body_parts(body_enum_1, severity_score_1, body_enum_2, severity
 '''
 one body part
 NEED: SORENESS = 4, 5
-if soreness=3 (no more than 60% of time on inhibit exercises, no more than 60% of time on lengthen exercises, 
+if soreness=3 (no more than 60% of event_date on inhibit exercises, no more than 60% of event_date on lengthen exercises, 
 total no more than 15 minutes)
-if soreness=2 (no more than 40% of time on inhibit exercises, no more than 40% of time on lengthen exercises, 
+if soreness=2 (no more than 40% of event_date on inhibit exercises, no more than 40% of event_date on lengthen exercises, 
 no more than 40% on activate exercises, total no more than 15 minutes)
-if soreness =1 (no more than 30% of time on inhibit exercises, no more than 30% of time on lengthen exercises, 
+if soreness =1 (no more than 30% of event_date on inhibit exercises, no more than 30% of event_date on lengthen exercises, 
 no more than 60% on activate exercises, total no more than 15 minutes)
-if no soreness, due general program (no more than 30% of time on inhibit exercises, 
-no more than 30% of time on lengthen exercises, no more than 60% on activate exercises, total no more than 15 minutes)
+if no soreness, due general program (no more than 30% of event_date on inhibit exercises, 
+no more than 30% of event_date on lengthen exercises, no more than 60% on activate exercises, total no more than 15 minutes)
 
 dosage
 
@@ -78,8 +78,8 @@ dosage:
 two body parts, same severity: merge list and then drop off by priority like with 1 body part (pick which one is first 
 based on body part ranking
 
-if not same severity: find difference in time % and allocate that net gain to the more server part(s); then follow
-normal protocol for the lower severity portion of time
+if not same severity: find difference in event_date % and allocate that net gain to the more server part(s); then follow
+normal protocol for the lower severity portion of event_date
 '''
 
 # test initial targets based on soreness levels
