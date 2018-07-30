@@ -411,13 +411,13 @@ Authorization: eyJraWQ...ajBc4VQ
     [
         {
             "session_type": 0,
-            "start_time": "2018-07-26T07:30:00Z",
+            "event_date": "2018-07-26T07:30:00Z",
             "duration": 90,
             "descrption": "Morning Practice"
         },
         {
             "session_type": 1,
-            "start_time": "2018-07-26T19:30:00Z",
+            "event_date": "2018-07-26T19:30:00Z",
             "duration": 30,
             "description": "Evening Biking"
         }
