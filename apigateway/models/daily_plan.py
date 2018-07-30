@@ -52,11 +52,11 @@ class DailyPlan(Serialisable):
 
         sessions = []
         practice_sessions = [x for x in self.practice_sessions if x.event_date is not None and
-                             datetime.strptime(x.event_date, "%Y-%m-%dT%H:%M:%SZ") < trigger_date_time]
+                             x.event_date < trigger_date_time]
         game_sessions = [x for x in self.games if x.event_date is not None and
-                         datetime.strptime(x.event_date, "%Y-%m-%dT%H:%M:%SZ") < trigger_date_time]
+                         x.event_date < trigger_date_time]
         cross_training_sessions = [x for x in self.strength_conditioning_sessions if x.event_date is not None and
-                                   datetime.strptime(x.event_date, "%Y-%m-%dT%H:%M:%SZ") < trigger_date_time]
+                                   x.event_date < trigger_date_time]
 
         sessions.extend(practice_sessions)
         sessions.extend(game_sessions)
@@ -68,11 +68,11 @@ class DailyPlan(Serialisable):
 
         sessions = []
         practice_sessions = [x for x in self.practice_sessions if x.event_date is not None and
-                             datetime.strptime(x.event_date, "%Y-%m-%dT%H:%M:%SZ") > trigger_date_time]
+                             x.event_date > trigger_date_time]
         game_sessions = [x for x in self.games if x.event_date is not None and
-                         datetime.strptime(x.event_date, "%Y-%m-%dT%H:%M:%SZ") > trigger_date_time]
+                         x.event_date > trigger_date_time]
         cross_training_sessions = [x for x in self.strength_conditioning_sessions if x.event_date is not None and
-                                   datetime.strptime(x.event_date, "%Y-%m-%dT%H:%M:%SZ") > trigger_date_time]
+                                   x.event_date > trigger_date_time]
 
         sessions.extend(practice_sessions)
         sessions.extend(game_sessions)

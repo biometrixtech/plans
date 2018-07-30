@@ -1,13 +1,14 @@
 from aws_xray_sdk.core import xray_recorder
 from flask import request, Blueprint
-import datetime
 
+from datastores.daily_plan_datastore import DailyPlanDatastore
 from datastores.session_datastore import SessionDatastore
 from decorators import authentication_required
-from exceptions import InvalidSchemaException
+from exceptions import InvalidSchemaException, NoSuchEntityException
 from models.session import SessionType, SessionFactory
+from models.daily_plan import DailyPlan
 from utils import parse_datetime, format_date, format_datetime, run_async
-
+from config import get_mongo_collection
 
 app = Blueprint('session', __name__)
 
@@ -31,17 +32,21 @@ def handle_session_create():
             session_type = SessionType(request.json['session_type']).value
         except ValueError:
             raise InvalidSchemaException('session_type not recognized')
+    user_id = request.json['user_id']
     description = request.json.get('description', "")
+    if not _check_plan_exists(user_id, event_date):
+        plan = DailyPlan(event_date=event_date)
+        plan.user_id = user_id
+        DailyPlanDatastore().put(plan)
 
-    session = SessionFactory()
-    session = session.create(SessionType(session_type))
-    session.description = description
+    session = _create_session(user_id, session_type, {"description": description})
 
     store = SessionDatastore()
 
-    store.insert(user_id=request.json['user_id'],
-                 event_date=event_date,
-                 item=session)
+    store.insert(item=session,
+                 user_id=user_id,
+                 event_date=event_date
+                 )
 
     return {'message': 'success'}, 201
 
@@ -65,10 +70,13 @@ def handle_session_delete(session_id):
             session_type = SessionType(request.json['session_type']).value
         except ValueError:
             raise InvalidSchemaException('session_type not recognized')
+    user_id = request.json['user_id']
+    if not _check_plan_exists(user_id, event_date):
+        raise NoSuchEntityException("Plan does not exist for the user to delete session")
 
     store = SessionDatastore()
 
-    store.delete(user_id=request.json['user_id'],
+    store.delete(user_id=user_id,
                  event_date=event_date,
                  session_type=session_type,
                  session_id=session_id)
@@ -84,6 +92,9 @@ def handle_session_delete(session_id):
 def handle_session_sensor_data():
     if not isinstance(request.json, dict):
         raise InvalidSchemaException('Request body must be a dictionary')
+    if 'user_id' not in request.json:
+        raise InvalidSchemaException('Missing required parameter user_id')
+    user_id = request.json['user_id']
 
     store = SessionDatastore()
 
@@ -92,16 +103,22 @@ def handle_session_sensor_data():
         sensor_data = get_sensor_data(session)
         sensor_data['data_transferred'] = True
         event_date = session.get('event_date', "")
+        session_type = session.get('session_type', 0)
         if event_date == "":
-            event_date = datetime.datetime.strptime(sensor_data['sensor_start_date_time'], "%Y-%m-%dT%H:%M:%SZ").date()
-            event_date = datetime.datetime.strftime(event_date, "%Y-%m-%d")
+            event_date = format_date(parse_datetime(sensor_data['sensor_start_date_time']))
+        if not _check_plan_exists(user_id, event_date):
+            plan = DailyPlan(event_date=event_date)
+            plan.user_id = user_id
+            DailyPlanDatastore().put(plan)
 
-        # For now we're assuming session does not exist and just inserting a new session
-        # without trying to match (upsert is essentially insert)
-        store.upsert(user_id=request.json['user_id'],
-                     event_date=event_date,
-                     session_type=0,
-                     data=sensor_data)
+        session_id = session.get('session_id', None)
+        if session_id is None:
+            session_obj = _create_session(user_id, session_type, sensor_data)
+            store.insert(session_obj, user_id, event_date)
+        else:
+            session_obj = store.get(user_id, event_date, session_type, session_id)[0]
+            _update_session(session_obj, sensor_data)
+            store.update(session_obj, user_id, event_date)
 
     update_plan()
 
@@ -135,8 +152,27 @@ def get_sensor_data(session):
                    "high_intensity_load": high_accel
                    }
     return sensor_data
-#
 
+
+def _create_session(user_id, session_type, data):
+    factory = SessionFactory()
+    session = factory.create(SessionType(session_type))
+    for key, value in data.items():
+        setattr(session, key, value)
+    return session
+
+def _update_session(session, data):
+    for key, value in data.items():
+        setattr(session, key, value)
+
+
+def _check_plan_exists(user_id, event_date):
+    mongo_collection = get_mongo_collection('dailyplan')
+    if mongo_collection.count({"user_id": user_id,
+                               "date": event_date}) == 1:
+        return True
+    else:
+        return False
 
 def update_plan():
     endpoint = "athlete/{}/daily_plan".format(request.json['user_id'])
