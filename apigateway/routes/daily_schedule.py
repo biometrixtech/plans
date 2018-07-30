@@ -52,6 +52,7 @@ def handle_daily_schedule_create():
             past_sessions.append(item.json_serialise())
         session_store.insert(item, user_id=user_id, event_date=event_date)
 
+    past_sessions = _filter_response_data(past_sessions)
     return {'past_sessions': past_sessions}, 201
 
 
@@ -86,3 +87,8 @@ def _create_session(user_id, session_type, data):
 def _update_session(session, data):
     for key, value in data.items():
         setattr(session, key, value)
+
+def _filter_response_data(past_sessions):
+    keys_to_return = ['session_id', 'event_date', 'description', 'duration_minutes']
+    past_sessions = [{ key: s[key] for key in keys_to_return } for s in past_sessions]
+    return past_sessions
