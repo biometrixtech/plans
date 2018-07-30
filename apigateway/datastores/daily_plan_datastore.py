@@ -43,8 +43,8 @@ class DailyPlanDatastore(object):
             # daily_plan.tournaments = \
             #     [_external_session_from_mongodb(s, session.SessionType.tournament)
             #      for s in plan['tournament_sessions']]
-            daily_plan.recovery_am = _recovery_session_from_mongodb(plan['recovery_am']) if plan['recovery_am'] is not None else None
-            daily_plan.recovery_pm = _recovery_session_from_mongodb(plan['recovery_pm']) if plan['recovery_pm'] is not None else None
+            daily_plan.pre_recovery = _recovery_session_from_mongodb(plan['pre_recovery']) if plan['pre_recovery'] is not None else None
+            daily_plan.post_recovery = _recovery_session_from_mongodb(plan['post_recovery']) if plan['post_recovery'] is not None else None
             # daily_plan.corrective_sessions = \
             #    [_external_session_from_mongodb(s, session.SessionType.corrective)
             #     for s in plan['corrective_sessions']]
@@ -75,11 +75,11 @@ class DailyPlanDatastore(object):
         am_recovery_bson = ()
         pm_recovery_bson = ()
 
-        if item.recovery_am is not None:
-            am_recovery_bson = self.get_recovery_bson(item.recovery_am)
+        if item.pre_recovery is not None:
+            am_recovery_bson = self.get_recovery_bson(item.pre_recovery)
 
-        if item.recovery_pm is not None:
-            pm_recovery_bson = self.get_recovery_bson(item.recovery_pm)
+        if item.post_recovery is not None:
+            pm_recovery_bson = self.get_recovery_bson(item.post_recovery)
 
         for practice_session in item.practice_sessions:
             practice_session_bson += ({'session_id': str(practice_session.id),
@@ -107,8 +107,8 @@ class DailyPlanDatastore(object):
                                'bump_up_sessions': bump_up_session_bson,
                                'cross_training_sessions': cross_training_session_bson,
                                'game_sessions': game_session_bson,
-                               'recovery_am': am_recovery_bson,
-                               'recovery_pm': pm_recovery_bson,
+                               'pre_recovery': am_recovery_bson,
+                               'post_recovery': pm_recovery_bson,
                                'last_updated': item.last_updated})
         '''
         query = {'user_id': item.user_id, 'date': item.event_date}
