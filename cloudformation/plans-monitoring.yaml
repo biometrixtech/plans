@@ -1,0 +1,61 @@
+# A template that creates monitoring for a Plans service
+# Version: da39a3ee5e6b4b0d3255bfef95601890afd80709
+#
+# Copyright 2018 Melon Software Ltd (UK), all rights reserved.  Used under license.
+#
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "Creates monitoring systems for the Plans service"
+
+Parameters:
+
+    # Environment name
+    Environment:
+        Type: "String"
+        Description: "The name of the environment"
+
+Mappings:
+    TemplateVersion:
+        Self: { Commit: "da39a3ee5e6b4b0d3255bfef95601890afd80709" }
+
+Resources:
+
+    ##########################################################################################################
+    ##  DASHBOARD
+    ##########################################################################################################
+
+    CloudWatchDashboard:
+        Type: "AWS::CloudWatch::Dashboard"
+        Properties:
+            DashboardName: { "Fn::Sub": "plans-${Environment}-${AWS::Region}" }
+            DashboardBody: !Sub |
+                { "widgets":[
+                    {
+                        "type": "metric",
+                        "x": 0,
+                        "y": 0,
+                        "width": 12,
+                        "height": 6,
+                        "properties": {
+                            "view": "timeSeries",
+                            "stacked": false,
+                            "metrics": [
+                                [
+                                    "AWS/ApiGateway", "4XXError",
+                                    "ApiName", "plans - ${Environment}",
+                                    { "period": 60, "label": "4XX Errors" }
+                                ],
+                                [ ".", "5XXError", ".", ".", { "period": 60, "label": "5XX Errors" } ]
+                            ],
+                            "region": "${AWS::Region}",
+                            "yAxis": {
+                                "left": {
+                                    "min": 0
+                                },
+                                "right": {
+                                    "min": 0
+                                }
+                            },
+                            "title": "API Gateway - Error responses"
+                        }
+                    }
+                ] }
