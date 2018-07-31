@@ -1,8 +1,16 @@
 import csv
-import pymongo
-import exercise_generator
-import database_config  # not committed to source code, contains connection string
+from config import get_mongo_collection
 import models.exercise
+
+exercise_descriptions = {}
+with open('Exercise_Descriptions.csv', newline='') as csvfile:
+  exercise_reader = csv.reader(csvfile, delimiter='\t')
+  row_count = 0
+  for row in exercise_reader:
+    if row_count >0:
+      exercise_descriptions[row[0]] = row[3]
+    row_count = row_count + 1
+csvfile.close()
 
 exercises = []
 with open('Exercise_Library.csv', newline='') as csvfile:
@@ -41,17 +49,18 @@ with open('Exercise_Library.csv', newline='') as csvfile:
                 exercise_item.technical_difficulty = row[29]
                 exercise_item.equipment_required = row[30]
                 exercise_item.youtube_id = row[32]
+                exercise_item.description = exercise_descriptions[exercise_item.id]
                 exercises.append(exercise_item)
         row_count = row_count + 1
 
 exercise_count = len(exercises)
-client = pymongo.MongoClient(database_config.mongodb_dev)
-db = client.movementStats
-collection = db.exerciseLibrary
+collection = get_mongo_collection('exerciselibrary')
 for exercise_item in exercises:
-    collection.insert_one({'library_id': exercise_item.id,
+    collection.replace_one({'library_id': exercise_item.id},
+                           {'library_id': exercise_item.id,
                            'name': exercise_item.name,
                            'display_name': exercise_item.display_name,
+                           'description': exercise_item.description,
                            'youtube_id': exercise_item.youtube_id,
                            'min_sets': exercise_item.min_sets,
                            'max_sets': exercise_item.max_sets,
@@ -67,5 +76,5 @@ for exercise_item in exercises:
                            'progresses_to': exercise_item.progresses_to,
                            'technical_difficulty': exercise_item.technical_difficulty,
                            'equipment_required': exercise_item.equipment_required
-                           })
-
+                           },
+                           upsert=True)
