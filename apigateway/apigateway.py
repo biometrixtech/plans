@@ -77,6 +77,9 @@ app.register_blueprint(add_delete_session_routes, url_prefix='/plans/session')
 from routes.daily_schedule import app as daily_schedule_routes
 app.register_blueprint(daily_schedule_routes, url_prefix='/plans/schedule')
 
+from routes.active_recovery import app as active_recovery_routes
+app.register_blueprint(active_recovery_routes, url_prefix='/plans/active_recovery')
+
 
 @app.errorhandler(500)
 def handle_server_error(e):
@@ -102,6 +105,13 @@ def handle_application_exception(e):
 
 def handler(event, context):
     print(json.dumps(event))
+
+    if 'Records' in event:
+        # An asynchronous invocation from SQS
+        print('Asynchronous invocation')
+        event = json.loads(event['Records'][0]['body'])
+    else:
+        print('API Gateway invocation')
 
     # Trim trailing slashes from urls
     event['path'] = event['path'].rstrip('/')

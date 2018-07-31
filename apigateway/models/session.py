@@ -267,6 +267,7 @@ class RecoverySession(Serialisable):
         self.impact_score = 0
         self.why_text = ""
         self.goal_text = ""
+        self.completed = False
 
     def json_serialise(self):
         ret = {'minutes_duration': self.duration_minutes,
@@ -275,6 +276,7 @@ class RecoverySession(Serialisable):
                'start_time': str(self.start_time),
                'end_time': str(self.end_time),
                'impact_score': self.impact_score,
+               'completed': self.completed,
                'inhibit_exercises': [ex.json_serialise() for ex in self.inhibit_exercises],
                'lengthen_exercises': [ex.json_serialise() for ex in self.lengthen_exercises],
                'activate_exercises': [ex.json_serialise() for ex in self.activate_exercises],
