@@ -77,6 +77,9 @@ app.register_blueprint(add_delete_session_routes, url_prefix='/plans/session')
 from routes.daily_schedule import app as daily_schedule_routes
 app.register_blueprint(daily_schedule_routes, url_prefix='/plans/schedule')
 
+from routes.active_recovery import app as active_recovery_routes
+app.register_blueprint(active_recovery_routes, url_prefix='/plans/active_recovery')
+
 
 @app.errorhandler(500)
 def handle_server_error(e):

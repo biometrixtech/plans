@@ -232,7 +232,7 @@ Content-Type: application/json
 Authorization: eyJraWQ...ajBc4VQ
 
 {
-    "user_id": "morning_practice_2",
+    "user_id": "02cb7965-7921-493a-80d4-6b278c928fad",
     "event_date": "2018-07-11",
     "session_type": 0,
     "description": "evening biking"
@@ -276,7 +276,7 @@ Content-Type: application/json
 Authorization: eyJraWQ...ajBc4VQ
 
 {
-    "user_id": "morning_practice_2",
+    "user_id": "02cb7965-7921-493a-80d4-6b278c928fad",
     "event_date": "2018-07-11",
     "session_type": 1
 }
@@ -339,7 +339,7 @@ Content-Type: application/json
 Authorization: eyJraWQ...ajBc4VQ
 
 {
-    "user_id": "e8514489-8de9-47e0-b3d5-b15da244783f",
+    "user_id": "02cb7965-7921-493a-80d4-6b278c928fad",
     "sessions":
     [
         {
@@ -366,6 +366,54 @@ Authorization: eyJraWQ...ajBc4VQ
     "message": "success"
 }
 ```
+
+
+### Active Recovery
+
+#### Mark Completed
+
+This endpoint can be called to mark either the pre- or post-recovery completed.
+
+##### Query String
+ 
+The client __must__ submit a request to the endpoint `/plans/active_recovery`. The request method __must__ be `PATCH`.
+
+##### Request
+
+The client __must__ submit a request body containing a JSON object with the following schema:
+```
+{
+    "user_id": Uuid,
+    "event_date": Datetime,
+    "recovery_type": string,
+    "description": string
+}
+```
+* `event_date` __should__ should be of format `yyyy-yy-yy`.
+* `recovery_type` __should__ be either `pre` or `post`
+
+```
+POST /plans/active_recovery HTTPS/1.1
+Host: apis.env.fathomai.com
+Content-Type: application/json
+Authorization: eyJraWQ...ajBc4VQ
+
+{
+    "user_id": "02cb7965-7921-493a-80d4-6b278c928fad",
+    "event_date": "2018-07-31",
+    "recovery_type": "pre"
+}
+```
+##### Responses
+ 
+ If the write was successful, the Service __will__ respond with HTTP Status `202 Accepted`, and return the daily_plan in the body with following syntax.
+ 
+```
+{
+    "daily_plans": [daily_plan]
+}
+```
+* `daily_plan` will have the same structure as defined in output of daily_plan route.
 
 
 ### Schedule
@@ -405,7 +453,7 @@ Content-Type: application/json
 Authorization: eyJraWQ...ajBc4VQ
 
 {
-    "user_id": "dipesh",
+    "user_id": "02cb7965-7921-493a-80d4-6b278c928fad",
     "event_date": "2018-07-26",
     "sessions":
     [
@@ -577,7 +625,7 @@ Content-Type: application/json
 Authorization: eyJraWQ...ajBc4VQ
 
 {
-    "user_id": "dipesh",
+    "user_id": "02cb7965-7921-493a-80d4-6b278c928fad",
     "event_date": "2018-07-31T02:50:02Z",
     "start_date": "2018-07-31"
 }
