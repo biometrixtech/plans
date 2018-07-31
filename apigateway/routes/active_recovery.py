@@ -10,7 +10,7 @@ from config import get_mongo_collection
 app = Blueprint('active_recovery', __name__)
 
 
-@app.route('/', methods=['POST'])
+@app.route('/', methods=['PATCH'])
 @authentication_required
 @xray_recorder.capture('routes.active_recovery')
 def handle_active_recovery_update():
@@ -40,6 +40,14 @@ def handle_active_recovery_update():
         plan.post_recovery.completed = True
 
     store.put(plan)
+
+    survey_complete = plan.daily_readiness_survey_completed()
+    plan = plan.json_serialise()
+    plan['daily_readiness_survey_completed'] = survey_complete
+    del plan['daily_readiness_survey'], plan['user_id']
+
+
+    return {'daily_plans': [plan]}, 202
 
 
 def _check_plan_exists(user_id, event_date):
