@@ -57,5 +57,83 @@ Resources:
                             },
                             "title": "API Gateway - Error responses"
                         }
+                    },
+                    {
+                        "type": "metric",
+                        "x": 12,
+                        "y": 0,
+                        "width": 12,
+                        "height": 6,
+                        "properties": {
+                            "view": "timeSeries",
+                            "stacked": false,
+                            "metrics": [
+                                [
+                                    "AWS/ApiGateway", "IntegrationLatency",
+                                    "ApiName", "plans - ${Environment}",
+                                    { "stat": "p90", "period": 60, "label": "90%" }
+                                ],
+                                [ ".", ".", ".", ".", { "stat": "p9", "period": 60, "label": "99%" } ]
+                            ],
+                            "region": "us-west-2"
+                        }
+                    },
+                    {
+                        "type": "metric",
+                        "x": 0,
+                        "y": 6,
+                        "width": 12,
+                        "height": 6,
+                        "properties": {
+                            "view": "timeSeries",
+                            "stacked": false,
+                            "metrics": [
+                                [
+                                    "AWS/SQS", "NumberOfMessagesSent",
+                                    "QueueName", "plans-${Environment}-apigateway-async",
+                                    { "label": "Jobs requested", "period": 300 }
+                                ],
+                                [ ".", "ApproximateNumberOfMessagesNotVisible", ".", ".", { "label": "Jobs in progress" } ],
+                                [ ".", "ApproximateAgeOfOldestMessage", ".", ".", { "yAxis": "right", "label": "Backlog Latency" } ]
+                            ],
+                            "region": "us-west-2"
+                        }
                     }
                 ] }
+
+    ##########################################################################################################
+    ##  ALARMS
+    ##########################################################################################################
+
+    MonitoringAlarmTopic:
+        Type: "AWS::SNS::Topic"
+        Properties:
+            DisplayName: "Plans infrastructure alarm notifications"
+            TopicName: { "Fn::Sub": "plans-${Environment}-monitoringalarms" }
+
+    SnsDataQualitySubscriptionStephen:
+        Type: "AWS::SNS::Subscription"
+        Properties:
+            Endpoint: { "Fn::Sub": "stephen+plans-${Environment}@biometrixtech.com" }
+            Protocol: "email"
+            TopicArn: { Ref: "MonitoringAlarmTopic" }
+
+    SqsBacklogAgeAlarm:
+        Type: "AWS::CloudWatch::Alarm"
+        Properties:
+            ActionsEnabled: true
+            AlarmActions: [ { Ref: "MonitoringAlarmTopic" } ]
+            AlarmDescription: "Alerts when the SQS stream for asynchronous processing gets backed up due to an error"
+            AlarmName: { "Fn::Sub": "plans-${Environment}-apigateway-async" }
+            ComparisonOperator: "GreaterThanThreshold"
+            Dimensions:
+              - Name: "QueueName"
+                Value: { "Fn::Sub": "plans-${Environment}-apigateway-async" }
+            EvaluationPeriods: 3
+            MetricName: "ApproximateAgeOfOldestMessage"
+            Namespace: "AWS/SQS"
+            Period: 60
+            Statistic: "Average"
+            Threshold: 1800
+            TreatMissingData: "ignore"
+            Unit: "Milliseconds"
