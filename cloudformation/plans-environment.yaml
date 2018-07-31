@@ -213,9 +213,9 @@ Resources:
         Properties:
             DelaySeconds: 0
             QueueName: { "Fn::Sub": "plans-${Environment}-apigateway-async" }
-            RedrivePolicy:
-                deadLetterTargetArn: { Ref: "AsyncDeadLetterTopic" }
-                maxReceiveCount: 1
+#            RedrivePolicy:
+#                deadLetterTargetArn: { Ref: "AsyncDeadLetterTopic" }
+#                maxReceiveCount: 1
             VisibilityTimeout: 300
 
     AsyncDeadLetterTopic:
