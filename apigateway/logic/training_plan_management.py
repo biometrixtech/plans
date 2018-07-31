@@ -244,6 +244,8 @@ class TrainingPlanManager(object):
             #                                                    trigger_date_time.day, 12, 0, 0)
         else:
             daily_plan.pre_recovery = None
+            if daily_plan.post_recovery is not None and daily_plan.post_recovery.completed:
+                daily_plan.completed_post_recovery_sessions.append(daily_plan.post_recovery)
             daily_plan.post_recovery = session.RecoverySession()
         #daily_plan.post_recovery.start_time = datetime.datetime(trigger_date_time.year, trigger_date_time.month,
         #                                                      trigger_date_time.day, 12, 0, 0)
