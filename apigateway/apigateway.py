@@ -103,6 +103,13 @@ def handle_application_exception(e):
 def handler(event, context):
     print(json.dumps(event))
 
+    if 'Records' in event:
+        # An asynchronous invocation from SQS
+        print('Asynchronous invocation')
+        event = json.loads(event['Records'][0]['body'])
+    else:
+        print('API Gateway invocation')
+
     # Trim trailing slashes from urls
     event['path'] = event['path'].rstrip('/')
 
@@ -121,10 +128,6 @@ def handler(event, context):
     xray_recorder.current_segment().put_http_meta('method', event['httpMethod'])
     xray_recorder.current_segment().put_http_meta('user_agent', event['headers']['User-Agent'])
     xray_recorder.current_segment().put_annotation('environment', os.environ['ENVIRONMENT'])
-
-    if 'Records' in event:
-        # An asynchronous invocation from SQS
-        event = json.loads(event['Records'][0]['body'])
 
 
     ret = app(event, context)
