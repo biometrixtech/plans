@@ -1,6 +1,6 @@
 {
     "templates": [
-        { "s3_filename": "plans-environment.yaml", "src": "cloudformation/plans-environment.yaml" }
+        { "s3_filename": "plans-environment.yaml", "src": "cloudformation/plans-environment.yaml" },
         { "s3_filename": "plans-monitoring.yaml", "src": "cloudformation/plans-monitoring.yaml" }
     ],
     "lambdas": [
