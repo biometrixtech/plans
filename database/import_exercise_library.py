@@ -1,4 +1,6 @@
 import csv
+#import exercise_generator
+#import database_config  # not committed to source code, contains connection string
 from config import get_mongo_collection
 import models.exercise
 
@@ -20,10 +22,17 @@ with open('Exercise_Library.csv', newline='') as csvfile:
         if row_count > 0:
             if row[14] != "x":
                 exercise_item = models.exercise.Exercise(row[0])
+                print(row[0])
                 exercise_item.display_name = row[1]
                 exercise_item.name = row[2]
-                exercise_item.min_sets = int(row[16])
-                exercise_item.max_sets = int(row[17])
+                if row[16] == "-" or row[16] == "":
+                    exercise_item.min_sets = 0
+                else:
+                    exercise_item.min_sets = int(row[16])
+                if row[17] == "-" or row[17] == "":
+                    exercise_item.max_sets = 0
+                else:
+                    exercise_item.max_sets = int(row[17])
                 if row[18] == "-" or row[18] == "":
                     exercise_item.min_reps = None
                 else:
@@ -33,10 +42,19 @@ with open('Exercise_Library.csv', newline='') as csvfile:
                 else:
                     exercise_item.max_reps = int(row[19])
                 exercise_item.bilateral = (row[20] == "Y")
-                exercise_item.progression_interval = int(row[21])
-                exercise_item.exposure_target = int(row[22])
+                if row[21] == "-" or row[21] == "":
+                    exercise_item.progression_interval = 0
+                else:
+                    exercise_item.progression_interval = int(row[21])
+                if row[22] == "-" or row[22] == "":
+                    exercise_item.exposure_target = 0
+                else:
+                    exercise_item.exposure_target = int(row[22])
                 exercise_item.unit_of_measure = row[23]
-                exercise_item.seconds_rest_between_sets = int(row[24])
+                if row[24] == "-" or row[24] == "":
+                    exercise_item.seconds_rest_between_sets = 0
+                else:
+                    exercise_item.seconds_rest_between_sets = int(row[24])
                 if row[25] == "-" or row[25] == "":
                     exercise_item.seconds_per_set = None
                 else:
@@ -54,6 +72,8 @@ with open('Exercise_Library.csv', newline='') as csvfile:
         row_count = row_count + 1
 
 exercise_count = len(exercises)
+# db = get_mongo_database()
+# collection = db.exerciseLibrary_1
 collection = get_mongo_collection('exerciselibrary')
 for exercise_item in exercises:
     collection.replace_one({'library_id': exercise_item.id},
