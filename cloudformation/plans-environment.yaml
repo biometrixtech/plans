@@ -237,6 +237,6 @@ Resources:
         Properties:
             BatchSize: 1
             Enabled: true
-            EventSourceArn: { Ref: 'AsyncSqsQueue' }
+            EventSourceArn: { "Fn::GetAtt": [ 'AsyncSqsQueue', "Arn" ] }
             FunctionName: { Ref: "ApiGatewayLambda" }
             StartingPosition: "LATEST"
