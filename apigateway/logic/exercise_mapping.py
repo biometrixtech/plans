@@ -140,7 +140,7 @@ class ExerciseAssignmentCalculator(object):
 
         body_parts = []
 
-        general = soreness_and_injury.BodyPart(soreness_and_injury.BodyPartLocation.general, 15)
+        general = models.soreness.BodyPart(models.soreness.BodyPartLocation.general, 15)
 
         general.inhibit_exercises.append(models.exercise.AssignedExercise("48", general.treatment_priority, 1))
         general.inhibit_exercises.append(models.exercise.AssignedExercise("3", general.treatment_priority, 2))
@@ -189,7 +189,7 @@ class ExerciseAssignmentCalculator(object):
         body_parts = []
 
         # lower back
-        lower_back = soreness_and_injury.BodyPart(soreness_and_injury.BodyPartLocation.lower_back, 1)
+        lower_back = models.soreness.BodyPart(models.soreness.BodyPartLocation.lower_back, 1)
 
         lower_back.inhibit_exercises.append(models.exercise.AssignedExercise("55", lower_back.treatment_priority, 1))
         lower_back.inhibit_exercises.append(models.exercise.AssignedExercise("54", lower_back.treatment_priority, 2))
@@ -219,7 +219,7 @@ class ExerciseAssignmentCalculator(object):
 
         # hip
 
-        hip = soreness_and_injury.BodyPart(soreness_and_injury.BodyPartLocation.hip_flexor, 2)
+        hip = models.soreness.BodyPart(models.soreness.BodyPartLocation.hip_flexor, 2)
 
         hip.inhibit_exercises.append(models.exercise.AssignedExercise("3", hip.treatment_priority, 1))
         hip.inhibit_exercises.append(models.exercise.AssignedExercise("48", hip.treatment_priority, 2))
@@ -255,7 +255,7 @@ class ExerciseAssignmentCalculator(object):
 
         # glutes
 
-        glutes = soreness_and_injury.BodyPart(soreness_and_injury.BodyPartLocation.glutes, 3)
+        glutes = models.soreness.BodyPart(models.soreness.BodyPartLocation.glutes, 3)
 
         glutes.inhibit_exercises.append(models.exercise.AssignedExercise("44", glutes.treatment_priority, 1))
         glutes.inhibit_exercises.append(models.exercise.AssignedExercise("3", glutes.treatment_priority, 2))
@@ -301,7 +301,7 @@ class ExerciseAssignmentCalculator(object):
 
         # abdominals
 
-        abdominals = soreness_and_injury.BodyPart(soreness_and_injury.BodyPartLocation.abdominals, 4)
+        abdominals = models.soreness.BodyPart(models.soreness.BodyPartLocation.abdominals, 4)
 
         abdominals.inhibit_exercises.append(models.exercise.AssignedExercise("102", abdominals.treatment_priority, 1))
         abdominals.inhibit_exercises.append(models.exercise.AssignedExercise("4", abdominals.treatment_priority, 2))
@@ -340,7 +340,7 @@ class ExerciseAssignmentCalculator(object):
 
         # hamstrings
 
-        hamstrings = soreness_and_injury.BodyPart(soreness_and_injury.BodyPartLocation.hamstrings, 5)
+        hamstrings = models.soreness.BodyPart(models.soreness.BodyPartLocation.hamstrings, 5)
 
         hamstrings.inhibit_exercises.append(models.exercise.AssignedExercise("3", hamstrings.treatment_priority, 1))
         hamstrings.inhibit_exercises.append(models.exercise.AssignedExercise("44", hamstrings.treatment_priority, 2))
@@ -383,7 +383,7 @@ class ExerciseAssignmentCalculator(object):
 
         # outer_thigh
 
-        outer_thigh = soreness_and_injury.BodyPart(soreness_and_injury.BodyPartLocation.outer_thigh, 6)
+        outer_thigh = models.soreness.BodyPart(models.soreness.BodyPartLocation.outer_thigh, 6)
 
         outer_thigh.inhibit_exercises.append(models.exercise.AssignedExercise("48", outer_thigh.treatment_priority, 1))
         outer_thigh.inhibit_exercises.append(models.exercise.AssignedExercise("4", outer_thigh.treatment_priority, 2))
@@ -419,7 +419,7 @@ class ExerciseAssignmentCalculator(object):
 
         # groin
 
-        groin = soreness_and_injury.BodyPart(soreness_and_injury.BodyPartLocation.groin, 7)
+        groin = models.soreness.BodyPart(models.soreness.BodyPartLocation.groin, 7)
 
         groin.inhibit_exercises.append(models.exercise.AssignedExercise("54", groin.treatment_priority, 1))
         groin.inhibit_exercises.append(models.exercise.AssignedExercise("1", groin.treatment_priority, 2))
@@ -463,7 +463,7 @@ class ExerciseAssignmentCalculator(object):
 
         # quads
 
-        quads = soreness_and_injury.BodyPart(soreness_and_injury.BodyPartLocation.quads, 8)
+        quads = models.soreness.BodyPart(models.soreness.BodyPartLocation.quads, 8)
 
         quads.inhibit_exercises.append(models.exercise.AssignedExercise("54", quads.treatment_priority, 1))
         quads.inhibit_exercises.append(models.exercise.AssignedExercise("1", quads.treatment_priority, 2))
@@ -500,7 +500,7 @@ class ExerciseAssignmentCalculator(object):
 
         # knee
 
-        knee = soreness_and_injury.BodyPart(soreness_and_injury.BodyPartLocation.knee, 9)
+        knee = models.soreness.BodyPart(models.soreness.BodyPartLocation.knee, 9)
 
         # it_band = models.exercise.AssignedExercise("4", knee.treatment_priority, 1)
         # it_band.progressions = ["5"]
@@ -528,7 +528,7 @@ class ExerciseAssignmentCalculator(object):
 
         # calves
 
-        calves = soreness_and_injury.BodyPart(soreness_and_injury.BodyPartLocation.calves, 10)
+        calves = models.soreness.BodyPart(models.soreness.BodyPartLocation.calves, 10)
 
         calves.inhibit_exercises.append(models.exercise.AssignedExercise("2", calves.treatment_priority, 1))
         calves.inhibit_exercises.append(models.exercise.AssignedExercise("71", calves.treatment_priority, 2))
@@ -557,7 +557,7 @@ class ExerciseAssignmentCalculator(object):
 
         # shin
 
-        shin = soreness_and_injury.BodyPart(soreness_and_injury.BodyPartLocation.shin, 11)
+        shin = models.soreness.BodyPart(models.soreness.BodyPartLocation.shin, 11)
 
         shin.inhibit_exercises.append(models.exercise.AssignedExercise("2", shin.treatment_priority, 1))
         shin.inhibit_exercises.append(models.exercise.AssignedExercise("71", shin.treatment_priority, 2))
@@ -580,7 +580,7 @@ class ExerciseAssignmentCalculator(object):
 
         # ankle
 
-        ankle = soreness_and_injury.BodyPart(soreness_and_injury.BodyPartLocation.ankle, 12)
+        ankle = models.soreness.BodyPart(models.soreness.BodyPartLocation.ankle, 12)
 
         ankle.inhibit_exercises.append(models.exercise.AssignedExercise("2", ankle.treatment_priority, 1))
         ankle.inhibit_exercises.append(models.exercise.AssignedExercise("71", ankle.treatment_priority, 2))
@@ -601,7 +601,7 @@ class ExerciseAssignmentCalculator(object):
 
         # foot
 
-        foot = soreness_and_injury.BodyPart(soreness_and_injury.BodyPartLocation.foot, 13)
+        foot = models.soreness.BodyPart(models.soreness.BodyPartLocation.foot, 13)
 
         foot.inhibit_exercises.append(models.exercise.AssignedExercise("74", foot.treatment_priority, 1))
         foot.inhibit_exercises.append(models.exercise.AssignedExercise("2", foot.treatment_priority, 2))
@@ -625,7 +625,7 @@ class ExerciseAssignmentCalculator(object):
 
         # achilles
 
-        achilles = soreness_and_injury.BodyPart(soreness_and_injury.BodyPartLocation.achilles, 14)
+        achilles = models.soreness.BodyPart(models.soreness.BodyPartLocation.achilles, 14)
 
         achilles.inhibit_exercises.append(models.exercise.AssignedExercise("2", achilles.treatment_priority, 1))
         achilles.inhibit_exercises.append(models.exercise.AssignedExercise("71", achilles.treatment_priority, 2))
