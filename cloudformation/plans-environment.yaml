@@ -230,7 +230,7 @@ Resources:
             FunctionName: { 'Fn::GetAtt': [ 'ApiGatewayLambda', 'Arn' ] }
             Action: 'lambda:InvokeFunction'
             Principal: 'sqs.amazonaws.com'
-            SourceArn: { Ref: 'AsyncSqsQueue' }
+            SourceArn: { "Fn::GetAtt": [ 'AsyncSqsQueue', "Arn" ] }
 
     SessionsDynamodbTriggerMapping:
         Type: "AWS::Lambda::EventSourceMapping"
