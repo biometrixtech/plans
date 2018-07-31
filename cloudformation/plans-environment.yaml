@@ -103,6 +103,7 @@ Resources:
             ManagedPolicyArns:
               - "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
               - "arn:aws:iam::aws:policy/AWSXrayWriteOnlyAccess"
+              - "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
             Policies:
               - PolicyName: "default"
                 PolicyDocument:
@@ -232,7 +233,7 @@ Resources:
             Principal: 'sqs.amazonaws.com'
             SourceArn: { "Fn::GetAtt": [ 'AsyncSqsQueue', "Arn" ] }
 
-    SessionsDynamodbTriggerMapping:
+    AsyncLambdaTriggerMapping:
         Type: "AWS::Lambda::EventSourceMapping"
         Properties:
             BatchSize: 1
