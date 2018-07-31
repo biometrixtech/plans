@@ -224,18 +224,18 @@ Resources:
             DisplayName: "Plans service asynchronous invocation dead-letter queue"
             TopicName: { "Fn::Sub": "plans-${Environment}-apigateway-asyncdlq" }
 
-    AsyncLambdaInvokePermission:
-        Type: 'AWS::Lambda::Permission'
-        Properties:
-            FunctionName: { 'Fn::GetAtt': [ 'ApiGatewayLambda', 'Arn' ] }
-            Action: 'lambda:InvokeFunction'
-            Principal: 'sqs.amazonaws.com'
-            SourceArn: { "Fn::GetAtt": [ 'AsyncSqsQueue', "Arn" ] }
-
-    SessionsDynamodbTriggerMapping:
-        Type: "AWS::Lambda::EventSourceMapping"
-        Properties:
-            BatchSize: 1
-            Enabled: true
-            EventSourceArn: { "Fn::GetAtt": [ 'AsyncSqsQueue', "Arn" ] }
-            FunctionName: { Ref: "ApiGatewayLambda" }
+#    AsyncLambdaInvokePermission:
+#        Type: 'AWS::Lambda::Permission'
+#        Properties:
+#            FunctionName: { 'Fn::GetAtt': [ 'ApiGatewayLambda', 'Arn' ] }
+#            Action: 'lambda:InvokeFunction'
+#            Principal: 'sqs.amazonaws.com'
+#            SourceArn: { "Fn::GetAtt": [ 'AsyncSqsQueue', "Arn" ] }
+#
+#    SessionsDynamodbTriggerMapping:
+#        Type: "AWS::Lambda::EventSourceMapping"
+#        Properties:
+#            BatchSize: 1
+#            Enabled: true
+#            EventSourceArn: { "Fn::GetAtt": [ 'AsyncSqsQueue', "Arn" ] }
+#            FunctionName: { Ref: "ApiGatewayLambda" }
