@@ -35,9 +35,15 @@ def handle_active_recovery_update():
     store = DailyPlanDatastore()
     plan = store.get(user_id=user_id, start_date=event_date, end_date=event_date)[0]
     if recovery_type == 'pre':
-        plan.pre_recovery.completed = True
+        if plan.pre_recovery is not None:
+            plan.pre_recovery.completed = True
+        else:
+            raise NoSuchEntityException("Pre-Recovery does not exist for the user")
     elif recovery_type == 'post':
-        plan.post_recovery.completed = True
+        if plan.post_recovery is not None:
+            plan.post_recovery.completed = True
+        else:
+            raise NoSuchEntityException("Post-Recovery does not exist for the user")
 
     store.put(plan)
 
