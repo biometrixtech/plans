@@ -393,7 +393,7 @@ The client __must__ submit a request body containing a JSON object with the foll
 * `recovery_type` __should__ be either `pre` or `post`
 
 ```
-POST /plans/active_recovery HTTPS/1.1
+PATCH /plans/active_recovery HTTPS/1.1
 Host: apis.env.fathomai.com
 Content-Type: application/json
 Authorization: eyJraWQ...ajBc4VQ
