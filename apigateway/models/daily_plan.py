@@ -16,6 +16,7 @@ class DailyPlan(Serialisable):
         self.tournaments = []
         self.pre_recovery = session.RecoverySession()
         self.post_recovery = session.RecoverySession()
+        self.completed_post_recovery_sessions = []
         self.corrective_sessions = []
         self.bump_up_sessions = []
         self.daily_readiness_survey = None
@@ -39,6 +40,7 @@ class DailyPlan(Serialisable):
                'recovery_pm': self.post_recovery.json_serialise() if self.post_recovery is not None else None,
                'pre_recovery': self.pre_recovery.json_serialise() if self.pre_recovery is not None else None,
                'post_recovery': self.post_recovery.json_serialise() if self.post_recovery is not None else None,
+               'completed_post_recovery_sessions': [c.json_serialise() for c in self.completed_post_recovery_sessions],
                'last_updated': self.last_updated,
                'daily_readiness_survey': self.daily_readiness_survey
                }
