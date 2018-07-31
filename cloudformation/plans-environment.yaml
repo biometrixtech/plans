@@ -231,11 +231,11 @@ Resources:
             Action: 'lambda:InvokeFunction'
             Principal: 'sqs.amazonaws.com'
             SourceArn: { "Fn::GetAtt": [ 'AsyncSqsQueue', "Arn" ] }
-#
-#    SessionsDynamodbTriggerMapping:
-#        Type: "AWS::Lambda::EventSourceMapping"
-#        Properties:
-#            BatchSize: 1
-#            Enabled: true
-#            EventSourceArn: { "Fn::GetAtt": [ 'AsyncSqsQueue', "Arn" ] }
-#            FunctionName: { Ref: "ApiGatewayLambda" }
+
+    SessionsDynamodbTriggerMapping:
+        Type: "AWS::Lambda::EventSourceMapping"
+        Properties:
+            BatchSize: 1
+            Enabled: true
+            EventSourceArn: { "Fn::GetAtt": [ 'AsyncSqsQueue', "Arn" ] }
+            FunctionName: { Ref: "ApiGatewayLambda" }
