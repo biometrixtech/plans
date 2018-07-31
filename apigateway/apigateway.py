@@ -122,6 +122,10 @@ def handler(event, context):
     xray_recorder.current_segment().put_http_meta('user_agent', event['headers']['User-Agent'])
     xray_recorder.current_segment().put_annotation('environment', os.environ['ENVIRONMENT'])
 
+    if 'Records' in event:
+        # An asynchronous invocation from SQS
+        event = json.loads(event['Records'][0]['body'])
+
 
     ret = app(event, context)
     ret['headers'].update({
