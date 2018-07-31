@@ -239,4 +239,3 @@ Resources:
             Enabled: true
             EventSourceArn: { "Fn::GetAtt": [ 'AsyncSqsQueue', "Arn" ] }
             FunctionName: { Ref: "ApiGatewayLambda" }
-            StartingPosition: "LATEST"
