@@ -82,11 +82,17 @@ class TrainingPlanManager(object):
 
         return max_scores
 
-    def post_session_surveys_today(self, post_session_surveys, todays_date):
+    def post_session_surveys_today(self, post_session_surveys, trigger_date):
 
         # any post session surveys from today
         # if todays_date is None:
         #    todays_date = datetime.date.today().strftime("%Y-%m-%d")
+        try:
+            todays_date_time = datetime.datetime.strptime(trigger_date, '%Y-%m-%d')
+        except ValueError:
+            todays_date_time = datetime.datetime.strptime(trigger_date, '%Y-%m-%dT%H:%M:%SZ')
+
+        todays_date = todays_date_time.strftime("%Y-%m-%d")
 
         for p in post_session_surveys:
             event_date_time = datetime.datetime.strptime(p.event_date, "%Y-%m-%d")

@@ -1,4 +1,5 @@
 from models.exercise import Exercise
+from pathlib import Path
 import csv
 
 class ExerciseLibraryDatastore(object):
@@ -9,19 +10,36 @@ class ExerciseLibraryDatastore(object):
     def side_load_exercise_list(self, exercise_list):
         self.exercise_list = exercise_list
 
-    def side_load_exericse_list_from_csv(self, csv_path):
+    def side_load_exericse_list_from_csv(self):
+        exercise_descriptions = {}
+        with open(Path(__file__).resolve().parent.parent.parent / 'database/Exercise_Descriptions.csv', newline='') as csvfile:
+            exercise_reader = csv.reader(csvfile, delimiter='\t')
+            row_count = 0
+            for row in exercise_reader:
+                if row_count > 0:
+                    exercise_descriptions[row[0]] = row[3]
+                row_count = row_count + 1
+        csvfile.close()
+
         exercises = []
-        with open(csv_path, newline='') as csvfile:
+        with open(Path(__file__).resolve().parent.parent.parent / 'database/Exercise_Library.csv', newline='') as csvfile:
             exercise_reader = csv.reader(csvfile, delimiter=',')
             row_count = 0
             for row in exercise_reader:
                 if row_count > 0:
                     if row[14] != "x":
                         exercise_item = Exercise(row[0])
+                        print(row[0])
                         exercise_item.display_name = row[1]
                         exercise_item.name = row[2]
-                        exercise_item.min_sets = int(row[16])
-                        exercise_item.max_sets = int(row[17])
+                        if row[16] == "-" or row[16] == "":
+                            exercise_item.min_sets = 0
+                        else:
+                            exercise_item.min_sets = int(row[16])
+                        if row[17] == "-" or row[17] == "":
+                            exercise_item.max_sets = 0
+                        else:
+                            exercise_item.max_sets = int(row[17])
                         if row[18] == "-" or row[18] == "":
                             exercise_item.min_reps = None
                         else:
@@ -31,10 +49,19 @@ class ExerciseLibraryDatastore(object):
                         else:
                             exercise_item.max_reps = int(row[19])
                         exercise_item.bilateral = (row[20] == "Y")
-                        exercise_item.progression_interval = int(row[21])
-                        exercise_item.exposure_target = int(row[22])
+                        if row[21] == "-" or row[21] == "":
+                            exercise_item.progression_interval = 0
+                        else:
+                            exercise_item.progression_interval = int(row[21])
+                        if row[22] == "-" or row[22] == "":
+                            exercise_item.exposure_target = 0
+                        else:
+                            exercise_item.exposure_target = int(row[22])
                         exercise_item.unit_of_measure = row[23]
-                        exercise_item.seconds_rest_between_sets = int(row[24])
+                        if row[24] == "-" or row[24] == "":
+                            exercise_item.seconds_rest_between_sets = 0
+                        else:
+                            exercise_item.seconds_rest_between_sets = int(row[24])
                         if row[25] == "-" or row[25] == "":
                             exercise_item.seconds_per_set = None
                         else:
@@ -47,6 +74,7 @@ class ExerciseLibraryDatastore(object):
                         exercise_item.technical_difficulty = row[29]
                         exercise_item.equipment_required = row[30]
                         exercise_item.youtube_id = row[32]
+                        exercise_item.description = exercise_descriptions[exercise_item.id]
                         exercises.append(exercise_item)
                 row_count = row_count + 1
         self.exercise_list = exercises
