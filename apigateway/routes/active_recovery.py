@@ -50,8 +50,10 @@ def handle_active_recovery_update():
     store.put(plan)
 
     survey_complete = plan.daily_readiness_survey_completed()
+    landing_screen = plan.define_landing_screen()
     plan = plan.json_serialise()
     plan['daily_readiness_survey_completed'] = survey_complete
+    plan['landing_screen'] = landing_screen
     del plan['daily_readiness_survey'], plan['user_id']
 
 
