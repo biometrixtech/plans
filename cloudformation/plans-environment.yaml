@@ -103,6 +103,7 @@ Resources:
             ManagedPolicyArns:
               - "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
               - "arn:aws:iam::aws:policy/AWSXrayWriteOnlyAccess"
+              - "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
             Policies:
               - PolicyName: "default"
                 PolicyDocument:
@@ -113,9 +114,9 @@ Resources:
                         Effect: "Allow"
                         Resource: { "Fn::Sub": "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:plans/${Environment}/*" }
                       - Action:
-                          - "lambda:InvokeFunction"
+                          - "sqs:SendMessage"
                         Effect: "Allow"
-                        Resource: { "Fn::Sub": "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:plans-${Environment}-apigateway-execute" }
+                        Resource: { "Fn::GetAtt": [ "AsyncSqsQueue", "Arn" ] }
                       - Effect: "Allow"
                         Action:
                           - "iot:Publish"
@@ -160,6 +161,7 @@ Resources:
                 Variables:
                     ENVIRONMENT: { Ref: 'Environment' }
                     AWS_ACCOUNT_ID: { Ref: "AWS::AccountId" }
+                    ASYNC_QUEUE_URL: { Ref: "AsyncSqsQueue" }
             Handler: "apigateway.handler"
             Runtime: "python3.6"
             Timeout: "30"
@@ -203,3 +205,60 @@ Resources:
                 TemplateVersion: { "Fn::FindInMap": [ "TemplateVersion", "Infrastructure", "Commit" ] }
             } ] }
             TimeoutInMinutes: 30
+
+    ##########################################################################################################
+    ##  SQS
+    ##########################################################################################################
+
+    AsyncSqsQueue:
+        Type: "AWS::SQS::Queue"
+        Properties:
+            DelaySeconds: 0
+            QueueName: { "Fn::Sub": "plans-${Environment}-apigateway-async" }
+#            RedrivePolicy:
+#                deadLetterTargetArn: { Ref: "AsyncDeadLetterTopic" }
+#                maxReceiveCount: 1
+            VisibilityTimeout: 300
+
+    AsyncDeadLetterTopic:
+        Type: "AWS::SNS::Topic"
+        Properties:
+            DisplayName: "Plans service asynchronous invocation dead-letter queue"
+            TopicName: { "Fn::Sub": "plans-${Environment}-apigateway-asyncdlq" }
+
+    AsyncLambdaInvokePermission:
+        Type: 'AWS::Lambda::Permission'
+        Properties:
+            FunctionName: { 'Fn::GetAtt': [ 'ApiGatewayLambda', 'Arn' ] }
+            Action: 'lambda:InvokeFunction'
+            Principal: 'sqs.amazonaws.com'
+            SourceArn: { "Fn::GetAtt": [ 'AsyncSqsQueue', "Arn" ] }
+
+    AsyncLambdaTriggerMapping:
+        Type: "AWS::Lambda::EventSourceMapping"
+        Properties:
+            BatchSize: 1
+            Enabled: true
+            EventSourceArn: { "Fn::GetAtt": [ 'AsyncSqsQueue', "Arn" ] }
+            FunctionName: { Ref: "ApiGatewayLambda" }
+
+    ##########################################################################################################
+    ## MONITORING
+    ##########################################################################################################
+
+    MonitoringStack:
+        Type: "AWS::CloudFormation::Stack"
+        Properties:
+            Parameters:
+                Environment: { Ref: "Environment" }
+            Tags:
+              - { Key: "Name", Value: { "Fn::Sub": "plans-${Environment}-monitoring" } }
+              - { Key: "Management", Value: "managed" }
+              - { Key: "Project", Value: "plans" }
+              - { Key: "Environment", Value: { Ref: "Environment" } }
+              - { Key: "Service", Value: "monitoring" }
+            TemplateURL: { "Fn::Sub": [ "https://s3.amazonaws.com/${InfrastructureBucketName}/cloudformation/plans/${TemplateVersion}/plans-monitoring.yaml", {
+                InfrastructureBucketName: { "Fn::ImportValue": "InfrastructureBucketName" },
+                TemplateVersion: { "Fn::FindInMap": [ "TemplateVersion", "Self", "Commit" ] }
+            } ] }
+            TimeoutInMinutes: 10

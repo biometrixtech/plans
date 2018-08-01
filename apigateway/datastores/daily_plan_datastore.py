@@ -46,7 +46,7 @@ class DailyPlanDatastore(object):
             daily_plan.pre_recovery = _recovery_session_from_mongodb(plan['pre_recovery']) if plan.get('pre_recovery', None) is not None else None
             daily_plan.post_recovery = _recovery_session_from_mongodb(plan['post_recovery']) if plan.get('post_recovery', None) is not None else None
             daily_plan.completed_post_recovery_sessions = \
-                [_recovery_session_from_mongodb(s) for s in plan['completed_post_recovery_sessions']]
+                [_recovery_session_from_mongodb(s) for s in plan.get('completed_post_recovery_sessions', [])]
             # daily_plan.corrective_sessions = \
             #    [_external_session_from_mongodb(s, session.SessionType.corrective)
             #     for s in plan['corrective_sessions']]
@@ -187,6 +187,7 @@ def _assigned_exercises_from_mongodb(mongo_result):
     assigned_exercise.exercise.name = _key_present("name", mongo_result)
     assigned_exercise.exercise.display_name = _key_present("display_name", mongo_result)
     assigned_exercise.exercise.youtube_id = _key_present("youtube_id", mongo_result)
+    assigned_exercise.exercise.description = _key_present("description", mongo_result)
     assigned_exercise.exercise.bilateral = _key_present("bilateral", mongo_result)
     assigned_exercise.exercise.unit_of_measure = _key_present("unit_of_measure", mongo_result)
     assigned_exercise.position_order = _key_present("position_order", mongo_result)
