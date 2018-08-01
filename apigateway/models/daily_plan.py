@@ -56,6 +56,22 @@ class DailyPlan(Serialisable):
         else:
             return False
 
+    def define_landing_screen(self):
+        if self.pre_recovery is None and self.post_recovery is None:
+            return 0.0
+        elif self.pre_recovery is not None:
+            if self.pre_recovery_completed:
+                return 1.0
+            else:
+                return 0.0
+        elif self.post_recovery is not None:
+            if self.post_recovery.completed:
+                return 1.0
+            else:
+                return 2.0
+        else:
+            return None
+
     def get_past_sessions(self, trigger_date_time):
 
         sessions = []
