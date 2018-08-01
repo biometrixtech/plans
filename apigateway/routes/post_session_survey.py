@@ -48,7 +48,7 @@ def handle_post_session_survey_create():
     endpoint = "athlete/{}/daily_plan".format(request.json['user_id'])
     headers = {'Authorization': request.headers['Authorization'],
                 'Content-Type': 'applicaiton/json'}
-    body = {'event_date': format_date(event_date)}
+    body = {'event_date': format_date(parse_datetime(event_date))}
     run_async(endpoint, method='POST', body=body, headers=headers)
 
     return {'message': 'success'}, 201

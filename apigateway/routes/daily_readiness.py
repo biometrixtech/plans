@@ -33,7 +33,7 @@ def handle_daily_readiness_create():
     endpoint = "athlete/{}/daily_plan".format(request.json['user_id'])
     headers = {'Authorization': request.headers['Authorization'],
                 'Content-Type': 'applicaiton/json'}
-    body = {'event_date': format_date(request.json['date_time'])}
+    body = {'event_date': format_date(parse_datetime(request.json['date_time']))}
     run_async(endpoint, method='POST', body=body, headers=headers)
 
     return {'message': 'success'}, 201
