@@ -85,8 +85,8 @@ class TrainingPlanManager(object):
     def post_session_surveys_today(self, post_session_surveys, todays_date):
 
         # any post session surveys from today
-        if todays_date is None:
-            todays_date = datetime.date.today().strftime("%Y-%m-%d")
+        # if todays_date is None:
+        #    todays_date = datetime.date.today().strftime("%Y-%m-%d")
 
         for p in post_session_surveys:
             event_date_time = datetime.datetime.strptime(p.event_date, "%Y-%m-%d")
@@ -116,9 +116,15 @@ class TrainingPlanManager(object):
                                                - datetime.timedelta(hours=48, minutes=0),
                                                last_daily_readiness_survey.get_event_date())
 
-        show_post_recovery = self.post_session_surveys_today(last_post_session_surveys, event_date)
-
         trigger_date_time = last_daily_readiness_survey.get_event_date()
+        trigger_date_time_string = trigger_date_time.date().strftime('%Y-%m-%d')
+
+        if event_date is None:
+            today_date = trigger_date_time_string
+        else:
+            today_date = event_date
+
+        show_post_recovery = self.post_session_surveys_today(last_post_session_surveys, today_date)
 
         survey_event_dates = [s.get_event_date() for s in last_post_session_surveys if s is not None]
 
@@ -132,8 +138,6 @@ class TrainingPlanManager(object):
         )
 
         # scheduled_sessions = self.daily_schedule_datastore.get(self.athlete_id, trigger_date_time)
-
-        trigger_date_time_string = trigger_date_time.date().strftime('%Y-%m-%d')
 
         daily_plans = self.daily_plan_datastore.get(self.athlete_id, trigger_date_time_string, trigger_date_time_string)
 
