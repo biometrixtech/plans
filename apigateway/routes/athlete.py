@@ -1,6 +1,6 @@
 from aws_xray_sdk.core import xray_recorder
 from decorators import authentication_required
-from flask import Blueprint
+from flask import Blueprint, request
 from datastores.daily_plan_datastore import DailyPlanDatastore
 from datastores.daily_readiness_datastore import DailyReadinessDatastore
 from datastores.post_session_survey_datastore import PostSessionSurveyDatastore
@@ -29,10 +29,10 @@ def create_daily_plan(athlete_id):
 
     push_plan_update(athlete_id, daily_plan)
 
-    endpoint = "athlete/{}/stats".format(request.json['user_id'])
+    endpoint = "athlete/{}/stats".format(athlete_id)
     headers = {'Authorization': request.headers['Authorization'],
                 'Content-Type': 'applicaiton/json'}
-    body = {'event_date': event_date}
+    body = {'event_date': request.json['event_date']}
     run_async(endpoint, method='POST', body=body, headers=headers)
 
     return {'message': 'Update requested'}, 202
@@ -43,7 +43,7 @@ def create_daily_plan(athlete_id):
 @xray_recorder.capture('routes.athlete.stats.update')
 def update_athlete_stats(athlete_id):
     event_date = request.json['event_date']
-    stats = StatsProcessing(athlete_id, event_date, DailyReadinessDatastore(), PostSessionSurveyDatastore()).calc_athlete_stats()
+    StatsProcessing(athlete_id, event_date, DailyReadinessDatastore(), PostSessionSurveyDatastore()).calc_athlete_stats()
     return {'message': 'Update requested'}, 202
 
 
