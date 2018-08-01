@@ -26,7 +26,7 @@ def create_daily_plan(athlete_id):
     daily_plan = TrainingPlanManager(athlete_id, ExerciseLibraryDatastore(), DailyReadinessDatastore(),
                                      PostSessionSurveyDatastore(), DailyPlanDatastore()).create_daily_plan()
     # daily_plan.last_updated = format_datetime(datetime.datetime.now())
-
+    print(request)
     push_plan_update(athlete_id, daily_plan)
 
     endpoint = "athlete/{}/stats".format(athlete_id)
