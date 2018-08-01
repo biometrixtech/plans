@@ -5,13 +5,14 @@ from tests.mocks.mock_daily_plan_datastore import DailyPlanDatastore
 from tests.mocks.mock_daily_readiness_datastore import DailyReadinessDatastore
 from tests.mocks.mock_post_session_survey_datastore import PostSessionSurveyDatastore
 from tests.mocks.mock_exercise_datastore import ExerciseLibraryDatastore
+from tests.mocks.mock_athlete_stats_datastore import AthleteStatsDatastore
 from tests.testing_utilities import TestUtilities
 from models.post_session_survey import PostSessionSurvey
 
 
 def training_plan_manager():
     mgr = tpm.TrainingPlanManager("test", ExerciseLibraryDatastore(), DailyReadinessDatastore(),
-                                  PostSessionSurveyDatastore(), DailyPlanDatastore())
+                                  PostSessionSurveyDatastore(), DailyPlanDatastore(), AthleteStatsDatastore())
     return mgr
 
 

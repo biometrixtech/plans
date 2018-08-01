@@ -3,6 +3,7 @@ from tests.mocks.mock_exercise_datastore import ExerciseLibraryDatastore
 from tests.mocks.mock_daily_readiness_datastore import DailyReadinessDatastore
 from tests.mocks.mock_post_session_survey_datastore import PostSessionSurveyDatastore
 from tests.mocks.mock_daily_plan_datastore import DailyPlanDatastore
+from tests.mocks.mock_athlete_stats_datastore import AthleteStatsDatastore
 from models.session import PracticeSession, Game, StrengthConditioningSession
 from datetime import datetime, timedelta, date, time
 from utils import format_datetime
@@ -25,7 +26,7 @@ def create_plan():
     daily_readiness_datastore.side_load_surveys([survey])
 
     mgr = TrainingPlanManager(user_id, ExerciseLibraryDatastore(), daily_readiness_datastore,
-                              PostSessionSurveyDatastore(), DailyPlanDatastore())
+                              PostSessionSurveyDatastore(), DailyPlanDatastore(), AthleteStatsDatastore())
 
     daily_plan = mgr.create_daily_plan()
 

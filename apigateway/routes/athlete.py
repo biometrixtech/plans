@@ -5,6 +5,7 @@ from datastores.daily_plan_datastore import DailyPlanDatastore
 from datastores.daily_readiness_datastore import DailyReadinessDatastore
 from datastores.post_session_survey_datastore import PostSessionSurveyDatastore
 from datastores.exercise_datastore import ExerciseLibraryDatastore
+from datastores.athlete_stats_datastore import AthleteStatsDatastore
 from logic.training_plan_management import TrainingPlanManager
 from utils import format_datetime
 from serialisable import json_serialise
@@ -23,7 +24,8 @@ iotd_client = boto3.client('iot-data')
 @xray_recorder.capture('routes.athlete.daily_plan.create')
 def create_daily_plan(athlete_id):
     daily_plan = TrainingPlanManager(athlete_id, ExerciseLibraryDatastore(), DailyReadinessDatastore(),
-                                     PostSessionSurveyDatastore(), DailyPlanDatastore()).create_daily_plan()
+                                     PostSessionSurveyDatastore(), DailyPlanDatastore(),
+                                     AthleteStatsDatastore()).create_daily_plan()
     # daily_plan.last_updated = format_datetime(datetime.datetime.now())
 
     push_plan_update(athlete_id, daily_plan)
