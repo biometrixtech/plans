@@ -49,6 +49,7 @@ class Exercise(Serialisable):
         self.name = ""
         self.display_name = ""
         self.youtube_id = ""
+        self.description = ""
         # self.body_parts_targeted = []
         self.min_reps = None
         self.max_reps = None
@@ -76,6 +77,7 @@ class Exercise(Serialisable):
         ret = {'library_id': self.id,
                'name': self.name,
                'display_name': self.display_name,
+               'description': self.description,
                'youtube_id': self.youtube_id,
                'min_sets': self.min_sets,
                'max_sets': self.max_sets,
@@ -132,6 +134,7 @@ class AssignedExercise(Serialisable):
         ret = {'name': self.exercise.name,
                'display_name': self.exercise.display_name,
                'library_id': self.exercise.id,
+               'description': self.exercise.description,
                'youtube_id': self.exercise.youtube_id,
                'bilateral': self.exercise.bilateral,
                'seconds_per_rep': self.exercise.seconds_per_rep,

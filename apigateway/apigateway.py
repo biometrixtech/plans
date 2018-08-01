@@ -106,6 +106,13 @@ def handle_application_exception(e):
 def handler(event, context):
     print(json.dumps(event))
 
+    if 'Records' in event:
+        # An asynchronous invocation from SQS
+        print('Asynchronous invocation')
+        event = json.loads(event['Records'][0]['body'])
+    else:
+        print('API Gateway invocation')
+
     # Trim trailing slashes from urls
     event['path'] = event['path'].rstrip('/')
 

@@ -52,6 +52,10 @@ def get_mongo_database():
 def get_secret(secret_name):
     client = boto3.client('secretsmanager')
     try:
+        os.environ['ENVIRONMENT']
+    except:
+        os.environ['ENVIRONMENT'] = 'dev'
+    try:
         secret_name = '/'.join(['plans', os.environ['ENVIRONMENT'], secret_name])
         get_secret_value_response = client.get_secret_value(SecretId=secret_name)
     except ClientError as e:
