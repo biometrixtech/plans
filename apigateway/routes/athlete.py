@@ -6,7 +6,8 @@ from datastores.daily_readiness_datastore import DailyReadinessDatastore
 from datastores.post_session_survey_datastore import PostSessionSurveyDatastore
 from datastores.exercise_datastore import ExerciseLibraryDatastore
 from logic.training_plan_management import TrainingPlanManager
-from utils import format_datetime
+from logic.stats_processing import StatsProcessing
+from utils import format_datetime, run_async
 from serialisable import json_serialise
 import boto3
 import datetime
@@ -27,6 +28,22 @@ def create_daily_plan(athlete_id):
     # daily_plan.last_updated = format_datetime(datetime.datetime.now())
 
     push_plan_update(athlete_id, daily_plan)
+
+    endpoint = "athlete/{}/stats".format(request.json['user_id'])
+    headers = {'Authorization': request.headers['Authorization'],
+                'Content-Type': 'applicaiton/json'}
+    body = {'event_date': event_date}
+    run_async(endpoint, method='POST', body=body, headers=headers)
+
+    return {'message': 'Update requested'}, 202
+
+
+@app.route('/<uuid:athlete_id>/stats', methods=['POST'])
+@authentication_required
+@xray_recorder.capture('routes.athlete.stats.update')
+def update_athlete_stats(athlete_id):
+    event_date = request.json['event_date']
+    stats = StatsProcessing(athlete_id, event_date, DailyReadinessDatastore(), PostSessionSurveyDatastore()).calc_athlete_stats()
     return {'message': 'Update requested'}, 202
 
 
