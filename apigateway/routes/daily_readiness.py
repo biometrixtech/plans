@@ -9,7 +9,7 @@ from decorators import authentication_required
 from exceptions import InvalidSchemaException, NoSuchEntityException
 from models.daily_readiness import DailyReadiness
 from models.soreness import MuscleSorenessSeverity, BodyPartLocation
-from utils import parse_datetime, format_datetime, format_date, run_async
+from utils import parse_datetime, format_datetime, run_async
 
 app = Blueprint('daily_readiness', __name__)
 
@@ -33,8 +33,7 @@ def handle_daily_readiness_create():
     endpoint = "athlete/{}/daily_plan".format(request.json['user_id'])
     headers = {'Authorization': request.headers['Authorization'],
                 'Content-Type': 'applicaiton/json'}
-    body = {'event_date': format_date(parse_datetime(request.json['date_time']))}
-    run_async(endpoint, method='POST', body=body, headers=headers)
+    run_async(endpoint, method='POST', body=None, headers=headers)
 
     return {'message': 'success'}, 201
 
