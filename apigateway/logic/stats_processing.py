@@ -5,7 +5,7 @@ from utils import format_datetime
 
 class StatsProcessing(object):
 
-    def __init__(self, athlete_id, event_date=None, daily_readiness_datastore, post_session_survey_datastore):
+    def __init__(self, athlete_id, event_date, daily_readiness_datastore, post_session_survey_datastore):
         self.athlete_id = athlete_id
         self.event_date = event_date
         self.daily_readiness_datastore = daily_readiness_datastore

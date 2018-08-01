@@ -39,7 +39,9 @@ def create_daily_plan(athlete_id):
 @authentication_required
 @xray_recorder.capture('routes.athlete.stats.update')
 def update_athlete_stats(athlete_id):
-    StatsProcessing(athlete_id, event_date=None, DailyReadinessDatastore(), PostSessionSurveyDatastore()).calc_athlete_stats()
+    StatsProcessing(athlete_id, event_date=None,
+    				daily_readiness_datastore=DailyReadinessDatastore(),
+    				post_session_survey_datastore=PostSessionSurveyDatastore()).calc_athlete_stats()
     return {'message': 'Update requested'}, 202
 
 
