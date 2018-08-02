@@ -81,7 +81,7 @@ def handle_session_delete(session_id):
                  session_type=session_type,
                  session_id=session_id)
 
-    update_plan()
+    # update_plan(event_date)
 
     return {'message': 'success'}, 200
 
@@ -120,7 +120,7 @@ def handle_session_sensor_data():
             _update_session(session_obj, sensor_data)
             store.update(session_obj, user_id, event_date)
 
-    update_plan()
+    # update_plan(event_date)
 
     return {'message': 'success'}, 200
 
@@ -174,9 +174,10 @@ def _check_plan_exists(user_id, event_date):
     else:
         return False
 
-def update_plan():
+def update_plan(event_date):
     endpoint = "athlete/{}/daily_plan".format(request.json['user_id'])
     headers = {'Authorization': request.headers['Authorization'],
                 'Content-Type': 'applicaiton/json'}
-    run_async(endpoint, method='POST', body=None, headers=headers)
+    body = {'event_date': event_date}
+    run_async(endpoint, method='POST', body=body, headers=headers)
  

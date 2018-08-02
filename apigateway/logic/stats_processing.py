@@ -10,17 +10,29 @@ class StatsProcessing(object):
         self.event_date = event_date
         self.daily_readiness_datastore = daily_readiness_datastore
         self.post_session_survey_datastore = post_session_survey_datastore
-        self.start_date = datetime.strptime(event_date, "%Y-%m-%d")
-        self.end_date = datetime.strptime(event_date, "%Y-%m-%d")
-        self.start_date_time = self.start_date - timedelta(days=28)
-        self.end_date_time = self.end_date + timedelta(days=1)
+        # self.start_date = None
+        # self.end_date = None
+        self.start_date_time = None
+        self.end_date_time = None
         self.acute_readiness_surveys = []
         self.chronic_readiness_surveys = []
         self.acute_post_session_surveys = []
         self.chronic_post_session_surveys = []
 
-    def calc_athlete_stats(self):
+    def set_start_end_times(self):
+        if self.event_date is None:
+            readiness_surveys = self.daily_readiness_datastore.get(self.athlete_id)
+            last_daily_readiness_survey = readiness_surveys[0]
+            event_date_time = last_daily_readiness_survey.get_event_date()
+            self.event_date = event_date_time.date().strftime('%Y-%m-%d')
+        start_date = datetime.strptime(self.event_date, "%Y-%m-%d")
+        end_date = datetime.strptime(self.event_date, "%Y-%m-%d")
+        self.start_date_time = start_date - timedelta(days=28)
+        self.end_date_time = end_date + timedelta(days=1)
 
+
+    def calc_athlete_stats(self):
+        self.set_start_end_times()
         self.load_acute_chronic_data()
 
         athlete_stats = AthleteStats(self.athlete_id)
