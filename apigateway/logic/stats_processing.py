@@ -5,11 +5,13 @@ from utils import format_datetime
 
 class StatsProcessing(object):
 
-    def __init__(self, athlete_id, event_date, daily_readiness_datastore, post_session_survey_datastore):
+    def __init__(self, athlete_id, event_date, daily_readiness_datastore, post_session_survey_datastore,
+                 athlete_stats_datastore):
         self.athlete_id = athlete_id
         self.event_date = event_date
         self.daily_readiness_datastore = daily_readiness_datastore
         self.post_session_survey_datastore = post_session_survey_datastore
+        self.athlete_stats_datastore = athlete_stats_datastore
         # self.start_date = None
         # self.end_date = None
         self.start_date_time = None
@@ -30,10 +32,13 @@ class StatsProcessing(object):
         self.start_date_time = start_date - timedelta(days=28)
         self.end_date_time = end_date + timedelta(days=1)
 
-
-    def calc_athlete_stats(self):
+    def process_athlete_stats(self):
         self.set_start_end_times()
         self.load_acute_chronic_data()
+        athlete_stats = self.calc_athlete_stats()
+        self.athlete_stats_datastore.put(athlete_stats)
+
+    def calc_athlete_stats(self):
 
         athlete_stats = AthleteStats(self.athlete_id)
         athlete_stats.event_date = self.event_date

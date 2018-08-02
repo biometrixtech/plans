@@ -177,7 +177,7 @@ def _check_plan_exists(user_id, event_date):
 def update_plan(event_date):
     endpoint = "athlete/{}/daily_plan".format(request.json['user_id'])
     headers = {'Authorization': request.headers['Authorization'],
-                'Content-Type': 'applicaiton/json'}
+                'Content-Type': 'application/json'}
     body = {'event_date': event_date}
     run_async(endpoint, method='POST', body=body, headers=headers)
  
