@@ -74,31 +74,20 @@ class StatsProcessing(object):
             x for x in self.get_session_attribute_sum("low_intensity_load", self.acute_daily_plans) if
             x is not None)
 
-        week1_sessions = [d for d in self.chronic_daily_plans if self.chronic_load_start_date_time >=
-                          d.get_event_date_time() < self.acute_start_date_time - timedelta(days=7)]
-        week2_sessions = [d for d in self.chronic_daily_plans if self.chronic_load_start_date_time
-                          + timedelta(days=7) >= d.get_event_date_time() < self.acute_start_date_time -
-                          timedelta(days=14)]
-        week3_sessions = [d for d in self.chronic_daily_plans if self.chronic_load_start_date_time
-                          + timedelta(days=14) >= d.get_event_date_time() < self.acute_start_date_time -
-                          timedelta(days=7)]
-        week4_sessions = [d for d in self.chronic_daily_plans if self.chronic_load_start_date_time
-                          + timedelta(days=21) >= d.get_event_date_time() < self.acute_start_date_time]
-
-        weeks_list = [week1_sessions, week2_sessions, week3_sessions, week4_sessions]
+        weeks_list = self.get_chronic_weeks_plans()
 
         for w in weeks_list:
 
             c_external_load_values.extend(x for x in self.get_session_attribute_sum("external_load", w) if x is not None)
 
             c_high_intensity_values.extend(x for x in self.get_session_attribute_sum("high_intensity_load", w)
-                                       if x is not None)
+                                           if x is not None)
 
             c_mod_intensity_values.extend(x for x in self.get_session_attribute_sum("mod_intensity_load", w)
-                                       if x is not None)
+                                          if x is not None)
 
             c_low_intensity_values.extend(x for x in self.get_session_attribute_sum("low_intensity_load", w)
-                                       if x is not None)
+                                          if x is not None)
 
         if len(a_external_load_values) > 0:
             athlete_stats.acute_external_total_load = sum(a_external_load_values)
@@ -119,6 +108,23 @@ class StatsProcessing(object):
             athlete_stats.chronic_external_low_intensity_load = statistics.mean(c_low_intensity_values)
 
         return athlete_stats
+
+    def get_chronic_weeks_plans(self):
+
+        week1_sessions = [d for d in self.chronic_daily_plans if self.chronic_load_start_date_time <=
+                          d.get_event_datetime() < self.chronic_load_start_date_time + timedelta(days=7)]
+        week2_sessions = [d for d in self.chronic_daily_plans if self.chronic_load_start_date_time
+                          + timedelta(days=7) <= d.get_event_datetime() < self.chronic_load_start_date_time +
+                          timedelta(days=14)]
+        week3_sessions = [d for d in self.chronic_daily_plans if self.chronic_load_start_date_time
+                          + timedelta(days=14) <= d.get_event_datetime() < self.chronic_load_start_date_time +
+                          timedelta(days=21)]
+        week4_sessions = [d for d in self.chronic_daily_plans if self.chronic_load_start_date_time
+                          + timedelta(days=21) <= d.get_event_datetime() < self.acute_start_date_time]
+
+        weeks_list = [week1_sessions, week2_sessions, week3_sessions, week4_sessions]
+
+        return weeks_list
 
     def get_session_attribute_sum(self, attribute_name, daily_plan_collection):
 
@@ -267,10 +273,10 @@ class StatsProcessing(object):
 
         if 7 <= days_difference < 14:
             acute_days = 3
-            chronic_days = days_difference
+            chronic_days = int(days_difference)
         elif 14 <= days_difference <= 28:
             acute_days = 7
-            chronic_days = days_difference
+            chronic_days = int(days_difference)
         elif days_difference > 28:
             acute_days = 7
             chronic_days = 28
@@ -278,8 +284,9 @@ class StatsProcessing(object):
         if acute_days is not None and chronic_days is not None:
             self.acute_start_date_time = self.end_date_time - timedelta(days=acute_days)
             self.chronic_start_date_time = self.end_date_time - timedelta(days=chronic_days)
-            self.chronic_load_start_date_time = (self.end_date_time - timedelta(days=self.acute_start_date_time)
-                                                 - timedelta(days=chronic_days))
+            chronic_date_time = self.acute_start_date_time - timedelta(days=chronic_days)
+            chronic_delta = self.end_date_time - chronic_date_time
+            self.chronic_load_start_date_time = self.end_date_time - chronic_delta
 
             self.acute_post_session_surveys = [p for p in post_session_surveys
                                                if p.event_date_time >= self.acute_start_date_time]
@@ -290,11 +297,13 @@ class StatsProcessing(object):
             self.chronic_readiness_surveys = [p for p in daily_readiness_surveys
                                               if p.event_date >= self.chronic_start_date_time]
 
-            self.acute_daily_plans = [p for p in daily_plans if p.get_event_date_time() >= self.acute_start_date_time]
+            self.acute_daily_plans = [p for p in daily_plans if p.get_event_datetime() >= self.acute_start_date_time]
 
-            self.chronic_daily_plans = [p for p in daily_plans if p.get_event_date_time() >=
-                                        self.chronic_load_start_date_time and
-                                        p.get_event_date_time < self.acute_start_date_time]
+            self.chronic_daily_plans = [p for p in daily_plans if self.acute_start_date_time >
+                                        p.get_event_datetime() >= self.chronic_load_start_date_time]
+
+
+
 
 
 
