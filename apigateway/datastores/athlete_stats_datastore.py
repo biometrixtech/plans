@@ -39,7 +39,7 @@ class AthleteStatsDatastore(object):
             return athlete_stats
 
         else:
-            raise NoSuchEntityException("athlete stats does not exist for the user")
+            return None
 
     @xray_recorder.capture('datastore.AthleteStatsDatastore._put_mongodb')
     def _put_mongodb(self, item):
