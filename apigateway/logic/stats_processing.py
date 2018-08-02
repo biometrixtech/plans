@@ -59,37 +59,20 @@ class StatsProcessing(object):
         c_mod_intensity_values = []
         c_low_intensity_values = []
 
-        for c in self.acute_daily_plans:
+        a_external_load_values.extend(
+            x for x in self.get_session_attribute_sum("external_load", self.acute_daily_plans) if x is not None)
 
-            a_external_load_values.extend(self.get_values_for_session_attribute("external_load", c.practice_sessions))
-            a_external_load_values.extend(self.get_values_for_session_attribute("external_load",
-                                                                                c.strength_conditioning_sessions))
-            a_external_load_values.extend(self.get_values_for_session_attribute("external_load", c.games))
-            a_external_load_values.extend(self.get_values_for_session_attribute("external_load", c.bump_up_sessions))
+        a_high_intensity_values.extend(
+            x for x in self.get_session_attribute_sum("high_intensity_load", self.acute_daily_plans) if
+            x is not None)
 
-            a_high_intensity_values.extend(self.get_values_for_session_attribute("high_intensity_load",
-                                                                                 c.practice_sessions))
-            a_high_intensity_values.extend(self.get_values_for_session_attribute("high_intensity_load",
-                                                                                 c.strength_conditioning_sessions))
-            a_high_intensity_values.extend(self.get_values_for_session_attribute("high_intensity_load", c.games))
-            a_high_intensity_values.extend(self.get_values_for_session_attribute("high_intensity_load",
-                                                                                 c.bump_up_sessions))
+        a_mod_intensity_values.extend(
+            x for x in self.get_session_attribute_sum("mod_intensity_load", self.acute_daily_plans) if
+            x is not None)
 
-            a_mod_intensity_values.extend(self.get_values_for_session_attribute("mod_intensity_load",
-                                                                                c.practice_sessions))
-            a_mod_intensity_values.extend(self.get_values_for_session_attribute("mod_intensity_load",
-                                                                                c.strength_conditioning_sessions))
-            a_mod_intensity_values.extend(self.get_values_for_session_attribute("mod_intensity_load", c.games))
-            a_mod_intensity_values.extend(self.get_values_for_session_attribute("mod_intensity_load",
-                                                                                c.bump_up_sessions))
-
-            a_low_intensity_values.extend(self.get_values_for_session_attribute("low_intensity_load",
-                                                                                c.practice_sessions))
-            a_low_intensity_values.extend(self.get_values_for_session_attribute("low_intensity_load",
-                                                                                c.strength_conditioning_sessions))
-            a_low_intensity_values.extend(self.get_values_for_session_attribute("low_intensity_load", c.games))
-            a_low_intensity_values.extend(self.get_values_for_session_attribute("low_intensity_load",
-                                                                                c.bump_up_sessions))
+        a_low_intensity_values.extend(
+            x for x in self.get_session_attribute_sum("low_intensity_load", self.acute_daily_plans) if
+            x is not None)
 
         week1_sessions = [d for d in self.chronic_daily_plans if self.chronic_load_start_date_time >=
                           d.get_event_date_time() < self.acute_start_date_time - timedelta(days=7)]
@@ -102,40 +85,19 @@ class StatsProcessing(object):
         week4_sessions = [d for d in self.chronic_daily_plans if self.chronic_load_start_date_time
                           + timedelta(days=21) >= d.get_event_date_time() < self.acute_start_date_time]
 
-        c_external_load_values.extend(x for x in self.get_chronic_sum("external_load", week1_sessions)
-                                      if x is not None)
-        c_external_load_values.extend(x for x in self.get_chronic_sum("external_load", week2_sessions)
-                                      if x is not None)
-        c_external_load_values.extend(x for x in self.get_chronic_sum("external_load", week3_sessions)
-                                      if x is not None)
-        c_external_load_values.extend(x for x in self.get_chronic_sum("external_load", week4_sessions)
-                                      if x is not None)
+        weeks_list = [week1_sessions, week2_sessions, week3_sessions, week4_sessions]
 
-        c_high_intensity_values.extend(x for x in self.get_chronic_sum("high_intensity_load", week1_sessions)
-                                       if x is not None)
-        c_high_intensity_values.extend(x for x in self.get_chronic_sum("high_intensity_load", week2_sessions)
-                                       if x is not None)
-        c_high_intensity_values.extend(x for x in self.get_chronic_sum("high_intensity_load", week3_sessions)
-                                       if x is not None)
-        c_high_intensity_values.extend(x for x in self.get_chronic_sum("high_intensity_load", week4_sessions)
+        for w in weeks_list:
+
+            c_external_load_values.extend(x for x in self.get_session_attribute_sum("external_load", w) if x is not None)
+
+            c_high_intensity_values.extend(x for x in self.get_session_attribute_sum("high_intensity_load", w)
                                        if x is not None)
 
-        c_mod_intensity_values.extend(x for x in self.get_chronic_sum("mod_intensity_load", week1_sessions)
-                                       if x is not None)
-        c_mod_intensity_values.extend(x for x in self.get_chronic_sum("mod_intensity_load", week2_sessions)
-                                       if x is not None)
-        c_mod_intensity_values.extend(x for x in self.get_chronic_sum("mod_intensity_load", week3_sessions)
-                                       if x is not None)
-        c_mod_intensity_values.extend(x for x in self.get_chronic_sum("mod_intensity_load", week4_sessions)
+            c_mod_intensity_values.extend(x for x in self.get_session_attribute_sum("mod_intensity_load", w)
                                        if x is not None)
 
-        c_low_intensity_values.extend(x for x in self.get_chronic_sum("low_intensity_load", week1_sessions)
-                                       if x is not None)
-        c_low_intensity_values.extend(x for x in self.get_chronic_sum("low_intensity_load", week2_sessions)
-                                       if x is not None)
-        c_low_intensity_values.extend(x for x in self.get_chronic_sum("low_intensity_load", week3_sessions)
-                                       if x is not None)
-        c_low_intensity_values.extend(x for x in self.get_chronic_sum("low_intensity_load", week4_sessions)
+            c_low_intensity_values.extend(x for x in self.get_session_attribute_sum("low_intensity_load", w)
                                        if x is not None)
 
         if len(a_external_load_values) > 0:
@@ -148,17 +110,17 @@ class StatsProcessing(object):
             athlete_stats.acute_external_low_intensity_load = sum(a_low_intensity_values)
 
         if len(c_external_load_values) > 0:
-            athlete_stats.chronic_external_total_load = sum(c_external_load_values)
+            athlete_stats.chronic_external_total_load = statistics.mean(c_external_load_values)
         if len(c_high_intensity_values) > 0:
-            athlete_stats.chronic_external_high_intensity_load = sum(c_high_intensity_values)
+            athlete_stats.chronic_external_high_intensity_load = statistics.mean(c_high_intensity_values)
         if len(c_mod_intensity_values) > 0:
-            athlete_stats.chronic_external_mod_intensity_load = sum(c_mod_intensity_values)
+            athlete_stats.chronic_external_mod_intensity_load = statistics.mean(c_mod_intensity_values)
         if len(c_low_intensity_values) > 0:
-            athlete_stats.chronic_external_low_intensity_load = sum(c_low_intensity_values)
+            athlete_stats.chronic_external_low_intensity_load = statistics.mean(c_low_intensity_values)
 
         return athlete_stats
 
-    def get_chronic_sum(self, attribute_name, daily_plan_collection):
+    def get_session_attribute_sum(self, attribute_name, daily_plan_collection):
 
         sum_value = None
 
