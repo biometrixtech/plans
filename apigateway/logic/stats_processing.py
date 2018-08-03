@@ -47,6 +47,7 @@ class StatsProcessing(object):
         athlete_stats = AthleteStats(self.athlete_id)
         athlete_stats.event_date = self.event_date
         athlete_stats = self.calc_survey_stats(athlete_stats)
+        athlete_stats = self.calc_training_volume_metrics(athlete_stats)
         self.athlete_stats_datastore.put(athlete_stats)
 
     def calc_training_volume_metrics(self, athlete_stats):
