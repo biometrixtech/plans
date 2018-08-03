@@ -42,10 +42,11 @@ def handle_daily_plan_get():
     daily_plans = []
     for plan in items:
         survey_complete = plan.daily_readiness_survey_completed()
-        landing_screen = plan.define_landing_screen()
+        landing_screen, nav_bar_indicator = plan.define_landing_screen()
         plan = plan.json_serialise()
         plan['daily_readiness_survey_completed'] = survey_complete
         plan['landing_screen'] = landing_screen
+        plan['nav_bar_indicator'] = nav_bar_indicator
         del plan['daily_readiness_survey'], plan['user_id']
         daily_plans.append(plan)
 
