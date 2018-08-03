@@ -18,6 +18,8 @@ class StatsProcessing(object):
         # self.end_date = None
         self.start_date_time = None
         self.end_date_time = None
+        self.acute_days = None
+        self.chronic_days = None
         self.acute_start_date_time = None
         self.chronic_start_date_time = None
         self.chronic_load_start_date_time = None
@@ -110,17 +112,17 @@ class StatsProcessing(object):
         return athlete_stats
 
     def get_chronic_weeks_plans(self):
-
-        week1_sessions = [d for d in self.chronic_daily_plans if self.chronic_load_start_date_time <=
-                          d.get_event_datetime() < self.chronic_load_start_date_time + timedelta(days=7)]
-        week2_sessions = [d for d in self.chronic_daily_plans if self.chronic_load_start_date_time
-                          + timedelta(days=7) <= d.get_event_datetime() < self.chronic_load_start_date_time +
-                          timedelta(days=14)]
-        week3_sessions = [d for d in self.chronic_daily_plans if self.chronic_load_start_date_time
-                          + timedelta(days=14) <= d.get_event_datetime() < self.chronic_load_start_date_time +
-                          timedelta(days=21)]
-        week4_sessions = [d for d in self.chronic_daily_plans if self.chronic_load_start_date_time
-                          + timedelta(days=21) <= d.get_event_datetime() < self.acute_start_date_time]
+        
+        week4_sessions = [d for d in self.chronic_daily_plans if self.acute_start_date_time - timedelta(days=28) <=
+                          d.get_event_datetime() < self.acute_start_date_time - timedelta(days=21)]
+        week3_sessions = [d for d in self.chronic_daily_plans if self.acute_start_date_time
+                          - timedelta(days=21) <= d.get_event_datetime() < self.acute_start_date_time -
+                          timedelta(days=11)]
+        week2_sessions = [d for d in self.chronic_daily_plans if self.acute_start_date_time
+                          - timedelta(days=14) <= d.get_event_datetime() < self.acute_start_date_time -
+                          timedelta(days=7)]
+        week1_sessions = [d for d in self.chronic_daily_plans if self.acute_start_date_time
+                          - timedelta(days=7) <= d.get_event_datetime() < self.acute_start_date_time]
 
         weeks_list = [week1_sessions, week2_sessions, week3_sessions, week4_sessions]
 
@@ -268,23 +270,20 @@ class StatsProcessing(object):
 
         days_difference = (self.end_date_time - earliest_survey_date_time).days
 
-        acute_days = None
-        chronic_days = None
-
         if 7 <= days_difference < 14:
-            acute_days = 3
-            chronic_days = int(days_difference)
+            self.acute_days = 3
+            self.chronic_days = int(days_difference)
         elif 14 <= days_difference <= 28:
-            acute_days = 7
-            chronic_days = int(days_difference)
+            self.acute_days = 7
+            self.chronic_days = int(days_difference)
         elif days_difference > 28:
-            acute_days = 7
-            chronic_days = 28
+            self.acute_days = 7
+            self.chronic_days = 28
 
-        if acute_days is not None and chronic_days is not None:
-            self.acute_start_date_time = self.end_date_time - timedelta(days=acute_days)
-            self.chronic_start_date_time = self.end_date_time - timedelta(days=chronic_days)
-            chronic_date_time = self.acute_start_date_time - timedelta(days=chronic_days)
+        if self.acute_days is not None and self.chronic_days is not None:
+            self.acute_start_date_time = self.end_date_time - timedelta(days=self.acute_days)
+            self.chronic_start_date_time = self.end_date_time - timedelta(days=self.chronic_days)
+            chronic_date_time = self.acute_start_date_time - timedelta(days=self.chronic_days)
             chronic_delta = self.end_date_time - chronic_date_time
             self.chronic_load_start_date_time = self.end_date_time - chronic_delta
 

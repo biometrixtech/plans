@@ -98,20 +98,27 @@ def test_chronic_correct_dates_28_days():
     pass
 
 def test_chronic_correct_dates_33_days():
-    plans = get_daily_plans(datetime(2018, 6, 1, 12, 0, 0), datetime(2018, 7, 5, 12, 0, 0))
-    surveys = get_daily_readiness_surveys(datetime(2018, 6, 1, 12, 0, 0), datetime(2018, 7, 4, 12, 0, 0))
+    plans = get_daily_plans(datetime(2018, 6, 1, 12, 0, 0), datetime(2018, 7, 3, 12, 0, 0))
+    surveys = get_daily_readiness_surveys(datetime(2018, 6, 1, 12, 0, 0), datetime(2018, 7, 3, 12, 0, 0))
     daily_plan_datastore = DailyPlanDatastore()
     daily_plan_datastore.side_load_plans(plans)
     daily_readiness_datastore = DailyReadinessDatastore()
     daily_readiness_datastore.side_load_surveys(surveys)
 
-    stats = StatsProcessing("Tester", "2018-07-04", daily_readiness_datastore, PostSessionSurveyDatastore(),
+    stats = StatsProcessing("Tester", "2018-07-03", daily_readiness_datastore, PostSessionSurveyDatastore(),
                  daily_plan_datastore, AthleteStatsDatastore())
     stats.set_start_end_times()
     stats.load_acute_chronic_data()
     weeks = stats.get_chronic_weeks_plans()
+    assert weeks[0][6].event_date == '2018-06-26T12:00:00Z'
+    assert weeks[0][0].event_date == '2018-06-20T12:00:00Z'
+    assert weeks[1][6].event_date == '2018-06-19T12:00:00Z'
+    assert weeks[1][0].event_date == '2018-06-13T12:00:00Z'
+    assert weeks[2][6].event_date == '2018-06-12T12:00:00Z'
+    assert weeks[2][0].event_date == '2018-06-06T12:00:00Z'
+    assert weeks[3][4].event_date == '2018-06-05T12:00:00Z'
+    assert weeks[3][0].event_date == '2018-06-01T12:00:00Z'
 
-    assert None is not weeks
 
 
 
