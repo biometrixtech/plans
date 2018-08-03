@@ -27,6 +27,12 @@ class AthleteStats(Serialisable):
         self.chronic_external_mod_intensity_load = None
         self.chronic_external_low_intensity_load = None
 
+    def acute_to_chronic_external_ratio(self):
+        if self.acute_external_total_load is not None and self.chronic_external_total_load is not None:
+            return self.acute_external_total_load / self.chronic_external_total_load
+        else:
+            return None
+
     def json_serialise(self):
         ret = {
             'athlete_id': self.athlete_id,
