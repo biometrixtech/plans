@@ -52,50 +52,153 @@ def get_daily_readiness_surveys(start_date, end_date):
 
     return surveys
 
+
 def test_acute_correct_dates_7_days():
-    pass
+    plans = get_daily_plans(datetime(2018, 6, 26, 12, 0, 0), datetime(2018, 7, 3, 12, 0, 0))
+    surveys = get_daily_readiness_surveys(datetime(2018, 6, 26, 12, 0, 0), datetime(2018, 7, 3, 12, 0, 0))
+    daily_plan_datastore = DailyPlanDatastore()
+    daily_plan_datastore.side_load_plans(plans)
+    daily_readiness_datastore = DailyReadinessDatastore()
+    daily_readiness_datastore.side_load_surveys(surveys)
+
+    stats = StatsProcessing("Tester", "2018-07-03", daily_readiness_datastore, PostSessionSurveyDatastore(),
+                            daily_plan_datastore, AthleteStatsDatastore())
+    stats.set_start_end_times()
+    stats.load_acute_chronic_data()
+    assert 3 == len(stats.acute_daily_plans)
+    assert '2018-07-03T12:00:00Z' == stats.acute_daily_plans[2].event_date
+    assert '2018-07-01T12:00:00Z' == stats.acute_daily_plans[0].event_date
+
+
+def test_acute_correct_dates_8_days():
+    plans = get_daily_plans(datetime(2018, 6, 25, 12, 0, 0), datetime(2018, 7, 3, 12, 0, 0))
+    surveys = get_daily_readiness_surveys(datetime(2018, 6, 25, 12, 0, 0), datetime(2018, 7, 3, 12, 0, 0))
+    daily_plan_datastore = DailyPlanDatastore()
+    daily_plan_datastore.side_load_plans(plans)
+    daily_readiness_datastore = DailyReadinessDatastore()
+    daily_readiness_datastore.side_load_surveys(surveys)
+
+    stats = StatsProcessing("Tester", "2018-07-03", daily_readiness_datastore, PostSessionSurveyDatastore(),
+                 daily_plan_datastore, AthleteStatsDatastore())
+    stats.set_start_end_times()
+    stats.load_acute_chronic_data()
+    weeks = stats.get_chronic_weeks_plans()
+    assert 3 == len(stats.acute_daily_plans)
+    assert '2018-07-03T12:00:00Z' == stats.acute_daily_plans[2].event_date
+    assert '2018-07-01T12:00:00Z' == stats.acute_daily_plans[0].event_date
+
+
+def test_acute_correct_dates_9_days():
+    plans = get_daily_plans(datetime(2018, 6, 24, 12, 0, 0), datetime(2018, 7, 3, 12, 0, 0))
+    surveys = get_daily_readiness_surveys(datetime(2018, 6, 24, 12, 0, 0), datetime(2018, 7, 3, 12, 0, 0))
+    daily_plan_datastore = DailyPlanDatastore()
+    daily_plan_datastore.side_load_plans(plans)
+    daily_readiness_datastore = DailyReadinessDatastore()
+    daily_readiness_datastore.side_load_surveys(surveys)
+
+    stats = StatsProcessing("Tester", "2018-07-03", daily_readiness_datastore, PostSessionSurveyDatastore(),
+                 daily_plan_datastore, AthleteStatsDatastore())
+    stats.set_start_end_times()
+    stats.load_acute_chronic_data()
+    weeks = stats.get_chronic_weeks_plans()
+    assert 3 == len(stats.acute_daily_plans)
+    assert '2018-07-03T12:00:00Z' == stats.acute_daily_plans[2].event_date
+    assert '2018-07-01T12:00:00Z' == stats.acute_daily_plans[0].event_date
+
 
 def test_acute_correct_dates_10_days():
-    pass
+    plans = get_daily_plans(datetime(2018, 6, 23, 12, 0, 0), datetime(2018, 7, 3, 12, 0, 0))
+    surveys = get_daily_readiness_surveys(datetime(2018, 6, 23, 12, 0, 0), datetime(2018, 7, 3, 12, 0, 0))
+    daily_plan_datastore = DailyPlanDatastore()
+    daily_plan_datastore.side_load_plans(plans)
+    daily_readiness_datastore = DailyReadinessDatastore()
+    daily_readiness_datastore.side_load_surveys(surveys)
+
+    stats = StatsProcessing("Tester", "2018-07-03", daily_readiness_datastore, PostSessionSurveyDatastore(),
+                 daily_plan_datastore, AthleteStatsDatastore())
+    stats.set_start_end_times()
+    stats.load_acute_chronic_data()
+    weeks = stats.get_chronic_weeks_plans()
+    assert 3 == len(stats.acute_daily_plans)
+    assert '2018-07-03T12:00:00Z' == stats.acute_daily_plans[2].event_date
+    assert '2018-07-01T12:00:00Z' == stats.acute_daily_plans[0].event_date
+
 
 def test_acute_correct_dates_14_days():
-    pass
+    plans = get_daily_plans(datetime(2018, 6, 19, 12, 0, 0), datetime(2018, 7, 3, 12, 0, 0))
+    surveys = get_daily_readiness_surveys(datetime(2018, 6, 19, 12, 0, 0), datetime(2018, 7, 3, 12, 0, 0))
+    daily_plan_datastore = DailyPlanDatastore()
+    daily_plan_datastore.side_load_plans(plans)
+    daily_readiness_datastore = DailyReadinessDatastore()
+    daily_readiness_datastore.side_load_surveys(surveys)
 
-def test_acute_correct_dates_20_days():
-    pass
+    stats = StatsProcessing("Tester", "2018-07-03", daily_readiness_datastore, PostSessionSurveyDatastore(),
+                 daily_plan_datastore, AthleteStatsDatastore())
+    stats.set_start_end_times()
+    stats.load_acute_chronic_data()
+    weeks = stats.get_chronic_weeks_plans()
+    assert 7 == len(stats.acute_daily_plans)
+    assert '2018-07-03T12:00:00Z' == stats.acute_daily_plans[6].event_date
+    assert '2018-06-27T12:00:00Z' == stats.acute_daily_plans[0].event_date
 
-def test_acute_correct_dates_21_days():
-    pass
-
-def test_acute_correct_dates_25_days():
-    pass
 
 def test_acute_correct_dates_28_days():
-    pass
+    plans = get_daily_plans(datetime(2018, 6, 6, 12, 0, 0), datetime(2018, 7, 3, 12, 0, 0))
+    surveys = get_daily_readiness_surveys(datetime(2018, 6, 6, 12, 0, 0), datetime(2018, 7, 3, 12, 0, 0))
+    daily_plan_datastore = DailyPlanDatastore()
+    daily_plan_datastore.side_load_plans(plans)
+    daily_readiness_datastore = DailyReadinessDatastore()
+    daily_readiness_datastore.side_load_surveys(surveys)
 
-def test_acute_correct_dates_33_days():
-    pass
+    stats = StatsProcessing("Tester", "2018-07-03", daily_readiness_datastore, PostSessionSurveyDatastore(),
+                 daily_plan_datastore, AthleteStatsDatastore())
+    stats.set_start_end_times()
+    stats.load_acute_chronic_data()
+    weeks = stats.get_chronic_weeks_plans()
+    assert 7 == len(stats.acute_daily_plans)
+    assert '2018-07-03T12:00:00Z' == stats.acute_daily_plans[6].event_date
+    assert '2018-06-27T12:00:00Z' == stats.acute_daily_plans[0].event_date
+
 
 def test_chronic_correct_dates_7_days():
-    pass
+    plans = get_daily_plans(datetime(2018, 6, 26, 12, 0, 0), datetime(2018, 7, 3, 12, 0, 0))
+    surveys = get_daily_readiness_surveys(datetime(2018, 6, 26, 12, 0, 0), datetime(2018, 7, 3, 12, 0, 0))
+    daily_plan_datastore = DailyPlanDatastore()
+    daily_plan_datastore.side_load_plans(plans)
+    daily_readiness_datastore = DailyReadinessDatastore()
+    daily_readiness_datastore.side_load_surveys(surveys)
 
-def test_chronic_correct_dates_10_days():
-    pass
+    stats = StatsProcessing("Tester", "2018-07-03", daily_readiness_datastore, PostSessionSurveyDatastore(),
+                 daily_plan_datastore, AthleteStatsDatastore())
+    stats.set_start_end_times()
+    stats.load_acute_chronic_data()
+    weeks = stats.get_chronic_weeks_plans()
+    assert 5 == len(weeks[0])
+    assert '2018-06-30T12:00:00Z' == weeks[0][4].event_date
+    assert '2018-06-26T12:00:00Z' == weeks[0][0].event_date
 
-def test_chronic_correct_dates_14_days():
-    pass
-
-def test_chronic_correct_dates_20_days():
-    pass
-
-def test_chronic_correct_dates_21_days():
-    pass
-
-def test_chronic_correct_dates_25_days():
-    pass
 
 def test_chronic_correct_dates_28_days():
-    pass
+    plans = get_daily_plans(datetime(2018, 6, 6, 12, 0, 0), datetime(2018, 7, 3, 12, 0, 0))
+    surveys = get_daily_readiness_surveys(datetime(2018, 6, 6, 12, 0, 0), datetime(2018, 7, 3, 12, 0, 0))
+    daily_plan_datastore = DailyPlanDatastore()
+    daily_plan_datastore.side_load_plans(plans)
+    daily_readiness_datastore = DailyReadinessDatastore()
+    daily_readiness_datastore.side_load_surveys(surveys)
+
+    stats = StatsProcessing("Tester", "2018-07-03", daily_readiness_datastore, PostSessionSurveyDatastore(),
+                 daily_plan_datastore, AthleteStatsDatastore())
+    stats.set_start_end_times()
+    stats.load_acute_chronic_data()
+    weeks = stats.get_chronic_weeks_plans()
+    assert weeks[0][6].event_date == '2018-06-26T12:00:00Z'
+    assert weeks[0][0].event_date == '2018-06-20T12:00:00Z'
+    assert weeks[1][6].event_date == '2018-06-19T12:00:00Z'
+    assert weeks[1][0].event_date == '2018-06-13T12:00:00Z'
+    assert weeks[2][6].event_date == '2018-06-12T12:00:00Z'
+    assert weeks[2][0].event_date == '2018-06-06T12:00:00Z'
+    assert 0 == len(weeks[3])
+
 
 def test_chronic_correct_dates_33_days():
     plans = get_daily_plans(datetime(2018, 6, 1, 12, 0, 0), datetime(2018, 7, 3, 12, 0, 0))
@@ -120,5 +223,26 @@ def test_chronic_correct_dates_33_days():
     assert weeks[3][0].event_date == '2018-06-01T12:00:00Z'
 
 
+def test_chronic_correct_dates_40_days():
+    plans = get_daily_plans(datetime(2018, 5, 25, 12, 0, 0), datetime(2018, 7, 3, 12, 0, 0))
+    surveys = get_daily_readiness_surveys(datetime(2018, 5, 25, 12, 0, 0), datetime(2018, 7, 3, 12, 0, 0))
+    daily_plan_datastore = DailyPlanDatastore()
+    daily_plan_datastore.side_load_plans(plans)
+    daily_readiness_datastore = DailyReadinessDatastore()
+    daily_readiness_datastore.side_load_surveys(surveys)
+
+    stats = StatsProcessing("Tester", "2018-07-03", daily_readiness_datastore, PostSessionSurveyDatastore(),
+                 daily_plan_datastore, AthleteStatsDatastore())
+    stats.set_start_end_times()
+    stats.load_acute_chronic_data()
+    weeks = stats.get_chronic_weeks_plans()
+    assert weeks[0][6].event_date == '2018-06-26T12:00:00Z'
+    assert weeks[0][0].event_date == '2018-06-20T12:00:00Z'
+    assert weeks[1][6].event_date == '2018-06-19T12:00:00Z'
+    assert weeks[1][0].event_date == '2018-06-13T12:00:00Z'
+    assert weeks[2][6].event_date == '2018-06-12T12:00:00Z'
+    assert weeks[2][0].event_date == '2018-06-06T12:00:00Z'
+    assert weeks[3][6].event_date == '2018-06-05T12:00:00Z'
+    assert weeks[3][0].event_date == '2018-05-30T12:00:00Z'
 
 

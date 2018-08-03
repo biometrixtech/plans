@@ -112,7 +112,7 @@ class StatsProcessing(object):
         return athlete_stats
 
     def get_chronic_weeks_plans(self):
-        
+
         week4_sessions = [d for d in self.chronic_daily_plans if self.acute_start_date_time - timedelta(days=28) <=
                           d.get_event_datetime() < self.acute_start_date_time - timedelta(days=21)]
         week3_sessions = [d for d in self.chronic_daily_plans if self.acute_start_date_time
