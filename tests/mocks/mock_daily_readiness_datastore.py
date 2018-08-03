@@ -12,7 +12,7 @@ class DailyReadinessDatastore(object):
     def side_load_surveys(self, surveys):
         self.surveys = surveys
 
-    def get(self, user_id):
+    def get(self, user_id, start_date=None, end_date=None, last_only=True):
         return self._query_mongodb(user_id)
 
     def put(self, items):
