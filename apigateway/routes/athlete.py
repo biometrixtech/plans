@@ -28,6 +28,7 @@ def create_daily_plan(athlete_id):
                                      PostSessionSurveyDatastore(), DailyPlanDatastore(),
                                      AthleteStatsDatastore()).create_daily_plan()
     # daily_plan.last_updated = format_datetime(datetime.datetime.now())
+    push_plan_update(athlete_id, daily_plan)
 
     endpoint = "athlete/{}/stats".format(athlete_id)
     headers = {'Authorization': request.headers['Authorization'],
