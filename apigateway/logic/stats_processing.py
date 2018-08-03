@@ -51,15 +51,21 @@ class StatsProcessing(object):
 
     def calc_training_volume_metrics(self, athlete_stats):
 
+        a_internal_load_values = []
         a_external_load_values = []
         a_high_intensity_values = []
         a_mod_intensity_values = []
         a_low_intensity_values = []
 
+        c_internal_load_values = []
         c_external_load_values = []
         c_high_intensity_values = []
         c_mod_intensity_values = []
         c_low_intensity_values = []
+
+        a_internal_load_values.extend(
+            x for x in self.get_session_attributes_product_sum("session_RPE", "duration_minutes",
+                                                               self.acute_daily_plans) if x is not None)
 
         a_external_load_values.extend(
             x for x in self.get_session_attribute_sum("external_load", self.acute_daily_plans) if x is not None)
@@ -80,6 +86,10 @@ class StatsProcessing(object):
 
         for w in weeks_list:
 
+            c_internal_load_values.extend(
+                x for x in self.get_session_attributes_product_sum("session_RPE", "duration_minutes", w)
+                if x is not None)
+
             c_external_load_values.extend(x for x in self.get_session_attribute_sum("external_load", w) if x is not None)
 
             c_high_intensity_values.extend(x for x in self.get_session_attribute_sum("high_intensity_load", w)
@@ -91,6 +101,9 @@ class StatsProcessing(object):
             c_low_intensity_values.extend(x for x in self.get_session_attribute_sum("low_intensity_load", w)
                                           if x is not None)
 
+        if len(a_internal_load_values) > 0:
+            athlete_stats.acute_internal_total_load = sum(a_internal_load_values)
+
         if len(a_external_load_values) > 0:
             athlete_stats.acute_external_total_load = sum(a_external_load_values)
         if len(a_high_intensity_values) > 0:
@@ -99,6 +112,9 @@ class StatsProcessing(object):
             athlete_stats.acute_external_mod_intensity_load = sum(a_mod_intensity_values)
         if len(a_low_intensity_values) > 0:
             athlete_stats.acute_external_low_intensity_load = sum(a_low_intensity_values)
+
+        if len(c_internal_load_values) > 0:
+            athlete_stats.chronic_internal_total_load = statistics.mean(c_internal_load_values)
 
         if len(c_external_load_values) > 0:
             athlete_stats.chronic_external_total_load = statistics.mean(c_external_load_values)
@@ -146,9 +162,37 @@ class StatsProcessing(object):
 
         return [sum_value]
 
+    def get_session_attributes_product_sum(self, attribute_1_name, attribute_2_name, daily_plan_collection):
+
+        sum_value = None
+
+        values = []
+
+        for c in daily_plan_collection:
+
+            values.extend(self.get_product_of_session_attributes(attribute_1_name, attribute_2_name,
+                                                                 c.practice_sessions))
+            values.extend(self.get_product_of_session_attributes(attribute_1_name, attribute_2_name,
+                                                                 c.strength_conditioning_sessions))
+            values.extend(self.get_product_of_session_attributes(attribute_1_name, attribute_2_name,
+                                                                 c.games))
+            values.extend(self.get_product_of_session_attributes(attribute_1_name, attribute_2_name,
+                                                                 c.bump_up_sessions))
+
+        if len(values) > 0:
+            sum_value = sum(values)
+
+        return [sum_value]
+
     def get_values_for_session_attribute(self, attribute_name, session_collection):
 
         values = list(getattr(c, attribute_name) for c in session_collection if getattr(c, attribute_name) is not None)
+        return values
+
+    def get_product_of_session_attributes(self, attribute_1_name, attribute_2_name, session_collection):
+
+        values = list(getattr(c, attribute_1_name) * getattr(c, attribute_1_name) for c in session_collection
+                      if getattr(c, attribute_1_name) is not None and getattr(c, attribute_2_name) is not None)
         return values
 
     def calc_survey_stats(self, athlete_stats):

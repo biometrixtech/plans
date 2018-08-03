@@ -33,6 +33,12 @@ class AthleteStats(Serialisable):
         else:
             return None
 
+    def acute_to_chronic_internal_ratio(self):
+        if self.acute_internal_total_load is not None and self.chronic_internal_total_load is not None:
+            return self.acute_internal_total_load / self.chronic_internal_total_load
+        else:
+            return None
+
     def json_serialise(self):
         ret = {
             'athlete_id': self.athlete_id,

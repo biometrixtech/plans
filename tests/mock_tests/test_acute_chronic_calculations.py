@@ -43,6 +43,26 @@ def get_daily_plans(start_date, end_date):
 
     return plans
 
+def get_daily_internal_plans(start_date, end_date):
+
+    plans = []
+
+    dates = get_dates(start_date, end_date)
+
+    i = 1
+
+    for d in dates:
+        daily_plan = DailyPlan(event_date=d.strftime("%Y-%m-%dT%H:%M:%SZ"))
+        practice_session = PracticeSession()
+        practice_session.event_date = d
+        practice_session.session_RPE = 5
+        practice_session.duration_minutes = 60
+        daily_plan.practice_sessions.append(practice_session)
+        plans.append(daily_plan)
+        i += 1
+
+    return plans
+
 def get_sessionless_daily_plans(start_date, end_date):
 
     plans = []
@@ -329,3 +349,36 @@ def test_correct_acwr_empty_load_33_days():
     athlete_stats = AthleteStats("Tester")
     athlete_stats = stats.calc_training_volume_metrics(athlete_stats)
     assert None is athlete_stats.acute_to_chronic_external_ratio()
+
+def test_correct_internal_acwr_load_33_days():
+    plans = get_daily_internal_plans(datetime(2018, 6, 1, 12, 0, 0), datetime(2018, 7, 3, 12, 0, 0))
+    surveys = get_daily_readiness_surveys(datetime(2018, 6, 1, 12, 0, 0), datetime(2018, 7, 3, 12, 0, 0))
+    daily_plan_datastore = DailyPlanDatastore()
+    daily_plan_datastore.side_load_plans(plans)
+    daily_readiness_datastore = DailyReadinessDatastore()
+    daily_readiness_datastore.side_load_surveys(surveys)
+
+    stats = StatsProcessing("Tester", "2018-07-03", daily_readiness_datastore, PostSessionSurveyDatastore(),
+                 daily_plan_datastore, AthleteStatsDatastore())
+    stats.set_start_end_times()
+    stats.load_acute_chronic_data()
+    athlete_stats = AthleteStats("Tester")
+    athlete_stats = stats.calc_training_volume_metrics(athlete_stats)
+    assert 175 / 181.25 == athlete_stats.acute_to_chronic_internal_ratio()
+
+
+def test_correct_internal_acwr_empty_load_33_days():
+    plans = get_sessionless_daily_plans(datetime(2018, 6, 1, 12, 0, 0), datetime(2018, 7, 3, 12, 0, 0))
+    surveys = get_daily_readiness_surveys(datetime(2018, 6, 1, 12, 0, 0), datetime(2018, 7, 3, 12, 0, 0))
+    daily_plan_datastore = DailyPlanDatastore()
+    daily_plan_datastore.side_load_plans(plans)
+    daily_readiness_datastore = DailyReadinessDatastore()
+    daily_readiness_datastore.side_load_surveys(surveys)
+
+    stats = StatsProcessing("Tester", "2018-07-03", daily_readiness_datastore, PostSessionSurveyDatastore(),
+                 daily_plan_datastore, AthleteStatsDatastore())
+    stats.set_start_end_times()
+    stats.load_acute_chronic_data()
+    athlete_stats = AthleteStats("Tester")
+    athlete_stats = stats.calc_training_volume_metrics(athlete_stats)
+    assert None is athlete_stats.acute_to_chronic_internal_ratio()
