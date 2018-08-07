@@ -2,7 +2,7 @@ import pytest
 import logic.exercise_mapping as exercise_mapping
 import models.session as session
 import logic.soreness_processing as soreness_and_injury
-from pathlib import Path
+
 from tests.mocks.mock_exercise_datastore import ExerciseLibraryDatastore
 from models.soreness import Soreness, BodyPart, BodyPartLocation
 
@@ -11,7 +11,7 @@ exercise_library_datastore = ExerciseLibraryDatastore()
 
 @pytest.fixture(scope="session", autouse=True)
 def load_exercises():
-    exercise_library_datastore.side_load_exericse_list_from_csv(Path(__file__).resolve().parent.parent.parent / 'database/Exercise_Library.csv')
+    exercise_library_datastore.side_load_exericse_list_from_csv()
 
 
 @pytest.fixture(scope="module")

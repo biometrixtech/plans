@@ -36,20 +36,25 @@ def handle_active_recovery_update():
     plan = store.get(user_id=user_id, start_date=event_date, end_date=event_date)[0]
     if recovery_type == 'pre':
         if plan.pre_recovery is not None:
-            plan.pre_recovery.completed = True
+            plan.pre_recovery_completed = True # plan
+            plan.pre_recovery.completed = True # recovery
         else:
             raise NoSuchEntityException("Pre-Recovery does not exist for the user")
     elif recovery_type == 'post':
         if plan.post_recovery is not None:
-            plan.post_recovery.completed = True
+            plan.post_recovery_completed = True # plan
+            plan.post_recovery.completed = True # recovery
         else:
             raise NoSuchEntityException("Post-Recovery does not exist for the user")
 
     store.put(plan)
 
     survey_complete = plan.daily_readiness_survey_completed()
+    landing_screen, nav_bar_indicator = plan.define_landing_screen()
     plan = plan.json_serialise()
     plan['daily_readiness_survey_completed'] = survey_complete
+    plan['landing_screen'] = landing_screen
+    plan['nav_bar_indicator'] = nav_bar_indicator
     del plan['daily_readiness_survey'], plan['user_id']
 
 

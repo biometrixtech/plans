@@ -31,16 +31,19 @@ def add_xray_support(request):
 
 def test_ryan_robbins_athlete_stats_day_after_week():
     user_id = "rrobbins@fakemail.com"
-    calc = StatsProcessing(user_id, "2018-07-19", DailyReadinessDatastore(), PostSessionSurveyDatastore())
-    athlete_stats = calc.calc_athlete_stats()
-    athlete_stats_data_store = AthleteStatsDatastore()
-    athlete_stats_data_store.put(athlete_stats)
-    athlete_stats_retrieved = athlete_stats_data_store.get(user_id)
+    athlete_stats_datastore = AthleteStatsDatastore()
+    calc = StatsProcessing(user_id, "2018-07-19", DailyReadinessDatastore(), PostSessionSurveyDatastore(), None,
+                           athlete_stats_datastore)
+    calc.process_athlete_stats()
+    athlete_stats_retrieved = athlete_stats_datastore.get(user_id)
     assert None is not athlete_stats_retrieved
 
 
 def test_ryan_robbins_athlete_stats_last_day_of_week():
     user_id = "rrobbins@fakemail.com"
-    calc = StatsProcessing(user_id, "2018-07-18", DailyReadinessDatastore(), PostSessionSurveyDatastore())
-    athlete_stats = calc.calc_athlete_stats()
-    assert None is not athlete_stats
+    athlete_stats_datastore = AthleteStatsDatastore()
+    calc = StatsProcessing(user_id, "2018-07-18", DailyReadinessDatastore(), PostSessionSurveyDatastore(), None,
+                           AthleteStatsDatastore())
+    calc.process_athlete_stats()
+    athlete_stats_retrieved = athlete_stats_datastore.get(user_id)
+    assert None is not athlete_stats_retrieved

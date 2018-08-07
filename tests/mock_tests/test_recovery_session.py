@@ -5,13 +5,14 @@ from tests.mocks.mock_daily_plan_datastore import DailyPlanDatastore
 from tests.mocks.mock_daily_readiness_datastore import DailyReadinessDatastore
 from tests.mocks.mock_post_session_survey_datastore import PostSessionSurveyDatastore
 from tests.mocks.mock_exercise_datastore import ExerciseLibraryDatastore
+from tests.mocks.mock_athlete_stats_datastore import AthleteStatsDatastore
 from tests.testing_utilities import TestUtilities
 from models.post_session_survey import PostSessionSurvey
 
 
 def training_plan_manager():
     mgr = tpm.TrainingPlanManager("test", ExerciseLibraryDatastore(), DailyReadinessDatastore(),
-                                  PostSessionSurveyDatastore(), DailyPlanDatastore())
+                                  PostSessionSurveyDatastore(), DailyPlanDatastore(), AthleteStatsDatastore())
     return mgr
 
 
@@ -39,15 +40,15 @@ def test_one_survey_available_with_date():
 
     assert True is surveys_today
 
-def test_no_surveys_available_no_date():
+def test_no_surveys_available_wrong_date_format():
 
     mgr = training_plan_manager()
-    surveys_today = mgr.post_session_surveys_today([], None)
+    surveys_today = mgr.post_session_surveys_today([], datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"))
 
     assert False is surveys_today
 
 
-def test_one_survey_available_no_date():
+def test_one_survey_available_wrong_date_format():
     user_id = "tester"
 
     mgr = training_plan_manager()
@@ -59,7 +60,7 @@ def test_one_survey_available_no_date():
         PostSessionSurvey(datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, None,
                           1, post_survey)
 
-    surveys_today = mgr.post_session_surveys_today([post_session_survey], None)
+    surveys_today = mgr.post_session_surveys_today([post_session_survey], datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"))
 
     assert True is surveys_today
 

@@ -14,6 +14,8 @@ class DailyPlan(Serialisable):
         self.strength_conditioning_sessions = []  # includes cross training
         self.games = []
         self.tournaments = []
+        self.pre_recovery_completed = False
+        self.post_recovery_completed = False
         self.pre_recovery = session.RecoverySession()
         self.post_recovery = session.RecoverySession()
         self.completed_post_recovery_sessions = []
@@ -36,6 +38,8 @@ class DailyPlan(Serialisable):
                'bump_up_sessions': [b.json_serialise() for b in self.bump_up_sessions],
                'cross_training_sessions': [c.json_serialise() for c in self.strength_conditioning_sessions],
                'game_sessions': [g.json_serialise() for g in self.games],
+               'pre_recovery_completed': self.pre_recovery_completed,
+               'post_recovery_completed': self.post_recovery_completed,
                'recovery_am': self.pre_recovery.json_serialise() if self.pre_recovery is not None else None,
                'recovery_pm': self.post_recovery.json_serialise() if self.post_recovery is not None else None,
                'pre_recovery': self.pre_recovery.json_serialise() if self.pre_recovery is not None else None,
@@ -51,6 +55,22 @@ class DailyPlan(Serialisable):
             return True
         else:
             return False
+
+    def define_landing_screen(self):
+        if self.pre_recovery is None and self.post_recovery is None:
+            return 0.0, 0.0
+        elif self.pre_recovery is not None:
+            if self.pre_recovery_completed:
+                return 1.0, 1.0
+            else:
+                return 0.0, 0.0
+        elif self.post_recovery is not None:
+            if self.post_recovery.completed:
+                return 2.0, None
+            else:
+                return 2.0, 2.0
+        else:
+            return 0.0, None
 
     def get_past_sessions(self, trigger_date_time):
 

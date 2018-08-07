@@ -13,12 +13,13 @@ from logic.stats_processing import StatsProcessing
 class TrainingPlanManager(object):
 
     def __init__(self, athlete_id, exercise_library_datastore, daily_readiness_datastore, post_session_survey_datastore,
-                 daily_plan_datastore):
+                 daily_plan_datastore, athlete_stats_datastore):
         self.athlete_id = athlete_id
         self.daily_readiness_datastore = daily_readiness_datastore
         self.post_session_survey_datastore = post_session_survey_datastore
         self.daily_plan_datastore = daily_plan_datastore
         self.exercise_library_datastore = exercise_library_datastore
+        self.athlete_stats_datastore = athlete_stats_datastore
 
     def calculate_pre_impact_score(self, rpe, readiness, sleep_quality, max_soreness, athlete_stats=None):
 
@@ -82,11 +83,17 @@ class TrainingPlanManager(object):
 
         return max_scores
 
-    def post_session_surveys_today(self, post_session_surveys, todays_date):
+    def post_session_surveys_today(self, post_session_surveys, trigger_date):
 
         # any post session surveys from today
-        if todays_date is None:
-            todays_date = datetime.date.today().strftime("%Y-%m-%d")
+        # if todays_date is None:
+        #    todays_date = datetime.date.today().strftime("%Y-%m-%d")
+        try:
+            todays_date_time = datetime.datetime.strptime(trigger_date, '%Y-%m-%d')
+        except ValueError:
+            todays_date_time = datetime.datetime.strptime(trigger_date, '%Y-%m-%dT%H:%M:%SZ')
+
+        todays_date = todays_date_time.strftime("%Y-%m-%d")
 
         for p in post_session_surveys:
             event_date_time = datetime.datetime.strptime(p.event_date, "%Y-%m-%d")
@@ -116,9 +123,15 @@ class TrainingPlanManager(object):
                                                - datetime.timedelta(hours=48, minutes=0),
                                                last_daily_readiness_survey.get_event_date())
 
-        show_post_recovery = self.post_session_surveys_today(last_post_session_surveys, event_date)
-
         trigger_date_time = last_daily_readiness_survey.get_event_date()
+        trigger_date_time_string = trigger_date_time.date().strftime('%Y-%m-%d')
+
+        if event_date is None:
+            today_date = trigger_date_time_string
+        else:
+            today_date = event_date
+
+        show_post_recovery = self.post_session_surveys_today(last_post_session_surveys, today_date)
 
         survey_event_dates = [s.get_event_date() for s in last_post_session_surveys if s is not None]
 
@@ -132,8 +145,6 @@ class TrainingPlanManager(object):
         )
 
         # scheduled_sessions = self.daily_schedule_datastore.get(self.athlete_id, trigger_date_time)
-
-        trigger_date_time_string = trigger_date_time.date().strftime('%Y-%m-%d')
 
         daily_plans = self.daily_plan_datastore.get(self.athlete_id, trigger_date_time_string, trigger_date_time_string)
 
@@ -163,11 +174,8 @@ class TrainingPlanManager(object):
         else:
             max_rpe = 0
 
-        '''To be implemented later, athlete_stats will then be passed to both am_impact_score and pm_impact_score
-        stats_processing = StatsProcessing(self.athlete_id,trigger_date_time_string, self.daily_readiness_datastore,
-                                           self.post_session_survey_datastore)
-        athlete_stats = stats_processing.calc_athlete_stats()
-        '''
+
+        athlete_stats = self.athlete_stats_datastore.get(self.athlete_id)
 
         text_generator = RecoveryTextGenerator()
         body_part_text = text_generator.get_text_from_body_part_list(soreness_list)
@@ -177,7 +185,8 @@ class TrainingPlanManager(object):
                                 max_rpe,
                                 last_daily_readiness_survey.readiness,
                                 last_daily_readiness_survey.sleep_quality,
-                                max_soreness
+                                max_soreness,
+                                athlete_stats
                                 )
             if daily_plan.pre_recovery is not None and pre_impact_score >= 1.5:
                 rpe_impact_score = min((max_rpe / 10) * 4, 4)
@@ -197,7 +206,8 @@ class TrainingPlanManager(object):
                 max_rpe,
                 last_daily_readiness_survey.readiness,
                 last_daily_readiness_survey.sleep_quality,
-                max_soreness
+                max_soreness,
+                athlete_stats
             )
             if daily_plan.post_recovery is not None and post_impact_score >= 1.5:
                 rpe_impact_score = min((max_rpe / 10) * 5, 5)
