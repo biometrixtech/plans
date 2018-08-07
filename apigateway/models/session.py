@@ -30,6 +30,7 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
 
     def __init__(self):
         self.id = None
+        self.sport = None
         self.duration_sensor = None
         self.external_load = None
         self.high_intensity_load = None
@@ -88,6 +89,7 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
     def json_serialise(self):
         ret = {
             'session_id': self.id,
+            'sport': self.sport,
             'description': self.description,
             # 'date': self.date,
             'event_date': format_datetime(self.event_date),
