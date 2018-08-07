@@ -217,12 +217,14 @@ The client __must__ submit a request body containing a JSON object with the foll
 {
 	"user_id": Uuid,
 	"event_date": Datetime,
+    "sport": number,
 	"session_type": number,
 	"description": string
 }
 ```
-* `event_date` __should__ reflect the date the session should be created for and should be of format `yyyy-yy-yy`.
+* `event_date` __should__ reflect the date and time the session is scheduled for.
 * `session_type` __should__ be an integer reflecting SessionType enumeration.
+* `sport` __should__ be an integer reflecting SportName enumeration.
 * `description` is __optional__ parameter to provide short description of the session they're adding
 
 ```
@@ -266,7 +268,7 @@ The client __must__ submit a request body containing a JSON object with the foll
 	"session_type": number
 }
 ```
-* `event_date` __should__ reflect the date the session should be created for and should be of format `yyyy-mm-dd`.
+* `event_date` __should__ reflect the date and time the session was scheduled for.
 * `session_type` __should__ be an integer reflecting SessionType enumeration.
 
 ```

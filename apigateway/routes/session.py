@@ -9,6 +9,7 @@ from models.session import SessionType, SessionFactory
 from models.daily_plan import DailyPlan
 from utils import parse_datetime, format_date, format_datetime, run_async
 from config import get_mongo_collection
+from logic.athlete import SportName
 
 app = Blueprint('session', __name__)
 
@@ -22,7 +23,7 @@ def handle_session_create():
     if 'event_date' not in request.json:
         raise InvalidSchemaException('Missing required parameter event_date')
     else:
-        event_date = format_date(request.json['event_date'])
+        event_date = format_datetime(request.json['event_date'])
         if event_date is None:
             raise InvalidSchemaException('event_date is not formatted correctly')
     if 'session_type' not in request.json:
@@ -33,19 +34,27 @@ def handle_session_create():
         except ValueError:
             raise InvalidSchemaException('session_type not recognized')
     user_id = request.json['user_id']
+    sport = request.json['sport']
+    sport = SportName(sport).name
+    duration = request.json["duration"]
     description = request.json.get('description', "")
-    if not _check_plan_exists(user_id, event_date):
-        plan = DailyPlan(event_date=event_date)
+    date = format_date(parse_datetime(event_date))
+    if not _check_plan_exists(user_id, date):
+        plan = DailyPlan(event_date=date)
         plan.user_id = user_id
         DailyPlanDatastore().put(plan)
+    session_data = {"sport": sport,
+                    "description": description,
+                    "duration_minutes": duration,
+                    "event_date": event_date}
 
-    session = _create_session(user_id, session_type, {"description": description})
+    session = _create_session(user_id, session_type, session_data)
 
     store = SessionDatastore()
 
     store.insert(item=session,
                  user_id=user_id,
-                 event_date=event_date
+                 event_date=date
                  )
 
     return {'message': 'success'}, 201
@@ -60,7 +69,7 @@ def handle_session_delete(session_id):
     if 'event_date' not in request.json:
         raise InvalidSchemaException('Missing required parameter event_date')
     else:
-        event_date = format_date(request.json['event_date'])
+        event_date = format_date(parse_datetime(request.json['event_date']))
         if event_date is None:
             raise InvalidSchemaException('event_date is not formatted correctly')
     if 'session_type' not in request.json:
@@ -157,8 +166,9 @@ def get_sensor_data(session):
 def _create_session(user_id, session_type, data):
     factory = SessionFactory()
     session = factory.create(SessionType(session_type))
-    for key, value in data.items():
-        setattr(session, key, value)
+    _update_session(session, data)
+    # for key, value in data.items():
+    #     setattr(session, key, value)
     return session
 
 def _update_session(session, data):
