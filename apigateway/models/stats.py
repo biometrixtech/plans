@@ -3,7 +3,7 @@ from serialisable import Serialisable
 
 
 class FitFatigueStatus(Enum):
-    Undefined = 0
+    undefined = 0
     trending_toward_fatigue = 1
     trending_toward_fitness = 2
 
@@ -68,7 +68,7 @@ class AthleteStats(Serialisable):
     def fit_fatigue_status(self):
         acute = self.acute_il_el_ratio()
         chronic = self.chronic_il_el_ratio()
-        status = FitFatigueStatus.Undefined
+        status = FitFatigueStatus.undefined
 
         if acute is not None and chronic is not None:
             if acute > chronic:
