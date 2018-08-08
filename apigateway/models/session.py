@@ -1,8 +1,10 @@
 import abc
 from enum import Enum
 import uuid
+import datetime
 from serialisable import Serialisable
-import logic.exercise as exercise
+import logic.exercise_generator as exercise
+from utils import format_datetime, parse_datetime
 
 
 class SessionType(Enum):
@@ -28,7 +30,7 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
 
     def __init__(self):
         self.id = None
-        self.duration_minutes = None
+        self.duration_sensor = None
         self.external_load = None
         self.high_intensity_load = None
         self.mod_intensity_load = None
@@ -40,8 +42,8 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         self.mod_intensity_RPE = None
         self.low_intensity_RPE = None
         self.post_session_soreness = []     # post_session_soreness object array
-        self.date = None
-        self.time = None
+        self.duration_minutes = None
+        self.event_date = None
         self.sensor_start_date_time = None
         self.sensor_end_date_time = None
         self.day_of_week = DayOfWeek.monday
@@ -60,6 +62,12 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         self.sustained_injury_or_pain = False
         self.description = ""
 
+    def __setattr__(self, name, value):
+        if name in ['event_date', 'sensor_start_date_time', 'sensor_end_date_time']:
+            if not isinstance(value, datetime.datetime) and value is not None:
+                value = parse_datetime(value)
+        super().__setattr__(name, value)
+
     @abc.abstractmethod
     def session_type(self):
         return SessionType.practice
@@ -77,19 +85,15 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         else:
             return False
 
-    @abc.abstractmethod
-    def in_daily_plan(self, date):
-        if self.date == date:
-            return True
-        else:
-            return False
-
     def json_serialise(self):
         ret = {
             'session_id': self.id,
             'description': self.description,
-            'data_transferred': self.data_transferred,
+            # 'date': self.date,
+            'event_date': format_datetime(self.event_date),
             'duration_minutes': self.duration_minutes,
+            'data_transferred': self.data_transferred,
+            'duration_sensor': self.duration_sensor,
             'external_load': self.external_load,
             'high_intensity_minutes': self.high_intensity_minutes,
             'mod_intensity_minutes': self.mod_intensity_minutes,
@@ -97,8 +101,8 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
             'high_intensity_load': self.high_intensity_load,
             'mod_intensity_load': self.mod_intensity_load,
             'low_intensity_load': self.low_intensity_load,
-            'sensor_start_date_time': self.sensor_start_date_time,
-            'sensor_end_date_time': self.sensor_end_date_time,
+            'sensor_start_date_time': format_datetime(self.sensor_start_date_time),
+            'sensor_end_date_time': format_datetime(self.sensor_end_date_time),
             'post_session_survey': self.post_session_survey
         }
         return ret
@@ -154,12 +158,6 @@ class BumpUpSession(Session):
     def missing_post_session_survey(self):
         return Session.missing_post_session_survey()
 
-    def in_daily_plan(self, date):
-        if self.date >= date:
-            return True
-        else:
-            return False
-
 
 class PracticeSession(Session):
     def __init__(self):
@@ -175,9 +173,6 @@ class PracticeSession(Session):
 
     def missing_post_session_survey(self):
         return Session.missing_post_session_survey()
-
-    def in_daily_plan(self, date):
-        return Session.in_daily_plan(date)
 
 
 class StrengthConditioningSession(Session):
@@ -195,9 +190,6 @@ class StrengthConditioningSession(Session):
     def missing_post_session_survey(self):
         return Session.missing_post_session_survey()
 
-    def in_daily_plan(self, date):
-        return Session.in_daily_plan(date)
-
 
 class Game(Session):
     def __init__(self):
@@ -213,9 +205,6 @@ class Game(Session):
 
     def missing_post_session_survey(self):
         return Session.missing_post_session_survey()
-
-    def in_daily_plan(self, date):
-        return Session.in_daily_plan(date)
 
 
 class Tournament(Session):
@@ -236,12 +225,6 @@ class Tournament(Session):
     def missing_post_session_survey(self):
         return Session.missing_post_session_survey()
 
-    def in_daily_plan(self, date):
-        if self.start_date <= date <= self.end_date:
-            return True
-        else:
-            return False
-
 
 class CorrectiveSession(Session):
     def __init__(self):
@@ -258,12 +241,6 @@ class CorrectiveSession(Session):
 
     def missing_post_session_survey(self):
         if self.session_RPE is None:
-            return True
-        else:
-            return False
-
-    def in_daily_plan(self, date):
-        if self.date >= date:
             return True
         else:
             return False
@@ -290,6 +267,7 @@ class RecoverySession(Serialisable):
         self.impact_score = 0
         self.why_text = ""
         self.goal_text = ""
+        self.completed = False
 
     def json_serialise(self):
         ret = {'minutes_duration': self.duration_minutes,
@@ -298,6 +276,7 @@ class RecoverySession(Serialisable):
                'start_time': str(self.start_time),
                'end_time': str(self.end_time),
                'impact_score': self.impact_score,
+               'completed': self.completed,
                'inhibit_exercises': [ex.json_serialise() for ex in self.inhibit_exercises],
                'lengthen_exercises': [ex.json_serialise() for ex in self.lengthen_exercises],
                'activate_exercises': [ex.json_serialise() for ex in self.activate_exercises],

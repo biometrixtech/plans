@@ -1,4 +1,4 @@
-from logic.soreness_and_injury import DailySoreness, BodyPart, BodyPartLocation
+from models.soreness import Soreness, BodyPartLocation, BodyPart
 from models.daily_readiness import DailyReadiness
 from utils import format_datetime
 import datetime
@@ -6,7 +6,13 @@ import datetime
 class DailyReadinessDatastore(object):
     mongo_collection = 'readiness'
 
-    def get(self, user_id):
+    def __init__(self):
+        self.surveys = []
+
+    def side_load_surveys(self, surveys):
+        self.surveys = surveys
+
+    def get(self, user_id, start_date=None, end_date=None, last_only=True):
         return self._query_mongodb(user_id)
 
     def put(self, items):
@@ -19,6 +25,7 @@ class DailyReadinessDatastore(object):
             raise e
 
     def _query_mongodb(self, user_id):
+        '''
         if user_id == "morning":
             daily_readiness = DailyReadiness("2018-06-27T11:00:00Z", user_id, None, 4, 5)
 
@@ -31,7 +38,7 @@ class DailyReadinessDatastore(object):
 
             soreness_list = []
 
-            daily_readiness_soreness = DailySoreness()
+            daily_readiness_soreness = Soreness()
             daily_readiness_soreness.body_part = BodyPart(BodyPartLocation(12),
                                                                               1)
             daily_readiness_soreness.severity = 2
@@ -45,7 +52,7 @@ class DailyReadinessDatastore(object):
 
             soreness_list = []
 
-            daily_readiness_soreness = DailySoreness()
+            daily_readiness_soreness = Soreness()
             daily_readiness_soreness.body_part = BodyPart(BodyPartLocation(11),
                                                                               1)
             daily_readiness_soreness.severity = 2
@@ -54,7 +61,8 @@ class DailyReadinessDatastore(object):
             daily_readiness = DailyReadiness("2018-07-11T11:00:00Z", user_id, soreness_list, 7, 8)
 
             return daily_readiness
-
+        '''
+        return self.surveys
 
     def _put_mongodb(self, item):
         item = self.item_to_mongodb(item)

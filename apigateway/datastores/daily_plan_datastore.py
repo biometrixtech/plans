@@ -43,8 +43,10 @@ class DailyPlanDatastore(object):
             # daily_plan.tournaments = \
             #     [_external_session_from_mongodb(s, session.SessionType.tournament)
             #      for s in plan['tournament_sessions']]
-            daily_plan.recovery_am = _recovery_session_from_mongodb(plan['recovery_am']) if plan['recovery_am'] is not None else None
-            daily_plan.recovery_pm = _recovery_session_from_mongodb(plan['recovery_pm']) if plan['recovery_pm'] is not None else None
+            daily_plan.pre_recovery = _recovery_session_from_mongodb(plan['pre_recovery']) if plan.get('pre_recovery', None) is not None else None
+            daily_plan.post_recovery = _recovery_session_from_mongodb(plan['post_recovery']) if plan.get('post_recovery', None) is not None else None
+            daily_plan.completed_post_recovery_sessions = \
+                [_recovery_session_from_mongodb(s) for s in plan.get('completed_post_recovery_sessions', [])]
             # daily_plan.corrective_sessions = \
             #    [_external_session_from_mongodb(s, session.SessionType.corrective)
             #     for s in plan['corrective_sessions']]
@@ -54,6 +56,8 @@ class DailyPlanDatastore(object):
             daily_plan.daily_readiness_survey = plan.get('daily_readiness_survey', None)
             daily_plan.updated = plan.get('updated', None)
             daily_plan.last_updated = plan.get('last_updated', None)
+            daily_plan.pre_recovery_completed = plan.get('pre_recovery_completed', False)
+            daily_plan.post_recovery_completed = plan.get('post_recovery_completed', False)
             ret.append(daily_plan)
 
         if len(ret) == 0:
@@ -75,11 +79,11 @@ class DailyPlanDatastore(object):
         am_recovery_bson = ()
         pm_recovery_bson = ()
 
-        if item.recovery_am is not None:
-            am_recovery_bson = self.get_recovery_bson(item.recovery_am)
+        if item.pre_recovery is not None:
+            am_recovery_bson = self.get_recovery_bson(item.pre_recovery)
 
-        if item.recovery_pm is not None:
-            pm_recovery_bson = self.get_recovery_bson(item.recovery_pm)
+        if item.post_recovery is not None:
+            pm_recovery_bson = self.get_recovery_bson(item.post_recovery)
 
         for practice_session in item.practice_sessions:
             practice_session_bson += ({'session_id': str(practice_session.id),
@@ -107,8 +111,8 @@ class DailyPlanDatastore(object):
                                'bump_up_sessions': bump_up_session_bson,
                                'cross_training_sessions': cross_training_session_bson,
                                'game_sessions': game_session_bson,
-                               'recovery_am': am_recovery_bson,
-                               'recovery_pm': pm_recovery_bson,
+                               'pre_recovery': am_recovery_bson,
+                               'post_recovery': pm_recovery_bson,
                                'last_updated': item.last_updated})
         '''
         query = {'user_id': item.user_id, 'date': item.event_date}
@@ -138,13 +142,25 @@ def _external_session_from_mongodb(mongo_result, session_type):
     factory = session.SessionFactory()
     mongo_session = factory.create(session_type)
     mongo_session.id = mongo_result["session_id"]
-    mongo_session.description = _key_present("description", mongo_result)
-    mongo_session.data_transferred = _key_present("data_transferred", mongo_result)
-    mongo_session.duration_minutes = _key_present("duration_minutes", mongo_result)
-    mongo_session.post_session_survey = _key_present("post_session_survey", mongo_result)
+    attrs_from_mongo = ["description",
+                        "event_date",
+                        "duration",
+                        "data_transferred",
+                        "duration_minutes",
+                        "external_load",
+                        "high_intensity_minutes",
+                        "mod_intensity_minutes",
+                        "low_intensity_minutes",
+                        "high_intensity_load",
+                        "mod_intensity_load",
+                        "low_intensity_load",
+                        "sensor_start_date_time",
+                        "sensor_end_date_time",
+                        "post_session_survey"]
+    for key in attrs_from_mongo:
+        setattr(mongo_session, key, _key_present(key, mongo_result))
 
     return mongo_session
-
 
 def _recovery_session_from_mongodb(mongo_result):
 
@@ -155,6 +171,7 @@ def _recovery_session_from_mongodb(mongo_result):
     recovery_session.goal_text = _key_present("goal_text", mongo_result)
     recovery_session.why_text = _key_present("why_text", mongo_result)
     recovery_session.duration_minutes = _key_present("minutes_duration", mongo_result)
+    recovery_session.completed = mongo_result.get("completed", False)
     recovery_session.inhibit_exercises = [_assigned_exercises_from_mongodb(s)
                                           for s in mongo_result['inhibit_exercises']]
     recovery_session.lengthen_exercises = [_assigned_exercises_from_mongodb(s)
@@ -172,6 +189,7 @@ def _assigned_exercises_from_mongodb(mongo_result):
     assigned_exercise.exercise.name = _key_present("name", mongo_result)
     assigned_exercise.exercise.display_name = _key_present("display_name", mongo_result)
     assigned_exercise.exercise.youtube_id = _key_present("youtube_id", mongo_result)
+    assigned_exercise.exercise.description = _key_present("description", mongo_result)
     assigned_exercise.exercise.bilateral = _key_present("bilateral", mongo_result)
     assigned_exercise.exercise.unit_of_measure = _key_present("unit_of_measure", mongo_result)
     assigned_exercise.position_order = _key_present("position_order", mongo_result)

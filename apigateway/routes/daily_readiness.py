@@ -8,7 +8,7 @@ from datastores.post_session_survey_datastore import PostSessionSurveyDatastore
 from decorators import authentication_required
 from exceptions import InvalidSchemaException, NoSuchEntityException
 from models.daily_readiness import DailyReadiness
-from logic.soreness_and_injury import MuscleSorenessSeverity, BodyPartLocation
+from models.soreness import MuscleSorenessSeverity, BodyPartLocation
 from utils import parse_datetime, format_datetime, run_async
 
 app = Blueprint('daily_readiness', __name__)
@@ -32,7 +32,7 @@ def handle_daily_readiness_create():
 
     endpoint = "athlete/{}/daily_plan".format(request.json['user_id'])
     headers = {'Authorization': request.headers['Authorization'],
-                'Content-Type': 'applicaiton/json'}
+                'Content-Type': 'application/json'}
     run_async(endpoint, method='POST', body=None, headers=headers)
 
     return {'message': 'success'}, 201

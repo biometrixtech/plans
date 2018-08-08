@@ -7,6 +7,7 @@ import re
 import sys
 import traceback
 from utils import validate_uuid4
+import config
 
 
 # Break out of Lambda's X-Ray sandbox so we can define our own segments and attach metadata, annotations, etc, to them
@@ -73,6 +74,12 @@ app.register_blueprint(post_session_survey_routes, url_prefix='/plans/post_sessi
 from routes.session import app as add_delete_session_routes
 app.register_blueprint(add_delete_session_routes, url_prefix='/plans/session')
 
+from routes.daily_schedule import app as daily_schedule_routes
+app.register_blueprint(daily_schedule_routes, url_prefix='/plans/schedule')
+
+from routes.active_recovery import app as active_recovery_routes
+app.register_blueprint(active_recovery_routes, url_prefix='/plans/active_recovery')
+
 
 @app.errorhandler(500)
 def handle_server_error(e):
@@ -99,8 +106,18 @@ def handle_application_exception(e):
 def handler(event, context):
     print(json.dumps(event))
 
+    if 'Records' in event:
+        # An asynchronous invocation from SQS
+        print('Asynchronous invocation')
+        event = json.loads(event['Records'][0]['body'])
+    else:
+        print('API Gateway invocation')
+
     # Trim trailing slashes from urls
     event['path'] = event['path'].rstrip('/')
+
+    # Trim semantic versioning string from urls, if present
+    event['path'] = event['path'].replace('/plans/latest/', '/plans/').replace('/plans/1.0.0/', '/plans/')
 
     # Pass tracing info to X-Ray
     if 'X-Amzn-Trace-Id-Safe' in event['headers']:
@@ -118,22 +135,6 @@ def handler(event, context):
     xray_recorder.current_segment().put_http_meta('user_agent', event['headers']['User-Agent'])
     xray_recorder.current_segment().put_annotation('environment', os.environ['ENVIRONMENT'])
 
-
-    # Load mongo details from secrets manager
-    from config import get_secret
-    config = get_secret('mongo')
-    os.environ["MONGO_HOST"] = config['host']
-    os.environ["MONGO_REPLICASET"] = config['replicaset']
-    os.environ["MONGO_DATABASE"] = config['database']
-    os.environ["MONGO_USER"] = config['user']
-    os.environ["MONGO_PASSWORD"] = config['password']
-    os.environ["MONGO_COLLECTION_DAILYREADINESS"] = config['collection_dailyreadiness']
-    os.environ["MONGO_COLLECTION_READINESS"] = config['collection_readiness']
-    os.environ["MONGO_COLLECTION_DAILYPLAN"] = config['collection_dailyplan']
-    os.environ["MONGO_COLLECTION_EXERCISELIBRARY"] = config['collection_exerciselibrary']
-    os.environ["MONGO_COLLECTION_TRAINING"] = config['collection_training']
-    os.environ["MONGO_COLLECTION_TRAININGSCHEDULE"] = config['collection_trainingschedule']
-    os.environ["MONGO_COLLECTION_ATHLETESEASON"] = config['collection_athleteseason']
 
     ret = app(event, context)
     ret['headers'].update({

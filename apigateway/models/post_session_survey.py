@@ -1,6 +1,6 @@
 from serialisable import Serialisable
 
-from logic.soreness_and_injury import BodyPart, DailySoreness, BodyPartLocation
+from models.soreness import Soreness, BodyPartLocation, BodyPart
 from models.session import SessionType
 import datetime
 from utils import parse_datetime, format_datetime
@@ -58,7 +58,7 @@ class PostSurvey(Serialisable):
         return ret
 
     def _soreness_from_dict(self, soreness_dict, event_date):
-        soreness = DailySoreness()
+        soreness = Soreness()
         soreness.body_part = BodyPart(BodyPartLocation(soreness_dict['body_part']), None)
         soreness.severity = soreness_dict['severity']
         soreness.side = self._key_present('side', soreness_dict)

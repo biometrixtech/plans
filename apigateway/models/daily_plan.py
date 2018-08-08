@@ -1,6 +1,8 @@
 from serialisable import Serialisable
 from utils import parse_datetime
+from datetime import datetime
 import models.session as session
+from utils import format_datetime
 
 
 class DailyPlan(Serialisable):
@@ -12,8 +14,11 @@ class DailyPlan(Serialisable):
         self.strength_conditioning_sessions = []  # includes cross training
         self.games = []
         self.tournaments = []
-        self.recovery_am = session.RecoverySession()
-        self.recovery_pm = session.RecoverySession()
+        self.pre_recovery_completed = False
+        self.post_recovery_completed = False
+        self.pre_recovery = session.RecoverySession()
+        self.post_recovery = session.RecoverySession()
+        self.completed_post_recovery_sessions = []
         self.corrective_sessions = []
         self.bump_up_sessions = []
         self.daily_readiness_survey = None
@@ -33,8 +38,13 @@ class DailyPlan(Serialisable):
                'bump_up_sessions': [b.json_serialise() for b in self.bump_up_sessions],
                'cross_training_sessions': [c.json_serialise() for c in self.strength_conditioning_sessions],
                'game_sessions': [g.json_serialise() for g in self.games],
-               'recovery_am': self.recovery_am.json_serialise() if self.recovery_am is not None else None,
-               'recovery_pm': self.recovery_pm.json_serialise() if self.recovery_pm is not None else None,
+               'pre_recovery_completed': self.pre_recovery_completed,
+               'post_recovery_completed': self.post_recovery_completed,
+               'recovery_am': self.pre_recovery.json_serialise() if self.pre_recovery is not None else None,
+               'recovery_pm': self.post_recovery.json_serialise() if self.post_recovery is not None else None,
+               'pre_recovery': self.pre_recovery.json_serialise() if self.pre_recovery is not None else None,
+               'post_recovery': self.post_recovery.json_serialise() if self.post_recovery is not None else None,
+               'completed_post_recovery_sessions': [c.json_serialise() for c in self.completed_post_recovery_sessions],
                'last_updated': self.last_updated,
                'daily_readiness_survey': self.daily_readiness_survey
                }
@@ -45,6 +55,54 @@ class DailyPlan(Serialisable):
             return True
         else:
             return False
+
+    def define_landing_screen(self):
+        if self.pre_recovery is None and self.post_recovery is None:
+            return 0.0, 0.0
+        elif self.pre_recovery is not None:
+            if self.pre_recovery_completed:
+                return 1.0, 1.0
+            else:
+                return 0.0, 0.0
+        elif self.post_recovery is not None:
+            if self.post_recovery.completed:
+                return 2.0, None
+            else:
+                return 2.0, 2.0
+        else:
+            return 0.0, None
+
+    def get_past_sessions(self, trigger_date_time):
+
+        sessions = []
+        practice_sessions = [x for x in self.practice_sessions if x.event_date is not None and
+                             x.event_date < trigger_date_time]
+        game_sessions = [x for x in self.games if x.event_date is not None and
+                         x.event_date < trigger_date_time]
+        cross_training_sessions = [x for x in self.strength_conditioning_sessions if x.event_date is not None and
+                                   x.event_date < trigger_date_time]
+
+        sessions.extend(practice_sessions)
+        sessions.extend(game_sessions)
+        sessions.extend(cross_training_sessions)
+
+        return sessions
+
+    def get_future_sessions(self, trigger_date_time):
+
+        sessions = []
+        practice_sessions = [x for x in self.practice_sessions if x.event_date is not None and
+                             x.event_date > trigger_date_time]
+        game_sessions = [x for x in self.games if x.event_date is not None and
+                         x.event_date > trigger_date_time]
+        cross_training_sessions = [x for x in self.strength_conditioning_sessions if x.event_date is not None and
+                                   x.event_date > trigger_date_time]
+
+        sessions.extend(practice_sessions)
+        sessions.extend(game_sessions)
+        sessions.extend(cross_training_sessions)
+
+        return sessions
 
     def add_scheduled_sessions(self, scheduled_sessions):
 

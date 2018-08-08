@@ -1,10 +1,7 @@
 from aws_xray_sdk.core import xray_recorder
 from config import get_mongo_collection
-from logic.soreness_and_injury import DailySoreness, BodyPart, BodyPartLocation
 from models.stats import AthleteStats
-from utils import format_datetime, parse_datetime
 from exceptions import NoSuchEntityException
-import datetime
 
 
 class AthleteStatsDatastore(object):
@@ -42,7 +39,7 @@ class AthleteStatsDatastore(object):
             return athlete_stats
 
         else:
-            raise NoSuchEntityException("athlete stats does not exist for the user")
+            return None
 
     @xray_recorder.capture('datastore.AthleteStatsDatastore._put_mongodb')
     def _put_mongodb(self, item):

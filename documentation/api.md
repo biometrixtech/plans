@@ -161,7 +161,7 @@ The client __must__ submit a request body containing a JSON object with the foll
 	}
 }
 ```
-* `event_date` __should__ reflect the date which the session happened and should be of format `yyyy-mm-dd`
+* `event_date` __should__ reflect the date and time when the survey happened
 * `session_id` __should__ be id of the session associated. It's __optional__ if the survey is associated with new session that doesn't exist in daily_plan
 * `session_type` __should__ be an integer reflecting enumeration of different session type (0-5)
 * `RPE` __should__ be an integer between 1 and 10
@@ -232,7 +232,7 @@ Content-Type: application/json
 Authorization: eyJraWQ...ajBc4VQ
 
 {
-    "user_id": "morning_practice_2",
+    "user_id": "02cb7965-7921-493a-80d4-6b278c928fad",
     "event_date": "2018-07-11",
     "session_type": 0,
     "description": "evening biking"
@@ -276,7 +276,7 @@ Content-Type: application/json
 Authorization: eyJraWQ...ajBc4VQ
 
 {
-    "user_id": "morning_practice_2",
+    "user_id": "02cb7965-7921-493a-80d4-6b278c928fad",
     "event_date": "2018-07-11",
     "session_type": 1
 }
@@ -339,7 +339,7 @@ Content-Type: application/json
 Authorization: eyJraWQ...ajBc4VQ
 
 {
-    "user_id": "e8514489-8de9-47e0-b3d5-b15da244783f",
+    "user_id": "02cb7965-7921-493a-80d4-6b278c928fad",
     "sessions":
     [
         {
@@ -367,6 +367,122 @@ Authorization: eyJraWQ...ajBc4VQ
 }
 ```
 
+
+### Active Recovery
+
+#### Mark Completed
+
+This endpoint can be called to mark either the pre- or post-recovery completed.
+
+##### Query String
+ 
+The client __must__ submit a request to the endpoint `/plans/active_recovery`. The request method __must__ be `PATCH`.
+
+##### Request
+
+The client __must__ submit a request body containing a JSON object with the following schema:
+```
+{
+    "user_id": Uuid,
+    "event_date": Datetime,
+    "recovery_type": string,
+    "description": string
+}
+```
+* `event_date` __should__ should be of format `yyyy-yy-yy`.
+* `recovery_type` __should__ be either `pre` or `post`
+
+```
+PATCH /plans/active_recovery HTTPS/1.1
+Host: apis.env.fathomai.com
+Content-Type: application/json
+Authorization: eyJraWQ...ajBc4VQ
+
+{
+    "user_id": "02cb7965-7921-493a-80d4-6b278c928fad",
+    "event_date": "2018-07-31",
+    "recovery_type": "pre"
+}
+```
+##### Responses
+ 
+ If the write was successful, the Service __will__ respond with HTTP Status `202 Accepted`, and return the daily_plan in the body with following syntax.
+ 
+```
+{
+    "daily_plans": [daily_plan]
+}
+```
+* `daily_plan` will have the same structure as defined in output of daily_plan route.
+
+
+### Schedule
+
+#### Daily Schedule
+This API can be used to submit athlete's daily schedule when they first open the app.
+
+##### Query String
+The client __must__ submit a request to the endpoint `/plans/daily_schedule`. The request method __must__ be `POST`.
+
+##### Request
+The client __must__ submit a request body containing a JSON object with the following schema:
+```
+{
+    "user_id": Uuid,
+    "event_date": Datetime
+    "sessions": [Session, Session]
+}
+```
+* `event_date` __should__ be reflect the time when the daily_schedule was completed
+* `Session` object __should__ have the following schema
+```
+    {
+        "session_type": number,
+        "start_time": Datetime,
+        "duration": number,
+        "description": string
+    }
+```
+* `start_time` should reflect the date and time when the session is scheduled
+* `duration` should be in minutes
+
+```
+POST /plans/daily_schedule HTTPS/1.1
+Host: apis.env.fathomai.com
+Content-Type: application/json
+Authorization: eyJraWQ...ajBc4VQ
+
+{
+    "user_id": "02cb7965-7921-493a-80d4-6b278c928fad",
+    "event_date": "2018-07-26",
+    "sessions":
+    [
+        {
+            "session_type": 0,
+            "event_date": "2018-07-26T07:30:00Z",
+            "duration": 90,
+            "descrption": "Morning Practice"
+        },
+        {
+            "session_type": 1,
+            "event_date": "2018-07-26T19:30:00Z",
+            "duration": 30,
+            "description": "Evening Biking"
+        }
+        ]
+}
+```
+##### Responses
+ 
+ If the write was successful, the Service __will__ respond with HTTP Status `201 Created`, with a body with the following syntax:
+ 
+```
+{
+    "sessions": [Session, Session]
+}
+```
+If there were no session scheduled/created for time prior to the schedule being created by the user __sessions__ will be an empty list.
+Each session will have __uuid__, __date__, __time__ to be used to ask user for post-session survey.
 
 ### Weekly Training
 
@@ -493,10 +609,12 @@ The client __must__ submit a request body containing a JSON object with the foll
 ```
 {
 	"user_id": Uuid,
+    "event_date": Datetime
 	"start_date": string,
 	"end_date": string
 }
 ```
+* `event_date` __should__ reflect the time (in local timezone) when the api call is made.
 * `start_date` __should__ should be of format `yyyy-mm-dd`
 * `end_date` __should__ should be of format `yyyy-mm-dd` but is __optional__
 
@@ -507,9 +625,9 @@ Content-Type: application/json
 Authorization: eyJraWQ...ajBc4VQ
 
 {
-	"user_id": "test_user",
-	"start_date": "2018-06-26",
-	"end_date": "2018-06-27"
+    "user_id": "02cb7965-7921-493a-80d4-6b278c928fad",
+    "event_date": "2018-07-31T02:50:02Z",
+    "start_date": "2018-07-31"
 }
 ```
 ##### Responses
@@ -527,85 +645,468 @@ The Service __will__ respond with HTTP Status `200 OK`, with a body with the fol
 {
     "daily_plans": [
         {
-            "date": "2018-07-17",
-            "practice_sessions": [],
             "bump_up_sessions": [],
-            "strength_conditioning_sessions": [],
-            "games": [],
-            "corrective_sessions": [],
-            "tournaments": [],
+            "cross_training_sessions": [],
             "daily_readiness_survey_completed": true,
-            "recovery_am": {
-                "minutes_duration": 14,
-                "start_time": "2018-07-17 00:00:00",
-                "end_time": "2018-07-17 12:00:00",
-                "impact_score": 3,
-                "activate_exercises": [],
+            "date": "2018-07-30",
+            "game_sessions": [],
+            "last_updated": "2018-07-30T21:02:25Z",
+            "post_recovery": {
+                "activate_exercises": [
+                    {
+                        "bilateral": true,
+                        "display_name": "Bird-dog (Opposite Arm/Leg Raise)",
+                        "goal_text": "Focused muscle activation",
+                        "library_id": "50",
+                        "name": "Quadruped Arm/Opposite Leg Raise",
+                        "position_order": 10,
+                        "reps_assigned": 10,
+                        "seconds_duration": 60,
+                        "seconds_per_rep": 3,
+                        "seconds_per_set": null,
+                        "sets_assigned": 1,
+                        "unit_of_measure": "count",
+                        "youtube_id": "wiFNA3sqjCA"
+                    },
+                    {
+                        "bilateral": false,
+                        "display_name": "Posterior Pelvic Tilt",
+                        "goal_text": "Focused muscle activation",
+                        "library_id": "79",
+                        "name": "Posterior Pelvic Tilt",
+                        "position_order": 11,
+                        "reps_assigned": 10,
+                        "seconds_duration": 20,
+                        "seconds_per_rep": 2,
+                        "seconds_per_set": null,
+                        "sets_assigned": 1,
+                        "unit_of_measure": "count",
+                        "youtube_id": "q0gRZJ5M3ls"
+                    },
+                    {
+                        "bilateral": true,
+                        "display_name": "Lying Knee Flexion and Hip Internal Rotation",
+                        "goal_text": "Increase strength",
+                        "library_id": "32",
+                        "name": "Knee Flexion with Hip Internally Rotated",
+                        "position_order": 12,
+                        "reps_assigned": 10,
+                        "seconds_duration": 40,
+                        "seconds_per_rep": 2,
+                        "seconds_per_set": null,
+                        "sets_assigned": 1,
+                        "unit_of_measure": "count",
+                        "youtube_id": "ToOjPbDb6wQ"
+                    }
+                ],
+                "end_time": "None",
+                "goal_text": "Get stronger and move your groin, knee and hip more efficiently to prevent fatigue",
+                "impact_score": 2,
                 "inhibit_exercises": [
                     {
                         "bilateral": true,
-                        "library_id": "3",
-                        "name": "SMR - Hamstrings",
+                        "display_name": "Foam Roll - Hip Flexor",
+                        "goal_text": "Increase blood flow",
+                        "library_id": "54",
+                        "name": "SMR - Hip Flexor",
                         "position_order": 0,
                         "reps_assigned": 30,
                         "seconds_duration": 60,
                         "seconds_per_rep": null,
                         "seconds_per_set": 30,
                         "sets_assigned": 1,
-                        "unit_of_measure": "seconds"
+                        "unit_of_measure": "seconds",
+                        "youtube_id": "bdbsy5vFz10"
+                    },
+                    {
+                        "bilateral": true,
+                        "display_name": "Foam Roll - Outer Thigh (IT Band)",
+                        "goal_text": "Increase blood flow",
+                        "library_id": "4",
+                        "name": "SMR - IT-Band",
+                        "position_order": 1,
+                        "reps_assigned": 30,
+                        "seconds_duration": 60,
+                        "seconds_per_rep": null,
+                        "seconds_per_set": 30,
+                        "sets_assigned": 1,
+                        "unit_of_measure": "seconds",
+                        "youtube_id": "asigNf1sh-k"
+                    },
+                    {
+                        "bilateral": true,
+                        "display_name": "Foam Roll - Hamstrings",
+                        "goal_text": "Increase blood flow",
+                        "library_id": "3",
+                        "name": "SMR - Hamstrings",
+                        "position_order": 2,
+                        "reps_assigned": 30,
+                        "seconds_duration": 60,
+                        "seconds_per_rep": null,
+                        "seconds_per_set": 30,
+                        "sets_assigned": 1,
+                        "unit_of_measure": "seconds",
+                        "youtube_id": "wQ6uUuBWCbw"
+                    },
+                    {
+                        "bilateral": true,
+                        "display_name": "Foam Roll - Inner Thigh (Adductor)",
+                        "goal_text": "Increase blood flow",
+                        "library_id": "1",
+                        "name": "SMR - Adductors",
+                        "position_order": 3,
+                        "reps_assigned": 30,
+                        "seconds_duration": 60,
+                        "seconds_per_rep": null,
+                        "seconds_per_set": 30,
+                        "sets_assigned": 1,
+                        "unit_of_measure": "seconds",
+                        "youtube_id": "vkVg1dEmjwE"
+                    },
+                    {
+                        "bilateral": true,
+                        "display_name": "Foam Roll - Quads",
+                        "goal_text": "Increase flexibility",
+                        "library_id": "48",
+                        "name": "SMR Quadriceps",
+                        "position_order": 4,
+                        "reps_assigned": 30,
+                        "seconds_duration": 60,
+                        "seconds_per_rep": null,
+                        "seconds_per_set": 30,
+                        "sets_assigned": 1,
+                        "unit_of_measure": "seconds",
+                        "youtube_id": "ERTVBjwgPS4"
                     }
                 ],
                 "integrate_exercises": [],
                 "lengthen_exercises": [
                     {
                         "bilateral": true,
-                        "library_id": "49",
-                        "name": "Kneeling Hip Flexor Static Stretch",
-                        "position_order": 7,
+                        "display_name": "Standing Outer Hip (TFL) Stretch",
+                        "goal_text": "Increase flexibility",
+                        "library_id": "28",
+                        "name": "Standing TFL Static Stretch",
+                        "position_order": 5,
                         "reps_assigned": 30,
                         "seconds_duration": 60,
                         "seconds_per_rep": null,
                         "seconds_per_set": 30,
                         "sets_assigned": 1,
-                        "unit_of_measure": "seconds"
+                        "unit_of_measure": "seconds",
+                        "youtube_id": "ClJL9Kn5DHw"
+                    },
+                    {
+                        "bilateral": true,
+                        "display_name": "Lunging Hip Stretch",
+                        "goal_text": "Increase flexibility",
+                        "library_id": "49",
+                        "name": "Kneeling Hip Flexor Static Stretch",
+                        "position_order": 6,
+                        "reps_assigned": 30,
+                        "seconds_duration": 60,
+                        "seconds_per_rep": null,
+                        "seconds_per_set": 30,
+                        "sets_assigned": 1,
+                        "unit_of_measure": "seconds",
+                        "youtube_id": "XbN3TvLEm2A"
+                    },
+                    {
+                        "bilateral": false,
+                        "display_name": "Child's Pose (Arms Straight)",
+                        "goal_text": "Increase flexibility",
+                        "library_id": "103",
+                        "name": "Child's Pose Arms Straight",
+                        "position_order": 7,
+                        "reps_assigned": 30,
+                        "seconds_duration": 30,
+                        "seconds_per_rep": null,
+                        "seconds_per_set": 30,
+                        "sets_assigned": 1,
+                        "unit_of_measure": "seconds",
+                        "youtube_id": "pJcobQf324o"
+                    },
+                    {
+                        "bilateral": true,
+                        "display_name": "Lying Hamstring Stretch",
+                        "goal_text": "Increase flexibility",
+                        "library_id": "9",
+                        "name": "Hamstrings Static Stretch ",
+                        "position_order": 8,
+                        "reps_assigned": 30,
+                        "seconds_duration": 60,
+                        "seconds_per_rep": null,
+                        "seconds_per_set": 30,
+                        "sets_assigned": 1,
+                        "unit_of_measure": "seconds",
+                        "youtube_id": "z73l6oZUniQ"
+                    },
+                    {
+                        "bilateral": true,
+                        "display_name": "Standing Inner Thigh (Adductor) Stretch",
+                        "goal_text": "Increase flexibility",
+                        "library_id": "8",
+                        "name": "Adductors Static Stretch",
+                        "position_order": 9,
+                        "reps_assigned": 30,
+                        "seconds_duration": 60,
+                        "seconds_per_rep": null,
+                        "seconds_per_set": 30,
+                        "sets_assigned": 1,
+                        "unit_of_measure": "seconds",
+                        "youtube_id": "Qmq5fGSrAmg"
                     }
-                ]
+                ],
+                "minutes_duration": 11.5,
+                "start_time": "None",
+                "why_text": "mild soreness and discomfort and hard effort"
             },
+            "practice_sessions": [
+                {
+                    "data_transferred": false,
+                    "description": "",
+                    "duration_minutes": null,
+                    "duration_sensor": null,
+                    "event_date": null,
+                    "external_load": null,
+                    "high_intensity_load": null,
+                    "high_intensity_minutes": null,
+                    "low_intensity_load": null,
+                    "low_intensity_minutes": null,
+                    "mod_intensity_load": null,
+                    "mod_intensity_minutes": null,
+                    "post_session_survey": {
+                        "RPE": 4,
+                        "event_date": "2018-07-30T18:05:20Z",
+                        "soreness": [
+                            {
+                                "body_part": 7,
+                                "severity": 1,
+                                "side": 2
+                            },
+                            {
+                                "body_part": 4,
+                                "severity": 2,
+                                "side": 2
+                            }
+                        ]
+                    },
+                    "sensor_end_date_time": null,
+                    "sensor_start_date_time": null,
+                    "session_id": "99d64d90-a6c0-4593-835a-cfa04e97871e"
+                }
+            ],
+            "pre_recovery": null,
+            "recovery_am": null,
             "recovery_pm": {
-                "minutes_duration": 14,
-                "start_time": "2018-07-17 12:00:00",
-                "end_time": "2018-07-18 00:00:00",
-                "impact_score": 3,
+                "activate_exercises": [
+                    {
+                        "bilateral": true,
+                        "display_name": "Bird-dog (Opposite Arm/Leg Raise)",
+                        "goal_text": "Focused muscle activation",
+                        "library_id": "50",
+                        "name": "Quadruped Arm/Opposite Leg Raise",
+                        "position_order": 10,
+                        "reps_assigned": 10,
+                        "seconds_duration": 60,
+                        "seconds_per_rep": 3,
+                        "seconds_per_set": null,
+                        "sets_assigned": 1,
+                        "unit_of_measure": "count",
+                        "youtube_id": "wiFNA3sqjCA"
+                    },
+                    {
+                        "bilateral": false,
+                        "display_name": "Posterior Pelvic Tilt",
+                        "goal_text": "Focused muscle activation",
+                        "library_id": "79",
+                        "name": "Posterior Pelvic Tilt",
+                        "position_order": 11,
+                        "reps_assigned": 10,
+                        "seconds_duration": 20,
+                        "seconds_per_rep": 2,
+                        "seconds_per_set": null,
+                        "sets_assigned": 1,
+                        "unit_of_measure": "count",
+                        "youtube_id": "q0gRZJ5M3ls"
+                    },
+                    {
+                        "bilateral": true,
+                        "display_name": "Lying Knee Flexion and Hip Internal Rotation",
+                        "goal_text": "Increase strength",
+                        "library_id": "32",
+                        "name": "Knee Flexion with Hip Internally Rotated",
+                        "position_order": 12,
+                        "reps_assigned": 10,
+                        "seconds_duration": 40,
+                        "seconds_per_rep": 2,
+                        "seconds_per_set": null,
+                        "sets_assigned": 1,
+                        "unit_of_measure": "count",
+                        "youtube_id": "ToOjPbDb6wQ"
+                    }
+                ],
+                "end_time": "None",
+                "goal_text": "Get stronger and move your groin, knee and hip more efficiently to prevent fatigue",
+                "impact_score": 2,
                 "inhibit_exercises": [
                     {
                         "bilateral": true,
-                        "library_id": "3",
-                        "name": "SMR - Hamstrings",
+                        "display_name": "Foam Roll - Hip Flexor",
+                        "goal_text": "Increase blood flow",
+                        "library_id": "54",
+                        "name": "SMR - Hip Flexor",
                         "position_order": 0,
                         "reps_assigned": 30,
                         "seconds_duration": 60,
                         "seconds_per_rep": null,
                         "seconds_per_set": 30,
                         "sets_assigned": 1,
-                        "unit_of_measure": "seconds"
-                    }
-                ],
-                "activate_exercises": [],
-                "integrate_exercises": [],
-                "lengthen_exercises": [
+                        "unit_of_measure": "seconds",
+                        "youtube_id": "bdbsy5vFz10"
+                    },
                     {
                         "bilateral": true,
-                        "library_id": "49",
-                        "name": "Kneeling Hip Flexor Static Stretch",
-                        "position_order": 7,
+                        "display_name": "Foam Roll - Outer Thigh (IT Band)",
+                        "goal_text": "Increase blood flow",
+                        "library_id": "4",
+                        "name": "SMR - IT-Band",
+                        "position_order": 1,
                         "reps_assigned": 30,
                         "seconds_duration": 60,
                         "seconds_per_rep": null,
                         "seconds_per_set": 30,
                         "sets_assigned": 1,
-                        "unit_of_measure": "seconds"
+                        "unit_of_measure": "seconds",
+                        "youtube_id": "asigNf1sh-k"
+                    },
+                    {
+                        "bilateral": true,
+                        "display_name": "Foam Roll - Hamstrings",
+                        "goal_text": "Increase blood flow",
+                        "library_id": "3",
+                        "name": "SMR - Hamstrings",
+                        "position_order": 2,
+                        "reps_assigned": 30,
+                        "seconds_duration": 60,
+                        "seconds_per_rep": null,
+                        "seconds_per_set": 30,
+                        "sets_assigned": 1,
+                        "unit_of_measure": "seconds",
+                        "youtube_id": "wQ6uUuBWCbw"
+                    },
+                    {
+                        "bilateral": true,
+                        "display_name": "Foam Roll - Inner Thigh (Adductor)",
+                        "goal_text": "Increase blood flow",
+                        "library_id": "1",
+                        "name": "SMR - Adductors",
+                        "position_order": 3,
+                        "reps_assigned": 30,
+                        "seconds_duration": 60,
+                        "seconds_per_rep": null,
+                        "seconds_per_set": 30,
+                        "sets_assigned": 1,
+                        "unit_of_measure": "seconds",
+                        "youtube_id": "vkVg1dEmjwE"
+                    },
+                    {
+                        "bilateral": true,
+                        "display_name": "Foam Roll - Quads",
+                        "goal_text": "Increase flexibility",
+                        "library_id": "48",
+                        "name": "SMR Quadriceps",
+                        "position_order": 4,
+                        "reps_assigned": 30,
+                        "seconds_duration": 60,
+                        "seconds_per_rep": null,
+                        "seconds_per_set": 30,
+                        "sets_assigned": 1,
+                        "unit_of_measure": "seconds",
+                        "youtube_id": "ERTVBjwgPS4"
                     }
-                ]
+                ],
+                "integrate_exercises": [],
+                "lengthen_exercises": [
+                    {
+                        "bilateral": true,
+                        "display_name": "Standing Outer Hip (TFL) Stretch",
+                        "goal_text": "Increase flexibility",
+                        "library_id": "28",
+                        "name": "Standing TFL Static Stretch",
+                        "position_order": 5,
+                        "reps_assigned": 30,
+                        "seconds_duration": 60,
+                        "seconds_per_rep": null,
+                        "seconds_per_set": 30,
+                        "sets_assigned": 1,
+                        "unit_of_measure": "seconds",
+                        "youtube_id": "ClJL9Kn5DHw"
+                    },
+                    {
+                        "bilateral": true,
+                        "display_name": "Lunging Hip Stretch",
+                        "goal_text": "Increase flexibility",
+                        "library_id": "49",
+                        "name": "Kneeling Hip Flexor Static Stretch",
+                        "position_order": 6,
+                        "reps_assigned": 30,
+                        "seconds_duration": 60,
+                        "seconds_per_rep": null,
+                        "seconds_per_set": 30,
+                        "sets_assigned": 1,
+                        "unit_of_measure": "seconds",
+                        "youtube_id": "XbN3TvLEm2A"
+                    },
+                    {
+                        "bilateral": false,
+                        "display_name": "Child's Pose (Arms Straight)",
+                        "goal_text": "Increase flexibility",
+                        "library_id": "103",
+                        "name": "Child's Pose Arms Straight",
+                        "position_order": 7,
+                        "reps_assigned": 30,
+                        "seconds_duration": 30,
+                        "seconds_per_rep": null,
+                        "seconds_per_set": 30,
+                        "sets_assigned": 1,
+                        "unit_of_measure": "seconds",
+                        "youtube_id": "pJcobQf324o"
+                    },
+                    {
+                        "bilateral": true,
+                        "display_name": "Lying Hamstring Stretch",
+                        "goal_text": "Increase flexibility",
+                        "library_id": "9",
+                        "name": "Hamstrings Static Stretch ",
+                        "position_order": 8,
+                        "reps_assigned": 30,
+                        "seconds_duration": 60,
+                        "seconds_per_rep": null,
+                        "seconds_per_set": 30,
+                        "sets_assigned": 1,
+                        "unit_of_measure": "seconds",
+                        "youtube_id": "z73l6oZUniQ"
+                    },
+                    {
+                        "bilateral": true,
+                        "display_name": "Standing Inner Thigh (Adductor) Stretch",
+                        "goal_text": "Increase flexibility",
+                        "library_id": "8",
+                        "name": "Adductors Static Stretch",
+                        "position_order": 9,
+                        "reps_assigned": 30,
+                        "seconds_duration": 60,
+                        "seconds_per_rep": null,
+                        "seconds_per_set": 30,
+                        "sets_assigned": 1,
+                        "unit_of_measure": "seconds",
+                        "youtube_id": "Qmq5fGSrAmg"
+                    }
+                ],
+                "minutes_duration": 11.5,
+                "start_time": "None",
+                "why_text": "mild soreness and discomfort and hard effort"
             }
         }
     ]
