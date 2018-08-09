@@ -172,6 +172,7 @@ def _recovery_session_from_mongodb(mongo_result):
     recovery_session.why_text = _key_present("why_text", mongo_result)
     recovery_session.duration_minutes = _key_present("minutes_duration", mongo_result)
     recovery_session.completed = mongo_result.get("completed", False)
+    recovery_session.display = mongo_result.get("display", False)
     recovery_session.inhibit_exercises = [_assigned_exercises_from_mongodb(s)
                                           for s in mongo_result['inhibit_exercises']]
     recovery_session.lengthen_exercises = [_assigned_exercises_from_mongodb(s)

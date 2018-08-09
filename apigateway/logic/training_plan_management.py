@@ -13,12 +13,13 @@ from logic.stats_processing import StatsProcessing
 class TrainingPlanManager(object):
 
     def __init__(self, athlete_id, exercise_library_datastore, daily_readiness_datastore, post_session_survey_datastore,
-                 daily_plan_datastore):
+                 daily_plan_datastore, athlete_stats_datastore):
         self.athlete_id = athlete_id
         self.daily_readiness_datastore = daily_readiness_datastore
         self.post_session_survey_datastore = post_session_survey_datastore
         self.daily_plan_datastore = daily_plan_datastore
         self.exercise_library_datastore = exercise_library_datastore
+        self.athlete_stats_datastore = athlete_stats_datastore
 
     def calculate_pre_impact_score(self, rpe, readiness, sleep_quality, max_soreness, athlete_stats=None):
 
@@ -173,11 +174,8 @@ class TrainingPlanManager(object):
         else:
             max_rpe = 0
 
-        '''To be implemented later, athlete_stats will then be passed to both am_impact_score and pm_impact_score
-        stats_processing = StatsProcessing(self.athlete_id,trigger_date_time_string, self.daily_readiness_datastore,
-                                           self.post_session_survey_datastore)
-        athlete_stats = stats_processing.calc_athlete_stats()
-        '''
+
+        athlete_stats = self.athlete_stats_datastore.get(self.athlete_id)
 
         text_generator = RecoveryTextGenerator()
         body_part_text = text_generator.get_text_from_body_part_list(soreness_list)
@@ -187,9 +185,11 @@ class TrainingPlanManager(object):
                                 max_rpe,
                                 last_daily_readiness_survey.readiness,
                                 last_daily_readiness_survey.sleep_quality,
-                                max_soreness
+                                max_soreness,
+                                athlete_stats
                                 )
-            if daily_plan.pre_recovery is not None and pre_impact_score >= 1.5:
+            if (daily_plan.pre_recovery is not None and pre_impact_score >= 1.5 and 
+                    not daily_plan.pre_recovery.completed):
                 rpe_impact_score = min((max_rpe / 10) * 4, 4)
                 daily_plan.pre_recovery.set_exercise_target_minutes(soreness_list, 15)
                 am_exercise_assignments = calc.create_exercise_assignments(daily_plan.pre_recovery,
@@ -199,17 +199,21 @@ class TrainingPlanManager(object):
                 daily_plan.pre_recovery.why_text = text_generator.get_why_text(rpe_impact_score, max_soreness)
                 daily_plan.pre_recovery.goal_text = text_generator.get_goal_text(rpe_impact_score, max_soreness,
                                                                                  body_part_text)
+                daily_plan.pre_recovery.display = True
             else:
-                daily_plan.pre_recovery = None
+                # daily_plan.pre_recovery = None
+                daily_plan.pre_recovery.display = False
 
         if show_post_recovery:
             post_impact_score = self.calculate_post_impact_score(
                 max_rpe,
                 last_daily_readiness_survey.readiness,
                 last_daily_readiness_survey.sleep_quality,
-                max_soreness
+                max_soreness,
+                athlete_stats
             )
-            if daily_plan.post_recovery is not None and post_impact_score >= 1.5:
+            if (daily_plan.post_recovery is not None and post_impact_score >= 1.5 and
+                    not daily_plan.post_recovery.completed):
                 rpe_impact_score = min((max_rpe / 10) * 5, 5)
                 daily_plan.post_recovery.set_exercise_target_minutes(soreness_list, 15)
                 pm_exercise_assignments = calc.create_exercise_assignments(daily_plan.post_recovery,
@@ -219,8 +223,10 @@ class TrainingPlanManager(object):
                 daily_plan.post_recovery.why_text = text_generator.get_why_text(rpe_impact_score, max_soreness)
                 daily_plan.post_recovery.goal_text = text_generator.get_goal_text(rpe_impact_score, max_soreness,
                                                                                   body_part_text)
+                daily_plan.post_recovery.display = True
             else:
-                daily_plan.post_recovery = None
+                # daily_plan.post_recovery = None
+                daily_plan.post_recovery.display = False
 
         # daily_plan.add_scheduled_sessions(scheduled_sessions)
 
@@ -247,16 +253,20 @@ class TrainingPlanManager(object):
         if not show_post_recovery:
             if daily_plan.pre_recovery is None:
                 daily_plan.pre_recovery = session.RecoverySession()
-            daily_plan.post_recovery = None
+                daily_plan.pre_recovery.display = True
+            # daily_plan.post_recovery = None
+            daily_plan.post_recovery.display = False
             # daily_plan.pre_recovery.start_time = datetime.datetime(trigger_date_time.year, trigger_date_time.month,
             #                                                      trigger_date_time.day, 0, 0, 0)
             # daily_plan.pre_recovery.end_time = datetime.datetime(trigger_date_time.year, trigger_date_time.month,
             #                                                    trigger_date_time.day, 12, 0, 0)
         else:
-            daily_plan.pre_recovery = None
+            # daily_plan.pre_recovery = None
+            daily_plan.pre_recovery.display = False
             if daily_plan.post_recovery is not None and daily_plan.post_recovery.completed:
                 daily_plan.completed_post_recovery_sessions.append(daily_plan.post_recovery)
             daily_plan.post_recovery = session.RecoverySession()
+            daily_plan.post_recovery.display = True
         #daily_plan.post_recovery.start_time = datetime.datetime(trigger_date_time.year, trigger_date_time.month,
         #                                                      trigger_date_time.day, 12, 0, 0)
         #next_date = trigger_date_time + datetime.timedelta(days=1)
