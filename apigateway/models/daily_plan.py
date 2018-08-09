@@ -1,5 +1,5 @@
 from serialisable import Serialisable
-from utils import parse_datetime
+from utils import parse_date
 from datetime import datetime
 import models.session as session
 from utils import format_datetime
@@ -31,7 +31,7 @@ class DailyPlan(Serialisable):
         return self.user_id
 
     def get_event_datetime(self):
-        return parse_datetime(self.event_date)
+        return parse_date(self.event_date)
 
     def json_serialise(self):
         ret = {'user_id': self.user_id,
