@@ -66,7 +66,7 @@ class DailyPlan(Serialisable):
         elif self.post_recovery.display_exercises:
             return 2.0, 2.0
         elif not self.post_recovery.display_exercises and self.post_recovery.completed:
-            return 2,0, None
+            return 2.0, None
         elif self.pre_recovery.display_exercises:
             return 0.0, 0.0
         elif not self.pre_recovery.display_exercises and not self.post_recovery.display_exercises and not self.post_recovery.completed:
