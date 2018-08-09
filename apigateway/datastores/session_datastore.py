@@ -17,7 +17,7 @@ class SessionDatastore(object):
             for session in sessions:
                 if session.id == session_id:
                     return [session]
-            raise NoSuchEntityException('No session could be found for the session_id: {} of session_type: {}'.format(session_id, SessionType(session_type)))
+            raise NoSuchEntityException('No session could be found for the session_id: {} of session_type: {}'.format(session_id, SessionType(session_type).name))
 
     @xray_recorder.capture('datastore.SessionDatastore.insert')
     def insert(self, item, user_id, event_date):
@@ -61,7 +61,7 @@ class SessionDatastore(object):
             external_sessions.extend(getattr(plan, 'training_sessions'))
         else:
             external_sessions = getattr(plan, 'training_sessions')
-            external_sessions = [s for s in external_sessions if s.session_type == SessionType(session_type)]
+            external_sessions = [s for s in external_sessions if s.session_type == session_type]
 
 
         return external_sessions
