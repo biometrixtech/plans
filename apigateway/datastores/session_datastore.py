@@ -2,7 +2,7 @@ from aws_xray_sdk.core import xray_recorder
 from config import get_mongo_collection
 from datastores.daily_plan_datastore import DailyPlanDatastore
 from models.session import SessionType
-from exceptions import NoSuchEntityException, UnauthorizedException
+from exceptions import NoSuchEntityException, UnauthorizedActionException
 
 class SessionDatastore(object):
     mongo_collection = 'dailyplan'
@@ -48,7 +48,7 @@ class SessionDatastore(object):
         mongo_collection = get_mongo_collection(self.mongo_collection)
         result = mongo_collection.update_one(query, {'$pull': {session_type_name: {'session_id': session_id, 'post_session_survey': None}}})
         if result.modified_count == 0:
-            raise UnauthorizedException("Cannot delete a session that's already logged.")
+            raise UnauthorizedActionException("Cannot delete a session that's already logged.")
 
     def _get_sessions_from_mongo(self, user_id, event_date, session_type=None):
         daily_plan_store = DailyPlanDatastore()
