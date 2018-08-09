@@ -63,13 +63,13 @@ class DailyPlan(Serialisable):
     def define_landing_screen(self):
         if not self.daily_readiness_survey_completed():
             return 0.0, 0.0
-        elif self.post_recovery.display_exercises:
+        elif self.post_recovery is not None and self.post_recovery.display_exercises:
             return 2.0, 2.0
-        elif not self.post_recovery.display_exercises and self.post_recovery.completed:
+        elif self.post_recovery is not None and not self.post_recovery.display_exercises and self.post_recovery.completed:
             return 2.0, None
-        elif self.pre_recovery.display_exercises:
+        elif self.pre_recovery is not None and self.pre_recovery.display_exercises:
             return 0.0, 0.0
-        elif not self.pre_recovery.display_exercises and not self.post_recovery.display_exercises and not self.post_recovery.completed:
+        elif self.pre_recovery is not None and self.post_recovery is not None and not self.pre_recovery.display_exercises and not self.post_recovery.display_exercises and not self.post_recovery.completed:
             return 1.0, 1.0
         else:
             return 0.0, None

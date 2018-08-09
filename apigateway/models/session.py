@@ -67,6 +67,11 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         if name in ['event_date', 'sensor_start_date_time', 'sensor_end_date_time']:
             if not isinstance(value, datetime.datetime) and value is not None:
                 value = parse_datetime(value)
+        elif name == "sport_name" and not isinstance(value, SportName):
+            if value == '':
+                value = SportName(None)
+            else:
+                value = SportName(value)
         super().__setattr__(name, value)
 
     @abc.abstractmethod
@@ -92,7 +97,7 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
             'session_id': self.id,
             'description': self.description,
             'session_type': session_type.value,
-            'sport_name': self.sport_name,
+            'sport_name': self.sport_name.value,
             # 'date': self.date,
             'event_date': format_datetime(self.event_date),
             'duration_minutes': self.duration_minutes,
