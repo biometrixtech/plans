@@ -34,7 +34,7 @@ def authentication_required(decorated_function):
             return decorated_function(*args, **kwargs)
         except UnauthorizedException:
             try:
-                authenticate_user_jwt(token)
+                authenticate_user_jwt(raw_token)
                 # A dashboard client
                 return decorated_function(*args, **kwargs)
             except UnauthorizedException:
