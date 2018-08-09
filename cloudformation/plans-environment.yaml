@@ -104,6 +104,8 @@ Resources:
               - "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
               - "arn:aws:iam::aws:policy/AWSXrayWriteOnlyAccess"
               - "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
+              - { "Fn::ImportValue": { "Fn::Sub": "UsersValidateAuthPolicyArn-${Environment}" } }
+              - { "Fn::ImportValue": { "Fn::Sub": "UsersServiceAuthPolicyArn-${Environment}" } }
             Policies:
               - PolicyName: "default"
                 PolicyDocument:
