@@ -50,6 +50,15 @@ def parse_datetime(date_input):
         raise InvalidSchemaException('date_time must be in ISO8601 format')
 
 
+def parse_date(date_input):
+    for format_string in ('%Y-%m-%d', '%m/%d/%y'):
+        try:
+            return datetime.datetime.strptime(date_input, format_string)
+        except ValueError:
+            pass
+    raise InvalidSchemaException('date_time must be in ISO8601 format')
+
+
 def validate_uuid4(uuid_string):
     try:
         val = uuid.UUID(uuid_string, version=4)

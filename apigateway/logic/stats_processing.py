@@ -136,13 +136,13 @@ class StatsProcessing(object):
             previous_load = sum(previous_week_internal_values)
             athlete_stats.internal_ramp = ((current_load - previous_load) / previous_load) * 100
 
-        if len(last_week_external_values) > 0:
+        if len(last_week_external_values) > 1:
             average_load = statistics.mean(last_week_external_values)
             stdev_load = statistics.stdev(last_week_external_values)
             athlete_stats.external_monotony = average_load / stdev_load
             athlete_stats.external_strain = athlete_stats.external_monotony * sum(last_week_external_values)
 
-        if len(last_week_internal_values) > 0:
+        if len(last_week_internal_values) > 1:
             average_load = statistics.mean(last_week_internal_values)
             stdev_load = statistics.stdev(last_week_internal_values)
             athlete_stats.internal_monotony = average_load / stdev_load
@@ -199,6 +199,7 @@ class StatsProcessing(object):
 
         for c in daily_plan_collection:
 
+            values.extend(self.get_values_for_session_attribute(attribute_name, c.training_sessions))
             values.extend(self.get_values_for_session_attribute(attribute_name, c.practice_sessions))
             values.extend(self.get_values_for_session_attribute(attribute_name, c.strength_conditioning_sessions))
             values.extend(self.get_values_for_session_attribute(attribute_name, c.games))
@@ -217,6 +218,8 @@ class StatsProcessing(object):
 
         for c in daily_plan_collection:
 
+            values.extend(self.get_product_of_session_attributes(attribute_1_name, attribute_2_name,
+                                                                 c.training_sessions))
             values.extend(self.get_product_of_session_attributes(attribute_1_name, attribute_2_name,
                                                                  c.practice_sessions))
             values.extend(self.get_product_of_session_attributes(attribute_1_name, attribute_2_name,
