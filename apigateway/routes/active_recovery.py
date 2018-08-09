@@ -38,7 +38,7 @@ def handle_active_recovery_update():
         if plan.pre_recovery is not None:
             plan.pre_recovery_completed = True # plan
             plan.pre_recovery.completed = True # recovery
-            plan.pre_recovery.display_exercise = False
+            plan.pre_recovery.display_exercises = False
         else:
             raise NoSuchEntityException("Pre-Recovery does not exist for the user")
     elif recovery_type == 'post':
