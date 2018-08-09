@@ -29,7 +29,7 @@ class ExerciseAssignmentCalculator(object):
             # did athlete already complete this exercise
             if completed_exercises is not None:
                 completed_exercise = [ex for ex in completed_exercises if
-                                      ex.id == target_exercise.id]
+                                      ex.exercise_id == target_exercise.id]
 
             # if completed_exercise is not None:
             # do stuff
@@ -140,6 +140,18 @@ class ExerciseAssignmentCalculator(object):
         exercise_assignments.scale_to_targets()
 
         return exercise_assignments
+
+    def get_progression_dictionary(self, assigned_exercise):
+
+        progression_dictionary = {}
+
+        for e in range(0, assigned_exercise.progressions):
+            if e == 0:
+                progression_dictionary[assigned_exercise.library_id] = assigned_exercise.progressions[e]
+            else:
+                progression_dictionary[assigned_exercise.progressions[e - 1]] = assigned_exercise.progressions[e]
+
+        return progression_dictionary
 
     def get_general_exercises(self):
 
