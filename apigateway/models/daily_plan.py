@@ -61,7 +61,7 @@ class DailyPlan(Serialisable):
             return False
 
     def define_landing_screen(self):
-        if not self.daily_readiness_survey_completed:
+        if not self.daily_readiness_survey_completed():
             return 0.0, 0.0
         elif self.post_recovery.display_exercises:
             return 2.0, 2.0
