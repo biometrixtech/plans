@@ -89,7 +89,6 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
     def json_serialise(self):
         ret = {
             'session_id': self.id,
-            'sport': self.sport,
             'description': self.description,
             'session_type': SessionType(self.session_type()).value,
             'sport_name': SportName(self.sport()).value,

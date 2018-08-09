@@ -9,7 +9,7 @@ from models.session import SessionType, SessionFactory
 from models.daily_plan import DailyPlan
 from utils import parse_datetime, format_date, format_datetime, run_async
 from config import get_mongo_collection
-from logic.athlete import SportName
+from models.athlete import SportName
 
 app = Blueprint('session', __name__)
 
@@ -24,10 +24,10 @@ def handle_session_create():
     session_type = SessionType(request.json['session_type']).value
     user_id = request.json['user_id']
     try:
-        sport = request.json['sport']
-        sport = SportName(sport).name
+        sport_name = request.json['sport_name']
+        sport_name = SportName(sport_name)
     except:
-        sport = ""
+        sport_name = None
     try:
         duration = request.json["duration"]
     except:
@@ -39,7 +39,7 @@ def handle_session_create():
         plan = DailyPlan(event_date=plan_event_date)
         plan.user_id = user_id
         DailyPlanDatastore().put(plan)
-    session_data = {"sport": sport,
+    session_data = {"sport_name": sport_name,
                     "description": description,
                     "duration_minutes": duration,
                     "event_date": session_event_date}
@@ -95,13 +95,13 @@ def handle_session_update(session_id):
     session_event_date = format_datetime(event_date)
     plan_event_date = format_date(event_date)
     try:
-        sport = request.json['sport']
-        sport = SportName(sport).name
+        sport_name = request.json['sport_name']
+        sport_name = SportName(sport_name)
     except:
-        sport = ""
+        sport_name = None
     duration = request.json.get("duration", None)
     description = request.json.get('description', "")
-    session_data = {"sport": sport,
+    session_data = {"sport_name": sport_name,
                     "description": description,
                     "duration_minutes": duration,
                     "event_date": session_event_date}
