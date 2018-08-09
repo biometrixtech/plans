@@ -87,11 +87,12 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
             return False
 
     def json_serialise(self):
+        session_type = self.session_type()
         ret = {
             'session_id': self.id,
             'description': self.description,
-            'session_type': self.session_type.value,
-            'sport_name': self.sport_name.value,
+            'session_type': session_type.value,
+            'sport_name': self.sport_name,
             # 'date': self.date,
             'event_date': format_datetime(self.event_date),
             'duration_minutes': self.duration_minutes,
