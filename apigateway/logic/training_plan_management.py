@@ -188,7 +188,7 @@ class TrainingPlanManager(object):
                                 max_soreness,
                                 athlete_stats
                                 )
-            if (daily_plan.pre_recovery is not None and pre_impact_score >= 1.5 and 
+            if (daily_plan.pre_recovery is not None and pre_impact_score >= 1.5 and
                     not daily_plan.pre_recovery.completed):
                 rpe_impact_score = min((max_rpe / 10) * 4, 4)
                 daily_plan.pre_recovery.set_exercise_target_minutes(soreness_list, 15)
