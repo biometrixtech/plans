@@ -27,7 +27,7 @@ def handle_session_create():
         sport_name = request.json['sport_name']
         sport_name = SportName(sport_name)
     except:
-        sport_name = None
+        sport_name = SportName(None)
     try:
         duration = request.json["duration"]
     except:
@@ -98,7 +98,7 @@ def handle_session_update(session_id):
         sport_name = request.json['sport_name']
         sport_name = SportName(sport_name)
     except:
-        sport_name = None
+        sport_name = SportName(None)
     duration = request.json.get("duration", None)
     description = request.json.get('description', "")
     session_data = {"sport_name": sport_name,
