@@ -149,17 +149,31 @@ class AssignedExercise(Serialisable):
         return ret
 
 
-class CompletedExercise(object):
+class CompletedExercise(Serialisable):
 
     def __init__(self, athlete_id, exercise_id, event_date):
         self.athlete_id = athlete_id
         self.exercise_id = exercise_id
         self.event_date = event_date
 
+    def json_serialise(self):
+        ret = {'athlete_id': self.athlete_id,
+               'exercise_id': self.exercise_id,
+               'event_date': self.event_date,
+               }
+        return ret
 
-class CompletedExerciseSummary(object):
+
+class CompletedExerciseSummary(Serialisable):
 
     def __init__(self, athlete_id, exercise_id, exposures):
         self.athlete_id = athlete_id
         self.exercise_id = exercise_id
         self.exposures = exposures
+
+    def json_serialise(self):
+        ret = {'athlete_id': self.athlete_id,
+               'exercise_id': self.exercise_id,
+               'exposures': self.exposures,
+               }
+        return ret
