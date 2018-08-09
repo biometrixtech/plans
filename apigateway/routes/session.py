@@ -21,7 +21,7 @@ def handle_session_create():
     _validate_schema()
 
     event_date = parse_datetime(request.json['event_date'])
-    session_type = SessionType(request.json['session_type']).value
+    session_type = request.json['session_type']
     user_id = request.json['user_id']
     try:
         sport_name = request.json['sport_name']
@@ -63,7 +63,7 @@ def handle_session_delete(session_id):
     _validate_schema()
 
     event_date = parse_datetime(request.json['event_date'])
-    session_type = SessionType(request.json['session_type']).value
+    session_type = request.json['session_type']
     user_id = request.json['user_id']
     plan_event_date = format_date(event_date)
     if not _check_plan_exists(user_id, plan_event_date):
@@ -87,7 +87,7 @@ def handle_session_delete(session_id):
 def handle_session_update(session_id):
     _validate_schema()
     event_date = parse_datetime(request.json['event_date'])
-    session_type = SessionType(request.json['session_type']).value
+    session_type = request.json['session_type']
     user_id = request.json['user_id']
     if not _check_plan_exists(user_id, event_date):
         raise NoSuchEntityException("Plan does not exist for the user to update session")

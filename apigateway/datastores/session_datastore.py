@@ -40,12 +40,15 @@ class SessionDatastore(object):
 
     @xray_recorder.capture('datastore.SessionDatastore.delete')
     def delete(self, user_id, event_date, session_type, session_id):
-        session_type = session_type.value
         query = {"user_id": user_id, "date": event_date}
         mongo_collection = get_mongo_collection(self.mongo_collection)
-        result = mongo_collection.update_one(query, {'$pull': {'training_sessions': {'session_id': session_id, 'post_session_survey': None, 'session_type': session_type}}})
-        if result.modified_count == 0:
-            raise UnauthorizedActionException("Cannot delete a session that's already logged.")
+        session = self.get(user_id, event_date, session_type, session_id)
+        if len(session) == 1:
+            result = mongo_collection.update_one(query, {'$pull': {'training_sessions': {'session_id': session_id, 'post_session_survey': None, 'session_type': session_type}}})
+            if result.modified_count == 0:
+                raise UnauthorizedActionException("Cannot delete a session that's already logged.")
+        else:
+            raise NoSuchEntityException('No session could be found for the session_id: {} of session_type: {}'.format(session_id, SessionType(session_type).name))
 
     def _get_sessions_from_mongo(self, user_id, event_date, session_type=None):
         daily_plan_store = DailyPlanDatastore()
@@ -61,7 +64,7 @@ class SessionDatastore(object):
             external_sessions.extend(getattr(plan, 'training_sessions'))
         else:
             external_sessions = getattr(plan, 'training_sessions')
-            external_sessions = [s for s in external_sessions if s.session_type == session_type]
+            external_sessions = [s for s in external_sessions if s.session_type() == SessionType(session_type)]
 
 
         return external_sessions
