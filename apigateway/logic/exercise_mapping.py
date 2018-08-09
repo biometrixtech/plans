@@ -7,9 +7,10 @@ from logic.goal_focus_text_generator import RecoveryTextGenerator
 
 class ExerciseAssignmentCalculator(object):
 
-    def __init__(self, athlete_id, exercise_library_datastore):
+    def __init__(self, athlete_id, exercise_library_datastore, completed_exercise_datastore):
         self.athlete_id = athlete_id
         self.exercise_library_datastore = exercise_library_datastore
+        self.completed_exercise_datastore = completed_exercise_datastore
         self.exercise_library = self.exercise_library_datastore.get()
         self.exercises_for_body_parts = self.get_exercises_for_body_parts()
 
