@@ -151,12 +151,15 @@ class AssignedExercise(Serialisable):
 
 class CompletedExercise(object):
 
-    def __init__(self, athlete_id, exercise_id):
+    def __init__(self, athlete_id, exercise_id, event_date):
         self.athlete_id = athlete_id
         self.exercise_id = exercise_id
-        self.exposures_completed = 0
-        self.last_completed_date = None
+        self.event_date = event_date
 
-    def increment(self):
-        self.exposures_completed = self.exposures_completed + 1
-        self.last_completed_date = datetime.date.today()
+
+class CompletedExerciseSummary(object):
+
+    def __init__(self, athlete_id, exercise_id, exposures):
+        self.athlete_id = athlete_id
+        self.exercise_id = exercise_id
+        self.exposures = exposures

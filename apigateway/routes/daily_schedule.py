@@ -10,6 +10,7 @@ from datastores.session_datastore import SessionDatastore
 from models.daily_plan import DailyPlan
 from models.session import SessionFactory, SessionType
 from utils import format_date, format_datetime, parse_datetime
+from models.athlete import SportName
 
 app = Blueprint('daily_schedule', __name__)
 
@@ -67,11 +68,14 @@ def _check_plan_exists(user_id, event_date):
 
 def _get_session_data(session):
     event_date = parse_datetime(session['event_date'])
+    sport = session['sport']
+    sport = SportName(sport).name
     duration_minutes = session.get('duration', None)
     if duration_minutes is None:
         raise InvalidSchemaException("duration is missing for the session")
 
     session_data = {"event_date": event_date,
+                    "sport": sport,    
                     "duration_minutes": duration_minutes,
                     "description": session.get("description", "")
                    }

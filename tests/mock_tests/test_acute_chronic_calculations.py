@@ -30,14 +30,15 @@ def get_daily_plans(start_date, end_date):
     i = 1
 
     for d in dates:
-        daily_plan = DailyPlan(event_date=d.strftime("%Y-%m-%dT%H:%M:%SZ"))
+        daily_plan = DailyPlan(event_date=d.strftime("%Y-%m-%d"))
         practice_session = PracticeSession()
         practice_session.event_date = d
         practice_session.external_load = 10 * i
         practice_session.high_intensity_load = 2 * i
         practice_session.mod_intensity_load = 5 * i
         practice_session.low_intensity_load = 3 * i
-        daily_plan.practice_sessions.append(practice_session)
+        # daily_plan.practice_sessions.append(practice_session)
+        daily_plan.training_sessions.append(practice_session)
         plans.append(daily_plan)
         i += 1
 
@@ -52,12 +53,13 @@ def get_daily_internal_plans(start_date, end_date):
     i = 1
 
     for d in dates:
-        daily_plan = DailyPlan(event_date=d.strftime("%Y-%m-%dT%H:%M:%SZ"))
+        daily_plan = DailyPlan(event_date=d.strftime("%Y-%m-%d"))
         practice_session = PracticeSession()
         practice_session.event_date = d
         practice_session.session_RPE = 5
         practice_session.duration_minutes = 60
-        daily_plan.practice_sessions.append(practice_session)
+        # daily_plan.practice_sessions.append(practice_session)
+        daily_plan.training_sessions.append(practice_session)
         plans.append(daily_plan)
         i += 1
 
@@ -70,7 +72,7 @@ def get_sessionless_daily_plans(start_date, end_date):
     dates = get_dates(start_date, end_date)
 
     for d in dates:
-        daily_plan = DailyPlan(event_date=d.strftime("%Y-%m-%dT%H:%M:%SZ"))
+        daily_plan = DailyPlan(event_date=d.strftime("%Y-%m-%d"))
         plans.append(daily_plan)
 
     return plans
@@ -102,8 +104,8 @@ def test_acute_correct_dates_7_days():
     stats.set_start_end_times()
     stats.load_historical_data()
     assert 3 == len(stats.acute_daily_plans)
-    assert '2018-07-03T12:00:00Z' == stats.acute_daily_plans[2].event_date
-    assert '2018-07-01T12:00:00Z' == stats.acute_daily_plans[0].event_date
+    assert '2018-07-03' == stats.acute_daily_plans[2].event_date
+    assert '2018-07-01' == stats.acute_daily_plans[0].event_date
 
 
 def test_acute_correct_dates_8_days():
@@ -120,8 +122,8 @@ def test_acute_correct_dates_8_days():
     stats.load_historical_data()
     weeks = stats.get_chronic_weeks_plans()
     assert 3 == len(stats.acute_daily_plans)
-    assert '2018-07-03T12:00:00Z' == stats.acute_daily_plans[2].event_date
-    assert '2018-07-01T12:00:00Z' == stats.acute_daily_plans[0].event_date
+    assert '2018-07-03' == stats.acute_daily_plans[2].event_date
+    assert '2018-07-01' == stats.acute_daily_plans[0].event_date
 
 
 def test_acute_correct_dates_9_days():
@@ -138,8 +140,8 @@ def test_acute_correct_dates_9_days():
     stats.load_historical_data()
     weeks = stats.get_chronic_weeks_plans()
     assert 3 == len(stats.acute_daily_plans)
-    assert '2018-07-03T12:00:00Z' == stats.acute_daily_plans[2].event_date
-    assert '2018-07-01T12:00:00Z' == stats.acute_daily_plans[0].event_date
+    assert '2018-07-03' == stats.acute_daily_plans[2].event_date
+    assert '2018-07-01' == stats.acute_daily_plans[0].event_date
 
 
 def test_acute_correct_dates_10_days():
@@ -156,8 +158,8 @@ def test_acute_correct_dates_10_days():
     stats.load_historical_data()
     weeks = stats.get_chronic_weeks_plans()
     assert 3 == len(stats.acute_daily_plans)
-    assert '2018-07-03T12:00:00Z' == stats.acute_daily_plans[2].event_date
-    assert '2018-07-01T12:00:00Z' == stats.acute_daily_plans[0].event_date
+    assert '2018-07-03' == stats.acute_daily_plans[2].event_date
+    assert '2018-07-01' == stats.acute_daily_plans[0].event_date
 
 
 def test_acute_correct_dates_14_days():
@@ -174,8 +176,8 @@ def test_acute_correct_dates_14_days():
     stats.load_historical_data()
     weeks = stats.get_chronic_weeks_plans()
     assert 7 == len(stats.acute_daily_plans)
-    assert '2018-07-03T12:00:00Z' == stats.acute_daily_plans[6].event_date
-    assert '2018-06-27T12:00:00Z' == stats.acute_daily_plans[0].event_date
+    assert '2018-07-03' == stats.acute_daily_plans[6].event_date
+    assert '2018-06-27' == stats.acute_daily_plans[0].event_date
 
 
 def test_acute_correct_dates_28_days():
@@ -192,8 +194,8 @@ def test_acute_correct_dates_28_days():
     stats.load_historical_data()
     weeks = stats.get_chronic_weeks_plans()
     assert 7 == len(stats.acute_daily_plans)
-    assert '2018-07-03T12:00:00Z' == stats.acute_daily_plans[6].event_date
-    assert '2018-06-27T12:00:00Z' == stats.acute_daily_plans[0].event_date
+    assert '2018-07-03' == stats.acute_daily_plans[6].event_date
+    assert '2018-06-27' == stats.acute_daily_plans[0].event_date
 
 
 def test_chronic_correct_dates_7_days():
@@ -210,8 +212,8 @@ def test_chronic_correct_dates_7_days():
     stats.load_historical_data()
     weeks = stats.get_chronic_weeks_plans()
     assert 5 == len(weeks[0])
-    assert '2018-06-30T12:00:00Z' == weeks[0][4].event_date
-    assert '2018-06-26T12:00:00Z' == weeks[0][0].event_date
+    assert '2018-06-30' == weeks[0][4].event_date
+    assert '2018-06-26' == weeks[0][0].event_date
 
 
 def test_chronic_correct_dates_28_days():
@@ -227,12 +229,12 @@ def test_chronic_correct_dates_28_days():
     stats.set_start_end_times()
     stats.load_historical_data()
     weeks = stats.get_chronic_weeks_plans()
-    assert weeks[0][6].event_date == '2018-06-26T12:00:00Z'
-    assert weeks[0][0].event_date == '2018-06-20T12:00:00Z'
-    assert weeks[1][6].event_date == '2018-06-19T12:00:00Z'
-    assert weeks[1][0].event_date == '2018-06-13T12:00:00Z'
-    assert weeks[2][6].event_date == '2018-06-12T12:00:00Z'
-    assert weeks[2][0].event_date == '2018-06-06T12:00:00Z'
+    assert weeks[0][6].event_date == '2018-06-26'
+    assert weeks[0][0].event_date == '2018-06-20'
+    assert weeks[1][6].event_date == '2018-06-19'
+    assert weeks[1][0].event_date == '2018-06-13'
+    assert weeks[2][6].event_date == '2018-06-12'
+    assert weeks[2][0].event_date == '2018-06-06'
     assert 0 == len(weeks[3])
 
 
@@ -249,14 +251,14 @@ def test_chronic_correct_dates_33_days():
     stats.set_start_end_times()
     stats.load_historical_data()
     weeks = stats.get_chronic_weeks_plans()
-    assert weeks[0][6].event_date == '2018-06-26T12:00:00Z'
-    assert weeks[0][0].event_date == '2018-06-20T12:00:00Z'
-    assert weeks[1][6].event_date == '2018-06-19T12:00:00Z'
-    assert weeks[1][0].event_date == '2018-06-13T12:00:00Z'
-    assert weeks[2][6].event_date == '2018-06-12T12:00:00Z'
-    assert weeks[2][0].event_date == '2018-06-06T12:00:00Z'
-    assert weeks[3][4].event_date == '2018-06-05T12:00:00Z'
-    assert weeks[3][0].event_date == '2018-06-01T12:00:00Z'
+    assert weeks[0][6].event_date == '2018-06-26'
+    assert weeks[0][0].event_date == '2018-06-20'
+    assert weeks[1][6].event_date == '2018-06-19'
+    assert weeks[1][0].event_date == '2018-06-13'
+    assert weeks[2][6].event_date == '2018-06-12'
+    assert weeks[2][0].event_date == '2018-06-06'
+    assert weeks[3][4].event_date == '2018-06-05'
+    assert weeks[3][0].event_date == '2018-06-01'
 
 
 def test_chronic_correct_dates_40_days():
@@ -272,14 +274,14 @@ def test_chronic_correct_dates_40_days():
     stats.set_start_end_times()
     stats.load_historical_data()
     weeks = stats.get_chronic_weeks_plans()
-    assert weeks[0][6].event_date == '2018-06-26T12:00:00Z'
-    assert weeks[0][0].event_date == '2018-06-20T12:00:00Z'
-    assert weeks[1][6].event_date == '2018-06-19T12:00:00Z'
-    assert weeks[1][0].event_date == '2018-06-13T12:00:00Z'
-    assert weeks[2][6].event_date == '2018-06-12T12:00:00Z'
-    assert weeks[2][0].event_date == '2018-06-06T12:00:00Z'
-    assert weeks[3][6].event_date == '2018-06-05T12:00:00Z'
-    assert weeks[3][0].event_date == '2018-05-30T12:00:00Z'
+    assert weeks[0][6].event_date == '2018-06-26'
+    assert weeks[0][0].event_date == '2018-06-20'
+    assert weeks[1][6].event_date == '2018-06-19'
+    assert weeks[1][0].event_date == '2018-06-13'
+    assert weeks[2][6].event_date == '2018-06-12'
+    assert weeks[2][0].event_date == '2018-06-06'
+    assert weeks[3][6].event_date == '2018-06-05'
+    assert weeks[3][0].event_date == '2018-05-30'
 
 
 def test_correct_acute_chronic_load_33_days():
