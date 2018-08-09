@@ -2,6 +2,7 @@ import pytest
 import logic.exercise_mapping as exercise_mapping
 import models.session as session
 import logic.soreness_processing as soreness_and_injury
+import datetime
 
 from tests.mocks.mock_exercise_datastore import ExerciseLibraryDatastore
 from tests.mocks.mock_completed_exercise_datastore import CompletedExerciseDatastore
@@ -52,6 +53,10 @@ def soreness_two_body_parts(body_enum_1, severity_score_1, body_enum_2, severity
     soreness_list.append(soreness_item_2)
 
     return soreness_list
+
+
+def get_trigger_date_time():
+    return datetime.datetime(2018, 7, 10, 2, 0, 0)
 
 # test initial targets based on soreness levels
 
@@ -221,7 +226,8 @@ def test_recovery_session_exercises_assigned():
                                                          completed_exercise_datastore)
     soreness_list = soreness_one_body_part(12, 1)    # lower back
     target_recovery_session = recovery_session(soreness_one_body_part(12, 1), 15)
-    exercise_assignments = calc.create_exercise_assignments(target_recovery_session, soreness_list)
+    exercise_assignments = calc.create_exercise_assignments(target_recovery_session, soreness_list,
+                                                            get_trigger_date_time())
     assert True is (len(exercise_assignments.inhibit_exercises) > 0)
     assert True is (len(exercise_assignments.lengthen_exercises) > 0)
     assert True is (len(exercise_assignments.activate_exercises) > 0)
@@ -231,7 +237,8 @@ def test_recovery_session_exercises_assigned_2_body_parts():
                                                          completed_exercise_datastore)
     soreness_list = soreness_two_body_parts(12, 1, 4, 1, 1, 2)    # lower back
     target_recovery_session = recovery_session(soreness_two_body_parts(12, 1, 4, 1, 1, 2), 15)
-    exercise_assignments = calc.create_exercise_assignments(target_recovery_session, soreness_list)
+    exercise_assignments = calc.create_exercise_assignments(target_recovery_session, soreness_list,
+                                                            get_trigger_date_time())
     assert True is (len(exercise_assignments.inhibit_exercises) > 0)
     assert True is (len(exercise_assignments.lengthen_exercises) > 0)
     assert True is (len(exercise_assignments.activate_exercises) > 0)
@@ -241,7 +248,8 @@ def test_recovery_session_exercises_assigned_2_body_parts_diff_severity():
                                                          completed_exercise_datastore)
     soreness_list = soreness_two_body_parts(12, 1, 4, 2, 1, 2)    # lower back
     target_recovery_session = recovery_session(soreness_two_body_parts(12, 1, 4, 1, 1, 2), 15)
-    exercise_assignments = calc.create_exercise_assignments(target_recovery_session, soreness_list)
+    exercise_assignments = calc.create_exercise_assignments(target_recovery_session, soreness_list,
+                                                            get_trigger_date_time())
     assert True is (len(exercise_assignments.inhibit_exercises) > 0)
     assert True is (len(exercise_assignments.lengthen_exercises) > 0)
     assert True is (len(exercise_assignments.activate_exercises) > 0)

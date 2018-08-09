@@ -195,7 +195,8 @@ class TrainingPlanManager(object):
                 rpe_impact_score = min((max_rpe / 10) * 4, 4)
                 daily_plan.pre_recovery.set_exercise_target_minutes(soreness_list, 15)
                 am_exercise_assignments = calc.create_exercise_assignments(daily_plan.pre_recovery,
-                                                                           soreness_list)
+                                                                           soreness_list,
+                                                                           trigger_date_time)
                 daily_plan.pre_recovery.update_from_exercise_assignments(am_exercise_assignments)
                 daily_plan.pre_recovery.impact_score = pre_impact_score
                 daily_plan.pre_recovery.why_text = text_generator.get_why_text(rpe_impact_score, max_soreness)
@@ -219,7 +220,8 @@ class TrainingPlanManager(object):
                 rpe_impact_score = min((max_rpe / 10) * 5, 5)
                 daily_plan.post_recovery.set_exercise_target_minutes(soreness_list, 15)
                 pm_exercise_assignments = calc.create_exercise_assignments(daily_plan.post_recovery,
-                                                                           soreness_list)
+                                                                           soreness_list,
+                                                                           trigger_date_time)
                 daily_plan.post_recovery.update_from_exercise_assignments(pm_exercise_assignments)
                 daily_plan.post_recovery.impact_score = post_impact_score
                 daily_plan.post_recovery.why_text = text_generator.get_why_text(rpe_impact_score, max_soreness)
