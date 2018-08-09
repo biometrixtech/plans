@@ -36,15 +36,15 @@ class DailyPlanDatastore(object):
             daily_plan = DailyPlan(event_date=plan['date'])
             daily_plan.user_id = plan.get('user_id', None)
             daily_plan.training_sessions = \
-                [_external_session_from_mongodb(s, session.SessionType) for s in plan.get('training_sessions', None)]
+                [_external_session_from_mongodb(s, session.SessionType) for s in plan.get('training_sessions', [])]
             daily_plan.practice_sessions = \
-                [_external_session_from_mongodb(s, session.SessionType.practice) for s in plan.get('practice_sessions', None)]
+                [_external_session_from_mongodb(s, session.SessionType.practice) for s in plan.get('practice_sessions', [])]
             daily_plan.strength_conditioning_sessions = \
                 [_external_session_from_mongodb(s, session.SessionType.strength_and_conditioning)
-                 for s in plan.get('cross_training_sessions', None)]
+                 for s in plan.get('cross_training_sessions', [])]
             daily_plan.games = \
                 [_external_session_from_mongodb(s, session.SessionType.game)
-                 for s in plan.get('game_sessions', None)]
+                 for s in plan.get('game_sessions', [])]
             # daily_plan.tournaments = \
             #     [_external_session_from_mongodb(s, session.SessionType.tournament)
             #      for s in plan['tournament_sessions']]
@@ -57,7 +57,7 @@ class DailyPlanDatastore(object):
             #     for s in plan['corrective_sessions']]
             daily_plan.bump_up_sessions = \
                 [_external_session_from_mongodb(s, session.SessionType.bump_up)
-                 for s in plan.get('bump_up_sessions', None)]
+                 for s in plan.get('bump_up_sessions', [])]
             daily_plan.daily_readiness_survey = plan.get('daily_readiness_survey', None)
             daily_plan.updated = plan.get('updated', None)
             daily_plan.last_updated = plan.get('last_updated', None)
