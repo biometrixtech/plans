@@ -37,7 +37,8 @@ def get_daily_plans(start_date, end_date):
         practice_session.high_intensity_load = 2 * i
         practice_session.mod_intensity_load = 5 * i
         practice_session.low_intensity_load = 3 * i
-        daily_plan.practice_sessions.append(practice_session)
+        # daily_plan.practice_sessions.append(practice_session)
+        daily_plan.training_sessions.append(practice_session)
         plans.append(daily_plan)
         i += 1
 
@@ -57,7 +58,8 @@ def get_daily_internal_plans(start_date, end_date):
         practice_session.event_date = d
         practice_session.session_RPE = 5
         practice_session.duration_minutes = 60
-        daily_plan.practice_sessions.append(practice_session)
+        # daily_plan.practice_sessions.append(practice_session)
+        daily_plan.training_sessions.append(practice_session)
         plans.append(daily_plan)
         i += 1
 

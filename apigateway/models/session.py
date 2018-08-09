@@ -89,6 +89,7 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         ret = {
             'session_id': self.id,
             'description': self.description,
+            'session_type': SessionType(self.session_type()).value,
             # 'date': self.date,
             'event_date': format_datetime(self.event_date),
             'duration_minutes': self.duration_minutes,
