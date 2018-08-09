@@ -5,7 +5,7 @@ import datetime
 from serialisable import Serialisable
 import logic.exercise_generator as exercise
 from utils import format_datetime, parse_datetime
-
+from models.athlete import SportName
 
 class SessionType(Enum):
     practice = 0
@@ -30,7 +30,7 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
 
     def __init__(self):
         self.id = None
-        self.sport = None
+        self.sport_name = None
         self.duration_sensor = None
         self.external_load = None
         self.high_intensity_load = None
@@ -91,6 +91,8 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
             'session_id': self.id,
             'sport': self.sport,
             'description': self.description,
+            'session_type': SessionType(self.session_type()).value,
+            'sport_name': SportName(self.sport()).value,
             # 'date': self.date,
             'event_date': format_datetime(self.event_date),
             'duration_minutes': self.duration_minutes,

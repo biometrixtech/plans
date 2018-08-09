@@ -199,6 +199,7 @@ class StatsProcessing(object):
 
         for c in daily_plan_collection:
 
+            values.extend(self.get_values_for_session_attribute(attribute_name, c.training_sessions))
             values.extend(self.get_values_for_session_attribute(attribute_name, c.practice_sessions))
             values.extend(self.get_values_for_session_attribute(attribute_name, c.strength_conditioning_sessions))
             values.extend(self.get_values_for_session_attribute(attribute_name, c.games))
@@ -217,6 +218,8 @@ class StatsProcessing(object):
 
         for c in daily_plan_collection:
 
+            values.extend(self.get_product_of_session_attributes(attribute_1_name, attribute_2_name,
+                                                                 c.training_sessions))
             values.extend(self.get_product_of_session_attributes(attribute_1_name, attribute_2_name,
                                                                  c.practice_sessions))
             values.extend(self.get_product_of_session_attributes(attribute_1_name, attribute_2_name,
