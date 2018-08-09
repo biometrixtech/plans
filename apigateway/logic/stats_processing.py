@@ -136,13 +136,13 @@ class StatsProcessing(object):
             previous_load = sum(previous_week_internal_values)
             athlete_stats.internal_ramp = ((current_load - previous_load) / previous_load) * 100
 
-        if len(last_week_external_values) > 0:
+        if len(last_week_external_values) > 1:
             average_load = statistics.mean(last_week_external_values)
             stdev_load = statistics.stdev(last_week_external_values)
             athlete_stats.external_monotony = average_load / stdev_load
             athlete_stats.external_strain = athlete_stats.external_monotony * sum(last_week_external_values)
 
-        if len(last_week_internal_values) > 0:
+        if len(last_week_internal_values) > 1:
             average_load = statistics.mean(last_week_internal_values)
             stdev_load = statistics.stdev(last_week_internal_values)
             athlete_stats.internal_monotony = average_load / stdev_load

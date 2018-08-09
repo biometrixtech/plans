@@ -296,7 +296,7 @@ def test_correct_acute_chronic_load_33_days():
     stats.load_historical_data()
     athlete_stats = AthleteStats("Tester")
     athlete_stats = stats.calc_training_volume_metrics(athlete_stats)
-    assert 2100 == athlete_stats.acute_external_total_load
+    assert 4200 == athlete_stats.acute_external_total_load
     assert 982.5 == athlete_stats.chronic_external_total_load
 
 def test_correct_acute_chronic_empty_load_33_days():
@@ -331,7 +331,7 @@ def test_correct_acwr_load_33_days():
     stats.load_historical_data()
     athlete_stats = AthleteStats("Tester")
     athlete_stats = stats.calc_training_volume_metrics(athlete_stats)
-    assert 2100 / 982.5 == athlete_stats.acute_to_chronic_external_ratio()
+    assert 4200 / 982.5 == athlete_stats.acute_to_chronic_external_ratio()
 
 
 def test_correct_acwr_empty_load_33_days():
