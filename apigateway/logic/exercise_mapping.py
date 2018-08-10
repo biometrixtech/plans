@@ -139,7 +139,7 @@ class ExerciseAssignmentCalculator(object):
         target_exercise_list = [ex for ex in exercise_list if ex.id == body_part_exercise.exercise.id]
         target_exercise = target_exercise_list[0]
 
-        if len(body_part_exercise.progressions) == 0:
+        if len(body_part_exercise.exercise.progressions) == 0:
             return target_exercise
         else:
             completed_exercise_list = [ex for ex in completed_exercises if ex.exercise_id == body_part_exercise.exercise.id]
