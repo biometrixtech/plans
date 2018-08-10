@@ -74,7 +74,8 @@ def handle_session_delete(session_id):
     store.delete(user_id=user_id,
                  event_date=plan_event_date,
                  session_type=session_type,
-                 session_id=session_id)
+                 session_id=session_id
+                 )
 
     # update_plan(event_date)
 
@@ -107,10 +108,19 @@ def handle_session_update(session_id):
                     "event_date": session_event_date}
 
     store = SessionDatastore()
-    session_obj = store.get(user_id, plan_event_date, session_type, session_id)[0]
-    _update_session(session_obj, session_data)
-    store.update(session_obj, user_id, plan_event_date)
-
+    session_obj = store.get(user_id=user_id, 
+                            event_date=plan_event_date,
+                            session_type=session_type,
+                            session_id=session_id
+                            )[0]
+    if session_obj.post_session_survey:
+        raise ForbiddenException("Cannot modify a Session that's already logged")
+    else:
+        _update_session(session_obj, session_data)
+        store.update(session_obj,
+                     user_id=user_id,
+                     event_date=plan_event_date
+                     )
 
     return {'message': 'success'}, 200
 
@@ -143,11 +153,20 @@ def handle_session_sensor_data():
         session_id = session.get('session_id', None)
         if session_id is None:
             session_obj = _create_session(user_id, session_type, sensor_data)
-            store.insert(session_obj, user_id, event_date)
+            store.insert(session_obj,
+                         user_id=user_id,
+                         event_date=event_date
+                         )
         else:
-            session_obj = store.get(user_id, event_date, session_type, session_id)[0]
+            session_obj = store.get(user_id=user_id,
+                                    event_date=event_date,
+                                    session_type=session_type,
+                                    session_id=session_id)[0]
             _update_session(session_obj, sensor_data)
-            store.update(session_obj, user_id, event_date)
+            store.update(session_obj,
+                         user_id=user_id,
+                         event_date=event_date
+                         )
 
     # update_plan(event_date)
 
