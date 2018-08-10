@@ -4,7 +4,7 @@ from flask import request, Blueprint
 from datastores.daily_plan_datastore import DailyPlanDatastore
 from datastores.session_datastore import SessionDatastore
 from decorators import authentication_required
-from exceptions import InvalidSchemaException, NoSuchEntityException
+from exceptions import InvalidSchemaException, NoSuchEntityException, ForbiddenException
 from models.session import SessionType, SessionFactory
 from models.daily_plan import DailyPlan
 from utils import parse_datetime, format_date, format_datetime, run_async
@@ -90,22 +90,23 @@ def handle_session_update(session_id):
     event_date = parse_datetime(request.json['event_date'])
     session_type = request.json['session_type']
     user_id = request.json['user_id']
-    if not _check_plan_exists(user_id, event_date):
-        raise NoSuchEntityException("Plan does not exist for the user to update session")
-
-    session_event_date = format_datetime(event_date)
-    plan_event_date = format_date(event_date)
     try:
         sport_name = request.json['sport_name']
         sport_name = SportName(sport_name)
     except:
         sport_name = SportName(None)
+    session_event_date = format_datetime(event_date)
+    plan_event_date = format_date(event_date)
     duration = request.json.get("duration", None)
     description = request.json.get('description', "")
     session_data = {"sport_name": sport_name,
                     "description": description,
                     "duration_minutes": duration,
                     "event_date": session_event_date}
+
+    if not _check_plan_exists(user_id, plan_event_date):
+        raise NoSuchEntityException("Plan does not exist for the user to update session")
+
 
     store = SessionDatastore()
     session_obj = store.get(user_id=user_id, 
