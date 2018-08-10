@@ -5,7 +5,7 @@ import datetime
 from serialisable import Serialisable
 import logic.exercise_generator as exercise
 from utils import format_datetime, parse_datetime
-
+from models.athlete import SportName
 
 class SessionType(Enum):
     practice = 0
@@ -30,6 +30,7 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
 
     def __init__(self):
         self.id = None
+        self.sport_name = None
         self.duration_sensor = None
         self.external_load = None
         self.high_intensity_load = None
@@ -89,6 +90,8 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         ret = {
             'session_id': self.id,
             'description': self.description,
+            'session_type': SessionType(self.session_type()).value,
+            'sport_name': SportName(self.sport()).value,
             # 'date': self.date,
             'event_date': format_datetime(self.event_date),
             'duration_minutes': self.duration_minutes,
@@ -268,6 +271,7 @@ class RecoverySession(Serialisable):
         self.why_text = ""
         self.goal_text = ""
         self.completed = False
+        self.display_exercises = False
 
     def json_serialise(self):
         ret = {'minutes_duration': self.duration_minutes,
@@ -277,6 +281,7 @@ class RecoverySession(Serialisable):
                'end_time': str(self.end_time),
                'impact_score': self.impact_score,
                'completed': self.completed,
+               'display_exercises': self.display_exercises,
                'inhibit_exercises': [ex.json_serialise() for ex in self.inhibit_exercises],
                'lengthen_exercises': [ex.json_serialise() for ex in self.lengthen_exercises],
                'activate_exercises': [ex.json_serialise() for ex in self.activate_exercises],

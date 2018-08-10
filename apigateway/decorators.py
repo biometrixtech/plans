@@ -1,10 +1,12 @@
+from exceptions import UnauthorizedException
 from flask import request
 from functools import wraps
 from uuid import UUID
+import boto3
+import json
 import jwt
 import os
 import re
-from exceptions import UnauthorizedException
 
 
 def authentication_required(decorated_function):
@@ -23,18 +25,17 @@ def authentication_required(decorated_function):
             raise UnauthorizedException('No Authorization token provided')
         try:
             token = jwt.decode(raw_token, verify=False)
-            validate_token(token)
         except Exception:
             raise UnauthorizedException('Token not a valid JWT')
 
         try:
-            authenticate_user_jwt(token)
-            # A dashboard client
+            authenticate_hardware_jwt(token)
+            # A hardware client
             return decorated_function(*args, **kwargs)
         except UnauthorizedException:
             try:
-                authenticate_hardware_jwt(token)
-                # A hardware client
+                authenticate_user_jwt(raw_token)
+                # A dashboard client
                 return decorated_function(*args, **kwargs)
             except UnauthorizedException:
                 raise
@@ -42,29 +43,22 @@ def authentication_required(decorated_function):
 
 
 def authenticate_user_jwt(token):
-    print({'jwt': token})
-    if 'sub' in token:
-        raw_user_id = token['sub']
-    elif 'user_id' in token:
-        raw_user_id = token['user_id']
-    else:
-        raise UnauthorizedException('No user id in token')
+    res = json.loads(boto3.client('lambda').invoke(
+        FunctionName='users-{ENVIRONMENT}-apigateway-validateauth'.format(**os.environ),
+        Payload=json.dumps({"authorizationToken": token}),
+    )['Payload'].read())
+    print(res)
 
-    if ':' in raw_user_id:
-        region, principal = raw_user_id.split(':', 1)
-    else:
-        region, principal = os.environ['AWS_REGION'], raw_user_id
-
-    if region != os.environ['AWS_REGION']:
-        raise UnauthorizedException('Mismatching region in token')
-    if not validate_uuid4(principal):
-        raise UnauthorizedException('Principal is not a valid uuid')
-
-    return principal
+    if 'principalId' in res:
+        # Success
+        return res['principalId']
+    elif 'errorMessage' in res:
+        # Some failure
+        raise UnauthorizedException()
 
 
 def authenticate_hardware_jwt(token):
-
+    # FIXME no actual validation of token done here!
     print({'jwt_token': token})
     if 'username' in token:
         principal = token['username']
@@ -75,11 +69,6 @@ def authenticate_hardware_jwt(token):
         raise UnauthorizedException('Username is not a valid MAC address')
 
     return principal.upper()
-
-
-def validate_token(token):
-    # TODO
-    pass
 
 
 def validate_mac_address(string):

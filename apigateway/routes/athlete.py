@@ -30,10 +30,7 @@ def create_daily_plan(athlete_id):
     # daily_plan.last_updated = format_datetime(datetime.datetime.now())
     push_plan_update(athlete_id, daily_plan)
 
-    endpoint = "athlete/{}/stats".format(athlete_id)
-    headers = {'Authorization': request.headers['Authorization'],
-                'Content-Type': 'application/json'}
-    run_async(endpoint, method='POST', body=None, headers=headers)
+    run_async('POST', f"athlete/{athlete_id}/stats")
 
     return {'message': 'Update requested'}, 202
 
@@ -43,7 +40,8 @@ def create_daily_plan(athlete_id):
 @xray_recorder.capture('routes.athlete.stats.update')
 def update_athlete_stats(athlete_id):
     StatsProcessing(athlete_id, event_date=None, daily_readiness_datastore=DailyReadinessDatastore(),
-                    post_session_survey_datastore=PostSessionSurveyDatastore(), daily_plan_datastore=None,
+                    post_session_survey_datastore=PostSessionSurveyDatastore(),
+                    daily_plan_datastore=DailyPlanDatastore(),
                     athlete_stats_datastore=AthleteStatsDatastore()).process_athlete_stats()
     return {'message': 'Update requested'}, 202
 
