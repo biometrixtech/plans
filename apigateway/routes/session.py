@@ -111,12 +111,16 @@ def handle_session_update(session_id):
     store = SessionDatastore()
     session_obj = store.get(user_id=user_id, 
                             event_date=plan_event_date,
-                            session_type=session_type,
                             session_id=session_id
                             )[0]
     if session_obj.post_session_survey:
         raise ForbiddenException("Cannot modify a Session that's already logged")
     else:
+        if session_type != session_obj.session_type().value:
+            session_data = session_obj.json_serialise()
+            session_data['id'] = session_data['session_id']
+            del session_data['session_type'], session_data['session_id']
+            session_obj = _create_session(user_id, session_type, session_data)
         _update_session(session_obj, session_data)
         store.update(session_obj,
                      user_id=user_id,

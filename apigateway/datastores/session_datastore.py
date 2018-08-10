@@ -12,7 +12,7 @@ class SessionDatastore(object):
         sessions = self._get_sessions_from_mongo(user_id, event_date, session_type, session_id)
 
         if session_id is not None and len(sessions) == 0:
-            raise NoSuchEntityException('No session could be found for the session_id: {} of session_type: {}'.format(session_id, SessionType(session_type).name))
+            raise NoSuchEntityException('No session could be found for the session_id: {}'.format(session_id))
         else:
             return sessions
 
@@ -30,9 +30,9 @@ class SessionDatastore(object):
         session = item.json_serialise()
         query = {"user_id": user_id, "date": event_date}
         mongo_collection = get_mongo_collection(self.mongo_collection)
-        result = mongo_collection.update_one(query, {'$pull': {'training_sessions': {'session_id': item.id, 'session_type': session_type}}})
+        result = mongo_collection.update_one(query, {'$pull': {'training_sessions': {'session_id': item.id}}})
         if result.modified_count == 0:
-            raise NoSuchEntityException('No session could be found for the session_id: {} of session_type: {}'.format(item.id, SessionType(session_type).name))
+            raise NoSuchEntityException('No session could be found for the session_id: {}'.format(item.id))
         else:
             mongo_collection.update_one(query, {'$push': {'training_sessions': session}})
 
@@ -59,9 +59,8 @@ class SessionDatastore(object):
             external_sessions.extend(getattr(plan, 'training_sessions'))
         else:
             external_sessions = getattr(plan, 'training_sessions')
-            if session_id is None:
-                external_sessions = [s for s in external_sessions if s.session_type() == SessionType(session_type)]
-            else:
-                external_sessions = [s for s in external_sessions if s.id == session_id]
+            external_sessions = [s for s in external_sessions if s.session_type() == SessionType(session_type)]
+        if session_id is not None:
+            external_sessions = [s for s in external_sessions if s.id == session_id]
 
         return external_sessions
