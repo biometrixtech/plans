@@ -23,27 +23,20 @@ class ExerciseAssignmentCalculator(object):
         assigned_exercise_list = []
 
         for body_part_exercise in body_part_exercises:
-            # get details from library
-            target_exercise = [ex for ex in exercise_list if ex.id == body_part_exercise.exercise.id]
 
-            # did athlete already complete this exercise
-            if completed_exercises is not None:
-                completed_exercise = [ex for ex in completed_exercises if
-                                      ex.exercise_id == target_exercise.id]
-
-            # if completed_exercise is not None:
-            # do stuff
+            #has athlete completed enough exposures for this exercise?
+            target_exercise = self.get_current_exercise(body_part_exercise, self.exercise_library, completed_exercises)
 
             # determine reps and sets
-            assigned_exercise = models.exercise.AssignedExercise(target_exercise[0].id,
+            assigned_exercise = models.exercise.AssignedExercise(target_exercise.id,
                                                                  body_part_exercise.body_part_priority,
                                                                  body_part_exercise.body_part_exercise_priority,
                                                                  soreness_severity
                                                                  )
-            assigned_exercise.exercise = target_exercise[0]
+            assigned_exercise.exercise = target_exercise
 
-            assigned_exercise.reps_assigned = target_exercise[0].max_reps
-            assigned_exercise.sets_assigned = target_exercise[0].max_sets
+            assigned_exercise.reps_assigned = target_exercise.max_reps
+            assigned_exercise.sets_assigned = target_exercise.max_sets
 
             assigned_exercise_list.append(assigned_exercise)
 
@@ -141,17 +134,42 @@ class ExerciseAssignmentCalculator(object):
 
         return exercise_assignments
 
-    def get_progression_dictionary(self, assigned_exercise):
+    def get_current_exercise(self, body_part_exercise, exercise_list, completed_exercises):
 
-        progression_dictionary = {}
+        target_exercise_list = [ex for ex in exercise_list if ex.id == body_part_exercise.exercise.id]
+        target_exercise = target_exercise_list[0]
 
-        for e in range(0, assigned_exercise.progressions):
-            if e == 0:
-                progression_dictionary[assigned_exercise.library_id] = assigned_exercise.progressions[e]
+        if len(body_part_exercise.progressions) == 0:
+            return target_exercise
+        else:
+            completed_exercise_list = [ex for ex in completed_exercises if ex.exercise_id == body_part_exercise.exercise.id]
+            if len(completed_exercise_list) == 0:
+                return target_exercise
             else:
-                progression_dictionary[assigned_exercise.progressions[e - 1]] = assigned_exercise.progressions[e]
+                if completed_exercise_list[0].exposures >= target_exercise.exposure_target:
+                    # now work through progressions...
 
-        return progression_dictionary
+                    for p in range(len(target_exercise.progressions), 0, -1):
+                        completed_progression_list = [ex for ex in completed_exercises if
+                                                      ex.exercise_id == target_exercise.progressions[p]]
+                        proposed_exercise_list = [ex for ex in exercise_list if ex.id == target_exercise.progressions[p]]
+                        proposed_exercise = proposed_exercise_list[0]
+                        if len(completed_progression_list) == 0:
+                            # haven't dont anything with this exercise yet, keep working our way down
+                            continue
+                        elif completed_progression_list[0].exposures >= proposed_exercise.exposure_target:
+                            # return next progression
+                            if p < (len(target_exercise.progressions) - 1):
+                                proposed_exercise_list = [ex for ex in exercise_list if
+                                                          ex.id == target_exercise.progressions[p + 1]]
+                                proposed_exercise = proposed_exercise_list[0]
+                                return proposed_exercise
+                            else:
+                                return proposed_exercise
+                        else:
+                            return proposed_exercise
+                else:
+                    return target_exercise
 
     def get_general_exercises(self):
 
