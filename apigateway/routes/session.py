@@ -77,7 +77,7 @@ def handle_session_delete(session_id):
                  session_id=session_id
                  )
 
-    # update_plan(event_date)
+    # update_plan(user_id, event_date)
 
     return {'message': 'success'}, 200
 
@@ -168,7 +168,7 @@ def handle_session_sensor_data():
                          event_date=event_date
                          )
 
-    # update_plan(event_date)
+    # update_plan(user_id, event_date)
 
     return {'message': 'success'}, 200
 
@@ -210,6 +210,7 @@ def _create_session(user_id, session_type, data):
     #     setattr(session, key, value)
     return session
 
+
 def _update_session(session, data):
     for key, value in data.items():
         setattr(session, key, value)
@@ -223,12 +224,9 @@ def _check_plan_exists(user_id, event_date):
     else:
         return False
 
-def update_plan(event_date):
-    endpoint = "athlete/{}/daily_plan".format(request.json['user_id'])
-    headers = {'Authorization': request.headers['Authorization'],
-                'Content-Type': 'application/json'}
-    body = {'event_date': event_date}
-    run_async(endpoint, method='POST', body=body, headers=headers)
+
+def update_plan(user_id, event_date):
+    run_async('POST', f"athlete/{user_id}/daily_plan", body={'event_date': event_date})
 
 
 def _validate_schema():
@@ -247,4 +245,3 @@ def _validate_schema():
             raise InvalidSchemaException('session_type not recognized')
     if 'user_id' not in request.json:
         raise InvalidSchemaException('Missing required parameter user_id')
- 
