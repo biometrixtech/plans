@@ -44,7 +44,7 @@ def handle_session_create():
                     "duration_minutes": duration,
                     "event_date": session_event_date}
 
-    session = _create_session(user_id, session_type, session_data)
+    session = _create_session(session_type, session_data)
 
     store = SessionDatastore()
 
@@ -120,7 +120,7 @@ def handle_session_update(session_id):
             session_data = session_obj.json_serialise()
             session_data['id'] = session_data['session_id']
             del session_data['session_type'], session_data['session_id']
-            session_obj = _create_session(user_id, session_type, session_data)
+            session_obj = _create_session(session_type, session_data)
         _update_session(session_obj, session_data)
         store.update(session_obj,
                      user_id=user_id,
@@ -157,7 +157,7 @@ def handle_session_sensor_data():
 
         session_id = session.get('session_id', None)
         if session_id is None:
-            session_obj = _create_session(user_id, session_type, sensor_data)
+            session_obj = _create_session(session_type, sensor_data)
             store.insert(session_obj,
                          user_id=user_id,
                          event_date=event_date
@@ -207,7 +207,7 @@ def get_sensor_data(session):
     return sensor_data
 
 
-def _create_session(user_id, session_type, data):
+def _create_session(session_type, data):
     factory = SessionFactory()
     session = factory.create(SessionType(session_type))
     _update_session(session, data)
