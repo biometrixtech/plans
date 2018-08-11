@@ -22,9 +22,9 @@ class DuplicateEntityException(ApplicationException):
     def __init__(self):
         super().__init__(409, 'DuplicateEntity', 'Duplicate Entity')
 
-class UnauthorizedActionException(ApplicationException):
+class ForbiddenException(ApplicationException):
     def __init__(self, message=''):
-        super().__init__(401, 'UnauthorizedAction', message)
+        super().__init__(403, 'Forbidden', message)
 
 
 class InvalidSchemaException(ApplicationException):
