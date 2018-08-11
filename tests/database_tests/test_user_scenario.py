@@ -35,6 +35,7 @@ def add_xray_support(request):
     os.environ["MONGO_COLLECTION_TRAININGSCHEDULE"] = config['collection_trainingschedule']
     os.environ["MONGO_COLLECTION_ATHLETESEASON"] = config['collection_athleteseason']
     os.environ["MONGO_COLLECTION_ATHLETESTATS"] = config['collection_athletestats']
+    os.environ["MONGO_COLLECTION_COMPLETEDEXERCISES"] = config['collection_completedexercises']
 
 
 def write_file(file_name, daily_plan):

@@ -24,7 +24,7 @@ class CompletedExerciseDatastore(object):
     def _query_mongodb(self, athlete_id, start_date, end_date, get_summary):
         mongo_collection = get_mongo_collection(self.mongo_collection)
         ret = []
-        query = {'athlete_id': athlete_id, 'date': {'$gte': start_date, '$lte': end_date}}
+        query = {"$and": [{'athlete_id': athlete_id, 'event_date': {'$gte': start_date, '$lte': end_date}}]}
 
         if not get_summary:
 
@@ -42,6 +42,7 @@ class CompletedExerciseDatastore(object):
                 {'$match': query},
                 {"$group": {"_id": {"athlete_id": "$athlete_id", "exercise_id": "$exercise_id"},
                             "exposures": {"$sum": 1}}}])
+            agg_list = list(mongo_cursor)
             for mongo_result in mongo_cursor:
                 completed_exercise_summary = CompletedExerciseSummary(athlete_id=mongo_result['$_id.athlete_id'],
                                                                       exercise_id=mongo_result['$_id.exercise_id'],
