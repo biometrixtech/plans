@@ -81,6 +81,10 @@ from routes.active_recovery import app as active_recovery_routes
 app.register_blueprint(active_recovery_routes, url_prefix='/plans/active_recovery')
 
 
+from routes.misc import app as misc_routes
+app.register_blueprint(misc_routes, url_prefix='/plans/misc')
+
+
 @app.errorhandler(500)
 def handle_server_error(e):
     tb = sys.exc_info()[2]
