@@ -45,9 +45,6 @@ def handle_post_session_survey_create():
     store = PostSessionSurveyDatastore()
     store.put(survey)
 
-    endpoint = "athlete/{}/daily_plan".format(request.json['user_id'])
-    headers = {'Authorization': request.headers['Authorization'],
-                'Content-Type': 'application/json'}
-    run_async(endpoint, method='POST', body=None, headers=headers)
+    run_async('POST', f"athlete/{request.json['user_id']}/daily_plan")
 
     return {'message': 'success'}, 201
