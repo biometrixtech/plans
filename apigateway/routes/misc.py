@@ -15,13 +15,13 @@ app = Blueprint('misc', __name__)
 @xray_recorder.capture('routes.misc.clearuser')
 def handle_clear_user_data():
     user_id = jwt.decode(request.headers['Authorization'], verify=False)['user_id']
-    if user_id not in  ['c4f3ba9c-c874-4687-bbb8-67633a6a6d7d', # dipesh
-                        'a1233423-73d3-4761-ac92-89cc15921d34', # mazen
-                        '', # demo1 (test)
-                        '', # demo2 (test)
-                        '', # demo3 (test)
-                        '', # demo4 (test)
-                        '', # demo5 (test)
+    if user_id not in  ["c4f3ba9c-c874-4687-bbb8-67633a6a6d7d", # dipesh+mvp@fathomai.com
+                        "a1233423-73d3-4761-ac92-89cc15921d34", # mazen+mvp@fathomai.com
+                        "ad328899-f8e6-4070-8878-73bf84c79699", # hello+demo1@fathomai.com
+                        "c1394094-c8e2-4880-b940-237d41d4118e", # hello+demo2@fathomai.com
+                        "9138da93-d054-45d2-9149-2572523b49da", # hello+demo3@fathomai.com
+                        "865f9e91-00b6-418b-a037-5a5d322a7e34", # hello+demo4@fathomai.com
+                        "74bfd848-dc85-4025-a612-ff76d1b9eaa9", # hello+demo5@fathomai.com
                         ]:
         raise ForbiddenException("The user is not allowed to perform this action.")
     if 'event_date' not in request.json:
@@ -34,9 +34,9 @@ def handle_clear_user_data():
     tomorrow = format_date(current_time + datetime.timedelta(days=1))
     readiness = get_mongo_collection('dailyreadiness')
     result = readiness.delete_many({"user_id": user_id, "event_date": {"$gte": today, "$lt": tomorrow}})
-    print(result.deleted_count)
+    print("readiness surveys deleted: {}".format(result.deleted_count))
     daily_plan = get_mongo_collection('dailyplan')
     result = daily_plan.delete_one({"user_id": user_id, "date": today})
-    print(result.deleted_count)
+    print("daily plans deleted: {}".format(result.deleted_count))
 
     return {'message': 'Success'}, 200
