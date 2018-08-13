@@ -38,19 +38,19 @@ class PostSessionSurveyDatastore(object):
         for plan in mongo_cursor:
             training_session_surveys = \
                 [_post_session_survey_from_mongodb(s, user_id, s["session_id"], s["session_type"], plan["date"])
-                 for s in plan['training_sessions'] if s is not None]
+                 for s in plan.get('training_sessions', []) if s is not None]
             practice_session_surveys = \
                 [_post_session_survey_from_mongodb(s, user_id, s["session_id"], SessionType.practice, plan["date"])
-                 for s in plan['practice_sessions'] if s is not None]
+                 for s in plan.get('practice_sessions', []) if s is not None]
             strength_conditioning_session_surveys = \
                 [_post_session_survey_from_mongodb(s, user_id, s["session_id"], SessionType.strength_and_conditioning, plan["date"])
-                 for s in plan['cross_training_sessions'] if s is not None]
+                 for s in plan.get('cross_training_sessions', []) if s is not None]
             game_surveys = \
                 [_post_session_survey_from_mongodb(s, user_id, s["session_id"], SessionType.game, plan["date"])
-                 for s in plan['game_sessions'] if s is not None]
+                 for s in plan.get('game_sessions', []) if s is not None]
             bump_up_session_surveys = \
                 [_post_session_survey_from_mongodb(s, user_id, s["session_id"], SessionType.bump_up, plan["date"])
-                 for s in plan['bump_up_sessions'] if s is not None]
+                 for s in plan.get('bump_up_sessions', []) if s is not None]
 
             ret.extend([s for s in practice_session_surveys if s is not None])
             ret.extend([s for s in strength_conditioning_session_surveys if s is not None])

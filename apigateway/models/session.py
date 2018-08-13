@@ -67,6 +67,11 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         if name in ['event_date', 'sensor_start_date_time', 'sensor_end_date_time']:
             if not isinstance(value, datetime.datetime) and value is not None:
                 value = parse_datetime(value)
+        elif name == "sport_name" and not isinstance(value, SportName):
+            if value == '':
+                value = SportName(None)
+            else:
+                value = SportName(value)
         super().__setattr__(name, value)
 
     @abc.abstractmethod
@@ -87,11 +92,12 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
             return False
 
     def json_serialise(self):
+        session_type = self.session_type()
         ret = {
             'session_id': self.id,
             'description': self.description,
-            'session_type': SessionType(self.session_type()).value,
-            'sport_name': SportName(self.sport()).value,
+            'session_type': session_type.value,
+            'sport_name': self.sport_name.value,
             # 'date': self.date,
             'event_date': format_datetime(self.event_date),
             'duration_minutes': self.duration_minutes,
@@ -336,7 +342,16 @@ class RecoverySession(Serialisable):
             for soreness in soreness_list:
                 max_severity = max(max_severity, soreness.severity)
 
-        if max_severity == 3:
+        if max_severity > 3:
+            self.integrate_target_minutes = 0
+            self.activate_target_minutes = 0
+            self.lengthen_target_minutes = 0
+            self.inhibit_target_minutes = 0
+            self.integrate_max_percentage = 0
+            self.activate_max_percentage = 0
+            self.lengthen_max_percentage = 0
+            self.inhibit_max_percentage = 0
+        elif max_severity == 3:
             self.integrate_target_minutes = None
             self.activate_target_minutes = None
             self.lengthen_target_minutes = total_minutes_target / 2

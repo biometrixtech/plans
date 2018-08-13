@@ -6,6 +6,7 @@ from datastores.daily_readiness_datastore import DailyReadinessDatastore
 from datastores.post_session_survey_datastore import PostSessionSurveyDatastore
 from datastores.exercise_datastore import ExerciseLibraryDatastore
 from datastores.athlete_stats_datastore import AthleteStatsDatastore
+from datastores.completed_exercise_datastore import CompletedExerciseDatastore
 from logic.training_plan_management import TrainingPlanManager
 from logic.stats_processing import StatsProcessing
 from utils import format_datetime, run_async
@@ -26,14 +27,11 @@ iotd_client = boto3.client('iot-data')
 def create_daily_plan(athlete_id):
     daily_plan = TrainingPlanManager(athlete_id, ExerciseLibraryDatastore(), DailyReadinessDatastore(),
                                      PostSessionSurveyDatastore(), DailyPlanDatastore(),
-                                     AthleteStatsDatastore()).create_daily_plan()
+                                     AthleteStatsDatastore(), CompletedExerciseDatastore()).create_daily_plan()
     # daily_plan.last_updated = format_datetime(datetime.datetime.now())
     push_plan_update(athlete_id, daily_plan)
 
-    endpoint = "athlete/{}/stats".format(athlete_id)
-    headers = {'Authorization': request.headers['Authorization'],
-                'Content-Type': 'application/json'}
-    run_async(endpoint, method='POST', body=None, headers=headers)
+    run_async('POST', f"athlete/{athlete_id}/stats")
 
     return {'message': 'Update requested'}, 202
 
