@@ -39,4 +39,4 @@ def handle_clear_user_data():
     result = daily_plan.delete_one({"user_id": user_id, "date": today})
     print("daily plans deleted: {}".format(result.deleted_count))
 
-    return {'message': 'Success'}, 200
+    return {'message': 'success'}, 200

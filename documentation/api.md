@@ -1227,4 +1227,39 @@ Authorization: eyJraWQ...ajBc4VQ
 }
 ```
 
+### Misc
+
+#### Clear user's data
+This endpoint can used to clear the user's data for the given day. Note that his endpoint is restricted to select demo accounts and user must be authorized to perform the action. It will clear out users daily readiness survey and their plan for the day. If the request is made before 3 am, plan and surveys for the previous day will be cleared which is consistent with 3am being the cutoff time for the new daily plan.
+
+##### Query String
+The client __must__ submit a request to the endpoint `/plans/misc/clear_user_data`. The request method __must__ be `POST`.
+
+##### Request
+The client __must__ submit a request body containing a JSON object with the following schema:
+```
+{
+    "event_date": Datetime
+}
+```
+* `event_date` __should__ reflect the local date and time when the request was made
+
+```
+POST /plans/misc/clear_user_data HTTPS/1.1
+Host: apis.env.fathomai.com
+Content-Type: application/json
+Authorization: eyJraWQ...ajBc4VQ
+
+{
+    {"event_date": "2018-08-13T11:12:30Z"}
+}
+```
+##### Responses
+ If clearing data was successful, the Service __will__ respond with HTTP Status `200 OK`, with a body with the following syntax:
+ 
+```
+{
+    "message": "success"
+}
+```
 
