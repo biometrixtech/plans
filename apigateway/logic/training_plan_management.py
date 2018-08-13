@@ -227,6 +227,7 @@ class TrainingPlanManager(object):
                 daily_plan.post_recovery.why_text = text_generator.get_why_text(rpe_impact_score, max_soreness)
                 daily_plan.post_recovery.goal_text = text_generator.get_goal_text(rpe_impact_score, max_soreness,
                                                                                   body_part_text)
+
                 daily_plan.post_recovery.display_exercises = True
             else:
                 # daily_plan.post_recovery = None

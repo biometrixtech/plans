@@ -139,6 +139,8 @@ class ExerciseAssignmentCalculator(object):
         target_exercise_list = [ex for ex in exercise_list if ex.id == body_part_exercise.exercise.id]
         target_exercise = target_exercise_list[0]
 
+        ''' Coming Soon
+
         if len(body_part_exercise.exercise.progressions) == 0:
             return target_exercise
         else:
@@ -173,6 +175,10 @@ class ExerciseAssignmentCalculator(object):
                             return proposed_exercise
                 else:
                     return target_exercise
+                    
+        '''
+
+        return target_exercise
 
     def get_general_exercises(self):
 
@@ -672,7 +678,7 @@ class ExerciseAssignmentCalculator(object):
         achilles.lengthen_exercises.append(models.exercise.AssignedExercise("7", achilles.treatment_priority, 1))
         achilles.lengthen_exercises.append(models.exercise.AssignedExercise("9", achilles.treatment_priority, 2))
 
-        achilles.activate_exercises.append(models.exercise.AssignedExercise("29", achilles.treatment_priority, 1))
+        achilles.activate_exercises.append(models.exercise.AssignedExercise("106", achilles.treatment_priority, 1))
 
         calf_raise_progression = models.exercise.AssignedExercise("67", achilles.treatment_priority, 2)
         calf_raise_progression.exercise.progressions = ["78", "68"]

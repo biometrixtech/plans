@@ -342,7 +342,16 @@ class RecoverySession(Serialisable):
             for soreness in soreness_list:
                 max_severity = max(max_severity, soreness.severity)
 
-        if max_severity == 3:
+        if max_severity > 3:
+            self.integrate_target_minutes = 0
+            self.activate_target_minutes = 0
+            self.lengthen_target_minutes = 0
+            self.inhibit_target_minutes = 0
+            self.integrate_max_percentage = 0
+            self.activate_max_percentage = 0
+            self.lengthen_max_percentage = 0
+            self.inhibit_max_percentage = 0
+        elif max_severity == 3:
             self.integrate_target_minutes = None
             self.activate_target_minutes = None
             self.lengthen_target_minutes = total_minutes_target / 2
