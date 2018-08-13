@@ -33,8 +33,10 @@ def handle_clear_user_data():
     today = format_date(current_time)
     tomorrow = format_date(current_time + datetime.timedelta(days=1))
     readiness = get_mongo_collection('dailyreadiness')
-    readiness.delete_many({"user_id": user_id, "event_date": {"$gte": today, "$lt": tomorrow}})
+    result = readiness.delete_many({"user_id": user_id, "event_date": {"$gte": today, "$lt": tomorrow}})
+    print(result.deleted_count)
     daily_plan = get_mongo_collection('dailyplan')
-    daily_plan.delete_one({"user_id": user_id, "date": today})
+    result = daily_plan.delete_one({"user_id": user_id, "date": today})
+    print(result.deleted_count)
 
     return {'message': 'Success'}, 200
