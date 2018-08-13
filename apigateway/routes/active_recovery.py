@@ -6,7 +6,7 @@ from exceptions import InvalidSchemaException, NoSuchEntityException
 from datastores.daily_plan_datastore import DailyPlanDatastore
 from datastores.completed_exercise_datastore import CompletedExerciseDatastore
 from models.exercise import CompletedExercise
-from utils import format_date
+from utils import format_date, parse_datetime, format_datetime
 from config import get_mongo_collection
 
 app = Blueprint('active_recovery', __name__)
@@ -21,9 +21,7 @@ def handle_active_recovery_update():
     if 'event_date' not in request.json:
         raise InvalidSchemaException('Missing required parameter event_date')
     else:
-        event_date = format_date(request.json['event_date'])
-        if event_date is None:
-            raise InvalidSchemaException('event_date is not formatted correctly')
+        event_date = parse_datetime(request.json['event_date'])
     try:
         user_id = request.json['user_id']
     except:
@@ -32,11 +30,14 @@ def handle_active_recovery_update():
         recovery_type = request.json['recovery_type']
     except:
         raise InvalidSchemaException('recovery_type is required')
-    if not _check_plan_exists(user_id, event_date):
+
+    plan_event_date = format_date(event_date)
+    recovery_event_date = format_datetime(event_date)
+    if not _check_plan_exists(user_id, plan_event_date):
         raise NoSuchEntityException('Plan not found for the user')
     store = DailyPlanDatastore()
 
-    plan = store.get(user_id=user_id, start_date=event_date, end_date=event_date)[0]
+    plan = store.get(user_id=user_id, start_date=plan_event_date, end_date=plan_event_date)[0]
     if recovery_type == 'pre':
         plan.pre_recovery_completed = True # plan
         plan.pre_recovery.completed = True # recovery
@@ -50,9 +51,9 @@ def handle_active_recovery_update():
     store.put(plan)
 
     if recovery_type == 'pre':
-        save_completed_exercises_for_recovery(plan.pre_recovery, user_id, event_date)
+        save_completed_exercises_for_recovery(plan.pre_recovery, user_id, recovery_event_date)
     elif recovery_type == 'post':
-        save_completed_exercises_for_recovery(plan.post_recovery, user_id, event_date)
+        save_completed_exercises_for_recovery(plan.post_recovery, user_id, recovery_event_date)
 
     survey_complete = plan.daily_readiness_survey_completed()
     landing_screen, nav_bar_indicator = plan.define_landing_screen()
