@@ -216,7 +216,7 @@ def three_post_session_survey_24_hours_mixed_soreness():
                                               "tester",
                                               "test_session", 0, post_survey_3)
 
-    surveys.append(post_session_survey_2)
+    surveys.append(post_session_survey_3)
 
     return surveys
 
