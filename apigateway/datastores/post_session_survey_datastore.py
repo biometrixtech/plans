@@ -36,23 +36,27 @@ class PostSessionSurveyDatastore(object):
         ret = []
 
         for plan in mongo_cursor:
+            training_session_surveys = \
+                [_post_session_survey_from_mongodb(s, user_id, s["session_id"], s["session_type"], plan["date"])
+                 for s in plan.get('training_sessions', []) if s is not None]
             practice_session_surveys = \
                 [_post_session_survey_from_mongodb(s, user_id, s["session_id"], SessionType.practice, plan["date"])
-                 for s in plan['practice_sessions'] if s is not None]
+                 for s in plan.get('practice_sessions', []) if s is not None]
             strength_conditioning_session_surveys = \
                 [_post_session_survey_from_mongodb(s, user_id, s["session_id"], SessionType.strength_and_conditioning, plan["date"])
-                 for s in plan['cross_training_sessions'] if s is not None]
+                 for s in plan.get('cross_training_sessions', []) if s is not None]
             game_surveys = \
                 [_post_session_survey_from_mongodb(s, user_id, s["session_id"], SessionType.game, plan["date"])
-                 for s in plan['game_sessions'] if s is not None]
+                 for s in plan.get('game_sessions', []) if s is not None]
             bump_up_session_surveys = \
                 [_post_session_survey_from_mongodb(s, user_id, s["session_id"], SessionType.bump_up, plan["date"])
-                 for s in plan['bump_up_sessions'] if s is not None]
+                 for s in plan.get('bump_up_sessions', []) if s is not None]
 
             ret.extend([s for s in practice_session_surveys if s is not None])
             ret.extend([s for s in strength_conditioning_session_surveys if s is not None])
             ret.extend([s for s in game_surveys if s is not None])
             ret.extend([s for s in bump_up_session_surveys if s is not None])
+            ret.extend([s for s in training_session_surveys if s is not None])
 
         return ret
 
@@ -63,6 +67,7 @@ class PostSessionSurveyDatastore(object):
         daily_plan = daily_plan_store.get(user_id=item.user_id,
                                           start_date=item.event_date,
                                           end_date=item.event_date)
+        '''
         session_type = item.session_type.value
         if session_type == 0:
             session_type_name = 'practice_sessions'
@@ -76,9 +81,11 @@ class PostSessionSurveyDatastore(object):
             session_type_name = 'bump_up_sessions'
         elif session_type == 5:
             session_type_name = 'corrective_sessions'
+        '''
 
         plan = daily_plan[0]
-        sessions = getattr(plan, session_type_name)
+        # sessions = getattr(plan, session_type_name)
+        sessions = getattr(plan, 'training_sessions')
         sessions = [s.json_serialise() for s in sessions]
         if item.session_id is not None:
             for session in sessions:
@@ -93,16 +100,20 @@ class PostSessionSurveyDatastore(object):
            
             sessions.append(session_json)
 
+        '''
         if session_type == 1:
             session_type_name = 'cross_training_sessions'
         elif session_type == 2:
             session_type_name = 'game_sessions'
         elif session_type == 3:
             session_type_name = 'tournament_sessions'
+        '''
 
         mongo_collection = get_mongo_collection(self.mongo_collection)
         query = {"user_id": item.user_id, "date": item.event_date}
-        mongo_collection.update_one(query, {'$set': {session_type_name: sessions}})
+        # mongo_collection.update_one(query, {'$set': {session_type_name: sessions}})
+        mongo_collection.update_one(query, {'$set': {'training_sessions': sessions}})
+
 
 def _post_session_survey_from_mongodb(mongo_result, user_id, session_id, session_type, event_date):
 
