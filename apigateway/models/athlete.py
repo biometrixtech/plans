@@ -79,6 +79,7 @@ class SportName(Enum):
     volleyball = 17
     wrestling = 18
     weightlifting = 19
+    no_sport = None
 
 
 class YouthAthlete(Athlete):

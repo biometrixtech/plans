@@ -27,6 +27,7 @@ The client __must__ submit the header `Authorization: <JWT>` with all requests. 
 In addition to the AWS API Gateway responses and the specific responses for each endpoint, the server __may__ respond with one of the following HTTP responses:
 
 * `400 Bad Request` with `Status` header equal to `InvalidSchema`, if the JSON body of the request does not match the requirements of the endpoint.
+* `403 Forbidden` with `Status` header equal to `Forbidden`, if the user is not allowed to perform the requested action.
 * `404 Unknown` with `Status` header equal to `UnknownEndpoint`, if an invalid endpoint was requested.
 
 ## Schema
@@ -215,14 +216,18 @@ The client __must__ submit a request to the endpoint `/plans/session`. The reque
 The client __must__ submit a request body containing a JSON object with the following schema:
 ```
 {
-	"user_id": Uuid,
-	"event_date": Datetime,
-	"session_type": number,
-	"description": string
+    "user_id": Uuid,
+    "event_date": Datetime,
+    "sport_name": number,
+    "session_type": number,
+    "duration": number,
+    "description": string
 }
 ```
-* `event_date` __should__ reflect the date the session should be created for and should be of format `yyyy-yy-yy`.
+* `event_date` __should__ reflect the date and time the session is scheduled for.
 * `session_type` __should__ be an integer reflecting SessionType enumeration.
+* `sport_name` __should__ be an integer reflecting SportName enumeration.
+* `duration` __should__ be in minutes and reflect the length of time the session is scheduled for.
 * `description` is __optional__ parameter to provide short description of the session they're adding
 
 ```
@@ -233,9 +238,11 @@ Authorization: eyJraWQ...ajBc4VQ
 
 {
     "user_id": "02cb7965-7921-493a-80d4-6b278c928fad",
-    "event_date": "2018-07-11",
+    "event_date": "2018-08-10T16:30:00Z",
     "session_type": 0,
-    "description": "evening biking"
+    "sport_name": 5,
+    "duration": 90,
+    "description": "Later Afteronoon Practice"
 }
 ```
 ##### Responses
@@ -266,7 +273,7 @@ The client __must__ submit a request body containing a JSON object with the foll
 	"session_type": number
 }
 ```
-* `event_date` __should__ reflect the date the session should be created for and should be of format `yyyy-mm-dd`.
+* `event_date` __should__ reflect the date and time the session was scheduled for.
 * `session_type` __should__ be an integer reflecting SessionType enumeration.
 
 ```
@@ -277,8 +284,8 @@ Authorization: eyJraWQ...ajBc4VQ
 
 {
     "user_id": "02cb7965-7921-493a-80d4-6b278c928fad",
-    "event_date": "2018-07-11",
-    "session_type": 1
+    "event_date": "2018-08-10T16:30:00Z",
+    "session_type": 0
 }
 ```
 ##### Responses
@@ -291,6 +298,57 @@ Authorization: eyJraWQ...ajBc4VQ
 }
 ```
 
+#### Update
+
+This endpoint can be called to update the details of an existing session that hasn't already been logged. This endpoint can be called to reschedule a session, or change duration/sport/session type/description of the session.
+
+##### Query String
+ 
+The client __must__ submit a request to the endpoint `/plans/session/{session_id}`. The request method __must__ be `PATCH`.
+
+##### Request
+
+The client __must__ submit a request body containing a JSON object with the following schema:
+```
+{
+    "user_id": Uuid,
+    "event_date": Datetime,
+    "sport_name": number,
+    "session_type": number,
+    "duration": number,
+    "description": string
+}
+```
+* `event_date` __should__ reflect the date and time the session is scheduled for. If the session is being recheduled, it should reflect the new time.
+* `session_type` __should__ be an integer reflecting SessionType enumeration.
+* `sport_name` __should__ be an integer reflecting SportName enumeration.
+* `duration` __should__ be in minutes and reflect the length of time the session is scheduled for.
+* `description` is __optional__ parameter to provide short description of the session they're adding
+
+```
+PATCH /plans/session/73e8f603-d2d5-423a-b2b6-fe0996a373c8 HTTPS/1.1
+Host: apis.env.fathomai.com
+Content-Type: application/json
+Authorization: eyJraWQ...ajBc4VQ
+
+{
+    "user_id": "02cb7965-7921-493a-80d4-6b278c928fad",
+    "event_date": "2018-08-10T16:30:00Z",
+    "session_type": 1,
+    "sport_name": 5,
+    "duration": 90,
+    "description": "Late Afteronoon Practice"
+}
+```
+##### Responses
+ 
+ If the update was successful, the Service __will__ respond with HTTP Status `200 OK`, with a body with the following syntax:
+ 
+```
+{
+    "message": "success"
+}
+```
 
 #### Send sensor data
 
@@ -608,10 +666,10 @@ The client __must__ submit a request to the endpoint `/plans/daily_plan`. The re
 The client __must__ submit a request body containing a JSON object with the following schema:
 ```
 {
-	"user_id": Uuid,
+    "user_id": Uuid,
     "event_date": Datetime
-	"start_date": string,
-	"end_date": string
+    "start_date": string,
+    "end_date": string
 }
 ```
 * `event_date` __should__ reflect the time (in local timezone) when the api call is made.
@@ -1169,4 +1227,39 @@ Authorization: eyJraWQ...ajBc4VQ
 }
 ```
 
+### Misc
+
+#### Clear user's data
+This endpoint can used to clear the user's data for the given day. Note that his endpoint is restricted to select demo accounts and user must be authorized to perform the action. It will clear out users daily readiness survey and their plan for the day. If the request is made before 3 am, plan and surveys for the previous day will be cleared which is consistent with 3am being the cutoff time for the new daily plan.
+
+##### Query String
+The client __must__ submit a request to the endpoint `/plans/misc/clear_user_data`. The request method __must__ be `POST`.
+
+##### Request
+The client __must__ submit a request body containing a JSON object with the following schema:
+```
+{
+    "event_date": Datetime
+}
+```
+* `event_date` __should__ reflect the local date and time when the request was made
+
+```
+POST /plans/misc/clear_user_data HTTPS/1.1
+Host: apis.env.fathomai.com
+Content-Type: application/json
+Authorization: eyJraWQ...ajBc4VQ
+
+{
+    {"event_date": "2018-08-13T11:12:30Z"}
+}
+```
+##### Responses
+ If clearing data was successful, the Service __will__ respond with HTTP Status `200 OK`, with a body with the following syntax:
+ 
+```
+{
+    "message": "success"
+}
+```
 

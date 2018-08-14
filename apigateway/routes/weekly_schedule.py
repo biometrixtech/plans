@@ -1,13 +1,12 @@
 from aws_xray_sdk.core import xray_recorder
 from flask import request, Blueprint
-import json
 import datetime
 
 from decorators import authentication_required
 from exceptions import InvalidSchemaException
 from datastores.weekly_schedule_datastore import WeeklyCrossTrainingDatastore, WeeklyTrainingDatastore
 from models.weekly_schedule import WeeklySchedule
-from logic.athlete import SportName
+from models.athlete import SportName
 
 
 app = Blueprint('weekly_schedule', __name__)

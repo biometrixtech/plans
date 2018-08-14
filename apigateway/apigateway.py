@@ -81,6 +81,10 @@ from routes.active_recovery import app as active_recovery_routes
 app.register_blueprint(active_recovery_routes, url_prefix='/plans/active_recovery')
 
 
+from routes.misc import app as misc_routes
+app.register_blueprint(misc_routes, url_prefix='/plans/misc')
+
+
 @app.errorhandler(500)
 def handle_server_error(e):
     tb = sys.exc_info()[2]
@@ -115,6 +119,9 @@ def handler(event, context):
 
     # Trim trailing slashes from urls
     event['path'] = event['path'].rstrip('/')
+
+    # Trim semantic versioning string from urls, if present
+    event['path'] = event['path'].replace('/plans/latest/', '/plans/').replace('/plans/1.0.0/', '/plans/')
 
     # Pass tracing info to X-Ray
     if 'X-Amzn-Trace-Id-Safe' in event['headers']:

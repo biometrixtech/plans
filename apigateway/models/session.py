@@ -5,7 +5,7 @@ import datetime
 from serialisable import Serialisable
 import logic.exercise_generator as exercise
 from utils import format_datetime, parse_datetime
-
+from models.athlete import SportName
 
 class SessionType(Enum):
     practice = 0
@@ -30,6 +30,7 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
 
     def __init__(self):
         self.id = None
+        self.sport_name = None
         self.duration_sensor = None
         self.external_load = None
         self.high_intensity_load = None
@@ -66,6 +67,11 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         if name in ['event_date', 'sensor_start_date_time', 'sensor_end_date_time']:
             if not isinstance(value, datetime.datetime) and value is not None:
                 value = parse_datetime(value)
+        elif name == "sport_name" and not isinstance(value, SportName):
+            if value == '':
+                value = SportName(None)
+            else:
+                value = SportName(value)
         super().__setattr__(name, value)
 
     @abc.abstractmethod
@@ -86,9 +92,12 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
             return False
 
     def json_serialise(self):
+        session_type = self.session_type()
         ret = {
             'session_id': self.id,
             'description': self.description,
+            'session_type': session_type.value,
+            'sport_name': self.sport_name.value,
             # 'date': self.date,
             'event_date': format_datetime(self.event_date),
             'duration_minutes': self.duration_minutes,
@@ -268,6 +277,7 @@ class RecoverySession(Serialisable):
         self.why_text = ""
         self.goal_text = ""
         self.completed = False
+        self.display_exercises = False
 
     def json_serialise(self):
         ret = {'minutes_duration': self.duration_minutes,
@@ -277,6 +287,7 @@ class RecoverySession(Serialisable):
                'end_time': str(self.end_time),
                'impact_score': self.impact_score,
                'completed': self.completed,
+               'display_exercises': self.display_exercises,
                'inhibit_exercises': [ex.json_serialise() for ex in self.inhibit_exercises],
                'lengthen_exercises': [ex.json_serialise() for ex in self.lengthen_exercises],
                'activate_exercises': [ex.json_serialise() for ex in self.activate_exercises],
@@ -331,7 +342,16 @@ class RecoverySession(Serialisable):
             for soreness in soreness_list:
                 max_severity = max(max_severity, soreness.severity)
 
-        if max_severity == 3:
+        if max_severity > 3:
+            self.integrate_target_minutes = 0
+            self.activate_target_minutes = 0
+            self.lengthen_target_minutes = 0
+            self.inhibit_target_minutes = 0
+            self.integrate_max_percentage = 0
+            self.activate_max_percentage = 0
+            self.lengthen_max_percentage = 0
+            self.inhibit_max_percentage = 0
+        elif max_severity == 3:
             self.integrate_target_minutes = None
             self.activate_target_minutes = None
             self.lengthen_target_minutes = total_minutes_target / 2
