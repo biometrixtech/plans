@@ -139,7 +139,7 @@ def handler(event, context):
     xray_recorder.current_segment().put_http_meta('method', event['httpMethod'])
     xray_recorder.current_segment().put_http_meta('user_agent', event['headers']['User-Agent'])
     xray_recorder.current_segment().put_annotation('environment', os.environ['ENVIRONMENT'])
-    xray_recorder.current_segment().put_annotation('version', api_version)
+    xray_recorder.current_segment().put_annotation('version', str(api_version))
 
     ret = app(event, context)
     ret['headers'].update({
