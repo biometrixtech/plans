@@ -24,23 +24,32 @@ def handle_daily_schedule_create():
     if 'event_date' not in request.json:
         raise InvalidSchemaException('Missing required parameter event_date')
     else:
-        current_time = parse_datetime(request.json['event_date'])
-        event_date = format_date(current_time)
-        if event_date is None:
-            raise InvalidSchemaException('event_date is not formatted correctly')
+        event_date = parse_datetime(request.json['event_date'])
+    if 'user_id' not in request.json:
+        raise InvalidSchemaException('Missing required parameter event_date')
+    else:
+        user_id = request.json['user_id']
 
+    cutoff_time = 3
+    if event_date.hour < cutoff_time:
+        plan_event_date = event_date - datetime.timedelta(days=1)
+    else:
+        plan_event_date = event_date
+
+    plan_event_date = format_date(plan_event_date)
     session_store = SessionDatastore()
-    user_id = request.json['user_id']
     past_sessions = []
 
-    if not _check_plan_exists(user_id, event_date):
-        plan = DailyPlan(event_date=event_date)
+    if not _check_plan_exists(user_id, plan_event_date):
+        plan = DailyPlan(event_date=plan_event_date)
         plan.user_id = user_id
         plan.last_updated = format_datetime(datetime.datetime.utcnow())
         DailyPlanDatastore().put(plan)
     else:
-        daily_plan = DailyPlanDatastore().get(user_id, start_date=event_date, end_date=event_date)[0]
-        sessions = daily_plan.get_past_sessions(current_time)
+        daily_plan = DailyPlanDatastore().get(user_id,
+                                              start_date=plan_event_date,
+                                              end_date=plan_event_date)[0]
+        sessions = daily_plan.get_past_sessions(event_date)
         past_sessions.extend([s.json_serialise() for s in sessions])
         
 
@@ -50,12 +59,57 @@ def handle_daily_schedule_create():
         item = _create_session(user_id=user_id,
                                session_type=session['session_type'],
                                data=session_data)
-        if item.event_date < current_time:
+        if item.event_date < event_date:
             past_sessions.append(item.json_serialise())
         session_store.insert(item, user_id=user_id, event_date=event_date)
 
     past_sessions = _filter_response_data(past_sessions)
     return {'past_sessions': past_sessions}, 201
+
+
+
+@app.route('/typical', methods=['POST'])
+@authentication_required
+@xray_recorder.capture('routes.typical_schedule')
+def handle_get_typical_schedule():
+    if 'event_date' not in request.json:
+        raise InvalidSchemaException('Missing required parameter event_date')
+    else:
+        event_date = parse_datetime(request.json['event_date'])
+    if 'user_id' not in request.json:
+        raise InvalidSchemaException('Missing required parameter event_date')
+    else:
+        user_id = request.json['user_id']
+
+    cutoff_time = 3
+
+    if event_date.hour < cutoff_time:
+        event_date -= datetime.timedelta(days=1)
+
+    day_of_week = event_date.weekday()
+    dailyplan_store = DailyPlanDatastore()
+    start_date = format_date(event_date - datetime.timedelta(days=14))
+    end_date = format_date(event_date - datetime.timedelta(days=7))
+    plans = dailyplan_store.get(
+                                user_id=user_id,
+                                start_date=start_date,
+                                end_date=end_date,
+                                day_of_week=day_of_week
+                                )
+    sessions = []
+    for plan in plans:
+        sessions.extend(plan.training_sessions)
+        sessions.extend(plan.practice_sessions)
+        sessions.extend(plan.games)
+        sessions.extend(plan.strength_conditioning_sessions)
+        sessions.extend(plan.tournaments)
+    
+    sessions = [{'sport_name': s.sport_name.value,
+                 'session_type': s.session_type().value} for s in sessions]
+    sessions = [dict(t) for t in {tuple(d.items()) for d in sessions}]
+
+    return {'typical_sessions': sessions}, 200
+
 
 
 def _check_plan_exists(user_id, event_date):
