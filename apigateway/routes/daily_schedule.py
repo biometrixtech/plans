@@ -61,7 +61,7 @@ def handle_daily_schedule_create():
                                data=session_data)
         if item.event_date < event_date:
             past_sessions.append(item.json_serialise())
-        session_store.insert(item, user_id=user_id, event_date=event_date)
+        session_store.insert(item, user_id=user_id, event_date=plan_event_date)
 
     past_sessions = _filter_response_data(past_sessions)
     return {'past_sessions': past_sessions}, 201
