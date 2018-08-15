@@ -10,7 +10,7 @@ class DailyPlan(Serialisable):
     def __init__(self, event_date):
         self.user_id = ""
         self.event_date = event_date
-        self.day_of_week = self.get_event_datetime().today().weekday()
+        self.day_of_week = self.get_event_datetime().weekday()
         self.training_sessions = []
         self.practice_sessions = []
         self.strength_conditioning_sessions = []  # includes cross training
