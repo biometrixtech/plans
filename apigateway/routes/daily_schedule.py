@@ -68,14 +68,18 @@ def _check_plan_exists(user_id, event_date):
 
 def _get_session_data(session):
     event_date = parse_datetime(session['event_date'])
-    sport = session['sport']
-    sport = SportName(sport).name
-    duration_minutes = session.get('duration', None)
-    if duration_minutes is None:
+    try:
+        sport_name = session['sport_name']
+        sport_name = SportName(sport_name)
+    except:
+        sport_name = SportName(None)
+    try:
+        duration_minutes = session["duration"]
+    except:
         raise InvalidSchemaException("duration is missing for the session")
 
     session_data = {"event_date": event_date,
-                    "sport": sport,    
+                    "sport_name": sport_name,    
                     "duration_minutes": duration_minutes,
                     "description": session.get("description", "")
                    }
