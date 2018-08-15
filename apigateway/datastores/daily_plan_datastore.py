@@ -211,4 +211,4 @@ def _key_present(key_name, dictionary):
     if key_name in dictionary:
         return dictionary[key_name]
     else:
-        return ""
+        return None
