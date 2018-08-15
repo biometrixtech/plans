@@ -161,6 +161,7 @@ Resources:
                 } ] }
             Environment:
                 Variables:
+                    SERVICE: 'plans'
                     ENVIRONMENT: { Ref: 'Environment' }
                     AWS_ACCOUNT_ID: { Ref: "AWS::AccountId" }
                     ASYNC_QUEUE_URL: { Ref: "AsyncSqsQueue" }
@@ -194,7 +195,6 @@ Resources:
                 Environment: { Ref: "Environment" }
                 Service: "apigateway"
                 LambdaArn: { "Fn::GetAtt": [ "ApiGatewayLambda", "Arn" ] }
-                CreateCustomDomain: "false"
             Tags:
               - { Key: "Name", Value: { "Fn::Sub": "plans-${Environment}-apigateway" } }
               - { Key: "Management", Value: "managed" }
