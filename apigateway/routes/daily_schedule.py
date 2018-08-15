@@ -105,8 +105,21 @@ def handle_get_typical_schedule():
         sessions.extend(plan.tournaments)
     
     sessions = [{'sport_name': s.sport_name.value,
-                 'session_type': s.session_type().value} for s in sessions]
-    sessions = [dict(t) for t in {tuple(d.items()) for d in sessions}]
+                 'session_type': s.session_type().value,
+                 'event_date': format_datetime(s.event_date),
+                 'duration': s.duration_minutes} for s in sessions]
+    sessions = sorted(sessions, key=lambda k: k['event_date'], reverse=True)
+    filtered_sessions = []
+    for session in sessions:
+        if len(filtered_sessions) == 0:
+            filtered_sessions.append(session)
+        else:
+            exists = [session['sport_name'] == s['sport_name'] and \
+                      session['session_type'] == s['session_type'] for s in filtered_sessions]
+            if any(exists):
+                pass
+            else:
+                filtered_sessions.append(session)
 
     return {'typical_sessions': sessions}, 200
 
