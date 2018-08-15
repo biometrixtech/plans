@@ -19,3 +19,4 @@ apigateway/flask_lambda.py
 !apigateway/models
 !apigateway/pip_requirements
 !apigateway/routes
+*__pycache__*
