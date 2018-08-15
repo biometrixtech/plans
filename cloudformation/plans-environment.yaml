@@ -195,7 +195,6 @@ Resources:
                 Environment: { Ref: "Environment" }
                 Service: "apigateway"
                 LambdaArn: { "Fn::GetAtt": [ "ApiGatewayLambda", "Arn" ] }
-                CreateCustomDomain: "false"
             Tags:
               - { Key: "Name", Value: { "Fn::Sub": "plans-${Environment}-apigateway" } }
               - { Key: "Management", Value: "managed" }
