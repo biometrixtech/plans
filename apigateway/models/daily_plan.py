@@ -65,10 +65,10 @@ class DailyPlan(Serialisable):
             return 0.0, 0.0
         elif len(self.training_sessions) > 0 and self.post_recovery is not None and self.post_recovery.impact_score < 1.5:
             self.post_recovery.display_exercises = True
-            return 2.0, None
+            return 2.0, 2.0
         elif self.post_recovery is not None and self.post_recovery.display_exercises:
             if self.post_recovery.duration_minutes == 0.0:
-                return 2.0, None
+                return 2.0, 2.0
             else:
                 return 2.0, 2.0
         elif self.post_recovery is not None and not self.post_recovery.display_exercises and self.post_recovery.completed:
