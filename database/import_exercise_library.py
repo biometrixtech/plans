@@ -20,7 +20,7 @@ with open('Exercise_Library.csv', newline='') as csvfile:
     row_count = 0
     for row in exercise_reader:
         if row_count > 0:
-            if row[8] != "x" and row[26] != "x":
+            if row[8] != "x" and row[26] == "x":
                 exercise_item = models.exercise.Exercise(row[0])
                 exercise_item.display_name = row[1]
                 exercise_item.name = row[2]
@@ -50,9 +50,9 @@ with open('Exercise_Library.csv', newline='') as csvfile:
                 else:
                     exercise_item.exposure_target = int(row[16])
                 if row[17] in ["-", ""]:
-                    exercise_item.minimum_exposure_stage = 0
+                    exercise_item.exposure_minimum = 0
                 else:
-                    exercise_item.minimum_exposure_stage = int(row[17])
+                    exercise_item.exposure_minimum = int(row[17])
                 exercise_item.unit_of_measure = row[18]
                 if row[19] in ["-", ""]:
                     exercise_item.seconds_rest_between_sets = 0
@@ -69,19 +69,19 @@ with open('Exercise_Library.csv', newline='') as csvfile:
                 exercise_item.progresses_to = row[22]
                 exercise_item.technical_difficulty = row[24]
                 exercise_item.equipment_required = row[25]
-                print(exercise_item.equipment_required)
                 exercise_item.youtube_id = None
                 try:
                     exercise_item.description = exercise_descriptions[exercise_item.id]
                 except KeyError:
+                    print("no description")
                     exercise_item.description = ""
                 exercises.append(exercise_item)
         row_count = row_count + 1
 
-import sys
-sys.exit()
 exercise_count = len(exercises)
 collection = get_mongo_collection('exerciselibrary')
+print(collection)
+
 for exercise_item in exercises:
     collection.replace_one({'library_id': exercise_item.id},
                            {'library_id': exercise_item.id,
@@ -96,7 +96,7 @@ for exercise_item in exercises:
                            'bilateral': exercise_item.bilateral,
                            'progression_interval': exercise_item.progression_interval,
                            'exposure_target': exercise_item.exposure_target,
-                           'minimum_exposure_stage': exercise_item.minimum_exposure_stage,
+                           'exposure_minimum': exercise_item.exposure_minimum,
                            'unit_of_measure': exercise_item.unit_of_measure,
                            'seconds_rest_between_sets': exercise_item.seconds_rest_between_sets,
                            'time_per_set': exercise_item.seconds_per_set,
