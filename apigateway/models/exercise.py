@@ -2,6 +2,7 @@ import datetime
 from enum import IntEnum, Enum
 from serialisable import Serialisable
 from models.soreness import BodyPartLocation
+from utils import format_datetime
 
 
 class TechnicalDifficulty(IntEnum):
@@ -149,14 +150,31 @@ class AssignedExercise(Serialisable):
         return ret
 
 
-class CompletedExercise(object):
+class CompletedExercise(Serialisable):
 
-    def __init__(self, athlete_id, exercise_id):
+    def __init__(self, athlete_id, exercise_id, event_date):
         self.athlete_id = athlete_id
         self.exercise_id = exercise_id
-        self.exposures_completed = 0
-        self.last_completed_date = None
+        self.event_date = event_date
 
-    def increment(self):
-        self.exposures_completed = self.exposures_completed + 1
-        self.last_completed_date = datetime.date.today()
+    def json_serialise(self):
+        ret = {'athlete_id': self.athlete_id,
+               'exercise_id': self.exercise_id,
+               'event_date': format_datetime(self.event_date),
+               }
+        return ret
+
+
+class CompletedExerciseSummary(Serialisable):
+
+    def __init__(self, athlete_id, exercise_id, exposures):
+        self.athlete_id = athlete_id
+        self.exercise_id = exercise_id
+        self.exposures = exposures
+
+    def json_serialise(self):
+        ret = {'athlete_id': self.athlete_id,
+               'exercise_id': self.exercise_id,
+               'exposures': self.exposures,
+               }
+        return ret

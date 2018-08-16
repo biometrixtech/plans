@@ -8,8 +8,8 @@ from utils import  format_datetime, parse_datetime
 class DailyPlanDatastore(object):
     mongo_collection = 'dailyplan'
 
-    def get(self, user_id=None, start_date=None, end_date=None):
-        return self._query_mongodb(user_id, start_date, end_date)
+    def get(self, user_id=None, start_date=None, end_date=None, day_of_week=None):
+        return self._query_mongodb(user_id, start_date, end_date, day_of_week)
 
     def put(self, items):
         if not isinstance(items, list):
@@ -21,10 +21,13 @@ class DailyPlanDatastore(object):
             raise e
 
     @xray_recorder.capture('datastore.DailyPlanDatastore._query_mongodb')
-    def _query_mongodb(self, user_id, start_date, end_date):
+    def _query_mongodb(self, user_id, start_date, end_date, day_of_week):
         mongo_collection = get_mongo_collection(self.mongo_collection)
-        query0 = {'user_id': user_id, 'date': {'$gte': start_date, '$lte': end_date}}
-        # query1 = {'_id': 0, 'last_updated': 0, 'user_id': 0}
+        if day_of_week is None:
+            query0 = {'user_id': user_id, 'date': {'$gte': start_date, '$lte': end_date}}
+            # query1 = {'_id': 0, 'last_updated': 0, 'user_id': 0}
+        else:
+            query0 = {'user_id': user_id, 'date': {'$gte': start_date, '$lte': end_date}, 'day_of_week': day_of_week}
         mongo_cursor = mongo_collection.find(query0)
         ret = []
 
@@ -32,14 +35,16 @@ class DailyPlanDatastore(object):
             # ret.append(self.item_to_response(plan))
             daily_plan = DailyPlan(event_date=plan['date'])
             daily_plan.user_id = plan.get('user_id', None)
+            daily_plan.training_sessions = \
+                [_external_session_from_mongodb(s, session.SessionType(s['session_type'])) for s in plan.get('training_sessions', [])]
             daily_plan.practice_sessions = \
-                [_external_session_from_mongodb(s, session.SessionType.practice) for s in plan['practice_sessions']]
+                [_external_session_from_mongodb(s, session.SessionType.practice) for s in plan.get('practice_sessions', [])]
             daily_plan.strength_conditioning_sessions = \
                 [_external_session_from_mongodb(s, session.SessionType.strength_and_conditioning)
-                 for s in plan['cross_training_sessions']]
+                 for s in plan.get('cross_training_sessions', [])]
             daily_plan.games = \
                 [_external_session_from_mongodb(s, session.SessionType.game)
-                 for s in plan['game_sessions']]
+                 for s in plan.get('game_sessions', [])]
             # daily_plan.tournaments = \
             #     [_external_session_from_mongodb(s, session.SessionType.tournament)
             #      for s in plan['tournament_sessions']]
@@ -52,7 +57,7 @@ class DailyPlanDatastore(object):
             #     for s in plan['corrective_sessions']]
             daily_plan.bump_up_sessions = \
                 [_external_session_from_mongodb(s, session.SessionType.bump_up)
-                 for s in plan['bump_up_sessions']]
+                 for s in plan.get('bump_up_sessions', [])]
             daily_plan.daily_readiness_survey = plan.get('daily_readiness_survey', None)
             daily_plan.updated = plan.get('updated', None)
             daily_plan.last_updated = plan.get('last_updated', None)
@@ -143,6 +148,7 @@ def _external_session_from_mongodb(mongo_result, session_type):
     mongo_session = factory.create(session_type)
     mongo_session.id = mongo_result["session_id"]
     attrs_from_mongo = ["description",
+                        "sport_name",
                         "event_date",
                         "duration",
                         "data_transferred",
@@ -172,6 +178,7 @@ def _recovery_session_from_mongodb(mongo_result):
     recovery_session.why_text = _key_present("why_text", mongo_result)
     recovery_session.duration_minutes = _key_present("minutes_duration", mongo_result)
     recovery_session.completed = mongo_result.get("completed", False)
+    recovery_session.display_exercises = mongo_result.get("display_exercises", False)
     recovery_session.inhibit_exercises = [_assigned_exercises_from_mongodb(s)
                                           for s in mongo_result['inhibit_exercises']]
     recovery_session.lengthen_exercises = [_assigned_exercises_from_mongodb(s)
@@ -204,4 +211,4 @@ def _key_present(key_name, dictionary):
     if key_name in dictionary:
         return dictionary[key_name]
     else:
-        return ""
+        return None

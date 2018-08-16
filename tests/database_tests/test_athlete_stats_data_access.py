@@ -32,7 +32,7 @@ def add_xray_support(request):
 def test_ryan_robbins_athlete_stats_day_after_week():
     user_id = "rrobbins@fakemail.com"
     athlete_stats_datastore = AthleteStatsDatastore()
-    calc = StatsProcessing(user_id, "2018-07-19", DailyReadinessDatastore(), PostSessionSurveyDatastore(),
+    calc = StatsProcessing(user_id, "2018-07-19", DailyReadinessDatastore(), PostSessionSurveyDatastore(), None,
                            athlete_stats_datastore)
     calc.process_athlete_stats()
     athlete_stats_retrieved = athlete_stats_datastore.get(user_id)
@@ -42,7 +42,7 @@ def test_ryan_robbins_athlete_stats_day_after_week():
 def test_ryan_robbins_athlete_stats_last_day_of_week():
     user_id = "rrobbins@fakemail.com"
     athlete_stats_datastore = AthleteStatsDatastore()
-    calc = StatsProcessing(user_id, "2018-07-18", DailyReadinessDatastore(), PostSessionSurveyDatastore(),
+    calc = StatsProcessing(user_id, "2018-07-18", DailyReadinessDatastore(), PostSessionSurveyDatastore(), None,
                            AthleteStatsDatastore())
     calc.process_athlete_stats()
     athlete_stats_retrieved = athlete_stats_datastore.get(user_id)

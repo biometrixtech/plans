@@ -34,7 +34,7 @@ Parameters:
 Mappings:
     TemplateVersion:
         Self: { Commit: "da39a3ee5e6b4b0d3255bfef95601890afd80709" }
-        Infrastructure: { Commit: "baa6e593c00fa6c2fb81a98464977a8d8940a499" }
+        Infrastructure: { Commit: "75121e414c6725f23e9b2cff9e158f538c61333b" }
 
 Metadata:
     "AWS::CloudFormation::Interface":
@@ -104,6 +104,8 @@ Resources:
               - "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
               - "arn:aws:iam::aws:policy/AWSXrayWriteOnlyAccess"
               - "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
+              - { "Fn::ImportValue": { "Fn::Sub": "UsersValidateAuthPolicyArn-${Environment}" } }
+              - { "Fn::ImportValue": { "Fn::Sub": "UsersServiceAuthPolicyArn-${Environment}" } }
             Policies:
               - PolicyName: "default"
                 PolicyDocument:
@@ -159,6 +161,7 @@ Resources:
                 } ] }
             Environment:
                 Variables:
+                    SERVICE: 'plans'
                     ENVIRONMENT: { Ref: 'Environment' }
                     AWS_ACCOUNT_ID: { Ref: "AWS::AccountId" }
                     ASYNC_QUEUE_URL: { Ref: "AsyncSqsQueue" }
@@ -192,8 +195,6 @@ Resources:
                 Environment: { Ref: "Environment" }
                 Service: "apigateway"
                 LambdaArn: { "Fn::GetAtt": [ "ApiGatewayLambda", "Arn" ] }
-                CustomAuthLambdaArn: { "Fn::ImportValue": { "Fn::Sub": "users-${Environment}-CustomAuthLambdaArn" } }
-                CreateCustomDomain: "false"
             Tags:
               - { Key: "Name", Value: { "Fn::Sub": "plans-${Environment}-apigateway" } }
               - { Key: "Management", Value: "managed" }
