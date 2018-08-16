@@ -67,7 +67,7 @@ class DailyPlan(Serialisable):
             self.post_recovery.display_exercises = True
             return 2.0, 1.0
         elif self.post_recovery is not None and self.post_recovery.display_exercises:
-            if self.post_recovery.minutes_duration == 0.0:
+            if self.post_recovery.duration_minutes == 0.0:
                 return 2.0, 1.0
             else:
                 return 2.0, 2.0
@@ -77,7 +77,7 @@ class DailyPlan(Serialisable):
             self.pre_recovery.display_exercises = True
             return 0.0, 1.0
         elif self.pre_recovery is not None and self.pre_recovery.display_exercises:
-            if self.pre_recovery.minutes_duration == 0.0:
+            if self.pre_recovery.duration_minutes == 0.0:
                 return 0.0, 1.0
             else:
                 return 0.0, 0.0
