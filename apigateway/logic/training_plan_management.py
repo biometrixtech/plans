@@ -22,11 +22,12 @@ class TrainingPlanManager(object):
         self.athlete_stats_datastore = athlete_stats_datastore
         self.completed_exercise_datastore = completed_exercise_datastore
 
+
     def calculate_pre_impact_score(self, rpe, readiness, sleep_quality, max_soreness, athlete_stats=None):
 
         scores = []
 
-        scores.append(min(max_soreness, 5))
+        scores.append(min(2 + (0.75 * (max_soreness - 1)), 5))
         scores.append(min(((10 - sleep_quality) / 10) * 3, 3))
         scores.append(min(((10 - readiness) / 10) * 5, 5))
         scores.append(min((rpe / 10) * 4, 4))
@@ -57,7 +58,7 @@ class TrainingPlanManager(object):
 
         scores = []
 
-        scores.append(min(max_soreness, 5))
+        scores.append(min(2 + (0.75 * (max_soreness - 1)), 5))
         scores.append(min(((10 - sleep_quality) / 10) * 3, 3))
         scores.append(min(((10 - readiness) / 10) * 3, 3))
         scores.append(min((rpe / 10) * 5, 5))
