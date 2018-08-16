@@ -103,7 +103,8 @@ def handle_get_typical_schedule():
         sessions.extend(plan.games)
         sessions.extend(plan.strength_conditioning_sessions)
         sessions.extend(plan.tournaments)
-    
+
+    sessions = [s for s in sessions if s.event_date is not None]
     sessions = [{'sport_name': s.sport_name.value,
                  'session_type': s.session_type().value,
                  'event_date': format_datetime(s.event_date),
