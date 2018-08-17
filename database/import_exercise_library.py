@@ -80,7 +80,7 @@ with open('Exercise_Library.csv', newline='') as csvfile:
 
 exercise_count = len(exercises)
 collection = get_mongo_collection('exerciselibrary')
-print(collection)
+# print(collection)
 
 for exercise_item in exercises:
     collection.replace_one({'library_id': exercise_item.id},
