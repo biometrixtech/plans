@@ -1,117 +1,125 @@
-Numeric ID,Display Name,Exercise,Program Type,,,,,,PHASE,Muscle Group / Joint,Inhibit,Lengthen,Activate,Integrate,DOSAGE,min Sets,max Sets,min Reps,max Reps,Bilateral (Y/N),Progression Interval (e.g. 2 reps),Progression Cadence (e.g. 2 exposures),Unit of Measure for Reps,Rest Between Sets (seconds),Time Per Set (seconds),Time Per Rep (seconds),Progresses To,,Technical Difficulty,Equipment Required,Video URL,Video ID
-1,Foam Roll - Inner Thigh (Adductor),SMR - Adductors,,,,,x,,,Adductor,x,,,,,1,2,30,30,Y,0,0,seconds,0,30,-,,,Beginner,SMR,https://www.youtube.com/watch?v=vkVg1dEmjwE,vkVg1dEmjwE
-2,Foam Roll - Calves,SMR - Calves,,,,,x,x,,Calves,x,,,,,1,2,30,30,Y,0,0,seconds,0,30,-,,,Beginner,SMR,https://www.youtube.com/watch?v=w-e7YIpiok0,w-e7YIpiok0
-3,Foam Roll - Hamstrings,SMR - Hamstrings,,,,,x,x,,Hamstring,x,,,,,1,2,30,30,Y,0,0,seconds,0,30,-,,,Beginner,SMR,https://www.youtube.com/watch?v=wQ6uUuBWCbw,wQ6uUuBWCbw
-4,Foam Roll - Outer Thigh (IT Band),SMR - IT-Band,,,,,x,x,,IT-Band,x,,,,,1,2,30,30,Y,0,0,seconds,0,30,-,,,Beginner,SMR,https://www.youtube.com/watch?v=asigNf1sh-k,asigNf1sh-k
-5,Foam Roll - Upper Thigh,SMR - Tensor Fascia Latae,,,,,x,x,,Tensor Fascia Latae,x,,,,,1,3,30,30,Y,0,0,seconds,0,30,-,,,Beginner,SMR,https://www.youtube.com/watch?v=asigNf1sh-k,asigNf1sh-k
-6,Standing Hip Stretch,Hip Flexor Static Stretch (Standing),,,,,x,,,Hip,,x,,,,1,2,30,30,Y,0,0,seconds,0,30,-,,,Beginner,Floor,https://www.youtube.com/watch?v=YXcz_ENOMWs,YXcz_ENOMWs
-7,Standing Calf Stretch,Calves Static Stretch,,,,,x,,,Calf,,x,,,,1,2,30,30,Y,0,0,seconds,0,30,-,,,Beginner,Floor,https://www.youtube.com/watch?v=URK3EXjTUP4,URK3EXjTUP4
-8,Standing Inner Thigh (Adductor) Stretch,Adductors Static Stretch,,,,,x,,,Adductor,,x,,,,1,2,30,30,Y,0,0,seconds,0,30,-,,,Beginner,Floor,https://www.youtube.com/watch?v=Qmq5fGSrAmg,Qmq5fGSrAmg
-9,Lying Hamstring Stretch,Hamstrings Static Stretch ,,,,,x,,,Hamstring,,x,,,,1,2,30,30,Y,0,0,seconds,0,30,-,,,Beginner,Floor,https://www.youtube.com/watch?v=z73l6oZUniQ,z73l6oZUniQ
-10,Hip Bridge - Double Leg,Hip Bridge (double leg),,,,,x,,,Hips; Hamstrings; Glutes; Core; Lower back,,,x,,,1,3,10,12,N,2,3,count,0,,2,12,,Beginner,Floor,https://www.youtube.com/watch?v=SKOMwg1JLrU,SKOMwg1JLrU
-11,Hip Bridge - Single Leg,Hip Bridge (single leg),,,,,x,,,Hips; Hamstrings; Glutes; Core; Lower back,,,x,,,1,3,10,12,Y,2,3,count,0,,2,13,,Beginner,Floor,https://www.youtube.com/watch?v=3NXv0Nany-Q,3NXv0Nany-Q
-12,Hip Bridge on Unstable Surface - Double Leg,Hip Bridge (double leg) on unstable surface,,,,,x,,,Hips; Hamstrings; Glutes; Core; Lower back,,,x,,,1,3,10,12,N,2,3,count,0,,2,11,,Intermediate,Pillow; Half Bosu Ball,https://www.youtube.com/watch?v=jgnBh3xubt8,jgnBh3xubt8
-13,Hip Bridge on Unstable Surface - Single Leg,Hip Bridge (single leg) on unstable surface,,,,,x,,,Hips; Hamstrings; Glutes; Core; Lower back,,,x,,,1,3,10,12,Y,2,3,count,0,,2,,,Intermediate,Pillow; Half Bosu Ball,https://www.youtube.com/watch?v=ATWk7ZXeJO8,ATWk7ZXeJO8
-14,Single Leg Balance Reach - Multiple Directions,Single Leg Balance (multiplanar) with Reach,,,,,x,,,Glutes; Core; Adductor; Abductor,,,x,,,1,3,10,12,Y,2,3,count,0,,5,,,Beginner,Floor,https://www.youtube.com/watch?v=9s2yFvd09K4,9s2yFvd09K4
-15,Double Leg Squat (Bodyweight),Double Leg Squat (Bodyweight),,,,,x,,,Glute; Quad; Core; Hamstring,,,x,,,1,3,10,15,N,2,3,count,0,,2,39,,Beginner,Floor,https://www.youtube.com/watch?v=C_VtOYc6j5c,C_VtOYc6j5c
-16,High Knees,High Knees,,,,,,x,,quads core,,,,x,,1,1,10,10,N,0,0,seconds,0,10,,,,Beginner,Field; Open Space,,
-17,Back Pedal,Back Pedal,,,,,,x,,lower body,,,,x,,1,1,10,10,N,0,0,seconds,0,10,,,,Beginner,Field; Open Space,,
-18,Side Shuffle,Side Shuffle,,,,,,x,,lower body,,,,x,,1,1,10,10,N,0,0,seconds,0,10,,,,Beginner,Field; Open Space,,
-19,A-Skips,A-Skips,,,,,,x,,lower body,,,,x,,1,1,10,10,N,0,0,seconds,0,10,,,,Beginner,Field; Open Space,,
-20,Carioca,Carioca,,,,,,x,,lower body,,,,x,,1,1,10,10,N,0,0,seconds,0,10,,,,Beginner,Field; Open Space,,
-25,,Gastrocnemius Static Stretch,,,,,x,x,,Calves,,x,,,,1,3,30,30,Y,0,0,seconds,0,30,,,,Beginner,Floor,-,
-26,,Soleus Static Stretch,,,,,x,x,,Calves,,x,,,,1,3,30,30,Y,0,0,seconds,0,30,,,,Beginner,Floor,-,
-28,Standing Outer Hip (TFL) Stretch,Standing TFL Static Stretch,,,,,x,x,,TFL ,,x,,,,1,2,30,30,Y,0,0,seconds,0,30,,,,Beginner,Floor,https://www.youtube.com/watch?v=ClJL9Kn5DHw,ClJL9Kn5DHw
-29,Ankle Mobility (Toes Up),Ankle Dorsiflexion,,,,,x,x,,Ankle,,,x,,,1,3,10,15,Y,2,2,count,0,,2,65,,Beginner,Floor,https://www.youtube.com/watch?v=xyMnUruGwuo,xyMnUruGwuo
-30,Ankle Mobility (Toes Down),Ankle Plantarflexion,,,,,x,x,,Ankle,,,x,,,1,3,10,15,Y,2,2,count,0,,2,66,,Beginner,Floor,https://www.youtube.com/watch?v=he_jYIGisMM,he_jYIGisMM
-31,Single Leg Calf Raise ,Single - Leg Calf Raise,,,,,,x,,Calf,,,x,,,1,3,10,15,Y,2,2,count,0,,2,,,Beginner,Floor,https://www.youtube.com/watch?v=Tla2ScHQgu0,Tla2ScHQgu0
-32,Lying Knee Flexion and Hip Internal Rotation,Knee Flexion with Hip Internally Rotated,,,,,,x,,Knee; Hamstrings,,,x,,,1,3,10,15,Y,2,2,count,0,,2,,,Beginner,Towel,https://www.youtube.com/watch?v=ToOjPbDb6wQ,ToOjPbDb6wQ
-33,,Multiplanar Single-Leg Balance Reach (Firm Surface),,,,,,x,,Glutes; Core; Adductor; Abductor,,,,x,,1,2,10,14,Y,2,2,count,0,5,,69,,Beginner,Floor,,
-34,Standing Leg Extension (Abductors),Hip Abduction,,,,,x,x,,Glutes; TFL,,,x,,,1,3,10,15,Y,2,2,count,0,,2,,,Beginner,None,https://www.youtube.com/watch?v=k0oEjtPIsXI,k0oEjtPIsXI
-35,Standing Leg Extension (Glutes),Hip Extension,,,,,x,x,,Glutes; hamstrings,,,x,,,1,3,10,15,Y,2,2,count,0,,2,,,Beginner,None,https://www.youtube.com/watch?v=ogFC7XVkYuY,ogFC7XVkYuY
-36,,Ball Squats,,,,,,x,,Glutes; Quads; Core,,,,x,,1,2,10,14,N,2,2,count,30,30,,37,,Beginner,Ball,,
-37,,Step-Ups,,,,,,x,,Glutes; Quads; Core,,,,x,,1,2,10,14,Y,2,2,count,30,30,,38,,Beginner,Box,,
-38,,Lunges,,,,,,x,,Glutes; Quads; Core,,,,x,,1,2,10,14,N,2,2,count,30,30,,39,,Beginner,Floor,,
-39,,Single-Leg Squat,,,,,,x,,Glutes; Quads; Core,,,,x,,1,2,10,14,Y,2,2,count,30,30,,,,Intermediate,Floor,,
-40,,Wall Jumps,,,,,,x,,Quads; Hamstring,,,,x,,1,2,10,14,N,2,2,count,30,30,,41,,Beginner,Floor,,
-41,,Tuck Jump,,,,,,x,,Quads; Hamstring,,,,x,,1,2,6,10,N,2,2,count,30,30,,42,,Intermediate,Floor,,
-42,,Long Jump with Stabilization,,,,,,x,,Quads; Hamstring,,,,x,,1,4,1,1,N,0,4,count,30,10,,43,,Intermediate,Floor,,
-43,,Single-Leg Hop with Stabilization,,,,,,x,,Quads; Hamstring,,,,x,,1,4,1,1,Y,0,4,count,10,10,,70,,Intermediate,Floor,,
-44,Foam Roll - Glutes,SMR - Piriformis,,,,,x,x,,Glutes,x,,,,,1,2,30,30,Y,0,0,seconds,0,30,,,,Beginner,SMR,https://www.youtube.com/watch?v=djNRSC295-A,djNRSC295-A
-46,Lying Crossover Glute Stretch,Supine Piriformis Static Stretch,,,,,x,x,,Hip,,x,,,,1,2,30,30,Y,0,0,seconds,0,30,,,,Beginner,Floor,https://www.youtube.com/watch?v=fR7020ZswtY,fR7020ZswtY
-47,Standing Banded Hip Stretch,Resisted Hip Adduction and Internal Rotation,,,,,,x,,Hip,,,x,,,1,2,10,15,Y,2,2,count,0,,2,,,Beginner,Band,https://www.youtube.com/watch?v=Wxbr3Ip8nM8,Wxbr3Ip8nM8
-48,Foam Roll - Quads,SMR Quadriceps,,,,,x,x,,Quads,x,,,,,1,2,30,30,Y,0,0,seconds,0,30,,,,Beginner,SMR,https://www.youtube.com/watch?v=ERTVBjwgPS4,ERTVBjwgPS4
-49,Lunging Hip Stretch,Kneeling Hip Flexor Static Stretch,,,,,x,x,,Hip,,x,,,,1,2,30,30,Y,0,0,seconds,0,30,,,,Beginner,Floor,https://www.youtube.com/watch?v=XbN3TvLEm2A,XbN3TvLEm2A
-50,Bird-dog (Opposite Arm/Leg Raise),Quadruped Arm/Opposite Leg Raise,,,,,,x,,Abdominals,,,x,,,1,3,10,12,Y,2,2,count,0,,3,,,Beginner,Floor,https://www.youtube.com/watch?v=wiFNA3sqjCA,wiFNA3sqjCA
-51,Floor Cobra (Superman) Stretch,Floor Prone Cobra,,,,,x,x,,Erector Spinae,,,x,,,1,3,10,12,N,2,2,count,0,,3,,,Beginner,Floor,https://www.youtube.com/watch?v=pNIC1PEp3eU,pNIC1PEp3eU
-52,Ball Squats with Overheard Press,Ball Squats with Overheard Press,,,,,,x,,Glutes; Quads; Abdominals,,,,x,,1,2,10,14,N,2,2,count,30,30,,,,Intermediate,Ball; Dumbbell,,
-53,Toe Scrunches,Towel scrunches (Intrinsic Foot Muscles),,,,,x,,,Foot,,,x,,,1,3,10,12,Y,2,2,count,0,,2,,,Beginner,Towel,https://www.youtube.com/watch?v=-BBQO_9_YMU,BBQO_9_YMU
-54,Foam Roll - Hip Flexor,SMR - Hip Flexor,,,,,x,x,,IT Band,x,,,,,1,2,30,30,Y,0,0,seconds,0,30,,,,Beginner,SMR,https://www.youtube.com/watch?v=bdbsy5vFz10,bdbsy5vFz10
-55,Foam Roll - Lats,SMR - Latissimus Dorsi,,,,,x,x,,Upper Back,x,,,,,1,2,30,30,Y,0,0,seconds,0,30,,,,Beginner,SMR,https://www.youtube.com/watch?v=1GaR-a9TWYM,1GaR-a9TWYM
-56,Seated Spinal Twist Stretch,Erector Spinae Static Stretch,,,,,x,x,,Upper Back,,x,,,,1,2,30,30,Y,0,0,seconds,0,30,,,,Beginner,Floor,https://www.youtube.com/watch?v=yeorC_eJofs,yeorC_eJofs
-57,Kneeling One-Armed Lat Stretch,Latissimus Dorsi Static Stretch,,,,,x,x,,Upper Back,,x,,,,1,2,30,30,Y,0,0,seconds,0,30,,,,Beginner,Floor/Wall,https://www.youtube.com/watch?v=wzyB34izUNI,wzyB34izUNI
-58,,B-Skips,,,,,,x,,Lower Body,,,,x,,1,1,10,10,N,0,0,seconds,0,10,,,,Beginner,Field; Open Space,,
-59,Ankle Stretch and Hold (Towards You),Isometric Ankle Dorsiflexion,,,,,,x,,Ankle,,,x,,,1,2,15,15,Y,0,6,seconds,0,30,,29,,Beginner,None,https://www.youtube.com/watch?v=xyMnUruGwuo,xyMnUruGwuo
-60,Ankle Stretch and Hold (Away From You),Isometric Ankle Plantarflexion,,,,,,x,,Ankle,,,x,,,1,2,15,15,Y,0,6,seconds,0,30,,30,,Beginner,None,https://www.youtube.com/watch?v=_6JT68FmWRs,_6JT68FmWRs
-61,Ankle Stretch and Hold (Toes In),Isometric Ankle Inversion,,,,,,x,,Ankle,,,x,,,1,2,15,15,Y,0,6,seconds,0,30,,63,,Beginner,None,https://www.youtube.com/watch?v=v_zjz5mOvuY,v_zjz5mOvuY
-62,Ankle Stretch and Hold (Toes Out),Isometric Ankle Eversion,,,,,,x,,Ankle,,,x,,,1,2,15,15,Y,0,6,seconds,0,30,,64,,Beginner,None,https://www.youtube.com/watch?v=x7V2fPbaLX8,x7V2fPbaLX8
-63,Ankle Mobility (Toes In),Ankle Inversion,,,,,x,,,Ankle,,,x,,,1,2,10,12,Y,2,2,count,0,,2,66,,Beginner,None,,
-64,Ankle Mobility (Toes Out),Ankle Eversion,,,,,x,,,Ankle,,,x,,,1,2,10,12,Y,2,2,count,0,,2,65,,Beginner,None,,
-65,Ankle Mobility (Up and Out),Ankle Dorsiflexion and Eversion,,,,,x,,,Ankle,,,x,,,1,2,10,12,Y,2,2,count,0,,2,,,Intermediate,None,,
-66,Ankle Mobility (Down and In),Ankle Plantarflexion and Inversion,,,,,x,,,Ankle,,,x,,,1,2,10,12,Y,2,2,count,0,,2,,,Intermediate,None,,
-67,Double Leg Calf Raise,Double Leg Calf Raise,,,,,,x,,Calf,,,x,,,1,2,10,12,N,2,2,count,0,,2,68,,Beginner,Floor,https://www.youtube.com/watch?v=7ti1VEuyyBQ,7ti1VEuyyBQ
-68,Double Leg (Up) - Single Leg (Down) Calf Raise,Double Leg (up); Single leg (down) calf raise,,,,,,x,,Calf,,,x,,,1,3,10,12,Y,2,2,count,0,,2,31,,Beginner,Floor,https://www.youtube.com/watch?v=-yopXxZl3fM,yopXxZl3fM
-69,,Multiplanar Single-Leg Balance Reach (Uneven Surface),,,,,,x,,Glutes; Abdominals; Hips,,,,x,,1,2,10,14,Y,2,2,count,30,30,,,,Intermediate,Pillow; Foam Pad; Half Bosu Ball,,
-70,,Triple-hop to stabilization (distance),,,,,,x,,Lower Body; Abdominals,,,,x,,1,4,3,3,Y,0,4,count,30,15,,,,Intermediate,Floor,,
-71,Foam Roll - Outer Lower Leg,SMR - Peroneals,,,,,x,x,,Calf,x,,,,,1,2,30,30,Y,0,0,seconds,0,30,,,,Beginner,SMR,https://www.youtube.com/watch?v=mNkT0AbkEy4,mNkT0AbkEy4
-72,Foam Roll - Outer Shin,SMR - Tibialis Anterior,,,,,x,x,,Shin,x,,,,,1,2,30,30,Y,0,0,seconds,0,30,,,,Beginner,SMR,https://www.youtube.com/watch?v=vSUIBqrldkU,vSUIBqrldkU
-73,Active Release - Inner Shin,SMR - Tibialis Posterior,,,,,x,x,,Shin,x,,,,,1,2,30,30,Y,0,0,seconds,0,30,,,,Beginner,SMR,https://www.youtube.com/watch?v=c88lwFseOcU,c88lwFseOcU
-74,Foam Roll - Bottom of Foot,SMR- Bottom of Foot,,,,,x,x,,Foot,x,,,,,1,2,30,30,Y,0,0,seconds,0,30,,,,Beginner,SMR,https://www.youtube.com/watch?v=ZqwV6pJgvgE,ZqwV6pJgvgE
-75,Toe Lifts,Toe Lifts,,,,,x,,,Foot,,,x,,,1,3,10,12,N,2,2,count,0,,2,,,Beginner,Floor,https://www.youtube.com/watch?v=LH0h1drPry8&t=2s,LH0h1drPry8&t=2s
-76,,Banded A-march,,,,,,x,,Lower Body,,,,x,,1,2,,,,0,0,count,,,,,,Beginner,Band,,
-77,Wall Sit,Wall Sit,,,,,,x,,Lower Body; Abdominals,,,x,,,1,2,30,30,N,0,0,seconds,0,30,,,,Beginner,Wall,https://www.youtube.com/watch?v=-cdph8hv0O0,-cdph8hv0O0
-78,Standing Calf Raises,Calf Raise on Raised Surface,,,,,x,,,Calves,,,x,,,1,3,10,12,N,2,2,count,0,,2,68,,Beginner,Step; Stair,https://www.youtube.com/watch?v=7ti1VEuyyBQ,7ti1VEuyyBQ
-79,Posterior Pelvic Tilt,Posterior Pelvic Tilt,,,,,x,,,Lower Back; Abdominals,,,x,,,1,3,10,12,N,2,2,count,0,,2,,,Beginner,Floor,https://www.youtube.com/watch?v=q0gRZJ5M3ls,q0gRZJ5M3ls
-80,,Posterior Pelvic Tilt with Hip Bridge,,,,,x,,,Lower Back; Abdominals; Hamstring; Glutes,,,x,,,1,2,10,15,N,2,2,count,0,,2,,,Beginner,Floor,,
-81,Clam Shells (On Side),Bent Knee Hip External Rotation (On Side),,,,,x,,,Glutes,,,x,,,1,3,10,12,Y,2,2,count,0,,2,110,,Beginner,None,https://www.youtube.com/watch?v=EG5_gXcfozw,EG5_gXcfozw
-82,Lateral Walks,Lateral Walks,,,,,x,,,Glutes,,,x,,,1,2,10,15,Y,2,2,count,0,,2,83,,Beginner,None,,
-83,Monster Walks,Monster Walks,,,,,x,,,Glutes,,,x,,,1,2,10,15,Y,2,2,count,0,,2,,,Beginner,None,,
-84,Dead Bugs,Supine Arm/Leg Raise - Dying Bugs,,,,,x,,,Abdominals; Hips; Glutes,,,x,,,1,3,10,12,N,2,2,count,0,,2,,,Beginner,Floor,https://www.youtube.com/watch?v=kwWZBbkXtg4,kwWZBbkXtg4
-85,Plank (on Knees),Prone Plank on Knees,,,,,x,,,Abdominals,,,x,,,1,2,30,30,N,2,2,seconds,0,30,,86,,Beginner,Floor,https://www.youtube.com/watch?v=Mqxmsfgv9Es,Mqxmsfgv9Es
-86,Plank,Prone Plank on Toes,,,,,x,,,Abdominals,,,x,,,1,3,30,30,N,2,2,seconds,0,30,,87,,Beginner,Floor,,
-87,Plank with Kickbacks,Prone Plank Leg Lift,,,,,x,,,Abdominals,,,x,,,1,2,10,15,Y,2,2,count,0,,3,88,,Beginner,Floor,,
-88,Mountain Climbers,Prone Plank Knee to Chest,,,,,x,,,Abdominals,,,x,,,1,2,10,15,Y,2,2,count,0,,3,89,,Beginner,Floor,,
-89,Side Plank (Knees Bent),Side Plank Knees Bent,,,,,x,,,Abdominals,,,x,,,1,3,30,30,Y,2,2,seconds,0,30,,90,,Beginner,Floor,,
-90,Side Plank,Side Plank Knees Straight,,,,,x,,,Abdominals,,,x,,,1,3,30,30,Y,2,2,seconds,0,30,,91,,Beginner,Floor,,
-91,Side Plank (Knees Bent) w/ Leg Lifts,Side Plank Knees Bent Leg Lifts,,,,,x,,,Abdominals,,,x,,,1,2,10,15,Y,2,2,count,0,,3,92,,Beginner,Floor,,
-92,Side Plank with Leg Lifts,Side Plank Knees Straight Leg Lifts,,,,,x,,,Abdominals,,,x,,,1,2,10,15,Y,2,2,count,0,,3,,,Beginner,Floor,,
-93,,Wall Sit With Resistance,,,,,,,,Quads; Abdominals,,,,x,,1,2,30,60,N,0,2,seconds,0,30,,,,Intermediate,Band,,
-94,,Wall Sit With Weight,,,,,,,,Quads; Abdominals,,,,x,,1,2,30,60,N,0,2,seconds,0,30,,,,Intermediate,Dumbells; Weighted Plate; Kettle Bell,,
-95,,Step-ups to overhead press,,,,,,,,quads; hamstrings; glutes; upper extremity,,,,x,,1,2,10,15,Y,2,2,count,0,,,,,Intermediate,Dumbells,,
-96,,Lunges to overhead press,,,,,,,,quads; hamstrings; glutes; upper extremity,,,,x,,1,2,10,15,Y,2,2,count,0,,,,,Intermediate,Dumbells,,
-97,,Single-leg squat to overhead press,,,,,,,,quads; hamstrings; glutes; upper extremity,,,,x,,1,2,10,15,Y,2,2,count,0,,,,,Advanced,Dumbells,,
-98,Lying Abdominal Stretch (Cobra),Cobra Abdominal Stretch,,,,,,,,Abdominals,,x,,,,1,2,30,30,N,0,0,seconds,0,30,,,,Beginner,Floor,https://www.youtube.com/watch?v=JDcdhTuycOI,JDcdhTuycOI
-99,,Double leg squat with overhead press,,,,,,,,Glute; Quad; Core; Hamstring,,,,x,,1,2,10,15,Y,2,2,count,0,,,,,Intermediate,Dumbells,,
-100,,Double leg RDL,,,,,,,,Glute; Quad; Core; Hamstring,,,,x,,1,2,10,15,Y,2,2,count,0,,,,,Intermediate,Dumbells,,
-101,,Single leg RDL,,,,,,,,Glute; Quad; Core; Hamstring; Adductors,,,,x,,1,2,10,15,Y,2,2,count,0,,,,,Intermediate,Dumbells,,
-102,Foam Roll - Upper Back,SMR - Erector Spinae,,,,,,,,Upper Back; Abdominals,x,,,,,1,2,30,30,N,0,0,seconds,0,30,,,,Beginner,SMR,https://www.youtube.com/watch?v=NS73eSohTbc,NS73eSohTbc
-103,Child's Pose (Arms Straight),Child's Pose Arms Straight,,,,,,,,Upper Back; Abdominals,,x,,,,1,2,30,30,N,0,0,seconds,0,30,,,,Beginner,Floor,https://www.youtube.com/watch?v=pJcobQf324o,pJcobQf324o
-104,Child's Pose (Arms to Side),Child's Pose to Side,,,,,,,,Upper Back; Abdominals,,x,,,,1,2,30,30,Y,0,0,seconds,0,30,,,,Beginner,Floor,https://www.youtube.com/watch?v=p6kvGzqarR4,p6kvGzqarR4
-105,4-Way Ankle Holds,4-Way Ankle Isometrics,,,,,,,,Ankle,,,x,,,1,2,60,60,Y,0,0,seconds,0,60,,,,Beginner,Towel,https://www.youtube.com/watch?v=MBy6-k_-NsI,MBy6-k_-NsI
-106,4-Way Ankle Mobility,4-Way Ankle Mobility,,,,,,,,Ankle,,,x,,,1,2,120,120,Y,0,0,seconds,0,120,,,,Beginner,None,,
-107,Combined Ankle Resistance,Compound Resisted Ankle,,,,,,,,Ankle,,,x,,,1,2,120,120,Y,0,0,seconds,0,120,,,,Beginner,Towel; Band,,
-108,Glute Activation Extensions,Glute Max Activation,,,,,,,,Glutes,,,x,,,1,2,10,15,Y,0,0,count,0,,4,,,Beginner,Towel; Band,https://www.youtube.com/watch?v=UcoWI7tlWF0,UcoWI7tlWF0
-109,Hip Mobility and Activation,Glute Med Activation,,,,,,,,Glutes,,,x,,,1,2,10,15,Y,0,0,count,0,60,,,,Beginner,Towel; Band,,
-110,Banded Clam Shells (On Side),Bent Knee Hip External Rotation (On Side),,,,,x,,,Glutes,,,x,,,1,2,10,15,Y,2,2,count,0,,2,82,,Beginner,Band,https://www.youtube.com/watch?v=6xDr8LvURMc,6xDr8LvURMc
-111,Standing Banded Leg Extension (Abductors),Hip Abduction,,,,,x,x,,Glutes; TFL,,,x,,,1,2,10,15,Y,2,2,count,0,,2,,,Beginner,Band,https://www.youtube.com/watch?v=k0oEjtPIsXI,k0oEjtPIsXI
-112,Standing Banded Leg Extension (Glutes),Hip Extension,,,,,x,x,,Glutes; hamstrings,,,x,,,1,2,10,15,Y,2,2,count,0,,2,,,Beginner,Band,https://www.youtube.com/watch?v=ogFC7XVkYuY,ogFC7XVkYuY
-113,4-Way Ankle Strengthening (Banded),4-Way Ankle Resistance,,,,,,,,Ankle,,,x,,,1,2,120,120,Y,0,0,seconds,0,120,,,,Beginner,Towel; Band,,
-114,4-Way Ankle Holds (Banded),4-Way Ankle Isometrics (Banded),,,,,,,,Ankle,,,x,,,1,2,60,60,Y,0,0,seconds,0,60,,,,Beginner,None,,
-115,Ankle Pumps,Ankle Pumps,,,,,,,,Ankle,,,x,,,1,2,12,15,Y,0,0,count,0,,2,,,Beginner,None,https://www.youtube.com/watch?v=jQWPW25W5nw,jQWPW25W5nw
-116,Knee Hugs,Knee Hugs,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-117,Hip Cradles,Hip Cradles,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-118,Standing Quads Stretch,Standing Quads Stretch,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-119,Dynamic Runner Lunges,Dynamic Runner Lunges,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-120,Crab Reaches,Crab Reaches,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-121,YTW,YTW,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-122,World's Greatest Stretch,World's Greatest Stretch,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Numeric ID,Display Name,Exercise,PHASE,Muscle Group / Joint,Inhibit,Lengthen,Activate,Integrate,DOSAGE,min Sets,max Sets,min Reps,max Reps,Bilateral (Y/N),Progression Interval (e.g. 2 reps),Progression Cadence (e.g. 2 exposures),Minimum Exposures to Maintain Stage,Unit of Measure for Reps,Rest Between Sets (seconds),Time Per Set (seconds),Time Per Rep (seconds),Progresses To,MISC.,Technical Difficulty,Equipment Required,Present in Mapping Logic
+1,Foam Roll - Inner Thigh (Adductor),SMR - Adductors,,Adductor,x,,,,,1,2,30,30,Y,0,,,seconds,0,30,-,,,Beginner,SMR,x
+2,Foam Roll - Calves,SMR - Calves,,Calves,x,,,,,1,2,30,30,Y,0,,,seconds,0,30,-,,,Beginner,SMR,x
+3,Foam Roll - Hamstrings,SMR - Hamstrings,,Hamstring,x,,,,,1,2,30,30,Y,0,,,seconds,0,30,-,,,Beginner,SMR,x
+4,Foam Roll - Outer Thigh (IT Band),SMR - IT-Band,,IT-Band,x,,,,,1,2,30,30,Y,0,,,seconds,0,30,-,,,Beginner,SMR,x
+5,,,,,,,,,,,,,,,,,,,,,,,,,,
+6,Standing Hip Stretch,Hip Flexor Static Stretch (Standing),,Hip,,x,,,,1,2,30,30,Y,0,,,seconds,0,30,-,,,Beginner,Floor,x
+7,Standing Calf Stretch,Calves Static Stretch,,Calf,,x,,,,1,2,30,30,Y,0,,,seconds,0,30,-,,,Beginner,Floor,x
+8,Standing Inner Thigh (Adductor) Stretch,Adductors Static Stretch,,Adductor,,x,,,,1,2,30,30,Y,0,,,seconds,0,30,-,,,Beginner,Floor,x
+9,Lying Hamstring Stretch,Hamstrings Static Stretch ,,Hamstring,,x,,,,1,2,30,30,Y,0,5,3,seconds,0,30,-,121,,Beginner,Floor,x
+10,Hip Bridge - Double Leg,Hip Bridge (double leg),,Hips; Hamstrings; Glutes; Core; Lower back,,,x,,,1,3,10,12,N,2,8,5,count,0,,2,12,,Beginner,Floor,x
+11,Hip Bridge - Single Leg,Hip Bridge (single leg),,Hips; Hamstrings; Glutes; Core; Lower back,,,x,,,1,3,10,12,Y,2,8,5,count,0,,2,13,,Beginner,Floor,x
+12,Hip Bridge on Unstable Surface - Double Leg,Hip Bridge (double leg) on unstable surface,,Hips; Hamstrings; Glutes; Core; Lower back,,,x,,,1,3,10,12,N,2,8,5,count,0,,2,11,,Intermediate,Pillow; Half Bosu Ball,x
+13,Hip Bridge on Unstable Surface - Single Leg,Hip Bridge (single leg) on unstable surface,,Hips; Hamstrings; Glutes; Core; Lower back,,,x,,,1,3,10,12,Y,2,8,5,count,0,,2,120,,Intermediate,Pillow; Half Bosu Ball,x
+14,Single Leg Balance Reach - Multiple Directions,Single Leg Balance (multiplanar) with Reach,,Glutes; Core; Adductor; Abductor,,,x,,,1,3,10,12,Y,2,,,count,0,,5,,,Beginner,Floor,
+15,Double Leg Squat (Bodyweight),Double Leg Squat (Bodyweight),,Glute; Quad; Core; Hamstring,,,,x,,1,3,10,15,N,2,,,count,0,,2,39,,Beginner,Floor,
+16,High Knees,High Knees,,quads core,,,,x,,1,1,10,10,N,0,,,seconds,0,10,,,,Beginner,Field; Open Space,
+17,Back Pedal,Back Pedal,,lower body,,,,x,,1,1,10,10,N,0,,,seconds,0,10,,,,Beginner,Field; Open Space,
+18,Side Shuffle,Side Shuffle,,lower body,,,,x,,1,1,10,10,N,0,,,seconds,0,10,,,,Beginner,Field; Open Space,
+19,A-Skips,A-Skips,,lower body,,,,x,,1,1,10,10,N,0,,,seconds,0,10,,,,Beginner,Field; Open Space,
+20,Carioca,Carioca,,lower body,,,,x,,1,1,10,10,N,0,,,seconds,0,10,,,,Beginner,Field; Open Space,
+21,,,,,,,,,,,,,,,,,,,,,,,,,,
+22,,,,,,,,,,,,,,,,,,,,,,,,,,
+23,,,,,,,,,,,,,,,,,,,,,,,,,,
+24,,,,,,,,,,,,,,,,,,,,,,,,,,
+25,,,,,,,,,,,,,,,,,,,,,,,,,,
+26,Calf (Soleus) Stretch,Soleus Static Stretch,,Calves,,x,,,,1,3,30,30,Y,0,,,seconds,0,30,,,,Beginner,Floor,
+27,,,,,,,,,,,,,,,,,,,,,,,,,,
+28,Standing Outer Hip (TFL) Stretch,Standing TFL Static Stretch,,TFL ,,x,,,,1,2,30,30,Y,0,5,3,seconds,0,30,,122,,Beginner,Floor,x
+29,Ankle Mobility (Toes Up),Ankle Dorsiflexion,,Ankle,,,x,,,1,3,10,15,Y,2,3,1,count,0,,2,63,,Beginner,Floor,x
+30,,,,,,,,,,,,,,,,,,,,,,,,,,
+31,Single Leg Calf Raise ,Single - Leg Calf Raise,,Calf,,,x,,,1,3,10,15,Y,2,,,count,0,,2,,,Beginner,Floor,x
+32,Lying Knee Flexion and Hip Internal Rotation,Knee Flexion with Hip Internally Rotated,,Knee; Hamstrings,,,x,,,1,3,10,15,Y,2,,,count,0,,2,,,Beginner,Towel,x
+33,Multiplanar Single-Leg Balance Reach (Firm Surface),Multiplanar Single-Leg Balance Reach (Firm Surface),,Glutes; Core; Adductor; Abductor,,,,x,,1,2,10,14,Y,2,,,count,0,5,,69,,Beginner,Floor,
+34,,,,,,,,,,,,,,,,,,,,,,,,,,
+35,,,,,,,,,,,,,,,,,,,,,,,,,,
+36,Ball Squats,Ball Squats,,Glutes; Quads; Core,,,,x,,1,2,10,14,N,2,,,count,30,30,,37,,Beginner,Ball,
+37,Step-Ups,Step-Ups,,Glutes; Quads; Core,,,,x,,1,2,10,14,Y,2,,,count,30,30,,38,,Beginner,Box,
+38,Lunges,Lunges,,Glutes; Quads; Core,,,,x,,1,2,10,14,N,2,,,count,30,30,,39,,Beginner,Floor,
+39,Single-Leg Squat,Single-Leg Squat,,Glutes; Quads; Core,,,,x,,1,2,10,14,Y,2,,,count,30,30,,,,Intermediate,Floor,
+40,Wall Jumps,Wall Jumps,,Quads; Hamstring,,,,x,,1,2,10,14,N,2,,,count,30,30,,41,,Beginner,Floor,
+41,Tuck Jump,Tuck Jump,,Quads; Hamstring,,,,x,,1,2,6,10,N,2,,,count,30,30,,42,,Intermediate,Floor,
+42,Long Jump with Stabilization,Long Jump with Stabilization,,Quads; Hamstring,,,,x,,1,4,1,1,N,0,,,count,30,10,,43,,Intermediate,Floor,
+43,Single-Leg Hop with Stabilization,Single-Leg Hop with Stabilization,,Quads; Hamstring,,,,x,,1,4,1,1,Y,0,,,count,10,10,,70,,Intermediate,Floor,
+44,Foam Roll - Glutes,SMR - Piriformis,,Glutes,x,,,,,1,2,30,30,Y,0,,,seconds,0,30,,,,Beginner,SMR,x
+45,,,,,,,,,,,,,,,,,,,,,,,,,,
+46,Lying Crossover Glute Stretch,Supine Piriformis Static Stretch,,Hip,,x,,,,1,2,30,30,Y,0,5,3,seconds,0,30,,117,,Beginner,Floor,x
+47,,,,,,,,,,,,,,,,,,,,,,,,,,
+48,Foam Roll - Quads,SMR Quadriceps,,Quads,x,,,,,1,2,30,30,Y,0,,,seconds,0,30,,,,Beginner,SMR,x
+49,Lunging Hip Stretch,Kneeling Hip Flexor Static Stretch,,Hip,,x,,,,1,2,30,30,Y,0,5,3,seconds,0,30,,119,,Beginner,Floor,x
+50,Bird-dog (Opposite Arm/Leg Raise),Quadruped Arm/Opposite Leg Raise,,Abdominals,,,x,,,1,3,10,12,Y,2,,,count,0,,3,,,Beginner,Floor,x
+51,Floor Cobra (Superman) Stretch,Floor Prone Cobra,,Erector Spinae,,,x,,,1,3,10,12,N,2,,,count,0,,3,,,Beginner,Floor,x
+52,Ball Squats with Overheard Press,Ball Squats with Overheard Press,,Glutes; Quads; Abdominals,,,,x,,1,2,10,14,N,2,,,count,30,30,,,,Intermediate,Ball; Dumbbell,
+53,Toe Scrunches,Towel scrunches (Intrinsic Foot Muscles),,Foot,,,x,,,1,3,10,12,Y,2,,,count,0,,2,,,Beginner,Towel,x
+54,Foam Roll - Hip Flexor,SMR - Hip Flexor,,IT Band,x,,,,,1,2,30,30,Y,0,,,seconds,0,30,,,,Beginner,SMR,x
+55,Foam Roll - Lats,SMR - Latissimus Dorsi,,Upper Back,x,,,,,1,2,30,30,Y,0,,,seconds,0,30,,,,Beginner,SMR,x
+56,Seated Spinal Twist Stretch,Erector Spinae Static Stretch,,Upper Back,,x,,,,1,2,30,30,Y,0,,,seconds,0,30,,,,Beginner,Floor,x
+57,Kneeling One-Armed Lat Stretch,Latissimus Dorsi Static Stretch,,Upper Back,,x,,,,1,2,30,30,Y,0,,,seconds,0,30,,,,Beginner,Floor/Wall,x
+58,B-Skips,B-Skips,,Lower Body,,,,x,,1,1,10,10,N,0,,,seconds,0,10,,,,Beginner,Field; Open Space,
+59,Ankle Stretch and Hold (Towards You),Isometric Ankle Dorsiflexion,,Ankle,,x,,,,1,2,15,15,Y,0,,,seconds,0,30,,,,Beginner,None,
+60,Ankle Stretch and Hold (Away From You),Isometric Ankle Plantarflexion,,Ankle,,x,,,,1,2,15,15,Y,0,,,seconds,0,30,,,,Beginner,None,x
+61,Ankle Stretch and Hold (Toes In),Isometric Ankle Inversion,,Ankle,,x,,,,1,2,15,15,Y,0,,,seconds,0,30,,,,Beginner,None,
+62,Ankle Stretch and Hold (Toes Out),Isometric Ankle Eversion,,Ankle,,x,,,,1,2,15,15,Y,0,,,seconds,0,30,,,,Beginner,None,
+63,Ankle Mobility (Toes In),Ankle Inversion,,Ankle,,,x,,,1,2,10,12,Y,2,3,1,count,0,,2,64,,Beginner,None,
+64,Ankle Mobility (Toes Out),Ankle Eversion,,Ankle,,,x,,,1,2,10,12,Y,2,,,count,0,,2,,,Beginner,None,
+65,Ankle Mobility (Up and Out),Ankle Dorsiflexion and Eversion,,Ankle,,,x,,,1,2,10,12,Y,2,3,1,count,0,,2,66,,Intermediate,None,
+66,Ankle Mobility (Down and In),Ankle Plantarflexion and Inversion,,Ankle,,,x,,,1,2,10,12,Y,2,3,1,count,0,,2,107,,Intermediate,None,
+67,Double Leg Calf Raise,Double Leg Calf Raise,,Calf,,,x,,,1,2,10,12,N,2,,,count,0,,2,,,Beginner,Floor,x
+68,Double Leg (Up) - Single Leg (Down) Calf Raise,Double Leg (up); Single leg (down) calf raise,,Calf,,,x,,,1,3,10,12,Y,2,5,3,count,0,,2,31,,Beginner,Floor,x
+69,Multiplanar Single-Leg Balance Reach (Unstable Surface),Multiplanar Single-Leg Balance Reach (Uneven Surface),,Glutes; Abdominals; Hips,,,,x,,1,2,10,14,Y,2,,,count,30,30,,,,Intermediate,Pillow; Foam Pad; Half Bosu Ball,
+70,Triple-Hop to Stabilization,Triple-hop to stabilization (distance),,Lower Body; Abdominals,,,,x,,1,4,3,3,Y,0,,,count,30,15,,,,Intermediate,Floor,
+71,Foam Roll - Outer Lower Leg,SMR - Peroneals,,Calf,x,,,,,1,2,30,30,Y,0,,,seconds,0,30,,,,Beginner,SMR,x
+72,Foam Roll - Outer Shin,SMR - Tibialis Anterior,,Shin,x,,,,,1,2,30,30,Y,0,,,seconds,0,30,,,,Beginner,SMR,x
+73,Inner Shin Release,SMR - Tibialis Posterior,,Shin,x,,,,,1,2,30,30,Y,0,,,seconds,0,30,,,,Beginner,SMR,x
+74,Foam Roll - Bottom of Foot,SMR- Bottom of Foot,,Foot,x,,,,,1,2,30,30,Y,0,,,seconds,0,30,,,,Beginner,SMR,x
+75,Toe Lifts,Toe Lifts,,Foot,,,x,,,1,3,10,12,N,2,,,count,0,,2,,,Beginner,Floor,x
+76,Banded A-March,Banded A-March,,Lower Body,,,,x,,1,2,,,,0,,,count,,,,,,Beginner,Band,
+77,Wall Sit,Wall Sit,,Lower Body; Abdominals,,,x,,,1,2,30,30,N,0,,,seconds,0,30,,,,Beginner,Wall,x
+78,Standing Calf Raises (Elevated Surface),Calf Raise on Raised Surface,,Calves,,,x,,,1,3,10,12,N,2,5,3,count,0,,2,68,,Beginner,Step; Stair,x
+79,Posterior Pelvic Tilt,Posterior Pelvic Tilt,,Lower Back; Abdominals,,,x,,,1,3,10,12,N,2,5,3,count,0,,2,80,,Beginner,Floor,x
+80,Posterior Pelvic Tilt with Hip Bridge,Posterior Pelvic Tilt with Hip Bridge,,Lower Back; Abdominals; Hamstring; Glutes,,,x,,,1,2,10,15,N,2,,,count,0,,2,,,Beginner,Floor,x
+81,Clam Shells (On Side),Bent Knee Hip External Rotation (On Side),,Glutes,,,x,,,1,3,10,12,Y,2,8,5,count,0,,2,82,,Beginner,None,x
+82,Lateral Walks,Lateral Walks,,Glutes,,,x,,,1,2,10,15,Y,2,8,5,count,0,,2,83,,Beginner,None,x
+83,Monster Walks,Monster Walks,,Glutes,,,x,,,1,2,10,15,Y,2,8,5,count,0,,2,110,,Beginner,None,x
+84,Dead Bugs,Supine Arm/Leg Raise - Dying Bugs,,Abdominals; Hips; Glutes,,,x,,,1,3,10,12,N,2,,,count,0,,2,,,Beginner,Floor,x
+85,Plank (on Knees),Prone Plank on Knees,,Abdominals,,,x,,,1,2,30,30,N,2,8,5,seconds,0,30,,86,,Beginner,Floor,x
+86,Plank,Prone Plank on Toes,,Abdominals,,,x,,,1,3,30,30,N,2,8,5,seconds,0,30,,87,,Beginner,Floor,x
+87,Plank with Kickbacks,Prone Plank Leg Lift,,Abdominals,,,x,,,1,2,10,15,Y,2,8,5,count,0,,3,88,,Beginner,Floor,x
+88,Mountain Climbers,Prone Plank Knee to Chest,,Abdominals,,,x,,,1,2,10,15,Y,2,,,count,0,,3,,,Beginner,Floor,x
+89,Side Plank (Knees Bent),Side Plank Knees Bent,,Abdominals,,,x,,,1,3,30,30,Y,2,8,5,seconds,0,30,,90,,Beginner,Floor,x
+90,Side Plank,Side Plank Knees Straight,,Abdominals,,,x,,,1,3,30,30,Y,2,8,5,seconds,0,30,,91,,Beginner,Floor,x
+91,Side Plank (Knees Bent) w/ Leg Lifts,Side Plank Knees Bent Leg Lifts,,Abdominals,,,x,,,1,2,10,15,Y,2,8,5,count,0,,3,92,,Beginner,Floor,x
+92,Side Plank with Leg Lifts,Side Plank Knees Straight Leg Lifts,,Abdominals,,,x,,,1,2,10,15,Y,2,,,count,0,,3,,,Beginner,Floor,x
+93,Wall Sit With Resistance,Wall Sit With Resistance,,Quads; Abdominals,,,,x,,1,2,30,60,N,0,,,seconds,0,30,,,,Intermediate,Band,
+94,Wall Sit With Weight,Wall Sit With Weight,,Quads; Abdominals,,,,x,,1,2,30,60,N,0,,,seconds,0,30,,,,Intermediate,Dumbells; Weighted Plate; Kettle Bell,
+95,Step-Ups to Overhead Press,Step-Ups to Overhead Press,,quads; hamstrings; glutes; upper extremity,,,,x,,1,2,10,15,Y,2,,,count,0,,,,,Intermediate,Dumbells,
+96,Lunges to Overhead Press,Lunges to Overhead Press,,quads; hamstrings; glutes; upper extremity,,,,x,,1,2,10,15,Y,2,,,count,0,,,,,Intermediate,Dumbells,
+97,Single-Leg Squat to Overhead Press,Single-Leg Squat to Overhead Press,,quads; hamstrings; glutes; upper extremity,,,,x,,1,2,10,15,Y,2,,,count,0,,,,,Advanced,Dumbells,
+98,Lying Abdominal Stretch (Cobra),Cobra Abdominal Stretch,,Abdominals,,x,,,,1,2,30,30,N,0,,,seconds,0,30,,,,Beginner,Floor,x
+99,Double Leg Squat with Overhead Press,Double Leg Squat with Overhead Press,,Glute; Quad; Core; Hamstring,,,,x,,1,2,10,15,Y,2,,,count,0,,,,,Intermediate,Dumbells,
+100,Double Leg RDL,Double Leg RDL,,Glute; Quad; Core; Hamstring,,,,x,,1,2,10,15,Y,2,,,count,0,,,,,Intermediate,Dumbells,
+101,Single Leg RDL,Single Leg RDL,,Glute; Quad; Core; Hamstring; Adductors,,,,x,,1,2,10,15,Y,2,,,count,0,,,,,Intermediate,Dumbells,
+102,Foam Roll - Upper Back,SMR - Erector Spinae,,Upper Back; Abdominals,x,,,,,1,2,30,30,N,0,,,seconds,0,30,,,,Beginner,SMR,x
+103,Child's Pose (Arms Straight),Child's Pose Arms Straight,,Upper Back; Abdominals,,x,,,,1,2,30,30,N,0,3,1,seconds,0,30,,104,,Beginner,Floor,x
+104,Child's Pose (Arms to Side),Child's Pose to Side,,Upper Back; Abdominals,,x,,,,1,2,30,30,Y,0,,,seconds,0,30,,,,Beginner,Floor,x
+105,4-Way Ankle Holds,4-Way Ankle Isometrics,,Ankle,,,x,,,1,2,60,60,Y,0,3,1,seconds,0,60,,113,,Beginner,Towel,x
+106,4-Way Ankle Mobility,4-Way Ankle Mobility,,Ankle,,,x,,,1,2,120,120,Y,0,3,1,seconds,0,120,,105,,Beginner,None,x
+107,Combined Ankle Resistance,Compound Resisted Ankle,,Ankle,,,x,,,1,2,120,120,Y,0,,,seconds,0,120,,,,Beginner,Towel; Band,x
+108,Glute Activation Extensions,Glute Max Activation,,Glutes,,,x,,,1,2,10,15,Y,0,5,3,count,0,,4,124,,Beginner,Towel; Band,x
+109,,,,,,,,,,,,,,,,,,,,,,,,,,
+110,Banded Clam Shells (On Side),Bent Knee Hip External Rotation (On Side),,Glutes,,,x,,,1,2,10,15,Y,2,,,count,0,,2,,,Beginner,Band,x
+111,,,,,,,,,,,,,,,,,,,,,,,,,,
+112,,,,,,,,,,,,,,,,,,,,,,,,,,
+113,4-Way Ankle Strengthening (Banded),4-Way Ankle Resistance,,Ankle,,,x,,,1,2,120,120,Y,0,,,seconds,0,120,,,,Beginner,Towel; Band,x
+114,4-Way Ankle Holds (Towel),4-Way Ankle Isometrics (Towel),,Ankle,,,x,,,1,2,60,60,Y,0,3,1,seconds,0,60,,65,,Beginner,Towel,x
+115,Ankle Pumps,Ankle Pumps,,Ankle,,,x,,,1,2,12,15,Y,3,3,1,count,0,,2,114,,Beginner,None,x
+116,Knee Hugs,Knee Hugs,,"Glutes, hamstrings",,x,,,,1,2,10,15,Y,2,,,count,0,60,,,,Beginner,None,x
+117,Hip Cradles,Hip Cradles,,"glutes, IT band, hamstrings",,x,,,,1,2,10,15,Y,2,,,count,0,60,,,,Beginner,None,x
+118,Standing Quads Stretch,Standing Quads Stretch,,"Quads, abdominals",,x,,,,1,2,10,15,Y,2,,,count,0,60,,,,Beginner,None,x
+119,Dynamic Runner Lunges,Dynamic Runner Lunges,,"Quads, hips, abdominals, glutes, hamstrings",,x,,,,1,2,10,10,Y,0,,,count,0,60,,,,Beginner,None,x
+120,Crab Reaches,Crab Reaches,,"abdominals, hamstrings, glutes",,,x,,,1,2,10,12,Y,2,,,count,0,60,,,,Beginner,None,x
+121,Seated Forward Fold,Seated Forward Fold,,Hamstrings,,x,,,,1,2,30,30,Y,0,,,seconds,0,60,,,,Beginner,None,x
+122,Lateral Hip Openers,Lateral Hip Openers,,"IT band, hips, groin",,x,,,,1,2,12,15,Y,3,,,count,0,60,,,,Beginner,None,x
+123,,,,,,,,,,,,,,,,,,,,,,,,,,
+124,Banded Glute Extensions,Banded Glute Max Activation,,Glutes,,,x,,,1,2,10,15,Y,2,,,count,0,60,,,,Beginner,Band,x
