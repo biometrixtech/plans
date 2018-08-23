@@ -48,41 +48,41 @@ app.url_map.converters['uuid'] = UuidConverter
 app.url_map.strict_slashes = False
 
 from routes.athlete import app as athlete_routes
-app.register_blueprint(athlete_routes, url_prefix='/plans/athlete')
+app.register_blueprint(athlete_routes, url_prefix='/athlete')
 
 
 from routes.daily_readiness import app as daily_readiness_routes
-app.register_blueprint(daily_readiness_routes, url_prefix='/plans/daily_readiness')
+app.register_blueprint(daily_readiness_routes, url_prefix='/daily_readiness')
 
 
 from routes.weekly_schedule import app as weekly_schedule_routes
-app.register_blueprint(weekly_schedule_routes, url_prefix='/plans/weekly_schedule')
+app.register_blueprint(weekly_schedule_routes, url_prefix='/weekly_schedule')
 
 
 from routes.daily_plan import app as daily_plan_routes
-app.register_blueprint(daily_plan_routes, url_prefix='/plans/daily_plan')
+app.register_blueprint(daily_plan_routes, url_prefix='/daily_plan')
 
 
 from routes.athlete_season import app as athlete_season_routes
-app.register_blueprint(athlete_season_routes, url_prefix='/plans/athlete_season')
+app.register_blueprint(athlete_season_routes, url_prefix='/athlete_season')
 
 
 from routes.post_session_survey import app as post_session_survey_routes
-app.register_blueprint(post_session_survey_routes, url_prefix='/plans/post_session_survey')
+app.register_blueprint(post_session_survey_routes, url_prefix='/post_session_survey')
 
 
 from routes.session import app as add_delete_session_routes
-app.register_blueprint(add_delete_session_routes, url_prefix='/plans/session')
+app.register_blueprint(add_delete_session_routes, url_prefix='/session')
 
 from routes.daily_schedule import app as daily_schedule_routes
-app.register_blueprint(daily_schedule_routes, url_prefix='/plans/schedule')
+app.register_blueprint(daily_schedule_routes, url_prefix='/schedule')
 
 from routes.active_recovery import app as active_recovery_routes
-app.register_blueprint(active_recovery_routes, url_prefix='/plans/active_recovery')
+app.register_blueprint(active_recovery_routes, url_prefix='/active_recovery')
 
 
 from routes.misc import app as misc_routes
-app.register_blueprint(misc_routes, url_prefix='/plans/misc')
+app.register_blueprint(misc_routes, url_prefix='/misc')
 
 
 @app.errorhandler(500)
@@ -117,28 +117,29 @@ def handler(event, context):
     else:
         print('API Gateway invocation')
 
-    # Trim trailing slashes from urls
-    event['path'] = event['path'].rstrip('/')
-
-    # Trim semantic versioning string from urls, if present
-    event['path'] = event['path'].replace('/plans/latest/', '/plans/').replace('/plans/1.0.0/', '/plans/')
+    # Strip mount point and version information from the path
+    path_match = re.match(f'^/(?P<mount>({os.environ["SERVICE"]}|v1))?(/(?P<version>(\d+([._]\d+([._]\d+(-\w+([._]\d+)?)?)?)?)|latest))?(?P<path>/.+?)/?$', event['path'])
+    if path_match is None:
+        raise Exception('Invalid path')
+    event['path'] = path_match.groupdict()['path']
+    api_version = path_match.groupdict()['version']
 
     # Pass tracing info to X-Ray
     if 'X-Amzn-Trace-Id-Safe' in event['headers']:
         xray_trace = TraceHeader.from_header_str(event['headers']['X-Amzn-Trace-Id-Safe'])
         xray_recorder.begin_segment(
-            name='hardware.{}.fathomai.com'.format(os.environ['ENVIRONMENT']),
+            name='{SERVICE}.{ENVIRONMENT}.fathomai.com'.format(**os.environ),
             traceid=xray_trace.root,
             parent_id=xray_trace.parent
         )
     else:
-        xray_recorder.begin_segment(name='plans.{}.fathomai.com'.format(os.environ['ENVIRONMENT']))
+        xray_recorder.begin_segment(name='{SERVICE}.{ENVIRONMENT}.fathomai.com'.format(**os.environ))
 
-    xray_recorder.current_segment().put_http_meta('url', 'https://{}{}'.format(event['headers']['Host'], event['path']))
+    xray_recorder.current_segment().put_http_meta('url', f"https://{event['headers']['Host']}/{os.environ['SERVICE']}/{api_version}{event['path']}")
     xray_recorder.current_segment().put_http_meta('method', event['httpMethod'])
     xray_recorder.current_segment().put_http_meta('user_agent', event['headers']['User-Agent'])
     xray_recorder.current_segment().put_annotation('environment', os.environ['ENVIRONMENT'])
-
+    xray_recorder.current_segment().put_annotation('version', str(api_version))
 
     ret = app(event, context)
     ret['headers'].update({
