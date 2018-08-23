@@ -23,6 +23,7 @@ def handle_clear_user_data():
                         "865f9e91-00b6-418b-a037-5a5d322a7e34", # hello+demo4@fathomai.com
                         "74bfd848-dc85-4025-a612-ff76d1b9eaa9", # hello+demo5@fathomai.com
                         "e155d933-8353-4157-8c17-061c7d1e7dcb", # chris+mvp@fathomai.com
+                        "b0501843-f067-48c3-a99b-bf3b56f4db04", # ivonna+mvp@fathomai.com
                         ]:
         raise ForbiddenException("The user is not allowed to perform this action.")
     if 'event_date' not in request.json:
