@@ -1,121 +1,66 @@
 from aws_xray_sdk.core import xray_recorder
 from config import get_mongo_collection
 from datastores.daily_plan_datastore import DailyPlanDatastore
-from models.session import SessionType, SessionFactory
-from exceptions import NoSuchEntityException
+from models.session import SessionType
+from exceptions import NoSuchEntityException, ForbiddenException
 
 class SessionDatastore(object):
     mongo_collection = 'dailyplan'
 
-    def get(self, user_id, event_date, session_type, session_id=None):
-        sessions = _get_sessions_from_mongo(self, user_id, event_date, session_type)
-        if session_id is None:
-            return sessions
+    @xray_recorder.capture('datastore.SessionDatastore.get')
+    def get(self, user_id, event_date, session_type=None, session_id=None):
+        sessions = self._get_sessions_from_mongo(user_id, event_date, session_type, session_id)
+
+        if session_id is not None and len(sessions) == 0:
+            raise NoSuchEntityException('No session could be found for the session_id: {}'.format(session_id))
         else:
-            for session in sessions:
-                if session.id == session_id:
-                    return [session]
-            raise NoSuchEntityException('No session could be found for the session_id: {} of session_type: {}'.format(session_id, SessionType(session_type)))
+            return sessions
 
 
+    @xray_recorder.capture('datastore.SessionDatastore.insert')
     def insert(self, item, user_id, event_date):
-        session_type = item.session_type().value
-        sessions = self._get_sessions_from_mongo(user_id, event_date, session_type)
-        sessions.append(item)
-        sessions = [s.json_serialise() for s in sessions]
-        self._update_sessions_mongo(user_id, event_date, session_type, sessions)
+        session = item.json_serialise()
+        query = {"user_id": user_id, "date": event_date}
+        mongo_collection = get_mongo_collection(self.mongo_collection)
+        mongo_collection.update_one(query, {'$push': {'training_sessions': session}})
 
-
+    @xray_recorder.capture('datastore.SessionDatastore.update')
     def update(self, item, user_id, event_date):
         session_type = item.session_type().value
-        sessions = self._get_sessions_from_mongo(user_id, event_date, session_type)
-        for session in sessions:
-            if session.id == item.id:
-                sessions.remove(session)
-                sessions.append(item)
-                break
-        sessions = [s.json_serialise() for s in sessions]
-        self._update_sessions_mongo(user_id, event_date, session_type, sessions)
-
-
-    def delete(self, user_id, event_date, session_type, session_id):
-        sessions = self._get_sessions_from_mongo(user_id, event_date, session_type)
-        for session in sessions:
-            if session.id == session_id:
-                sessions.remove(session)
-                break
-        sessions = [s.json_serialise() for s in sessions]
-
-        self._update_sessions_mongo(user_id, event_date, session_type, sessions)
-
-
-    def upsert(self, user_id, event_date, session_type, item=None, data=None):
-        if item is None:
-            session = _create_session(user_id, session_type, data)
-            self.insert(session, user_id, event_date)
-        else:
-            if data is None:
-                self.insert(item, user_id, event_date)
-            else:
-                update_item(item, data)
-                self.update(item, user_id, event_date)
-
-
-    def _get_sessions_from_mongo(self, user_id, event_date, session_type):
-        daily_plan_store = DailyPlanDatastore()
-        daily_plan = daily_plan_store.get(user_id=user_id,
-                                          start_date=event_date,
-                                          end_date=event_date)
-        plan = daily_plan[0]
-        session_type_name = _get_session_type_name(session_type, 'object')
-        sessions = getattr(plan, session_type_name)
-        return sessions
-
-    def _update_sessions_mongo(self, user_id, event_date, session_type, sessions):
-        session_type_name = _get_session_type_name(session_type, 'mongo')
-        mongo_collection = get_mongo_collection(self.mongo_collection)
+        session = item.json_serialise()
         query = {"user_id": user_id, "date": event_date}
-        mongo_collection.update_one(query, {'$set': {session_type_name: sessions}})
+        mongo_collection = get_mongo_collection(self.mongo_collection)
+        result = mongo_collection.update_one(query, {'$pull': {'training_sessions': {'session_id': item.id}}})
+        if result.modified_count == 0:
+            raise NoSuchEntityException('No session could be found for the session_id: {}'.format(item.id))
+        else:
+            mongo_collection.update_one(query, {'$push': {'training_sessions': session}})
 
-def _create_session(user_id, session_type, data):
-    print(data)
-    session = SessionFactory()
-    session = session.create(SessionType(session_type))
-    for key, value in data.items():
-        setattr(session, key, value)
-    return session
+    @xray_recorder.capture('datastore.SessionDatastore.delete')
+    def delete(self, user_id, event_date, session_type, session_id):
+        query = {"user_id": user_id, "date": event_date}
+        mongo_collection = get_mongo_collection(self.mongo_collection)
+        session = self.get(user_id, event_date, session_type, session_id)
+        result = mongo_collection.update_one(query, {'$pull': {'training_sessions': {'session_id': session_id, 'post_session_survey': None, 'session_type': session_type}}})
+        if result.modified_count == 0:
+            raise ForbiddenException("Cannot delete a session that's already logged")
 
-def _update_session(session, data):
-    for key, value in data.items():
-        setattr(session, key, value)
+    def _get_sessions_from_mongo(self, user_id, event_date, session_type=None, session_id=None):
+        daily_plan_store = DailyPlanDatastore()
+        plan = daily_plan_store.get(user_id=user_id,
+                                    start_date=event_date,
+                                    end_date=event_date)
+        plan = plan[0]
+        if session_type is None:
+            external_sessions = []
+            external_sessions.extend(getattr(plan, 'practice_sessions'))
+            external_sessions.extend(getattr(plan, 'strength_conditioning_sessions'))
+            external_sessions.extend(getattr(plan, 'games'))
+            external_sessions.extend(getattr(plan, 'training_sessions'))
+        else:
+            external_sessions = getattr(plan, 'training_sessions')
+            external_sessions = [s for s in external_sessions if s.session_type() == SessionType(session_type)]
+        if session_id is not None:
+            external_sessions = [s for s in external_sessions if s.id == session_id]
 
-
-def _get_session_type_name(session_type, destination):
-    if destination == 'mongo':
-        if session_type == 0:
-            session_type_name = 'practice_sessions'
-        elif session_type == 1:
-            session_type_name = 'cross_training_sessions'
-        elif session_type == 2:
-            session_type_name = 'game_sessions'
-        elif session_type == 3:
-            session_type_name = 'tournament_sessions'
-        elif session_type == 4:
-            session_type_name = 'bump_up_sessions'
-        elif session_type == 5:
-            session_type_name = 'corrective_sessions'
-    elif destination == 'object':
-        if session_type == 0:
-            session_type_name = 'practice_sessions'
-        elif session_type == 1:
-            session_type_name = 'strength_conditioning_sessions'
-        elif session_type == 2:
-            session_type_name = 'games'
-        elif session_type == 3:
-            session_type_name = 'tournaments'
-        elif session_type == 4:
-            session_type_name = 'bump_up_sessions'
-        elif session_type == 5:
-            session_type_name = 'corrective_sessions'
-
-    return session_type_name
+        return external_sessions

@@ -1,8 +1,9 @@
 import abc
 from enum import Enum, IntEnum
-import logic.soreness_and_injury as soreness_and_injury
-import logic.exercise as exercise
+import logic.soreness_processing as soreness_and_injury
+import logic.exercise_generator as exercise
 import models.exercise
+import models.soreness
 
 
 class Athlete(metaclass=abc.ABCMeta):
@@ -11,7 +12,7 @@ class Athlete(metaclass=abc.ABCMeta):
         self.full_name = ""
         self.email = ""
         self.date_of_birth = None
-        self.injury_status = soreness_and_injury.InjuryStatus.healthy
+        self.injury_status = models.soreness.InjuryStatus.healthy
         self.height = 0
         self.weight = 0
         self.sports = []
@@ -78,6 +79,7 @@ class SportName(Enum):
     volleyball = 17
     wrestling = 18
     weightlifting = 19
+    no_sport = None
 
 
 class YouthAthlete(Athlete):

@@ -4,6 +4,12 @@ from models.daily_plan import DailyPlan
 class DailyPlanDatastore(object):
     mongo_collection = 'dailyplan'
 
+    def __init__(self):
+        self.daily_plans = []
+
+    def side_load_plans(self, daily_plans):
+        self.daily_plans = daily_plans
+
     def get(self, user_id=None, start_date=None, end_date=None):
         return self._query_mongodb(user_id, start_date, end_date)
 
@@ -17,10 +23,12 @@ class DailyPlanDatastore(object):
             raise e
 
     def _query_mongodb(self, user_id, start_date, end_date):
-        pass
+        return self.daily_plans
 
     def _put_mongodb(self, item):
 
+        pass
+        '''
         practice_session_bson = ()
         cross_training_session_bson = ()
         game_session_bson = ()
@@ -28,11 +36,11 @@ class DailyPlanDatastore(object):
         am_recovery_bson = ()
         pm_recovery_bson = ()
 
-        if item.recovery_am is not None:
-            am_recovery_bson = self.get_recovery_bson(item.recovery_am)
+        if item.pre_recovery is not None:
+            am_recovery_bson = self.get_recovery_bson(item.pre_recovery)
 
-        if item.recovery_pm is not None:
-            pm_recovery_bson = self.get_recovery_bson(item.recovery_pm)
+        if item.post_recovery is not None:
+            pm_recovery_bson = self.get_recovery_bson(item.post_recovery)
 
         for practice_session in item.practice_sessions:
             practice_session_bson += ({'session_id': str(practice_session.id),
@@ -60,9 +68,11 @@ class DailyPlanDatastore(object):
                         'bump_up_sessions': bump_up_session_bson,
                         'cross_training_sessions': cross_training_session_bson,
                         'game_sessions': game_session_bson,
-                        'recovery_am': am_recovery_bson,
-                        'recovery_pm': pm_recovery_bson,
+                        'pre_recovery': am_recovery_bson,
+                        'post_recovery': pm_recovery_bson,
                         'last_updated': item.last_updated})
+                        
+        '''
 
     def get_recovery_bson(self, recovery_session):
         exercise_bson = ()

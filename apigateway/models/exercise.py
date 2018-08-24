@@ -1,7 +1,8 @@
 import datetime
 from enum import IntEnum, Enum
 from serialisable import Serialisable
-from logic.soreness_and_injury import BodyPartLocation
+from models.soreness import BodyPartLocation
+from utils import format_datetime
 
 
 class TechnicalDifficulty(IntEnum):
@@ -49,6 +50,7 @@ class Exercise(Serialisable):
         self.name = ""
         self.display_name = ""
         self.youtube_id = ""
+        self.description = ""
         # self.body_parts_targeted = []
         self.min_reps = None
         self.max_reps = None
@@ -76,6 +78,7 @@ class Exercise(Serialisable):
         ret = {'library_id': self.id,
                'name': self.name,
                'display_name': self.display_name,
+               'description': self.description,
                'youtube_id': self.youtube_id,
                'min_sets': self.min_sets,
                'max_sets': self.max_sets,
@@ -132,6 +135,7 @@ class AssignedExercise(Serialisable):
         ret = {'name': self.exercise.name,
                'display_name': self.exercise.display_name,
                'library_id': self.exercise.id,
+               'description': self.exercise.description,
                'youtube_id': self.exercise.youtube_id,
                'bilateral': self.exercise.bilateral,
                'seconds_per_rep': self.exercise.seconds_per_rep,
@@ -146,28 +150,31 @@ class AssignedExercise(Serialisable):
         return ret
 
 
-class ExerciseDeserialiser(object):
+class CompletedExercise(Serialisable):
 
-    def get_assigned_exercise(self, json_data):
-        assigned_exercise = AssignedExercise(json_data["library_id"])
-        assigned_exercise.exercise.name = json_data["name"]
-        assigned_exercise.exercise.bilateral = json_data["bilateral"]
-        assigned_exercise.exercise.seconds_per_rep = json_data["seconds_per_rep"]
-        assigned_exercise.exercise.seconds_per_set = json_data["seconds_per_set"]
-        assigned_exercise.exercise.unit_of_measure = json_data["unit_of_measure"]
-        assigned_exercise.position_order = json_data["position_order"]
-        assigned_exercise.reps_assigned = json_data["reps_assigned"]
-        assigned_exercise.sets_assigned = json_data["sets_assigned"]
-        return assigned_exercise
-
-class CompletedExercise(object):
-
-    def __init__(self, athlete_id, exercise_id):
+    def __init__(self, athlete_id, exercise_id, event_date):
         self.athlete_id = athlete_id
         self.exercise_id = exercise_id
-        self.exposures_completed = 0
-        self.last_completed_date = None
+        self.event_date = event_date
 
-    def increment(self):
-        self.exposures_completed = self.exposures_completed + 1
-        self.last_completed_date = datetime.date.today()
+    def json_serialise(self):
+        ret = {'athlete_id': self.athlete_id,
+               'exercise_id': self.exercise_id,
+               'event_date': format_datetime(self.event_date),
+               }
+        return ret
+
+
+class CompletedExerciseSummary(Serialisable):
+
+    def __init__(self, athlete_id, exercise_id, exposures):
+        self.athlete_id = athlete_id
+        self.exercise_id = exercise_id
+        self.exposures = exposures
+
+    def json_serialise(self):
+        ret = {'athlete_id': self.athlete_id,
+               'exercise_id': self.exercise_id,
+               'exposures': self.exposures,
+               }
+        return ret

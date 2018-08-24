@@ -3,7 +3,7 @@ import datetime
 import json
 import os
 import uuid
-
+from flask import request
 from exceptions import InvalidSchemaException
 
 
@@ -50,6 +50,15 @@ def parse_datetime(date_input):
         raise InvalidSchemaException('date_time must be in ISO8601 format')
 
 
+def parse_date(date_input):
+    for format_string in ('%Y-%m-%d', '%m/%d/%y'):
+        try:
+            return datetime.datetime.strptime(date_input, format_string)
+        except ValueError:
+            pass
+    raise InvalidSchemaException('date_time must be in ISO8601 format')
+
+
 def validate_uuid4(uuid_string):
     try:
         val = uuid.UUID(uuid_string, version=4)
@@ -61,36 +70,29 @@ def validate_uuid4(uuid_string):
         return False
 
 
-def run_async(endpoint, method='POST', body=None, headers=None):
+def run_async(method, endpoint, body=None):
     endpoint = endpoint.strip('/')
-    base_headers = {
-        "Accept": "*/*",
-        "Authorization": get_service_token(),
-        "Content-Type": "application/json",
-        "Host": "apis.{}.fathomai.com".format(os.environ['ENVIRONMENT']),
-        "User-Agent": "Biometrix/Plans API",
-        "X-Forwarded-Port": "443",
-        "X-Forwarded-Proto": "https"
+    payload = {
+        "path": "/plans/" + endpoint,
+        "httpMethod": method,
+        "headers": {
+            "Accept": "*/*",
+            "Authorization": request.headers.get('Authorization', None),
+            "Content-Type": "application/json",
+            "Host": "apis.{}.fathomai.com".format(os.environ['ENVIRONMENT']),
+            "User-Agent": "Biometrix/Plans API",
+            "X-Forwarded-Port": "443",
+            "X-Forwarded-Proto": "https"
+        },
+        "queryStringParameters": None,
+        "pathParameters": {"endpoint": endpoint},
+        "stageVariables": None,
+        "requestContext": {"identity": {"sourceIp": "0.0.0.0"}},
+        "body": json.dumps(body) if body is not None else None,
+        "isBase64Encoded": False
     }
-    if isinstance(headers, dict):
-        base_headers.update(headers)
-    boto3.client('lambda').invoke(
-        FunctionName=os.environ.get('AWS_LAMBDA_FUNCTION_NAME', 'plans-{}-apigateway-execute'.format(os.environ['ENVIRONMENT'])),
-        InvocationType='Event',
-        Payload=json.dumps({
-            "path": "/plans/" + endpoint,
-            "httpMethod": method,
-            "headers": base_headers,
-            "queryStringParameters": None,
-            "pathParameters": {"endpoint": endpoint},
-            "stageVariables": None,
-            "requestContext": {"identity": {"sourceIp": "0.0.0.0"}},
-            "body": json.dumps(body) if body is not None else None,
-            "isBase64Encoded": False
-        }).encode(),
+
+    boto3.client('sqs').send_message(
+        QueueUrl=os.environ['ASYNC_QUEUE_URL'],
+        MessageBody=json.dumps(payload)
     )
-
-
-def get_service_token():
-    # TODO
-    return "eyJraWQiOiJ1cy13ZXN0LTIxIiwidHlwIjoiSldTIiwiYWxnIjoiSFMyNTYifQ.eyJzdWIiOiJ1cy13ZXN0LTI6MTliZmFkNzUtOWQ5NS00ZmZmLWFlYzktZGU0YTkzZGEyMTRkIiwiYXVkIjoidXMtd2VzdC0yOjA5M2RhOGRjLThlNzUtNGJmNS04MGE5LWE0NmYwMDBhNGEyNiIsImFtciI6WyJ1bmF1dGhlbnRpY2F0ZWQiXSwiaXNzIjoiaHR0cHM6Ly9jb2duaXRvLWlkZW50aXR5LmFtYXpvbmF3cy5jb20iLCJleHAiOjE1MTM2MzA4ODcsImlhdCI6MTUxMzYzMDI4NywidXNlcl9pZCI6IjAyY2I3OTY1LTc5MjEtNDkzYS04MGQ0LTZiMjc4YzkyOGZhZCJ9.ZCUKZfP2XUZKeVjqx3txMzMBnFogZ65MdRqP1r27vTI"

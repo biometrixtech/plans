@@ -3,43 +3,122 @@ import models.session as session
 from models.daily_plan import DailyPlan
 import datetime
 import logic.exercise_mapping as exercise_mapping
-from logic.soreness_and_injury import SorenessCalculator, BodyPartLocation
+from logic.soreness_processing import SorenessCalculator
+from models.soreness import BodyPartLocation
 from logic.goal_focus_text_generator import RecoveryTextGenerator
-#from datastores.daily_readiness_datastore import DailyReadinessDatastore
-#from datastores.daily_schedule_datastore import DailyScheduleDatastore
 from utils import format_datetime
+from logic.stats_processing import StatsProcessing
 
 
 class TrainingPlanManager(object):
 
-    def __init__(self, athlete_id, daily_readiness_datastore, daily_schedule_datastore, post_session_survey_datastore,
-                 daily_plan_datastore):
+    def __init__(self, athlete_id, exercise_library_datastore, daily_readiness_datastore, post_session_survey_datastore,
+                 daily_plan_datastore, athlete_stats_datastore, completed_exercise_datastore):
         self.athlete_id = athlete_id
         self.daily_readiness_datastore = daily_readiness_datastore
-        self.daily_schedule_datastore = daily_schedule_datastore
         self.post_session_survey_datastore = post_session_survey_datastore
         self.daily_plan_datastore = daily_plan_datastore
+        self.exercise_library_datastore = exercise_library_datastore
+        self.athlete_stats_datastore = athlete_stats_datastore
+        self.completed_exercise_datastore = completed_exercise_datastore
 
-    def calculate_am_impact_score(self, rpe, readiness, sleep_quality, max_soreness):
 
-        max_soreness_score = min(max_soreness, 5)
-        sleep_quality_score = min(((10 - sleep_quality) / 10) * 3, 3)
-        readiness_score = min(((10 - readiness) / 10) * 5, 5)
-        rpe_score = min((rpe / 10) * 4, 4)
+    def calculate_pre_impact_score(self, rpe, readiness, sleep_quality, max_soreness, athlete_stats=None):
 
-        return max(max_soreness_score, sleep_quality_score, readiness_score, rpe_score)
+        scores = []
 
-    def calculate_pm_impact_score(self, rpe, readiness, sleep_quality, max_soreness):
+        scores.append(min(2 + (0.75 * (max_soreness - 1)), 5))
+        scores.append(min(((10 - sleep_quality) / 10) * 3, 3))
+        scores.append(min(((10 - readiness) / 10) * 5, 5))
+        scores.append(min((rpe / 10) * 4, 4))
 
-        max_soreness_score = min(max_soreness, 5)
-        sleep_quality_score = min(((10 - sleep_quality) / 10) * 3, 3)
-        readiness_score = min(((10 - readiness) / 10) * 3, 3)
-        rpe_score = min((rpe / 10) * 5, 5)
+        if athlete_stats is not None:
+            if athlete_stats.acute_avg_RPE is not None:
+                scores.append(min((athlete_stats.acute_avg_RPE/10) * 3, 3))
+            if athlete_stats.acute_avg_readiness is not None:
+                scores.append(min(((10 - athlete_stats.acute_avg_readiness) / 10) * 4, 4))
+            if athlete_stats.acute_avg_sleep_quality is not None:
+                scores.append(min(((10 - athlete_stats.acute_avg_sleep_quality) / 10) * 2, 2))
+            if athlete_stats.acute_avg_max_soreness is not None:
+                scores.append(min(athlete_stats.acute_avg_max_soreness, 5))
+            if athlete_stats.chronic_avg_RPE is not None:
+                scores.append(min((athlete_stats.chronic_avg_RPE/10) * 2, 2))
+            if athlete_stats.chronic_avg_readiness is not None:
+                scores.append(min(((10 - athlete_stats.chronic_avg_readiness) / 10) * 3, 3))
+            if athlete_stats.chronic_avg_sleep_quality is not None:
+                scores.append(min(((10 - athlete_stats.chronic_avg_sleep_quality) / 10) * 1, 1))
+            if athlete_stats.chronic_avg_max_soreness is not None:
+                scores.append(min(athlete_stats.chronic_avg_max_soreness, 5))
 
-        return max(max_soreness_score, sleep_quality_score, readiness_score, rpe_score)
+        max_scores = max(scores)
+
+        return max_scores
+
+    def calculate_post_impact_score(self, rpe, readiness, sleep_quality, max_soreness, athlete_stats=None):
+
+        scores = []
+
+        scores.append(min(2 + (0.75 * (max_soreness - 1)), 5))
+        scores.append(min(((10 - sleep_quality) / 10) * 3, 3))
+        scores.append(min(((10 - readiness) / 10) * 3, 3))
+        scores.append(min((rpe / 10) * 5, 5))
+
+        if athlete_stats is not None:
+            if athlete_stats.acute_avg_RPE is not None:
+                scores.append(min((athlete_stats.acute_avg_RPE/10) * 4, 4))
+            if athlete_stats.acute_avg_readiness is not None:
+                scores.append(min(((10 - athlete_stats.acute_avg_readiness) / 10) * 2, 2))
+            if athlete_stats.acute_avg_sleep_quality is not None:
+                scores.append(min(((10 - athlete_stats.acute_avg_sleep_quality) / 10) * 2, 2))
+            if athlete_stats.acute_avg_max_soreness is not None:
+                scores.append(min(athlete_stats.acute_avg_max_soreness, 5))
+            if athlete_stats.chronic_avg_RPE is not None:
+                scores.append(min((athlete_stats.chronic_avg_RPE/10) * 3, 3))
+            if athlete_stats.chronic_avg_readiness is not None:
+                scores.append(min(((10 - athlete_stats.chronic_avg_readiness) / 10) * 1, 1))
+            if athlete_stats.chronic_avg_sleep_quality is not None:
+                scores.append(min(((10 - athlete_stats.chronic_avg_sleep_quality) / 10) * 1, 1))
+            if athlete_stats.chronic_avg_max_soreness is not None:
+                scores.append(min(athlete_stats.chronic_avg_max_soreness, 5))
+
+        max_scores = max(scores)
+
+        return max_scores
+
+    def post_session_surveys_today(self, post_session_surveys, trigger_date):
+
+        # any post session surveys from today
+        # if todays_date is None:
+        #    todays_date = datetime.date.today().strftime("%Y-%m-%d")
+        try:
+            todays_date_time = datetime.datetime.strptime(trigger_date, '%Y-%m-%d')
+        except ValueError:
+            todays_date_time = datetime.datetime.strptime(trigger_date, '%Y-%m-%dT%H:%M:%SZ')
+
+        todays_date = todays_date_time.strftime("%Y-%m-%d")
+
+        for p in post_session_surveys:
+            event_date_time = datetime.datetime.strptime(p.event_date, "%Y-%m-%d")
+            if event_date_time.strftime("%Y-%m-%d") == todays_date:
+                return True
+
+        return False
 
     def create_daily_plan(self, event_date=None):
-        last_daily_readiness_survey = self.daily_readiness_datastore.get(self.athlete_id, event_date)
+
+        show_post_recovery = False
+
+        if event_date is not None:
+            start_date_time = datetime.datetime.strptime(event_date, "%Y-%m-%d")
+            end_date_time = datetime.datetime.strptime(event_date, "%Y-%m-%d")
+            start_time = datetime.datetime(start_date_time.year, start_date_time.month, start_date_time.day, 0, 0, 0)
+            end_time = end_date_time + datetime.timedelta(days=1)
+
+            readiness_surveys = self.daily_readiness_datastore.get(self.athlete_id, start_time, end_time)
+        else:
+            readiness_surveys = self.daily_readiness_datastore.get(self.athlete_id)
+
+        last_daily_readiness_survey = readiness_surveys[0]
 
         last_post_session_surveys = self.post_session_survey_datastore.get(self.athlete_id,
                                                last_daily_readiness_survey.get_event_date()
@@ -47,8 +126,16 @@ class TrainingPlanManager(object):
                                                last_daily_readiness_survey.get_event_date())
 
         trigger_date_time = last_daily_readiness_survey.get_event_date()
+        trigger_date_time_string = trigger_date_time.date().strftime('%Y-%m-%d')
 
-        survey_event_dates = [s.get_event_date() for s in last_post_session_surveys]
+        if event_date is None:
+            today_date = trigger_date_time_string
+        else:
+            today_date = event_date
+
+        show_post_recovery = self.post_session_surveys_today(last_post_session_surveys, today_date)
+
+        survey_event_dates = [s.get_event_date() for s in last_post_session_surveys if s is not None]
 
         if survey_event_dates is not None and len(survey_event_dates) > 0:
             trigger_date_time = max(trigger_date_time, max(survey_event_dates))
@@ -59,9 +146,7 @@ class TrainingPlanManager(object):
             trigger_date_time
         )
 
-        scheduled_sessions = self.daily_schedule_datastore.get(self.athlete_id, trigger_date_time)
-
-        trigger_date_time_string = trigger_date_time.date().strftime('%Y-%m-%d')
+        # scheduled_sessions = self.daily_schedule_datastore.get(self.athlete_id, trigger_date_time)
 
         daily_plans = self.daily_plan_datastore.get(self.athlete_id, trigger_date_time_string, trigger_date_time_string)
 
@@ -73,18 +158,15 @@ class TrainingPlanManager(object):
         daily_plan.user_id = self.athlete_id
         daily_plan.daily_readiness_survey = last_daily_readiness_survey.get_event_date().strftime('%Y-%m-%d')
 
-        daily_plan = self.add_recovery_times(trigger_date_time, daily_plan)
+        daily_plan = self.add_recovery_times(show_post_recovery, daily_plan)
 
-        calc = exercise_mapping.ExerciseAssignmentCalculator(self.athlete_id)
+        calc = exercise_mapping.ExerciseAssignmentCalculator(self.athlete_id, self.exercise_library_datastore,
+                                                             self.completed_exercise_datastore)
 
         soreness_values = [s.severity for s in soreness_list if s.severity is not None]
 
-        body_part_list = []
-
         if soreness_values is not None and len(soreness_values) > 0:
             max_soreness = max(soreness_values)
-            body_part_list = [s.body_part for s in soreness_list if s.severity == max_soreness
-                              and s.body_part.location.name != BodyPartLocation.general]
         else:
             max_soreness = 0
 
@@ -95,48 +177,64 @@ class TrainingPlanManager(object):
         else:
             max_rpe = 0
 
-        am_impact_score = self.calculate_am_impact_score(
-                            max_rpe,
-                            last_daily_readiness_survey.readiness,
-                            last_daily_readiness_survey.sleep_quality,
-                            max_soreness
-                            )
 
-        pm_impact_score = self.calculate_pm_impact_score(
-            max_rpe,
-            last_daily_readiness_survey.readiness,
-            last_daily_readiness_survey.sleep_quality,
-            max_soreness
-        )
+        athlete_stats = self.athlete_stats_datastore.get(self.athlete_id)
 
         text_generator = RecoveryTextGenerator()
         body_part_text = text_generator.get_text_from_body_part_list(soreness_list)
 
-        if daily_plan.recovery_am is not None and am_impact_score >= 0.5:
-            rpe_impact_score = min((max_rpe / 10) * 4, 4)
-            daily_plan.recovery_am.set_exercise_target_minutes(soreness_list, 15)
-            am_exercise_assignments = calc.create_exercise_assignments(daily_plan.recovery_am,
-                                                                       soreness_list)
-            daily_plan.recovery_am.update_from_exercise_assignments(am_exercise_assignments)
-            daily_plan.recovery_am.impact_score = am_impact_score
-            daily_plan.recovery_am.why_text = text_generator.get_why_text(rpe_impact_score, max_soreness)
-            daily_plan.recovery_am.goal_text = text_generator.get_goal_text(rpe_impact_score, max_soreness, body_part_text)
-        else:
-            daily_plan.recovery_am is None
+        if not show_post_recovery:
+            pre_impact_score = self.calculate_pre_impact_score(
+                                max_rpe,
+                                last_daily_readiness_survey.readiness,
+                                last_daily_readiness_survey.sleep_quality,
+                                max_soreness,
+                                athlete_stats
+                                )
+            if (daily_plan.pre_recovery is not None and pre_impact_score >= 1.5 and
+                    not daily_plan.pre_recovery.completed):
+                rpe_impact_score = min((max_rpe / 10) * 4, 4)
+                daily_plan.pre_recovery.set_exercise_target_minutes(soreness_list, 15)
+                am_exercise_assignments = calc.create_exercise_assignments(daily_plan.pre_recovery,
+                                                                           soreness_list,
+                                                                           trigger_date_time)
+                daily_plan.pre_recovery.update_from_exercise_assignments(am_exercise_assignments)
+                daily_plan.pre_recovery.impact_score = pre_impact_score
+                daily_plan.pre_recovery.why_text = text_generator.get_why_text(rpe_impact_score, max_soreness)
+                daily_plan.pre_recovery.goal_text = text_generator.get_goal_text(rpe_impact_score, max_soreness,
+                                                                                 body_part_text)
+                daily_plan.pre_recovery.display_exercises = True
+            else:
+                # daily_plan.pre_recovery = None
+                daily_plan.pre_recovery.display_exercises = False
 
-        if pm_impact_score >= 0.5:
-            rpe_impact_score = min((max_rpe / 10) * 5, 5)
-            daily_plan.recovery_pm.set_exercise_target_minutes(soreness_list, 15)
-            pm_exercise_assignments = calc.create_exercise_assignments(daily_plan.recovery_pm,
-                                                                       soreness_list)
-            daily_plan.recovery_pm.update_from_exercise_assignments(pm_exercise_assignments)
-            daily_plan.recovery_pm.impact_score = pm_impact_score
-            daily_plan.recovery_pm.why_text = text_generator.get_why_text(rpe_impact_score, max_soreness)
-            daily_plan.recovery_pm.goal_text = text_generator.get_goal_text(rpe_impact_score, max_soreness, body_part_text)
-        else:
-            daily_plan.recovery_pm is None
+        if show_post_recovery:
+            post_impact_score = self.calculate_post_impact_score(
+                max_rpe,
+                last_daily_readiness_survey.readiness,
+                last_daily_readiness_survey.sleep_quality,
+                max_soreness,
+                athlete_stats
+            )
+            if (daily_plan.post_recovery is not None and post_impact_score >= 1.5 and
+                    not daily_plan.post_recovery.completed):
+                rpe_impact_score = min((max_rpe / 10) * 5, 5)
+                daily_plan.post_recovery.set_exercise_target_minutes(soreness_list, 15)
+                pm_exercise_assignments = calc.create_exercise_assignments(daily_plan.post_recovery,
+                                                                           soreness_list,
+                                                                           trigger_date_time)
+                daily_plan.post_recovery.update_from_exercise_assignments(pm_exercise_assignments)
+                daily_plan.post_recovery.impact_score = post_impact_score
+                daily_plan.post_recovery.why_text = text_generator.get_why_text(rpe_impact_score, max_soreness)
+                daily_plan.post_recovery.goal_text = text_generator.get_goal_text(rpe_impact_score, max_soreness,
+                                                                                  body_part_text)
 
-        daily_plan.add_scheduled_sessions(scheduled_sessions)
+                daily_plan.post_recovery.display_exercises = True
+            else:
+                # daily_plan.post_recovery = None
+                daily_plan.post_recovery.display_exercises = False
+
+        # daily_plan.add_scheduled_sessions(scheduled_sessions)
 
         daily_plan.last_updated = format_datetime(datetime.datetime.utcnow())
 
@@ -156,23 +254,30 @@ class TrainingPlanManager(object):
         # add recovery sessions based on athlete status and history
         training_cycle.recovery_modalities = self.get_recovery_sessions(athlete_injury_history, training_cycle)
 
-    def add_recovery_times(self, trigger_date_time, daily_plan):
+    def add_recovery_times(self, show_post_recovery, daily_plan):
 
-        if trigger_date_time.hour < 12:
-            if daily_plan.recovery_am is None:
-                daily_plan.recovery_am = session.RecoverySession()
-            daily_plan.recovery_am.start_time = datetime.datetime(trigger_date_time.year, trigger_date_time.month,
-                                                                  trigger_date_time.day, 0, 0, 0)
-            daily_plan.recovery_am.end_time = datetime.datetime(trigger_date_time.year, trigger_date_time.month,
-                                                                trigger_date_time.day, 12, 0, 0)
+        if not show_post_recovery:
+            if daily_plan.pre_recovery is None:
+                daily_plan.pre_recovery = session.RecoverySession()
+                daily_plan.pre_recovery.display_exercises = True
+            # daily_plan.post_recovery = None
+            daily_plan.post_recovery.display_exercises = False
+            # daily_plan.pre_recovery.start_time = datetime.datetime(trigger_date_time.year, trigger_date_time.month,
+            #                                                      trigger_date_time.day, 0, 0, 0)
+            # daily_plan.pre_recovery.end_time = datetime.datetime(trigger_date_time.year, trigger_date_time.month,
+            #                                                    trigger_date_time.day, 12, 0, 0)
         else:
-            daily_plan.recovery_am = None
-
-        daily_plan.recovery_pm.start_time = datetime.datetime(trigger_date_time.year, trigger_date_time.month,
-                                                              trigger_date_time.day, 12, 0, 0)
-        next_date = trigger_date_time + datetime.timedelta(days=1)
-        daily_plan.recovery_pm.end_time = datetime.datetime(trigger_date_time.year, trigger_date_time.month,
-                                                            next_date.day, 0, 0, 0)
+            # daily_plan.pre_recovery = None
+            daily_plan.pre_recovery.display_exercises = False
+            if daily_plan.post_recovery is not None and daily_plan.post_recovery.completed:
+                daily_plan.completed_post_recovery_sessions.append(daily_plan.post_recovery)
+            daily_plan.post_recovery = session.RecoverySession()
+            daily_plan.post_recovery.display_exercises = True
+        #daily_plan.post_recovery.start_time = datetime.datetime(trigger_date_time.year, trigger_date_time.month,
+        #                                                      trigger_date_time.day, 12, 0, 0)
+        #next_date = trigger_date_time + datetime.timedelta(days=1)
+        #daily_plan.post_recovery.end_time = datetime.datetime(trigger_date_time.year, trigger_date_time.month,
+        #                                                    next_date.day, 0, 0, 0)
         return daily_plan
 
     def get_recovery_start_end_times(self, trigger_date_time, recovery_number):

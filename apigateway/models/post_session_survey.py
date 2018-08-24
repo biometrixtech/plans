@@ -1,9 +1,9 @@
 from serialisable import Serialisable
 
-from logic.soreness_and_injury import BodyPart, DailySoreness, BodyPartLocation
+from models.soreness import Soreness, BodyPartLocation, BodyPart
 from models.session import SessionType
 import datetime
-from utils import parse_datetime
+from utils import parse_datetime, format_datetime
 
 class PostSessionSurvey(Serialisable):
     
@@ -47,22 +47,22 @@ class PostSurvey(Serialisable):
         if survey is not None:
             self.RPE = survey['RPE']
             self.soreness = [self._soreness_from_dict(s, event_date) for s in survey['soreness']]
-            self.event_date = event_date
+            self.event_date = parse_datetime(event_date)
 
     def json_serialise(self):
         ret = {
             'RPE': self.RPE,
             'soreness': [item.json_serialise() for item in self.soreness],
-            'event_date': self.event_date
+            'event_date': format_datetime(self.event_date)
         }
         return ret
 
     def _soreness_from_dict(self, soreness_dict, event_date):
-        soreness = DailySoreness()
+        soreness = Soreness()
         soreness.body_part = BodyPart(BodyPartLocation(soreness_dict['body_part']), None)
         soreness.severity = soreness_dict['severity']
         soreness.side = self._key_present('side', soreness_dict)
-        soreness.reported_date_time = event_date
+        soreness.reported_date_time = parse_datetime(event_date)
         return soreness
 
     def _key_present(self, key_name, dictionary):
