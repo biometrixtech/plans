@@ -12,7 +12,7 @@ Numeric ID,Display Name,Exercise,PHASE,Muscle Group / Joint,Inhibit,Lengthen,Act
 11,Hip Bridge - Single Leg,Hip Bridge (single leg),,Hips; Hamstrings; Glutes; Core; Lower back,,,x,,,1,3,10,12,Y,2,8,5,count,0,,2,13,,Beginner,Floor,x
 12,Hip Bridge on Unstable Surface - Double Leg,Hip Bridge (double leg) on unstable surface,,Hips; Hamstrings; Glutes; Core; Lower back,,,x,,,1,3,10,12,N,2,8,5,count,0,,2,11,,Intermediate,Pillow; Half Bosu Ball,x
 13,Hip Bridge on Unstable Surface - Single Leg,Hip Bridge (single leg) on unstable surface,,Hips; Hamstrings; Glutes; Core; Lower back,,,x,,,1,3,10,12,Y,2,8,5,count,0,,2,120,,Intermediate,Pillow; Half Bosu Ball,x
-14,Single Leg Balance Reach - Multiple Directions,Single Leg Balance (multiplanar) with Reach,,Glutes; Core; Adductor; Abductor,,,x,,,1,3,10,12,Y,2,,,count,0,,5,,,Beginner,Floor,
+14,Single Leg Balance Reach - Multiple Directions,Single Leg Balance (multiplanar) with Reach,,Glutes; Core; Adductor; Abductor,,,x,,,1,3,10,12,Y,2,,,count,0,,5,,,Beginner,Floor,x
 15,Double Leg Squat (Bodyweight),Double Leg Squat (Bodyweight),,Glute; Quad; Core; Hamstring,,,,x,,1,3,10,15,N,2,,,count,0,,2,39,,Beginner,Floor,
 16,High Knees,High Knees,,quads core,,,,x,,1,1,10,10,N,0,,,seconds,0,10,,,,Beginner,Field; Open Space,
 17,Back Pedal,Back Pedal,,lower body,,,,x,,1,1,10,10,N,0,,,seconds,0,10,,,,Beginner,Field; Open Space,
@@ -24,7 +24,7 @@ Numeric ID,Display Name,Exercise,PHASE,Muscle Group / Joint,Inhibit,Lengthen,Act
 23,,,,,,,,,,,,,,,,,,,,,,,,,,
 24,,,,,,,,,,,,,,,,,,,,,,,,,,
 25,,,,,,,,,,,,,,,,,,,,,,,,,,
-26,Calf (Soleus) Stretch,Soleus Static Stretch,,Calves,,x,,,,1,3,30,30,Y,0,,,seconds,0,30,,,,Beginner,Floor,
+26,Calf (Soleus) Stretch,Soleus Static Stretch,,Calves,,x,,,,1,3,30,30,Y,0,,,seconds,0,30,,,,Beginner,Floor,x
 27,,,,,,,,,,,,,,,,,,,,,,,,,,
 28,Standing Outer Hip (TFL) Stretch,Standing TFL Static Stretch,,TFL ,,x,,,,1,2,30,30,Y,0,5,3,seconds,0,30,,122,,Beginner,Floor,x
 29,Ankle Mobility (Toes Up),Ankle Dorsiflexion,,Ankle,,,x,,,1,3,10,15,Y,2,3,1,count,0,,2,63,,Beginner,Floor,x
@@ -57,15 +57,15 @@ Numeric ID,Display Name,Exercise,PHASE,Muscle Group / Joint,Inhibit,Lengthen,Act
 56,Seated Spinal Twist Stretch,Erector Spinae Static Stretch,,Upper Back,,x,,,,1,2,30,30,Y,0,,,seconds,0,30,,,,Beginner,Floor,x
 57,Kneeling One-Armed Lat Stretch,Latissimus Dorsi Static Stretch,,Upper Back,,x,,,,1,2,30,30,Y,0,,,seconds,0,30,,,,Beginner,Floor/Wall,x
 58,B-Skips,B-Skips,,Lower Body,,,,x,,1,1,10,10,N,0,,,seconds,0,10,,,,Beginner,Field; Open Space,
-59,Ankle Stretch and Hold (Towards You),Isometric Ankle Dorsiflexion,,Ankle,,x,,,,1,2,15,15,Y,0,,,seconds,0,30,,,,Beginner,None,
+59,Ankle Stretch and Hold (Towards You),Isometric Ankle Dorsiflexion,,Ankle,,x,,,,1,2,15,15,Y,0,,,seconds,0,30,,,,Beginner,None,x
 60,Ankle Stretch and Hold (Away From You),Isometric Ankle Plantarflexion,,Ankle,,x,,,,1,2,15,15,Y,0,,,seconds,0,30,,,,Beginner,None,x
-61,Ankle Stretch and Hold (Toes In),Isometric Ankle Inversion,,Ankle,,x,,,,1,2,15,15,Y,0,,,seconds,0,30,,,,Beginner,None,
-62,Ankle Stretch and Hold (Toes Out),Isometric Ankle Eversion,,Ankle,,x,,,,1,2,15,15,Y,0,,,seconds,0,30,,,,Beginner,None,
-63,Ankle Mobility (Toes In),Ankle Inversion,,Ankle,,,x,,,1,2,10,12,Y,2,3,1,count,0,,2,64,,Beginner,None,
-64,Ankle Mobility (Toes Out),Ankle Eversion,,Ankle,,,x,,,1,2,10,12,Y,2,,,count,0,,2,,,Beginner,None,
-65,Ankle Mobility (Up and Out),Ankle Dorsiflexion and Eversion,,Ankle,,,x,,,1,2,10,12,Y,2,3,1,count,0,,2,66,,Intermediate,None,
-66,Ankle Mobility (Down and In),Ankle Plantarflexion and Inversion,,Ankle,,,x,,,1,2,10,12,Y,2,3,1,count,0,,2,107,,Intermediate,None,
-67,Double Leg Calf Raise,Double Leg Calf Raise,,Calf,,,x,,,1,2,10,12,N,2,,,count,0,,2,,,Beginner,Floor,x
+61,Ankle Stretch and Hold (Toes In),Isometric Ankle Inversion,,Ankle,,x,,,,1,2,15,15,Y,0,,,seconds,0,30,,,,Beginner,None,x
+62,Ankle Stretch and Hold (Toes Out),Isometric Ankle Eversion,,Ankle,,x,,,,1,2,15,15,Y,0,,,seconds,0,30,,,,Beginner,None,x
+63,Ankle Mobility (Toes In),Ankle Inversion,,Ankle,,,x,,,1,2,10,12,Y,2,3,1,count,0,,2,64,,Beginner,None,x
+64,Ankle Mobility (Toes Out),Ankle Eversion,,Ankle,,,x,,,1,2,10,12,Y,2,,,count,0,,2,,,Beginner,None,x
+65,Ankle Mobility (Up and Out),Ankle Dorsiflexion and Eversion,,Ankle,,,x,,,1,2,10,12,Y,2,3,1,count,0,,2,66,,Intermediate,None,x
+66,Ankle Mobility (Down and In),Ankle Plantarflexion and Inversion,,Ankle,,,x,,,1,2,10,12,Y,2,3,1,count,0,,2,107,,Intermediate,None,x
+67,Double Leg Calf Raise,Double Leg Calf Raise,,Calf,,,x,,,1,2,10,12,N,2,5,3,count,0,,2,78,,Beginner,Floor,x
 68,Double Leg (Up) - Single Leg (Down) Calf Raise,Double Leg (up); Single leg (down) calf raise,,Calf,,,x,,,1,3,10,12,Y,2,5,3,count,0,,2,31,,Beginner,Floor,x
 69,Multiplanar Single-Leg Balance Reach (Unstable Surface),Multiplanar Single-Leg Balance Reach (Uneven Surface),,Glutes; Abdominals; Hips,,,,x,,1,2,10,14,Y,2,,,count,30,30,,,,Intermediate,Pillow; Foam Pad; Half Bosu Ball,
 70,Triple-Hop to Stabilization,Triple-hop to stabilization (distance),,Lower Body; Abdominals,,,,x,,1,4,3,3,Y,0,,,count,30,15,,,,Intermediate,Floor,
@@ -78,7 +78,7 @@ Numeric ID,Display Name,Exercise,PHASE,Muscle Group / Joint,Inhibit,Lengthen,Act
 77,Wall Sit,Wall Sit,,Lower Body; Abdominals,,,x,,,1,2,30,30,N,0,,,seconds,0,30,,,,Beginner,Wall,x
 78,Standing Calf Raises (Elevated Surface),Calf Raise on Raised Surface,,Calves,,,x,,,1,3,10,12,N,2,5,3,count,0,,2,68,,Beginner,Step; Stair,x
 79,Posterior Pelvic Tilt,Posterior Pelvic Tilt,,Lower Back; Abdominals,,,x,,,1,3,10,12,N,2,5,3,count,0,,2,80,,Beginner,Floor,x
-80,Posterior Pelvic Tilt with Hip Bridge,Posterior Pelvic Tilt with Hip Bridge,,Lower Back; Abdominals; Hamstring; Glutes,,,x,,,1,2,10,15,N,2,,,count,0,,2,,,Beginner,Floor,x
+80,,,,,,,,,,,,,,,,,,,,,,,,,,
 81,Clam Shells (On Side),Bent Knee Hip External Rotation (On Side),,Glutes,,,x,,,1,3,10,12,Y,2,8,5,count,0,,2,82,,Beginner,None,x
 82,Lateral Walks,Lateral Walks,,Glutes,,,x,,,1,2,10,15,Y,2,8,5,count,0,,2,83,,Beginner,None,x
 83,Monster Walks,Monster Walks,,Glutes,,,x,,,1,2,10,15,Y,2,8,5,count,0,,2,110,,Beginner,None,x
