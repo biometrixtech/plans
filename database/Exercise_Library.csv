@@ -1,13 +1,13 @@
 Numeric ID,Display Name,Exercise,PHASE,Muscle Group / Joint,Inhibit,Lengthen,Activate,Integrate,DOSAGE,min Sets,max Sets,min Reps,max Reps,Bilateral (Y/N),Progression Interval (e.g. 2 reps),Progression Cadence (e.g. 2 exposures),Minimum Exposures to Maintain Stage,Unit of Measure for Reps,Rest Between Sets (seconds),Time Per Set (seconds),Time Per Rep (seconds),Progresses To,MISC.,Technical Difficulty,Equipment Required,Present in Mapping Logic
-1,Foam Roll - Inner Thigh (Adductor),SMR - Adductors,,Adductor,x,,,,,1,2,30,30,Y,0,,,seconds,0,30,-,,,Beginner,SMR,x
-2,Foam Roll - Calves,SMR - Calves,,Calves,x,,,,,1,2,30,30,Y,0,,,seconds,0,30,-,,,Beginner,SMR,x
-3,Foam Roll - Hamstrings,SMR - Hamstrings,,Hamstring,x,,,,,1,2,30,30,Y,0,,,seconds,0,30,-,,,Beginner,SMR,x
-4,Foam Roll - Outer Thigh (IT Band),SMR - IT-Band,,IT-Band,x,,,,,1,2,30,30,Y,0,,,seconds,0,30,-,,,Beginner,SMR,x
+1,Foam Roll - Inner Thigh (Adductor),SMR - Adductors,,Adductor,x,,,,,1,2,30,30,Y,0,,,seconds,0,30,,,,Beginner,SMR,x
+2,Foam Roll - Calves,SMR - Calves,,Calves,x,,,,,1,2,30,30,Y,0,,,seconds,0,30,,,,Beginner,SMR,x
+3,Foam Roll - Hamstrings,SMR - Hamstrings,,Hamstring,x,,,,,1,2,30,30,Y,0,,,seconds,0,30,,,,Beginner,SMR,x
+4,Foam Roll - Outer Thigh (IT Band),SMR - IT-Band,,IT-Band,x,,,,,1,2,30,30,Y,0,,,seconds,0,30,,,,Beginner,SMR,x
 5,,,,,,,,,,,,,,,,,,,,,,,,,,
-6,Standing Hip Stretch,Hip Flexor Static Stretch (Standing),,Hip,,x,,,,1,2,30,30,Y,0,,,seconds,0,30,-,,,Beginner,Floor,x
-7,Standing Calf Stretch,Calves Static Stretch,,Calf,,x,,,,1,2,30,30,Y,0,,,seconds,0,30,-,,,Beginner,Floor,x
-8,Standing Inner Thigh (Adductor) Stretch,Adductors Static Stretch,,Adductor,,x,,,,1,2,30,30,Y,0,,,seconds,0,30,-,,,Beginner,Floor,x
-9,Lying Hamstring Stretch,Hamstrings Static Stretch ,,Hamstring,,x,,,,1,2,30,30,Y,0,5,3,seconds,0,30,-,121,,Beginner,Floor,x
+6,Standing Hip Stretch,Hip Flexor Static Stretch (Standing),,Hip,,x,,,,1,2,30,30,Y,0,,,seconds,0,30,,,,Beginner,Floor,x
+7,Standing Calf Stretch,Calves Static Stretch,,Calf,,x,,,,1,2,30,30,Y,0,,,seconds,0,30,,,,Beginner,Floor,x
+8,Standing Inner Thigh (Adductor) Stretch,Adductors Static Stretch,,Adductor,,x,,,,1,2,30,30,Y,0,,,seconds,0,30,,,,Beginner,Floor,x
+9,Lying Hamstring Stretch,Hamstrings Static Stretch ,,Hamstring,,x,,,,1,2,30,30,Y,0,5,3,seconds,0,30,,121,,Beginner,Floor,x
 10,Hip Bridge - Double Leg,Hip Bridge (double leg),,Hips; Hamstrings; Glutes; Core; Lower back,,,x,,,1,3,10,12,N,2,8,5,count,0,,2,12,,Beginner,Floor,x
 11,Hip Bridge - Single Leg,Hip Bridge (single leg),,Hips; Hamstrings; Glutes; Core; Lower back,,,x,,,1,3,10,12,Y,2,8,5,count,0,,2,13,,Beginner,Floor,x
 12,Hip Bridge on Unstable Surface - Double Leg,Hip Bridge (double leg) on unstable surface,,Hips; Hamstrings; Glutes; Core; Lower back,,,x,,,1,3,10,12,N,2,8,5,count,0,,2,11,,Intermediate,Pillow; Half Bosu Ball,x
@@ -112,14 +112,14 @@ Numeric ID,Display Name,Exercise,PHASE,Muscle Group / Joint,Inhibit,Lengthen,Act
 111,,,,,,,,,,,,,,,,,,,,,,,,,,
 112,,,,,,,,,,,,,,,,,,,,,,,,,,
 113,4-Way Ankle Strengthening (Banded),4-Way Ankle Resistance,,Ankle,,,x,,,1,2,120,120,Y,0,,,seconds,0,120,,,,Beginner,Towel; Band,x
-114,4-Way Ankle Holds (Towel),4-Way Ankle Isometrics (Towel),,Ankle,,,x,,,1,2,60,60,Y,0,3,1,seconds,0,60,,65,,Beginner,Towel,x
+114,4-Way Ankle Holds (Towel),4-Way Ankle Isometrics (Towel),,Ankle,,,x,,,1,2,60,60,Y,0,3,1,seconds,0,120,,65,,Beginner,Towel,x
 115,Ankle Pumps,Ankle Pumps,,Ankle,,,x,,,1,2,12,15,Y,3,3,1,count,0,,2,114,,Beginner,None,x
-116,Knee Hugs,Knee Hugs,,"Glutes, hamstrings",,x,,,,1,2,10,15,Y,2,,,count,0,60,,,,Beginner,None,x
-117,Hip Cradles,Hip Cradles,,"glutes, IT band, hamstrings",,x,,,,1,2,10,15,Y,2,,,count,0,60,,,,Beginner,None,x
-118,Standing Quads Stretch,Standing Quads Stretch,,"Quads, abdominals",,x,,,,1,2,10,15,Y,2,,,count,0,60,,,,Beginner,None,x
-119,Dynamic Runner Lunges,Dynamic Runner Lunges,,"Quads, hips, abdominals, glutes, hamstrings",,x,,,,1,2,10,10,Y,0,,,count,0,60,,,,Beginner,None,x
-120,Crab Reaches,Crab Reaches,,"abdominals, hamstrings, glutes",,,x,,,1,2,10,12,Y,2,,,count,0,60,,,,Beginner,None,x
-121,Seated Forward Fold,Seated Forward Fold,,Hamstrings,,x,,,,1,2,30,30,Y,0,,,seconds,0,60,,,,Beginner,None,x
-122,Lateral Hip Openers,Lateral Hip Openers,,"IT band, hips, groin",,x,,,,1,2,12,15,Y,3,,,count,0,60,,,,Beginner,None,x
+116,Knee Hugs,Knee Hugs,,"Glutes, hamstrings",,x,,,,1,2,10,15,Y,2,,,count,0,,2,,,Beginner,None,x
+117,Hip Cradles,Hip Cradles,,"glutes, IT band, hamstrings",,x,,,,1,2,10,15,Y,2,,,count,0,,2,,,Beginner,None,x
+118,Standing Quads Stretch,Standing Quads Stretch,,"Quads, abdominals",,x,,,,1,2,30,30,Y,2,,,seconds,0,30,,,,Beginner,None,x
+119,Dynamic Runner Lunges,Dynamic Runner Lunges,,"Quads, hips, abdominals, glutes, hamstrings",,x,,,,1,2,10,10,Y,0,,,count,0,,2,,,Beginner,None,x
+120,Crab Reaches,Crab Reaches,,"abdominals, hamstrings, glutes",,,x,,,1,2,10,12,Y,2,,,count,0,,2,,,Beginner,None,x
+121,Seated Forward Fold,Seated Forward Fold,,Hamstrings,,x,,,,1,2,30,30,Y,0,,,seconds,0,30,,,,Beginner,None,x
+122,Lateral Hip Openers,Lateral Hip Openers,,"IT band, hips, groin",,x,,,,1,2,12,15,Y,3,,,count,0,,2,,,Beginner,None,x
 123,,,,,,,,,,,,,,,,,,,,,,,,,,
-124,Banded Glute Extensions,Banded Glute Max Activation,,Glutes,,,x,,,1,2,10,15,Y,2,,,count,0,60,,,,Beginner,Band,x
+124,Banded Glute Extensions,Banded Glute Max Activation,,Glutes,,,x,,,1,2,10,15,Y,2,,,count,0,,2,,,Beginner,Band,x
