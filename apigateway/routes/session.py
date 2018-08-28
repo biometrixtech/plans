@@ -46,7 +46,7 @@ def handle_session_create():
                     "duration_minutes": duration,
                     "event_date": session_event_date}
     if 'post_session_survey' in request.json:
-        survey = PostSessionSurvey(event_date_time=event_date,
+        survey = PostSessionSurvey(event_date_time=session_event_date,
                                    user_id=user_id,
                                    session_id=None,
                                    session_type=session_type,
