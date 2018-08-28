@@ -63,6 +63,7 @@ class DailyPlanDatastore(object):
             daily_plan.last_updated = plan.get('last_updated', None)
             daily_plan.pre_recovery_completed = plan.get('pre_recovery_completed', False)
             daily_plan.post_recovery_completed = plan.get('post_recovery_completed', False)
+            daily_plan.last_sensor_sync = plan.get('last_sensor_sync', None)
             ret.append(daily_plan)
 
         if len(ret) == 0:

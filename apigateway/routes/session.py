@@ -185,7 +185,6 @@ def handle_session_sensor_data():
         if not _check_plan_exists(user_id, event_date):
             plan = DailyPlan(event_date=event_date)
             plan.user_id = user_id
-            plan.last_sensor_sync = last_sensor_sync
             DailyPlanDatastore().put(plan)
 
         session_id = session.get('session_id', None)
@@ -228,9 +227,9 @@ def get_sensor_data(session):
     duration = low_duration + mod_duration + high_duration
     
     
-    low_accel = session['low_accel'] * 1000
-    mod_accel = session['mod_accel'] * 1000
-    high_accel = session['high_accel'] * 1000
+    low_accel = session['low_accel']
+    mod_accel = session['mod_accel']
+    high_accel = session['high_accel']
     total_accel = low_accel + mod_accel + high_accel
     
     sensor_data = {"sensor_start_date_time": start_time,
