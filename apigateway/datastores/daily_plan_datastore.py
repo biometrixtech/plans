@@ -162,7 +162,8 @@ def _external_session_from_mongodb(mongo_result, session_type):
                         "low_intensity_load",
                         "sensor_start_date_time",
                         "sensor_end_date_time",
-                        "post_session_survey"]
+                        "post_session_survey",
+                        "deleted"]
     for key in attrs_from_mongo:
         setattr(mongo_session, key, _key_present(key, mongo_result))
 

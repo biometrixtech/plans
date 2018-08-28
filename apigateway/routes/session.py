@@ -156,6 +156,21 @@ def handle_session_sensor_data():
     if 'user_id' not in request.json:
         raise InvalidSchemaException('Missing required parameter user_id')
     user_id = request.json['user_id']
+    if 'last_sensor_sync' in request.json:
+        last_sensor_sync = request.json['last_sensor_sync']
+        plan_event_date = format_date(parse_datetime(last_sensor_sync))
+        if not _check_plan_exists(user_id, plan_event_date):
+            plan = DailyPlan(event_date=plan_event_date)
+            plan.user_id = user_id
+            plan.last_sensor_sync = last_sensor_sync
+            DailyPlanDatastore().put(plan)
+        else:
+            daly_plan_store = DailyPlanDatastore()
+            plan = daly_plan_store.get(user_id, plan_event_date, plan_event_date)[0]
+            plan.last_sensor_sync = last_sensor_sync
+            daly_plan_store.put(plan)
+    else:
+        plan_event_date = format_date(datetime.datetime.now())
 
     store = SessionDatastore()
 
@@ -170,6 +185,7 @@ def handle_session_sensor_data():
         if not _check_plan_exists(user_id, event_date):
             plan = DailyPlan(event_date=event_date)
             plan.user_id = user_id
+            plan.last_sensor_sync = last_sensor_sync
             DailyPlanDatastore().put(plan)
 
         session_id = session.get('session_id', None)
@@ -191,8 +207,15 @@ def handle_session_sensor_data():
                          )
 
     # update_plan(user_id, event_date)
-
-    return {'message': 'success'}, 200
+    plan = DailyPlanDatastore().get(user_id, plan_event_date, plan_event_date)[0]
+    survey_complete = plan.daily_readiness_survey_completed()
+    landing_screen, nav_bar_indicator = plan.define_landing_screen()
+    plan = plan.json_serialise()
+    plan['daily_readiness_survey_completed'] = survey_complete
+    plan['landing_screen'] = landing_screen
+    plan['nav_bar_indicator'] = nav_bar_indicator
+    del plan['daily_readiness_survey'], plan['user_id']
+    return {'daily_plan': plan}, 200
 
 
 def get_sensor_data(session):

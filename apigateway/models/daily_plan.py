@@ -26,6 +26,7 @@ class DailyPlan(Serialisable):
         self.daily_readiness_survey = None
         self.updated = False
         self.last_updated = None
+        self.last_sensor_sync = None
 
     def get_id(self):
         return self.user_id
@@ -50,7 +51,8 @@ class DailyPlan(Serialisable):
                'post_recovery': self.post_recovery.json_serialise() if self.post_recovery is not None else None,
                'completed_post_recovery_sessions': [c.json_serialise() for c in self.completed_post_recovery_sessions],
                'last_updated': self.last_updated,
-               'daily_readiness_survey': self.daily_readiness_survey
+               'daily_readiness_survey': self.daily_readiness_survey,
+               'last_sensor_sync': self.last_sensor_sync
                }
         return ret
 

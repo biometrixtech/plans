@@ -54,6 +54,7 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         self.data_transferred = False
         self.movement_limited = False
         self.same_muscle_discomfort_over_72_hrs = False
+        self.deleted = False
 
         # post-session
         self.post_session_survey = None
@@ -112,7 +113,8 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
             'low_intensity_load': self.low_intensity_load,
             'sensor_start_date_time': format_datetime(self.sensor_start_date_time),
             'sensor_end_date_time': format_datetime(self.sensor_end_date_time),
-            'post_session_survey': self.post_session_survey
+            'post_session_survey': self.post_session_survey,
+            'deleted': self.deleted
         }
         return ret
 
