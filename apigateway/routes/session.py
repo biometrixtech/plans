@@ -62,7 +62,9 @@ def handle_session_create():
                  user_id=user_id,
                  event_date=plan_event_date
                  )
-
+    plan = DailyPlanDatastore().get(user_id, plan_event_date, plan_event_date)[0]
+    plan.sessions_present = True
+    DailyPlanDatastore().put(plan)
     return {'message': 'success'}, 201
 
 

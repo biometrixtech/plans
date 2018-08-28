@@ -27,6 +27,7 @@ class DailyPlan(Serialisable):
         self.updated = False
         self.last_updated = None
         self.last_sensor_sync = None
+        self.sessions_planned = True
 
     def get_id(self):
         return self.user_id
@@ -52,7 +53,8 @@ class DailyPlan(Serialisable):
                'completed_post_recovery_sessions': [c.json_serialise() for c in self.completed_post_recovery_sessions],
                'last_updated': self.last_updated,
                'daily_readiness_survey': self.daily_readiness_survey,
-               'last_sensor_sync': self.last_sensor_sync
+               'last_sensor_sync': self.last_sensor_sync,
+               'sessions_planned': self.sessions_planned
                }
         return ret
 
