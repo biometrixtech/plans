@@ -17,6 +17,13 @@ def handle_clear_user_data():
     user_id = jwt.decode(request.headers['Authorization'], verify=False)['user_id']
     if user_id not in  ["c4f3ba9c-c874-4687-bbb8-67633a6a6d7d", # dipesh+mvp@fathomai.com
                         "a1233423-73d3-4761-ac92-89cc15921d34", # mazen+mvp@fathomai.com
+                        "e155d933-8353-4157-8c17-061c7d1e7dcb", # chris+mvp@fathomai.com
+                        "b0501843-f067-48c3-a99b-bf3b56f4db04", # ivonna+mvp@fathomai.com
+                        "f45d72a8-4569-42b7-bbfd-79e810983b00", # gabby+mvp@fathomai.com
+                        "9930c5cd-0ae7-43f3-aee4-de621e935525", # maria+mvp@fathomai.com
+                        "a045f81b-477a-4a31-ae65-1dd46bcafc0c", # melissa+mvp@fathomai.com
+                        "1092081e-30f9-4886-b94f-36f993ba9065", # amina+mvp@fathomai.com
+                        "bf9f61b3-a985-49ef-b733-9f34309942a5", # paul+mvp@fathomai.com
                         "ad328899-f8e6-4070-8878-73bf84c79699", # hello+demo1@fathomai.com
                         "c1394094-c8e2-4880-b940-237d41d4118e", # hello+demo2@fathomai.com
                         "9138da93-d054-45d2-9149-2572523b49da", # hello+demo3@fathomai.com
