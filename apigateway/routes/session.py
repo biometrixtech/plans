@@ -3,9 +3,11 @@ from flask import request, Blueprint
 
 from datastores.daily_plan_datastore import DailyPlanDatastore
 from datastores.session_datastore import SessionDatastore
+# from datastore.post_session_survey import PostSessionSurveyDatastore
 from decorators import authentication_required
 from exceptions import InvalidSchemaException, NoSuchEntityException, ForbiddenException
 from models.session import SessionType, SessionFactory
+from models.post_session_survey import PostSessionSurvey
 from models.daily_plan import DailyPlan
 from utils import parse_datetime, format_date, format_datetime, run_async
 from config import get_mongo_collection
@@ -43,6 +45,14 @@ def handle_session_create():
                     "description": description,
                     "duration_minutes": duration,
                     "event_date": session_event_date}
+    if 'post_session_survey' in request.json:
+        survey = PostSessionSurvey(event_date_time=event_date,
+                                   user_id=user_id,
+                                   session_id=None,
+                                   session_type=session_type,
+                                   survey=request.json['post_session_survey']
+                                   )
+        session_data['post_session_survey'] = survey.survey.json_serialise()
 
     session = _create_session(session_type, session_data)
 
