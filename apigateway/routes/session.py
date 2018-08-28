@@ -63,7 +63,7 @@ def handle_session_create():
                  event_date=plan_event_date
                  )
     plan = DailyPlanDatastore().get(user_id, plan_event_date, plan_event_date)[0]
-    plan.sessions_present = True
+    plan.sessions_planned = True
     DailyPlanDatastore().put(plan)
     return {'message': 'success'}, 201
 
@@ -157,58 +157,66 @@ def handle_session_sensor_data():
         raise InvalidSchemaException('Request body must be a dictionary')
     if 'user_id' not in request.json:
         raise InvalidSchemaException('Missing required parameter user_id')
+    if 'last_sensor_sync' not in request.json:
+        raise InvalidSchemaException('Missing required parameter user_id')
     user_id = request.json['user_id']
-    if 'last_sensor_sync' in request.json:
-        last_sensor_sync = request.json['last_sensor_sync']
-        plan_event_date = format_date(parse_datetime(last_sensor_sync))
-        if not _check_plan_exists(user_id, plan_event_date):
-            plan = DailyPlan(event_date=plan_event_date)
-            plan.user_id = user_id
-            plan.last_sensor_sync = last_sensor_sync
-            DailyPlanDatastore().put(plan)
-        else:
-            daly_plan_store = DailyPlanDatastore()
-            plan = daly_plan_store.get(user_id, plan_event_date, plan_event_date)[0]
-            plan.last_sensor_sync = last_sensor_sync
-            daly_plan_store.put(plan)
-    else:
-        plan_event_date = format_date(datetime.datetime.now())
 
-    store = SessionDatastore()
+    # update last_sensor_syc date
+    last_sensor_sync = request.json['last_sensor_sync']
+    sensor_sync_date = format_date(parse_datetime(last_sensor_sync))
+    daly_plan_store = DailyPlanDatastore()
+    if not _check_plan_exists(user_id, sensor_sync_date):
+        plan = DailyPlan(event_date=sensor_sync_date)
+        plan.user_id = user_id
+    else:
+        plan = daly_plan_store.get(user_id, sensor_sync_date, sensor_sync_date)[0]
+    plan.last_sensor_sync = last_sensor_sync
+    daly_plan_store.put(plan)
+    updated_dates = [sensor_sync_date]
+
+    session_store = SessionDatastore()
 
     sessions = request.json['sessions']
     for session in sessions:
         sensor_data = get_sensor_data(session)
         sensor_data['data_transferred'] = True
-        event_date = session.get('event_date', "")
+        plan_event_date = session.get('event_date', "")
         session_type = session.get('session_type', 0)
-        if event_date == "":
-            event_date = format_date(parse_datetime(sensor_data['sensor_start_date_time']))
-        if not _check_plan_exists(user_id, event_date):
-            plan = DailyPlan(event_date=event_date)
+        if plan_event_date == "":
+            plan_event_date = format_date(parse_datetime(sensor_data['sensor_start_date_time']))
+        if not _check_plan_exists(user_id, plan_event_date):
+            plan = DailyPlan(event_date=plan_event_date)
             plan.user_id = user_id
-            DailyPlanDatastore().put(plan)
+            plan.last_sensor_sync = last_sensor_sync
+            daly_plan_store.put(plan)
 
         session_id = session.get('session_id', None)
         if session_id is None:
             session_obj = _create_session(session_type, sensor_data)
-            store.insert(session_obj,
-                         user_id=user_id,
-                         event_date=event_date
-                         )
+            session_store.insert(session_obj,
+                                 user_id=user_id,
+                                 event_date=plan_event_date
+                                 )
         else:
-            session_obj = store.get(user_id=user_id,
-                                    event_date=event_date,
-                                    session_type=session_type,
-                                    session_id=session_id)[0]
+            session_obj = session_store.get(user_id=user_id,
+                                            event_date=plan_event_date,
+                                            session_type=session_type,
+                                            session_id=session_id)[0]
             _update_session(session_obj, sensor_data)
-            store.update(session_obj,
-                         user_id=user_id,
-                         event_date=event_date
-                         )
+            session_store.update(session_obj,
+                                 user_id=user_id,
+                                 event_date=plan_event_date
+                                 )
+        if plan_event_date not in updated_dates:
+            plan = daly_plan_store.get(user_id, plan_event_date, plan_event_date)[0]
+            plan.last_sensor_sync = last_sensor_sync
+            plan.sessions_planned = True
+            daly_plan_store.put(plan)
+            updated_dates.append(plan_event_date)
+
 
     # update_plan(user_id, event_date)
-    plan = DailyPlanDatastore().get(user_id, plan_event_date, plan_event_date)[0]
+    plan = daly_plan_store.get(user_id, plan_event_date, plan_event_date)[0]
     survey_complete = plan.daily_readiness_survey_completed()
     landing_screen, nav_bar_indicator = plan.define_landing_screen()
     plan = plan.json_serialise()
@@ -216,7 +224,8 @@ def handle_session_sensor_data():
     plan['landing_screen'] = landing_screen
     plan['nav_bar_indicator'] = nav_bar_indicator
     del plan['daily_readiness_survey'], plan['user_id']
-    return {'daily_plan': plan}, 200
+    return {'message': 'success',
+            'daily_plan': plan}, 200
 
 
 def get_sensor_data(session):
