@@ -116,7 +116,14 @@ def handle_session_update(session_id):
 
     if not _check_plan_exists(user_id, plan_event_date):
         raise NoSuchEntityException("Plan does not exist for the user to update session")
-
+    if 'post_session_survey' in request.json:
+        survey = PostSessionSurvey(event_date_time=event_date,
+                                   user_id=user_id,
+                                   session_id=None,
+                                   session_type=session_type,
+                                   survey=request.json['post_session_survey']
+                                   )
+        session_data['post_session_survey'] = survey.survey.json_serialise()
 
     store = SessionDatastore()
     session_obj = store.get(user_id=user_id, 
