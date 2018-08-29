@@ -246,15 +246,18 @@ def get_sensor_data(session):
     low_duration = session['low_duration'] if session['low_duration'] is not None else 0
     mod_duraiton = session['mod_duration'] if session['mod_duration'] is not None else 0
     high_duration = session['high_duration'] if session['high_duration'] is not None else 0
+    inactive_duration = session['inactive_duration'] if session['inactive_duration'] is not None else 0
     low_duration = round(low_duration / 60, 2)
     mod_duration = round(mod_duration / 60, 2)
     high_duration = round(high_duration / 60, 2)
+    inactive_duration = round(inactive_duration / 60, 2)
     duration = low_duration + mod_duration + high_duration
     
     
     low_accel = session['low_accel'] if session['low_accel'] is not None else 0
     mod_accel = session['mod_accel'] if session['mod_accel'] is not None else 0
     high_accel = session['high_accel'] if session['high_accel'] is not None else 0
+    inactive_accel = session['inactive_accel'] if session['inactive_accel'] is not None else 0
     total_accel = low_accel + mod_accel + high_accel
     
     sensor_data = {"sensor_start_date_time": start_time,
@@ -263,10 +266,12 @@ def get_sensor_data(session):
                    "low_intensity_minutes": low_duration,
                    "mod_intensity_minutes": mod_duration,
                    "high_intensity_minutes": high_duration,
+                   "inactive_minutes": inactive_duration,
                    "external_load": total_accel,
                    "low_intensity_load": low_accel,
                    "mod_intensity_load": mod_accel,
-                   "high_intensity_load": high_accel
+                   "high_intensity_load": high_accel,
+                   "inactive_load": inactive_accel
                    }
     return sensor_data
 

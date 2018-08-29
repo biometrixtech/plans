@@ -47,9 +47,11 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         self.high_intensity_load = None
         self.mod_intensity_load = None
         self.low_intensity_load = None
+        self.inactive_load = None
         self.high_intensity_minutes = None
         self.mod_intensity_minutes = None
         self.low_intensity_minutes = None
+        self.inactive_minutes = None
         self.high_intensity_RPE = None
         self.mod_intensity_RPE = None
         self.low_intensity_RPE = None
@@ -124,9 +126,11 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
             'high_intensity_minutes': self.high_intensity_minutes,
             'mod_intensity_minutes': self.mod_intensity_minutes,
             'low_intensity_minutes': self.low_intensity_minutes,
+            'inactive_minutes': self.inactive_minutes,
             'high_intensity_load': self.high_intensity_load,
             'mod_intensity_load': self.mod_intensity_load,
             'low_intensity_load': self.low_intensity_load,
+            'inactive_load': self.inactive_load,
             'sensor_start_date_time': format_datetime(self.sensor_start_date_time),
             'sensor_end_date_time': format_datetime(self.sensor_end_date_time),
             'post_session_survey': self.post_session_survey,
