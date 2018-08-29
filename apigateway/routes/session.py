@@ -6,7 +6,7 @@ from datastores.session_datastore import SessionDatastore
 # from datastore.post_session_survey import PostSessionSurveyDatastore
 from decorators import authentication_required
 from exceptions import InvalidSchemaException, NoSuchEntityException, ForbiddenException
-from models.session import SessionType, SessionFactory, TrainingType
+from models.session import SessionType, SessionFactory, StrengthConditioningType
 from models.post_session_survey import PostSessionSurvey
 from models.daily_plan import DailyPlan
 from utils import parse_datetime, format_date, format_datetime, run_async
@@ -31,10 +31,10 @@ def handle_session_create():
     except:
         sport_name = SportName(None)
     try:
-        training_type = request.json['training_type']
-        training_type = TrainingType(training_type)
+        strength_and_conditioning_type = request.json['strength_and_conditioning_type']
+        strength_and_conditioning_type = StrengthConditioningType(strength_and_conditioning_type)
     except:
-        training_type = TrainingType(None)
+        strength_and_conditioning_type = StrengthConditioningType(None)
     try:
         duration = request.json["duration"]
     except:
@@ -47,7 +47,7 @@ def handle_session_create():
         plan.user_id = user_id
         DailyPlanDatastore().put(plan)
     session_data = {"sport_name": sport_name,
-                    "training_type": training_type,
+                    "strength_and_conditioning_type": strength_and_conditioning_type,
                     "description": description,
                     "duration_minutes": duration,
                     "event_date": session_event_date}
@@ -114,16 +114,16 @@ def handle_session_update(session_id):
     except:
         sport_name = SportName(None)
     try:
-        training_type = request.json['training_type']
-        training_type = TrainingType(training_type)
+        strength_and_conditioning_type = request.json['strength_and_conditioning_type']
+        strength_and_conditioning_type = StrengthConditioningType(strength_and_conditioning_type)
     except:
-        training_type = TrainingType(None)
+        strength_and_conditioning_type = StrengthConditioningType(None)
     session_event_date = format_datetime(event_date)
     plan_event_date = format_date(event_date)
     duration = request.json.get("duration", None)
     description = request.json.get('description', "")
     session_data = {"sport_name": sport_name,
-                    "training_type": training_type,
+                    "strength_and_conditioning_type": strength_and_conditioning_type,
                     "description": description,
                     "duration_minutes": duration,
                     "event_date": session_event_date}
