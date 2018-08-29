@@ -84,6 +84,11 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
                 value = SportName(None)
             else:
                 value = SportName(value)
+        elif name == "strength_and_conditioning_type" and not isinstance(value, StrengthConditioningType):
+            if value == '':
+                value = StrengthConditioningType(None)
+            else:
+                value = StrengthConditioningType(value)
         super().__setattr__(name, value)
 
     @abc.abstractmethod
