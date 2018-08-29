@@ -43,7 +43,7 @@ class PostSessionSurveyDatastore(object):
                 [_post_session_survey_from_mongodb(s, user_id, s["session_id"], SessionType.practice, plan["date"])
                  for s in plan.get('practice_sessions', []) if s is not None]
             strength_conditioning_session_surveys = \
-                [_post_session_survey_from_mongodb(s, user_id, s["session_id"], SessionType.strength_and_conditioning, plan["date"])
+                [_post_session_survey_from_mongodb(s, user_id, s["session_id"], SessionType.training, plan["date"])
                  for s in plan.get('cross_training_sessions', []) if s is not None]
             game_surveys = \
                 [_post_session_survey_from_mongodb(s, user_id, s["session_id"], SessionType.game, plan["date"])

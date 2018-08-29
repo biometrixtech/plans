@@ -9,11 +9,20 @@ from models.athlete import SportName
 
 class SessionType(Enum):
     practice = 0
-    strength_and_conditioning = 1
+    training = 1
     game = 2
     tournament = 3
     bump_up = 4
     corrective = 5
+    sport_training = 6
+
+class TrainingType(Enum):
+    "sub-type for session_type=1"
+    endurance = 0
+    power = 1
+    speed = 2
+    strength = 3
+    cross_training = 4
 
 
 class DayOfWeek(Enum):
@@ -31,6 +40,7 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
     def __init__(self):
         self.id = None
         self.sport_name = None
+        self.training_type = None
         self.duration_sensor = None
         self.external_load = None
         self.high_intensity_load = None
@@ -99,7 +109,7 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
             'description': self.description,
             'session_type': session_type.value,
             'sport_name': self.sport_name.value,
-            # 'date': self.date,
+            'training_type': self.training_type.value,
             'event_date': format_datetime(self.event_date),
             'duration_minutes': self.duration_minutes,
             'data_transferred': self.data_transferred,
@@ -141,10 +151,12 @@ class SessionFactory(object):
             session_object = Game()
         elif session_type == SessionType.bump_up:
             session_object = BumpUpSession()
-        elif session_type == SessionType.strength_and_conditioning:
-            session_object = StrengthConditioningSession()
+        elif session_type == SessionType.training:
+            session_object = TrainingSession()
         elif session_type == SessionType.tournament:
             session_object = Tournament()
+        elif session_type == SessionType.sport_training:
+            session_object = SportTrainingSession()
         else:
             session_object = CorrectiveSession()
 
@@ -186,15 +198,31 @@ class PracticeSession(Session):
         return Session.missing_post_session_survey()
 
 
-class StrengthConditioningSession(Session):
+class SportTrainingSession(Session):
     def __init__(self):
         Session.__init__(self)
 
     def session_type(self):
-        return SessionType.strength_and_conditioning
+        return SessionType.sport_training
 
     def create(self):
-        new_session = StrengthConditioningSession()
+        new_session = SportTrainingSession()
+        new_session.id = str(uuid.uuid4())
+        return new_session
+
+    def missing_post_session_survey(self):
+        return Session.missing_post_session_survey()
+
+
+class TrainingSession(Session):
+    def __init__(self):
+        Session.__init__(self)
+
+    def session_type(self):
+        return SessionType.training
+
+    def create(self):
+        new_session = TrainingSession()
         new_session.id = str(uuid.uuid4())
         return new_session
 

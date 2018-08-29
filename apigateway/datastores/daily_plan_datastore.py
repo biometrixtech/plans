@@ -40,7 +40,7 @@ class DailyPlanDatastore(object):
             daily_plan.practice_sessions = \
                 [_external_session_from_mongodb(s, session.SessionType.practice) for s in plan.get('practice_sessions', [])]
             daily_plan.strength_conditioning_sessions = \
-                [_external_session_from_mongodb(s, session.SessionType.strength_and_conditioning)
+                [_external_session_from_mongodb(s, session.SessionType.training)
                  for s in plan.get('cross_training_sessions', [])]
             daily_plan.games = \
                 [_external_session_from_mongodb(s, session.SessionType.game)
@@ -151,6 +151,7 @@ def _external_session_from_mongodb(mongo_result, session_type):
     mongo_session.id = mongo_result["session_id"]
     attrs_from_mongo = ["description",
                         "sport_name",
+                        "training_type",
                         "event_date",
                         "duration_minutes",
                         "data_transferred",
