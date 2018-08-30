@@ -79,3 +79,4 @@ def test_last_progression_found():
     exercise_assignments = calc.create_exercise_assignments(target_recovery_session, soreness_list,
                                                             get_trigger_date_time())
     assert "120" == exercise_assignments.activate_exercises[1].exercise.id
+
