@@ -30,7 +30,7 @@ Numeric ID,Display Name,Exercise,PHASE,Muscle Group / Joint,Inhibit,Lengthen,Act
 29,Ankle Mobility (Toes Up),Ankle Dorsiflexion,,Ankle,,,x,,,1,3,10,15,Y,2,3,1,count,0,,2,63,,Beginner,Floor,x
 30,,,,,,,,,,,,,,,,,,,,,,,,,,
 31,Single Leg Calf Raise ,Single - Leg Calf Raise,,Calf,,,x,,,1,3,10,15,Y,2,,,count,0,,2,,,Beginner,Floor,x
-32,Lying Knee Flexion and Hip Internal Rotation,Knee Flexion with Hip Internally Rotated,,Knee; Hamstrings,,,x,,,1,3,10,15,Y,2,,,count,0,,2,,,Beginner,Towel,x
+32,,,,,,,,,,,,,,,,,,,,,,,,,,
 33,Multiplanar Single-Leg Balance Reach (Firm Surface),Multiplanar Single-Leg Balance Reach (Firm Surface),,Glutes; Core; Adductor; Abductor,,,,x,,1,2,10,14,Y,2,,,count,0,5,,69,,Beginner,Floor,
 34,,,,,,,,,,,,,,,,,,,,,,,,,,
 35,,,,,,,,,,,,,,,,,,,,,,,,,,
@@ -123,3 +123,17 @@ Numeric ID,Display Name,Exercise,PHASE,Muscle Group / Joint,Inhibit,Lengthen,Act
 122,Lateral Hip Openers,Lateral Hip Openers,,"IT band, hips, groin",,x,,,,1,2,12,15,Y,3,,,count,0,,2,,,Beginner,None,x
 123,,,,,,,,,,,,,,,,,,,,,,,,,,
 124,Banded Glute Extensions,Banded Glute Max Activation,,Glutes,,,x,,,1,2,10,15,Y,2,,,count,0,,2,,,Beginner,Band,x
+125,Posterior Neck Release,SMR - Levator Scapulae,,Upper Back/Neck,x,,,,,1,2,30,30,N,0,,,seconds,0,30,,,,Beginner,Ball,x
+126,Upper Back Release,SMR - Upper Trapezius,,Upper Back/Neck,x,,,,,1,2,30,30,Y,0,,,seconds,0,30,,,,Beginner,Ball,x
+127,Neck Flexion Stretch,Upper Trap Static Stretch,,Upper Back/Neck,,x,,,,1,3,30,30,N,0,,,seconds,0,30,,,,Beginner,None,x
+128,Sidebending Neck Stretch,SCM Static Stretch,,Upper Back/Neck,,x,,,,1,3,30,30,Y,0,,,seconds,0,30,,,,Beginner,None,x
+129,Diagonal Neck Stretch,Cervical Rotator Static Stretch,,Upper Back/Neck,,x,,,,1,3,30,30,Y,0,,,seconds,0,30,,,,Beginner,None,x
+130,Cross Body Arm Stretch,Posterior Deltoid Static Stretch,,Upper Back/Neck,,x,,,,1,3,30,30,Y,0,,,seconds,0,30,,,,Beginner,None,x
+131,Neck Flexion/Extension,Cervical Flexion/Extension,,Upper Back/Neck,,,x,,,1,2,10,12,N,2,,,count,0,,2,,,Beginner,None,x
+132,Neck Sidebending,Cervical Sidebending,,Upper Back/Neck,,,x,,,1,2,10,12,Y,2,,,count,0,,2,,,Beginner,None,x
+133,Neck Rotation,Cervical Rotation,,Upper Back/Neck,,,x,,,1,2,10,12,Y,2,,,count,0,,2,,,Beginner,None,x
+134,Chin Tucks,Cervical Retraction,,Upper Back/Neck,,,x,,,1,2,10,15,N,2,,,count,0,,2,,,Beginner,None,x
+135,Scapular Squeezes,Scapular Retraction,,Upper Back/Neck,,,x,,,1,2,10,15,N,2,8,5,count,0,,2,136,,Beginner,None,x
+136,Prone Floor Arm Raises,Lower Trapezius Prone Floor Scaption,,Upper Back/Neck,,,x,,,1,2,10,12,Y,2,8,5,count,0,,2,138,,Beginner,None,x
+137,Shoulder Shrugs,Scapular Elevation,,Upper Back/Neck,,,x,,,1,2,10,12,Y,2,,,count,0,,2,,,Beginner,None,x
+138,YTWs,YTWs,,Upper Back/Neck,,,x,,,1,2,10,12,Y,2,,,count,0,,4,,,Beginner,None,x
