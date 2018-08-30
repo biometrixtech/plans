@@ -65,6 +65,7 @@ class BodyPartLocation(Enum):
     hamstrings = 15
     calves = 16
     achilles = 17
+    upper_back_neck = 18
 
 
 class BodyPart(object):
