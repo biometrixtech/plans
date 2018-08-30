@@ -790,20 +790,20 @@ class ExerciseAssignmentCalculator(object):
         child_pose.exercise.progressions = ["104"]
         upper_back_neck.lengthen_exercises.append(child_pose)
 
-        upper_back_neck.activate_exercise.append(
+        upper_back_neck.activate_exercises.append(
             models.exercise.AssignedExercise("131", upper_back_neck.treatment_priority, 1))
-        upper_back_neck.activate_exercise.append(
+        upper_back_neck.activate_exercises.append(
             models.exercise.AssignedExercise("134", upper_back_neck.treatment_priority, 2))
-        upper_back_neck.activate_exercise.append(
+        upper_back_neck.activate_exercises.append(
             models.exercise.AssignedExercise("132", upper_back_neck.treatment_priority, 3))
-        upper_back_neck.activate_exercise.append(
+        upper_back_neck.activate_exercises.append(
             models.exercise.AssignedExercise("133", upper_back_neck.treatment_priority, 4))
 
         shoulder_activation = models.exercise.AssignedExercise("135", upper_back_neck.treatment_priority, 5)
         shoulder_activation.exercise.progressions = ["136", "138"]
-        upper_back_neck.activate_exercise.append(shoulder_activation)
+        upper_back_neck.activate_exercises.append(shoulder_activation)
 
-        upper_back_neck.activate_exercise.append(
+        upper_back_neck.activate_exercises.append(
             models.exercise.AssignedExercise("137", upper_back_neck.treatment_priority, 6))
 
         body_parts.append(upper_back_neck)
