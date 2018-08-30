@@ -63,6 +63,8 @@ class DailyPlanDatastore(object):
             daily_plan.last_updated = plan.get('last_updated', None)
             daily_plan.pre_recovery_completed = plan.get('pre_recovery_completed', False)
             daily_plan.post_recovery_completed = plan.get('post_recovery_completed', False)
+            daily_plan.last_sensor_sync = plan.get('last_sensor_sync', None)
+            daily_plan.sessions_planned = plan.get('sessions_planned', True)
             ret.append(daily_plan)
 
         if len(ret) == 0:
@@ -150,9 +152,9 @@ def _external_session_from_mongodb(mongo_result, session_type):
     attrs_from_mongo = ["description",
                         "sport_name",
                         "event_date",
-                        "duration",
-                        "data_transferred",
                         "duration_minutes",
+                        "data_transferred",
+                        "duration_sensor",
                         "external_load",
                         "high_intensity_minutes",
                         "mod_intensity_minutes",
@@ -162,7 +164,8 @@ def _external_session_from_mongodb(mongo_result, session_type):
                         "low_intensity_load",
                         "sensor_start_date_time",
                         "sensor_end_date_time",
-                        "post_session_survey"]
+                        "post_session_survey",
+                        "deleted"]
     for key in attrs_from_mongo:
         setattr(mongo_session, key, _key_present(key, mongo_result))
 
