@@ -25,7 +25,7 @@ class ExerciseAssignmentCalculator(object):
         for body_part_exercise in body_part_exercises:
 
             #has athlete completed enough exposures for this exercise?
-            target_exercise = self.get_current_exercise(body_part_exercise, self.exercise_library, completed_exercises)
+            target_exercise = self.get_current_exercise(body_part_exercise, exercise_list, completed_exercises)
 
             # determine reps and sets
             assigned_exercise = models.exercise.AssignedExercise(target_exercise.id,
@@ -139,12 +139,11 @@ class ExerciseAssignmentCalculator(object):
         target_exercise_list = [ex for ex in exercise_list if ex.id == body_part_exercise.exercise.id]
         target_exercise = target_exercise_list[0]
 
-        ''' Coming Soon
-
-        if len(body_part_exercise.exercise.progressions) == 0:
+        if len(body_part_exercise.exercise.progressions) == 0 or completed_exercises is None:
             return target_exercise
         else:
-            completed_exercise_list = [ex for ex in completed_exercises if ex.exercise_id == body_part_exercise.exercise.id]
+            completed_exercise_list = [ex for ex in completed_exercises if ex.exercise_id is not None and
+                                       ex.exercise_id == body_part_exercise.exercise.id]
             if len(completed_exercise_list) == 0:
                 return target_exercise
             else:
@@ -175,8 +174,6 @@ class ExerciseAssignmentCalculator(object):
                             return proposed_exercise
                 else:
                     return target_exercise
-                    
-        '''
 
         return target_exercise
 
