@@ -26,6 +26,7 @@ class JointSorenessSeverity(IntEnum):
 class Soreness(Serialisable):
     def __init__(self):
         self.body_part = None
+        self.pain = False
         self.severity = None  # muscle_soreness_severity or joint_soreness_severity
         self.side = None
         self.type = None  # soreness_type
@@ -34,6 +35,7 @@ class Soreness(Serialisable):
     def json_serialise(self):
         ret = {
             'body_part': self.body_part.location.value,
+            'pain': self.pain,
             'severity': self.severity,
             'side': self.side
         }
