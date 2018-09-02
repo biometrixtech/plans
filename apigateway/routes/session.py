@@ -7,7 +7,7 @@ from datastores.session_datastore import SessionDatastore
 from decorators import authentication_required
 from exceptions import InvalidSchemaException, NoSuchEntityException, ForbiddenException
 from models.session import SessionType, SessionFactory, StrengthConditioningType
-from models.post_session_survey import PostSessionSurvey
+from models.post_session_survey import PostSessionSurvey, PostSurvey
 from models.daily_plan import DailyPlan
 from utils import parse_datetime, format_date, format_datetime, run_async
 from config import get_mongo_collection
