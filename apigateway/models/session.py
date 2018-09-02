@@ -14,6 +14,16 @@ class SessionType(Enum):
     tournament = 3
     bump_up = 4
     corrective = 5
+    sport_training = 6
+
+class StrengthConditioningType(Enum):
+    "sub-type for session_type=1"
+    endurance = 0
+    power = 1
+    speed = 2
+    strength = 3
+    cross_training = 4
+    none = None
 
 
 class DayOfWeek(Enum):
@@ -31,14 +41,17 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
     def __init__(self):
         self.id = None
         self.sport_name = None
+        self.strength_and_conditioning_type = None
         self.duration_sensor = None
         self.external_load = None
         self.high_intensity_load = None
         self.mod_intensity_load = None
         self.low_intensity_load = None
+        self.inactive_load = None
         self.high_intensity_minutes = None
         self.mod_intensity_minutes = None
         self.low_intensity_minutes = None
+        self.inactive_minutes = None
         self.high_intensity_RPE = None
         self.mod_intensity_RPE = None
         self.low_intensity_RPE = None
@@ -73,6 +86,11 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
                 value = SportName(None)
             else:
                 value = SportName(value)
+        elif name == "strength_and_conditioning_type" and not isinstance(value, StrengthConditioningType):
+            if value == '':
+                value = StrengthConditioningType(None)
+            else:
+                value = StrengthConditioningType(value)
         super().__setattr__(name, value)
 
     @abc.abstractmethod
@@ -99,7 +117,7 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
             'description': self.description,
             'session_type': session_type.value,
             'sport_name': self.sport_name.value,
-            # 'date': self.date,
+            'strength_and_conditioning_type': self.strength_and_conditioning_type.value,
             'event_date': format_datetime(self.event_date),
             'duration_minutes': self.duration_minutes,
             'data_transferred': self.data_transferred,
@@ -108,9 +126,11 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
             'high_intensity_minutes': self.high_intensity_minutes,
             'mod_intensity_minutes': self.mod_intensity_minutes,
             'low_intensity_minutes': self.low_intensity_minutes,
+            'inactive_minutes': self.inactive_minutes,
             'high_intensity_load': self.high_intensity_load,
             'mod_intensity_load': self.mod_intensity_load,
             'low_intensity_load': self.low_intensity_load,
+            'inactive_load': self.inactive_load,
             'sensor_start_date_time': format_datetime(self.sensor_start_date_time),
             'sensor_end_date_time': format_datetime(self.sensor_end_date_time),
             'post_session_survey': self.post_session_survey,
@@ -145,6 +165,8 @@ class SessionFactory(object):
             session_object = StrengthConditioningSession()
         elif session_type == SessionType.tournament:
             session_object = Tournament()
+        elif session_type == SessionType.sport_training:
+            session_object = SportTrainingSession()
         else:
             session_object = CorrectiveSession()
 
@@ -179,6 +201,22 @@ class PracticeSession(Session):
 
     def create(self):
         new_session = PracticeSession()
+        new_session.id = str(uuid.uuid4())
+        return new_session
+
+    def missing_post_session_survey(self):
+        return Session.missing_post_session_survey()
+
+
+class SportTrainingSession(Session):
+    def __init__(self):
+        Session.__init__(self)
+
+    def session_type(self):
+        return SessionType.sport_training
+
+    def create(self):
+        new_session = SportTrainingSession()
         new_session.id = str(uuid.uuid4())
         return new_session
 

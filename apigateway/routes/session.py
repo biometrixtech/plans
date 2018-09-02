@@ -6,7 +6,7 @@ from datastores.session_datastore import SessionDatastore
 # from datastore.post_session_survey import PostSessionSurveyDatastore
 from decorators import authentication_required
 from exceptions import InvalidSchemaException, NoSuchEntityException, ForbiddenException
-from models.session import SessionType, SessionFactory
+from models.session import SessionType, SessionFactory, StrengthConditioningType
 from models.post_session_survey import PostSessionSurvey
 from models.daily_plan import DailyPlan
 from utils import parse_datetime, format_date, format_datetime, run_async
@@ -31,6 +31,11 @@ def handle_session_create():
     except:
         sport_name = SportName(None)
     try:
+        strength_and_conditioning_type = request.json['strength_and_conditioning_type']
+        strength_and_conditioning_type = StrengthConditioningType(strength_and_conditioning_type)
+    except:
+        strength_and_conditioning_type = StrengthConditioningType(None)
+    try:
         duration = request.json["duration"]
     except:
         raise InvalidSchemaException("Missing required parameter duration")
@@ -41,18 +46,17 @@ def handle_session_create():
         plan = DailyPlan(event_date=plan_event_date)
         plan.user_id = user_id
         DailyPlanDatastore().put(plan)
+
     session_data = {"sport_name": sport_name,
+                    "strength_and_conditioning_type": strength_and_conditioning_type,
                     "description": description,
                     "duration_minutes": duration,
                     "event_date": session_event_date}
     if 'post_session_survey' in request.json:
-        survey = PostSessionSurvey(event_date_time=session_event_date,
-                                   user_id=user_id,
-                                   session_id=None,
-                                   session_type=session_type,
-                                   survey=request.json['post_session_survey']
-                                   )
-        session_data['post_session_survey'] = survey.survey.json_serialise()
+        survey = PostSurvey(event_date=session_event_date,
+                            survey=request.json['post_session_survey']
+                            )
+        session_data['post_session_survey'] = survey.json_serialise()
 
     session = _create_session(session_type, session_data)
 
@@ -63,8 +67,9 @@ def handle_session_create():
                  event_date=plan_event_date
                  )
     plan = DailyPlanDatastore().get(user_id, plan_event_date, plan_event_date)[0]
-    plan.sessions_planned = True
-    DailyPlanDatastore().put(plan)
+    if not plan.sessions_planned:
+        plan.sessions_planned = True
+        DailyPlanDatastore().put(plan)
     return {'message': 'success'}, 201
 
 
@@ -107,11 +112,17 @@ def handle_session_update(session_id):
         sport_name = SportName(sport_name)
     except:
         sport_name = SportName(None)
+    try:
+        strength_and_conditioning_type = request.json['strength_and_conditioning_type']
+        strength_and_conditioning_type = StrengthConditioningType(strength_and_conditioning_type)
+    except:
+        strength_and_conditioning_type = StrengthConditioningType(None)
     session_event_date = format_datetime(event_date)
     plan_event_date = format_date(event_date)
     duration = request.json.get("duration", None)
     description = request.json.get('description', "")
     session_data = {"sport_name": sport_name,
+                    "strength_and_conditioning_type": strength_and_conditioning_type,
                     "description": description,
                     "duration_minutes": duration,
                     "event_date": session_event_date}
@@ -119,13 +130,10 @@ def handle_session_update(session_id):
     if not _check_plan_exists(user_id, plan_event_date):
         raise NoSuchEntityException("Plan does not exist for the user to update session")
     if 'post_session_survey' in request.json:
-        survey = PostSessionSurvey(event_date_time=event_date,
-                                   user_id=user_id,
-                                   session_id=None,
-                                   session_type=session_type,
-                                   survey=request.json['post_session_survey']
-                                   )
-        session_data['post_session_survey'] = survey.survey.json_serialise()
+        survey = PostSurvey(event_date_time=event_date,
+                            survey=request.json['post_session_survey']
+                            )
+        session_data['post_session_survey'] = survey.json_serialise()
 
     store = SessionDatastore()
     session_obj = store.get(user_id=user_id, 
@@ -145,6 +153,10 @@ def handle_session_update(session_id):
                      user_id=user_id,
                      event_date=plan_event_date
                      )
+    plan = DailyPlanDatastore().get(user_id, plan_event_date, plan_event_date)[0]
+    if not plan.sessions_planned:
+        plan.sessions_planned = True
+        DailyPlanDatastore().put(plan)
 
     return {'message': 'success'}, 200
 
@@ -231,16 +243,21 @@ def handle_session_sensor_data():
 def get_sensor_data(session):
     start_time = format_datetime(session['start_time'])
     end_time = format_datetime(session['end_time'])
-
-    low_duration = session['low_duration'] / 60
-    mod_duration = session['mod_duration'] / 60
-    high_duration = session['high_duration'] / 60
+    low_duration = session['low_duration'] if session['low_duration'] is not None else 0
+    mod_duraiton = session['mod_duration'] if session['mod_duration'] is not None else 0
+    high_duration = session['high_duration'] if session['high_duration'] is not None else 0
+    inactive_duration = session['inactive_duration'] if session['inactive_duration'] is not None else 0
+    low_duration = round(low_duration / 60, 2)
+    mod_duration = round(mod_duration / 60, 2)
+    high_duration = round(high_duration / 60, 2)
+    inactive_duration = round(inactive_duration / 60, 2)
     duration = low_duration + mod_duration + high_duration
     
     
-    low_accel = session['low_accel']
-    mod_accel = session['mod_accel']
-    high_accel = session['high_accel']
+    low_accel = session['low_accel'] if session['low_accel'] is not None else 0
+    mod_accel = session['mod_accel'] if session['mod_accel'] is not None else 0
+    high_accel = session['high_accel'] if session['high_accel'] is not None else 0
+    inactive_accel = session['inactive_accel'] if session['inactive_accel'] is not None else 0
     total_accel = low_accel + mod_accel + high_accel
     
     sensor_data = {"sensor_start_date_time": start_time,
@@ -249,10 +266,12 @@ def get_sensor_data(session):
                    "low_intensity_minutes": low_duration,
                    "mod_intensity_minutes": mod_duration,
                    "high_intensity_minutes": high_duration,
+                   "inactive_minutes": inactive_duration,
                    "external_load": total_accel,
                    "low_intensity_load": low_accel,
                    "mod_intensity_load": mod_accel,
-                   "high_intensity_load": high_accel
+                   "high_intensity_load": high_accel,
+                   "inactive_load": inactive_accel
                    }
     return sensor_data
 
