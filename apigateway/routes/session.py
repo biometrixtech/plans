@@ -7,7 +7,7 @@ from datastores.session_datastore import SessionDatastore
 from decorators import authentication_required
 from exceptions import InvalidSchemaException, NoSuchEntityException, ForbiddenException
 from models.session import SessionType, SessionFactory, StrengthConditioningType
-from models.post_session_survey import PostSessionSurvey
+from models.post_session_survey import PostSessionSurvey, PostSurvey
 from models.daily_plan import DailyPlan
 from utils import parse_datetime, format_date, format_datetime, run_async
 from config import get_mongo_collection
@@ -244,7 +244,7 @@ def get_sensor_data(session):
     start_time = format_datetime(session['start_time'])
     end_time = format_datetime(session['end_time'])
     low_duration = session['low_duration'] if session['low_duration'] is not None else 0
-    mod_duraiton = session['mod_duration'] if session['mod_duration'] is not None else 0
+    mod_duration = session['mod_duration'] if session['mod_duration'] is not None else 0
     high_duration = session['high_duration'] if session['high_duration'] is not None else 0
     inactive_duration = session['inactive_duration'] if session['inactive_duration'] is not None else 0
     low_duration = round(low_duration / 60, 2)
