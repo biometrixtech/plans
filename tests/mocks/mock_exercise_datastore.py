@@ -12,7 +12,7 @@ class ExerciseLibraryDatastore(object):
 
     def side_load_exericse_list_from_csv(self):
         exercise_descriptions = {}
-        with open(Path(__file__).resolve().parent.parent.parent / 'database/Exercise_Descriptions.csv', newline='') as csvfile:
+        with open(Path(__file__).resolve().parent.parent.parent / 'database/Exercise_Descriptions.tsv', newline='') as csvfile:
             exercise_reader = csv.reader(csvfile, delimiter='\t')
             row_count = 0
             for row in exercise_reader:
