@@ -1,10 +1,8 @@
 from aws_xray_sdk.core import xray_recorder
-import datetime
 from config import get_mongo_collection
 from models.daily_plan import DailyPlan
 import models.session as session
 import models.exercise as exercise
-from utils import  format_datetime, parse_datetime, parse_date, format_date
 
 class DailyPlanDatastore(object):
     mongo_collection = 'dailyplan'
@@ -149,17 +147,13 @@ class DailyPlanDatastore(object):
 
     def get_last_sensor_sync(self, user_id, event_date):
         mongo_collection = get_mongo_collection(self.mongo_collection)
-        query0 = {'user_id': user_id, 'date': {'$lte': event_date}}
+        query0 = {'user_id': user_id, 'date': {'$lte': event_date}, 'last_sensor_sync': {'$exists': True, '$ne': None } }
         query1 = {'_id': 0, "last_sensor_sync": 1, "date": 1}
         mongo_cursor = mongo_collection.find_one(query0, query1, sort=[("date", -1)])
-        try:
-            last_sensor_sync = mongo_cursor.get('last_sensor_sync', None)
-            event_date = mongo_cursor.get("date")
-            if last_sensor_sync is None:
-                event_date = format_date(parse_date(event_date) - datetime.timedelta(days=1))
-                last_sensor_sync = self.get_last_sensor_sync(user_id, event_date)
+        if mongo_cursor is not None:
+            last_sensor_sync = mongo_cursor.get('last_sensor_sync')
             return last_sensor_sync
-        except AttributeError:
+        else:
             return None
 
 
