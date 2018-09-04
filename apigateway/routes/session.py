@@ -266,7 +266,6 @@ def handle_get_typical_sessions():
     dailyplan_store = DailyPlanDatastore()
     start_date = format_date(event_date - datetime.timedelta(days=14))
     end_date = format_date(event_date)
-    print(start_date, end_date)
     plans = dailyplan_store.get(
                                 user_id=user_id,
                                 start_date=start_date,
@@ -274,7 +273,6 @@ def handle_get_typical_sessions():
                                 )
     sessions = []
     for plan in plans:
-        print(plan.event_date)
         sessions.extend(plan.training_sessions)
 
     sessions = [s for s in sessions if s.event_date is not None]
