@@ -70,6 +70,8 @@ def handle_session_create():
     if not plan.sessions_planned:
         plan.sessions_planned = True
         DailyPlanDatastore().put(plan)
+
+    update_plan(user_id, plan_event_date)
     return {'message': 'success'}, 201
 
 
