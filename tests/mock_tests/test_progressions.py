@@ -63,10 +63,12 @@ def test_last_progression_found():
     summary_2 = CompletedExerciseSummary("test_user", "12", 10)
     summary_3 = CompletedExerciseSummary("test_user", "11", 10)
     summary_4 = CompletedExerciseSummary("test_user", "13", 10)
+    summary_5 = CompletedExerciseSummary("test_user", "120", 10)
     completed_exercises.append(summary_1)
     completed_exercises.append(summary_2)
     completed_exercises.append(summary_3)
     completed_exercises.append(summary_4)
+    completed_exercises.append(summary_5)
 
     completed_exercise_datastore.side_load_completd_exercise_summaries(completed_exercises)
 
@@ -76,4 +78,5 @@ def test_last_progression_found():
     target_recovery_session = recovery_session(soreness_one_body_part(12, 1), 15)
     exercise_assignments = calc.create_exercise_assignments(target_recovery_session, soreness_list,
                                                             get_trigger_date_time())
-    assert "13" == exercise_assignments.activate_exercises[1].exercise.id
+    assert "120" == exercise_assignments.activate_exercises[1].exercise.id
+

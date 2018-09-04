@@ -35,9 +35,32 @@ def create_plan():
     return daily_plan
 
 
+def create_no_soreness_plan():
+    user_id = "tester"
+
+    current_date = date.today()
+    current_date_time = datetime.combine(current_date, time(12, 0, 0))
+
+    daily_readiness_datastore = DailyReadinessDatastore()
+
+    soreness_list = []
+
+    survey = DailyReadiness(current_date_time.strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, soreness_list, 7, 9)
+
+    daily_readiness_datastore.side_load_surveys([survey])
+
+    mgr = TrainingPlanManager(user_id, ExerciseLibraryDatastore(), daily_readiness_datastore,
+                              PostSessionSurveyDatastore(), DailyPlanDatastore(), AthleteStatsDatastore(),
+                              CompletedExerciseDatastore())
+
+    daily_plan = mgr.create_daily_plan()
+
+    return daily_plan
+
+
 def test_find_earlier_practice_sessions():
 
-    daily_plan = create_plan()
+    daily_plan = create_no_soreness_plan()
     current_date = date.today()
     current_date_time = datetime.combine(current_date, time(12, 0, 0))
 
@@ -56,7 +79,7 @@ def test_find_earlier_practice_sessions():
 
 def test_find_later_practice_sessions():
 
-    daily_plan = create_plan()
+    daily_plan = create_no_soreness_plan()
     current_date = date.today()
     current_date_time = datetime.combine(current_date, time(12, 0, 0))
 
@@ -75,7 +98,7 @@ def test_find_later_practice_sessions():
 
 def test_find_earlier_game_sessions():
 
-    daily_plan = create_plan()
+    daily_plan = create_no_soreness_plan()
     current_date = date.today()
     current_date_time = datetime.combine(current_date, time(12, 0, 0))
 
@@ -94,7 +117,7 @@ def test_find_earlier_game_sessions():
 
 def test_find_later_game_sessions():
 
-    daily_plan = create_plan()
+    daily_plan = create_no_soreness_plan()
     current_date = date.today()
     current_date_time = datetime.combine(current_date, time(12, 0, 0))
 
@@ -113,7 +136,7 @@ def test_find_later_game_sessions():
 
 def test_find_earlier_cross_training_sessions():
 
-    daily_plan = create_plan()
+    daily_plan = create_no_soreness_plan()
     current_date = date.today()
     current_date_time = datetime.combine(current_date, time(12, 0, 0))
 
@@ -132,7 +155,7 @@ def test_find_earlier_cross_training_sessions():
 
 def test_find_later_cross_training_sessions():
 
-    daily_plan = create_plan()
+    daily_plan = create_no_soreness_plan()
     current_date = date.today()
     current_date_time = datetime.combine(current_date, time(12, 0, 0))
 
