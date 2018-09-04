@@ -56,7 +56,7 @@ def handle_session_create():
                     "duration_minutes": duration,
                     "event_date": session_event_date}
     if 'post_session_survey' in request.json:
-        survey = PostSurvey(event_date=session_event_date,
+        survey = PostSurvey(event_date=request.json['post_session_survey']['event_date'],
                             survey=request.json['post_session_survey']
                             )
         session_data['post_session_survey'] = survey.json_serialise()
