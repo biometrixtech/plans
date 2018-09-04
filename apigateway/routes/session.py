@@ -1,5 +1,6 @@
 from aws_xray_sdk.core import xray_recorder
 from flask import request, Blueprint
+import datetime
 
 from datastores.daily_plan_datastore import DailyPlanDatastore
 from datastores.session_datastore import SessionDatastore
@@ -243,6 +244,61 @@ def handle_session_sensor_data():
     return {'message': 'success',
             'daily_plan': plan}, 200
 
+
+@app.route('/typical', methods=['POST'])
+@authentication_required
+@xray_recorder.capture('routes.typical_sessions')
+def handle_get_typical_sessions():
+    if 'event_date' not in request.json:
+        raise InvalidSchemaException('Missing required parameter event_date')
+    else:
+        event_date = parse_datetime(request.json['event_date'])
+    if 'user_id' not in request.json:
+        raise InvalidSchemaException('Missing required parameter event_date')
+    else:
+        user_id = request.json['user_id']
+
+    cutoff_time = 3
+
+    if event_date.hour < cutoff_time:
+        event_date -= datetime.timedelta(days=1)
+
+    day_of_week = event_date.weekday()
+    dailyplan_store = DailyPlanDatastore()
+    start_date = format_date(event_date - datetime.timedelta(days=14))
+    end_date = format_date(event_date - datetime.timedelta(days=7))
+
+    plans = dailyplan_store.get(
+                                user_id=user_id,
+                                start_date=start_date,
+                                end_date=end_date,
+                                day_of_week=day_of_week
+                                )
+    sessions = []
+    for plan in plans:
+        sessions.extend(plan.training_sessions)
+
+    sessions = [s for s in sessions if s.event_date is not None]
+    sessions = [{'sport_name': s.sport_name.value,
+                 'strength_and_conditioning_type': s.strength_and_conditioning_type.value,
+                 'session_type': s.session_type().value,
+                 'event_date': format_datetime(s.event_date),
+                 'duration': s.duration_minutes} for s in sessions]
+    sessions = sorted(sessions, key=lambda k: k['event_date'], reverse=True)
+    filtered_sessions = []
+    for session in sessions:
+        if len(filtered_sessions) == 0:
+            filtered_sessions.append(session)
+        else:
+            exists = [session['sport_name'] == s['sport_name'] and \
+                      session['strength_and_conditioning_type'] == s['strength_and_conditioning_type'] and \
+                      session['session_type'] == s['session_type'] for s in filtered_sessions]
+            if any(exists):
+                pass
+            else:
+                filtered_sessions.append(session)
+
+    return {'typical_sessions': sessions}, 200
 
 def get_sensor_data(session):
     start_time = format_datetime(session['start_time'])
