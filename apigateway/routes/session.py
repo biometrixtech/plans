@@ -45,6 +45,8 @@ def handle_session_create():
     if not _check_plan_exists(user_id, plan_event_date):
         plan = DailyPlan(event_date=plan_event_date)
         plan.user_id = user_id
+        plan.last_sensor_sync = DailyPlanDatastore.get_last_sensor_sync(user_id, plan_event_date)
+        
         DailyPlanDatastore().put(plan)
 
     session_data = {"sport_name": sport_name,

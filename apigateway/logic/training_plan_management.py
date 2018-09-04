@@ -152,6 +152,7 @@ class TrainingPlanManager(object):
 
         if daily_plans is None or len(daily_plans) == 0:
             daily_plan = DailyPlan(trigger_date_time_string)
+            daily_plan.last_sensor_sync = self.daily_plan_datastore.get_last_sensor_sync(self.athlete_id, trigger_date_time_string)
         else:
             daily_plan = daily_plans[len(daily_plans) - 1]
 
