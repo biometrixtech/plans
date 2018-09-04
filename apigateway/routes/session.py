@@ -263,19 +263,18 @@ def handle_get_typical_sessions():
     if event_date.hour < cutoff_time:
         event_date -= datetime.timedelta(days=1)
 
-    day_of_week = event_date.weekday()
     dailyplan_store = DailyPlanDatastore()
     start_date = format_date(event_date - datetime.timedelta(days=14))
-    end_date = format_date(event_date - datetime.timedelta(days=7))
-
+    end_date = format_date(event_date)
+    print(start_date, end_date)
     plans = dailyplan_store.get(
                                 user_id=user_id,
                                 start_date=start_date,
-                                end_date=end_date,
-                                day_of_week=day_of_week
+                                end_date=end_date
                                 )
     sessions = []
     for plan in plans:
+        print(plan.event_date)
         sessions.extend(plan.training_sessions)
 
     sessions = [s for s in sessions if s.event_date is not None]
@@ -283,7 +282,8 @@ def handle_get_typical_sessions():
                  'strength_and_conditioning_type': s.strength_and_conditioning_type.value,
                  'session_type': s.session_type().value,
                  'event_date': format_datetime(s.event_date),
-                 'duration': s.duration_minutes} for s in sessions]
+                 'duration': s.duration_minutes,
+                 'count': 1} for s in sessions]
     sessions = sorted(sessions, key=lambda k: k['event_date'], reverse=True)
     filtered_sessions = []
     for session in sessions:
@@ -294,11 +294,13 @@ def handle_get_typical_sessions():
                       session['strength_and_conditioning_type'] == s['strength_and_conditioning_type'] and \
                       session['session_type'] == s['session_type'] for s in filtered_sessions]
             if any(exists):
-                pass
+                session = [filtered_sessions[i] for i in range(len(exists)) if exists[i]][0]
+                session['count'] += 1
             else:
                 filtered_sessions.append(session)
+    filtered_sessions = sorted(filtered_sessions, key=lambda k: k['count'], reverse=True)
 
-    return {'typical_sessions': sessions}, 200
+    return {'typical_sessions': filtered_sessions[0:4]}, 200
 
 def get_sensor_data(session):
     start_time = format_datetime(session['start_time'])
