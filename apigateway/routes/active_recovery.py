@@ -72,7 +72,7 @@ def save_completed_exercises(exercise_list, user_id, event_date):
 
     for exercise in exercise_list:
         exercise_store.put(CompletedExercise(athlete_id=user_id,
-                                             exercise_id=exercise.exercise.id,
+                                             exercise_id=exercise,
                                              event_date=event_date))
 
 
