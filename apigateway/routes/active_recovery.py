@@ -30,6 +30,10 @@ def handle_active_recovery_update():
         recovery_type = request.json['recovery_type']
     except:
         raise InvalidSchemaException('recovery_type is required')
+    try:
+        completed_exercises = request.json['completed_exercises']
+    except:
+        completed_exercises = []
 
     plan_event_date = format_date(event_date)
     recovery_event_date = format_datetime(event_date)
@@ -50,10 +54,7 @@ def handle_active_recovery_update():
 
     store.put(plan)
 
-    if recovery_type == 'pre':
-        save_completed_exercises_for_recovery(plan.pre_recovery, user_id, recovery_event_date)
-    elif recovery_type == 'post':
-        save_completed_exercises_for_recovery(plan.post_recovery, user_id, recovery_event_date)
+    save_completed_exercises(completed_exercises, user_id, recovery_event_date)
 
     survey_complete = plan.daily_readiness_survey_completed()
     landing_screen, nav_bar_indicator = plan.define_landing_screen()
@@ -64,13 +65,6 @@ def handle_active_recovery_update():
     del plan['daily_readiness_survey'], plan['user_id']
 
     return {'daily_plans': [plan]}, 202
-
-
-def save_completed_exercises_for_recovery(recovery_session, user_id, event_date):
-    save_completed_exercises(recovery_session.inhibit_exercises, user_id, event_date)
-    save_completed_exercises(recovery_session.lengthen_exercises, user_id, event_date)
-    save_completed_exercises(recovery_session.activate_exercises, user_id, event_date)
-    save_completed_exercises(recovery_session.integrate_exercises, user_id, event_date)
 
 
 def save_completed_exercises(exercise_list, user_id, event_date):
