@@ -56,7 +56,7 @@ def handle_session_create():
                     "duration_minutes": duration,
                     "event_date": session_event_date}
     if 'post_session_survey' in request.json:
-        survey = PostSurvey(event_date=session_event_date,
+        survey = PostSurvey(event_date=request.json['post_session_survey']['event_date'],
                             survey=request.json['post_session_survey']
                             )
         session_data['post_session_survey'] = survey.json_serialise()
@@ -303,6 +303,49 @@ def handle_get_typical_sessions():
     filtered_sessions = sorted(filtered_sessions, key=lambda k: k['count'], reverse=True)
 
     return {'typical_sessions': filtered_sessions[0:4]}, 200
+
+
+@app.route('/no_sessions', methods=['POST'])
+@authentication_required
+@xray_recorder.capture('routes.no_sessions_planned')
+def handle_no_sessions_planned():
+    if 'event_date' not in request.json:
+        raise InvalidSchemaException('Missing required parameter event_date')
+    else:
+        event_date = parse_datetime(request.json['event_date'])
+    if 'user_id' not in request.json:
+        raise InvalidSchemaException('Missing required parameter event_date')
+    else:
+        user_id = request.json['user_id']
+
+    cutoff_time = 3
+
+    if event_date.hour < cutoff_time:
+        event_date -= datetime.timedelta(days=1)
+
+    plan_event_date = format_date(event_date)
+    if not _check_plan_exists(user_id, plan_event_date):
+        plan = DailyPlan(event_date=plan_event_date)
+        plan.user_id = user_id
+        plan.last_sensor_sync = DailyPlanDatastore().get_last_sensor_sync(user_id, plan_event_date)
+        plan.sessions_planned = False
+        DailyPlanDatastore().put(plan)
+    else:
+        plan = DailyPlanDatastore().get(user_id, plan_event_date, plan_event_date)[0]
+        if plan.sessions_planned:
+            plan.sessions_planned = False
+            DailyPlanDatastore().put(plan)
+
+
+    survey_complete = plan.daily_readiness_survey_completed()
+    plan = plan.json_serialise()
+    plan['daily_readiness_survey_completed'] = survey_complete
+    plan['landing_screen'] = 1.0
+    plan['nav_bar_indicator'] = 1.0
+    del plan['daily_readiness_survey'], plan['user_id']
+    return {'message': 'success',
+            'daily_plan': plan}, 200
+
 
 def get_sensor_data(session):
     start_time = format_datetime(session['start_time'])
