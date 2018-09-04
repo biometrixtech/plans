@@ -157,7 +157,7 @@ class DailyPlanDatastore(object):
             event_date = mongo_cursor.get("date")
             if last_sensor_sync is None:
                 event_date = format_date(parse_date(event_date) - datetime.timedelta(days=1))
-                last_sensor_sync = self.get_last_sync(user_id, event_date)
+                last_sensor_sync = self.get_last_sensor_sync(user_id, event_date)
             return last_sensor_sync
         except AttributeError:
             return None
