@@ -46,7 +46,7 @@ def handle_session_create():
     if not _check_plan_exists(user_id, plan_event_date):
         plan = DailyPlan(event_date=plan_event_date)
         plan.user_id = user_id
-        plan.last_sensor_sync = DailyPlanDatastore.get_last_sensor_sync(user_id, plan_event_date)
+        plan.last_sensor_sync = DailyPlanDatastore().get_last_sensor_sync(user_id, plan_event_date)
         
         DailyPlanDatastore().put(plan)
 
@@ -287,7 +287,11 @@ def handle_get_typical_sessions():
     sessions = sorted(sessions, key=lambda k: k['event_date'], reverse=True)
     filtered_sessions = []
     for session in sessions:
-        if len(filtered_sessions) == 0:
+        if session['session_type'] == 1 and session['strength_and_conditioning_type'] is None:
+            pass
+        elif session['session_type'] in [0, 2, 3, 6] and session['sport_name'] is None:
+            pass
+        elif len(filtered_sessions) == 0:
             filtered_sessions.append(session)
         else:
             exists = [session['sport_name'] == s['sport_name'] and \
