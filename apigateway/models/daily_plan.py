@@ -10,7 +10,7 @@ class DailyPlan(Serialisable):
     def __init__(self, event_date):
         self.user_id = ""
         self.event_date = event_date
-        self.day_of_week = self.get_event_datetime().today().weekday()
+        self.day_of_week = self.get_event_datetime().weekday()
         self.training_sessions = []
         self.practice_sessions = []
         self.strength_conditioning_sessions = []  # includes cross training
@@ -26,6 +26,8 @@ class DailyPlan(Serialisable):
         self.daily_readiness_survey = None
         self.updated = False
         self.last_updated = None
+        self.last_sensor_sync = None
+        self.sessions_planned = True
 
     def get_id(self):
         return self.user_id
@@ -50,7 +52,9 @@ class DailyPlan(Serialisable):
                'post_recovery': self.post_recovery.json_serialise() if self.post_recovery is not None else None,
                'completed_post_recovery_sessions': [c.json_serialise() for c in self.completed_post_recovery_sessions],
                'last_updated': self.last_updated,
-               'daily_readiness_survey': self.daily_readiness_survey
+               'daily_readiness_survey': self.daily_readiness_survey,
+               'last_sensor_sync': self.last_sensor_sync,
+               'sessions_planned': self.sessions_planned
                }
         return ret
 

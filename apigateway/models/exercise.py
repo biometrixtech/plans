@@ -59,6 +59,7 @@ class Exercise(Serialisable):
         self.bilateral = False
         self.progression_interval = 0
         self.exposure_target = 0
+        self.exposure_minimum = 0
         self.unit_of_measure = UnitOfMeasure.seconds
         self.seconds_rest_between_sets = 0
         self.seconds_per_set = 0
@@ -87,6 +88,7 @@ class Exercise(Serialisable):
                'bilateral': self.bilateral,
                'progression_interval': self.progression_interval,
                'exposure_target': self.exposure_target,
+               'exposure_minimum': self.exposure_minimum,
                'unit_of_measure': self.unit_of_measure,
                'seconds_rest_between_sets': self.seconds_rest_between_sets,
                'time_per_set': self.seconds_per_set,

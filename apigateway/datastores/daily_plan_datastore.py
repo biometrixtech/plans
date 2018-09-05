@@ -3,7 +3,6 @@ from config import get_mongo_collection
 from models.daily_plan import DailyPlan
 import models.session as session
 import models.exercise as exercise
-from utils import  format_datetime, parse_datetime
 
 class DailyPlanDatastore(object):
     mongo_collection = 'dailyplan'
@@ -63,11 +62,14 @@ class DailyPlanDatastore(object):
             daily_plan.last_updated = plan.get('last_updated', None)
             daily_plan.pre_recovery_completed = plan.get('pre_recovery_completed', False)
             daily_plan.post_recovery_completed = plan.get('post_recovery_completed', False)
+            daily_plan.last_sensor_sync = plan.get('last_sensor_sync', None)
+            daily_plan.sessions_planned = plan.get('sessions_planned', True)
             ret.append(daily_plan)
 
         if len(ret) == 0:
             plan = DailyPlan(event_date=end_date)
             plan.user_id = user_id
+            plan.last_sensor_sync = self.get_last_sensor_sync(user_id, end_date)
             ret.append(plan)
 
         return ret
@@ -142,6 +144,20 @@ class DailyPlanDatastore(object):
 
         return recovery_bson
     '''
+
+    def get_last_sensor_sync(self, user_id, event_date):
+        mongo_collection = get_mongo_collection(self.mongo_collection)
+        query0 = {'user_id': user_id, 'date': {'$lte': event_date}, 'last_sensor_sync': {'$exists': True, '$ne': None } }
+        query1 = {'_id': 0, "last_sensor_sync": 1, "date": 1}
+        mongo_cursor = mongo_collection.find_one(query0, query1, sort=[("date", -1)])
+        if mongo_cursor is not None:
+            last_sensor_sync = mongo_cursor.get('last_sensor_sync')
+            return last_sensor_sync
+        else:
+            return None
+
+
+
 def _external_session_from_mongodb(mongo_result, session_type):
 
     factory = session.SessionFactory()
@@ -149,20 +165,24 @@ def _external_session_from_mongodb(mongo_result, session_type):
     mongo_session.id = mongo_result["session_id"]
     attrs_from_mongo = ["description",
                         "sport_name",
+                        "strength_and_conditioning_type",
                         "event_date",
-                        "duration",
-                        "data_transferred",
                         "duration_minutes",
+                        "data_transferred",
+                        "duration_sensor",
                         "external_load",
                         "high_intensity_minutes",
                         "mod_intensity_minutes",
                         "low_intensity_minutes",
+                        "inactive_minutes",
                         "high_intensity_load",
                         "mod_intensity_load",
                         "low_intensity_load",
+                        "inactive_load",
                         "sensor_start_date_time",
                         "sensor_end_date_time",
-                        "post_session_survey"]
+                        "post_session_survey",
+                        "deleted"]
     for key in attrs_from_mongo:
         setattr(mongo_session, key, _key_present(key, mongo_result))
 
