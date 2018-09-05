@@ -67,7 +67,7 @@ class DailyPlan(Serialisable):
     def define_landing_screen(self):
         if not self.daily_readiness_survey_completed():
             return 0.0, 0.0
-        elif len(self.training_sessions) > 0 and self.post_recovery is not None and self.post_recovery.impact_score < 1.5:
+        elif len(self.training_sessions) > 0 and self.post_recovery is not None and self.post_recovery.goal_text != "" and self.post_recovery.impact_score < 1.5:
             self.post_recovery.display_exercises = True
             return 2.0, None
         elif self.post_recovery is not None and self.post_recovery.display_exercises:
