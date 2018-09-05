@@ -233,7 +233,7 @@ def handle_session_sensor_data():
 
 
     # update_plan(user_id, event_date)
-    plan = daly_plan_store.get(user_id, plan_event_date, plan_event_date)[0]
+    plan = daly_plan_store.get(user_id, sensor_sync_date, sensor_sync_date)[0]
     survey_complete = plan.daily_readiness_survey_completed()
     landing_screen, nav_bar_indicator = plan.define_landing_screen()
     plan = plan.json_serialise()
