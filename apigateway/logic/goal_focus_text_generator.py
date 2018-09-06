@@ -105,6 +105,8 @@ class RecoveryTextGenerator(object):
             return "head"
         elif body_part_location == BodyPartLocation.shoulder:
             return side_text + "shoulder"
+        elif body_part_location == BodyPartLocation.upper_back_neck:
+            return "upper back/neck"
         elif body_part_location == BodyPartLocation.general:
             return ""
 
