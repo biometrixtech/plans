@@ -73,7 +73,7 @@ def validate_uuid4(uuid_string):
 def run_async(method, endpoint, body=None):
     endpoint = endpoint.strip('/')
     payload = {
-        "path": "/plans/" + endpoint,
+        "path": f"/plans/{os.environ['API_VERSION']}/{endpoint}",
         "httpMethod": method,
         "headers": {
             "Accept": "*/*",
