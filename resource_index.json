@@ -8,9 +8,16 @@
             "name": "plans-{ENVIRONMENT}-apigateway-execute",
             "s3_filename": "apigateway.zip",
             "src": "apigateway",
-            "pip": true
+            "pip": true,
+            "publish_tags": true
         }
     ],
     "datastores": [
+    ],
+    "apigateways": [
+        {
+            "name": "plans-{ENVIRONMENT}-apigateway",
+            "lambda_function_name": "plans-{ENVIRONMENT}-apigateway-execute"
+        }
     ]
 }
