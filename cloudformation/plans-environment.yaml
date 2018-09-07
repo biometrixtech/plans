@@ -187,25 +187,25 @@ Resources:
                 { Ref: "AWS::NoValue" }
             ]}
 
-#    ApigatewayStack:
-#        Type: "AWS::CloudFormation::Stack"
-#        Properties:
-#            Parameters:
-#                Project: "plans"
-#                Environment: { Ref: "Environment" }
-#                Service: "apigateway"
-#                LambdaArn: { "Fn::GetAtt": [ "ApiGatewayLambda", "Arn" ] }
-#            Tags:
-#              - { Key: "Name", Value: { "Fn::Sub": "plans-${Environment}-apigateway" } }
-#              - { Key: "Management", Value: "managed" }
-#              - { Key: "Project", Value: "plans" }
-#              - { Key: "Environment", Value: { Ref: "Environment" } }
-#              - { Key: "Service", Value: "apigateway" }
-#            TemplateURL: { "Fn::Sub": [ "https://s3.amazonaws.com/${InfrastructureBucketName}/cloudformation/infrastructure/${TemplateVersion}/apigateway.yaml", {
-#                InfrastructureBucketName: { "Fn::ImportValue": "InfrastructureBucketName" },
-#                TemplateVersion: { "Fn::FindInMap": [ "TemplateVersion", "Infrastructure", "Commit" ] }
-#            } ] }
-#            TimeoutInMinutes: 30
+    ApigatewayStack:
+        Type: "AWS::CloudFormation::Stack"
+        Properties:
+            Parameters:
+                Project: "plans"
+                Environment: { Ref: "Environment" }
+                Service: "apigateway"
+                LambdaArn: { "Fn::GetAtt": [ "ApiGatewayLambda", "Arn" ] }
+            Tags:
+              - { Key: "Name", Value: { "Fn::Sub": "plans-${Environment}-apigateway" } }
+              - { Key: "Management", Value: "managed" }
+              - { Key: "Project", Value: "plans" }
+              - { Key: "Environment", Value: { Ref: "Environment" } }
+              - { Key: "Service", Value: "apigateway" }
+            TemplateURL: { "Fn::Sub": [ "https://s3.amazonaws.com/${InfrastructureBucketName}/cloudformation/infrastructure/${TemplateVersion}/apigateway.yaml", {
+                InfrastructureBucketName: { "Fn::ImportValue": "InfrastructureBucketName" },
+                TemplateVersion: { "Fn::FindInMap": [ "TemplateVersion", "Infrastructure", "Commit" ] }
+            } ] }
+            TimeoutInMinutes: 30
 
     ##########################################################################################################
     ##  SQS

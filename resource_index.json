@@ -15,6 +15,9 @@
     "datastores": [
     ],
     "apigateways": [
-
+        {
+            "name": "plans-{ENVIRONMENT}-apigateway",
+            "lambda_function_name": "plans-{ENVIRONMENT}-apigateway-execute"
+        }
     ]
 }
