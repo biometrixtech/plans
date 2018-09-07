@@ -122,7 +122,7 @@ def handler(event, context):
     if path_match is None:
         raise Exception('Invalid path')
     event['path'] = path_match.groupdict()['path']
-    os.environ['API_VERSION'] = path_match.groupdict()['version']
+    os.environ['API_VERSION'] = path_match.groupdict()['version'] or ''
 
     # Pass tracing info to X-Ray
     if 'X-Amzn-Trace-Id-Safe' in event['headers']:
