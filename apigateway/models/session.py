@@ -5,7 +5,8 @@ import datetime
 from serialisable import Serialisable
 import logic.exercise_generator as exercise
 from utils import format_datetime, parse_datetime
-from models.athlete import SportName
+from models.sport import SportName
+
 
 class SessionType(Enum):
     practice = 0

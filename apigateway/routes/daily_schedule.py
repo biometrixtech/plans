@@ -10,7 +10,7 @@ from datastores.session_datastore import SessionDatastore
 from models.daily_plan import DailyPlan
 from models.session import SessionFactory, SessionType
 from utils import format_date, format_datetime, parse_datetime
-from models.athlete import SportName
+from models.sport import SportName
 
 app = Blueprint('daily_schedule', __name__)
 
