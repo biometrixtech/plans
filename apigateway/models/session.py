@@ -296,6 +296,35 @@ class CorrectiveSession(Session):
             return False
 
 
+class FunctionalStrengthSession(Serialisable):
+
+    def __init__(self):
+        self.warm_up = []
+        self.dynamic_movement = []
+        self.stability_work = []
+        self.optional_drills = []
+        self.duration_minutes = 0
+        self.warm_up_target_minutes = 0
+        self.dynamic_movement_target_minutes = 0
+        self.stability_work_target_minutes = 0
+        self.optional_drills_target_minutes = 0
+        self.warm_up_max_percentage = 0
+        self.dynamic_movement_max_percentage = 0
+        self.stability_work_max_percentage = 0
+        self.optional_drills_max_percentage = 0
+        self.completed = False
+
+    def json_serialise(self):
+            ret = {'minutes_duration': self.duration_minutes,
+                   'completed': self.completed,
+                   'warm_up': [ex.json_serialise() for ex in self.warm_up],
+                   'dynamic_movement': [ex.json_serialise() for ex in self.dynamic_movement],
+                   'stability_work': [ex.json_serialise() for ex in self.stability_work],
+                   'optional_drills': [ex.json_serialise() for ex in self.optional_drills],
+                   }
+            return ret
+
+
 class RecoverySession(Serialisable):
 
     def __init__(self):
