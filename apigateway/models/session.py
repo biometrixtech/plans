@@ -299,6 +299,7 @@ class CorrectiveSession(Session):
 class FunctionalStrengthSession(Serialisable):
 
     def __init__(self):
+        self.equipment_required = []
         self.warm_up = []
         self.dynamic_movement = []
         self.stability_work = []
@@ -315,7 +316,8 @@ class FunctionalStrengthSession(Serialisable):
         self.completed = False
 
     def json_serialise(self):
-            ret = {'minutes_duration': self.duration_minutes,
+            ret = {'equipment_required':  [e for e in self.equipment_required],
+                   'minutes_duration': self.duration_minutes,
                    'completed': self.completed,
                    'warm_up': [ex.json_serialise() for ex in self.warm_up],
                    'dynamic_movement': [ex.json_serialise() for ex in self.dynamic_movement],
