@@ -40,6 +40,7 @@ class AthleteStats(Serialisable):
         self.external_strain = None
         self.internal_ramp = None
         self.external_ramp = None
+        self.functional_strength_eligible = False
 
     def acute_to_chronic_external_ratio(self):
         if self.acute_external_total_load is not None and self.chronic_external_total_load is not None:
@@ -113,5 +114,6 @@ class AthleteStats(Serialisable):
             'chronic_external_high_intensity_load': self.chronic_external_high_intensity_load,
             'chronic_external_mod_intensity_load': self.chronic_external_mod_intensity_load,
             'chronic_external_low_intensity_load': self.chronic_external_low_intensity_load,
+            'functional_strength_eligible': self.functional_strength_eligible,
         }
         return ret

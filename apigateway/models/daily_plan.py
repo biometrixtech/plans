@@ -28,6 +28,7 @@ class DailyPlan(Serialisable):
         self.last_updated = None
         self.last_sensor_sync = None
         self.sessions_planned = True
+        self.functional_strength_eligible = False
 
     def get_id(self):
         return self.user_id
@@ -54,7 +55,8 @@ class DailyPlan(Serialisable):
                'last_updated': self.last_updated,
                'daily_readiness_survey': self.daily_readiness_survey,
                'last_sensor_sync': self.last_sensor_sync,
-               'sessions_planned': self.sessions_planned
+               'sessions_planned': self.sessions_planned,
+               'functional_strength_eligible': self.functional_strength_eligible,
                }
         return ret
 

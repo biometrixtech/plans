@@ -36,6 +36,7 @@ class AthleteStatsDatastore(object):
             athlete_stats.chronic_avg_RPE = mongo_result['chronic_avg_RPE']
             athlete_stats.chronic_avg_readiness = mongo_result['chronic_avg_readiness']
             athlete_stats.chronic_avg_max_soreness = mongo_result['chronic_avg_max_soreness']
+            athlete_stats.functional_strength_eligible = mongo_result.get('functional_strength_eligibile', False)
             return athlete_stats
 
         else:

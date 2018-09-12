@@ -178,8 +178,10 @@ class TrainingPlanManager(object):
         else:
             max_rpe = 0
 
-
         athlete_stats = self.athlete_stats_datastore.get(self.athlete_id)
+
+        if athlete_stats is not None:
+            daily_plan.functional_strength_eligible = athlete_stats.functional_strength_eligible
 
         text_generator = RecoveryTextGenerator()
         body_part_text = text_generator.get_text_from_body_part_list(soreness_list)

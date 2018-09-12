@@ -327,6 +327,32 @@ class FunctionalStrengthSession(Serialisable):
             return ret
 
 
+class CompletedFunctionalStrengthSession(Serialisable):
+
+    def __init__(self, user_id, event_date):
+        self.user_id = user_id
+        self.event_date = event_date
+
+    def json_serialise(self):
+        ret = {'user_id': self.user_id,
+               'event_date': format_datetime(self.event_date),
+               }
+        return ret
+
+
+class CompletedFunctionalStrengthSummary(Serialisable):
+
+    def __init__(self, user_id, completed_count):
+        self.user_id = user_id
+        self.completed_count = completed_count
+
+    def json_serialise(self):
+        ret = {'user_id': self.user_id,
+               'completed_count': self.completed_count,
+               }
+        return ret
+
+
 class RecoverySession(Serialisable):
 
     def __init__(self):
