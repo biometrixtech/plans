@@ -5,6 +5,27 @@ from models.exercise import AssignedExercise
 
 class FSProgramGenerator(object):
 
+    def __init__(self, exercise_library_datastore):
+        self.exercise_library_datastore = exercise_library_datastore
+        self.exercise_library = self.exercise_library_datastore.get()
+
+    def populate_exercises(self, session):
+
+        session.warm_up = self.assign_exercises(session.warm_up)
+        session.dynamic_movement = self.assign_exercises(session.dynamic_movement)
+        session.stability_work = self.assign_exercises(session.stability_work)
+        session.optional_drills = self.assign_exercises(session.optional_drills)
+
+        return session
+
+    def assign_exercises(self, exercise_list):
+
+        for ex in range(0, len(exercise_list) - 1):
+            mapped_exercises = [ex for ex in self.exercise_library if ex.id == exercise_list[ex].exercise.id]
+            exercise_list[ex].exercise = mapped_exercises[0]
+
+        return exercise_list
+
     def getFunctionalStrengthForSportPosition(self, sport_name, position=None):
 
         session = FunctionalStrengthSession()
@@ -258,4 +279,4 @@ class FSProgramGenerator(object):
             session.optional_drills.append(AssignedExercise("159", 4, 4))
             session.optional_drills.append(AssignedExercise("160", 4, 5))
 
-        return session
+        return self.populate_exercises(session)

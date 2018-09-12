@@ -30,6 +30,7 @@ class Phase(IntEnum):
 class UnitOfMeasure(Enum):
     seconds = 0
     count = 1
+    yards = 2
 
 
 class Tempo(Enum):
