@@ -9,6 +9,7 @@ from datastores.post_session_survey_datastore import PostSessionSurveyDatastore 
 from datastores.exercise_datastore import ExerciseLibraryDatastore
 from datastores.athlete_stats_datastore import AthleteStatsDatastore
 from datastores.completed_exercise_datastore import CompletedExerciseDatastore
+from datastores.datastore_collection import DatastoreCollection
 from models.daily_readiness import DailyReadiness
 from models.post_session_survey import PostSessionSurvey
 from models.daily_plan import DailyPlan
@@ -61,9 +62,6 @@ def generate_plan(user_id, survey, plan_date, file_name, plan_letter):
     plan_datastore = DailyPlanDatastore()
     readiness_store = DailyReadinessDatastore()
     post_session_store = PostSessionSurveyDataStore()
-    exercise_data_store = ExerciseLibraryDatastore()
-    athlete_stats_data_store = AthleteStatsDatastore()
-    completed_exercise_data_store = CompletedExerciseDatastore()
 
     if plan_letter == "a":
 
@@ -72,13 +70,7 @@ def generate_plan(user_id, survey, plan_date, file_name, plan_letter):
     else:
         post_session_store.put([survey])
 
-    manager = training_plan_management.TrainingPlanManager(user_id,
-                                                           exercise_data_store,
-                                                           readiness_store,
-                                                           PostSessionSurveyDataStore(),
-                                                           plan_datastore,
-                                                           athlete_stats_data_store,
-                                                           completed_exercise_data_store)
+    manager = training_plan_management.TrainingPlanManager(user_id, DatastoreCollection())
     plan = manager.create_daily_plan(plan_date)
 
     if plan is not None:

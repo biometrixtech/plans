@@ -12,15 +12,15 @@ from logic.stats_processing import StatsProcessing
 
 class TrainingPlanManager(object):
 
-    def __init__(self, athlete_id, exercise_library_datastore, daily_readiness_datastore, post_session_survey_datastore,
-                 daily_plan_datastore, athlete_stats_datastore, completed_exercise_datastore):
+    def __init__(self, athlete_id, datastore_collection):
         self.athlete_id = athlete_id
-        self.daily_readiness_datastore = daily_readiness_datastore
-        self.post_session_survey_datastore = post_session_survey_datastore
-        self.daily_plan_datastore = daily_plan_datastore
-        self.exercise_library_datastore = exercise_library_datastore
-        self.athlete_stats_datastore = athlete_stats_datastore
-        self.completed_exercise_datastore = completed_exercise_datastore
+        self.daily_readiness_datastore = datastore_collection.daily_readiness_datastore
+        self.post_session_survey_datastore = datastore_collection.post_session_survey_datastore
+        self.daily_plan_datastore = datastore_collection.daily_plan_datastore
+        self.exercise_library_datastore = datastore_collection.exercise_datastore
+        self.athlete_stats_datastore = datastore_collection.athlete_stats_datastore
+        self.completed_exercise_datastore = datastore_collection.completed_exercise_datastore
+        self.functional_strength_datastore = datastore_collection.functional_strength_datastore
 
 
     def calculate_pre_impact_score(self, rpe, readiness, sleep_quality, max_soreness, athlete_stats=None):
