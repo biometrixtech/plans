@@ -3,11 +3,14 @@ from models.session import FunctionalStrengthSession
 from models.exercise import AssignedExercise
 
 
-class ProgramGenerator(object):
+class FSProgramGenerator(object):
 
     def getFunctionalStrengthForSportPosition(self, sport_name, position=None):
 
         session = FunctionalStrengthSession()
+
+        if sport_name is None:
+            return session
 
         if sport_name == sport.SportName.baseball_softball:
 

@@ -65,6 +65,7 @@ class DailyPlanDatastore(object):
             daily_plan.last_sensor_sync = plan.get('last_sensor_sync', None)
             daily_plan.sessions_planned = plan.get('sessions_planned', True)
             daily_plan.functional_strength_eligible = plan.get('functional_strength_eligibile', False)
+            daily_plan.completed_functional_strength_sessions = plan.get('completed_functional_strength_sessions', 0)
             ret.append(daily_plan)
 
         if len(ret) == 0:
