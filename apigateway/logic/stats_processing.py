@@ -53,6 +53,7 @@ class StatsProcessing(object):
         athlete_stats = self.calc_survey_stats(athlete_stats)
         athlete_stats = self.calc_training_volume_metrics(athlete_stats)
         athlete_stats.functional_strength_eligible = self.is_athlete_functional_strength_eligible()
+        athlete_stats.completed_functional_strength_sessions = self.get_completed_functional_strength_sessions()
         self.athlete_stats_datastore.put(athlete_stats)
 
     def calc_training_volume_metrics(self, athlete_stats):
@@ -298,6 +299,12 @@ class StatsProcessing(object):
             return True
         else:
             return False
+
+    def get_completed_functional_strength_sessions(self):
+
+        completed_sesions = [a for a in self.last_7_days_plans if a.functional_strength_completed if a is not None]
+
+        return len(completed_sesions)
 
     def calc_survey_stats(self, athlete_stats):
 

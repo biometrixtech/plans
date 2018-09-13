@@ -5,11 +5,13 @@ import datetime
 
 from datastores.daily_readiness_datastore import DailyReadinessDatastore
 from datastores.post_session_survey_datastore import PostSessionSurveyDatastore
+from datastores.athlete_stats_datastore import AthleteStatsDatastore
 from decorators import authentication_required
 from exceptions import InvalidSchemaException, NoSuchEntityException
 from models.daily_readiness import DailyReadiness
 from models.soreness import MuscleSorenessSeverity, BodyPartLocation
-from utils import parse_datetime, format_datetime, run_async
+from models.stats import AthleteStats
+from utils import parse_datetime, format_date, format_datetime, run_async
 
 app = Blueprint('daily_readiness', __name__)
 
@@ -24,11 +26,28 @@ def handle_daily_readiness_create():
         event_date=request.json['date_time'],
         soreness=request.json['soreness'],  # dailysoreness object array
         sleep_quality=request.json['sleep_quality'],
-        readiness=request.json['readiness']
-
+        readiness=request.json['readiness'],
+        wants_functional_strength=(request.json['wants_functional_strength']
+                                   if 'wants_functional_strength' in request.json else False)
     )
     store = DailyReadinessDatastore()
     store.put(daily_readiness)
+
+    if 'current_sport_name' in request.json or 'current_position' in request.json:
+
+        athlete_stats_store = AthleteStatsDatastore()
+        athlete_stats = athlete_stats_store.get(athlete_id=daily_readiness.user_id)
+
+        if athlete_stats is None:
+            athlete_stats = AthleteStats()
+            athlete_stats.event_date = format_date(daily_readiness.event_date)
+
+        if 'current_sport_name' in request.json:
+            athlete_stats.current_sport_name = request.json['current_sport_name']
+        if 'current_position' in request.json:
+            athlete_stats.current_position = request.json['current_position']
+
+        athlete_stats_store.put(athlete_stats)
 
     run_async('POST', f"athlete/{request.json['user_id']}/daily_plan")
 
@@ -58,7 +77,25 @@ def handle_daily_readiness_get():
         post_session_surveys = sorted(post_session_surveys, key=lambda k: k.survey.event_date, reverse=True)
         sore_body_parts += [{"body_part": s.body_part.location.value, "side": s.side} for s in post_session_surveys[0].survey.soreness if s.severity > 1]
     sore_body_parts = [dict(t) for t in {tuple(d.items()) for d in sore_body_parts}]
-    return {'body_parts': sore_body_parts}, 200
+
+    athlete_stats_store = AthleteStatsDatastore()
+    athlete_stats = athlete_stats_store.get(athlete_id=user_id)
+
+    current_sport_name = None
+    current_position = None
+    functional_strength_eligible = False
+
+    if athlete_stats is not None:
+        current_sport_name = athlete_stats.current_sport_name
+        current_position = athlete_stats.current_position
+        functional_strength_eligible = athlete_stats.functional_strength_eligible
+
+    return {
+               'body_parts': sore_body_parts,
+               'current_position': current_position,
+               'current_sport_name': current_sport_name,
+               'functional_strength_eligible': functional_strength_eligible
+           }, 200
 
 
 @xray_recorder.capture('routes.daily_readiness.validate')

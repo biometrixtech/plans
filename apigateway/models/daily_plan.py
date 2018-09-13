@@ -51,7 +51,7 @@ class DailyPlan(Serialisable):
                'pre_recovery_completed': self.pre_recovery_completed,
                'post_recovery_completed': self.post_recovery_completed,
                'functional_strength_session': (self.functional_strength_session.json_serialise()
-                                       if self.functional_strength_session is not None else None),
+                                               if self.functional_strength_session is not None else None),
                'recovery_am': self.pre_recovery.json_serialise() if self.pre_recovery is not None else None,
                'recovery_pm': self.post_recovery.json_serialise() if self.post_recovery is not None else None,
                'pre_recovery': self.pre_recovery.json_serialise() if self.pre_recovery is not None else None,
@@ -61,6 +61,7 @@ class DailyPlan(Serialisable):
                'daily_readiness_survey': self.daily_readiness_survey,
                'last_sensor_sync': self.last_sensor_sync,
                'sessions_planned': self.sessions_planned,
+               'functional_strength_completed': self.functional_strength_completed,
                'functional_strength_eligible': self.functional_strength_eligible,
                'completed_functional_strength_sessions': self.completed_functional_strength_sessions,
                }

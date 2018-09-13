@@ -29,6 +29,8 @@ class FSProgramGenerator(object):
     def getFunctionalStrengthForSportPosition(self, sport_name, position=None):
 
         session = FunctionalStrengthSession()
+        session.sport_name = sport_name
+        session.position = position
 
         if sport_name is None:
             return session

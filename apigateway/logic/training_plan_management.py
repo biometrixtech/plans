@@ -21,8 +21,6 @@ class TrainingPlanManager(object):
         self.exercise_library_datastore = datastore_collection.exercise_datastore
         self.athlete_stats_datastore = datastore_collection.athlete_stats_datastore
         self.completed_exercise_datastore = datastore_collection.completed_exercise_datastore
-        self.functional_strength_datastore = datastore_collection.functional_strength_datastore
-
 
     def calculate_pre_impact_score(self, rpe, readiness, sleep_quality, max_soreness, athlete_stats=None):
 
@@ -181,8 +179,9 @@ class TrainingPlanManager(object):
 
         athlete_stats = self.athlete_stats_datastore.get(self.athlete_id)
 
-        daily_plan = self.populate_functional_strength(daily_plan, athlete_stats, last_daily_readiness_survey,
-                                                       event_date)
+        if daily_plan.functional_strength_session is None:
+            daily_plan = self.populate_functional_strength(daily_plan, athlete_stats, last_daily_readiness_survey,
+                                                           event_date)
 
         text_generator = RecoveryTextGenerator()
         body_part_text = text_generator.get_text_from_body_part_list(soreness_list)
@@ -251,20 +250,11 @@ class TrainingPlanManager(object):
         if athlete_stats is not None:
             daily_plan.functional_strength_eligible = athlete_stats.functional_strength_eligible
 
-        if daily_plan.functional_strength_eligible:
-            functional_strength_sessions = sorted(self.functional_strength_datastore.get(self.athlete_id,
-                                               last_daily_readiness_survey.get_event_date()
-                                               - datetime.timedelta(days=7),
-                                               last_daily_readiness_survey.get_event_date(), False),
-                                                            key=lambda x: x.event_date)
-            daily_plan.completed_functional_strength_sessions = len(functional_strength_sessions)
-            if daily_plan.completed_functional_strength_sessions > 0:
-                last_fs_date = functional_strength_sessions[len(functional_strength_sessions) - 1].event_date
-                if format_date(last_fs_date) == format_date(event_date):
-                    daily_plan.functional_strength_completed = True
+        if daily_plan.functional_strength_eligible and last_daily_readiness_survey.wants_functional_strength:
+            daily_plan.completed_functional_strength_sessions = athlete_stats.completed_functional_strength_sessions
             if not daily_plan.functional_strength_completed and daily_plan.completed_functional_strength_sessions < 3:
                 fs_mapping = FSProgramGenerator()
-                daily_plan.functional_strength = fs_mapping.getFunctionalStrengthForSportPosition(
+                daily_plan.functional_strength_session = fs_mapping.getFunctionalStrengthForSportPosition(
                     athlete_stats.current_sport_name,
                     athlete_stats.current_position)
 

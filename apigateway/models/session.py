@@ -314,6 +314,8 @@ class FunctionalStrengthSession(Serialisable):
         self.stability_work_max_percentage = 0
         self.optional_drills_max_percentage = 0
         self.completed = False
+        self.sport_name = None
+        self.position = None
 
     def json_serialise(self):
             ret = {'equipment_required':  [e for e in self.equipment_required],
@@ -323,6 +325,8 @@ class FunctionalStrengthSession(Serialisable):
                    'dynamic_movement': [ex.json_serialise() for ex in self.dynamic_movement],
                    'stability_work': [ex.json_serialise() for ex in self.stability_work],
                    'optional_drills': [ex.json_serialise() for ex in self.optional_drills],
+                   'sport_name': self.sport_name,
+                   'position': self.position
                    }
             return ret
 

@@ -28,7 +28,6 @@ def add_xray_support(request):
     os.environ["MONGO_COLLECTION_TRAININGSCHEDULE"] = config['collection_trainingschedule']
     os.environ["MONGO_COLLECTION_ATHLETESEASON"] = config['collection_athleteseason']
     os.environ["MONGO_COLLECTION_ATHLETESTATS"] = config['collection_athletestats']
-    os.environ["MONGO_COLLECTION_FUNCTIONALSTRENGTH"] = config['collection_functionalstrength']
 
 def test_ryan_robbins_athlete_stats_day_after_week():
     user_id = "rrobbins@fakemail.com"

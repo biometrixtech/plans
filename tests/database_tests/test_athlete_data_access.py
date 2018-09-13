@@ -30,7 +30,6 @@ def add_xray_support(request):
     os.environ["MONGO_COLLECTION_ATHLETESEASON"] = config['collection_athleteseason']
     os.environ["MONGO_COLLECTION_ATHLETESTATS"] = config['collection_athletestats']
     os.environ["MONGO_COLLECTION_COMPLETEDEXERCISES"] = config['collection_completedexercises']
-    os.environ["MONGO_COLLECTION_FUNCTIONALSTRENGTH"] = config['collection_functionalstrength']
 
 def test_get_readiness_survey_test_data():
     athlete_dao = DailyReadinessDatastore()
