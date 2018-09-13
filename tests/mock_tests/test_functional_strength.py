@@ -10,6 +10,7 @@ exercise_library_datastore = ExerciseLibraryDatastore()
 def load_exercises():
     exercise_library_datastore.side_load_exericse_list_from_csv(library_file='database/FS_Exercise_Library.csv',
                                                                 desc_file='database/FS_Exercise_Descriptions.tsv')
+    #exercise_library_datastore.side_load_exericse_list_from_csv()
 
 
 def test_generate_session_for_soccer():

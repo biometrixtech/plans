@@ -21,7 +21,7 @@ class FSProgramGenerator(object):
     def assign_exercises(self, exercise_list):
 
         for ex in range(0, len(exercise_list) - 1):
-            mapped_exercises = [ex for ex in self.exercise_library if ex.id == exercise_list[ex].exercise.id]
+            mapped_exercises = [x for x in self.exercise_library if x.id == exercise_list[ex].exercise.id]
             exercise_list[ex].exercise = mapped_exercises[0]
 
         return exercise_list
@@ -48,7 +48,6 @@ class FSProgramGenerator(object):
             session.dynamic_movement.append(AssignedExercise("149", 2, 3))
             session.dynamic_movement.append(AssignedExercise("146", 2, 4))
             session.dynamic_movement.append(AssignedExercise("148", 2, 5))
-            session.dynamic_movement.append(AssignedExercise("167", 2, 6))
 
             session.stability_work.append(AssignedExercise("168", 3, 1))
             session.stability_work.append(AssignedExercise("169", 3, 2))
@@ -102,7 +101,6 @@ class FSProgramGenerator(object):
                 session.dynamic_movement.append(AssignedExercise("149", 2, 3))
                 session.dynamic_movement.append(AssignedExercise("146", 2, 4))
                 session.dynamic_movement.append(AssignedExercise("148", 2, 5))
-                session.dynamic_movement.append(AssignedExercise("167", 2, 6))
 
                 session.stability_work.append(AssignedExercise("168", 3, 1))
                 session.stability_work.append(AssignedExercise("169", 3, 2))
@@ -160,7 +158,6 @@ class FSProgramGenerator(object):
                 session.dynamic_movement.append(AssignedExercise("149", 2, 3))
                 session.dynamic_movement.append(AssignedExercise("146", 2, 4))
                 session.dynamic_movement.append(AssignedExercise("148", 2, 5))
-                session.dynamic_movement.append(AssignedExercise("167", 2, 6))
 
                 session.stability_work.append(AssignedExercise("168", 3, 1))
                 session.stability_work.append(AssignedExercise("169", 3, 2))
@@ -186,7 +183,6 @@ class FSProgramGenerator(object):
             session.dynamic_movement.append(AssignedExercise("149", 2, 3))
             session.dynamic_movement.append(AssignedExercise("146", 2, 4))
             session.dynamic_movement.append(AssignedExercise("148", 2, 5))
-            session.dynamic_movement.append(AssignedExercise("167", 2, 6))
 
             session.stability_work.append(AssignedExercise("168", 3, 1))
             session.stability_work.append(AssignedExercise("169", 3, 2))
@@ -243,7 +239,6 @@ class FSProgramGenerator(object):
                 session.dynamic_movement.append(AssignedExercise("149", 2, 3))
                 session.dynamic_movement.append(AssignedExercise("146", 2, 4))
                 session.dynamic_movement.append(AssignedExercise("148", 2, 5))
-                session.dynamic_movement.append(AssignedExercise("167", 2, 6))
 
                 session.stability_work.append(AssignedExercise("168", 3, 1))
                 session.stability_work.append(AssignedExercise("169", 3, 2))
