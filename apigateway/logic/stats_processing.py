@@ -30,6 +30,8 @@ class StatsProcessing(object):
         self.chronic_daily_plans = []
         self.last_7_days_plans = []
         self.days_8_14_plans = []
+        self.last_7_days_ps_surveys = []
+        self.days_8_14_ps_surveys = []
 
     def set_start_end_times(self):
         if self.event_date is None:
@@ -270,11 +272,9 @@ class StatsProcessing(object):
         four_plus_training_sessions_logged = False
         logged_session_plans = []
 
-        for p in self.last_7_days_plans:
-            logged_session_plans.extend(p.training_sessions)
+        logged_session_plans.extend(self.last_7_days_ps_surveys)
 
-        for p in self.days_8_14_plans:
-            logged_session_plans.extend(p.training_sessions)
+        logged_session_plans.extend(self.days_8_14_ps_surveys)
 
         if len(logged_session_plans) > 4:
             four_plus_training_sessions_logged = True
@@ -487,6 +487,10 @@ class StatsProcessing(object):
             self.last_7_days_plans = [p for p in daily_plans if p.get_event_datetime() >= last_week]
 
             self.days_8_14_plans = [p for p in daily_plans if last_week > p.get_event_datetime() >= previous_week]
+
+            self.last_7_days_ps_surveys = [p for p in post_session_surveys if p.event_date_time >= last_week]
+
+            self.days_8_14_ps_surveys = [p for p in post_session_surveys if last_week > p.event_date_time >= previous_week]
 
 
 

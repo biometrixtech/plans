@@ -3,12 +3,14 @@ from logic.functional_strength_mapping import FSProgramGenerator
 from logic.stats_processing import StatsProcessing
 from models.daily_plan import DailyPlan
 from models.daily_readiness import DailyReadiness
-from models.session import PracticeSession
+from models.post_session_survey import PostSessionSurvey
+from models.session import PracticeSession, SessionType
 from models.sport import BasketballPosition, SportName, SoccerPosition
 from tests.mocks.mock_exercise_datastore import ExerciseLibraryDatastore
 from tests.mocks.mock_datastore_collection import DatastoreCollection
 from tests.mocks.mock_daily_plan_datastore import DailyPlanDatastore
 from tests.mocks.mock_daily_readiness_datastore import DailyReadinessDatastore
+from tests.mocks.mock_post_session_survey_datastore import PostSessionSurveyDatastore
 from tests.testing_utilities import TestUtilities
 from datetime import datetime, timedelta
 
@@ -64,6 +66,26 @@ def get_daily_readiness_surveys(start_date, end_date):
 
     return surveys
 
+
+def get_post_session_surveys(start_date, end_date):
+
+    surveys = []
+
+    dates = get_dates(start_date, end_date)
+
+    for d in dates:
+        soreness = TestUtilities().body_part_soreness(9, 1)
+
+        soreness_list = [soreness]
+
+        post_survey = TestUtilities().get_post_survey(6, soreness_list)
+
+        post_session = PostSessionSurvey(d.strftime("%Y-%m-%dT%H:%M:%SZ"), "tester",None, SessionType.practice, post_survey )
+        surveys.append(post_session)
+
+    return surveys
+
+
 def test_generate_session_for_soccer():
     mapping = FSProgramGenerator(exercise_library_datastore)
     fs_session = mapping.getFunctionalStrengthForSportPosition(SportName.soccer, position=SoccerPosition.Forward)
@@ -90,6 +112,7 @@ def test_athlete_has_enough_training_sessions():
     plans_1_7_days = get_daily_plans(datetime(2018, 7, 24, 0, 0, 0), datetime(2018, 7, 30, 0, 0, 0))
     plans_8_14_days = get_daily_plans(datetime(2018, 7, 17, 0, 0, 0), datetime(2018, 7, 23, 0, 0, 0))
     surveys = get_daily_readiness_surveys(datetime(2018, 7, 17, 12, 0, 0), datetime(2018, 7, 31, 0, 0, 0))
+    ps_surveys = get_post_session_surveys(datetime(2018, 7, 17, 0, 0, 0), datetime(2018, 7, 30, 0, 0, 0))
 
     all_plans = []
     all_plans.extend(plans_8_14_days)
@@ -99,10 +122,13 @@ def test_athlete_has_enough_training_sessions():
     daily_plan_datastore.side_load_plans(all_plans)
     daily_readiness_datastore = DailyReadinessDatastore()
     daily_readiness_datastore.side_load_surveys(surveys)
+    post_session_datastore = PostSessionSurveyDatastore()
+    post_session_datastore.side_load_surveys(ps_surveys)
 
     datastore_collection = DatastoreCollection()
     datastore_collection.daily_plan_datastore = daily_plan_datastore
     datastore_collection.daily_readiness_datastore = daily_readiness_datastore
+    datastore_collection.post_session_survey_datastore = post_session_datastore
 
     stats_processing = StatsProcessing("tester", "2018-07-31", datastore_collection)
     stats_processing.process_athlete_stats()
