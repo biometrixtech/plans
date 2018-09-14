@@ -140,3 +140,61 @@ def test_athlete_is_onboarded_twoweeks():
     stats_processing.process_athlete_stats()
     logged_enough = stats_processing.is_athlete_two_weeks_from_onboarding()
     assert True is logged_enough
+
+
+def test_athlete_no_ap_ar():
+
+    plans_1_7_days = get_daily_plans(datetime(2018, 7, 24, 0, 0, 0), datetime(2018, 7, 30, 0, 0, 0))
+    plans_8_14_days = get_daily_plans(datetime(2018, 7, 17, 0, 0, 0), datetime(2018, 7, 23, 0, 0, 0))
+
+    surveys = get_daily_readiness_surveys(datetime(2018, 7, 17, 12, 0, 0), datetime(2018, 7, 31, 0, 0, 0))
+
+    all_plans = []
+    all_plans.extend(plans_8_14_days)
+    all_plans.extend(plans_1_7_days)
+
+    daily_plan_datastore = DailyPlanDatastore()
+    daily_plan_datastore.side_load_plans(all_plans)
+    daily_readiness_datastore = DailyReadinessDatastore()
+    daily_readiness_datastore.side_load_surveys(surveys)
+
+    datastore_collection = DatastoreCollection()
+    datastore_collection.daily_plan_datastore = daily_plan_datastore
+    datastore_collection.daily_readiness_datastore = daily_readiness_datastore
+
+    stats_processing = StatsProcessing("tester", "2018-07-31", datastore_collection)
+    stats_processing.process_athlete_stats()
+    logged_enough = stats_processing.athlete_has_enough_active_prep_recovery_sessions()
+    assert False is logged_enough
+
+
+def test_athlete_enough_ap_ar():
+
+    plans_1_7_days = get_daily_plans(datetime(2018, 7, 24, 0, 0, 0), datetime(2018, 7, 30, 0, 0, 0))
+    plans_8_14_days = get_daily_plans(datetime(2018, 7, 17, 0, 0, 0), datetime(2018, 7, 23, 0, 0, 0))
+
+    plans_1_7_days[0].post_recovery_completed = True
+    plans_1_7_days[0].pre_recovery_completed = True
+
+    plans_8_14_days[0].post_recovery_completed = True
+    plans_8_14_days[0].pre_recovery_completed = True
+
+    surveys = get_daily_readiness_surveys(datetime(2018, 7, 17, 12, 0, 0), datetime(2018, 7, 31, 0, 0, 0))
+
+    all_plans = []
+    all_plans.extend(plans_8_14_days)
+    all_plans.extend(plans_1_7_days)
+
+    daily_plan_datastore = DailyPlanDatastore()
+    daily_plan_datastore.side_load_plans(all_plans)
+    daily_readiness_datastore = DailyReadinessDatastore()
+    daily_readiness_datastore.side_load_surveys(surveys)
+
+    datastore_collection = DatastoreCollection()
+    datastore_collection.daily_plan_datastore = daily_plan_datastore
+    datastore_collection.daily_readiness_datastore = daily_readiness_datastore
+
+    stats_processing = StatsProcessing("tester", "2018-07-31", datastore_collection)
+    stats_processing.process_athlete_stats()
+    logged_enough = stats_processing.athlete_has_enough_active_prep_recovery_sessions()
+    assert True is logged_enough
