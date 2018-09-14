@@ -46,12 +46,13 @@ def handle_functional_strength_update():
 
     save_completed_exercises(completed_exercises, user_id, fs_event_date)
 
+    survey_complete = plan.daily_readiness_survey_completed()
     landing_screen, nav_bar_indicator = plan.define_landing_screen()
     plan = plan.json_serialise()
-    plan['functional_strength_completed'] = True
+    plan['daily_readiness_survey_completed'] = survey_complete
     plan['landing_screen'] = landing_screen
     plan['nav_bar_indicator'] = nav_bar_indicator
-    del plan['functional_strength_session'], plan['user_id']
+    del plan['daily_readiness_survey'], plan['user_id']
 
     return {'daily_plans': [plan]}, 202
 
