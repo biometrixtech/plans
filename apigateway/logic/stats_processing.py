@@ -6,14 +6,13 @@ from utils import parse_date, parse_datetime
 
 class StatsProcessing(object):
 
-    def __init__(self, athlete_id, event_date, daily_readiness_datastore, post_session_survey_datastore,
-                 daily_plan_datastore, athlete_stats_datastore):
+    def __init__(self, athlete_id, event_date, datastore_collection):
         self.athlete_id = athlete_id
         self.event_date = event_date
-        self.daily_readiness_datastore = daily_readiness_datastore
-        self.post_session_survey_datastore = post_session_survey_datastore
-        self.athlete_stats_datastore = athlete_stats_datastore
-        self.daily_plan_datastore = daily_plan_datastore
+        self.daily_readiness_datastore = datastore_collection.daily_readiness_datastore
+        self.post_session_survey_datastore = datastore_collection.post_session_survey_datastore
+        self.athlete_stats_datastore = datastore_collection.athlete_stats_datastore
+        self.daily_plan_datastore = datastore_collection.daily_plan_datastore
         self.start_date = None
         self.end_date = None
         self.start_date_time = None
@@ -184,7 +183,7 @@ class StatsProcessing(object):
                           d.get_event_datetime() < self.acute_start_date_time - timedelta(days=21)]
         week3_sessions = [d for d in self.chronic_daily_plans if self.acute_start_date_time
                           - timedelta(days=21) <= d.get_event_datetime() < self.acute_start_date_time -
-                          timedelta(days=11)]
+                          timedelta(days=14)]
         week2_sessions = [d for d in self.chronic_daily_plans if self.acute_start_date_time
                           - timedelta(days=14) <= d.get_event_datetime() < self.acute_start_date_time -
                           timedelta(days=7)]
@@ -251,18 +250,40 @@ class StatsProcessing(object):
 
     def is_athlete_functional_strength_eligible(self):
 
-        two_plus_weeks_since_onboarding = False
-        two_apar_sessions_completed = False
-        four_plus_training_sessions_logged = False
-
         # onboarded > 2 weeks?
-        if self.chronic_readiness_surveys is not None and len(self.chronic_readiness_surveys) > 0:
-            days_diff = (parse_date(self.event_date) - parse_datetime(self.chronic_readiness_surveys[0].event_date)).days
-
-            if days_diff >= 14:
-                two_plus_weeks_since_onboarding = True
+        two_plus_weeks_since_onboarding = self.is_athlete_two_weeks_from_onboarding()
 
         # active prep / active recovery checks
+        two_apar_sessions_completed = self.athlete_has_enough_active_prep_recovery_sessions()
+
+        # logged sessions
+        four_plus_training_sessions_logged = self.athlete_logged_enough_sessions()
+
+        # wrapping it all up
+        if two_plus_weeks_since_onboarding and two_apar_sessions_completed and four_plus_training_sessions_logged:
+            return True
+        else:
+            return False
+
+    def athlete_logged_enough_sessions(self):
+
+        four_plus_training_sessions_logged = False
+        logged_session_plans = []
+
+        for p in self.last_7_days_plans:
+            logged_session_plans.extend(p.training_sessions)
+
+        for p in self.days_8_14_plans:
+            logged_session_plans.extend(p.training_sessions)
+
+        if len(logged_session_plans) > 4:
+            four_plus_training_sessions_logged = True
+
+        return four_plus_training_sessions_logged
+
+    def athlete_has_enough_active_prep_recovery_sessions(self):
+
+        two_apar_sessions_completed = False
         apar_sessions_completed_count_7 = 0
         apar_sessions_completed_count_14 = 0
 
@@ -282,23 +303,20 @@ class StatsProcessing(object):
         if apar_sessions_completed_count_7 >= 2 and apar_sessions_completed_count_14 >= 2:
             two_apar_sessions_completed = True
 
-        # logged sessions
-        logged_session_plans = []
+        return two_apar_sessions_completed
 
-        for p in self.last_7_days_plans:
-            logged_session_plans.extend(p.training_sessions)
+    def is_athlete_two_weeks_from_onboarding(self):
 
-        for p in self.days_8_14_plans:
-            logged_session_plans.extend(p.training_sessions)
+        two_plus_weeks_since_onboarding = False
 
-        if len(logged_session_plans) > 4:
-            four_plus_training_sessions_logged = True
+        if self.chronic_readiness_surveys is not None and len(self.chronic_readiness_surveys) > 0:
+            days_diff = (
+                        parse_date(self.event_date) - self.chronic_readiness_surveys[0].event_date).days
 
-        # wrapping it all up
-        if two_plus_weeks_since_onboarding and two_apar_sessions_completed and four_plus_training_sessions_logged:
-            return True
-        else:
-            return False
+            if days_diff >= 13: # for difference, we need one less than fourteen
+                two_plus_weeks_since_onboarding = True
+
+        return two_plus_weeks_since_onboarding
 
     def get_completed_functional_strength_sessions(self):
 
@@ -423,7 +441,8 @@ class StatsProcessing(object):
             post_session_surveys.sort(key=lambda x: x.event_date_time, reverse=False)
             earliest_survey_date_time = min(earliest_survey_date_time, post_session_surveys[0].event_date_time)
 
-        days_difference = (self.end_date_time - earliest_survey_date_time).days
+        # add one since survey is first thing done in the day
+        days_difference = (self.end_date_time - earliest_survey_date_time).days + 1
 
         if 7 <= days_difference < 14:
             self.acute_days = 3
@@ -436,12 +455,12 @@ class StatsProcessing(object):
             self.chronic_days = 28
 
         if self.acute_days is not None and self.chronic_days is not None:
-            self.acute_start_date_time = self.end_date_time - timedelta(days=self.acute_days)
+            self.acute_start_date_time = self.end_date_time - timedelta(days=self.acute_days + 1)
             self.chronic_start_date_time = self.end_date_time - timedelta(days=self.chronic_days)
             chronic_date_time = self.acute_start_date_time - timedelta(days=self.chronic_days)
             chronic_delta = self.end_date_time - chronic_date_time
             self.chronic_load_start_date_time = self.end_date_time - chronic_delta
-            last_week = self.end_date_time - timedelta(days=7)
+            last_week = self.end_date_time - timedelta(days=7 + 1)
             previous_week = last_week - timedelta(days=7)
 
             self.acute_post_session_surveys = sorted([p for p in post_session_surveys

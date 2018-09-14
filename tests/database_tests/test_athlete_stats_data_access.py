@@ -5,9 +5,8 @@ import os
 import json
 from logic.stats_processing import StatsProcessing
 from models.stats import AthleteStats
-from datastores.post_session_survey_datastore import PostSessionSurveyDatastore
-from datastores.daily_readiness_datastore import DailyReadinessDatastore
 from datastores.athlete_stats_datastore import AthleteStatsDatastore
+from datastores.datastore_collection import DatastoreCollection
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -32,8 +31,7 @@ def add_xray_support(request):
 def test_ryan_robbins_athlete_stats_day_after_week():
     user_id = "rrobbins@fakemail.com"
     athlete_stats_datastore = AthleteStatsDatastore()
-    calc = StatsProcessing(user_id, "2018-07-19", DailyReadinessDatastore(), PostSessionSurveyDatastore(), None,
-                           athlete_stats_datastore)
+    calc = StatsProcessing(user_id, "2018-07-19", DatastoreCollection())
     calc.process_athlete_stats()
     athlete_stats_retrieved = athlete_stats_datastore.get(user_id)
     assert None is not athlete_stats_retrieved
@@ -42,8 +40,7 @@ def test_ryan_robbins_athlete_stats_day_after_week():
 def test_ryan_robbins_athlete_stats_last_day_of_week():
     user_id = "rrobbins@fakemail.com"
     athlete_stats_datastore = AthleteStatsDatastore()
-    calc = StatsProcessing(user_id, "2018-07-18", DailyReadinessDatastore(), PostSessionSurveyDatastore(), None,
-                           AthleteStatsDatastore())
+    calc = StatsProcessing(user_id, "2018-07-18", DatastoreCollection())
     calc.process_athlete_stats()
     athlete_stats_retrieved = athlete_stats_datastore.get(user_id)
     assert None is not athlete_stats_retrieved

@@ -180,8 +180,7 @@ class TrainingPlanManager(object):
         athlete_stats = self.athlete_stats_datastore.get(self.athlete_id)
 
         if daily_plan.functional_strength_session is None:
-            daily_plan = self.populate_functional_strength(daily_plan, athlete_stats, last_daily_readiness_survey,
-                                                           event_date)
+            daily_plan = self.populate_functional_strength(daily_plan, athlete_stats, last_daily_readiness_survey)
 
         text_generator = RecoveryTextGenerator()
         body_part_text = text_generator.get_text_from_body_part_list(soreness_list)
@@ -245,7 +244,7 @@ class TrainingPlanManager(object):
 
         return daily_plan
 
-    def populate_functional_strength(self, daily_plan, athlete_stats, last_daily_readiness_survey, event_date):
+    def populate_functional_strength(self, daily_plan, athlete_stats, last_daily_readiness_survey):
 
         if athlete_stats is not None:
             daily_plan.functional_strength_eligible = athlete_stats.functional_strength_eligible
