@@ -737,6 +737,9 @@ class ExerciseAssignmentCalculator(object):
         ankle_mobility_2.exercise.progressions = ["105", "113"]
         shin.activate_exercises.append(ankle_mobility_2)
 
+        shin.activate_exercises.append(models.exercise.AssignedExercise("53", shin.treatment_priority, 3))
+        shin.activate_exercises.append(models.exercise.AssignedExercise("75", shin.treatment_priority, 4))
+
         body_parts.append(shin)
 
         # ankle
