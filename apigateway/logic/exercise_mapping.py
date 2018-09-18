@@ -158,7 +158,7 @@ class ExerciseAssignmentCalculator(object):
                                                   if ex.id == body_part_exercise.exercise.progressions[p]]
                         proposed_exercise = proposed_exercise_list[0]
                         if len(completed_progression_list) == 0: # haven't done this
-                            if len(body_part_exercise.exercise.progressions) == 1:
+                            if p == 0:
                                 return proposed_exercise
                             else:
                                 # haven't dont anything with this exercise yet, keep working our way down
