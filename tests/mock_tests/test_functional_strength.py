@@ -168,6 +168,46 @@ def test_athlete_is_onboarded_twoweeks():
     assert True is logged_enough
 
 
+def test_athlete_completed_yesterday():
+
+    plans_1_7_days = get_daily_plans(datetime(2018, 7, 24, 0, 0, 0), datetime(2018, 7, 30, 0, 0, 0))
+    plans_1_7_days[6].functional_strength_completed = True
+
+    all_plans = []
+    all_plans.extend(plans_1_7_days)
+
+    daily_plan_datastore = DailyPlanDatastore()
+    daily_plan_datastore.side_load_plans(all_plans)
+
+    datastore_collection = DatastoreCollection()
+    datastore_collection.daily_plan_datastore = daily_plan_datastore
+
+    stats_processing = StatsProcessing("tester", "2018-07-31", datastore_collection)
+    stats_processing.process_athlete_stats()
+    completed_yesterday = stats_processing.functional_strength_yesterday()
+    assert False is completed_yesterday
+
+
+def test_athlete_not_completed_yesterday():
+
+    plans_1_7_days = get_daily_plans(datetime(2018, 7, 24, 0, 0, 0), datetime(2018, 7, 30, 0, 0, 0))
+    plans_1_7_days[6].functional_strength_completed = False
+
+    all_plans = []
+    all_plans.extend(plans_1_7_days)
+
+    daily_plan_datastore = DailyPlanDatastore()
+    daily_plan_datastore.side_load_plans(all_plans)
+
+    datastore_collection = DatastoreCollection()
+    datastore_collection.daily_plan_datastore = daily_plan_datastore
+
+    stats_processing = StatsProcessing("tester", "2018-07-31", datastore_collection)
+    stats_processing.process_athlete_stats()
+    completed_yesterday = stats_processing.functional_strength_yesterday()
+    assert False is completed_yesterday
+
+
 def test_athlete_no_ap_ar():
 
     plans_1_7_days = get_daily_plans(datetime(2018, 7, 24, 0, 0, 0), datetime(2018, 7, 30, 0, 0, 0))

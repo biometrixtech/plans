@@ -18,11 +18,23 @@ class FSProgramGenerator(object):
 
         return session
 
+    def calculate_exercise_length(self, exercise_list):
+
+        minutes = 0
+
+        return minutes
+
+    def calculate_time_for_fs_exercises(self, session):
+
+        return session
+
     def assign_exercises(self, exercise_list):
 
         for ex in range(0, len(exercise_list) - 1):
             mapped_exercises = [x for x in self.exercise_library if x.id == exercise_list[ex].exercise.id]
             exercise_list[ex].exercise = mapped_exercises[0]
+
+        minutes = self.calculate_exercise_length(exercise_list)
 
         return exercise_list
 
@@ -32,8 +44,61 @@ class FSProgramGenerator(object):
         session.sport_name = sport_name
         session.position = position
 
-        if sport_name is None:
+        if sport_name is None and position is None:
             return session
+
+        if sport_name is None:
+            if position == sport.NoSportPosition.Power or position == sport.NoSportPosition.Strength:
+
+                session.warm_up.append(AssignedExercise("139", 1, 1))
+                session.warm_up.append(AssignedExercise("140", 1, 2))
+                session.warm_up.append(AssignedExercise("141", 1, 3))
+                session.warm_up.append(AssignedExercise("142", 1, 4))
+                session.warm_up.append(AssignedExercise("143", 1, 5))
+                session.warm_up.append(AssignedExercise("144", 1, 6))
+                session.dynamic_movement.append(AssignedExercise("145", 2, 1))
+                session.dynamic_movement.append(AssignedExercise("146", 2, 2))
+                session.dynamic_movement.append(AssignedExercise("147", 2, 3))
+                session.dynamic_movement.append(AssignedExercise("148", 2, 4))
+                session.dynamic_movement.append(AssignedExercise("149", 2, 5))
+                session.dynamic_movement.append(AssignedExercise("150", 2, 6))
+                session.dynamic_movement.append(AssignedExercise("151", 2, 7))
+                session.stability_work.append(AssignedExercise("152", 3, 1))
+                session.stability_work.append(AssignedExercise("153", 3, 2))
+                session.stability_work.append(AssignedExercise("154", 3, 3))
+                session.stability_work.append(AssignedExercise("155", 3, 4))
+                session.optional_drills.append(AssignedExercise("156", 4, 1))
+                session.optional_drills.append(AssignedExercise("157", 4, 2))
+                session.optional_drills.append(AssignedExercise("158", 4, 3))
+                session.optional_drills.append(AssignedExercise("159", 4, 4))
+                session.optional_drills.append(AssignedExercise("160", 4, 5))
+
+            elif (position == sport.NoSportPosition.Endurance or
+                  position == sport.NoSportPosition.Speed or
+                  position == sport.NoSportPosition.CrossTraining):
+
+                session.warm_up.append(AssignedExercise("161", 1, 1))
+                session.warm_up.append(AssignedExercise("162", 1, 2))
+                session.warm_up.append(AssignedExercise("163", 1, 3))
+                session.warm_up.append(AssignedExercise("164", 1, 4))
+                session.warm_up.append(AssignedExercise("165", 1, 5))
+
+                session.dynamic_movement.append(AssignedExercise("166", 2, 1))
+                session.dynamic_movement.append(AssignedExercise("151", 2, 2))
+                session.dynamic_movement.append(AssignedExercise("149", 2, 3))
+                session.dynamic_movement.append(AssignedExercise("146", 2, 4))
+                session.dynamic_movement.append(AssignedExercise("148", 2, 5))
+
+                session.stability_work.append(AssignedExercise("168", 3, 1))
+                session.stability_work.append(AssignedExercise("169", 3, 2))
+                session.stability_work.append(AssignedExercise("170", 3, 3))
+                session.stability_work.append(AssignedExercise("152", 3, 4))
+                session.stability_work.append(AssignedExercise("171", 3, 5))
+
+                session.optional_drills.append(AssignedExercise("157", 4, 1))
+                session.optional_drills.append(AssignedExercise("172", 4, 2))
+                session.optional_drills.append(AssignedExercise("173", 4, 3))
+                session.optional_drills.append(AssignedExercise("174", 4, 4))
 
         if sport_name == sport.SportName.baseball_softball:
 
