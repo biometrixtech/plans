@@ -43,9 +43,10 @@ class CompletedExerciseDatastore(object):
                 {"$group": {"_id": {"athlete_id": "$athlete_id", "exercise_id": "$exercise_id"},
                             "exposures": {"$sum": 1}}}])
 
-            for mongo_result in mongo_cursor:
-                completed_exercise_summary = CompletedExerciseSummary(athlete_id=mongo_result['$_id.athlete_id'],
-                                                                      exercise_id=mongo_result['$_id.exercise_id'],
+            agg_list = list(mongo_cursor)
+            for mongo_result in agg_list:
+                completed_exercise_summary = CompletedExerciseSummary(athlete_id=mongo_result['_id']['athlete_id'],
+                                                                      exercise_id=mongo_result['_id']['exercise_id'],
                                                                       exposures=mongo_result['exposures'])
                 ret.append(completed_exercise_summary)
 

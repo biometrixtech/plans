@@ -4,6 +4,7 @@ import logic.soreness_processing as soreness_and_injury
 import models.exercise
 from logic.goal_focus_text_generator import RecoveryTextGenerator
 from datetime import  timedelta
+from utils import format_datetime
 
 
 class ExerciseAssignmentCalculator(object):
@@ -57,8 +58,8 @@ class ExerciseAssignmentCalculator(object):
         exercise_assignments.lengthen_target_minutes = exercise_session.lengthen_target_minutes
 
         completed_exercises = self.completed_exercise_datastore.get(self.athlete_id,
-                                                                    trigger_date_time - timedelta(30),
-                                                                    trigger_date_time,
+                                                                    format_datetime(trigger_date_time - timedelta(30)),
+                                                                    format_datetime(trigger_date_time),
                                                                     get_summary=True)
         body_part_exercises = self.exercises_for_body_parts
         exercise_list = self.exercise_library
@@ -157,7 +158,7 @@ class ExerciseAssignmentCalculator(object):
                                                   if ex.id == body_part_exercise.exercise.progressions[p]]
                         proposed_exercise = proposed_exercise_list[0]
                         if len(completed_progression_list) == 0: # haven't done this
-                            if len(body_part_exercise.exercise.progressions) == 1:
+                            if p == 0:
                                 return proposed_exercise
                             else:
                                 # haven't dont anything with this exercise yet, keep working our way down
