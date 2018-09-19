@@ -340,8 +340,13 @@ def handle_no_sessions_planned():
     survey_complete = plan.daily_readiness_survey_completed()
     plan = plan.json_serialise()
     plan['daily_readiness_survey_completed'] = survey_complete
-    plan['landing_screen'] = 1.0
-    plan['nav_bar_indicator'] = 1.0
+    if plan['pre_recovery_completed']:
+        plan['landing_screen'] = 1.0
+        plan['nav_bar_indicator'] = 1.0
+    else:
+        plan['landing_screen'] = 1.0
+        plan['nav_bar_indicator'] = 0.0
+
     del plan['daily_readiness_survey'], plan['user_id']
     return {'message': 'success',
             'daily_plan': plan}, 200
