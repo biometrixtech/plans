@@ -99,7 +99,7 @@ class AthleteStats(Serialisable):
         if name == "current_sport_name":
             value = SportName(value)
         elif name == "current_position":
-            if self.current_sport_name is None and value is not None:
+            if self.current_sport_name.value is None and value is not None:
                 value = NoSportPosition(value)
             elif self.current_sport_name == SportName.soccer:
                 value = SoccerPosition(value)
