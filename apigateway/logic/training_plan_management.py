@@ -252,7 +252,7 @@ class TrainingPlanManager(object):
         if daily_plan.functional_strength_eligible and last_daily_readiness_survey.wants_functional_strength:
             daily_plan.completed_functional_strength_sessions = athlete_stats.completed_functional_strength_sessions
             if not daily_plan.functional_strength_completed and daily_plan.completed_functional_strength_sessions < 3:
-                fs_mapping = FSProgramGenerator()
+                fs_mapping = FSProgramGenerator(self.exercise_library_datastore)
                 daily_plan.functional_strength_session = fs_mapping.getFunctionalStrengthForSportPosition(
                     athlete_stats.current_sport_name,
                     athlete_stats.current_position)

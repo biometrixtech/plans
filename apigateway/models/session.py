@@ -5,8 +5,7 @@ import datetime
 from serialisable import Serialisable
 import logic.exercise_generator as exercise
 from utils import format_datetime, parse_datetime
-from models.sport import SportName
-
+from models.sport import SportName, NoSportPosition, BaseballPosition, BasketballPosition, FootballPosition, LacrossePosition, SoccerPosition
 
 class SessionType(Enum):
     practice = 0
@@ -317,6 +316,25 @@ class FunctionalStrengthSession(Serialisable):
         self.sport_name = None
         self.position = None
 
+
+    def __setattr__(self, name, value):
+        if name == "sport_name":
+            value = SportName(value)
+        elif name == "position":
+            if self.sport_name == SportName.no_sport and value is not None:
+                value = NoSportPosition(value)
+            elif self.sport_name == SportName.soccer:
+                value = SoccerPosition(value)
+            elif self.sport_name == SportName.basketball:
+                value = BasketballPosition(value)
+            elif self.sport_name == SportName.baseball_softball:
+                value = BaseballPosition(value)
+            elif self.sport_name == SportName.football:
+                value = FootballPosition(value)
+            elif self.sport_name == SportName.lacrosse:
+                value = LacrossePosition(value)
+        super().__setattr__(name, value)
+
     def json_serialise(self):
             ret = {'equipment_required':  [e for e in self.equipment_required],
                    'minutes_duration': self.duration_minutes,
@@ -325,8 +343,8 @@ class FunctionalStrengthSession(Serialisable):
                    'dynamic_movement': [ex.json_serialise() for ex in self.dynamic_movement],
                    'stability_work': [ex.json_serialise() for ex in self.stability_work],
                    'victory_lap': [ex.json_serialise() for ex in self.victory_lap],
-                   'sport_name': self.sport_name,
-                   'position': self.position
+                   'sport_name': self.sport_name.value,
+                   'position': self.position.value
                    }
             return ret
 

@@ -66,7 +66,7 @@ class DailyPlanDatastore(object):
             daily_plan.sessions_planned = plan.get('sessions_planned', True)
             daily_plan.functional_strength_eligible = plan.get('functional_strength_eligible', False)
             daily_plan.completed_functional_strength_sessions = plan.get('completed_functional_strength_sessions', 0)
-            daily_plan.functional_strength_session = plan.get('functional_strength_session', None)
+            daily_plan.functional_strength_session = _functional_strength_session_from_mongodb(plan['functional_strength_session']) if plan.get('functional_strength_session', None) is not None else None
             daily_plan.functional_strength_completed = plan.get('functional_strength_completed', False)
             ret.append(daily_plan)
 
@@ -214,6 +214,31 @@ def _recovery_session_from_mongodb(mongo_result):
     return recovery_session
 
 
+
+def _functional_strength_session_from_mongodb(mongo_result):
+    functional_strength_session = session.FunctionalStrengthSession()
+    functional_strength_session.equipment_required = _key_present("equipment_required", mongo_result)
+    functional_strength_session.warm_up = [_assigned_exercises_from_mongodb(s)
+                                          for s in mongo_result['warm_up']]
+    functional_strength_session.dynamic_movement = [_assigned_exercises_from_mongodb(s)
+                                          for s in mongo_result['dynamic_movement']]
+    functional_strength_session.stability_work = [_assigned_exercises_from_mongodb(s)
+                                          for s in mongo_result['stability_work']]
+    functional_strength_session.victory_lap = [_assigned_exercises_from_mongodb(s)
+                                          for s in mongo_result['victory_lap']]
+    functional_strength_session.duration_minutes = _key_present("duration_minutes", mongo_result)
+    functional_strength_session.warm_up_target_minutes = _key_present("warm_up_target_minutes", mongo_result)
+    functional_strength_session.dynamic_movement_target_minutes = _key_present("dynamic_movement_target_minutes", mongo_result)
+    functional_strength_session.stability_work_target_minutes = _key_present("stability_work_target_minutes", mongo_result)
+    functional_strength_session.victory_lap_target_minutes = _key_present("victory_lap_target_minutes", mongo_result)
+    functional_strength_session.warm_up_max_percentage = _key_present("warm_up_max_percentage", mongo_result)
+    functional_strength_session.dynamic_movement_max_percentage = _key_present("dynamic_movement_max_percentage", mongo_result)
+    functional_strength_session.stability_work_max_percentage = _key_present("stability_work_max_percentage", mongo_result)
+    functional_strength_session.victory_lap_max_percentage = _key_present("victory_lap_max_percentage", mongo_result)
+    functional_strength_session.completed = mongo_result.get("completed", False)
+    functional_strength_session.sport_name = _key_present("sport_name", mongo_result)
+    functional_strength_session.position = _key_present("position", mongo_result)
+
 def _assigned_exercises_from_mongodb(mongo_result):
 
     assigned_exercise = exercise.AssignedExercise(_key_present("library_id", mongo_result))
@@ -230,6 +255,8 @@ def _assigned_exercises_from_mongodb(mongo_result):
     assigned_exercise.exercise.seconds_per_rep = _key_present("seconds_per_rep", mongo_result)
     assigned_exercise.goal_text = _key_present("goal_text", mongo_result)
     return assigned_exercise
+
+
 
 def _key_present(key_name, dictionary):
     if key_name in dictionary:

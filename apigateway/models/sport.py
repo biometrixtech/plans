@@ -28,30 +28,33 @@ class SportName(Enum):
     cross_country = 2
     cycling = 3
     field_hockey = 4
-    general_fitness = 5
-    golf = 6
-    gymnastics = 7
-    ice_hockey = 8
-    lacrosse = 9
-    rowing = 10
-    rugby = 11
-    running = 12
-    soccer = 13
-    swimming_diving = 14
-    tennis = 15
-    track_and_field = 16
-    volleyball = 17
-    wrestling = 18
-    weightlifting = 19
-    football = 20
+    football = 5
+    general_fitness = 6
+    golf = 7
+    gymnastics = 8
+    ice_hockey = 9
+    lacrosse = 10
+    rowing = 11
+    rugby = 12
+    running = 13
+    soccer = 14
+    swimming_diving = 15
+    tennis = 16
+    distance_running = 17
+    sprints = 18
+    jumps = 19
+    throws = 20
+    volleyball = 21
+    wrestling = 22
+    weightlifting = 23
     no_sport = None
 
 
 class NoSportPosition(Enum):
-    Power = 0
-    Strength = 1
-    Endurance = 2
-    Speed = 3
+    Power = 1
+    Strength = 3
+    Endurance = 0
+    Speed = 2
     CrossTraining = 4
 
 

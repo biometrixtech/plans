@@ -31,11 +31,11 @@ class FSProgramGenerator(object):
 
         for ex in exercise_list:
             total = 0
-            if ex.exercise.unit_of_measure == 'seconds':
+            if ex.exercise.unit_of_measure.name == 'seconds':
                 total = ex.exercise.seconds_per_set * ex.sets_assigned
-            elif ex.exercise.unit_of_measure == 'count':
+            elif ex.exercise.unit_of_measure.name == 'count':
                 total = ex.exercise.seconds_per_rep * ex.reps_assigned
-            elif ex.exercise.unit_of_measure == 'yards':
+            elif ex.exercise.unit_of_measure.name == 'yards':
                 total = ex.exercise.seconds_per_set * ex.sets_assigned
             if ex.exercise.bilateral:
                 total = total * 2
@@ -61,10 +61,10 @@ class FSProgramGenerator(object):
         session.sport_name = sport_name
         session.position = position
 
-        if sport_name is None and position is None:
+        if sport_name.value is None and position is None:
             return session
 
-        if sport_name is None:
+        if sport_name.value is None:
             if position == sport.NoSportPosition.Power or position == sport.NoSportPosition.Strength:
 
                 session.warm_up.append(AssignedExercise("139", 1, 1))

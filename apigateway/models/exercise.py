@@ -76,6 +76,11 @@ class Exercise(Serialisable):
         self.goal = ""
         self.equipment_required = None
 
+    def __setattr__(self, name, value):
+        if name == "unit_of_measure" and not isinstance(value, UnitOfMeasure):
+            value = UnitOfMeasure[value]
+        super().__setattr__(name, value)
+
     def json_serialise(self):
         ret = {'library_id': self.id,
                'name': self.name,
@@ -90,7 +95,7 @@ class Exercise(Serialisable):
                'progression_interval': self.progression_interval,
                'exposure_target': self.exposure_target,
                'exposure_minimum': self.exposure_minimum,
-               'unit_of_measure': self.unit_of_measure,
+               'unit_of_measure': self.unit_of_measure.name,
                'seconds_rest_between_sets': self.seconds_rest_between_sets,
                'time_per_set': self.seconds_per_set,
                'time_per_rep': self.seconds_per_rep,
@@ -121,18 +126,22 @@ class AssignedExercise(Serialisable):
         return ExercisePriority.neutral
     '''
     def duration(self):
-        if self.exercise.unit_of_measure == "count":
+        if self.exercise.unit_of_measure.name == "count":
             if not self.exercise.bilateral:
                 return self.exercise.seconds_per_rep * self.reps_assigned * self.sets_assigned
             else:
                 return (self.exercise.seconds_per_rep * self.reps_assigned * self.sets_assigned) * 2
-        elif self.exercise.unit_of_measure == "seconds":
+        elif self.exercise.unit_of_measure.name == "seconds":
             if not self.exercise.bilateral:
                 return self.exercise.seconds_per_set * self.sets_assigned
             else:
                 return (self.exercise.seconds_per_set * self.sets_assigned) * 2
         else:
             return None
+    def __setattr__(self, name, value):
+        if name == "unit_of_measure" and not isinstance(value, UnitOfMeasure):
+            value = UnitOfMeasure[value]
+        super().__setattr__(name, value)
 
     def json_serialise(self):
         ret = {'name': self.exercise.name,
@@ -143,7 +152,7 @@ class AssignedExercise(Serialisable):
                'bilateral': self.exercise.bilateral,
                'seconds_per_rep': self.exercise.seconds_per_rep,
                'seconds_per_set': self.exercise.seconds_per_set,
-               'unit_of_measure': self.exercise.unit_of_measure,
+               'unit_of_measure': self.exercise.unit_of_measure.name,
                'position_order': self.position_order,
                'reps_assigned': self.reps_assigned,
                'sets_assigned': self.sets_assigned,
