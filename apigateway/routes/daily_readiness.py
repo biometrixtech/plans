@@ -86,8 +86,8 @@ def handle_daily_readiness_get():
     functional_strength_eligible = False
 
     if athlete_stats is not None:
-        current_sport_name = athlete_stats.current_sport_name
-        current_position = athlete_stats.current_position
+        current_sport_name = athlete_stats.current_sport_name.value
+        current_position = athlete_stats.current_position.value
         functional_strength_eligible = athlete_stats.functional_strength_eligible
 
     return {
