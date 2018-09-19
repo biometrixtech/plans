@@ -92,7 +92,8 @@ def test_generate_session_for_soccer():
     assert True is (len(fs_session.warm_up) > 0)
     assert True is (len(fs_session.dynamic_movement) > 0)
     assert True is (len(fs_session.stability_work) > 0)
-    assert True is (len(fs_session.optional_drills) > 0)
+    assert True is (len(fs_session.victory_lap) > 0)
+    assert True is (fs_session.duration_minutes > 0)
 
 
 def test_fs_exercises_populated():
