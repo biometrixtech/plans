@@ -5,7 +5,7 @@ from models.daily_plan import DailyPlan
 from models.daily_readiness import DailyReadiness
 from models.post_session_survey import PostSessionSurvey
 from models.session import PracticeSession, SessionType
-from models.sport import BasketballPosition, SportName, SoccerPosition
+from models.sport import BasketballPosition, SportName, SoccerPosition, NoSportPosition
 from tests.mocks.mock_exercise_datastore import ExerciseLibraryDatastore
 from tests.mocks.mock_datastore_collection import DatastoreCollection
 from tests.mocks.mock_daily_plan_datastore import DailyPlanDatastore
@@ -95,6 +95,15 @@ def test_generate_session_for_soccer():
     assert True is (len(fs_session.victory_lap) > 0)
     assert True is (fs_session.duration_minutes > 0)
 
+
+def test_generate_session_for_speed():
+    mapping = FSProgramGenerator(exercise_library_datastore)
+    fs_session = mapping.getFunctionalStrengthForSportPosition(None, position=NoSportPosition.Speed)
+    assert True is (len(fs_session.warm_up) > 0)
+    assert True is (len(fs_session.dynamic_movement) > 0)
+    assert True is (len(fs_session.stability_work) > 0)
+    assert True is (len(fs_session.victory_lap) > 0)
+    assert True is (fs_session.duration_minutes > 0)
 
 def test_fs_exercises_populated():
     mapping = FSProgramGenerator(exercise_library_datastore)
