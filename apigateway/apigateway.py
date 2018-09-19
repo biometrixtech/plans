@@ -80,6 +80,8 @@ app.register_blueprint(daily_schedule_routes, url_prefix='/schedule')
 from routes.active_recovery import app as active_recovery_routes
 app.register_blueprint(active_recovery_routes, url_prefix='/active_recovery')
 
+from routes.functional_strength import app as functional_strength_routes
+app.register_blueprint(functional_strength_routes, url_prefix='/functional_strength')
 
 from routes.misc import app as misc_routes
 app.register_blueprint(misc_routes, url_prefix='/misc')
@@ -122,7 +124,7 @@ def handler(event, context):
     if path_match is None:
         raise Exception('Invalid path')
     event['path'] = path_match.groupdict()['path']
-    api_version = path_match.groupdict()['version']
+    os.environ['API_VERSION'] = path_match.groupdict()['version'] or ''
 
     # Pass tracing info to X-Ray
     if 'X-Amzn-Trace-Id-Safe' in event['headers']:
@@ -135,11 +137,11 @@ def handler(event, context):
     else:
         xray_recorder.begin_segment(name='{SERVICE}.{ENVIRONMENT}.fathomai.com'.format(**os.environ))
 
-    xray_recorder.current_segment().put_http_meta('url', f"https://{event['headers']['Host']}/{os.environ['SERVICE']}/{api_version}{event['path']}")
+    xray_recorder.current_segment().put_http_meta('url', f"https://{event['headers']['Host']}/{os.environ['SERVICE']}/{os.environ['API_VERSION']}{event['path']}")
     xray_recorder.current_segment().put_http_meta('method', event['httpMethod'])
     xray_recorder.current_segment().put_http_meta('user_agent', event['headers']['User-Agent'])
     xray_recorder.current_segment().put_annotation('environment', os.environ['ENVIRONMENT'])
-    xray_recorder.current_segment().put_annotation('version', str(api_version))
+    xray_recorder.current_segment().put_annotation('version', str(os.environ['API_VERSION']))
 
     ret = app(event, context)
     ret['headers'].update({

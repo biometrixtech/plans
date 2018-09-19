@@ -12,13 +12,15 @@ class DailyReadiness(Serialisable):
                  user_id,
                  soreness,
                  sleep_quality,
-                 readiness
+                 readiness,
+                 wants_functional_strength=False
                  ):
         self.event_date = parse_datetime(event_date)
         self.user_id = user_id
         self.soreness = [self._soreness_from_dict(s) for s in soreness]
         self.sleep_quality = int(sleep_quality)
         self.readiness = int(readiness)
+        self.wants_functional_strength = wants_functional_strength
 
     def get_id(self):
         return self.user_id
@@ -33,6 +35,7 @@ class DailyReadiness(Serialisable):
             'soreness': [s.json_serialise() for s in self.soreness],
             'sleep_quality': self.sleep_quality,
             'readiness': self.readiness,
+            'wants_functional_strength': self.wants_functional_strength,
             'sore_body_parts': [{"body_part": s.body_part.location.value, "side": s.side} for s in self.soreness if s.severity > 1]
         }
         return ret

@@ -6,22 +6,21 @@ import logic.exercise_mapping as exercise_mapping
 from logic.soreness_processing import SorenessCalculator
 from models.soreness import BodyPartLocation
 from logic.goal_focus_text_generator import RecoveryTextGenerator
-from utils import format_datetime
+from utils import format_datetime, format_date
 from logic.stats_processing import StatsProcessing
+from logic.functional_strength_mapping import FSProgramGenerator
 
 
 class TrainingPlanManager(object):
 
-    def __init__(self, athlete_id, exercise_library_datastore, daily_readiness_datastore, post_session_survey_datastore,
-                 daily_plan_datastore, athlete_stats_datastore, completed_exercise_datastore):
+    def __init__(self, athlete_id, datastore_collection):
         self.athlete_id = athlete_id
-        self.daily_readiness_datastore = daily_readiness_datastore
-        self.post_session_survey_datastore = post_session_survey_datastore
-        self.daily_plan_datastore = daily_plan_datastore
-        self.exercise_library_datastore = exercise_library_datastore
-        self.athlete_stats_datastore = athlete_stats_datastore
-        self.completed_exercise_datastore = completed_exercise_datastore
-
+        self.daily_readiness_datastore = datastore_collection.daily_readiness_datastore
+        self.post_session_survey_datastore = datastore_collection.post_session_survey_datastore
+        self.daily_plan_datastore = datastore_collection.daily_plan_datastore
+        self.exercise_library_datastore = datastore_collection.exercise_datastore
+        self.athlete_stats_datastore = datastore_collection.athlete_stats_datastore
+        self.completed_exercise_datastore = datastore_collection.completed_exercise_datastore
 
     def calculate_pre_impact_score(self, rpe, readiness, sleep_quality, max_soreness, athlete_stats=None):
 
@@ -178,8 +177,10 @@ class TrainingPlanManager(object):
         else:
             max_rpe = 0
 
-
         athlete_stats = self.athlete_stats_datastore.get(self.athlete_id)
+
+        if daily_plan.functional_strength_session is None:
+            daily_plan = self.populate_functional_strength(daily_plan, athlete_stats, last_daily_readiness_survey)
 
         text_generator = RecoveryTextGenerator()
         body_part_text = text_generator.get_text_from_body_part_list(soreness_list)
@@ -240,6 +241,21 @@ class TrainingPlanManager(object):
         daily_plan.last_updated = format_datetime(datetime.datetime.utcnow())
 
         self.daily_plan_datastore.put(daily_plan)
+
+        return daily_plan
+
+    def populate_functional_strength(self, daily_plan, athlete_stats, last_daily_readiness_survey):
+
+        if athlete_stats is not None:
+            daily_plan.functional_strength_eligible = athlete_stats.functional_strength_eligible
+
+        if daily_plan.functional_strength_eligible and last_daily_readiness_survey.wants_functional_strength:
+            daily_plan.completed_functional_strength_sessions = athlete_stats.completed_functional_strength_sessions
+            if not daily_plan.functional_strength_completed and daily_plan.completed_functional_strength_sessions < 3:
+                fs_mapping = FSProgramGenerator()
+                daily_plan.functional_strength_session = fs_mapping.getFunctionalStrengthForSportPosition(
+                    athlete_stats.current_sport_name,
+                    athlete_stats.current_position)
 
         return daily_plan
 
