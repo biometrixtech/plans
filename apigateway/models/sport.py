@@ -47,6 +47,14 @@ class SportName(Enum):
     no_sport = None
 
 
+class NoSportPosition(Enum):
+    Power = 0
+    Strength = 1
+    Endurance = 2
+    Speed = 3
+    CrossTraining = 4
+
+
 class BaseballPosition(Enum):
     Catcher = 0
     Infielder = 1

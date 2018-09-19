@@ -1,7 +1,7 @@
 from models.stats import AthleteStats
 from datetime import datetime, timedelta
 import statistics
-from utils import parse_date, parse_datetime
+from utils import parse_date, parse_datetime, format_date
 
 
 class StatsProcessing(object):
@@ -252,6 +252,9 @@ class StatsProcessing(object):
 
     def is_athlete_functional_strength_eligible(self):
 
+        # completed yesterday?
+        completed_yesterday = self.functional_strength_yesterday()
+
         # onboarded > 2 weeks?
         two_plus_weeks_since_onboarding = self.is_athlete_two_weeks_from_onboarding()
 
@@ -262,10 +265,23 @@ class StatsProcessing(object):
         four_plus_training_sessions_logged = self.athlete_logged_enough_sessions()
 
         # wrapping it all up
-        if two_plus_weeks_since_onboarding and two_apar_sessions_completed and four_plus_training_sessions_logged:
+        if (two_plus_weeks_since_onboarding and two_apar_sessions_completed and four_plus_training_sessions_logged
+                and not completed_yesterday):
             return True
         else:
             return False
+
+    def functional_strength_yesterday(self):
+
+        yesterday = format_date(parse_date(self.event_date) - timedelta(1))
+
+        completed_sessions = [a for a in self.last_7_days_plans if a.functional_strength_completed if a is not None
+                              and a.event_Date == yesterday]
+
+        if len(completed_sessions) > 0:
+            return True
+
+        return False
 
     def athlete_logged_enough_sessions(self):
 
