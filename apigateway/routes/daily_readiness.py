@@ -84,17 +84,20 @@ def handle_daily_readiness_get():
     current_sport_name = None
     current_position = None
     functional_strength_eligible = False
+    completed_functional_strength_sessions = 0
 
     if athlete_stats is not None:
         current_sport_name = athlete_stats.current_sport_name.value if athlete_stats.current_position is not None else None
         current_position = athlete_stats.current_position.value if athlete_stats.current_position is not None else None
         functional_strength_eligible = athlete_stats.functional_strength_eligible
+        completed_functional_strength_sessions = athlete_stats.completed_functional_strength_sessions
 
     return {
                'body_parts': sore_body_parts,
                'current_position': current_position,
                'current_sport_name': current_sport_name,
-               'functional_strength_eligible': functional_strength_eligible
+               'functional_strength_eligible': functional_strength_eligible,
+               'completed_functional_strength_sessions': completed_functional_strength_sessions
            }, 200
 
 
