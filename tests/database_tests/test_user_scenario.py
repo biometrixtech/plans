@@ -665,7 +665,7 @@ def test_ak_create_daily_july_18():
 
     soreness_list = [TestUtilities().body_part_soreness(8, 2), TestUtilities().body_part_soreness(7, 2)]
 
-    post_survey = TestUtilities.get_post_survey(6, soreness_list)
+    post_survey = TestUtilities().get_post_survey(6, soreness_list)
     post_session_survey = \
         PostSessionSurvey(datetime.datetime(2018, 7, 18, 13, 1, 0).strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, None,
                           0, post_survey)

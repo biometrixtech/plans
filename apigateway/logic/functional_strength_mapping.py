@@ -31,11 +31,11 @@ class FSProgramGenerator(object):
 
         for ex in exercise_list:
             total = 0
-            if ex.exercise.unit_of_measure == 'seconds':
+            if ex.exercise.unit_of_measure.name == 'seconds':
                 total = ex.exercise.seconds_per_set * ex.sets_assigned
-            elif ex.exercise.unit_of_measure == 'count':
+            elif ex.exercise.unit_of_measure.name == 'count':
                 total = ex.exercise.seconds_per_rep * ex.reps_assigned
-            elif ex.exercise.unit_of_measure == 'yards':
+            elif ex.exercise.unit_of_measure.name == 'yards':
                 total = ex.exercise.seconds_per_set * ex.sets_assigned
             if ex.exercise.bilateral:
                 total = total * 2
@@ -61,10 +61,10 @@ class FSProgramGenerator(object):
         session.sport_name = sport_name
         session.position = position
 
-        if sport_name is None and position is None:
+        if sport_name.value is None and position is None:
             return session
 
-        if sport_name is None:
+        if sport_name.value is None:
             if position == sport.NoSportPosition.Power or position == sport.NoSportPosition.Strength:
 
                 session.warm_up.append(AssignedExercise("139", 1, 1))
@@ -143,57 +143,33 @@ class FSProgramGenerator(object):
             session.victory_lap.append(AssignedExercise("174", 4, 4))
 
         if sport_name == sport.SportName.basketball:
-            if position is not None and position == sport.BasketballPosition.Center:
+            # position doesn't matter
 
-                session.warm_up.append(AssignedExercise("139", 1, 1))
-                session.warm_up.append(AssignedExercise("140", 1, 2))
-                session.warm_up.append(AssignedExercise("141", 1, 3))
-                session.warm_up.append(AssignedExercise("142", 1, 4))
-                session.warm_up.append(AssignedExercise("143", 1, 5))
-                session.warm_up.append(AssignedExercise("144", 1, 6))
-                session.dynamic_movement.append(AssignedExercise("145", 2, 1))
-                session.dynamic_movement.append(AssignedExercise("146", 2, 2))
-                session.dynamic_movement.append(AssignedExercise("147", 2, 3))
-                session.dynamic_movement.append(AssignedExercise("148", 2, 4))
-                session.dynamic_movement.append(AssignedExercise("149", 2, 5))
-                session.dynamic_movement.append(AssignedExercise("150", 2, 6))
-                session.dynamic_movement.append(AssignedExercise("151", 2, 7))
-                session.stability_work.append(AssignedExercise("152", 3, 1))
-                session.stability_work.append(AssignedExercise("153", 3, 2))
-                session.stability_work.append(AssignedExercise("154", 3, 3))
-                session.stability_work.append(AssignedExercise("155", 3, 4))
-                session.victory_lap.append(AssignedExercise("156", 4, 1))
-                session.victory_lap.append(AssignedExercise("157", 4, 2))
-                session.victory_lap.append(AssignedExercise("158", 4, 3))
-                session.victory_lap.append(AssignedExercise("159", 4, 4))
-                session.victory_lap.append(AssignedExercise("160", 4, 5))
+            session.warm_up.append(AssignedExercise("175", 1, 1))
+            session.warm_up.append(AssignedExercise("176", 1, 2))
+            session.warm_up.append(AssignedExercise("177", 1, 3))
+            session.warm_up.append(AssignedExercise("178", 1, 4))
+            session.warm_up.append(AssignedExercise("179", 1, 5))
+            session.warm_up.append(AssignedExercise("162", 1, 6))
+            session.warm_up.append(AssignedExercise("180", 1, 7))
+            session.warm_up.append(AssignedExercise("181", 1, 8))
+            session.dynamic_movement.append(AssignedExercise("151", 2, 1))
+            session.dynamic_movement.append(AssignedExercise("149", 2, 2))
+            session.dynamic_movement.append(AssignedExercise("145", 2, 3))
+            session.dynamic_movement.append(AssignedExercise("182", 2, 4))
+            session.dynamic_movement.append(AssignedExercise("183", 2, 5))
+            session.dynamic_movement.append(AssignedExercise("184", 2, 6))
 
-            elif (position is not None and
-                  (position == sport.BasketballPosition.Forward or
-                   position == sport.BasketballPosition.Guard)):
+            session.stability_work.append(AssignedExercise("185", 3, 1))
+            session.stability_work.append(AssignedExercise("186", 3, 2))
+            session.stability_work.append(AssignedExercise("187", 3, 3))
+            session.stability_work.append(AssignedExercise("188", 3, 4))
+            session.stability_work.append(AssignedExercise("189", 3, 5))
 
-                session.warm_up.append(AssignedExercise("161", 1, 1))
-                session.warm_up.append(AssignedExercise("162", 1, 2))
-                session.warm_up.append(AssignedExercise("163", 1, 3))
-                session.warm_up.append(AssignedExercise("164", 1, 4))
-                session.warm_up.append(AssignedExercise("165", 1, 5))
-
-                session.dynamic_movement.append(AssignedExercise("166", 2, 1))
-                session.dynamic_movement.append(AssignedExercise("151", 2, 2))
-                session.dynamic_movement.append(AssignedExercise("149", 2, 3))
-                session.dynamic_movement.append(AssignedExercise("146", 2, 4))
-                session.dynamic_movement.append(AssignedExercise("148", 2, 5))
-
-                session.stability_work.append(AssignedExercise("168", 3, 1))
-                session.stability_work.append(AssignedExercise("169", 3, 2))
-                session.stability_work.append(AssignedExercise("170", 3, 3))
-                session.stability_work.append(AssignedExercise("152", 3, 4))
-                session.stability_work.append(AssignedExercise("171", 3, 5))
-
-                session.victory_lap.append(AssignedExercise("157", 4, 1))
-                session.victory_lap.append(AssignedExercise("172", 4, 2))
-                session.victory_lap.append(AssignedExercise("173", 4, 3))
-                session.victory_lap.append(AssignedExercise("174", 4, 4))
+            session.victory_lap.append(AssignedExercise("190", 4, 1))
+            session.victory_lap.append(AssignedExercise("191", 4, 2))
+            session.victory_lap.append(AssignedExercise("159", 4, 3))
+            session.victory_lap.append(AssignedExercise("192", 4, 4))
 
         if sport_name == sport.SportName.football:
             if (position is not None and (position == sport.FootballPosition.Kicker or

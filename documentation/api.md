@@ -59,7 +59,7 @@ The client __must__ submit a request body containing a JSON object with the foll
 {
 	"date_time": Datetime,
 	"user_id": Uuid,
-	"soreness": [{"body_part": number, "severity": number, "side": number}],
+	"soreness": [{"body_part": number, "severity": number, "side": number, "pain": boolean}],
 	"sleep_quality": number,
 	"readines": number
 }
@@ -69,6 +69,7 @@ The client __must__ submit a request body containing a JSON object with the foll
 * `body_part` __should__ be an integer between 0 and 17
 * `severity` __should__ be an integer between 1 and 5
 * `side` __should__ be an integer between 0 and 2
+* `pain` __should__ be a boolean to indicate whether it's pain or soreness.
 * `sleep_quality` __should__ be an integer between 1 and 10
 * `readiness` __should__ be an integer between 1 and 10
 
@@ -82,8 +83,8 @@ Authorization: eyJraWQ...ajBc4VQ
 	"date_time": "2018-07-03T10:42:20Z",
 	"user_id":"02cb7965-7921-493a-80d4-6b278c928fad",
 	"soreness":[
-			{"body_part": 8, "severity": 2, "side": 0},
-			{"body_part": 14, "severity": 3, "side": 0}
+			{"body_part": 8, "severity": 2, "side": 0, "pain": true},
+			{"body_part": 14, "severity": 3, "side": 0, "pain": false}
 		   ],
 	"sleep_quality":4,
 	"readiness":10
@@ -100,9 +101,9 @@ Authorization: eyJraWQ...ajBc4VQ
 ```
 
 
-#### Soreness from previous survey
+#### Soreness history
 
-This endpoint can be called to get the body parts where soreness was reported in the last report.
+This endpoint can be called to get the body parts where soreness was reported in the last report as well as the user's eligibility status for functional strength.
 
 ##### Query String
  
@@ -129,11 +130,16 @@ Authentication is required for this endpoint
 {
     "body_parts": [
     		{"body_part": number, "side": number},
-    		{"body_part": number,"side": number}
+    		{"body_part": number, "side": number}
     		]
+    "current_position": number,
+    "current_sport_name": number,
+    "functional_strength_eligible": boolean
 }
 ```
 * body_part will be a list of enumerated body parts (potentially empty).
+* current_position and current_sport_name will be enumeration
+* current_position exists but current_sport_name does not, then it's implied that the user wants functional strength for sport-less activity
 
 
 
@@ -158,7 +164,7 @@ The client __must__ submit a request body containing a JSON object with the foll
 	"session_type": number,
 	"survey": {
 		"RPE": number,
-		"soreness": [{"body_part": number, "severity": number, "side": number}]
+		"soreness": [{"body_part": number, "severity": number, "side": number, "pain", boolean}]
 	}
 }
 ```
@@ -183,8 +189,8 @@ Authorization: eyJraWQ...ajBc4VQ
             {
                "RPE": 4,
                "soreness": [
-               		{"body_part": 17.0, "severity": 5, "side": 0},
-               		{"body_part": 14, "severity": 3, "side": 0}
+               		{"body_part": 17.0, "severity": 5, "side": 0, pain: false},
+               		{"body_part": 14, "severity": 3, "side": 0, pain: false}
                		]
             }
             
@@ -205,7 +211,7 @@ Authorization: eyJraWQ...ajBc4VQ
 
 #### Create
 
-This endpoint can be called to create a new session to be added to either today's or yesterday's plan.
+This endpoint can be called to log a new session to today's plan and should include the session information as well as post-session surveys for the session being logged.
 
 ##### Query String
  
@@ -221,7 +227,12 @@ The client __must__ submit a request body containing a JSON object with the foll
     "sport_name": number,
     "session_type": number,
     "duration": number,
-    "description": string
+    "description": string,
+    "post_session_survey": {
+                            "event_date": Datetime
+                            "RPE": number,
+                            "soreness": [{"body_part": number, "severity": number, "side": number, "pain", boolean}]
+                        }
 }
 ```
 * `event_date` __should__ reflect the date and time the session is scheduled for.
@@ -231,18 +242,28 @@ The client __must__ submit a request body containing a JSON object with the foll
 * `description` is __optional__ parameter to provide short description of the session they're adding
 
 ```
-POST /plans/session HTTPS/1.1
-Host: apis.env.fathomai.com
+POST /plans/1_0/session HTTP/1.1
+Host: apis.dev.fathomai.com
 Content-Type: application/json
-Authorization: eyJraWQ...ajBc4VQ
+Authorization: eyJ0eX...xA8
+Cache-Control: no-cache
+Postman-Token: 4b6c3946-89fd-4cde-ae29-3a4984d5f373
 
 {
-    "user_id": "02cb7965-7921-493a-80d4-6b278c928fad",
-    "event_date": "2018-08-10T16:30:00Z",
+    "user_id":"a1233423-73d3-4761-ac92-89cc15921d34",
+    "event_date": "2018-09-14T19:54:48Z",
     "session_type": 0,
-    "sport_name": 5,
+    "sport_name": 0,
     "duration": 90,
-    "description": "Later Afteronoon Practice"
+    "description": "Evening Practice",
+    "post_session_survey": {
+               "event_date": "2018-09-14T19:54:48Z",
+               "RPE": 5,
+               "soreness": [
+                            {"body_part": 16, "severity": 3, "pain": false, "side": 1},
+                            {"body_part": 6, "severity": 2, "pain": false, "side": 2},
+                            ]
+            }
 }
 ```
 ##### Responses
@@ -364,6 +385,7 @@ The client __must__ submit a request body containing a JSON object with the foll
 ```
 {
     "user_id": Uuid,
+    "last_sensor_sync": Datetime
     "sessions": [Session]
 }
 ```
@@ -391,13 +413,14 @@ A `Session` object __will__ have the following schema:
 
 
 ```
-POST /plans/session/sensor_data HTTPS/1.1
+POST /plans/1_0/session/sensor_data HTTPS/1.1
 Host: apis.env.fathomai.com
 Content-Type: application/json
 Authorization: eyJraWQ...ajBc4VQ
 
 {
     "user_id": "02cb7965-7921-493a-80d4-6b278c928fad",
+    "last_sensor_sync": "2018-09-05T14:06:44Z",
     "sessions":
     [
         {

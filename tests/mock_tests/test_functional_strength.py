@@ -98,7 +98,7 @@ def test_generate_session_for_soccer():
 
 def test_generate_session_for_speed():
     mapping = FSProgramGenerator(exercise_library_datastore)
-    fs_session = mapping.getFunctionalStrengthForSportPosition(None, position=NoSportPosition.Speed)
+    fs_session = mapping.getFunctionalStrengthForSportPosition(SportName.no_sport, position=NoSportPosition.Speed)
     assert True is (len(fs_session.warm_up) > 0)
     assert True is (len(fs_session.dynamic_movement) > 0)
     assert True is (len(fs_session.stability_work) > 0)
