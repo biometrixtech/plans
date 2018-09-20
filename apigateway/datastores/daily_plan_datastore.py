@@ -211,6 +211,10 @@ def _recovery_session_from_mongodb(mongo_result):
                                            for s in mongo_result['activate_exercises']]
     recovery_session.integrate_exercises = [_assigned_exercises_from_mongodb(s)
                                             for s in mongo_result['integrate_exercises']]
+    recovery_session.inhibit_iterations = mongo_result.get("inhibit_iterations", 0)
+    recovery_session.lengthen_iterations = mongo_result.get("lengthen_iterations", 0)
+    recovery_session.activate_iterations = mongo_result.get("activate_iterations", 0)
+    recovery_session.integrate_iterations = mongo_result.get("integrate_iterations", 0)
     return recovery_session
 
 
