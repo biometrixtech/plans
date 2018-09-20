@@ -39,7 +39,7 @@ def handle_daily_readiness_create():
         athlete_stats = athlete_stats_store.get(athlete_id=daily_readiness.user_id)
 
         if athlete_stats is None:
-            athlete_stats = AthleteStats()
+            athlete_stats = AthleteStats(request.json['user_id'])
             athlete_stats.event_date = format_date(daily_readiness.event_date)
 
         if 'current_sport_name' in request.json:
