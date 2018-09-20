@@ -391,6 +391,10 @@ class RecoverySession(Serialisable):
         self.lengthen_target_minutes = 0
         self.activate_target_minutes = 0
         self.integrate_target_minutes = 0
+        self.inhibit_iterations = 0
+        self.lengthen_iterations = 0
+        self.activate_iterations = 0
+        self.integrate_iterations = 0
         self.inhibit_max_percentage = 0
         self.lengthen_max_percentage = 0
         self.activate_max_percentage = 0
@@ -416,6 +420,10 @@ class RecoverySession(Serialisable):
                'lengthen_exercises': [ex.json_serialise() for ex in self.lengthen_exercises],
                'activate_exercises': [ex.json_serialise() for ex in self.activate_exercises],
                'integrate_exercises': [ex.json_serialise() for ex in self.integrate_exercises],
+               'inhibit_iterations': self.inhibit_iterations,
+               'lengthen_iterations': self.lengthen_iterations,
+               'activate_iterations': self.activate_iterations,
+               'integrate_iterations': self.integrate_iterations,
                }
         return ret
 
@@ -440,6 +448,11 @@ class RecoverySession(Serialisable):
                                  exercise_assignments.lengthen_minutes +
                                  exercise_assignments.activate_minutes +
                                  exercise_assignments.integrate_minutes)
+
+        self.inhibit_iterations = exercise_assignments.inhibit_iterations
+        self.lengthen_iterations = exercise_assignments.lengthen_iterations
+        self.activate_iterations = exercise_assignments.activate_iterations
+        self.integrate_iterations = exercise_assignments.integrate_iterations
 
         num = 0
 
