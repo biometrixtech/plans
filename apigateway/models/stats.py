@@ -138,6 +138,6 @@ class AthleteStats(Serialisable):
             'functional_strength_eligible': self.functional_strength_eligible,
             'completed_functional_strength_sessions': self.completed_functional_strength_sessions,
             'current_sport_name': self.current_sport_name.value,
-            'current_position': self.current_position.value,
+            'current_position': self.current_position.value if self.current_position is not None else None,
         }
         return ret
