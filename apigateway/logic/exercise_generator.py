@@ -89,7 +89,7 @@ class ExerciseAssignments(object):
                     if assigned_exercise_list[i].exercise.bilateral:
                         bilateral_factor = 2
 
-                    if assigned_exercise_list[i].exercise.unit_of_measure == "seconds":
+                    if assigned_exercise_list[i].exercise.unit_of_measure.name == "seconds":
                         seconds_reduction_needed -= (assigned_exercise_list[i].exercise.seconds_per_set *
                                                      bilateral_factor)
                     else:

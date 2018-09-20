@@ -1,10 +1,6 @@
 from training_plan_management import TrainingPlanManager
-from tests.mocks.mock_exercise_datastore import ExerciseLibraryDatastore
 from tests.mocks.mock_daily_readiness_datastore import DailyReadinessDatastore
-from tests.mocks.mock_post_session_survey_datastore import PostSessionSurveyDatastore
-from tests.mocks.mock_daily_plan_datastore import DailyPlanDatastore
-from tests.mocks.mock_athlete_stats_datastore import AthleteStatsDatastore
-from tests.mocks.mock_completed_exercise_datastore import CompletedExerciseDatastore
+from tests.mocks.mock_datastore_collection import DatastoreCollection
 from models.session import PracticeSession, Game, StrengthConditioningSession
 from datetime import datetime, timedelta, date, time
 from utils import format_datetime
@@ -26,9 +22,7 @@ def create_plan():
 
     daily_readiness_datastore.side_load_surveys([survey])
 
-    mgr = TrainingPlanManager(user_id, ExerciseLibraryDatastore(), daily_readiness_datastore,
-                              PostSessionSurveyDatastore(), DailyPlanDatastore(), AthleteStatsDatastore(),
-                              CompletedExerciseDatastore())
+    mgr = TrainingPlanManager(user_id, DatastoreCollection())
 
     daily_plan = mgr.create_daily_plan()
 
@@ -49,9 +43,10 @@ def create_no_soreness_plan():
 
     daily_readiness_datastore.side_load_surveys([survey])
 
-    mgr = TrainingPlanManager(user_id, ExerciseLibraryDatastore(), daily_readiness_datastore,
-                              PostSessionSurveyDatastore(), DailyPlanDatastore(), AthleteStatsDatastore(),
-                              CompletedExerciseDatastore())
+    datastore_collection = DatastoreCollection()
+    datastore_collection.daily_readiness_datastore = daily_readiness_datastore
+
+    mgr = TrainingPlanManager(user_id, datastore_collection)
 
     daily_plan = mgr.create_daily_plan()
 

@@ -1,5 +1,6 @@
 from enum import Enum
 from serialisable import Serialisable
+from models.sport import SportName, NoSportPosition, BaseballPosition, BasketballPosition, FootballPosition, LacrossePosition, SoccerPosition
 
 
 class FitFatigueStatus(Enum):
@@ -40,6 +41,10 @@ class AthleteStats(Serialisable):
         self.external_strain = None
         self.internal_ramp = None
         self.external_ramp = None
+        self.functional_strength_eligible = False
+        self.completed_functional_strength_sessions = 0
+        self.current_sport_name = None
+        self.current_position = None
 
     def acute_to_chronic_external_ratio(self):
         if self.acute_external_total_load is not None and self.chronic_external_total_load is not None:
@@ -90,6 +95,23 @@ class AthleteStats(Serialisable):
         else:
             return None
 
+    def __setattr__(self, name, value):
+        if name == "current_sport_name":
+            value = SportName(value)
+        elif name == "current_position":
+            if self.current_sport_name.value is None and value is not None:
+                value = NoSportPosition(value)
+            elif self.current_sport_name == SportName.soccer:
+                value = SoccerPosition(value)
+            elif self.current_sport_name == SportName.basketball:
+                value = BasketballPosition(value)
+            elif self.current_sport_name == SportName.baseball_softball:
+                value = BaseballPosition(value)
+            elif self.current_sport_name == SportName.football:
+                value = FootballPosition(value)
+            elif self.current_sport_name == SportName.lacrosse:
+                value = LacrossePosition(value)
+        super().__setattr__(name, value)
 
     def json_serialise(self):
         ret = {
@@ -113,5 +135,9 @@ class AthleteStats(Serialisable):
             'chronic_external_high_intensity_load': self.chronic_external_high_intensity_load,
             'chronic_external_mod_intensity_load': self.chronic_external_mod_intensity_load,
             'chronic_external_low_intensity_load': self.chronic_external_low_intensity_load,
+            'functional_strength_eligible': self.functional_strength_eligible,
+            'completed_functional_strength_sessions': self.completed_functional_strength_sessions,
+            'current_sport_name': self.current_sport_name.value,
+            'current_position': self.current_position.value if self.current_position is not None else None,
         }
         return ret

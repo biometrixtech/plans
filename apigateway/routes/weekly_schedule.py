@@ -6,8 +6,7 @@ from decorators import authentication_required
 from exceptions import InvalidSchemaException
 from datastores.weekly_schedule_datastore import WeeklyCrossTrainingDatastore, WeeklyTrainingDatastore
 from models.weekly_schedule import WeeklySchedule
-from models.athlete import SportName
-
+from models.sport import SportName
 
 app = Blueprint('weekly_schedule', __name__)
 

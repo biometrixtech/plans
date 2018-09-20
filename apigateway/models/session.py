@@ -5,7 +5,7 @@ import datetime
 from serialisable import Serialisable
 import logic.exercise_generator as exercise
 from utils import format_datetime, parse_datetime
-from models.athlete import SportName
+from models.sport import SportName, NoSportPosition, BaseballPosition, BasketballPosition, FootballPosition, LacrossePosition, SoccerPosition
 
 class SessionType(Enum):
     practice = 0
@@ -293,6 +293,90 @@ class CorrectiveSession(Session):
             return True
         else:
             return False
+
+
+class FunctionalStrengthSession(Serialisable):
+
+    def __init__(self):
+        self.equipment_required = []
+        self.warm_up = []
+        self.dynamic_movement = []
+        self.stability_work = []
+        self.victory_lap = []
+        self.duration_minutes = 0
+        self.warm_up_target_minutes = 0
+        self.dynamic_movement_target_minutes = 0
+        self.stability_work_target_minutes = 0
+        self.victory_lap_target_minutes = 0
+        self.warm_up_max_percentage = 0
+        self.dynamic_movement_max_percentage = 0
+        self.stability_work_max_percentage = 0
+        self.victory_lap_max_percentage = 0
+        self.completed = False
+        self.sport_name = None
+        self.position = None
+
+
+    def __setattr__(self, name, value):
+        if name == "sport_name":
+            value = SportName(value)
+        elif name == "position":
+            if self.sport_name == SportName.no_sport and value is not None:
+                value = NoSportPosition(value)
+            elif self.sport_name == SportName.soccer:
+                value = SoccerPosition(value)
+            elif self.sport_name == SportName.basketball:
+                value = BasketballPosition(value)
+            elif self.sport_name == SportName.baseball_softball:
+                value = BaseballPosition(value)
+            elif self.sport_name == SportName.football:
+                value = FootballPosition(value)
+            elif self.sport_name == SportName.lacrosse:
+                value = LacrossePosition(value)
+        super().__setattr__(name, value)
+
+    def json_serialise(self):
+            ret = {'equipment_required':  [e for e in self.equipment_required],
+                   'minutes_duration': self.duration_minutes,
+                   'completed': self.completed,
+                   'warm_up': [ex.json_serialise() for ex in self.warm_up],
+                   'dynamic_movement': [ex.json_serialise() for ex in self.dynamic_movement],
+                   'stability_work': [ex.json_serialise() for ex in self.stability_work],
+                   'victory_lap': [ex.json_serialise() for ex in self.victory_lap],
+                   'sport_name': self.sport_name.value,
+                   'position': self.position.value
+                   }
+            return ret
+
+
+class CompletedFunctionalStrengthSession(Serialisable):
+
+    def __init__(self, user_id, event_date, sport_name, position=None):
+        self.user_id = user_id
+        self.event_date = event_date
+        self.sport_name = sport_name,
+        self.position = position
+
+    def json_serialise(self):
+        ret = {'user_id': self.user_id,
+               'sport_name': self.sport_name,
+               'position': self.position,
+               'event_date': format_datetime(self.event_date),
+               }
+        return ret
+
+
+class CompletedFunctionalStrengthSummary(Serialisable):
+
+    def __init__(self, user_id, completed_count):
+        self.user_id = user_id
+        self.completed_count = completed_count
+
+    def json_serialise(self):
+        ret = {'user_id': self.user_id,
+               'completed_count': self.completed_count,
+               }
+        return ret
 
 
 class RecoverySession(Serialisable):
