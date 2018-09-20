@@ -51,8 +51,8 @@ def test_get_daily_plan_doesnt_exist():
 
 def test_get_post_session_surveys():
     athlete_dao = PostSessionSurveyDatastore()
-    surveys = athlete_dao.get("morning_practice_2", "2018-07-10", "2018-07-11")
-    assert None is surveys
+    surveys = athlete_dao.get("morning_practice_2", datetime(2018, 7, 10, 0, 0, 0), datetime(2018, 7, 11, 0, 0, 0))
+    assert len(surveys) == 2
 
 def test_put_completed_exercises():
     data_store = CompletedExerciseDatastore()

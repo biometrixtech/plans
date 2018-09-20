@@ -1,0 +1,55 @@
+Numeric ID,Display Name,Exercise,PHASE,Muscle Group / Joint,Inhibit,Lengthen,Activate,Integrate,DOSAGE,min Sets,max Sets,min Reps,max Reps,Bilateral (Y/N),Progression Interval (e.g. 2 reps),Progression Cadence (e.g. 2 exposures),Minimum Exposures to Maintain Stage,Unit of Measure for Reps,Rest Between Sets (seconds),Time Per Set (seconds),Time Per Rep (seconds),Progresses To,,Technical Difficulty,Equipment required,Present in Mapping Logic,Warm-Up,Dynamic Movement,Stability Work,Optional Drills
+139,Walking Hamstring Scoops,Walking Hamstring Scoops,,,,,,,,1,1,12,12,Y,0,,,yards,0,30,,,,Beginner,none,x,x,,,
+140,Knee Hug to Lunge with Reach,Knee Hug to Lunge with Reach,,,,,,,,1,1,12,12,Y,0,,,yards,0,30,,,,Beginner,none,x,x,,,
+141,Walking Superman,Walking Superman,,,,,,,,1,1,12,12,Y,0,,,yards,0,30,,,,Beginner,none,x,x,,,
+142,Hurdle Walks (In),Hurdle Walks (In),,,,,,,,1,1,12,12,Y,0,,,yards,0,30,,,,Beginner,none,x,x,,,
+143,Hurdle Walks (Out),Hurdle Walks (Out),,,,,,,,1,1,12,12,Y,0,,,yards,0,30,,,,Beginner,none,x,x,,,
+144,Iron Cross,Iron Cross,,,,,,,,1,1,10,10,Y,0,,,count,0,,3,,,Beginner,none,x,x,,,
+145,Mini Skips,Mini Skips,,,,,,,,1,1,12,12,Y,0,,,yards,0,30,,,,Beginner,none,x,,x,,
+146,Skips for Height,Skips for Height,,,,,,,,1,1,12,12,Y,0,,,yards,0,30,,,,Beginner,none,x,,x,,
+147,Butt Kicks,Butt Kicks,,,,,,,,1,1,12,12,Y,0,,,yards,0,30,,,,Beginner,none,x,,x,,
+148,Lateral Shuffles,Lateral Shuffles,,,,,,,,1,1,12,12,Y,0,,,yards,0,30,,,,Beginner,none,x,,x,,
+149,Carioca,Carioca,,,,,,,,1,1,12,12,Y,0,,,yards,0,30,,,,Beginner,none,x,,x,,
+150,Backward Run,Backward Run,,,,,,,,1,1,12,12,Y,0,,,yards,0,30,,,,Beginner,none,x,,x,,
+151,High Knees,High Knees,,,,,,,,1,1,12,12,Y,0,,,yards,0,30,,,,Beginner,none,x,,x,,
+152,Ice Skaters,Ice Skaters,,,,,,,,1,1,12,12,Y,0,,,yards,0,30,,,,Beginner,none,x,,,x,
+153,Continuous Jumps,Continuous Jumps,,,,,,,,1,1,12,12,N,0,,,yards,0,30,,,,Beginner,none,x,,,x,
+154,Long Jump,Long Jump,,,,,,,,1,1,12,12,N,0,,,yards,0,30,,,,Beginner,none,x,,,x,
+155,Triple Hop to Stabilization,Triple Hop to Stabilization,,,,,,,,1,1,12,12,Y,0,,,yards,0,30,,,,Beginner,none,x,,,x,
+156,Weaving,Weaving,,,,,,,,1,1,2,2,N,0,,,count,0,,30,,,Beginner,none,x,,,,x
+157,Box Drill,Box Drill,,,,,,,,1,1,2,2,N,0,,,count,0,,30,,,Beginner,none,x,,,,x
+158,Field Sprints,Field Sprints,,,,,,,,1,1,3,3,N,0,,,count,0,,30,,,Beginner,none,x,,,,x
+159,Field Bounds,Field Bounds,,,,,,,,1,1,3,3,N,0,,,count,0,,30,,,Beginner,none,x,,,,x
+160,Plant & Cuts,Plant & Cuts,,,,,,,,1,1,3,3,N,0,,,count,0,,30,,,Beginner,none,x,,,,x
+161,Leg Swings,Leg Swings,,,,,,,,1,1,12,12,Y,0,,,count,0,,30,,,Beginner,none,x,x,,,
+162,Running Arm Cricles,Running Arm Cricles,,,,,,,,1,1,12,12,Y,0,,,yards,0,30,,,,Beginner,none,x,x,,,
+163,Low Lateral Squat,Low Lateral Squat,,,,,,,,1,1,12,12,Y,0,,,count,0,,30,,,Beginner,none,x,x,,,
+164,Lunge with Rotation,Lunge with Rotation,,,,,,,,1,1,12,12,Y,0,,,yards,0,60,,,,Beginner,none,x,x,,,
+165,Reverse Lunge with Reach,Reverse Lunge with Reach,,,,,,,,1,1,12,12,Y,0,,,yards,0,60,,,,Beginner,none,x,x,,,
+166,Quick Stance Changes,Quick Stance Changes,,,,,,,,1,1,30,30,Y,0,,,seconds,0,60,,,,Beginner,none,x,,x,,
+167,Lateral Dives,Lateral Dives,,,,,,,,1,1,12,12,Y,0,,,count,0,60,0,,,Beginner,none,x,,x,,
+168,Ankle Poppers,Ankle Poppers,,,,,,,,1,1,30,30,N,0,,,seconds,0,30,,,,Beginner,none,x,,,x,
+169,Star Jumps,Star Jumps,,,,,,,,1,1,10,10,N,0,,,count,0,,3,,,Beginner,none,x,,,x,
+170,DL Lateral Jumps,DL Lateral Jumps,,,,,,,,1,1,15,15,Y,0,,,count,0,,3,,,Beginner,none,x,,,x,
+171,Single Leg Hop to Balance,Single Leg Hop to Balance,,,,,,,,1,1,12,12,Y,0,,,yards,0,30,,,,Beginner,none,x,,,x,
+172,X Drill,X Drill,,,,,,,,1,1,2,2,N,0,,,count,0,,30,,,Beginner,none,x,,,,x
+173,N Drill,N Drill,,,,,,,,1,1,2,2,N,0,,,count,0,,30,,,Beginner,none,x,,,,x
+174,Bear Crawls,Bear Crawls,,,,,,,,1,1,12,12,N,0,,,yards,0,60,,,,Beginner,none,x,,,,x
+175,Knee Hugs,Knee Hugs,,,,,,,,1,1,30,30,Y,0,,,seconds,0,30,,,,Beginner,none,x,x,,,
+176,Quad Stretch w/ Toe Raise,Quad Stretch w/ Toe Raise,,,,,,,,1,1,30,30,Y,0,,,seconds,0,30,,,,Beginner,none,x,x,,,
+177,Frankensteins,Frankensteins,,,,,,,,1,1,12,12,Y,0,,,yards,0,30,,,,Beginner,none,x,x,,,
+178,Scorpions,Scorpions,,,,,,,,1,1,10,10,Y,0,,,count,0,,3,,,Beginner,none,x,x,,,
+179,Hip Circles,Hip Circles,,,,,,,,1,1,30,30,N,0,,,seconds,0,30,,,,Beginner,none,x,x,,,
+180,Lateral Lunge with Arm Raise,Lateral Lunge with Arm Raise,,,,,,,,1,1,10,10,Y,0,,,count,0,,3,,,Beginner,towel/band,x,x,,,
+181,Trunk Sidebending with Arm Raise,Trunk Sidebending with Arm Raise,,,,,,,,1,1,10,10,Y,0,,,count,0,,3,,,Beginner,towel/band,x,x,,,
+182,Squats with Toe Raise,Squats with Toe Raise,,,,,,,,1,1,15,15,N,0,,,count,0,,3,,,Beginner,none,x,,x,,
+183,Jumping Lunges,Jumping Lunges,,,,,,,,1,1,12,12,Y,0,,,count,0,,3,,,Beginner,none,x,,x,,
+184,Banded Calf Raises,Banded Calf Raises,,,,,,,,1,1,15,15,Y,0,,,count,0,,3,,,Beginner,band,x,,x,,
+185,Standing Banded Oblique Twists,Standing Banded Oblique Twists,,,,,,,,1,1,12,12,Y,0,,,count,0,,3,,,Beginner,band,x,,,x,
+186,Banded Plank Step-Outs,Banded Plank Step-Outs,,,,,,,,1,1,12,12,Y,0,,,count,0,,3,,,Beginner,band,x,,,x,
+187,Lunge to Knee Drive,Lunge to Knee Drive,,,,,,,,1,1,12,12,Y,0,,,count,0,,3,,,Beginner,none,x,,,x,
+188,Single Leg V-Jumps,Single Leg V-Jumps,,,,,,,,1,1,30,30,Y,0,,,seconds,0,30,,,,Beginner,none,x,,,x,
+189,Single Leg Toe Touches,Single Leg Toe Touches,,,,,,,,1,1,12,12,Y,0,,,count,0,,3,,,Beginner,none,x,,,x,
+190,Star Drill,Star Drill,,,,,,,,1,1,3,3,N,0,,,count,0,,10,,,Beginner,none,x,,,,x
+191,Dot Drill,Dot Drill,,,,,,,,1,1,3,3,N,0,,,count,0,,10,,,Beginner,none,x,,,,x
+192,Triple Extension Max Jump,Triple Extension Max Jump,,,,,,,,1,1,3,3,N,0,,,count,0,,10,,,Beginner,none,x,,,,x

@@ -25,6 +25,9 @@ class DailyPlanDatastore(object):
     def _query_mongodb(self, user_id, start_date, end_date):
         return self.daily_plans
 
+    def get_last_sensor_sync(self, user_id, event_date):
+        return None
+
     def _put_mongodb(self, item):
 
         pass

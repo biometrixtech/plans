@@ -80,6 +80,8 @@ app.register_blueprint(daily_schedule_routes, url_prefix='/schedule')
 from routes.active_recovery import app as active_recovery_routes
 app.register_blueprint(active_recovery_routes, url_prefix='/active_recovery')
 
+from routes.functional_strength import app as functional_strength_routes
+app.register_blueprint(functional_strength_routes, url_prefix='/functional_strength')
 
 from routes.misc import app as misc_routes
 app.register_blueprint(misc_routes, url_prefix='/misc')
