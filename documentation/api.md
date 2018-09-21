@@ -288,6 +288,105 @@ Postman-Token: 4b6c3946-89fd-4cde-ae29-3a4984d5f373
 }
 ```
 
+#### Get Typical Sessions
+
+This endpoint can be called to get the typical sessions the user has logged in the past two weeks ordered by their occurence. Only the top four most occuring session types will be returned.
+
+##### Query String
+ 
+The client __must__ submit a request to the endpoint `/plans/version/session/typical`. The request method __must__ be `POST`.
+
+##### Request
+
+The client __must__ submit a request body containing a JSON object with the following schema:
+```
+{
+    "user_id": Uuid,
+    "event_date": Datetime
+}
+```
+* `event_date` __should__ reflect the date and time when the call is made
+
+```
+POST /plans/version/session/typical HTTP/1.1
+Host: apis.dev.fathomai.com
+Content-Type: application/json
+Authorization: eyJ0eX...xA8
+Cache-Control: no-cache
+Postman-Token: 4b6c3946-89fd-4cde-ae29-3a4984d5f373
+
+{
+    "user_id":"a1233423-73d3-4761-ac92-89cc15921d34",
+    "event_date": "2018-09-14T19:54:48Z"
+
+}
+```
+##### Responses
+ 
+ If the request was successful, the Service __will__ respond with HTTP Status `200 OK`, with a body with the following syntax:
+ 
+```
+{
+    "typical_sessions": [session, session]
+}
+```
+each session object will be of the following schema
+
+``` 
+    {
+            "count": 4,
+            "duration": 25,
+            "event_date": "2018-09-19T15:30:00Z",
+            "session_type": 0,
+            "sport_name": 5,
+            "strength_and_conditioning_type": null
+        }
+```
+
+#### Mark no sessions planned
+
+This endpoint can be called to notify that no sessios are planned for the day.
+
+##### Query String
+ 
+The client __must__ submit a request to the endpoint `/plans/version/session/no_session`. The request method __must__ be `POST`.
+
+##### Request
+
+The client __must__ submit a request body containing a JSON object with the following schema:
+```
+{
+    "user_id": Uuid,
+    "event_date": Datetime
+}
+```
+* `event_date` __should__ reflect the date and time when the call is made
+
+```
+POST /plans/version/session/no_session HTTP/1.1
+Host: apis.dev.fathomai.com
+Content-Type: application/json
+Authorization: eyJ0eX...xA8
+Cache-Control: no-cache
+Postman-Token: 4b6c3946-89fd-4cde-ae29-3a4984d5f373
+
+{
+    "user_id":"a1233423-73d3-4761-ac92-89cc15921d34",
+    "event_date": "2018-09-14T19:54:48Z"
+
+}
+```
+##### Responses
+ 
+ If the request was successful, the Service __will__ respond with HTTP Status `200 OK`, with a body with the following syntax:
+ 
+```
+{
+    "daily_plan": daily_plan
+}
+```
+where `daily_plan` will have the standard schema.
+
 #### Delete
 
 This endpoint can be called to delete existing externally regimented session from today or yesterday's plan.
@@ -479,6 +578,7 @@ The client __must__ submit a request body containing a JSON object with the foll
     "user_id": Uuid,
     "event_date": Datetime,
     "recovery_type": string
+    "completed_exercises": [string]
 }
 ```
 * `event_date` __should__ be the time when user completes the session.
@@ -492,7 +592,8 @@ Authorization: eyJraWQ...ajBc4VQ
 {
     "user_id":"a1233423-73d3-4761-ac92-89cc15921d34",
     "event_date": "2018-09-21T17:53:39Z",
-    "recovery_type": "post"
+    "recovery_type": "post",
+    "completed_exercises": ["3", "5", "20", "142"]
 }
 ```
 ##### Responses
@@ -524,7 +625,8 @@ The client __must__ submit a request body containing a JSON object with the foll
 ```
 {
     "user_id": Uuid,
-    "event_date": Datetime
+    "event_date": Datetime,
+    "completed_exercises": [string]
 }
 ```
 * `event_date` __should__ be the time when user completes the session.
@@ -537,7 +639,8 @@ Authorization: eyJraWQ...ajBc4VQ
 
 {
     "user_id":"a1233423-73d3-4761-ac92-89cc15921d34",
-    "event_date": "2018-09-21T17:53:39Z"
+    "event_date": "2018-09-21T17:53:39Z",
+    "completed_exercises": ["3", "5", "20", "142"]
 }
 ```
 ##### Responses
