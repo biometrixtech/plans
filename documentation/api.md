@@ -76,10 +76,10 @@ The client __must__ submit a request body containing a JSON object with the foll
 * `sleep_quality` __should__ be an integer between 1 and 10
 * `readiness` __should__ be an integer between 1 and 10
 * `wants_functional_strength` is optional argument only for the users that are eligible for functional strength and should be included once they are eligible
-* `current_sport` __should__ be integer representing SportName enumeration
+* `current_sport_name` __should__ be integer representing SportName enumeration
 * `current_position` __should__ be integer representating position enumeration for specific sport or NoSportPosition enumeration
 
-Note: `current_sport` and `current_position` are only required when the user is first eligible for functional strength. `current_position` should always be present. `current_sport` is optional and if it's absent, NoSportPosition is assumed for `current_position`.
+Note: `current_sport_name` and `current_position` are only required when the user is first eligible for functional strength. `current_position` should always be present. `current_sport` is optional and if it's absent, NoSportPosition is assumed for `current_position`.
 
 ```
 POST /plans/version/daily_readiness HTTPS/1.1
@@ -94,7 +94,7 @@ Authorization: eyJraWQ...ajBc4VQ
     "sleep_quality":4,
     "readiness":4,
     "wants_functional_strength": true,
-    "current_sport": 14,
+    "current_sport_name": 14,
     "current_position": 1
 }
 ```
