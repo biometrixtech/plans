@@ -57,7 +57,7 @@ class StatsProcessing(object):
         athlete_stats.completed_functional_strength_sessions = self.get_completed_functional_strength_sessions()
         current_athlete_stats = self.athlete_stats_datastore.get(athlete_id=self.athlete_id)
         if current_athlete_stats is not None and athlete_stats.functional_strength_eligible:
-            athlete_stats.current_sport = current_athlete_stats.current_sport
+            athlete_stats.current_sport_name = current_athlete_stats.current_sport_name
             athlete_stats.current_position = current_athlete_stats.current_position
         self.athlete_stats_datastore.put(athlete_stats)
 
@@ -280,7 +280,7 @@ class StatsProcessing(object):
         yesterday = format_date(parse_date(self.event_date) - timedelta(1))
 
         completed_sessions = [a for a in self.last_7_days_plans if a.functional_strength_completed if a is not None
-                              and a.event_Date == yesterday]
+                              and a.event_date == yesterday]
 
         if len(completed_sessions) > 0:
             return True
