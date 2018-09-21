@@ -22,8 +22,7 @@ def handle_functional_strength_update():
         raise InvalidSchemaException('Missing required parameter event_date')
     else:
         event_date = parse_datetime(request.json['event_date'])
-    if 'start_date' in request.json:
-        fs_start_date = format_datetime(parse_datetime(request.json['start_date']))
+    fs_start_date = format_datetime(parse_datetime(request.json['start_date'])) if 'start_date' in request.json else None
     try:
         user_id = request.json['user_id']
     except:
