@@ -240,6 +240,7 @@ def _functional_strength_session_from_mongodb(mongo_result):
     functional_strength_session.event_date = _key_present("event_date", mongo_result)
     functional_strength_session.sport_name = _key_present("sport_name", mongo_result)
     functional_strength_session.position = _key_present("position", mongo_result)
+    return functional_strength_session
 
 def _assigned_exercises_from_mongodb(mongo_result):
 
