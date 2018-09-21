@@ -226,7 +226,7 @@ def _functional_strength_session_from_mongodb(mongo_result):
                                           for s in mongo_result['stability_work']]
     functional_strength_session.victory_lap = [_assigned_exercises_from_mongodb(s)
                                           for s in mongo_result['victory_lap']]
-    functional_strength_session.duration_minutes = _key_present("duration_minutes", mongo_result)
+    functional_strength_session.duration_minutes = _key_present("minutes_duration", mongo_result)
     functional_strength_session.warm_up_target_minutes = _key_present("warm_up_target_minutes", mongo_result)
     functional_strength_session.dynamic_movement_target_minutes = _key_present("dynamic_movement_target_minutes", mongo_result)
     functional_strength_session.stability_work_target_minutes = _key_present("stability_work_target_minutes", mongo_result)
