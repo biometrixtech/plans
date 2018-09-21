@@ -313,6 +313,8 @@ class FunctionalStrengthSession(Serialisable):
         self.stability_work_max_percentage = 0
         self.victory_lap_max_percentage = 0
         self.completed = False
+        self.start_date = None
+        self.event_date = None
         self.sport_name = None
         self.position = None
 
@@ -333,12 +335,17 @@ class FunctionalStrengthSession(Serialisable):
                 value = FootballPosition(value)
             elif self.sport_name == SportName.lacrosse:
                 value = LacrossePosition(value)
+        elif name in ['start_date', 'event_date']:
+            if not isinstance(value, datetime.datetime) and value is not None:
+                value = parse_datetime(value)
         super().__setattr__(name, value)
 
     def json_serialise(self):
             ret = {'equipment_required':  [e for e in self.equipment_required],
                    'minutes_duration': self.duration_minutes,
                    'completed': self.completed,
+                   'start_date': format_datetime(self.start_date),
+                   'event_date': format_datetime(self.event_date),
                    'warm_up': [ex.json_serialise() for ex in self.warm_up],
                    'dynamic_movement': [ex.json_serialise() for ex in self.dynamic_movement],
                    'stability_work': [ex.json_serialise() for ex in self.stability_work],
@@ -395,20 +402,26 @@ class RecoverySession(Serialisable):
         self.lengthen_max_percentage = 0
         self.activate_max_percentage = 0
         self.integrate_max_percentage = 0
-        self.start_time = None
-        self.end_time = None
+        self.start_date = None
+        self.event_date = None
         self.impact_score = 0
         self.why_text = ""
         self.goal_text = ""
         self.completed = False
         self.display_exercises = False
 
+    def __setattr__(self, name, value):
+        if name in ['start_date', 'event_date']:
+            if not isinstance(value, datetime.datetime) and value is not None:
+                value = parse_datetime(value)
+        super().__setattr__(name, value)
+
     def json_serialise(self):
         ret = {'minutes_duration': self.duration_minutes,
                'why_text': self.why_text,
                'goal_text': self.goal_text,
-               'start_time': str(self.start_time),
-               'end_time': str(self.end_time),
+               'start_date': format_datetime(self.start_date),
+               'event_date': format_datetime(self.event_date),
                'impact_score': self.impact_score,
                'completed': self.completed,
                'display_exercises': self.display_exercises,

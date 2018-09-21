@@ -195,8 +195,8 @@ def _external_session_from_mongodb(mongo_result, session_type):
 def _recovery_session_from_mongodb(mongo_result):
 
     recovery_session = session.RecoverySession()
-    recovery_session.start_time = _key_present("start_time", mongo_result)
-    recovery_session.end_time = _key_present("end_time", mongo_result)
+    recovery_session.start_date = _key_present("start_date", mongo_result)
+    recovery_session.event_date = _key_present("event_date", mongo_result)
     recovery_session.impact_score = _key_present("impact_score", mongo_result)
     recovery_session.goal_text = _key_present("goal_text", mongo_result)
     recovery_session.why_text = _key_present("why_text", mongo_result)
@@ -236,6 +236,8 @@ def _functional_strength_session_from_mongodb(mongo_result):
     functional_strength_session.stability_work_max_percentage = _key_present("stability_work_max_percentage", mongo_result)
     functional_strength_session.victory_lap_max_percentage = _key_present("victory_lap_max_percentage", mongo_result)
     functional_strength_session.completed = mongo_result.get("completed", False)
+    functional_strength_session.start_date = _key_present("start_date", mongo_result)
+    functional_strength_session.event_date = _key_present("event_date", mongo_result)
     functional_strength_session.sport_name = _key_present("sport_name", mongo_result)
     functional_strength_session.position = _key_present("position", mongo_result)
 

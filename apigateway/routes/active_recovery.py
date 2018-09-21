@@ -22,6 +22,8 @@ def handle_active_recovery_update():
         raise InvalidSchemaException('Missing required parameter event_date')
     else:
         event_date = parse_datetime(request.json['event_date'])
+    if 'start_date' in request.json:
+        recovery_start_date = format_datetime(parse_datetime(request.json['start_date']))
     try:
         user_id = request.json['user_id']
     except:
@@ -45,11 +47,15 @@ def handle_active_recovery_update():
     if recovery_type == 'pre':
         plan.pre_recovery_completed = True # plan
         plan.pre_recovery.completed = True # recovery
+        plan.pre_recovery.start_date = recovery_start_date
+        plan.pre_recovery.event_date = recovery_event_date
         plan.pre_recovery.display_exercises = False
 
     elif recovery_type == 'post':
         plan.post_recovery_completed = True # plan
         plan.post_recovery.completed = True # recovery
+        plan.post_recovery.start_time = recovery_start_date
+        plan.post_recovery.end_time = recovery_event_date
         plan.post_recovery.display_exercises = False
 
     store.put(plan)

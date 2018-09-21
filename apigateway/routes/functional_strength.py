@@ -22,6 +22,8 @@ def handle_functional_strength_update():
         raise InvalidSchemaException('Missing required parameter event_date')
     else:
         event_date = parse_datetime(request.json['event_date'])
+    if 'start_date' in request.json:
+        fs_start_date = format_datetime(parse_datetime(request.json['start_date']))
     try:
         user_id = request.json['user_id']
     except:
@@ -39,6 +41,10 @@ def handle_functional_strength_update():
 
     plan = store.get(user_id=user_id, start_date=plan_event_date, end_date=plan_event_date)[0]
 
+    if plan.functional_strength_session is not None:
+        plan.functional_strength_session.completed = True
+        plan.functional_strength_session.start_date = fs_start_date
+        plan.functional_strength_session.event_date = fs_event_date
     plan.functional_strength_completed = True
     plan.completed_functional_strength_sessions = plan.completed_functional_strength_sessions + 1
 
