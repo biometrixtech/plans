@@ -55,6 +55,11 @@ class StatsProcessing(object):
         athlete_stats = self.calc_training_volume_metrics(athlete_stats)
         athlete_stats.functional_strength_eligible = self.is_athlete_functional_strength_eligible()
         athlete_stats.completed_functional_strength_sessions = self.get_completed_functional_strength_sessions()
+        athlete_stats_store = AthleteStatsDatastore()
+        current_athlete_stats = athlete_stats_store.get(athlete_id=daily_readiness.user_id)
+        if current_athlete_stats is not None and athlete_stats.functional_strength_eligible:
+            athlete_stats.current_sport = current_athlete_stats.current_sport
+            athlete_stats.current_position = current_athlete_stats.current_position
         self.athlete_stats_datastore.put(athlete_stats)
 
     def calc_training_volume_metrics(self, athlete_stats):
