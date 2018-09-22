@@ -206,7 +206,7 @@ Resources:
         Type: "AWS::IAM::Policy"
         Properties:
             PolicyName: { "Fn::Sub": "plans-${Environment}-asyncpush" }
-            Roles: [ { 'Fn::GetAtt': [ 'ApiGatewayLambdaExecutionRole', 'Arn' ] } ]
+            Roles: [ { Ref: 'ApiGatewayLambdaExecutionRole' } ]
             PolicyDocument:
                 Version: "2012-10-17"
                 Statement:
