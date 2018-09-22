@@ -116,8 +116,6 @@ def handler(event, context):
     if 'eventSourceARN' in event['requestContext'] and 'sqs' in event['requestContext']['eventSourceARN']:
         # An asynchronous invocation from SQS
         print('Asynchronous invocation')
-        event = json.loads(event['Records'][0]['body'])
-
         event['headers']['X-Source'] = 'sqs'
 
         if 'X-Execute-At' in event['headers']:
