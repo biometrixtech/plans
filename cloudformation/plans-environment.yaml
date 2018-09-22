@@ -34,7 +34,7 @@ Parameters:
 Mappings:
     TemplateVersion:
         Self: { Commit: "da39a3ee5e6b4b0d3255bfef95601890afd80709" }
-        Infrastructure: { Commit: "1aced7a6371dd077a92cae552e3f659174aa578d" }
+        Infrastructure: { Commit: "INFRASTRUCTUREREF" }
 
 Metadata:
     "AWS::CloudFormation::Interface":
@@ -201,6 +201,19 @@ Resources:
                 TemplateVersion: { "Fn::FindInMap": [ "TemplateVersion", "Infrastructure", "Commit" ] }
             } ] }
             TimeoutInMinutes: 30
+
+    AsyncPushPolicy:
+        Type: "AWS::IAM::Policy"
+        Properties:
+            PolicyName: { "Fn::Sub": "plans-${Environment}-asyncpush" }
+            Roles: [ { 'Fn::GetAtt': [ 'ApiGatewayLambdaExecutionRole', 'Arn' ] } ]
+            PolicyDocument:
+                Version: "2012-10-17"
+                Statement:
+                  - Action:
+                      - "sqs:SendMessage"
+                    Effect: "Allow"
+                    Resource: "arn:aws:sqs:us-west-2:887689817172:plans-dev-apigateway-async"
 
     ##########################################################################################################
     ## MONITORING
