@@ -70,7 +70,9 @@ def validate_uuid4(uuid_string):
         return False
 
 
-def run_async(method, endpoint, body=None):
+def run_async(method, endpoint, body=None, timestamp=None):
+    if timestamp is None:
+        timestamp = datetime.datetime.now()
     endpoint = endpoint.strip('/')
     payload = {
         "path": f"/plans/{os.environ['API_VERSION']}/{endpoint}",
@@ -83,6 +85,7 @@ def run_async(method, endpoint, body=None):
             "User-Agent": "Biometrix/Plans API",
             "X-Forwarded-Port": "443",
             "X-Forwarded-Proto": "https",
+            "X-Execute-At": format_datetime(timestamp),
             "X-Api-Version": os.environ['API_VERSION'],
         },
         "queryStringParameters": None,
@@ -94,6 +97,7 @@ def run_async(method, endpoint, body=None):
     }
 
     boto3.client('sqs').send_message(
-        QueueUrl='https://sqs.amazonaws.com/{AWS_ACCOUNT_ID}/{AWS_REGION}.{SERVICE}-{ENVIRONMENT}-apigateway-async'.format(**os.environ),
+        QueueUrl='https://sqs.{AWS_REGION}.amazonaws.com/{AWS_ACCOUNT_ID}/{SERVICE}-{ENVIRONMENT}-apigateway-async'.format(**os.environ),
         MessageBody=json.dumps(payload),
+        DelaySeconds=max(0, min(int((timestamp - datetime.datetime.now()).total_seconds()), 15*60)),
     )
