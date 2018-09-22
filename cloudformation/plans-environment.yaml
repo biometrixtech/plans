@@ -115,10 +115,6 @@ Resources:
                           - "secretsmanager:GetSecretValue"
                         Effect: "Allow"
                         Resource: { "Fn::Sub": "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:plans/${Environment}/*" }
-                      - Action:
-                          - "sqs:SendMessage"
-                        Effect: "Allow"
-                        Resource: { "Fn::GetAtt": [ "AsyncSqsQueue", "Arn" ] }
                       - Effect: "Allow"
                         Action:
                           - "iot:Publish"
@@ -164,7 +160,6 @@ Resources:
                     SERVICE: 'plans'
                     ENVIRONMENT: { Ref: 'Environment' }
                     AWS_ACCOUNT_ID: { Ref: "AWS::AccountId" }
-                    ASYNC_QUEUE_URL: { Ref: "AsyncSqsQueue" }
             Handler: "apigateway.handler"
             Runtime: "python3.6"
             Timeout: "30"
@@ -206,42 +201,6 @@ Resources:
                 TemplateVersion: { "Fn::FindInMap": [ "TemplateVersion", "Infrastructure", "Commit" ] }
             } ] }
             TimeoutInMinutes: 30
-
-    ##########################################################################################################
-    ##  SQS
-    ##########################################################################################################
-
-    AsyncSqsQueue:
-        Type: "AWS::SQS::Queue"
-        Properties:
-            DelaySeconds: 0
-            QueueName: { "Fn::Sub": "plans-${Environment}-apigateway-async" }
-#            RedrivePolicy:
-#                deadLetterTargetArn: { Ref: "AsyncDeadLetterTopic" }
-#                maxReceiveCount: 1
-            VisibilityTimeout: 300
-
-    AsyncDeadLetterTopic:
-        Type: "AWS::SNS::Topic"
-        Properties:
-            DisplayName: "Plans service asynchronous invocation dead-letter queue"
-            TopicName: { "Fn::Sub": "plans-${Environment}-apigateway-asyncdlq" }
-
-    AsyncLambdaInvokePermission:
-        Type: 'AWS::Lambda::Permission'
-        Properties:
-            FunctionName: { 'Fn::GetAtt': [ 'ApiGatewayLambda', 'Arn' ] }
-            Action: 'lambda:InvokeFunction'
-            Principal: 'sqs.amazonaws.com'
-            SourceArn: { "Fn::GetAtt": [ 'AsyncSqsQueue', "Arn" ] }
-
-    AsyncLambdaTriggerMapping:
-        Type: "AWS::Lambda::EventSourceMapping"
-        Properties:
-            BatchSize: 1
-            Enabled: true
-            EventSourceArn: { "Fn::GetAtt": [ 'AsyncSqsQueue', "Arn" ] }
-            FunctionName: { Ref: "ApiGatewayLambda" }
 
     ##########################################################################################################
     ## MONITORING

@@ -82,7 +82,8 @@ def run_async(method, endpoint, body=None):
             "Host": "apis.{}.fathomai.com".format(os.environ['ENVIRONMENT']),
             "User-Agent": "Biometrix/Plans API",
             "X-Forwarded-Port": "443",
-            "X-Forwarded-Proto": "https"
+            "X-Forwarded-Proto": "https",
+            "X-Api-Version": os.environ['API_VERSION'],
         },
         "queryStringParameters": None,
         "pathParameters": {"endpoint": endpoint},
@@ -93,6 +94,6 @@ def run_async(method, endpoint, body=None):
     }
 
     boto3.client('sqs').send_message(
-        QueueUrl=os.environ['ASYNC_QUEUE_URL'],
-        MessageBody=json.dumps(payload)
+        QueueUrl='{SERVICE}-{ENVIRONMENT}-apigateway-async'.format(**os.environ),
+        MessageBody=json.dumps(payload),
     )
