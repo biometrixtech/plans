@@ -34,7 +34,7 @@ Parameters:
 Mappings:
     TemplateVersion:
         Self: { Commit: "da39a3ee5e6b4b0d3255bfef95601890afd80709" }
-        Infrastructure: { Commit: "1aced7a6371dd077a92cae552e3f659174aa578d" }
+        Infrastructure: { Commit: "5a57bd0801ab71696ebc5e1945e465c643090530" }
 
 Metadata:
     "AWS::CloudFormation::Interface":
@@ -213,7 +213,7 @@ Resources:
                   - Action:
                       - "sqs:SendMessage"
                     Effect: "Allow"
-                    Resource: "arn:aws:sqs:us-west-2:887689817172:plans-dev-apigateway-async"
+                    Resource: { 'Fn::GetAtt': [ 'ApigatewayStack', 'Outputs.AsyncSqsQueueArn' ] }
 
     ##########################################################################################################
     ## MONITORING
