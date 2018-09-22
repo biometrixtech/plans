@@ -94,6 +94,6 @@ def run_async(method, endpoint, body=None):
     }
 
     boto3.client('sqs').send_message(
-        QueueUrl='{SERVICE}-{ENVIRONMENT}-apigateway-async'.format(**os.environ),
+        QueueUrl='https://sqs.amazonaws.com/{AWS_ACCOUNT_ID}/{AWS_REGION}.{SERVICE}-{ENVIRONMENT}-apigateway-async'.format(**os.environ),
         MessageBody=json.dumps(payload),
     )
