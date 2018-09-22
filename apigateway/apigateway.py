@@ -113,7 +113,7 @@ def handle_application_exception(e):
 def handler(event, context):
     print(json.dumps(event))
 
-    if 'eventSourceARN' in event['requestContext'] and event['requestContext']['eventSourceARN'].contains('sqs'):
+    if 'eventSourceARN' in event['requestContext'] and 'sqs' in event['requestContext']['eventSourceARN']:
         # An asynchronous invocation from SQS
         print('Asynchronous invocation')
         event = json.loads(event['Records'][0]['body'])
