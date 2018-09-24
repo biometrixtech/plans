@@ -1,6 +1,6 @@
 from enum import Enum
 from serialisable import Serialisable
-from models.sport import SportName, NoSportPosition, BaseballPosition, BasketballPosition, FootballPosition, LacrossePosition, SoccerPosition
+from models.sport import SportName, NoSportPosition, BaseballPosition, BasketballPosition, FootballPosition, LacrossePosition, SoccerPosition, RunningPosition
 
 
 class FitFatigueStatus(Enum):
@@ -111,6 +111,8 @@ class AthleteStats(Serialisable):
                 value = FootballPosition(value)
             elif self.current_sport_name == SportName.lacrosse:
                 value = LacrossePosition(value)
+            elif self.current_sport_name == SportName.running:
+                value = RunningPosition(value)
         super().__setattr__(name, value)
 
     def json_serialise(self):
