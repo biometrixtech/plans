@@ -45,7 +45,7 @@ class FSProgramGenerator(object):
 
     def assign_exercises(self, exercise_list):
 
-        for ex in range(0, len(exercise_list) - 1):
+        for ex in range(0, len(exercise_list)):
             mapped_exercises = [x for x in self.exercise_library if x.id == exercise_list[ex].exercise.id]
             exercise_list[ex].exercise = mapped_exercises[0]
             exercise_list[ex].reps_assigned = mapped_exercises[0].max_reps
