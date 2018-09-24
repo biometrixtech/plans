@@ -353,7 +353,8 @@ class FSProgramGenerator(object):
 
         if sport_name == sport.SportName.soccer:
             if (position is not None and
-                    (position == sport.SoccerPosition.forward or
+                    (position == sport.SoccerPosition.striker or
+                     position == sport.SoccerPosition.forward or
                      position == sport.SoccerPosition.midfielder or
                      position == sport.SoccerPosition.defender)):
 
@@ -381,8 +382,7 @@ class FSProgramGenerator(object):
                 session.victory_lap.append(AssignedExercise("160", 4, 5))
 
             elif (position is not None and
-                  (position == sport.SoccerPosition.goalkeeper or
-                   position == sport.SoccerPosition.striker)):
+                  (position == sport.SoccerPosition.goalkeeper)):
 
                 session.warm_up.append(AssignedExercise("161", 1, 1))
                 session.warm_up.append(AssignedExercise("162", 1, 2))
@@ -407,7 +407,7 @@ class FSProgramGenerator(object):
                 session.victory_lap.append(AssignedExercise("173", 4, 3))
                 session.victory_lap.append(AssignedExercise("174", 4, 4))
 
-        if sport_name == sport.SportName.running or sport_name == sport.SportName.tennis:
+        if sport_name == sport.SportName.tennis:
 
             session.warm_up.append(AssignedExercise("139", 1, 1))
             session.warm_up.append(AssignedExercise("140", 1, 2))
