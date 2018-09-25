@@ -88,7 +88,7 @@ def get_post_session_surveys(start_date, end_date):
 
 def test_generate_session_for_soccer():
     mapping = FSProgramGenerator(exercise_library_datastore)
-    fs_session = mapping.getFunctionalStrengthForSportPosition(SportName.soccer, position=SoccerPosition.Forward)
+    fs_session = mapping.getFunctionalStrengthForSportPosition(SportName.soccer, position=SoccerPosition.forward)
     assert True is (len(fs_session.warm_up) > 0)
     assert True is (len(fs_session.dynamic_movement) > 0)
     assert True is (len(fs_session.stability_work) > 0)
@@ -98,7 +98,7 @@ def test_generate_session_for_soccer():
 
 def test_generate_session_for_speed():
     mapping = FSProgramGenerator(exercise_library_datastore)
-    fs_session = mapping.getFunctionalStrengthForSportPosition(SportName.no_sport, position=NoSportPosition.Speed)
+    fs_session = mapping.getFunctionalStrengthForSportPosition(SportName.no_sport, position=NoSportPosition.speed)
     assert True is (len(fs_session.warm_up) > 0)
     assert True is (len(fs_session.dynamic_movement) > 0)
     assert True is (len(fs_session.stability_work) > 0)
@@ -107,7 +107,7 @@ def test_generate_session_for_speed():
 
 def test_fs_exercises_populated():
     mapping = FSProgramGenerator(exercise_library_datastore)
-    fs_session = mapping.getFunctionalStrengthForSportPosition(SportName.basketball, position=BasketballPosition.Guard)
+    fs_session = mapping.getFunctionalStrengthForSportPosition(SportName.basketball, position=BasketballPosition.guard)
     assert True is (len(fs_session.warm_up[0].exercise.description) > 0)
 
 

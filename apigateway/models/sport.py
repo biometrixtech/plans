@@ -51,49 +51,55 @@ class SportName(Enum):
 
 
 class NoSportPosition(Enum):
-    Power = 1
-    Strength = 3
-    Endurance = 0
-    Speed = 2
-    CrossTraining = 4
+    power = 1
+    strength = 3
+    endurance = 0
+    speed = 2
+    cross_training = 4
 
 
 class BaseballPosition(Enum):
-    Catcher = 0
-    Infielder = 1
-    Pitcher = 2
-    Outfielder = 3
+    catcher = 0
+    infielder = 1
+    pitcher = 2
+    outfielder = 3
 
 
 class BasketballPosition(Enum):
-    Center = 0
-    Forward = 1
-    Guard = 2
+    center = 0
+    forward = 1
+    guard = 2
 
 
 class FootballPosition(Enum):
-    DefensiveBack = 0
-    Kicker = 1
-    Linebacker = 2
-    Lineman = 3
-    Quarterback = 4
-    Receiver = 5
-    RunningBack = 6
+    defensive_back = 0
+    kicker = 1
+    linebacker = 2
+    lineman = 3
+    quarterback = 4
+    receiver = 5
+    running_back = 6
 
 
 class LacrossePosition(Enum):
-    Attacker = 0
-    Defender = 1
-    Goalie = 2
-    Midfielder = 3
+    attacker = 0
+    defender = 1
+    goalie = 2
+    midfielder = 3
 
 
 class SoccerPosition(Enum):
-    Defender = 0
-    Forward = 1
-    Goalkeeper = 2
-    Midfielder = 3
-    Striker = 4
+    defender = 0
+    forward = 1
+    goalkeeper = 2
+    midfielder = 3
+    striker = 4
+
+
+class RunningPosition(Enum):
+    long_distance = 0
+    sprinter = 1
+
 
 
 
