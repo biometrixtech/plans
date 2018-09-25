@@ -53,3 +53,24 @@ Numeric ID,Display Name,Exercise,PHASE,Muscle Group / Joint,Inhibit,Lengthen,Act
 190,Star Drill,Star Drill,,,,,,,,1,1,3,3,N,0,,,count,0,,10,,,Beginner,none,x,,,,x
 191,Dot Drill,Dot Drill,,,,,,,,1,1,3,3,N,0,,,count,0,,10,,,Beginner,none,x,,,,x
 192,Triple Extension Max Jump,Triple Extension Max Jump,,,,,,,,1,1,3,3,N,0,,,count,0,,10,,,Beginner,none,x,,,,x
+193,Side to Side Squat,Side to Side Squat,,,,,,,,1,1,12,12,Y,0,,,count,0,,3,,,Beginner,none,x,x,,,
+194,Squat Jumps,Squat Jumps,,,,,,,,1,1,12,12,N,0,,,count,0,,3,,,Beginner,none,x,,x,,
+195,Balance Back Kicks,Balance Back Kicks,,,,,,,,1,1,12,12,Y,0,,,count,0,,3,,,Beginner,none,x,,,x,
+196,Russian Twists,Russian Twists,,,,,,,,1,1,15,15,Y,0,,,count,0,,3,,,Beginner,none,x,,,x,
+197,V-Ups,V-Ups,,,,,,,,1,1,15,15,N,0,,,count,0,,3,,,Beginner,none,x,,,x,
+198,Leg Lifts,Leg Lifts,,,,,,,,1,1,15,15,N,0,,,count,0,,3,,,Beginner,none,x,,,x,
+199,Tricep Dips,Tricep Dips,,,,,,,,1,1,15,15,N,0,,,count,0,,3,,,Beginner,Bench/Box,x,,,,x
+200,Mountain Climbers,Mountain Climbers,,,,,,,,1,1,15,15,Y,0,,,count,0,,3,,,Beginner,none,x,,,,x
+201,Elevated Pushups,Elevated Pushups,,,,,,,,1,1,10,10,N,0,,,count,0,,3,,,Beginner,Bench/Box,x,,,,x
+202,Plank with Shoulder Taps,Plank with Shoulder Taps,,,,,,,,1,1,30,30,Y,0,,,seconds,0,30,,,,Beginner,none,x,,,,x
+203,A-Skips,A-Skips,,,,,,,,1,1,12,12,N,0,,,yards,0,30,,,,Beginner,none,x,,x,,
+204,B-Skips,B-Skips,,,,,,,,1,1,12,12,N,0,,,yards,0,30,,,,Beginner,none,x,,x,,
+205,Tuck Jumps,Tuck Jumps,,,,,,,,1,1,10,10,N,0,,,count,0,,3,,,Beginner,none,x,,x,,
+206,Frog Squat Jumps,Frog Squat Jumps,,,,,,,,1,1,10,10,N,0,,,count,0,,3,,,Beginner,none,x,,x,,
+207,Box Jumps,Box Jumps,,,,,,,,1,1,10,10,N,0,,,count,0,,3,,,Beginner,Box,x,,x,,
+208,Plyometric Deadlifts,Plyometric Deadlifts,,,,,,,,1,1,10,10,Y,0,,,count,0,,3,,,Beginner,none,x,,,x,
+209,Box Hops,Box Hops,,,,,,,,1,1,5,5,Y,0,,,count,0,,5,,,Beginner,none,x,,,x,
+210,Lateral Triple Jumps,Lateral Triple Jumps,,,,,,,,1,1,3,3,Y,0,,,count,0,,10,,,Beginner,none,x,,,x,
+211,Side Plank Stars,Side Plank Stars,,,,,,,,1,1,8,8,Y,0,,,count,0,,3,,,Beginner,none,x,,,x,
+212,Push-up to Sprint,Push-up to Sprint,,,,,,,,1,1,3,3,N,0,,,count,0,,10,,,Beginner,none,x,,,,x
+213,Alternating Fast Claw,Alternating Fast Claw,,,,,,,,1,1,12,12,N,0,,,yards,0,30,,,,Beginner,none,x,,,,x

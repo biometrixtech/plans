@@ -1,6 +1,6 @@
 from enum import Enum
 from serialisable import Serialisable
-from models.sport import SportName, NoSportPosition, BaseballPosition, BasketballPosition, FootballPosition, LacrossePosition, SoccerPosition, RunningPosition
+from models.sport import SportName, NoSportPosition, BaseballPosition, BasketballPosition, FootballPosition, LacrossePosition, SoccerPosition
 
 
 class FitFatigueStatus(Enum):
@@ -42,6 +42,7 @@ class AthleteStats(Serialisable):
         self.internal_ramp = None
         self.external_ramp = None
         self.functional_strength_eligible = False
+        self.next_functional_strength_eligible_date = None
         self.completed_functional_strength_sessions = 0
         self.current_sport_name = None
         self.current_position = None
@@ -111,8 +112,6 @@ class AthleteStats(Serialisable):
                 value = FootballPosition(value)
             elif self.current_sport_name == SportName.lacrosse:
                 value = LacrossePosition(value)
-            elif self.current_sport_name == SportName.running:
-                value = RunningPosition(value)
         super().__setattr__(name, value)
 
     def json_serialise(self):
@@ -139,6 +138,7 @@ class AthleteStats(Serialisable):
             'chronic_external_low_intensity_load': self.chronic_external_low_intensity_load,
             'functional_strength_eligible': self.functional_strength_eligible,
             'completed_functional_strength_sessions': self.completed_functional_strength_sessions,
+            'next_functional_strength_eligible_date': self.next_functional_strength_eligible_date,
             'current_sport_name': self.current_sport_name.value,
             'current_position': self.current_position.value if self.current_position is not None else None,
         }
