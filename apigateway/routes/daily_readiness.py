@@ -54,13 +54,19 @@ def handle_daily_readiness_create():
     return {'message': 'success'}, 201
 
 
-@app.route('/previous', methods=['GET'])
+@app.route('/previous', methods=['POST', 'GET'])
 @authentication_required
 @xray_recorder.capture('routes.daily_readiness.previous')
 def handle_daily_readiness_get():
     daily_readiness_store = DailyReadinessDatastore()
     user_id = jwt.decode(request.headers['Authorization'], verify=False)['user_id']
-    current_time = datetime.datetime.now()
+    if request.method == 'POST':
+        if 'event_date' not in request.json:
+            raise InvalidSchemaException('Missing required parameter event_date')
+        else:
+            current_time = parse_datetime(request.json['event_date'])
+    elif request.method == 'GET':
+        current_time = datetime.datetime.now()
     start_time = current_time - datetime.timedelta(hours=48)
     sore_body_parts = []
     try:
