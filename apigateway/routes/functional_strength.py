@@ -53,7 +53,7 @@ def handle_functional_strength_update():
     athlete_stats_store = AthleteStatsDatastore()
     athlete_stats = athlete_stats_store.get(athlete_id=user_id)
     athlete_stats.completed_functional_strength_sessions += 1
-    athlete_stats.next_functional_strength_eligible_date = format_datetime(parse_datetime(fs_event_date) + timedelta(days=2))
+    athlete_stats.next_functional_strength_eligible_date = format_datetime(parse_datetime(fs_event_date) + timedelta(days=1))
     athlete_stats_store.put(athlete_stats)
 
     save_completed_exercises(completed_exercises, user_id, fs_event_date)
