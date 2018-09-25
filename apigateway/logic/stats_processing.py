@@ -56,7 +56,7 @@ class StatsProcessing(object):
         athlete_stats.functional_strength_eligible = self.is_athlete_functional_strength_eligible()
         athlete_stats.completed_functional_strength_sessions = self.get_completed_functional_strength_sessions()
         current_athlete_stats = self.athlete_stats_datastore.get(athlete_id=self.athlete_id)
-        if current_athlete_stats is not None and athlete_stats.functional_strength_eligible:
+        if current_athlete_stats is not None:
             athlete_stats.current_sport_name = current_athlete_stats.current_sport_name
             athlete_stats.current_position = current_athlete_stats.current_position
         self.athlete_stats_datastore.put(athlete_stats)

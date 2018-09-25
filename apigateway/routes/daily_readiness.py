@@ -89,7 +89,10 @@ def handle_daily_readiness_get():
     if athlete_stats is not None:
         current_sport_name = athlete_stats.current_sport_name.value if athlete_stats.current_position is not None else None
         current_position = athlete_stats.current_position.value if athlete_stats.current_position is not None else None
-        functional_strength_eligible = athlete_stats.functional_strength_eligible
+        functional_strength_eligible = False
+        if athlete_stats.functional_strength_eligible and parse_datetime(athlete_stats.next_functional_strength_eligible_date) < current_time:
+            functional_strength_eligible = True
+
         completed_functional_strength_sessions = athlete_stats.completed_functional_strength_sessions
 
     return {

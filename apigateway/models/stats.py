@@ -42,6 +42,7 @@ class AthleteStats(Serialisable):
         self.internal_ramp = None
         self.external_ramp = None
         self.functional_strength_eligible = False
+        self.next_functional_strength_eligible_date = None
         self.completed_functional_strength_sessions = 0
         self.current_sport_name = None
         self.current_position = None
