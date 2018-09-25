@@ -42,6 +42,7 @@ class CompletedExerciseDatastore(object):
                 {'$match': query},
                 {"$group": {"_id": {"athlete_id": "$athlete_id", "exercise_id": "$exercise_id"},
                             "exposures": {"$sum": 1}}}])
+
             agg_list = list(mongo_cursor)
             for mongo_result in agg_list:
                 completed_exercise_summary = CompletedExerciseSummary(athlete_id=mongo_result['_id']['athlete_id'],

@@ -3,6 +3,7 @@ from config import get_mongo_collection
 from datastores.daily_plan_datastore import DailyPlanDatastore
 from models.session import SessionType, SessionFactory
 from models.post_session_survey import PostSessionSurvey, PostSurvey
+from utils import format_datetime, parse_date
 
 
 class PostSessionSurveyDatastore(object):
@@ -122,7 +123,7 @@ def _post_session_survey_from_mongodb(mongo_result, user_id, session_id, session
         if "event_date" in survey_result:
             post_session_survey = PostSessionSurvey(survey_result["event_date"], user_id, session_id, session_type, survey_result)
         else:
-            post_session_survey = PostSessionSurvey(event_date, user_id, session_id, session_type, survey_result)
+            post_session_survey = PostSessionSurvey(format_datetime(parse_date(event_date)), user_id, session_id, session_type, survey_result)
         return post_session_survey
     else:
         return None

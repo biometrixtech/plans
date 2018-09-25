@@ -12,7 +12,7 @@ from models.post_session_survey import PostSessionSurvey, PostSurvey
 from models.daily_plan import DailyPlan
 from utils import parse_datetime, format_date, format_datetime, run_async
 from config import get_mongo_collection
-from models.athlete import SportName
+from models.sport import SportName
 
 app = Blueprint('session', __name__)
 

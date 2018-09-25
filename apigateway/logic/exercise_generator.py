@@ -12,6 +12,10 @@ class ExerciseAssignments(object):
         self.lengthen_minutes = 0
         self.activate_minutes = 0
         self.integrate_minutes = 0
+        self.inhibit_iterations = 0
+        self.lengthen_iterations = 0
+        self.activate_iterations = 0
+        self.integrate_iterations = 0
         self.inhibit_percentage = None
         self.lengthen_percentage = None
         self.activate_percentage = None
@@ -73,7 +77,7 @@ class ExerciseAssignments(object):
     def reduce_assigned_exercises(self, seconds_reduction_needed, assigned_exercise_list):
         assigned_exercise_list = self.sort_reverse_priority(assigned_exercise_list)
         iterations = 0
-        while seconds_reduction_needed >= 0 and iterations < 50:
+        while seconds_reduction_needed >= 0 and iterations < 100:
             for i in range(0, len(assigned_exercise_list)):
                 if assigned_exercise_list[i].reps_assigned > assigned_exercise_list[i].exercise.min_reps:
                     rep_reducer = self.get_reduced_rep_value(assigned_exercise_list[i].reps_assigned)
@@ -89,7 +93,7 @@ class ExerciseAssignments(object):
                     if assigned_exercise_list[i].exercise.bilateral:
                         bilateral_factor = 2
 
-                    if assigned_exercise_list[i].exercise.unit_of_measure == "seconds":
+                    if assigned_exercise_list[i].exercise.unit_of_measure.name == "seconds":
                         seconds_reduction_needed -= (assigned_exercise_list[i].exercise.seconds_per_set *
                                                      bilateral_factor)
                     else:
@@ -110,7 +114,7 @@ class ExerciseAssignments(object):
                                       and ex.sets_assigned > 0)
         assigned_exercise_list = self.sort_priority(assigned_exercise_list)
 
-        return assigned_exercise_list
+        return assigned_exercise_list, iterations
 
     def remove_duplicate_assigned_exercises(self, assigned_exercise_list):
 
@@ -153,15 +157,15 @@ class ExerciseAssignments(object):
 
         else:
             if self.inhibit_exercises is not None and len(self.inhibit_exercises) > 0:
-                self.inhibit_exercises = self.reduce_assigned_exercises(
+                self.inhibit_exercises, self.inhibit_iterations = self.reduce_assigned_exercises(
                     (self.inhibit_minutes * 60) - (self.inhibit_target_minutes * 60), self.inhibit_exercises)
                 self.calculate_durations()
             if self.lengthen_exercises is not None and len(self.lengthen_exercises) > 0:
-                self.lengthen_exercises = self.reduce_assigned_exercises(
+                self.lengthen_exercises, self.lengthen_iterations = self.reduce_assigned_exercises(
                     (self.lengthen_minutes * 60) - (self.lengthen_target_minutes * 60), self.lengthen_exercises)
                 self.calculate_durations()
             if self.activate_exercises is not None and len(self.activate_exercises) > 0:
-                self.activate_exercises = self.reduce_assigned_exercises(
+                self.activate_exercises, self.activate_iterations = self.reduce_assigned_exercises(
                     (self.activate_minutes * 60) - (self.activate_target_minutes * 60), self.activate_exercises)
                 self.calculate_durations()
 
