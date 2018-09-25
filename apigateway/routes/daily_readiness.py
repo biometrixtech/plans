@@ -59,7 +59,12 @@ def handle_daily_readiness_create():
 @xray_recorder.capture('routes.daily_readiness.previous')
 def handle_daily_readiness_get():
     daily_readiness_store = DailyReadinessDatastore()
-    user_id = jwt.decode(request.headers['Authorization'], verify=False)['user_id']
+    # user_id = jwt.decode(request.headers['Authorization'], verify=False)['user_id']
+    token = jwt.decode(request.headers['Authorization'], verify=False)
+    if 'sub' in token:
+        user_id = token['sub']
+    elif 'user_id' in token:
+        user_id = token['user_id']
     current_time = datetime.datetime.now()
     start_time = current_time - datetime.timedelta(hours=48)
     sore_body_parts = []
