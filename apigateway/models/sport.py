@@ -36,7 +36,7 @@ class SportName(Enum):
     lacrosse = 10
     rowing = 11
     rugby = 12
-    running = 13
+
     soccer = 14
     swimming_diving = 15
     tennis = 16
