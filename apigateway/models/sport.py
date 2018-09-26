@@ -36,7 +36,7 @@ class SportName(Enum):
     lacrosse = 10
     rowing = 11
     rugby = 12
-    running = 13
+
     soccer = 14
     swimming_diving = 15
     tennis = 16
@@ -54,7 +54,7 @@ class NoSportPosition(Enum):
     power = 1
     strength = 3
     endurance = 0
-    speed = 2
+    speed_agility = 2
     cross_training = 4
 
 
@@ -95,10 +95,6 @@ class SoccerPosition(Enum):
     midfielder = 3
     striker = 4
 
-
-class RunningPosition(Enum):
-    long_distance = 0
-    sprinter = 1
 
 
 

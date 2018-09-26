@@ -5,7 +5,7 @@ import datetime
 from serialisable import Serialisable
 import logic.exercise_generator as exercise
 from utils import format_datetime, parse_datetime
-from models.sport import SportName, NoSportPosition, BaseballPosition, BasketballPosition, FootballPosition, LacrossePosition, SoccerPosition, RunningPosition
+from models.sport import SportName, NoSportPosition, BaseballPosition, BasketballPosition, FootballPosition, LacrossePosition, SoccerPosition
 
 class SessionType(Enum):
     practice = 0
@@ -20,7 +20,7 @@ class StrengthConditioningType(Enum):
     "sub-type for session_type=1"
     endurance = 0
     power = 1
-    speed = 2
+    speed_agility = 2
     strength = 3
     cross_training = 4
     none = None
@@ -334,8 +334,6 @@ class FunctionalStrengthSession(Serialisable):
                 value = FootballPosition(value)
             elif self.sport_name == SportName.lacrosse:
                 value = LacrossePosition(value)
-            elif self.sport_name == SportName.running:
-                value = RunningPosition(value)
         elif name in ['start_date', 'event_date']:
             if not isinstance(value, datetime.datetime) and value is not None:
                 value = parse_datetime(value)

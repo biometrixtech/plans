@@ -38,6 +38,7 @@ class AthleteStatsDatastore(object):
             athlete_stats.chronic_avg_max_soreness = mongo_result['chronic_avg_max_soreness']
             athlete_stats.functional_strength_eligible = mongo_result.get('functional_strength_eligible', False)
             athlete_stats.completed_functional_strength_sessions = mongo_result.get('completed_functional_strength_sessions', 0)
+            athlete_stats.next_functional_strength_eligible_date = mongo_result.get('next_functional_strength_eligible_date', None)
             athlete_stats.current_sport_name = mongo_result.get('current_sport_name', None)
             athlete_stats.current_position = mongo_result.get('current_position', None)
             return athlete_stats
