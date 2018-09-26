@@ -24,8 +24,8 @@ class Sport(object):
 
 class SportName(Enum):
     basketball = 0
-    baseball_softball = 1
-    cross_country = 2
+    baseball = 1
+    softball = 2
     cycling = 3
     field_hockey = 4
     football = 5
@@ -36,9 +36,9 @@ class SportName(Enum):
     lacrosse = 10
     rowing = 11
     rugby = 12
-
+    diving = 13
     soccer = 14
-    swimming_diving = 15
+    swimming = 15
     tennis = 16
     distance_running = 17
     sprints = 18
