@@ -14,7 +14,11 @@ app = Blueprint('misc', __name__)
 @authentication_required
 @xray_recorder.capture('routes.misc.clearuser')
 def handle_clear_user_data():
-    user_id = jwt.decode(request.headers['Authorization'], verify=False)['user_id']
+    token = jwt.decode(request.headers['Authorization'], verify=False)
+    if 'sub' in token:
+        user_id = token['sub']
+    elif 'user_id' in token:
+        user_id = token['user_id']
     if user_id not in  ["c4f3ba9c-c874-4687-bbb8-67633a6a6d7d", # dipesh+mvp@fathomai.com
                         "a1233423-73d3-4761-ac92-89cc15921d34", # mazen+mvp@fathomai.com
                         "e155d933-8353-4157-8c17-061c7d1e7dcb", # chris+mvp@fathomai.com
