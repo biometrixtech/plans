@@ -106,7 +106,7 @@ class AthleteStats(Serialisable):
                 value = SoccerPosition(value)
             elif self.current_sport_name == SportName.basketball:
                 value = BasketballPosition(value)
-            elif self.current_sport_name == SportName.baseball_softball:
+            elif self.current_sport_name == SportName.baseball:
                 value = BaseballPosition(value)
             elif self.current_sport_name == SportName.football:
                 value = FootballPosition(value)

@@ -191,7 +191,7 @@ class FSProgramGenerator(object):
             session.victory_lap.append(AssignedExercise("201", 4, 3))
             session.victory_lap.append(AssignedExercise("202", 4, 4))
 
-        if sport_name == sport.SportName.baseball_softball:
+        if sport_name == sport.SportName.baseball or sport_name == sport.SportName.softball:
 
             session.warm_up.append(AssignedExercise("161", 1, 1))
             session.warm_up.append(AssignedExercise("162", 1, 2))

@@ -328,7 +328,7 @@ class FunctionalStrengthSession(Serialisable):
                 value = SoccerPosition(value)
             elif self.sport_name == SportName.basketball:
                 value = BasketballPosition(value)
-            elif self.sport_name == SportName.baseball_softball:
+            elif self.sport_name == SportName.baseball:
                 value = BaseballPosition(value)
             elif self.sport_name == SportName.football:
                 value = FootballPosition(value)
