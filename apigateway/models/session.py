@@ -20,7 +20,7 @@ class StrengthConditioningType(Enum):
     "sub-type for session_type=1"
     endurance = 0
     power = 1
-    speed = 2
+    speed_agility = 2
     strength = 3
     cross_training = 4
     none = None
