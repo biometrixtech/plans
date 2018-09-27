@@ -4,7 +4,7 @@ import datetime
 import jwt
 from utils import format_date, parse_datetime
 
-from config import get_mongo_collection
+from config import get_mongo_collection, get_mongo_database
 from decorators import authentication_required
 from exceptions import ForbiddenException, InvalidSchemaException
 app = Blueprint('misc', __name__)
@@ -14,7 +14,11 @@ app = Blueprint('misc', __name__)
 @authentication_required
 @xray_recorder.capture('routes.misc.clearuser')
 def handle_clear_user_data():
-    user_id = jwt.decode(request.headers['Authorization'], verify=False)['user_id']
+    token = jwt.decode(request.headers['Authorization'], verify=False)
+    if 'sub' in token:
+        user_id = token['sub']
+    elif 'user_id' in token:
+        user_id = token['user_id']
     if user_id not in  ["c4f3ba9c-c874-4687-bbb8-67633a6a6d7d", # dipesh+mvp@fathomai.com
                         "a1233423-73d3-4761-ac92-89cc15921d34", # mazen+mvp@fathomai.com
                         "e155d933-8353-4157-8c17-061c7d1e7dcb", # chris+mvp@fathomai.com
@@ -46,4 +50,63 @@ def handle_clear_user_data():
     result = daily_plan.delete_one({"user_id": user_id, "date": today})
     print("daily plans deleted: {}".format(result.deleted_count))
 
+    if 'clear_all' in request.json:
+        if request.json['clear_all']:
+            stats = get_mongo_collection('athletestats')
+            execises = get_mongo_collection('completedexercises')
+            stats.delete_one({"athlete_id": user_id})
+            exercises.delete_many({"athlete_id": user_id, "event_date": {"$gte": today, "$lt": tomorrow}})
+            print("readiness surveys deleted: {}".format(result.deleted_count))
+
     return {'message': 'success'}, 200
+
+
+@app.route('/cognito_migration', methods=['PATCH'])
+@xray_recorder.capture('routes.misc.cognito_migration')
+def handle_data_migration():
+    """update user_id in all relevant mongo collections to the new id
+        collections to update:
+            ---v3 data---
+            athleteStats: athlete_id
+            completedExercises: athlete_id
+            dailyPlan: user_id
+            dailyReadiness: user_id
+            ---v2 data---
+            activeBlockStats: userId
+            dateStats: userId
+            progCompDateStats: userId
+            progCompStats: userId
+            sessionStats: userId
+            twoMinuteStats: userId
+    """
+    legacy_user_id = request.json['legacy_user_id']
+    user_id = request.json['user_id']
+    query = {"user_id": legacy_user_id}
+    mongo_collection = get_mongo_collection('dailyplan')
+    mongo_collection.update_many(query, {'$set': {'user_id': user_id}})
+    mongo_collection = get_mongo_collection('dailyreadiness')
+    mongo_collection.update_many(query, {'$set': {'user_id': user_id}})
+
+    query = {"athlete_id": legacy_user_id}
+    mongo_collection = get_mongo_collection('athletestats')
+    mongo_collection.update_many(query, {'$set': {'athlete_id': user_id}})
+    mongo_collection = get_mongo_collection('completedexercises')
+    mongo_collection.update_many(query, {'$set': {'athlete_id': user_id}})
+
+    mongo_database = get_mongo_database()
+
+    query = {"userId": str(legacy_user_id)}
+    mongo_collection = mongo_database['activeBlockStats']
+    mongo_collection.update_many(query, {'$set': {'userId': user_id}})
+    mongo_collection = mongo_database['dateStats']
+    mongo_collection.update_many(query, {'$set': {'userId': user_id}})
+    mongo_collection = mongo_database['progCompDateStats']
+    mongo_collection.update_many(query, {'$set': {'userId': user_id}})
+    mongo_collection = mongo_database['progCompStats']
+    mongo_collection.update_many(query, {'$set': {'userId': user_id}})
+    mongo_collection = mongo_database['sessionStats']
+    mongo_collection.update_many(query, {'$set': {'userId': user_id}})
+    mongo_collection = mongo_database['twoMinuteStats']
+    mongo_collection.update_many(query, {'$set': {'userId': user_id}})
+
+    return {'message': 'success'}, 202

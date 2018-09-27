@@ -1,12 +1,13 @@
 from flask import Response, jsonify
 from flask_lambda import FlaskLambda
 from werkzeug.routing import BaseConverter, ValidationError
+import datetime
 import json
 import os
 import re
 import sys
 import traceback
-from utils import validate_uuid4
+from utils import validate_uuid4, run_async, parse_datetime
 import config
 
 
@@ -112,12 +113,20 @@ def handle_application_exception(e):
 def handler(event, context):
     print(json.dumps(event))
 
-    if 'Records' in event:
+    if 'eventSourceARN' in event['requestContext'] and 'sqs' in event['requestContext']['eventSourceARN']:
         # An asynchronous invocation from SQS
         print('Asynchronous invocation')
-        event = json.loads(event['Records'][0]['body'])
+        event['headers']['X-Source'] = 'sqs'
+
+        if 'X-Execute-At' in event['headers']:
+            execute_at = parse_datetime(event['headers']['X-Execute-At'])
+            if execute_at > datetime.datetime.now():
+                print('Not executing yet')
+                run_async(event['httpMethod'], event['pathParameters']['endpoint'], body=json.loads(event['body']), timestamp=execute_at)
+                return
     else:
         print('API Gateway invocation')
+        event['headers']['X-Source'] = 'apigateway'
 
     # Strip mount point and version information from the path
     path_match = re.match(f'^/(?P<mount>({os.environ["SERVICE"]}|v1))?(/(?P<version>(\d+([._]\d+([._]\d+(-\w+([._]\d+)?)?)?)?)|latest))?(?P<path>/.+?)/?$', event['path'])
