@@ -5,14 +5,14 @@ import datetime
 from utils import format_date, format_datetime, parse_datetime
 
 from datastores.daily_plan_datastore import DailyPlanDatastore
-from decorators import authentication_required
+from fathomapi.utils.decorators import require
 from fathomapi.utils.exceptions import InvalidSchemaException
 
 app = Blueprint('daily_plan', __name__)
 
 
 @app.route('/', methods=['POST'])
-@authentication_required
+@require.authenticated.any
 @xray_recorder.capture('routes.daily_plan.get')
 def handle_daily_plan_get():
     validate_input(request)

@@ -5,13 +5,13 @@ import jwt
 from utils import format_date, parse_datetime
 
 from config import get_mongo_collection, get_mongo_database
-from decorators import authentication_required
+from fathomapi.utils.decorators import require
 from fathomapi.utils.exceptions import ForbiddenException, InvalidSchemaException
 app = Blueprint('misc', __name__)
 
 
 @app.route('/clear_user_data', methods=['POST'])
-@authentication_required
+@require.authenticated.any
 @xray_recorder.capture('routes.misc.clearuser')
 def handle_clear_user_data():
     token = jwt.decode(request.headers['Authorization'], verify=False)

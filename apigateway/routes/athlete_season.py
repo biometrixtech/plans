@@ -3,7 +3,7 @@ from flask import request, Blueprint
 import json
 import datetime
 
-from decorators import authentication_required
+from fathomapi.utils.decorators import require
 from datastores.season_datastore import AthleteSeasonDatastore
 from models.athlete_season import AthleteSeason, Season
 
@@ -12,7 +12,7 @@ app = Blueprint('athlete_season', __name__)
 
 
 @app.route('/', methods=['POST'])
-@authentication_required
+@require.authenticated.any
 @xray_recorder.capture('routes.athlete_season.create')
 def handle_season_create():
     seasons = []

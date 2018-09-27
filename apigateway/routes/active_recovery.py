@@ -1,7 +1,7 @@
 from aws_xray_sdk.core import xray_recorder
 from flask import request, Blueprint
 
-from decorators import authentication_required
+from fathomapi.utils.decorators import require
 from fathomapi.utils.exceptions import InvalidSchemaException, NoSuchEntityException
 from datastores.daily_plan_datastore import DailyPlanDatastore
 from datastores.completed_exercise_datastore import CompletedExerciseDatastore
@@ -13,7 +13,7 @@ app = Blueprint('active_recovery', __name__)
 
 
 @app.route('/', methods=['PATCH'])
-@authentication_required
+@require.authenticated.any
 @xray_recorder.capture('routes.active_recovery')
 def handle_active_recovery_update():
     if not isinstance(request.json, dict):

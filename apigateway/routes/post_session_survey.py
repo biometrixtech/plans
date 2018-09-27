@@ -2,7 +2,7 @@ from aws_xray_sdk.core import xray_recorder
 from flask import request, Blueprint
 
 from datastores.post_session_survey_datastore import PostSessionSurveyDatastore
-from decorators import authentication_required
+from fathomapi.utils.decorators import require
 from fathomapi.utils.exceptions import InvalidSchemaException
 from models.post_session_survey import PostSessionSurvey
 from models.session import SessionType
@@ -13,7 +13,7 @@ app = Blueprint('post_session_survey', __name__)
 
 
 @app.route('/', methods=['POST'])
-@authentication_required
+@require.authenticated.any
 @xray_recorder.capture('routes.post_session_survey.put')
 def handle_post_session_survey_create():
     if not isinstance(request.json, dict):

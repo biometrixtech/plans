@@ -6,7 +6,7 @@ import datetime
 from datastores.daily_readiness_datastore import DailyReadinessDatastore
 from datastores.post_session_survey_datastore import PostSessionSurveyDatastore
 from datastores.athlete_stats_datastore import AthleteStatsDatastore
-from decorators import authentication_required
+from fathomapi.utils.decorators import require
 from fathomapi.utils.exceptions import InvalidSchemaException, NoSuchEntityException
 from models.daily_readiness import DailyReadiness
 from models.soreness import MuscleSorenessSeverity, BodyPartLocation
@@ -17,7 +17,7 @@ app = Blueprint('daily_readiness', __name__)
 
 
 @app.route('/', methods=['POST'])
-@authentication_required
+@require.authenticated.any
 @xray_recorder.capture('routes.daily_readiness.create')
 def handle_daily_readiness_create():
     validate_data()
@@ -56,7 +56,7 @@ def handle_daily_readiness_create():
 
 
 @app.route('/previous', methods=['POST', 'GET'])
-@authentication_required
+@require.authenticated.any
 @xray_recorder.capture('routes.daily_readiness.previous')
 def handle_daily_readiness_get():
     daily_readiness_store = DailyReadinessDatastore()

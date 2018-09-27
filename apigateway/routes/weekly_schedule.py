@@ -2,7 +2,7 @@ from aws_xray_sdk.core import xray_recorder
 from flask import request, Blueprint
 import datetime
 
-from decorators import authentication_required
+from fathomapi.utils.decorators import require
 from fathomapi.utils.exceptions import InvalidSchemaException
 from datastores.weekly_schedule_datastore import WeeklyCrossTrainingDatastore, WeeklyTrainingDatastore
 from models.weekly_schedule import WeeklySchedule
@@ -12,7 +12,7 @@ app = Blueprint('weekly_schedule', __name__)
 
 
 @app.route('/cross_training', methods=['POST'])
-@authentication_required
+@require.authenticated.any
 @xray_recorder.capture('routes.weekly_schedule.cross_training.create')
 def handle_crosstraining_schedule_create():
     validate_data(request)
@@ -42,22 +42,23 @@ def handle_crosstraining_schedule_create():
     store.put(schedule, collection='training')
     return {'message': 'success'}, 201
 
+
 @app.route('/cross_training/get_schedule', methods=['POST'])
-@authentication_required
+@require.authenticated.any
 @xray_recorder.capture('routes.weekly_schedule.cross_training.get')
 def handle_crosstraining_schedule_get():
     pass
 
 
 @app.route('/cross_training/update', methods=['POST'])
-@authentication_required
+@require.authenticated.any
 @xray_recorder.capture('routes.weekly_schedule.cross_training.update')
 def handle_crosstraining_schedule_update():
     pass
 
 
 @app.route('/training', methods=['POST'])
-@authentication_required
+@require.authenticated.any
 @xray_recorder.capture('routes.weekly_schedule.training.create')
 def handle_training_schedule_create():
     validate_data(request)
@@ -81,15 +82,16 @@ def handle_training_schedule_create():
     store.put(schedule, collection='training')
     return {'message': 'success'}, 201
 
+
 @app.route('/training/get_schedule', methods=['POST'])
-@authentication_required
+@require.authenticated.any
 @xray_recorder.capture('routes.weekly_schedule.cross_training.get')
 def handle_training_schedule_get():
     pass
 
 
 @app.route('/training/update', methods=['POST'])
-@authentication_required
+@require.authenticated.any
 @xray_recorder.capture('routes.weekly_schedule.cross_training.update')
 def handle_training_schedule_update():
     pass
@@ -101,6 +103,7 @@ def validate_data(request):
         raise InvalidSchemaException('Request body must be a dictionary')
     if 'user_id' not in request.json:
         raise InvalidSchemaException('Missing required parameter user_id')
+
 
 @xray_recorder.capture('routes.weekly_schedule.validate_crosstraining')
 def validate_crosstraining_data(request):
