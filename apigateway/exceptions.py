@@ -22,6 +22,7 @@ class DuplicateEntityException(ApplicationException):
     def __init__(self):
         super().__init__(409, 'DuplicateEntity', 'Duplicate Entity')
 
+
 class ForbiddenException(ApplicationException):
     def __init__(self, message=''):
         super().__init__(403, 'Forbidden', message)

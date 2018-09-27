@@ -1,6 +1,5 @@
 # Execute this with
 #     pip install -r ./pip_requirements -t .
-aws_xray_sdk==0.95
-flask-lambda==0.0.4
+git+https://{GITHUB_TOKEN}@github.com/biometrixtech/fathomapi.git
 pymongo==3.4.0
 pyjwt==1.5.3
