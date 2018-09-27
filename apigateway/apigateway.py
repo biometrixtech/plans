@@ -7,7 +7,7 @@ import os
 import re
 import sys
 import traceback
-from utils import validate_uuid4, run_async
+from utils import validate_uuid4, run_async, parse_datetime
 import config
 
 
@@ -119,7 +119,7 @@ def handler(event, context):
         event['headers']['X-Source'] = 'sqs'
 
         if 'X-Execute-At' in event['headers']:
-            execute_at = datetime.datetime.strptime(event['headers']['X-Execute-At'], "%Y-%m-%dT%H:%M:%SZ")
+            execute_at = parse_datetime(event['headers']['X-Execute-At'])
             if execute_at > datetime.datetime.now():
                 print('Not executing yet')
                 run_async(event['httpMethod'], event['pathParameters']['endpoint'], body=json.loads(event['body']), timestamp=execute_at)
