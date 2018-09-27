@@ -68,36 +68,3 @@ def validate_uuid4(uuid_string):
     except ValueError:
         # If it's a value error, then the string is not a valid hex code for a UUID.
         return False
-
-
-def run_async(method, endpoint, body=None, timestamp=None):
-    if timestamp is None:
-        timestamp = datetime.datetime.now()
-    endpoint = endpoint.strip('/')
-    payload = {
-        "path": f"/plans/{os.environ['API_VERSION']}/{endpoint}",
-        "httpMethod": method,
-        "headers": {
-            "Accept": "*/*",
-            "Authorization": request.headers.get('Authorization', None),
-            "Content-Type": "application/json",
-            "Host": "apis.{}.fathomai.com".format(os.environ['ENVIRONMENT']),
-            "User-Agent": "Biometrix/Plans API",
-            "X-Forwarded-Port": "443",
-            "X-Forwarded-Proto": "https",
-            "X-Execute-At": format_datetime(timestamp),
-            "X-Api-Version": os.environ['API_VERSION'],
-        },
-        "queryStringParameters": None,
-        "pathParameters": {"endpoint": endpoint},
-        "stageVariables": None,
-        "requestContext": {"identity": {"sourceIp": "0.0.0.0"}},
-        "body": json.dumps(body) if body is not None else None,
-        "isBase64Encoded": False
-    }
-
-    boto3.client('sqs').send_message(
-        QueueUrl='https://sqs.{AWS_REGION}.amazonaws.com/{AWS_ACCOUNT_ID}/{SERVICE}-{ENVIRONMENT}-apigateway-async'.format(**os.environ),
-        MessageBody=json.dumps(payload),
-        DelaySeconds=max(0, min(int((timestamp - datetime.datetime.now()).total_seconds()), 15*60)),
-    )

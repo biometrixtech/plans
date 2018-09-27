@@ -1,10 +1,11 @@
 from aws_xray_sdk.core import xray_recorder
+from fathomapi.api.config import Config
+from fathomapi.comms.service import Service
 from fathomapi.utils.decorators import require
 from flask import Blueprint
 from datastores.datastore_collection import DatastoreCollection
 from logic.training_plan_management import TrainingPlanManager
 from logic.stats_processing import StatsProcessing
-from utils import run_async
 from serialisable import json_serialise
 import boto3
 import json
@@ -23,7 +24,7 @@ def create_daily_plan(athlete_id):
     # daily_plan.last_updated = format_datetime(datetime.datetime.now())
     push_plan_update(athlete_id, daily_plan)
 
-    run_async('POST', f"athlete/{athlete_id}/stats")
+    Service('plans', Config.get('API_VERSION')).call_apigateway_async('POST', f"athlete/{athlete_id}/stats")
 
     return {'message': 'Update requested'}, 202
 

@@ -5,12 +5,14 @@ import datetime
 from datastores.daily_plan_datastore import DailyPlanDatastore
 from datastores.session_datastore import SessionDatastore
 # from datastore.post_session_survey import PostSessionSurveyDatastore
+from fathomapi.api.config import Config
+from fathomapi.comms.service import Service
 from fathomapi.utils.decorators import require
 from fathomapi.utils.exceptions import InvalidSchemaException, NoSuchEntityException, ForbiddenException
 from models.session import SessionType, SessionFactory, StrengthConditioningType
 from models.post_session_survey import PostSessionSurvey, PostSurvey
 from models.daily_plan import DailyPlan
-from utils import parse_datetime, format_date, format_datetime, run_async
+from utils import parse_datetime, format_date, format_datetime
 from config import get_mongo_collection
 from models.sport import SportName
 
@@ -412,7 +414,7 @@ def _check_plan_exists(user_id, event_date):
 
 
 def update_plan(user_id, event_date):
-    run_async('POST', f"athlete/{user_id}/daily_plan", body={'event_date': event_date})
+    Service('plans', Config.get('API_VERSION')).call_apigateway_async('POST', f"athlete/{user_id}/daily_plan", body={'event_date': event_date})
 
 
 def _validate_schema():

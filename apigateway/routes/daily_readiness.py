@@ -1,17 +1,18 @@
 from aws_xray_sdk.core import xray_recorder
 from flask import request, Blueprint
-import jwt
 import datetime
 
 from datastores.daily_readiness_datastore import DailyReadinessDatastore
 from datastores.post_session_survey_datastore import PostSessionSurveyDatastore
 from datastores.athlete_stats_datastore import AthleteStatsDatastore
+from fathomapi.api.config import Config
+from fathomapi.comms.service import Service
 from fathomapi.utils.decorators import require
 from fathomapi.utils.exceptions import InvalidSchemaException, NoSuchEntityException
 from models.daily_readiness import DailyReadiness
 from models.soreness import MuscleSorenessSeverity, BodyPartLocation
 from models.stats import AthleteStats
-from utils import parse_datetime, format_date, format_datetime, run_async
+from utils import parse_datetime, format_date, format_datetime
 
 app = Blueprint('daily_readiness', __name__)
 
@@ -50,7 +51,7 @@ def handle_daily_readiness_create():
 
         athlete_stats_store.put(athlete_stats)
 
-    run_async('POST', f"athlete/{request.json['user_id']}/daily_plan")
+    Service('plans', Config.get('API_VERSION')).call_apigateway_async('POST', f"athlete/{request.json['user_id']}/daily_plan")
 
     return {'message': 'success'}, 201
 
