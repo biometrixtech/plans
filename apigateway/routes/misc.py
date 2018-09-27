@@ -1,46 +1,43 @@
 from aws_xray_sdk.core import xray_recorder
 from flask import request, Blueprint
 import datetime
-import jwt
 from utils import format_date, parse_datetime
 
 from config import get_mongo_collection, get_mongo_database
 from fathomapi.utils.decorators import require
-from fathomapi.utils.exceptions import ForbiddenException, InvalidSchemaException
+from fathomapi.utils.exceptions import ForbiddenException
 app = Blueprint('misc', __name__)
 
 
 @app.route('/clear_user_data', methods=['POST'])
+@require.body({'event_date': str})
 @require.authenticated.any
 @xray_recorder.capture('routes.misc.clearuser')
-def handle_clear_user_data():
-    token = jwt.decode(request.headers['Authorization'], verify=False)
-    if 'sub' in token:
-        user_id = token['sub']
-    elif 'user_id' in token:
-        user_id = token['user_id']
-    if user_id not in  ["c4f3ba9c-c874-4687-bbb8-67633a6a6d7d", # dipesh+mvp@fathomai.com
-                        "a1233423-73d3-4761-ac92-89cc15921d34", # mazen+mvp@fathomai.com
-                        "e155d933-8353-4157-8c17-061c7d1e7dcb", # chris+mvp@fathomai.com
-                        "b0501843-f067-48c3-a99b-bf3b56f4db04", # ivonna+mvp@fathomai.com
-                        "f45d72a8-4569-42b7-bbfd-79e810983b00", # gabby+mvp@fathomai.com
-                        "9930c5cd-0ae7-43f3-aee4-de621e935525", # maria+mvp@fathomai.com
-                        "a045f81b-477a-4a31-ae65-1dd46bcafc0c", # melissa+mvp@fathomai.com
-                        "1092081e-30f9-4886-b94f-36f993ba9065", # amina+mvp@fathomai.com
-                        "bf9f61b3-a985-49ef-b733-9f34309942a5", # paul+mvp@fathomai.com
-                        "ad328899-f8e6-4070-8878-73bf84c79699", # hello+demo1@fathomai.com
-                        "c1394094-c8e2-4880-b940-237d41d4118e", # hello+demo2@fathomai.com
-                        "9138da93-d054-45d2-9149-2572523b49da", # hello+demo3@fathomai.com
-                        "865f9e91-00b6-418b-a037-5a5d322a7e34", # hello+demo4@fathomai.com
-                        "74bfd848-dc85-4025-a612-ff76d1b9eaa9", # hello+demo5@fathomai.com
-                        ]:
+def handle_clear_user_data(principal_id=None):
+    if principal_id not in [
+        "c4f3ba9c-c874-4687-bbb8-67633a6a6d7d",  # dipesh+mvp@fathomai.com
+        "a1233423-73d3-4761-ac92-89cc15921d34",  # mazen+mvp@fathomai.com
+        "e155d933-8353-4157-8c17-061c7d1e7dcb",  # chris+mvp@fathomai.com
+        "b0501843-f067-48c3-a99b-bf3b56f4db04",  # ivonna+mvp@fathomai.com
+        "f45d72a8-4569-42b7-bbfd-79e810983b00",  # gabby+mvp@fathomai.com
+        "9930c5cd-0ae7-43f3-aee4-de621e935525",  # maria+mvp@fathomai.com
+        "a045f81b-477a-4a31-ae65-1dd46bcafc0c",  # melissa+mvp@fathomai.com
+        "1092081e-30f9-4886-b94f-36f993ba9065",  # amina+mvp@fathomai.com
+        "bf9f61b3-a985-49ef-b733-9f34309942a5",  # paul+mvp@fathomai.com
+        "ad328899-f8e6-4070-8878-73bf84c79699",  # hello+demo1@fathomai.com
+        "c1394094-c8e2-4880-b940-237d41d4118e",  # hello+demo2@fathomai.com
+        "9138da93-d054-45d2-9149-2572523b49da",  # hello+demo3@fathomai.com
+        "865f9e91-00b6-418b-a037-5a5d322a7e34",  # hello+demo4@fathomai.com
+        "74bfd848-dc85-4025-a612-ff76d1b9eaa9",  # hello+demo5@fathomai.com
+    ]:
         raise ForbiddenException("The user is not allowed to perform this action.")
-    if 'event_date' not in request.json:
-        raise InvalidSchemaException('Missing required parameter event_date')
-    else:
-        current_time = parse_datetime(request.json['event_date'])
+    user_id = principal_id
+
+    current_time = parse_datetime(request.json['event_date'])
+
     if current_time.hour < 3:
         current_time -= datetime.timedelta(days=1)
+
     today = format_date(current_time)
     tomorrow = format_date(current_time + datetime.timedelta(days=1))
     readiness = get_mongo_collection('dailyreadiness')
@@ -50,13 +47,12 @@ def handle_clear_user_data():
     result = daily_plan.delete_one({"user_id": user_id, "date": today})
     print("daily plans deleted: {}".format(result.deleted_count))
 
-    if 'clear_all' in request.json:
-        if request.json['clear_all']:
-            stats = get_mongo_collection('athletestats')
-            execises = get_mongo_collection('completedexercises')
-            stats.delete_one({"athlete_id": user_id})
-            exercises.delete_many({"athlete_id": user_id, "event_date": {"$gte": today, "$lt": tomorrow}})
-            print("readiness surveys deleted: {}".format(result.deleted_count))
+    if 'clear_all' in request.json and request.json['clear_all']:
+        stats = get_mongo_collection('athletestats')
+        exercises = get_mongo_collection('completedexercises')
+        stats.delete_one({"athlete_id": user_id})
+        exercises.delete_many({"athlete_id": user_id, "event_date": {"$gte": today, "$lt": tomorrow}})
+        print("readiness surveys deleted: {}".format(result.deleted_count))
 
     return {'message': 'success'}, 200
 
