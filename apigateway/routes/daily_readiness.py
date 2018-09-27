@@ -54,7 +54,7 @@ def handle_daily_readiness_create():
     return {'message': 'success'}, 201
 
 
-@app.route('/previous', methods=['GET'])
+@app.route('/previous', methods=['POST', 'GET'])
 @authentication_required
 @xray_recorder.capture('routes.daily_readiness.previous')
 def handle_daily_readiness_get():
@@ -65,7 +65,14 @@ def handle_daily_readiness_get():
         user_id = token['sub']
     elif 'user_id' in token:
         user_id = token['user_id']
-    current_time = datetime.datetime.now()
+    user_id = jwt.decode(request.headers['Authorization'], verify=False)['user_id']
+    if request.method == 'POST':
+        if 'event_date' not in request.json:
+            raise InvalidSchemaException('Missing required parameter event_date')
+        else:
+            current_time = parse_datetime(request.json['event_date'])
+    elif request.method == 'GET':
+        current_time = datetime.datetime.now()
     start_time = current_time - datetime.timedelta(hours=48)
     sore_body_parts = []
     try:
@@ -94,7 +101,11 @@ def handle_daily_readiness_get():
     if athlete_stats is not None:
         current_sport_name = athlete_stats.current_sport_name.value if athlete_stats.current_position is not None else None
         current_position = athlete_stats.current_position.value if athlete_stats.current_position is not None else None
-        functional_strength_eligible = athlete_stats.functional_strength_eligible
+        functional_strength_eligible = False
+        if (athlete_stats.functional_strength_eligible and (athlete_stats.next_functional_strength_eligible_date is None
+                or parse_datetime(athlete_stats.next_functional_strength_eligible_date) < current_time)):
+            functional_strength_eligible = True
+
         completed_functional_strength_sessions = athlete_stats.completed_functional_strength_sessions
 
     return {

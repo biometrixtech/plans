@@ -20,7 +20,7 @@ class StrengthConditioningType(Enum):
     "sub-type for session_type=1"
     endurance = 0
     power = 1
-    speed = 2
+    speed_agility = 2
     strength = 3
     cross_training = 4
     none = None
@@ -318,7 +318,6 @@ class FunctionalStrengthSession(Serialisable):
         self.sport_name = None
         self.position = None
 
-
     def __setattr__(self, name, value):
         if name == "sport_name":
             value = SportName(value)
@@ -329,7 +328,7 @@ class FunctionalStrengthSession(Serialisable):
                 value = SoccerPosition(value)
             elif self.sport_name == SportName.basketball:
                 value = BasketballPosition(value)
-            elif self.sport_name == SportName.baseball_softball:
+            elif self.sport_name == SportName.baseball:
                 value = BaseballPosition(value)
             elif self.sport_name == SportName.football:
                 value = FootballPosition(value)
