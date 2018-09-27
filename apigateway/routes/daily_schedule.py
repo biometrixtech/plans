@@ -3,7 +3,7 @@ from flask import request, Blueprint
 import datetime
 
 from decorators import authentication_required
-from exceptions import InvalidSchemaException
+from fathomapi.utils.exceptions import InvalidSchemaException
 from config import get_mongo_collection
 from datastores.daily_plan_datastore import DailyPlanDatastore
 from datastores.session_datastore import SessionDatastore

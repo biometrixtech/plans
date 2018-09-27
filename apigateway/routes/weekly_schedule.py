@@ -3,7 +3,7 @@ from flask import request, Blueprint
 import datetime
 
 from decorators import authentication_required
-from exceptions import InvalidSchemaException
+from fathomapi.utils.exceptions import InvalidSchemaException
 from datastores.weekly_schedule_datastore import WeeklyCrossTrainingDatastore, WeeklyTrainingDatastore
 from models.weekly_schedule import WeeklySchedule
 from models.sport import SportName

@@ -7,13 +7,14 @@ from datastores.daily_readiness_datastore import DailyReadinessDatastore
 from datastores.post_session_survey_datastore import PostSessionSurveyDatastore
 from datastores.athlete_stats_datastore import AthleteStatsDatastore
 from decorators import authentication_required
-from exceptions import InvalidSchemaException, NoSuchEntityException
+from fathomapi.utils.exceptions import InvalidSchemaException, NoSuchEntityException
 from models.daily_readiness import DailyReadiness
 from models.soreness import MuscleSorenessSeverity, BodyPartLocation
 from models.stats import AthleteStats
 from utils import parse_datetime, format_date, format_datetime, run_async
 
 app = Blueprint('daily_readiness', __name__)
+
 
 @app.route('/', methods=['POST'])
 @authentication_required

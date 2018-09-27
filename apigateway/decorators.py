@@ -1,4 +1,4 @@
-from exceptions import UnauthorizedException
+from fathomapi.utils.exceptions import UnauthorizedException
 from flask import request
 from functools import wraps
 from uuid import UUID

@@ -3,7 +3,7 @@ from flask import request, Blueprint
 
 from datastores.post_session_survey_datastore import PostSessionSurveyDatastore
 from decorators import authentication_required
-from exceptions import InvalidSchemaException
+from fathomapi.utils.exceptions import InvalidSchemaException
 from models.post_session_survey import PostSessionSurvey
 from models.session import SessionType
 from utils import format_datetime, run_async

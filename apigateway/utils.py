@@ -4,7 +4,7 @@ import json
 import os
 import uuid
 from flask import request
-from exceptions import InvalidSchemaException
+from fathomapi.utils.exceptions import InvalidSchemaException
 
 
 def format_date(date_input):

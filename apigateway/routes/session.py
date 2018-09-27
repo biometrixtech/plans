@@ -6,7 +6,7 @@ from datastores.daily_plan_datastore import DailyPlanDatastore
 from datastores.session_datastore import SessionDatastore
 # from datastore.post_session_survey import PostSessionSurveyDatastore
 from decorators import authentication_required
-from exceptions import InvalidSchemaException, NoSuchEntityException, ForbiddenException
+from fathomapi.utils.exceptions import InvalidSchemaException, NoSuchEntityException, ForbiddenException
 from models.session import SessionType, SessionFactory, StrengthConditioningType
 from models.post_session_survey import PostSessionSurvey, PostSurvey
 from models.daily_plan import DailyPlan

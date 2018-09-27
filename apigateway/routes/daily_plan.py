@@ -6,7 +6,7 @@ from utils import format_date, format_datetime, parse_datetime
 
 from datastores.daily_plan_datastore import DailyPlanDatastore
 from decorators import authentication_required
-from exceptions import InvalidSchemaException
+from fathomapi.utils.exceptions import InvalidSchemaException
 
 app = Blueprint('daily_plan', __name__)
 

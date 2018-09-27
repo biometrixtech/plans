@@ -6,7 +6,7 @@ from utils import format_date, parse_datetime
 
 from config import get_mongo_collection, get_mongo_database
 from decorators import authentication_required
-from exceptions import ForbiddenException, InvalidSchemaException
+from fathomapi.utils.exceptions import ForbiddenException, InvalidSchemaException
 app = Blueprint('misc', __name__)
 
 

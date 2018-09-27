@@ -1,7 +1,6 @@
 from aws_xray_sdk.core import xray_recorder
 from config import get_mongo_collection
 from models.stats import AthleteStats
-from exceptions import NoSuchEntityException
 
 
 class AthleteStatsDatastore(object):

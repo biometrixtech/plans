@@ -4,7 +4,6 @@ import json
 import datetime
 
 from decorators import authentication_required
-from exceptions import InvalidSchemaException
 from datastores.season_datastore import AthleteSeasonDatastore
 from models.athlete_season import AthleteSeason, Season
 

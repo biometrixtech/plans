@@ -3,7 +3,7 @@ import os
 import boto3
 import json
 from botocore.exceptions import ClientError
-from exceptions import ApplicationException
+from fathomapi.utils.exceptions import ApplicationException
 
 global DATABASE
 
