@@ -79,7 +79,6 @@ def handle_data_migration():
             sessionStats: userId
             twoMinuteStats: userId
     """
-    # Sample code for mongo update
     legacy_user_id = request.json['legacy_user_id']
     user_id = request.json['user_id']
     query = {"user_id": legacy_user_id}
