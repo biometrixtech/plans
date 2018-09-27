@@ -1,4 +1,3 @@
-from aws_xray_sdk.core import xray_recorder
 from flask import request, Blueprint
 import datetime
 
@@ -9,6 +8,7 @@ from fathomapi.api.config import Config
 from fathomapi.comms.service import Service
 from fathomapi.utils.decorators import require
 from fathomapi.utils.exceptions import InvalidSchemaException, NoSuchEntityException
+from fathomapi.utils.xray import xray_recorder
 from models.daily_readiness import DailyReadiness
 from models.soreness import MuscleSorenessSeverity, BodyPartLocation
 from models.stats import AthleteStats

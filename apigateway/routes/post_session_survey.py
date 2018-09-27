@@ -1,4 +1,3 @@
-from aws_xray_sdk.core import xray_recorder
 from flask import request, Blueprint
 
 from datastores.post_session_survey_datastore import PostSessionSurveyDatastore
@@ -6,6 +5,7 @@ from fathomapi.api.config import Config
 from fathomapi.comms.service import Service
 from fathomapi.utils.decorators import require
 from fathomapi.utils.exceptions import InvalidSchemaException
+from fathomapi.utils.xray import xray_recorder
 from models.post_session_survey import PostSessionSurvey
 from models.session import SessionType
 from utils import format_datetime

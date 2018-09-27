@@ -1,9 +1,9 @@
-from aws_xray_sdk.core import xray_recorder
 from flask import request, Blueprint
 import datetime
 
 from fathomapi.utils.decorators import require
 from fathomapi.utils.exceptions import InvalidSchemaException
+from fathomapi.utils.xray import xray_recorder
 from datastores.weekly_schedule_datastore import WeeklyCrossTrainingDatastore, WeeklyTrainingDatastore
 from models.weekly_schedule import WeeklySchedule
 from models.sport import SportName

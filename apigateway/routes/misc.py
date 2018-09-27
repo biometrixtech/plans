@@ -1,4 +1,3 @@
-from aws_xray_sdk.core import xray_recorder
 from flask import request, Blueprint
 import datetime
 from utils import format_date, parse_datetime
@@ -6,6 +5,8 @@ from utils import format_date, parse_datetime
 from config import get_mongo_collection, get_mongo_database
 from fathomapi.utils.decorators import require
 from fathomapi.utils.exceptions import ForbiddenException
+from fathomapi.utils.xray import xray_recorder
+
 app = Blueprint('misc', __name__)
 
 

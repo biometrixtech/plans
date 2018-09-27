@@ -1,12 +1,12 @@
-from aws_xray_sdk.core import xray_recorder
 from flask import request, Blueprint
-import json
 import datetime
-from utils import format_date, format_datetime, parse_datetime
 
+from utils import format_date, format_datetime, parse_datetime
 from datastores.daily_plan_datastore import DailyPlanDatastore
+
 from fathomapi.utils.decorators import require
 from fathomapi.utils.exceptions import InvalidSchemaException
+from fathomapi.utils.xray import xray_recorder
 
 app = Blueprint('daily_plan', __name__)
 

@@ -1,9 +1,9 @@
-from aws_xray_sdk.core import xray_recorder
 from flask import request, Blueprint
 import datetime
 
 from fathomapi.utils.decorators import require
 from fathomapi.utils.exceptions import InvalidSchemaException
+from fathomapi.utils.xray import xray_recorder
 from config import get_mongo_collection
 from datastores.daily_plan_datastore import DailyPlanDatastore
 from datastores.session_datastore import SessionDatastore

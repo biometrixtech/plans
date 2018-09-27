@@ -1,14 +1,13 @@
-from aws_xray_sdk.core import xray_recorder
 from flask import request, Blueprint
 import datetime
 
 from datastores.daily_plan_datastore import DailyPlanDatastore
 from datastores.session_datastore import SessionDatastore
-# from datastore.post_session_survey import PostSessionSurveyDatastore
 from fathomapi.api.config import Config
 from fathomapi.comms.service import Service
 from fathomapi.utils.decorators import require
 from fathomapi.utils.exceptions import InvalidSchemaException, NoSuchEntityException, ForbiddenException
+from fathomapi.utils.xray import xray_recorder
 from models.session import SessionType, SessionFactory, StrengthConditioningType
 from models.post_session_survey import PostSessionSurvey, PostSurvey
 from models.daily_plan import DailyPlan

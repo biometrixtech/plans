@@ -1,8 +1,8 @@
-from aws_xray_sdk.core import xray_recorder
 from flask import request, Blueprint
 
 from fathomapi.utils.decorators import require
 from fathomapi.utils.exceptions import InvalidSchemaException, NoSuchEntityException
+from fathomapi.utils.xray import xray_recorder
 from datastores.daily_plan_datastore import DailyPlanDatastore
 from datastores.completed_exercise_datastore import CompletedExerciseDatastore
 from models.exercise import CompletedExercise

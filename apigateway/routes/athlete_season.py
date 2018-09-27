@@ -1,9 +1,8 @@
-from aws_xray_sdk.core import xray_recorder
 from flask import request, Blueprint
-import json
-import datetime
 
 from fathomapi.utils.decorators import require
+from fathomapi.utils.xray import xray_recorder
+
 from datastores.season_datastore import AthleteSeasonDatastore
 from models.athlete_season import AthleteSeason, Season
 
