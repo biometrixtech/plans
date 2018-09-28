@@ -79,7 +79,7 @@ def manage_readiness_push_notification(athlete_id):
     if not plan or not plan.daily_readiness_survey_completed():
         body = {"message": "Good morning, Ivonna. Let’s make the most of your day! Tap to get started.",
                 "call_to_action": "COMPLETE_DAILY_READINESS"}
-        Service('users', '2_0').call_apigateway_sync('POST', f'/user/{user.id}/notify', body=body)
+        Service('users', '2_0').call_apigateway_sync('POST', f'/user/{athlete_id}/notify', body=body)
 
 @app.route('/<uuid:athlete_id>/send_active_prep_notification', methods=['POST'])
 @require.authenticated.any
@@ -90,7 +90,7 @@ def manage_prep_push_notification(athlete_id):
     if plan and not plan.pre_recovery_completed and plan.pre_recovery.impact_score > 3:
         body = {"message": "Your self care ritual is ready. Take time to invest in yourself.",
                 "call_to_action": "COMPLETE_ACTIVE_PREP"}
-        Service('users', '2_0').call_apigateway_sync('POST', f'/user/{user.id}/notify', body=body)
+        Service('users', '2_0').call_apigateway_sync('POST', f'/user/{athlete_id}/notify', body=body)
 
 
 @app.route('/<uuid:athlete_id>/send_recovery_notification', methods=['POST'])
@@ -102,15 +102,52 @@ def manage_recovery_push_notification(athlete_id):
     if plan and not plan.post_recovery_completed and plan.post_recovery.impact_score > 3:
         body = {"message": "Your self care ritual is ready. Take time to invest in yourself.",
                 "call_to_action": "COMPLETE_ACTIVE_RECOVERY"}
-        Service('users', '2_0').call_apigateway_sync('POST', f'/user/{user.id}/notify', body=body)
+        Service('users', '2_0').call_apigateway_sync('POST', f'/user/{athlete_id}/notify', body=body)
 
+
+@app.route('/<uuid:athlete_id>/prep_started', methods=['POST'])
+@require.authenticated.any
+@xray_recorder.capture('routes.athlete.completion_pn')
+def manage_prep_completion_push_notification(athlete_id):
+    execute_at = datetime.datetime.now() + datetime.timedelta(minutes=30)
+    execute_at = format_datetime(execute_at)
+    body = {"recovery_type": "prep",
+            "event_date": format_date(parse_datetime(request.json["event_date"]))}
+    Service('plans', Config.get('API_VERSION')).call_apigateway_sync('POST', f'/user/{athlete_id}/send_completion_notification', body=body, execute_at=execute_at)
+
+
+@app.route('/<uuid:athlete_id>/recovery_started', methods=['POST'])
+@require.authenticated.any
+@xray_recorder.capture('routes.athlete.recovery_pn')
+def manage_recovery_completion_push_notification(athlete_id):
+    execute_at = datetime.datetime.now() + datetime.timedelta(minutes=30)
+    execute_at = format_datetime(execute_at)
+    body = {"recovery_type": "recovery",
+            "event_date": format_date(parse_datetime(request.json["event_date"]))}
+    Service('plans', Config.get('API_VERSION')).call_apigateway_sync('POST', f'/user/{athlete_id}/send_completion_notification', body=body, execute_at=execute_at)
+
+
+@app.route('/<uuid:athlete_id>/send_completion_notification', methods=['POST'])
+@require.authenticated.any
+@xray_recorder.capture('routes.athlete.completion_pn')
+def manage_recovery_push_notification(athlete_id):
+    recovery_type = request.json['recovery_type']
+    event_date = format_date(parse_date(request.json['event_date']))
+    plan = _get_plan(athlete_id, event_date)
+    body = {"message": "Being your best takes discipline. Finish what you started. Tap to complete your ritual.",
+            "call_to_action": "COMPLETE_ACTIVE_RECOVERY"}
+    if recovery_type=='prep' and plan and not plan.pre_recovery_completed:
+        Service('users', '2_0').call_apigateway_sync('POST', f'/user/{athlete_id}/notify', body=body)
+
+    elif recovery_type=='recovery' and plan and not plan.post_recovery.completed:
+        Service('users', '2_0').call_apigateway_sync('POST', f'/user/{athlete_id}/notify', body=body)
 
 def _get_plan(user_id, event_date):
     plans = DatastoreCollection().daily_plan_datastore.get(user_id, event_date, event_date)
     if len(plans) == 0:
         return False
     else:
-        return plan[0]
+        return plans[0]
 
 def _is_athlete_active(athlete_id):
     athlete_stats = DatastoreCollection().athlete_stats_datastore.get(athlete_id=athlete_id)
