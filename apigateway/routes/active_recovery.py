@@ -73,6 +73,54 @@ def handle_active_recovery_update():
     return {'daily_plans': [plan]}, 202
 
 
+@app.route('/', methods=['POST'])
+@require.authenticated.any
+@xray_recorder.capture('routes.active_recovery.start')
+def handle_active_recovery_update():
+    if not isinstance(request.json, dict):
+        raise InvalidSchemaException('Request body must be a dictionary')
+    if 'event_date' not in request.json:
+        raise InvalidSchemaException('Missing required parameter event_date')
+    else:
+        event_date = parse_datetime(request.json['event_date'])
+    try:
+        user_id = request.json['user_id']
+    except:
+        raise InvalidSchemaException('user_id is required')
+    try:
+        recovery_type = request.json['recovery_type']
+    except:
+        raise InvalidSchemaException('recovery_type is required')
+    try:
+        completed_exercises = request.json['completed_exercises']
+    except:
+        completed_exercises = []
+
+    plan_event_date = format_date(event_date)
+    recovery_start_date = format_datetime(event_date)
+    if not _check_plan_exists(user_id, plan_event_date):
+        raise NoSuchEntityException('Plan not found for the user')
+    store = DailyPlanDatastore()
+
+    plan = store.get(user_id=user_id,
+                     start_date=plan_event_date,
+                     end_date=plan_event_date)[0]
+    plans_service = Service('plans', Config.get('API_VERSION'))
+    if recovery_type == 'pre':
+        plan.pre_recovery.start_date = recovery_start_date
+        plans_service.call_apigateway_sync(method='POST',
+                                           endpoint=f'/user/{athlete_id}/prep_started')
+
+    elif recovery_type == 'post':
+        plan.post_recovery.start_time = recovery_start_date
+        plans_service.call_apigateway_sync(method='POST',
+                                           endpoint=f'/user/{athlete_id}/recovery_started')
+
+    store.put(plan)
+
+    return {'message': 'success'}, 202
+
+
 def save_completed_exercises(exercise_list, user_id, event_date):
     exercise_store = CompletedExerciseDatastore()
 

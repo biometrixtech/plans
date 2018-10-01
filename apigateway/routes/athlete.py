@@ -63,9 +63,19 @@ def manage_athlete_push_notification(athlete_id):
         recovery_event_date = format_datetime(recovery_date_utc)
 
         body = {"event_date": format_date(current_date_local)}
-        Service('plans', Config.get('API_VERSION')).call_apigateway_sync('POST', f"athlete/{athlete_id}/send_daily_readiness_notification", body=body, execute_at=readiness_event_date)
-        Service('plans', Config.get('API_VERSION')).call_apigateway_sync('POST', f"athlete/{athlete_id}/send_active_prep_notification", body=body, execute_at=prep_event_date)
-        Service('plans', Config.get('API_VERSION')).call_apigateway_sync('POST', f"athlete/{athlete_id}/send_recovery_notification", body=body, execute_at=recovery_event_date)
+        plans_service = Service('plans', Config.get('API_VERSION'))
+        plans_service.call_apigateway_sync(method='POST',
+                                           endpoint=f"athlete/{athlete_id}/send_daily_readiness_notification",
+                                           body=body,
+                                           execute_at=readiness_event_date)
+        plans_service.call_apigateway_sync(method='POST',
+                                           endpoint=f"athlete/{athlete_id}/send_active_prep_notification",
+                                           body=body,
+                                           execute_at=prep_event_date)
+        plans_service.call_apigateway_sync(method='POST',
+                                           endpoint=f"athlete/{athlete_id}/send_recovery_notification",
+                                           body=body,
+                                           execute_at=recovery_event_date)
     else:
         raise ValueError
 
@@ -79,7 +89,7 @@ def manage_readiness_push_notification(athlete_id):
     if not plan or not plan.daily_readiness_survey_completed():
         body = {"message": "Good morning, Ivonna. Let’s make the most of your day! Tap to get started.",
                 "call_to_action": "COMPLETE_DAILY_READINESS"}
-        Service('users', '2_0').call_apigateway_sync('POST', f'/user/{athlete_id}/notify', body=body)
+        _notify_user(athlete_id, body)
 
 @app.route('/<uuid:athlete_id>/send_active_prep_notification', methods=['POST'])
 @require.authenticated.any
@@ -87,10 +97,10 @@ def manage_readiness_push_notification(athlete_id):
 def manage_prep_push_notification(athlete_id):
     event_date = format_date(parse_date(request.json['event_date']))
     plan = _get_plan(athlete_id, event_date)
-    if plan and not plan.pre_recovery_completed and plan.pre_recovery.impact_score > 3:
+    if plan and not plan.pre_recovery.start_date is not None and plan.pre_recovery.impact_score > 3:
         body = {"message": "Your self care ritual is ready. Take time to invest in yourself.",
                 "call_to_action": "COMPLETE_ACTIVE_PREP"}
-        Service('users', '2_0').call_apigateway_sync('POST', f'/user/{athlete_id}/notify', body=body)
+        _notify_user(athlete_id, body)
 
 
 @app.route('/<uuid:athlete_id>/send_recovery_notification', methods=['POST'])
@@ -99,10 +109,10 @@ def manage_prep_push_notification(athlete_id):
 def manage_recovery_push_notification(athlete_id):
     event_date = format_date(parse_date(request.json['event_date']))
     plan = _get_plan(athlete_id, event_date)
-    if plan and not plan.post_recovery_completed and plan.post_recovery.impact_score > 3:
+    if plan and plan.post_recovery.start_date is not None and plan.post_recovery.impact_score > 3:
         body = {"message": "Your self care ritual is ready. Take time to invest in yourself.",
                 "call_to_action": "COMPLETE_ACTIVE_RECOVERY"}
-        Service('users', '2_0').call_apigateway_sync('POST', f'/user/{athlete_id}/notify', body=body)
+        _notify_user(athlete_id, body)
 
 
 @app.route('/<uuid:athlete_id>/prep_started', methods=['POST'])
@@ -134,13 +144,15 @@ def manage_recovery_push_notification(athlete_id):
     recovery_type = request.json['recovery_type']
     event_date = format_date(parse_date(request.json['event_date']))
     plan = _get_plan(athlete_id, event_date)
-    body = {"message": "Being your best takes discipline. Finish what you started. Tap to complete your ritual.",
-            "call_to_action": "COMPLETE_ACTIVE_RECOVERY"}
     if recovery_type=='prep' and plan and not plan.pre_recovery_completed:
-        Service('users', '2_0').call_apigateway_sync('POST', f'/user/{athlete_id}/notify', body=body)
+        body = {"message": "Being your best takes discipline. Finish what you started. Tap to complete your ritual.",
+                "call_to_action": "COMPLETE_ACTIVE_PREP"}
+        _notify_user(athlete_id, body)
 
     elif recovery_type=='recovery' and plan and not plan.post_recovery.completed:
-        Service('users', '2_0').call_apigateway_sync('POST', f'/user/{athlete_id}/notify', body=body)
+        body = {"message": "Being your best takes discipline. Finish what you started. Tap to complete your ritual.",
+                "call_to_action": "COMPLETE_ACTIVE_RECOVERY"}
+        _notify_user(athlete_id, body)
 
 def _get_plan(user_id, event_date):
     plans = DatastoreCollection().daily_plan_datastore.get(user_id, event_date, event_date)
@@ -155,6 +167,12 @@ def _is_athlete_active(athlete_id):
         return True
     else:
         return False
+
+def _notify_user(athlete_id, body):
+    users_service = Service('users', '2_0')
+    users_service.call_apigateway_sync(method='POST',
+                                       endpoint=f'/user/{athlete_id}/notify',
+                                       body=body)
 
 
 @xray_recorder.capture('routes.athlete.daily_plan.push')
