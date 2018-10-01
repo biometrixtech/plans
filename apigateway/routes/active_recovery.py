@@ -54,8 +54,8 @@ def handle_active_recovery_update():
     elif recovery_type == 'post':
         plan.post_recovery_completed = True # plan
         plan.post_recovery.completed = True # recovery
-        plan.post_recovery.start_time = recovery_start_date
-        plan.post_recovery.end_time = recovery_event_date
+        plan.post_recovery.start_date = recovery_start_date
+        plan.post_recovery.event_date = recovery_event_date
         plan.post_recovery.display_exercises = False
 
     store.put(plan)
