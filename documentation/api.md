@@ -153,12 +153,15 @@ This endpoint can be called to get the body parts where soreness was reported in
 
 ##### Query String
  
-The client __must__ submit a request to the endpoint `/plans/version/daily_readiness/previous`. The request method __must__ be `GET`.
+The client __must__ submit a request to the endpoint `/plans/version/daily_readiness/previous`. The request method __must__ be `GET` or `POST`.
 
 ##### Request
-This request does not require a body.
-
-
+For `POST` method, the client __must__ submit a request body containing a JSON object with the following schema:
+```
+{
+    "event_date": Datetime
+}
+```
 ```
 GET /plans/version/daily_readiness/previous HTTPS/1.1
 Host: apis.env.fathomai.com
