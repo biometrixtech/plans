@@ -59,13 +59,11 @@ def handle_daily_readiness_create():
 @xray_recorder.capture('routes.daily_readiness.previous')
 def handle_daily_readiness_get():
     daily_readiness_store = DailyReadinessDatastore()
-    # user_id = jwt.decode(request.headers['Authorization'], verify=False)['user_id']
     token = jwt.decode(request.headers['Authorization'], verify=False)
     if 'sub' in token:
         user_id = token['sub']
     elif 'user_id' in token:
         user_id = token['user_id']
-    user_id = jwt.decode(request.headers['Authorization'], verify=False)['user_id']
     if request.method == 'POST':
         if 'event_date' not in request.json:
             raise InvalidSchemaException('Missing required parameter event_date')
