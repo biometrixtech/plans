@@ -91,10 +91,6 @@ def handle_active_recovery_update():
         recovery_type = request.json['recovery_type']
     except:
         raise InvalidSchemaException('recovery_type is required')
-    try:
-        completed_exercises = request.json['completed_exercises']
-    except:
-        completed_exercises = []
 
     plan_event_date = format_date(event_date)
     recovery_start_date = format_datetime(event_date)
@@ -112,7 +108,7 @@ def handle_active_recovery_update():
                                            endpoint=f'/user/{athlete_id}/prep_started')
 
     elif recovery_type == 'post':
-        plan.post_recovery.start_time = recovery_start_date
+        plan.post_recovery.start_date = recovery_start_date
         plans_service.call_apigateway_sync(method='POST',
                                            endpoint=f'/user/{athlete_id}/recovery_started')
 

@@ -76,8 +76,6 @@ def manage_athlete_push_notification(athlete_id):
                                            endpoint=f"athlete/{athlete_id}/send_recovery_notification",
                                            body=body,
                                            execute_at=recovery_event_date)
-    else:
-        raise ValueError
 
 
 @app.route('/<uuid:athlete_id>/send_daily_readiness_notification', methods=['POST'])
