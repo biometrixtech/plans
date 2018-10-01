@@ -1,3 +1,48 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Plans API](#plans-api)
+  - [Common provisions](#common-provisions)
+      - [Terminology](#terminology)
+      - [Protocol](#protocol)
+      - [Encoding](#encoding)
+      - [Authentication](#authentication)
+      - [General responses](#general-responses)
+  - [Schema](#schema)
+    - [Simple](#simple)
+  - [Endpoints](#endpoints)
+    - [Daily Readiness](#daily-readiness)
+      - [Create](#create)
+      - [Soreness history](#soreness-history)
+    - [Post-Session Survey (Deprecated)](#post-session-survey-deprecated)
+      - [Create](#create-1)
+    - [Session](#session)
+      - [Create](#create-2)
+      - [Get Typical Sessions](#get-typical-sessions)
+      - [Mark no sessions planned](#mark-no-sessions-planned)
+      - [Delete](#delete)
+      - [Update](#update)
+      - [Send sensor data](#send-sensor-data)
+    - [Active Recovery](#active-recovery)
+      - [Mark Started](#mark-started)
+      - [Mark Completed](#mark-completed)
+    - [Functional Strength](#functional-strength)
+      - [Mark Completed](#mark-completed-1)
+    - [Schedule](#schedule)
+      - [Daily Schedule](#daily-schedule)
+    - [Weekly Training](#weekly-training)
+      - [Cross-Training](#cross-training)
+      - [Training](#training)
+    - [Daily Plans](#daily-plans)
+      - [Get daily plan](#get-daily-plan)
+    - [Training Seasons](#training-seasons)
+      - [athlete seasons](#athlete-seasons)
+    - [Misc](#misc)
+      - [Clear user's data](#clear-users-data)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Plans API
 
 ## Common provisions
@@ -561,6 +606,48 @@ Authorization: eyJraWQ...ajBc4VQ
 
 
 ### Active Recovery
+
+#### Mark Started
+
+This endpoint can be called to mark either the pre- or post-recovery started.
+
+##### Query String
+ 
+The client __must__ submit a request to the endpoint `/plans/version/active_recovery`. The request method __must__ be `POST`.
+
+##### Request
+
+The client __must__ submit a request body containing a JSON object with the following schema:
+```
+{
+    "user_id": Uuid,
+    "event_date": Datetime,
+    "recovery_type": string
+}
+```
+* `event_date` __should__ be the time when user checks the first exercise for the session.
+* `recovery_type` __should__ be either `pre` or `post`
+
+```
+POST /plans/version/active_recovery HTTPS/1.1
+Host: apis.env.fathomai.com
+Content-Type: application/json
+Authorization: eyJraWQ...ajBc4VQ
+{
+    "user_id":"a1233423-73d3-4761-ac92-89cc15921d34",
+    "event_date": "2018-09-21T17:53:39Z",
+    "recovery_type": "pre"
+}
+```
+##### Responses
+ 
+ If the write was successful, the Service __will__ respond with HTTP Status `200 OK`, and return the daily_plan in the body with following syntax.
+ 
+```
+{
+    "message": "success"
+}
+```
 
 #### Mark Completed
 

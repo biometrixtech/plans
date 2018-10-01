@@ -114,7 +114,7 @@ def handle_active_recovery_update():
 
     store.put(plan)
 
-    return {'message': 'success'}, 202
+    return {'message': 'success'}, 200
 
 
 def save_completed_exercises(exercise_list, user_id, event_date):
