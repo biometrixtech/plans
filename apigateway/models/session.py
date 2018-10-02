@@ -350,7 +350,7 @@ class FunctionalStrengthSession(Serialisable):
                    'stability_work': [ex.json_serialise() for ex in self.stability_work],
                    'victory_lap': [ex.json_serialise() for ex in self.victory_lap],
                    'sport_name': self.sport_name.value,
-                   'position': self.position.value
+                   'position': self.position.value if self.position is not None else None
                    }
             return ret
 
