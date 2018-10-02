@@ -158,12 +158,12 @@ class FSProgramGenerator(object):
 
                 session.stability_work.append(AssignedExercise("208", 3, 1))
                 session.stability_work.append(AssignedExercise("209", 3, 2))
-                session.stability_work.append(AssignedExercise("210", 3, 3))
-                session.stability_work.append(AssignedExercise("211", 3, 4))
+                #session.stability_work.append(AssignedExercise("210", 3, 3))
+                session.stability_work.append(AssignedExercise("211", 3, 3))
 
-                session.victory_lap.append(AssignedExercise("212", 4, 1))
-                session.victory_lap.append(AssignedExercise("159", 4, 2))
-                session.victory_lap.append(AssignedExercise("213", 4, 3))
+                #session.victory_lap.append(AssignedExercise("212", 4, 1))
+                session.victory_lap.append(AssignedExercise("159", 4, 1))
+                session.victory_lap.append(AssignedExercise("213", 4, 2))
 
         if sport_name == sport.SportName.distance_running:
 
@@ -240,10 +240,10 @@ class FSProgramGenerator(object):
             session.stability_work.append(AssignedExercise("188", 3, 4))
             session.stability_work.append(AssignedExercise("189", 3, 5))
 
-            session.victory_lap.append(AssignedExercise("190", 4, 1))
-            session.victory_lap.append(AssignedExercise("191", 4, 2))
-            session.victory_lap.append(AssignedExercise("159", 4, 3))
-            session.victory_lap.append(AssignedExercise("192", 4, 4))
+            #session.victory_lap.append(AssignedExercise("190", 4, 1))
+            #session.victory_lap.append(AssignedExercise("191", 4, 2))
+            session.victory_lap.append(AssignedExercise("159", 4, 1))
+            #session.victory_lap.append(AssignedExercise("192", 4, 4))
 
         if sport_name == sport.SportName.football:
             if (position is not None and (position == sport.FootballPosition.kicker or
