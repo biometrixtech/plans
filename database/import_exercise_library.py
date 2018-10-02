@@ -5,7 +5,7 @@ from config import get_mongo_collection
 import models.exercise
 
 exercise_descriptions = {}
-with open('FS_Exercise_Descriptions.tsv', newline='') as csvfile:
+with open('Exercise_Descriptions.tsv', newline='') as csvfile:
   exercise_reader = csv.reader(csvfile, delimiter='\t')
   row_count = 0
   for row in exercise_reader:
@@ -15,7 +15,7 @@ with open('FS_Exercise_Descriptions.tsv', newline='') as csvfile:
 csvfile.close()
 
 exercises = []
-with open('FS_Exercise_Library.csv', newline='') as csvfile:
+with open('Exercise_Library.csv', newline='') as csvfile:
     exercise_reader = csv.reader(csvfile, delimiter=',')
     row_count = 0
     for row in exercise_reader:
