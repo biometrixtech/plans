@@ -1,19 +1,18 @@
 from models.stats import AthleteStats
 from datetime import datetime, timedelta
 import statistics
-from utils import format_datetime
+from utils import parse_date, parse_datetime, format_date
 
 
 class StatsProcessing(object):
 
-    def __init__(self, athlete_id, event_date, daily_readiness_datastore, post_session_survey_datastore,
-                 daily_plan_datastore, athlete_stats_datastore):
+    def __init__(self, athlete_id, event_date, datastore_collection):
         self.athlete_id = athlete_id
         self.event_date = event_date
-        self.daily_readiness_datastore = daily_readiness_datastore
-        self.post_session_survey_datastore = post_session_survey_datastore
-        self.athlete_stats_datastore = athlete_stats_datastore
-        self.daily_plan_datastore = daily_plan_datastore
+        self.daily_readiness_datastore = datastore_collection.daily_readiness_datastore
+        self.post_session_survey_datastore = datastore_collection.post_session_survey_datastore
+        self.athlete_stats_datastore = datastore_collection.athlete_stats_datastore
+        self.daily_plan_datastore = datastore_collection.daily_plan_datastore
         self.start_date = None
         self.end_date = None
         self.start_date_time = None
@@ -31,6 +30,8 @@ class StatsProcessing(object):
         self.chronic_daily_plans = []
         self.last_7_days_plans = []
         self.days_8_14_plans = []
+        self.last_7_days_ps_surveys = []
+        self.days_8_14_ps_surveys = []
 
     def set_start_end_times(self):
         if self.event_date is None:
@@ -52,6 +53,12 @@ class StatsProcessing(object):
         athlete_stats.event_date = self.event_date
         athlete_stats = self.calc_survey_stats(athlete_stats)
         athlete_stats = self.calc_training_volume_metrics(athlete_stats)
+        athlete_stats.functional_strength_eligible = self.is_athlete_functional_strength_eligible()
+        athlete_stats.completed_functional_strength_sessions = self.get_completed_functional_strength_sessions()
+        current_athlete_stats = self.athlete_stats_datastore.get(athlete_id=self.athlete_id)
+        if current_athlete_stats is not None:
+            athlete_stats.current_sport_name = current_athlete_stats.current_sport_name
+            athlete_stats.current_position = current_athlete_stats.current_position
         self.athlete_stats_datastore.put(athlete_stats)
 
     def calc_training_volume_metrics(self, athlete_stats):
@@ -182,7 +189,7 @@ class StatsProcessing(object):
                           d.get_event_datetime() < self.acute_start_date_time - timedelta(days=21)]
         week3_sessions = [d for d in self.chronic_daily_plans if self.acute_start_date_time
                           - timedelta(days=21) <= d.get_event_datetime() < self.acute_start_date_time -
-                          timedelta(days=11)]
+                          timedelta(days=14)]
         week2_sessions = [d for d in self.chronic_daily_plans if self.acute_start_date_time
                           - timedelta(days=14) <= d.get_event_datetime() < self.acute_start_date_time -
                           timedelta(days=7)]
@@ -246,6 +253,95 @@ class StatsProcessing(object):
         values = list(getattr(c, attribute_1_name) * getattr(c, attribute_1_name) for c in session_collection
                       if getattr(c, attribute_1_name) is not None and getattr(c, attribute_2_name) is not None)
         return values
+
+    def is_athlete_functional_strength_eligible(self):
+
+        # completed yesterday?
+        #completed_yesterday = self.functional_strength_yesterday()
+
+        # onboarded > 2 weeks?
+        two_plus_weeks_since_onboarding = self.is_athlete_two_weeks_from_onboarding()
+
+        # active prep / active recovery checks
+        two_apar_sessions_completed = self.athlete_has_enough_active_prep_recovery_sessions()
+
+        # logged sessions
+        four_plus_training_sessions_logged = self.athlete_logged_enough_sessions()
+
+        # wrapping it all up
+        if (two_plus_weeks_since_onboarding and two_apar_sessions_completed and four_plus_training_sessions_logged):
+            return True
+        else:
+            return False
+
+    def functional_strength_yesterday(self):
+
+        yesterday = format_date(parse_date(self.event_date) - timedelta(1))
+
+        completed_sessions = [a for a in self.last_7_days_plans if a.functional_strength_completed if a is not None
+                              and a.event_date == yesterday]
+
+        if len(completed_sessions) > 0:
+            return True
+
+        return False
+
+    def athlete_logged_enough_sessions(self):
+
+        four_plus_training_sessions_logged = False
+        logged_session_plans = []
+
+        logged_session_plans.extend(self.last_7_days_ps_surveys)
+
+        logged_session_plans.extend(self.days_8_14_ps_surveys)
+
+        if len(logged_session_plans) > 4:
+            four_plus_training_sessions_logged = True
+
+        return four_plus_training_sessions_logged
+
+    def athlete_has_enough_active_prep_recovery_sessions(self):
+
+        two_apar_sessions_completed = False
+        apar_sessions_completed_count_7 = 0
+        apar_sessions_completed_count_14 = 0
+
+        active_prep_completed_plans_7 = [a for a in self.last_7_days_plans if a.pre_recovery_completed if a is not None]
+        active_rec_completed_plans_7 = [a for a in self.last_7_days_plans if a.post_recovery_completed if a is not None]
+        active_prep_completed_plans_14 = [a for a in self.days_8_14_plans if a.pre_recovery_completed if a is not None]
+        active_rec_completed_plans_14 = [a for a in self.days_8_14_plans if a.post_recovery_completed if a is not None]
+
+        if active_prep_completed_plans_7 is not None and active_rec_completed_plans_7 is not None:
+            apar_sessions_completed_count_7 = (apar_sessions_completed_count_7 + len(active_prep_completed_plans_7) +
+                                               len(active_rec_completed_plans_7))
+
+        if active_prep_completed_plans_14 is not None and active_rec_completed_plans_14 is not None:
+            apar_sessions_completed_count_14 = (apar_sessions_completed_count_14 + len(active_prep_completed_plans_14) +
+                                                len(active_rec_completed_plans_14))
+
+        if apar_sessions_completed_count_7 >= 2 and apar_sessions_completed_count_14 >= 2:
+            two_apar_sessions_completed = True
+
+        return two_apar_sessions_completed
+
+    def is_athlete_two_weeks_from_onboarding(self):
+
+        two_plus_weeks_since_onboarding = False
+
+        if self.chronic_readiness_surveys is not None and len(self.chronic_readiness_surveys) > 0:
+            days_diff = (
+                        parse_date(self.event_date) - self.chronic_readiness_surveys[0].event_date).days
+
+            if days_diff >= 13: # for difference, we need one less than fourteen
+                two_plus_weeks_since_onboarding = True
+
+        return two_plus_weeks_since_onboarding
+
+    def get_completed_functional_strength_sessions(self):
+
+        completed_sesions = [a for a in self.last_7_days_plans if a.functional_strength_completed if a is not None]
+
+        return len(completed_sesions)
 
     def calc_survey_stats(self, athlete_stats):
 
@@ -364,7 +460,8 @@ class StatsProcessing(object):
             post_session_surveys.sort(key=lambda x: x.event_date_time, reverse=False)
             earliest_survey_date_time = min(earliest_survey_date_time, post_session_surveys[0].event_date_time)
 
-        days_difference = (self.end_date_time - earliest_survey_date_time).days
+        # add one since survey is first thing done in the day
+        days_difference = (self.end_date_time - earliest_survey_date_time).days + 1
 
         if 7 <= days_difference < 14:
             self.acute_days = 3
@@ -377,31 +474,44 @@ class StatsProcessing(object):
             self.chronic_days = 28
 
         if self.acute_days is not None and self.chronic_days is not None:
-            self.acute_start_date_time = self.end_date_time - timedelta(days=self.acute_days)
+            self.acute_start_date_time = self.end_date_time - timedelta(days=self.acute_days + 1)
             self.chronic_start_date_time = self.end_date_time - timedelta(days=self.chronic_days)
             chronic_date_time = self.acute_start_date_time - timedelta(days=self.chronic_days)
             chronic_delta = self.end_date_time - chronic_date_time
             self.chronic_load_start_date_time = self.end_date_time - chronic_delta
-            last_week = self.end_date_time - timedelta(days=7)
+            last_week = self.end_date_time - timedelta(days=7 + 1)
             previous_week = last_week - timedelta(days=7)
 
-            self.acute_post_session_surveys = [p for p in post_session_surveys
-                                               if p.event_date_time >= self.acute_start_date_time]
-            self.chronic_post_session_surveys = [p for p in post_session_surveys
-                                                 if p.event_date_time >= self.chronic_start_date_time]
-            self.acute_readiness_surveys = [p for p in daily_readiness_surveys
-                                            if p.event_date >= self.acute_start_date_time]
-            self.chronic_readiness_surveys = [p for p in daily_readiness_surveys
-                                              if p.event_date >= self.chronic_start_date_time]
+            self.acute_post_session_surveys = sorted([p for p in post_session_surveys
+                                                      if p.event_date_time >= self.acute_start_date_time],
+                                                     key=lambda x: x.event_date)
+            self.chronic_post_session_surveys = sorted([p for p in post_session_surveys
+                                                       if p.event_date_time >= self.chronic_start_date_time],
+                                                       key=lambda x: x.event_date)
+            self.acute_readiness_surveys = sorted([p for p in daily_readiness_surveys
+                                                  if p.event_date >= self.acute_start_date_time],
+                                                  key=lambda x: x.event_date)
 
-            self.acute_daily_plans = [p for p in daily_plans if p.get_event_datetime() >= self.acute_start_date_time]
+            self.chronic_readiness_surveys = sorted([p for p in daily_readiness_surveys
+                                                    if p.event_date >= self.chronic_start_date_time],
+                                                    key=lambda x: x.event_date)
 
-            self.chronic_daily_plans = [p for p in daily_plans if self.acute_start_date_time >
-                                        p.get_event_datetime() >= self.chronic_load_start_date_time]
+            self.acute_daily_plans = sorted([p for p in daily_plans if p.get_event_datetime() >=
+                                             self.acute_start_date_time], key=lambda x: x.event_date)
+
+            self.chronic_daily_plans = sorted([p for p in daily_plans if self.acute_start_date_time >
+                                              p.get_event_datetime() >= self.chronic_load_start_date_time],
+                                              key=lambda x: x.event_date)
 
             self.last_7_days_plans = [p for p in daily_plans if p.get_event_datetime() >= last_week]
 
             self.days_8_14_plans = [p for p in daily_plans if last_week > p.get_event_datetime() >= previous_week]
+
+            self.last_7_days_ps_surveys = [p for p in post_session_surveys if p.event_date_time >= last_week]
+
+            self.days_8_14_ps_surveys = [p for p in post_session_surveys if last_week > p.event_date_time >= previous_week]
+
+
 
 
 

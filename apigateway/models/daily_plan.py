@@ -18,6 +18,7 @@ class DailyPlan(Serialisable):
         self.tournaments = []
         self.pre_recovery_completed = False
         self.post_recovery_completed = False
+        self.functional_strength_completed = False
         self.pre_recovery = session.RecoverySession()
         self.post_recovery = session.RecoverySession()
         self.completed_post_recovery_sessions = []
@@ -28,6 +29,9 @@ class DailyPlan(Serialisable):
         self.last_updated = None
         self.last_sensor_sync = None
         self.sessions_planned = True
+        self.functional_strength_eligible = False
+        self.completed_functional_strength_sessions = 0
+        self.functional_strength_session = None
 
     def get_id(self):
         return self.user_id
@@ -46,6 +50,8 @@ class DailyPlan(Serialisable):
                'game_sessions': [g.json_serialise() for g in self.games],
                'pre_recovery_completed': self.pre_recovery_completed,
                'post_recovery_completed': self.post_recovery_completed,
+               'functional_strength_session': (self.functional_strength_session.json_serialise()
+                                               if self.functional_strength_session is not None else None),
                'recovery_am': self.pre_recovery.json_serialise() if self.pre_recovery is not None else None,
                'recovery_pm': self.post_recovery.json_serialise() if self.post_recovery is not None else None,
                'pre_recovery': self.pre_recovery.json_serialise() if self.pre_recovery is not None else None,
@@ -54,7 +60,10 @@ class DailyPlan(Serialisable):
                'last_updated': self.last_updated,
                'daily_readiness_survey': self.daily_readiness_survey,
                'last_sensor_sync': self.last_sensor_sync,
-               'sessions_planned': self.sessions_planned
+               'sessions_planned': self.sessions_planned,
+               'functional_strength_completed': self.functional_strength_completed,
+               'functional_strength_eligible': self.functional_strength_eligible,
+               'completed_functional_strength_sessions': self.completed_functional_strength_sessions,
                }
         return ret
 

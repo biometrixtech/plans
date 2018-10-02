@@ -81,7 +81,7 @@ with open('Exercise_Library.csv', newline='') as csvfile:
 exercise_count = len(exercises)
 collection = get_mongo_collection('exerciselibrary')
 print(collection)
-collection.delete_many({})
+# collection.delete_many({})
 
 for exercise_item in exercises:
     collection.replace_one({'library_id': exercise_item.id},
@@ -98,7 +98,7 @@ for exercise_item in exercises:
                            'progression_interval': exercise_item.progression_interval,
                            'exposure_target': exercise_item.exposure_target,
                            'exposure_minimum': exercise_item.exposure_minimum,
-                           'unit_of_measure': exercise_item.unit_of_measure,
+                           'unit_of_measure': exercise_item.unit_of_measure.name,
                            'seconds_rest_between_sets': exercise_item.seconds_rest_between_sets,
                            'time_per_set': exercise_item.seconds_per_set,
                            'time_per_rep': exercise_item.seconds_per_rep,

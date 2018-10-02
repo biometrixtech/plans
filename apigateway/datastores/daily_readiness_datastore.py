@@ -39,7 +39,9 @@ class DailyReadinessDatastore(object):
                                       user_id=mongo_result['user_id'],
                                       soreness=mongo_result['soreness'],
                                       sleep_quality=mongo_result['sleep_quality'],
-                                      readiness=mongo_result['readiness'])]
+                                      readiness=mongo_result['readiness'],
+                                      wants_functional_strength=mongo_result.get('wants_functional_strength', False)
+                                    )]
 
             else:
                 raise NoSuchEntityException("readiness survey does not exist for the user")
@@ -53,7 +55,8 @@ class DailyReadinessDatastore(object):
                     user_id=mongo_result['user_id'],
                     soreness=mongo_result['soreness'],
                     sleep_quality=mongo_result['sleep_quality'],
-                    readiness=mongo_result['readiness'])
+                    readiness=mongo_result['readiness'],
+                    wants_functional_strength=mongo_result.get('wants_functional_strength', False))
                 ret.append(daily_readiness)
 
             return ret
