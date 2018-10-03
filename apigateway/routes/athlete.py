@@ -39,8 +39,9 @@ def update_athlete_stats(athlete_id):
     StatsProcessing(athlete_id, event_date=None, datastore_collection=DatastoreCollection()).process_athlete_stats()
     return {'message': 'Update requested'}, 202
 
+
 @app.route('/<uuid:athlete_id>/active', methods=['POST'])
-@require.authenticated.any
+@require.authenticated.service
 @xray_recorder.capture('routes.athlete.pn.manage')
 def manage_athlete_push_notification(athlete_id):
     if _is_athlete_active(athlete_id):
@@ -75,7 +76,7 @@ def manage_athlete_push_notification(athlete_id):
 
 
 @app.route('/<uuid:athlete_id>/send_daily_readiness_notification', methods=['POST'])
-@require.authenticated.any
+@require.authenticated.service
 @xray_recorder.capture('routes.athlete.readiness_pn')
 def manage_readiness_push_notification(athlete_id):
     event_date = format_date(parse_date(request.json['event_date']))
@@ -87,7 +88,7 @@ def manage_readiness_push_notification(athlete_id):
 
 
 @app.route('/<uuid:athlete_id>/send_active_prep_notification', methods=['POST'])
-@require.authenticated.any
+@require.authenticated.service
 @xray_recorder.capture('routes.athlete.prep_pn')
 def manage_prep_push_notification(athlete_id):
     event_date = format_date(parse_date(request.json['event_date']))
@@ -99,7 +100,7 @@ def manage_prep_push_notification(athlete_id):
 
 
 @app.route('/<uuid:athlete_id>/send_recovery_notification', methods=['POST'])
-@require.authenticated.any
+@require.authenticated.service
 @xray_recorder.capture('routes.athlete.recovery_pn')
 def manage_recovery_push_notification(athlete_id):
     event_date = format_date(parse_date(request.json['event_date']))
@@ -111,7 +112,7 @@ def manage_recovery_push_notification(athlete_id):
 
 
 @app.route('/<uuid:athlete_id>/prep_started', methods=['POST'])
-@require.authenticated.any
+@require.authenticated.service
 @xray_recorder.capture('routes.athlete.completion_pn')
 def manage_prep_completion_push_notification(athlete_id):
     execute_at = datetime.datetime.now() + datetime.timedelta(minutes=30)
@@ -122,7 +123,7 @@ def manage_prep_completion_push_notification(athlete_id):
 
 
 @app.route('/<uuid:athlete_id>/recovery_started', methods=['POST'])
-@require.authenticated.any
+@require.authenticated.service
 @xray_recorder.capture('routes.athlete.recovery_pn')
 def manage_recovery_completion_push_notification(athlete_id):
     execute_at = datetime.datetime.now() + datetime.timedelta(minutes=30)
@@ -133,13 +134,13 @@ def manage_recovery_completion_push_notification(athlete_id):
 
 
 @app.route('/<uuid:athlete_id>/send_completion_notification', methods=['POST'])
-@require.authenticated.any
+@require.authenticated.service
 @xray_recorder.capture('routes.athlete.completion_pn')
 def manage_recovery_push_notification(athlete_id):
     recovery_type = request.json['recovery_type']
     event_date = format_date(parse_date(request.json['event_date']))
     plan = _get_plan(athlete_id, event_date)
-    if recovery_type=='prep' and plan and not plan.pre_recovery_completed:
+    if recovery_type=='prep' and plan and not plan.pre_recovery_completed and plan.post_recovery.goal_text == "":
         body = {"message": "Being your best takes discipline. Finish what you started. Tap to complete your ritual.",
                 "call_to_action": "COMPLETE_ACTIVE_PREP"}
         _notify_user(athlete_id, body)
