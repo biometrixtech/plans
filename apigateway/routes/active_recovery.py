@@ -76,7 +76,7 @@ def handle_active_recovery_update():
 @app.route('/', methods=['POST'])
 @require.authenticated.any
 @xray_recorder.capture('routes.active_recovery.start')
-def handle_active_recovery_update():
+def handle_active_recovery_start():
     if not isinstance(request.json, dict):
         raise InvalidSchemaException('Request body must be a dictionary')
     if 'event_date' not in request.json:

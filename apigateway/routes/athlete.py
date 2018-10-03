@@ -41,7 +41,7 @@ def update_athlete_stats(athlete_id):
 
 
 @app.route('/<uuid:athlete_id>/active', methods=['POST'])
-@require.authenticated.service
+@require.authenticated.any
 @xray_recorder.capture('routes.athlete.pn.manage')
 def manage_athlete_push_notification(athlete_id):
     if _is_athlete_active(athlete_id):
@@ -121,7 +121,7 @@ def manage_recovery_push_notification(athlete_id):
 @app.route('/<uuid:athlete_id>/prep_started', methods=['POST'])
 @require.authenticated.service
 @xray_recorder.capture('routes.athlete.completion_pn')
-def manage_prep_completion_push_notification(athlete_id):
+def schedule_prep_completion_push_notification(athlete_id):
     execute_at = datetime.datetime.now() + datetime.timedelta(minutes=30)
     execute_at = format_datetime(execute_at)
     body = {"recovery_type": "prep",
@@ -132,7 +132,7 @@ def manage_prep_completion_push_notification(athlete_id):
 @app.route('/<uuid:athlete_id>/recovery_started', methods=['POST'])
 @require.authenticated.service
 @xray_recorder.capture('routes.athlete.recovery_pn')
-def manage_recovery_completion_push_notification(athlete_id):
+def schedule_recovery_completion_push_notification(athlete_id):
     execute_at = datetime.datetime.now() + datetime.timedelta(minutes=30)
     execute_at = format_datetime(execute_at)
     body = {"recovery_type": "recovery",
@@ -143,7 +143,7 @@ def manage_recovery_completion_push_notification(athlete_id):
 @app.route('/<uuid:athlete_id>/send_completion_notification', methods=['POST'])
 @require.authenticated.service
 @xray_recorder.capture('routes.athlete.completion_pn')
-def manage_recovery_push_notification(athlete_id):
+def manage_recovery_completion_push_notification(athlete_id):
     recovery_type = request.json['recovery_type']
     event_date = format_date(parse_date(request.json['event_date']))
     plan = _get_plan(athlete_id, event_date)
