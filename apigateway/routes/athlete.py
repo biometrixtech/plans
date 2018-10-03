@@ -123,7 +123,7 @@ def manage_recovery_push_notification(athlete_id):
 @xray_recorder.capture('routes.athlete.completion_pn')
 def schedule_prep_completion_push_notification(athlete_id):
     execute_at = datetime.datetime.now() + datetime.timedelta(minutes=30)
-    execute_at = format_datetime(execute_at)
+    # execute_at = format_datetime(execute_at)
     body = {"recovery_type": "prep",
             "event_date": format_date(parse_datetime(request.json["event_date"]))}
     Service('plans', Config.get('API_VERSION')).call_apigateway_async('POST', f'/user/{athlete_id}/send_completion_notification', body=body, execute_at=execute_at)
@@ -134,7 +134,7 @@ def schedule_prep_completion_push_notification(athlete_id):
 @xray_recorder.capture('routes.athlete.recovery_pn')
 def schedule_recovery_completion_push_notification(athlete_id):
     execute_at = datetime.datetime.now() + datetime.timedelta(minutes=30)
-    execute_at = format_datetime(execute_at)
+    # execute_at = format_datetime(execute_at)
     body = {"recovery_type": "recovery",
             "event_date": format_date(parse_datetime(request.json["event_date"]))}
     Service('plans', Config.get('API_VERSION')).call_apigateway_async('POST', f'/user/{athlete_id}/send_completion_notification', body=body, execute_at=execute_at)
@@ -185,7 +185,8 @@ def _randomize_trigger_time(start_time, window, tz_offset):
     offset_from_start = random.randint(0, window)
     local_date = parse_datetime(start_time) + datetime.timedelta(minutes=offset_from_start)
     utc_date = local_date - datetime.timedelta(minutes=tz_offset)
-    return format_datetime(utc_date)
+    return utc_date
+    # return format_datetime(utc_date)
 
 
 @xray_recorder.capture('routes.athlete.daily_plan.push')
