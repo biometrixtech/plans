@@ -45,25 +45,32 @@ def update_athlete_stats(athlete_id):
 @xray_recorder.capture('routes.athlete.pn.manage')
 def manage_athlete_push_notification(athlete_id):
     if _is_athlete_active(athlete_id):
+        tz = request.json['timezone']
+        offset = tz.split(":")
+        hour_offset = int(offset[0])
+        minute_offset = int(offset[1])
+        if hour_offset < 0:
+            minute_offset = hour_offset * 60 - minute_offset
+        else:
+            minute_offset += hour_offset * 60
         current_time_utc = datetime.datetime.utcnow()
-        current_time_local = current_time_utc + datetime.timedelta(hours=request.json['timezone'])
-        current_date_local = current_time_local.date()
+        current_time_local = current_time_utc + datetime.timedelta(minutes=minute_offset)
 
         plans_service = Service('plans', Config.get('API_VERSION'))
-        body = {"event_date": format_date(current_date_local)}
+        body = {"event_date": format_date(current_time_local)}
 
         # schedule readiness PN check
-        readiness_start = format_date(current_date_local) + 'T08:00:00Z'
-        readiness_event_date = _randomize_trigger_time(readiness_start, 60, request.json['timezone'])
+        readiness_start = format_date(current_time_local) + 'T08:00:00Z'
+        readiness_event_date = _randomize_trigger_time(readiness_start, 60, minute_offset)
         plans_service.call_apigateway_sync(method='POST',
                                            endpoint=f"athlete/{athlete_id}/send_daily_readiness_notification",
                                            body=body,
                                            execute_at=readiness_event_date)
 
         # schedule prep and recovery PN check
-        prep_rec_start = format_date(current_date_local) + 'T18:00:00Z'
-        prep_event_date = _randomize_trigger_time(prep_rec_start, 210, request.json['timezone'])
-        recovery_event_date = _randomize_trigger_time(prep_rec_start, 210, request.json['timezone'])
+        prep_rec_start = format_date(current_time_local) + 'T18:00:00Z'
+        prep_event_date = _randomize_trigger_time(prep_rec_start, 210, minute_offset)
+        recovery_event_date = _randomize_trigger_time(prep_rec_start, 210, minute_offset)
 
         plans_service.call_apigateway_sync(method='POST',
                                            endpoint=f"athlete/{athlete_id}/send_active_prep_notification",
@@ -174,10 +181,10 @@ def _notify_user(athlete_id, body):
                                        body=body)
 
 
-def _randomize_trigger_time(start_time, window, tz):
+def _randomize_trigger_time(start_time, window, tz_offset):
     offset_from_start = random.randint(0, window)
     local_date = parse_datetime(start_time) + datetime.timedelta(minutes=offset_from_start)
-    utc_date = prep_date_local - datetime.timedelta(hours=request.json['timezone'])
+    utc_date = local_date - datetime.timedelta(minutes=tz_offset)
     return format_datetime(utc_date)
 
 
