@@ -168,7 +168,7 @@ def _get_plan(user_id, event_date):
 
 def _is_athlete_active(athlete_id):
     athlete_stats = DatastoreCollection().athlete_stats_datastore.get(athlete_id=athlete_id)
-    if athlete_stats is not None and athlete_stats.event_date > datetime.datetime.now() - datetime.timedelta(days=14):
+    if athlete_stats is not None and athlete_stats.event_date > format_date(datetime.datetime.now() - datetime.timedelta(days=14)):
         return True
     else:
         return False
