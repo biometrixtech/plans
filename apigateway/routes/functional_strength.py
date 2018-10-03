@@ -1,8 +1,8 @@
-from aws_xray_sdk.core import xray_recorder
 from flask import request, Blueprint
 
-from decorators import authentication_required
-from exceptions import InvalidSchemaException, NoSuchEntityException
+from fathomapi.utils.decorators import require
+from fathomapi.utils.exceptions import InvalidSchemaException, NoSuchEntityException
+from fathomapi.utils.xray import xray_recorder
 from datastores.daily_plan_datastore import DailyPlanDatastore
 from datastores.athlete_stats_datastore import AthleteStatsDatastore
 from datastores.completed_exercise_datastore import CompletedExerciseDatastore
@@ -15,7 +15,7 @@ app = Blueprint('functional_strength', __name__)
 
 
 @app.route('/', methods=['PATCH'])
-@authentication_required
+@require.authenticated.any
 @xray_recorder.capture('routes.functional_strength')
 def handle_functional_strength_update():
     if not isinstance(request.json, dict):

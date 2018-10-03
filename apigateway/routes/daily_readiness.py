@@ -1,22 +1,24 @@
-from aws_xray_sdk.core import xray_recorder
 from flask import request, Blueprint
-import jwt
 import datetime
 
 from datastores.daily_readiness_datastore import DailyReadinessDatastore
 from datastores.post_session_survey_datastore import PostSessionSurveyDatastore
 from datastores.athlete_stats_datastore import AthleteStatsDatastore
-from decorators import authentication_required
-from exceptions import InvalidSchemaException, NoSuchEntityException
+from fathomapi.api.config import Config
+from fathomapi.comms.service import Service
+from fathomapi.utils.decorators import require
+from fathomapi.utils.exceptions import InvalidSchemaException, NoSuchEntityException
+from fathomapi.utils.xray import xray_recorder
 from models.daily_readiness import DailyReadiness
 from models.soreness import MuscleSorenessSeverity, BodyPartLocation
 from models.stats import AthleteStats
-from utils import parse_datetime, format_date, format_datetime, run_async
+from utils import parse_datetime, format_date, format_datetime
 
 app = Blueprint('daily_readiness', __name__)
 
+
 @app.route('/', methods=['POST'])
-@authentication_required
+@require.authenticated.any
 @xray_recorder.capture('routes.daily_readiness.create')
 def handle_daily_readiness_create():
     validate_data()
@@ -49,21 +51,18 @@ def handle_daily_readiness_create():
 
         athlete_stats_store.put(athlete_stats)
 
-    run_async('POST', f"athlete/{request.json['user_id']}/daily_plan")
+    Service('plans', Config.get('API_VERSION')).call_apigateway_async('POST', f"athlete/{request.json['user_id']}/daily_plan")
 
     return {'message': 'success'}, 201
 
 
 @app.route('/previous', methods=['POST', 'GET'])
-@authentication_required
+@require.authenticated.any
 @xray_recorder.capture('routes.daily_readiness.previous')
-def handle_daily_readiness_get():
+def handle_daily_readiness_get(principal_id=None):
     daily_readiness_store = DailyReadinessDatastore()
-    token = jwt.decode(request.headers['Authorization'], verify=False)
-    if 'sub' in token:
-        user_id = token['sub']
-    elif 'user_id' in token:
-        user_id = token['user_id']
+    user_id = principal_id
+
     if request.method == 'POST':
         if 'event_date' not in request.json:
             raise InvalidSchemaException('Missing required parameter event_date')
@@ -71,6 +70,7 @@ def handle_daily_readiness_get():
             current_time = parse_datetime(request.json['event_date'])
     elif request.method == 'GET':
         current_time = datetime.datetime.now()
+
     start_time = current_time - datetime.timedelta(hours=48)
     sore_body_parts = []
     try:

@@ -2,7 +2,8 @@ from aws_xray_sdk.core import xray_recorder
 from config import get_mongo_collection
 from datastores.daily_plan_datastore import DailyPlanDatastore
 from models.session import SessionType
-from exceptions import NoSuchEntityException, ForbiddenException
+from fathomapi.utils.exceptions import NoSuchEntityException, ForbiddenException
+
 
 class SessionDatastore(object):
     mongo_collection = 'dailyplan'
@@ -15,7 +16,6 @@ class SessionDatastore(object):
             raise NoSuchEntityException('No session could be found for the session_id: {}'.format(session_id))
         else:
             return sessions
-
 
     @xray_recorder.capture('datastore.SessionDatastore.insert')
     def insert(self, item, user_id, event_date):
