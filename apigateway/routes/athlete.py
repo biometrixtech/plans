@@ -48,26 +48,22 @@ def manage_athlete_push_notification(athlete_id):
         current_time_local = current_time_utc + datetime.timedelta(hours=request.json['timezone'])
         current_date_local = current_time_local.date()
 
-        readiness_date_local = format_date(current_date_local) + 'T08:00:00Z'
-        readiness_date_local = parse_datetime(readiness_date_local) + datetime.timedelta(minutes=random.randint(0, 60))
-        readiness_date_utc = readiness_date_local - datetime.timedelta(hours=request.json['timezone'])
-        readiness_event_date = format_datetime(readiness_date_utc)
-
-        prep_date_local = format_date(current_date_local) + 'T18:00:00Z'
-        prep_pn_time = random.randint(0, 90)
-        prep_date_local = parse_datetime(prep_date_local) + datetime.timedelta(minutes=prep_pn_time)
-        prep_date_utc = prep_date_local - datetime.timedelta(hours=request.json['timezone'])
-        prep_event_date = format_datetime(prep_date_utc)
-
-        recovery_date_utc = prep_date_utc + datetime.timedelta(minutes=random.randint(0, 210-prep_pn_time))
-        recovery_event_date = format_datetime(recovery_date_utc)
-
-        body = {"event_date": format_date(current_date_local)}
         plans_service = Service('plans', Config.get('API_VERSION'))
+        body = {"event_date": format_date(current_date_local)}
+
+        # schedule readiness PN check
+        readiness_start = format_date(current_date_local) + 'T08:00:00Z'
+        readiness_event_date = _randomize_trigger_time(readiness_start, 60, request.json['timezone'])
         plans_service.call_apigateway_sync(method='POST',
                                            endpoint=f"athlete/{athlete_id}/send_daily_readiness_notification",
                                            body=body,
                                            execute_at=readiness_event_date)
+
+        # schedule prep and recovery PN check
+        prep_rec_start = format_date(current_date_local) + 'T18:00:00Z'
+        prep_event_date = _randomize_trigger_time(prep_rec_start, 210, request.json['timezone'])
+        recovery_event_date = _randomize_trigger_time(prep_rec_start, 210, request.json['timezone'])
+
         plans_service.call_apigateway_sync(method='POST',
                                            endpoint=f"athlete/{athlete_id}/send_active_prep_notification",
                                            body=body,
@@ -85,9 +81,10 @@ def manage_readiness_push_notification(athlete_id):
     event_date = format_date(parse_date(request.json['event_date']))
     plan = _get_plan(athlete_id, event_date)
     if not plan or not plan.daily_readiness_survey_completed():
-        body = {"message": "Good morning, Ivonna. Let’s make the most of your day! Tap to get started.",
+        body = {"message": f"Good morning, {athlete_id}. Let’s make the most of your day! Tap to get started.",
                 "call_to_action": "COMPLETE_DAILY_READINESS"}
         _notify_user(athlete_id, body)
+
 
 @app.route('/<uuid:athlete_id>/send_active_prep_notification', methods=['POST'])
 @require.authenticated.any
@@ -95,7 +92,7 @@ def manage_readiness_push_notification(athlete_id):
 def manage_prep_push_notification(athlete_id):
     event_date = format_date(parse_date(request.json['event_date']))
     plan = _get_plan(athlete_id, event_date)
-    if plan and not plan.pre_recovery.start_date is not None and plan.pre_recovery.impact_score > 3:
+    if plan and not plan.pre_recovery_completed and plan.pre_recovery.start_date is None and plan.pre_recovery.impact_score > 3 and plan.post_recovery.goal_text == "":
         body = {"message": "Your self care ritual is ready. Take time to invest in yourself.",
                 "call_to_action": "COMPLETE_ACTIVE_PREP"}
         _notify_user(athlete_id, body)
@@ -107,7 +104,7 @@ def manage_prep_push_notification(athlete_id):
 def manage_recovery_push_notification(athlete_id):
     event_date = format_date(parse_date(request.json['event_date']))
     plan = _get_plan(athlete_id, event_date)
-    if plan and plan.post_recovery.start_date is not None and plan.post_recovery.impact_score > 3:
+    if plan and not plan.post_recovery_completed and plan.post_recovery.start_date is None  and plan.post_recovery.impact_score > 3:
         body = {"message": "Your self care ritual is ready. Take time to invest in yourself.",
                 "call_to_action": "COMPLETE_ACTIVE_RECOVERY"}
         _notify_user(athlete_id, body)
@@ -152,12 +149,14 @@ def manage_recovery_push_notification(athlete_id):
                 "call_to_action": "COMPLETE_ACTIVE_RECOVERY"}
         _notify_user(athlete_id, body)
 
+
 def _get_plan(user_id, event_date):
     plans = DatastoreCollection().daily_plan_datastore.get(user_id, event_date, event_date)
     if len(plans) == 0:
         return False
     else:
         return plans[0]
+
 
 def _is_athlete_active(athlete_id):
     athlete_stats = DatastoreCollection().athlete_stats_datastore.get(athlete_id=athlete_id)
@@ -166,11 +165,19 @@ def _is_athlete_active(athlete_id):
     else:
         return False
 
+
 def _notify_user(athlete_id, body):
     users_service = Service('users', '2_0')
     users_service.call_apigateway_sync(method='POST',
                                        endpoint=f'/user/{athlete_id}/notify',
                                        body=body)
+
+
+def _randomize_trigger_time(start_time, window, tz):
+    offset_from_start = random.randint(0, window)
+    local_date = parse_datetime(start_time) + datetime.timedelta(minutes=offset_from_start)
+    utc_date = prep_date_local - datetime.timedelta(hours=request.json['timezone'])
+    return format_datetime(utc_date)
 
 
 @xray_recorder.capture('routes.athlete.daily_plan.push')
