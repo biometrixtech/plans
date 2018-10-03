@@ -81,6 +81,8 @@ def manage_athlete_push_notification(athlete_id):
                                            body=body,
                                            execute_at=recovery_event_date)
 
+    return {'message': 'Scheduled'}, 202
+
 
 @app.route('/<uuid:athlete_id>/send_daily_readiness_notification', methods=['POST'])
 @require.authenticated.service
@@ -92,6 +94,9 @@ def manage_readiness_push_notification(athlete_id):
         body = {"message": "Good morning, {athlete_id}. Let’s make the most of your day! Tap to get started.",
                 "call_to_action": "COMPLETE_DAILY_READINESS"}
         _notify_user(athlete_id, body)
+        return {'message': 'User Notified'}, 200
+    else:
+        return {'message': 'Do not need to notify user'}, 200
 
 
 @app.route('/<uuid:athlete_id>/send_active_prep_notification', methods=['POST'])
@@ -104,6 +109,9 @@ def manage_prep_push_notification(athlete_id):
         body = {"message": "Your self care ritual is ready. Take time to invest in yourself.",
                 "call_to_action": "COMPLETE_ACTIVE_PREP"}
         _notify_user(athlete_id, body)
+        return {'message': 'User Notified'}, 200
+    else:
+        return {'message': 'Do not need to notify user'}, 200
 
 
 @app.route('/<uuid:athlete_id>/send_recovery_notification', methods=['POST'])
@@ -116,6 +124,9 @@ def manage_recovery_push_notification(athlete_id):
         body = {"message": "Your self care ritual is ready. Take time to invest in yourself.",
                 "call_to_action": "COMPLETE_ACTIVE_RECOVERY"}
         _notify_user(athlete_id, body)
+        return {'message': 'User Notified'}, 200
+    else:
+        return {'message': 'Do not need to notify user'}, 200
 
 
 @app.route('/<uuid:athlete_id>/prep_started', methods=['POST'])
@@ -127,7 +138,7 @@ def schedule_prep_completion_push_notification(athlete_id):
     body = {"recovery_type": "prep",
             "event_date": format_date(parse_datetime(request.json["event_date"]))}
     Service('plans', Config.get('API_VERSION')).call_apigateway_async('POST', f'/user/{athlete_id}/send_completion_notification', body=body, execute_at=execute_at)
-
+    return {"messate": "Scheduled"}, 202
 
 @app.route('/<uuid:athlete_id>/recovery_started', methods=['POST'])
 @require.authenticated.service
@@ -138,7 +149,7 @@ def schedule_recovery_completion_push_notification(athlete_id):
     body = {"recovery_type": "recovery",
             "event_date": format_date(parse_datetime(request.json["event_date"]))}
     Service('plans', Config.get('API_VERSION')).call_apigateway_async('POST', f'/user/{athlete_id}/send_completion_notification', body=body, execute_at=execute_at)
-
+    return {"messate": "Scheduled"}, 202
 
 @app.route('/<uuid:athlete_id>/send_completion_notification', methods=['POST'])
 @require.authenticated.service
@@ -151,11 +162,15 @@ def manage_recovery_completion_push_notification(athlete_id):
         body = {"message": "Being your best takes discipline. Finish what you started. Tap to complete your ritual.",
                 "call_to_action": "COMPLETE_ACTIVE_PREP"}
         _notify_user(athlete_id, body)
+        return {'message': 'User Notified'}, 200
 
     elif recovery_type=='recovery' and plan and not plan.post_recovery.completed:
         body = {"message": "Being your best takes discipline. Finish what you started. Tap to complete your ritual.",
                 "call_to_action": "COMPLETE_ACTIVE_RECOVERY"}
         _notify_user(athlete_id, body)
+        return {'message': 'User Notified'}, 200
+    else:
+        return {'message': 'Do not need to notify user'}, 200
 
 
 def _get_plan(user_id, event_date):
