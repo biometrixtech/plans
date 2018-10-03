@@ -62,7 +62,7 @@ def manage_athlete_push_notification(athlete_id):
         # schedule readiness PN check
         readiness_start = format_date(current_time_local) + 'T10:00:00Z'
         readiness_event_date = _randomize_trigger_time(readiness_start, 60, minute_offset)
-        plans_service.call_apigateway_sync(method='POST',
+        plans_service.call_apigateway_async(method='POST',
                                            endpoint=f"athlete/{athlete_id}/send_daily_readiness_notification",
                                            body=body,
                                            execute_at=readiness_event_date)
@@ -72,11 +72,11 @@ def manage_athlete_push_notification(athlete_id):
         prep_event_date = _randomize_trigger_time(prep_rec_start, 210, minute_offset)
         recovery_event_date = _randomize_trigger_time(prep_rec_start, 210, minute_offset)
 
-        plans_service.call_apigateway_sync(method='POST',
+        plans_service.call_apigateway_async(method='POST',
                                            endpoint=f"athlete/{athlete_id}/send_active_prep_notification",
                                            body=body,
                                            execute_at=prep_event_date)
-        plans_service.call_apigateway_sync(method='POST',
+        plans_service.call_apigateway_async(method='POST',
                                            endpoint=f"athlete/{athlete_id}/send_recovery_notification",
                                            body=body,
                                            execute_at=recovery_event_date)
@@ -126,7 +126,7 @@ def schedule_prep_completion_push_notification(athlete_id):
     execute_at = format_datetime(execute_at)
     body = {"recovery_type": "prep",
             "event_date": format_date(parse_datetime(request.json["event_date"]))}
-    Service('plans', Config.get('API_VERSION')).call_apigateway_sync('POST', f'/user/{athlete_id}/send_completion_notification', body=body, execute_at=execute_at)
+    Service('plans', Config.get('API_VERSION')).call_apigateway_async('POST', f'/user/{athlete_id}/send_completion_notification', body=body, execute_at=execute_at)
 
 
 @app.route('/<uuid:athlete_id>/recovery_started', methods=['POST'])
@@ -137,7 +137,7 @@ def schedule_recovery_completion_push_notification(athlete_id):
     execute_at = format_datetime(execute_at)
     body = {"recovery_type": "recovery",
             "event_date": format_date(parse_datetime(request.json["event_date"]))}
-    Service('plans', Config.get('API_VERSION')).call_apigateway_sync('POST', f'/user/{athlete_id}/send_completion_notification', body=body, execute_at=execute_at)
+    Service('plans', Config.get('API_VERSION')).call_apigateway_async('POST', f'/user/{athlete_id}/send_completion_notification', body=body, execute_at=execute_at)
 
 
 @app.route('/<uuid:athlete_id>/send_completion_notification', methods=['POST'])
