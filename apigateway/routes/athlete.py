@@ -63,9 +63,9 @@ def manage_athlete_push_notification(athlete_id):
         readiness_start = format_date(current_time_local) + 'T16:30:00Z'
         readiness_event_date = _randomize_trigger_time(readiness_start, 10, minute_offset)
         plans_service.call_apigateway_async(method='POST',
-                                           endpoint=f"athlete/{athlete_id}/send_daily_readiness_notification",
-                                           body=body,
-                                           execute_at=readiness_event_date)
+                                            endpoint=f"athlete/{athlete_id}/send_daily_readiness_notification",
+                                            body=body,
+                                            execute_at=readiness_event_date)
 
         # schedule prep and recovery PN check
         prep_rec_start = format_date(current_time_local) + 'T16:30:00Z'
@@ -73,13 +73,13 @@ def manage_athlete_push_notification(athlete_id):
         recovery_event_date = _randomize_trigger_time(prep_rec_start, 10, minute_offset)
 
         plans_service.call_apigateway_async(method='POST',
-                                           endpoint=f"athlete/{athlete_id}/send_active_prep_notification",
-                                           body=body,
-                                           execute_at=prep_event_date)
+                                            endpoint=f"athlete/{athlete_id}/send_active_prep_notification",
+                                            body=body,
+                                            execute_at=prep_event_date)
         plans_service.call_apigateway_async(method='POST',
-                                           endpoint=f"athlete/{athlete_id}/send_recovery_notification",
-                                           body=body,
-                                           execute_at=recovery_event_date)
+                                            endpoint=f"athlete/{athlete_id}/send_recovery_notification",
+                                            body=body,
+                                            execute_at=recovery_event_date)
 
     return {'message': 'Scheduled'}, 202
 
@@ -138,9 +138,11 @@ def schedule_prep_completion_push_notification(athlete_id):
     # execute_at = format_datetime(execute_at)
     body = {"recovery_type": "prep",
             "event_date": format_date(parse_datetime(request.json["event_date"]))}
+    print(body)
     plans_service = Service('plans', Config.get('API_VERSION'))
-    plans_service.call_apigateway_async('POST',
-                                        f'/athlete/{athlete_id}/send_completion_notification',
+    print(plans_service)
+    plans_service.call_apigateway_async(method='POST',
+                                        endpoint=f'/athlete/{athlete_id}/send_completion_notification',
                                         body=body,
                                         execute_at=execute_at)
     return {"messate": "Scheduled"}, 202
