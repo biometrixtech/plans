@@ -169,6 +169,7 @@ def manage_recovery_completion_push_notification(athlete_id):
     recovery_type = request.json['recovery_type']
     event_date = format_date(parse_date(request.json['event_date']))
     plan = _get_plan(athlete_id, event_date)
+    print(plan)
     if recovery_type=='prep' and plan and not plan.pre_recovery_completed and plan.post_recovery.goal_text == "":
         body = {"message": "Being your best takes discipline. Finish what you started. Tap to complete your ritual.",
                 "call_to_action": "COMPLETE_ACTIVE_PREP"}
