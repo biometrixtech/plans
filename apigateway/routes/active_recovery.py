@@ -106,12 +106,12 @@ def handle_active_recovery_start():
     if recovery_type == 'pre':
         plan.pre_recovery.start_date = recovery_start_date
         plans_service.call_apigateway_async(method='POST',
-                                           endpoint=f'/user/{user_id}/prep_started')
+                                           endpoint=f'/athlete/{user_id}/prep_started')
 
     elif recovery_type == 'post':
         plan.post_recovery.start_date = recovery_start_date
         plans_service.call_apigateway_async(method='POST',
-                                           endpoint=f'/user/{user_id}/recovery_started')
+                                           endpoint=f'/athlete/{user_id}/recovery_started')
 
     store.put(plan)
 
