@@ -103,15 +103,18 @@ def handle_active_recovery_start():
                      start_date=plan_event_date,
                      end_date=plan_event_date)[0]
     plans_service = Service('plans', Config.get('API_VERSION'))
+    body = {"event_date": recovery_start_date}
     if recovery_type == 'pre':
         plan.pre_recovery.start_date = recovery_start_date
         plans_service.call_apigateway_async(method='POST',
-                                            endpoint=f'/athlete/{user_id}/prep_started')
+                                            endpoint=f'/athlete/{user_id}/prep_started',
+                                            body=body)
 
     elif recovery_type == 'post':
         plan.post_recovery.start_date = recovery_start_date
         plans_service.call_apigateway_async(method='POST',
-                                            endpoint=f'/athlete/{user_id}/recovery_started')
+                                            endpoint=f'/athlete/{user_id}/recovery_started',
+                                            body=body)
 
     store.put(plan)
 

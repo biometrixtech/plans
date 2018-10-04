@@ -156,8 +156,8 @@ def schedule_recovery_completion_push_notification(athlete_id):
     body = {"recovery_type": "recovery",
             "event_date": format_date(parse_datetime(request.json["event_date"]))}
     plans_service = Service('plans', Config.get('API_VERSION'))
-    plans_service.call_apigateway_async('POST',
-                                        f'/athlete/{athlete_id}/send_completion_notification',
+    plans_service.call_apigateway_async(method='POST',
+                                        endpoint=f'/athlete/{athlete_id}/send_completion_notification',
                                         body=body,
                                         execute_at=execute_at)
     return {"messate": "Scheduled"}, 202
