@@ -85,7 +85,7 @@ def manage_athlete_push_notification(athlete_id):
 
 
 @app.route('/<uuid:athlete_id>/send_daily_readiness_notification', methods=['POST'])
-@require.authenticated.service
+@require.authenticated.any
 @xray_recorder.capture('routes.athlete.readiness_pn')
 def manage_readiness_push_notification(athlete_id):
     event_date = format_date(parse_date(request.json['event_date']))
@@ -100,7 +100,7 @@ def manage_readiness_push_notification(athlete_id):
 
 
 @app.route('/<uuid:athlete_id>/send_active_prep_notification', methods=['POST'])
-@require.authenticated.service
+@require.authenticated.any
 @xray_recorder.capture('routes.athlete.prep_pn')
 def manage_prep_push_notification(athlete_id):
     event_date = format_date(parse_date(request.json['event_date']))
@@ -115,7 +115,7 @@ def manage_prep_push_notification(athlete_id):
 
 
 @app.route('/<uuid:athlete_id>/send_recovery_notification', methods=['POST'])
-@require.authenticated.service
+@require.authenticated.any
 @xray_recorder.capture('routes.athlete.recovery_pn')
 def manage_recovery_push_notification(athlete_id):
     event_date = format_date(parse_date(request.json['event_date']))
@@ -130,7 +130,7 @@ def manage_recovery_push_notification(athlete_id):
 
 
 @app.route('/<uuid:athlete_id>/prep_started', methods=['POST'])
-@require.authenticated.service
+@require.authenticated.any
 @xray_recorder.capture('routes.athlete.completion_pn')
 def schedule_prep_completion_push_notification(athlete_id):
     execute_at = datetime.datetime.now() + datetime.timedelta(minutes=5)
@@ -142,7 +142,7 @@ def schedule_prep_completion_push_notification(athlete_id):
     return {"messate": "Scheduled"}, 202
 
 @app.route('/<uuid:athlete_id>/recovery_started', methods=['POST'])
-@require.authenticated.service
+@require.authenticated.any
 @xray_recorder.capture('routes.athlete.recovery_pn')
 def schedule_recovery_completion_push_notification(athlete_id):
     execute_at = datetime.datetime.now() + datetime.timedelta(minutes=30)
@@ -153,7 +153,7 @@ def schedule_recovery_completion_push_notification(athlete_id):
     return {"messate": "Scheduled"}, 202
 
 @app.route('/<uuid:athlete_id>/send_completion_notification', methods=['POST'])
-@require.authenticated.service
+@require.authenticated.any
 @xray_recorder.capture('routes.athlete.completion_pn')
 def manage_recovery_completion_push_notification(athlete_id):
     recovery_type = request.json['recovery_type']
