@@ -187,10 +187,11 @@ def manage_recovery_completion_push_notification(athlete_id):
 
 def _get_plan(user_id, event_date):
     plans = DatastoreCollection().daily_plan_datastore.get(user_id, event_date, event_date)
-    if len(plans) == 0:
+    plan = plans[0]
+    if not plan.daily_readiness_survey_completed():
         return False
     else:
-        return plans[0]
+        return plan
 
 
 def _is_athlete_active(athlete_id):
