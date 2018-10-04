@@ -138,11 +138,12 @@ def schedule_prep_completion_push_notification(athlete_id):
     # execute_at = format_datetime(execute_at)
     body = {"recovery_type": "prep",
             "event_date": format_date(parse_datetime(request.json["event_date"]))}
-    try:
-        Service('plans', Config.get('API_VERSION')).call_apigateway_async('POST', f'/user/{athlete_id}/send_completion_notification', body=body, execute_at=execute_at)
-        return {"messate": "Scheduled"}, 202
-    except Exception as e:
-        print(e)
+    plans_service = Service('plans', Config.get('API_VERSION'))
+    plans_service.call_apigateway_async('POST',
+                                        f'/athlete/{athlete_id}/send_completion_notification',
+                                        body=body,
+                                        execute_at=execute_at)
+    return {"messate": "Scheduled"}, 202
 
 @app.route('/<uuid:athlete_id>/recovery_started', methods=['POST'])
 @require.authenticated.any
@@ -152,7 +153,11 @@ def schedule_recovery_completion_push_notification(athlete_id):
     # execute_at = format_datetime(execute_at)
     body = {"recovery_type": "recovery",
             "event_date": format_date(parse_datetime(request.json["event_date"]))}
-    Service('plans', Config.get('API_VERSION')).call_apigateway_async('POST', f'/user/{athlete_id}/send_completion_notification', body=body, execute_at=execute_at)
+    plans_service = Service('plans', Config.get('API_VERSION'))
+    plans_service.call_apigateway_async('POST',
+                                        f'/athlete/{athlete_id}/send_completion_notification',
+                                        body=body,
+                                        execute_at=execute_at)
     return {"messate": "Scheduled"}, 202
 
 @app.route('/<uuid:athlete_id>/send_completion_notification', methods=['POST'])
