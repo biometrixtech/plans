@@ -83,6 +83,7 @@ def manage_athlete_push_notification(athlete_id):
                                             endpoint=f"athlete/{athlete_id}/send_recovery_notification",
                                             body=body,
                                             execute_at=recovery_event_date)
+        print(readiness_event_date, prep_event_date, recovery_event_date)
 
     return {'message': 'Scheduled'}, 202
 
