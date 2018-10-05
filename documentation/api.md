@@ -28,6 +28,7 @@
       - [Mark Started](#mark-started)
       - [Mark Completed](#mark-completed)
     - [Functional Strength](#functional-strength)
+      - [Mark Started](#mark-started-1)
       - [Mark Completed](#mark-completed-1)
     - [Daily Plans](#daily-plans)
       - [Get daily plan](#get-daily-plan)
@@ -693,6 +694,48 @@ Authorization: eyJraWQ...ajBc4VQ
 
 
 ### Functional Strength
+
+#### Mark Started
+
+This endpoint can be called to mark functional strength start.
+
+##### Query String
+ 
+The client __must__ submit a request to the endpoint `/plans/version/functional_strength`. The request method __must__ be `POST`.
+
+##### Request
+
+The client __must__ submit a request body containing a JSON object with the following schema:
+```
+{
+    "user_id": Uuid,
+    "event_date": Datetime,
+}
+```
+* `event_date` __should__ be the time when user starts (checks the first exercise off) the session.
+
+```
+POST /plans/version/functional_strength HTTPS/1.1
+Host: apis.env.fathomai.com
+Content-Type: application/json
+Authorization: eyJraWQ...ajBc4VQ
+
+{
+    "user_id":"a1233423-73d3-4761-ac92-89cc15921d34",
+    "event_date": "2018-09-21T17:53:39Z"
+}
+```
+##### Responses
+ 
+ If the write was successful, the Service __will__ respond with HTTP Status `200 OK`, with a body with the following syntax:
+ 
+```
+{
+    "message": "success"
+}
+```
+
+
 
 #### Mark Completed
 
