@@ -109,7 +109,7 @@ def manage_readiness_push_notification(athlete_id):
 def manage_prep_push_notification(athlete_id):
     event_date = format_date(parse_date(request.json['event_date']))
     plan = _get_plan(athlete_id, event_date)
-    if plan and not plan.pre_recovery_completed and plan.pre_recovery.start_date is None and plan.pre_recovery.impact_score > 3 and plan.post_recovery.goal_text == "":
+    if plan and not plan.pre_recovery_completed and plan.pre_recovery.start_date is None and plan.pre_recovery.impact_score >= 3 and plan.post_recovery.goal_text == "":
         body = {"message": "Your self care ritual is ready. Take time to invest in yourself.",
                 "call_to_action": "COMPLETE_ACTIVE_PREP"}
         _notify_user(athlete_id, body)
@@ -124,7 +124,7 @@ def manage_prep_push_notification(athlete_id):
 def manage_recovery_push_notification(athlete_id):
     event_date = format_date(parse_date(request.json['event_date']))
     plan = _get_plan(athlete_id, event_date)
-    if plan and not plan.post_recovery_completed and plan.post_recovery.start_date is None  and plan.post_recovery.impact_score > 3:
+    if plan and not plan.post_recovery_completed and plan.post_recovery.start_date is None  and plan.post_recovery.impact_score >= 3:
         body = {"message": "Your self care ritual is ready. Take time to invest in yourself.",
                 "call_to_action": "COMPLETE_ACTIVE_RECOVERY"}
         _notify_user(athlete_id, body)
