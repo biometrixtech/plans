@@ -63,7 +63,7 @@ def manage_athlete_push_notification(athlete_id):
         body = {"event_date": format_date(current_time_local)}
 
         # schedule readiness PN check
-        readiness_start = format_date(current_time_local) + 'T09:40:00Z'
+        readiness_start = format_date(current_time_local) + 'T13:35:00Z'
         readiness_event_date = _randomize_trigger_time(readiness_start, 10, minute_offset)
         plans_service.call_apigateway_async(method='POST',
                                             endpoint=f"athlete/{athlete_id}/send_daily_readiness_notification",
@@ -71,7 +71,7 @@ def manage_athlete_push_notification(athlete_id):
                                             execute_at=readiness_event_date)
 
         # schedule prep and recovery PN check
-        prep_rec_start = format_date(current_time_local) + 'T09:50:00Z'
+        prep_rec_start = format_date(current_time_local) + 'T13:45:00Z'
         prep_event_date = _randomize_trigger_time(prep_rec_start, 10, minute_offset)
         recovery_event_date = _randomize_trigger_time(prep_rec_start, 10, minute_offset)
 
@@ -95,7 +95,7 @@ def manage_readiness_push_notification(athlete_id):
     event_date = format_date(parse_date(request.json['event_date']))
     plan = _get_plan(athlete_id, event_date)
     if not plan or not plan.daily_readiness_survey_completed():
-        body = {"message": "Good morning, {athlete_id}. Let’s make the most of your day! Tap to get started.",
+        body = {"message": "Good morning, {user_id}. Let’s make the most of your day! Tap to get started.",
                 "call_to_action": "COMPLETE_DAILY_READINESS"}
         _notify_user(athlete_id, body)
         return {'message': 'User Notified'}, 200
