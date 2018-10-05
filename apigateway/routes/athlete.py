@@ -25,7 +25,10 @@ iotd_client = boto3.client('iot-data')
 def create_daily_plan(athlete_id):
     daily_plan = TrainingPlanManager(athlete_id, DatastoreCollection()).create_daily_plan()
     # daily_plan.last_updated = format_datetime(datetime.datetime.now())
-    push_plan_update(athlete_id, daily_plan)
+    # push_plan_update(athlete_id, daily_plan)
+    body = {"message": "Your plan is ready!",
+            "call_to_action": "VIEW_PLAN"}
+    _notify_user(athlete_id, body)
 
     Service('plans', Config.get('API_VERSION')).call_apigateway_async('POST', f"athlete/{athlete_id}/stats")
 
@@ -217,9 +220,9 @@ def _randomize_trigger_time(start_time, window, tz_offset):
     # return format_datetime(utc_date)
 
 
-@xray_recorder.capture('routes.athlete.daily_plan.push')
-def push_plan_update(user_id, daily_plan):
-    iotd_client.publish(
-        topic='plans/{}/athlete/{}/daily_plan'.format(os.environ['ENVIRONMENT'], user_id),
-        payload=json.dumps({'daily_plan': daily_plan}, default=json_serialise).encode()
-    )
+# @xray_recorder.capture('routes.athlete.daily_plan.push')
+# def push_plan_update(user_id, daily_plan):
+#     iotd_client.publish(
+#         topic='plans/{}/athlete/{}/daily_plan'.format(os.environ['ENVIRONMENT'], user_id),
+#         payload=json.dumps({'daily_plan': daily_plan}, default=json_serialise).encode()
+#     )
