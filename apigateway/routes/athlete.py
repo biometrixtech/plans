@@ -205,7 +205,7 @@ def _is_athlete_active(athlete_id):
 
 def _notify_user(athlete_id, body):
     users_service = Service('users', '2_0')
-    users_service.call_apigateway_sync(method='POST',
+    users_service.call_apigateway_async(method='POST',
                                        endpoint=f'/user/{athlete_id}/notify',
                                        body=body)
 
