@@ -95,7 +95,7 @@ def manage_readiness_push_notification(athlete_id):
     event_date = format_date(parse_date(request.json['event_date']))
     plan = _get_plan(athlete_id, event_date)
     if not plan or not plan.daily_readiness_survey_completed():
-        body = {"message": "Good morning, {user_id}. Let’s make the most of your day! Tap to get started.",
+        body = {"message": "Good morning, {first_name}. Let’s make the most of your day! Tap to get started.",
                 "call_to_action": "COMPLETE_DAILY_READINESS"}
         _notify_user(athlete_id, body)
         return {'message': 'User Notified'}, 200
