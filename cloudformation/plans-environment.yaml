@@ -121,6 +121,10 @@ Resources:
                         Resource:
                           - { "Fn::Sub": "arn:aws:iot:${AWS::Region}:${AWS::AccountId}:topic/users/${Environment}/*" }
                           - { "Fn::Sub": "arn:aws:iot:${AWS::Region}:${AWS::AccountId}:topic/plans/${Environment}/*" }
+                      - Action:
+                          - "sqs:SendMessage"
+                        Effect: "Allow"
+                        Resource: "*"
             RoleName: { "Fn::Sub": "plans-${Environment}-apigateway-${AWS::Region}" }
 
     ##########################################################################################################
