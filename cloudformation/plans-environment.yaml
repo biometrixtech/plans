@@ -34,7 +34,7 @@ Parameters:
 Mappings:
     TemplateVersion:
         Self: { Commit: "da39a3ee5e6b4b0d3255bfef95601890afd80709" }
-        Infrastructure: { Commit: "fba0b4cc4b55dc377ae003ba907ed552660a579c" }
+        Infrastructure: { Commit: "7c6f66762804ded587ed4fa2085705f0a46892cd" }
 
 Metadata:
     "AWS::CloudFormation::Interface":
@@ -121,6 +121,10 @@ Resources:
                         Resource:
                           - { "Fn::Sub": "arn:aws:iot:${AWS::Region}:${AWS::AccountId}:topic/users/${Environment}/*" }
                           - { "Fn::Sub": "arn:aws:iot:${AWS::Region}:${AWS::AccountId}:topic/plans/${Environment}/*" }
+                      - Action:
+                          - "sqs:SendMessage"
+                        Effect: "Allow"
+                        Resource: "*"
             RoleName: { "Fn::Sub": "plans-${Environment}-apigateway-${AWS::Region}" }
 
     ##########################################################################################################

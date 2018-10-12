@@ -1,3 +1,42 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Plans API](#plans-api)
+  - [Common provisions](#common-provisions)
+      - [Terminology](#terminology)
+      - [Protocol](#protocol)
+      - [Encoding](#encoding)
+      - [Authentication](#authentication)
+      - [General responses](#general-responses)
+  - [Schema](#schema)
+    - [Simple](#simple)
+  - [Endpoints](#endpoints)
+    - [Daily Readiness](#daily-readiness)
+      - [Create](#create)
+      - [Soreness history](#soreness-history)
+    - [Post-Session Survey (Deprecated)](#post-session-survey-deprecated)
+      - [Create](#create-1)
+    - [Session](#session)
+      - [Create](#create-2)
+      - [Get Typical Sessions](#get-typical-sessions)
+      - [Mark no sessions planned](#mark-no-sessions-planned)
+      - [Delete](#delete)
+      - [Update](#update)
+      - [Send sensor data](#send-sensor-data)
+    - [Active Recovery](#active-recovery)
+      - [Mark Started](#mark-started)
+      - [Mark Completed](#mark-completed)
+    - [Functional Strength](#functional-strength)
+      - [Mark Started](#mark-started-1)
+      - [Mark Completed](#mark-completed-1)
+    - [Daily Plans](#daily-plans)
+      - [Get daily plan](#get-daily-plan)
+    - [Misc](#misc)
+      - [Clear user's data](#clear-users-data)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Plans API
 
 ## Common provisions
@@ -115,12 +154,15 @@ This endpoint can be called to get the body parts where soreness was reported in
 
 ##### Query String
  
-The client __must__ submit a request to the endpoint `/plans/version/daily_readiness/previous`. The request method __must__ be `GET`.
+The client __must__ submit a request to the endpoint `/plans/version/daily_readiness/previous`. The request method __must__ be `GET` or `POST`.
 
 ##### Request
-This request does not require a body.
-
-
+For `POST` method, the client __must__ submit a request body containing a JSON object with the following schema:
+```
+{
+    "event_date": Datetime
+}
+```
 ```
 GET /plans/version/daily_readiness/previous HTTPS/1.1
 Host: apis.env.fathomai.com
@@ -562,6 +604,48 @@ Authorization: eyJraWQ...ajBc4VQ
 
 ### Active Recovery
 
+#### Mark Started
+
+This endpoint can be called to mark either the pre- or post-recovery started.
+
+##### Query String
+ 
+The client __must__ submit a request to the endpoint `/plans/version/active_recovery`. The request method __must__ be `POST`.
+
+##### Request
+
+The client __must__ submit a request body containing a JSON object with the following schema:
+```
+{
+    "user_id": Uuid,
+    "event_date": Datetime,
+    "recovery_type": string
+}
+```
+* `event_date` __should__ be the time when user checks the first exercise for the session.
+* `recovery_type` __should__ be either `pre` or `post`
+
+```
+POST /plans/version/active_recovery HTTPS/1.1
+Host: apis.env.fathomai.com
+Content-Type: application/json
+Authorization: eyJraWQ...ajBc4VQ
+{
+    "user_id":"a1233423-73d3-4761-ac92-89cc15921d34",
+    "event_date": "2018-09-21T17:53:39Z",
+    "recovery_type": "pre"
+}
+```
+##### Responses
+ 
+ If the write was successful, the Service __will__ respond with HTTP Status `200 OK`, with a body with the following syntax:
+ 
+```
+{
+    "message": "success"
+}
+```
+
 #### Mark Completed
 
 This endpoint can be called to mark either the pre- or post-recovery completed.
@@ -611,6 +695,48 @@ Authorization: eyJraWQ...ajBc4VQ
 
 ### Functional Strength
 
+#### Mark Started
+
+This endpoint can be called to mark functional strength start.
+
+##### Query String
+ 
+The client __must__ submit a request to the endpoint `/plans/version/functional_strength`. The request method __must__ be `POST`.
+
+##### Request
+
+The client __must__ submit a request body containing a JSON object with the following schema:
+```
+{
+    "user_id": Uuid,
+    "event_date": Datetime,
+}
+```
+* `event_date` __should__ be the time when user starts (checks the first exercise off) the session.
+
+```
+POST /plans/version/functional_strength HTTPS/1.1
+Host: apis.env.fathomai.com
+Content-Type: application/json
+Authorization: eyJraWQ...ajBc4VQ
+
+{
+    "user_id":"a1233423-73d3-4761-ac92-89cc15921d34",
+    "event_date": "2018-09-21T17:53:39Z"
+}
+```
+##### Responses
+ 
+ If the write was successful, the Service __will__ respond with HTTP Status `200 OK`, with a body with the following syntax:
+ 
+```
+{
+    "message": "success"
+}
+```
+
+
+
 #### Mark Completed
 
 This endpoint can be called to mark functional strength completion.
@@ -654,186 +780,6 @@ Authorization: eyJraWQ...ajBc4VQ
 ```
 * `daily_plan` will have the same structure as defined in output of daily_plan route.
 
-
-### Schedule
-
-#### Daily Schedule
-This API can be used to submit athlete's daily schedule when they first open the app.
-
-##### Query String
-The client __must__ submit a request to the endpoint `/plans/version/daily_schedule`. The request method __must__ be `POST`.
-
-##### Request
-The client __must__ submit a request body containing a JSON object with the following schema:
-```
-{
-    "user_id": Uuid,
-    "event_date": Datetime
-    "sessions": [Session, Session]
-}
-```
-* `event_date` __should__ be reflect the time when the daily_schedule was completed
-* `Session` object __should__ have the following schema
-```
-    {
-        "session_type": number,
-        "start_time": Datetime,
-        "duration": number,
-        "description": string
-    }
-```
-* `start_time` should reflect the date and time when the session is scheduled
-* `duration` should be in minutes
-
-```
-POST /plans/daily_schedule HTTPS/1.1
-Host: apis.env.fathomai.com
-Content-Type: application/json
-Authorization: eyJraWQ...ajBc4VQ
-
-{
-    "user_id": "02cb7965-7921-493a-80d4-6b278c928fad",
-    "event_date": "2018-07-26",
-    "sessions":
-    [
-        {
-            "session_type": 0,
-            "event_date": "2018-07-26T07:30:00Z",
-            "duration": 90,
-            "descrption": "Morning Practice"
-        },
-        {
-            "session_type": 1,
-            "event_date": "2018-07-26T19:30:00Z",
-            "duration": 30,
-            "description": "Evening Biking"
-        }
-        ]
-}
-```
-##### Responses
- 
- If the write was successful, the Service __will__ respond with HTTP Status `201 Created`, with a body with the following syntax:
- 
-```
-{
-    "sessions": [Session, Session]
-}
-```
-If there were no session scheduled/created for time prior to the schedule being created by the user __sessions__ will be an empty list.
-Each session will have __uuid__, __date__, __time__ to be used to ask user for post-session survey.
-
-### Weekly Training
-
-#### Cross-Training
-
-##### Query String
-The client __must__ submit a request to the endpoint `/plans/version/weekly_schedule/cross_training`. The request method __must__ be `POST`.
-
-##### Request
-The client __must__ submit a request body containing a JSON object with the following schema:
-```
-{
-	"user_id": Uuid,
-	"activities": [string, string],
-	"days_of_week": [number, number]
-	"duration": number
-}
-```
-* `activities` __should__ reflect the list of cross-training activities user performs in the week
-* `days_of_week` __should__ be a list of days of the week that the user plans to perform the activities encoded 0-Monday ... 6-Sunday
-* `duration` __should__ be an integer representing average minutes per session
-
-```
-POST /plans/version/weekly_schedule/cross_training HTTPS/1.1
-Host: apis.env.fathomai.com
-Content-Type: application/json
-Authorization: eyJraWQ...ajBc4VQ
-
-{
-    "user_id": "02cb7965-7921-493a-80d4-6b278c928fad",
-    "activities": ["cycling", "weightlifting", "yoga"],
-    "days_of_week": [0,1,4],
-    "duration": 50
-}
-```
-##### Responses
- 
- If the write was successful, the Service __will__ respond with HTTP Status `201 Created`, with a body with the following syntax:
- 
-```
-{
-    "message": "success"
-}
-```
-
-#### Training
-
-##### Query String
-The client __must__ submit a request to the endpoint `/plans/version/weekly_schedule/training`. The request method __must__ be `POST`.
-
-##### Request
-The client __must__ submit a request body containing a JSON object with the following schema:
-```
-{
-	"user_id": Uuid,
-	"sports": [sport1, sport2]
-}
-```
-Where sports is the weekly schedule for a sport of the following schema:
-```
-{
-	"sport": string,
-	"practice": {
-		"days_of_week": [number, number],
-		"duration": number
-		},
-	"competition": {
-		"days_of_week": [number]
-	}
-}
-
-```
-###### Example
-```
-POST /plans/version/weekly_schedule/training HTTPS/1.1
-Host: apis.env.fathomai.com
-Content-Type: application/json
-Authorization: eyJraWQ...ajBc4VQ
-
-{
-    "user_id": "02cb7965-7921-493a-80d4-6b278c928fad",
-	"sports": [
-        {"sport": "sportX",
-		"practice": {
-			"days_of_week": [0, 1, 2, 3, 4, 5],
-			"duration": 90
-		},
-		"competition": {
-			"days_of_week": [6]
-		}
-	},
-    { "sport": "sportY",
-		"practice": {
-			"days_of_week": [0, 1, 2, 3, 4, 5],
-			"duration": 90
-		},
-		"competition": {
-			"days_of_week": [6]
-		}
-	}
-        ]
-}
-```
-##### Responses
- 
- If the write was successful, the Service __will__ respond with HTTP Status `201 Created`, with a body with the following syntax:
- 
-```
-{
-    "message": "success"
-}
-```
 
 
 ### Daily Plans
@@ -882,530 +828,889 @@ The Service __will__ respond with HTTP Status `200 OK`, with a body with the fol
 * each `daily_plan*` will be of following syntax:
 ```
 {
-    "daily_plans": [
-        {
-            "bump_up_sessions": [],
-            "cross_training_sessions": [],
-            "daily_readiness_survey_completed": true,
-            "date": "2018-07-30",
-            "game_sessions": [],
-            "last_updated": "2018-07-30T21:02:25Z",
-            "post_recovery": {
-                "activate_exercises": [
-                    {
-                        "bilateral": true,
-                        "display_name": "Bird-dog (Opposite Arm/Leg Raise)",
-                        "goal_text": "Focused muscle activation",
-                        "library_id": "50",
-                        "name": "Quadruped Arm/Opposite Leg Raise",
-                        "position_order": 10,
-                        "reps_assigned": 10,
-                        "seconds_duration": 60,
-                        "seconds_per_rep": 3,
-                        "seconds_per_set": null,
-                        "sets_assigned": 1,
-                        "unit_of_measure": "count",
-                        "youtube_id": "wiFNA3sqjCA"
-                    },
-                    {
-                        "bilateral": false,
-                        "display_name": "Posterior Pelvic Tilt",
-                        "goal_text": "Focused muscle activation",
-                        "library_id": "79",
-                        "name": "Posterior Pelvic Tilt",
-                        "position_order": 11,
-                        "reps_assigned": 10,
-                        "seconds_duration": 20,
-                        "seconds_per_rep": 2,
-                        "seconds_per_set": null,
-                        "sets_assigned": 1,
-                        "unit_of_measure": "count",
-                        "youtube_id": "q0gRZJ5M3ls"
-                    },
-                    {
-                        "bilateral": true,
-                        "display_name": "Lying Knee Flexion and Hip Internal Rotation",
-                        "goal_text": "Increase strength",
-                        "library_id": "32",
-                        "name": "Knee Flexion with Hip Internally Rotated",
-                        "position_order": 12,
-                        "reps_assigned": 10,
-                        "seconds_duration": 40,
-                        "seconds_per_rep": 2,
-                        "seconds_per_set": null,
-                        "sets_assigned": 1,
-                        "unit_of_measure": "count",
-                        "youtube_id": "ToOjPbDb6wQ"
-                    }
-                ],
-                "end_time": "None",
-                "goal_text": "Get stronger and move your groin, knee and hip more efficiently to prevent fatigue",
-                "impact_score": 2,
-                "inhibit_exercises": [
-                    {
-                        "bilateral": true,
-                        "display_name": "Foam Roll - Hip Flexor",
-                        "goal_text": "Increase blood flow",
-                        "library_id": "54",
-                        "name": "SMR - Hip Flexor",
-                        "position_order": 0,
-                        "reps_assigned": 30,
-                        "seconds_duration": 60,
-                        "seconds_per_rep": null,
-                        "seconds_per_set": 30,
-                        "sets_assigned": 1,
-                        "unit_of_measure": "seconds",
-                        "youtube_id": "bdbsy5vFz10"
-                    },
-                    {
-                        "bilateral": true,
-                        "display_name": "Foam Roll - Outer Thigh (IT Band)",
-                        "goal_text": "Increase blood flow",
-                        "library_id": "4",
-                        "name": "SMR - IT-Band",
-                        "position_order": 1,
-                        "reps_assigned": 30,
-                        "seconds_duration": 60,
-                        "seconds_per_rep": null,
-                        "seconds_per_set": 30,
-                        "sets_assigned": 1,
-                        "unit_of_measure": "seconds",
-                        "youtube_id": "asigNf1sh-k"
-                    },
-                    {
-                        "bilateral": true,
-                        "display_name": "Foam Roll - Hamstrings",
-                        "goal_text": "Increase blood flow",
-                        "library_id": "3",
-                        "name": "SMR - Hamstrings",
-                        "position_order": 2,
-                        "reps_assigned": 30,
-                        "seconds_duration": 60,
-                        "seconds_per_rep": null,
-                        "seconds_per_set": 30,
-                        "sets_assigned": 1,
-                        "unit_of_measure": "seconds",
-                        "youtube_id": "wQ6uUuBWCbw"
-                    },
-                    {
-                        "bilateral": true,
-                        "display_name": "Foam Roll - Inner Thigh (Adductor)",
-                        "goal_text": "Increase blood flow",
-                        "library_id": "1",
-                        "name": "SMR - Adductors",
-                        "position_order": 3,
-                        "reps_assigned": 30,
-                        "seconds_duration": 60,
-                        "seconds_per_rep": null,
-                        "seconds_per_set": 30,
-                        "sets_assigned": 1,
-                        "unit_of_measure": "seconds",
-                        "youtube_id": "vkVg1dEmjwE"
-                    },
-                    {
-                        "bilateral": true,
-                        "display_name": "Foam Roll - Quads",
-                        "goal_text": "Increase flexibility",
-                        "library_id": "48",
-                        "name": "SMR Quadriceps",
-                        "position_order": 4,
-                        "reps_assigned": 30,
-                        "seconds_duration": 60,
-                        "seconds_per_rep": null,
-                        "seconds_per_set": 30,
-                        "sets_assigned": 1,
-                        "unit_of_measure": "seconds",
-                        "youtube_id": "ERTVBjwgPS4"
-                    }
-                ],
-                "integrate_exercises": [],
-                "lengthen_exercises": [
-                    {
-                        "bilateral": true,
-                        "display_name": "Standing Outer Hip (TFL) Stretch",
-                        "goal_text": "Increase flexibility",
-                        "library_id": "28",
-                        "name": "Standing TFL Static Stretch",
-                        "position_order": 5,
-                        "reps_assigned": 30,
-                        "seconds_duration": 60,
-                        "seconds_per_rep": null,
-                        "seconds_per_set": 30,
-                        "sets_assigned": 1,
-                        "unit_of_measure": "seconds",
-                        "youtube_id": "ClJL9Kn5DHw"
-                    },
-                    {
-                        "bilateral": true,
-                        "display_name": "Lunging Hip Stretch",
-                        "goal_text": "Increase flexibility",
-                        "library_id": "49",
-                        "name": "Kneeling Hip Flexor Static Stretch",
-                        "position_order": 6,
-                        "reps_assigned": 30,
-                        "seconds_duration": 60,
-                        "seconds_per_rep": null,
-                        "seconds_per_set": 30,
-                        "sets_assigned": 1,
-                        "unit_of_measure": "seconds",
-                        "youtube_id": "XbN3TvLEm2A"
-                    },
-                    {
-                        "bilateral": false,
-                        "display_name": "Child's Pose (Arms Straight)",
-                        "goal_text": "Increase flexibility",
-                        "library_id": "103",
-                        "name": "Child's Pose Arms Straight",
-                        "position_order": 7,
-                        "reps_assigned": 30,
-                        "seconds_duration": 30,
-                        "seconds_per_rep": null,
-                        "seconds_per_set": 30,
-                        "sets_assigned": 1,
-                        "unit_of_measure": "seconds",
-                        "youtube_id": "pJcobQf324o"
-                    },
-                    {
-                        "bilateral": true,
-                        "display_name": "Lying Hamstring Stretch",
-                        "goal_text": "Increase flexibility",
-                        "library_id": "9",
-                        "name": "Hamstrings Static Stretch ",
-                        "position_order": 8,
-                        "reps_assigned": 30,
-                        "seconds_duration": 60,
-                        "seconds_per_rep": null,
-                        "seconds_per_set": 30,
-                        "sets_assigned": 1,
-                        "unit_of_measure": "seconds",
-                        "youtube_id": "z73l6oZUniQ"
-                    },
-                    {
-                        "bilateral": true,
-                        "display_name": "Standing Inner Thigh (Adductor) Stretch",
-                        "goal_text": "Increase flexibility",
-                        "library_id": "8",
-                        "name": "Adductors Static Stretch",
-                        "position_order": 9,
-                        "reps_assigned": 30,
-                        "seconds_duration": 60,
-                        "seconds_per_rep": null,
-                        "seconds_per_set": 30,
-                        "sets_assigned": 1,
-                        "unit_of_measure": "seconds",
-                        "youtube_id": "Qmq5fGSrAmg"
-                    }
-                ],
-                "minutes_duration": 11.5,
-                "start_time": "None",
-                "why_text": "mild soreness and discomfort and hard effort"
-            },
-            "practice_sessions": [
-                {
-                    "data_transferred": false,
-                    "description": "",
-                    "duration_minutes": null,
-                    "duration_sensor": null,
-                    "event_date": null,
-                    "external_load": null,
-                    "high_intensity_load": null,
-                    "high_intensity_minutes": null,
-                    "low_intensity_load": null,
-                    "low_intensity_minutes": null,
-                    "mod_intensity_load": null,
-                    "mod_intensity_minutes": null,
-                    "post_session_survey": {
-                        "RPE": 4,
-                        "event_date": "2018-07-30T18:05:20Z",
-                        "soreness": [
-                            {
-                                "body_part": 7,
-                                "severity": 1,
-                                "side": 2
-                            },
-                            {
-                                "body_part": 4,
-                                "severity": 2,
-                                "side": 2
-                            }
-                        ]
-                    },
-                    "sensor_end_date_time": null,
-                    "sensor_start_date_time": null,
-                    "session_id": "99d64d90-a6c0-4593-835a-cfa04e97871e"
-                }
-            ],
-            "pre_recovery": null,
-            "recovery_am": null,
-            "recovery_pm": {
-                "activate_exercises": [
-                    {
-                        "bilateral": true,
-                        "display_name": "Bird-dog (Opposite Arm/Leg Raise)",
-                        "goal_text": "Focused muscle activation",
-                        "library_id": "50",
-                        "name": "Quadruped Arm/Opposite Leg Raise",
-                        "position_order": 10,
-                        "reps_assigned": 10,
-                        "seconds_duration": 60,
-                        "seconds_per_rep": 3,
-                        "seconds_per_set": null,
-                        "sets_assigned": 1,
-                        "unit_of_measure": "count",
-                        "youtube_id": "wiFNA3sqjCA"
-                    },
-                    {
-                        "bilateral": false,
-                        "display_name": "Posterior Pelvic Tilt",
-                        "goal_text": "Focused muscle activation",
-                        "library_id": "79",
-                        "name": "Posterior Pelvic Tilt",
-                        "position_order": 11,
-                        "reps_assigned": 10,
-                        "seconds_duration": 20,
-                        "seconds_per_rep": 2,
-                        "seconds_per_set": null,
-                        "sets_assigned": 1,
-                        "unit_of_measure": "count",
-                        "youtube_id": "q0gRZJ5M3ls"
-                    },
-                    {
-                        "bilateral": true,
-                        "display_name": "Lying Knee Flexion and Hip Internal Rotation",
-                        "goal_text": "Increase strength",
-                        "library_id": "32",
-                        "name": "Knee Flexion with Hip Internally Rotated",
-                        "position_order": 12,
-                        "reps_assigned": 10,
-                        "seconds_duration": 40,
-                        "seconds_per_rep": 2,
-                        "seconds_per_set": null,
-                        "sets_assigned": 1,
-                        "unit_of_measure": "count",
-                        "youtube_id": "ToOjPbDb6wQ"
-                    }
-                ],
-                "end_time": "None",
-                "goal_text": "Get stronger and move your groin, knee and hip more efficiently to prevent fatigue",
-                "impact_score": 2,
-                "inhibit_exercises": [
-                    {
-                        "bilateral": true,
-                        "display_name": "Foam Roll - Hip Flexor",
-                        "goal_text": "Increase blood flow",
-                        "library_id": "54",
-                        "name": "SMR - Hip Flexor",
-                        "position_order": 0,
-                        "reps_assigned": 30,
-                        "seconds_duration": 60,
-                        "seconds_per_rep": null,
-                        "seconds_per_set": 30,
-                        "sets_assigned": 1,
-                        "unit_of_measure": "seconds",
-                        "youtube_id": "bdbsy5vFz10"
-                    },
-                    {
-                        "bilateral": true,
-                        "display_name": "Foam Roll - Outer Thigh (IT Band)",
-                        "goal_text": "Increase blood flow",
-                        "library_id": "4",
-                        "name": "SMR - IT-Band",
-                        "position_order": 1,
-                        "reps_assigned": 30,
-                        "seconds_duration": 60,
-                        "seconds_per_rep": null,
-                        "seconds_per_set": 30,
-                        "sets_assigned": 1,
-                        "unit_of_measure": "seconds",
-                        "youtube_id": "asigNf1sh-k"
-                    },
-                    {
-                        "bilateral": true,
-                        "display_name": "Foam Roll - Hamstrings",
-                        "goal_text": "Increase blood flow",
-                        "library_id": "3",
-                        "name": "SMR - Hamstrings",
-                        "position_order": 2,
-                        "reps_assigned": 30,
-                        "seconds_duration": 60,
-                        "seconds_per_rep": null,
-                        "seconds_per_set": 30,
-                        "sets_assigned": 1,
-                        "unit_of_measure": "seconds",
-                        "youtube_id": "wQ6uUuBWCbw"
-                    },
-                    {
-                        "bilateral": true,
-                        "display_name": "Foam Roll - Inner Thigh (Adductor)",
-                        "goal_text": "Increase blood flow",
-                        "library_id": "1",
-                        "name": "SMR - Adductors",
-                        "position_order": 3,
-                        "reps_assigned": 30,
-                        "seconds_duration": 60,
-                        "seconds_per_rep": null,
-                        "seconds_per_set": 30,
-                        "sets_assigned": 1,
-                        "unit_of_measure": "seconds",
-                        "youtube_id": "vkVg1dEmjwE"
-                    },
-                    {
-                        "bilateral": true,
-                        "display_name": "Foam Roll - Quads",
-                        "goal_text": "Increase flexibility",
-                        "library_id": "48",
-                        "name": "SMR Quadriceps",
-                        "position_order": 4,
-                        "reps_assigned": 30,
-                        "seconds_duration": 60,
-                        "seconds_per_rep": null,
-                        "seconds_per_set": 30,
-                        "sets_assigned": 1,
-                        "unit_of_measure": "seconds",
-                        "youtube_id": "ERTVBjwgPS4"
-                    }
-                ],
-                "integrate_exercises": [],
-                "lengthen_exercises": [
-                    {
-                        "bilateral": true,
-                        "display_name": "Standing Outer Hip (TFL) Stretch",
-                        "goal_text": "Increase flexibility",
-                        "library_id": "28",
-                        "name": "Standing TFL Static Stretch",
-                        "position_order": 5,
-                        "reps_assigned": 30,
-                        "seconds_duration": 60,
-                        "seconds_per_rep": null,
-                        "seconds_per_set": 30,
-                        "sets_assigned": 1,
-                        "unit_of_measure": "seconds",
-                        "youtube_id": "ClJL9Kn5DHw"
-                    },
-                    {
-                        "bilateral": true,
-                        "display_name": "Lunging Hip Stretch",
-                        "goal_text": "Increase flexibility",
-                        "library_id": "49",
-                        "name": "Kneeling Hip Flexor Static Stretch",
-                        "position_order": 6,
-                        "reps_assigned": 30,
-                        "seconds_duration": 60,
-                        "seconds_per_rep": null,
-                        "seconds_per_set": 30,
-                        "sets_assigned": 1,
-                        "unit_of_measure": "seconds",
-                        "youtube_id": "XbN3TvLEm2A"
-                    },
-                    {
-                        "bilateral": false,
-                        "display_name": "Child's Pose (Arms Straight)",
-                        "goal_text": "Increase flexibility",
-                        "library_id": "103",
-                        "name": "Child's Pose Arms Straight",
-                        "position_order": 7,
-                        "reps_assigned": 30,
-                        "seconds_duration": 30,
-                        "seconds_per_rep": null,
-                        "seconds_per_set": 30,
-                        "sets_assigned": 1,
-                        "unit_of_measure": "seconds",
-                        "youtube_id": "pJcobQf324o"
-                    },
-                    {
-                        "bilateral": true,
-                        "display_name": "Lying Hamstring Stretch",
-                        "goal_text": "Increase flexibility",
-                        "library_id": "9",
-                        "name": "Hamstrings Static Stretch ",
-                        "position_order": 8,
-                        "reps_assigned": 30,
-                        "seconds_duration": 60,
-                        "seconds_per_rep": null,
-                        "seconds_per_set": 30,
-                        "sets_assigned": 1,
-                        "unit_of_measure": "seconds",
-                        "youtube_id": "z73l6oZUniQ"
-                    },
-                    {
-                        "bilateral": true,
-                        "display_name": "Standing Inner Thigh (Adductor) Stretch",
-                        "goal_text": "Increase flexibility",
-                        "library_id": "8",
-                        "name": "Adductors Static Stretch",
-                        "position_order": 9,
-                        "reps_assigned": 30,
-                        "seconds_duration": 60,
-                        "seconds_per_rep": null,
-                        "seconds_per_set": 30,
-                        "sets_assigned": 1,
-                        "unit_of_measure": "seconds",
-                        "youtube_id": "Qmq5fGSrAmg"
-                    }
-                ],
-                "minutes_duration": 11.5,
-                "start_time": "None",
-                "why_text": "mild soreness and discomfort and hard effort"
-            }
-        }
-    ]
-}
-```
-
-### Training Seasons
-
-#### athlete seasons
-
-##### Query String
-The client __must__ submit a request to the endpoint `/plans/version/athlete_seasons`. The request method __must__ be `POST`.
-
-##### Request
-The client __must__ submit a request body containing a JSON object with the following schema:
-```
-{
-	"user_id": Uuid,
-	"seasons": [season1, season2]
-}
-```
-* `season` object __should__ be of following shcema:
-```
-{
-	"sport": string,
-	"competition_level": string,
-	"start_date": string,
-	"end_date": string,
-	"positions": [string, string]
-}
-```
-* `start_date` and `end_date` __should__ be of format `yyyy-mm`
-
-
-```
-POST /plans/version/athlete_seasons HTTPS/1.1
-Host: apis.env.fathomai.com
-Content-Type: application/json
-Authorization: eyJraWQ...ajBc4VQ
-
-{
-    "user_id": "02cb7965-7921-493a-80d4-6b278c928fad",
-    "seasons": [
+    "bump_up_sessions": [],
+    "completed_functional_strength_sessions": 2,
+    "completed_post_recovery_sessions": [],
+    "cross_training_sessions": [],
+    "daily_readiness_survey_completed": true,
+    "date": "2018-10-01",
+    "day_of_week": 0,
+    "functional_strength_completed": false,
+    "functional_strength_eligible": true,
+    "functional_strength_session": {
+        "completed": false,
+        "dynamic_movement": [
             {
-               "sport": "soccer",
-               "competition_level":  "NCAA div 1",
-               "start_date": "2018-06",
-               "end_date": "2018-09",
-               "positions": ["forward"]
-               }
-            ]
-}
-```
-##### Responses
- If the write was successful, the Service __will__ respond with HTTP Status `201 Created`, with a body with the following syntax:
- 
-```
-{
-    "message": "success"
-}
+                "bilateral": true,
+                "description": "Jog in place, driving your knees high into the air with every step.",
+                "display_name": "High Knees",
+                "goal_text": "",
+                "library_id": "151",
+                "name": "High Knees",
+                "position_order": 0,
+                "reps_assigned": 12,
+                "seconds_duration": null,
+                "seconds_per_rep": null,
+                "seconds_per_set": 30,
+                "sets_assigned": 1,
+                "unit_of_measure": "yards",
+                "youtube_id": null
+            },
+            {
+                "bilateral": true,
+                "description": "In a standing position, flex your knee to kick your heel up to your glute. Repeat this motion, alternating each leg and moving at a quick pace.",
+                "display_name": "Butt Kicks",
+                "goal_text": "",
+                "library_id": "147",
+                "name": "Butt Kicks",
+                "position_order": 0,
+                "reps_assigned": 12,
+                "seconds_duration": null,
+                "seconds_per_rep": null,
+                "seconds_per_set": 30,
+                "sets_assigned": 1,
+                "unit_of_measure": "yards",
+                "youtube_id": null
+            },
+            {
+                "bilateral": true,
+                "description": "Standing feet shoulder-width apart, cross one leg over the other. Next, step your back foot out so you are in the starting position. Cross the first foot behind your other foot. Step the front foot out to be back in the starting position. Repeat this motion quickly, then perform the exercise again in the other direction.",
+                "display_name": "Carioca",
+                "goal_text": "",
+                "library_id": "149",
+                "name": "Carioca",
+                "position_order": 0,
+                "reps_assigned": 12,
+                "seconds_duration": null,
+                "seconds_per_rep": null,
+                "seconds_per_set": 30,
+                "sets_assigned": 1,
+                "unit_of_measure": "yards",
+                "youtube_id": null
+            },
+            {
+                "bilateral": true,
+                "description": "Skip with minimal movement, keeping your steps small and jump height relatively low.",
+                "display_name": "Mini Skips",
+                "goal_text": "",
+                "library_id": "145",
+                "name": "Mini Skips",
+                "position_order": 0,
+                "reps_assigned": 12,
+                "seconds_duration": null,
+                "seconds_per_rep": null,
+                "seconds_per_set": 30,
+                "sets_assigned": 1,
+                "unit_of_measure": "yards",
+                "youtube_id": null
+            },
+            {
+                "bilateral": false,
+                "description": "Stand feet slightly wider than shoulder-width. Squat with proper form then jump straight up, landing in the squat position. Continue for the designated reps.",
+                "display_name": "Squat Jumps",
+                "goal_text": "",
+                "library_id": "194",
+                "name": "Squat Jumps",
+                "position_order": 0,
+                "reps_assigned": 12,
+                "seconds_duration": 36,
+                "seconds_per_rep": 3,
+                "seconds_per_set": null,
+                "sets_assigned": 1,
+                "unit_of_measure": "count",
+                "youtube_id": null
+            },
+            {
+                "bilateral": true,
+                "description": "Place a small resistance band around your ankles. Step out until you feel adequate resistance in the band. Stand up onto your toes to perform a calf raise against the resistance of the band. Repeat for the designated reps.",
+                "display_name": "Banded Calf Raises",
+                "goal_text": "",
+                "library_id": "184",
+                "name": "Banded Calf Raises",
+                "position_order": 0,
+                "reps_assigned": 15,
+                "seconds_duration": 90,
+                "seconds_per_rep": 3,
+                "seconds_per_set": null,
+                "sets_assigned": 1,
+                "unit_of_measure": "count",
+                "youtube_id": null
+            }
+        ],
+        "equipment_required": [],
+        "event_date": null,
+        "minutes_duration": 31.449999999999996,
+        "position": 0,
+        "sport_name": null,
+        "stability_work": [
+            {
+                "bilateral": true,
+                "description": "Place one end of a large resistance band around your foot, anchoring it to the ground. Grasp the other end of the band in your hands and pull up on the band, twisting your torso away from the foot holding the band down. Release and complete for the designated reps, then repeat on the other side.",
+                "display_name": "Standing Banded Oblique Twists",
+                "goal_text": "",
+                "library_id": "185",
+                "name": "Standing Banded Oblique Twists",
+                "position_order": 0,
+                "reps_assigned": 12,
+                "seconds_duration": 72,
+                "seconds_per_rep": 3,
+                "seconds_per_set": null,
+                "sets_assigned": 1,
+                "unit_of_measure": "count",
+                "youtube_id": null
+            },
+            {
+                "bilateral": true,
+                "description": "Stand on one leg. Your other leg should be bent at the hip and knee. Lean forward and touch your toes, extending your raised leg behind you. Stand back up and drive your knee up, maintaining your balance. Repeat for the designated reps.",
+                "display_name": "Balance Back Kicks",
+                "goal_text": "",
+                "library_id": "195",
+                "name": "Balance Back Kicks",
+                "position_order": 0,
+                "reps_assigned": 12,
+                "seconds_duration": 72,
+                "seconds_per_rep": 3,
+                "seconds_per_set": null,
+                "sets_assigned": 1,
+                "unit_of_measure": "count",
+                "youtube_id": null
+            },
+            {
+                "bilateral": true,
+                "description": "Sit with your feet elevated off the floor, knees bent toward your torso. Twist the top half of your body toward one side and twist your knees in the other direction. Without putting your feet on the floor, switch sides. This is one rep. Continue for the designated reps.",
+                "display_name": "Russian Twists",
+                "goal_text": "",
+                "library_id": "196",
+                "name": "Russian Twists",
+                "position_order": 0,
+                "reps_assigned": 15,
+                "seconds_duration": 90,
+                "seconds_per_rep": 3,
+                "seconds_per_set": null,
+                "sets_assigned": 1,
+                "unit_of_measure": "count",
+                "youtube_id": null
+            },
+            {
+                "bilateral": false,
+                "description": "Sit with your feet outstretched and your torso leaned back slightly. Bring your knees in toward your chest, meeting your knees in the middle. Extend back all the way, keeping your feet elevated. Complete for the designated reps.",
+                "display_name": "V-Ups",
+                "goal_text": "",
+                "library_id": "197",
+                "name": "V-Ups",
+                "position_order": 0,
+                "reps_assigned": 15,
+                "seconds_duration": 45,
+                "seconds_per_rep": 3,
+                "seconds_per_set": null,
+                "sets_assigned": 1,
+                "unit_of_measure": "count",
+                "youtube_id": null
+            },
+            {
+                "bilateral": false,
+                "description": "Lay down on your back. Keep your hands by your sides, engage your core, and lift your legs up as far as you can. Make sure your back stays flush with the ground as your lower back to the ground. Do not let your feet touch the floor between reps. Complete for the designated reps.",
+                "display_name": "Leg Lifts",
+                "goal_text": "",
+                "library_id": "198",
+                "name": "Leg Lifts",
+                "position_order": 0,
+                "reps_assigned": 15,
+                "seconds_duration": 45,
+                "seconds_per_rep": 3,
+                "seconds_per_set": null,
+                "sets_assigned": 1,
+                "unit_of_measure": "count",
+                "youtube_id": null
+            }
+        ],
+        "start_date": null,
+        "victory_lap": [
+            {
+                "bilateral": false,
+                "description": "Place your hands on a box, feet on the ground as you hold your self up. Bend your elbows and allow your body to descend. Only use your arms to lift your body back up. Complete for the designated reps.",
+                "display_name": "Tricep Dips",
+                "goal_text": "",
+                "library_id": "199",
+                "name": "Tricep Dips",
+                "position_order": 0,
+                "reps_assigned": 15,
+                "seconds_duration": 45,
+                "seconds_per_rep": 3,
+                "seconds_per_set": null,
+                "sets_assigned": 1,
+                "unit_of_measure": "count",
+                "youtube_id": null
+            },
+            {
+                "bilateral": true,
+                "description": "Begin in a plank position on your hands. Bring one knee in toward your chest. Switch legs quickly to complete one rep. Keep your back straight throughout the duration of the exercise.",
+                "display_name": "Mountain Climbers",
+                "goal_text": "",
+                "library_id": "200",
+                "name": "Mountain Climbers",
+                "position_order": 0,
+                "reps_assigned": 15,
+                "seconds_duration": 90,
+                "seconds_per_rep": 3,
+                "seconds_per_set": null,
+                "sets_assigned": 1,
+                "unit_of_measure": "count",
+                "youtube_id": null
+            },
+            {
+                "bilateral": false,
+                "description": "Get into a pushup position with your hands on an elevated surface, ideally a box or bench. Perform a pushup regularly, keeping your back straight and your core tight.",
+                "display_name": "Elevated Pushups",
+                "goal_text": "",
+                "library_id": "201",
+                "name": "Elevated Pushups",
+                "position_order": 0,
+                "reps_assigned": 10,
+                "seconds_duration": 30,
+                "seconds_per_rep": 3,
+                "seconds_per_set": null,
+                "sets_assigned": 1,
+                "unit_of_measure": "count",
+                "youtube_id": null
+            },
+            {
+                "bilateral": true,
+                "description": "Begin in a plank position on your hands. Alternate tapping your shoulders with the opposite arms. Be sure to keep your body in line and core tight as you move. Complete for the designated time.",
+                "display_name": "Plank with Shoulder Taps",
+                "goal_text": "",
+                "library_id": "202",
+                "name": "Plank with Shoulder Taps",
+                "position_order": 0,
+                "reps_assigned": 30,
+                "seconds_duration": 60,
+                "seconds_per_rep": null,
+                "seconds_per_set": 30,
+                "sets_assigned": 1,
+                "unit_of_measure": "seconds",
+                "youtube_id": null
+            }
+        ],
+        "warm_up": [
+            {
+                "bilateral": true,
+                "description": "Lift one leg and grab your foot, bringing it toward your rear to stretch your quad. Reach the opposite arm all the way up, then stand up on your toes. Hold for 1-2 seconds, then release and repeat on the other side.",
+                "display_name": "Quad Stretch w/ Toe Raise",
+                "goal_text": "",
+                "library_id": "176",
+                "name": "Quad Stretch w/ Toe Raise",
+                "position_order": 0,
+                "reps_assigned": 30,
+                "seconds_duration": 60,
+                "seconds_per_rep": null,
+                "seconds_per_set": 30,
+                "sets_assigned": 1,
+                "unit_of_measure": "seconds",
+                "youtube_id": null
+            },
+            {
+                "bilateral": true,
+                "description": "Step forward and straighten your leg, lifting your toes off the ground as you lean down, moving your arms in a scooping motion. Straighten back up and repeat on the other leg as you take another step forward. ",
+                "display_name": "Walking Hamstring Scoops",
+                "goal_text": "",
+                "library_id": "139",
+                "name": "Walking Hamstring Scoops",
+                "position_order": 0,
+                "reps_assigned": 12,
+                "seconds_duration": null,
+                "seconds_per_rep": null,
+                "seconds_per_set": 30,
+                "sets_assigned": 1,
+                "unit_of_measure": "yards",
+                "youtube_id": null
+            },
+            {
+                "bilateral": true,
+                "description": "Use a wall for support if needed. Keep your torso straight as you swing your leg backward as far as you can, then swing it forward. Complete for the set number of reps.",
+                "display_name": "Leg Swings",
+                "goal_text": "",
+                "library_id": "161",
+                "name": "Leg Swings",
+                "position_order": 0,
+                "reps_assigned": 12,
+                "seconds_duration": 720,
+                "seconds_per_rep": 30,
+                "seconds_per_set": null,
+                "sets_assigned": 1,
+                "unit_of_measure": "count",
+                "youtube_id": null
+            },
+            {
+                "bilateral": true,
+                "description": "Stand with your feet shoulder-width apart. Perform a squat but shift your weight onto one side so your body is off-center. Come back to the starting position, then perform the squat on the other side. Repeat for the designated reps.",
+                "display_name": "Side to Side Squat",
+                "goal_text": "",
+                "library_id": "193",
+                "name": "Side to Side Squat",
+                "position_order": 0,
+                "reps_assigned": 12,
+                "seconds_duration": 72,
+                "seconds_per_rep": 3,
+                "seconds_per_set": null,
+                "sets_assigned": 1,
+                "unit_of_measure": "count",
+                "youtube_id": null
+            },
+            {
+                "bilateral": true,
+                "description": "Laying on your back with your arms in a T-position, bring one leg up toward the opposite arm as far as you can without lifting your midback off the ground. Bring that leg back down to the starting position, then repeat on the other side. Complete for the set number of reps.",
+                "display_name": "Iron Cross",
+                "goal_text": "",
+                "library_id": "144",
+                "name": "Iron Cross",
+                "position_order": 0,
+                "reps_assigned": 10,
+                "seconds_duration": 60,
+                "seconds_per_rep": 3,
+                "seconds_per_set": null,
+                "sets_assigned": 1,
+                "unit_of_measure": "count",
+                "youtube_id": null
+            }
+        ]
+    },
+    "game_sessions": [],
+    "landing_screen": 0,
+    "last_sensor_sync": "2018-09-14T10:00:41Z",
+    "last_updated": "2018-10-01T17:53:28Z",
+    "nav_bar_indicator": 0,
+    "post_recovery": {
+        "activate_exercises": [],
+        "activate_iterations": 0,
+        "completed": false,
+        "display_exercises": false,
+        "event_date": null,
+        "goal_text": "",
+        "impact_score": 0,
+        "inhibit_exercises": [],
+        "inhibit_iterations": 0,
+        "integrate_exercises": [],
+        "integrate_iterations": 0,
+        "lengthen_exercises": [],
+        "lengthen_iterations": 0,
+        "minutes_duration": 0,
+        "start_date": null,
+        "why_text": ""
+    },
+    "post_recovery_completed": false,
+    "practice_sessions": [],
+    "pre_recovery": {
+        "activate_exercises": [
+            {
+                "bilateral": false,
+                "description": "Stand feet shoulder-width apart. Keeping your shoulders level and your back straight, bend your head forward so you are looking down at your toes. Then, extend your neck all the way up so you are looking at the ceiling. This is one rep. Repeat for the recommended number of reps.",
+                "display_name": "Neck Flexion/Extension",
+                "goal_text": "Focused muscle activation",
+                "library_id": "131",
+                "name": "Cervical Flexion/Extension",
+                "position_order": 8,
+                "reps_assigned": 10,
+                "seconds_duration": 40,
+                "seconds_per_rep": 2,
+                "seconds_per_set": null,
+                "sets_assigned": 2,
+                "unit_of_measure": "count",
+                "youtube_id": null
+            },
+            {
+                "bilateral": false,
+                "description": "Stand feet shoulder-width apart. Keep your shoulders level and your back straight. Scoop your chin down and back so you are tucking it back and elongating your neck. Hold the tucked position for 1-2 seconds, then release. Repeat for the recommended number of reps.",
+                "display_name": "Chin Tucks",
+                "goal_text": "Focused muscle activation",
+                "library_id": "134",
+                "name": "Cervical Retraction",
+                "position_order": 9,
+                "reps_assigned": 12,
+                "seconds_duration": 48,
+                "seconds_per_rep": 2,
+                "seconds_per_set": null,
+                "sets_assigned": 2,
+                "unit_of_measure": "count",
+                "youtube_id": null
+            },
+            {
+                "bilateral": true,
+                "description": "Stand feet shoulder-width apart. Keeping your shoulders level and your back straight, bend your head to the side, bringing your ear as close to your shoulder as you can. Then, bend your head to the other side. This is one rep. Repeat for the recommended number of reps.",
+                "display_name": "Neck Sidebending",
+                "goal_text": "Focused muscle activation",
+                "library_id": "132",
+                "name": "Cervical Sidebending",
+                "position_order": 10,
+                "reps_assigned": 10,
+                "seconds_duration": 40,
+                "seconds_per_rep": 2,
+                "seconds_per_set": null,
+                "sets_assigned": 1,
+                "unit_of_measure": "count",
+                "youtube_id": null
+            },
+            {
+                "bilateral": true,
+                "description": "Stand feet shoulder-width apart. Keeping your shoulders level and your back straight, look over one shoulder as far as you can without moving your torso or hips. Then, look over your other shoulder. This is one rep. Repeat for the recommended number of reps.",
+                "display_name": "Neck Rotation",
+                "goal_text": "Focused muscle activation",
+                "library_id": "133",
+                "name": "Cervical Rotation",
+                "position_order": 11,
+                "reps_assigned": 10,
+                "seconds_duration": 40,
+                "seconds_per_rep": 2,
+                "seconds_per_set": null,
+                "sets_assigned": 1,
+                "unit_of_measure": "count",
+                "youtube_id": null
+            },
+            {
+                "bilateral": false,
+                "description": "Stand feet shoulder-width apart. Keep your shoulders level and your back straight. Scoop your chin down and back so you are tucking it toward the back of your neck. Hold the tucked position for 1-2 seconds, then release. Repeat for the recommended number of reps.",
+                "display_name": "Scapular Squeezes",
+                "goal_text": "Focused muscle activation",
+                "library_id": "135",
+                "name": "Scapular Retraction",
+                "position_order": 12,
+                "reps_assigned": 10,
+                "seconds_duration": 40,
+                "seconds_per_rep": 2,
+                "seconds_per_set": null,
+                "sets_assigned": 2,
+                "unit_of_measure": "count",
+                "youtube_id": null
+            },
+            {
+                "bilateral": true,
+                "description": "Sit or stand with your shoulders level and your back straight. Bring your shoulders up into shrug, bringing them as close to your ears as you can. Relax and let your shoulders fall back to the starting position. Repeat for the recommended number of reps.",
+                "display_name": "Shoulder Shrugs",
+                "goal_text": "Focused muscle activation",
+                "library_id": "137",
+                "name": "Scapular Elevation",
+                "position_order": 13,
+                "reps_assigned": 10,
+                "seconds_duration": 40,
+                "seconds_per_rep": 2,
+                "seconds_per_set": null,
+                "sets_assigned": 1,
+                "unit_of_measure": "count",
+                "youtube_id": null
+            }
+        ],
+        "activate_iterations": 10,
+        "completed": false,
+        "display_exercises": true,
+        "event_date": null,
+        "goal_text": "Stay loose! Focus on increasing flexibility and building stamina!",
+        "impact_score": 2.9047619047619047,
+        "inhibit_exercises": [
+            {
+                "bilateral": false,
+                "description": "Place a foam roller behind your low back. Cross your arms in front of you and protract your shoulders. Raise your hips off of the floor and lean back, keeping your weight on your lower back. Roll over your back, holding points of tension for 30 seconds. Repeat on the other side.",
+                "display_name": "Foam Roll - Upper Back",
+                "goal_text": "Increase blood flow",
+                "library_id": "102",
+                "name": "SMR - Erector Spinae",
+                "position_order": 0,
+                "reps_assigned": 30,
+                "seconds_duration": 60,
+                "seconds_per_rep": null,
+                "seconds_per_set": 30,
+                "sets_assigned": 2,
+                "unit_of_measure": "seconds",
+                "youtube_id": null
+            },
+            {
+                "bilateral": true,
+                "description": "Lie on one side with the arm on the ground over your head with thumb facing upwards. Place a foam roller under the arm. Slowly roll down your side back and forth. If you find a tender spot, hold for 30 seconds. Repeat on other side.",
+                "display_name": "Foam Roll - Lats",
+                "goal_text": "Increase blood flow",
+                "library_id": "55",
+                "name": "SMR - Latissimus Dorsi",
+                "position_order": 1,
+                "reps_assigned": 30,
+                "seconds_duration": 120,
+                "seconds_per_rep": null,
+                "seconds_per_set": 30,
+                "sets_assigned": 2,
+                "unit_of_measure": "seconds",
+                "youtube_id": null
+            },
+            {
+                "bilateral": false,
+                "description": "Stand with your back against a wall. Place a ball between the wall and the back of your neck, just off center. If you feel have any points of tenderness, you may place the ball over those. Keeping the ball in contact with the wall, bend and rotate your neck so you are looking down toward your opposite front hip. Use you hand to push on the back of your head for more of a stretch. Hold the stretch for 30 seconds, then release.",
+                "display_name": "Posterior Neck Release",
+                "goal_text": "Increase blood flow",
+                "library_id": "125",
+                "name": "SMR - Levator Scapulae",
+                "position_order": 2,
+                "reps_assigned": 30,
+                "seconds_duration": 60,
+                "seconds_per_rep": null,
+                "seconds_per_set": 30,
+                "sets_assigned": 2,
+                "unit_of_measure": "seconds",
+                "youtube_id": null
+            },
+            {
+                "bilateral": true,
+                "description": "Stand with your back against a wall. Place a ball between the wall and on your upper back, in between your shoulder and neck. If you feel have any points of tenderness in this area, you may place the ball over those. Keeping the ball in contact with the wall, push your thumb into the muscle from the front. Bend your neck as far as you can and look straight down. Apply pressure for 30 seconds, then release. ",
+                "display_name": "Upper Back Release",
+                "goal_text": "Increase blood flow",
+                "library_id": "126",
+                "name": "SMR - Upper Trapezius",
+                "position_order": 3,
+                "reps_assigned": 30,
+                "seconds_duration": 60,
+                "seconds_per_rep": null,
+                "seconds_per_set": 30,
+                "sets_assigned": 1,
+                "unit_of_measure": "seconds",
+                "youtube_id": null
+            }
+        ],
+        "inhibit_iterations": 1,
+        "integrate_exercises": [],
+        "integrate_iterations": 0,
+        "lengthen_exercises": [
+            {
+                "bilateral": false,
+                "description": "Place your hands on the back of your head and pull your head down. Make sure you do not round through your back as you pull. Hold for 30 seconds, and then relax.",
+                "display_name": "Neck Flexion Stretch",
+                "goal_text": "Increase flexibility",
+                "library_id": "127",
+                "name": "Upper Trap Static Stretch",
+                "position_order": 4,
+                "reps_assigned": 30,
+                "seconds_duration": 60,
+                "seconds_per_rep": null,
+                "seconds_per_set": 30,
+                "sets_assigned": 2,
+                "unit_of_measure": "seconds",
+                "youtube_id": null
+            },
+            {
+                "bilateral": true,
+                "description": "In a seated position, place one hand under your leg to keep your shoulder level during the stretch. Bring the other hand to the opposite side of your head and pull your head to the side. Try to get your ear as close to your shoulder without lifting the other shoulder. Hold for 30 seconds, then release. Repeat on the other side.",
+                "display_name": "Sidebending Neck Stretch",
+                "goal_text": "Increase flexibility",
+                "library_id": "128",
+                "name": "SCM Static Stretch",
+                "position_order": 5,
+                "reps_assigned": 30,
+                "seconds_duration": 120,
+                "seconds_per_rep": null,
+                "seconds_per_set": 30,
+                "sets_assigned": 2,
+                "unit_of_measure": "seconds",
+                "youtube_id": null
+            },
+            {
+                "bilateral": true,
+                "description": "In a seated position, sit on one hand to keep your shoulder level during the stretch. Bring the other hand to the opposite side of your head and pull your head to the side. Try to get your ear as close to your shoulder without lifting it. Hold for 30 seconds, then release. Repeat on the other side.",
+                "display_name": "Diagonal Neck Stretch",
+                "goal_text": "Increase flexibility",
+                "library_id": "129",
+                "name": "Cervical Rotator Static Stretch",
+                "position_order": 6,
+                "reps_assigned": 30,
+                "seconds_duration": 60,
+                "seconds_per_rep": null,
+                "seconds_per_set": 30,
+                "sets_assigned": 1,
+                "unit_of_measure": "seconds",
+                "youtube_id": null
+            },
+            {
+                "bilateral": true,
+                "description": "Stand feet shoulder-width apart and cross one arm over your body at chest-level. Apply pressure on your forearm with your other hand to stretch the back of your shoulder. Hold for 30 seconds, then repeat on the othe side.",
+                "display_name": "Cross Body Arm Stretch",
+                "goal_text": "Increase flexibility",
+                "library_id": "130",
+                "name": "Posterior Deltoid Static Stretch",
+                "position_order": 7,
+                "reps_assigned": 30,
+                "seconds_duration": 60,
+                "seconds_per_rep": null,
+                "seconds_per_set": 30,
+                "sets_assigned": 1,
+                "unit_of_measure": "seconds",
+                "youtube_id": null
+            }
+        ],
+        "lengthen_iterations": 8,
+        "minutes_duration": 14.133333333333333,
+        "start_date": null,
+        "why_text": "mild soreness and discomfort"
+    },
+    "pre_recovery_completed": false,
+    "recovery_am": {
+        "activate_exercises": [
+            {
+                "bilateral": false,
+                "description": "Stand feet shoulder-width apart. Keeping your shoulders level and your back straight, bend your head forward so you are looking down at your toes. Then, extend your neck all the way up so you are looking at the ceiling. This is one rep. Repeat for the recommended number of reps.",
+                "display_name": "Neck Flexion/Extension",
+                "goal_text": "Focused muscle activation",
+                "library_id": "131",
+                "name": "Cervical Flexion/Extension",
+                "position_order": 8,
+                "reps_assigned": 10,
+                "seconds_duration": 40,
+                "seconds_per_rep": 2,
+                "seconds_per_set": null,
+                "sets_assigned": 2,
+                "unit_of_measure": "count",
+                "youtube_id": null
+            },
+            {
+                "bilateral": false,
+                "description": "Stand feet shoulder-width apart. Keep your shoulders level and your back straight. Scoop your chin down and back so you are tucking it back and elongating your neck. Hold the tucked position for 1-2 seconds, then release. Repeat for the recommended number of reps.",
+                "display_name": "Chin Tucks",
+                "goal_text": "Focused muscle activation",
+                "library_id": "134",
+                "name": "Cervical Retraction",
+                "position_order": 9,
+                "reps_assigned": 12,
+                "seconds_duration": 48,
+                "seconds_per_rep": 2,
+                "seconds_per_set": null,
+                "sets_assigned": 2,
+                "unit_of_measure": "count",
+                "youtube_id": null
+            },
+            {
+                "bilateral": true,
+                "description": "Stand feet shoulder-width apart. Keeping your shoulders level and your back straight, bend your head to the side, bringing your ear as close to your shoulder as you can. Then, bend your head to the other side. This is one rep. Repeat for the recommended number of reps.",
+                "display_name": "Neck Sidebending",
+                "goal_text": "Focused muscle activation",
+                "library_id": "132",
+                "name": "Cervical Sidebending",
+                "position_order": 10,
+                "reps_assigned": 10,
+                "seconds_duration": 40,
+                "seconds_per_rep": 2,
+                "seconds_per_set": null,
+                "sets_assigned": 1,
+                "unit_of_measure": "count",
+                "youtube_id": null
+            },
+            {
+                "bilateral": true,
+                "description": "Stand feet shoulder-width apart. Keeping your shoulders level and your back straight, look over one shoulder as far as you can without moving your torso or hips. Then, look over your other shoulder. This is one rep. Repeat for the recommended number of reps.",
+                "display_name": "Neck Rotation",
+                "goal_text": "Focused muscle activation",
+                "library_id": "133",
+                "name": "Cervical Rotation",
+                "position_order": 11,
+                "reps_assigned": 10,
+                "seconds_duration": 40,
+                "seconds_per_rep": 2,
+                "seconds_per_set": null,
+                "sets_assigned": 1,
+                "unit_of_measure": "count",
+                "youtube_id": null
+            },
+            {
+                "bilateral": false,
+                "description": "Stand feet shoulder-width apart. Keep your shoulders level and your back straight. Scoop your chin down and back so you are tucking it toward the back of your neck. Hold the tucked position for 1-2 seconds, then release. Repeat for the recommended number of reps.",
+                "display_name": "Scapular Squeezes",
+                "goal_text": "Focused muscle activation",
+                "library_id": "135",
+                "name": "Scapular Retraction",
+                "position_order": 12,
+                "reps_assigned": 10,
+                "seconds_duration": 40,
+                "seconds_per_rep": 2,
+                "seconds_per_set": null,
+                "sets_assigned": 2,
+                "unit_of_measure": "count",
+                "youtube_id": null
+            },
+            {
+                "bilateral": true,
+                "description": "Sit or stand with your shoulders level and your back straight. Bring your shoulders up into shrug, bringing them as close to your ears as you can. Relax and let your shoulders fall back to the starting position. Repeat for the recommended number of reps.",
+                "display_name": "Shoulder Shrugs",
+                "goal_text": "Focused muscle activation",
+                "library_id": "137",
+                "name": "Scapular Elevation",
+                "position_order": 13,
+                "reps_assigned": 10,
+                "seconds_duration": 40,
+                "seconds_per_rep": 2,
+                "seconds_per_set": null,
+                "sets_assigned": 1,
+                "unit_of_measure": "count",
+                "youtube_id": null
+            }
+        ],
+        "activate_iterations": 10,
+        "completed": false,
+        "display_exercises": true,
+        "event_date": null,
+        "goal_text": "Stay loose! Focus on increasing flexibility and building stamina!",
+        "impact_score": 2.9047619047619047,
+        "inhibit_exercises": [
+            {
+                "bilateral": false,
+                "description": "Place a foam roller behind your low back. Cross your arms in front of you and protract your shoulders. Raise your hips off of the floor and lean back, keeping your weight on your lower back. Roll over your back, holding points of tension for 30 seconds. Repeat on the other side.",
+                "display_name": "Foam Roll - Upper Back",
+                "goal_text": "Increase blood flow",
+                "library_id": "102",
+                "name": "SMR - Erector Spinae",
+                "position_order": 0,
+                "reps_assigned": 30,
+                "seconds_duration": 60,
+                "seconds_per_rep": null,
+                "seconds_per_set": 30,
+                "sets_assigned": 2,
+                "unit_of_measure": "seconds",
+                "youtube_id": null
+            },
+            {
+                "bilateral": true,
+                "description": "Lie on one side with the arm on the ground over your head with thumb facing upwards. Place a foam roller under the arm. Slowly roll down your side back and forth. If you find a tender spot, hold for 30 seconds. Repeat on other side.",
+                "display_name": "Foam Roll - Lats",
+                "goal_text": "Increase blood flow",
+                "library_id": "55",
+                "name": "SMR - Latissimus Dorsi",
+                "position_order": 1,
+                "reps_assigned": 30,
+                "seconds_duration": 120,
+                "seconds_per_rep": null,
+                "seconds_per_set": 30,
+                "sets_assigned": 2,
+                "unit_of_measure": "seconds",
+                "youtube_id": null
+            },
+            {
+                "bilateral": false,
+                "description": "Stand with your back against a wall. Place a ball between the wall and the back of your neck, just off center. If you feel have any points of tenderness, you may place the ball over those. Keeping the ball in contact with the wall, bend and rotate your neck so you are looking down toward your opposite front hip. Use you hand to push on the back of your head for more of a stretch. Hold the stretch for 30 seconds, then release.",
+                "display_name": "Posterior Neck Release",
+                "goal_text": "Increase blood flow",
+                "library_id": "125",
+                "name": "SMR - Levator Scapulae",
+                "position_order": 2,
+                "reps_assigned": 30,
+                "seconds_duration": 60,
+                "seconds_per_rep": null,
+                "seconds_per_set": 30,
+                "sets_assigned": 2,
+                "unit_of_measure": "seconds",
+                "youtube_id": null
+            },
+            {
+                "bilateral": true,
+                "description": "Stand with your back against a wall. Place a ball between the wall and on your upper back, in between your shoulder and neck. If you feel have any points of tenderness in this area, you may place the ball over those. Keeping the ball in contact with the wall, push your thumb into the muscle from the front. Bend your neck as far as you can and look straight down. Apply pressure for 30 seconds, then release. ",
+                "display_name": "Upper Back Release",
+                "goal_text": "Increase blood flow",
+                "library_id": "126",
+                "name": "SMR - Upper Trapezius",
+                "position_order": 3,
+                "reps_assigned": 30,
+                "seconds_duration": 60,
+                "seconds_per_rep": null,
+                "seconds_per_set": 30,
+                "sets_assigned": 1,
+                "unit_of_measure": "seconds",
+                "youtube_id": null
+            }
+        ],
+        "inhibit_iterations": 1,
+        "integrate_exercises": [],
+        "integrate_iterations": 0,
+        "lengthen_exercises": [
+            {
+                "bilateral": false,
+                "description": "Place your hands on the back of your head and pull your head down. Make sure you do not round through your back as you pull. Hold for 30 seconds, and then relax.",
+                "display_name": "Neck Flexion Stretch",
+                "goal_text": "Increase flexibility",
+                "library_id": "127",
+                "name": "Upper Trap Static Stretch",
+                "position_order": 4,
+                "reps_assigned": 30,
+                "seconds_duration": 60,
+                "seconds_per_rep": null,
+                "seconds_per_set": 30,
+                "sets_assigned": 2,
+                "unit_of_measure": "seconds",
+                "youtube_id": null
+            },
+            {
+                "bilateral": true,
+                "description": "In a seated position, place one hand under your leg to keep your shoulder level during the stretch. Bring the other hand to the opposite side of your head and pull your head to the side. Try to get your ear as close to your shoulder without lifting the other shoulder. Hold for 30 seconds, then release. Repeat on the other side.",
+                "display_name": "Sidebending Neck Stretch",
+                "goal_text": "Increase flexibility",
+                "library_id": "128",
+                "name": "SCM Static Stretch",
+                "position_order": 5,
+                "reps_assigned": 30,
+                "seconds_duration": 120,
+                "seconds_per_rep": null,
+                "seconds_per_set": 30,
+                "sets_assigned": 2,
+                "unit_of_measure": "seconds",
+                "youtube_id": null
+            },
+            {
+                "bilateral": true,
+                "description": "In a seated position, sit on one hand to keep your shoulder level during the stretch. Bring the other hand to the opposite side of your head and pull your head to the side. Try to get your ear as close to your shoulder without lifting it. Hold for 30 seconds, then release. Repeat on the other side.",
+                "display_name": "Diagonal Neck Stretch",
+                "goal_text": "Increase flexibility",
+                "library_id": "129",
+                "name": "Cervical Rotator Static Stretch",
+                "position_order": 6,
+                "reps_assigned": 30,
+                "seconds_duration": 60,
+                "seconds_per_rep": null,
+                "seconds_per_set": 30,
+                "sets_assigned": 1,
+                "unit_of_measure": "seconds",
+                "youtube_id": null
+            },
+            {
+                "bilateral": true,
+                "description": "Stand feet shoulder-width apart and cross one arm over your body at chest-level. Apply pressure on your forearm with your other hand to stretch the back of your shoulder. Hold for 30 seconds, then repeat on the othe side.",
+                "display_name": "Cross Body Arm Stretch",
+                "goal_text": "Increase flexibility",
+                "library_id": "130",
+                "name": "Posterior Deltoid Static Stretch",
+                "position_order": 7,
+                "reps_assigned": 30,
+                "seconds_duration": 60,
+                "seconds_per_rep": null,
+                "seconds_per_set": 30,
+                "sets_assigned": 1,
+                "unit_of_measure": "seconds",
+                "youtube_id": null
+            }
+        ],
+        "lengthen_iterations": 8,
+        "minutes_duration": 14.133333333333333,
+        "start_date": null,
+        "why_text": "mild soreness and discomfort"
+    },
+    "recovery_pm": {
+        "activate_exercises": [],
+        "activate_iterations": 0,
+        "completed": false,
+        "display_exercises": false,
+        "event_date": null,
+        "goal_text": "",
+        "impact_score": 0,
+        "inhibit_exercises": [],
+        "inhibit_iterations": 0,
+        "integrate_exercises": [],
+        "integrate_iterations": 0,
+        "lengthen_exercises": [],
+        "lengthen_iterations": 0,
+        "minutes_duration": 0,
+        "start_date": null,
+        "why_text": ""
+    },
+    "sessions_planned": true,
+    "training_sessions": []
+    }
 ```
 
 ### Misc
