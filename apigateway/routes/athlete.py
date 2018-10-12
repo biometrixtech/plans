@@ -17,6 +17,7 @@ import random
 
 app = Blueprint('athlete', __name__)
 iotd_client = boto3.client('iot-data')
+USERS_API_VERSION = '2_0'
 
 
 @app.route('/<uuid:athlete_id>/daily_plan', methods=['POST'])
@@ -203,7 +204,7 @@ def _is_athlete_active(athlete_id):
 
 
 def _notify_user(athlete_id, body):
-    users_service = Service('users', '2_0')
+    users_service = Service('users', USERS_API_VERSION)
     users_service.call_apigateway_async(method='POST',
                                        endpoint=f'/user/{athlete_id}/notify',
                                        body=body)
