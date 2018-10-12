@@ -207,18 +207,18 @@ Resources:
             } ] }
             TimeoutInMinutes: 30
 
-    AsyncPushPolicy:
-        Type: "AWS::IAM::Policy"
-        Properties:
-            PolicyName: { "Fn::Sub": "plans-${Environment}-asyncpush" }
-            Roles: [ { Ref: 'ApiGatewayLambdaExecutionRole' } ]
-            PolicyDocument:
-                Version: "2012-10-17"
-                Statement:
-                  - Action:
-                      - "sqs:SendMessage"
-                    Effect: "Allow"
-                    Resource: { 'Fn::GetAtt': [ 'ApigatewayStack', 'Outputs.AsyncSqsQueueArn' ] }
+    # AsyncPushPolicy:
+    #     Type: "AWS::IAM::Policy"
+    #     Properties:
+    #         PolicyName: { "Fn::Sub": "plans-${Environment}-asyncpush" }
+    #         Roles: [ { Ref: 'ApiGatewayLambdaExecutionRole' } ]
+    #         PolicyDocument:
+    #             Version: "2012-10-17"
+    #             Statement:
+    #               - Action:
+    #                   - "sqs:SendMessage"
+    #                 Effect: "Allow"
+    #                 Resource: { 'Fn::GetAtt': [ 'ApigatewayStack', 'Outputs.AsyncSqsQueueArn' ] }
 
     ##########################################################################################################
     ## MONITORING
