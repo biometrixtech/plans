@@ -1,19 +1,21 @@
-from aws_xray_sdk.core import xray_recorder
 from flask import request, Blueprint
 
 from datastores.post_session_survey_datastore import PostSessionSurveyDatastore
-from decorators import authentication_required
-from exceptions import InvalidSchemaException
+from fathomapi.api.config import Config
+from fathomapi.comms.service import Service
+from fathomapi.utils.decorators import require
+from fathomapi.utils.exceptions import InvalidSchemaException
+from fathomapi.utils.xray import xray_recorder
 from models.post_session_survey import PostSessionSurvey
 from models.session import SessionType
-from utils import format_datetime, run_async
+from utils import format_datetime
 
 
 app = Blueprint('post_session_survey', __name__)
 
 
 @app.route('/', methods=['POST'])
-@authentication_required
+@require.authenticated.any
 @xray_recorder.capture('routes.post_session_survey.put')
 def handle_post_session_survey_create():
     if not isinstance(request.json, dict):
@@ -45,6 +47,6 @@ def handle_post_session_survey_create():
     store = PostSessionSurveyDatastore()
     store.put(survey)
 
-    run_async('POST', f"athlete/{request.json['user_id']}/daily_plan")
+    Service('plans', Config.get('API_VERSION')).call_apigateway_async('POST', f"athlete/{request.json['user_id']}/daily_plan")
 
     return {'message': 'success'}, 201

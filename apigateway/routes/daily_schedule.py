@@ -1,9 +1,9 @@
-from aws_xray_sdk.core import xray_recorder
 from flask import request, Blueprint
 import datetime
 
-from decorators import authentication_required
-from exceptions import InvalidSchemaException
+from fathomapi.utils.decorators import require
+from fathomapi.utils.exceptions import InvalidSchemaException
+from fathomapi.utils.xray import xray_recorder
 from config import get_mongo_collection
 from datastores.daily_plan_datastore import DailyPlanDatastore
 from datastores.session_datastore import SessionDatastore
@@ -16,7 +16,7 @@ app = Blueprint('daily_schedule', __name__)
 
 
 @app.route('/', methods=['POST'])
-@authentication_required
+@require.authenticated.any
 @xray_recorder.capture('routes.daily_schedule')
 def handle_daily_schedule_create():
     if not isinstance(request.json, dict):
@@ -67,9 +67,8 @@ def handle_daily_schedule_create():
     return {'past_sessions': past_sessions}, 201
 
 
-
 @app.route('/typical', methods=['POST'])
-@authentication_required
+@require.authenticated.any
 @xray_recorder.capture('routes.typical_schedule')
 def handle_get_typical_schedule():
     if 'event_date' not in request.json:
