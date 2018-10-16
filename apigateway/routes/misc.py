@@ -18,6 +18,8 @@ USERS_API_VERSION = '2_0'
 @xray_recorder.capture('routes.misc.clearuser')
 def handle_clear_user_data(principal_id=None):
     users_service = Service('users', USERS_API_VERSION)
+    print(principal_id)
+    print(f'/user/{principal_id}')
     user_data = users_service.call_apigateway_sync(method='GET',
                                                    endpoint=f'/user/{principal_id}')
     user_email = user_data['user']['personal_data']['email']
