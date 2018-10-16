@@ -26,7 +26,7 @@ def handle_clear_user_data(principal_id=None):
         "dipesh@fathomai.com",
         "mazen+mvp@fathomai.com",
         "mazen@fathomai.com",
-        "chris+mvp@fathomai.com",
+        "chrisp+mvp@fathomai.com",
         "ivonna+mvp@fathomai.com",
         "gabby+mvp@fathomai.com",
         "maria+mvp@fathomai.com",
