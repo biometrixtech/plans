@@ -17,32 +17,29 @@ USERS_API_VERSION = '2_0'
 @require.authenticated.any
 @xray_recorder.capture('routes.misc.clearuser')
 def handle_clear_user_data(principal_id=None):
-    users_service = Service('users', '2_0')
-    print(users_service.name, users_service.version, principal_id)
-    print(f'/user/{principal_id}')
-    user_data = users_service.call_apigateway_sync(method='GET',
-                                                   endpoint=f'user/{principal_id}',
-                                                   headers={'Content-Type': "application/json"})
-    user_email = user_data['user']['personal_data']['email']
-    if email not in [
-        "dipesh+mvp@fathomai.com",
-        "dipesh@fathomai.com",
-        "mazen+mvp@fathomai.com",
-        "mazen@fathomai.com",
-        "chrisp+mvp@fathomai.com",
-        "ivonna+mvp@fathomai.com",
-        "gabby+mvp@fathomai.com",
-        "maria+mvp@fathomai.com",
-        "melissa+mvp@fathomai.com",
-        "amina+mvp@fathomai.com",
-        "paul+mvp@fathomai.com",
-        "hello+demo1@fathomai.com",
-        "hello+demo2@fathomai.com",
-        "hello+demo3@fathomai.com",
-        "hello+demo4@fathomai.com",
-        "hello+demo5@fathomai.com"
-    ]:
-        raise ForbiddenException("The user is not allowed to perform this action.")
+    # users_service = Service('users', '2_0')
+    # user_data = users_service.call_apigateway_sync(method='GET',
+    #                                                endpoint=f'user/{principal_id}')
+    # user_email = user_data['user']['personal_data']['email']
+    # if email not in [
+    #     "dipesh+mvp@fathomai.com",
+    #     "dipesh@fathomai.com",
+    #     "mazen+mvp@fathomai.com",
+    #     "mazen@fathomai.com",
+    #     "chrisp+mvp@fathomai.com",
+    #     "ivonna+mvp@fathomai.com",
+    #     "gabby+mvp@fathomai.com",
+    #     "maria+mvp@fathomai.com",
+    #     "melissa+mvp@fathomai.com",
+    #     "amina+mvp@fathomai.com",
+    #     "paul+mvp@fathomai.com",
+    #     "hello+demo1@fathomai.com",
+    #     "hello+demo2@fathomai.com",
+    #     "hello+demo3@fathomai.com",
+    #     "hello+demo4@fathomai.com",
+    #     "hello+demo5@fathomai.com"
+    # ]:
+    #     raise ForbiddenException("The user is not allowed to perform this action.")
     user_id = principal_id
 
     current_time = parse_datetime(request.json['event_date'])
