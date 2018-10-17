@@ -1,8 +1,8 @@
-from aws_xray_sdk.core import xray_recorder
 from flask import request, Blueprint
 
-from decorators import authentication_required
-from exceptions import InvalidSchemaException, NoSuchEntityException
+from fathomapi.utils.decorators import require
+from fathomapi.utils.exceptions import InvalidSchemaException, NoSuchEntityException
+from fathomapi.utils.xray import xray_recorder
 from datastores.daily_plan_datastore import DailyPlanDatastore
 from datastores.athlete_stats_datastore import AthleteStatsDatastore
 from datastores.completed_exercise_datastore import CompletedExerciseDatastore
@@ -15,7 +15,7 @@ app = Blueprint('functional_strength', __name__)
 
 
 @app.route('/', methods=['PATCH'])
-@authentication_required
+@require.authenticated.any
 @xray_recorder.capture('routes.functional_strength')
 def handle_functional_strength_update():
     if not isinstance(request.json, dict):
@@ -24,7 +24,6 @@ def handle_functional_strength_update():
         raise InvalidSchemaException('Missing required parameter event_date')
     else:
         event_date = parse_datetime(request.json['event_date'])
-    fs_start_date = format_datetime(parse_datetime(request.json['start_date'])) if 'start_date' in request.json else None
     try:
         user_id = request.json['user_id']
     except:
@@ -44,7 +43,6 @@ def handle_functional_strength_update():
 
     if plan.functional_strength_session is not None:
         plan.functional_strength_session.completed = True
-        plan.functional_strength_session.start_date = fs_start_date
         plan.functional_strength_session.event_date = fs_event_date
     plan.functional_strength_completed = True
     plan.completed_functional_strength_sessions = plan.completed_functional_strength_sessions + 1
@@ -67,6 +65,44 @@ def handle_functional_strength_update():
     del plan['daily_readiness_survey'], plan['user_id']
 
     return {'daily_plans': [plan]}, 202
+
+
+@app.route('/', methods=['POST'])
+@require.authenticated.any
+@xray_recorder.capture('routes.functional_strength')
+def handle_functional_strength_start():
+    if not isinstance(request.json, dict):
+        raise InvalidSchemaException('Request body must be a dictionary')
+    if 'event_date' not in request.json:
+        raise InvalidSchemaException('Missing required parameter event_date')
+    else:
+        event_date = parse_datetime(request.json['event_date'])
+    try:
+        user_id = request.json['user_id']
+    except:
+        raise InvalidSchemaException('user_id is required')
+
+    plan_event_date = format_date(event_date)
+    fs_start_date = format_datetime(event_date)
+    if not _check_plan_exists(user_id, plan_event_date):
+        raise NoSuchEntityException('Plan not found for the user')
+    store = DailyPlanDatastore()
+
+    plan = store.get(user_id=user_id,
+                     start_date=plan_event_date,
+                     end_date=plan_event_date)[0]
+
+    if plan.functional_strength_session is not None:
+        plan.functional_strength_session.start_date = fs_start_date
+        # TODO: need to implement this route
+        # plans_service = Service('plans', Config.get('API_VERSION'))
+        # body = {"event_date": recovery_start_date}
+        # plans_service.call_apigateway_async(method='POST',
+        #                                     endpoint=f'/athlete/{user_id}/fs_started',
+        #                                     body=body)
+    store.put(plan)
+
+    return {'message': 'success'}, 200
 
 
 def save_completed_exercises(exercise_list, user_id, event_date):

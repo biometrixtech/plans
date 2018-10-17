@@ -34,7 +34,7 @@ Parameters:
 Mappings:
     TemplateVersion:
         Self: { Commit: "da39a3ee5e6b4b0d3255bfef95601890afd80709" }
-        Infrastructure: { Commit: "1bbee7413deba8a5920c91339f0324fa8a631d84" }
+        Infrastructure: { Commit: "94a5566657dfdc37fb985b1b497df9878e204d1c" }
 
 Metadata:
     "AWS::CloudFormation::Interface":
@@ -115,16 +115,16 @@ Resources:
                           - "secretsmanager:GetSecretValue"
                         Effect: "Allow"
                         Resource: { "Fn::Sub": "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:plans/${Environment}/*" }
-                      - Action:
-                          - "sqs:SendMessage"
-                        Effect: "Allow"
-                        Resource: { "Fn::GetAtt": [ "AsyncSqsQueue", "Arn" ] }
                       - Effect: "Allow"
                         Action:
                           - "iot:Publish"
                         Resource:
                           - { "Fn::Sub": "arn:aws:iot:${AWS::Region}:${AWS::AccountId}:topic/users/${Environment}/*" }
                           - { "Fn::Sub": "arn:aws:iot:${AWS::Region}:${AWS::AccountId}:topic/plans/${Environment}/*" }
+                      - Action:
+                          - "sqs:SendMessage"
+                        Effect: "Allow"
+                        Resource: "*"
             RoleName: { "Fn::Sub": "plans-${Environment}-apigateway-${AWS::Region}" }
 
     ##########################################################################################################
@@ -164,7 +164,6 @@ Resources:
                     SERVICE: 'plans'
                     ENVIRONMENT: { Ref: 'Environment' }
                     AWS_ACCOUNT_ID: { Ref: "AWS::AccountId" }
-                    ASYNC_QUEUE_URL: { Ref: "AsyncSqsQueue" }
             Handler: "apigateway.handler"
             Runtime: "python3.6"
             Timeout: "30"
@@ -195,6 +194,7 @@ Resources:
                 Environment: { Ref: "Environment" }
                 Service: "apigateway"
                 LambdaArn: { "Fn::GetAtt": [ "ApiGatewayLambda", "Arn" ] }
+                CreateAsync: "true"
             Tags:
               - { Key: "Name", Value: { "Fn::Sub": "plans-${Environment}-apigateway" } }
               - { Key: "Management", Value: "managed" }
@@ -207,41 +207,18 @@ Resources:
             } ] }
             TimeoutInMinutes: 30
 
-    ##########################################################################################################
-    ##  SQS
-    ##########################################################################################################
-
-    AsyncSqsQueue:
-        Type: "AWS::SQS::Queue"
+    AsyncPushPolicy:
+        Type: "AWS::IAM::Policy"
         Properties:
-            DelaySeconds: 0
-            QueueName: { "Fn::Sub": "plans-${Environment}-apigateway-async" }
-#            RedrivePolicy:
-#                deadLetterTargetArn: { Ref: "AsyncDeadLetterTopic" }
-#                maxReceiveCount: 1
-            VisibilityTimeout: 300
-
-    AsyncDeadLetterTopic:
-        Type: "AWS::SNS::Topic"
-        Properties:
-            DisplayName: "Plans service asynchronous invocation dead-letter queue"
-            TopicName: { "Fn::Sub": "plans-${Environment}-apigateway-asyncdlq" }
-
-    AsyncLambdaInvokePermission:
-        Type: 'AWS::Lambda::Permission'
-        Properties:
-            FunctionName: { 'Fn::GetAtt': [ 'ApiGatewayLambda', 'Arn' ] }
-            Action: 'lambda:InvokeFunction'
-            Principal: 'sqs.amazonaws.com'
-            SourceArn: { "Fn::GetAtt": [ 'AsyncSqsQueue', "Arn" ] }
-
-    AsyncLambdaTriggerMapping:
-        Type: "AWS::Lambda::EventSourceMapping"
-        Properties:
-            BatchSize: 1
-            Enabled: true
-            EventSourceArn: { "Fn::GetAtt": [ 'AsyncSqsQueue', "Arn" ] }
-            FunctionName: { Ref: "ApiGatewayLambda" }
+            PolicyName: { "Fn::Sub": "plans-${Environment}-asyncpush" }
+            Roles: [ { Ref: 'ApiGatewayLambdaExecutionRole' } ]
+            PolicyDocument:
+                Version: "2012-10-17"
+                Statement:
+                  - Action:
+                      - "sqs:SendMessage"
+                    Effect: "Allow"
+                    Resource: { 'Fn::GetAtt': [ 'ApigatewayStack', 'Outputs.AsyncSqsQueueArn' ] }
 
     ##########################################################################################################
     ## MONITORING

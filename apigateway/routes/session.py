@@ -1,16 +1,17 @@
-from aws_xray_sdk.core import xray_recorder
 from flask import request, Blueprint
 import datetime
 
 from datastores.daily_plan_datastore import DailyPlanDatastore
 from datastores.session_datastore import SessionDatastore
-# from datastore.post_session_survey import PostSessionSurveyDatastore
-from decorators import authentication_required
-from exceptions import InvalidSchemaException, NoSuchEntityException, ForbiddenException
+from fathomapi.api.config import Config
+from fathomapi.comms.service import Service
+from fathomapi.utils.decorators import require
+from fathomapi.utils.exceptions import InvalidSchemaException, NoSuchEntityException, ForbiddenException
+from fathomapi.utils.xray import xray_recorder
 from models.session import SessionType, SessionFactory, StrengthConditioningType
 from models.post_session_survey import PostSessionSurvey, PostSurvey
 from models.daily_plan import DailyPlan
-from utils import parse_datetime, format_date, format_datetime, run_async
+from utils import parse_datetime, format_date, format_datetime
 from config import get_mongo_collection
 from models.sport import SportName
 
@@ -18,7 +19,7 @@ app = Blueprint('session', __name__)
 
 
 @app.route('/', methods=['POST'])
-@authentication_required
+@require.authenticated.any
 @xray_recorder.capture('routes.session.create')
 def handle_session_create():
     _validate_schema()
@@ -79,7 +80,7 @@ def handle_session_create():
 
 
 @app.route('/<uuid:session_id>', methods=['DELETE'])
-@authentication_required
+@require.authenticated.any
 @xray_recorder.capture('routes.session.delete')
 def handle_session_delete(session_id):
     _validate_schema()
@@ -105,7 +106,7 @@ def handle_session_delete(session_id):
 
 
 @app.route('/<uuid:session_id>', methods=['PATCH'])
-@authentication_required
+@require.authenticated.any
 @xray_recorder.capture('routes.session.update')
 def handle_session_update(session_id):
     _validate_schema()
@@ -167,7 +168,7 @@ def handle_session_update(session_id):
 
 
 @app.route('/sensor_data', methods=['POST'])
-@authentication_required
+@require.authenticated.any
 @xray_recorder.capture('routes.session.add_sensor_data')
 def handle_session_sensor_data():
     if not isinstance(request.json, dict):
@@ -246,7 +247,7 @@ def handle_session_sensor_data():
 
 
 @app.route('/typical', methods=['POST'])
-@authentication_required
+@require.authenticated.any
 @xray_recorder.capture('routes.typical_sessions')
 def handle_get_typical_sessions():
     if 'event_date' not in request.json:
@@ -306,7 +307,7 @@ def handle_get_typical_sessions():
 
 
 @app.route('/no_sessions', methods=['POST'])
-@authentication_required
+@require.authenticated.any
 @xray_recorder.capture('routes.no_sessions_planned')
 def handle_no_sessions_planned():
     if 'event_date' not in request.json:
@@ -412,7 +413,7 @@ def _check_plan_exists(user_id, event_date):
 
 
 def update_plan(user_id, event_date):
-    run_async('POST', f"athlete/{user_id}/daily_plan", body={'event_date': event_date})
+    Service('plans', Config.get('API_VERSION')).call_apigateway_async('POST', f"athlete/{user_id}/daily_plan", body={'event_date': event_date})
 
 
 def _validate_schema():
