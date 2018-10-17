@@ -150,7 +150,7 @@ Numeric ID,Display Name,Exercise,PHASE,Muscle Group / Joint,Inhibit,Lengthen,Act
 149,Carioca,Carioca,,,,,,,,1,1,12,12,Y,0,,,yards,0,30,,,,Beginner,none,x,,x,,
 150,Backward Run,Backward Run,,,,,,,,1,1,12,12,Y,0,,,yards,0,30,,,,Beginner,none,x,,x,,
 151,High Knees,High Knees,,,,,,,,1,1,30,30,Y,0,,,seconds,0,30,,,,Beginner,none,x,,x,,
-152,Ice Skaters,Ice Skaters,,,,,,,,1,1,12,12,Y,0,,,yards,0,30,,,,Beginner,none,x,,,x,
+152,Ice Skaters,Ice Skaters,,,,,,,,1,1,12,12,N,0,,,count,0,,3,,,Beginner,none,x,,,x,
 153,Continuous Jumps,Continuous Jumps,,,,,,,,1,1,10,10,N,0,,,count,0,,3,,,Beginner,none,x,,,x,
 154,Long Jumps,Long Jumps,,,,,,,,1,1,5,5,N,0,,,count,0,,5,,,Beginner,none,x,,,x,
 155,Triple Hop to Stabilization,Triple Hop to Stabilization,,,,,,,,1,1,3,3,Y,0,,,count,0,,15,,,Beginner,none,x,,,x,

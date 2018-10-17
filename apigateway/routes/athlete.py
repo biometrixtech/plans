@@ -111,7 +111,7 @@ def manage_prep_push_notification(athlete_id):
     event_date = format_date(parse_date(request.json['event_date']))
     plan = _get_plan(athlete_id, event_date)
     if plan and not plan.pre_recovery_completed and plan.pre_recovery.start_date is None and plan.pre_recovery.impact_score >= 3 and plan.post_recovery.goal_text == "":
-        body = {"message": "Your self care ritual is ready. Take time to invest in yourself.",
+        body = {"message": "Your prep exercises are ready! Tap to to get started!",
                 "call_to_action": "COMPLETE_ACTIVE_PREP"}
         _notify_user(athlete_id, body)
         return {'message': 'User Notified'}, 200
@@ -126,7 +126,7 @@ def manage_recovery_push_notification(athlete_id):
     event_date = format_date(parse_date(request.json['event_date']))
     plan = _get_plan(athlete_id, event_date)
     if plan and not plan.post_recovery_completed and plan.post_recovery.start_date is None  and plan.post_recovery.impact_score >= 3:
-        body = {"message": "Your self care ritual is ready. Take time to invest in yourself.",
+        body = {"message": "Your recovery exercises are ready! Tap to begin taking care!",
                 "call_to_action": "COMPLETE_ACTIVE_RECOVERY"}
         _notify_user(athlete_id, body)
         return {'message': 'User Notified'}, 200
@@ -172,13 +172,13 @@ def manage_recovery_completion_push_notification(athlete_id):
     event_date = format_date(parse_date(request.json['event_date']))
     plan = _get_plan(athlete_id, event_date)
     if recovery_type=='prep' and plan and not plan.pre_recovery_completed and plan.post_recovery.goal_text == "":
-        body = {"message": "Being your best takes discipline. Finish what you started. Tap to complete your ritual.",
+        body = {"message": "Take time to invest in yourself. Let's finish your exercises!",
                 "call_to_action": "COMPLETE_ACTIVE_PREP"}
         _notify_user(athlete_id, body)
         return {'message': 'User Notified'}, 200
 
-    elif recovery_type=='recovery' and plan and not plan.post_recovery.completed:
-        body = {"message": "Being your best takes discipline. Finish what you started. Tap to complete your ritual.",
+    elif recovery_type=='recovery' and plan and plan.post_recovery.start_date is not None and not plan.post_recovery.completed:
+        body = {"message": "Take time to invest in yourself. Let's finish your exercises!",
                 "call_to_action": "COMPLETE_ACTIVE_RECOVERY"}
         _notify_user(athlete_id, body)
         return {'message': 'User Notified'}, 200
