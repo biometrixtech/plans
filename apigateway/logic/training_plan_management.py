@@ -205,7 +205,8 @@ class TrainingPlanManager(object):
                 daily_plan.pre_recovery.why_text = text_generator.get_why_text(rpe_impact_score, max_soreness)
                 daily_plan.pre_recovery.goal_text = text_generator.get_goal_text(rpe_impact_score, max_soreness,
                                                                                  body_part_text)
-                daily_plan.pre_recovery.display_exercises = True
+
+                daily_plan.pre_recovery.display_exercises = self.display_exercises(am_exercise_assignments)
             else:
                 # daily_plan.pre_recovery = None
                 daily_plan.pre_recovery.display_exercises = False
@@ -231,7 +232,7 @@ class TrainingPlanManager(object):
                 daily_plan.post_recovery.goal_text = text_generator.get_goal_text(rpe_impact_score, max_soreness,
                                                                                   body_part_text)
 
-                daily_plan.post_recovery.display_exercises = True
+                daily_plan.post_recovery.display_exercises = self.display_exercises(am_exercise_assignments)
             else:
                 # daily_plan.post_recovery = None
                 daily_plan.post_recovery.display_exercises = False
@@ -243,6 +244,17 @@ class TrainingPlanManager(object):
         self.daily_plan_datastore.put(daily_plan)
 
         return daily_plan
+
+    def display_exercises(self, exercise_assignments):
+
+        display = False
+
+        if (exercise_assignments.duration_minutes() > 0 and
+                (len(exercise_assignments.inhibit_exercises) + len(exercise_assignments.activate_exercises) +
+                 len(exercise_assignments.lengthen_exercises) + len(exercise_assignments.integrate_exercises) > 0)):
+            display = True
+
+        return display
 
     def populate_functional_strength(self, daily_plan, athlete_stats, last_daily_readiness_survey):
 
