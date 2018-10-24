@@ -2,6 +2,7 @@ from fathomapi.api.config import Config
 from fathomapi.comms.service import Service
 from fathomapi.utils.decorators import require
 from fathomapi.utils.xray import xray_recorder
+from fathomapi.utils.exceptions import NoSuchEntityException
 from flask import Blueprint, request
 from datastores.datastore_collection import DatastoreCollection
 from logic.training_plan_management import TrainingPlanManager
@@ -196,10 +197,13 @@ def _get_plan(user_id, event_date):
 
 
 def _is_athlete_active(athlete_id):
-    athlete_stats = DatastoreCollection().athlete_stats_datastore.get(athlete_id=athlete_id)
-    if athlete_stats is not None and athlete_stats.event_date > format_date(datetime.datetime.now() - datetime.timedelta(days=14)):
-        return True
-    else:
+    try:
+        daily_readiness = DatastoreCollection().daily_readiness_datastore.get(user_id=athlete_id, last_only=True)[0]
+        if format_date(daily_readiness.event_date) >= format_date(datetime.datetime.now() - datetime.timedelta(days=14)):
+            return True
+        else:
+            return False
+    except NoSuchEntityException:
         return False
 
 
@@ -215,12 +219,4 @@ def _randomize_trigger_time(start_time, window, tz_offset):
     local_date = parse_datetime(start_time) + datetime.timedelta(minutes=offset_from_start)
     utc_date = local_date - datetime.timedelta(minutes=tz_offset)
     return utc_date
-    # return format_datetime(utc_date)
 
-
-# @xray_recorder.capture('routes.athlete.daily_plan.push')
-# def push_plan_update(user_id, daily_plan):
-#     iotd_client.publish(
-#         topic='plans/{}/athlete/{}/daily_plan'.format(os.environ['ENVIRONMENT'], user_id),
-#         payload=json.dumps({'daily_plan': daily_plan}, default=json_serialise).encode()
-#     )
