@@ -14,6 +14,8 @@ tests/mock_tests/.pytest_cache/*
 !apigateway/*.py
 apigateway/itsdangerous.py
 apigateway/flask_lambda.py
+apigateway/six.py
+apigateway/semver.py
 !apigateway/datastores/
 !apigateway/logic/
 !apigateway/models
