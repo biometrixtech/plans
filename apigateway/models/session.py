@@ -355,34 +355,34 @@ class FunctionalStrengthSession(Serialisable):
             return ret
 
 
-class CompletedFunctionalStrengthSession(Serialisable):
+# class CompletedFunctionalStrengthSession(Serialisable):
 
-    def __init__(self, user_id, event_date, sport_name, position=None):
-        self.user_id = user_id
-        self.event_date = event_date
-        self.sport_name = sport_name,
-        self.position = position
+#     def __init__(self, user_id, event_date, sport_name, position=None):
+#         self.user_id = user_id
+#         self.event_date = event_date
+#         self.sport_name = sport_name,
+#         self.position = position
 
-    def json_serialise(self):
-        ret = {'user_id': self.user_id,
-               'sport_name': self.sport_name,
-               'position': self.position,
-               'event_date': format_datetime(self.event_date),
-               }
-        return ret
+#     def json_serialise(self):
+#         ret = {'user_id': self.user_id,
+#                'sport_name': self.sport_name,
+#                'position': self.position,
+#                'event_date': format_datetime(self.event_date),
+#                }
+#         return ret
 
 
-class CompletedFunctionalStrengthSummary(Serialisable):
+# class CompletedFunctionalStrengthSummary(Serialisable):
 
-    def __init__(self, user_id, completed_count):
-        self.user_id = user_id
-        self.completed_count = completed_count
+#     def __init__(self, user_id, completed_count):
+#         self.user_id = user_id
+#         self.completed_count = completed_count
 
-    def json_serialise(self):
-        ret = {'user_id': self.user_id,
-               'completed_count': self.completed_count,
-               }
-        return ret
+#     def json_serialise(self):
+#         ret = {'user_id': self.user_id,
+#                'completed_count': self.completed_count,
+#                }
+#         return ret
 
 
 class RecoverySession(Serialisable):
