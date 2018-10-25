@@ -32,13 +32,13 @@ class SportName(Enum):
     general_fitness = 6
     golf = 7
     gymnastics = 8
-    ice_hockey = 9
+    skate_sports = 9
     lacrosse = 10
     rowing = 11
     rugby = 12
     diving = 13
     soccer = 14
-    swimming = 15
+    pool_sports = 15
     tennis = 16
     distance_running = 17
     sprints = 18
@@ -47,6 +47,7 @@ class SportName(Enum):
     volleyball = 21
     wrestling = 22
     weightlifting = 23
+    track_field =24
     no_sport = None
 
 
@@ -95,8 +96,21 @@ class SoccerPosition(Enum):
     midfielder = 3
     striker = 4
 
+class SoftballPosition(Enum):
+    catcher = 0
+    infielder = 1
+    pitcher = 2
+    outfielder = 3
 
+class FieldHockeyPosition(Enum):
+    goalie = 0
+    fullback = 1
+    midfielder = 2
+    forward = 3
 
-
-
+class TrackAndFieldPosition(Enum):
+    sprinter = 0
+    jumper = 1
+    thrower = 2
+    distance = 3
 
