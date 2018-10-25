@@ -5,7 +5,7 @@ import datetime
 from serialisable import Serialisable
 import logic.exercise_generator as exercise
 from utils import format_datetime, parse_datetime
-from models.sport import SportName, NoSportPosition, BaseballPosition, BasketballPosition, FootballPosition, LacrossePosition, SoccerPosition
+from models.sport import SportName, NoSportPosition, BaseballPosition, BasketballPosition, FootballPosition, LacrossePosition, SoccerPosition, SoftballPosition, TrackAndFieldPosition, FieldHockeyPosition
 
 class SessionType(Enum):
     practice = 0
@@ -330,10 +330,16 @@ class FunctionalStrengthSession(Serialisable):
                 value = BasketballPosition(value)
             elif self.sport_name == SportName.baseball:
                 value = BaseballPosition(value)
+            elif self.sport_name == SportName.softball:
+                value = SoftballPosition(value)
             elif self.sport_name == SportName.football:
                 value = FootballPosition(value)
             elif self.sport_name == SportName.lacrosse:
                 value = LacrossePosition(value)
+            elif self.sport_name == SportName.track_field:
+                value = TrackAndFieldPosition(value)
+            elif self.sport_name == SportName.field_hockey:
+                value = FieldHockeyPosition(value)
         elif name in ['start_date', 'event_date']:
             if not isinstance(value, datetime.datetime) and value is not None:
                 value = parse_datetime(value)
