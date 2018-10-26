@@ -209,6 +209,7 @@ class TrainingPlanManager(object):
             else:
                 # daily_plan.pre_recovery = None
                 daily_plan.pre_recovery.display_exercises = False
+                daily_plan.functional_strength_session = None
 
         if show_post_recovery:
             post_impact_score = self.calculate_post_impact_score(
@@ -235,6 +236,7 @@ class TrainingPlanManager(object):
             else:
                 # daily_plan.post_recovery = None
                 daily_plan.post_recovery.display_exercises = False
+                daily_plan.functional_strength_session = None
 
         # daily_plan.add_scheduled_sessions(scheduled_sessions)
 
