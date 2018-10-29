@@ -46,6 +46,7 @@ class InjuryStatus(Enum):
     healthy = 0
     healthy_chronically_injured = 1
     returning_from_injury = 2
+    returning_from_chronic_injury = 3
 
 
 class BodyPartLocation(Enum):
