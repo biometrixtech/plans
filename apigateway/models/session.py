@@ -5,7 +5,7 @@ import datetime
 from serialisable import Serialisable
 import logic.exercise_generator as exercise
 from utils import format_datetime, parse_datetime
-from models.sport import SportName, NoSportPosition, BaseballPosition, BasketballPosition, FootballPosition, LacrossePosition, SoccerPosition
+from models.sport import SportName, NoSportPosition, BaseballPosition, BasketballPosition, FootballPosition, LacrossePosition, SoccerPosition, SoftballPosition, TrackAndFieldPosition, FieldHockeyPosition
 
 class SessionType(Enum):
     practice = 0
@@ -330,10 +330,16 @@ class FunctionalStrengthSession(Serialisable):
                 value = BasketballPosition(value)
             elif self.sport_name == SportName.baseball:
                 value = BaseballPosition(value)
+            elif self.sport_name == SportName.softball:
+                value = SoftballPosition(value)
             elif self.sport_name == SportName.football:
                 value = FootballPosition(value)
             elif self.sport_name == SportName.lacrosse:
                 value = LacrossePosition(value)
+            elif self.sport_name == SportName.track_field:
+                value = TrackAndFieldPosition(value)
+            elif self.sport_name == SportName.field_hockey:
+                value = FieldHockeyPosition(value)
         elif name in ['start_date', 'event_date']:
             if not isinstance(value, datetime.datetime) and value is not None:
                 value = parse_datetime(value)
@@ -355,34 +361,34 @@ class FunctionalStrengthSession(Serialisable):
             return ret
 
 
-class CompletedFunctionalStrengthSession(Serialisable):
+# class CompletedFunctionalStrengthSession(Serialisable):
 
-    def __init__(self, user_id, event_date, sport_name, position=None):
-        self.user_id = user_id
-        self.event_date = event_date
-        self.sport_name = sport_name,
-        self.position = position
+#     def __init__(self, user_id, event_date, sport_name, position=None):
+#         self.user_id = user_id
+#         self.event_date = event_date
+#         self.sport_name = sport_name,
+#         self.position = position
 
-    def json_serialise(self):
-        ret = {'user_id': self.user_id,
-               'sport_name': self.sport_name,
-               'position': self.position,
-               'event_date': format_datetime(self.event_date),
-               }
-        return ret
+#     def json_serialise(self):
+#         ret = {'user_id': self.user_id,
+#                'sport_name': self.sport_name,
+#                'position': self.position,
+#                'event_date': format_datetime(self.event_date),
+#                }
+#         return ret
 
 
-class CompletedFunctionalStrengthSummary(Serialisable):
+# class CompletedFunctionalStrengthSummary(Serialisable):
 
-    def __init__(self, user_id, completed_count):
-        self.user_id = user_id
-        self.completed_count = completed_count
+#     def __init__(self, user_id, completed_count):
+#         self.user_id = user_id
+#         self.completed_count = completed_count
 
-    def json_serialise(self):
-        ret = {'user_id': self.user_id,
-               'completed_count': self.completed_count,
-               }
-        return ret
+#     def json_serialise(self):
+#         ret = {'user_id': self.user_id,
+#                'completed_count': self.completed_count,
+#                }
+#         return ret
 
 
 class RecoverySession(Serialisable):

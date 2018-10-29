@@ -3,7 +3,7 @@ from models.daily_plan import DailyPlan
 from models.session import PracticeSession
 from models.daily_readiness import DailyReadiness
 from models.stats import AthleteStats
-from stats_processing import StatsProcessing
+from logic.stats_processing import StatsProcessing
 from tests.testing_utilities import TestUtilities
 from tests.mocks.mock_athlete_stats_datastore import AthleteStatsDatastore
 from tests.mocks.mock_daily_plan_datastore import DailyPlanDatastore

@@ -1,11 +1,12 @@
 import pytest
 from logic.functional_strength_mapping import FSProgramGenerator
 from logic.stats_processing import StatsProcessing
+from logic.training_plan_management import TrainingPlanManager
 from models.daily_plan import DailyPlan
 from models.daily_readiness import DailyReadiness
 from models.post_session_survey import PostSessionSurvey
-from models.session import PracticeSession, SessionType
-from models.sport import BasketballPosition, SportName, SoccerPosition, NoSportPosition
+from models.session import FunctionalStrengthSession, PracticeSession, SessionType
+from models.sport import BasketballPosition, SportName, SoccerPosition, NoSportPosition, TrackAndFieldPosition, SoftballPosition, FieldHockeyPosition
 from tests.mocks.mock_exercise_datastore import ExerciseLibraryDatastore
 from tests.mocks.mock_datastore_collection import DatastoreCollection
 from tests.mocks.mock_daily_plan_datastore import DailyPlanDatastore
@@ -67,6 +68,14 @@ def get_daily_readiness_surveys(start_date, end_date):
     return surveys
 
 
+def get_daily_readiness_survey_high_soreness(date, soreness_level):
+
+    soreness = TestUtilities().body_part_soreness(9, soreness_level)
+    daily_readiness = DailyReadiness(date.strftime("%Y-%m-%dT%H:%M:%SZ"), "tester", [soreness], 4, 5)
+
+    return daily_readiness
+
+
 def get_post_session_surveys(start_date, end_date):
 
     surveys = []
@@ -95,6 +104,83 @@ def test_generate_session_for_soccer():
     assert True is (len(fs_session.victory_lap) > 0)
     assert True is (fs_session.duration_minutes > 0)
 
+def test_generate_session_for_cycling():
+    mapping = FSProgramGenerator(exercise_library_datastore)
+    fs_session = mapping.getFunctionalStrengthForSportPosition(SportName.cycling)
+    assert True is (len(fs_session.warm_up) > 0)
+    assert True is (len(fs_session.dynamic_movement) > 0)
+    assert True is (len(fs_session.stability_work) > 0)
+    assert True is (len(fs_session.victory_lap) > 0)
+    assert True is (fs_session.duration_minutes > 0)
+
+def test_generate_session_for_field_hockey():
+    mapping = FSProgramGenerator(exercise_library_datastore)
+    fs_session = mapping.getFunctionalStrengthForSportPosition(SportName.field_hockey, FieldHockeyPosition.goalie)
+    assert True is (len(fs_session.warm_up) > 0)
+    assert True is (len(fs_session.dynamic_movement) > 0)
+    assert True is (len(fs_session.stability_work) > 0)
+    assert True is (len(fs_session.victory_lap) > 0)
+    assert True is (fs_session.duration_minutes > 0)
+
+def test_generate_session_for_rowing():
+    mapping = FSProgramGenerator(exercise_library_datastore)
+    fs_session = mapping.getFunctionalStrengthForSportPosition(SportName.rowing)
+    assert True is (len(fs_session.warm_up) > 0)
+    assert True is (len(fs_session.dynamic_movement) > 0)
+    assert True is (len(fs_session.stability_work) > 0)
+    assert True is (len(fs_session.victory_lap) > 0)
+    assert True is (fs_session.duration_minutes > 0)
+
+def test_generate_session_for_skate_sports():
+    mapping = FSProgramGenerator(exercise_library_datastore)
+    fs_session = mapping.getFunctionalStrengthForSportPosition(SportName.skate_sports)
+    assert True is (len(fs_session.warm_up) > 0)
+    assert True is (len(fs_session.dynamic_movement) > 0)
+    assert True is (len(fs_session.stability_work) > 0)
+    assert True is (len(fs_session.victory_lap) > 0)
+    assert True is (fs_session.duration_minutes > 0)
+
+def test_generate_session_for_softball():
+    mapping = FSProgramGenerator(exercise_library_datastore)
+    fs_session = mapping.getFunctionalStrengthForSportPosition(SportName.softball, SoftballPosition.catcher)
+    assert True is (len(fs_session.warm_up) > 0)
+    assert True is (len(fs_session.dynamic_movement) > 0)
+    assert True is (len(fs_session.stability_work) > 0)
+    assert True is (len(fs_session.victory_lap) > 0)
+    assert True is (fs_session.duration_minutes > 0)
+
+def test_generate_session_for_pool_sports():
+    mapping = FSProgramGenerator(exercise_library_datastore)
+    fs_session = mapping.getFunctionalStrengthForSportPosition(SportName.pool_sports)
+    assert True is (len(fs_session.warm_up) > 0)
+    assert True is (len(fs_session.dynamic_movement) > 0)
+    assert True is (len(fs_session.stability_work) > 0)
+    assert True is (len(fs_session.victory_lap) > 0)
+    assert True is (fs_session.duration_minutes > 0)
+
+def test_generate_session_for_sprinter():
+    mapping = FSProgramGenerator(exercise_library_datastore)
+    fs_session = mapping.getFunctionalStrengthForSportPosition(SportName.track_field, TrackAndFieldPosition.sprinter)
+    assert True is (len(fs_session.warm_up) > 0)
+    assert True is (len(fs_session.dynamic_movement) > 0)
+    assert True is (len(fs_session.stability_work) > 0)
+    assert True is (len(fs_session.victory_lap) > 0)
+    assert True is (fs_session.duration_minutes > 0)
+
+    fs_session_power = mapping.getFunctionalStrengthForSportPosition(SportName.no_sport, NoSportPosition.power)
+    assert True is ([i.json_serialise() for i in fs_session.warm_up] == [i.json_serialise() for i in fs_session_power.warm_up])
+    assert True is ([i.json_serialise() for i in fs_session.dynamic_movement] == [i.json_serialise() for i in fs_session_power.dynamic_movement])
+    assert True is ([i.json_serialise() for i in fs_session.stability_work] == [i.json_serialise() for i in fs_session_power.stability_work])
+    assert True is ([i.json_serialise() for i in fs_session.victory_lap] == [i.json_serialise() for i in fs_session_power.victory_lap])
+
+def test_generate_session_for_distance():
+    mapping = FSProgramGenerator(exercise_library_datastore)
+    fs_session = mapping.getFunctionalStrengthForSportPosition(SportName.track_field, TrackAndFieldPosition.distance)
+    assert True is (len(fs_session.warm_up) > 0)
+    assert True is (len(fs_session.dynamic_movement) > 0)
+    assert True is (len(fs_session.stability_work) > 0)
+    assert True is (len(fs_session.victory_lap) > 0)
+    assert True is (fs_session.duration_minutes > 0)
 
 def test_generate_session_for_speed():
     mapping = FSProgramGenerator(exercise_library_datastore)
@@ -274,3 +360,46 @@ def test_athlete_enough_ap_ar():
     stats_processing.process_athlete_stats()
     logged_enough = stats_processing.athlete_has_enough_active_prep_recovery_sessions()
     assert True is logged_enough
+
+
+def test_no_fs_with_high_readiness_soreness():
+    daily_plan = get_daily_plans(datetime(2018, 7, 24, 0, 0, 0), datetime(2018, 7, 25, 0, 0, 0))[0]
+    daily_plan.functional_strength_session = FunctionalStrengthSession()
+    survey = get_daily_readiness_survey_high_soreness(datetime(2018, 7, 24, 12, 0, 0), 4)
+    daily_plan_datastore = DailyPlanDatastore()
+    daily_plan_datastore.side_load_plans([daily_plan])
+    daily_readiness_datastore = DailyReadinessDatastore()
+    daily_readiness_datastore.side_load_surveys([survey])
+    datastore_collection = DatastoreCollection()
+    datastore_collection.daily_plan_datastore = daily_plan_datastore
+    datastore_collection.daily_readiness_datastore = daily_readiness_datastore
+    tpm = TrainingPlanManager("tester", datastore_collection)
+    plan = tpm.create_daily_plan("2018-07-24")
+    assert(None is plan.functional_strength_session)
+
+
+def test_no_fs_with_high_post_session_soreness():
+    daily_plan = get_daily_plans(datetime(2018, 7, 24, 0, 0, 0), datetime(2018, 7, 25, 0, 0, 0))[0]
+    daily_plan.functional_strength_session = FunctionalStrengthSession()
+    survey = get_daily_readiness_survey_high_soreness(datetime(2018, 7, 24, 12, 0, 0), 1)
+    daily_plan_datastore = DailyPlanDatastore()
+    daily_plan_datastore.side_load_plans([daily_plan])
+    daily_readiness_datastore = DailyReadinessDatastore()
+    daily_readiness_datastore.side_load_surveys([survey])
+    post_session_datastore = PostSessionSurveyDatastore()
+
+    soreness_list = [TestUtilities().body_part_soreness(12, 4)]
+    post_survey = TestUtilities().get_post_survey(4, soreness_list)
+    post_session_survey = \
+        PostSessionSurvey(datetime(2018, 7, 24, 17, 30, 0).strftime("%Y-%m-%dT%H:%M:%SZ"), "tester", None,
+                          1, post_survey)
+
+    post_session_datastore.side_load_surveys([post_session_survey])
+
+    datastore_collection = DatastoreCollection()
+    datastore_collection.daily_plan_datastore = daily_plan_datastore
+    datastore_collection.daily_readiness_datastore = daily_readiness_datastore
+    datastore_collection.post_session_survey_datastore = post_session_datastore
+    tpm = TrainingPlanManager("tester", datastore_collection)
+    plan = tpm.create_daily_plan("2018-07-24")
+    assert(None is plan.functional_strength_session)
