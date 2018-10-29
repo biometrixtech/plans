@@ -1,4 +1,4 @@
-from training_plan_management import TrainingPlanManager
+from logic.training_plan_management import TrainingPlanManager
 from tests.mocks.mock_daily_readiness_datastore import DailyReadinessDatastore
 from tests.mocks.mock_datastore_collection import DatastoreCollection
 from models.session import PracticeSession, Game, StrengthConditioningSession

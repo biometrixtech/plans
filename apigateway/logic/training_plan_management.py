@@ -205,6 +205,10 @@ class TrainingPlanManager(object):
                 daily_plan.pre_recovery.why_text = text_generator.get_why_text(rpe_impact_score, max_soreness)
                 daily_plan.pre_recovery.goal_text = text_generator.get_goal_text(rpe_impact_score, max_soreness,
                                                                                  body_part_text)
+
+                if am_exercise_assignments is None or am_exercise_assignments.duration_minutes() == 0:
+                    daily_plan.functional_strength_session = None
+
                 daily_plan.pre_recovery.display_exercises = True
             else:
                 # daily_plan.pre_recovery = None
@@ -230,6 +234,9 @@ class TrainingPlanManager(object):
                 daily_plan.post_recovery.why_text = text_generator.get_why_text(rpe_impact_score, max_soreness)
                 daily_plan.post_recovery.goal_text = text_generator.get_goal_text(rpe_impact_score, max_soreness,
                                                                                   body_part_text)
+
+                if pm_exercise_assignments is None or pm_exercise_assignments.duration_minutes() == 0:
+                    daily_plan.functional_strength_session = None
 
                 daily_plan.post_recovery.display_exercises = True
             else:

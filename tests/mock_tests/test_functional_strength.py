@@ -1,10 +1,11 @@
 import pytest
 from logic.functional_strength_mapping import FSProgramGenerator
 from logic.stats_processing import StatsProcessing
+from logic.training_plan_management import TrainingPlanManager
 from models.daily_plan import DailyPlan
 from models.daily_readiness import DailyReadiness
 from models.post_session_survey import PostSessionSurvey
-from models.session import PracticeSession, SessionType
+from models.session import FunctionalStrengthSession, PracticeSession, SessionType
 from models.sport import BasketballPosition, SportName, SoccerPosition, NoSportPosition, TrackAndFieldPosition, SoftballPosition, FieldHockeyPosition
 from tests.mocks.mock_exercise_datastore import ExerciseLibraryDatastore
 from tests.mocks.mock_datastore_collection import DatastoreCollection
@@ -65,6 +66,14 @@ def get_daily_readiness_surveys(start_date, end_date):
         surveys.append(daily_readiness)
 
     return surveys
+
+
+def get_daily_readiness_survey_high_soreness(date, soreness_level):
+
+    soreness = TestUtilities().body_part_soreness(9, soreness_level)
+    daily_readiness = DailyReadiness(date.strftime("%Y-%m-%dT%H:%M:%SZ"), "tester", [soreness], 4, 5)
+
+    return daily_readiness
 
 
 def get_post_session_surveys(start_date, end_date):
@@ -351,3 +360,46 @@ def test_athlete_enough_ap_ar():
     stats_processing.process_athlete_stats()
     logged_enough = stats_processing.athlete_has_enough_active_prep_recovery_sessions()
     assert True is logged_enough
+
+
+def test_no_fs_with_high_readiness_soreness():
+    daily_plan = get_daily_plans(datetime(2018, 7, 24, 0, 0, 0), datetime(2018, 7, 25, 0, 0, 0))[0]
+    daily_plan.functional_strength_session = FunctionalStrengthSession()
+    survey = get_daily_readiness_survey_high_soreness(datetime(2018, 7, 24, 12, 0, 0), 4)
+    daily_plan_datastore = DailyPlanDatastore()
+    daily_plan_datastore.side_load_plans([daily_plan])
+    daily_readiness_datastore = DailyReadinessDatastore()
+    daily_readiness_datastore.side_load_surveys([survey])
+    datastore_collection = DatastoreCollection()
+    datastore_collection.daily_plan_datastore = daily_plan_datastore
+    datastore_collection.daily_readiness_datastore = daily_readiness_datastore
+    tpm = TrainingPlanManager("tester", datastore_collection)
+    plan = tpm.create_daily_plan("2018-07-24")
+    assert(None is plan.functional_strength_session)
+
+
+def test_no_fs_with_high_post_session_soreness():
+    daily_plan = get_daily_plans(datetime(2018, 7, 24, 0, 0, 0), datetime(2018, 7, 25, 0, 0, 0))[0]
+    daily_plan.functional_strength_session = FunctionalStrengthSession()
+    survey = get_daily_readiness_survey_high_soreness(datetime(2018, 7, 24, 12, 0, 0), 1)
+    daily_plan_datastore = DailyPlanDatastore()
+    daily_plan_datastore.side_load_plans([daily_plan])
+    daily_readiness_datastore = DailyReadinessDatastore()
+    daily_readiness_datastore.side_load_surveys([survey])
+    post_session_datastore = PostSessionSurveyDatastore()
+
+    soreness_list = [TestUtilities().body_part_soreness(12, 4)]
+    post_survey = TestUtilities().get_post_survey(4, soreness_list)
+    post_session_survey = \
+        PostSessionSurvey(datetime(2018, 7, 24, 17, 30, 0).strftime("%Y-%m-%dT%H:%M:%SZ"), "tester", None,
+                          1, post_survey)
+
+    post_session_datastore.side_load_surveys([post_session_survey])
+
+    datastore_collection = DatastoreCollection()
+    datastore_collection.daily_plan_datastore = daily_plan_datastore
+    datastore_collection.daily_readiness_datastore = daily_readiness_datastore
+    datastore_collection.post_session_survey_datastore = post_session_datastore
+    tpm = TrainingPlanManager("tester", datastore_collection)
+    plan = tpm.create_daily_plan("2018-07-24")
+    assert(None is plan.functional_strength_session)
