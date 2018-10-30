@@ -22,10 +22,21 @@ app = Blueprint('daily_readiness', __name__)
 @xray_recorder.capture('routes.daily_readiness.create')
 def handle_daily_readiness_create():
     validate_data()
+    event_date = parse_datetime(request.json['date_time'])
+    if event_date.hour < 3:
+        event_date = datetime.datetime(
+                            year=event_date.year, 
+                            month=event_date.month,
+                            day=event_date.day - 1,
+                            hour=23,
+                            minute=59,
+                            second=59
+                            )
+        event_date = format_datetime(event_date)
 
     daily_readiness = DailyReadiness(
         user_id=request.json['user_id'],
-        event_date=request.json['date_time'],
+        event_date=event_date,
         soreness=request.json['soreness'],  # dailysoreness object array
         sleep_quality=request.json['sleep_quality'],
         readiness=request.json['readiness'],
