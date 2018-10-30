@@ -9,6 +9,7 @@ from datastores.completed_exercise_datastore import CompletedExerciseDatastore
 from models.exercise import CompletedExercise
 from utils import format_date, parse_datetime, format_datetime
 from config import get_mongo_collection
+import datetime
 
 app = Blueprint('active_recovery', __name__)
 
