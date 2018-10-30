@@ -73,20 +73,31 @@ def handle_daily_readiness_get(principal_id=None):
 
     start_time = current_time - datetime.timedelta(hours=48)
     sore_body_parts = []
+    severe_soreness_last_24_hours = False
     try:
         daily_readiness = daily_readiness_store.get(user_id, start_date=start_time, end_date=current_time)
         if len(daily_readiness) != 0:
             sore_body_parts = daily_readiness[0].json_serialise()['sore_body_parts']
+            if daily_readiness[0].event_date > current_time - datetime.timedelta(hours=24):
+                if len([s for s in daily_readiness[0].soreness if s.severity >= 4]):
+                    severe_soreness_last_24_hours = True
     except NoSuchEntityException:
         pass
 
     post_session_store = PostSessionSurveyDatastore()
     post_session_surveys = post_session_store.get(user_id=user_id, start_date=start_time, end_date=current_time)
-    post_session_surveys = [s for s in post_session_surveys if s is not None and s.event_date < format_datetime(current_time) and s.event_date > format_datetime(start_time)]
+    post_session_surveys = [s for s in post_session_surveys if s is not None and s.event_date_time < current_time and s.event_date_time > start_time]
     if len(post_session_surveys) != 0:
         post_session_surveys = sorted(post_session_surveys, key=lambda k: k.survey.event_date, reverse=True)
         sore_body_parts += [{"body_part": s.body_part.location.value, "side": s.side} for s in post_session_surveys[0].survey.soreness if s.severity > 1]
     sore_body_parts = [dict(t) for t in {tuple(d.items()) for d in sore_body_parts}]
+
+    post_session_surveys_24_hours = [s for s in post_session_surveys if s.event_date_time > current_time - datetime.timedelta(hours=24)]
+    if len(post_session_surveys_24_hours) != 0 and not severe_soreness_last_24_hours:
+        for post_survey in post_session_surveys_24_hours:
+            if len([s for s in post_survey.survey.soreness if s.severity >= 4]):
+                severe_soreness_last_24_hours = True
+                break
 
     athlete_stats_store = AthleteStatsDatastore()
     athlete_stats = athlete_stats_store.get(athlete_id=user_id)
@@ -101,7 +112,8 @@ def handle_daily_readiness_get(principal_id=None):
         current_position = athlete_stats.current_position.value if athlete_stats.current_position is not None else None
         functional_strength_eligible = False
         if (athlete_stats.functional_strength_eligible and (athlete_stats.next_functional_strength_eligible_date is None
-                or parse_datetime(athlete_stats.next_functional_strength_eligible_date) < current_time)):
+                or parse_datetime(athlete_stats.next_functional_strength_eligible_date) < current_time) and
+            not severe_soreness_last_24_hours):
             functional_strength_eligible = True
 
         completed_functional_strength_sessions = athlete_stats.completed_functional_strength_sessions
