@@ -86,16 +86,16 @@ def handle_daily_readiness_get(principal_id=None):
 
     post_session_store = PostSessionSurveyDatastore()
     post_session_surveys = post_session_store.get(user_id=user_id, start_date=start_time, end_date=current_time)
-    post_session_surveys = [s for s in post_session_surveys if s is not None and s.event_date < format_datetime(current_time) and s.event_date > format_datetime(start_time)]
+    post_session_surveys = [s for s in post_session_surveys if s is not None and s.event_date_time < current_time and s.event_date_time > start_time]
     if len(post_session_surveys) != 0:
         post_session_surveys = sorted(post_session_surveys, key=lambda k: k.survey.event_date, reverse=True)
         sore_body_parts += [{"body_part": s.body_part.location.value, "side": s.side} for s in post_session_surveys[0].survey.soreness if s.severity > 1]
     sore_body_parts = [dict(t) for t in {tuple(d.items()) for d in sore_body_parts}]
 
-    post_session_surveys_24_hours = [s for s in post_session_surveys if s.event_date > format_datetime(current_time - datetime.timedelta(hours=24))]
+    post_session_surveys_24_hours = [s for s in post_session_surveys if s.event_date_time > current_time - datetime.timedelta(hours=24)]
     if len(post_session_surveys_24_hours) != 0 and not severe_soreness_last_24_hours:
         for post_survey in post_session_surveys_24_hours:
-            if len([s for s in post_survey.soreness if s.severity >= 4]):
+            if len([s for s in post_survey.survey.soreness if s.severity >= 4]):
                 severe_soreness_last_24_hours = True
                 break
 
