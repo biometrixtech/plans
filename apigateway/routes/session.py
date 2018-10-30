@@ -149,9 +149,23 @@ def handle_session_update(session_id):
     if not _check_plan_exists(user_id, plan_event_date):
         raise NoSuchEntityException("Plan does not exist for the user to update session")
     if 'post_session_survey' in request.json:
-        survey = PostSurvey(event_date_time=event_date,
+        survey = PostSurvey(event_date=request.json['post_session_survey']['event_date'],
                             survey=request.json['post_session_survey']
                             )
+        if survey.event_date.hour < 3:
+            survey.event_date = datetime.datetime(
+                                        year=survey.event_date.year, 
+                                        month=survey.event_date.month,
+                                        day=survey.event_date.day - 1,
+                                        hour=23,
+                                        minute=59,
+                                        second=59
+                                        )
+            plan_event_date = format_date(event_date - datetime.timedelta(days=1))
+            # TODO: if the frontend error is fixed, this needs to be removed
+            if event_date.hour >= 3:
+                session_data["event_date"] = format_datetime(parse_datetime(session_data["event_date"]) - datetime.timedelta(days=1))
+
         session_data['post_session_survey'] = survey.json_serialise()
 
     store = SessionDatastore()
