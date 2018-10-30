@@ -44,13 +44,6 @@ def handle_session_create():
     description = request.json.get('description', "")
     plan_event_date = format_date(event_date)
     session_event_date = format_datetime(event_date)
-    if not _check_plan_exists(user_id, plan_event_date):
-        plan = DailyPlan(event_date=plan_event_date)
-        plan.user_id = user_id
-        plan.last_sensor_sync = DailyPlanDatastore().get_last_sensor_sync(user_id, plan_event_date)
-        
-        DailyPlanDatastore().put(plan)
-
     session_data = {"sport_name": sport_name,
                     "strength_and_conditioning_type": strength_and_conditioning_type,
                     "description": description,
@@ -61,6 +54,18 @@ def handle_session_create():
                             survey=request.json['post_session_survey']
                             )
         session_data['post_session_survey'] = survey.json_serialise()
+        if survey.event_date.hour < 3:
+            plan_event_date = format_date(event_date - datetime.timedelta(days=1))
+            # TODO: if the frontend error is fixed, this needs to be removed
+            if event_date.hour >= 3:
+                session_data["event_date"] = format_datetime(parse_datetime(session_data["event_date"]) - datetime.timedelta(days=1))
+
+    if not _check_plan_exists(user_id, plan_event_date):
+        plan = DailyPlan(event_date=plan_event_date)
+        plan.user_id = user_id
+        plan.last_sensor_sync = DailyPlanDatastore().get_last_sensor_sync(user_id, plan_event_date)
+        
+        DailyPlanDatastore().put(plan)
 
     session = _create_session(session_type, session_data)
 
