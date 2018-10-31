@@ -49,13 +49,15 @@ def update_athlete_stats(athlete_id):
 @require.authenticated.service
 @xray_recorder.capture('routes.athlete.pn.manage')
 def manage_athlete_push_notification(athlete_id):
+    # Make sure stats are consistent
+    try:
+        StatsProcessing(athlete_id, event_date=None, datastore_collection=DatastoreCollection()).process_athlete_stats()
+    except:
+        pass
     if not _is_athlete_active(athlete_id):
         return {'message': 'Athlete is not active'}, 200
 
     _schedule_notifications(athlete_id)
-
-    # Make sure stats are consistent
-    StatsProcessing(athlete_id, event_date=None, datastore_collection=DatastoreCollection()).process_athlete_stats()
 
     return {'message': 'Processed'}, 202
 
