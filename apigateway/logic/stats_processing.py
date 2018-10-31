@@ -2,6 +2,7 @@ from models.stats import AthleteStats
 from datetime import datetime, timedelta
 import statistics
 from utils import parse_date, parse_datetime, format_date
+from fathomapi.utils.exceptions import NoSuchEntityException
 
 
 class StatsProcessing(object):
@@ -35,8 +36,9 @@ class StatsProcessing(object):
 
     def set_start_end_times(self):
         if self.event_date is None:
-            readiness_surveys = self.daily_readiness_datastore.get(self.athlete_id)
-            if readiness_surveys is None or len(readiness_surveys) == 0:
+            try:
+                readiness_surveys = self.daily_readiness_datastore.get(self.athlete_id)
+            except NoSuchEntityException:
                 return False
             last_daily_readiness_survey = readiness_surveys[0]
             event_date_time = last_daily_readiness_survey.get_event_date()
