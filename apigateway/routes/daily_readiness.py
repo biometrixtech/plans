@@ -32,7 +32,7 @@ def handle_daily_readiness_create():
                             minute=59,
                             second=59
                             )
-        event_date = format_datetime(event_date)
+    event_date = format_datetime(event_date)
 
     daily_readiness = DailyReadiness(
         user_id=request.json['user_id'],
