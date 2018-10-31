@@ -2,6 +2,7 @@ from models.stats import AthleteStats
 from datetime import datetime, timedelta
 import statistics
 from utils import parse_date, parse_datetime, format_date
+from fathomapi.utils.exceptions import NoSuchEntityException
 
 
 class StatsProcessing(object):
@@ -35,7 +36,10 @@ class StatsProcessing(object):
 
     def set_start_end_times(self):
         if self.event_date is None:
-            readiness_surveys = self.daily_readiness_datastore.get(self.athlete_id)
+            try:
+                readiness_surveys = self.daily_readiness_datastore.get(self.athlete_id)
+            except NoSuchEntityException:
+                return False
             last_daily_readiness_survey = readiness_surveys[0]
             event_date_time = last_daily_readiness_survey.get_event_date()
             self.event_date = event_date_time.date().strftime('%Y-%m-%d')
@@ -45,21 +49,23 @@ class StatsProcessing(object):
         self.end_date_time = end_date + timedelta(days=1)
         self.start_date = self.start_date_time.strftime('%Y-%m-%d')
         self.end_date = self.end_date_time.strftime('%Y-%m-%d')
+        return True
 
     def process_athlete_stats(self):
-        self.set_start_end_times()
-        self.load_historical_data()
-        athlete_stats = AthleteStats(self.athlete_id)
-        athlete_stats.event_date = self.event_date
-        athlete_stats = self.calc_survey_stats(athlete_stats)
-        athlete_stats = self.calc_training_volume_metrics(athlete_stats)
-        athlete_stats.functional_strength_eligible = self.is_athlete_functional_strength_eligible()
-        athlete_stats.completed_functional_strength_sessions = self.get_completed_functional_strength_sessions()
-        current_athlete_stats = self.athlete_stats_datastore.get(athlete_id=self.athlete_id)
-        if current_athlete_stats is not None:
-            athlete_stats.current_sport_name = current_athlete_stats.current_sport_name
-            athlete_stats.current_position = current_athlete_stats.current_position
-        self.athlete_stats_datastore.put(athlete_stats)
+        success = self.set_start_end_times()
+        if success:
+            self.load_historical_data()
+            athlete_stats = AthleteStats(self.athlete_id)
+            athlete_stats.event_date = self.event_date
+            athlete_stats = self.calc_survey_stats(athlete_stats)
+            athlete_stats = self.calc_training_volume_metrics(athlete_stats)
+            athlete_stats.functional_strength_eligible = self.is_athlete_functional_strength_eligible()
+            athlete_stats.completed_functional_strength_sessions = self.get_completed_functional_strength_sessions()
+            current_athlete_stats = self.athlete_stats_datastore.get(athlete_id=self.athlete_id)
+            if current_athlete_stats is not None:
+                athlete_stats.current_sport_name = current_athlete_stats.current_sport_name
+                athlete_stats.current_position = current_athlete_stats.current_position
+            self.athlete_stats_datastore.put(athlete_stats)
 
     def calc_training_volume_metrics(self, athlete_stats):
 
