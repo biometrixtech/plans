@@ -49,13 +49,15 @@ def update_athlete_stats(athlete_id):
 @require.authenticated.service
 @xray_recorder.capture('routes.athlete.pn.manage')
 def manage_athlete_push_notification(athlete_id):
+    # Make sure stats are consistent
+    try:
+        StatsProcessing(athlete_id, event_date=None, datastore_collection=DatastoreCollection()).process_athlete_stats()
+    except:
+        pass
     if not _is_athlete_active(athlete_id):
         return {'message': 'Athlete is not active'}, 200
 
     _schedule_notifications(athlete_id)
-
-    # Make sure stats are consistent
-    StatsProcessing(athlete_id, event_date=None, datastore_collection=DatastoreCollection()).process_athlete_stats()
 
     return {'message': 'Processed'}, 202
 
@@ -181,7 +183,7 @@ def manage_recovery_completion_push_notification(athlete_id):
     recovery_type = request.json['recovery_type']
     event_date = format_date(parse_date(request.json['event_date']))
     plan = _get_plan(athlete_id, event_date)
-    if recovery_type=='prep' and plan and and plan.pre_recovery.start_date is not None not plan.pre_recovery_completed and plan.post_recovery.goal_text == "":
+    if recovery_type=='prep' and plan and plan.pre_recovery.start_date is not None and not plan.pre_recovery_completed and plan.post_recovery.goal_text == "":
         body = {"message": "Take time to invest in yourself. Let's finish your exercises!",
                 "call_to_action": "COMPLETE_ACTIVE_PREP"}
         _notify_user(athlete_id, body)
