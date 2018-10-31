@@ -111,7 +111,7 @@ def manage_readiness_push_notification(athlete_id):
 def manage_prep_push_notification(athlete_id):
     event_date = format_date(parse_date(request.json['event_date']))
     plan = _get_plan(athlete_id, event_date)
-    if plan and not plan.pre_recovery_completed and plan.pre_recovery.start_date is None and plan.pre_recovery.impact_score >= 3 and plan.post_recovery.goal_text == "":
+    if plan and not plan.pre_recovery_completed and plan.pre_recovery.start_date is None and plan.pre_recovery.impact_score >= 3 and _are_exercises_assigned(plan.pre_recovery) and plan.post_recovery.goal_text == "":
         body = {"message": "Your prep exercises are ready! Tap to to get started!",
                 "call_to_action": "COMPLETE_ACTIVE_PREP"}
         _notify_user(athlete_id, body)
@@ -126,7 +126,7 @@ def manage_prep_push_notification(athlete_id):
 def manage_recovery_push_notification(athlete_id):
     event_date = format_date(parse_date(request.json['event_date']))
     plan = _get_plan(athlete_id, event_date)
-    if plan and not plan.post_recovery_completed and plan.post_recovery.start_date is None  and plan.post_recovery.impact_score >= 3:
+    if plan and not plan.post_recovery_completed and plan.post_recovery.start_date is None and plan.post_recovery.impact_score >= 3 and _are_exercises_assigned(plan.post_recovery):
         body = {"message": "Your recovery exercises are ready! Tap to begin taking care!",
                 "call_to_action": "COMPLETE_ACTIVE_RECOVERY"}
         _notify_user(athlete_id, body)
@@ -172,7 +172,7 @@ def manage_recovery_completion_push_notification(athlete_id):
     recovery_type = request.json['recovery_type']
     event_date = format_date(parse_date(request.json['event_date']))
     plan = _get_plan(athlete_id, event_date)
-    if recovery_type=='prep' and plan and not plan.pre_recovery_completed and plan.post_recovery.goal_text == "":
+    if recovery_type=='prep' and plan and and plan.pre_recovery.start_date is not None not plan.pre_recovery_completed and plan.post_recovery.goal_text == "":
         body = {"message": "Take time to invest in yourself. Let's finish your exercises!",
                 "call_to_action": "COMPLETE_ACTIVE_PREP"}
         _notify_user(athlete_id, body)
@@ -219,4 +219,14 @@ def _randomize_trigger_time(start_time, window, tz_offset):
     local_date = parse_datetime(start_time) + datetime.timedelta(minutes=offset_from_start)
     utc_date = local_date - datetime.timedelta(minutes=tz_offset)
     return utc_date
+
+def _are_exercises_assigned(rec):
+    exercises = (len(rec.inhibit_exercises) +
+                 len(rec.lengthen_exercises) +
+                 len(rec.activate_exercises) +
+                 len (rec.integrate_exercises))
+    if exercises > 0:
+        return True
+    else:
+        return False
 
