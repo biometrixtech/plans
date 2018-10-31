@@ -49,45 +49,54 @@ def update_athlete_stats(athlete_id):
 @require.authenticated.service
 @xray_recorder.capture('routes.athlete.pn.manage')
 def manage_athlete_push_notification(athlete_id):
-    if _is_athlete_active(athlete_id):
-        tz = request.json['timezone']
-        offset = tz.split(":")
-        hour_offset = int(offset[0])
-        minute_offset = int(offset[1])
-        if hour_offset < 0:
-            minute_offset = hour_offset * 60 - minute_offset
-        else:
-            minute_offset += hour_offset * 60
-        current_time_utc = datetime.datetime.utcnow()
-        current_time_local = current_time_utc + datetime.timedelta(minutes=minute_offset)
+    if not _is_athlete_active(athlete_id):
+        return {'message': 'Athlete is not active'}, 200
 
-        plans_service = Service('plans', Config.get('API_VERSION'))
-        body = {"event_date": format_date(current_time_local)}
+    _schedule_notifications(athlete_id)
 
-        # schedule readiness PN check
-        readiness_start = format_date(current_time_local) + 'T10:00:00Z'
-        readiness_event_date = _randomize_trigger_time(readiness_start, 60, minute_offset)
-        plans_service.call_apigateway_async(method='POST',
-                                            endpoint=f"athlete/{athlete_id}/send_daily_readiness_notification",
-                                            body=body,
-                                            execute_at=readiness_event_date)
+    # Make sure stats are consistent
+    StatsProcessing(athlete_id, event_date=None, datastore_collection=DatastoreCollection()).process_athlete_stats()
 
-        # schedule prep and recovery PN check
-        prep_rec_start = format_date(current_time_local) + 'T18:00:00Z'
-        prep_event_date = _randomize_trigger_time(prep_rec_start, 210, minute_offset)
-        recovery_event_date = _randomize_trigger_time(prep_rec_start, 210, minute_offset)
+    return {'message': 'Processed'}, 202
 
-        plans_service.call_apigateway_async(method='POST',
-                                            endpoint=f"athlete/{athlete_id}/send_active_prep_notification",
-                                            body=body,
-                                            execute_at=prep_event_date)
-        plans_service.call_apigateway_async(method='POST',
-                                            endpoint=f"athlete/{athlete_id}/send_recovery_notification",
-                                            body=body,
-                                            execute_at=recovery_event_date)
-        print(readiness_event_date, prep_event_date, recovery_event_date)
 
-    return {'message': 'Scheduled'}, 202
+def _schedule_notifications(athlete_id):
+    tz = request.json['timezone']
+    offset = tz.split(":")
+    hour_offset = int(offset[0])
+    minute_offset = int(offset[1])
+    if hour_offset < 0:
+        minute_offset = hour_offset * 60 - minute_offset
+    else:
+        minute_offset += hour_offset * 60
+    current_time_utc = datetime.datetime.utcnow()
+    current_time_local = current_time_utc + datetime.timedelta(minutes=minute_offset)
+
+    plans_service = Service('plans', Config.get('API_VERSION'))
+    body = {"event_date": format_date(current_time_local)}
+
+    # schedule readiness PN check
+    readiness_start = format_date(current_time_local) + 'T10:00:00Z'
+    readiness_event_date = _randomize_trigger_time(readiness_start, 60, minute_offset)
+    plans_service.call_apigateway_async(method='POST',
+                                        endpoint=f"athlete/{athlete_id}/send_daily_readiness_notification",
+                                        body=body,
+                                        execute_at=readiness_event_date)
+
+    # schedule prep and recovery PN check
+    prep_rec_start = format_date(current_time_local) + 'T18:00:00Z'
+    prep_event_date = _randomize_trigger_time(prep_rec_start, 210, minute_offset)
+    recovery_event_date = _randomize_trigger_time(prep_rec_start, 210, minute_offset)
+
+    plans_service.call_apigateway_async(method='POST',
+                                        endpoint=f"athlete/{athlete_id}/send_active_prep_notification",
+                                        body=body,
+                                        execute_at=prep_event_date)
+    plans_service.call_apigateway_async(method='POST',
+                                        endpoint=f"athlete/{athlete_id}/send_recovery_notification",
+                                        body=body,
+                                        execute_at=recovery_event_date)
+    print(readiness_event_date, prep_event_date, recovery_event_date)
 
 
 @app.route('/<uuid:athlete_id>/send_daily_readiness_notification', methods=['POST'])
