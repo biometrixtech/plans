@@ -51,7 +51,9 @@ def update_athlete_stats(athlete_id):
 def manage_athlete_push_notification(athlete_id):
     # Make sure stats are consistent
     try:
-        StatsProcessing(athlete_id, event_date=None, datastore_collection=DatastoreCollection()).process_athlete_stats()
+        current_time_local, minute_offset = _get_local_time()
+        event_date = format_date(current_time_local)
+        StatsProcessing(athlete_id, event_date=event_date, datastore_collection=DatastoreCollection()).process_athlete_stats()
     except:
         pass
     if not _is_athlete_active(athlete_id):
@@ -63,17 +65,7 @@ def manage_athlete_push_notification(athlete_id):
 
 
 def _schedule_notifications(athlete_id):
-    tz = request.json['timezone']
-    offset = tz.split(":")
-    hour_offset = int(offset[0])
-    minute_offset = int(offset[1])
-    if hour_offset < 0:
-        minute_offset = hour_offset * 60 - minute_offset
-    else:
-        minute_offset += hour_offset * 60
-    current_time_utc = datetime.datetime.utcnow()
-    current_time_local = current_time_utc + datetime.timedelta(minutes=minute_offset)
-
+    current_time_local, minute_offset = _get_local_time()
     plans_service = Service('plans', Config.get('API_VERSION'))
     body = {"event_date": format_date(current_time_local)}
 
@@ -241,3 +233,15 @@ def _are_exercises_assigned(rec):
     else:
         return False
 
+def _get_local_time():
+    tz = request.json['timezone']
+    offset = tz.split(":")
+    hour_offset = int(offset[0])
+    minute_offset = int(offset[1])
+    if hour_offset < 0:
+        minute_offset = hour_offset * 60 - minute_offset
+    else:
+        minute_offset += hour_offset * 60
+    current_time_utc = datetime.datetime.utcnow()
+    current_time_local = current_time_utc + datetime.timedelta(minutes=minute_offset)
+    return current_time_local, minute_offset
