@@ -1,3 +1,4 @@
+import pytest
 from logic.training_plan_management import TrainingPlanManager
 from tests.mocks.mock_daily_readiness_datastore import DailyReadinessDatastore
 from tests.mocks.mock_datastore_collection import DatastoreCollection
@@ -6,6 +7,16 @@ from datetime import datetime, timedelta, date, time
 from utils import format_datetime
 from tests.testing_utilities import TestUtilities
 from models.daily_readiness import DailyReadiness
+from tests.mocks.mock_exercise_datastore import ExerciseLibraryDatastore
+from tests.mocks.mock_completed_exercise_datastore import CompletedExerciseDatastore
+
+exercise_library_datastore = ExerciseLibraryDatastore()
+completed_exercise_datastore = CompletedExerciseDatastore()
+
+
+@pytest.fixture(scope="session", autouse=True)
+def load_exercises():
+    exercise_library_datastore.side_load_exericse_list_from_csv()
 
 
 def create_plan():
@@ -45,6 +56,7 @@ def create_no_soreness_plan():
 
     datastore_collection = DatastoreCollection()
     datastore_collection.daily_readiness_datastore = daily_readiness_datastore
+    datastore_collection.exercise_datastore = exercise_library_datastore
 
     mgr = TrainingPlanManager(user_id, datastore_collection)
 
