@@ -257,7 +257,7 @@ class StatsProcessing(object):
         hs = namedtuple("hs", ["location", "is_pain", "side"])
 
         for s in soreness_list:
-            hs_new = hs(s.body_part.location, s.is_pain, s.side)
+            hs_new = hs(s.body_part.location, s.pain, s.side)
             if hs_new in historic_soreness:
                 historic_soreness[hs_new] = historic_soreness[hs_new] + 1
             else:

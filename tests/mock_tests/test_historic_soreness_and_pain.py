@@ -12,7 +12,7 @@ def get_soreness_list(body_part_location, side, severity, is_pain, length):
         soreness.side = side
         soreness.body_part = BodyPart(body_part_location, 1)
         soreness.severity = severity
-        soreness.is_pain = is_pain
+        soreness.pain = is_pain
         soreness_list.append(soreness)
 
     return soreness_list
