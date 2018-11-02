@@ -614,17 +614,17 @@ class StatsProcessing(object):
 
             self.days_8_14_ps_surveys = [p for p in post_session_surveys if last_week > p.event_date_time >= previous_week]
 
-            self.last_7_days_readiness_surveys = [p for p in daily_readiness_surveys if p.event_date_time >= last_week]
+            self.last_7_days_readiness_surveys = [p for p in daily_readiness_surveys if p.event_date >= last_week]
 
-            self.days_8_14_readiness_surveys = [p for p in daily_readiness_surveys if last_week > p.event_date_time >= previous_week]
+            self.days_8_14_readiness_surveys = [p for p in daily_readiness_surveys if last_week > p.event_date >= previous_week]
 
-            self.days_15_21_ps_surveys = [p for p in daily_readiness_surveys if previous_week > p.event_date_time >= previous_week_2]
+            self.days_15_21_ps_surveys = [p for p in post_session_surveys if previous_week > p.event_date_time >= previous_week_2]
 
-            self.days_15_21_readiness_surveys = [p for p in daily_readiness_surveys if previous_week > p.event_date_time >= previous_week_2]
+            self.days_15_21_readiness_surveys = [p for p in daily_readiness_surveys if previous_week > p.event_date >= previous_week_2]
 
-            self.days_22_28_ps_surveys = [p for p in daily_readiness_surveys if previous_week_2 > p.event_date_time >= previous_week_3]
+            self.days_22_28_ps_surveys = [p for p in post_session_surveys if previous_week_2 > p.event_date_time >= previous_week_3]
 
-            self.days_22_28_readiness_surveys = [p for p in daily_readiness_surveys if previous_week_2 > p.event_date_time >= previous_week_3]
+            self.days_22_28_readiness_surveys = [p for p in daily_readiness_surveys if previous_week_2 > p.event_date >= previous_week_3]
 
 
 

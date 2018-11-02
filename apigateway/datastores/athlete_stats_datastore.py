@@ -61,5 +61,5 @@ class AthleteStatsDatastore(object):
         hs = HistoricSoreness(BodyPartLocation(historic_soreness["body_part_location"]), historic_soreness["side"],
                               historic_soreness["is_pain"])
         hs.historic_soreness_status = HistoricSorenessStatus(historic_soreness["historic_soreness_status"])
-        
+
         return hs
