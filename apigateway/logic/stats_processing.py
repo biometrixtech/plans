@@ -33,6 +33,12 @@ class StatsProcessing(object):
         self.days_8_14_plans = []
         self.last_7_days_ps_surveys = []
         self.days_8_14_ps_surveys = []
+        self.last_7_days_readiness_surveys = []
+        self.days_8_14_readiness_surveys = []
+        self.days_15_21_ps_surveys = []
+        self.days_15_21_readiness_surveys = []
+        self.days_22_28_ps_surveys = []
+        self.days_22_28_readiness_surveys = []
 
     def set_start_end_times(self):
         if self.event_date is None:
@@ -87,20 +93,20 @@ class StatsProcessing(object):
         previous_week_internal_values = []
 
         last_week_external_values.extend(
-            x for x in self.get_session_attribute_sum("external_load", self.last_7_days_plans) if x is not None)
+            x for x in self.get_plan_session_attribute_sum("external_load", self.last_7_days_plans) if x is not None)
 
         last_week_internal_values.extend(
             x for x in self.get_session_attributes_product_sum("session_RPE", "duration_minutes",
                                                                self.last_7_days_plans) if x is not None)
         previous_week_external_values.extend(
-            x for x in self.get_session_attribute_sum("external_load", self.days_8_14_plans) if x is not None)
+            x for x in self.get_plan_session_attribute_sum("external_load", self.days_8_14_plans) if x is not None)
 
         previous_week_internal_values.extend(
             x for x in self.get_session_attributes_product_sum("session_RPE", "duration_minutes",
                                                                self.days_8_14_plans) if x is not None)
 
         a_external_load_values.extend(
-            x for x in self.get_session_attribute_sum("external_load", self.acute_daily_plans) if x is not None)
+            x for x in self.get_plan_session_attribute_sum("external_load", self.acute_daily_plans) if x is not None)
 
 
         a_internal_load_values.extend(
@@ -108,18 +114,18 @@ class StatsProcessing(object):
                                                                self.acute_daily_plans) if x is not None)
 
         a_external_load_values.extend(
-            x for x in self.get_session_attribute_sum("external_load", self.acute_daily_plans) if x is not None)
+            x for x in self.get_plan_session_attribute_sum("external_load", self.acute_daily_plans) if x is not None)
 
         a_high_intensity_values.extend(
-            x for x in self.get_session_attribute_sum("high_intensity_load", self.acute_daily_plans) if
+            x for x in self.get_plan_session_attribute_sum("high_intensity_load", self.acute_daily_plans) if
             x is not None)
 
         a_mod_intensity_values.extend(
-            x for x in self.get_session_attribute_sum("mod_intensity_load", self.acute_daily_plans) if
+            x for x in self.get_plan_session_attribute_sum("mod_intensity_load", self.acute_daily_plans) if
             x is not None)
 
         a_low_intensity_values.extend(
-            x for x in self.get_session_attribute_sum("low_intensity_load", self.acute_daily_plans) if
+            x for x in self.get_plan_session_attribute_sum("low_intensity_load", self.acute_daily_plans) if
             x is not None)
 
         weeks_list = self.get_chronic_weeks_plans()
@@ -130,15 +136,15 @@ class StatsProcessing(object):
                 x for x in self.get_session_attributes_product_sum("session_RPE", "duration_minutes", w)
                 if x is not None)
 
-            c_external_load_values.extend(x for x in self.get_session_attribute_sum("external_load", w) if x is not None)
+            c_external_load_values.extend(x for x in self.get_plan_session_attribute_sum("external_load", w) if x is not None)
 
-            c_high_intensity_values.extend(x for x in self.get_session_attribute_sum("high_intensity_load", w)
+            c_high_intensity_values.extend(x for x in self.get_plan_session_attribute_sum("high_intensity_load", w)
                                            if x is not None)
 
-            c_mod_intensity_values.extend(x for x in self.get_session_attribute_sum("mod_intensity_load", w)
+            c_mod_intensity_values.extend(x for x in self.get_plan_session_attribute_sum("mod_intensity_load", w)
                                           if x is not None)
 
-            c_low_intensity_values.extend(x for x in self.get_session_attribute_sum("low_intensity_load", w)
+            c_low_intensity_values.extend(x for x in self.get_plan_session_attribute_sum("low_intensity_load", w)
                                           if x is not None)
 
         if len(last_week_external_values) > 0 and len(previous_week_external_values) > 0:
@@ -189,6 +195,20 @@ class StatsProcessing(object):
 
         return athlete_stats
 
+    def update_historic_soreness(self, athlete_stats):
+
+        persistent_soreness_events = []
+        chronic_soreness_events = []
+        persistent_pain_events = []
+        chronic_pain_events = []
+
+        soreness_list_7_days = []
+
+        soreness_list_7_days.extend(self.get_ps_survey_soreness_list(self.last_7_days_ps_surveys))
+        soreness_list_7_days.extend(self.get_readiness_soreness_list(self.last_7_days_readiness_surveys))
+
+        return athlete_stats
+
     def get_chronic_weeks_plans(self):
 
         week4_sessions = [d for d in self.chronic_daily_plans if self.acute_start_date_time - timedelta(days=28) <=
@@ -206,7 +226,7 @@ class StatsProcessing(object):
 
         return weeks_list
 
-    def get_session_attribute_sum(self, attribute_name, daily_plan_collection):
+    def get_plan_session_attribute_sum(self, attribute_name, daily_plan_collection):
 
         sum_value = None
 
@@ -224,6 +244,25 @@ class StatsProcessing(object):
             sum_value = sum(values)
 
         return [sum_value]
+
+    def get_ps_survey_soreness_list(self, survey_list):
+
+        soreness_list = []
+
+        for c in survey_list:
+
+            soreness_list.extend(c.survey.soreness)
+
+        return soreness_list
+
+    def get_readiness_soreness_list(self, survey_list):
+
+        soreness_list = []
+
+        for c in survey_list:
+            soreness_list.extend(c.soreness)
+
+        return soreness_list
 
     def get_session_attributes_product_sum(self, attribute_1_name, attribute_2_name, daily_plan_collection):
 
@@ -487,6 +526,8 @@ class StatsProcessing(object):
             self.chronic_load_start_date_time = self.end_date_time - chronic_delta
             last_week = self.end_date_time - timedelta(days=7 + 1)
             previous_week = last_week - timedelta(days=7)
+            previous_week_2 = previous_week - timedelta(days=7)
+            previous_week_3 = previous_week_2 - timedelta(days=7)
 
             self.acute_post_session_surveys = sorted([p for p in post_session_surveys
                                                       if p.event_date_time >= self.acute_start_date_time],
@@ -517,10 +558,17 @@ class StatsProcessing(object):
 
             self.days_8_14_ps_surveys = [p for p in post_session_surveys if last_week > p.event_date_time >= previous_week]
 
+            self.last_7_days_readiness_surveys = [p for p in daily_readiness_surveys if p.event_date_time >= last_week]
 
+            self.days_8_14_readiness_surveys = [p for p in daily_readiness_surveys if last_week > p.event_date_time >= previous_week]
 
+            self.days_15_21_ps_surveys = [p for p in daily_readiness_surveys if previous_week > p.event_date_time >= previous_week_2]
 
+            self.days_15_21_readiness_surveys = [p for p in daily_readiness_surveys if previous_week > p.event_date_time >= previous_week_2]
 
+            self.days_22_28_ps_surveys = [p for p in daily_readiness_surveys if previous_week_2 > p.event_date_time >= previous_week_3]
+
+            self.days_22_28_readiness_surveys = [p for p in daily_readiness_surveys if previous_week_2 > p.event_date_time >= previous_week_3]
 
 
 

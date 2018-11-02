@@ -47,6 +47,8 @@ class AthleteStats(Serialisable):
         self.current_sport_name = None
         self.current_position = None
 
+        self.historic_soreness = []
+
     def acute_to_chronic_external_ratio(self):
         if self.acute_external_total_load is not None and self.chronic_external_total_load is not None:
             return self.acute_external_total_load / self.chronic_external_total_load
