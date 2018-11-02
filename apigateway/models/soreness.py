@@ -90,24 +90,18 @@ class HistoricSorenessStatus(IntEnum):
 
 class HistoricSoreness(Serialisable):
 
-    def __init__(self, body_part_location, historic_soreness_status, is_pain):
+    def __init__(self, body_part_location, side, is_pain):
         self.body_part_location = body_part_location
-        self.historic_soreness_status = historic_soreness_status
+        self.historic_soreness_status = HistoricSorenessStatus.dormant_cleared
         self.is_pain = is_pain
-        self.persistent_soreness_count = 0
-        self.chronic_soreness_count = 0
-        self.persistent_pain_count = 0
-        self.chronic_pain_count = 0
+        self.side = side
 
     def json_serialise(self):
         ret = {
             'body_part_location': self.body_part_location.value,
             'historic_soreness_status': self.historic_soreness_status,
             'is_pain': self.is_pain,
-            'persistent_soreness_count': self.persistent_soreness_count,
-            'chronic_soreness_count': self.chronic_soreness_count,
-            'persistent_pain_count': self.persistent_pain_count,
-            'chronic_pain_count': self.chronic_pain_count,
+            'side': self.side,
         }
         return ret
 

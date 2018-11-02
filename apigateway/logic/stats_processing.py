@@ -3,7 +3,8 @@ from datetime import datetime, timedelta
 import statistics
 from utils import parse_date, parse_datetime, format_date
 from fathomapi.utils.exceptions import NoSuchEntityException
-
+from models.soreness import HistoricSoreness, HistoricSorenessStatus
+from collections import namedtuple
 
 class StatsProcessing(object):
 
@@ -197,17 +198,71 @@ class StatsProcessing(object):
 
     def update_historic_soreness(self, athlete_stats):
 
-        persistent_soreness_events = []
-        chronic_soreness_events = []
-        persistent_pain_events = []
-        chronic_pain_events = []
+        soreness_list_last_7_days = []
 
-        soreness_list_7_days = []
+        soreness_list_last_7_days.extend(self.get_ps_survey_soreness_list(self.last_7_days_ps_surveys))
+        soreness_list_last_7_days.extend(self.get_readiness_soreness_list(self.last_7_days_readiness_surveys))
 
-        soreness_list_7_days.extend(self.get_ps_survey_soreness_list(self.last_7_days_ps_surveys))
-        soreness_list_7_days.extend(self.get_readiness_soreness_list(self.last_7_days_readiness_surveys))
+        soreness_list_8_14_days = []
+
+        soreness_list_8_14_days.extend(self.get_ps_survey_soreness_list(self.days_8_14_ps_surveys))
+        soreness_list_8_14_days.extend(self.get_readiness_soreness_list(self.days_8_14_readiness_surveys))
+
+        soreness_list_15_21_days = []
+
+        soreness_list_15_21_days.extend(self.get_ps_survey_soreness_list(self.days_15_21_ps_surveys))
+        soreness_list_15_21_days.extend(self.get_readiness_soreness_list(self.days_15_21_readiness_surveys))
+
+        soreness_list_22_28_days = []
+
+        soreness_list_22_28_days.extend(self.get_ps_survey_soreness_list(self.days_22_28_ps_surveys))
+        soreness_list_22_28_days.extend(self.get_readiness_soreness_list(self.days_22_28_readiness_surveys))
+
+        athlete_stats.historic_soreness = self.get_historic_soreness(soreness_list_last_7_days,
+                                                                     soreness_list_8_14_days,
+                                                                     soreness_list_15_21_days,
+                                                                     soreness_list_22_28_days)
 
         return athlete_stats
+
+    def get_historic_soreness(self, soreness_last_7, soreness_8_14, soreness_15_21, soreness_22_28):
+
+        historic_soreness_list = []
+
+        historic_soreness_last_7 = self.get_hs_dictionary(soreness_last_7)
+        historic_soreness_8_14 = self.get_hs_dictionary(soreness_8_14)
+        historic_soreness_15_21 = self.get_hs_dictionary(soreness_15_21)
+        historic_soreness_22_28 = self.get_hs_dictionary(soreness_22_28)
+
+        for h in historic_soreness_last_7:
+            historic_soreness = HistoricSoreness(h.location, h.side, h.is_pain)
+
+            if h in historic_soreness_8_14 and h in historic_soreness_15_21 and h in historic_soreness_22_28:
+                if (historic_soreness_8_14[h] >= 3 and historic_soreness_15_21[h] >= 3
+                        and historic_soreness_22_28[h] >= 3):
+                    historic_soreness.historic_soreness_status = HistoricSorenessStatus.chronic
+                else:
+                    historic_soreness.historic_soreness_status = HistoricSorenessStatus.persistent
+
+            if historic_soreness.historic_soreness_status is not HistoricSorenessStatus.dormant_cleared:
+                historic_soreness_list.append(historic_soreness)
+
+        return historic_soreness_list
+
+    def get_hs_dictionary(self, soreness_list):
+
+        historic_soreness = {}
+
+        hs = namedtuple("hs", ["location", "is_pain", "side", "severity"])
+
+        for s in soreness_list:
+            hs_new = hs(s.body_part.location, s.is_pain, s.side, s.severity)
+            if hs_new in historic_soreness:
+                historic_soreness[hs_new] = historic_soreness[hs_new] + 1
+            else:
+                historic_soreness[hs_new] = 1
+
+        return historic_soreness
 
     def get_chronic_weeks_plans(self):
 
