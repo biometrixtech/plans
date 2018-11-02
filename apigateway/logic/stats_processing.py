@@ -68,6 +68,7 @@ class StatsProcessing(object):
             athlete_stats = self.calc_training_volume_metrics(athlete_stats)
             athlete_stats.functional_strength_eligible = self.is_athlete_functional_strength_eligible()
             athlete_stats.completed_functional_strength_sessions = self.get_completed_functional_strength_sessions()
+            athlete_stats = self.update_historic_soreness(athlete_stats)
             current_athlete_stats = self.athlete_stats_datastore.get(athlete_id=self.athlete_id)
             if current_athlete_stats is not None:
                 athlete_stats.current_sport_name = current_athlete_stats.current_sport_name
@@ -253,10 +254,10 @@ class StatsProcessing(object):
 
         historic_soreness = {}
 
-        hs = namedtuple("hs", ["location", "is_pain", "side", "severity"])
+        hs = namedtuple("hs", ["location", "is_pain", "side"])
 
         for s in soreness_list:
-            hs_new = hs(s.body_part.location, s.is_pain, s.side, s.severity)
+            hs_new = hs(s.body_part.location, s.is_pain, s.side)
             if hs_new in historic_soreness:
                 historic_soreness[hs_new] = historic_soreness[hs_new] + 1
             else:

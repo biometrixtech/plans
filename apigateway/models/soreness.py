@@ -99,7 +99,7 @@ class HistoricSoreness(Serialisable):
     def json_serialise(self):
         ret = {
             'body_part_location': self.body_part_location.value,
-            'historic_soreness_status': self.historic_soreness_status,
+            'historic_soreness_status': self.historic_soreness_status.value,
             'is_pain': self.is_pain,
             'side': self.side,
         }
