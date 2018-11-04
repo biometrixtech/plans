@@ -1,6 +1,7 @@
 from aws_xray_sdk.core import xray_recorder
 from config import get_mongo_collection
 from models.stats import AthleteStats
+from models.soreness import BodyPartLocation, HistoricSoreness, HistoricSorenessStatus
 
 
 class AthleteStatsDatastore(object):
@@ -40,6 +41,8 @@ class AthleteStatsDatastore(object):
             athlete_stats.next_functional_strength_eligible_date = mongo_result.get('next_functional_strength_eligible_date', None)
             athlete_stats.current_sport_name = mongo_result.get('current_sport_name', None)
             athlete_stats.current_position = mongo_result.get('current_position', None)
+            athlete_stats.historic_soreness = [self._historic_soreness_from_mongodb(s)
+                                               for s in mongo_result.get('historic_soreness', [])]
             return athlete_stats
 
         else:
@@ -52,3 +55,11 @@ class AthleteStatsDatastore(object):
         mongo_collection = get_mongo_collection(self.mongo_collection)
         query = {'athlete_id': item['athlete_id']}
         mongo_collection.replace_one(query, item, upsert=True)
+
+    def _historic_soreness_from_mongodb(self, historic_soreness):
+
+        hs = HistoricSoreness(BodyPartLocation(historic_soreness["body_part_location"]), historic_soreness["side"],
+                              historic_soreness["is_pain"])
+        hs.historic_soreness_status = HistoricSorenessStatus(historic_soreness["historic_soreness_status"])
+
+        return hs
