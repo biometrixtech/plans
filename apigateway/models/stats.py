@@ -47,6 +47,8 @@ class AthleteStats(Serialisable):
         self.current_sport_name = None
         self.current_position = None
 
+        self.historic_soreness = []
+
     def acute_to_chronic_external_ratio(self):
         if self.acute_external_total_load is not None and self.chronic_external_total_load is not None:
             return self.acute_external_total_load / self.chronic_external_total_load
@@ -147,5 +149,6 @@ class AthleteStats(Serialisable):
             'next_functional_strength_eligible_date': self.next_functional_strength_eligible_date,
             'current_sport_name': self.current_sport_name.value,
             'current_position': self.current_position.value if self.current_position is not None else None,
+            'historic_soreness': [h.json_serialise() for h in self.historic_soreness],
         }
         return ret
