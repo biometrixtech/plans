@@ -26,11 +26,12 @@ class JointSorenessSeverity(IntEnum):
 class Soreness(Serialisable):
     def __init__(self):
         self.body_part = None
+        self.historic_soreness_status = None
         self.pain = False
+        self.reported_date_time = None
         self.severity = None  # muscle_soreness_severity or joint_soreness_severity
         self.side = None
         self.type = None  # soreness_type
-        self.reported_date_time = None
 
     def json_serialise(self):
         ret = {
