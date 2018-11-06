@@ -96,16 +96,15 @@ class SorenessCalculator(object):
             historic_soreness_found = False
             for s in range(0, len(soreness_list)):
                 if (soreness_list[s].body_part.location == historic_soreness[h].body_part_location and
-                        soreness_list[s].side == historic_soreness[h].side):
-                    # Wait, what if one is pain and the other is just soreness, that a match?
+                        soreness_list[s].side == historic_soreness[h].side and
+                        soreness_list[s].pain == historic_soreness[h].is_pain):
                     soreness_list[s].historic_soreness_status = historic_soreness[h].historic_soreness_status
                     historic_soreness_found = True
             if not historic_soreness_found:
                 new_soreness = Soreness()
                 new_soreness.pain = historic_soreness[h].is_pain
                 new_soreness.side = historic_soreness[h].side
-                new_soreness.body_part = BodyPart(historic_soreness[h].body_part_location, 0)
-                # TODO: determine body part treatment priority for hs body part
+                new_soreness.body_part = BodyPart(historic_soreness[h].body_part_location, None)
                 soreness_list.append(new_soreness)
 
         return soreness_list

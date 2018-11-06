@@ -184,6 +184,8 @@ class TrainingPlanManager(object):
         text_generator = RecoveryTextGenerator()
         body_part_text = text_generator.get_text_from_body_part_list(soreness_list)
 
+        functional_strength_active = (daily_plan.functional_strength_session is not None)
+
         if not show_post_recovery:
             pre_impact_score = self.calculate_pre_impact_score(
                                 max_rpe,
@@ -194,7 +196,7 @@ class TrainingPlanManager(object):
                                 )
             if daily_plan.pre_recovery is not None and not daily_plan.pre_recovery.completed:
                 rpe_impact_score = min((max_rpe / 10) * 4, 4)
-                daily_plan.pre_recovery.set_exercise_target_minutes(soreness_list, 15)
+                daily_plan.pre_recovery.set_exercise_target_minutes(soreness_list, 15, functional_strength_active)
                 am_exercise_assignments = calc.create_exercise_assignments(daily_plan.pre_recovery, soreness_list,
                                                                            trigger_date_time)
                 daily_plan.pre_recovery.update_from_exercise_assignments(am_exercise_assignments)
@@ -221,7 +223,7 @@ class TrainingPlanManager(object):
             )
             if daily_plan.post_recovery is not None and not daily_plan.post_recovery.completed:
                 rpe_impact_score = min((max_rpe / 10) * 5, 5)
-                daily_plan.post_recovery.set_exercise_target_minutes(soreness_list, 15)
+                daily_plan.post_recovery.set_exercise_target_minutes(soreness_list, 15, functional_strength_active)
                 pm_exercise_assignments = calc.create_exercise_assignments(daily_plan.post_recovery, soreness_list,
                                                                            trigger_date_time)
                 daily_plan.post_recovery.update_from_exercise_assignments(pm_exercise_assignments)
