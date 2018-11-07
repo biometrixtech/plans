@@ -51,8 +51,8 @@ def update_athlete_stats(athlete_id):
 def manage_athlete_push_notification(athlete_id):
     # Make sure stats are consistent
     try:
-        current_time_local, minute_offset = _get_local_time()
-        event_date = format_date(current_time_local)
+        minute_offset = _get_offset()
+        event_date = format_date(datetime.datetime.now() + datetime.timedelta(minutes=minute_offset))
         StatsProcessing(athlete_id, event_date=event_date, datastore_collection=DatastoreCollection()).process_athlete_stats()
     except:
         pass
@@ -65,12 +65,21 @@ def manage_athlete_push_notification(athlete_id):
 
 
 def _schedule_notifications(athlete_id):
-    current_time_local, minute_offset = _get_local_time()
+    """
+    Schedule checks for three notifications
+    1) readiness -- between 10am and 11am local time
+    2) prep -- between 6pm and 9:30pm local time
+    3) recovery -- between 6pm and 9:30pm local time
+    Checks are to be performed for the date it scheduled for which could be different from
+    the current local date
+    """
+    minute_offset = _get_offset()
     plans_service = Service('plans', Config.get('API_VERSION'))
-    body = {"event_date": format_date(current_time_local)}
+    trigger_event_date = format_date(datetime.datetime.now())
+    body = {"event_date": trigger_event_date}
 
     # schedule readiness PN check
-    readiness_start = format_date(datetime.datetime.now()) + 'T10:00:00Z'
+    readiness_start = trigger_event_date + 'T10:00:00Z'
     readiness_event_date = _randomize_trigger_time(readiness_start, 60, minute_offset)
     plans_service.call_apigateway_async(method='POST',
                                         endpoint=f"athlete/{athlete_id}/send_daily_readiness_notification",
@@ -78,7 +87,7 @@ def _schedule_notifications(athlete_id):
                                         execute_at=readiness_event_date)
 
     # schedule prep and recovery PN check
-    prep_rec_start = format_date(datetime.datetime.now()) + 'T18:00:00Z'
+    prep_rec_start = trigger_event_date + 'T18:00:00Z'
     prep_event_date = _randomize_trigger_time(prep_rec_start, 210, minute_offset)
     recovery_event_date = _randomize_trigger_time(prep_rec_start, 210, minute_offset)
 
@@ -233,7 +242,7 @@ def _are_exercises_assigned(rec):
     else:
         return False
 
-def _get_local_time():
+def _get_offset():
     tz = request.json['timezone']
     offset = tz.split(":")
     hour_offset = int(offset[0])
@@ -242,6 +251,4 @@ def _get_local_time():
         minute_offset = hour_offset * 60 - minute_offset
     else:
         minute_offset += hour_offset * 60
-    current_time_utc = datetime.datetime.utcnow()
-    current_time_local = current_time_utc + datetime.timedelta(minutes=minute_offset)
-    return current_time_local, minute_offset
+    return minute_offset
