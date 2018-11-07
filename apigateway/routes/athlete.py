@@ -70,7 +70,7 @@ def _schedule_notifications(athlete_id):
     body = {"event_date": format_date(current_time_local)}
 
     # schedule readiness PN check
-    readiness_start = format_date(current_time_local) + 'T10:00:00Z'
+    readiness_start = format_date(datetime.datetime.now()) + 'T10:00:00Z'
     readiness_event_date = _randomize_trigger_time(readiness_start, 60, minute_offset)
     plans_service.call_apigateway_async(method='POST',
                                         endpoint=f"athlete/{athlete_id}/send_daily_readiness_notification",
@@ -78,7 +78,7 @@ def _schedule_notifications(athlete_id):
                                         execute_at=readiness_event_date)
 
     # schedule prep and recovery PN check
-    prep_rec_start = format_date(current_time_local) + 'T18:00:00Z'
+    prep_rec_start = format_date(datetime.datetime.now()) + 'T18:00:00Z'
     prep_event_date = _randomize_trigger_time(prep_rec_start, 210, minute_offset)
     recovery_event_date = _randomize_trigger_time(prep_rec_start, 210, minute_offset)
 
