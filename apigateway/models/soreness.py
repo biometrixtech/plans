@@ -82,5 +82,30 @@ class BodyPart(object):
         self.integrate_exercises = []
 
 
+class HistoricSorenessStatus(IntEnum):
+    dormant_cleared = 0
+    persistent = 1
+    chronic = 2
+
+
+class HistoricSoreness(Serialisable):
+
+    def __init__(self, body_part_location, side, is_pain):
+        self.body_part_location = body_part_location
+        self.historic_soreness_status = HistoricSorenessStatus.dormant_cleared
+        self.is_pain = is_pain
+        self.side = side
+
+    def json_serialise(self):
+        ret = {
+            'body_part_location': self.body_part_location.value,
+            'historic_soreness_status': self.historic_soreness_status.value,
+            'is_pain': self.is_pain,
+            'side': self.side,
+        }
+        return ret
+
+
+
 
 
