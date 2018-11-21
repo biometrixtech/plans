@@ -23,6 +23,9 @@ USERS_API_VERSION = '2_0'
 @xray_recorder.capture('routes.team.dashboard.get')
 def get_dashboard_data(user_id):
     team_ids = _get_teams(user_id)
+    for team_id in team_ids:
+        users = _get_users_in_team(team_id)
+        print(users)
 
     teams = [{"name": "fathom",
             "compliance": {
@@ -121,8 +124,11 @@ def get_dashboard_data(user_id):
 
 
 def _get_teams(user_id):
-    user = Service('users', USERS_API_VERSION).call_apigateway_sync('GET', f"user/{user_id}")
-    print(user)
-    # teams = json.loads
+    response = Service('users', USERS_API_VERSION).call_apigateway_sync('GET', f"user/{user_id}")
+    return response['user']['account_ids']
 
+
+def _get_users_in_team(account_id):
+    response = Service('users', USERS_API_VERSION).call_apigateway_sync('GET', f"account/{account_id}")
+    return response['account']['users']
 
