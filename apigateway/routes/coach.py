@@ -15,7 +15,7 @@ import random
 
 
 app = Blueprint('coach', __name__)
-USERS_API_VERSION = '2_1'
+USERS_API_VERSION = '2_0'
 
 
 @app.route('/<uuid:user_id>/dashboard', methods=['GET'])
