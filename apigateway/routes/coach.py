@@ -15,7 +15,7 @@ import random
 
 
 app = Blueprint('coach', __name__)
-USERS_API_VERSION = '2_0'
+USERS_API_VERSION = '2_1'
 
 
 @app.route('/<uuid:user_id>/dashboard', methods=['GET'])
@@ -50,8 +50,7 @@ def get_dashboard_data(user_id):
                                                                             "last_name": "Chami"}
                                                                           ],
                                                      "balance_overtraining_risk": [],
-                                                     "add_variety": [],
-                                                     "reevaluate_training": []
+                                                     "add_variety": []
                                                     }
                                 },
                                 {"not_cleared_to_play": {
@@ -64,8 +63,7 @@ def get_dashboard_data(user_id):
                                                                                "last_name": "White"}
                                                                               ],
                                                          "balance_overtraining_risk": [],
-                                                         "add_variety": [],
-                                                         "reevaluate_training": []
+                                                         "add_variety": []
                                                         }
 
                                 }
