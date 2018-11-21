@@ -24,8 +24,18 @@ USERS_API_VERSION = '2_1'
 def get_dashboard_data(user_id):
     team_ids = _get_teams(user_id)
     for team_id in team_ids:
+        completed = []
+        incomplete = []
         users = _get_users_in_team(team_id)
-        print(users)
+        for user_id in users:
+            user = _get_user(user_id)
+            start_date = '2018-11-21'
+            end_date = '2018-11-21'
+            if DatastoreCollection().daily_plan_datastore.get(user_id, start_date, end_date)[0].daily_readiness_survey_completed():
+                completed.append(user)
+            else:
+                incomplete.append(user)
+        print(users, completed, incomplete)
 
     teams = [{"name": "fathom",
             "compliance": {
@@ -129,4 +139,11 @@ def _get_teams(user_id):
 def _get_users_in_team(account_id):
     response = Service('users', USERS_API_VERSION).call_apigateway_sync('GET', f"account/{account_id}")
     return response['account']['users']
+
+
+def _get_user(user_id):
+    response = Service('users', USERS_API_VERSION).call_apigateway_sync('GET', f"user/{user_id}")
+    return {"user_id": user_id,
+            "first_name": response['user']['personal_data']['first_name'],
+            "last_name": response['user']['personal_data']['first_name']}
 
