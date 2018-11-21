@@ -22,7 +22,7 @@ USERS_API_VERSION = '2_0'
 @require.authenticated.any
 @xray_recorder.capture('routes.team.dashboard.get')
 def get_dashboard_data(user_id):
-    team_ids = _get_teams(user_id)
+    # team_ids = _get_teams(user_id)
 
     teams = [{"name": "fathom",
             "compliance": {
