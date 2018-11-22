@@ -21,6 +21,17 @@ class TestUtilities(object):
 
         return soreness
 
+    def body_part_pain(self, location_enum, severity, side):
+
+        soreness = {
+            "body_part": location_enum,
+            "severity": severity,
+            "side":side,
+            "pain": True
+        }
+
+        return soreness
+
     def body_part_location(self, location_enum):
         location = BodyPartLocation(location_enum)
 
