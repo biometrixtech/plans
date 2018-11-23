@@ -124,7 +124,7 @@ class DailyPlanDatastore(object):
                                'game_sessions': game_session_bson,
                                'pre_recovery': am_recovery_bson,
                                'post_recovery': pm_recovery_bson,
-                               'last_reported': item.last_reported})
+                               'last_updated': item.last_updated})
         '''
         query = {'user_id': item.user_id, 'date': item.event_date}
         collection.replace_one(query, item.json_serialise(), upsert=True)

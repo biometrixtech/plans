@@ -57,7 +57,7 @@ class DailyPlan(Serialisable):
                'pre_recovery': self.pre_recovery.json_serialise() if self.pre_recovery is not None else None,
                'post_recovery': self.post_recovery.json_serialise() if self.post_recovery is not None else None,
                'completed_post_recovery_sessions': [c.json_serialise() for c in self.completed_post_recovery_sessions],
-               'last_reported': self.last_updated,
+               'last_updated': self.last_updated,
                'daily_readiness_survey': self.daily_readiness_survey,
                'last_sensor_sync': self.last_sensor_sync,
                'sessions_planned': self.sessions_planned,

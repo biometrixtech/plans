@@ -32,7 +32,7 @@ class PostSessionSurveyDatastore(object):
             end_time = None
         mongo_collection = get_mongo_collection(self.mongo_collection)
         query0 = {'user_id': user_id, 'date': {'$gte': start_time, '$lte': end_time}}
-        # query1 = {'_id': 0, 'last_reported': 0, 'user_id': 0}
+        # query1 = {'_id': 0, 'last_updated': 0, 'user_id': 0}
         mongo_cursor = mongo_collection.find(query0)
         ret = []
 
