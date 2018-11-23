@@ -1,4 +1,6 @@
-from models.metrics import AthleteRecommendation
+from models.metrics import AthleteRecommendation, MetricType
+from models.soreness import HistoricSorenessStatus
+
 
 class MetricsProcessing(object):
 
@@ -9,6 +11,7 @@ class MetricsProcessing(object):
         if athlete_stats.session_RPE is not None and athlete_stats.session_RPE_event_date == event_date:
             if athlete_stats.session_RPE >= 5.0:
                 rec = AthleteRecommendation()
+                rec.metric_type = MetricType.daily
                 rec.metric = "Session RPE"
                 rec.threshold = athlete_stats.session_RPE
                 rec.body_part_location = None
@@ -32,6 +35,7 @@ class MetricsProcessing(object):
             for t in athlete_stats.daily_severe_soreness:
                 if t.severity >= 3.0:
                     rec = AthleteRecommendation()
+                    rec.metric_type = MetricType.daily
                     rec.metric = "Daily Severe Soreness"
                     rec.threshold = t.severity
                     rec.body_part_location = t.body_part.location.value
@@ -59,6 +63,7 @@ class MetricsProcessing(object):
                 and athlete_stats.daily_severe_pain == event_date):
             for t in athlete_stats.daily_severe_pain:
                 rec = AthleteRecommendation()
+                rec.metric_type = MetricType.daily
                 rec.metric = "Daily Severe Pain"
                 rec.threshold = t.severity
                 rec.body_part_location = t.body_part.location.value
@@ -93,6 +98,7 @@ class MetricsProcessing(object):
         for t in athlete_stats.historic_soreness:
             if t.streak >= 3 and t.is_pain:
                 rec = AthleteRecommendation()
+                rec.metric_type = MetricType.daily
                 rec.metric = "3 Day Consecutive Pain"
                 rec.threshold = t.average_severity
                 rec.body_part_location = t.body_part.location.value
@@ -111,6 +117,134 @@ class MetricsProcessing(object):
                     rec.specific_insight_recovery = "Consistent reports of significant [Body Part] pain for the last " + str(t.streak) + " days may be a sign of injury"
                     rec.recommendations.append("6A")
                     rec.recommendations.append("7B")
+                recommendations.append(rec)
+
+        for t in athlete_stats.historic_soreness:
+            if t.historic_soreness_status == HistoricSorenessStatus.persistent and not t.is_pain:
+                rec = AthleteRecommendation()
+                rec.metric_type = MetricType.longitudinal
+                rec.metric = "Persistent Soreness"
+                rec.threshold = t.average_severity
+                rec.body_part_location = t.body_part.location.value
+                rec.body_part_side = t.side
+                rec.high_level_insight = "Address Pain or Soreness"
+                rec.high_level_action_description = "Prioritize Recovery and consider decreasing upcoming workloads"
+                if rec.threshold >= 4:
+                    rec.color = "Red"
+                    rec.specific_insight_recovery = "a "+ str(t.streak) + " day trend of persistent, severe [body part] soreness impacting performance & indicating elevated injury risk"
+                    rec.recommendations.append("7A")
+
+                elif 2 < rec.threshold < 4:
+                    rec.color = "Yellow"
+                    rec.specific_insight_recovery = "a " + str(
+                        t.streak) + " day trend of persistent, moderate [body part] soreness impacting performance & indicating elevated injury risk"
+                    rec.recommendations.append("7A")
+                    rec.recommendations.append("6C")
+                    rec.recommendations.append("3B")
+
+                else:
+                    rec.color = "Green"
+                    rec.specific_insight_recovery = "a " + str(
+                        t.streak) + " day trend of persistent, mild [body part] soreness impacting performance & indicating elevated injury risk"
+                    # NONE
+
+                recommendations.append(rec)
+
+            if t.historic_soreness_status == HistoricSorenessStatus.chronic and not t.is_pain:
+                rec = AthleteRecommendation()
+                rec.metric_type = MetricType.longitudinal
+                rec.metric = "Chronic Soreness"
+                rec.threshold = t.average_severity
+                rec.body_part_location = t.body_part.location.value
+                rec.body_part_side = t.side
+                rec.high_level_insight = "Address Pain or Soreness"
+                rec.high_level_action_description = "Prioritize Recovery and consider decreasing upcoming workloads"
+                if rec.threshold >= 4:
+                    rec.color = "Red"
+                    rec.specific_insight_recovery = "a "+ str(t.streak) + " day trend of chronic, severe [body part] soreness impacting performance & indicating elevated injury risk"
+                    rec.recommendations.append("3B")
+                    rec.recommendations.append("7A")
+
+                elif 2 < rec.threshold < 4:
+                    rec.color = "Yellow"
+                    rec.specific_insight_recovery = "a " + str(
+                        t.streak) + " day trend of chronic, moderate [body part] soreness impacting performance & indicating elevated injury risk"
+                    rec.recommendations.append("7A")
+                    rec.recommendations.append("6C")
+                    rec.recommendations.append("3B")
+
+                else:
+                    rec.color = "Green"
+                    rec.specific_insight_recovery = "a " + str(
+                        t.streak) + " day trend of chronic, mild [body part] soreness impacting performance & indicating elevated injury risk"
+                    rec.recommendations.append("7A")
+
+                recommendations.append(rec)
+
+            if t.historic_soreness_status == HistoricSorenessStatus.persistent and t.is_pain:
+                rec = AthleteRecommendation()
+                rec.metric_type = MetricType.longitudinal
+                rec.metric = "Persistent Pain"
+                rec.threshold = t.average_severity
+                rec.body_part_location = t.body_part.location.value
+                rec.body_part_side = t.side
+                rec.high_level_insight = "Address Pain or Soreness"
+                rec.high_level_action_description = "Prioritize Recovery and consider decreasing upcoming workloads"
+                if rec.threshold >= 4:
+                    rec.color = "Red"
+                    rec.specific_insight_recovery = "a " + str(
+                        t.streak) + " day trend of persistent, severe [body part] pain impacting performance & indicating elevated injury risk"
+                    rec.recommendations.append("5A")
+                    rec.recommendations.append("2A")
+                    rec.recommendations.append("3A")
+
+                elif 2 < rec.threshold < 4:
+                    rec.color = "Yellow"
+                    rec.specific_insight_recovery = "a " + str(
+                        t.streak) + " day trend of persistent, moderate [body part] pain impacting performance & indicating elevated injury risk"
+                    rec.recommendations.append("6B")
+                    rec.recommendations.append("7A")
+                    rec.recommendations.append("3B")
+
+                else:
+                    rec.color = "Green"
+                    rec.specific_insight_recovery = "a " + str(
+                        t.streak) + " day trend of persistent, mild [body part] pain impacting performance & indicating elevated injury risk"
+                    rec.recommendations.append("7A")
+
+                recommendations.append(rec)
+
+            if t.historic_soreness_status == HistoricSorenessStatus.chronic and t.is_pain:
+                rec = AthleteRecommendation()
+                rec.metric_type = MetricType.longitudinal
+                rec.metric = "Chronic Pain"
+                rec.threshold = t.average_severity
+                rec.body_part_location = t.body_part.location.value
+                rec.body_part_side = t.side
+                rec.high_level_insight = "Address Pain or Soreness"
+                rec.high_level_action_description = "Prioritize Recovery and consider decreasing upcoming workloads"
+                if rec.threshold >= 4:
+                    rec.color = "Red"
+                    rec.specific_insight_recovery = "a " + str(
+                        t.streak) + " day trend of chronic, severe [body part] pain impacting performance & indicating elevated injury risk"
+                    rec.recommendations.append("5A")
+                    rec.recommendations.append("2A")
+                    rec.recommendations.append("3A")
+
+                elif 2 < rec.threshold < 4:
+                    rec.color = "Yellow"
+                    rec.specific_insight_recovery = "a " + str(
+                        t.streak) + " day trend of chronic, moderate [body part] pain impacting performance & indicating elevated injury risk"
+                    rec.recommendations.append("6B")
+                    rec.recommendations.append("7A")
+                    rec.recommendations.append("3B")
+
+                else:
+                    rec.color = "Green"
+                    rec.specific_insight_recovery = "a " + str(
+                        t.streak) + " day trend of chronic, mild [body part] pain impacting performance & indicating elevated injury risk"
+                    rec.recommendations.append("7A")
+                    rec.recommendations.append("6C")
                 recommendations.append(rec)
 
         return recommendations
