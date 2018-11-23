@@ -46,19 +46,29 @@ def handle_daily_readiness_create():
     store = DailyReadinessDatastore()
     store.put(daily_readiness)
 
-    if 'current_sport_name' in request.json or 'current_position' in request.json:
+    need_stats_update = False
+    soreness = daily_readiness.soreness
+    severe_soreness = [s for s in soreness if not s.pain and s.severity >= 3]
+    severe_pain = [s for s in soreness if s.pain]
+    if len(soreness) > 0 or 'current_sport_name' in request.json or 'current_position' in request.json:
+        need_stats_update = True
 
+    if need_stats_update:
         athlete_stats_store = AthleteStatsDatastore()
         athlete_stats = athlete_stats_store.get(athlete_id=daily_readiness.user_id)
+        athlete_stats.daily_severe_soreness = severe_soreness
+        athlete_stats.daily_severe_soreness_event_date = format_date(parse_datetime(event_date))
+        athlete_stats.daily_severe_pain = severe_pain
+        athlete_stats.daily_severe_soreness_event_date = format_date(parse_datetime(event_date))
+        if 'current_sport_name' in request.json or 'current_position' in request.json:
+            if athlete_stats is None:
+                athlete_stats = AthleteStats(request.json['user_id'])
+                athlete_stats.event_date = format_date(daily_readiness.event_date)
 
-        if athlete_stats is None:
-            athlete_stats = AthleteStats(request.json['user_id'])
-            athlete_stats.event_date = format_date(daily_readiness.event_date)
-
-        if 'current_sport_name' in request.json:
-            athlete_stats.current_sport_name = request.json['current_sport_name']
-        if 'current_position' in request.json:
-            athlete_stats.current_position = request.json['current_position']
+            if 'current_sport_name' in request.json:
+                athlete_stats.current_sport_name = request.json['current_sport_name']
+            if 'current_position' in request.json:
+                athlete_stats.current_position = request.json['current_position']
 
         athlete_stats_store.put(athlete_stats)
 
@@ -97,7 +107,7 @@ def handle_daily_readiness_get(principal_id=None):
 
     post_session_store = PostSessionSurveyDatastore()
     post_session_surveys = post_session_store.get(user_id=user_id, start_date=start_time, end_date=current_time)
-    post_session_surveys = [s for s in post_session_surveys if s is not None and s.event_date_time < current_time and s.event_date_time > start_time]
+    post_session_surveys = [s for s in post_session_surveys if s is not None and start_time < s.event_date_time < current_time]
     if len(post_session_surveys) != 0:
         post_session_surveys = sorted(post_session_surveys, key=lambda k: k.survey.event_date, reverse=True)
         sore_body_parts += [{"body_part": s.body_part.location.value, "side": s.side} for s in post_session_surveys[0].survey.soreness if s.severity > 1]

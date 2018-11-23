@@ -134,6 +134,8 @@ class AthleteStats(Serialisable):
         ret = {
             'athlete_id': self.athlete_id,
             'event_date': self.event_date,
+            'session_RPE': self.session_RPE,
+            'session_RPE_event_date': self.session_RPE_event_date,
             'acute_avg_RPE': self.acute_avg_RPE,
             'acute_avg_readiness': self.acute_avg_readiness,
             'acute_avg_sleep_quality': self.acute_avg_sleep_quality,
@@ -158,5 +160,9 @@ class AthleteStats(Serialisable):
             'current_sport_name': self.current_sport_name.value,
             'current_position': self.current_position.value if self.current_position is not None else None,
             'historic_soreness': [h.json_serialise() for h in self.historic_soreness],
+            'daily_severe_pain': [s.json_serialise() for s in self.daily_severe_pain],
+            'daily_severe_soreness': [s.json_serialise() for s in self.daily_severe_soreness],
+            'daily_severe_soreness_event_date': self.daily_severe_soreness_event_date,
+            'daily_severe_pain_event_date': self.daily_severe_pain_event_date
         }
         return ret
