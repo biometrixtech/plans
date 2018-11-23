@@ -114,10 +114,10 @@ def test_find_persistent_soreness():
 
     stats_processing = StatsProcessing("tester", "2018-01-01", DatastoreCollection())
 
-    historic_soreness = stats_processing.get_historic_soreness(soreness_list_1,
-                                                               soreness_list_2,
-                                                               soreness_list_3,
-                                                               soreness_list_4)
+    historic_soreness = stats_processing.get_historic_soreness_list(soreness_list_1,
+                                                                    soreness_list_2,
+                                                                    soreness_list_3,
+                                                                    soreness_list_4)
 
     assert(HistoricSorenessStatus.persistent is historic_soreness[0].historic_soreness_status)
     assert (False is historic_soreness[0].is_pain)
@@ -132,10 +132,10 @@ def test_find_chronic_soreness():
 
     stats_processing = StatsProcessing("tester", "2018-01-01", DatastoreCollection())
 
-    historic_soreness = stats_processing.get_historic_soreness(soreness_list_1,
-                                                               soreness_list_2,
-                                                               soreness_list_3,
-                                                               soreness_list_4)
+    historic_soreness = stats_processing.get_historic_soreness_list(soreness_list_1,
+                                                                    soreness_list_2,
+                                                                    soreness_list_3,
+                                                                    soreness_list_4)
 
     assert(HistoricSorenessStatus.chronic is historic_soreness[0].historic_soreness_status)
     assert (False is historic_soreness[0].is_pain)
@@ -150,10 +150,10 @@ def test_find_persistent_pain():
 
     stats_processing = StatsProcessing("tester", "2018-01-01", DatastoreCollection())
 
-    historic_soreness = stats_processing.get_historic_soreness(soreness_list_1,
-                                                               soreness_list_2,
-                                                               soreness_list_3,
-                                                               soreness_list_4)
+    historic_soreness = stats_processing.get_historic_soreness_list(soreness_list_1,
+                                                                    soreness_list_2,
+                                                                    soreness_list_3,
+                                                                    soreness_list_4)
 
     assert(HistoricSorenessStatus.persistent is historic_soreness[0].historic_soreness_status)
     assert (True is historic_soreness[0].is_pain)
@@ -168,10 +168,10 @@ def test_find_chronic_pain():
 
     stats_processing = StatsProcessing("tester", "2018-01-01", DatastoreCollection())
 
-    historic_soreness = stats_processing.get_historic_soreness(soreness_list_1,
-                                                               soreness_list_2,
-                                                               soreness_list_3,
-                                                               soreness_list_4)
+    historic_soreness = stats_processing.get_historic_soreness_list(soreness_list_1,
+                                                                    soreness_list_2,
+                                                                    soreness_list_3,
+                                                                    soreness_list_4)
 
     assert(HistoricSorenessStatus.chronic is historic_soreness[0].historic_soreness_status)
     assert (True is historic_soreness[0].is_pain)
@@ -186,10 +186,10 @@ def test_find_no_soreness():
 
     stats_processing = StatsProcessing("tester", "2018-01-01", DatastoreCollection())
 
-    historic_soreness = stats_processing.get_historic_soreness(soreness_list_1,
-                                                               soreness_list_2,
-                                                               soreness_list_3,
-                                                               soreness_list_4)
+    historic_soreness = stats_processing.get_historic_soreness_list(soreness_list_1,
+                                                                    soreness_list_2,
+                                                                    soreness_list_3,
+                                                                    soreness_list_4)
 
     assert(0 is len(historic_soreness))
 
@@ -203,10 +203,10 @@ def test_find_no_pain():
 
     stats_processing = StatsProcessing("tester", "2018-01-01", DatastoreCollection())
 
-    historic_soreness = stats_processing.get_historic_soreness(soreness_list_1,
-                                                               soreness_list_2,
-                                                               soreness_list_3,
-                                                               soreness_list_4)
+    historic_soreness = stats_processing.get_historic_soreness_list(soreness_list_1,
+                                                                    soreness_list_2,
+                                                                    soreness_list_3,
+                                                                    soreness_list_4)
 
     assert(0 is len(historic_soreness))
 
@@ -219,12 +219,12 @@ def test_find_no_soreness_3_weeks():
 
     stats_processing = StatsProcessing("tester", "2018-01-01", DatastoreCollection())
 
-    historic_soreness = stats_processing.get_historic_soreness(soreness_list_1,
-                                                               soreness_list_2,
-                                                               soreness_list_3,
-                                                               soreness_list_4)
+    historic_soreness = stats_processing.get_historic_soreness_list(soreness_list_1,
+                                                                    soreness_list_2,
+                                                                    soreness_list_3,
+                                                                    soreness_list_4)
 
-    assert(0 is len(historic_soreness))
+    assert (HistoricSorenessStatus.dormant_cleared is historic_soreness[0].historic_soreness_status)
 
 
 def test_find_no_pain_3_weeks():
@@ -236,12 +236,12 @@ def test_find_no_pain_3_weeks():
 
     stats_processing = StatsProcessing("tester", "2018-01-01", DatastoreCollection())
 
-    historic_soreness = stats_processing.get_historic_soreness(soreness_list_1,
-                                                               soreness_list_2,
-                                                               soreness_list_3,
-                                                               soreness_list_4)
+    historic_soreness = stats_processing.get_historic_soreness_list(soreness_list_1,
+                                                                    soreness_list_2,
+                                                                    soreness_list_3,
+                                                                    soreness_list_4)
 
-    assert(0 is len(historic_soreness))
+    assert (HistoricSorenessStatus.dormant_cleared is historic_soreness[0].historic_soreness_status)
 
 def test_consecutive_pain_3_days():
 
@@ -262,11 +262,11 @@ def test_consecutive_pain_3_days():
     stats_processing.set_start_end_times()
     stats_processing.load_historical_data()
 
-    consecutive_pain_list = stats_processing.get_three_days_consecutive_pain_list()
+    consecutive_pain_list = stats_processing.get_historic_soreness()
 
-    assert(len(consecutive_pain_list) > 0)
+    assert(3 is consecutive_pain_list[0].streak)
 
-def test_consecutive_pain_not_3_days():
+def test_consecutive_pain_2_days_with_break():
 
     readiness_list = []
 
@@ -284,6 +284,28 @@ def test_consecutive_pain_not_3_days():
     stats_processing.set_start_end_times()
     stats_processing.load_historical_data()
 
-    consecutive_pain_list = stats_processing.get_three_days_consecutive_pain_list()
+    consecutive_pain_list = stats_processing.get_historic_soreness()
 
-    assert(len(consecutive_pain_list) == 0)
+    assert (2 is consecutive_pain_list[0].streak)
+
+def test_consecutive_avg_severity_2_days_with_break():
+
+    readiness_list = []
+
+    readiness_list.append(get_daily_readiness_survey_high_pain(datetime(2018, 7, 17, 11, 0, 0), 3))
+    readiness_list.append(get_daily_readiness_survey_high_pain(datetime(2018, 7, 19, 11, 0, 0), 3))
+
+    daily_readiness_datastore = DailyReadinessDatastore()
+    daily_readiness_datastore.side_load_surveys(readiness_list)
+
+    datastore_collection = DatastoreCollection()
+    datastore_collection.daily_readiness_datastore = daily_readiness_datastore
+
+    stats_processing = StatsProcessing("tester", "2018-07-19", datastore_collection)
+
+    stats_processing.set_start_end_times()
+    stats_processing.load_historical_data()
+
+    consecutive_pain_list = stats_processing.get_historic_soreness()
+
+    assert (3.0 == consecutive_pain_list[0].average_severity)
