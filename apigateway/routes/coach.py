@@ -50,71 +50,72 @@ def get_dashboard_data(user_id):
 
                             },
             "weekly_insights": [
-                                {"cleared_to_play": {
-                                                     "address_pain_soreness": [{"user_id": "1",
-                                                                               "first_name": "Dipesh",
-                                                                               "last_name": "Gautam"}
-                                                                              ],
-                                                     "increase_workload": [{"user_id": "2",
-                                                                            "first_name": "Mazen",
-                                                                            "last_name": "Chami"}
-                                                                          ],
-                                                     "balance_overtraining_risk": [],
-                                                     "add_variety": []
-                                                    }
-                                },
-                                {"not_cleared_to_play": {
-                                                         "address_pain_soreness": [{"user_id": "3",
-                                                                                    "first_name": "Paul",
-                                                                                    "last_name": "LaForge"}
-                                                                                  ],
-                                                         "increase_workload": [{"user_id": "4",
-                                                                               "first_name": "Melissa",
-                                                                               "last_name": "White"}
-                                                                              ],
-                                                         "balance_overtraining_risk": [],
-                                                         "add_variety": []
-                                                        }
-
+                                {
+                                 "address_pain_soreness": [{"user_id": "1",
+                                                           "first_name": "Dipesh",
+                                                           "last_name": "Gautam",
+                                                           "cleared_to_train": True,
+                                                           "color": 0},
+                                                           {"user_id": "3",
+                                                            "first_name": "Paul",
+                                                            "last_name": "LaForge",
+                                                            "cleared_to_train": False,
+                                                            "color": 2}
+                                                          ],
+                                 "increase_workload": [{"user_id": "2",
+                                                        "first_name": "Mazen",
+                                                        "last_name": "Chami",
+                                                        "cleared_to_train": True,
+                                                        "color": 1}
+                                                      ],
+                                 "balance_overtraining_risk": [{"user_id": "4",
+                                                           "first_name": "Melissa",
+                                                           "last_name": "White",
+                                                           "cleared_to_train": False,
+                                                           "color": 2}],
+                                 "add_variety": []
                                 }
                              ],
             "daily_insights": [
-                                {"cleared_to_play": {
-                                                     "limit_time_intensity": [{"user_id": "1",
-                                                                               "first_name": "Dipesh",
-                                                                               "last_name": "Gautam"}
-                                                                              ],
-                                                     "increase_workload": [{"user_id": "2",
-                                                                            "first_name": "Mazen",
-                                                                            "last_name": "Chami"}
-                                                                          ],
-                                                     "monitor_training": [],
-                                                     "not_cleared": [],
-                                                     "all_good": [{"user_id": "5",
-                                                                   "first_name": "Mazen",
-                                                                   "last_name": "Chami"},
-                                                                  {"user_id": "6",
-                                                                   "first_name": "Gabby",
-                                                                   "last_name": "Levac"}
-                                                                   ]
-                                                    }
-                                },
-                                {"not_cleared_to_play": {
-                                                         "limit_time_intensity": [{"user_id": "3",
-                                                                                   "first_name": "Paul",
-                                                                                   "last_name": "LaForge"}
-                                                                                  ],
-                                                         "increase_workload": [{"user_id": "4",
-                                                                               "first_name": "Melissa",
-                                                                               "last_name": "White"}
-                                                                              ],
-                                                         "monitor_training": [],
-                                                         "not_cleared": [{"user_id": "7",
-                                                                          "first_name": "Ivonna",
-                                                                          "last_name": "Dumanyan"}],
-                                                         "all_good": []
-                                                        }
-
+                                {
+                                 "limit_time_intensity": [{"user_id": "1",
+                                                           "first_name": "Dipesh",
+                                                           "last_name": "Gautam",
+                                                           "cleared_to_train": True,
+                                                           "color": 1}
+                                                          ],
+                                 "increase_workload": [{"user_id": "2",
+                                                        "first_name": "Mazen",
+                                                        "last_name": "Chami",
+                                                        "cleared_to_train": True,
+                                                        "color": 1}
+                                                      ],
+                                 "monitor_training": [{"user_id": "3",
+                                                       "first_name": "Paul",
+                                                       "last_name": "LaForge",
+                                                       "cleared_to_train": True,
+                                                       "color": 1}],
+                                 "not_cleared": [{"user_id": "7",
+                                                  "first_name": "Ivonna",
+                                                  "last_name": "Dumanyan",
+                                                   "cleared_to_train": False,
+                                                   "color": 2},
+                                                 {"user_id": "4",
+                                                  "first_name": "Melissa",
+                                                  "last_name": "White",
+                                                  "cleared_to_train": False,
+                                                  "color": 2}],
+                                 "all_good": [{"user_id": "5",
+                                               "first_name": "Mazen",
+                                               "last_name": "Chami",
+                                               "cleared_to_train": True,
+                                               "color": 0},
+                                              {"user_id": "6",
+                                               "first_name": "Gabby",
+                                               "last_name": "Levac",
+                                               "cleared_to_train": True,
+                                               "color": 0}
+                                               ]
                                 }
                               ],
             "athletes": [{"user_id": 1},
@@ -139,71 +140,72 @@ def get_dashboard_data(user_id):
 
                             },
             "weekly_insights": [
-                                {"cleared_to_play": {
-                                                     "address_pain_soreness": [{"user_id": "1",
-                                                                               "first_name": "Dipesh",
-                                                                               "last_name": "Gautam"}
-                                                                              ],
-                                                     "increase_workload": [{"user_id": "2",
-                                                                            "first_name": "Mazen",
-                                                                            "last_name": "Chami"}
-                                                                          ],
-                                                     "balance_overtraining_risk": [],
-                                                     "add_variety": []
-                                                    }
-                                },
-                                {"not_cleared_to_play": {
-                                                         "address_pain_soreness": [{"user_id": "3",
-                                                                                    "first_name": "Paul",
-                                                                                    "last_name": "LaForge"}
-                                                                                  ],
-                                                         "increase_workload": [{"user_id": "4",
-                                                                               "first_name": "Melissa",
-                                                                               "last_name": "White"}
-                                                                              ],
-                                                         "balance_overtraining_risk": [],
-                                                         "add_variety": []
-                                                        }
-
+                                {
+                                 "address_pain_soreness": [{"user_id": "1",
+                                                           "first_name": "Dipesh",
+                                                           "last_name": "Gautam",
+                                                           "cleared_to_train": True,
+                                                           "color": 0},
+                                                           {"user_id": "3",
+                                                            "first_name": "Paul",
+                                                            "last_name": "LaForge",
+                                                            "cleared_to_train": False,
+                                                            "color": 2}
+                                                          ],
+                                 "increase_workload": [{"user_id": "2",
+                                                        "first_name": "Mazen",
+                                                        "last_name": "Chami",
+                                                        "cleared_to_train": True,
+                                                        "color": 1}
+                                                      ],
+                                 "balance_overtraining_risk": [{"user_id": "4",
+                                                           "first_name": "Melissa",
+                                                           "last_name": "White",
+                                                           "cleared_to_train": False,
+                                                           "color": 2}],
+                                 "add_variety": []
                                 }
                              ],
             "daily_insights": [
-                                {"cleared_to_play": {
-                                                     "limit_time_intensity": [{"user_id": "1",
-                                                                               "first_name": "Dipesh",
-                                                                               "last_name": "Gautam"}
-                                                                              ],
-                                                     "increase_workload": [{"user_id": "2",
-                                                                            "first_name": "Mazen",
-                                                                            "last_name": "Chami"}
-                                                                          ],
-                                                     "monitor_training": [],
-                                                     "not_cleared": [],
-                                                     "all_good": [{"user_id": "5",
-                                                                   "first_name": "Mazen",
-                                                                   "last_name": "Chami"},
-                                                                  {"user_id": "6",
-                                                                   "first_name": "Gabby",
-                                                                   "last_name": "Levac"}
-                                                                   ]
-                                                    }
-                                },
-                                {"not_cleared_to_play": {
-                                                         "limit_time_intensity": [{"user_id": "3",
-                                                                                   "first_name": "Paul",
-                                                                                   "last_name": "LaForge"}
-                                                                                  ],
-                                                         "increase_workload": [{"user_id": "4",
-                                                                               "first_name": "Melissa",
-                                                                               "last_name": "White"}
-                                                                              ],
-                                                         "monitor_training": [],
-                                                         "not_cleared": [{"user_id": "7",
-                                                                          "first_name": "Ivonna",
-                                                                          "last_name": "Dumanyan"}],
-                                                         "all_good": []
-                                                        }
-
+                                {
+                                 "limit_time_intensity": [{"user_id": "1",
+                                                           "first_name": "Dipesh",
+                                                           "last_name": "Gautam",
+                                                           "cleared_to_train": True,
+                                                           "color": 1}
+                                                          ],
+                                 "increase_workload": [{"user_id": "2",
+                                                        "first_name": "Mazen",
+                                                        "last_name": "Chami",
+                                                        "cleared_to_train": True,
+                                                        "color": 1}
+                                                      ],
+                                 "monitor_training": [{"user_id": "3",
+                                                       "first_name": "Paul",
+                                                       "last_name": "LaForge",
+                                                       "cleared_to_train": True,
+                                                       "color": 1}],
+                                 "not_cleared": [{"user_id": "7",
+                                                  "first_name": "Ivonna",
+                                                  "last_name": "Dumanyan",
+                                                   "cleared_to_train": False,
+                                                   "color": 2},
+                                                 {"user_id": "4",
+                                                  "first_name": "Melissa",
+                                                  "last_name": "White",
+                                                  "cleared_to_train": False,
+                                                  "color": 2}],
+                                 "all_good": [{"user_id": "5",
+                                               "first_name": "Mazen",
+                                               "last_name": "Chami",
+                                               "cleared_to_train": True,
+                                               "color": 0},
+                                              {"user_id": "6",
+                                               "first_name": "Gabby",
+                                               "last_name": "Levac",
+                                               "cleared_to_train": True,
+                                               "color": 0}
+                                               ]
                                 }
                               ],
             "athletes": [{"user_id": 1},
