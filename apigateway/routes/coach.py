@@ -239,7 +239,7 @@ def get_dashboard_data(user_id):
                           "color": 2,
                           "weekly_recommendation": [],
                           "daily_recommendation": [],
-                          "insights": []}
+                          "insights": []},
                          {"user_id": "5",
                           "first_name": "Chris",
                           "last_name": "Perry",
