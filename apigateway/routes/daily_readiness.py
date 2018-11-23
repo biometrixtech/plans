@@ -12,6 +12,7 @@ from fathomapi.utils.xray import xray_recorder
 from models.daily_readiness import DailyReadiness
 from models.soreness import MuscleSorenessSeverity, BodyPartLocation
 from models.stats import AthleteStats
+from logic.metrics_processing import MetricsProcessing
 from utils import parse_datetime, format_date, format_datetime
 
 app = Blueprint('daily_readiness', __name__)
@@ -54,12 +55,18 @@ def handle_daily_readiness_create():
         need_stats_update = True
 
     if need_stats_update:
+        plan_event_date = format_date(parse_datetime(event_date))
         athlete_stats_store = AthleteStatsDatastore()
         athlete_stats = athlete_stats_store.get(athlete_id=user_id)
         athlete_stats.daily_severe_soreness = severe_soreness
-        athlete_stats.daily_severe_soreness_event_date = format_date(parse_datetime(event_date))
+        athlete_stats.daily_severe_soreness_event_date = plan_event_date
         athlete_stats.daily_severe_pain = severe_pain
-        athlete_stats.daily_severe_pain_event_date = format_date(parse_datetime(event_date))
+        athlete_stats.daily_severe_pain_event_date = plan_event_date
+
+        for s in daily_readiness.soreness:
+            athlete_stats.update_historic_soreness(s, plan_event_date)
+
+
         if 'current_sport_name' in request.json or 'current_position' in request.json:
             if athlete_stats is None:
                 athlete_stats = AthleteStats(request.json['user_id'])
