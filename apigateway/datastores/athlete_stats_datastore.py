@@ -1,7 +1,7 @@
 from aws_xray_sdk.core import xray_recorder
 from config import get_mongo_collection
 from models.stats import AthleteStats
-from models.soreness import BodyPartLocation, HistoricSoreness, HistoricSorenessStatus, Soreness
+from models.soreness import BodyPartLocation, HistoricSoreness, HistoricSorenessStatus, Soreness, BodyPart
 
 
 class AthleteStatsDatastore(object):
@@ -77,7 +77,7 @@ class AthleteStatsDatastore(object):
         soreness.body_part = BodyPart(BodyPartLocation(soreness_dict['body_part']), None)
         soreness.pain = soreness_dict.get('pain', False)
         soreness.severity = soreness_dict['severity']
-        soreness.side = soreness_dict['side', None]
+        soreness.side = soreness_dict.get('side', None)
         return soreness
 
 
