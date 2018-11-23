@@ -22,22 +22,111 @@ USERS_API_VERSION = '2_1'
 @require.authenticated.any
 @xray_recorder.capture('routes.team.dashboard.get')
 def get_dashboard_data(user_id):
-    team_ids = _get_teams(user_id)
-    for team_id in team_ids:
-        completed = []
-        incomplete = []
-        users = _get_users_in_team(team_id)
-        for user_id in users:
-            user = _get_user(user_id)
-            start_date = '2018-11-21'
-            end_date = '2018-11-21'
-            if DatastoreCollection().daily_plan_datastore.get(user_id, start_date, end_date)[0].daily_readiness_survey_completed():
-                completed.append(user)
-            else:
-                incomplete.append(user)
-        print(users, completed, incomplete)
+    # team_ids = _get_teams(user_id)
+    # for team_id in team_ids:
+    #     completed = []
+    #     incomplete = []
+    #     users = _get_users_in_team(team_id)
+    #     for user_id in users:
+    #         user = _get_user(user_id)
+    #         start_date = '2018-11-21'
+    #         end_date = '2018-11-21'
+    #         if DatastoreCollection().daily_plan_datastore.get(user_id, start_date, end_date)[0].daily_readiness_survey_completed():
+    #             completed.append(user)
+    #         else:
+    #             incomplete.append(user)
+    #     print(users, completed, incomplete)
 
     teams = [{"name": "fathom",
+            "compliance": {
+                            "complete" : [{"first_name": "Dipesh", "last_name": "Gautam"},
+                                          {"first_name": "Mazen", "last_name": "Chami"}
+                                          ],
+                            "incomplete" : [{"first_name": "Paul", "last_name": "LaForge"},
+                                            {"first_name": "Gabby", "last_name": "Levac"},
+                                            {"first_name": "Chris", "last_name": "Perry"},
+                                            {"first_name": "Melissa", "last_name": "White"},
+                                            {"first_name": "Ivonna", "last_name": "Dumanyan"}]
+
+                            },
+            "weekly_insights": [
+                                {"cleared_to_play": {
+                                                     "address_pain_soreness": [{"user_id": "1",
+                                                                               "first_name": "Dipesh",
+                                                                               "last_name": "Gautam"}
+                                                                              ],
+                                                     "increase_workload": [{"user_id": "2",
+                                                                            "first_name": "Mazen",
+                                                                            "last_name": "Chami"}
+                                                                          ],
+                                                     "balance_overtraining_risk": [],
+                                                     "add_variety": []
+                                                    }
+                                },
+                                {"not_cleared_to_play": {
+                                                         "address_pain_soreness": [{"user_id": "3",
+                                                                                    "first_name": "Paul",
+                                                                                    "last_name": "LaForge"}
+                                                                                  ],
+                                                         "increase_workload": [{"user_id": "4",
+                                                                               "first_name": "Melissa",
+                                                                               "last_name": "White"}
+                                                                              ],
+                                                         "balance_overtraining_risk": [],
+                                                         "add_variety": []
+                                                        }
+
+                                }
+                             ],
+            "daily_insights": [
+                                {"cleared_to_play": {
+                                                     "limit_time_intensity": [{"user_id": "1",
+                                                                               "first_name": "Dipesh",
+                                                                               "last_name": "Gautam"}
+                                                                              ],
+                                                     "increase_workload": [{"user_id": "2",
+                                                                            "first_name": "Mazen",
+                                                                            "last_name": "Chami"}
+                                                                          ],
+                                                     "monitor_training": [],
+                                                     "not_cleared": [],
+                                                     "all_good": [{"user_id": "5",
+                                                                   "first_name": "Mazen",
+                                                                   "last_name": "Chami"},
+                                                                  {"user_id": "6",
+                                                                   "first_name": "Gabby",
+                                                                   "last_name": "Levac"}
+                                                                   ]
+                                                    }
+                                },
+                                {"not_cleared_to_play": {
+                                                         "limit_time_intensity": [{"user_id": "3",
+                                                                                   "first_name": "Paul",
+                                                                                   "last_name": "LaForge"}
+                                                                                  ],
+                                                         "increase_workload": [{"user_id": "4",
+                                                                               "first_name": "Melissa",
+                                                                               "last_name": "White"}
+                                                                              ],
+                                                         "monitor_training": [],
+                                                         "not_cleared": [{"user_id": "7",
+                                                                          "first_name": "Ivonna",
+                                                                          "last_name": "Dumanyan"}],
+                                                         "all_good": []
+                                                        }
+
+                                }
+                              ],
+            "athletes": [{"user_id": 1},
+                         {"user_id": 2},
+                         {"user_id": 3},
+                         {"user_id": 4},
+                         {"user_id": 5},
+                         {"user_id": 6},
+                         {"user_id": 7}]
+
+                 },
+            {"name": "fathom-2",
             "compliance": {
                             "complete" : [{"first_name": "Dipesh", "last_name": "Gautam"},
                                           {"first_name": "Mazen", "last_name": "Chami"}
