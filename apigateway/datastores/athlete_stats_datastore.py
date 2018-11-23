@@ -29,8 +29,8 @@ class AthleteStatsDatastore(object):
         if mongo_result is not None:
             athlete_stats = AthleteStats(athlete_id=mongo_result['athlete_id'])
             athlete_stats.event_date = mongo_result['event_date']
-            athlete_stats.session_RPE = mongo_result['session_RPE']
-            athlete_stats.session_RPE_event_date = mongo_result['session_RPE_event_date']
+            athlete_stats.session_RPE = mongo_result.get('session_RPE', None)
+            athlete_stats.session_RPE_event_date = mongo_result.get('session_RPE_event_date', None)
             athlete_stats.acute_avg_RPE = mongo_result['acute_avg_RPE']
             athlete_stats.acute_avg_readiness = mongo_result['acute_avg_readiness']
             athlete_stats.acute_avg_sleep_quality = mongo_result['acute_avg_sleep_quality']
@@ -49,8 +49,8 @@ class AthleteStatsDatastore(object):
                                                for s in mongo_result.get('daily_severe_soreness', [])]
             athlete_stats.daily_severe_soreness = [self._soreness_from_mongodb(s)
                                                for s in mongo_result.get('daily_severe_pain', [])]
-            athlete_stats.daily_severe_soreness_event_date = self.daily_severe_soreness_event_date
-            athlete_stats.daily_severe_pain_event_date = self.daily_severe_pain_event_date
+            athlete_stats.daily_severe_soreness_event_date = mongo_result.get('daily_severe_soreness_event_date', None)
+            athlete_stats.daily_severe_pain_event_date = mongo_result.get('daily_severe_soreness_event_date', None)
             return athlete_stats
 
         else:
