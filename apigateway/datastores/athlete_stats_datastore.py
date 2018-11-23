@@ -47,7 +47,7 @@ class AthleteStatsDatastore(object):
                                                for s in mongo_result.get('historic_soreness', [])]
             athlete_stats.daily_severe_soreness = [self._soreness_from_mongodb(s)
                                                    for s in mongo_result.get('daily_severe_soreness', [])]
-            athlete_stats.daily_severe_soreness = [self._soreness_from_mongodb(s)
+            athlete_stats.daily_severe_pain = [self._soreness_from_mongodb(s)
                                                    for s in mongo_result.get('daily_severe_pain', [])]
             athlete_stats.daily_severe_soreness_event_date = mongo_result.get('daily_severe_soreness_event_date', None)
             athlete_stats.daily_severe_pain_event_date = mongo_result.get('daily_severe_soreness_event_date', None)
