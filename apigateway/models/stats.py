@@ -1,7 +1,8 @@
 from enum import Enum
 from serialisable import Serialisable
 from models.sport import SportName, NoSportPosition, BaseballPosition, BasketballPosition, FootballPosition, LacrossePosition, SoccerPosition, SoftballPosition, FieldHockeyPosition, TrackAndFieldPosition
-
+from utils import format_date
+from models.soreness import HistoricSorenessStatus
 
 class FitFatigueStatus(Enum):
     undefined = 0
@@ -51,11 +52,65 @@ class AthleteStats(Serialisable):
         self.current_position = None
 
         self.historic_soreness = []
-        self.three_day_consecutive_pain = []
         self.daily_severe_soreness = []
         self.daily_severe_pain = []
         self.daily_severe_pain_event_date = None
         self.daily_severe_soreness_event_date = None
+
+    def update_historic_soreness(self, soreness, event_date):
+
+        for h in range(0, len(self.historic_soreness)):
+            if (self.historic_soreness[h].body_part_location == soreness.body_part.location.value and
+                    self.historic_soreness[h].side == soreness.side and
+                    self.historic_soreness[h].is_pain == soreness.pain):
+                # was historic_soreness already updated today?
+                if format_date(event_date) != self.historic_soreness[h].last_updated: #not updated
+                    if self.historic_soreness[h].historic_soreness_status == HistoricSorenessStatus.almost_persistent:
+                        self.historic_soreness[h].historic_soreness_status = HistoricSorenessStatus.persistent
+                    elif self.historic_soreness[h].historic_soreness_status == HistoricSorenessStatus.persistent_almost_chronic:
+                        self.historic_soreness[h].historic_soreness_status = HistoricSorenessStatus.chronic
+                    else:
+                        break
+
+                    self.historic_soreness[h].last_updated = event_date
+                    # weighted average
+                    self.historic_soreness[h].average_severity = (
+                        ((self.historic_soreness[h].average_severity * (float(self.historic_soreness[h].streak) /
+                                                                      float(self.historic_soreness[h].streak) + 1
+                                                                      )) +
+                        (soreness.severity * (float(1) / float(self.historic_soreness[h].streak) + 1))) /
+                        float(self.historic_soreness[h].streak) + 1
+                    )
+
+                    self.historic_soreness[h].streak = self.historic_soreness[h].streak + 1
+                    break
+                else:
+                    # we first have to determine if current value is higher previous day's value
+                    for s in self.daily_severe_soreness:
+                        if (self.daily_severe_soreness[h].body_part.location.value == soreness.body_part.location.value and
+                                self.daily_severe_soreness[h].side == soreness.side and
+                                self.daily_severe_soreness[h].pain == soreness.pain):
+                            if s.severity >= soreness.severity:
+                                break
+                            else:
+                                new_severity = (((self.historic_soreness[h].average_severity *
+                                                self.historic_soreness[h].streak) - s.severity) /
+                                                (float(self.historic_soreness[h].streak - 1)))
+                                self.historic_soreness[h].average_severity = new_severity
+                                # temporarily set it back to keep consistency with algo
+                                self.historic_soreness[h].streak = self.historic_soreness[h].streak - 1
+                                self.historic_soreness[h].average_severity = (
+                                        ((self.historic_soreness[h].average_severity * (
+                                                    float(self.historic_soreness[h].streak) /
+                                                    float(self.historic_soreness[h].streak) + 1
+                                                    )) +
+                                         (soreness.severity * (
+                                                     float(1) / float(self.historic_soreness[h].streak) + 1))) /
+                                        float(self.historic_soreness[h].streak) + 1
+                                )
+                                self.historic_soreness[h].streak = self.historic_soreness[h].streak + 1
+                                break
+
 
     def acute_to_chronic_external_ratio(self):
         if self.acute_external_total_load is not None and self.chronic_external_total_load is not None:

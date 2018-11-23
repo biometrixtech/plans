@@ -101,7 +101,7 @@ def test_build_dictionary_from_soreness():
 
     stats_processing = StatsProcessing("tester", "2018-01-01", DatastoreCollection())
 
-    hs_dict = stats_processing.get_hs_dictionary(soreness_list)
+    hs_dict, hs_dict_reported = stats_processing.get_hs_dictionary(soreness_list)
 
     assert(2 is len(hs_dict.keys()))
 
@@ -309,3 +309,26 @@ def test_consecutive_avg_severity_2_days_with_break():
     consecutive_pain_list = stats_processing.get_historic_soreness()
 
     assert (3.0 == consecutive_pain_list[0].average_severity)
+
+
+def test_consecutive_last_updated_2_days_with_break():
+
+    readiness_list = []
+
+    readiness_list.append(get_daily_readiness_survey_high_pain(datetime(2018, 7, 17, 11, 0, 0), 3))
+    readiness_list.append(get_daily_readiness_survey_high_pain(datetime(2018, 7, 19, 11, 0, 0), 3))
+
+    daily_readiness_datastore = DailyReadinessDatastore()
+    daily_readiness_datastore.side_load_surveys(readiness_list)
+
+    datastore_collection = DatastoreCollection()
+    datastore_collection.daily_readiness_datastore = daily_readiness_datastore
+
+    stats_processing = StatsProcessing("tester", "2018-07-19", datastore_collection)
+
+    stats_processing.set_start_end_times()
+    stats_processing.load_historical_data()
+
+    consecutive_pain_list = stats_processing.get_historic_soreness()
+
+    assert ("2018-07-19" == consecutive_pain_list[0].last_reported)

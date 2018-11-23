@@ -256,6 +256,7 @@ class StatsProcessing(object):
                         and s.location == historic_soreness[h].body_part_location):
                     historic_soreness[h].streak = streak_soreness[s]
                     historic_soreness[h].average_severity = s.avg_severity
+                    #historic_soreness[h].last_reported =
 
         return historic_soreness
 
@@ -332,20 +333,21 @@ class StatsProcessing(object):
 
         historic_soreness_list = []
 
-        historic_soreness_last_7 = self.get_hs_dictionary(soreness_last_7)
-        historic_soreness_8_14 = self.get_hs_dictionary(soreness_8_14)
-        historic_soreness_15_21 = self.get_hs_dictionary(soreness_15_21)
-        historic_soreness_22_28 = self.get_hs_dictionary(soreness_22_28)
+        historic_soreness_last_7, historic_soreness_last_7_reported = self.get_hs_dictionary(soreness_last_7)
+        historic_soreness_8_14, historic_soreness_last_8_14_reported = self.get_hs_dictionary(soreness_8_14)
+        historic_soreness_15_21, historic_soreness_last_15_21_reported = self.get_hs_dictionary(soreness_15_21)
+        historic_soreness_22_28, historic_soreness_last_22_28_reported = self.get_hs_dictionary(soreness_22_28)
 
         for h in historic_soreness_8_14:
             historic_soreness = HistoricSoreness(h.location, h.side, h.is_pain)
+            historic_soreness.last_reported = historic_soreness_last_8_14_reported[h]
             if h not in historic_soreness_last_7 and h in historic_soreness_15_21 and h in historic_soreness_22_28:
                 historic_soreness.historic_soreness_status = HistoricSorenessStatus.almost_persistent
                 historic_soreness_list.append(historic_soreness)
 
         for h in historic_soreness_last_7:
             historic_soreness = HistoricSoreness(h.location, h.side, h.is_pain)
-
+            historic_soreness.last_reported = historic_soreness_last_7_reported[h]
             if historic_soreness_last_7[h] > 2:
 
                 if h in historic_soreness_8_14 and h in historic_soreness_15_21 and h in historic_soreness_22_28:
@@ -377,8 +379,12 @@ class StatsProcessing(object):
     def get_hs_dictionary(self, soreness_list):
 
         historic_soreness = {}
+        historic_soreness_reported = {}
+
+        soreness_list.sort(key=lambda x: x.reported_date_time if x.reported_date_time is not None else '', reverse=False)
 
         hs = namedtuple("hs", ["location", "is_pain", "side"])
+        hs_last = namedtuple("hs_last", ["location", "is_pain", "side", "last_reported"])
 
         for s in soreness_list:
             hs_new = hs(s.body_part.location, s.pain, s.side)
@@ -386,8 +392,9 @@ class StatsProcessing(object):
                 historic_soreness[hs_new] = historic_soreness[hs_new] + 1
             else:
                 historic_soreness[hs_new] = 1
+            historic_soreness_reported[hs_new] = s.reported_date_time
 
-        return historic_soreness
+        return historic_soreness, historic_soreness_reported
 
     def get_chronic_weeks_plans(self):
 
