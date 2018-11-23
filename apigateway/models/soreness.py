@@ -105,7 +105,7 @@ class HistoricSoreness(Serialisable):
         self.side = side
         self.streak = 0
         self.average_severity = 0.0
-        self.last_updated = ""
+        self.last_reported = ""
 
     def json_serialise(self):
         ret = {
@@ -115,7 +115,7 @@ class HistoricSoreness(Serialisable):
             'side': self.side,
             'streak': self.streak,
             'average_severity': self.average_severity,
-            'last_updated': self.last_updated
+            'last_reported': self.last_reported
         }
         return ret
 

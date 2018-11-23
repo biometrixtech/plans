@@ -24,7 +24,7 @@ class DailyPlanDatastore(object):
         mongo_collection = get_mongo_collection(self.mongo_collection)
         if day_of_week is None:
             query0 = {'user_id': user_id, 'date': {'$gte': start_date, '$lte': end_date}}
-            # query1 = {'_id': 0, 'last_updated': 0, 'user_id': 0}
+            # query1 = {'_id': 0, 'last_reported': 0, 'user_id': 0}
         else:
             query0 = {'user_id': user_id, 'date': {'$gte': start_date, '$lte': end_date}, 'day_of_week': day_of_week}
         mongo_cursor = mongo_collection.find(query0)
@@ -59,7 +59,7 @@ class DailyPlanDatastore(object):
                  for s in plan.get('bump_up_sessions', [])]
             daily_plan.daily_readiness_survey = plan.get('daily_readiness_survey', None)
             daily_plan.updated = plan.get('updated', None)
-            daily_plan.last_updated = plan.get('last_updated', None)
+            daily_plan.last_updated = plan.get('last_reported', None)
             daily_plan.pre_recovery_completed = plan.get('pre_recovery_completed', False)
             daily_plan.post_recovery_completed = plan.get('post_recovery_completed', False)
             daily_plan.last_sensor_sync = plan.get('last_sensor_sync', None)
@@ -124,7 +124,7 @@ class DailyPlanDatastore(object):
                                'game_sessions': game_session_bson,
                                'pre_recovery': am_recovery_bson,
                                'post_recovery': pm_recovery_bson,
-                               'last_updated': item.last_updated})
+                               'last_reported': item.last_reported})
         '''
         query = {'user_id': item.user_id, 'date': item.event_date}
         collection.replace_one(query, item.json_serialise(), upsert=True)

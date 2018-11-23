@@ -19,7 +19,7 @@ class DailyPlan(object):
         self.bump_up_sessions = []
         self.daily_readiness_survey = None
         self.updated = False
-        self.last_updated = None
+        self.last_reported = None
 
     def daily_readiness_survey_completed(self):
         if self.daily_readiness_survey is not None:

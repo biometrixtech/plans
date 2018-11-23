@@ -26,7 +26,7 @@ USERS_API_VERSION = '2_0'
 @xray_recorder.capture('routes.athlete.daily_plan.create')
 def create_daily_plan(athlete_id):
     daily_plan = TrainingPlanManager(athlete_id, DatastoreCollection()).create_daily_plan()
-    # daily_plan.last_updated = format_datetime(datetime.datetime.now())
+    # daily_plan.last_reported = format_datetime(datetime.datetime.now())
     # push_plan_update(athlete_id, daily_plan)
     body = {"message": "Your plan is ready!",
             "call_to_action": "VIEW_PLAN"}
