@@ -59,7 +59,7 @@ def handle_daily_readiness_create():
         athlete_stats.daily_severe_soreness = severe_soreness
         athlete_stats.daily_severe_soreness_event_date = format_date(parse_datetime(event_date))
         athlete_stats.daily_severe_pain = severe_pain
-        athlete_stats.daily_severe_soreness_event_date = format_date(parse_datetime(event_date))
+        athlete_stats.daily_severe_pain_event_date = format_date(parse_datetime(event_date))
         if 'current_sport_name' in request.json or 'current_position' in request.json:
             if athlete_stats is None:
                 athlete_stats = AthleteStats(request.json['user_id'])

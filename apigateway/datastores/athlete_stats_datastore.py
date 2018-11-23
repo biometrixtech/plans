@@ -1,7 +1,7 @@
 from aws_xray_sdk.core import xray_recorder
 from config import get_mongo_collection
 from models.stats import AthleteStats
-from models.soreness import BodyPartLocation, HistoricSoreness, HistoricSorenessStatus
+from models.soreness import BodyPartLocation, HistoricSoreness, HistoricSorenessStatus, Soreness
 
 
 class AthleteStatsDatastore(object):
@@ -29,6 +29,8 @@ class AthleteStatsDatastore(object):
         if mongo_result is not None:
             athlete_stats = AthleteStats(athlete_id=mongo_result['athlete_id'])
             athlete_stats.event_date = mongo_result['event_date']
+            athlete_stats.session_RPE = mongo_result['session_RPE']
+            athlete_stats.session_RPE_event_date = mongo_result['session_RPE_event_date']
             athlete_stats.acute_avg_RPE = mongo_result['acute_avg_RPE']
             athlete_stats.acute_avg_readiness = mongo_result['acute_avg_readiness']
             athlete_stats.acute_avg_sleep_quality = mongo_result['acute_avg_sleep_quality']
@@ -41,8 +43,14 @@ class AthleteStatsDatastore(object):
             athlete_stats.next_functional_strength_eligible_date = mongo_result.get('next_functional_strength_eligible_date', None)
             athlete_stats.current_sport_name = mongo_result.get('current_sport_name', None)
             athlete_stats.current_position = mongo_result.get('current_position', None)
-            athlete_stats.historic_soreness = [self._historic_soreness_from_mongodb(s)
+            athlete_stats.daily_severe_pain = [self._historic_soreness_from_mongodb(s)
                                                for s in mongo_result.get('historic_soreness', [])]
+            athlete_stats.historic_soreness = [self._soreness_from_mongodb(s)
+                                               for s in mongo_result.get('daily_severe_soreness', [])]
+            athlete_stats.daily_severe_soreness = [self._soreness_from_mongodb(s)
+                                               for s in mongo_result.get('daily_severe_pain', [])]
+            athlete_stats.daily_severe_soreness_event_date = self.daily_severe_soreness_event_date
+            athlete_stats.daily_severe_pain_event_date = self.daily_severe_pain_event_date
             return athlete_stats
 
         else:
@@ -63,3 +71,13 @@ class AthleteStatsDatastore(object):
         hs.historic_soreness_status = HistoricSorenessStatus(historic_soreness["historic_soreness_status"])
 
         return hs
+
+    def _soreness_from_mongodb(self, soreness_dict):
+        soreness = Soreness()
+        soreness.body_part = BodyPart(BodyPartLocation(soreness_dict['body_part']), None)
+        soreness.pain = soreness_dict.get('pain', False)
+        soreness.severity = soreness_dict['severity']
+        soreness.side = soreness_dict['side', None]
+        return soreness
+
+
