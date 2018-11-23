@@ -55,7 +55,7 @@ def handle_daily_readiness_create():
 
     if need_stats_update:
         athlete_stats_store = AthleteStatsDatastore()
-        athlete_stats = athlete_stats_store.get(athlete_id=daily_readiness.user_id)
+        athlete_stats = athlete_stats_store.get(athlete_id=user_id)
         athlete_stats.daily_severe_soreness = severe_soreness
         athlete_stats.daily_severe_soreness_event_date = format_date(parse_datetime(event_date))
         athlete_stats.daily_severe_pain = severe_pain
