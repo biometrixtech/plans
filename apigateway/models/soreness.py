@@ -33,6 +33,7 @@ class Soreness(Serialisable):
         self.side = None
         self.type = None  # soreness_type
         self.count = 1
+        self.streak = 0
 
     def json_serialise(self):
         ret = {
@@ -91,6 +92,8 @@ class HistoricSorenessStatus(IntEnum):
     dormant_cleared = 0
     persistent = 1
     chronic = 2
+    almost_persistent = 3
+    persistent_almost_chronic = 4
 
 
 class HistoricSoreness(Serialisable):
@@ -100,6 +103,8 @@ class HistoricSoreness(Serialisable):
         self.historic_soreness_status = HistoricSorenessStatus.dormant_cleared
         self.is_pain = is_pain
         self.side = side
+        self.streak = 0
+        self.average_severity = 0.0
 
     def json_serialise(self):
         ret = {
@@ -107,6 +112,7 @@ class HistoricSoreness(Serialisable):
             'historic_soreness_status': self.historic_soreness_status.value,
             'is_pain': self.is_pain,
             'side': self.side,
+            'streak': self.streak
         }
         return ret
 
