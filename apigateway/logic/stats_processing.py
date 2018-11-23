@@ -376,10 +376,12 @@ class StatsProcessing(object):
 
         for c in survey_list:
 
-            for s in range(0, len(c.survey.soreness)):
-                c.survey.soreness[s].reported_date_time = format_date(c.event_date)
-
-            soreness_list.extend(c.survey.soreness[s])
+            # for s in range(0, len(c.survey.soreness)):
+            for s in c.survey.soreness:
+                s.reported_date_time = format_date(c.event_date)
+                # c.survey.soreness[s].reported_date_time = format_date(c.event_date)
+                soreness_list.extend(s)
+            # soreness_list.extend(c.survey.soreness[s])
 
         return soreness_list
 
@@ -389,9 +391,12 @@ class StatsProcessing(object):
 
         for c in survey_list:
 
-            for s in range(0, len(c.soreness)):
-                c.soreness[s].reported_date_time = format_date(c.event_date)
-                soreness_list.append(c.soreness[s])
+            # for s in range(0, len(c.soreness)):
+            for s in c.soreness:
+                s.reported_date_time = format_date(c.event_date)
+                # c.soreness[s].reported_date_time = format_date(c.event_date)
+                soreness_list.append(s)
+                # soreness_list.append(c.soreness[s])
 
         return soreness_list
 
