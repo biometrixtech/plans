@@ -43,12 +43,12 @@ class AthleteStatsDatastore(object):
             athlete_stats.next_functional_strength_eligible_date = mongo_result.get('next_functional_strength_eligible_date', None)
             athlete_stats.current_sport_name = mongo_result.get('current_sport_name', None)
             athlete_stats.current_position = mongo_result.get('current_position', None)
-            athlete_stats.daily_severe_pain = [self._historic_soreness_from_mongodb(s)
+            athlete_stats.historic_soreness = [self._historic_soreness_from_mongodb(s)
                                                for s in mongo_result.get('historic_soreness', [])]
-            athlete_stats.historic_soreness = [self._soreness_from_mongodb(s)
-                                               for s in mongo_result.get('daily_severe_soreness', [])]
             athlete_stats.daily_severe_soreness = [self._soreness_from_mongodb(s)
-                                               for s in mongo_result.get('daily_severe_pain', [])]
+                                                   for s in mongo_result.get('daily_severe_soreness', [])]
+            athlete_stats.daily_severe_soreness = [self._soreness_from_mongodb(s)
+                                                   for s in mongo_result.get('daily_severe_pain', [])]
             athlete_stats.daily_severe_soreness_event_date = mongo_result.get('daily_severe_soreness_event_date', None)
             athlete_stats.daily_severe_pain_event_date = mongo_result.get('daily_severe_soreness_event_date', None)
             return athlete_stats
