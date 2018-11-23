@@ -80,6 +80,13 @@ class StatsProcessing(object):
             if current_athlete_stats is not None:
                 athlete_stats.current_sport_name = current_athlete_stats.current_sport_name
                 athlete_stats.current_position = current_athlete_stats.current_position
+                if current_athlete_stats.event_date == self.event_date:
+                    athlete_stats.session_RPE = current_athlete_stats.session_RPE
+                    athlete_stats.session_RPE_event_date = current_athlete_stats.session_RPE_event_date
+                    athlete_stats.daily_severe_soreness = current_athlete_stats.daily_severe_soreness
+                    athlete_stats.daily_severe_soreness_event_date = current_athlete_stats.daily_severe_soreness_event_date
+                    athlete_stats.daily_severe_pain = current_athlete_stats.daily_severe_pain
+                    athlete_stats.daily_severe_pain_event_date = current_athlete_stats.daily_severe_pain_event_date
             self.athlete_stats_datastore.put(athlete_stats)
 
 
