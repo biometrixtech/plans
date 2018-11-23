@@ -1,10 +1,14 @@
 from models.stats import AthleteStats
+from models.metrics import AthleteRecommendation
+from models.soreness import Soreness, BodyPart, BodyPartLocation
 from datetime import datetime, timedelta
 import statistics
 from utils import parse_date, parse_datetime, format_date
 from fathomapi.utils.exceptions import NoSuchEntityException
 from models.soreness import HistoricSoreness, HistoricSorenessStatus
 from collections import namedtuple
+from itertools import groupby
+from operator import itemgetter
 
 class StatsProcessing(object):
 
@@ -32,9 +36,11 @@ class StatsProcessing(object):
         self.chronic_daily_plans = []
         self.last_7_days_plans = []
         self.days_8_14_plans = []
+        self.last_3_days_ps_surveys = []
+        self.last_3_days_readiness_surveys = []
         self.last_7_days_ps_surveys = []
-        self.days_8_14_ps_surveys = []
         self.last_7_days_readiness_surveys = []
+        self.days_8_14_ps_surveys = []
         self.days_8_14_readiness_surveys = []
         self.days_15_21_ps_surveys = []
         self.days_15_21_readiness_surveys = []
@@ -69,11 +75,74 @@ class StatsProcessing(object):
             athlete_stats.functional_strength_eligible = self.is_athlete_functional_strength_eligible()
             athlete_stats.completed_functional_strength_sessions = self.get_completed_functional_strength_sessions()
             athlete_stats = self.update_historic_soreness(athlete_stats)
+            athlete_stats.three_day_consecutive_pain = self.get_three_days_consecutive_pain_list()
             current_athlete_stats = self.athlete_stats_datastore.get(athlete_id=self.athlete_id)
             if current_athlete_stats is not None:
                 athlete_stats.current_sport_name = current_athlete_stats.current_sport_name
                 athlete_stats.current_position = current_athlete_stats.current_position
             self.athlete_stats_datastore.put(athlete_stats)
+
+
+    def get_athlete_metrics(self, athlete_id, event_date):
+
+        athlete_metric = AthleteRecommendation()
+        athlete_metric.three_day_consecutive_pain = 0.0
+
+    def get_three_days_consecutive_pain_list(self):
+
+        soreness_list_last_3_days = []
+
+        soreness_list_last_3_days.extend(self.get_ps_survey_soreness_list(self.last_3_days_ps_surveys))
+        soreness_list_last_3_days.extend(self.get_readiness_soreness_list(self.last_3_days_readiness_surveys))
+
+        initial_soreness_list = []
+        soreness_list = []
+
+        # consolidate soreness list
+
+        initial_soreness = {}
+        pain_list = {}
+        count_list = {}
+
+
+        ns = namedtuple("ns", ["location", "is_pain", "side", "reported_date_time"])
+
+        for s in soreness_list_last_3_days:
+            ns_new = ns(s.body_part.location, s.pain, s.side, s.reported_date_time)
+            if ns_new in initial_soreness:
+                initial_soreness[ns_new] = max(initial_soreness[ns_new], s.severity)
+            else:
+                initial_soreness[ns_new] = s.severity
+
+        for r in initial_soreness:
+            if r.is_pain:
+                s = Soreness()
+                s.body_part = BodyPart(r.location, None)
+                s.side = r.side
+                s.reported_date_time = r.reported_date_time
+                s.severity = initial_soreness[r]
+                initial_soreness_list.append(s)
+
+        ns2 = namedtuple("ns2", ["location", "side"])
+
+        for s in initial_soreness_list:
+            ns_new_2 = ns2(s.body_part.location, s.side)
+            if ns_new_2 in pain_list:
+                pain_list[ns_new_2] = pain_list[ns_new_2] + s.severity
+                count_list[ns_new_2] = count_list[ns_new_2] + 1
+            else:
+                pain_list[ns_new_2] = s.severity
+                count_list[ns_new_2] = 1
+
+        for r in pain_list:
+            if count_list[r] >= 3:
+                s = Soreness()
+                s.body_part = BodyPart(r.location, None)
+                s.side = r.side
+                s.severity = pain_list[r] / float(count_list[r])
+                soreness_list.append(s)
+
+        return soreness_list
 
     def calc_training_volume_metrics(self, athlete_stats):
 
@@ -307,7 +376,10 @@ class StatsProcessing(object):
 
         for c in survey_list:
 
-            soreness_list.extend(c.survey.soreness)
+            for s in range(0, len(c.survey.soreness)):
+                c.survey.soreness[s].reported_date_time = format_date(c.event_date)
+
+            soreness_list.extend(c.survey.soreness[s])
 
         return soreness_list
 
@@ -316,7 +388,10 @@ class StatsProcessing(object):
         soreness_list = []
 
         for c in survey_list:
-            soreness_list.extend(c.soreness)
+
+            for s in range(0, len(c.soreness)):
+                c.soreness[s].reported_date_time = format_date(c.event_date)
+                soreness_list.append(c.soreness[s])
 
         return soreness_list
 
@@ -573,6 +648,11 @@ class StatsProcessing(object):
         elif days_difference > 28:
             self.acute_days = 7
             self.chronic_days = 28
+
+        three_days_ago = self.end_date_time - timedelta(days=3 + 1)
+
+        self.last_3_days_readiness_surveys = [p for p in daily_readiness_surveys if p.event_date >= three_days_ago]
+        self.last_3_days_ps_surveys = [p for p in post_session_surveys if p.event_date_time >= three_days_ago]
 
         if self.acute_days is not None and self.chronic_days is not None:
             self.acute_start_date_time = self.end_date_time - timedelta(days=self.acute_days + 1)

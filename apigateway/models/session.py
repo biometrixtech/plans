@@ -490,12 +490,23 @@ class RecoverySession(Serialisable):
             self.integrate_exercises[s].position_order = num
             num = num + 1
 
-
-    def set_exercise_target_minutes(self, soreness_list, total_minutes_target):
+    def set_exercise_target_minutes(self, soreness_list, total_minutes_target, functional_strength_active=False):
         max_severity = 0
+        historic_soreness_present = False
+        max_severity_and_historic_soreness = False
+
         if soreness_list is not None:
             for soreness in soreness_list:
                 max_severity = max(max_severity, soreness.severity)
+                if soreness.historic_soreness_status is not None:
+                    historic_soreness_present = True
+
+            for soreness in soreness_list:
+                if (soreness.historic_soreness_status is not None and soreness.severity == max_severity and
+                        soreness.severity > 0):
+                    max_severity_and_historic_soreness = True
+
+        # TODO update for the presence of functional strength AND historic soreness
 
         if max_severity > 3:
             self.integrate_target_minutes = 0

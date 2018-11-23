@@ -2,6 +2,7 @@ import pytest
 from logic.functional_strength_mapping import FSProgramGenerator
 from logic.stats_processing import StatsProcessing
 from logic.training_plan_management import TrainingPlanManager
+from models.stats import AthleteStats
 from models.daily_plan import DailyPlan
 from models.daily_readiness import DailyReadiness
 from models.post_session_survey import PostSessionSurvey
@@ -12,6 +13,7 @@ from tests.mocks.mock_datastore_collection import DatastoreCollection
 from tests.mocks.mock_daily_plan_datastore import DailyPlanDatastore
 from tests.mocks.mock_daily_readiness_datastore import DailyReadinessDatastore
 from tests.mocks.mock_post_session_survey_datastore import PostSessionSurveyDatastore
+from tests.mocks.mock_athlete_stats_datastore import AthleteStatsDatastore
 from tests.testing_utilities import TestUtilities
 from datetime import datetime, timedelta
 
@@ -366,13 +368,20 @@ def test_no_fs_with_high_readiness_soreness():
     daily_plan = get_daily_plans(datetime(2018, 7, 24, 0, 0, 0), datetime(2018, 7, 25, 0, 0, 0))[0]
     daily_plan.functional_strength_session = FunctionalStrengthSession()
     survey = get_daily_readiness_survey_high_soreness(datetime(2018, 7, 24, 12, 0, 0), 4)
+    athlete_stats = AthleteStats("tester")
+
     daily_plan_datastore = DailyPlanDatastore()
+    athlete_stats_datastore = AthleteStatsDatastore()
     daily_plan_datastore.side_load_plans([daily_plan])
     daily_readiness_datastore = DailyReadinessDatastore()
     daily_readiness_datastore.side_load_surveys([survey])
+    athlete_stats_datastore.side_load_athlete_stats(athlete_stats)
+
     datastore_collection = DatastoreCollection()
     datastore_collection.daily_plan_datastore = daily_plan_datastore
     datastore_collection.daily_readiness_datastore = daily_readiness_datastore
+    datastore_collection.athlete_stats_datastore = athlete_stats_datastore
+
     tpm = TrainingPlanManager("tester", datastore_collection)
     plan = tpm.create_daily_plan("2018-07-24")
     assert(None is plan.functional_strength_session)
@@ -382,12 +391,16 @@ def test_no_fs_with_high_post_session_soreness():
     daily_plan = get_daily_plans(datetime(2018, 7, 24, 0, 0, 0), datetime(2018, 7, 25, 0, 0, 0))[0]
     daily_plan.functional_strength_session = FunctionalStrengthSession()
     survey = get_daily_readiness_survey_high_soreness(datetime(2018, 7, 24, 12, 0, 0), 1)
+
+    athlete_stats = AthleteStats("tester")
+
     daily_plan_datastore = DailyPlanDatastore()
+    athlete_stats_datastore = AthleteStatsDatastore()
     daily_plan_datastore.side_load_plans([daily_plan])
     daily_readiness_datastore = DailyReadinessDatastore()
     daily_readiness_datastore.side_load_surveys([survey])
     post_session_datastore = PostSessionSurveyDatastore()
-
+    athlete_stats_datastore.side_load_athlete_stats(athlete_stats)
     soreness_list = [TestUtilities().body_part_soreness(12, 4)]
     post_survey = TestUtilities().get_post_survey(4, soreness_list)
     post_session_survey = \
@@ -400,6 +413,7 @@ def test_no_fs_with_high_post_session_soreness():
     datastore_collection.daily_plan_datastore = daily_plan_datastore
     datastore_collection.daily_readiness_datastore = daily_readiness_datastore
     datastore_collection.post_session_survey_datastore = post_session_datastore
+    datastore_collection.athlete_stats_datastore = athlete_stats_datastore
     tpm = TrainingPlanManager("tester", datastore_collection)
     plan = tpm.create_daily_plan("2018-07-24")
     assert(None is plan.functional_strength_session)
