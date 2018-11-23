@@ -380,7 +380,7 @@ class StatsProcessing(object):
             for s in c.survey.soreness:
                 s.reported_date_time = format_date(c.event_date)
                 # c.survey.soreness[s].reported_date_time = format_date(c.event_date)
-                soreness_list.extend(s)
+                soreness_list.append(s)
             # soreness_list.extend(c.survey.soreness[s])
 
         return soreness_list
