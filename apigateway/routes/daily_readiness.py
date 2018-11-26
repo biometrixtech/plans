@@ -64,6 +64,7 @@ def handle_daily_readiness_create():
         athlete_stats.daily_severe_pain_event_date = plan_event_date
 
         for s in daily_readiness.soreness:
+            print(s.json_serialise())
             athlete_stats.update_historic_soreness(s, plan_event_date)
 
         if 'current_sport_name' in request.json or 'current_position' in request.json:
