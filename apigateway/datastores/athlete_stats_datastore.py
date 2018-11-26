@@ -72,6 +72,7 @@ class AthleteStatsDatastore(object):
         hs.streak = historic_soreness.get('streak', 0.0)
         hs.average_severity = historic_soreness.get('average_severity', 0.0)
         hs.last_reported = historic_soreness.get('last_reported', "")
+        hs.streak_start_date = historic_soreness.get('streak_start_date', "")
 
         return hs
 
