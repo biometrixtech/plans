@@ -58,6 +58,9 @@ def handle_daily_readiness_create():
         plan_event_date = format_date(parse_datetime(event_date))
         athlete_stats_store = AthleteStatsDatastore()
         athlete_stats = athlete_stats_store.get(athlete_id=request.json['user_id'])
+        if athlete_stats is None:
+            athlete_stats = AthleteStats(request.json['user_id'])
+            athlete_stats.event_date = plan_event_date
         athlete_stats.daily_severe_soreness = severe_soreness
         athlete_stats.daily_severe_soreness_event_date = plan_event_date
         athlete_stats.daily_severe_pain = severe_pain
@@ -65,7 +68,6 @@ def handle_daily_readiness_create():
 
         for s in daily_readiness.soreness:
             athlete_stats.update_historic_soreness(s, plan_event_date)
-            print(athlete_stats.historic_soreness[0].json_serialise())
 
         if 'current_sport_name' in request.json or 'current_position' in request.json:
             if athlete_stats is None:
