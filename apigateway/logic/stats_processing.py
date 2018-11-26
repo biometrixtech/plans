@@ -319,14 +319,15 @@ class StatsProcessing(object):
                 grouped_soreness[ns_new] = s.severity
 
         for r in grouped_soreness:
-            if r.is_pain:
-                s = Soreness()
-                s.body_part = BodyPart(r.location, None)
-                s.side = r.side
-                s.reported_date_time = r.reported_date_time
-                s.severity = grouped_soreness[r]
-                merged_soreness_list.append(s)
 
+            s = Soreness()
+            s.body_part = BodyPart(r.location, None)
+            s.side = r.side
+            s.reported_date_time = r.reported_date_time
+            s.severity = grouped_soreness[r]
+            s.pain = r.is_pain
+            merged_soreness_list.append(s)
+        
         return merged_soreness_list
 
     def get_historic_soreness_list(self, soreness_last_7, soreness_8_14, soreness_15_21, soreness_22_28):
