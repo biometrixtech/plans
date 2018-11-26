@@ -104,6 +104,7 @@ class HistoricSoreness(Serialisable):
         self.is_pain = is_pain
         self.side = side
         self.streak = 0
+        self.streak_start_date = None
         self.average_severity = 0.0
         self.last_reported = ""
 
@@ -114,6 +115,7 @@ class HistoricSoreness(Serialisable):
             'is_pain': self.is_pain,
             'side': self.side,
             'streak': self.streak,
+            'streak_start_date': self.streak_start_date,
             'average_severity': self.average_severity,
             'last_reported': self.last_reported
         }
