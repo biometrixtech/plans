@@ -73,7 +73,10 @@ def handle_session_create():
         athlete_stats_store = AthleteStatsDatastore()
         athlete_stats = athlete_stats_store.get(athlete_id=user_id)
         # update session_RPE
-        athlete_stats.session_RPE = survey.RPE
+        if athlete_stats.session_RPE is not None:
+            athlete_stats.session_RPE = max(survey.RPE, athlete_stats.session_RPE)
+        else:
+            athlete_stats.session_RPE = survey.RPE
         athlete_stats.session_RPE_event_date = plan_event_date
 
         # update severe soreness and severe pain

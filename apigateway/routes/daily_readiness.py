@@ -70,10 +70,6 @@ def handle_daily_readiness_create():
             athlete_stats.update_historic_soreness(s, plan_event_date)
 
         if 'current_sport_name' in request.json or 'current_position' in request.json:
-            if athlete_stats is None:
-                athlete_stats = AthleteStats(request.json['user_id'])
-                athlete_stats.event_date = format_date(daily_readiness.event_date)
-
             if 'current_sport_name' in request.json:
                 athlete_stats.current_sport_name = request.json['current_sport_name']
             if 'current_position' in request.json:
