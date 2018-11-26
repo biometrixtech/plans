@@ -72,16 +72,21 @@ def handle_session_create():
 
         athlete_stats_store = AthleteStatsDatastore()
         athlete_stats = athlete_stats_store.get(athlete_id=user_id)
+        # update session_RPE
         athlete_stats.session_RPE = survey.RPE
         athlete_stats.session_RPE_event_date = plan_event_date
 
+        # update severe soreness and severe pain
         soreness = survey.soreness
-        severe_soreness = [s for s in soreness if not s.pain and s.severity >= 3]
+        severe_soreness = [s for s in soreness if not s.pain]
         severe_pain = [s for s in soreness if s.pain]
         athlete_stats.daily_severe_soreness_event_date = plan_event_date
         athlete_stats.daily_severe_pain_event_date = plan_event_date
         athlete_stats.daily_severe_soreness.extend(severe_soreness)
         athlete_stats.daily_severe_pain.extend(severe_pain)
+        # update historic soreness
+        for s in soreness:
+            athlete_stats.update_historic_soreness(s, plan_event_date)
         athlete_stats_store.put(athlete_stats)
 
     if not _check_plan_exists(user_id, plan_event_date):

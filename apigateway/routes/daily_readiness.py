@@ -49,7 +49,7 @@ def handle_daily_readiness_create():
 
     need_stats_update = False
     soreness = daily_readiness.soreness
-    severe_soreness = [s for s in soreness if not s.pain and s.severity >= 3]
+    severe_soreness = [s for s in soreness if not s.pain]
     severe_pain = [s for s in soreness if s.pain]
     if len(soreness) > 0 or 'current_sport_name' in request.json or 'current_position' in request.json:
         need_stats_update = True
@@ -65,7 +65,6 @@ def handle_daily_readiness_create():
 
         for s in daily_readiness.soreness:
             athlete_stats.update_historic_soreness(s, plan_event_date)
-
 
         if 'current_sport_name' in request.json or 'current_position' in request.json:
             if athlete_stats is None:
