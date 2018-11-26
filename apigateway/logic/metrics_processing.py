@@ -1,5 +1,5 @@
 from models.metrics import AthleteRecommendation, DailyHighLevelInsight, MetricType, WeeklyHighLevelInsight
-from models.soreness import HistoricSorenessStatus
+from models.soreness import HistoricSorenessStatus, BodyPartLocationText
 
 
 class MetricsProcessing(object):
@@ -45,7 +45,7 @@ class MetricsProcessing(object):
                     if athlete_stats.daily_severe_soreness >= 4.0:
                         rec.high_level_insight = DailyHighLevelInsight.limit_time_intensity_of_training
 
-                        rec.specific_insight_recovery = ("Severe [bodypart/global] soreness on for the last " + str(t.streak) + " reported days may impact performance & indicate elevated injury risk")
+                        rec.specific_insight_recovery = "Severe {body_part} soreness on for the last " + str(t.streak) + " reported days may impact performance & indicate elevated injury risk".format(body_part=t.body_part.location.name)
                         rec.specific_insight_training_volume = ""
                         rec.recommendations.append("2B")
                         rec.recommendations.append("7A")
@@ -107,14 +107,14 @@ class MetricsProcessing(object):
                     rec.color = "Red"
                     rec.high_level_insight = DailyHighLevelInsight.not_cleared_for_training
                     rec.high_level_action_description = "Pain severity is too high for training today, consult medical staff to evaluate status"
-                    rec.specific_insight_recovery = "Consistent reports of significant [Body Part] pain for the last " + str(t.streak) + " days may be a sign of injury"
+                    rec.specific_insight_recovery = "Consistent reports of significant {body_part} pain for the last " + str(t.streak) + " days may be a sign of injury".format(body_part=t.body_part.location.name)
                     rec.recommendations.append("5A")
                     rec.recommendations.append("2A")
                 else:
                     rec.color = "Yellow"
                     rec.high_level_insight = DailyHighLevelInsight.monitor_in_training
                     rec.high_level_action_description = "Stop training if pain increases and consider reducing workload to facilitate recovery"
-                    rec.specific_insight_recovery = "Consistent reports of significant [Body Part] pain for the last " + str(t.streak) + " days may be a sign of injury"
+                    rec.specific_insight_recovery = "Consistent reports of significant {body_part} pain for the last " + str(t.streak) + " days may be a sign of injury".format(body_part=t.body_part.location.name)
                     rec.recommendations.append("6A")
                     rec.recommendations.append("7B")
                 recommendations.append(rec)
@@ -248,3 +248,18 @@ class MetricsProcessing(object):
                 recommendations.append(rec)
 
         return recommendations
+
+    def _get_body_part_text(self, soreness_list):
+        body_part_text = BodyPartLocationText().body_part_text
+        body_part_list = []
+        for soreness in soreness_list:
+            part = body_part_text[soreness.body_part.location.name]
+            side = soreness.body_part.side
+            if side == 0:
+                text = part
+            elif side == 1:
+                text = ' '.join(['left', part])
+            elif side == 2:
+                text = ' '.join(['right', part])
+            body_part_list.append(text)
+        return body_part_list
