@@ -7,7 +7,7 @@ class AthleteRecommendation(object):
         self.metric_type = MetricType.daily
         self.threshold = 0.0
         self.color = ""
-        self.high_level_insight = ""
+        self.high_level_insight = None
         self.high_level_action_description = ""
         self.specific_insight_training_volume = ""
         self.specific_insight_recovery = ""
