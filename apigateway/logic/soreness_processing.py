@@ -93,6 +93,7 @@ class SorenessCalculator(object):
     def merge_current_historic_soreness(self, soreness_list, historic_soreness):
 
         for h in range(0, len(historic_soreness)):
+            print(historic_soreness[h].json_serialise())
             historic_soreness_found = False
             for s in range(0, len(soreness_list)):
                 if (soreness_list[s].body_part.location == historic_soreness[h].body_part_location and
