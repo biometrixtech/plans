@@ -497,7 +497,6 @@ class RecoverySession(Serialisable):
 
         if soreness_list is not None:
             for soreness in soreness_list:
-                print(soreness.json_serialise())
                 max_severity = max(max_severity, soreness.severity)
                 if soreness.historic_soreness_status is not None:
                     historic_soreness_present = True
