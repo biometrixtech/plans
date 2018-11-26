@@ -104,6 +104,7 @@ class SorenessCalculator(object):
                 new_soreness = Soreness()
                 new_soreness.pain = historic_soreness[h].is_pain
                 new_soreness.side = historic_soreness[h].side
+                new_soreness.severity = historic_soreness[h].average_severity
                 new_soreness.body_part = BodyPart(historic_soreness[h].body_part_location, None)
                 soreness_list.append(new_soreness)
 
