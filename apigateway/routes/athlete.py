@@ -32,7 +32,7 @@ def create_daily_plan(athlete_id):
             "call_to_action": "VIEW_PLAN"}
     _notify_user(athlete_id, body)
 
-    Service('plans', Config.get('API_VERSION')).call_apigateway_async('POST', f"athlete/{athlete_id}/stats")
+    # Service('plans', Config.get('API_VERSION')).call_apigateway_async('POST', f"athlete/{athlete_id}/stats")
 
     return {'message': 'Update requested'}, 202
 
