@@ -1,5 +1,5 @@
 from models.stats import AthleteStats
-from models.metrics import AthleteRecommendation
+from models.metrics import AthleteMetric
 from models.soreness import Soreness, BodyPart, BodyPartLocation
 from datetime import datetime, timedelta
 import statistics
@@ -89,7 +89,7 @@ class StatsProcessing(object):
 
     def get_athlete_metrics(self, athlete_id, event_date):
 
-        athlete_metric = AthleteRecommendation()
+        athlete_metric = AthleteMetric()
         athlete_metric.three_day_consecutive_pain = 0.0
 
     def calc_training_volume_metrics(self, athlete_stats):
