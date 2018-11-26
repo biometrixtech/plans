@@ -1,4 +1,4 @@
-from models.metrics import AthleteRecommendation, MetricType
+from models.metrics import AthleteRecommendation, DailyHighLevelInsight, MetricType, WeeklyHighLevelInsight
 from models.soreness import HistoricSorenessStatus
 
 
@@ -20,7 +20,7 @@ class MetricsProcessing(object):
                     rec.color = "Red"
                 elif 6.0 <= athlete_stats.session_RPE < 8.0:
                     rec.color = "Yellow"
-                rec.high_level_insight = "Limit Time & Intensity of Training"
+                rec.high_level_insight = DailyHighLevelInsight.limit_time_intensity_of_training
                 rec.high_level_action_description = "Shorten training or limit intensity and focus on recovery modalities"
                 rec.specific_insight_recovery = ""
                 rec.specific_insight_training_volume = ("A spike in workload on "+athlete_stats.session_RPE_event_date +
@@ -43,7 +43,7 @@ class MetricsProcessing(object):
                     rec.color = "Yellow"
                     rec.high_level_action_description = "Stop training if pain increases and consider reducing workload to facilitate recovery"
                     if athlete_stats.daily_severe_soreness >= 4.0:
-                        rec.high_level_insight = "Limit Time & Intensity of Training"
+                        rec.high_level_insight = DailyHighLevelInsight.limit_time_intensity_of_training
 
                         rec.specific_insight_recovery = ("Severe [bodypart/global] soreness on for the last " + str(t.streak) + " reported days may impact performance & indicate elevated injury risk")
                         rec.specific_insight_training_volume = ""
@@ -51,7 +51,7 @@ class MetricsProcessing(object):
                         rec.recommendations.append("7A")
                         rec.recommendations.append("6B")
                     elif 3.0 <= athlete_stats.daily_severe_soreness < 4.0 :
-                        rec.high_level_insight = "Monitor in Training, Moderate if Needed"
+                        rec.high_level_insight = DailyHighLevelInsight.monitor_in_training
                         rec.specific_insight_recovery = "Elevated [body part] soreness which may impact performance"
                         rec.specific_insight_training_volume = ""
                         rec.recommendations.append("6A")
@@ -72,7 +72,7 @@ class MetricsProcessing(object):
                 rec.high_level_action_description = "Stop training if pain increases and consider reducing workload to facilitate recovery"
                 if athlete_stats.daily_severe_pain <= 2.0:
                     rec.color = "Yellow"
-                    rec.high_level_insight = "Monitor in Training, Moderate if Needed"
+                    rec.high_level_insight = DailyHighLevelInsight.monitor_in_training
                     rec.specific_insight_recovery = ("Low severity [body part] pain which should be monitored to prevent the development of injury")
                     rec.specific_insight_training_volume = ""
                     rec.recommendations.append("6A")
@@ -80,7 +80,7 @@ class MetricsProcessing(object):
 
                 elif 2.0 < athlete_stats.daily_severe_pain < 4.0:
                     rec.color = "Yellow"
-                    rec.high_level_insight = "Limit Time & Intensity of Training"
+                    rec.high_level_insight = DailyHighLevelInsight.limit_time_intensity_of_training
                     rec.specific_insight_recovery = "Elevated [body part] pain which should be monitored to prevent injury"
                     rec.specific_insight_training_volume = ""
                     rec.recommendations.append("2B")
@@ -88,7 +88,7 @@ class MetricsProcessing(object):
                     rec.recommendations.append("6A")
                 elif athlete_stats.daily_severe_pain >= 4.0:
                     rec.color = "Red"
-                    rec.high_level_insight = "Not cleared for Training"
+                    rec.high_level_insight = DailyHighLevelInsight.not_cleared_for_training
                     rec.specific_insight_recovery = "[body part] pain severity that is too high to train today and may indicate injury"
                     rec.specific_insight_training_volume = ""
                     rec.recommendations.append("5A")
@@ -105,14 +105,14 @@ class MetricsProcessing(object):
                 rec.body_part_side = t.side
                 if rec.threshold >= 3:
                     rec.color = "Red"
-                    rec.high_level_insight = "Not Cleared for Training"
+                    rec.high_level_insight = DailyHighLevelInsight.not_cleared_for_training
                     rec.high_level_action_description = "Pain severity is too high for training today, consult medical staff to evaluate status"
                     rec.specific_insight_recovery = "Consistent reports of significant [Body Part] pain for the last " + str(t.streak) + " days may be a sign of injury"
                     rec.recommendations.append("5A")
                     rec.recommendations.append("2A")
                 else:
                     rec.color = "Yellow"
-                    rec.high_level_insight = "Monitor in Training, Moderate if Needed"
+                    rec.high_level_insight = DailyHighLevelInsight.monitor_in_training
                     rec.high_level_action_description = "Stop training if pain increases and consider reducing workload to facilitate recovery"
                     rec.specific_insight_recovery = "Consistent reports of significant [Body Part] pain for the last " + str(t.streak) + " days may be a sign of injury"
                     rec.recommendations.append("6A")
@@ -127,7 +127,7 @@ class MetricsProcessing(object):
                 rec.threshold = t.average_severity
                 rec.body_part_location = t.body_part.location.value
                 rec.body_part_side = t.side
-                rec.high_level_insight = "Address Pain or Soreness"
+                rec.high_level_insight = WeeklyHighLevelInsight.address_pain_or_soreness
                 rec.high_level_action_description = "Prioritize Recovery and consider decreasing upcoming workloads"
                 if rec.threshold >= 4:
                     rec.color = "Red"
@@ -157,7 +157,7 @@ class MetricsProcessing(object):
                 rec.threshold = t.average_severity
                 rec.body_part_location = t.body_part.location.value
                 rec.body_part_side = t.side
-                rec.high_level_insight = "Address Pain or Soreness"
+                rec.high_level_insight = WeeklyHighLevelInsight.address_pain_or_soreness
                 rec.high_level_action_description = "Prioritize Recovery and consider decreasing upcoming workloads"
                 if rec.threshold >= 4:
                     rec.color = "Red"
@@ -188,7 +188,7 @@ class MetricsProcessing(object):
                 rec.threshold = t.average_severity
                 rec.body_part_location = t.body_part.location.value
                 rec.body_part_side = t.side
-                rec.high_level_insight = "Address Pain or Soreness"
+                rec.high_level_insight = WeeklyHighLevelInsight.address_pain_or_soreness
                 rec.high_level_action_description = "Prioritize Recovery and consider decreasing upcoming workloads"
                 if rec.threshold >= 4:
                     rec.color = "Red"
@@ -221,7 +221,7 @@ class MetricsProcessing(object):
                 rec.threshold = t.average_severity
                 rec.body_part_location = t.body_part.location.value
                 rec.body_part_side = t.side
-                rec.high_level_insight = "Address Pain or Soreness"
+                rec.high_level_insight = WeeklyHighLevelInsight.address_pain_or_soreness
                 rec.high_level_action_description = "Prioritize Recovery and consider decreasing upcoming workloads"
                 if rec.threshold >= 4:
                     rec.color = "Red"

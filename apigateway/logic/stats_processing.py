@@ -243,7 +243,7 @@ class StatsProcessing(object):
         soreness_list.extend(soreness_list_15_21_days)
         soreness_list.extend(soreness_list_22_28_days)
 
-        streak_soreness = self.get_soreness_streaks(soreness_list)
+        streak_soreness, streak_start_soreness = self.get_soreness_streaks(soreness_list)
 
         historic_soreness = self.get_historic_soreness_list(soreness_list_last_7_days,
                                                             soreness_list_8_14_days,
@@ -255,8 +255,8 @@ class StatsProcessing(object):
                 if (s.side == historic_soreness[h].side and s.is_pain == historic_soreness[h].is_pain
                         and s.location == historic_soreness[h].body_part_location):
                     historic_soreness[h].streak = streak_soreness[s]
+                    historic_soreness[h].streak_start_date = streak_start_soreness[s]
                     historic_soreness[h].average_severity = s.avg_severity
-                    #historic_soreness[h].last_reported =
 
         return historic_soreness
 
@@ -264,6 +264,7 @@ class StatsProcessing(object):
 
         grouped_soreness = {}
         streak_soreness = {}
+        streak_start_soreness = {}
 
         ns = namedtuple("ns", ["location", "is_pain", "side"])
         ns_2 = namedtuple("ns", ["location", "is_pain", "side", "avg_severity"])
@@ -277,12 +278,14 @@ class StatsProcessing(object):
 
         for g in grouped_soreness:
             streak = 1
+            streak_start_date = None
             body_part_history = list(s for s in soreness_list if s.body_part.location ==
                                      g.location and s.side == g.side and s.pain == g.is_pain)
             body_part_history.sort(key=lambda x: x.reported_date_time, reverse=True)
             severity = 0.0
             if len(body_part_history) >= 2:
                 for b in range(0,len(body_part_history)-1):
+                    streak_start_date = body_part_history[b].reported_date_time
                     days_skipped = (parse_date(body_part_history[b].reported_date_time) -
                                     parse_date(body_part_history[b + 1].reported_date_time)).days
 
@@ -295,9 +298,11 @@ class StatsProcessing(object):
                 severity += body_part_history[b].severity
 
             nsd_new = ns_2(g.location, g.is_pain, g.side, severity/float(streak))
+            ns_ss = ns_2(g.location, g.is_pain, g.side, severity/float(streak))
             streak_soreness[nsd_new] = streak
+            streak_start_soreness[ns_ss] = streak_start_date
 
-        return streak_soreness
+        return streak_soreness, streak_start_soreness
 
     def merge_soreness_from_surveys(self, readiness_survey_soreness_list, ps_survey_soreness_list):
 
@@ -327,7 +332,7 @@ class StatsProcessing(object):
             s.severity = grouped_soreness[r]
             s.pain = r.is_pain
             merged_soreness_list.append(s)
-        
+
         return merged_soreness_list
 
     def get_historic_soreness_list(self, soreness_last_7, soreness_8_14, soreness_15_21, soreness_22_28):
