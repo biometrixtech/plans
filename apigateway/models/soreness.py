@@ -147,7 +147,7 @@ class BodyPartLocationText(object):
                           'achilles': 'achilles',
                           'upper_back_neck': 'upper back'}
 
-        return body_part_text[self.body_part_location]
+        return body_part_text[self.body_part_location.name]
 
 
 

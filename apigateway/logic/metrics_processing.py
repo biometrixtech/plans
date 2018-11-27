@@ -89,7 +89,7 @@ class DailySeverePainMetricGenerator(AthleteMetricGenerator):
 class ThreeDayConsecutivePainMetricGenerator(AthleteMetricGenerator):
     def __init__(self, soreness_list):
         super(ThreeDayConsecutivePainMetricGenerator, self).__init__("3 Day Consecutive Pain", MetricType.daily,
-                                                                     soreness_list, "severity")
+                                                                     soreness_list, "average_severity")
         self.high_level_action_description = ""
         self.thresholds[0] = ThresholdRecommendation(MetricColor.red,
                                                      DailyHighLevelInsight.not_cleared_for_training,
@@ -107,7 +107,7 @@ class ThreeDayConsecutivePainMetricGenerator(AthleteMetricGenerator):
 class PersistentSorenessMetricGenerator(AthleteMetricGenerator):
     def __init__(self, soreness_list):
         super(PersistentSorenessMetricGenerator, self).__init__("Persistent Soreness", MetricType.longitudinal,
-                                                                soreness_list, "severity")
+                                                                soreness_list, "average_severity")
         self.high_level_action_description = "Prioritize Recovery and consider decreasing upcoming workloads"
         self.thresholds[0] = ThresholdRecommendation(MetricColor.yellow,
                                                      WeeklyHighLevelInsight.evaluate_health_status,
@@ -130,7 +130,7 @@ class PersistentSorenessMetricGenerator(AthleteMetricGenerator):
 class ChronicSorenessMetricGenerator(AthleteMetricGenerator):
     def __init__(self, soreness_list):
         super(ChronicSorenessMetricGenerator, self).__init__("Chronic Soreness", MetricType.longitudinal,
-                                                             soreness_list, "severity")
+                                                             soreness_list, "average_severity")
         self.high_level_action_description = "Prioritize Recovery and consider decreasing upcoming workloads"
         self.thresholds[0] = ThresholdRecommendation(MetricColor.yellow,
                                                      WeeklyHighLevelInsight.evaluate_health_status,
@@ -153,7 +153,7 @@ class ChronicSorenessMetricGenerator(AthleteMetricGenerator):
 class PersistentPainMetricGenerator(AthleteMetricGenerator):
     def __init__(self, soreness_list):
         super(PersistentPainMetricGenerator, self).__init__("Persistent Pain", MetricType.longitudinal,
-                                                            soreness_list, "severity")
+                                                            soreness_list, "average_severity")
         self.high_level_action_description = "Prioritize Recovery and consider decreasing upcoming workloads"
         self.thresholds[0] = ThresholdRecommendation(MetricColor.red,
                                                      WeeklyHighLevelInsight.evaluate_health_status,
@@ -176,7 +176,7 @@ class PersistentPainMetricGenerator(AthleteMetricGenerator):
 class ChronicPainMetricGenerator(AthleteMetricGenerator):
     def __init__(self, soreness_list):
         super(ChronicPainMetricGenerator, self).__init__("Chronic Pain", MetricType.longitudinal,
-                                                         soreness_list, "severity")
+                                                         soreness_list, "average_severity")
         self.high_level_action_description = "Prioritize Recovery and consider decreasing upcoming workloads"
         self.thresholds[0] = ThresholdRecommendation(MetricColor.red,
                                                      WeeklyHighLevelInsight.evaluate_health_status,

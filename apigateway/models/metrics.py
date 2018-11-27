@@ -28,7 +28,7 @@ class AthleteMetricGenerator(object):
     def populate_thresholds_with_soreness(self):
 
         for s in self.soreness:
-            for t, v in self.thresholds:
+            for t, v in self.thresholds.items():
                 if v.low_value is not None and v.high_value is not None:
                     if v.low_value <= getattr(s, self.threshold_attribute) < v.high_value:
                         v.soreness_list.append(s)
@@ -36,14 +36,17 @@ class AthleteMetricGenerator(object):
                     if v.low_value <= getattr(s, self.threshold_attribute):
                         v.soreness_list.append(s)
                 if v.low_value is None and v.high_value is not None:
-                    if v.high_value < getattr(s, self.threshold_attribute):
+                    if v.high_value <= getattr(s, self.threshold_attribute):
                         v.soreness_list.append(s)
 
     def get_body_part_text(self, text, soreness_list):
 
         body_part_list = []
         for soreness in soreness_list:
-            part = BodyPartLocationText(soreness.body_part.location).value()
+            try:
+                part = BodyPartLocationText(soreness.body_part.location).value()
+            except:
+                part = BodyPartLocationText(soreness.body_part_location).value()
             side = soreness.side
             if side == 1:
                 body_text = ' '.join(['left', part])
@@ -64,11 +67,12 @@ class AthleteMetricGenerator(object):
         metric_list = []
 
         for key in sorted(self.thresholds.keys()):
-            metric = AthleteMetric(self.name, self.metric_type)
-            metric.high_level_action_description = self.thresholds[key].high_level_action_description
-            metric.specific_insight_recovery = self.get_body_part_text(self.thresholds[key].specific_insight_recovery,
-                                                                       self.thresholds[key].soreness_list)
-            metric_list.append(metric)
+            if len(self.thresholds[key].soreness_list) > 0:
+                metric = AthleteMetric(self.name, self.metric_type)
+                metric.high_level_action_description = self.thresholds[key].high_level_action_description
+                metric.specific_insight_recovery = self.get_body_part_text(self.thresholds[key].specific_insight_recovery,
+                                                                           self.thresholds[key].soreness_list)
+                metric_list.append(metric)
 
         return metric_list
 
