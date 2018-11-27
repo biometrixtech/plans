@@ -89,7 +89,7 @@ class DailySeverePainMetricGenerator(AthleteMetricGenerator):
 class ThreeDayConsecutivePainMetricGenerator(AthleteMetricGenerator):
     def __init__(self, soreness_list):
         super(ThreeDayConsecutivePainMetricGenerator, self).__init__("3 Day Consecutive Pain", MetricType.daily,
-                                                                     soreness_list, "streak")
+                                                                     soreness_list, "severity")
         self.high_level_action_description = ""
         self.thresholds[0] = ThresholdRecommendation(MetricColor.red,
                                                      DailyHighLevelInsight.not_cleared_for_training,
