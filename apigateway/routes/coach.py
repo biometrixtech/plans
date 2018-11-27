@@ -38,12 +38,12 @@ def get_dashboard_data(user_id):
             athlete_stats = athlete_stats_datastore.get(user_id)
             if athlete_stats is not None:
                 athlete = AthleteDashboardData(user['user_id'], user['first_name'], user['last_name'])
-                for metric in athlete.metrics:
+                for metric in athlete_stats.metrics:
                     # update athlete card based on insight
                     athlete.insights.append(metric.specific_insight_training_volume)
                     athlete.insights.append(metric.specific_insight_recovery)
                     athlete.color = MetricColor(max([athlete.color.value, metric.color.value]))
-                    athlete.cleared_to_train = athlete.determine_if_cleared_to_play()
+                    athlete.cleared_to_train = False if athlete.color.value == 2 else True
                     # update team card for the athlete
                     if metric.metric_type == MetricType.daily:
                         team.add_user_to_daily_report(user, metric)
@@ -51,9 +51,13 @@ def get_dashboard_data(user_id):
                     elif metric.metric_type == MetricType.longitudional:
                         team.add_user_to_weekly_report(user, metric)
                         athlete.weekly_recommendation.extend(metric.specific_actions)
+                athlete.insights = insights = [i for i in athlete.insights if i != '']
+                athlete.daily_recommendation = list(set(athlete.daily_recommendation))
+                athlete.weekly_recommendation = list(set(athlete.weekly_recommendation))
         # consodilate weekly and daily card for team
         for v in team.daily_insights_dict.items():
-            team.daily_insights.append(v)
+            for user in v:
+                team.daily_insights[].append(v)
         for v in team.weekly_insights_dict.items():
             team.weekly_insights.append(v)
         print(team.json_serialise())
