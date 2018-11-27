@@ -56,6 +56,7 @@ class AthleteStats(Serialisable):
         self.daily_severe_pain = []
         self.daily_severe_pain_event_date = None
         self.daily_severe_soreness_event_date = None
+        self.metrics = []
 
     def update_historic_soreness(self, soreness, event_date):
 
@@ -218,6 +219,7 @@ class AthleteStats(Serialisable):
             'daily_severe_pain': [s.json_serialise() for s in self.daily_severe_pain],
             'daily_severe_soreness': [s.json_serialise() for s in self.daily_severe_soreness],
             'daily_severe_soreness_event_date': self.daily_severe_soreness_event_date,
-            'daily_severe_pain_event_date': self.daily_severe_pain_event_date
+            'daily_severe_pain_event_date': self.daily_severe_pain_event_date,
+            'metrics': [m.json_serialise() for m in self.metrics]
         }
         return ret

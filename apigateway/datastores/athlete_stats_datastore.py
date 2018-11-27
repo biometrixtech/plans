@@ -2,6 +2,7 @@ from aws_xray_sdk.core import xray_recorder
 from config import get_mongo_collection
 from models.stats import AthleteStats
 from models.soreness import BodyPartLocation, HistoricSoreness, HistoricSorenessStatus, Soreness, BodyPart
+from models.metrics import AthleteMetric, MetricType, DailyHighLevelInsight, WeeklyHighLevelInsight, MetricColor
 
 
 class AthleteStatsDatastore(object):
@@ -51,6 +52,7 @@ class AthleteStatsDatastore(object):
                                                    for s in mongo_result.get('daily_severe_pain', [])]
             athlete_stats.daily_severe_soreness_event_date = mongo_result.get('daily_severe_soreness_event_date', None)
             athlete_stats.daily_severe_pain_event_date = mongo_result.get('daily_severe_soreness_event_date', None)
+            athlete_stats.metrics = [self._metrics_from_mongodb(s) for s in mongo_result.get('metrics', [])]
             return athlete_stats
 
         else:
@@ -83,5 +85,22 @@ class AthleteStatsDatastore(object):
         soreness.severity = soreness_dict['severity']
         soreness.side = soreness_dict.get('side', None)
         return soreness
+
+    def _metrics_from_mongodb(self, metric):
+        rec = AthleteMetric(metric['name'], MetricType(metric['metric_type']))
+        rec.color = MetricColor(metric.get('color', 0))
+        high_level_insight = metric.get('high_level_insight', 0)
+        if rec.metric_type == MetricType.daily:
+            rec.high_level_insight = DailyHighLevelInsight(high_level_insight)
+        else:
+            rec.high_level_insight = WeeklyHighLevelInsight(high_level_insight)
+        rec.high_level_action_description = metric.get('high_level_action_description', "")
+        rec.specific_insight_training_volume = metric.get('specific_insight_training_volume', "")
+        rec.specific_insight_recovery = metric.get('specific_insight_recovery', 0)
+        # rec.body_part_location = metric.get('body_part_location', None)
+        # rec.body_part_side = metric.get('body_part_side', None)
+        # rec.soreness = [self._soreness_from_mongodb(s) for s in metric.get('soreness', [])]
+        rec.specific_actions = metric.get('specific_actions', [])
+
 
 
