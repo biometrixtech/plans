@@ -285,7 +285,9 @@ class StatsProcessing(object):
             severity = 0.0
             if len(body_part_history) >= 2:
                 for b in range(0,len(body_part_history)-1):
-                    streak_start_date = body_part_history[b].reported_date_time
+                    if (streak_start_date is None or parse_date(body_part_history[b].reported_date_time)
+                            < parse_date(streak_start_date)):
+                        streak_start_date = body_part_history[b].reported_date_time
                     days_skipped = (parse_date(body_part_history[b].reported_date_time) -
                                     parse_date(body_part_history[b + 1].reported_date_time)).days
 
