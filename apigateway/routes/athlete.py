@@ -44,7 +44,10 @@ def create_daily_plan(athlete_id):
 @require.authenticated.any
 @xray_recorder.capture('routes.athlete.stats.update')
 def update_athlete_stats(athlete_id):
-    event_date = request.json.get('event_date', None)
+    if 'event_date' in request.json:
+        event_date = request.json['event_date']
+    else:
+        event_date = None
     StatsProcessing(athlete_id, event_date=event_date, datastore_collection=DatastoreCollection()).process_athlete_stats()
 
     if event_date is not None:
