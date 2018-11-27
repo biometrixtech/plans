@@ -35,3 +35,4 @@ class WeeklyHighLevelInsight(Enum):
     add_variety_to_training_risk = 2
     increase_weekly_workload = 3
     address_pain_or_soreness = 4
+    evaluate_health_status = 5

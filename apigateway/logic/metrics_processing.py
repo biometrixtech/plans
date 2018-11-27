@@ -170,12 +170,13 @@ class MetricsProcessing(object):
 
                 rec = AthleteMetric("Persistent Soreness", MetricType.longitudinal)
 
-                rec.high_level_insight = WeeklyHighLevelInsight.address_pain_or_soreness
                 rec.high_level_action_description = "Prioritize Recovery and consider decreasing upcoming workloads"
 
                 if t.average_severity>= 4:
                     if 2 not in met_dict:
-                        rec.color = "Red"
+                        rec.color = "Yellow"
+                        rec.high_level_action_description = "Consult medical staff to evaluate status before training"
+                        rec.high_level_insight = WeeklyHighLevelInsight.evaluate_health_status
                         rec.specific_insight_recovery = "a "+ str(t.streak) + " day trend of persistent, severe [body part] soreness impacting performance & indicating elevated injury risk"
                         rec.specific_actions.append("7A")
 
@@ -186,6 +187,7 @@ class MetricsProcessing(object):
                 elif 2 < t.average_severity < 4:
                     if 1 not in met_dict:
                         rec.color = "Yellow"
+                        rec.high_level_insight = WeeklyHighLevelInsight.address_pain_or_soreness
                         rec.specific_insight_recovery = "a " + str(
                             t.streak) + " day trend of persistent, moderate [body part] soreness impacting performance & indicating elevated injury risk"
                         rec.specific_actions.append("7A")
@@ -199,6 +201,7 @@ class MetricsProcessing(object):
                 else:
                     if 0 not in met_dict:
                         rec.color = "Green"
+                        rec.high_level_insight = WeeklyHighLevelInsight.address_pain_or_soreness
                         rec.specific_insight_recovery = "a " + str(
                             t.streak) + " day trend of persistent, mild [body part] soreness impacting performance & indicating elevated injury risk"
                         # NONE
@@ -217,12 +220,12 @@ class MetricsProcessing(object):
             if t.historic_soreness_status == HistoricSorenessStatus.chronic and not t.is_pain:
                 rec = AthleteMetric("Chronic Soreness", MetricType.longitudinal)
 
-                rec.high_level_insight = WeeklyHighLevelInsight.address_pain_or_soreness
                 rec.high_level_action_description = "Prioritize Recovery and consider decreasing upcoming workloads"
 
                 if t.average_severity >= 4:
                     if 2 not in met_dict:
-                        rec.color = "Red"
+                        rec.color = "Yellow"
+                        rec.high_level_insight = WeeklyHighLevelInsight.evaluate_health_status
                         rec.specific_insight_recovery = "a "+ str(t.streak) + " day trend of chronic, severe [body part] soreness impacting performance & indicating elevated injury risk"
                         rec.specific_actions.append("3B")
                         rec.specific_actions.append("7A")
@@ -234,6 +237,7 @@ class MetricsProcessing(object):
                 elif 2 < t.average_severity < 4:
                     if 1 not in met_dict:
                         rec.color = "Yellow"
+                        rec.high_level_insight = WeeklyHighLevelInsight.address_pain_or_soreness
                         rec.specific_insight_recovery = "a " + str(
                             t.streak) + " day trend of chronic, moderate [body part] soreness impacting performance & indicating elevated injury risk"
                         rec.specific_actions.append("7A")
@@ -246,6 +250,7 @@ class MetricsProcessing(object):
                 else:
                     if 0 not in met_dict:
                         rec.color = "Green"
+                        rec.high_level_insight = WeeklyHighLevelInsight.address_pain_or_soreness
                         rec.specific_insight_recovery = "a " + str(
                             t.streak) + " day trend of chronic, mild [body part] soreness impacting performance & indicating elevated injury risk"
                         rec.specific_actions.append("7A")
@@ -263,13 +268,14 @@ class MetricsProcessing(object):
             if t.historic_soreness_status == HistoricSorenessStatus.persistent and t.is_pain:
 
                 rec = AthleteMetric("Persistent Pain", MetricType.longitudinal)
-                rec.high_level_insight = WeeklyHighLevelInsight.address_pain_or_soreness
+
                 rec.high_level_action_description = "Prioritize Recovery and consider decreasing upcoming workloads"
                 if t.average_severity >= 4:
                     if 2 not in met_dict:
                         rec.color = "Red"
+                        rec.high_level_insight = WeeklyHighLevelInsight.evaluate_health_status
                         rec.specific_insight_recovery = "a " + str(
-                            t.streak) + " day trend of persistent, severe [body part] pain impacting performance & indicating elevated injury risk"
+                            t.streak) + " day trend of persistent, severe [body part] pain which may indicate injury"
                         rec.specific_actions.append("5A")
                         rec.specific_actions.append("2A")
                         rec.specific_actions.append("3A")
@@ -281,6 +287,7 @@ class MetricsProcessing(object):
                 elif 2 < t.average_severity < 4:
                     if 1 not in met_dict:
                         rec.color = "Yellow"
+                        rec.high_level_insight = WeeklyHighLevelInsight.address_pain_or_soreness
                         rec.specific_insight_recovery = "a " + str(
                             t.streak) + " day trend of persistent, moderate [body part] pain impacting performance & indicating elevated injury risk"
                         rec.specific_actions.append("6B")
@@ -294,6 +301,7 @@ class MetricsProcessing(object):
                 else:
                     if 0 not in met_dict:
                         rec.color = "Green"
+                        rec.high_level_insight = WeeklyHighLevelInsight.address_pain_or_soreness
                         rec.specific_insight_recovery = "a " + str(
                             t.streak) + " day trend of persistent, mild [body part] pain impacting performance & indicating elevated injury risk"
                         rec.specific_actions.append("7A")
@@ -311,13 +319,14 @@ class MetricsProcessing(object):
             if t.historic_soreness_status == HistoricSorenessStatus.chronic and t.is_pain:
 
                 rec = AthleteMetric("Chronic Pain", MetricType.longitudinal)
-                rec.high_level_insight = WeeklyHighLevelInsight.address_pain_or_soreness
+
                 rec.high_level_action_description = "Prioritize Recovery and consider decreasing upcoming workloads"
                 if t.average_severity >= 4:
                     if 2 not in met_dict:
                         rec.color = "Red"
+                        rec.high_level_insight = WeeklyHighLevelInsight.evaluate_health_status
                         rec.specific_insight_recovery = "a " + str(
-                            t.streak) + " day trend of chronic, severe [body part] pain impacting performance & indicating elevated injury risk"
+                            t.streak) + " day trend of chronic, severe [body part] pain may indicate injury"
                         rec.specific_actions.append("5A")
                         rec.specific_actions.append("2A")
                         rec.specific_actions.append("3A")
@@ -329,6 +338,7 @@ class MetricsProcessing(object):
                 elif 2 < t.average_severity < 4:
                     if 1 not in met_dict:
                         rec.color = "Yellow"
+                        rec.high_level_insight = WeeklyHighLevelInsight.address_pain_or_soreness
                         rec.specific_insight_recovery = "a " + str(
                             t.streak) + " day trend of chronic, moderate [body part] pain impacting performance & indicating elevated injury risk"
                         rec.specific_actions.append("6B")
@@ -342,6 +352,7 @@ class MetricsProcessing(object):
                 else:
                     if 0 not in met_dict:
                         rec.color = "Green"
+                        rec.high_level_insight = WeeklyHighLevelInsight.address_pain_or_soreness
                         rec.specific_insight_recovery = "a " + str(
                             t.streak) + " day trend of chronic, mild [body part] pain impacting performance & indicating elevated injury risk"
                         rec.specific_actions.append("7A")
