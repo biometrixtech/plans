@@ -1,4 +1,4 @@
-from enum import Enum
+from enum import Enum, IntEnum
 
 
 class AthleteMetric(object):
@@ -36,3 +36,9 @@ class WeeklyHighLevelInsight(Enum):
     increase_weekly_workload = 3
     address_pain_or_soreness = 4
     evaluate_health_status = 5
+
+
+class MetricColor(IntEnum):
+    green = 0
+    yellow = 1
+    red = 2
