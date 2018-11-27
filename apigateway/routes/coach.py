@@ -2,16 +2,17 @@ from fathomapi.api.config import Config
 from fathomapi.comms.service import Service
 from fathomapi.utils.decorators import require
 from fathomapi.utils.xray import xray_recorder
-from fathomapi.utils.exceptions import NoSuchEntityException
+# from fathomapi.utils.exceptions import NoSuchEntityException
 from flask import Blueprint, request
-from datastores.datastore_collection import DatastoreCollection
-from serialisable import json_serialise
-from utils import parse_date, parse_datetime, format_date, format_datetime
-import boto3
-import json
-import os
-import datetime
-import random
+# from datastores.datastore_collection import DatastoreCollection
+# from serialisable import json_serialise
+# from models.metrics import MetricType, DailyHighLevelInsight, WeeklyHighLevelInsight, MetricColor
+# from utils import parse_date, parse_datetime, format_date, format_datetime
+# import boto3
+# import json
+# import os
+# import datetime
+# import random
 
 
 app = Blueprint('coach', __name__)
@@ -23,19 +24,39 @@ USERS_API_VERSION = '2_1'
 @xray_recorder.capture('routes.team.dashboard.get')
 def get_dashboard_data(user_id):
     # team_ids = _get_teams(user_id)
+    # athlete_stats_datastore = DatastoreCollection().athlete_stats_datastore
+    # count = 0
     # for team_id in team_ids:
+    #   team_name = str(count)
+    #     team = TeamDashboardData(team)
     #     completed = []
     #     incomplete = []
     #     users = _get_users_in_team(team_id)
     #     for user_id in users:
     #         user = _get_user(user_id)
-    #         start_date = '2018-11-21'
-    #         end_date = '2018-11-21'
+    #         start_date = '2018-11-27'
+    #         end_date = '2018-11-27'
     #         if DatastoreCollection().daily_plan_datastore.get(user_id, start_date, end_date)[0].daily_readiness_survey_completed():
     #             completed.append(user)
     #         else:
     #             incomplete.append(user)
-    #     print(users, completed, incomplete)
+    #         athlete_stats = athlete_stats_datastore.get(user_id)
+    #         if athlete_stats is not None:
+    #             athlete = AthleteDashboardData(user['user_id'], user['first_name'], usser['last_name'])
+    #             for metric in athlete.metrics:
+    #                 athlete.insights.append(metric.specific_insight_training_volume)
+    #                 athlete.insights.append(metric.specific_insight_recovery)
+    #                 if metric.metric_type == MetricType.daily:
+    #                     team.add_user_to_daily_report(user, metric)
+    #                     athlete.daily_recommendation.extend(metric.specific_actions)
+    #                 elif metric.metric_type == MetricType.longitudional:
+    #                     team.add_user_to_weekly_report(user, metric)
+    #                     athlete.weekly_recommendation.extend(metric.specific_actions)
+    #                 athlete.color = MetricColor(max([athlete.color.value, metric.color.value]))
+    #                 athlete.cleared_to_train = athlete.determine_if_cleared_to_play()
+    #
+    #   count += 1
+
 
     teams = [{"name": "fathom",
             "compliance": {

@@ -20,6 +20,18 @@ class AthleteStatsDatastore(object):
                 self._put_mongodb(item)
         except Exception as e:
             raise e
+    def get_many(self, athletes):
+        if not isinstance(athletes, list):
+            athletes = [athletes]
+        athlete_stats_list = []
+        for athlete in athletes:
+            athlete_stats = _query_mongodb(self, athlete)
+            if athlete_stats is None:
+                # athlete_stats = AthleteStats(athlete_id=)
+                pass
+            else:
+                athlete_stats_list.append(athlete_stats)
+        return athlete_stats_list
 
     @xray_recorder.capture('datastore.AthleteStatsDatastore._query_mongodb')
     def _query_mongodb(self, athlete_id):
