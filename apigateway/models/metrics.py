@@ -1,11 +1,10 @@
-from enum import Enum
+from enum import Enum, IntEnum
 
 
-class AthleteRecommendation(object):
-    def __init__(self):
-        self.metric = ""
-        self.metric_type = MetricType.daily
-        self.threshold = 0.0
+class AthleteMetric(object):
+    def __init__(self, name, metric_type):
+        self.name = name
+        self.metric_type = metric_type
         self.color = ""
         self.high_level_insight = None
         self.high_level_action_description = ""
@@ -13,7 +12,8 @@ class AthleteRecommendation(object):
         self.specific_insight_recovery = ""
         self.body_part_location = None
         self.body_part_side = 0
-        self.recommendations = []
+        self.soreness = []
+        self.specific_actions = []
 
 
 class MetricType(Enum):
@@ -35,3 +35,10 @@ class WeeklyHighLevelInsight(Enum):
     add_variety_to_training_risk = 2
     increase_weekly_workload = 3
     address_pain_or_soreness = 4
+    evaluate_health_status = 5
+
+
+class MetricColor(IntEnum):
+    green = 0
+    yellow = 1
+    red = 2

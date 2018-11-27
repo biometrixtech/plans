@@ -76,27 +76,6 @@ class BodyPartLocation(Enum):
     achilles = 17
     upper_back_neck = 18
 
-class BodyPartLocationText(object):
-    def __init__(self):
-        self.body_part_text = {'head': 'head',
-                              'shoulder': 'shoulder',
-                              'chest': 'chest',
-                              'abdominals': 'abdominal',
-                              'hip_flexor': 'hip',
-                              'groin': 'groin',
-                              'quads': 'quad',
-                              'knee': 'knee',
-                              'shin': 'shin',
-                              'ankle': 'ankle',
-                              'foot': 'foot',
-                              'outer_thigh': 'IT band',
-                              'lower_back': 'lower back',
-                              'general': 'general',
-                              'glutes': 'glute',
-                              'hamstrings': 'hamstring',
-                              'calves': 'calf',
-                              'achilles': 'achilles',
-                              'upper_back_neck': 'upper back'}
 
 class BodyPart(object):
 
