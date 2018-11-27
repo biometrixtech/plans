@@ -63,7 +63,9 @@ def update_athlete_stats(athlete_id):
 def get_athlete_metrics(athlete_id):
     event_date = request.json['event_date']
     athlete_stats = DatastoreCollection().athlete_stats_datastore.get(athlete_id=athlete_id)
-    MetricsProcessing().get_athlete_metrics_from_stats(athlete_stats, event_date)
+    metrics = MetricsProcessing().get_athlete_metrics_from_stats(athlete_stats, event_date)
+    athlete_stats.metrics = metrics
+    DatastoreCollection().athlete_stats_datastore.put(athlete_stats)
     return {'message': 'Update requested'}, 202
 
 
