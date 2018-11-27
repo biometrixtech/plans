@@ -1,5 +1,4 @@
-from models.metrics import AthleteMetric, DailyHighLevelInsight, MetricColor, MetricType, WeeklyHighLevelInsight
-from models.soreness import HistoricSorenessStatus
+from models.metrics import AthleteMetric, AthleteMetricGenerator, DailyHighLevelInsight, MetricColor, MetricType, ThresholdRecommendation, WeeklyHighLevelInsight
 
 
 class MetricsProcessing(object):
@@ -29,341 +28,169 @@ class MetricsProcessing(object):
 
                 metrics.append(met)
 
-        if (athlete_stats.daily_severe_soreness is not None and len(athlete_stats.daily_severe_soreness) > 0
-                and athlete_stats.daily_severe_soreness_event_date == event_date):
-
-            met_dict = {}
-
-            for t in athlete_stats.daily_severe_soreness:
-                if t.severity >= 3.0:
-
-                    met = AthleteMetric("Daily Severe Soreness", MetricType.daily)
-                    met.color = MetricColor.yellow
-                    met.high_level_action_description = "Stop training if pain increases and consider reducing workload to facilitate recovery"
-
-                    if 3.0 <= athlete_stats.daily_severe_soreness < 4.0:
-                        if 0 not in met_dict:
-                            met.high_level_insight = DailyHighLevelInsight.monitor_in_training
-                            met.specific_insight_recovery = "Elevated [body part] soreness which may impact performance"
-                            met.specific_insight_training_volume = ""
-                            met.specific_actions.append("6A")
-                            met.specific_actions.append("7A")
-
-                            met_dict[0] = met
-                        else:
-                            met_dict[0].soreness.append(t)
-
-                    elif athlete_stats.daily_severe_soreness >= 4.0:
-                        if 1 not in met_dict:
-                            met.high_level_insight = DailyHighLevelInsight.limit_time_intensity_of_training
-
-                            met.specific_insight_recovery = ("Severe [bodypart/global] soreness on for the last " + str(t.streak) + " reported days may impact performance & indicate elevated injury risk")
-                            met.specific_insight_training_volume = ""
-                            met.specific_actions.append("2B")
-                            met.specific_actions.append("7A")
-                            met.specific_actions.append("6B")
-                            met_dict[1] = met
-                        else:
-                            met_dict[0].soreness.append(t)
-
-            for k, v in met_dict:
-                metrics.append(v)
-
-        if (athlete_stats.daily_severe_pain is not None and len(athlete_stats.daily_severe_pain) > 0
-                and athlete_stats.daily_severe_pain == event_date):
-
-            met_dict = {}
-
-            for t in athlete_stats.daily_severe_pain:
-
-                rec = AthleteMetric("Daily Severe Pain", MetricType.daily)
-                rec.high_level_action_description = "Stop training if pain increases and consider reducing workload to facilitate recovery"
-
-                if athlete_stats.daily_severe_pain <= 2.0:
-                    if 0 not in met_dict:
-
-                        rec.color = MetricColor.yellow
-                        rec.high_level_insight = DailyHighLevelInsight.monitor_in_training
-                        rec.specific_insight_recovery = ("Low severity [body part] pain which should be monitored to prevent the development of injury")
-                        rec.specific_insight_training_volume = ""
-                        rec.specific_actions.append("6A")
-                        rec.specific_actions.append("7A")
-
-                        met_dict[0] = rec
-
-                    else:
-                        met_dict[0].soreness.append(t)
-
-                elif 2.0 < athlete_stats.daily_severe_pain < 4.0:
-                    if 1 not in met_dict:
-
-                        rec.color = MetricColor.yellow
-                        rec.high_level_insight = DailyHighLevelInsight.limit_time_intensity_of_training
-                        rec.specific_insight_recovery = "Elevated [body part] pain which should be monitored to prevent injury"
-                        rec.specific_insight_training_volume = ""
-                        rec.specific_actions.append("2B")
-                        rec.specific_actions.append("7B")
-                        rec.specific_actions.append("6A")
-
-                        met_dict[0] = rec
-
-                    else:
-                        met_dict[0].soreness.append(t)
-
-                elif athlete_stats.daily_severe_pain >= 4.0:
-                    if 2 not in met_dict:
-
-                        rec.color = MetricColor.red
-                        rec.high_level_insight = DailyHighLevelInsight.not_cleared_for_training
-                        rec.specific_insight_recovery = "[body part] pain severity that is too high to train today and may indicate injury"
-                        rec.specific_insight_training_volume = ""
-                        rec.specific_actions.append("5A")
-                        rec.specific_actions.append("2A")
-
-                        met_dict[0] = rec
-
-                    else:
-                        met_dict[0].soreness.append(t)
-
-            for k, v in met_dict:
-                metrics.append(v)
-
-        met_dict = {}
-
-        for t in athlete_stats.historic_soreness:
-            if t.streak >= 3 and t.is_pain:
-
-                rec = AthleteMetric("3 Day Consecutive Pain", MetricType.daily)
-
-                if t.average_severity >= 3:
-                    if 1 not in met_dict:
-                        rec.color = MetricColor.red
-                        rec.high_level_insight = DailyHighLevelInsight.not_cleared_for_training
-                        rec.high_level_action_description = "Pain severity is too high for training today, consult medical staff to evaluate status"
-                        rec.specific_insight_recovery = "Consistent reports of significant [Body Part] pain for the last " + str(t.streak) + " days may be a sign of injury"
-                        rec.specific_actions.append("5A")
-                        rec.specific_actions.append("2A")
-
-                        met_dict[1] = rec
-                    else:
-                        met_dict[1].soreness.append(t)
-                else:
-                    if 0 not in met_dict:
-                        rec.color = MetricColor.yellow
-                        rec.high_level_insight = DailyHighLevelInsight.monitor_in_training
-                        rec.high_level_action_description = "Stop training if pain increases and consider reducing workload to facilitate recovery"
-                        rec.specific_insight_recovery = "Consistent reports of significant [Body Part] pain for the last " + str(t.streak) + " days may be a sign of injury"
-                        rec.specific_actions.append("6A")
-                        rec.specific_actions.append("7B")
-
-                        met_dict[0] = rec
-                    else:
-                        met_dict[0].soreness.append(t)
-
-        for k, v in met_dict:
-            metrics.append(v)
-
-        met_dict = {}
-
-        for t in athlete_stats.historic_soreness:
-            if t.historic_soreness_status == HistoricSorenessStatus.persistent and not t.is_pain:
-
-                rec = AthleteMetric("Persistent Soreness", MetricType.longitudinal)
-
-                rec.high_level_action_description = "Prioritize Recovery and consider decreasing upcoming workloads"
-
-                if t.average_severity>= 4:
-                    if 2 not in met_dict:
-                        rec.color = MetricColor.yellow
-                        rec.high_level_action_description = "Consult medical staff to evaluate status before training"
-                        rec.high_level_insight = WeeklyHighLevelInsight.evaluate_health_status
-                        rec.specific_insight_recovery = "a "+ str(t.streak) + " day trend of persistent, severe [body part] soreness impacting performance & indicating elevated injury risk"
-                        rec.specific_actions.append("7A")
-
-                        met_dict[2] = rec
-                    else:
-                        met_dict[2].soreness.append(t)
-
-                elif 2 < t.average_severity < 4:
-                    if 1 not in met_dict:
-                        rec.color = MetricColor.yellow
-                        rec.high_level_insight = WeeklyHighLevelInsight.address_pain_or_soreness
-                        rec.specific_insight_recovery = "a " + str(
-                            t.streak) + " day trend of persistent, moderate [body part] soreness impacting performance & indicating elevated injury risk"
-                        rec.specific_actions.append("7A")
-                        rec.specific_actions.append("6C")
-                        rec.specific_actions.append("3B")
-
-                        met_dict[1] = rec
-                    else:
-                        met_dict[1].soreness.append(t)
-
-                else:
-                    if 0 not in met_dict:
-                        rec.color = MetricColor.green
-                        rec.high_level_insight = WeeklyHighLevelInsight.address_pain_or_soreness
-                        rec.specific_insight_recovery = "a " + str(
-                            t.streak) + " day trend of persistent, mild [body part] soreness impacting performance & indicating elevated injury risk"
-                        # NONE
-
-                        met_dict[0] = rec
-                    else:
-                        met_dict[0].soreness.append(t)
-
-        for k, v in met_dict:
-            metrics.append(v)
-
-        met_dict = {}
-
-        for t in athlete_stats.historic_soreness:
-
-            if t.historic_soreness_status == HistoricSorenessStatus.chronic and not t.is_pain:
-                rec = AthleteMetric("Chronic Soreness", MetricType.longitudinal)
-
-                rec.high_level_action_description = "Prioritize Recovery and consider decreasing upcoming workloads"
-
-                if t.average_severity >= 4:
-                    if 2 not in met_dict:
-                        rec.color = MetricColor.yellow
-                        rec.high_level_insight = WeeklyHighLevelInsight.evaluate_health_status
-                        rec.specific_insight_recovery = "a "+ str(t.streak) + " day trend of chronic, severe [body part] soreness impacting performance & indicating elevated injury risk"
-                        rec.specific_actions.append("3B")
-                        rec.specific_actions.append("7A")
-                        met_dict[2] = rec
-
-                    else:
-                        met_dict[2].soreness.append(t)
-
-                elif 2 < t.average_severity < 4:
-                    if 1 not in met_dict:
-                        rec.color = MetricColor.yellow
-                        rec.high_level_insight = WeeklyHighLevelInsight.address_pain_or_soreness
-                        rec.specific_insight_recovery = "a " + str(
-                            t.streak) + " day trend of chronic, moderate [body part] soreness impacting performance & indicating elevated injury risk"
-                        rec.specific_actions.append("7A")
-                        rec.specific_actions.append("6C")
-                        rec.specific_actions.append("3B")
-                        met_dict[1] = rec
-
-                    else:
-                        met_dict[1].soreness.append(t)
-                else:
-                    if 0 not in met_dict:
-                        rec.color = MetricColor.green
-                        rec.high_level_insight = WeeklyHighLevelInsight.address_pain_or_soreness
-                        rec.specific_insight_recovery = "a " + str(
-                            t.streak) + " day trend of chronic, mild [body part] soreness impacting performance & indicating elevated injury risk"
-                        rec.specific_actions.append("7A")
-                        met_dict[0] = rec
-
-                    else:
-                        met_dict[0].soreness.append(t)
-
-        for k, v in met_dict:
-            metrics.append(v)
-
-        met_dict = {}
-
-        for t in athlete_stats.historic_soreness:
-            if t.historic_soreness_status == HistoricSorenessStatus.persistent and t.is_pain:
-
-                rec = AthleteMetric("Persistent Pain", MetricType.longitudinal)
-
-                rec.high_level_action_description = "Prioritize Recovery and consider decreasing upcoming workloads"
-                if t.average_severity >= 4:
-                    if 2 not in met_dict:
-                        rec.color = MetricColor.red
-                        rec.high_level_insight = WeeklyHighLevelInsight.evaluate_health_status
-                        rec.specific_insight_recovery = "a " + str(
-                            t.streak) + " day trend of persistent, severe [body part] pain which may indicate injury"
-                        rec.specific_actions.append("5A")
-                        rec.specific_actions.append("2A")
-                        rec.specific_actions.append("3A")
-                        met_dict[2] = rec
-
-                    else:
-                        met_dict[2].soreness.append(t)
-
-                elif 2 < t.average_severity < 4:
-                    if 1 not in met_dict:
-                        rec.color = MetricColor.yellow
-                        rec.high_level_insight = WeeklyHighLevelInsight.address_pain_or_soreness
-                        rec.specific_insight_recovery = "a " + str(
-                            t.streak) + " day trend of persistent, moderate [body part] pain impacting performance & indicating elevated injury risk"
-                        rec.specific_actions.append("6B")
-                        rec.specific_actions.append("7A")
-                        rec.specific_actions.append("3B")
-                        met_dict[1] = rec
-
-                    else:
-                        met_dict[1].soreness.append(t)
-
-                else:
-                    if 0 not in met_dict:
-                        rec.color = MetricColor.green
-                        rec.high_level_insight = WeeklyHighLevelInsight.address_pain_or_soreness
-                        rec.specific_insight_recovery = "a " + str(
-                            t.streak) + " day trend of persistent, mild [body part] pain impacting performance & indicating elevated injury risk"
-                        rec.specific_actions.append("7A")
-                        met_dict[0] = rec
-
-                    else:
-                        met_dict[0].soreness.append(t)
-
-        for k, v in met_dict:
-            metrics.append(v)
-
-        met_dict = {}
-
-        for t in athlete_stats.historic_soreness:
-            if t.historic_soreness_status == HistoricSorenessStatus.chronic and t.is_pain:
-
-                rec = AthleteMetric("Chronic Pain", MetricType.longitudinal)
-
-                rec.high_level_action_description = "Prioritize Recovery and consider decreasing upcoming workloads"
-                if t.average_severity >= 4:
-                    if 2 not in met_dict:
-                        rec.color = MetricColor.red
-                        rec.high_level_insight = WeeklyHighLevelInsight.evaluate_health_status
-                        rec.specific_insight_recovery = "a " + str(
-                            t.streak) + " day trend of chronic, severe [body part] pain may indicate injury"
-                        rec.specific_actions.append("5A")
-                        rec.specific_actions.append("2A")
-                        rec.specific_actions.append("3A")
-                        met_dict[2] = rec
-
-                    else:
-                        met_dict[2].soreness.append(t)
-
-                elif 2 < t.average_severity < 4:
-                    if 1 not in met_dict:
-                        rec.color = MetricColor.yellow
-                        rec.high_level_insight = WeeklyHighLevelInsight.address_pain_or_soreness
-                        rec.specific_insight_recovery = "a " + str(
-                            t.streak) + " day trend of chronic, moderate [body part] pain impacting performance & indicating elevated injury risk"
-                        rec.specific_actions.append("6B")
-                        rec.specific_actions.append("7A")
-                        rec.specific_actions.append("3B")
-                        met_dict[1] = rec
-
-                    else:
-                        met_dict[1].soreness.append(t)
-
-                else:
-                    if 0 not in met_dict:
-                        rec.color = MetricColor.green
-                        rec.high_level_insight = WeeklyHighLevelInsight.address_pain_or_soreness
-                        rec.specific_insight_recovery = "a " + str(
-                            t.streak) + " day trend of chronic, mild [body part] pain impacting performance & indicating elevated injury risk"
-                        rec.specific_actions.append("7A")
-                        rec.specific_actions.append("6C")
-
-                        met_dict[0] = rec
-
-                    else:
-                        met_dict[0].soreness.append(t)
-
-        for k, v in met_dict:
-            metrics.append(v)
+        if athlete_stats.daily_severe_soreness_event_date == event_date:
+            metrics.extend(DailySevereSorenessMetricGenerator(athlete_stats.daily_severe_soreness).get_metric_list())
+
+        if athlete_stats.daily_severe_pain_event_date == event_date:
+            metrics.extend(DailySeverePainMetricGenerator(athlete_stats.daily_severe_pain).get_metric_list())
+
+        pain_list = list(p for p in athlete_stats.historic_soreness if p.is_pain and p.streak >= 3)
+        metrics.extend(ThreeDayConsecutivePainMetricGenerator(pain_list).get_metric_list())
+
+        metrics.extend(PersistentSorenessMetricGenerator(athlete_stats.historic_soreness).get_metric_list())
+        metrics.extend(ChronicSorenessMetricGenerator(athlete_stats.historic_soreness).get_metric_list())
+        metrics.extend(PersistentPainMetricGenerator(athlete_stats.historic_soreness).get_metric_list())
+        metrics.extend(ChronicPainMetricGenerator(athlete_stats.historic_soreness).get_metric_list())
 
         return metrics
+
+
+class DailySevereSorenessMetricGenerator(AthleteMetricGenerator):
+    def __init__(self, soreness_list):
+        super(DailySevereSorenessMetricGenerator, self).__init__("Daily Severe Soreness", MetricType.daily,
+                                                                 soreness_list, "severity")
+        self.high_level_action_description = "Stop training if pain increases and consider reducing workload to facilitate recovery"
+        self.thresholds[0] = ThresholdRecommendation(MetricColor.yellow,
+                                                     DailyHighLevelInsight.limit_time_intensity_of_training,
+                                                     self.high_level_action_description,
+                                                     ["2B", "7A", "6B"], 4.0, None,
+                                                     "Severe [bodypart] soreness which may impact performance & indicate elevated injury risk")
+        self.thresholds[1] = ThresholdRecommendation(MetricColor.yellow,
+                                                     DailyHighLevelInsight.monitor_in_training,
+                                                     self.high_level_action_description,
+                                                     ["6A", "7A"], 3.0, 4.0,
+                                                     "Elevated [bodypart] soreness which may impact performance")
+        self.populate_thresholds_with_soreness()
+
+
+class DailySeverePainMetricGenerator(AthleteMetricGenerator):
+    def __init__(self, soreness_list):
+        super(DailySeverePainMetricGenerator, self).__init__("Daily Severe Pain", MetricType.daily,
+                                                             soreness_list, "severity")
+        self.high_level_action_description = "Stop training if pain increases and consider reducing workload to facilitate recovery"
+        self.thresholds[0] = ThresholdRecommendation(MetricColor.red,
+                                                     DailyHighLevelInsight.not_cleared_for_training,
+                                                     self.high_level_action_description,
+                                                     ["5A", "2A"], 4.0, None,
+                                                     "[bodypart] pain severity that is too high to train today and may indicate injury")
+        self.thresholds[1] = ThresholdRecommendation(MetricColor.yellow,
+                                                     DailyHighLevelInsight.limit_time_intensity_of_training,
+                                                     self.high_level_action_description,
+                                                     ["2B", "7A", "6B"], 2.0, 4.0,
+                                                     "Elevated [bodypart] pain which should be monitored to prevent injury")
+        self.thresholds[2] = ThresholdRecommendation(MetricColor.yellow,
+                                                     DailyHighLevelInsight.monitor_in_training,
+                                                     self.high_level_action_description,
+                                                     ["6A", "7A"], 1.0, 2.0,
+                                                     "Low severity [bodypart] pain which should be monitored to prevent the development of injury")
+        self.populate_thresholds_with_soreness()
+
+
+class ThreeDayConsecutivePainMetricGenerator(AthleteMetricGenerator):
+    def __init__(self, soreness_list):
+        super(ThreeDayConsecutivePainMetricGenerator, self).__init__("3 Day Consecutive Pain", MetricType.daily,
+                                                                     soreness_list, "streak")
+        self.high_level_action_description = ""
+        self.thresholds[0] = ThresholdRecommendation(MetricColor.red,
+                                                     DailyHighLevelInsight.not_cleared_for_training,
+                                                     "Pain severity is too high for training today, consult medical staff to evaluate status",
+                                                     ["5A", "2A"], 3.0, None,
+                                                     "Consistent reports of significant [bodypart] pain which may be a sign of injury")
+        self.thresholds[1] = ThresholdRecommendation(MetricColor.yellow,
+                                                     DailyHighLevelInsight.monitor_in_training,
+                                                     "Stop training if pain increases and consider reducing workload to facilitate recovery",
+                                                     ["6A", "7B"], 1.0, 3.0,
+                                                     "Consistent reports of [bodypart] pain which may be a sign of injury")
+        self.populate_thresholds_with_soreness()
+
+
+class PersistentSorenessMetricGenerator(AthleteMetricGenerator):
+    def __init__(self, soreness_list):
+        super(PersistentSorenessMetricGenerator, self).__init__("Persistent Soreness", MetricType.longitudinal,
+                                                                soreness_list, "severity")
+        self.high_level_action_description = "Prioritize Recovery and consider decreasing upcoming workloads"
+        self.thresholds[0] = ThresholdRecommendation(MetricColor.yellow,
+                                                     WeeklyHighLevelInsight.evaluate_health_status,
+                                                     "Consult medical staff to evaluate status before training",
+                                                     ["7A", "9"], 4.0, None,
+                                                     "Persistent, severe [bodypart] soreness which may impact performance & indicate elevated injury risk")
+        self.thresholds[1] = ThresholdRecommendation(MetricColor.yellow,
+                                                     WeeklyHighLevelInsight.address_pain_or_soreness,
+                                                     self.high_level_action_description,
+                                                     ["7A", "6C", "3B"], 2.0, 4.0,
+                                                     "Persistent, moderate [bodypart] soreness which may impact performance & indicate elevated injury risk")
+        self.thresholds[2] = ThresholdRecommendation(MetricColor.green,
+                                                     WeeklyHighLevelInsight.address_pain_or_soreness,
+                                                     self.high_level_action_description,
+                                                     [], None, 2.0,
+                                                     "Persistent, mild [bodypart] soreness which may impact performance")
+        self.populate_thresholds_with_soreness()
+
+
+class ChronicSorenessMetricGenerator(AthleteMetricGenerator):
+    def __init__(self, soreness_list):
+        super(ChronicSorenessMetricGenerator, self).__init__("Chronic Soreness", MetricType.longitudinal,
+                                                             soreness_list, "severity")
+        self.high_level_action_description = "Prioritize Recovery and consider decreasing upcoming workloads"
+        self.thresholds[0] = ThresholdRecommendation(MetricColor.yellow,
+                                                     WeeklyHighLevelInsight.evaluate_health_status,
+                                                     self.high_level_action_description,
+                                                     ["3B", "7A", "9"], 4.0, None,
+                                                     "Chronic, severe [bodypart] soreness which may impact performance & indicate elevated injury risk")
+        self.thresholds[1] = ThresholdRecommendation(MetricColor.yellow,
+                                                     WeeklyHighLevelInsight.address_pain_or_soreness,
+                                                     self.high_level_action_description,
+                                                     ["7A", "6C", "3B"], 2.0, 4.0,
+                                                     "Chronic, moderate [bodypart] soreness which may impact performance & indicate elevated injury risk")
+        self.thresholds[2] = ThresholdRecommendation(MetricColor.green,
+                                                     WeeklyHighLevelInsight.address_pain_or_soreness,
+                                                     self.high_level_action_description,
+                                                     [], None, 2.0,
+                                                     "Chronic, mild [bodypart] soreness which may impact performance")
+        self.populate_thresholds_with_soreness()
+
+
+class PersistentPainMetricGenerator(AthleteMetricGenerator):
+    def __init__(self, soreness_list):
+        super(PersistentPainMetricGenerator, self).__init__("Persistent Pain", MetricType.longitudinal,
+                                                            soreness_list, "severity")
+        self.high_level_action_description = "Prioritize Recovery and consider decreasing upcoming workloads"
+        self.thresholds[0] = ThresholdRecommendation(MetricColor.red,
+                                                     WeeklyHighLevelInsight.evaluate_health_status,
+                                                     self.high_level_action_description,
+                                                     ["5A", "2A", "3A"], 4.0, None,
+                                                     "Persistent, severe [bodypart] pain which may indicate injury")
+        self.thresholds[1] = ThresholdRecommendation(MetricColor.yellow,
+                                                     WeeklyHighLevelInsight.address_pain_or_soreness,
+                                                     self.high_level_action_description,
+                                                     ["6B", "7A", "3B"], 1.0, 4.0,
+                                                     "Persistent, moderate [bodypart] pain which should be monitored to prevent injury")
+        self.thresholds[2] = ThresholdRecommendation(MetricColor.green,
+                                                     WeeklyHighLevelInsight.address_pain_or_soreness,
+                                                     self.high_level_action_description,
+                                                     [], None, 1.0,
+                                                     "Persistent, mild [bodypart] pain which should be monitored to prevent the development of injury")
+        self.populate_thresholds_with_soreness()
+
+
+class ChronicPainMetricGenerator(AthleteMetricGenerator):
+    def __init__(self, soreness_list):
+        super(ChronicPainMetricGenerator, self).__init__("Chronic Pain", MetricType.longitudinal,
+                                                         soreness_list, "severity")
+        self.high_level_action_description = "Prioritize Recovery and consider decreasing upcoming workloads"
+        self.thresholds[0] = ThresholdRecommendation(MetricColor.red,
+                                                     WeeklyHighLevelInsight.evaluate_health_status,
+                                                     self.high_level_action_description,
+                                                     ["5A", "2A", "3A"], 4.0, None,
+                                                     "Chronic, severe [bodypart] pain which may indicate injury")
+        self.thresholds[1] = ThresholdRecommendation(MetricColor.yellow,
+                                                     WeeklyHighLevelInsight.address_pain_or_soreness,
+                                                     self.high_level_action_description,
+                                                     ["6B", "7A", "3B"], 1.0, 4.0,
+                                                     "Chronic, moderate [bodypart] pain which should be monitored to prevent injury")
+        self.thresholds[2] = ThresholdRecommendation(MetricColor.green,
+                                                     WeeklyHighLevelInsight.address_pain_or_soreness,
+                                                     self.high_level_action_description,
+                                                     ["7A", "6C", ], None, 1.0,
+                                                     "Chronic, mild [bodypart] pain which should be monitored to prevent the development of injury")
+        self.populate_thresholds_with_soreness()
