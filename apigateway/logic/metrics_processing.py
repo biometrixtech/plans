@@ -54,12 +54,12 @@ class DailySevereSorenessMetricGenerator(AthleteMetricGenerator):
                                                      DailyHighLevelInsight.limit_time_intensity_of_training,
                                                      self.high_level_action_description,
                                                      ["2B", "7A", "6B"], 4.0, None,
-                                                     "Severe [bodypart] soreness which may impact performance & indicate elevated injury risk")
+                                                     "Severe {bodypart} soreness which may impact performance & indicate elevated injury risk")
         self.thresholds[1] = ThresholdRecommendation(MetricColor.yellow,
                                                      DailyHighLevelInsight.monitor_in_training,
                                                      self.high_level_action_description,
                                                      ["6A", "7A"], 3.0, 4.0,
-                                                     "Elevated [bodypart] soreness which may impact performance")
+                                                     "Elevated {bodypart} soreness which may impact performance")
         self.populate_thresholds_with_soreness()
 
 
@@ -72,17 +72,17 @@ class DailySeverePainMetricGenerator(AthleteMetricGenerator):
                                                      DailyHighLevelInsight.not_cleared_for_training,
                                                      self.high_level_action_description,
                                                      ["5A", "2A"], 4.0, None,
-                                                     "[bodypart] pain severity that is too high to train today and may indicate injury")
+                                                     "{bodypart} pain severity that is too high to train today and may indicate injury")
         self.thresholds[1] = ThresholdRecommendation(MetricColor.yellow,
                                                      DailyHighLevelInsight.limit_time_intensity_of_training,
                                                      self.high_level_action_description,
                                                      ["2B", "7A", "6B"], 2.0, 4.0,
-                                                     "Elevated [bodypart] pain which should be monitored to prevent injury")
+                                                     "Elevated {bodypart} pain which should be monitored to prevent injury")
         self.thresholds[2] = ThresholdRecommendation(MetricColor.yellow,
                                                      DailyHighLevelInsight.monitor_in_training,
                                                      self.high_level_action_description,
                                                      ["6A", "7A"], 1.0, 2.0,
-                                                     "Low severity [bodypart] pain which should be monitored to prevent the development of injury")
+                                                     "Low severity {bodypart} pain which should be monitored to prevent the development of injury")
         self.populate_thresholds_with_soreness()
 
 
@@ -95,12 +95,12 @@ class ThreeDayConsecutivePainMetricGenerator(AthleteMetricGenerator):
                                                      DailyHighLevelInsight.not_cleared_for_training,
                                                      "Pain severity is too high for training today, consult medical staff to evaluate status",
                                                      ["5A", "2A"], 3.0, None,
-                                                     "Consistent reports of significant [bodypart] pain which may be a sign of injury")
+                                                     "Consistent reports of significant {bodypart} pain which may be a sign of injury")
         self.thresholds[1] = ThresholdRecommendation(MetricColor.yellow,
                                                      DailyHighLevelInsight.monitor_in_training,
                                                      "Stop training if pain increases and consider reducing workload to facilitate recovery",
                                                      ["6A", "7B"], 1.0, 3.0,
-                                                     "Consistent reports of [bodypart] pain which may be a sign of injury")
+                                                     "Consistent reports of {bodypart} pain which may be a sign of injury")
         self.populate_thresholds_with_soreness()
 
 
@@ -113,17 +113,17 @@ class PersistentSorenessMetricGenerator(AthleteMetricGenerator):
                                                      WeeklyHighLevelInsight.evaluate_health_status,
                                                      "Consult medical staff to evaluate status before training",
                                                      ["7A", "9"], 4.0, None,
-                                                     "Persistent, severe [bodypart] soreness which may impact performance & indicate elevated injury risk")
+                                                     "Persistent, severe {bodypart} soreness which may impact performance & indicate elevated injury risk")
         self.thresholds[1] = ThresholdRecommendation(MetricColor.yellow,
                                                      WeeklyHighLevelInsight.address_pain_or_soreness,
                                                      self.high_level_action_description,
                                                      ["7A", "6C", "3B"], 2.0, 4.0,
-                                                     "Persistent, moderate [bodypart] soreness which may impact performance & indicate elevated injury risk")
+                                                     "Persistent, moderate {bodypart} soreness which may impact performance & indicate elevated injury risk")
         self.thresholds[2] = ThresholdRecommendation(MetricColor.green,
                                                      WeeklyHighLevelInsight.address_pain_or_soreness,
                                                      self.high_level_action_description,
                                                      [], None, 2.0,
-                                                     "Persistent, mild [bodypart] soreness which may impact performance")
+                                                     "Persistent, mild {bodypart} soreness which may impact performance")
         self.populate_thresholds_with_soreness()
 
 
@@ -136,17 +136,17 @@ class ChronicSorenessMetricGenerator(AthleteMetricGenerator):
                                                      WeeklyHighLevelInsight.evaluate_health_status,
                                                      self.high_level_action_description,
                                                      ["3B", "7A", "9"], 4.0, None,
-                                                     "Chronic, severe [bodypart] soreness which may impact performance & indicate elevated injury risk")
+                                                     "Chronic, severe {bodypart} soreness which may impact performance & indicate elevated injury risk")
         self.thresholds[1] = ThresholdRecommendation(MetricColor.yellow,
                                                      WeeklyHighLevelInsight.address_pain_or_soreness,
                                                      self.high_level_action_description,
                                                      ["7A", "6C", "3B"], 2.0, 4.0,
-                                                     "Chronic, moderate [bodypart] soreness which may impact performance & indicate elevated injury risk")
+                                                     "Chronic, moderate {bodypart} soreness which may impact performance & indicate elevated injury risk")
         self.thresholds[2] = ThresholdRecommendation(MetricColor.green,
                                                      WeeklyHighLevelInsight.address_pain_or_soreness,
                                                      self.high_level_action_description,
                                                      [], None, 2.0,
-                                                     "Chronic, mild [bodypart] soreness which may impact performance")
+                                                     "Chronic, mild {bodypart} soreness which may impact performance")
         self.populate_thresholds_with_soreness()
 
 
@@ -159,17 +159,17 @@ class PersistentPainMetricGenerator(AthleteMetricGenerator):
                                                      WeeklyHighLevelInsight.evaluate_health_status,
                                                      self.high_level_action_description,
                                                      ["5A", "2A", "3A"], 4.0, None,
-                                                     "Persistent, severe [bodypart] pain which may indicate injury")
+                                                     "Persistent, severe {bodypart} pain which may indicate injury")
         self.thresholds[1] = ThresholdRecommendation(MetricColor.yellow,
                                                      WeeklyHighLevelInsight.address_pain_or_soreness,
                                                      self.high_level_action_description,
                                                      ["6B", "7A", "3B"], 1.0, 4.0,
-                                                     "Persistent, moderate [bodypart] pain which should be monitored to prevent injury")
+                                                     "Persistent, moderate {bodypart} pain which should be monitored to prevent injury")
         self.thresholds[2] = ThresholdRecommendation(MetricColor.green,
                                                      WeeklyHighLevelInsight.address_pain_or_soreness,
                                                      self.high_level_action_description,
                                                      [], None, 1.0,
-                                                     "Persistent, mild [bodypart] pain which should be monitored to prevent the development of injury")
+                                                     "Persistent, mild {bodypart} pain which should be monitored to prevent the development of injury")
         self.populate_thresholds_with_soreness()
 
 
@@ -182,15 +182,15 @@ class ChronicPainMetricGenerator(AthleteMetricGenerator):
                                                      WeeklyHighLevelInsight.evaluate_health_status,
                                                      self.high_level_action_description,
                                                      ["5A", "2A", "3A"], 4.0, None,
-                                                     "Chronic, severe [bodypart] pain which may indicate injury")
+                                                     "Chronic, severe {bodypart} pain which may indicate injury")
         self.thresholds[1] = ThresholdRecommendation(MetricColor.yellow,
                                                      WeeklyHighLevelInsight.address_pain_or_soreness,
                                                      self.high_level_action_description,
                                                      ["6B", "7A", "3B"], 1.0, 4.0,
-                                                     "Chronic, moderate [bodypart] pain which should be monitored to prevent injury")
+                                                     "Chronic, moderate {bodypart} pain which should be monitored to prevent injury")
         self.thresholds[2] = ThresholdRecommendation(MetricColor.green,
                                                      WeeklyHighLevelInsight.address_pain_or_soreness,
                                                      self.high_level_action_description,
                                                      ["7A", "6C", ], None, 1.0,
-                                                     "Chronic, mild [bodypart] pain which should be monitored to prevent the development of injury")
+                                                     "Chronic, mild {bodypart} pain which should be monitored to prevent the development of injury")
         self.populate_thresholds_with_soreness()
