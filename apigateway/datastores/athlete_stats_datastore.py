@@ -113,6 +113,7 @@ class AthleteStatsDatastore(object):
         # rec.body_part_side = metric.get('body_part_side', None)
         # rec.soreness = [self._soreness_from_mongodb(s) for s in metric.get('soreness', [])]
         rec.specific_actions = metric.get('specific_actions', [])
+        return rec
 
 
 
