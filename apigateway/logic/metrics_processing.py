@@ -1,5 +1,5 @@
 from models.metrics import AthleteMetric, AthleteMetricGenerator, DailyHighLevelInsight, MetricColor, MetricType, ThresholdRecommendation, WeeklyHighLevelInsight
-
+from models.soreness import HistoricSorenessStatus
 
 class MetricsProcessing(object):
 
@@ -37,10 +37,24 @@ class MetricsProcessing(object):
         pain_list = list(p for p in athlete_stats.historic_soreness if p.is_pain and p.streak >= 3)
         metrics.extend(ThreeDayConsecutivePainMetricGenerator(pain_list).get_metric_list())
 
-        metrics.extend(PersistentSorenessMetricGenerator(athlete_stats.historic_soreness).get_metric_list())
-        metrics.extend(ChronicSorenessMetricGenerator(athlete_stats.historic_soreness).get_metric_list())
-        metrics.extend(PersistentPainMetricGenerator(athlete_stats.historic_soreness).get_metric_list())
-        metrics.extend(ChronicPainMetricGenerator(athlete_stats.historic_soreness).get_metric_list())
+        ps_list = list(p for p in athlete_stats.historic_soreness if not p.is_pain and p.historic_soreness_status ==
+                         HistoricSorenessStatus.persistent)
+        metrics.extend(PersistentSorenessMetricGenerator(ps_list).get_metric_list())
+
+        cs_list = list(p for p in athlete_stats.historic_soreness if not p.is_pain and p.historic_soreness_status ==
+                       HistoricSorenessStatus.chronic)
+
+        metrics.extend(ChronicSorenessMetricGenerator(cs_list).get_metric_list())
+
+        pp_list = list(p for p in athlete_stats.historic_soreness if p.is_pain and p.historic_soreness_status ==
+                       HistoricSorenessStatus.persistent)
+
+        metrics.extend(PersistentPainMetricGenerator(pp_list).get_metric_list())
+
+        cp_list = list(p for p in athlete_stats.historic_soreness if p.is_pain and p.historic_soreness_status ==
+                       HistoricSorenessStatus.chronic)
+
+        metrics.extend(ChronicPainMetricGenerator(cp_list).get_metric_list())
 
         return metrics
 
