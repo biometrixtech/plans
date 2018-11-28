@@ -38,7 +38,59 @@ class MetricsProcessing(object):
 
         metrics.extend(ChronicPainMetricGenerator(cp_list).get_metric_list())
 
+        rec_matrix = RecommendationMatrix()
+        rec_matrix.add_metrics(metrics)
+        metrics = rec_matrix.get_ranked_metrics()
+
         return metrics
+
+
+class RecommendationMatrix(object):
+    def __init__(self):
+        self.recs = {}
+        self.metrics = []
+
+    def add_metrics(self, metrics):
+
+        self.metrics = metrics
+
+        for m in metrics:
+            for a in m.specific_actions:
+                if a.code not in self.recs:
+                    self.recs[a.code] = 1
+                else:
+                    self.recs[a.code] += 1
+
+    def get_winners(self):
+
+        winners = []
+
+        for r in range(1, 8):
+            code = str(r)+'A'
+            if code in self.recs:
+                winners.append(code)
+                continue
+            code = str(r) + 'B'
+            if code in self.recs:
+                winners.append(code)
+                continue
+            code = str(r) + 'C'
+            if code in self.recs:
+                winners.append(code)
+
+        return winners
+
+    def get_ranked_metrics(self):
+
+        winners = self.get_winners()
+
+        for m in range(0, len(self.metrics)):
+            for a in range(0, len(self.metrics[m].specific_actions)):
+                if self.metrics[m].specific_actions[a].code in winners:
+                    self.metrics[m].specific_actions[a].display = True
+                else:
+                    self.metrics[m].specific_actions[a].display = False
+        return self.metrics
 
 
 class DailySessionRPEMetricGenerator(AthleteTrainingVolumeMetricGenerator):
