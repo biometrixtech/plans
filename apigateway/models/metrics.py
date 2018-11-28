@@ -174,8 +174,6 @@ class ThresholdRecommendation(object):
 
 class TextGenerator(object):
     def get_specific_action(self, rec, soreness=None):
-        if rec  == '6B':
-            print([s.json_serialise() for s in soreness])
         text = RecommendationText(rec).value()
 
         if soreness is None:

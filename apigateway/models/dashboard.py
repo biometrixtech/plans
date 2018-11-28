@@ -112,8 +112,8 @@ class AthleteDashboardData(Serialisable):
         self.last_name = last_name
         self.cleared_to_train = True
         self.color = MetricColor(0)
-        self.daily_recommendation = []
-        self.weekly_recommendation = []
+        self.daily_recommendation = set()
+        self.weekly_recommendation = set()
         self.insights =[]
 
 
@@ -123,8 +123,8 @@ class AthleteDashboardData(Serialisable):
                'last_name': self.last_name,
                'cleared_to_train': self.cleared_to_train,
                'color': self.color.value,
-               'daily_recommendation': self.daily_recommendation,
-               'weekly_recommendation': self.weekly_recommendation,
+               'daily_recommendation': list(self.daily_recommendation),
+               'weekly_recommendation': list(self.weekly_recommendation),
                'insights': self.insights
               }
         return ret
