@@ -7,6 +7,7 @@ from flask import Blueprint, request
 from datastores.datastore_collection import DatastoreCollection
 from logic.training_plan_management import TrainingPlanManager
 from logic.stats_processing import StatsProcessing
+from logic.metrics_processing import MetricsProcessing
 from serialisable import json_serialise
 from utils import parse_date, parse_datetime, format_date, format_datetime
 import boto3
@@ -31,8 +32,10 @@ def create_daily_plan(athlete_id):
     body = {"message": "Your plan is ready!",
             "call_to_action": "VIEW_PLAN"}
     _notify_user(athlete_id, body)
-
-    Service('plans', Config.get('API_VERSION')).call_apigateway_async('POST', f"athlete/{athlete_id}/stats")
+    event_date = daily_plan.event_date
+    Service('plans', Config.get('API_VERSION')).call_apigateway_async(method='POST',
+                                                                      endpoint=f"athlete/{athlete_id}/stats",
+                                                                      body={"event_date": event_date})
 
     return {'message': 'Update requested'}, 202
 
@@ -41,7 +44,28 @@ def create_daily_plan(athlete_id):
 @require.authenticated.any
 @xray_recorder.capture('routes.athlete.stats.update')
 def update_athlete_stats(athlete_id):
-    StatsProcessing(athlete_id, event_date=None, datastore_collection=DatastoreCollection()).process_athlete_stats()
+    if 'event_date' in request.json:
+        event_date = request.json['event_date']
+    else:
+        event_date = None
+    StatsProcessing(athlete_id, event_date=event_date, datastore_collection=DatastoreCollection()).process_athlete_stats()
+
+    if event_date is not None:
+        Service('plans', Config.get('API_VERSION')).call_apigateway_async(method='POST',
+                                                                          endpoint=f"athlete/{athlete_id}/metrics",
+                                                                          body={"event_date": event_date})
+    return {'message': 'Update requested'}, 202
+
+
+@app.route('/<uuid:athlete_id>/metrics', methods=['POST'])
+@require.authenticated.any
+@xray_recorder.capture('routes.athlete.metrics.update')
+def get_athlete_metrics(athlete_id):
+    event_date = request.json['event_date']
+    athlete_stats = DatastoreCollection().athlete_stats_datastore.get(athlete_id=athlete_id)
+    metrics = MetricsProcessing().get_athlete_metrics_from_stats(athlete_stats, event_date)
+    athlete_stats.metrics = metrics
+    DatastoreCollection().athlete_stats_datastore.put(athlete_stats)
     return {'message': 'Update requested'}, 202
 
 

@@ -12,6 +12,7 @@ from fathomapi.utils.xray import xray_recorder
 from models.daily_readiness import DailyReadiness
 from models.soreness import MuscleSorenessSeverity, BodyPartLocation
 from models.stats import AthleteStats
+from logic.metrics_processing import MetricsProcessing
 from utils import parse_datetime, format_date, format_datetime
 
 app = Blueprint('daily_readiness', __name__)
@@ -46,19 +47,33 @@ def handle_daily_readiness_create():
     store = DailyReadinessDatastore()
     store.put(daily_readiness)
 
-    if 'current_sport_name' in request.json or 'current_position' in request.json:
+    need_stats_update = False
+    soreness = daily_readiness.soreness
+    severe_soreness = [s for s in soreness if not s.pain]
+    severe_pain = [s for s in soreness if s.pain]
+    if len(soreness) > 0 or 'current_sport_name' in request.json or 'current_position' in request.json:
+        need_stats_update = True
 
+    if need_stats_update:
+        plan_event_date = format_date(parse_datetime(event_date))
         athlete_stats_store = AthleteStatsDatastore()
-        athlete_stats = athlete_stats_store.get(athlete_id=daily_readiness.user_id)
-
+        athlete_stats = athlete_stats_store.get(athlete_id=request.json['user_id'])
         if athlete_stats is None:
             athlete_stats = AthleteStats(request.json['user_id'])
-            athlete_stats.event_date = format_date(daily_readiness.event_date)
+        athlete_stats.event_date = plan_event_date
+        athlete_stats.daily_severe_soreness = severe_soreness
+        athlete_stats.daily_severe_soreness_event_date = plan_event_date
+        athlete_stats.daily_severe_pain = severe_pain
+        athlete_stats.daily_severe_pain_event_date = plan_event_date
 
-        if 'current_sport_name' in request.json:
-            athlete_stats.current_sport_name = request.json['current_sport_name']
-        if 'current_position' in request.json:
-            athlete_stats.current_position = request.json['current_position']
+        for s in daily_readiness.soreness:
+            athlete_stats.update_historic_soreness(s, plan_event_date)
+
+        if 'current_sport_name' in request.json or 'current_position' in request.json:
+            if 'current_sport_name' in request.json:
+                athlete_stats.current_sport_name = request.json['current_sport_name']
+            if 'current_position' in request.json:
+                athlete_stats.current_position = request.json['current_position']
 
         athlete_stats_store.put(athlete_stats)
 
@@ -97,7 +112,7 @@ def handle_daily_readiness_get(principal_id=None):
 
     post_session_store = PostSessionSurveyDatastore()
     post_session_surveys = post_session_store.get(user_id=user_id, start_date=start_time, end_date=current_time)
-    post_session_surveys = [s for s in post_session_surveys if s is not None and s.event_date_time < current_time and s.event_date_time > start_time]
+    post_session_surveys = [s for s in post_session_surveys if s is not None and start_time < s.event_date_time < current_time]
     if len(post_session_surveys) != 0:
         post_session_surveys = sorted(post_session_surveys, key=lambda k: k.survey.event_date, reverse=True)
         sore_body_parts += [{"body_part": s.body_part.location.value, "side": s.side} for s in post_session_surveys[0].survey.soreness if s.severity > 1]
