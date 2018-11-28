@@ -135,7 +135,7 @@ class PersistentSorenessMetricGenerator(AthleteSorenessMetricGenerator):
         self.thresholds[0] = ThresholdRecommendation(MetricColor.yellow,
                                                      WeeklyHighLevelInsight.evaluate_health_status,
                                                      "Consult medical staff to evaluate status before training",
-                                                     ["7A", "9"], 4.0, None,
+                                                     ["7A"], 4.0, None,
                                                      "Persistent, severe {bodypart} soreness which may impact performance & indicate elevated injury risk",
                                                      None)
         self.thresholds[1] = ThresholdRecommendation(MetricColor.yellow,
@@ -161,7 +161,7 @@ class ChronicSorenessMetricGenerator(AthleteSorenessMetricGenerator):
         self.thresholds[0] = ThresholdRecommendation(MetricColor.yellow,
                                                      WeeklyHighLevelInsight.evaluate_health_status,
                                                      self.high_level_action_description,
-                                                     ["3B", "7A", "9"], 4.0, None,
+                                                     ["3B", "7A"], 4.0, None,
                                                      "Chronic, severe {bodypart} soreness which may impact performance & indicate elevated injury risk",
                                                      None)
         self.thresholds[1] = ThresholdRecommendation(MetricColor.yellow,
