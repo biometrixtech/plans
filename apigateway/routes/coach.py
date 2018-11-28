@@ -41,8 +41,8 @@ def get_dashboard_data(coach_id):
         incomplete = []
         athlete_stats_list = athlete_stats_datastore.get(users)
         readiness_survey_list = daily_readiness_datastore.get(users,
-                                                              start_date_time=start_time,
-                                                              end_date_time=current_time,
+                                                              start_date=start_time,
+                                                              end_date=current_time,
                                                               last_only=False)
         completed_users = [survey.user_id for survey in readiness_survey_list]
 
