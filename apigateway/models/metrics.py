@@ -29,7 +29,7 @@ class AthleteMetric(Serialisable):
                # 'body_part_location': self.body_part_location,
                # 'body_part_side': self.body_part_side,
                # 'soreness': [s.json_serialise() for s in self.soreness],
-               'specific_actions': self.specific_actions
+               'specific_actions': [s.json_serialise() for s in self.specific_actions]
               }
         return ret
 
@@ -118,11 +118,19 @@ class MetricType(Enum):
     longitudinal = 1
 
 
-class SpecificAction(object):
+class SpecificAction(Serialisable):
     def __init__(self, code, text, display):
         self.code = code
         self.text = text
         self.display = display
+
+    def json_serialise(self):
+        ret = {
+               'code': self.code,
+               'text': self.text,
+               'display': self.display
+                }
+        return ret
 
 
 class DailyHighLevelInsight(Enum):
