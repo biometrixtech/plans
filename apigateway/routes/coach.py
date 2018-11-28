@@ -115,7 +115,7 @@ def _get_user(user_id):
     response = Service('users', USERS_API_VERSION).call_apigateway_sync('GET', f"user/{user_id}")
     return {"user_id": user_id,
             "first_name": response['user']['personal_data']['first_name'],
-            "last_name": response['user']['personal_data']['first_name']}
+            "last_name": response['user']['personal_data']['last_name']}
 
 def _get_offset(tz):
     offset = tz.split(":")
