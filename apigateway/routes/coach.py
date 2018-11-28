@@ -25,11 +25,10 @@ def get_dashboard_data(coach_id):
     count = 0
     teams = []
     for team_id in team_ids:
-        team_name = 'Team'+str(count)
+        users, team_name = _get_team_info(team_id)
         team = TeamDashboardData(team_name)
         completed = []
         incomplete = []
-        users = _get_users_in_team(team_id)
         for user_id in users:
             user = _get_user(user_id)
             if DatastoreCollection().daily_plan_datastore.get(user_id, event_date, event_date)[0].daily_readiness_survey_completed():
@@ -82,9 +81,9 @@ def _get_teams(user_id):
     return response['user']['account_ids'], response['user']['timezone']
 
 
-def _get_users_in_team(account_id):
+def _get_team_info(account_id):
     response = Service('users', USERS_API_VERSION).call_apigateway_sync('GET', f"account/{account_id}")
-    return response['account']['users']
+    return response['account']['users'], response['account']['name']
 
 
 def _get_user(user_id):
