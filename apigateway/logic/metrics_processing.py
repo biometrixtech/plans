@@ -49,15 +49,15 @@ class DailySessionRPEMetricGenerator(AthleteTrainingVolumeMetricGenerator):
         self.thresholds[0] = ThresholdRecommendation(MetricColor.red,
                                                      DailyHighLevelInsight.limit_time_intensity_of_training,
                                                      self.high_level_action_description,
-                                                     ["2B", "7A"], 8.0, None,
-                                                     "A spike in workload on "+session_rpe_event_date+" which should be countered with a recovery day soon for optimal recovery and gains",
-                                                     None)
+                                                     ["2B", "7A"], 8.0, None, None,
+                                                     "A spike in workload on "+session_rpe_event_date+" which should be countered with a recovery day soon for optimal recovery and gains"
+                                                     )
         self.thresholds[1] = ThresholdRecommendation(MetricColor.yellow,
                                                      DailyHighLevelInsight.limit_time_intensity_of_training,
                                                      self.high_level_action_description,
-                                                     ["2B", "7A"], 6.0, 8.0,
-                                                     "A spike in workload on "+session_rpe_event_date+" which should be countered with a recovery day soon for optimal recovery and gains",
-                                                     None)
+                                                     ["2B", "7A"], 6.0, 8.0, None,
+                                                     "A spike in workload on "+session_rpe_event_date+" which should be countered with a recovery day soon for optimal recovery and gains"
+                                                     )
         self.populate_thresholds()
 
 
