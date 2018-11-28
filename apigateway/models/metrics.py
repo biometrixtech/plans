@@ -66,7 +66,7 @@ class AthleteTrainingVolumeMetricGenerator(object):
                 metric.high_level_action_description = self.thresholds[key].high_level_action_description
                 metric.specific_insight_training_volume = self.thresholds[key].specific_insight_training_volume
                 metric.high_level_insight = self.thresholds[key].high_level_insight
-                metric.specific_actions = [TextGenerator().get_recommendation_text(rec=rec) for rec in self.thresholds[key].specific_actions]
+                metric.specific_actions = [TextGenerator().get_specific_action(rec=rec) for rec in self.thresholds[key].specific_actions]
                 metric.color = self.thresholds[key].color
                 metric_list.append(metric)
 
@@ -100,16 +100,15 @@ class AthleteSorenessMetricGenerator(object):
         metric_list = []
 
         for key in sorted(self.thresholds.keys()):
-              if len(self.thresholds[key].soreness_list) > 0:
-                  metric = AthleteMetric(self.name, self.metric_type)
-                  metric.high_level_action_description = self.thresholds[key].high_level_action_description
-                  metric.specific_insight_recovery = TextGenerator().get_body_part_text(self.thresholds[key].specific_insight_recovery,
-                                                                                        self.thresholds[key].soreness_list)
-                  metric.high_level_insight = self.thresholds[key].high_level_insight
-                  metric.specific_actions = [TextGenerator().get_recommendation_text(rec=rec, soreness=self.thresholds[key].soreness_list) for rec in self.thresholds[key].specific_actions]
-                  metric.color = self.thresholds[key].color
-                  metric_list.append(metric)
-
+            if len(self.thresholds[key].soreness_list) > 0:
+                metric = AthleteMetric(self.name, self.metric_type)
+                metric.high_level_action_description = self.thresholds[key].high_level_action_description
+                metric.specific_insight_recovery = TextGenerator().get_body_part_text(self.thresholds[key].specific_insight_recovery,
+                                                                                    self.thresholds[key].soreness_list)
+                metric.high_level_insight = self.thresholds[key].high_level_insight
+                metric.specific_actions = [TextGenerator().get_specific_action(rec=rec, soreness=self.thresholds[key].soreness_list) for rec in self.thresholds[key].specific_actions]
+                metric.color = self.thresholds[key].color
+                metric_list.append(metric)
 
         return metric_list
 
@@ -117,6 +116,13 @@ class AthleteSorenessMetricGenerator(object):
 class MetricType(Enum):
     daily = 0
     longitudinal = 1
+
+
+class SpecificAction(object):
+    def __init__(self, code, text, display):
+        self.code = code
+        self.text = text
+        self.display = display
 
 
 class DailyHighLevelInsight(Enum):
@@ -159,14 +165,15 @@ class ThresholdRecommendation(object):
 
 
 class TextGenerator(object):
-    def get_recommendation_text(self, rec, soreness=None):
+    def get_specific_action(self, rec, soreness=None):
         if rec  == '6B':
             print([s.json_serialise() for s in soreness])
         text = RecommendationText(rec).value()
+
         if soreness is None:
-            return text
+            return SpecificAction(rec, text, True)
         else:
-            return self.get_body_part_text(text, soreness)
+            return SpecificAction(rec, self.get_body_part_text(text, soreness), True)
 
     def get_body_part_text(self, text, soreness_list=[], pain_type=None):
 
