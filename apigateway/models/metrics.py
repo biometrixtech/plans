@@ -2,6 +2,7 @@ from enum import Enum, IntEnum
 from serialisable import Serialisable
 from models.soreness import BodyPartLocationText
 
+
 class AthleteMetric(Serialisable):
     def __init__(self, name, metric_type):
         self.name = name
@@ -32,7 +33,47 @@ class AthleteMetric(Serialisable):
               }
         return ret
 
-class AthleteMetricGenerator(object):
+
+class AthleteTrainingVolumeMetricGenerator(object):
+    def __init__(self, name, metric_type, athlete_stats, threshold_attribute):
+        self.name = name,
+        self.metric_type = metric_type
+        self.athlete_stats = athlete_stats
+        self.threshold_attribute = threshold_attribute
+        self.thresholds = {}
+
+    def populate_thresholds(self):
+
+        for t, v in self.thresholds.items():
+            if getattr(self.athlete_stats, self.threshold_attribute) is not None:
+                if v.low_value is not None and v.high_value is not None:
+                    if v.low_value <= getattr(self.athlete_stats, self.threshold_attribute) < v.high_value:
+                        v.count += 1
+                elif v.low_value is not None and v.high_value is None:
+                    if v.low_value <= getattr(self.athlete_stats, self.threshold_attribute):
+                        v.count += 1
+                elif v.low_value is None and v.high_value is not None:
+                    if v.high_value >= getattr(self.athlete_stats, self.threshold_attribute):
+                        v.count += 1
+
+    def get_metric_list(self):
+
+        metric_list = []
+
+        for key in sorted(self.thresholds.keys()):
+            if self.thresholds[key].count > 0:
+                metric = AthleteMetric(self.name, self.metric_type)
+                metric.high_level_action_description = self.thresholds[key].high_level_action_description
+                metric.specific_insight_training_volume = self.thresholds[key].specific_insight_training_volume
+                metric.high_level_insight = self.thresholds[key].high_level_insight
+                metric.specific_actions = self.thresholds[key].specific_actions
+                metric.color = self.thresholds[key].color
+                metric_list.append(metric)
+
+        return metric_list
+
+
+class AthleteSorenessMetricGenerator(object):
     def __init__(self, name, metric_type, soreness_list, threshold_attribute):
         self.name = name,
         self.metric_type = metric_type
@@ -131,13 +172,15 @@ class MetricColor(IntEnum):
 
 class ThresholdRecommendation(object):
     def __init__(self, metric_color, high_level_insight, high_level_action_description, specific_actions, low_value,
-                 high_value, specific_insight_recovery):
+                 high_value, specific_insight_recovery, specific_insight_training_volume):
         self.specific_actions = specific_actions
         self.color = metric_color
         self.high_level_description = ""
         self.high_level_action_description = high_level_action_description
         self.high_level_insight = high_level_insight
         self.specific_insight_recovery = specific_insight_recovery
+        self.specific_insight_training_volume = specific_insight_training_volume
         self.low_value = low_value
         self.high_value = high_value
         self.soreness_list = []
+        self.count = 0
