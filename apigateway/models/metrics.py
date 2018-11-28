@@ -36,7 +36,7 @@ class AthleteMetric(Serialisable):
 
 class AthleteTrainingVolumeMetricGenerator(object):
     def __init__(self, name, metric_type, athlete_stats, threshold_attribute):
-        self.name = name,
+        self.name = name
         self.metric_type = metric_type
         self.athlete_stats = athlete_stats
         self.threshold_attribute = threshold_attribute
@@ -75,7 +75,7 @@ class AthleteTrainingVolumeMetricGenerator(object):
 
 class AthleteSorenessMetricGenerator(object):
     def __init__(self, name, metric_type, soreness_list, threshold_attribute):
-        self.name = name,
+        self.name = name
         self.metric_type = metric_type
         self.soreness = soreness_list
         self.threshold_attribute = threshold_attribute
