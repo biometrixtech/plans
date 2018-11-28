@@ -81,10 +81,10 @@ def get_dashboard_data(coach_id):
                     # update team card for the athlete
                     if metric.metric_type == MetricType.daily:
                         team.add_user_to_daily_report(user, metric)
-                        athlete.daily_recommendation.update([m['text'] for m in metric.specific_actions if m['display']])
+                        athlete.daily_recommendation.update([m.text for m in metric.specific_actions if m.display])
                     elif metric.metric_type == MetricType.longitudinal:
                         team.add_user_to_weekly_report(user, metric)
-                        athlete.weekly_recommendation.update([m['text'] for m in metric.specific_actions if m['display']])
+                        athlete.weekly_recommendation.update([m.text for m in metric.specific_actions if m.display])
                 if len(athlete_stats.metrics) == 0:
                     # add user to all good
                     user = AthleteDashboardSummary(user['user_id'], user['first_name'], user['last_name'])
