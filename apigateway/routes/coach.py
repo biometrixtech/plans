@@ -29,6 +29,14 @@ def get_dashboard_data(coach_id):
                                     minute=0,
                                     second=0
                                     )
+    end_time = datetime.datetime(
+                                    year=current_time.year, 
+                                    month=current_time.month,
+                                    day=current_time.day,
+                                    hour=23,
+                                    minute=59,
+                                    second=59
+                                    )
     event_date = format_date(current_time)
     athlete_stats_datastore = DatastoreCollection().athlete_stats_datastore
     daily_readiness_datastore = DatastoreCollection().daily_readiness_datastore
@@ -42,7 +50,7 @@ def get_dashboard_data(coach_id):
         athlete_stats_list = athlete_stats_datastore.get(users)
         readiness_survey_list = daily_readiness_datastore.get(users,
                                                               start_date=start_time,
-                                                              end_date=current_time,
+                                                              end_date=end_time,
                                                               last_only=False)
         completed_users = [survey.user_id for survey in readiness_survey_list]
 
