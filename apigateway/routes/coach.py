@@ -36,6 +36,8 @@ def get_dashboard_data(coach_id):
                 completed.append(user)
             else:
                 incomplete.append(user)
+            team.compliance['completed'] = completed
+            team.compliance['incomplete'] = incomplete
             athlete_stats = athlete_stats_datastore.get(user_id)
             if athlete_stats is not None:
                 athlete = AthleteDashboardData(user['user_id'], user['first_name'], user['last_name'])

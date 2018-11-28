@@ -6,7 +6,7 @@ class TeamDashboardData(Serialisable):
 
     def __init__(self, name):
         self.name = name
-        self.compliance = []
+        self.compliance = {}
         self.daily_insights_dict = {}
         self.daily_insights = DailySummary()
         self.weekly_insights_dict = {}
