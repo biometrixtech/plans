@@ -31,7 +31,7 @@ def get_dashboard_data(coach_id):
                                     )
     event_date = format_date(current_time)
     athlete_stats_datastore = DatastoreCollection().athlete_stats_datastore
-    daily_readiness_datastore = DatastoreCollection().readiness_survey_datastore
+    daily_readiness_datastore = DatastoreCollection().daily_readiness_datastore
     count = 0
     teams = []
     for team_id in team_ids:
