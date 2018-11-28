@@ -229,7 +229,7 @@ class RecommendationText(object):
                 "5B": "Limiting your training. Seek medical advice if symptoms persist after warm-up.",
                 "6A": "Stopping activity if {bodypart} {is_pain} present",
                 "6B": "Modifying training so all activity is free of {bodypart} {is_pain}",
-                "6C": "Monitoring {body_part} symptoms during training. If symptoms persists, consider decreasing training in the next few days to allow recovery",
+                "6C": "Monitoring {bodypart} symptoms during training. If symptoms persists, consider decreasing training in the next few days to allow recovery",
                 "7A": "Completing Fathom's personalized Prep & Recovery",
                 "7B": "Completing Fathom's Prep",
                 "8A": "Heat {bodypart} before training for 10 minutes",
