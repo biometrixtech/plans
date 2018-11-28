@@ -56,11 +56,11 @@ class RecommendationMatrix(object):
 
         for m in metrics:
             for a in m.specific_actions:
-                if a.rec in self.recs:
-                    self.recs[a.rec].append(a)
+                if a.code in self.recs:
+                    self.recs[a.code].append(a)
                 else:
-                    self.recs[a.rec] = []
-                    self.recs[a.rec].append(a)
+                    self.recs[a.code] = []
+                    self.recs[a.code].append(a)
 
     def get_winners(self):
 
@@ -87,7 +87,7 @@ class RecommendationMatrix(object):
 
         for m in range(0, len(self.metrics)):
             for a in range(0, len(self.metrics[m].specific_actions)):
-                if self.metrics[m].specific_actions[a].rec in winners:
+                if self.metrics[m].specific_actions[a].code in winners:
                     self.metrics[m].specific_actions[a].display = True
                 else:
                     self.metrics[m].specific_actions[a].display = False
