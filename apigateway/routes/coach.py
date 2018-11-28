@@ -29,7 +29,10 @@ def get_dashboard_data(coach_id):
         team = TeamDashboardData(team_name)
         completed = []
         incomplete = []
-        for user_id in users:
+        athlete_stats_list = athlete_stats_datastore.get(users)
+        #for user_id in users:
+        for athlete_stats in athlete_stats_list:
+            user_id = athlete_stats.athlete_id
             user = _get_user(user_id)
             if DatastoreCollection().daily_plan_datastore.get(user_id, event_date, event_date)[0].daily_readiness_survey_completed():
                 completed.append(user)
@@ -37,7 +40,7 @@ def get_dashboard_data(coach_id):
                 incomplete.append(user)
             team.compliance['completed'] = completed
             team.compliance['incomplete'] = incomplete
-            athlete_stats = athlete_stats_datastore.get(user_id)
+            # athlete_stats = athlete_stats_datastore.get(user_id)
             if athlete_stats is not None:
                 athlete = AthleteDashboardData(user['user_id'], user['first_name'], user['last_name'])
                 for metric in athlete_stats.metrics:
