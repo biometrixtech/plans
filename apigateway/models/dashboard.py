@@ -17,7 +17,7 @@ class TeamDashboardData(Serialisable):
     def json_serialise(self):
         ret = {'name': self.name,
                'compliance': self.compliance,
-               'daily_summary': self.daily_insights.json_serialise(),
+               'daily_insights': self.daily_insights.json_serialise(),
                'weekly_insights': self.weekly_insights.json_serialise(),
                'athletes': [a.json_serialise() for a in self.athletes]
                 }
