@@ -1,6 +1,7 @@
 from logic.metrics_processing import MetricsProcessing
 from models.stats import AthleteStats
 from models.metrics import MetricColor
+from models.soreness import BodyPartLocation, HistoricSorenessStatus, HistoricSoreness
 
 
 def test_session_rpe_specific_actions():
@@ -57,3 +58,19 @@ def test_no_session_rpe_diff_date():
     metrics_list = metrics_processor.get_athlete_metrics_from_stats(athlete_stats, "2018-07-02")
 
     assert len(metrics_list) == 0
+
+
+def test_chronic_pain_specific_actions():
+    athlete_stats = AthleteStats("tester")
+
+    hist_soreness = HistoricSoreness(BodyPartLocation(12), 1, True)
+    hist_soreness.historic_soreness_status = HistoricSorenessStatus.chronic
+    hist_soreness.average_severity = 3
+    hist_soreness_list = [hist_soreness]
+    athlete_stats.historic_soreness = hist_soreness_list
+
+    metrics_processor = MetricsProcessing()
+    metrics_list = metrics_processor.get_athlete_metrics_from_stats(athlete_stats, "2018-07-01")
+
+    assert metrics_list[0].specific_actions[0] == "6B"
+    assert metrics_list[0].specific_actions[1] == "7A"
