@@ -160,28 +160,24 @@ class ThresholdRecommendation(object):
 
 class TextGenerator(object):
     def get_recommendation_text(self, rec, soreness=None):
+        if rec  == '6B':
+            print([s.json_serialise() for s in soreness])
         text = RecommendationText(rec).value()
         if soreness is None:
             return text
         else:
-            text = self.get_body_part_text(text, soreness)
-            try:
-                is_pain = soreness[0].pain
-            except:
-                is_pain = soreness[0].is_pain
-            if is_pain:
-                return text.format(is_pain="pain")
-            else:
-                return text.format(is_pain="soreness")
+            return self.get_body_part_text(text, soreness)
 
-    def get_body_part_text(self, text, soreness_list=[]):
+    def get_body_part_text(self, text, soreness_list=[], pain_type=None):
 
         body_part_list = []
         for soreness in soreness_list:
             try:
                 part = BodyPartLocationText(soreness.body_part.location).value()
+                is_pain = soreness.pain
             except:
                 part = BodyPartLocationText(soreness.body_part_location).value()
+                is_pain = soreness.is_pain
             side = soreness.side
             if side == 1:
                 body_text = " ".join(["left", part])
@@ -191,14 +187,15 @@ class TextGenerator(object):
                 body_text = part
 
             body_part_list.append(body_text)
+        sore_type = "pain" if is_pain else "soreness"
         if len(body_part_list) > 1:
             joined_text = ", ".join(body_part_list)
             pos = joined_text.rfind(",")
             joined_text = joined_text[:pos] + " and" + joined_text[pos+1:]
-            return text.format(bodypart=joined_text, is_pain="pain")
+            return text.format(bodypart=joined_text, is_pain=sore_type)
         elif len(body_part_list) == 1:
             joined_text = body_part_list[0]
-            return text.format(bodypart=joined_text, is_pain="pain")
+            return text.format(bodypart=joined_text, is_pain=sore_type)
         else:
             return text
 
@@ -208,21 +205,20 @@ class RecommendationText(object):
 
     def value(self):
         recs = {"1A": "Creating a periodized plan for the next month to introduce a variety of different stimuli",
-                "1B": "Increase variety in your training regimen",
+                "1B": "Increasing variety in your training regimen",
                 "2A": "Considering not training today",
                 "2B": "A shorter or lower-intensity training session",
                 "2C": "Exposure to a longer or higher-intensity training session",
                 "3A": "Drastically decreasing workload this week",
                 "3B": "Consider decreasing weekly workload",
                 "3C": "Consider increasing weekly workload",
-                "5A": "Seek help from a medical professional",
-                "5B": "Limiting your training.",
-                "5C": "Seek medical advice if symptoms persist after warm-up.", 
-                "6A": "Stop activity if {bodypart} {is_pain} are present",
+                "5A": "Seeking help from a medical professional",
+                "5B": "Limiting your training. Seek medical advice if symptoms persist after warm-up.",
+                "6A": "Stopping activity if {bodypart} {is_pain} present",
                 "6B": "Modifying training so all activity is free of {bodypart} {is_pain}",
-                "6C": "Monitor {body_part} symptoms during training. If symptoms persists, consider decreasing training in the next few days to allow recovery",
+                "6C": "Monitoring {body_part} symptoms during training. If symptoms persists, consider decreasing training in the next few days to allow recovery",
                 "7A": "Completing Fathom's personalized Prep & Recovery",
-                "7B": "Complete Prep",
+                "7B": "Completing Fathom's Prep",
                 "8A": "Heat {bodypart} before training for 10 minutes",
                 "9A": "Ice {bodypart} immediately after training for 20 minutes",
                 "9C": "Ice bath for 10 minutes after training"
