@@ -3,6 +3,7 @@ import datetime
 
 from datastores.daily_plan_datastore import DailyPlanDatastore
 from datastores.session_datastore import SessionDatastore
+from datastores.athlete_stats_datastore import AthleteStatsDatastore
 from fathomapi.api.config import Config
 from fathomapi.comms.service import Service
 from fathomapi.utils.decorators import require
@@ -68,6 +69,29 @@ def handle_session_create():
                 session_data["event_date"] = format_datetime(parse_datetime(session_data["event_date"]) - datetime.timedelta(days=1))
 
         session_data['post_session_survey'] = survey.json_serialise()
+
+        athlete_stats_store = AthleteStatsDatastore()
+        athlete_stats = athlete_stats_store.get(athlete_id=user_id)
+        # update session_RPE
+        if athlete_stats.session_RPE is not None:
+            athlete_stats.session_RPE = max(survey.RPE, athlete_stats.session_RPE)
+        else:
+            athlete_stats.session_RPE = survey.RPE
+        athlete_stats.session_RPE_event_date = plan_event_date
+
+        # update severe soreness and severe pain
+        soreness = survey.soreness
+        severe_soreness = [s for s in soreness if not s.pain]
+        severe_pain = [s for s in soreness if s.pain]
+        athlete_stats.daily_severe_soreness_event_date = plan_event_date
+        athlete_stats.daily_severe_pain_event_date = plan_event_date
+        athlete_stats.daily_severe_soreness.extend(severe_soreness)
+        athlete_stats.daily_severe_pain.extend(severe_pain)
+        # update historic soreness
+        for s in soreness:
+            athlete_stats.update_historic_soreness(s, plan_event_date)
+        athlete_stats_store.put(athlete_stats)
+
     if not _check_plan_exists(user_id, plan_event_date):
         plan = DailyPlan(event_date=plan_event_date)
         plan.user_id = user_id

@@ -63,7 +63,7 @@ def handle_clear_user_data(principal_id=None):
     result = exercises.delete_many({"athlete_id": user_id, "event_date": {"$gte": today, "$lt": tomorrow}})
     print("completed exercises deleted: {}".format(result.deleted_count))
     # Update stats to reset it to yesterday's state
-    Service('plans', Config.get('API_VERSION')).call_apigateway_sync('POST', f"athlete/{user_id}/stats")
+    Service('plans', Config.get('API_VERSION')).call_apigateway_sync('POST', f"athlete/{user_id}/stats", body={})
 
     if 'clear_all' in request.json and request.json['clear_all']:
         readiness.delete_many({"user_id": user_id})

@@ -24,7 +24,7 @@ class DailyPlanDatastore(object):
         mongo_collection = get_mongo_collection(self.mongo_collection)
         if day_of_week is None:
             query0 = {'user_id': user_id, 'date': {'$gte': start_date, '$lte': end_date}}
-            # query1 = {'_id': 0, 'last_updated': 0, 'user_id': 0}
+            # query1 = {'_id': 0, 'last_reported': 0, 'user_id': 0}
         else:
             query0 = {'user_id': user_id, 'date': {'$gte': start_date, '$lte': end_date}, 'day_of_week': day_of_week}
         mongo_cursor = mongo_collection.find(query0)

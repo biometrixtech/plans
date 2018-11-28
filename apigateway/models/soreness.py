@@ -26,11 +26,14 @@ class JointSorenessSeverity(IntEnum):
 class Soreness(Serialisable):
     def __init__(self):
         self.body_part = None
+        self.historic_soreness_status = None
         self.pain = False
+        self.reported_date_time = None
         self.severity = None  # muscle_soreness_severity or joint_soreness_severity
         self.side = None
         self.type = None  # soreness_type
-        self.reported_date_time = None
+        self.count = 1
+        self.streak = 0
 
     def json_serialise(self):
         ret = {
@@ -40,6 +43,9 @@ class Soreness(Serialisable):
             'side': self.side
         }
         return ret
+
+    def __getitem__(self, item):
+        return getattr(self, item)
 
 
 class InjuryStatus(Enum):
@@ -86,6 +92,8 @@ class HistoricSorenessStatus(IntEnum):
     dormant_cleared = 0
     persistent = 1
     chronic = 2
+    almost_persistent = 3
+    persistent_almost_chronic = 4
 
 
 class HistoricSoreness(Serialisable):
@@ -95,6 +103,10 @@ class HistoricSoreness(Serialisable):
         self.historic_soreness_status = HistoricSorenessStatus.dormant_cleared
         self.is_pain = is_pain
         self.side = side
+        self.streak = 0
+        self.streak_start_date = None
+        self.average_severity = 0.0
+        self.last_reported = ""
 
     def json_serialise(self):
         ret = {
@@ -102,9 +114,40 @@ class HistoricSoreness(Serialisable):
             'historic_soreness_status': self.historic_soreness_status.value,
             'is_pain': self.is_pain,
             'side': self.side,
+            'streak': self.streak,
+            'streak_start_date': self.streak_start_date,
+            'average_severity': self.average_severity,
+            'last_reported': self.last_reported
         }
         return ret
 
+
+class BodyPartLocationText(object):
+    def __init__(self, body_part_location):
+        self.body_part_location = body_part_location
+
+    def value(self):
+        body_part_text = {'head': 'head',
+                          'shoulder': 'shoulder',
+                          'chest': 'chest',
+                          'abdominals': 'abdominal',
+                          'hip_flexor': 'hip',
+                          'groin': 'groin',
+                          'quads': 'quad',
+                          'knee': 'knee',
+                          'shin': 'shin',
+                          'ankle': 'ankle',
+                          'foot': 'foot',
+                          'outer_thigh': 'IT band',
+                          'lower_back': 'lower back',
+                          'general': 'general',
+                          'glutes': 'glute',
+                          'hamstrings': 'hamstring',
+                          'calves': 'calf',
+                          'achilles': 'achilles',
+                          'upper_back_neck': 'upper back'}
+
+        return body_part_text[self.body_part_location.name]
 
 
 
