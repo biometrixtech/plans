@@ -20,8 +20,18 @@ USERS_API_VERSION = '2_1'
 def get_dashboard_data(coach_id):
     team_ids, tz = _get_teams(coach_id)
     minute_offset = _get_offset(tz)
-    event_date = format_date(datetime.datetime.now() + datetime.timedelta(minutes=minute_offset))
+    current_time = datetime.datetime.now() + datetime.timedelta(minutes=minute_offset)
+    start_time = datetime.datetime(
+                                    year=current_time.year, 
+                                    month=current_time.month,
+                                    day=current_time.day,
+                                    hour=3,
+                                    minute=0,
+                                    second=0
+                                    )
+    event_date = format_date(current_time)
     athlete_stats_datastore = DatastoreCollection().athlete_stats_datastore
+    daily_readiness_datastore = DatastoreCollection().readiness_survey_datastore
     count = 0
     teams = []
     for team_id in team_ids:
@@ -30,16 +40,25 @@ def get_dashboard_data(coach_id):
         completed = []
         incomplete = []
         athlete_stats_list = athlete_stats_datastore.get(users)
-        #for user_id in users:
+        readiness_survey_list = daily_readiness_datastore.get(users,
+                                                              start_date_time=start_time,
+                                                              end_date_time=current_time,
+                                                              last_only=False)
+        completed_users = [survey.user_id for survey in readiness_survey_list]
+
+        #for user_id in users:a
         for athlete_stats in athlete_stats_list:
             user_id = athlete_stats.athlete_id
             user = _get_user(user_id)
-            if DatastoreCollection().daily_plan_datastore.get(user_id, event_date, event_date)[0].daily_readiness_survey_completed():
+            if user_id in completed_users:
                 completed.append(user)
             else:
                 incomplete.append(user)
-            team.compliance['completed'] = completed
-            team.compliance['incomplete'] = incomplete
+
+            # if DatastoreCollection().daily_plan_datastore.get(user_id, event_date, event_date)[0].daily_readiness_survey_completed():
+            #     completed.append(user)
+            # else:
+            #     incomplete.append(user)
             # athlete_stats = athlete_stats_datastore.get(user_id)
             if athlete_stats is not None:
                 athlete = AthleteDashboardData(user['user_id'], user['first_name'], user['last_name'])
@@ -74,6 +93,9 @@ def get_dashboard_data(coach_id):
             high_insight = WeeklyHighLevelInsight(k).name
             for user_id, user in v.items():
                 getattr(team.weekly_insights, high_insight).append(user)
+
+        team.compliance['completed'] = completed
+        team.compliance['incomplete'] = incomplete
         teams.append(team.json_serialise())
         count += 1
     return {'teams': teams}, 200
