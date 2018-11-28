@@ -20,6 +20,7 @@ class AthleteStatsDatastore(object):
                 self._put_mongodb(item)
         except Exception as e:
             raise e
+
     def get_many(self, athletes):
         if not isinstance(athletes, list):
             athletes = [athletes]
@@ -36,39 +37,52 @@ class AthleteStatsDatastore(object):
     @xray_recorder.capture('datastore.AthleteStatsDatastore._query_mongodb')
     def _query_mongodb(self, athlete_id):
         mongo_collection = get_mongo_collection(self.mongo_collection)
-        query = {'athlete_id': athlete_id}
-        mongo_result = mongo_collection.find_one(query)
+        if isinstance(athlete_id, list):
+            query = {'athlete_id': {'$in': athlete_id}}
+            mongo_results = mongo_collection.find(query)
+            athlete_stats_list = []
+            for mongo_result in mongo_results:
+                athlete_stats_list.append(self.get_athlete_stats_from_mongo(mongo_result))
 
-        if mongo_result is not None:
-            athlete_stats = AthleteStats(athlete_id=mongo_result['athlete_id'])
-            athlete_stats.event_date = mongo_result['event_date']
-            athlete_stats.session_RPE = mongo_result.get('session_RPE', None)
-            athlete_stats.session_RPE_event_date = mongo_result.get('session_RPE_event_date', None)
-            athlete_stats.acute_avg_RPE = mongo_result['acute_avg_RPE']
-            athlete_stats.acute_avg_readiness = mongo_result['acute_avg_readiness']
-            athlete_stats.acute_avg_sleep_quality = mongo_result['acute_avg_sleep_quality']
-            athlete_stats.acute_avg_max_soreness = mongo_result['acute_avg_max_soreness']
-            athlete_stats.chronic_avg_RPE = mongo_result['chronic_avg_RPE']
-            athlete_stats.chronic_avg_readiness = mongo_result['chronic_avg_readiness']
-            athlete_stats.chronic_avg_max_soreness = mongo_result['chronic_avg_max_soreness']
-            athlete_stats.functional_strength_eligible = mongo_result.get('functional_strength_eligible', False)
-            athlete_stats.completed_functional_strength_sessions = mongo_result.get('completed_functional_strength_sessions', 0)
-            athlete_stats.next_functional_strength_eligible_date = mongo_result.get('next_functional_strength_eligible_date', None)
-            athlete_stats.current_sport_name = mongo_result.get('current_sport_name', None)
-            athlete_stats.current_position = mongo_result.get('current_position', None)
-            athlete_stats.historic_soreness = [self._historic_soreness_from_mongodb(s)
-                                               for s in mongo_result.get('historic_soreness', [])]
-            athlete_stats.daily_severe_soreness = [self._soreness_from_mongodb(s)
-                                                   for s in mongo_result.get('daily_severe_soreness', [])]
-            athlete_stats.daily_severe_pain = [self._soreness_from_mongodb(s)
-                                                   for s in mongo_result.get('daily_severe_pain', [])]
-            athlete_stats.daily_severe_soreness_event_date = mongo_result.get('daily_severe_soreness_event_date', None)
-            athlete_stats.daily_severe_pain_event_date = mongo_result.get('daily_severe_soreness_event_date', None)
-            athlete_stats.metrics = [self._metrics_from_mongodb(s) for s in mongo_result.get('metrics', [])]
-            return athlete_stats
-
+            return athlete_stats_list
         else:
-            return None
+            query = {'athlete_id': athlete_id}
+            mongo_result = mongo_collection.find_one(query)
+
+            if mongo_result is not None:
+                return self.get_athlete_stats_from_mongo(mongo_result)
+            else:
+                return None
+
+    def get_athlete_stats_from_mongo(self, mongo_result):
+        athlete_stats = AthleteStats(athlete_id=mongo_result['athlete_id'])
+        athlete_stats.event_date = mongo_result['event_date']
+        athlete_stats.session_RPE = mongo_result.get('session_RPE', None)
+        athlete_stats.session_RPE_event_date = mongo_result.get('session_RPE_event_date', None)
+        athlete_stats.acute_avg_RPE = mongo_result['acute_avg_RPE']
+        athlete_stats.acute_avg_readiness = mongo_result['acute_avg_readiness']
+        athlete_stats.acute_avg_sleep_quality = mongo_result['acute_avg_sleep_quality']
+        athlete_stats.acute_avg_max_soreness = mongo_result['acute_avg_max_soreness']
+        athlete_stats.chronic_avg_RPE = mongo_result['chronic_avg_RPE']
+        athlete_stats.chronic_avg_readiness = mongo_result['chronic_avg_readiness']
+        athlete_stats.chronic_avg_max_soreness = mongo_result['chronic_avg_max_soreness']
+        athlete_stats.functional_strength_eligible = mongo_result.get('functional_strength_eligible', False)
+        athlete_stats.completed_functional_strength_sessions = mongo_result.get(
+            'completed_functional_strength_sessions', 0)
+        athlete_stats.next_functional_strength_eligible_date = mongo_result.get(
+            'next_functional_strength_eligible_date', None)
+        athlete_stats.current_sport_name = mongo_result.get('current_sport_name', None)
+        athlete_stats.current_position = mongo_result.get('current_position', None)
+        athlete_stats.historic_soreness = [self._historic_soreness_from_mongodb(s)
+                                           for s in mongo_result.get('historic_soreness', [])]
+        athlete_stats.daily_severe_soreness = [self._soreness_from_mongodb(s)
+                                               for s in mongo_result.get('daily_severe_soreness', [])]
+        athlete_stats.daily_severe_pain = [self._soreness_from_mongodb(s)
+                                           for s in mongo_result.get('daily_severe_pain', [])]
+        athlete_stats.daily_severe_soreness_event_date = mongo_result.get('daily_severe_soreness_event_date', None)
+        athlete_stats.daily_severe_pain_event_date = mongo_result.get('daily_severe_soreness_event_date', None)
+        athlete_stats.metrics = [self._metrics_from_mongodb(s) for s in mongo_result.get('metrics', [])]
+        return athlete_stats
 
     @xray_recorder.capture('datastore.AthleteStatsDatastore._put_mongodb')
     def _put_mongodb(self, item):
