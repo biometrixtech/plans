@@ -56,7 +56,7 @@ class RecommendationMatrix(object):
 
         for m in metrics:
             for a in m.specific_actions:
-                if a.code in self.recs:
+                if a.code not in self.recs:
                     self.recs[a.code] = 1
                 else:
                     self.recs[a.code] += 1
