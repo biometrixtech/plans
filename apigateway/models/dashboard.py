@@ -150,7 +150,7 @@ class AthleteDashboardData(Serialisable):
         self.daily_insights = set()
         self.weekly_insights = set()
 
-    def aggregate(self, metrics, team):
+    def aggregate(self, metrics):
         not_cleared_recs_day = []
         not_cleared_recs_week = []
         for metric in metrics:
