@@ -1,4 +1,4 @@
-from models.metrics import AthleteSorenessMetricGenerator, AthleteTrainingVolumeMetricGenerator, MetricColor, DailyHighLevelInsight, MetricType, ThresholdRecommendation
+from models.metrics import AthleteSorenessMetricGenerator, AthleteTrainingVolumeMetricGenerator, MetricColor, DailyHighLevelInsight, MetricType, TextGenerator, ThresholdRecommendation
 from models.stats import AthleteStats
 from models.soreness import BodyPart, BodyPartLocation, Soreness, HistoricSoreness, HistoricSorenessStatus
 
@@ -193,3 +193,28 @@ def test_populate_thresholds_athlete_daily_soreness_thresh_mod_metrics_diff():
     metrics = asg.get_metric_list()
 
     assert len(metrics) == 2
+
+
+def test_body_part_text_uppercase_if_first():
+
+    soreness1 = Soreness()
+    soreness1.severity = 4
+    soreness1.pain = True
+    soreness1.streak = 2
+    soreness1.side = 1
+    soreness1.body_part = BodyPart(BodyPartLocation.calves, None)
+
+    soreness2 = Soreness()
+    soreness2.severity = 1
+    soreness2.pain = True
+    soreness2.streak = 3
+    soreness2.side = 2
+    soreness2.body_part = BodyPart(BodyPartLocation.calves, None)
+
+    soreness_list = [soreness1, soreness2]
+
+    text_gen = TextGenerator()
+
+    test_text = text_gen.get_body_part_text("{bodypart} hurts badly!!", soreness_list)
+
+    assert test_text[0].isupper() is True

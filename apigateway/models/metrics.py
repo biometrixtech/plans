@@ -205,10 +205,10 @@ class TextGenerator(object):
             joined_text = ", ".join(body_part_list)
             pos = joined_text.rfind(",")
             joined_text = joined_text[:pos] + " and" + joined_text[pos+1:]
-            return text.format(bodypart=joined_text, is_pain=sore_type)
+            return text.format(bodypart=joined_text, is_pain=sore_type).capitalize()
         elif len(body_part_list) == 1:
             joined_text = body_part_list[0]
-            return text.format(bodypart=joined_text, is_pain=sore_type)
+            return text.format(bodypart=joined_text, is_pain=sore_type).capitalize()
         else:
             return text
 
