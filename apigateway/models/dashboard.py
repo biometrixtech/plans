@@ -164,12 +164,12 @@ class AthleteDashboardData(Serialisable):
             if metric.metric_type == MetricType.daily:
                 self.daily_insights.add(metric.high_level_insight)
                 self.daily_recommendation.update([m.text for m in metric.specific_actions if m.display])
-                if not self.cleared_to_train:
+                if metric.color == MetricColor.red:
                     not_cleared_recs_day.extend([m.text for m in metric.specific_actions if m.display])
             elif metric.metric_type == MetricType.longitudinal:
                 self.weekly_insights.add(metric.high_level_insight)
                 self.weekly_recommendation.update([m.text for m in metric.specific_actions if m.display])
-                if not self.cleared_to_train:
+                if metric.color == MetricColor.red:
                     not_cleared_recs_week.extend([m.text for m in metric.specific_actions if m.display])
 
         if not self.cleared_to_train:
