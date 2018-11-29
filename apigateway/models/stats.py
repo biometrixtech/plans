@@ -112,6 +112,20 @@ class AthleteStats(Serialisable):
                                 self.historic_soreness[h].streak = self.historic_soreness[h].streak + 1
                                 break
 
+    def update_daily_soreness(self, soreness):
+        for existing_soreness in self.daily_severe_soreness:
+            if soreness.body_part == existing_soreness.body_part and soreness.side == existing_soreness.side:
+                existing_soreness.severity = max([soreness.severity, existing_soreness.severity])
+                return True
+        self.daily_severe_soreness.append(soreness)
+
+    def update_daily_pain(self, pain):
+        for existing_pain in self.daily_severe_pain:
+            if pain.body_part == existing_pain.body_part and pain.side == existing_pain.side:
+                existing_pain.severity = max([pain.severity, existing_pain.severity])
+                return True
+        self.daily_severe_pain.append(pain)
+
 
     def acute_to_chronic_external_ratio(self):
         if self.acute_external_total_load is not None and self.chronic_external_total_load is not None:

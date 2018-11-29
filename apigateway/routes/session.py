@@ -85,8 +85,10 @@ def handle_session_create():
         severe_pain = [s for s in soreness if s.pain]
         athlete_stats.daily_severe_soreness_event_date = plan_event_date
         athlete_stats.daily_severe_pain_event_date = plan_event_date
-        athlete_stats.daily_severe_soreness.extend(severe_soreness)
-        athlete_stats.daily_severe_pain.extend(severe_pain)
+        for soreness in severe_soreness:
+            athlete_stats.update_daily_soreness(sorenes)
+        for pain in severe_soreness:
+            athlete_stats.update_daily_pain(pain)
         # update historic soreness
         for s in soreness:
             athlete_stats.update_historic_soreness(s, plan_event_date)
