@@ -218,3 +218,110 @@ def test_body_part_text_uppercase_if_first():
     test_text = text_gen.get_body_part_text("{bodypart} hurts badly!!", soreness_list)
 
     assert test_text[0].isupper() is True
+
+
+def test_body_part_text_bilateral_grouping():
+
+    soreness1 = Soreness()
+    soreness1.severity = 4
+    soreness1.pain = True
+    soreness1.streak = 2
+    soreness1.side = 1
+    soreness1.body_part = BodyPart(BodyPartLocation.calves, None)
+
+    soreness2 = Soreness()
+    soreness2.severity = 1
+    soreness2.pain = True
+    soreness2.streak = 3
+    soreness2.side = 1
+    soreness2.body_part = BodyPart(BodyPartLocation.ankle, None)
+
+    soreness3 = Soreness()
+    soreness3.severity = 1
+    soreness3.pain = True
+    soreness3.streak = 3
+    soreness3.side = 2
+    soreness3.body_part = BodyPart(BodyPartLocation.calves, None)
+
+    soreness_list = [soreness1, soreness2, soreness3]
+
+    text_gen = TextGenerator()
+
+    test_text = text_gen.get_body_part_text("{bodypart} hurts badly!!", soreness_list)
+
+    assert test_text == "Left ankle, left and right calf hurts badly!!"
+
+
+def test_3_body_part_text_no_bilateral_grouping():
+
+    soreness1 = Soreness()
+    soreness1.severity = 4
+    soreness1.pain = True
+    soreness1.streak = 2
+    soreness1.side = 1
+    soreness1.body_part = BodyPart(BodyPartLocation.calves, None)
+
+    soreness2 = Soreness()
+    soreness2.severity = 1
+    soreness2.pain = True
+    soreness2.streak = 3
+    soreness2.side = 1
+    soreness2.body_part = BodyPart(BodyPartLocation.ankle, None)
+
+    soreness3 = Soreness()
+    soreness3.severity = 1
+    soreness3.pain = True
+    soreness3.streak = 3
+    soreness3.side = 2
+    soreness3.body_part = BodyPart(BodyPartLocation.foot, None)
+
+    soreness_list = [soreness1, soreness2, soreness3]
+
+    text_gen = TextGenerator()
+
+    test_text = text_gen.get_body_part_text("{bodypart} hurts badly!!", soreness_list)
+
+    assert test_text == "Left ankle, right foot and left calf hurts badly!!"
+
+
+def test_2_body_part_text_no_bilateral_grouping():
+
+    soreness1 = Soreness()
+    soreness1.severity = 4
+    soreness1.pain = True
+    soreness1.streak = 2
+    soreness1.side = 1
+    soreness1.body_part = BodyPart(BodyPartLocation.calves, None)
+
+    soreness2 = Soreness()
+    soreness2.severity = 1
+    soreness2.pain = True
+    soreness2.streak = 3
+    soreness2.side = 1
+    soreness2.body_part = BodyPart(BodyPartLocation.ankle, None)
+
+    soreness_list = [soreness1, soreness2]
+
+    text_gen = TextGenerator()
+
+    test_text = text_gen.get_body_part_text("{bodypart} hurts badly!!", soreness_list)
+
+    assert test_text == "Left ankle and left calf hurts badly!!"
+
+
+def test_1_body_part_text_no_bilateral_grouping():
+
+    soreness2 = Soreness()
+    soreness2.severity = 1
+    soreness2.pain = True
+    soreness2.streak = 3
+    soreness2.side = 1
+    soreness2.body_part = BodyPart(BodyPartLocation.ankle, None)
+
+    soreness_list = [soreness2]
+
+    text_gen = TextGenerator()
+
+    test_text = text_gen.get_body_part_text("{bodypart} hurts badly!!", soreness_list)
+
+    assert test_text == "Left ankle hurts badly!!"
