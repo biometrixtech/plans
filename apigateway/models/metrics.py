@@ -184,14 +184,22 @@ class TextGenerator(object):
     def get_body_part_text(self, text, soreness_list=[], pain_type=None):
 
         body_part_list = []
-        soreness_list.sort(key=lambda x: x.body_part.location.value, reverse=False)
+
+        is_historic = False
+
+        try:
+            soreness_list.sort(key=lambda x: x.body_part.location.value, reverse=False)
+        except:
+            soreness_list.sort(key=lambda x: x.body_part_location.value, reverse=False)
+            is_historic = True
+
         for soreness in soreness_list:
-            try:
-                part = BodyPartLocationText(soreness.body_part.location).value()
-                is_pain = soreness.pain
-            except:
+            if is_historic:
                 part = BodyPartLocationText(soreness.body_part_location).value()
                 is_pain = soreness.is_pain
+            else:
+                part = BodyPartLocationText(soreness.body_part.location).value()
+                is_pain = soreness.pain
             side = soreness.side
             if side == 1:
                 body_text = " ".join(["left", part])
