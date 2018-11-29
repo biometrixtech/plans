@@ -1,6 +1,6 @@
-from logic.metrics_processing import MetricsProcessing
+from logic.metrics_processing import MetricsProcessing, RecommendationMatrix
 from models.stats import AthleteStats
-from models.metrics import MetricColor
+from models.metrics import AthleteMetric, MetricColor, MetricType, SpecificAction
 from models.soreness import BodyPartLocation, HistoricSorenessStatus, HistoricSoreness
 
 
@@ -74,3 +74,29 @@ def test_chronic_pain_specific_actions():
 
     assert metrics_list[0].specific_actions[0] == "6B"
     assert metrics_list[0].specific_actions[1] == "7A"
+
+
+def test_recommendation_matrix_ranking():
+
+    metric1 = AthleteMetric("Cool metric", MetricType.daily)
+    metric2 = AthleteMetric("Cooler metric", MetricType.daily)
+    metric3 = AthleteMetric("Coolest metric", MetricType.daily)
+
+    specific_action1 = SpecificAction("7A", "Cool", True)
+    specific_action2 = SpecificAction("7B", "Cooler", True)
+    specific_action3 = SpecificAction("7C", "Coolest", True)
+
+    metric1.specific_actions.append(specific_action1)
+    metric2.specific_actions.append(specific_action2)
+    metric3.specific_actions.append(specific_action3)
+
+    metric_list = [metric3, metric2, metric1]  # add reverse order to make sorting harder
+
+    rec_matrix = RecommendationMatrix()
+    rec_matrix.add_metrics(metric_list)
+
+    ranked_list = rec_matrix.get_ranked_metrics()
+
+    assert ranked_list[0].specific_actions[0].display == False
+    assert ranked_list[1].specific_actions[0].display == False
+    assert ranked_list[2].specific_actions[0].display == True
