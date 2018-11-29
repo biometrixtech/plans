@@ -53,7 +53,7 @@ class AthleteTrainingVolumeMetricGenerator(object):
                     if v.low_value <= getattr(self.athlete_stats, self.threshold_attribute):
                         v.count += 1
                 elif v.low_value is None and v.high_value is not None:
-                    if v.high_value >= getattr(self.athlete_stats, self.threshold_attribute):
+                    if v.high_value > getattr(self.athlete_stats, self.threshold_attribute):
                         v.count += 1
 
     def get_metric_list(self):

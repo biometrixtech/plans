@@ -1,6 +1,6 @@
 from models.metrics import AthleteSorenessMetricGenerator, AthleteTrainingVolumeMetricGenerator, MetricColor, DailyHighLevelInsight, MetricType, ThresholdRecommendation
 from models.stats import AthleteStats
-from models.soreness import BodyPartLocation, Soreness, HistoricSoreness, HistoricSorenessStatus
+from models.soreness import BodyPart, BodyPartLocation, Soreness, HistoricSoreness, HistoricSorenessStatus
 
 
 def get_atv(rpe_val):
@@ -29,19 +29,17 @@ def get_asg(soreness_list, attribute_name):
     asg.thresholds[0] = ThresholdRecommendation(MetricColor.red,
                                                  DailyHighLevelInsight.limit_time_intensity_of_training,
                                                  "high_level_action_description",
-                                                 ["2B", "7A"], 4.0, None, None,
-                                                 "stop now")
+                                                 ["2B", "7A"], 4.0, None, "stop with your {bodypart}!", None)
     asg.thresholds[1] = ThresholdRecommendation(MetricColor.yellow,
                                                  DailyHighLevelInsight.limit_time_intensity_of_training,
                                                 "high_level_action_description",
-                                                 ["2B", "7A"], 3.0, 4.0, None,
-                                                 "consider stopping")
+                                                 ["2B", "7A"], 3.0, 4.0, "consider stopping your {bodypart}!", None,
+                                                 )
 
     asg.thresholds[2] = ThresholdRecommendation(MetricColor.green,
                                                 DailyHighLevelInsight.limit_time_intensity_of_training,
                                                 "high_level_action_description",
-                                                ["2B", "7A"], None, 3.0, None,
-                                                "don't stop")
+                                                ["2B", "7A"], None, 3.0, "don't stop your {bodypart}!", None)
 
     return asg
 
@@ -74,6 +72,7 @@ def test_populate_thresholds_athlete_training_volume_thresh_2():
     assert atv.thresholds[0].count == 1
     assert atv.thresholds[1].count == 0
 
+
 def test_populate_thresholds_athlete_training_volume_thresh_None():
 
     atv = get_atv(None)
@@ -83,7 +82,8 @@ def test_populate_thresholds_athlete_training_volume_thresh_None():
     assert atv.thresholds[0].count == 0
     assert atv.thresholds[1].count == 0
 
-def test_populate_thresholds_athlete_soreness_thresh_low():
+
+def test_populate_thresholds_athlete_hist_soreness_thresh_low():
 
     hist_soreness = HistoricSoreness(BodyPartLocation(12), 1, True)
     hist_soreness.historic_soreness_status = HistoricSorenessStatus.chronic
@@ -98,3 +98,98 @@ def test_populate_thresholds_athlete_soreness_thresh_low():
     assert len(asg.thresholds[1].soreness_list) == 1
     assert len(asg.thresholds[2].soreness_list) == 0
 
+
+def test_populate_thresholds_athlete_hist_soreness_thresh_mod():
+
+    hist_soreness = HistoricSoreness(BodyPartLocation(12), 1, True)
+    hist_soreness.historic_soreness_status = HistoricSorenessStatus.chronic
+    hist_soreness.average_severity = 4
+    hist_soreness_list = [hist_soreness]
+
+    asg = get_asg(soreness_list=hist_soreness_list, attribute_name="average_severity")
+
+    asg.populate_thresholds_with_soreness()
+
+    assert len(asg.thresholds[0].soreness_list) == 1
+    assert len(asg.thresholds[1].soreness_list) == 0
+    assert len(asg.thresholds[2].soreness_list) == 0
+
+
+def test_populate_thresholds_athlete_daily_soreness_thresh_mod_diff():
+
+    soreness1 = Soreness()
+    soreness1.severity = 4
+    soreness1.pain = True
+    soreness1.streak = 2
+    soreness1.side = 1
+    soreness1.body_part = BodyPart(BodyPartLocation.calves, None)
+
+    soreness2 = Soreness()
+    soreness2.severity = 4
+    soreness2.pain = True
+    soreness2.streak = 3
+    soreness2.side = 2
+    soreness2.body_part = BodyPart(BodyPartLocation.calves, None)
+
+    soreness_list = [soreness1, soreness2]
+
+    asg = get_asg(soreness_list=soreness_list, attribute_name="severity")
+
+    asg.populate_thresholds_with_soreness()
+
+    assert len(asg.thresholds[0].soreness_list) == 2
+    assert len(asg.thresholds[1].soreness_list) == 0
+    assert len(asg.thresholds[2].soreness_list) == 0
+
+def test_populate_thresholds_athlete_daily_soreness_thresh_mod_metrics_same():
+
+    soreness1 = Soreness()
+    soreness1.severity = 4
+    soreness1.pain = True
+    soreness1.streak = 2
+    soreness1.side = 1
+    soreness1.body_part = BodyPart(BodyPartLocation.calves, None)
+
+    soreness2 = Soreness()
+    soreness2.severity = 4
+    soreness2.pain = True
+    soreness2.streak = 3
+    soreness2.side = 2
+    soreness2.body_part = BodyPart(BodyPartLocation.calves, None)
+
+    soreness_list = [soreness1, soreness2]
+
+    asg = get_asg(soreness_list=soreness_list, attribute_name="severity")
+
+    asg.populate_thresholds_with_soreness()
+
+    metrics = asg.get_metric_list()
+
+    assert len(metrics) == 1
+
+
+def test_populate_thresholds_athlete_daily_soreness_thresh_mod_metrics_diff():
+
+    soreness1 = Soreness()
+    soreness1.severity = 4
+    soreness1.pain = True
+    soreness1.streak = 2
+    soreness1.side = 1
+    soreness1.body_part = BodyPart(BodyPartLocation.calves, None)
+
+    soreness2 = Soreness()
+    soreness2.severity = 1
+    soreness2.pain = True
+    soreness2.streak = 3
+    soreness2.side = 2
+    soreness2.body_part = BodyPart(BodyPartLocation.calves, None)
+
+    soreness_list = [soreness1, soreness2]
+
+    asg = get_asg(soreness_list=soreness_list, attribute_name="severity")
+
+    asg.populate_thresholds_with_soreness()
+
+    metrics = asg.get_metric_list()
+
+    assert len(metrics) == 2
