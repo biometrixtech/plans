@@ -65,7 +65,7 @@ def get_dashboard_data(coach_id):
                     if len(athlete_stats.metrics) == 0:
                         # add user to all good
                         user = AthleteDashboardSummary(user_dict['user_id'], user_dict['first_name'], user_dict['last_name'])
-                        athlete.daily_recommendation = set()
+                        athlete.daily_recommendation = set(['Training as normal and complete Fathom’s Prep and Recovery'])
                         athlete.weekly_recommendation = set()
                         athlete.insights =["No signs of overtraining or injury risk"]
                         getattr(team.daily_insights, 'all_good').append(user)

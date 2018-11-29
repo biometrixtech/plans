@@ -166,7 +166,7 @@ class AthleteDashboardData(Serialisable):
                 self.daily_recommendation.update([m.text for m in metric.specific_actions if m.display])
                 if metric.color == MetricColor.red:
                     not_cleared_recs_day.extend([m.text for m in metric.specific_actions if m.display])
-            elif metric.metric_type == MetricType.longitudinal:
+            elif metric.metric_type == MetricType.longitudinal and metric.color != MetricColor.green:
                 self.weekly_insights.add(metric.high_level_insight)
                 self.weekly_recommendation.update([m.text for m in metric.specific_actions if m.display])
                 if metric.color == MetricColor.red:
