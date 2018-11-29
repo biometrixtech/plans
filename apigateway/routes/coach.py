@@ -51,16 +51,15 @@ def get_dashboard_data(coach_id):
                                                               end_date=end_time,
                                                               last_only=False)
         completed_users = [survey.user_id for survey in readiness_survey_list]
-
+        
         for athlete_stats in athlete_stats_list:
-            user_id = athlete_stats.athlete_id
-            user_dict = users[user_id]
-            if user_id in completed_users:
-                completed.append(user_dict)
-            else:
-                incomplete.append(user_dict)
-
             if athlete_stats is not None:
+                user_id = athlete_stats.athlete_id
+                user_dict = users[user_id]
+                if user_id in completed_users:
+                    completed.append(user_dict)
+                else:
+                    incomplete.append(user_dict)
                 athlete = AthleteDashboardData(user_dict['user_id'], user_dict['first_name'], user_dict['last_name'])
                 for metric in athlete_stats.metrics:
                     # update athlete card based on insight
@@ -101,7 +100,10 @@ def get_dashboard_data(coach_id):
 
 def _get_teams(user_id):
     response = Service('users', USERS_API_VERSION).call_apigateway_sync('GET', f"user/{user_id}")
-    return response['user']['account_ids'], response['user']['timezone']
+    team_ids = response['user']['account_ids']
+    # if len(team_ids) == 0:
+    #     raise NoSuchEntityException("User does not belong to any team")
+    return team_ids, response['user']['timezone']
 
 
 def _get_team_info(user_id, account_id):
