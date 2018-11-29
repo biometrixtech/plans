@@ -92,7 +92,7 @@ class AthleteSorenessMetricGenerator(object):
                     if v.low_value <= getattr(s, self.threshold_attribute):
                         v.soreness_list.append(s)
                 elif v.low_value is None and v.high_value is not None:
-                    if v.high_value >= getattr(s, self.threshold_attribute):
+                    if v.high_value > getattr(s, self.threshold_attribute):
                         v.soreness_list.append(s)
 
     def get_metric_list(self):
