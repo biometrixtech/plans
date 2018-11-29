@@ -2,7 +2,7 @@ from aws_xray_sdk.core import xray_recorder
 from config import get_mongo_collection
 from models.stats import AthleteStats
 from models.soreness import BodyPartLocation, HistoricSoreness, HistoricSorenessStatus, Soreness, BodyPart
-from models.metrics import AthleteMetric, MetricType, DailyHighLevelInsight, WeeklyHighLevelInsight, MetricColor
+from models.metrics import AthleteMetric, MetricType, DailyHighLevelInsight, WeeklyHighLevelInsight, MetricColor, SpecificAction
 
 
 class AthleteStatsDatastore(object):
@@ -123,11 +123,8 @@ class AthleteStatsDatastore(object):
         rec.high_level_action_description = metric.get('high_level_action_description', "")
         rec.specific_insight_training_volume = metric.get('specific_insight_training_volume', "")
         rec.specific_insight_recovery = metric.get('specific_insight_recovery', 0)
-        # rec.body_part_location = metric.get('body_part_location', None)
-        # rec.body_part_side = metric.get('body_part_side', None)
-        # rec.soreness = [self._soreness_from_mongodb(s) for s in metric.get('soreness', [])]
-        rec.specific_actions = metric.get('specific_actions', [])
+        rec.specific_actions = [self._get_specific_actions_from_mongodb(sa)for sa in metric.get('specific_actions', [])]
         return rec
 
-
-
+    def _get_specific_actions_from_mongodb(self, action):
+        return SpecificAction(action['code'], action['text'], action['display'])
