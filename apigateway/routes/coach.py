@@ -51,7 +51,7 @@ def get_dashboard_data(coach_id):
                                                               end_date=end_time,
                                                               last_only=False)
         completed_users = [survey.user_id for survey in readiness_survey_list]
-        
+
         for athlete_stats in athlete_stats_list:
             if athlete_stats is not None:
                 user_id = athlete_stats.athlete_id
@@ -114,9 +114,9 @@ def _get_team_info(user_id, account_id):
     team_name = response['account']['name']
     users = {}
     for user in response['users']:
-        users[user] = {'user_id': user['id'],
-                       'first_name': user['personal_data']['first_name'],
-                       'last_name': user['personal_data']['last_name']}
+        users[user['id']] = {'user_id': user['id'],
+                             'first_name': user['personal_data']['first_name'],
+                             'last_name': user['personal_data']['last_name']}
     return team_name, user_ids, users
 
 
