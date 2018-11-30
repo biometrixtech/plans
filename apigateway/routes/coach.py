@@ -57,21 +57,13 @@ def get_dashboard_data(coach_id):
                                                                       last_only=False)
                 team.get_compliance_data(user_ids, users, readiness_survey_list)
                 athlete_stats_list = athlete_stats_datastore.get(user_ids)
-                
+
                 for athlete_stats in athlete_stats_list:
                     user_id = athlete_stats.athlete_id
                     user_dict = users[user_id]
                     athlete = AthleteDashboardData(user_dict['user_id'], user_dict['first_name'], user_dict['last_name'])
-                    if len(athlete_stats.metrics) == 0:
-                        # add user to all good
-                        user = AthleteDashboardSummary(user_dict['user_id'], user_dict['first_name'], user_dict['last_name'])
-                        athlete.daily_recommendation = set(['Training as normal and complete Fathom’s Prep and Recovery'])
-                        athlete.weekly_recommendation = set()
-                        athlete.insights =["No signs of overtraining or injury risk"]
-                        getattr(team.daily_insights, 'all_good').append(user)
-                    else:
-                        athlete.aggregate(athlete_stats.metrics)
-                        team.insert_user(athlete)
+                    athlete.aggregate(athlete_stats.metrics)
+                    team.insert_user(athlete)
                     team.athletes.append(athlete)
 
                 teams.append(team.json_serialise())

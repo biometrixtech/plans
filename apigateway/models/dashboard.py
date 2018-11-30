@@ -58,18 +58,24 @@ class TeamDashboardData(Serialisable):
         athlete_summary = AthleteDashboardSummary(athlete.user_id, athlete.first_name, athlete.last_name)
         athlete_summary.cleared_to_train = athlete.cleared_to_train
         athlete_summary.color = athlete.color
+        # if not cleared to train, add to not_cleared to train for daily and check if belong to weekly red insight
         if not athlete_summary.cleared_to_train:
             self.daily_insights.not_cleared_for_training.append(athlete_summary)
             if WeeklyHighLevelInsight.evaluate_health_status in athlete.weekly_insights:
                 self.weekly_insights.evaluate_health_status.append(athlete_summary)
         else:
-            for insight in athlete.daily_insights:
-                if insight == DailyHighLevelInsight.increase_workload:
-                    self.daily_insights.increase_workload.append(athlete_summary)
-                elif insight == DailyHighLevelInsight.limit_time_intensity_of_training:
-                    self.daily_insights.limit_time_intensity_of_training.append(athlete_summary)
-                elif insight == DailyHighLevelInsight.monitor_in_training:
-                    self.daily_insights.monitor_in_training.append(athlete_summary)
+            # grpup athletes into daily_insight bins
+            if len(athlete.daily_insights) == 0:
+                self.daily_insights.all_good.append(athlete_summary)
+            else:
+                for insight in athlete.daily_insights:
+                    if insight == DailyHighLevelInsight.increase_workload:
+                        self.daily_insights.increase_workload.append(athlete_summary)
+                    elif insight == DailyHighLevelInsight.limit_time_intensity_of_training:
+                        self.daily_insights.limit_time_intensity_of_training.append(athlete_summary)
+                    elif insight == DailyHighLevelInsight.monitor_in_training:
+                        self.daily_insights.monitor_in_training.append(athlete_summary)
+            # group athletes in weekly_insight bins
             for insight in athlete.weekly_insights:
                 if insight == WeeklyHighLevelInsight.balance_overtraining_risk:
                     self.weekly_insights.balance_overtraining_risk.append(athlete_summary)
@@ -151,30 +157,34 @@ class AthleteDashboardData(Serialisable):
         self.weekly_insights = set()
 
     def aggregate(self, metrics):
-        not_cleared_recs_day = []
-        not_cleared_recs_week = []
-        for metric in metrics:
-            if metric.specific_insight_training_volume != "":
-                self.insights.append(metric.specific_insight_training_volume)
-            if metric.specific_insight_recovery != "":
-                self.insights.append(metric.specific_insight_recovery)
-            self.color = MetricColor(max([self.color.value, metric.color.value]))
-            self.cleared_to_train = False if self.color.value == 2 else True
+        if len(metrics) == 0:
+            self.daily_recommendation = set(['Training as normal and complete Fathom’s Prep and Recovery'])
+            self.insights =["No signs of overtraining or injury risk"]
+        else:
+            not_cleared_recs_day = []
+            not_cleared_recs_week = []
+            for metric in metrics:
+                if metric.specific_insight_training_volume != "":
+                    self.insights.append(metric.specific_insight_training_volume)
+                if metric.specific_insight_recovery != "":
+                    self.insights.append(metric.specific_insight_recovery)
+                self.color = MetricColor(max([self.color.value, metric.color.value]))
+                self.cleared_to_train = False if self.color.value == 2 else True
 
-            if metric.metric_type == MetricType.daily:
-                self.daily_insights.add(metric.high_level_insight)
-                self.daily_recommendation.update([m.text for m in metric.specific_actions if m.display])
-                if metric.color == MetricColor.red:
-                    not_cleared_recs_day.extend([m.text for m in metric.specific_actions if m.display])
-            elif metric.metric_type == MetricType.longitudinal and metric.color != MetricColor.green:
-                self.weekly_insights.add(metric.high_level_insight)
-                self.weekly_recommendation.update([m.text for m in metric.specific_actions if m.display])
-                if metric.color == MetricColor.red:
-                    not_cleared_recs_week.extend([m.text for m in metric.specific_actions if m.display])
-
-        if not self.cleared_to_train:
-            self.daily_recommendation = set(not_cleared_recs_day)
-            self.weekly_recommendation = set(not_cleared_recs_week)
+                if metric.metric_type == MetricType.daily:
+                    self.daily_insights.add(metric.high_level_insight)
+                    self.daily_recommendation.update([m.text for m in metric.specific_actions if m.display])
+                    if metric.color == MetricColor.red:
+                        not_cleared_recs_day.extend([m.text for m in metric.specific_actions if m.display])
+                elif metric.metric_type == MetricType.longitudinal and metric.color != MetricColor.green:
+                    self.weekly_insights.add(metric.high_level_insight)
+                    self.weekly_recommendation.update([m.text for m in metric.specific_actions if m.display])
+                    if metric.color == MetricColor.red:
+                        not_cleared_recs_week.extend([m.text for m in metric.specific_actions if m.display])
+            # if not cleared to train, removed recs from other insights
+            if not self.cleared_to_train:
+                self.daily_recommendation = set(not_cleared_recs_day)
+                self.weekly_recommendation = set(not_cleared_recs_week)
 
     def json_serialise(self):
         ret = {'user_id': self.user_id,
