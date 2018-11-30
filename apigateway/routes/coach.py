@@ -81,8 +81,8 @@ def _get_teams(user_id):
 def _get_team_info(user_id, account_id):
     response = Service('users', USERS_API_VERSION).call_apigateway_sync('GET', f"account/{account_id}/users")
     user_ids = response['account']['users']
-    # if user_id in user_ids:
-    #     raise ForbiddenException("Must be a coach to view the dashboard")
+    if user_id in user_ids:
+        raise ForbiddenException("Must be a coach to view the dashboard")
     team_name = response['account']['name']
     users = {}
     for user in response['users']:
