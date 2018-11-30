@@ -53,7 +53,7 @@ class AthleteTrainingVolumeMetricGenerator(object):
                     if v.low_value <= getattr(self.athlete_stats, self.threshold_attribute):
                         v.count += 1
                 elif v.low_value is None and v.high_value is not None:
-                    if v.high_value >= getattr(self.athlete_stats, self.threshold_attribute):
+                    if v.high_value > getattr(self.athlete_stats, self.threshold_attribute):
                         v.count += 1
 
     def get_metric_list(self):
@@ -92,7 +92,7 @@ class AthleteSorenessMetricGenerator(object):
                     if v.low_value <= getattr(s, self.threshold_attribute):
                         v.soreness_list.append(s)
                 elif v.low_value is None and v.high_value is not None:
-                    if v.high_value >= getattr(s, self.threshold_attribute):
+                    if v.high_value > getattr(s, self.threshold_attribute):
                         v.soreness_list.append(s)
 
     def get_metric_list(self):
@@ -184,13 +184,22 @@ class TextGenerator(object):
     def get_body_part_text(self, text, soreness_list=[], pain_type=None):
 
         body_part_list = []
+
+        is_historic = False
+
+        try:
+            soreness_list.sort(key=lambda x: x.body_part.location.value, reverse=False)
+        except:
+            soreness_list.sort(key=lambda x: x.body_part_location.value, reverse=False)
+            is_historic = True
+
         for soreness in soreness_list:
-            try:
-                part = BodyPartLocationText(soreness.body_part.location).value()
-                is_pain = soreness.pain
-            except:
+            if is_historic:
                 part = BodyPartLocationText(soreness.body_part_location).value()
                 is_pain = soreness.is_pain
+            else:
+                part = BodyPartLocationText(soreness.body_part.location).value()
+                is_pain = soreness.pain
             side = soreness.side
             if side == 1:
                 body_text = " ".join(["left", part])
@@ -201,16 +210,44 @@ class TextGenerator(object):
 
             body_part_list.append(body_text)
         sore_type = "pain" if is_pain else "soreness"
-        if len(body_part_list) > 1:
+
+        body_part_list = self.merge_bilaterals(body_part_list)
+
+        if len(body_part_list) > 2:
             joined_text = ", ".join(body_part_list)
             pos = joined_text.rfind(",")
             joined_text = joined_text[:pos] + " and" + joined_text[pos+1:]
-            return text.format(bodypart=joined_text, is_pain=sore_type)
+            return text.format(bodypart=joined_text, is_pain=sore_type).capitalize()
+        elif len(body_part_list) == 2:
+            if "left and right" not in body_part_list[0] and "left and right" not in body_part_list[1]:
+                joined_text = ", ".join(body_part_list)
+                pos = joined_text.rfind(",")
+                joined_text = joined_text[:pos] + " and" + joined_text[pos + 1:]
+                return text.format(bodypart=joined_text, is_pain=sore_type).capitalize()
+            else:
+                joined_text = ", ".join(body_part_list)
+                return text.format(bodypart=joined_text, is_pain=sore_type).capitalize()
         elif len(body_part_list) == 1:
             joined_text = body_part_list[0]
-            return text.format(bodypart=joined_text, is_pain=sore_type)
+            return text.format(bodypart=joined_text, is_pain=sore_type).capitalize()
         else:
             return text
+
+    def merge_bilaterals(self, body_part_list):
+
+        last_part = ""
+
+        for b in range(0, len(body_part_list)):
+
+            cleaned_part = body_part_list[b].replace("left ", "").replace("right ", "")
+            if cleaned_part == last_part:
+                body_part_list[b] = "left and right " + cleaned_part
+                body_part_list[b - 1] = ""
+            last_part = cleaned_part
+
+        new_body_part_list = [x for x in body_part_list if x != ""]
+
+        return new_body_part_list
 
 class RecommendationText(object):
     def __init__(self, rec):

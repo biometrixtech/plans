@@ -98,7 +98,7 @@ class DailySessionRPEMetricGenerator(AthleteTrainingVolumeMetricGenerator):
         super(DailySessionRPEMetricGenerator, self).__init__("Session RPE", MetricType.daily,
                                                              athlete_stats, "session_RPE")
         self.high_level_action_description = "Shorten training or limit intensity and focus on recovery modalities"
-        self.thresholds[0] = ThresholdRecommendation(MetricColor.red,
+        self.thresholds[0] = ThresholdRecommendation(MetricColor.yellow,
                                                      DailyHighLevelInsight.limit_time_intensity_of_training,
                                                      self.high_level_action_description,
                                                      ["2B", "7A"], 8.0, None, None,

@@ -77,7 +77,9 @@ def manage_athlete_push_notification(athlete_id):
     try:
         minute_offset = _get_offset()
         event_date = format_date(datetime.datetime.now() + datetime.timedelta(minutes=minute_offset))
-        StatsProcessing(athlete_id, event_date=event_date, datastore_collection=DatastoreCollection()).process_athlete_stats()
+        Service('plans', Config.get('API_VERSION')).call_apigateway_async(method='POST',
+                                                                          endpoint=f"athlete/{athlete_id}/stats",
+                                                                          body={"event_date": event_date})
     except:
         pass
     if not _is_athlete_active(athlete_id):
