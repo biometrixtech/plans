@@ -23,31 +23,6 @@ class TeamDashboardData(Serialisable):
                 }
         return ret
 
-    # def add_user_to_daily_report(self, user, metric):
-    #     if metric.high_level_insight.value not in self.daily_insights_dict.keys():
-    #         self.daily_insights_dict[metric.high_level_insight.value] = {}
-    #     if user['user_id'] not in self.daily_insights_dict[metric.high_level_insight.value].keys():
-    #         athlete = AthleteDashboardSummary(user['user_id'], user['first_name'], user['last_name'])
-    #         athlete.color = metric.color
-    #         athlete.cleared_to_train = False if metric.color.value == 2 else True
-    #         self.daily_insights_dict[metric.high_level_insight.value][user['user_id']] = athlete
-    #     else:
-    #         athlete = self.daily_insights_dict[metric.high_level_insight.value][user['user_id']]
-    #         athlete.color = MetricColor(max([athlete.color.value, metric.color.value]))
-    #         athlete.cleared_to_train = False if athlete.color.value == 2 else True
-
-
-    # def add_user_to_weekly_report(self, user, metric):
-    #     if user['user_id'] not in self.weekly_insights_dict[metric.high_level_insight.value].keys():
-    #         athlete = AthleteDashboardSummary(user['user_id'], user['first_name'], user['last_name'])
-    #         athlete.color = metric.color
-    #         athlete.cleared_to_train = False if metric.color.value == 2 else True
-    #         self.weekly_insights_dict[metric.high_level_insight.value][user['user_id']] = athlete
-    #     else:
-    #         athlete = self.weekly_insights_dict[metric.high_level_insight.value][user['user_id']]
-    #         athlete.color = MetricColor(max([athlete.color.value, metric.color.value]))
-    #         athlete.cleared_to_train = False if athlete.color.value == 2 else True
-
     def get_compliance_data(self, user_ids, users, readiness_survey_list):
         completed_users = [survey.user_id for survey in readiness_survey_list]
         self.compliance['completed'] = [users[user_id] for user_id in user_ids if user_id in completed_users]
