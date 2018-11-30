@@ -171,16 +171,19 @@ class AthleteDashboardData(Serialisable):
                 self.color = MetricColor(max([self.color.value, metric.color.value]))
                 self.cleared_to_train = False if self.color.value == 2 else True
 
+                daily_recs = [m.text for m in metric.specific_actions if m.display and m.code[0] in ["2", "5", "6", "7"]]
+                weekly_recs = [m.text for m in metric.specific_actions if m.display and m.code[0] in ["1", "3"]]
+                
+                self.daily_recommendation.update(daily_recs)
+                self.weekly_recommendation.update(weekly_recs)
+                if metric.color == MetricColor.red:
+                    not_cleared_recs_day.extend(daily_recs)
+                    not_cleared_recs_week.extend(weekly_recs)
+
                 if metric.metric_type == MetricType.daily:
                     self.daily_insights.add(metric.high_level_insight)
-                    self.daily_recommendation.update([m.text for m in metric.specific_actions if m.display])
-                    if metric.color == MetricColor.red:
-                        not_cleared_recs_day.extend([m.text for m in metric.specific_actions if m.display])
                 elif metric.metric_type == MetricType.longitudinal and metric.color != MetricColor.green:
                     self.weekly_insights.add(metric.high_level_insight)
-                    self.weekly_recommendation.update([m.text for m in metric.specific_actions if m.display])
-                    if metric.color == MetricColor.red:
-                        not_cleared_recs_week.extend([m.text for m in metric.specific_actions if m.display])
             # if not cleared to train, removed recs from other insights
             if not self.cleared_to_train:
                 self.daily_recommendation = set(not_cleared_recs_day)
