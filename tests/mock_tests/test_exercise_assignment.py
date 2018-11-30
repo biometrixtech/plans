@@ -201,10 +201,10 @@ def test_recovery_session_ankle_3_soreness_integrate_minutes():
 
 
 def test_recovery_session_ankle_4_soreness_inhibit_max_percentage():
-    assert 1.0 is recovery_session(soreness_one_body_part(9, 4), 15).inhibit_max_percentage
+    assert 1.0 == recovery_session(soreness_one_body_part(9, 4), 15).inhibit_max_percentage
 
 
-def test_recovery_session_ankle_4_soreness_inhibit_max_percentage():
+def test_recovery_session_ankle_4_pain_inhibit_max_percentage():
     assert 0 is recovery_session(pain_one_body_part(9, 4), 15).inhibit_max_percentage
 
 
@@ -224,7 +224,7 @@ def test_recovery_session_ankle_4_soreness_inhibit_minutes():
     assert 15 is recovery_session(soreness_one_body_part(9, 4), 15).inhibit_target_minutes
 
 
-def test_recovery_session_ankle_4_soreness_inhibit_minutes():
+def test_recovery_session_ankle_4_pain_inhibit_minutes():
     assert 0 is recovery_session(pain_one_body_part(9, 4), 15).inhibit_target_minutes
 
 
