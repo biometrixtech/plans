@@ -35,6 +35,17 @@ def soreness_one_body_part(body_enum, severity_score, treatment_priority=1):
     soreness_list.append(soreness_item)
     return soreness_list
 
+@pytest.fixture(scope="module")
+def pain_one_body_part(body_enum, severity_score, treatment_priority=1):
+    soreness_list = []
+    soreness_item = Soreness()
+    soreness_item.severity = severity_score
+    soreness_item.pain = True
+    soreness_body_part = BodyPart(BodyPartLocation(body_enum),
+                                                  treatment_priority)
+    soreness_item.body_part = soreness_body_part
+    soreness_list.append(soreness_item)
+    return soreness_list
 
 @pytest.fixture(scope="module")
 def soreness_two_body_parts(body_enum_1, severity_score_1, body_enum_2, severity_score_2,
@@ -190,7 +201,11 @@ def test_recovery_session_ankle_3_soreness_integrate_minutes():
 
 
 def test_recovery_session_ankle_4_soreness_inhibit_max_percentage():
-    assert 0 is recovery_session(soreness_one_body_part(9, 4), 15).inhibit_max_percentage
+    assert 1.0 is recovery_session(soreness_one_body_part(9, 4), 15).inhibit_max_percentage
+
+
+def test_recovery_session_ankle_4_soreness_inhibit_max_percentage():
+    assert 0 is recovery_session(pain_one_body_part(9, 4), 15).inhibit_max_percentage
 
 
 def test_recovery_session_ankle_4_soreness_lengthen_max_percentage():
@@ -206,7 +221,11 @@ def test_recovery_session_ankle_4_soreness_integrate_max_percentage():
 
 
 def test_recovery_session_ankle_4_soreness_inhibit_minutes():
-    assert 0 is recovery_session(soreness_one_body_part(9, 4), 15).inhibit_target_minutes
+    assert 15 is recovery_session(soreness_one_body_part(9, 4), 15).inhibit_target_minutes
+
+
+def test_recovery_session_ankle_4_soreness_inhibit_minutes():
+    assert 0 is recovery_session(pain_one_body_part(9, 4), 15).inhibit_target_minutes
 
 
 def test_recovery_session_ankle_4_soreness_lengthen_minutes():
