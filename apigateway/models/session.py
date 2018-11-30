@@ -512,8 +512,6 @@ class RecoverySession(Serialisable):
                 if soreness.severity > 3 and soreness.pain:
                     high_severity_is_pain = True
 
-        # TODO update for the presence of functional strength AND historic soreness
-
         if max_severity > 3 and high_severity_is_pain:
             self.integrate_target_minutes = 0
             self.activate_target_minutes = 0
