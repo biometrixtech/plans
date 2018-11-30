@@ -217,8 +217,11 @@ def test_body_part_text_uppercase_if_first():
 
     test_text = text_gen.get_body_part_text("{bodypart} hurts badly!!", soreness_list)
 
+    test_text2 = text_gen.get_body_part_text("bodypart hurts badly, complete Fathom's Prep!!", soreness_list)
+
     assert test_text[0].isupper() is True
 
+    assert test_text2 == "Bodypart hurts badly, complete Fathom's Prep!!"
 
 def test_body_part_text_bilateral_grouping():
 
