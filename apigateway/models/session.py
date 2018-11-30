@@ -494,6 +494,7 @@ class RecoverySession(Serialisable):
         max_severity = 0
         historic_soreness_present = False
         max_severity_and_historic_soreness = False
+        high_severity_is_pain = False
 
         if soreness_list is not None:
             for soreness in soreness_list:
@@ -505,10 +506,12 @@ class RecoverySession(Serialisable):
                 if (soreness.historic_soreness_status is not None and soreness.severity == max_severity and
                         soreness.severity > 0):
                     max_severity_and_historic_soreness = True
+                if soreness.severity > 3 and soreness.pain:
+                    high_severity_is_pain = True
 
         # TODO update for the presence of functional strength AND historic soreness
 
-        if max_severity > 3:
+        if max_severity > 3 and high_severity_is_pain:
             self.integrate_target_minutes = 0
             self.activate_target_minutes = 0
             self.lengthen_target_minutes = 0
@@ -517,6 +520,15 @@ class RecoverySession(Serialisable):
             self.activate_max_percentage = 0
             self.lengthen_max_percentage = 0
             self.inhibit_max_percentage = 0
+        elif max_severity > 3 and not high_severity_is_pain:
+            self.integrate_target_minutes = 0
+            self.activate_target_minutes = 0
+            self.lengthen_target_minutes = 0
+            self.inhibit_target_minutes = 15
+            self.integrate_max_percentage = 0
+            self.activate_max_percentage = 0
+            self.lengthen_max_percentage = 0
+            self.inhibit_max_percentage = 1.0
         elif max_severity == 3:
             self.integrate_target_minutes = None
             self.activate_target_minutes = None
