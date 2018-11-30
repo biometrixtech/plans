@@ -5,6 +5,7 @@ import datetime
 from serialisable import Serialisable
 import logic.exercise_generator as exercise
 from utils import format_datetime, parse_datetime
+from models.soreness import HistoricSorenessStatus
 from models.sport import SportName, NoSportPosition, BaseballPosition, BasketballPosition, FootballPosition, LacrossePosition, SoccerPosition, SoftballPosition, TrackAndFieldPosition, FieldHockeyPosition
 
 class SessionType(Enum):
@@ -490,7 +491,7 @@ class RecoverySession(Serialisable):
             self.integrate_exercises[s].position_order = num
             num = num + 1
 
-    def set_exercise_target_minutes(self, soreness_list, total_minutes_target, functional_strength_active=False):
+    def set_exercise_target_minutes(self, soreness_list, total_minutes_target, functional_strength_active=False, is_active_prep=True):
         max_severity = 0
         historic_soreness_present = False
         max_severity_and_historic_soreness = False
@@ -499,7 +500,9 @@ class RecoverySession(Serialisable):
         if soreness_list is not None:
             for soreness in soreness_list:
                 max_severity = max(max_severity, soreness.severity)
-                if soreness.historic_soreness_status is not None:
+                if (soreness.historic_soreness_status is not None and
+                        soreness.historic_soreness_status is not HistoricSorenessStatus.dormant_cleared and
+                    soreness.historic_soreness_status is not HistoricSorenessStatus.almost_persistent):
                     historic_soreness_present = True
 
             for soreness in soreness_list:
@@ -524,38 +527,169 @@ class RecoverySession(Serialisable):
             self.integrate_target_minutes = 0
             self.activate_target_minutes = 0
             self.lengthen_target_minutes = 0
-            self.inhibit_target_minutes = 15
+            self.inhibit_target_minutes = total_minutes_target
             self.integrate_max_percentage = 0
             self.activate_max_percentage = 0
             self.lengthen_max_percentage = 0
             self.inhibit_max_percentage = 1.0
         elif max_severity == 3:
-            self.integrate_target_minutes = None
-            self.activate_target_minutes = None
-            self.lengthen_target_minutes = total_minutes_target / 2
-            self.inhibit_target_minutes = total_minutes_target / 2
-            self.integrate_max_percentage = None
-            self.activate_max_percentage = None
-            self.lengthen_max_percentage = .6
-            self.inhibit_max_percentage = .6
+            if max_severity_and_historic_soreness:
+                if not functional_strength_active:
+                    self.set_70_30_time_split(total_minutes_target)
+                else:
+                    self.set_50_50_time_split(total_minutes_target)
+            elif historic_soreness_present:
+                if not functional_strength_active:
+                    self.set_60_40_time_split(total_minutes_target)
+                else:
+                    self.set_50_50_time_split(total_minutes_target)
+            else:
+                self.set_50_50_time_split(total_minutes_target)
         elif max_severity == 2:
-            self.integrate_target_minutes = None
-            self.activate_target_minutes = total_minutes_target / 3
-            self.lengthen_target_minutes = total_minutes_target / 3
-            self.inhibit_target_minutes = total_minutes_target / 3
-            self.integrate_max_percentage = None
-            self.activate_max_percentage = .4
-            self.lengthen_max_percentage = .4
-            self.inhibit_max_percentage = .4
-        elif max_severity <= 1:
-            self.integrate_target_minutes = None
-            self.activate_target_minutes = total_minutes_target / 2
-            self.lengthen_target_minutes = total_minutes_target / 4
-            self.inhibit_target_minutes = total_minutes_target / 4
-            self.integrate_max_percentage = None
-            self.activate_max_percentage = .6
-            self.lengthen_max_percentage = .3
-            self.inhibit_max_percentage = .3
+            if max_severity_and_historic_soreness:
+                if not functional_strength_active:
+                    if is_active_prep:
+                        self.set_35_35_30_time_split(total_minutes_target)
+                    else:
+                        self.set_40_40_20_time_split(total_minutes_target)
+                else:
+                    self.set_40_60_time_split(total_minutes_target)
+            elif historic_soreness_present:
+                if not functional_strength_active:
+                    if is_active_prep:
+                        self.set_30_30_40_time_split(total_minutes_target)
+                    else:
+                        self.set_40_40_20_time_split(total_minutes_target)
+                else:
+                    self.set_50_50_time_split(total_minutes_target)
+            else:
+                self.set_33_33_33_time_split(total_minutes_target)
+        elif 0 < max_severity <= 1:
+            if max_severity_and_historic_soreness:
+                if not functional_strength_active:
+                    if is_active_prep:
+                        self.set_30_30_40_time_split(total_minutes_target)
+                    else:
+                        self.set_40_40_20_time_split(total_minutes_target)
+                else:
+                    # no difference between AP/AR
+                    self.set_40_60_time_split(total_minutes_target)
+            elif historic_soreness_present:
+                if not functional_strength_active:
+                    if is_active_prep:
+                        self.set_35_35_30_time_split(total_minutes_target)
+                    else:
+                        self.set_40_40_20_time_split(total_minutes_target)
+                else:
+                    # no difference between AP/AR
+                    self.set_50_50_time_split(total_minutes_target)
+            else:
+                self.set_25_25_50_time_split(total_minutes_target)
+
+        elif max_severity == 0:
+            if historic_soreness_present:
+                if not functional_strength_active:
+                    if is_active_prep:
+                        self.set_25_25_50_time_split(total_minutes_target)
+                    else:
+                        self.set_35_35_30_time_split(total_minutes_target)
+                else:
+                    # no difference between AP/AR
+                    self.set_50_50_time_split(total_minutes_target)
+            else:
+                self.set_25_25_50_time_split(total_minutes_target)
+
+    def set_70_30_time_split(self, total_minutes_target):
+        self.integrate_target_minutes = None
+        self.activate_target_minutes = None
+        self.lengthen_target_minutes = total_minutes_target / 3.3
+        self.inhibit_target_minutes = total_minutes_target / 1.43
+        self.integrate_max_percentage = None
+        self.activate_max_percentage = None
+        self.lengthen_max_percentage = .4
+        self.inhibit_max_percentage = .8
+
+
+    def set_60_40_time_split(self, total_minutes_target):
+        self.integrate_target_minutes = None
+        self.activate_target_minutes = None
+        self.lengthen_target_minutes = total_minutes_target / 2.5
+        self.inhibit_target_minutes = total_minutes_target / 1.67
+        self.integrate_max_percentage = None
+        self.activate_max_percentage = None
+        self.lengthen_max_percentage = .5
+        self.inhibit_max_percentage = .7
+
+
+    def set_40_60_time_split(self, total_minutes_target):
+        self.integrate_target_minutes = None
+        self.activate_target_minutes = None
+        self.lengthen_target_minutes = total_minutes_target / 1.67
+        self.inhibit_target_minutes = total_minutes_target / 2.5
+        self.integrate_max_percentage = None
+        self.activate_max_percentage = None
+        self.lengthen_max_percentage = .7
+        self.inhibit_max_percentage = .5
+
+    def set_30_30_40_time_split(self, total_minutes_target):
+        self.integrate_target_minutes = None
+        self.activate_target_minutes = total_minutes_target / 2.5
+        self.lengthen_target_minutes = total_minutes_target / 3.3
+        self.inhibit_target_minutes = total_minutes_target / 3.3
+        self.integrate_max_percentage = None
+        self.activate_max_percentage = .45
+        self.lengthen_max_percentage = .35
+        self.inhibit_max_percentage = .35
+
+    def set_33_33_33_time_split(self, total_minutes_target):
+        self.integrate_target_minutes = None
+        self.activate_target_minutes = total_minutes_target / 3
+        self.lengthen_target_minutes = total_minutes_target / 3
+        self.inhibit_target_minutes = total_minutes_target / 3
+        self.integrate_max_percentage = None
+        self.activate_max_percentage = .4
+        self.lengthen_max_percentage = .4
+        self.inhibit_max_percentage = .4
+
+    def set_25_25_50_time_split(self, total_minutes_target):
+        self.integrate_target_minutes = None
+        self.activate_target_minutes = total_minutes_target / 2
+        self.lengthen_target_minutes = total_minutes_target / 4
+        self.inhibit_target_minutes = total_minutes_target / 4
+        self.integrate_max_percentage = None
+        self.activate_max_percentage = .6
+        self.lengthen_max_percentage = .3
+        self.inhibit_max_percentage = .3
+
+    def set_50_50_time_split(self, total_minutes_target):
+        self.integrate_target_minutes = None
+        self.activate_target_minutes = None
+        self.lengthen_target_minutes = total_minutes_target / 2
+        self.inhibit_target_minutes = total_minutes_target / 2
+        self.integrate_max_percentage = None
+        self.activate_max_percentage = None
+        self.lengthen_max_percentage = .6
+        self.inhibit_max_percentage = .6
+
+    def set_40_40_20_time_split(self, total_minutes_target):
+        self.integrate_target_minutes = None
+        self.activate_target_minutes = total_minutes_target / 5
+        self.lengthen_target_minutes = total_minutes_target / 2.5
+        self.inhibit_target_minutes = total_minutes_target / 2.5
+        self.integrate_max_percentage = None
+        self.activate_max_percentage = .3
+        self.lengthen_max_percentage = .5
+        self.inhibit_max_percentage = .5
+
+    def set_35_35_30_time_split(self, total_minutes_target):
+        self.integrate_target_minutes = None
+        self.activate_target_minutes = total_minutes_target / 3.3
+        self.lengthen_target_minutes = total_minutes_target / 2.85
+        self.inhibit_target_minutes = total_minutes_target / 2.85
+        self.integrate_max_percentage = None
+        self.activate_max_percentage = .4
+        self.lengthen_max_percentage = .4
+        self.inhibit_max_percentage = .4
 
 
 class GlobalLoadEstimationParameters(object):
