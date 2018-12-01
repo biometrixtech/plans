@@ -108,8 +108,9 @@ class Exercise(Serialisable):
 
 class AssignedExercise(Serialisable):
     def __init__(self, library_id, body_part_priority=0, body_part_exercise_priority=0, body_part_soreness_level=0,
-                 body_part_location=BodyPartLocation.general):
+                 body_part_location=BodyPartLocation.general, progressions=[]):
         self.exercise = Exercise(library_id)
+        self.exercise.progressions = progressions
         self.body_part_priority = body_part_priority
         self.body_part_exercise_priority = body_part_exercise_priority
         self.body_part_soreness_level = body_part_soreness_level
