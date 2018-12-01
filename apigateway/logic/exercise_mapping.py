@@ -278,15 +278,19 @@ class ExerciseAssignmentCalculator(object):
         dict["9"] = ["121"]
         dict["10"] = ["12", "11", "13", "120"]
         dict["28"] = ["122"]
+        dict["29"] = ["63", "64"]
         dict["46"] = ["117"]
         dict["49"] = ["119"]
+        dict["67"] = ["78", "68", "31"]
         dict["81"] = ["82", "83", "110"]
 
         dict["85"] = ["86", "87", "88"]
         dict["89"] = ["90", "91", "92"]
         dict["103"] = ["104"]
+        dict["106"] = ["105", "113"]
         dict["108"] = ["124"]
         dict["115"] = ["114", "65", "66", "107"]
+        dict["135"] = ["136", "138"]
 
         if exercise in dict:
             return dict[exercise]
@@ -394,53 +398,11 @@ class ExerciseAssignmentCalculator(object):
 
         quads = models.soreness.BodyPart(models.soreness.BodyPartLocation.quads, 8)
 
-        quads.inhibit_exercises.append(AssignedExercise("54", quads.treatment_priority, 1))
-        quads.inhibit_exercises.append(AssignedExercise("1", quads.treatment_priority, 2))
-        quads.inhibit_exercises.append(AssignedExercise("4", quads.treatment_priority, 3))
-        quads.inhibit_exercises.append(AssignedExercise("44", quads.treatment_priority, 4))
-        quads.inhibit_exercises.append(AssignedExercise("3", quads.treatment_priority, 5))
-        quads.inhibit_exercises.append(AssignedExercise("2", quads.treatment_priority, 6))
+        inhibit = self.get_exercise_dictionary(["54", "1", "4", "44", "3", "2"])
+        lengthen = self.get_exercise_dictionary(["49","118", "8", "28", "98", "46", "9", "7"])
+        activate = self.get_exercise_dictionary(["84", "81", "14","108", "77", "29"])
 
-        hip_stretch_progression = AssignedExercise("49", quads.treatment_priority, 1)
-        hip_stretch_progression.exercise.progressions = ["119"]
-        quads.lengthen_exercises.append(hip_stretch_progression)
-
-        quads.lengthen_exercises.append(AssignedExercise("118", quads.treatment_priority, 2))
-        quads.lengthen_exercises.append(AssignedExercise("8", quads.treatment_priority, 3))
-
-        hip_stretch_progression = AssignedExercise("28", quads.treatment_priority, 4)
-        hip_stretch_progression.exercise.progressions = ["122"]
-        quads.lengthen_exercises.append(hip_stretch_progression)
-
-        quads.lengthen_exercises.append(AssignedExercise("98", quads.treatment_priority, 5))
-
-        glute_stretch_progression = AssignedExercise("46", quads.treatment_priority, 6)
-        glute_stretch_progression.exercise.progressions = ["117"]
-        quads.lengthen_exercises.append(glute_stretch_progression)
-
-        hamstring_stretch_progression = AssignedExercise("9", quads.treatment_priority, 7)
-        hamstring_stretch_progression.exercise.progressions = ["121"]
-        quads.lengthen_exercises.append(hamstring_stretch_progression)
-
-        quads.lengthen_exercises.append(AssignedExercise("7", quads.treatment_priority, 8))
-
-        quads.activate_exercises.append(AssignedExercise("84", quads.treatment_priority, 1))
-
-        glute_activation = AssignedExercise("81", quads.treatment_priority, 2)
-        glute_activation.exercise.progressions = ["82", "83", "110"]
-        quads.activate_exercises.append(glute_activation)
-
-        quads.activate_exercises.append(AssignedExercise("14", quads.treatment_priority, 3))
-
-        glute_activation = AssignedExercise("108", quads.treatment_priority, 4)
-        glute_activation.exercise.progressions = ["124"]
-        quads.activate_exercises.append(glute_activation)
-
-        quads.activate_exercises.append(AssignedExercise("77", quads.treatment_priority, 5))
-
-        ankle_mobility = AssignedExercise("29", quads.treatment_priority, 6)
-        ankle_mobility.exercise.progressions = ["63", "64"]
-        quads.activate_exercises.append(ankle_mobility)
+        quads = self.add_exercises(quads, inhibit, lengthen, activate)
 
         body_parts.append(quads)
 
@@ -448,37 +410,11 @@ class ExerciseAssignmentCalculator(object):
 
         knee = models.soreness.BodyPart(models.soreness.BodyPartLocation.knee, 9)
 
-        knee.inhibit_exercises.append(AssignedExercise("4", knee.treatment_priority, 1))
-        knee.inhibit_exercises.append(AssignedExercise("71", knee.treatment_priority, 2))
-        knee.inhibit_exercises.append(AssignedExercise("2", knee.treatment_priority, 3))
-        knee.inhibit_exercises.append(AssignedExercise("48", knee.treatment_priority, 4))
-        knee.inhibit_exercises.append(AssignedExercise("72", knee.treatment_priority, 5))
-        knee.inhibit_exercises.append(AssignedExercise("73", knee.treatment_priority, 6))
+        inhibit = self.get_exercise_dictionary(["4","71", "2", "48", "72", "73"])
+        lengthen = self.get_exercise_dictionary(["28", "118", "6", "9", "7"])
+        activate = self.get_exercise_dictionary(["115", "14", "81", "77"])
 
-        hip_stretch_progression = AssignedExercise("28", knee.treatment_priority, 1)
-        hip_stretch_progression.exercise.progressions = ["122"]
-        knee.lengthen_exercises.append(hip_stretch_progression)
-
-        knee.lengthen_exercises.append(AssignedExercise("118", knee.treatment_priority, 2))
-        knee.lengthen_exercises.append(AssignedExercise("6", knee.treatment_priority, 3))
-
-        hamstring_stretch_progression = AssignedExercise("9", quads.treatment_priority, 4)
-        hamstring_stretch_progression.exercise.progressions = ["121"]
-        quads.lengthen_exercises.append(hamstring_stretch_progression)
-
-        knee.lengthen_exercises.append(AssignedExercise("7", knee.treatment_priority, 5))
-
-        ankle_activation = AssignedExercise("115", knee.treatment_priority, 1)
-        ankle_activation.exercise.progressions = ["114", "65", "66", "107"]
-        knee.activate_exercises.append(ankle_activation)
-
-        knee.activate_exercises.append(AssignedExercise("14", knee.treatment_priority, 2))
-
-        glute_activation = AssignedExercise("81", knee.treatment_priority, 3)
-        glute_activation.exercise.progressions = ["82", "83", "110"]
-        knee.activate_exercises.append(glute_activation)
-
-        knee.activate_exercises.append(AssignedExercise("77", knee.treatment_priority, 4))
+        knee = self.add_exercises(knee, inhibit, lengthen, activate)
 
         body_parts.append(knee)
 
@@ -486,29 +422,11 @@ class ExerciseAssignmentCalculator(object):
 
         calves = models.soreness.BodyPart(models.soreness.BodyPartLocation.calves, 10)
 
-        calves.inhibit_exercises.append(AssignedExercise("2", calves.treatment_priority, 1))
-        calves.inhibit_exercises.append(AssignedExercise("71", calves.treatment_priority, 2))
-        calves.inhibit_exercises.append(AssignedExercise("4", calves.treatment_priority, 3))
-        calves.inhibit_exercises.append(AssignedExercise("3", calves.treatment_priority, 4))
+        inhibit = self.get_exercise_dictionary(["2", "71", "4", "3"])
+        lengthen = self.get_exercise_dictionary(["7", "26", "9"])
+        activate = self.get_exercise_dictionary(["67", "115", "106"])
 
-        calves.lengthen_exercises.append(AssignedExercise("7", calves.treatment_priority, 1))
-        calves.lengthen_exercises.append(AssignedExercise("26", calves.treatment_priority, 2))
-
-        hamstring_stretch_progression = AssignedExercise("9", calves.treatment_priority, 3)
-        hamstring_stretch_progression.exercise.progressions = ["121"]
-        calves.lengthen_exercises.append(hamstring_stretch_progression)
-
-        calf_raise_progression = AssignedExercise("67", calves.treatment_priority, 1)
-        calf_raise_progression.exercise.progressions = ["78", "68", "31"]
-        calves.activate_exercises.append(calf_raise_progression)
-
-        ankle_activation = AssignedExercise("115", calves.treatment_priority, 2)
-        ankle_activation.exercise.progressions = ["114", "65", "66", "107"]
-        calves.activate_exercises.append(ankle_activation)
-
-        ankle_mobility_2 = AssignedExercise("106", calves.treatment_priority, 3)
-        ankle_mobility_2.exercise.progressions = ["105", "113"]
-        calves.activate_exercises.append(ankle_mobility_2)
+        calves = self.add_exercises(calves, inhibit, lengthen, activate)
 
         body_parts.append(calves)
 
@@ -516,34 +434,11 @@ class ExerciseAssignmentCalculator(object):
 
         shin = models.soreness.BodyPart(models.soreness.BodyPartLocation.shin, 11)
 
-        shin.inhibit_exercises.append(AssignedExercise("2", shin.treatment_priority, 1))
-        shin.inhibit_exercises.append(AssignedExercise("71", shin.treatment_priority, 2))
-        shin.inhibit_exercises.append(AssignedExercise("73", shin.treatment_priority, 3))
-        shin.inhibit_exercises.append(AssignedExercise("3", shin.treatment_priority, 4))
-        shin.inhibit_exercises.append(AssignedExercise("1", shin.treatment_priority, 5))
+        inhibit = self.get_exercise_dictionary(["2", "71", "73", "3", "1"])
+        lengthen = self.get_exercise_dictionary(["60", "61", "7", "28", "9"])
+        activate = self.get_exercise_dictionary(["115", "114", "106", "53", "75"])
 
-        shin.lengthen_exercises.append(AssignedExercise("60", shin.treatment_priority, 1))
-        shin.lengthen_exercises.append(AssignedExercise("61", shin.treatment_priority, 2))
-        shin.lengthen_exercises.append(AssignedExercise("7", shin.treatment_priority, 3))
-
-        hip_stretch_progression = AssignedExercise("28", shin.treatment_priority, 4)
-        hip_stretch_progression.exercise.progressions = ["122"]
-        shin.lengthen_exercises.append(hip_stretch_progression)
-
-        hamstring_stretch_progression = AssignedExercise("9", shin.treatment_priority, 5)
-        hamstring_stretch_progression.exercise.progressions = ["121"]
-        shin.lengthen_exercises.append(hamstring_stretch_progression)
-
-        ankle_activation = AssignedExercise("115", shin.treatment_priority, 1)
-        ankle_activation.exercise.progressions = ["114", "65", "66", "107"]
-        shin.activate_exercises.append(ankle_activation)
-
-        ankle_mobility_2 = AssignedExercise("106", shin.treatment_priority, 2)
-        ankle_mobility_2.exercise.progressions = ["105", "113"]
-        shin.activate_exercises.append(ankle_mobility_2)
-
-        shin.activate_exercises.append(AssignedExercise("53", shin.treatment_priority, 3))
-        shin.activate_exercises.append(AssignedExercise("75", shin.treatment_priority, 4))
+        shin = self.add_exercises(shin, inhibit, lengthen, activate)
 
         body_parts.append(shin)
 
@@ -551,23 +446,11 @@ class ExerciseAssignmentCalculator(object):
 
         ankle = models.soreness.BodyPart(models.soreness.BodyPartLocation.ankle, 12)
 
-        ankle.inhibit_exercises.append(AssignedExercise("2", ankle.treatment_priority, 1))
-        ankle.inhibit_exercises.append(AssignedExercise("71", ankle.treatment_priority, 2))
-        ankle.inhibit_exercises.append(AssignedExercise("72", ankle.treatment_priority, 3))
-        ankle.inhibit_exercises.append(AssignedExercise("73", ankle.treatment_priority, 4))
-        ankle.inhibit_exercises.append(AssignedExercise("3", ankle.treatment_priority, 5))
+        inhibit = self.get_exercise_dictionary(["2", "71", "72", "73", "3"])
+        lengthen = self.get_exercise_dictionary(["59", "62", "7"])
+        activate = self.get_exercise_dictionary(["115", "106",])
 
-        ankle.lengthen_exercises.append(AssignedExercise("59", ankle.treatment_priority, 1))
-        ankle.lengthen_exercises.append(AssignedExercise("62", ankle.treatment_priority, 2))
-        ankle.lengthen_exercises.append(AssignedExercise("7", ankle.treatment_priority, 3))
-
-        ankle_activation = AssignedExercise("115", ankle.treatment_priority, 1)
-        ankle_activation.exercise.progressions = ["114", "65", "66", "107"]
-        ankle.activate_exercises.append(ankle_activation)
-
-        ankle_mobility_2 = AssignedExercise("106", ankle.treatment_priority, 2)
-        ankle_mobility_2.exercise.progressions = ["105", "113"]
-        ankle.activate_exercises.append(ankle_mobility_2)
+        ankle = self.add_exercises(ankle, inhibit, lengthen, activate)
 
         body_parts.append(ankle)
 
@@ -575,43 +458,11 @@ class ExerciseAssignmentCalculator(object):
 
         upper_back_neck = models.soreness.BodyPart(models.soreness.BodyPartLocation.upper_back_neck, 13)
 
-        upper_back_neck.inhibit_exercises.append(
-            AssignedExercise("102", upper_back_neck.treatment_priority, 1))
-        upper_back_neck.inhibit_exercises.append(
-            AssignedExercise("55", upper_back_neck.treatment_priority, 2))
-        upper_back_neck.inhibit_exercises.append(
-            AssignedExercise("125", upper_back_neck.treatment_priority, 3))
-        upper_back_neck.inhibit_exercises.append(
-            AssignedExercise("126", upper_back_neck.treatment_priority, 4))
+        inhibit = self.get_exercise_dictionary(["102", "55", "125", "126"])
+        lengthen = self.get_exercise_dictionary(["127", "128", "129", "130", "103"])
+        activate = self.get_exercise_dictionary(["131", "134", "132", "133", "135", "137"])
 
-        upper_back_neck.lengthen_exercises.append(
-            AssignedExercise("127", upper_back_neck.treatment_priority, 1))
-        upper_back_neck.lengthen_exercises.append(
-            AssignedExercise("128", upper_back_neck.treatment_priority, 2))
-        upper_back_neck.lengthen_exercises.append(
-            AssignedExercise("129", upper_back_neck.treatment_priority, 3))
-        upper_back_neck.lengthen_exercises.append(
-            AssignedExercise("130", upper_back_neck.treatment_priority, 4))
-
-        child_pose = AssignedExercise("103", upper_back_neck.treatment_priority, 5)
-        child_pose.exercise.progressions = ["104"]
-        upper_back_neck.lengthen_exercises.append(child_pose)
-
-        upper_back_neck.activate_exercises.append(
-            AssignedExercise("131", upper_back_neck.treatment_priority, 1))
-        upper_back_neck.activate_exercises.append(
-            AssignedExercise("134", upper_back_neck.treatment_priority, 2))
-        upper_back_neck.activate_exercises.append(
-            AssignedExercise("132", upper_back_neck.treatment_priority, 3))
-        upper_back_neck.activate_exercises.append(
-            AssignedExercise("133", upper_back_neck.treatment_priority, 4))
-
-        shoulder_activation = AssignedExercise("135", upper_back_neck.treatment_priority, 5)
-        shoulder_activation.exercise.progressions = ["136", "138"]
-        upper_back_neck.activate_exercises.append(shoulder_activation)
-
-        upper_back_neck.activate_exercises.append(
-            AssignedExercise("137", upper_back_neck.treatment_priority, 6))
+        upper_back_neck = self.add_exercises(upper_back_neck, inhibit, lengthen, activate)
 
         body_parts.append(upper_back_neck)
 
@@ -619,28 +470,11 @@ class ExerciseAssignmentCalculator(object):
 
         foot = models.soreness.BodyPart(models.soreness.BodyPartLocation.foot, 14)
 
-        foot.inhibit_exercises.append(AssignedExercise("74", foot.treatment_priority, 1))
-        foot.inhibit_exercises.append(AssignedExercise("2", foot.treatment_priority, 2))
-        foot.inhibit_exercises.append(AssignedExercise("71", foot.treatment_priority, 3))
-        foot.inhibit_exercises.append(AssignedExercise("3", foot.treatment_priority, 4))
+        inhibit = self.get_exercise_dictionary(["74", "2", "71", "3"])
+        lengthen = self.get_exercise_dictionary(["7", "73", "9"])
+        activate = self.get_exercise_dictionary(["53", "75", "115", "106"])
 
-        foot.lengthen_exercises.append(AssignedExercise("7", foot.treatment_priority, 1))
-        foot.lengthen_exercises.append(AssignedExercise("73", foot.treatment_priority, 2))
-
-        hamstring_stretch_progression = AssignedExercise("9", foot.treatment_priority, 3)
-        hamstring_stretch_progression.exercise.progressions = ["121"]
-        foot.lengthen_exercises.append(hamstring_stretch_progression)
-
-        foot.activate_exercises.append(AssignedExercise("53", foot.treatment_priority, 1))
-        foot.activate_exercises.append(AssignedExercise("75", foot.treatment_priority, 2))
-
-        ankle_activation = AssignedExercise("115", foot.treatment_priority, 3)
-        ankle_activation.exercise.progressions = ["114", "65", "66", "107"]
-        foot.activate_exercises.append(ankle_activation)
-
-        ankle_mobility_2 = AssignedExercise("106", foot.treatment_priority, 4)
-        ankle_mobility_2.exercise.progressions = ["105", "113"]
-        foot.activate_exercises.append(ankle_mobility_2)
+        foot = self.add_exercises(foot, inhibit, lengthen, activate)
 
         body_parts.append(foot)
 
@@ -648,29 +482,11 @@ class ExerciseAssignmentCalculator(object):
 
         achilles = models.soreness.BodyPart(models.soreness.BodyPartLocation.achilles, 15)
 
-        achilles.inhibit_exercises.append(AssignedExercise("2", achilles.treatment_priority, 1))
-        achilles.inhibit_exercises.append(AssignedExercise("71", achilles.treatment_priority, 2))
-        achilles.inhibit_exercises.append(AssignedExercise("3", achilles.treatment_priority, 3))
+        inhibit = self.get_exercise_dictionary(["2", "71", "3"])
+        lengthen = self.get_exercise_dictionary(["7", "9"])
+        activate = self.get_exercise_dictionary(["29", "67", "108", "77"])
 
-        achilles.lengthen_exercises.append(AssignedExercise("7", achilles.treatment_priority, 1))
-
-        hamstring_stretch_progression = AssignedExercise("9", achilles.treatment_priority, 2)
-        hamstring_stretch_progression.exercise.progressions = ["121"]
-        achilles.lengthen_exercises.append(hamstring_stretch_progression)
-
-        ankle_mobility = AssignedExercise("29", achilles.treatment_priority, 1)
-        ankle_mobility.exercise.progressions = ["63", "64"]
-        achilles.activate_exercises.append(ankle_mobility)
-
-        calf_raise_progression = AssignedExercise("67", achilles.treatment_priority, 2)
-        calf_raise_progression.exercise.progressions = ["78", "68", "31"]
-        achilles.activate_exercises.append(calf_raise_progression)
-
-        glute_activation = AssignedExercise("108", achilles.treatment_priority, 3)
-        glute_activation.exercise.progressions = ["124"]
-        achilles.activate_exercises.append(glute_activation)
-
-        achilles.activate_exercises.append(AssignedExercise("77", achilles.treatment_priority, 4))
+        achilles = self.add_exercises(achilles, inhibit, lengthen, activate)
 
         body_parts.append(achilles)
 
