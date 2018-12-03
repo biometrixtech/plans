@@ -3,6 +3,7 @@ from config import get_mongo_collection
 from models.stats import AthleteStats
 from models.soreness import BodyPartLocation, HistoricSoreness, HistoricSorenessStatus, Soreness, BodyPart
 from models.metrics import AthleteMetric, MetricType, DailyHighLevelInsight, WeeklyHighLevelInsight, MetricColor, SpecificAction
+from utils import parse_datetime
 
 
 class AthleteStatsDatastore(object):
@@ -119,6 +120,8 @@ class AthleteStatsDatastore(object):
         soreness.severity = soreness_dict['severity']
         soreness.side = soreness_dict.get('side', None)
         soreness.reported_date_time = soreness_dict.get('reported_date_time', None)
+        if soreness.reported_date_time is not None:
+            soreness.reported_date_time = parse_datetime(soreness.reported_date_time)
         return soreness
 
     def _metrics_from_mongodb(self, metric):
