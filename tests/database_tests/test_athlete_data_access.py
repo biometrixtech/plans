@@ -6,7 +6,7 @@ from datastores.daily_readiness_datastore import DailyReadinessDatastore
 from datastores.daily_plan_datastore import DailyPlanDatastore
 from datastores.post_session_survey_datastore import PostSessionSurveyDatastore
 from datastores.completed_exercise_datastore import CompletedExerciseDatastore
-from models.exercise import CompletedExercise
+from models.soreness import CompletedExercise
 from datetime import datetime
 from config import get_secret
 
