@@ -88,6 +88,12 @@ class StatsProcessing(object):
                     athlete_stats.readiness_pain = current_athlete_stats.readiness_pain
                     athlete_stats.post_session_soreness = current_athlete_stats.post_session_soreness
                     athlete_stats.post_session_pain = current_athlete_stats.post_session_pain
+                else:
+                    # update post_session_soreness from the last 48 hours
+                    current_time = parse_date(self.event_date)
+                    athlete_stats.post_session_soreness = [s for s in current_athlete_stats.post_session_soreness if s.reported_date_time is not None and (current_time - s.reported_date_time).total_seconds() < 172800]
+                    athlete_stats.post_session_pain = [s for s in current_athlete_stats.post_session_pain if s.reported_date_time is not None and (current_time - s.reported_date_time).total_seconds() < 172800]
+
             self.athlete_stats_datastore.put(athlete_stats)
 
 
