@@ -10,13 +10,15 @@ from utils import format_datetime
 
 class ExerciseAssignmentCalculator(object):
 
-    def __init__(self, athlete_id, exercise_library_datastore, completed_exercise_datastore):
+    def __init__(self, athlete_id, exercise_library_datastore, completed_exercise_datastore, injury_history_present
+                 , is_active_prep):
         self.athlete_id = athlete_id
         self.exercise_library_datastore = exercise_library_datastore
         self.completed_exercise_datastore = completed_exercise_datastore
         self.exercise_library = self.exercise_library_datastore.get()
-        self.exercises_for_body_parts = self.get_exercises_for_body_parts()
-
+        # self.exercises_for_body_parts = self.get_exercises_for_body_parts()
+        self.is_active_prep = is_active_prep
+        self.injury_history_present = injury_history_present
 
     # def create_assigned_exercise(self, target_exercise, body_part_priority, body_part_exercise_priority, body_part_soreness_level):
 
@@ -62,7 +64,8 @@ class ExerciseAssignmentCalculator(object):
                                                                     format_datetime(trigger_date_time - timedelta(30)),
                                                                     format_datetime(trigger_date_time),
                                                                     get_summary=True)
-        body_part_exercises = self.exercises_for_body_parts
+        # body_part_exercises = self.exercises_for_body_parts
+        body_part_exercises = self.get_exercises_for_body_parts()
         exercise_list = self.exercise_library
 
         if soreness_list is not None and len(soreness_list) > 0:
@@ -281,182 +284,295 @@ class ExerciseAssignmentCalculator(object):
 
         # lower back
 
-        lower_back = models.soreness.BodyPart(models.soreness.BodyPartLocation.lower_back, 1)
-
-        inhibit = self.get_exercise_dictionary(["55", "54", "4", "48", "3"])
-        lengthen = self.get_exercise_dictionary(["49", "57", "56", "103", "8"])
-        activate = self.get_exercise_dictionary(["79", "10", "85", "89"])
-
-        lower_back.add_exercise_phases(inhibit, lengthen, activate)
+        lower_back = self.get_lower_back_exercises()
 
         body_parts.append(lower_back)
 
         # hip
 
-        hip = models.soreness.BodyPart(models.soreness.BodyPartLocation.hip_flexor, 2)
-
-        inhibit = self.get_exercise_dictionary(["3", "48", "54", "1", "44", "4", "2"])
-        lengthen = self.get_exercise_dictionary(["49", "118", "9", "46", "28"])
-        activate = self.get_exercise_dictionary(["79", "10", "14", "50", "84", "108"])
-
-        hip.add_exercise_phases(inhibit, lengthen, activate)
+        hip = self.get_hip_exercises()
 
         body_parts.append(hip)
 
         # glutes
 
-        glutes = models.soreness.BodyPart(models.soreness.BodyPartLocation.glutes, 3)
-
-        inhibit = self.get_exercise_dictionary(["44", "3", "4", "54", "2"])
-        lengthen = self.get_exercise_dictionary(["9", "46", "116", "103", "28", "7"])
-        activate = self.get_exercise_dictionary(["10", "81", "108", "14", "50", "51", "85", "89"])
-
-        glutes.add_exercise_phases(inhibit, lengthen, activate)
+        glutes = self.get_glutes_exercises()
 
         body_parts.append(glutes)
 
         # abdominals
 
-        abdominals = models.soreness.BodyPart(models.soreness.BodyPartLocation.abdominals, 4)
-
-        inhibit = self.get_exercise_dictionary(["102", "4", "54", "48"])
-        lengthen = self.get_exercise_dictionary(["103", "46", "118", "9", "49", "98"])
-        activate = self.get_exercise_dictionary(["85", "89", "10", "51", "81"])
-
-        abdominals.add_exercise_phases(inhibit, lengthen, activate)
+        abdominals = self.get_abdominals_exercises()
 
         body_parts.append(abdominals)
 
         # hamstrings
 
-        hamstrings = models.soreness.BodyPart(models.soreness.BodyPartLocation.hamstrings, 5)
-
-        inhibit = self.get_exercise_dictionary(["3","44","4","54","1","2"])
-        lengthen = self.get_exercise_dictionary(["9","46","116", "28","49","8","98","7"])
-        activate = self.get_exercise_dictionary(["108","77","81","115","85","89"])
-
-        hamstrings.add_exercise_phases(inhibit, lengthen, activate)
+        hamstrings = self.get_hamstrings_exercises()
 
         body_parts.append(hamstrings)
 
         # outer_thigh
 
-        outer_thigh = models.soreness.BodyPart(models.soreness.BodyPartLocation.outer_thigh, 6)
-
-        inhibit = self.get_exercise_dictionary(["48","4","1","2"])
-        lengthen = self.get_exercise_dictionary(["28","6","118","8","7"])
-        activate = self.get_exercise_dictionary(["108","14","81","10"])
-
-        outer_thigh.add_exercise_phases(inhibit, lengthen, activate)
+        outer_thigh = self.get_outer_thigh_exercises()
 
         body_parts.append(outer_thigh)
 
         # groin
 
-        groin = models.soreness.BodyPart(models.soreness.BodyPartLocation.groin, 7)
-
-        inhibit = self.get_exercise_dictionary(["54", "1", "102", "55", "4", "44", "3", "2"])
-        lengthen = self.get_exercise_dictionary(["103", "8", "118", "28", "49", "98", "46", "9", "7"])
-        activate = self.get_exercise_dictionary(["50", "84", "14", "79", "81", "85", "89"])
-
-        groin.add_exercise_phases(inhibit, lengthen, activate)
+        groin = self.get_groin_exercises()
 
         body_parts.append(groin)
 
         # quads
 
-        quads = models.soreness.BodyPart(models.soreness.BodyPartLocation.quads, 8)
-
-        inhibit = self.get_exercise_dictionary(["54", "1", "4", "44", "3", "2"])
-        lengthen = self.get_exercise_dictionary(["49","118", "8", "28", "98", "46", "9", "7"])
-        activate = self.get_exercise_dictionary(["84", "81", "14","108", "77", "29"])
-
-        quads.add_exercise_phases(inhibit, lengthen, activate)
+        quads = self.get_quads_exercises()
 
         body_parts.append(quads)
 
         # knee
 
-        knee = models.soreness.BodyPart(models.soreness.BodyPartLocation.knee, 9)
-
-        inhibit = self.get_exercise_dictionary(["4","71", "2", "48", "72", "73"])
-        lengthen = self.get_exercise_dictionary(["28", "118", "6", "9", "7"])
-        activate = self.get_exercise_dictionary(["115", "14", "81", "77"])
-
-        knee.add_exercise_phases(inhibit, lengthen, activate)
+        knee = self.get_knee_exercises()
 
         body_parts.append(knee)
 
         # calves
 
-        calves = models.soreness.BodyPart(models.soreness.BodyPartLocation.calves, 10)
-
-        inhibit = self.get_exercise_dictionary(["2", "71", "4", "3"])
-        lengthen = self.get_exercise_dictionary(["7", "26", "9"])
-        activate = self.get_exercise_dictionary(["67", "115", "106"])
-
-        calves.add_exercise_phases(inhibit, lengthen, activate)
+        calves = self.get_calves_exercises()
 
         body_parts.append(calves)
 
         # shin
 
-        shin = models.soreness.BodyPart(models.soreness.BodyPartLocation.shin, 11)
-
-        inhibit = self.get_exercise_dictionary(["2", "71", "73", "3", "1"])
-        lengthen = self.get_exercise_dictionary(["60", "61", "7", "28", "9"])
-        activate = self.get_exercise_dictionary(["115", "114", "106", "53", "75"])
-
-        shin.add_exercise_phases(inhibit, lengthen, activate)
+        shin = self.get_shin_exercises()
 
         body_parts.append(shin)
 
         # ankle
 
-        ankle = models.soreness.BodyPart(models.soreness.BodyPartLocation.ankle, 12)
-
-        inhibit = self.get_exercise_dictionary(["2", "71", "72", "73", "3"])
-        lengthen = self.get_exercise_dictionary(["59", "62", "7"])
-        activate = self.get_exercise_dictionary(["115", "106",])
-
-        ankle.add_exercise_phases(inhibit, lengthen, activate)
+        ankle = self.get_ankle_exercises()
 
         body_parts.append(ankle)
 
         # upper back/neck
 
-        upper_back_neck = models.soreness.BodyPart(models.soreness.BodyPartLocation.upper_back_neck, 13)
-
-        inhibit = self.get_exercise_dictionary(["102", "55", "125", "126"])
-        lengthen = self.get_exercise_dictionary(["127", "128", "129", "130", "103"])
-        activate = self.get_exercise_dictionary(["131", "134", "132", "133", "135", "137"])
-
-        upper_back_neck.add_exercise_phases(inhibit, lengthen, activate)
+        upper_back_neck = self.get_upper_back_neck_exercises()
 
         body_parts.append(upper_back_neck)
 
         # foot
 
-        foot = models.soreness.BodyPart(models.soreness.BodyPartLocation.foot, 14)
-
-        inhibit = self.get_exercise_dictionary(["74", "2", "71", "3"])
-        lengthen = self.get_exercise_dictionary(["7", "73", "9"])
-        activate = self.get_exercise_dictionary(["53", "75", "115", "106"])
-
-        foot.add_exercise_phases(inhibit, lengthen, activate)
+        foot = self.get_foot_exercises()
 
         body_parts.append(foot)
 
         # achilles
 
-        achilles = models.soreness.BodyPart(models.soreness.BodyPartLocation.achilles, 15)
-
-        inhibit = self.get_exercise_dictionary(["2", "71", "3"])
-        lengthen = self.get_exercise_dictionary(["7", "9"])
-        activate = self.get_exercise_dictionary(["29", "67", "108", "77"])
-
-        achilles.add_exercise_phases(inhibit, lengthen, activate)
+        achilles = self.get_achilles_exercises()
 
         body_parts.append(achilles)
 
         return body_parts
+
+    def get_achilles_exercises(self):
+        achilles = models.soreness.BodyPart(models.soreness.BodyPartLocation.achilles, 15)
+
+        if not self.injury_history_present:
+            inhibit = self.get_exercise_dictionary(["2", "71", "3"])
+            lengthen = self.get_exercise_dictionary(["7", "9"])
+            activate = self.get_exercise_dictionary(["29", "67", "108", "77"])
+        else:
+            if self.is_active_prep:
+                inhibit = self.get_exercise_dictionary(["2", "71", "73", "2"])
+                lengthen = self.get_exercise_dictionary(["7", "59", "61", "9"])
+                activate = self.get_exercise_dictionary(["67", "106", "108"])
+            else:
+                inhibit = self.get_exercise_dictionary(["2", "71", "72", "4", "3"])
+                lengthen = self.get_exercise_dictionary(["7", "26", "28", "9"])
+                activate = self.get_exercise_dictionary(["106"])
+
+        achilles.add_exercise_phases(inhibit, lengthen, activate)
+        return achilles
+
+    def get_foot_exercises(self):
+        foot = models.soreness.BodyPart(models.soreness.BodyPartLocation.foot, 14)
+        inhibit = self.get_exercise_dictionary(["74", "2", "71", "3"])
+        lengthen = self.get_exercise_dictionary(["7", "73", "9"])
+        activate = self.get_exercise_dictionary(["53", "75", "115", "106"])
+        foot.add_exercise_phases(inhibit, lengthen, activate)
+        return foot
+
+    def get_upper_back_neck_exercises(self):
+        upper_back_neck = models.soreness.BodyPart(models.soreness.BodyPartLocation.upper_back_neck, 13)
+        inhibit = self.get_exercise_dictionary(["102", "55", "125", "126"])
+        lengthen = self.get_exercise_dictionary(["127", "128", "129", "130", "103"])
+        activate = self.get_exercise_dictionary(["131", "134", "132", "133", "135", "137"])
+        upper_back_neck.add_exercise_phases(inhibit, lengthen, activate)
+        return upper_back_neck
+
+    def get_ankle_exercises(self):
+        ankle = models.soreness.BodyPart(models.soreness.BodyPartLocation.ankle, 12)
+
+        if not self.injury_history_present:
+            inhibit = self.get_exercise_dictionary(["2", "71", "72", "73", "3"])
+            lengthen = self.get_exercise_dictionary(["59", "62", "7"])
+            activate = self.get_exercise_dictionary(["115", "106"])
+        else:
+            if self.is_active_prep:
+                inhibit = self.get_exercise_dictionary(["71", "72", "73", "2", "4"])
+                lengthen = self.get_exercise_dictionary(["60", "61", "7"])
+                activate = self.get_exercise_dictionary(["115", "106", "108"])
+            else:
+                inhibit = self.get_exercise_dictionary(["71", "72", "73", "2", "4", "44"])
+                lengthen = self.get_exercise_dictionary(["60", "61", "59", "62"])
+                activate = self.get_exercise_dictionary(["106"])
+
+        ankle.add_exercise_phases(inhibit, lengthen, activate)
+        return ankle
+
+    def get_shin_exercises(self):
+        shin = models.soreness.BodyPart(models.soreness.BodyPartLocation.shin, 11)
+        inhibit = self.get_exercise_dictionary(["2", "71", "73", "3", "1"])
+        lengthen = self.get_exercise_dictionary(["60", "61", "7", "28", "9"])
+        activate = self.get_exercise_dictionary(["115", "114", "106", "53", "75"])
+        shin.add_exercise_phases(inhibit, lengthen, activate)
+        return shin
+
+    def get_calves_exercises(self):
+        calves = models.soreness.BodyPart(models.soreness.BodyPartLocation.calves, 10)
+        inhibit = self.get_exercise_dictionary(["2", "71", "4", "3"])
+        lengthen = self.get_exercise_dictionary(["7", "26", "9"])
+        activate = self.get_exercise_dictionary(["67", "115", "106"])
+        calves.add_exercise_phases(inhibit, lengthen, activate)
+        return calves
+
+    def get_knee_exercises(self):
+        knee = models.soreness.BodyPart(models.soreness.BodyPartLocation.knee, 9)
+
+        if not self.injury_history_present:
+            inhibit = self.get_exercise_dictionary(["4", "71", "2", "48", "72", "73"])
+            lengthen = self.get_exercise_dictionary(["28", "118", "6", "9", "7"])
+            activate = self.get_exercise_dictionary(["115", "14", "81", "77"])
+        else:
+            if self.is_active_prep:
+                inhibit = self.get_exercise_dictionary(["48", "4", "44", "2", "102"])
+                lengthen = self.get_exercise_dictionary(["49", "46", "9", "56", "7"])
+                activate = self.get_exercise_dictionary(["10", "81", "59", "14"])
+            else:
+                inhibit = self.get_exercise_dictionary(["48", "4", "44", "2", "102"])
+                lengthen = self.get_exercise_dictionary(["49", "46", "118", "9", "7"])
+                activate = self.get_exercise_dictionary(["115", "75", "67"])
+
+        knee.add_exercise_phases(inhibit, lengthen, activate)
+        return knee
+
+    def get_quads_exercises(self):
+        quads = models.soreness.BodyPart(models.soreness.BodyPartLocation.quads, 8)
+        inhibit = self.get_exercise_dictionary(["54", "1", "4", "44", "3", "2"])
+        lengthen = self.get_exercise_dictionary(["49", "118", "8", "28", "98", "46", "9", "7"])
+        activate = self.get_exercise_dictionary(["84", "81", "14", "108", "77", "29"])
+        quads.add_exercise_phases(inhibit, lengthen, activate)
+        return quads
+
+    def get_groin_exercises(self):
+        groin = models.soreness.BodyPart(models.soreness.BodyPartLocation.groin, 7)
+
+        if not self.injury_history_present:
+            inhibit = self.get_exercise_dictionary(["54", "1", "102", "55", "4", "44", "3", "2"])
+            lengthen = self.get_exercise_dictionary(["103", "8", "118", "28", "49", "98", "46", "9", "7"])
+            activate = self.get_exercise_dictionary(["50", "84", "14", "79", "81", "85", "89"])
+        else:
+            if self.is_active_prep:
+                inhibit = self.get_exercise_dictionary(["54", "1", "102", "55", "4", "44", "3", "48"])
+                lengthen = self.get_exercise_dictionary(["103", "28", "98", "46", "9", "56"])
+                activate = self.get_exercise_dictionary(["50", "81", "10", "51"])
+            else:
+                inhibit = self.get_exercise_dictionary(["54", "1", "102", "55", "4", "44"])
+                lengthen = self.get_exercise_dictionary(["103", "98", "46", "56"])
+                activate = self.get_exercise_dictionary(["10", "51"])
+
+        groin.add_exercise_phases(inhibit, lengthen, activate)
+        return groin
+
+    def get_outer_thigh_exercises(self):
+        outer_thigh = models.soreness.BodyPart(models.soreness.BodyPartLocation.outer_thigh, 6)
+        inhibit = self.get_exercise_dictionary(["48", "4", "1", "2"])
+        lengthen = self.get_exercise_dictionary(["28", "6", "118", "8", "7"])
+        activate = self.get_exercise_dictionary(["108", "14", "81", "10"])
+        outer_thigh.add_exercise_phases(inhibit, lengthen, activate)
+        return outer_thigh
+
+    def get_hamstrings_exercises(self):
+        hamstrings = models.soreness.BodyPart(models.soreness.BodyPartLocation.hamstrings, 5)
+
+        if not self.injury_history_present:
+            inhibit = self.get_exercise_dictionary(["3", "44", "4", "54", "1", "2"])
+            lengthen = self.get_exercise_dictionary(["9", "46", "116", "28", "49", "8", "98", "7"])
+            activate = self.get_exercise_dictionary(["108", "77", "81", "115", "85", "89"])
+        else:
+            if self.is_active_prep:
+                inhibit = self.get_exercise_dictionary(["3", "44", "4", "54", "48"])
+                lengthen = self.get_exercise_dictionary(["9", "46", "103", "28", "49", "118"])
+                activate = self.get_exercise_dictionary(["10", "81", "84", "108"])
+            else:
+                inhibit = self.get_exercise_dictionary(["3", "44", "4", "54", "48"])
+                lengthen = self.get_exercise_dictionary(["9", "46", "103", "49"])
+                activate = self.get_exercise_dictionary(["10", "81"])
+
+        hamstrings.add_exercise_phases(inhibit, lengthen, activate)
+        return hamstrings
+
+    def get_abdominals_exercises(self):
+        abdominals = models.soreness.BodyPart(models.soreness.BodyPartLocation.abdominals, 4)
+        inhibit = self.get_exercise_dictionary(["102", "4", "54", "48"])
+        lengthen = self.get_exercise_dictionary(["103", "46", "118", "9", "49", "98"])
+        activate = self.get_exercise_dictionary(["85", "89", "10", "51", "81"])
+        abdominals.add_exercise_phases(inhibit, lengthen, activate)
+        return abdominals
+
+    def get_glutes_exercises(self):
+        glutes = models.soreness.BodyPart(models.soreness.BodyPartLocation.glutes, 3)
+
+        if not self.injury_history_present:
+            inhibit = self.get_exercise_dictionary(["44", "3", "4", "54", "2"])
+            lengthen = self.get_exercise_dictionary(["9", "46", "116", "103", "28", "7"])
+            activate = self.get_exercise_dictionary(["10", "81", "108", "14", "50", "51", "85", "89"])
+        else:
+            if self.is_active_prep:
+                inhibit = self.get_exercise_dictionary(["44", "3", "4", "54", "48"])
+                lengthen = self.get_exercise_dictionary(["9", "46", "56", "49", "28", "118"])
+                activate = self.get_exercise_dictionary(["10", "81", "108", "50"])
+            else:
+                inhibit = self.get_exercise_dictionary(["44", "3", "4", "48"])
+                lengthen = self.get_exercise_dictionary(["9", "46", "49", "118"])
+                activate = self.get_exercise_dictionary(["10", "50"])
+        glutes.add_exercise_phases(inhibit, lengthen, activate)
+        return glutes
+
+    def get_hip_exercises(self):
+        hip = models.soreness.BodyPart(models.soreness.BodyPartLocation.hip_flexor, 2)
+
+        if not self.injury_history_present:
+            inhibit = self.get_exercise_dictionary(["3", "48", "54", "1", "44", "4", "2"])
+            lengthen = self.get_exercise_dictionary(["49", "118", "9", "46", "28"])
+            activate = self.get_exercise_dictionary(["79", "10", "14", "50", "84", "108"])
+        else:
+            if self.is_active_prep:
+                inhibit = self.get_exercise_dictionary(["54", "44", "4", "3", "1"])
+                lengthen = self.get_exercise_dictionary(["49", "46", "28", "56", "118"])
+                activate = self.get_exercise_dictionary(["79", "10", "108", "14", "84"])
+            else:
+                inhibit = self.get_exercise_dictionary(["54", "44", "1", "4", "3"])
+                lengthen = self.get_exercise_dictionary(["49", "46", "56", "118"])
+                activate = self.get_exercise_dictionary(["79", "81"])
+
+        hip.add_exercise_phases(inhibit, lengthen, activate)
+        return hip
+
+    def get_lower_back_exercises(self):
+        lower_back = models.soreness.BodyPart(models.soreness.BodyPartLocation.lower_back, 1)
+        inhibit = self.get_exercise_dictionary(["55", "54", "4", "48", "3"])
+        lengthen = self.get_exercise_dictionary(["49", "57", "56", "103", "8"])
+        activate = self.get_exercise_dictionary(["79", "10", "85", "89"])
+        lower_back.add_exercise_phases(inhibit, lengthen, activate)
+        return lower_back

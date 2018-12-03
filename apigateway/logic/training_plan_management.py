@@ -4,7 +4,7 @@ from models.daily_plan import DailyPlan
 import datetime
 import logic.exercise_mapping as exercise_mapping
 from logic.soreness_processing import SorenessCalculator
-from models.soreness import BodyPartLocation
+from models.soreness import BodyPartLocation, HistoricSorenessStatus
 from logic.goal_focus_text_generator import RecoveryTextGenerator
 from utils import format_datetime, format_date
 from logic.stats_processing import StatsProcessing
@@ -141,10 +141,20 @@ class TrainingPlanManager(object):
         if survey_event_dates is not None and len(survey_event_dates) > 0:
             trigger_date_time = max(trigger_date_time, max(survey_event_dates))
 
+        historic_soreness_present = False
+
         soreness_list = SorenessCalculator().get_soreness_summary_from_surveys(last_daily_readiness_survey,
                                                                                last_post_session_surveys,
                                                                                trigger_date_time,
                                                                                athlete_stats.historic_soreness)
+
+        for soreness in soreness_list:
+
+            if (soreness.historic_soreness_status is not None and
+                    soreness.historic_soreness_status is not HistoricSorenessStatus.dormant_cleared and
+                    soreness.historic_soreness_status is not HistoricSorenessStatus.almost_persistent):
+                historic_soreness_present = True
+
 
         # scheduled_sessions = self.daily_schedule_datastore.get(self.athlete_id, trigger_date_time)
 
@@ -162,7 +172,9 @@ class TrainingPlanManager(object):
         daily_plan = self.add_recovery_times(show_post_recovery, daily_plan)
 
         calc = exercise_mapping.ExerciseAssignmentCalculator(self.athlete_id, self.exercise_library_datastore,
-                                                             self.completed_exercise_datastore)
+                                                             self.completed_exercise_datastore,
+                                                             historic_soreness_present,
+                                                             show_post_recovery)
 
         soreness_values = [s.severity for s in soreness_list if s.severity is not None]
 
