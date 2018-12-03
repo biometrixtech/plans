@@ -79,6 +79,14 @@ class AthleteStatsDatastore(object):
                                                for s in mongo_result.get('daily_severe_soreness', [])]
         athlete_stats.daily_severe_pain = [self._soreness_from_mongodb(s)
                                            for s in mongo_result.get('daily_severe_pain', [])]
+        athlete_stats.readiness_soreness = [self._soreness_from_mongodb(s)
+                                            for s in mongo_result.get('readiness_soreness', [])]
+        athlete_stats.post_session_soreness = [self._soreness_from_mongodb(s)
+                                               for s in mongo_result.get('post_session_soreness', [])]
+        athlete_stats.readiness_pain = [self._soreness_from_mongodb(s)
+                                        for s in mongo_result.get('readiness_pain', [])]
+        athlete_stats.post_session_pain = [self._soreness_from_mongodb(s)
+                                           for s in mongo_result.get('post_session_pain', [])]
         athlete_stats.daily_severe_soreness_event_date = mongo_result.get('daily_severe_soreness_event_date', None)
         athlete_stats.daily_severe_pain_event_date = mongo_result.get('daily_severe_soreness_event_date', None)
         athlete_stats.metrics = [self._metrics_from_mongodb(s) for s in mongo_result.get('metrics', [])]
@@ -110,6 +118,7 @@ class AthleteStatsDatastore(object):
         soreness.pain = soreness_dict.get('pain', False)
         soreness.severity = soreness_dict['severity']
         soreness.side = soreness_dict.get('side', None)
+        soreness.reported_date_time = soreness_dict.get('reported_date_time', None)
         return soreness
 
     def _metrics_from_mongodb(self, metric):
