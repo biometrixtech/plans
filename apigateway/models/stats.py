@@ -112,7 +112,7 @@ class AthleteStats(Serialisable):
 
     def update_daily_pain(self, current_time):
         pain_list = self._combine_soreness_lists(self.readiness_pain, self.post_session_pain, current_time)
-        self.daily_severe_soreness = pain_list
+        self.daily_severe_pain = pain_list
 
 
     def _combine_soreness_lists(self, readiness_soreness_list, post_session_soreness_list, current_time):
