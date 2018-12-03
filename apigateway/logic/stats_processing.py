@@ -84,6 +84,10 @@ class StatsProcessing(object):
                     athlete_stats.daily_severe_soreness_event_date = current_athlete_stats.daily_severe_soreness_event_date
                     athlete_stats.daily_severe_pain = current_athlete_stats.daily_severe_pain
                     athlete_stats.daily_severe_pain_event_date = current_athlete_stats.daily_severe_pain_event_date
+                    athlete_stats.readiness_soreness = current_athlete_stats.readiness_soreness
+                    athlete_stats.readiness_pain = current_athlete_stats.readiness_pain
+                    athlete_stats.post_session_soreness = current_athlete_stats.post_session_soreness
+                    athlete_stats.post_session_pain = current_athlete_stats.post_session_pain
             self.athlete_stats_datastore.put(athlete_stats)
 
 
