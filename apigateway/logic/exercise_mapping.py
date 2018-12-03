@@ -354,9 +354,7 @@ class ExerciseAssignmentCalculator(object):
 
         injury_history_present = self.is_soreness_historic(soreness)
 
-        if (soreness.historic_soreness_status == HistoricSorenessStatus.chronic or
-                soreness.historic_soreness_status == HistoricSorenessStatus.almost_persistent or
-                soreness.historic_soreness_status == HistoricSorenessStatus.dormant_cleared):
+        if self.is_daily_or_chronic(soreness):
             inhibit = self.get_exercise_dictionary(["2", "71", "3"])
             lengthen = self.get_exercise_dictionary(["7", "9"])
             activate = self.get_exercise_dictionary(["29", "67", "108", "77"])
@@ -395,9 +393,7 @@ class ExerciseAssignmentCalculator(object):
 
         injury_history_present = self.is_soreness_historic(soreness)
 
-        if (soreness.historic_soreness_status == HistoricSorenessStatus.chronic or
-                soreness.historic_soreness_status == HistoricSorenessStatus.almost_persistent or
-                soreness.historic_soreness_status == HistoricSorenessStatus.dormant_cleared):
+        if self.is_daily_or_chronic(soreness):
             inhibit = self.get_exercise_dictionary(["2", "71", "72", "73", "3"])
             lengthen = self.get_exercise_dictionary(["59", "62", "7"])
             activate = self.get_exercise_dictionary(["115", "106"])
@@ -436,9 +432,7 @@ class ExerciseAssignmentCalculator(object):
 
         injury_history_present = self.is_soreness_historic(soreness)
 
-        if (soreness.historic_soreness_status == HistoricSorenessStatus.chronic or
-                soreness.historic_soreness_status == HistoricSorenessStatus.almost_persistent or
-                soreness.historic_soreness_status == HistoricSorenessStatus.dormant_cleared):
+        if self.is_daily_or_chronic(soreness):
             inhibit = self.get_exercise_dictionary(["4", "71", "2", "48", "72", "73"])
             lengthen = self.get_exercise_dictionary(["28", "118", "6", "9", "7"])
             activate = self.get_exercise_dictionary(["115", "14", "81", "77"])
@@ -469,9 +463,7 @@ class ExerciseAssignmentCalculator(object):
 
         injury_history_present = self.is_soreness_historic(soreness)
 
-        if (soreness.historic_soreness_status == HistoricSorenessStatus.chronic or
-                soreness.historic_soreness_status == HistoricSorenessStatus.almost_persistent or
-                soreness.historic_soreness_status == HistoricSorenessStatus.dormant_cleared):
+        if self.is_daily_or_chronic(soreness):
             inhibit = self.get_exercise_dictionary(["54", "1", "102", "55", "4", "44", "3", "2"])
             lengthen = self.get_exercise_dictionary(["103", "8", "118", "28", "49", "98", "46", "9", "7"])
             activate = self.get_exercise_dictionary(["50", "84", "14", "79", "81", "85", "89"])
@@ -502,9 +494,7 @@ class ExerciseAssignmentCalculator(object):
 
         injury_history_present = self.is_soreness_historic(soreness)
 
-        if (soreness.historic_soreness_status == HistoricSorenessStatus.chronic or
-                soreness.historic_soreness_status == HistoricSorenessStatus.almost_persistent or
-                soreness.historic_soreness_status == HistoricSorenessStatus.dormant_cleared):
+        if self.is_daily_or_chronic(soreness):
             inhibit = self.get_exercise_dictionary(["3", "44", "4", "54", "1", "2"])
             lengthen = self.get_exercise_dictionary(["9", "46", "116", "28", "49", "8", "98", "7"])
             activate = self.get_exercise_dictionary(["108", "77", "81", "115", "85", "89"])
@@ -535,9 +525,7 @@ class ExerciseAssignmentCalculator(object):
 
         injury_history_present = self.is_soreness_historic(soreness)
 
-        if (soreness.historic_soreness_status == HistoricSorenessStatus.chronic or
-                soreness.historic_soreness_status == HistoricSorenessStatus.almost_persistent or
-                soreness.historic_soreness_status == HistoricSorenessStatus.dormant_cleared):
+        if self.is_daily_or_chronic(soreness):
             inhibit = self.get_exercise_dictionary(["44", "3", "4", "54", "2"])
             lengthen = self.get_exercise_dictionary(["9", "46", "116", "103", "28", "7"])
             activate = self.get_exercise_dictionary(["10", "81", "108", "14", "50", "51", "85", "89"])
@@ -559,9 +547,7 @@ class ExerciseAssignmentCalculator(object):
 
         injury_history_present = self.is_soreness_historic(soreness)
 
-        if (soreness.historic_soreness_status == HistoricSorenessStatus.chronic or
-                soreness.historic_soreness_status == HistoricSorenessStatus.almost_persistent or
-                soreness.historic_soreness_status == HistoricSorenessStatus.dormant_cleared):
+        if self.is_daily_or_chronic(soreness):
             inhibit = self.get_exercise_dictionary(["3", "48", "54", "1", "44", "4", "2"])
             lengthen = self.get_exercise_dictionary(["49", "118", "9", "46", "28"])
             activate = self.get_exercise_dictionary(["79", "10", "14", "50", "84", "108"])
@@ -581,10 +567,25 @@ class ExerciseAssignmentCalculator(object):
 
     def get_lower_back_exercises(self, soreness):
         lower_back = models.soreness.BodyPart(models.soreness.BodyPartLocation.lower_back, self.get_body_part_priority(1, soreness))
-        inhibit = self.get_exercise_dictionary(["55", "54", "4", "48", "3"])
-        lengthen = self.get_exercise_dictionary(["49", "57", "56", "103", "8"])
-        activate = self.get_exercise_dictionary(["79", "10", "85", "89"])
-        lower_back.add_exercise_phases(inhibit, lengthen, activate)
+
+        injury_history_present = self.is_soreness_historic(soreness)
+
+        if self.is_daily_or_chronic(soreness):
+            inhibit = self.get_exercise_dictionary(["55", "54", "4", "48", "3"])
+            lengthen = self.get_exercise_dictionary(["49", "57", "56", "103", "8"])
+            activate = self.get_exercise_dictionary(["79", "10", "85", "89"])
+            lower_back.add_exercise_phases(inhibit, lengthen, activate, injury_history_present)
+        if injury_history_present:
+            if self.is_active_prep:
+                inhibit = self.get_exercise_dictionary(["55", "44", "54", "4", "48", "3"])
+                lengthen = self.get_exercise_dictionary(["49", "46", "56", "103", "9"])
+                activate = self.get_exercise_dictionary(["10", "84", "50", "81"])
+            else:
+                inhibit = self.get_exercise_dictionary(["55", "44", "54", "4", "3"])
+                lengthen = self.get_exercise_dictionary(["46", "56", "103"])
+                activate = self.get_exercise_dictionary(["10", "84"])
+            lower_back.add_exercise_phases(inhibit, lengthen, activate)
+
         return lower_back
 
     def get_body_part_priority(self, base_priority, soreness):
@@ -595,3 +596,13 @@ class ExerciseAssignmentCalculator(object):
                 return base_priority - 19  # reduces ranking by length of body part enumerations
         else:
             return base_priority
+
+    def is_daily_or_chronic(self, soreness):
+
+        if (soreness.historic_soreness_status is None or
+                soreness.historic_soreness_status == HistoricSorenessStatus.chronic or
+                soreness.historic_soreness_status == HistoricSorenessStatus.almost_persistent or
+                soreness.historic_soreness_status == HistoricSorenessStatus.dormant_cleared):
+            return True
+        else:
+            return False
