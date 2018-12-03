@@ -85,9 +85,9 @@ def handle_session_create():
         severe_pain = [s for s in soreness if s.pain]
         athlete_stats.daily_severe_soreness_event_date = plan_event_date
         athlete_stats.daily_severe_pain_event_date = plan_event_date
-        post_session_soreness = athlete_stats.post_session_soreness.extend(sore)
+        post_session_soreness = athlete_stats.post_session_soreness.extend(severe_soreness)
         athlete_stats.post_session_soreness = [s for s in post_session_soreness if s.reported_date_time is not None and (current_time - s.reported_date_time).total_seconds() < 172800]
-        post_session_pain = athlete_stats.post_session_pain.extend(pain)
+        post_session_pain = athlete_stats.post_session_pain.extend(severe_pain)
         athlete_stats.post_session_pain = [s for s in post_session_pain if s.reported_date_time is not None and (current_time - s.reported_date_time).total_seconds() < 172800]
         athlete_stats.update_daily_soreness(survey.event_date)
         athlete_stats.update_daily_pain(survey.event_date)
