@@ -3,10 +3,9 @@ import logic.exercise_mapping as exercise_mapping
 import models.session as session
 import logic.soreness_processing as soreness_and_injury
 import datetime
-from models.exercise import CompletedExerciseSummary
 from tests.mocks.mock_exercise_datastore import ExerciseLibraryDatastore
 from tests.mocks.mock_completed_exercise_datastore import CompletedExerciseDatastore
-from models.soreness import Soreness, BodyPart, BodyPartLocation
+from models.soreness import Soreness, BodyPart, BodyPartLocation, CompletedExerciseSummary
 
 exercise_library_datastore = ExerciseLibraryDatastore()
 completed_exercise_datastore = CompletedExerciseDatastore()

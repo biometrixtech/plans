@@ -1,3 +1,4 @@
+import models.soreness
 from aws_xray_sdk.core import xray_recorder
 from config import get_mongo_collection
 from models.daily_plan import DailyPlan
@@ -248,7 +249,7 @@ def _functional_strength_session_from_mongodb(mongo_result):
 
 def _assigned_exercises_from_mongodb(mongo_result):
 
-    assigned_exercise = exercise.AssignedExercise(_key_present("library_id", mongo_result))
+    assigned_exercise = models.soreness.AssignedExercise(_key_present("library_id", mongo_result))
     assigned_exercise.exercise.name = _key_present("name", mongo_result)
     assigned_exercise.exercise.display_name = _key_present("display_name", mongo_result)
     assigned_exercise.exercise.youtube_id = _key_present("youtube_id", mongo_result)

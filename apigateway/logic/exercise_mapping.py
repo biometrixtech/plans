@@ -1,11 +1,11 @@
 import models.soreness
 from logic.exercise_generator import ExerciseAssignments
 import logic.soreness_processing as soreness_and_injury
-from models.exercise import AssignedExercise, Phase
+from models.exercise import Phase
+from models.soreness import AssignedExercise
 from logic.goal_focus_text_generator import RecoveryTextGenerator
 from datetime import  timedelta
 from utils import format_datetime
-from random import shuffle
 
 
 class ExerciseAssignmentCalculator(object):
@@ -241,37 +241,6 @@ class ExerciseAssignmentCalculator(object):
 
         return body_parts
 
-    def add_exercises_for_body_part(self, exercise_list, exercise_dict, treatment_priority, randomize=False):
-
-        priority = 1
-
-        keys = list(exercise_dict.keys())
-
-        if randomize:
-            shuffle(keys)
-
-        for k in keys:
-            if len(exercise_dict[k]) == 0:
-                exercise_list.append(AssignedExercise(k, treatment_priority, priority))
-            else:
-                progression_exercise = AssignedExercise(k, treatment_priority, priority)
-                progression_exercise.exercise.progressions = exercise_dict[k]
-                exercise_list.append(progression_exercise)
-            priority += 1
-
-        return exercise_list
-
-    def add_exercises(self, body_part, inhibit, lengthen, activate, randomize=False):
-
-        body_part.inhibit_exercises = self.add_exercises_for_body_part(body_part.inhibit_exercises, inhibit,
-                                                                       body_part.treatment_priority, randomize)
-        body_part.lengthen_exercises = self.add_exercises_for_body_part(body_part.lengthen_exercises, lengthen,
-                                                                        body_part.treatment_priority, randomize)
-        body_part.activate_exercises = self.add_exercises_for_body_part(body_part.activate_exercises, activate,
-                                                                        body_part.treatment_priority, randomize)
-
-        return body_part
-
     def get_progression_list(self, exercise):
 
         dict = {}
@@ -318,7 +287,7 @@ class ExerciseAssignmentCalculator(object):
         lengthen = self.get_exercise_dictionary(["49", "57", "56", "103", "8"])
         activate = self.get_exercise_dictionary(["79", "10", "85", "89"])
 
-        lower_back = self.add_exercises(lower_back, inhibit, lengthen, activate)
+        lower_back.add_exercise_phases(inhibit, lengthen, activate)
 
         body_parts.append(lower_back)
 
@@ -330,7 +299,7 @@ class ExerciseAssignmentCalculator(object):
         lengthen = self.get_exercise_dictionary(["49", "118", "9", "46", "28"])
         activate = self.get_exercise_dictionary(["79", "10", "14", "50", "84", "108"])
 
-        hip = self.add_exercises(hip, inhibit, lengthen, activate)
+        hip.add_exercise_phases(inhibit, lengthen, activate)
 
         body_parts.append(hip)
 
@@ -342,7 +311,7 @@ class ExerciseAssignmentCalculator(object):
         lengthen = self.get_exercise_dictionary(["9", "46", "116", "103", "28", "7"])
         activate = self.get_exercise_dictionary(["10", "81", "108", "14", "50", "51", "85", "89"])
 
-        glutes = self.add_exercises(glutes, inhibit, lengthen, activate)
+        glutes.add_exercise_phases(inhibit, lengthen, activate)
 
         body_parts.append(glutes)
 
@@ -354,7 +323,7 @@ class ExerciseAssignmentCalculator(object):
         lengthen = self.get_exercise_dictionary(["103", "46", "118", "9", "49", "98"])
         activate = self.get_exercise_dictionary(["85", "89", "10", "51", "81"])
 
-        abdominals = self.add_exercises(abdominals, inhibit, lengthen, activate)
+        abdominals.add_exercise_phases(inhibit, lengthen, activate)
 
         body_parts.append(abdominals)
 
@@ -366,7 +335,7 @@ class ExerciseAssignmentCalculator(object):
         lengthen = self.get_exercise_dictionary(["9","46","116", "28","49","8","98","7"])
         activate = self.get_exercise_dictionary(["108","77","81","115","85","89"])
 
-        hamstrings = self.add_exercises(hamstrings, inhibit, lengthen, activate)
+        hamstrings.add_exercise_phases(inhibit, lengthen, activate)
 
         body_parts.append(hamstrings)
 
@@ -378,7 +347,7 @@ class ExerciseAssignmentCalculator(object):
         lengthen = self.get_exercise_dictionary(["28","6","118","8","7"])
         activate = self.get_exercise_dictionary(["108","14","81","10"])
 
-        outer_thigh = self.add_exercises(outer_thigh, inhibit, lengthen, activate)
+        outer_thigh.add_exercise_phases(inhibit, lengthen, activate)
 
         body_parts.append(outer_thigh)
 
@@ -390,7 +359,7 @@ class ExerciseAssignmentCalculator(object):
         lengthen = self.get_exercise_dictionary(["103", "8", "118", "28", "49", "98", "46", "9", "7"])
         activate = self.get_exercise_dictionary(["50", "84", "14", "79", "81", "85", "89"])
 
-        groin = self.add_exercises(groin, inhibit, lengthen, activate)
+        groin.add_exercise_phases(inhibit, lengthen, activate)
 
         body_parts.append(groin)
 
@@ -402,7 +371,7 @@ class ExerciseAssignmentCalculator(object):
         lengthen = self.get_exercise_dictionary(["49","118", "8", "28", "98", "46", "9", "7"])
         activate = self.get_exercise_dictionary(["84", "81", "14","108", "77", "29"])
 
-        quads = self.add_exercises(quads, inhibit, lengthen, activate)
+        quads.add_exercise_phases(inhibit, lengthen, activate)
 
         body_parts.append(quads)
 
@@ -414,7 +383,7 @@ class ExerciseAssignmentCalculator(object):
         lengthen = self.get_exercise_dictionary(["28", "118", "6", "9", "7"])
         activate = self.get_exercise_dictionary(["115", "14", "81", "77"])
 
-        knee = self.add_exercises(knee, inhibit, lengthen, activate)
+        knee.add_exercise_phases(inhibit, lengthen, activate)
 
         body_parts.append(knee)
 
@@ -426,7 +395,7 @@ class ExerciseAssignmentCalculator(object):
         lengthen = self.get_exercise_dictionary(["7", "26", "9"])
         activate = self.get_exercise_dictionary(["67", "115", "106"])
 
-        calves = self.add_exercises(calves, inhibit, lengthen, activate)
+        calves.add_exercise_phases(inhibit, lengthen, activate)
 
         body_parts.append(calves)
 
@@ -438,7 +407,7 @@ class ExerciseAssignmentCalculator(object):
         lengthen = self.get_exercise_dictionary(["60", "61", "7", "28", "9"])
         activate = self.get_exercise_dictionary(["115", "114", "106", "53", "75"])
 
-        shin = self.add_exercises(shin, inhibit, lengthen, activate)
+        shin.add_exercise_phases(inhibit, lengthen, activate)
 
         body_parts.append(shin)
 
@@ -450,7 +419,7 @@ class ExerciseAssignmentCalculator(object):
         lengthen = self.get_exercise_dictionary(["59", "62", "7"])
         activate = self.get_exercise_dictionary(["115", "106",])
 
-        ankle = self.add_exercises(ankle, inhibit, lengthen, activate)
+        ankle.add_exercise_phases(inhibit, lengthen, activate)
 
         body_parts.append(ankle)
 
@@ -462,7 +431,7 @@ class ExerciseAssignmentCalculator(object):
         lengthen = self.get_exercise_dictionary(["127", "128", "129", "130", "103"])
         activate = self.get_exercise_dictionary(["131", "134", "132", "133", "135", "137"])
 
-        upper_back_neck = self.add_exercises(upper_back_neck, inhibit, lengthen, activate)
+        upper_back_neck.add_exercise_phases(inhibit, lengthen, activate)
 
         body_parts.append(upper_back_neck)
 
@@ -474,7 +443,7 @@ class ExerciseAssignmentCalculator(object):
         lengthen = self.get_exercise_dictionary(["7", "73", "9"])
         activate = self.get_exercise_dictionary(["53", "75", "115", "106"])
 
-        foot = self.add_exercises(foot, inhibit, lengthen, activate)
+        foot.add_exercise_phases(inhibit, lengthen, activate)
 
         body_parts.append(foot)
 
@@ -486,7 +455,7 @@ class ExerciseAssignmentCalculator(object):
         lengthen = self.get_exercise_dictionary(["7", "9"])
         activate = self.get_exercise_dictionary(["29", "67", "108", "77"])
 
-        achilles = self.add_exercises(achilles, inhibit, lengthen, activate)
+        achilles.add_exercise_phases(inhibit, lengthen, activate)
 
         body_parts.append(achilles)
 
