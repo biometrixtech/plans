@@ -142,11 +142,15 @@ class TrainingPlanManager(object):
             trigger_date_time = max(trigger_date_time, max(survey_event_dates))
 
         historic_soreness_present = False
+        if athlete_stats is None:
+            historic_soreness = []
+        else:
+            historic_soreness = athlete_stats.historic_soreness
 
         soreness_list = SorenessCalculator().get_soreness_summary_from_surveys(last_daily_readiness_survey,
                                                                                last_post_session_surveys,
                                                                                trigger_date_time,
-                                                                               athlete_stats.historic_soreness)
+                                                                               historic_soreness)
 
         for soreness in soreness_list:
 
