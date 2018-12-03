@@ -242,7 +242,7 @@ def test_recovery_session_ankle_4_soreness_integrate_minutes():
 
 def test_recovery_session_exercises_assigned():
     calc = exercise_mapping.ExerciseAssignmentCalculator("test_user", exercise_library_datastore,
-                                                         completed_exercise_datastore, False, False)
+                                                         completed_exercise_datastore, False)
     soreness_list = soreness_one_body_part(12, 1)    # lower back
     target_recovery_session = recovery_session(soreness_one_body_part(12, 1), 15)
     exercise_assignments = calc.create_exercise_assignments(target_recovery_session, soreness_list,
@@ -253,7 +253,7 @@ def test_recovery_session_exercises_assigned():
 
 def test_recovery_session_exercises_assigned_2_body_parts():
     calc = exercise_mapping.ExerciseAssignmentCalculator("test_user", exercise_library_datastore,
-                                                         completed_exercise_datastore, False, False)
+                                                         completed_exercise_datastore, False)
     soreness_list = soreness_two_body_parts(12, 1, 4, 1, 1, 2)    # lower back
     target_recovery_session = recovery_session(soreness_two_body_parts(12, 1, 4, 1, 1, 2), 15)
     exercise_assignments = calc.create_exercise_assignments(target_recovery_session, soreness_list,
@@ -264,7 +264,7 @@ def test_recovery_session_exercises_assigned_2_body_parts():
 
 def test_recovery_session_exercises_assigned_2_body_parts_diff_severity():
     calc = exercise_mapping.ExerciseAssignmentCalculator("test_user", exercise_library_datastore,
-                                                         completed_exercise_datastore, False, False)
+                                                         completed_exercise_datastore, False)
     soreness_list = soreness_two_body_parts(12, 1, 4, 2, 1, 2)    # lower back
     target_recovery_session = recovery_session(soreness_two_body_parts(12, 1, 4, 1, 1, 2), 15)
     exercise_assignments = calc.create_exercise_assignments(target_recovery_session, soreness_list,

@@ -173,8 +173,7 @@ class TrainingPlanManager(object):
 
         calc = exercise_mapping.ExerciseAssignmentCalculator(self.athlete_id, self.exercise_library_datastore,
                                                              self.completed_exercise_datastore,
-                                                             historic_soreness_present,
-                                                             show_post_recovery)
+                                                             historic_soreness_present)
 
         soreness_values = [s.severity for s in soreness_list if s.severity is not None]
 
