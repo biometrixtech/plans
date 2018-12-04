@@ -133,7 +133,7 @@ class AthleteDashboardData(Serialisable):
 
     def aggregate(self, metrics):
         if len(metrics) == 0:
-            self.daily_recommendation = set(['Training as normal and complete Fathom’s Prep and Recovery'])
+            self.daily_recommendation = set(['Training as normal and complete Fathom’s Prep and Recovery exercises'])
             self.insights =["No signs of overtraining or injury risk"]
         else:
             not_cleared_recs_day = []
