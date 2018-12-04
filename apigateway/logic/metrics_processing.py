@@ -16,8 +16,8 @@ class MetricsProcessing(object):
         if athlete_stats.daily_severe_pain_event_date == event_date:
             metrics.extend(DailySeverePainMetricGenerator(athlete_stats.daily_severe_pain).get_metric_list())
 
-        pain_list = list(p for p in athlete_stats.historic_soreness if p.is_pain and p.streak >= 3)
-        metrics.extend(ThreeDayConsecutivePainMetricGenerator(pain_list).get_metric_list())
+        # pain_list = list(p for p in athlete_stats.historic_soreness if p.is_pain and p.streak >= 3)
+        # metrics.extend(ThreeDayConsecutivePainMetricGenerator(pain_list).get_metric_list())
 
         ps_list = list(p for p in athlete_stats.historic_soreness if not p.is_pain and p.historic_soreness_status ==
                          HistoricSorenessStatus.persistent)
