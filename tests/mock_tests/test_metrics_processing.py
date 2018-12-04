@@ -60,11 +60,11 @@ def test_no_session_rpe_diff_date():
     assert len(metrics_list) == 0
 
 
-def test_chronic_pain_specific_actions():
+def test_persistent_2_pain_specific_actions():
     athlete_stats = AthleteStats("tester")
 
     hist_soreness = HistoricSoreness(BodyPartLocation(12), 1, True)
-    hist_soreness.historic_soreness_status = HistoricSorenessStatus.chronic
+    hist_soreness.historic_soreness_status = HistoricSorenessStatus.persistent_2
     hist_soreness.average_severity = 3
     hist_soreness_list = [hist_soreness]
     athlete_stats.historic_soreness = hist_soreness_list

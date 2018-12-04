@@ -72,8 +72,8 @@ class AthleteStats(Serialisable):
                 if format_date(event_date) != h.last_reported: #not updated
                     if h.historic_soreness_status == HistoricSorenessStatus.almost_persistent:
                         h.historic_soreness_status = HistoricSorenessStatus.persistent
-                    elif h.historic_soreness_status == HistoricSorenessStatus.persistent_almost_chronic:
-                        h.historic_soreness_status = HistoricSorenessStatus.chronic
+                    elif h.historic_soreness_status == HistoricSorenessStatus.persistent_almost_persistent_2:
+                        h.historic_soreness_status = HistoricSorenessStatus.persistent_2
                     else:
                         break
 
