@@ -517,3 +517,58 @@ def test_historical_soreness_trigger_update_same_day_no_hist():
     athlete_stats.update_historic_soreness(new_soreness, "2018-12-03")
 
     assert len(athlete_stats.historic_soreness) == 0
+
+
+def test_daily_soreness_update_less_than_24():
+    athlete_stats = AthleteStats("tester")
+    athlete_stats.event_date = "2018-12-03"
+
+    soreness = Soreness()
+    soreness.side = 1
+    soreness.body_part = BodyPart(BodyPartLocation(9), None)
+    soreness.severity = 2
+    soreness.pain = False
+    soreness.reported_date_time = datetime(2018, 12, 3, 12, 0, 0)
+    athlete_stats.readiness_soreness = [soreness]
+
+    post_soreness = Soreness()
+    post_soreness.side = 1
+    post_soreness.body_part = BodyPart(BodyPartLocation(9), None)
+    post_soreness.severity = 4
+    post_soreness.pain = False
+    post_soreness.reported_date_time = datetime(2018, 12, 2, 17, 0, 0)
+    athlete_stats.post_session_soreness = [post_soreness]
+
+    current_time = soreness.reported_date_time
+
+    athlete_stats.update_daily_soreness(current_time)
+    assert len(athlete_stats.daily_severe_soreness) == 1
+    assert athlete_stats.daily_severe_soreness[0]. severity == 4
+
+def test_daily_soreness_update_more_than_24():
+    athlete_stats = AthleteStats("tester")
+    athlete_stats.event_date = "2018-12-03"
+    post_soreness = Soreness()
+    post_soreness.side = 1
+    post_soreness.body_part = BodyPart(BodyPartLocation(9), None)
+    post_soreness.severity = 4
+    post_soreness.pain = False
+    post_soreness.reported_date_time = datetime(2018, 12, 1, 17, 0, 0)
+    athlete_stats.post_session_soreness = [post_soreness]
+
+    soreness = Soreness()
+    soreness.side = 1
+    soreness.body_part = BodyPart(BodyPartLocation(9), None)
+    soreness.severity = 2
+    soreness.pain = False
+    soreness.reported_date_time = datetime(2018, 12, 3, 12, 0, 0)
+    athlete_stats.readiness_soreness = [soreness]
+
+    current_time = soreness.reported_date_time
+
+    athlete_stats.update_daily_soreness(current_time)
+    assert len(athlete_stats.daily_severe_soreness) == 1
+    assert athlete_stats.daily_severe_soreness[0]. severity == 2
+
+
+

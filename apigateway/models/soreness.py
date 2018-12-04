@@ -49,6 +49,16 @@ class Soreness(Serialisable):
         }
         return ret
 
+    def json_serialise_daily_soreness(self):
+        ret = {
+            'body_part': self.body_part.location.value,
+            'pain': self.pain,
+            'severity': self.severity,
+            'side': self.side,
+            'reported_date_time': format_datetime(self.reported_date_time)
+        }
+        return ret
+
     def __getitem__(self, item):
         return getattr(self, item)
 
