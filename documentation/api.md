@@ -32,6 +32,8 @@
       - [Mark Completed](#mark-completed-1)
     - [Daily Plans](#daily-plans)
       - [Get daily plan](#get-daily-plan)
+    - [Coach Dashboard](#coach-dashboard)
+      - [Get dashboard data for all users](#get-dashboard-data-for-all-users)
     - [Misc](#misc)
       - [Clear user's data](#clear-users-data)
 
@@ -96,11 +98,11 @@ The client __must__ submit a request to the endpoint `/plans/version/daily_readi
 The client __must__ submit a request body containing a JSON object with the following schema:
 ```
 {
-	"date_time": Datetime,
-	"user_id": Uuid,
-	"soreness": [{"body_part": number, "severity": number, "side": number, "pain": boolean}],
-	"sleep_quality": number,
-	"readines": number,
+    "date_time": Datetime,
+    "user_id": Uuid,
+    "soreness": [{"body_part": number, "severity": number, "side": number, "pain": boolean}],
+    "sleep_quality": number,
+    "readines": number,
     "wants_functional_strength": boolean
     "current_sport": number
     "current_position": number
@@ -179,9 +181,9 @@ Authentication is required for this endpoint
 ```
 {
     "body_parts": [
-            		{"body_part": number, "side": number},
-            		{"body_part": number, "side": number}
-            		],
+                {"body_part": number, "side": number},
+                {"body_part": number, "side": number}
+                ],
     "completed_functional_strength_sessions": number,
     "current_position": number,
     "current_sport_name": number,
@@ -210,14 +212,14 @@ The client __must__ submit a request to the endpoint `/plans/version/post_sessio
 The client __must__ submit a request body containing a JSON object with the following schema:
 ```
 {
-	"user_id": Uuid,
-	"event_date": Datetime,
-	"session_id": Uuid,
-	"session_type": number,
-	"survey": {
-		"RPE": number,
-		"soreness": [{"body_part": number, "severity": number, "side": number, "pain", boolean}]
-	}
+    "user_id": Uuid,
+    "event_date": Datetime,
+    "session_id": Uuid,
+    "session_type": number,
+    "survey": {
+      "RPE": number,
+      "soreness": [{"body_part": number, "severity": number, "side": number, "pain", boolean}]
+    }
 }
 ```
 * `event_date` __should__ reflect the date and time when the survey happened
@@ -241,9 +243,9 @@ Authorization: eyJraWQ...ajBc4VQ
             {
                "RPE": 4,
                "soreness": [
-               		{"body_part": 17.0, "severity": 5, "side": 0, pain: false},
-               		{"body_part": 14, "severity": 3, "side": 0, pain: false}
-               		]
+                  {"body_part": 17.0, "severity": 5, "side": 0, pain: false},
+                  {"body_part": 14, "severity": 3, "side": 0, pain: false}
+                  ]
             }
             
 }
@@ -360,7 +362,6 @@ Postman-Token: 4b6c3946-89fd-4cde-ae29-3a4984d5f373
 {
     "user_id":"a1233423-73d3-4761-ac92-89cc15921d34",
     "event_date": "2018-09-14T19:54:48Z"
-
 }
 ```
 ##### Responses
@@ -375,14 +376,14 @@ Postman-Token: 4b6c3946-89fd-4cde-ae29-3a4984d5f373
 each session object will be of the following schema
 
 ``` 
-    {
-            "count": 4,
-            "duration": 25,
-            "event_date": "2018-09-19T15:30:00Z",
-            "session_type": 0,
-            "sport_name": 5,
-            "strength_and_conditioning_type": null
-        }
+{
+    "count": 4,
+    "duration": 25,
+    "event_date": "2018-09-19T15:30:00Z",
+    "session_type": 0,
+    "sport_name": 5,
+    "strength_and_conditioning_type": null
+}
 ```
 
 #### Mark no sessions planned
@@ -442,9 +443,9 @@ The client __must__ submit a request to the endpoint `/plans/version/session/{se
 The client __must__ submit a request body containing a JSON object with the following schema:
 ```
 {
-	"user_id": Uuid,
-	"event_date": Datetime,
-	"session_type": number
+    "user_id": Uuid,
+    "event_date": Datetime,
+    "session_type": number
 }
 ```
 * `event_date` __should__ reflect the date and time the session was scheduled for.
@@ -734,8 +735,6 @@ Authorization: eyJraWQ...ajBc4VQ
     "message": "success"
 }
 ```
-
-
 
 #### Mark Completed
 
@@ -1713,6 +1712,100 @@ The Service __will__ respond with HTTP Status `200 OK`, with a body with the fol
     }
 ```
 
+### Coach Dashboard
+
+#### Get dashboard data for all users
+This endpoint can used get relevant data for all the users across all the team the user is a coach for. Note that the user needs to be a coach for all the teams they belong to.
+
+##### Query String
+The client __must__ submit a request to the endpoint `/plans/version/coach/{user_id}/dashboard`. The request method __must__ be `GET`.
+
+##### Request
+A body is not required for this request
+
+```
+GET /plans/version/coach/{user_id}/dashboard HTTPS/1.1
+Host: apis.env.fathomai.com
+Content-Type: application/json
+Authorization: eyJraWQ...ajBc4VQ
+```
+##### Responses
+The Service __will__ respond with HTTP Status `200 OK`, with a body with the following syntax:
+ 
+```
+{"teams": [team, team]}
+```
+where team has the following schema
+```
+{
+    "name": string,
+    "compliance": compliance,
+    "daily_insights": daily_insights,
+    "weekly_insights": weekly_insights,
+    "athletes": [athlete, athlete]
+}
+```
+* `compliance` would be of format
+```
+{
+    "completed": [user, user],
+    "incomplete": [user, user]
+}
+```
+where user will have the following schema
+```
+{
+    "user_id": Uuid,
+    "first_name": string,
+    "last_name": string
+}
+```
+* `daily_insights` will have the following schema
+```
+{
+    "all_good": [user],
+    "balance_overtraining_risk": [user, user],
+    "add_variety_to_training_risk": [user, user, user],
+    "increase_weekly_workload": [user, user, user],
+    "address_pain_or_soreness": [user, user, user],
+    "evaluate_health_status": [user, user, user]
+}
+```
+
+* `weekly_insights` will have the following schema
+```
+{
+    "all_good": [user],
+    "increase_workload": [user, user],
+    "limit_time_intensity_of_training": [user, user, user],
+    "monitor_in_training": [user, user, user],
+    "not_cleared_for_training": [user, user, user]
+}
+```
+where `user` in `daily_insights` and `weekly_insights`has the following schema
+```
+{
+    "user_id": Uuid,
+    "first_name": string,
+    "last_name": string,
+    "cleared_to_train": Boolean,
+    "color": Number
+}
+```
+* `athlete` will have the following schema
+```
+{
+    "user_id": Uuid,
+    "first_name": string,
+    "last_name": string,
+    "cleared_to_train": Boolean,
+    "color": Number,
+    "daily_recommendation": [string, string],
+    "weekly_recommendation": [string, string],
+    "insights': [string, string]
+}
+```
+
 ### Misc
 
 #### Clear user's data
@@ -1748,4 +1841,8 @@ Authorization: eyJraWQ...ajBc4VQ
     "message": "success"
 }
 ```
+
+
+
+
 
