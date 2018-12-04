@@ -270,8 +270,8 @@ class RecommendationText(object):
                 "6A": "Stopping activity if {bodypart} {is_pain} present",
                 "6B": "Modifying training so all activity is free of {bodypart} {is_pain}",
                 "6C": "Monitoring {bodypart} symptoms during training. If symptoms persists, consider decreasing training in the next few days to allow recovery",
-                "7A": "Completing Fathom's personalized Prep & Recovery",
-                "7B": "Completing Fathom's Prep",
+                "7A": "Completing Fathom's personalized Prep & Recovery exercises",
+                "7B": "Completing Fathom's personalized Prep exercises",
                 "8A": "Heat {bodypart} before training for 10 minutes",
                 "9A": "Ice {bodypart} immediately after training for 20 minutes",
                 "9C": "Ice bath for 10 minutes after training"

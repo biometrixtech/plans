@@ -93,6 +93,8 @@ def _get_team_info(user_id, account_id):
 
 
 def _get_offset(tz):
+    if tz is None:
+        tz = "-05:00"
     offset = tz.split(":")
     hour_offset = int(offset[0])
     minute_offset = int(offset[1])

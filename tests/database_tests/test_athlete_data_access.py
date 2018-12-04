@@ -6,7 +6,7 @@ from datastores.daily_readiness_datastore import DailyReadinessDatastore
 from datastores.daily_plan_datastore import DailyPlanDatastore
 from datastores.post_session_survey_datastore import PostSessionSurveyDatastore
 from datastores.completed_exercise_datastore import CompletedExerciseDatastore
-from models.exercise import CompletedExercise
+from models.soreness import CompletedExercise
 from datetime import datetime
 from config import get_secret
 
@@ -39,7 +39,6 @@ def test_get_readiness_survey_test_data():
 def test_multi_get_readiness_survey_test_data():
     athlete_dao = DailyReadinessDatastore()
     last_daily_readiness_survey = athlete_dao.get(["jjones@email.com", "rrobbins@fakemail.com"], datetime(2018, 7, 12, 3, 0, 0), datetime(2018, 7, 12, 23, 59, 59), False)
-    print(last_daily_readiness_survey)
     assert None is not last_daily_readiness_survey
     assert len(last_daily_readiness_survey) == 2
 

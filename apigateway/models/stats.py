@@ -52,6 +52,10 @@ class AthleteStats(Serialisable):
         self.current_position = None
 
         self.historic_soreness = []
+        self.readiness_soreness = []
+        self.post_session_soreness = []
+        self.readiness_pain = []
+        self.post_session_pain = []
         self.daily_severe_soreness = []
         self.daily_severe_pain = []
         self.daily_severe_pain_event_date = None
@@ -60,72 +64,94 @@ class AthleteStats(Serialisable):
 
     def update_historic_soreness(self, soreness, event_date):
 
-        for h in range(0, len(self.historic_soreness)):
-            if (self.historic_soreness[h].body_part_location == soreness.body_part.location.value and
-                    self.historic_soreness[h].side == soreness.side and
-                    self.historic_soreness[h].is_pain == soreness.pain):
+        for h in self.historic_soreness:
+            if (h.body_part_location == soreness.body_part.location.value and
+                h.side == soreness.side and
+                h.is_pain == soreness.pain):
                 # was historic_soreness already updated today?
-                if format_date(event_date) != self.historic_soreness[h].last_reported: #not updated
-                    if self.historic_soreness[h].historic_soreness_status == HistoricSorenessStatus.almost_persistent:
-                        self.historic_soreness[h].historic_soreness_status = HistoricSorenessStatus.persistent
-                    elif self.historic_soreness[h].historic_soreness_status == HistoricSorenessStatus.persistent_almost_chronic:
-                        self.historic_soreness[h].historic_soreness_status = HistoricSorenessStatus.chronic
+                if format_date(event_date) != h.last_reported: #not updated
+                    if h.historic_soreness_status == HistoricSorenessStatus.almost_persistent:
+                        h.historic_soreness_status = HistoricSorenessStatus.persistent
+                    elif h.historic_soreness_status == HistoricSorenessStatus.persistent_almost_persistent_2:
+                        h.historic_soreness_status = HistoricSorenessStatus.persistent_2
                     else:
                         break
 
-                    self.historic_soreness[h].last_reported = event_date
+                    h.last_reported = event_date
                     # weighted average
-                    self.historic_soreness[h].average_severity = (
-                        ((self.historic_soreness[h].average_severity * (float(self.historic_soreness[h].streak) /
-                                                                      float(self.historic_soreness[h].streak) + 1
-                                                                      )) +
-                        (soreness.severity * (float(1) / float(self.historic_soreness[h].streak) + 1))) /
-                        float(self.historic_soreness[h].streak) + 1
-                    )
+                    h.average_severity = round(h.average_severity * float(h.streak) / (float(h.streak) + 1) +
+                                               soreness.severity * float(1) / (float(h.streak) + 1), 2)
+                    
 
-                    self.historic_soreness[h].streak = self.historic_soreness[h].streak + 1
+                    h.streak = h.streak + 1
                     break
                 else:
                     # we first have to determine if current value is higher previous day's value
-                    for s in self.daily_severe_soreness:
-                        if (self.daily_severe_soreness[h].body_part.location.value == soreness.body_part.location.value and
-                                self.daily_severe_soreness[h].side == soreness.side and
-                                self.daily_severe_soreness[h].pain == soreness.pain):
+                    pain_soreness_list = self.daily_severe_soreness
+                    pain_soreness_list.extend(self.daily_severe_pain)
+                    for s in pain_soreness_list:
+                        if (s.body_part.location.value == soreness.body_part.location.value and
+                            s.side == soreness.side and
+                            s.pain == soreness.pain):
                             if s.severity >= soreness.severity:
                                 break
                             else:
-                                new_severity = (((self.historic_soreness[h].average_severity *
-                                                self.historic_soreness[h].streak) - s.severity) /
-                                                (float(self.historic_soreness[h].streak - 1)))
-                                self.historic_soreness[h].average_severity = new_severity
+                                new_severity = ((h.average_severity * h.streak) - s.severity) / (float(h.streak - 1))
+                                h.average_severity = new_severity
                                 # temporarily set it back to keep consistency with algo
-                                self.historic_soreness[h].streak = self.historic_soreness[h].streak - 1
-                                self.historic_soreness[h].average_severity = (
-                                        ((self.historic_soreness[h].average_severity * (
-                                                    float(self.historic_soreness[h].streak) /
-                                                    float(self.historic_soreness[h].streak) + 1
-                                                    )) +
-                                         (soreness.severity * (
-                                                     float(1) / float(self.historic_soreness[h].streak) + 1))) /
-                                        float(self.historic_soreness[h].streak) + 1
-                                )
-                                self.historic_soreness[h].streak = self.historic_soreness[h].streak + 1
+                                h.streak = h.streak - 1
+                                h.average_severity = round(h.average_severity * float(h.streak) / (float(h.streak) + 1) +
+                                                           soreness.severity * float(1) / (float(h.streak) + 1), 2)
+                                h.streak = h.streak + 1
                                 break
 
-    def update_daily_soreness(self, soreness):
-        for existing_soreness in self.daily_severe_soreness:
-            if soreness.body_part.location.value == existing_soreness.body_part.location.value and soreness.side == existing_soreness.side:
-                existing_soreness.severity = max([soreness.severity, existing_soreness.severity])
-                return 'Updated'
-        self.daily_severe_soreness.append(soreness)
 
-    def update_daily_pain(self, pain):
-        for existing_pain in self.daily_severe_pain:
-            if pain.body_part.location.value == existing_pain.body_part.location.value and pain.side == existing_pain.side:
-                existing_pain.severity = max([pain.severity, existing_pain.severity])
-                return 'Updated'
-        self.daily_severe_pain.append(pain)
+    def update_daily_soreness(self, current_time):
+        soreness_list = self._combine_soreness_lists(self.readiness_soreness, self.post_session_soreness, current_time)
+        self.daily_severe_soreness = soreness_list
 
+    def update_daily_pain(self, current_time):
+        pain_list = self._combine_soreness_lists(self.readiness_pain, self.post_session_pain, current_time)
+        self.daily_severe_pain = pain_list
+
+
+    def _combine_soreness_lists(self, readiness_soreness_list, post_session_soreness_list, current_time):
+        soreness_list = []
+        soreness_list.extend(readiness_soreness_list)
+        for s in post_session_soreness_list:
+            post_soreness_within_24_hours = False
+            post_soreness_age = current_time - s.reported_date_time
+            if post_soreness_age.total_seconds() <= 86400: # within 24 hours
+                post_soreness_within_24_hours = True
+            updated = False
+            for r in soreness_list:
+
+                soreness_list_item_within_24_hours = False
+
+                soreness_list_age = current_time - r.reported_date_time
+
+                if soreness_list_age.total_seconds() <= 86400: # within 24 hours
+                    soreness_list_item_within_24_hours = True
+
+                if (r.body_part.location.value == s.body_part.location.value and
+                        r.side == s.side):
+                        if soreness_list_item_within_24_hours and post_soreness_within_24_hours:
+                            if r.severity <= s.severity:
+                                r.severity = s.severity
+                                r.reported_date_time = s.reported_date_time
+                        elif not soreness_list_item_within_24_hours and post_soreness_within_24_hours:
+                            r.severity = s.severity
+                            r.reported_date_time = s.reported_date_time
+                        elif not soreness_list_item_within_24_hours and not post_soreness_within_24_hours:
+                            if r.reported_date_time < s.reported_date_time:
+                                r.severity = s.severity
+                                r.reported_date_time = s.reported_date_time
+
+                        updated = True
+            if not updated:
+                soreness_list.append(s)
+
+        return soreness_list
 
     def acute_to_chronic_external_ratio(self):
         if self.acute_external_total_load is not None and self.chronic_external_total_load is not None:
@@ -230,8 +256,12 @@ class AthleteStats(Serialisable):
             'current_sport_name': self.current_sport_name.value,
             'current_position': self.current_position.value if self.current_position is not None else None,
             'historic_soreness': [h.json_serialise() for h in self.historic_soreness],
-            'daily_severe_pain': [s.json_serialise() for s in self.daily_severe_pain],
-            'daily_severe_soreness': [s.json_serialise() for s in self.daily_severe_soreness],
+            'readiness_soreness': [s.json_serialise_daily_soreness() for s in self.readiness_soreness],
+            'post_session_soreness': [s.json_serialise_daily_soreness() for s in self.post_session_soreness],
+            'readiness_pain': [s.json_serialise_daily_soreness() for s in self.readiness_pain],
+            'post_session_pain': [s.json_serialise_daily_soreness() for s in self.post_session_pain],
+            'daily_severe_pain': [s.json_serialise_daily_soreness() for s in self.daily_severe_pain],
+            'daily_severe_soreness': [s.json_serialise_daily_soreness() for s in self.daily_severe_soreness],
             'daily_severe_soreness_event_date': self.daily_severe_soreness_event_date,
             'daily_severe_pain_event_date': self.daily_severe_pain_event_date,
             'metrics': [m.json_serialise() for m in self.metrics]

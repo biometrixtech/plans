@@ -6,7 +6,7 @@ from fathomapi.utils.xray import xray_recorder
 from datastores.daily_plan_datastore import DailyPlanDatastore
 from datastores.athlete_stats_datastore import AthleteStatsDatastore
 from datastores.completed_exercise_datastore import CompletedExerciseDatastore
-from models.exercise import CompletedExercise
+from models.soreness import CompletedExercise
 from utils import format_date, parse_datetime, format_datetime
 from config import get_mongo_collection
 from datetime import timedelta
