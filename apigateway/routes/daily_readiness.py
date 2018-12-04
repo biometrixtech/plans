@@ -33,11 +33,11 @@ def handle_daily_readiness_create():
                             minute=59,
                             second=59
                             )
-    event_date = format_datetime(event_date)
+    # event_date = format_datetime(event_date)
 
     daily_readiness = DailyReadiness(
         user_id=request.json['user_id'],
-        event_date=event_date,
+        event_date=format_datetime(event_date),
         soreness=request.json['soreness'],  # dailysoreness object array
         sleep_quality=request.json['sleep_quality'],
         readiness=request.json['readiness'],
@@ -55,15 +55,17 @@ def handle_daily_readiness_create():
         need_stats_update = True
 
     if need_stats_update:
-        plan_event_date = format_date(parse_datetime(event_date))
+        plan_event_date = format_date(event_date)
         athlete_stats_store = AthleteStatsDatastore()
         athlete_stats = athlete_stats_store.get(athlete_id=request.json['user_id'])
         if athlete_stats is None:
             athlete_stats = AthleteStats(request.json['user_id'])
         athlete_stats.event_date = plan_event_date
-        athlete_stats.daily_severe_soreness = severe_soreness
+        athlete_stats.readiness_soreness = severe_soreness
+        athlete_stats.update_daily_soreness(event_date)
+        athlete_stats.readiness_pain = severe_pain
+        athlete_stats.update_daily_pain(event_date)
         athlete_stats.daily_severe_soreness_event_date = plan_event_date
-        athlete_stats.daily_severe_pain = severe_pain
         athlete_stats.daily_severe_pain_event_date = plan_event_date
 
         for s in daily_readiness.soreness:

@@ -84,6 +84,16 @@ class StatsProcessing(object):
                     athlete_stats.daily_severe_soreness_event_date = current_athlete_stats.daily_severe_soreness_event_date
                     athlete_stats.daily_severe_pain = current_athlete_stats.daily_severe_pain
                     athlete_stats.daily_severe_pain_event_date = current_athlete_stats.daily_severe_pain_event_date
+                    athlete_stats.readiness_soreness = current_athlete_stats.readiness_soreness
+                    athlete_stats.readiness_pain = current_athlete_stats.readiness_pain
+                    athlete_stats.post_session_soreness = current_athlete_stats.post_session_soreness
+                    athlete_stats.post_session_pain = current_athlete_stats.post_session_pain
+                else:
+                    # update post_session_soreness from the last 48 hours
+                    current_time = parse_date(self.event_date)
+                    athlete_stats.post_session_soreness = [s for s in current_athlete_stats.post_session_soreness if s.reported_date_time is not None and (current_time - s.reported_date_time).total_seconds() < 172800]
+                    athlete_stats.post_session_pain = [s for s in current_athlete_stats.post_session_pain if s.reported_date_time is not None and (current_time - s.reported_date_time).total_seconds() < 172800]
+
             self.athlete_stats_datastore.put(athlete_stats)
 
 
@@ -361,7 +371,7 @@ class StatsProcessing(object):
                 if h in historic_soreness_8_14 and h in historic_soreness_15_21 and h in historic_soreness_22_28:
                     if (historic_soreness_8_14[h] >= 3 and historic_soreness_15_21[h] >= 3
                             and historic_soreness_22_28[h] >= 3):
-                        historic_soreness.historic_soreness_status = HistoricSorenessStatus.chronic
+                        historic_soreness.historic_soreness_status = HistoricSorenessStatus.persistent_2
                     else:
                         historic_soreness.historic_soreness_status = HistoricSorenessStatus.persistent
 
@@ -369,7 +379,7 @@ class StatsProcessing(object):
                 if h in historic_soreness_8_14 and h in historic_soreness_15_21 and h in historic_soreness_22_28:
                     if (historic_soreness_8_14[h] >= 3 and historic_soreness_15_21[h] >= 3
                             and historic_soreness_22_28[h] >= 3):
-                        historic_soreness.historic_soreness_status = HistoricSorenessStatus.persistent_almost_chronic
+                        historic_soreness.historic_soreness_status = HistoricSorenessStatus.persistent_almost_persistent_2
                     else:
                         historic_soreness.historic_soreness_status = HistoricSorenessStatus.persistent
 
@@ -604,10 +614,10 @@ class StatsProcessing(object):
             dates_difference = self.end_date_time - self.start_date_time
 
             max_acute_soreness_values = []
-            max_chronic_soreness_values = []
+            max_persistent_2_soreness_values = []
 
             acute_soreness_values = []
-            chronic_soreness_values = []
+            persistent_2_soreness_values = []
 
             for d in range(dates_difference.days + 1):
 
@@ -653,11 +663,11 @@ class StatsProcessing(object):
                     soreness_values = [x.severity for x in s.soreness if x.severity is not None]
                     chronic_readiness_soreness_values.extend(soreness_values)
 
-                chronic_soreness_values.extend(chronic_post_soreness_values)
-                chronic_soreness_values.extend(chronic_readiness_soreness_values)
+                persistent_2_soreness_values.extend(chronic_post_soreness_values)
+                persistent_2_soreness_values.extend(chronic_readiness_soreness_values)
 
-                if len(chronic_soreness_values) > 0:
-                    max_chronic_soreness_values.append(max(chronic_soreness_values))
+                if len(persistent_2_soreness_values) > 0:
+                    max_persistent_2_soreness_values.append(max(persistent_2_soreness_values))
 
             if len(acute_RPE_values) > 0:
                 athlete_stats.acute_avg_RPE = statistics.mean(acute_RPE_values)
@@ -680,8 +690,8 @@ class StatsProcessing(object):
             if len(chronic_sleep_quality_values) > 0:
                 athlete_stats.chronic_avg_sleep_quality = statistics.mean(chronic_sleep_quality_values)
 
-            if len(max_chronic_soreness_values) > 0:
-                athlete_stats.chronic_avg_max_soreness = statistics.mean(max_chronic_soreness_values)
+            if len(max_persistent_2_soreness_values) > 0:
+                athlete_stats.chronic_avg_max_soreness = statistics.mean(max_persistent_2_soreness_values)
 
         return athlete_stats
 
