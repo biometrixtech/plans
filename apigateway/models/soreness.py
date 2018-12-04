@@ -125,9 +125,9 @@ class BodyPart(object):
 class HistoricSorenessStatus(IntEnum):
     dormant_cleared = 0
     persistent = 1
-    chronic = 2
+    persistent_2 = 2
     almost_persistent = 3
-    persistent_almost_chronic = 4
+    persistent_almost_persistent_2 = 4
 
 
 class HistoricSoreness(Serialisable):

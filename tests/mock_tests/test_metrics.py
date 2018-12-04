@@ -86,7 +86,7 @@ def test_populate_thresholds_athlete_training_volume_thresh_None():
 def test_populate_thresholds_athlete_hist_soreness_thresh_low():
 
     hist_soreness = HistoricSoreness(BodyPartLocation(12), 1, True)
-    hist_soreness.historic_soreness_status = HistoricSorenessStatus.chronic
+    hist_soreness.historic_soreness_status = HistoricSorenessStatus.persistent_2
     hist_soreness.average_severity = 3
     hist_soreness_list = [hist_soreness]
 
@@ -102,7 +102,7 @@ def test_populate_thresholds_athlete_hist_soreness_thresh_low():
 def test_populate_thresholds_athlete_hist_soreness_thresh_mod():
 
     hist_soreness = HistoricSoreness(BodyPartLocation(12), 1, True)
-    hist_soreness.historic_soreness_status = HistoricSorenessStatus.chronic
+    hist_soreness.historic_soreness_status = HistoricSorenessStatus.persistent_2
     hist_soreness.average_severity = 4
     hist_soreness_list = [hist_soreness]
 

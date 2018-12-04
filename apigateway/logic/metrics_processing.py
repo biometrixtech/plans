@@ -24,9 +24,9 @@ class MetricsProcessing(object):
         metrics.extend(PersistentSorenessMetricGenerator(ps_list).get_metric_list())
 
         cs_list = list(p for p in athlete_stats.historic_soreness if not p.is_pain and p.historic_soreness_status ==
-                       HistoricSorenessStatus.chronic)
+                       HistoricSorenessStatus.persistent_2)
 
-        metrics.extend(ChronicSorenessMetricGenerator(cs_list).get_metric_list())
+        metrics.extend(Persistent_2SorenessMetricGenerator(cs_list).get_metric_list())
 
         pp_list = list(p for p in athlete_stats.historic_soreness if p.is_pain and p.historic_soreness_status ==
                        HistoricSorenessStatus.persistent)
@@ -34,7 +34,7 @@ class MetricsProcessing(object):
         metrics.extend(PersistentPainMetricGenerator(pp_list).get_metric_list())
 
         cp_list = list(p for p in athlete_stats.historic_soreness if p.is_pain and p.historic_soreness_status ==
-                       HistoricSorenessStatus.chronic)
+                       HistoricSorenessStatus.persistent_2)
 
         metrics.extend(ChronicPainMetricGenerator(cp_list).get_metric_list())
 
@@ -205,10 +205,10 @@ class PersistentSorenessMetricGenerator(AthleteSorenessMetricGenerator):
         self.populate_thresholds_with_soreness()
 
 
-class ChronicSorenessMetricGenerator(AthleteSorenessMetricGenerator):
+class Persistent_2SorenessMetricGenerator(AthleteSorenessMetricGenerator):
     def __init__(self, soreness_list):
-        super(ChronicSorenessMetricGenerator, self).__init__("Chronic Soreness", MetricType.longitudinal,
-                                                             soreness_list, "average_severity")
+        super(Persistent_2SorenessMetricGenerator, self).__init__("Chronic Soreness", MetricType.longitudinal,
+                                                                  soreness_list, "average_severity")
         self.high_level_action_description = "Prioritize Recovery and consider decreasing upcoming workloads"
         self.thresholds[0] = ThresholdRecommendation(MetricColor.yellow,
                                                      WeeklyHighLevelInsight.evaluate_health_status,
