@@ -360,7 +360,7 @@ class StatsProcessing(object):
             historic_soreness = HistoricSoreness(h.location, h.side, h.is_pain)
             historic_soreness.last_reported = historic_soreness_last_8_14_reported[h]
             if h not in historic_soreness_last_7 and h in historic_soreness_15_21 and h in historic_soreness_22_28:
-                historic_soreness.historic_soreness_status = HistoricSorenessStatus.almost_persistent
+                historic_soreness.historic_soreness_status = HistoricSorenessStatus.almost_persistent_pain
                 historic_soreness_list.append(historic_soreness)
 
         for h in historic_soreness_last_7:
@@ -371,23 +371,23 @@ class StatsProcessing(object):
                 if h in historic_soreness_8_14 and h in historic_soreness_15_21 and h in historic_soreness_22_28:
                     if (historic_soreness_8_14[h] >= 3 and historic_soreness_15_21[h] >= 3
                             and historic_soreness_22_28[h] >= 3):
-                        historic_soreness.historic_soreness_status = HistoricSorenessStatus.persistent_2
+                        historic_soreness.historic_soreness_status = HistoricSorenessStatus.persistent_2_pain
                     else:
-                        historic_soreness.historic_soreness_status = HistoricSorenessStatus.persistent
+                        historic_soreness.historic_soreness_status = HistoricSorenessStatus.persistent_pain
 
             elif historic_soreness_last_7[h] == 2:
                 if h in historic_soreness_8_14 and h in historic_soreness_15_21 and h in historic_soreness_22_28:
                     if (historic_soreness_8_14[h] >= 3 and historic_soreness_15_21[h] >= 3
                             and historic_soreness_22_28[h] >= 3):
-                        historic_soreness.historic_soreness_status = HistoricSorenessStatus.persistent_almost_persistent_2
+                        historic_soreness.historic_soreness_status = HistoricSorenessStatus.almost_persistent_2_pain
                     else:
-                        historic_soreness.historic_soreness_status = HistoricSorenessStatus.persistent
+                        historic_soreness.historic_soreness_status = HistoricSorenessStatus.persistent_pain
 
             elif historic_soreness_last_7[h] == 1:
                 if h in historic_soreness_8_14 and h in historic_soreness_15_21 and h in historic_soreness_22_28:
                     if (historic_soreness_8_14[h] >= 1 and historic_soreness_15_21[h] >= 1
                             and historic_soreness_22_28[h] >= 1):
-                        historic_soreness.historic_soreness_status = HistoricSorenessStatus.persistent
+                        historic_soreness.historic_soreness_status = HistoricSorenessStatus.persistent_pain
 
             if historic_soreness.historic_soreness_status is not None:
                 historic_soreness_list.append(historic_soreness)

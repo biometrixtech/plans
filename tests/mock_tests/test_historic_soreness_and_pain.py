@@ -119,7 +119,7 @@ def test_find_persistent_soreness():
                                                                     soreness_list_3,
                                                                     soreness_list_4)
 
-    assert(HistoricSorenessStatus.persistent is historic_soreness[0].historic_soreness_status)
+    assert(HistoricSorenessStatus.persistent_soreness is historic_soreness[0].historic_soreness_status)
     assert (False is historic_soreness[0].is_pain)
 
 
@@ -137,7 +137,7 @@ def test_find_persistent_2_soreness():
                                                                     soreness_list_3,
                                                                     soreness_list_4)
 
-    assert(HistoricSorenessStatus.persistent_2 is historic_soreness[0].historic_soreness_status)
+    assert(HistoricSorenessStatus.persistent_2_soreness is historic_soreness[0].historic_soreness_status)
     assert (False is historic_soreness[0].is_pain)
 
 
@@ -155,7 +155,7 @@ def test_find_persistent_pain():
                                                                     soreness_list_3,
                                                                     soreness_list_4)
 
-    assert(HistoricSorenessStatus.persistent is historic_soreness[0].historic_soreness_status)
+    assert(HistoricSorenessStatus.persistent_pain is historic_soreness[0].historic_soreness_status)
     assert (True is historic_soreness[0].is_pain)
 
 
@@ -173,7 +173,7 @@ def test_find_persistent_2_pain():
                                                                     soreness_list_3,
                                                                     soreness_list_4)
 
-    assert(HistoricSorenessStatus.persistent_2 is historic_soreness[0].historic_soreness_status)
+    assert(HistoricSorenessStatus.persistent_2_pain is historic_soreness[0].historic_soreness_status)
     assert (True is historic_soreness[0].is_pain)
 
 
@@ -337,7 +337,7 @@ def test_historical_soreness_trigger_update_almost_persistent_to_persistent():
     athlete_stats = AthleteStats("tester")
     athlete_stats.event_date = "2018-12-02"
     soreness = HistoricSoreness(9, 1, True)
-    soreness.historic_soreness_status = HistoricSorenessStatus.almost_persistent
+    soreness.historic_soreness_status = HistoricSorenessStatus.almost_persistent_pain
     soreness.streak = 2
     soreness.streak_start_date = "2018-12-01"
     soreness.average_severity = 2.0
@@ -353,7 +353,7 @@ def test_historical_soreness_trigger_update_almost_persistent_to_persistent():
 
     updated_soreness = athlete_stats.historic_soreness[0]
 
-    assert updated_soreness.historic_soreness_status == HistoricSorenessStatus.persistent
+    assert updated_soreness.historic_soreness_status == HistoricSorenessStatus.persistent_pain
     assert updated_soreness.streak == 3
     assert updated_soreness.average_severity == 2.33
 
@@ -362,7 +362,7 @@ def test_historical_soreness_trigger_update_almost_persistent_to_persistent_2():
     athlete_stats = AthleteStats("tester")
     athlete_stats.event_date = "2018-12-02"
     soreness = HistoricSoreness(9, 1, True)
-    soreness.historic_soreness_status = HistoricSorenessStatus.persistent_almost_persistent_2
+    soreness.historic_soreness_status = HistoricSorenessStatus.almost_persistent_2_pain
     soreness.streak = 2
     soreness.streak_start_date = "2018-12-01"
     soreness.average_severity = 2.0
@@ -378,7 +378,7 @@ def test_historical_soreness_trigger_update_almost_persistent_to_persistent_2():
 
     updated_soreness = athlete_stats.historic_soreness[0]
 
-    assert updated_soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2
+    assert updated_soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_pain
     assert updated_soreness.streak == 3
     assert updated_soreness.average_severity == 2.33
 
@@ -386,7 +386,7 @@ def test_historical_soreness_trigger_update_almost_persistent_to_peristent_2_sor
     athlete_stats = AthleteStats("tester")
     athlete_stats.event_date = "2018-12-02"
     soreness = HistoricSoreness(9, 1, False)
-    soreness.historic_soreness_status = HistoricSorenessStatus.persistent_almost_persistent_2
+    soreness.historic_soreness_status = HistoricSorenessStatus.almost_persistent_2_pain
     soreness.streak = 2
     soreness.streak_start_date = "2018-12-01"
     soreness.average_severity = 2.0
@@ -402,7 +402,7 @@ def test_historical_soreness_trigger_update_almost_persistent_to_peristent_2_sor
 
     updated_soreness = athlete_stats.historic_soreness[0]
 
-    assert updated_soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2
+    assert updated_soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_pain
     assert updated_soreness.streak == 3
     assert updated_soreness.average_severity == 2.33
 
@@ -410,7 +410,7 @@ def test_historical_soreness_trigger_update_same_day_pain():
     athlete_stats = AthleteStats("tester")
     athlete_stats.event_date = "2018-12-03"
     soreness = HistoricSoreness(9, 1, True)
-    soreness.historic_soreness_status = HistoricSorenessStatus.persistent_almost_persistent_2
+    soreness.historic_soreness_status = HistoricSorenessStatus.almost_persistent_2_pain
     soreness.streak = 2
     soreness.streak_start_date = "2018-12-01"
     soreness.average_severity = 2.0
@@ -434,7 +434,7 @@ def test_historical_soreness_trigger_update_same_day_pain():
 
     updated_soreness = athlete_stats.historic_soreness[0]
 
-    assert updated_soreness.historic_soreness_status == HistoricSorenessStatus.persistent_almost_persistent_2
+    assert updated_soreness.historic_soreness_status == HistoricSorenessStatus.almost_persistent_2_pain
     assert updated_soreness.streak == 2
     assert updated_soreness.average_severity == 2.5
 
@@ -443,7 +443,7 @@ def test_historical_soreness_trigger_update_same_day_soreness():
     athlete_stats = AthleteStats("tester")
     athlete_stats.event_date = "2018-12-03"
     soreness = HistoricSoreness(9, 1, False)
-    soreness.historic_soreness_status = HistoricSorenessStatus.persistent_almost_persistent_2
+    soreness.historic_soreness_status = HistoricSorenessStatus.almost_persistent_2_pain
     soreness.streak = 2
     soreness.streak_start_date = "2018-12-01"
     soreness.average_severity = 3.0
@@ -467,7 +467,7 @@ def test_historical_soreness_trigger_update_same_day_soreness():
 
     updated_soreness = athlete_stats.historic_soreness[0]
 
-    assert updated_soreness.historic_soreness_status == HistoricSorenessStatus.persistent_almost_persistent_2
+    assert updated_soreness.historic_soreness_status == HistoricSorenessStatus.almost_persistent_2_pain
     assert updated_soreness.streak == 2
     assert updated_soreness.average_severity == 3.5
 
@@ -476,7 +476,7 @@ def test_historical_soreness_trigger_update_same_day_lower_severity():
     athlete_stats = AthleteStats("tester")
     athlete_stats.event_date = "2018-12-03"
     soreness = HistoricSoreness(9, 1, True)
-    soreness.historic_soreness_status = HistoricSorenessStatus.persistent_almost_persistent_2
+    soreness.historic_soreness_status = HistoricSorenessStatus.almost_persistent_2_pain
     soreness.streak = 2
     soreness.streak_start_date = "2018-12-01"
     soreness.average_severity = 2.0
@@ -500,7 +500,7 @@ def test_historical_soreness_trigger_update_same_day_lower_severity():
 
     updated_soreness = athlete_stats.historic_soreness[0]
 
-    assert updated_soreness.historic_soreness_status == HistoricSorenessStatus.persistent_almost_persistent_2
+    assert updated_soreness.historic_soreness_status == HistoricSorenessStatus.almost_persistent_2_pain
     assert updated_soreness.streak == 2
     assert updated_soreness.average_severity == 2.0
 

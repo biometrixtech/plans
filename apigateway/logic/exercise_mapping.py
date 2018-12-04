@@ -342,9 +342,12 @@ class ExerciseAssignmentCalculator(object):
 
     def is_soreness_historic(self, soreness):
 
-        if (soreness.historic_soreness_status == HistoricSorenessStatus.persistent_almost_persistent_2 or
-                soreness.historic_soreness_status == HistoricSorenessStatus.persistent or
-                soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2):
+        if (soreness.historic_soreness_status == HistoricSorenessStatus.almost_persistent_2_pain or
+                soreness.historic_soreness_status == HistoricSorenessStatus.persistent_pain or
+                soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_pain or
+                soreness.historic_soreness_status == HistoricSorenessStatus.almost_persistent_2_soreness or
+                soreness.historic_soreness_status == HistoricSorenessStatus.persistent_soreness or
+                soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_soreness):
             return True
         else:
             return  False
@@ -358,8 +361,8 @@ class ExerciseAssignmentCalculator(object):
             inhibit = self.get_exercise_dictionary(["2", "71", "3"])
             lengthen = self.get_exercise_dictionary(["7", "9"])
             activate = self.get_exercise_dictionary(["29", "67", "108", "77"])
-            achilles.add_exercise_phases(inhibit, lengthen, activate, injury_history_present)  # randomize if persistent_2
-        if injury_history_present:  #intentionally sending persistent_2 status through both!
+            achilles.add_exercise_phases(inhibit, lengthen, activate, injury_history_present)  # randomize if persistent_2_pain
+        if injury_history_present:  #intentionally sending persistent_2_pain status through both!
             if self.is_active_prep:
                 inhibit = self.get_exercise_dictionary(["2", "71", "73", "2"])
                 lengthen = self.get_exercise_dictionary(["7", "59", "61", "9"])
@@ -397,7 +400,7 @@ class ExerciseAssignmentCalculator(object):
             inhibit = self.get_exercise_dictionary(["2", "71", "72", "73", "3"])
             lengthen = self.get_exercise_dictionary(["59", "62", "7"])
             activate = self.get_exercise_dictionary(["115", "106"])
-            ankle.add_exercise_phases(inhibit, lengthen, activate, injury_history_present)  # randomize if persistent_2
+            ankle.add_exercise_phases(inhibit, lengthen, activate, injury_history_present)  # randomize if persistent_2_pain
         if injury_history_present:
             if self.is_active_prep:
                 inhibit = self.get_exercise_dictionary(["71", "72", "73", "2", "4"])
@@ -436,7 +439,7 @@ class ExerciseAssignmentCalculator(object):
             inhibit = self.get_exercise_dictionary(["4", "71", "2", "48", "72", "73"])
             lengthen = self.get_exercise_dictionary(["28", "118", "6", "9", "7"])
             activate = self.get_exercise_dictionary(["115", "14", "81", "77"])
-            knee.add_exercise_phases(inhibit, lengthen, activate, injury_history_present)  # randomize if persistent_2
+            knee.add_exercise_phases(inhibit, lengthen, activate, injury_history_present)  # randomize if persistent_2_pain
         if injury_history_present:
             if self.is_active_prep:
                 inhibit = self.get_exercise_dictionary(["48", "4", "44", "2", "102"])
@@ -467,7 +470,7 @@ class ExerciseAssignmentCalculator(object):
             inhibit = self.get_exercise_dictionary(["54", "1", "102", "55", "4", "44", "3", "2"])
             lengthen = self.get_exercise_dictionary(["103", "8", "118", "28", "49", "98", "46", "9", "7"])
             activate = self.get_exercise_dictionary(["50", "84", "14", "79", "81", "85", "89"])
-            groin.add_exercise_phases(inhibit, lengthen, activate, injury_history_present)  # randomize if persistent_2
+            groin.add_exercise_phases(inhibit, lengthen, activate, injury_history_present)  # randomize if persistent_2_pain
         if injury_history_present:
             if self.is_active_prep:
                 inhibit = self.get_exercise_dictionary(["54", "1", "102", "55", "4", "44", "3", "48"])
@@ -498,7 +501,7 @@ class ExerciseAssignmentCalculator(object):
             inhibit = self.get_exercise_dictionary(["3", "44", "4", "54", "1", "2"])
             lengthen = self.get_exercise_dictionary(["9", "46", "116", "28", "49", "8", "98", "7"])
             activate = self.get_exercise_dictionary(["108", "77", "81", "115", "85", "89"])
-            hamstrings.add_exercise_phases(inhibit, lengthen, activate, injury_history_present)  # randomize if persistent_2
+            hamstrings.add_exercise_phases(inhibit, lengthen, activate, injury_history_present)  # randomize if persistent_2_pain
         if injury_history_present:
             if self.is_active_prep:
                 inhibit = self.get_exercise_dictionary(["3", "44", "4", "54", "48"])
@@ -529,7 +532,7 @@ class ExerciseAssignmentCalculator(object):
             inhibit = self.get_exercise_dictionary(["44", "3", "4", "54", "2"])
             lengthen = self.get_exercise_dictionary(["9", "46", "116", "103", "28", "7"])
             activate = self.get_exercise_dictionary(["10", "81", "108", "14", "50", "51", "85", "89"])
-            glutes.add_exercise_phases(inhibit, lengthen, activate, injury_history_present)  # randomize if persistent_2
+            glutes.add_exercise_phases(inhibit, lengthen, activate, injury_history_present)  # randomize if persistent_2_pain
         if injury_history_present:
             if self.is_active_prep:
                 inhibit = self.get_exercise_dictionary(["44", "3", "4", "54", "48"])
@@ -551,7 +554,7 @@ class ExerciseAssignmentCalculator(object):
             inhibit = self.get_exercise_dictionary(["3", "48", "54", "1", "44", "4", "2"])
             lengthen = self.get_exercise_dictionary(["49", "118", "9", "46", "28"])
             activate = self.get_exercise_dictionary(["79", "10", "14", "50", "84", "108"])
-            hip.add_exercise_phases(inhibit, lengthen, activate, injury_history_present) # randomize if persistent_2
+            hip.add_exercise_phases(inhibit, lengthen, activate, injury_history_present) # randomize if persistent_2_pain
         if injury_history_present:
             if self.is_active_prep:
                 inhibit = self.get_exercise_dictionary(["54", "44", "4", "3", "1"])
@@ -590,9 +593,12 @@ class ExerciseAssignmentCalculator(object):
 
     def get_body_part_priority(self, base_priority, soreness):
 
-        if (soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2 or
-                soreness.historic_soreness_status == HistoricSorenessStatus.persistent or
-                soreness.historic_soreness_status == HistoricSorenessStatus.persistent_almost_persistent_2):
+        if (soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_pain or
+                soreness.historic_soreness_status == HistoricSorenessStatus.persistent_pain or
+                soreness.historic_soreness_status == HistoricSorenessStatus.almost_persistent_2_pain or
+                soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_soreness or
+                soreness.historic_soreness_status == HistoricSorenessStatus.persistent_soreness or
+                soreness.historic_soreness_status == HistoricSorenessStatus.almost_persistent_2_soreness):
                 return base_priority - 19  # reduces ranking by length of body part enumerations
         else:
             return base_priority
@@ -600,8 +606,10 @@ class ExerciseAssignmentCalculator(object):
     def is_daily_or_persistent(self, soreness):
 
         if (soreness.historic_soreness_status is None or
-                soreness.historic_soreness_status == HistoricSorenessStatus.persistent or
-                soreness.historic_soreness_status == HistoricSorenessStatus.persistent_almost_persistent_2 or
+                soreness.historic_soreness_status == HistoricSorenessStatus.persistent_pain or
+                soreness.historic_soreness_status == HistoricSorenessStatus.almost_persistent_2_pain or
+                soreness.historic_soreness_status == HistoricSorenessStatus.persistent_soreness or
+                soreness.historic_soreness_status == HistoricSorenessStatus.almost_persistent_2_soreness or
                 soreness.historic_soreness_status == HistoricSorenessStatus.dormant_cleared):
             return True
         else:

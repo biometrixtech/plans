@@ -156,7 +156,7 @@ class TrainingPlanManager(object):
 
             if (soreness.historic_soreness_status is not None and
                     soreness.historic_soreness_status is not HistoricSorenessStatus.dormant_cleared and
-                    soreness.historic_soreness_status is not HistoricSorenessStatus.almost_persistent):
+                    soreness.historic_soreness_status is not HistoricSorenessStatus.almost_persistent_pain):
                 historic_soreness_present = True
 
 
