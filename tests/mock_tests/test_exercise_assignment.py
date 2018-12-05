@@ -18,9 +18,9 @@ def load_exercises():
 
 
 @pytest.fixture(scope="module")
-def recovery_session(soreness_list, target_minutes):
+def recovery_session(soreness_list, target_minutes, max_severity):
     target_recovery_session = session.RecoverySession()
-    target_recovery_session.set_exercise_target_minutes(soreness_list, target_minutes)
+    target_recovery_session.set_exercise_target_minutes(soreness_list, target_minutes, max_severity)
     return target_recovery_session
 
 
@@ -73,178 +73,178 @@ def get_trigger_date_time():
 
 
 def test_recovery_session_no_soreness_inhibit_max_percentage():
-    assert .3 == recovery_session(None, 15).inhibit_max_percentage
+    assert .3 == recovery_session(None, 15, 0).inhibit_max_percentage
 
 
 def test_recovery_session_no_soreness_lengthen_max_percentage():
-    assert .3 == recovery_session(None, 15).lengthen_max_percentage
+    assert .3 == recovery_session(None, 15, 0).lengthen_max_percentage
 
 
 def test_recovery_session_no_soreness_activate_max_percentage():
-    assert .6 == recovery_session(None, 15).activate_max_percentage
+    assert .6 == recovery_session(None, 15, 0).activate_max_percentage
 
 
 def test_recovery_session_no_soreness_integrate_max_percentage():
-    assert None is recovery_session(None, 15).integrate_max_percentage
+    assert None is recovery_session(None, 15, 0).integrate_max_percentage
 
 
 def test_recovery_session_no_soreness_inhibit_minutes():
-    assert 3.75 == recovery_session(None, 15).inhibit_target_minutes
+    assert 3.75 == recovery_session(None, 15, 0).inhibit_target_minutes
 
 
 def test_recovery_session_no_soreness_lengthen_minutes():
-    assert 3.75 == recovery_session(None, 15).lengthen_target_minutes
+    assert 3.75 == recovery_session(None, 15, 0).lengthen_target_minutes
 
 
 def test_recovery_session_no_soreness_activate_minutes():
-    assert 7.5 == recovery_session(None, 15).activate_target_minutes
+    assert 7.5 == recovery_session(None, 15, 0).activate_target_minutes
 
 
 def test_recovery_session_no_soreness_integrate_minutes():
-    assert None is recovery_session(None, 15).integrate_target_minutes
+    assert None is recovery_session(None, 15, 0).integrate_target_minutes
 
 
 def test_recovery_session_ankle_1_soreness_inhibit_max_percentage():
-    assert .3 == recovery_session(soreness_one_body_part(9, 1), 15).inhibit_max_percentage
+    assert .3 == recovery_session(soreness_one_body_part(9, 1), 15, 1).inhibit_max_percentage
 
 
 def test_recovery_session_ankle_1_soreness_lengthen_max_percentage():
-    assert .3 == recovery_session(soreness_one_body_part(9, 1), 15).lengthen_max_percentage
+    assert .3 == recovery_session(soreness_one_body_part(9, 1), 15, 1).lengthen_max_percentage
 
 
 def test_recovery_session_ankle_1_soreness_activate_max_percentage():
-    assert .6 == recovery_session(soreness_one_body_part(9, 1), 15).activate_max_percentage
+    assert .6 == recovery_session(soreness_one_body_part(9, 1), 15, 1).activate_max_percentage
 
 
 def test_recovery_session_ankle_1_soreness_integrate_max_percentage():
-    assert None is recovery_session(soreness_one_body_part(9, 1), 15).integrate_max_percentage
+    assert None is recovery_session(soreness_one_body_part(9, 1), 15, 1).integrate_max_percentage
 
 
 def test_recovery_session_ankle_1_soreness_inhibit_minutes():
-    assert 3.75 == recovery_session(soreness_one_body_part(9, 1), 15).inhibit_target_minutes
+    assert 3.75 == recovery_session(soreness_one_body_part(9, 1), 15, 1).inhibit_target_minutes
 
 
 def test_recovery_session_ankle_1_soreness_lengthen_minutes():
-    assert 3.75 == recovery_session(soreness_one_body_part(9, 1), 15).lengthen_target_minutes
+    assert 3.75 == recovery_session(soreness_one_body_part(9, 1), 15, 1).lengthen_target_minutes
 
 
 def test_recovery_session_ankle_1_soreness_activate_minutes():
-    assert 7.5 == recovery_session(soreness_one_body_part(9, 1), 15).activate_target_minutes
+    assert 7.5 == recovery_session(soreness_one_body_part(9, 1), 15, 1).activate_target_minutes
 
 
 def test_recovery_session_ankle_1_soreness_integrate_minutes():
-    assert None is recovery_session(soreness_one_body_part(9, 1), 15).integrate_target_minutes
+    assert None is recovery_session(soreness_one_body_part(9, 1), 15, 1).integrate_target_minutes
 
 
 def test_recovery_session_ankle_2_soreness_inhibit_max_percentage():
-    assert .4 == recovery_session(soreness_one_body_part(9, 2), 15).inhibit_max_percentage
+    assert .4 == recovery_session(soreness_one_body_part(9, 2), 15, 2).inhibit_max_percentage
 
 
 def test_recovery_session_ankle_2_soreness_lengthen_max_percentage():
-    assert .4 == recovery_session(soreness_one_body_part(9, 2), 15).lengthen_max_percentage
+    assert .4 == recovery_session(soreness_one_body_part(9, 2), 15, 2).lengthen_max_percentage
 
 
 def test_recovery_session_ankle_2_soreness_activate_max_percentage():
-    assert .4 == recovery_session(soreness_one_body_part(9, 2), 15).activate_max_percentage
+    assert .4 == recovery_session(soreness_one_body_part(9, 2), 15, 2).activate_max_percentage
 
 
 def test_recovery_session_ankle_2_soreness_integrate_max_percentage():
-    assert None is recovery_session(soreness_one_body_part(9, 2), 15).integrate_max_percentage
+    assert None is recovery_session(soreness_one_body_part(9, 2), 15, 2).integrate_max_percentage
 
 
 def test_recovery_session_ankle_2_soreness_inhibit_minutes():
-    assert 5 == recovery_session(soreness_one_body_part(9, 2), 15).inhibit_target_minutes
+    assert 5 == recovery_session(soreness_one_body_part(9, 2), 15, 2).inhibit_target_minutes
 
 
 def test_recovery_session_ankle_2_soreness_lengthen_minutes():
-    assert 5 == recovery_session(soreness_one_body_part(9, 2), 15).lengthen_target_minutes
+    assert 5 == recovery_session(soreness_one_body_part(9, 2), 15, 2).lengthen_target_minutes
 
 
 def test_recovery_session_ankle_2_soreness_activate_minutes():
-    assert 5 == recovery_session(soreness_one_body_part(9, 2), 15).activate_target_minutes
+    assert 5 == recovery_session(soreness_one_body_part(9, 2), 15, 2).activate_target_minutes
 
 
 def test_recovery_session_ankle_2_soreness_integrate_minutes():
-    assert None is recovery_session(soreness_one_body_part(9, 2), 15).integrate_target_minutes
+    assert None is recovery_session(soreness_one_body_part(9, 2), 15, 2).integrate_target_minutes
 
 
 def test_recovery_session_ankle_3_soreness_inhibit_max_percentage():
-    assert .6 == recovery_session(soreness_one_body_part(9, 3), 15).inhibit_max_percentage
+    assert .6 == recovery_session(soreness_one_body_part(9, 3), 15, 3).inhibit_max_percentage
 
 
 def test_recovery_session_ankle_3_soreness_lengthen_max_percentage():
-    assert .6 == recovery_session(soreness_one_body_part(9, 3), 15).lengthen_max_percentage
+    assert .6 == recovery_session(soreness_one_body_part(9, 3), 15, 3).lengthen_max_percentage
 
 
 def test_recovery_session_ankle_3_soreness_activate_max_percentage():
-    assert None is recovery_session(soreness_one_body_part(9, 3), 15).activate_max_percentage
+    assert None is recovery_session(soreness_one_body_part(9, 3), 15, 3).activate_max_percentage
 
 
 def test_recovery_session_ankle_3_soreness_integrate_max_percentage():
-    assert None is recovery_session(soreness_one_body_part(9, 3), 15).integrate_max_percentage
+    assert None is recovery_session(soreness_one_body_part(9, 3), 15, 3).integrate_max_percentage
 
 
 def test_recovery_session_ankle_3_soreness_inhibit_minutes():
-    assert 7.5 == recovery_session(soreness_one_body_part(9, 3), 15).inhibit_target_minutes
+    assert 7.5 == recovery_session(soreness_one_body_part(9, 3), 15, 3).inhibit_target_minutes
 
 
 def test_recovery_session_ankle_3_soreness_lengthen_minutes():
-    assert 7.5 == recovery_session(soreness_one_body_part(9, 3), 15).lengthen_target_minutes
+    assert 7.5 == recovery_session(soreness_one_body_part(9, 3), 15, 3).lengthen_target_minutes
 
 
 def test_recovery_session_ankle_3_soreness_activate_minutes():
-    assert None is recovery_session(soreness_one_body_part(9, 3), 15).activate_target_minutes
+    assert None is recovery_session(soreness_one_body_part(9, 3), 15, 3).activate_target_minutes
 
 
 def test_recovery_session_ankle_3_soreness_integrate_minutes():
-    assert None is recovery_session(soreness_one_body_part(9, 3), 15).integrate_target_minutes
+    assert None is recovery_session(soreness_one_body_part(9, 3), 15, 3).integrate_target_minutes
 
 
 def test_recovery_session_ankle_4_soreness_inhibit_max_percentage():
-    assert 1.0 == recovery_session(soreness_one_body_part(9, 4), 15).inhibit_max_percentage
+    assert 1.0 == recovery_session(soreness_one_body_part(9, 4), 15, 4).inhibit_max_percentage
 
 
 def test_recovery_session_ankle_4_pain_inhibit_max_percentage():
-    assert 0 is recovery_session(pain_one_body_part(9, 4), 15).inhibit_max_percentage
+    assert 0 is recovery_session(pain_one_body_part(9, 4), 15, 4).inhibit_max_percentage
 
 
 def test_recovery_session_ankle_4_soreness_lengthen_max_percentage():
-    assert 0 is recovery_session(soreness_one_body_part(9, 4), 15).lengthen_max_percentage
+    assert 0 is recovery_session(soreness_one_body_part(9, 4), 15, 4).lengthen_max_percentage
 
 
 def test_recovery_session_ankle_4_soreness_activate_max_percentage():
-    assert 0 is recovery_session(soreness_one_body_part(9, 4), 15).activate_max_percentage
+    assert 0 is recovery_session(soreness_one_body_part(9, 4), 15, 4).activate_max_percentage
 
 
 def test_recovery_session_ankle_4_soreness_integrate_max_percentage():
-    assert 0 is recovery_session(soreness_one_body_part(9, 4), 15).integrate_max_percentage
+    assert 0 is recovery_session(soreness_one_body_part(9, 4), 15, 4).integrate_max_percentage
 
 
 def test_recovery_session_ankle_4_soreness_inhibit_minutes():
-    assert 15 is recovery_session(soreness_one_body_part(9, 4), 15).inhibit_target_minutes
+    assert 15 is recovery_session(soreness_one_body_part(9, 4), 15, 4).inhibit_target_minutes
 
 
 def test_recovery_session_ankle_4_pain_inhibit_minutes():
-    assert 0 is recovery_session(pain_one_body_part(9, 4), 15).inhibit_target_minutes
+    assert 0 is recovery_session(pain_one_body_part(9, 4), 15, 4).inhibit_target_minutes
 
 
 def test_recovery_session_ankle_4_soreness_lengthen_minutes():
-    assert 0 is recovery_session(soreness_one_body_part(9, 4), 15).lengthen_target_minutes
+    assert 0 is recovery_session(soreness_one_body_part(9, 4), 15, 4).lengthen_target_minutes
 
 
 def test_recovery_session_ankle_4_soreness_activate_minutes():
-    assert 0 is recovery_session(soreness_one_body_part(9, 4), 15).activate_target_minutes
+    assert 0 is recovery_session(soreness_one_body_part(9, 4), 15, 4).activate_target_minutes
 
 
 def test_recovery_session_ankle_4_soreness_integrate_minutes():
-    assert 0 is recovery_session(soreness_one_body_part(9, 4), 15).integrate_target_minutes
+    assert 0 is recovery_session(soreness_one_body_part(9, 4), 15, 4).integrate_target_minutes
 
 
 def test_recovery_session_exercises_assigned():
     calc = exercise_mapping.ExerciseAssignmentCalculator("test_user", exercise_library_datastore,
                                                          completed_exercise_datastore, False)
     soreness_list = soreness_one_body_part(12, 1)    # lower back
-    target_recovery_session = recovery_session(soreness_one_body_part(12, 1), 15)
+    target_recovery_session = recovery_session(soreness_one_body_part(12, 1), 15, 1)
     exercise_assignments = calc.create_exercise_assignments(target_recovery_session, soreness_list,
                                                             get_trigger_date_time())
     assert True is (len(exercise_assignments.inhibit_exercises) > 0)
@@ -255,7 +255,7 @@ def test_recovery_session_exercises_assigned_2_body_parts():
     calc = exercise_mapping.ExerciseAssignmentCalculator("test_user", exercise_library_datastore,
                                                          completed_exercise_datastore, False)
     soreness_list = soreness_two_body_parts(12, 1, 4, 1, 1, 2)    # lower back
-    target_recovery_session = recovery_session(soreness_two_body_parts(12, 1, 4, 1, 1, 2), 15)
+    target_recovery_session = recovery_session(soreness_two_body_parts(12, 1, 4, 1, 1, 2), 15, 1)
     exercise_assignments = calc.create_exercise_assignments(target_recovery_session, soreness_list,
                                                             get_trigger_date_time())
     assert True is (len(exercise_assignments.inhibit_exercises) > 0)
@@ -266,7 +266,7 @@ def test_recovery_session_exercises_assigned_2_body_parts_diff_severity():
     calc = exercise_mapping.ExerciseAssignmentCalculator("test_user", exercise_library_datastore,
                                                          completed_exercise_datastore, False)
     soreness_list = soreness_two_body_parts(12, 1, 4, 2, 1, 2)    # lower back
-    target_recovery_session = recovery_session(soreness_two_body_parts(12, 1, 4, 1, 1, 2), 15)
+    target_recovery_session = recovery_session(soreness_two_body_parts(12, 1, 4, 1, 1, 2), 15, 1)
     exercise_assignments = calc.create_exercise_assignments(target_recovery_session, soreness_list,
                                                             get_trigger_date_time())
     assert True is (len(exercise_assignments.inhibit_exercises) > 0)
