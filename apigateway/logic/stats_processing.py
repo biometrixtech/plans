@@ -305,7 +305,7 @@ class StatsProcessing(object):
         last_reported_date_time = None
 
         for s in soreness_list_10:
-            if s.is_pain:
+            if s.pain:
                 ns_new = ns(s.body_part.location, s.side)
                 if ns_new in grouped_soreness:
                     grouped_soreness[ns_new] = grouped_soreness[ns_new] + 1
