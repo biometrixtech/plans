@@ -35,6 +35,7 @@ def get_soreness_list(body_part_location, side, severity, is_pain, length):
 
     return soreness_list
 
+
 def get_daily_readiness_surveys(start_date, end_date):
 
     surveys = []
