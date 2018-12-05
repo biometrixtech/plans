@@ -61,15 +61,14 @@ class AthleteStats(Serialisable):
         self.daily_severe_pain = []
         self.daily_severe_pain_event_date = None
         self.daily_severe_soreness_event_date = None
-        self.acute_pain = False
+        self.acute_pain = []
         self.metrics = []
 
     def update_historic_soreness(self, soreness, event_date):
 
         for h in self.historic_soreness:
             if (h.body_part_location == soreness.body_part.location.value and
-                h.side == soreness.side and
-                h.is_pain == soreness.pain):
+                    h.side == soreness.side and h.is_pain == soreness.pain):
                 # was historic_soreness already updated today?
                 if format_date(event_date) != h.last_reported: #not updated
                     if h.is_pain:
@@ -100,8 +99,7 @@ class AthleteStats(Serialisable):
                     pain_soreness_list.extend(self.daily_severe_pain)
                     for s in pain_soreness_list:
                         if (s.body_part.location.value == soreness.body_part.location.value and
-                            s.side == soreness.side and
-                            s.pain == soreness.pain):
+                                s.side == soreness.side and s.pain == soreness.pain):
                             if s.severity >= soreness.severity:
                                 break
                             else:
