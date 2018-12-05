@@ -19,9 +19,11 @@ class SorenessCalculator(object):
         soreness_list = []
 
         for rs_survey in readiness_surveys:
-            self.update_soreness_list(soreness_list, rs_survey.soreness)
+            if (trigger_date_time.date() - rs_survey.get_event_date().date()).days < 2:
+                self.update_soreness_list(soreness_list, rs_survey.soreness)
         for ps_survey in post_session_surveys:
-            self.update_soreness_list(soreness_list, ps_survey.survey.soreness)
+            if (trigger_date_time.date() - ps_survey.event_date_time.date()).days < 2:
+                self.update_soreness_list(soreness_list, ps_survey.survey.soreness)
 
         soreness_list = self.merge_current_historic_soreness(soreness_list, historic_soreness)
         return soreness_list
