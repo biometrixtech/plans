@@ -138,7 +138,7 @@ class AthleteStats(Serialisable):
         soreness_list = SorenessCalculator().update_soreness_list(soreness_list, self.readiness_soreness)
         soreness_list = SorenessCalculator().update_soreness_list(soreness_list, self.post_session_soreness)
         self.daily_severe_soreness = soreness_list
-        self.daily_severe_soreness_event_date = max([d.reported_date_time for d in soreness_list])
+        self.daily_severe_soreness_event_date = format_date(max([d.reported_date_time for d in soreness_list]))
 
     def update_daily_pain(self):
         # make sure old pains are cleared out
@@ -147,7 +147,7 @@ class AthleteStats(Serialisable):
         pain_list = SorenessCalculator().update_soreness_list(pain_list, self.readiness_pain)
         pain_list = SorenessCalculator().update_soreness_list(pain_list, self.post_session_pain)
         self.daily_severe_pain = pain_list
-        self.daily_severe_soreness_event_date = max([d.reported_date_time for d in pain_list])
+        self.daily_severe_soreness_event_date = format_date(max([d.reported_date_time for d in pain_list]))
 
     def acute_to_chronic_external_ratio(self):
         if self.acute_external_total_load is not None and self.chronic_external_total_load is not None:
