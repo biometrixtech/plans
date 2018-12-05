@@ -71,13 +71,20 @@ class AthleteStats(Serialisable):
                 h.is_pain == soreness.pain):
                 # was historic_soreness already updated today?
                 if format_date(event_date) != h.last_reported: #not updated
-                    if h.historic_soreness_status == HistoricSorenessStatus.almost_persistent_pain:
-                        h.historic_soreness_status = HistoricSorenessStatus.persistent_pain
-                    elif h.historic_soreness_status == HistoricSorenessStatus.almost_persistent_2_pain:
-                        h.historic_soreness_status = HistoricSorenessStatus.persistent_2_pain
+                    if h.is_pain:
+                        if h.historic_soreness_status == HistoricSorenessStatus.almost_persistent_pain:
+                            h.historic_soreness_status = HistoricSorenessStatus.persistent_pain
+                        elif h.historic_soreness_status == HistoricSorenessStatus.almost_persistent_2_pain:
+                            h.historic_soreness_status = HistoricSorenessStatus.persistent_2_pain
+                        else:
+                            break
                     else:
-                        break
-
+                        if h.historic_soreness_status == HistoricSorenessStatus.almost_persistent_soreness:
+                            h.historic_soreness_status = HistoricSorenessStatus.persistent_soreness
+                        elif h.historic_soreness_status == HistoricSorenessStatus.almost_persistent_2_soreness:
+                            h.historic_soreness_status = HistoricSorenessStatus.persistent_2_soreness
+                        else:
+                            break
                     h.last_reported = event_date
                     # weighted average
                     h.average_severity = round(h.average_severity * float(h.streak) / (float(h.streak) + 1) +

@@ -387,7 +387,7 @@ def test_historical_soreness_trigger_update_almost_persistent_to_peristent_2_sor
     athlete_stats = AthleteStats("tester")
     athlete_stats.event_date = "2018-12-02"
     soreness = HistoricSoreness(9, 1, False)
-    soreness.historic_soreness_status = HistoricSorenessStatus.almost_persistent_2_pain
+    soreness.historic_soreness_status = HistoricSorenessStatus.almost_persistent_2_soreness
     soreness.streak = 2
     soreness.streak_start_date = "2018-12-01"
     soreness.average_severity = 2.0
@@ -403,7 +403,7 @@ def test_historical_soreness_trigger_update_almost_persistent_to_peristent_2_sor
 
     updated_soreness = athlete_stats.historic_soreness[0]
 
-    assert updated_soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_pain
+    assert updated_soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_soreness
     assert updated_soreness.streak == 3
     assert updated_soreness.average_severity == 2.33
 

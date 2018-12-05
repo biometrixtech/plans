@@ -156,9 +156,9 @@ class TrainingPlanManager(object):
 
             if (soreness.historic_soreness_status is not None and
                     soreness.historic_soreness_status is not HistoricSorenessStatus.dormant_cleared and
-                    soreness.historic_soreness_status is not HistoricSorenessStatus.almost_persistent_pain):
+                    soreness.historic_soreness_status is not HistoricSorenessStatus.almost_persistent_pain and
+                    soreness.historic_soreness_status is not HistoricSorenessStatus.almost_persistent_soreness):
                 historic_soreness_present = True
-
 
         # scheduled_sessions = self.daily_schedule_datastore.get(self.athlete_id, trigger_date_time)
 
