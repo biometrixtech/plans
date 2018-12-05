@@ -1,8 +1,9 @@
 from enum import Enum
 from serialisable import Serialisable
 from models.sport import SportName, NoSportPosition, BaseballPosition, BasketballPosition, FootballPosition, LacrossePosition, SoccerPosition, SoftballPosition, FieldHockeyPosition, TrackAndFieldPosition
-from utils import format_date
+from utils import format_date, parse_date
 from models.soreness import HistoricSorenessStatus
+from logic.soreness_processing import SorenessCalculator
 
 class FitFatigueStatus(Enum):
     undefined = 0
@@ -105,53 +106,46 @@ class AthleteStats(Serialisable):
                                 h.streak = h.streak + 1
                                 break
 
+    def persist_soreness(self, soreness):
+        if soreness.reported_date_time is not None:
+            if (parse_date(self.event_date).date() - soreness.reported_date_time.date()).days <= 1:
+                return True
+            else:
+                return False
+        else:
+            return False
 
-    def update_daily_soreness(self, current_time):
-        soreness_list = self._combine_soreness_lists(self.readiness_soreness, self.post_session_soreness, current_time)
+    def update_readiness_soreness(self, severe_soreness):
+        self.readiness_soreness = [s for s in self.readiness_soreness if self.persist_soreness(s)]
+        self.readiness_soreness.extend(severe_soreness)
+
+    def update_readiness_pain(self, severe_pain):
+        self.readiness_pain = [s for s in self.readiness_pain if self.persist_soreness(s)]
+        self.readiness_pain.extend(severe_pain)
+
+    def update_post_session_soreness(self, severe_soreness):
+        self.post_session_soreness = [s for s in self.post_session_soreness if self.persist_soreness(s)]
+        self.post_session_soreness.extend(severe_soreness)
+
+    def update_post_session_pain(self, severe_pain):
+        self.post_session_pain = [s for s in self.post_session_pain if self.persist_soreness(s)]
+        self.post_session_pain.extend(severe_pain)
+
+    def update_daily_soreness(self):
+        # make sure old sorenesses are cleared out
+        soreness_list = [s for s in self.daily_severe_soreness if self.persist_soreness(s)]
+        # merge sorenesses from current survey
+        soreness_list = SorenessCalculator().update_soreness_list(soreness_list, self.readiness_soreness)
+        soreness_list = SorenessCalculator().update_soreness_list(soreness_list, self.post_session_soreness)
         self.daily_severe_soreness = soreness_list
 
-    def update_daily_pain(self, current_time):
-        pain_list = self._combine_soreness_lists(self.readiness_pain, self.post_session_pain, current_time)
+    def update_daily_pain(self):
+        # make sure old pains are cleared out
+        pain_list = [s for s in self.daily_severe_pain if self.persist_soreness(s)]
+        # merge pains from the current survey
+        pain_list = SorenessCalculator().update_soreness_list(pain_list, self.readiness_pain)
+        pain_list = SorenessCalculator().update_soreness_list(pain_list, self.post_session_pain)
         self.daily_severe_pain = pain_list
-
-
-    def _combine_soreness_lists(self, readiness_soreness_list, post_session_soreness_list, current_time):
-        soreness_list = []
-        soreness_list.extend(readiness_soreness_list)
-        for s in post_session_soreness_list:
-            post_soreness_within_24_hours = False
-            post_soreness_age = current_time - s.reported_date_time
-            if post_soreness_age.total_seconds() <= 86400: # within 24 hours
-                post_soreness_within_24_hours = True
-            updated = False
-            for r in soreness_list:
-
-                soreness_list_item_within_24_hours = False
-
-                soreness_list_age = current_time - r.reported_date_time
-
-                if soreness_list_age.total_seconds() <= 86400: # within 24 hours
-                    soreness_list_item_within_24_hours = True
-
-                if (r.body_part.location.value == s.body_part.location.value and
-                        r.side == s.side):
-                        if soreness_list_item_within_24_hours and post_soreness_within_24_hours:
-                            if r.severity <= s.severity:
-                                r.severity = s.severity
-                                r.reported_date_time = s.reported_date_time
-                        elif not soreness_list_item_within_24_hours and post_soreness_within_24_hours:
-                            r.severity = s.severity
-                            r.reported_date_time = s.reported_date_time
-                        elif not soreness_list_item_within_24_hours and not post_soreness_within_24_hours:
-                            if r.reported_date_time < s.reported_date_time:
-                                r.severity = s.severity
-                                r.reported_date_time = s.reported_date_time
-
-                        updated = True
-            if not updated:
-                soreness_list.append(s)
-
-        return soreness_list
 
     def acute_to_chronic_external_ratio(self):
         if self.acute_external_total_load is not None and self.chronic_external_total_load is not None:
