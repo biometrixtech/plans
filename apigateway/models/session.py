@@ -498,7 +498,7 @@ class RecoverySession(Serialisable):
         high_severity_is_pain = False
 
         if soreness_list is not None:
-            for soreness in soreness_list:
+            for soreness in [s for s in soreness_list if s.daily]:
                 max_severity = max(max_severity, soreness.severity)
                 if (soreness.historic_soreness_status is not None and
                         soreness.historic_soreness_status is not HistoricSorenessStatus.dormant_cleared and
@@ -506,7 +506,7 @@ class RecoverySession(Serialisable):
                         soreness.historic_soreness_status is not HistoricSorenessStatus.almost_persistent_soreness):
                     historic_soreness_present = True
 
-            for soreness in soreness_list:
+            for soreness in [s for s in soreness_list if s.daily]:
                 if (soreness.historic_soreness_status is not None and
                         soreness.historic_soreness_status is not HistoricSorenessStatus.dormant_cleared and
                     soreness.historic_soreness_status is not HistoricSorenessStatus.almost_persistent_pain and

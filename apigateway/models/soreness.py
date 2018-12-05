@@ -39,6 +39,7 @@ class Soreness(Serialisable):
         self.type = None  # soreness_type
         self.count = 1
         self.streak = 0
+        self.daily = True
 
     def json_serialise(self):
         ret = {
