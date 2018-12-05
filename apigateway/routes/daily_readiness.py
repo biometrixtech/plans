@@ -61,8 +61,8 @@ def handle_daily_readiness_create():
         if athlete_stats is None:
             athlete_stats = AthleteStats(request.json['user_id'])
         athlete_stats.event_date = plan_event_date
-        athlete_stats.readiness_soreness.extend(severe_soreness)
-        athlete_stats.readiness_pain.extend(severe_pain)
+        athlete_stats.update_readiness_soreness(severe_soreness)
+        athlete_stats.update_readiness_pain(severe_pain)
         athlete_stats.update_daily_soreness()
         athlete_stats.update_daily_pain()
         athlete_stats.daily_severe_soreness_event_date = plan_event_date
