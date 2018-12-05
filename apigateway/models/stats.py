@@ -106,9 +106,9 @@ class AthleteStats(Serialisable):
                                 h.streak = h.streak + 1
                                 break
 
-    def persist_soreness(self, event_date, soreness):
+    def persist_soreness(self, soreness):
         if soreness.reported_date_time is not None:
-            if (parse_date(event_date).date() - soreness.reported_date_time.date()).days <= 1:
+            if (parse_date(self.event_date).date() - soreness.reported_date_time.date()).days <= 1:
                 return True
             else:
                 return False
@@ -116,24 +116,24 @@ class AthleteStats(Serialisable):
             return False
 
     def update_readiness_soreness(self, severe_soreness):
-        self.readiness_soreness = [s for s in self.readiness_soreness if self.persist_soreness(self.event_date, s)]
+        self.readiness_soreness = [s for s in self.readiness_soreness if self.persist_soreness(s)]
         self.readiness_soreness.extend(severe_soreness)
 
     def update_readiness_pain(self, severe_pain):
-        self.readiness_pain = [s for s in self.readiness_pain if self.persist_soreness(self.event_date, s)]
+        self.readiness_pain = [s for s in self.readiness_pain if self.persist_soreness(s)]
         self.readiness_pain.extend(severe_pain)
 
     def update_post_session_soreness(self, severe_soreness):
-        self.post_session_soreness = [s for s in self.post_session_soreness if self.persist_soreness(self.event_date, s)]
+        self.post_session_soreness = [s for s in self.post_session_soreness if self.persist_soreness(s)]
         self.post_session_soreness.extend(severe_soreness)
 
     def update_post_session_pain(self, severe_pain):
-        self.post_session_pain = [s for s in self.post_session_pain if self.persist_soreness(self.event_date, s)]
+        self.post_session_pain = [s for s in self.post_session_pain if self.persist_soreness(s)]
         self.post_session_pain.extend(severe_pain)
 
     def update_daily_soreness(self):
         # make sure old sorenesses are cleared out
-        soreness_list = [s for s in self.daily_severe_soreness if self.persist_soreness(self.event_date, s)]
+        soreness_list = [s for s in self.daily_severe_soreness if self.persist_soreness(s)]
         # merge sorenesses from current survey
         soreness_list = SorenessCalculator().update_soreness_list(soreness_list, self.readiness_soreness)
         soreness_list = SorenessCalculator().update_soreness_list(soreness_list, self.post_session_soreness)
@@ -141,7 +141,7 @@ class AthleteStats(Serialisable):
 
     def update_daily_pain(self):
         # make sure old pains are cleared out
-        pain_list = [s for s in self.daily_severe_pain if self.persist_soreness(self.event_date, s)]
+        pain_list = [s for s in self.daily_severe_pain if self.persist_soreness(s)]
         # merge pains from the current survey
         pain_list = SorenessCalculator().update_soreness_list(pain_list, self.readiness_pain)
         pain_list = SorenessCalculator().update_soreness_list(pain_list, self.post_session_pain)
