@@ -115,18 +115,20 @@ class AthleteStats(Serialisable):
         else:
             return False
 
-    def update_daily_soreness(self, severe_soreness):
+    def update_daily_soreness(self):
         # make sure old sorenesses are cleared out
         soreness_list = [s for s in self.daily_severe_soreness if self.persist_soreness(self.event_date, s)]
         # merge sorenesses from current survey
-        soreness_list = SorenessCalculator().update_soreness_list(soreness_list, severe_soreness)
+        soreness_list = SorenessCalculator().update_soreness_list(soreness_list, self.readiness_soreness)
+        soreness_list = SorenessCalculator().update_soreness_list(soreness_list, self.post_session_soreness)
         self.daily_severe_soreness = soreness_list
 
-    def update_daily_pain(self, severe_pain):
+    def update_daily_pain(self):
         # make sure old pains are cleared out
         pain_list = [s for s in self.daily_severe_pain if self.persist_soreness(self.event_date, s)]
         # merge pains from the current survey
-        pain_list = SorenessCalculator().update_soreness_list(pain_list, severe_pain)
+        pain_list = SorenessCalculator().update_soreness_list(pain_list, self.readiness_pain)
+        pain_list = SorenessCalculator().update_soreness_list(pain_list, self.post_session_pain)
         self.daily_severe_pain = pain_list
 
     def acute_to_chronic_external_ratio(self):
