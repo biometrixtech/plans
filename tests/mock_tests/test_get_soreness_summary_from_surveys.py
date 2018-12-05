@@ -29,6 +29,15 @@ def readiness_survey_0_hours_ankle(severity_score):
 
     return survey
 
+@pytest.fixture(scope="module")
+def readiness_survey_12_hours_ankle(severity_score):
+
+    soreness_item = TestUtilities().body_part_soreness(9, severity_score)
+    survey = DailyReadiness(datetime.datetime(2018, 6, 27, 2, 30, 0).strftime("%Y-%m-%dT%H:%M:%SZ"),
+                            "tester", [soreness_item], 5, 5)
+
+    return survey
+
 def readiness_survey_24_hours_ankle(severity_score):
 
     soreness_item = TestUtilities().body_part_soreness(9, severity_score)
@@ -66,6 +75,21 @@ def post_session_survey_24_hours_ankle(severity_score):
 
     return surveys
 
+@pytest.fixture(scope="module")
+def post_session_survey_0_hours_ankle(severity_score):
+    surveys = []
+
+    soreness_list = [TestUtilities().body_part_soreness(9, severity_score)]
+
+    post_survey = TestUtilities().get_post_survey(6, soreness_list)
+
+    post_session_survey = PostSessionSurvey(datetime.datetime(2018, 6, 27, 14, 30, 0).strftime("%Y-%m-%dT%H:%M:%SZ"),
+                                            "tester",
+                                            "test_session", 0, post_survey)
+
+    surveys.append(post_session_survey)
+
+    return surveys
 
 @pytest.fixture(scope="module")
 def post_session_survey_24_hours_foot(severity_score):
@@ -152,6 +176,34 @@ def post_session_surveys_24_48_hours_foot(severity_score_1, severity_score_2):
     post_survey_2 = TestUtilities().get_post_survey(6, soreness_list_2)
 
     post_session_survey_2 = PostSessionSurvey(datetime.datetime(2018, 6, 26, 17, 0, 0).strftime("%Y-%m-%dT%H:%M:%SZ"),
+                                            "tester",
+                                            "test_session", 0, post_survey_2)
+
+    surveys.append(post_session_survey_2)
+
+    return surveys
+
+
+
+@pytest.fixture(scope="module")
+def post_session_survey_24_0_hours_ankle(severity_score_1, severity_score_2):
+    surveys = []
+
+    soreness_list_1 = [TestUtilities().body_part_soreness(9, severity_score_1)]
+
+    post_survey_1 = TestUtilities().get_post_survey(6, soreness_list_1)
+
+    post_session_survey = PostSessionSurvey(datetime.datetime(2018, 6, 26, 14, 30, 0).strftime("%Y-%m-%dT%H:%M:%SZ"),
+                                            "tester",
+                                            "test_session", 0, post_survey_1)
+
+    surveys.append(post_session_survey)
+
+    soreness_list_2 = [TestUtilities().body_part_soreness(9, severity_score_2)]
+
+    post_survey_2 = TestUtilities().get_post_survey(6, soreness_list_2)
+
+    post_session_survey_2 = PostSessionSurvey(datetime.datetime(2018, 6, 27, 14, 30, 0).strftime("%Y-%m-%dT%H:%M:%SZ"),
                                             "tester",
                                             "test_session", 0, post_survey_2)
 
@@ -382,8 +434,8 @@ def test_soreness_2_body_parts_from_2_post_session_one_readiness_diff_severity()
                                                                             trigger_date_time(), [])
     assert TestUtilities().body_part(9, 2).severity == soreness_list[0].severity
     assert TestUtilities().body_part(9, 2).body_part == soreness_list[0].body_part.location
-    assert TestUtilities().body_part(10, 4).severity == soreness_list[1].severity
-    assert TestUtilities().body_part(10, 4).body_part == soreness_list[1].body_part.location
+    assert TestUtilities().body_part(10, 1).severity == soreness_list[1].severity
+    assert TestUtilities().body_part(10, 1).body_part == soreness_list[1].body_part.location
 
 
 def test_soreness_from_3_post_session_diff_severity():
@@ -400,6 +452,48 @@ def test_soreness_from_3_post_session_diff_severity():
 def test_soreness_high_severity_readiness_yesterday():
     soreness_list = soreness_calculator().get_soreness_summary_from_surveys([readiness_survey_0_hours_ankle(2), readiness_survey_24_hours_ankle(4)],
                                                                             [],
+                                                                            trigger_date_time(), [])
+
+    assert TestUtilities().body_part(9, 4).severity == soreness_list[0].severity
+    assert TestUtilities().body_part(9, 4).body_part == soreness_list[0].body_part.location
+
+def test_soreness_high_severity_readiness_today():
+    soreness_list = soreness_calculator().get_soreness_summary_from_surveys([readiness_survey_0_hours_ankle(4), readiness_survey_24_hours_ankle(2)],
+                                                                            [],
+                                                                            trigger_date_time(), [])
+
+    assert TestUtilities().body_part(9, 4).severity == soreness_list[0].severity
+    assert TestUtilities().body_part(9, 4).body_part == soreness_list[0].body_part.location
+
+def test_soreness_high_severity_readiness_lower_severity_post():
+    soreness_list = soreness_calculator().get_soreness_summary_from_surveys([readiness_survey_12_hours_ankle(4)],
+                                                                            post_session_survey_0_hours_ankle(3),
+                                                                            trigger_date_time(), [])
+
+    assert TestUtilities().body_part(9, 4).severity == soreness_list[0].severity
+    assert TestUtilities().body_part(9, 4).body_part == soreness_list[0].body_part.location
+
+def test_soreness_high_severity_readiness_yesterday_lower_severity_post_today():
+    soreness_list = soreness_calculator().get_soreness_summary_from_surveys([readiness_survey_24_hours_ankle(4)],
+                                                                            post_session_survey_0_hours_ankle(3),
+                                                                            trigger_date_time(), [])
+
+    assert TestUtilities().body_part(9, 4).severity == soreness_list[0].severity
+    assert TestUtilities().body_part(9, 4).body_part == soreness_list[0].body_part.location
+
+
+def test_soreness_low_severity_readiness_yesterday_high_severity_post_today():
+    soreness_list = soreness_calculator().get_soreness_summary_from_surveys([readiness_survey_24_hours_ankle(2)],
+                                                                            post_session_survey_0_hours_ankle(4),
+                                                                            trigger_date_time(), [])
+
+    assert TestUtilities().body_part(9, 4).severity == soreness_list[0].severity
+    assert TestUtilities().body_part(9, 4).body_part == soreness_list[0].body_part.location
+
+
+def test_soreness_low_severity_post_yesterday_high_severity_post_today():
+    soreness_list = soreness_calculator().get_soreness_summary_from_surveys([readiness_survey_12_hours_ankle(2)],
+                                                                            post_session_survey_24_0_hours_ankle(2, 4),
                                                                             trigger_date_time(), [])
 
     assert TestUtilities().body_part(9, 4).severity == soreness_list[0].severity

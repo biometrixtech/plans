@@ -17,9 +17,9 @@ def load_exercises():
 
 
 @pytest.fixture(scope="module")
-def recovery_session(soreness_list, target_minutes):
+def recovery_session(soreness_list, target_minutes, max_severity):
     target_recovery_session = session.RecoverySession()
-    target_recovery_session.set_exercise_target_minutes(soreness_list, target_minutes)
+    target_recovery_session.set_exercise_target_minutes(soreness_list, target_minutes, max_severity)
     return target_recovery_session
 
 
@@ -48,7 +48,7 @@ def test_first_progression_found():
     calc = exercise_mapping.ExerciseAssignmentCalculator("test_user", exercise_library_datastore,
                                                          completed_exercise_datastore, False)
     soreness_list = soreness_one_body_part(12, 1)  # lower back
-    target_recovery_session = recovery_session(soreness_one_body_part(12, 1), 15)
+    target_recovery_session = recovery_session(soreness_one_body_part(12, 1), 15, 1)
     exercise_assignments = calc.create_exercise_assignments(target_recovery_session, soreness_list,
                                                             get_trigger_date_time())
     assert "12" == exercise_assignments.activate_exercises[1].exercise.id
@@ -67,7 +67,7 @@ def test_next_progression_found():
     calc = exercise_mapping.ExerciseAssignmentCalculator("test_user", exercise_library_datastore,
                                                          completed_exercise_datastore, False)
     soreness_list = soreness_one_body_part(12, 1)  # lower back
-    target_recovery_session = recovery_session(soreness_one_body_part(12, 1), 15)
+    target_recovery_session = recovery_session(soreness_one_body_part(12, 1), 15, 1)
     exercise_assignments = calc.create_exercise_assignments(target_recovery_session, soreness_list,
                                                             get_trigger_date_time())
     assert "11" == exercise_assignments.activate_exercises[1].exercise.id
@@ -91,7 +91,7 @@ def test_last_progression_found():
     calc = exercise_mapping.ExerciseAssignmentCalculator("test_user", exercise_library_datastore,
                                                          completed_exercise_datastore, False)
     soreness_list = soreness_one_body_part(12, 1)  # lower back
-    target_recovery_session = recovery_session(soreness_one_body_part(12, 1), 15)
+    target_recovery_session = recovery_session(soreness_one_body_part(12, 1), 15, 1)
     exercise_assignments = calc.create_exercise_assignments(target_recovery_session, soreness_list,
                                                             get_trigger_date_time())
     assert "120" == exercise_assignments.activate_exercises[1].exercise.id
