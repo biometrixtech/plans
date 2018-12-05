@@ -77,26 +77,26 @@ class StatsProcessing(object):
             if current_athlete_stats is not None:
                 athlete_stats.current_sport_name = current_athlete_stats.current_sport_name
                 athlete_stats.current_position = current_athlete_stats.current_position
+                # Only persist readiness and ps soreness from today and yesterday
+                athlete_stats.readiness_soreness = [s for s in current_athlete_stats.readiness_soreness if self.persist_soreness(self.event_date, s)]
+                athlete_stats.post_session_soreness = [s for s in current_athlete_stats.post_session_soreness if self.persist_soreness(self.event_date, s)]
+                athlete_stats.update_daily_soreness()
+                athlete_stats.readiness_pain = [s for s in current_athlete_stats.readiness_pain if self.persist_soreness(self.event_date, s)]
+                athlete_stats.post_session_pain = [s for s in current_athlete_stats.post_session_pain if self.persist_soreness(self.event_date, s)]
+                athlete_stats.update_daily_pain()
                 if current_athlete_stats.event_date == self.event_date:
                     # persist all of soreness/pain and session_RPE
                     athlete_stats.session_RPE = current_athlete_stats.session_RPE
                     athlete_stats.session_RPE_event_date = current_athlete_stats.session_RPE_event_date
-                    athlete_stats.readiness_soreness = current_athlete_stats.readiness_soreness
-                    athlete_stats.post_session_soreness = current_athlete_stats.post_session_soreness
-                    athlete_stats.daily_severe_soreness = current_athlete_stats.daily_severe_soreness
-                    athlete_stats.daily_severe_soreness_event_date = current_athlete_stats.daily_severe_soreness_event_date
-                    athlete_stats.readiness_pain = current_athlete_stats.readiness_pain
-                    athlete_stats.post_session_pain = current_athlete_stats.post_session_pain
-                    athlete_stats.daily_severe_pain = current_athlete_stats.daily_severe_pain
-                    athlete_stats.daily_severe_pain_event_date = current_athlete_stats.daily_severe_pain_event_date
-                else:
-                    # Only persist readiness and ps soreness from today and yesterday
-                    athlete_stats.readiness_soreness = [s for s in current_athlete_stats.readiness_soreness if self.persist_soreness(self.event_date, s)]
-                    athlete_stats.post_session_soreness = [s for s in current_athlete_stats.post_session_soreness if self.persist_soreness(self.event_date, s)]
-                    athlete_stats.update_daily_soreness()
-                    athlete_stats.readiness_pain = [s for s in current_athlete_stats.readiness_pain if self.persist_soreness(self.event_date, s)]
-                    athlete_stats.post_session_pain = [s for s in current_athlete_stats.post_session_pain if self.persist_soreness(self.event_date, s)]
-                    athlete_stats.update_daily_pain()
+                    # athlete_stats.readiness_soreness = current_athlete_stats.readiness_soreness
+                    # athlete_stats.post_session_soreness = current_athlete_stats.post_session_soreness
+                    # athlete_stats.daily_severe_soreness = current_athlete_stats.daily_severe_soreness
+                    # athlete_stats.daily_severe_soreness_event_date = current_athlete_stats.daily_severe_soreness_event_date
+                    # athlete_stats.readiness_pain = current_athlete_stats.readiness_pain
+                    # athlete_stats.post_session_pain = current_athlete_stats.post_session_pain
+                    # athlete_stats.daily_severe_pain = current_athlete_stats.daily_severe_pain
+                    # athlete_stats.daily_severe_pain_event_date = current_athlete_stats.daily_severe_pain_event_date
+
 
             self.athlete_stats_datastore.put(athlete_stats)
 
