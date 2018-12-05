@@ -78,24 +78,30 @@ class StatsProcessing(object):
                 athlete_stats.current_sport_name = current_athlete_stats.current_sport_name
                 athlete_stats.current_position = current_athlete_stats.current_position
                 if current_athlete_stats.event_date == self.event_date:
+                    # persist all of soreness/pain and session_RPE
                     athlete_stats.session_RPE = current_athlete_stats.session_RPE
                     athlete_stats.session_RPE_event_date = current_athlete_stats.session_RPE_event_date
                     athlete_stats.daily_severe_soreness = current_athlete_stats.daily_severe_soreness
                     athlete_stats.daily_severe_soreness_event_date = current_athlete_stats.daily_severe_soreness_event_date
                     athlete_stats.daily_severe_pain = current_athlete_stats.daily_severe_pain
                     athlete_stats.daily_severe_pain_event_date = current_athlete_stats.daily_severe_pain_event_date
-                    athlete_stats.readiness_soreness = current_athlete_stats.readiness_soreness
-                    athlete_stats.readiness_pain = current_athlete_stats.readiness_pain
-                    athlete_stats.post_session_soreness = current_athlete_stats.post_session_soreness
-                    athlete_stats.post_session_pain = current_athlete_stats.post_session_pain
                 else:
-                    # update post_session_soreness from the last 48 hours
-                    current_time = parse_date(self.event_date)
-                    athlete_stats.post_session_soreness = [s for s in current_athlete_stats.post_session_soreness if s.reported_date_time is not None and (current_time - s.reported_date_time).total_seconds() < 172800]
-                    athlete_stats.post_session_pain = [s for s in current_athlete_stats.post_session_pain if s.reported_date_time is not None and (current_time - s.reported_date_time).total_seconds() < 172800]
+                    # Only persist readiness and ps soreness from today and yesterday
+                    athlete_stats.daily_severe_soreness = [s for s in current_athlete_stats.daily_severe_soreness if self.persist_soreness(self.event_date, s)]
+                    athlete_stats.daily_severe_soreness_event_date = self.event_date
+                    athlete_stats.daily_severe_pain = [s for s in current_athlete_stats.daily_severe_pain if self.persist_soreness(self.event_date, s)]
+                    athlete_stats.daily_severe_pain_event_date = self.event_date
 
             self.athlete_stats_datastore.put(athlete_stats)
 
+    def persist_soreness(self, event_date, soreness):
+        if soreness.reported_date_time is not None:
+            if (parse_date(event_date).date() - soreness.reported_date_time.date()).days <= 1:
+                return True
+            else:
+                return False
+        else:
+            return False
 
     def get_athlete_metrics(self, athlete_id, event_date):
 
