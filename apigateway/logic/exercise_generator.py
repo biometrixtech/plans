@@ -36,9 +36,10 @@ class ExerciseAssignments(object):
     def sort_reverse_priority(self, assigned_exercise_list):
         # rank all exercise by reverse priority, assumes all body parts have same level of severity
         sorted_list = []
-
-        severity_3_list = [a for a in assigned_exercise_list if a.body_part_soreness_level == 3]
-        severity_2_list = [a for a in assigned_exercise_list if a.body_part_soreness_level == 2]
+        severity_5_list = [a for a in assigned_exercise_list if 4 < a.body_part_soreness_level]
+        severity_4_list = [a for a in assigned_exercise_list if 3 < a.body_part_soreness_level <= 4]
+        severity_3_list = [a for a in assigned_exercise_list if 2 < a.body_part_soreness_level <= 3]
+        severity_2_list = [a for a in assigned_exercise_list if 1 < a.body_part_soreness_level <= 2]
         severity_1_list = [a for a in assigned_exercise_list if a.body_part_soreness_level <= 1]
 
         sorted_1_list = sorted(severity_1_list,
@@ -50,10 +51,18 @@ class ExerciseAssignments(object):
         sorted_3_list = sorted(severity_3_list,
                                key=lambda x: (x.body_part_exercise_priority, x.body_part_priority),
                                reverse=True)
+        sorted_4_list = sorted(severity_4_list,
+                               key=lambda x: (x.body_part_exercise_priority, x.body_part_priority),
+                               reverse=True)
+        sorted_5_list = sorted(severity_5_list,
+                               key=lambda x: (x.body_part_exercise_priority, x.body_part_priority),
+                               reverse=True)
 
         sorted_list.extend(sorted_1_list)
         sorted_list.extend(sorted_2_list)
         sorted_list.extend(sorted_3_list)
+        sorted_list.extend(sorted_4_list)
+        sorted_list.extend(sorted_5_list)
 
         return sorted_list
 
