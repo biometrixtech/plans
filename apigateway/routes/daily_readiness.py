@@ -114,7 +114,7 @@ def handle_daily_readiness_get(principal_id=None):
 
     post_session_store = PostSessionSurveyDatastore()
     post_session_surveys = post_session_store.get(user_id=user_id, start_date=start_time, end_date=current_time)
-    post_session_surveys = [s for s in post_session_surveys if s is not None and start_time < s.event_date_time < current_time]
+    post_session_surveys = [s for s in post_session_surveys if s is not None and start_time <= s.event_date_time < current_time]
     if len(post_session_surveys) != 0:
         for ps_survey in post_session_surveys:
             sore_body_parts += [{"body_part": s.body_part.location.value, "side": s.side} for s in ps_survey.survey.soreness if s.severity > 1]
