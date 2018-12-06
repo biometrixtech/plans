@@ -111,11 +111,6 @@ class StatsProcessing(object):
         else:
             return False
 
-    def get_athlete_metrics(self, athlete_id, event_date):
-
-        athlete_metric = AthleteMetric()
-        athlete_metric.three_day_consecutive_pain = 0.0
-
     def calc_training_volume_metrics(self, athlete_stats):
 
         a_internal_load_values = []

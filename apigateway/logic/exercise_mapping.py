@@ -361,7 +361,7 @@ class ExerciseAssignmentCalculator(object):
             achilles.add_exercise_phases(inhibit, lengthen, activate, injury_history_present)  # randomize if persistent_2
         if injury_history_present:  #intentionally sending persistent_2 status through both!
             if self.is_active_prep:
-                inhibit = self.get_exercise_dictionary(["2", "71", "73", "2"])
+                inhibit = self.get_exercise_dictionary(["2", "71", "73", "72"])
                 lengthen = self.get_exercise_dictionary(["7", "59", "61", "9"])
                 activate = self.get_exercise_dictionary(["67", "106", "108"])
             else:
