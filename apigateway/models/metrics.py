@@ -263,18 +263,18 @@ class RecommendationText(object):
                 "2B": "A shorter or lower-intensity training session",
                 "2C": "Exposure to a longer or higher-intensity training session",
                 "3A": "Drastically decreasing workload this week",
-                "3B": "Consider decreasing weekly workload",
-                "3C": "Consider increasing weekly workload",
+                "3B": "Considering decreasing weekly workload",
+                "3C": "Considering increasing weekly workload",
                 "5A": "Seeking help from a medical professional",
                 "5B": "Limiting your training. Seek medical advice if symptoms persist after warm-up.",
                 "6A": "Stopping activity if {bodypart} {is_pain} present",
                 "6B": "Modifying training so all activity is free of {bodypart} {is_pain}",
                 "6C": "Monitoring {bodypart} symptoms during training. If symptoms persists, consider decreasing training in the next few days to allow recovery",
-                "7A": "Completing Fathom's personalized Prep & Recovery exercises",
-                "7B": "Completing Fathom's personalized Prep exercises",
+                "7A": "Completing Fathom's personalized Mobility & Recovery exercises",
+                "7B": "Completing Fathom's personalized Mobility exercises",
                 "8A": "Heat {bodypart} before training for 10 minutes",
                 "9A": "Ice {bodypart} immediately after training for 20 minutes",
-                "9C": "Ice bath for 10 minutes after training"
+                "9B": "Ice bath for 10 minutes after training"
                 }
 
         return recs[self.rec]
