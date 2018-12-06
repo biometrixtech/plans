@@ -12,7 +12,6 @@ from fathomapi.utils.xray import xray_recorder
 from models.daily_readiness import DailyReadiness
 from models.soreness import MuscleSorenessSeverity, BodyPartLocation
 from models.stats import AthleteStats
-from logic.metrics_processing import MetricsProcessing
 from utils import parse_datetime, format_date, format_datetime, parse_date
 
 app = Blueprint('daily_readiness', __name__)
@@ -33,7 +32,6 @@ def handle_daily_readiness_create():
                             minute=59,
                             second=59
                             )
-    # event_date = format_datetime(event_date)
 
     daily_readiness = DailyReadiness(
         user_id=request.json['user_id'],
