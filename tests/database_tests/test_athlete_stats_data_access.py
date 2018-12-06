@@ -44,3 +44,16 @@ def test_ryan_robbins_athlete_stats_last_day_of_week():
     calc.process_athlete_stats()
     athlete_stats_retrieved = athlete_stats_datastore.get(user_id)
     assert None is not athlete_stats_retrieved
+
+
+def test_single_athlete_stats_query():
+    user_id = "fd263811-b299-461f-9e79-895c69612bac"
+    athlete_stats_datastore = AthleteStatsDatastore()
+    athlete_stats_retrieved = athlete_stats_datastore.get(user_id)
+    assert None is not athlete_stats_retrieved
+
+def test_multi_athlete_stats_query():
+    user_id = ["fd263811-b299-461f-9e79-895c69612bac", "d8e4d148-1918-4b7f-867e-72d2be319145"]
+    athlete_stats_datastore = AthleteStatsDatastore()
+    athlete_stats_retrieved = athlete_stats_datastore.get(user_id)
+    assert None is not athlete_stats_retrieved

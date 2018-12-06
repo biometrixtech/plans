@@ -1,6 +1,7 @@
 import models.sport as sport
 from models.session import FunctionalStrengthSession
-from models.exercise import AssignedExercise, UnitOfMeasure
+from models.exercise import UnitOfMeasure
+from models.soreness import AssignedExercise
 
 
 class FSProgramGenerator(object):
