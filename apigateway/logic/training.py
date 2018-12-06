@@ -499,7 +499,7 @@ class Calculator(object):
 
         chronic_load = []
 
-        # loop through past training history and calculate persistent_2 load
+        # loop through past training history and calculate chronic load
         for training_cycle in training_cycles[1:]:
             if included_estimated:
                 load = list(getattr(c, attribute_name) for c in training_cycle.sessions
@@ -592,7 +592,7 @@ class Calculator(object):
         taper load
 
         we use UNCOUPLED ACWR formula where the period of time used in the acute calculation is not included in the
-        period of time for the persistent_2 calculation
+        period of time for the chronic calculation
 
         acute_load = array of actual load values this week
         chronic_load = array of previous 4 week averages of load (if contains Nones then acute_load represents totality of data)

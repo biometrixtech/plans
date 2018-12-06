@@ -136,20 +136,16 @@ class TrainingPlanManager(object):
         if athlete_stats is None:
             historic_soreness = []
         else:
-            historic_soreness = athlete_stats.historic_soreness
+            historic_soreness = [hs for hs in athlete_stats.historic_soreness if hs.historic_soreness_status is not None and
+                                 hs.historic_soreness_status is not HistoricSorenessStatus.dormant_cleared and
+                                 hs.historic_soreness_status is not HistoricSorenessStatus.almost_persistent]
+            historic_soreness_present = len(historic_soreness) > 0
+                
 
         soreness_list = SorenessCalculator().get_soreness_summary_from_surveys(readiness_surveys,
                                                                                post_session_surveys,
                                                                                trigger_date_time,
                                                                                historic_soreness)
-
-        for soreness in soreness_list:
-
-            if (soreness.historic_soreness_status is not None and
-                    soreness.historic_soreness_status is not HistoricSorenessStatus.dormant_cleared and
-                    soreness.historic_soreness_status is not HistoricSorenessStatus.almost_persistent_pain and
-                    soreness.historic_soreness_status is not HistoricSorenessStatus.almost_persistent_soreness):
-                historic_soreness_present = True
 
         # scheduled_sessions = self.daily_schedule_datastore.get(self.athlete_id, trigger_date_time)
 
