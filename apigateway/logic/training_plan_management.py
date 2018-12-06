@@ -138,9 +138,9 @@ class TrainingPlanManager(object):
         else:
             historic_soreness = [hs for hs in athlete_stats.historic_soreness if hs.historic_soreness_status is not None and
                                  hs.historic_soreness_status is not HistoricSorenessStatus.dormant_cleared and
-                                 hs.historic_soreness_status is not HistoricSorenessStatus.almost_persistent]
+                                 hs.historic_soreness_status is not HistoricSorenessStatus.almost_persistent_soreness and
+                                 hs.historic_soreness_status is not HistoricSorenessStatus.almost_persistent_pain]
             historic_soreness_present = len(historic_soreness) > 0
-                
 
         soreness_list = SorenessCalculator().get_soreness_summary_from_surveys(readiness_surveys,
                                                                                post_session_surveys,
