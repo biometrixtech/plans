@@ -76,7 +76,7 @@ class StatsProcessing(object):
             athlete_stats.functional_strength_eligible = self.is_athlete_functional_strength_eligible()
             athlete_stats.completed_functional_strength_sessions = self.get_completed_functional_strength_sessions()
             athlete_stats.historic_soreness = self.get_historic_soreness()
-            athlete_stats.acute_pain = self.get_acute_pain_list()
+            # athlete_stats.acute_pain = self.get_acute_pain_list()
             current_athlete_stats = self.athlete_stats_datastore.get(athlete_id=self.athlete_id)
             if current_athlete_stats is not None:
                 athlete_stats.current_sport_name = current_athlete_stats.current_sport_name
