@@ -17,12 +17,12 @@ def format_date(date_input):
     if date_input is None:
         return None
     if isinstance(date_input, datetime.datetime):
+        if date_input.hour < 3:
+            date_input = date_input - datetime.timedelta(days=1)
         return date_input.strftime("%Y-%m-%d")
     else:
         for format_string in ('%Y-%m-%d', '%m/%d/%y', '%Y-%m'):
             try:
-                if date_input.hour < 3:
-                    date_input = date_input - datetime.timedelta(days=1)
                 date_input = datetime.datetime.strptime(date_input, format_string)
                 return date_input.strftime("%Y-%m-%d")
             except ValueError:
