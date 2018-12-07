@@ -35,9 +35,12 @@ class StatsProcessing(object):
         self.acute_daily_plans = []
         self.chronic_daily_plans = []
         self.last_7_days_plans = []
+        self.last_10_days_plans = []
         self.days_8_14_plans = []
         self.last_7_days_ps_surveys = []
+        self.last_10_days_ps_surveys = []
         self.last_7_days_readiness_surveys = []
+        self.last_10_days_readiness_surveys = []
         self.days_8_14_ps_surveys = []
         self.days_8_14_readiness_surveys = []
         self.days_15_21_ps_surveys = []
@@ -73,6 +76,7 @@ class StatsProcessing(object):
             athlete_stats.functional_strength_eligible = self.is_athlete_functional_strength_eligible()
             athlete_stats.completed_functional_strength_sessions = self.get_completed_functional_strength_sessions()
             athlete_stats.historic_soreness = self.get_historic_soreness()
+            # athlete_stats.acute_pain = self.get_acute_pain_list()
             current_athlete_stats = self.athlete_stats_datastore.get(athlete_id=self.athlete_id)
             if current_athlete_stats is not None:
                 athlete_stats.current_sport_name = current_athlete_stats.current_sport_name
@@ -242,6 +246,7 @@ class StatsProcessing(object):
             self.get_ps_survey_soreness_list(self.last_7_days_ps_surveys)
         )
 
+
         soreness_list_8_14_days = self.merge_soreness_from_surveys(
             self.get_readiness_soreness_list(self.days_8_14_readiness_surveys),
             self.get_ps_survey_soreness_list(self.days_8_14_ps_surveys)
@@ -278,6 +283,77 @@ class StatsProcessing(object):
                     historic_soreness[h].average_severity = s.avg_severity
 
         return historic_soreness
+
+    def get_acute_pain_list(self):
+
+        soreness_list_10 = self.merge_soreness_from_surveys(
+            self.get_readiness_soreness_list(self.last_10_days_readiness_surveys),
+            self.get_ps_survey_soreness_list(self.last_10_days_ps_surveys)
+        )
+
+        grouped_soreness = {}
+
+        acute_pain_list = []
+
+        ns = namedtuple("ns", ["location", "side"])
+
+        last_reported_date_time = None
+
+        for s in soreness_list_10:
+            if s.pain:
+                ns_new = ns(s.body_part.location, s.side)
+                if ns_new in grouped_soreness:
+                    grouped_soreness[ns_new] = grouped_soreness[ns_new] + 1
+                else:
+                    grouped_soreness[ns_new] = 1
+            if last_reported_date_time is None or parse_date(s.reported_date_time) > last_reported_date_time:
+                    last_reported_date_time = parse_date(s.reported_date_time)
+
+        for g in grouped_soreness:
+
+            ask_acute_pain_question = False
+            streak = 1
+            streak_start_date = None
+            body_part_history = list(s for s in soreness_list_10 if s.body_part.location ==
+                                     g.location and s.side == g.side and s.pain)
+            body_part_history.sort(key=lambda x: x.reported_date_time, reverse=True)
+            severity = 0.0
+            days_skipped = 0
+
+            if len(body_part_history) >= 2:
+
+                for b in range(0,len(body_part_history)-1):
+                    if (streak_start_date is None or parse_date(body_part_history[b].reported_date_time)
+                            < parse_date(streak_start_date)):
+                        streak_start_date = body_part_history[b].reported_date_time
+                    days_skipped = (parse_date(body_part_history[b].reported_date_time) -
+                                    parse_date(body_part_history[b + 1].reported_date_time)).days
+
+                    if days_skipped <= 3:
+                        streak += 1
+                    else:
+                        break
+
+            if streak >= 3:
+                if days_skipped >= 3:
+                    ask_acute_pain_question = True
+
+                days_for_severity = (last_reported_date_time - parse_date(streak_start_date)).days
+
+                for b in range(1, days_for_severity+1):
+                    severity += (body_part_history[b].severity / (days_for_severity + 1 - b))
+
+                soreness = Soreness()
+                soreness.body_part = BodyPart(BodyPartLocation.value, None)
+                soreness.pain = True
+                soreness.acute_pain = True
+                soreness.ask_acute_pain_question = ask_acute_pain_question
+                soreness.severity = severity / float(streak)
+                soreness.side = g.side
+
+                acute_pain_list.append(soreness)
+
+        return acute_pain_list
 
     def get_soreness_streaks(self, soreness_list):
 
@@ -369,7 +445,11 @@ class StatsProcessing(object):
             historic_soreness = HistoricSoreness(h.location, h.side, h.is_pain)
             historic_soreness.last_reported = historic_soreness_last_8_14_reported[h]
             if h not in historic_soreness_last_7 and h in historic_soreness_15_21 and h in historic_soreness_22_28:
-                historic_soreness.historic_soreness_status = HistoricSorenessStatus.almost_persistent
+                if h.is_pain:
+                    historic_soreness.historic_soreness_status = HistoricSorenessStatus.almost_persistent_pain
+                else:
+                    historic_soreness.historic_soreness_status = HistoricSorenessStatus.almost_persistent_soreness
+
                 historic_soreness_list.append(historic_soreness)
 
         for h in historic_soreness_last_7:
@@ -380,23 +460,38 @@ class StatsProcessing(object):
                 if h in historic_soreness_8_14 and h in historic_soreness_15_21 and h in historic_soreness_22_28:
                     if (historic_soreness_8_14[h] >= 3 and historic_soreness_15_21[h] >= 3
                             and historic_soreness_22_28[h] >= 3):
-                        historic_soreness.historic_soreness_status = HistoricSorenessStatus.persistent_2
+                        if h.is_pain:
+                            historic_soreness.historic_soreness_status = HistoricSorenessStatus.persistent_2_pain
+                        else:
+                            historic_soreness.historic_soreness_status = HistoricSorenessStatus.persistent_2_soreness
                     else:
-                        historic_soreness.historic_soreness_status = HistoricSorenessStatus.persistent
+                        if h.is_pain:
+                            historic_soreness.historic_soreness_status = HistoricSorenessStatus.persistent_pain
+                        else:
+                            historic_soreness.historic_soreness_status = HistoricSorenessStatus.persistent_soreness
 
             elif historic_soreness_last_7[h] == 2:
                 if h in historic_soreness_8_14 and h in historic_soreness_15_21 and h in historic_soreness_22_28:
                     if (historic_soreness_8_14[h] >= 3 and historic_soreness_15_21[h] >= 3
                             and historic_soreness_22_28[h] >= 3):
-                        historic_soreness.historic_soreness_status = HistoricSorenessStatus.persistent_almost_persistent_2
+                        if h.is_pain:
+                            historic_soreness.historic_soreness_status = HistoricSorenessStatus.almost_persistent_2_pain
+                        else:
+                            historic_soreness.historic_soreness_status = HistoricSorenessStatus.almost_persistent_2_soreness
                     else:
-                        historic_soreness.historic_soreness_status = HistoricSorenessStatus.persistent
+                        if h.is_pain:
+                            historic_soreness.historic_soreness_status = HistoricSorenessStatus.persistent_pain
+                        else:
+                            historic_soreness.historic_soreness_status = HistoricSorenessStatus.persistent_soreness
 
             elif historic_soreness_last_7[h] == 1:
                 if h in historic_soreness_8_14 and h in historic_soreness_15_21 and h in historic_soreness_22_28:
                     if (historic_soreness_8_14[h] >= 1 and historic_soreness_15_21[h] >= 1
                             and historic_soreness_22_28[h] >= 1):
-                        historic_soreness.historic_soreness_status = HistoricSorenessStatus.persistent
+                        if h.is_pain:
+                            historic_soreness.historic_soreness_status = HistoricSorenessStatus.persistent_pain
+                        else:
+                            historic_soreness.historic_soreness_status = HistoricSorenessStatus.persistent_soreness
 
             if historic_soreness.historic_soreness_status is not None:
                 historic_soreness_list.append(historic_soreness)
@@ -766,19 +861,26 @@ class StatsProcessing(object):
                                               key=lambda x: x.event_date)
 
         last_week = self.end_date_time - timedelta(days=7 + 1)
+        last_10_days = self.end_date_time - timedelta(days=10 + 1)
         previous_week = last_week - timedelta(days=7)
         previous_week_2 = previous_week - timedelta(days=7)
         previous_week_3 = previous_week_2 - timedelta(days=7)
 
         self.last_7_days_plans = [p for p in daily_plans if p.get_event_datetime() >= last_week]
 
+        self.last_10_days_plans = [p for p in daily_plans if p.get_event_datetime() >= last_10_days]
+
         self.days_8_14_plans = [p for p in daily_plans if last_week > p.get_event_datetime() >= previous_week]
 
         self.last_7_days_ps_surveys = [p for p in post_session_surveys if p.event_date_time >= last_week]
 
+        self.last_10_days_ps_surveys = [p for p in post_session_surveys if p.event_date_time >= last_10_days]
+
         self.days_8_14_ps_surveys = [p for p in post_session_surveys if last_week > p.event_date_time >= previous_week]
 
         self.last_7_days_readiness_surveys = [p for p in daily_readiness_surveys if p.event_date >= last_week]
+
+        self.last_10_days_readiness_surveys = [p for p in daily_readiness_surveys if p.event_date >= last_10_days]
 
         self.days_8_14_readiness_surveys = [p for p in daily_readiness_surveys if last_week > p.event_date >= previous_week]
 

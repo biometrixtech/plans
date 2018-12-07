@@ -32,6 +32,8 @@ class Soreness(Serialisable):
     def __init__(self):
         self.body_part = None
         self.historic_soreness_status = None
+        self.acute_pain = False
+        self.ask_acute_pain_question = False
         self.pain = False
         self.reported_date_time = None
         self.severity = None  # muscle_soreness_severity or joint_soreness_severity
@@ -135,10 +137,14 @@ class BodyPart(object):
 
 class HistoricSorenessStatus(IntEnum):
     dormant_cleared = 0
-    persistent = 1
-    persistent_2 = 2
-    almost_persistent = 3
-    persistent_almost_persistent_2 = 4
+    persistent_pain = 1
+    persistent_2_pain = 2
+    almost_persistent_pain = 3
+    almost_persistent_2_pain = 4
+    persistent_soreness = 5
+    persistent_2_soreness = 6
+    almost_persistent_soreness = 7
+    almost_persistent_2_soreness = 8
 
 
 class HistoricSoreness(Serialisable):

@@ -50,7 +50,7 @@ def test_first_progression_found():
     soreness_list = soreness_one_body_part(12, 1)  # lower back
     target_recovery_session = recovery_session(soreness_one_body_part(12, 1), 15, 1)
     exercise_assignments = calc.create_exercise_assignments(target_recovery_session, soreness_list,
-                                                            get_trigger_date_time())
+                                                            get_trigger_date_time(), 15)
     assert "12" == exercise_assignments.activate_exercises[1].exercise.id
 
 
@@ -69,7 +69,7 @@ def test_next_progression_found():
     soreness_list = soreness_one_body_part(12, 1)  # lower back
     target_recovery_session = recovery_session(soreness_one_body_part(12, 1), 15, 1)
     exercise_assignments = calc.create_exercise_assignments(target_recovery_session, soreness_list,
-                                                            get_trigger_date_time())
+                                                            get_trigger_date_time(), 15)
     assert "11" == exercise_assignments.activate_exercises[1].exercise.id
 
 def test_last_progression_found():
@@ -93,6 +93,6 @@ def test_last_progression_found():
     soreness_list = soreness_one_body_part(12, 1)  # lower back
     target_recovery_session = recovery_session(soreness_one_body_part(12, 1), 15, 1)
     exercise_assignments = calc.create_exercise_assignments(target_recovery_session, soreness_list,
-                                                            get_trigger_date_time())
+                                                            get_trigger_date_time(), 15)
     assert "120" == exercise_assignments.activate_exercises[1].exercise.id
 
