@@ -246,7 +246,7 @@ def test_recovery_session_exercises_assigned():
     soreness_list = soreness_one_body_part(12, 1)    # lower back
     target_recovery_session = recovery_session(soreness_one_body_part(12, 1), 15, 1)
     exercise_assignments = calc.create_exercise_assignments(target_recovery_session, soreness_list,
-                                                            get_trigger_date_time())
+                                                            get_trigger_date_time(), 15)
     assert True is (len(exercise_assignments.inhibit_exercises) > 0)
     assert True is (len(exercise_assignments.lengthen_exercises) > 0)
     assert True is (len(exercise_assignments.activate_exercises) > 0)
@@ -257,7 +257,7 @@ def test_recovery_session_exercises_assigned_2_body_parts():
     soreness_list = soreness_two_body_parts(12, 1, 4, 1, 1, 2)    # lower back
     target_recovery_session = recovery_session(soreness_two_body_parts(12, 1, 4, 1, 1, 2), 15, 1)
     exercise_assignments = calc.create_exercise_assignments(target_recovery_session, soreness_list,
-                                                            get_trigger_date_time())
+                                                            get_trigger_date_time(), 15)
     assert True is (len(exercise_assignments.inhibit_exercises) > 0)
     assert True is (len(exercise_assignments.lengthen_exercises) > 0)
     assert True is (len(exercise_assignments.activate_exercises) > 0)
@@ -268,7 +268,7 @@ def test_recovery_session_exercises_assigned_2_body_parts_diff_severity():
     soreness_list = soreness_two_body_parts(12, 1, 4, 2, 1, 2)    # lower back
     target_recovery_session = recovery_session(soreness_two_body_parts(12, 1, 4, 1, 1, 2), 15, 1)
     exercise_assignments = calc.create_exercise_assignments(target_recovery_session, soreness_list,
-                                                            get_trigger_date_time())
+                                                            get_trigger_date_time(), 15)
     assert True is (len(exercise_assignments.inhibit_exercises) > 0)
     assert True is (len(exercise_assignments.lengthen_exercises) > 0)
     assert True is (len(exercise_assignments.activate_exercises) > 0)

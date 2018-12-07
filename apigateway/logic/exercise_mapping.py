@@ -45,13 +45,14 @@ class ExerciseAssignmentCalculator(object):
 
         return assigned_exercise_list
 
-    def create_exercise_assignments(self, exercise_session, soreness_list, trigger_date_time):
+    def create_exercise_assignments(self, exercise_session, soreness_list, trigger_date_time, duration_minutes_target):
 
         # TODO: handle progressions
 
         text_generator = RecoveryTextGenerator()
 
         exercise_assignments = ExerciseAssignments()
+        exercise_assignments.duration_minutes_target = duration_minutes_target
         exercise_assignments.inhibit_max_percentage = exercise_session.inhibit_max_percentage
         exercise_assignments.inhibit_target_minutes = exercise_session.inhibit_target_minutes
         exercise_assignments.activate_max_percentage = exercise_session.activate_max_percentage
