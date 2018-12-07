@@ -61,7 +61,6 @@ class AthleteStats(Serialisable):
         self.daily_severe_pain = []
         self.daily_severe_pain_event_date = None
         self.daily_severe_soreness_event_date = None
-        self.acute_pain = []
         self.metrics = []
 
     def update_historic_soreness(self, soreness, event_date):

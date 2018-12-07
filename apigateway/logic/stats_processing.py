@@ -246,6 +246,10 @@ class StatsProcessing(object):
             self.get_ps_survey_soreness_list(self.last_7_days_ps_surveys)
         )
 
+        soreness_list_10 = self.merge_soreness_from_surveys(
+            self.get_readiness_soreness_list(self.last_10_days_readiness_surveys),
+            self.get_ps_survey_soreness_list(self.last_10_days_ps_surveys)
+        )
 
         soreness_list_8_14_days = self.merge_soreness_from_surveys(
             self.get_readiness_soreness_list(self.days_8_14_readiness_surveys),
@@ -270,6 +274,7 @@ class StatsProcessing(object):
         streak_soreness, streak_start_soreness = self.get_soreness_streaks(soreness_list)
 
         historic_soreness = self.get_historic_soreness_list(soreness_list_last_7_days,
+                                                            soreness_list_10,
                                                             soreness_list_8_14_days,
                                                             soreness_list_15_21_days,
                                                             soreness_list_22_28_days)
@@ -284,12 +289,7 @@ class StatsProcessing(object):
 
         return historic_soreness
 
-    def get_acute_pain_list(self):
-
-        soreness_list_10 = self.merge_soreness_from_surveys(
-            self.get_readiness_soreness_list(self.last_10_days_readiness_surveys),
-            self.get_ps_survey_soreness_list(self.last_10_days_ps_surveys)
-        )
+    def get_acute_pain_list(self, soreness_list_10):
 
         grouped_soreness = {}
 
@@ -341,15 +341,12 @@ class StatsProcessing(object):
                 days_for_severity = (last_reported_date_time - parse_date(streak_start_date)).days
 
                 for b in range(1, days_for_severity+1):
-                    severity += (body_part_history[b].severity / (days_for_severity + 1 - b))
+                    severity += (body_part_history[b - 1].severity / (days_for_severity + 1 - b))
 
-                soreness = Soreness()
-                soreness.body_part = BodyPart(BodyPartLocation.value, None)
-                soreness.pain = True
-                soreness.acute_pain = True
+                soreness = HistoricSoreness(g.location, g.side, True)
+                soreness.historic_soreness_status = HistoricSorenessStatus.acute_pain
                 soreness.ask_acute_pain_question = ask_acute_pain_question
                 soreness.severity = severity / float(streak)
-                soreness.side = g.side
 
                 acute_pain_list.append(soreness)
 
@@ -432,7 +429,7 @@ class StatsProcessing(object):
 
         return merged_soreness_list
 
-    def get_historic_soreness_list(self, soreness_last_7, soreness_8_14, soreness_15_21, soreness_22_28):
+    def get_historic_soreness_list(self, soreness_last_7, soreness_list_10, soreness_8_14, soreness_15_21, soreness_22_28):
 
         historic_soreness_list = []
 
@@ -440,6 +437,8 @@ class StatsProcessing(object):
         historic_soreness_8_14, historic_soreness_last_8_14_reported = self.get_hs_dictionary(soreness_8_14)
         historic_soreness_15_21, historic_soreness_last_15_21_reported = self.get_hs_dictionary(soreness_15_21)
         historic_soreness_22_28, historic_soreness_last_22_28_reported = self.get_hs_dictionary(soreness_22_28)
+
+        historic_soreness_list.extend(self.get_acute_pain_list(soreness_list_10))
 
         for h in historic_soreness_8_14:
             historic_soreness = HistoricSoreness(h.location, h.side, h.is_pain)

@@ -116,6 +116,7 @@ def test_find_persistent_soreness():
     stats_processing = StatsProcessing("tester", "2018-01-01", DatastoreCollection())
 
     historic_soreness = stats_processing.get_historic_soreness_list(soreness_list_1,
+                                                                    [],
                                                                     soreness_list_2,
                                                                     soreness_list_3,
                                                                     soreness_list_4)
@@ -134,6 +135,7 @@ def test_find_persistent_2_soreness():
     stats_processing = StatsProcessing("tester", "2018-01-01", DatastoreCollection())
 
     historic_soreness = stats_processing.get_historic_soreness_list(soreness_list_1,
+                                                                    [],
                                                                     soreness_list_2,
                                                                     soreness_list_3,
                                                                     soreness_list_4)
@@ -152,6 +154,7 @@ def test_find_persistent_pain():
     stats_processing = StatsProcessing("tester", "2018-01-01", DatastoreCollection())
 
     historic_soreness = stats_processing.get_historic_soreness_list(soreness_list_1,
+                                                                    [],
                                                                     soreness_list_2,
                                                                     soreness_list_3,
                                                                     soreness_list_4)
@@ -170,6 +173,7 @@ def test_find_persistent_2_pain():
     stats_processing = StatsProcessing("tester", "2018-01-01", DatastoreCollection())
 
     historic_soreness = stats_processing.get_historic_soreness_list(soreness_list_1,
+                                                                    [],
                                                                     soreness_list_2,
                                                                     soreness_list_3,
                                                                     soreness_list_4)
@@ -188,6 +192,7 @@ def test_find_no_soreness():
     stats_processing = StatsProcessing("tester", "2018-01-01", DatastoreCollection())
 
     historic_soreness = stats_processing.get_historic_soreness_list(soreness_list_1,
+                                                                    [],
                                                                     soreness_list_2,
                                                                     soreness_list_3,
                                                                     soreness_list_4)
@@ -205,6 +210,7 @@ def test_find_no_pain():
     stats_processing = StatsProcessing("tester", "2018-01-01", DatastoreCollection())
 
     historic_soreness = stats_processing.get_historic_soreness_list(soreness_list_1,
+                                                                    [],
                                                                     soreness_list_2,
                                                                     soreness_list_3,
                                                                     soreness_list_4)
@@ -221,6 +227,7 @@ def test_find_no_soreness_3_weeks():
     stats_processing = StatsProcessing("tester", "2018-01-01", DatastoreCollection())
 
     historic_soreness = stats_processing.get_historic_soreness_list(soreness_list_1,
+                                                                    [],
                                                                     soreness_list_2,
                                                                     soreness_list_3,
                                                                     soreness_list_4)
@@ -238,6 +245,7 @@ def test_find_no_pain_3_weeks():
     stats_processing = StatsProcessing("tester", "2018-01-01", DatastoreCollection())
 
     historic_soreness = stats_processing.get_historic_soreness_list(soreness_list_1,
+                                                                    [],
                                                                     soreness_list_2,
                                                                     soreness_list_3,
                                                                     soreness_list_4)
