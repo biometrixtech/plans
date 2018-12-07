@@ -20,6 +20,8 @@ def format_date(date_input):
         if date_input.hour < 3:
             date_input = date_input - datetime.timedelta(days=1)
         return date_input.strftime("%Y-%m-%d")
+    elif isinstance(date_input, datetime.date):
+        return date_input.strftime("%Y-%m-%d")
     else:
         for format_string in ('%Y-%m-%d', '%m/%d/%y', '%Y-%m'):
             try:
