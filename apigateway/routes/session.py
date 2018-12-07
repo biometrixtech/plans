@@ -70,9 +70,9 @@ def handle_session_create():
         athlete_stats = athlete_stats_store.get(athlete_id=user_id)
         # update session_RPE
         if athlete_stats.session_RPE is not None:
-            athlete_stats.session_RPE = max(session.survey.RPE, athlete_stats.session_RPE)
+            athlete_stats.session_RPE = max(session.post_session_survey['RPE'], athlete_stats.session_RPE)
         else:
-            athlete_stats.session_RPE = session.survey.RPE
+            athlete_stats.session_RPE = session.post_session_survey['RPE']
         athlete_stats.session_RPE_event_date = plan_event_date
 
         # update severe soreness and severe pain
