@@ -362,8 +362,8 @@ class ExerciseAssignmentCalculator(object):
             inhibit = self.get_exercise_dictionary(["2", "71", "3"])
             lengthen = self.get_exercise_dictionary(["7", "9"])
             activate = self.get_exercise_dictionary(["29", "67", "108", "77"])
-            achilles.add_exercise_phases(inhibit, lengthen, activate, injury_history_present)  # randomize if persistent_pain
-        if injury_history_present:  #intentionally sending persistent_2_pain status through both!
+            achilles.add_exercise_phases(inhibit, lengthen, activate, injury_history_present)  # randomize if persistent
+        if injury_history_present:  #intentionally sending persistent_2_status through both!
             if self.is_active_prep:
                 inhibit = self.get_exercise_dictionary(["2", "71", "73", "72"])
                 lengthen = self.get_exercise_dictionary(["7", "59", "61", "9"])
@@ -401,7 +401,7 @@ class ExerciseAssignmentCalculator(object):
             inhibit = self.get_exercise_dictionary(["2", "71", "72", "73", "3"])
             lengthen = self.get_exercise_dictionary(["59", "62", "7"])
             activate = self.get_exercise_dictionary(["115", "106"])
-            ankle.add_exercise_phases(inhibit, lengthen, activate, injury_history_present)  # randomize if persistent__pain
+            ankle.add_exercise_phases(inhibit, lengthen, activate, injury_history_present)  # randomize if persistent
         if injury_history_present:
             if self.is_active_prep:
                 inhibit = self.get_exercise_dictionary(["71", "72", "73", "2", "4"])
@@ -440,7 +440,7 @@ class ExerciseAssignmentCalculator(object):
             inhibit = self.get_exercise_dictionary(["4", "71", "2", "48", "72", "73"])
             lengthen = self.get_exercise_dictionary(["28", "118", "6", "9", "7"])
             activate = self.get_exercise_dictionary(["115", "14", "81", "77"])
-            knee.add_exercise_phases(inhibit, lengthen, activate, injury_history_present)  # randomize if persistent_pain
+            knee.add_exercise_phases(inhibit, lengthen, activate, injury_history_present)  # randomize if persistent
         if injury_history_present:
             if self.is_active_prep:
                 inhibit = self.get_exercise_dictionary(["48", "4", "44", "2", "102"])
@@ -471,7 +471,7 @@ class ExerciseAssignmentCalculator(object):
             inhibit = self.get_exercise_dictionary(["54", "1", "102", "55", "4", "44", "3", "2"])
             lengthen = self.get_exercise_dictionary(["103", "8", "118", "28", "49", "98", "46", "9", "7"])
             activate = self.get_exercise_dictionary(["50", "84", "14", "79", "81", "85", "89"])
-            groin.add_exercise_phases(inhibit, lengthen, activate, injury_history_present)  # randomize if persistent_pain
+            groin.add_exercise_phases(inhibit, lengthen, activate, injury_history_present)  # randomize if persistent
         if injury_history_present:
             if self.is_active_prep:
                 inhibit = self.get_exercise_dictionary(["54", "1", "102", "55", "4", "44", "3", "48"])
@@ -502,7 +502,7 @@ class ExerciseAssignmentCalculator(object):
             inhibit = self.get_exercise_dictionary(["3", "44", "4", "54", "1", "2"])
             lengthen = self.get_exercise_dictionary(["9", "46", "116", "28", "49", "8", "98", "7"])
             activate = self.get_exercise_dictionary(["108", "77", "81", "115", "85", "89"])
-            hamstrings.add_exercise_phases(inhibit, lengthen, activate, injury_history_present)  # randomize if persistent_pain
+            hamstrings.add_exercise_phases(inhibit, lengthen, activate, injury_history_present)  # randomize if persistent
         if injury_history_present:
             if self.is_active_prep:
                 inhibit = self.get_exercise_dictionary(["3", "44", "4", "54", "48"])
@@ -533,7 +533,7 @@ class ExerciseAssignmentCalculator(object):
             inhibit = self.get_exercise_dictionary(["44", "3", "4", "54", "2"])
             lengthen = self.get_exercise_dictionary(["9", "46", "116", "103", "28", "7"])
             activate = self.get_exercise_dictionary(["10", "81", "108", "14", "50", "51", "85", "89"])
-            glutes.add_exercise_phases(inhibit, lengthen, activate, injury_history_present)  # randomize if persistent_pain
+            glutes.add_exercise_phases(inhibit, lengthen, activate, injury_history_present)  # randomize if persistent
         if injury_history_present:
             if self.is_active_prep:
                 inhibit = self.get_exercise_dictionary(["44", "3", "4", "54", "48"])
@@ -555,7 +555,7 @@ class ExerciseAssignmentCalculator(object):
             inhibit = self.get_exercise_dictionary(["3", "48", "54", "1", "44", "4", "2"])
             lengthen = self.get_exercise_dictionary(["49", "118", "9", "46", "28"])
             activate = self.get_exercise_dictionary(["79", "10", "14", "50", "84", "108"])
-            hip.add_exercise_phases(inhibit, lengthen, activate, injury_history_present) # randomize if persistent_pain
+            hip.add_exercise_phases(inhibit, lengthen, activate, injury_history_present) # randomize if persistent
         if injury_history_present:
             if self.is_active_prep:
                 inhibit = self.get_exercise_dictionary(["54", "44", "4", "3", "1"])
