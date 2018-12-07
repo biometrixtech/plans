@@ -8,7 +8,7 @@ from models.sport import SportName
 class SurveyProcessing(object):
 
     def create_session_from_survey(self, session):
-        session_event_date = parse_datetime(session['event_date'])
+        event_date = parse_datetime(session['event_date'])
         session_type = session['session_type']
         try:
             sport_name = session['sport_name']
@@ -25,19 +25,18 @@ class SurveyProcessing(object):
         except:
             raise InvalidSchemaException("Missing required parameter duration")
         description = session.get('description', "")
-        session_event_date = format_datetime(session_event_date)
+        session_event_date = format_datetime(event_date)
         session_data = {"sport_name": sport_name,
                         "strength_and_conditioning_type": strength_and_conditioning_type,
                         "description": description,
                         "duration_minutes": duration,
                         "event_date": session_event_date}
         if 'post_session_survey' in session:
-            # TODO: if the frontend error is fixed, this needs to be removed
-            if session['post_session_survey']['event_date'] < 3 and session_event_date.hour >= 3:
-                session_event_date = format_datetime(session_event_date - datetime.timedelta(days=1))
-            session_data["event_date"] = session_event_date
             survey = PostSurvey(event_date=session['post_session_survey']['event_date'],
                                 survey=session['post_session_survey'])
+            # TODO: if the frontend error is fixed, this needs to be removed
+            if survey.event_date.hour < 3 and event_date.hour >= 3:
+                session_data['event_date'] = format_datetime(event_date - datetime.timedelta(days=1))
             survey.event_date == fix_early_survey_event_date(survey.event_date)
             session_data['post_session_survey'] = survey.json_serialise()
         return self._create_session(session_type, session_data)
