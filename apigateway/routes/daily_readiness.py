@@ -50,9 +50,13 @@ def handle_daily_readiness_create():
 
     all_sessions = []
     need_new_plan = False
-    off_day = False
+    sessions_planned = True
+    if 'sessions_planned' in request.json and not request.json['sessions_planned']:
+        need_new_plan = True
+        sessions_planned = False
     if 'sessions' in request.json and len(request.json['sessions']) > 0:
         need_new_plan = True
+        sessions_planned = True
         for session in request.json['sessions']:
             session_event_date = parse_datetime(session['event_date'])
             session_type = session['session_type']
@@ -85,15 +89,13 @@ def handle_daily_readiness_create():
                                                              survey=session['post_session_survey']
                                                              ).json_serialise()
             all_sessions.append(_create_session(session_type, session_data))
-    if 'no_sessions' in request.json and request.json['no_sessions']:
-        need_new_plan = True
-        off_day = True
+
     if need_new_plan:
         plan = DailyPlan(event_date=plan_event_date)
         plan.user_id = user_id
         plan.last_sensor_sync = DailyPlanDatastore().get_last_sensor_sync(user_id, plan_event_date)
         plan.training_sessions = all_sessions
-        plan.sessions_planned = off_day
+        plan.sessions_planned = sessions_planned
         DailyPlanDatastore().put(plan)
 
     store = DailyReadinessDatastore()
