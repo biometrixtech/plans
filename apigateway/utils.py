@@ -21,6 +21,8 @@ def format_date(date_input):
     else:
         for format_string in ('%Y-%m-%d', '%m/%d/%y', '%Y-%m'):
             try:
+                if date_input.hour < 3:
+                    date_input = date_input - datetime.timedelta(days=1)
                 date_input = datetime.datetime.strptime(date_input, format_string)
                 return date_input.strftime("%Y-%m-%d")
             except ValueError:
@@ -68,3 +70,16 @@ def validate_uuid4(uuid_string):
     except ValueError:
         # If it's a value error, then the string is not a valid hex code for a UUID.
         return False
+
+def fix_early_survey_event_date(event_date):
+    if event_date.hour < 3:
+        return datetime.datetime(
+                            year=event_date.year, 
+                            month=event_date.month,
+                            day=event_date.day - 1,
+                            hour=23,
+                            minute=59,
+                            second=59
+                            )
+    else:
+        return event_date

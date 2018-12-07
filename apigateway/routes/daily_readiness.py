@@ -13,11 +13,9 @@ from fathomapi.utils.xray import xray_recorder
 from models.daily_readiness import DailyReadiness
 from models.soreness import MuscleSorenessSeverity, BodyPartLocation
 from models.stats import AthleteStats
-from utils import parse_datetime, format_date, format_datetime, parse_date
-from models.session import SessionType, SessionFactory, StrengthConditioningType
-from models.post_session_survey import PostSessionSurvey, PostSurvey
 from models.daily_plan import DailyPlan
-from models.sport import SportName
+from logic.survey_processing import SurveyProcessing
+from utils import parse_datetime, format_date, format_datetime, parse_date, fix_early_survey_event_date
 
 app = Blueprint('daily_readiness', __name__)
 
@@ -28,15 +26,8 @@ app = Blueprint('daily_readiness', __name__)
 def handle_daily_readiness_create():
     validate_data()
     event_date = parse_datetime(request.json['date_time'])
-    if event_date.hour < 3:
-        event_date = datetime.datetime(
-                            year=event_date.year, 
-                            month=event_date.month,
-                            day=event_date.day - 1,
-                            hour=23,
-                            minute=59,
-                            second=59
-                            )
+    event_date = fix_early_survey_event_date(event_date)
+    
     user_id = request.json['user_id']
     daily_readiness = DailyReadiness(
         user_id=user_id,
@@ -51,46 +42,27 @@ def handle_daily_readiness_create():
     all_sessions = []
     need_new_plan = False
     sessions_planned = True
+    need_stats_update = False
+    session_RPE = None
+    session_RPE_event_date = None
+    plan_event_date = format_date(event_date)
     if 'sessions_planned' in request.json and not request.json['sessions_planned']:
         need_new_plan = True
         sessions_planned = False
     if 'sessions' in request.json and len(request.json['sessions']) > 0:
         need_new_plan = True
         sessions_planned = True
+        need_stats_update = True
         for session in request.json['sessions']:
-            session_event_date = parse_datetime(session['event_date'])
-            session_type = session['session_type']
-            try:
-                sport_name = session['sport_name']
-                sport_name = SportName(sport_name)
-            except:
-                sport_name = SportName(None)
-            try:
-                strength_and_conditioning_type = session['strength_and_conditioning_type']
-                strength_and_conditioning_type = StrengthConditioningType(strength_and_conditioning_type)
-            except:
-                strength_and_conditioning_type = StrengthConditioningType(None)
-            try:
-                duration = session["duration"]
-            except:
-                raise InvalidSchemaException("Missing required parameter duration")
-            description = session.get('description', "")
-            if session_event_date.hour >= 3:
-                session_event_date = format_datetime(session_event_date - datetime.timedelta(days=1))
+            session_obj = SurveyProcessing().create_session_from_survey(session)
+            if session_RPE is not None:
+                session_RPE = max(session.survey.RPE, session_RPE)
             else:
-                session_event_date = format_datetime(session_event_date)
-            session_data = {"sport_name": sport_name,
-                            "strength_and_conditioning_type": strength_and_conditioning_type,
-                            "description": description,
-                            "duration_minutes": duration,
-                            "event_date": session_event_date}
-            session_data['post_session_survey'] = PostSurvey(event_date=format_datetime(event_date),
-                                                             survey=session['post_session_survey']
-                                                             ).json_serialise()
-            all_sessions.append(_create_session(session_type, session_data))
+                session_RPE = session.survey.RPE
+            session_RPE_event_date = plan_event_date
+            all_sessions.append(session_obj)
 
     if need_new_plan:
-        plan_event_date = format_date(event_date)
         plan = DailyPlan(event_date=plan_event_date)
         plan.user_id = user_id
         plan.last_sensor_sync = DailyPlanDatastore().get_last_sensor_sync(user_id, plan_event_date)
@@ -101,7 +73,6 @@ def handle_daily_readiness_create():
     store = DailyReadinessDatastore()
     store.put(daily_readiness)
 
-    need_stats_update = False
     soreness = daily_readiness.soreness
     severe_soreness = [s for s in soreness if not s.pain]
     severe_pain = [s for s in soreness if s.pain]
@@ -115,6 +86,8 @@ def handle_daily_readiness_create():
         if athlete_stats is None:
             athlete_stats = AthleteStats(request.json['user_id'])
         athlete_stats.event_date = plan_event_date
+        athlete_stats.session_RPE = session_RPE
+        athlete_stats.session_RPE_event_date = session_RPE_event_date
         athlete_stats.update_readiness_soreness(severe_soreness)
         athlete_stats.update_readiness_pain(severe_pain)
         athlete_stats.update_daily_soreness()
@@ -245,17 +218,3 @@ def validate_data():
         raise InvalidSchemaException('Missing required parameter readiness')
     elif request.json['readiness'] not in range(1, 11):
         raise InvalidSchemaException('readiness need to be between 1 and 10')
-
-
-def _create_session(session_type, data):
-    factory = SessionFactory()
-    session = factory.create(SessionType(session_type))
-    _update_session(session, data)
-    # for key, value in data.items():
-    #     setattr(session, key, value)
-    return session
-
-
-def _update_session(session, data):
-    for key, value in data.items():
-        setattr(session, key, value)
