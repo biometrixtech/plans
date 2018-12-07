@@ -56,9 +56,9 @@ def handle_daily_readiness_create():
         for session in request.json['sessions']:
             session_obj = SurveyProcessing().create_session_from_survey(session)
             if session_RPE is not None:
-                session_RPE = max(session_obj.survey.RPE, session_RPE)
+                session_RPE = max(session_obj.post_session_survey.RPE, session_RPE)
             else:
-                session_RPE = session_obj.survey.RPE
+                session_RPE = session_obj.post_session_survey.RPE
             session_RPE_event_date = plan_event_date
             all_sessions.append(session_obj)
 
