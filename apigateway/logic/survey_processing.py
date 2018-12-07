@@ -1,4 +1,4 @@
-from datetime import datetime
+import datetime
 from utils import parse_datetime, format_datetime, fix_early_survey_event_date
 from fathomapi.utils.exceptions import InvalidSchemaException
 from models.session import SessionType, SessionFactory, StrengthConditioningType

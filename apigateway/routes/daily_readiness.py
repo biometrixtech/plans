@@ -80,7 +80,6 @@ def handle_daily_readiness_create():
         need_stats_update = True
 
     if need_stats_update:
-        plan_event_date = format_date(event_date)
         athlete_stats_store = AthleteStatsDatastore()
         athlete_stats = athlete_stats_store.get(athlete_id=request.json['user_id'])
         if athlete_stats is None:

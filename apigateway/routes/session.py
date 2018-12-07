@@ -26,45 +26,9 @@ app = Blueprint('session', __name__)
 def handle_session_create():
     _validate_schema()
     user_id = request.json['user_id']
-    session = SurveyProcessing().create_session_from_survey(request.json)
     plan_event_date = format_date(session.event_date)
+    session = SurveyProcessing().create_session_from_survey(request.json)
 
-
-    # event_date = parse_datetime(request.json['event_date'])
-    # session_type = request.json['session_type']
-    # user_id = request.json['user_id']
-    # try:
-    #     sport_name = request.json['sport_name']
-    #     sport_name = SportName(sport_name)
-    # except:
-    #     sport_name = SportName(None)
-    # try:
-    #     strength_and_conditioning_type = request.json['strength_and_conditioning_type']
-    #     strength_and_conditioning_type = StrengthConditioningType(strength_and_conditioning_type)
-    # except:
-    #     strength_and_conditioning_type = StrengthConditioningType(None)
-    # try:
-    #     duration = request.json["duration"]
-    # except:
-    #     raise InvalidSchemaException("Missing required parameter duration")
-    # description = request.json.get('description', "")
-    # plan_event_date = format_date(event_date)
-    # session_event_date = format_datetime(event_date)
-    # session_data = {"sport_name": sport_name,
-    #                 "strength_and_conditioning_type": strength_and_conditioning_type,
-    #                 "description": description,
-    #                 "duration_minutes": duration,
-    #                 "event_date": session_event_date}
-    # if 'post_session_survey' in request.json:
-    #     survey = PostSurvey(event_date=request.json['post_session_survey']['event_date'],
-    #                         survey=request.json['post_session_survey']
-    #                         )
-
-    #     # TODO: if the frontend error is fixed, this needs to be removed
-    #     if survey.event_date < 3 and event_date.hour >= 3:
-    #         session_data["event_date"] = format_datetime(parse_datetime(session_data["event_date"]) - datetime.timedelta(days=1))
-
-    #     session_data['post_session_survey'] = survey.json_serialise()
     if 'post_session_survey' in request.json:
         athlete_stats_store = AthleteStatsDatastore()
         athlete_stats = athlete_stats_store.get(athlete_id=user_id)
