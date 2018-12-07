@@ -20,7 +20,8 @@ class MetricsProcessing(object):
         # metrics.extend(ThreeDayConsecutivePainMetricGenerator(pain_list).get_metric_list())
 
         ps_list = list(p for p in athlete_stats.historic_soreness if p.historic_soreness_status ==
-                       HistoricSorenessStatus.persistent_soreness)
+                       HistoricSorenessStatus.persistent_soreness or p.historic_soreness_status ==
+                       HistoricSorenessStatus.almost_persistent_2_soreness)
         metrics.extend(PersistentSorenessMetricGenerator(ps_list).get_metric_list())
 
         cs_list = list(p for p in athlete_stats.historic_soreness if p.historic_soreness_status ==
@@ -29,7 +30,8 @@ class MetricsProcessing(object):
         metrics.extend(Persistent_2SorenessMetricGenerator(cs_list).get_metric_list())
 
         pp_list = list(p for p in athlete_stats.historic_soreness if p.historic_soreness_status ==
-                       HistoricSorenessStatus.persistent_pain)
+                       HistoricSorenessStatus.persistent_pain or p.historic_soreness_status ==
+                       HistoricSorenessStatus.almost_persistent_2_pain)
 
         metrics.extend(PersistentPainMetricGenerator(pp_list).get_metric_list())
 
