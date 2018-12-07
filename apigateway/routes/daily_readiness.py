@@ -75,7 +75,6 @@ def handle_daily_readiness_create():
             except:
                 raise InvalidSchemaException("Missing required parameter duration")
             description = session.get('description', "")
-            plan_event_date = format_date(event_date)
             if session_event_date.hour >= 3:
                 session_event_date = format_datetime(session_event_date - datetime.timedelta(days=1))
             else:
@@ -91,6 +90,7 @@ def handle_daily_readiness_create():
             all_sessions.append(_create_session(session_type, session_data))
 
     if need_new_plan:
+        plan_event_date = format_date(event_date)
         plan = DailyPlan(event_date=plan_event_date)
         plan.user_id = user_id
         plan.last_sensor_sync = DailyPlanDatastore().get_last_sensor_sync(user_id, plan_event_date)
