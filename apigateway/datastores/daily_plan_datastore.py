@@ -4,6 +4,7 @@ from config import get_mongo_collection
 from models.daily_plan import DailyPlan
 import models.session as session
 import models.exercise as exercise
+from models.post_session_survey import PostSurvey
 
 class DailyPlanDatastore(object):
     mongo_collection = 'dailyplan'
@@ -82,73 +83,9 @@ class DailyPlanDatastore(object):
     @xray_recorder.capture('datastore.DailyPlanDatastore._put_mongodb')
     def _put_mongodb(self, item):
         collection = get_mongo_collection(self.mongo_collection)
-
-        '''Deprecated
-        practice_session_bson = ()
-        cross_training_session_bson = ()
-        game_session_bson = ()
-        bump_up_session_bson = ()
-        am_recovery_bson = ()
-        pm_recovery_bson = ()
-
-        if item.pre_recovery is not None:
-            am_recovery_bson = self.get_recovery_bson(item.pre_recovery)
-
-        if item.post_recovery is not None:
-            pm_recovery_bson = self.get_recovery_bson(item.post_recovery)
-
-        for practice_session in item.practice_sessions:
-            practice_session_bson += ({'session_id': str(practice_session.id),
-                                       'post_session_survey': practice_session.post_session_survey
-                                       },)
-
-        for cross_training_session in item.strength_conditioning_sessions:
-            cross_training_session_bson += ({'session_id': str(cross_training_session.id),
-                                             'post_session_survey': cross_training_session.post_session_survey
-                                             },)
-
-        for game_session in item.games:
-            game_session_bson += ({'session_id': str(game_session.id),
-                                   'post_session_survey': game_session.post_session_survey
-                                   },)
-
-        for bump_up_session in item.bump_up_sessions:
-            bump_up_session_bson += ({'session_id': str(bump_up_session.id),
-                                      'post_session_survey': bump_up_session.post_session_survey
-                                      },)
-
-        collection.insert_one({'user_id': item.athlete_id,
-                               'date': item.date.strftime('%Y-%m-%d'),
-                               'practice_sessions': practice_session_bson,
-                               'bump_up_sessions': bump_up_session_bson,
-                               'cross_training_sessions': cross_training_session_bson,
-                               'game_sessions': game_session_bson,
-                               'pre_recovery': am_recovery_bson,
-                               'post_recovery': pm_recovery_bson,
-                               'last_updated': item.last_updated})
-        '''
         query = {'user_id': item.user_id, 'date': item.event_date}
         collection.replace_one(query, item.json_serialise(), upsert=True)
 
-    '''Deprecated
-    def get_recovery_bson(self, recovery_session):
-        exercise_bson = ()
-        for recovery_exercise in recovery_session.recommended_exercises():
-            exercise_bson += ({'name': recovery_exercise.exercise.name,
-                               'position_order': recovery_exercise.position_order,
-                               'reps_assigned': recovery_exercise.reps_assigned,
-                               'sets_assigned': recovery_exercise.sets_assigned,
-                               'seconds_duration': recovery_exercise.duration()
-                               },)
-        recovery_bson = ({'minutes_duration': recovery_session.duration_minutes,
-                          'start_time': str(recovery_session.start_time),
-                          'end_time': str(recovery_session.end_time),
-                          'impact_score': recovery_session.impact_score,
-                          'exercises': exercise_bson
-                          })
-
-        return recovery_bson
-    '''
 
     def get_last_sensor_sync(self, user_id, event_date):
         mongo_collection = get_mongo_collection(self.mongo_collection)
@@ -186,10 +123,13 @@ def _external_session_from_mongodb(mongo_result, session_type):
                         "inactive_load",
                         "sensor_start_date_time",
                         "sensor_end_date_time",
-                        "post_session_survey",
                         "deleted"]
     for key in attrs_from_mongo:
         setattr(mongo_session, key, _key_present(key, mongo_result))
+    if "post_session_survey" in mongo_result and mongo_result["post_session_survey"] is not None:
+        mongo_session.post_session_survey = PostSurvey(mongo_result["post_session_survey"], mongo_result["post_session_survey"]["event_date"])
+    else:
+        mongo_session.post_session_survey = None
 
     return mongo_session
 

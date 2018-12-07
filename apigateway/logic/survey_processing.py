@@ -38,7 +38,7 @@ class SurveyProcessing(object):
             if survey.event_date.hour < 3 and event_date.hour >= 3:
                 session_data['event_date'] = format_datetime(event_date - datetime.timedelta(days=1))
             survey.event_date == fix_early_survey_event_date(survey.event_date)
-            session_data['post_session_survey'] = survey.json_serialise()
+            session_data['post_session_survey'] = survey
         return self._create_session(session_type, session_data)
 
 

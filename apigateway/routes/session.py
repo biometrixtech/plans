@@ -76,7 +76,7 @@ def handle_session_create():
         athlete_stats.session_RPE_event_date = plan_event_date
 
         # update severe soreness and severe pain
-        soreness = survey.soreness
+        soreness = session.post_session_survey.soreness
         severe_soreness = [s for s in soreness if not s.pain]
         severe_pain = [s for s in soreness if s.pain]
         athlete_stats.daily_severe_soreness_event_date = plan_event_date
