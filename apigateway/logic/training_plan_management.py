@@ -103,9 +103,19 @@ class TrainingPlanManager(object):
 
         return False
 
-    def create_daily_plan(self, event_date=None):
+    def show_post_recovery(self, post_surveys_today, daily_plan):
+        if post_surveys_today:
+            if daily_plan.session_from_readiness:
+                return True
+            else:
+                return False
+        else:
+            if daily_plan.sessions_planned_readiness:
+                return False
+            else:
+                return True
 
-        show_post_recovery = False
+    def create_daily_plan(self, event_date=None):
 
         if event_date is not None:
             start_time = format_datetime(parse_date(event_date) - datetime.timedelta(days=1))
@@ -124,8 +134,6 @@ class TrainingPlanManager(object):
         trigger_date_time = last_daily_readiness_survey.get_event_date()
         post_session_surveys = self.post_session_survey_datastore.get(self.athlete_id, parse_datetime(start_time), parse_datetime(end_time))
         athlete_stats = self.athlete_stats_datastore.get(self.athlete_id)
-
-        show_post_recovery = self.post_session_surveys_today(post_session_surveys, today_date)
 
         survey_event_dates = [s.get_event_date() for s in post_session_surveys if s is not None]
 
@@ -156,7 +164,9 @@ class TrainingPlanManager(object):
             daily_plan.last_sensor_sync = self.daily_plan_datastore.get_last_sensor_sync(self.athlete_id, today_date)
         else:
             daily_plan = daily_plans[len(daily_plans) - 1]
+        post_surveys_today = self.post_session_surveys_today(post_session_surveys, today_date)
 
+        show_post_recovery = self.show_post_recovery(post_surveys_today, daily_plan)
         daily_plan.user_id = self.athlete_id
         daily_plan.daily_readiness_survey = last_daily_readiness_survey.get_event_date().strftime('%Y-%m-%d')
 

@@ -70,6 +70,8 @@ class DailyPlanDatastore(object):
             daily_plan.completed_functional_strength_sessions = plan.get('completed_functional_strength_sessions', 0)
             daily_plan.functional_strength_session = _functional_strength_session_from_mongodb(plan['functional_strength_session']) if plan.get('functional_strength_session', None) is not None else None
             daily_plan.functional_strength_completed = plan.get('functional_strength_completed', False)
+            daily_plan.session_from_readiness = plan.get('session_from_readiness', False)
+            daily_plan.sessions_planned_readiness = plan.get('sessions_planned_readiness', True)
             ret.append(daily_plan)
 
         if len(ret) == 0:

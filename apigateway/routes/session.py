@@ -70,8 +70,9 @@ def handle_session_create():
                  event_date=plan_event_date
                  )
     plan = DailyPlanDatastore().get(user_id, plan_event_date, plan_event_date)[0]
-    if not plan.sessions_planned:
+    if not plan.sessions_planned or plan.session_from_readiness:
         plan.sessions_planned = True
+        plan.session_from_readiness = False
         DailyPlanDatastore().put(plan)
 
     update_plan(user_id, plan_event_date)
