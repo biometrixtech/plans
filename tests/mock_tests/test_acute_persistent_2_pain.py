@@ -288,6 +288,54 @@ def test_flag_acute_pain_10_days_3_day_gaps_question():
     assert(True is historic_soreness[0].ask_acute_pain_question)
 
 
+def test_flag_acute_pain_9_days_3_day_gap_question():
+
+    dates = ["2018-05-12", "2018-05-13", "2018-05-16"]
+    severity = [1,2,3]
+
+    ten_day_soreness_list = get_soreness_list(BodyPartLocation.achilles, 1, severity, True, dates)
+
+    # System processes on 2018-05-17 at midnight, but uses tomorrow's date
+
+    stats_processing = StatsProcessing("tester", "2018-05-20", DatastoreCollection())
+
+    historic_soreness = stats_processing.get_historic_soreness_list([], ten_day_soreness_list,[], [], [])
+
+    assert(True is historic_soreness[0].ask_acute_pain_question)
+
+
+def test_flag_acute_pain_9_days_3_day_gap_question_v2():
+
+    dates = ["2018-05-12", "2018-05-13","2018-05-14","2018-05-15", "2018-05-16"]
+    severity = [1,2,3,2,3]
+
+    ten_day_soreness_list = get_soreness_list(BodyPartLocation.achilles, 1, severity, True, dates)
+
+    # System processes on 2018-05-17 at midnight, but uses tomorrow's date
+
+    stats_processing = StatsProcessing("tester", "2018-05-20", DatastoreCollection())
+
+    historic_soreness = stats_processing.get_historic_soreness_list([], ten_day_soreness_list,[], [], [])
+
+    assert(True is historic_soreness[0].ask_acute_pain_question)
+
+
+def test_flag_acute_pain_11_days_3_day_gap_question():
+
+    dates = ["2018-05-12", "2018-05-13","2018-05-14","2018-05-17", "2018-05-18"]
+    severity = [1,2,3,2,3]
+
+    ten_day_soreness_list = get_soreness_list(BodyPartLocation.achilles, 1, severity, True, dates)
+
+    # System processes on 2018-05-17 at midnight, but uses tomorrow's date
+
+    stats_processing = StatsProcessing("tester", "2018-05-22", DatastoreCollection())
+
+    historic_soreness = stats_processing.get_historic_soreness_list([], ten_day_soreness_list,[], [], [])
+
+    assert(True is historic_soreness[0].ask_acute_pain_question)
+
+
 def test_migrate_acute_pain_to_persistent2_9_days_3_day_gap():
 
     dates = ["2018-05-12", "2018-05-15", "2018-05-16"]
@@ -619,3 +667,31 @@ def test_flag_acute_pain_8_days_no_gaps_v5():
     historic_soreness = stats_processing.get_historic_soreness_list([], soreness_list, [], [], [], historic_soreness)
 
     assert(HistoricSorenessStatus.persistent_2_pain is historic_soreness[0].historic_soreness_status)
+
+
+def test_flag_acute_pain_3_days_severity_1():
+
+    dates = ["2018-05-12", "2018-05-13", "2018-05-14"]
+    severity = [2, 1, 2]
+
+    soreness_list = get_soreness_list(BodyPartLocation.achilles, 1, severity, True, dates)
+
+    stats_processing = StatsProcessing("tester", "2018-05-14", DatastoreCollection())
+
+    historic_soreness = stats_processing.get_historic_soreness_list([],soreness_list,  [],[], [])
+
+    assert (1.7 <= historic_soreness[0].average_severity <= 1.9)
+
+
+def test_flag_acute_pain_3_days_severity_2():
+
+    dates = ["2018-05-12", "2018-05-13", "2018-05-14"]
+    severity = [2, 4, 3]
+
+    soreness_list = get_soreness_list(BodyPartLocation.achilles, 1, severity, True, dates)
+
+    stats_processing = StatsProcessing("tester", "2018-05-14", DatastoreCollection())
+
+    historic_soreness = stats_processing.get_historic_soreness_list([],soreness_list,  [],[], [])
+
+    assert (3.1 <= historic_soreness[0].average_severity <= 3.4)

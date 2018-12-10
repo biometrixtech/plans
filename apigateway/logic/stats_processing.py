@@ -9,6 +9,7 @@ from models.soreness import HistoricSoreness, HistoricSorenessStatus
 from collections import namedtuple
 from itertools import groupby
 from operator import itemgetter
+import math
 
 class StatsProcessing(object):
 
@@ -366,15 +367,20 @@ class StatsProcessing(object):
                     if days_skipped > 3 or (days_since_last_report is not None and days_since_last_report > 3):
                         ask_acute_pain_question = True
 
-                    days_for_severity = (last_reported_date_time - parse_date(streak_start_date)).days
+                    # days_for_severity = (last_reported_date_time - parse_date(streak_start_date)).days
+                    denom_sum = 0
+
+                    last_day_in_streak = body_part_history[0].reported_date_time
 
                     for b in range(0, streak):
-                        severity += (body_part_history[b].severity / (streak - b))
+                        days_difference = (parse_date(last_day_in_streak) - parse_date(body_part_history[b].reported_date_time)).days
+                        severity += (body_part_history[b].severity) * (math.exp(-1.0*days_difference))
+                        denom_sum += math.exp(-1.0*b)
 
                     soreness = HistoricSoreness(g.location, g.side, True)
                     soreness.historic_soreness_status = HistoricSorenessStatus.acute_pain
                     soreness.ask_acute_pain_question = ask_acute_pain_question
-                    soreness.average_severity = severity / float(streak)
+                    soreness.average_severity = severity / float(denom_sum)
                     soreness.last_reported = last_reported_date
                     soreness.streak_start_date = streak_start_date
 
