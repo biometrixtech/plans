@@ -32,6 +32,8 @@ class DailyPlan(Serialisable):
         self.functional_strength_eligible = False
         self.completed_functional_strength_sessions = 0
         self.functional_strength_session = None
+        self.session_from_readiness = False
+        self.sessions_planned_readiness = True
 
     def get_id(self):
         return self.user_id
@@ -64,6 +66,8 @@ class DailyPlan(Serialisable):
                'functional_strength_completed': self.functional_strength_completed,
                'functional_strength_eligible': self.functional_strength_eligible,
                'completed_functional_strength_sessions': self.completed_functional_strength_sessions,
+               'session_from_readiness': self.session_from_readiness,
+               'sessions_planned_readiness': self.sessions_planned_readiness
                }
         return ret
 
