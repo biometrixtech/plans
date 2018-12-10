@@ -3,6 +3,7 @@ import datetime
 
 from datastores.daily_readiness_datastore import DailyReadinessDatastore
 from datastores.post_session_survey_datastore import PostSessionSurveyDatastore
+from datastores.daily_plan_datastore import DailyPlanDatastore
 from datastores.athlete_stats_datastore import AthleteStatsDatastore
 from fathomapi.api.config import Config
 from fathomapi.comms.service import Service
@@ -12,7 +13,9 @@ from fathomapi.utils.xray import xray_recorder
 from models.daily_readiness import DailyReadiness
 from models.soreness import MuscleSorenessSeverity, BodyPartLocation
 from models.stats import AthleteStats
-from utils import parse_datetime, format_date, format_datetime, parse_date
+from models.daily_plan import DailyPlan
+from logic.survey_processing import SurveyProcessing
+from utils import parse_datetime, format_date, format_datetime, parse_date, fix_early_survey_event_date
 
 app = Blueprint('daily_readiness', __name__)
 
@@ -23,18 +26,11 @@ app = Blueprint('daily_readiness', __name__)
 def handle_daily_readiness_create():
     validate_data()
     event_date = parse_datetime(request.json['date_time'])
-    if event_date.hour < 3:
-        event_date = datetime.datetime(
-                            year=event_date.year, 
-                            month=event_date.month,
-                            day=event_date.day - 1,
-                            hour=23,
-                            minute=59,
-                            second=59
-                            )
-
+    event_date = fix_early_survey_event_date(event_date)
+    
+    user_id = request.json['user_id']
     daily_readiness = DailyReadiness(
-        user_id=request.json['user_id'],
+        user_id=user_id,
         event_date=format_datetime(event_date),
         soreness=request.json['soreness'],  # dailysoreness object array
         sleep_quality=request.json['sleep_quality'],
@@ -42,10 +38,41 @@ def handle_daily_readiness_create():
         wants_functional_strength=(request.json['wants_functional_strength']
                                    if 'wants_functional_strength' in request.json else False)
     )
+
+    all_sessions = []
+    need_new_plan = False
+    sessions_planned = True
+    need_stats_update = False
+    session_RPE = None
+    session_RPE_event_date = None
+    plan_event_date = format_date(event_date)
+    if 'sessions_planned' in request.json and not request.json['sessions_planned']:
+        need_new_plan = True
+        sessions_planned = False
+    if 'sessions' in request.json and len(request.json['sessions']) > 0:
+        need_new_plan = True
+        sessions_planned = True
+        need_stats_update = True
+        for session in request.json['sessions']:
+            session_obj = SurveyProcessing().create_session_from_survey(session)
+            if session_RPE is not None:
+                session_RPE = max(session_obj.post_session_survey.RPE, session_RPE)
+            else:
+                session_RPE = session_obj.post_session_survey.RPE
+            session_RPE_event_date = plan_event_date
+            all_sessions.append(session_obj)
+
+    if need_new_plan:
+        plan = DailyPlan(event_date=plan_event_date)
+        plan.user_id = user_id
+        plan.last_sensor_sync = DailyPlanDatastore().get_last_sensor_sync(user_id, plan_event_date)
+        plan.training_sessions = all_sessions
+        plan.sessions_planned = sessions_planned
+        DailyPlanDatastore().put(plan)
+
     store = DailyReadinessDatastore()
     store.put(daily_readiness)
 
-    need_stats_update = False
     soreness = daily_readiness.soreness
     severe_soreness = [s for s in soreness if not s.pain]
     severe_pain = [s for s in soreness if s.pain]
@@ -53,12 +80,13 @@ def handle_daily_readiness_create():
         need_stats_update = True
 
     if need_stats_update:
-        plan_event_date = format_date(event_date)
         athlete_stats_store = AthleteStatsDatastore()
         athlete_stats = athlete_stats_store.get(athlete_id=request.json['user_id'])
         if athlete_stats is None:
             athlete_stats = AthleteStats(request.json['user_id'])
         athlete_stats.event_date = plan_event_date
+        athlete_stats.session_RPE = session_RPE
+        athlete_stats.session_RPE_event_date = session_RPE_event_date
         athlete_stats.update_readiness_soreness(severe_soreness)
         athlete_stats.update_readiness_pain(severe_pain)
         athlete_stats.update_daily_soreness()
@@ -77,7 +105,10 @@ def handle_daily_readiness_create():
 
         athlete_stats_store.put(athlete_stats)
 
-    Service('plans', Config.get('API_VERSION')).call_apigateway_async('POST', f"athlete/{request.json['user_id']}/daily_plan")
+    body = {"event_date": plan_event_date}
+    Service('plans', Config.get('API_VERSION')).call_apigateway_async('POST',
+                                                                      f"athlete/{request.json['user_id']}/daily_plan",
+                                                                      body)
 
     return {'message': 'success'}, 201
 

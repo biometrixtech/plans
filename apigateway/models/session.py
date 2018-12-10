@@ -134,7 +134,7 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
             'inactive_load': self.inactive_load,
             'sensor_start_date_time': format_datetime(self.sensor_start_date_time),
             'sensor_end_date_time': format_datetime(self.sensor_end_date_time),
-            'post_session_survey': self.post_session_survey,
+            'post_session_survey': self.post_session_survey.json_serialise() if self.post_session_survey is not None else self.post_session_survey,
             'deleted': self.deleted
         }
         return ret
@@ -499,7 +499,8 @@ class RecoverySession(Serialisable):
             for soreness in [s for s in soreness_list if s.daily]:
                 if (soreness.historic_soreness_status is not None and
                         soreness.historic_soreness_status is not HistoricSorenessStatus.dormant_cleared and
-                    soreness.historic_soreness_status is not HistoricSorenessStatus.almost_persistent
+                    soreness.historic_soreness_status is not HistoricSorenessStatus.almost_persistent_pain and
+                        soreness.historic_soreness_status is not HistoricSorenessStatus.almost_persistent_soreness
                         and soreness.severity == max_severity and
                         soreness.severity > 0):
                     max_severity_and_historic_soreness = True

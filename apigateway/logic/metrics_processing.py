@@ -19,22 +19,24 @@ class MetricsProcessing(object):
         # pain_list = list(p for p in athlete_stats.historic_soreness if p.is_pain and p.streak >= 3)
         # metrics.extend(ThreeDayConsecutivePainMetricGenerator(pain_list).get_metric_list())
 
-        ps_list = list(p for p in athlete_stats.historic_soreness if not p.is_pain and p.historic_soreness_status ==
-                         HistoricSorenessStatus.persistent)
+        ps_list = list(p for p in athlete_stats.historic_soreness if p.historic_soreness_status ==
+                       HistoricSorenessStatus.persistent_soreness or p.historic_soreness_status ==
+                       HistoricSorenessStatus.almost_persistent_2_soreness)
         metrics.extend(PersistentSorenessMetricGenerator(ps_list).get_metric_list())
 
-        cs_list = list(p for p in athlete_stats.historic_soreness if not p.is_pain and p.historic_soreness_status ==
-                       HistoricSorenessStatus.persistent_2)
+        cs_list = list(p for p in athlete_stats.historic_soreness if p.historic_soreness_status ==
+                       HistoricSorenessStatus.persistent_2_soreness)
 
         metrics.extend(Persistent_2SorenessMetricGenerator(cs_list).get_metric_list())
 
-        pp_list = list(p for p in athlete_stats.historic_soreness if p.is_pain and p.historic_soreness_status ==
-                       HistoricSorenessStatus.persistent)
+        pp_list = list(p for p in athlete_stats.historic_soreness if p.historic_soreness_status ==
+                       HistoricSorenessStatus.persistent_pain or p.historic_soreness_status ==
+                       HistoricSorenessStatus.almost_persistent_2_pain)
 
         metrics.extend(PersistentPainMetricGenerator(pp_list).get_metric_list())
 
-        cp_list = list(p for p in athlete_stats.historic_soreness if p.is_pain and p.historic_soreness_status ==
-                       HistoricSorenessStatus.persistent_2)
+        cp_list = list(p for p in athlete_stats.historic_soreness if p.historic_soreness_status ==
+                       HistoricSorenessStatus.persistent_2_pain)
 
         metrics.extend(Persistent_2PainMetricGenerator(cp_list).get_metric_list())
 
