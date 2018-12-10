@@ -134,7 +134,7 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
             'inactive_load': self.inactive_load,
             'sensor_start_date_time': format_datetime(self.sensor_start_date_time),
             'sensor_end_date_time': format_datetime(self.sensor_end_date_time),
-            'post_session_survey': self.post_session_survey,
+            'post_session_survey': self.post_session_survey.json_serialise() if self.post_session_survey is not None else self.post_session_survey,
             'deleted': self.deleted
         }
         return ret
