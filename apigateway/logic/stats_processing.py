@@ -342,7 +342,7 @@ class StatsProcessing(object):
                     if len(body_part_history) > 0:
                         historic_soreness.last_reported = body_part_history[0].reported_date_time
 
-                if ((parse_date(self.event_date) - parse_date(historic_soreness.streak_start_date)).days >= 8
+                if ((parse_date(self.event_date) - parse_date(historic_soreness.streak_start_date)).days >= 7
                         and not historic_soreness.ask_acute_pain_question):
                     historic_soreness.historic_soreness_status = HistoricSorenessStatus.persistent_2_pain
                 acute_pain_list.append(historic_soreness)
@@ -363,7 +363,7 @@ class StatsProcessing(object):
                             break
 
                 if streak >= 3:
-                    if days_skipped >= 3 or (days_since_last_report is not None and days_since_last_report >= 3):
+                    if days_skipped > 3 or (days_since_last_report is not None and days_since_last_report > 3):
                         ask_acute_pain_question = True
 
                     days_for_severity = (last_reported_date_time - parse_date(streak_start_date)).days
