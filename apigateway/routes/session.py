@@ -26,8 +26,8 @@ app = Blueprint('session', __name__)
 def handle_session_create():
     _validate_schema()
     user_id = request.json['user_id']
-    plan_event_date = format_date(session.event_date)
     session = SurveyProcessing().create_session_from_survey(request.json)
+    plan_event_date = format_date(session.event_date)
 
     if 'post_session_survey' in request.json:
         athlete_stats_store = AthleteStatsDatastore()
@@ -70,8 +70,9 @@ def handle_session_create():
                  event_date=plan_event_date
                  )
     plan = DailyPlanDatastore().get(user_id, plan_event_date, plan_event_date)[0]
-    if not plan.sessions_planned:
+    if not plan.sessions_planned or plan.session_from_readiness:
         plan.sessions_planned = True
+        plan.session_from_readiness = False
         DailyPlanDatastore().put(plan)
 
     update_plan(user_id, plan_event_date)
