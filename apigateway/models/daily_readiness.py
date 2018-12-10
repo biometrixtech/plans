@@ -1,5 +1,4 @@
 from serialisable import Serialisable
-import datetime
 
 from utils import parse_datetime, format_datetime
 from models.soreness import Soreness, BodyPartLocation, BodyPart

@@ -1,8 +1,6 @@
 from serialisable import Serialisable
 from utils import parse_date
-from datetime import datetime
 import models.session as session
-from utils import format_datetime
 
 
 class DailyPlan(Serialisable):

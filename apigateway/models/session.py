@@ -3,7 +3,6 @@ from enum import Enum
 import uuid
 import datetime
 from serialisable import Serialisable
-import logic.exercise_generator as exercise
 from utils import format_datetime, parse_datetime
 from models.soreness import HistoricSorenessStatus
 from models.sport import SportName, NoSportPosition, BaseballPosition, BasketballPosition, FootballPosition, LacrossePosition, SoccerPosition, SoftballPosition, TrackAndFieldPosition, FieldHockeyPosition
