@@ -26,8 +26,8 @@ app = Blueprint('session', __name__)
 def handle_session_create():
     _validate_schema()
     user_id = request.json['user_id']
-    plan_event_date = format_date(session.event_date)
     session = SurveyProcessing().create_session_from_survey(request.json)
+    plan_event_date = format_date(session.event_date)
 
     if 'post_session_survey' in request.json:
         athlete_stats_store = AthleteStatsDatastore()
