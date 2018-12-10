@@ -105,7 +105,10 @@ def handle_daily_readiness_create():
 
         athlete_stats_store.put(athlete_stats)
 
-    Service('plans', Config.get('API_VERSION')).call_apigateway_async('POST', f"athlete/{request.json['user_id']}/daily_plan")
+    body = {"event_date": plan_event_date}
+    Service('plans', Config.get('API_VERSION')).call_apigateway_async('POST',
+                                                                      f"athlete/{request.json['user_id']}/daily_plan",
+                                                                      body)
 
     return {'message': 'success'}, 201
 
