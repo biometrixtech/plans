@@ -404,7 +404,7 @@ class StatsProcessing(object):
             days_difference = (
                         parse_date(last_day_in_streak) - parse_date(body_part_history[b].reported_date_time)).days
             severity += (body_part_history[b].severity) * (math.exp(-1.0 * days_difference))
-            denom_sum += math.exp(-1.0 * b)
+            denom_sum += math.exp(-1.0 * days_difference)
         avg_severity = severity / float(denom_sum)
 
         return avg_severity
@@ -414,13 +414,13 @@ class StatsProcessing(object):
         denom_sum = 0
         severity = 0.0
 
-        for b in range(0, 11):
+        for b in range(0, 10):
             days_ago = parse_date(current_date) - timedelta(days=b)
 
             for h in body_part_history:
                 if parse_date(h.reported_date_time) == days_ago:
-                    severity += h.severity * (math.exp(-2.0 * b))
-                    denom_sum += math.exp(-2.0 * b)
+                    severity += h.severity * (math.exp(-0.7 * b))
+                    denom_sum += math.exp(-0.7 * b)
         if denom_sum > 0:
             avg_severity = severity / float(denom_sum)
         else:
