@@ -104,14 +104,8 @@ class TrainingPlanManager(object):
         return False
 
     def show_post_recovery(self, post_surveys_today, daily_plan):
-        if post_surveys_today:
-            if not daily_plan.session_from_readiness:
-                return True
-            else:
-                if daily_plan.sessions_planned_readiness:
-                    return False
-                else:
-                    return True
+        if post_surveys_today and not daily_plan.session_from_readiness:
+            return True
         else:
             if daily_plan.sessions_planned_readiness:
                 return False

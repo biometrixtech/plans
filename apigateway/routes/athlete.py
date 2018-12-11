@@ -8,11 +8,8 @@ from datastores.datastore_collection import DatastoreCollection
 from logic.training_plan_management import TrainingPlanManager
 from logic.stats_processing import StatsProcessing
 from logic.metrics_processing import MetricsProcessing
-from serialisable import json_serialise
-from utils import parse_date, parse_datetime, format_date, format_datetime
+from utils import parse_date, parse_datetime, format_date
 import boto3
-import json
-import os
 import datetime
 import random
 

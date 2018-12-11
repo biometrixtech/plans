@@ -4,7 +4,7 @@ from fathomapi.utils.xray import xray_recorder
 from fathomapi.utils.exceptions import NoSuchEntityException, ForbiddenException
 from flask import Blueprint
 from datastores.datastore_collection import DatastoreCollection
-from models.dashboard import TeamDashboardData, AthleteDashboardData, AthleteDashboardSummary
+from models.dashboard import TeamDashboardData, AthleteDashboardData
 import datetime
 
 

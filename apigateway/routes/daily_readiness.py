@@ -136,7 +136,7 @@ def handle_daily_readiness_get(principal_id=None):
 
     start_time = parse_date(format_date(current_time - datetime.timedelta(days=2)))
     sore_body_parts = []
-    severe_soreness_today_yesterday = False
+    severe_pain_today_yesterday = False
     try:
         readiness_surveys = daily_readiness_store.get(user_id, start_date=start_time, end_date=current_time, last_only=False)
         # readiness_surveys = sorted(readiness_surveys, key=lambda k: k.event_date, reverse=True)
@@ -144,8 +144,8 @@ def handle_daily_readiness_get(principal_id=None):
             for rs_survey in readiness_surveys:
                 sore_body_parts.extend(rs_survey.json_serialise()['sore_body_parts'])
                 if rs_survey.event_date > start_time + datetime.timedelta(days=1):
-                    if len([s for s in rs_survey.soreness if s.severity >= 4]):
-                        severe_soreness_today_yesterday = True
+                    if len([s for s in rs_survey.soreness if s.severity >= 3 and s.pain]):
+                        severe_pain_today_yesterday = True
     except NoSuchEntityException:
         pass
 
@@ -156,8 +156,8 @@ def handle_daily_readiness_get(principal_id=None):
         for ps_survey in post_session_surveys:
             sore_body_parts += [{"body_part": s.body_part.location.value, "side": s.side} for s in ps_survey.survey.soreness if s.severity > 1]
             if ps_survey.event_date_time > start_time + datetime.timedelta(days=1):
-                if len([s for s in ps_survey.survey.soreness if s.severity >= 4]):
-                    severe_soreness_today_yesterday = True
+                if len([s for s in ps_survey.survey.soreness if s.severity >= 3 and s.pain]):
+                    severe_pain_today_yesterday = True
     sore_body_parts = [dict(t) for t in {tuple(d.items()) for d in sore_body_parts}]
 
     athlete_stats_store = AthleteStatsDatastore()
@@ -174,7 +174,7 @@ def handle_daily_readiness_get(principal_id=None):
         functional_strength_eligible = False
         if (athlete_stats.functional_strength_eligible and (athlete_stats.next_functional_strength_eligible_date is None
                 or parse_datetime(athlete_stats.next_functional_strength_eligible_date) < current_time) and
-            not severe_soreness_today_yesterday):
+            not severe_pain_today_yesterday):
             functional_strength_eligible = True
 
         completed_functional_strength_sessions = athlete_stats.completed_functional_strength_sessions
