@@ -831,13 +831,12 @@ def test_avg_severity_persistent_2_pain_2_weeks():
 
     assert (2.0 <= avg_severity <= 2.25)
 
-    stats_processing = StatsProcessing("tester", "2018-06-01", DatastoreCollection())
+    stats_processing = StatsProcessing("tester", "2018-06-08", DatastoreCollection())
 
-    avg_severity = stats_processing.calc_avg_severity_persistent_2_pain(soreness_list, "2018-06-01")
+    avg_severity = stats_processing.calc_avg_severity_persistent_2_pain(soreness_list, "2018-06-08")
 
-    # Note: this is a problem.  We are no longer able to "age" the score to zero as it doesn't reconcile with
-    # the other numbers
-    assert (2.0 <= avg_severity <= 2.25)
+    assert (0.0 <= avg_severity <= 0.0)
+
 
 def test_avg_severity_persistent_2_pain_2_weeks_v2():
     dates = ["2018-05-12", "2018-05-14", "2018-05-16", "2018-05-18", "2018-05-20", "2018-05-22", "2018-05-25",
@@ -852,10 +851,8 @@ def test_avg_severity_persistent_2_pain_2_weeks_v2():
 
     assert (1.0 <= avg_severity <= 1.25)
 
-    stats_processing = StatsProcessing("tester", "2018-06-01", DatastoreCollection())
+    stats_processing = StatsProcessing("tester", "2018-06-08", DatastoreCollection())
 
-    avg_severity = stats_processing.calc_avg_severity_persistent_2_pain(soreness_list, "2018-06-01")
+    avg_severity = stats_processing.calc_avg_severity_persistent_2_pain(soreness_list, "2018-06-08")
 
-    # Note: this is a problem.  We are no longer able to "age" the score to zero as it doesn't reconcile with
-    # the other numbers
-    assert (1.0 <= avg_severity <= 1.25)
+    assert (0.0 <= avg_severity <= 0)
