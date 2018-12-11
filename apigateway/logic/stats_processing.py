@@ -419,9 +419,12 @@ class StatsProcessing(object):
 
             for h in body_part_history:
                 if parse_date(h.reported_date_time) == days_ago:
-                    severity += h.severity * (math.exp(-1.0 * b))
-            denom_sum += math.exp(-1.0 * b)
-        avg_severity = severity / float(denom_sum)
+                    severity += h.severity * (math.exp(-2.0 * b))
+                    denom_sum += math.exp(-2.0 * b)
+        if denom_sum > 0:
+            avg_severity = severity / float(denom_sum)
+        else:
+            avg_severity = severity
 
         return avg_severity
 
