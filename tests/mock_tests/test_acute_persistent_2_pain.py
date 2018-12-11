@@ -496,7 +496,7 @@ def test_migrate_acute_pain_to_persistent2_9_days_3_day_gap_v3():
     assert (HistoricSorenessStatus.persistent_2_pain is historic_soreness[0].historic_soreness_status)
 
 
-def test_migrate_acute_pain_to_persistent2_9_days_3_day_gap_v3():
+def test_migrate_acute_pain_to_persistent2_9_days_3_day_gap_v4():
 
     dates = ["2018-05-12", "2018-05-13","2018-05-14","2018-05-17", "2018-05-18"]
     severity = [1, 2, 3,2,3]
@@ -695,3 +695,99 @@ def test_flag_acute_pain_3_days_severity_2():
     historic_soreness = stats_processing.get_historic_soreness_list([],soreness_list,  [],[], [])
 
     assert (3.1 <= historic_soreness[0].average_severity <= 3.4)
+
+
+def test_perisistent_pain_2_question_after_acute_question():
+
+    dates = ["2018-05-12", "2018-05-14", "2018-05-16"]
+    severity = [1, 2, 3]
+
+    soreness_list = get_soreness_list(BodyPartLocation.achilles, 1, severity, True, dates)
+
+    # processed at midnight on 2018-05-16 for the next day
+    stats_processing = StatsProcessing("tester", "2018-05-17", DatastoreCollection())
+
+    historic_soreness = stats_processing.get_historic_soreness_list([], soreness_list, [], [], [])
+
+    dates = ["2018-05-12", "2018-05-14", "2018-05-16", "2018-05-18"]
+    severity = [1, 2, 3, 2]
+
+    soreness_list = get_soreness_list(BodyPartLocation.achilles, 1, severity, True, dates)
+
+    # processed at midnight on 2018-05-21 for the next day
+    stats_processing = StatsProcessing("tester", "2018-05-22", DatastoreCollection())
+
+    historic_soreness = stats_processing.get_historic_soreness_list([], soreness_list, [], [], [], historic_soreness)
+
+    assert (HistoricSorenessStatus.acute_pain is historic_soreness[0].historic_soreness_status)
+
+    historic_soreness = stats_processing.answer_acute_pain_question(historic_soreness, BodyPartLocation.achilles, 1,
+                                                                    "2018-05-22", True)
+
+    assert (HistoricSorenessStatus.persistent_2_pain is historic_soreness[0].historic_soreness_status)
+    assert(False is historic_soreness[0].ask_persistent_2_pain_question)
+
+    dates = ["2018-05-12", "2018-05-14", "2018-05-16","2018-05-18","2018-05-22", "2018-05-25", "2018-05-26", "2018-05-28"]
+    severity = [1,2,3,2,3,3,3,2]
+
+    soreness_list = get_soreness_list(BodyPartLocation.achilles, 1, severity, True, dates)
+
+    # processed at midnight on 2018-06-05 for the next day
+    stats_processing = StatsProcessing("tester", "2018-06-08", DatastoreCollection())
+
+    historic_soreness = stats_processing.get_historic_soreness_list([], soreness_list, [], [], [], historic_soreness)
+
+    assert(True is historic_soreness[0].ask_persistent_2_pain_question)
+
+    historic_soreness = stats_processing.answer_persistent_2_pain_question(historic_soreness, BodyPartLocation.achilles, 1,
+                                                                    "2018-06-08", True)
+
+    assert (HistoricSorenessStatus.persistent_2_pain is historic_soreness[0].historic_soreness_status)
+    assert (False is historic_soreness[0].ask_persistent_2_pain_question)
+
+
+def test_perisistent_pain_2_question_automigrate():
+
+    dates = ["2018-05-12", "2018-05-14", "2018-05-16"]
+    severity = [1, 2, 3]
+
+    soreness_list = get_soreness_list(BodyPartLocation.achilles, 1, severity, True, dates)
+
+    # processed at midnight on 2018-05-16 for the next day
+    stats_processing = StatsProcessing("tester", "2018-05-17", DatastoreCollection())
+
+    historic_soreness = stats_processing.get_historic_soreness_list([], soreness_list, [], [], [])
+
+    assert (HistoricSorenessStatus.acute_pain is historic_soreness[0].historic_soreness_status)
+
+    dates = ["2018-05-12", "2018-05-14", "2018-05-16", "2018-05-18", "2018-05-20"]
+    severity = [1, 2, 3, 2, 3]
+
+    soreness_list = get_soreness_list(BodyPartLocation.achilles, 1, severity, True, dates)
+
+    # processed at midnight on 2018-05-20 for the next day
+    stats_processing = StatsProcessing("tester", "2018-05-21", DatastoreCollection())
+
+    historic_soreness = stats_processing.get_historic_soreness_list([], soreness_list, [], [], [], historic_soreness)
+
+    assert (HistoricSorenessStatus.persistent_2_pain is historic_soreness[0].historic_soreness_status)
+    assert (False is historic_soreness[0].ask_persistent_2_pain_question)
+
+    dates = ["2018-05-12", "2018-05-14", "2018-05-16", "2018-05-18", "2018-05-20", "2018-05-22", "2018-05-25", "2018-05-26", "2018-05-28"]
+    severity = [1,2,3,2,3,3,3,2,3]
+
+    soreness_list = get_soreness_list(BodyPartLocation.achilles, 1, severity, True, dates)
+
+    # processed at midnight on 2018-06-05 for the next day
+    stats_processing = StatsProcessing("tester", "2018-06-08", DatastoreCollection())
+
+    historic_soreness = stats_processing.get_historic_soreness_list([], soreness_list, [], [], [], historic_soreness)
+
+    assert(True is historic_soreness[0].ask_persistent_2_pain_question)
+
+
+    historic_soreness = stats_processing.answer_persistent_2_pain_question(historic_soreness, BodyPartLocation.achilles, 1,
+                                                                    "2018-06-08", False)
+
+    assert (HistoricSorenessStatus.dormant_cleared is historic_soreness[0].historic_soreness_status)
+    assert (False is historic_soreness[0].ask_persistent_2_pain_question)

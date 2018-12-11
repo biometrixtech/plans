@@ -348,6 +348,17 @@ class StatsProcessing(object):
                     historic_soreness.historic_soreness_status = HistoricSorenessStatus.persistent_2_pain
                 acute_pain_list.append(historic_soreness)
 
+            elif historic_soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_pain:
+                if len(body_part_history) > 0:
+                    last_reported_date = max(historic_soreness.last_reported, body_part_history[0].reported_date_time)
+                if (parse_date(self.event_date) - parse_date(last_reported_date)).days > 10:
+                    historic_soreness.ask_persistent_2_pain_question = True
+
+                    if len(body_part_history) > 0:
+                        historic_soreness.last_reported = body_part_history[0].reported_date_time
+
+                acute_pain_list.append(historic_soreness)
+
             else:
                 if len(body_part_history) >= 2:
 
@@ -404,6 +415,19 @@ class StatsProcessing(object):
 
         return existing_historic_soreness
 
+    def answer_persistent_2_pain_question(self, existing_historic_soreness, body_part_location, side, question_response_date, still_pain):
+
+        for e in existing_historic_soreness:
+            if e.body_part_location == body_part_location and e.side == side and e.is_pain:
+                if e.historic_soreness_status == HistoricSorenessStatus.persistent_2_pain:
+                    if still_pain:
+                        e.ask_persistent_2_pain_question = False
+
+                    else:
+                        e.ask_persistent_2_pain_question = False
+                        e.historic_soreness_status = HistoricSorenessStatus.dormant_cleared
+
+        return existing_historic_soreness
 
     def get_soreness_streaks(self, soreness_list):
 
