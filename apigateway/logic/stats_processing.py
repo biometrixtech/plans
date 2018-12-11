@@ -331,7 +331,7 @@ class StatsProcessing(object):
             body_part_history = list(s for s in soreness_list_10 if s.body_part.location ==
                                      g.location and s.side == g.side and s.pain)
             body_part_history.sort(key=lambda x: x.reported_date_time, reverse=True)
-            severity = 0.0
+
             days_skipped = 0
 
             if historic_soreness.historic_soreness_status == HistoricSorenessStatus.acute_pain:
@@ -346,6 +346,8 @@ class StatsProcessing(object):
                 if ((parse_date(self.event_date) - parse_date(historic_soreness.streak_start_date)).days >= 7
                         and not historic_soreness.ask_acute_pain_question):
                     historic_soreness.historic_soreness_status = HistoricSorenessStatus.persistent_2_pain
+                    historic_soreness.average_severity = self.calc_avg_severity_persistent_2_pain(body_part_history,
+                                                                                                  self.event_date)
                 acute_pain_list.append(historic_soreness)
 
             elif historic_soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_pain:
@@ -357,6 +359,7 @@ class StatsProcessing(object):
                     if len(body_part_history) > 0:
                         historic_soreness.last_reported = body_part_history[0].reported_date_time
 
+                historic_soreness.average_severity = self.calc_avg_severity_persistent_2_pain(body_part_history, self.event_date)
                 acute_pain_list.append(historic_soreness)
 
             else:
@@ -378,26 +381,49 @@ class StatsProcessing(object):
                     if days_skipped > 3 or (days_since_last_report is not None and days_since_last_report > 3):
                         ask_acute_pain_question = True
 
-                    # days_for_severity = (last_reported_date_time - parse_date(streak_start_date)).days
-                    denom_sum = 0
-
-                    last_day_in_streak = body_part_history[0].reported_date_time
-
-                    for b in range(0, streak):
-                        days_difference = (parse_date(last_day_in_streak) - parse_date(body_part_history[b].reported_date_time)).days
-                        severity += (body_part_history[b].severity) * (math.exp(-1.0*days_difference))
-                        denom_sum += math.exp(-1.0*b)
+                    avg_severity = self.calc_avg_severity_acute_pain(body_part_history, streak)
 
                     soreness = HistoricSoreness(g.location, g.side, True)
                     soreness.historic_soreness_status = HistoricSorenessStatus.acute_pain
                     soreness.ask_acute_pain_question = ask_acute_pain_question
-                    soreness.average_severity = severity / float(denom_sum)
+                    soreness.average_severity = avg_severity
                     soreness.last_reported = last_reported_date
                     soreness.streak_start_date = streak_start_date
 
                     acute_pain_list.append(soreness)
 
         return acute_pain_list
+
+    def calc_avg_severity_acute_pain(self, body_part_history, streak):
+        # days_for_severity = (last_reported_date_time - parse_date(streak_start_date)).days
+        denom_sum = 0
+        severity = 0.0
+
+        last_day_in_streak = body_part_history[0].reported_date_time
+        for b in range(0, streak):
+            days_difference = (
+                        parse_date(last_day_in_streak) - parse_date(body_part_history[b].reported_date_time)).days
+            severity += (body_part_history[b].severity) * (math.exp(-1.0 * days_difference))
+            denom_sum += math.exp(-1.0 * b)
+        avg_severity = severity / float(denom_sum)
+
+        return avg_severity
+
+    def calc_avg_severity_persistent_2_pain(self, body_part_history, current_date):
+
+        denom_sum = 0
+        severity = 0.0
+
+        for b in range(0, 11):
+            days_ago = parse_date(current_date) - timedelta(days=b)
+
+            for h in body_part_history:
+                if parse_date(h.reported_date_time) == days_ago:
+                    severity += h.severity * (math.exp(-1.0 * b))
+            denom_sum += math.exp(-1.0 * b)
+        avg_severity = severity / float(denom_sum)
+
+        return avg_severity
 
     def answer_acute_pain_question(self, existing_historic_soreness, body_part_location, side, question_response_date, still_pain):
 
