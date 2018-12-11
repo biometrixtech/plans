@@ -816,3 +816,46 @@ def test_avg_severity_persistent_2_pain_v2():
     avg_severity = stats_processing.calc_avg_severity_persistent_2_pain(soreness_list, "2018-06-01")
 
     assert (3.0 <= avg_severity <= 3.3)
+
+
+def test_avg_severity_persistent_2_pain_2_weeks():
+
+    dates = ["2018-05-12", "2018-05-14", "2018-05-16", "2018-05-18", "2018-05-22", "2018-05-25", "2018-05-26", "2018-05-28"]
+    severity = [2, 1, 2, 4, 3, 3, 4, 2]
+
+    soreness_list = get_soreness_list(BodyPartLocation.achilles, 1, severity, True, dates)
+
+    stats_processing = StatsProcessing("tester", "2018-05-28", DatastoreCollection())
+
+    avg_severity = stats_processing.calc_avg_severity_persistent_2_pain(soreness_list, "2018-05-28")
+
+    assert (2.0 <= avg_severity <= 2.25)
+
+    stats_processing = StatsProcessing("tester", "2018-06-01", DatastoreCollection())
+
+    avg_severity = stats_processing.calc_avg_severity_persistent_2_pain(soreness_list, "2018-06-01")
+
+    # Note: this is a problem.  We are no longer able to "age" the score to zero as it doesn't reconcile with
+    # the other numbers
+    assert (2.0 <= avg_severity <= 2.25)
+
+def test_avg_severity_persistent_2_pain_2_weeks_v2():
+    dates = ["2018-05-12", "2018-05-14", "2018-05-16", "2018-05-18", "2018-05-20", "2018-05-22", "2018-05-25",
+             "2018-05-26", "2018-05-28"]
+    severity = [3, 2, 2, 3, 2, 3, 1, 2, 1]
+
+    soreness_list = get_soreness_list(BodyPartLocation.achilles, 1, severity, True, dates)
+
+    stats_processing = StatsProcessing("tester", "2018-05-28", DatastoreCollection())
+
+    avg_severity = stats_processing.calc_avg_severity_persistent_2_pain(soreness_list, "2018-05-28")
+
+    assert (1.0 <= avg_severity <= 1.25)
+
+    stats_processing = StatsProcessing("tester", "2018-06-01", DatastoreCollection())
+
+    avg_severity = stats_processing.calc_avg_severity_persistent_2_pain(soreness_list, "2018-06-01")
+
+    # Note: this is a problem.  We are no longer able to "age" the score to zero as it doesn't reconcile with
+    # the other numbers
+    assert (1.0 <= avg_severity <= 1.25)
