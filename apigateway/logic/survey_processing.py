@@ -7,7 +7,7 @@ from models.sport import SportName
 
 class SurveyProcessing(object):
 
-    def create_session_from_survey(self, session):
+    def create_session_from_survey(self, session, return_dict=False):
         event_date = parse_datetime(session['event_date'])
         session_type = session['session_type']
         try:
@@ -39,7 +39,10 @@ class SurveyProcessing(object):
                 session_data['event_date'] = format_datetime(event_date - datetime.timedelta(days=1))
             survey.event_date = fix_early_survey_event_date(survey.event_date)
             session_data['post_session_survey'] = survey
-        return self._create_session(session_type, session_data)
+        if return_dict:
+            return session_data
+        else:
+            return self._create_session(session_type, session_data)
 
 
     def _create_session(self, session_type, data):

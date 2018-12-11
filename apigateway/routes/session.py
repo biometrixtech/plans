@@ -9,12 +9,10 @@ from fathomapi.comms.service import Service
 from fathomapi.utils.decorators import require
 from fathomapi.utils.exceptions import InvalidSchemaException, NoSuchEntityException, ForbiddenException
 from fathomapi.utils.xray import xray_recorder
-from models.session import SessionType, SessionFactory, StrengthConditioningType
-from models.post_session_survey import PostSessionSurvey, PostSurvey
+from models.session import SessionType, SessionFactory
 from models.daily_plan import DailyPlan
-from utils import parse_datetime, format_date, format_datetime, fix_early_survey_event_date
+from utils import parse_datetime, format_date, format_datetime
 from config import get_mongo_collection
-from models.sport import SportName
 from logic.survey_processing import SurveyProcessing
 
 app = Blueprint('session', __name__)
@@ -110,51 +108,13 @@ def handle_session_delete(session_id):
 @xray_recorder.capture('routes.session.update')
 def handle_session_update(session_id):
     _validate_schema()
-    event_date = parse_datetime(request.json['event_date'])
-    session_type = request.json['session_type']
     user_id = request.json['user_id']
-    try:
-        sport_name = request.json['sport_name']
-        sport_name = SportName(sport_name)
-    except:
-        sport_name = SportName(None)
-    try:
-        strength_and_conditioning_type = request.json['strength_and_conditioning_type']
-        strength_and_conditioning_type = StrengthConditioningType(strength_and_conditioning_type)
-    except:
-        strength_and_conditioning_type = StrengthConditioningType(None)
-    session_event_date = format_datetime(event_date)
-    plan_event_date = format_date(event_date)
-    duration = request.json.get("duration", None)
-    description = request.json.get('description', "")
-    session_data = {"sport_name": sport_name,
-                    "strength_and_conditioning_type": strength_and_conditioning_type,
-                    "description": description,
-                    "duration_minutes": duration,
-                    "event_date": session_event_date}
+    session_data = SurveyProcessing().create_session_from_survey(request.json, return_dict=True)
+    plan_event_date = format_date(session_data['event_date'])
+    session_type = request.json['session_type']
 
     if not _check_plan_exists(user_id, plan_event_date):
         raise NoSuchEntityException("Plan does not exist for the user to update session")
-    if 'post_session_survey' in request.json:
-        survey = PostSurvey(event_date=request.json['post_session_survey']['event_date'],
-                            survey=request.json['post_session_survey']
-                            )
-        if survey.event_date.hour < 3:
-            survey.event_date = datetime.datetime(
-                                        year=survey.event_date.year, 
-                                        month=survey.event_date.month,
-                                        day=survey.event_date.day - 1,
-                                        hour=23,
-                                        minute=59,
-                                        second=59
-                                        )
-            plan_event_date = format_date(event_date - datetime.timedelta(days=1))
-            # TODO: if the frontend error is fixed, this needs to be removed
-            if event_date.hour >= 3:
-                session_data["event_date"] = format_datetime(parse_datetime(session_data["event_date"]) - datetime.timedelta(days=1))
-
-        session_data['post_session_survey'] = survey.json_serialise()
-
     store = SessionDatastore()
     session_obj = store.get(user_id=user_id, 
                             event_date=plan_event_date,
@@ -164,10 +124,10 @@ def handle_session_update(session_id):
         raise ForbiddenException("Cannot modify a Session that's already logged")
     else:
         if session_type != session_obj.session_type().value:
-            session_data = session_obj.json_serialise()
-            session_data['id'] = session_data['session_id']
-            del session_data['session_type'], session_data['session_id']
-            session_obj = _create_session(session_type, session_data)
+            session_data_existing = session_obj.json_serialise()
+            session_data_existing['id'] = session_data_existing['session_id']
+            del session_data_existing['session_type'], session_data_existing['session_id']
+            session_obj = _create_session(session_type, session_data_existing)
         _update_session(session_obj, session_data)
         store.update(session_obj,
                      user_id=user_id,

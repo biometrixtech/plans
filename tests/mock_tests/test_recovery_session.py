@@ -10,6 +10,7 @@ from tests.mocks.mock_completed_exercise_datastore import CompletedExerciseDatas
 from tests.mocks.mock_datastore_collection import DatastoreCollection
 from tests.testing_utilities import TestUtilities
 from models.post_session_survey import PostSessionSurvey
+from models.daily_plan import DailyPlan
 
 
 def training_plan_manager():
@@ -66,7 +67,73 @@ def test_one_survey_available_wrong_date_format():
     assert True is surveys_today
 
 
+def test_no_session_submitted_no_session_planned():
+    user_id = "tester"
 
+    mgr = training_plan_manager()
+    daily_plan = DailyPlan(event_date='2018-12-10')
+    daily_plan.session_from_readiness = False
+    daily_plan.sessions_planned_readiness = False
+    surveys_today = False
+
+    assert mgr.show_post_recovery(surveys_today, daily_plan)
+
+def test_no_session_submitted_session_planned():
+    user_id = "tester"
+
+    mgr = training_plan_manager()
+    daily_plan = DailyPlan(event_date='2018-12-10')
+    daily_plan.session_from_readiness = False
+    daily_plan.sessions_planned_readiness = True
+    surveys_today = False
+
+    assert not mgr.show_post_recovery(surveys_today, daily_plan)
+
+def test_session_submitted_session_planned():
+    user_id = "tester"
+
+    mgr = training_plan_manager()
+    daily_plan = DailyPlan(event_date='2018-12-10')
+    daily_plan.session_from_readiness = True
+    daily_plan.sessions_planned_readiness = True
+    surveys_today = True
+
+    assert not mgr.show_post_recovery(surveys_today, daily_plan)
+
+def test_session_submitted_no_session_planned():
+    user_id = "tester"
+
+    mgr = training_plan_manager()
+    daily_plan = DailyPlan(event_date='2018-12-10')
+    daily_plan.session_from_readiness = True
+    daily_plan.sessions_planned_readiness = False
+    surveys_today = True
+
+    assert mgr.show_post_recovery(surveys_today, daily_plan)
+
+
+def test_readiness_nosession_session_planned_post_sessionpresent():
+    user_id = "tester"
+
+    mgr = training_plan_manager()
+    daily_plan = DailyPlan(event_date='2018-12-10')
+    daily_plan.session_from_readiness = False
+    daily_plan.sessions_planned_readiness = True
+    surveys_today = True
+
+    assert mgr.show_post_recovery(surveys_today, daily_plan)
+
+
+def test_readiness_nosession_nosession_planned_post_sessionpresent():
+    user_id = "tester"
+
+    mgr = training_plan_manager()
+    daily_plan = DailyPlan(event_date='2018-12-10')
+    daily_plan.session_from_readiness = False
+    daily_plan.sessions_planned_readiness = False
+    surveys_today = True
+
+    assert mgr.show_post_recovery(surveys_today, daily_plan)
 
 '''
 def test_get_start_time_from_morning_trigger_recovery_0():
