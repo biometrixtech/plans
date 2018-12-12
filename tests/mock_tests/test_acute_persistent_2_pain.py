@@ -1167,6 +1167,20 @@ def test_avg_severity_persistent_2_pain_corner_case_13():
     assert (2.6 <= avg_severity <= 2.8)
     print(avg_severity)
 
+
+def test_avg_severity_persistent_2_pain_corner_case_14():
+    dates = ["2018-05-15","2018-05-16", "2018-05-17","2018-05-18"]
+    severity = [5, 4, 3, 2]
+
+    soreness_list = get_soreness_list(BodyPartLocation.achilles, 1, severity, True, dates)
+
+    stats_processing = StatsProcessing("tester", "2018-05-21", DatastoreCollection())
+
+    avg_severity = stats_processing.calc_avg_severity_persistent_2_pain(soreness_list, "2018-05-21")
+
+    assert (2.6 <= avg_severity <= 2.8)
+    print(avg_severity)
+
 def test_flag_acute_pain_avg_severity_primary_1():
 
     dates = ["2018-05-12", "2018-05-15", "2018-05-16", "2018-05-18"]
