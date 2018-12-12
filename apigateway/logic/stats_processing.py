@@ -340,8 +340,14 @@ class StatsProcessing(object):
                 if (parse_date(self.event_date) - parse_date(last_reported_date)).days > 3:
                     historic_soreness.ask_acute_pain_question = True
 
-                    if len(body_part_history) > 0:
-                        historic_soreness.last_reported = body_part_history[0].reported_date_time
+                if len(body_part_history) > 0:
+                    historic_soreness.last_reported = body_part_history[0].reported_date_time
+                    streak = 0
+                    for b in body_part_history:
+                        if parse_date(b.reported_date_time) >= parse_date(historic_soreness.streak_start_date):
+                            streak += 1
+                    historic_soreness.streak = streak
+                    historic_soreness.average_severity = self.calc_avg_severity_acute_pain(body_part_history, streak)
 
                 if ((parse_date(self.event_date) - parse_date(historic_soreness.streak_start_date)).days >= 7
                         and not historic_soreness.ask_acute_pain_question):
