@@ -124,3 +124,17 @@ def handle_data_migration():
     mongo_collection.update_many(query, {'$set': {'userId': user_id}})
 
     return {'message': 'success'}, 202
+
+
+@app.route('/app_logs', methods=['POST'])
+@require.authenticated.any
+@xray_recorder.capture('routes.misc.app_logs')
+def handle_app_open_tracking(principal_id=None):
+    event_date = request.json['event_date']
+    mongo_collection = get_mongo_collection('applogs')
+    user = {"user_id": principal_id,
+            "event_date": event_date}
+    mongo_collection.replace_one(user, user, upsert=True)
+
+
+
