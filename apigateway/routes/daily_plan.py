@@ -21,14 +21,13 @@ def handle_daily_plan_get():
     event_date = request.json.get('event_date', format_datetime(datetime.datetime.utcnow()))
     event_date = parse_datetime(event_date)
 
-
     start_date = request.json['start_date']
     if 'end_date' in request.json:
         end_date = request.json['end_date']
     else:
         start_date = format_date(event_date)
         end_date = start_date
-
+    print(event_date, start_date, end_date)
     store = DailyPlanDatastore()
     items = store.get(user_id, start_date, end_date)
     daily_plans = []
