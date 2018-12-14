@@ -47,6 +47,16 @@ def test_get_daily_plan_many():
     plans = athlete_dao.get("02cb7965-7921-493a-80d4-6b278c928fad","2018-06-01","2018-08-13")
     assert None is not plans
 
+def test_get_daily_plan_users_list():
+    athlete_dao = DailyPlanDatastore()
+    plans = athlete_dao.get(["02cb7965-7921-493a-80d4-6b278c928fad"],"2018-06-01","2018-08-13")
+    assert None is not plans
+
+def test_get_daily_plan_users_list_no_plans():
+    athlete_dao = DailyPlanDatastore()
+    plans = athlete_dao.get(["02cb7965"],"2018-06-01","2018-08-13")
+    assert None is not plans
+    assert plans == []
 
 def test_get_daily_plan_doesnt_exist():
     athlete_dao = DailyPlanDatastore()

@@ -5,6 +5,7 @@ from fathomapi.utils.exceptions import NoSuchEntityException, ForbiddenException
 from flask import Blueprint
 from datastores.datastore_collection import DatastoreCollection
 from models.dashboard import TeamDashboardData, AthleteDashboardData
+from utils import format_date
 import datetime
 
 
@@ -41,6 +42,7 @@ def get_dashboard_data(coach_id):
                                     )
         athlete_stats_datastore = DatastoreCollection().athlete_stats_datastore
         daily_readiness_datastore = DatastoreCollection().daily_readiness_datastore
+        daily_plan_datastore = DatastoreCollection().daily_plan_datastore
         teams = []
         for team_id in team_ids:
             try:
@@ -55,7 +57,10 @@ def get_dashboard_data(coach_id):
                                                                       start_date=start_time,
                                                                       end_date=end_time,
                                                                       last_only=False)
-                team.get_compliance_data(user_ids, users, readiness_survey_list)
+                daily_plan_list = daily_plan_datastore.get(user_ids,
+                                                           start_date=format_date(current_time),
+                                                           end_date=format_date(current_time))
+                team.get_compliance_data(user_ids, users, readiness_survey_list, daily_plan_list)
                 athlete_stats_list = athlete_stats_datastore.get(user_ids)
 
                 for athlete_stats in athlete_stats_list:
