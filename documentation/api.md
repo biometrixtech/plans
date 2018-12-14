@@ -36,6 +36,7 @@
       - [Get dashboard data for all users](#get-dashboard-data-for-all-users)
     - [Misc](#misc)
       - [Clear user's data](#clear-users-data)
+      - [Log App/Device information](#log-appdevice-information)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -1158,6 +1159,51 @@ Authorization: eyJraWQ...ajBc4VQ
 ```
 ##### Responses
  If clearing data was successful, the Service __will__ respond with HTTP Status `200 OK`, with a body with the following syntax:
+ 
+```
+{
+    "message": "success"
+}
+```
+
+#### Log App/Device information
+This endpoingt can be used to log relevant device/app information and usage
+
+##### Query String
+The client __must__ submit a request to the endpoint `/plans/version/misc/app_logs`. The request method __must__ be `POST`.
+
+##### Request
+The client __must__ submit a request body containing a JSON object with the following schema:
+```
+{
+    "event_date": Datetime,
+    "os_name": string,
+    "os_version": string,
+    "app_version": string
+
+}
+```
+* `event_date` __should__ reflect the local date and time when the request was made
+* `os_name` __should__ be the os name (Android/iOS)
+* `os_version` __should__ be the version of os running on the device
+* `app_version` __should__ be the version of app installed
+
+
+```
+POST /plans/version/misc/app_logs HTTPS/1.1
+Host: apis.env.fathomai.com
+Content-Type: application/json
+Authorization: eyJraWQ...ajBc4VQ
+
+{
+    "event_date": "2018-12-13T18:19:50Z",
+    "os_name": Android,
+    "os_version": "8.1.0",
+    "app_version": "2.2.9"
+}
+```
+##### Responses
+ If the request was successful, the Service __will__ respond with HTTP Status `200 OK`, with a body with the following syntax:
  
 ```
 {
