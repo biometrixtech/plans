@@ -441,7 +441,7 @@ class StatsProcessing(object):
                             streak += 1
 
                 if streak >= 3:  # check for acute pain FIRST
-                    if days_skipped > 3 or (days_since_last_report is not None and days_since_last_report > 3):
+                    if days_since_last_report is not None and days_since_last_report > 3:
                         ask_acute_pain_question = True
 
                     avg_severity = self.calc_avg_severity_acute_pain(body_part_history, streak)
