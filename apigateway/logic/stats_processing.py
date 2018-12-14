@@ -401,6 +401,22 @@ class StatsProcessing(object):
                     if len(body_part_history) > 0:
                         historic_soreness.last_reported = body_part_history[0].reported_date_time
 
+                for b in range(0, len(body_part_history)):
+
+                    days_diff = (parse_date(self.event_date) - parse_date(body_part_history[b].reported_date_time)).days
+
+                    if days_diff <= 14:
+                        last_fourteen_day_count += 1
+                    if days_diff <= 10:
+                        last_ten_day_count += 1
+                    if 5 <= days_diff <= 14:
+                        last_five_fourteen_day_count += 1
+
+                if last_ten_day_count >=4:
+                    historic_soreness.historic_soreness_status = HistoricSorenessStatus.persistent_2_pain
+                    historic_soreness.ask_acute_pain_question = False
+                    historic_soreness.ask_persistent_2_pain_question = False
+
                 historic_soreness.average_severity = self.calc_avg_severity_persistent_2_pain(body_part_history, self.event_date)
                 acute_pain_list.append(historic_soreness)
 
