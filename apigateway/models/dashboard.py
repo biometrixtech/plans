@@ -23,11 +23,23 @@ class TeamDashboardData(Serialisable):
                 }
         return ret
 
-    def get_compliance_data(self, user_ids, users, readiness_survey_list):
+    def get_compliance_data(self, user_ids, users, readiness_survey_list, daily_plan_list):
         completed_users = [survey.user_id for survey in readiness_survey_list]
         self.compliance['completed'] = [users[user_id] for user_id in user_ids if user_id in completed_users]
         self.compliance['incomplete'] = [users[user_id] for user_id in user_ids if user_id not in completed_users]
-
+        training_compliance = TrainingCompliance()
+        training_compliance.no_response = []
+        training_compliance.no_response.extend(self.compliance['incomplete'])
+        for plan in daily_plan_list:
+            if plan.daily_readiness_survey_completed():
+                if not plan.sessions_planned:
+                    training_compliance.rest_day.append(users[plan.user_id])
+                else:
+                    if len(plan.training_sessions) == 0:
+                        training_compliance.no_response.append(users[plan.user_id])
+                    else:
+                        training_compliance.sessions_logged.append(users[plan.user_id])
+        self.compliance['training_compliance'] = training_compliance.json_serialise()
 
     def insert_user(self, athlete):
         athlete_summary = AthleteDashboardSummary(athlete.user_id, athlete.first_name, athlete.last_name)
@@ -39,7 +51,7 @@ class TeamDashboardData(Serialisable):
             if WeeklyHighLevelInsight.evaluate_health_status in athlete.weekly_insights:
                 self.weekly_insights.evaluate_health_status.append(athlete_summary)
         else:
-            # grpup athletes into daily_insight bins
+            # group athletes into daily_insight bins
             if len(athlete.daily_insights) == 0:
                 self.daily_insights.all_good.append(athlete_summary)
             else:
@@ -61,6 +73,19 @@ class TeamDashboardData(Serialisable):
                 elif insight == WeeklyHighLevelInsight.address_pain_or_soreness:
                     self.weekly_insights.address_pain_or_soreness.append(athlete_summary)
 
+
+class TrainingCompliance(Serialisable):
+    def __init__(self):
+        self.no_response = []
+        self.rest_day = []
+        self.sessions_logged = []
+
+    def json_serialise(self):
+        ret = {"no_response": self.no_response,
+               "rest_day": self.rest_day,
+               "sessions_logged": self.sessions_logged
+              }
+        return ret
 
 class DailySummary(Serialisable):
     def __init__(self):

@@ -25,10 +25,16 @@ class DailyPlanDatastore(object):
     def _query_mongodb(self, user_id, start_date, end_date, day_of_week):
         mongo_collection = get_mongo_collection(self.mongo_collection)
         if day_of_week is None:
-            query0 = {'user_id': user_id, 'date': {'$gte': start_date, '$lte': end_date}}
+            if isinstance(user_id, list):
+                query0 = {'user_id': {'$in': user_id}, 'date': {'$gte': start_date, '$lte': end_date}}
+            else:
+                query0 = {'user_id': user_id, 'date': {'$gte': start_date, '$lte': end_date}}
             # query1 = {'_id': 0, 'last_reported': 0, 'user_id': 0}
         else:
-            query0 = {'user_id': user_id, 'date': {'$gte': start_date, '$lte': end_date}, 'day_of_week': day_of_week}
+            if isinstance(user_id, list):
+                query0 = {'user_id': {'$in': user_id}, 'date': {'$gte': start_date, '$lte': end_date}, 'day_of_week': day_of_week}
+            else:
+                query0 = {'user_id': user_id, 'date': {'$gte': start_date, '$lte': end_date}, 'day_of_week': day_of_week}
         mongo_cursor = mongo_collection.find(query0)
         ret = []
 
@@ -74,7 +80,7 @@ class DailyPlanDatastore(object):
             daily_plan.sessions_planned_readiness = plan.get('sessions_planned_readiness', True)
             ret.append(daily_plan)
 
-        if len(ret) == 0:
+        if len(ret) == 0 and not isinstance(user_id, list):
             plan = DailyPlan(event_date=end_date)
             plan.user_id = user_id
             plan.last_sensor_sync = self.get_last_sensor_sync(user_id, end_date)
