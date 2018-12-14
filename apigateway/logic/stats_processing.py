@@ -362,21 +362,16 @@ class StatsProcessing(object):
             elif historic_soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_pain:
                 if len(body_part_history) > 0:
                     last_reported_date = max(historic_soreness.last_reported, body_part_history[0].reported_date_time)
-                if (parse_date(self.event_date) - parse_date(last_reported_date)).days > 10:
-                    historic_soreness.ask_persistent_2_pain_question = True
-
-                    if len(body_part_history) > 0:
-                        historic_soreness.last_reported = body_part_history[0].reported_date_time
-
-                # adding in autodowngrade to persistent_pain
 
                 for b in range(0, len(body_part_history)):
 
-                    if (parse_date(self.event_date) - parse_date(body_part_history[b].reported_date_time)).days <= 14:
+                    days_diff = (parse_date(self.event_date) - parse_date(body_part_history[b].reported_date_time)).days
+
+                    if days_diff <= 14:
                         last_fourteen_day_count += 1
-                    if (parse_date(self.event_date) - parse_date(body_part_history[b].reported_date_time)).days <= 10:
+                    if days_diff <= 10:
                         last_ten_day_count += 1
-                    if 5 <= (parse_date(self.event_date) - parse_date(body_part_history[b].reported_date_time)).days <= 14:
+                    if 5 <= days_diff <= 14:
                         last_five_fourteen_day_count += 1
 
                 if last_fourteen_day_count == 0:
@@ -385,6 +380,7 @@ class StatsProcessing(object):
                     historic_soreness.ask_persistent_2_pain_question = True
                     historic_soreness.last_reported = last_reported_date
                     historic_soreness.streak_start_date = None
+
                 elif last_ten_day_count <= 4 and len(body_part_history) >= 8:  # is it persistent pain?
 
                     if last_five_fourteen_day_count <= 4 and body_part_history[0].reported_date_time == self.event_date:

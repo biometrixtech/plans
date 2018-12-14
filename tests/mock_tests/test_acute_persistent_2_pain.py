@@ -382,7 +382,8 @@ def test_perisistent_2_pain_ask_persistent_2_Q3():
     assert (HistoricSorenessStatus.persistent_2_pain is historic_soreness[0].historic_soreness_status)
     assert(False is historic_soreness[0].ask_persistent_2_pain_question)
 
-    historic_soreness = get_historic_soreness(extend_with_nones([1, None, 2, None, 3, None, 2, None, None, None, 3, None, None, 3,3, None, 2], 11), "2018-06-08",
+    #put in 15 days because it will process on the next day at 1am to prompt the question that day (with 14 non-report days
+    historic_soreness = get_historic_soreness(extend_with_nones([1, None, 2, None, 3, None, 2, None, None, None, 3, None, None, 3,3, None, 2], 15), "2018-06-08",
                                               historic_soreness)
 
     assert(True is historic_soreness[0].ask_persistent_2_pain_question)
@@ -394,6 +395,11 @@ def test_perisistent_pain_2_auto_downgrade_persistent():
     historic_soreness = get_historic_soreness([1, None, 2, None, 3], "2018-05-16")
 
     assert (HistoricSorenessStatus.acute_pain is historic_soreness[0].historic_soreness_status)
+
+    historic_soreness = get_historic_soreness([1, None, 2, None, 3, None, 2, None, 3], "2018-05-20",
+                                              historic_soreness)
+
+    assert (HistoricSorenessStatus.persistent_2_pain is historic_soreness[0].historic_soreness_status)
 
     historic_soreness = get_historic_soreness([1, None, 2, None, 3, None, 2, None, 3, None], "2018-05-21",
                                               historic_soreness)
@@ -407,3 +413,7 @@ def test_perisistent_pain_2_auto_downgrade_persistent():
     assert (HistoricSorenessStatus.persistent_pain is historic_soreness[0].historic_soreness_status)
     assert (False is historic_soreness[0].ask_persistent_2_pain_question)
 
+def test_persistent_pain_flagged_from_reporting():
+
+    historic_soreness = get_historic_soreness([1, None, None, 2, None, None, 3, None, None, 2, None, 3, None, None, 2, None, None, None, 3, None, None, 2, None, None, None], "2018-05-21")
+    assert (HistoricSorenessStatus.persistent_pain is historic_soreness[0].historic_soreness_status)
