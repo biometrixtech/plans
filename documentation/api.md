@@ -36,6 +36,7 @@
       - [Get dashboard data for all users](#get-dashboard-data-for-all-users)
     - [Misc](#misc)
       - [Clear user's data](#clear-users-data)
+      - [Log App/Device information](#log-appdevice-information)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -1166,7 +1167,7 @@ Authorization: eyJraWQ...ajBc4VQ
 ```
 
 #### Log App/Device information
-This endpoing can be used to log relevant device/app information and usage
+This endpoingt can be used to log relevant device/app information and usage
 
 ##### Query String
 The client __must__ submit a request to the endpoint `/plans/version/misc/app_logs`. The request method __must__ be `POST`.
