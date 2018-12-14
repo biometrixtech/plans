@@ -438,7 +438,7 @@ def test_persistent_pain_upgraded_to_persistent_2():
     assert (False is historic_soreness[0].ask_persistent_2_pain_question)
 
 
-def test_persistent_2_without_acute():
+def test_persistent_2_upgraded_from_acute():
 
     historic_soreness = get_historic_soreness(
         [None, None, 3, None, None, None, 3, None, None, None, 3, None,
