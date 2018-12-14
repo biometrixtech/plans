@@ -27,7 +27,6 @@ def handle_daily_plan_get():
     else:
         start_date = format_date(event_date)
         end_date = start_date
-    print(event_date, start_date, end_date)
     store = DailyPlanDatastore()
     items = store.get(user_id, start_date, end_date)
     daily_plans = []

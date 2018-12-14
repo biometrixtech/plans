@@ -80,7 +80,6 @@ def manage_athlete_push_notification(athlete_id):
         event_date = format_date(datetime.datetime.now())
         stats_update_time = event_date + 'T03:00:00Z'
         trigger_event_date = _randomize_trigger_time(stats_update_time, 60, minute_offset)
-        print(trigger_event_date)
 
         Service('plans', Config.get('API_VERSION')).call_apigateway_async(method='POST',
                                                                           endpoint=f"athlete/{athlete_id}/stats",
@@ -131,7 +130,6 @@ def _schedule_notifications(athlete_id):
                                         endpoint=f"athlete/{athlete_id}/send_recovery_notification",
                                         body=body,
                                         execute_at=recovery_event_date)
-    print(readiness_event_date, prep_event_date, recovery_event_date)
 
 
 @app.route('/<uuid:athlete_id>/send_daily_readiness_notification', methods=['POST'])
