@@ -14,6 +14,11 @@ def test_format_date_before_3_am():
     event_date = datetime.datetime(2018, 11, 30, 1, 30, 30)
     assert format_date(event_date) == '2018-11-29'
 
+
+def test_format_date_parse_date():
+    event_date = parse_date('2018-11-30')
+    assert format_date(event_date) == '2018-11-30'
+
 def test_format_date_none():
     assert format_date(None) == None
 

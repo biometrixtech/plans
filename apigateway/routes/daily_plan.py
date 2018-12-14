@@ -26,15 +26,7 @@ def handle_daily_plan_get():
     if 'end_date' in request.json:
         end_date = request.json['end_date']
     else:
-        cutoff_time = datetime.datetime(
-                            year=event_date.year, 
-                            month=event_date.month,
-                            day=event_date.day,
-                            hour=3
-                            )
-        if event_date < cutoff_time:
-            start_date = datetime.datetime.strptime(start_date, "%Y-%m-%d") - datetime.timedelta(days=1)
-            start_date = format_date(start_date)
+        start_date = format_date(event_date)
         end_date = start_date
 
     store = DailyPlanDatastore()

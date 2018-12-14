@@ -17,7 +17,7 @@ def format_date(date_input):
     if date_input is None:
         return None
     if isinstance(date_input, datetime.datetime):
-        if date_input.hour < 3:
+        if date_input.hour < 3 and date_input.hour != 0 and date_input.minute !=0 and date_input.second !=0 :
             date_input = date_input - datetime.timedelta(days=1)
         return date_input.strftime("%Y-%m-%d")
     elif isinstance(date_input, datetime.date):
