@@ -135,11 +135,10 @@ def handle_app_open_tracking(principal_id=None):
     event_date = request.json['event_date']
     mongo_collection = get_mongo_collection('applogs')
     log = AppLogs(principal_id, event_date)
-    log.device_type = request.json.get('device_type', None)
-    log.device_version = request.json.get('device_version', None)
+    log.os_name = request.json.get('os_name', None)
+    log.os_version = request.json.get('os_version', None)
     log.app_version = request.json.get('app_version', None)
-    log.users_api_version = request.json.get('users_api_version', None)
-    log.plans_api_version = request.json.get('plans_api_version', None)
+    log.plans_api_version = Config.get('API_VERSION')
 
     mongo_collection.replace_one(log.get_filter_condition(), log.json_serialise(), upsert=True)
 
