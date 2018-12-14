@@ -77,10 +77,15 @@ def manage_athlete_push_notification(athlete_id):
     # Make sure stats are consistent
     try:
         minute_offset = _get_offset()
-        event_date = format_date(datetime.datetime.now() + datetime.timedelta(minutes=minute_offset))
+        event_date = format_date(datetime.datetime.now())
+        stats_update_time = event_date + 'T03:00:00Z'
+        trigger_event_date = _randomize_trigger_time(stats_update_time, 60, minute_offset)
+        print(trigger_event_date)
+
         Service('plans', Config.get('API_VERSION')).call_apigateway_async(method='POST',
                                                                           endpoint=f"athlete/{athlete_id}/stats",
-                                                                          body={"event_date": event_date})
+                                                                          body={"event_date": event_date},
+                                                                          execute_at=trigger_event_date)
     except:
         pass
     if not _is_athlete_active(athlete_id):
@@ -107,7 +112,7 @@ def _schedule_notifications(athlete_id):
 
     # schedule readiness PN check
     readiness_start = trigger_event_date + 'T10:00:00Z'
-    readiness_event_date = _randomize_trigger_time(readiness_start, 60, minute_offset)
+    readiness_event_date = _randomize_trigger_time(readiness_start, 60*60, minute_offset)
     plans_service.call_apigateway_async(method='POST',
                                         endpoint=f"athlete/{athlete_id}/send_daily_readiness_notification",
                                         body=body,
@@ -115,8 +120,8 @@ def _schedule_notifications(athlete_id):
 
     # schedule prep and recovery PN check
     prep_rec_start = trigger_event_date + 'T18:00:00Z'
-    prep_event_date = _randomize_trigger_time(prep_rec_start, 210, minute_offset)
-    recovery_event_date = _randomize_trigger_time(prep_rec_start, 210, minute_offset)
+    prep_event_date = _randomize_trigger_time(prep_rec_start, 210*60, minute_offset)
+    recovery_event_date = _randomize_trigger_time(prep_rec_start, 210*60, minute_offset)
 
     plans_service.call_apigateway_async(method='POST',
                                         endpoint=f"athlete/{athlete_id}/send_active_prep_notification",
@@ -133,7 +138,7 @@ def _schedule_notifications(athlete_id):
 @require.authenticated.service
 @xray_recorder.capture('routes.athlete.readiness_pn')
 def manage_readiness_push_notification(athlete_id):
-    event_date = format_date(parse_date(request.json['event_date']))
+    event_date = request.json['event_date']
     plan = _get_plan(athlete_id, event_date)
     if not plan or not plan.daily_readiness_survey_completed():
         body = {"message": "Good morning, {first_name}. Let’s make the most of your day! Tap to get started.",
@@ -148,7 +153,7 @@ def manage_readiness_push_notification(athlete_id):
 @require.authenticated.service
 @xray_recorder.capture('routes.athlete.prep_pn')
 def manage_prep_push_notification(athlete_id):
-    event_date = format_date(parse_date(request.json['event_date']))
+    event_date = request.json['event_date']
     plan = _get_plan(athlete_id, event_date)
     if plan and not plan.pre_recovery_completed and plan.pre_recovery.start_date is None and plan.pre_recovery.impact_score >= 3 and _are_exercises_assigned(plan.pre_recovery) and plan.post_recovery.goal_text == "":
         body = {"message": "Your prep exercises are ready! Tap to to get started!",
@@ -163,7 +168,7 @@ def manage_prep_push_notification(athlete_id):
 @require.authenticated.service
 @xray_recorder.capture('routes.athlete.recovery_pn')
 def manage_recovery_push_notification(athlete_id):
-    event_date = format_date(parse_date(request.json['event_date']))
+    event_date = request.json['event_date']
     plan = _get_plan(athlete_id, event_date)
     if plan and not plan.post_recovery_completed and plan.post_recovery.start_date is None and plan.post_recovery.impact_score >= 3 and _are_exercises_assigned(plan.post_recovery):
         body = {"message": "Your recovery exercises are ready! Tap to begin taking care!",
@@ -209,7 +214,7 @@ def schedule_recovery_completion_push_notification(athlete_id):
 @xray_recorder.capture('routes.athlete.completion_pn')
 def manage_recovery_completion_push_notification(athlete_id):
     recovery_type = request.json['recovery_type']
-    event_date = format_date(parse_date(request.json['event_date']))
+    event_date = request.json['event_date']
     plan = _get_plan(athlete_id, event_date)
     if recovery_type=='prep' and plan and plan.pre_recovery.start_date is not None and not plan.pre_recovery_completed and plan.post_recovery.goal_text == "":
         body = {"message": "Take time to invest in yourself. Let's finish your exercises!",
@@ -255,7 +260,7 @@ def _notify_user(athlete_id, body):
 
 def _randomize_trigger_time(start_time, window, tz_offset):
     offset_from_start = random.randint(0, window)
-    local_date = parse_datetime(start_time) + datetime.timedelta(minutes=offset_from_start)
+    local_date = parse_datetime(start_time) + datetime.timedelta(seconds=offset_from_start)
     utc_date = local_date - datetime.timedelta(minutes=tz_offset)
     return utc_date
 
