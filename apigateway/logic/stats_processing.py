@@ -469,7 +469,7 @@ class StatsProcessing(object):
 
                     acute_pain_list.append(soreness)
 
-                elif last_ten_day_count <= 4 and len(body_part_history) >= 5:  # is it persistent pain?
+                elif last_ten_day_count <= 4 and len(body_part_history) >= 5:  # is it persistent?
 
                     avg_severity = self.calc_avg_severity_persistent_2(body_part_history, self.event_date)
 
@@ -486,7 +486,7 @@ class StatsProcessing(object):
 
                     acute_pain_list.append(soreness)
 
-                elif len(body_part_history) >= 8 and last_ten_day_count > 4:  # will we ever even get here?
+                elif len(body_part_history) >= 5 and last_ten_day_count > 4:  # will we ever even get here?
 
                     avg_severity = self.calc_avg_severity_persistent_2(body_part_history, self.event_date)
 
