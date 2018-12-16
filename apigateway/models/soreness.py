@@ -158,7 +158,7 @@ class HistoricSoreness(Serialisable):
         self.average_severity = 0.0
         self.last_reported = ""
         self.ask_acute_pain_question = False
-        self.ask_persistent_2_pain_question = False
+        self.ask_persistent_2_question = False
 
     def json_serialise(self):
         ret = {
@@ -171,7 +171,7 @@ class HistoricSoreness(Serialisable):
             'average_severity': self.average_severity,
             'last_reported': self.last_reported,
             'ask_acute_pain_question': self.ask_acute_pain_question,
-            'ask_persistent_2_pain_question': self.ask_persistent_2_pain_question
+            'ask_persistent_2_question': self.ask_persistent_2_question
         }
         return ret
 
