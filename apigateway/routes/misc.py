@@ -9,6 +9,8 @@ from fathomapi.utils.decorators import require
 from fathomapi.utils.exceptions import ForbiddenException
 from fathomapi.utils.xray import xray_recorder
 
+from models.app_logs import AppLogs
+
 app = Blueprint('misc', __name__)
 USERS_API_VERSION = '2_0'
 
@@ -124,3 +126,23 @@ def handle_data_migration():
     mongo_collection.update_many(query, {'$set': {'userId': user_id}})
 
     return {'message': 'success'}, 202
+
+
+@app.route('/app_logs', methods=['POST'])
+@require.authenticated.any
+@xray_recorder.capture('routes.misc.app_logs')
+def handle_app_open_tracking(principal_id=None):
+    event_date = request.json['event_date']
+    mongo_collection = get_mongo_collection('applogs')
+    log = AppLogs(principal_id, event_date)
+    log.os_name = request.json.get('os_name', None)
+    log.os_version = request.json.get('os_version', None)
+    log.app_version = request.json.get('app_version', None)
+    log.plans_api_version = Config.get('API_VERSION')
+
+    mongo_collection.replace_one(log.get_filter_condition(), log.json_serialise(), upsert=True)
+
+    return {'message': 'success'}, 200
+
+
+

@@ -4,7 +4,8 @@ from fathomapi.utils.xray import xray_recorder
 from fathomapi.utils.exceptions import NoSuchEntityException, ForbiddenException
 from flask import Blueprint
 from datastores.datastore_collection import DatastoreCollection
-from models.dashboard import TeamDashboardData, AthleteDashboardData, AthleteDashboardSummary
+from models.dashboard import TeamDashboardData, AthleteDashboardData
+from utils import format_date
 import datetime
 
 
@@ -18,29 +19,16 @@ USERS_API_VERSION = '2_1'
 def get_dashboard_data(coach_id):
     try:
         team_ids, tz = _get_teams(coach_id)
+    except NoSuchEntityException as e:
+        raise e
     except:
         return {'message': 'Could not get the teams associated with the user'}, 500
     else:
         minute_offset = _get_offset(tz)
         current_time = datetime.datetime.now() + datetime.timedelta(minutes=minute_offset)
-        start_time = datetime.datetime(
-                                       year=current_time.year, 
-                                       month=current_time.month,
-                                       day=current_time.day,
-                                       hour=3,
-                                       minute=0,
-                                       second=0
-                                      )
-        end_time = datetime.datetime(
-                                     year=current_time.year, 
-                                     month=current_time.month,
-                                     day=current_time.day,
-                                     hour=23,
-                                     minute=59,
-                                     second=59
-                                    )
+
         athlete_stats_datastore = DatastoreCollection().athlete_stats_datastore
-        daily_readiness_datastore = DatastoreCollection().daily_readiness_datastore
+        daily_plan_datastore = DatastoreCollection().daily_plan_datastore
         teams = []
         for team_id in team_ids:
             try:
@@ -51,11 +39,10 @@ def get_dashboard_data(coach_id):
                 return {'message': 'Error Getting users for the team'}, 500
             else:
                 team = TeamDashboardData(team_name)
-                readiness_survey_list = daily_readiness_datastore.get(user_ids,
-                                                                      start_date=start_time,
-                                                                      end_date=end_time,
-                                                                      last_only=False)
-                team.get_compliance_data(user_ids, users, readiness_survey_list)
+                daily_plan_list = daily_plan_datastore.get(user_ids,
+                                                           start_date=format_date(current_time),
+                                                           end_date=format_date(current_time))
+                team.get_compliance_data(user_ids, users, daily_plan_list)
                 athlete_stats_list = athlete_stats_datastore.get(user_ids)
 
                 for athlete_stats in athlete_stats_list:
