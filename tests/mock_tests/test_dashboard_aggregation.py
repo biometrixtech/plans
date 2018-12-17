@@ -229,18 +229,14 @@ def test_compliance_grouping():
                           "first_name": "user"+user_id,
                           "last_name": "last_name"
                           }
-    readiness_survey_list = [DailyReadiness("2018-11-30T10:00:00Z", "1", [], 5, 7),
-                             DailyReadiness("2018-11-30T10:00:00Z", "2", [], 5, 7),
-                             DailyReadiness("2018-11-30T10:00:00Z", "3", [], 5, 7)]
 
     daily_plan_list = [create_plan("1", "2018-11-30", True, []),
                        create_plan("2", "2018-11-30", True, ["session1", "session2"]),
                        create_plan("3", "2018-11-30", False, []),
                        create_plan("4", None, True, ["sensor_data"])]
     team = TeamDashboardData("Fathom Team")
-    team.get_compliance_data(user_ids, users, readiness_survey_list, daily_plan_list)
+    team.get_compliance_data(user_ids, users, daily_plan_list)
 
-    print(team.compliance)
     assert len(team.compliance["completed"]) == 3
     assert len(team.compliance["incomplete"]) == 2
     assert len(team.compliance["training_compliance"]["no_response"]) == 3
