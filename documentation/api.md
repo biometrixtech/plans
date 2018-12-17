@@ -1073,10 +1073,19 @@ where team has the following schema
 ```
 {
     "completed": [user, user],
-    "incomplete": [user, user]
+    "incomplete": [user, user],
+    "training_compliance": training_compliance
 }
 ```
-where user will have the following schema
+* `training_compliance` will have the following schema
+```
+{
+  "no_response": [user, user, user],
+  "rest_day": [user, user],
+  "sessions_logged": [user, user]
+}
+```
+where `user` will have the following schema
 ```
 {
     "user_id": Uuid,
