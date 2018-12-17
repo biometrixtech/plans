@@ -403,7 +403,9 @@ class StatsProcessing(object):
                 acute_pain_list.append(historic_soreness)
 
             elif (historic_soreness.historic_soreness_status == HistoricSorenessStatus.persistent_pain or
-                    historic_soreness.historic_soreness_status == HistoricSorenessStatus.persistent_soreness):
+                    historic_soreness.historic_soreness_status == HistoricSorenessStatus.persistent_soreness or
+                  historic_soreness.historic_soreness_status == HistoricSorenessStatus.almost_persistent_2_pain or
+                  historic_soreness.historic_soreness_status == HistoricSorenessStatus.almost_persistent_2_soreness):
 
                 if len(body_part_history) > 0:
                     last_reported_date = max(historic_soreness.last_reported, body_part_history[0].reported_date_time)
