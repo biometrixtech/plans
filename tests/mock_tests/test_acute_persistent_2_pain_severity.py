@@ -28,7 +28,7 @@ def test_flag_acute_pain_3_days_severity_1():
 
     stats_processing = StatsProcessing("tester", "2018-05-14", DatastoreCollection())
 
-    historic_soreness = stats_processing.get_historic_soreness_list([],soreness_list,  [],[], [])
+    historic_soreness = stats_processing.get_historic_soreness_list(soreness_list)
 
     assert (1.7 <= historic_soreness[0].average_severity <= 1.9)
 
@@ -42,7 +42,7 @@ def test_flag_acute_pain_3_days_severity_2():
 
     stats_processing = StatsProcessing("tester", "2018-05-14", DatastoreCollection())
 
-    historic_soreness = stats_processing.get_historic_soreness_list([],soreness_list,  [],[], [])
+    historic_soreness = stats_processing.get_historic_soreness_list(soreness_list)
 
     assert (3.1 <= historic_soreness[0].average_severity <= 3.4)
 
@@ -528,7 +528,7 @@ def test_flag_acute_pain_avg_severity_primary_1():
 
     stats_processing = StatsProcessing("tester", "2018-05-18", DatastoreCollection())
 
-    historic_soreness = stats_processing.get_historic_soreness_list([],soreness_list,  [],[], [])
+    historic_soreness = stats_processing.get_historic_soreness_list(soreness_list)
 
     assert (2.1 <= historic_soreness[0].average_severity <= 2.4)
 
@@ -542,7 +542,7 @@ def test_flag_acute_pain_avg_severity_primary_2():
 
     stats_processing = StatsProcessing("tester", "2018-05-18", DatastoreCollection())
 
-    historic_soreness = stats_processing.get_historic_soreness_list([],soreness_list,  [],[], [])
+    historic_soreness = stats_processing.get_historic_soreness_list(soreness_list)
 
     assert (3.6 <= historic_soreness[0].average_severity <= 3.8)
 
@@ -557,7 +557,7 @@ def test_flag_acute_pain_avg_severity_primary_3():
 
     stats_processing = StatsProcessing("tester", "2018-05-18", DatastoreCollection())
 
-    historic_soreness = stats_processing.get_historic_soreness_list([],soreness_list,  [],[], [])
+    historic_soreness = stats_processing.get_historic_soreness_list(soreness_list)
 
     assert (2.9 <= historic_soreness[0].average_severity <= 3.2)
 
@@ -572,7 +572,7 @@ def test_flag_acute_pain_avg_severity_primary_4():
 
     stats_processing = StatsProcessing("tester", "2018-05-18", DatastoreCollection())
 
-    historic_soreness = stats_processing.get_historic_soreness_list([],soreness_list,  [],[], [])
+    historic_soreness = stats_processing.get_historic_soreness_list(soreness_list)
 
     assert (1.6 <= historic_soreness[0].average_severity <= 1.8)
 
@@ -586,7 +586,7 @@ def test_flag_acute_pain_avg_severity_primary_5():
 
     stats_processing = StatsProcessing("tester", "2018-05-18", DatastoreCollection())
 
-    historic_soreness = stats_processing.get_historic_soreness_list([],soreness_list,  [],[], [])
+    historic_soreness = stats_processing.get_historic_soreness_list(soreness_list)
 
     assert (2.7 <= historic_soreness[0].average_severity <= 2.9)
 
@@ -601,7 +601,7 @@ def test_flag_acute_pain_avg_severity_primary_6():
 
     stats_processing = StatsProcessing("tester", "2018-05-18", DatastoreCollection())
 
-    historic_soreness = stats_processing.get_historic_soreness_list([],soreness_list,  [],[], [])
+    historic_soreness = stats_processing.get_historic_soreness_list(soreness_list)
 
     assert (2.7 <= historic_soreness[0].average_severity <= 2.9)
 
@@ -616,7 +616,7 @@ def test_flag_acute_pain_avg_severity_corner_case_1():
 
     stats_processing = StatsProcessing("tester", "2018-05-18", DatastoreCollection())
 
-    historic_soreness = stats_processing.get_historic_soreness_list([],soreness_list,  [],[], [])
+    historic_soreness = stats_processing.get_historic_soreness_list(soreness_list)
 
     assert (4.3 <= historic_soreness[0].average_severity <= 4.8)
 
@@ -631,7 +631,7 @@ def test_flag_acute_pain_avg_severity_corner_case_2():
 
     stats_processing = StatsProcessing("tester", "2018-05-18", DatastoreCollection())
 
-    historic_soreness = stats_processing.get_historic_soreness_list([],soreness_list,  [],[], [])
+    historic_soreness = stats_processing.get_historic_soreness_list(soreness_list)
 
     assert (4.6 <= historic_soreness[0].average_severity <= 4.8)
 
@@ -646,7 +646,7 @@ def test_flag_acute_pain_avg_severity_corner_case_3():
 
     stats_processing = StatsProcessing("tester", "2018-05-18", DatastoreCollection())
 
-    historic_soreness = stats_processing.get_historic_soreness_list([],soreness_list,  [],[], [])
+    historic_soreness = stats_processing.get_historic_soreness_list(soreness_list)
 
     assert (3.5 <= historic_soreness[0].average_severity <= 3.6)
 
@@ -660,7 +660,7 @@ def test_flag_acute_pain_avg_severity_corner_case_4():
 
     stats_processing = StatsProcessing("tester", "2018-05-18", DatastoreCollection())
 
-    historic_soreness = stats_processing.get_historic_soreness_list([],soreness_list,  [],[], [])
+    historic_soreness = stats_processing.get_historic_soreness_list(soreness_list)
 
     assert (1.4 <= historic_soreness[0].average_severity <= 1.6)
 
@@ -674,7 +674,7 @@ def test_flag_acute_pain_avg_severity_corner_case_5():
 
     stats_processing = StatsProcessing("tester", "2018-05-18", DatastoreCollection())
 
-    historic_soreness = stats_processing.get_historic_soreness_list([],soreness_list,  [],[], [])
+    historic_soreness = stats_processing.get_historic_soreness_list(soreness_list)
 
     assert (4.2 <= historic_soreness[0].average_severity <= 4.5)
 
@@ -688,7 +688,7 @@ def test_flag_acute_pain_avg_severity_corner_case_6():
 
     stats_processing = StatsProcessing("tester", "2018-05-18", DatastoreCollection())
 
-    historic_soreness = stats_processing.get_historic_soreness_list([],soreness_list,  [],[], [])
+    historic_soreness = stats_processing.get_historic_soreness_list(soreness_list)
 
     assert (1.5 <= historic_soreness[0].average_severity <= 1.6)
 
@@ -702,7 +702,7 @@ def test_flag_acute_pain_avg_severity_corner_case_7():
 
     stats_processing = StatsProcessing("tester", "2018-05-18", DatastoreCollection())
 
-    historic_soreness = stats_processing.get_historic_soreness_list([],soreness_list,  [],[], [])
+    historic_soreness = stats_processing.get_historic_soreness_list(soreness_list)
 
     dates = ["2018-05-12", "2018-05-13", "2018-05-14", "2018-05-18"]
     severity = [1, 1, 1, 5]
@@ -713,7 +713,7 @@ def test_flag_acute_pain_avg_severity_corner_case_7():
 
     historic_soreness = stats_processing.answer_acute_pain_question(historic_soreness, BodyPartLocation.achilles, 1, "2018-05-18", True)
 
-    historic_soreness = stats_processing.get_historic_soreness_list([],soreness_list,  [],[], [], historic_soreness)
+    historic_soreness = stats_processing.get_historic_soreness_list(soreness_list, historic_soreness)
 
     assert (4.8 <= historic_soreness[0].average_severity <= 5.0)
 
@@ -727,7 +727,7 @@ def test_flag_acute_pain_avg_severity_corner_case_8():
 
     stats_processing = StatsProcessing("tester", "2018-05-18", DatastoreCollection())
 
-    historic_soreness = stats_processing.get_historic_soreness_list([],soreness_list,  [],[], [])
+    historic_soreness = stats_processing.get_historic_soreness_list(soreness_list)
 
     dates = ["2018-05-12", "2018-05-13", "2018-05-14", "2018-05-18"]
     severity = [5, 1, 1, 1]
@@ -738,7 +738,7 @@ def test_flag_acute_pain_avg_severity_corner_case_8():
 
     historic_soreness = stats_processing.answer_acute_pain_question(historic_soreness, BodyPartLocation.achilles, 1, "2018-05-18", True)
 
-    historic_soreness = stats_processing.get_historic_soreness_list([],soreness_list,  [],[], [], historic_soreness)
+    historic_soreness = stats_processing.get_historic_soreness_list(soreness_list, historic_soreness)
 
     assert (1.0 <= historic_soreness[0].average_severity <= 1.2)
 
@@ -752,7 +752,7 @@ def test_flag_acute_pain_avg_severity_corner_case_9():
 
     stats_processing = StatsProcessing("tester", "2018-05-18", DatastoreCollection())
 
-    historic_soreness = stats_processing.get_historic_soreness_list([],soreness_list,  [],[], [])
+    historic_soreness = stats_processing.get_historic_soreness_list(soreness_list)
 
     dates = ["2018-05-12", "2018-05-13", "2018-05-14", "2018-05-18"]
     severity = [1, 1, 3, 5]
@@ -763,7 +763,7 @@ def test_flag_acute_pain_avg_severity_corner_case_9():
 
     historic_soreness = stats_processing.answer_acute_pain_question(historic_soreness, BodyPartLocation.achilles, 1, "2018-05-18", True)
 
-    historic_soreness = stats_processing.get_historic_soreness_list([],soreness_list,  [],[], [], historic_soreness)
+    historic_soreness = stats_processing.get_historic_soreness_list(soreness_list, historic_soreness)
 
     assert (4.9 <= historic_soreness[0].average_severity <= 5.0)
 
@@ -777,7 +777,7 @@ def test_flag_acute_pain_avg_severity_corner_case_10():
 
     stats_processing = StatsProcessing("tester", "2018-05-18", DatastoreCollection())
 
-    historic_soreness = stats_processing.get_historic_soreness_list([],soreness_list,  [],[], [])
+    historic_soreness = stats_processing.get_historic_soreness_list(soreness_list)
 
     dates = ["2018-05-12", "2018-05-13", "2018-05-14", "2018-05-18"]
     severity = [5, 1, 3, 1]
@@ -788,7 +788,7 @@ def test_flag_acute_pain_avg_severity_corner_case_10():
 
     historic_soreness = stats_processing.answer_acute_pain_question(historic_soreness, BodyPartLocation.achilles, 1, "2018-05-18", True)
 
-    historic_soreness = stats_processing.get_historic_soreness_list([],soreness_list,  [],[], [], historic_soreness)
+    historic_soreness = stats_processing.get_historic_soreness_list(soreness_list, historic_soreness)
 
     assert (1.0 <= historic_soreness[0].average_severity <= 1.3)
 
@@ -802,7 +802,7 @@ def test_flag_acute_pain_avg_severity_corner_case_11():
 
     stats_processing = StatsProcessing("tester", "2018-05-18", DatastoreCollection())
 
-    historic_soreness = stats_processing.get_historic_soreness_list([],soreness_list,  [],[], [])
+    historic_soreness = stats_processing.get_historic_soreness_list(soreness_list)
 
     assert (1.2 <= historic_soreness[0].average_severity <= 1.4)
 
@@ -816,7 +816,7 @@ def test_flag_acute_pain_avg_severity_corner_case_12():
 
     stats_processing = StatsProcessing("tester", "2018-05-18", DatastoreCollection())
 
-    historic_soreness = stats_processing.get_historic_soreness_list([],soreness_list,  [],[], [])
+    historic_soreness = stats_processing.get_historic_soreness_list(soreness_list)
 
     assert (2.5 <= historic_soreness[0].average_severity <= 2.7)
 
@@ -830,7 +830,7 @@ def test_flag_acute_pain_avg_severity_corner_case_13():
 
     stats_processing = StatsProcessing("tester", "2018-05-18", DatastoreCollection())
 
-    historic_soreness = stats_processing.get_historic_soreness_list([],soreness_list,  [],[], [])
+    historic_soreness = stats_processing.get_historic_soreness_list(soreness_list)
 
     assert (2.0 <= historic_soreness[0].average_severity <= 2.2)
 
@@ -844,7 +844,7 @@ def test_flag_acute_pain_avg_severity_corner_case_14():
 
     stats_processing = StatsProcessing("tester", "2018-05-18", DatastoreCollection())
 
-    historic_soreness = stats_processing.get_historic_soreness_list([],soreness_list,  [],[], [])
+    historic_soreness = stats_processing.get_historic_soreness_list(soreness_list)
 
     assert (3.8 <= historic_soreness[0].average_severity <= 4.0)
 
@@ -858,7 +858,7 @@ def test_flag_acute_pain_avg_severity_corner_case_15():
 
     stats_processing = StatsProcessing("tester", "2018-05-18", DatastoreCollection())
 
-    historic_soreness = stats_processing.get_historic_soreness_list([],soreness_list,  [],[], [])
+    historic_soreness = stats_processing.get_historic_soreness_list(soreness_list)
 
     assert (5.0 <= historic_soreness[0].average_severity <= 5.0)
 
@@ -872,6 +872,6 @@ def test_flag_acute_pain_avg_severity_corner_case_16():
 
     stats_processing = StatsProcessing("tester", "2018-05-18", DatastoreCollection())
 
-    historic_soreness = stats_processing.get_historic_soreness_list([],soreness_list,  [],[], [])
+    historic_soreness = stats_processing.get_historic_soreness_list(soreness_list)
 
     assert (4.5 <= historic_soreness[0].average_severity <= 4.7)

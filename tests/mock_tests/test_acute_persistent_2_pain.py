@@ -62,7 +62,7 @@ def get_historic_soreness(severity_list, date, historic_soreness=None, is_pain=T
 
     stats_processing = StatsProcessing("tester", date, DatastoreCollection())
 
-    historic_soreness = stats_processing.get_historic_soreness_list([],soreness_list,  [],[], [], historic_soreness)
+    historic_soreness = stats_processing.get_historic_soreness_list(soreness_list,historic_soreness)
 
     return historic_soreness
 
@@ -73,7 +73,7 @@ def get_historic_soreness_and_answer_acute_question(severity_list, date, histori
 
     stats_processing = StatsProcessing("tester", date, DatastoreCollection())
 
-    historic_soreness = stats_processing.get_historic_soreness_list([],soreness_list,  [],[], [], historic_soreness)
+    historic_soreness = stats_processing.get_historic_soreness_list(soreness_list,historic_soreness)
 
     historic_soreness = stats_processing.answer_acute_pain_question(historic_soreness, BodyPartLocation.achilles, 1,
                                                                     date, True)
@@ -87,7 +87,7 @@ def get_historic_soreness_and_answer_pers2_question(severity_list, date, histori
 
     stats_processing = StatsProcessing("tester", date, DatastoreCollection())
 
-    historic_soreness = stats_processing.get_historic_soreness_list([],soreness_list,  [],[], [], historic_soreness)
+    historic_soreness = stats_processing.get_historic_soreness_list(soreness_list,historic_soreness)
 
     historic_soreness = stats_processing.answer_persistent_2_question(historic_soreness, BodyPartLocation.achilles, 1,
                                                                       is_pain, date, True)
@@ -391,6 +391,29 @@ def test_perisistent_2_pain_ask_persistent_2_Q3():
 
     assert(True is historic_soreness[0].ask_persistent_2_question)
     assert (HistoricSorenessStatus.persistent_2_pain is historic_soreness[0].historic_soreness_status)
+
+
+def test_perisistent_soreness_ask_persistent_2_Q3():
+
+    historic_soreness = get_historic_soreness([1, None, 2, None, 3], "2018-05-16", [], False)
+
+    historic_soreness = get_historic_soreness([1, None, 2, None, 3, None, 2, None, None, None, None], "2018-05-22", historic_soreness, False)
+
+    assert (HistoricSorenessStatus.dormant_cleared is historic_soreness[0].historic_soreness_status)
+    assert(False is historic_soreness[0].ask_persistent_2_question)
+
+    #put in 15 days because it will process on the next day at 1am to prompt the question that day (with 14 non-report days
+    historic_soreness = get_historic_soreness(extend_with_nones([1, None, 2, None, 3, None, 2, None, None, None, 3, None, None, 3,3, None, 2], 8), "2018-06-08",
+                                              historic_soreness, False)
+
+    assert(False is historic_soreness[0].ask_persistent_2_question)
+    assert (HistoricSorenessStatus.persistent_soreness is historic_soreness[0].historic_soreness_status)
+
+    historic_soreness = get_historic_soreness(extend_with_nones([1, None, 2, None, 3, None, 2, None, None, None, 3, None, None, 3,3, None, 2], 15), "2018-06-15",
+                                              historic_soreness, False)
+
+    assert (True is historic_soreness[0].ask_persistent_2_question)
+    assert (HistoricSorenessStatus.persistent_soreness is historic_soreness[0].historic_soreness_status)
 
 
 def test_perisistent_pain_2_auto_downgrade_persistent():
