@@ -75,7 +75,7 @@ def get_historic_soreness_and_answer_acute_question(severity_list, date, histori
 
     historic_soreness = stats_processing.get_historic_soreness_list(soreness_list,historic_soreness)
 
-    historic_soreness = stats_processing.answer_acute_pain_question(historic_soreness, BodyPartLocation.achilles, 1,
+    historic_soreness = stats_processing.answer_acute_pain_question(historic_soreness, soreness_list, BodyPartLocation.achilles, 1,
                                                                     date, True)
 
     return historic_soreness
@@ -104,7 +104,7 @@ def test_flag_acute_pain_3_days():
 
 def test_flag_acute_pain_5_days():
 
-    historic_soreness = get_historic_soreness([1, 2, 3], "2018-05-16")
+    historic_soreness = get_historic_soreness([1, None, 2, None, 3], "2018-05-16")
 
     assert(HistoricSorenessStatus.acute_pain is historic_soreness[0].historic_soreness_status)
 
@@ -144,31 +144,72 @@ def test_no_flag_acute_pain_7_days_5_day_gap():
     assert(HistoricSorenessStatus.dormant_cleared is historic_soreness[0].historic_soreness_status)
 
 
-def test_no_flag_acute_pain_7_days_3_day_gap():
+def test_no_flag_almost_acute_pain_7_days_3_day_gap():
 
-    historic_soreness = get_historic_soreness([1, None, 2, None, None, None, 3], "2018-05-18")
+    historic_soreness = get_historic_soreness([1, None, 2, None], "2018-05-15")
+
+    assert (HistoricSorenessStatus.almost_acute_pain is historic_soreness[0].historic_soreness_status)
+
+    historic_soreness = get_historic_soreness([1, None, 2, None, None], "2018-05-16")
+
+    assert (HistoricSorenessStatus.almost_acute_pain is historic_soreness[0].historic_soreness_status)
+
+    historic_soreness = get_historic_soreness([1, None, 2, None, None, None], "2018-05-17")
+
+    assert (HistoricSorenessStatus.almost_acute_pain is historic_soreness[0].historic_soreness_status)
+
+    historic_soreness = get_historic_soreness([1, None, 2, None, None, None, None], "2018-05-18")
+
+    assert(HistoricSorenessStatus.dormant_cleared is historic_soreness[0].historic_soreness_status)
+
+    historic_soreness = get_historic_soreness([1, None, 2, None, None, None, 3], "2018-05-18", historic_soreness)
 
     assert(HistoricSorenessStatus.dormant_cleared is historic_soreness[0].historic_soreness_status)
 
 
-def test_no_flag_acute_pain_7_days_3_day_gap_b():
+def test_no_flag_acute_pain_7_days_3_day_gap():
+
+    historic_soreness = get_historic_soreness([1, 2, None, None], "2018-05-15")
+
+    assert (HistoricSorenessStatus.almost_acute_pain is historic_soreness[0].historic_soreness_status)
+
+    historic_soreness = get_historic_soreness([1, 2, None, None, None], "2018-05-16")
+
+    assert (HistoricSorenessStatus.almost_acute_pain is historic_soreness[0].historic_soreness_status)
+
+    historic_soreness = get_historic_soreness([1, 2, None, None, None, None], "2018-05-17")
+
+    assert (HistoricSorenessStatus.dormant_cleared is historic_soreness[0].historic_soreness_status)
+
+    historic_soreness = get_historic_soreness([1, 2, None, None, None, 3], "2018-05-17")
+
+    assert (HistoricSorenessStatus.dormant_cleared is historic_soreness[0].historic_soreness_status)
 
     historic_soreness = get_historic_soreness([1, 2, None, None, None, 3, None], "2018-05-18")
 
     assert(HistoricSorenessStatus.dormant_cleared is historic_soreness[0].historic_soreness_status)
 
 
-def test_almost_acute_pain_7_days_3_day_gap_c():
+def test_almost_acute_pain_7_days_3_day_gap():
 
     historic_soreness = get_historic_soreness([1, None, None, None, 2, None, 3], "2018-05-18")
 
     assert(HistoricSorenessStatus.almost_acute_pain is historic_soreness[0].historic_soreness_status)
 
 
+def test_flag_acute_pain_7_days_3_day_gap_no_question():
+
+    historic_soreness = get_historic_soreness([1, None, None, 2, 3, None, None, None], "2018-05-20")
+
+    assert (HistoricSorenessStatus.acute_pain is historic_soreness[0].historic_soreness_status)
+    assert(False is historic_soreness[0].ask_acute_pain_question)
+
+
 def test_flag_acute_pain_7_days_3_day_gap_question():
 
     historic_soreness = get_historic_soreness([1, None, None, 2, 3, None, None, None, None], "2018-05-20")
 
+    assert (HistoricSorenessStatus.acute_pain is historic_soreness[0].historic_soreness_status)
     assert(True is historic_soreness[0].ask_acute_pain_question)
 
 
@@ -176,6 +217,7 @@ def test_flag_acute_pain_7_days_5_day_gap_question():
 
     historic_soreness = get_historic_soreness([1, None, None, 2, 3, None, None, None, None], "2018-05-22")
 
+    assert (HistoricSorenessStatus.acute_pain is historic_soreness[0].historic_soreness_status)
     assert(True is historic_soreness[0].ask_acute_pain_question)
 
 
@@ -183,6 +225,7 @@ def test_flag_acute_pain_7_days_2_2_3_day_gap_question():
 
     historic_soreness = get_historic_soreness([1, None, None, 2, None, None, 3, None, None, None, None], "2018-05-22")
 
+    assert (HistoricSorenessStatus.acute_pain is historic_soreness[0].historic_soreness_status)
     assert(True is historic_soreness[0].ask_acute_pain_question)
 
 
@@ -190,6 +233,7 @@ def test_flag_acute_pain_6_days_3_day_gap_question():
 
     historic_soreness = get_historic_soreness([1, 2, 3, None, None, None, None], "2018-05-18")
 
+    assert (HistoricSorenessStatus.acute_pain is historic_soreness[0].historic_soreness_status)
     assert(True is historic_soreness[0].ask_acute_pain_question)
 
 
@@ -211,10 +255,12 @@ def test_flag_acute_pain_10_days_3_day_gaps_question():
     historic_soreness = get_historic_soreness_and_answer_acute_question([1, 2, 3, None, None, None, None], "2018-05-18")
 
     # make sure ask question is now false
+    assert (HistoricSorenessStatus.almost_persistent_2_pain_acute is historic_soreness[0].historic_soreness_status)
     assert (False is historic_soreness[0].ask_acute_pain_question)
 
     historic_soreness = get_historic_soreness([1, 2, 3, None, None, None, 3, None, None, None, None], "2018-05-22", historic_soreness)
 
+    assert (HistoricSorenessStatus.almost_persistent_2_pain_acute is historic_soreness[0].historic_soreness_status)
     assert(True is historic_soreness[0].ask_acute_pain_question)
 
 
@@ -224,6 +270,7 @@ def test_flag_acute_pain_9_days_3_day_gap_question():
 
     historic_soreness = get_historic_soreness([1, 2, None, None, 3, None, None, None, None], "2018-05-20")
 
+    assert (HistoricSorenessStatus.acute_pain is historic_soreness[0].historic_soreness_status)
     assert(True is historic_soreness[0].ask_acute_pain_question)
 
 
@@ -231,6 +278,7 @@ def test_flag_acute_pain_9_days_3_day_gap_question_v2():
 
     historic_soreness = get_historic_soreness([1, 2, 3, 2, 3, None, None, None, None], "2018-05-20")
 
+    assert (HistoricSorenessStatus.acute_pain is historic_soreness[0].historic_soreness_status)
     assert(True is historic_soreness[0].ask_acute_pain_question)
 
 
@@ -238,6 +286,7 @@ def test_flag_acute_pain_11_days_3_day_gap_question():
 
     historic_soreness = get_historic_soreness([1, 2, 3, None, None, 2, 3, None, None, None, None], "2018-05-22")
 
+    assert (HistoricSorenessStatus.acute_pain is historic_soreness[0].historic_soreness_status)
     assert(True is historic_soreness[0].ask_acute_pain_question)
 
 
@@ -246,6 +295,31 @@ def test_migrate_acute_pain_to_persistent2_9_days_3_day_gap():
     historic_soreness = get_historic_soreness([1, None, None, 2, 3], "2018-05-16")
 
     historic_soreness = get_historic_soreness_and_answer_acute_question([1, None, None, 2, 3, None, None, None, None], "2018-05-20", historic_soreness)
+
+    assert (HistoricSorenessStatus.persistent_2_pain is historic_soreness[0].historic_soreness_status)
+
+    historic_soreness = get_historic_soreness_and_answer_acute_question([1, None, None, 2, 3, None, None, None, 3,2], "2018-05-21", historic_soreness)
+
+    assert (HistoricSorenessStatus.persistent_2_pain is historic_soreness[0].historic_soreness_status)
+
+
+def test_auto_migrate_acute_pain_to_persistent2_9_days_3_day_gap():
+
+    historic_soreness = get_historic_soreness([1, 2, 3], "2018-05-14")
+    assert (HistoricSorenessStatus.acute_pain is historic_soreness[0].historic_soreness_status)
+    historic_soreness = get_historic_soreness_and_answer_acute_question([1, 2, 3, None, None, None, None], "2018-05-18", historic_soreness)
+    assert (HistoricSorenessStatus.almost_persistent_2_pain_acute is historic_soreness[0].historic_soreness_status)
+    historic_soreness = get_historic_soreness([1, 2, 3, None, None, None, 3], "2018-05-18", historic_soreness)
+    assert (HistoricSorenessStatus.almost_persistent_2_pain_acute is historic_soreness[0].historic_soreness_status)
+    historic_soreness = get_historic_soreness([1, 2, 3, None, None, None, 3, None], "2018-05-19", historic_soreness)
+    assert (HistoricSorenessStatus.almost_persistent_2_pain_acute is historic_soreness[0].historic_soreness_status)
+    historic_soreness = get_historic_soreness([1, 2, 3, None, None, None, 3, None, None], "2018-05-20", historic_soreness)
+    assert (HistoricSorenessStatus.almost_persistent_2_pain_acute is historic_soreness[0].historic_soreness_status)
+    historic_soreness = get_historic_soreness([1, 2, 3, None, None, None, 3, None, 3], "2018-05-20", historic_soreness)
+
+    assert (HistoricSorenessStatus.persistent_2_pain is historic_soreness[0].historic_soreness_status)
+
+    historic_soreness = get_historic_soreness([1, 2, 3, None, None, None, 3, None, None, 3, None], "2018-05-21", historic_soreness)
 
     assert (HistoricSorenessStatus.persistent_2_pain is historic_soreness[0].historic_soreness_status)
 
@@ -261,15 +335,16 @@ def test_migrate_acute_pain_to_persistent2_11_days_3_day_gap():
     assert (HistoricSorenessStatus.persistent_2_pain is historic_soreness[0].historic_soreness_status)
 
 
-def test_auto_migrate_acute_pain_to_persistent2_9_days_3_day_gap():
-
-    historic_soreness = get_historic_soreness([1, 2, 3], "2018-05-14")
-
-    historic_soreness = get_historic_soreness_and_answer_acute_question([1, 2, 3, None, None, None, None], "2018-05-18", historic_soreness)
-
-    historic_soreness = get_historic_soreness([1, 2, 3, None, None, None, 3, None, None, None], "2018-05-21", historic_soreness)
+    historic_soreness = get_historic_soreness([1, None, None, 2, None, None, 3, None, None, None, 2, 3],
+                                                                  "2018-05-23", historic_soreness)
 
     assert (HistoricSorenessStatus.persistent_2_pain is historic_soreness[0].historic_soreness_status)
+
+    historic_soreness = get_historic_soreness([1, None, None, 2, None, None, 3, None, None, None, 2, 3, 2],
+                                                                  "2018-05-24", historic_soreness)
+
+    assert (HistoricSorenessStatus.persistent_2_pain is historic_soreness[0].historic_soreness_status)
+
 
 
 def test_migrate_acute_pain_to_persistent2_11_days_3_day_gaps():
@@ -280,7 +355,7 @@ def test_migrate_acute_pain_to_persistent2_11_days_3_day_gaps():
 
     historic_soreness = get_historic_soreness([1, 2, 3, None, None, None, 3, None, None, None, None], "2018-05-22",
                                               historic_soreness)
-    assert (HistoricSorenessStatus.acute_pain is historic_soreness[0].historic_soreness_status)
+    assert (HistoricSorenessStatus.almost_persistent_2_pain_acute is historic_soreness[0].historic_soreness_status)
     assert (True is historic_soreness[0].ask_acute_pain_question)
 
     historic_soreness = get_historic_soreness_and_answer_acute_question([1, 2, 3, None, None, None, 3, None, None, None, None], "2018-05-22",
@@ -288,6 +363,10 @@ def test_migrate_acute_pain_to_persistent2_11_days_3_day_gaps():
 
     assert (HistoricSorenessStatus.persistent_2_pain is historic_soreness[0].historic_soreness_status)
 
+    historic_soreness = get_historic_soreness([1, 2, 3, None, None, None, 3, None, None, None, 2], "2018-05-22",
+                                                                        historic_soreness)
+
+    assert (HistoricSorenessStatus.persistent_2_pain is historic_soreness[0].historic_soreness_status)
 
 def test_migrate_acute_pain_to_persistent2_9_days_3_day_gap_v2():
 
@@ -397,9 +476,12 @@ def test_perisistent_soreness_ask_persistent_2_Q3():
 
     historic_soreness = get_historic_soreness([1, None, 2, None, 3], "2018-05-16", [], False)
 
+    historic_soreness = get_historic_soreness([1, None, 2, None, 3, None, 2, None], "2018-05-21",
+                                              historic_soreness, False)
+
     historic_soreness = get_historic_soreness([1, None, 2, None, 3, None, 2, None, None, None, None], "2018-05-22", historic_soreness, False)
 
-    assert (HistoricSorenessStatus.dormant_cleared is historic_soreness[0].historic_soreness_status)
+    assert (HistoricSorenessStatus.almost_persistent_soreness is historic_soreness[0].historic_soreness_status)
     assert(False is historic_soreness[0].ask_persistent_2_question)
 
     #put in 15 days because it will process on the next day at 1am to prompt the question that day (with 14 non-report days
@@ -520,6 +602,22 @@ def test_persistent_soreness_upgraded_to_persistent_2():
     assert (False is historic_soreness[0].ask_persistent_2_question)
 
 
+def test_almost_persistent_2_soreness_flagged_from_reporting():
+
+    historic_soreness = get_historic_soreness([1, None, None, 2, None, None, 3, None, None, 2, None, 3, None, None, 2, 2, None, None, 3, None, None, 2, None, None, 2], "2018-05-21", [], False)
+    assert (HistoricSorenessStatus.almost_persistent_2_soreness is historic_soreness[0].historic_soreness_status)
+    assert (False is historic_soreness[0].ask_persistent_2_question)
+    assert (False is historic_soreness[0].ask_acute_pain_question)
+
+
+def test_persistent_2_soreness_flagged_from_reporting():
+
+    historic_soreness = get_historic_soreness([1, None, None, 2, None, None, 3, None, None, 2, None, 3, None, None, 2, 2, None, None, 3, 2, None, 2, None, None, 2], "2018-05-21", [], False)
+    assert (HistoricSorenessStatus.persistent_2_soreness is historic_soreness[0].historic_soreness_status)
+    assert (False is historic_soreness[0].ask_persistent_2_question)
+    assert (False is historic_soreness[0].ask_acute_pain_question)
+
+
 def test_persistent_2_upgraded_from_acute():
 
     historic_soreness = get_historic_soreness(
@@ -540,4 +638,229 @@ def test_persistent_2_upgraded_from_acute():
 
     assert (HistoricSorenessStatus.persistent_2_pain is historic_soreness[0].historic_soreness_status)
 
+
+def test_flag_persistent_2_pain():
+
+    historic_soreness = get_historic_soreness(
+        [1, None, None, 2, None, None, 3], "2018-05-29")
+
+    assert (HistoricSorenessStatus.acute_pain is historic_soreness[0].historic_soreness_status)
+
+    historic_soreness = get_historic_soreness(
+        [1, None, None, 2, None, None, 3, None], "2018-05-30", historic_soreness)
+
+    assert (HistoricSorenessStatus.almost_persistent_2_pain_acute is historic_soreness[0].historic_soreness_status)
+
+    historic_soreness = get_historic_soreness(
+        [1, None, None, 2, None, None, 3, None, None], "2018-05-31", historic_soreness)
+
+    assert (HistoricSorenessStatus.almost_persistent_2_pain_acute is historic_soreness[0].historic_soreness_status)
+
+    historic_soreness = get_historic_soreness(
+        [1, None, None, 2, None, None, 3, None, None, 2], "2018-06-01", historic_soreness)
+
+    assert (HistoricSorenessStatus.persistent_2_pain is historic_soreness[0].historic_soreness_status)
+
+    historic_soreness = get_historic_soreness(
+        [1, None, None, 2, None, None, 3, None, None, 2, None], "2018-06-02", historic_soreness)
+
+    assert (HistoricSorenessStatus.persistent_2_pain is historic_soreness[0].historic_soreness_status)
+
+    historic_soreness = get_historic_soreness(
+        [1, None, None, 2, None, None, 3, None, None, 2, None, 3], "2018-06-03", historic_soreness)
+
+    assert (HistoricSorenessStatus.persistent_2_pain is historic_soreness[0].historic_soreness_status)
+
+    historic_soreness = get_historic_soreness(
+        [1, None, None, 2, None, None, 3, None, None, 2, None, 3,
+         None], "2018-06-04", historic_soreness)
+
+    assert (HistoricSorenessStatus.persistent_2_pain is historic_soreness[0].historic_soreness_status)
+
+    historic_soreness = get_historic_soreness(
+        [1, None, None, 2, None, None, 3, None, None, 2, None, 3,
+         None, None], "2018-06-05", historic_soreness)
+
+    assert (HistoricSorenessStatus.persistent_2_pain is historic_soreness[0].historic_soreness_status)
+
+    historic_soreness = get_historic_soreness(
+        [1, None, None, 2, None, None, 3, None, None, 2, None, 3,
+         None, None, 2], "2018-06-06", historic_soreness)
+
+    assert (HistoricSorenessStatus.persistent_pain is historic_soreness[0].historic_soreness_status)
+
+    historic_soreness = get_historic_soreness(
+        [1, None, None, 2, None, None, 3, None, None, 2, None, 3,
+         None, None, 2, 2], "2018-06-07", historic_soreness)
+
+    assert (HistoricSorenessStatus.persistent_2_pain is historic_soreness[0].historic_soreness_status)
+
+    historic_soreness = get_historic_soreness(
+        [1, None, None, 2, None, None, 3, None, None, 2, None, 3,
+         None, None, 2, 2, None], "2018-06-08", historic_soreness)
+
+    assert (HistoricSorenessStatus.persistent_2_pain is historic_soreness[0].historic_soreness_status)
+
+    historic_soreness = get_historic_soreness(
+        [1, None, None, 2, None, None, 3, None, None, 2, None, 3,
+         None, None, 2, 2, None, None], "2018-06-09", historic_soreness)
+
+    assert (HistoricSorenessStatus.persistent_2_pain is historic_soreness[0].historic_soreness_status)
+
+    historic_soreness = get_historic_soreness(
+        [1, None, None, 2, None, None, 3, None, None, 2, None, 3,
+         None, None, 2, 2, None, None, 3], "2018-06-10", historic_soreness)
+
+    assert (HistoricSorenessStatus.persistent_2_pain is historic_soreness[0].historic_soreness_status)
+
+    historic_soreness = get_historic_soreness(
+        [1, None, None, 2, None, None, 3, None, None, 2, None, 3,
+         None, None, 2, 2, None, None, 3, 2], "2018-06-11", historic_soreness)
+
+    assert (HistoricSorenessStatus.persistent_2_pain is historic_soreness[0].historic_soreness_status)
+
+    historic_soreness = get_historic_soreness(
+        [1, None, None, 2, None, None, 3, None, None, 2, None, 3,
+         None, None, 2, 2, None, None, 3, 2, None], "2018-06-12", historic_soreness)
+
+    assert (HistoricSorenessStatus.persistent_2_pain is historic_soreness[0].historic_soreness_status)
+
+    historic_soreness = get_historic_soreness(
+        [1, None, None, 2, None, None, 3, None, None, 2, None, 3,
+         None, None, 2, 2, None, None, 3, 2, None, 2], "2018-06-13", historic_soreness)
+
+    assert (HistoricSorenessStatus.persistent_2_pain is historic_soreness[0].historic_soreness_status)
+
+    historic_soreness = get_historic_soreness(
+        [1, None, None, 2, None, None, 3, None, None, 2, None, 3,
+         None, None, 2, 2, None, None, 3, 2, None, 2, None], "2018-06-14", historic_soreness)
+
+    assert (HistoricSorenessStatus.persistent_2_pain is historic_soreness[0].historic_soreness_status)
+
+    historic_soreness = get_historic_soreness(
+        [1, None, None, 2, None, None, 3, None, None, 2, None, 3,
+         None, None, 2, 2, None, None, 3, 2, None, 2, None,
+         None], "2018-06-15", historic_soreness, True)
+
+    assert (HistoricSorenessStatus.persistent_2_pain is historic_soreness[0].historic_soreness_status)
+
+    historic_soreness = get_historic_soreness(
+        [1, None, None, 2, None, None, 3, None, None, 2, None, 3,
+         None, None, 2, 2, None, None, 3, 2, None, 2, None,
+         None, 2], "2018-06-16", historic_soreness, True)
+
+    assert (HistoricSorenessStatus.persistent_2_pain is historic_soreness[0].historic_soreness_status)
+
+
+def test_flag_persistent_2_soreness_over_time():
+
+    historic_soreness = get_historic_soreness(
+        [1, None, None, 2, None, None, 3], "2018-05-29", [], False)
+
+    assert (HistoricSorenessStatus.dormant_cleared is historic_soreness[0].historic_soreness_status)
+
+    historic_soreness = get_historic_soreness(
+        [1, None, None, 2, None, None, 3, None], "2018-05-30", historic_soreness, False)
+
+    assert (HistoricSorenessStatus.dormant_cleared is historic_soreness[0].historic_soreness_status)
+
+    historic_soreness = get_historic_soreness(
+        [1, None, None, 2, None, None, 3, None, None], "2018-05-31", historic_soreness, False)
+
+    assert (HistoricSorenessStatus.dormant_cleared is historic_soreness[0].historic_soreness_status)
+
+    historic_soreness = get_historic_soreness(
+        [1, None, None, 2, None, None, 3, None, None, 2], "2018-06-01", historic_soreness, False)
+
+    assert (HistoricSorenessStatus.dormant_cleared is historic_soreness[0].historic_soreness_status)
+
+    historic_soreness = get_historic_soreness(
+        [1, None, None, 2, None, None, 3, None, None, 2, None], "2018-06-02", historic_soreness, False)
+
+    assert (HistoricSorenessStatus.almost_persistent_soreness is historic_soreness[0].historic_soreness_status)
+
+    historic_soreness = get_historic_soreness(
+        [1, None, None, 2, None, None, 3, None, None, 2, None, 3], "2018-06-03", historic_soreness, False)
+
+    assert (HistoricSorenessStatus.almost_persistent_2_soreness is historic_soreness[0].historic_soreness_status)
+
+    historic_soreness = get_historic_soreness(
+        [1, None, None, 2, None, None, 3, None, None, 2, None, 3,
+         None], "2018-06-04", historic_soreness, False)
+
+    assert (HistoricSorenessStatus.almost_persistent_2_soreness is historic_soreness[0].historic_soreness_status)
+
+    historic_soreness = get_historic_soreness(
+        [1, None, None, 2, None, None, 3, None, None, 2, None, 3,
+         None, None], "2018-06-05", historic_soreness, False)
+
+    assert (HistoricSorenessStatus.almost_persistent_2_soreness is historic_soreness[0].historic_soreness_status)
+
+    historic_soreness = get_historic_soreness(
+        [1, None, None, 2, None, None, 3, None, None, 2, None, 3,
+         None, None, 2], "2018-06-06", historic_soreness, False)
+
+    assert (HistoricSorenessStatus.almost_persistent_2_soreness is historic_soreness[0].historic_soreness_status)
+
+    historic_soreness = get_historic_soreness(
+        [1, None, None, 2, None, None, 3, None, None, 2, None, 3,
+         None, None, 2, 2], "2018-06-07", historic_soreness, False)
+
+    assert (HistoricSorenessStatus.persistent_2_soreness is historic_soreness[0].historic_soreness_status)
+
+    historic_soreness = get_historic_soreness(
+        [1, None, None, 2, None, None, 3, None, None, 2, None, 3,
+         None, None, 2, 2, None], "2018-06-08", historic_soreness, False)
+
+    assert (HistoricSorenessStatus.persistent_2_soreness is historic_soreness[0].historic_soreness_status)
+
+    historic_soreness = get_historic_soreness(
+        [1, None, None, 2, None, None, 3, None, None, 2, None, 3,
+         None, None, 2, 2, None, None], "2018-06-09", historic_soreness, False)
+
+    assert (HistoricSorenessStatus.persistent_2_soreness is historic_soreness[0].historic_soreness_status)
+
+    historic_soreness = get_historic_soreness(
+        [1, None, None, 2, None, None, 3, None, None, 2, None, 3,
+         None, None, 2, 2, None, None, 3], "2018-06-10", historic_soreness, False)
+
+    assert (HistoricSorenessStatus.persistent_2_soreness is historic_soreness[0].historic_soreness_status)
+
+    historic_soreness = get_historic_soreness(
+        [1, None, None, 2, None, None, 3, None, None, 2, None, 3,
+         None, None, 2, 2, None, None, 3, 2], "2018-06-11", historic_soreness, False)
+
+    assert (HistoricSorenessStatus.persistent_2_soreness is historic_soreness[0].historic_soreness_status)
+
+    historic_soreness = get_historic_soreness(
+        [1, None, None, 2, None, None, 3, None, None, 2, None, 3,
+         None, None, 2, 2, None, None, 3, 2, None], "2018-06-12", historic_soreness, False)
+
+    assert (HistoricSorenessStatus.persistent_2_soreness is historic_soreness[0].historic_soreness_status)
+
+    historic_soreness = get_historic_soreness(
+        [1, None, None, 2, None, None, 3, None, None, 2, None, 3,
+         None, None, 2, 2, None, None, 3, 2, None, 2], "2018-06-13", historic_soreness, False)
+
+    assert (HistoricSorenessStatus.persistent_2_soreness is historic_soreness[0].historic_soreness_status)
+
+    historic_soreness = get_historic_soreness(
+        [1, None, None, 2, None, None, 3, None, None, 2, None, 3,
+         None, None, 2, 2, None, None, 3, 2, None, 2, None], "2018-06-14", historic_soreness, False)
+
+    assert (HistoricSorenessStatus.persistent_2_soreness is historic_soreness[0].historic_soreness_status)
+
+    historic_soreness = get_historic_soreness(
+        [1, None, None, 2, None, None, 3, None, None, 2, None, 3,
+         None, None, 2, 2, None, None, 3, 2, None, 2, None,
+         None], "2018-06-15", historic_soreness,False)
+
+    assert (HistoricSorenessStatus.persistent_2_soreness is historic_soreness[0].historic_soreness_status)
+
+    historic_soreness = get_historic_soreness(
+        [1, None, None, 2, None, None, 3, None, None, 2, None, 3,
+         None, None, 2, 2, None, None, 3, 2, None, 2, None,
+         None, 2], "2018-06-16", historic_soreness, False)
+
+    assert (HistoricSorenessStatus.persistent_2_soreness is historic_soreness[0].historic_soreness_status)
 
