@@ -130,11 +130,11 @@ def test_flag_acute_pain_7_days_3_day_gap():
     assert(HistoricSorenessStatus.acute_pain is historic_soreness[0].historic_soreness_status)
 
 
-def test_no_flag_acute_pain_6_days_3_day_gap():
+def test_almost_acute_pain_6_days_3_day_gap():
 
     historic_soreness = get_historic_soreness([1, None, None, None, 2, 3], "2018-05-17")
 
-    assert(HistoricSorenessStatus.dormant_cleared is historic_soreness[0].historic_soreness_status)
+    assert(HistoricSorenessStatus.almost_acute_pain is historic_soreness[0].historic_soreness_status)
 
 
 def test_no_flag_acute_pain_7_days_5_day_gap():
@@ -158,11 +158,11 @@ def test_no_flag_acute_pain_7_days_3_day_gap_b():
     assert(HistoricSorenessStatus.dormant_cleared is historic_soreness[0].historic_soreness_status)
 
 
-def test_no_flag_acute_pain_7_days_3_day_gap_c():
+def test_almost_acute_pain_7_days_3_day_gap_c():
 
     historic_soreness = get_historic_soreness([1, None, None, None, 2, None, 3], "2018-05-18")
 
-    assert(HistoricSorenessStatus.dormant_cleared is historic_soreness[0].historic_soreness_status)
+    assert(HistoricSorenessStatus.almost_acute_pain is historic_soreness[0].historic_soreness_status)
 
 
 def test_flag_acute_pain_7_days_3_day_gap_question():
@@ -476,6 +476,14 @@ def test_persistent_soreness_flagged_from_reporting():
 
     historic_soreness = get_historic_soreness([1, None, None, 2, None, None, 3, None, None, 2, None, 3, None, None, 2, None, None, None, 3, None, None, 2, None, None, None], "2018-05-21", [], False)
     assert (HistoricSorenessStatus.persistent_soreness is historic_soreness[0].historic_soreness_status)
+    assert (False is historic_soreness[0].ask_persistent_2_question)
+    assert (False is historic_soreness[0].ask_acute_pain_question)
+
+
+def test_almost_persistent_soreness_flagged_from_reporting():
+
+    historic_soreness = get_historic_soreness([None, None, None, 2, None, None, 3, None, None, None, None, 3, None, None, 2, None, None, None, None, None, None], "2018-05-21", [], False)
+    assert (HistoricSorenessStatus.almost_persistent_soreness is historic_soreness[0].historic_soreness_status)
     assert (False is historic_soreness[0].ask_persistent_2_question)
     assert (False is historic_soreness[0].ask_acute_pain_question)
 
