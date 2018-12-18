@@ -373,7 +373,7 @@ class StatsProcessing(object):
                     historic_soreness.historic_soreness_status = HistoricSorenessStatus.persistent_2_pain
                     historic_soreness.average_severity = self.calc_avg_severity_persistent_2(body_part_history,
                                                                                              self.event_date)
-                elif ((parse_date(self.event_date) - parse_date(historic_soreness.streak_start_date)).days >= 6
+                elif ((parse_date(self.event_date) - parse_date(historic_soreness.streak_start_date)).days >= 7
                         and not historic_soreness.ask_acute_pain_question):
                     historic_soreness.historic_soreness_status = HistoricSorenessStatus.almost_persistent_2_pain_acute
                     historic_soreness.average_severity = self.calc_avg_severity_persistent_2(body_part_history,

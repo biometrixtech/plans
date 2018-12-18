@@ -215,9 +215,25 @@ def test_flag_acute_pain_7_days_3_day_gap_question():
 
 def test_flag_acute_pain_7_days_5_day_gap_question():
 
-    historic_soreness = get_historic_soreness([1, None, None, 2, 3, None, None, None, None], "2018-05-22")
+    historic_soreness = get_historic_soreness([1, None, None, 2, 3], "2018-05-18")
 
     assert (HistoricSorenessStatus.acute_pain is historic_soreness[0].historic_soreness_status)
+
+    historic_soreness = get_historic_soreness([1, None, None, 2, 3, None], "2018-05-19", historic_soreness)
+
+    assert (HistoricSorenessStatus.acute_pain is historic_soreness[0].historic_soreness_status)
+
+    historic_soreness = get_historic_soreness([1, None, None, 2, 3, None, None], "2018-05-20", historic_soreness)
+
+    assert (HistoricSorenessStatus.acute_pain is historic_soreness[0].historic_soreness_status)
+
+    historic_soreness = get_historic_soreness([1, None, None, 2, 3, None, None, None], "2018-05-21", historic_soreness)
+
+    assert (HistoricSorenessStatus.almost_persistent_2_pain_acute is historic_soreness[0].historic_soreness_status)
+
+    historic_soreness = get_historic_soreness([1, None, None, 2, 3, None, None, None, None], "2018-05-22", historic_soreness)
+
+    assert (HistoricSorenessStatus.almost_persistent_2_pain_acute is historic_soreness[0].historic_soreness_status)
     assert(True is historic_soreness[0].ask_acute_pain_question)
 
 
