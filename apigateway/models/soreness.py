@@ -177,7 +177,7 @@ class HistoricSoreness(Serialisable):
         }
         return ret
 
-    def is_pain_acute(self):
+    def is_acute_pain(self):
         if (self.historic_soreness_status == HistoricSorenessStatus.acute_pain or
                 self.historic_soreness_status == HistoricSorenessStatus.almost_persistent_2_pain_acute):
             return True

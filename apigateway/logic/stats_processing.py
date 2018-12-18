@@ -353,7 +353,7 @@ class StatsProcessing(object):
                 if 5 < days_diff < 14:
                     last_five_fourteen_day_count += 1
 
-            if historic_soreness.is_pain_acute():
+            if historic_soreness.is_acute_pain():
                 if len(body_part_history) > 0:
                     last_reported_date = max(historic_soreness.last_reported, body_part_history[0].reported_date_time)
                 if (parse_date(self.event_date) - parse_date(last_reported_date)).days > 3:
@@ -415,11 +415,8 @@ class StatsProcessing(object):
                 historic_soreness.average_severity = self.calc_avg_severity_persistent_2(body_part_history, self.event_date)
                 acute_pain_list.append(historic_soreness)
 
-            elif (historic_soreness.historic_soreness_status == HistoricSorenessStatus.persistent_pain or
-                    historic_soreness.historic_soreness_status == HistoricSorenessStatus.persistent_soreness or
-                  historic_soreness.historic_soreness_status == HistoricSorenessStatus.almost_persistent_2_pain or
-                  historic_soreness.historic_soreness_status == HistoricSorenessStatus.almost_persistent_2_pain_acute or
-                  historic_soreness.historic_soreness_status == HistoricSorenessStatus.almost_persistent_2_soreness):
+            elif (historic_soreness.is_persistent_pain() or historic_soreness.is_persistent_soreness() or
+                    historic_soreness.historic_soreness_status == HistoricSorenessStatus.almost_persistent_2_pain_acute):
 
                 if (parse_date(self.event_date) - parse_date(last_reported_date)).days > 14:
                     historic_soreness.ask_persistent_2_question = True  # same question even though different status
@@ -631,7 +628,7 @@ class StatsProcessing(object):
 
         for e in existing_historic_soreness:
             if e.body_part_location == body_part_location and e.side == side and e.is_pain:
-                if e.is_pain_acute():
+                if e.is_acute_pain():
                     if severity_value is not None and severity_value > 0:
                         new_soreness = Soreness()
                         new_soreness.body_part = BodyPart(body_part_location, None)
