@@ -715,7 +715,7 @@ def test_flag_acute_pain_avg_severity_corner_case_7():
 
     historic_soreness = stats_processing.get_historic_soreness_list(soreness_list, historic_soreness)
 
-    assert (4.6 <= historic_soreness[0].average_severity <= 5.0)
+    assert (2.9 <= historic_soreness[0].average_severity <= 3.0)
 
 
 def test_flag_acute_pain_avg_severity_corner_case_8():
@@ -765,7 +765,7 @@ def test_flag_acute_pain_avg_severity_corner_case_9():
 
     historic_soreness = stats_processing.get_historic_soreness_list(soreness_list, historic_soreness)
 
-    assert (4.7 <= historic_soreness[0].average_severity <= 5.0)
+    assert (2.8 <= historic_soreness[0].average_severity <= 3.0)
 
 
 def test_flag_acute_pain_avg_severity_corner_case_10():
