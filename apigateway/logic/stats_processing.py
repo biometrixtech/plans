@@ -696,7 +696,7 @@ class StatsProcessing(object):
 
         for e in existing_historic_soreness:
             if e.body_part_location == body_part_location and e.side == side and e.is_pain == is_pain:
-                if (e.is_persistent_sorenss() or e.is_persistent_pain() or
+                if (e.is_persistent_soreness() or e.is_persistent_pain() or
                         e.historic_soreness_status == HistoricSorenessStatus.persistent_2_pain or
                         e.historic_soreness_status == HistoricSorenessStatus.persistent_2_soreness):
                     if severity_value is not None and severity_value > 0:
@@ -710,17 +710,17 @@ class StatsProcessing(object):
 
                         last_ten_day_count += 1
 
-                        if e.is_persistent_sorenss() or e.is_persistent_pain():
+                        if e.is_persistent_soreness() or e.is_persistent_pain():
                             e = self.process_persistent_status(is_pain, e, question_response_date, last_ten_day_count,
                                                                 soreness_list_25)
                         else:
                             e = self.process_persistent_2_status(soreness_list_25, days_diff, is_pain,e,
                                                                  last_five_fourteen_day_count, last_fourteen_day_count,
                                                                  question_response_date, last_ten_day_count)
-                        e.ask_persistent_2_pain_question = False
+                        e.ask_persistent_2_question = False
 
                     else:
-                        e.ask_persistent_2_pain_question = False
+                        e.ask_persistent_2_question = False
                         e.historic_soreness_status = HistoricSorenessStatus.dormant_cleared
 
         return existing_historic_soreness
