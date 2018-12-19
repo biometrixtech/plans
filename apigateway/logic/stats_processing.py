@@ -354,84 +354,27 @@ class StatsProcessing(object):
                     last_five_fourteen_day_count += 1
 
             if historic_soreness.is_acute_pain():
-                if len(body_part_history) > 0:
-                    last_reported_date = max(historic_soreness.last_reported, body_part_history[0].reported_date_time)
-                if (parse_date(self.event_date) - parse_date(last_reported_date)).days > 3:
-                    historic_soreness.ask_acute_pain_question = True
 
-                if len(body_part_history) > 0:
-                    historic_soreness.last_reported = body_part_history[0].reported_date_time
-                    streak = 0
-                    for b in body_part_history:
-                        if parse_date(b.reported_date_time) >= parse_date(historic_soreness.streak_start_date):
-                            streak += 1
-                    historic_soreness.streak = streak
-                    historic_soreness.average_severity = self.calc_avg_severity_acute_pain(body_part_history, streak)
-
-                if ((parse_date(last_reported_date) - parse_date(historic_soreness.streak_start_date)).days >= 7
-                        and not historic_soreness.ask_acute_pain_question):
-                    historic_soreness.historic_soreness_status = HistoricSorenessStatus.persistent_2_pain
-                    historic_soreness.average_severity = self.calc_avg_severity_persistent_2(body_part_history,
-                                                                                             self.event_date)
-                elif ((parse_date(self.event_date) - parse_date(historic_soreness.streak_start_date)).days >= 7
-                        and not historic_soreness.ask_acute_pain_question):
-                    historic_soreness.historic_soreness_status = HistoricSorenessStatus.almost_persistent_2_pain_acute
-                    historic_soreness.average_severity = self.calc_avg_severity_persistent_2(body_part_history,
-                                                                                             self.event_date)
-
-                #if last_ten_day_count == 4:
-                #    historic_soreness.historic_soreness_status = HistoricSorenessStatus.almost_persistent_2_pain_acute
-
-                #elif last_ten_day_count > 4 and not historic_soreness.ask_acute_pain_question:
-                #    historic_soreness.historic_soreness_status = HistoricSorenessStatus.persistent_2_pain
+                historic_soreness = self.process_acute_pain_status(body_part_history, historic_soreness,
+                                                                    last_reported_date)
 
                 acute_pain_list.append(historic_soreness)
 
             elif (historic_soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_pain or
                     historic_soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_soreness):
 
-                if last_fourteen_day_count == 0:
-                    if g.is_pain:
-                        historic_soreness.historic_soreness_status = HistoricSorenessStatus.persistent_2_pain
-                    else:
-                        historic_soreness.historic_soreness_status = HistoricSorenessStatus.persistent_2_soreness
-                    historic_soreness.ask_acute_pain_question = False
-                    historic_soreness.ask_persistent_2_question = True
-                    historic_soreness.last_reported = last_reported_date
-                    historic_soreness.streak_start_date = None
-
-                elif last_ten_day_count <= 4 and len(body_part_history) >= 5:  # is it persistent pain?
-
-                    if last_five_fourteen_day_count <= 4 and days_diff >= 14 and body_part_history[0].reported_date_time == self.event_date:
-                        if g.is_pain:
-                            historic_soreness.historic_soreness_status = HistoricSorenessStatus.persistent_pain
-                        else:
-                            historic_soreness.historic_soreness_status = HistoricSorenessStatus.persistent_soreness
-                        historic_soreness.ask_acute_pain_question = False
-                        historic_soreness.ask_persistent_2_question = False
-                        historic_soreness.last_reported = last_reported_date
-                        historic_soreness.streak_start_date = None
-
-                historic_soreness.average_severity = self.calc_avg_severity_persistent_2(body_part_history, self.event_date)
+                historic_soreness = self.process_persistent_2_status(body_part_history, days_diff, g.is_pain,
+                                                                     historic_soreness,
+                                                                     last_five_fourteen_day_count,
+                                                                     last_fourteen_day_count,
+                                                                     last_reported_date, last_ten_day_count)
                 acute_pain_list.append(historic_soreness)
 
             elif (historic_soreness.is_persistent_pain() or historic_soreness.is_persistent_soreness() or
                     historic_soreness.historic_soreness_status == HistoricSorenessStatus.almost_persistent_2_pain_acute):
 
-                if (parse_date(self.event_date) - parse_date(last_reported_date)).days > 14:
-                    historic_soreness.ask_persistent_2_question = True  # same question even though different status
-                    if len(body_part_history) > 0:
-                        historic_soreness.last_reported = body_part_history[0].reported_date_time
-
-                if last_ten_day_count > 4:
-                    if g.is_pain:
-                        historic_soreness.historic_soreness_status = HistoricSorenessStatus.persistent_2_pain
-                    else:
-                        historic_soreness.historic_soreness_status = HistoricSorenessStatus.persistent_2_soreness
-                    historic_soreness.ask_acute_pain_question = False
-                    historic_soreness.ask_persistent_2_question = False
-
-                historic_soreness.average_severity = self.calc_avg_severity_persistent_2(body_part_history, self.event_date)
+                historic_soreness = self.process_persistent_status(g.is_pain, historic_soreness, last_reported_date, last_ten_day_count,
+                                               body_part_history)
                 acute_pain_list.append(historic_soreness)
 
             else:
@@ -571,6 +514,78 @@ class StatsProcessing(object):
 
         return acute_pain_list
 
+    def process_acute_pain_status(self, body_part_history, historic_soreness, last_reported_date):
+
+        if len(body_part_history) > 0:
+            last_reported_date = max(historic_soreness.last_reported, body_part_history[0].reported_date_time)
+        if (parse_date(self.event_date) - parse_date(last_reported_date)).days > 3:
+            historic_soreness.ask_acute_pain_question = True
+        if len(body_part_history) > 0:
+            historic_soreness.last_reported = body_part_history[0].reported_date_time
+            streak = 0
+            for b in body_part_history:
+                if parse_date(b.reported_date_time) >= parse_date(historic_soreness.streak_start_date):
+                    streak += 1
+            historic_soreness.streak = streak
+            historic_soreness.average_severity = self.calc_avg_severity_acute_pain(body_part_history, streak)
+        if ((parse_date(last_reported_date) - parse_date(historic_soreness.streak_start_date)).days >= 7
+                and not historic_soreness.ask_acute_pain_question):
+            historic_soreness.historic_soreness_status = HistoricSorenessStatus.persistent_2_pain
+            historic_soreness.average_severity = self.calc_avg_severity_persistent_2(body_part_history,
+                                                                                     self.event_date)
+        elif ((parse_date(self.event_date) - parse_date(historic_soreness.streak_start_date)).days >= 7
+              and not historic_soreness.ask_acute_pain_question):
+            historic_soreness.historic_soreness_status = HistoricSorenessStatus.almost_persistent_2_pain_acute
+            historic_soreness.average_severity = self.calc_avg_severity_persistent_2(body_part_history,
+                                                                                     self.event_date)
+
+        return historic_soreness
+
+    def process_persistent_2_status(self, body_part_history, days_diff, is_pain, historic_soreness,
+                                    last_five_fourteen_day_count, last_fourteen_day_count, last_reported_date,
+                                    last_ten_day_count):
+        if last_fourteen_day_count == 0:
+            if is_pain:
+                historic_soreness.historic_soreness_status = HistoricSorenessStatus.persistent_2_pain
+            else:
+                historic_soreness.historic_soreness_status = HistoricSorenessStatus.persistent_2_soreness
+            historic_soreness.ask_acute_pain_question = False
+            historic_soreness.ask_persistent_2_question = True
+            historic_soreness.last_reported = last_reported_date
+            historic_soreness.streak_start_date = None
+
+        elif last_ten_day_count <= 4 and len(body_part_history) >= 5:  # is it persistent pain?
+
+            if (last_five_fourteen_day_count <= 4 and days_diff >= 14 and
+                    body_part_history[0].reported_date_time == self.event_date):
+                if is_pain:
+                    historic_soreness.historic_soreness_status = HistoricSorenessStatus.persistent_pain
+                else:
+                    historic_soreness.historic_soreness_status = HistoricSorenessStatus.persistent_soreness
+                historic_soreness.ask_acute_pain_question = False
+                historic_soreness.ask_persistent_2_question = False
+                historic_soreness.last_reported = last_reported_date
+                historic_soreness.streak_start_date = None
+        historic_soreness.average_severity = self.calc_avg_severity_persistent_2(body_part_history, self.event_date)
+        return historic_soreness
+
+    def process_persistent_status(self, is_pain, historic_soreness, last_reported_date, last_ten_day_count,
+                                  body_part_history):
+        if (parse_date(self.event_date) - parse_date(last_reported_date)).days > 14:
+            historic_soreness.ask_persistent_2_question = True  # same question even though different status
+            if len(body_part_history) > 0:
+                historic_soreness.last_reported = body_part_history[0].reported_date_time
+        if last_ten_day_count > 4:
+            if is_pain:
+                historic_soreness.historic_soreness_status = HistoricSorenessStatus.persistent_2_pain
+            else:
+                historic_soreness.historic_soreness_status = HistoricSorenessStatus.persistent_2_soreness
+            historic_soreness.ask_acute_pain_question = False
+            historic_soreness.ask_persistent_2_question = False
+        historic_soreness.average_severity = self.calc_avg_severity_persistent_2(body_part_history, self.event_date)
+
+        return historic_soreness
+
     def calc_avg_severity_acute_pain(self, body_part_history, streak):
         # days_for_severity = (last_reported_date_time - parse_date(streak_start_date)).days
         denom_sum = 0
@@ -657,13 +672,51 @@ class StatsProcessing(object):
 
         return existing_historic_soreness
 
-    def answer_persistent_2_question(self, existing_historic_soreness, body_part_location, side, is_pain, question_response_date, still_hurts):
+    def answer_persistent_2_question(self, existing_historic_soreness,  soreness_list_25, body_part_location, side, is_pain, question_response_date, severity_value):
+
+        body_part_history = list(s for s in soreness_list_25 if s.body_part.location ==
+                                 body_part_location and s.side == side and s.pain)
+        body_part_history.sort(key=lambda x: x.reported_date_time, reverse=True)
+
+        last_ten_day_count = 0
+        last_fourteen_day_count = 0
+        last_five_fourteen_day_count = 0
+        days_diff = 0
+
+        for b in range(0, len(body_part_history)):
+
+            days_diff = (parse_date(self.event_date) - parse_date(body_part_history[b].reported_date_time)).days
+
+            if days_diff < 14:
+                last_fourteen_day_count += 1
+            if days_diff < 10:
+                last_ten_day_count += 1
+            if 5 < days_diff < 14:
+                last_five_fourteen_day_count += 1
 
         for e in existing_historic_soreness:
             if e.body_part_location == body_part_location and e.side == side and e.is_pain == is_pain:
-                if (e.historic_soreness_status == HistoricSorenessStatus.persistent_2_pain or
+                if (e.is_persistent_sorenss() or e.is_persistent_pain() or
+                        e.historic_soreness_status == HistoricSorenessStatus.persistent_2_pain or
                         e.historic_soreness_status == HistoricSorenessStatus.persistent_2_soreness):
-                    if still_hurts:
+                    if severity_value is not None and severity_value > 0:
+                        new_soreness = Soreness()
+                        new_soreness.body_part = BodyPart(body_part_location, None)
+                        new_soreness.side = side
+                        new_soreness.pain = True
+                        new_soreness.severity = severity_value
+                        new_soreness.reported_date_time = question_response_date
+                        soreness_list_25.append(new_soreness)
+
+                        last_ten_day_count += 1
+
+                        if e.is_persistent_sorenss() or e.is_persistent_pain():
+                            e = self.process_persistent_status(is_pain, e, question_response_date, last_ten_day_count,
+                                                                soreness_list_25)
+                        else:
+                            e = self.process_persistent_2_status(soreness_list_25, days_diff, is_pain,e,
+                                                                 last_five_fourteen_day_count, last_fourteen_day_count,
+                                                                 question_response_date, last_ten_day_count)
                         e.ask_persistent_2_pain_question = False
 
                     else:
