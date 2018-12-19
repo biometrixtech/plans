@@ -35,8 +35,8 @@ def handle_functional_strength_update():
 
     plan_event_date = format_date(event_date)
     fs_event_date = format_datetime(event_date)
-    if event_date.hour < 3:
-        plan_event_date = format_date(event_date - timedelta(days=1))
+    # if event_date.hour < 3:
+    #     plan_event_date = format_date(event_date - timedelta(days=1))
     if not _check_plan_exists(user_id, plan_event_date):
         raise NoSuchEntityException('Plan not found for the user')
     store = DailyPlanDatastore()
@@ -86,8 +86,8 @@ def handle_functional_strength_start():
 
     plan_event_date = format_date(event_date)
     fs_start_date = format_datetime(event_date)
-    if event_date.hour < 3:
-        plan_event_date = format_date(event_date - timedelta(days=1))
+    # if event_date.hour < 3:
+    #     plan_event_date = format_date(event_date - timedelta(days=1))
     if not _check_plan_exists(user_id, plan_event_date):
         raise NoSuchEntityException('Plan not found for the user')
     store = DailyPlanDatastore()

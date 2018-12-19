@@ -64,7 +64,7 @@ def test_persistent_2_pain_specific_actions():
     athlete_stats = AthleteStats("tester")
 
     hist_soreness = HistoricSoreness(BodyPartLocation(12), 1, True)
-    hist_soreness.historic_soreness_status = HistoricSorenessStatus.persistent_2
+    hist_soreness.historic_soreness_status = HistoricSorenessStatus.persistent_2_pain
     hist_soreness.average_severity = 3
     hist_soreness_list = [hist_soreness]
     athlete_stats.historic_soreness = hist_soreness_list

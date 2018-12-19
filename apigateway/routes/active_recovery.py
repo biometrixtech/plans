@@ -9,7 +9,6 @@ from datastores.completed_exercise_datastore import CompletedExerciseDatastore
 from models.soreness import CompletedExercise
 from utils import format_date, parse_datetime, format_datetime
 from config import get_mongo_collection
-import datetime
 
 app = Blueprint('active_recovery', __name__)
 
@@ -40,8 +39,8 @@ def handle_active_recovery_update():
 
     plan_event_date = format_date(event_date)
     recovery_event_date = format_datetime(event_date)
-    if event_date.hour < 3:
-        plan_event_date = format_date(event_date - datetime.timedelta(days=1))
+    # if event_date.hour < 3:
+    #     plan_event_date = format_date(event_date - datetime.timedelta(days=1))
     if not _check_plan_exists(user_id, plan_event_date):
         raise NoSuchEntityException('Plan not found for the user')
     store = DailyPlanDatastore()
@@ -97,8 +96,8 @@ def handle_active_recovery_start():
 
     plan_event_date = format_date(event_date)
     recovery_start_date = format_datetime(event_date)
-    if event_date.hour < 3:
-        plan_event_date = format_date(event_date - datetime.timedelta(days=1))
+    # if event_date.hour < 3:
+    #     plan_event_date = format_date(event_date - datetime.timedelta(days=1))
     if not _check_plan_exists(user_id, plan_event_date):
         raise NoSuchEntityException('Plan not found for the user')
     store = DailyPlanDatastore()

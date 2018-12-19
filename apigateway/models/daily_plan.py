@@ -1,8 +1,6 @@
 from serialisable import Serialisable
 from utils import parse_date
-from datetime import datetime
 import models.session as session
-from utils import format_datetime
 
 
 class DailyPlan(Serialisable):
@@ -32,6 +30,8 @@ class DailyPlan(Serialisable):
         self.functional_strength_eligible = False
         self.completed_functional_strength_sessions = 0
         self.functional_strength_session = None
+        self.session_from_readiness = False
+        self.sessions_planned_readiness = True
 
     def get_id(self):
         return self.user_id
@@ -52,8 +52,8 @@ class DailyPlan(Serialisable):
                'post_recovery_completed': self.post_recovery_completed,
                'functional_strength_session': (self.functional_strength_session.json_serialise()
                                                if self.functional_strength_session is not None else None),
-               'recovery_am': self.pre_recovery.json_serialise() if self.pre_recovery is not None else None,
-               'recovery_pm': self.post_recovery.json_serialise() if self.post_recovery is not None else None,
+               # 'recovery_am': self.pre_recovery.json_serialise() if self.pre_recovery is not None else None,
+               # 'recovery_pm': self.post_recovery.json_serialise() if self.post_recovery is not None else None,
                'pre_recovery': self.pre_recovery.json_serialise() if self.pre_recovery is not None else None,
                'post_recovery': self.post_recovery.json_serialise() if self.post_recovery is not None else None,
                'completed_post_recovery_sessions': [c.json_serialise() for c in self.completed_post_recovery_sessions],
@@ -64,6 +64,8 @@ class DailyPlan(Serialisable):
                'functional_strength_completed': self.functional_strength_completed,
                'functional_strength_eligible': self.functional_strength_eligible,
                'completed_functional_strength_sessions': self.completed_functional_strength_sessions,
+               'session_from_readiness': self.session_from_readiness,
+               'sessions_planned_readiness': self.sessions_planned_readiness
                }
         return ret
 

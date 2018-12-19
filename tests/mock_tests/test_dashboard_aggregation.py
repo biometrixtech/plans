@@ -1,6 +1,7 @@
 from models.metrics import AthleteMetric, MetricColor, WeeklyHighLevelInsight, DailyHighLevelInsight, MetricType, SpecificAction
 from models.dashboard import AthleteDashboardData, TeamDashboardData
 from models.daily_readiness import DailyReadiness
+from models.daily_plan import  DailyPlan
 import datetime
 
 def get_metric(metric_type, color, high_level_insight, specific_insight, rec1, rec2):
@@ -16,6 +17,14 @@ def get_athlete(metrics):
     athlete = AthleteDashboardData("user_id", "fisrt_name", 'last_name')
     athlete.aggregate(metrics)
     return athlete
+
+def create_plan(user_id, readiness_survey_date, sessions_planned, training_sessions):
+    plan = DailyPlan('2018-11-30')
+    plan.user_id = user_id
+    plan.daily_readiness_survey = readiness_survey_date
+    plan.sessions_planned = sessions_planned
+    plan.training_sessions = training_sessions
+    return plan
 
 def test_no_metrics():
     metrics = []
@@ -220,12 +229,17 @@ def test_compliance_grouping():
                           "first_name": "user"+user_id,
                           "last_name": "last_name"
                           }
-    readiness_survey_list = [DailyReadiness("2018-11-30T10:00:00Z", "1", [], 5, 7),
-                             DailyReadiness("2018-11-30T10:00:00Z", "2", [], 5, 7),
-                             DailyReadiness("2018-11-30T10:00:00Z", "3", [], 5, 7)]
-    team = TeamDashboardData("Fathom Team")
-    team.get_compliance_data(user_ids, users, readiness_survey_list)
 
+    daily_plan_list = [create_plan("1", "2018-11-30", True, []),
+                       create_plan("2", "2018-11-30", True, ["session1", "session2"]),
+                       create_plan("3", "2018-11-30", False, []),
+                       create_plan("4", None, True, ["sensor_data"])]
+    team = TeamDashboardData("Fathom Team")
+    team.get_compliance_data(user_ids, users, daily_plan_list)
 
     assert len(team.compliance["completed"]) == 3
     assert len(team.compliance["incomplete"]) == 2
+    assert len(team.compliance["training_compliance"]["no_response"]) == 3
+    assert len(team.compliance["training_compliance"]["rest_day"]) == 1
+    assert len(team.compliance["training_compliance"]["sessions_logged"]) == 1
+

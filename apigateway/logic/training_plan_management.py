@@ -103,9 +103,16 @@ class TrainingPlanManager(object):
 
         return False
 
-    def create_daily_plan(self, event_date=None):
+    def show_post_recovery(self, post_surveys_today, daily_plan):
+        if post_surveys_today and not daily_plan.session_from_readiness:
+            return True
+        else:
+            if daily_plan.sessions_planned_readiness:
+                return False
+            else:
+                return True
 
-        show_post_recovery = False
+    def create_daily_plan(self, event_date=None):
 
         if event_date is not None:
             start_time = format_datetime(parse_date(event_date) - datetime.timedelta(days=1))
@@ -125,8 +132,6 @@ class TrainingPlanManager(object):
         post_session_surveys = self.post_session_survey_datastore.get(self.athlete_id, parse_datetime(start_time), parse_datetime(end_time))
         athlete_stats = self.athlete_stats_datastore.get(self.athlete_id)
 
-        show_post_recovery = self.post_session_surveys_today(post_session_surveys, today_date)
-
         survey_event_dates = [s.get_event_date() for s in post_session_surveys if s is not None]
 
         if survey_event_dates is not None and len(survey_event_dates) > 0:
@@ -138,9 +143,9 @@ class TrainingPlanManager(object):
         else:
             historic_soreness = [hs for hs in athlete_stats.historic_soreness if hs.historic_soreness_status is not None and
                                  hs.historic_soreness_status is not HistoricSorenessStatus.dormant_cleared and
-                                 hs.historic_soreness_status is not HistoricSorenessStatus.almost_persistent]
+                                 hs.historic_soreness_status is not HistoricSorenessStatus.almost_persistent_soreness and
+                                 hs.historic_soreness_status is not HistoricSorenessStatus.almost_persistent_pain]
             historic_soreness_present = len(historic_soreness) > 0
-                
 
         soreness_list = SorenessCalculator().get_soreness_summary_from_surveys(readiness_surveys,
                                                                                post_session_surveys,
@@ -156,7 +161,9 @@ class TrainingPlanManager(object):
             daily_plan.last_sensor_sync = self.daily_plan_datastore.get_last_sensor_sync(self.athlete_id, today_date)
         else:
             daily_plan = daily_plans[len(daily_plans) - 1]
+        post_surveys_today = self.post_session_surveys_today(post_session_surveys, today_date)
 
+        show_post_recovery = self.show_post_recovery(post_surveys_today, daily_plan)
         daily_plan.user_id = self.athlete_id
         daily_plan.daily_readiness_survey = last_daily_readiness_survey.get_event_date().strftime('%Y-%m-%d')
 
@@ -188,6 +195,8 @@ class TrainingPlanManager(object):
 
         functional_strength_active = (daily_plan.functional_strength_session is not None)
 
+        target_minutes = 15
+
         if not show_post_recovery:
             pre_impact_score = self.calculate_pre_impact_score(
                                 max_rpe,
@@ -198,12 +207,12 @@ class TrainingPlanManager(object):
                                 )
             if daily_plan.pre_recovery is not None and not daily_plan.pre_recovery.completed:
                 rpe_impact_score = min((max_rpe / 10) * 4, 4)
-                daily_plan.pre_recovery.set_exercise_target_minutes(soreness_list, 15, max_soreness,
+                daily_plan.pre_recovery.set_exercise_target_minutes(soreness_list, target_minutes, max_soreness,
                                                                     historic_soreness_present,
                                                                     functional_strength_active,
                                                                     is_active_prep=True)
                 am_exercise_assignments = calc.create_exercise_assignments(daily_plan.pre_recovery, soreness_list,
-                                                                           trigger_date_time)
+                                                                           trigger_date_time, target_minutes)
                 daily_plan.pre_recovery.update_from_exercise_assignments(am_exercise_assignments)
                 daily_plan.pre_recovery.impact_score = pre_impact_score
                 daily_plan.pre_recovery.why_text = text_generator.get_why_text(rpe_impact_score, max_soreness)
@@ -228,12 +237,12 @@ class TrainingPlanManager(object):
             )
             if daily_plan.post_recovery is not None and not daily_plan.post_recovery.completed:
                 rpe_impact_score = min((max_rpe / 10) * 5, 5)
-                daily_plan.post_recovery.set_exercise_target_minutes(soreness_list, 15, max_soreness,
+                daily_plan.post_recovery.set_exercise_target_minutes(soreness_list, target_minutes, max_soreness,
                                                                      historic_soreness_present,
                                                                      functional_strength_active,
                                                                      is_active_prep=False)
                 pm_exercise_assignments = calc.create_exercise_assignments(daily_plan.post_recovery, soreness_list,
-                                                                           trigger_date_time)
+                                                                           trigger_date_time, target_minutes)
                 daily_plan.post_recovery.update_from_exercise_assignments(pm_exercise_assignments)
                 daily_plan.post_recovery.impact_score = post_impact_score
                 daily_plan.post_recovery.why_text = text_generator.get_why_text(rpe_impact_score, max_soreness)
