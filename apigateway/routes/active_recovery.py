@@ -124,10 +124,10 @@ def handle_active_recovery_start():
     return {'message': 'success'}, 200
 
 
-@app.route('/target_minutes', methods=['PATCH'])
+@app.route('/active_time', methods=['PATCH'])
 @require.authenticated.any
-@xray_recorder.capture('routes.active_recovery')
-def handle_active_recovery_scale():
+@xray_recorder.capture('routes.active_time')
+def hangle_workout_active_time():
     if not isinstance(request.json, dict):
         raise InvalidSchemaException('Request body must be a dictionary')
     if 'event_date' not in request.json:
