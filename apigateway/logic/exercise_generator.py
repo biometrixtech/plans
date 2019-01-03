@@ -154,21 +154,6 @@ class ExerciseAssignments(object):
         self.activate_exercises = self.remove_duplicate_assigned_exercises(self.activate_exercises)
 
         self.calculate_durations()
-        # if self.duration_minutes() < self.duration_minutes_target - 3:
-        #     body_part = self.get_general_exercises()
-
-        #     if exercise_session.inhibit_target_minutes is not None and exercise_session.inhibit_target_minutes > 0:
-        #         new_assignments = self.get_exercise_list_for_body_part(body_part.inhibit_exercises, exercise_list,
-        #                                                  completed_exercises, 0)
-        #         exercise_assignments.inhibit_exercises.extend(new_assignments)
-        #     if exercise_session.lengthen_target_minutes is not None and exercise_session.lengthen_target_minutes > 0:
-        #         new_assignments = self.get_exercise_list_for_body_part(body_part.lengthen_exercises, exercise_list,
-        #                                                  completed_exercises, 0)
-        #         exercise_assignments.lengthen_exercises.extend(new_assignments)
-        #     if exercise_session.activate_target_minutes is not None and exercise_session.activate_target_minutes > 0:
-        #         new_assignments = self.get_exercise_list_for_body_part(body_part.activate_exercises, exercise_list,
-        #                                                  completed_exercises, 0)
-        #         exercise_assignments.activate_exercises.extend(new_assignments)
 
         if (self.inhibit_max_percentage is not None and
                 self.lengthen_max_percentage is not None and
