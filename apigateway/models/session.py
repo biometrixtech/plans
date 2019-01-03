@@ -462,11 +462,11 @@ class RecoverySession(Serialisable):
         self.lengthen_exercises = exercise_assignments.lengthen_exercises
         self.activate_exercises = exercise_assignments.activate_exercises
         self.integrate_exercises = exercise_assignments.integrate_exercises
-        self.duration_minutes = exercise_assignments.duration_minutes_target
-        # self.duration_minutes = (exercise_assignments.inhibit_minutes +
-        #                          exercise_assignments.lengthen_minutes +
-        #                          exercise_assignments.activate_minutes +
-        #                          exercise_assignments.integrate_minutes)
+        # self.duration_minutes = exercise_assignments.duration_minutes_target
+        self.duration_minutes = (exercise_assignments.inhibit_minutes +
+                                 exercise_assignments.lengthen_minutes +
+                                 exercise_assignments.activate_minutes +
+                                 exercise_assignments.integrate_minutes)
 
         self.inhibit_iterations = exercise_assignments.inhibit_iterations
         self.lengthen_iterations = exercise_assignments.lengthen_iterations
