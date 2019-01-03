@@ -462,10 +462,11 @@ class RecoverySession(Serialisable):
         self.lengthen_exercises = exercise_assignments.lengthen_exercises
         self.activate_exercises = exercise_assignments.activate_exercises
         self.integrate_exercises = exercise_assignments.integrate_exercises
-        self.duration_minutes = (exercise_assignments.inhibit_minutes +
-                                 exercise_assignments.lengthen_minutes +
-                                 exercise_assignments.activate_minutes +
-                                 exercise_assignments.integrate_minutes)
+        self.duration_minutes = exercise_assignments.duration_minutes_target
+        # self.duration_minutes = (exercise_assignments.inhibit_minutes +
+        #                          exercise_assignments.lengthen_minutes +
+        #                          exercise_assignments.activate_minutes +
+        #                          exercise_assignments.integrate_minutes)
 
         self.inhibit_iterations = exercise_assignments.inhibit_iterations
         self.lengthen_iterations = exercise_assignments.lengthen_iterations
@@ -515,7 +516,7 @@ class RecoverySession(Serialisable):
             self.activate_max_percentage = 0
             self.lengthen_max_percentage = 0
             self.inhibit_max_percentage = 0
-        elif max_severity > 3 and not high_severity_is_pain:
+        elif (max_severity > 3 and not high_severity_is_pain) or total_minutes_target == 5:
             self.integrate_target_minutes = 0
             self.activate_target_minutes = 0
             self.lengthen_target_minutes = 0
@@ -590,6 +591,18 @@ class RecoverySession(Serialisable):
                     self.set_50_50_time_split(total_minutes_target)
             else:
                 self.set_25_25_50_time_split(total_minutes_target)
+
+        if total_minutes_target == 10:
+            lengthen_percentage = self.lengthen_target_minutes / (self.lengthen_target_minutes + self.inhibit_target_minutes)
+            inhibit_percentage = self.inhibit_target_minutes / (self.lengthen_target_minutes + self.inhibit_target_minutes)
+            self.integrate_target_minutes = None
+            self.activate_target_minutes = None
+            self.lengthen_target_minutes = total_minutes_target * lengthen_percentage
+            self.inhibit_target_minutes = total_minutes_target * inhibit_percentage
+            self.integrate_max_percentage = None
+            self.activate_max_percentage = None
+            self.lengthen_max_percentage = lengthen_percentage + .1
+            self.inhibit_max_percentage = inhibit_percentage + .1
 
     def set_70_30_time_split(self, total_minutes_target):
         self.integrate_target_minutes = None

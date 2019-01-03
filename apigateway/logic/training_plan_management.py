@@ -112,7 +112,7 @@ class TrainingPlanManager(object):
             else:
                 return True
 
-    def create_daily_plan(self, event_date=None):
+    def create_daily_plan(self, event_date=None, target_minutes=15):
 
         if event_date is not None:
             start_time = format_datetime(parse_date(event_date) - datetime.timedelta(days=1))
@@ -195,7 +195,7 @@ class TrainingPlanManager(object):
 
         functional_strength_active = (daily_plan.functional_strength_session is not None)
 
-        target_minutes = 15
+        # target_minutes = 15
 
         if not show_post_recovery:
             pre_impact_score = self.calculate_pre_impact_score(

@@ -124,6 +124,42 @@ def handle_active_recovery_start():
     return {'message': 'success'}, 200
 
 
+@app.route('/target_minutes', methods=['PATCH'])
+@require.authenticated.any
+@xray_recorder.capture('routes.active_recovery')
+def handle_active_recovery_scale():
+    if not isinstance(request.json, dict):
+        raise InvalidSchemaException('Request body must be a dictionary')
+    if 'event_date' not in request.json:
+        raise InvalidSchemaException('Missing required parameter event_date')
+    else:
+        event_date = parse_datetime(request.json['event_date'])
+
+    try:
+        user_id = request.json['user_id']
+    except:
+        raise InvalidSchemaException('user_id is required')
+    try:
+        target_minutes = request.json['target_minutes']
+    except:
+        raise InvalidSchemaException('target_minutes is required')
+
+    plan_event_date = format_date(event_date)
+    if not _check_plan_exists(user_id, plan_event_date):
+        raise NoSuchEntityException('Plan not found for the user')
+    store = DailyPlanDatastore()
+
+    body = {"event_date": plan_event_date,
+            "target_minutes": target_minutes}
+    Service('plans', Config.get('API_VERSION')).call_apigateway_async('POST',
+                                                                      f"athlete/{user_id}/daily_plan",
+                                                                      body)
+
+    return {'message': 'success'}, 201
+
+
+
+
 def save_completed_exercises(exercise_list, user_id, event_date):
     exercise_store = CompletedExerciseDatastore()
 

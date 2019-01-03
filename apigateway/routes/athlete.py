@@ -27,7 +27,11 @@ def create_daily_plan(athlete_id):
         event_date = request.json['event_date']
     except:
         event_date = None
-    daily_plan = TrainingPlanManager(athlete_id, DatastoreCollection()).create_daily_plan(event_date=event_date)
+    try:
+        target_minutes = request.json['target_minutes']
+    except:
+        target_minutes = 15
+    daily_plan = TrainingPlanManager(athlete_id, DatastoreCollection()).create_daily_plan(event_date=event_date, target_minutes=target_minutes)
     # daily_plan.last_updated = format_datetime(datetime.datetime.now())
     # push_plan_update(athlete_id, daily_plan)
     body = {"message": "Your plan is ready!",
