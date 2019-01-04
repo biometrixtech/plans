@@ -11,7 +11,7 @@ from fathomapi.utils.decorators import require
 from fathomapi.utils.exceptions import InvalidSchemaException, NoSuchEntityException
 from fathomapi.utils.xray import xray_recorder
 from models.daily_readiness import DailyReadiness
-from models.soreness import MuscleSorenessSeverity, BodyPartLocation
+from models.soreness import MuscleSorenessSeverity, BodyPartLocation, HistoricSorenessStatus
 from models.stats import AthleteStats
 from models.daily_plan import DailyPlan
 from logic.survey_processing import SurveyProcessing
@@ -158,7 +158,7 @@ def handle_daily_readiness_get(principal_id=None):
             if ps_survey.event_date_time > start_time + datetime.timedelta(days=1):
                 if len([s for s in ps_survey.survey.soreness if s.severity >= 3 and s.pain]):
                     severe_pain_today_yesterday = True
-    sore_body_parts = [dict(t) for t in {tuple(d.items()) for d in sore_body_parts}]
+    # sore_body_parts = [dict(t) for t in {tuple(d.items()) for d in sore_body_parts}]
 
     athlete_stats_store = AthleteStatsDatastore()
     athlete_stats = athlete_stats_store.get(athlete_id=user_id)
@@ -168,7 +168,10 @@ def handle_daily_readiness_get(principal_id=None):
     functional_strength_eligible = False
     completed_functional_strength_sessions = 0
 
+    q2 = []
+    q3 = []
     if athlete_stats is not None:
+        q2, q3 = get_q2_q3_from_athlete_stats(athlete_stats)
         current_sport_name = athlete_stats.current_sport_name.value if athlete_stats.current_sport_name is not None else None
         current_position = athlete_stats.current_position.value if athlete_stats.current_position is not None else None
         functional_strength_eligible = False
@@ -178,15 +181,39 @@ def handle_daily_readiness_get(principal_id=None):
             functional_strength_eligible = True
 
         completed_functional_strength_sessions = athlete_stats.completed_functional_strength_sessions
+    
+    for sore_part in sore_body_parts:
+        if sore_part["body_part"] in q3:
+            sore_body_parts.remove(sore_part)
+    sore_body_parts.extend(q2)
+    sore_body_parts = [dict(t) for t in {tuple(d.items()) for d in sore_body_parts}]
 
     return {
                'body_parts': sore_body_parts,
+               'q3': q3,
                'current_position': current_position,
                'current_sport_name': current_sport_name,
                'functional_strength_eligible': functional_strength_eligible,
                'completed_functional_strength_sessions': completed_functional_strength_sessions
            }, 200
 
+def get_q2_q3_from_athlete_stats(athlete_stats):
+    q2 = []
+    q3 = []
+    for soreness in athlete_stats.historic_soreness:
+        if soreness.ask_persistent_2_question:
+            q3.append({"body_part": soreness.body_part_location.value,
+                       "side": soreness.side,
+                       "is_pain": soreness.is_pain,
+                       "status": "persistent"})
+        elif soreness.ask_acute_pain_question:
+            q3.append({"body_part": soreness.body_part_location.value,
+                       "side": soreness.side,
+                       "is_pain": soreness.is_pain,
+                       "status": "acute"})
+        elif soreness.historic_soreness_status not in [HistoricSorenessStatus.dormant_cleared, HistoricSorenessStatus.almost_persistent_pain, HistoricSorenessStatus.almost_persistent_soreness, HistoricSorenessStatus.almost_acute_pain]:
+            q2.append({"body_part": soreness.body_part_location.value, "side": soreness.side})
+    return q2, q3
 
 @xray_recorder.capture('routes.daily_readiness.validate')
 def validate_data():
