@@ -136,6 +136,27 @@ class ExerciseAssignmentCalculator(object):
 
                 exercise_assignments.activate_exercises.extend(new_assignments)
 
+
+        exercise_assignments.inhibit_exercises = exercise_assignments.remove_duplicate_assigned_exercises(exercise_assignments.inhibit_exercises)
+        exercise_assignments.lengthen_exercises = exercise_assignments.remove_duplicate_assigned_exercises(exercise_assignments.lengthen_exercises)
+        exercise_assignments.activate_exercises = exercise_assignments.remove_duplicate_assigned_exercises(exercise_assignments.activate_exercises)
+        exercise_assignments.calculate_durations()
+        if exercise_assignments.duration_minutes() < exercise_assignments.duration_minutes_target - 3:
+            body_part = self.get_general_exercises()
+
+            if exercise_session.inhibit_target_minutes is not None and exercise_session.inhibit_target_minutes > 0:
+                new_assignments = self.get_exercise_list_for_body_part(body_part.inhibit_exercises, exercise_list,
+                                                         completed_exercises, 0)
+                exercise_assignments.inhibit_exercises.extend(new_assignments)
+            if exercise_session.lengthen_target_minutes is not None and exercise_session.lengthen_target_minutes > 0:
+                new_assignments = self.get_exercise_list_for_body_part(body_part.lengthen_exercises, exercise_list,
+                                                         completed_exercises, 0)
+                exercise_assignments.lengthen_exercises.extend(new_assignments)
+            if exercise_session.activate_target_minutes is not None and exercise_session.activate_target_minutes > 0:
+                new_assignments = self.get_exercise_list_for_body_part(body_part.activate_exercises, exercise_list,
+                                                         completed_exercises, 0)
+                exercise_assignments.activate_exercises.extend(new_assignments)
+
         exercise_assignments.scale_to_targets()
 
         return exercise_assignments

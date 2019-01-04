@@ -16,8 +16,8 @@ class MetricsProcessing(object):
         if athlete_stats.daily_severe_pain_event_date == event_date:
             metrics.extend(DailySeverePainMetricGenerator(athlete_stats.daily_severe_pain).get_metric_list())
 
-        # pain_list = list(p for p in athlete_stats.historic_soreness if p.is_pain and p.streak >= 3)
-        # metrics.extend(ThreeDayConsecutivePainMetricGenerator(pain_list).get_metric_list())
+        pain_list = list(p for p in athlete_stats.historic_soreness if p.is_acute_pain())
+        metrics.extend(AcutePainMetricGenerator(pain_list).get_metric_list())
 
         ps_list = list(p for p in athlete_stats.historic_soreness if p.historic_soreness_status ==
                        HistoricSorenessStatus.persistent_soreness or p.historic_soreness_status ==
@@ -161,23 +161,30 @@ class DailySeverePainMetricGenerator(AthleteSorenessMetricGenerator):
         self.populate_thresholds_with_soreness()
 
 
-class ThreeDayConsecutivePainMetricGenerator(AthleteSorenessMetricGenerator):
+class AcutePainMetricGenerator(AthleteSorenessMetricGenerator):
     def __init__(self, soreness_list):
-        super(ThreeDayConsecutivePainMetricGenerator, self).__init__("3 Day Consecutive Pain", MetricType.daily,
-                                                                     soreness_list, "average_severity")
+        super(AcutePainMetricGenerator, self).__init__("Acute Pain", MetricType.daily,
+                                                       soreness_list, "average_severity")
         self.high_level_action_description = ""
         self.thresholds[0] = ThresholdRecommendation(MetricColor.red,
                                                      DailyHighLevelInsight.not_cleared_for_training,
                                                      "Pain severity is too high for training today, consult medical staff to evaluate status",
-                                                     ["5A", "2A"], 3.0, None,
-                                                     "Consistent reports of moderate {bodypart} pain which may be a sign of injury",
+                                                     ["5A", "2A"], 4.0, None,
+                                                     "Consistent severe {bodypart} pain that is too high to train today and may indicate injury",
                                                      None)
         self.thresholds[1] = ThresholdRecommendation(MetricColor.yellow,
+                                                     DailyHighLevelInsight.monitor_in_training,
+                                                     "Pain severity is too high for training today, consult medical staff to evaluate status",
+                                                     ["6A", "7B"], 3.0, 4.0,
+                                                     "Consistent reports of moderate {bodypart} pain which may be a sign of injury",
+                                                     None)
+        self.thresholds[2] = ThresholdRecommendation(MetricColor.yellow,
                                                      DailyHighLevelInsight.monitor_in_training,
                                                      "Stop training if pain increases and consider reducing workload to facilitate recovery",
                                                      ["6A", "7B"], 1.0, 3.0,
                                                      "Consistent reports of mild {bodypart} pain which may be a sign of injury",
                                                      None)
+
         self.populate_thresholds_with_soreness()
 
 

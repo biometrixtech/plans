@@ -154,6 +154,7 @@ class ExerciseAssignments(object):
         self.activate_exercises = self.remove_duplicate_assigned_exercises(self.activate_exercises)
 
         self.calculate_durations()
+
         if (self.inhibit_max_percentage is not None and
                 self.lengthen_max_percentage is not None and
                 self.activate_max_percentage is not None and
