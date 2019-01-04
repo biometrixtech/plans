@@ -146,9 +146,9 @@ def hangle_workout_active_time():
     except:
         raise InvalidSchemaException('user_id is required')
     try:
-        target_minutes = request.json['target_minutes']
+        target_minutes = request.json['active_time']
     except:
-        raise InvalidSchemaException('target_minutes is required')
+        raise InvalidSchemaException('active_time is required')
 
     plan_event_date = format_date(event_date)
     if not _check_plan_exists(user_id, plan_event_date):
