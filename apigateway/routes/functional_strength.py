@@ -43,7 +43,10 @@ def handle_functional_strength_update():
 
     plan = store.get(user_id=user_id, start_date=plan_event_date, end_date=plan_event_date)[0]
 
+    save_exercises = True
     if plan.functional_strength_session is not None:
+        if plan.functional_strength_session.completed:
+            save_exercises = False
         plan.functional_strength_session.completed = True
         plan.functional_strength_session.event_date = fs_event_date
     plan.functional_strength_completed = True
@@ -56,7 +59,8 @@ def handle_functional_strength_update():
     athlete_stats.next_functional_strength_eligible_date = format_datetime(parse_datetime(fs_event_date) + timedelta(days=1))
     athlete_stats_store.put(athlete_stats)
 
-    save_completed_exercises(completed_exercises, user_id, fs_event_date)
+    if save_exercises:
+        save_completed_exercises(completed_exercises, user_id, fs_event_date)
 
     survey_complete = plan.daily_readiness_survey_completed()
     landing_screen, nav_bar_indicator = plan.define_landing_screen()
