@@ -12,8 +12,9 @@ class FSProgramGenerator(object):
 
     def populate_exercises(self, session):
 
-        session.warm_up = self.assign_exercises(session.warm_up)
-        session.duration_minutes += self.calculate_exercise_length(session.warm_up)
+        # session.warm_up = self.assign_exercises(session.warm_up)
+        # session.duration_minutes += self.calculate_exercise_length(session.warm_up)
+        session.warm_up = []
 
         session.dynamic_movement = self.assign_exercises(session.dynamic_movement)
         session.duration_minutes += self.calculate_exercise_length(session.dynamic_movement)
@@ -21,9 +22,9 @@ class FSProgramGenerator(object):
         session.stability_work = self.assign_exercises(session.stability_work)
         session.duration_minutes += self.calculate_exercise_length(session.stability_work)
 
-        session.victory_lap = self.assign_exercises(session.victory_lap)
-        session.duration_minutes += self.calculate_exercise_length(session.victory_lap)
-
+        # session.victory_lap = self.assign_exercises(session.victory_lap)
+        # session.duration_minutes += self.calculate_exercise_length(session.victory_lap)
+        session.victory_lap = []
         return session
 
     def calculate_exercise_length(self, exercise_list):
