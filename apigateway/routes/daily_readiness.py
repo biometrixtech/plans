@@ -158,7 +158,7 @@ def handle_daily_readiness_get(principal_id=None):
             if ps_survey.event_date_time > start_time + datetime.timedelta(days=1):
                 if len([s for s in ps_survey.survey.soreness if s.severity >= 3 and s.pain]):
                     severe_pain_today_yesterday = True
-    # sore_body_parts = [dict(t) for t in {tuple(d.items()) for d in sore_body_parts}]
+    sore_body_parts = [dict(t) for t in {tuple(d.items()) for d in sore_body_parts}]
 
     athlete_stats_store = AthleteStatsDatastore()
     athlete_stats = athlete_stats_store.get(athlete_id=user_id)
@@ -168,10 +168,11 @@ def handle_daily_readiness_get(principal_id=None):
     functional_strength_eligible = False
     completed_functional_strength_sessions = 0
 
-    q2 = []
-    q3 = []
+    hist_sore_status = []
+    clear_candidates = []
+    dormant_tipping_candidates = []
     if athlete_stats is not None:
-        q2, q3 = get_q2_q3_from_athlete_stats(athlete_stats)
+        hist_sore_status, clear_candidates, dormant_tipping_candidates = athlete_stats.get_q2_q3_list()
         current_sport_name = athlete_stats.current_sport_name.value if athlete_stats.current_sport_name is not None else None
         current_position = athlete_stats.current_position.value if athlete_stats.current_position is not None else None
         functional_strength_eligible = False
@@ -181,39 +182,32 @@ def handle_daily_readiness_get(principal_id=None):
             functional_strength_eligible = True
 
         completed_functional_strength_sessions = athlete_stats.completed_functional_strength_sessions
-    
+    q3_list = [{"body_part": q["body_part"], "side": q["side"]} for q in clear_candidates]
+    q2_list = [{"body_part": q["body_part"], "side": q["side"]} for q in hist_sore_status]
+    tipping_list = [{"body_part": q["body_part"], "side": q["side"]} for q in dormant_tipping_candidates]
     for sore_part in sore_body_parts:
-        if sore_part["body_part"] in q3:
+        if sore_part in q2_list or sore_part in q3_list:
             sore_body_parts.remove(sore_part)
-    sore_body_parts.extend(q2)
-    sore_body_parts = [dict(t) for t in {tuple(d.items()) for d in sore_body_parts}]
+        elif sore_part in tipping_list:
+            for t in dormant_tipping_candidates:
+                if t['body_part'] == sore_part['body_part'] and t['side'] == sore_part['side']:
+                    sore_part['status'] = t['status']
+                    dormant_tipping_candidates.remove(t)
+        else:
+            sore_part['status'] = HistoricSorenessStatus.dormant_cleared.name
+
 
     return {
                'body_parts': sore_body_parts,
-               'q3': q3,
+               'dormant_tipping_candidates': dormant_tipping_candidates,
+               'hist_sore_status': hist_sore_status,
+               'clear_candidates': clear_candidates,
                'current_position': current_position,
                'current_sport_name': current_sport_name,
                'functional_strength_eligible': functional_strength_eligible,
                'completed_functional_strength_sessions': completed_functional_strength_sessions
            }, 200
 
-def get_q2_q3_from_athlete_stats(athlete_stats):
-    q2 = []
-    q3 = []
-    for soreness in athlete_stats.historic_soreness:
-        if soreness.ask_persistent_2_question:
-            q3.append({"body_part": soreness.body_part_location.value,
-                       "side": soreness.side,
-                       "is_pain": soreness.is_pain,
-                       "status": "persistent"})
-        elif soreness.ask_acute_pain_question:
-            q3.append({"body_part": soreness.body_part_location.value,
-                       "side": soreness.side,
-                       "is_pain": soreness.is_pain,
-                       "status": "acute"})
-        elif soreness.historic_soreness_status not in [HistoricSorenessStatus.dormant_cleared, HistoricSorenessStatus.almost_persistent_pain, HistoricSorenessStatus.almost_persistent_soreness, HistoricSorenessStatus.almost_acute_pain]:
-            q2.append({"body_part": soreness.body_part_location.value, "side": soreness.side})
-    return q2, q3
 
 @xray_recorder.capture('routes.daily_readiness.validate')
 def validate_data():

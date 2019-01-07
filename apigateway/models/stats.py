@@ -201,6 +201,33 @@ class AthleteStats(Serialisable):
         else:
             return None
 
+    def get_q2_q3_list(self):
+        q2 = []
+        q3 = []
+        tipping_status = []
+        for soreness in self.historic_soreness:
+            if soreness.ask_persistent_2_question or soreness.ask_acute_pain_question:
+                q3.append({"body_part": soreness.body_part_location.value,
+                           "side": soreness.side,
+                           "is_pain": soreness.is_pain,
+                           "status": soreness.historic_soreness_status.name})
+            elif soreness.historic_soreness_status in [HistoricSorenessStatus.almost_persistent_pain,
+                                                       HistoricSorenessStatus.almost_persistent_soreness,
+                                                       HistoricSorenessStatus.almost_persistent_2_pain,
+                                                       HistoricSorenessStatus.almost_persistent_2_soreness,
+                                                       HistoricSorenessStatus.almost_acute_pain]:
+                tipping_status.append({"body_part": soreness.body_part_location.value,
+                                       "side": soreness.side,
+                                       "is_pain": soreness.is_pain,
+                                       "status": soreness.historic_soreness_status.name})
+            elif soreness.historic_soreness_status != HistoricSorenessStatus.dormant_cleared:
+                q2.append({"body_part": soreness.body_part_location.value,
+                           "side": soreness.side,
+                           "is_pain": soreness.is_pain,
+                           "status": soreness.historic_soreness_status.name})
+
+        return q2, q3, tipping_status
+
     def __setattr__(self, name, value):
         if name == "current_sport_name":
             value = SportName(value)
