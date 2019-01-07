@@ -11,7 +11,7 @@ from fathomapi.utils.decorators import require
 from fathomapi.utils.exceptions import InvalidSchemaException, NoSuchEntityException
 from fathomapi.utils.xray import xray_recorder
 from models.daily_readiness import DailyReadiness
-from models.soreness import MuscleSorenessSeverity, BodyPartLocation
+from models.soreness import MuscleSorenessSeverity, BodyPartLocation, HistoricSorenessStatus
 from models.stats import AthleteStats
 from models.daily_plan import DailyPlan
 from logic.survey_processing import SurveyProcessing
@@ -168,7 +168,11 @@ def handle_daily_readiness_get(principal_id=None):
     functional_strength_eligible = False
     completed_functional_strength_sessions = 0
 
+    hist_sore_status = []
+    clear_candidates = []
+    dormant_tipping_candidates = []
     if athlete_stats is not None:
+        hist_sore_status, clear_candidates, dormant_tipping_candidates = athlete_stats.get_q2_q3_list()
         current_sport_name = athlete_stats.current_sport_name.value if athlete_stats.current_sport_name is not None else None
         current_position = athlete_stats.current_position.value if athlete_stats.current_position is not None else None
         functional_strength_eligible = False
@@ -178,9 +182,26 @@ def handle_daily_readiness_get(principal_id=None):
             functional_strength_eligible = True
 
         completed_functional_strength_sessions = athlete_stats.completed_functional_strength_sessions
+    q3_list = [{"body_part": q["body_part"], "side": q["side"]} for q in clear_candidates]
+    q2_list = [{"body_part": q["body_part"], "side": q["side"]} for q in hist_sore_status]
+    tipping_list = [{"body_part": q["body_part"], "side": q["side"]} for q in dormant_tipping_candidates]
+    for sore_part in sore_body_parts:
+        if sore_part in q2_list or sore_part in q3_list:
+            sore_body_parts.remove(sore_part)
+        elif sore_part in tipping_list:
+            for t in dormant_tipping_candidates:
+                if t['body_part'] == sore_part['body_part'] and t['side'] == sore_part['side']:
+                    sore_part['status'] = t['status']
+                    dormant_tipping_candidates.remove(t)
+        else:
+            sore_part['status'] = HistoricSorenessStatus.dormant_cleared.name
+
 
     return {
                'body_parts': sore_body_parts,
+               'dormant_tipping_candidates': dormant_tipping_candidates,
+               'hist_sore_status': hist_sore_status,
+               'clear_candidates': clear_candidates,
                'current_position': current_position,
                'current_sport_name': current_sport_name,
                'functional_strength_eligible': functional_strength_eligible,
