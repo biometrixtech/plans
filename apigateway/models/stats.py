@@ -221,10 +221,18 @@ class AthleteStats(Serialisable):
                                        "is_pain": soreness.is_pain,
                                        "status": soreness.historic_soreness_status.name})
             elif soreness.historic_soreness_status != HistoricSorenessStatus.dormant_cleared:
-                q2.append({"body_part": soreness.body_part_location.value,
-                           "side": soreness.side,
-                           "is_pain": soreness.is_pain,
-                           "status": soreness.historic_soreness_status.name})
+                new_part = {"body_part": soreness.body_part_location.value,
+                             "side": soreness.side,
+                             "is_pain": soreness.is_pain,
+                             "status": soreness.historic_soreness_status.name}
+                if len(q2) > 0:
+                    for q2_part in q2:
+                        if q2_part["body_part"] == new_part["body_part"] and q2_part["side"] == new_part["side"]:
+                            q2_part["is_pain"] = True
+                        else:
+                            q2.append(new_part)
+                else:
+                    q2.append(new_part)
 
         return q2, q3, tipping_status
 
