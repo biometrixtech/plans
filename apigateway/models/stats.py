@@ -209,7 +209,7 @@ class AthleteStats(Serialisable):
             if soreness.ask_persistent_2_question or soreness.ask_acute_pain_question:
                 q3.append({"body_part": soreness.body_part_location.value,
                            "side": soreness.side,
-                           "is_pain": soreness.is_pain,
+                           "pain": soreness.is_pain,
                            "status": soreness.historic_soreness_status.name})
             elif soreness.historic_soreness_status in [HistoricSorenessStatus.almost_persistent_pain,
                                                        HistoricSorenessStatus.almost_persistent_soreness,
@@ -218,17 +218,17 @@ class AthleteStats(Serialisable):
                                                        HistoricSorenessStatus.almost_acute_pain]:
                 tipping_status.append({"body_part": soreness.body_part_location.value,
                                        "side": soreness.side,
-                                       "is_pain": soreness.is_pain,
+                                       "pain": soreness.is_pain,
                                        "status": soreness.historic_soreness_status.name})
             elif soreness.historic_soreness_status != HistoricSorenessStatus.dormant_cleared:
                 new_part = {"body_part": soreness.body_part_location.value,
                              "side": soreness.side,
-                             "is_pain": soreness.is_pain,
+                             "pain": soreness.is_pain,
                              "status": soreness.historic_soreness_status.name}
                 if len(q2) > 0:
                     for q2_part in q2:
                         if q2_part["body_part"] == new_part["body_part"] and q2_part["side"] == new_part["side"]:
-                            q2_part["is_pain"] = True
+                            q2_part["pain"] = True
                         else:
                             q2.append(new_part)
                 else:
