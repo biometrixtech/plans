@@ -96,7 +96,7 @@ class SurveyProcessing(object):
                         if (h.body_part_location == body_part_location and
                                 h.side == side and
                                 h.historic_soreness_status.name == status and
-                                h.ask_persistent_2_question):
+                                h.ask_acute_pain_question):
                             h.ask_acute_pain_question = False
                             h.historic_soreness_status = HistoricSorenessStatus.dormant_cleared
                             break
@@ -114,7 +114,7 @@ class SurveyProcessing(object):
                                 h.side == side and
                                 h.historic_soreness_status.name == status and
                                 h.ask_persistent_2_question):
-                            h.ask_acute_pain_question = False
+                            h.ask_persistent_2_question = False
                             h.historic_soreness_status = HistoricSorenessStatus.dormant_cleared
                             break
                 else:
