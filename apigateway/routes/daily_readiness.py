@@ -76,6 +76,13 @@ def handle_daily_readiness_create():
         plan.sessions_planned_readiness = sessions_planned_readiness
         DailyPlanDatastore().put(plan)
 
+    athlete_stats = AthleteStatsDatastore().get(athlete_id=request.json['user_id'])
+    if athlete_stats is None:
+        athlete_stats = AthleteStats(request.json['user_id'])
+
+    if "clear_candidates" in request.json and len(request.json['clear_candidates']) > 0:
+        SurveyProcessing().process_clear_status_answers(request.json['clear_candidates'], athlete_stats, event_date, daily_readiness.soreness)
+
     store = DailyReadinessDatastore()
     store.put(daily_readiness)
 
@@ -86,10 +93,10 @@ def handle_daily_readiness_create():
         need_stats_update = True
 
     if need_stats_update:
-        athlete_stats_store = AthleteStatsDatastore()
-        athlete_stats = athlete_stats_store.get(athlete_id=request.json['user_id'])
-        if athlete_stats is None:
-            athlete_stats = AthleteStats(request.json['user_id'])
+        # athlete_stats_store = AthleteStatsDatastore()
+        # athlete_stats = athlete_stats_store.get(athlete_id=request.json['user_id'])
+        # if athlete_stats is None:
+        #     athlete_stats = AthleteStats(request.json['user_id'])
         athlete_stats.event_date = plan_event_date
         athlete_stats.session_RPE = session_RPE
         athlete_stats.session_RPE_event_date = session_RPE_event_date
@@ -109,7 +116,7 @@ def handle_daily_readiness_create():
             if 'current_position' in request.json:
                 athlete_stats.current_position = request.json['current_position']
 
-        athlete_stats_store.put(athlete_stats)
+    athlete_stats_store.put(athlete_stats)
 
     body = {"event_date": plan_event_date}
     Service('plans', Config.get('API_VERSION')).call_apigateway_async('POST',

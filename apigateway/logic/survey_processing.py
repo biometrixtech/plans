@@ -1,13 +1,16 @@
 import datetime
-from utils import parse_datetime, format_datetime, fix_early_survey_event_date
+from utils import parse_datetime, format_datetime, fix_early_survey_event_date, format_date
 from fathomapi.utils.exceptions import InvalidSchemaException
 from models.session import SessionType, SessionFactory, StrengthConditioningType
 from models.post_session_survey import PostSurvey
 from models.sport import SportName
+from models.soreness import BodyPart, BodyPartLocation, HistoricSorenessStatus, Soreness
+from logic.stats_processing import StatsProcessing
+from datastores.datastore_collection import DatastoreCollection
 
 class SurveyProcessing(object):
 
-    def create_session_from_survey(self, session, return_dict=False):
+    def create_session_from_survey(self, session, return_dict=False, athlete_stats=None):
         event_date = parse_datetime(session['event_date'])
         session_type = session['session_type']
         try:
@@ -38,7 +41,14 @@ class SurveyProcessing(object):
             if survey.event_date.hour < 3 and event_date.hour >= 3:
                 session_data['event_date'] = format_datetime(event_date - datetime.timedelta(days=1))
             survey.event_date = fix_early_survey_event_date(survey.event_date)
+            if "clear_candidates" in session['post_session_survey'] and len(session['post_session_survey']['clear_candidates']) > 0:
+                self.process_clear_status_answers(session['post_session_survey']['clear_candidates'],
+                                                  athlete_stats,
+                                                  event_date,
+                                                  survey.soreness)
             session_data['post_session_survey'] = survey
+
+
         if return_dict:
             return session_data
         else:
@@ -54,3 +64,64 @@ class SurveyProcessing(object):
     def _update_session(self, session, data):
         for key, value in data.items():
             setattr(session, key, value)
+
+
+    def process_clear_status_answers(self, clear_candidates, athlete_stats, event_date, soreness):
+        plan_event_date = format_date(event_date)
+        stats_processing = StatsProcessing(athlete_stats.athlete_id,
+                                           plan_event_date,
+                                           DatastoreCollection())
+        soreness_list_25 = stats_processing.merge_soreness_from_surveys(
+            stats_processing.get_readiness_soreness_list(stats_processing.last_25_days_readiness_surveys),
+            stats_processing.get_ps_survey_soreness_list(stats_processing.last_25_days_ps_surveys)
+            )
+        # historic_soreness_list = athlete_stats.historic_soreness
+        for q3_response in clear_candidates:
+            body_part_location = BodyPartLocation(q3_response['body_part'])
+            side = q3_response['side']
+            severity = q3_response['severity']
+            pain = q3_response['pain']
+            status = q3_response['status']
+            if severity > 0:
+                sore_part = Soreness()
+                sore_part.body_part = BodyPart(body_part_location, None)
+                sore_part.pain = pain
+                sore_part.severity = severity
+                sore_part.side = side
+                sore_part.reported_date_time = event_date
+                soreness.append(sore_part)
+            if "acute" in status:
+                if not pain or severity == 0:
+                    for h in athlete_stats.historic_soreness:
+                        if (h.body_part_location == body_part_location and
+                                h.side == side and
+                                h.historic_soreness_status.name == status and
+                                h.ask_persistent_2_question):
+                            h.ask_acute_pain_question = False
+                            h.historic_soreness_status = HistoricSorenessStatus.dormant_cleared
+                            break
+                else:
+                    athlete_stats.historic_soreness = stats_processing.answer_acute_pain_question(athlete_stats.historic_soreness,
+                                           soreness_list_25,
+                                           body_part_location=body_part_location,
+                                           side=side,
+                                           question_response_date=plan_event_date,
+                                           severity_value=severity)
+            elif "persistent" in status:
+                if ("pain" in status and not pain) or ("soreness" in status and pain) or severity == 0:
+                    for h in athlete_stats.historic_soreness:
+                        if (h.body_part_location == body_part_location and
+                                h.side == side and
+                                h.historic_soreness_status.name == status and
+                                h.ask_persistent_2_question):
+                            h.ask_acute_pain_question = False
+                            h.historic_soreness_status = HistoricSorenessStatus.dormant_cleared
+                            break
+                else:
+                    athlete_stats.historic_soreness = stats_processing.answer_persistent_2_question(athlete_stats.historic_soreness,
+                                           soreness_list_25,
+                                           body_part_location=body_part_location,
+                                           side=side,
+                                           is_pain=pain,
+                                           question_response_date=plan_event_date,
+                                           severity_value=severity)
