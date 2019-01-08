@@ -194,14 +194,17 @@ def handle_daily_readiness_get(principal_id=None):
     tipping_list = [{"body_part": q["body_part"], "side": q["side"]} for q in dormant_tipping_candidates]
     for sore_part in sore_body_parts:
         if sore_part in q2_list or sore_part in q3_list:
-            sore_body_parts.remove(sore_part)
+            sore_part['delete'] = True
         elif sore_part in tipping_list:
             for t in dormant_tipping_candidates:
                 if t['body_part'] == sore_part['body_part'] and t['side'] == sore_part['side']:
                     sore_part['status'] = t['status']
-                    dormant_tipping_candidates.remove(t)
+                    t['delete'] = True
+                    break
         else:
             sore_part['status'] = HistoricSorenessStatus.dormant_cleared.name
+    sore_body_parts = [s for s in sore_body_parts if not s.get('delete', False)]
+    dormant_tipping_candidates = [s for s in dormant_tipping_candidates if not s.get('delete', False)]
 
 
     return {

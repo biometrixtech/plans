@@ -133,7 +133,7 @@ def handle_active_recovery_start():
 @app.route('/active_time', methods=['PATCH'])
 @require.authenticated.any
 @xray_recorder.capture('routes.active_time')
-def hangle_workout_active_time():
+def handle_workout_active_time():
     if not isinstance(request.json, dict):
         raise InvalidSchemaException('Request body must be a dictionary')
     if 'event_date' not in request.json:
@@ -156,7 +156,8 @@ def hangle_workout_active_time():
     store = DailyPlanDatastore()
 
     body = {"event_date": plan_event_date,
-            "target_minutes": target_minutes}
+            "target_minutes": target_minutes,
+            "last_updated": format_datetime(event_date)}
     Service('plans', Config.get('API_VERSION')).call_apigateway_async('POST',
                                                                       f"athlete/{user_id}/daily_plan",
                                                                       body)

@@ -112,7 +112,7 @@ class TrainingPlanManager(object):
             else:
                 return True
 
-    def create_daily_plan(self, event_date=None, target_minutes=15):
+    def create_daily_plan(self, event_date=None, target_minutes=15, last_updated=None):
 
         if event_date is not None:
             start_time = format_datetime(parse_date(event_date) - datetime.timedelta(days=1))
@@ -258,8 +258,10 @@ class TrainingPlanManager(object):
                 daily_plan.post_recovery.display_exercises = False
 
         # daily_plan.add_scheduled_sessions(scheduled_sessions)
-
-        daily_plan.last_updated = format_datetime(datetime.datetime.utcnow())
+        if last_updated is None:
+            daily_plan.last_updated = format_datetime(datetime.datetime.utcnow())
+        else:
+            daily_plan.last_updated = last_updated
 
         self.daily_plan_datastore.put(daily_plan)
 
