@@ -703,7 +703,7 @@ class StatsProcessing(object):
                         new_soreness = Soreness()
                         new_soreness.body_part = BodyPart(body_part_location, None)
                         new_soreness.side = side
-                        new_soreness.pain = True
+                        new_soreness.pain = is_pain
                         new_soreness.severity = severity_value
                         new_soreness.reported_date_time = question_response_date
                         soreness_list_25.append(new_soreness)
