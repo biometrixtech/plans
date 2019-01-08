@@ -116,7 +116,7 @@ def handle_daily_readiness_create():
             if 'current_position' in request.json:
                 athlete_stats.current_position = request.json['current_position']
 
-    athlete_stats_store.put(athlete_stats)
+    AthleteStatsDatastore().put(athlete_stats)
 
     body = {"event_date": plan_event_date}
     Service('plans', Config.get('API_VERSION')).call_apigateway_async('POST',
