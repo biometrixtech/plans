@@ -49,7 +49,7 @@ def handle_session_create():
         # update historic soreness
         for s in soreness:
             athlete_stats.update_historic_soreness(s, plan_event_date)
-    athlete_stats_store.put(athlete_stats)
+    AthleteStatsDatastore().put(athlete_stats)
 
     if not _check_plan_exists(user_id, plan_event_date):
         plan = DailyPlan(event_date=plan_event_date)
