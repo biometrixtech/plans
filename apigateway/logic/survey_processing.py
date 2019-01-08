@@ -10,7 +10,7 @@ from datastores.datastore_collection import DatastoreCollection
 
 class SurveyProcessing(object):
 
-    def create_session_from_survey(self, session, return_dict=False):
+    def create_session_from_survey(self, session, return_dict=False, athlete_stats=None):
         event_date = parse_datetime(session['event_date'])
         session_type = session['session_type']
         try:
@@ -41,7 +41,14 @@ class SurveyProcessing(object):
             if survey.event_date.hour < 3 and event_date.hour >= 3:
                 session_data['event_date'] = format_datetime(event_date - datetime.timedelta(days=1))
             survey.event_date = fix_early_survey_event_date(survey.event_date)
+            if "clear_candidates" in session['post_session_survey'] and len(session['post_session_survey']['clear_candidates']) > 0:
+                self.process_clear_status_answers(session['post_session_survey']['clear_candidates'],
+                                                  athlete_stats,
+                                                  event_date,
+                                                  survey.soreness)
             session_data['post_session_survey'] = survey
+
+
         if return_dict:
             return session_data
         else:
@@ -59,7 +66,7 @@ class SurveyProcessing(object):
             setattr(session, key, value)
 
 
-    def process_clear_status_answers(self, clear_candidates, athlete_stats, event_date, daily_readiness):
+    def process_clear_status_answers(self, clear_candidates, athlete_stats, event_date, soreness):
         plan_event_date = format_date(event_date)
         stats_processing = StatsProcessing(athlete_stats.athlete_id,
                                            plan_event_date,
@@ -82,16 +89,17 @@ class SurveyProcessing(object):
                 sore_part.severity = severity
                 sore_part.side = side
                 sore_part.reported_date_time = event_date
-                daily_readiness.soreness.append(sore_part)
+                soreness.append(sore_part)
             if "acute" in status:
                 if not pain or severity == 0:
-                    hist_soreness = [h for h in athlete_stats.historic_soreness if h.body_part_location == body_part_location and
-                                                                                   h.side == side and
-                                                                                   h.ask_acute_pain_question][0]
-                    athlete_stats.historic_soreness.remove(hist_soreness)
-                    hist_soreness.ask_acute_pain_question = False
-                    hist_soreness.historic_soreness_status = HistoricSorenessStatus.dormant_cleared
-                    athlete_stats.historic_soreness.append(hist_soreness)
+                    for h in athlete_stats.historic_soreness:
+                        if (h.body_part_location == body_part_location and
+                                h.side == side and
+                                h.historic_soreness_status.name == status and
+                                h.ask_persistent_2_question):
+                            h.ask_acute_pain_question = False
+                            h.historic_soreness_status = HistoricSorenessStatus.dormant_cleared
+                            break
                 else:
                     athlete_stats.historic_soreness = stats_processing.answer_acute_pain_question(athlete_stats.historic_soreness,
                                            soreness_list_25,
@@ -101,14 +109,14 @@ class SurveyProcessing(object):
                                            severity_value=severity)
             elif "persistent" in status:
                 if ("pain" in status and not pain) or ("soreness" in status and pain) or severity == 0:
-                    hist_soreness = [h for h in athlete_stats.historic_soreness if h.body_part_location == body_part_location and
-                                                                                   h.side == side and
-                                                                                   h.historic_soreness_status.name == status and
-                                                                                   h.ask_persistent_2_question][0]
-                    athlete_stats.historic_soreness.remove(hist_soreness)
-                    hist_soreness.ask_acute_pain_question = False
-                    hist_soreness.historic_soreness_status = HistoricSorenessStatus.dormant_cleared
-                    athlete_stats.historic_soreness.append(hist_soreness)
+                    for h in athlete_stats.historic_soreness:
+                        if (h.body_part_location == body_part_location and
+                                h.side == side and
+                                h.historic_soreness_status.name == status and
+                                h.ask_persistent_2_question):
+                            h.ask_acute_pain_question = False
+                            h.historic_soreness_status = HistoricSorenessStatus.dormant_cleared
+                            break
                 else:
                     athlete_stats.historic_soreness = stats_processing.answer_persistent_2_question(athlete_stats.historic_soreness,
                                            soreness_list_25,

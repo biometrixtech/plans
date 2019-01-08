@@ -76,13 +76,12 @@ def handle_daily_readiness_create():
         plan.sessions_planned_readiness = sessions_planned_readiness
         DailyPlanDatastore().put(plan)
 
-    athlete_stats_store = AthleteStatsDatastore()
-    athlete_stats = athlete_stats_store.get(athlete_id=request.json['user_id'])
+    athlete_stats = AthleteStatsDatastore().get(athlete_id=request.json['user_id'])
     if athlete_stats is None:
         athlete_stats = AthleteStats(request.json['user_id'])
 
     if "clear_candidates" in request.json and len(request.json['clear_candidates']) > 0:
-        SurveyProcessing().process_clear_status_answers(request.json['clear_candidates'], athlete_stats, event_date, daily_readiness)
+        SurveyProcessing().process_clear_status_answers(request.json['clear_candidates'], athlete_stats, event_date, daily_readiness.soreness)
 
     store = DailyReadinessDatastore()
     store.put(daily_readiness)
