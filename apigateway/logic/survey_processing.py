@@ -59,28 +59,34 @@ class SurveyProcessing(object):
             setattr(session, key, value)
 
 
-    def _process_clear_status_answers(self, clear_candidates, athlete_stats, event_date, daily_readiness):
+    def process_clear_status_answers(self, clear_candidates, athlete_stats, event_date, daily_readiness):
+        plan_event_date = format_date(event_date)
         stats_processing = StatsProcessing(athlete_stats.athlete_id,
-                                           format_date(event_date),
+                                           plan_event_date,
                                            DatastoreCollection())
         soreness_list_25 = stats_processing.merge_soreness_from_surveys(
             stats_processing.get_readiness_soreness_list(stats_processing.last_25_days_readiness_surveys),
             stats_processing.get_ps_survey_soreness_list(stats_processing.last_25_days_ps_surveys)
             )
-        historic_soreness_list = athlete_stats.historic_soreness
+        # historic_soreness_list = athlete_stats.historic_soreness
         for q3_response in clear_candidates:
-            if q3_response['severity'] > 0:
+            body_part_location = BodyPartLocation(q3_response['body_part'])
+            side = q3_response['side']
+            severity = q3_response['severity']
+            pain = q3_response['pain']
+            status = q3_response['status']
+            if severity > 0:
                 sore_part = Soreness()
-                sore_part.body_part = BodyPart(BodyPartLocation(q3_response['body_part']), None)
-                sore_part.pain = q3_response.get('pain', False)
-                sore_part.severity = q3_response['severity']
-                sore_part.side = q3_response['side']
+                sore_part.body_part = BodyPart(body_part_location, None)
+                sore_part.pain = pain
+                sore_part.severity = severity
+                sore_part.side = side
                 sore_part.reported_date_time = event_date
                 daily_readiness.soreness.append(sore_part)
-            if "acute" in q3_response['status']:
-                if not q3_response['pain'] or q3_response['severity'] == 0:
-                    hist_soreness = [h for h in athlete_stats.historic_soreness if h.body_part_location == q3_response['body_part'] and
-                                                                                   h.side == q3_response['side'] and
+            if "acute" in status:
+                if not pain or severity == 0:
+                    hist_soreness = [h for h in athlete_stats.historic_soreness if h.body_part_location == body_part_location and
+                                                                                   h.side == side and
                                                                                    h.ask_acute_pain_question][0]
                     athlete_stats.historic_soreness.remove(hist_soreness)
                     hist_soreness.ask_acute_pain_question = False
@@ -89,15 +95,15 @@ class SurveyProcessing(object):
                 else:
                     athlete_stats.historic_soreness = stats_processing.answer_acute_pain_question(athlete_stats.historic_soreness,
                                            soreness_list_25,
-                                           body_part_location=q3_response['body_part'],
-                                           side=q3_response['side'],
-                                           question_response_date=format_date(event_date),
-                                           severity_value=q3_response['severity'])
-            elif "persistent" in q3_response['status']:
-                if ("pain" in q3_response['status'] and not q3_response["pain"]) or ("soreness" in q3_response['status'] and q3_response["pain"]) or q3_response['severity'] == 0:
-                    hist_soreness = [h for h in athlete_stats.historic_soreness if h.body_part_location == q3_response['body_part'] and
-                                                                                   h.side == q3_response['side'] and
-                                                                                   h.historic_soreness_status.name == q3_response['status'] and
+                                           body_part_location=body_part_location,
+                                           side=side,
+                                           question_response_date=plan_event_date,
+                                           severity_value=severity)
+            elif "persistent" in status:
+                if ("pain" in status and not pain) or ("soreness" in status and pain) or severity == 0:
+                    hist_soreness = [h for h in athlete_stats.historic_soreness if h.body_part_location == body_part_location and
+                                                                                   h.side == side and
+                                                                                   h.historic_soreness_status.name == status and
                                                                                    h.ask_persistent_2_question][0]
                     athlete_stats.historic_soreness.remove(hist_soreness)
                     hist_soreness.ask_acute_pain_question = False
@@ -106,8 +112,8 @@ class SurveyProcessing(object):
                 else:
                     athlete_stats.historic_soreness = stats_processing.answer_persistent_2_question(athlete_stats.historic_soreness,
                                            soreness_list_25,
-                                           body_part_location=q3_response['body_part'],
-                                           side=q3_response['side'],
-                                           is_pain=q3_response['pain'],
-                                           question_response_date=format_date(event_date),
-                                           severity_value=q3_response['severity'])
+                                           body_part_location=body_part_location,
+                                           side=side,
+                                           is_pain=pain,
+                                           question_response_date=plan_event_date,
+                                           severity_value=severity)
