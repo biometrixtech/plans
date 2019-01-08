@@ -31,11 +31,19 @@ def create_daily_plan(athlete_id):
         target_minutes = request.json['target_minutes']
     except:
         target_minutes = 15
-    daily_plan = TrainingPlanManager(athlete_id, DatastoreCollection()).create_daily_plan(event_date=event_date, target_minutes=target_minutes)
+    try:
+        last_updated = request.json['last_updated']
+    except:
+        last_updated = None
+    plan_manager = TrainingPlanManager(athlete_id, DatastoreCollection())
+    daily_plan = plan_manager.create_daily_plan(event_date=event_date,
+                                                target_minutes=target_minutes,
+                                                last_updated=last_updated)
     # daily_plan.last_updated = format_datetime(datetime.datetime.now())
     # push_plan_update(athlete_id, daily_plan)
     body = {"message": "Your plan is ready!",
-            "call_to_action": "VIEW_PLAN"}
+            "call_to_action": "VIEW_PLAN",
+            "last_updated": last_updated}
     _notify_user(athlete_id, body)
     event_date = daily_plan.event_date
     Service('plans', Config.get('API_VERSION')).call_apigateway_async(method='POST',
