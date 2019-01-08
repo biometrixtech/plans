@@ -72,7 +72,7 @@ def handle_session_create():
         plan.session_from_readiness = False
         DailyPlanDatastore().put(plan)
 
-    update_plan(user_id, plan_event_date)
+    update_plan(user_id, seession.event_date)
     return {'message': 'success'}, 201
 
 
@@ -386,7 +386,9 @@ def _check_plan_exists(user_id, event_date):
 
 
 def update_plan(user_id, event_date):
-    Service('plans', Config.get('API_VERSION')).call_apigateway_async('POST', f"athlete/{user_id}/daily_plan", body={'event_date': event_date})
+    body={'event_date': format_date(event_date),
+          'last_updated': format_datetime(event_date)}
+    Service('plans', Config.get('API_VERSION')).call_apigateway_async('POST', f"athlete/{user_id}/daily_plan", body=body)
 
 
 def _validate_schema():
