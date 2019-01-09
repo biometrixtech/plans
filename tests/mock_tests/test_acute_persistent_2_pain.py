@@ -76,7 +76,7 @@ def get_historic_soreness_and_answer_acute_question(severity_list, date, histori
     historic_soreness = stats_processing.get_historic_soreness_list(soreness_list,historic_soreness)
 
     historic_soreness = stats_processing.answer_acute_pain_question(historic_soreness, soreness_list, BodyPartLocation.achilles, 1,
-                                                                    date, 2)
+                                                                    True, date, 2)
 
     return historic_soreness
 
@@ -90,7 +90,7 @@ def get_historic_soreness_and_answer_pers2_question(severity_list, date, histori
     historic_soreness = stats_processing.get_historic_soreness_list(soreness_list,historic_soreness)
 
     historic_soreness = stats_processing.answer_persistent_2_question(historic_soreness, BodyPartLocation.achilles, 1,
-                                                                      is_pain, date, True)
+                                                                      is_pain, date, True, historic_soreness[0].historic_soreness_status)
 
     return historic_soreness
 
@@ -548,7 +548,7 @@ def test_perisistent_soreness_ask_persistent_2_Q3():
 
     historic_soreness = get_historic_soreness([1, None, 2, None, 3], "2018-05-16", [], False)
 
-    historic_soreness = get_historic_soreness([1, None, 2, None, 3, None, 2, None], "2018-05-21",
+    historic_soreness = get_historic_soreness([1, None, 2, None, 3, None, 2, None], "2018-05-19",
                                               historic_soreness, False)
 
     historic_soreness = get_historic_soreness([1, None, 2, None, 3, None, 2, None, None, None, None], "2018-05-22", historic_soreness, False)

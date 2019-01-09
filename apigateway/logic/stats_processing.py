@@ -78,7 +78,7 @@ class StatsProcessing(object):
             athlete_stats.completed_functional_strength_sessions = self.get_completed_functional_strength_sessions()
             # athlete_stats.acute_pain = self.get_acute_pain_list()
             current_athlete_stats = self.athlete_stats_datastore.get(athlete_id=self.athlete_id)
-            athlete_stats.historic_soreness = self.get_historic_soreness(current_athlete_stats.historic_soreness if current_athlete_stats is not None else [])
+            athlete_stats.historic_soreness = self.get_historic_soreness(current_athlete_stats.historic_soreness if current_athlete_stats is not None else None)
             if current_athlete_stats is not None:
                 athlete_stats.current_sport_name = current_athlete_stats.current_sport_name
                 athlete_stats.current_position = current_athlete_stats.current_position
@@ -319,7 +319,7 @@ class StatsProcessing(object):
 
             # find any possible matching historic soreness
             historic_soreness = HistoricSoreness(g.location, g.side, g.is_pain)
-            historic_soreness.historic_soreness_status = HistoricSorenessStatus.dormant_cleared
+            # historic_soreness.historic_soreness_status = HistoricSorenessStatus.dormant_cleared
 
             if existing_historic_soreness is not None:
                 for h in existing_historic_soreness:
@@ -341,6 +341,10 @@ class StatsProcessing(object):
 
             if len(body_part_history) > 0:
                 last_reported_date = max(historic_soreness.last_reported, body_part_history[0].reported_date_time)
+                if (historic_soreness.last_reported == last_reported_date and
+                    historic_soreness.last_reported != body_part_history[0].reported_date_time and
+                    historic_soreness.historic_soreness_status == HistoricSorenessStatus.dormant_cleared):
+                    body_part_history = []
 
             for b in range(0, len(body_part_history)):
 
@@ -620,7 +624,7 @@ class StatsProcessing(object):
 
         return avg_severity
 
-    def answer_acute_pain_question(self, existing_historic_soreness, soreness_list_25, body_part_location, side, question_response_date, severity_value):
+    def answer_acute_pain_question(self, existing_historic_soreness, soreness_list_25, body_part_location, side, is_pain, question_response_date, severity_value):
 
         body_part_history = list(s for s in soreness_list_25 if s.body_part.location ==
                                  body_part_location and s.side == side and s.pain)
@@ -644,7 +648,7 @@ class StatsProcessing(object):
         for e in existing_historic_soreness:
             if e.body_part_location == body_part_location and e.side == side and e.is_pain:
                 if e.is_acute_pain():
-                    if severity_value is not None and severity_value > 0:
+                    if severity_value is not None and severity_value > 0 and is_pain:
                         new_soreness = Soreness()
                         new_soreness.body_part = BodyPart(body_part_location, None)
                         new_soreness.side = side
@@ -667,12 +671,13 @@ class StatsProcessing(object):
                         else:
                             e.streak += 1
                     else:
+                        e.last_reported = question_response_date
                         e.ask_acute_pain_question = False
                         e.historic_soreness_status = HistoricSorenessStatus.dormant_cleared
 
         return existing_historic_soreness
 
-    def answer_persistent_2_question(self, existing_historic_soreness,  soreness_list_25, body_part_location, side, is_pain, question_response_date, severity_value):
+    def answer_persistent_2_question(self, existing_historic_soreness,  soreness_list_25, body_part_location, side, is_pain, question_response_date, severity_value, current_status):
 
         body_part_history = list(s for s in soreness_list_25 if s.body_part.location ==
                                  body_part_location and s.side == side and s.pain)
@@ -695,11 +700,11 @@ class StatsProcessing(object):
                 last_eight_seventeen_day_count += 1
 
         for e in existing_historic_soreness:
-            if e.body_part_location == body_part_location and e.side == side and e.is_pain == is_pain:
+            if e.body_part_location == body_part_location and e.side == side and e.historic_soreness_status == current_status:
                 if (e.is_persistent_soreness() or e.is_persistent_pain() or
                         e.historic_soreness_status == HistoricSorenessStatus.persistent_2_pain or
                         e.historic_soreness_status == HistoricSorenessStatus.persistent_2_soreness):
-                    if severity_value is not None and severity_value > 0:
+                    if severity_value is not None and severity_value > 0 and e.is_pain == is_pain:
                         new_soreness = Soreness()
                         new_soreness.body_part = BodyPart(body_part_location, None)
                         new_soreness.side = side
@@ -720,6 +725,7 @@ class StatsProcessing(object):
                         e.ask_persistent_2_question = False
 
                     else:
+                        e.last_reported = question_response_date
                         e.ask_persistent_2_question = False
                         e.historic_soreness_status = HistoricSorenessStatus.dormant_cleared
 

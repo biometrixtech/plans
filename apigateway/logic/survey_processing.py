@@ -90,38 +90,20 @@ class SurveyProcessing(object):
                 sore_part.side = side
                 sore_part.reported_date_time = event_date
                 soreness.append(sore_part)
-            if "acute" in status:
-                if not pain or severity == 0:
-                    for h in athlete_stats.historic_soreness:
-                        if (h.body_part_location == body_part_location and
-                                h.side == side and
-                                h.historic_soreness_status.name == status and
-                                h.ask_acute_pain_question):
-                            h.ask_acute_pain_question = False
-                            h.historic_soreness_status = HistoricSorenessStatus.dormant_cleared
-                            break
-                else:
-                    athlete_stats.historic_soreness = stats_processing.answer_acute_pain_question(athlete_stats.historic_soreness,
-                                           soreness_list_25,
-                                           body_part_location=body_part_location,
-                                           side=side,
-                                           question_response_date=plan_event_date,
-                                           severity_value=severity)
-            elif "persistent" in status:
-                if ("pain" in status and not pain) or ("soreness" in status and pain) or severity == 0:
-                    for h in athlete_stats.historic_soreness:
-                        if (h.body_part_location == body_part_location and
-                                h.side == side and
-                                h.historic_soreness_status.name == status and
-                                h.ask_persistent_2_question):
-                            h.ask_persistent_2_question = False
-                            h.historic_soreness_status = HistoricSorenessStatus.dormant_cleared
-                            break
-                else:
-                    athlete_stats.historic_soreness = stats_processing.answer_persistent_2_question(athlete_stats.historic_soreness,
+            if status in ['acute_pain', 'almost_persistent_2_pain_acute']:
+                athlete_stats.historic_soreness = stats_processing.answer_acute_pain_question(athlete_stats.historic_soreness,
                                            soreness_list_25,
                                            body_part_location=body_part_location,
                                            side=side,
                                            is_pain=pain,
                                            question_response_date=plan_event_date,
                                            severity_value=severity)
+            else:
+                athlete_stats.historic_soreness = stats_processing.answer_persistent_2_question(athlete_stats.historic_soreness,
+                                           soreness_list_25,
+                                           body_part_location=body_part_location,
+                                           side=side,
+                                           is_pain=pain,
+                                           question_response_date=plan_event_date,
+                                           severity_value=severity,
+                                           current_status=HistoricSorenessStatus[status])
