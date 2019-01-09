@@ -711,7 +711,7 @@ def test_flag_acute_pain_avg_severity_corner_case_7():
 
     stats_processing = StatsProcessing("tester", "2018-05-18", DatastoreCollection())
 
-    historic_soreness = stats_processing.answer_acute_pain_question(historic_soreness, soreness_list, BodyPartLocation.achilles, 1, "2018-05-18", True)
+    historic_soreness = stats_processing.answer_acute_pain_question(historic_soreness, soreness_list, BodyPartLocation.achilles, 1, True, "2018-05-18", True)
 
     historic_soreness = stats_processing.get_historic_soreness_list(soreness_list, historic_soreness)
 
@@ -736,7 +736,7 @@ def test_flag_acute_pain_avg_severity_corner_case_8():
 
     stats_processing = StatsProcessing("tester", "2018-05-18", DatastoreCollection())
 
-    historic_soreness = stats_processing.answer_acute_pain_question(historic_soreness, soreness_list,BodyPartLocation.achilles, 1, "2018-05-18", True)
+    historic_soreness = stats_processing.answer_acute_pain_question(historic_soreness, soreness_list,BodyPartLocation.achilles, 1, True, "2018-05-18", True)
 
     historic_soreness = stats_processing.get_historic_soreness_list(soreness_list, historic_soreness)
 
@@ -761,7 +761,7 @@ def test_flag_acute_pain_avg_severity_corner_case_9():
 
     stats_processing = StatsProcessing("tester", "2018-05-18", DatastoreCollection())
 
-    historic_soreness = stats_processing.answer_acute_pain_question(historic_soreness, soreness_list,BodyPartLocation.achilles, 1, "2018-05-18", True)
+    historic_soreness = stats_processing.answer_acute_pain_question(historic_soreness, soreness_list,BodyPartLocation.achilles, 1, True, "2018-05-18", True)
 
     historic_soreness = stats_processing.get_historic_soreness_list(soreness_list, historic_soreness)
 
@@ -786,7 +786,7 @@ def test_flag_acute_pain_avg_severity_corner_case_10():
 
     stats_processing = StatsProcessing("tester", "2018-05-18", DatastoreCollection())
 
-    historic_soreness = stats_processing.answer_acute_pain_question(historic_soreness, soreness_list, BodyPartLocation.achilles, 1, "2018-05-18", True)
+    historic_soreness = stats_processing.answer_acute_pain_question(historic_soreness, soreness_list, BodyPartLocation.achilles, 1, True, "2018-05-18", True)
 
     historic_soreness = stats_processing.get_historic_soreness_list(soreness_list, historic_soreness)
 
