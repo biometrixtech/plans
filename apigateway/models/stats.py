@@ -205,6 +205,7 @@ class AthleteStats(Serialisable):
         q2 = []
         q3 = []
         tipping_status = []
+        unique_q2 = []
         for soreness in self.historic_soreness:
             if soreness.ask_persistent_2_question or soreness.ask_acute_pain_question:
                 q3.append({"body_part": soreness.body_part_location.value,
@@ -225,13 +226,15 @@ class AthleteStats(Serialisable):
                              "side": soreness.side,
                              "pain": soreness.is_pain,
                              "status": soreness.historic_soreness_status.name}
-                if len(q2) > 0:
+                if {new_part["body_part"]: new_part["side"]} in unique_q2:
                     for q2_part in q2:
-                        if q2_part["body_part"] == new_part["body_part"] and q2_part["side"] == new_part["side"]:
-                            q2_part["pain"] = True
-                        else:
-                            q2.append(new_part)
+                        if q2_part['new_part'] == new_part['body_part'] and q2_part['side'] == new_part['side']:
+                            if new_part['pain']:
+                                q2_part['pain'] = True
+                                q2_part['status'] = new_part['status']
+                            break
                 else:
+                    unique_q2.append({new_part["body_part"]: new_part["side"]})
                     q2.append(new_part)
 
         return q2, q3, tipping_status
