@@ -205,6 +205,7 @@ class AthleteStats(Serialisable):
         q2 = []
         q3 = []
         tipping_status = []
+        unique_q2 = []
         for soreness in self.historic_soreness:
             if soreness.ask_persistent_2_question or soreness.ask_acute_pain_question:
                 q3.append({"body_part": soreness.body_part_location.value,
