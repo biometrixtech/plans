@@ -72,7 +72,7 @@ def handle_session_create():
         plan.session_from_readiness = False
         DailyPlanDatastore().put(plan)
 
-    update_plan(user_id, seession.event_date)
+    update_plan(user_id, session.event_date)
     return {'message': 'success'}, 201
 
 
