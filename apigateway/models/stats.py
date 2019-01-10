@@ -214,8 +214,6 @@ class AthleteStats(Serialisable):
                            "status": soreness.historic_soreness_status.name})
             elif soreness.historic_soreness_status in [HistoricSorenessStatus.almost_persistent_pain,
                                                        HistoricSorenessStatus.almost_persistent_soreness,
-                                                       HistoricSorenessStatus.almost_persistent_2_pain,
-                                                       HistoricSorenessStatus.almost_persistent_2_soreness,
                                                        HistoricSorenessStatus.almost_acute_pain]:
                 tipping_status.append({"body_part": soreness.body_part_location.value,
                                        "side": soreness.side,
