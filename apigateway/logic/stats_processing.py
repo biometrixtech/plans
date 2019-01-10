@@ -1246,7 +1246,7 @@ class StatsProcessing(object):
 
         self.last_7_days_plans = [p for p in daily_plans if p.get_event_datetime() >= last_week]
 
-        self.last_10_days_plans = [p for p in daily_plans if p.get_event_datetime() >= last_25_days]
+        # self.last_10_days_plans = [p for p in daily_plans if p.get_event_datetime() >= last_25_days]
 
         self.days_8_14_plans = [p for p in daily_plans if last_week > p.get_event_datetime() >= previous_week]
 
