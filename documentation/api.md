@@ -27,6 +27,7 @@
     - [Active Recovery](#active-recovery)
       - [Mark Started](#mark-started)
       - [Mark Completed](#mark-completed)
+      - [Adjust active time](#adjust-active-time)
     - [Functional Strength](#functional-strength)
       - [Mark Started](#mark-started-1)
       - [Mark Completed](#mark-completed-1)
@@ -101,7 +102,8 @@ The client __must__ submit a request body containing a JSON object with the foll
 {
     "date_time": Datetime,
     "user_id": Uuid,
-    "soreness": [{"body_part": number, "severity": number, "side": number, "pain": boolean}],
+    "soreness": [sore_part, sore_part],
+    "clear_candidates": [sore_part, sore_part]
     "sleep_quality": number,
     "readines": number,
     "wants_functional_strength": boolean,
@@ -112,11 +114,8 @@ The client __must__ submit a request body containing a JSON object with the foll
 }
 ```
 * `date_time` __should__ reflect the local time that survey was taken
-* `soreness` __should__ reflect the number of body part that the user indicated soreness. Length __could__ be 0.
-* `body_part` __should__ be an integer reflecting BodyPart enum
-* `severity` __should__ be an integer between 1 and 5
-* `side` __should__ be an integer between 0 and 2
-* `pain` __should__ be a boolean to indicate whether it's pain or soreness.
+* `soreness` __should__ reflect the number of body part that the user indicated soreness that were not candidates for clearance. Length __could__ be 0.
+* `clear_candidates` __should__ include body parts that were candidates to be cleared of historical status. Note this should include the body part even if marked "all_clear".
 * `sleep_quality` __should__ be an integer between 1 and 10
 * `readiness` __should__ be an integer between 1 and 10
 * `wants_functional_strength` is optional argument only for the users that are eligible for functional strength and should be included once they are eligible
@@ -124,7 +123,21 @@ The client __must__ submit a request body containing a JSON object with the foll
 * `current_position` __should__ be integer representating position enumeration for specific sport or NoSportPosition enumeration
 * `sessions` __should__ be a list of session, where each session matches the body of [Create](#create-2) Session with `user_id` removed.
 * `sessions_planned` __should__ be a boolean representing whether the user plans to train again that day.
-
+* `sore_part` __should__ have the following schema:
+```
+{
+    "body_part": number,
+    "severity": number,
+    "side": number,
+    "pain": boolean,
+    status: string
+}
+```
+* `body_part` __should__ be an integer reflecting BodyPart enum
+* `severity` __should__ be an integer between 0 and 5. (0 is only allowed for clear_candidates)
+* `side` __should__ be an integer between 0 and 2
+* `pain` __should__ be a boolean to indicate whether it's pain or soreness.
+* `status` __should__ be a string representating the historical soreness status if one was received. Optional for soreness but required for clear candidates.
 
 Note: `current_sport_name` and `current_position` are only required when the user is first eligible for functional strength. `current_position` should always be present. `current_sport` is optional and if it's absent, NoSportPosition is assumed for `current_position`.
 
@@ -138,6 +151,7 @@ Authorization: eyJraWQ...ajBc4VQ
     "date_time": "2018-12-10T17:45:24Z",
     "user_id":"a1233423-73d3-4761-ac92-89cc15921d34",
     "soreness":[{"body_part": 18, "severity": 2, "side": 0}],
+    "clear_candidates": [{"body_part": 5, "severity": 0, "side": 1, "pain":true, "status": "persistant_2_pain"}]
     "sleep_quality":4,
     "readiness":4,
     "wants_functional_strength": true,
@@ -200,16 +214,22 @@ Authentication is required for this endpoint
 ```
 {
     "body_parts": [
-                {"body_part": number, "side": number},
-                {"body_part": number, "side": number}
+                {"body_part": number, "side": number, "status": string},
+                {"body_part": number, "side": number, "status": string}
                 ],
+    "hist_sore_status": [{"body_part": number, "side": number, "status": string, pain: boolean}],
+    "clear_candidates": [{"body_part": number, "side": number, "status": string, pain: boolean}],
+    "dormant_tipping_candidates": [{"body_part": number, "side": number, "status": string, pain: boolean}],
     "completed_functional_strength_sessions": number,
     "current_position": number,
     "current_sport_name": number,
     "functional_strength_eligible": boolean,
 }
 ```
-* `body_part` will be a list of enumerated body parts (potentially empty)
+* `body_part` will be a list of enumerated body parts + side (potentially empty)
+* `clear_candidates` will be a list of sore body parts with historical status that are candidates for clearance
+* `hist_sore_status` will be a list of sore body parts with historical status that are not candidates for clearing
+* `dormant_tipping_candidates` will be a list of sore body parts that should not prompt a response for the user but if they indicate a status for that, they will tip into specific status as defined in the response
 * `completed_functional_strength_sessions` will be a count of completed functional strength sessions for the last week
 * `current_position` and `current_sport_name` will be enumeration
 * `current_position` exists but `current_sport_name` does not, then it's implied that the user wants functional strength for sport-less activity
@@ -712,6 +732,46 @@ Authorization: eyJraWQ...ajBc4VQ
 * `daily_plan` will have the same structure as defined in output of [Get daily plan](#get-daily-plan) route.
 
 
+#### Adjust active time
+
+This endpoint can be called to adjust the active time for either pre- or post-recovery.
+
+##### Query String
+ 
+The client __must__ submit a request to the endpoint `/plans/version/active_recovery/active_time`. The request method __must__ be `PATCH`.
+
+##### Request
+
+The client __must__ submit a request body containing a JSON object with the following schema:
+```
+{
+    "user_id": Uuid,
+    "event_date": Datetime,
+    "active_time": number
+}
+```
+* `event_date` __should__ be the time when user makes the request
+* `active_time` __should__ be in minutes
+
+```
+PATCH /plans/version/active_recovery/active_time HTTPS/1.1
+Host: apis.env.fathomai.com
+Content-Type: application/json
+Authorization: eyJraWQ...ajBc4VQ
+{
+    "user_id":"a1233423-73d3-4761-ac92-89cc15921d34",
+    "event_date": "2018-09-21T17:53:39Z",
+    "active_time": 20
+}
+```
+##### Responses
+ 
+ If the write was successful, the Service __will__ respond with HTTP Status `200 OK` with a body with the following syntax:
+```
+{
+    "message": "success"
+}
+```
 
 ### Functional Strength
 

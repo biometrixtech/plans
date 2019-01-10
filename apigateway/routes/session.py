@@ -24,12 +24,11 @@ app = Blueprint('session', __name__)
 def handle_session_create():
     _validate_schema()
     user_id = request.json['user_id']
-    session = SurveyProcessing().create_session_from_survey(request.json)
+    athlete_stats = AthleteStatsDatastore().get(athlete_id=user_id)
+    session = SurveyProcessing().create_session_from_survey(request.json, athlete_stats=athlete_stats)
     plan_event_date = format_date(session.event_date)
 
     if 'post_session_survey' in request.json:
-        athlete_stats_store = AthleteStatsDatastore()
-        athlete_stats = athlete_stats_store.get(athlete_id=user_id)
         # update session_RPE
         if athlete_stats.session_RPE is not None:
             athlete_stats.session_RPE = max(session.post_session_survey.RPE, athlete_stats.session_RPE)
@@ -50,7 +49,7 @@ def handle_session_create():
         # update historic soreness
         for s in soreness:
             athlete_stats.update_historic_soreness(s, plan_event_date)
-        athlete_stats_store.put(athlete_stats)
+    AthleteStatsDatastore().put(athlete_stats)
 
     if not _check_plan_exists(user_id, plan_event_date):
         plan = DailyPlan(event_date=plan_event_date)
@@ -73,7 +72,7 @@ def handle_session_create():
         plan.session_from_readiness = False
         DailyPlanDatastore().put(plan)
 
-    update_plan(user_id, plan_event_date)
+    update_plan(user_id, session.event_date)
     return {'message': 'success'}, 201
 
 
@@ -387,7 +386,9 @@ def _check_plan_exists(user_id, event_date):
 
 
 def update_plan(user_id, event_date):
-    Service('plans', Config.get('API_VERSION')).call_apigateway_async('POST', f"athlete/{user_id}/daily_plan", body={'event_date': event_date})
+    body={'event_date': format_date(event_date),
+          'last_updated': format_datetime(event_date)}
+    Service('plans', Config.get('API_VERSION')).call_apigateway_async('POST', f"athlete/{user_id}/daily_plan", body=body)
 
 
 def _validate_schema():

@@ -25,14 +25,14 @@ class TeamDashboardData(Serialisable):
 
     def get_compliance_data(self, user_ids, users, daily_plan_list):
         users_with_plan = [plan.user_id for plan in daily_plan_list]
-        self.compliance['completed'] = []
+        self.compliance['complete'] = []
         self.compliance['incomplete'] = [users[user_id] for user_id in user_ids if user_id not in users_with_plan]
         training_compliance = TrainingCompliance()
         training_compliance.no_response = []
         training_compliance.no_response.extend(self.compliance['incomplete'])
         for plan in daily_plan_list:
             if plan.daily_readiness_survey_completed():
-                self.compliance['completed'].append(users[plan.user_id])
+                self.compliance['complete'].append(users[plan.user_id])
                 if not plan.sessions_planned:
                     training_compliance.rest_day.append(users[plan.user_id])
                 else:

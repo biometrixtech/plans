@@ -103,73 +103,73 @@ def get_post_session_surveys(start_date, end_date):
 def test_generate_session_for_soccer():
     mapping = FSProgramGenerator(fs_exercise_library_datastore)
     fs_session = mapping.getFunctionalStrengthForSportPosition(SportName.soccer, position=SoccerPosition.forward)
-    assert True is (len(fs_session.warm_up) > 0)
+    assert True is (len(fs_session.warm_up) == 0)
     assert True is (len(fs_session.dynamic_movement) > 0)
     assert True is (len(fs_session.stability_work) > 0)
-    assert True is (len(fs_session.victory_lap) > 0)
+    assert True is (len(fs_session.victory_lap) == 0)
     assert True is (fs_session.duration_minutes > 0)
 
 def test_generate_session_for_cycling():
     mapping = FSProgramGenerator(fs_exercise_library_datastore)
     fs_session = mapping.getFunctionalStrengthForSportPosition(SportName.cycling)
-    assert True is (len(fs_session.warm_up) > 0)
+    assert True is (len(fs_session.warm_up) == 0)
     assert True is (len(fs_session.dynamic_movement) > 0)
     assert True is (len(fs_session.stability_work) > 0)
-    assert True is (len(fs_session.victory_lap) > 0)
+    assert True is (len(fs_session.victory_lap) == 0)
     assert True is (fs_session.duration_minutes > 0)
 
 def test_generate_session_for_field_hockey():
     mapping = FSProgramGenerator(fs_exercise_library_datastore)
     fs_session = mapping.getFunctionalStrengthForSportPosition(SportName.field_hockey, FieldHockeyPosition.goalie)
-    assert True is (len(fs_session.warm_up) > 0)
+    assert True is (len(fs_session.warm_up) == 0)
     assert True is (len(fs_session.dynamic_movement) > 0)
     assert True is (len(fs_session.stability_work) > 0)
-    assert True is (len(fs_session.victory_lap) > 0)
+    assert True is (len(fs_session.victory_lap) == 0)
     assert True is (fs_session.duration_minutes > 0)
 
 def test_generate_session_for_rowing():
     mapping = FSProgramGenerator(fs_exercise_library_datastore)
     fs_session = mapping.getFunctionalStrengthForSportPosition(SportName.rowing)
-    assert True is (len(fs_session.warm_up) > 0)
+    assert True is (len(fs_session.warm_up) == 0)
     assert True is (len(fs_session.dynamic_movement) > 0)
     assert True is (len(fs_session.stability_work) > 0)
-    assert True is (len(fs_session.victory_lap) > 0)
+    assert True is (len(fs_session.victory_lap) == 0)
     assert True is (fs_session.duration_minutes > 0)
 
 def test_generate_session_for_skate_sports():
     mapping = FSProgramGenerator(fs_exercise_library_datastore)
     fs_session = mapping.getFunctionalStrengthForSportPosition(SportName.skate_sports)
-    assert True is (len(fs_session.warm_up) > 0)
+    assert True is (len(fs_session.warm_up) == 0)
     assert True is (len(fs_session.dynamic_movement) > 0)
     assert True is (len(fs_session.stability_work) > 0)
-    assert True is (len(fs_session.victory_lap) > 0)
+    assert True is (len(fs_session.victory_lap) == 0)
     assert True is (fs_session.duration_minutes > 0)
 
 def test_generate_session_for_softball():
     mapping = FSProgramGenerator(fs_exercise_library_datastore)
     fs_session = mapping.getFunctionalStrengthForSportPosition(SportName.softball, SoftballPosition.catcher)
-    assert True is (len(fs_session.warm_up) > 0)
+    assert True is (len(fs_session.warm_up) == 0)
     assert True is (len(fs_session.dynamic_movement) > 0)
     assert True is (len(fs_session.stability_work) > 0)
-    assert True is (len(fs_session.victory_lap) > 0)
+    assert True is (len(fs_session.victory_lap) == 0)
     assert True is (fs_session.duration_minutes > 0)
 
 def test_generate_session_for_pool_sports():
     mapping = FSProgramGenerator(fs_exercise_library_datastore)
     fs_session = mapping.getFunctionalStrengthForSportPosition(SportName.pool_sports)
-    assert True is (len(fs_session.warm_up) > 0)
+    assert True is (len(fs_session.warm_up) == 0)
     assert True is (len(fs_session.dynamic_movement) > 0)
     assert True is (len(fs_session.stability_work) > 0)
-    assert True is (len(fs_session.victory_lap) > 0)
+    assert True is (len(fs_session.victory_lap) == 0)
     assert True is (fs_session.duration_minutes > 0)
 
 def test_generate_session_for_sprinter():
     mapping = FSProgramGenerator(fs_exercise_library_datastore)
     fs_session = mapping.getFunctionalStrengthForSportPosition(SportName.track_field, TrackAndFieldPosition.sprinter)
-    assert True is (len(fs_session.warm_up) > 0)
+    assert True is (len(fs_session.warm_up) == 0)
     assert True is (len(fs_session.dynamic_movement) > 0)
     assert True is (len(fs_session.stability_work) > 0)
-    assert True is (len(fs_session.victory_lap) > 0)
+    assert True is (len(fs_session.victory_lap) == 0)
     assert True is (fs_session.duration_minutes > 0)
 
     fs_session_power = mapping.getFunctionalStrengthForSportPosition(SportName.no_sport, NoSportPosition.power)
@@ -181,25 +181,25 @@ def test_generate_session_for_sprinter():
 def test_generate_session_for_distance():
     mapping = FSProgramGenerator(fs_exercise_library_datastore)
     fs_session = mapping.getFunctionalStrengthForSportPosition(SportName.track_field, TrackAndFieldPosition.distance)
-    assert True is (len(fs_session.warm_up) > 0)
+    assert True is (len(fs_session.warm_up) == 0)
     assert True is (len(fs_session.dynamic_movement) > 0)
     assert True is (len(fs_session.stability_work) > 0)
-    assert True is (len(fs_session.victory_lap) > 0)
+    assert True is (len(fs_session.victory_lap) == 0)
     assert True is (fs_session.duration_minutes > 0)
 
 def test_generate_session_for_speed():
     mapping = FSProgramGenerator(fs_exercise_library_datastore)
     fs_session = mapping.getFunctionalStrengthForSportPosition(SportName.no_sport, position=NoSportPosition.speed_agility)
-    assert True is (len(fs_session.warm_up) > 0)
+    assert True is (len(fs_session.warm_up) == 0)
     assert True is (len(fs_session.dynamic_movement) > 0)
     assert True is (len(fs_session.stability_work) > 0)
-    assert True is (len(fs_session.victory_lap) > 0)
+    assert True is (len(fs_session.victory_lap) == 0)
     assert True is (fs_session.duration_minutes > 0)
 
 def test_fs_exercises_populated():
     mapping = FSProgramGenerator(fs_exercise_library_datastore)
     fs_session = mapping.getFunctionalStrengthForSportPosition(SportName.basketball, position=BasketballPosition.guard)
-    assert True is (len(fs_session.warm_up[0].exercise.description) > 0)
+    assert True is (len(fs_session.dynamic_movement[0].exercise.description) > 0)
 
 
 def test_athlete_doesnt_have_enough_training_sessions():

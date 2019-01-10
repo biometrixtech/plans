@@ -11,7 +11,7 @@ from fathomapi.utils.decorators import require
 from fathomapi.utils.exceptions import InvalidSchemaException, NoSuchEntityException
 from fathomapi.utils.xray import xray_recorder
 from models.daily_readiness import DailyReadiness
-from models.soreness import MuscleSorenessSeverity, BodyPartLocation
+from models.soreness import MuscleSorenessSeverity, BodyPartLocation, HistoricSorenessStatus
 from models.stats import AthleteStats
 from models.daily_plan import DailyPlan
 from logic.survey_processing import SurveyProcessing
@@ -76,6 +76,13 @@ def handle_daily_readiness_create():
         plan.sessions_planned_readiness = sessions_planned_readiness
         DailyPlanDatastore().put(plan)
 
+    athlete_stats = AthleteStatsDatastore().get(athlete_id=request.json['user_id'])
+    if athlete_stats is None:
+        athlete_stats = AthleteStats(request.json['user_id'])
+
+    if "clear_candidates" in request.json and len(request.json['clear_candidates']) > 0:
+        SurveyProcessing().process_clear_status_answers(request.json['clear_candidates'], athlete_stats, event_date, daily_readiness.soreness)
+
     store = DailyReadinessDatastore()
     store.put(daily_readiness)
 
@@ -86,10 +93,10 @@ def handle_daily_readiness_create():
         need_stats_update = True
 
     if need_stats_update:
-        athlete_stats_store = AthleteStatsDatastore()
-        athlete_stats = athlete_stats_store.get(athlete_id=request.json['user_id'])
-        if athlete_stats is None:
-            athlete_stats = AthleteStats(request.json['user_id'])
+        # athlete_stats_store = AthleteStatsDatastore()
+        # athlete_stats = athlete_stats_store.get(athlete_id=request.json['user_id'])
+        # if athlete_stats is None:
+        #     athlete_stats = AthleteStats(request.json['user_id'])
         athlete_stats.event_date = plan_event_date
         athlete_stats.session_RPE = session_RPE
         athlete_stats.session_RPE_event_date = session_RPE_event_date
@@ -109,9 +116,10 @@ def handle_daily_readiness_create():
             if 'current_position' in request.json:
                 athlete_stats.current_position = request.json['current_position']
 
-        athlete_stats_store.put(athlete_stats)
+    AthleteStatsDatastore().put(athlete_stats)
 
-    body = {"event_date": plan_event_date}
+    body = {"event_date": plan_event_date,
+            "last_updated": format_datetime(event_date)}
     Service('plans', Config.get('API_VERSION')).call_apigateway_async('POST',
                                                                       f"athlete/{request.json['user_id']}/daily_plan",
                                                                       body)
@@ -168,7 +176,11 @@ def handle_daily_readiness_get(principal_id=None):
     functional_strength_eligible = False
     completed_functional_strength_sessions = 0
 
+    hist_sore_status = []
+    clear_candidates = []
+    dormant_tipping_candidates = []
     if athlete_stats is not None:
+        hist_sore_status, clear_candidates, dormant_tipping_candidates = athlete_stats.get_q2_q3_list()
         current_sport_name = athlete_stats.current_sport_name.value if athlete_stats.current_sport_name is not None else None
         current_position = athlete_stats.current_position.value if athlete_stats.current_position is not None else None
         functional_strength_eligible = False
@@ -178,9 +190,29 @@ def handle_daily_readiness_get(principal_id=None):
             functional_strength_eligible = True
 
         completed_functional_strength_sessions = athlete_stats.completed_functional_strength_sessions
+    q3_list = [{"body_part": q["body_part"], "side": q["side"]} for q in clear_candidates]
+    q2_list = [{"body_part": q["body_part"], "side": q["side"]} for q in hist_sore_status]
+    tipping_list = [{"body_part": q["body_part"], "side": q["side"]} for q in dormant_tipping_candidates]
+    for sore_part in sore_body_parts:
+        if sore_part in q2_list or sore_part in q3_list:
+            sore_part['delete'] = True
+        elif sore_part in tipping_list:
+            for t in dormant_tipping_candidates:
+                if t['body_part'] == sore_part['body_part'] and t['side'] == sore_part['side']:
+                    sore_part['status'] = t['status']
+                    t['delete'] = True
+                    break
+        else:
+            sore_part['status'] = HistoricSorenessStatus.dormant_cleared.name
+    sore_body_parts = [s for s in sore_body_parts if not s.get('delete', False)]
+    dormant_tipping_candidates = [s for s in dormant_tipping_candidates if not s.get('delete', False)]
+
 
     return {
                'body_parts': sore_body_parts,
+               'dormant_tipping_candidates': dormant_tipping_candidates,
+               'hist_sore_status': hist_sore_status,
+               'clear_candidates': clear_candidates,
                'current_position': current_position,
                'current_sport_name': current_sport_name,
                'functional_strength_eligible': functional_strength_eligible,
