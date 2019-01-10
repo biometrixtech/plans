@@ -162,7 +162,7 @@ def handle_workout_active_time():
                                                                       f"athlete/{user_id}/daily_plan",
                                                                       body)
 
-    return {'message': 'success'}, 201
+    return {'message': 'success'}, 200
 
 
 
