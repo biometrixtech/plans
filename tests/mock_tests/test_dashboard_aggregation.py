@@ -237,7 +237,7 @@ def test_compliance_grouping():
     team = TeamDashboardData("Fathom Team")
     team.get_compliance_data(user_ids, users, daily_plan_list)
 
-    assert len(team.compliance["completed"]) == 3
+    assert len(team.compliance["complete"]) == 3
     assert len(team.compliance["incomplete"]) == 2
     assert len(team.compliance["training_compliance"]["no_response"]) == 3
     assert len(team.compliance["training_compliance"]["rest_day"]) == 1
