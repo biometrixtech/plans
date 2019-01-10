@@ -91,7 +91,7 @@ def manage_athlete_push_notification(athlete_id):
         minute_offset = _get_offset()
         event_date = format_date(datetime.datetime.now())
         stats_update_time = event_date + 'T03:00:00Z'
-        trigger_event_date = _randomize_trigger_time(stats_update_time, 60, minute_offset)
+        trigger_event_date = _randomize_trigger_time(stats_update_time, 10*60, minute_offset)
 
         Service('plans', Config.get('API_VERSION')).call_apigateway_async(method='POST',
                                                                           endpoint=f"athlete/{athlete_id}/stats",
