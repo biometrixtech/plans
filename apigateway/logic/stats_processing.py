@@ -374,8 +374,7 @@ class StatsProcessing(object):
                                                                      last_reported_date, last_ten_day_count)
                 acute_pain_list.append(historic_soreness)
 
-            elif (historic_soreness.is_persistent_pain() or historic_soreness.is_persistent_soreness() or
-                    historic_soreness.historic_soreness_status == HistoricSorenessStatus.almost_persistent_2_pain_acute):
+            elif (historic_soreness.is_persistent_pain() or historic_soreness.is_persistent_soreness()):
 
                 historic_soreness = self.process_persistent_status(g.is_pain, historic_soreness, last_reported_date, last_ten_day_count,
                                                body_part_history)
