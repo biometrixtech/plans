@@ -54,6 +54,27 @@ class AthleteStatsDatastore(object):
         athlete_stats.chronic_avg_RPE = mongo_result['chronic_avg_RPE']
         athlete_stats.chronic_avg_readiness = mongo_result['chronic_avg_readiness']
         athlete_stats.chronic_avg_max_soreness = mongo_result['chronic_avg_max_soreness']
+
+        athlete_stats.acute_internal_total_load = mongo_result['acute_internal_total_load']
+        athlete_stats.acute_external_total_load = mongo_result['acute_external_total_load']
+        athlete_stats.acute_external_high_intensity_load = mongo_result['acute_external_high_intensity_load']
+        athlete_stats.acute_external_mod_intensity_load = mongo_result['acute_external_mod_intensity_load']
+        athlete_stats.acute_external_low_intensity_load = mongo_result['acute_external_low_intensity_load']
+        athlete_stats.chronic_internal_total_load = mongo_result['chronic_internal_total_load']
+        athlete_stats.chronic_external_total_load = mongo_result['chronic_external_total_load']
+        athlete_stats.chronic_external_high_intensity_load = mongo_result['chronic_external_high_intensity_load']
+        athlete_stats.chronic_external_mod_intensity_load = mongo_result['chronic_external_mod_intensity_load']
+        athlete_stats.chronic_external_low_intensity_load = mongo_result['chronic_external_low_intensity_load']
+
+        athlete_stats.internal_monotony = mongo_result['internal_monotony']
+        athlete_stats.internal_strain = mongo_result['internal_strain']
+        athlete_stats.external_monotony = mongo_result['external_monotony']
+        athlete_stats.external_strain = mongo_result['external_strain']
+        athlete_stats.internal_ramp = mongo_result['internal_ramp']
+        athlete_stats.external_ramp = mongo_result['external_ramp']
+        athlete_stats.internal_acwr = mongo_result['internal_acwr']
+        athlete_stats.external_acwr = mongo_result['external_acwr']
+
         athlete_stats.functional_strength_eligible = mongo_result.get('functional_strength_eligible', False)
         athlete_stats.completed_functional_strength_sessions = mongo_result.get(
             'completed_functional_strength_sessions', 0)
