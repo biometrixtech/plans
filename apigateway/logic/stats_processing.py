@@ -238,7 +238,28 @@ class StatsProcessing(object):
         if len(c_low_intensity_values) > 0:
             athlete_stats.chronic_external_low_intensity_load = statistics.mean(c_low_intensity_values)
 
+        if athlete_stats.acute_internal_total_load is not None and athlete_stats.chronic_internal_total_load is not None:
+            athlete_stats.internal_acwr = athlete_stats.acute_internal_total_load / athlete_stats.chronic_internal_total_load
+
+        if athlete_stats.acute_external_total_load is not None and athlete_stats.chronic_external_total_load is not None:
+            athlete_stats.external_acwr = athlete_stats.acute_external_total_load / athlete_stats.chronic_external_total_load
+
         return athlete_stats
+
+    def get_next_training_session(self, athlete_stats):
+
+        ramp_max = athlete_stats.internal_ramp * 1.1
+
+
+
+    def get_acute_training_sessions(self):
+
+        training_sessions = []
+
+        for a in self.acute_daily_plans:
+            training_sessions.extend(a.training_sessions)
+
+        return training_sessions
 
     def get_historic_soreness(self, existing_historic_soreness=None):
 
@@ -989,7 +1010,7 @@ class StatsProcessing(object):
 
     def get_product_of_session_attributes(self, attribute_1_name, attribute_2_name, session_collection):
 
-        values = list(getattr(c, attribute_1_name) * getattr(c, attribute_1_name) for c in session_collection
+        values = list(getattr(c, attribute_1_name) * getattr(c, attribute_2_name) for c in session_collection
                       if getattr(c, attribute_1_name) is not None and getattr(c, attribute_2_name) is not None)
         return values
 
@@ -1223,14 +1244,14 @@ class StatsProcessing(object):
                                                       if p.event_date_time >= self.acute_start_date_time],
                                                      key=lambda x: x.event_date)
             self.chronic_post_session_surveys = sorted([p for p in post_session_surveys
-                                                        if p.event_date_time >= self.chronic_start_date_time],
+                                                        if self.acute_start_date_time > p.event_date_time >= self.chronic_start_date_time],
                                                        key=lambda x: x.event_date)
             self.acute_readiness_surveys = sorted([p for p in daily_readiness_surveys
                                                    if p.event_date >= self.acute_start_date_time],
                                                   key=lambda x: x.event_date)
 
-            self.chronic_readiness_surveys = sorted([p for p in daily_readiness_surveys
-                                                     if p.event_date >= self.chronic_start_date_time],
+            self.chronic_readiness_surveys = sorted([p for p in daily_readiness_surveys if self.acute_start_date_time >
+                                                     p.event_date >= self.chronic_start_date_time],
                                                     key=lambda x: x.event_date)
 
             self.acute_daily_plans = sorted([p for p in daily_plans if p.get_event_datetime() >=
