@@ -107,6 +107,19 @@ def manage_athlete_push_notification(athlete_id):
     return {'message': 'Processed'}, 202
 
 
+@app.route('/<uuid:athlete_id>/survey', methods=['PATCH'])
+@require.authenticated.any
+@xray_recorder.capture('routes.athlete.survey')
+def process_athlete_survey(athlete_id):
+    athlete_stats = DatastoreCollection().athlete_stats_datastore.get(athlete_id=athlete_id)
+    if 'typical_weekly_sessions' in request.json:
+        athlete_stats.typical_weekly_sessions = request.json['typical_weekly_sessions']
+    if 'wearable_devices' in request.json:
+        athlete_stats.wearable_devices = request.json['wearable_devices']
+    DatastoreCollection().athlete_stats_datastore.put(athlete_stats)
+    return {'message': 'Update requested'}, 202
+
+
 def _schedule_notifications(athlete_id):
     """
     Schedule checks for three notifications
