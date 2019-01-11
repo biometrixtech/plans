@@ -236,6 +236,12 @@ class StatsProcessing(object):
         if len(c_low_intensity_values) > 0:
             athlete_stats.chronic_external_low_intensity_load = statistics.mean(c_low_intensity_values)
 
+        if athlete_stats.acute_internal_total_load is not None and athlete_stats.chronic_internal_total_load is not None:
+            athlete_stats.internal_acwr = athlete_stats.acute_internal_total_load / athlete_stats.chronic_internal_total_load
+
+        if athlete_stats.acute_external_total_load is not None and athlete_stats.chronic_external_total_load is not None:
+            athlete_stats.external_acwr = athlete_stats.acute_external_total_load / athlete_stats.chronic_external_total_load
+
         return athlete_stats
 
     def get_historic_soreness(self, existing_historic_soreness=None):

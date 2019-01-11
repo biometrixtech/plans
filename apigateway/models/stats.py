@@ -46,6 +46,8 @@ class AthleteStats(Serialisable):
         self.external_strain = None
         self.internal_ramp = None
         self.external_ramp = None
+        self.internal_acwr = None
+        self.external_acwr = None
         self.functional_strength_eligible = False
         self.next_functional_strength_eligible_date = None
         self.completed_functional_strength_sessions = 0
@@ -285,6 +287,14 @@ class AthleteStats(Serialisable):
             'chronic_external_high_intensity_load': self.chronic_external_high_intensity_load,
             'chronic_external_mod_intensity_load': self.chronic_external_mod_intensity_load,
             'chronic_external_low_intensity_load': self.chronic_external_low_intensity_load,
+            'internal_monotony': self.internal_monotony,
+            'internal_strain': self.internal_strain,
+            'external_monotony': self.external_monotony,
+            'external_strain': self.external_strain,
+            'internal_ramp': self.internal_ramp,
+            'external_ramp': self.external_ramp,
+            'internal_acwr': self.internal_acwr,
+            'external_acwr': self.external_acwr,
             'functional_strength_eligible': self.functional_strength_eligible,
             'completed_functional_strength_sessions': self.completed_functional_strength_sessions,
             'next_functional_strength_eligible_date': self.next_functional_strength_eligible_date,
