@@ -78,6 +78,8 @@ class AthleteStatsDatastore(object):
         athlete_stats.daily_severe_soreness_event_date = mongo_result.get('daily_severe_soreness_event_date', None)
         athlete_stats.daily_severe_pain_event_date = mongo_result.get('daily_severe_soreness_event_date', None)
         athlete_stats.metrics = [self._metrics_from_mongodb(s) for s in mongo_result.get('metrics', [])]
+        athlete_stats.typical_weekly_sessions = mongo_result.get('typical_weekly_sessions', None)
+        athlete_stats.wearable_devices = mongo_result.get('wearable_devices', [])
         return athlete_stats
 
     @xray_recorder.capture('datastore.AthleteStatsDatastore._put_mongodb')
