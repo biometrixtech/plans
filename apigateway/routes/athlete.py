@@ -107,7 +107,7 @@ def manage_athlete_push_notification(athlete_id):
     return {'message': 'Processed'}, 202
 
 
-@app.route('/<uuid:athlete_id>/survey', methods=['PATCH'])
+@app.route('/<uuid:athlete_id>/survey', methods=['POST'])
 @require.authenticated.any
 @xray_recorder.capture('routes.athlete.survey')
 def process_athlete_survey(athlete_id):
