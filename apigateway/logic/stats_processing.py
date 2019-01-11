@@ -246,9 +246,86 @@ class StatsProcessing(object):
 
         return athlete_stats
 
+    def get_historical_internal_strain(self):
+
+        target_dates = []
+
+        all_plans = self.chronic_daily_plans
+        all_plans.extend(self.acute_daily_plans)
+
+        all_plans.sort(key=lambda x: x.event_date)
+
+        date_diff = self.start_date - self.end_date
+        for i in range(date_diff.days + 1):
+            target_dates.append(self.start_date + timedelta(i))
+
+        strain_values = []
+
+        index = 0
+        if len(target_dates) > 7:
+            for t in range(6, len(target_dates)):
+                load_values = []
+                daily_plans = [p for p in all_plans if (self.start_date + timedelta(index)) < p.get_event_datetime() <= target_dates[t]]
+                load_values.extend(
+                    x for x in self.get_session_attributes_product_sum("session_RPE", "duration_minutes",
+                                                                       daily_plans) if x is not None)
+                current_load = sum(load_values)
+                average_load = statistics.mean(load_values)
+                stdev_load = statistics.stdev(load_values)
+                internal_monotony = average_load / stdev_load
+                internal_strain = internal_monotony * current_load
+                strain_values.append(internal_strain)
+                index += 1
+
+        return strain_values
+
+
     def get_next_training_session(self, athlete_stats):
 
-        ramp_max = athlete_stats.internal_ramp * 1.1
+        last_6_internal_load_values = []
+        last_7_13_internal_load_values = []
+
+        last_six_days = self.end_date_time - timedelta(days=6 + 1)
+        thirteen_days_ago = last_six_days - timedelta(days=7)
+
+        last_6_day_plans = [p for p in self.last_7_days_plans if p.get_event_datetime() >= last_six_days]
+        last_7_13_day_plans = [p for p in self.last_7_days_plans if p.get_event_datetime() < last_six_days]
+        last_7_13_day_plans.extend([p for p in self.days_8_14_plans if p.get_event_datetime() >= thirteen_days_ago])
+
+        last_6_internal_load_values.extend(
+            x for x in self.get_session_attributes_product_sum("session_RPE", "duration_minutes",
+                                                               last_6_day_plans) if x is not None)
+        last_7_13_internal_load_values.extend(
+            x for x in self.get_session_attributes_product_sum("session_RPE", "duration_minutes",
+                                                               last_7_13_day_plans) if x is not None)
+
+        current_load = sum(last_6_internal_load_values)
+        previous_load = sum(last_7_13_internal_load_values)
+        ramp = ((current_load - previous_load) / float(previous_load))
+
+        load_gap = 0.0
+
+        if ramp > 1.1:
+            load_gap = 0.0
+        else:
+            load_gap = (1.1 * previous_load) + previous_load - current_load
+
+        # what is the monotony if we have a workout with this load?
+        average_load = statistics.mean(last_6_internal_load_values)
+        stdev_load = statistics.stdev(last_6_internal_load_values)
+        internal_monotony = average_load / stdev_load
+        internal_strain = internal_monotony * current_load
+
+        # need to create a rolling array of strain calcs to see if the athlete is overreaching (strain hits 1.2 s.d)
+
+        # monotony = weekly mean total load/weekly standard deviation of load
+        # In order to increase the standard deviation of a set of numbers, you must add a value that is more than
+        # one standard deviation away from the mean
+
+        if internal_monotony >= 2:
+            low_monotony_fix = average_load - (1.1 * stdev_load)
+            high_monotony_fix = average_load + (1.1 * stdev_load)
+
 
 
 
