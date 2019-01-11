@@ -91,6 +91,8 @@ class StatsProcessing(object):
                 athlete_stats.update_daily_pain()
                 athlete_stats.daily_severe_soreness_event_date = self.event_date
                 athlete_stats.daily_severe_pain_event_date = self.event_date
+                athlete_stats.typical_weekly_sessions = current_athlete_stats.typical_weekly_sessions
+                athlete_stats.wearable_devices = current_athlete_stats.wearable_devices
                 if current_athlete_stats.event_date == self.event_date:
                     # persist all of soreness/pain and session_RPE
                     athlete_stats.session_RPE = current_athlete_stats.session_RPE
