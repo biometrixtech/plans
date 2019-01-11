@@ -117,7 +117,7 @@ def process_athlete_survey(athlete_id):
     if 'wearable_devices' in request.json:
         athlete_stats.wearable_devices = request.json['wearable_devices']
     DatastoreCollection().athlete_stats_datastore.put(athlete_stats)
-    return {'message': 'Update requested'}, 202
+    return {'message': 'success'}, 200
 
 
 def _schedule_notifications(athlete_id):
