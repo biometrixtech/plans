@@ -9,6 +9,10 @@ class DailyPlanDatastore(object):
 
     def side_load_plans(self, daily_plans):
         self.daily_plans = daily_plans
+        for p in daily_plans:
+            for t in p.training_sessions:
+                if t.post_session_survey is not None:
+                    t.session_RPE = t.post_session_survey.survey.RPE
 
     def get(self, user_id=None, start_date=None, end_date=None):
         return self._query_mongodb(user_id, start_date, end_date)
