@@ -276,7 +276,7 @@ class StatsProcessing(object):
                 load_values = []
                 daily_plans = [p for p in all_plans if (parse_date(self.start_date) + timedelta(index)) < p.get_event_datetime() <= target_dates[t]]
                 load_values.extend(
-                    x for x in self.get_session_attributes_product_sum("session_RPE", "duration_minutes",
+                    x for x in self.get_session_attributes_product_sum_list("session_RPE", "duration_minutes",
                                                                             daily_plans) if x is not None)
                 if len(load_values) > 1:
                     current_load = sum(load_values)
@@ -1026,6 +1026,25 @@ class StatsProcessing(object):
 
     def get_plan_session_attribute_sum(self, attribute_name, daily_plan_collection):
 
+        sum_value = None
+
+        values = []
+
+        for c in daily_plan_collection:
+
+            values.extend(self.get_values_for_session_attribute(attribute_name, c.training_sessions))
+            values.extend(self.get_values_for_session_attribute(attribute_name, c.practice_sessions))
+            values.extend(self.get_values_for_session_attribute(attribute_name, c.strength_conditioning_sessions))
+            values.extend(self.get_values_for_session_attribute(attribute_name, c.games))
+            values.extend(self.get_values_for_session_attribute(attribute_name, c.bump_up_sessions))
+
+        if len(values) > 0:
+            sum_value = sum(values)
+
+        return [sum_value]
+
+    def get_plan_session_attribute_sum_list(self, attribute_name, daily_plan_collection):
+
         #sum_value = None
 
         values = []
@@ -1070,7 +1089,7 @@ class StatsProcessing(object):
 
         return soreness_list
 
-    def get_session_attributes_product_sum(self, attribute_1_name, attribute_2_name, daily_plan_collection):
+    def get_session_attributes_product_sum_list(self, attribute_1_name, attribute_2_name, daily_plan_collection):
 
         #sum_value = None
 
@@ -1095,6 +1114,29 @@ class StatsProcessing(object):
                 values.append(sum_value)
 
         return values
+
+    def get_session_attributes_product_sum(self, attribute_1_name, attribute_2_name, daily_plan_collection):
+
+        sum_value = None
+
+        values = []
+
+        for c in daily_plan_collection:
+
+            values.extend(self.get_product_of_session_attributes(attribute_1_name, attribute_2_name,
+                                                                 c.training_sessions))
+            values.extend(self.get_product_of_session_attributes(attribute_1_name, attribute_2_name,
+                                                                 c.practice_sessions))
+            values.extend(self.get_product_of_session_attributes(attribute_1_name, attribute_2_name,
+                                                                 c.strength_conditioning_sessions))
+            values.extend(self.get_product_of_session_attributes(attribute_1_name, attribute_2_name,
+                                                                 c.games))
+            values.extend(self.get_product_of_session_attributes(attribute_1_name, attribute_2_name,
+                                                                 c.bump_up_sessions))
+        if len(values) > 0:
+            sum_value = sum(values)
+
+        return [sum_value]
 
     def get_values_for_session_attribute(self, attribute_name, session_collection):
 
@@ -1303,6 +1345,12 @@ class StatsProcessing(object):
 
         daily_plans = self.daily_plan_datastore.get(self.athlete_id, self.start_date, self.end_date)
 
+        latest_plan_date = self.end_date_time
+
+        if daily_plans is not None and len(daily_plans) > 0:
+            daily_plans.sort(key=lambda x: x.event_date, reverse=False)
+            latest_plan_date = parse_date(daily_plans[len(daily_plans) - 1].event_date)
+
         if daily_readiness_surveys is not None and len(daily_readiness_surveys) > 0:
             daily_readiness_surveys.sort(key=lambda x: x.event_date, reverse=False)
             earliest_survey_date_time = daily_readiness_surveys[0].event_date
@@ -1326,9 +1374,14 @@ class StatsProcessing(object):
             self.acute_days = 7
             self.chronic_days = 28
 
+        adjustment_factor = 0
+        if latest_plan_date is not None and parse_date(self.event_date) > latest_plan_date:
+            adjustment_factor = (parse_date(self.event_date) - latest_plan_date).days
+
         if self.acute_days is not None and self.chronic_days is not None:
-            self.acute_start_date_time = self.end_date_time - timedelta(days=self.acute_days)
-            self.chronic_start_date_time = self.end_date_time - timedelta(days=self.chronic_days)
+
+            self.acute_start_date_time = self.end_date_time - timedelta(days=self.acute_days + adjustment_factor)
+            self.chronic_start_date_time = self.end_date_time - timedelta(days=self.chronic_days + adjustment_factor)
             chronic_date_time = self.acute_start_date_time - timedelta(days=self.chronic_days)
             chronic_delta = self.end_date_time - chronic_date_time
             self.chronic_load_start_date_time = self.end_date_time - chronic_delta
@@ -1354,7 +1407,7 @@ class StatsProcessing(object):
                                                p.get_event_datetime() >= self.chronic_load_start_date_time],
                                               key=lambda x: x.event_date)
 
-        last_week = self.end_date_time - timedelta(days=7)
+        last_week = self.end_date_time - timedelta(days=7 + adjustment_factor)
         last_25_days = self.end_date_time - timedelta(days=25 + 1)
         previous_week = last_week - timedelta(days=7)
         previous_week_2 = previous_week - timedelta(days=7)

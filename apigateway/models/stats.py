@@ -157,17 +157,17 @@ class AthleteStats(Serialisable):
         pain_list = SorenessCalculator().update_soreness_list(pain_list, self.post_session_pain)
         self.daily_severe_pain = pain_list
 
-    def acute_to_chronic_external_ratio(self):
-        if self.acute_external_total_load is not None and self.chronic_external_total_load is not None:
-            return self.acute_external_total_load / self.chronic_external_total_load
-        else:
-            return None
+    #def acute_to_chronic_external_ratio(self):
+    #    if self.acute_external_total_load is not None and self.chronic_external_total_load is not None:
+    #        return self.acute_external_total_load / self.chronic_external_total_load
+    #    else:
+    #        return None
 
-    def acute_to_chronic_internal_ratio(self):
-        if self.acute_internal_total_load is not None and self.chronic_internal_total_load is not None:
-            return self.acute_internal_total_load / self.chronic_internal_total_load
-        else:
-            return None
+    #def acute_to_chronic_internal_ratio(self):
+    #    if self.acute_internal_total_load is not None and self.chronic_internal_total_load is not None:
+    #        return self.acute_internal_total_load / self.chronic_internal_total_load
+    #    else:
+    #        return None
 
     def acute_il_el_ratio(self):
         if self.acute_internal_total_load is not None and self.acute_external_total_load is not None:
