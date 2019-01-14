@@ -8,6 +8,7 @@ from datastores.datastore_collection import DatastoreCollection
 from logic.training_plan_management import TrainingPlanManager
 from logic.stats_processing import StatsProcessing
 from logic.metrics_processing import MetricsProcessing
+from models.stats import AthleteStats
 from utils import parse_date, parse_datetime, format_date
 import boto3
 import datetime
@@ -112,6 +113,9 @@ def manage_athlete_push_notification(athlete_id):
 @xray_recorder.capture('routes.athlete.survey')
 def process_athlete_survey(athlete_id):
     athlete_stats = DatastoreCollection().athlete_stats_datastore.get(athlete_id=athlete_id)
+    if athlete_stats is None:
+        athlete_stats = AthleteStats(athlete_id)
+
     if 'typical_weekly_sessions' in request.json:
         athlete_stats.typical_weekly_sessions = request.json['typical_weekly_sessions']
     if 'wearable_devices' in request.json:
