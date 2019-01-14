@@ -206,7 +206,7 @@ def manage_recovery_push_notification(athlete_id):
 @require.authenticated.service
 @xray_recorder.capture('routes.athlete.completion_pn')
 def schedule_prep_completion_push_notification(athlete_id):
-    execute_at = datetime.datetime.now() + datetime.timedelta(minutes=30)
+    execute_at = datetime.datetime.now() + datetime.timedelta(minutes=60)
     print(f"scheduled prep notification at {execute_at}")
     body = {"recovery_type": "prep",
             "event_date": format_date(parse_datetime(request.json["event_date"]))}
@@ -221,7 +221,7 @@ def schedule_prep_completion_push_notification(athlete_id):
 @require.authenticated.service
 @xray_recorder.capture('routes.athlete.recovery_pn')
 def schedule_recovery_completion_push_notification(athlete_id):
-    execute_at = datetime.datetime.now() + datetime.timedelta(minutes=30)
+    execute_at = datetime.datetime.now() + datetime.timedelta(minutes=60)
     # execute_at = format_datetime(execute_at)
     body = {"recovery_type": "recovery",
             "event_date": format_date(parse_datetime(request.json["event_date"]))}
