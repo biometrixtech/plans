@@ -35,6 +35,8 @@
       - [Get daily plan](#get-daily-plan)
     - [Coach Dashboard](#coach-dashboard)
       - [Get dashboard data for all users](#get-dashboard-data-for-all-users)
+    - [Athlete](#athlete)
+      - [Athlete Survey](#athlete-survey)
     - [Misc](#misc)
       - [Clear user's data](#clear-users-data)
       - [Log App/Device information](#log-appdevice-information)
@@ -1199,6 +1201,44 @@ where `user` in `daily_insights` and `weekly_insights`has the following schema
 }
 ```
 
+### Athlete
+
+#### Athlete Survey
+This endpoint can used to submit user survey.
+
+##### Query String
+The client __must__ submit a request to the endpoint `/plans/version/athlete/{athlete_id}/survey`. The request method __must__ be `POST`.
+
+##### Request
+The client __must__ submit a request body containing a JSON object with the following schema:
+```
+{
+    "wearable_devices": [string, string],
+    "typical_weekly_sessions": string
+}
+```
+
+```
+POST /plans/version/athlete/02cb7965-7921-493a-80d4-6b278c928fad/survey HTTPS/1.1
+Host: apis.env.fathomai.com
+Content-Type: application/json
+Authorization: eyJraWQ...ajBc4VQ
+
+{
+    "wearable_devices": ["Fitbit", "Garmin", "Whoop"],
+    "typical_weekly_sessions": "1-3"
+}
+```
+##### Responses
+ If successful, the Service __will__ respond with HTTP Status `200 OK`, with a body with the following syntax:
+ 
+```
+{
+    "message": "success"
+}
+```
+
+
 ### Misc
 
 #### Clear user's data
@@ -1223,7 +1263,7 @@ Content-Type: application/json
 Authorization: eyJraWQ...ajBc4VQ
 
 {
-    {"event_date": "2018-08-13T11:12:30Z"}
+    "event_date": "2018-08-13T11:12:30Z"
 }
 ```
 ##### Responses
