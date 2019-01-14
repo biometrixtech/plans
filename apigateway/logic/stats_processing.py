@@ -312,7 +312,10 @@ class StatsProcessing(object):
 
         current_load = sum(last_6_internal_load_values)
         previous_load = sum(last_7_13_internal_load_values)
-        ramp = ((current_load - previous_load) / float(previous_load))
+        if previous_load > 0:
+            ramp = ((current_load - previous_load) / float(previous_load))
+        else:
+            ramp = 0
 
         load_gap = 0.0
 
@@ -324,8 +327,12 @@ class StatsProcessing(object):
         # what is the monotony if we have a workout with this load?
         average_load = statistics.mean(last_6_internal_load_values)
         stdev_load = statistics.stdev(last_6_internal_load_values)
-        internal_monotony = average_load / stdev_load
-        internal_strain = internal_monotony * current_load
+        if stdev_load > 0:
+            internal_monotony = average_load / stdev_load
+            internal_strain = internal_monotony * current_load
+        else:
+            internal_monotony = 0
+            internal_strain = 0
 
         # need to create a rolling array of strain calcs to see if the athlete is overreaching (strain hits 1.2 s.d)
 
