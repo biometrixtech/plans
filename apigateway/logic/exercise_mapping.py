@@ -365,6 +365,8 @@ class ExerciseAssignmentCalculator(object):
     def is_soreness_historic(self, soreness):
 
         if (soreness.historic_soreness_status == HistoricSorenessStatus.almost_persistent_2_pain or
+                soreness.historic_soreness_status == HistoricSorenessStatus.almost_persistent_2_pain_acute or
+                soreness.historic_soreness_status == HistoricSorenessStatus.acute_pain or
                 soreness.historic_soreness_status == HistoricSorenessStatus.persistent_pain or
                 soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_pain or
                 soreness.historic_soreness_status == HistoricSorenessStatus.almost_persistent_2_soreness or
@@ -615,9 +617,11 @@ class ExerciseAssignmentCalculator(object):
 
     def get_body_part_priority(self, base_priority, soreness):
 
-        if (soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_pain or
+        if (soreness.historic_soreness_status == HistoricSorenessStatus.acute_pain or
+                soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_pain or
                 soreness.historic_soreness_status == HistoricSorenessStatus.persistent_pain or
                 soreness.historic_soreness_status == HistoricSorenessStatus.almost_persistent_2_pain or
+                soreness.historic_soreness_status == HistoricSorenessStatus.almost_persistent_2_pain_acute or
                 soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_soreness or
                 soreness.historic_soreness_status == HistoricSorenessStatus.persistent_soreness or
                 soreness.historic_soreness_status == HistoricSorenessStatus.almost_persistent_2_soreness):
@@ -628,6 +632,9 @@ class ExerciseAssignmentCalculator(object):
     def is_daily_or_persistent(self, soreness):
 
         if (soreness.historic_soreness_status is None or
+                soreness.historic_soreness_status == HistoricSorenessStatus.almost_acute_pain or
+                soreness.historic_soreness_status == HistoricSorenessStatus.almost_persistent_pain or
+                soreness.historic_soreness_status == HistoricSorenessStatus.almost_persistent_soreness or
                 soreness.historic_soreness_status == HistoricSorenessStatus.persistent_pain or
                 soreness.historic_soreness_status == HistoricSorenessStatus.almost_persistent_2_pain or
                 soreness.historic_soreness_status == HistoricSorenessStatus.persistent_soreness or
