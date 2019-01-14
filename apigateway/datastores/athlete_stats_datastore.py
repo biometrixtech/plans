@@ -54,6 +54,27 @@ class AthleteStatsDatastore(object):
         athlete_stats.chronic_avg_RPE = mongo_result['chronic_avg_RPE']
         athlete_stats.chronic_avg_readiness = mongo_result['chronic_avg_readiness']
         athlete_stats.chronic_avg_max_soreness = mongo_result['chronic_avg_max_soreness']
+
+        athlete_stats.acute_internal_total_load = mongo_result.get('acute_internal_total_load', None)
+        athlete_stats.acute_external_total_load = mongo_result.get('acute_external_total_load', None)
+        athlete_stats.acute_external_high_intensity_load = mongo_result.get('acute_external_high_intensity_load', None)
+        athlete_stats.acute_external_mod_intensity_load = mongo_result.get('acute_external_mod_intensity_load', None)
+        athlete_stats.acute_external_low_intensity_load = mongo_result.get('acute_external_low_intensity_load', None)
+        athlete_stats.chronic_internal_total_load = mongo_result.get('chronic_internal_total_load', None)
+        athlete_stats.chronic_external_total_load = mongo_result.get('chronic_external_total_load', None)
+        athlete_stats.chronic_external_high_intensity_load = mongo_result.get('chronic_external_high_intensity_load', None)
+        athlete_stats.chronic_external_mod_intensity_load = mongo_result.get('chronic_external_mod_intensity_load', None)
+        athlete_stats.chronic_external_low_intensity_load = mongo_result.get('chronic_external_low_intensity_load', None)
+
+        athlete_stats.internal_monotony = mongo_result.get('internal_monotony', None)
+        athlete_stats.internal_strain = mongo_result.get('internal_strain', None)
+        athlete_stats.external_monotony = mongo_result.get('external_monotony', None)
+        athlete_stats.external_strain = mongo_result.get('external_strain', None)
+        athlete_stats.internal_ramp = mongo_result.get('internal_ramp', None)
+        athlete_stats.external_ramp = mongo_result.get('external_ramp', None)
+        athlete_stats.internal_acwr = mongo_result.get('internal_acwr', None)
+        athlete_stats.external_acwr = mongo_result.get('external_acwr', None)
+
         athlete_stats.functional_strength_eligible = mongo_result.get('functional_strength_eligible', False)
         athlete_stats.completed_functional_strength_sessions = mongo_result.get(
             'completed_functional_strength_sessions', 0)
