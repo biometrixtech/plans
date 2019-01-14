@@ -195,24 +195,28 @@ class StatsProcessing(object):
         if len(last_week_external_values) > 0 and len(previous_week_external_values) > 0:
             current_load = sum(last_week_external_values)
             previous_load = sum(previous_week_external_values)
-            athlete_stats.external_ramp = ((current_load - previous_load) / previous_load) * 100
+            if previous_load > 0:
+                athlete_stats.external_ramp = ((current_load - previous_load) / previous_load) * 100
 
         if len(last_week_internal_values) > 0 and len(previous_week_internal_values) > 0:
             current_load = sum(last_week_internal_values)
             previous_load = sum(previous_week_internal_values)
-            athlete_stats.internal_ramp = ((current_load - previous_load) / previous_load) * 100
+            if previous_load > 0:
+                athlete_stats.internal_ramp = ((current_load - previous_load) / previous_load) * 100
 
         if len(last_week_external_values) > 1:
             average_load = statistics.mean(last_week_external_values)
             stdev_load = statistics.stdev(last_week_external_values)
-            athlete_stats.external_monotony = average_load / stdev_load
-            athlete_stats.external_strain = athlete_stats.external_monotony * sum(last_week_external_values)
+            if stdev_load > 0:
+                athlete_stats.external_monotony = average_load / stdev_load
+                athlete_stats.external_strain = athlete_stats.external_monotony * sum(last_week_external_values)
 
         if len(last_week_internal_values) > 1:
             average_load = statistics.mean(last_week_internal_values)
             stdev_load = statistics.stdev(last_week_internal_values)
-            athlete_stats.internal_monotony = average_load / stdev_load
-            athlete_stats.internal_strain = athlete_stats.internal_monotony * sum(last_week_internal_values)
+            if stdev_load > 0:
+                athlete_stats.internal_monotony = average_load / stdev_load
+                athlete_stats.internal_strain = athlete_stats.internal_monotony * sum(last_week_internal_values)
 
         if len(a_internal_load_values) > 0:
             athlete_stats.acute_internal_total_load = sum(a_internal_load_values)
@@ -239,10 +243,14 @@ class StatsProcessing(object):
             athlete_stats.chronic_external_low_intensity_load = statistics.mean(c_low_intensity_values)
 
         if athlete_stats.acute_internal_total_load is not None and athlete_stats.chronic_internal_total_load is not None:
-            athlete_stats.internal_acwr = athlete_stats.acute_internal_total_load / athlete_stats.chronic_internal_total_load
+            if athlete_stats.chronic_internal_total_load > 0:
+                athlete_stats.internal_acwr = athlete_stats.acute_internal_total_load / athlete_stats.chronic_internal_total_load
 
         if athlete_stats.acute_external_total_load is not None and athlete_stats.chronic_external_total_load is not None:
-            athlete_stats.external_acwr = athlete_stats.acute_external_total_load / athlete_stats.chronic_external_total_load
+            if athlete_stats.chronic_external_total_load > 0:
+                athlete_stats.external_acwr = athlete_stats.acute_external_total_load / athlete_stats.chronic_external_total_load
+
+        athlete_stats.historical_internal_strain = self.get_historical_internal_strain()
 
         return athlete_stats
 
@@ -255,9 +263,10 @@ class StatsProcessing(object):
 
         all_plans.sort(key=lambda x: x.event_date)
 
-        date_diff = self.start_date - self.end_date
+        date_diff = parse_date(self.end_date) - parse_date(self.start_date)
+
         for i in range(date_diff.days + 1):
-            target_dates.append(self.start_date + timedelta(i))
+            target_dates.append(parse_date(self.start_date) + timedelta(i))
 
         strain_values = []
 
@@ -265,16 +274,18 @@ class StatsProcessing(object):
         if len(target_dates) > 7:
             for t in range(6, len(target_dates)):
                 load_values = []
-                daily_plans = [p for p in all_plans if (self.start_date + timedelta(index)) < p.get_event_datetime() <= target_dates[t]]
+                daily_plans = [p for p in all_plans if (parse_date(self.start_date) + timedelta(index)) < p.get_event_datetime() <= target_dates[t]]
                 load_values.extend(
                     x for x in self.get_session_attributes_product_sum("session_RPE", "duration_minutes",
-                                                                       daily_plans) if x is not None)
-                current_load = sum(load_values)
-                average_load = statistics.mean(load_values)
-                stdev_load = statistics.stdev(load_values)
-                internal_monotony = average_load / stdev_load
-                internal_strain = internal_monotony * current_load
-                strain_values.append(internal_strain)
+                                                                            daily_plans) if x is not None)
+                if len(load_values) > 1:
+                    current_load = sum(load_values)
+                    average_load = statistics.mean(load_values)
+                    stdev_load = statistics.stdev(load_values)
+                    if stdev_load > 0:
+                        internal_monotony = average_load / stdev_load
+                        internal_strain = internal_monotony * current_load
+                        strain_values.append(internal_strain)
                 index += 1
 
         return strain_values
@@ -1015,22 +1026,25 @@ class StatsProcessing(object):
 
     def get_plan_session_attribute_sum(self, attribute_name, daily_plan_collection):
 
-        sum_value = None
+        #sum_value = None
 
         values = []
 
         for c in daily_plan_collection:
 
-            values.extend(self.get_values_for_session_attribute(attribute_name, c.training_sessions))
-            values.extend(self.get_values_for_session_attribute(attribute_name, c.practice_sessions))
-            values.extend(self.get_values_for_session_attribute(attribute_name, c.strength_conditioning_sessions))
-            values.extend(self.get_values_for_session_attribute(attribute_name, c.games))
-            values.extend(self.get_values_for_session_attribute(attribute_name, c.bump_up_sessions))
+            sub_values = []
 
-        if len(values) > 0:
-            sum_value = sum(values)
+            sub_values.extend(self.get_values_for_session_attribute(attribute_name, c.training_sessions))
+            sub_values.extend(self.get_values_for_session_attribute(attribute_name, c.practice_sessions))
+            sub_values.extend(self.get_values_for_session_attribute(attribute_name, c.strength_conditioning_sessions))
+            sub_values.extend(self.get_values_for_session_attribute(attribute_name, c.games))
+            sub_values.extend(self.get_values_for_session_attribute(attribute_name, c.bump_up_sessions))
 
-        return [sum_value]
+            if len(sub_values) > 0:
+                sum_value = sum(sub_values)
+                values.append(sum_value)
+
+        return values
 
     def get_ps_survey_soreness_list(self, survey_list):
 
@@ -1058,27 +1072,29 @@ class StatsProcessing(object):
 
     def get_session_attributes_product_sum(self, attribute_1_name, attribute_2_name, daily_plan_collection):
 
-        sum_value = None
+        #sum_value = None
 
         values = []
 
         for c in daily_plan_collection:
 
-            values.extend(self.get_product_of_session_attributes(attribute_1_name, attribute_2_name,
+            sub_values = []
+
+            sub_values.extend(self.get_product_of_session_attributes(attribute_1_name, attribute_2_name,
                                                                  c.training_sessions))
-            values.extend(self.get_product_of_session_attributes(attribute_1_name, attribute_2_name,
+            sub_values.extend(self.get_product_of_session_attributes(attribute_1_name, attribute_2_name,
                                                                  c.practice_sessions))
-            values.extend(self.get_product_of_session_attributes(attribute_1_name, attribute_2_name,
+            sub_values.extend(self.get_product_of_session_attributes(attribute_1_name, attribute_2_name,
                                                                  c.strength_conditioning_sessions))
-            values.extend(self.get_product_of_session_attributes(attribute_1_name, attribute_2_name,
+            sub_values.extend(self.get_product_of_session_attributes(attribute_1_name, attribute_2_name,
                                                                  c.games))
-            values.extend(self.get_product_of_session_attributes(attribute_1_name, attribute_2_name,
+            sub_values.extend(self.get_product_of_session_attributes(attribute_1_name, attribute_2_name,
                                                                  c.bump_up_sessions))
+            if len(sub_values) > 0:
+                sum_value = sum(sub_values)
+                values.append(sum_value)
 
-        if len(values) > 0:
-            sum_value = sum(values)
-
-        return [sum_value]
+        return values
 
     def get_values_for_session_attribute(self, attribute_name, session_collection):
 
@@ -1311,7 +1327,7 @@ class StatsProcessing(object):
             self.chronic_days = 28
 
         if self.acute_days is not None and self.chronic_days is not None:
-            self.acute_start_date_time = self.end_date_time - timedelta(days=self.acute_days + 1)
+            self.acute_start_date_time = self.end_date_time - timedelta(days=self.acute_days)
             self.chronic_start_date_time = self.end_date_time - timedelta(days=self.chronic_days)
             chronic_date_time = self.acute_start_date_time - timedelta(days=self.chronic_days)
             chronic_delta = self.end_date_time - chronic_date_time
@@ -1338,7 +1354,7 @@ class StatsProcessing(object):
                                                p.get_event_datetime() >= self.chronic_load_start_date_time],
                                               key=lambda x: x.event_date)
 
-        last_week = self.end_date_time - timedelta(days=7 + 1)
+        last_week = self.end_date_time - timedelta(days=7)
         last_25_days = self.end_date_time - timedelta(days=25 + 1)
         previous_week = last_week - timedelta(days=7)
         previous_week_2 = previous_week - timedelta(days=7)
