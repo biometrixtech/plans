@@ -399,8 +399,8 @@ class ExerciseAssignmentCalculator(object):
 
     def get_foot_exercises(self, soreness):
         foot = models.soreness.BodyPart(models.soreness.BodyPartLocation.foot, self.get_body_part_priority(14, soreness))
-        inhibit = self.get_exercise_dictionary(["74", "2", "71", "3"])
-        lengthen = self.get_exercise_dictionary(["7", "73", "9"])
+        inhibit = self.get_exercise_dictionary(["74", "2", "71", "73", "3"])
+        lengthen = self.get_exercise_dictionary(["7", "9"])
         activate = self.get_exercise_dictionary(["53", "75", "115", "106"])
         foot.add_exercise_phases(inhibit, lengthen, activate)
         return foot
