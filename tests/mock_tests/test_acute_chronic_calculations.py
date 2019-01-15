@@ -373,7 +373,7 @@ def test_correct_acwr_load_33_days():
     stats.load_historical_data()
     athlete_stats = AthleteStats("Tester")
     athlete_stats = stats.calc_training_volume_metrics(athlete_stats)
-    assert 4060 / 812.5 == athlete_stats.acute_to_chronic_external_ratio()
+    assert 4060 / 812.5 == athlete_stats.external_acwr
 
 
 def test_correct_acwr_empty_load_33_days():
@@ -393,7 +393,7 @@ def test_correct_acwr_empty_load_33_days():
     stats.load_historical_data()
     athlete_stats = AthleteStats("Tester")
     athlete_stats = stats.calc_training_volume_metrics(athlete_stats)
-    assert None is athlete_stats.acute_to_chronic_external_ratio()
+    assert None is athlete_stats.external_acwr
 
 def test_correct_internal_acwr_load_33_days():
     plans = get_daily_internal_plans(datetime(2018, 6, 1, 12, 0, 0), datetime(2018, 7, 2, 12, 0, 0))
@@ -412,7 +412,7 @@ def test_correct_internal_acwr_load_33_days():
     stats.load_historical_data()
     athlete_stats = AthleteStats("Tester")
     athlete_stats = stats.calc_training_volume_metrics(athlete_stats)
-    assert 175 / 156.25 == athlete_stats.acute_to_chronic_internal_ratio()
+    assert 175 / 156.25 == athlete_stats.internal_acwr
 
 
 def test_correct_internal_acwr_empty_load_33_days():
@@ -432,4 +432,4 @@ def test_correct_internal_acwr_empty_load_33_days():
     stats.load_historical_data()
     athlete_stats = AthleteStats("Tester")
     athlete_stats = stats.calc_training_volume_metrics(athlete_stats)
-    assert None is athlete_stats.acute_to_chronic_internal_ratio()
+    assert None is athlete_stats.internal_acwr

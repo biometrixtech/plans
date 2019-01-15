@@ -8,6 +8,7 @@ from datastores.datastore_collection import DatastoreCollection
 from logic.training_plan_management import TrainingPlanManager
 from logic.stats_processing import StatsProcessing
 from logic.metrics_processing import MetricsProcessing
+from models.stats import AthleteStats
 from utils import parse_date, parse_datetime, format_date
 import boto3
 import datetime
@@ -107,6 +108,22 @@ def manage_athlete_push_notification(athlete_id):
     return {'message': 'Processed'}, 202
 
 
+@app.route('/<uuid:athlete_id>/survey', methods=['POST'])
+@require.authenticated.any
+@xray_recorder.capture('routes.athlete.survey')
+def process_athlete_survey(athlete_id):
+    athlete_stats = DatastoreCollection().athlete_stats_datastore.get(athlete_id=athlete_id)
+    if athlete_stats is None:
+        athlete_stats = AthleteStats(athlete_id)
+
+    if 'typical_weekly_sessions' in request.json:
+        athlete_stats.typical_weekly_sessions = request.json['typical_weekly_sessions']
+    if 'wearable_devices' in request.json:
+        athlete_stats.wearable_devices = request.json['wearable_devices']
+    DatastoreCollection().athlete_stats_datastore.put(athlete_stats)
+    return {'message': 'success'}, 200
+
+
 def _schedule_notifications(athlete_id):
     """
     Schedule checks for three notifications
@@ -193,7 +210,7 @@ def manage_recovery_push_notification(athlete_id):
 @require.authenticated.service
 @xray_recorder.capture('routes.athlete.completion_pn')
 def schedule_prep_completion_push_notification(athlete_id):
-    execute_at = datetime.datetime.now() + datetime.timedelta(minutes=30)
+    execute_at = datetime.datetime.now() + datetime.timedelta(minutes=60)
     print(f"scheduled prep notification at {execute_at}")
     body = {"recovery_type": "prep",
             "event_date": format_date(parse_datetime(request.json["event_date"]))}
@@ -208,7 +225,7 @@ def schedule_prep_completion_push_notification(athlete_id):
 @require.authenticated.service
 @xray_recorder.capture('routes.athlete.recovery_pn')
 def schedule_recovery_completion_push_notification(athlete_id):
-    execute_at = datetime.datetime.now() + datetime.timedelta(minutes=30)
+    execute_at = datetime.datetime.now() + datetime.timedelta(minutes=60)
     # execute_at = format_datetime(execute_at)
     body = {"recovery_type": "recovery",
             "event_date": format_date(parse_datetime(request.json["event_date"]))}

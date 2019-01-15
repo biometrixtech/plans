@@ -136,6 +136,7 @@ def _external_session_from_mongodb(mongo_result, session_type):
         setattr(mongo_session, key, _key_present(key, mongo_result))
     if "post_session_survey" in mongo_result and mongo_result["post_session_survey"] is not None:
         mongo_session.post_session_survey = PostSurvey(mongo_result["post_session_survey"], mongo_result["post_session_survey"]["event_date"])
+        mongo_session.session_RPE = mongo_session.post_session_survey.RPE if mongo_session.post_session_survey.RPE is not None else None
     else:
         mongo_session.post_session_survey = None
 
