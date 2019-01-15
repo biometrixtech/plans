@@ -250,7 +250,8 @@ class TrainingVolumeProcessing(object):
 
         target_dates = []
 
-        all_plans = chronic_daily_plans
+        all_plans = []
+        all_plans.extend(chronic_daily_plans)
         all_plans.extend(acute_daily_plans)
 
         all_plans.sort(key=lambda x: x.event_date)
@@ -297,7 +298,7 @@ class TrainingVolumeProcessing(object):
 
         return training_volume_gap
 
-    def get_acwr_gap(self, acute_days, chronic_days, acute_daily_plans, chronic_daily_plans):
+    def get_acwr_gap(self, acute_start_date_time, chronic_start_date_time, acute_days, chronic_days, acute_daily_plans, chronic_daily_plans):
         if acute_days == 7 and chronic_days == 28:  # simplest case
             acute_values = []
             chronic_1_values = []
@@ -309,8 +310,8 @@ class TrainingVolumeProcessing(object):
             daily_plans.extend(acute_daily_plans)
             daily_plans.extend(chronic_daily_plans)
 
-            new_acute_start_date_time = self.acute_start_date_time + timedelta(days=1)
-            new_chronic_start_date_time = self.acute_start_date_time + timedelta(days=1)
+            new_acute_start_date_time = acute_start_date_time + timedelta(days=1)
+            new_chronic_start_date_time = chronic_start_date_time + timedelta(days=1)
             new_acute_daily_plans = sorted([p for p in daily_plans if p.get_event_datetime() >=
                                             new_acute_start_date_time], key=lambda x: x.event_date)
 
@@ -326,7 +327,7 @@ class TrainingVolumeProcessing(object):
             week3_sessions = [d for d in new_chronic_daily_plans if new_acute_start_date_time
                               - timedelta(days=21) <= d.get_event_datetime() < new_acute_start_date_time -
                               timedelta(days=14)]
-            week2_sessions = [d for d in self.chronic_daily_plans if new_acute_start_date_time
+            week2_sessions = [d for d in chronic_daily_plans if new_acute_start_date_time
                               - timedelta(days=14) <= d.get_event_datetime() < new_acute_start_date_time -
                               timedelta(days=7)]
             week1_sessions = [d for d in new_chronic_daily_plans if new_acute_start_date_time
@@ -370,7 +371,7 @@ class TrainingVolumeProcessing(object):
 
             return training_volume_gap
 
-    def get_next_training_session(self, athlete_stats, last_7_days_plans, days_8_14_plans, acute_plans, chronic_plans, end_date_time):
+    def get_next_training_session(self, athlete_stats, last_7_days_plans, days_8_14_plans, acute_start_date_time, chronic_start_date_time, acute_plans, chronic_plans, end_date_time):
         last_6_internal_load_values = []
         last_7_internal_load_values = []
         last_7_13_internal_load_values = []
@@ -426,18 +427,19 @@ class TrainingVolumeProcessing(object):
         low_montony_gap = TrainingVolumeGap(0, low_monotony_fix)
         high_monotony_gap = TrainingVolumeGap(high_monotony_fix, None)
 
-        acwr_gap = self.get_acwr_gap(7,28, acute_plans, chronic_plans)
+        acwr_gap = self.get_acwr_gap(acute_start_date_time, chronic_start_date_time, 7, 28, acute_plans, chronic_plans)
 
         low_list = [low_montony_gap, ramp_gap, strain_gap, acwr_gap]
         high_list = [high_monotony_gap, ramp_gap, strain_gap, acwr_gap]
 
         low_gap = self.get_training_volume_gap(low_list)
         high_gap = self.get_training_volume_gap(high_list)
+        i=0
 
     def get_training_volume_gap(self, gap_list):
 
-        min_values = list(g.low_threshold for g in gap_list)
-        max_values = list(g.high_threshold for g in gap_list)
+        min_values = list(g.low_threshold for g in gap_list if g is not None and g.low_threshold is not None)
+        max_values = list(g.high_threshold for g in gap_list if g is not None and g.high_threshold is not None)
 
         min_values.sort()
         max_values.sort()

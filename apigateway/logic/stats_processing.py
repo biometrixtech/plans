@@ -1067,7 +1067,7 @@ class StatsProcessing(object):
         if self.acute_days is not None and self.chronic_days is not None:
 
             self.acute_start_date_time = self.end_date_time - timedelta(days=self.acute_days + adjustment_factor)
-            self.chronic_start_date_time = self.end_date_time - timedelta(days=self.chronic_days + adjustment_factor)
+            self.chronic_start_date_time = self.end_date_time - timedelta(days=self.chronic_days + self.acute_days + adjustment_factor)
             chronic_date_time = self.acute_start_date_time - timedelta(days=self.chronic_days)
             chronic_delta = self.end_date_time - chronic_date_time
             self.chronic_load_start_date_time = self.end_date_time - chronic_delta
