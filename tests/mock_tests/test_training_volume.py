@@ -11,6 +11,7 @@ from tests.mocks.mock_daily_readiness_datastore import DailyReadinessDatastore
 from tests.mocks.mock_post_session_survey_datastore import PostSessionSurveyDatastore
 from tests.mocks.mock_athlete_stats_datastore import AthleteStatsDatastore
 from logic.stats_processing import StatsProcessing
+from logic.training_volume_processing import TrainingVolumeProcessing
 
 
 def get_dates(start_date, days):
@@ -92,11 +93,16 @@ def test_strain_works():
     datastore_collection.daily_readiness_datastore = daily_readiness_datastore
     datastore_collection.post_session_survey_datastore = post_session_datastore
 
-    stats_processing = StatsProcessing("tester", "2018-08-13", datastore_collection)
-    success = stats_processing.set_start_end_times()
-    stats_processing.load_historical_data()
+    stats = StatsProcessing("tester", "2018-08-13", datastore_collection)
+    success = stats.set_start_end_times()
+    stats.load_historical_data()
     athlete_stats = AthleteStats("tester")
-    athlete_stats = stats_processing.calc_training_volume_metrics(athlete_stats)
-    next_training_session = stats_processing.get_next_training_session(athlete_stats)
+    training_volume_processing = TrainingVolumeProcessing(stats.start_date, stats.end_date)
+    athlete_stats = training_volume_processing.calc_training_volume_metrics(athlete_stats, stats.last_7_days_plans,
+                                                                            stats.days_8_14_plans,
+                                                                            stats.acute_daily_plans,
+                                                                            stats.get_chronic_weeks_plans(),
+                                                                            stats.chronic_daily_plans)
+    next_training_session = training_volume_processing.get_next_training_session(athlete_stats, stats.last_7_days_plans, stats.days_8_14_plans, stats.end_date_time)
 
     assert athlete_stats.acute_internal_total_load == 2590
