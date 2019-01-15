@@ -97,5 +97,6 @@ def test_strain_works():
     stats_processing.load_historical_data()
     athlete_stats = AthleteStats("tester")
     athlete_stats = stats_processing.calc_training_volume_metrics(athlete_stats)
+    next_training_session = stats_processing.get_next_training_session(athlete_stats)
 
     assert athlete_stats.acute_internal_total_load == 2590
