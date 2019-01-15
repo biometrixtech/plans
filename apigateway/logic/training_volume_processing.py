@@ -370,7 +370,7 @@ class TrainingVolumeProcessing(object):
 
             return training_volume_gap
 
-    def get_next_training_session(self, athlete_stats, last_7_days_plans, days_8_14_plans, end_date_time):
+    def get_next_training_session(self, athlete_stats, last_7_days_plans, days_8_14_plans, acute_plans, chronic_plans, end_date_time):
         last_6_internal_load_values = []
         last_7_internal_load_values = []
         last_7_13_internal_load_values = []
@@ -416,10 +416,33 @@ class TrainingVolumeProcessing(object):
         # In order to increase the standard deviation of a set of numbers, you must add a value that is more than
         # one standard deviation away from the mean
 
-        if internal_monotony >= 2:
-            low_monotony_fix = average_load - (1.1 * stdev_load)
-            high_monotony_fix = average_load + (1.1 * stdev_load)
+        low_monotony_fix = 0
+        high_monotony_fix = 0
 
+        if internal_monotony >= 2:
+            low_monotony_fix = average_load - (1.05 * stdev_load)
+            high_monotony_fix = average_load + (1.05 * stdev_load)
+
+        low_montony_gap = TrainingVolumeGap(0, low_monotony_fix)
+        high_monotony_gap = TrainingVolumeGap(high_monotony_fix, None)
+
+        acwr_gap = self.get_acwr_gap(7,28, acute_plans, chronic_plans)
+
+        low_list = [low_montony_gap, ramp_gap, strain_gap, acwr_gap]
+        high_list = [high_monotony_gap, ramp_gap, strain_gap, acwr_gap]
+
+        low_gap = self.get_training_volume_gap(low_list)
+        high_gap = self.get_training_volume_gap(high_list)
+
+    def get_training_volume_gap(self, gap_list):
+
+        min_values = list(g.low_threshold for g in gap_list)
+        max_values = list(g.high_threshold for g in gap_list)
+
+        min_values.sort()
+        max_values.sort()
+
+        return TrainingVolumeGap(min_values[0], max_values[0])
 
     def get_strain_gap(self, athlete_stats, internal_monotony, last_7_internal_load_values):
         internal_strain_sd = 0
