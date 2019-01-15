@@ -1,5 +1,6 @@
 # import numpy as np
-
+import random
+from models.exercise import ExerciseBuckets
 
 class ExerciseAssignments(object):
 
@@ -147,8 +148,51 @@ class ExerciseAssignments(object):
 
         return unified_list
 
-    def scale_to_targets(self):
+    def randomize_exercise(self, exercise_id):
 
+        group = ExerciseBuckets().get_exercise_bucket_list()
+
+        for k, v in group.items():
+            if exercise_id in v:
+                return self.pick_element_from_group(v)
+
+        return exercise_id
+
+    def pick_element_from_group(self, group):
+
+        position = random.randint(0, len(group) - 1)
+        return group[position]
+
+
+    def randomize_exercise_selection(self, assigned_exercise_list, exercise_list):
+
+        for assigned_exercise in assigned_exercise_list:
+            random_exercise = self.randomize_exercise(assigned_exercise.exercise.id)
+            if random_exercise != assigned_exercise.exercise.id:
+                i=0
+            target_exercise_list = [ex for ex in exercise_list if ex.id == random_exercise]
+            target_exercise = target_exercise_list[0]
+
+            # determine reps and sets
+            assigned_exercise.exercise = target_exercise
+
+            assigned_exercise.reps_assigned = target_exercise.max_reps
+            assigned_exercise.sets_assigned = target_exercise.max_sets
+
+        return assigned_exercise_list
+
+    def scale_to_targets(self, exercise_list):
+
+        self.inhibit_exercises = self.remove_duplicate_assigned_exercises(self.inhibit_exercises)
+        self.lengthen_exercises = self.remove_duplicate_assigned_exercises(self.lengthen_exercises)
+        self.activate_exercises = self.remove_duplicate_assigned_exercises(self.activate_exercises)
+
+        # want duplicates removed as duplicates could create two different random exercises
+        self.inhibit_exercises = self.randomize_exercise_selection(self.inhibit_exercises, exercise_list)
+        self.lengthen_exercises = self.randomize_exercise_selection(self.lengthen_exercises, exercise_list)
+        self.activate_exercises = self.randomize_exercise_selection(self.activate_exercises, exercise_list)
+
+        # just in case we just created duplicates
         self.inhibit_exercises = self.remove_duplicate_assigned_exercises(self.inhibit_exercises)
         self.lengthen_exercises = self.remove_duplicate_assigned_exercises(self.lengthen_exercises)
         self.activate_exercises = self.remove_duplicate_assigned_exercises(self.activate_exercises)

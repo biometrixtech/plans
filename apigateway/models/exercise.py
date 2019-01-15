@@ -41,6 +41,34 @@ class ExercisePriority(IntEnum):
     avoid = 2
 '''
 
+class ExerciseBuckets(object):
+
+    def get_exercise_bucket_list(self):
+
+        group = {}
+
+        group[0] = ["9", "121", "116"]
+        group[1] = ["119", "122"]
+        group[2] = ["6", "46"]
+        group[3] = ["28", "49"]
+        group[4] = ["56", "127", "128", "129", "130"]
+        group[5] = ["7", "26"]
+        group[6] = ["81", "50"]
+        group[7] = ["108", "14"]
+        group[8] = ["10", "77"]
+        group[9] = ["89", "84", "79"]
+
+        return group
+
+    def get_bucket_for_exercise(self, exercise):
+
+        group = self.get_exercise_bucket_list()
+
+        for k, v in group.items():
+            if exercise in v:
+                return v
+
+        return [exercise]
 
 class Exercise(Serialisable):
     def __init__(self, library_id):
