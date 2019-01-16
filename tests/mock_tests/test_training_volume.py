@@ -73,6 +73,32 @@ def get_post_session_surveys(start_date, rpe_list):
     return surveys
 
 
+'''
+Liz Data
+1-14-19 - 30, 3
+1-14-19 - 120, 3
+1-5-19 - 150, 3
+1-4-19 - 135, 3
+1-4-19 - 45, 3
+1-3-19 - 150, 4
+1-2-19 - 160, 5
+1-2-19 - 30, 5
+12-31-18 - 30, 4
+12-30-18 - 60, 1
+12-29-19 - 60, 2
+12-28-18 - 120, 3
+12-27-18 - 110, 4
+12-26-18 - 170, 6
+12-24-18 - 120, 3
+12-21-18 - 120, 2
+12-20-18 - 120, 5
+12-19-18 - 120, 4
+12-18-18 - 85, 3
+12-17-18 - 90, 1
+12-16-18 - 120, 3
+12-15-18 - NONE
+'''
+
 def test_strain_works():
 
     rpe_list = [4, 6, 8, 4, 7, 4, 3, 3, 5, 6, 5, 5, 4, 3, 7, 4, 6, 4, 7, 4, 4, 3, 3, 4, 5, 6, 8, 4, 8, 4, 5, 7, 5, 4, 8]
@@ -103,13 +129,13 @@ def test_strain_works():
                                                                             stats.acute_daily_plans,
                                                                             stats.get_chronic_weeks_plans(),
                                                                             stats.chronic_daily_plans)
-    next_training_session = training_volume_processing.get_training_report(athlete_stats,
-                                                                           stats.last_7_days_plans,
-                                                                           stats.days_8_14_plans,
-                                                                           stats.acute_start_date_time,
-                                                                           stats.chronic_start_date_time,
-                                                                           stats.acute_daily_plans,
-                                                                           stats.chronic_daily_plans,
-                                                                           stats.end_date_time)
+    report = training_volume_processing.get_training_report(athlete_stats,
+                                                           stats.last_7_days_plans,
+                                                           stats.days_8_14_plans,
+                                                           stats.acute_start_date_time,
+                                                           stats.chronic_start_date_time,
+                                                           stats.acute_daily_plans,
+                                                           stats.chronic_daily_plans,
+                                                           stats.end_date_time)
 
     assert athlete_stats.acute_internal_total_load == 2590
