@@ -299,37 +299,65 @@ class TrainingVolumeProcessing(object):
         return training_volume_gap
 
     def get_acwr_gap(self, acute_start_date_time, chronic_start_date_time, acute_days, chronic_days, acute_daily_plans, chronic_daily_plans):
-        if acute_days == 7 and chronic_days == 28:  # simplest case
-            acute_values = []
-            chronic_1_values = []
-            chronic_2_values = []
-            chronic_3_values = []
-            chronic_4_values = []
 
-            daily_plans = []
-            daily_plans.extend(acute_daily_plans)
-            daily_plans.extend(chronic_daily_plans)
+        acute_values = []
+        chronic_1_values = []
+        chronic_2_values = []
+        chronic_3_values = []
+        chronic_4_values = []
 
-            new_acute_start_date_time = acute_start_date_time + timedelta(days=1)
-            new_chronic_start_date_time = chronic_start_date_time + timedelta(days=1)
-            new_acute_daily_plans = sorted([p for p in daily_plans if p.get_event_datetime() >=
-                                            new_acute_start_date_time], key=lambda x: x.event_date)
+        daily_plans = []
+        daily_plans.extend(acute_daily_plans)
+        daily_plans.extend(chronic_daily_plans)
 
-            new_chronic_daily_plans = sorted([p for p in daily_plans if new_acute_start_date_time >
-                                              p.get_event_datetime() >= new_chronic_start_date_time],
-                                             key=lambda x: x.event_date)
-            acute_values.extend(
-                x for x in self.get_session_attributes_product_sum_list("session_RPE", "duration_minutes",
-                                                                        new_acute_daily_plans) if x is not None)
+        new_acute_start_date_time = acute_start_date_time + timedelta(days=1)
+        new_chronic_start_date_time = chronic_start_date_time + timedelta(days=1)
+        new_acute_daily_plans = sorted([p for p in daily_plans if p.get_event_datetime() >=
+                                        new_acute_start_date_time], key=lambda x: x.event_date)
+
+        new_chronic_daily_plans = sorted([p for p in daily_plans if new_acute_start_date_time >
+                                          p.get_event_datetime() >= new_chronic_start_date_time],
+                                         key=lambda x: x.event_date)
+        acute_values.extend(
+            x for x in self.get_session_attributes_product_sum_list("session_RPE", "duration_minutes",
+                                                                    new_acute_daily_plans) if x is not None)
+
+        chronic_values = []
+
+        if acute_days == 7 and chronic_days == 28:
 
             week4_sessions = [d for d in new_chronic_daily_plans if new_acute_start_date_time - timedelta(days=28) <=
                               d.get_event_datetime() < new_acute_start_date_time - timedelta(days=21)]
+
+            chronic_4_values.extend(
+                x for x in self.get_session_attributes_product_sum_list("session_RPE", "duration_minutes",
+                                                                        week4_sessions) if x is not None)
+            chronic_values.append(sum(chronic_4_values))
+
+        if acute_days == 7 and 21 <= chronic_days <= 28:
+
             week3_sessions = [d for d in new_chronic_daily_plans if new_acute_start_date_time
                               - timedelta(days=21) <= d.get_event_datetime() < new_acute_start_date_time -
                               timedelta(days=14)]
+
+            chronic_3_values.extend(
+                x for x in self.get_session_attributes_product_sum_list("session_RPE", "duration_minutes",
+                                                                        week3_sessions) if x is not None)
+            chronic_values.append(sum(chronic_3_values))
+
+        if acute_days == 7 and 14 <= chronic_days <= 28:
+
             week2_sessions = [d for d in chronic_daily_plans if new_acute_start_date_time
                               - timedelta(days=14) <= d.get_event_datetime() < new_acute_start_date_time -
                               timedelta(days=7)]
+
+            chronic_2_values.extend(
+                x for x in self.get_session_attributes_product_sum_list("session_RPE", "duration_minutes",
+                                                                        week2_sessions) if x is not None)
+            chronic_values.append(sum(chronic_2_values))
+
+        if acute_days <= 7 and 7 <= chronic_days <= 28:
+
             week1_sessions = [d for d in new_chronic_daily_plans if new_acute_start_date_time
                               - timedelta(days=7) <= d.get_event_datetime() < new_acute_start_date_time]
 
@@ -337,39 +365,22 @@ class TrainingVolumeProcessing(object):
                 x for x in self.get_session_attributes_product_sum_list("session_RPE", "duration_minutes",
                                                                         week1_sessions) if x is not None)
 
-            chronic_2_values.extend(
-                x for x in self.get_session_attributes_product_sum_list("session_RPE", "duration_minutes",
-                                                                        week2_sessions) if x is not None)
-
-            chronic_3_values.extend(
-                x for x in self.get_session_attributes_product_sum_list("session_RPE", "duration_minutes",
-                                                                        week3_sessions) if x is not None)
-
-            chronic_4_values.extend(
-                x for x in self.get_session_attributes_product_sum_list("session_RPE", "duration_minutes",
-                                                                        week4_sessions) if x is not None)
-
-            chronic_values = []
-
             chronic_values.append(sum(chronic_1_values))
-            chronic_values.append(sum(chronic_2_values))
-            chronic_values.append(sum(chronic_3_values))
-            chronic_values.append(sum(chronic_4_values))
 
-            chronic_value = statistics.mean(chronic_values)
-            acute_value = sum(acute_values)
+        chronic_value = statistics.mean(chronic_values)
+        acute_value = sum(acute_values)
 
-            # ideal is 0.8 to 1.3 with 1.3 being ideal
-            # low_difference = 0.8 = (acute_value + x) / chronic_value
-            # 0.8 * chronic_value = acute_value + x
-            # (0.8 * chronic_value) - acute_value = x
+        # ideal is 0.8 to 1.3 with 1.3 being ideal
+        # low_difference = 0.8 = (acute_value + x) / chronic_value
+        # 0.8 * chronic_value = acute_value + x
+        # (0.8 * chronic_value) - acute_value = x
 
-            low_target = (0.8 * chronic_value) - acute_value
-            high_target = (1.3 * chronic_value) - acute_value
+        low_target = (0.8 * chronic_value) - acute_value
+        high_target = (1.3 * chronic_value) - acute_value
 
-            training_volume_gap = TrainingVolumeGap(low_target, high_target)
+        training_volume_gap = TrainingVolumeGap(low_target, high_target)
 
-            return training_volume_gap
+        return training_volume_gap
 
     def get_next_training_session(self, athlete_stats, last_7_days_plans, days_8_14_plans, acute_start_date_time, chronic_start_date_time, acute_plans, chronic_plans, end_date_time):
         last_6_internal_load_values = []
@@ -456,7 +467,7 @@ class TrainingVolumeProcessing(object):
             internal_strain_sd = statistics.stdev(athlete_stats.historical_internal_strain[-strain_count:])
             internal_strain_avg = statistics.mean(athlete_stats.historical_internal_strain[-strain_count:])
 
-            strain_surplus = athlete_stats.internal_strain - (1.2 * internal_strain_sd)
+            strain_surplus = athlete_stats.internal_strain - (1.2 * internal_strain_sd) - internal_strain_avg
             load_change = strain_surplus / internal_monotony
 
             # 1.2 * internal_strain_sd = athlete_stats.internal_strain - x
