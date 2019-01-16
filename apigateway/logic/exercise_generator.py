@@ -168,15 +168,15 @@ class ExerciseAssignments(object):
 
         for assigned_exercise in assigned_exercise_list:
             random_exercise = self.randomize_exercise(assigned_exercise.exercise.id)
-            
-            target_exercise_list = [ex for ex in exercise_list if ex.id == random_exercise]
-            target_exercise = target_exercise_list[0]
+            if random_exercise != assigned_exercise.exercise.id:
+                target_exercise_list = [ex for ex in exercise_list if ex.id == random_exercise]
+                target_exercise = target_exercise_list[0]
 
-            # determine reps and sets
-            assigned_exercise.exercise = target_exercise
+                # determine reps and sets
+                assigned_exercise.exercise = target_exercise
 
-            assigned_exercise.reps_assigned = target_exercise.max_reps
-            assigned_exercise.sets_assigned = target_exercise.max_sets
+                assigned_exercise.reps_assigned = target_exercise.max_reps
+                assigned_exercise.sets_assigned = target_exercise.max_sets
 
         return assigned_exercise_list
 
