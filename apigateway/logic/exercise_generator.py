@@ -168,8 +168,7 @@ class ExerciseAssignments(object):
 
         for assigned_exercise in assigned_exercise_list:
             random_exercise = self.randomize_exercise(assigned_exercise.exercise.id)
-            if random_exercise != assigned_exercise.exercise.id:
-                i=0
+            
             target_exercise_list = [ex for ex in exercise_list if ex.id == random_exercise]
             target_exercise = target_exercise_list[0]
 
