@@ -1,21 +1,9 @@
-from enum import Enum
+from models.training_volume import FitFatigueStatus
 from serialisable import Serialisable
 from models.sport import SportName, NoSportPosition, BaseballPosition, BasketballPosition, FootballPosition, LacrossePosition, SoccerPosition, SoftballPosition, FieldHockeyPosition, TrackAndFieldPosition
 from utils import format_date, parse_date
 from models.soreness import HistoricSorenessStatus
 from logic.soreness_processing import SorenessCalculator
-
-
-class FitFatigueStatus(Enum):
-    undefined = 0
-    trending_toward_fatigue = 1
-    trending_toward_fitness = 2
-
-
-class TrainingVolumeGap(object):
-    def __init__(self, low_threshold=None, high_threshold=None):
-        self.low_threshold = low_threshold
-        self.high_threshold = high_threshold
 
 
 class AthleteStats(Serialisable):

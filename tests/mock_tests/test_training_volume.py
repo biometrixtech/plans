@@ -103,13 +103,13 @@ def test_strain_works():
                                                                             stats.acute_daily_plans,
                                                                             stats.get_chronic_weeks_plans(),
                                                                             stats.chronic_daily_plans)
-    next_training_session = training_volume_processing.get_next_training_session(athlete_stats,
-                                                                                 stats.last_7_days_plans,
-                                                                                 stats.days_8_14_plans,
-                                                                                 stats.acute_start_date_time,
-                                                                                 stats.chronic_start_date_time,
-                                                                                 stats.acute_daily_plans,
-                                                                                 stats.chronic_daily_plans,
-                                                                                 stats.end_date_time)
+    next_training_session = training_volume_processing.get_training_report(athlete_stats,
+                                                                           stats.last_7_days_plans,
+                                                                           stats.days_8_14_plans,
+                                                                           stats.acute_start_date_time,
+                                                                           stats.chronic_start_date_time,
+                                                                           stats.acute_daily_plans,
+                                                                           stats.chronic_daily_plans,
+                                                                           stats.end_date_time)
 
     assert athlete_stats.acute_internal_total_load == 2590
