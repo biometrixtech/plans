@@ -10,6 +10,7 @@ from tests.mocks.mock_daily_plan_datastore import DailyPlanDatastore
 from tests.mocks.mock_post_session_survey_datastore import PostSessionSurveyDatastore
 from tests.mocks.mock_daily_readiness_datastore import DailyReadinessDatastore
 from tests.mocks.mock_datastore_collection import DatastoreCollection
+from logic.training_volume_processing import TrainingVolumeProcessing
 
 def get_dates(start_date, end_date):
 
@@ -331,7 +332,12 @@ def test_correct_acute_chronic_load_33_days():
     stats.set_start_end_times()
     stats.load_historical_data()
     athlete_stats = AthleteStats("Tester")
-    athlete_stats = stats.calc_training_volume_metrics(athlete_stats)
+    training_volume_processing = TrainingVolumeProcessing(stats.start_date, stats.end_date)
+    athlete_stats = training_volume_processing.calc_training_volume_metrics(athlete_stats, stats.last_7_days_plans,
+                                                                            stats.days_8_14_plans,
+                                                                            stats.acute_daily_plans,
+                                                                            stats.get_chronic_weeks_plans(),
+                                                                            stats.chronic_daily_plans)
     assert 4060 == athlete_stats.acute_external_total_load
     assert 812.5 == athlete_stats.chronic_external_total_load
 
@@ -351,7 +357,12 @@ def test_correct_acute_chronic_empty_load_33_days():
     stats.set_start_end_times()
     stats.load_historical_data()
     athlete_stats = AthleteStats("Tester")
-    athlete_stats = stats.calc_training_volume_metrics(athlete_stats)
+    training_volume_processing = TrainingVolumeProcessing(stats.start_date, stats.end_date)
+    athlete_stats = training_volume_processing.calc_training_volume_metrics(athlete_stats, stats.last_7_days_plans,
+                                                                            stats.days_8_14_plans,
+                                                                            stats.acute_daily_plans,
+                                                                            stats.get_chronic_weeks_plans(),
+                                                                            stats.chronic_daily_plans)
     assert None is athlete_stats.acute_external_total_load
     assert None is athlete_stats.chronic_external_total_load
 
@@ -372,7 +383,12 @@ def test_correct_acwr_load_33_days():
     stats.set_start_end_times()
     stats.load_historical_data()
     athlete_stats = AthleteStats("Tester")
-    athlete_stats = stats.calc_training_volume_metrics(athlete_stats)
+    training_volume_processing = TrainingVolumeProcessing(stats.start_date, stats.end_date)
+    athlete_stats = training_volume_processing.calc_training_volume_metrics(athlete_stats, stats.last_7_days_plans,
+                                                                            stats.days_8_14_plans,
+                                                                            stats.acute_daily_plans,
+                                                                            stats.get_chronic_weeks_plans(),
+                                                                            stats.chronic_daily_plans)
     assert 4060 / 812.5 == athlete_stats.external_acwr
 
 
@@ -392,7 +408,12 @@ def test_correct_acwr_empty_load_33_days():
     stats.set_start_end_times()
     stats.load_historical_data()
     athlete_stats = AthleteStats("Tester")
-    athlete_stats = stats.calc_training_volume_metrics(athlete_stats)
+    training_volume_processing = TrainingVolumeProcessing(stats.start_date, stats.end_date)
+    athlete_stats = training_volume_processing.calc_training_volume_metrics(athlete_stats, stats.last_7_days_plans,
+                                                                            stats.days_8_14_plans,
+                                                                            stats.acute_daily_plans,
+                                                                            stats.get_chronic_weeks_plans(),
+                                                                            stats.chronic_daily_plans)
     assert None is athlete_stats.external_acwr
 
 def test_correct_internal_acwr_load_33_days():
@@ -411,7 +432,12 @@ def test_correct_internal_acwr_load_33_days():
     stats.set_start_end_times()
     stats.load_historical_data()
     athlete_stats = AthleteStats("Tester")
-    athlete_stats = stats.calc_training_volume_metrics(athlete_stats)
+    training_volume_processing = TrainingVolumeProcessing(stats.start_date, stats.end_date)
+    athlete_stats = training_volume_processing.calc_training_volume_metrics(athlete_stats, stats.last_7_days_plans,
+                                                                            stats.days_8_14_plans,
+                                                                            stats.acute_daily_plans,
+                                                                            stats.get_chronic_weeks_plans(),
+                                                                            stats.chronic_daily_plans)
     assert 175 / 156.25 == athlete_stats.internal_acwr
 
 
@@ -431,5 +457,10 @@ def test_correct_internal_acwr_empty_load_33_days():
     stats.set_start_end_times()
     stats.load_historical_data()
     athlete_stats = AthleteStats("Tester")
-    athlete_stats = stats.calc_training_volume_metrics(athlete_stats)
+    training_volume_processing = TrainingVolumeProcessing(stats.start_date, stats.end_date)
+    athlete_stats = training_volume_processing.calc_training_volume_metrics(athlete_stats, stats.last_7_days_plans,
+                                                                            stats.days_8_14_plans,
+                                                                            stats.acute_daily_plans,
+                                                                            stats.get_chronic_weeks_plans(),
+                                                                            stats.chronic_daily_plans)
     assert None is athlete_stats.internal_acwr
