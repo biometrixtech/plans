@@ -1,7 +1,7 @@
 import models.soreness
 from logic.exercise_generator import ExerciseAssignments
 import logic.soreness_processing as soreness_and_injury
-from models.exercise import Phase
+from models.exercise import ExerciseBuckets, Phase
 from models.soreness import AssignedExercise, BodyPartLocation, HistoricSorenessStatus
 from logic.goal_focus_text_generator import RecoveryTextGenerator
 from datetime import  timedelta
@@ -157,11 +157,13 @@ class ExerciseAssignmentCalculator(object):
                                                          completed_exercises, 0)
                 exercise_assignments.activate_exercises.extend(new_assignments)
 
-        exercise_assignments.scale_to_targets()
+        exercise_assignments.scale_to_targets(self.exercise_library)
 
         return exercise_assignments
 
     def get_current_exercise(self, body_part_exercise, exercise_list, completed_exercises):
+
+        exercise_bucket_list = ExerciseBuckets().get_bucket_for_exercise(body_part_exercise.exercise.id)
 
         target_exercise_list = [ex for ex in exercise_list if ex.id == body_part_exercise.exercise.id]
         target_exercise = target_exercise_list[0]
@@ -170,11 +172,15 @@ class ExerciseAssignmentCalculator(object):
             return target_exercise
         else:
             completed_exercise_list = [ex for ex in completed_exercises if ex.exercise_id is not None and
-                                       ex.exercise_id == body_part_exercise.exercise.id]
+                                       ex.exercise_id in exercise_bucket_list]
             if len(completed_exercise_list) == 0:
                 return target_exercise
             else:
-                if completed_exercise_list[0].exposures >= target_exercise.exposure_target:
+                exposures = 0
+                for c in completed_exercise_list:
+                    exposures += c.exposures
+
+                if exposures >= target_exercise.exposure_target:
                     # now work through progressions...
 
                     for p in range(len(body_part_exercise.exercise.progressions) - 1, -1, -1):
@@ -189,7 +195,7 @@ class ExerciseAssignmentCalculator(object):
                             else:
                                 # haven't dont anything with this exercise yet, keep working our way down
                                 continue
-                        elif completed_progression_list[0].exposures >= proposed_exercise.exposure_target:
+                        elif exposures >= proposed_exercise.exposure_target:
                             # return next progression
                             if p < (len(body_part_exercise.exercise.progressions) - 1):
                                 proposed_exercise_list = [ex for ex in exercise_list if
@@ -269,12 +275,19 @@ class ExerciseAssignmentCalculator(object):
     def get_progression_list(self, exercise):
 
         dict = {}
-        dict["9"] = ["121"]
+        #dict["9"] = ["121"]
+
         dict["10"] = ["12", "11", "13", "120"]
-        dict["28"] = ["122"]
+
         dict["29"] = ["63", "64"]
+
+        dict["6"] = ["117"]
         dict["46"] = ["117"]
+
+        # 28 and 49 are in the same bucket, and 119 and 122 are in the same bucket.  This should be ok
+        dict["28"] = ["122"]
         dict["49"] = ["119"]
+
         dict["67"] = ["78", "68", "31"]
         dict["81"] = ["82", "83", "110"]
 
