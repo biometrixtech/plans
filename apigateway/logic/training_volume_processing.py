@@ -290,11 +290,13 @@ class TrainingVolumeProcessing(object):
             ramp = 0
 
         if ramp > 1.1:
-            load_gap = 0.0
+            low_load = 0.0
+            high_load = 0.0
         else:
-            load_gap = (1.1 * previous_load) + previous_load - current_load
+            low_load = (1.0 * previous_load) + previous_load - current_load
+            high_load = (1.1 * previous_load) + previous_load - current_load
 
-        training_volume_gap = TrainingVolumeGap(0.0, load_gap, TrainingVolumeGapType.ramp)
+        training_volume_gap = TrainingVolumeGap(low_load, high_load, TrainingVolumeGapType.ramp)
 
         if ramp < 1:
             training_volume_gap.training_level = TrainingLevel.undertraining
@@ -445,11 +447,19 @@ class TrainingVolumeProcessing(object):
 
         acwr_gap = self.get_acwr_gap(acute_start_date_time, chronic_start_date_time, acute_plans, chronic_plans)
 
-        low_list = [low_monotony_gap, ramp_gap, strain_gap, acwr_gap]
-        high_list = [high_monotony_gap, ramp_gap, strain_gap, acwr_gap]
+        gap_list = [ramp_gap, strain_gap, acwr_gap]
 
-        low_gap = self.get_training_volume_gap(low_list)
-        high_gap = self.get_training_volume_gap(high_list)
+        report = self.compile_training_report(athlete_stats.athlete_id, gap_list, low_monotony_gap, high_monotony_gap)
+
+        report.internal_monotony_index = high_monotony_gap.internal_monotony_index
+        report.internal_freshness_index = acwr_gap.internal_freshness_index
+        report.internal_acwr = acwr_gap.internal_acwr
+        report.performance_focused = acwr_gap.performance_focused
+        report.competition_focused = acwr_gap.competition_focused
+        report.internal_strain = strain_gap.internal_strain
+        report.internal_ramp = ramp_gap.internal_ramp
+
+        return report
 
     def get_monotony_gap(self, last_6_internal_load_values):
 
@@ -487,15 +497,39 @@ class TrainingVolumeProcessing(object):
 
         return low_monotony_gap, high_monotony_gap
 
-    def get_training_volume_gap(self, gap_list):
+    def compile_training_report(self, user_id, gap_list, low_monotony_gap, high_monotony_gap):
 
-        min_values = list(g.low_threshold for g in gap_list if g is not None and g.low_threshold is not None)
-        max_values = list(g.high_threshold for g in gap_list if g is not None and g.high_threshold is not None)
+        min_values = []
+        max_values = []
 
-        min_values.sort()
-        max_values.sort()
+        max_values.extend(list(g for g in gap_list if g.high_threshold is not None))
+        max_values.sort(key=lambda x: x.high_threshold, reverse=False)
 
-        return TrainingVolumeGap(min_values[0], max_values[0])
+        # we want the lowest high threshold
+        if high_monotony_gap.high_threshold is None or max_values[0].high_threshold <= high_monotony_gap.high_threshold:
+            high_threshold_gap = max_values[0]
+        else:
+            high_threshold_gap = high_monotony_gap
+
+        min_values.extend(list(g for g in gap_list if g.low_threshold is not None and g.low_threshold < high_threshold_gap.high_threshold))
+
+        min_values.sort(key=lambda x: x.low_threshold,
+                        reverse=True)  # I think we want the highest min value for the tightest band that is lower than the high_threshold
+
+        # we want the highest low threshold
+        if min_values[0].low_threshold >= low_monotony_gap.low_threshold:
+            low_threshold_gap = min_values[0]
+        else:
+            low_threshold_gap = low_monotony_gap
+
+        report = TrainingReport(user_id, low_threshold_gap.low_threshold, high_threshold_gap.high_threshold)
+
+        report.most_limiting_gap_type_low = low_threshold_gap.training_volume_gap_type
+        report.most_limiting_gap_type_high = high_threshold_gap.training_volume_gap_type
+        report.training_level = TrainingLevel(max(low_threshold_gap.training_level,
+                                                               high_threshold_gap.training_level))
+
+        return report
 
     def get_strain_gap(self, athlete_stats, internal_monotony, last_7_internal_load_values):
 

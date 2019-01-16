@@ -46,15 +46,18 @@ class TrainingVolumeGap(object):
 
 
 class TrainingReport(object):
-    def __init__(self, user_id):
+    def __init__(self, user_id, low_threshold=None, high_threshold=None):
         self.user_id = user_id
+        self.low_threshold = low_threshold
+        self.high_threshold = high_threshold
         self.internal_freshness_index = None
         self.internal_acwr = None
         self.internal_ramp = None
         self.internal_monotony_index = None
         self.internal_strain = None
         self.training_volume_gaps = []
-        self.most_limiting_gap_type = None
+        self.most_limiting_gap_type_low = None
+        self.most_limiting_gap_type_high = None
         self.training_level = None
         self.performance_focused = False
         self.competition_focused = False
