@@ -229,10 +229,6 @@ class AthleteStats(Serialisable):
                     unique_q3.append({new_part["body_part"]: new_part["side"]})
                     q3.append(new_part)
 
-                # q3.append({"body_part": soreness.body_part_location.value,
-                #            "side": soreness.side,
-                #            "pain": soreness.is_pain,
-                #            "status": soreness.historic_soreness_status.name})
             elif soreness.historic_soreness_status in [HistoricSorenessStatus.almost_persistent_pain,
                                                        HistoricSorenessStatus.almost_persistent_soreness,
                                                        HistoricSorenessStatus.almost_acute_pain]:
