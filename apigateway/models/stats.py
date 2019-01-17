@@ -212,49 +212,45 @@ class AthleteStats(Serialisable):
         tipping_status = []
         unique_q2 = []
         unique_q3 = []
+        unique_tipping_status = []
         for soreness in self.historic_soreness:
+            new_part = {"body_part": soreness.body_part_location.value,
+                         "side": soreness.side,
+                         "pain": soreness.is_pain,
+                         "status": soreness.historic_soreness_status.name}
             if soreness.ask_persistent_2_question or soreness.ask_acute_pain_question:
-                new_part = {"body_part": soreness.body_part_location.value,
-                           "side": soreness.side,
-                           "pain": soreness.is_pain,
-                           "status": soreness.historic_soreness_status.name}
-                if {new_part["body_part"]: new_part["side"]} in unique_q3:
-                    for q3_part in q3:
-                        if q3_part['body_part'] == new_part['body_part'] and q3_part['side'] == new_part['side']:
-                            if new_part['pain']:
-                                q3_part['pain'] = True
-                                q3_part['status'] = new_part['status']
-                            break
-                else:
-                    unique_q3.append({new_part["body_part"]: new_part["side"]})
-                    q3.append(new_part)
-
+                self._add_body_part(new_part, q3, unique_q3)
             elif soreness.historic_soreness_status in [HistoricSorenessStatus.almost_persistent_pain,
                                                        HistoricSorenessStatus.almost_persistent_soreness,
                                                        HistoricSorenessStatus.almost_acute_pain]:
-                tipping_status.append({"body_part": soreness.body_part_location.value,
-                                       "side": soreness.side,
-                                       "pain": soreness.is_pain,
-                                       "status": soreness.historic_soreness_status.name})
+                self._add_body_part(new_part, tipping_status, unique_tipping_status)
             elif soreness.historic_soreness_status != HistoricSorenessStatus.dormant_cleared:
-                new_part = {"body_part": soreness.body_part_location.value,
-                             "side": soreness.side,
-                             "pain": soreness.is_pain,
-                             "status": soreness.historic_soreness_status.name}
-                if {new_part["body_part"]: new_part["side"]} in unique_q3:
-                    pass
-                elif {new_part["body_part"]: new_part["side"]} in unique_q2:
-                    for q2_part in q2:
-                        if q2_part['body_part'] == new_part['body_part'] and q2_part['side'] == new_part['side']:
-                            if new_part['pain']:
-                                q2_part['pain'] = True
-                                q2_part['status'] = new_part['status']
-                            break
-                else:
-                    unique_q2.append({new_part["body_part"]: new_part["side"]})
-                    q2.append(new_part)
+                self._add_body_part(new_part, q2, unique_q2)
+
+        for q2_part in q2:
+            if {q2_part["body_part"]: q2_part["side"]} in unique_q3:
+                q2_part['delete'] = True
+        for tipping_part in tipping_status:
+            if {tipping_part["body_part"]: tipping_part["side"]} in unique_q3 or {tipping_part["body_part"]: tipping_part["side"]} in unique_q2:
+                tipping_part['delete'] = True
+        q2 = [s for s in q2 if not s.get('delete', False)]
+        tipping_status = [s for s in tipping_status if not s.get('delete', False)]
 
         return q2, q3, tipping_status
+
+    def _add_body_part(self, new_part, full_list, unique_list):
+        ## add body part to the list if it doesn't already exist. update to pain if new is pain and existing is soreness
+        if {new_part["body_part"]: new_part["side"]} in unique_list:
+            for part in full_list:
+                if part['body_part'] == new_part['body_part'] and part['side'] == new_part['side']:
+                    if new_part['pain']:
+                        part['pain'] = True
+                        part['status'] = new_part['status']
+                    break
+        else:
+            unique_list.append({new_part["body_part"]: new_part["side"]})
+            full_list.append(new_part)
+
 
     def __setattr__(self, name, value):
         if name == "current_sport_name":
