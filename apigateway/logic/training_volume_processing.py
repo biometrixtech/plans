@@ -1,4 +1,5 @@
 from models.training_volume import IndicatorLevel, TrainingLevel, TrainingVolumeGap, TrainingVolumeGapType, TrainingReport
+from models.soreness import HistoricSorenessStatus
 from datetime import datetime, timedelta
 import statistics
 from utils import parse_date, parse_datetime, format_date
@@ -136,10 +137,12 @@ class TrainingVolumeProcessing(object):
         if athlete_stats.acute_internal_total_load is not None and athlete_stats.chronic_internal_total_load is not None:
             if athlete_stats.chronic_internal_total_load > 0:
                 athlete_stats.internal_acwr = athlete_stats.acute_internal_total_load / athlete_stats.chronic_internal_total_load
+                athlete_stats.internal_freshness_index = athlete_stats.chronic_internal_total_load - athlete_stats.acute_internal_total_load
 
         if athlete_stats.acute_external_total_load is not None and athlete_stats.chronic_external_total_load is not None:
             if athlete_stats.chronic_external_total_load > 0:
                 athlete_stats.external_acwr = athlete_stats.acute_external_total_load / athlete_stats.chronic_external_total_load
+                athlete_stats.external_freshness_index = athlete_stats.chronic_external_total_load - athlete_stats.acute_external_total_load
 
         athlete_stats.historical_internal_strain = self.get_historical_internal_strain(self.start_date,
                                                                                        self.end_date,
@@ -403,24 +406,6 @@ class TrainingVolumeProcessing(object):
         high_target = (1.3 * chronic_value) - acute_value
 
         training_volume_gap = TrainingVolumeGap(low_target, high_target, TrainingVolumeGapType.acwr)
-        if chronic_value > 0:
-            training_volume_gap.internal_acwr = acute_value / chronic_value
-        else:
-            training_volume_gap.internal_acwr = 0
-
-        training_volume_gap.internal_freshness_index = chronic_value - acute_value
-        training_volume_gap.competition_focused = (training_volume_gap.internal_freshness_index > 0)
-        training_volume_gap.performance_focused = (training_volume_gap.internal_freshness_index <= 0)
-
-        if chronic_value > 0:
-            if acute_value / chronic_value < 0.8:
-                training_volume_gap.training_level = TrainingLevel.undertraining
-            elif 0.8 <= acute_value / chronic_value <= 1.3:
-                training_volume_gap.training_level = TrainingLevel.optimal
-            elif 1.3 < acute_value / chronic_value <= 1.5:
-                training_volume_gap.training_level = TrainingLevel.overreaching
-            elif acute_value / chronic_value > 1.5:
-                training_volume_gap.training_level = TrainingLevel.excessive
 
         return training_volume_gap
 
@@ -458,7 +443,7 @@ class TrainingVolumeProcessing(object):
 
         low_monotony_gap, high_monotony_gap,  = self.get_monotony_gap(last_6_internal_load_values)
 
-        strain_gap = self.get_strain_gap(athlete_stats, low_monotony_gap.internal_monotony_index, last_7_internal_load_values)
+        strain_gap = self.get_strain_gap(athlete_stats, athlete_stats.internal_monotony, last_7_internal_load_values)
 
         acwr_gap = self.get_acwr_gap(acute_start_date_time, chronic_start_date_time, acute_plans, chronic_plans)
 
@@ -466,14 +451,49 @@ class TrainingVolumeProcessing(object):
 
         report = self.compile_training_report(athlete_stats.athlete_id, gap_list, low_monotony_gap, high_monotony_gap)
 
-        report.internal_monotony_index = high_monotony_gap.internal_monotony_index
-        report.internal_freshness_index = acwr_gap.internal_freshness_index
-        report.internal_acwr = acwr_gap.internal_acwr
-        report.performance_focused = acwr_gap.performance_focused
-        report.competition_focused = acwr_gap.competition_focused
+        report.internal_monotony_index = athlete_stats.internal_monotony
+
+        if athlete_stats.internal_monotony is not None:
+            if athlete_stats.internal_monotony > 2:
+                report.need_for_variability = IndicatorLevel.high
+                #report.training_level = TrainingLevel.overreaching - how should we summarize?
+
+            elif 1.3 < athlete_stats.internal_monotony <= 2:
+                report.need_for_variability = IndicatorLevel.moderate
+
+            elif athlete_stats.internal_monotony <= 1.3:
+                report.need_for_variability = IndicatorLevel.low
+
+        else:
+            report.need_for_variability = IndicatorLevel.low
+
+        report.internal_acwr = athlete_stats.internal_acwr
+        report.internal_freshness_index = athlete_stats.internal_freshness_index
+
+        report.competition_focused = (report.internal_freshness_index > 0)
+        report.performance_focused = (report.internal_freshness_index <= 0)
+
+        if athlete_stats.internal_acwr is not None:
+            if athlete_stats.internal_acwr < 0.8:
+                report.training_level = TrainingLevel.undertraining
+            elif 0.8 <= athlete_stats.internal_acwr <= 1.3:
+                report.training_level = TrainingLevel.optimal
+            elif 1.3 < athlete_stats.internal_acwr <= 1.5:
+                report.training_level = TrainingLevel.overreaching
+            elif athlete_stats.internal_acwr > 1.5:
+                report.training_level = TrainingLevel.excessive
+
         report.internal_strain = athlete_stats.internal_strain
         report.internal_ramp = athlete_stats.internal_ramp
-        report.need_for_variability = high_monotony_gap.need_for_variability
+        report.historic_soreness = list(h for h in athlete_stats.historic_soreness if h.historic_soreness_status is not HistoricSorenessStatus.dormant_cleared)
+
+        severity_list = list(h.average_severity for h in report.historic_soreness)
+
+        if len(severity_list) > 0:
+            report.low_hs_severity = min(severity_list)
+            report.high_hs_severity = max(severity_list)
+            report.average_hs_severity = statistics.mean(severity_list)
+
         return report
 
     def get_monotony_gap(self, last_6_internal_load_values):
@@ -501,20 +521,8 @@ class TrainingVolumeProcessing(object):
             high_monotony_fix = average_load + (1.05 * stdev_load)
         low_monotony_gap = TrainingVolumeGap(0, low_monotony_fix, TrainingVolumeGapType.monotony)
         high_monotony_gap = TrainingVolumeGap(high_monotony_fix, None, TrainingVolumeGapType.monotony)
-        if internal_monotony > 2:
-            low_monotony_gap.need_for_variability = IndicatorLevel.high
-            high_monotony_gap.need_for_variability = IndicatorLevel.high
-            low_monotony_gap.training_level = TrainingLevel.overreaching
-            high_monotony_gap.training_level = TrainingLevel.overreaching
-        elif 1.3 < internal_monotony <= 2:
-            low_monotony_gap.need_for_variability = IndicatorLevel.moderate
-            high_monotony_gap.need_for_variability = IndicatorLevel.moderate
-        elif internal_monotony <= 1.3:
-            low_monotony_gap.need_for_variability = IndicatorLevel.low
-            high_monotony_gap.need_for_variability = IndicatorLevel.low
-
-        low_monotony_gap.internal_monotony_index = internal_monotony
-        high_monotony_gap.internal_monotony_index = internal_monotony
+        low_monotony_gap.training_level = None
+        high_monotony_gap.training_level = None
 
         return low_monotony_gap, high_monotony_gap
 

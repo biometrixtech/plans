@@ -34,15 +34,16 @@ class TrainingVolumeGap(object):
         self.low_threshold = low_threshold
         self.high_threshold = high_threshold
         self.training_volume_gap_type = gap_type
-        self.internal_freshness_index = None
-        self.internal_acwr = None
-        self.internal_ramp = None
-        self.internal_monotony_index = None
-        self.internal_strain = None
+        #self.internal_freshness_index = None
+        #self.internal_acwr = None
+        #self.internal_ramp = None
+        #self.internal_monotony_index = None
+        #self.internal_strain = None
         self.training_level = None
-        self.performance_focused = False
-        self.competition_focused = False
-        self.need_for_variability = None
+        #self.performance_focused = False
+        #self.competition_focused = False
+        #self.need_for_variability = None
+        self.historic_soreness = []
 
 
 class TrainingReport(object):
@@ -62,5 +63,8 @@ class TrainingReport(object):
         self.performance_focused = False
         self.competition_focused = False
         self.need_for_variability = None
+        self.low_hs_severity = None
+        self.high_hs_severity = None
+        self.average_hs_severity = None
 
 
