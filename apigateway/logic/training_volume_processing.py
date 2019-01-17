@@ -496,7 +496,7 @@ class TrainingVolumeProcessing(object):
         # one standard deviation away from the mean
         low_monotony_fix = 0
         high_monotony_fix = 0
-        if internal_monotony >= 2:
+        if internal_monotony >= 1.7: # bumped it down from 2 just for safe measure
             low_monotony_fix = average_load - (1.05 * stdev_load)
             high_monotony_fix = average_load + (1.05 * stdev_load)
         low_monotony_gap = TrainingVolumeGap(0, low_monotony_fix, TrainingVolumeGapType.monotony)
@@ -523,14 +523,22 @@ class TrainingVolumeProcessing(object):
         min_values = []
         max_values = []
 
+        # we want the lowest high threshold
         max_values.extend(list(g for g in gap_list if g.high_threshold is not None))
         max_values.sort(key=lambda x: x.high_threshold, reverse=False)
 
-        # we want the lowest high threshold
-        if high_monotony_gap.high_threshold is None or max_values[0].high_threshold <= high_monotony_gap.high_threshold:
-            high_threshold_gap = max_values[0]
+        # this number needs to be consistent with monotony.  Should we use the low or high?
+        if max_values[0].high_threshold < high_monotony_gap.low_threshold:
+            max_values.append(low_monotony_gap)  # go with low monotony option since best option could create monotony
+            min_values.append(low_monotony_gap)
         else:
-            high_threshold_gap = high_monotony_gap
+            #max_values.append(high_monotony_gap)  this will usuall be None
+            min_values.append(high_monotony_gap)
+
+        # re-sort
+        max_values.sort(key=lambda x: x.high_threshold, reverse=False)
+
+        high_threshold_gap = max_values[0]
 
         min_values.extend(list(g for g in gap_list if g.low_threshold is not None and g.low_threshold < high_threshold_gap.high_threshold))
 
@@ -539,17 +547,15 @@ class TrainingVolumeProcessing(object):
 
         if len(min_values) > 0:
             # we want the highest low threshold
-            if min_values[0].low_threshold >= low_monotony_gap.low_threshold:
-                low_threshold_gap = min_values[0]
-            else:
-                low_threshold_gap = low_monotony_gap
+            low_threshold_gap = min_values[0]
         else:
-            low_threshold_gap = high_threshold_gap
+            low_threshold_gap = max_values[0]
 
-        report = TrainingReport(user_id, low_threshold_gap.low_threshold, high_threshold_gap.high_threshold)
+        report = TrainingReport(user_id, low_threshold_gap.low_threshold, max(0, high_threshold_gap.high_threshold))
 
         report.most_limiting_gap_type_low = low_threshold_gap.training_volume_gap_type
         report.most_limiting_gap_type_high = high_threshold_gap.training_volume_gap_type
+        report.training_volume_gaps = max_values
         report.training_level = TrainingLevel(max(low_threshold_gap.training_level if low_threshold_gap.training_level is not None else 0,
                                                                high_threshold_gap.training_level if high_threshold_gap.training_level is not None else 0))
 
@@ -575,7 +581,7 @@ class TrainingVolumeProcessing(object):
                 # (-1) * (1.2 * internal_strain_sd - athlete_stats.internal_strain =  - x)
 
                 # add/reduce this load from day 7 so the forecast load will reduce the strain; not perfect but close
-                strain_gap = max(0, last_7_internal_load_values[0] + load_change)
+                strain_gap = max(0, last_7_internal_load_values[0] - load_change)
             else:
                 strain_gap = None
             training_volume_gap.low_threshold = 0

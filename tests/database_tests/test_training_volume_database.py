@@ -43,10 +43,10 @@ def test_get_training_plan_from_database():
 
     #user_id = '93176a69-2d5d-4326-b986-ca6b04a9a29d' #liz
     #user_id = 'e4fff5dc-6467-4717-8cef-3f2cb13e5c33'  #abbey
-    #user_id = '82ccf294-7c1e-48e6-8149-c5a001e76f78'  #pene
+    user_id = '82ccf294-7c1e-48e6-8149-c5a001e76f78'  #pene
     #user_id = '8bca10bf-8bdd-4971-85ca-cb2712c32478' #rhonda
     #user_id = '5e516e2e-ac2d-425e-ba4d-bf2689c28cec'  #td
-    user_id = '4f5567c7-a592-4c26-b89d-5c1287884d37'  #megan
+    #user_id = '4f5567c7-a592-4c26-b89d-5c1287884d37'  #megan
     #user_id = 'fac4be57-35d6-4952-8af9-02aadf979982'  #bay
     start_date = "2018-10-31"
     end_date = "2019-01-16"
