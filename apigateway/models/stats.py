@@ -1,6 +1,6 @@
 from enum import Enum
 from serialisable import Serialisable
-from models.sport import SportName, NoSportPosition, BaseballPosition, BasketballPosition, FootballPosition, LacrossePosition, SoccerPosition, SoftballPosition, FieldHockeyPosition, TrackAndFieldPosition
+from models.sport import SportName, NoSportPosition, BaseballPosition, BasketballPosition, FootballPosition, LacrossePosition, SoccerPosition, SoftballPosition, FieldHockeyPosition, TrackAndFieldPosition, VolleyballPosition
 from utils import format_date, parse_date
 from models.soreness import HistoricSorenessStatus
 from logic.soreness_processing import SorenessCalculator
@@ -281,6 +281,8 @@ class AthleteStats(Serialisable):
                 value = FieldHockeyPosition(value)
             elif self.current_sport_name == SportName.track_field:
                 value = TrackAndFieldPosition(value)
+            elif self.current_sport_name == SportName.volleyball:
+                value = VolleyballPosition(value)
         super().__setattr__(name, value)
 
     def json_serialise(self):
