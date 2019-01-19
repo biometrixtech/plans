@@ -109,7 +109,7 @@ The client __must__ submit a request body containing a JSON object with the foll
     "sleep_quality": number,
     "readines": number,
     "wants_functional_strength": boolean,
-    "current_sport": number,
+    "current_sport_name": number,
     "current_position": number,
     "sessions": [session, session],
     "sessions_planned": boolean
