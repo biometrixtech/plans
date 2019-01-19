@@ -66,7 +66,7 @@ class FSProgramGenerator(object):
         if sport_name.value is None and position is None:
             return session
 
-        if sport_name.value is None or sport_name in [sport.SportName.pool_sports, sport.SportName.track_field]:
+        if sport_name.value is None or sport_name in [sport.SportName.pool_sports, sport.SportName.track_field, sport.SportName.wrestling]:
             if position == sport.NoSportPosition.strength or position == sport.TrackAndFieldPosition.thrower:
 
                 session.warm_up.append(AssignedExercise("139", 1, 1))
@@ -144,7 +144,7 @@ class FSProgramGenerator(object):
                 session.victory_lap.append(AssignedExercise("202", 4, 4))
 
             elif (position == sport.NoSportPosition.speed_agility or
-                  position == sport.NoSportPosition.power) or position in [sport.TrackAndFieldPosition.sprinter, sport.TrackAndFieldPosition.jumper]:
+                  position == sport.NoSportPosition.power) or position in [sport.TrackAndFieldPosition.sprinter, sport.TrackAndFieldPosition.jumper] or sport_name == sport.SportName.wrestling:
 
                 session.warm_up.append(AssignedExercise("176", 1, 1))
                 session.warm_up.append(AssignedExercise("139", 1, 2))
@@ -193,7 +193,7 @@ class FSProgramGenerator(object):
             session.victory_lap.append(AssignedExercise("201", 4, 3))
             session.victory_lap.append(AssignedExercise("202", 4, 4))
 
-        if sport_name == sport.SportName.baseball or sport_name == sport.SportName.softball:
+        if sport_name == sport.SportName.baseball or sport_name == sport.SportName.softball or sport_name == sport.SportName.golf:
 
             session.warm_up.append(AssignedExercise("161", 1, 1))
             session.warm_up.append(AssignedExercise("162", 1, 2))
@@ -218,7 +218,7 @@ class FSProgramGenerator(object):
             session.victory_lap.append(AssignedExercise("173", 4, 3))
             session.victory_lap.append(AssignedExercise("174", 4, 4))
 
-        if sport_name == sport.SportName.basketball or sport_name in [sport.SportName.cycling, sport.SportName.rowing]:
+        if sport_name == sport.SportName.basketball or sport_name in [sport.SportName.cycling, sport.SportName.rowing, sport.SportName.volleyball]:
             # position doesn't matter
 
             session.warm_up.append(AssignedExercise("175", 1, 1))
