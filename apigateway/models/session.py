@@ -5,7 +5,7 @@ import datetime
 from serialisable import Serialisable
 from utils import format_datetime, parse_datetime
 from models.soreness import HistoricSorenessStatus
-from models.sport import SportName, NoSportPosition, BaseballPosition, BasketballPosition, FootballPosition, LacrossePosition, SoccerPosition, SoftballPosition, TrackAndFieldPosition, FieldHockeyPosition
+from models.sport import SportName, NoSportPosition, BaseballPosition, BasketballPosition, FootballPosition, LacrossePosition, SoccerPosition, SoftballPosition, TrackAndFieldPosition, FieldHockeyPosition, VolleyballPosition
 
 class SessionType(Enum):
     practice = 0
@@ -340,6 +340,8 @@ class FunctionalStrengthSession(Serialisable):
                 value = TrackAndFieldPosition(value)
             elif self.sport_name == SportName.field_hockey:
                 value = FieldHockeyPosition(value)
+            elif self.sport_name == SportName.volleyball:
+                value = VolleyballPosition(value)
         elif name in ['start_date', 'event_date']:
             if not isinstance(value, datetime.datetime) and value is not None:
                 value = parse_datetime(value)

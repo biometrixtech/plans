@@ -7,7 +7,7 @@ from models.daily_plan import DailyPlan
 from models.daily_readiness import DailyReadiness
 from models.post_session_survey import PostSessionSurvey
 from models.session import FunctionalStrengthSession, PracticeSession, SessionType
-from models.sport import BasketballPosition, SportName, SoccerPosition, NoSportPosition, TrackAndFieldPosition, SoftballPosition, FieldHockeyPosition
+from models.sport import BasketballPosition, SportName, SoccerPosition, NoSportPosition, TrackAndFieldPosition, SoftballPosition, FieldHockeyPosition, VolleyballPosition, BaseballPosition
 from tests.mocks.mock_exercise_datastore import ExerciseLibraryDatastore
 from tests.mocks.mock_datastore_collection import DatastoreCollection
 from tests.mocks.mock_daily_plan_datastore import DailyPlanDatastore
@@ -162,6 +162,53 @@ def test_generate_session_for_pool_sports():
     assert True is (len(fs_session.stability_work) > 0)
     assert True is (len(fs_session.victory_lap) == 0)
     assert True is (fs_session.duration_minutes > 0)
+
+def test_generate_session_for_volleyball():
+    mapping = FSProgramGenerator(fs_exercise_library_datastore)
+    fs_session = mapping.getFunctionalStrengthForSportPosition(SportName.volleyball, VolleyballPosition.hitter)
+    assert True is (len(fs_session.warm_up) == 0)
+    assert True is (len(fs_session.dynamic_movement) > 0)
+    assert True is (len(fs_session.stability_work) > 0)
+    assert True is (len(fs_session.victory_lap) == 0)
+    assert True is (fs_session.duration_minutes > 0)
+
+    fs_session_basketball = mapping.getFunctionalStrengthForSportPosition(SportName.basketball, BasketballPosition.guard)
+    assert True is ([i.json_serialise() for i in fs_session.warm_up] == [i.json_serialise() for i in fs_session_basketball.warm_up])
+    assert True is ([i.json_serialise() for i in fs_session.dynamic_movement] == [i.json_serialise() for i in fs_session_basketball.dynamic_movement])
+    assert True is ([i.json_serialise() for i in fs_session.stability_work] == [i.json_serialise() for i in fs_session_basketball.stability_work])
+    assert True is ([i.json_serialise() for i in fs_session.victory_lap] == [i.json_serialise() for i in fs_session_basketball.victory_lap])
+
+
+def test_generate_session_for_golf():
+    mapping = FSProgramGenerator(fs_exercise_library_datastore)
+    fs_session = mapping.getFunctionalStrengthForSportPosition(SportName.golf)
+    assert True is (len(fs_session.warm_up) == 0)
+    assert True is (len(fs_session.dynamic_movement) > 0)
+    assert True is (len(fs_session.stability_work) > 0)
+    assert True is (len(fs_session.victory_lap) == 0)
+    assert True is (fs_session.duration_minutes > 0)
+
+    fs_session_baseball = mapping.getFunctionalStrengthForSportPosition(SportName.baseball, BaseballPosition.pitcher)
+    assert True is ([i.json_serialise() for i in fs_session.warm_up] == [i.json_serialise() for i in fs_session_baseball.warm_up])
+    assert True is ([i.json_serialise() for i in fs_session.dynamic_movement] == [i.json_serialise() for i in fs_session_baseball.dynamic_movement])
+    assert True is ([i.json_serialise() for i in fs_session.stability_work] == [i.json_serialise() for i in fs_session_baseball.stability_work])
+    assert True is ([i.json_serialise() for i in fs_session.victory_lap] == [i.json_serialise() for i in fs_session_baseball.victory_lap])
+
+
+def test_generate_session_for_wrestling():
+    mapping = FSProgramGenerator(fs_exercise_library_datastore)
+    fs_session = mapping.getFunctionalStrengthForSportPosition(SportName.wrestling)
+    assert True is (len(fs_session.warm_up) == 0)
+    assert True is (len(fs_session.dynamic_movement) > 0)
+    assert True is (len(fs_session.stability_work) > 0)
+    assert True is (len(fs_session.victory_lap) == 0)
+    assert True is (fs_session.duration_minutes > 0)
+
+    fs_session_power = mapping.getFunctionalStrengthForSportPosition(SportName.no_sport, NoSportPosition.power)
+    assert True is ([i.json_serialise() for i in fs_session.warm_up] == [i.json_serialise() for i in fs_session_power.warm_up])
+    assert True is ([i.json_serialise() for i in fs_session.dynamic_movement] == [i.json_serialise() for i in fs_session_power.dynamic_movement])
+    assert True is ([i.json_serialise() for i in fs_session.stability_work] == [i.json_serialise() for i in fs_session_power.stability_work])
+    assert True is ([i.json_serialise() for i in fs_session.victory_lap] == [i.json_serialise() for i in fs_session_power.victory_lap])
 
 def test_generate_session_for_sprinter():
     mapping = FSProgramGenerator(fs_exercise_library_datastore)

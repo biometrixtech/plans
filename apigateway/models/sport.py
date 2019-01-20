@@ -114,3 +114,9 @@ class TrackAndFieldPosition(Enum):
     thrower = 2
     distance = 3
 
+class VolleyballPosition(Enum):
+    hitter = 0
+    setter = 1
+    middle_blocker = 2
+    libero = 3
+
