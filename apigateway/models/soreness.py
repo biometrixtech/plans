@@ -141,10 +141,13 @@ class HistoricSorenessStatus(IntEnum):
     persistent_2_pain = 2
     almost_persistent_pain = 3
     almost_persistent_2_pain = 4
-    persistent_soreness = 5
-    persistent_2_soreness = 6
-    almost_persistent_soreness = 7
-    almost_persistent_2_soreness = 8
+    almost_persistent_2_pain_acute = 5
+    persistent_soreness = 6
+    persistent_2_soreness = 7
+    almost_persistent_soreness = 8
+    almost_persistent_2_soreness = 9
+    acute_pain = 10
+    almost_acute_pain = 11
 
 
 class HistoricSoreness(Serialisable):
