@@ -1,14 +1,9 @@
-from enum import Enum
+from models.training_volume import FitFatigueStatus
 from serialisable import Serialisable
 from models.sport import SportName, NoSportPosition, BaseballPosition, BasketballPosition, FootballPosition, LacrossePosition, SoccerPosition, SoftballPosition, FieldHockeyPosition, TrackAndFieldPosition, VolleyballPosition
 from utils import format_date, parse_date
 from models.soreness import HistoricSorenessStatus
 from logic.soreness_processing import SorenessCalculator
-
-class FitFatigueStatus(Enum):
-    undefined = 0
-    trending_toward_fatigue = 1
-    trending_toward_fitness = 2
 
 
 class AthleteStats(Serialisable):
@@ -48,6 +43,8 @@ class AthleteStats(Serialisable):
         self.external_ramp = None
         self.internal_acwr = None
         self.external_acwr = None
+        self.internal_freshness_index = None
+        self.external_freshness_index = None
         self.historical_internal_strain = []
         self.functional_strength_eligible = False
         self.next_functional_strength_eligible_date = None
@@ -194,6 +191,7 @@ class AthleteStats(Serialisable):
 
         return status
 
+    '''
     def external_freshness_index(self):
         if self.chronic_external_total_load is not None and self.acute_external_total_load is not None:
             return self.chronic_external_total_load - self.acute_external_total_load
@@ -205,7 +203,7 @@ class AthleteStats(Serialisable):
             return self.chronic_internal_total_load - self.acute_internal_total_load
         else:
             return None
-
+    '''
     def get_q2_q3_list(self):
         q2 = []
         q3 = []
