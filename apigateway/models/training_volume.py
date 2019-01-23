@@ -46,19 +46,31 @@ class TrainingVolumeGap(object):
         self.historic_soreness = []
 
 
-class TrainingReport(object):
-    def __init__(self, user_id, low_threshold=None, high_threshold=None):
+class SuggestedTrainingDay(object):
+    def __init__(self, user_id, date_time, low_threshold=None, high_threshold=None):
         self.user_id = user_id
+        self.date_time = date_time
         self.low_threshold = low_threshold
         self.high_threshold = high_threshold
+        self.target_load = 0
+        self.most_limiting_gap_type_low = None
+        self.most_limiting_gap_type_high = None
+        self.training_volume_gaps = []
+
+
+class TrainingReport(object):
+    def __init__(self, user_id):
+        self.user_id = user_id
+        #self.low_threshold = low_threshold
+        #self.high_threshold = high_threshold
         self.internal_freshness_index = None
         self.internal_acwr = None
         self.internal_ramp = None
         self.internal_monotony_index = None
         self.internal_strain = None
-        self.training_volume_gaps = []
-        self.most_limiting_gap_type_low = None
-        self.most_limiting_gap_type_high = None
+        #self.training_volume_gaps = []
+        #self.most_limiting_gap_type_low = None
+        #self.most_limiting_gap_type_high = None
         self.training_level = None
         self.performance_focused = False
         self.competition_focused = False
@@ -66,5 +78,22 @@ class TrainingReport(object):
         self.low_hs_severity = None
         self.high_hs_severity = None
         self.average_hs_severity = None
+        self.acute_min_rpe = None
+        self.acute_max_rpe = None
+        self.acute_avg_rpe = None
+        self.chronic_min_rpe = None
+        self.chronic_max_rpe = None
+        self.chronic_avg_rpe = None
+        self.rpe_acwr = None
+        self.acute_duration_minutes = None
+        self.acute_min_duration_minutes = None
+        self.acute_max_duration_minutss = None
+        self.acute_avg_duration_minutes = None
+        self.chronic_min_duration_minutes = None
+        self.chronic_max_duration_minutes = None
+        self.chronic_avg_duration_minutes = None
+        self.chronic_duration_minutes = None
+        self.acute_chronic_duration_minutes = None
+        self.suggested_training_days = []
 
 

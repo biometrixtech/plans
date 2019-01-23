@@ -104,6 +104,7 @@ def test_get_training_plan_from_database():
                                                                 stats.chronic_daily_plans,
                                                                 stats.end_date_time)
 
+        '''deprecated
         if report.high_threshold > 0:
             okay_list.append(user_id)
             rate_limiting_factor.append(report.most_limiting_gap_type_high)
@@ -114,5 +115,7 @@ def test_get_training_plan_from_database():
             risk_list.append(user_id)
             risk_rate_limitiing_factor.append(report.most_limiting_gap_type_high)
             risk_severity_list.append(report.average_hs_severity)
+        '''
+        j = 0
 
     assert athlete_stats.acute_internal_total_load == 2590
