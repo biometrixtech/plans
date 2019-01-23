@@ -1,4 +1,5 @@
-from models.stats import TrainingVolumeGap
+from models.training_volume import IndicatorLevel, TrainingLevel, TrainingVolumeGap, TrainingVolumeGapType, TrainingReport
+from models.soreness import HistoricSorenessStatus
 from datetime import datetime, timedelta
 import statistics
 from utils import parse_date, parse_datetime, format_date
@@ -85,13 +86,15 @@ class TrainingVolumeProcessing(object):
             current_load = sum(last_week_external_values)
             previous_load = sum(previous_week_external_values)
             if previous_load > 0:
-                athlete_stats.external_ramp = ((current_load - previous_load) / previous_load) * 100
+                #athlete_stats.external_ramp = ((current_load - previous_load) / previous_load) * 100
+                athlete_stats.external_ramp = current_load / previous_load
 
         if len(last_week_internal_values) > 0 and len(previous_week_internal_values) > 0:
             current_load = sum(last_week_internal_values)
             previous_load = sum(previous_week_internal_values)
             if previous_load > 0:
-                athlete_stats.internal_ramp = ((current_load - previous_load) / previous_load) * 100
+                #athlete_stats.internal_ramp = ((current_load - previous_load) / previous_load) * 100
+                athlete_stats.internal_ramp = current_load / previous_load
 
         if len(last_week_external_values) > 1:
             average_load = statistics.mean(last_week_external_values)
@@ -134,10 +137,12 @@ class TrainingVolumeProcessing(object):
         if athlete_stats.acute_internal_total_load is not None and athlete_stats.chronic_internal_total_load is not None:
             if athlete_stats.chronic_internal_total_load > 0:
                 athlete_stats.internal_acwr = athlete_stats.acute_internal_total_load / athlete_stats.chronic_internal_total_load
+                athlete_stats.internal_freshness_index = athlete_stats.chronic_internal_total_load - athlete_stats.acute_internal_total_load
 
         if athlete_stats.acute_external_total_load is not None and athlete_stats.chronic_external_total_load is not None:
             if athlete_stats.chronic_external_total_load > 0:
                 athlete_stats.external_acwr = athlete_stats.acute_external_total_load / athlete_stats.chronic_external_total_load
+                athlete_stats.external_freshness_index = athlete_stats.chronic_external_total_load - athlete_stats.acute_external_total_load
 
         athlete_stats.historical_internal_strain = self.get_historical_internal_strain(self.start_date,
                                                                                        self.end_date,
@@ -285,26 +290,44 @@ class TrainingVolumeProcessing(object):
 
     def get_ramp_gap(self, current_load, previous_load):
         if previous_load > 0:
-            ramp = ((current_load - previous_load) / float(previous_load))
+            #ramp = ((current_load - previous_load) / float(previous_load))
+            ramp = current_load / float(previous_load)
         else:
             ramp = 0
 
         if ramp > 1.1:
-            load_gap = 0.0
+            low_load = 0.0
+            high_load = 0.0
         else:
-            load_gap = (1.1 * previous_load) + previous_load - current_load
+            #1.0 = current_load / previous_load
+            #1.1* previous_load = current_load + gap
+            #low_load = (1.0 * previous_load) + previous_load - current_load
+            low_load = previous_load - current_load
+            high_load = (1.1 * previous_load) - current_load
 
-        training_volume_gap = TrainingVolumeGap(0.0, load_gap)
+        training_volume_gap = TrainingVolumeGap(low_load, high_load, TrainingVolumeGapType.ramp)
+
+        if ramp < 1:
+            training_volume_gap.training_level = TrainingLevel.undertraining
+        elif 1 <= ramp < 1.1:
+            training_volume_gap.training_level = TrainingLevel.optimal
+        elif 1.1 <= ramp < 1.15:
+            training_volume_gap.training_level = TrainingLevel.overreaching
+        elif ramp >= 1.15:
+            training_volume_gap.training_level = TrainingLevel.excessive
 
         return training_volume_gap
 
-    def get_acwr_gap(self, acute_start_date_time, chronic_start_date_time, acute_days, chronic_days, acute_daily_plans, chronic_daily_plans):
+    def get_acwr_gap(self, acute_start_date_time, chronic_start_date_time, acute_daily_plans, chronic_daily_plans):
 
         acute_values = []
         chronic_1_values = []
         chronic_2_values = []
         chronic_3_values = []
         chronic_4_values = []
+
+        acute_days = len(acute_daily_plans)
+        chronic_days = len(chronic_daily_plans)
 
         daily_plans = []
         daily_plans.extend(acute_daily_plans)
@@ -367,8 +390,12 @@ class TrainingVolumeProcessing(object):
 
             chronic_values.append(sum(chronic_1_values))
 
-        chronic_value = statistics.mean(chronic_values)
-        acute_value = sum(acute_values)
+        chronic_value = 0
+        if len(chronic_values) > 0:
+            chronic_value = statistics.mean(chronic_values)
+        acute_value = 0
+        if len(acute_values) > 0:
+            acute_value = sum(acute_values)
 
         # ideal is 0.8 to 1.3 with 1.3 being ideal
         # low_difference = 0.8 = (acute_value + x) / chronic_value
@@ -378,11 +405,12 @@ class TrainingVolumeProcessing(object):
         low_target = (0.8 * chronic_value) - acute_value
         high_target = (1.3 * chronic_value) - acute_value
 
-        training_volume_gap = TrainingVolumeGap(low_target, high_target)
+        training_volume_gap = TrainingVolumeGap(low_target, high_target, TrainingVolumeGapType.acwr)
 
         return training_volume_gap
 
-    def get_next_training_session(self, athlete_stats, last_7_days_plans, days_8_14_plans, acute_start_date_time, chronic_start_date_time, acute_plans, chronic_plans, end_date_time):
+    def get_training_report(self, athlete_stats, last_7_days_plans, days_8_14_plans, acute_start_date_time, chronic_start_date_time, acute_plans, chronic_plans, end_date_time):
+
         last_6_internal_load_values = []
         last_7_internal_load_values = []
         last_7_13_internal_load_values = []
@@ -410,55 +438,138 @@ class TrainingVolumeProcessing(object):
 
         current_load = sum(last_6_internal_load_values)
         previous_load = sum(last_7_13_internal_load_values)
+
         ramp_gap = self.get_ramp_gap(current_load, previous_load)
 
+        low_monotony_gap, high_monotony_gap,  = self.get_monotony_gap(last_6_internal_load_values)
+
+        strain_gap = self.get_strain_gap(athlete_stats, athlete_stats.internal_monotony, last_7_internal_load_values)
+
+        acwr_gap = self.get_acwr_gap(acute_start_date_time, chronic_start_date_time, acute_plans, chronic_plans)
+
+        gap_list = [ramp_gap, strain_gap, acwr_gap]
+
+        report = self.compile_training_report(athlete_stats.athlete_id, gap_list, low_monotony_gap, high_monotony_gap)
+
+        report.internal_monotony_index = athlete_stats.internal_monotony
+
+        if athlete_stats.internal_monotony is not None:
+            if athlete_stats.internal_monotony > 2:
+                report.need_for_variability = IndicatorLevel.high
+                #report.training_level = TrainingLevel.overreaching - how should we summarize?
+
+            elif 1.3 < athlete_stats.internal_monotony <= 2:
+                report.need_for_variability = IndicatorLevel.moderate
+
+            elif athlete_stats.internal_monotony <= 1.3:
+                report.need_for_variability = IndicatorLevel.low
+
+        else:
+            report.need_for_variability = IndicatorLevel.low
+
+        report.internal_acwr = athlete_stats.internal_acwr
+        report.internal_freshness_index = athlete_stats.internal_freshness_index
+
+        report.competition_focused = (report.internal_freshness_index > 0)
+        report.performance_focused = (report.internal_freshness_index <= 0)
+
+        if athlete_stats.internal_acwr is not None:
+            if athlete_stats.internal_acwr < 0.8:
+                report.training_level = TrainingLevel.undertraining
+            elif 0.8 <= athlete_stats.internal_acwr <= 1.3:
+                report.training_level = TrainingLevel.optimal
+            elif 1.3 < athlete_stats.internal_acwr <= 1.5:
+                report.training_level = TrainingLevel.overreaching
+            elif athlete_stats.internal_acwr > 1.5:
+                report.training_level = TrainingLevel.excessive
+
+        report.internal_strain = athlete_stats.internal_strain
+        report.internal_ramp = athlete_stats.internal_ramp
+        report.historic_soreness = list(h for h in athlete_stats.historic_soreness if h.historic_soreness_status is not HistoricSorenessStatus.dormant_cleared)
+
+        severity_list = list(h.average_severity for h in report.historic_soreness)
+
+        if len(severity_list) > 0:
+            report.low_hs_severity = min(severity_list)
+            report.high_hs_severity = max(severity_list)
+            report.average_hs_severity = statistics.mean(severity_list)
+
+        return report
+
+    def get_monotony_gap(self, last_6_internal_load_values):
+
         # what is the monotony if we have a workout with this load?
-        average_load = statistics.mean(last_6_internal_load_values)
-        stdev_load = statistics.stdev(last_6_internal_load_values)
+        average_load = 0
+        if len(last_6_internal_load_values) > 0:
+            average_load = statistics.mean(last_6_internal_load_values)
+
+        stdev_load = 0
+        if len(last_6_internal_load_values) > 1:
+            stdev_load = statistics.stdev(last_6_internal_load_values)
+
         if stdev_load > 0:
             internal_monotony = average_load / stdev_load
-            internal_strain = internal_monotony * current_load
         else:
             internal_monotony = 0
-            internal_strain = 0
-
-        strain_gap = self.get_strain_gap(athlete_stats, internal_monotony, last_7_internal_load_values)
-
         # monotony = weekly mean total load/weekly standard deviation of load
         # In order to increase the standard deviation of a set of numbers, you must add a value that is more than
         # one standard deviation away from the mean
-
         low_monotony_fix = 0
         high_monotony_fix = 0
-
-        if internal_monotony >= 2:
+        if internal_monotony >= 1.7: # bumped it down from 2 just for safe measure
             low_monotony_fix = average_load - (1.05 * stdev_load)
             high_monotony_fix = average_load + (1.05 * stdev_load)
+        low_monotony_gap = TrainingVolumeGap(0, low_monotony_fix, TrainingVolumeGapType.monotony)
+        high_monotony_gap = TrainingVolumeGap(high_monotony_fix, None, TrainingVolumeGapType.monotony)
+        low_monotony_gap.training_level = None
+        high_monotony_gap.training_level = None
 
-        low_montony_gap = TrainingVolumeGap(0, low_monotony_fix)
-        high_monotony_gap = TrainingVolumeGap(high_monotony_fix, None)
+        return low_monotony_gap, high_monotony_gap
 
-        acwr_gap = self.get_acwr_gap(acute_start_date_time, chronic_start_date_time, 7, 28, acute_plans, chronic_plans)
+    def compile_training_report(self, user_id, gap_list, low_monotony_gap, high_monotony_gap):
 
-        low_list = [low_montony_gap, ramp_gap, strain_gap, acwr_gap]
-        high_list = [high_monotony_gap, ramp_gap, strain_gap, acwr_gap]
+        min_values = []
+        max_values = []
 
-        low_gap = self.get_training_volume_gap(low_list)
-        high_gap = self.get_training_volume_gap(high_list)
-        i=0
+        # we want the lowest high threshold
+        max_values.extend(list(g for g in gap_list if g.high_threshold is not None))
+        max_values.sort(key=lambda x: x.high_threshold, reverse=False)
 
-    def get_training_volume_gap(self, gap_list):
+        # this number needs to be consistent with monotony.  Should we use the low or high?
+        if max_values[0].high_threshold < high_monotony_gap.low_threshold:
+            max_values.append(low_monotony_gap)  # go with low monotony option since best option could create monotony
+            min_values.append(low_monotony_gap)
+        else:
+            #max_values.append(high_monotony_gap)  this will usuall be None
+            min_values.append(high_monotony_gap)
 
-        min_values = list(g.low_threshold for g in gap_list if g is not None and g.low_threshold is not None)
-        max_values = list(g.high_threshold for g in gap_list if g is not None and g.high_threshold is not None)
+        # re-sort
+        max_values.sort(key=lambda x: x.high_threshold, reverse=False)
 
-        min_values.sort()
-        max_values.sort()
+        high_threshold_gap = max_values[0]
 
-        return TrainingVolumeGap(min_values[0], max_values[0])
+        min_values.extend(list(g for g in gap_list if g.low_threshold is not None and g.low_threshold < high_threshold_gap.high_threshold))
+
+        min_values.sort(key=lambda x: x.low_threshold,
+                        reverse=True)  # I think we want the highest min value for the tightest band that is lower than the high_threshold
+
+        if len(min_values) > 0:
+            # we want the highest low threshold
+            low_threshold_gap = min_values[0]
+        else:
+            low_threshold_gap = max_values[0]
+
+        report = TrainingReport(user_id, low_threshold_gap.low_threshold, max(0, high_threshold_gap.high_threshold))
+
+        report.most_limiting_gap_type_low = low_threshold_gap.training_volume_gap_type
+        report.most_limiting_gap_type_high = high_threshold_gap.training_volume_gap_type
+        report.training_volume_gaps = max_values
+        report.training_level = TrainingLevel(max(low_threshold_gap.training_level if low_threshold_gap.training_level is not None else 0,
+                                                               high_threshold_gap.training_level if high_threshold_gap.training_level is not None else 0))
+
+        return report
 
     def get_strain_gap(self, athlete_stats, internal_monotony, last_7_internal_load_values):
-        internal_strain_sd = 0
 
         strain_count = min(7, len(athlete_stats.historical_internal_strain))
         training_volume_gap = TrainingVolumeGap()
@@ -467,17 +578,47 @@ class TrainingVolumeProcessing(object):
             internal_strain_sd = statistics.stdev(athlete_stats.historical_internal_strain[-strain_count:])
             internal_strain_avg = statistics.mean(athlete_stats.historical_internal_strain[-strain_count:])
 
-            strain_surplus = athlete_stats.internal_strain - (1.2 * internal_strain_sd) - internal_strain_avg
-            load_change = strain_surplus / internal_monotony
+            # not guaranteed internal_strain has a value today
+            if athlete_stats.internal_strain is not None and internal_monotony is not None and internal_monotony > 0:
 
-            # 1.2 * internal_strain_sd = athlete_stats.internal_strain - x
-            # 1.2 * internal_strain_sd - athlete_stats.internal_strain =  - x
-            # (-1) * (1.2 * internal_strain_sd - athlete_stats.internal_strain =  - x)
+                strain_surplus = athlete_stats.internal_strain - (1.2 * internal_strain_sd) - internal_strain_avg
+                load_change = strain_surplus / internal_monotony
 
-            # add/reduce this load from day 7 so the forecast load will reduce the strain; not perfect but close
-            strain_gap = max(0, last_7_internal_load_values[0] + load_change)
+                # 1.2 * internal_strain_sd = athlete_stats.internal_strain - x
+                # 1.2 * internal_strain_sd - athlete_stats.internal_strain =  - x
+                # (-1) * (1.2 * internal_strain_sd - athlete_stats.internal_strain =  - x)
 
+                # add/reduce this load from day 7 so the forecast load will reduce the strain; not perfect but close
+                strain_gap = max(0, last_7_internal_load_values[0] - load_change)
+            else:
+                strain_gap = None
             training_volume_gap.low_threshold = 0
             training_volume_gap.high_threshold = strain_gap
+            training_volume_gap.training_volume_gap_type = TrainingVolumeGapType.strain
+
+        # review the last week of strain and determine and count how many strain spikes occurred
+
+        strain_events = 0
+
+        for s in range(8, 15):
+            hist_strain_count = min(s, len(athlete_stats.historical_internal_strain))
+
+            if hist_strain_count >= (s + 1):
+                start_index = -len(athlete_stats.historical_internal_strain) - (s + 1)
+                end_index = start_index + 7
+                internal_strain_sd = statistics.stdev(athlete_stats.historical_internal_strain[start_index:end_index])
+                internal_strain_avg = statistics.mean(athlete_stats.historical_internal_strain[start_index:end_index])
+
+                current_strain = athlete_stats.historical_internal_strain[end_index]
+
+                if (current_strain - internal_strain_avg) / internal_strain_sd > 1.2:
+                    strain_events += 1
+
+        if strain_events == 0:
+            training_volume_gap.training_level = TrainingLevel.optimal
+        elif strain_events == 1:
+            training_volume_gap.training_level = TrainingLevel.overreaching
+        elif strain_events > 1:
+            training_volume_gap.training_level = TrainingLevel.excessive
 
         return training_volume_gap
