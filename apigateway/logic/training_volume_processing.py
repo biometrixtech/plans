@@ -470,13 +470,13 @@ class TrainingVolumeProcessing(object):
         # (0.8 * chronic_value) - acute_value = x
 
         low_target = (0.8 * chronic_value) - acute_value
-        high_target = (1.3 * chronic_value) - acute_value
+        high_target = (1.5 * chronic_value) - acute_value
 
         training_volume_gap = TrainingVolumeGap(low_target, high_target, TrainingVolumeGapType.acwr)
 
         return training_volume_gap
 
-    def get_training_report(self, athlete_stats, last_7_days_plans, days_8_14_plans, acute_start_date_time, chronic_start_date_time, acute_plans, chronic_plans, end_date_time):
+    def get_training_report(self, athlete_stats, acute_start_date_time, chronic_start_date_time, acute_plans, chronic_plans, end_date_time):
 
         report = TrainingReport(user_id=athlete_stats.athlete_id)
         report = self.calc_report_stats(acute_plans, acute_start_date_time, athlete_stats, chronic_plans, report)
@@ -574,8 +574,11 @@ class TrainingVolumeProcessing(object):
 
             current_load = sum(last_6_internal_load_values)
             previous_load = sum(last_7_13_internal_load_values)
-
-            ramp_gap = self.get_ramp_gap(current_load, previous_load)
+            ramp_load = previous_load
+            if len(chronic_values) > 0:
+                average_chronic_load = statistics.mean(chronic_values)
+                ramp_load = max(average_chronic_load, ramp_load)
+            ramp_gap = self.get_ramp_gap(current_load, ramp_load)
 
             low_monotony_gap, high_monotony_gap,  = self.get_monotony_gap(last_6_internal_load_values)
 

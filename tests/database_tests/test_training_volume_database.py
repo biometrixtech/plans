@@ -96,8 +96,6 @@ def test_get_training_plan_from_database():
                                                                                 stats.get_chronic_weeks_plans(),
                                                                                 stats.chronic_daily_plans)
         report = training_volume_processing.get_training_report(athlete_stats,
-                                                                stats.last_7_days_plans,
-                                                                stats.days_8_14_plans,
                                                                 stats.acute_start_date_time,
                                                                 stats.chronic_start_date_time,
                                                                 stats.acute_daily_plans,
