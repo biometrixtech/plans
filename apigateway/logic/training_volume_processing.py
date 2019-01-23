@@ -495,12 +495,6 @@ class TrainingVolumeProcessing(object):
         acute_days = len(acute_plans)
         chronic_days = len(chronic_plans)
 
-        chronic_values = []
-        chronic_1_values = []
-        chronic_2_values = []
-        chronic_3_values = []
-        chronic_4_values = []
-
         daily_plans = []
         daily_plans.extend(list(x for x in
                                 self.get_session_attributes_product_sum_tuple_list("session_RPE", "duration_minutes",
@@ -510,6 +504,12 @@ class TrainingVolumeProcessing(object):
                                                                                    chronic_plans) if x is not None))
 
         for index in range(0, 7):
+
+            chronic_values = []
+            chronic_1_values = []
+            chronic_2_values = []
+            chronic_3_values = []
+            chronic_4_values = []
 
             new_acute_start_date_time = acute_start_date_time + timedelta(days=1) + timedelta(days=index)
             new_chronic_start_date_time = chronic_start_date_time + timedelta(days=1) + timedelta(days=index)
@@ -522,30 +522,30 @@ class TrainingVolumeProcessing(object):
             new_chronic_daily_plans = sorted([p for p in daily_plans if new_acute_start_date_time > p[0] >=
                                               new_chronic_start_date_time], key=lambda x: x[0])
 
-            if acute_days == 7 and chronic_days == 28:
+            if acute_days == 7 and 21 <=chronic_days <= 28:
                 week4_sessions = [d for d in new_chronic_daily_plans if new_acute_start_date_time - timedelta(days=28)
-                                  + timedelta(days=index) <= d[0] < new_acute_start_date_time - timedelta(days=21)]
+                                  <= d[0] < new_acute_start_date_time - timedelta(days=21)]
 
                 chronic_4_values.extend(x[1] for x in week4_sessions if x[1] is not None)
                 chronic_values.append(sum(chronic_4_values))
 
-            if acute_days == 7 and 21 <= chronic_days <= 28:
+            if acute_days == 7 and 14 <= chronic_days <= 28:
                 week3_sessions = [d for d in new_chronic_daily_plans if new_acute_start_date_time - timedelta(days=21)
-                                  + timedelta(days=index) <= d[0] < new_acute_start_date_time - timedelta(days=14)]
+                                  <= d[0] < new_acute_start_date_time - timedelta(days=14)]
 
                 chronic_3_values.extend(x[1] for x in week3_sessions if x[1] is not None)
                 chronic_values.append(sum(chronic_3_values))
 
-            if acute_days == 7 and 14 <= chronic_days <= 28:
+            if acute_days == 7 and 7 <= chronic_days <= 28:
                 week2_sessions = [d for d in new_chronic_daily_plans if new_acute_start_date_time - timedelta(days=14)
-                                  + timedelta(days=index) <= d[0] < new_acute_start_date_time - timedelta(days=7)]
+                                  <= d[0] < new_acute_start_date_time - timedelta(days=7)]
 
                 chronic_2_values.extend(x[1] for x in week2_sessions if x[1] is not None)
                 chronic_values.append(sum(chronic_2_values))
 
             if acute_days <= 7 and 7 <= chronic_days <= 28:
                 week1_sessions = [d for d in new_chronic_daily_plans if new_acute_start_date_time - timedelta(days=7)
-                                  + timedelta(days=index) <= d[0] < new_acute_start_date_time]
+                                  <= d[0] < new_acute_start_date_time]
 
                 chronic_1_values.extend(x[1] for x in week1_sessions if x[1] is not None)
 
@@ -586,13 +586,15 @@ class TrainingVolumeProcessing(object):
             gap_list = [ramp_gap, strain_gap, acwr_gap]
 
             suggested_training_day = self.compile_training_report(athlete_stats.athlete_id, end_date_time + timedelta(days=index), gap_list, low_monotony_gap, high_monotony_gap)
-            if min(suggested_training_day.high_threshold - suggested_training_day.low_threshold, target_load) < 40:
+            if min(suggested_training_day.high_threshold - suggested_training_day.low_threshold, target_load) < 30:
                 suggested_training_day.target_load = 0
             else:
                 suggested_training_day.target_load = min(suggested_training_day.high_threshold - suggested_training_day.low_threshold, target_load)
             suggested_training_days.append(suggested_training_day)
             daily_plans.append((suggested_training_day.date_time, suggested_training_day.target_load))
             internal_monotony = 0
+            if chronic_days < 28:
+                chronic_days += 1
             if len(last_7_internal_load_values) > 0:
                 new_strain = self.calculate_daily_strain(last_7_internal_load_values)
                 if len(historical_internal_strain) > 0:

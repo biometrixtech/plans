@@ -61,8 +61,8 @@ def test_get_training_plan_from_database():
     users.append('fac4be57-35d6-4952-8af9-02aadf979982')  #bay
     for user_id in users:
         start_date = "2018-10-31"
-        end_date = "2019-01-16"
-        run_date = "2019-01-16"
+        end_date = "2019-01-23"
+        run_date = "2019-01-23"
         drs_dao = DailyReadinessDatastore()
         daily_readiness_surveys = drs_dao.get(user_id, parse_date(start_date), parse_date(end_date), False)
         dpo_dao = DailyPlanDatastore()
