@@ -360,10 +360,7 @@ class TrainingVolumeProcessing(object):
         overreaching_load = (1.11 * previous_load) - current_load
         excessive_load = (1.16 * previous_load) - current_load
 
-        training_volume_gap = TrainingVolumeGap(low_load, high_load, TrainingVolumeGapType.ramp)
-        training_volume_gap.low_optimal_threshold = low_load
-        training_volume_gap.low_overreaching_threshold = overreaching_load
-        training_volume_gap.low_excessive_threshold = excessive_load
+        training_volume_gap = TrainingVolumeGap(low_load, overreaching_load, excessive_load, TrainingVolumeGapType.ramp)
 
         if ramp < 1:
             training_volume_gap.training_level = TrainingLevel.undertraining
@@ -476,13 +473,9 @@ class TrainingVolumeProcessing(object):
         # 0.8 * chronic_value = acute_value + x
         # (0.8 * chronic_value) - acute_value = x
 
-        low_target = (0.8 * chronic_value) - acute_value
-        high_target = (1.5 * chronic_value) - acute_value
-
-        training_volume_gap = TrainingVolumeGap(low_target, high_target, TrainingVolumeGapType.acwr)
-        training_volume_gap.low_optimal_threshold = (0.8 * chronic_value) - acute_value
-        training_volume_gap.low_overreaching_threshold = (1.31 * chronic_value) - acute_value
-        training_volume_gap.low_excessive_threshold = (1.51 * chronic_value) - acute_value
+        training_volume_gap = TrainingVolumeGap((0.8 * chronic_value) - acute_value,
+                                                (1.31 * chronic_value) - acute_value,
+                                                (1.51 * chronic_value) - acute_value, TrainingVolumeGapType.acwr)
 
         return training_volume_gap
 
@@ -577,7 +570,7 @@ class TrainingVolumeProcessing(object):
             last_7_13_day_plans = [p for p in daily_plans if thirteen_days_ago <= p[0] < last_six_days]
 
             last_6_internal_load_values.extend(x[1] for x in last_6_day_plans if x[1] is not None)
-            last_6_internal_load_values.extend(list(x.target_load for x in suggested_training_days))
+            #last_6_internal_load_values.extend(list(x.target_load for x in suggested_training_days))
 
             last_7_internal_load_values.extend(x[1] for x in last_7_day_plans if x[1] is not None)
 
@@ -721,29 +714,34 @@ class TrainingVolumeProcessing(object):
         # monotony = weekly mean total load/weekly standard deviation of load
         # In order to increase the standard deviation of a set of numbers, you must add a value that is more than
         # one standard deviation away from the mean
-        low_monotony_fix = 0
-        high_monotony_fix = 0
-        if internal_monotony >= 1.7: # bumped it down from 2 just for safe measure
-            low_monotony_fix = average_load - (1.05 * stdev_load)
-            high_monotony_fix = average_load + (1.05 * stdev_load)
-        low_monotony_gap = TrainingVolumeGap(0, low_monotony_fix, TrainingVolumeGapType.monotony)
-        high_monotony_gap = TrainingVolumeGap(high_monotony_fix, None, TrainingVolumeGapType.monotony)
-        low_monotony_gap.training_level = None
-        high_monotony_gap.training_level = None
+        low_overreaching_fix = None
+        high_overreaching_fix = None
+        low_excessive_fix = None
+        high_excessive_fix = None
+        if 1.7 < internal_monotony < 2.0:
+            low_overreaching_fix = average_load - (1.05 * stdev_load)
+            high_overreaching_fix = average_load + (1.05 * stdev_load)
+        elif internal_monotony >= 2.0:
+            low_excessive_fix = average_load - (1.05 * stdev_load)
+            high_excessive_fix = average_load + (1.05 * stdev_load)
+        low_monotony_gap = TrainingVolumeGap(None, low_overreaching_fix, low_excessive_fix, TrainingVolumeGapType.monotony)
+        high_monotony_gap = TrainingVolumeGap(None, high_overreaching_fix, high_excessive_fix, TrainingVolumeGapType.monotony)
+        #low_monotony_gap.training_level = None
+        #high_monotony_gap.training_level = None
 
         return low_monotony_gap, high_monotony_gap
 
     def compile_training_report(self, user_id, date_time, gap_list, low_monotony_gap, high_monotony_gap):
 
-        min_values = []
-        max_values = []
+        #min_values = []
+        #max_values = []
         opt_values = []
         ovr_values = []
         exc_values = []
 
         # we want the lowest high threshold
-        max_values.extend(list(g for g in gap_list if g.high_threshold is not None))
-        max_values.sort(key=lambda x: x.high_threshold, reverse=False)
+        #max_values.extend(list(g for g in gap_list if g.high_threshold is not None))
+        #max_values.sort(key=lambda x: x.high_threshold, reverse=False)
 
         opt_values.extend(list(g for g in gap_list if g.low_optimal_threshold is not None))
         opt_values.sort(key=lambda x: x.low_optimal_threshold, reverse=False)
@@ -755,41 +753,46 @@ class TrainingVolumeProcessing(object):
         exc_values.sort(key=lambda x: x.low_excessive_threshold, reverse=False)
 
         # this number needs to be consistent with monotony.  Should we use the low or high?
-        if max_values[0].high_threshold < high_monotony_gap.low_threshold:
-            max_values.append(low_monotony_gap)  # go with low monotony option since best option could create monotony
-            min_values.append(low_monotony_gap)
+        if high_monotony_gap.low_overreaching_threshold is not None and ovr_values[0].low_overreaching_threshold < high_monotony_gap.low_overreaching_threshold:
+            ovr_values.append(low_monotony_gap)  # go with low monotony option since best option could create monotony
+
         else:
-            #max_values.append(high_monotony_gap)  this will usuall be None
-            min_values.append(high_monotony_gap)
+            if high_monotony_gap.low_overreaching_threshold is not None:
+                ovr_values.append(high_monotony_gap)
+
+        # this number needs to be consistent with monotony.  Should we use the low or high?
+        if high_monotony_gap.low_excessive_threshold is not None and exc_values[0].low_excessive_threshold < high_monotony_gap.low_excessive_threshold:
+            exc_values.append(low_monotony_gap)  # go with low monotony option since best option could create monotony
+        else:
+            if high_monotony_gap.low_excessive_threshold is not None:
+                exc_values.append(high_monotony_gap)
 
         # re-sort
-        max_values.sort(key=lambda x: x.high_threshold, reverse=False)
+        ovr_values.sort(key=lambda x: x.low_overreaching_threshold, reverse=False)
+        exc_values.sort(key=lambda x: x.low_excessive_threshold, reverse=False)
 
-        high_threshold_gap = max_values[0]
+        #high_threshold_gap = max_values[0]
 
-        min_values.extend(list(g for g in gap_list if g.low_threshold is not None and g.low_threshold < high_threshold_gap.high_threshold))
+        #min_values.extend(list(g for g in gap_list if g.low_threshold is not None and g.low_threshold < high_threshold_gap.high_threshold))
 
-        min_values.sort(key=lambda x: x.low_threshold,
-                        reverse=True)  # I think we want the highest min value for the tightest band that is lower than the high_threshold
+        #min_values.sort(key=lambda x: x.low_threshold,
+        #                reverse=True)  # I think we want the highest min value for the tightest band that is lower than the high_threshold
 
-        if len(min_values) > 0:
+        #if len(min_values) > 0:
             # we want the highest low threshold
-            low_threshold_gap = min_values[0]
-        else:
-            low_threshold_gap = max_values[0]
+        #    low_threshold_gap = min_values[0]
+        #else:
+        #    low_threshold_gap = max_values[0]
 
         #report = TrainingReport(user_id, low_threshold_gap.low_threshold, max(0, high_threshold_gap.high_threshold))
-        training_day = SuggestedTrainingDay(user_id, date_time, low_threshold_gap.low_threshold, max(0, high_threshold_gap.high_threshold))
+        training_day = SuggestedTrainingDay(user_id, date_time, opt_values[0].low_optimal_threshold,
+                                            ovr_values[0].low_overreaching_threshold,
+                                            exc_values[0].low_excessive_threshold)
 
-        training_day.most_limiting_gap_type_low = low_threshold_gap.training_volume_gap_type
-        training_day.most_limiting_gap_type_high = high_threshold_gap.training_volume_gap_type
-        training_day.training_volume_gaps = max_values
-        if len(opt_values) > 0:
-            training_day.low_optimal_threshold = opt_values[0].low_optimal_threshold
-        if len(ovr_values) > 0:
-            training_day.low_overreaching_threshold = ovr_values[0].low_overreaching_threshold
-        if len(exc_values) > 0:
-            training_day.low_excessive_threshold = exc_values[0].low_excessive_threshold
+        training_day.low_optimal_gap_type = opt_values[0].training_volume_gap_type
+        training_day.low_overreaching_gap_type = ovr_values[0].training_volume_gap_type
+        training_day.low_excessive_gap_type = exc_values[0].training_volume_gap_type
+        training_day.training_volume_gaps = opt_values
 
         #report.training_level = TrainingLevel(max(low_threshold_gap.training_level if low_threshold_gap.training_level is not None else 0,
         #                                                       high_threshold_gap.training_level if high_threshold_gap.training_level is not None else 0))
@@ -823,10 +826,10 @@ class TrainingVolumeProcessing(object):
                 # add/reduce this load from day 7 so the forecast load will reduce the strain; not perfect but close
                 strain_gap = max(0, last_7_internal_load_values[0] - load_change)
 
-            else:
-                strain_gap = None
-            training_volume_gap.low_threshold = 0
-            training_volume_gap.high_threshold = strain_gap
+            #else:
+            #    strain_gap = None
+            #training_volume_gap.low_threshold = 0
+            #training_volume_gap.high_threshold = strain_gap
             training_volume_gap.training_volume_gap_type = TrainingVolumeGapType.strain
 
         # review the last week of strain and determine and count how many strain spikes occurred
@@ -847,12 +850,12 @@ class TrainingVolumeProcessing(object):
                 if (current_strain - internal_strain_avg) / internal_strain_sd > 1.2:
                     strain_events += 1
 
-        if strain_events == 0:
-            training_volume_gap.training_level = TrainingLevel.optimal
-        elif strain_events == 1:
-            training_volume_gap.training_level = TrainingLevel.overreaching
-        elif strain_events > 1:
-            training_volume_gap.training_level = TrainingLevel.excessive
+        #if strain_events == 0:
+        #    training_volume_gap.training_level = TrainingLevel.optimal
+        #elif strain_events == 1:
+        #    training_volume_gap.training_level = TrainingLevel.overreaching
+        #elif strain_events > 1:
+        #    training_volume_gap.training_level = TrainingLevel.excessive
 
         if strain_events >= 1:
             training_volume_gap.low_excessive_threshold = max_load
