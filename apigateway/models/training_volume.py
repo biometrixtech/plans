@@ -33,6 +33,9 @@ class TrainingVolumeGap(object):
     def __init__(self, low_threshold=None, high_threshold=None, gap_type=None):
         self.low_threshold = low_threshold
         self.high_threshold = high_threshold
+        self.low_optimal_threshold = None
+        self.low_overreaching_threshold = None
+        self.low_excessive_threshold = None
         self.training_volume_gap_type = gap_type
         #self.internal_freshness_index = None
         #self.internal_acwr = None
@@ -55,7 +58,11 @@ class SuggestedTrainingDay(object):
         self.target_load = 0
         self.most_limiting_gap_type_low = None
         self.most_limiting_gap_type_high = None
+        self.low_optimal_threshold = None
+        self.low_overreaching_threshold = None
+        self.low_excessive_threshold = None
         self.training_volume_gaps = []
+        self.matching_workouts = []
 
 
 class TrainingReport(object):
