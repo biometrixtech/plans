@@ -103,12 +103,9 @@ class TrainingVolumeProcessing(object):
                 athlete_stats.external_monotony = average_load / stdev_load
                 athlete_stats.external_strain = athlete_stats.external_monotony * sum(last_week_external_values)
 
-        if len(last_week_internal_values) > 1:
-            average_load = statistics.mean(last_week_internal_values)
-            stdev_load = statistics.stdev(last_week_internal_values)
-            if stdev_load > 0:
-                athlete_stats.internal_monotony = average_load / stdev_load
-                athlete_stats.internal_strain = athlete_stats.internal_monotony * sum(last_week_internal_values)
+        monotony, strain = self.calc_monotony_strain(last_week_internal_values)
+        athlete_stats.internal_monotony = monotony
+        athlete_stats.internal_strain = strain
 
         if len(a_internal_load_values) > 0:
             athlete_stats.acute_internal_total_load = sum(a_internal_load_values)
@@ -144,12 +141,29 @@ class TrainingVolumeProcessing(object):
                 athlete_stats.external_acwr = athlete_stats.acute_external_total_load / athlete_stats.chronic_external_total_load
                 athlete_stats.external_freshness_index = athlete_stats.chronic_external_total_load - athlete_stats.acute_external_total_load
 
+        all_plans = []
+        all_plans.extend(chronic_daily_plans)
+        all_plans.extend(acute_daily_plans)
+
         athlete_stats.historical_internal_strain = self.get_historical_internal_strain(self.start_date,
                                                                                        self.end_date,
-                                                                                       acute_daily_plans,
-                                                                                       chronic_daily_plans)
+                                                                                       all_plans)
 
         return athlete_stats
+
+    def calc_monotony_strain(self, load_values):
+
+        monotony = None
+        strain = None
+
+        if len(load_values) > 1:
+            average_load = statistics.mean(load_values)
+            stdev_load = statistics.stdev(load_values)
+            if stdev_load > 0:
+                monotony = average_load / stdev_load
+                strain = monotony * sum(load_values)
+
+        return monotony, strain
 
     def get_plan_session_attribute_sum(self, attribute_name, daily_plan_collection):
 
@@ -290,13 +304,9 @@ class TrainingVolumeProcessing(object):
 
         return values
 
-    def get_historical_internal_strain(self, start_date, end_date, acute_daily_plans, chronic_daily_plans):
+    def get_historical_internal_strain(self, start_date, end_date, all_plans):
 
         target_dates = []
-
-        all_plans = []
-        all_plans.extend(chronic_daily_plans)
-        all_plans.extend(acute_daily_plans)
 
         all_plans.sort(key=lambda x: x.event_date)
 
@@ -479,33 +489,16 @@ class TrainingVolumeProcessing(object):
 
         return training_volume_gap
 
-    def get_training_report(self, athlete_stats, acute_start_date_time, chronic_start_date_time, acute_plans, chronic_plans, end_date_time):
+    def get_training_report(self, user_id, acute_start_date_time, chronic_start_date_time, daily_plans, historical_internal_strain,end_date_time):
 
-        report = TrainingReport(user_id=athlete_stats.athlete_id)
-        report = self.calc_report_stats(acute_plans, acute_start_date_time, athlete_stats, chronic_plans, report)
-        #if report.chronic_avg_duration_minutes is not None and report.chronic_avg_rpe is not None:
-        #    target_load = report.chronic_avg_duration_minutes * report.chronic_avg_rpe
-        #else:
-        #    target_load = 0
-        target_load = 0
+        report = TrainingReport(user_id=user_id)
 
-        report.internal_monotony_index = athlete_stats.internal_monotony
-        report = self.calc_need_for_variability(athlete_stats.internal_monotony, report)
+        #report.internal_monotony_index = athlete_stats.internal_monotony
+        #report = self.calc_need_for_variability(athlete_stats.internal_monotony, report)
 
         suggested_training_days = []
-        historical_internal_strain = athlete_stats.historical_internal_strain
-        internal_monotony = athlete_stats.internal_monotony
 
-        acute_days = len(acute_plans)
-        chronic_days = len(chronic_plans)
-
-        daily_plans = []
-        daily_plans.extend(list(x for x in
-                                self.get_session_attributes_product_sum_tuple_list("session_RPE", "duration_minutes",
-                                                                                   acute_plans) if x is not None))
-        daily_plans.extend(list(x for x in
-                                self.get_session_attributes_product_sum_tuple_list("session_RPE", "duration_minutes",
-                                                                                   chronic_plans) if x is not None))
+        target_load = 0
 
         for index in range(0, 7):
 
@@ -526,34 +519,47 @@ class TrainingVolumeProcessing(object):
             new_chronic_daily_plans = sorted([p for p in daily_plans if new_acute_start_date_time > p[0] >=
                                               new_chronic_start_date_time], key=lambda x: x[0])
 
-            if acute_days == 7 and 21 <=chronic_days <= 28:
-                week4_sessions = [d for d in new_chronic_daily_plans if new_acute_start_date_time - timedelta(days=28)
-                                  <= d[0] < new_acute_start_date_time - timedelta(days=21)]
+            #if 21 <=chronic_days <= 28:
+            week4_sessions = [d for d in new_chronic_daily_plans if new_acute_start_date_time - timedelta(days=28)
+                              <= d[0] < new_acute_start_date_time - timedelta(days=21)]
 
-                chronic_4_values.extend(x[1] for x in week4_sessions if x[1] is not None)
+            chronic_4_values.extend(x[1] for x in week4_sessions if x[1] is not None)
+            if len(chronic_4_values) > 0:
                 chronic_values.append(sum(chronic_4_values))
 
-            if acute_days == 7 and 14 <= chronic_days <= 28:
-                week3_sessions = [d for d in new_chronic_daily_plans if new_acute_start_date_time - timedelta(days=21)
-                                  <= d[0] < new_acute_start_date_time - timedelta(days=14)]
+            #if 14 <= chronic_days <= 28:
+            week3_sessions = [d for d in new_chronic_daily_plans if new_acute_start_date_time - timedelta(days=21)
+                              <= d[0] < new_acute_start_date_time - timedelta(days=14)]
 
-                chronic_3_values.extend(x[1] for x in week3_sessions if x[1] is not None)
+            chronic_3_values.extend(x[1] for x in week3_sessions if x[1] is not None)
+            if len(chronic_3_values) > 0:
                 chronic_values.append(sum(chronic_3_values))
+            else:
+                if len(chronic_values) > 0:
+                    chronic_values.append(0)
 
-            if acute_days == 7 and 7 <= chronic_days <= 28:
-                week2_sessions = [d for d in new_chronic_daily_plans if new_acute_start_date_time - timedelta(days=14)
-                                  <= d[0] < new_acute_start_date_time - timedelta(days=7)]
+            #if 7 <= chronic_days <= 28:
+            week2_sessions = [d for d in new_chronic_daily_plans if new_acute_start_date_time - timedelta(days=14)
+                              <= d[0] < new_acute_start_date_time - timedelta(days=7)]
 
-                chronic_2_values.extend(x[1] for x in week2_sessions if x[1] is not None)
+            chronic_2_values.extend(x[1] for x in week2_sessions if x[1] is not None)
+            if len(chronic_2_values) > 0:
                 chronic_values.append(sum(chronic_2_values))
+            else:
+                if len(chronic_values) > 0:
+                    chronic_values.append(0)
 
-            if acute_days <= 7 and 7 <= chronic_days <= 28:
-                week1_sessions = [d for d in new_chronic_daily_plans if new_acute_start_date_time - timedelta(days=7)
-                                  <= d[0] < new_acute_start_date_time]
+            #if 7 <= chronic_days <= 28:
+            week1_sessions = [d for d in new_chronic_daily_plans if new_acute_start_date_time - timedelta(days=7)
+                              <= d[0] < new_acute_start_date_time]
 
-                chronic_1_values.extend(x[1] for x in week1_sessions if x[1] is not None)
+            chronic_1_values.extend(x[1] for x in week1_sessions if x[1] is not None)
 
+            if len(chronic_1_values) > 0:
                 chronic_values.append(sum(chronic_1_values))
+            else:
+                if len(chronic_values) > 0:
+                    chronic_values.append(0)
 
             last_6_internal_load_values = []
             last_7_internal_load_values = []
@@ -586,13 +592,13 @@ class TrainingVolumeProcessing(object):
 
             low_monotony_gap, high_monotony_gap,  = self.get_monotony_gap(last_6_internal_load_values)
 
-            strain_gap = self.get_strain_gap(historical_internal_strain, internal_monotony, last_7_internal_load_values)
+            strain_gap = self.get_strain_gap(historical_internal_strain, last_7_internal_load_values)
 
             acwr_gap = self.get_acwr_gap(acute_values, chronic_values)
 
             gap_list = [ramp_gap, strain_gap, acwr_gap]
 
-            suggested_training_day = self.compile_training_report(athlete_stats.athlete_id, end_date_time + timedelta(days=index), gap_list, low_monotony_gap, high_monotony_gap)
+            suggested_training_day = self.compile_training_report(user_id, end_date_time + timedelta(days=index), gap_list, low_monotony_gap, high_monotony_gap)
             #if min(suggested_training_day.high_threshold - suggested_training_day.low_threshold, target_load) < 30:
             #    suggested_training_day.target_load = 0
             #else:
@@ -607,8 +613,8 @@ class TrainingVolumeProcessing(object):
             suggested_training_day.matching_workouts = matching_workouts
             daily_plans.append((suggested_training_day.date_time, suggested_training_day.target_load))
             internal_monotony = 0
-            if chronic_days < 28:
-                chronic_days += 1
+            #if chronic_days < 28:
+            #    chronic_days += 1
             if len(last_7_internal_load_values) > 0:
                 new_strain = self.calculate_daily_strain(last_7_internal_load_values)
                 if len(historical_internal_strain) > 0:
@@ -792,18 +798,22 @@ class TrainingVolumeProcessing(object):
         training_day.low_optimal_gap_type = opt_values[0].training_volume_gap_type
         training_day.low_overreaching_gap_type = ovr_values[0].training_volume_gap_type
         training_day.low_excessive_gap_type = exc_values[0].training_volume_gap_type
-        training_day.training_volume_gaps = opt_values
+        training_day.training_volume_gaps_opt = opt_values
+        training_day.training_volume_gaps_ovr = ovr_values
+        training_day.training_volume_gaps_exc = exc_values
 
         #report.training_level = TrainingLevel(max(low_threshold_gap.training_level if low_threshold_gap.training_level is not None else 0,
         #                                                       high_threshold_gap.training_level if high_threshold_gap.training_level is not None else 0))
 
         return training_day
 
-    def get_strain_gap(self, historical_internal_strain, internal_monotony, last_7_internal_load_values):
+    def get_strain_gap(self, historical_internal_strain, last_7_internal_load_values):
 
         strain_count = min(7, len(historical_internal_strain))
         training_volume_gap = TrainingVolumeGap()
         max_load = None
+
+        internal_monotony, internal_strain = self.calc_monotony_strain(last_7_internal_load_values)
 
         if strain_count > 1:
             internal_strain_sd = statistics.stdev(historical_internal_strain[-strain_count:])

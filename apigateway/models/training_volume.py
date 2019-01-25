@@ -64,7 +64,9 @@ class SuggestedTrainingDay(object):
         self.low_overreaching_gap_type = None
         self.low_excessive_threshold = low_excessive_threshold
         self.low_excessive_gap_type = None
-        self.training_volume_gaps = []
+        self.training_volume_gaps_opt = []
+        self.training_volume_gaps_ovr = []
+        self.training_volume_gaps_exc = []
         self.matching_workouts = []
 
 
@@ -78,7 +80,7 @@ class TrainingReport(object):
         self.internal_ramp = None
         self.internal_monotony_index = None
         self.internal_strain = None
-        #self.training_volume_gaps = []
+        #self.training_volume_gaps_opt = []
         #self.most_limiting_gap_type_low = None
         #self.most_limiting_gap_type_high = None
         self.training_level = None

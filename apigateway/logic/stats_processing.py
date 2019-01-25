@@ -62,7 +62,7 @@ class StatsProcessing(object):
             self.event_date = event_date_time.date().strftime('%Y-%m-%d')
         start_date = datetime.strptime(self.event_date, "%Y-%m-%d")
         end_date = datetime.strptime(self.event_date, "%Y-%m-%d")
-        self.start_date_time = start_date - timedelta(days=28)
+        self.start_date_time = start_date - timedelta(days=35)  #used to be 28, this allows for non-overlapping 7/28
         self.end_date_time = end_date + timedelta(days=1)
         self.start_date = self.start_date_time.strftime('%Y-%m-%d')
         self.end_date = self.end_date_time.strftime('%Y-%m-%d')

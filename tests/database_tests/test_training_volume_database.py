@@ -16,9 +16,9 @@ from models.stats import AthleteStats
 from models.training_volume import TrainingLevel
 from datastores.completed_exercise_datastore import CompletedExerciseDatastore
 from models.soreness import CompletedExercise
-from datetime import datetime
+from datetime import datetime, timedelta
 from config import get_secret
-from utils import parse_date
+from utils import parse_date, format_date
 
 @pytest.fixture(scope="session", autouse=True)
 def add_xray_support(request):
@@ -41,6 +41,44 @@ def add_xray_support(request):
     os.environ["MONGO_COLLECTION_COMPLETEDEXERCISES"] = config['collection_completedexercises']
 
 
+def calc_historical_internal_strain(start_date, end_date, all_plans):
+
+        target_dates = []
+
+        all_plans.sort(key=lambda x: x[0])
+
+        date_diff = parse_date(end_date) - parse_date(start_date)
+
+        for i in range(1, date_diff.days):
+            target_dates.append(parse_date(start_date) + timedelta(days=i))
+
+        index = 0
+        strain_values = []
+
+        if len(target_dates) > 7:
+            for t in range(6, len(target_dates)):
+                load_values = []
+                daily_plans = [p for p in all_plans if (p[0] + timedelta(index)) < p.get_event_datetime()[0] <= target_dates[t]]
+                load_values.extend(list(x[1] for x in daily_plans if x is not None))
+                strain = self.calculate_daily_strain(load_values)
+                if strain is not None:
+                    strain_values.append(strain)
+                index += 1
+
+        return strain_values
+
+
+def get_dates(start_date, end_date):
+
+    dates = []
+
+    delta = end_date - start_date
+
+    for i in range(delta.days + 1):
+        dates.append(start_date + timedelta(i))
+
+    return dates
+
 def test_get_training_plan_from_database():
 
     okay_list = []
@@ -52,6 +90,7 @@ def test_get_training_plan_from_database():
     risk_severity_list = []
 
     users = []
+    users.append('0dd21808-55f9-45f2-a408-b1713d40681f') #mw
     users.append('93176a69-2d5d-4326-b986-ca6b04a9a29d') #liz
     users.append('e4fff5dc-6467-4717-8cef-3f2cb13e5c33')  #abbey
     users.append('82ccf294-7c1e-48e6-8149-c5a001e76f78')  #pene
@@ -95,12 +134,20 @@ def test_get_training_plan_from_database():
                                                                                 stats.acute_daily_plans,
                                                                                 stats.get_chronic_weeks_plans(),
                                                                                 stats.chronic_daily_plans)
+        daily_plans = []
+        daily_plans.extend(list(x for x in
+                                training_volume_processing.get_session_attributes_product_sum_tuple_list("session_RPE", "duration_minutes",
+                                                                                   stats.acute_daily_plans) if x is not None))
+        daily_plans.extend(list(x for x in
+                                training_volume_processing.get_session_attributes_product_sum_tuple_list("session_RPE", "duration_minutes",
+                                                                                   stats.chronic_daily_plans) if x is not None))
         report = training_volume_processing.get_training_report(athlete_stats,
                                                                 stats.acute_start_date_time,
                                                                 stats.chronic_start_date_time,
-                                                                stats.acute_daily_plans,
-                                                                stats.chronic_daily_plans,
+                                                                daily_plans,
                                                                 stats.end_date_time)
+        report = training_volume_processing.calc_report_stats(stats.acute_daily_plans, stats.acute_start_date_time,
+                                                              athlete_stats, stats.chronic_daily_plans, report)
 
         '''deprecated
         if report.high_threshold > 0:
@@ -117,3 +164,66 @@ def test_get_training_plan_from_database():
         j = 0
 
     assert athlete_stats.acute_internal_total_load == 2590
+
+
+def test_missing_session_data():
+    user_id = "slacker"
+    run_date = "2019-01-23"
+    start_date = datetime.strptime(run_date, "%Y-%m-%d")
+    end_date = datetime.strptime(run_date, "%Y-%m-%d")
+    end_date_time = end_date + timedelta(days=1)
+
+    acute_days = None
+    chronic_days = None
+    acute_start_date_time = None
+    chronic_start_date_time = None
+
+    daily_plans = []
+
+    internal_load_values = [50, None, 250, None, 600, None, None,
+                            450, None, 185, None, 350, None, None,
+                            250, None, 450, None, 700, None, None,
+                            650, None, 375, None, 200, None, None,
+                            350, None, 250, None, 400, None, None]
+
+    dates = get_dates(parse_date(run_date) - timedelta(days=(len(internal_load_values))), parse_date(run_date))
+
+    for v in range(0, len(internal_load_values)):
+        if internal_load_values[v] is not None:
+            daily_plans.append((dates[v], internal_load_values[v]))
+
+    earliest_plan_date = daily_plans[0][0]
+    latest_plan_date = daily_plans[len(daily_plans) - 1][0]
+
+    days_difference = (end_date_time - earliest_plan_date).days + 1
+
+    if 7 <= days_difference < 14:
+        acute_days = 3
+        chronic_days = int(days_difference)
+    elif 14 <= days_difference <= 28:
+        acute_days = 7
+        chronic_days = int(days_difference)
+    elif days_difference > 28:
+        acute_days = 7
+        chronic_days = 28
+
+    adjustment_factor = 0
+    if latest_plan_date is not None and parse_date(run_date) > latest_plan_date:
+        adjustment_factor = (parse_date(run_date) - latest_plan_date).days
+
+    if acute_days is not None and chronic_days is not None:
+        acute_start_date_time = end_date_time - timedelta(days=acute_days + 1 + adjustment_factor)
+        chronic_start_date_time = end_date_time - timedelta(
+            days=chronic_days + 1 + acute_days + adjustment_factor)
+
+    training_volume_processing = TrainingVolumeProcessing(start_date, end_date)
+
+    historical_internal_strain = calc_historical_internal_strain(format_date(start_date), format_date(end_date), daily_plans)
+
+    report = training_volume_processing.get_training_report(user_id,
+                                                            acute_start_date_time,
+                                                            chronic_start_date_time,
+                                                            daily_plans,historical_internal_strain,
+                                                            end_date_time)
+
+    assert report is not None
