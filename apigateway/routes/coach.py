@@ -7,6 +7,7 @@ from datastores.datastore_collection import DatastoreCollection
 from models.dashboard import TeamDashboardData, AthleteDashboardData
 from utils import format_date
 import datetime
+import os
 
 
 app = Blueprint('coach', __name__)

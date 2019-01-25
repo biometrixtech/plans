@@ -13,6 +13,7 @@ from utils import parse_date, parse_datetime, format_date
 import boto3
 import datetime
 import random
+import os
 
 
 app = Blueprint('athlete', __name__)
