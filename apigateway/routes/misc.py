@@ -12,7 +12,7 @@ from fathomapi.utils.xray import xray_recorder
 from models.app_logs import AppLogs
 
 app = Blueprint('misc', __name__)
-USERS_API_VERSION = '2_1'
+USERS_API_VERSION = os.environ['USERS_API_VERSION']
 
 @app.route('/clear_user_data', methods=['POST'])
 @require.body({'event_date': str})

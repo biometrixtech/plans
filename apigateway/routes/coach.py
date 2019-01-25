@@ -10,7 +10,7 @@ import datetime
 
 
 app = Blueprint('coach', __name__)
-USERS_API_VERSION = '2_1'
+USERS_API_VERSION = os.environ['USERS_API_VERSION']
 
 
 @app.route('/<uuid:coach_id>/dashboard', methods=['GET'])

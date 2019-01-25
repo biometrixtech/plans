@@ -17,7 +17,7 @@ import random
 
 app = Blueprint('athlete', __name__)
 iotd_client = boto3.client('iot-data')
-USERS_API_VERSION = '2_1'
+USERS_API_VERSION = os.environ['USERS_API_VERSION']
 
 
 @app.route('/<uuid:athlete_id>/daily_plan', methods=['POST'])
