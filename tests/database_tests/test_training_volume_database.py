@@ -328,3 +328,167 @@ def test_missing_session_data():
                         report.suggested_training_days[0].low_excessive_threshold)
 
     assert report is not None
+
+
+def test_progressive_missing_session_data():
+    user_id = "slacker"
+    run_date = "2019-01-23"
+    start_date = datetime.strptime(run_date, "%Y-%m-%d")
+    end_date = datetime.strptime(run_date, "%Y-%m-%d")
+    end_date_time = end_date + timedelta(days=1)
+
+    acute_days = None
+    chronic_days = None
+    acute_start_date_time = None
+    chronic_start_date_time = None
+
+    results = {}
+    load_values = {}
+
+    load_values[0] = [50, None, 250, None, 600, None, None,
+                                450, None, 185, None, 350, None, None,
+                                250, None, 450, None, 700, None, None,
+                                650, None, 375, None, 200, None, None,
+                                350, None, 250, None, 400, None, None]
+
+    load_values[1] = [None, None, 250, None, 600, None, None,
+                                450, None, 185, None, 350, None, None,
+                                250, None, 450, None, 700, None, None,
+                                650, None, 375, None, 200, None, None,
+                                350, None, 250, None, 400, None, None]
+
+
+    load_values[2] = [None, None, None, None, 600, None, None,
+                                450, None, 185, None, 350, None, None,
+                                250, None, 450, None, 700, None, None,
+                                650, None, 375, None, 200, None, None,
+                                350, None, 250, None, 400, None, None]
+
+
+    load_values[3] = [None, None, None, None, None, None, None,
+                                450, None, 185, None, 350, None, None,
+                                250, None, 450, None, 700, None, None,
+                                650, None, 375, None, 200, None, None,
+                                350, None, 250, None, 400, None, None]
+
+
+    load_values[4] = [None, None, None, None, None, None, None,
+                                None, None, 185, None, 350, None, None,
+                                250, None, 450, None, 700, None, None,
+                                650, None, 375, None, 200, None, None,
+                                350, None, 250, None, 400, None, None]
+
+
+    load_values[5] = [None, None, None, None, None, None, None,
+                                None, None, None, None, 350, None, None,
+                                250, None, 450, None, 700, None, None,
+                                650, None, 375, None, 200, None, None,
+                                350, None, 250, None, 400, None, None]
+
+
+    load_values[6] = [None, None, None, None, None, None, None,
+                                None, None, None, None, None, None, None,
+                                250, None, 450, None, 700, None, None,
+                                650, None, 375, None, 200, None, None,
+                                350, None, 250, None, 400, None, None]
+
+    load_values[7] = [None, None, None, None, None, None, None,
+                                None, None, None, None, None, None, None,
+                                None, None, 450, None, 700, None, None,
+                                650, None, 375, None, 200, None, None,
+                                350, None, 250, None, 400, None, None]
+
+    load_values[8] = [None, None, None, None, None, None, None,
+                                None, None, None, None, None, None, None,
+                                None, None, None, None, 700, None, None,
+                                650, None, 375, None, 200, None, None,
+                                350, None, 250, None, 400, None, None]
+
+    load_values[9] = [None, None, None, None, None, None, None,
+                                None, None, None, None, None, None, None,
+                                None, None, None, None, None, None, None,
+                                650, None, 375, None, 200, None, None,
+                                350, None, 250, None, 400, None, None]
+
+    load_values[10] = [None, None, None, None, None, None, None,
+                                None, None, None, None, None, None, None,
+                                None, None, None, None, None, None, None,
+                                None, None, 375, None, 200, None, None,
+                                350, None, 250, None, 400, None, None]
+
+    load_values[11] = [None, None, None, None, None, None, None,
+                                None, None, None, None, None, None, None,
+                                None, None, None, None, None, None, None,
+                                None, None, None, None, 200, None, None,
+                                350, None, 250, None, 400, None, None]
+
+    load_values[12] = [None, None, None, None, None, None, None,
+                                None, None, None, None, None, None, None,
+                                None, None, None, None, None, None, None,
+                                None, None, None, None, None, None, None,
+                                350, None, 250, None, 400, None, None]
+
+    load_values[13] = [None, None, None, None, None, None, None,
+                                None, None, None, None, None, None, None,
+                                None, None, None, None, None, None, None,
+                                None, None, None, None, None, None, None,
+                                None, None, 250, None, 400, None, None]
+
+    load_values[14] = [None, None, None, None, None, None, None,
+                       None, None, None, None, None, None, None,
+                       None, None, None, None, None, None, None,
+                       None, None, None, None, None, None, None,
+                       None, None, None, None, 400, None, None]
+
+    for r in range(0, 15):
+
+        daily_plans = []
+
+        internal_load_values = load_values[r]
+
+        dates = get_dates(parse_date(run_date) - timedelta(days=(len(internal_load_values))), parse_date(run_date))
+
+        for v in range(0, len(internal_load_values)):
+            if internal_load_values[v] is not None:
+                daily_plans.append((dates[v], internal_load_values[v]))
+
+
+        earliest_plan_date = daily_plans[0][0]
+        latest_plan_date = daily_plans[len(daily_plans) - 1][0]
+
+        days_difference = (end_date_time - earliest_plan_date).days + 1
+
+        if 7 <= days_difference < 14:
+            acute_days = 3
+            chronic_days = int(days_difference)
+        elif 14 <= days_difference <= 28:
+            acute_days = 7
+            chronic_days = int(days_difference)
+        elif days_difference > 28:
+            acute_days = 7
+            chronic_days = 28
+
+        adjustment_factor = 0
+        if latest_plan_date is not None and parse_date(run_date) > latest_plan_date:
+            adjustment_factor = (parse_date(run_date) - latest_plan_date).days
+
+        if acute_days is not None and chronic_days is not None:
+            acute_start_date_time = end_date_time - timedelta(days=acute_days + 1 + adjustment_factor)
+            chronic_start_date_time = end_date_time - timedelta(
+                days=chronic_days + 1 + acute_days + adjustment_factor)
+
+        training_volume_processing = TrainingVolumeProcessing(start_date, end_date)
+
+        historical_internal_strain = calc_historical_internal_strain(format_date(start_date), format_date(end_date), daily_plans)
+
+        report = training_volume_processing.get_training_report(user_id,
+                                                                acute_start_date_time,
+                                                                chronic_start_date_time,
+                                                                daily_plans,historical_internal_strain,
+                                                                end_date_time)
+
+        results[r] = (report.suggested_training_days[0].low_optimal_threshold,
+                        report.suggested_training_days[0].low_overreaching_threshold,
+                        report.suggested_training_days[0].low_excessive_threshold)
+
+    assert report is not None
