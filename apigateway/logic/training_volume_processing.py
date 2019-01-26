@@ -489,6 +489,29 @@ class TrainingVolumeProcessing(object):
 
         return training_volume_gap
 
+    def get_ewacwr_gap(self, acute_plans, chronic_plans):
+
+        acute_value = 0
+        chronic_value = 0
+        acute_n = len(acute_plans)
+        chronic_n = len(chronic_plans)
+
+        for a in acute_plans:
+           acute_value += (2/(acute_n + 1)) * a[1] + ((1 - (2/(acute_n + 1))) * acute_value)
+
+        for c in chronic_plans:
+            chronic_value += (2 / (chronic_n + 1)) * a[1] + ((1 - (2 / (chronic_n + 1))) * chronic_value)
+        # ideal is 0.8 to 1.3 with 1.3 being ideal
+        # low_difference = 0.8 = (acute_value + x) / chronic_value
+        # 0.8 * chronic_value = acute_value + x
+        # (0.8 * chronic_value) - acute_value = x
+
+        training_volume_gap = TrainingVolumeGap((0.8 * chronic_value) - acute_value,
+                                                (1.31 * chronic_value) - acute_value,
+                                                (1.51 * chronic_value) - acute_value, TrainingVolumeGapType.acwr)
+
+        return training_volume_gap
+
     def get_training_report(self, user_id, acute_start_date_time, chronic_start_date_time, daily_plans, historical_internal_strain,end_date_time):
 
         report = TrainingReport(user_id=user_id)
@@ -594,7 +617,8 @@ class TrainingVolumeProcessing(object):
 
             strain_gap = self.get_strain_gap(historical_internal_strain, last_7_internal_load_values)
 
-            acwr_gap = self.get_acwr_gap(acute_values, chronic_values)
+            #acwr_gap = self.get_acwr_gap(acute_values, chronic_values)
+            acwr_gap = self.get_ewacwr_gap(new_acute_daily_plans, new_chronic_daily_plans)
 
             gap_list = [ramp_gap, strain_gap, acwr_gap]
 

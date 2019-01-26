@@ -246,7 +246,37 @@ def test_missing_session_data():
                                 650, None, None, None, None, None, None,
                                 None, None, None, None, 400, None, None]
 
-    for r in range(0, 10):
+    load_values[10] = [50, None, None, None, None, None, None,
+                                450, None, None, None, 350, None, None,
+                                None, None, None, None, None, None, None,
+                                650, None, None, None, None, None, None,
+                                None, None, None, None, 400, None, None]
+
+    load_values[11] = [50, None, None, None, None, None, None,
+                       None, None, None, None, 350, None, None,
+                       None, None, None, None, None, None, None,
+                       650, None, None, None, None, None, None,
+                       None, None, None, None, 400, None, None]
+
+    load_values[12] = [50, None, None, None, None, None, None,
+                       None, None, None, None, 350, None, None,
+                       None, None, None, None, None, None, None,
+                       None, None, None, None, None, None, None,
+                       None, None, None, None, 400, None, None]
+
+    load_values[13] = [50, None, None, None, None, None, None,
+                       None, None, None, None, None, None, None,
+                       None, None, None, None, None, None, None,
+                       None, None, None, None, None, None, None,
+                       None, None, None, None, 400, None, None]
+
+    load_values[14] = [None, None, None, None, None, None, None,
+                       None, None, None, None, None, None, None,
+                       None, None, None, None, None, None, None,
+                       None, None, None, None, None, None, None,
+                       None, None, None, None, 400, None, None]
+
+    for r in range(0, 15):
 
         daily_plans = []
 
