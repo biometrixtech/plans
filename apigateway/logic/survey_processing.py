@@ -12,6 +12,9 @@ class SurveyProcessing(object):
 
     def create_session_from_survey(self, session, return_dict=False, athlete_stats=None):
         event_date = parse_datetime(session['event_date'])
+        end_date = session.get('end_date', None)
+        if end_date is not None:
+            end_date = parse_datetime(end_date)
         session_type = session['session_type']
         try:
             sport_name = session['sport_name']
@@ -29,11 +32,21 @@ class SurveyProcessing(object):
             raise InvalidSchemaException("Missing required parameter duration")
         description = session.get('description', "")
         session_event_date = format_datetime(event_date)
+        session_end_date = format_datetime(end_date) if end_date is not None else None
+        calories = session.get("calories", None)
+        distance = session.get("distance", None)
+        source = session.get("source", None)
+        deleted = session.get("deleted", False)
         session_data = {"sport_name": sport_name,
                         "strength_and_conditioning_type": strength_and_conditioning_type,
                         "description": description,
                         "duration_minutes": duration,
-                        "event_date": session_event_date}
+                        "event_date": session_event_date,
+                        "end_date": session_end_date,
+                        "calories": calories,
+                        "distance": distance,
+                        "source": source,
+                        "deleted": deleted}
         if 'post_session_survey' in session:
             survey = PostSurvey(event_date=session['post_session_survey']['event_date'],
                                 survey=session['post_session_survey'])
