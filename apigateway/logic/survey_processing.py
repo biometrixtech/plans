@@ -120,3 +120,14 @@ class SurveyProcessing(object):
                                            question_response_date=plan_event_date,
                                            severity_value=severity,
                                            current_status=HistoricSorenessStatus[status])
+    def cleanup_hr_data_from_api(self, hr_data):
+        start_date = hr_data['startDate']
+        if len(start_date.split('.')) == 2:
+            start_date = start_date.split(".")[0] + 'Z'
+        end_date = hr_data['endDate']
+        if len(end_date.split('.')) == 2:
+            end_date = end_date.split(".")[0] + 'Z'
+        return {'start_date': start_date,
+                'end_date': end_date,
+                'value': hr_data['value']
+                }

@@ -5,6 +5,7 @@ from datastores.daily_readiness_datastore import DailyReadinessDatastore
 from datastores.post_session_survey_datastore import PostSessionSurveyDatastore
 from datastores.daily_plan_datastore import DailyPlanDatastore
 from datastores.athlete_stats_datastore import AthleteStatsDatastore
+from datastores.heart_rate_datastore import HeartRateDatastore
 from fathomapi.api.config import Config
 from fathomapi.comms.service import Service
 from fathomapi.utils.decorators import require
@@ -14,6 +15,7 @@ from models.daily_readiness import DailyReadiness
 from models.soreness import MuscleSorenessSeverity, BodyPartLocation, HistoricSorenessStatus
 from models.stats import AthleteStats
 from models.daily_plan import DailyPlan
+from models.heart_rate import SessionHeartRate, HeartRateData
 from logic.survey_processing import SurveyProcessing
 from utils import parse_datetime, format_date, format_datetime, parse_date, fix_early_survey_event_date
 
@@ -40,6 +42,7 @@ def handle_daily_readiness_create():
     )
 
     all_sessions = []
+    all_session_heart_rates = []
     need_new_plan = False
     sessions_planned = True
     sessions_planned_readiness = True
@@ -64,6 +67,12 @@ def handle_daily_readiness_create():
             else:
                 session_RPE = session_obj.post_session_survey.RPE
             session_RPE_event_date = plan_event_date
+            if 'hr_data' in session and len(session['hr_data']) > 0:
+                session_heart_rate = SessionHeartRate(user_id=user_id,
+                                                      session_id=session_obj.id,
+                                                      event_date=session_obj.event_date)
+                session_heart_rate.hr_workout = [HeartRateData(SurveyProcessing().cleanup_hr_data_from_api(hr)) for hr in session['hr_data']]
+                all_session_heart_rates.append(session_heart_rate)
             all_sessions.append(session_obj)
 
     if need_new_plan:
@@ -75,6 +84,7 @@ def handle_daily_readiness_create():
         plan.session_from_readiness = session_from_readiness
         plan.sessions_planned_readiness = sessions_planned_readiness
         DailyPlanDatastore().put(plan)
+        HeartRateDatastore().put(all_session_heart_rates)
 
     athlete_stats = AthleteStatsDatastore().get(athlete_id=request.json['user_id'])
     if athlete_stats is None:

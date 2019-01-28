@@ -166,6 +166,7 @@ class FSProgramGenerator(object):
                 #session.victory_lap.append(AssignedExercise("212", 4, 1))
                 session.victory_lap.append(AssignedExercise("159", 4, 1))
                 session.victory_lap.append(AssignedExercise("213", 4, 2))
+
             else:
                 session.warm_up.append(AssignedExercise("176", 1, 1))
                 session.warm_up.append(AssignedExercise("139", 1, 2))
