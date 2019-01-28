@@ -102,6 +102,7 @@ def test_get_training_plan_from_database():
         start_date = "2018-10-31"
         end_date = "2019-01-23"
         run_date = "2019-01-23"
+
         drs_dao = DailyReadinessDatastore()
         daily_readiness_surveys = drs_dao.get(user_id, parse_date(start_date), parse_date(end_date), False)
         dpo_dao = DailyPlanDatastore()
@@ -141,10 +142,11 @@ def test_get_training_plan_from_database():
         daily_plans.extend(list(x for x in
                                 training_volume_processing.get_session_attributes_product_sum_tuple_list("session_RPE", "duration_minutes",
                                                                                    stats.chronic_daily_plans) if x is not None))
-        report = training_volume_processing.get_training_report(athlete_stats,
+        
+        report = training_volume_processing.get_training_report(user_id,
                                                                 stats.acute_start_date_time,
                                                                 stats.chronic_start_date_time,
-                                                                daily_plans,
+                                                                daily_plans,athlete_stats.historical_internal_strain,
                                                                 stats.end_date_time)
         report = training_volume_processing.calc_report_stats(stats.acute_daily_plans, stats.acute_start_date_time,
                                                               athlete_stats, stats.chronic_daily_plans, report)

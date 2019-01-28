@@ -36,6 +36,10 @@ class TrainingVolumeGap(object):
         self.low_optimal_threshold = low_optimal_threshold
         self.low_overreaching_threshold = low_overreaching_threshold
         self.low_excessive_threshold = low_excessive_threshold
+        self.high_optimal_threshold = None
+        self.high_overreaching_threshold = None
+        self.high_excessive_threshold = None
+
         self.training_volume_gap_type = gap_type
         #self.internal_freshness_index = None
         #self.internal_acwr = None
@@ -64,9 +68,18 @@ class SuggestedTrainingDay(object):
         self.low_overreaching_gap_type = None
         self.low_excessive_threshold = low_excessive_threshold
         self.low_excessive_gap_type = None
+        self.high_optimal_threshold = None
+        self.high_optimal_gap_type = None
+        self.high_overreaching_threshold = None
+        self.high_overreaching_gap_type = None
+        self.high_excessive_threshold = None
+        self.high_excessive_gap_type = None
         self.training_volume_gaps_opt = []
         self.training_volume_gaps_ovr = []
         self.training_volume_gaps_exc = []
+        self.training_volume_gaps_opt_high = []
+        self.training_volume_gaps_ovr_high = []
+        self.training_volume_gaps_exc_high = []
         self.matching_workouts = []
 
 
