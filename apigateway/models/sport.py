@@ -78,12 +78,37 @@ class SportName(Enum):
     no_sport = None
 
 
-class NoSportPosition(Enum):
-    power = 1
-    strength = 3
-    endurance = 0
-    speed_agility = 2
-    cross_training = 4
+# class NoSportPosition(Enum):
+#     power = 1
+#     strength = 3
+#     endurance = 0
+#     speed_agility = 2
+#     cross_training = 4
+#     elliptical = 5
+#     functional_strength_training = 6
+#     hiking = 7
+#     hunting = 8
+#     mind_and_body = 9
+#     play = 10
+#     preparation_and_recovery = 11
+#     stair_climbing = 12
+#     traditional_strength_training = 13
+#     walking = 14
+#     water_fitness = 15
+#     yoga = 16
+#     barre = 17
+#     core_training = 18
+#     flexibility = 19
+#     high_intensity_interval_training = 20
+#     jump_rope = 21
+#     pilates = 22
+#     stairs = 23
+#     step_training = 24
+#     wheelchair_walk_pace = 25
+#     wheelchair_run_pace = 26
+#     taichi = 27
+#     mixed_cardio = 28
+#     hand_cycling = 29
 
 
 class BaseballPosition(Enum):
