@@ -47,7 +47,34 @@ class SportName(Enum):
     volleyball = 21
     wrestling = 22
     weightlifting = 23
-    track_field =24
+    track_field = 24
+    archery = 25
+    australian_football = 26
+    badminton = 27
+    bowling = 28
+    boxing = 29
+    cricket = 30
+    curling = 31
+    dance = 32
+    equestrian_sports = 33
+    fencing = 34
+    fishing = 35
+    handball = 36
+    hockey = 37
+    martial_arts = 38
+    paddle_sports = 39
+    racquetball = 40
+    sailing = 41
+    snow_sports = 42
+    squash = 43
+    surfing_sports = 44
+    swimming = 45
+    table_tennis = 46
+    water_polo = 47
+    cross_country_skiing = 48
+    downhill_skiing = 49
+    kick_boxing = 50
+    snowboarding = 51
     no_sport = None
 
 
