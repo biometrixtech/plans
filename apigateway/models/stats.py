@@ -1,6 +1,7 @@
 from models.training_volume import FitFatigueStatus
 from serialisable import Serialisable
-from models.sport import SportName, NoSportPosition, BaseballPosition, BasketballPosition, FootballPosition, LacrossePosition, SoccerPosition, SoftballPosition, FieldHockeyPosition, TrackAndFieldPosition, VolleyballPosition
+from models.sport import SportName, BaseballPosition, BasketballPosition, FootballPosition, LacrossePosition, SoccerPosition, SoftballPosition, FieldHockeyPosition, TrackAndFieldPosition, VolleyballPosition
+from models.session import StrengthConditioningType
 from utils import format_date, parse_date
 from models.soreness import HistoricSorenessStatus
 from logic.soreness_processing import SorenessCalculator
@@ -255,7 +256,7 @@ class AthleteStats(Serialisable):
             value = SportName(value)
         elif name == "current_position":
             if self.current_sport_name.value is None and value is not None:
-                value = NoSportPosition(value)
+                value = StrengthConditioningType(value)
             elif self.current_sport_name == SportName.soccer:
                 value = SoccerPosition(value)
             elif self.current_sport_name == SportName.basketball:
