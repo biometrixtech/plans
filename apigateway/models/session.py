@@ -154,7 +154,7 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
             'sport_name': self.sport_name.value,
             'strength_and_conditioning_type': self.strength_and_conditioning_type.value,
             'event_date': format_datetime(self.event_date),
-            'end_date': format_datetime(self.event_date) if self.event_date is not None else None,
+            'end_date': format_datetime(self.end_date) if self.event_date is not None else None,
             'duration_minutes': self.duration_minutes,
             'data_transferred': self.data_transferred,
             'duration_sensor': self.duration_sensor,
