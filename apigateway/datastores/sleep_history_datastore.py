@@ -1,10 +1,10 @@
 from aws_xray_sdk.core import xray_recorder
 from config import get_mongo_collection
-from models.sleep_data import DailySleepData, SleepData
+from models.sleep_data import DailySleepData, SleepEvent
 
 
 class SleepHistoryDatastore(object):
-    mongo_collection = 'heartrate'
+    mongo_collection = 'sleephistory'
 
     @xray_recorder.capture('datastore.SleepHistoryDatastore.get')
     def get(self, user_id, start_date=None, end_date=None):
@@ -36,13 +36,13 @@ class SleepHistoryDatastore(object):
         item = item.json_serialise()
 
         mongo_collection = get_mongo_collection(self.mongo_collection)
-        mongo_collection.replace_one({"session_id": item['session_id']},
+        mongo_collection.replace_one({"user_id": item['user_id'], "event_date": item['event_date']},
                                      item,
                                      upsert=True)
 
     def sleep_data_from_mongo(self, mongo_result):
         daily_sleep_data = DailySleepData(user_id=mongo_result['user_id'],
                                           event_date=mongo_result['event_date'])
-        daily_sleep_data.sleep_data = [SleepData(mongo_result['sleep_data'])]
+        daily_sleep_data.sleep_data = [SleepEvent(mongo_result['sleep_data'])]
 
         return sleep_data

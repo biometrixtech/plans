@@ -6,6 +6,7 @@ from datastores.post_session_survey_datastore import PostSessionSurveyDatastore
 from datastores.daily_plan_datastore import DailyPlanDatastore
 from datastores.athlete_stats_datastore import AthleteStatsDatastore
 from datastores.heart_rate_datastore import HeartRateDatastore
+from datastores.sleep_history_datastore import SleepHistoryDatastore
 from fathomapi.api.config import Config
 from fathomapi.comms.service import Service
 from fathomapi.utils.decorators import require
@@ -16,6 +17,7 @@ from models.soreness import MuscleSorenessSeverity, BodyPartLocation, HistoricSo
 from models.stats import AthleteStats
 from models.daily_plan import DailyPlan
 from models.heart_rate import SessionHeartRate, HeartRateData
+from models.sleep_data import DailySleepData, SleepEvent
 from logic.survey_processing import SurveyProcessing
 from utils import parse_datetime, format_date, format_datetime, parse_date, fix_early_survey_event_date
 
@@ -74,6 +76,12 @@ def handle_daily_readiness_create():
                 session_heart_rate.hr_workout = [HeartRateData(SurveyProcessing().cleanup_hr_data_from_api(hr)) for hr in session['hr_data']]
                 all_session_heart_rates.append(session_heart_rate)
             all_sessions.append(session_obj)
+
+    if "sleep_data" in request.json and len(request.json['sleep_data']) > 0:
+        daily_sleep_data = DailySleepData(user_id=user_id,
+                                          event_date=plan_event_date)
+        daily_sleep_data.sleep_events = [SleepEvent(SurveyProcessing().cleanup_sleep_data_from_api(sd)) for sd in request.json['sleep_data']]
+        SleepHistoryDatastore().put(daily_sleep_data)
 
     if need_new_plan:
         plan = DailyPlan(event_date=plan_event_date)
