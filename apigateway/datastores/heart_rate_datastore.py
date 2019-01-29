@@ -8,7 +8,7 @@ class HeartRateDatastore(object):
 
     @xray_recorder.capture('datastore.HeartRateDatastore.get')
     def get(self, user_id, start_date=None, end_date=None, session_id=None):
-        return self._query_mongodb(user_id, start_date=None, end_date=None)
+        return self._query_mongodb(user_id, start_date=start_date, end_date=end_date, session_id=session_id)
 
     def put(self, items):
         if not isinstance(items, list):
@@ -32,7 +32,7 @@ class HeartRateDatastore(object):
 
         mongo_cursor = mongo_collection.find(query)
 
-        return [session_heart_rate_from_mongo(session_hr) for session_hr in mongo_cursor]
+        return [self.session_heart_rate_from_mongo(session_hr) for session_hr in mongo_cursor]
 
     @xray_recorder.capture('datastore.HeartRateDatastore._put_mongodb')
     def _put_mongodb(self, item):
@@ -43,7 +43,7 @@ class HeartRateDatastore(object):
                                      item,
                                      upsert=True)
 
-    def session_heart_rate_from_mongo(mongo_result):
+    def session_heart_rate_from_mongo(self, mongo_result):
         session_heart_rate = SessionHeartRate(user_id=mongo_result['user_id'], 
                                               session_id=mongo_result['session_id'],
                                               event_date=mongo_result['event_date'])
