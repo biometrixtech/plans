@@ -1,5 +1,6 @@
 from flask import request, Blueprint
 import datetime
+import os
 
 from datastores.daily_plan_datastore import DailyPlanDatastore
 from datastores.session_datastore import SessionDatastore
@@ -22,33 +23,39 @@ app = Blueprint('session', __name__)
 @require.authenticated.any
 @xray_recorder.capture('routes.session.create')
 def handle_session_create():
-    _validate_schema()
+    # _validate_schema()
     user_id = request.json['user_id']
+    event_date = parse_datetime(request.json['event_date'])
     athlete_stats = AthleteStatsDatastore().get(athlete_id=user_id)
-    session = SurveyProcessing().create_session_from_survey(request.json, athlete_stats=athlete_stats)
-    plan_event_date = format_date(session.event_date)
+    sessions = []
+    soreness = []
+    for session in request.json['sessions']:
+        session_obj = SurveyProcessing().create_session_from_survey(session, athlete_stats=athlete_stats)
+        sessions.append(session_obj)
+        plan_event_date = format_date(session_obj.event_date)
 
-    if 'post_session_survey' in request.json:
         # update session_RPE
         if athlete_stats.session_RPE is not None:
-            athlete_stats.session_RPE = max(session.post_session_survey.RPE, athlete_stats.session_RPE)
+            athlete_stats.session_RPE = max(session_obj.post_session_survey.RPE, athlete_stats.session_RPE)
         else:
-            athlete_stats.session_RPE = session.post_session_survey.RPE
+            athlete_stats.session_RPE = session_obj.post_session_survey.RPE
         athlete_stats.session_RPE_event_date = plan_event_date
 
         # update severe soreness and severe pain
-        soreness = session.post_session_survey.soreness
-        severe_soreness = [s for s in soreness if not s.pain]
-        severe_pain = [s for s in soreness if s.pain]
-        athlete_stats.daily_severe_soreness_event_date = plan_event_date
-        athlete_stats.daily_severe_pain_event_date = plan_event_date
-        athlete_stats.update_post_session_soreness(severe_soreness)
-        athlete_stats.update_post_session_pain(severe_pain)
-        athlete_stats.update_daily_soreness()
-        athlete_stats.update_daily_pain()
-        # update historic soreness
-        for s in soreness:
-            athlete_stats.update_historic_soreness(s, plan_event_date)
+        soreness.extend(session_obj.post_session_survey.soreness)
+
+    # update daily pain and soreness in athlete_stats
+    severe_soreness = [s for s in soreness if not s.pain]
+    severe_pain = [s for s in soreness if s.pain]
+    athlete_stats.daily_severe_soreness_event_date = plan_event_date
+    athlete_stats.daily_severe_pain_event_date = plan_event_date
+    athlete_stats.update_post_session_soreness(severe_soreness)
+    athlete_stats.update_post_session_pain(severe_pain)
+    athlete_stats.update_daily_soreness()
+    athlete_stats.update_daily_pain()
+    # update historic soreness
+    for s in soreness:
+        athlete_stats.update_historic_soreness(s, plan_event_date)
     AthleteStatsDatastore().put(athlete_stats)
 
     if not _check_plan_exists(user_id, plan_event_date):
@@ -62,17 +69,22 @@ def handle_session_create():
 
     store = SessionDatastore()
 
-    store.insert(item=session,
-                 user_id=user_id,
-                 event_date=plan_event_date
-                 )
+    for session in sessions:
+        store.insert(item=session,
+                     user_id=user_id,
+                     event_date=plan_event_date
+                     )
     plan = DailyPlanDatastore().get(user_id, plan_event_date, plan_event_date)[0]
     if not plan.sessions_planned or plan.session_from_readiness:
         plan.sessions_planned = True
         plan.session_from_readiness = False
         DailyPlanDatastore().put(plan)
 
-    update_plan(user_id, session.event_date)
+    update_plan(user_id, event_date)
+    if "health_sync_date" in request.json and request.json['health_sync_date'] is not None:
+        Service('users', os.environ['USERS_API_VERSION']).call_apigateway_async(method='PATCH',
+                                                                                endpoint=f"user/{user_id}",
+                                                                                body={"health_sync_date": request.json['health_sync_date']})
     return {'message': 'success'}, 201
 
 
