@@ -131,3 +131,15 @@ class SurveyProcessing(object):
                 'end_date': end_date,
                 'value': hr_data['value']
                 }
+
+    def cleanup_sleep_data_from_api(self, sleep_data):
+        start_date = sleep_data['startDate']
+        if len(start_date.split('.')) == 2:
+            start_date = start_date.split(".")[0] + 'Z'
+        end_date = sleep_data['endDate']
+        if len(end_date.split('.')) == 2:
+            end_date = end_date.split(".")[0] + 'Z'
+        return {'start_date': start_date,
+                'end_date': end_date,
+                'sleep_type': sleep_data['value']
+                }
