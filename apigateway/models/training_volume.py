@@ -29,6 +29,13 @@ class IndicatorLevel(IntEnum):
     high = 2
 
 
+class StandardErrorRange(object):
+    def __init__(self, lower_bound=None, upper_bound=None, observed_value=None):
+        self.lower_bound = lower_bound
+        self.upper_bound = upper_bound
+        self.observed_value = observed_value
+
+
 class TrainingVolumeGap(object):
     def __init__(self, low_optimal_threshold=None, low_overreaching_threshold=None, low_excessive_threshold=None, gap_type=None):
         #self.low_threshold = low_threshold

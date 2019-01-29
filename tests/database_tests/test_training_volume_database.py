@@ -142,11 +142,17 @@ def test_get_training_plan_from_database():
         daily_plans.extend(list(x for x in
                                 training_volume_processing.get_session_attributes_product_sum_tuple_list("session_RPE", "duration_minutes",
                                                                                    stats.chronic_daily_plans) if x is not None))
-        
+
+        all_plans = []
+        all_plans.extend(stats.acute_daily_plans)
+        all_plans.extend(stats.chronic_daily_plans)
+
+        historical_internal_strain = training_volume_processing.get_historical_internal_strain(start_date, end_date, all_plans)
+
         report = training_volume_processing.get_training_report(user_id,
                                                                 stats.acute_start_date_time,
                                                                 stats.chronic_start_date_time,
-                                                                daily_plans,athlete_stats.historical_internal_strain,
+                                                                daily_plans,historical_internal_strain,
                                                                 stats.end_date_time)
         report = training_volume_processing.calc_report_stats(stats.acute_daily_plans, stats.acute_start_date_time,
                                                               athlete_stats, stats.chronic_daily_plans, report)

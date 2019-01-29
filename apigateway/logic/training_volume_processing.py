@@ -1,4 +1,4 @@
-from models.training_volume import IndicatorLevel, SuggestedTrainingDay, TrainingLevel, TrainingVolumeGap, TrainingVolumeGapType, TrainingReport
+from models.training_volume import IndicatorLevel, StandardErrorRange, SuggestedTrainingDay, TrainingLevel, TrainingVolumeGap, TrainingVolumeGapType, TrainingReport
 from models.soreness import HistoricSorenessStatus
 from datetime import datetime, timedelta
 import statistics, math
@@ -326,7 +326,7 @@ class TrainingVolumeProcessing(object):
 
         return values
 
-    def get_historical_internal_strain(self, start_date, end_date, all_plans):
+    def get_historical_internal_strain(self, start_date, end_date, all_plans, weekly_expected_workouts=5):
 
         target_dates = []
 
@@ -340,6 +340,7 @@ class TrainingVolumeProcessing(object):
         index = 0
         strain_values = []
 
+        # evaluates a rolling week's worth of values for each day to calculate "daily" strain
         if len(target_dates) > 7:
             for t in range(6, len(target_dates)):
                 load_values = []
@@ -347,40 +348,37 @@ class TrainingVolumeProcessing(object):
                 load_values.extend(
                     x for x in self.get_session_attributes_product_sum_list("session_RPE", "duration_minutes",
                                                                             daily_plans) if x is not None)
-                strain = self.calculate_daily_strain(load_values)
-                if strain is not None:
+                strain = self.calculate_daily_strain(load_values, weekly_expected_workouts)
+                if strain.observed_value is not None or strain.upper_bound is not None:
                     strain_values.append(strain)
                 index += 1
 
         return strain_values
 
-    def calculate_daily_strain(self, load_values):
+    def calculate_daily_strain(self, load_values, weekly_expected_workouts=5):
 
-        internal_strain = None
+        daily_strain = StandardErrorRange()
 
         if len(load_values) > 1:
 
             current_load = sum(load_values)
             average_load = statistics.mean(load_values)
             stdev_load = statistics.stdev(load_values)
-            standard_error = stdev_load / math.sqrt(len(load_values))
-            standard_error_range_factor = 1.96 * standard_error
-            standard_error_low = average_load - standard_error_range_factor
-            standard_error_high = average_load + standard_error_range_factor
-
-            #doesn't seem like we can calculate the standard error of the sample standard deviation
-
             if stdev_load > 0:
-                internal_monotony = average_load / stdev_load
-                internal_strain = internal_monotony * current_load
+                monotony = average_load / stdev_load
+                daily_strain.observed_value = monotony * current_load
 
-                internal_monotony_low = standard_error_low / stdev_load
-                internal_strain_low = internal_monotony_low * current_load
+                if len(load_values) < weekly_expected_workouts:
+                    standard_error = (stdev_load / math.sqrt(len(load_values))) * math.sqrt(
+                        (weekly_expected_workouts - len(load_values)) / weekly_expected_workouts)  # adjusts for finite population correction
+                    standard_error_range_factor = 1.96 * standard_error
+                    # we may underestimate load from observed values, not overestimate so we only need upper bound
+                    standard_error_high = average_load + standard_error_range_factor
 
-                internal_monotony_high = standard_error_high / stdev_load
-                internal_strain_high = internal_monotony_high * current_load
+                    internal_monotony_high = standard_error_high / stdev_load
+                    daily_strain.upper_bound = internal_monotony_high * current_load
 
-        return internal_strain
+        return daily_strain
 
     def get_ramp_gap(self, current_load_values, previous_load_values, avg_workouts_week=5):
 
@@ -390,24 +388,24 @@ class TrainingVolumeProcessing(object):
         previous_load_high = 0
 
         if len(current_load_values) > 1:
-            fpc = max(avg_workouts_week, len(current_load_values))
-            average_load = statistics.mean(current_load_values)
-            stdev_load = statistics.stdev(current_load_values)
-            standard_error = (stdev_load / math.sqrt(len(current_load_values))) * math.sqrt(
-                (fpc - len(current_load_values)) / fpc)  # adjusts for finite population correction
-            standard_error_range_factor = 1.96 * standard_error
-            current_load_high = (average_load + standard_error_range_factor) * len(current_load_values)
-        current_load = sum(current_load_values)
+            if len(current_load_values) < avg_workouts_week:
+                average_load = statistics.mean(current_load_values)
+                stdev_load = statistics.stdev(current_load_values)
+                standard_error = (stdev_load / math.sqrt(len(current_load_values))) * math.sqrt(
+                    (avg_workouts_week - len(current_load_values)) / avg_workouts_week)  # adjusts for finite population correction
+                standard_error_range_factor = 1.96 * standard_error
+                current_load_high = (average_load + standard_error_range_factor) * len(current_load_values)
+            current_load = sum(current_load_values)
 
         if len(previous_load_values) > 1:
-            fpc = max(avg_workouts_week, len(previous_load_values))
-            average_load = statistics.mean(previous_load_values)
-            stdev_load = statistics.stdev(previous_load_values)
-            standard_error = (stdev_load / math.sqrt(len(previous_load_values))) * math.sqrt(
-                (fpc - len(previous_load_values)) / fpc)  # adjusts for finite population correction
-            standard_error_range_factor = 1.96 * standard_error
-            previous_load_high = (average_load + standard_error_range_factor) * len(previous_load_values)
-        previous_load = sum(previous_load_values)
+            if len(previous_load_values) < avg_workouts_week:
+                average_load = statistics.mean(previous_load_values)
+                stdev_load = statistics.stdev(previous_load_values)
+                standard_error = (stdev_load / math.sqrt(len(previous_load_values))) * math.sqrt(
+                    (avg_workouts_week - len(previous_load_values)) / avg_workouts_week)  # adjusts for finite population correction
+                standard_error_range_factor = 1.96 * standard_error
+                previous_load_high = (average_load + standard_error_range_factor) * len(previous_load_values)
+            previous_load = sum(previous_load_values)
 
         '''deprecated
         if previous_load > 0:
@@ -435,33 +433,53 @@ class TrainingVolumeProcessing(object):
         #low_load = (1.0 * previous_load) + previous_load - current_load
 
         training_volume_gap = TrainingVolumeGap(gap_type=TrainingVolumeGapType.ramp)
-        training_volume_gap.low_optimal_threshold = min(previous_load - current_load,
-                                                        previous_load_high - current_load,
-                                                        previous_load - current_load_high,
-                                                        previous_load_high - current_load_high)
 
-        training_volume_gap.high_optimal_threshold = max(previous_load - current_load,
-                                                        previous_load_high - current_load,
-                                                        previous_load - current_load_high,
-                                                        previous_load_high - current_load_high)
-        training_volume_gap.low_overreaching_threshold = min((1.11 * previous_load) - current_load,
-                                                             (1.11 * previous_load_high) - current_load,
-                                                             (1.11 * previous_load) - current_load_high,
-                                                             (1.11 * previous_load_high) - current_load_high)
+        training_volume_gap.low_optimal_threshold = previous_load - current_load
+        training_volume_gap.high_optimal_threshold = previous_load - current_load
+        training_volume_gap.low_overreaching_threshold = (1.11 * previous_load) - current_load
+        training_volume_gap.high_overreaching_threshold = (1.11 * previous_load) - current_load
+        training_volume_gap.low_excessive_threshold = (1.16 * previous_load) - current_load
+        training_volume_gap.high_excessive_threshold = (1.16 * previous_load) - current_load
+        if previous_load_high > 0:
+            training_volume_gap.low_optimal_threshold = min(training_volume_gap.low_optimal_threshold,
+                                                            previous_load_high - current_load)
+            training_volume_gap.high_optimal_threshold = max(training_volume_gap.high_optimal_threshold,
+                                                            previous_load_high - current_load)
+            training_volume_gap.low_overreaching_threshold = min(training_volume_gap.low_overreaching_threshold,
+                                                                 (1.11 * previous_load_high) - current_load)
+            training_volume_gap.high_overreaching_threshold = max(training_volume_gap.high_overreaching_threshold,
+                                                                  (1.11 * previous_load_high) - current_load)
+            training_volume_gap.low_excessive_threshold = min(training_volume_gap.low_excessive_threshold,
+                                                                 (1.16 * previous_load_high) - current_load)
+            training_volume_gap.high_excessive_threshold = max(training_volume_gap.high_excessive_threshold,
+                                                                  (1.16 * previous_load_high) - current_load)
+        if current_load_high > 0:
+            training_volume_gap.low_optimal_threshold = min(training_volume_gap.low_optimal_threshold,
+                                                            previous_load - current_load_high)
+            training_volume_gap.high_optimal_threshold = max(training_volume_gap.high_optimal_threshold,
+                                                            previous_load - current_load_high)
+            training_volume_gap.low_overreaching_threshold = min(training_volume_gap.low_overreaching_threshold,
+                                                                 (1.11 * previous_load) - current_load_high)
+            training_volume_gap.high_overreaching_threshold = max(training_volume_gap.high_overreaching_threshold,
+                                                                  (1.11 * previous_load) - current_load_high)
+            training_volume_gap.low_excessive_threshold = min(training_volume_gap.low_excessive_threshold,
+                                                                 (1.16 * previous_load) - current_load_high)
+            training_volume_gap.high_excessive_threshold = max(training_volume_gap.high_excessive_threshold,
+                                                                  (1.16 * previous_load) - current_load_high)
+        if previous_load_high > 0 and current_load_high > 0:
+            training_volume_gap.low_optimal_threshold = min(training_volume_gap.low_optimal_threshold,
+                                                            previous_load_high - current_load_high)
+            training_volume_gap.high_optimal_threshold = max(training_volume_gap.high_optimal_threshold,
+                                                            previous_load_high - current_load_high)
+            training_volume_gap.low_overreaching_threshold = min(training_volume_gap.low_overreaching_threshold,
+                                                                 (1.11 * previous_load_high) - current_load_high)
+            training_volume_gap.high_overreaching_threshold = max(training_volume_gap.high_overreaching_threshold,
+                                                                  (1.11 * previous_load_high) - current_load_high)
+            training_volume_gap.low_excessive_threshold = min(training_volume_gap.low_excessive_threshold,
+                                                                 (1.16 * previous_load_high) - current_load_high)
+            training_volume_gap.high_excessive_threshold = max(training_volume_gap.high_excessive_threshold,
+                                                                  (1.16 * previous_load_high) - current_load_high)
 
-        training_volume_gap.high_overreaching_threshold = max((1.11 * previous_load) - current_load,
-                                                             (1.11 * previous_load_high) - current_load,
-                                                             (1.11 * previous_load) - current_load_high,
-                                                             (1.11 * previous_load_high) - current_load_high)
-        training_volume_gap.low_excessive_threshold = min((1.16 * previous_load) - current_load,
-                                                             (1.16 * previous_load_high) - current_load,
-                                                             (1.16 * previous_load) - current_load_high,
-                                                             (1.16 * previous_load_high) - current_load_high)
-
-        training_volume_gap.high_excessive_threshold = max((1.16 * previous_load) - current_load,
-                                                             (1.16 * previous_load_high) - current_load,
-                                                             (1.16 * previous_load) - current_load_high,
-                                                             (1.16 * previous_load_high) - current_load_high)
         '''deprecated
         low_load = previous_load - current_load
         high_load = (1.1 * previous_load) - current_load
@@ -574,7 +592,6 @@ class TrainingVolumeProcessing(object):
         chronic_high_value = 0
         acute_high = 0
 
-
         if len(chronic_values) > 0:
             chronic_value = statistics.mean(chronic_values)
 
@@ -582,14 +599,12 @@ class TrainingVolumeProcessing(object):
             chronic_high_value = statistics.mean(chronic_values_high)
 
         acute_value = 0
-        if len(acute_values) > 0:
+        if len(acute_values) > 0 or len(acute_values) >= avg_workouts_week:
             acute_value = sum(acute_values)
-        if len(acute_values) > 1:
-            fpc = max(avg_workouts_week, len(acute_values))
-
+        if 1 < len(acute_values) < avg_workouts_week:
             average_load = statistics.mean(acute_values)
             stdev_load = statistics.stdev(acute_values)
-            standard_error = (stdev_load / math.sqrt(len(acute_values))) * math.sqrt((fpc-len(acute_values))/fpc) #adjusts for finite population correction
+            standard_error = (stdev_load / math.sqrt(len(acute_values))) * math.sqrt((avg_workouts_week-len(acute_values))/avg_workouts_week) #adjusts for finite population correction
             standard_error_range_factor = 1.96 * standard_error
             acute_high = (average_load + standard_error_range_factor) * len(acute_values)
 
@@ -714,15 +729,13 @@ class TrainingVolumeProcessing(object):
                               <= d[0] < new_acute_start_date_time - timedelta(days=21)]
 
             chronic_4_values.extend(x[1] for x in week4_sessions if x[1] is not None)
-            if len(chronic_4_values) > 0:
+            if len(chronic_4_values) > 0  or len(chronic_4_values) >= avg_workouts_week:
                 chronic_values.append(sum(chronic_4_values))
-            if len(chronic_4_values) > 1:
-                fpc = max(avg_workouts_week, len(chronic_4_values))
-
+            if len(chronic_4_values) > 1 and len(chronic_4_values) < avg_workouts_week:
                 average_load = statistics.mean(chronic_4_values)
                 stdev_load = statistics.stdev(chronic_4_values)
                 standard_error = (stdev_load / math.sqrt(len(chronic_4_values))) * math.sqrt(
-                    (fpc - len(chronic_4_values)) / fpc) # includes finite population correction
+                    (avg_workouts_week - len(chronic_4_values)) / avg_workouts_week) # includes finite population correction
                 standard_error_range_factor = 1.96 * standard_error
                 chronic_values_high.append((average_load + standard_error_range_factor)*len(chronic_4_values))
 
@@ -731,19 +744,16 @@ class TrainingVolumeProcessing(object):
                               <= d[0] < new_acute_start_date_time - timedelta(days=14)]
 
             chronic_3_values.extend(x[1] for x in week3_sessions if x[1] is not None)
-            if len(chronic_3_values) > 0:
+            if len(chronic_3_values) > 0 or len(chronic_3_values) >= avg_workouts_week:
                 chronic_values.append(sum(chronic_3_values))
             else:
                 if len(chronic_values) > 0:
                     chronic_values.append(0)
-            if len(chronic_3_values) > 1:
-                fpc = max(avg_workouts_week, len(chronic_3_values))
-
-
+            if len(chronic_3_values) > 1 and len(chronic_3_values) < avg_workouts_week:
                 average_load = statistics.mean(chronic_3_values)
                 stdev_load = statistics.stdev(chronic_3_values)
                 standard_error = (stdev_load / math.sqrt(len(chronic_3_values))) * math.sqrt(
-                    (fpc - len(chronic_3_values)) / fpc) # includes finite population correction
+                    (avg_workouts_week - len(chronic_3_values)) / avg_workouts_week) # includes finite population correction
                 standard_error_range_factor = 1.96 * standard_error
                 chronic_values_high.append((average_load + standard_error_range_factor)*len(chronic_3_values))
             else:
@@ -756,18 +766,16 @@ class TrainingVolumeProcessing(object):
                               <= d[0] < new_acute_start_date_time - timedelta(days=7)]
 
             chronic_2_values.extend(x[1] for x in week2_sessions if x[1] is not None)
-            if len(chronic_2_values) > 0:
+            if len(chronic_2_values) > 0  or len(chronic_2_values) >= avg_workouts_week:
                 chronic_values.append(sum(chronic_2_values))
             else:
                 if len(chronic_values) > 0:
                     chronic_values.append(0)
-            if len(chronic_2_values) > 1:
-                fpc = max(avg_workouts_week, len(chronic_2_values))
-
+            if len(chronic_2_values) > 1 and len(chronic_2_values) < avg_workouts_week:
                 average_load = statistics.mean(chronic_2_values)
                 stdev_load = statistics.stdev(chronic_2_values)
                 standard_error = (stdev_load / math.sqrt(len(chronic_2_values))) * math.sqrt(
-                    (fpc - len(chronic_2_values)) / fpc) # includes finite population correction
+                    (avg_workouts_week - len(chronic_2_values)) / avg_workouts_week) # includes finite population correction
                 standard_error_range_factor = 1.96 * standard_error
                 chronic_values_high.append((average_load + standard_error_range_factor)*len(chronic_2_values))
             else:
@@ -780,19 +788,16 @@ class TrainingVolumeProcessing(object):
 
             chronic_1_values.extend(x[1] for x in week1_sessions if x[1] is not None)
 
-            if len(chronic_1_values) > 0:
+            if len(chronic_1_values) > 0 or len(chronic_1_values) >= avg_workouts_week:
                 chronic_values.append(sum(chronic_1_values))
             else:
                 if len(chronic_values) > 0:
                     chronic_values.append(0)
-
-            if len(chronic_1_values) > 1:
-                fpc = max(avg_workouts_week, len(chronic_1_values))
-
+            if len(chronic_1_values) > 1 and len(chronic_1_values) < avg_workouts_week:
                 average_load = statistics.mean(chronic_1_values)
                 stdev_load = statistics.stdev(chronic_1_values)
                 standard_error = (stdev_load / math.sqrt(len(chronic_1_values))) * math.sqrt(
-                    (fpc - len(chronic_1_values)) / fpc) # includes finite population correction
+                    (avg_workouts_week - len(chronic_1_values)) / avg_workouts_week) # includes finite population correction
                 standard_error_range_factor = 1.96 * standard_error
                 chronic_values_high.append((average_load + standard_error_range_factor)*len(chronic_1_values))
             else:
@@ -1105,25 +1110,34 @@ class TrainingVolumeProcessing(object):
 
         return training_day
 
-    def get_strain_gap(self, historical_internal_strain, last_7_internal_load_values, avg_workouts_week=5):
+    def get_strain_gap(self, historical_internal_strain, last_7_internal_load_values, weekly_expected_workouts=5):
 
         strain_count = min(7, len(historical_internal_strain))
         training_volume_gap = TrainingVolumeGap(gap_type=TrainingVolumeGapType.strain)
         max_load = None
-        max_load_high = None
+        max_load_upper = None
+
+        internal_strain_sd = 0
+        internal_strain_avg = 0
+
+        internal_strain_sd_upper = 0
+        internal_strain_avg_upper = 0
 
         internal_monotony, internal_strain = self.calc_monotony_strain(last_7_internal_load_values)
-        internal_monotony_high, internal_strain_high = self.calc_monotony_strain_se(last_7_internal_load_values, avg_workouts_week)
+        internal_monotony_upper, internal_strain_upper = self.calc_monotony_strain_se(last_7_internal_load_values, weekly_expected_workouts)
 
         if strain_count > 1:
-            internal_strain_sd = statistics.stdev(historical_internal_strain[-strain_count:])
-            internal_strain_avg = statistics.mean(historical_internal_strain[-strain_count:])
+            internal_strain_sd = statistics.stdev(list(x.observed_value for x in historical_internal_strain[-strain_count:]))
+            internal_strain_avg = statistics.mean(list(x.observed_value for x in historical_internal_strain[-strain_count:]))
+            if len(list(x.upper_bound for x in historical_internal_strain[-strain_count:])) > 0:
+                internal_strain_sd_upper = statistics.stdev(list(x.upper_bound for x in historical_internal_strain[-strain_count:]))
+                internal_strain_avg_upper = statistics.mean(list(x.upper_bound for x in historical_internal_strain[-strain_count:]))
 
             # not guaranteed internal_strain has a value today
             if historical_internal_strain[len(historical_internal_strain)-1] is not None and internal_monotony is not None and internal_monotony > 0:
 
-                strain_surplus = historical_internal_strain[len(historical_internal_strain)-1] - (1.2 * internal_strain_sd) - internal_strain_avg
-                load_change = strain_surplus / internal_monotony
+                #strain_surplus = historical_internal_strain[len(historical_internal_strain)-1] - (1.2 * internal_strain_sd) - internal_strain_avg
+                #load_change = strain_surplus / internal_monotony
 
                 internal_strain_sd_load = internal_strain_sd / internal_monotony
                 internal_strain_avg_load = internal_strain_avg / internal_monotony
@@ -1134,27 +1148,20 @@ class TrainingVolumeProcessing(object):
                 # (-1) * (1.2 * internal_strain_sd - athlete_stats.internal_strain =  - x)
 
                 # add/reduce this load from day 7 so the forecast load will reduce the strain; not perfect but close
-                strain_gap = max(0, last_7_internal_load_values[0] - load_change)
+                #strain_gap = max(0, last_7_internal_load_values[0] - load_change)
 
-            if historical_internal_strain[len(historical_internal_strain)-1] is not None and internal_monotony_high is not None and internal_monotony_high > 0:
+            if historical_internal_strain[len(historical_internal_strain)-1] is not None and internal_monotony_upper is not None and internal_monotony_upper > 0:
 
-                strain_surplus = historical_internal_strain[len(historical_internal_strain)-1] - (1.2 * internal_strain_sd) - internal_strain_avg
-                load_change = strain_surplus / internal_monotony_high
+                internal_strain_sd_load_upper = internal_strain_sd_upper / internal_monotony_upper
+                internal_strain_avg_load_upper = internal_strain_avg_upper / internal_monotony_upper
+                max_load_upper = internal_strain_avg_load_upper + internal_strain_sd_load_upper
 
-                internal_strain_sd_load = internal_strain_sd / internal_monotony_high
-                internal_strain_avg_load = internal_strain_avg / internal_monotony_high
-                max_load_high = internal_strain_avg_load + internal_strain_sd_load
-
-            #else:
-            #    strain_gap = None
-            #training_volume_gap.low_threshold = 0
-            #training_volume_gap.high_threshold = strain_gap
             training_volume_gap.training_volume_gap_type = TrainingVolumeGapType.strain
 
         # review the last week of strain and determine and count how many strain spikes occurred
 
         strain_events = 0
-        strain_events_high = 0
+        strain_events_upper = 0
 
         for s in range(8, 15):
             hist_strain_count = min(s, len(historical_internal_strain))
@@ -1162,22 +1169,40 @@ class TrainingVolumeProcessing(object):
             if hist_strain_count >= (s + 1):
                 start_index = -len(historical_internal_strain) - (s + 1)
                 end_index = start_index + 7
-                internal_strain_sd = statistics.stdev(historical_internal_strain[start_index:end_index])
-                internal_strain_avg = statistics.mean(historical_internal_strain[start_index:end_index])
+                if len(list(x.observed_value for x in historical_internal_strain[-strain_count:])) > 0:
+                    internal_strain_sd = statistics.stdev(list(x.observed_value for x in historical_internal_strain[-strain_count:]))
+                    internal_strain_avg = statistics.mean(list(x.observed_value for x in historical_internal_strain[-strain_count:]))
 
-                current_strain = historical_internal_strain[end_index]
+                    current_strain = historical_internal_strain[end_index].observed_value
 
-                if (current_strain - internal_strain_avg) / internal_strain_sd > 1.2:
-                    strain_events += 1
+                    if (current_strain - internal_strain_avg) / internal_strain_sd > 1.2:
+                        strain_events += 1
+
+                if len(list(x.upper_bound for x in historical_internal_strain[-strain_count:])) > 0:
+                    internal_strain_sd_upper = statistics.stdev(
+                        list(x.upper_bound for x in historical_internal_strain[-strain_count:]))
+                    internal_strain_avg_upper = statistics.mean(
+                        list(x.upper_bound for x in historical_internal_strain[-strain_count:]))
+
+                    current_strain_upper = historical_internal_strain[end_index].upper_bound
+
+                    if (current_strain_upper - internal_strain_avg_upper) / internal_strain_sd_upper > 1.2:
+                        strain_events_upper += 1
 
         if strain_events >= 1:
             training_volume_gap.low_excessive_threshold = max_load
-            training_volume_gap.high_excessive_threshold = max_load_high
             training_volume_gap.low_overreaching_threshold = None
         else:
             training_volume_gap.low_overreaching_threshold = max_load
-            training_volume_gap.high_overreaching_threshold = max_load_high
             training_volume_gap.low_excessive_threshold = None
+
+        if strain_events_upper >= 1:
+            training_volume_gap.high_excessive_threshold = max_load_upper
+            training_volume_gap.high_overreaching_threshold = None
+        else:
+            training_volume_gap.high_overreaching_threshold = max_load_upper
+            training_volume_gap.high_excessive_threshold = None
+
         training_volume_gap.low_optimal_threshold = None
 
         return training_volume_gap
