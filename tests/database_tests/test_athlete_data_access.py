@@ -7,6 +7,7 @@ from datastores.daily_plan_datastore import DailyPlanDatastore
 from datastores.post_session_survey_datastore import PostSessionSurveyDatastore
 from datastores.completed_exercise_datastore import CompletedExerciseDatastore
 from datastores.heart_rate_datastore import HeartRateDatastore
+from datastores.sleep_history_datastore import SleepHistoryDatastore
 from models.soreness import CompletedExercise
 from datetime import datetime
 from config import get_secret
@@ -84,6 +85,19 @@ def test_get_heartrate_data_range():
     session_heart_rates = athlete_dao.get(user_id='fd263811-b299-461f-9e79-895c69612bac', start_date='2019-01-19', end_date="2019-01-29")
     assert len(session_heart_rates) == 4
     assert len(session_heart_rates[0].hr_workout) == 7
+
+def test_get_sleep_data_day():
+    athlete_dao = SleepHistoryDatastore()
+    sleep_history = athlete_dao.get(user_id='fd263811-b299-461f-9e79-895c69612bac', start_date='2019-01-09')
+    assert len(sleep_history) == 1
+    assert len(sleep_history[0].sleep_events) == 10
+
+
+def test_get_sleep_data_range():
+    athlete_dao = SleepHistoryDatastore()
+    sleep_history = athlete_dao.get(user_id='fd263811-b299-461f-9e79-895c69612bac', start_date='2019-01-09', end_date="2019-01-29")
+    assert len(sleep_history) == 2
+    assert len(sleep_history[0].sleep_events) == 10
 
 def test_put_completed_exercises():
     data_store = CompletedExerciseDatastore()

@@ -8,6 +8,8 @@ class SleepHistoryDatastore(object):
 
     @xray_recorder.capture('datastore.SleepHistoryDatastore.get')
     def get(self, user_id, start_date=None, end_date=None):
+        if end_date is None:
+            end_date = start_date
         return self._query_mongodb(user_id, start_date=start_date, end_date=end_date)
 
     def put(self, items):
@@ -43,6 +45,6 @@ class SleepHistoryDatastore(object):
     def sleep_data_from_mongo(self, mongo_result):
         daily_sleep_data = DailySleepData(user_id=mongo_result['user_id'],
                                           event_date=mongo_result['event_date'])
-        daily_sleep_data.sleep_data = [SleepEvent(mongo_result['sleep_data'])]
+        daily_sleep_data.sleep_events = [SleepEvent(se) for se in mongo_result['sleep_events']]
 
-        return sleep_data
+        return daily_sleep_data

@@ -141,5 +141,5 @@ class SurveyProcessing(object):
             end_date = end_date.split(".")[0] + 'Z'
         return {'start_date': start_date,
                 'end_date': end_date,
-                'value': sleep_data['value']
+                'sleep_type': sleep_data['value']
                 }

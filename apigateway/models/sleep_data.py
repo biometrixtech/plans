@@ -21,13 +21,21 @@ class SleepEvent(Serialisable):
     def __init__(self, sleep_event):
         self.start_date = parse_datetime(sleep_event['start_date'])
         self.end_date = parse_datetime(sleep_event['end_date'])
-        self.sleep_type = SleepType[sleep_event['value']]
+        self.sleep_type = sleep_event['sleep_type']
 
     def json_serialise(self):
         ret = {'start_date': format_datetime(self.start_date),
                'end_date': format_datetime(self.end_date),
                'sleep_type': self.sleep_type.value}
         return ret
+
+    def __setattr__(self, name, value):
+        if name == "sleep_type":
+            if isinstance(value, str):
+                value = SleepType[value]
+            elif isinstance(value, int):
+                value = SleepType(value)
+        super().__setattr__(name, value)
 
 class SleepType(Enum):
     INBED = 0
