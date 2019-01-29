@@ -142,7 +142,7 @@ def handle_daily_readiness_create():
     Service('plans', Config.get('API_VERSION')).call_apigateway_async('POST',
                                                                       f"athlete/{request.json['user_id']}/daily_plan",
                                                                       body)
-    if "health_sync_date" in request.json:
+    if "health_sync_date" in request.json and request.json['health_sync_date'] is not None:
         Service('users', os.environ['USERS_API_VERSION']).call_apigateway_async(method='PATCH',
                                                                                 endpoint=f"user/{user_id}",
                                                                                 body={"health_sync_date": request.json['health_sync_date']})
