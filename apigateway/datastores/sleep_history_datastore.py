@@ -40,12 +40,14 @@ class SleepHistoryDatastore(object):
         existing_records = self.get(item.user_id, item.event_date)
         if len(existing_records) == 1:
             existing_record = existing_records[0]
-            all_sleep_events = set(existing_record.sleep_events)
-            new_sleep_events = set(item.sleep_events)
-            if len(new_sleep_events - all_sleep_events) > 0:
-                all_sleep_events.update(item.sleep_events)
-                item.sleep_events = list(all_sleep_events)
+            existing_sleep_events = set([se.start_date for se in existing_record.sleep_events])
+            new_sleep_events = set([se.start_date for se in item.sleep_events])
+            new_sleep_events.update(existing_sleep_events)
+            difference = new_sleep_events - existing_sleep_events
+            if len(difference) > 0:
+                item.sleep_events.extend(existing_record.sleep_events)
                 item = item.json_serialise()
+                item['sleep_events'] = [dict(t) for t in {tuple(d.items()) for d in item['sleep_events']}]
                 mongo_collection.replace_one({"user_id": item['user_id'], "event_date": item['event_date']},
                                              item,
                                              upsert=True)
