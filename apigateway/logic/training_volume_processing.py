@@ -149,6 +149,10 @@ class TrainingVolumeProcessing(object):
     def get_acwr(self, acute_load_error, chronic_load_error):
 
         standard_error_range = StandardErrorRange()
+
+        if acute_load_error.insufficient_data or chronic_load_error.insufficient_data:
+            standard_error_range.insufficient_data = True
+
         if acute_load_error.observed_value is not None and chronic_load_error.observed_value is not None:
             if chronic_load_error.observed_value > 0:
                 standard_error_range.observed_value = (acute_load_error.observed_value /
@@ -184,6 +188,10 @@ class TrainingVolumeProcessing(object):
     def get_freshness_index(self, acute_load_error, chronic_load_error):
 
         standard_error_range = StandardErrorRange()
+
+        if acute_load_error.insufficient_data or chronic_load_error.insufficient_data:
+            standard_error_range.insufficient_data = True
+
         if acute_load_error.observed_value is not None and chronic_load_error.observed_value is not None:
             if chronic_load_error.observed_value > 0:
                 standard_error_range.observed_value = (chronic_load_error.observed_value -
@@ -221,6 +229,9 @@ class TrainingVolumeProcessing(object):
         load = self.get_standard_error_range(expected_weekly_workouts, last_week_values)
 
         standard_error_range = StandardErrorRange()
+
+        if monotony_error_range.insufficient_data or load.insufficient_data:
+            standard_error_range.insufficient_data = True
 
         if load.observed_value is not None and monotony_error_range.observed_value is not None:
             standard_error_range.observed_value = load.observed_value * monotony_error_range.observed_value
@@ -271,6 +282,9 @@ class TrainingVolumeProcessing(object):
                     else:
                         standard_error_range.upper_bound = average_load.upper_bound / stdev_load
 
+        else:
+            standard_error_range.insufficient_data = True
+
         return standard_error_range
 
     def get_ramp(self, expected_weekly_workouts, last_week_values, previous_week_values):
@@ -278,11 +292,17 @@ class TrainingVolumeProcessing(object):
         current_load = self.get_standard_error_range(expected_weekly_workouts, last_week_values)
         previous_load = self.get_standard_error_range(expected_weekly_workouts, previous_week_values)
 
-        ext_ramp_error_range = StandardErrorRange()
+        ramp_error_range = StandardErrorRange()
+
+        if current_load.insufficient_data or previous_load.insufficient_data:
+            ramp_error_range.insufficient_data = True
+
         if (current_load.observed_value is not None and previous_load.observed_value is not None
                 and previous_load.observed_value > 0):
-            ext_ramp_error_range.observed_value = current_load.observed_value / float(previous_load.observed_value)
+            ramp_error_range.observed_value = current_load.observed_value / float(previous_load.observed_value)
+
         bound_values = []
+
         if (current_load.upper_bound is not None and previous_load.upper_bound is not None
                 and previous_load.upper_bound > 0):
             bound_values.append(current_load.upper_bound / float(previous_load.upper_bound))
@@ -295,13 +315,13 @@ class TrainingVolumeProcessing(object):
         if len(bound_values) > 0:
             min_bound = min(bound_values)
             max_bound = max(bound_values)
-            if (ext_ramp_error_range.observed_value is None or (ext_ramp_error_range.observed_value is not None and
-                                                                min_bound < ext_ramp_error_range.observed_value)):
-                ext_ramp_error_range.lower_bound = min_bound
-            if (ext_ramp_error_range.observed_value is None or (ext_ramp_error_range.observed_value is not None and
-                                                                max_bound > ext_ramp_error_range.observed_value)):
-                ext_ramp_error_range.upper_bound = max_bound
-        return ext_ramp_error_range
+            if (ramp_error_range.observed_value is None or (ramp_error_range.observed_value is not None and
+                                                                min_bound < ramp_error_range.observed_value)):
+                ramp_error_range.lower_bound = min_bound
+            if (ramp_error_range.observed_value is None or (ramp_error_range.observed_value is not None and
+                                                                max_bound > ramp_error_range.observed_value)):
+                ramp_error_range.upper_bound = max_bound
+        return ramp_error_range
 
     def calc_monotony_strain(self, load_values):
 
@@ -1048,7 +1068,7 @@ class TrainingVolumeProcessing(object):
                 standard_error_range.upper_bound = (average_value + standard_error_range_factor) * len(values)
             else:
                 standard_error_range.upper_bound = (average_value + standard_error_range_factor)
-        elif 1 == len(values) < expected_workouts:
+        elif 1 == len(values) < expected_workouts or len(values) == 0:
             standard_error_range.insufficient_data = True
 
         return standard_error_range
