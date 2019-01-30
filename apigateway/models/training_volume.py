@@ -34,6 +34,7 @@ class StandardErrorRange(object):
         self.lower_bound = lower_bound
         self.upper_bound = upper_bound
         self.observed_value = observed_value
+        self.insufficient_data = False
 
 
 class TrainingVolumeGap(object):

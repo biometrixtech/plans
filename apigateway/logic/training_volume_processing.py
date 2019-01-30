@@ -82,64 +82,59 @@ class TrainingVolumeProcessing(object):
             c_low_intensity_values.extend(x for x in self.get_plan_session_attribute_sum("low_intensity_load", w)
                                           if x is not None)
 
-        if len(last_week_external_values) > 0 and len(previous_week_external_values) > 0:
-            current_load = sum(last_week_external_values)
-            previous_load = sum(previous_week_external_values)
-            if previous_load > 0:
-                #athlete_stats.external_ramp = ((current_load - previous_load) / previous_load) * 100
-                athlete_stats.external_ramp = current_load / previous_load
+        athlete_stats.external_ramp = self.get_ramp(athlete_stats.expected_weekly_workouts,
+                                                    last_week_external_values, previous_week_external_values)
 
-        if len(last_week_internal_values) > 0 and len(previous_week_internal_values) > 0:
-            current_load = sum(last_week_internal_values)
-            previous_load = sum(previous_week_internal_values)
-            if previous_load > 0:
-                #athlete_stats.internal_ramp = ((current_load - previous_load) / previous_load) * 100
-                athlete_stats.internal_ramp = current_load / previous_load
+        athlete_stats.internal_ramp = self.get_ramp(athlete_stats.expected_weekly_workouts,
+                                                    last_week_internal_values, previous_week_internal_values)
 
-        if len(last_week_external_values) > 1:
-            average_load = statistics.mean(last_week_external_values)
-            stdev_load = statistics.stdev(last_week_external_values)
-            if stdev_load > 0:
-                athlete_stats.external_monotony = average_load / stdev_load
-                athlete_stats.external_strain = athlete_stats.external_monotony * sum(last_week_external_values)
+        athlete_stats.external_monotony = self.get_monotony(athlete_stats.expected_weekly_workouts,
+                                                            last_week_external_values)
 
-        monotony, strain = self.calc_monotony_strain(last_week_internal_values)
-        athlete_stats.internal_monotony = monotony
-        athlete_stats.internal_strain = strain
+        athlete_stats.external_strain = self.get_strain(athlete_stats.expected_weekly_workouts,
+                                                        athlete_stats.external_monotony, last_week_external_values)
 
-        if len(a_internal_load_values) > 0:
-            athlete_stats.acute_internal_total_load = sum(a_internal_load_values)
+        athlete_stats.internal_monotony = self.get_monotony(athlete_stats.expected_weekly_workouts,
+                                                            last_week_internal_values)
 
-        if len(a_external_load_values) > 0:
-            athlete_stats.acute_external_total_load = sum(a_external_load_values)
-        if len(a_high_intensity_values) > 0:
-            athlete_stats.acute_external_high_intensity_load = sum(a_high_intensity_values)
-        if len(a_mod_intensity_values) > 0:
-            athlete_stats.acute_external_mod_intensity_load = sum(a_mod_intensity_values)
-        if len(a_low_intensity_values) > 0:
-            athlete_stats.acute_external_low_intensity_load = sum(a_low_intensity_values)
+        athlete_stats.internal_strain = self.get_strain(athlete_stats.expected_weekly_workouts,
+                                                        athlete_stats.internal_monotony, last_week_internal_values)
 
-        if len(c_internal_load_values) > 0:
-            athlete_stats.chronic_internal_total_load = statistics.mean(c_internal_load_values)
+        athlete_stats.acute_internal_total_load = self.get_standard_error_range(athlete_stats.expected_weekly_workouts,
+                                                                                a_internal_load_values)
+        athlete_stats.acute_external_total_load = self.get_standard_error_range(athlete_stats.expected_weekly_workouts,
+                                                                                a_external_load_values)
+        athlete_stats.acute_external_high_intensity_load = self.get_standard_error_range(
+            athlete_stats.expected_weekly_workouts, a_high_intensity_values)
+        athlete_stats.acute_external_mod_intensity_load = self.get_standard_error_range(
+            athlete_stats.expected_weekly_workouts, a_mod_intensity_values)
+        athlete_stats.acute_external_low_intensity_load = self.get_standard_error_range(
+            athlete_stats.expected_weekly_workouts, a_low_intensity_values)
 
-        if len(c_external_load_values) > 0:
-            athlete_stats.chronic_external_total_load = statistics.mean(c_external_load_values)
-        if len(c_high_intensity_values) > 0:
-            athlete_stats.chronic_external_high_intensity_load = statistics.mean(c_high_intensity_values)
-        if len(c_mod_intensity_values) > 0:
-            athlete_stats.chronic_external_mod_intensity_load = statistics.mean(c_mod_intensity_values)
-        if len(c_low_intensity_values) > 0:
-            athlete_stats.chronic_external_low_intensity_load = statistics.mean(c_low_intensity_values)
+        athlete_stats.chronic_internal_total_load = self.get_standard_error_range(
+            athlete_stats.expected_weekly_workouts, c_internal_load_values)
+        athlete_stats.chronic_external_total_load = self.get_standard_error_range(
+            athlete_stats.expected_weekly_workouts, c_external_load_values)
+        athlete_stats.chronic_external_high_intensity_load = self.get_standard_error_range(
+            athlete_stats.expected_weekly_workouts, c_high_intensity_values)
+        athlete_stats.chronic_external_mod_intensity_load = self.get_standard_error_range(
+            athlete_stats.expected_weekly_workouts, c_mod_intensity_values)
+        athlete_stats.chronic_external_low_intensity_load = self.get_standard_error_range(
+            athlete_stats.expected_weekly_workouts, c_low_intensity_values)
 
-        if athlete_stats.acute_internal_total_load is not None and athlete_stats.chronic_internal_total_load is not None:
-            if athlete_stats.chronic_internal_total_load > 0:
-                athlete_stats.internal_acwr = athlete_stats.acute_internal_total_load / athlete_stats.chronic_internal_total_load
-                athlete_stats.internal_freshness_index = athlete_stats.chronic_internal_total_load - athlete_stats.acute_internal_total_load
+        athlete_stats.external_acwr = self.get_acwr(athlete_stats.acute_external_total_load,
+                                                    athlete_stats.chronic_external_total_load)
 
-        if athlete_stats.acute_external_total_load is not None and athlete_stats.chronic_external_total_load is not None:
-            if athlete_stats.chronic_external_total_load > 0:
-                athlete_stats.external_acwr = athlete_stats.acute_external_total_load / athlete_stats.chronic_external_total_load
-                athlete_stats.external_freshness_index = athlete_stats.chronic_external_total_load - athlete_stats.acute_external_total_load
+        athlete_stats.internal_acwr = self.get_acwr(athlete_stats.acute_internal_total_load,
+                                                    athlete_stats.chronic_internal_total_load)
+
+        athlete_stats.internal_freshness_index = self.get_freshness_index(
+            athlete_stats.acute_internal_total_load,
+            athlete_stats.chronic_internal_total_load)
+
+        athlete_stats.external_freshness_index = self.get_freshness_index(
+            athlete_stats.acute_external_total_load,
+            athlete_stats.chronic_external_total_load)
 
         all_plans = []
         all_plans.extend(chronic_daily_plans)
@@ -150,6 +145,163 @@ class TrainingVolumeProcessing(object):
                                                                                        all_plans)
 
         return athlete_stats
+
+    def get_acwr(self, acute_load_error, chronic_load_error):
+
+        standard_error_range = StandardErrorRange()
+        if acute_load_error.observed_value is not None and chronic_load_error.observed_value is not None:
+            if chronic_load_error.observed_value > 0:
+                standard_error_range.observed_value = (acute_load_error.observed_value /
+                                                       chronic_load_error.observed_value)
+
+        acwr_values = []
+
+        if acute_load_error.observed_value is not None and chronic_load_error.upper_bound is not None:
+            if chronic_load_error.upper_bound > 0:
+                acwr_values.append(acute_load_error.observed_value / chronic_load_error.upper_bound)
+        if acute_load_error.upper_bound is not None and chronic_load_error.upper_bound is not None:
+            if chronic_load_error.upper_bound > 0:
+                acwr_values.append(acute_load_error.upper_bound / chronic_load_error.upper_bound)
+        if acute_load_error.upper_bound is not None and chronic_load_error.observed_value is not None:
+            if chronic_load_error.observed_value > 0:
+                acwr_values.append(acute_load_error.upper_bound / chronic_load_error.observed_value)
+
+        if len(acwr_values) > 0:
+            min_acwr = min(acwr_values)
+            max_acwr = max(acwr_values)
+            if (standard_error_range.observed_value is not None
+                    and (min_acwr < standard_error_range.observed_value)):
+                standard_error_range.lower_bound = min_acwr
+            if (standard_error_range.observed_value is not None
+                    and (max_acwr > standard_error_range.observed_value)):
+                standard_error_range.upper_bound = max_acwr
+            if standard_error_range.observed_value is None:
+                standard_error_range.lower_bound = min_acwr
+                standard_error_range.upper_bound = max_acwr
+
+        return standard_error_range
+
+    def get_freshness_index(self, acute_load_error, chronic_load_error):
+
+        standard_error_range = StandardErrorRange()
+        if acute_load_error.observed_value is not None and chronic_load_error.observed_value is not None:
+            if chronic_load_error.observed_value > 0:
+                standard_error_range.observed_value = (chronic_load_error.observed_value -
+                                                       acute_load_error.observed_value)
+
+        fresh_values = []
+
+        if acute_load_error.observed_value is not None and chronic_load_error.upper_bound is not None:
+            if chronic_load_error.upper_bound > 0:
+                fresh_values.append(chronic_load_error.upper_bound - acute_load_error.observed_value)
+        if acute_load_error.upper_bound is not None and chronic_load_error.upper_bound is not None:
+            if chronic_load_error.upper_bound > 0:
+                fresh_values.append(chronic_load_error.upper_bound - acute_load_error.upper_bound)
+        if acute_load_error.upper_bound is not None and chronic_load_error.observed_value is not None:
+            if chronic_load_error.observed_value > 0:
+                fresh_values.append(chronic_load_error.observed_value - acute_load_error.upper_bound)
+
+        if len(fresh_values) > 0:
+            min_fresh = min(fresh_values)
+            max_fresh = max(fresh_values)
+            if (standard_error_range.observed_value is not None
+                    and (min_fresh < standard_error_range.observed_value)):
+                standard_error_range.lower_bound = min_fresh
+            if (standard_error_range.observed_value is not None
+                    and (max_fresh > standard_error_range.observed_value)):
+                standard_error_range.upper_bound = max_fresh
+            if standard_error_range.observed_value is None:
+                standard_error_range.lower_bound = min_fresh
+                standard_error_range.upper_bound = max_fresh
+
+        return standard_error_range
+
+    def get_strain(self, expected_weekly_workouts, monotony_error_range, last_week_values):
+
+        load = self.get_standard_error_range(expected_weekly_workouts, last_week_values)
+
+        standard_error_range = StandardErrorRange()
+
+        if load.observed_value is not None and monotony_error_range.observed_value is not None:
+            standard_error_range.observed_value = load.observed_value * monotony_error_range.observed_value
+
+        strain_values = []
+
+        if load.upper_bound is not None and monotony_error_range.observed_value is not None:
+            strain_values.append(load.upper_bound * monotony_error_range.observed_value)
+        if load.upper_bound is not None and monotony_error_range.upper_bound is not None:
+            strain_values.append(load.upper_bound * monotony_error_range.upper_bound)
+        if load.observed_value is not None and monotony_error_range.upper_bound is not None:
+            strain_values.append(load.observed_value * monotony_error_range.upper_bound)
+        if len(strain_values) > 0:
+            min_strain = min(strain_values)
+            max_strain = max(strain_values)
+
+            if standard_error_range.observed_value is not None and min_strain < standard_error_range.observed_value:
+                standard_error_range.lower_bound = min_strain
+            if standard_error_range.observed_value is not None and max_strain > standard_error_range.observed_value:
+                standard_error_range.upper_bound = max_strain
+            if standard_error_range.observed_value is None:
+                standard_error_range.lower_bound = min_strain
+                standard_error_range.upper_bound = max_strain
+
+        return standard_error_range
+
+    def get_monotony(self, expected_weekly_workouts, values):
+
+        standard_error_range = StandardErrorRange()
+
+        if len(values) > 1:
+
+            average_load = self.get_standard_error_range(expected_weekly_workouts, values, return_sum=False)
+
+            stdev_load = statistics.stdev(values)
+
+            if stdev_load > 0:
+
+                if average_load.observed_value is not None:
+                    standard_error_range.observed_value = average_load.observed_value / stdev_load
+
+                if average_load.upper_bound is not None:
+                    if standard_error_range.observed_value is not None:
+                        if average_load.upper_bound / stdev_load < standard_error_range.observed_value:
+                            standard_error_range.lower_bound = average_load.upper_bound / stdev_load
+                        elif average_load.upper_bound / stdev_load > standard_error_range.observed_value:
+                            standard_error_range.upper_bound = average_load.upper_bound / stdev_load
+                    else:
+                        standard_error_range.upper_bound = average_load.upper_bound / stdev_load
+
+        return standard_error_range
+
+    def get_ramp(self, expected_weekly_workouts, last_week_values, previous_week_values):
+
+        current_load = self.get_standard_error_range(expected_weekly_workouts, last_week_values)
+        previous_load = self.get_standard_error_range(expected_weekly_workouts, previous_week_values)
+
+        ext_ramp_error_range = StandardErrorRange()
+        if (current_load.observed_value is not None and previous_load.observed_value is not None
+                and previous_load.observed_value > 0):
+            ext_ramp_error_range.observed_value = current_load.observed_value / float(previous_load.observed_value)
+        bound_values = []
+        if (current_load.upper_bound is not None and previous_load.upper_bound is not None
+                and previous_load.upper_bound > 0):
+            bound_values.append(current_load.upper_bound / float(previous_load.upper_bound))
+        if (current_load.observed_value is not None and previous_load.upper_bound is not None
+                and previous_load.upper_bound > 0):
+            bound_values.append(current_load.observed_value / float(previous_load.upper_bound))
+        if (current_load.upper_bound is not None and previous_load.observed_value is not None
+                and previous_load.observed_value > 0):
+            bound_values.append(current_load.upper_bound / float(previous_load.observed_value))
+        if len(bound_values) > 0:
+            min_bound = min(bound_values)
+            max_bound = max(bound_values)
+            if (ext_ramp_error_range.observed_value is None or (ext_ramp_error_range.observed_value is not None and
+                                                                min_bound < ext_ramp_error_range.observed_value)):
+                ext_ramp_error_range.lower_bound = min_bound
+            if (ext_ramp_error_range.observed_value is None or (ext_ramp_error_range.observed_value is not None and
+                                                                max_bound > ext_ramp_error_range.observed_value)):
+                ext_ramp_error_range.upper_bound = max_bound
+        return ext_ramp_error_range
 
     def calc_monotony_strain(self, load_values):
 
@@ -729,15 +881,12 @@ class TrainingVolumeProcessing(object):
                               <= d[0] < new_acute_start_date_time - timedelta(days=21)]
 
             chronic_4_values.extend(x[1] for x in week4_sessions if x[1] is not None)
-            if len(chronic_4_values) > 0  or len(chronic_4_values) >= avg_workouts_week:
-                chronic_values.append(sum(chronic_4_values))
-            if len(chronic_4_values) > 1 and len(chronic_4_values) < avg_workouts_week:
-                average_load = statistics.mean(chronic_4_values)
-                stdev_load = statistics.stdev(chronic_4_values)
-                standard_error = (stdev_load / math.sqrt(len(chronic_4_values))) * math.sqrt(
-                    (avg_workouts_week - len(chronic_4_values)) / avg_workouts_week) # includes finite population correction
-                standard_error_range_factor = 1.96 * standard_error
-                chronic_values_high.append((average_load + standard_error_range_factor)*len(chronic_4_values))
+
+            se_range_chronic_4 = self.get_standard_error_range(avg_workouts_week, chronic_4_values)
+            if not se_range_chronic_4.insufficient_data and se_range_chronic_4.upper_bound is not None:
+                chronic_values_high.append(se_range_chronic_4.upper_bound*len(chronic_4_values))
+            if se_range_chronic_4.observed_value is not None:
+                chronic_values.append(se_range_chronic_4.observed_value)
 
             #if 14 <= chronic_days <= 28:
             week3_sessions = [d for d in new_chronic_daily_plans if new_acute_start_date_time - timedelta(days=21)
@@ -876,6 +1025,33 @@ class TrainingVolumeProcessing(object):
 
 
         return report
+
+    def get_standard_error_range(self, expected_workouts_week, values, return_sum=True):
+
+        standard_error_range = StandardErrorRange()
+
+        expected_workouts = 5
+
+        if expected_workouts_week is not None:
+            expected_workouts = expected_workouts_week
+
+        if len(values) > 0:
+            standard_error_range.observed_value = sum(values)
+
+        if 1 < len(values) < expected_workouts:
+            average_value = statistics.mean(values)
+            stdev = statistics.stdev(values)
+            standard_error = (stdev / math.sqrt(len(values))) * math.sqrt(
+                (expected_workouts - len(values)) / expected_workouts)  # includes finite population correction
+            standard_error_range_factor = 1.96 * standard_error
+            if return_sum:
+                standard_error_range.upper_bound = (average_value + standard_error_range_factor) * len(values)
+            else:
+                standard_error_range.upper_bound = (average_value + standard_error_range_factor)
+        elif 1 == len(values) < expected_workouts:
+            standard_error_range.insufficient_data = True
+
+        return standard_error_range
 
     def calc_need_for_variability(self, internal_monotony, report):
 

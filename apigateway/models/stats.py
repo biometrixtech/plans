@@ -1,4 +1,4 @@
-from models.training_volume import FitFatigueStatus
+from models.training_volume import FitFatigueStatus, StandardErrorRange
 from serialisable import Serialisable
 from models.sport import SportName, NoSportPosition, BaseballPosition, BasketballPosition, FootballPosition, LacrossePosition, SoccerPosition, SoftballPosition, FieldHockeyPosition, TrackAndFieldPosition
 from utils import format_date, parse_date
@@ -19,6 +19,7 @@ class AthleteStats(Serialisable):
         self.acute_avg_readiness = None
         self.acute_avg_sleep_quality = None
         self.acute_avg_max_soreness = None
+
         self.acute_internal_total_load = None
         self.acute_external_total_load = None
         self.acute_external_high_intensity_load = None
@@ -51,6 +52,8 @@ class AthleteStats(Serialisable):
         self.completed_functional_strength_sessions = 0
         self.current_sport_name = None
         self.current_position = None
+
+        self.expected_weekly_workouts = None
 
         self.historic_soreness = []
         self.readiness_soreness = []
@@ -301,6 +304,7 @@ class AthleteStats(Serialisable):
             'next_functional_strength_eligible_date': self.next_functional_strength_eligible_date,
             'current_sport_name': self.current_sport_name.value,
             'current_position': self.current_position.value if self.current_position is not None else None,
+            'expected_weekly_workouts': self.expected_weekly_workouts,
             'historic_soreness': [h.json_serialise() for h in self.historic_soreness],
             'readiness_soreness': [s.json_serialise_daily_soreness() for s in self.readiness_soreness],
             'post_session_soreness': [s.json_serialise_daily_soreness() for s in self.post_session_soreness],

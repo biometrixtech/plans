@@ -82,6 +82,7 @@ class AthleteStatsDatastore(object):
             'next_functional_strength_eligible_date', None)
         athlete_stats.current_sport_name = mongo_result.get('current_sport_name', None)
         athlete_stats.current_position = mongo_result.get('current_position', None)
+        athlete_stats.expected_weekly_workouts = mongo_result.get('expected_weekly_workouts', None)
         athlete_stats.historic_soreness = [self._historic_soreness_from_mongodb(s)
                                            for s in mongo_result.get('historic_soreness', [])]
         athlete_stats.daily_severe_soreness = [self._soreness_from_mongodb(s)

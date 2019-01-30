@@ -154,8 +154,8 @@ def test_get_training_plan_from_database():
                                                                 stats.chronic_start_date_time,
                                                                 daily_plans,historical_internal_strain,
                                                                 stats.end_date_time)
-        report = training_volume_processing.calc_report_stats(stats.acute_daily_plans, stats.acute_start_date_time,
-                                                              athlete_stats, stats.chronic_daily_plans, report)
+        #report = training_volume_processing.calc_report_stats(stats.acute_daily_plans, stats.acute_start_date_time,
+        #                                                      athlete_stats, stats.chronic_daily_plans, report)
 
         '''deprecated
         if report.high_threshold > 0:
