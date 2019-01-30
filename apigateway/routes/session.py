@@ -5,12 +5,14 @@ import os
 from datastores.daily_plan_datastore import DailyPlanDatastore
 from datastores.session_datastore import SessionDatastore
 from datastores.athlete_stats_datastore import AthleteStatsDatastore
+from datastores.heart_rate_datastore import HeartRateDatastore
 from fathomapi.api.config import Config
 from fathomapi.comms.service import Service
 from fathomapi.utils.decorators import require
 from fathomapi.utils.exceptions import InvalidSchemaException, NoSuchEntityException, ForbiddenException
 from fathomapi.utils.xray import xray_recorder
 from models.session import SessionType, SessionFactory
+from models.heart_rate import SessionHeartRate, HeartRateData
 from models.daily_plan import DailyPlan
 from utils import parse_datetime, format_date, format_datetime
 from config import get_mongo_collection
@@ -29,8 +31,15 @@ def handle_session_create():
     athlete_stats = AthleteStatsDatastore().get(athlete_id=user_id)
     sessions = []
     soreness = []
+    all_session_heart_rates = []
     for session in request.json['sessions']:
         session_obj = SurveyProcessing().create_session_from_survey(session, athlete_stats=athlete_stats)
+        if 'hr_data' in session and len(session['hr_data']) > 0:
+            session_heart_rate = SessionHeartRate(user_id=user_id,
+                                                  session_id=session_obj.id,
+                                                  event_date=session_obj.event_date)
+            session_heart_rate.hr_workout = [HeartRateData(SurveyProcessing().cleanup_hr_data_from_api(hr)) for hr in session['hr_data']]
+            all_session_heart_rates.append(session_heart_rate)
         sessions.append(session_obj)
         plan_event_date = format_date(session_obj.event_date)
 
@@ -62,7 +71,6 @@ def handle_session_create():
         plan = DailyPlan(event_date=plan_event_date)
         plan.user_id = user_id
         plan.last_sensor_sync = DailyPlanDatastore().get_last_sensor_sync(user_id, plan_event_date)
-        
         DailyPlanDatastore().put(plan)
 
     # session = _create_session(session_type, session_data)
@@ -79,7 +87,8 @@ def handle_session_create():
         plan.sessions_planned = True
         plan.session_from_readiness = False
         DailyPlanDatastore().put(plan)
-
+    if len(all_session_heart_rates) > 0:
+        HeartRateDatastore().put(all_session_heart_rates)
     update_plan(user_id, event_date)
     if "health_sync_date" in request.json and request.json['health_sync_date'] is not None:
         Service('users', os.environ['USERS_API_VERSION']).call_apigateway_async(method='PATCH',

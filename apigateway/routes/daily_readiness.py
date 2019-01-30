@@ -93,7 +93,8 @@ def handle_daily_readiness_create():
         plan.session_from_readiness = session_from_readiness
         plan.sessions_planned_readiness = sessions_planned_readiness
         DailyPlanDatastore().put(plan)
-        HeartRateDatastore().put(all_session_heart_rates)
+        if len(all_session_heart_rates) > 0:
+            HeartRateDatastore().put(all_session_heart_rates)
 
     athlete_stats = AthleteStatsDatastore().get(athlete_id=request.json['user_id'])
     if athlete_stats is None:
