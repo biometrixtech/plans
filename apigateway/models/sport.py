@@ -75,6 +75,39 @@ class SportName(Enum):
     downhill_skiing = 49
     kick_boxing = 50
     snowboarding = 51
+
+    endurance = 52
+    power = 53
+    speed_agility = 54
+    strength = 55
+    cross_training = 56
+    elliptical = 57
+    functional_strength_training = 58
+    hiking = 59
+    hunting = 60
+    mind_and_body = 61
+    play = 62
+    preparation_and_recovery = 63
+    stair_climbing = 64
+    traditional_strength_training = 65
+    walking = 66
+    water_fitness = 67
+    yoga = 68
+    barre = 69
+    core_training = 70
+    flexibility = 71
+    high_intensity_interval_training = 72
+    jump_rope = 73
+    pilates = 74
+    stairs = 75
+    step_training = 76
+    wheelchair_walk_pace = 77
+    wheelchair_run_pace = 78
+    taichi = 79
+    mixed_cardio = 80
+    hand_cycling = 81
+    climbing = 82
+    other = 83
     no_sport = None
 
 

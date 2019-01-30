@@ -243,9 +243,15 @@ def test_generate_session_for_speed():
     assert True is (len(fs_session.victory_lap) == 0)
     assert True is (fs_session.duration_minutes > 0)
 
+    fs_session_2 = mapping.getFunctionalStrengthForSportPosition(SportName.speed_agility)
+    assert True is ([i.json_serialise() for i in fs_session.warm_up] == [i.json_serialise() for i in fs_session_2.warm_up])
+    assert True is ([i.json_serialise() for i in fs_session.dynamic_movement] == [i.json_serialise() for i in fs_session_2.dynamic_movement])
+    assert True is ([i.json_serialise() for i in fs_session.stability_work] == [i.json_serialise() for i in fs_session_2.stability_work])
+    assert True is ([i.json_serialise() for i in fs_session.victory_lap] == [i.json_serialise() for i in fs_session_2.victory_lap])
+
 def test_generate_session_for_walking():
     mapping = FSProgramGenerator(fs_exercise_library_datastore)
-    fs_session = mapping.getFunctionalStrengthForSportPosition(SportName.no_sport, position=StrengthConditioningType.walking)
+    fs_session = mapping.getFunctionalStrengthForSportPosition(SportName.walking)
     assert True is (len(fs_session.warm_up) == 0)
     assert True is (len(fs_session.dynamic_movement) > 0)
     assert True is (len(fs_session.stability_work) > 0)
