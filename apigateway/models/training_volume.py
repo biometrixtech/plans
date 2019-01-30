@@ -1,5 +1,5 @@
 from enum import Enum, IntEnum
-
+from serialisable import Serialisable
 
 class FitFatigueStatus(Enum):
     undefined = 0
@@ -29,12 +29,21 @@ class IndicatorLevel(IntEnum):
     high = 2
 
 
-class StandardErrorRange(object):
+class StandardErrorRange(Serialisable):
     def __init__(self, lower_bound=None, upper_bound=None, observed_value=None):
         self.lower_bound = lower_bound
         self.upper_bound = upper_bound
         self.observed_value = observed_value
         self.insufficient_data = False
+
+    def json_serialise(self):
+        ret = {
+            'lower_bound': self.lower_bound,
+            'upper_bound': self.upper_bound,
+            'observed_value': self.observed_value,
+            'insufficient_data' : self.insufficient_data
+        }
+        return ret
 
 
 class TrainingVolumeGap(object):

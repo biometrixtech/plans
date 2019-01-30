@@ -3,7 +3,9 @@ from config import get_mongo_collection
 from models.stats import AthleteStats
 from models.soreness import BodyPartLocation, HistoricSoreness, HistoricSorenessStatus, Soreness, BodyPart
 from models.metrics import AthleteMetric, MetricType, DailyHighLevelInsight, WeeklyHighLevelInsight, MetricColor, SpecificAction
+from models.training_volume import StandardErrorRange
 from utils import parse_datetime
+import numbers
 
 
 class AthleteStatsDatastore(object):
@@ -73,7 +75,7 @@ class AthleteStatsDatastore(object):
         athlete_stats.internal_ramp = mongo_result.get('internal_ramp', None)
         athlete_stats.external_ramp = mongo_result.get('external_ramp', None)
         athlete_stats.internal_acwr = mongo_result.get('internal_acwr', None)
-        athlete_stats.external_acwr = mongo_result.get('external_acwr', None)
+        athlete_stats.external_acwr = self._standard_error_from_monogodb(mongo_result.get('external_acwr', None))
 
         athlete_stats.functional_strength_eligible = mongo_result.get('functional_strength_eligible', False)
         athlete_stats.completed_functional_strength_sessions = mongo_result.get(
@@ -111,6 +113,23 @@ class AthleteStatsDatastore(object):
         mongo_collection = get_mongo_collection(self.mongo_collection)
         query = {'athlete_id': item['athlete_id']}
         mongo_collection.replace_one(query, item, upsert=True)
+
+    def _standard_error_from_monogodb(self, std_error):
+
+        standard_error_range = StandardErrorRange()
+
+        if std_error is None or isinstance(std_error, numbers.Number):
+
+            standard_error_range.observed_value = std_error
+
+        elif isinstance(std_error, dict):
+
+            standard_error_range.lower_bound = std_error.get("lower_bound", None)
+            standard_error_range.observed_value = std_error.get("observed_value", None)
+            standard_error_range.upper_bound = std_error.get("upper_bound", None)
+            standard_error_range.insufficient_data = std_error.get("insufficient_data", False)
+
+        return standard_error_range
 
     def _historic_soreness_from_mongodb(self, historic_soreness):
 
