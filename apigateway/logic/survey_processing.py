@@ -1,10 +1,13 @@
 import datetime
 from utils import parse_datetime, format_datetime, fix_early_survey_event_date, format_date
 from fathomapi.utils.exceptions import InvalidSchemaException
-from models.session import SessionType, SessionFactory, StrengthConditioningType
+from models.session import SessionType, SessionFactory, StrengthConditioningType, SessionSource
 from models.post_session_survey import PostSurvey
 from models.sport import SportName
 from models.soreness import BodyPart, BodyPartLocation, HistoricSorenessStatus, Soreness
+from models.daily_plan import DailyPlan
+from models.heart_rate import SessionHeartRate, HeartRateData
+from models.sleep_data import DailySleepData, SleepEvent
 from logic.stats_processing import StatsProcessing
 from datastores.datastore_collection import DatastoreCollection
 
@@ -120,6 +123,50 @@ class SurveyProcessing(object):
                                            question_response_date=plan_event_date,
                                            severity_value=severity,
                                            current_status=HistoricSorenessStatus[status])
+
+    def process_historic_health_data(self, user_id, sessions, plans, event_date):
+        days_with_plan = [plan.event_date for plan in plans]
+        all_session_heart_rates = []
+        for session in sessions:
+            session_event_date = parse_datetime(session['event_date'])
+            plan_date = format_date(session_event_date)
+            if plan_date in days_with_plan:
+                daily_plan = [plan for plan in plans if plan.event_date == plan_date][0]
+            else:
+                daily_plan = DailyPlan(event_date=plan_date)
+                daily_plan.user_id = user_id
+                plans.append(daily_plan)
+
+            stored_health_sessions = [session.event_date for session in daily_plan.training_sessions if session.source == SessionSource.health]
+            if parse_datetime(session['event_date']) not in stored_health_sessions:
+                if "post_session_survey" in session:
+                    del session["post_session_survey"]
+                session_obj = self.create_session_from_survey(session)
+                daily_plan.training_sessions.append(session_obj)
+                daily_plan.last_updated = event_date
+                if 'hr_data' in session and len(session['hr_data']) > 0:
+                    session_heart_rate = SessionHeartRate(user_id=user_id,
+                                                          session_id=session_obj.id,
+                                                          event_date=session_obj.event_date)
+                    session_heart_rate.hr_workout = [HeartRateData(self.cleanup_hr_data_from_api(hr)) for hr in session['hr_data']]
+                    all_session_heart_rates.append(session_heart_rate)
+
+        plans = [plan for plan in plans if plan.last_updated == event_date]
+        return plans, all_session_heart_rates
+
+    def process_historic_sleep_data(self, user_id, sleep_data):
+        sleep_events = [SleepEvent(self.cleanup_sleep_data_from_api(sd)) for sd in sleep_data]
+        # sleep_events = sorted(sleep_events, key=lambda k: k.start_date)
+        days_with_sleep_data = set([se.event_date for se in sleep_events])
+        all_sleep_history = []
+        for sleep_date in days_with_sleep_data:
+            daily_sleep_data = DailySleepData(user_id=user_id,
+                                              event_date=sleep_date)
+            daily_sleep_data.sleep_events = [se for se in sleep_events if se.event_date == sleep_date]
+            all_sleep_history.append(daily_sleep_data)
+        return all_sleep_history
+
+
     def cleanup_hr_data_from_api(self, hr_data):
         start_date = hr_data['startDate']
         if len(start_date.split('.')) == 2:

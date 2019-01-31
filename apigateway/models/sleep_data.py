@@ -1,4 +1,5 @@
 from enum import Enum
+import datetime
 from serialisable import Serialisable
 from utils import format_datetime, parse_datetime, format_date
 
@@ -22,12 +23,19 @@ class SleepEvent(Serialisable):
         self.start_date = parse_datetime(sleep_event['start_date'])
         self.end_date = parse_datetime(sleep_event['end_date'])
         self.sleep_type = sleep_event['sleep_type']
+        self.event_date = self.get_event_date()
 
     def json_serialise(self):
         ret = {'start_date': format_datetime(self.start_date),
                'end_date': format_datetime(self.end_date),
                'sleep_type': self.sleep_type.value}
         return ret
+    def get_event_date(self):
+        if self.start_date.hour < 17:
+            event_date = format_datetime(self.start_date).split("T")[0]
+        else:
+            event_date = format_datetime(self.start_date + datetime.timedelta(days=1)).split("T")[0]
+        return event_date
 
     def __setattr__(self, name, value):
         if name == "sleep_type":
