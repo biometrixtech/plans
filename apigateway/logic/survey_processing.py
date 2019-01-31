@@ -1,6 +1,7 @@
 import datetime
 from utils import parse_datetime, format_datetime, fix_early_survey_event_date, format_date
 from fathomapi.utils.exceptions import InvalidSchemaException
+from fathomapi.utils.xray import xray_recorder
 from models.session import SessionType, SessionFactory, StrengthConditioningType, SessionSource
 from models.post_session_survey import PostSurvey
 from models.sport import SportName
@@ -11,7 +12,6 @@ from models.sleep_data import DailySleepData, SleepEvent
 from logic.stats_processing import StatsProcessing
 from datastores.datastore_collection import DatastoreCollection
 
-from fathomapi.utils.xray import xray_recorder
 
 class SurveyProcessing(object):
 
@@ -31,27 +31,31 @@ class SurveyProcessing(object):
             strength_and_conditioning_type = StrengthConditioningType(strength_and_conditioning_type)
         except:
             strength_and_conditioning_type = StrengthConditioningType(None)
-        try:
-            duration = session["duration"]
-        except:
-            raise InvalidSchemaException("Missing required parameter duration")
+        duration = session.get("duration", None)
         description = session.get('description', "")
         session_event_date = format_datetime(event_date)
-        session_end_date = format_datetime(end_date) if end_date is not None else None
+        session_end_date = format_datetime(end_date)
         calories = session.get("calories", None)
         distance = session.get("distance", None)
         source = session.get("source", None)
         deleted = session.get("deleted", False)
+        ignored = session.get("ignored", False)
+        if end_date is not None:
+            duration_health = round((end_date - event_date).seconds / 60, 2)
+        else:
+            duration_health = None
         session_data = {"sport_name": sport_name,
                         "strength_and_conditioning_type": strength_and_conditioning_type,
                         "description": description,
                         "duration_minutes": duration,
+                        "duration_health": duration_health,
                         "event_date": session_event_date,
                         "end_date": session_end_date,
                         "calories": calories,
                         "distance": distance,
                         "source": source,
-                        "deleted": deleted}
+                        "deleted": deleted,
+                        "ignored": ignored}
         if 'post_session_survey' in session:
             survey = PostSurvey(event_date=session['post_session_survey']['event_date'],
                                 survey=session['post_session_survey'])
@@ -65,6 +69,7 @@ class SurveyProcessing(object):
                                                   event_date,
                                                   survey.soreness)
             session_data['post_session_survey'] = survey
+            session_data['created_date'] = survey.event_date
 
 
         if return_dict:
@@ -142,8 +147,6 @@ class SurveyProcessing(object):
 
             stored_health_sessions = [session.event_date for session in daily_plan.training_sessions if session.source == SessionSource.health]
             if parse_datetime(session['event_date']) not in stored_health_sessions:
-                if "post_session_survey" in session:
-                    del session["post_session_survey"]
                 session_obj = self.create_session_from_survey(session)
                 daily_plan.training_sessions.append(session_obj)
                 daily_plan.last_updated = event_date
