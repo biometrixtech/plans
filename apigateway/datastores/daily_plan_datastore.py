@@ -133,6 +133,8 @@ def _external_session_from_mongodb(mongo_result, session_type):
                         "sensor_start_date_time",
                         "sensor_end_date_time",
                         "deleted",
+                        "ignored",
+                        "duration_health",
                         "calories",
                         "distance",
                         "source"]

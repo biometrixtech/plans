@@ -27,9 +27,12 @@ class TrainingPlanManager(object):
         scores = []
 
         scores.append(min(2 + (0.75 * (max_soreness - 1)), 5))
-        scores.append(min(((10 - sleep_quality) / 10) * 3, 3))
-        scores.append(min(((10 - readiness) / 10) * 5, 5))
-        scores.append(min((rpe / 10) * 4, 4))
+        if sleep_quality is not None:
+            scores.append(min(((10 - sleep_quality) / 10) * 3, 3))
+        if readiness is not None:
+            scores.append(min(((10 - readiness) / 10) * 5, 5))
+        if rpe is not None:
+            scores.append(min((rpe / 10) * 4, 4))
 
         if athlete_stats is not None:
             if athlete_stats.acute_avg_RPE is not None:
@@ -58,9 +61,12 @@ class TrainingPlanManager(object):
         scores = []
 
         scores.append(min(2 + (0.75 * (max_soreness - 1)), 5))
-        scores.append(min(((10 - sleep_quality) / 10) * 3, 3))
-        scores.append(min(((10 - readiness) / 10) * 3, 3))
-        scores.append(min((rpe / 10) * 5, 5))
+        if sleep_quality is not None:
+            scores.append(min(((10 - sleep_quality) / 10) * 3, 3))
+        if readiness is not None:
+            scores.append(min(((10 - readiness) / 10) * 3, 3))
+        if rpe is not None:
+            scores.append(min((rpe / 10) * 5, 5))
 
         if athlete_stats is not None:
             if athlete_stats.acute_avg_RPE is not None:

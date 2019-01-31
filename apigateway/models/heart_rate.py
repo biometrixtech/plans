@@ -24,12 +24,12 @@ class SessionHeartRate(Serialisable):
 
 class HeartRateData(Serialisable):
     def __init__(self, hr_data):
-        self.start_date = parse_datetime(hr_data['start_date'])
-        self.end_date = parse_datetime(hr_data['end_date'])
+        self.start_date = hr_data['start_date']
+        self.end_date = hr_data['end_date']
         self.value = hr_data['value']
 
     def json_serialise(self):
-        ret = {'start_date': format_datetime(self.start_date),
-               'end_date': format_datetime(self.end_date),
+        ret = {'start_date': self.start_date,
+               'end_date': self.end_date,
                'value': self.value}
         return ret
