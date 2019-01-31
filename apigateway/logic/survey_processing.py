@@ -11,7 +11,7 @@ from models.sleep_data import DailySleepData, SleepEvent
 from logic.stats_processing import StatsProcessing
 from datastores.datastore_collection import DatastoreCollection
 
-# from fathomapi.utils.xray import xray_recorder
+from fathomapi.utils.xray import xray_recorder
 
 class SurveyProcessing(object):
 
@@ -126,7 +126,7 @@ class SurveyProcessing(object):
                                            severity_value=severity,
                                            current_status=HistoricSorenessStatus[status])
 
-    # @xray_recorder.capture('logic.survey_processing.historic_workout_data')
+    @xray_recorder.capture('logic.survey_processing.historic_workout_data')
     def process_historic_health_data(self, user_id, sessions, plans, event_date):
         days_with_plan = [plan.event_date for plan in plans]
         all_session_heart_rates = []
