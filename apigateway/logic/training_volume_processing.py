@@ -1325,9 +1325,9 @@ class TrainingVolumeProcessing(object):
         if strain_count > 1:
             internal_strain_sd = statistics.stdev(list(x.observed_value for x in historical_internal_strain[-strain_count:]))
             internal_strain_avg = statistics.mean(list(x.observed_value for x in historical_internal_strain[-strain_count:]))
-            if len(list(x.upper_bound for x in historical_internal_strain[-strain_count:])) > 0:
-                internal_strain_sd_upper = statistics.stdev(list(x.upper_bound for x in historical_internal_strain[-strain_count:]))
-                internal_strain_avg_upper = statistics.mean(list(x.upper_bound for x in historical_internal_strain[-strain_count:]))
+            if len(list(x.upper_bound for x in historical_internal_strain[-strain_count:] if x.upper_bound is not None)) > 0:
+                internal_strain_sd_upper = statistics.stdev(list(x.upper_bound for x in historical_internal_strain[-strain_count:] if x.upper_bound is not None))
+                internal_strain_avg_upper = statistics.mean(list(x.upper_bound for x in historical_internal_strain[-strain_count:] if x.upper_bound is not None))
 
             # not guaranteed internal_strain has a value today
             if historical_internal_strain[len(historical_internal_strain)-1] is not None and internal_monotony is not None and internal_monotony > 0:

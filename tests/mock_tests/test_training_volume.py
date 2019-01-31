@@ -1,6 +1,6 @@
 from models.daily_plan import DailyPlan
 from models.session import PracticeSession, SessionType
-from models.post_session_survey import PostSessionSurvey
+from models.post_session_survey import PostSurvey, PostSessionSurvey
 from models.daily_readiness import DailyReadiness
 from models.stats import AthleteStats
 from datetime import datetime, timedelta
@@ -35,7 +35,7 @@ def get_daily_plans(start_date, rpe_list, time_list):
         practice_session = PracticeSession()
         practice_session.event_date = dates[d]
         post_survey = TestUtilities().get_post_survey(rpe_list[d], [])
-        post_session = PostSessionSurvey(dates[d].strftime("%Y-%m-%dT%H:%M:%SZ"), "tester", None, SessionType.practice, post_survey)
+        post_session = PostSurvey(survey=post_survey, event_date=dates[d].strftime("%Y-%m-%dT%H:%M:%SZ"))
         practice_session.post_session_survey = post_session
         practice_session.duration_minutes = time_list[d]
         daily_plan.training_sessions.append(practice_session)
@@ -129,13 +129,30 @@ def test_strain_works():
                                                                             stats.acute_daily_plans,
                                                                             stats.get_chronic_weeks_plans(),
                                                                             stats.chronic_daily_plans)
-    report = training_volume_processing.get_training_report(athlete_stats,
-                                                           stats.last_7_days_plans,
-                                                           stats.days_8_14_plans,
-                                                           stats.acute_start_date_time,
-                                                           stats.chronic_start_date_time,
-                                                           stats.acute_daily_plans,
-                                                           stats.chronic_daily_plans,
-                                                           stats.end_date_time)
+    daily_plans = []
+    daily_plans.extend(list(x for x in
+                            training_volume_processing.get_session_attributes_product_sum_tuple_list("session_RPE",
+                                                                                                     "duration_minutes",
+                                                                                                     stats.acute_daily_plans)
+                            if x is not None))
+    daily_plans.extend(list(x for x in
+                            training_volume_processing.get_session_attributes_product_sum_tuple_list("session_RPE",
+                                                                                                     "duration_minutes",
+                                                                                                     stats.chronic_daily_plans)
+                            if x is not None))
 
-    assert athlete_stats.acute_internal_total_load == 2590
+    all_plans = []
+    all_plans.extend(stats.acute_daily_plans)
+    all_plans.extend(stats.chronic_daily_plans)
+
+    historical_internal_strain = training_volume_processing.get_historical_internal_strain("2018-07-10", "2018-08-06",
+                                                                                           all_plans)
+
+    report = training_volume_processing.get_training_report(athlete_stats.athlete_id,
+                                                            stats.acute_start_date_time,
+                                                            stats.chronic_start_date_time,
+                                                            daily_plans,
+                                                            historical_internal_strain,
+                                                            stats.end_date_time)
+
+    assert report is not None

@@ -795,16 +795,16 @@ class StatsProcessing(object):
 
     def get_chronic_weeks_plans(self):
 
-        week4_sessions = [d for d in self.chronic_daily_plans if self.acute_start_date_time - timedelta(days=28) <=
-                          d.get_event_datetime() < self.acute_start_date_time - timedelta(days=21)]
+        week4_sessions = [d for d in self.chronic_daily_plans if self.acute_start_date_time - timedelta(days=min(28, self.chronic_days)) <=
+                          d.get_event_datetime() < self.acute_start_date_time - timedelta(days=min(21, self.chronic_days))]
         week3_sessions = [d for d in self.chronic_daily_plans if self.acute_start_date_time
-                          - timedelta(days=21) <= d.get_event_datetime() < self.acute_start_date_time -
-                          timedelta(days=14)]
+                          - timedelta(days=min(21, self.chronic_days)) <= d.get_event_datetime() < self.acute_start_date_time -
+                          timedelta(days=min(14, self.chronic_days))]
         week2_sessions = [d for d in self.chronic_daily_plans if self.acute_start_date_time
-                          - timedelta(days=14) <= d.get_event_datetime() < self.acute_start_date_time -
-                          timedelta(days=7)]
+                          - timedelta(days=min(14, self.chronic_days)) <= d.get_event_datetime() < self.acute_start_date_time -
+                          timedelta(days=min(7, self.chronic_days))]
         week1_sessions = [d for d in self.chronic_daily_plans if self.acute_start_date_time
-                          - timedelta(days=7) <= d.get_event_datetime() < self.acute_start_date_time]
+                          - timedelta(days=min(7, self.chronic_days)) <= d.get_event_datetime() < self.acute_start_date_time]
 
         weeks_list = [week1_sessions, week2_sessions, week3_sessions, week4_sessions]
 
@@ -1050,15 +1050,26 @@ class StatsProcessing(object):
         # add one since survey is first thing done in the day
         days_difference = (self.end_date_time - earliest_survey_date_time).days + 1
 
-        if 7 <= days_difference < 14:
+        acute_days_adjustment = 0
+
+        if days_difference == 7:
+            self.acute_days = 3
+            self.chronic_days = 7
+        elif 7 < days_difference < 10:
             self.acute_days = 3
             self.chronic_days = int(days_difference)
-        elif 14 <= days_difference <= 28:
+        elif 10 <= days_difference < 21:
+            self.acute_days = 3
+            self.chronic_days = int(days_difference) - 3
+            acute_days_adjustment = 3
+        elif 21 <= days_difference <= 35:
             self.acute_days = 7
-            self.chronic_days = int(days_difference)
-        elif days_difference > 28:
+            self.chronic_days = int(days_difference) - 7
+            acute_days_adjustment = 7
+        elif days_difference > 35:
             self.acute_days = 7
             self.chronic_days = 28
+            acute_days_adjustment = 7
 
         adjustment_factor = 0
         if latest_plan_date is not None and parse_date(self.event_date) > latest_plan_date:
@@ -1066,8 +1077,8 @@ class StatsProcessing(object):
 
         if self.acute_days is not None and self.chronic_days is not None:
 
-            self.acute_start_date_time = self.end_date_time - timedelta(days=self.acute_days + 1 + adjustment_factor)
-            self.chronic_start_date_time = self.end_date_time - timedelta(days=self.chronic_days + 1 + self.acute_days + adjustment_factor)
+            self.acute_start_date_time = self.end_date_time - timedelta(days=self.acute_days + adjustment_factor)
+            self.chronic_start_date_time = self.end_date_time - timedelta(days=self.chronic_days + acute_days_adjustment + adjustment_factor)
             chronic_date_time = self.acute_start_date_time - timedelta(days=self.chronic_days)
             chronic_delta = self.end_date_time - chronic_date_time
             self.chronic_load_start_date_time = self.end_date_time - chronic_delta
@@ -1094,7 +1105,7 @@ class StatsProcessing(object):
                                               key=lambda x: x.event_date)
 
         last_week = self.end_date_time - timedelta(days=7 + adjustment_factor)
-        last_25_days = self.end_date_time - timedelta(days=25 + 1)
+        last_25_days = self.end_date_time - timedelta(days=25 + adjustment_factor)
         previous_week = last_week - timedelta(days=7)
         previous_week_2 = previous_week - timedelta(days=7)
         previous_week_3 = previous_week_2 - timedelta(days=7)

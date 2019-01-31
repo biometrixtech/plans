@@ -94,8 +94,8 @@ def get_daily_readiness_surveys(start_date, end_date):
 
 
 def test_acute_correct_dates_7_days():
-    plans = get_daily_plans(datetime(2018, 6, 26, 12, 0, 0), datetime(2018, 7, 2, 12, 0, 0))
-    surveys = get_daily_readiness_surveys(datetime(2018, 6, 26, 12, 0, 0), datetime(2018, 7, 3, 12, 0, 0))
+    plans = get_daily_plans(datetime(2018, 6, 23, 12, 0, 0), datetime(2018, 7, 2, 12, 0, 0))
+    surveys = get_daily_readiness_surveys(datetime(2018, 6, 23, 12, 0, 0), datetime(2018, 7, 3, 12, 0, 0))
     daily_plan_datastore = DailyPlanDatastore()
     daily_plan_datastore.side_load_plans(plans)
     daily_readiness_datastore = DailyReadinessDatastore()
@@ -114,8 +114,8 @@ def test_acute_correct_dates_7_days():
 
 
 def test_acute_correct_dates_8_days():
-    plans = get_daily_plans(datetime(2018, 6, 25, 12, 0, 0), datetime(2018, 7, 2, 12, 0, 0))
-    surveys = get_daily_readiness_surveys(datetime(2018, 6, 25, 12, 0, 0), datetime(2018, 7, 3, 12, 0, 0))
+    plans = get_daily_plans(datetime(2018, 6, 22, 12, 0, 0), datetime(2018, 7, 2, 12, 0, 0))
+    surveys = get_daily_readiness_surveys(datetime(2018, 6, 22, 12, 0, 0), datetime(2018, 7, 3, 12, 0, 0))
     daily_plan_datastore = DailyPlanDatastore()
     daily_plan_datastore.side_load_plans(plans)
     daily_readiness_datastore = DailyReadinessDatastore()
@@ -177,8 +177,8 @@ def test_acute_correct_dates_10_days():
 
 
 def test_acute_correct_dates_14_days():
-    plans = get_daily_plans(datetime(2018, 6, 19, 12, 0, 0), datetime(2018, 7, 2, 12, 0, 0))
-    surveys = get_daily_readiness_surveys(datetime(2018, 6, 19, 12, 0, 0), datetime(2018, 7, 3, 12, 0, 0))
+    plans = get_daily_plans(datetime(2018, 6, 16, 12, 0, 0), datetime(2018, 7, 2, 12, 0, 0))
+    surveys = get_daily_readiness_surveys(datetime(2018, 6, 16, 12, 0, 0), datetime(2018, 7, 3, 12, 0, 0))
     daily_plan_datastore = DailyPlanDatastore()
     daily_plan_datastore.side_load_plans(plans)
     daily_readiness_datastore = DailyReadinessDatastore()
@@ -192,9 +192,9 @@ def test_acute_correct_dates_14_days():
     stats.set_start_end_times()
     stats.load_historical_data()
     weeks = stats.get_chronic_weeks_plans()
-    assert 7 == len(stats.acute_daily_plans)
-    assert '2018-07-02' == stats.acute_daily_plans[6].event_date
-    assert '2018-06-26' == stats.acute_daily_plans[0].event_date
+    assert 3 == len(stats.acute_daily_plans)
+    assert '2018-07-02' == stats.acute_daily_plans[2].event_date
+    assert '2018-06-30' == stats.acute_daily_plans[0].event_date
 
 
 def test_acute_correct_dates_28_days():
@@ -338,8 +338,8 @@ def test_correct_acute_chronic_load_33_days():
                                                                             stats.acute_daily_plans,
                                                                             stats.get_chronic_weeks_plans(),
                                                                             stats.chronic_daily_plans)
-    assert 4060 == athlete_stats.acute_external_total_load
-    assert 812.5 == athlete_stats.chronic_external_total_load
+    assert 4060 == athlete_stats.acute_external_total_load.observed_value
+    assert 3250 == athlete_stats.chronic_external_total_load.observed_value
 
 def test_correct_acute_chronic_empty_load_33_days():
     plans = get_sessionless_daily_plans(datetime(2018, 6, 1, 12, 0, 0), datetime(2018, 7, 2, 12, 0, 0))
@@ -363,8 +363,8 @@ def test_correct_acute_chronic_empty_load_33_days():
                                                                             stats.acute_daily_plans,
                                                                             stats.get_chronic_weeks_plans(),
                                                                             stats.chronic_daily_plans)
-    assert None is athlete_stats.acute_external_total_load
-    assert None is athlete_stats.chronic_external_total_load
+    assert None is athlete_stats.acute_external_total_load.observed_value
+    assert None is athlete_stats.chronic_external_total_load.observed_value
 
 
 def test_correct_acwr_load_33_days():
@@ -389,7 +389,7 @@ def test_correct_acwr_load_33_days():
                                                                             stats.acute_daily_plans,
                                                                             stats.get_chronic_weeks_plans(),
                                                                             stats.chronic_daily_plans)
-    assert 4060 / 812.5 == athlete_stats.external_acwr
+    assert 1.2492307692307691 == athlete_stats.external_acwr.observed_value
 
 
 def test_correct_acwr_empty_load_33_days():
@@ -414,7 +414,7 @@ def test_correct_acwr_empty_load_33_days():
                                                                             stats.acute_daily_plans,
                                                                             stats.get_chronic_weeks_plans(),
                                                                             stats.chronic_daily_plans)
-    assert None is athlete_stats.external_acwr
+    assert None is athlete_stats.external_acwr.observed_value
 
 def test_correct_internal_acwr_load_33_days():
     plans = get_daily_internal_plans(datetime(2018, 6, 1, 12, 0, 0), datetime(2018, 7, 2, 12, 0, 0))
@@ -438,7 +438,7 @@ def test_correct_internal_acwr_load_33_days():
                                                                             stats.acute_daily_plans,
                                                                             stats.get_chronic_weeks_plans(),
                                                                             stats.chronic_daily_plans)
-    assert 175 / 156.25 == athlete_stats.internal_acwr
+    assert 0.28 == athlete_stats.internal_acwr.observed_value
 
 
 def test_correct_internal_acwr_empty_load_33_days():
@@ -463,4 +463,4 @@ def test_correct_internal_acwr_empty_load_33_days():
                                                                             stats.acute_daily_plans,
                                                                             stats.get_chronic_weeks_plans(),
                                                                             stats.chronic_daily_plans)
-    assert None is athlete_stats.internal_acwr
+    assert None is athlete_stats.internal_acwr.observed_value
