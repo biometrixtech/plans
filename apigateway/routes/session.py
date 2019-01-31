@@ -44,9 +44,9 @@ def handle_session_create():
         plan_event_date = format_date(session_obj.event_date)
 
         # update session_RPE
-        if athlete_stats.session_RPE is not None:
+        if athlete_stats.session_RPE is not None and session_obj.post_session_survey.RPE is not None:
             athlete_stats.session_RPE = max(session_obj.post_session_survey.RPE, athlete_stats.session_RPE)
-        else:
+        elif session_obj.post_session_survey.RPE is not None:
             athlete_stats.session_RPE = session_obj.post_session_survey.RPE
         athlete_stats.session_RPE_event_date = plan_event_date
 

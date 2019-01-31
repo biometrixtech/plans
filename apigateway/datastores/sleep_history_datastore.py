@@ -35,12 +35,28 @@ class SleepHistoryDatastore(object):
 
     @xray_recorder.capture('datastore.SleepHistoryDatastore._put_mongodb')
     def _put_mongodb(self, item):
-        item = item.json_serialise()
 
         mongo_collection = get_mongo_collection(self.mongo_collection)
-        mongo_collection.replace_one({"user_id": item['user_id'], "event_date": item['event_date']},
-                                     item,
-                                     upsert=True)
+        existing_records = self.get(item.user_id, item.event_date)
+        if len(existing_records) == 1:
+            existing_record = existing_records[0]
+            existing_sleep_events = set([se.start_date for se in existing_record.sleep_events])
+            new_sleep_events = set([se.start_date for se in item.sleep_events])
+            new_sleep_events.update(existing_sleep_events)
+            difference = new_sleep_events - existing_sleep_events
+            if len(difference) > 0:
+                item.sleep_events.extend(existing_record.sleep_events)
+                item = item.json_serialise()
+                item['sleep_events'] = [dict(t) for t in {tuple(d.items()) for d in item['sleep_events']}]
+                mongo_collection.replace_one({"user_id": item['user_id'], "event_date": item['event_date']},
+                                             item,
+                                             upsert=True)
+        else:
+            item = item.json_serialise()
+            mongo_collection.replace_one({"user_id": item['user_id'], "event_date": item['event_date']},
+                                         item,
+                                         upsert=True)
+
 
     def sleep_data_from_mongo(self, mongo_result):
         daily_sleep_data = DailySleepData(user_id=mongo_result['user_id'],
