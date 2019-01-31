@@ -928,11 +928,11 @@ class StatsProcessing(object):
 
         if len(self.acute_readiness_surveys) > 0:
 
-            acute_readiness_values = [x.readiness for x in self.acute_readiness_surveys if x is not None]
-            acute_sleep_quality_values = [x.sleep_quality for x in self.acute_readiness_surveys if x is not None]
+            acute_readiness_values = [x.readiness for x in self.acute_readiness_surveys if x is not None and x.readiness is not None]
+            acute_sleep_quality_values = [x.sleep_quality for x in self.acute_readiness_surveys if x is not None and x.sleep_quality is not None]
 
-            chronic_readiness_values = [x.readiness for x in self.chronic_readiness_surveys if x is not None]
-            chronic_sleep_quality_values = [x.sleep_quality for x in self.chronic_readiness_surveys if x is not None]
+            chronic_readiness_values = [x.readiness for x in self.chronic_readiness_surveys if x is not None and x.readiness is not None]
+            chronic_sleep_quality_values = [x.sleep_quality for x in self.chronic_readiness_surveys if x is not None and x.sleep_quality is not None]
 
             acute_RPE_values = [x.survey.RPE for x in self.acute_post_session_surveys if x.survey.RPE is not None]
             chronic_RPE_values = [x.survey.RPE for x in self.chronic_post_session_surveys if x.survey.RPE is not None]
