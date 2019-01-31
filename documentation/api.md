@@ -109,7 +109,7 @@ The client __must__ submit a request body containing a JSON object with the foll
     "sleep_quality": number,
     "readines": number,
     "wants_functional_strength": boolean,
-    "current_sport": number,
+    "current_sport_name": number,
     "current_position": number,
     "sessions": [session, session],
     "sessions_planned": boolean
@@ -122,7 +122,7 @@ The client __must__ submit a request body containing a JSON object with the foll
 * `readiness` __should__ be an integer between 1 and 10
 * `wants_functional_strength` is optional argument only for the users that are eligible for functional strength and should be included once they are eligible
 * `current_sport_name` __should__ be integer representing SportName enumeration
-* `current_position` __should__ be integer representating position enumeration for specific sport or NoSportPosition enumeration
+* `current_position` __should__ be integer representating position enumeration for specific sport or StrengthConditioningType enumeration
 * `sessions` __should__ be a list of session, where each session matches the body of [Create](#create-2) Session with `user_id` removed.
 * `sessions_planned` __should__ be a boolean representing whether the user plans to train again that day.
 * `sore_part` __should__ have the following schema:
@@ -141,7 +141,7 @@ The client __must__ submit a request body containing a JSON object with the foll
 * `pain` __should__ be a boolean to indicate whether it's pain or soreness.
 * `status` __should__ be a string representating the historical soreness status if one was received. Optional for soreness but required for clear candidates.
 
-Note: `current_sport_name` and `current_position` are only required when the user is first eligible for functional strength. `current_position` should always be present. `current_sport` is optional and if it's absent, NoSportPosition is assumed for `current_position`.
+Note: `current_sport_name` and `current_position` are only required when the user is first eligible for functional strength. `current_position` should always be present. `current_sport` is optional and if it's absent, StrengthConditioningType is assumed for `current_position`.
 
 ```
 POST /plans/version/daily_readiness HTTPS/1.1

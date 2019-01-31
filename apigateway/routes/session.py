@@ -1,15 +1,18 @@
 from flask import request, Blueprint
 import datetime
+import os
 
 from datastores.daily_plan_datastore import DailyPlanDatastore
 from datastores.session_datastore import SessionDatastore
 from datastores.athlete_stats_datastore import AthleteStatsDatastore
+from datastores.heart_rate_datastore import HeartRateDatastore
 from fathomapi.api.config import Config
 from fathomapi.comms.service import Service
 from fathomapi.utils.decorators import require
 from fathomapi.utils.exceptions import InvalidSchemaException, NoSuchEntityException, ForbiddenException
 from fathomapi.utils.xray import xray_recorder
 from models.session import SessionType, SessionFactory
+from models.heart_rate import SessionHeartRate, HeartRateData
 from models.daily_plan import DailyPlan
 from utils import parse_datetime, format_date, format_datetime
 from config import get_mongo_collection
@@ -22,57 +25,75 @@ app = Blueprint('session', __name__)
 @require.authenticated.any
 @xray_recorder.capture('routes.session.create')
 def handle_session_create():
-    _validate_schema()
+    # _validate_schema()
     user_id = request.json['user_id']
+    event_date = parse_datetime(request.json['event_date'])
     athlete_stats = AthleteStatsDatastore().get(athlete_id=user_id)
-    session = SurveyProcessing().create_session_from_survey(request.json, athlete_stats=athlete_stats)
-    plan_event_date = format_date(session.event_date)
+    sessions = []
+    soreness = []
+    all_session_heart_rates = []
+    for session in request.json['sessions']:
+        session_obj = SurveyProcessing().create_session_from_survey(session, athlete_stats=athlete_stats)
+        if 'hr_data' in session and len(session['hr_data']) > 0:
+            session_heart_rate = SessionHeartRate(user_id=user_id,
+                                                  session_id=session_obj.id,
+                                                  event_date=session_obj.event_date)
+            session_heart_rate.hr_workout = [HeartRateData(SurveyProcessing().cleanup_hr_data_from_api(hr)) for hr in session['hr_data']]
+            all_session_heart_rates.append(session_heart_rate)
+        sessions.append(session_obj)
+        plan_event_date = format_date(session_obj.event_date)
 
-    if 'post_session_survey' in request.json:
         # update session_RPE
-        if athlete_stats.session_RPE is not None:
-            athlete_stats.session_RPE = max(session.post_session_survey.RPE, athlete_stats.session_RPE)
-        else:
-            athlete_stats.session_RPE = session.post_session_survey.RPE
+        if athlete_stats.session_RPE is not None and session_obj.post_session_survey.RPE is not None:
+            athlete_stats.session_RPE = max(session_obj.post_session_survey.RPE, athlete_stats.session_RPE)
+        elif session_obj.post_session_survey.RPE is not None:
+            athlete_stats.session_RPE = session_obj.post_session_survey.RPE
         athlete_stats.session_RPE_event_date = plan_event_date
 
         # update severe soreness and severe pain
-        soreness = session.post_session_survey.soreness
-        severe_soreness = [s for s in soreness if not s.pain]
-        severe_pain = [s for s in soreness if s.pain]
-        athlete_stats.daily_severe_soreness_event_date = plan_event_date
-        athlete_stats.daily_severe_pain_event_date = plan_event_date
-        athlete_stats.update_post_session_soreness(severe_soreness)
-        athlete_stats.update_post_session_pain(severe_pain)
-        athlete_stats.update_daily_soreness()
-        athlete_stats.update_daily_pain()
-        # update historic soreness
-        for s in soreness:
-            athlete_stats.update_historic_soreness(s, plan_event_date)
+        soreness.extend(session_obj.post_session_survey.soreness)
+
+    # update daily pain and soreness in athlete_stats
+    severe_soreness = [s for s in soreness if not s.pain]
+    severe_pain = [s for s in soreness if s.pain]
+    athlete_stats.daily_severe_soreness_event_date = plan_event_date
+    athlete_stats.daily_severe_pain_event_date = plan_event_date
+    athlete_stats.update_post_session_soreness(severe_soreness)
+    athlete_stats.update_post_session_pain(severe_pain)
+    athlete_stats.update_daily_soreness()
+    athlete_stats.update_daily_pain()
+    # update historic soreness
+    for s in soreness:
+        athlete_stats.update_historic_soreness(s, plan_event_date)
     AthleteStatsDatastore().put(athlete_stats)
 
     if not _check_plan_exists(user_id, plan_event_date):
         plan = DailyPlan(event_date=plan_event_date)
         plan.user_id = user_id
         plan.last_sensor_sync = DailyPlanDatastore().get_last_sensor_sync(user_id, plan_event_date)
-        
         DailyPlanDatastore().put(plan)
 
     # session = _create_session(session_type, session_data)
 
     store = SessionDatastore()
 
-    store.insert(item=session,
-                 user_id=user_id,
-                 event_date=plan_event_date
-                 )
+    for session in sessions:
+        store.insert(item=session,
+                     user_id=user_id,
+                     event_date=plan_event_date
+                     )
     plan = DailyPlanDatastore().get(user_id, plan_event_date, plan_event_date)[0]
     if not plan.sessions_planned or plan.session_from_readiness:
         plan.sessions_planned = True
         plan.session_from_readiness = False
         DailyPlanDatastore().put(plan)
-
-    update_plan(user_id, session.event_date)
+    if len(all_session_heart_rates) > 0:
+        HeartRateDatastore().put(all_session_heart_rates)
+    update_plan(user_id, event_date)
+    if "health_sync_date" in request.json and request.json['health_sync_date'] is not None:
+        Service('users', os.environ['USERS_API_VERSION']).call_apigateway_async(method='PATCH',
+                                                                                endpoint=f"user/{user_id}",
+                                                                                body={"health_sync_date": request.json['health_sync_date']})
     return {'message': 'success'}, 201
 
 

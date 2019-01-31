@@ -1,17 +1,25 @@
 import datetime
 from utils import parse_datetime, format_datetime, fix_early_survey_event_date, format_date
 from fathomapi.utils.exceptions import InvalidSchemaException
-from models.session import SessionType, SessionFactory, StrengthConditioningType
+from fathomapi.utils.xray import xray_recorder
+from models.session import SessionType, SessionFactory, StrengthConditioningType, SessionSource
 from models.post_session_survey import PostSurvey
 from models.sport import SportName
 from models.soreness import BodyPart, BodyPartLocation, HistoricSorenessStatus, Soreness
+from models.daily_plan import DailyPlan
+from models.heart_rate import SessionHeartRate, HeartRateData
+from models.sleep_data import DailySleepData, SleepEvent
 from logic.stats_processing import StatsProcessing
 from datastores.datastore_collection import DatastoreCollection
+
 
 class SurveyProcessing(object):
 
     def create_session_from_survey(self, session, return_dict=False, athlete_stats=None):
         event_date = parse_datetime(session['event_date'])
+        end_date = session.get('end_date', None)
+        if end_date is not None:
+            end_date = parse_datetime(end_date)
         session_type = session['session_type']
         try:
             sport_name = session['sport_name']
@@ -23,17 +31,31 @@ class SurveyProcessing(object):
             strength_and_conditioning_type = StrengthConditioningType(strength_and_conditioning_type)
         except:
             strength_and_conditioning_type = StrengthConditioningType(None)
-        try:
-            duration = session["duration"]
-        except:
-            raise InvalidSchemaException("Missing required parameter duration")
+        duration = session.get("duration", None)
         description = session.get('description', "")
         session_event_date = format_datetime(event_date)
+        session_end_date = format_datetime(end_date)
+        calories = session.get("calories", None)
+        distance = session.get("distance", None)
+        source = session.get("source", None)
+        deleted = session.get("deleted", False)
+        ignored = session.get("ignored", False)
+        if end_date is not None:
+            duration_health = round((end_date - event_date).seconds / 60, 2)
+        else:
+            duration_health = None
         session_data = {"sport_name": sport_name,
                         "strength_and_conditioning_type": strength_and_conditioning_type,
                         "description": description,
                         "duration_minutes": duration,
-                        "event_date": session_event_date}
+                        "duration_health": duration_health,
+                        "event_date": session_event_date,
+                        "end_date": session_end_date,
+                        "calories": calories,
+                        "distance": distance,
+                        "source": source,
+                        "deleted": deleted,
+                        "ignored": ignored}
         if 'post_session_survey' in session:
             survey = PostSurvey(event_date=session['post_session_survey']['event_date'],
                                 survey=session['post_session_survey'])
@@ -47,6 +69,7 @@ class SurveyProcessing(object):
                                                   event_date,
                                                   survey.soreness)
             session_data['post_session_survey'] = survey
+            session_data['created_date'] = survey.event_date
 
 
         if return_dict:
@@ -107,3 +130,72 @@ class SurveyProcessing(object):
                                            question_response_date=plan_event_date,
                                            severity_value=severity,
                                            current_status=HistoricSorenessStatus[status])
+
+    @xray_recorder.capture('logic.survey_processing.historic_workout_data')
+    def process_historic_health_data(self, user_id, sessions, plans, event_date):
+        days_with_plan = [plan.event_date for plan in plans]
+        all_session_heart_rates = []
+        for session in sessions:
+            session_event_date = parse_datetime(session['event_date'])
+            plan_date = format_date(session_event_date)
+            if plan_date in days_with_plan:
+                daily_plan = [plan for plan in plans if plan.event_date == plan_date][0]
+            else:
+                daily_plan = DailyPlan(event_date=plan_date)
+                daily_plan.user_id = user_id
+                plans.append(daily_plan)
+
+            stored_health_sessions = [session.event_date for session in daily_plan.training_sessions if session.source == SessionSource.health]
+            if parse_datetime(session['event_date']) not in stored_health_sessions:
+                session_obj = self.create_session_from_survey(session)
+                daily_plan.training_sessions.append(session_obj)
+                daily_plan.last_updated = event_date
+                if 'hr_data' in session and len(session['hr_data']) > 0:
+                    session_heart_rate = SessionHeartRate(user_id=user_id,
+                                                          session_id=session_obj.id,
+                                                          event_date=session_obj.event_date)
+                    session_heart_rate.hr_workout = [HeartRateData(self.cleanup_hr_data_from_api(hr)) for hr in session['hr_data']]
+                    all_session_heart_rates.append(session_heart_rate)
+
+        plans = [plan for plan in plans if plan.last_updated == event_date]
+        return plans, all_session_heart_rates
+
+    # @xray_recorder.capture('logic.survey_processing.historic_sleep_data')
+    def process_historic_sleep_data(self, user_id, sleep_data):
+        sleep_events = [SleepEvent(self.cleanup_sleep_data_from_api(sd)) for sd in sleep_data]
+        # sleep_events = sorted(sleep_events, key=lambda k: k.start_date)
+        days_with_sleep_data = set([se.event_date for se in sleep_events])
+        all_sleep_history = []
+        for sleep_date in days_with_sleep_data:
+            daily_sleep_data = DailySleepData(user_id=user_id,
+                                              event_date=sleep_date)
+            daily_sleep_data.sleep_events = [se for se in sleep_events if se.event_date == sleep_date]
+            all_sleep_history.append(daily_sleep_data)
+        return all_sleep_history
+
+
+    # @xray_recorder.capture('logic.survey_processing.cleanup_hr_data')
+    def cleanup_hr_data_from_api(self, hr_data):
+        start_date = hr_data['startDate']
+        if len(start_date.split('.')) == 2:
+            start_date = start_date.split(".")[0] + 'Z'
+        end_date = hr_data['endDate']
+        if len(end_date.split('.')) == 2:
+            end_date = end_date.split(".")[0] + 'Z'
+        return {'start_date': start_date,
+                'end_date': end_date,
+                'value': hr_data['value']
+                }
+
+    # @xray_recorder.capture('logic.survey_processing.cleanup_sleep_data')
+    def cleanup_sleep_data_from_api(self, sleep_data):
+        start_date = sleep_data['startDate']
+        if len(start_date.split('.')) == 2:
+            start_date = start_date.split(".")[0] + 'Z'
+        end_date = sleep_data['endDate']
+        if len(end_date.split('.')) == 2:
+            end_date = end_date.split(".")[0] + 'Z'
+        return {'start_date': start_date,
+                'end_date': end_date,
+                'sleep_type': sleep_data['value']
+                }

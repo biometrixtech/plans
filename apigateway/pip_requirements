@@ -1,5 +1,5 @@
 # Execute this with
 #     pip install -r ./pip_requirements -t .
-git+ssh://git@github.com/biometrixtech/fathomapi.git@0.15.2
+git+ssh://git@github.com/biometrixtech/fathomapi.git@0.17.0
 pymongo==3.4.0
 pyjwt==1.5.3

@@ -5,7 +5,7 @@ import datetime
 from serialisable import Serialisable
 from utils import format_datetime, parse_datetime
 from models.soreness import HistoricSorenessStatus
-from models.sport import SportName, NoSportPosition, BaseballPosition, BasketballPosition, FootballPosition, LacrossePosition, SoccerPosition, SoftballPosition, TrackAndFieldPosition, FieldHockeyPosition
+from models.sport import SportName, BaseballPosition, BasketballPosition, FootballPosition, LacrossePosition, SoccerPosition, SoftballPosition, TrackAndFieldPosition, FieldHockeyPosition, VolleyballPosition
 
 class SessionType(Enum):
     practice = 0
@@ -23,6 +23,33 @@ class StrengthConditioningType(Enum):
     speed_agility = 2
     strength = 3
     cross_training = 4
+    # elliptical = 5
+    # functional_strength_training = 6
+    # hiking = 7
+    # hunting = 8
+    # mind_and_body = 9
+    # play = 10
+    # preparation_and_recovery = 11
+    # stair_climbing = 12
+    # traditional_strength_training = 13
+    # walking = 14
+    # water_fitness = 15
+    # yoga = 16
+    # barre = 17
+    # core_training = 18
+    # flexibility = 19
+    # high_intensity_interval_training = 20
+    # jump_rope = 21
+    # pilates = 22
+    # stairs = 23
+    # step_training = 24
+    # wheelchair_walk_pace = 25
+    # wheelchair_run_pace = 26
+    # taichi = 27
+    # mixed_cardio = 28
+    # hand_cycling = 29
+    # climbing = 30
+    # other = 31
     none = None
 
 
@@ -35,6 +62,10 @@ class DayOfWeek(Enum):
     saturday = 5
     sunday = 6
 
+
+class SessionSource(Enum):
+    user = 0
+    health = 1
 
 class Session(Serialisable, metaclass=abc.ABCMeta):
 
@@ -57,7 +88,9 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         self.low_intensity_RPE = None
         self.post_session_soreness = []     # post_session_soreness object array
         self.duration_minutes = None
+        self.created_date = None
         self.event_date = None
+        self.end_date = None
         self.sensor_start_date_time = None
         self.sensor_end_date_time = None
         self.day_of_week = DayOfWeek.monday
@@ -68,6 +101,11 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         self.movement_limited = False
         self.same_muscle_discomfort_over_72_hrs = False
         self.deleted = False
+        self.ignored = False
+        self.duration_health = None
+        self.calories = None
+        self.distance = None
+        self.source = SessionSource.user
 
         # post-session
         self.post_session_survey = None
@@ -78,7 +116,7 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         self.description = ""
 
     def __setattr__(self, name, value):
-        if name in ['event_date', 'sensor_start_date_time', 'sensor_end_date_time']:
+        if name in ['event_date', 'end_date', 'created_date', 'sensor_start_date_time', 'sensor_end_date_time']:
             if not isinstance(value, datetime.datetime) and value is not None:
                 value = parse_datetime(value)
         elif name == "sport_name" and not isinstance(value, SportName):
@@ -91,6 +129,10 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
                 value = StrengthConditioningType(None)
             else:
                 value = StrengthConditioningType(value)
+        elif name in "source":
+            value = SessionSource(value) if value is not None else SessionSource.user
+        elif name == ["deleted", "ignored"]:
+            value = value if value is not None else False
         super().__setattr__(name, value)
 
     @abc.abstractmethod
@@ -118,7 +160,9 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
             'session_type': session_type.value,
             'sport_name': self.sport_name.value,
             'strength_and_conditioning_type': self.strength_and_conditioning_type.value,
+            'created_date': format_datetime(self.created_date),
             'event_date': format_datetime(self.event_date),
+            'end_date': format_datetime(self.end_date),
             'duration_minutes': self.duration_minutes,
             'data_transferred': self.data_transferred,
             'duration_sensor': self.duration_sensor,
@@ -134,7 +178,12 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
             'sensor_start_date_time': format_datetime(self.sensor_start_date_time),
             'sensor_end_date_time': format_datetime(self.sensor_end_date_time),
             'post_session_survey': self.post_session_survey.json_serialise() if self.post_session_survey is not None else self.post_session_survey,
-            'deleted': self.deleted
+            'deleted': self.deleted,
+            'ignored': self.ignored,
+            'duration_health': self.duration_health,
+            'calories': self.calories,
+            'distance': self.distance,
+            'source': self.source.value if self.source is not None else SessionSource.user.value
         }
         return ret
 
@@ -323,7 +372,7 @@ class FunctionalStrengthSession(Serialisable):
             value = SportName(value)
         elif name == "position":
             if self.sport_name == SportName.no_sport and value is not None:
-                value = NoSportPosition(value)
+                value = StrengthConditioningType(value)
             elif self.sport_name == SportName.soccer:
                 value = SoccerPosition(value)
             elif self.sport_name == SportName.basketball:
@@ -340,6 +389,8 @@ class FunctionalStrengthSession(Serialisable):
                 value = TrackAndFieldPosition(value)
             elif self.sport_name == SportName.field_hockey:
                 value = FieldHockeyPosition(value)
+            elif self.sport_name == SportName.volleyball:
+                value = VolleyballPosition(value)
         elif name in ['start_date', 'event_date']:
             if not isinstance(value, datetime.datetime) and value is not None:
                 value = parse_datetime(value)
