@@ -11,6 +11,8 @@ from models.sleep_data import DailySleepData, SleepEvent
 from logic.stats_processing import StatsProcessing
 from datastores.datastore_collection import DatastoreCollection
 
+# from fathomapi.utils.xray import xray_recorder
+
 class SurveyProcessing(object):
 
     def create_session_from_survey(self, session, return_dict=False, athlete_stats=None):
@@ -124,6 +126,7 @@ class SurveyProcessing(object):
                                            severity_value=severity,
                                            current_status=HistoricSorenessStatus[status])
 
+    # @xray_recorder.capture('logic.survey_processing.historic_workout_data')
     def process_historic_health_data(self, user_id, sessions, plans, event_date):
         days_with_plan = [plan.event_date for plan in plans]
         all_session_heart_rates = []
@@ -154,6 +157,7 @@ class SurveyProcessing(object):
         plans = [plan for plan in plans if plan.last_updated == event_date]
         return plans, all_session_heart_rates
 
+    # @xray_recorder.capture('logic.survey_processing.historic_sleep_data')
     def process_historic_sleep_data(self, user_id, sleep_data):
         sleep_events = [SleepEvent(self.cleanup_sleep_data_from_api(sd)) for sd in sleep_data]
         # sleep_events = sorted(sleep_events, key=lambda k: k.start_date)
@@ -167,6 +171,7 @@ class SurveyProcessing(object):
         return all_sleep_history
 
 
+    # @xray_recorder.capture('logic.survey_processing.cleanup_hr_data')
     def cleanup_hr_data_from_api(self, hr_data):
         start_date = hr_data['startDate']
         if len(start_date.split('.')) == 2:
@@ -179,6 +184,7 @@ class SurveyProcessing(object):
                 'value': hr_data['value']
                 }
 
+    # @xray_recorder.capture('logic.survey_processing.cleanup_sleep_data')
     def cleanup_sleep_data_from_api(self, sleep_data):
         start_date = sleep_data['startDate']
         if len(start_date.split('.')) == 2:
