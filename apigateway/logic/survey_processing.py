@@ -146,9 +146,13 @@ class SurveyProcessing(object):
                 plans.append(daily_plan)
                 days_with_plan.append(plan_date)
 
-            stored_health_sessions = [session.event_date for session in daily_plan.training_sessions if session.source == SessionSource.health]
-            if parse_datetime(session['event_date']) not in stored_health_sessions:
+            stored_health_sessions = [session.event_date for session in daily_plan.training_sessions if session.source in [SessionSource.health, SessionSource.combined]]
+            user_sessions = [session for session in daily_plan.training_sessions if session.source == SessionSource.user]
+            session_event_date = session['event_date']
+            if session_event_date not in stored_health_sessions:
                 session_obj = self.create_session_from_survey(session)
+                if len(user_sessions) > 0:
+                    session_obj = self.match_sessions(user_sessions, session_obj)
                 daily_plan.training_sessions.append(session_obj)
                 daily_plan.last_updated = event_date
                 if 'hr_data' in session and len(session['hr_data']) > 0:
@@ -200,3 +204,19 @@ class SurveyProcessing(object):
                 'end_date': end_date,
                 'sleep_type': sleep_data['value']
                 }
+
+    def match_sessions(self, user_sessions, health_session):
+        for user_session in user_sessions:
+            if user_session.sport_name  == health_session.sport_name:
+                if user_session.created_date is None:
+                    if user_session.post_session_survey is not None:
+                        user_session.created_date = user_session.post_session_survey.event_date
+                if user_session.created_date is not None and 0 < (user_session.created_date - health_session.end_date).seconds / 60. < 120:
+                    user_session.event_date = health_session.event_date
+                    user_session.end_date = health_session.end_date
+                    user_session.duration_health = health_session.duration_health
+                    user_session.calories = health_session.calories
+                    user_session.distance = health_session.distance
+                    user_session.source = SessionSource.combined
+                    return user_session
+        return health_session
