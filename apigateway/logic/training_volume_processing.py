@@ -864,7 +864,16 @@ class TrainingVolumeProcessing(object):
 
         return training_volume_gap
 
-    def get_training_report(self, user_id, acute_start_date_time, chronic_start_date_time, daily_plans, historical_internal_strain,end_date_time, avg_workouts_week=5):
+    def get_training_report(self, athlete_stats, new_stats_processing, avg_workouts_week=5):
+
+        user_id = athlete_stats.athlete_id
+        historical_internal_strain = athlete_stats.historical_internal_strain
+        acute_days = new_stats_processing.acute_days
+        chronic_days = new_stats_processing.chronic_days
+        acute_start_date_time = new_stats_processing.acute_start_date_time
+        chronic_start_date_time = new_stats_processing.chronic_start_date_time
+        end_date_time = new_stats_processing.end_date_time
+        daily_plans = new_stats_processing.daily_internal_plans
 
         report = TrainingReport(user_id=user_id)
 
@@ -880,97 +889,78 @@ class TrainingVolumeProcessing(object):
 
             chronic_values = []
             chronic_values_high = []
-            chronic_1_values = []
-            chronic_2_values = []
-            chronic_3_values = []
-            chronic_4_values = []
+            #chronic_1_values = []
+            #chronic_2_values = []
+            #chronic_3_values = []
+            #chronic_4_values = []
 
-            new_acute_start_date_time = acute_start_date_time + timedelta(days=1) + timedelta(days=index)
-            new_chronic_start_date_time = chronic_start_date_time + timedelta(days=1) + timedelta(days=index)
+            #new_acute_start_date_time = acute_start_date_time + timedelta(days=1) + timedelta(days=index)
+            #new_chronic_start_date_time = chronic_start_date_time + timedelta(days=1) + timedelta(days=index)
 
-            new_acute_daily_plans = sorted([p for p in daily_plans if p[0] >= new_acute_start_date_time],
-                                           key=lambda x: x[0])
+            acute_values = new_stats_processing.get_acute_internal_values()
+            chronic_values_by_week = new_stats_processing.get_chronic_daily_values_by_week()
 
-            acute_values = list(x[1] for x in new_acute_daily_plans if x[1] is not None)
+            #new_chronic_daily_plans = sorted([p for p in daily_plans if new_acute_start_date_time > p[0] >=
+            #                                  new_chronic_start_date_time], key=lambda x: x[0])
 
-            new_chronic_daily_plans = sorted([p for p in daily_plans if new_acute_start_date_time > p[0] >=
-                                              new_chronic_start_date_time], key=lambda x: x[0])
+            #week4_sessions = [d for d in new_chronic_daily_plans if new_acute_start_date_time - timedelta(days=28)
+            #                  <= d[0] < new_acute_start_date_time - timedelta(days=21)]
 
-            #if 21 <=chronic_days <= 28:
-            week4_sessions = [d for d in new_chronic_daily_plans if new_acute_start_date_time - timedelta(days=28)
-                              <= d[0] < new_acute_start_date_time - timedelta(days=21)]
+            #chronic_4_values.extend(x[1] for x in week4_sessions if x[1] is not None)
 
-            chronic_4_values.extend(x[1] for x in week4_sessions if x[1] is not None)
-
-            se_range_chronic_4 = self.get_standard_error_range(avg_workouts_week, chronic_4_values)
+            se_range_chronic_4 = self.get_standard_error_range(avg_workouts_week, chronic_values_by_week[3])
             if not se_range_chronic_4.insufficient_data and se_range_chronic_4.upper_bound is not None:
-                chronic_values_high.append(se_range_chronic_4.upper_bound*len(chronic_4_values))
+                chronic_values_high.append(se_range_chronic_4.upper_bound*len(chronic_values_by_week[3]))
             if se_range_chronic_4.observed_value is not None:
                 chronic_values.append(se_range_chronic_4.observed_value)
 
-            #if 14 <= chronic_days <= 28:
-            week3_sessions = [d for d in new_chronic_daily_plans if new_acute_start_date_time - timedelta(days=21)
-                              <= d[0] < new_acute_start_date_time - timedelta(days=14)]
+            #week3_sessions = [d for d in new_chronic_daily_plans if new_acute_start_date_time - timedelta(days=21)
+            #                  <= d[0] < new_acute_start_date_time - timedelta(days=14)]
 
-            chronic_3_values.extend(x[1] for x in week3_sessions if x[1] is not None)
-            if len(chronic_3_values) > 0 or len(chronic_3_values) >= avg_workouts_week:
-                chronic_values.append(sum(chronic_3_values))
+            #chronic_3_values.extend(x[1] for x in week3_sessions if x[1] is not None)
+            se_range_chronic_3 = self.get_standard_error_range(avg_workouts_week, chronic_values_by_week[2])
+            if se_range_chronic_3.observed_value is not None:
+                chronic_values.append(se_range_chronic_3.observed_value)
             else:
                 if len(chronic_values) > 0:
                     chronic_values.append(0)
-            if len(chronic_3_values) > 1 and len(chronic_3_values) < avg_workouts_week:
-                average_load = statistics.mean(chronic_3_values)
-                stdev_load = statistics.stdev(chronic_3_values)
-                standard_error = (stdev_load / math.sqrt(len(chronic_3_values))) * math.sqrt(
-                    (avg_workouts_week - len(chronic_3_values)) / avg_workouts_week) # includes finite population correction
-                standard_error_range_factor = 1.96 * standard_error
-                chronic_values_high.append((average_load + standard_error_range_factor)*len(chronic_3_values))
+            if not se_range_chronic_3.insufficient_data and se_range_chronic_3.upper_bound is not None:
+                chronic_values_high.append(se_range_chronic_3.upper_bound*len(chronic_values_by_week[2]))
             else:
-                if len(chronic_values) > 0:
-                    chronic_values_high.append(0)
-                    # not sure what to do with low/high here
-
-            #if 7 <= chronic_days <= 28:
-            week2_sessions = [d for d in new_chronic_daily_plans if new_acute_start_date_time - timedelta(days=14)
-                              <= d[0] < new_acute_start_date_time - timedelta(days=7)]
-
-            chronic_2_values.extend(x[1] for x in week2_sessions if x[1] is not None)
-            if len(chronic_2_values) > 0  or len(chronic_2_values) >= avg_workouts_week:
-                chronic_values.append(sum(chronic_2_values))
-            else:
-                if len(chronic_values) > 0:
-                    chronic_values.append(0)
-            if len(chronic_2_values) > 1 and len(chronic_2_values) < avg_workouts_week:
-                average_load = statistics.mean(chronic_2_values)
-                stdev_load = statistics.stdev(chronic_2_values)
-                standard_error = (stdev_load / math.sqrt(len(chronic_2_values))) * math.sqrt(
-                    (avg_workouts_week - len(chronic_2_values)) / avg_workouts_week) # includes finite population correction
-                standard_error_range_factor = 1.96 * standard_error
-                chronic_values_high.append((average_load + standard_error_range_factor)*len(chronic_2_values))
-            else:
-                if len(chronic_values) > 0:
+                if len(chronic_values_high) > 0:
                     chronic_values_high.append(0)
 
-            #if 7 <= chronic_days <= 28:
-            week1_sessions = [d for d in new_chronic_daily_plans if new_acute_start_date_time - timedelta(days=7)
-                              <= d[0] < new_acute_start_date_time]
+            #week2_sessions = [d for d in new_chronic_daily_plans if new_acute_start_date_time - timedelta(days=14)
+            #                  <= d[0] < new_acute_start_date_time - timedelta(days=7)]
 
-            chronic_1_values.extend(x[1] for x in week1_sessions if x[1] is not None)
-
-            if len(chronic_1_values) > 0 or len(chronic_1_values) >= avg_workouts_week:
-                chronic_values.append(sum(chronic_1_values))
+            #chronic_2_values.extend(x[1] for x in week2_sessions if x[1] is not None)
+            se_range_chronic_2 = self.get_standard_error_range(avg_workouts_week, chronic_values_by_week[1])
+            if se_range_chronic_2.observed_value is not None:
+                chronic_values.append(se_range_chronic_2.observed_value)
             else:
                 if len(chronic_values) > 0:
                     chronic_values.append(0)
-            if len(chronic_1_values) > 1 and len(chronic_1_values) < avg_workouts_week:
-                average_load = statistics.mean(chronic_1_values)
-                stdev_load = statistics.stdev(chronic_1_values)
-                standard_error = (stdev_load / math.sqrt(len(chronic_1_values))) * math.sqrt(
-                    (avg_workouts_week - len(chronic_1_values)) / avg_workouts_week) # includes finite population correction
-                standard_error_range_factor = 1.96 * standard_error
-                chronic_values_high.append((average_load + standard_error_range_factor)*len(chronic_1_values))
+            if not se_range_chronic_2.insufficient_data and se_range_chronic_2.upper_bound is not None:
+                chronic_values_high.append(se_range_chronic_2.upper_bound*len(chronic_values_by_week[1]))
+            else:
+                if len(chronic_values_high) > 0:
+                    chronic_values_high.append(0)
+
+            #week1_sessions = [d for d in new_chronic_daily_plans if new_acute_start_date_time - timedelta(days=7)
+            #                  <= d[0] < new_acute_start_date_time]
+
+            #chronic_1_values.extend(x[1] for x in week1_sessions if x[1] is not None)
+
+            se_range_chronic_1 = self.get_standard_error_range(avg_workouts_week, chronic_values_by_week[0])
+            if se_range_chronic_1.observed_value is not None:
+                chronic_values.append(se_range_chronic_1.observed_value)
             else:
                 if len(chronic_values) > 0:
+                    chronic_values.append(0)
+            if not se_range_chronic_1.insufficient_data and se_range_chronic_1.upper_bound is not None:
+                chronic_values_high.append(se_range_chronic_1.upper_bound*len(chronic_values_by_week[0]))
+            else:
+                if len(chronic_values_high) > 0:
                     chronic_values_high.append(0)
 
             last_6_internal_load_values = []
