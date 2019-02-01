@@ -144,6 +144,7 @@ class SurveyProcessing(object):
                 daily_plan = DailyPlan(event_date=plan_date)
                 daily_plan.user_id = user_id
                 plans.append(daily_plan)
+                days_with_plan.append(plan_date)
 
             stored_health_sessions = [session.event_date for session in daily_plan.training_sessions if session.source == SessionSource.health]
             if parse_datetime(session['event_date']) not in stored_health_sessions:

@@ -116,6 +116,7 @@ def _external_session_from_mongodb(mongo_result, session_type):
     attrs_from_mongo = ["description",
                         "sport_name",
                         "strength_and_conditioning_type",
+                        "created_date",
                         "event_date",
                         "end_date",
                         "duration_minutes",
