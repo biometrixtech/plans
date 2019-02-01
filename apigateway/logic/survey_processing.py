@@ -211,7 +211,7 @@ class SurveyProcessing(object):
                 if user_session.created_date is None:
                     if user_session.post_session_survey is not None:
                         user_session.created_date = user_session.post_session_survey.event_date
-                if user_session.created_date is not None and (user_session.created_date - health_session.end_date).seconds / 60. < 120:
+                if user_session.created_date is not None and 0 < (user_session.created_date - health_session.end_date).seconds / 60. < 120:
                     user_session.event_date = health_session.event_date
                     user_session.end_date = health_session.end_date
                     user_session.duration_health = health_session.duration_health
