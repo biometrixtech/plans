@@ -35,9 +35,6 @@ class StandardErrorRange(Serialisable):
         self.upper_bound = upper_bound
         self.observed_value = observed_value
         self.insufficient_data = False
-        self.lower_bound_gap = None
-        self.upper_bound_gap = None
-        self.observed_value_gap = None
 
     def json_serialise(self):
         ret = {
@@ -48,6 +45,21 @@ class StandardErrorRange(Serialisable):
         }
         return ret
 
+
+class StandardErrorRangeMetric(StandardErrorRange):
+    def __init__(self, lower_bound=None, upper_bound=None, observed_value=None):
+        StandardErrorRange.__init__(self, lower_bound, upper_bound, observed_value)
+        self.training_volume_gaps = []
+
+    def json_serialise(self):
+        ret = {
+            'lower_bound': self.lower_bound,
+            'upper_bound': self.upper_bound,
+            'observed_value': self.observed_value,
+            'insufficient_data': self.insufficient_data,
+            'training_volume_gaps': [x.json_serialise() for x in self.training_volume_gaps]
+        }
+        return ret
 
 class TrainingVolumeGap(object):
     def __init__(self, low_optimal_threshold=None, low_overreaching_threshold=None, low_excessive_threshold=None, gap_type=None):
@@ -66,11 +78,11 @@ class TrainingVolumeGap(object):
         #self.internal_ramp = None
         #self.internal_monotony_index = None
         #self.internal_strain = None
-        self.training_level = None
+        #self.training_level = None
         #self.performance_focused = False
         #self.competition_focused = False
         #self.need_for_variability = None
-        self.historic_soreness = []
+        #self.historic_soreness = []
 
 
 class SuggestedTrainingDay(object):

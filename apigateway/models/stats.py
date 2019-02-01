@@ -48,6 +48,7 @@ class AthleteStats(Serialisable):
         self.internal_freshness_index = None
         self.external_freshness_index = None
         self.historical_internal_strain = []
+        self.historical_external_strain = []
         self.functional_strength_eligible = False
         self.next_functional_strength_eligible_date = None
         self.completed_functional_strength_sessions = 0

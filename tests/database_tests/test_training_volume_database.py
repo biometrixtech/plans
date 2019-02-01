@@ -126,22 +126,44 @@ def test_get_training_plan_from_database():
 
         stats = StatsProcessing(user_id, run_date, datastore_collection)
         success = stats.set_start_end_times()
-        stats.load_historical_data()
+        stats.all_plans = stats.daily_plan_datastore.get(stats.athlete_id, stats.start_date, stats.end_date)
+        stats.set_acute_chronic_periods()
+        stats.load_historical_plans()
         athlete_stats = AthleteStats(user_id)
         athlete_stats.historic_soreness = ath_stats.historic_soreness
         training_volume_processing = TrainingVolumeProcessing(stats.start_date, stats.end_date)
-        athlete_stats = training_volume_processing.calc_training_volume_metrics(athlete_stats, stats.last_7_days_plans,
-                                                                                stats.days_8_14_plans,
-                                                                                stats.acute_daily_plans,
-                                                                                stats.get_chronic_weeks_plans(),
-                                                                                stats.chronic_daily_plans)
-
         all_plans = []
         all_plans.extend(stats.acute_daily_plans)
         all_plans.extend(stats.chronic_daily_plans)
 
         historical_internal_strain = training_volume_processing.get_historical_internal_strain(start_date, end_date, all_plans)
+        athlete_stats.historical_internal_strain = historical_internal_strain
+        training_volume_processing.load_plan_values(stats.last_7_days_plans,
+                                                    stats.days_8_14_plans,
+                                                    stats.acute_daily_plans,
+                                                    stats.get_chronic_weeks_plans(),
+                                                    stats.chronic_daily_plans)
+        athlete_stats = training_volume_processing.calc_training_volume_metrics(athlete_stats)
 
+        # now let's do next day
+        stats.increment_start_end_times(1)
+        stats.set_acute_chronic_periods()
+        stats.load_historical_plans()
+        new_athlete_stats = AthleteStats(user_id)
+        new_athlete_stats.historic_soreness = ath_stats.historic_soreness
+        training_volume_processing = TrainingVolumeProcessing(stats.start_date, stats.end_date)
+
+        historical_internal_strain = training_volume_processing.get_historical_internal_strain(start_date, end_date,
+                                                                                               stats.all_plans)
+        new_athlete_stats.historical_internal_strain = historical_internal_strain
+        training_volume_processing.load_plan_values(stats.last_7_days_plans,
+                                                    stats.days_8_14_plans,
+                                                    stats.acute_daily_plans,
+                                                    stats.get_chronic_weeks_plans(),
+                                                    stats.chronic_daily_plans)
+        new_athlete_stats = training_volume_processing.calc_training_volume_metrics(new_athlete_stats)
+
+        '''deprecated
         daily_plans = []
         daily_plans.extend(list(x for x in TrainingVolumeProcessing(
                                     stats.start_date,
@@ -164,7 +186,7 @@ def test_get_training_plan_from_database():
                                                                 stats.end_date_time)
         #report = training_volume_processing.calc_report_stats(stats.acute_daily_plans, stats.acute_start_date_time,
         #                                                      athlete_stats, stats.chronic_daily_plans, report)
-
+        '''
         '''deprecated
         if report.high_threshold > 0:
             okay_list.append(user_id)

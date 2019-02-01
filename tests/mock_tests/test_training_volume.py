@@ -120,15 +120,23 @@ def test_strain_works():
     datastore_collection.post_session_survey_datastore = post_session_datastore
 
     stats = StatsProcessing("tester", "2018-08-13", datastore_collection)
-    success = stats.set_start_end_times()
-    stats.load_historical_data()
-    athlete_stats = AthleteStats("tester")
+    stats.set_start_end_times()
+    stats.set_acute_chronic_periods()
+    stats.all_plans = plans_28_days
+    stats.update_start_times(surveys, [], stats.all_plans)
+    stats.set_acute_chronic_periods()
+    #stats.load_historical_readiness_surveys(surveys)
+    #stats.load_historical_post_session_surveys([])
+    stats.load_historical_plans()
+    athlete_stats = AthleteStats("Tester")
     training_volume_processing = TrainingVolumeProcessing(stats.start_date, stats.end_date)
-    athlete_stats = training_volume_processing.calc_training_volume_metrics(athlete_stats, stats.last_7_days_plans,
-                                                                            stats.days_8_14_plans,
-                                                                            stats.acute_daily_plans,
-                                                                            stats.get_chronic_weeks_plans(),
-                                                                            stats.chronic_daily_plans)
+    training_volume_processing.load_plan_values(stats.last_7_days_plans,
+                                                stats.days_8_14_plans,
+                                                stats.acute_daily_plans,
+                                                stats.get_chronic_weeks_plans(),
+                                                stats.chronic_daily_plans)
+    athlete_stats = training_volume_processing.calc_training_volume_metrics(athlete_stats)
+    '''deprecated
     daily_plans = []
     daily_plans.extend(list(x for x in
                             training_volume_processing.get_session_attributes_product_sum_tuple_list("session_RPE",
@@ -148,11 +156,12 @@ def test_strain_works():
     historical_internal_strain = training_volume_processing.get_historical_internal_strain("2018-07-10", "2018-08-06",
                                                                                            all_plans)
 
+
     report = training_volume_processing.get_training_report(athlete_stats.athlete_id,
                                                             stats.acute_start_date_time,
                                                             stats.chronic_start_date_time,
                                                             daily_plans,
                                                             historical_internal_strain,
                                                             stats.end_date_time)
-
-    assert report is not None
+    '''
+    assert len(athlete_stats.historical_internal_strain) == 29

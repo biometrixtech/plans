@@ -1,4 +1,4 @@
-from models.training_volume import IndicatorLevel, StandardErrorRange, SuggestedTrainingDay, TrainingLevel, TrainingVolumeGap, TrainingVolumeGapType, TrainingReport
+from models.training_volume import IndicatorLevel, StandardErrorRange, StandardErrorRangeMetric, SuggestedTrainingDay, TrainingLevel, TrainingVolumeGap, TrainingVolumeGapType, TrainingReport
 from models.soreness import HistoricSorenessStatus
 from datetime import datetime, timedelta
 import statistics, math
@@ -9,118 +9,134 @@ class TrainingVolumeProcessing(object):
     def __init__(self, start_date, end_date):
         self.start_date = start_date
         self.end_date = end_date
+        self.a_internal_load_values = []
+        self.a_external_load_values = []
+        self.a_high_intensity_values = []
+        self.a_mod_intensity_values = []
+        self.a_low_intensity_values = []
 
-    def calc_training_volume_metrics(self, athlete_stats, last_7_days_plans, days_8_14_plans, acute_daily_plans, chronic_weeks_plans, chronic_daily_plans):
+        self.c_internal_load_values = []
+        self.c_external_load_values = []
+        self.c_high_intensity_values = []
+        self.c_mod_intensity_values = []
+        self.c_low_intensity_values = []
 
-        a_internal_load_values = []
-        a_external_load_values = []
-        a_high_intensity_values = []
-        a_mod_intensity_values = []
-        a_low_intensity_values = []
+        self.last_week_external_values = []
+        self.previous_week_external_values = []
+        self.last_week_internal_values = []
+        self.previous_week_internal_values = []
 
-        c_internal_load_values = []
-        c_external_load_values = []
-        c_high_intensity_values = []
-        c_mod_intensity_values = []
-        c_low_intensity_values = []
+        self.internal_load_tuples = []
+        self.external_load_tuples = []
 
-        last_week_external_values = []
-        previous_week_external_values = []
-        last_week_internal_values = []
-        previous_week_internal_values = []
+    def load_plan_values(self, last_7_days_plans, days_8_14_plans, acute_daily_plans, chronic_weeks_plans, chronic_daily_plans):
 
-        last_week_external_values.extend(
+        self.last_week_external_values.extend(
             x for x in self.get_plan_session_attribute_sum_list("external_load", last_7_days_plans) if x is not None)
 
-        last_week_internal_values.extend(
+        self.last_week_internal_values.extend(
             x for x in self.get_session_attributes_product_sum_list("session_RPE", "duration_minutes",
-                                                               last_7_days_plans) if x is not None)
-        previous_week_external_values.extend(
+                                                                    last_7_days_plans) if x is not None)
+        self.previous_week_external_values.extend(
             x for x in self.get_plan_session_attribute_sum_list("external_load", days_8_14_plans) if x is not None)
 
-        previous_week_internal_values.extend(
+        self.previous_week_internal_values.extend(
             x for x in self.get_session_attributes_product_sum_list("session_RPE", "duration_minutes",
-                                                               days_8_14_plans) if x is not None)
+                                                                    days_8_14_plans) if x is not None)
 
-        a_external_load_values.extend(
+        self.a_external_load_values.extend(
             x for x in self.get_plan_session_attribute_sum("external_load", acute_daily_plans) if x is not None)
 
-
-        a_internal_load_values.extend(
+        self.a_internal_load_values.extend(
             x for x in self.get_session_attributes_product_sum("session_RPE", "duration_minutes",
                                                                acute_daily_plans) if x is not None)
 
-        a_external_load_values.extend(
+        self.a_external_load_values.extend(
             x for x in self.get_plan_session_attribute_sum("external_load", acute_daily_plans) if x is not None)
 
-        a_high_intensity_values.extend(
+        self.a_high_intensity_values.extend(
             x for x in self.get_plan_session_attribute_sum("high_intensity_load", acute_daily_plans) if
             x is not None)
 
-        a_mod_intensity_values.extend(
+        self.a_mod_intensity_values.extend(
             x for x in self.get_plan_session_attribute_sum("mod_intensity_load", acute_daily_plans) if
             x is not None)
 
-        a_low_intensity_values.extend(
+        self.a_low_intensity_values.extend(
             x for x in self.get_plan_session_attribute_sum("low_intensity_load", acute_daily_plans) if
             x is not None)
 
         for w in chronic_weeks_plans:
-
-            c_internal_load_values.extend(
+            self.c_internal_load_values.extend(
                 x for x in self.get_session_attributes_product_sum("session_RPE", "duration_minutes", w)
                 if x is not None)
 
-            c_external_load_values.extend(x for x in self.get_plan_session_attribute_sum("external_load", w) if x is not None)
+            self.c_external_load_values.extend(
+                x for x in self.get_plan_session_attribute_sum("external_load", w) if x is not None)
 
-            c_high_intensity_values.extend(x for x in self.get_plan_session_attribute_sum("high_intensity_load", w)
+            self.c_high_intensity_values.extend(x for x in self.get_plan_session_attribute_sum("high_intensity_load", w)
                                            if x is not None)
 
-            c_mod_intensity_values.extend(x for x in self.get_plan_session_attribute_sum("mod_intensity_load", w)
+            self.c_mod_intensity_values.extend(x for x in self.get_plan_session_attribute_sum("mod_intensity_load", w)
                                           if x is not None)
 
-            c_low_intensity_values.extend(x for x in self.get_plan_session_attribute_sum("low_intensity_load", w)
+            self.c_low_intensity_values.extend(x for x in self.get_plan_session_attribute_sum("low_intensity_load", w)
                                           if x is not None)
+
+        self.internal_load_tuples.extend(list(x for x in self.get_session_attributes_product_sum_tuple_list("session_RPE",
+                                                                                                 "duration_minutes",
+                                                                                                acute_daily_plans)
+                                if x is not None))
+        self.internal_load_tuples.extend(list(x for x in self.get_session_attributes_product_sum_tuple_list("session_RPE",
+                                                                                                 "duration_minutes",
+                                                                                                 chronic_daily_plans)
+                                if x is not None))
+
+
+    def calc_training_volume_metrics(self, athlete_stats):
 
         athlete_stats.external_ramp = self.get_ramp(athlete_stats.expected_weekly_workouts,
-                                                    last_week_external_values, previous_week_external_values)
+                                                    self.last_week_external_values, self.previous_week_external_values)
 
         athlete_stats.internal_ramp = self.get_ramp(athlete_stats.expected_weekly_workouts,
-                                                    last_week_internal_values, previous_week_internal_values)
+                                                    self.last_week_internal_values, self.previous_week_internal_values)
 
         athlete_stats.external_monotony = self.get_monotony(athlete_stats.expected_weekly_workouts,
-                                                            last_week_external_values)
+                                                            self.last_week_external_values)
 
         athlete_stats.external_strain = self.get_strain(athlete_stats.expected_weekly_workouts,
-                                                        athlete_stats.external_monotony, last_week_external_values)
+                                                        athlete_stats.external_monotony, self.last_week_external_values, athlete_stats.historical_external_strain)
 
         athlete_stats.internal_monotony = self.get_monotony(athlete_stats.expected_weekly_workouts,
-                                                            last_week_internal_values)
+                                                            self.last_week_internal_values)
+
+        historical_internal_strain = self.get_historical_internal_strain(self.start_date, self.end_date)
 
         athlete_stats.internal_strain = self.get_strain(athlete_stats.expected_weekly_workouts,
-                                                        athlete_stats.internal_monotony, last_week_internal_values)
+                                                        athlete_stats.internal_monotony, self.last_week_internal_values,
+                                                        historical_internal_strain)
 
         athlete_stats.acute_internal_total_load = self.get_standard_error_range(athlete_stats.expected_weekly_workouts,
-                                                                                a_internal_load_values)
+                                                                                self.a_internal_load_values)
         athlete_stats.acute_external_total_load = self.get_standard_error_range(athlete_stats.expected_weekly_workouts,
-                                                                                a_external_load_values)
+                                                                                self.a_external_load_values)
         athlete_stats.acute_external_high_intensity_load = self.get_standard_error_range(
-            athlete_stats.expected_weekly_workouts, a_high_intensity_values)
+            athlete_stats.expected_weekly_workouts, self.a_high_intensity_values)
         athlete_stats.acute_external_mod_intensity_load = self.get_standard_error_range(
-            athlete_stats.expected_weekly_workouts, a_mod_intensity_values)
+            athlete_stats.expected_weekly_workouts, self.a_mod_intensity_values)
         athlete_stats.acute_external_low_intensity_load = self.get_standard_error_range(
-            athlete_stats.expected_weekly_workouts, a_low_intensity_values)
+            athlete_stats.expected_weekly_workouts, self.a_low_intensity_values)
 
         athlete_stats.chronic_internal_total_load = self.get_standard_error_range(
-            athlete_stats.expected_weekly_workouts, c_internal_load_values)
+            athlete_stats.expected_weekly_workouts, self.c_internal_load_values)
         athlete_stats.chronic_external_total_load = self.get_standard_error_range(
-            athlete_stats.expected_weekly_workouts, c_external_load_values)
+            athlete_stats.expected_weekly_workouts, self.c_external_load_values)
         athlete_stats.chronic_external_high_intensity_load = self.get_standard_error_range(
-            athlete_stats.expected_weekly_workouts, c_high_intensity_values)
+            athlete_stats.expected_weekly_workouts, self.c_high_intensity_values)
         athlete_stats.chronic_external_mod_intensity_load = self.get_standard_error_range(
-            athlete_stats.expected_weekly_workouts, c_mod_intensity_values)
+            athlete_stats.expected_weekly_workouts, self.c_mod_intensity_values)
         athlete_stats.chronic_external_low_intensity_load = self.get_standard_error_range(
-            athlete_stats.expected_weekly_workouts, c_low_intensity_values)
+            athlete_stats.expected_weekly_workouts, self.c_low_intensity_values)
 
         athlete_stats.external_acwr = self.get_acwr(athlete_stats.acute_external_total_load,
                                                     athlete_stats.chronic_external_total_load)
@@ -136,19 +152,13 @@ class TrainingVolumeProcessing(object):
             athlete_stats.acute_external_total_load,
             athlete_stats.chronic_external_total_load)
 
-        all_plans = []
-        all_plans.extend(chronic_daily_plans)
-        all_plans.extend(acute_daily_plans)
-
-        athlete_stats.historical_internal_strain = self.get_historical_internal_strain(self.start_date,
-                                                                                       self.end_date,
-                                                                                       all_plans)
+        athlete_stats.historical_internal_strain = historical_internal_strain
 
         return athlete_stats
 
     def get_acwr(self, acute_load_error, chronic_load_error):
 
-        standard_error_range = StandardErrorRange()
+        standard_error_range = StandardErrorRangeMetric()
 
         if acute_load_error.insufficient_data or chronic_load_error.insufficient_data:
             standard_error_range.insufficient_data = True
@@ -188,20 +198,24 @@ class TrainingVolumeProcessing(object):
         acwr_gaps.append(self.get_acwr_gap(acute_load_error.lower_bound, chronic_load_error.observed_value))
         acwr_gaps.append(self.get_acwr_gap(acute_load_error.lower_bound, chronic_load_error.upper_bound))
         acwr_gaps.append(self.get_acwr_gap(acute_load_error.observed_value, chronic_load_error.lower_bound))
+        acwr_gaps.append(self.get_acwr_gap(acute_load_error.observed_value, chronic_load_error.observed_value))
         acwr_gaps.append(self.get_acwr_gap(acute_load_error.observed_value, chronic_load_error.upper_bound))
         acwr_gaps.append(self.get_acwr_gap(acute_load_error.upper_bound, chronic_load_error.lower_bound))
         acwr_gaps.append(self.get_acwr_gap(acute_load_error.upper_bound, chronic_load_error.observed_value))
         acwr_gaps.append(self.get_acwr_gap(acute_load_error.upper_bound, chronic_load_error.upper_bound))
 
-        standard_error_range.lower_bound_gap = self.get_lower_training_volume_gap(TrainingVolumeGapType.acwr, acwr_gaps)
+        gap = self.get_lower_training_volume_gap(TrainingVolumeGapType.acwr, list(a for a in acwr_gaps if a is not None))
 
-        standard_error_range.observed_value_gap = self.get_acwr_gap(acute_load_error.observed_value, chronic_load_error.observed_value)
-        standard_error_range.upper_bound_gap = self.get_upper_training_volume_gap(TrainingVolumeGapType.acwr, acwr_gaps)
-
+        if gap is not None:
+            standard_error_range.training_volume_gaps.append(gap)
 
         return standard_error_range
 
     def get_lower_training_volume_gap(self, gap_type, gaps):
+
+        if len(gaps) == 0:
+            return  None
+
         lower_training_volume_gap = TrainingVolumeGap(gap_type=gap_type)
 
         low_optimal_list = list(a.low_optimal_threshold for a in gaps if a.low_optimal_threshold is not None)
@@ -296,11 +310,11 @@ class TrainingVolumeProcessing(object):
 
         return standard_error_range
 
-    def get_strain(self, expected_weekly_workouts, monotony_error_range, last_week_values):
+    def get_strain(self, expected_weekly_workouts, monotony_error_range, last_week_values, historical_strain):
 
         load = self.get_standard_error_range(expected_weekly_workouts, last_week_values)
 
-        standard_error_range = StandardErrorRange()
+        standard_error_range = StandardErrorRangeMetric()
 
         if monotony_error_range.insufficient_data or load.insufficient_data:
             standard_error_range.insufficient_data = True
@@ -328,11 +342,36 @@ class TrainingVolumeProcessing(object):
                 standard_error_range.lower_bound = min_strain
                 standard_error_range.upper_bound = max_strain
 
+        gaps = []
+        gaps.append(self.get_strain_gap(list(x.observed_value for x in historical_strain if x is not None), monotony_error_range.observed_value))
+        gaps.append(self.get_strain_gap(list(x.observed_value for x in historical_strain if x is not None),
+                                        monotony_error_range.lower_bound))
+        gaps.append(self.get_strain_gap(list(x.observed_value for x in historical_strain if x is not None),
+                                        monotony_error_range.upper_bound))
+        gaps.append(self.get_strain_gap(list(x.lower_bound for x in historical_strain if x is not None),
+                                        monotony_error_range.observed_value))
+        gaps.append(self.get_strain_gap(list(x.lower_bound for x in historical_strain if x is not None),
+                                        monotony_error_range.lower_bound))
+        gaps.append(self.get_strain_gap(list(x.lower_bound for x in historical_strain if x is not None),
+                                        monotony_error_range.upper_bound))
+        gaps.append(self.get_strain_gap(list(x.upper_bound for x in historical_strain if x is not None),
+                                        monotony_error_range.observed_value))
+        gaps.append(self.get_strain_gap(list(x.upper_bound for x in historical_strain if x is not None),
+                                        monotony_error_range.lower_bound))
+        gaps.append(self.get_strain_gap(list(x.upper_bound for x in historical_strain if x is not None),
+                                        monotony_error_range.upper_bound))
+
+        gap = self.get_lower_training_volume_gap(TrainingVolumeGapType.strain,
+                                                                 list(x for x in gaps if x is not None))
+
+        if gap is not None:
+            standard_error_range.training_volume_gaps.append(gap)
+
         return standard_error_range
 
     def get_monotony(self, expected_weekly_workouts, values):
 
-        standard_error_range = StandardErrorRange()
+        standard_error_range = StandardErrorRangeMetric()
 
         if len(values) > 1:
 
@@ -354,6 +393,29 @@ class TrainingVolumeProcessing(object):
                     else:
                         standard_error_range.upper_bound = average_load.upper_bound / stdev_load
 
+            low_gaps = []
+            high_gaps = []
+            m1, m2 = self.get_monotony_gaps(average_load.lower_bound, stdev_load)
+            low_gaps.append(m1)
+            high_gaps.append(m2)
+            m3, m4 = self.get_monotony_gaps(average_load.observed_value, stdev_load)
+            low_gaps.append(m3)
+            high_gaps.append(m4)
+            m5, m6 = self.get_monotony_gaps(average_load.upper_bound, stdev_load)
+            low_gaps.append(m5)
+            high_gaps.append(m6)
+
+            low_gap = self.get_lower_training_volume_gap(TrainingVolumeGapType.monotony,
+                                                         list(x for x in low_gaps if x is not None))
+            high_gap = self.get_lower_training_volume_gap(TrainingVolumeGapType.monotony,
+                                                          list(x for x in high_gaps if x is not None))
+
+            if low_gap is not None:
+                standard_error_range.training_volume_gaps.append(low_gap)
+
+            if high_gap is not None:
+                standard_error_range.training_volume_gaps.append(high_gap)
+
         else:
             standard_error_range.insufficient_data = True
 
@@ -364,7 +426,7 @@ class TrainingVolumeProcessing(object):
         current_load = self.get_standard_error_range(expected_weekly_workouts, last_week_values)
         previous_load = self.get_standard_error_range(expected_weekly_workouts, previous_week_values)
 
-        ramp_error_range = StandardErrorRange()
+        ramp_error_range = StandardErrorRangeMetric()
 
         if current_load.insufficient_data or previous_load.insufficient_data:
             ramp_error_range.insufficient_data = True
@@ -399,14 +461,16 @@ class TrainingVolumeProcessing(object):
         ramp_gaps.append(self.get_ramp_gap(current_load.lower_bound, previous_load.observed_value))
         ramp_gaps.append(self.get_ramp_gap(current_load.lower_bound, previous_load.upper_bound))
         ramp_gaps.append(self.get_ramp_gap(current_load.observed_value, previous_load.lower_bound))
+        ramp_gaps.append(self.get_ramp_gap(current_load.observed_value, previous_load.observed_value))
         ramp_gaps.append(self.get_ramp_gap(current_load.observed_value, previous_load.upper_bound))
         ramp_gaps.append(self.get_ramp_gap(current_load.upper_bound, previous_load.lower_bound))
         ramp_gaps.append(self.get_ramp_gap(current_load.upper_bound, previous_load.observed_value))
         ramp_gaps.append(self.get_ramp_gap(current_load.upper_bound, previous_load.upper_bound))
 
-        ramp_error_range.lower_bound_gap = self.get_lower_training_volume_gap(TrainingVolumeGapType.ramp, ramp_gaps)
-        ramp_error_range.observed_value_gap = self.get_ramp_gap(current_load.observed_value, previous_load.observed_value)
-        ramp_error_range.upper_bound_gap = self.get_upper_training_volume_gap(TrainingVolumeGapType.ramp, ramp_gaps)
+        gap = self.get_lower_training_volume_gap(TrainingVolumeGapType.ramp, list(r for r in ramp_gaps if r is not None))
+
+        if gap is not None:
+            ramp_error_range.training_volume_gaps.append(gap)
 
         return ramp_error_range
 
@@ -585,11 +649,12 @@ class TrainingVolumeProcessing(object):
 
         return values
 
-    def get_historical_internal_strain(self, start_date, end_date, all_plans, weekly_expected_workouts=5):
+    def get_historical_internal_strain(self, start_date, end_date, weekly_expected_workouts=5):
 
         target_dates = []
 
-        all_plans.sort(key=lambda x: x.event_date)
+        #all_plans.sort(key=lambda x: x.event_date)
+        self.internal_load_tuples.sort(key=lambda x: x[0])
 
         date_diff = parse_date(end_date) - parse_date(start_date)
 
@@ -603,10 +668,8 @@ class TrainingVolumeProcessing(object):
         if len(target_dates) > 7:
             for t in range(6, len(target_dates)):
                 load_values = []
-                daily_plans = [p for p in all_plans if (parse_date(start_date) + timedelta(index)) < p.get_event_datetime() <= target_dates[t]]
-                load_values.extend(
-                    x for x in self.get_session_attributes_product_sum_list("session_RPE", "duration_minutes",
-                                                                            daily_plans) if x is not None)
+                daily_plans = [p for p in self.internal_load_tuples if (parse_date(start_date) + timedelta(index)) < p[0] <= target_dates[t]]
+                load_values.extend(x[1] for x in daily_plans if x is not None)
                 strain = self.calculate_daily_strain(load_values, weekly_expected_workouts)
                 if strain.observed_value is not None or strain.upper_bound is not None:
                     strain_values.append(strain)
@@ -864,12 +927,15 @@ class TrainingVolumeProcessing(object):
     def get_acwr_gap(self, acute_value, chronic_value):
 
         training_volume_gap = TrainingVolumeGap(gap_type=TrainingVolumeGapType.acwr)
-        training_volume_gap.low_optimal_threshold =(0.8 * chronic_value) - acute_value
-        training_volume_gap.high_optimal_threshold = (1.3 * chronic_value) - acute_value
-        training_volume_gap.low_overreaching_threshold = (1.31 * chronic_value) - acute_value
-        training_volume_gap.high_overreaching_threshold = (1.50 * chronic_value) - acute_value
-        training_volume_gap.low_excessive_threshold = (1.51 * chronic_value) - acute_value
-        training_volume_gap.high_excessive_threshold = (1.51 * chronic_value) - acute_value
+
+        if acute_value is not None and chronic_value is not None and chronic_value > 0:
+
+            training_volume_gap.low_optimal_threshold =(0.8 * chronic_value) - acute_value
+            training_volume_gap.high_optimal_threshold = (1.3 * chronic_value) - acute_value
+            training_volume_gap.low_overreaching_threshold = (1.31 * chronic_value) - acute_value
+            training_volume_gap.high_overreaching_threshold = (1.50 * chronic_value) - acute_value
+            training_volume_gap.low_excessive_threshold = (1.51 * chronic_value) - acute_value
+            training_volume_gap.high_excessive_threshold = (1.51 * chronic_value) - acute_value
 
         return training_volume_gap
 
@@ -1247,6 +1313,22 @@ class TrainingVolumeProcessing(object):
 
         return training_report
 
+
+    def get_monotony_gaps(self, average_load, stdev_load):
+
+        if average_load is None or stdev_load is None or stdev_load == 0:
+            return None, None
+
+        low_monotony_gap = TrainingVolumeGap(gap_type=TrainingVolumeGapType.monotony)
+        low_monotony_gap.low_optimal_threshold = average_load - (1.10 * stdev_load)
+        low_monotony_gap.high_optimal_threshold = average_load - (1.01 * stdev_load)
+
+        high_montony_gap = TrainingVolumeGap(gap_type=TrainingVolumeGapType.monotony)
+        high_montony_gap.low_optimal_threshold = average_load + (1.01 * stdev_load)
+        high_montony_gap.high_optimal_threshold = average_load + (1.10 * stdev_load)
+
+        return low_monotony_gap, high_montony_gap
+
     def get_monotony_gap(self, last_6_internal_load_values, avg_workouts_week=5):
 
         # what is the monotony if we have a workout with this load?
@@ -1411,7 +1493,31 @@ class TrainingVolumeProcessing(object):
 
         return training_day
 
-    def get_strain_gap(self, historical_internal_strain, last_7_internal_load_values, weekly_expected_workouts=5):
+
+    def get_strain_gap(self, historical_strain_values, monotony):
+
+        training_volume_gap = TrainingVolumeGap(gap_type=TrainingVolumeGapType.strain)
+
+        if len(historical_strain_values) > 0:
+
+            strain_count = min(7, len(list(x for x in historical_strain_values if x is not None)))
+
+            if strain_count > 1:
+                strain_sd = statistics.stdev(
+                    list(x for x in historical_strain_values[-strain_count:] if x is not None))
+                strain_avg = statistics.mean(
+                    list(x for x in historical_strain_values[-strain_count:] if x is not None))
+
+                if historical_strain_values[len(
+                        historical_strain_values) - 1] is not None and monotony is not None and monotony > 0:
+
+                    strain_sd_load = strain_sd / monotony
+                    strain_avg_load = strain_avg / monotony
+                    training_volume_gap.high_optimal_threshold = strain_avg_load + strain_sd_load
+
+        return training_volume_gap
+
+    def get_strain_gap_old(self, historical_internal_strain, last_7_internal_load_values, weekly_expected_workouts=5):
 
         strain_count = min(7, len(historical_internal_strain))
         training_volume_gap = TrainingVolumeGap(gap_type=TrainingVolumeGapType.strain)
