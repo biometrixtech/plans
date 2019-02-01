@@ -183,7 +183,79 @@ class TrainingVolumeProcessing(object):
                 standard_error_range.lower_bound = min_acwr
                 standard_error_range.upper_bound = max_acwr
 
+        acwr_gaps = []
+        acwr_gaps.append(self.get_acwr_gap(acute_load_error.lower_bound, chronic_load_error.lower_bound))
+        acwr_gaps.append(self.get_acwr_gap(acute_load_error.lower_bound, chronic_load_error.observed_value))
+        acwr_gaps.append(self.get_acwr_gap(acute_load_error.lower_bound, chronic_load_error.upper_bound))
+        acwr_gaps.append(self.get_acwr_gap(acute_load_error.observed_value, chronic_load_error.lower_bound))
+        acwr_gaps.append(self.get_acwr_gap(acute_load_error.observed_value, chronic_load_error.upper_bound))
+        acwr_gaps.append(self.get_acwr_gap(acute_load_error.upper_bound, chronic_load_error.lower_bound))
+        acwr_gaps.append(self.get_acwr_gap(acute_load_error.upper_bound, chronic_load_error.observed_value))
+        acwr_gaps.append(self.get_acwr_gap(acute_load_error.upper_bound, chronic_load_error.upper_bound))
+
+        standard_error_range.lower_bound_gap = self.get_lower_training_volume_gap(TrainingVolumeGapType.acwr, acwr_gaps)
+
+        standard_error_range.observed_value_gap = self.get_acwr_gap(acute_load_error.observed_value, chronic_load_error.observed_value)
+        standard_error_range.upper_bound_gap = self.get_upper_training_volume_gap(TrainingVolumeGapType.acwr, acwr_gaps)
+
+
         return standard_error_range
+
+    def get_lower_training_volume_gap(self, gap_type, gaps):
+        lower_training_volume_gap = TrainingVolumeGap(gap_type=gap_type)
+
+        low_optimal_list = list(a.low_optimal_threshold for a in gaps if a.low_optimal_threshold is not None)
+        high_optimal_list = list(a.high_optimal_threshold for a in gaps if a.high_optimal_threshold is not None)
+        low_overreaching_list = list(
+            a.low_overreaching_threshold for a in gaps if a.low_overreaching_threshold is not None)
+        high_overreaching_list = list(
+            a.high_overreaching_threshold for a in gaps if a.high_overreaching_threshold is not None)
+        low_excessive_list = list(
+            a.low_excessive_threshold for a in gaps if a.low_excessive_threshold is not None)
+        high_excessive_list = list(
+            a.high_excessive_threshold for a in gaps if a.high_excessive_threshold is not None)
+
+        if len(low_optimal_list) > 0:
+            lower_training_volume_gap.low_optimal_threshold = min(low_optimal_list)
+        if len(high_optimal_list) > 0:
+            lower_training_volume_gap.high_optimal_threshold = min(high_optimal_list)
+        if len(low_overreaching_list) > 0:
+            lower_training_volume_gap.low_overreaching_threshold = min(low_overreaching_list)
+        if len(high_overreaching_list) > 0:
+            lower_training_volume_gap.high_overreaching_threshold = min(high_overreaching_list)
+        if len(low_excessive_list) > 0:
+            lower_training_volume_gap.low_excessive_threshold = min(low_excessive_list)
+        if len(high_excessive_list) > 0:
+            lower_training_volume_gap.high_excessive_threshold = min(high_excessive_list)
+        return lower_training_volume_gap
+
+    def get_upper_training_volume_gap(self, gap_type, gaps):
+        upper_training_volume_gap = TrainingVolumeGap(gap_type=gap_type)
+
+        low_optimal_list = list(a.low_optimal_threshold for a in gaps if a.low_optimal_threshold is not None)
+        high_optimal_list = list(a.high_optimal_threshold for a in gaps if a.high_optimal_threshold is not None)
+        low_overreaching_list = list(
+            a.low_overreaching_threshold for a in gaps if a.low_overreaching_threshold is not None)
+        high_overreaching_list = list(
+            a.high_overreaching_threshold for a in gaps if a.high_overreaching_threshold is not None)
+        low_excessive_list = list(
+            a.low_excessive_threshold for a in gaps if a.low_excessive_threshold is not None)
+        high_excessive_list = list(
+            a.high_excessive_threshold for a in gaps if a.high_excessive_threshold is not None)
+
+        if len(low_optimal_list) > 0:
+            upper_training_volume_gap.low_optimal_threshold = max(low_optimal_list)
+        if len(high_optimal_list) > 0:
+            upper_training_volume_gap.high_optimal_threshold = max(high_optimal_list)
+        if len(low_overreaching_list) > 0:
+            upper_training_volume_gap.low_overreaching_threshold = max(low_overreaching_list)
+        if len(high_overreaching_list) > 0:
+            upper_training_volume_gap.high_overreaching_threshold = max(high_overreaching_list)
+        if len(low_excessive_list) > 0:
+            upper_training_volume_gap.low_excessive_threshold = max(low_excessive_list)
+        if len(high_excessive_list) > 0:
+            upper_training_volume_gap.high_excessive_threshold = max(high_excessive_list)
+        return upper_training_volume_gap
 
     def get_freshness_index(self, acute_load_error, chronic_load_error):
 
@@ -321,6 +393,21 @@ class TrainingVolumeProcessing(object):
             if (ramp_error_range.observed_value is None or (ramp_error_range.observed_value is not None and
                                                                 max_bound > ramp_error_range.observed_value)):
                 ramp_error_range.upper_bound = max_bound
+
+        ramp_gaps = []
+        ramp_gaps.append(self.get_ramp_gap(current_load.lower_bound, previous_load.lower_bound))
+        ramp_gaps.append(self.get_ramp_gap(current_load.lower_bound, previous_load.observed_value))
+        ramp_gaps.append(self.get_ramp_gap(current_load.lower_bound, previous_load.upper_bound))
+        ramp_gaps.append(self.get_ramp_gap(current_load.observed_value, previous_load.lower_bound))
+        ramp_gaps.append(self.get_ramp_gap(current_load.observed_value, previous_load.upper_bound))
+        ramp_gaps.append(self.get_ramp_gap(current_load.upper_bound, previous_load.lower_bound))
+        ramp_gaps.append(self.get_ramp_gap(current_load.upper_bound, previous_load.observed_value))
+        ramp_gaps.append(self.get_ramp_gap(current_load.upper_bound, previous_load.upper_bound))
+
+        ramp_error_range.lower_bound_gap = self.get_lower_training_volume_gap(TrainingVolumeGapType.ramp, ramp_gaps)
+        ramp_error_range.observed_value_gap = self.get_ramp_gap(current_load.observed_value, previous_load.observed_value)
+        ramp_error_range.upper_bound_gap = self.get_upper_training_volume_gap(TrainingVolumeGapType.ramp, ramp_gaps)
+
         return ramp_error_range
 
     def calc_monotony_strain(self, load_values):
@@ -552,7 +639,23 @@ class TrainingVolumeProcessing(object):
 
         return daily_strain
 
-    def get_ramp_gap(self, current_load_values, previous_load_values, avg_workouts_week=5):
+    def get_ramp_gap(self, current_load, previous_load):
+
+        if current_load is None or previous_load is None:
+            return None
+
+        training_volume_gap = TrainingVolumeGap(gap_type=TrainingVolumeGapType.ramp)
+
+        training_volume_gap.low_optimal_threshold = previous_load - current_load
+        training_volume_gap.high_optimal_threshold = (1.10 * previous_load) - current_load
+        training_volume_gap.low_overreaching_threshold = (1.11 * previous_load) - current_load
+        training_volume_gap.high_overreaching_threshold = (1.15 * previous_load) - current_load
+        training_volume_gap.low_excessive_threshold = (1.16 * previous_load) - current_load
+        training_volume_gap.high_excessive_threshold = (1.16 * previous_load) - current_load
+
+        return training_volume_gap
+
+    def get_ramp_gap_old(self, current_load_values, previous_load_values, avg_workouts_week=5):
 
         current_load = 0
         current_load_high = 0
@@ -607,20 +710,20 @@ class TrainingVolumeProcessing(object):
         training_volume_gap = TrainingVolumeGap(gap_type=TrainingVolumeGapType.ramp)
 
         training_volume_gap.low_optimal_threshold = previous_load - current_load
-        training_volume_gap.high_optimal_threshold = previous_load - current_load
+        training_volume_gap.high_optimal_threshold = (1.10 * previous_load) - current_load
         training_volume_gap.low_overreaching_threshold = (1.11 * previous_load) - current_load
-        training_volume_gap.high_overreaching_threshold = (1.11 * previous_load) - current_load
+        training_volume_gap.high_overreaching_threshold = (1.15 * previous_load) - current_load
         training_volume_gap.low_excessive_threshold = (1.16 * previous_load) - current_load
         training_volume_gap.high_excessive_threshold = (1.16 * previous_load) - current_load
         if previous_load_high > 0:
             training_volume_gap.low_optimal_threshold = min(training_volume_gap.low_optimal_threshold,
                                                             previous_load_high - current_load)
             training_volume_gap.high_optimal_threshold = max(training_volume_gap.high_optimal_threshold,
-                                                            previous_load_high - current_load)
+                                                             (1.10 * previous_load_high) - current_load)
             training_volume_gap.low_overreaching_threshold = min(training_volume_gap.low_overreaching_threshold,
                                                                  (1.11 * previous_load_high) - current_load)
             training_volume_gap.high_overreaching_threshold = max(training_volume_gap.high_overreaching_threshold,
-                                                                  (1.11 * previous_load_high) - current_load)
+                                                                  (1.15 * previous_load_high) - current_load)
             training_volume_gap.low_excessive_threshold = min(training_volume_gap.low_excessive_threshold,
                                                                  (1.16 * previous_load_high) - current_load)
             training_volume_gap.high_excessive_threshold = max(training_volume_gap.high_excessive_threshold,
@@ -629,11 +732,11 @@ class TrainingVolumeProcessing(object):
             training_volume_gap.low_optimal_threshold = min(training_volume_gap.low_optimal_threshold,
                                                             previous_load - current_load_high)
             training_volume_gap.high_optimal_threshold = max(training_volume_gap.high_optimal_threshold,
-                                                            previous_load - current_load_high)
+                                                             (1.10 * previous_load) - current_load_high)
             training_volume_gap.low_overreaching_threshold = min(training_volume_gap.low_overreaching_threshold,
                                                                  (1.11 * previous_load) - current_load_high)
             training_volume_gap.high_overreaching_threshold = max(training_volume_gap.high_overreaching_threshold,
-                                                                  (1.11 * previous_load) - current_load_high)
+                                                                  (1.15 * previous_load) - current_load_high)
             training_volume_gap.low_excessive_threshold = min(training_volume_gap.low_excessive_threshold,
                                                                  (1.16 * previous_load) - current_load_high)
             training_volume_gap.high_excessive_threshold = max(training_volume_gap.high_excessive_threshold,
@@ -642,11 +745,11 @@ class TrainingVolumeProcessing(object):
             training_volume_gap.low_optimal_threshold = min(training_volume_gap.low_optimal_threshold,
                                                             previous_load_high - current_load_high)
             training_volume_gap.high_optimal_threshold = max(training_volume_gap.high_optimal_threshold,
-                                                            previous_load_high - current_load_high)
+                                                             (1.10 * previous_load_high) - current_load_high)
             training_volume_gap.low_overreaching_threshold = min(training_volume_gap.low_overreaching_threshold,
                                                                  (1.11 * previous_load_high) - current_load_high)
             training_volume_gap.high_overreaching_threshold = max(training_volume_gap.high_overreaching_threshold,
-                                                                  (1.11 * previous_load_high) - current_load_high)
+                                                                  (1.15 * previous_load_high) - current_load_high)
             training_volume_gap.low_excessive_threshold = min(training_volume_gap.low_excessive_threshold,
                                                                  (1.16 * previous_load_high) - current_load_high)
             training_volume_gap.high_excessive_threshold = max(training_volume_gap.high_excessive_threshold,
@@ -758,7 +861,19 @@ class TrainingVolumeProcessing(object):
 
         return training_report
 
-    def get_acwr_gap(self, acute_values, chronic_values, chronic_values_high, avg_workouts_week=5):
+    def get_acwr_gap(self, acute_value, chronic_value):
+
+        training_volume_gap = TrainingVolumeGap(gap_type=TrainingVolumeGapType.acwr)
+        training_volume_gap.low_optimal_threshold =(0.8 * chronic_value) - acute_value
+        training_volume_gap.high_optimal_threshold = (1.3 * chronic_value) - acute_value
+        training_volume_gap.low_overreaching_threshold = (1.31 * chronic_value) - acute_value
+        training_volume_gap.high_overreaching_threshold = (1.50 * chronic_value) - acute_value
+        training_volume_gap.low_excessive_threshold = (1.51 * chronic_value) - acute_value
+        training_volume_gap.high_excessive_threshold = (1.51 * chronic_value) - acute_value
+
+        return training_volume_gap
+
+    def get_acwr_gap_old(self, acute_values, chronic_values, chronic_values_high, avg_workouts_week=5):
 
         chronic_value = 0
         chronic_high_value = 0

@@ -35,6 +35,9 @@ class StandardErrorRange(Serialisable):
         self.upper_bound = upper_bound
         self.observed_value = observed_value
         self.insufficient_data = False
+        self.lower_bound_gap = None
+        self.upper_bound_gap = None
+        self.observed_value_gap = None
 
     def json_serialise(self):
         ret = {
