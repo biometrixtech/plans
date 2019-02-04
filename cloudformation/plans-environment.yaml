@@ -12,6 +12,12 @@ Parameters:
         Type: "String"
         Description: "The name of the environment"
 
+    # Users API version
+    UsersApiVersion: 
+        Type: "String"
+        Default: "2_1"
+        Description: "Corresponding Users API version"
+
     # The second part of the CIDR block for the VPN (10.xx.0.0/24).
     VpnCidr:
         Type: "Number"
