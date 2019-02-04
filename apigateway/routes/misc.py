@@ -46,9 +46,6 @@ def handle_clear_user_data(principal_id=None):
 
     current_time = parse_datetime(request.json['event_date'])
 
-    if current_time.hour < 3:
-        current_time -= datetime.timedelta(days=1)
-
     # get collections
     readiness = get_mongo_collection('dailyreadiness')
     daily_plan = get_mongo_collection('dailyplan')
