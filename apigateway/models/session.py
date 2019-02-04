@@ -85,7 +85,10 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
             if value == '':
                 value = SportName(None)
             else:
-                value = SportName(value)
+                try:
+                    value = SportName(value)
+                except ValueError:
+                    value = SportName(None)
         elif name == "strength_and_conditioning_type" and not isinstance(value, StrengthConditioningType):
             if value == '':
                 value = StrengthConditioningType(None)
@@ -320,7 +323,10 @@ class FunctionalStrengthSession(Serialisable):
 
     def __setattr__(self, name, value):
         if name == "sport_name":
-            value = SportName(value)
+            try:
+                value = SportName(value)
+            except ValueError:
+                value = SportName(None)
         elif name == "position":
             if self.sport_name == SportName.no_sport and value is not None:
                 value = NoSportPosition(value)

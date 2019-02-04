@@ -252,7 +252,10 @@ class AthleteStats(Serialisable):
 
     def __setattr__(self, name, value):
         if name == "current_sport_name":
-            value = SportName(value)
+            try:
+                value = SportName(value)
+            else:
+                value = SportName(None)
         elif name == "current_position":
             if self.current_sport_name.value is None and value is not None:
                 value = NoSportPosition(value)
