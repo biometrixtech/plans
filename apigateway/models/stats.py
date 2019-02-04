@@ -254,7 +254,7 @@ class AthleteStats(Serialisable):
         if name == "current_sport_name":
             try:
                 value = SportName(value)
-            else:
+            except ValueError:
                 value = SportName(None)
         elif name == "current_position":
             if self.current_sport_name.value is None and value is not None:
