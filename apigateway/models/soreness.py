@@ -199,8 +199,11 @@ class HistoricSoreness(Serialisable):
             return False
 
     def is_dormant_cleared(self):
-        if (self.historic_soreness_status == HistoricSorenessStatus.dormant_cleared or
-                self.historic_soreness_status == HistoricSorenessStatus.almost_acute_pain):
+        if (self.historic_soreness_status == None or
+            self.historic_soreness_status == HistoricSorenessStatus.dormant_cleared or
+            self.historic_soreness_status == HistoricSorenessStatus.almost_acute_pain or 
+            self.historic_soreness_status == HistoricSorenessStatus.almost_persistent_pain or
+            self.historic_soreness_status == HistoricSorenessStatus.almost_persistent_soreness):
             return True
         else:
             return False
