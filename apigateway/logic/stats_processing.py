@@ -451,7 +451,6 @@ class StatsProcessing(object):
                 historic_soreness.historic_soreness_status = HistoricSorenessStatus.persistent_2_soreness
             historic_soreness.ask_acute_pain_question = False
             historic_soreness.ask_persistent_2_question = True
-            historic_soreness.last_reported = last_reported_date
             historic_soreness.streak_start_date = None
 
         elif last_ten_day_count <= 3 and len(body_part_history) >= 5:  # is it persistent pain?
@@ -464,9 +463,9 @@ class StatsProcessing(object):
                     historic_soreness.historic_soreness_status = HistoricSorenessStatus.persistent_soreness
                 historic_soreness.ask_acute_pain_question = False
                 historic_soreness.ask_persistent_2_question = False
-                historic_soreness.last_reported = last_reported_date
                 historic_soreness.streak_start_date = None
         historic_soreness.average_severity = self.calc_avg_severity_persistent_2(body_part_history, self.event_date)
+        historic_soreness.last_reported = last_reported_date
         return historic_soreness
 
     def process_persistent_status(self, is_pain, historic_soreness, last_reported_date, last_ten_day_count,
