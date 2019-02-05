@@ -235,9 +235,9 @@ class StatsProcessing(object):
             else:
                 grouped_soreness[ns_new] = 1
             if last_reported_date_time is None or parse_date(s.reported_date_time) > last_reported_date_time:
-                    last_reported_date_time = parse_date(s.reported_date_time)
-                    last_reported_date = s.reported_date_time
-                    days_since_last_report = (parse_date(self.event_date) - last_reported_date_time).days
+                last_reported_date_time = parse_date(s.reported_date_time)
+                last_reported_date = s.reported_date_time
+                days_since_last_report = (parse_date(self.event_date) - last_reported_date_time).days
 
         for g in grouped_soreness:
 
@@ -478,7 +478,6 @@ class StatsProcessing(object):
                 historic_soreness.historic_soreness_status = HistoricSorenessStatus.persistent_2_soreness
             historic_soreness.ask_acute_pain_question = False
             historic_soreness.ask_persistent_2_question = True
-            historic_soreness.last_reported = last_reported_date
             historic_soreness.streak_start_date = None
 
         elif last_ten_day_count <= 3 and len(body_part_history) >= 5:  # is it persistent pain?
@@ -491,17 +490,17 @@ class StatsProcessing(object):
                     historic_soreness.historic_soreness_status = HistoricSorenessStatus.persistent_soreness
                 historic_soreness.ask_acute_pain_question = False
                 historic_soreness.ask_persistent_2_question = False
-                historic_soreness.last_reported = last_reported_date
                 historic_soreness.streak_start_date = None
         historic_soreness.average_severity = self.calc_avg_severity_persistent_2(body_part_history, self.event_date)
+        historic_soreness.last_reported = last_reported_date
         return historic_soreness
 
     def process_persistent_status(self, is_pain, historic_soreness, last_reported_date, last_ten_day_count,
                                   body_part_history):
         if (parse_date(self.event_date) - parse_date(last_reported_date)).days > 14:
             historic_soreness.ask_persistent_2_question = True  # same question even though different status
-            if len(body_part_history) > 0:
-                historic_soreness.last_reported = body_part_history[0].reported_date_time
+        if len(body_part_history) > 0:
+            historic_soreness.last_reported = body_part_history[0].reported_date_time
         if last_ten_day_count > 3:
             if is_pain:
                 historic_soreness.historic_soreness_status = HistoricSorenessStatus.persistent_2_pain
