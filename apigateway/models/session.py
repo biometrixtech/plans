@@ -95,7 +95,10 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
             if value == '':
                 value = SportName(None)
             else:
-                value = SportName(value)
+                try:
+                    value = SportName(value)
+                except ValueError:
+                    value = SportName(None)
         elif name == "strength_and_conditioning_type" and not isinstance(value, StrengthConditioningType):
             if value == '':
                 value = StrengthConditioningType(None)
@@ -341,7 +344,10 @@ class FunctionalStrengthSession(Serialisable):
 
     def __setattr__(self, name, value):
         if name == "sport_name":
-            value = SportName(value)
+            try:
+                value = SportName(value)
+            except ValueError:
+                value = SportName(None)
         elif name == "position":
             if self.sport_name == SportName.no_sport and value is not None:
                 value = StrengthConditioningType(value)
@@ -520,12 +526,9 @@ class RecoverySession(Serialisable):
 
         if soreness_list is not None:
             for soreness in [s for s in soreness_list if s.daily]:
-                if (soreness.historic_soreness_status is not None and
-                        soreness.historic_soreness_status is not HistoricSorenessStatus.dormant_cleared and
-                    soreness.historic_soreness_status is not HistoricSorenessStatus.almost_persistent_pain and
-                        soreness.historic_soreness_status is not HistoricSorenessStatus.almost_persistent_soreness
-                        and soreness.severity == max_severity and
-                        soreness.severity > 0):
+                if (not soreness.is_dormant_cleared() and
+                    soreness.severity == max_severity and
+                    soreness.severity > 0):
                     max_severity_and_historic_soreness = True
                 if soreness.severity > 3 and soreness.pain:
                     high_severity_is_pain = True
