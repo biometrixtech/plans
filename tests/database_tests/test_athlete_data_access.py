@@ -73,31 +73,31 @@ def test_get_post_session_surveys():
     assert len(surveys) == 2
 
 
-# def test_get_session_heartrate_data():
-#     athlete_dao = HeartRateDatastore()
-#     session_heart_rates = athlete_dao.get(user_id='fd263811-b299-461f-9e79-895c69612bac', session_id='9e855c3c-090d-486f-bc16-ce09fc5423c2')
-#     assert len(session_heart_rates) == 1
-#     assert len(session_heart_rates[0].hr_workout) == 7
-#
-#
-# def test_get_heartrate_data_range():
-#     athlete_dao = HeartRateDatastore()
-#     session_heart_rates = athlete_dao.get(user_id='fd263811-b299-461f-9e79-895c69612bac', start_date='2019-01-19', end_date="2019-01-29")
-#     assert len(session_heart_rates) == 4
-#     assert len(session_heart_rates[0].hr_workout) == 7
-#
-# def test_get_sleep_data_day():
-#     athlete_dao = SleepHistoryDatastore()
-#     sleep_history = athlete_dao.get(user_id='fd263811-b299-461f-9e79-895c69612bac', start_date='2019-01-09')
-#     assert len(sleep_history) == 1
-#     assert len(sleep_history[0].sleep_events) == 10
-#
-#
-# def test_get_sleep_data_range():
-#     athlete_dao = SleepHistoryDatastore()
-#     sleep_history = athlete_dao.get(user_id='fd263811-b299-461f-9e79-895c69612bac', start_date='2019-01-09', end_date="2019-01-29")
-#     assert len(sleep_history) == 2
-#     assert len(sleep_history[0].sleep_events) == 10
+def test_get_session_heartrate_data():
+    athlete_dao = HeartRateDatastore()
+    session_heart_rates = athlete_dao.get(user_id='hr_test', session_id='hr_session_1')
+    assert len(session_heart_rates) == 1
+    assert len(session_heart_rates[0].hr_workout) == 7
+
+
+def test_get_heartrate_data_range():
+    athlete_dao = HeartRateDatastore()
+    session_heart_rates = athlete_dao.get(user_id='hr_test', start_date='2018-01-09', end_date="2018-01-15")
+    assert len(session_heart_rates) == 3
+    assert len(session_heart_rates[0].hr_workout) == 7
+
+def test_get_sleep_data_day():
+    athlete_dao = SleepHistoryDatastore()
+    sleep_history = athlete_dao.get(user_id='test_sleep', start_date='2018-01-09')
+    assert len(sleep_history) == 1
+    assert len(sleep_history[0].sleep_events) == 10
+
+
+def test_get_sleep_data_range():
+    athlete_dao = SleepHistoryDatastore()
+    sleep_history = athlete_dao.get(user_id='test_sleep', start_date='2018-01-09', end_date="2018-01-15")
+    assert len(sleep_history) == 2
+    assert len(sleep_history[0].sleep_events) == 10
 
 def test_put_completed_exercises():
     data_store = CompletedExerciseDatastore()

@@ -20,6 +20,7 @@ from models.daily_plan import DailyPlan
 from models.heart_rate import SessionHeartRate, HeartRateData
 from models.sleep_data import DailySleepData, SleepEvent
 from logic.survey_processing import SurveyProcessing
+from logic.athlete_status_processing import AthleteStatusProcessing
 from utils import parse_datetime, format_date, format_datetime, parse_date, fix_early_survey_event_date
 
 app = Blueprint('daily_readiness', __name__)
@@ -113,10 +114,6 @@ def handle_daily_readiness_create():
         need_stats_update = True
 
     if need_stats_update:
-        # athlete_stats_store = AthleteStatsDatastore()
-        # athlete_stats = athlete_stats_store.get(athlete_id=request.json['user_id'])
-        # if athlete_stats is None:
-        #     athlete_stats = AthleteStats(request.json['user_id'])
         athlete_stats.event_date = plan_event_date
         athlete_stats.session_RPE = session_RPE
         athlete_stats.session_RPE_event_date = session_RPE_event_date
@@ -166,83 +163,31 @@ def handle_daily_readiness_get(principal_id=None):
             current_time = parse_datetime(request.json['event_date'])
     elif request.method == 'GET':
         current_time = datetime.datetime.now()
+    previous_soreness_processor = AthleteStatusProcessing(user_id, current_time)
+    (
+        sore_body_parts,
+        hist_sore_status,
+        clear_candidates,
+        dormant_tipping_candidates,
+        current_sport_name,
+        current_position,
+        functional_strength_eligible,
+        completed_functional_strength_sessions
+        ) = previous_soreness_processor.get_previous_soreness()
 
-    start_time = parse_date(format_date(current_time - datetime.timedelta(days=2)))
-    sore_body_parts = []
-    severe_pain_today_yesterday = False
-    try:
-        readiness_surveys = daily_readiness_store.get(user_id, start_date=start_time, end_date=current_time, last_only=False)
-        # readiness_surveys = sorted(readiness_surveys, key=lambda k: k.event_date, reverse=True)
-        if len(readiness_surveys) != 0:
-            for rs_survey in readiness_surveys:
-                sore_body_parts.extend(rs_survey.json_serialise()['sore_body_parts'])
-                if rs_survey.event_date > start_time + datetime.timedelta(days=1):
-                    if len([s for s in rs_survey.soreness if s.severity >= 3 and s.pain]):
-                        severe_pain_today_yesterday = True
-    except NoSuchEntityException:
-        pass
-
-    post_session_store = PostSessionSurveyDatastore()
-    post_session_surveys = post_session_store.get(user_id=user_id, start_date=start_time, end_date=current_time)
-    post_session_surveys = [s for s in post_session_surveys if s is not None and start_time <= s.event_date_time < current_time]
-    if len(post_session_surveys) != 0:
-        for ps_survey in post_session_surveys:
-            sore_body_parts += [{"body_part": s.body_part.location.value, "side": s.side} for s in ps_survey.survey.soreness if s.severity > 1]
-            if ps_survey.event_date_time > start_time + datetime.timedelta(days=1):
-                if len([s for s in ps_survey.survey.soreness if s.severity >= 3 and s.pain]):
-                    severe_pain_today_yesterday = True
-    sore_body_parts = [dict(t) for t in {tuple(d.items()) for d in sore_body_parts}]
-
-    athlete_stats_store = AthleteStatsDatastore()
-    athlete_stats = athlete_stats_store.get(athlete_id=user_id)
-
-    current_sport_name = None
-    current_position = None
-    functional_strength_eligible = False
-    completed_functional_strength_sessions = 0
-
-    hist_sore_status = []
-    clear_candidates = []
-    dormant_tipping_candidates = []
-    if athlete_stats is not None:
-        hist_sore_status, clear_candidates, dormant_tipping_candidates = athlete_stats.get_q2_q3_list()
-        current_sport_name = athlete_stats.current_sport_name.value if athlete_stats.current_sport_name is not None else None
-        current_position = athlete_stats.current_position.value if athlete_stats.current_position is not None else None
-        functional_strength_eligible = False
-        if (athlete_stats.functional_strength_eligible and (athlete_stats.next_functional_strength_eligible_date is None
-                or parse_datetime(athlete_stats.next_functional_strength_eligible_date) < current_time) and
-            not severe_pain_today_yesterday):
-            functional_strength_eligible = True
-
-        completed_functional_strength_sessions = athlete_stats.completed_functional_strength_sessions
-    q3_list = [{"body_part": q["body_part"], "side": q["side"]} for q in clear_candidates]
-    q2_list = [{"body_part": q["body_part"], "side": q["side"]} for q in hist_sore_status]
-    tipping_list = [{"body_part": q["body_part"], "side": q["side"]} for q in dormant_tipping_candidates]
-    for sore_part in sore_body_parts:
-        if sore_part in q2_list or sore_part in q3_list:
-            sore_part['delete'] = True
-        elif sore_part in tipping_list:
-            for t in dormant_tipping_candidates:
-                if t['body_part'] == sore_part['body_part'] and t['side'] == sore_part['side']:
-                    sore_part['status'] = t['status']
-                    t['delete'] = True
-                    break
-        else:
-            sore_part['status'] = HistoricSorenessStatus.dormant_cleared.name
-    sore_body_parts = [s for s in sore_body_parts if not s.get('delete', False)]
-    dormant_tipping_candidates = [s for s in dormant_tipping_candidates if not s.get('delete', False)]
-
-
+    typical_sessions = previous_soreness_processor.get_typical_sessions()
     return {
-               'body_parts': sore_body_parts,
-               'dormant_tipping_candidates': dormant_tipping_candidates,
-               'hist_sore_status': hist_sore_status,
-               'clear_candidates': clear_candidates,
-               'current_position': current_position,
-               'current_sport_name': current_sport_name,
-               'functional_strength_eligible': functional_strength_eligible,
-               'completed_functional_strength_sessions': completed_functional_strength_sessions
-           }, 200
+            "readiness": {
+                          'body_parts': sore_body_parts,
+                          'dormant_tipping_candidates': dormant_tipping_candidates,
+                          'hist_sore_status': hist_sore_status,
+                          'clear_candidates': clear_candidates,
+                          'current_position': current_position,
+                          'current_sport_name': current_sport_name,
+                          'functional_strength_eligible': functional_strength_eligible,
+                          'completed_functional_strength_sessions': completed_functional_strength_sessions
+                         },
+            "typical_sessions": typical_sessions} , 200
 
 
 @xray_recorder.capture('routes.daily_readiness.validate')
@@ -272,14 +217,3 @@ def validate_data():
         soreness['body_part'] = int(soreness['body_part'])
         soreness['severity'] = int(soreness['severity'])
 
-    # # validate sleep_quality
-    # if 'sleep_quality' in request.json:
-    #     raise InvalidSchemaException('Missing required parameter sleep_quality')
-    # elif request.json['sleep_quality'] not in range(1, 11):
-    #     raise InvalidSchemaException('sleep_quality need to be between 1 and 10')
-
-    # # validate readiness
-    # if 'readiness' not in request.json:
-    #     raise InvalidSchemaException('Missing required parameter readiness')
-    # elif request.json['readiness'] not in range(1, 11):
-    #     raise InvalidSchemaException('readiness need to be between 1 and 10')
