@@ -114,10 +114,6 @@ def handle_daily_readiness_create():
         need_stats_update = True
 
     if need_stats_update:
-        # athlete_stats_store = AthleteStatsDatastore()
-        # athlete_stats = athlete_stats_store.get(athlete_id=request.json['user_id'])
-        # if athlete_stats is None:
-        #     athlete_stats = AthleteStats(request.json['user_id'])
         athlete_stats.event_date = plan_event_date
         athlete_stats.session_RPE = session_RPE
         athlete_stats.session_RPE_event_date = session_RPE_event_date
@@ -221,14 +217,3 @@ def validate_data():
         soreness['body_part'] = int(soreness['body_part'])
         soreness['severity'] = int(soreness['severity'])
 
-    # # validate sleep_quality
-    # if 'sleep_quality' in request.json:
-    #     raise InvalidSchemaException('Missing required parameter sleep_quality')
-    # elif request.json['sleep_quality'] not in range(1, 11):
-    #     raise InvalidSchemaException('sleep_quality need to be between 1 and 10')
-
-    # # validate readiness
-    # if 'readiness' not in request.json:
-    #     raise InvalidSchemaException('Missing required parameter readiness')
-    # elif request.json['readiness'] not in range(1, 11):
-    #     raise InvalidSchemaException('readiness need to be between 1 and 10')

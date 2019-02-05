@@ -16,8 +16,15 @@ class AthleteStatusProcessing(object):
         self.post_session_store = DatastoreCollection().post_session_survey_datastore
         self.athlete_stats_store = DatastoreCollection().athlete_stats_datastore
         self.daily_plan_store = DatastoreCollection().daily_plan_datastore
-        self.sore_body_parts = []
         self.severe_pain_today_yesterday = False
+        self.sore_body_parts = []
+        self.hist_sore_status = []
+        self.clear_candidates = []
+        self.dormant_tipping_candidates = []
+        self.current_sport_name = None
+        self.current_position = None
+        self.functional_strength_eligible = False
+        self.completed_functional_strength_sessions = 0
 
 
     def get_previous_soreness(self):
@@ -43,45 +50,56 @@ class AthleteStatusProcessing(object):
         if len(severe_pain_dates) > 0:
             self.severe_pain_today_yesterday = True
         self.sore_body_parts = self.remove_duplicate_sore_body_parts()
+        # get athlete_stats
         athlete_stats = self.athlete_stats_store.get(athlete_id=self.user_id)
-        current_sport_name = None
-        current_position = None
-        functional_strength_eligible = False
-        completed_functional_strength_sessions = 0
+        # current_sport_name = None
+        # current_position = None
+        # functional_strength_eligible = False
+        # completed_functional_strength_sessions = 0
 
-        hist_sore_status = []
-        clear_candidates = []
-        dormant_tipping_candidates = []
+        # hist_sore_status = []
+        # clear_candidates = []
+        # dormant_tipping_candidates = []
         if athlete_stats is not None:
-            hist_sore_status, clear_candidates, dormant_tipping_candidates = athlete_stats.get_q2_q3_list()
-            current_sport_name = athlete_stats.current_sport_name.value if athlete_stats.current_sport_name is not None else None
-            current_position = athlete_stats.current_position.value if athlete_stats.current_position is not None else None
-            functional_strength_eligible = False
+            # get historical soreness
+            self.hist_sore_status, self.clear_candidates, self.dormant_tipping_candidates = athlete_stats.get_q2_q3_list()
+            # get fs eligibility and sports
+            self.current_sport_name = athlete_stats.current_sport_name.value if athlete_stats.current_sport_name is not None else None
+            self.current_position = athlete_stats.current_position.value if athlete_stats.current_position is not None else None
             if (athlete_stats.functional_strength_eligible and (athlete_stats.next_functional_strength_eligible_date is None
                     or parse_datetime(athlete_stats.next_functional_strength_eligible_date) < self.current_time) and
                 not self.severe_pain_today_yesterday):
-                functional_strength_eligible = True
-            completed_functional_strength_sessions = athlete_stats.completed_functional_strength_sessions
-        q3_list = [{"body_part": q["body_part"], "side": q["side"]} for q in clear_candidates]
-        q2_list = [{"body_part": q["body_part"], "side": q["side"]} for q in hist_sore_status]
-        tipping_list = [{"body_part": q["body_part"], "side": q["side"]} for q in dormant_tipping_candidates]
+                self.functional_strength_eligible = True
+            self.completed_functional_strength_sessions = athlete_stats.completed_functional_strength_sessions
+            self.remove_duplicates_sore_body_parts_historic_soreness()
+        return (self.sore_body_parts,
+                self.hist_sore_status,
+                self.clear_candidates,
+                self.dormant_tipping_candidates,
+                self.current_sport_name,
+                self.current_position,
+                self.functional_strength_eligible,
+                self.completed_functional_strength_sessions)
+
+    def remove_duplicates_sore_body_parts_historic_soreness(self):
+        q3_list = [{"body_part": q["body_part"], "side": q["side"]} for q in self.clear_candidates]
+        q2_list = [{"body_part": q["body_part"], "side": q["side"]} for q in self.hist_sore_status]
+        tipping_list = [{"body_part": q["body_part"], "side": q["side"]} for q in self.dormant_tipping_candidates]
         for sore_part in self.sore_body_parts:
             if sore_part in q2_list or sore_part in q3_list:
                 sore_part['delete'] = True
             elif sore_part in tipping_list:
-                for t in dormant_tipping_candidates:
+                for t in self.dormant_tipping_candidates:
                     if t['body_part'] == sore_part['body_part'] and t['side'] == sore_part['side']:
                         sore_part['status'] = t['status']
                         t['delete'] = True
                         break
             else:
                 sore_part['status'] = HistoricSorenessStatus.dormant_cleared.name
-        sore_body_parts = [s for s in self.sore_body_parts if not s.get('delete', False)]
-        dormant_tipping_candidates = [s for s in dormant_tipping_candidates if not s.get('delete', False)]
-        print('a')
-        return (sore_body_parts, hist_sore_status, clear_candidates, dormant_tipping_candidates,
-                current_sport_name, current_position,
-                functional_strength_eligible, completed_functional_strength_sessions)
+        cleaned_sore_parts = [s for s in self.sore_body_parts if not s.get('delete', False)]
+        cleaned_tipping_candidates = [s for s in self.dormant_tipping_candidates if not s.get('delete', False)]
+        self.sore_body_parts = cleaned_sore_parts
+        self.dormant_tipping_candidates = cleaned_tipping_candidates
 
     def remove_duplicate_sore_body_parts(self):
         self.sore_body_parts = [s.json_serialise() for s in self.sore_body_parts]
@@ -99,8 +117,6 @@ class AthleteStatusProcessing(object):
             else:
                 unique_parts.append(body_part)
         return [s for s in self.sore_body_parts if not s.get('delete', False)]
-
-
 
     def get_typical_sessions(self):
         plans = self.daily_plan_store.get(
