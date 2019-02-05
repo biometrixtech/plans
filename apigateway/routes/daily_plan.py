@@ -3,6 +3,7 @@ import datetime
 
 from utils import format_date, format_datetime, parse_datetime
 from datastores.daily_plan_datastore import DailyPlanDatastore
+from logic.athlete_status_processing import AthleteStatusProcessing
 
 from fathomapi.utils.decorators import require
 from fathomapi.utils.exceptions import InvalidSchemaException
@@ -30,8 +31,11 @@ def handle_daily_plan_get():
     store = DailyPlanDatastore()
     items = store.get(user_id, start_date, end_date)
     daily_plans = []
+    need_soreness_sessions = False
     for plan in items:
         survey_complete = plan.daily_readiness_survey_completed()
+        if plan.event_date == format_date(event_date) and not survey_complete:
+            need_soreness_sessions = True
         landing_screen, nav_bar_indicator = plan.define_landing_screen()
         plan = plan.json_serialise()
         plan['daily_readiness_survey_completed'] = survey_complete
@@ -39,8 +43,37 @@ def handle_daily_plan_get():
         plan['nav_bar_indicator'] = nav_bar_indicator
         del plan['daily_readiness_survey'], plan['user_id']
         daily_plans.append(plan)
+    if need_soreness_sessions:
+        previous_soreness_processor = AthleteStatusProcessing(user_id, event_date)
+        (
+            sore_body_parts,
+            hist_sore_status,
+            clear_candidates,
+            dormant_tipping_candidates,
+            current_sport_name,
+            current_position,
+            functional_strength_eligible,
+            completed_functional_strength_sessions
+        ) = previous_soreness_processor.get_previous_soreness()
+        readiness = {
+                      'body_parts': sore_body_parts,
+                      'dormant_tipping_candidates': dormant_tipping_candidates,
+                      'hist_sore_status': hist_sore_status,
+                      'clear_candidates': clear_candidates,
+                      'current_position': current_position,
+                      'current_sport_name': current_sport_name,
+                      'functional_strength_eligible': functional_strength_eligible,
+                      'completed_functional_strength_sessions': completed_functional_strength_sessions
+                     }
 
-    return {'daily_plans': daily_plans}, 200
+        typical_sessions = previous_soreness_processor.get_typical_sessions()
+    else:
+        readiness = {}
+        typical_sessions = []
+
+    return {'daily_plans': daily_plans,
+            'readiness': readiness,
+            'typical_sessions': typical_sessions}, 200
 
 
 def validate_input(request):
