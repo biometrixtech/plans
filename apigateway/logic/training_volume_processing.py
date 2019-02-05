@@ -1403,6 +1403,91 @@ class TrainingVolumeProcessing(object):
 
         return low_monotony_gap, high_monotony_gap
 
+    def rank_standard_error_range_metrics(self, metrics_list):
+
+        gaps = []
+        monotony_gaps = []
+
+        for m in metrics_list:
+            for t in m.training_volume_gaps:
+                if t.training_volume_gap_type is not TrainingVolumeGapType.monotony:
+                    gaps.append(t)
+                else:
+                    monotony_gaps.append(t)
+
+        opt_low_values = []
+        opt_high_values = []
+        ovr_low_values = []
+        ovr_high_values = []
+        exc_low_values = []
+        exc_high_values = []
+
+        opt_low_values.extend(list(g for g in gaps if g.low_optimal_threshold is not None))
+        opt_low_values.sort(key=lambda x: x.low_optimal_threshold, reverse=False)
+
+        opt_high_values.extend(list(g for g in gaps if g.high_optimal_threshold is not None))
+        opt_high_values.sort(key=lambda x: x.high_optimal_threshold, reverse=False)
+
+        ovr_low_values.extend(list(g for g in gaps if g.low_overreaching_threshold is not None))
+        ovr_low_values.sort(key=lambda x: x.low_overreaching_threshold, reverse=False)
+
+        ovr_high_values.extend(list(g for g in gaps if g.high_overreaching_threshold is not None))
+        ovr_high_values.sort(key=lambda x: x.high_overreaching_threshold, reverse=False)
+
+        exc_low_values.extend(list(g for g in gaps if g.low_excessive_threshold is not None))
+        exc_low_values.sort(key=lambda x: x.low_excessive_threshold, reverse=False)
+
+        exc_high_values.extend(list(g for g in gaps if g.high_excessive_threshold is not None))
+        exc_high_values.sort(key=lambda x: x.high_excessive_threshold, reverse=False)
+
+        '''reconcile this and make it work
+        # this number needs to be consistent with monotony.  Should we use the low or high?
+        if high_monotony_gap.low_overreaching_threshold is not None and ovr_values[0].low_overreaching_threshold < high_monotony_gap.low_overreaching_threshold:
+            ovr_values.append(low_monotony_gap)  # go with low monotony option since best option could create monotony
+
+        else:
+            if high_monotony_gap.low_overreaching_threshold is not None:
+                ovr_values.append(high_monotony_gap)
+
+        # this number needs to be consistent with monotony.  Should we use the low or high?
+        if high_monotony_gap.low_excessive_threshold is not None and exc_values[0].low_excessive_threshold < high_monotony_gap.low_excessive_threshold:
+            exc_values.append(low_monotony_gap)  # go with low monotony option since best option could create monotony
+        else:
+            if high_monotony_gap.low_excessive_threshold is not None:
+                exc_values.append(high_monotony_gap)
+
+        # re-sort
+        ovr_values.sort(key=lambda x: x.low_overreaching_threshold, reverse=False)
+        exc_values.sort(key=lambda x: x.low_excessive_threshold, reverse=False)
+        '''
+
+        low_optimal = None
+        high_optimal = None
+        low_overreaching = None
+        high_overreaching = None
+        low_excessive = None
+        high_excessive = None
+
+        if len(opt_low_values) > 0:
+            low_optimal = opt_low_values[0].low_optimal_threshold
+
+        if len(opt_high_values) > 0:
+            high_optimal = opt_high_values[0].high_optimal_threshold
+
+        if len(ovr_low_values) > 0:
+            low_overreaching = ovr_low_values[0].low_overreaching_threshold
+
+        if len(ovr_high_values) > 0:
+            high_overreaching = ovr_high_values[0].high_overreaching_threshold
+
+        if len(exc_low_values) > 0:
+            low_excessive = exc_low_values[0].low_excessive_threshold
+
+        if len(exc_high_values) > 0:
+            high_excessive = exc_high_values[0].high_excessive_threshold
+
+        j=0
+
     def compile_training_report(self, user_id, date_time, gap_list, low_monotony_gap, high_monotony_gap):
 
         #min_values = []

@@ -145,6 +145,14 @@ def test_get_training_plan_from_database():
                                                     stats.chronic_daily_plans)
         athlete_stats = training_volume_processing.calc_training_volume_metrics(athlete_stats)
 
+        metrics_list = []
+        metrics_list.append(athlete_stats.internal_acwr)
+        metrics_list.append(athlete_stats.internal_strain)
+        metrics_list.append(athlete_stats.internal_monotony)
+        metrics_list.append(athlete_stats.internal_ramp)
+
+        training_volume_processing.rank_standard_error_range_metrics(metrics_list)
+
         # now let's do next day
         stats.increment_start_end_times(1)
         stats.set_acute_chronic_periods()
