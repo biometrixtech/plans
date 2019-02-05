@@ -17,6 +17,7 @@ from models.daily_plan import DailyPlan
 from utils import parse_datetime, format_date, format_datetime
 from config import get_mongo_collection
 from logic.survey_processing import SurveyProcessing
+from logic.athlete_status_processing import AthleteStatusProcessing
 
 app = Blueprint('session', __name__)
 
@@ -259,50 +260,8 @@ def handle_get_typical_sessions():
     else:
         user_id = request.json['user_id']
 
-    cutoff_time = 3
-
-    if event_date.hour < cutoff_time:
-        event_date -= datetime.timedelta(days=1)
-
-    dailyplan_store = DailyPlanDatastore()
-    start_date = format_date(event_date - datetime.timedelta(days=14))
-    end_date = format_date(event_date)
-    plans = dailyplan_store.get(
-                                user_id=user_id,
-                                start_date=start_date,
-                                end_date=end_date
-                                )
-    sessions = []
-    for plan in plans:
-        sessions.extend(plan.training_sessions)
-
-    sessions = [s for s in sessions if s.event_date is not None]
-    sessions = [{'sport_name': s.sport_name.value,
-                 'strength_and_conditioning_type': s.strength_and_conditioning_type.value,
-                 'session_type': s.session_type().value,
-                 'event_date': format_datetime(s.event_date),
-                 'duration': s.duration_minutes,
-                 'count': 1} for s in sessions]
-    sessions = sorted(sessions, key=lambda k: k['event_date'], reverse=True)
-    filtered_sessions = []
-    for session in sessions:
-        if session['session_type'] == 1 and session['strength_and_conditioning_type'] is None:
-            pass
-        elif session['session_type'] in [0, 2, 3, 6] and session['sport_name'] is None:
-            pass
-        elif len(filtered_sessions) == 0:
-            filtered_sessions.append(session)
-        else:
-            exists = [session['sport_name'] == s['sport_name'] and \
-                      session['strength_and_conditioning_type'] == s['strength_and_conditioning_type'] and \
-                      session['session_type'] == s['session_type'] for s in filtered_sessions]
-            if any(exists):
-                session = [filtered_sessions[i] for i in range(len(exists)) if exists[i]][0]
-                session['count'] += 1
-            else:
-                filtered_sessions.append(session)
-    filtered_sessions = sorted(filtered_sessions, key=lambda k: k['count'], reverse=True)
-
+    filtered_sessions = AthleteStatusProcessing(user_id, event_date).get_typical_sessions()
+    
     return {'typical_sessions': filtered_sessions[0:4]}, 200
 
 
