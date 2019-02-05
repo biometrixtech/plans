@@ -208,9 +208,9 @@ class StatsProcessing(object):
             else:
                 grouped_soreness[ns_new] = 1
             if last_reported_date_time is None or parse_date(s.reported_date_time) > last_reported_date_time:
-                    last_reported_date_time = parse_date(s.reported_date_time)
-                    last_reported_date = s.reported_date_time
-                    days_since_last_report = (parse_date(self.event_date) - last_reported_date_time).days
+                last_reported_date_time = parse_date(s.reported_date_time)
+                last_reported_date = s.reported_date_time
+                days_since_last_report = (parse_date(self.event_date) - last_reported_date_time).days
 
         for g in grouped_soreness:
 
