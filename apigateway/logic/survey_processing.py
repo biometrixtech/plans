@@ -75,19 +75,7 @@ class SurveyProcessing(object):
         if return_dict:
             return session_data
         else:
-            return self._create_session(session_type, session_data)
-
-
-    def _create_session(self, session_type, data):
-        session = SessionFactory().create(SessionType(session_type))
-        self._update_session(session, data)
-        return session
-
-
-    def _update_session(self, session, data):
-        for key, value in data.items():
-            setattr(session, key, value)
-
+            return create_session(session_type, session_data)
 
     def process_clear_status_answers(self, clear_candidates, athlete_stats, event_date, soreness):
         plan_event_date = format_date(event_date)
@@ -208,6 +196,17 @@ class SurveyProcessing(object):
                     user_session.source = SessionSource.combined
                     return user_session
         return health_session
+
+def create_session(session_type, data):
+    session = SessionFactory().create(SessionType(session_type))
+    _update_session(session, data)
+    return session
+
+
+def _update_session(session, data):
+    for key, value in data.items():
+        setattr(session, key, value)
+
 
 def force_datetime_iso(event_date):
     if len(event_date.split('.')) == 2:

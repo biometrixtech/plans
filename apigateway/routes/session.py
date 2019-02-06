@@ -16,7 +16,7 @@ from models.heart_rate import SessionHeartRate, HeartRateData
 from models.daily_plan import DailyPlan
 from utils import parse_datetime, format_date, format_datetime
 from config import get_mongo_collection
-from logic.survey_processing import SurveyProcessing
+from logic.survey_processing import SurveyProcessing, create_session
 from logic.athlete_status_processing import AthleteStatusProcessing
 
 app = Blueprint('session', __name__)
@@ -211,7 +211,7 @@ def handle_session_sensor_data():
 
         session_id = session.get('session_id', None)
         if session_id is None:
-            session_obj = _create_session(session_type, sensor_data)
+            session_obj = create_session(session_type, sensor_data)
             session_store.insert(session_obj,
                                  user_id=user_id,
                                  event_date=plan_event_date
@@ -346,20 +346,6 @@ def get_sensor_data(session):
                    "inactive_load": inactive_accel
                    }
     return sensor_data
-
-
-def _create_session(session_type, data):
-    factory = SessionFactory()
-    session = factory.create(SessionType(session_type))
-    _update_session(session, data)
-    # for key, value in data.items():
-    #     setattr(session, key, value)
-    return session
-
-
-def _update_session(session, data):
-    for key, value in data.items():
-        setattr(session, key, value)
 
 
 def _check_plan_exists(user_id, event_date):
