@@ -151,7 +151,9 @@ def test_get_training_plan_from_database():
         metrics_list.append(athlete_stats.internal_monotony)
         metrics_list.append(athlete_stats.internal_ramp)
 
-        training_volume_processing.rank_standard_error_range_metrics(metrics_list)
+        filtered_metrics = list(m for m in metrics_list if not m.insufficient_data)
+
+        training_volume_processing.rank_standard_error_range_metrics(filtered_metrics)
 
         # now let's do next day
         stats.increment_start_end_times(1)

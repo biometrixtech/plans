@@ -1,6 +1,13 @@
 from enum import Enum, IntEnum
 from serialisable import Serialisable
 
+class TrainingStatus(object):
+    def __init__(self, training_level, projected_days_duration):
+        training_level = training_level
+        projected_days_duration = projected_days_duration
+
+
+
 class FitFatigueStatus(Enum):
     undefined = 0
     trending_toward_fatigue = 1
@@ -17,10 +24,14 @@ class TrainingVolumeGapType(Enum):
 
 
 class TrainingLevel(IntEnum):
-    undertraining = -1
-    optimal = 0
-    overreaching = 1
-    excessive = 2
+    insufficient_data = 0
+    undertraining = 1
+    possibly_undertraining = 2
+    optimal = 3
+    possibly_overreaching = 4
+    overreaching = 5
+    possibly_excessive = 6
+    excessive = 7
 
 
 class IndicatorLevel(IntEnum):

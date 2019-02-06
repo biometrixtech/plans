@@ -1422,6 +1422,17 @@ class TrainingVolumeProcessing(object):
         exc_low_values = []
         exc_high_values = []
 
+        monotony_gaps.sort(key=lambda x: x.low_optimal_threshold, reverse=False)
+
+        if len(monotony_gaps) > 0:
+            low_monotony_gap = monotony_gaps[0]
+        else:
+            low_monotony_gap = None
+        if len(monotony_gaps) > 1:
+            high_monotony_gap = monotony_gaps[1]
+        else:
+            high_monotony_gap = None
+
         opt_low_values.extend(list(g for g in gaps if g.low_optimal_threshold is not None))
         opt_low_values.sort(key=lambda x: x.low_optimal_threshold, reverse=False)
 
@@ -1440,26 +1451,26 @@ class TrainingVolumeProcessing(object):
         exc_high_values.extend(list(g for g in gaps if g.high_excessive_threshold is not None))
         exc_high_values.sort(key=lambda x: x.high_excessive_threshold, reverse=False)
 
-        '''reconcile this and make it work
         # this number needs to be consistent with monotony.  Should we use the low or high?
-        if high_monotony_gap.low_overreaching_threshold is not None and ovr_values[0].low_overreaching_threshold < high_monotony_gap.low_overreaching_threshold:
-            ovr_values.append(low_monotony_gap)  # go with low monotony option since best option could create monotony
+        if (high_monotony_gap is not None and high_monotony_gap.low_overreaching_threshold is not None and
+                ovr_low_values[0].low_overreaching_threshold < high_monotony_gap.low_overreaching_threshold):
+            ovr_low_values.append(low_monotony_gap)  # go with low monotony option since best option could create monotony
 
         else:
-            if high_monotony_gap.low_overreaching_threshold is not None:
-                ovr_values.append(high_monotony_gap)
+            if high_monotony_gap is not None and high_monotony_gap.low_overreaching_threshold is not None:
+                ovr_low_values.append(high_monotony_gap)
 
         # this number needs to be consistent with monotony.  Should we use the low or high?
-        if high_monotony_gap.low_excessive_threshold is not None and exc_values[0].low_excessive_threshold < high_monotony_gap.low_excessive_threshold:
-            exc_values.append(low_monotony_gap)  # go with low monotony option since best option could create monotony
+        if (high_monotony_gap is not None and high_monotony_gap.low_excessive_threshold is not None and
+                exc_low_values[0].low_excessive_threshold < high_monotony_gap.low_excessive_threshold):
+            exc_low_values.append(low_monotony_gap)  # go with low monotony option since best option could create monotony
         else:
-            if high_monotony_gap.low_excessive_threshold is not None:
-                exc_values.append(high_monotony_gap)
+            if high_monotony_gap is not None and high_monotony_gap.low_excessive_threshold is not None:
+                exc_low_values.append(high_monotony_gap)
 
         # re-sort
-        ovr_values.sort(key=lambda x: x.low_overreaching_threshold, reverse=False)
-        exc_values.sort(key=lambda x: x.low_excessive_threshold, reverse=False)
-        '''
+        ovr_low_values.sort(key=lambda x: x.low_overreaching_threshold, reverse=False)
+        exc_low_values.sort(key=lambda x: x.low_excessive_threshold, reverse=False)
 
         low_optimal = None
         high_optimal = None
@@ -1485,6 +1496,27 @@ class TrainingVolumeProcessing(object):
 
         if len(exc_high_values) > 0:
             high_excessive = exc_high_values[0].high_excessive_threshold
+
+        training_level = TrainingLevel.insufficient_data
+
+        if (high_optimal is not None and low_optimal is not None and high_optimal > low_optimal and
+                high_optimal - low_optimal > 0):
+            training_level = TrainingLevel.optimal
+
+        if low_optimal is not None and low_optimal > 0:
+            training_level = TrainingLevel.undertraining
+
+        if high_optimal is not None and low_overreaching is not None and low_overreaching < high_optimal:
+            training_level = TrainingLevel.possibly_overreaching
+
+        if high_optimal is not None and high_optimal < 0:
+            training_level = TrainingLevel.overreaching
+
+        if high_overreaching is not None and low_excessive is not None and low_excessive < high_overreaching:
+            training_level = TrainingLevel.possibly_excessive
+
+        if high_overreaching is not None and high_overreaching < 0:
+            training_level = TrainingLevel.excessive
 
         j=0
 
