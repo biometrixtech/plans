@@ -94,15 +94,13 @@ class AthleteStatusProcessing(object):
                         sore_part['status'] = t['status']
                         t['delete'] = True
                         break
-            else:
-                sore_part['status'] = HistoricSorenessStatus.dormant_cleared.name
         cleaned_sore_parts = [s for s in self.sore_body_parts if not s.get('delete', False)]
         cleaned_tipping_candidates = [s for s in self.dormant_tipping_candidates if not s.get('delete', False)]
         self.sore_body_parts = cleaned_sore_parts
         self.dormant_tipping_candidates = cleaned_tipping_candidates
 
     def remove_duplicate_sore_body_parts(self):
-        self.sore_body_parts = [s.json_serialise() for s in self.sore_body_parts]
+        self.sore_body_parts = [s.json_serialise(api=True) for s in self.sore_body_parts]
         self.sore_body_parts = [dict(t) for t in {tuple(d.items()) for d in self.sore_body_parts}]
         unique_parts = []
         for soreness in self.sore_body_parts:
@@ -112,8 +110,10 @@ class AthleteStatusProcessing(object):
                 if not soreness['pain']:
                     soreness['delete'] = True
                 else:
-                    dup_part = [s for s in self.sore_body_parts if s['body_part'] == soreness['body_part'] and s['side'] == soreness['side'] and not s['pain']][0]
-                    dup_part['delete'] = True
+                    for part in self.sore_body_parts:
+                        if part['body_part'] == soreness['body_part'] and part['side'] == soreness['side'] and not part['pain']:
+                            part['delete'] = True
+                            continue
             else:
                 unique_parts.append(body_part)
         return [s for s in self.sore_body_parts if not s.get('delete', False)]
@@ -154,6 +154,6 @@ class AthleteStatusProcessing(object):
                     filtered_sessions.append(session)
         filtered_sessions = sorted(filtered_sessions, key=lambda k: k['count'], reverse=True)
 
-        return filtered_sessions
+        return filtered_sessions[0:5]
 
 
