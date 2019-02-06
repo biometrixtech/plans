@@ -31,6 +31,21 @@ class TrainingVolumeProcessing(object):
 
     def load_plan_values(self, last_7_days_plans, days_8_14_plans, acute_daily_plans, chronic_weeks_plans, chronic_daily_plans):
 
+        self.last_week_external_values = []
+        self.last_week_internal_values = []
+        self.previous_week_external_values = []
+        self.previous_week_internal_values = []
+        self.a_internal_load_values = []
+        self.a_external_load_values = []
+        self.a_high_intensity_values = []
+        self.a_mod_intensity_values = []
+        self.a_low_intensity_values = []
+        self.c_external_load_values = []
+        self.c_high_intensity_values = []
+        self.c_mod_intensity_values = []
+        self.c_low_intensity_values = []
+        self.internal_load_tuples = []
+
         self.last_week_external_values.extend(
             x for x in self.get_plan_session_attribute_sum_list("external_load", last_7_days_plans) if x is not None)
 
@@ -50,9 +65,6 @@ class TrainingVolumeProcessing(object):
         self.a_internal_load_values.extend(
             x for x in self.get_session_attributes_product_sum("session_RPE", "duration_minutes",
                                                                acute_daily_plans) if x is not None)
-
-        self.a_external_load_values.extend(
-            x for x in self.get_plan_session_attribute_sum("external_load", acute_daily_plans) if x is not None)
 
         self.a_high_intensity_values.extend(
             x for x in self.get_plan_session_attribute_sum("high_intensity_load", acute_daily_plans) if
@@ -1403,7 +1415,7 @@ class TrainingVolumeProcessing(object):
 
         return low_monotony_gap, high_monotony_gap
 
-    def rank_standard_error_range_metrics(self, metrics_list):
+    def get_training_status(self, metrics_list):
 
         gaps = []
         monotony_gaps = []
@@ -1518,7 +1530,7 @@ class TrainingVolumeProcessing(object):
         if high_overreaching is not None and high_overreaching < 0:
             training_level = TrainingLevel.excessive
 
-        j=0
+        return training_level
 
     def compile_training_report(self, user_id, date_time, gap_list, low_monotony_gap, high_monotony_gap):
 

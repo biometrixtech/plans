@@ -127,6 +127,7 @@ def test_get_training_plan_from_database():
         stats = StatsProcessing(user_id, run_date, datastore_collection)
         success = stats.set_start_end_times()
         stats.all_plans = stats.daily_plan_datastore.get(stats.athlete_id, stats.start_date, stats.end_date)
+        stats.update_start_times(daily_readiness_surveys, surveys, stats.all_plans)
         stats.set_acute_chronic_periods()
         stats.load_historical_plans()
         athlete_stats = AthleteStats(user_id)
@@ -145,33 +146,39 @@ def test_get_training_plan_from_database():
                                                     stats.chronic_daily_plans)
         athlete_stats = training_volume_processing.calc_training_volume_metrics(athlete_stats)
 
-        metrics_list = []
-        metrics_list.append(athlete_stats.internal_acwr)
-        metrics_list.append(athlete_stats.internal_strain)
-        metrics_list.append(athlete_stats.internal_monotony)
-        metrics_list.append(athlete_stats.internal_ramp)
+        metrics_list = [athlete_stats.internal_acwr, athlete_stats.internal_strain, athlete_stats.internal_monotony,
+                        athlete_stats.internal_ramp]
 
         filtered_metrics = list(m for m in metrics_list if not m.insufficient_data)
 
-        training_volume_processing.rank_standard_error_range_metrics(filtered_metrics)
+        training_level = training_volume_processing.get_training_status(filtered_metrics)
 
-        # now let's do next day
-        stats.increment_start_end_times(1)
-        stats.set_acute_chronic_periods()
-        stats.load_historical_plans()
-        new_athlete_stats = AthleteStats(user_id)
-        new_athlete_stats.historic_soreness = ath_stats.historic_soreness
-        training_volume_processing = TrainingVolumeProcessing(stats.start_date, stats.end_date)
+        new_athlete_stats = athlete_stats
 
-        historical_internal_strain = training_volume_processing.get_historical_internal_strain(start_date, end_date,
-                                                                                               stats.all_plans)
-        new_athlete_stats.historical_internal_strain = historical_internal_strain
-        training_volume_processing.load_plan_values(stats.last_7_days_plans,
-                                                    stats.days_8_14_plans,
-                                                    stats.acute_daily_plans,
-                                                    stats.get_chronic_weeks_plans(),
-                                                    stats.chronic_daily_plans)
-        new_athlete_stats = training_volume_processing.calc_training_volume_metrics(new_athlete_stats)
+        for d in range(1,8):
+            # now let's do next day
+            stats.increment_start_end_times(d)
+            stats.set_acute_chronic_periods()
+            stats.load_historical_plans()
+            training_volume_processing = TrainingVolumeProcessing(stats.start_date, stats.end_date)
+
+            training_volume_processing.load_plan_values(stats.last_7_days_plans,
+                                                        stats.days_8_14_plans,
+                                                        stats.acute_daily_plans,
+                                                        stats.get_chronic_weeks_plans(),
+                                                        stats.chronic_daily_plans)
+            new_athlete_stats = training_volume_processing.calc_training_volume_metrics(new_athlete_stats)
+
+            metrics_list = [new_athlete_stats.internal_acwr, new_athlete_stats.internal_strain, new_athlete_stats.internal_monotony,
+                            new_athlete_stats.internal_ramp]
+
+            filtered_metrics = list(m for m in metrics_list if not m.insufficient_data)
+
+            new_training_level = training_volume_processing.get_training_status(filtered_metrics)
+
+            if training_level.value != new_training_level.value:
+                days = d
+                break
 
         '''deprecated
         daily_plans = []
