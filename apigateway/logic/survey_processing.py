@@ -136,7 +136,6 @@ class SurveyProcessing(object):
 
             stored_health_sessions = [session.event_date for session in daily_plan.training_sessions if session.source in [SessionSource.health, SessionSource.combined]]
             user_sessions = [session for session in daily_plan.training_sessions if session.source == SessionSource.user]
-            session_event_date = session['event_date']
             if session_event_date not in stored_health_sessions:
                 session_obj = self.create_session_from_survey(session)
                 if len(user_sessions) > 0:
