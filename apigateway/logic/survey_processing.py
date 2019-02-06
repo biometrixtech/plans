@@ -75,19 +75,7 @@ class SurveyProcessing(object):
         if return_dict:
             return session_data
         else:
-            return self._create_session(session_type, session_data)
-
-
-    def _create_session(self, session_type, data):
-        session = SessionFactory().create(SessionType(session_type))
-        self._update_session(session, data)
-        return session
-
-
-    def _update_session(self, session, data):
-        for key, value in data.items():
-            setattr(session, key, value)
-
+            return create_session(session_type, session_data)
 
     def process_clear_status_answers(self, clear_candidates, athlete_stats, event_date, soreness):
         plan_event_date = format_date(event_date)
@@ -148,7 +136,6 @@ class SurveyProcessing(object):
 
             stored_health_sessions = [session.event_date for session in daily_plan.training_sessions if session.source in [SessionSource.health, SessionSource.combined]]
             user_sessions = [session for session in daily_plan.training_sessions if session.source == SessionSource.user]
-            session_event_date = session['event_date']
             if session_event_date not in stored_health_sessions:
                 session_obj = self.create_session_from_survey(session)
                 if len(user_sessions) > 0:
@@ -168,7 +155,6 @@ class SurveyProcessing(object):
     # @xray_recorder.capture('logic.survey_processing.historic_sleep_data')
     def process_historic_sleep_data(self, user_id, sleep_data):
         sleep_events = [SleepEvent(self.cleanup_sleep_data_from_api(sd)) for sd in sleep_data]
-        # sleep_events = sorted(sleep_events, key=lambda k: k.start_date)
         days_with_sleep_data = set([se.event_date for se in sleep_events])
         all_sleep_history = []
         for sleep_date in days_with_sleep_data:
@@ -178,30 +164,19 @@ class SurveyProcessing(object):
             all_sleep_history.append(daily_sleep_data)
         return all_sleep_history
 
-
     # @xray_recorder.capture('logic.survey_processing.cleanup_hr_data')
     def cleanup_hr_data_from_api(self, hr_data):
-        start_date = hr_data['startDate']
-        if len(start_date.split('.')) == 2:
-            start_date = start_date.split(".")[0] + 'Z'
-        end_date = hr_data['endDate']
-        if len(end_date.split('.')) == 2:
-            end_date = end_date.split(".")[0] + 'Z'
-        return {'start_date': start_date,
-                'end_date': end_date,
+        return {
+                'start_date': force_datetime_iso(hr_data['startDate']),
+                'end_date': force_datetime_iso(hr_data['endDate']),
                 'value': hr_data['value']
                 }
 
     # @xray_recorder.capture('logic.survey_processing.cleanup_sleep_data')
     def cleanup_sleep_data_from_api(self, sleep_data):
-        start_date = sleep_data['startDate']
-        if len(start_date.split('.')) == 2:
-            start_date = start_date.split(".")[0] + 'Z'
-        end_date = sleep_data['endDate']
-        if len(end_date.split('.')) == 2:
-            end_date = end_date.split(".")[0] + 'Z'
-        return {'start_date': start_date,
-                'end_date': end_date,
+        return {
+                'start_date': force_datetime_iso(sleep_data['startDate']),
+                'end_date': force_datetime_iso(sleep_data['endDate']),
                 'sleep_type': sleep_data['value']
                 }
 
@@ -220,3 +195,19 @@ class SurveyProcessing(object):
                     user_session.source = SessionSource.combined
                     return user_session
         return health_session
+
+def create_session(session_type, data):
+    session = SessionFactory().create(SessionType(session_type))
+    _update_session(session, data)
+    return session
+
+
+def _update_session(session, data):
+    for key, value in data.items():
+        setattr(session, key, value)
+
+
+def force_datetime_iso(event_date):
+    if len(event_date.split('.')) == 2:
+        event_date = event_date.split(".")[0] + 'Z'
+    return event_date
