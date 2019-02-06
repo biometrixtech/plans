@@ -86,9 +86,10 @@ class AthleteStatusProcessing(object):
         q2_list = [{"body_part": q["body_part"], "side": q["side"]} for q in self.hist_sore_status]
         tipping_list = [{"body_part": q["body_part"], "side": q["side"]} for q in self.dormant_tipping_candidates]
         for sore_part in self.sore_body_parts:
-            if sore_part in q2_list or sore_part in q3_list:
+            part = {"body_part": sore_part["body_part"], "side": sore_part["side"]}
+            if part in q2_list or part in q3_list:
                 sore_part['delete'] = True
-            elif sore_part in tipping_list:
+            elif part in tipping_list:
                 for t in self.dormant_tipping_candidates:
                     if t['body_part'] == sore_part['body_part'] and t['side'] == sore_part['side']:
                         sore_part['status'] = t['status']
