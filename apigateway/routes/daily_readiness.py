@@ -3,7 +3,6 @@ import datetime
 import os
 
 from datastores.daily_readiness_datastore import DailyReadinessDatastore
-from datastores.post_session_survey_datastore import PostSessionSurveyDatastore
 from datastores.daily_plan_datastore import DailyPlanDatastore
 from datastores.athlete_stats_datastore import AthleteStatsDatastore
 from datastores.heart_rate_datastore import HeartRateDatastore
@@ -11,17 +10,17 @@ from datastores.sleep_history_datastore import SleepHistoryDatastore
 from fathomapi.api.config import Config
 from fathomapi.comms.service import Service
 from fathomapi.utils.decorators import require
-from fathomapi.utils.exceptions import InvalidSchemaException, NoSuchEntityException
+from fathomapi.utils.exceptions import InvalidSchemaException
 from fathomapi.utils.xray import xray_recorder
 from models.daily_readiness import DailyReadiness
-from models.soreness import MuscleSorenessSeverity, BodyPartLocation, HistoricSorenessStatus
+from models.soreness import MuscleSorenessSeverity, BodyPartLocation
 from models.stats import AthleteStats
 from models.daily_plan import DailyPlan
 from models.heart_rate import SessionHeartRate, HeartRateData
 from models.sleep_data import DailySleepData, SleepEvent
 from logic.survey_processing import SurveyProcessing
 from logic.athlete_status_processing import AthleteStatusProcessing
-from utils import parse_datetime, format_date, format_datetime, parse_date, fix_early_survey_event_date
+from utils import parse_datetime, format_date, format_datetime, fix_early_survey_event_date
 
 app = Blueprint('daily_readiness', __name__)
 
@@ -52,9 +51,13 @@ def handle_daily_readiness_create():
     sessions_planned_readiness = True
     session_from_readiness = False
     need_stats_update = False
-    session_RPE = None
-    session_RPE_event_date = None
+    session_rpe = None
+    session_rpe_event_date = None
     plan_event_date = format_date(event_date)
+    athlete_stats = AthleteStatsDatastore().get(athlete_id=request.json['user_id'])
+    if athlete_stats is None:
+        athlete_stats = AthleteStats(user_id)
+    survey_processor = SurveyProcessing(user_id, event_date, athlete_stats)
     if 'sessions_planned' in request.json and not request.json['sessions_planned']:
         need_new_plan = True
         sessions_planned = False
@@ -65,24 +68,26 @@ def handle_daily_readiness_create():
         session_from_readiness = True
         need_stats_update = True
         for session in request.json['sessions']:
-            session_obj = SurveyProcessing().create_session_from_survey(session)
-            if session_RPE is not None and session_obj.post_session_survey.RPE is not None:
-                session_RPE = max(session_obj.post_session_survey.RPE, session_RPE)
+            if session is None:
+                continue
+            session_obj = survey_processor.create_session_from_survey(session)
+            if session_rpe is not None and session_obj.post_session_survey.RPE is not None:
+                session_rpe = max(session_obj.post_session_survey.RPE, session_rpe)
             elif session_obj.post_session_survey.RPE is not None:
-                session_RPE = session_obj.post_session_survey.RPE
-            session_RPE_event_date = plan_event_date
+                session_rpe = session_obj.post_session_survey.RPE
+            session_rpe_event_date = plan_event_date
             if 'hr_data' in session and len(session['hr_data']) > 0:
                 session_heart_rate = SessionHeartRate(user_id=user_id,
                                                       session_id=session_obj.id,
                                                       event_date=session_obj.event_date)
-                session_heart_rate.hr_workout = [HeartRateData(SurveyProcessing().cleanup_hr_data_from_api(hr)) for hr in session['hr_data']]
+                session_heart_rate.hr_workout = [HeartRateData(survey_processor.cleanup_hr_data_from_api(hr)) for hr in session['hr_data']]
                 all_session_heart_rates.append(session_heart_rate)
             all_sessions.append(session_obj)
 
     if "sleep_data" in request.json and len(request.json['sleep_data']) > 0:
         daily_sleep_data = DailySleepData(user_id=user_id,
                                           event_date=plan_event_date)
-        daily_sleep_data.sleep_events = [SleepEvent(SurveyProcessing().cleanup_sleep_data_from_api(sd)) for sd in request.json['sleep_data']]
+        daily_sleep_data.sleep_events = [SleepEvent(survey_processor.cleanup_sleep_data_from_api(sd)) for sd in request.json['sleep_data']]
         SleepHistoryDatastore().put(daily_sleep_data)
 
     if need_new_plan:
@@ -97,12 +102,8 @@ def handle_daily_readiness_create():
         if len(all_session_heart_rates) > 0:
             HeartRateDatastore().put(all_session_heart_rates)
 
-    athlete_stats = AthleteStatsDatastore().get(athlete_id=request.json['user_id'])
-    if athlete_stats is None:
-        athlete_stats = AthleteStats(request.json['user_id'])
-
     if "clear_candidates" in request.json and len(request.json['clear_candidates']) > 0:
-        SurveyProcessing().process_clear_status_answers(request.json['clear_candidates'], athlete_stats, event_date, daily_readiness.soreness)
+        survey_processor.process_clear_status_answers(request.json['clear_candidates'], event_date, daily_readiness.soreness)
 
     store = DailyReadinessDatastore()
     store.put(daily_readiness)
@@ -115,8 +116,8 @@ def handle_daily_readiness_create():
 
     if need_stats_update:
         athlete_stats.event_date = plan_event_date
-        athlete_stats.session_RPE = session_RPE
-        athlete_stats.session_RPE_event_date = session_RPE_event_date
+        athlete_stats.session_RPE = session_rpe
+        athlete_stats.session_RPE_event_date = session_rpe_event_date
         athlete_stats.update_readiness_soreness(severe_soreness)
         athlete_stats.update_readiness_pain(severe_pain)
         athlete_stats.update_daily_soreness()
@@ -153,7 +154,6 @@ def handle_daily_readiness_create():
 @require.authenticated.any
 @xray_recorder.capture('routes.daily_readiness.previous')
 def handle_daily_readiness_get(principal_id=None):
-    daily_readiness_store = DailyReadinessDatastore()
     user_id = principal_id
 
     if request.method == 'POST':
@@ -161,7 +161,7 @@ def handle_daily_readiness_get(principal_id=None):
             raise InvalidSchemaException('Missing required parameter event_date')
         else:
             current_time = parse_datetime(request.json['event_date'])
-    elif request.method == 'GET':
+    else:
         current_time = datetime.datetime.now()
     previous_soreness_processor = AthleteStatusProcessing(user_id, current_time)
     (
