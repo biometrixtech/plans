@@ -23,7 +23,7 @@ class SurveyProcessing(object):
         self.soreness = []
         self.plans = []
 
-    def create_session_from_survey(self, session, return_obj=False):
+    def create_session_from_survey(self, session, historic_health_data=False):
         event_date = parse_datetime(session['event_date'])
         end_date = session.get('end_date', None)
         if end_date is not None:
@@ -79,19 +79,20 @@ class SurveyProcessing(object):
             session_data['created_date'] = survey.event_date
 
             # update session_RPE
-            if self.athlete_stats.session_RPE is not None and survey.RPE is not None:
-                self.athlete_stats.session_RPE = max(survey.RPE, self.athlete_stats.session_RPE)
-                self.athlete_stats.session_RPE_event_date = self.event_date
-            elif survey.RPE is not None:
-                self.athlete_stats.session_RPE = survey.RPE
-                self.athlete_stats.session_RPE_event_date = self.event_date
+            if not historic_health_data:
+                if self.athlete_stats.session_RPE is not None and survey.RPE is not None:
+                    self.athlete_stats.session_RPE = max(survey.RPE, self.athlete_stats.session_RPE)
+                    self.athlete_stats.session_RPE_event_date = self.event_date
+                elif survey.RPE is not None:
+                    self.athlete_stats.session_RPE = survey.RPE
+                    self.athlete_stats.session_RPE_event_date = self.event_date
         session_obj = create_session(session_type, session_data)
         if 'hr_data' in session and len(session['hr_data']) > 0:
             self.create_session_hr_data(session_obj, session['hr_data'])
 
         self.soreness.extend(session_obj.post_session_survey.soreness)
         self.sessions.append(session_obj)
-        if return_obj:
+        if historic_health_data:
             return session_obj
 
     def patch_daily_and_historic_soreness(self, survey='readiness'):
@@ -170,7 +171,7 @@ class SurveyProcessing(object):
             stored_health_sessions = [session.event_date for session in daily_plan.training_sessions if session.source in [SessionSource.health, SessionSource.combined]]
             user_sessions = [session for session in daily_plan.training_sessions if session.source == SessionSource.user]
             if session_event_date not in stored_health_sessions:
-                session_obj = self.create_session_from_survey(session, return_obj=True)
+                session_obj = self.create_session_from_survey(session, historic_health_data=True)
                 if len(user_sessions) > 0:
                     session_obj = match_sessions(user_sessions, session_obj)
                 daily_plan.training_sessions.append(session_obj)

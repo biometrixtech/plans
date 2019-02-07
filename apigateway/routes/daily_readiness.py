@@ -19,6 +19,7 @@ from models.daily_plan import DailyPlan
 from models.sleep_data import DailySleepData, SleepEvent
 from logic.survey_processing import SurveyProcessing
 from logic.athlete_status_processing import AthleteStatusProcessing
+from config import get_mongo_collection
 from utils import parse_datetime, format_date, format_datetime, fix_early_survey_event_date
 
 app = Blueprint('daily_readiness', __name__)
@@ -76,10 +77,15 @@ def handle_daily_readiness_create():
         SleepHistoryDatastore().put(daily_sleep_data)
 
     if need_new_plan:
-        plan = DailyPlan(event_date=plan_event_date)
-        plan.user_id = user_id
-        plan.last_sensor_sync = DailyPlanDatastore().get_last_sensor_sync(user_id, plan_event_date)
-        plan.training_sessions = survey_processor.sessions
+        if _check_plan_exists(user_id, plan_event_date):
+            plan = DailyPlanDatastore().get(user_id, plan_event_date, plan_event_date)[0]
+            plan.user_id = user_id
+            plan.training_sessions.extend(survey_processor.sessions)
+        else:
+            plan = DailyPlan(event_date=plan_event_date)
+            plan.user_id = user_id
+            plan.last_sensor_sync = DailyPlanDatastore().get_last_sensor_sync(user_id, plan_event_date)
+            plan.training_sessions = survey_processor.sessions
         plan.sessions_planned = sessions_planned
         plan.session_from_readiness = session_from_readiness
         plan.sessions_planned_readiness = sessions_planned_readiness
@@ -188,3 +194,10 @@ def validate_data():
         soreness['body_part'] = int(soreness['body_part'])
         soreness['severity'] = int(soreness['severity'])
 
+def _check_plan_exists(user_id, event_date):
+    mongo_collection = get_mongo_collection('dailyplan')
+    if mongo_collection.count({"user_id": user_id,
+                               "date": event_date}) == 1:
+        return True
+    else:
+        return False
