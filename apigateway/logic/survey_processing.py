@@ -1,6 +1,5 @@
 import datetime
 from utils import parse_datetime, format_datetime, fix_early_survey_event_date, format_date
-from fathomapi.utils.exceptions import InvalidSchemaException
 from fathomapi.utils.xray import xray_recorder
 from models.session import SessionType, SessionFactory, StrengthConditioningType, SessionSource
 from models.post_session_survey import PostSurvey
@@ -19,11 +18,12 @@ class SurveyProcessing(object):
         self.event_date = format_date(event_date)
         self.athlete_stats = athlete_stats
         self.sessions = []
-        self.sleep_data = []
+        self.sleep_history = []
         self.heart_rate_data = []
         self.soreness = []
+        self.plans = []
 
-    def create_session_from_survey(self, session):
+    def create_session_from_survey(self, session, return_obj=False):
         event_date = parse_datetime(session['event_date'])
         end_date = session.get('end_date', None)
         if end_date is not None:
@@ -87,14 +87,12 @@ class SurveyProcessing(object):
                 self.athlete_stats.session_RPE_event_date = self.event_date
         session_obj = create_session(session_type, session_data)
         if 'hr_data' in session and len(session['hr_data']) > 0:
-            session_heart_rate = SessionHeartRate(user_id=self.user_id,
-                                                  session_id=session_obj.id,
-                                                  event_date=session_obj.event_date)
-            session_heart_rate.hr_workout = [HeartRateData(self.cleanup_hr_data_from_api(hr)) for hr in session['hr_data']]
-            self.heart_rate_data.append(session_heart_rate)
+            self.create_session_hr_data(session_obj, session['hr_data'])
 
         self.soreness.extend(session_obj.post_session_survey.soreness)
         self.sessions.append(session_obj)
+        if return_obj:
+            return session_obj
 
     def patch_daily_and_historic_soreness(self, survey='readiness'):
         severe_soreness = [s for s in self.soreness if not s.pain]
@@ -113,7 +111,6 @@ class SurveyProcessing(object):
             # update historic soreness
             for s in self.soreness:
                 self.athlete_stats.update_historic_soreness(s, self.event_date)
-        # DatastoreCollection().athlete_stats_datastore.put(self.athlete_stats)
 
     def process_clear_status_answers(self, clear_candidates, event_date, soreness):
         plan_event_date = format_date(event_date)
@@ -157,81 +154,48 @@ class SurveyProcessing(object):
                                            current_status=HistoricSorenessStatus[status])
 
     @xray_recorder.capture('logic.survey_processing.historic_workout_data')
-    def process_historic_health_data(self, user_id, sessions, plans, event_date):
-        days_with_plan = [plan.event_date for plan in plans]
-        all_session_heart_rates = []
+    def process_historic_health_data(self, sessions, event_date):
+        days_with_plan = [plan.event_date for plan in self.plans]
         for session in sessions:
             session_event_date = parse_datetime(session['event_date'])
             plan_date = format_date(session_event_date)
             if plan_date in days_with_plan:
-                daily_plan = [plan for plan in plans if plan.event_date == plan_date][0]
+                daily_plan = [plan for plan in self.plans if plan.event_date == plan_date][0]
             else:
                 daily_plan = DailyPlan(event_date=plan_date)
-                daily_plan.user_id = user_id
-                plans.append(daily_plan)
+                daily_plan.user_id = self.user_id
+                self.plans.append(daily_plan)
                 days_with_plan.append(plan_date)
 
             stored_health_sessions = [session.event_date for session in daily_plan.training_sessions if session.source in [SessionSource.health, SessionSource.combined]]
             user_sessions = [session for session in daily_plan.training_sessions if session.source == SessionSource.user]
             if session_event_date not in stored_health_sessions:
-                session_obj = self.create_session_from_survey(session)
+                session_obj = self.create_session_from_survey(session, return_obj=True)
                 if len(user_sessions) > 0:
-                    session_obj = self.match_sessions(user_sessions, session_obj)
+                    session_obj = match_sessions(user_sessions, session_obj)
                 daily_plan.training_sessions.append(session_obj)
                 daily_plan.last_updated = event_date
                 if 'hr_data' in session and len(session['hr_data']) > 0:
-                    session_heart_rate = SessionHeartRate(user_id=user_id,
-                                                          session_id=session_obj.id,
-                                                          event_date=session_obj.event_date)
-                    session_heart_rate.hr_workout = [HeartRateData(self.cleanup_hr_data_from_api(hr)) for hr in session['hr_data']]
-                    all_session_heart_rates.append(session_heart_rate)
+                    self.create_session_hr_data(session_obj, session['hr_data'])
 
-        plans = [plan for plan in plans if plan.last_updated == event_date]
-        return plans, all_session_heart_rates
+        self.plans = [plan for plan in self.plans if plan.last_updated == event_date]
 
     # @xray_recorder.capture('logic.survey_processing.historic_sleep_data')
-    def process_historic_sleep_data(self, user_id, sleep_data):
-        sleep_events = [SleepEvent(self.cleanup_sleep_data_from_api(sd)) for sd in sleep_data]
+    def process_historic_sleep_data(self, sleep_data):
+        sleep_events = [SleepEvent(cleanup_sleep_data_from_api(sd)) for sd in sleep_data]
         days_with_sleep_data = set([se.event_date for se in sleep_events])
-        all_sleep_history = []
         for sleep_date in days_with_sleep_data:
-            daily_sleep_data = DailySleepData(user_id=user_id,
+            daily_sleep_data = DailySleepData(user_id=self.user_id,
                                               event_date=sleep_date)
             daily_sleep_data.sleep_events = [se for se in sleep_events if se.event_date == sleep_date]
-            all_sleep_history.append(daily_sleep_data)
-        return all_sleep_history
+            self.sleep_history.append(daily_sleep_data)
 
-    # @xray_recorder.capture('logic.survey_processing.cleanup_hr_data')
-    def cleanup_hr_data_from_api(self, hr_data):
-        return {
-                'start_date': force_datetime_iso(hr_data['startDate']),
-                'end_date': force_datetime_iso(hr_data['endDate']),
-                'value': hr_data['value']
-                }
-
-    # @xray_recorder.capture('logic.survey_processing.cleanup_sleep_data')
-    def cleanup_sleep_data_from_api(self, sleep_data):
-        return {
-                'start_date': force_datetime_iso(sleep_data['startDate']),
-                'end_date': force_datetime_iso(sleep_data['endDate']),
-                'sleep_type': sleep_data['value']
-                }
-
-    def match_sessions(self, user_sessions, health_session):
-        for user_session in user_sessions:
-            if user_session.sport_name  == health_session.sport_name:
-                if user_session.created_date is None:
-                    if user_session.post_session_survey is not None:
-                        user_session.created_date = user_session.post_session_survey.event_date
-                if user_session.created_date is not None and 0 < (user_session.created_date - health_session.end_date).seconds / 60. < 120:
-                    user_session.event_date = health_session.event_date
-                    user_session.end_date = health_session.end_date
-                    user_session.duration_health = health_session.duration_health
-                    user_session.calories = health_session.calories
-                    user_session.distance = health_session.distance
-                    user_session.source = SessionSource.combined
-                    return user_session
-        return health_session
+    def create_session_hr_data(self, session, hr_data):
+        session_heart_rate = SessionHeartRate(user_id=self.user_id,
+                                              session_id=session.id,
+                                              event_date=session.event_date)
+        session_heart_rate.hr_workout = [HeartRateData(cleanup_hr_data_from_api(hr)) for hr in hr_data]
+        self.heart_rate_data.append(session_heart_rate)
 
 def create_session(session_type, data):
     session = SessionFactory().create(SessionType(session_type))
@@ -243,10 +207,37 @@ def update_session(session, data):
     for key, value in data.items():
         setattr(session, key, value)
 
+def cleanup_hr_data_from_api(hr_data):
+    return {
+            'start_date': force_datetime_iso(hr_data['startDate']),
+            'end_date': force_datetime_iso(hr_data['endDate']),
+            'value': hr_data['value']
+            }
+
+def cleanup_sleep_data_from_api(sleep_data):
+    return {
+            'start_date': force_datetime_iso(sleep_data['startDate']),
+            'end_date': force_datetime_iso(sleep_data['endDate']),
+            'sleep_type': sleep_data['value']
+            }
 
 def force_datetime_iso(event_date):
     if len(event_date.split('.')) == 2:
         event_date = event_date.split(".")[0] + 'Z'
     return event_date
 
-
+def match_sessions(user_sessions, health_session):
+    for user_session in user_sessions:
+        if user_session.sport_name  == health_session.sport_name:
+            if user_session.created_date is None:
+                if user_session.post_session_survey is not None:
+                    user_session.created_date = user_session.post_session_survey.event_date
+            if user_session.created_date is not None and 0. < (user_session.created_date - health_session.end_date).seconds / 60. < 120:
+                user_session.event_date = health_session.event_date
+                user_session.end_date = health_session.end_date
+                user_session.duration_health = health_session.duration_health
+                user_session.calories = health_session.calories
+                user_session.distance = health_session.distance
+                user_session.source = SessionSource.combined
+                return user_session
+    return health_session
