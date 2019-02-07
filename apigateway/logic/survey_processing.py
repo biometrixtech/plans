@@ -18,8 +18,12 @@ class SurveyProcessing(object):
         self.user_id = user_id
         self.event_date = format_date(event_date)
         self.athlete_stats = athlete_stats
+        self.sessions = []
+        self.sleep_data = []
+        self.heart_rate_data = []
+        self.soreness = []
 
-    def create_session_from_survey(self, session, return_dict=False):
+    def create_session_from_survey(self, session):
         event_date = parse_datetime(session['event_date'])
         end_date = session.get('end_date', None)
         if end_date is not None:
@@ -74,22 +78,41 @@ class SurveyProcessing(object):
             session_data['post_session_survey'] = survey
             session_data['created_date'] = survey.event_date
 
+            # update session_RPE
+            if self.athlete_stats.session_RPE is not None and survey.RPE is not None:
+                self.athlete_stats.session_RPE = max(survey.RPE, self.athlete_stats.session_RPE)
+                self.athlete_stats.session_RPE_event_date = self.event_date
+            elif survey.RPE is not None:
+                self.athlete_stats.session_RPE = survey.RPE
+                self.athlete_stats.session_RPE_event_date = self.event_date
+        session_obj = create_session(session_type, session_data)
+        if 'hr_data' in session and len(session['hr_data']) > 0:
+            session_heart_rate = SessionHeartRate(user_id=self.user_id,
+                                                  session_id=session_obj.id,
+                                                  event_date=session_obj.event_date)
+            session_heart_rate.hr_workout = [HeartRateData(self.cleanup_hr_data_from_api(hr)) for hr in session['hr_data']]
+            self.heart_rate_data.append(session_heart_rate)
 
-        if return_dict:
-            return session_data
-        else:
-            return create_session(session_type, session_data)
+        self.soreness.extend(session_obj.post_session_survey.soreness)
+        self.sessions.append(session_obj)
 
-    def patch_daily_and_historic_soreness(self, severe_pain, severe_soreness):
-        self.athlete_stats.daily_severe_soreness_event_date = self.event_date
-        self.athlete_stats.daily_severe_pain_event_date = self.event_date
-        self.athlete_stats.update_post_session_soreness(severe_soreness)
-        self.athlete_stats.update_post_session_pain(severe_pain)
-        self.athlete_stats.update_daily_soreness()
-        self.athlete_stats.update_daily_pain()
-        # update historic soreness
-        for s in soreness:
-            self.athlete_stats.update_historic_soreness(s, plan_event_date)
+    def patch_daily_and_historic_soreness(self, survey='readiness'):
+        severe_soreness = [s for s in self.soreness if not s.pain]
+        severe_pain = [s for s in self.soreness if s.pain]
+        if (len(severe_soreness) + len(severe_pain)) > 0:
+            self.athlete_stats.daily_severe_soreness_event_date = self.event_date
+            self.athlete_stats.daily_severe_pain_event_date = self.event_date
+            if survey == 'post_session':
+                self.athlete_stats.update_post_session_soreness(severe_soreness)
+                self.athlete_stats.update_post_session_pain(severe_pain)
+            else:
+                self.athlete_stats.update_readiness_soreness(severe_soreness)
+                self.athlete_stats.update_readiness_pain(severe_pain)
+            self.athlete_stats.update_daily_soreness()
+            self.athlete_stats.update_daily_pain()
+            # update historic soreness
+            for s in self.soreness:
+                self.athlete_stats.update_historic_soreness(s, self.event_date)
         # DatastoreCollection().athlete_stats_datastore.put(self.athlete_stats)
 
     def process_clear_status_answers(self, clear_candidates, event_date, soreness):

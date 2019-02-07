@@ -16,7 +16,6 @@ from models.daily_readiness import DailyReadiness
 from models.soreness import MuscleSorenessSeverity, BodyPartLocation
 from models.stats import AthleteStats
 from models.daily_plan import DailyPlan
-from models.heart_rate import SessionHeartRate, HeartRateData
 from models.sleep_data import DailySleepData, SleepEvent
 from logic.survey_processing import SurveyProcessing
 from logic.athlete_status_processing import AthleteStatusProcessing
@@ -44,20 +43,17 @@ def handle_daily_readiness_create():
                                    if 'wants_functional_strength' in request.json else False)
     )
 
-    all_sessions = []
-    all_session_heart_rates = []
     need_new_plan = False
     sessions_planned = True
     sessions_planned_readiness = True
     session_from_readiness = False
     need_stats_update = False
-    session_rpe = None
-    session_rpe_event_date = None
     plan_event_date = format_date(event_date)
-    athlete_stats = AthleteStatsDatastore().get(athlete_id=request.json['user_id'])
+    athlete_stats = AthleteStatsDatastore().get(athlete_id=user_id)
     if athlete_stats is None:
         athlete_stats = AthleteStats(user_id)
     survey_processor = SurveyProcessing(user_id, event_date, athlete_stats)
+
     if 'sessions_planned' in request.json and not request.json['sessions_planned']:
         need_new_plan = True
         sessions_planned = False
@@ -70,71 +66,46 @@ def handle_daily_readiness_create():
         for session in request.json['sessions']:
             if session is None:
                 continue
-            session_obj = survey_processor.create_session_from_survey(session)
-            if session_rpe is not None and session_obj.post_session_survey.RPE is not None:
-                session_rpe = max(session_obj.post_session_survey.RPE, session_rpe)
-            elif session_obj.post_session_survey.RPE is not None:
-                session_rpe = session_obj.post_session_survey.RPE
-            session_rpe_event_date = plan_event_date
-            if 'hr_data' in session and len(session['hr_data']) > 0:
-                session_heart_rate = SessionHeartRate(user_id=user_id,
-                                                      session_id=session_obj.id,
-                                                      event_date=session_obj.event_date)
-                session_heart_rate.hr_workout = [HeartRateData(survey_processor.cleanup_hr_data_from_api(hr)) for hr in session['hr_data']]
-                all_session_heart_rates.append(session_heart_rate)
-            all_sessions.append(session_obj)
+            survey_processor.create_session_from_survey(session)
 
     if "sleep_data" in request.json and len(request.json['sleep_data']) > 0:
         daily_sleep_data = DailySleepData(user_id=user_id,
                                           event_date=plan_event_date)
-        daily_sleep_data.sleep_events = [SleepEvent(survey_processor.cleanup_sleep_data_from_api(sd)) for sd in request.json['sleep_data']]
+        daily_sleep_data.sleep_events = [SleepEvent(survey_processor.cleanup_sleep_data_from_api(sd)) for sd in
+                                         request.json['sleep_data']]
         SleepHistoryDatastore().put(daily_sleep_data)
 
     if need_new_plan:
         plan = DailyPlan(event_date=plan_event_date)
         plan.user_id = user_id
         plan.last_sensor_sync = DailyPlanDatastore().get_last_sensor_sync(user_id, plan_event_date)
-        plan.training_sessions = all_sessions
+        plan.training_sessions = survey_processor.sessions
         plan.sessions_planned = sessions_planned
         plan.session_from_readiness = session_from_readiness
         plan.sessions_planned_readiness = sessions_planned_readiness
         DailyPlanDatastore().put(plan)
-        if len(all_session_heart_rates) > 0:
-            HeartRateDatastore().put(all_session_heart_rates)
+        if len(survey_processor.heart_rate_data) > 0:
+            HeartRateDatastore().put(survey_processor.heart_rate_data)
 
     if "clear_candidates" in request.json and len(request.json['clear_candidates']) > 0:
-        survey_processor.process_clear_status_answers(request.json['clear_candidates'], event_date, daily_readiness.soreness)
+        survey_processor.process_clear_status_answers(request.json['clear_candidates'], event_date,
+                                                      daily_readiness.soreness)
 
     store = DailyReadinessDatastore()
     store.put(daily_readiness)
 
-    soreness = daily_readiness.soreness
-    severe_soreness = [s for s in soreness if not s.pain]
-    severe_pain = [s for s in soreness if s.pain]
-    if len(soreness) > 0 or 'current_sport_name' in request.json or 'current_position' in request.json:
+    survey_processor.soreness = daily_readiness.soreness
+    survey_processor.patch_daily_and_historic_soreness(survey='readiness')
+    if len(survey_processor.soreness) > 0 or 'current_sport_name' in request.json or 'current_position' in request.json:
         need_stats_update = True
+    if 'current_sport_name' in request.json or 'current_position' in request.json:
+        if 'current_sport_name' in request.json:
+            survey_processor.athlete_stats.current_sport_name = request.json['current_sport_name']
+        if 'current_position' in request.json:
+            survey_processor.current_position = request.json['current_position']
 
     if need_stats_update:
-        athlete_stats.event_date = plan_event_date
-        athlete_stats.session_RPE = session_rpe
-        athlete_stats.session_RPE_event_date = session_rpe_event_date
-        athlete_stats.update_readiness_soreness(severe_soreness)
-        athlete_stats.update_readiness_pain(severe_pain)
-        athlete_stats.update_daily_soreness()
-        athlete_stats.update_daily_pain()
-        athlete_stats.daily_severe_soreness_event_date = plan_event_date
-        athlete_stats.daily_severe_pain_event_date = plan_event_date
-
-        for s in daily_readiness.soreness:
-            athlete_stats.update_historic_soreness(s, plan_event_date)
-
-        if 'current_sport_name' in request.json or 'current_position' in request.json:
-            if 'current_sport_name' in request.json:
-                athlete_stats.current_sport_name = request.json['current_sport_name']
-            if 'current_position' in request.json:
-                athlete_stats.current_position = request.json['current_position']
-
-    AthleteStatsDatastore().put(athlete_stats)
+        AthleteStatsDatastore().put(survey_processor.athlete_stats)
 
     body = {"event_date": plan_event_date,
             "last_updated": format_datetime(event_date)}
@@ -144,8 +115,8 @@ def handle_daily_readiness_create():
     if "health_sync_date" in request.json and request.json['health_sync_date'] is not None:
         Service('users', os.environ['USERS_API_VERSION']).call_apigateway_async(method='PATCH',
                                                                                 endpoint=f"user/{user_id}",
-                                                                                body={"health_sync_date": request.json['health_sync_date']})
-
+                                                                                body={"health_sync_date": request.json[
+                                                                                    'health_sync_date']})
 
     return {'message': 'success'}, 201
 
