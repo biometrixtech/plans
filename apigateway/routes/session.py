@@ -9,14 +9,14 @@ from datastores.heart_rate_datastore import HeartRateDatastore
 from fathomapi.api.config import Config
 from fathomapi.comms.service import Service
 from fathomapi.utils.decorators import require
-from fathomapi.utils.exceptions import InvalidSchemaException, NoSuchEntityException, ForbiddenException
+from fathomapi.utils.exceptions import InvalidSchemaException, NoSuchEntityException
 from fathomapi.utils.xray import xray_recorder
-from models.session import SessionType, SessionFactory, SessionSource
+from models.session import SessionType, SessionSource
 from models.heart_rate import SessionHeartRate, HeartRateData
 from models.daily_plan import DailyPlan
 from utils import parse_datetime, format_date, format_datetime
 from config import get_mongo_collection
-from logic.survey_processing import SurveyProcessing, create_session
+from logic.survey_processing import SurveyProcessing, create_session, update_session
 from logic.athlete_status_processing import AthleteStatusProcessing
 
 app = Blueprint('session', __name__)
@@ -26,69 +26,53 @@ app = Blueprint('session', __name__)
 @require.authenticated.any
 @xray_recorder.capture('routes.session.create')
 def handle_session_create():
-    # _validate_schema()
     user_id = request.json['user_id']
     event_date = parse_datetime(request.json['event_date'])
+    plan_update_required = False
     athlete_stats = AthleteStatsDatastore().get(athlete_id=user_id)
-    sessions = []
-    soreness = []
-    all_session_heart_rates = []
+    plan_event_date = format_date(event_date)
+    survey_processor = SurveyProcessing(user_id, event_date, athlete_stats)
     for session in request.json['sessions']:
-        session_obj = SurveyProcessing().create_session_from_survey(session, athlete_stats=athlete_stats)
-        if 'hr_data' in session and len(session['hr_data']) > 0:
-            session_heart_rate = SessionHeartRate(user_id=user_id,
-                                                  session_id=session_obj.id,
-                                                  event_date=session_obj.event_date)
-            session_heart_rate.hr_workout = [HeartRateData(SurveyProcessing().cleanup_hr_data_from_api(hr)) for hr in session['hr_data']]
-            all_session_heart_rates.append(session_heart_rate)
-        sessions.append(session_obj)
-        plan_event_date = format_date(session_obj.event_date)
-
-        # update session_RPE
-        if athlete_stats.session_RPE is not None and session_obj.post_session_survey.RPE is not None:
-            athlete_stats.session_RPE = max(session_obj.post_session_survey.RPE, athlete_stats.session_RPE)
-        elif session_obj.post_session_survey.RPE is not None:
-            athlete_stats.session_RPE = session_obj.post_session_survey.RPE
-        athlete_stats.session_RPE_event_date = plan_event_date
-
-        # update severe soreness and severe pain
-        soreness.extend(session_obj.post_session_survey.soreness)
+        if session is None:
+            continue
+        survey_processor.create_session_from_survey(session)
 
     # update daily pain and soreness in athlete_stats
-    severe_soreness = [s for s in soreness if not s.pain]
-    severe_pain = [s for s in soreness if s.pain]
-    athlete_stats.daily_severe_soreness_event_date = plan_event_date
-    athlete_stats.daily_severe_pain_event_date = plan_event_date
-    athlete_stats.update_post_session_soreness(severe_soreness)
-    athlete_stats.update_post_session_pain(severe_pain)
-    athlete_stats.update_daily_soreness()
-    athlete_stats.update_daily_pain()
-    # update historic soreness
-    for s in soreness:
-        athlete_stats.update_historic_soreness(s, plan_event_date)
-    AthleteStatsDatastore().put(athlete_stats)
+    survey_processor.patch_daily_and_historic_soreness(survey='post_session')
 
+    # check that not all sessions are deleted or ignored
+    for session in survey_processor.sessions:
+        if not session.deleted and not session.ignored:
+            plan_update_required = True
+            break
+
+    # check if plan exists, if not create a new one and save it to database, also check if existing one needs updating flags
     if not _check_plan_exists(user_id, plan_event_date):
         plan = DailyPlan(event_date=plan_event_date)
         plan.user_id = user_id
         plan.last_sensor_sync = DailyPlanDatastore().get_last_sensor_sync(user_id, plan_event_date)
         DailyPlanDatastore().put(plan)
+    else:
+        plan = DailyPlanDatastore().get(user_id, plan_event_date, plan_event_date)[0]
+        if plan_update_required and (not plan.sessions_planned or plan.session_from_readiness):
+            plan.sessions_planned = True
+            plan.session_from_readiness = False
+            DailyPlanDatastore().put(plan)
 
+    # save all the sessions to database
     store = SessionDatastore()
-
-    for session in sessions:
+    for session in survey_processor.sessions:
         store.insert(item=session,
                      user_id=user_id,
                      event_date=plan_event_date
                      )
-    plan = DailyPlanDatastore().get(user_id, plan_event_date, plan_event_date)[0]
-    if not plan.sessions_planned or plan.session_from_readiness:
-        plan.sessions_planned = True
-        plan.session_from_readiness = False
-        DailyPlanDatastore().put(plan)
-    if len(all_session_heart_rates) > 0:
-        HeartRateDatastore().put(all_session_heart_rates)
-    update_plan(user_id, event_date)
+    # save heart_rate_data if it exists in any of the sessions
+    if len(survey_processor.heart_rate_data) > 0:
+        HeartRateDatastore().put(survey_processor.heart_rate_data)
+    # update plan
+    if plan_update_required:
+        update_plan(user_id, event_date)
+    # update users database if health data received
     if "health_sync_date" in request.json and request.json['health_sync_date'] is not None:
         Service('users', os.environ['USERS_API_VERSION']).call_apigateway_async(method='PATCH',
                                                                                 endpoint=f"user/{user_id}",
@@ -130,36 +114,35 @@ def handle_session_update(session_id):
     event_date = parse_datetime(request.json['event_date'])
     plan_event_date = format_date(event_date)
 
-    all_session_heart_rates = []
-    for session in request.json['sessions']:
-        new_session = SurveyProcessing().create_session_from_survey(session)
+    # create session
+    survey_processor = SurveyProcessing(user_id, event_date)
+    session = request.json['sessions'][0]
+    survey_processor.create_session_from_survey(session)
+    new_session = survey_processor.sessions[0]
 
-        if not _check_plan_exists(user_id, plan_event_date):
-            raise NoSuchEntityException("Plan does not exist for the user to update session")
-        store = SessionDatastore()
-        session_obj = store.get(user_id=user_id,
-                                event_date=plan_event_date,
-                                session_id=session_id
-                                )[0]
-        if session_obj.source == SessionSource.user:
-            session_obj.event_date = new_session.event_date
-            session_obj.end_date = new_session.end_date
-            session_obj.duration_health = new_session.duration_health
-            session_obj.calories = new_session.calories
-            session_obj.distance = new_session.distance
-            session_obj.source = SessionSource.combined
-            store.update(session_obj,
-                         user_id=user_id,
-                         event_date=plan_event_date
-                         )
-            if 'hr_data' in session and len(session['hr_data']) > 0:
-                session_heart_rate = SessionHeartRate(user_id=user_id,
-                                                      session_id=session_obj.id,
-                                                      event_date=session_obj.event_date)
-                session_heart_rate.hr_workout = [HeartRateData(SurveyProcessing().cleanup_hr_data_from_api(hr)) for hr in session['hr_data']]
-                all_session_heart_rates.append(session_heart_rate)
-    if len(all_session_heart_rates) > 0:
-        HeartRateDatastore().put(all_session_heart_rates)
+    # get existing session
+    if not _check_plan_exists(user_id, plan_event_date):
+        raise NoSuchEntityException("Plan does not exist for the user to update session")
+    store = SessionDatastore()
+    session_obj = store.get(user_id=user_id,
+                            event_date=plan_event_date,
+                            session_id=session_id
+                            )[0]
+    # update existing session with new data
+    if session_obj.source == SessionSource.user:
+        session_obj.event_date = new_session.event_date
+        session_obj.end_date = new_session.end_date
+        session_obj.duration_health = new_session.duration_health
+        session_obj.calories = new_session.calories
+        session_obj.distance = new_session.distance
+        session_obj.source = SessionSource.combined
+        store.update(session_obj,
+                     user_id=user_id,
+                     event_date=plan_event_date
+                     )
+    # write hr data if it exists
+    if len(survey_processor.heart_rate_data) > 0:
+        HeartRateDatastore().put(survey_processor.heart_rate_data)
     if "health_sync_date" in request.json and request.json['health_sync_date'] is not None:
         Service('users', os.environ['USERS_API_VERSION']).call_apigateway_async(method='PATCH',
                                                                                 endpoint=f"user/{user_id}",
@@ -221,7 +204,7 @@ def handle_session_sensor_data():
                                             event_date=plan_event_date,
                                             session_type=session_type,
                                             session_id=session_id)[0]
-            _update_session(session_obj, sensor_data)
+            update_session(session_obj, sensor_data)
             session_store.update(session_obj,
                                  user_id=user_id,
                                  event_date=plan_event_date
