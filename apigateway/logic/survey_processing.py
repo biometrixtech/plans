@@ -90,7 +90,8 @@ class SurveyProcessing(object):
         if 'hr_data' in session and len(session['hr_data']) > 0:
             self.create_session_hr_data(session_obj, session['hr_data'])
 
-        self.soreness.extend(session_obj.post_session_survey.soreness)
+        if session_obj.post_session_survey is not None:
+            self.soreness.extend(session_obj.post_session_survey.soreness)
         self.sessions.append(session_obj)
         if historic_health_data:
             return session_obj

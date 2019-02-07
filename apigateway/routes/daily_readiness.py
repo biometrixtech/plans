@@ -17,7 +17,7 @@ from models.soreness import MuscleSorenessSeverity, BodyPartLocation
 from models.stats import AthleteStats
 from models.daily_plan import DailyPlan
 from models.sleep_data import DailySleepData, SleepEvent
-from logic.survey_processing import SurveyProcessing
+from logic.survey_processing import SurveyProcessing, cleanup_sleep_data_from_api
 from logic.athlete_status_processing import AthleteStatusProcessing
 from config import get_mongo_collection
 from utils import parse_datetime, format_date, format_datetime, fix_early_survey_event_date
@@ -72,7 +72,7 @@ def handle_daily_readiness_create():
     if "sleep_data" in request.json and len(request.json['sleep_data']) > 0:
         daily_sleep_data = DailySleepData(user_id=user_id,
                                           event_date=plan_event_date)
-        daily_sleep_data.sleep_events = [SleepEvent(survey_processor.cleanup_sleep_data_from_api(sd)) for sd in
+        daily_sleep_data.sleep_events = [SleepEvent(cleanup_sleep_data_from_api(sd)) for sd in
                                          request.json['sleep_data']]
         SleepHistoryDatastore().put(daily_sleep_data)
 
