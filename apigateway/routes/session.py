@@ -66,6 +66,9 @@ def handle_session_create():
                      user_id=user_id,
                      event_date=plan_event_date
                      )
+    # save updated athlete stats
+    if survey_processor.athlete_stats is not None:
+        AthleteStatsDatastore().put(survey_processor.athlete_stats)
     # save heart_rate_data if it exists in any of the sessions
     if len(survey_processor.heart_rate_data) > 0:
         HeartRateDatastore().put(survey_processor.heart_rate_data)
