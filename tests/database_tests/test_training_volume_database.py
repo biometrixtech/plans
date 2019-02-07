@@ -151,7 +151,7 @@ def test_get_training_plan_from_database():
 
         filtered_metrics = list(m for m in metrics_list if not m.insufficient_data)
 
-        training_level = training_volume_processing.get_training_status(filtered_metrics)
+        training_status = training_volume_processing.get_training_status(filtered_metrics)
 
         new_athlete_stats = athlete_stats
 
@@ -174,9 +174,9 @@ def test_get_training_plan_from_database():
 
             filtered_metrics = list(m for m in metrics_list if not m.insufficient_data)
 
-            new_training_level = training_volume_processing.get_training_status(filtered_metrics)
+            new_training_status = training_volume_processing.get_training_status(filtered_metrics)
 
-            if training_level.value != new_training_level.value:
+            if training_status.training_level.value != new_training_status.training_level.value:
                 days = d
                 break
 

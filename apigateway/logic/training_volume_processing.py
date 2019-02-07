@@ -1,4 +1,4 @@
-from models.training_volume import IndicatorLevel, StandardErrorRange, StandardErrorRangeMetric, SuggestedTrainingDay, TrainingLevel, TrainingVolumeGap, TrainingVolumeGapType, TrainingReport
+from models.training_volume import IndicatorLevel, StandardErrorRange, StandardErrorRangeMetric, SuggestedTrainingDay, TrainingLevel, TrainingStatus, TrainingVolumeGap, TrainingVolumeGapType, TrainingReport
 from models.soreness import HistoricSorenessStatus
 from datetime import datetime, timedelta
 import statistics, math
@@ -1251,7 +1251,22 @@ class TrainingVolumeProcessing(object):
                 standard_error_range.upper_bound = (average_value + standard_error_range_factor) * len(values)
             else:
                 standard_error_range.upper_bound = (average_value + standard_error_range_factor)
-        elif 1 == len(values) < expected_workouts or len(values) == 0:
+        elif 1 == len(values) < expected_workouts:
+            #let'a quick manufacture some data
+            fake_values = []
+            fake_values.extend(values)
+            fake_values.append(values[0] * 1.5)
+            average_value = statistics.mean(fake_values)
+            stdev = statistics.stdev(fake_values)
+            standard_error = (stdev / math.sqrt(len(fake_values))) * math.sqrt(
+                (expected_workouts - len(fake_values)) / expected_workouts)  # includes finite population correction
+            standard_error_range_factor = 1.96 * standard_error
+            if return_sum:
+                standard_error_range.upper_bound = (average_value + standard_error_range_factor) * len(fake_values)
+            else:
+                standard_error_range.upper_bound = (average_value + standard_error_range_factor)
+
+        elif len(values) == 0:
             standard_error_range.insufficient_data = True
 
         return standard_error_range
@@ -1510,27 +1525,37 @@ class TrainingVolumeProcessing(object):
             high_excessive = exc_high_values[0].high_excessive_threshold
 
         training_level = TrainingLevel.insufficient_data
+        most_limiting = None
 
         if (high_optimal is not None and low_optimal is not None and high_optimal > low_optimal and
                 high_optimal - low_optimal > 0):
             training_level = TrainingLevel.optimal
+            most_limiting = opt_low_values[0]
 
         if low_optimal is not None and low_optimal > 0:
             training_level = TrainingLevel.undertraining
+            most_limiting = opt_low_values[0]
 
         if high_optimal is not None and low_overreaching is not None and low_overreaching < high_optimal:
             training_level = TrainingLevel.possibly_overreaching
+            most_limiting = ovr_low_values[0]
 
         if high_optimal is not None and high_optimal < 0:
             training_level = TrainingLevel.overreaching
+            most_limiting = ovr_low_values[0]
 
         if high_overreaching is not None and low_excessive is not None and low_excessive < high_overreaching:
             training_level = TrainingLevel.possibly_excessive
+            most_limiting = exc_low_values[0]
 
         if high_overreaching is not None and high_overreaching < 0:
             training_level = TrainingLevel.excessive
+            most_limiting = exc_low_values[0]
 
-        return training_level
+        status = TrainingStatus(training_level)
+        status.limiting_metric = most_limiting
+
+        return status
 
     def compile_training_report(self, user_id, date_time, gap_list, low_monotony_gap, high_monotony_gap):
 

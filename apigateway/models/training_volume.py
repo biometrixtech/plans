@@ -1,11 +1,12 @@
 from enum import Enum, IntEnum
 from serialisable import Serialisable
 
-class TrainingStatus(object):
-    def __init__(self, training_level, projected_days_duration):
-        training_level = training_level
-        projected_days_duration = projected_days_duration
 
+class TrainingStatus(object):
+    def __init__(self, training_level, projected_days_duration=0):
+        self.training_level = training_level
+        self.projected_days_duration = projected_days_duration
+        self.limiting_metric = None
 
 
 class FitFatigueStatus(Enum):
