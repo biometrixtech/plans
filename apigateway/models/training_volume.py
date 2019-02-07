@@ -61,6 +61,12 @@ class StandardErrorRange(Serialisable):
 class StandardErrorRangeMetric(StandardErrorRange):
     def __init__(self, lower_bound=None, upper_bound=None, observed_value=None):
         StandardErrorRange.__init__(self, lower_bound, upper_bound, observed_value)
+        self.lower_bound_rate = None
+        self.lower_bound_target_rate = None
+        self.upper_bound_rate = None
+        self.upper_bound_target_rate = None
+        self.observed_target_rate = None
+        self.observed_target = None
         self.training_volume_gaps = []
 
     def json_serialise(self):

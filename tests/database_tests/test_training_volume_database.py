@@ -90,7 +90,7 @@ def test_get_training_plan_from_database():
     risk_severity_list = []
 
     users = []
-    users.append('0dd21808-55f9-45f2-a408-b1713d40681f') #mw
+    #users.append('0dd21808-55f9-45f2-a408-b1713d40681f') #mw
     users.append('93176a69-2d5d-4326-b986-ca6b04a9a29d') #liz
     users.append('e4fff5dc-6467-4717-8cef-3f2cb13e5c33')  #abbey
     users.append('82ccf294-7c1e-48e6-8149-c5a001e76f78')  #pene
@@ -145,6 +145,10 @@ def test_get_training_plan_from_database():
                                                     stats.get_chronic_weeks_plans(),
                                                     stats.chronic_daily_plans)
         athlete_stats = training_volume_processing.calc_training_volume_metrics(athlete_stats)
+
+        training_volume_processing.update_allowable_loads(athlete_stats.internal_strain)
+
+        training_volume_processing.get_training_recs(athlete_stats.internal_acwr, athlete_stats.internal_ramp)
 
         metrics_list = [athlete_stats.internal_acwr, athlete_stats.internal_strain, athlete_stats.internal_monotony,
                         athlete_stats.internal_ramp]

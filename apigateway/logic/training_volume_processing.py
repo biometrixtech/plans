@@ -28,6 +28,12 @@ class TrainingVolumeProcessing(object):
 
         self.internal_load_tuples = []
         self.external_load_tuples = []
+        self.low_internal_load_day_lower_bound = None
+        self.mod_internal_load_day_lower_bound = None
+        self.high_internal_load_day_lower_bound = None
+        self.low_internal_load_day_upper_bound = None
+        self.mod_internal_load_day_upper_bound = None
+        self.high_internal_load_day_upper_bound = None
 
     def load_plan_values(self, last_7_days_plans, days_8_14_plans, acute_daily_plans, chronic_weeks_plans, chronic_daily_plans):
 
@@ -104,6 +110,15 @@ class TrainingVolumeProcessing(object):
                                                                                                  chronic_daily_plans)
                                 if x is not None))
 
+        if len(self.internal_load_tuples) > 0:
+            internal_load_values = list(x[1] for x in self.internal_load_tuples if x[1] is not None)
+            high_internal = max(internal_load_values)
+            low_internal = min(internal_load_values)
+            range = (high_internal - low_internal) / 3
+            self.low_internal_load_day_lower_bound = low_internal
+            self.low_internal_load_day_upper_bound = low_internal + range
+            self.mod_internal_load_day_upper_bound = high_internal - range
+            self.high_internal_load_day_upper_bound = high_internal
 
     def calc_training_volume_metrics(self, athlete_stats):
 
@@ -179,12 +194,19 @@ class TrainingVolumeProcessing(object):
             if chronic_load_error.observed_value > 0:
                 standard_error_range.observed_value = (acute_load_error.observed_value /
                                                        chronic_load_error.observed_value)
+                standard_error_range.observed_target = (1.3 * chronic_load_error.observed_value ) - acute_load_error.observed_value
 
         acwr_values = []
 
-        if acute_load_error.observed_value is not None and chronic_load_error.upper_bound is not None:
-            if chronic_load_error.upper_bound > 0:
-                acwr_values.append(acute_load_error.observed_value / chronic_load_error.upper_bound)
+        acwr_values = self.get_acwr_target(acwr_values, acute_load_error.lower_bound, chronic_load_error.lower_bound)
+        acwr_values = self.get_acwr_target(acwr_values, acute_load_error.lower_bound, chronic_load_error.observed_value)
+        acwr_values = self.get_acwr_target(acwr_values, acute_load_error.lower_bound, chronic_load_error.upper_bound)
+        acwr_values = self.get_acwr_target(acwr_values, acute_load_error.observed_value, chronic_load_error.lower_bound)
+        acwr_values = self.get_acwr_target(acwr_values, acute_load_error.observed_value, chronic_load_error.upper_bound)
+        acwr_values = self.get_acwr_target(acwr_values, acute_load_error.upper_bound, chronic_load_error.lower_bound)
+        acwr_values = self.get_acwr_target(acwr_values, acute_load_error.upper_bound, chronic_load_error.observed_value)
+        acwr_values = self.get_acwr_target(acwr_values, acute_load_error.upper_bound, chronic_load_error.upper_bound)
+
         if acute_load_error.upper_bound is not None and chronic_load_error.upper_bound is not None:
             if chronic_load_error.upper_bound > 0:
                 acwr_values.append(acute_load_error.upper_bound / chronic_load_error.upper_bound)
@@ -205,6 +227,7 @@ class TrainingVolumeProcessing(object):
                 standard_error_range.lower_bound = min_acwr
                 standard_error_range.upper_bound = max_acwr
 
+        '''deprecated
         acwr_gaps = []
         acwr_gaps.append(self.get_acwr_gap(acute_load_error.lower_bound, chronic_load_error.lower_bound))
         acwr_gaps.append(self.get_acwr_gap(acute_load_error.lower_bound, chronic_load_error.observed_value))
@@ -220,8 +243,16 @@ class TrainingVolumeProcessing(object):
 
         if gap is not None:
             standard_error_range.training_volume_gaps.append(gap)
-
+        '''
         return standard_error_range
+
+    def get_acwr_target(self, acwr_values, acute_load_value, chronic_load_value):
+
+        if acute_load_value is not None and chronic_load_value is not None:
+            if chronic_load_value > 0:
+                acwr_values.append((1.3 * chronic_load_value) - acute_load_value)
+
+        return acwr_values
 
     def get_lower_training_volume_gap(self, gap_type, gaps):
 
@@ -334,14 +365,29 @@ class TrainingVolumeProcessing(object):
         if load.observed_value is not None and monotony_error_range.observed_value is not None:
             standard_error_range.observed_value = load.observed_value * monotony_error_range.observed_value
 
+        if len(historical_strain) > 0:
+
+            strain_count = min(7, len(list(x.observed_value for x in historical_strain if x.observed_value is not None)))
+
+            if strain_count > 1:
+                strain_sd = statistics.stdev(
+                    list(x.observed_value for x in historical_strain[-strain_count:] if x.observed_value is not None))
+                strain_avg = statistics.mean(
+                    list(x.observed_value for x in historical_strain[-strain_count:] if x.observed_value is not None))
+
+                if historical_strain[len(
+                        historical_strain) - 1] is not None and monotony_error_range.observed_value is not None and monotony_error_range.observed_value > 0:
+
+                    strain_sd_load = strain_sd / monotony_error_range.observed_value
+                    strain_avg_load = strain_avg / monotony_error_range.observed_value
+                    standard_error_range.observed_target = strain_avg_load + strain_sd_load
+
         strain_values = []
 
-        if load.upper_bound is not None and monotony_error_range.observed_value is not None:
-            strain_values.append(load.upper_bound * monotony_error_range.observed_value)
-        if load.upper_bound is not None and monotony_error_range.upper_bound is not None:
-            strain_values.append(load.upper_bound * monotony_error_range.upper_bound)
-        if load.observed_value is not None and monotony_error_range.upper_bound is not None:
-            strain_values.append(load.observed_value * monotony_error_range.upper_bound)
+        strain_values = self.get_strain_value(strain_values, historical_strain, "lower_bound", monotony_error_range.lower_bound)
+        strain_values = self.get_strain_value(strain_values, historical_strain, "lower_bound", monotony_error_range.observed_value)
+        strain_values = self.get_strain_value(strain_values, historical_strain, "lower_bound", monotony_error_range.upper_bound)
+
         if len(strain_values) > 0:
             min_strain = min(strain_values)
             max_strain = max(strain_values)
@@ -354,6 +400,7 @@ class TrainingVolumeProcessing(object):
                 standard_error_range.lower_bound = min_strain
                 standard_error_range.upper_bound = max_strain
 
+        '''deprecated
         gaps = []
         gaps.append(self.get_strain_gap(list(x.observed_value for x in historical_strain if x is not None), monotony_error_range.observed_value))
         gaps.append(self.get_strain_gap(list(x.observed_value for x in historical_strain if x is not None),
@@ -378,8 +425,61 @@ class TrainingVolumeProcessing(object):
 
         if gap is not None:
             standard_error_range.training_volume_gaps.append(gap)
+        '''
 
         return standard_error_range
+
+    def get_strain_value(self, strain_values, historical_strain, strain_variable, monotony_value):
+
+        if len(historical_strain) > 0:
+
+            strain_count = min(7, len(list(getattr(x, strain_variable) for x in historical_strain if getattr(x, strain_variable) is not None)))
+
+            if strain_count > 1:
+                strain_sd = statistics.stdev(
+                    list(getattr(x, strain_variable) for x in historical_strain[-strain_count:] if getattr(x, strain_variable) is not None))
+                strain_avg = statistics.mean(
+                    list(getattr(x, strain_variable) for x in historical_strain[-strain_count:] if getattr(x, strain_variable) is not None))
+
+                if historical_strain[len(
+                        historical_strain) - 1] is not None and monotony_value is not None and monotony_value > 0:
+
+                    strain_sd_load = strain_sd / monotony_value
+                    strain_avg_load = strain_avg / monotony_value
+                    strain_values.append(strain_avg_load + strain_sd_load)
+
+        return strain_values
+
+    def update_allowable_loads(self, strain_error_range):
+
+        if strain_error_range.lower_bound is not None:
+            strain = strain_error_range.lower_bound
+        elif strain_error_range.observed_target is not None:
+            strain = strain_error_range.observed_target
+        elif strain_error_range.upper_bound is not None:
+            strain = strain_error_range.upper_bound
+        else:
+            strain = None
+
+        if strain is not None:
+            if self.high_internal_load_day_upper_bound is not None and self.high_internal_load_day_upper_bound > strain:
+                self.high_internal_load_day_upper_bound = strain
+            if self.high_internal_load_day_lower_bound is not None and self.high_internal_load_day_lower_bound > strain:
+                self.high_internal_load_day_lower_bound = None
+                self.high_internal_load_day_upper_bound = None
+            if self.mod_internal_load_day_upper_bound is not None and self.mod_internal_load_day_upper_bound > strain:
+                self.mod_internal_load_day_upper_bound = strain
+                self.high_internal_load_day_lower_bound = None
+                self.high_internal_load_day_upper_bound = None
+
+            if self.mod_internal_load_day_lower_bound is not None and self.mod_internal_load_day_lower_bound > strain:
+                self.mod_internal_load_day_lower_bound = None
+                self.mod_internal_load_day_upper_bound = None
+            if self.low_internal_load_day_upper_bound is not None and self.low_internal_load_day_upper_bound > strain:
+                self.low_internal_load_day_upper_bound = strain
+            if self.low_internal_load_day_lower_bound is not None and self.low_internal_load_day_lower_bound > strain:
+                self.low_internal_load_day_lower_bound = None
+                self.low_internal_load_day_upper_bound = None
 
     def get_monotony(self, expected_weekly_workouts, values):
 
@@ -437,6 +537,7 @@ class TrainingVolumeProcessing(object):
 
         current_load = self.get_standard_error_range(expected_weekly_workouts, last_week_values)
         previous_load = self.get_standard_error_range(expected_weekly_workouts, previous_week_values)
+        days = 7  # assume 7 days for rate calculation
 
         ramp_error_range = StandardErrorRangeMetric()
 
@@ -446,30 +547,34 @@ class TrainingVolumeProcessing(object):
         if (current_load.observed_value is not None and previous_load.observed_value is not None
                 and previous_load.observed_value > 0):
             ramp_error_range.observed_value = current_load.observed_value / float(previous_load.observed_value)
+            ramp_error_range.observed_target = (1.10 * previous_load.observed_value) - current_load.observed_value
+            ramp_error_range.observed_target_rate = ramp_error_range.observed_target / float(days)
 
-        bound_values = []
+        target_values = []
 
-        if (current_load.upper_bound is not None and previous_load.upper_bound is not None
-                and previous_load.upper_bound > 0):
-            bound_values.append(current_load.upper_bound / float(previous_load.upper_bound))
-        if (current_load.observed_value is not None and previous_load.upper_bound is not None
-                and previous_load.upper_bound > 0):
-            bound_values.append(current_load.observed_value / float(previous_load.upper_bound))
-        if (current_load.upper_bound is not None and previous_load.observed_value is not None
-                and previous_load.observed_value > 0):
-            bound_values.append(current_load.upper_bound / float(previous_load.observed_value))
-        if len(bound_values) > 0:
-            min_bound = min(bound_values)
-            max_bound = max(bound_values)
+        target_values = self.get_ramp_target(target_values, current_load.lower_bound, previous_load.lower_bound)
+        target_values = self.get_ramp_target(target_values, current_load.lower_bound, previous_load.observed_value)
+        target_values = self.get_ramp_target(target_values, current_load.lower_bound, previous_load.upper_bound)
+        target_values = self.get_ramp_target(target_values, current_load.observed_value, previous_load.lower_bound)
+        target_values = self.get_ramp_target(target_values, current_load.observed_value, previous_load.upper_bound)
+        target_values = self.get_ramp_target(target_values, current_load.upper_bound, previous_load.lower_bound)
+        target_values = self.get_ramp_target(target_values, current_load.upper_bound, previous_load.observed_value)
+        target_values = self.get_ramp_target(target_values, current_load.upper_bound, previous_load.upper_bound)
+
+        if len(target_values) > 0:
+            min_bound = min(target_values)
+            max_bound = max(target_values)
             if (ramp_error_range.observed_value is None or (ramp_error_range.observed_value is not None and
-                                                                min_bound < ramp_error_range.observed_value)):
+                                                            min_bound < ramp_error_range.observed_value)):
                 ramp_error_range.lower_bound = min_bound
+                ramp_error_range.lower_bound_rate = ramp_error_range.lower_bound / float(days)
             if (ramp_error_range.observed_value is None or (ramp_error_range.observed_value is not None and
-                                                                max_bound > ramp_error_range.observed_value)):
+                                                            max_bound > ramp_error_range.observed_value)):
                 ramp_error_range.upper_bound = max_bound
+                ramp_error_range.upper_bound_rate = ramp_error_range.upper_bound / float(days)
 
+        '''deprecated
         ramp_gaps = []
-        ramp_gaps.append(self.get_ramp_gap(current_load.lower_bound, previous_load.lower_bound))
         ramp_gaps.append(self.get_ramp_gap(current_load.lower_bound, previous_load.observed_value))
         ramp_gaps.append(self.get_ramp_gap(current_load.lower_bound, previous_load.upper_bound))
         ramp_gaps.append(self.get_ramp_gap(current_load.observed_value, previous_load.lower_bound))
@@ -483,8 +588,17 @@ class TrainingVolumeProcessing(object):
 
         if gap is not None:
             ramp_error_range.training_volume_gaps.append(gap)
-
+        '''
         return ramp_error_range
+
+    def get_ramp_target(self, bound_values, current_load_value, previous_load_value):
+
+        if (current_load_value is not None and previous_load_value is not None
+                and previous_load_value > 0):
+            #bound_values.append(current_load_value / float(previous_load_value))
+            bound_values.append((1.10 * previous_load_value) - current_load_value)
+
+        return bound_values
 
     def calc_monotony_strain(self, load_values):
 
@@ -1429,6 +1543,49 @@ class TrainingVolumeProcessing(object):
         #high_monotony_gap.training_level = None
 
         return low_monotony_gap, high_monotony_gap
+
+    def get_training_recs(self, acwr, ramp):
+
+        # first calc the integrated range between acwr and ramp
+
+        lower_target = self.get_min(acwr.lower_bound, ramp.lower_bound)
+        observed_target = self.get_min(acwr.observed_target, ramp.observed_target)
+        upper_target = self.get_min(acwr.upper_bound, ramp.upper_bound)
+
+        low_days_resolve = 0
+        mod_days_resolve = 0
+        high_days_resolve = 0
+
+        if upper_target is not None:
+            target = upper_target
+            for d in range(0,8):
+                if target >= self.low_internal_load_day_lower_bound and target <= self.low_internal_load_day_upper_bound:
+                    low_days_resolve += 1
+                    target = target - self.get_min(target, self.low_internal_load_day_upper_bound)
+                elif target > self.low_internal_load_day_lower_bound and upper_target <= self.mod_internal_load_day_upper_bound:
+                    mod_days_resolve += 1
+                    target = target - self.get_min(target, self.mod_internal_load_day_upper_bound)
+                elif target > self.mod_internal_load_day_upper_bound:
+                    high_days_resolve += 1
+                    target = target - self.get_min(target, self.high_internal_load_day_upper_bound)
+                elif target <= 0:
+                    break
+        j=0
+
+
+
+    def get_min(self, value_1, value_2):
+
+        if value_1 is not None and value_2 is None:
+            min_val = value_1
+        elif value_1 is None and value_2 is not None:
+            min_val = value_2
+        elif value_1 is not None and value_2 is not None:
+            min_val = min(value_1, value_2)
+        else:
+            min_val = None
+
+        return min_val
 
     def get_training_status(self, metrics_list):
 
