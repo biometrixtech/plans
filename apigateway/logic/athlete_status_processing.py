@@ -1,7 +1,6 @@
 import datetime
 
 from datastores.datastore_collection import DatastoreCollection
-from models.soreness import HistoricSorenessStatus
 from fathomapi.utils.exceptions import NoSuchEntityException
 from utils import parse_datetime, format_datetime, parse_date, format_date
 
@@ -18,6 +17,7 @@ class AthleteStatusProcessing(object):
         self.daily_plan_store = DatastoreCollection().daily_plan_datastore
         self.severe_pain_today_yesterday = False
         self.sore_body_parts = []
+        self.cleaned_sore_body_parts = []
         self.hist_sore_status = []
         self.clear_candidates = []
         self.dormant_tipping_candidates = []
@@ -49,17 +49,9 @@ class AthleteStatusProcessing(object):
         severe_pain_dates = [s.reported_date_time for s in self.sore_body_parts if s.pain and s.severity >= 3 and s.reported_date_time > self.soreness_start_time + datetime.timedelta(days=1)]
         if len(severe_pain_dates) > 0:
             self.severe_pain_today_yesterday = True
-        self.sore_body_parts = self.remove_duplicate_sore_body_parts()
+        self.cleaned_sore_body_parts = self.remove_duplicate_sore_body_parts()
         # get athlete_stats
         athlete_stats = self.athlete_stats_store.get(athlete_id=self.user_id)
-        # current_sport_name = None
-        # current_position = None
-        # functional_strength_eligible = False
-        # completed_functional_strength_sessions = 0
-
-        # hist_sore_status = []
-        # clear_candidates = []
-        # dormant_tipping_candidates = []
         if athlete_stats is not None:
             # get historical soreness
             self.hist_sore_status, self.clear_candidates, self.dormant_tipping_candidates = athlete_stats.get_q2_q3_list()
@@ -72,7 +64,7 @@ class AthleteStatusProcessing(object):
                 self.functional_strength_eligible = True
             self.completed_functional_strength_sessions = athlete_stats.completed_functional_strength_sessions
             self.remove_duplicates_sore_body_parts_historic_soreness()
-        return (self.sore_body_parts,
+        return (self.cleaned_sore_body_parts,
                 self.hist_sore_status,
                 self.clear_candidates,
                 self.dormant_tipping_candidates,
@@ -85,7 +77,7 @@ class AthleteStatusProcessing(object):
         q3_list = [{"body_part": q["body_part"], "side": q["side"]} for q in self.clear_candidates]
         q2_list = [{"body_part": q["body_part"], "side": q["side"]} for q in self.hist_sore_status]
         tipping_list = [{"body_part": q["body_part"], "side": q["side"]} for q in self.dormant_tipping_candidates]
-        for sore_part in self.sore_body_parts:
+        for sore_part in self.cleaned_sore_body_parts:
             part = {"body_part": sore_part["body_part"], "side": sore_part["side"]}
             if part in q2_list or part in q3_list:
                 sore_part['delete'] = True
@@ -95,29 +87,29 @@ class AthleteStatusProcessing(object):
                         sore_part['status'] = t['status']
                         t['delete'] = True
                         break
-        cleaned_sore_parts = [s for s in self.sore_body_parts if not s.get('delete', False)]
+        cleaned_sore_parts = [s for s in self.cleaned_sore_body_parts if not s.get('delete', False)]
         cleaned_tipping_candidates = [s for s in self.dormant_tipping_candidates if not s.get('delete', False)]
-        self.sore_body_parts = cleaned_sore_parts
+        self.cleaned_sore_body_parts = cleaned_sore_parts
         self.dormant_tipping_candidates = cleaned_tipping_candidates
 
     def remove_duplicate_sore_body_parts(self):
-        self.sore_body_parts = [s.json_serialise(api=True) for s in self.sore_body_parts]
-        self.sore_body_parts = [dict(t) for t in {tuple(d.items()) for d in self.sore_body_parts}]
+        self.cleaned_sore_body_parts = [s.json_serialise(api=True) for s in self.sore_body_parts]
+        self.cleaned_sore_body_parts = [dict(t) for t in {tuple(d.items()) for d in self.cleaned_sore_body_parts}]
         unique_parts = []
-        for soreness in self.sore_body_parts:
+        for soreness in self.cleaned_sore_body_parts:
             body_part = {'body_part': soreness['body_part'],
                          'side': soreness['side']}
             if body_part in unique_parts:
                 if not soreness['pain']:
                     soreness['delete'] = True
                 else:
-                    for part in self.sore_body_parts:
+                    for part in self.cleaned_sore_body_parts:
                         if part['body_part'] == soreness['body_part'] and part['side'] == soreness['side'] and not part['pain']:
                             part['delete'] = True
                             continue
             else:
                 unique_parts.append(body_part)
-        return [s for s in self.sore_body_parts if not s.get('delete', False)]
+        return [s for s in self.cleaned_sore_body_parts if not s.get('delete', False)]
 
     def get_typical_sessions(self):
         plans = self.daily_plan_store.get(
