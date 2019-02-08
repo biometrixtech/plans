@@ -14,12 +14,12 @@
   - [Endpoints](#endpoints)
     - [Daily Readiness](#daily-readiness)
       - [Create](#create)
-      - [Soreness history](#soreness-history)
+      - [Soreness/Typical Session history](#sorenesstypical-session-history)
     - [Post-Session Survey (Deprecated)](#post-session-survey-deprecated)
       - [Create](#create-1)
     - [Session](#session)
       - [Create](#create-2)
-      - [Get Typical Sessions](#get-typical-sessions)
+      - [Get Typical Sessions (Deprecated)](#get-typical-sessions-deprecated)
       - [Mark no sessions planned](#mark-no-sessions-planned)
       - [Delete](#delete)
       - [Update](#update)
@@ -37,6 +37,8 @@
       - [Get dashboard data for all users](#get-dashboard-data-for-all-users)
     - [Athlete](#athlete)
       - [Athlete Survey](#athlete-survey)
+    - [Health Data](#health-data)
+      - [Sync health data](#sync-health-data)
     - [Misc](#misc)
       - [Clear user's data](#clear-users-data)
       - [Log App/Device information](#log-appdevice-information)
@@ -112,19 +114,23 @@ The client __must__ submit a request body containing a JSON object with the foll
     "current_sport_name": number,
     "current_position": number,
     "sessions": [session, session],
-    "sessions_planned": boolean
+    "sessions_planned": boolean,
+    "sleep_data": [sleep_event, sleep_event],
+    "health_sync_date": Datetime
 }
 ```
 * `date_time` __should__ reflect the local time that survey was taken
 * `soreness` __should__ reflect the number of body part that the user indicated soreness that were not candidates for clearance. Length __could__ be 0.
 * `clear_candidates` __should__ include body parts that were candidates to be cleared of historical status. Note this should include the body part even if marked "all_clear".
-* `sleep_quality` __should__ be an integer between 1 and 10
-* `readiness` __should__ be an integer between 1 and 10
+* `sleep_quality` __should__ be an integer between 1 and 10 or null
+* `readiness` __should__ be an integer between 1 and 10 or null
 * `wants_functional_strength` is optional argument only for the users that are eligible for functional strength and should be included once they are eligible
 * `current_sport_name` __should__ be integer representing SportName enumeration
 * `current_position` __should__ be integer representating position enumeration for specific sport or StrengthConditioningType enumeration
-* `sessions` __should__ be a list of session, where each session matches the body of [Create](#create-2) Session with `user_id` removed.
+* `sessions` __should__ be a list of session, where each session matches the body of [Create](#create-2) Session.
+* `sleep_data` __should__ be a list of sleep_events.
 * `sessions_planned` __should__ be a boolean representing whether the user plans to train again that day.
+* `health_sync_date` is __optional__ and only provided if one of the sessions is obtained from health app
 * `sore_part` __should__ have the following schema:
 ```
 {
@@ -132,7 +138,7 @@ The client __must__ submit a request body containing a JSON object with the foll
     "severity": number,
     "side": number,
     "pain": boolean,
-    status: string
+    "status": string
 }
 ```
 * `body_part` __should__ be an integer reflecting BodyPart enum
@@ -171,7 +177,8 @@ Authorization: eyJraWQ...ajBc4VQ
                                         }
                   }
                 ],
-    "sessions_planned": false
+    "sessions_planned": false,
+    "sleep_data": [{"value": "INBED", "startDate": "2019-01-09T00:09:50.212-0500", "endDate": "2019-01-09T07:35:21.256-0500"}]
 }
 ```
 ##### Responses
@@ -185,9 +192,9 @@ Authorization: eyJraWQ...ajBc4VQ
 ```
 
 
-#### Soreness history
+#### Soreness/Typical Session history
 
-This endpoint can be called to get the body parts where soreness was reported in the last report as well as the user's eligibility status for functional strength.
+This endpoint can be called to get the body parts where soreness was reported in the last three days, user's eligibility status for functional strength and typical sessions.
 
 ##### Query String
  
@@ -214,6 +221,11 @@ Authentication is required for this endpoint
  The Service __will__ respond with HTTP Status `200 OK`, with a body with the following syntax:
  
 ```
+"readiness": readiness,
+"typical_sessions": [sesson, session]
+```
+* `readiness` will have the following schema
+```
 {
     "body_parts": [
                 {"body_part": number, "side": number, "status": string},
@@ -236,7 +248,20 @@ Authentication is required for this endpoint
 * `current_position` and `current_sport_name` will be enumeration
 * `current_position` exists but `current_sport_name` does not, then it's implied that the user wants functional strength for sport-less activity
 
+* `typical sessions` will be a list of sessions that the user has logged in the last 14 days. 
+* `session` object will be of the following schema
 
+``` 
+{
+    "count": number,
+    "duration": number,
+    "event_date": datetime,
+    "session_type": number,
+    "sport_name": number,
+    "strength_and_conditioning_type": number
+}
+
+```
 
 ### Post-Session Survey (Deprecated)
 
@@ -319,25 +344,48 @@ The client __must__ submit a request body containing a JSON object with the foll
 {
     "user_id": Uuid,
     "event_date": Datetime,
-    "sport_name": number,
+    "sessions": [session, session],
+    "health_sync_date": Datetime
+}
+```
+* `event_date` __should__ reflect the date and time when the survey is submitted.
+* `health_sync_date` is __optional__ and only provided if one of the sessions is obtained from health app
+* `session` __should__ be of the following schema
+```
+{
+    "event_date": Datetime,
+    "end_date": Datetime,
     "session_type": number,
+    "sport_name": number,
     "duration": number,
     "description": string,
+    "calories": number,
+    "distance": number,
+    "source": number,
+    "deleted": boolean,
+    "ignored": boolean,
     "post_session_survey": {
                             "event_date": Datetime
                             "RPE": number,
-                            "soreness": [{"body_part": number, "severity": number, "side": number, "pain", boolean}]
-                        }
+                            "soreness": [sore_part, sore_part],
+                            "clear_candidates": [sore_part]}
+                        },
+    "hr_data": [hr, hr, hr]
 }
 ```
-* `event_date` __should__ reflect the date and time the session is scheduled for.
-* `session_type` __should__ be an integer reflecting SessionType enumeration.
+* `event_date` __should__ reflect the start time of the session (health data) or default date (manually logged session)
+* `end_date` __shole__ reflect the end time of the session (health data) or be null (manually logged session)
+* `session_type` __should__ be an integer reflecting SessionType enumeration. NOTE: We'll only use 6 moving forward
 * `sport_name` __should__ be an integer reflecting SportName enumeration.
-* `strength_and_conditioning_type` __should__ be an integer reflecting StrengthAndContioningType enumeration
-* `duration` __should__ be in minutes and reflect the length of time the session is scheduled for.
+* `duration` __should__ be in minutes and reflect the duration which the user confirmend (health data) or entered (manually logged session)
+* `calories` __should__ be calorie information obtained from health workout
+* `distance` __should__ be distance information obtained from health workout
+* `source` __should__ be 0 for manually logged session and 1 for health data
+* `deleted` __should__ be true if the user deletes the workout detected from health app
+* `ignored` __should__ be true for short walking workouts.
+* `hr_data` __should__ be the heart rate data associated with the health workout. each hr will have `startDate`, `endDate` and `value`
 * `description` is __optional__ parameter to provide short description of the session they're adding
 
-Note: A session will either have `sport_name` or `strength_and_conditioning_type` `session_type=1` will have `strength_and_conditioning_type` and `session_type=1=0,2,3,6` will have `sport_name` associated
 ```
 POST /plans/version/session HTTP/1.1
 Host: apis.dev.fathomai.com
@@ -347,20 +395,39 @@ Cache-Control: no-cache
 Postman-Token: 4b6c3946-89fd-4cde-ae29-3a4984d5f373
 
 {
-    "user_id":"a1233423-73d3-4761-ac92-89cc15921d34",
-    "event_date": "2018-09-14T19:54:48Z",
-    "session_type": 0,
-    "sport_name": 0,
-    "duration": 90,
-    "description": "Evening Practice",
-    "post_session_survey": {
-               "event_date": "2018-09-14T19:54:48Z",
-               "RPE": 5,
-               "soreness": [
-                            {"body_part": 16, "severity": 3, "pain": false, "side": 1},
-                            {"body_part": 6, "severity": 2, "pain": false, "side": 2},
-                            ]
-            }
+    "user_id": "fd263811-b299-461f-9e79-895c69612bac",
+    "event_date": "2019-01-12T16:54:57Z",
+    "sessions":[
+                {
+                    "event_date": "2019-01-12T10:41:57Z",
+                    "session_type": 6,
+                    "sport_name": 1,
+                    "duration": 14,
+                    "description": "Evening Practice",
+                    "calories": 100,
+                    "distance": 200,
+                    "end_date": "2019-02-12T10:54:57Z",
+                    "source": 1,
+                    "deleted": false,
+                    "ignored": false,
+                    "hr_data":  [
+                                {"value": 153, "startDate": "2019-01-12T10:43:08.490-0500", "endDate": "2019-01-12T10:43:08.490-0500"},
+                                {"value": 156, "startDate": "2019-01-12T10:43:03.490-0500", "endDate": "2019-01-12T10:43:03.490-0500"},
+                                {"value": 161, "startDate": "2019-01-12T10:42:58.490-0500", "endDate": "2019-01-12T10:42:58.490-0500"},
+                                {"value": 163, "startDate": "2019-01-12T10:42:56.490-0500", "endDate": "2019-01-12T10:42:56.490-0500"},
+                                {"value": 167, "startDate": "2019-01-12T10:42:50.490-0500", "endDate": "2019-01-12T10:42:50.490-0500"},
+                                {"value": 163, "startDate": "2019-01-12T10:42:47.490-0500", "endDate": "2019-01-12T10:42:47.490-0500"},
+                                {"value": 127, "startDate": "2019-01-12T10:41:23.490-0500", "endDate": "2019-01-12T10:41:23.490-0500"}
+                            ],
+                    "post_session_survey": {
+                                            "event_date": "2019-02-08T16:54:57Z",
+                                            "RPE": 5,
+                                            "soreness": [],
+                                            "clear_candidates": []
+                                            }
+                    }
+                    
+                ]
 }
 ```
 ##### Responses
@@ -373,9 +440,9 @@ Postman-Token: 4b6c3946-89fd-4cde-ae29-3a4984d5f373
 }
 ```
 
-#### Get Typical Sessions
+#### Get Typical Sessions (Deprecated)
 
-This endpoint can be called to get the typical sessions the user has logged in the past two weeks ordered by their occurence. Only the top four most occuring session types will be returned.
+This endpoint can be called to get the typical sessions the user has logged in the past two weeks ordered by their occurence. Only the top five most occuring session types will be returned.
 
 ##### Query String
  
@@ -516,7 +583,7 @@ Authorization: eyJraWQ...ajBc4VQ
 
 #### Update
 
-This endpoint can be called to update the details of an existing session that hasn't already been logged. This endpoint can be called to reschedule a session, or change duration/sport/session type/description of the session.
+This endpoint can be called to update and combine manually logged session with a health app session
 
 ##### Query String
  
@@ -529,17 +596,13 @@ The client __must__ submit a request body containing a JSON object with the foll
 {
     "user_id": Uuid,
     "event_date": Datetime,
-    "sport_name": number,
-    "session_type": number,
-    "duration": number,
-    "description": string
+    "sessions": [session],
+    "health_sync_date": Datetime
 }
 ```
-* `event_date` __should__ reflect the date and time the session is scheduled for. If the session is being recheduled, it should reflect the new time.
-* `session_type` __should__ be an integer reflecting SessionType enumeration.
-* `sport_name` __should__ be an integer reflecting SportName enumeration.
-* `duration` __should__ be in minutes and reflect the length of time the session is scheduled for.
-* `description` is __optional__ parameter to provide short description of the session they're adding
+* `event_date` __should__ reflect the local date and time when the call is being made
+* `session` __should__ follow the same schema as defined in [Create Session](#create-2)
+* `health_sync_date` __should__ reflect the time when the data was obtained from health app
 
 ```
 PATCH /plans/version/session/73e8f603-d2d5-423a-b2b6-fe0996a373c8 HTTPS/1.1
@@ -549,11 +612,28 @@ Authorization: eyJraWQ...ajBc4VQ
 
 {
     "user_id": "02cb7965-7921-493a-80d4-6b278c928fad",
-    "event_date": "2018-08-10T16:30:00Z",
-    "session_type": 1,
-    "sport_name": 5,
-    "duration": 90,
-    "description": "Late Afteronoon Practice"
+    "event_date": "2019-02-08T16:30:00Z",
+    "sessions": [
+                 {
+                    "event_date": "2019-02-08T16:45:55Z",
+                    "end_date": "2019-02-08T16:45:55Z",
+                    "session_type": 6,
+                    "sport_name": 1,
+                    "duration": 90.5,
+                    "calories": 50,
+                    "distance": 100,
+                    "source": 1,
+                    "hr_data": [],
+                    "post_session_survey": {
+                                            "event_date": "2019-02-08T16:30:00Z",
+                                            "RPE": null,
+                                            "soreness": [],
+                                            "clear_candidates": []
+                                            }
+
+                }
+                ],
+    "health_sync_date": "2019-02-08T16:30:00Z"
 }
 ```
 ##### Responses
@@ -901,9 +981,13 @@ The Service __will__ respond with HTTP Status `200 OK`, with a body with the fol
  
 ```
 {
-    "daily_plans": [daily_plan1, daily_plan2]
+    "daily_plans": [daily_plan1, daily_plan2],
+    "readiness": readiness,
+    "typical_sessions": [session, session]
 }
 ```
+* `readiness` is only returned if readiness survey hasn't been completed for the day and will follow the schema defined [here](#sorenesstypical-session-history)
+* `typical_sessions` is only returned if readiness survey hasn't been completed for the day and will follow the schema defined [here](#sorenesstypical-session-history)
 * `daily_plans` __could__ be emply list
 * each `daily_plan*` will be of following syntax:
 ```
@@ -1238,6 +1322,56 @@ Authorization: eyJraWQ...ajBc4VQ
 }
 ```
 
+
+### Health Data
+
+#### Sync health data
+This endpoint can used to submit health app workouts from missed days
+
+##### Query String
+The client __must__ submit a request to the endpoint `/plans/version/health_data`. The request method __must__ be `POST`.
+
+##### Request
+The client __must__ submit a request body containing a JSON object with the following schema:
+```
+{
+    "user_id": string,
+    "event_date": Datetime,
+    "start_date": Date,
+    "end_date": Date,
+    "sessions": [session, session],
+    "sleep_data": [sleep_event, sleep_event],
+}
+```
+* `event_date` __should__ reflect the local time the call is made
+* `start_date` __should__ reflect the start date of the range of data being sent
+* `end_date` __should__ reflect the end date of the range of data being sent
+* `session` __should__ follow the same schema as defined in [Session Create](#create-2)
+* `sleep_event` __should__ follow the same schema as defined in [Readiness Create](#create)
+
+```
+POST /plans/version/health_data HTTPS/1.1
+Host: apis.env.fathomai.com
+Content-Type: application/json
+Authorization: eyJraWQ...ajBc4VQ
+
+{
+    "user_id": "fd263811-b299-461f-9e79-895c69612bac",
+    "event_date": "2019-01-31T16:12:02Z",
+    "start_date": "2019-01-29",
+    "end_date": "2019-01-30",
+    "sessions": [session1],
+    "sleep_data": [sleep_event1, sleep_event2]
+}
+```
+##### Responses
+ If successful, the Service __will__ respond with HTTP Status `200 OK`, with a body with the following syntax:
+ 
+```
+{
+    "message": "success"
+}
+```
 
 ### Misc
 
