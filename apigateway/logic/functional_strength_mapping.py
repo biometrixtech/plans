@@ -1,5 +1,5 @@
 import models.sport as sport
-from models.session import FunctionalStrengthSession
+from models.session import FunctionalStrengthSession, StrengthConditioningType
 from models.exercise import UnitOfMeasure
 from models.soreness import AssignedExercise
 
@@ -66,8 +66,10 @@ class FSProgramGenerator(object):
         if sport_name.value is None and position is None:
             return session
 
-        if sport_name.value is None or sport_name in [sport.SportName.pool_sports, sport.SportName.track_field, sport.SportName.wrestling]:
-            if position == sport.NoSportPosition.strength or position == sport.TrackAndFieldPosition.thrower:
+        if sport_name.value is None or sport_name in [sport.SportName.pool_sports, sport.SportName.track_field, sport.SportName.wrestling,
+                                                      sport.SportName.strength, sport.SportName.cross_training,  sport.SportName.endurance,
+                                                      sport.SportName.speed_agility, sport.SportName.power]:
+            if position in [StrengthConditioningType.strength, sport.TrackAndFieldPosition.thrower] or sport_name == sport.SportName.strength:
 
                 session.warm_up.append(AssignedExercise("139", 1, 1))
                 session.warm_up.append(AssignedExercise("140", 1, 2))
@@ -92,7 +94,7 @@ class FSProgramGenerator(object):
                 session.victory_lap.append(AssignedExercise("159", 4, 4))
                 session.victory_lap.append(AssignedExercise("160", 4, 5))
 
-            elif position == sport.NoSportPosition.cross_training:
+            elif position == StrengthConditioningType.cross_training or sport_name == sport.SportName.cross_training:
 
                 session.warm_up.append(AssignedExercise("161", 1, 1))
                 session.warm_up.append(AssignedExercise("162", 1, 2))
@@ -117,7 +119,7 @@ class FSProgramGenerator(object):
                 session.victory_lap.append(AssignedExercise("173", 4, 3))
                 session.victory_lap.append(AssignedExercise("174", 4, 4))
 
-            elif position == sport.NoSportPosition.endurance or sport_name == sport.SportName.pool_sports:
+            elif position == StrengthConditioningType.endurance or sport_name in [sport.SportName.pool_sports, sport.SportName.endurance]:
 
                 session.warm_up.append(AssignedExercise("176", 1, 1))
                 session.warm_up.append(AssignedExercise("139", 1, 2))
@@ -143,8 +145,8 @@ class FSProgramGenerator(object):
                 session.victory_lap.append(AssignedExercise("201", 4, 3))
                 session.victory_lap.append(AssignedExercise("202", 4, 4))
 
-            elif (position == sport.NoSportPosition.speed_agility or
-                  position == sport.NoSportPosition.power) or position in [sport.TrackAndFieldPosition.sprinter, sport.TrackAndFieldPosition.jumper] or sport_name == sport.SportName.wrestling:
+            elif (position in [StrengthConditioningType.speed_agility, StrengthConditioningType.power, sport.TrackAndFieldPosition.sprinter, sport.TrackAndFieldPosition.jumper]
+                  or sport_name in [sport.SportName.speed_agility, sport.SportName.power, sport.SportName.wrestling]):
 
                 session.warm_up.append(AssignedExercise("176", 1, 1))
                 session.warm_up.append(AssignedExercise("139", 1, 2))
@@ -167,7 +169,32 @@ class FSProgramGenerator(object):
                 session.victory_lap.append(AssignedExercise("159", 4, 1))
                 session.victory_lap.append(AssignedExercise("213", 4, 2))
 
-        if sport_name == sport.SportName.distance_running or (sport_name == sport.SportName.track_field and position == sport.TrackAndFieldPosition.distance):
+            else:
+                session.warm_up.append(AssignedExercise("176", 1, 1))
+                session.warm_up.append(AssignedExercise("139", 1, 2))
+                session.warm_up.append(AssignedExercise("161", 1, 3))
+                session.warm_up.append(AssignedExercise("193", 1, 4))
+                session.warm_up.append(AssignedExercise("144", 1, 5))
+
+                session.dynamic_movement.append(AssignedExercise("151", 2, 1))
+                session.dynamic_movement.append(AssignedExercise("147", 2, 2))
+                session.dynamic_movement.append(AssignedExercise("149", 2, 3))
+                session.dynamic_movement.append(AssignedExercise("145", 2, 4))
+                session.dynamic_movement.append(AssignedExercise("194", 2, 5))
+                session.dynamic_movement.append(AssignedExercise("184", 2, 6))
+
+                session.stability_work.append(AssignedExercise("185", 3, 1))
+                session.stability_work.append(AssignedExercise("195", 3, 2))
+                session.stability_work.append(AssignedExercise("196", 3, 3))
+                session.stability_work.append(AssignedExercise("197", 3, 4))
+                session.stability_work.append(AssignedExercise("198", 3, 5))
+
+                session.victory_lap.append(AssignedExercise("199", 4, 1))
+                session.victory_lap.append(AssignedExercise("200", 4, 2))
+                session.victory_lap.append(AssignedExercise("201", 4, 3))
+                session.victory_lap.append(AssignedExercise("202", 4, 4))
+
+        elif sport_name == sport.SportName.distance_running or (sport_name == sport.SportName.track_field and position == sport.TrackAndFieldPosition.distance):
 
             session.warm_up.append(AssignedExercise("176", 1, 1))
             session.warm_up.append(AssignedExercise("139", 1, 2))
@@ -193,7 +220,7 @@ class FSProgramGenerator(object):
             session.victory_lap.append(AssignedExercise("201", 4, 3))
             session.victory_lap.append(AssignedExercise("202", 4, 4))
 
-        if sport_name == sport.SportName.baseball or sport_name == sport.SportName.softball or sport_name == sport.SportName.golf:
+        elif sport_name in [sport.SportName.baseball, sport.SportName.softball, sport.SportName.golf]:
 
             session.warm_up.append(AssignedExercise("161", 1, 1))
             session.warm_up.append(AssignedExercise("162", 1, 2))
@@ -218,7 +245,7 @@ class FSProgramGenerator(object):
             session.victory_lap.append(AssignedExercise("173", 4, 3))
             session.victory_lap.append(AssignedExercise("174", 4, 4))
 
-        if sport_name == sport.SportName.basketball or sport_name in [sport.SportName.cycling, sport.SportName.rowing, sport.SportName.volleyball]:
+        elif sport_name in [sport.SportName.basketball, sport.SportName.cycling, sport.SportName.rowing, sport.SportName.volleyball]:
             # position doesn't matter
 
             session.warm_up.append(AssignedExercise("175", 1, 1))
@@ -247,7 +274,7 @@ class FSProgramGenerator(object):
             session.victory_lap.append(AssignedExercise("159", 4, 1))
             #session.victory_lap.append(AssignedExercise("192", 4, 4))
 
-        if sport_name == sport.SportName.football:
+        elif sport_name == sport.SportName.football:
             if (position is not None and (position == sport.FootballPosition.kicker or
                                           position == sport.FootballPosition.lineman or
                                           position == sport.FootballPosition.linebacker or
@@ -304,7 +331,7 @@ class FSProgramGenerator(object):
                 session.victory_lap.append(AssignedExercise("173", 4, 3))
                 session.victory_lap.append(AssignedExercise("174", 4, 4))
 
-        if sport_name == sport.SportName.lacrosse or sport_name in [sport.SportName.skate_sports, sport.SportName.field_hockey]:
+        elif sport_name in [sport.SportName.lacrosse, sport.SportName.skate_sports, sport.SportName.field_hockey]:
 
             session.warm_up.append(AssignedExercise("161", 1, 1))
             session.warm_up.append(AssignedExercise("162", 1, 2))
@@ -329,7 +356,7 @@ class FSProgramGenerator(object):
             session.victory_lap.append(AssignedExercise("173", 4, 3))
             session.victory_lap.append(AssignedExercise("174", 4, 4))
 
-        if sport_name == sport.SportName.soccer:
+        elif sport_name == sport.SportName.soccer:
             if (position is not None and
                     (position == sport.SoccerPosition.striker or
                      position == sport.SoccerPosition.forward or
@@ -385,7 +412,7 @@ class FSProgramGenerator(object):
                 session.victory_lap.append(AssignedExercise("173", 4, 3))
                 session.victory_lap.append(AssignedExercise("174", 4, 4))
 
-        if sport_name == sport.SportName.tennis:
+        elif sport_name == sport.SportName.tennis:
 
             session.warm_up.append(AssignedExercise("139", 1, 1))
             session.warm_up.append(AssignedExercise("140", 1, 2))
@@ -409,5 +436,30 @@ class FSProgramGenerator(object):
             session.victory_lap.append(AssignedExercise("158", 4, 3))
             session.victory_lap.append(AssignedExercise("159", 4, 4))
             session.victory_lap.append(AssignedExercise("160", 4, 5))
+
+        else:
+            session.warm_up.append(AssignedExercise("176", 1, 1))
+            session.warm_up.append(AssignedExercise("139", 1, 2))
+            session.warm_up.append(AssignedExercise("161", 1, 3))
+            session.warm_up.append(AssignedExercise("193", 1, 4))
+            session.warm_up.append(AssignedExercise("144", 1, 5))
+
+            session.dynamic_movement.append(AssignedExercise("151", 2, 1))
+            session.dynamic_movement.append(AssignedExercise("147", 2, 2))
+            session.dynamic_movement.append(AssignedExercise("149", 2, 3))
+            session.dynamic_movement.append(AssignedExercise("145", 2, 4))
+            session.dynamic_movement.append(AssignedExercise("194", 2, 5))
+            session.dynamic_movement.append(AssignedExercise("184", 2, 6))
+
+            session.stability_work.append(AssignedExercise("185", 3, 1))
+            session.stability_work.append(AssignedExercise("195", 3, 2))
+            session.stability_work.append(AssignedExercise("196", 3, 3))
+            session.stability_work.append(AssignedExercise("197", 3, 4))
+            session.stability_work.append(AssignedExercise("198", 3, 5))
+
+            session.victory_lap.append(AssignedExercise("199", 4, 1))
+            session.victory_lap.append(AssignedExercise("200", 4, 2))
+            session.victory_lap.append(AssignedExercise("201", 4, 3))
+            session.victory_lap.append(AssignedExercise("202", 4, 4))
 
         return self.populate_exercises(session)

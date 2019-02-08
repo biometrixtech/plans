@@ -116,7 +116,9 @@ def _external_session_from_mongodb(mongo_result, session_type):
     attrs_from_mongo = ["description",
                         "sport_name",
                         "strength_and_conditioning_type",
+                        "created_date",
                         "event_date",
+                        "end_date",
                         "duration_minutes",
                         "data_transferred",
                         "duration_sensor",
@@ -131,7 +133,12 @@ def _external_session_from_mongodb(mongo_result, session_type):
                         "inactive_load",
                         "sensor_start_date_time",
                         "sensor_end_date_time",
-                        "deleted"]
+                        "deleted",
+                        "ignored",
+                        "duration_health",
+                        "calories",
+                        "distance",
+                        "source"]
     for key in attrs_from_mongo:
         setattr(mongo_session, key, _key_present(key, mongo_result))
     if "post_session_survey" in mongo_result and mongo_result["post_session_survey"] is not None:

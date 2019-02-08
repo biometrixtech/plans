@@ -1,6 +1,7 @@
 from models.training_volume import FitFatigueStatus
 from serialisable import Serialisable
-from models.sport import SportName, NoSportPosition, BaseballPosition, BasketballPosition, FootballPosition, LacrossePosition, SoccerPosition, SoftballPosition, FieldHockeyPosition, TrackAndFieldPosition, VolleyballPosition
+from models.sport import SportName, BaseballPosition, BasketballPosition, FootballPosition, LacrossePosition, SoccerPosition, SoftballPosition, FieldHockeyPosition, TrackAndFieldPosition, VolleyballPosition
+from models.session import StrengthConditioningType
 from utils import format_date, parse_date
 from models.soreness import HistoricSorenessStatus
 from logic.soreness_processing import SorenessCalculator
@@ -212,10 +213,7 @@ class AthleteStats(Serialisable):
         unique_q3 = []
         unique_tipping_status = []
         for soreness in self.historic_soreness:
-            new_part = {"body_part": soreness.body_part_location.value,
-                         "side": soreness.side,
-                         "pain": soreness.is_pain,
-                         "status": soreness.historic_soreness_status.name}
+            new_part = soreness.json_serialise(api=True)
             if soreness.ask_persistent_2_question or soreness.ask_acute_pain_question:
                 self._add_body_part(new_part, q3, unique_q3)
             elif soreness.historic_soreness_status in [HistoricSorenessStatus.almost_persistent_pain,
@@ -252,10 +250,13 @@ class AthleteStats(Serialisable):
 
     def __setattr__(self, name, value):
         if name == "current_sport_name":
-            value = SportName(value)
+            try:
+                value = SportName(value)
+            except ValueError:
+                value = SportName(None)
         elif name == "current_position":
             if self.current_sport_name.value is None and value is not None:
-                value = NoSportPosition(value)
+                value = StrengthConditioningType(value)
             elif self.current_sport_name == SportName.soccer:
                 value = SoccerPosition(value)
             elif self.current_sport_name == SportName.basketball:
@@ -314,12 +315,12 @@ class AthleteStats(Serialisable):
             'current_sport_name': self.current_sport_name.value,
             'current_position': self.current_position.value if self.current_position is not None else None,
             'historic_soreness': [h.json_serialise() for h in self.historic_soreness],
-            'readiness_soreness': [s.json_serialise_daily_soreness() for s in self.readiness_soreness],
-            'post_session_soreness': [s.json_serialise_daily_soreness() for s in self.post_session_soreness],
-            'readiness_pain': [s.json_serialise_daily_soreness() for s in self.readiness_pain],
-            'post_session_pain': [s.json_serialise_daily_soreness() for s in self.post_session_pain],
-            'daily_severe_pain': [s.json_serialise_daily_soreness() for s in self.daily_severe_pain],
-            'daily_severe_soreness': [s.json_serialise_daily_soreness() for s in self.daily_severe_soreness],
+            'readiness_soreness': [s.json_serialise(daily=True) for s in self.readiness_soreness],
+            'post_session_soreness': [s.json_serialise(daily=True) for s in self.post_session_soreness],
+            'readiness_pain': [s.json_serialise(daily=True) for s in self.readiness_pain],
+            'post_session_pain': [s.json_serialise(daily=True) for s in self.post_session_pain],
+            'daily_severe_pain': [s.json_serialise(daily=True) for s in self.daily_severe_pain],
+            'daily_severe_soreness': [s.json_serialise(daily=True) for s in self.daily_severe_soreness],
             'daily_severe_soreness_event_date': self.daily_severe_soreness_event_date,
             'daily_severe_pain_event_date': self.daily_severe_pain_event_date,
             'metrics': [m.json_serialise() for m in self.metrics],

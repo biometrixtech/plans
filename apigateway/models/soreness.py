@@ -41,23 +41,42 @@ class Soreness(Serialisable):
         self.streak = 0
         self.daily = True
 
-    def json_serialise(self):
-        ret = {
-            'body_part': self.body_part.location.value,
-            'pain': self.pain,
-            'severity': self.severity,
-            'side': self.side
-        }
-        return ret
+    def is_dormant_cleared(self):
+        try:
+            if (self.historic_soreness_status == None or
+                self.historic_soreness_status == HistoricSorenessStatus.dormant_cleared or
+                self.historic_soreness_status == HistoricSorenessStatus.almost_acute_pain or 
+                self.historic_soreness_status == HistoricSorenessStatus.almost_persistent_pain or
+                self.historic_soreness_status == HistoricSorenessStatus.almost_persistent_soreness):
+                return True
+            else:
+                return False
+        except AtrributeError:
+            return False
 
-    def json_serialise_daily_soreness(self):
-        ret = {
-            'body_part': self.body_part.location.value,
-            'pain': self.pain,
-            'severity': self.severity,
-            'side': self.side,
-            'reported_date_time': format_datetime(self.reported_date_time)
-        }
+    def json_serialise(self, api=False, daily=False):
+        if api:
+            ret = {
+                   'body_part': self.body_part.location.value,
+                   'side': self.side,
+                   'pain': self.pain,
+                   'status': self.historic_soreness_status.name if self.historic_soreness_status is not None else HistoricSorenessStatus.dormant_cleared.name
+                   }
+        elif daily:
+            ret = {
+                   'body_part': self.body_part.location.value,
+                   'pain': self.pain,
+                   'severity': self.severity,
+                   'side': self.side,
+                   'reported_date_time': format_datetime(self.reported_date_time)
+                   }
+        else:
+            ret = {
+                   'body_part': self.body_part.location.value,
+                   'pain': self.pain,
+                   'severity': self.severity,
+                   'side': self.side
+                  }
         return ret
 
     def __getitem__(self, item):
@@ -162,19 +181,25 @@ class HistoricSoreness(Serialisable):
         self.ask_acute_pain_question = False
         self.ask_persistent_2_question = False
 
-    def json_serialise(self):
-        ret = {
-            'body_part_location': self.body_part_location.value,
-            'historic_soreness_status': self.historic_soreness_status.value,
-            'is_pain': self.is_pain,
-            'side': self.side,
-            'streak': self.streak,
-            'streak_start_date': self.streak_start_date,
-            'average_severity': self.average_severity,
-            'last_reported': self.last_reported,
-            'ask_acute_pain_question': self.ask_acute_pain_question,
-            'ask_persistent_2_question': self.ask_persistent_2_question
-        }
+    def json_serialise(self, api=False):
+        if api:
+            ret = {"body_part": self.body_part_location.value,
+                   "side": self.side,
+                   "pain": self.is_pain,
+                   "status": self.historic_soreness_status.name}
+        else:
+            ret = {
+                   'body_part_location': self.body_part_location.value,
+                   'historic_soreness_status': self.historic_soreness_status.value,
+                   'is_pain': self.is_pain,
+                   'side': self.side,
+                   'streak': self.streak,
+                   'streak_start_date': self.streak_start_date,
+                   'average_severity': self.average_severity,
+                   'last_reported': self.last_reported,
+                   'ask_acute_pain_question': self.ask_acute_pain_question,
+                   'ask_persistent_2_question': self.ask_persistent_2_question
+                  }
         return ret
 
     def is_acute_pain(self):
@@ -199,8 +224,11 @@ class HistoricSoreness(Serialisable):
             return False
 
     def is_dormant_cleared(self):
-        if (self.historic_soreness_status == HistoricSorenessStatus.dormant_cleared or
-                self.historic_soreness_status == HistoricSorenessStatus.almost_acute_pain):
+        if (self.historic_soreness_status == None or
+            self.historic_soreness_status == HistoricSorenessStatus.dormant_cleared or
+            self.historic_soreness_status == HistoricSorenessStatus.almost_acute_pain or 
+            self.historic_soreness_status == HistoricSorenessStatus.almost_persistent_pain or
+            self.historic_soreness_status == HistoricSorenessStatus.almost_persistent_soreness):
             return True
         else:
             return False

@@ -5,7 +5,7 @@ import datetime
 from serialisable import Serialisable
 from utils import format_datetime, parse_datetime
 from models.soreness import HistoricSorenessStatus
-from models.sport import SportName, NoSportPosition, BaseballPosition, BasketballPosition, FootballPosition, LacrossePosition, SoccerPosition, SoftballPosition, TrackAndFieldPosition, FieldHockeyPosition, VolleyballPosition
+from models.sport import SportName, BaseballPosition, BasketballPosition, FootballPosition, LacrossePosition, SoccerPosition, SoftballPosition, TrackAndFieldPosition, FieldHockeyPosition, VolleyballPosition
 
 class SessionType(Enum):
     practice = 0
@@ -25,7 +25,6 @@ class StrengthConditioningType(Enum):
     cross_training = 4
     none = None
 
-
 class DayOfWeek(Enum):
     monday = 0
     tuesday = 1
@@ -35,6 +34,10 @@ class DayOfWeek(Enum):
     saturday = 5
     sunday = 6
 
+class SessionSource(Enum):
+    user = 0
+    health = 1
+    combined = 2
 
 class Session(Serialisable, metaclass=abc.ABCMeta):
 
@@ -57,7 +60,9 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         self.low_intensity_RPE = None
         self.post_session_soreness = []     # post_session_soreness object array
         self.duration_minutes = None
+        self.created_date = None
         self.event_date = None
+        self.end_date = None
         self.sensor_start_date_time = None
         self.sensor_end_date_time = None
         self.day_of_week = DayOfWeek.monday
@@ -68,6 +73,11 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         self.movement_limited = False
         self.same_muscle_discomfort_over_72_hrs = False
         self.deleted = False
+        self.ignored = False
+        self.duration_health = None
+        self.calories = None
+        self.distance = None
+        self.source = SessionSource.user
 
         # post-session
         self.post_session_survey = None
@@ -78,19 +88,26 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         self.description = ""
 
     def __setattr__(self, name, value):
-        if name in ['event_date', 'sensor_start_date_time', 'sensor_end_date_time']:
+        if name in ['event_date', 'end_date', 'created_date', 'sensor_start_date_time', 'sensor_end_date_time']:
             if not isinstance(value, datetime.datetime) and value is not None:
                 value = parse_datetime(value)
         elif name == "sport_name" and not isinstance(value, SportName):
             if value == '':
                 value = SportName(None)
             else:
-                value = SportName(value)
+                try:
+                    value = SportName(value)
+                except ValueError:
+                    value = SportName(None)
         elif name == "strength_and_conditioning_type" and not isinstance(value, StrengthConditioningType):
             if value == '':
                 value = StrengthConditioningType(None)
             else:
                 value = StrengthConditioningType(value)
+        elif name in "source":
+            value = SessionSource(value) if value is not None else SessionSource.user
+        elif name == ["deleted", "ignored"]:
+            value = value if value is not None else False
         super().__setattr__(name, value)
 
     @abc.abstractmethod
@@ -118,7 +135,9 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
             'session_type': session_type.value,
             'sport_name': self.sport_name.value,
             'strength_and_conditioning_type': self.strength_and_conditioning_type.value,
+            'created_date': format_datetime(self.created_date),
             'event_date': format_datetime(self.event_date),
+            'end_date': format_datetime(self.end_date),
             'duration_minutes': self.duration_minutes,
             'data_transferred': self.data_transferred,
             'duration_sensor': self.duration_sensor,
@@ -134,7 +153,12 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
             'sensor_start_date_time': format_datetime(self.sensor_start_date_time),
             'sensor_end_date_time': format_datetime(self.sensor_end_date_time),
             'post_session_survey': self.post_session_survey.json_serialise() if self.post_session_survey is not None else self.post_session_survey,
-            'deleted': self.deleted
+            'deleted': self.deleted,
+            'ignored': self.ignored,
+            'duration_health': self.duration_health,
+            'calories': self.calories,
+            'distance': self.distance,
+            'source': self.source.value if self.source is not None else SessionSource.user.value
         }
         return ret
 
@@ -320,10 +344,13 @@ class FunctionalStrengthSession(Serialisable):
 
     def __setattr__(self, name, value):
         if name == "sport_name":
-            value = SportName(value)
+            try:
+                value = SportName(value)
+            except ValueError:
+                value = SportName(None)
         elif name == "position":
             if self.sport_name == SportName.no_sport and value is not None:
-                value = NoSportPosition(value)
+                value = StrengthConditioningType(value)
             elif self.sport_name == SportName.soccer:
                 value = SoccerPosition(value)
             elif self.sport_name == SportName.basketball:
@@ -499,12 +526,9 @@ class RecoverySession(Serialisable):
 
         if soreness_list is not None:
             for soreness in [s for s in soreness_list if s.daily]:
-                if (soreness.historic_soreness_status is not None and
-                        soreness.historic_soreness_status is not HistoricSorenessStatus.dormant_cleared and
-                    soreness.historic_soreness_status is not HistoricSorenessStatus.almost_persistent_pain and
-                        soreness.historic_soreness_status is not HistoricSorenessStatus.almost_persistent_soreness
-                        and soreness.severity == max_severity and
-                        soreness.severity > 0):
+                if (not soreness.is_dormant_cleared() and
+                    soreness.severity == max_severity and
+                    soreness.severity > 0):
                     max_severity_and_historic_soreness = True
                 if soreness.severity > 3 and soreness.pain:
                     high_severity_is_pain = True
