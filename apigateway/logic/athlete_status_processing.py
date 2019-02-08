@@ -130,6 +130,9 @@ class AthleteStatusProcessing(object):
         sessions = sorted(sessions, key=lambda k: k['event_date'], reverse=True)
         filtered_sessions = []
         for session in sessions:
+            if session['session_type'] == 1 and session['strength_and_conditioning_type'] is not None:
+                session = remap_strength_conditioning_sessions(session)
+            session['session_type'] = 6
             if session['session_type'] == 1 and session['strength_and_conditioning_type'] is None:
                 pass
             elif session['session_type'] in [0, 2, 3, 6] and session['sport_name'] is None:
@@ -148,5 +151,15 @@ class AthleteStatusProcessing(object):
         filtered_sessions = sorted(filtered_sessions, key=lambda k: k['count'], reverse=True)
 
         return filtered_sessions[0:5]
+
+def remap_strength_conditioning_sessions(session):
+    sc_sport_map = {0: 52,
+                    1: 53,
+                    2: 54,
+                    3: 55,
+                    4: 56}
+    session['sport_name'] = sc_sport_map[session['strength_and_conditioning_type']]
+    session['strength_and_conditioning_type'] = None
+    return session
 
 
