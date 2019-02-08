@@ -75,11 +75,11 @@ class SurveyProcessing(object):
                 self.process_clear_status_answers(session['post_session_survey']['clear_candidates'],
                                                   event_date,
                                                   survey.soreness)
-            session_data['post_session_survey'] = survey
             session_data['created_date'] = survey.event_date
 
-            # update session_RPE
-            if not historic_health_data:
+            # update session_RPE and add post_session_survey to session
+            if not historic_health_data and not session_data['deleted'] and not session_data['ignored']:
+                session_data['post_session_survey'] = survey
                 if self.athlete_stats.session_RPE is not None and survey.RPE is not None:
                     self.athlete_stats.session_RPE = max(survey.RPE, self.athlete_stats.session_RPE)
                     self.athlete_stats.session_RPE_event_date = self.event_date

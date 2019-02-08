@@ -1,5 +1,5 @@
 from flask import request, Blueprint
-# import os
+import os
 
 from utils import format_date, parse_datetime
 from datastores.daily_plan_datastore import DailyPlanDatastore
@@ -8,7 +8,7 @@ from datastores.sleep_history_datastore import SleepHistoryDatastore
 from logic.survey_processing import SurveyProcessing
 from fathomapi.utils.decorators import require
 from fathomapi.utils.xray import xray_recorder
-# from fathomapi.comms.service import Service
+from fathomapi.comms.service import Service
 
 app = Blueprint('health_data', __name__)
 
@@ -41,9 +41,9 @@ def handle_previous_health_data_write():
     if len(survey_processor.sleep_history) > 0:
         SleepHistoryDatastore().put(survey_processor.sleep_history)
 
-    # Service('users', os.environ['USERS_API_VERSION']).call_apigateway_async(method='PATCH',
-    #                                                                         endpoint=f"user/{user_id}",
-    #                                                                         body={"previous_health_sync_date": event_date})
+    Service('users', os.environ['USERS_API_VERSION']).call_apigateway_async(method='PATCH',
+                                                                            endpoint=f"user/{user_id}",
+                                                                            body={"historic_health_sync_date": event_date})
 
 
 
