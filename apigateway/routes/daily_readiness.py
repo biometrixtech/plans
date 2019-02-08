@@ -108,7 +108,7 @@ def handle_daily_readiness_create():
         if 'current_sport_name' in request.json:
             survey_processor.athlete_stats.current_sport_name = request.json['current_sport_name']
         if 'current_position' in request.json:
-            survey_processor.current_position = request.json['current_position']
+            survey_processor.athlete_stats.current_position = request.json['current_position']
 
     if need_stats_update:
         AthleteStatsDatastore().put(survey_processor.athlete_stats)

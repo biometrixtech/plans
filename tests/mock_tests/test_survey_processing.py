@@ -1,6 +1,23 @@
 import datetime
-from logic.survey_processing import SurveyProcessing, force_datetime_iso, cleanup_sleep_data_from_api, cleanup_hr_data_from_api
+from logic.survey_processing import SurveyProcessing, force_datetime_iso, cleanup_sleep_data_from_api, cleanup_hr_data_from_api, create_session
 from models.soreness import  Soreness, BodyPartLocation, BodyPart, HistoricSoreness, HistoricSorenessStatus
+from models.stats import AthleteStats
+from utils import format_date
+
+def get_soreness(body_part, side, pain=False, severity=0, hist_status=None, reported_date_time=datetime.datetime.now()):
+    soreness = Soreness()
+    soreness.body_part = BodyPart(BodyPartLocation(body_part), None)
+    soreness.side = side
+    soreness.pain = pain
+    soreness.severity = severity
+    soreness.historic_soreness_status = hist_status
+    soreness.reported_date_time = reported_date_time
+    return soreness
+
+def get_historic_soreness(body_part, side, pain=False, status=HistoricSorenessStatus.dormant_cleared):
+    soreness = HistoricSoreness(body_part_location=BodyPartLocation(body_part), is_pain=pain, side=side)
+    soreness.historic_soreness_status = status
+    return soreness.json_serialise(api=True)
 
 def test_force_datetime_iso():
     iso_date = '2019-01-15T01:01:01Z'
@@ -10,6 +27,36 @@ def test_force_datetime_iso():
     assert force_datetime_iso(event_date_1) == iso_date
     assert force_datetime_iso(event_date_2) == iso_date
 
+def get_session_data():
+    session_data = {"event_date": "2019-01-12T10:23:08Z",
+                    "end_date": "2019-01-12T10:43:08Z",
+                    "session_type": 6,
+                    "sport_name": 52,
+                    "duration": 90.5,
+                    "calories": 50,
+                    "distance": 100,
+                    "source": 1,
+                    "hr_data": [
+                                 {"value": 153, "startDate": "2019-01-12T10:43:08.490-0500", "endDate": "2019-01-12T10:43:08.490-0500"},
+                                 {"value": 156, "startDate": "2019-01-12T10:43:03.490-0500", "endDate": "2019-01-12T10:43:03.490-0500"},
+                                 {"value": 161, "startDate": "2019-01-12T10:42:58.490-0500", "endDate": "2019-01-12T10:42:58.490-0500"},
+                                 {"value": 163, "startDate": "2019-01-12T10:42:56.490-0500", "endDate": "2019-01-12T10:42:56.490-0500"},
+                                 {"value": 167, "startDate": "2019-01-12T10:42:50.490-0500", "endDate": "2019-01-12T10:42:50.490-0500"},
+                                 {"value": 163, "startDate": "2019-01-12T10:42:47.490-0500", "endDate": "2019-01-12T10:42:47.490-0500"},
+                                 {"value": 127, "startDate": "2019-01-12T10:41:23.490-0500", "endDate": "2019-01-12T10:41:23.490-0500"}
+                             ],
+                     "post_session_survey": {
+                                             "event_date": "2019-01-12T10:53:08Z",
+                                             "RPE": 3,
+                                             "soreness": [{
+                                                            "body_part": 16,
+                                                            "severity": 2,
+                                                            "pain": False,
+                                                            "side": 1
+                                                        }]
+                                            }
+                     }
+    return session_data
 
 def test_cleanup_hr_data_from_api():
     hr_data = {'startDate': '2019-01-15T01:01:01.001-0500',
@@ -26,7 +73,6 @@ def test_cleanup_sleep_data_from_api():
     assert cleanup_sleep_data_from_api(hr_data) == {'start_date': '2019-01-15T01:01:01Z',
                                                     'end_date': '2019-01-15T09:01:01Z',
                                                     'sleep_type': "INBED"}
-
 
 def test_process_historic_sleep_data():
     sleep_data = [{"value": "INBED", "startDate": "2019-01-09T00:09:50.212-0500", "endDate": "2019-01-09T07:35:21.256-0500"},
@@ -80,3 +126,70 @@ def test_process_historic_sleep_data_multi_days():
     assert len(sleep_109.sleep_events) == 2
     sleep_103 = [sleep for sleep in survey_processor.sleep_history if sleep.event_date == '2019-01-03'][0]
     assert len(sleep_103.sleep_events) == 7
+
+def test_create_session_hr_data():
+    hr_data = [
+               {"value": 153, "startDate": "2019-01-12T10:43:08.490-0500", "endDate": "2019-01-12T10:43:08.490-0500"},
+               {"value": 156, "startDate": "2019-01-12T10:43:03.490-0500", "endDate": "2019-01-12T10:43:03.490-0500"},
+               {"value": 161, "startDate": "2019-01-12T10:42:58.490-0500", "endDate": "2019-01-12T10:42:58.490-0500"},
+               {"value": 163, "startDate": "2019-01-12T10:42:56.490-0500", "endDate": "2019-01-12T10:42:56.490-0500"},
+               {"value": 167, "startDate": "2019-01-12T10:42:50.490-0500", "endDate": "2019-01-12T10:42:50.490-0500"},
+               {"value": 163, "startDate": "2019-01-12T10:42:47.490-0500", "endDate": "2019-01-12T10:42:47.490-0500"},
+               {"value": 127, "startDate": "2019-01-12T10:41:23.490-0500", "endDate": "2019-01-12T10:41:23.490-0500"}
+              ]
+    survey_processor = SurveyProcessing('test', datetime.datetime.now())
+    session = create_session(6, {'event_date': datetime.datetime.now()})
+    survey_processor.create_session_hr_data(session, hr_data)
+
+    assert len(survey_processor.heart_rate_data) == 1
+    assert len(survey_processor.heart_rate_data[0].hr_workout) == 7
+
+
+def  test_patch_daily_and_historic_soreness_higher_soreness():
+    current_time = datetime.datetime.now()
+    athlete_stats = AthleteStats('test')
+    athlete_stats.event_date = format_date(current_time)
+    athlete_stats.readiness_soreness = [get_soreness(7, 1, False, 2)]
+    athlete_stats.daily_severe_soreness = [get_soreness(7, 1, False, 2)]
+
+    survey_processor = SurveyProcessing('test', datetime.datetime.now(), athlete_stats)
+    survey_processor.soreness = [get_soreness(7, 1, False, 3)]
+    survey_processor.patch_daily_and_historic_soreness(survey='readiness')
+
+    assert len(survey_processor.athlete_stats.daily_severe_soreness) == 1
+    assert survey_processor.athlete_stats.daily_severe_soreness[0].severity == 3
+
+def  test_patch_daily_and_historic_soreness_lower_soreness():
+    current_time = datetime.datetime.now()
+    athlete_stats = AthleteStats('test')
+    athlete_stats.event_date = format_date(current_time)
+    athlete_stats.readiness_soreness = [get_soreness(7, 1, False, 3, reported_date_time=current_time - datetime.timedelta(days=1))]
+    athlete_stats.daily_severe_soreness = [get_soreness(7, 1, False, 3, reported_date_time=current_time - datetime.timedelta(days=1))]
+
+    survey_processor = SurveyProcessing('test', datetime.datetime.now(), athlete_stats)
+    survey_processor.soreness = [get_soreness(7, 1, False, 2, reported_date_time=current_time)]
+    survey_processor.patch_daily_and_historic_soreness(survey='readiness')
+
+    assert len(survey_processor.athlete_stats.daily_severe_soreness) == 1
+    assert survey_processor.athlete_stats.daily_severe_soreness[0].severity == 3
+
+def test_session_from_survey():
+    current_time = datetime.datetime.now()
+    athlete_stats = AthleteStats('test')
+    athlete_stats.event_date = format_date(current_time)
+    survey_processor = SurveyProcessing('test', current_time, athlete_stats)
+    session_data = get_session_data()
+    survey_processor.create_session_from_survey(session_data)
+
+    assert len(survey_processor.sessions) == 1
+    assert len(survey_processor.heart_rate_data) == 1
+    assert len(survey_processor.soreness) == 1
+
+def test_session_from_survey_hr_data():
+    pass
+
+def test_session_from_survey_no_ps_survey():
+    pass
+
+def test_session_from_survey_historic_health_data():
+    pass
