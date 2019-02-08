@@ -205,6 +205,7 @@ def test_session_from_survey_hr_data():
     assert survey_processor.athlete_stats.session_RPE == 3
     assert survey_processor.sessions[0].duration_health is not None
     assert survey_processor.sessions[0].created_date is not None
+    assert survey_processor.sessions[0].post_session_survey is not None
 
 def test_session_from_survey_no_ps_survey():
     current_time = datetime.datetime.now()
@@ -221,6 +222,7 @@ def test_session_from_survey_no_ps_survey():
     assert survey_processor.athlete_stats.session_RPE == None
     assert survey_processor.sessions[0].duration_health is not None
     assert survey_processor.sessions[0].created_date is None
+    assert survey_processor.sessions[0].post_session_survey is None
 
 def test_session_from_survey_historic_health_data():
     current_time = datetime.datetime.now()
@@ -233,6 +235,8 @@ def test_session_from_survey_historic_health_data():
     assert session_obj.sport_name.value == 52
     assert len(survey_processor.sessions) == 1
     assert len(survey_processor.heart_rate_data) == 1
-    assert len(survey_processor.soreness) == 1
+    assert len(survey_processor.soreness) == 0
     assert survey_processor.athlete_stats.session_RPE == None
-    assert survey_processor.sessions[0].duration_health is not None
+    assert session_obj == survey_processor.sessions[0]
+    assert session_obj.duration_health is not None
+    assert session_obj.post_session_survey is None
