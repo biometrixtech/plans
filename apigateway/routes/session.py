@@ -12,7 +12,6 @@ from fathomapi.utils.decorators import require
 from fathomapi.utils.exceptions import InvalidSchemaException, NoSuchEntityException
 from fathomapi.utils.xray import xray_recorder
 from models.session import SessionType, SessionSource
-from models.heart_rate import SessionHeartRate, HeartRateData
 from models.daily_plan import DailyPlan
 from utils import parse_datetime, format_date, format_datetime
 from config import get_mongo_collection
@@ -248,7 +247,7 @@ def handle_get_typical_sessions():
 
     filtered_sessions = AthleteStatusProcessing(user_id, event_date).get_typical_sessions()
     
-    return {'typical_sessions': filtered_sessions[0:4]}, 200
+    return {'typical_sessions': filtered_sessions}, 200
 
 
 @app.route('/no_sessions', methods=['POST'])
