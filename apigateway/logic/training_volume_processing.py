@@ -390,7 +390,7 @@ class TrainingVolumeProcessing(object):
 
                     # if the athlete strained, this wil be a negative number
                     # if positive, it reports the amount of load they have left without straining for the last practice
-                    strain_surplus = (1.2 * strain_sd) + strain_avg - historical_strain[len(historical_strain)-1]
+                    strain_surplus = (1.2 * strain_sd) + strain_avg - historical_strain[len(historical_strain)-1].observed_value
                     load_change = strain_surplus / monotony_error_range.observed_value
                     standard_error_range.observed_value_gap = load_change
 
