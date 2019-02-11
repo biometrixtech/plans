@@ -87,18 +87,7 @@ class StatsProcessing(object):
     def process_athlete_stats(self):
         success = self.set_start_end_times()
         if success:
-            daily_readiness_surveys = self.daily_readiness_datastore.get(self.athlete_id, self.start_date_time,
-                                                                         self.end_date_time, last_only=False)
-
-            post_session_surveys = self.post_session_survey_datastore.get(self.athlete_id, self.start_date_time,
-                                                                          self.end_date_time)
-
-            self.all_plans = self.daily_plan_datastore.get(self.athlete_id, self.start_date, self.end_date)
-            self.update_start_times(daily_readiness_surveys, post_session_surveys, self.all_plans)
-            self.set_acute_chronic_periods()
-            self.load_historical_readiness_surveys(daily_readiness_surveys)
-            self.load_historical_post_session_surveys(post_session_surveys)
-            self.load_historical_plans()
+            self.load_historical_data()
             athlete_stats = AthleteStats(self.athlete_id)
             athlete_stats.event_date = self.event_date
             athlete_stats = self.calc_survey_stats(athlete_stats)
@@ -142,6 +131,19 @@ class StatsProcessing(object):
                     # athlete_stats.daily_severe_pain_event_date = current_athlete_stats.daily_severe_pain_event_date
 
             self.athlete_stats_datastore.put(athlete_stats)
+
+    def load_historical_data(self):
+        
+        daily_readiness_surveys = self.daily_readiness_datastore.get(self.athlete_id, self.start_date_time,
+                                                                     self.end_date_time, last_only=False)
+        post_session_surveys = self.post_session_survey_datastore.get(self.athlete_id, self.start_date_time,
+                                                                      self.end_date_time)
+        self.all_plans = self.daily_plan_datastore.get(self.athlete_id, self.start_date, self.end_date)
+        self.update_start_times(daily_readiness_surveys, post_session_surveys, self.all_plans)
+        self.set_acute_chronic_periods()
+        self.load_historical_readiness_surveys(daily_readiness_surveys)
+        self.load_historical_post_session_surveys(post_session_surveys)
+        self.load_historical_plans()
 
     def persist_soreness(self, soreness):
         if soreness.reported_date_time is not None:
