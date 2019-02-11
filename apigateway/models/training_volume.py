@@ -1,13 +1,13 @@
 from enum import Enum, IntEnum
 from serialisable import Serialisable
 
-
+'''deprecated for now
 class TrainingStatus(object):
     def __init__(self, training_level, projected_days_duration=0):
         self.training_level = training_level
         self.projected_days_duration = projected_days_duration
         self.limiting_metric = None
-
+'''
 
 class FitFatigueStatus(Enum):
     undefined = 0
@@ -15,6 +15,7 @@ class FitFatigueStatus(Enum):
     trending_toward_fitness = 2
 
 
+'''deprecated for now
 class TrainingVolumeGapType(Enum):
     acwr = 0
     fit_fatigue_ratio = 1
@@ -39,7 +40,7 @@ class IndicatorLevel(IntEnum):
     low = 0
     moderate = 1
     high = 2
-
+'''
 
 class StandardErrorRange(Serialisable):
     def __init__(self, lower_bound=None, upper_bound=None, observed_value=None):
@@ -61,13 +62,9 @@ class StandardErrorRange(Serialisable):
 class StandardErrorRangeMetric(StandardErrorRange):
     def __init__(self, lower_bound=None, upper_bound=None, observed_value=None):
         StandardErrorRange.__init__(self, lower_bound, upper_bound, observed_value)
-        self.lower_bound_rate = None
-        self.lower_bound_target_rate = None
-        self.upper_bound_rate = None
-        self.upper_bound_target_rate = None
-        self.observed_target_rate = None
-        self.observed_target = None
-        self.training_volume_gaps = []
+        self.lower_bound_gap = None
+        self.upper_bound_gap = None
+        self.observed_value_gap = None
 
     def json_serialise(self):
         ret = {
@@ -75,10 +72,13 @@ class StandardErrorRangeMetric(StandardErrorRange):
             'upper_bound': self.upper_bound,
             'observed_value': self.observed_value,
             'insufficient_data': self.insufficient_data,
-            'training_volume_gaps': [x.json_serialise() for x in self.training_volume_gaps]
+            'lower_bound_gaps': self.lower_bound_gap,
+            'upper_bound_gaps': self.upper_bound_gap,
+            'observed_value_gaps': self.observed_value_gap,
         }
         return ret
 
+'''deprecated for now
 class TrainingVolumeGap(object):
     def __init__(self, low_optimal_threshold=None, low_overreaching_threshold=None, low_excessive_threshold=None, gap_type=None):
         #self.low_threshold = low_threshold
@@ -170,5 +170,5 @@ class TrainingReport(object):
         self.chronic_duration_minutes = None
         self.acute_chronic_duration_minutes = None
         self.suggested_training_days = []
-
+'''
 
