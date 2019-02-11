@@ -133,7 +133,7 @@ class StatsProcessing(object):
             self.athlete_stats_datastore.put(athlete_stats)
 
     def load_historical_data(self):
-        
+
         daily_readiness_surveys = self.daily_readiness_datastore.get(self.athlete_id, self.start_date_time,
                                                                      self.end_date_time, last_only=False)
         post_session_surveys = self.post_session_survey_datastore.get(self.athlete_id, self.start_date_time,

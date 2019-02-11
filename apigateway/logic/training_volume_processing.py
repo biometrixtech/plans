@@ -184,6 +184,7 @@ class TrainingVolumeProcessing(object):
 
     def get_acwr(self, acute_load_error, chronic_load_error, factor=1.3):
 
+        #standard_error_range = StandardErrorRangeMetric() not doing this now
         standard_error_range = StandardErrorRangeMetric()
 
         if acute_load_error.insufficient_data or chronic_load_error.insufficient_data:
@@ -193,7 +194,8 @@ class TrainingVolumeProcessing(object):
             if chronic_load_error.observed_value > 0:
                 standard_error_range.observed_value = (acute_load_error.observed_value /
                                                        chronic_load_error.observed_value)
-                standard_error_range.observed_value_gap = (factor * chronic_load_error.observed_value) - acute_load_error.observed_value
+                #not doing this now
+                #standard_error_range.observed_value_gap = (factor * chronic_load_error.observed_value) - acute_load_error.observed_value
 
         acwr_values = []
         # ignore all cases of lower_bound since we know the load could not be lower than observed
@@ -220,6 +222,7 @@ class TrainingVolumeProcessing(object):
                 standard_error_range.lower_bound = min_value
                 standard_error_range.upper_bound = max_value
 
+        '''not doing this now
         gap_values = []
         # ignore all cases of lower_bound since we know the load could not be lower than observed
         # the following commenting out was for clarity and should be preserved
@@ -245,6 +248,7 @@ class TrainingVolumeProcessing(object):
                 standard_error_range.lower_bound_gap = min_acwr
                 standard_error_range.upper_bound_gap = max_acwr
 
+        '''
         return standard_error_range
 
     def get_acwr_value(self, acwr_values, acute_load_value, chronic_load_value):
@@ -367,7 +371,8 @@ class TrainingVolumeProcessing(object):
 
         load = self.get_standard_error_range(expected_weekly_workouts, last_week_values)
 
-        standard_error_range = StandardErrorRangeMetric()
+        #standard_error_range = StandardErrorRangeMetric() not doing this now
+        standard_error_range = StandardErrorRange()
 
         if monotony_error_range.insufficient_data or load.insufficient_data:
             standard_error_range.insufficient_data = True
@@ -375,6 +380,7 @@ class TrainingVolumeProcessing(object):
         if load.observed_value is not None and monotony_error_range.observed_value is not None:
             standard_error_range.observed_value = load.observed_value * monotony_error_range.observed_value
 
+        '''not doing this now
         if len(historical_strain) > 0:
 
             strain_count = min(7, len(list(x.observed_value for x in historical_strain if x.observed_value is not None)))
@@ -392,7 +398,9 @@ class TrainingVolumeProcessing(object):
                     # if positive, it reports the amount of load they have left without straining for the last practice
                     strain_surplus = (1.2 * strain_sd) + strain_avg - historical_strain[len(historical_strain)-1].observed_value
                     load_change = strain_surplus / monotony_error_range.observed_value
+                    
                     standard_error_range.observed_value_gap = load_change
+        '''
 
         strain_values = []
         # ignoring lower bounds since we know the load can't be lower than observed
@@ -417,6 +425,7 @@ class TrainingVolumeProcessing(object):
                 standard_error_range.lower_bound = min_strain_value
                 standard_error_range.upper_bound = max_strain_value
 
+        '''not doing gap analysis now
         gap_values = []
         # ignoring lower bounds since we know the load can't be lower than observed
         #gap_values = self.get_strain_gap(gap_values, historical_strain, "lower_bound", monotony_error_range.lower_bound)
@@ -440,6 +449,7 @@ class TrainingVolumeProcessing(object):
                 standard_error_range.lower_bound_gap = min_strain
                 standard_error_range.upper_bound_gap = max_strain
 
+        '''
         return standard_error_range
 
     def get_strain_value(self, strain_values, load_value, monotony_value):
@@ -557,7 +567,8 @@ class TrainingVolumeProcessing(object):
         current_load = self.get_standard_error_range(expected_weekly_workouts, last_week_values)
         previous_load = self.get_standard_error_range(expected_weekly_workouts, previous_week_values)
 
-        ramp_error_range = StandardErrorRangeMetric()
+        #ramp_error_range = StandardErrorRangeMetric() this is for later
+        ramp_error_range = StandardErrorRange()
 
         if current_load.insufficient_data or previous_load.insufficient_data:
             ramp_error_range.insufficient_data = True
@@ -577,7 +588,8 @@ class TrainingVolumeProcessing(object):
         if (current_load.observed_value is not None and previous_load.observed_value is not None
                 and previous_load.observed_value > 0):
             ramp_error_range.observed_value = current_load.observed_value / float(previous_load.observed_value)
-            ramp_error_range.observed_value_gap = (factor * previous_load.observed_value) - current_load.observed_value
+            #not doing this now
+            #ramp_error_range.observed_value_gap = (factor * previous_load.observed_value) - current_load.observed_value
 
         if len(ramp_values) > 0:
             min_value = min(ramp_values)
@@ -590,6 +602,7 @@ class TrainingVolumeProcessing(object):
                                                             max_value > ramp_error_range.observed_value)):
                 ramp_error_range.upper_bound = max_value
 
+        '''not doing gap analysis for now
         gap_values = []
         # ignore all cases of lower_bound since we know the load could not be lower than observed
         # the following commenting out was for clarity and should be preserved
@@ -613,6 +626,7 @@ class TrainingVolumeProcessing(object):
                                                             max_bound > ramp_error_range.observed_value_gap)):
                 ramp_error_range.upper_bound_gap = max_bound
 
+        '''
         return ramp_error_range
 
     def get_ramp_value(self, values, current_load_value, previous_load_value):
