@@ -89,8 +89,8 @@ def get_historic_soreness_and_answer_pers2_question(severity_list, date, histori
 
     historic_soreness = stats_processing.get_historic_soreness_list(soreness_list,historic_soreness)
 
-    historic_soreness = stats_processing.answer_persistent_2_question(historic_soreness, BodyPartLocation.achilles, 1,
-                                                                      is_pain, date, True, historic_soreness[0].historic_soreness_status)
+    historic_soreness = stats_processing.answer_persistent_2_question(historic_soreness, soreness_list, BodyPartLocation.achilles, 1,
+                                                                      is_pain, date, 1, historic_soreness[0].historic_soreness_status)
 
     return historic_soreness
 
