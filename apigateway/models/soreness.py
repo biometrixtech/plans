@@ -52,7 +52,7 @@ class Soreness(Serialisable):
                 return True
             else:
                 return False
-        except AtrributeError:
+        except AttributeError:
             return False
 
     def json_serialise(self, api=False, daily=False):
