@@ -71,6 +71,8 @@ class SurveyProcessing(object):
         stats_processing = StatsProcessing(athlete_stats.athlete_id,
                                            plan_event_date,
                                            DatastoreCollection())
+        stats_processing.set_start_end_times()
+        stats_processing.load_historical_data()
         soreness_list_25 = stats_processing.merge_soreness_from_surveys(
             stats_processing.get_readiness_soreness_list(stats_processing.last_25_days_readiness_surveys),
             stats_processing.get_ps_survey_soreness_list(stats_processing.last_25_days_ps_surveys)
