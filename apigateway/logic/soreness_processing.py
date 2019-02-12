@@ -37,23 +37,23 @@ class SorenessCalculator(object):
         elif severity == 1:
             if movement == 1:
                 return 1
-            elif movement == 3:
+            elif 1 < movement <= 3:
                 return 2
-            elif movement == 5:
+            elif 3 < movement <= 5:
                 return 3
-        elif severity == 3:
+        elif 1 < severity <= 3:
             if movement == 1:
                 return 2
-            elif movement == 3:
+            elif 1 < movement <= 3:
                 return 3
-            elif movement == 5:
+            elif 3 < movement <= 5:
                 return 4
-        elif severity == 5:
+        elif 3 < severity <= 5:
             if movement == 1:
                 return 4
-            elif movement == 3:
+            elif 1 < movement <= 3:
                 return 4
-            elif movement == 5:
+            elif 3 < movement <= 5:
                 return 5
 
     def update_soreness_list(self, soreness_list, soreness_from_survey):

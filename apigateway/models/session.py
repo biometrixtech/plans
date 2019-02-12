@@ -533,7 +533,7 @@ class RecoverySession(Serialisable):
                 if soreness.severity > 3 and soreness.pain:
                     high_severity_is_pain = True
 
-        if max_severity > 3 and high_severity_is_pain:
+        if (max_severity > 3 and high_severity_is_pain) or (max_severity > 4 and not high_severity_is_pain):
             self.integrate_target_minutes = 0
             self.activate_target_minutes = 0
             self.lengthen_target_minutes = 0
@@ -542,7 +542,16 @@ class RecoverySession(Serialisable):
             self.activate_max_percentage = 0
             self.lengthen_max_percentage = 0
             self.inhibit_max_percentage = 0
-        elif (max_severity > 3 and not high_severity_is_pain) or total_minutes_target == 5:
+        elif total_minutes_target == 5:
+            self.integrate_target_minutes = 0
+            self.activate_target_minutes = 0
+            self.lengthen_target_minutes = 0
+            self.inhibit_target_minutes = total_minutes_target
+            self.integrate_max_percentage = 0
+            self.activate_max_percentage = 0
+            self.lengthen_max_percentage = 0
+            self.inhibit_max_percentage = 1.0
+        elif 3 < max_severity <= 4 and not high_severity_is_pain:
             self.integrate_target_minutes = 0
             self.activate_target_minutes = 0
             self.lengthen_target_minutes = 0
@@ -553,68 +562,68 @@ class RecoverySession(Serialisable):
             self.inhibit_max_percentage = 1.0
         elif max_severity == 3:
             if max_severity_and_historic_soreness:
-                if not functional_strength_active:
-                    self.set_70_30_time_split(total_minutes_target)
-                else:
-                    self.set_50_50_time_split(total_minutes_target)
+                #if not functional_strength_active:
+                self.set_70_30_time_split(total_minutes_target)
+                #else:
+                #    self.set_50_50_time_split(total_minutes_target)
             elif historic_soreness_present:
-                if not functional_strength_active:
-                    self.set_60_40_time_split(total_minutes_target)
-                else:
-                    self.set_50_50_time_split(total_minutes_target)
+                #if not functional_strength_active:
+                self.set_60_40_time_split(total_minutes_target)
+                #else:
+                #    self.set_50_50_time_split(total_minutes_target)
             else:
                 self.set_50_50_time_split(total_minutes_target)
         elif max_severity == 2:
             if max_severity_and_historic_soreness:
-                if not functional_strength_active:
-                    if is_active_prep:
-                        self.set_35_35_30_time_split(total_minutes_target)
-                    else:
-                        self.set_40_40_20_time_split(total_minutes_target)
+                #if not functional_strength_active:
+                if is_active_prep:
+                    self.set_35_35_30_time_split(total_minutes_target)
                 else:
-                    self.set_40_60_time_split(total_minutes_target)
+                    self.set_40_40_20_time_split(total_minutes_target)
+                #else:
+                #    self.set_40_60_time_split(total_minutes_target)
             elif historic_soreness_present:
-                if not functional_strength_active:
-                    if is_active_prep:
-                        self.set_30_30_40_time_split(total_minutes_target)
-                    else:
-                        self.set_40_40_20_time_split(total_minutes_target)
+                #if not functional_strength_active:
+                if is_active_prep:
+                    self.set_30_30_40_time_split(total_minutes_target)
                 else:
-                    self.set_50_50_time_split(total_minutes_target)
+                    self.set_40_40_20_time_split(total_minutes_target)
+                #else:
+                #    self.set_50_50_time_split(total_minutes_target)
             else:
                 self.set_33_33_33_time_split(total_minutes_target)
         elif 0 < max_severity <= 1:
             if max_severity_and_historic_soreness:
-                if not functional_strength_active:
-                    if is_active_prep:
-                        self.set_30_30_40_time_split(total_minutes_target)
-                    else:
-                        self.set_40_40_20_time_split(total_minutes_target)
+                #if not functional_strength_active:
+                if is_active_prep:
+                    self.set_30_30_40_time_split(total_minutes_target)
                 else:
-                    # no difference between AP/AR
-                    self.set_40_60_time_split(total_minutes_target)
+                    self.set_40_40_20_time_split(total_minutes_target)
+                #else:
+                #    # no difference between AP/AR
+                #    self.set_40_60_time_split(total_minutes_target)
             elif historic_soreness_present:
-                if not functional_strength_active:
-                    if is_active_prep:
-                        self.set_35_35_30_time_split(total_minutes_target)
-                    else:
-                        self.set_40_40_20_time_split(total_minutes_target)
+                #if not functional_strength_active:
+                if is_active_prep:
+                    self.set_35_35_30_time_split(total_minutes_target)
                 else:
-                    # no difference between AP/AR
-                    self.set_50_50_time_split(total_minutes_target)
+                    self.set_40_40_20_time_split(total_minutes_target)
+                #else:
+                # no difference between AP/AR
+                #self.set_50_50_time_split(total_minutes_target)
             else:
                 self.set_25_25_50_time_split(total_minutes_target)
 
         elif max_severity == 0:
             if historic_soreness_present:
-                if not functional_strength_active:
-                    if is_active_prep:
-                        self.set_25_25_50_time_split(total_minutes_target)
-                    else:
-                        self.set_35_35_30_time_split(total_minutes_target)
+                #if not functional_strength_active:
+                if is_active_prep:
+                    self.set_25_25_50_time_split(total_minutes_target)
                 else:
+                    self.set_35_35_30_time_split(total_minutes_target)
+                #else:
                     # no difference between AP/AR
-                    self.set_50_50_time_split(total_minutes_target)
+                #    self.set_50_50_time_split(total_minutes_target)
             else:
                 self.set_25_25_50_time_split(total_minutes_target)
 
