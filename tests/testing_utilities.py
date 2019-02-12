@@ -12,23 +12,39 @@ class TestUtilities(object):
         return survey
 
 
-    def body_part_soreness(self, location_enum, severity):
+    def body_part_soreness(self, location_enum, severity, movement=None):
 
-        soreness = {
-            "body_part": location_enum,
-            "severity": severity
-        }
+        if movement is None:
+            soreness = {
+                "body_part": location_enum,
+                "severity": severity
+            }
+        else:
+            soreness = {
+                "body_part": location_enum,
+                "severity": severity,
+                "movement": movement
+            }
 
         return soreness
 
-    def body_part_pain(self, location_enum, severity, side):
+    def body_part_pain(self, location_enum, severity, side, movement=None):
 
-        soreness = {
-            "body_part": location_enum,
-            "severity": severity,
-            "side":side,
-            "pain": True
-        }
+        if movement is None:
+            soreness = {
+                "body_part": location_enum,
+                "severity": severity,
+                "side":side,
+                "pain": True
+            }
+        else:
+            soreness = {
+                "body_part": location_enum,
+                "severity": severity,
+                "movement": movement,
+                "side": side,
+                "pain": True
+            }
 
         return soreness
 
@@ -37,8 +53,9 @@ class TestUtilities(object):
 
         return location
 
-    def body_part(self, body_enum, severity_score):
+    def body_part(self, body_enum, severity_score, movement=None):
         soreness_item = Soreness()
         soreness_item.severity = severity_score
+        soreness_item.movement = movement
         soreness_item.body_part = BodyPartLocation(body_enum)
         return soreness_item

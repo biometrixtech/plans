@@ -64,6 +64,7 @@ class SorenessCalculator(object):
                     r.severity = max([self.get_severity(r.severity, r.movement), self.get_severity(s.severity, s.movement)])
                     updated = True
             if not updated:
+                s.severity = self.get_severity(s.severity, s.movement)
                 soreness_list.append(s)
         return soreness_list
 
