@@ -131,6 +131,7 @@ class SurveyProcessing(object):
             body_part_location = BodyPartLocation(q3_response['body_part'])
             side = q3_response['side']
             severity = q3_response['severity']
+            movement = q3_response['movement']
             pain = q3_response['pain']
             status = q3_response['status']
             if severity > 0:
@@ -138,6 +139,7 @@ class SurveyProcessing(object):
                 sore_part.body_part = BodyPart(body_part_location, None)
                 sore_part.pain = pain
                 sore_part.severity = severity
+                sore_part.movement = movement
                 sore_part.side = side
                 sore_part.reported_date_time = event_date
                 soreness.append(sore_part)
@@ -148,7 +150,7 @@ class SurveyProcessing(object):
                                            side=side,
                                            is_pain=pain,
                                            question_response_date=plan_event_date,
-                                           severity_value=severity)
+                                           severity_value=SorenessCalculator().get_severity(severity, movement))
             else:
                 self.athlete_stats.historic_soreness = stats_processing.answer_persistent_2_question(self.athlete_stats.historic_soreness,
                                            soreness_list_25,
@@ -156,7 +158,7 @@ class SurveyProcessing(object):
                                            side=side,
                                            is_pain=pain,
                                            question_response_date=plan_event_date,
-                                           severity_value=severity,
+                                           severity_value=SorenessCalculator().get_severity(severity, movement),
                                            current_status=HistoricSorenessStatus[status])
 
     @xray_recorder.capture('logic.survey_processing.historic_workout_data')
