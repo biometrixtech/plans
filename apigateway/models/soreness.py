@@ -35,6 +35,7 @@ class Soreness(Serialisable):
         self.pain = False
         self.reported_date_time = None
         self.severity = None  # muscle_soreness_severity or joint_soreness_severity
+        self.movement = None
         self.side = None
         self.type = None  # soreness_type
         self.count = 1
@@ -51,7 +52,7 @@ class Soreness(Serialisable):
                 return True
             else:
                 return False
-        except AtrributeError:
+        except AttributeError:
             return False
 
     def json_serialise(self, api=False, daily=False):
@@ -67,6 +68,7 @@ class Soreness(Serialisable):
                    'body_part': self.body_part.location.value,
                    'pain': self.pain,
                    'severity': self.severity,
+                   'movement': self.movement,
                    'side': self.side,
                    'reported_date_time': format_datetime(self.reported_date_time)
                    }
@@ -75,6 +77,7 @@ class Soreness(Serialisable):
                    'body_part': self.body_part.location.value,
                    'pain': self.pain,
                    'severity': self.severity,
+                   'movement': self.movement,
                    'side': self.side
                   }
         return ret

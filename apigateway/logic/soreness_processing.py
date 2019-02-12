@@ -28,14 +28,43 @@ class SorenessCalculator(object):
         soreness_list = self.merge_current_historic_soreness(soreness_list, historic_soreness)
         return soreness_list
 
+    def get_severity(self, severity, movement):
+
+        if severity is None:
+            return None
+        elif movement is None:
+            return severity
+        elif severity == 1:
+            if movement == 1:
+                return 1
+            elif 1 < movement <= 3:
+                return 2
+            elif 3 < movement <= 5:
+                return 3
+        elif 1 < severity <= 3:
+            if movement == 1:
+                return 2
+            elif 1 < movement <= 3:
+                return 3
+            elif 3 < movement <= 5:
+                return 4
+        elif 3 < severity <= 5:
+            if movement == 1:
+                return 4
+            elif 1 < movement <= 3:
+                return 4
+            elif 3 < movement <= 5:
+                return 5
+
     def update_soreness_list(self, soreness_list, soreness_from_survey):
         for s in soreness_from_survey:
             updated = False
             for r in soreness_list:
                 if (r.body_part.location.value == s.body_part.location.value and r.side == s.side and r.pain == s.pain):
-                    r.severity = max([r.severity, s.severity])
+                    r.severity = max([self.get_severity(r.severity, r.movement), self.get_severity(s.severity, s.movement)])
                     updated = True
             if not updated:
+                s.severity = self.get_severity(s.severity, s.movement)
                 soreness_list.append(s)
         return soreness_list
 

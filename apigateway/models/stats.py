@@ -72,6 +72,8 @@ class AthleteStats(Serialisable):
 
     def update_historic_soreness(self, soreness, event_date):
 
+        soreness_calc = SorenessCalculator()
+
         for h in self.historic_soreness:
             if (h.body_part_location == soreness.body_part.location.value and
                     h.side == soreness.side and h.is_pain == soreness.pain):
@@ -94,19 +96,19 @@ class AthleteStats(Serialisable):
                     h.last_reported = event_date
                     # weighted average
                     h.average_severity = round(h.average_severity * float(h.streak) / (float(h.streak) + 1) +
-                                               soreness.severity * float(1) / (float(h.streak) + 1), 2)
+                                               soreness_calc.get_severity(soreness.severity, soreness.movement) * float(1) / (float(h.streak) + 1), 2)
                     
 
                     h.streak = h.streak + 1
                     break
                 else:
                     # we first have to determine if current value is higher previous day's value
-                    pain_soreness_list = self.daily_severe_soreness
-                    pain_soreness_list.extend(self.daily_severe_pain)
+                    pain_soreness_list = [s for s in self.daily_severe_soreness if self.persist_soreness(s, days=0)]
+                    pain_soreness_list.extend([s for s in self.daily_severe_pain if self.persist_soreness(s, days=0)])
                     for s in pain_soreness_list:
                         if (s.body_part.location.value == soreness.body_part.location.value and
                                 s.side == soreness.side and s.pain == soreness.pain):
-                            if s.severity >= soreness.severity:
+                            if s.severity >= soreness_calc.get_severity(soreness.severity, soreness.movement):
                                 break
                             else:
                                 new_severity = ((h.average_severity * h.streak) - s.severity) / (float(h.streak - 1))
@@ -114,13 +116,14 @@ class AthleteStats(Serialisable):
                                 # temporarily set it back to keep consistency with algo
                                 h.streak = h.streak - 1
                                 h.average_severity = round(h.average_severity * float(h.streak) / (float(h.streak) + 1) +
-                                                           soreness.severity * float(1) / (float(h.streak) + 1), 2)
+                                                           soreness_calc.get_severity(soreness.severity,
+                                                                                      soreness.movement) * float(1) / (float(h.streak) + 1), 2)
                                 h.streak = h.streak + 1
                                 break
 
-    def persist_soreness(self, soreness):
+    def persist_soreness(self, soreness, days=1):
         if soreness.reported_date_time is not None:
-            if (parse_date(self.event_date).date() - soreness.reported_date_time.date()).days <= 1:
+            if (parse_date(self.event_date).date() - soreness.reported_date_time.date()).days <= days:
                 return True
             else:
                 return False

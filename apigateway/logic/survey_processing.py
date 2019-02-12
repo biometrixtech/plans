@@ -9,6 +9,7 @@ from models.daily_plan import DailyPlan
 from models.heart_rate import SessionHeartRate, HeartRateData
 from models.sleep_data import DailySleepData, SleepEvent
 from logic.stats_processing import StatsProcessing
+from logic.soreness_processing import SorenessCalculator
 from datastores.datastore_collection import DatastoreCollection
 
 
@@ -115,6 +116,7 @@ class SurveyProcessing(object):
                 self.athlete_stats.update_historic_soreness(s, self.event_date)
 
     def process_clear_status_answers(self, clear_candidates, event_date, soreness):
+
         plan_event_date = format_date(event_date)
         stats_processing = StatsProcessing(self.athlete_stats.athlete_id,
                                            plan_event_date,
