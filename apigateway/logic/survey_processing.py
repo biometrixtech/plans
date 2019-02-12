@@ -131,7 +131,7 @@ class SurveyProcessing(object):
             body_part_location = BodyPartLocation(q3_response['body_part'])
             side = q3_response['side']
             severity = q3_response['severity']
-            movement = q3_response['movement']
+            movement = q3_response.get('movement', None)
             pain = q3_response['pain']
             status = q3_response['status']
             if severity > 0:
