@@ -226,6 +226,7 @@ def test_historical_soreness_trigger_update_same_day_pain():
     prev_soreness.body_part = BodyPart(BodyPartLocation(9), None)
     prev_soreness.severity = 3
     prev_soreness.pain = True
+    prev_soreness.reported_date_time = parse_date("2018-12-03")
     athlete_stats.daily_severe_pain = [prev_soreness]
     athlete_stats.daily_severe_soreness = []
 
@@ -259,6 +260,7 @@ def test_historical_soreness_trigger_update_same_day_soreness():
     prev_soreness.body_part = BodyPart(BodyPartLocation(9), None)
     prev_soreness.severity = 3
     prev_soreness.pain = False
+    prev_soreness.reported_date_time = parse_date("2018-12-03")
     athlete_stats.daily_severe_pain = [prev_soreness]
     athlete_stats.daily_severe_soreness = []
 
