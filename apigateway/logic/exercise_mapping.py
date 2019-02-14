@@ -40,6 +40,7 @@ class ExerciseAssignmentCalculator(object):
 
             assigned_exercise.reps_assigned = target_exercise.max_reps
             assigned_exercise.sets_assigned = target_exercise.max_sets
+            assigned_exercise.equipment_required = target_exercise.equipment_required
 
             assigned_exercise_list.append(assigned_exercise)
 
