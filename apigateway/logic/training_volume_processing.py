@@ -136,6 +136,10 @@ class TrainingVolumeProcessing(object):
         athlete_stats.internal_monotony = self.get_monotony(athlete_stats.expected_weekly_workouts,
                                                             self.last_week_internal_values)
 
+        historical_internal_monotony = self.get_historical_internal_monotony(self.start_date, self.end_date)
+
+        athlete_stats.historical_internal_monotony = historical_internal_monotony
+
         historical_internal_strain = self.get_historical_internal_strain(self.start_date, self.end_date)
 
         athlete_stats.internal_strain = self.get_strain(athlete_stats.expected_weekly_workouts,
@@ -419,9 +423,9 @@ class TrainingVolumeProcessing(object):
 
             if standard_error_range.observed_value is not None and min_strain_value < standard_error_range.observed_value:
                 standard_error_range.lower_bound = min_strain_value
-            if standard_error_range.observed_value_gap is not None and max_strain_value > standard_error_range.observed_value:
+            if standard_error_range.observed_value is not None and max_strain_value > standard_error_range.observed_value:
                 standard_error_range.upper_bound = max_strain_value
-            if standard_error_range.observed_value_gap is None:
+            if standard_error_range.observed_value is None:
                 standard_error_range.lower_bound = min_strain_value
                 standard_error_range.upper_bound = max_strain_value
 
@@ -811,6 +815,34 @@ class TrainingVolumeProcessing(object):
                 index += 1
 
         return strain_values
+
+    def get_historical_internal_monotony(self, start_date, end_date, weekly_expected_workouts=5):
+
+        target_dates = []
+
+        self.internal_load_tuples.sort(key=lambda x: x[0])
+
+        date_diff = parse_date(end_date) - parse_date(start_date)
+
+        for i in range(1, date_diff.days):
+            target_dates.append(parse_date(start_date) + timedelta(days=i))
+
+        index = 0
+        monotony_values = []
+
+        # evaluates a rolling week's worth of values for each day
+        if len(target_dates) > 7:
+            for t in range(6, len(target_dates)):
+                load_values = []
+                daily_plans = [p for p in self.internal_load_tuples if (parse_date(start_date) + timedelta(index)) < p[0] <= target_dates[t]]
+                load_values.extend(x[1] for x in daily_plans if x is not None)
+                monotony = self.get_monotony(weekly_expected_workouts, load_values)
+
+                if monotony.observed_value is not None or monotony.upper_bound is not None:
+                    monotony_values.append(monotony)
+                index += 1
+
+        return monotony_values
 
     def calculate_daily_strain(self, load_values, weekly_expected_workouts=5):
 
