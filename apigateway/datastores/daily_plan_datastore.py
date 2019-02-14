@@ -218,6 +218,7 @@ def _assigned_exercises_from_mongodb(mongo_result):
     assigned_exercise.exercise.seconds_per_set = _key_present("seconds_per_set", mongo_result)
     assigned_exercise.exercise.seconds_per_rep = _key_present("seconds_per_rep", mongo_result)
     assigned_exercise.goal_text = _key_present("goal_text", mongo_result)
+    assigned_exercise.equipment_required = _key_present("equipment_required", mongo_result)
     return assigned_exercise
 
 
