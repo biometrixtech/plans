@@ -82,6 +82,10 @@ def test_recommendation_matrix_ranking():
     metric2 = AthleteMetric("Cooler metric", MetricType.daily)
     metric3 = AthleteMetric("Coolest metric", MetricType.daily)
 
+    metric1.color = MetricColor.red
+    metric2.color = MetricColor.yellow
+    metric3.color = MetricColor.yellow
+
     specific_action1 = SpecificAction("7A", "Cool", True)
     specific_action2 = SpecificAction("7B", "Cooler", True)
     specific_action3 = SpecificAction("7C", "Coolest", True)
