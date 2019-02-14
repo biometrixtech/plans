@@ -86,12 +86,25 @@ class RecommendationMatrix(object):
 
         winners = self.get_winners()
 
+        top_ranked_insights = {}
+
         for m in range(0, len(self.metrics)):
             for a in range(0, len(self.metrics[m].specific_actions)):
                 if self.metrics[m].specific_actions[a].code in winners:
                     self.metrics[m].specific_actions[a].display = True
                 else:
                     self.metrics[m].specific_actions[a].display = False
+
+        for m in range(0, len(self.metrics)):
+            if self.metrics[m].high_level_insight in top_ranked_insights:
+                if self.metrics[m].color is not None and top_ranked_insights[self.metrics[m].high_level_insight].color is not None:
+                    if self.metrics[m].color > top_ranked_insights[self.metrics[m].high_level_insight].color:
+                        top_ranked_insights[self.metrics[m].high_level_insight] = self.metrics[m]
+            else:
+                top_ranked_insights[self.metrics[m].high_level_insight] = self.metrics[m]
+
+        unique_metrics = list(top_ranked_insights.values())
+
         return self.metrics
 
 
