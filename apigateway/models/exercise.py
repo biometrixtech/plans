@@ -99,7 +99,7 @@ class Exercise(Serialisable):
         self.cues = ""
         self.procedure = ""
         self.goal = ""
-        self.equipment_required = None
+        self.equipment_required = []
 
     def __setattr__(self, name, value):
         if name == "unit_of_measure" and not isinstance(value, UnitOfMeasure):

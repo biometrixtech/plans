@@ -280,7 +280,7 @@ class AssignedExercise(Serialisable):
         self.expire_date_time = None
         self.position_order = 0
         self.goal_text = ""
-        self.equipment_required = None
+        self.equipment_required = []
 
     '''
     def soreness_priority(self):
