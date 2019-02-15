@@ -242,7 +242,7 @@ class ThresholdRecommendation(object):
         self.count = 0
         self.lower_bound_count = 0
         self.upper_bound_count = 0
-        self.insufficent_date = False
+        self.insufficient_data = False
 
 
 class TextGenerator(object):

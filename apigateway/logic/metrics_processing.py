@@ -14,6 +14,7 @@ class MetricsProcessing(object):
             metrics.extend(IncreasingIACWRGenerator(athlete_stats).get_metric_list())
             metrics.extend(IncreasingInternalRampGenerator(athlete_stats).get_metric_list())
             metrics.extend(InternalMonotonyEventGenerator(athlete_stats).get_metric_list())
+            metrics.extend(InternalStrainEventsGenerator(athlete_stats).get_metric_list())
             metrics.extend(DecreasingIACWRGenerator(athlete_stats).get_metric_list())
 
         if athlete_stats.daily_severe_soreness_event_date == event_date:
@@ -175,6 +176,29 @@ class IncreasingInternalRampGenerator(AthleteTrainingVolumeMetricGenerator):
                                                      ["3B", "7A"], 1.11, 1.15, None,
                                                      "Workload increasing at a moderate risk of injury."
                                                      )
+        self.populate_thresholds()
+
+
+class InternalStrainEventsGenerator(AthleteTrainingVolumeMetricGenerator):
+    def __init__(self, athlete_stats):
+        super(InternalStrainEventsGenerator, self).__init__("Internal Strain Events", MetricType.longitudinal,
+                                                             athlete_stats, "internal_strain_events")
+        self.high_level_action_description = "ncrease variety in training duration & intensity, prioritize holistic recovery"
+        self.high_level_extended_description = "Low variety in training duration & intensity raises cortoisol & inhibits recovery. Increase training variability & prioritize holistic recovery."
+        self.thresholds[0] = ThresholdRecommendation(MetricColor.red,
+                                                     DailyHighLevelInsight.needs_workload_variability,
+                                                     self.high_level_action_description,
+                                                     ["1A", "7A"], 2, None, None,
+                                                     "Very low training variability & high loads which increase risk of minor injury"
+                                                     )
+        self.thresholds[1] = ThresholdRecommendation(MetricColor.yellow,
+                                                     DailyHighLevelInsight.needs_workload_variability,
+                                                     self.high_level_action_description,
+                                                     ["1B", "7A"], 1, 1, None,
+                                                     "Very low training variability & high loads which increase risk of minor injury"
+                                                     )
+        self.thresholds[0].high_level_extended_description = self.high_level_extended_description
+        self.thresholds[1].high_level_extended_description = self.high_level_extended_description
         self.populate_thresholds()
 
 

@@ -69,7 +69,12 @@ class AthleteStatsDatastore(object):
         athlete_stats.chronic_external_low_intensity_load = self._standard_error_from_monogodb(mongo_result.get('chronic_external_low_intensity_load', None))
 
         athlete_stats.internal_monotony = self._standard_error_from_monogodb(mongo_result.get('internal_monotony', None))
+        athlete_stats.historical_internal_monotony = [self._standard_error_from_monogodb(s)
+                                           for s in mongo_result.get('historic_internal_monotony', [])]
         athlete_stats.internal_strain = self._standard_error_from_monogodb(mongo_result.get('internal_strain', None))
+        athlete_stats.historical_internal_strain = [self._standard_error_from_monogodb(s)
+                                                      for s in mongo_result.get('historic_internal_strain', [])]
+        athlete_stats.internal_strain_events = self._standard_error_from_monogodb(mongo_result.get('internal_strain_events', None))
         athlete_stats.external_monotony = self._standard_error_from_monogodb(mongo_result.get('external_monotony', None))
         athlete_stats.external_strain = self._standard_error_from_monogodb(mongo_result.get('external_strain', None))
         athlete_stats.internal_ramp = self._standard_error_from_monogodb(mongo_result.get('internal_ramp', None))
