@@ -105,6 +105,8 @@ class RecommendationMatrix(object):
 
         unique_metrics = list(top_ranked_insights.values())
 
+        self.metrics = unique_metrics
+
         return self.metrics
 
 

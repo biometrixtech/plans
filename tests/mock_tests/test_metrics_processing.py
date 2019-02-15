@@ -86,6 +86,10 @@ def test_recommendation_matrix_ranking():
     metric2.color = MetricColor.yellow
     metric3.color = MetricColor.yellow
 
+    metric1.high_level_insight = "insight A"
+    metric2.high_level_insight = "insight B"
+    metric3.high_level_insight = "insight C"
+
     specific_action1 = SpecificAction("7A", "Cool", True)
     specific_action2 = SpecificAction("7B", "Cooler", True)
     specific_action3 = SpecificAction("7C", "Coolest", True)
@@ -104,3 +108,34 @@ def test_recommendation_matrix_ranking():
     assert ranked_list[0].specific_actions[0].display == False
     assert ranked_list[1].specific_actions[0].display == False
     assert ranked_list[2].specific_actions[0].display == True
+
+def test_recommendation_matrix_color_ranking():
+
+    metric1 = AthleteMetric("Cool metric", MetricType.daily)
+    metric2 = AthleteMetric("Cooler metric", MetricType.daily)
+    metric3 = AthleteMetric("Coolest metric", MetricType.daily)
+
+    metric1.color = MetricColor.red
+    metric2.color = MetricColor.yellow
+    metric3.color = MetricColor.yellow
+
+    metric1.high_level_insight = "insight A"
+    metric2.high_level_insight = "insight A"
+    metric3.high_level_insight = "insight B"
+
+    specific_action1 = SpecificAction("7A", "Cool", True)
+    specific_action2 = SpecificAction("7B", "Cooler", True)
+    specific_action3 = SpecificAction("7C", "Coolest", True)
+
+    metric1.specific_actions.append(specific_action1)
+    metric2.specific_actions.append(specific_action2)
+    metric3.specific_actions.append(specific_action3)
+
+    metric_list = [metric3, metric2, metric1]  # add reverse order to make sorting harder
+
+    rec_matrix = RecommendationMatrix()
+    rec_matrix.add_metrics(metric_list)
+
+    ranked_list = rec_matrix.get_ranked_metrics()
+
+    assert len(ranked_list) == 2
