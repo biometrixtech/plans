@@ -348,7 +348,7 @@ def test_athlete_completed_yesterday():
     stats_processing = StatsProcessing("tester", "2018-07-31", datastore_collection)
     stats_processing.process_athlete_stats()
     completed_yesterday = stats_processing.functional_strength_yesterday()
-    assert False is completed_yesterday
+    assert True is completed_yesterday
 
 
 def test_athlete_not_completed_yesterday():

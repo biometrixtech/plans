@@ -1,4 +1,4 @@
-from models.training_volume import FitFatigueStatus
+from models.training_volume import FitFatigueStatus, StandardErrorRange
 from serialisable import Serialisable
 from models.sport import SportName, BaseballPosition, BasketballPosition, FootballPosition, LacrossePosition, SoccerPosition, SoftballPosition, FieldHockeyPosition, TrackAndFieldPosition, VolleyballPosition
 from models.session import StrengthConditioningType
@@ -20,6 +20,7 @@ class AthleteStats(Serialisable):
         self.acute_avg_readiness = None
         self.acute_avg_sleep_quality = None
         self.acute_avg_max_soreness = None
+
         self.acute_internal_total_load = None
         self.acute_external_total_load = None
         self.acute_external_high_intensity_load = None
@@ -47,11 +48,15 @@ class AthleteStats(Serialisable):
         self.internal_freshness_index = None
         self.external_freshness_index = None
         self.historical_internal_strain = []
+        self.historical_internal_monotony = []
+        self.historical_external_strain = []
         self.functional_strength_eligible = False
         self.next_functional_strength_eligible_date = None
         self.completed_functional_strength_sessions = 0
         self.current_sport_name = None
         self.current_position = None
+
+        self.expected_weekly_workouts = None
 
         self.historic_soreness = []
         self.readiness_soreness = []
@@ -67,6 +72,8 @@ class AthleteStats(Serialisable):
         self.wearable_devices = []
 
     def update_historic_soreness(self, soreness, event_date):
+
+        soreness_calc = SorenessCalculator()
 
         for h in self.historic_soreness:
             if (h.body_part_location == soreness.body_part.location.value and
@@ -90,19 +97,19 @@ class AthleteStats(Serialisable):
                     h.last_reported = event_date
                     # weighted average
                     h.average_severity = round(h.average_severity * float(h.streak) / (float(h.streak) + 1) +
-                                               soreness.severity * float(1) / (float(h.streak) + 1), 2)
+                                               soreness_calc.get_severity(soreness.severity, soreness.movement) * float(1) / (float(h.streak) + 1), 2)
                     
 
                     h.streak = h.streak + 1
                     break
                 else:
                     # we first have to determine if current value is higher previous day's value
-                    pain_soreness_list = self.daily_severe_soreness
-                    pain_soreness_list.extend(self.daily_severe_pain)
+                    pain_soreness_list = [s for s in self.daily_severe_soreness if self.persist_soreness(s, days=0)]
+                    pain_soreness_list.extend([s for s in self.daily_severe_pain if self.persist_soreness(s, days=0)])
                     for s in pain_soreness_list:
                         if (s.body_part.location.value == soreness.body_part.location.value and
                                 s.side == soreness.side and s.pain == soreness.pain):
-                            if s.severity >= soreness.severity:
+                            if s.severity >= soreness_calc.get_severity(soreness.severity, soreness.movement):
                                 break
                             else:
                                 new_severity = ((h.average_severity * h.streak) - s.severity) / (float(h.streak - 1))
@@ -110,13 +117,14 @@ class AthleteStats(Serialisable):
                                 # temporarily set it back to keep consistency with algo
                                 h.streak = h.streak - 1
                                 h.average_severity = round(h.average_severity * float(h.streak) / (float(h.streak) + 1) +
-                                                           soreness.severity * float(1) / (float(h.streak) + 1), 2)
+                                                           soreness_calc.get_severity(soreness.severity,
+                                                                                      soreness.movement) * float(1) / (float(h.streak) + 1), 2)
                                 h.streak = h.streak + 1
                                 break
 
-    def persist_soreness(self, soreness):
+    def persist_soreness(self, soreness, days=1):
         if soreness.reported_date_time is not None:
-            if (parse_date(self.event_date).date() - soreness.reported_date_time.date()).days <= 1:
+            if (parse_date(self.event_date).date() - soreness.reported_date_time.date()).days <= days:
                 return True
             else:
                 return False
@@ -287,33 +295,34 @@ class AthleteStats(Serialisable):
             'acute_avg_readiness': self.acute_avg_readiness,
             'acute_avg_sleep_quality': self.acute_avg_sleep_quality,
             'acute_avg_max_soreness': self.acute_avg_max_soreness,
-            'acute_internal_total_load': self.acute_internal_total_load,
-            'acute_external_total_load': self.acute_external_total_load,
-            'acute_external_high_intensity_load': self.acute_external_high_intensity_load,
-            'acute_external_mod_intensity_load': self.acute_external_mod_intensity_load,
-            'acute_external_low_intensity_load': self.acute_external_low_intensity_load,
+            'acute_internal_total_load': self.acute_internal_total_load.json_serialise() if self.acute_internal_total_load is not None else None,
+            'acute_external_total_load': self.acute_external_total_load.json_serialise() if self.acute_external_total_load is not None else None,
+            'acute_external_high_intensity_load': self.acute_external_high_intensity_load.json_serialise() if self.acute_external_high_intensity_load is not None else None,
+            'acute_external_mod_intensity_load': self.acute_external_mod_intensity_load.json_serialise() if self.acute_external_mod_intensity_load is not None else None,
+            'acute_external_low_intensity_load': self.acute_external_low_intensity_load.json_serialise() if self.acute_external_low_intensity_load is not None else None,
             'chronic_avg_RPE': self.chronic_avg_RPE,
             'chronic_avg_readiness': self.chronic_avg_readiness,
             'chronic_avg_sleep_quality': self.chronic_avg_sleep_quality,
             'chronic_avg_max_soreness': self.chronic_avg_max_soreness,
-            'chronic_internal_total_load': self.chronic_internal_total_load,
-            'chronic_external_total_load': self.chronic_external_total_load,
-            'chronic_external_high_intensity_load': self.chronic_external_high_intensity_load,
-            'chronic_external_mod_intensity_load': self.chronic_external_mod_intensity_load,
-            'chronic_external_low_intensity_load': self.chronic_external_low_intensity_load,
-            'internal_monotony': self.internal_monotony,
-            'internal_strain': self.internal_strain,
-            'external_monotony': self.external_monotony,
-            'external_strain': self.external_strain,
-            'internal_ramp': self.internal_ramp,
-            'external_ramp': self.external_ramp,
-            'internal_acwr': self.internal_acwr,
-            'external_acwr': self.external_acwr,
+            'chronic_internal_total_load': self.chronic_internal_total_load.json_serialise() if self.chronic_internal_total_load is not None else None,
+            'chronic_external_total_load': self.chronic_external_total_load.json_serialise() if self.chronic_external_total_load is not None else None,
+            'chronic_external_high_intensity_load': self.chronic_external_high_intensity_load.json_serialise() if self.chronic_external_high_intensity_load is not None else None,
+            'chronic_external_mod_intensity_load': self.chronic_external_mod_intensity_load.json_serialise() if self.chronic_external_mod_intensity_load is not None else None,
+            'chronic_external_low_intensity_load': self.chronic_external_low_intensity_load.json_serialise() if self.chronic_external_low_intensity_load is not None else None,
+            'internal_monotony': self.internal_monotony.json_serialise() if self.internal_monotony is not None else None,
+            'internal_strain': self.internal_strain.json_serialise() if self.internal_strain is not None else None,
+            'external_monotony': self.external_monotony.json_serialise() if self.external_monotony is not None else None,
+            'external_strain': self.external_strain.json_serialise() if self.external_strain is not None else None,
+            'internal_ramp': self.internal_ramp.json_serialise() if self.internal_ramp is not None else None,
+            'external_ramp': self.external_ramp.json_serialise() if self.external_ramp is not None else None,
+            'internal_acwr': self.internal_acwr.json_serialise() if self.internal_acwr is not None else None,
+            'external_acwr': self.external_acwr.json_serialise() if self.external_acwr is not None else None,
             'functional_strength_eligible': self.functional_strength_eligible,
             'completed_functional_strength_sessions': self.completed_functional_strength_sessions,
             'next_functional_strength_eligible_date': self.next_functional_strength_eligible_date,
             'current_sport_name': self.current_sport_name.value,
             'current_position': self.current_position.value if self.current_position is not None else None,
+            'expected_weekly_workouts': self.expected_weekly_workouts,
             'historic_soreness': [h.json_serialise() for h in self.historic_soreness],
             'readiness_soreness': [s.json_serialise(daily=True) for s in self.readiness_soreness],
             'post_session_soreness': [s.json_serialise(daily=True) for s in self.post_session_soreness],
