@@ -79,6 +79,27 @@ def test_yellow_internal_acwr():
     assert metrics_list[0].color == MetricColor.yellow
     assert False is metrics_list[0].insufficient_data
 
+def test_yellow_internal_monotony():
+    athlete_stats = AthleteStats("tester")
+    standard_error_range = StandardErrorRange()
+    standard_error_range.observed_value = 1.4
+    standard_error_range.upper_bound = None
+
+    standard_error_range_2 = StandardErrorRange()
+    standard_error_range_2.observed_value = 1.8
+    standard_error_range_2.upper_bound = None
+
+    monotony_list = [standard_error_range, standard_error_range_2]
+
+    athlete_stats.event_date = "2018-07-01"
+    athlete_stats.historical_internal_monotony = monotony_list
+
+    metrics_processor = MetricsProcessing()
+    metrics_list = metrics_processor.get_athlete_metrics_from_stats(athlete_stats, "2018-07-01")
+
+    assert metrics_list[0].color == MetricColor.yellow
+    assert False is metrics_list[0].insufficient_data
+
 
 def test_no_session_rpe_diff_date():
     athlete_stats = AthleteStats("tester")
