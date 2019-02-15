@@ -233,13 +233,13 @@ class DecreasingIACWRGenerator(AthleteTrainingVolumeMetricGenerator):
                                                      DailyHighLevelInsight.needs_higher_weekly_workload,
                                                      "Increase this week's load with a longer or higher intensity session or add supplemental session",
                                                      ["3C", "7A"], None, 0.5, None,
-                                                     "Workload decreasing at a very significant rate. This is associated with an increased risk of injury"
+                                                     "Rapidly decreasing load which may elevate athlete's succeptablility to injury"
                                                      )
         self.thresholds[1] = ThresholdRecommendation(MetricColor.yellow,
                                                      DailyHighLevelInsight.needs_higher_weekly_workload,
                                                      "If tapering is unintentional, increase this week's load to reduce undertraining",
                                                      ["3C", "7A"], 0.51, 0.8, None,
-                                                     "Workload decreasing at a significant rate. If unintentional, this can increase risk of injury."
+                                                     "Significantly decreasing load. If unintentional, can reduce injury resiliance"
                                                      )
         self.populate_thresholds()
 
