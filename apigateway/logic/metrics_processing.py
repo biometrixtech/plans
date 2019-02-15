@@ -12,6 +12,8 @@ class MetricsProcessing(object):
 
         if athlete_stats.event_date == event_date:
             metrics.extend(IncreasingIACWRGenerator(athlete_stats).get_metric_list())
+            metrics.extend(IncreasingInternalRampGenerator(athlete_stats).get_metric_list())
+            metrics.extend(DecreasingIACWRGenerator(athlete_stats).get_metric_list())
 
         if athlete_stats.daily_severe_soreness_event_date == event_date:
             metrics.extend(DailySevereSorenessMetricGenerator(athlete_stats.daily_severe_soreness).get_metric_list())
@@ -147,10 +149,49 @@ class IncreasingIACWRGenerator(AthleteTrainingVolumeMetricGenerator):
                                                      "Workload increasing at a high risk of injury."
                                                      )
         self.thresholds[1] = ThresholdRecommendation(MetricColor.yellow,
-                                                     DailyHighLevelInsight.limit_time_intensity_of_training,
+                                                     DailyHighLevelInsight.at_risk_of_overtraining,
                                                      self.high_level_action_description,
                                                      ["3B", "7A"], 1.3, 1.5, None,
                                                      "Workload increasing at a moderate risk of injury."
+                                                     )
+        self.populate_thresholds()
+
+
+class IncreasingInternalRampGenerator(AthleteTrainingVolumeMetricGenerator):
+    def __init__(self, athlete_stats):
+        super(IncreasingInternalRampGenerator, self).__init__("Increasing Internal Ramp", MetricType.longitudinal,
+                                                             athlete_stats, "internal_ramp")
+        self.high_level_action_description = "Consider decreasing workload this week or prioritizing holistic recovery"
+        self.thresholds[0] = ThresholdRecommendation(MetricColor.red,
+                                                     DailyHighLevelInsight.at_risk_of_overtraining,
+                                                     self.high_level_action_description,
+                                                     ["3A", "7A"], 1.15, None, None,
+                                                     "Workload increasing at a high risk of injury."
+                                                     )
+        self.thresholds[1] = ThresholdRecommendation(MetricColor.yellow,
+                                                     DailyHighLevelInsight.at_risk_of_overtraining,
+                                                     self.high_level_action_description,
+                                                     ["3B", "7A"], 1.11, 1.15, None,
+                                                     "Workload increasing at a moderate risk of injury."
+                                                     )
+        self.populate_thresholds()
+
+
+class DecreasingIACWRGenerator(AthleteTrainingVolumeMetricGenerator):
+    def __init__(self, athlete_stats):
+        super(DecreasingIACWRGenerator, self).__init__("Decreasing IACWR", MetricType.longitudinal,
+                                                             athlete_stats, "internal_acwr")
+        self.thresholds[0] = ThresholdRecommendation(MetricColor.red,
+                                                     DailyHighLevelInsight.needs_higher_weekly_workload,
+                                                     "Increase this week's load with a longer or higher intensity session or add supplemental session",
+                                                     ["3C", "7A"], None, 0.5, None,
+                                                     "Workload decreasing at a very significant rate. This is associated with an increased risk of injury"
+                                                     )
+        self.thresholds[1] = ThresholdRecommendation(MetricColor.yellow,
+                                                     DailyHighLevelInsight.needs_higher_weekly_workload,
+                                                     "If tapering is unintentional, increase this week's load to reduce undertraining",
+                                                     ["3C", "7A"], 0.51, 0.8, None,
+                                                     "Workload decreasing at a significant rate. If unintentional, this can increase risk of injury."
                                                      )
         self.populate_thresholds()
 

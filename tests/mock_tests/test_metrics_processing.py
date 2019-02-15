@@ -78,7 +78,7 @@ def test_yellow_internal_acwr():
 
     assert metrics_list[0].color == MetricColor.yellow
     assert False is metrics_list[0].insufficient_data
-    
+
 
 def test_no_session_rpe_diff_date():
     athlete_stats = AthleteStats("tester")

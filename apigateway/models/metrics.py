@@ -71,9 +71,9 @@ class AthleteTrainingVolumeMetricGenerator(object):
                 elif v.low_value is None and v.high_value is not None:
                     if observed_value is not None and v.high_value > observed_value:
                         v.count += 1
-                    if lower_bound_value is not None and v.low_value > lower_bound_value:
+                    if lower_bound_value is not None and v.high_value > lower_bound_value:
                         v.lower_bound_count += 1
-                    if upper_bound_value is not None and v.low_value > upper_bound_value:
+                    if upper_bound_value is not None and v.high_value > upper_bound_value:
                         v.upper_bound_count += 1
 
                 standard_error_range = getattr(self.athlete_stats, self.threshold_attribute)
@@ -187,6 +187,8 @@ class DailyHighLevelInsight(Enum):
     monitor_in_training = 3
     not_cleared_for_training = 4
     at_risk_of_overtraining = 5
+    needs_workload_variability = 6
+    needs_higher_weekly_workload = 7
 
 
 class WeeklyHighLevelInsight(Enum):
