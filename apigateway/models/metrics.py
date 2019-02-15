@@ -1,6 +1,7 @@
 from enum import Enum, IntEnum
 from serialisable import Serialisable
 from models.soreness import BodyPartLocationText
+from models.training_volume import StandardErrorRange
 
 
 class AthleteMetric(Serialisable):
@@ -10,12 +11,14 @@ class AthleteMetric(Serialisable):
         self.color = None
         self.high_level_insight = None
         self.high_level_action_description = ""
+        self.high_level_extended_description = ""
         self.specific_insight_training_volume = ""
         self.specific_insight_recovery = ""
         #self.body_part_location = None
         #self.body_part_side = 0
 
         self.specific_actions = []
+        self.insufficient_data = False
 
     def json_serialise(self):
         ret = {
@@ -24,8 +27,10 @@ class AthleteMetric(Serialisable):
                'color': self.color.value,
                'high_level_insight': self.high_level_insight.value,
                'high_level_action_description': self.high_level_action_description,
+               'high_level_extended_description': self.high_level_extended_description,
                'specific_insight_training_volume': self.specific_insight_training_volume,
                'specific_insight_recovery': self.specific_insight_recovery,
+               'insufficient_data': self.insufficient_data,
                # 'body_part_location': self.body_part_location,
                # 'body_part_side': self.body_part_side,
                # 'soreness': [s.json_serialise() for s in self.soreness],
@@ -41,11 +46,22 @@ class AthleteTrainingVolumeMetricGenerator(object):
         self.athlete_stats = athlete_stats
         self.threshold_attribute = threshold_attribute
         self.thresholds = {}
+        self.insufficient_data = False
 
     def populate_thresholds(self):
 
         for t, v in self.thresholds.items():
-            if getattr(self.athlete_stats, self.threshold_attribute) is not None:
+            if (getattr(self.athlete_stats, self.threshold_attribute) is not None and
+                    isinstance(getattr(self.athlete_stats, self.threshold_attribute), StandardErrorRange)):
+                self.process_standard_error_threshold_value(v, self.threshold_attribute)
+
+            elif (getattr(self.athlete_stats, self.threshold_attribute) is not None and
+                    isinstance(getattr(self.athlete_stats, self.threshold_attribute), list)):
+                attribute_list = getattr(self.athlete_stats, self.threshold_attribute)
+                for a in range(0, len(attribute_list)):
+                    self.process_standard_error_threshold_value(v, self.threshold_attribute, a)
+
+            elif getattr(self.athlete_stats, self.threshold_attribute) is not None:
                 if v.low_value is not None and v.high_value is not None:
                     if v.low_value <= getattr(self.athlete_stats, self.threshold_attribute) < v.high_value:
                         v.count += 1
@@ -56,6 +72,58 @@ class AthleteTrainingVolumeMetricGenerator(object):
                     if v.high_value > getattr(self.athlete_stats, self.threshold_attribute):
                         v.count += 1
 
+    def process_standard_error_threshold_value(self, v, threshold_attribute, index_value=None):
+        observed_value = self.get_metric_value("observed_value", threshold_attribute, index_value)
+        upper_bound_value = self.get_metric_value("upper_bound", threshold_attribute, index_value)
+        lower_bound_value = self.get_metric_value("lower_bound", threshold_attribute, index_value)
+        if v.low_value is not None and v.high_value is not None:
+            if observed_value is not None and v.low_value <= observed_value < v.high_value:
+                v.count += 1
+            if lower_bound_value is not None and v.low_value <= lower_bound_value < v.high_value:
+                v.lower_bound_count += 1
+            if upper_bound_value is not None and v.low_value <= upper_bound_value < v.high_value:
+                v.upper_bound_count += 1
+        elif v.low_value is not None and v.high_value is None:
+            if observed_value is not None and v.low_value <= observed_value:
+                v.count += 1
+            if lower_bound_value is not None and v.low_value <= lower_bound_value:
+                v.lower_bound_count += 1
+            if upper_bound_value is not None and v.low_value <= upper_bound_value:
+                v.upper_bound_count += 1
+        elif v.low_value is None and v.high_value is not None:
+            if observed_value is not None and v.high_value > observed_value:
+                v.count += 1
+            if lower_bound_value is not None and v.high_value > lower_bound_value:
+                v.lower_bound_count += 1
+            if upper_bound_value is not None and v.high_value > upper_bound_value:
+                v.upper_bound_count += 1
+        if index_value is None:
+            standard_error_range = getattr(self.athlete_stats, threshold_attribute)
+        else:
+            standard_error_range_list = getattr(self.athlete_stats, threshold_attribute)
+            standard_error_range = standard_error_range_list[index_value]
+        if (standard_error_range.insufficient_data or (
+                (v.upper_bound_count > 0 and v.upper_bound_count != v.count) or
+                (v.lower_bound_count > 0 and v.lower_bound_count != v.count))):
+            v.insufficient_data = True
+            self.insufficient_data = True
+
+    def get_metric_value(self, attribute, threshold_attribute, index_value):
+
+        if index_value is None:
+            try:
+                value_object = getattr(self.athlete_stats, threshold_attribute)
+                value = getattr(value_object, attribute)
+            except:
+                value = None
+        else:
+            try:
+                value_object = getattr(self.athlete_stats, threshold_attribute)
+                value = getattr(value_object[index_value], attribute)
+            except:
+                value = None
+        return value
+
     def get_metric_list(self):
 
         metric_list = []
@@ -64,10 +132,12 @@ class AthleteTrainingVolumeMetricGenerator(object):
             if self.thresholds[key].count > 0:
                 metric = AthleteMetric(self.name, self.metric_type)
                 metric.high_level_action_description = self.thresholds[key].high_level_action_description
+                metric.high_level_extended_description = self.thresholds[key].high_level_extended_description
                 metric.specific_insight_training_volume = self.thresholds[key].specific_insight_training_volume
                 metric.high_level_insight = self.thresholds[key].high_level_insight
                 metric.specific_actions = [TextGenerator().get_specific_action(rec=rec) for rec in self.thresholds[key].specific_actions]
                 metric.color = self.thresholds[key].color
+                metric.insufficient_data = self.insufficient_data
                 metric_list.append(metric)
 
         return metric_list
@@ -103,6 +173,7 @@ class AthleteSorenessMetricGenerator(object):
             if len(self.thresholds[key].soreness_list) > 0:
                 metric = AthleteMetric(self.name, self.metric_type)
                 metric.high_level_action_description = self.thresholds[key].high_level_action_description
+                metric.high_level_extended_description = self.thresholds[key].high_level_extended_description
                 metric.specific_insight_recovery = TextGenerator().get_body_part_text(self.thresholds[key].specific_insight_recovery,
                                                                                     self.thresholds[key].soreness_list)
                 metric.high_level_insight = self.thresholds[key].high_level_insight
@@ -138,7 +209,11 @@ class DailyHighLevelInsight(Enum):
     increase_workload = 1
     limit_time_intensity_of_training = 2
     monitor_in_training = 3
-    not_cleared_for_training = 4
+    seek_med_staff_evaluation = 4
+    at_risk_of_overtraining = 5
+    needs_workload_variability = 6
+    needs_higher_weekly_workload = 7
+    needs_lower_training_intensity = 8
 
 
 class WeeklyHighLevelInsight(Enum):
@@ -146,8 +221,9 @@ class WeeklyHighLevelInsight(Enum):
     balance_overtraining_risk = 1
     add_variety_to_training_risk = 2
     increase_weekly_workload = 3
-    address_pain_or_soreness = 4
-    evaluate_health_status = 5
+    signs_of_elevated_injury_risk = 4
+    needs_lower_training_intensity = 5
+    seek_med_staff_evaluation = 6
 
 
 class MetricColor(IntEnum):
@@ -163,6 +239,7 @@ class ThresholdRecommendation(object):
         self.color = metric_color
         self.high_level_description = ""
         self.high_level_action_description = high_level_action_description
+        self.high_level_extended_description = ""
         self.high_level_insight = high_level_insight
         self.specific_insight_recovery = specific_insight_recovery
         self.specific_insight_training_volume = specific_insight_training_volume
@@ -170,6 +247,9 @@ class ThresholdRecommendation(object):
         self.high_value = high_value
         self.soreness_list = []
         self.count = 0
+        self.lower_bound_count = 0
+        self.upper_bound_count = 0
+        self.insufficient_data = False
 
 
 class TextGenerator(object):

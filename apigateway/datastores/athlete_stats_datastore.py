@@ -69,7 +69,12 @@ class AthleteStatsDatastore(object):
         athlete_stats.chronic_external_low_intensity_load = self._standard_error_from_monogodb(mongo_result.get('chronic_external_low_intensity_load', None))
 
         athlete_stats.internal_monotony = self._standard_error_from_monogodb(mongo_result.get('internal_monotony', None))
+        athlete_stats.historical_internal_monotony = [self._standard_error_from_monogodb(s)
+                                           for s in mongo_result.get('historic_internal_monotony', [])]
         athlete_stats.internal_strain = self._standard_error_from_monogodb(mongo_result.get('internal_strain', None))
+        athlete_stats.historical_internal_strain = [self._standard_error_from_monogodb(s)
+                                                      for s in mongo_result.get('historic_internal_strain', [])]
+        athlete_stats.internal_strain_events = self._standard_error_from_monogodb(mongo_result.get('internal_strain_events', None))
         athlete_stats.external_monotony = self._standard_error_from_monogodb(mongo_result.get('external_monotony', None))
         athlete_stats.external_strain = self._standard_error_from_monogodb(mongo_result.get('external_strain', None))
         athlete_stats.internal_ramp = self._standard_error_from_monogodb(mongo_result.get('internal_ramp', None))
@@ -165,8 +170,10 @@ class AthleteStatsDatastore(object):
         else:
             rec.high_level_insight = WeeklyHighLevelInsight(high_level_insight)
         rec.high_level_action_description = metric.get('high_level_action_description', "")
+        rec.high_level_extended_description = metric.get('high_level_extended_description', "")
         rec.specific_insight_training_volume = metric.get('specific_insight_training_volume', "")
         rec.specific_insight_recovery = metric.get('specific_insight_recovery', 0)
+        rec.insufficient_data = metric.get('insufficient_data', False)
         rec.specific_actions = [self._get_specific_actions_from_mongodb(sa)for sa in metric.get('specific_actions', [])]
         return rec
 

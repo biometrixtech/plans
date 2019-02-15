@@ -52,7 +52,7 @@ class TeamDashboardData(Serialisable):
         # if not cleared to train, add to not_cleared to train for daily and check if belong to weekly red insight
         if not athlete_summary.cleared_to_train:
             self.daily_insights.not_cleared_for_training.append(athlete_summary)
-            if WeeklyHighLevelInsight.evaluate_health_status in athlete.weekly_insights:
+            if WeeklyHighLevelInsight.needs_lower_training_intensity in athlete.weekly_insights:
                 self.weekly_insights.evaluate_health_status.append(athlete_summary)
         else:
             # group athletes into daily_insight bins
@@ -74,7 +74,7 @@ class TeamDashboardData(Serialisable):
                     self.weekly_insights.add_variety_to_training_risk.append(athlete_summary)
                 elif insight == WeeklyHighLevelInsight.increase_weekly_workload:
                     self.weekly_insights.increase_weekly_workload.append(athlete_summary)
-                elif insight == WeeklyHighLevelInsight.address_pain_or_soreness:
+                elif insight == WeeklyHighLevelInsight.signs_of_elevated_injury_risk:
                     self.weekly_insights.address_pain_or_soreness.append(athlete_summary)
 
 
@@ -105,7 +105,7 @@ class DailySummary(Serialisable):
                'increase_workload': [a.json_serialise() for a in self.increase_workload],
                'limit_time_intensity_of_training': [a.json_serialise() for a in self.limit_time_intensity_of_training],
                'monitor_in_training': [a.json_serialise() for a in self.monitor_in_training],
-               'not_cleared_for_training': [a.json_serialise() for a in self.not_cleared_for_training]
+               'seek_med_staff_evaluation': [a.json_serialise() for a in self.not_cleared_for_training]
                 }
         return ret
 
@@ -123,8 +123,8 @@ class WeeklySummary(Serialisable):
                'balance_overtraining_risk': [a.json_serialise() for a in self.balance_overtraining_risk],
                'add_variety_to_training_risk': [a.json_serialise() for a in self.add_variety_to_training_risk],
                'increase_weekly_workload': [a.json_serialise() for a in self.increase_weekly_workload],
-               'address_pain_or_soreness': [a.json_serialise() for a in self.address_pain_or_soreness],
-               'evaluate_health_status': [a.json_serialise() for a in self.evaluate_health_status]
+               'signs_of_elevated_injury_risk': [a.json_serialise() for a in self.address_pain_or_soreness],
+               'needs_lower_training_intensity': [a.json_serialise() for a in self.evaluate_health_status]
               }
         return ret
 

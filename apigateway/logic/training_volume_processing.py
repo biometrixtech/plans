@@ -140,7 +140,9 @@ class TrainingVolumeProcessing(object):
 
         athlete_stats.historical_internal_monotony = historical_internal_monotony
 
-        historical_internal_strain = self.get_historical_internal_strain(self.start_date, self.end_date)
+        historical_internal_strain, strain_events = self.get_historical_internal_strain(self.start_date, self.end_date)
+
+        athlete_stats.internal_strain_events = strain_events
 
         athlete_stats.internal_strain = self.get_strain(athlete_stats.expected_weekly_workouts,
                                                         athlete_stats.internal_monotony, self.last_week_internal_values,
@@ -802,6 +804,7 @@ class TrainingVolumeProcessing(object):
 
         index = 0
         strain_values = []
+        strain_events = StandardErrorRange()
 
         # evaluates a rolling week's worth of values for each day to calculate "daily" strain
         if len(target_dates) > 7:
@@ -814,7 +817,22 @@ class TrainingVolumeProcessing(object):
                     strain_values.append(strain)
                 index += 1
 
-        return strain_values
+        if len(strain_values) >= 7:
+            observed_values = list(o.observed_value for o in strain_values if o.observed_value is not None)
+            upper_values = list(o.upper_bound for o in strain_values if o.upper_bound is not None)
+
+            if 1 < len(observed_values) >= 7:
+                avg_observed = statistics.mean(observed_values)
+                stdev_observed = statistics.stdev(observed_values)
+                obs_events = list(o for o in observed_values if o >= ((1.2 * stdev_observed)+avg_observed))
+                strain_events.observed_value = len(obs_events)
+            if 1 < len(upper_values) >= 7:
+                avg_upper = statistics.mean(upper_values)
+                stdev_upper = statistics.stdev(upper_values)
+                up_events = list(o for o in upper_values if o >= ((1.2 * stdev_upper)+avg_upper))
+                strain_events.upper_bound = len(up_events)
+
+        return strain_values, strain_events
 
     def get_historical_internal_monotony(self, start_date, end_date, weekly_expected_workouts=5):
 

@@ -39,10 +39,10 @@ def test_no_metrics():
 def test_not_cleared_to_train():
     metric = get_metric(MetricType.daily,
                         MetricColor.red,
-                        DailyHighLevelInsight.not_cleared_for_training,
+                        DailyHighLevelInsight.seek_med_staff_evaluation,
                         "Metric insight",
-                         SpecificAction("2A", "metric1_rec1", True),
-                         SpecificAction("5A", "metric1_rec2", True)
+                        SpecificAction("2A", "metric1_rec1", True),
+                        SpecificAction("5A", "metric1_rec2", True)
                         )
     metrics = [metric]
     athlete = AthleteDashboardData('tester', 'first_name', 'last_name')
@@ -53,14 +53,14 @@ def test_not_cleared_to_train():
 def test_not_cleared_to_train_daily():
     metric1 = get_metric(MetricType.longitudinal,
                          MetricColor.yellow,
-                         WeeklyHighLevelInsight.address_pain_or_soreness,
+                         WeeklyHighLevelInsight.signs_of_elevated_injury_risk,
                          "Metric1 insight",
                          SpecificAction("1B", "metric1_rec1", True),
                          SpecificAction("3B", "metric1_rec2", True)
                          )
     metric2 = get_metric(MetricType.daily,
                          MetricColor.red,
-                         DailyHighLevelInsight.not_cleared_for_training,
+                         DailyHighLevelInsight.seek_med_staff_evaluation,
                          "Metric2 insight",
                          SpecificAction("2A", "metric2_rec1", True),
                          SpecificAction("5A", "metric2_rec2", True)
@@ -77,14 +77,14 @@ def test_not_cleared_to_train_daily():
 def test_not_cleared_to_train_daily_weekly():
     metric1 = get_metric(MetricType.longitudinal,
                          MetricColor.red,
-                         WeeklyHighLevelInsight.evaluate_health_status,
+                         WeeklyHighLevelInsight.needs_lower_training_intensity,
                          "Metric1 insight",
                          SpecificAction("1A", "metric1_rec1", True),
                          SpecificAction("2A", "metric1_rec2", True)
                          )
     metric2 = get_metric(MetricType.daily,
                          MetricColor.red,
-                         DailyHighLevelInsight.not_cleared_for_training,
+                         DailyHighLevelInsight.seek_med_staff_evaluation,
                          "Metric2 insight",
                          SpecificAction("5A", "metric2_rec1", True),
                          SpecificAction("3A", "metric2_rec2", True)
@@ -102,7 +102,7 @@ def test_not_cleared_to_train_daily_weekly():
 def test_not_cleared_to_train_weekly():
     metric1 = get_metric(MetricType.longitudinal,
                          MetricColor.red,
-                         WeeklyHighLevelInsight.evaluate_health_status,
+                         WeeklyHighLevelInsight.needs_lower_training_intensity,
                          "Metric1 insight",
                          SpecificAction("1A", "metric1_rec1", True),
                          SpecificAction("2A", "metric1_rec2", True)
@@ -128,7 +128,7 @@ def test_not_cleared_to_train_weekly():
 def test_cleared_to_train():
     metric1 = get_metric(MetricType.longitudinal,
                          MetricColor.yellow,
-                         WeeklyHighLevelInsight.address_pain_or_soreness,
+                         WeeklyHighLevelInsight.signs_of_elevated_injury_risk,
                          "Metric1 insight",
                          SpecificAction("1B", "metric1_rec1", True),
                          SpecificAction("2B", "metric1_rec2", True)
@@ -191,11 +191,11 @@ def test_athlete_grouping():
 
     weekly_evaluate_health_status = get_metric(MetricType.longitudinal,
                                                MetricColor.red,
-                                               WeeklyHighLevelInsight.evaluate_health_status,
+                                               WeeklyHighLevelInsight.needs_lower_training_intensity,
                                                "insight",
                                                SpecificAction("1B", "rec1", True),
                                                SpecificAction("2B", "rec2", True)
-                                              )
+                                               )
     team = TeamDashboardData("Fathom Team")
     athlete1 = get_athlete([daily_limit_time_intensity_of_training, daily_monitor_in_training, weekly_balance_overtraining_risk])
     team.insert_user(athlete1)
