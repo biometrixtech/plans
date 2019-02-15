@@ -204,10 +204,11 @@ class DailyHighLevelInsight(Enum):
     increase_workload = 1
     limit_time_intensity_of_training = 2
     monitor_in_training = 3
-    not_cleared_for_training = 4
+    seek_med_staff_evaluation = 4
     at_risk_of_overtraining = 5
     needs_workload_variability = 6
     needs_higher_weekly_workload = 7
+    needs_lower_training_intensity = 8
 
 
 class WeeklyHighLevelInsight(Enum):
@@ -215,8 +216,9 @@ class WeeklyHighLevelInsight(Enum):
     balance_overtraining_risk = 1
     add_variety_to_training_risk = 2
     increase_weekly_workload = 3
-    address_pain_or_soreness = 4
-    evaluate_health_status = 5
+    signs_of_elevated_injury_risk = 4
+    needs_lower_training_intensity = 5
+    seek_med_staff_evaluation = 6
 
 
 class MetricColor(IntEnum):
