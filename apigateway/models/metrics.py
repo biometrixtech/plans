@@ -11,6 +11,7 @@ class AthleteMetric(Serialisable):
         self.color = None
         self.high_level_insight = None
         self.high_level_action_description = ""
+        self.high_level_extended_description = ""
         self.specific_insight_training_volume = ""
         self.specific_insight_recovery = ""
         #self.body_part_location = None
@@ -26,8 +27,10 @@ class AthleteMetric(Serialisable):
                'color': self.color.value,
                'high_level_insight': self.high_level_insight.value,
                'high_level_action_description': self.high_level_action_description,
+               'high_level_extended_description': self.high_level_extended_description,
                'specific_insight_training_volume': self.specific_insight_training_volume,
                'specific_insight_recovery': self.specific_insight_recovery,
+               'insufficient_data': self.insufficient_data,
                # 'body_part_location': self.body_part_location,
                # 'body_part_side': self.body_part_side,
                # 'soreness': [s.json_serialise() for s in self.soreness],
@@ -129,6 +132,7 @@ class AthleteTrainingVolumeMetricGenerator(object):
             if self.thresholds[key].count > 0:
                 metric = AthleteMetric(self.name, self.metric_type)
                 metric.high_level_action_description = self.thresholds[key].high_level_action_description
+                metric.high_level_extended_description = self.thresholds[key].high_level_extended_description
                 metric.specific_insight_training_volume = self.thresholds[key].specific_insight_training_volume
                 metric.high_level_insight = self.thresholds[key].high_level_insight
                 metric.specific_actions = [TextGenerator().get_specific_action(rec=rec) for rec in self.thresholds[key].specific_actions]
@@ -169,6 +173,7 @@ class AthleteSorenessMetricGenerator(object):
             if len(self.thresholds[key].soreness_list) > 0:
                 metric = AthleteMetric(self.name, self.metric_type)
                 metric.high_level_action_description = self.thresholds[key].high_level_action_description
+                metric.high_level_extended_description = self.thresholds[key].high_level_extended_description
                 metric.specific_insight_recovery = TextGenerator().get_body_part_text(self.thresholds[key].specific_insight_recovery,
                                                                                     self.thresholds[key].soreness_list)
                 metric.high_level_insight = self.thresholds[key].high_level_insight
