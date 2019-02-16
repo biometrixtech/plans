@@ -82,6 +82,7 @@ def handle_daily_readiness_create():
 
     if "clear_candidates" in request.json and len(request.json['clear_candidates']) > 0:
         SurveyProcessing().process_clear_status_answers(request.json['clear_candidates'], athlete_stats, event_date, daily_readiness.soreness)
+        need_stats_update = True
 
     store = DailyReadinessDatastore()
     store.put(daily_readiness)
