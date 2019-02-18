@@ -10,14 +10,14 @@ def get_atv(rpe_val):
 
     atv = AthleteTrainingVolumeMetricGenerator("session RPE", MetricType.daily, athlete_stats, "session_RPE")
     atv.thresholds[0] = ThresholdRecommendation(MetricColor.red,
-                                                 DailyHighLevelInsight.limit_time_intensity_of_training,
+                                                DailyHighLevelInsight.adapt_training_to_avoid_symptoms,
                                                  "high_level_action_description",
-                                                 ["2B", "7A"], 8.0, None, None,
+                                                ["2B", "7A"], 8.0, None, None,
                                                  "stop now")
     atv.thresholds[1] = ThresholdRecommendation(MetricColor.yellow,
-                                                 DailyHighLevelInsight.limit_time_intensity_of_training,
+                                                DailyHighLevelInsight.adapt_training_to_avoid_symptoms,
                                                 "high_level_action_description",
-                                                 ["2B", "7A"], 6.0, 8.0, None,
+                                                ["2B", "7A"], 6.0, 8.0, None,
                                                  "consider stopping")
 
     return atv
@@ -27,17 +27,17 @@ def get_asg(soreness_list, attribute_name):
 
     asg = AthleteSorenessMetricGenerator("deep pain", MetricType.daily, soreness_list, attribute_name)
     asg.thresholds[0] = ThresholdRecommendation(MetricColor.red,
-                                                 DailyHighLevelInsight.limit_time_intensity_of_training,
+                                                DailyHighLevelInsight.adapt_training_to_avoid_symptoms,
                                                  "high_level_action_description",
-                                                 ["2B", "7A"], 4.0, None, "stop with your {bodypart}!", None)
+                                                ["2B", "7A"], 4.0, None, "stop with your {bodypart}!", None)
     asg.thresholds[1] = ThresholdRecommendation(MetricColor.yellow,
-                                                 DailyHighLevelInsight.limit_time_intensity_of_training,
+                                                DailyHighLevelInsight.adapt_training_to_avoid_symptoms,
                                                 "high_level_action_description",
-                                                 ["2B", "7A"], 3.0, 4.0, "consider stopping your {bodypart}!", None,
-                                                 )
+                                                ["2B", "7A"], 3.0, 4.0, "consider stopping your {bodypart}!", None,
+                                                )
 
     asg.thresholds[2] = ThresholdRecommendation(MetricColor.green,
-                                                DailyHighLevelInsight.limit_time_intensity_of_training,
+                                                DailyHighLevelInsight.adapt_training_to_avoid_symptoms,
                                                 "high_level_action_description",
                                                 ["2B", "7A"], None, 3.0, "don't stop your {bodypart}!", None)
 

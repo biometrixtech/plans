@@ -11,7 +11,6 @@ class AthleteMetric(Serialisable):
         self.color = None
         self.high_level_insight = None
         self.high_level_action_description = ""
-        self.high_level_extended_description = ""
         self.specific_insight_training_volume = ""
         self.specific_insight_recovery = ""
         #self.body_part_location = None
@@ -27,7 +26,6 @@ class AthleteMetric(Serialisable):
                'color': self.color.value,
                'high_level_insight': self.high_level_insight.value,
                'high_level_action_description': self.high_level_action_description,
-               'high_level_extended_description': self.high_level_extended_description,
                'specific_insight_training_volume': self.specific_insight_training_volume,
                'specific_insight_recovery': self.specific_insight_recovery,
                'insufficient_data': self.insufficient_data,
@@ -132,7 +130,6 @@ class AthleteTrainingVolumeMetricGenerator(object):
             if self.thresholds[key].count > 0:
                 metric = AthleteMetric(self.name, self.metric_type)
                 metric.high_level_action_description = self.thresholds[key].high_level_action_description
-                metric.high_level_extended_description = self.thresholds[key].high_level_extended_description
                 metric.specific_insight_training_volume = self.thresholds[key].specific_insight_training_volume
                 metric.high_level_insight = self.thresholds[key].high_level_insight
                 metric.specific_actions = [TextGenerator().get_specific_action(rec=rec) for rec in self.thresholds[key].specific_actions]
@@ -173,7 +170,6 @@ class AthleteSorenessMetricGenerator(object):
             if len(self.thresholds[key].soreness_list) > 0:
                 metric = AthleteMetric(self.name, self.metric_type)
                 metric.high_level_action_description = self.thresholds[key].high_level_action_description
-                metric.high_level_extended_description = self.thresholds[key].high_level_extended_description
                 metric.specific_insight_recovery = TextGenerator().get_body_part_text(self.thresholds[key].specific_insight_recovery,
                                                                                     self.thresholds[key].soreness_list)
                 metric.high_level_insight = self.thresholds[key].high_level_insight
@@ -206,24 +202,18 @@ class SpecificAction(Serialisable):
 
 class DailyHighLevelInsight(Enum):
     all_good = 0
-    increase_workload = 1
-    limit_time_intensity_of_training = 2
-    monitor_in_training = 3
-    seek_med_staff_evaluation = 4
-    at_risk_of_overtraining = 5
-    needs_workload_variability = 6
-    needs_higher_weekly_workload = 7
-    needs_lower_training_intensity = 8
-
+    seek_med_eval_to_clear_for_training = 1
+    recovery_day_recommended = 2
+    adapt_training_to_avoid_symptoms = 2
+    monitor_modify_if_needed = 3
 
 class WeeklyHighLevelInsight(Enum):
     all_good = 0
-    balance_overtraining_risk = 1
-    add_variety_to_training_risk = 2
-    increase_weekly_workload = 3
-    signs_of_elevated_injury_risk = 4
-    needs_lower_training_intensity = 5
-    seek_med_staff_evaluation = 6
+    seek_med_eval_to_clear_for_training = 1
+    at_risk_of_overtraining = 2
+    low_variability_inhibiting_recovery = 3
+    at_risk_of_undertraining = 4
+    at_risk_of_time_loss_injury = 5
 
 
 class MetricColor(IntEnum):
@@ -239,7 +229,6 @@ class ThresholdRecommendation(object):
         self.color = metric_color
         self.high_level_description = ""
         self.high_level_action_description = high_level_action_description
-        self.high_level_extended_description = ""
         self.high_level_insight = high_level_insight
         self.specific_insight_recovery = specific_insight_recovery
         self.specific_insight_training_volume = specific_insight_training_volume
