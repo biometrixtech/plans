@@ -7,8 +7,8 @@ class MetricsProcessing(object):
 
         metrics = []
 
-        if athlete_stats.session_RPE_event_date == event_date:
-            metrics.extend(DailySessionRPEMetricGenerator(athlete_stats, athlete_stats.session_RPE_event_date).get_metric_list())
+        #if athlete_stats.session_RPE_event_date == event_date:
+        #    metrics.extend(DailySessionRPEMetricGenerator(athlete_stats, athlete_stats.session_RPE_event_date).get_metric_list())
 
         if athlete_stats.event_date == event_date:
             metrics.extend(IncreasingIACWRGenerator(athlete_stats).get_metric_list())
