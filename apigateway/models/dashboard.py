@@ -49,6 +49,7 @@ class TeamDashboardData(Serialisable):
         athlete_summary = AthleteDashboardSummary(athlete.user_id, athlete.first_name, athlete.last_name)
         athlete_summary.cleared_to_train = athlete.cleared_to_train
         athlete_summary.color = athlete.color
+        athlete_summary.insufficient_data = athlete.insufficient_data
         # if not cleared to train, add to not_cleared to train for daily and check if belong to weekly red insight
         if not athlete_summary.cleared_to_train:
             self.daily_insights.not_cleared_for_training.append(athlete_summary)
@@ -135,13 +136,15 @@ class AthleteDashboardSummary(Serialisable):
         self.last_name = last_name
         self.cleared_to_train = True
         self.color = MetricColor(0)
+        self.insufficient_data = False
 
     def json_serialise(self):
         ret = {'user_id': self.user_id,
                'first_name': self.first_name,
                'last_name': self.last_name,
                'cleared_to_train': self.cleared_to_train,
-               'color': self.color.value
+               'color': self.color.value,
+               'insufficient_data': self.insufficient_data
               }
         return ret
 
@@ -159,6 +162,7 @@ class AthleteDashboardData(Serialisable):
         self.insights =[]
         self.daily_insights = set()
         self.weekly_insights = set()
+        self.insufficient_data = False
 
     def aggregate(self, metrics):
         if len(metrics) == 0:
@@ -167,22 +171,23 @@ class AthleteDashboardData(Serialisable):
         else:
             not_cleared_recs_day = []
             not_cleared_recs_week = []
+            insufficient_data_red = False
             for metric in metrics:
-                if metric.specific_insight_training_volume != "":
-                    self.insights.append(metric.specific_insight_training_volume)
-                if metric.specific_insight_recovery != "":
-                    self.insights.append(metric.specific_insight_recovery)
                 self.color = MetricColor(max([self.color.value, metric.color.value]))
                 self.cleared_to_train = False if self.color.value == 2 else True
-
-                daily_recs = [m.text for m in metric.specific_actions if m.display and m.code[0] in ["2", "5", "6", "7"]]
-                weekly_recs = [m.text for m in metric.specific_actions if m.display and m.code[0] in ["1", "3"]]
-                
-                self.daily_recommendation.update(daily_recs)
-                self.weekly_recommendation.update(weekly_recs)
-                if metric.color == MetricColor.red:
+                self.add_insight(metric)
+                daily_recs = [(m.text, metric.insufficient_data) for m in metric.specific_actions if m.display and m.code[0] in ["2", "5", "6", "7"]]
+                weekly_recs = [(m.text, metric.insufficient_data) for m in metric.specific_actions if m.display and m.code[0] in ["1", "3"]]
+                if metric.color == MetricColor.red: # not cleared to train
                     not_cleared_recs_day.extend(daily_recs)
                     not_cleared_recs_week.extend(weekly_recs)
+                    if metric.insufficient_data:
+                        insufficient_data_red = True
+                elif metric.color != MetricColor.red and self.cleared_to_train:
+                    self.daily_recommendation.update(daily_recs)
+                    self.weekly_recommendation.update(weekly_recs)
+                else: # not cleared to train but current metric is yellow
+                    pass
 
                 if metric.metric_type == MetricType.daily:
                     self.daily_insights.add(metric.high_level_insight)
@@ -192,8 +197,47 @@ class AthleteDashboardData(Serialisable):
             if not self.cleared_to_train:
                 self.daily_recommendation = set(not_cleared_recs_day)
                 self.weekly_recommendation = set(not_cleared_recs_week)
+                self.insufficient_data = insufficient_data_red
             elif self.color == MetricColor.yellow and len(self.daily_insights) == 0:
                 self.daily_insights.add(DailyHighLevelInsight.monitor_in_training)
+
+            sorted_insights = sorted(self.insights,  key=lambda k: k[1], reverse=True)
+            self.insights = [i[0] for i in sorted_insights]
+            self.daily_recommendation = self.cleanup_recs('daily')
+            self.weekly_recommendation = self.cleanup_recs('weekly')
+
+    def add_insight(self, metric):
+        if metric.specific_insight_training_volume != "":
+            if metric.insufficient_data:
+                self.insufficient_data = True
+                self.insights.append(("*"+metric.specific_insight_training_volume, metric.color))
+            else:
+                self.insights.append((metric.specific_insight_training_volume, metric.color))
+        if metric.specific_insight_recovery != "":
+            self.insights.append((metric.specific_insight_recovery, metric.color))
+
+
+    def cleanup_recs(self, rec_type='daily'):
+        if rec_type == 'daily':
+            all_recs = self.daily_recommendation
+        elif rec_type == 'weekly':
+            all_recs = self.weekly_recommendation
+        recs = {}
+        for rec in all_recs:
+            if rec[0] not in recs:
+                recs[rec[0]] = rec[1]
+            else:
+                if not rec[1]:
+                    recs[rec[0]] = rec[1]
+        cleaned_recs = set()
+        for rec in recs:
+            if recs[rec]:
+                cleaned_recs.add("*" + rec)
+            else:
+                cleaned_recs.add(rec)
+        return cleaned_recs
+
+
 
     def json_serialise(self):
         ret = {'user_id': self.user_id,
@@ -203,6 +247,7 @@ class AthleteDashboardData(Serialisable):
                'color': self.color.value,
                'daily_recommendation': list(self.daily_recommendation),
                'weekly_recommendation': list(self.weekly_recommendation),
-               'insights': self.insights
+               'insights': self.insights,
+               'insufficient_data': self.insufficient_data
               }
         return ret
