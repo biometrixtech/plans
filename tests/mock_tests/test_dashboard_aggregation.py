@@ -4,11 +4,14 @@ from models.daily_readiness import DailyReadiness
 from models.daily_plan import  DailyPlan
 import datetime
 
-def get_metric(metric_type, color, high_level_insight, specific_insight, rec1, rec2, insufficient_data=False):
+def get_metric(metric_type, color, high_level_insight, specific_insight, rec1, rec2, insufficient_data=False, tv=False):
     metric = AthleteMetric('Metric', metric_type)
     metric.color = color
     metric.high_level_insight = high_level_insight
-    metric.specific_insight_recovery = specific_insight
+    if not tv:
+        metric.specific_insight_recovery = specific_insight
+    else:
+        metric.specific_insight_training_volume = specific_insight
     metric.specific_actions = [rec1, rec2]
     metric.insufficient_data = insufficient_data
     return metric
@@ -75,6 +78,31 @@ def test_not_cleared_to_train_daily():
     assert athlete.weekly_recommendation == set()
     assert athlete.daily_recommendation == set(["*metric2_rec1", "*metric2_rec2"])
     assert athlete.insufficient_data
+    assert athlete.insights == ["Metric2 insight", "Metric1 insight"]
+
+def test_insights_order_both_yellow():
+    metric1 = get_metric(MetricType.longitudinal,
+                         MetricColor.yellow,
+                         WeeklyHighLevelInsight.needs_lower_training_intensity,
+                         "Metric1 insight",
+                         SpecificAction("1A", "metric1_rec1", True),
+                         SpecificAction("2A", "metric1_rec2", True),
+                         tv=True
+                         )
+    metric2 = get_metric(MetricType.daily,
+                         MetricColor.yellow,
+                         DailyHighLevelInsight.seek_med_staff_evaluation,
+                         "Metric2 insight",
+                         SpecificAction("5A", "metric2_rec1", True),
+                         SpecificAction("3A", "metric2_rec2", True)
+                         )
+    metrics = [metric1, metric2]
+    athlete = AthleteDashboardData('tester', 'first_name', 'last_name')
+    athlete.aggregate(metrics)
+    assert athlete.color == MetricColor.yellow
+    assert not athlete.insufficient_data
+    assert athlete.weekly_recommendation == set(["metric1_rec1", "metric2_rec2"])
+    assert athlete.daily_recommendation == set(["metric1_rec2", "metric2_rec1"])
     assert athlete.insights == ["Metric2 insight", "Metric1 insight"]
 
 def test_not_cleared_to_train_daily_weekly():

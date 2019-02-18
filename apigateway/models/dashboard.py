@@ -176,6 +176,7 @@ class AthleteDashboardData(Serialisable):
                 self.color = MetricColor(max([self.color.value, metric.color.value]))
                 self.cleared_to_train = False if self.color.value == 2 else True
                 self.add_insight(metric)
+                # pain_soreness = 1 if metric.specific_insight_recovery != "" else 0
                 daily_recs = [(m.text, metric.insufficient_data) for m in metric.specific_actions if m.display and m.code[0] in ["2", "5", "6", "7"]]
                 weekly_recs = [(m.text, metric.insufficient_data) for m in metric.specific_actions if m.display and m.code[0] in ["1", "3"]]
                 if metric.color == MetricColor.red: # not cleared to train
@@ -201,7 +202,7 @@ class AthleteDashboardData(Serialisable):
             elif self.color == MetricColor.yellow and len(self.daily_insights) == 0:
                 self.daily_insights.add(DailyHighLevelInsight.monitor_in_training)
 
-            sorted_insights = sorted(self.insights,  key=lambda k: k[1], reverse=True)
+            sorted_insights = sorted(self.insights,  key=lambda k: (k[1], k[2]), reverse=True)
             self.insights = [i[0] for i in sorted_insights]
             self.daily_recommendation = self.cleanup_recs('daily')
             self.weekly_recommendation = self.cleanup_recs('weekly')
@@ -210,11 +211,11 @@ class AthleteDashboardData(Serialisable):
         if metric.specific_insight_training_volume != "":
             if metric.insufficient_data:
                 self.insufficient_data = True
-                self.insights.append(("*"+metric.specific_insight_training_volume, metric.color))
+                self.insights.append(("*"+metric.specific_insight_training_volume, metric.color, 0))
             else:
-                self.insights.append((metric.specific_insight_training_volume, metric.color))
+                self.insights.append((metric.specific_insight_training_volume, metric.color, 0))
         if metric.specific_insight_recovery != "":
-            self.insights.append((metric.specific_insight_recovery, metric.color))
+            self.insights.append((metric.specific_insight_recovery, metric.color, 1))
 
 
     def cleanup_recs(self, rec_type='daily'):
