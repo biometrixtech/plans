@@ -314,7 +314,7 @@ class AthleteStats(Serialisable):
             'historical_internal_monotony': [h.json_serialise() for h in self.historical_internal_monotony],
             'internal_strain': self.internal_strain.json_serialise() if self.internal_strain is not None else None,
             'historical_internal_strain': [h.json_serialise() for h in self.historical_internal_strain],
-            'internal_strain_events': self.internal_strain_events.json_serialise(),
+            'internal_strain_events': self.internal_strain_events.json_serialise() if not None else None,
             'external_monotony': self.external_monotony.json_serialise() if self.external_monotony is not None else None,
             'external_strain': self.external_strain.json_serialise() if self.external_strain is not None else None,
             'internal_ramp': self.internal_ramp.json_serialise() if self.internal_ramp is not None else None,
