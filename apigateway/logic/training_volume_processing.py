@@ -797,7 +797,7 @@ class TrainingVolumeProcessing(object):
         #all_plans.sort(key=lambda x: x.event_date)
         self.internal_load_tuples.sort(key=lambda x: x[0])
 
-        date_diff = parse_date(end_date) - parse_date(start_date) + + timedelta(days=1)  # include all days within start/end
+        date_diff = parse_date(end_date) - parse_date(start_date) + timedelta(days=1)  # include all days within start/end
 
         for i in range(0, date_diff.days):
             target_dates.append(parse_date(start_date) + timedelta(days=i))
