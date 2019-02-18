@@ -1,7 +1,7 @@
 from models.training_volume import StandardErrorRange, StandardErrorRangeMetric
 from datetime import timedelta
 import statistics, math
-from utils import parse_date
+from utils import format_date, parse_date
 
 
 class TrainingVolumeProcessing(object):
@@ -797,9 +797,9 @@ class TrainingVolumeProcessing(object):
         #all_plans.sort(key=lambda x: x.event_date)
         self.internal_load_tuples.sort(key=lambda x: x[0])
 
-        date_diff = parse_date(end_date) - parse_date(start_date)
+        date_diff = parse_date(end_date) - parse_date(start_date) + timedelta(days=1)  # include all days within start/end
 
-        for i in range(1, date_diff.days):
+        for i in range(0, date_diff.days):
             target_dates.append(parse_date(start_date) + timedelta(days=i))
 
         index = 0
@@ -807,30 +807,45 @@ class TrainingVolumeProcessing(object):
         strain_events = StandardErrorRange()
 
         # evaluates a rolling week's worth of values for each day to calculate "daily" strain
+        avg_observed = None
+        stdev_observed = None
+        avg_upper = None
+        stdev_upper = None
+        obs_events = 0
+        up_events = 0
+
         if len(target_dates) > 7:
             for t in range(6, len(target_dates)):
                 load_values = []
-                daily_plans = [p for p in self.internal_load_tuples if (parse_date(start_date) + timedelta(index)) < p[0] <= target_dates[t]]
+                daily_plans = [p for p in self.internal_load_tuples if (parse_date(start_date) + timedelta(index)) <= p[0] <= target_dates[t]]
                 load_values.extend(x[1] for x in daily_plans if x is not None)
                 strain = self.calculate_daily_strain(load_values, weekly_expected_workouts)
+
                 if strain.observed_value is not None or strain.upper_bound is not None:
                     strain_values.append(strain)
+
+                    if len(strain_values) > 1:
+                        observed_values = list(o.observed_value for o in strain_values if o.observed_value is not None)
+                        upper_values = list(o.upper_bound for o in strain_values if o.upper_bound is not None)
+
+                        if 1 < len(observed_values):
+                            if stdev_observed is not None and avg_observed is not None:
+                                if strain.observed_value >= ((1.2 * stdev_observed) + avg_observed):
+                                    obs_events += 1
+                            avg_observed = statistics.mean(observed_values)
+                            stdev_observed = statistics.stdev(observed_values)
+
+                            strain_events.observed_value = obs_events
+
+                        if 1 < len(upper_values):
+                            if stdev_upper is not None and avg_upper is not None:
+                                if strain.upper_bound >= ((1.2 * stdev_upper) + avg_upper):
+                                    up_events += 1
+                            avg_upper = statistics.mean(upper_values)
+                            stdev_upper = statistics.stdev(upper_values)
+
+                            strain_events.upper_bound = up_events
                 index += 1
-
-        if len(strain_values) >= 7:
-            observed_values = list(o.observed_value for o in strain_values if o.observed_value is not None)
-            upper_values = list(o.upper_bound for o in strain_values if o.upper_bound is not None)
-
-            if 1 < len(observed_values) >= 7:
-                avg_observed = statistics.mean(observed_values)
-                stdev_observed = statistics.stdev(observed_values)
-                obs_events = list(o for o in observed_values if o >= ((1.2 * stdev_observed)+avg_observed))
-                strain_events.observed_value = len(obs_events)
-            if 1 < len(upper_values) >= 7:
-                avg_upper = statistics.mean(upper_values)
-                stdev_upper = statistics.stdev(upper_values)
-                up_events = list(o for o in upper_values if o >= ((1.2 * stdev_upper)+avg_upper))
-                strain_events.upper_bound = len(up_events)
 
         return strain_values, strain_events
 
@@ -871,24 +886,25 @@ class TrainingVolumeProcessing(object):
             current_load = sum(load_values)
             average_load = statistics.mean(load_values)
             stdev_load = statistics.stdev(load_values)
-            if stdev_load > 0:
-                monotony = average_load / stdev_load
-                daily_strain.observed_value = monotony * current_load
+            stdev_load = max(stdev_load, 0.1)
 
-                if len(load_values) < weekly_expected_workouts:
-                    standard_error = (stdev_load / math.sqrt(len(load_values))) * math.sqrt(
-                        (weekly_expected_workouts - len(load_values)) / weekly_expected_workouts)  # adjusts for finite population correction
-                    standard_error_range_factor = 1.96 * standard_error
+            monotony = average_load / stdev_load
+            daily_strain.observed_value = monotony * current_load
 
-                    standard_error_high = average_load + standard_error_range_factor
+            if len(load_values) < weekly_expected_workouts:
+                standard_error = (stdev_load / math.sqrt(len(load_values))) * math.sqrt(
+                    (weekly_expected_workouts - len(load_values)) / weekly_expected_workouts)  # adjusts for finite population correction
+                standard_error_range_factor = 1.96 * standard_error
 
-                    monotony_high = standard_error_high / stdev_load
-                    daily_strain.upper_bound = monotony_high * current_load
+                standard_error_high = average_load + standard_error_range_factor
 
-                    # unlikely actual load is lower than observed value; ignoring for now
-                    #standard_error_low = average_load - standard_error_range_factor
-                    #monotony_low = standard_error_low / stdev_load
-                    #daily_strain.lower_bound = monotony_low * current_load
+                monotony_high = standard_error_high / stdev_load
+                daily_strain.upper_bound = monotony_high * current_load
+
+                # unlikely actual load is lower than observed value; ignoring for now
+                #standard_error_low = average_load - standard_error_range_factor
+                #monotony_low = standard_error_low / stdev_load
+                #daily_strain.lower_bound = monotony_low * current_load
 
         return daily_strain
 
