@@ -220,7 +220,7 @@ class AthleteDashboardData(Serialisable):
                 self.daily_recommendation = set(not_cleared_recs_day)
                 self.weekly_recommendation = set(not_cleared_recs_week)
             elif self.color == MetricColor.yellow and len(self.daily_insights) == 0:
-                if "Pain" in " ".join(self.weekly_metrics):
+                if "pain" in " ".join(self.weekly_metrics).lower():
                     self.daily_insights.add(DailyHighLevelInsight.adapt_training_to_avoid_symptoms)
 
             sorted_insights = sorted(self.insights,  key=lambda k: (k[1], k[2]), reverse=True)
