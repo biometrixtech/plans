@@ -18,7 +18,7 @@ def get_metric(metric_type, color, high_level_insight, specific_insight, rec1, r
 
 
 def get_athlete(metrics):
-    athlete = AthleteDashboardData("user_id", "fisrt_name", 'last_name')
+    athlete = AthleteDashboardData("user_id", "first_name", 'last_name')
     athlete.aggregate(metrics)
     return athlete
 
@@ -83,7 +83,7 @@ def test_not_cleared_to_train_daily():
 def test_insights_order_both_yellow():
     metric1 = get_metric(MetricType.longitudinal,
                          MetricColor.yellow,
-                         WeeklyHighLevelInsight.needs_lower_training_intensity,
+                         WeeklyHighLevelInsight.at_risk_of_overtraining,
                          "Metric1 insight",
                          SpecificAction("1A", "metric1_rec1", True),
                          SpecificAction("2A", "metric1_rec2", True),
@@ -91,7 +91,7 @@ def test_insights_order_both_yellow():
                          )
     metric2 = get_metric(MetricType.daily,
                          MetricColor.yellow,
-                         DailyHighLevelInsight.seek_med_staff_evaluation,
+                         DailyHighLevelInsight.seek_med_eval_to_clear_for_training,
                          "Metric2 insight",
                          SpecificAction("5A", "metric2_rec1", True),
                          SpecificAction("3A", "metric2_rec2", True)
@@ -185,21 +185,21 @@ def test_cleared_to_train():
 
 
 def test_athlete_grouping():
-    daily_increase_workload = get_metric(MetricType.daily,
+    recovery_day_recommended = get_metric(MetricType.daily,
                                          MetricColor.yellow,
                                          DailyHighLevelInsight.recovery_day_recommended,
                                          "insight",
                                          SpecificAction("1B", "rec1", True),
                                          SpecificAction("2B", "rec2", True)
                                          )
-    daily_limit_time_intensity_of_training = get_metric(MetricType.daily,
+    adapt_training_to_avoid_symptoms = get_metric(MetricType.daily,
                                                         MetricColor.yellow,
                                                         DailyHighLevelInsight.adapt_training_to_avoid_symptoms,
                                                         "insight",
                                                         SpecificAction("1B", "rec1", True),
                                                         SpecificAction("2B", "rec2", True)
                                                         )
-    daily_monitor_in_training = get_metric(MetricType.daily,
+    monitor_modify_if_needed = get_metric(MetricType.daily,
                                            MetricColor.yellow,
                                            DailyHighLevelInsight.monitor_modify_if_needed,
                                            "insight",
@@ -207,14 +207,14 @@ def test_athlete_grouping():
                                            SpecificAction("2B", "rec2", True)
                                            )
 
-    weekly_balance_overtraining_risk = get_metric(MetricType.longitudinal,
+    at_risk_of_overtraining = get_metric(MetricType.longitudinal,
                                                   MetricColor.yellow,
                                                   WeeklyHighLevelInsight.at_risk_of_overtraining,
                                                   "insight",
                                                   SpecificAction("1B", "rec1", True),
                                                   SpecificAction("2B", "rec2", True)
                                                   )
-    weekly_add_variety_to_training_risk = get_metric(MetricType.longitudinal,
+    low_variability_inhibiting_recovery = get_metric(MetricType.longitudinal,
                                                      MetricColor.yellow,
                                                      WeeklyHighLevelInsight.low_variability_inhibiting_recovery,
                                                      "insight",
@@ -222,7 +222,7 @@ def test_athlete_grouping():
                                                      SpecificAction("2B", "rec2", True)
                                                      )
 
-    weekly_evaluate_health_status = get_metric(MetricType.longitudinal,
+    seek_med_eval_to_clear_for_training = get_metric(MetricType.longitudinal,
                                                MetricColor.red,
                                                WeeklyHighLevelInsight.seek_med_eval_to_clear_for_training,
                                                "insight",
@@ -230,28 +230,28 @@ def test_athlete_grouping():
                                                SpecificAction("2B", "rec2", True)
                                                )
     team = TeamDashboardData("Fathom Team")
-    athlete1 = get_athlete([daily_limit_time_intensity_of_training, daily_monitor_in_training, weekly_balance_overtraining_risk])
+    athlete1 = get_athlete([adapt_training_to_avoid_symptoms, monitor_modify_if_needed, at_risk_of_overtraining])
     team.insert_user(athlete1)
-    athlete2 = get_athlete([daily_increase_workload, weekly_add_variety_to_training_risk])
+    athlete2 = get_athlete([recovery_day_recommended, low_variability_inhibiting_recovery])
     team.insert_user(athlete2)
-    athlete3 = get_athlete([daily_limit_time_intensity_of_training, daily_monitor_in_training, weekly_add_variety_to_training_risk])
+    athlete3 = get_athlete([adapt_training_to_avoid_symptoms, monitor_modify_if_needed, low_variability_inhibiting_recovery])
     team.insert_user(athlete3)
-    athlete4 = get_athlete([daily_limit_time_intensity_of_training, daily_monitor_in_training, weekly_evaluate_health_status])
+    athlete4 = get_athlete([adapt_training_to_avoid_symptoms, monitor_modify_if_needed, seek_med_eval_to_clear_for_training])
     team.insert_user(athlete4)
 
 
     assert len(team.daily_insights.all_good) == 0
-    assert len(team.daily_insights.increase_workload) == 1
-    assert len(team.daily_insights.limit_time_intensity_of_training) == 2
-    assert len(team.daily_insights.monitor_in_training) == 2
-    assert len(team.daily_insights.not_cleared_for_training) == 1
+    assert len(team.daily_insights.adapt_training_to_avoid_symptoms) == 2
+    assert len(team.daily_insights.recovery_day_recommended) == 1
+    assert len(team.daily_insights.monitor_modify_if_needed) == 2
+    assert len(team.daily_insights.seek_med_eval_to_clear_for_training) == 1
 
     assert len(team.weekly_insights.all_good) == 0
-    assert len(team.weekly_insights.balance_overtraining_risk) == 1
-    assert len(team.weekly_insights.add_variety_to_training_risk) == 2
-    assert len(team.weekly_insights.increase_weekly_workload) == 0
-    assert len(team.weekly_insights.address_pain_or_soreness) == 0
-    assert len(team.weekly_insights.evaluate_health_status) == 1
+    assert len(team.weekly_insights.at_risk_of_overtraining) == 1
+    assert len(team.weekly_insights.low_variability_inhibiting_recovery) == 2
+    assert len(team.weekly_insights.at_risk_of_undertraining) == 0
+    assert len(team.weekly_insights.at_risk_of_time_loss_injury) == 0
+    assert len(team.weekly_insights.seek_med_eval_to_clear_for_training) == 1
 
 
 def test_compliance_grouping():
