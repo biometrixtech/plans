@@ -50,6 +50,7 @@ class AthleteStats(Serialisable):
         self.historical_internal_strain = []
         self.historical_internal_monotony = []
         self.historical_external_strain = []
+        self.internal_strain_events = None
         self.functional_strength_eligible = False
         self.next_functional_strength_eligible_date = None
         self.completed_functional_strength_sessions = 0
@@ -310,7 +311,10 @@ class AthleteStats(Serialisable):
             'chronic_external_mod_intensity_load': self.chronic_external_mod_intensity_load.json_serialise() if self.chronic_external_mod_intensity_load is not None else None,
             'chronic_external_low_intensity_load': self.chronic_external_low_intensity_load.json_serialise() if self.chronic_external_low_intensity_load is not None else None,
             'internal_monotony': self.internal_monotony.json_serialise() if self.internal_monotony is not None else None,
+            'historical_internal_monotony': [h.json_serialise() for h in self.historical_internal_monotony],
             'internal_strain': self.internal_strain.json_serialise() if self.internal_strain is not None else None,
+            'historical_internal_strain': [h.json_serialise() for h in self.historical_internal_strain],
+            'internal_strain_events': self.internal_strain_events.json_serialise() if self.internal_strain_events is not None else None,
             'external_monotony': self.external_monotony.json_serialise() if self.external_monotony is not None else None,
             'external_strain': self.external_strain.json_serialise() if self.external_strain is not None else None,
             'internal_ramp': self.internal_ramp.json_serialise() if self.internal_ramp is not None else None,
