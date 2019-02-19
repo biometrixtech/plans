@@ -202,19 +202,33 @@ class SpecificAction(Serialisable):
 
 class DailyHighLevelInsight(Enum):
     all_good = 0
-    seek_med_eval_to_clear_for_training = 1
-    monitor_modify_if_needed = 2
-    adapt_training_to_avoid_symptoms = 3
-    recovery_day_recommended = 4
+    increase_workload = 1
+    adapt_training_to_avoid_symptoms = 2
+    monitor_modify_if_needed = 3
+    seek_med_eval_to_clear_for_training = 4
+    recovery_day_recommended = 5
+
+    # all_good = 0
+    # seek_med_eval_to_clear_for_training = 1
+    # monitor_modify_if_needed = 2
+    # adapt_training_to_avoid_symptoms = 3
+    # recovery_day_recommended = 4
 
 
 class WeeklyHighLevelInsight(Enum):
     all_good = 0
-    seek_med_eval_to_clear_for_training = 1
-    at_risk_of_overtraining = 2
-    low_variability_inhibiting_recovery = 3
-    at_risk_of_undertraining = 4
-    at_risk_of_time_loss_injury = 5
+    at_risk_of_overtraining = 1
+    low_variability_inhibiting_recovery = 2
+    at_risk_of_undertraining = 3
+    at_risk_of_time_loss_injury = 4
+    seek_med_eval_to_clear_for_training = 5
+
+    # all_good = 0
+    # seek_med_eval_to_clear_for_training = 1
+    # at_risk_of_overtraining = 2
+    # low_variability_inhibiting_recovery = 3
+    # at_risk_of_undertraining = 4
+    # at_risk_of_time_loss_injury = 5
 
 
 class MetricColor(IntEnum):
@@ -327,21 +341,21 @@ class RecommendationText(object):
         self.rec = rec
 
     def value(self):
-        recs = {"1A": "Creating a periodized plan for the next month to introduce a variety of different stimuli",
-                "1B": "Increasing variety in your training regimen",
+        recs = {"1A": "Auditing monthly training to intro variety in duration & intensity",
+                "1B": "Adding more variety in training duration, intensity, & movements",
                 "2A": "Considering not training today",
-                "2B": "A shorter or lower-intensity training session",
-                "2C": "Exposure to a longer or higher-intensity training session",
-                "3A": "Drastically decreasing workload this week",
-                "3B": "Considering decreasing weekly workload",
-                "3C": "Considering increasing weekly workload",
-                "5A": "Seeking help from a medical professional",
-                "5B": "Limiting your training. Seek medical advice if symptoms persist after warm-up.",
-                "6A": "Stopping activity if {bodypart} {is_pain} present",
-                "6B": "Modifying training so all activity is free of {bodypart} {is_pain}",
-                "6C": "Monitoring {bodypart} symptoms during training. If symptoms persists, consider decreasing training in the next few days to allow recovery",
-                "7A": "Completing Fathom's personalized Mobility & Recovery exercises",
-                "7B": "Completing Fathom's personalized Mobility exercises",
+                "2B": "Shorter or lower than usual intensity training session",
+                "2C": "Longer or higher than usual intensity training session",
+                "3A": "Significantly decreasing workload this week",
+                "3B": "Moderately decreasing workload this week",
+                "3C": "Moderately increasing workload this week",
+                "5A": "Seeking help from a medical professional before training",
+                "5B": "Limiting your training, seeking medical advice if symptoms persist/worsen",
+                "6A": "Stopping activity if {bodypart} {is_pain} is present",
+                "6B": "Avoiding activities which trigger {bodypart} {is_pain}",
+                "6C": "Monitoring {bodypart} in training. If symptoms persists, reduce training",
+                "7A": "Completing Fathom's pre & post-training Mobility & Recovery exercises",
+                "7B": "Completing Fathom's pre-training Mobility exercises",
                 "8A": "Heat {bodypart} before training for 10 minutes",
                 "9A": "Ice {bodypart} immediately after training for 20 minutes",
                 "9B": "Ice bath for 10 minutes after training"

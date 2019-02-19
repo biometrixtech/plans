@@ -106,6 +106,7 @@ class StatsProcessing(object):
             if current_athlete_stats is not None:
                 athlete_stats.current_sport_name = current_athlete_stats.current_sport_name
                 athlete_stats.current_position = current_athlete_stats.current_position
+                athlete_stats.expected_weekly_workouts = current_athlete_stats.expected_weekly_workouts
                 # Only persist readiness and ps soreness from today and yesterday
                 athlete_stats.readiness_soreness = [s for s in current_athlete_stats.readiness_soreness if self.persist_soreness(s)]
                 athlete_stats.post_session_soreness = [s for s in current_athlete_stats.post_session_soreness if self.persist_soreness(s)]

@@ -834,7 +834,7 @@ class TrainingVolumeProcessing(object):
                         upper_values = list(o.upper_bound for o in strain_values if o.upper_bound is not None)
 
                         if 1 < len(observed_values):
-                            if stdev_observed is not None and avg_observed is not None:
+                            if stdev_observed is not None and avg_observed is not None and strain.observed_value is not None:
                                 if strain.observed_value >= ((1.2 * stdev_observed) + avg_observed):
                                     obs_events += 1
                             avg_observed = statistics.mean(observed_values)
@@ -843,7 +843,7 @@ class TrainingVolumeProcessing(object):
                             strain_events.observed_value = obs_events
 
                         if 1 < len(upper_values):
-                            if stdev_upper is not None and avg_upper is not None:
+                            if stdev_upper is not None and avg_upper is not None and strain.upper_bound is not None:
                                 if strain.upper_bound >= ((1.2 * stdev_upper) + avg_upper):
                                     up_events += 1
                             avg_upper = statistics.mean(upper_values)
