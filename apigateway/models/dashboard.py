@@ -199,7 +199,6 @@ class AthleteDashboardData(Serialisable):
         else:
             not_cleared_recs_day = []
             not_cleared_recs_week = []
-            insufficient_data_red = False
             for metric in metrics:
                 self.color = MetricColor(max([self.color.value, metric.color.value]))
                 self.cleared_to_train = False if self.color.value == 2 else True
@@ -210,8 +209,6 @@ class AthleteDashboardData(Serialisable):
                 if metric.color == MetricColor.red: # not cleared to train
                     not_cleared_recs_day.extend(daily_recs)
                     not_cleared_recs_week.extend(weekly_recs)
-                    if metric.insufficient_data:
-                        insufficient_data_red = True
                 elif metric.color != MetricColor.red and self.cleared_to_train:
                     self.daily_recommendation.update(daily_recs)
                     self.weekly_recommendation.update(weekly_recs)
@@ -222,7 +219,6 @@ class AthleteDashboardData(Serialisable):
             if not self.cleared_to_train:
                 self.daily_recommendation = set(not_cleared_recs_day)
                 self.weekly_recommendation = set(not_cleared_recs_week)
-                self.insufficient_data = insufficient_data_red
             elif self.color == MetricColor.yellow and len(self.daily_insights) == 0:
                 if "Pain" in " ".join(self.weekly_metrics):
                     self.daily_insights.add(DailyHighLevelInsight.adapt_training_to_avoid_symptoms)

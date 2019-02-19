@@ -70,7 +70,8 @@ def test_not_cleared_to_train_daily():
                          "Metric2 insight",
                          SpecificAction("2A", "metric2_rec1", True),
                          SpecificAction("5A", "metric2_rec2", True),
-                         insufficient_data=True
+                         insufficient_data=True,
+                         tv=True
                          )
     metrics = [metric1, metric2]
     athlete = AthleteDashboardData('tester', 'first_name', 'last_name')
@@ -81,33 +82,8 @@ def test_not_cleared_to_train_daily():
     assert athlete["weekly_recommendation"] == []
     assert athlete["daily_recommendation"] == ["*metric2_rec2", "*metric2_rec1"]
     assert athlete["insufficient_data"]
-    assert athlete["insights"] == ["Metric2 insight", "Metric1 insight"]
+    assert athlete["insights"] == ["*Metric2 insight", "Metric1 insight"]
 
-def test_insights_order_both_yellow():
-    metric1 = get_metric(MetricType.longitudinal,
-                         MetricColor.yellow,
-                         WeeklyHighLevelInsight.at_risk_of_overtraining,
-                         "Metric1 insight",
-                         SpecificAction("1A", "metric1_rec1", True),
-                         SpecificAction("2A", "metric1_rec2", True),
-                         tv=True
-                         )
-    metric2 = get_metric(MetricType.daily,
-                         MetricColor.yellow,
-                         DailyHighLevelInsight.monitor_modify_if_needed,
-                         "Metric2 insight",
-                         SpecificAction("5A", "metric2_rec1", True),
-                         SpecificAction("3A", "metric2_rec2", True)
-                         )
-    metrics = [metric1, metric2]
-    athlete = AthleteDashboardData('tester', 'first_name', 'last_name')
-    athlete.aggregate(metrics)
-    assert athlete.color == MetricColor.yellow
-    assert not athlete.insufficient_data
-    athlete = athlete.json_serialise()
-    assert athlete['weekly_recommendation'] == ["metric2_rec2", "metric1_rec1"]
-    assert athlete['daily_recommendation'] == ["metric2_rec1", "metric1_rec2"]
-    assert athlete['insights'] == ["Metric2 insight", "Metric1 insight"]
 
 def test_not_cleared_to_train_daily_weekly():
     metric1 = get_metric(MetricType.longitudinal,
@@ -162,6 +138,88 @@ def test_not_cleared_to_train_weekly():
     assert athlete.daily_recommendation == ["metric1_rec2"]
     assert athlete.insights == ["Metric1 insight", "Metric2 insight"]
 
+def test_cleared_to_train():
+    metric1 = get_metric(MetricType.longitudinal,
+                         MetricColor.yellow,
+                         WeeklyHighLevelInsight.at_risk_of_time_loss_injury,
+                         "Metric1 insight",
+                         SpecificAction("1B", "metric1_rec1", True),
+                         SpecificAction("2B", "metric1_rec2", True)
+                         )
+    metric2 = get_metric(MetricType.daily,
+                         MetricColor.yellow,
+                         DailyHighLevelInsight.monitor_modify_if_needed,
+                         "Metric2 insight",
+                         SpecificAction("3B", "metric2_rec1", True),
+                         SpecificAction("5B", "metric2_rec2", True)
+                         )
+
+    metrics = [metric1, metric2]
+    athlete = AthleteDashboardData('tester', 'first_name', 'last_name')
+    athlete.aggregate(metrics)
+    assert athlete.color == MetricColor.yellow
+    assert athlete.cleared_to_train  == True
+    athlete = athlete.json_serialise()
+    assert athlete["weekly_recommendation"] == ["metric2_rec1", "metric1_rec1"]
+    assert athlete["daily_recommendation"] == ["metric2_rec2", "metric1_rec2"]
+    assert athlete["insights"] == ["Metric1 insight", "Metric2 insight"]
+
+
+
+def test_insights_order_both_yellow():
+    metric1 = get_metric(MetricType.longitudinal,
+                         MetricColor.yellow,
+                         WeeklyHighLevelInsight.at_risk_of_overtraining,
+                         "Metric1 insight",
+                         SpecificAction("1A", "metric1_rec1", True),
+                         SpecificAction("2A", "metric1_rec2", True),
+                         tv=True
+                         )
+    metric2 = get_metric(MetricType.daily,
+                         MetricColor.yellow,
+                         DailyHighLevelInsight.monitor_modify_if_needed,
+                         "Metric2 insight",
+                         SpecificAction("5A", "metric2_rec1", True),
+                         SpecificAction("3A", "metric2_rec2", True)
+                         )
+    metrics = [metric1, metric2]
+    athlete = AthleteDashboardData('tester', 'first_name', 'last_name')
+    athlete.aggregate(metrics)
+    assert athlete.color == MetricColor.yellow
+    assert not athlete.insufficient_data
+    athlete = athlete.json_serialise()
+    assert athlete['weekly_recommendation'] == ["metric2_rec2", "metric1_rec1"]
+    assert athlete['daily_recommendation'] == ["metric2_rec1", "metric1_rec2"]
+    assert athlete['insights'] == ["Metric2 insight", "Metric1 insight"]
+
+def test_not_cleared_to_train_insufficient_data_other_metric():
+    metric1 = get_metric(MetricType.longitudinal,
+                         MetricColor.yellow,
+                         WeeklyHighLevelInsight.at_risk_of_overtraining,
+                         "Metric1 insight",
+                         SpecificAction("1A", "metric1_rec1", True),
+                         SpecificAction("2A", "metric1_rec2", True),
+                         insufficient_data=True,
+                         tv=True
+                         )
+    metric2 = get_metric(MetricType.daily,
+                         MetricColor.red,
+                         DailyHighLevelInsight.seek_med_eval_to_clear_for_training,
+                         "Metric2 insight",
+                         SpecificAction("2B", "metric2_rec1", True),
+                         SpecificAction("5B", "metric2_rec2", True)
+                         )
+
+    metrics = [metric1, metric2]
+    athlete = AthleteDashboardData('tester', 'first_name', 'last_name')
+    athlete.aggregate(metrics)
+    assert athlete.color == MetricColor.red
+    assert athlete.cleared_to_train  == False
+    assert athlete.insufficient_data
+    assert athlete.weekly_recommendation == []
+    assert athlete.daily_recommendation == ["metric2_rec2", "metric2_rec1"]
+    assert athlete.insights == ["Metric2 insight", "*Metric1 insight"]
+
 def test_pain_weekly_no_daily():
     metric1 = get_metric(MetricType.longitudinal,
                          MetricColor.yellow,
@@ -204,33 +262,6 @@ def test_soreness_weekly_no_daily():
     assert athlete.daily_recommendation == ["metric1_rec1"]
     assert athlete.insights == ["Metric1 insight"]
     assert athlete.daily_insights == set()
-
-def test_cleared_to_train():
-    metric1 = get_metric(MetricType.longitudinal,
-                         MetricColor.yellow,
-                         WeeklyHighLevelInsight.at_risk_of_time_loss_injury,
-                         "Metric1 insight",
-                         SpecificAction("1B", "metric1_rec1", True),
-                         SpecificAction("2B", "metric1_rec2", True)
-                         )
-    metric2 = get_metric(MetricType.daily,
-                         MetricColor.yellow,
-                         DailyHighLevelInsight.monitor_modify_if_needed,
-                         "Metric2 insight",
-                         SpecificAction("3B", "metric2_rec1", True),
-                         SpecificAction("5B", "metric2_rec2", True)
-                         )
-
-    metrics = [metric1, metric2]
-    athlete = AthleteDashboardData('tester', 'first_name', 'last_name')
-    athlete.aggregate(metrics)
-    assert athlete.color == MetricColor.yellow
-    assert athlete.cleared_to_train  == True
-    athlete = athlete.json_serialise()
-    assert athlete["weekly_recommendation"] == ["metric2_rec1", "metric1_rec1"]
-    assert athlete["daily_recommendation"] == ["metric2_rec2", "metric1_rec2"]
-    assert athlete["insights"] == ["Metric1 insight", "Metric2 insight"]
-
 
 def test_athlete_grouping():
     recovery_day_recommended = get_metric(MetricType.daily,
