@@ -202,19 +202,33 @@ class SpecificAction(Serialisable):
 
 class DailyHighLevelInsight(Enum):
     all_good = 0
-    seek_med_eval_to_clear_for_training = 1
-    monitor_modify_if_needed = 2
-    adapt_training_to_avoid_symptoms = 3
-    recovery_day_recommended = 4
+    increase_workload = 1
+    adapt_training_to_avoid_symptoms = 2
+    monitor_modify_if_needed = 3
+    seek_med_eval_to_clear_for_training = 4
+    recovery_day_recommended = 5
+
+    # all_good = 0
+    # seek_med_eval_to_clear_for_training = 1
+    # monitor_modify_if_needed = 2
+    # adapt_training_to_avoid_symptoms = 3
+    # recovery_day_recommended = 4
 
 
 class WeeklyHighLevelInsight(Enum):
     all_good = 0
-    seek_med_eval_to_clear_for_training = 1
-    at_risk_of_overtraining = 2
-    low_variability_inhibiting_recovery = 3
-    at_risk_of_undertraining = 4
-    at_risk_of_time_loss_injury = 5
+    at_risk_of_overtraining = 1
+    low_variability_inhibiting_recovery = 2
+    at_risk_of_undertraining = 3
+    at_risk_of_time_loss_injury = 4
+    seek_med_eval_to_clear_for_training = 5
+
+    # all_good = 0
+    # seek_med_eval_to_clear_for_training = 1
+    # at_risk_of_overtraining = 2
+    # low_variability_inhibiting_recovery = 3
+    # at_risk_of_undertraining = 4
+    # at_risk_of_time_loss_injury = 5
 
 
 class MetricColor(IntEnum):

@@ -286,8 +286,8 @@ class AthleteDashboardData(Serialisable):
                'daily_recommendation': list(self.daily_recommendation),
                'weekly_recommendation': list(self.weekly_recommendation),
                'insights': self.insights,
-               'daily_insights_text': self.daily_insights_text,
-               'weekly_insights_text': self.weekly_insights_text,
+               'daily_insights': self.daily_insights_text,
+               'weekly_insights': self.weekly_insights_text,
                'insufficient_data': self.insufficient_data
               }
         return ret
