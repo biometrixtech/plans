@@ -38,7 +38,7 @@ def test_no_metrics():
     athlete.aggregate(metrics)
     assert athlete.color == MetricColor.green
     assert athlete.cleared_to_train  == True
-    assert athlete.daily_recommendation == ['Training as normal and completing Fathom’s Mobility and Recovery exercises']
+    assert athlete.daily_recommendation == ['Survey responses indicate ready to train as normal if no other medical limitations']
     assert athlete.insights == ["No signs of overtraining or injury risk"]
 
 
