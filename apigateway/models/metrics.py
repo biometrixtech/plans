@@ -341,8 +341,8 @@ class RecommendationText(object):
         self.rec = rec
 
     def value(self):
-        recs = {"1A": "Audit monthly training to intro variety in duration & intensity",
-                "1B": "Add more variety in training duration, intensity, & movements",
+        recs = {"1A": "Auditing monthly training to intro variety in duration & intensity",
+                "1B": "Adding more variety in training duration, intensity, & movements",
                 "2A": "Considering not training today",
                 "2B": "Shorter or lower than usual intensity training session",
                 "2C": "Longer or higher than usual intensity training session",
@@ -350,9 +350,9 @@ class RecommendationText(object):
                 "3B": "Moderately decreasing workload this week",
                 "3C": "Moderately increasing workload this week",
                 "5A": "Seeking help from a medical professional before training",
-                "5B": "Limiting your training, seek medical advice if symptoms persist/worsen",
+                "5B": "Limiting your training, seeking medical advice if symptoms persist/worsen",
                 "6A": "Stopping activity if {bodypart} {is_pain} is present",
-                "6B": "Avoid activities which trigger {bodypart} {is_pain}",
+                "6B": "Avoiding activities which trigger {bodypart} {is_pain}",
                 "6C": "Monitoring {bodypart} in training. If symptoms persists, reduce training",
                 "7A": "Completing Fathom's pre & post-training Mobility & Recovery exercises",
                 "7B": "Completing Fathom's pre-training Mobility exercises",
