@@ -36,7 +36,7 @@ def test_no_metrics():
     athlete.aggregate(metrics)
     assert athlete.color == MetricColor.green
     assert athlete.cleared_to_train  == True
-    assert athlete.daily_recommendation == set(['Training as normal and completing Fathom’s Mobility and Recovery exercises'])
+    assert athlete.daily_recommendation == ['Training as normal and completing Fathom’s Mobility and Recovery exercises']
     assert athlete.insights == ["No signs of overtraining or injury risk"]
 
 
@@ -75,10 +75,11 @@ def test_not_cleared_to_train_daily():
     athlete.aggregate(metrics)
     assert athlete.color == MetricColor.red
     assert athlete.cleared_to_train  == False
-    assert athlete.weekly_recommendation == set()
-    assert athlete.daily_recommendation == set(["*metric2_rec1", "*metric2_rec2"])
-    assert athlete.insufficient_data
-    assert athlete.insights == ["Metric2 insight", "Metric1 insight"]
+    athlete = athlete.json_serialise()
+    assert athlete["weekly_recommendation"] == []
+    assert athlete["daily_recommendation"] == ["*metric2_rec2", "*metric2_rec1"]
+    assert athlete["insufficient_data"]
+    assert athlete["insights"] == ["Metric2 insight", "Metric1 insight"]
 
 def test_insights_order_both_yellow():
     metric1 = get_metric(MetricType.longitudinal,
@@ -91,7 +92,7 @@ def test_insights_order_both_yellow():
                          )
     metric2 = get_metric(MetricType.daily,
                          MetricColor.yellow,
-                         DailyHighLevelInsight.seek_med_eval_to_clear_for_training,
+                         DailyHighLevelInsight.monitor_modify_if_needed,
                          "Metric2 insight",
                          SpecificAction("5A", "metric2_rec1", True),
                          SpecificAction("3A", "metric2_rec2", True)
@@ -101,9 +102,10 @@ def test_insights_order_both_yellow():
     athlete.aggregate(metrics)
     assert athlete.color == MetricColor.yellow
     assert not athlete.insufficient_data
-    assert athlete.weekly_recommendation == set(["metric1_rec1", "metric2_rec2"])
-    assert athlete.daily_recommendation == set(["metric1_rec2", "metric2_rec1"])
-    assert athlete.insights == ["Metric2 insight", "Metric1 insight"]
+    athlete = athlete.json_serialise()
+    assert athlete['weekly_recommendation'] == ["metric2_rec2", "metric1_rec1"]
+    assert athlete['daily_recommendation'] == ["metric2_rec1", "metric1_rec2"]
+    assert athlete['insights'] == ["Metric2 insight", "Metric1 insight"]
 
 def test_not_cleared_to_train_daily_weekly():
     metric1 = get_metric(MetricType.longitudinal,
@@ -125,9 +127,10 @@ def test_not_cleared_to_train_daily_weekly():
     athlete.aggregate(metrics)
     assert athlete.color == MetricColor.red
     assert not athlete.insufficient_data
-    assert athlete.weekly_recommendation == set(["metric2_rec2", "metric1_rec1"])
-    assert athlete.daily_recommendation == set(["metric1_rec2", "metric2_rec1"])
-    assert athlete.insights == ["Metric1 insight", "Metric2 insight"]
+    athlete = athlete.json_serialise()
+    assert athlete["weekly_recommendation"] == ["metric2_rec2", "metric1_rec1"]
+    assert athlete["daily_recommendation"] == ["metric2_rec1", "metric1_rec2"]
+    assert athlete["insights"] == ["Metric1 insight", "Metric2 insight"]
 
 
 def test_not_cleared_to_train_weekly():
@@ -153,8 +156,8 @@ def test_not_cleared_to_train_weekly():
     assert athlete.color == MetricColor.red
     assert athlete.cleared_to_train  == False
     assert not athlete.insufficient_data
-    assert athlete.weekly_recommendation == set(["metric1_rec1"])
-    assert athlete.daily_recommendation == set(["metric1_rec2"])
+    assert athlete.weekly_recommendation == ["metric1_rec1"]
+    assert athlete.daily_recommendation == ["metric1_rec2"]
     assert athlete.insights == ["Metric1 insight", "Metric2 insight"]
 
 
@@ -179,9 +182,10 @@ def test_cleared_to_train():
     athlete.aggregate(metrics)
     assert athlete.color == MetricColor.yellow
     assert athlete.cleared_to_train  == True
-    assert athlete.weekly_recommendation == set(["metric1_rec1", "metric2_rec1"])
-    assert athlete.daily_recommendation == set(["metric1_rec2", "metric2_rec2"])
-    assert athlete.insights == ["Metric1 insight", "Metric2 insight"]
+    athlete = athlete.json_serialise()
+    assert athlete["weekly_recommendation"] == ["metric2_rec1", "metric1_rec1"]
+    assert athlete["daily_recommendation"] == ["metric2_rec2", "metric1_rec2"]
+    assert athlete["insights"] == ["Metric1 insight", "Metric2 insight"]
 
 
 def test_athlete_grouping():

@@ -193,7 +193,7 @@ class AthleteDashboardData(Serialisable):
 
     def aggregate(self, metrics):
         if len(metrics) == 0:
-            self.daily_recommendation = set(['Training as normal and completing Fathom’s Mobility and Recovery exercises'])
+            self.daily_recommendation = ['Training as normal and completing Fathom’s Mobility and Recovery exercises']
             self.insights =["No signs of overtraining or injury risk"]
         else:
             not_cleared_recs_day = []
@@ -271,13 +271,14 @@ class AthleteDashboardData(Serialisable):
             else:
                 if not rec.insufficient_data:
                     recs[rec.text] = rec
-        cleaned_recs = set()
+        cleaned_recs = []
         for rec in recs.values():
             rec.is_insufficient_data()
-            cleaned_recs.add(rec)
-        sorted_recs = [rec.text for rec in sorted(cleaned_recs, key=lambda x:order[x.code])]
+            cleaned_recs.append(rec)
+        sorted_recs = sorted(cleaned_recs, key=lambda x:order[x.code])
+        sorted_recs = [rec.text for rec in sorted_recs]
 
-        return set(sorted_recs)
+        return sorted_recs
 
 
     def json_serialise(self):
@@ -286,8 +287,8 @@ class AthleteDashboardData(Serialisable):
                'last_name': self.last_name,
                'cleared_to_train': self.cleared_to_train,
                'color': self.color.value,
-               'daily_recommendation': list(self.daily_recommendation),
-               'weekly_recommendation': list(self.weekly_recommendation),
+               'daily_recommendation': self.daily_recommendation,
+               'weekly_recommendation': self.weekly_recommendation,
                'insights': self.insights,
                'daily_insights': self.daily_insights_text,
                'weekly_insights': self.weekly_insights_text,
