@@ -125,7 +125,7 @@ def test_not_cleared_to_train_daily_weekly():
     athlete.aggregate(metrics)
     assert athlete.color == MetricColor.red
     assert not athlete.insufficient_data
-    assert athlete.weekly_recommendation == set(["metric1_rec1", "metric2_rec2"])
+    assert athlete.weekly_recommendation == set(["metric2_rec2", "metric1_rec1"])
     assert athlete.daily_recommendation == set(["metric1_rec2", "metric2_rec1"])
     assert athlete.insights == ["Metric1 insight", "Metric2 insight"]
 

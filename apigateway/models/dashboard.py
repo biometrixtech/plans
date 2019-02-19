@@ -204,8 +204,8 @@ class AthleteDashboardData(Serialisable):
                 self.cleared_to_train = False if self.color.value == 2 else True
                 self.add_insight(metric)
                 # pain_soreness = 1 if metric.specific_insight_recovery != "" else 0
-                daily_recs = [(m.text, metric.insufficient_data) for m in metric.specific_actions if m.display and m.code[0] in ["2", "5", "6", "7"]]
-                weekly_recs = [(m.text, metric.insufficient_data) for m in metric.specific_actions if m.display and m.code[0] in ["1", "3"]]
+                daily_recs = [(m.text, metric.insufficient_data, m.code[0]) for m in metric.specific_actions if m.display and m.code[0] in ["2", "5", "6", "7"]]
+                weekly_recs = [(m.text, metric.insufficient_data, m.code[0]) for m in metric.specific_actions if m.display and m.code[0] in ["1", "3"]]
                 if metric.color == MetricColor.red: # not cleared to train
                     not_cleared_recs_day.extend(daily_recs)
                     not_cleared_recs_week.extend(weekly_recs)
@@ -256,25 +256,28 @@ class AthleteDashboardData(Serialisable):
 
 
     def cleanup_recs(self, rec_type='daily'):
+
         if rec_type == 'daily':
-            all_recs = self.daily_recommendation
+            all_recs = [Recommendation(rec[0], rec[1], rec[2])for rec in self.daily_recommendation]
+            order = {"5":0, "6":1, "2":2, "7":3}
         elif rec_type == 'weekly':
-            all_recs = self.weekly_recommendation
+            all_recs = [Recommendation(rec[0], rec[1], rec[2]) for rec in self.weekly_recommendation]
+            order = {"3":0, "1":1}
+
         recs = {}
         for rec in all_recs:
-            if rec[0] not in recs:
-                recs[rec[0]] = rec[1]
+            if rec.text not in recs:
+                recs[rec.text] = rec
             else:
-                if not rec[1]:
-                    recs[rec[0]] = rec[1]
+                if not rec.insufficient_data:
+                    recs[rec.text] = rec
         cleaned_recs = set()
-        for rec in recs:
-            if recs[rec]:
-                cleaned_recs.add("*" + rec)
-            else:
-                cleaned_recs.add(rec)
-        return cleaned_recs
+        for rec in recs.values():
+            rec.is_insufficient_data()
+            cleaned_recs.add(rec)
+        sorted_recs = [rec.text for rec in sorted(cleaned_recs, key=lambda x:order[x.code])]
 
+        return set(sorted_recs)
 
 
     def json_serialise(self):
@@ -291,3 +294,18 @@ class AthleteDashboardData(Serialisable):
                'insufficient_data': self.insufficient_data
               }
         return ret
+
+class Recommendation(object):
+    def __init__(self, text, insufficient_data, code):
+        self.text = text
+        self.insufficient_data = insufficient_data
+        self.code = code
+
+    def json_serialise(self):
+        return {"text": self.text,
+                "insufficient_data": self.insufficient_data,
+                "code": self.code}
+
+    def is_insufficient_data(self):
+        if self.insufficient_data:
+            self.text = "".join(["*", self.text])

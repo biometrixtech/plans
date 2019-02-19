@@ -120,7 +120,7 @@ def process_athlete_survey(athlete_id):
     if 'typical_weekly_sessions' in request.json:
         athlete_stats.typical_weekly_sessions = request.json['typical_weekly_sessions']
         typ_sessions_exp_workout = {"0-1": 0.5, "2-4": 3.0, "5+": 5.0, None: None}
-        athlete_stats.expected_weekly_workouts = typ_sessions_exp_workout(request.json['typical_weekly_sessions'])
+        athlete_stats.expected_weekly_workouts = typ_sessions_exp_workout[request.json['typical_weekly_sessions']]
     if 'wearable_devices' in request.json:
         athlete_stats.wearable_devices = request.json['wearable_devices']
     DatastoreCollection().athlete_stats_datastore.put(athlete_stats)
