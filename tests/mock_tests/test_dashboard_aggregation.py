@@ -4,8 +4,10 @@ from models.daily_readiness import DailyReadiness
 from models.daily_plan import  DailyPlan
 import datetime
 
-def get_metric(metric_type, color, high_level_insight, specific_insight, rec1, rec2, insufficient_data=False, tv=False):
+def get_metric(metric_type, color, high_level_insight, specific_insight, rec1, rec2, insufficient_data=False, tv=False, name=None):
     metric = AthleteMetric('Metric', metric_type)
+    if name is not None:
+        metric.name = name
     metric.color = color
     metric.high_level_insight = high_level_insight
     if not tv:
@@ -160,6 +162,48 @@ def test_not_cleared_to_train_weekly():
     assert athlete.daily_recommendation == ["metric1_rec2"]
     assert athlete.insights == ["Metric1 insight", "Metric2 insight"]
 
+def test_pain_weekly_no_daily():
+    metric1 = get_metric(MetricType.longitudinal,
+                         MetricColor.yellow,
+                         WeeklyHighLevelInsight.at_risk_of_time_loss_injury,
+                         "Metric1 insight",
+                         SpecificAction("6B", "metric1_rec1", True),
+                         SpecificAction("3B", "metric1_rec2", True),
+                         name = "Persistent-2 (Constant) Pain"
+                         )
+
+    metrics = [metric1]
+    athlete = AthleteDashboardData('tester', 'first_name', 'last_name')
+    athlete.aggregate(metrics)
+    assert athlete.color == MetricColor.yellow
+    assert athlete.cleared_to_train  == True
+    assert not athlete.insufficient_data
+    assert athlete.weekly_recommendation == ["metric1_rec2"]
+    assert athlete.daily_recommendation == ["metric1_rec1"]
+    assert athlete.insights == ["Metric1 insight"]
+    assert athlete.daily_insights == {DailyHighLevelInsight.adapt_training_to_avoid_symptoms}
+
+
+def test_soreness_weekly_no_daily():
+    metric1 = get_metric(MetricType.longitudinal,
+                         MetricColor.yellow,
+                         WeeklyHighLevelInsight.at_risk_of_time_loss_injury,
+                         "Metric1 insight",
+                         SpecificAction("6B", "metric1_rec1", True),
+                         SpecificAction("3B", "metric1_rec2", True),
+                         name = "Persistent-2 (Constant) Soreness"
+                         )
+
+    metrics = [metric1]
+    athlete = AthleteDashboardData('tester', 'first_name', 'last_name')
+    athlete.aggregate(metrics)
+    assert athlete.color == MetricColor.yellow
+    assert athlete.cleared_to_train  == True
+    assert not athlete.insufficient_data
+    assert athlete.weekly_recommendation == ["metric1_rec2"]
+    assert athlete.daily_recommendation == ["metric1_rec1"]
+    assert athlete.insights == ["Metric1 insight"]
+    assert athlete.daily_insights == set()
 
 def test_cleared_to_train():
     metric1 = get_metric(MetricType.longitudinal,

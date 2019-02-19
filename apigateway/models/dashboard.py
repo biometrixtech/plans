@@ -190,6 +190,7 @@ class AthleteDashboardData(Serialisable):
         self.daily_insights = set()
         self.weekly_insights = set()
         self.insufficient_data = False
+        self.weekly_metrics = []
 
     def aggregate(self, metrics):
         if len(metrics) == 0:
@@ -223,7 +224,8 @@ class AthleteDashboardData(Serialisable):
                 self.weekly_recommendation = set(not_cleared_recs_week)
                 self.insufficient_data = insufficient_data_red
             elif self.color == MetricColor.yellow and len(self.daily_insights) == 0:
-                self.daily_insights.add(DailyHighLevelInsight.monitor_modify_if_needed)
+                if "Pain" in " ".join(self.weekly_metrics):
+                    self.daily_insights.add(DailyHighLevelInsight.adapt_training_to_avoid_symptoms)
 
             sorted_insights = sorted(self.insights,  key=lambda k: (k[1], k[2]), reverse=True)
             sorted_daily_insights = sorted(self.daily_insights_text,  key=lambda k: (k[1], k[2]), reverse=True)
@@ -253,6 +255,7 @@ class AthleteDashboardData(Serialisable):
             self.weekly_insights_text.append(insight)
             if metric.color != MetricColor.green:
                 self.weekly_insights.add(metric.high_level_insight)
+                self.weekly_metrics.append(metric.name)
 
 
     def cleanup_recs(self, rec_type='daily'):
