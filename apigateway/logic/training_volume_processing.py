@@ -136,11 +136,11 @@ class TrainingVolumeProcessing(object):
         athlete_stats.internal_monotony = self.get_monotony(athlete_stats.expected_weekly_workouts,
                                                             self.last_week_internal_values)
 
-        historical_internal_monotony = self.get_historical_internal_monotony(self.start_date, self.end_date)
+        historical_internal_monotony = self.get_historical_internal_monotony(self.start_date, self.end_date, athlete_stats.expected_weekly_workouts)
 
         athlete_stats.historical_internal_monotony = historical_internal_monotony
 
-        historical_internal_strain, strain_events = self.get_historical_internal_strain(self.start_date, self.end_date)
+        historical_internal_strain, strain_events = self.get_historical_internal_strain(self.start_date, self.end_date, athlete_stats.expected_weekly_workouts)
 
         athlete_stats.internal_strain_events = strain_events
 
@@ -790,9 +790,14 @@ class TrainingVolumeProcessing(object):
 
         return values
 
-    def get_historical_internal_strain(self, start_date, end_date, weekly_expected_workouts=5):
+    def get_historical_internal_strain(self, start_date, end_date, expected_weekly_workouts):
 
         target_dates = []
+
+        weekly_expected_workouts = 5
+
+        if expected_weekly_workouts is not None:
+            weekly_expected_workouts = expected_weekly_workouts
 
         #all_plans.sort(key=lambda x: x.event_date)
         self.internal_load_tuples.sort(key=lambda x: x[0])
@@ -849,9 +854,14 @@ class TrainingVolumeProcessing(object):
 
         return strain_values, strain_events
 
-    def get_historical_internal_monotony(self, start_date, end_date, weekly_expected_workouts=5):
+    def get_historical_internal_monotony(self, start_date, end_date, expected_weekly_workouts):
 
         target_dates = []
+
+        weekly_expected_workouts = 5
+
+        if expected_weekly_workouts is not None:
+            weekly_expected_workouts = expected_weekly_workouts
 
         self.internal_load_tuples.sort(key=lambda x: x[0])
 
@@ -877,9 +887,14 @@ class TrainingVolumeProcessing(object):
 
         return monotony_values
 
-    def calculate_daily_strain(self, load_values, weekly_expected_workouts=5):
+    def calculate_daily_strain(self, load_values, expected_weekly_workouts):
 
         daily_strain = StandardErrorRange()
+
+        weekly_expected_workouts = 5
+
+        if expected_weekly_workouts is not None:
+            weekly_expected_workouts = expected_weekly_workouts
 
         if len(load_values) > 1:
 
