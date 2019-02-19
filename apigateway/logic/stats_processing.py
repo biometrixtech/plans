@@ -826,18 +826,23 @@ class StatsProcessing(object):
 
     def get_chronic_weeks_plans(self):
 
-        week4_sessions = [d for d in self.chronic_daily_plans if self.acute_start_date_time - timedelta(days=min(28, self.chronic_days)) <=
-                          d.get_event_datetime() < self.acute_start_date_time - timedelta(days=min(21, self.chronic_days))]
-        week3_sessions = [d for d in self.chronic_daily_plans if self.acute_start_date_time
-                          - timedelta(days=min(21, self.chronic_days)) <= d.get_event_datetime() < self.acute_start_date_time -
-                          timedelta(days=min(14, self.chronic_days))]
-        week2_sessions = [d for d in self.chronic_daily_plans if self.acute_start_date_time
-                          - timedelta(days=min(14, self.chronic_days)) <= d.get_event_datetime() < self.acute_start_date_time -
-                          timedelta(days=min(7, self.chronic_days))]
-        week1_sessions = [d for d in self.chronic_daily_plans if self.acute_start_date_time
-                          - timedelta(days=min(7, self.chronic_days)) <= d.get_event_datetime() < self.acute_start_date_time]
+        weeks_list = []
 
-        weeks_list = [week1_sessions, week2_sessions, week3_sessions, week4_sessions]
+        if self.chronic_days is not None:
+
+            week4_sessions = [d for d in self.chronic_daily_plans if self.acute_start_date_time is not None and
+                              self.acute_start_date_time - timedelta(days=min(28, self.chronic_days)) <=
+                              d.get_event_datetime() < self.acute_start_date_time - timedelta(days=min(21, self.chronic_days))]
+            week3_sessions = [d for d in self.chronic_daily_plans if self.acute_start_date_time is not None and self.acute_start_date_time
+                              - timedelta(days=min(21, self.chronic_days)) <= d.get_event_datetime() < self.acute_start_date_time -
+                              timedelta(days=min(14, self.chronic_days))]
+            week2_sessions = [d for d in self.chronic_daily_plans if self.acute_start_date_time is not None and self.acute_start_date_time
+                              - timedelta(days=min(14, self.chronic_days)) <= d.get_event_datetime() < self.acute_start_date_time -
+                              timedelta(days=min(7, self.chronic_days))]
+            week1_sessions = [d for d in self.chronic_daily_plans if self.acute_start_date_time is not None and self.acute_start_date_time
+                              - timedelta(days=min(7, self.chronic_days)) <= d.get_event_datetime() < self.acute_start_date_time]
+
+            weeks_list = [week1_sessions, week2_sessions, week3_sessions, week4_sessions]
 
         return weeks_list
 
@@ -1075,35 +1080,37 @@ class StatsProcessing(object):
     def load_historical_readiness_surveys(self, daily_readiness_surveys):
 
         self.acute_readiness_surveys = sorted([p for p in daily_readiness_surveys
-                                               if p.event_date >= self.acute_start_date_time],
+                                               if self.acute_start_date_time is not None and p.event_date >= self.acute_start_date_time],
                                               key=lambda x: x.event_date)
 
-        self.chronic_readiness_surveys = sorted([p for p in daily_readiness_surveys if self.acute_start_date_time >
+        self.chronic_readiness_surveys = sorted([p for p in daily_readiness_surveys if self.acute_start_date_time is not None
+                                                 and self.chronic_start_date_time is not None and self.acute_start_date_time >
                                                  p.event_date >= self.chronic_start_date_time],
                                                 key=lambda x: x.event_date)
 
-        self.last_7_days_readiness_surveys = [p for p in daily_readiness_surveys if p.event_date >= self.last_week]
+        self.last_7_days_readiness_surveys = [p for p in daily_readiness_surveys if self.last_week is not None and p.event_date >= self.last_week]
 
-        self.last_25_days_readiness_surveys = [p for p in daily_readiness_surveys if p.event_date >= self.last_25_days]
+        self.last_25_days_readiness_surveys = [p for p in daily_readiness_surveys if self.last_25_days is not None and p.event_date >= self.last_25_days]
 
-        self.days_8_14_readiness_surveys = [p for p in daily_readiness_surveys if
+        self.days_8_14_readiness_surveys = [p for p in daily_readiness_surveys if self.last_week is not None and self.previous_week is not None and
                                             self.last_week > p.event_date >= self.previous_week]
 
     def load_historical_post_session_surveys(self, post_session_surveys):
 
         self.acute_post_session_surveys = sorted([p for p in post_session_surveys
-                                                  if p.event_date_time >= self.acute_start_date_time],
+                                                  if self.acute_start_date_time is not None and p.event_date_time >= self.acute_start_date_time],
                                                  key=lambda x: x.event_date)
         self.chronic_post_session_surveys = sorted([p for p in post_session_surveys
-                                                    if
+                                                    if self.acute_start_date_time is not None and self.chronic_start_date_time is not None and
                                                     self.acute_start_date_time > p.event_date_time >= self.chronic_start_date_time],
                                                    key=lambda x: x.event_date)
 
-        self.last_7_days_ps_surveys = [p for p in post_session_surveys if p.event_date_time >= self.last_week]
+        self.last_7_days_ps_surveys = [p for p in post_session_surveys if self.last_week is not None and p.event_date_time >= self.last_week]
 
-        self.last_25_days_ps_surveys = [p for p in post_session_surveys if p.event_date_time >= self.last_25_days]
+        self.last_25_days_ps_surveys = [p for p in post_session_surveys if self.last_25_days is not None and p.event_date_time >= self.last_25_days]
 
-        self.days_8_14_ps_surveys = [p for p in post_session_surveys if self.last_week > p.event_date_time >= self.previous_week]
+        self.days_8_14_ps_surveys = [p for p in post_session_surveys if self.last_week is not None
+                                     and self.previous_week is not None and self.last_week > p.event_date_time >= self.previous_week]
 
     def update_start_times(self, daily_readiness_surveys, post_session_surveys, daily_plans):
 
@@ -1172,10 +1179,11 @@ class StatsProcessing(object):
 
     def load_historical_plans(self):
 
-        self.acute_daily_plans = sorted([p for p in self.all_plans if p.get_event_datetime() >=
+        self.acute_daily_plans = sorted([p for p in self.all_plans if self.acute_start_date_time is not None and p.get_event_datetime() >=
                                          self.acute_start_date_time], key=lambda x: x.event_date)
 
-        self.chronic_daily_plans = sorted([p for p in self.all_plans if self.acute_start_date_time >
+        self.chronic_daily_plans = sorted([p for p in self.all_plans if self.acute_start_date_time is not None and
+                                           self.chronic_load_start_date_time is not None and self.acute_start_date_time >
                                            p.get_event_datetime() >= self.chronic_load_start_date_time],
                                           key=lambda x: x.event_date)
 
