@@ -203,9 +203,10 @@ class SpecificAction(Serialisable):
 class DailyHighLevelInsight(Enum):
     all_good = 0
     seek_med_eval_to_clear_for_training = 1
-    recovery_day_recommended = 2
-    adapt_training_to_avoid_symptoms = 2
-    monitor_modify_if_needed = 3
+    monitor_modify_if_needed = 2
+    adapt_training_to_avoid_symptoms = 3
+    recovery_day_recommended = 4
+
 
 class WeeklyHighLevelInsight(Enum):
     all_good = 0
