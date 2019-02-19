@@ -61,21 +61,21 @@ class TeamDashboardData(Serialisable):
                 self.daily_insights.all_good.append(athlete_summary)
             else:
                 for insight in athlete.daily_insights:
-                    if insight == DailyHighLevelInsight.increase_workload:
+                    if insight == DailyHighLevelInsight.recovery_day_recommended:
                         self.daily_insights.increase_workload.append(athlete_summary)
-                    elif insight == DailyHighLevelInsight.limit_time_intensity_of_training:
+                    elif insight == DailyHighLevelInsight.adapt_training_to_avoid_symptoms:
                         self.daily_insights.limit_time_intensity_of_training.append(athlete_summary)
-                    elif insight == DailyHighLevelInsight.monitor_in_training:
+                    elif insight == DailyHighLevelInsight.monitor_modify_if_needed:
                         self.daily_insights.monitor_in_training.append(athlete_summary)
             # group athletes in weekly_insight bins
             for insight in athlete.weekly_insights:
-                if insight == WeeklyHighLevelInsight.balance_overtraining_risk:
+                if insight == WeeklyHighLevelInsight.at_risk_of_overtraining:
                     self.weekly_insights.balance_overtraining_risk.append(athlete_summary)
-                elif insight == WeeklyHighLevelInsight.add_variety_to_training_risk:
+                elif insight == WeeklyHighLevelInsight.low_variability_inhibiting_recovery:
                     self.weekly_insights.add_variety_to_training_risk.append(athlete_summary)
-                elif insight == WeeklyHighLevelInsight.increase_weekly_workload:
+                elif insight == WeeklyHighLevelInsight.at_risk_of_undertraining:
                     self.weekly_insights.increase_weekly_workload.append(athlete_summary)
-                elif insight == WeeklyHighLevelInsight.signs_of_elevated_injury_risk:
+                elif insight == WeeklyHighLevelInsight.at_risk_of_time_loss_injury:
                     self.weekly_insights.address_pain_or_soreness.append(athlete_summary)
 
 
@@ -103,10 +103,10 @@ class DailySummary(Serialisable):
 
     def json_serialise(self):
         ret = {'all_good': [a.json_serialise() for a in self.all_good],
-               'increase_workload': [a.json_serialise() for a in self.increase_workload],
-               'limit_time_intensity_of_training': [a.json_serialise() for a in self.limit_time_intensity_of_training],
-               'monitor_in_training': [a.json_serialise() for a in self.monitor_in_training],
-               'seek_med_staff_evaluation': [a.json_serialise() for a in self.not_cleared_for_training]
+               'recovery_day_recommended': [a.json_serialise() for a in self.increase_workload],
+               'adapt_training_to_avoid_symptoms': [a.json_serialise() for a in self.limit_time_intensity_of_training],
+               'monitor_modify_if_needed': [a.json_serialise() for a in self.monitor_in_training],
+               'seek_med_eval_to_clear_for_training': [a.json_serialise() for a in self.not_cleared_for_training]
                 }
         return ret
 
@@ -121,10 +121,10 @@ class WeeklySummary(Serialisable):
 
     def json_serialise(self):
         ret = {'all_good': [a.json_serialise() for a in self.all_good],
-               'balance_overtraining_risk': [a.json_serialise() for a in self.balance_overtraining_risk],
-               'add_variety_to_training_risk': [a.json_serialise() for a in self.add_variety_to_training_risk],
-               'increase_weekly_workload': [a.json_serialise() for a in self.increase_weekly_workload],
-               'signs_of_elevated_injury_risk': [a.json_serialise() for a in self.address_pain_or_soreness],
+               'at_risk_of_overtraining': [a.json_serialise() for a in self.balance_overtraining_risk],
+               'low_variability_inhibiting_recovery': [a.json_serialise() for a in self.add_variety_to_training_risk],
+               'at_risk_of_undertraining': [a.json_serialise() for a in self.increase_weekly_workload],
+               'at_risk_of_time_loss_injury': [a.json_serialise() for a in self.address_pain_or_soreness],
                'needs_lower_training_intensity': [a.json_serialise() for a in self.evaluate_health_status]
               }
         return ret
@@ -200,7 +200,7 @@ class AthleteDashboardData(Serialisable):
                 self.weekly_recommendation = set(not_cleared_recs_week)
                 self.insufficient_data = insufficient_data_red
             elif self.color == MetricColor.yellow and len(self.daily_insights) == 0:
-                self.daily_insights.add(DailyHighLevelInsight.monitor_in_training)
+                self.daily_insights.add(DailyHighLevelInsight.monitor_modify_if_needed)
 
             sorted_insights = sorted(self.insights,  key=lambda k: (k[1], k[2]), reverse=True)
             self.insights = [i[0] for i in sorted_insights]

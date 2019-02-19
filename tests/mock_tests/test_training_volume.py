@@ -114,7 +114,7 @@ def test_strain_events():
 
     tvp = TrainingVolumeProcessing("2018-01-01", "2018-01-09")
     tvp.internal_load_tuples = strain_list
-    strain, strain_events = tvp.get_historical_internal_strain("2018-01-01", "2018-01-09")
+    strain, strain_events = tvp.get_historical_internal_strain("2018-01-01", "2018-01-09", None)
 
     assert 0 < strain_events.observed_value
 

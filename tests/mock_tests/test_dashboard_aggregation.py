@@ -43,7 +43,7 @@ def test_no_metrics():
 def test_not_cleared_to_train():
     metric = get_metric(MetricType.daily,
                         MetricColor.red,
-                        DailyHighLevelInsight.seek_med_staff_evaluation,
+                        DailyHighLevelInsight.seek_med_eval_to_clear_for_training,
                         "Metric insight",
                         SpecificAction("2A", "metric1_rec1", True),
                         SpecificAction("5A", "metric1_rec2", True)
@@ -57,14 +57,14 @@ def test_not_cleared_to_train():
 def test_not_cleared_to_train_daily():
     metric1 = get_metric(MetricType.longitudinal,
                          MetricColor.yellow,
-                         WeeklyHighLevelInsight.signs_of_elevated_injury_risk,
+                         WeeklyHighLevelInsight.at_risk_of_time_loss_injury,
                          "Metric1 insight",
                          SpecificAction("1B", "metric1_rec1", True),
                          SpecificAction("3B", "metric1_rec2", True)
                          )
     metric2 = get_metric(MetricType.daily,
                          MetricColor.red,
-                         DailyHighLevelInsight.seek_med_staff_evaluation,
+                         DailyHighLevelInsight.seek_med_eval_to_clear_for_training,
                          "Metric2 insight",
                          SpecificAction("2A", "metric2_rec1", True),
                          SpecificAction("5A", "metric2_rec2", True),
@@ -108,14 +108,14 @@ def test_insights_order_both_yellow():
 def test_not_cleared_to_train_daily_weekly():
     metric1 = get_metric(MetricType.longitudinal,
                          MetricColor.red,
-                         WeeklyHighLevelInsight.needs_lower_training_intensity,
+                         WeeklyHighLevelInsight.at_risk_of_overtraining,
                          "Metric1 insight",
                          SpecificAction("1A", "metric1_rec1", True),
                          SpecificAction("2A", "metric1_rec2", True)
                          )
     metric2 = get_metric(MetricType.daily,
                          MetricColor.red,
-                         DailyHighLevelInsight.seek_med_staff_evaluation,
+                         DailyHighLevelInsight.seek_med_eval_to_clear_for_training,
                          "Metric2 insight",
                          SpecificAction("5A", "metric2_rec1", True),
                          SpecificAction("3A", "metric2_rec2", True)
@@ -133,14 +133,14 @@ def test_not_cleared_to_train_daily_weekly():
 def test_not_cleared_to_train_weekly():
     metric1 = get_metric(MetricType.longitudinal,
                          MetricColor.red,
-                         WeeklyHighLevelInsight.needs_lower_training_intensity,
+                         WeeklyHighLevelInsight.at_risk_of_overtraining,
                          "Metric1 insight",
                          SpecificAction("1A", "metric1_rec1", True),
                          SpecificAction("2A", "metric1_rec2", True)
                          )
     metric2 = get_metric(MetricType.daily,
                          MetricColor.yellow,
-                         DailyHighLevelInsight.monitor_in_training,
+                         DailyHighLevelInsight.monitor_modify_if_needed,
                          "Metric2 insight",
                          SpecificAction("2B", "metric2_rec1", True),
                          SpecificAction("5B", "metric2_rec2", True),
@@ -161,14 +161,14 @@ def test_not_cleared_to_train_weekly():
 def test_cleared_to_train():
     metric1 = get_metric(MetricType.longitudinal,
                          MetricColor.yellow,
-                         WeeklyHighLevelInsight.signs_of_elevated_injury_risk,
+                         WeeklyHighLevelInsight.at_risk_of_time_loss_injury,
                          "Metric1 insight",
                          SpecificAction("1B", "metric1_rec1", True),
                          SpecificAction("2B", "metric1_rec2", True)
                          )
     metric2 = get_metric(MetricType.daily,
                          MetricColor.yellow,
-                         DailyHighLevelInsight.monitor_in_training,
+                         DailyHighLevelInsight.monitor_modify_if_needed,
                          "Metric2 insight",
                          SpecificAction("3B", "metric2_rec1", True),
                          SpecificAction("5B", "metric2_rec2", True)
@@ -187,21 +187,21 @@ def test_cleared_to_train():
 def test_athlete_grouping():
     daily_increase_workload = get_metric(MetricType.daily,
                                          MetricColor.yellow,
-                                         DailyHighLevelInsight.increase_workload,
+                                         DailyHighLevelInsight.recovery_day_recommended,
                                          "insight",
                                          SpecificAction("1B", "rec1", True),
                                          SpecificAction("2B", "rec2", True)
                                          )
     daily_limit_time_intensity_of_training = get_metric(MetricType.daily,
                                                         MetricColor.yellow,
-                                                        DailyHighLevelInsight.limit_time_intensity_of_training,
+                                                        DailyHighLevelInsight.adapt_training_to_avoid_symptoms,
                                                         "insight",
                                                         SpecificAction("1B", "rec1", True),
                                                         SpecificAction("2B", "rec2", True)
                                                         )
     daily_monitor_in_training = get_metric(MetricType.daily,
                                            MetricColor.yellow,
-                                           DailyHighLevelInsight.monitor_in_training,
+                                           DailyHighLevelInsight.monitor_modify_if_needed,
                                            "insight",
                                            SpecificAction("1B", "rec1", True),
                                            SpecificAction("2B", "rec2", True)
@@ -209,22 +209,22 @@ def test_athlete_grouping():
 
     weekly_balance_overtraining_risk = get_metric(MetricType.longitudinal,
                                                   MetricColor.yellow,
-                                                  WeeklyHighLevelInsight.balance_overtraining_risk,
+                                                  WeeklyHighLevelInsight.at_risk_of_overtraining,
                                                   "insight",
                                                   SpecificAction("1B", "rec1", True),
                                                   SpecificAction("2B", "rec2", True)
-                                                 )
+                                                  )
     weekly_add_variety_to_training_risk = get_metric(MetricType.longitudinal,
                                                      MetricColor.yellow,
-                                                     WeeklyHighLevelInsight.add_variety_to_training_risk,
+                                                     WeeklyHighLevelInsight.low_variability_inhibiting_recovery,
                                                      "insight",
                                                      SpecificAction("1B", "rec1", True),
                                                      SpecificAction("2B", "rec2", True)
-                                                    )
+                                                     )
 
     weekly_evaluate_health_status = get_metric(MetricType.longitudinal,
                                                MetricColor.red,
-                                               WeeklyHighLevelInsight.needs_lower_training_intensity,
+                                               WeeklyHighLevelInsight.seek_med_eval_to_clear_for_training,
                                                "insight",
                                                SpecificAction("1B", "rec1", True),
                                                SpecificAction("2B", "rec2", True)

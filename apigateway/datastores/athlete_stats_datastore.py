@@ -170,7 +170,6 @@ class AthleteStatsDatastore(object):
         else:
             rec.high_level_insight = WeeklyHighLevelInsight(high_level_insight)
         rec.high_level_action_description = metric.get('high_level_action_description', "")
-        rec.high_level_extended_description = metric.get('high_level_extended_description', "")
         rec.specific_insight_training_volume = metric.get('specific_insight_training_volume', "")
         rec.specific_insight_recovery = metric.get('specific_insight_recovery', 0)
         rec.insufficient_data = metric.get('insufficient_data', False)

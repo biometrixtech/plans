@@ -5,6 +5,7 @@ from models.soreness import BodyPartLocation, HistoricSorenessStatus, HistoricSo
 from models.training_volume import StandardErrorRange
 
 
+'''Excluding session RPE for now
 def test_session_rpe_specific_actions():
     athlete_stats = AthleteStats("tester")
     athlete_stats.session_RPE = 8.0
@@ -48,7 +49,7 @@ def test_yellow_low_session_rpe():
     metrics_list = metrics_processor.get_athlete_metrics_from_stats(athlete_stats, "2018-07-01")
 
     assert metrics_list[0].color == MetricColor.yellow
-
+'''
 
 def test_yellow_internal_acwr_insufficient():
     athlete_stats = AthleteStats("tester")
