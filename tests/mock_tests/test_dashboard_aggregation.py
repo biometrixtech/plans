@@ -77,7 +77,7 @@ def test_not_cleared_to_train_daily():
 def test_not_cleared_to_train_daily_weekly():
     metric1 = get_metric(MetricType.longitudinal,
                          MetricColor.red,
-                         WeeklyHighLevelInsight.needs_lower_training_intensity,
+                         WeeklyHighLevelInsight.at_risk_of_overtraining,
                          "Metric1 insight",
                          SpecificAction("1A", "metric1_rec1", True),
                          SpecificAction("2A", "metric1_rec2", True)
@@ -102,7 +102,7 @@ def test_not_cleared_to_train_daily_weekly():
 def test_not_cleared_to_train_weekly():
     metric1 = get_metric(MetricType.longitudinal,
                          MetricColor.red,
-                         WeeklyHighLevelInsight.needs_lower_training_intensity,
+                         WeeklyHighLevelInsight.at_risk_of_overtraining,
                          "Metric1 insight",
                          SpecificAction("1A", "metric1_rec1", True),
                          SpecificAction("2A", "metric1_rec2", True)
@@ -191,7 +191,7 @@ def test_athlete_grouping():
 
     weekly_evaluate_health_status = get_metric(MetricType.longitudinal,
                                                MetricColor.red,
-                                               WeeklyHighLevelInsight.needs_lower_training_intensity,
+                                               WeeklyHighLevelInsight.seek_med_eval_to_clear_for_training,
                                                "insight",
                                                SpecificAction("1B", "rec1", True),
                                                SpecificAction("2B", "rec2", True)

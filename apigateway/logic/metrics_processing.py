@@ -254,13 +254,13 @@ class AcutePainMetricGenerator(AthleteSorenessMetricGenerator):
         self.thresholds[1] = ThresholdRecommendation(MetricColor.yellow,
                                                      DailyHighLevelInsight.adapt_training_to_avoid_symptoms,
                                                      "Modify intensity, movements & drills to prevent severe pain & soreness from worsening",
-                                                     ["5A", "2A"], 2.0, 2.0,
+                                                     ["5A", "2A"], 2.0, 2.99,
                                                      "Moderate {bodypart} pain for several days",
                                                      None)
         self.thresholds[2] = ThresholdRecommendation(MetricColor.green,
                                                      DailyHighLevelInsight.monitor_modify_if_needed,
                                                      "Modify training if pain increases. Prioritize recovery to prevent development of injury",
-                                                     ["6A", "7B"], 1.0, 1.0,
+                                                     ["6A", "7B"], 1.0, 1.99,
                                                      "Mild {bodypart} pain for several days which may worsen if not managed appropriately",
                                                      None)
 
@@ -333,7 +333,7 @@ class PersistentSorenessMetricGenerator(AthleteSorenessMetricGenerator):
         self.thresholds[1] = ThresholdRecommendation(MetricColor.yellow,
                                                      WeeklyHighLevelInsight.at_risk_of_time_loss_injury,
                                                      self.high_level_action_description,
-                                                     ["7A","6C","3B"], 3.0, 3.0,
+                                                     ["7A","6C","3B"], 3.0, 3.99,
                                                      "Persistent, {bodypart} soreness which increases soft tissue injury risk if high loads occur during periods of soreness.",
                                                      None)
         self.populate_thresholds_with_soreness()
@@ -353,7 +353,7 @@ class Persistent_2SorenessMetricGenerator(AthleteSorenessMetricGenerator):
         self.thresholds[1] = ThresholdRecommendation(MetricColor.yellow,
                                                      WeeklyHighLevelInsight.at_risk_of_time_loss_injury,
                                                      "Consider reducing training intensity to lower risk of severe soreness developing into injury",
-                                                     ["7A", "6C", "3B"], 2.0, 3.0,
+                                                     ["7A", "6C", "3B"], 2.0, 3.99,
                                                      "Persistent, {bodypart} soreness which increases soft tissue injury risk if high loads occur during periods of soreness.",
                                                      None)
 
@@ -373,13 +373,13 @@ class PersistentPainMetricGenerator(AthleteSorenessMetricGenerator):
         self.thresholds[1] = ThresholdRecommendation(MetricColor.yellow,
                                                      WeeklyHighLevelInsight.at_risk_of_time_loss_injury,
                                                      "Modify intensity, movements & drills to avoid aggravating areas of severe pain & soreness",
-                                                     ["6B", "7A", "3B"], 2.0, 3.0,
+                                                     ["6B", "7A", "3B"], 2.0, 3.99,
                                                      "Persistent Moderate {bodypart} pain",
                                                      None)
         self.thresholds[2] = ThresholdRecommendation(MetricColor.green,
                                                      WeeklyHighLevelInsight.at_risk_of_time_loss_injury,
                                                      "Modify intensity, movements & drills to avoid aggravating areas of severe pain & soreness",
-                                                     ["7A"], 1.0, 1.0,
+                                                     ["7A"], 1.0, 1.99,
                                                      "Persistent Mild {bodypart} pain which may worsen if not managed appropriately",
                                                      None)
         self.populate_thresholds_with_soreness()
@@ -398,13 +398,13 @@ class Persistent_2PainMetricGenerator(AthleteSorenessMetricGenerator):
         self.thresholds[1] = ThresholdRecommendation(MetricColor.yellow,
                                                      WeeklyHighLevelInsight.at_risk_of_time_loss_injury,
                                                      "Modify intensity, movements & drills to avoid aggravating areas of severe pain & soreness",
-                                                     ["6B", "7A", "3B"], 2.0, 3.0,
+                                                     ["6B", "7A", "3B"], 2.0, 3.99,
                                                      "Persistent Moderate {bodypart} pain",
                                                      None)
         self.thresholds[2] = ThresholdRecommendation(MetricColor.green,
                                                      WeeklyHighLevelInsight.at_risk_of_time_loss_injury,
                                                      "Modify intensity, movements & drills to avoid aggravating areas of severe pain & soreness",
-                                                     ["7A"], 1.0, 1.0,
+                                                     ["7A"], 1.0, 1.99,
                                                      "Persistent Mild {bodypart} pain which may worsen if not managed appropriately",
                                                      None)
         self.populate_thresholds_with_soreness()

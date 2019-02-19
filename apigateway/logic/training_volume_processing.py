@@ -136,7 +136,7 @@ class TrainingVolumeProcessing(object):
         athlete_stats.internal_monotony = self.get_monotony(athlete_stats.expected_weekly_workouts,
                                                             self.last_week_internal_values)
 
-        historical_internal_monotony = self.get_historical_internal_monotony(self.start_date, self.end_date)
+        historical_internal_monotony = self.get_historical_internal_monotony(self.start_date, self.end_date, athlete_stats.expected_weekly_workouts)
 
         athlete_stats.historical_internal_monotony = historical_internal_monotony
 
