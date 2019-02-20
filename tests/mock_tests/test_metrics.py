@@ -282,9 +282,9 @@ def test_3_body_part_text_no_bilateral_grouping():
 
     text_gen = TextGenerator()
 
-    test_text = text_gen.get_body_part_text("{bodypart} hurts badly!!", soreness_list)
+    test_text = text_gen.get_body_part_text("{bodypart} Hurts badly!!", soreness_list)
 
-    assert test_text == "Left ankle, right foot and left calf hurts badly!!"
+    assert test_text == "Left ankle, right foot and left calf Hurts badly!!"
 
 
 def test_2_body_part_text_no_bilateral_grouping():
@@ -307,9 +307,9 @@ def test_2_body_part_text_no_bilateral_grouping():
 
     text_gen = TextGenerator()
 
-    test_text = text_gen.get_body_part_text("{bodypart} hurts badly!!", soreness_list)
+    test_text = text_gen.get_body_part_text("{bodypart} Hurts badly!!", soreness_list)
 
-    assert test_text == "Left ankle and left calf hurts badly!!"
+    assert test_text == "Left ankle and left calf Hurts badly!!"
 
 
 def test_1_body_part_text_no_bilateral_grouping():
