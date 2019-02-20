@@ -63,7 +63,7 @@ def test_yellow_internal_acwr_insufficient():
     metrics_list = metrics_processor.get_athlete_metrics_from_stats(athlete_stats, "2018-07-01")
 
     assert metrics_list[0].color == MetricColor.yellow
-    assert True is metrics_list[0].insufficient_data
+    assert True is metrics_list[0].insufficient_data_for_thresholds
 
 
 def test_yellow_internal_acwr():
@@ -78,7 +78,37 @@ def test_yellow_internal_acwr():
     metrics_list = metrics_processor.get_athlete_metrics_from_stats(athlete_stats, "2018-07-01")
 
     assert metrics_list[0].color == MetricColor.yellow
-    assert False is metrics_list[0].insufficient_data
+    assert False is metrics_list[0].insufficient_data_for_thresholds
+
+def test_yellow_internal_acwr_range_wider_partial():
+    athlete_stats = AthleteStats("tester")
+    standard_error_range = StandardErrorRange()
+    standard_error_range.observed_value = 0.6
+    standard_error_range.upper_bound = 3.0
+    athlete_stats.event_date = "2018-07-01"
+    athlete_stats.internal_acwr = standard_error_range
+
+    metrics_processor = MetricsProcessing()
+    metrics_list = metrics_processor.get_athlete_metrics_from_stats(athlete_stats, "2018-07-01")
+
+    assert metrics_list[0].color == MetricColor.yellow
+    assert True is metrics_list[0].range_wider_than_thresholds
+    assert False is metrics_list[1].range_wider_than_thresholds
+
+def test_yellow_internal_acwr_range_wider_full():
+    athlete_stats = AthleteStats("tester")
+    standard_error_range = StandardErrorRange()
+    standard_error_range.observed_value = 0.3
+    standard_error_range.upper_bound = 3.0
+    athlete_stats.event_date = "2018-07-01"
+    athlete_stats.internal_acwr = standard_error_range
+
+    metrics_processor = MetricsProcessing()
+    metrics_list = metrics_processor.get_athlete_metrics_from_stats(athlete_stats, "2018-07-01")
+
+    assert metrics_list[0].color == MetricColor.yellow
+    assert True is metrics_list[0].range_wider_than_thresholds
+    assert True is metrics_list[1].range_wider_than_thresholds
 
 def test_yellow_internal_monotony():
     athlete_stats = AthleteStats("tester")
@@ -99,7 +129,28 @@ def test_yellow_internal_monotony():
     metrics_list = metrics_processor.get_athlete_metrics_from_stats(athlete_stats, "2018-07-01")
 
     assert metrics_list[0].color == MetricColor.yellow
-    assert False is metrics_list[0].insufficient_data
+    assert False is metrics_list[0].insufficient_data_for_thresholds
+
+def test_yellow_internal_monotony_range_threshold_error():
+    athlete_stats = AthleteStats("tester")
+    standard_error_range = StandardErrorRange()
+    standard_error_range.observed_value = 0.2
+    standard_error_range.upper_bound = None
+
+    standard_error_range_2 = StandardErrorRange()
+    standard_error_range_2.observed_value = 3.8
+    standard_error_range_2.upper_bound = None
+
+    monotony_list = [standard_error_range, standard_error_range_2]
+
+    athlete_stats.event_date = "2018-07-01"
+    athlete_stats.historical_internal_monotony = monotony_list
+
+    metrics_processor = MetricsProcessing()
+    metrics_list = metrics_processor.get_athlete_metrics_from_stats(athlete_stats, "2018-07-01")
+
+    assert metrics_list[0].color == MetricColor.yellow
+    assert True is metrics_list[0].range_wider_than_thresholds
 
 
 def test_no_session_rpe_diff_date():

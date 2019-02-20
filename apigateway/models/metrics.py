@@ -17,7 +17,9 @@ class AthleteMetric(Serialisable):
         #self.body_part_side = 0
 
         self.specific_actions = []
-        self.insufficient_data = False
+        self.insufficient_data_for_thresholds = False
+        self.range_wider_than_thresholds = False
+
 
     def json_serialise(self):
         ret = {
@@ -28,7 +30,8 @@ class AthleteMetric(Serialisable):
                'high_level_action_description': self.high_level_action_description,
                'specific_insight_training_volume': self.specific_insight_training_volume,
                'specific_insight_recovery': self.specific_insight_recovery,
-               'insufficient_data': self.insufficient_data,
+               'insufficient_data_for_thresholds': self.insufficient_data_for_thresholds,
+               'range_wider_than_thresholds': self.range_wider_than_thresholds,
                # 'body_part_location': self.body_part_location,
                # 'body_part_side': self.body_part_side,
                # 'soreness': [s.json_serialise() for s in self.soreness],
@@ -44,9 +47,13 @@ class AthleteTrainingVolumeMetricGenerator(object):
         self.athlete_stats = athlete_stats
         self.threshold_attribute = threshold_attribute
         self.thresholds = {}
-        self.insufficient_data = False
+        self.insufficient_data_for_thresholds = False
+        self.range_wider_than_thresholds = False
 
     def populate_thresholds(self):
+
+        lowest_threshold_value = min(list(v.low_value for v in self.thresholds.values() if v.low_value is not None))
+        highest_threshold_value = max(list(v.high_value for v in self.thresholds.values() if v.high_value is not None))
 
         for t, v in self.thresholds.items():
             if (getattr(self.athlete_stats, self.threshold_attribute) is not None and
@@ -69,6 +76,33 @@ class AthleteTrainingVolumeMetricGenerator(object):
                 elif v.low_value is None and v.high_value is not None:
                     if v.high_value > getattr(self.athlete_stats, self.threshold_attribute):
                         v.count += 1
+
+        if (getattr(self.athlete_stats, self.threshold_attribute) is not None and
+                isinstance(getattr(self.athlete_stats, self.threshold_attribute), StandardErrorRange)):
+            sre = getattr(self.athlete_stats, self.threshold_attribute)
+            if ((sre.lower_bound is not None and sre.lower_bound < lowest_threshold_value or
+                sre.observed_value is not None and sre.observed_value < lowest_threshold_value or
+                sre.upper_bound is not None and sre.upper_bound < lowest_threshold_value) and
+                    (sre.lower_bound is not None and sre.lower_bound > highest_threshold_value or
+                     sre.observed_value is not None and sre.observed_value > highest_threshold_value or
+                     sre.upper_bound is not None and sre.upper_bound > highest_threshold_value)):
+                self.range_wider_than_thresholds = True
+        elif (getattr(self.athlete_stats, self.threshold_attribute) is not None and
+              isinstance(getattr(self.athlete_stats, self.threshold_attribute), list)):
+            attribute_list = getattr(self.athlete_stats, self.threshold_attribute)
+            for a in range(0, len(attribute_list)):
+                is_lower = False
+                is_higher = True
+                if ((attribute_list[a].lower_bound is not None and attribute_list[a].lower_bound < lowest_threshold_value or
+                     attribute_list[a].observed_value is not None and attribute_list[a].observed_value < lowest_threshold_value or
+                     attribute_list[a].upper_bound is not None and attribute_list[a].upper_bound < lowest_threshold_value)):
+                    is_lower = True
+                if((attribute_list[a].lower_bound is not None and attribute_list[a].lower_bound > highest_threshold_value or
+                         attribute_list[a].observed_value is not None and attribute_list[a].observed_value > highest_threshold_value or
+                         attribute_list[a].upper_bound is not None and attribute_list[a].upper_bound > highest_threshold_value)):
+                    is_higher = True
+                if is_lower and is_higher:
+                    self.range_wider_than_thresholds = True
 
     def process_standard_error_threshold_value(self, v, threshold_attribute, index_value=None):
         observed_value = self.get_metric_value("observed_value", threshold_attribute, index_value)
@@ -104,7 +138,7 @@ class AthleteTrainingVolumeMetricGenerator(object):
                 (upper_bound_value is not None and v.upper_bound_count != v.count) or
                 (lower_bound_value is not None and v.lower_bound_count != v.count))):
             v.insufficient_data = True
-            self.insufficient_data = True
+            self.insufficient_data_for_thresholds = True
 
     def get_metric_value(self, attribute, threshold_attribute, index_value):
 
@@ -127,14 +161,16 @@ class AthleteTrainingVolumeMetricGenerator(object):
         metric_list = []
 
         for key in sorted(self.thresholds.keys()):
-            if self.thresholds[key].count > 0:
+            if (self.thresholds[key].count > 0 or (self.thresholds[key].lower_bound_count is not None and self.thresholds[key].lower_bound_count > 0) or
+                    (self.thresholds[key].upper_bound_count is not None and self.thresholds[key].upper_bound_count > 0)):
                 metric = AthleteMetric(self.name, self.metric_type)
                 metric.high_level_action_description = self.thresholds[key].high_level_action_description
                 metric.specific_insight_training_volume = self.thresholds[key].specific_insight_training_volume
                 metric.high_level_insight = self.thresholds[key].high_level_insight
                 metric.specific_actions = [TextGenerator().get_specific_action(rec=rec) for rec in self.thresholds[key].specific_actions]
                 metric.color = self.thresholds[key].color
-                metric.insufficient_data = self.insufficient_data
+                metric.insufficient_data_for_thresholds = self.insufficient_data_for_thresholds
+                metric.range_wider_than_thresholds = self.range_wider_than_thresholds
                 metric_list.append(metric)
 
         return metric_list

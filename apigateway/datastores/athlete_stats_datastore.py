@@ -172,7 +172,8 @@ class AthleteStatsDatastore(object):
         rec.high_level_action_description = metric.get('high_level_action_description', "")
         rec.specific_insight_training_volume = metric.get('specific_insight_training_volume', "")
         rec.specific_insight_recovery = metric.get('specific_insight_recovery', 0)
-        rec.insufficient_data = metric.get('insufficient_data', False)
+        rec.insufficient_data_for_thresholds = metric.get('insufficient_data_for_thresholds', False)
+        rec.range_wider_than_thresholds = metric.get('range_wider_than_thresholds', False)
         rec.specific_actions = [self._get_specific_actions_from_mongodb(sa)for sa in metric.get('specific_actions', [])]
         return rec
 

@@ -106,8 +106,8 @@ class RecommendationMatrix(object):
             if self.metrics[m].high_level_insight in top_ranked_insights:
                 if self.metrics[m].color is not None and top_ranked_insights[self.metrics[m].high_level_insight].color is not None:
                     if (self.metrics[m].color > top_ranked_insights[self.metrics[m].high_level_insight].color or
-                            (not self.metrics[m].insufficient_data and
-                             top_ranked_insights[self.metrics[m].high_level_insight].insufficient_data)):
+                            (not self.metrics[m].range_wider_than_thresholds and
+                             top_ranked_insights[self.metrics[m].high_level_insight].range_wider_than_thresholds)):
                         top_ranked_insights[self.metrics[m].high_level_insight] = self.metrics[m]
             else:
                 top_ranked_insights[self.metrics[m].high_level_insight] = self.metrics[m]
