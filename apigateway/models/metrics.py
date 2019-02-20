@@ -301,7 +301,8 @@ class TextGenerator(object):
             joined_text = ", ".join(body_part_list)
             pos = joined_text.rfind(",")
             joined_text = joined_text[:pos] + " and" + joined_text[pos+1:]
-            return text.format(bodypart=joined_text, is_pain=sore_type).capitalize()
+            text = text.format(bodypart=joined_text, is_pain=sore_type)
+            return text[0].upper()+text[1:]
         elif len(body_part_list) == 2:
             if "left and right" not in body_part_list[0] and "left and right" not in body_part_list[1]:
                 joined_text = ", ".join(body_part_list)
