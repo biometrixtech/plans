@@ -130,10 +130,12 @@ class SurveyProcessing(object):
         for q3_response in clear_candidates:
             body_part_location = BodyPartLocation(q3_response['body_part'])
             side = q3_response['side']
-            severity = q3_response['severity']
+            severity = q3_response.get('severity', 0) # don't error out because of mobile bug
             movement = q3_response.get('movement', None)
-            pain = q3_response['pain']
-            status = q3_response['status']
+            pain = q3_response.get('pain', False)
+            status = q3_response.get('status', HistoricSorenessStatus.dormant_cleared)
+            if severity == 0:
+                pain = True if "pain" in status else False
             if severity > 0:
                 sore_part = Soreness()
                 sore_part.body_part = BodyPart(body_part_location, None)
