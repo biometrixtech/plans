@@ -196,6 +196,7 @@ class AthleteDashboardData(Serialisable):
         if len(metrics) == 0:
             self.daily_recommendation = ['Survey responses indicate ready to train as normal if no other medical limitations']
             self.insights =["No signs of overtraining or injury risk"]
+            self.daily_insights_text =["No signs of overtraining or injury risk"]
         else:
             not_cleared_recs_day = []
             not_cleared_recs_week = []
