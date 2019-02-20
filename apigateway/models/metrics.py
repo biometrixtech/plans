@@ -101,8 +101,8 @@ class AthleteTrainingVolumeMetricGenerator(object):
             standard_error_range_list = getattr(self.athlete_stats, threshold_attribute)
             standard_error_range = standard_error_range_list[index_value]
         if (standard_error_range.insufficient_data or (
-                (v.upper_bound_count > 0 and v.upper_bound_count != v.count) or
-                (v.lower_bound_count > 0 and v.lower_bound_count != v.count))):
+                (upper_bound_value is not None and v.upper_bound_count != v.count) or
+                (lower_bound_value is not None and v.lower_bound_count != v.count))):
             v.insufficient_data = True
             self.insufficient_data = True
 
