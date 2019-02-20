@@ -89,7 +89,7 @@ class AthleteStatsDatastore(object):
             'next_functional_strength_eligible_date', None)
         athlete_stats.current_sport_name = mongo_result.get('current_sport_name', None)
         athlete_stats.current_position = mongo_result.get('current_position', None)
-        athlete_stats.expected_weekly_workouts = mongo_result.get('expected_weekly_workouts', None)
+        athlete_stats.expected_weekly_workouts = _expected_workouts_from_mongo(mongo_result)
         athlete_stats.historic_soreness = [self._historic_soreness_from_mongodb(s)
                                            for s in mongo_result.get('historic_soreness', [])]
         athlete_stats.daily_severe_soreness = [self._soreness_from_mongodb(s)
@@ -178,3 +178,13 @@ class AthleteStatsDatastore(object):
 
     def _get_specific_actions_from_mongodb(self, action):
         return SpecificAction(action['code'], action['text'], action['display'])
+
+def _expected_workouts_from_mongo(mongo_result):
+    typ_sessions_exp_workout = {"0-1": 0.5, "2-4": 3.0, "5+": 5.0, None: None}
+    exp_workouts = mongo_result.get('expected_weekly_workouts', None)
+    if exp_workouts is None:
+        typical_weekly_sessions = mongo_result.get('typical_weekly_sessions', None)
+        exp_workouts = typ_sessions_exp_workout[typical_weekly_sessions]
+    return exp_workouts
+
+
