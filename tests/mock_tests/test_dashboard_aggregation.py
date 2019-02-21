@@ -15,7 +15,7 @@ def get_metric(metric_type, color, high_level_insight, specific_insight, rec1, r
     else:
         metric.specific_insight_training_volume = specific_insight
     metric.specific_actions = [rec1, rec2]
-    metric.insufficient_data = insufficient_data
+    metric.insufficient_data_for_thresholds = insufficient_data
     return metric
 
 
