@@ -67,14 +67,15 @@ class AthleteTrainingVolumeMetricGenerator(object):
                     self.process_standard_error_threshold_value(v, self.threshold_attribute, a)
 
             elif getattr(self.athlete_stats, self.threshold_attribute) is not None:
+                attribute_value = round(getattr(self.athlete_stats, self.threshold_attribute), 3)
                 if v.low_value is not None and v.high_value is not None:
-                    if v.low_value <= getattr(self.athlete_stats, self.threshold_attribute) < v.high_value:
+                    if v.low_value <= attribute_value < v.high_value:
                         v.count += 1
                 elif v.low_value is not None and v.high_value is None:
-                    if v.low_value <= getattr(self.athlete_stats, self.threshold_attribute):
+                    if v.low_value <= attribute_value:
                         v.count += 1
                 elif v.low_value is None and v.high_value is not None:
-                    if v.high_value > getattr(self.athlete_stats, self.threshold_attribute):
+                    if v.high_value > attribute_value:
                         v.count += 1
 
         if (getattr(self.athlete_stats, self.threshold_attribute) is not None and
@@ -154,6 +155,7 @@ class AthleteTrainingVolumeMetricGenerator(object):
                 value = getattr(value_object[index_value], attribute)
             except:
                 value = None
+        value = round(value, 3) if value is not None else None
         return value
 
     def get_metric_list(self):
