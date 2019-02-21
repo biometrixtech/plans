@@ -191,15 +191,17 @@ class AthleteDashboardData(Serialisable):
         self.weekly_insights = set()
         self.insufficient_data = False
         self.weekly_metrics = []
+        self.insufficient_data_tv = False
 
     def aggregate(self, metrics):
+        metrics = self.remove_tv_metrics_out_of_range(metrics)
+        self.remove_acwr_increasing_decreasing_conflict(metrics)
         if len(metrics) == 0:
             self.daily_recommendation = ['Survey responses indicate ready to train as normal if no other medical limitations']
             self.insights =["No signs of overtraining or injury risk"]
             self.daily_insights_text =["No signs of overtraining or injury risk"]
+            self.insufficient_data = self.insufficient_data_tv
         else:
-            metrics = remove_tv_metrics_out_of_range(metrics)
-            remove_acwr_increasing_decreasing_conflict(metrics)
             if len(metrics) == 0:
                 self.daily_recommendation = ['Survey responses indicate ready to train as normal if no other medical limitations']
                 self.insights =["No signs of overtraining or injury risk"]
@@ -288,9 +290,29 @@ class AthleteDashboardData(Serialisable):
 
         return sorted_recs
 
-    def reconcile_tv_metrics(self, metrics):
-        remove_tv_metrics_out_of_range(metrics)
-        remove_acwr_increasing_decreasing_conflict(metrics)
+
+    def remove_tv_metrics_out_of_range(self, metrics):
+        metrics_to_remove = set()
+        for metric in metrics:
+            if ((metric.name in ["Increasing IACWR",
+                                 "Decreasing IACWR",
+                                 "Increasing Internal Ramp"]) and
+                metric.range_wider_than_thresholds):
+                metrics_to_remove.add(metric)
+        if len(metrics_to_remove) > 0:
+            metrics = set(metrics)
+            metrics = list(metrics - metrics_to_remove)
+            self.insufficient_data_tv = True
+        return metrics
+
+    def remove_acwr_increasing_decreasing_conflict(self, metrics):
+        metric_names = [m.name for m in metrics]
+        if "Decreasing IACWR" in metric_names and "Increasing IACWR" in metric_names:
+            decreasing_iacwr_metric = [m for m in metrics if m.name == "Decreasing IACWR"][0]
+            increasing_iacwr_metric = [m for m in metrics if m.name == "Increasing IACWR"][0]
+            metrics.remove(decreasing_iacwr_metric)
+            metrics.remove(increasing_iacwr_metric)
+            self.insufficient_data_tv = True
 
     def json_serialise(self):
         ret = {'user_id': self.user_id,
@@ -321,26 +343,4 @@ class Recommendation(object):
     def is_insufficient_data(self):
         if self.insufficient_data:
             self.text = "".join(["*", self.text])
-
-def remove_tv_metrics_out_of_range(metrics):
-    metrics_to_remove = set()
-    for metric in metrics:
-        if ((metric.name in ["Internal Strain Events",
-                             "Internal Monotony Event",
-                             "Increasing IACWR",
-                             "Decreasing IACWR",
-                             "Increasing Internal Ramp"]) and
-            metric.range_wider_than_thresholds):
-            metrics_to_remove.add(metric)
-    metrics = set(metrics)
-    metrics = list(metrics - metrics_to_remove)
-    return metrics
-
-def remove_acwr_increasing_decreasing_conflict(metrics):
-    metric_names = [m.name for m in metrics]
-    if "Decreasing IACWR" in metric_names and "Increasing IACWR" in metric_names:
-        decreasing_iacwr_metric = [m for m in metrics if m.name == "Decreasing IACWR"][0]
-        increasing_iacwr_metric = [m for m in metrics if m.name == "Increasing IACWR"][0]
-        metrics.remove(decreasing_iacwr_metric)
-        metrics.remove(increasing_iacwr_metric)
 
