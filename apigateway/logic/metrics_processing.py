@@ -106,8 +106,8 @@ class RecommendationMatrix(object):
             if self.metrics[m].high_level_insight in top_ranked_insights:
                 if self.metrics[m].color is not None and top_ranked_insights[self.metrics[m].high_level_insight].color is not None:
                     if (self.metrics[m].color > top_ranked_insights[self.metrics[m].high_level_insight].color or
-                            (not self.metrics[m].insufficient_data and
-                             top_ranked_insights[self.metrics[m].high_level_insight].insufficient_data)):
+                            (not self.metrics[m].range_wider_than_thresholds and
+                             top_ranked_insights[self.metrics[m].high_level_insight].range_wider_than_thresholds)):
                         top_ranked_insights[self.metrics[m].high_level_insight] = self.metrics[m]
             else:
                 top_ranked_insights[self.metrics[m].high_level_insight] = self.metrics[m]
@@ -153,7 +153,7 @@ class IncreasingIACWRGenerator(AthleteTrainingVolumeMetricGenerator):
         self.thresholds[1] = ThresholdRecommendation(MetricColor.yellow,
                                                      WeeklyHighLevelInsight.at_risk_of_overtraining,
                                                      self.high_level_action_description,
-                                                     ["3B", "7A"], 1.3, 1.5, None,
+                                                     ["3B", "7A"], 1.3, 1.51, None,
                                                      "Workload increasing at a rate associated with a moderate risk of injury."
                                                      )
         self.populate_thresholds()
@@ -173,7 +173,7 @@ class IncreasingInternalRampGenerator(AthleteTrainingVolumeMetricGenerator):
         self.thresholds[1] = ThresholdRecommendation(MetricColor.yellow,
                                                      WeeklyHighLevelInsight.at_risk_of_overtraining,
                                                      self.high_level_action_description,
-                                                     ["3B", "7A"], 1.11, 1.15, None,
+                                                     ["3B", "7A"], 1.11, 1.151, None,
                                                      "Workload increasing at a rate associated with a moderate risk of injury."
                                                      )
         self.populate_thresholds()
@@ -214,7 +214,7 @@ class InternalMonotonyEventGenerator(AthleteTrainingVolumeMetricGenerator):
         self.thresholds[1] = ThresholdRecommendation(MetricColor.yellow,
                                                      WeeklyHighLevelInsight.low_variability_inhibiting_recovery,
                                                      self.high_level_action_description,
-                                                     ["1B", "7A"], 1.6, 1.99, None,
+                                                     ["1B", "7A"], 1.6, 2.0, None,
                                                      "Very low variability in workloads which suppresses the immune system"
                                                      )
         self.populate_thresholds()
@@ -234,7 +234,7 @@ class DecreasingIACWRGenerator(AthleteTrainingVolumeMetricGenerator):
         self.thresholds[1] = ThresholdRecommendation(MetricColor.yellow,
                                                      WeeklyHighLevelInsight.at_risk_of_undertraining,
                                                      self.high_level_action_description,
-                                                     ["3C", "7A"], 0.51, 0.8, None,
+                                                     ["3C", "7A"], 0.5, 0.8, None,
                                                      "Significantly decreasing load. If unintentional, can reduce injury resiliance"
                                                      )
         self.populate_thresholds()

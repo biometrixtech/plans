@@ -1,8 +1,9 @@
 from models.metrics import AthleteMetric, MetricColor, WeeklyHighLevelInsight, DailyHighLevelInsight, MetricType, SpecificAction
 from models.dashboard import AthleteDashboardData, TeamDashboardData
-from models.daily_readiness import DailyReadiness
+from models.stats import AthleteStats
 from models.daily_plan import  DailyPlan
-import datetime
+from logic.metrics_processing import MetricsProcessing
+from models.training_volume import StandardErrorRange
 
 def get_metric(metric_type, color, high_level_insight, specific_insight, rec1, rec2, insufficient_data=False, tv=False, name=None):
     metric = AthleteMetric('Metric', metric_type)
@@ -15,7 +16,7 @@ def get_metric(metric_type, color, high_level_insight, specific_insight, rec1, r
     else:
         metric.specific_insight_training_volume = specific_insight
     metric.specific_actions = [rec1, rec2]
-    metric.insufficient_data = insufficient_data
+    metric.insufficient_data_for_thresholds = insufficient_data
     return metric
 
 
@@ -91,7 +92,8 @@ def test_not_cleared_to_train_daily_weekly():
                          WeeklyHighLevelInsight.at_risk_of_overtraining,
                          "Metric1 insight",
                          SpecificAction("1A", "metric1_rec1", True),
-                         SpecificAction("2A", "metric1_rec2", True)
+                         SpecificAction("2A", "metric1_rec2", True),
+                         tv=True
                          )
     metric2 = get_metric(MetricType.daily,
                          MetricColor.red,
@@ -108,7 +110,7 @@ def test_not_cleared_to_train_daily_weekly():
     athlete = athlete.json_serialise()
     assert athlete["weekly_recommendation"] == ["metric2_rec2", "metric1_rec1"]
     assert athlete["daily_recommendation"] == ["metric2_rec1", "metric1_rec2"]
-    assert athlete["insights"] == ["Metric1 insight", "Metric2 insight"]
+    assert athlete["insights"] == ["Metric2 insight", "Metric1 insight"]
 
 
 def test_not_cleared_to_train_weekly():
@@ -162,7 +164,7 @@ def test_cleared_to_train():
     athlete = athlete.json_serialise()
     assert athlete["weekly_recommendation"] == ["metric2_rec1", "metric1_rec1"]
     assert athlete["daily_recommendation"] == ["metric2_rec2", "metric1_rec2"]
-    assert athlete["insights"] == ["Metric1 insight", "Metric2 insight"]
+    assert set(athlete["insights"]) == set(["Metric1 insight", "Metric2 insight"])
 
 
 
@@ -355,3 +357,52 @@ def test_compliance_grouping():
     assert len(team.compliance["training_compliance"]["rest_day"]) == 1
     assert len(team.compliance["training_compliance"]["sessions_logged"]) == 1
 
+
+
+def test_increasing_decreasing_acwr():
+    athlete_stats = AthleteStats("tester")
+    standard_error_range = StandardErrorRange()
+    standard_error_range.lower_bound = 0.75
+    standard_error_range.observed_value = 1.0
+    standard_error_range.upper_bound = 1.35
+    athlete_stats.event_date = "2018-07-01"
+    athlete_stats.internal_acwr = standard_error_range
+
+    metrics_processor = MetricsProcessing()
+    metrics_list = metrics_processor.get_athlete_metrics_from_stats(athlete_stats, "2018-07-01")
+
+    athlete = AthleteDashboardData('tester', 'first_name', 'last_name')
+    athlete.aggregate(metrics_list)
+    assert athlete.color == MetricColor.green
+    assert athlete.insufficient_data
+    assert athlete.cleared_to_train  == True
+    assert athlete.daily_recommendation == ['Survey responses indicate ready to train as normal if no other medical limitations']
+    assert athlete.insights == ["No signs of overtraining or injury risk"]
+
+def test_decreasing_acwr_increasing_ramp():
+    athlete_stats = AthleteStats("tester")
+
+    standard_error_range = StandardErrorRange()
+    standard_error_range.lower_bound = 0.49
+    standard_error_range.observed_value = .7
+    standard_error_range.upper_bound = .9
+
+    standard_error_range2 = StandardErrorRange()
+    standard_error_range2.lower_bound = 0.75
+    standard_error_range2.observed_value = 1.0
+    standard_error_range2.upper_bound = 1.35
+
+    athlete_stats.event_date = "2018-07-01"
+    athlete_stats.internal_acwr = standard_error_range
+    athlete_stats.internal_ramp = standard_error_range2
+
+    metrics_processor = MetricsProcessing()
+    metrics_list = metrics_processor.get_athlete_metrics_from_stats(athlete_stats, "2018-07-01")
+
+    athlete = AthleteDashboardData('tester', 'first_name', 'last_name')
+    athlete.aggregate(metrics_list)
+    assert athlete.color == MetricColor.green
+    assert athlete.insufficient_data
+    assert athlete.cleared_to_train  == True
+    assert athlete.daily_recommendation == ['Survey responses indicate ready to train as normal if no other medical limitations']
+    assert athlete.insights == ["No signs of overtraining or injury risk"]

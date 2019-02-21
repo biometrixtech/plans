@@ -191,12 +191,16 @@ class AthleteDashboardData(Serialisable):
         self.weekly_insights = set()
         self.insufficient_data = False
         self.weekly_metrics = []
+        self.insufficient_data_tv = False
 
     def aggregate(self, metrics):
+        metrics = self.remove_tv_metrics_out_of_range(metrics)
+        self.remove_acwr_increasing_decreasing_conflict(metrics)
         if len(metrics) == 0:
             self.daily_recommendation = ['Survey responses indicate ready to train as normal if no other medical limitations']
             self.insights =["No signs of overtraining or injury risk"]
             self.daily_insights_text =["No signs of overtraining or injury risk"]
+            self.insufficient_data = self.insufficient_data_tv
         else:
             not_cleared_recs_day = []
             not_cleared_recs_week = []
@@ -205,8 +209,8 @@ class AthleteDashboardData(Serialisable):
                 self.cleared_to_train = False if self.color.value == 2 else True
                 self.add_insight(metric)
                 # pain_soreness = 1 if metric.specific_insight_recovery != "" else 0
-                daily_recs = [(m.text, metric.insufficient_data, m.code[0]) for m in metric.specific_actions if m.display and m.code[0] in ["2", "5", "6", "7"]]
-                weekly_recs = [(m.text, metric.insufficient_data, m.code[0]) for m in metric.specific_actions if m.display and m.code[0] in ["1", "3"]]
+                daily_recs = [(m.text, metric.insufficient_data_for_thresholds, m.code[0]) for m in metric.specific_actions if m.display and m.code[0] in ["2", "5", "6", "7"]]
+                weekly_recs = [(m.text, metric.insufficient_data_for_thresholds, m.code[0]) for m in metric.specific_actions if m.display and m.code[0] in ["1", "3"]]
                 if metric.color == MetricColor.red: # not cleared to train
                     not_cleared_recs_day.extend(daily_recs)
                     not_cleared_recs_week.extend(weekly_recs)
@@ -236,7 +240,7 @@ class AthleteDashboardData(Serialisable):
     def add_insight(self, metric):
         if metric.specific_insight_training_volume != "":
             insight_text = metric.specific_insight_training_volume
-            if metric.insufficient_data:
+            if metric.insufficient_data_for_thresholds:
                 self.insufficient_data = True
                 insight_text = "*" + insight_text
             insight = (insight_text, metric.color, 0)
@@ -281,6 +285,29 @@ class AthleteDashboardData(Serialisable):
         return sorted_recs
 
 
+    def remove_tv_metrics_out_of_range(self, metrics):
+        metrics_to_remove = set()
+        for metric in metrics:
+            if ((metric.name in ["Increasing IACWR",
+                                 "Decreasing IACWR",
+                                 "Increasing Internal Ramp"]) and
+                metric.range_wider_than_thresholds):
+                metrics_to_remove.add(metric)
+        if len(metrics_to_remove) > 0:
+            metrics = set(metrics)
+            metrics = list(metrics - metrics_to_remove)
+            self.insufficient_data_tv = True
+        return metrics
+
+    def remove_acwr_increasing_decreasing_conflict(self, metrics):
+        metric_names = [m.name for m in metrics]
+        if "Decreasing IACWR" in metric_names and "Increasing IACWR" in metric_names:
+            decreasing_iacwr_metric = [m for m in metrics if m.name == "Decreasing IACWR"][0]
+            increasing_iacwr_metric = [m for m in metrics if m.name == "Increasing IACWR"][0]
+            metrics.remove(decreasing_iacwr_metric)
+            metrics.remove(increasing_iacwr_metric)
+            self.insufficient_data_tv = True
+
     def json_serialise(self):
         ret = {'user_id': self.user_id,
                'first_name': self.first_name,
@@ -310,3 +337,4 @@ class Recommendation(object):
     def is_insufficient_data(self):
         if self.insufficient_data:
             self.text = "".join(["*", self.text])
+
