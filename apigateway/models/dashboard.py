@@ -202,46 +202,40 @@ class AthleteDashboardData(Serialisable):
             self.daily_insights_text =["No signs of overtraining or injury risk"]
             self.insufficient_data = self.insufficient_data_tv
         else:
-            if len(metrics) == 0:
-                self.daily_recommendation = ['Survey responses indicate ready to train as normal if no other medical limitations']
-                self.insights =["No signs of overtraining or injury risk"]
-                self.daily_insights_text =["No signs of overtraining or injury risk"]
-                self.insufficient_data = True
-            else:
-                not_cleared_recs_day = []
-                not_cleared_recs_week = []
-                for metric in metrics:
-                    self.color = MetricColor(max([self.color.value, metric.color.value]))
-                    self.cleared_to_train = False if self.color.value == 2 else True
-                    self.add_insight(metric)
-                    # pain_soreness = 1 if metric.specific_insight_recovery != "" else 0
-                    daily_recs = [(m.text, metric.insufficient_data_for_thresholds, m.code[0]) for m in metric.specific_actions if m.display and m.code[0] in ["2", "5", "6", "7"]]
-                    weekly_recs = [(m.text, metric.insufficient_data_for_thresholds, m.code[0]) for m in metric.specific_actions if m.display and m.code[0] in ["1", "3"]]
-                    if metric.color == MetricColor.red: # not cleared to train
-                        not_cleared_recs_day.extend(daily_recs)
-                        not_cleared_recs_week.extend(weekly_recs)
-                    elif metric.color != MetricColor.red and self.cleared_to_train:
-                        self.daily_recommendation.update(daily_recs)
-                        self.weekly_recommendation.update(weekly_recs)
-                    else: # not cleared to train but current metric is yellow
-                        pass
+            not_cleared_recs_day = []
+            not_cleared_recs_week = []
+            for metric in metrics:
+                self.color = MetricColor(max([self.color.value, metric.color.value]))
+                self.cleared_to_train = False if self.color.value == 2 else True
+                self.add_insight(metric)
+                # pain_soreness = 1 if metric.specific_insight_recovery != "" else 0
+                daily_recs = [(m.text, metric.insufficient_data_for_thresholds, m.code[0]) for m in metric.specific_actions if m.display and m.code[0] in ["2", "5", "6", "7"]]
+                weekly_recs = [(m.text, metric.insufficient_data_for_thresholds, m.code[0]) for m in metric.specific_actions if m.display and m.code[0] in ["1", "3"]]
+                if metric.color == MetricColor.red: # not cleared to train
+                    not_cleared_recs_day.extend(daily_recs)
+                    not_cleared_recs_week.extend(weekly_recs)
+                elif metric.color != MetricColor.red and self.cleared_to_train:
+                    self.daily_recommendation.update(daily_recs)
+                    self.weekly_recommendation.update(weekly_recs)
+                else: # not cleared to train but current metric is yellow
+                    pass
 
-                # if not cleared to train, removed recs from other insights
-                if not self.cleared_to_train:
-                    self.daily_recommendation = set(not_cleared_recs_day)
-                    self.weekly_recommendation = set(not_cleared_recs_week)
-                elif self.color == MetricColor.yellow and len(self.daily_insights) == 0:
-                    if "pain" in " ".join(self.weekly_metrics).lower():
-                        self.daily_insights.add(DailyHighLevelInsight.adapt_training_to_avoid_symptoms)
+            # if not cleared to train, removed recs from other insights
+            if not self.cleared_to_train:
+                self.daily_recommendation = set(not_cleared_recs_day)
+                self.weekly_recommendation = set(not_cleared_recs_week)
+            elif self.color == MetricColor.yellow and len(self.daily_insights) == 0:
+                if "pain" in " ".join(self.weekly_metrics).lower():
+                    self.daily_insights.add(DailyHighLevelInsight.adapt_training_to_avoid_symptoms)
 
-                sorted_insights = sorted(self.insights,  key=lambda k: (k[1], k[2]), reverse=True)
-                sorted_daily_insights = sorted(self.daily_insights_text,  key=lambda k: (k[1], k[2]), reverse=True)
-                sorted_weekly_nsights = sorted(self.weekly_insights_text,  key=lambda k: (k[1], k[2]), reverse=True)
-                self.insights = [i[0] for i in sorted_insights]
-                self.daily_insights_text = [i[0] for i in sorted_daily_insights]
-                self.weekly_insights_text = [i[0] for i in sorted_weekly_nsights]
-                self.daily_recommendation = self.cleanup_recs('daily')
-                self.weekly_recommendation = self.cleanup_recs('weekly')
+            sorted_insights = sorted(self.insights,  key=lambda k: (k[1], k[2]), reverse=True)
+            sorted_daily_insights = sorted(self.daily_insights_text,  key=lambda k: (k[1], k[2]), reverse=True)
+            sorted_weekly_nsights = sorted(self.weekly_insights_text,  key=lambda k: (k[1], k[2]), reverse=True)
+            self.insights = [i[0] for i in sorted_insights]
+            self.daily_insights_text = [i[0] for i in sorted_daily_insights]
+            self.weekly_insights_text = [i[0] for i in sorted_weekly_nsights]
+            self.daily_recommendation = self.cleanup_recs('daily')
+            self.weekly_recommendation = self.cleanup_recs('weekly')
 
     def add_insight(self, metric):
         if metric.specific_insight_training_volume != "":
