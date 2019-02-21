@@ -380,11 +380,11 @@ class RecommendationText(object):
         self.rec = rec
 
     def value(self):
-        recs = {"1A": "Auditing monthly training to intro variety in duration & intensity",
+        recs = {"1A": "Auditing monthly training plan to introduce variety in duration & intensity",
                 "1B": "Adding more variety in training duration, intensity, & movements",
                 "2A": "Considering not training today",
-                "2B": "Shorter or lower than usual intensity training session",
-                "2C": "Longer or higher than usual intensity training session",
+                "2B": "A shorter or lower than usual intensity training session",
+                "2C": "A longer or higher than usual intensity training session",
                 "3A": "Significantly decreasing workload this week",
                 "3B": "Moderately decreasing workload this week",
                 "3C": "Moderately increasing workload this week",
