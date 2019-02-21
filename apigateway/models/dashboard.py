@@ -322,18 +322,6 @@ class Recommendation(object):
         if self.insufficient_data:
             self.text = "".join(["*", self.text])
 
-# def remove_acwr_ramp_conflict(metrics):
-#     metric_names = [m.name for m in metrics]
-#     if "Decreasing IACWR" in metric_names and "Increasing Internal Ramp" in metric_names:
-#         iacwr_metric = [m for m in metrics if m.name == "Decreasing IACWR"][0]
-#         ramp_metric = [m for m in metrics if m.name == "Increasing Internal Ramp"][0]
-#         if ramp_metric.range_wider_than_thresholds and not iacwr_metric.range_wider_than_thresholds:
-#             # remove ramp metric
-#             metrics.remove(ramp_metric)
-#         else:
-#             # remove iacwr metric
-#             metrics.remove(iacwr_metric)
-
 def remove_tv_metrics_out_of_range(metrics):
     metrics_to_remove = set()
     for metric in metrics:
