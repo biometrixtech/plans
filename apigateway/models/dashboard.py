@@ -198,45 +198,53 @@ class AthleteDashboardData(Serialisable):
             self.insights =["No signs of overtraining or injury risk"]
             self.daily_insights_text =["No signs of overtraining or injury risk"]
         else:
-            not_cleared_recs_day = []
-            not_cleared_recs_week = []
-            for metric in metrics:
-                self.color = MetricColor(max([self.color.value, metric.color.value]))
-                self.cleared_to_train = False if self.color.value == 2 else True
-                self.add_insight(metric)
-                # pain_soreness = 1 if metric.specific_insight_recovery != "" else 0
-                daily_recs = [(m.text, metric.insufficient_data, m.code[0]) for m in metric.specific_actions if m.display and m.code[0] in ["2", "5", "6", "7"]]
-                weekly_recs = [(m.text, metric.insufficient_data, m.code[0]) for m in metric.specific_actions if m.display and m.code[0] in ["1", "3"]]
-                if metric.color == MetricColor.red: # not cleared to train
-                    not_cleared_recs_day.extend(daily_recs)
-                    not_cleared_recs_week.extend(weekly_recs)
-                elif metric.color != MetricColor.red and self.cleared_to_train:
-                    self.daily_recommendation.update(daily_recs)
-                    self.weekly_recommendation.update(weekly_recs)
-                else: # not cleared to train but current metric is yellow
-                    pass
+            metrics = remove_tv_metrics_out_of_range(metrics)
+            remove_acwr_increasing_decreasing_conflict(metrics)
+            if len(metrics) == 0:
+                self.daily_recommendation = ['Survey responses indicate ready to train as normal if no other medical limitations']
+                self.insights =["No signs of overtraining or injury risk"]
+                self.daily_insights_text =["No signs of overtraining or injury risk"]
+                self.insufficient_data = True
+            else:
+                not_cleared_recs_day = []
+                not_cleared_recs_week = []
+                for metric in metrics:
+                    self.color = MetricColor(max([self.color.value, metric.color.value]))
+                    self.cleared_to_train = False if self.color.value == 2 else True
+                    self.add_insight(metric)
+                    # pain_soreness = 1 if metric.specific_insight_recovery != "" else 0
+                    daily_recs = [(m.text, metric.insufficient_data_for_thresholds, m.code[0]) for m in metric.specific_actions if m.display and m.code[0] in ["2", "5", "6", "7"]]
+                    weekly_recs = [(m.text, metric.insufficient_data_for_thresholds, m.code[0]) for m in metric.specific_actions if m.display and m.code[0] in ["1", "3"]]
+                    if metric.color == MetricColor.red: # not cleared to train
+                        not_cleared_recs_day.extend(daily_recs)
+                        not_cleared_recs_week.extend(weekly_recs)
+                    elif metric.color != MetricColor.red and self.cleared_to_train:
+                        self.daily_recommendation.update(daily_recs)
+                        self.weekly_recommendation.update(weekly_recs)
+                    else: # not cleared to train but current metric is yellow
+                        pass
 
-            # if not cleared to train, removed recs from other insights
-            if not self.cleared_to_train:
-                self.daily_recommendation = set(not_cleared_recs_day)
-                self.weekly_recommendation = set(not_cleared_recs_week)
-            elif self.color == MetricColor.yellow and len(self.daily_insights) == 0:
-                if "pain" in " ".join(self.weekly_metrics).lower():
-                    self.daily_insights.add(DailyHighLevelInsight.adapt_training_to_avoid_symptoms)
+                # if not cleared to train, removed recs from other insights
+                if not self.cleared_to_train:
+                    self.daily_recommendation = set(not_cleared_recs_day)
+                    self.weekly_recommendation = set(not_cleared_recs_week)
+                elif self.color == MetricColor.yellow and len(self.daily_insights) == 0:
+                    if "pain" in " ".join(self.weekly_metrics).lower():
+                        self.daily_insights.add(DailyHighLevelInsight.adapt_training_to_avoid_symptoms)
 
-            sorted_insights = sorted(self.insights,  key=lambda k: (k[1], k[2]), reverse=True)
-            sorted_daily_insights = sorted(self.daily_insights_text,  key=lambda k: (k[1], k[2]), reverse=True)
-            sorted_weekly_nsights = sorted(self.weekly_insights_text,  key=lambda k: (k[1], k[2]), reverse=True)
-            self.insights = [i[0] for i in sorted_insights]
-            self.daily_insights_text = [i[0] for i in sorted_daily_insights]
-            self.weekly_insights_text = [i[0] for i in sorted_weekly_nsights]
-            self.daily_recommendation = self.cleanup_recs('daily')
-            self.weekly_recommendation = self.cleanup_recs('weekly')
+                sorted_insights = sorted(self.insights,  key=lambda k: (k[1], k[2]), reverse=True)
+                sorted_daily_insights = sorted(self.daily_insights_text,  key=lambda k: (k[1], k[2]), reverse=True)
+                sorted_weekly_nsights = sorted(self.weekly_insights_text,  key=lambda k: (k[1], k[2]), reverse=True)
+                self.insights = [i[0] for i in sorted_insights]
+                self.daily_insights_text = [i[0] for i in sorted_daily_insights]
+                self.weekly_insights_text = [i[0] for i in sorted_weekly_nsights]
+                self.daily_recommendation = self.cleanup_recs('daily')
+                self.weekly_recommendation = self.cleanup_recs('weekly')
 
     def add_insight(self, metric):
         if metric.specific_insight_training_volume != "":
             insight_text = metric.specific_insight_training_volume
-            if metric.insufficient_data:
+            if metric.insufficient_data_for_thresholds:
                 self.insufficient_data = True
                 insight_text = "*" + insight_text
             insight = (insight_text, metric.color, 0)
@@ -280,6 +288,9 @@ class AthleteDashboardData(Serialisable):
 
         return sorted_recs
 
+    def reconcile_tv_metrics(self, metrics):
+        remove_tv_metrics_out_of_range(metrics)
+        remove_acwr_increasing_decreasing_conflict(metrics)
 
     def json_serialise(self):
         ret = {'user_id': self.user_id,
@@ -310,3 +321,38 @@ class Recommendation(object):
     def is_insufficient_data(self):
         if self.insufficient_data:
             self.text = "".join(["*", self.text])
+
+# def remove_acwr_ramp_conflict(metrics):
+#     metric_names = [m.name for m in metrics]
+#     if "Decreasing IACWR" in metric_names and "Increasing Internal Ramp" in metric_names:
+#         iacwr_metric = [m for m in metrics if m.name == "Decreasing IACWR"][0]
+#         ramp_metric = [m for m in metrics if m.name == "Increasing Internal Ramp"][0]
+#         if ramp_metric.range_wider_than_thresholds and not iacwr_metric.range_wider_than_thresholds:
+#             # remove ramp metric
+#             metrics.remove(ramp_metric)
+#         else:
+#             # remove iacwr metric
+#             metrics.remove(iacwr_metric)
+
+def remove_tv_metrics_out_of_range(metrics):
+    metrics_to_remove = set()
+    for metric in metrics:
+        if ((metric.name in ["Internal Strain Events",
+                             "Internal Monotony Event",
+                             "Increasing IACWR",
+                             "Decreasing IACWR",
+                             "Increasing Internal Ramp"]) and
+            metric.range_wider_than_thresholds):
+            metrics_to_remove.add(metric)
+    metrics = set(metrics)
+    metrics = list(metrics - metrics_to_remove)
+    return metrics
+
+def remove_acwr_increasing_decreasing_conflict(metrics):
+    metric_names = [m.name for m in metrics]
+    if "Decreasing IACWR" in metric_names and "Increasing IACWR" in metric_names:
+        decreasing_iacwr_metric = [m for m in metrics if m.name == "Decreasing IACWR"][0]
+        increasing_iacwr_metric = [m for m in metrics if m.name == "Increasing IACWR"][0]
+        metrics.remove(decreasing_iacwr_metric)
+        metrics.remove(increasing_iacwr_metric)
+

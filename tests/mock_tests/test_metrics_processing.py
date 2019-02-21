@@ -243,3 +243,89 @@ def test_recommendation_matrix_color_ranking():
     ranked_list = rec_matrix.get_ranked_metrics()
 
     assert len(ranked_list) == 2
+
+
+def test_green_internal_acwr_range_wider_lower():
+    athlete_stats = AthleteStats("tester")
+    standard_error_range = StandardErrorRange()
+    standard_error_range.lower_bound = 0.75
+    standard_error_range.observed_value = 1.0
+    standard_error_range.upper_bound = 1.15
+    athlete_stats.event_date = "2018-07-01"
+    athlete_stats.internal_acwr = standard_error_range
+
+    metrics_processor = MetricsProcessing()
+    metrics_list = metrics_processor.get_athlete_metrics_from_stats(athlete_stats, "2018-07-01")
+
+    assert metrics_list[0].color == MetricColor.yellow
+    assert not metrics_list[0].range_wider_than_thresholds
+    assert metrics_list[0].insufficient_data_for_thresholds
+
+def test_green_internal_acwr_range_wider_higher():
+    athlete_stats = AthleteStats("tester")
+    standard_error_range = StandardErrorRange()
+    standard_error_range.lower_bound = 0.85
+    standard_error_range.observed_value = 1.0
+    standard_error_range.upper_bound = 1.5
+    athlete_stats.event_date = "2018-07-01"
+    athlete_stats.internal_acwr = standard_error_range
+
+    metrics_processor = MetricsProcessing()
+    metrics_list = metrics_processor.get_athlete_metrics_from_stats(athlete_stats, "2018-07-01")
+
+    assert metrics_list[0].color == MetricColor.yellow
+    assert not metrics_list[0].range_wider_than_thresholds
+    assert metrics_list[0].insufficient_data_for_thresholds
+
+def test_green_internal_acwr_range_wider_both():
+    athlete_stats = AthleteStats("tester")
+    standard_error_range = StandardErrorRange()
+    standard_error_range.lower_bound = 0.75
+    standard_error_range.observed_value = 1.0
+    standard_error_range.upper_bound = 1.35
+    athlete_stats.event_date = "2018-07-01"
+    athlete_stats.internal_acwr = standard_error_range
+
+    metrics_processor = MetricsProcessing()
+    metrics_list = metrics_processor.get_athlete_metrics_from_stats(athlete_stats, "2018-07-01")
+
+    assert len(metrics_list) == 2
+    assert metrics_list[0].color == MetricColor.yellow
+    assert not metrics_list[0].range_wider_than_thresholds
+    assert metrics_list[0].insufficient_data_for_thresholds
+
+    assert metrics_list[1].color == MetricColor.yellow
+    assert not metrics_list[1].range_wider_than_thresholds
+    assert metrics_list[1].insufficient_data_for_thresholds
+
+def test_green_internal_ramp_range_wider():
+    athlete_stats = AthleteStats("tester")
+    standard_error_range = StandardErrorRange()
+    standard_error_range.lower_bound = 0.75
+    standard_error_range.observed_value = 1.1
+    standard_error_range.upper_bound = 1.151
+    athlete_stats.event_date = "2018-07-01"
+    athlete_stats.internal_ramp = standard_error_range
+
+    metrics_processor = MetricsProcessing()
+    metrics_list = metrics_processor.get_athlete_metrics_from_stats(athlete_stats, "2018-07-01")
+
+    assert metrics_list[0].color == MetricColor.yellow
+    assert not metrics_list[0].range_wider_than_thresholds
+    assert metrics_list[0].insufficient_data_for_thresholds
+
+def test_green_internal_ramp_range_wider_out_of_range():
+    athlete_stats = AthleteStats("tester")
+    standard_error_range = StandardErrorRange()
+    standard_error_range.lower_bound = 0.75
+    standard_error_range.observed_value = 1.1
+    standard_error_range.upper_bound = 1.15101
+    athlete_stats.event_date = "2018-07-01"
+    athlete_stats.internal_ramp = standard_error_range
+
+    metrics_processor = MetricsProcessing()
+    metrics_list = metrics_processor.get_athlete_metrics_from_stats(athlete_stats, "2018-07-01")
+
+    assert metrics_list[0].color == MetricColor.yellow
+    assert metrics_list[0].range_wider_than_thresholds
+    assert metrics_list[0].insufficient_data_for_thresholds
