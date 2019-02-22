@@ -1,10 +1,11 @@
 from models.daily_plan import DailyPlan
 from models.session import PracticeSession, SessionType
-from models.post_session_survey import PostSessionSurvey
+from models.post_session_survey import PostSurvey, PostSessionSurvey
 from models.daily_readiness import DailyReadiness
 from models.stats import AthleteStats
 from datetime import datetime, timedelta
 from tests.testing_utilities import TestUtilities
+from models.training_volume import StandardErrorRange
 from tests.mocks.mock_datastore_collection import DatastoreCollection
 from tests.mocks.mock_daily_plan_datastore import DailyPlanDatastore
 from tests.mocks.mock_daily_readiness_datastore import DailyReadinessDatastore
@@ -12,7 +13,7 @@ from tests.mocks.mock_post_session_survey_datastore import PostSessionSurveyData
 from tests.mocks.mock_athlete_stats_datastore import AthleteStatsDatastore
 from logic.stats_processing import StatsProcessing
 from logic.training_volume_processing import TrainingVolumeProcessing
-
+from utils import parse_date, format_date
 
 def get_dates(start_date, days):
 
@@ -35,7 +36,7 @@ def get_daily_plans(start_date, rpe_list, time_list):
         practice_session = PracticeSession()
         practice_session.event_date = dates[d]
         post_survey = TestUtilities().get_post_survey(rpe_list[d], [])
-        post_session = PostSessionSurvey(dates[d].strftime("%Y-%m-%dT%H:%M:%SZ"), "tester", None, SessionType.practice, post_survey)
+        post_session = PostSurvey(survey=post_survey, event_date=dates[d].strftime("%Y-%m-%dT%H:%M:%SZ"))
         practice_session.post_session_survey = post_session
         practice_session.duration_minutes = time_list[d]
         daily_plan.training_sessions.append(practice_session)
@@ -99,43 +100,21 @@ Liz Data
 12-15-18 - NONE
 '''
 
-def test_strain_works():
+def test_strain_events():
 
-    rpe_list = [4, 6, 8, 4, 7, 4, 3, 3, 5, 6, 5, 5, 4, 3, 7, 4, 6, 4, 7, 4, 4, 3, 3, 4, 5, 6, 8, 4, 8, 4, 5, 7, 5, 4, 8]
-    min_list = [40, 60, 80, 40, 70, 40, 30, 30, 50, 60, 50, 50, 40, 30, 70, 40, 60, 40, 70, 40, 40, 30, 30, 40, 50, 60, 80, 40, 80, 40, 50, 70, 50, 40, 80]
-
-    plans_28_days = get_daily_plans(datetime(2018, 7, 10, 0, 0, 0), rpe_list, min_list)
-    surveys = get_daily_readiness_surveys(datetime(2018, 7, 10, 12, 0, 0), len(rpe_list) - 1)
-    ps_surveys = get_post_session_surveys(datetime(2018, 7, 10, 12, 0, 0), rpe_list)
-    daily_plan_datastore = DailyPlanDatastore()
-    daily_plan_datastore.side_load_plans(plans_28_days)
-    daily_readiness_datastore = DailyReadinessDatastore()
-    daily_readiness_datastore.side_load_surveys(surveys)
-    post_session_datastore = PostSessionSurveyDatastore()
-    post_session_datastore.side_load_surveys(ps_surveys)
-
-    datastore_collection = DatastoreCollection()
-    datastore_collection.daily_plan_datastore = daily_plan_datastore
-    datastore_collection.daily_readiness_datastore = daily_readiness_datastore
-    datastore_collection.post_session_survey_datastore = post_session_datastore
-
-    stats = StatsProcessing("tester", "2018-08-13", datastore_collection)
-    success = stats.set_start_end_times()
-    stats.load_historical_data()
     athlete_stats = AthleteStats("tester")
-    training_volume_processing = TrainingVolumeProcessing(stats.start_date, stats.end_date)
-    athlete_stats = training_volume_processing.calc_training_volume_metrics(athlete_stats, stats.last_7_days_plans,
-                                                                            stats.days_8_14_plans,
-                                                                            stats.acute_daily_plans,
-                                                                            stats.get_chronic_weeks_plans(),
-                                                                            stats.chronic_daily_plans)
-    report = training_volume_processing.get_training_report(athlete_stats,
-                                                           stats.last_7_days_plans,
-                                                           stats.days_8_14_plans,
-                                                           stats.acute_start_date_time,
-                                                           stats.chronic_start_date_time,
-                                                           stats.acute_daily_plans,
-                                                           stats.chronic_daily_plans,
-                                                           stats.end_date_time)
+    strain_list = []
 
-    assert athlete_stats.acute_internal_total_load == 2590
+    seed = [1000, 300, 1450, 250, 1700, 600, 1400, 800, 2000]
+    seed_date = parse_date("2018-01-01")
+    for s in range(0, 9):
+
+        strain_list.append((seed_date, seed[s]))
+        seed_date = seed_date + timedelta(days=1)
+
+    tvp = TrainingVolumeProcessing("2018-01-01", "2018-01-09")
+    tvp.internal_load_tuples = strain_list
+    strain, strain_events = tvp.get_historical_internal_strain("2018-01-01", "2018-01-09", None)
+
+    assert 0 < strain_events.observed_value
+

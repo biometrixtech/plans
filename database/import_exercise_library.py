@@ -1,6 +1,8 @@
 import csv
 #import exercise_generator
 #import database_config  # not committed to source code, contains connection string
+from aws_xray_sdk.core import xray_recorder
+xray_recorder.begin_segment(name="test")
 from config import get_mongo_collection
 import models.exercise
 
@@ -68,7 +70,7 @@ with open('Exercise_Library.csv', newline='') as csvfile:
                     exercise_item.seconds_per_rep = int(row[21])
                 exercise_item.progresses_to = row[22]
                 exercise_item.technical_difficulty = row[24]
-                exercise_item.equipment_required = row[25]
+                exercise_item.equipment_required = row[25].split(';')
                 exercise_item.youtube_id = None
                 try:
                     exercise_item.description = exercise_descriptions[exercise_item.id]

@@ -178,7 +178,7 @@ def _recovery_session_from_mongodb(mongo_result):
 
 def _functional_strength_session_from_mongodb(mongo_result):
     functional_strength_session = session.FunctionalStrengthSession()
-    functional_strength_session.equipment_required = _key_present("equipment_required", mongo_result)
+    functional_strength_session.equipment_required = mongo_result.get("equipment_required", [])
     functional_strength_session.warm_up = [_assigned_exercises_from_mongodb(s)
                                           for s in mongo_result['warm_up']]
     functional_strength_session.dynamic_movement = [_assigned_exercises_from_mongodb(s)
@@ -218,6 +218,7 @@ def _assigned_exercises_from_mongodb(mongo_result):
     assigned_exercise.exercise.seconds_per_set = _key_present("seconds_per_set", mongo_result)
     assigned_exercise.exercise.seconds_per_rep = _key_present("seconds_per_rep", mongo_result)
     assigned_exercise.goal_text = _key_present("goal_text", mongo_result)
+    assigned_exercise.equipment_required = mongo_result.get("equipment_required", [])
     return assigned_exercise
 
 

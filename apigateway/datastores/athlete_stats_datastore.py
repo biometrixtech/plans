@@ -3,7 +3,9 @@ from config import get_mongo_collection
 from models.stats import AthleteStats
 from models.soreness import BodyPartLocation, HistoricSoreness, HistoricSorenessStatus, Soreness, BodyPart
 from models.metrics import AthleteMetric, MetricType, DailyHighLevelInsight, WeeklyHighLevelInsight, MetricColor, SpecificAction
+from models.training_volume import StandardErrorRange
 from utils import parse_datetime
+import numbers
 
 
 class AthleteStatsDatastore(object):
@@ -55,25 +57,30 @@ class AthleteStatsDatastore(object):
         athlete_stats.chronic_avg_readiness = mongo_result['chronic_avg_readiness']
         athlete_stats.chronic_avg_max_soreness = mongo_result['chronic_avg_max_soreness']
 
-        athlete_stats.acute_internal_total_load = mongo_result.get('acute_internal_total_load', None)
-        athlete_stats.acute_external_total_load = mongo_result.get('acute_external_total_load', None)
-        athlete_stats.acute_external_high_intensity_load = mongo_result.get('acute_external_high_intensity_load', None)
-        athlete_stats.acute_external_mod_intensity_load = mongo_result.get('acute_external_mod_intensity_load', None)
-        athlete_stats.acute_external_low_intensity_load = mongo_result.get('acute_external_low_intensity_load', None)
-        athlete_stats.chronic_internal_total_load = mongo_result.get('chronic_internal_total_load', None)
-        athlete_stats.chronic_external_total_load = mongo_result.get('chronic_external_total_load', None)
-        athlete_stats.chronic_external_high_intensity_load = mongo_result.get('chronic_external_high_intensity_load', None)
-        athlete_stats.chronic_external_mod_intensity_load = mongo_result.get('chronic_external_mod_intensity_load', None)
-        athlete_stats.chronic_external_low_intensity_load = mongo_result.get('chronic_external_low_intensity_load', None)
+        athlete_stats.acute_internal_total_load = self._standard_error_from_monogodb(mongo_result.get('acute_internal_total_load', None))
+        athlete_stats.acute_external_total_load = self._standard_error_from_monogodb(mongo_result.get('acute_external_total_load', None))
+        athlete_stats.acute_external_high_intensity_load = self._standard_error_from_monogodb(mongo_result.get('acute_external_high_intensity_load', None))
+        athlete_stats.acute_external_mod_intensity_load = self._standard_error_from_monogodb(mongo_result.get('acute_external_mod_intensity_load', None))
+        athlete_stats.acute_external_low_intensity_load = self._standard_error_from_monogodb(mongo_result.get('acute_external_low_intensity_load', None))
+        athlete_stats.chronic_internal_total_load = self._standard_error_from_monogodb(mongo_result.get('chronic_internal_total_load', None))
+        athlete_stats.chronic_external_total_load = self._standard_error_from_monogodb(mongo_result.get('chronic_external_total_load', None))
+        athlete_stats.chronic_external_high_intensity_load = self._standard_error_from_monogodb(mongo_result.get('chronic_external_high_intensity_load', None))
+        athlete_stats.chronic_external_mod_intensity_load = self._standard_error_from_monogodb(mongo_result.get('chronic_external_mod_intensity_load', None))
+        athlete_stats.chronic_external_low_intensity_load = self._standard_error_from_monogodb(mongo_result.get('chronic_external_low_intensity_load', None))
 
-        athlete_stats.internal_monotony = mongo_result.get('internal_monotony', None)
-        athlete_stats.internal_strain = mongo_result.get('internal_strain', None)
-        athlete_stats.external_monotony = mongo_result.get('external_monotony', None)
-        athlete_stats.external_strain = mongo_result.get('external_strain', None)
-        athlete_stats.internal_ramp = mongo_result.get('internal_ramp', None)
-        athlete_stats.external_ramp = mongo_result.get('external_ramp', None)
-        athlete_stats.internal_acwr = mongo_result.get('internal_acwr', None)
-        athlete_stats.external_acwr = mongo_result.get('external_acwr', None)
+        athlete_stats.internal_monotony = self._standard_error_from_monogodb(mongo_result.get('internal_monotony', None))
+        athlete_stats.historical_internal_monotony = [self._standard_error_from_monogodb(s)
+                                           for s in mongo_result.get('historic_internal_monotony', [])]
+        athlete_stats.internal_strain = self._standard_error_from_monogodb(mongo_result.get('internal_strain', None))
+        athlete_stats.historical_internal_strain = [self._standard_error_from_monogodb(s)
+                                                      for s in mongo_result.get('historic_internal_strain', [])]
+        athlete_stats.internal_strain_events = self._standard_error_from_monogodb(mongo_result.get('internal_strain_events', None))
+        athlete_stats.external_monotony = self._standard_error_from_monogodb(mongo_result.get('external_monotony', None))
+        athlete_stats.external_strain = self._standard_error_from_monogodb(mongo_result.get('external_strain', None))
+        athlete_stats.internal_ramp = self._standard_error_from_monogodb(mongo_result.get('internal_ramp', None))
+        athlete_stats.external_ramp = self._standard_error_from_monogodb(mongo_result.get('external_ramp', None))
+        athlete_stats.internal_acwr = self._standard_error_from_monogodb(mongo_result.get('internal_acwr', None))
+        athlete_stats.external_acwr = self._standard_error_from_monogodb(mongo_result.get('external_acwr', None))
 
         athlete_stats.functional_strength_eligible = mongo_result.get('functional_strength_eligible', False)
         athlete_stats.completed_functional_strength_sessions = mongo_result.get(
@@ -82,6 +89,7 @@ class AthleteStatsDatastore(object):
             'next_functional_strength_eligible_date', None)
         athlete_stats.current_sport_name = mongo_result.get('current_sport_name', None)
         athlete_stats.current_position = mongo_result.get('current_position', None)
+        athlete_stats.expected_weekly_workouts = _expected_workouts_from_mongo(mongo_result)
         athlete_stats.historic_soreness = [self._historic_soreness_from_mongodb(s)
                                            for s in mongo_result.get('historic_soreness', [])]
         athlete_stats.daily_severe_soreness = [self._soreness_from_mongodb(s)
@@ -110,6 +118,23 @@ class AthleteStatsDatastore(object):
         mongo_collection = get_mongo_collection(self.mongo_collection)
         query = {'athlete_id': item['athlete_id']}
         mongo_collection.replace_one(query, item, upsert=True)
+
+    def _standard_error_from_monogodb(self, std_error):
+
+        standard_error_range = StandardErrorRange()
+
+        if std_error is None or isinstance(std_error, numbers.Number):
+
+            standard_error_range.observed_value = std_error
+
+        elif isinstance(std_error, dict):
+
+            standard_error_range.lower_bound = std_error.get("lower_bound", None)
+            standard_error_range.observed_value = std_error.get("observed_value", None)
+            standard_error_range.upper_bound = std_error.get("upper_bound", None)
+            standard_error_range.insufficient_data = std_error.get("insufficient_data", False)
+
+        return standard_error_range
 
     def _historic_soreness_from_mongodb(self, historic_soreness):
 
@@ -147,8 +172,20 @@ class AthleteStatsDatastore(object):
         rec.high_level_action_description = metric.get('high_level_action_description', "")
         rec.specific_insight_training_volume = metric.get('specific_insight_training_volume', "")
         rec.specific_insight_recovery = metric.get('specific_insight_recovery', 0)
+        rec.insufficient_data_for_thresholds = metric.get('insufficient_data_for_thresholds', False)
+        rec.range_wider_than_thresholds = metric.get('range_wider_than_thresholds', False)
         rec.specific_actions = [self._get_specific_actions_from_mongodb(sa)for sa in metric.get('specific_actions', [])]
         return rec
 
     def _get_specific_actions_from_mongodb(self, action):
         return SpecificAction(action['code'], action['text'], action['display'])
+
+def _expected_workouts_from_mongo(mongo_result):
+    typ_sessions_exp_workout = {"0-1": 0.5, "2-4": 3.0, "5+": 5.0, None: None}
+    exp_workouts = mongo_result.get('expected_weekly_workouts', None)
+    if exp_workouts is None:
+        typical_weekly_sessions = mongo_result.get('typical_weekly_sessions', None)
+        exp_workouts = typ_sessions_exp_workout[typical_weekly_sessions]
+    return exp_workouts
+
+

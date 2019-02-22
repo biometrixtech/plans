@@ -9,6 +9,7 @@ from models.daily_plan import DailyPlan
 from models.heart_rate import SessionHeartRate, HeartRateData
 from models.sleep_data import DailySleepData, SleepEvent
 from logic.stats_processing import StatsProcessing
+from logic.soreness_processing import SorenessCalculator
 from datastores.datastore_collection import DatastoreCollection
 
 
@@ -115,6 +116,7 @@ class SurveyProcessing(object):
                 self.athlete_stats.update_historic_soreness(s, self.event_date)
 
     def process_clear_status_answers(self, clear_candidates, event_date, soreness):
+
         plan_event_date = format_date(event_date)
         stats_processing = StatsProcessing(self.athlete_stats.athlete_id,
                                            plan_event_date,
@@ -129,6 +131,7 @@ class SurveyProcessing(object):
             body_part_location = BodyPartLocation(q3_response['body_part'])
             side = q3_response['side']
             severity = q3_response.get('severity', 0) # don't error out because of mobile bug
+            movement = q3_response.get('movement', None)
             pain = q3_response.get('pain', False)
             status = q3_response.get('status', HistoricSorenessStatus.dormant_cleared)
             if severity == 0:
@@ -138,6 +141,7 @@ class SurveyProcessing(object):
                 sore_part.body_part = BodyPart(body_part_location, None)
                 sore_part.pain = pain
                 sore_part.severity = severity
+                sore_part.movement = movement
                 sore_part.side = side
                 sore_part.reported_date_time = event_date
                 soreness.append(sore_part)
@@ -148,7 +152,7 @@ class SurveyProcessing(object):
                                            side=side,
                                            is_pain=pain,
                                            question_response_date=plan_event_date,
-                                           severity_value=severity)
+                                           severity_value=SorenessCalculator().get_severity(severity, movement))
             else:
                 self.athlete_stats.historic_soreness = stats_processing.answer_persistent_2_question(self.athlete_stats.historic_soreness,
                                            soreness_list_25,
@@ -156,7 +160,7 @@ class SurveyProcessing(object):
                                            side=side,
                                            is_pain=pain,
                                            question_response_date=plan_event_date,
-                                           severity_value=severity,
+                                           severity_value=SorenessCalculator().get_severity(severity, movement),
                                            current_status=HistoricSorenessStatus[status])
 
     @xray_recorder.capture('logic.survey_processing.historic_workout_data')

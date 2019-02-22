@@ -51,12 +51,12 @@ class ExerciseBuckets(object):
         group[1] = ["119", "122"]
         group[2] = ["6", "46"]
         group[3] = ["28", "49"]
-        group[4] = ["56", "127", "128", "129", "130"]
-        group[5] = ["7", "26"]
-        group[6] = ["81", "50"]
-        group[7] = ["108", "14"]
-        group[8] = ["10", "77"]
-        group[9] = ["89", "84", "79"]
+        #group[4] = ["56", "127", "128", "129", "130"]
+        group[4] = ["7", "26"]
+        group[5] = ["81", "50"]
+        group[6] = ["108", "14"]
+        group[7] = ["10", "77"]
+        group[8] = ["89", "84", "79"]
 
         return group
 
@@ -99,7 +99,7 @@ class Exercise(Serialisable):
         self.cues = ""
         self.procedure = ""
         self.goal = ""
-        self.equipment_required = None
+        self.equipment_required = []
 
     def __setattr__(self, name, value):
         if name == "unit_of_measure" and not isinstance(value, UnitOfMeasure):

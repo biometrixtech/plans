@@ -44,6 +44,7 @@ class DailyReadiness(Serialisable):
         soreness.body_part = BodyPart(BodyPartLocation(soreness_dict['body_part']), None)
         soreness.pain = soreness_dict.get('pain', False)
         soreness.severity = soreness_dict['severity']
+        soreness.movement = soreness_dict.get('movement', None)
         soreness.side = self._key_present('side', soreness_dict)
         soreness.reported_date_time = self.event_date
         return soreness
