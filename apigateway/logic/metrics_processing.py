@@ -328,13 +328,13 @@ class PersistentSorenessMetricGenerator(AthleteSorenessMetricGenerator):
                                                      WeeklyHighLevelInsight.at_risk_of_time_loss_injury,
                                                      self.high_level_action_description,
                                                      ["7A"], 4.0, 5.01,
-                                                     "Persistent, {bodypart} soreness which increases soft tissue injury risk if high loads occur during periods of soreness.",
+                                                     "Persistent {bodypart} soreness which increases soft tissue injury risk if high loads occur during periods of soreness",
                                                      None)
         self.thresholds[1] = ThresholdRecommendation(MetricColor.yellow,
                                                      WeeklyHighLevelInsight.at_risk_of_time_loss_injury,
                                                      self.high_level_action_description,
                                                      ["7A","6C","3B"], 3.0, 4.0,
-                                                     "Persistent, {bodypart} soreness which increases soft tissue injury risk if high loads occur during periods of soreness.",
+                                                     "Persistent {bodypart} soreness which increases soft tissue injury risk if high loads occur during periods of soreness",
                                                      None)
         self.populate_thresholds_with_soreness()
 
@@ -348,13 +348,13 @@ class Persistent_2SorenessMetricGenerator(AthleteSorenessMetricGenerator):
                                                      WeeklyHighLevelInsight.seek_med_eval_to_clear_for_training,
                                                      "Significant pain or soreness reported: consult medical staff before considering training",
                                                      ["3B", "7A"], 4.0, 5.01,
-                                                     "Persistent, {bodypart} soreness which increases soft tissue injury risk if high loads occur during periods of soreness.",
+                                                     "Persistent {bodypart} soreness which increases soft tissue injury risk if high loads occur during periods of soreness",
                                                      None)
         self.thresholds[1] = ThresholdRecommendation(MetricColor.yellow,
                                                      WeeklyHighLevelInsight.at_risk_of_time_loss_injury,
                                                      "Consider reducing training intensity to lower risk of severe soreness developing into injury",
                                                      ["7A", "6C", "3B"], 2.0, 4.0,
-                                                     "Persistent, {bodypart} soreness which increases soft tissue injury risk if high loads occur during periods of soreness.",
+                                                     "Persistent {bodypart} soreness which increases soft tissue injury risk if high loads occur during periods of soreness",
                                                      None)
 
         self.populate_thresholds_with_soreness()
