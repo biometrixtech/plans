@@ -3,9 +3,11 @@ from flask import request, Blueprint
 from fathomapi.utils.decorators import require
 from fathomapi.utils.exceptions import InvalidSchemaException, NoSuchEntityException
 from fathomapi.utils.xray import xray_recorder
+from datastores.datastore_collection import DatastoreCollection
 from datastores.daily_plan_datastore import DailyPlanDatastore
 from datastores.athlete_stats_datastore import AthleteStatsDatastore
 from datastores.completed_exercise_datastore import CompletedExerciseDatastore
+from logic.training_plan_management import TrainingPlanManager
 from models.soreness import CompletedExercise
 from utils import format_date, parse_datetime, format_datetime
 from config import get_mongo_collection
@@ -111,6 +113,52 @@ def handle_functional_strength_start():
     store.put(plan)
 
     return {'message': 'success'}, 200
+
+
+@app.route('/activate', methods=['POST'])
+@require.authenticated.any
+@xray_recorder.capture('routes.functional_strength.activate')
+def handle_functional_strength_activate(principal_id=None):
+    if not isinstance(request.json, dict):
+        raise InvalidSchemaException('Request body must be a dictionary')
+    if 'event_date' not in request.json:
+        raise InvalidSchemaException('Missing required parameter event_date')
+    else:
+        event_date = parse_datetime(request.json['event_date'])
+    if 'current_sport_name' not in request.json and 'current_position' not in request.json:
+        raise InvalidSchemaException('Neither current_sport_name and/or current_position')
+
+    user_id = principal_id
+    plan_event_date = format_date(event_date)
+
+    # update athlete stats with sport/position information
+    athlete_stats_store = AthleteStatsDatastore()
+    athlete_stats = athlete_stats_store.get(athlete_id=user_id)
+    if 'current_sport_name' in request.json:
+        athlete_stats.current_sport_name = request.json['current_sport_name']
+    if 'current_position' in request.json:
+        athlete_stats.current_position = request.json['current_position']
+    athlete_stats_store.put(athlete_stats)
+
+    # get functional strength for the day and update daily_plan
+    if not _check_plan_exists(user_id, plan_event_date):
+        raise NoSuchEntityException('Plan not found for the user')
+    daily_plan_store = DailyPlanDatastore()
+    plan = daily_plan_store.get(user_id=user_id, start_date=plan_event_date, end_date=plan_event_date)[0]
+    plan_manager = TrainingPlanManager(user_id, DatastoreCollection())
+    plan = plan_manager.populate_functional_strength(daily_plan=plan,
+                                                     athlete_stats=athlete_stats,
+                                                     wants_functional_strength=True)
+    daily_plan_store.put(plan)
+
+    # return plan to user
+    plan = plan.json_serialise()
+    plan['daily_readiness_survey_completed'] = True
+    plan['landing_screen'] = 1.0
+    plan['nav_bar_indicator'] = 1.0
+    del plan['daily_readiness_survey'], plan['user_id']
+
+    return {'daily_plan': plan}, 200
 
 
 def save_completed_exercises(exercise_list, user_id, event_date):
