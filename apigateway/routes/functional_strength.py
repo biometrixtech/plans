@@ -125,8 +125,8 @@ def handle_functional_strength_activate(principal_id=None):
         raise InvalidSchemaException('Missing required parameter event_date')
     else:
         event_date = parse_datetime(request.json['event_date'])
-    if 'current_sport_name' not in request.json and 'current_position' not in request.json:
-        raise InvalidSchemaException('Neither current_sport_name and/or current_position')
+    if 'current_sport_name' not in request.json:
+        raise InvalidSchemaException('Missing required parameter current_sport_name')
 
     user_id = principal_id
     plan_event_date = format_date(event_date)
@@ -134,8 +134,7 @@ def handle_functional_strength_activate(principal_id=None):
     # update athlete stats with sport/position information
     athlete_stats_store = AthleteStatsDatastore()
     athlete_stats = athlete_stats_store.get(athlete_id=user_id)
-    if 'current_sport_name' in request.json:
-        athlete_stats.current_sport_name = request.json['current_sport_name']
+    athlete_stats.current_sport_name = request.json['current_sport_name']
     if 'current_position' in request.json:
         athlete_stats.current_position = request.json['current_position']
     athlete_stats_store.put(athlete_stats)
