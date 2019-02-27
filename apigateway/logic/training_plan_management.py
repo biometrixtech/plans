@@ -194,7 +194,7 @@ class TrainingPlanManager(object):
             max_rpe = 0
 
         if daily_plan.functional_strength_session is None:
-            daily_plan = self.populate_functional_strength(daily_plan, athlete_stats, last_daily_readiness_survey)
+            daily_plan = self.populate_functional_strength(daily_plan, athlete_stats, last_daily_readiness_survey.wants_functional_strength)
 
         text_generator = RecoveryTextGenerator()
         body_part_text = text_generator.get_text_from_body_part_list(soreness_list)
@@ -273,12 +273,12 @@ class TrainingPlanManager(object):
 
         return daily_plan
 
-    def populate_functional_strength(self, daily_plan, athlete_stats, last_daily_readiness_survey):
+    def populate_functional_strength(self, daily_plan, athlete_stats, wants_functional_strength):
 
         if athlete_stats is not None:
             daily_plan.functional_strength_eligible = athlete_stats.functional_strength_eligible
 
-        if daily_plan.functional_strength_eligible and last_daily_readiness_survey.wants_functional_strength:
+        if daily_plan.functional_strength_eligible and wants_functional_strength:
             daily_plan.completed_functional_strength_sessions = athlete_stats.completed_functional_strength_sessions
             if not daily_plan.functional_strength_completed and daily_plan.completed_functional_strength_sessions < 3:
                 fs_mapping = FSProgramGenerator(self.exercise_library_datastore)
