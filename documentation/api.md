@@ -29,6 +29,7 @@
       - [Mark Completed](#mark-completed)
       - [Adjust active time](#adjust-active-time)
     - [Functional Strength](#functional-strength)
+      - [Activate](#activate)
       - [Mark Started](#mark-started-1)
       - [Mark Completed](#mark-completed-1)
     - [Daily Plans](#daily-plans)
@@ -536,7 +537,7 @@ Postman-Token: 4b6c3946-89fd-4cde-ae29-3a4984d5f373
     "daily_plan": daily_plan
 }
 ```
-where `daily_plan` will have the standard schema.
+where `daily_plan` will have the standard schema as defined in [Get daily plan](#get-daily-plan)
 
 #### Delete
 
@@ -856,6 +857,51 @@ Authorization: eyJraWQ...ajBc4VQ
 ```
 
 ### Functional Strength
+
+#### Activate
+
+This endpoint can be called to activate functional strength and define sport and position.
+
+##### Query String
+ 
+The client __must__ submit a request to the endpoint `/plans/version/functional_strength/activate`. The request method __must__ be `POST`.
+
+##### Request
+
+The client __must__ submit a request body containing a JSON object with the following schema:
+```
+{
+    "event_date": Datetime,
+    "current_sport_name": number
+    "current_position": number
+}
+```
+* `event_date` __should__ be the time when user submits the request
+* `current_sport_name` __should__ be integer representing SportName enumeration
+* `current_position` __should__ be integer representating position enumeration. It should be `null` if no positions exist for the sport.
+
+```
+POST /plans/version/functional_strength/activate HTTPS/1.1
+Host: apis.env.fathomai.com
+Content-Type: application/json
+Authorization: eyJraWQ...ajBc4VQ
+
+{
+    "event_date": "2018-09-21T17:53:39Z",
+    "current_sport_name": 14,
+    "current_position": 0
+}
+```
+##### Responses
+ 
+ If the write was successful, the Service __will__ respond with HTTP Status `200 OK`, with a body with the following syntax:
+ 
+```
+{
+    "daily_plan": daily_plan
+}
+```
+where `daily_plan` will have the standard schema as defined in [Get daily plan](#get-daily-plan)
 
 #### Mark Started
 
