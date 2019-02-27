@@ -878,7 +878,7 @@ The client __must__ submit a request body containing a JSON object with the foll
 ```
 * `event_date` __should__ be the time when user submits the request
 * `current_sport_name` __should__ be integer representing SportName enumeration
-* `current_position` __should__ be integer representating position enumeration for specific sport
+* `current_position` __should__ be integer representating position enumeration. It should be `null` if no positions exist for the sport.
 
 ```
 POST /plans/version/functional_strength/activate HTTPS/1.1
