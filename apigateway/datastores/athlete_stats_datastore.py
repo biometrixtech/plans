@@ -12,8 +12,8 @@ class AthleteStatsDatastore(object):
     mongo_collection = 'athletestats'
 
     @xray_recorder.capture('datastore.AthlteStatsDatastore.get')
-    def get(self, athlete_id):
-        return self._query_mongodb(athlete_id)
+    def get(self, athlete_id, mongo_collection=None):
+        return self._query_mongodb(athlete_id, mongo_collection)
 
     def put(self, items):
         if not isinstance(items, list):
@@ -25,8 +25,9 @@ class AthleteStatsDatastore(object):
             raise e
 
     @xray_recorder.capture('datastore.AthleteStatsDatastore._query_mongodb')
-    def _query_mongodb(self, athlete_id):
-        mongo_collection = get_mongo_collection(self.mongo_collection)
+    def _query_mongodb(self, athlete_id, mongo_collection):
+        if mongo_collection is None:
+            mongo_collection = get_mongo_collection(self.mongo_collection)
         if isinstance(athlete_id, list):
             query = {'athlete_id': {'$in': athlete_id}}
             mongo_results = mongo_collection.find(query)

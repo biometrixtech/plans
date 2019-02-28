@@ -17,6 +17,7 @@ from config import get_secret
 def add_xray_support(request):
     os.environ["ENVIRONMENT"] = "dev"
 
+    xray_recorder.configure(sampling=False)
     xray_recorder.begin_segment(name="test")
 
     config = get_secret('mongo')

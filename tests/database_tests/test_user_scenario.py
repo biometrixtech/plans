@@ -22,6 +22,7 @@ import logic.training_plan_management as training_plan_management
 def add_xray_support(request):
     os.environ["ENVIRONMENT"] = "dev"
 
+    xray_recorder.configure(sampling=False)
     xray_recorder.begin_segment(name="test")
 
     config = get_secret('mongo')

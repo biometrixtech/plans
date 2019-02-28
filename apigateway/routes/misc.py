@@ -1,8 +1,10 @@
 from flask import request, Blueprint
 import datetime
 import os
-from utils import format_date, parse_datetime
-
+from utils import format_date, parse_datetime, parse_date
+from datastores.daily_readiness_datastore import DailyReadinessDatastore
+from datastores.daily_plan_datastore import DailyPlanDatastore
+from datastores.athlete_stats_datastore import AthleteStatsDatastore
 from config import get_mongo_collection, get_mongo_database
 from fathomapi.api.config import Config
 from fathomapi.comms.service import Service
@@ -143,5 +145,60 @@ def handle_app_open_tracking(principal_id=None):
 
     return {'message': 'success'}, 200
 
+
+@app.route('/copy_test_data', methods=['POST'])
+@require.authenticated.any
+@xray_recorder.capture('routes.misc.copy_test_data')
+def handle_test_data_copy(principal_id=None):
+    """Copy data for test user from test collection
+    """
+    user_id = principal_id
+    event_date = parse_datetime(request.json['event_date'])
+
+    # get required collections
+    plan_collection = get_mongo_collection('dailyplan')
+    readiness_collection = get_mongo_collection('dailyreadiness')
+    stats_collection = get_mongo_collection('athletestats')
+    completed_exercises_collection = get_mongo_collection('completedexercises')
+
+    mongo_database = get_mongo_database()
+    plan_collection_test = mongo_database['dailyPlanTest']
+    readiness_collection_test = mongo_database['dailyReadinessTest']
+    stats_collection_test = mongo_database['athleteStatsTest']
+    # completed_exercises_collection_test = mongo_database['completedExercisesTest']
+
+    # clear all existing data
+    readiness_collection.delete_many({"user_id": user_id})
+    plan_collection.delete_many({"user_id": user_id})
+    completed_exercises_collection.delete_many({"athlete_id": user_id})
+    stats_collection.delete_one({"athlete_id": user_id})
+    # get data from test collections
+    rs_datastore = DailyReadinessDatastore()
+    readiness_surveys = rs_datastore.get(user_id,
+                                         last_only=False,
+                                         mongo_collection=readiness_collection_test)
+    daily_plan_datastore = DailyPlanDatastore()
+    daily_plans = daily_plan_datastore.get(user_id,
+                                           mongo_collection=plan_collection_test)
+    athlete_stats_datastore = AthleteStatsDatastore()
+    athlete_stats = athlete_stats_datastore.get(user_id,
+                                                mongo_collection=stats_collection_test)
+
+    update_dates(readiness_surveys, daily_plans, athlete_stats, event_date)
+    rs_datastore.put(readiness_surveys)
+    daily_plan_datastore.put(daily_plans)
+    athlete_stats_datastore.put(athlete_stats)
+
+    return {'message': 'success'}, 202
+
+def update_dates(rs_surveys, daily_plans, athlete_stats, event_date):
+    athlete_today = parse_date(athlete_stats.event_date)
+    day_diff = (event_date - athlete_today).days
+    for rs_survey in rs_surveys:
+        rs_survey.event_date += datetime.timedelta(days=day_diff)
+
+    for plan in daily_plans:
+        plan.event_date = format_date(parse_date(plan.event_date) + datetime.timedelta(days=day_diff))
+    athlete_stats.event_date = format_date(event_date)
 
 

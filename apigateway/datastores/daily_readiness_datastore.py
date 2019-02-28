@@ -9,8 +9,8 @@ class DailyReadinessDatastore(object):
     mongo_collection = 'dailyreadiness'
 
     @xray_recorder.capture('datastore.DailyReadinessDatastore.get')
-    def get(self, user_id, start_date=None, end_date=None, last_only=True):
-        return self._query_mongodb(user_id, start_date, end_date, last_only)
+    def get(self, user_id, start_date=None, end_date=None, last_only=True, mongo_collection=None):
+        return self._query_mongodb(user_id, start_date, end_date, last_only, mongo_collection)
 
     def put(self, items):
         if not isinstance(items, list):
@@ -22,23 +22,20 @@ class DailyReadinessDatastore(object):
             raise e
 
     @xray_recorder.capture('datastore.DailyReadinessDatastore._query_mongodb')
-    def _query_mongodb(self, user_id, start_date_time, end_date_time, last_only):
-        mongo_collection = get_mongo_collection(self.mongo_collection)
-        if start_date_time is None and end_date_time is None:
-            if isinstance(user_id, list):
-                query = {'user_id': {'$in': user_id}}
-            else:
-                query = {'user_id': user_id}
+    def _query_mongodb(self, user_id, start_date_time, end_date_time, last_only, mongo_collection):
+        if mongo_collection is None:
+            mongo_collection = get_mongo_collection(self.mongo_collection)
+        query = {}
+        if isinstance(user_id, list):
+            query = {'user_id': {'$in': user_id}}
         else:
+            query = {'user_id': user_id}
+        if start_date_time is not None and end_date_time is not None:
             start_date_time = format_datetime(start_date_time)
             end_date_time = format_datetime(end_date_time)
-            if isinstance(user_id, list):
-                query = {'user_id': {'$in': user_id}, 'event_date': {'$gte': start_date_time, '$lte': end_date_time}}
-            else:
-                query = {'user_id': user_id, 'event_date': {'$gte': start_date_time, '$lte': end_date_time}}
+            query['event_date'] = {'$gte': start_date_time, '$lte': end_date_time}
         if last_only:
             mongo_result = mongo_collection.find_one(query, sort=[('event_date', -1)])
-
             if mongo_result is not None:
                 return [DailyReadiness(
                                       event_date=mongo_result['event_date'],
