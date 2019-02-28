@@ -152,6 +152,8 @@ def handle_app_open_tracking(principal_id=None):
 def handle_test_data_copy(principal_id=None):
     """Copy data for test user from test collection
     """
+    if Config.get('ENVIRONMENT') == 'production':
+        raise ForbiddenException("This API is only allowed in develop/test environment")
     user_id = principal_id
     event_date = parse_datetime(request.json['event_date'])
 
