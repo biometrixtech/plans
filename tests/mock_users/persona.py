@@ -1,10 +1,12 @@
-import datetime
+# import datetime
 from config import get_mongo_collection
 import datetime
 from models.daily_readiness import DailyReadiness
+from models.soreness import CompletedExercise
 from logic.stats_processing import StatsProcessing
 from logic.training_plan_management import TrainingPlanManager
 from datastores.daily_readiness_datastore import DailyReadinessDatastore
+from datastores.completed_exercise_datastore import CompletedExerciseDatastore
 from datastores.datastore_collection import DatastoreCollection
 from utils import format_datetime, format_date
 
@@ -14,6 +16,7 @@ class Persona(object):
         self.user_id = user_id
         self.soreness_history = None
         self.session_history = None
+        self.daily_plan = None
 
     def create_history(self, days):
         self.clear_user()
@@ -34,6 +37,8 @@ class Persona(object):
                                   'soreness': soreness}
                 self.create_readiness(readiness_data)
                 self.create_plan(today_date)
+                exercise_list = [ex.exercise.id for ex in self.daily_plan.pre_recovery.inhibit_exercises]
+                self.complete_exercises(exercise_list, format_datetime(event_date + datetime.timedelta(hours=1)))
                 print(today_date)
             self.update_stats(format_date(event_date))
             event_date = event_date + datetime.timedelta(days=1)
@@ -53,7 +58,7 @@ class Persona(object):
 
     def create_plan(self, event_date):
         plan_manager = TrainingPlanManager(self.user_id, DatastoreCollection())
-        plan_manager.create_daily_plan(event_date=event_date)
+        self.daily_plan = plan_manager.create_daily_plan(event_date=event_date)
 
 
     def update_stats(self, event_date):
@@ -70,4 +75,10 @@ class Persona(object):
         store = DailyReadinessDatastore()
         store.put(daily_readiness)
 
+    def complete_exercises(self, exercise_list, event_date):
+        exercise_store = CompletedExerciseDatastore()
 
+        for exercise in exercise_list:
+            exercise_store.put(CompletedExercise(athlete_id=self.user_id,
+                                                 exercise_id=exercise,
+                                                 event_date=event_date))

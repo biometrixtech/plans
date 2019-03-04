@@ -173,3 +173,21 @@ def test_delete_daily_plan_user_date_range():
 
     assert plans_count == new_plans_count + len(plans_to_delete)
 
+def test_delete_completed_exercises_user_all():
+    athlete_dao = CompletedExerciseDatastore(mongo_collection='completedexercisestest')
+    completed_exercises = athlete_dao.get("persona1", start_date='2017-01-27', end_date='2020-02-03', get_summary=False)
+    athlete_dao.delete(athlete_id="persona1")
+    completed_exercises_new = athlete_dao.get("persona1",start_date='2017-01-27', end_date='2020-02-03', get_summary=False)
+    athlete_dao.put(completed_exercises)
+
+    assert len(completed_exercises_new) == 0
+
+def test_delete_completed_exercises_user_date_range():
+    athlete_dao = CompletedExerciseDatastore(mongo_collection='completedexercisestest')
+    completed_exercises_count = len(athlete_dao.get("persona1", start_date='2017-01-27', end_date='2020-02-03', get_summary=False))
+    exercises_to_delete = athlete_dao.get(athlete_id="persona1", start_date='2019-01-27', end_date='2019-02-03', get_summary=False)
+    athlete_dao.delete(athlete_id="persona1", start_date='2019-01-27', end_date='2019-02-03')
+    new_exercises_count = len(athlete_dao.get("persona1", start_date='2017-01-27', end_date='2020-02-03', get_summary=False))
+    athlete_dao.put(exercises_to_delete)
+
+    assert completed_exercises_count == new_exercises_count + len(exercises_to_delete)
