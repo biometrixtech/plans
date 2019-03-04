@@ -5,6 +5,7 @@ from utils import format_date, parse_datetime, parse_date
 from datastores.daily_readiness_datastore import DailyReadinessDatastore
 from datastores.daily_plan_datastore import DailyPlanDatastore
 from datastores.athlete_stats_datastore import AthleteStatsDatastore
+from datastores.completed_exercise_datastore import CompletedExerciseDatastore
 from config import get_mongo_collection, get_mongo_database
 from fathomapi.api.config import Config
 from fathomapi.comms.service import Service
@@ -157,55 +158,46 @@ def handle_test_data_copy(principal_id=None):
     user_id = principal_id
     event_date = parse_datetime(request.json['event_date'])
 
-    # get required collections
-    plan_collection = get_mongo_collection('dailyplan')
-    readiness_collection = get_mongo_collection('dailyreadiness')
-    stats_collection = get_mongo_collection('athletestats')
-    completed_exercises_collection = get_mongo_collection('completedexercises')
-
     mongo_database = get_mongo_database()
-    plan_collection_test = mongo_database['dailyPlanTest']
-    readiness_collection_test = mongo_database['dailyReadinessTest']
     stats_collection_test = mongo_database['athleteStatsTest']
-    # completed_exercises_collection_test = mongo_database['completedExercisesTest']
 
+    # Datastores for personas collections
+    athlete_stats_datastore_test = AthleteStatsDatastore(mongo_collection='athletestatstest')
+    rs_datastore_test = DailyReadinessDatastore(mongo_collection='dailyreadinesstest')
+    daily_plan_datastore_test = DailyPlanDatastore(mongo_collection='dailyplantest')
+    # completed_exercises_datastore_test = CompletedExerciseDatastore(get_mongo_collection='completedexercisestest')
 
-    if "copy_all" in request.json and request.json["copy_all"]:
-        athlete_stats_datastore = AthleteStatsDatastore()
+    # datastores to copy data to
+    athlete_stats_datastore = AthleteStatsDatastore()
+    rs_datastore = DailyReadinessDatastore()
+    daily_plan_datastore = DailyPlanDatastore()
+    completed_exercises_datastore = CompletedExerciseDatastore()
+
+    if request.json["copy_all"]:
         mongo_results = stats_collection_test.find()
         athlete_stats = []
         for mongo_result in mongo_results:
-            athlete_stats.append(athlete_stats_datastore.get_athlete_stats_from_mongo(mongo_result))
-        all_users = [stat.athlete_id for stat in athlete_stats]
-        # get data from test collections
-        rs_datastore = DailyReadinessDatastore()
-        readiness_surveys = rs_datastore.get(all_users,
-                                             last_only=False,
-                                             mongo_collection=readiness_collection_test)
-        daily_plan_datastore = DailyPlanDatastore()
-        daily_plans = daily_plan_datastore.get(all_users,
-                                               mongo_collection=plan_collection_test)
+            athlete_stats.append(athlete_stats_datastore_test.get_athlete_stats_from_mongo(mongo_result))
+        user_id = [stat.athlete_id for stat in athlete_stats]
     else:
-        # clear all existing data
-        readiness_collection.delete_many({"user_id": user_id})
-        plan_collection.delete_many({"user_id": user_id})
-        completed_exercises_collection.delete_many({"athlete_id": user_id})
-        stats_collection.delete_one({"athlete_id": user_id})
-        # get data from test collections
-        rs_datastore = DailyReadinessDatastore()
-        readiness_surveys = rs_datastore.get(user_id,
-                                             last_only=False,
-                                             mongo_collection=readiness_collection_test)
-        if len(readiness_surveys) == 0:
-            raise ForbiddenException("User not present in personas")
-        daily_plan_datastore = DailyPlanDatastore()
-        daily_plans = daily_plan_datastore.get(user_id,
-                                               mongo_collection=plan_collection_test)
-        athlete_stats_datastore = AthleteStatsDatastore()
-        athlete_stats = [athlete_stats_datastore.get(user_id,
-                                                     mongo_collection=stats_collection_test)]
+        athlete_stats = [athlete_stats_datastore_test.get(user_id)]
 
+    # clear all existing data
+    rs_datastore.delete(user_id=user_id)
+    daily_plan_datastore.delete(user_id=user_id)
+    completed_exercises_datastore.delete(athlete_id=user_id)
+    athlete_stats_datastore.delete(athlete_id=user_id)
+
+    # get data from test collections
+    readiness_surveys = rs_datastore_test.get(user_id, last_only=False)
+    if len(readiness_surveys) == 0:
+        raise ForbiddenException("No data present to copy")
+    daily_plans = daily_plan_datastore_test.get(user_id)
+
+    # update to current date
     update_dates(readiness_surveys, daily_plans, athlete_stats, event_date)
+
+    # write the updated data
     rs_datastore.put(readiness_surveys)
     daily_plan_datastore.put(daily_plans)
     athlete_stats_datastore.put(athlete_stats)
@@ -222,5 +214,3 @@ def update_dates(rs_surveys, daily_plans, athlete_stats, event_date):
         plan.event_date = format_date(parse_date(plan.event_date) + datetime.timedelta(days=day_diff))
     for stat in athlete_stats:
         stat.event_date = format_date(event_date)
-
-

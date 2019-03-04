@@ -38,6 +38,11 @@ def get_mongo_database():
         os.environ["MONGO_COLLECTION_APPLOGS"] = config['collection_applogs']
         os.environ["MONGO_COLLECTION_HEARTRATE"] = config['collection_heartrate']
         os.environ["MONGO_COLLECTION_SLEEPHISTORY"] = config['collection_sleephistory']
+
+        os.environ["MONGO_COLLECTION_DAILYREADINESSTEST"] = config['collection_dailyreadinesstest']
+        os.environ["MONGO_COLLECTION_DAILYPLANTEST"] = config['collection_dailyplantest']
+        os.environ["MONGO_COLLECTION_ATHLETESTATSTEST"] = config['collection_athletestatstest']
+        os.environ["MONGO_COLLECTION_COMPLETEDEXERCISESTEST"] = config['collection_completedexercisestest']
     
         host = Config.get('MONGO_HOST')
         replicaset = Config.get('MONGO_REPLICASET')

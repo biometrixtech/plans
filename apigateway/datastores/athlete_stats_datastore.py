@@ -9,11 +9,12 @@ import numbers
 
 
 class AthleteStatsDatastore(object):
-    mongo_collection = 'athletestats'
+    def __init__(self, mongo_collection='athletestats'):
+        self.mongo_collection = mongo_collection
 
     @xray_recorder.capture('datastore.AthlteStatsDatastore.get')
-    def get(self, athlete_id, mongo_collection=None):
-        return self._query_mongodb(athlete_id, mongo_collection)
+    def get(self, athlete_id):
+        return self._query_mongodb(athlete_id)
 
     def put(self, items):
         if not isinstance(items, list):
@@ -24,10 +25,14 @@ class AthleteStatsDatastore(object):
         except Exception as e:
             raise e
 
+    def delete(self, athlete_id=None):
+        if athlete_id is None:
+            raise InvalidSchemaException("Need to provide athlete_id to delete")
+        self._delete_mongodb(athlete_id=athlete_id)
+
     @xray_recorder.capture('datastore.AthleteStatsDatastore._query_mongodb')
-    def _query_mongodb(self, athlete_id, mongo_collection):
-        if mongo_collection is None:
-            mongo_collection = get_mongo_collection(self.mongo_collection)
+    def _query_mongodb(self, athlete_id):
+        mongo_collection = get_mongo_collection(self.mongo_collection)
         if isinstance(athlete_id, list):
             query = {'athlete_id': {'$in': athlete_id}}
             mongo_results = mongo_collection.find(query)
@@ -119,6 +124,17 @@ class AthleteStatsDatastore(object):
         mongo_collection = get_mongo_collection(self.mongo_collection)
         query = {'athlete_id': item['athlete_id']}
         mongo_collection.replace_one(query, item, upsert=True)
+
+    @xray_recorder.capture('datastore.AthleteStatsDatastore._delete_mongodb')
+    def _delete_mongodb(self, athlete_id):
+        mongo_collection = get_mongo_collection(self.mongo_collection)
+        query = {}
+        if isinstance(athlete_id, list):
+            query['athlete_id'] = {'$in': athlete_id}
+        else:
+            query['athlete_id'] = athlete_id
+        if len(query) > 0:
+            mongo_collection.delete_many(query)
 
     def _standard_error_from_monogodb(self, std_error):
 
