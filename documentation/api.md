@@ -43,6 +43,7 @@
     - [Misc](#misc)
       - [Clear user's data](#clear-users-data)
       - [Log App/Device information](#log-appdevice-information)
+      - [Copy test user's data](#copy-test-users-data)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -1500,6 +1501,42 @@ Authorization: eyJraWQ...ajBc4VQ
 }
 ```
 
+#### Copy test user's data
+This endpoint can used to copy test user's data to create personas to test different scenarios. Note that his endpoint is restricted to dev and test environment to specific test accounts.
+
+##### Query String
+The client __must__ submit a request to the endpoint `/plans/version/misc/copy_test_data`. The request method __must__ be `POST`.
+
+##### Request
+The client __must__ submit a request body containing a JSON object with the following schema:
+```
+{
+    "event_date": Datetime,
+    "copy_all": Boolean
+}
+```
+* `event_date` __should__ reflect the local date and time when the request was made
+* `cop_all` __should__ be true if trying to copy/reset data for all personas. Setting it false would only copy/reset data for the persona logged in.
+
+```
+POST /plans/version/misc/copy_test_data HTTPS/1.1
+Host: apis.env.fathomai.com
+Content-Type: application/json
+Authorization: eyJraWQ...ajBc4VQ
+
+{
+    "event_date": "2018-08-13T11:12:30Z",
+    "copy_all": true
+}
+```
+##### Responses
+ If copying data was successful, the Service __will__ respond with HTTP Status `202 Accepted`, with a body with the following syntax:
+ 
+```
+{
+    "message": "success"
+}
+```
 
 
 
