@@ -376,16 +376,16 @@ The client __must__ submit a request body containing a JSON object with the foll
 }
 ```
 * `event_date` __should__ reflect the start time of the session (health data) or default date (manually logged session)
-* `end_date` __shole__ reflect the end time of the session (health data) or be null (manually logged session)
+* `end_date` is __optional__ parameter that reflects the end time of the session for health data
 * `session_type` __should__ be an integer reflecting SessionType enumeration. NOTE: We'll only use 6 moving forward
 * `sport_name` __should__ be an integer reflecting SportName enumeration.
-* `duration` __should__ be in minutes and reflect the duration which the user confirmend (health data) or entered (manually logged session)
-* `calories` __should__ be calorie information obtained from health workout
-* `distance` __should__ be distance information obtained from health workout
-* `source` __should__ be 0 for manually logged session and 1 for health data
-* `deleted` __should__ be true if the user deletes the workout detected from health app
-* `ignored` __should__ be true for short walking workouts.
-* `hr_data` __should__ be the heart rate data associated with the health workout. each hr will have `startDate`, `endDate` and `value`
+* `duration` __should__ be in minutes and reflect the duration which the user confirmend (health data) or entered (manually logged session).
+* `calories` __if present__, __should__ be calorie information obtained from health workout _(only needed for health workout)_
+* `distance` __if present__, __should__ be distance information obtained from health workout _(only needed for health workout)_
+* `source` __if present__, __should__ be 0 for manually logged session and 1 for health data
+* `deleted` __if present__, __should__ be true if the user deletes the workout detected from health app
+* `ignored` __if present__, __should__ be true for short walking workouts.
+* `hr_data` __if present__, __should__ be the heart rate data associated with the health workout. each hr will have `startDate`, `endDate` and `value` _(only needed for health workout)_
 * `description` is __optional__ parameter to provide short description of the session they're adding
 
 ```
