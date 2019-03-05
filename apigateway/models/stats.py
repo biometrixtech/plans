@@ -78,7 +78,7 @@ class AthleteStats(Serialisable):
         soreness_calc = SorenessCalculator()
 
         for h in self.historic_soreness:
-            if (h.body_part_location == soreness.body_part.location.value and
+            if (h.body_part_location == soreness.body_part.location and
                     h.side == soreness.side and h.is_pain == soreness.pain):
                 # was historic_soreness already updated today?
                 if format_date(event_date) != h.last_reported: #not updated
