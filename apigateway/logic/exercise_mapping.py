@@ -207,7 +207,6 @@ class ExerciseAssignmentCalculator(object):
                                 return proposed_exercise
                         else:
                             return proposed_exercise
-            
                 else:
                     return target_exercise
 
@@ -217,7 +216,7 @@ class ExerciseAssignmentCalculator(object):
 
         # body_parts = []
 
-        general = models.soreness.BodyPart(models.soreness.BodyPartLocation.general, 15)
+        general = models.soreness.BodyPart(models.soreness.BodyPartLocation.general, 21)
 
         general.inhibit_exercises.append(AssignedExercise("48", general.treatment_priority, 1))
         general.inhibit_exercises.append(AssignedExercise("3", general.treatment_priority, 2))
@@ -390,8 +389,24 @@ class ExerciseAssignmentCalculator(object):
         else:
             return  False
 
+    def get_wrist_exercises(self, soreness):
+        wrist = models.soreness.BodyPart(models.soreness.BodyPartLocation.wrist, self.get_body_part_priority(20, soreness))
+        inhibit = self.get_exercise_dictionary(["243", "244", "245"])
+        lengthen = self.get_exercise_dictionary(["246", "247", "248"])
+        activate = self.get_exercise_dictionary(["249", "250", "251", "252", "253", "254"])
+        wrist.add_exercise_phases(inhibit, lengthen, activate)
+        return wrist
+
+    def get_elbow_exercises(self, soreness):
+        elbow = models.soreness.BodyPart(models.soreness.BodyPartLocation.elbow, self.get_body_part_priority(19, soreness))
+        inhibit = self.get_exercise_dictionary(["243", "244", "245"])
+        lengthen = self.get_exercise_dictionary(["246", "247", "248"])
+        activate = self.get_exercise_dictionary(["249", "250", "251", "252", "253", "254"])
+        elbow.add_exercise_phases(inhibit, lengthen, activate)
+        return elbow
+
     def get_achilles_exercises(self, soreness):
-        achilles = models.soreness.BodyPart(models.soreness.BodyPartLocation.achilles, self.get_body_part_priority(15, soreness))
+        achilles = models.soreness.BodyPart(models.soreness.BodyPartLocation.achilles, self.get_body_part_priority(18, soreness))
 
         injury_history_present = self.is_soreness_historic(soreness)
 
@@ -414,18 +429,43 @@ class ExerciseAssignmentCalculator(object):
         return achilles
 
     def get_foot_exercises(self, soreness):
-        foot = models.soreness.BodyPart(models.soreness.BodyPartLocation.foot, self.get_body_part_priority(14, soreness))
+        foot = models.soreness.BodyPart(models.soreness.BodyPartLocation.foot, self.get_body_part_priority(17, soreness))
         inhibit = self.get_exercise_dictionary(["74", "2", "71", "73", "3"])
         lengthen = self.get_exercise_dictionary(["7", "9"])
         activate = self.get_exercise_dictionary(["53", "75", "115", "106"])
         foot.add_exercise_phases(inhibit, lengthen, activate)
         return foot
 
+
+    def get_chest_exercises(self, soreness):
+        chest = models.soreness.BodyPart(models.soreness.BodyPartLocation.pecs, self.get_body_part_priority(16, soreness))
+        inhibit = self.get_exercise_dictionary(["55", "102"])
+        lengthen = self.get_exercise_dictionary(["57", "238"])
+        activate = self.get_exercise_dictionary(["239", "240", "241"])
+        chest.add_exercise_phases(inhibit, lengthen, activate)
+        return chest
+
+    def get_lats_exercises(self, soreness):
+        lats = models.soreness.BodyPart(models.soreness.BodyPartLocation.lats, self.get_body_part_priority(15, soreness))
+        inhibit = self.get_exercise_dictionary(["55", "102"])
+        lengthen = self.get_exercise_dictionary(["57", "238"])
+        activate = self.get_exercise_dictionary(["239", "240", "241"])
+        lats.add_exercise_phases(inhibit, lengthen, activate)
+        return lats
+
+    def get_shoulder_exercises(self, soreness):
+        shoulder = models.soreness.BodyPart(models.soreness.BodyPartLocation.shoulder, self.get_body_part_priority(14, soreness))
+        inhibit = self.get_exercise_dictionary(["55", "102"])
+        lengthen = self.get_exercise_dictionary(["57", "238"])
+        activate = self.get_exercise_dictionary(["239", "240", "241"])
+        shoulder.add_exercise_phases(inhibit, lengthen, activate)
+        return shoulder
+
     def get_upper_back_neck_exercises(self, soreness):
         upper_back_neck = models.soreness.BodyPart(models.soreness.BodyPartLocation.upper_back_neck, self.get_body_part_priority(13, soreness))
         inhibit = self.get_exercise_dictionary(["102", "55", "125", "126"])
-        lengthen = self.get_exercise_dictionary(["127", "128", "129", "130", "103"])
-        activate = self.get_exercise_dictionary(["131", "134", "132", "133", "135", "137"])
+        lengthen = self.get_exercise_dictionary(["127", "128", "129", "130", "103", "238"])
+        activate = self.get_exercise_dictionary(["131", "134", "132", "133", "135", "137", "242"])
         upper_back_neck.add_exercise_phases(inhibit, lengthen, activate)
         return upper_back_neck
 
@@ -639,7 +679,7 @@ class ExerciseAssignmentCalculator(object):
                 soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_soreness or
                 soreness.historic_soreness_status == HistoricSorenessStatus.persistent_soreness or
                 soreness.historic_soreness_status == HistoricSorenessStatus.almost_persistent_2_soreness):
-                return base_priority - 19  # reduces ranking by length of body part enumerations
+                return base_priority - 22  # reduces ranking by length of body part enumerations
         else:
             return base_priority
 

@@ -13,6 +13,7 @@ from datastores.datastore_collection import DatastoreCollection
 def add_xray_support(request):
     os.environ["ENVIRONMENT"] = "dev"
 
+    xray_recorder.configure(sampling=False)
     xray_recorder.begin_segment(name="test")
 
     config = get_secret('mongo')
@@ -57,3 +58,23 @@ def test_multi_athlete_stats_query():
     athlete_stats_datastore = AthleteStatsDatastore()
     athlete_stats_retrieved = athlete_stats_datastore.get(user_id)
     assert None is not athlete_stats_retrieved
+
+
+def test_delete_athlete_stats_one():
+    athlete_dao = AthleteStatsDatastore(mongo_collection='athletestatstest')
+    existing_stats = athlete_dao.get(athlete_id="persona1")
+    athlete_dao.delete(athlete_id='persona1')
+    new_stats = athlete_dao.get("persona1")
+    athlete_dao.put(existing_stats)
+
+    assert new_stats is None
+
+def test_delete_athlete_stats_multi_users():
+    athlete_dao = AthleteStatsDatastore(mongo_collection='athletestatstest')
+    users = ['persona1', 'persona2']
+    existing_stats = athlete_dao.get(athlete_id=users)
+    athlete_dao.delete(athlete_id=users)
+    new_stats = athlete_dao.get(athlete_id=users)
+    athlete_dao.put(existing_stats)
+
+    assert len(new_stats) == 0

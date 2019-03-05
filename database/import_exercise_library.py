@@ -2,6 +2,7 @@ import csv
 #import exercise_generator
 #import database_config  # not committed to source code, contains connection string
 from aws_xray_sdk.core import xray_recorder
+xray_recorder.configure(sampling=False)
 xray_recorder.begin_segment(name="test")
 from config import get_mongo_collection
 import models.exercise

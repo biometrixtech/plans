@@ -7,7 +7,8 @@ import models.exercise as exercise
 from models.post_session_survey import PostSurvey
 
 class DailyPlanDatastore(object):
-    mongo_collection = 'dailyplan'
+    def __init__(self, mongo_collection='dailyplan'):
+        self.mongo_collection = mongo_collection
 
     def get(self, user_id=None, start_date=None, end_date=None, day_of_week=None):
         return self._query_mongodb(user_id, start_date, end_date, day_of_week)
@@ -21,21 +22,30 @@ class DailyPlanDatastore(object):
         except Exception as e:
             raise e
 
+    def delete(self, items=None, user_id=None, start_date=None, end_date=None):
+        if items is None and user_id is None:
+            raise InvalidSchemaException("Need to provide one of items and user_id")
+        if items is not None:
+            if not isinstance(items, list):
+                items = [items]
+            for item in items:
+                self._delete_mongodb(item=item, user_id=user_id, start_date=start_date, end_date=end_date)
+        else:
+            self._delete_mongodb(item=items, user_id=user_id, start_date=start_date, end_date=end_date)
+
     @xray_recorder.capture('datastore.DailyPlanDatastore._query_mongodb')
     def _query_mongodb(self, user_id, start_date, end_date, day_of_week):
         mongo_collection = get_mongo_collection(self.mongo_collection)
-        if day_of_week is None:
-            if isinstance(user_id, list):
-                query0 = {'user_id': {'$in': user_id}, 'date': {'$gte': start_date, '$lte': end_date}}
-            else:
-                query0 = {'user_id': user_id, 'date': {'$gte': start_date, '$lte': end_date}}
-            # query1 = {'_id': 0, 'last_reported': 0, 'user_id': 0}
+        query = {}
+        if isinstance(user_id, list):
+            query['user_id'] = {'$in': user_id}
         else:
-            if isinstance(user_id, list):
-                query0 = {'user_id': {'$in': user_id}, 'date': {'$gte': start_date, '$lte': end_date}, 'day_of_week': day_of_week}
-            else:
-                query0 = {'user_id': user_id, 'date': {'$gte': start_date, '$lte': end_date}, 'day_of_week': day_of_week}
-        mongo_cursor = mongo_collection.find(query0)
+            query['user_id'] = user_id
+        if start_date is not None and end_date is not None:
+            query['date'] = {'$gte': start_date, '$lte': end_date}
+        if day_of_week is not None:
+            query['day_of_week'] = day_of_week
+        mongo_cursor = mongo_collection.find(query)
         ret = []
 
         for plan in mongo_cursor:
@@ -85,7 +95,6 @@ class DailyPlanDatastore(object):
             plan.user_id = user_id
             plan.last_sensor_sync = self.get_last_sensor_sync(user_id, end_date)
             ret.append(plan)
-
         return ret
 
     @xray_recorder.capture('datastore.DailyPlanDatastore._put_mongodb')
@@ -94,6 +103,23 @@ class DailyPlanDatastore(object):
         query = {'user_id': item.user_id, 'date': item.event_date}
         collection.replace_one(query, item.json_serialise(), upsert=True)
 
+    @xray_recorder.capture('datastore.DailyPlanDatastore._delete_mongodb')
+    def _delete_mongodb(self, item, user_id, start_date, end_date):
+        mongo_collection = get_mongo_collection(self.mongo_collection)
+        query = {}
+        if item is not None:
+            query['user_id'] = item.user_id
+            query['date'] = item.event_date
+        else:
+            if isinstance(user_id, list):
+                query['user_id'] = {'$in': user_id}
+            else:
+                query['user_id'] = user_id
+            if start_date is not None and end_date is not None:
+                query['date'] = {'$gte': start_date, '$lte': end_date}
+
+        if len(query) > 0:
+            mongo_collection.delete_many(query)
 
     def get_last_sensor_sync(self, user_id, event_date):
         mongo_collection = get_mongo_collection(self.mongo_collection)

@@ -2,11 +2,12 @@ from aws_xray_sdk.core import xray_recorder
 from config import get_mongo_collection
 from models.daily_readiness import DailyReadiness
 from utils import format_datetime, parse_datetime
-from fathomapi.utils.exceptions import NoSuchEntityException
+from fathomapi.utils.exceptions import NoSuchEntityException, InvalidSchemaException
 
 
 class DailyReadinessDatastore(object):
-    mongo_collection = 'dailyreadiness'
+    def __init__(self, mongo_collection='dailyreadiness'):
+        self.mongo_collection = mongo_collection
 
     @xray_recorder.capture('datastore.DailyReadinessDatastore.get')
     def get(self, user_id, start_date=None, end_date=None, last_only=True):
@@ -21,24 +22,31 @@ class DailyReadinessDatastore(object):
         except Exception as e:
             raise e
 
+    def delete(self, items=None, user_id=None, start_date=None, end_date=None):
+        if items is None and user_id is None:
+            raise InvalidSchemaException("Need to provide one of items and user_id")
+        if items is not None:
+            if not isinstance(items, list):
+                items = [items]
+            for item in items:
+                self._delete_mongodb(item=item, user_id=user_id, start_date=start_date, end_date=end_date)
+        else:
+            self._delete_mongodb(item=items, user_id=user_id, start_date=start_date, end_date=end_date)
+
     @xray_recorder.capture('datastore.DailyReadinessDatastore._query_mongodb')
     def _query_mongodb(self, user_id, start_date_time, end_date_time, last_only):
         mongo_collection = get_mongo_collection(self.mongo_collection)
-        if start_date_time is None and end_date_time is None:
-            if isinstance(user_id, list):
-                query = {'user_id': {'$in': user_id}}
-            else:
-                query = {'user_id': user_id}
+        query = {}
+        if isinstance(user_id, list):
+            query['user_id'] = {'$in': user_id}
         else:
+            query['user_id'] = user_id
+        if start_date_time is not None and end_date_time is not None:
             start_date_time = format_datetime(start_date_time)
             end_date_time = format_datetime(end_date_time)
-            if isinstance(user_id, list):
-                query = {'user_id': {'$in': user_id}, 'event_date': {'$gte': start_date_time, '$lte': end_date_time}}
-            else:
-                query = {'user_id': user_id, 'event_date': {'$gte': start_date_time, '$lte': end_date_time}}
+            query['event_date'] = {'$gte': start_date_time, '$lte': end_date_time}
         if last_only:
             mongo_result = mongo_collection.find_one(query, sort=[('event_date', -1)])
-
             if mongo_result is not None:
                 return [DailyReadiness(
                                       event_date=mongo_result['event_date'],
@@ -74,3 +82,23 @@ class DailyReadinessDatastore(object):
         mongo_collection = get_mongo_collection(self.mongo_collection)
         query = {'user_id': item['user_id'], 'event_date': format_datetime(item['event_date'])}
         mongo_collection.replace_one(query, item, upsert=True)
+
+    @xray_recorder.capture('datastore.DailyReadinessDatastore._delete_mongodb')
+    def _delete_mongodb(self, item, user_id, start_date, end_date):
+        mongo_collection = get_mongo_collection(self.mongo_collection)
+        query = {}
+        if item is not None:
+            query['user_id'] = item.user_id
+            query['event_date'] = format_datetime(item.event_date)
+        else:
+            if isinstance(user_id, list):
+                query['user_id'] = {'$in': user_id}
+            else:
+                query['user_id'] = user_id
+            if start_date is not None and end_date is not None:
+                start_date = format_datetime(start_date)
+                end_date = format_datetime(end_date)
+                query['event_date'] = {'$gte': start_date, '$lte': end_date}
+
+        if len(query) > 0:
+            mongo_collection.delete_many(query)
