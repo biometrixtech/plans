@@ -43,6 +43,7 @@
     - [Misc](#misc)
       - [Clear user's data](#clear-users-data)
       - [Log App/Device information](#log-appdevice-information)
+      - [Copy test user's data](#copy-test-users-data)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -375,16 +376,16 @@ The client __must__ submit a request body containing a JSON object with the foll
 }
 ```
 * `event_date` __should__ reflect the start time of the session (health data) or default date (manually logged session)
-* `end_date` __shole__ reflect the end time of the session (health data) or be null (manually logged session)
+* `end_date` is __optional__ parameter that reflects the end time of the session for health data
 * `session_type` __should__ be an integer reflecting SessionType enumeration. NOTE: We'll only use 6 moving forward
 * `sport_name` __should__ be an integer reflecting SportName enumeration.
-* `duration` __should__ be in minutes and reflect the duration which the user confirmend (health data) or entered (manually logged session)
-* `calories` __should__ be calorie information obtained from health workout
-* `distance` __should__ be distance information obtained from health workout
-* `source` __should__ be 0 for manually logged session and 1 for health data
-* `deleted` __should__ be true if the user deletes the workout detected from health app
-* `ignored` __should__ be true for short walking workouts.
-* `hr_data` __should__ be the heart rate data associated with the health workout. each hr will have `startDate`, `endDate` and `value`
+* `duration` __should__ be in minutes and reflect the duration which the user confirmend (health data) or entered (manually logged session).
+* `calories` __if present__, __should__ be calorie information obtained from health workout _(only needed for health workout)_
+* `distance` __if present__, __should__ be distance information obtained from health workout _(only needed for health workout)_
+* `source` __if present__, __should__ be 0 for manually logged session and 1 for health data
+* `deleted` __if present__, __should__ be true if the user deletes the workout detected from health app
+* `ignored` __if present__, __should__ be true for short walking workouts.
+* `hr_data` __if present__, __should__ be the heart rate data associated with the health workout. each hr will have `startDate`, `endDate` and `value` _(only needed for health workout)_
 * `description` is __optional__ parameter to provide short description of the session they're adding
 
 ```
@@ -1500,6 +1501,42 @@ Authorization: eyJraWQ...ajBc4VQ
 }
 ```
 
+#### Copy test user's data
+This endpoint can used to copy test user's data to create personas to test different scenarios. Note that his endpoint is restricted to dev and test environment to specific test accounts.
+
+##### Query String
+The client __must__ submit a request to the endpoint `/plans/version/misc/copy_test_data`. The request method __must__ be `POST`.
+
+##### Request
+The client __must__ submit a request body containing a JSON object with the following schema:
+```
+{
+    "event_date": Datetime,
+    "copy_all": Boolean
+}
+```
+* `event_date` __should__ reflect the local date and time when the request was made
+* `cop_all` __should__ be true if trying to copy/reset data for all personas. Setting it false would only copy/reset data for the persona logged in.
+
+```
+POST /plans/version/misc/copy_test_data HTTPS/1.1
+Host: apis.env.fathomai.com
+Content-Type: application/json
+Authorization: eyJraWQ...ajBc4VQ
+
+{
+    "event_date": "2018-08-13T11:12:30Z",
+    "copy_all": true
+}
+```
+##### Responses
+ If copying data was successful, the Service __will__ respond with HTTP Status `202 Accepted`, with a body with the following syntax:
+ 
+```
+{
+    "message": "success"
+}
+```
 
 
 
