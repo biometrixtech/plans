@@ -66,10 +66,10 @@ class RecoveryTextGenerator(object):
 
         side_text = ""
 
-        if side is not None or side == 1:
-            side_text == "left "
+        if side == 1:
+            side_text = "left "
         elif side == 2:
-            side_text == "right "
+            side_text = "right "
 
         if body_part_location == BodyPartLocation.achilles:
             return side_text + "achilles"
@@ -100,15 +100,19 @@ class RecoveryTextGenerator(object):
         elif body_part_location == BodyPartLocation.hip_flexor:
             return side_text + "hip"
         elif body_part_location == BodyPartLocation.chest:
-            return "chest"
+            return side_text + "pecs"
         elif body_part_location == BodyPartLocation.head:
             return "head"
         elif body_part_location == BodyPartLocation.shoulder:
             return side_text + "shoulder"
         elif body_part_location == BodyPartLocation.upper_back_neck:
             return "upper back/neck"
-        elif body_part_location == BodyPartLocation.general:
-            return ""
+        elif body_part_location == BodyPartLocation.lats:
+            return side_text + "lats"
+        elif body_part_location == BodyPartLocation.wrist:
+            return side_text + "wrist"
+        elif body_part_location == BodyPartLocation.elbow:
+            return side_text + "elbow"
 
     def get_soreness_4_text(self, body_part_text):
         return "Based on the discomfort reporting at your " + body_part_text + " we recommend you rest and " \

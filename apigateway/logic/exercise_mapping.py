@@ -375,6 +375,26 @@ class ExerciseAssignmentCalculator(object):
 
             return self.get_achilles_exercises(soreness)
 
+        elif soreness.body_part.location == BodyPartLocation.elbow:
+
+            return self.get_elbow_exercises(soreness)
+
+        elif soreness.body_part.location == BodyPartLocation.wrist:
+
+            return self.get_wrist_exercises(soreness)
+
+        elif soreness.body_part.location == BodyPartLocation.shoulder:
+
+            return self.get_shoulder_exercises(soreness)
+
+        elif soreness.body_part.location == BodyPartLocation.lats:
+
+            return self.get_lats_exercises(soreness)
+
+        elif soreness.body_part.location == BodyPartLocation.chest:
+
+            return self.get_chest_exercises(soreness)
+
     def is_soreness_historic(self, soreness):
 
         if (soreness.historic_soreness_status == HistoricSorenessStatus.almost_persistent_2_pain or
@@ -438,7 +458,7 @@ class ExerciseAssignmentCalculator(object):
 
 
     def get_chest_exercises(self, soreness):
-        chest = models.soreness.BodyPart(models.soreness.BodyPartLocation.pecs, self.get_body_part_priority(16, soreness))
+        chest = models.soreness.BodyPart(models.soreness.BodyPartLocation.chest, self.get_body_part_priority(16, soreness))
         inhibit = self.get_exercise_dictionary(["55", "102"])
         lengthen = self.get_exercise_dictionary(["57", "238"])
         activate = self.get_exercise_dictionary(["239", "240", "241"])
