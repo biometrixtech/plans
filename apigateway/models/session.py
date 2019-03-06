@@ -432,6 +432,20 @@ class RecoverySession(Serialisable):
         self.lengthen_target_minutes = 0
         self.activate_target_minutes = 0
         self.integrate_target_minutes = 0
+
+        # new modalities
+        self.dynamic_movement_exercises = []
+        self.dynamic_flexibility_exercises = []
+        self.static_stretch_exercises = []
+        self.active_stretch_exercises = []
+        self.heat_minutes = 0
+        self.ice_minutes = 0
+        self.cold_water_immersion_minutes = 0
+        self.dynamic_movement_minutes = 0
+        self.dynamic_flexibility_minutes = 0
+        self.static_stretch_minutes = 0
+        self.active_stretch_minutes = 0
+
         self.inhibit_iterations = 0
         self.lengthen_iterations = 0
         self.activate_iterations = 0
