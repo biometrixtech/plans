@@ -5,6 +5,7 @@ from models.session import StrengthConditioningType
 from utils import format_date, parse_date
 from models.soreness import HistoricSorenessStatus
 from logic.soreness_processing import SorenessCalculator
+from fathomapi.utils.exceptions import InvalidSchemaException
 
 
 class AthleteStats(Serialisable):
@@ -77,14 +78,14 @@ class AthleteStats(Serialisable):
         soreness_calc = SorenessCalculator()
 
         for h in self.historic_soreness:
-            if (h.body_part_location == soreness.body_part.location.value and
+            if (h.body_part_location == soreness.body_part.location and
                     h.side == soreness.side and h.is_pain == soreness.pain):
                 # was historic_soreness already updated today?
                 if format_date(event_date) != h.last_reported: #not updated
                     if h.is_pain:
                         if h.historic_soreness_status == HistoricSorenessStatus.almost_persistent_pain:
                             h.historic_soreness_status = HistoricSorenessStatus.persistent_pain
-                        elif h.historic_soreness_status == HistoricSorenessStatus.almost_persistent_2_pain:
+                        elif h.historic_soreness_status in [HistoricSorenessStatus.almost_persistent_2_pain, HistoricSorenessStatus.almost_persistent_2_pain_acute]:
                             h.historic_soreness_status = HistoricSorenessStatus.persistent_2_pain
                         else:
                             break
@@ -266,24 +267,32 @@ class AthleteStats(Serialisable):
         elif name == "current_position":
             if self.current_sport_name.value is None and value is not None:
                 value = StrengthConditioningType(value)
-            elif self.current_sport_name == SportName.soccer:
-                value = SoccerPosition(value)
-            elif self.current_sport_name == SportName.basketball:
-                value = BasketballPosition(value)
-            elif self.current_sport_name == SportName.baseball:
-                value = BaseballPosition(value)
-            elif self.current_sport_name == SportName.softball:
-                value = SoftballPosition(value)
-            elif self.current_sport_name == SportName.football:
-                value = FootballPosition(value)
-            elif self.current_sport_name == SportName.lacrosse:
-                value = LacrossePosition(value)
-            elif self.current_sport_name == SportName.field_hockey:
-                value = FieldHockeyPosition(value)
-            elif self.current_sport_name == SportName.track_field:
-                value = TrackAndFieldPosition(value)
-            elif self.current_sport_name == SportName.volleyball:
-                value = VolleyballPosition(value)
+            else:
+                try:
+                    if self.current_sport_name == SportName.soccer:
+                        value = SoccerPosition(value)
+                    elif self.current_sport_name == SportName.basketball:
+                        value = BasketballPosition(value)
+                    elif self.current_sport_name == SportName.baseball:
+                        value = BaseballPosition(value)
+                    elif self.current_sport_name == SportName.softball:
+                        value = SoftballPosition(value)
+                    elif self.current_sport_name == SportName.football:
+                        value = FootballPosition(value)
+                    elif self.current_sport_name == SportName.lacrosse:
+                        value = LacrossePosition(value)
+                    elif self.current_sport_name == SportName.field_hockey:
+                        value = FieldHockeyPosition(value)
+                    elif self.current_sport_name == SportName.track_field:
+                        value = TrackAndFieldPosition(value)
+                    elif self.current_sport_name == SportName.volleyball:
+                        value = VolleyballPosition(value)
+                    elif value is not None:
+                            raise InvalidSchemaException("Positions do not exist for the provided sport")
+                except ValueError:
+                    raise InvalidSchemaException("Position is required for the provided sport")
+                except InvalidSchemaException:
+                    raise
         super().__setattr__(name, value)
 
     def json_serialise(self):

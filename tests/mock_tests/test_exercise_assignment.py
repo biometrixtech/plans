@@ -251,6 +251,17 @@ def test_recovery_session_exercises_assigned():
     assert True is (len(exercise_assignments.lengthen_exercises) > 0)
     assert True is (len(exercise_assignments.activate_exercises) > 0)
 
+def test_recovery_session_exercises_assigned_chest():
+    calc = exercise_mapping.ExerciseAssignmentCalculator("test_user", exercise_library_datastore,
+                                                         completed_exercise_datastore, False)
+    soreness_list = soreness_one_body_part(2, 1)    # chest
+    target_recovery_session = recovery_session(soreness_one_body_part(12, 1), 15, 1)
+    exercise_assignments = calc.create_exercise_assignments(target_recovery_session, soreness_list,
+                                                            get_trigger_date_time(), 15)
+    assert True is (len(exercise_assignments.inhibit_exercises) > 0)
+    assert True is (len(exercise_assignments.lengthen_exercises) > 0)
+    assert True is (len(exercise_assignments.activate_exercises) > 0)
+
 def test_recovery_session_exercises_assigned_2_body_parts():
     calc = exercise_mapping.ExerciseAssignmentCalculator("test_user", exercise_library_datastore,
                                                          completed_exercise_datastore, False)

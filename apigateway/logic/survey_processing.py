@@ -133,7 +133,7 @@ class SurveyProcessing(object):
             severity = q3_response.get('severity', 0) # don't error out because of mobile bug
             movement = q3_response.get('movement', None)
             pain = q3_response.get('pain', False)
-            status = q3_response.get('status', HistoricSorenessStatus.dormant_cleared)
+            status = q3_response.get('status', 'dormant_cleared')
             if severity == 0:
                 pain = True if "pain" in status else False
             if severity > 0:

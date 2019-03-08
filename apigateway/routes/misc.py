@@ -1,8 +1,11 @@
 from flask import request, Blueprint
 import datetime
 import os
-from utils import format_date, parse_datetime
-
+from utils import format_date, parse_datetime, parse_date
+from datastores.daily_readiness_datastore import DailyReadinessDatastore
+from datastores.daily_plan_datastore import DailyPlanDatastore
+from datastores.athlete_stats_datastore import AthleteStatsDatastore
+from datastores.completed_exercise_datastore import CompletedExerciseDatastore
 from config import get_mongo_collection, get_mongo_database
 from fathomapi.api.config import Config
 from fathomapi.comms.service import Service
@@ -124,7 +127,7 @@ def handle_data_migration():
     mongo_collection = mongo_database['twoMinuteStats']
     mongo_collection.update_many(query, {'$set': {'userId': user_id}})
 
-    return {'message': 'success'}, 202
+    return {'message': 'success'}, 200
 
 
 @app.route('/app_logs', methods=['POST'])
@@ -144,4 +147,70 @@ def handle_app_open_tracking(principal_id=None):
     return {'message': 'success'}, 200
 
 
+@app.route('/copy_test_data', methods=['POST'])
+@require.authenticated.any
+@xray_recorder.capture('routes.misc.copy_test_data')
+def handle_test_data_copy(principal_id=None):
+    """Copy data for test user from test collection
+    """
+    if Config.get('ENVIRONMENT') == 'production':
+        raise ForbiddenException("This API is only allowed in develop/test environment")
+    user_id = principal_id
+    event_date = parse_datetime(request.json['event_date'])
 
+    mongo_database = get_mongo_database()
+    stats_collection_test = mongo_database['athleteStatsTest']
+
+    # Datastores for personas collections
+    athlete_stats_datastore_test = AthleteStatsDatastore(mongo_collection='athletestatstest')
+    rs_datastore_test = DailyReadinessDatastore(mongo_collection='dailyreadinesstest')
+    daily_plan_datastore_test = DailyPlanDatastore(mongo_collection='dailyplantest')
+    # completed_exercises_datastore_test = CompletedExerciseDatastore(get_mongo_collection='completedexercisestest')
+
+    # datastores to copy data to
+    athlete_stats_datastore = AthleteStatsDatastore()
+    rs_datastore = DailyReadinessDatastore()
+    daily_plan_datastore = DailyPlanDatastore()
+    completed_exercises_datastore = CompletedExerciseDatastore()
+
+    if request.json["copy_all"]:
+        mongo_results = stats_collection_test.find()
+        athlete_stats = []
+        for mongo_result in mongo_results:
+            athlete_stats.append(athlete_stats_datastore_test.get_athlete_stats_from_mongo(mongo_result))
+        user_id = [stat.athlete_id for stat in athlete_stats]
+    else:
+        athlete_stats = [athlete_stats_datastore_test.get(user_id)]
+
+    # clear all existing data
+    rs_datastore.delete(user_id=user_id)
+    daily_plan_datastore.delete(user_id=user_id)
+    completed_exercises_datastore.delete(athlete_id=user_id)
+    athlete_stats_datastore.delete(athlete_id=user_id)
+
+    # get data from test collections
+    readiness_surveys = rs_datastore_test.get(user_id, last_only=False)
+    if len(readiness_surveys) == 0:
+        raise ForbiddenException("No data present to copy")
+    daily_plans = daily_plan_datastore_test.get(user_id)
+
+    # update to current date
+    update_dates(readiness_surveys, daily_plans, athlete_stats, event_date)
+
+    # write the updated data
+    rs_datastore.put(readiness_surveys)
+    daily_plan_datastore.put(daily_plans)
+    athlete_stats_datastore.put(athlete_stats)
+
+    return {'message': 'success'}, 202
+
+def update_dates(rs_surveys, daily_plans, athlete_stats, event_date):
+    athlete_today = parse_date(athlete_stats[0].event_date)
+    day_diff = (event_date - athlete_today).days
+    for rs_survey in rs_surveys:
+        rs_survey.event_date += datetime.timedelta(days=day_diff)
+
+    for plan in daily_plans:
+        plan.event_date = format_date(parse_date(plan.event_date) + datetime.timedelta(days=day_diff))
+    for stat in athlete_stats:
+        stat.event_date = format_date(event_date)

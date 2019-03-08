@@ -28,21 +28,14 @@ def get_mongo_database():
         os.environ["MONGO_DATABASE"] = config['database']
         os.environ["MONGO_USER"] = config['user']
         os.environ["MONGO_PASSWORD"] = config['password']
-        os.environ["MONGO_COLLECTION_DAILYREADINESS"] = config['collection_dailyreadiness']
-        os.environ["MONGO_COLLECTION_DAILYPLAN"] = config['collection_dailyplan']
+        os.environ["MONGO_COLLECTION_DAILYREADINESS"] = config['collection_dailyreadiness'] + 'Test'
+        os.environ["MONGO_COLLECTION_DAILYPLAN"] = config['collection_dailyplan'] + 'Test'
         os.environ["MONGO_COLLECTION_EXERCISELIBRARY"] = config['collection_exerciselibrary']
-        os.environ["MONGO_COLLECTION_TRAININGSCHEDULE"] = config['collection_trainingschedule']
-        os.environ["MONGO_COLLECTION_ATHLETESEASON"] = config['collection_athleteseason']
-        os.environ["MONGO_COLLECTION_ATHLETESTATS"] = config['collection_athletestats']
-        os.environ["MONGO_COLLECTION_COMPLETEDEXERCISES"] = config['collection_completedexercises']
-        os.environ["MONGO_COLLECTION_APPLOGS"] = config['collection_applogs']
-        os.environ["MONGO_COLLECTION_HEARTRATE"] = config['collection_heartrate']
-        os.environ["MONGO_COLLECTION_SLEEPHISTORY"] = config['collection_sleephistory']
-
-        os.environ["MONGO_COLLECTION_DAILYREADINESSTEST"] = config['collection_dailyreadinesstest']
-        os.environ["MONGO_COLLECTION_DAILYPLANTEST"] = config['collection_dailyplantest']
-        os.environ["MONGO_COLLECTION_ATHLETESTATSTEST"] = config['collection_athletestatstest']
-        os.environ["MONGO_COLLECTION_COMPLETEDEXERCISESTEST"] = config['collection_completedexercisestest']
+        os.environ["MONGO_COLLECTION_ATHLETESTATS"] = config['collection_athletestats'] + 'Test'
+        os.environ["MONGO_COLLECTION_COMPLETEDEXERCISES"] = config['collection_completedexercises'] + 'Test'
+        os.environ["MONGO_COLLECTION_APPLOGS"] = config['collection_applogs'] + 'Test'
+        os.environ["MONGO_COLLECTION_HEARTRATE"] = config['collection_heartrate'] + 'Test'
+        os.environ["MONGO_COLLECTION_SLEEPHISTORY"] = config['collection_sleephistory'] + 'Test'
     
         host = Config.get('MONGO_HOST')
         replicaset = Config.get('MONGO_REPLICASET')

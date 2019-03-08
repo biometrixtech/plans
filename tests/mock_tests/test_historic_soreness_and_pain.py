@@ -140,7 +140,7 @@ def test_consecutive_last_updated_2_days_with_break():
 def test_historical_soreness_trigger_update_almost_persistent_to_persistent():
     athlete_stats = AthleteStats("tester")
     athlete_stats.event_date = "2018-12-02"
-    soreness = HistoricSoreness(9, 1, True)
+    soreness = HistoricSoreness(BodyPartLocation(9), 1, True)
     soreness.historic_soreness_status = HistoricSorenessStatus.almost_persistent_pain
     soreness.streak = 2
     soreness.streak_start_date = "2018-12-01"
@@ -165,7 +165,7 @@ def test_historical_soreness_trigger_update_almost_persistent_to_persistent():
 def test_historical_soreness_trigger_update_almost_persistent_to_persistent_2():
     athlete_stats = AthleteStats("tester")
     athlete_stats.event_date = "2018-12-02"
-    soreness = HistoricSoreness(9, 1, True)
+    soreness = HistoricSoreness(BodyPartLocation(9), 1, True)
     soreness.historic_soreness_status = HistoricSorenessStatus.almost_persistent_2_pain
     soreness.streak = 2
     soreness.streak_start_date = "2018-12-01"
@@ -189,7 +189,7 @@ def test_historical_soreness_trigger_update_almost_persistent_to_persistent_2():
 def test_historical_soreness_trigger_update_almost_persistent_to_peristent_2_soreness():
     athlete_stats = AthleteStats("tester")
     athlete_stats.event_date = "2018-12-02"
-    soreness = HistoricSoreness(9, 1, False)
+    soreness = HistoricSoreness(BodyPartLocation(9), 1, False)
     soreness.historic_soreness_status = HistoricSorenessStatus.almost_persistent_2_soreness
     soreness.streak = 2
     soreness.streak_start_date = "2018-12-01"
@@ -213,7 +213,7 @@ def test_historical_soreness_trigger_update_almost_persistent_to_peristent_2_sor
 def test_historical_soreness_trigger_update_same_day_pain():
     athlete_stats = AthleteStats("tester")
     athlete_stats.event_date = "2018-12-03"
-    soreness = HistoricSoreness(9, 1, True)
+    soreness = HistoricSoreness(BodyPartLocation(9), 1, True)
     soreness.historic_soreness_status = HistoricSorenessStatus.almost_persistent_2_pain
     soreness.streak = 2
     soreness.streak_start_date = "2018-12-01"
@@ -247,7 +247,7 @@ def test_historical_soreness_trigger_update_same_day_pain():
 def test_historical_soreness_trigger_update_same_day_soreness():
     athlete_stats = AthleteStats("tester")
     athlete_stats.event_date = "2018-12-03"
-    soreness = HistoricSoreness(9, 1, False)
+    soreness = HistoricSoreness(BodyPartLocation(9), 1, False)
     soreness.historic_soreness_status = HistoricSorenessStatus.almost_persistent_2_pain
     soreness.streak = 2
     soreness.streak_start_date = "2018-12-01"
@@ -281,7 +281,7 @@ def test_historical_soreness_trigger_update_same_day_soreness():
 def test_historical_soreness_trigger_update_same_day_lower_severity():
     athlete_stats = AthleteStats("tester")
     athlete_stats.event_date = "2018-12-03"
-    soreness = HistoricSoreness(9, 1, True)
+    soreness = HistoricSoreness(BodyPartLocation(9), 1, True)
     soreness.historic_soreness_status = HistoricSorenessStatus.almost_persistent_2_pain
     soreness.streak = 2
     soreness.streak_start_date = "2018-12-01"

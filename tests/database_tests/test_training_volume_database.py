@@ -13,7 +13,7 @@ from datastores.post_session_survey_datastore import PostSessionSurveyDatastore
 from logic.stats_processing import StatsProcessing
 from logic.training_volume_processing import TrainingVolumeProcessing
 from models.stats import AthleteStats
-from models.training_volume import TrainingLevel
+# from models.training_volume import TrainingLevel
 from datastores.completed_exercise_datastore import CompletedExerciseDatastore
 from models.soreness import CompletedExercise
 from datetime import datetime, timedelta
@@ -24,6 +24,7 @@ from utils import parse_date, format_date
 def add_xray_support(request):
     os.environ["ENVIRONMENT"] = "production"
 
+    xray_recorder.configure(sampling=False)
     xray_recorder.begin_segment(name="test")
 
     config = get_secret('mongo')
