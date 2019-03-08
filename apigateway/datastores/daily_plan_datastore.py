@@ -3,8 +3,8 @@ from aws_xray_sdk.core import xray_recorder
 from config import get_mongo_collection
 from models.daily_plan import DailyPlan
 import models.session as session
-import models.exercise as exercise
 from models.post_session_survey import PostSurvey
+from fathomapi.utils.exceptions import InvalidSchemaException
 
 class DailyPlanDatastore(object):
     def __init__(self, mongo_collection='dailyplan'):
