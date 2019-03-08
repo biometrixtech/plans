@@ -1,7 +1,7 @@
 from aws_xray_sdk.core import xray_recorder
 from config import get_mongo_collection
 from models.daily_readiness import DailyReadiness
-from utils import format_datetime, parse_datetime
+from utils import format_datetime
 from fathomapi.utils.exceptions import NoSuchEntityException, InvalidSchemaException
 
 

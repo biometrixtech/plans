@@ -5,6 +5,7 @@ from models.soreness import BodyPartLocation, HistoricSoreness, HistoricSoreness
 from models.metrics import AthleteMetric, MetricType, DailyHighLevelInsight, WeeklyHighLevelInsight, MetricColor, SpecificAction
 from models.training_volume import StandardErrorRange
 from utils import parse_datetime
+from fathomapi.utils.exceptions import InvalidSchemaException
 import numbers
 
 
