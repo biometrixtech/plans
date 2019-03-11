@@ -6,9 +6,8 @@ from fathomapi.utils.exceptions import InvalidSchemaException, NoSuchEntityExcep
 from fathomapi.utils.xray import xray_recorder
 from datastores.daily_plan_datastore import DailyPlanDatastore
 from datastores.completed_exercise_datastore import CompletedExerciseDatastore
-from datastores.datastore_collection import DatastoreCollection
 from models.soreness import CompletedExercise
-from logic.training_plan_management import TrainingPlanManager
+from logic.survey_processing import create_plan
 from utils import format_date, parse_datetime, format_datetime
 from config import get_mongo_collection
 
@@ -163,16 +162,8 @@ def handle_workout_active_time():
     # Service('plans', Config.get('API_VERSION')).call_apigateway_async('POST',
     #                                                                   f"athlete/{user_id}/daily_plan",
     #                                                                   body)
-    plan_manager = TrainingPlanManager(user_id, DatastoreCollection())
-    plan = plan_manager.create_daily_plan(event_date=plan_event_date,
-                                          target_minutes=target_minutes,
-                                          last_updated=format_datetime(event_date))
-    survey_complete = plan.daily_readiness_survey_completed()
-    landing_screen, nav_bar_indicator = plan.define_landing_screen()
-    plan = plan.json_serialise()
-    plan['daily_readiness_survey_completed'] = survey_complete
-    plan['landing_screen'] = landing_screen
-    plan['nav_bar_indicator'] = nav_bar_indicator
+
+    plan = create_plan(user_id, event_date)
 
     return {'daily_plans': [plan]}, 200
 

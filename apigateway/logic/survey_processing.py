@@ -1,6 +1,8 @@
 import datetime
 from utils import parse_datetime, format_datetime, fix_early_survey_event_date, format_date
 from fathomapi.utils.xray import xray_recorder
+from fathomapi.api.config import Config
+from fathomapi.comms.service import Service
 from models.session import SessionType, SessionFactory, StrengthConditioningType, SessionSource
 from models.post_session_survey import PostSurvey
 from models.sport import SportName
@@ -10,6 +12,7 @@ from models.heart_rate import SessionHeartRate, HeartRateData
 from models.sleep_data import DailySleepData, SleepEvent
 from logic.stats_processing import StatsProcessing
 from logic.soreness_processing import SorenessCalculator
+from logic.training_plan_management import TrainingPlanManager
 from datastores.datastore_collection import DatastoreCollection
 
 
@@ -251,3 +254,23 @@ def match_sessions(user_sessions, health_session):
                 user_session.source = SessionSource.combined
                 return user_session
     return health_session
+
+def create_plan(user_id, event_date, target_minutes=15):
+    plan_manager = TrainingPlanManager(user_id, DatastoreCollection())
+    plan = plan_manager.create_daily_plan(event_date=format_date(event_date),
+                                          target_minutes=target_minutes,
+                                          last_updated=format_datetime(event_date))
+    survey_complete = plan.daily_readiness_survey_completed()
+    landing_screen, nav_bar_indicator = plan.define_landing_screen()
+    plan = plan.json_serialise()
+    plan['daily_readiness_survey_completed'] = survey_complete
+    plan['landing_screen'] = landing_screen
+    plan['nav_bar_indicator'] = nav_bar_indicator
+
+    # trigger async stats update
+    Service('plans', Config.get('API_VERSION')).call_apigateway_async(method='POST',
+                                                                      endpoint=f"athlete/{user_id}/stats",
+                                                                      body={"event_date": format_date(event_date)})
+
+    return plan
+

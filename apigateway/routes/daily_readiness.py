@@ -7,8 +7,7 @@ from datastores.daily_plan_datastore import DailyPlanDatastore
 from datastores.athlete_stats_datastore import AthleteStatsDatastore
 from datastores.heart_rate_datastore import HeartRateDatastore
 from datastores.sleep_history_datastore import SleepHistoryDatastore
-from datastores.datastore_collection import DatastoreCollection
-from fathomapi.api.config import Config
+# from fathomapi.api.config import Config
 from fathomapi.comms.service import Service
 from fathomapi.utils.decorators import require
 from fathomapi.utils.exceptions import InvalidSchemaException
@@ -18,9 +17,8 @@ from models.soreness import MuscleSorenessSeverity, BodyPartLocation
 from models.stats import AthleteStats
 from models.daily_plan import DailyPlan
 from models.sleep_data import DailySleepData, SleepEvent
-from logic.survey_processing import SurveyProcessing, cleanup_sleep_data_from_api
+from logic.survey_processing import SurveyProcessing, cleanup_sleep_data_from_api, create_plan
 from logic.athlete_status_processing import AthleteStatusProcessing
-from logic.training_plan_management import TrainingPlanManager
 from config import get_mongo_collection
 from utils import parse_datetime, format_date, format_datetime, fix_early_survey_event_date
 
@@ -116,21 +114,12 @@ def handle_daily_readiness_create():
     if need_stats_update:
         AthleteStatsDatastore().put(survey_processor.athlete_stats)
 
-    body = {"event_date": plan_event_date,
-            "last_updated": format_datetime(event_date)}
+    # body = {"event_date": plan_event_date,
+    #         "last_updated": format_datetime(event_date)}
     # Service('plans', Config.get('API_VERSION')).call_apigateway_async('POST',
     #                                                                   f"athlete/{request.json['user_id']}/daily_plan",
     #                                                                   body)
-    plan_manager = TrainingPlanManager(user_id, DatastoreCollection())
-    plan = plan_manager.create_daily_plan(event_date=plan_event_date,
-                                          target_minutes=15,
-                                          last_updated=format_datetime(event_date))
-    survey_complete = plan.daily_readiness_survey_completed()
-    landing_screen, nav_bar_indicator = plan.define_landing_screen()
-    plan = plan.json_serialise()
-    plan['daily_readiness_survey_completed'] = survey_complete
-    plan['landing_screen'] = landing_screen
-    plan['nav_bar_indicator'] = nav_bar_indicator
+    plan = create_plan(user_id, event_date)
     if "health_sync_date" in request.json and request.json['health_sync_date'] is not None:
         Service('users', os.environ['USERS_API_VERSION']).call_apigateway_async(method='PATCH',
                                                                                 endpoint=f"user/{user_id}",
