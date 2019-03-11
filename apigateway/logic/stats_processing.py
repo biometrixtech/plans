@@ -98,8 +98,6 @@ class StatsProcessing(object):
                                                         self.get_chronic_weeks_plans(),
                                                         self.chronic_daily_plans)
             athlete_stats = training_volume_processing.calc_training_volume_metrics(athlete_stats)
-            athlete_stats.functional_strength_eligible = self.is_athlete_functional_strength_eligible()
-            athlete_stats.completed_functional_strength_sessions = self.get_completed_functional_strength_sessions()
             # athlete_stats.acute_pain = self.get_acute_pain_list()
             current_athlete_stats = self.athlete_stats_datastore.get(athlete_id=self.athlete_id)
             athlete_stats.historic_soreness = self.get_historic_soreness(current_athlete_stats.historic_soreness if current_athlete_stats is not None else None)
@@ -130,6 +128,8 @@ class StatsProcessing(object):
                     # athlete_stats.post_session_pain = current_athlete_stats.post_session_pain
                     # athlete_stats.daily_severe_pain = current_athlete_stats.daily_severe_pain
                     # athlete_stats.daily_severe_pain_event_date = current_athlete_stats.daily_severe_pain_event_date
+            athlete_stats.completed_functional_strength_sessions = self.get_completed_functional_strength_sessions()
+            athlete_stats.functional_strength_eligible = self.is_athlete_functional_strength_eligible(athlete_stats)
 
             self.athlete_stats_datastore.put(athlete_stats)
 
@@ -871,7 +871,7 @@ class StatsProcessing(object):
         return soreness_list
 
 
-    def is_athlete_functional_strength_eligible(self):
+    def is_athlete_functional_strength_eligible(self, athlete_stats):
 
         # completed yesterday?
         #completed_yesterday = self.functional_strength_yesterday()
@@ -885,8 +885,16 @@ class StatsProcessing(object):
         # logged sessions
         four_plus_training_sessions_logged = self.athlete_logged_enough_sessions()
 
+        # no pain >=3 and soreness >=4 in the last two days
+        severe_pain_soreness = athlete_stats.severe_pain_soreness_today()
+
         # wrapping it all up
-        if (two_plus_weeks_since_onboarding and two_apar_sessions_completed and four_plus_training_sessions_logged):
+        if (two_plus_weeks_since_onboarding and
+            two_apar_sessions_completed and
+            four_plus_training_sessions_logged and
+            not severe_pain_soreness and
+            athlete_stats.completed_functional_strength_sessions < 3
+            ):
             return True
         else:
             return False
