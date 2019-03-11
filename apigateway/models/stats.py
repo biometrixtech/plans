@@ -165,6 +165,14 @@ class AthleteStats(Serialisable):
         pain_list = SorenessCalculator().update_soreness_list(pain_list, self.post_session_pain)
         self.daily_severe_pain = pain_list
 
+    def severe_pain_soreness_today(self):
+        severe_pain = [s for s in self.daily_severe_pain if s.severity >= 3]
+        severe_soreness = [s for s in self.daily_severe_soreness if s.severity >= 4]
+        if len(severe_pain) + len(severe_soreness) == 0:
+            return False
+        else:
+            return True
+
     #def acute_to_chronic_external_ratio(self):
     #    if self.acute_external_total_load is not None and self.chronic_external_total_load is not None:
     #        return self.acute_external_total_load / self.chronic_external_total_load
