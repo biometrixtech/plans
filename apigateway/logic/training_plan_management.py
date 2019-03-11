@@ -227,9 +227,6 @@ class TrainingPlanManager(object):
                 daily_plan.pre_recovery.why_text = text_generator.get_why_text(rpe_impact_score, max_soreness)
                 daily_plan.pre_recovery.goal_text = text_generator.get_goal_text(rpe_impact_score, max_soreness,
                                                                                  body_part_text)
-                # if remove_functional_strength(athlete_stats, last_updated, am_exercise_assignments):
-                #     daily_plan.functional_strength_session = None
-                #     daily_plan.functional_strength_eligible = False
 
                 daily_plan.pre_recovery.display_exercises = True
             else:
@@ -257,9 +254,10 @@ class TrainingPlanManager(object):
                 daily_plan.post_recovery.why_text = text_generator.get_why_text(rpe_impact_score, max_soreness)
                 daily_plan.post_recovery.goal_text = text_generator.get_goal_text(rpe_impact_score, max_soreness,
                                                                                   body_part_text)
-                # if remove_functional_strength(athlete_stats, last_updated, pm_exercise_assignments):
-                #     daily_plan.functional_strength_session = None
-                #     daily_plan.functional_strength_eligible = False
+                # if athlete reports severe pain/soreness in PSS and hasn't already completed FS session, remove it.
+                if athlete_stats.severe_pain_soreness_today() and not daily_plan.functional_strength_completed:
+                    daily_plan.functional_strength_session = None
+                    daily_plan.functional_strength_eligible = False
 
                 daily_plan.post_recovery.display_exercises = True
             else:
