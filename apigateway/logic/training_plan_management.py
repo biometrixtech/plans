@@ -255,7 +255,9 @@ class TrainingPlanManager(object):
                 daily_plan.post_recovery.goal_text = text_generator.get_goal_text(rpe_impact_score, max_soreness,
                                                                                   body_part_text)
                 # if athlete reports severe pain/soreness in PSS and hasn't already completed FS session, remove it.
-                if athlete_stats.severe_pain_soreness_today() and not daily_plan.functional_strength_completed:
+                # if athlete_stats.severe_pain_soreness_today() and not daily_plan.functional_strength_completed:
+                # Temporarily we're only checking if user is locked out of Recovery to avoid user confusion until mobile ui is in place
+                if not daily_plan.functional_strength_completed and (pm_exercise_assignments is None or pm_exercise_assignments.duration_minutes() == 0):
                     daily_plan.functional_strength_session = None
                     daily_plan.functional_strength_eligible = False
 
