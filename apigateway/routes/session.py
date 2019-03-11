@@ -349,9 +349,9 @@ def update_plan(user_id, event_date):
     #       'last_updated': format_datetime(event_date)}
     # Service('plans', Config.get('API_VERSION')).call_apigateway_async('POST', f"athlete/{user_id}/daily_plan", body=body)
     plan_manager = TrainingPlanManager(user_id, DatastoreCollection())
-    daily_plan = plan_manager.create_daily_plan(event_date=format_date(event_date),
-                                                target_minutes=15,
-                                                last_updated=format_datetime(event_date))
+    plan = plan_manager.create_daily_plan(event_date=format_date(event_date),
+                                          target_minutes=15,
+                                          last_updated=format_datetime(event_date))
     survey_complete = plan.daily_readiness_survey_completed()
     landing_screen, nav_bar_indicator = plan.define_landing_screen()
     plan = plan.json_serialise()

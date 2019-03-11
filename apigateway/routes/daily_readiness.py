@@ -122,9 +122,9 @@ def handle_daily_readiness_create():
     #                                                                   f"athlete/{request.json['user_id']}/daily_plan",
     #                                                                   body)
     plan_manager = TrainingPlanManager(user_id, DatastoreCollection())
-    daily_plan = plan_manager.create_daily_plan(event_date=plan_event_date,
-                                                target_minutes=15,
-                                                last_updated=format_datetime(event_date))
+    plan = plan_manager.create_daily_plan(event_date=plan_event_date,
+                                          target_minutes=15,
+                                          last_updated=format_datetime(event_date))
     survey_complete = plan.daily_readiness_survey_completed()
     landing_screen, nav_bar_indicator = plan.define_landing_screen()
     plan = plan.json_serialise()
