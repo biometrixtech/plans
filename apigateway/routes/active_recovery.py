@@ -163,7 +163,7 @@ def handle_workout_active_time():
     #                                                                   f"athlete/{user_id}/daily_plan",
     #                                                                   body)
 
-    plan = create_plan(user_id, event_date, update_stats=False)
+    plan = create_plan(user_id, event_date, target_minutes=target_minutes, update_stats=False)
 
     return {'daily_plans': [plan]}, 200
 
