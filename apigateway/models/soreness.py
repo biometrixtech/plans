@@ -247,7 +247,7 @@ class BodyPartLocationText(object):
     def value(self):
         body_part_text = {'head': 'head',
                           'shoulder': 'shoulder',
-                          'chest': 'chest',
+                          'chest': 'pecs',
                           'abdominals': 'abdominal',
                           'hip_flexor': 'hip',
                           'groin': 'groin',
@@ -263,7 +263,10 @@ class BodyPartLocationText(object):
                           'hamstrings': 'hamstring',
                           'calves': 'calf',
                           'achilles': 'achilles',
-                          'upper_back_neck': 'upper back'}
+                          'upper_back_neck': 'upper back',
+                          'elbow': 'elbow',
+                          'wrist': 'wrist',
+                          'lats': 'lat'}
 
         return body_part_text[self.body_part_location.name]
 
