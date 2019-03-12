@@ -62,7 +62,8 @@ class Persona(object):
 
 
     def update_stats(self, event_date):
-        StatsProcessing(self.user_id, event_date=event_date, datastore_collection=DatastoreCollection()).process_athlete_stats()
+        athlete_stats = StatsProcessing(self.user_id, event_date=event_date, datastore_collection=DatastoreCollection()).process_athlete_stats()
+        DatastoreCollection().athlete_stats_datastore.put(athlete_stats)
 
     def create_readiness(self, data):
         daily_readiness = DailyReadiness(

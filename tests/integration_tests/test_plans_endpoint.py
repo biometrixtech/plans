@@ -83,6 +83,7 @@ def test_submit_readiness_one_soreness():
 
     assert plan['daily_readiness_survey_completed']
     assert plan['pre_recovery']['minutes_duration'] == 15
+    assert plan['landing_screen'] == 0
 
 def test_change_active_time():
     if HEADERS['Authorization'] is None:
@@ -103,5 +104,6 @@ def test_change_active_time():
     plan = response.json()['daily_plans'][0]
 
     assert plan['pre_recovery']['minutes_duration'] == active_time
+    assert plan['landing_screen'] == 0
 
 
