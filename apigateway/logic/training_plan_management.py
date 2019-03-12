@@ -9,8 +9,7 @@ from logic.goal_focus_text_generator import RecoveryTextGenerator
 from utils import format_datetime, format_date, parse_datetime, parse_date
 from logic.stats_processing import StatsProcessing
 from logic.functional_strength_mapping import FSProgramGenerator
-from fathomapi.utils.xray import xray_recorder
-
+from aws_xray_sdk.core import xray_recorder
 
 class TrainingPlanManager(object):
 
