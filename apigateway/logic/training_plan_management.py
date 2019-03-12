@@ -9,6 +9,7 @@ from logic.goal_focus_text_generator import RecoveryTextGenerator
 from utils import format_datetime, format_date, parse_datetime, parse_date
 from logic.stats_processing import StatsProcessing
 from logic.functional_strength_mapping import FSProgramGenerator
+from fathomapi.utils.xray import xray_recorder
 
 
 class TrainingPlanManager(object):
@@ -118,6 +119,7 @@ class TrainingPlanManager(object):
             else:
                 return True
 
+    @xray_recorder.capture('logic.TrainingPlanManager.create_daily_plan')
     def create_daily_plan(self, event_date=None, target_minutes=15, last_updated=None, athlete_stats=None):
 
         if event_date is not None:

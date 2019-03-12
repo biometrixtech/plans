@@ -354,8 +354,8 @@ class StatsProcessing(object):
 
                     if last_ten_day_count <= 3 and len(body_part_history) >= 5:  # persistent
                         soreness.historic_soreness_status = HistoricSorenessStatus.persistent_pain
-                    else:
-                        soreness.historic_soreness_status = HistoricSorenessStatus.almost_acute_pain
+                    # else:
+                    #     soreness.historic_soreness_status = HistoricSorenessStatus.almost_acute_pain
                     soreness.ask_acute_pain_question = False
                     soreness.ask_persistent_2_question = False
                     soreness.average_severity = avg_severity
@@ -370,9 +370,11 @@ class StatsProcessing(object):
 
                     soreness = HistoricSoreness(g.location, g.side, g.is_pain)
                     if g.is_pain:
-                        soreness.historic_soreness_status = HistoricSorenessStatus.almost_persistent_2_pain
+                        # soreness.historic_soreness_status = HistoricSorenessStatus.almost_persistent_2_pain
+                        soreness.historic_soreness_status = HistoricSorenessStatus.persistent_pain
                     else:
-                        soreness.historic_soreness_status = HistoricSorenessStatus.almost_persistent_2_soreness
+                        # soreness.historic_soreness_status = HistoricSorenessStatus.almost_persistent_2_soreness
+                        soreness.historic_soreness_status = HistoricSorenessStatus.persistent_soreness
                     soreness.ask_acute_pain_question = False
                     soreness.ask_persistent_2_question = False
                     soreness.average_severity = avg_severity
@@ -403,10 +405,10 @@ class StatsProcessing(object):
                     avg_severity = self.calc_avg_severity_persistent_2(body_part_history, self.event_date)
 
                     soreness = HistoricSoreness(g.location, g.side, g.is_pain)
-                    if g.is_pain:
-                        soreness.historic_soreness_status = HistoricSorenessStatus.almost_persistent_pain
-                    else:
-                        soreness.historic_soreness_status = HistoricSorenessStatus.almost_persistent_soreness
+                    # if g.is_pain:
+                    #     soreness.historic_soreness_status = HistoricSorenessStatus.almost_persistent_pain
+                    # else:
+                    #     soreness.historic_soreness_status = HistoricSorenessStatus.almost_persistent_soreness
                     soreness.ask_acute_pain_question = False
                     soreness.ask_persistent_2_question = False
                     soreness.average_severity = avg_severity
@@ -467,7 +469,7 @@ class StatsProcessing(object):
                                                                                      self.event_date)
         elif ((parse_date(self.event_date) - parse_date(historic_soreness.streak_start_date)).days >= 7
               and not historic_soreness.ask_acute_pain_question):
-            historic_soreness.historic_soreness_status = HistoricSorenessStatus.almost_persistent_2_pain_acute
+            historic_soreness.historic_soreness_status = HistoricSorenessStatus.acute_pain
             historic_soreness.average_severity = self.calc_avg_severity_persistent_2(body_part_history,
                                                                                      self.event_date)
 
@@ -591,7 +593,7 @@ class StatsProcessing(object):
                         if (parse_date(question_response_date) - parse_date(e.streak_start_date)).days >=7:
                             e.historic_soreness_status = HistoricSorenessStatus.persistent_2_pain
                         if (parse_date(question_response_date) - parse_date(e.streak_start_date)).days == 6:
-                            e.historic_soreness_status = HistoricSorenessStatus.almost_persistent_2_pain_acute
+                            e.historic_soreness_status = HistoricSorenessStatus.acute_pain
                             e.streak += 1
                             e.average_severity = self.calc_avg_severity_acute_pain(body_part_history, e.streak)
                         #elif last_ten_day_count > 4:
