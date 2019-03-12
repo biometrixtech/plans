@@ -63,7 +63,8 @@ def update_athlete_stats(athlete_id):
         event_date = request.json['event_date']
     else:
         event_date = None
-    StatsProcessing(athlete_id, event_date=event_date, datastore_collection=DatastoreCollection()).process_athlete_stats()
+    athlete_stats = StatsProcessing(athlete_id, event_date=event_date, datastore_collection=DatastoreCollection()).process_athlete_stats()
+    DatastoreCollection().athlete_stats_datastore.put(athlete_stats)
 
     if event_date is not None:
         Service('plans', Config.get('API_VERSION')).call_apigateway_async(method='POST',
