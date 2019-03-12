@@ -134,6 +134,8 @@ class TrainingPlanManager(object):
             start_time = format_datetime(parse_date(today_date) - datetime.timedelta(days=1))
             end_time = format_datetime(parse_date(today_date) + datetime.timedelta(days=1))
 
+        if last_updated is None:
+            last_updated = format_datetime(datetime.datetime.utcnow())
         trigger_date_time = last_daily_readiness_survey.get_event_date()
         post_session_surveys = self.post_session_survey_datastore.get(self.athlete_id, parse_datetime(start_time), parse_datetime(end_time))
         athlete_stats = self.athlete_stats_datastore.get(self.athlete_id)
@@ -152,6 +154,7 @@ class TrainingPlanManager(object):
                                  hs.historic_soreness_status is not HistoricSorenessStatus.almost_persistent_soreness and
                                  hs.historic_soreness_status is not HistoricSorenessStatus.almost_persistent_pain]
             historic_soreness_present = len(historic_soreness) > 0
+            is_functional_strength_eligible(athlete_stats, last_updated)
 
         soreness_list = SorenessCalculator().get_soreness_summary_from_surveys(readiness_surveys,
                                                                                post_session_surveys,
@@ -194,7 +197,7 @@ class TrainingPlanManager(object):
             max_rpe = 0
 
         if daily_plan.functional_strength_session is None:
-            daily_plan = self.populate_functional_strength(daily_plan, athlete_stats, last_daily_readiness_survey.wants_functional_strength)
+            daily_plan = self.populate_functional_strength(daily_plan, athlete_stats, True)
 
         text_generator = RecoveryTextGenerator()
         body_part_text = text_generator.get_text_from_body_part_list(soreness_list)
@@ -225,9 +228,6 @@ class TrainingPlanManager(object):
                 daily_plan.pre_recovery.goal_text = text_generator.get_goal_text(rpe_impact_score, max_soreness,
                                                                                  body_part_text)
 
-                if max_soreness >= 4 or am_exercise_assignments is None or am_exercise_assignments.duration_minutes() == 0:
-                    daily_plan.functional_strength_session = None
-
                 daily_plan.pre_recovery.display_exercises = True
             else:
                 # daily_plan.pre_recovery = None
@@ -254,9 +254,12 @@ class TrainingPlanManager(object):
                 daily_plan.post_recovery.why_text = text_generator.get_why_text(rpe_impact_score, max_soreness)
                 daily_plan.post_recovery.goal_text = text_generator.get_goal_text(rpe_impact_score, max_soreness,
                                                                                   body_part_text)
-
-                if max_soreness >= 4 or pm_exercise_assignments is None or pm_exercise_assignments.duration_minutes() == 0:
+                # if athlete reports severe pain/soreness in PSS and hasn't already completed FS session, remove it.
+                # if athlete_stats.severe_pain_soreness_today() and not daily_plan.functional_strength_completed:
+                # Temporarily we're only checking if user is locked out of Recovery to avoid user confusion until mobile ui is in place
+                if not daily_plan.functional_strength_completed and (pm_exercise_assignments is None or pm_exercise_assignments.duration_minutes() == 0):
                     daily_plan.functional_strength_session = None
+                    daily_plan.functional_strength_eligible = False
 
                 daily_plan.post_recovery.display_exercises = True
             else:
@@ -264,10 +267,7 @@ class TrainingPlanManager(object):
                 daily_plan.post_recovery.display_exercises = False
 
         # daily_plan.add_scheduled_sessions(scheduled_sessions)
-        if last_updated is None:
-            daily_plan.last_updated = format_datetime(datetime.datetime.utcnow())
-        else:
-            daily_plan.last_updated = last_updated
+        daily_plan.last_updated = last_updated
 
         self.daily_plan_datastore.put(daily_plan)
 
@@ -278,13 +278,12 @@ class TrainingPlanManager(object):
         if athlete_stats is not None:
             daily_plan.functional_strength_eligible = athlete_stats.functional_strength_eligible
 
-        if daily_plan.functional_strength_eligible and wants_functional_strength:
-            daily_plan.completed_functional_strength_sessions = athlete_stats.completed_functional_strength_sessions
-            if not daily_plan.functional_strength_completed and daily_plan.completed_functional_strength_sessions < 3:
-                fs_mapping = FSProgramGenerator(self.exercise_library_datastore)
-                daily_plan.functional_strength_session = fs_mapping.getFunctionalStrengthForSportPosition(
-                    athlete_stats.current_sport_name,
-                    athlete_stats.current_position)
+            if daily_plan.functional_strength_eligible and wants_functional_strength:
+                if not daily_plan.functional_strength_completed:
+                    fs_mapping = FSProgramGenerator(self.exercise_library_datastore)
+                    daily_plan.functional_strength_session = fs_mapping.getFunctionalStrengthForSportPosition(
+                        athlete_stats.current_sport_name,
+                        athlete_stats.current_position)
 
         return daily_plan
 
@@ -580,5 +579,11 @@ class TrainingPlanManager(object):
 
             return bump_up_session
 
-
-
+def is_functional_strength_eligible(athlete_stats, last_updated):
+    if (athlete_stats.functional_strength_eligible and
+        not athlete_stats.severe_pain_soreness_today() and # these are updated from surveys but update doesn't make it to stats until after plan is created
+        (athlete_stats.next_functional_strength_eligible_date is None or 
+         parse_datetime(athlete_stats.next_functional_strength_eligible_date) < parse_datetime(last_updated))): # need to check if 24 hours have passed since last completed
+        athlete_stats.functional_strength_eligible = True
+    else:
+        athlete_stats.functional_strength_eligible = False

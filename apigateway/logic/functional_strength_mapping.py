@@ -64,7 +64,7 @@ class FSProgramGenerator(object):
         session.position = position
 
         if sport_name.value is None and position is None:
-            return session
+            return None
 
         if sport_name.value is None or sport_name in [sport.SportName.pool_sports, sport.SportName.track_field, sport.SportName.wrestling,
                                                       sport.SportName.strength, sport.SportName.cross_training,  sport.SportName.endurance,
