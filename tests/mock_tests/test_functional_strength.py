@@ -431,9 +431,13 @@ def test_athlete_enough_ap_ar():
 
 def test_no_fs_with_high_readiness_soreness():
     daily_plan = get_daily_plans(datetime(2018, 7, 24, 0, 0, 0), datetime(2018, 7, 25, 0, 0, 0))[0]
-    daily_plan.functional_strength_session = FunctionalStrengthSession()
+    # daily_plan.functional_strength_session = FunctionalStrengthSession()
     survey = get_daily_readiness_survey_high_soreness(datetime(2018, 7, 24, 12, 0, 0), 4)
     athlete_stats = AthleteStats("tester")
+    athlete_stats.daily_severe_soreness = survey.soreness
+    athlete_stats.functional_strength_eligible = True
+    athlete_stats.current_sport_name = SportName.soccer
+    athlete_stats.current_position = SoccerPosition.defender
 
     daily_plan_datastore = DailyPlanDatastore()
     athlete_stats_datastore = AthleteStatsDatastore()
@@ -467,7 +471,7 @@ def test_no_fs_with_high_post_session_soreness():
     daily_readiness_datastore.side_load_surveys([survey])
     post_session_datastore = PostSessionSurveyDatastore()
     athlete_stats_datastore.side_load_athlete_stats(athlete_stats)
-    soreness_list = [TestUtilities().body_part_soreness(12, 4)]
+    soreness_list = [TestUtilities().body_part_soreness(12, 5)]
     post_survey = TestUtilities().get_post_survey(4, soreness_list)
     post_session_survey = \
         PostSessionSurvey(datetime(2018, 7, 24, 17, 30, 0).strftime("%Y-%m-%dT%H:%M:%SZ"), "tester", None,
