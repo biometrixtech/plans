@@ -118,7 +118,7 @@ class TrainingPlanManager(object):
             else:
                 return True
 
-    def create_daily_plan(self, event_date=None, target_minutes=15, last_updated=None):
+    def create_daily_plan(self, event_date=None, target_minutes=15, last_updated=None, athlete_stats=None):
 
         if event_date is not None:
             start_time = format_datetime(parse_date(event_date) - datetime.timedelta(days=1))
@@ -138,7 +138,8 @@ class TrainingPlanManager(object):
             last_updated = format_datetime(datetime.datetime.utcnow())
         trigger_date_time = last_daily_readiness_survey.get_event_date()
         post_session_surveys = self.post_session_survey_datastore.get(self.athlete_id, parse_datetime(start_time), parse_datetime(end_time))
-        athlete_stats = self.athlete_stats_datastore.get(self.athlete_id)
+        if athlete_stats is None:
+            athlete_stats = self.athlete_stats_datastore.get(self.athlete_id)
 
         survey_event_dates = [s.get_event_date() for s in post_session_surveys if s is not None]
 

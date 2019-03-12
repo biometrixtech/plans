@@ -66,14 +66,14 @@ def handle_session_create():
                      event_date=plan_event_date
                      )
     # save updated athlete stats
-    if survey_processor.athlete_stats is not None:
-        AthleteStatsDatastore().put(survey_processor.athlete_stats)
+    # if survey_processor.athlete_stats is not None:
+    #     AthleteStatsDatastore().put(survey_processor.athlete_stats)
     # save heart_rate_data if it exists in any of the sessions
     if len(survey_processor.heart_rate_data) > 0:
         HeartRateDatastore().put(survey_processor.heart_rate_data)
     # update plan
     if plan_update_required:
-        plan = create_plan(user_id, event_date)
+        plan = create_plan(user_id, event_date, athlete_stats=survey_processor.athlete_stats)
     # update users database if health data received
     if "health_sync_date" in request.json and request.json['health_sync_date'] is not None:
         Service('users', os.environ['USERS_API_VERSION']).call_apigateway_async(method='PATCH',

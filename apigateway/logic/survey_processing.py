@@ -1,8 +1,6 @@
 import datetime
 from utils import parse_datetime, format_datetime, fix_early_survey_event_date, format_date
 from fathomapi.utils.xray import xray_recorder
-from fathomapi.api.config import Config
-from fathomapi.comms.service import Service
 from models.session import SessionType, SessionFactory, StrengthConditioningType, SessionSource
 from models.post_session_survey import PostSurvey
 from models.sport import SportName
@@ -13,6 +11,7 @@ from models.sleep_data import DailySleepData, SleepEvent
 from logic.stats_processing import StatsProcessing
 from logic.soreness_processing import SorenessCalculator
 from logic.training_plan_management import TrainingPlanManager
+from logic.metrics_processing import MetricsProcessing
 from datastores.datastore_collection import DatastoreCollection
 
 
@@ -115,8 +114,8 @@ class SurveyProcessing(object):
             self.athlete_stats.update_daily_soreness()
             self.athlete_stats.update_daily_pain()
             # update historic soreness
-            for s in self.soreness:
-                self.athlete_stats.update_historic_soreness(s, self.event_date)
+            # for s in self.soreness:
+            #     self.athlete_stats.update_historic_soreness(s, self.event_date)
 
     def process_clear_status_answers(self, clear_candidates, event_date, soreness):
 
@@ -255,22 +254,31 @@ def match_sessions(user_sessions, health_session):
                 return user_session
     return health_session
 
-def create_plan(user_id, event_date, target_minutes=15):
+def create_plan(user_id, event_date, target_minutes=15, update_stats=True, athlete_stats=None):
+    if update_stats:
+        # update stats
+        stats_processor = StatsProcessing(user_id,
+                                          event_date=format_date(event_date),
+                                          datastore_collection=DatastoreCollection())
+        athlete_stats = stats_processor.process_athlete_stats(athlete_stats)
+
+        # update metrics
+        metrics = MetricsProcessing().get_athlete_metrics_from_stats(athlete_stats, format_date(event_date))
+        athlete_stats.metrics = metrics
+        DatastoreCollection().athlete_stats_datastore.put(athlete_stats)
+
+    # update plan
     plan_manager = TrainingPlanManager(user_id, DatastoreCollection())
     plan = plan_manager.create_daily_plan(event_date=format_date(event_date),
                                           target_minutes=target_minutes,
-                                          last_updated=format_datetime(event_date))
+                                          last_updated=format_datetime(event_date),
+                                          athlete_stats=athlete_stats)
     survey_complete = plan.daily_readiness_survey_completed()
     landing_screen, nav_bar_indicator = plan.define_landing_screen()
     plan = plan.json_serialise()
     plan['daily_readiness_survey_completed'] = survey_complete
     plan['landing_screen'] = landing_screen
     plan['nav_bar_indicator'] = nav_bar_indicator
-
-    # trigger async stats update
-    Service('plans', Config.get('API_VERSION')).call_apigateway_async(method='POST',
-                                                                      endpoint=f"athlete/{user_id}/stats",
-                                                                      body={"event_date": format_date(event_date)})
 
     return plan
 

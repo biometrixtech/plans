@@ -84,7 +84,7 @@ class StatsProcessing(object):
         self.end_date = self.end_date_time.strftime('%Y-%m-%d')
         return True
 
-    def process_athlete_stats(self):
+    def process_athlete_stats(self, current_athlete_stats=None):
         success = self.set_start_end_times()
         if success:
             self.load_historical_data()
@@ -99,7 +99,8 @@ class StatsProcessing(object):
                                                         self.chronic_daily_plans)
             athlete_stats = training_volume_processing.calc_training_volume_metrics(athlete_stats)
             # athlete_stats.acute_pain = self.get_acute_pain_list()
-            current_athlete_stats = self.athlete_stats_datastore.get(athlete_id=self.athlete_id)
+            if current_athlete_stats is None:
+                current_athlete_stats = self.athlete_stats_datastore.get(athlete_id=self.athlete_id)
             athlete_stats.historic_soreness = self.get_historic_soreness(current_athlete_stats.historic_soreness if current_athlete_stats is not None else None)
             if current_athlete_stats is not None:
                 athlete_stats.current_sport_name = current_athlete_stats.current_sport_name
@@ -131,7 +132,8 @@ class StatsProcessing(object):
             athlete_stats.completed_functional_strength_sessions = self.get_completed_functional_strength_sessions()
             athlete_stats.functional_strength_eligible = self.is_athlete_functional_strength_eligible(athlete_stats)
 
-            self.athlete_stats_datastore.put(athlete_stats)
+            # self.athlete_stats_datastore.put(athlete_stats)
+            return athlete_stats
 
     def load_historical_data(self):
 

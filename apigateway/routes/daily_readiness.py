@@ -111,15 +111,15 @@ def handle_daily_readiness_create():
         if 'current_position' in request.json:
             survey_processor.athlete_stats.current_position = request.json['current_position']
 
-    if need_stats_update:
-        AthleteStatsDatastore().put(survey_processor.athlete_stats)
+    # if need_stats_update:
+    #     AthleteStatsDatastore().put(survey_processor.athlete_stats)
 
     # body = {"event_date": plan_event_date,
     #         "last_updated": format_datetime(event_date)}
     # Service('plans', Config.get('API_VERSION')).call_apigateway_async('POST',
     #                                                                   f"athlete/{request.json['user_id']}/daily_plan",
     #                                                                   body)
-    plan = create_plan(user_id, event_date)
+    plan = create_plan(user_id, event_date, athlete_stats=survey_processor.athlete_stats)
     if "health_sync_date" in request.json and request.json['health_sync_date'] is not None:
         Service('users', os.environ['USERS_API_VERSION']).call_apigateway_async(method='PATCH',
                                                                                 endpoint=f"user/{user_id}",
