@@ -7,9 +7,9 @@ from fathomapi.utils.xray import xray_recorder
 from fathomapi.utils.exceptions import NoSuchEntityException
 from logic.training_volume_processing import TrainingVolumeProcessing
 from models.stats import AthleteStats
-from models.soreness import Soreness, BodyPart
-from models.soreness import HistoricSoreness, HistoricSorenessStatus
-from utils import parse_date, format_date
+from models.soreness import Soreness, BodyPart, HistoricSoreness, HistoricSorenessStatus
+from models.post_session_survey import PostSessionSurvey
+from utils import parse_date, format_date, format_datetime
 
 
 class StatsProcessing(object):
@@ -139,9 +139,15 @@ class StatsProcessing(object):
 
         daily_readiness_surveys = self.daily_readiness_datastore.get(self.athlete_id, self.start_date_time,
                                                                      self.end_date_time, last_only=False)
-        post_session_surveys = self.post_session_survey_datastore.get(self.athlete_id, self.start_date_time,
-                                                                      self.end_date_time)
+        # post_session_surveys = self.post_session_survey_datastore.get(self.athlete_id, self.start_date_time,
+        #                                                               self.end_date_time)
         self.all_plans = self.daily_plan_datastore.get(self.athlete_id, self.start_date, self.end_date)
+        post_session_surveys = []
+        for plan in self.all_plans:
+            post_surveys = \
+                [_post_session_survey_from_training_session(session.post_session_survey, self.athlete_id, session.id, session.session_type().value, plan.event_date)
+                 for session in plan.training_sessions if session is not None]
+            post_session_surveys.extend([s for s in post_surveys if s is not None])
         self.update_start_times(daily_readiness_surveys, post_session_surveys, self.all_plans)
         self.set_acute_chronic_periods()
         self.load_historical_readiness_surveys(daily_readiness_surveys)
@@ -1209,6 +1215,16 @@ class StatsProcessing(object):
 
 
 
+def _post_session_survey_from_training_session(survey, user_id, session_id, session_type, event_date):
+    if survey is not None:
+        if survey.event_date is not None:
+            post_session_survey = PostSessionSurvey(format_datetime(survey.event_date), user_id, session_id, session_type)
+        else:
+            post_session_survey = PostSessionSurvey(format_datetime(parse_date(event_date)), user_id, session_id, session_type)
+        post_session_survey.survey = survey
+        return post_session_survey
+    else:
+        return None
 
 
 
