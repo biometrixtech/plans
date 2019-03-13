@@ -273,6 +273,11 @@ def create_plan(user_id, event_date, target_minutes=15, update_stats=True, athle
                                           target_minutes=target_minutes,
                                           last_updated=format_datetime(event_date),
                                           athlete_stats=athlete_stats)
+    plan = cleanup_plan(plan)
+
+    return plan
+
+def cleanup_plan(plan):
     survey_complete = plan.daily_readiness_survey_completed()
     landing_screen, nav_bar_indicator = plan.define_landing_screen()
     plan = plan.json_serialise()

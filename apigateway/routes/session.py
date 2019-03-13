@@ -15,7 +15,7 @@ from models.session import SessionType, SessionSource
 from models.daily_plan import DailyPlan
 from utils import parse_datetime, format_date, format_datetime
 from config import get_mongo_collection
-from logic.survey_processing import SurveyProcessing, create_session, update_session, create_plan
+from logic.survey_processing import SurveyProcessing, create_session, update_session, create_plan, cleanup_plan
 from logic.athlete_status_processing import AthleteStatusProcessing
 
 app = Blueprint('session', __name__)
@@ -73,7 +73,10 @@ def handle_session_create():
         HeartRateDatastore().put(survey_processor.heart_rate_data)
     # update plan
     if plan_update_required:
-        plan = create_plan(user_id, event_date, athlete_stats=survey_processor.athlete_stats)
+        plan = create_plan(user_id, event_date, athlete_stats=survey_processor.athlete_stats, update_plan=plan_update_required)
+    else:
+        plan = cleanup_plan(plan)
+
     # update users database if health data received
     if "health_sync_date" in request.json and request.json['health_sync_date'] is not None:
         Service('users', os.environ['USERS_API_VERSION']).call_apigateway_async(method='PATCH',
