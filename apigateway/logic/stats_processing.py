@@ -142,7 +142,7 @@ class StatsProcessing(object):
                                                                      self.end_date_time, last_only=False)
         # post_session_surveys = self.post_session_survey_datastore.get(self.athlete_id, self.start_date_time,
         #                                                               self.end_date_time)
-        self.all_plans = self.daily_plan_datastore.get(self.athlete_id, self.start_date, self.end_date)
+        self.all_plans = self.daily_plan_datastore.get(self.athlete_id, self.start_date, self.end_date, stats_processing=True)
         post_session_surveys = []
         for plan in self.all_plans:
             post_surveys = \
