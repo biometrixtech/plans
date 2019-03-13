@@ -38,8 +38,14 @@ def acute_pain_question():
 def acute_pain_no_question():
     return pre_pad_with_nones([1, None, 2, None, 3, None, 2, None])
 
-def persistent_question():
-    return pre_pad_with_nones(extend_with_nones([1, None, 2, None, 3, None, 2, None, None, None, 3, None, None, 3, 3, None, 2], 15))
+def persistent_soreness_question():
+    return pre_pad_with_nones(extend_with_nones([1, None, None, 2, None, None, 3, None, None, 2, None], 15))
 
-def persistent_no_question():
-    return pre_pad_with_nones([1, None, 2, None, 3, None, 2, None])
+def persistent_soreness_no_question():
+    return pre_pad_with_nones([1, None, None, 2, None, None, 3, None, None, 2, None])
+
+def persistent_pain_question():
+    return pre_pad_with_nones(extend_with_nones([3, None, 3, None, None, 3, 3, None, 3, None, None, 2, None, None, None, None, None, None, None, 2], 15))
+
+def persistent_pain_no_question():
+    return pre_pad_with_nones([3, None, 3, None, None, 3, 3, None, 3, None, None, 2, None, None, None, None, None, None, None, 2])
