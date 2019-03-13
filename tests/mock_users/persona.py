@@ -3,10 +3,13 @@ from config import get_mongo_collection
 import datetime
 from models.daily_readiness import DailyReadiness
 from models.soreness import CompletedExercise
+from models.session import SessionFactory, SessionType
+from models.post_session_survey import PostSurvey
 from logic.stats_processing import StatsProcessing
 from logic.training_plan_management import TrainingPlanManager
 from datastores.daily_readiness_datastore import DailyReadinessDatastore
 from datastores.completed_exercise_datastore import CompletedExerciseDatastore
+from datastores.session_datastore import SessionDatastore
 from datastores.datastore_collection import DatastoreCollection
 from utils import format_datetime, format_date
 
@@ -36,7 +39,7 @@ class Persona(object):
                 readiness_data = {'date_time': date_time,
                                   'soreness': soreness}
                 self.create_readiness(readiness_data)
-                self.create_plan(today_date)
+                self.create_plan(event_date)
                 exercise_list = [ex.exercise.id for ex in self.daily_plan.pre_recovery.inhibit_exercises]
                 self.complete_exercises(exercise_list, format_datetime(event_date + datetime.timedelta(hours=1)))
                 print(today_date)
@@ -58,7 +61,8 @@ class Persona(object):
 
     def create_plan(self, event_date):
         plan_manager = TrainingPlanManager(self.user_id, DatastoreCollection())
-        self.daily_plan = plan_manager.create_daily_plan(event_date=event_date)
+        self.daily_plan = plan_manager.create_daily_plan(event_date=format_date(event_date))
+        self.add_session(event_date)
 
 
     def update_stats(self, event_date):
@@ -83,3 +87,14 @@ class Persona(object):
             exercise_store.put(CompletedExercise(athlete_id=self.user_id,
                                                  exercise_id=exercise,
                                                  event_date=event_date))
+
+    def add_session(self, event_date):
+        ps_event_date = event_date + datetime.timedelta(minutes=40)
+        session = SessionFactory().create(SessionType(6))
+        session.event_date = ps_event_date
+        session.sport_name = 72
+        session.duration_minutes = 30
+        session.post_session_survey = PostSurvey(survey={'RPE': 5, 'soreness': []}, event_date=format_datetime(ps_event_date))
+        store = SessionDatastore()
+        store.insert(session, self.user_id, format_date(event_date))
+        self.daily_plan.training_sessions.append(session)

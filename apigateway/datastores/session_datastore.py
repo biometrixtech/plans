@@ -6,7 +6,8 @@ from fathomapi.utils.exceptions import NoSuchEntityException, ForbiddenException
 
 
 class SessionDatastore(object):
-    mongo_collection = 'dailyplan'
+    def __init__(self, mongo_collection='dailyplan'):
+        self.mongo_collection = mongo_collection
 
     @xray_recorder.capture('datastore.SessionDatastore.get')
     def get(self, user_id, event_date, session_type=None, session_id=None):
