@@ -1,15 +1,13 @@
-import logic.training as training
-import models.session as session
-from models.daily_plan import DailyPlan
 import datetime
+from fathomapi.utils.xray import xray_recorder
+import logic.training as training
 import logic.exercise_mapping as exercise_mapping
 from logic.soreness_processing import SorenessCalculator
-from models.soreness import BodyPartLocation, HistoricSorenessStatus
-from logic.goal_focus_text_generator import RecoveryTextGenerator
-from utils import format_datetime, format_date, parse_datetime, parse_date
-from logic.stats_processing import StatsProcessing
 from logic.functional_strength_mapping import FSProgramGenerator
-from aws_xray_sdk.core import xray_recorder
+import models.session as session
+from models.daily_plan import DailyPlan
+from models.soreness import HistoricSorenessStatus
+from utils import format_datetime, format_date, parse_datetime, parse_date
 
 class TrainingPlanManager(object):
 

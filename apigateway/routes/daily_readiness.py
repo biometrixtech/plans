@@ -28,12 +28,13 @@ app = Blueprint('daily_readiness', __name__)
 @app.route('/', methods=['POST'])
 @require.authenticated.any
 @xray_recorder.capture('routes.daily_readiness.create')
-def handle_daily_readiness_create():
+def handle_daily_readiness_create(principal_id=None):
     validate_data()
     event_date = parse_datetime(request.json['date_time'])
     event_date = fix_early_survey_event_date(event_date)
     
-    user_id = request.json['user_id']
+    # user_id = request.json['user_id']
+    user_id = principal_id
     daily_readiness = DailyReadiness(
         user_id=user_id,
         event_date=format_datetime(event_date),

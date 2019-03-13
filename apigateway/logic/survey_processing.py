@@ -1,5 +1,4 @@
 import datetime
-from utils import parse_datetime, format_datetime, fix_early_survey_event_date, format_date
 from fathomapi.utils.xray import xray_recorder
 from models.session import SessionType, SessionFactory, StrengthConditioningType, SessionSource
 from models.post_session_survey import PostSurvey
@@ -13,6 +12,7 @@ from logic.soreness_processing import SorenessCalculator
 from logic.training_plan_management import TrainingPlanManager
 from logic.metrics_processing import MetricsProcessing
 from datastores.datastore_collection import DatastoreCollection
+from utils import parse_datetime, format_datetime, fix_early_survey_event_date, format_date
 
 
 class SurveyProcessing(object):
