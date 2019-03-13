@@ -135,6 +135,7 @@ class StatsProcessing(object):
             # self.athlete_stats_datastore.put(athlete_stats)
             return athlete_stats
 
+    @xray_recorder.capture('logic.StatsProcessing.load_historical_data')
     def load_historical_data(self):
 
         daily_readiness_surveys = self.daily_readiness_datastore.get(self.athlete_id, self.start_date_time,
@@ -173,6 +174,7 @@ class StatsProcessing(object):
 
         return training_sessions
 
+    @xray_recorder.capture('logic.StatsProcessing.get_historic_soreness')
     def get_historic_soreness(self, existing_historic_soreness=None):
 
         soreness_list = []
