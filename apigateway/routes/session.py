@@ -66,7 +66,7 @@ def handle_session_create():
         HeartRateDatastore().put(survey_processor.heart_rate_data)
     # update plan
     if plan_update_required:
-        plan = create_plan(user_id, event_date, athlete_stats=survey_processor.athlete_stats)
+        plan = create_plan(user_id, event_date, athlete_stats=survey_processor.athlete_stats, stats_processor=survey_processor.stats_processor)
     else:
         plan = cleanup_plan(plan)
 

@@ -25,6 +25,7 @@ class SurveyProcessing(object):
         self.heart_rate_data = []
         self.soreness = []
         self.plans = []
+        self.stats_processor = None
 
     def create_session_from_survey(self, session, historic_health_data=False):
         event_date = parse_datetime(session['event_date'])
@@ -120,14 +121,14 @@ class SurveyProcessing(object):
     def process_clear_status_answers(self, clear_candidates, event_date, soreness):
 
         plan_event_date = format_date(event_date)
-        stats_processing = StatsProcessing(self.athlete_stats.athlete_id,
+        self.stats_processor = StatsProcessing(self.athlete_stats.athlete_id,
                                            plan_event_date,
                                            DatastoreCollection())
-        stats_processing.set_start_end_times()
-        stats_processing.load_historical_data()
-        soreness_list_25 = stats_processing.merge_soreness_from_surveys(
-            stats_processing.get_readiness_soreness_list(stats_processing.last_25_days_readiness_surveys),
-            stats_processing.get_ps_survey_soreness_list(stats_processing.last_25_days_ps_surveys)
+        self.stats_processor.set_start_end_times()
+        self.stats_processor.load_historical_data()
+        soreness_list_25 = self.stats_processor.merge_soreness_from_surveys(
+            self.stats_processor.get_readiness_soreness_list(self.stats_processor.last_25_days_readiness_surveys),
+            self.stats_processor.get_ps_survey_soreness_list(self.stats_processor.last_25_days_ps_surveys)
             )
         for q3_response in clear_candidates:
             body_part_location = BodyPartLocation(q3_response['body_part'])
@@ -148,7 +149,7 @@ class SurveyProcessing(object):
                 sore_part.reported_date_time = event_date
                 soreness.append(sore_part)
             if status in ['acute_pain', 'almost_persistent_2_pain_acute']:
-                self.athlete_stats.historic_soreness = stats_processing.answer_acute_pain_question(self.athlete_stats.historic_soreness,
+                self.athlete_stats.historic_soreness = self.stats_processor.answer_acute_pain_question(self.athlete_stats.historic_soreness,
                                            soreness_list_25,
                                            body_part_location=body_part_location,
                                            side=side,
@@ -156,7 +157,7 @@ class SurveyProcessing(object):
                                            question_response_date=plan_event_date,
                                            severity_value=SorenessCalculator().get_severity(severity, movement))
             else:
-                self.athlete_stats.historic_soreness = stats_processing.answer_persistent_2_question(self.athlete_stats.historic_soreness,
+                self.athlete_stats.historic_soreness = self.stats_processor.answer_persistent_2_question(self.athlete_stats.historic_soreness,
                                            soreness_list_25,
                                            body_part_location=body_part_location,
                                            side=side,
@@ -254,12 +255,13 @@ def match_sessions(user_sessions, health_session):
                 return user_session
     return health_session
 
-def create_plan(user_id, event_date, target_minutes=15, update_stats=True, athlete_stats=None):
+def create_plan(user_id, event_date, target_minutes=15, update_stats=True, athlete_stats=None, stats_processor=None):
     if update_stats:
         # update stats
-        stats_processor = StatsProcessing(user_id,
-                                          event_date=format_date(event_date),
-                                          datastore_collection=DatastoreCollection())
+        if stats_processor is None:
+            stats_processor = StatsProcessing(user_id,
+                                              event_date=format_date(event_date),
+                                              datastore_collection=DatastoreCollection())
         athlete_stats = stats_processor.process_athlete_stats(athlete_stats)
 
         # update metrics

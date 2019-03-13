@@ -56,6 +56,7 @@ class StatsProcessing(object):
         self.days_8_14_readiness_surveys = []
         self.daily_internal_plans = []
         self.all_plans = []
+        self.historic_data_loaded = False
 
     def set_start_end_times(self):
         if self.event_date is None:
@@ -85,9 +86,13 @@ class StatsProcessing(object):
 
     @xray_recorder.capture('logic.StatsProcessing.process_athlete_stats')
     def process_athlete_stats(self, current_athlete_stats=None):
-        success = self.set_start_end_times()
+        if self.start_date is None:
+            success = self.set_start_end_times()
+        else:
+            success = True
         if success:
-            self.load_historical_data()
+            if not self.historic_data_loaded:
+                self.load_historical_data()
             athlete_stats = AthleteStats(self.athlete_id)
             athlete_stats.event_date = self.event_date
             athlete_stats = self.calc_survey_stats(athlete_stats)
@@ -143,6 +148,7 @@ class StatsProcessing(object):
         self.load_historical_readiness_surveys(daily_readiness_surveys)
         self.load_historical_post_session_surveys(post_session_surveys)
         self.load_historical_plans()
+        self.historic_data_loaded = True
 
     def persist_soreness(self, soreness):
         if soreness.reported_date_time is not None:
