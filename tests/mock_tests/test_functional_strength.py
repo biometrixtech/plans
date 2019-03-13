@@ -1,3 +1,7 @@
+from aws_xray_sdk.core import xray_recorder
+xray_recorder.configure(sampling=False)
+xray_recorder.begin_segment(name="test")
+
 import pytest
 from logic.functional_strength_mapping import FSProgramGenerator
 from logic.stats_processing import StatsProcessing
@@ -5,7 +9,7 @@ from logic.training_plan_management import TrainingPlanManager
 from models.stats import AthleteStats
 from models.daily_plan import DailyPlan
 from models.daily_readiness import DailyReadiness
-from models.post_session_survey import PostSessionSurvey
+from models.post_session_survey import PostSessionSurvey, PostSurvey
 from models.session import FunctionalStrengthSession, PracticeSession, SessionType,  StrengthConditioningType
 from models.sport import BasketballPosition, SportName, SoccerPosition, TrackAndFieldPosition, SoftballPosition, FieldHockeyPosition, VolleyballPosition, BaseballPosition
 from tests.mocks.mock_exercise_datastore import ExerciseLibraryDatastore
@@ -53,6 +57,10 @@ def get_daily_plans(start_date, end_date):
         daily_plan = DailyPlan(event_date=d.strftime("%Y-%m-%d"))
         practice_session = PracticeSession()
         practice_session.event_date = d
+        soreness = TestUtilities().body_part_soreness(9, 1)
+        soreness_list = [soreness]
+        post_survey = TestUtilities().get_post_survey(6, soreness_list)
+        practice_session.post_session_survey = PostSurvey(post_survey, d.strftime("%Y-%m-%dT%H:%M:%SZ"))
         daily_plan.training_sessions.append(practice_session)
         plans.append(daily_plan)
         i += 1

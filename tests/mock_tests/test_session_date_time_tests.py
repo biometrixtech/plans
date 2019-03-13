@@ -1,3 +1,7 @@
+from aws_xray_sdk.core import xray_recorder
+xray_recorder.configure(sampling=False)
+xray_recorder.begin_segment(name="test")
+
 import pytest
 from logic.training_plan_management import TrainingPlanManager
 from tests.mocks.mock_daily_readiness_datastore import DailyReadinessDatastore
