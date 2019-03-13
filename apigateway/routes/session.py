@@ -50,21 +50,14 @@ def handle_session_create():
         plan = DailyPlan(event_date=plan_event_date)
         plan.user_id = user_id
         plan.last_sensor_sync = DailyPlanDatastore().get_last_sensor_sync(user_id, plan_event_date)
-        DailyPlanDatastore().put(plan)
     else:
         plan = DailyPlanDatastore().get(user_id, plan_event_date, plan_event_date)[0]
         if plan_update_required and (not plan.sessions_planned or plan.session_from_readiness):
             plan.sessions_planned = True
             plan.session_from_readiness = False
-            DailyPlanDatastore().put(plan)
-
-    # save all the sessions to database
-    store = SessionDatastore()
-    for session in survey_processor.sessions:
-        store.insert(item=session,
-                     user_id=user_id,
-                     event_date=plan_event_date
-                     )
+    # add sessions to plan and write to mongo
+    plan.training_sessions.extend(survey_processor.sessions)
+    DailyPlanDatastore().put(plan)
     # save updated athlete stats
     # if survey_processor.athlete_stats is not None:
     #     AthleteStatsDatastore().put(survey_processor.athlete_stats)
@@ -73,7 +66,7 @@ def handle_session_create():
         HeartRateDatastore().put(survey_processor.heart_rate_data)
     # update plan
     if plan_update_required:
-        plan = create_plan(user_id, event_date, athlete_stats=survey_processor.athlete_stats, update_plan=plan_update_required)
+        plan = create_plan(user_id, event_date, athlete_stats=survey_processor.athlete_stats)
     else:
         plan = cleanup_plan(plan)
 
