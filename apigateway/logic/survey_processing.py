@@ -279,6 +279,7 @@ def create_plan(user_id, event_date, target_minutes=15, update_stats=True, athle
     plan['daily_readiness_survey_completed'] = survey_complete
     plan['landing_screen'] = landing_screen
     plan['nav_bar_indicator'] = nav_bar_indicator
+    del plan['daily_readiness_survey'], plan['user_id']
 
     return plan
 
