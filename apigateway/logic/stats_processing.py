@@ -1,16 +1,15 @@
-from models.stats import AthleteStats
-from models.metrics import AthleteMetric
-from models.soreness import Soreness, BodyPart, BodyPartLocation
-from datetime import datetime, timedelta
-import statistics
-from utils import parse_date, parse_datetime, format_date
-from fathomapi.utils.exceptions import NoSuchEntityException
-from models.soreness import HistoricSoreness, HistoricSorenessStatus
-from collections import namedtuple
-from logic.training_volume_processing import TrainingVolumeProcessing
-from itertools import groupby
-from operator import itemgetter
 import math
+import statistics
+from collections import namedtuple
+from datetime import datetime, timedelta
+
+from fathomapi.utils.xray import xray_recorder
+from fathomapi.utils.exceptions import NoSuchEntityException
+from logic.training_volume_processing import TrainingVolumeProcessing
+from models.stats import AthleteStats
+from models.soreness import Soreness, BodyPart
+from models.soreness import HistoricSoreness, HistoricSorenessStatus
+from utils import parse_date, format_date
 
 
 class StatsProcessing(object):
@@ -84,6 +83,7 @@ class StatsProcessing(object):
         self.end_date = self.end_date_time.strftime('%Y-%m-%d')
         return True
 
+    @xray_recorder.capture('logic.StatsProcessing.process_athlete_stats')
     def process_athlete_stats(self, current_athlete_stats=None):
         success = self.set_start_end_times()
         if success:

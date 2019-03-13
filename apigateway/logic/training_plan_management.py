@@ -1,4 +1,5 @@
 import datetime
+
 from fathomapi.utils.xray import xray_recorder
 import logic.training as training
 import logic.exercise_mapping as exercise_mapping
