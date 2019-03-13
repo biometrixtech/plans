@@ -121,18 +121,9 @@ class StatsProcessing(object):
                     # persist all of soreness/pain and session_RPE
                     athlete_stats.session_RPE = current_athlete_stats.session_RPE
                     athlete_stats.session_RPE_event_date = current_athlete_stats.session_RPE_event_date
-                    # athlete_stats.readiness_soreness = current_athlete_stats.readiness_soreness
-                    # athlete_stats.post_session_soreness = current_athlete_stats.post_session_soreness
-                    # athlete_stats.daily_severe_soreness = current_athlete_stats.daily_severe_soreness
-                    # athlete_stats.daily_severe_soreness_event_date = current_athlete_stats.daily_severe_soreness_event_date
-                    # athlete_stats.readiness_pain = current_athlete_stats.readiness_pain
-                    # athlete_stats.post_session_pain = current_athlete_stats.post_session_pain
-                    # athlete_stats.daily_severe_pain = current_athlete_stats.daily_severe_pain
-                    # athlete_stats.daily_severe_pain_event_date = current_athlete_stats.daily_severe_pain_event_date
             athlete_stats.completed_functional_strength_sessions = self.get_completed_functional_strength_sessions()
             athlete_stats.functional_strength_eligible = self.is_athlete_functional_strength_eligible(athlete_stats)
 
-            # self.athlete_stats_datastore.put(athlete_stats)
             return athlete_stats
 
     @xray_recorder.capture('logic.StatsProcessing.load_historical_data')
@@ -140,8 +131,6 @@ class StatsProcessing(object):
 
         daily_readiness_surveys = self.daily_readiness_datastore.get(self.athlete_id, self.start_date_time,
                                                                      self.end_date_time, last_only=False)
-        # post_session_surveys = self.post_session_survey_datastore.get(self.athlete_id, self.start_date_time,
-        #                                                               self.end_date_time)
         self.all_plans = self.daily_plan_datastore.get(self.athlete_id, self.start_date, self.end_date, stats_processing=True)
         post_session_surveys = []
         for plan in self.all_plans:
@@ -362,8 +351,6 @@ class StatsProcessing(object):
 
                     if last_ten_day_count <= 3 and len(body_part_history) >= 5:  # persistent
                         soreness.historic_soreness_status = HistoricSorenessStatus.persistent_pain
-                    # else:
-                    #     soreness.historic_soreness_status = HistoricSorenessStatus.almost_acute_pain
                     soreness.ask_acute_pain_question = False
                     soreness.ask_persistent_2_question = False
                     soreness.average_severity = avg_severity
@@ -378,10 +365,8 @@ class StatsProcessing(object):
 
                     soreness = HistoricSoreness(g.location, g.side, g.is_pain)
                     if g.is_pain:
-                        # soreness.historic_soreness_status = HistoricSorenessStatus.almost_persistent_2_pain
                         soreness.historic_soreness_status = HistoricSorenessStatus.persistent_pain
                     else:
-                        # soreness.historic_soreness_status = HistoricSorenessStatus.almost_persistent_2_soreness
                         soreness.historic_soreness_status = HistoricSorenessStatus.persistent_soreness
                     soreness.ask_acute_pain_question = False
                     soreness.ask_persistent_2_question = False
@@ -413,10 +398,6 @@ class StatsProcessing(object):
                     avg_severity = self.calc_avg_severity_persistent_2(body_part_history, self.event_date)
 
                     soreness = HistoricSoreness(g.location, g.side, g.is_pain)
-                    # if g.is_pain:
-                    #     soreness.historic_soreness_status = HistoricSorenessStatus.almost_persistent_pain
-                    # else:
-                    #     soreness.historic_soreness_status = HistoricSorenessStatus.almost_persistent_soreness
                     soreness.ask_acute_pain_question = False
                     soreness.ask_persistent_2_question = False
                     soreness.average_severity = avg_severity

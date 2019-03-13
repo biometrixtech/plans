@@ -2,7 +2,7 @@ import os
 import time
 import json
 from aws_xray_sdk.core import xray_recorder
-os.environ['ENVIRONMENT'] = 'dev'
+os.environ['ENVIRONMENT'] = 'test'
 xray_recorder.configure(sampling=False)
 xray_recorder.begin_segment(name="test")
 import requests
@@ -28,7 +28,7 @@ def create_persona_with_two_historic_soreness(days):
     persona1.soreness_history = soreness_history
     persona1.create_history(days=days)
 
-def create_persona_with_ten_historic_soreness(days):
+def create_persona_with_eight_historic_soreness(days):
     soreness_history = []
     right_knee_persistent2_question = sh.create_body_part_history(sh.persistent2_question(), 7, 2, True)
     left_knee_acute_pain_no_question = sh.create_body_part_history(sh.acute_pain_no_question(), 7, 1, True)
@@ -57,7 +57,7 @@ def create_persona_with_ten_historic_soreness(days):
 if __name__ == '__main__':
     start = time.time()
     history_length = 35
-    # create_persona_with_two_historic_soreness(history_length)
-    create_persona_with_ten_historic_soreness(history_length)
+    create_persona_with_two_historic_soreness(history_length)
+    create_persona_with_eight_historic_soreness(history_length)
     print(time.time() - start)
 #    update_metrics(user_id, event_date)
