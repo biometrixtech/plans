@@ -7,7 +7,6 @@ from datastores.daily_plan_datastore import DailyPlanDatastore
 from datastores.athlete_stats_datastore import AthleteStatsDatastore
 from datastores.heart_rate_datastore import HeartRateDatastore
 from datastores.sleep_history_datastore import SleepHistoryDatastore
-# from fathomapi.api.config import Config
 from fathomapi.comms.service import Service
 from fathomapi.utils.decorators import require
 from fathomapi.utils.exceptions import InvalidSchemaException
@@ -32,8 +31,7 @@ def handle_daily_readiness_create(principal_id=None):
     validate_data()
     event_date = parse_datetime(request.json['date_time'])
     event_date = fix_early_survey_event_date(event_date)
-    
-    # user_id = request.json['user_id']
+
     user_id = principal_id
     daily_readiness = DailyReadiness(
         user_id=user_id,
@@ -49,11 +47,11 @@ def handle_daily_readiness_create(principal_id=None):
     sessions_planned = True
     sessions_planned_readiness = True
     session_from_readiness = False
-    need_stats_update = False
     plan_event_date = format_date(event_date)
     athlete_stats = AthleteStatsDatastore().get(athlete_id=user_id)
     if athlete_stats is None:
         athlete_stats = AthleteStats(user_id)
+        athlete_stats.event_date = plan_event_date
     survey_processor = SurveyProcessing(user_id, event_date, athlete_stats)
 
     if 'sessions_planned' in request.json and not request.json['sessions_planned']:
@@ -64,7 +62,6 @@ def handle_daily_readiness_create(principal_id=None):
         need_new_plan = True
         sessions_planned = True
         session_from_readiness = True
-        need_stats_update = True
         for session in request.json['sessions']:
             if session is None:
                 continue
@@ -85,7 +82,7 @@ def handle_daily_readiness_create(principal_id=None):
         else:
             plan = DailyPlan(event_date=plan_event_date)
             plan.user_id = user_id
-            plan.last_sensor_sync = DailyPlanDatastore().get_last_sensor_sync(user_id, plan_event_date)
+            # plan.last_sensor_sync = DailyPlanDatastore().get_last_sensor_sync(user_id, plan_event_date)
             plan.training_sessions = survey_processor.sessions
         plan.sessions_planned = sessions_planned
         plan.session_from_readiness = session_from_readiness
@@ -97,29 +94,19 @@ def handle_daily_readiness_create(principal_id=None):
     if "clear_candidates" in request.json and len(request.json['clear_candidates']) > 0:
         survey_processor.process_clear_status_answers(request.json['clear_candidates'], event_date,
                                                       daily_readiness.soreness)
-        need_stats_update = True
 
     store = DailyReadinessDatastore()
     store.put(daily_readiness)
 
     survey_processor.soreness = daily_readiness.soreness
     survey_processor.patch_daily_and_historic_soreness(survey='readiness')
-    if len(survey_processor.soreness) > 0 or 'current_sport_name' in request.json or 'current_position' in request.json:
-        need_stats_update = True
+
     if 'current_sport_name' in request.json or 'current_position' in request.json:
         if 'current_sport_name' in request.json:
             survey_processor.athlete_stats.current_sport_name = request.json['current_sport_name']
         if 'current_position' in request.json:
             survey_processor.athlete_stats.current_position = request.json['current_position']
 
-    # if need_stats_update:
-    #     AthleteStatsDatastore().put(survey_processor.athlete_stats)
-
-    # body = {"event_date": plan_event_date,
-    #         "last_updated": format_datetime(event_date)}
-    # Service('plans', Config.get('API_VERSION')).call_apigateway_async('POST',
-    #                                                                   f"athlete/{request.json['user_id']}/daily_plan",
-    #                                                                   body)
     plan = create_plan(user_id, event_date, athlete_stats=survey_processor.athlete_stats, stats_processor=survey_processor.stats_processor)
     if "health_sync_date" in request.json and request.json['health_sync_date'] is not None:
         Service('users', os.environ['USERS_API_VERSION']).call_apigateway_async(method='PATCH',

@@ -1,12 +1,10 @@
 from flask import request, Blueprint
-import datetime
 import os
 
 from datastores.daily_plan_datastore import DailyPlanDatastore
 from datastores.session_datastore import SessionDatastore
 from datastores.athlete_stats_datastore import AthleteStatsDatastore
 from datastores.heart_rate_datastore import HeartRateDatastore
-# from fathomapi.api.config import Config
 from fathomapi.comms.service import Service
 from fathomapi.utils.decorators import require
 from fathomapi.utils.exceptions import InvalidSchemaException, NoSuchEntityException
@@ -24,8 +22,8 @@ app = Blueprint('session', __name__)
 @app.route('/', methods=['POST'])
 @require.authenticated.any
 @xray_recorder.capture('routes.session.create')
-def handle_session_create():
-    user_id = request.json['user_id']
+def handle_session_create(principal_id=None):
+    user_id = principal_id
     event_date = parse_datetime(request.json['event_date'])
     plan_update_required = False
     athlete_stats = AthleteStatsDatastore().get(athlete_id=user_id)
@@ -55,15 +53,15 @@ def handle_session_create():
         if plan_update_required and (not plan.sessions_planned or plan.session_from_readiness):
             plan.sessions_planned = True
             plan.session_from_readiness = False
+
     # add sessions to plan and write to mongo
     plan.training_sessions.extend(survey_processor.sessions)
     DailyPlanDatastore().put(plan)
-    # save updated athlete stats
-    # if survey_processor.athlete_stats is not None:
-    #     AthleteStatsDatastore().put(survey_processor.athlete_stats)
+
     # save heart_rate_data if it exists in any of the sessions
     if len(survey_processor.heart_rate_data) > 0:
         HeartRateDatastore().put(survey_processor.heart_rate_data)
+
     # update plan
     if plan_update_required:
         plan = create_plan(user_id, event_date, athlete_stats=survey_processor.athlete_stats, stats_processor=survey_processor.stats_processor)
@@ -259,11 +257,6 @@ def handle_no_sessions_planned():
     else:
         user_id = request.json['user_id']
 
-    cutoff_time = 3
-
-    if event_date.hour < cutoff_time:
-        event_date -= datetime.timedelta(days=1)
-
     plan_event_date = format_date(event_date)
     if not _check_plan_exists(user_id, plan_event_date):
         plan = DailyPlan(event_date=plan_event_date)
@@ -276,7 +269,6 @@ def handle_no_sessions_planned():
         if plan.sessions_planned:
             plan.sessions_planned = False
             DailyPlanDatastore().put(plan)
-
 
     survey_complete = plan.daily_readiness_survey_completed()
     plan = plan.json_serialise()
@@ -336,12 +328,6 @@ def _check_plan_exists(user_id, event_date):
         return True
     else:
         return False
-
-
-# def update_plan(user_id, event_date):
-#     body={'event_date': format_date(event_date),
-#           'last_updated': format_datetime(event_date)}
-#     Service('plans', Config.get('API_VERSION')).call_apigateway_async('POST', f"athlete/{user_id}/daily_plan", body=body)
 
 
 def _validate_schema():
