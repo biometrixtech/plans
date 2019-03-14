@@ -2,12 +2,15 @@ from flask import request, Blueprint
 import datetime
 
 from utils import format_date, format_datetime, parse_datetime
-from datastores.daily_plan_datastore import DailyPlanDatastore
+from datastores.datastore_collection import DatastoreCollection
 from logic.athlete_status_processing import AthleteStatusProcessing
 
 from fathomapi.utils.decorators import require
 from fathomapi.utils.exceptions import InvalidSchemaException
 from fathomapi.utils.xray import xray_recorder
+
+datastore_collection = DatastoreCollection()
+daily_plan_datastore = datastore_collection.daily_plan_datastore
 
 app = Blueprint('daily_plan', __name__)
 
@@ -16,7 +19,7 @@ app = Blueprint('daily_plan', __name__)
 @require.authenticated.any
 @xray_recorder.capture('routes.daily_plan.get')
 def handle_daily_plan_get(principal_id=None):
-    validate_input(request)
+    validate_input()
     user_id = principal_id
     event_date = request.json.get('event_date', format_datetime(datetime.datetime.utcnow()))
     event_date = parse_datetime(event_date)
@@ -27,8 +30,7 @@ def handle_daily_plan_get(principal_id=None):
     else:
         start_date = format_date(event_date)
         end_date = start_date
-    store = DailyPlanDatastore()
-    items = store.get(user_id, start_date, end_date)
+    items = daily_plan_datastore.get(user_id, start_date, end_date)
     daily_plans = []
     need_soreness_sessions = False
     for plan in items:
@@ -43,7 +45,7 @@ def handle_daily_plan_get(principal_id=None):
         del plan['daily_readiness_survey'], plan['user_id']
         daily_plans.append(plan)
     if need_soreness_sessions:
-        previous_soreness_processor = AthleteStatusProcessing(user_id, event_date)
+        previous_soreness_processor = AthleteStatusProcessing(user_id, event_date, datastore_collection=datastore_collection)
         (
             sore_body_parts,
             hist_sore_status,
@@ -75,7 +77,7 @@ def handle_daily_plan_get(principal_id=None):
             'typical_sessions': typical_sessions}, 200
 
 
-def validate_input(request):
+def validate_input():
     if not isinstance(request.json, dict):
         raise InvalidSchemaException('Request body must be a dictionary')
     if 'start_date' not in request.json:

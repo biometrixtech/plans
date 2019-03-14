@@ -2,13 +2,16 @@ from flask import request, Blueprint
 import os
 
 from utils import format_date, parse_datetime
-from datastores.daily_plan_datastore import DailyPlanDatastore
-from datastores.heart_rate_datastore import HeartRateDatastore
-from datastores.sleep_history_datastore import SleepHistoryDatastore
+from datastores.datastore_collection import DatastoreCollection
 from logic.survey_processing import SurveyProcessing
 from fathomapi.utils.decorators import require
 from fathomapi.utils.xray import xray_recorder
 from fathomapi.comms.service import Service
+
+datastore_collection = DatastoreCollection()
+daily_plan_datastore = datastore_collection.daily_plan_datastore
+heart_rate_datastore = datastore_collection.heart_rate_datastore
+sleep_history_datastore = datastore_collection.sleep_history_datastore
 
 app = Blueprint('health_data', __name__)
 
@@ -21,8 +24,10 @@ def handle_previous_health_data_write():
     event_date = request.json['event_date']
     start_date = format_date(request.json['start_date'])
     end_date = format_date(request.json['end_date'])
-    survey_processor = SurveyProcessing(user_id, parse_datetime(event_date))
-    survey_processor.plans = DailyPlanDatastore().get(user_id=user_id, start_date=start_date, end_date=end_date)
+    survey_processor = SurveyProcessing(user_id,
+                                        parse_datetime(event_date),
+                                        datastore_collection=datastore_collection)
+    survey_processor.plans = daily_plan_datastore.get(user_id=user_id, start_date=start_date, end_date=end_date)
     if 'sessions' in request.json and len(request.json['sessions']) > 0:
         survey_processor.process_historic_health_data(request.json['sessions'], event_date)
     else:
@@ -35,11 +40,11 @@ def handle_previous_health_data_write():
         survey_processor.sleep_history = []
 
     if len(survey_processor.plans) > 0:
-        DailyPlanDatastore().put(survey_processor.plans)
+        daily_plan_datastore.put(survey_processor.plans)
     if len(survey_processor.heart_rate_data) > 0:
-        HeartRateDatastore().put(survey_processor.heart_rate_data)
+        heart_rate_datastore.put(survey_processor.heart_rate_data)
     if len(survey_processor.sleep_history) > 0:
-        SleepHistoryDatastore().put(survey_processor.sleep_history)
+        sleep_history_datastore.put(survey_processor.sleep_history)
 
     Service('users', os.environ['USERS_API_VERSION']).call_apigateway_async(method='PATCH',
                                                                             endpoint=f"user/{user_id}",

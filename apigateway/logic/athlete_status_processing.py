@@ -5,16 +5,16 @@ from fathomapi.utils.exceptions import NoSuchEntityException
 from utils import parse_datetime, format_datetime, parse_date, format_date
 
 class AthleteStatusProcessing(object):
-    def __init__(self, user_id, event_date):
+    def __init__(self, user_id, event_date, datastore_collection=DatastoreCollection()):
         self.user_id = user_id
         self.event_date = format_date(event_date)
         self.current_time = event_date
         self.soreness_start_time = parse_date(format_date(event_date - datetime.timedelta(days=2)))
         self.typical_sessions_start_date = format_date(event_date - datetime.timedelta(days=14))
-        self.daily_readiness_store = DatastoreCollection().daily_readiness_datastore
-        self.post_session_store = DatastoreCollection().post_session_survey_datastore
-        self.athlete_stats_store = DatastoreCollection().athlete_stats_datastore
-        self.daily_plan_store = DatastoreCollection().daily_plan_datastore
+        self.daily_readiness_store = datastore_collection.daily_readiness_datastore
+        self.post_session_store = datastore_collection.post_session_survey_datastore
+        self.athlete_stats_store = datastore_collection.athlete_stats_datastore
+        self.daily_plan_store = datastore_collection.daily_plan_datastore
         self.severe_pain_today_yesterday = False
         self.sore_body_parts = []
         self.cleaned_sore_body_parts = []

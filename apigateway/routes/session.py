@@ -31,7 +31,9 @@ def handle_session_create(principal_id=None):
     plan_update_required = False
     athlete_stats = athlete_stats_datastore.get(athlete_id=user_id)
     plan_event_date = format_date(event_date)
-    survey_processor = SurveyProcessing(user_id, event_date, athlete_stats)
+    survey_processor = SurveyProcessing(user_id, event_date,
+                                        athlete_stats=athlete_stats,
+                                        datastore_collection=datastore_collection)
     for session in request.json['sessions']:
         if session is None:
             continue
@@ -117,7 +119,9 @@ def handle_session_update(session_id):
     plan_event_date = format_date(event_date)
 
     # create session
-    survey_processor = SurveyProcessing(user_id, event_date)
+    survey_processor = SurveyProcessing(user_id,
+                                        event_date,
+                                        datastore_collection=datastore_collection)
     session = request.json['sessions'][0]
     survey_processor.create_session_from_survey(session)
     new_session = survey_processor.sessions[0]
@@ -243,7 +247,7 @@ def handle_get_typical_sessions():
     else:
         user_id = request.json['user_id']
 
-    filtered_sessions = AthleteStatusProcessing(user_id, event_date).get_typical_sessions()
+    filtered_sessions = AthleteStatusProcessing(user_id, event_date, datastore_collection).get_typical_sessions()
     
     return {'typical_sessions': filtered_sessions}, 200
 

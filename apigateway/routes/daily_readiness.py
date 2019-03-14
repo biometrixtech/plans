@@ -56,7 +56,7 @@ def handle_daily_readiness_create(principal_id=None):
     if athlete_stats is None:
         athlete_stats = AthleteStats(user_id)
         athlete_stats.event_date = plan_event_date
-    survey_processor = SurveyProcessing(user_id, event_date, athlete_stats)
+    survey_processor = SurveyProcessing(user_id, event_date, athlete_stats, datastore_collection)
 
     if 'sessions_planned' in request.json and not request.json['sessions_planned']:
         need_new_plan = True
@@ -137,7 +137,7 @@ def handle_daily_readiness_get(principal_id=None):
             current_time = parse_datetime(request.json['event_date'])
     else:
         current_time = datetime.datetime.now()
-    previous_soreness_processor = AthleteStatusProcessing(user_id, current_time)
+    previous_soreness_processor = AthleteStatusProcessing(user_id, current_time, datastore_collection)
     (
         sore_body_parts,
         hist_sore_status,

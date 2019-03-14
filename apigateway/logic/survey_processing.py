@@ -16,7 +16,7 @@ from utils import parse_datetime, format_datetime, fix_early_survey_event_date, 
 
 
 class SurveyProcessing(object):
-    def __init__(self, user_id, event_date, athlete_stats=None):
+    def __init__(self, user_id, event_date, athlete_stats=None, datastore_collection=DatastoreCollection()):
         self.user_id = user_id
         self.event_date = format_date(event_date)
         self.athlete_stats = athlete_stats
@@ -26,7 +26,7 @@ class SurveyProcessing(object):
         self.soreness = []
         self.plans = []
         self.stats_processor = None
-        self.datastore_collection = DatastoreCollection()
+        self.datastore_collection = datastore_collection
 
     def create_session_from_survey(self, session, historic_health_data=False):
         event_date = parse_datetime(session['event_date'])
