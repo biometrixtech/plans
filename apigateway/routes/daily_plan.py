@@ -17,8 +17,6 @@ app = Blueprint('daily_plan', __name__)
 @xray_recorder.capture('routes.daily_plan.get')
 def handle_daily_plan_get(principal_id=None):
     validate_input(request)
-
-    # user_id = request.json['user_id']
     user_id = principal_id
     event_date = request.json.get('event_date', format_datetime(datetime.datetime.utcnow()))
     event_date = parse_datetime(event_date)
@@ -80,8 +78,6 @@ def handle_daily_plan_get(principal_id=None):
 def validate_input(request):
     if not isinstance(request.json, dict):
         raise InvalidSchemaException('Request body must be a dictionary')
-    # if 'user_id' not in request.json:
-    #     raise InvalidSchemaException('Missing required parameter user_id')
     if 'start_date' not in request.json:
         raise InvalidSchemaException('Missing required parameter start_date')
     else:
