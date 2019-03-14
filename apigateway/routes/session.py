@@ -1,10 +1,7 @@
 from flask import request, Blueprint
 import os
 
-from datastores.daily_plan_datastore import DailyPlanDatastore
-from datastores.session_datastore import SessionDatastore
-from datastores.athlete_stats_datastore import AthleteStatsDatastore
-from datastores.heart_rate_datastore import HeartRateDatastore
+from datastores.datastore_collection import DatastoreCollection
 from fathomapi.comms.service import Service
 from fathomapi.utils.decorators import require
 from fathomapi.utils.exceptions import InvalidSchemaException, NoSuchEntityException
@@ -16,6 +13,12 @@ from config import get_mongo_collection
 from logic.survey_processing import SurveyProcessing, create_session, update_session, create_plan, cleanup_plan
 from logic.athlete_status_processing import AthleteStatusProcessing
 
+datastore_collection = DatastoreCollection()
+athlete_stats_datastore = datastore_collection.athlete_stats_datastore
+daily_plan_datastore = datastore_collection.daily_plan_datastore
+heart_rate_datastore = datastore_collection.heart_rate_datastore
+session_datastore = datastore_collection.session_datastore
+
 app = Blueprint('session', __name__)
 
 
@@ -26,7 +29,7 @@ def handle_session_create(principal_id=None):
     user_id = principal_id
     event_date = parse_datetime(request.json['event_date'])
     plan_update_required = False
-    athlete_stats = AthleteStatsDatastore().get(athlete_id=user_id)
+    athlete_stats = athlete_stats_datastore.get(athlete_id=user_id)
     plan_event_date = format_date(event_date)
     survey_processor = SurveyProcessing(user_id, event_date, athlete_stats)
     for session in request.json['sessions']:
@@ -44,27 +47,32 @@ def handle_session_create(principal_id=None):
             break
 
     # check if plan exists, if not create a new one and save it to database, also check if existing one needs updating flags
+
     if not _check_plan_exists(user_id, plan_event_date):
         plan = DailyPlan(event_date=plan_event_date)
         plan.user_id = user_id
-        plan.last_sensor_sync = DailyPlanDatastore().get_last_sensor_sync(user_id, plan_event_date)
+        plan.last_sensor_sync = daily_plan_datastore.get_last_sensor_sync(user_id, plan_event_date)
     else:
-        plan = DailyPlanDatastore().get(user_id, plan_event_date, plan_event_date)[0]
+        plan = daily_plan_datastore.get(user_id, plan_event_date, plan_event_date)[0]
         if plan_update_required and (not plan.sessions_planned or plan.session_from_readiness):
             plan.sessions_planned = True
             plan.session_from_readiness = False
 
     # add sessions to plan and write to mongo
     plan.training_sessions.extend(survey_processor.sessions)
-    DailyPlanDatastore().put(plan)
+    daily_plan_datastore.put(plan)
 
     # save heart_rate_data if it exists in any of the sessions
     if len(survey_processor.heart_rate_data) > 0:
-        HeartRateDatastore().put(survey_processor.heart_rate_data)
+        heart_rate_datastore.put(survey_processor.heart_rate_data)
 
     # update plan
     if plan_update_required:
-        plan = create_plan(user_id, event_date, athlete_stats=survey_processor.athlete_stats, stats_processor=survey_processor.stats_processor)
+        plan = create_plan(user_id,
+                           event_date,
+                           athlete_stats=survey_processor.athlete_stats,
+                           stats_processor=survey_processor.stats_processor,
+                           datastore_collection=datastore_collection)
     else:
         plan = cleanup_plan(plan)
 
@@ -89,13 +97,11 @@ def handle_session_delete(session_id):
     if not _check_plan_exists(user_id, plan_event_date):
         raise NoSuchEntityException("Plan does not exist for the user to delete session")
 
-    store = SessionDatastore()
-
-    store.delete(user_id=user_id,
-                 event_date=plan_event_date,
-                 session_type=session_type,
-                 session_id=session_id
-                 )
+    session_datastore.delete(user_id=user_id,
+                             event_date=plan_event_date,
+                             session_type=session_type,
+                             session_id=session_id
+                             )
 
     # update_plan(user_id, event_date)
 
@@ -119,11 +125,11 @@ def handle_session_update(session_id):
     # get existing session
     if not _check_plan_exists(user_id, plan_event_date):
         raise NoSuchEntityException("Plan does not exist for the user to update session")
-    store = SessionDatastore()
-    session_obj = store.get(user_id=user_id,
-                            event_date=plan_event_date,
-                            session_id=session_id
-                            )[0]
+
+    session_obj = session_datastore.get(user_id=user_id,
+                                        event_date=plan_event_date,
+                                        session_id=session_id
+                                        )[0]
     # update existing session with new data
     if session_obj.source == SessionSource.user:
         session_obj.event_date = new_session.event_date
@@ -132,13 +138,13 @@ def handle_session_update(session_id):
         session_obj.calories = new_session.calories
         session_obj.distance = new_session.distance
         session_obj.source = SessionSource.combined
-        store.update(session_obj,
-                     user_id=user_id,
-                     event_date=plan_event_date
-                     )
+        session_datastore.update(session_obj,
+                                 user_id=user_id,
+                                 event_date=plan_event_date
+                                 )
     # write hr data if it exists
     if len(survey_processor.heart_rate_data) > 0:
-        HeartRateDatastore().put(survey_processor.heart_rate_data)
+        heart_rate_datastore.put(survey_processor.heart_rate_data)
     if "health_sync_date" in request.json and request.json['health_sync_date'] is not None:
         Service('users', os.environ['USERS_API_VERSION']).call_apigateway_async(method='PATCH',
                                                                                 endpoint=f"user/{user_id}",
@@ -162,17 +168,15 @@ def handle_session_sensor_data():
     # update last_sensor_syc date
     last_sensor_sync = request.json['last_sensor_sync']
     sensor_sync_date = format_date(parse_datetime(last_sensor_sync))
-    daly_plan_store = DailyPlanDatastore()
     if not _check_plan_exists(user_id, sensor_sync_date):
         plan = DailyPlan(event_date=sensor_sync_date)
         plan.user_id = user_id
     else:
-        plan = daly_plan_store.get(user_id, sensor_sync_date, sensor_sync_date)[0]
+        plan = daily_plan_datastore.get(user_id, sensor_sync_date, sensor_sync_date)[0]
     plan.last_sensor_sync = last_sensor_sync
-    daly_plan_store.put(plan)
+    daily_plan_datastore.put(plan)
     updated_dates = [sensor_sync_date]
 
-    session_store = SessionDatastore()
 
     sessions = request.json['sessions']
     for session in sessions:
@@ -186,35 +190,35 @@ def handle_session_sensor_data():
             plan = DailyPlan(event_date=plan_event_date)
             plan.user_id = user_id
             plan.last_sensor_sync = last_sensor_sync
-            daly_plan_store.put(plan)
+            daily_plan_datastore.put(plan)
 
         session_id = session.get('session_id', None)
         if session_id is None:
             session_obj = create_session(session_type, sensor_data)
-            session_store.insert(session_obj,
-                                 user_id=user_id,
-                                 event_date=plan_event_date
-                                 )
+            session_datastore.insert(session_obj,
+                                     user_id=user_id,
+                                     event_date=plan_event_date
+                                     )
         else:
-            session_obj = session_store.get(user_id=user_id,
-                                            event_date=plan_event_date,
-                                            session_type=session_type,
-                                            session_id=session_id)[0]
+            session_obj = session_datastore.get(user_id=user_id,
+                                                event_date=plan_event_date,
+                                                session_type=session_type,
+                                                session_id=session_id)[0]
             update_session(session_obj, sensor_data)
-            session_store.update(session_obj,
-                                 user_id=user_id,
-                                 event_date=plan_event_date
-                                 )
+            session_datastore.update(session_obj,
+                                     user_id=user_id,
+                                     event_date=plan_event_date
+                                     )
         if plan_event_date not in updated_dates:
-            plan = daly_plan_store.get(user_id, plan_event_date, plan_event_date)[0]
+            plan = daily_plan_datastore.get(user_id, plan_event_date, plan_event_date)[0]
             plan.last_sensor_sync = last_sensor_sync
             plan.sessions_planned = True
-            daly_plan_store.put(plan)
+            daily_plan_datastore.put(plan)
             updated_dates.append(plan_event_date)
 
 
     # update_plan(user_id, event_date)
-    plan = daly_plan_store.get(user_id, sensor_sync_date, sensor_sync_date)[0]
+    plan = daily_plan_datastore.get(user_id, sensor_sync_date, sensor_sync_date)[0]
     survey_complete = plan.daily_readiness_survey_completed()
     landing_screen, nav_bar_indicator = plan.define_landing_screen()
     plan = plan.json_serialise()
@@ -261,14 +265,14 @@ def handle_no_sessions_planned():
     if not _check_plan_exists(user_id, plan_event_date):
         plan = DailyPlan(event_date=plan_event_date)
         plan.user_id = user_id
-        plan.last_sensor_sync = DailyPlanDatastore().get_last_sensor_sync(user_id, plan_event_date)
+        plan.last_sensor_sync = daily_plan_datastore.get_last_sensor_sync(user_id, plan_event_date)
         plan.sessions_planned = False
-        DailyPlanDatastore().put(plan)
+        daily_plan_datastore.put(plan)
     else:
-        plan = DailyPlanDatastore().get(user_id, plan_event_date, plan_event_date)[0]
+        plan = daily_plan_datastore.get(user_id, plan_event_date, plan_event_date)[0]
         if plan.sessions_planned:
             plan.sessions_planned = False
-            DailyPlanDatastore().put(plan)
+            daily_plan_datastore.put(plan)
 
     survey_complete = plan.daily_readiness_survey_completed()
     plan = plan.json_serialise()

@@ -4,12 +4,15 @@ from fathomapi.comms.service import Service
 from fathomapi.utils.decorators import require
 from fathomapi.utils.exceptions import InvalidSchemaException, NoSuchEntityException
 from fathomapi.utils.xray import xray_recorder
-from datastores.daily_plan_datastore import DailyPlanDatastore
-from datastores.completed_exercise_datastore import CompletedExerciseDatastore
+from datastores.datastore_collection import DatastoreCollection
 from models.soreness import CompletedExercise
 from logic.survey_processing import create_plan
 from utils import format_date, parse_datetime, format_datetime
 from config import get_mongo_collection
+
+datastore_collection = DatastoreCollection()
+daily_plan_datastore = datastore_collection.daily_plan_datastore
+completed_exercise_datastore = datastore_collection.completed_exercise_datastore
 
 app = Blueprint('active_recovery', __name__)
 
@@ -37,10 +40,9 @@ def handle_active_recovery_update(principal_id=None):
 
     if not _check_plan_exists(user_id, plan_event_date):
         raise NoSuchEntityException('Plan not found for the user')
-    store = DailyPlanDatastore()
 
     save_exercises = True
-    plan = store.get(user_id=user_id, start_date=plan_event_date, end_date=plan_event_date)[0]
+    plan = daily_plan_datastore.get(user_id=user_id, start_date=plan_event_date, end_date=plan_event_date)[0]
     if recovery_type == 'pre':
         if plan.pre_recovery_completed:
             save_exercises = False
@@ -57,7 +59,7 @@ def handle_active_recovery_update(principal_id=None):
         plan.post_recovery.event_date = recovery_event_date
         plan.post_recovery.display_exercises = False
 
-    store.put(plan)
+    daily_plan_datastore.put(plan)
 
     if save_exercises:
         save_completed_exercises(completed_exercises, user_id, recovery_event_date)
@@ -93,9 +95,8 @@ def handle_active_recovery_start(principal_id=None):
     recovery_start_date = format_datetime(event_date)
     if not _check_plan_exists(user_id, plan_event_date):
         raise NoSuchEntityException('Plan not found for the user')
-    store = DailyPlanDatastore()
 
-    plan = store.get(user_id=user_id,
+    plan = daily_plan_datastore.get(user_id=user_id,
                      start_date=plan_event_date,
                      end_date=plan_event_date)[0]
     plans_service = Service('plans', Config.get('API_VERSION'))
@@ -112,7 +113,7 @@ def handle_active_recovery_start(principal_id=None):
                                             endpoint=f'/athlete/{user_id}/recovery_started',
                                             body=body)
 
-    store.put(plan)
+    daily_plan_datastore.put(plan)
 
     return {'message': 'success'}, 200
 
@@ -137,17 +138,15 @@ def handle_workout_active_time(principal_id=None):
     if not _check_plan_exists(user_id, plan_event_date):
         raise NoSuchEntityException('Plan not found for the user')
 
-    plan = create_plan(user_id, event_date, target_minutes=target_minutes, update_stats=False)
+    plan = create_plan(user_id, event_date, target_minutes=target_minutes, update_stats=False, datastore_collection=datastore_collection)
 
     return {'daily_plans': [plan]}, 200
 
 def save_completed_exercises(exercise_list, user_id, event_date):
-    exercise_store = CompletedExerciseDatastore()
-
     for exercise in exercise_list:
-        exercise_store.put(CompletedExercise(athlete_id=user_id,
-                                             exercise_id=exercise,
-                                             event_date=event_date))
+        completed_exercise_datastore.put(CompletedExercise(athlete_id=user_id,
+                                                          exercise_id=exercise,
+                                                          event_date=event_date))
 
 
 def _check_plan_exists(user_id, event_date):
