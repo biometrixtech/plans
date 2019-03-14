@@ -9,7 +9,7 @@ from logic.training_plan_management import TrainingPlanManager
 from logic.stats_processing import StatsProcessing
 from logic.metrics_processing import MetricsProcessing
 from models.stats import AthleteStats
-from utils import parse_date, parse_datetime, format_date
+from utils import parse_datetime, format_date
 import boto3
 import datetime
 import random
@@ -25,24 +25,13 @@ USERS_API_VERSION = os.environ['USERS_API_VERSION']
 @require.authenticated.any
 @xray_recorder.capture('routes.athlete.daily_plan.create')
 def create_daily_plan(athlete_id):
-    try:
-        event_date = request.json['event_date']
-    except:
-        event_date = None
-    try:
-        target_minutes = request.json['target_minutes']
-    except:
-        target_minutes = 15
-    try:
-        last_updated = request.json['last_updated']
-    except:
-        last_updated = None
+    event_date = request.json.get('event_date', None)
+    target_minutes = request.json.get('target_minutes', 15)
+    last_updated = request.json.get('last_updated', None)
     plan_manager = TrainingPlanManager(athlete_id, DatastoreCollection())
     daily_plan = plan_manager.create_daily_plan(event_date=event_date,
                                                 target_minutes=target_minutes,
                                                 last_updated=last_updated)
-    # daily_plan.last_updated = format_datetime(datetime.datetime.now())
-    # push_plan_update(athlete_id, daily_plan)
     body = {"message": "Your plan is ready!",
             "call_to_action": "VIEW_PLAN",
             "last_updated": last_updated}
@@ -59,10 +48,7 @@ def create_daily_plan(athlete_id):
 @require.authenticated.any
 @xray_recorder.capture('routes.athlete.stats.update')
 def update_athlete_stats(athlete_id):
-    if 'event_date' in request.json:
-        event_date = request.json['event_date']
-    else:
-        event_date = None
+    event_date = request.json.get('event_date', None)
     athlete_stats = StatsProcessing(athlete_id, event_date=event_date, datastore_collection=DatastoreCollection()).process_athlete_stats()
     DatastoreCollection().athlete_stats_datastore.put(athlete_stats)
 
