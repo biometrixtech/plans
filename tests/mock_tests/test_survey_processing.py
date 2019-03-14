@@ -156,6 +156,8 @@ def  test_patch_daily_and_historic_soreness_higher_soreness():
     survey_processor.soreness = [get_soreness(7, 1, False, 3)]
     survey_processor.patch_daily_and_historic_soreness(survey='readiness')
 
+    assert len(survey_processor.athlete_stats.readiness_soreness) == 2
+    survey_processor.athlete_stats.update_daily_soreness()
     assert len(survey_processor.athlete_stats.daily_severe_soreness) == 1
     assert survey_processor.athlete_stats.daily_severe_soreness[0].severity == 3
 
@@ -170,6 +172,8 @@ def  test_patch_daily_and_historic_soreness_lower_soreness():
     survey_processor.soreness = [get_soreness(7, 1, False, 2, reported_date_time=current_time)]
     survey_processor.patch_daily_and_historic_soreness(survey='readiness')
 
+    assert len(survey_processor.athlete_stats.readiness_soreness) == 2
+    survey_processor.athlete_stats.update_daily_soreness()
     assert len(survey_processor.athlete_stats.daily_severe_soreness) == 1
     assert survey_processor.athlete_stats.daily_severe_soreness[0].severity == 3
 

@@ -7,7 +7,7 @@ import logic.exercise_generator as exercise
 
 
 class ExerciseLibraryDatastore(object):
-    # @xray_recorder.capture('datastores.ExerciseLibraryDatastore.get')
+    @xray_recorder.capture('datastores.ExerciseLibraryDatastore.get')
     def get(self, collection='exerciselibrary'):
         return self._query_mongodb(collection)
 
@@ -20,7 +20,7 @@ class ExerciseLibraryDatastore(object):
         except Exception as e:
             raise e
 
-    # @xray_recorder.capture('datastores.ExerciseLibraryDatastore._query_mongodb')
+    @xray_recorder.capture('datastores.ExerciseLibraryDatastore._query_mongodb')
     def _query_mongodb(self, collection):
 
         exercise_list = []
@@ -59,7 +59,7 @@ class ExerciseLibraryDatastore(object):
 
         return exercise_list
 
-    # @xray_recorder.capture('datastores.ExerciseLibraryDatastore._put_mongodb')
+    @xray_recorder.capture('datastores.ExerciseLibraryDatastore._put_mongodb')
     def _put_mongodb(self, item, collection):
         item = self.item_to_mongodb(item)
         mongo_collection = get_mongo_collection(collection)

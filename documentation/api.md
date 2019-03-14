@@ -189,9 +189,10 @@ Authorization: eyJraWQ...ajBc4VQ
  
 ```
 {
-    "message": "success"
+    "daily_plans": [daily_plan]
 }
 ```
+* `daily_plan` will have the same structure as defined in output of [Get daily plan](#get-daily-plan) route.
 
 
 #### Soreness/Typical Session history
@@ -438,9 +439,10 @@ Postman-Token: 4b6c3946-89fd-4cde-ae29-3a4984d5f373
  
 ```
 {
-    "message": "success"
+    "daily_plans": [daily_plan]
 }
 ```
+* `daily_plan` will have the same structure as defined in output of [Get daily plan](#get-daily-plan) route.
 
 #### Get Typical Sessions (Deprecated)
 
@@ -853,9 +855,10 @@ Authorization: eyJraWQ...ajBc4VQ
  If the write was successful, the Service __will__ respond with HTTP Status `200 OK` with a body with the following syntax:
 ```
 {
-    "message": "success"
+    "daily_plans": [daily_plan]
 }
 ```
+* `daily_plan` will have the same structure as defined in output of [Get daily plan](#get-daily-plan) route.
 
 ### Functional Strength
 

@@ -1,7 +1,7 @@
 import requests, os
 import time
 import json
-os.environ['ENVIRONMENT'] = 'test'
+os.environ['ENVIRONMENT'] = 'dev'
 BASE_URL = os.getenv("BASE_URL", "https://apis.dev.fathomai.com")
 # user:
 USER = {'email': "integrationtest@fathomai.com",
@@ -23,7 +23,7 @@ def get_plan(user_id, start_date, event_date):
     body = {'user_id': user_id,
             'start_date': start_date,
             'event_date': event_date}
-    response = requests.post("{}/plans/2_2/daily_plan".format(BASE_URL),
+    response = requests.post("{}/plans/3_0/daily_plan".format(BASE_URL),
                              headers=HEADERS,
                              data=json.dumps(body))
     return response
@@ -34,7 +34,7 @@ def test_get_plan_readiness_not_completed():
     response1 = get_plan(USER['id'], '2019-01-01', '2019-01-01T13:00:01Z')
     data = response1.json()
     body = {'event_date': '2019-01-01T13:00:01Z'}
-    response2 = requests.post("{}/plans/2_2/daily_readiness/previous".format(BASE_URL),
+    response2 = requests.post("{}/plans/3_0/daily_readiness/previous".format(BASE_URL),
                              headers=HEADERS,
                              data=json.dumps(body))
     readiness2 = response2.json()['readiness']
@@ -51,7 +51,7 @@ def test_get_plan_readiness_not_completed():
 def test_get_plan_one_plan_readiness_completed():
     if HEADERS['Authorization'] is None:
         login_user(USER['email'])
-    response = get_plan("test_user", '2018-06-27', '2018-06-27T13:00:01Z')
+    response = get_plan("test_user", '2018-01-01', '2018-01-01T13:00:01Z')
     data = response.json()
     readiness = data['readiness']
 
@@ -74,12 +74,16 @@ def test_submit_readiness_one_soreness():
                         "side": 1
                     }],
             "clear_candidates": []}
-    response = requests.post("{}/plans/2_2/daily_readiness".format(BASE_URL),
+    response = requests.post("{}/plans/3_0/daily_readiness".format(BASE_URL),
                              headers=HEADERS,
                              data=json.dumps(body))
 
     assert response.status_code == 201
-    assert response.json()['message'] == 'success'
+    plan = response.json()['daily_plans'][0]
+
+    assert plan['daily_readiness_survey_completed']
+    assert plan['pre_recovery']['minutes_duration'] == 15
+    assert plan['landing_screen'] == 0
 
 def test_change_active_time():
     if HEADERS['Authorization'] is None:
@@ -93,17 +97,13 @@ def test_change_active_time():
     body = {"event_date": "2018-01-01T13:01:00Z",
             "user_id": USER['id'],
             "active_time": active_time}
-    response = requests.patch("{}/plans/2_2/active_recovery/active_time".format(BASE_URL),
+    response = requests.patch("{}/plans/3_0/active_recovery/active_time".format(BASE_URL),
                              headers=HEADERS,
                              data=json.dumps(body))
     assert response.status_code == 200
-    assert response.json()['message'] == 'success'
-    time.sleep(5)
-
-    response = get_plan(USER['id'], '2018-01-01', "2018-01-01T13:01:00Z")
-
     plan = response.json()['daily_plans'][0]
 
     assert plan['pre_recovery']['minutes_duration'] == active_time
+    assert plan['landing_screen'] == 0
 
 

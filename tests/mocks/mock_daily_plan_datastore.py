@@ -15,7 +15,7 @@ class DailyPlanDatastore(object):
                     #t.session_RPE = t.post_session_survey.survey.RPE this is for fake data
                     t.session_RPE = t.post_session_survey.RPE
 
-    def get(self, user_id=None, start_date=None, end_date=None):
+    def get(self, user_id=None, start_date=None, end_date=None, stats_processing=True):
         return self._query_mongodb(user_id, start_date, end_date)
 
     def put(self, items):
