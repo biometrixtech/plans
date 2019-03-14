@@ -168,7 +168,7 @@ class TrainingPlanManager(object):
 
         if daily_plans is None or len(daily_plans) == 0:
             daily_plan = DailyPlan(today_date)
-            daily_plan.last_sensor_sync = self.daily_plan_datastore.get_last_sensor_sync(self.athlete_id, today_date)
+            # daily_plan.last_sensor_sync = self.daily_plan_datastore.get_last_sensor_sync(self.athlete_id, today_date)
         else:
             daily_plan = daily_plans[len(daily_plans) - 1]
         post_surveys_today = self.post_session_surveys_today(post_session_surveys, today_date)
