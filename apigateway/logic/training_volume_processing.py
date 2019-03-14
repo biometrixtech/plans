@@ -1,3 +1,4 @@
+from fathomapi.utils.xray import xray_recorder
 from models.training_volume import StandardErrorRange, StandardErrorRangeMetric
 from datetime import timedelta
 import statistics, math
@@ -34,6 +35,7 @@ class TrainingVolumeProcessing(object):
         self.mod_internal_load_day_upper_bound = None
         self.high_internal_load_day_upper_bound = None
 
+    @xray_recorder.capture('logic.TrainingVolumeProcessing.load_plan_values')
     def load_plan_values(self, last_7_days_plans, days_8_14_plans, acute_daily_plans, chronic_weeks_plans, chronic_daily_plans):
 
         self.last_week_external_values = []
@@ -119,6 +121,7 @@ class TrainingVolumeProcessing(object):
             self.mod_internal_load_day_upper_bound = high_internal - range
             self.high_internal_load_day_upper_bound = high_internal
 
+    @xray_recorder.capture('logic.TrainingVolumeProcessing.calc_training_volume_metrics')
     def calc_training_volume_metrics(self, athlete_stats):
 
         athlete_stats.external_ramp = self.get_ramp(athlete_stats.expected_weekly_workouts,

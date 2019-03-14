@@ -1,3 +1,7 @@
+from aws_xray_sdk.core import xray_recorder
+xray_recorder.configure(sampling=False)
+xray_recorder.begin_segment(name="test")
+
 from models.metrics import AthleteMetric, MetricColor, WeeklyHighLevelInsight, DailyHighLevelInsight, MetricType, SpecificAction
 from models.dashboard import AthleteDashboardData, TeamDashboardData
 from models.stats import AthleteStats
