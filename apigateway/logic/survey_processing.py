@@ -112,8 +112,8 @@ class SurveyProcessing(object):
             else:
                 self.athlete_stats.update_readiness_soreness(severe_soreness)
                 self.athlete_stats.update_readiness_pain(severe_pain)
-            self.athlete_stats.update_daily_soreness()
-            self.athlete_stats.update_daily_pain()
+            # self.athlete_stats.update_daily_soreness()
+            # self.athlete_stats.update_daily_pain()
             # update historic soreness
             # for s in self.soreness:
             #     self.athlete_stats.update_historic_soreness(s, self.event_date)
