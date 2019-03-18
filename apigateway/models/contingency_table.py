@@ -3,11 +3,13 @@ class ContingencyTable(object):
         self.number_rows = number_rows
         self.number_columns = number_columns
 
-        self.table = [[0 for x in range(self.number_columns)] for y in range(self.number_rows + 1)]
+        self.table = [[0 for x in range(self.number_columns + 1)] for y in range(self.number_rows + 1)]
 
         self.degrees_freedom = (self.number_rows - 1) * (self.number_columns - 1)
 
+        self.chi_square = 0
         self.chi_square_significant = None
+
 
     def calculate(self):
 
@@ -18,20 +20,22 @@ class ContingencyTable(object):
             for r in range(self.number_rows):
                 column_total += self.table[r][c]
                 total += self.table[r][c]  # only need to calculate this one this pass through
-            self.table[self.number_rows+1][c] = column_total
+            self.table[self.number_rows][c] = column_total
 
         for r in range(self.number_rows):
             row_total = 0
             for c in range(self.number_columns):
                 row_total += self.table[r][c]
-            self.table[r][self.number_columns + 1] = row_total
+            self.table[r][self.number_columns] = row_total
 
         # now calc expected values and chi-square
         for c in range(self.number_columns):
             for r in range(self.number_rows):
-                expected_value = (self.table[r][self.number_columns + 1] * self.table[self.number_rows + 1][c]) / float(total)
-                chi_square += ((expected_value - self.table[r][c]) ** 2) / expected_value
+                expected_value = (self.table[r][self.number_columns] * self.table[self.number_rows][c]) / float(total)
+                if expected_value > 0:
+                    chi_square += ((expected_value - self.table[r][c]) ** 2) / expected_value
 
+        self.chi_square = chi_square
         self.chi_square_significant = self.is_chi_square_significant(chi_square)
 
     def is_chi_square_significant(self, chi_square):
