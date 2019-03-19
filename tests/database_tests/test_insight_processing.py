@@ -56,9 +56,8 @@ def test_get_training_plan_from_database():
     users.append('fac4be57-35d6-4952-8af9-02aadf979982')  #bay
 
     for user_id in users:
-        start_date = "2018-10-31"
-        end_date = "2019-03-23"
-        run_date = "2019-03-23"
+        start_date = "2018-11-23"
+        end_date = "2019-01-23"
 
         drs_dao = DailyReadinessDatastore()
         daily_readiness_surveys = drs_dao.get(user_id, parse_date(start_date), parse_date(end_date), False)
@@ -83,5 +82,10 @@ def test_get_training_plan_from_database():
 
         insights_processing = InsightsProcessing(user_id)
         insights_processing.load_surveys(daily_readiness_surveys, plans)
-        insights_processing.get_contingency_table()
-        j = 1
+        contingency_tables = insights_processing.get_contingency_tables(datetime(2019, 1, 16), 2)
+        for c in contingency_tables:
+            if c.chi_square_significant_05:
+                k=1
+            elif c.chi_square_significant_10:
+                k=1
+
