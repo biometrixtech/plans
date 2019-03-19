@@ -82,7 +82,7 @@ def test_get_training_plan_from_database():
 
         insights_processing = InsightsProcessing(user_id)
         insights_processing.load_surveys(daily_readiness_surveys, plans)
-        contingency_tables = insights_processing.get_contingency_tables(datetime(2019, 1, 16), 2)
+        contingency_tables = insights_processing.get_contingency_tables(datetime(2019, 1, 16), 5)
         for c in contingency_tables:
             if c.chi_square_significant_05:
                 k=1

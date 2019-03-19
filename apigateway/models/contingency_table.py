@@ -15,6 +15,24 @@ class ContingencyTable(object):
 
         total = 0
         chi_square = 0
+
+        # first remove empty rows and update number of rows
+        delete_list = []
+        for r in range(self.number_rows):
+            test_total = 0
+            for c in range(self.number_columns):
+                test_total += self.table[r][c]
+            if test_total == 0:
+                delete_list.append(r)
+
+        delete_list.sort(reverse=True)
+
+        for d in delete_list:
+            #for c in range(self.number_columns):
+            del self.table[d]
+
+        self.number_rows = self.number_rows - len(delete_list)
+
         for c in range(self.number_columns):
             column_total = 0
             for r in range(self.number_rows):
