@@ -10,6 +10,7 @@ class ContingencyTable(object):
         self.chi_square = 0
         self.chi_square_significant_05 = None
         self.chi_square_significant_10 = None
+        self.descriptor = None
 
     def calculate(self):
 
@@ -17,6 +18,7 @@ class ContingencyTable(object):
         chi_square = 0
 
         # first remove empty rows and update number of rows
+        '''deprecated
         delete_list = []
         for r in range(self.number_rows):
             test_total = 0
@@ -32,7 +34,7 @@ class ContingencyTable(object):
             del self.table[d]
 
         self.number_rows = self.number_rows - len(delete_list)
-
+        '''
         for c in range(self.number_columns):
             column_total = 0
             for r in range(self.number_rows):
