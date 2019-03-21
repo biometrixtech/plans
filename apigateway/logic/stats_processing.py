@@ -1,16 +1,15 @@
-from models.stats import AthleteStats
-from models.metrics import AthleteMetric
-from models.soreness import Soreness, BodyPart, BodyPartLocation
-from datetime import datetime, timedelta
-import statistics
-from utils import parse_date, parse_datetime, format_date
-from fathomapi.utils.exceptions import NoSuchEntityException
-from models.soreness import HistoricSoreness, HistoricSorenessStatus
-from collections import namedtuple
-from logic.training_volume_processing import TrainingVolumeProcessing
-from itertools import groupby
-from operator import itemgetter
 import math
+import statistics
+from collections import namedtuple
+from datetime import datetime, timedelta
+
+from fathomapi.utils.xray import xray_recorder
+from fathomapi.utils.exceptions import NoSuchEntityException
+from logic.training_volume_processing import TrainingVolumeProcessing
+from models.stats import AthleteStats
+from models.soreness import Soreness, BodyPart, HistoricSoreness, HistoricSorenessStatus
+from models.post_session_survey import PostSessionSurvey
+from utils import parse_date, format_date, format_datetime
 
 
 class StatsProcessing(object):
@@ -57,6 +56,7 @@ class StatsProcessing(object):
         self.days_8_14_readiness_surveys = []
         self.daily_internal_plans = []
         self.all_plans = []
+        self.historic_data_loaded = False
 
     def set_start_end_times(self):
         if self.event_date is None:
@@ -84,10 +84,15 @@ class StatsProcessing(object):
         self.end_date = self.end_date_time.strftime('%Y-%m-%d')
         return True
 
-    def process_athlete_stats(self):
-        success = self.set_start_end_times()
+    @xray_recorder.capture('logic.StatsProcessing.process_athlete_stats')
+    def process_athlete_stats(self, current_athlete_stats=None):
+        if self.start_date is None:
+            success = self.set_start_end_times()
+        else:
+            success = True
         if success:
-            self.load_historical_data()
+            if not self.historic_data_loaded:
+                self.load_historical_data()
             athlete_stats = AthleteStats(self.athlete_id)
             athlete_stats.event_date = self.event_date
             athlete_stats = self.calc_survey_stats(athlete_stats)
@@ -99,7 +104,8 @@ class StatsProcessing(object):
                                                         self.chronic_daily_plans)
             athlete_stats = training_volume_processing.calc_training_volume_metrics(athlete_stats)
             # athlete_stats.acute_pain = self.get_acute_pain_list()
-            current_athlete_stats = self.athlete_stats_datastore.get(athlete_id=self.athlete_id)
+            if current_athlete_stats is None:
+                current_athlete_stats = self.athlete_stats_datastore.get(athlete_id=self.athlete_id)
             athlete_stats.historic_soreness = self.get_historic_soreness(current_athlete_stats.historic_soreness if current_athlete_stats is not None else None)
             if current_athlete_stats is not None:
                 athlete_stats.current_sport_name = current_athlete_stats.current_sport_name
@@ -120,31 +126,29 @@ class StatsProcessing(object):
                     # persist all of soreness/pain and session_RPE
                     athlete_stats.session_RPE = current_athlete_stats.session_RPE
                     athlete_stats.session_RPE_event_date = current_athlete_stats.session_RPE_event_date
-                    # athlete_stats.readiness_soreness = current_athlete_stats.readiness_soreness
-                    # athlete_stats.post_session_soreness = current_athlete_stats.post_session_soreness
-                    # athlete_stats.daily_severe_soreness = current_athlete_stats.daily_severe_soreness
-                    # athlete_stats.daily_severe_soreness_event_date = current_athlete_stats.daily_severe_soreness_event_date
-                    # athlete_stats.readiness_pain = current_athlete_stats.readiness_pain
-                    # athlete_stats.post_session_pain = current_athlete_stats.post_session_pain
-                    # athlete_stats.daily_severe_pain = current_athlete_stats.daily_severe_pain
-                    # athlete_stats.daily_severe_pain_event_date = current_athlete_stats.daily_severe_pain_event_date
             athlete_stats.completed_functional_strength_sessions = self.get_completed_functional_strength_sessions()
             athlete_stats.functional_strength_eligible = self.is_athlete_functional_strength_eligible(athlete_stats)
 
-            self.athlete_stats_datastore.put(athlete_stats)
+            return athlete_stats
 
+    @xray_recorder.capture('logic.StatsProcessing.load_historical_data')
     def load_historical_data(self):
 
         daily_readiness_surveys = self.daily_readiness_datastore.get(self.athlete_id, self.start_date_time,
                                                                      self.end_date_time, last_only=False)
-        post_session_surveys = self.post_session_survey_datastore.get(self.athlete_id, self.start_date_time,
-                                                                      self.end_date_time)
-        self.all_plans = self.daily_plan_datastore.get(self.athlete_id, self.start_date, self.end_date)
+        self.all_plans = self.daily_plan_datastore.get(self.athlete_id, self.start_date, self.end_date, stats_processing=True)
+        post_session_surveys = []
+        for plan in self.all_plans:
+            post_surveys = \
+                [_post_session_survey_from_training_session(session.post_session_survey, self.athlete_id, session.id, session.session_type().value, plan.event_date)
+                 for session in plan.training_sessions if session is not None]
+            post_session_surveys.extend([s for s in post_surveys if s is not None])
         self.update_start_times(daily_readiness_surveys, post_session_surveys, self.all_plans)
         self.set_acute_chronic_periods()
         self.load_historical_readiness_surveys(daily_readiness_surveys)
         self.load_historical_post_session_surveys(post_session_surveys)
         self.load_historical_plans()
+        self.historic_data_loaded = True
 
     def persist_soreness(self, soreness):
         if soreness.reported_date_time is not None:
@@ -165,6 +169,7 @@ class StatsProcessing(object):
 
         return training_sessions
 
+    @xray_recorder.capture('logic.StatsProcessing.get_historic_soreness')
     def get_historic_soreness(self, existing_historic_soreness=None):
 
         soreness_list = []
@@ -352,8 +357,6 @@ class StatsProcessing(object):
 
                     if last_ten_day_count <= 3 and len(body_part_history) >= 5:  # persistent
                         soreness.historic_soreness_status = HistoricSorenessStatus.persistent_pain
-                    else:
-                        soreness.historic_soreness_status = HistoricSorenessStatus.almost_acute_pain
                     soreness.ask_acute_pain_question = False
                     soreness.ask_persistent_2_question = False
                     soreness.average_severity = avg_severity
@@ -368,9 +371,9 @@ class StatsProcessing(object):
 
                     soreness = HistoricSoreness(g.location, g.side, g.is_pain)
                     if g.is_pain:
-                        soreness.historic_soreness_status = HistoricSorenessStatus.almost_persistent_2_pain
+                        soreness.historic_soreness_status = HistoricSorenessStatus.persistent_pain
                     else:
-                        soreness.historic_soreness_status = HistoricSorenessStatus.almost_persistent_2_soreness
+                        soreness.historic_soreness_status = HistoricSorenessStatus.persistent_soreness
                     soreness.ask_acute_pain_question = False
                     soreness.ask_persistent_2_question = False
                     soreness.average_severity = avg_severity
@@ -401,10 +404,6 @@ class StatsProcessing(object):
                     avg_severity = self.calc_avg_severity_persistent_2(body_part_history, self.event_date)
 
                     soreness = HistoricSoreness(g.location, g.side, g.is_pain)
-                    if g.is_pain:
-                        soreness.historic_soreness_status = HistoricSorenessStatus.almost_persistent_pain
-                    else:
-                        soreness.historic_soreness_status = HistoricSorenessStatus.almost_persistent_soreness
                     soreness.ask_acute_pain_question = False
                     soreness.ask_persistent_2_question = False
                     soreness.average_severity = avg_severity
@@ -465,7 +464,7 @@ class StatsProcessing(object):
                                                                                      self.event_date)
         elif ((parse_date(self.event_date) - parse_date(historic_soreness.streak_start_date)).days >= 7
               and not historic_soreness.ask_acute_pain_question):
-            historic_soreness.historic_soreness_status = HistoricSorenessStatus.almost_persistent_2_pain_acute
+            historic_soreness.historic_soreness_status = HistoricSorenessStatus.acute_pain
             historic_soreness.average_severity = self.calc_avg_severity_persistent_2(body_part_history,
                                                                                      self.event_date)
 
@@ -589,7 +588,7 @@ class StatsProcessing(object):
                         if (parse_date(question_response_date) - parse_date(e.streak_start_date)).days >=7:
                             e.historic_soreness_status = HistoricSorenessStatus.persistent_2_pain
                         if (parse_date(question_response_date) - parse_date(e.streak_start_date)).days == 6:
-                            e.historic_soreness_status = HistoricSorenessStatus.almost_persistent_2_pain_acute
+                            e.historic_soreness_status = HistoricSorenessStatus.acute_pain
                             e.streak += 1
                             e.average_severity = self.calc_avg_severity_acute_pain(body_part_history, e.streak)
                         #elif last_ten_day_count > 4:
@@ -1205,6 +1204,16 @@ class StatsProcessing(object):
 
 
 
+def _post_session_survey_from_training_session(survey, user_id, session_id, session_type, event_date):
+    if survey is not None:
+        if survey.event_date is not None:
+            post_session_survey = PostSessionSurvey(format_datetime(survey.event_date), user_id, session_id, session_type)
+        else:
+            post_session_survey = PostSessionSurvey(format_datetime(parse_date(event_date)), user_id, session_id, session_type)
+        post_session_survey.survey = survey
+        return post_session_survey
+    else:
+        return None
 
 
 

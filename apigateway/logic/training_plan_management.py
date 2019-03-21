@@ -1,15 +1,14 @@
-import logic.training as training
-import models.session as session
-from models.daily_plan import DailyPlan
 import datetime
+
+from fathomapi.utils.xray import xray_recorder
+import logic.training as training
 import logic.exercise_mapping as exercise_mapping
 from logic.soreness_processing import SorenessCalculator
-from models.soreness import BodyPartLocation, HistoricSorenessStatus
-from logic.goal_focus_text_generator import RecoveryTextGenerator
-from utils import format_datetime, format_date, parse_datetime, parse_date
-from logic.stats_processing import StatsProcessing
 from logic.functional_strength_mapping import FSProgramGenerator
-
+import models.session as session
+from models.daily_plan import DailyPlan
+from models.soreness import HistoricSorenessStatus
+from utils import format_datetime, format_date, parse_datetime, parse_date
 
 class TrainingPlanManager(object):
 
@@ -118,7 +117,8 @@ class TrainingPlanManager(object):
             else:
                 return True
 
-    def create_daily_plan(self, event_date=None, target_minutes=15, last_updated=None):
+    @xray_recorder.capture('logic.TrainingPlanManager.create_daily_plan')
+    def create_daily_plan(self, event_date=None, target_minutes=15, last_updated=None, athlete_stats=None):
 
         if event_date is not None:
             start_time = format_datetime(parse_date(event_date) - datetime.timedelta(days=1))
@@ -138,7 +138,8 @@ class TrainingPlanManager(object):
             last_updated = format_datetime(datetime.datetime.utcnow())
         trigger_date_time = last_daily_readiness_survey.get_event_date()
         post_session_surveys = self.post_session_survey_datastore.get(self.athlete_id, parse_datetime(start_time), parse_datetime(end_time))
-        athlete_stats = self.athlete_stats_datastore.get(self.athlete_id)
+        if athlete_stats is None:
+            athlete_stats = self.athlete_stats_datastore.get(self.athlete_id)
 
         survey_event_dates = [s.get_event_date() for s in post_session_surveys if s is not None]
 
@@ -167,7 +168,7 @@ class TrainingPlanManager(object):
 
         if daily_plans is None or len(daily_plans) == 0:
             daily_plan = DailyPlan(today_date)
-            daily_plan.last_sensor_sync = self.daily_plan_datastore.get_last_sensor_sync(self.athlete_id, today_date)
+            # daily_plan.last_sensor_sync = self.daily_plan_datastore.get_last_sensor_sync(self.athlete_id, today_date)
         else:
             daily_plan = daily_plans[len(daily_plans) - 1]
         post_surveys_today = self.post_session_surveys_today(post_session_surveys, today_date)
@@ -189,33 +190,33 @@ class TrainingPlanManager(object):
         else:
             max_soreness = 0
 
-        rpe_values = [s.survey.RPE for s in post_session_surveys if s.survey is not None and s.survey.RPE is not None]
+        #rpe_values = [s.survey.RPE for s in post_session_surveys if s.survey is not None and s.survey.RPE is not None]
 
-        if rpe_values is not None and len(rpe_values) > 0:
-            max_rpe = max(rpe_values)
-        else:
-            max_rpe = 0
+        #if rpe_values is not None and len(rpe_values) > 0:
+        #    max_rpe = max(rpe_values)
+        #else:
+        #    max_rpe = 0
 
         if daily_plan.functional_strength_session is None:
             daily_plan = self.populate_functional_strength(daily_plan, athlete_stats, True)
 
-        text_generator = RecoveryTextGenerator()
-        body_part_text = text_generator.get_text_from_body_part_list(soreness_list)
+        #text_generator = RecoveryTextGenerator()
+        #body_part_text = text_generator.get_text_from_body_part_list(soreness_list)
 
         functional_strength_active = (daily_plan.functional_strength_session is not None)
 
         # target_minutes = 15
 
         if not show_post_recovery:
-            pre_impact_score = self.calculate_pre_impact_score(
-                                max_rpe,
-                                last_daily_readiness_survey.readiness,
-                                last_daily_readiness_survey.sleep_quality,
-                                max_soreness,
-                                athlete_stats
-                                )
+            # pre_impact_score = self.calculate_pre_impact_score(
+            #                    max_rpe,
+            #                    last_daily_readiness_survey.readiness,
+            #                    last_daily_readiness_survey.sleep_quality,
+            #                    max_soreness,
+            #                    athlete_stats
+            #                    )
             if daily_plan.pre_recovery is not None and not daily_plan.pre_recovery.completed:
-                rpe_impact_score = min((max_rpe / 10) * 4, 4)
+                # rpe_impact_score = min((max_rpe / 10) * 4, 4)
                 daily_plan.pre_recovery.set_exercise_target_minutes(soreness_list, target_minutes, max_soreness,
                                                                     historic_soreness_present,
                                                                     functional_strength_active,
@@ -223,10 +224,10 @@ class TrainingPlanManager(object):
                 am_exercise_assignments = calc.create_exercise_assignments(daily_plan.pre_recovery, soreness_list,
                                                                            trigger_date_time, target_minutes)
                 daily_plan.pre_recovery.update_from_exercise_assignments(am_exercise_assignments)
-                daily_plan.pre_recovery.impact_score = pre_impact_score
-                daily_plan.pre_recovery.why_text = text_generator.get_why_text(rpe_impact_score, max_soreness)
-                daily_plan.pre_recovery.goal_text = text_generator.get_goal_text(rpe_impact_score, max_soreness,
-                                                                                 body_part_text)
+                # daily_plan.pre_recovery.impact_score = pre_impact_score
+                # daily_plan.pre_recovery.why_text = text_generator.get_why_text(rpe_impact_score, max_soreness)
+                # daily_plan.pre_recovery.goal_text = text_generator.get_goal_text(rpe_impact_score, max_soreness,
+                #                                                                 body_part_text)
 
                 daily_plan.pre_recovery.display_exercises = True
             else:
@@ -234,15 +235,15 @@ class TrainingPlanManager(object):
                 daily_plan.pre_recovery.display_exercises = False
 
         if show_post_recovery:
-            post_impact_score = self.calculate_post_impact_score(
-                max_rpe,
-                last_daily_readiness_survey.readiness,
-                last_daily_readiness_survey.sleep_quality,
-                max_soreness,
-                athlete_stats
-            )
+            # post_impact_score = self.calculate_post_impact_score(
+            #    max_rpe,
+            #    last_daily_readiness_survey.readiness,
+            #    last_daily_readiness_survey.sleep_quality,
+            #    max_soreness,
+            #    athlete_stats
+            #)
             if daily_plan.post_recovery is not None and not daily_plan.post_recovery.completed:
-                rpe_impact_score = min((max_rpe / 10) * 5, 5)
+                # rpe_impact_score = min((max_rpe / 10) * 5, 5)
                 daily_plan.post_recovery.set_exercise_target_minutes(soreness_list, target_minutes, max_soreness,
                                                                      historic_soreness_present,
                                                                      functional_strength_active,
@@ -250,10 +251,10 @@ class TrainingPlanManager(object):
                 pm_exercise_assignments = calc.create_exercise_assignments(daily_plan.post_recovery, soreness_list,
                                                                            trigger_date_time, target_minutes)
                 daily_plan.post_recovery.update_from_exercise_assignments(pm_exercise_assignments)
-                daily_plan.post_recovery.impact_score = post_impact_score
-                daily_plan.post_recovery.why_text = text_generator.get_why_text(rpe_impact_score, max_soreness)
-                daily_plan.post_recovery.goal_text = text_generator.get_goal_text(rpe_impact_score, max_soreness,
-                                                                                  body_part_text)
+                #daily_plan.post_recovery.impact_score = post_impact_score
+                #daily_plan.post_recovery.why_text = text_generator.get_why_text(rpe_impact_score, max_soreness)
+                #daily_plan.post_recovery.goal_text = text_generator.get_goal_text(rpe_impact_score, max_soreness,
+                #                                                                  body_part_text)
                 # if athlete reports severe pain/soreness in PSS and hasn't already completed FS session, remove it.
                 # if athlete_stats.severe_pain_soreness_today() and not daily_plan.functional_strength_completed:
                 # Temporarily we're only checking if user is locked out of Recovery to avoid user confusion until mobile ui is in place

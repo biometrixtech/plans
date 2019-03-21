@@ -4,11 +4,15 @@ from fathomapi.comms.service import Service
 from fathomapi.utils.decorators import require
 from fathomapi.utils.exceptions import InvalidSchemaException, NoSuchEntityException
 from fathomapi.utils.xray import xray_recorder
-from datastores.daily_plan_datastore import DailyPlanDatastore
-from datastores.completed_exercise_datastore import CompletedExerciseDatastore
+from datastores.datastore_collection import DatastoreCollection
 from models.soreness import CompletedExercise
+from logic.survey_processing import create_plan
 from utils import format_date, parse_datetime, format_datetime
 from config import get_mongo_collection
+
+datastore_collection = DatastoreCollection()
+daily_plan_datastore = datastore_collection.daily_plan_datastore
+completed_exercise_datastore = datastore_collection.completed_exercise_datastore
 
 app = Blueprint('active_recovery', __name__)
 
@@ -16,7 +20,8 @@ app = Blueprint('active_recovery', __name__)
 @app.route('/', methods=['PATCH'])
 @require.authenticated.any
 @xray_recorder.capture('routes.active_recovery')
-def handle_active_recovery_update():
+def handle_active_recovery_update(principal_id=None):
+    user_id = principal_id
     if not isinstance(request.json, dict):
         raise InvalidSchemaException('Request body must be a dictionary')
     if 'event_date' not in request.json:
@@ -25,34 +30,24 @@ def handle_active_recovery_update():
         event_date = parse_datetime(request.json['event_date'])
 
     try:
-        user_id = request.json['user_id']
-    except:
-        raise InvalidSchemaException('user_id is required')
-    try:
         recovery_type = request.json['recovery_type']
     except:
         raise InvalidSchemaException('recovery_type is required')
-    try:
-        completed_exercises = request.json['completed_exercises']
-    except:
-        completed_exercises = []
+    completed_exercises = request.json.get('completed_exercises', [])
 
     plan_event_date = format_date(event_date)
     recovery_event_date = format_datetime(event_date)
-    # if event_date.hour < 3:
-    #     plan_event_date = format_date(event_date - datetime.timedelta(days=1))
+
     if not _check_plan_exists(user_id, plan_event_date):
         raise NoSuchEntityException('Plan not found for the user')
-    store = DailyPlanDatastore()
 
     save_exercises = True
-    plan = store.get(user_id=user_id, start_date=plan_event_date, end_date=plan_event_date)[0]
+    plan = daily_plan_datastore.get(user_id=user_id, start_date=plan_event_date, end_date=plan_event_date)[0]
     if recovery_type == 'pre':
         if plan.pre_recovery_completed:
             save_exercises = False
         plan.pre_recovery_completed = True # plan
         plan.pre_recovery.completed = True # recovery
-        # plan.pre_recovery.start_date = recovery_start_date
         plan.pre_recovery.event_date = recovery_event_date
         plan.pre_recovery.display_exercises = False
 
@@ -61,11 +56,10 @@ def handle_active_recovery_update():
             save_exercises = False
         plan.post_recovery_completed = True # plan
         plan.post_recovery.completed = True # recovery
-        # plan.post_recovery.start_date = recovery_start_date
         plan.post_recovery.event_date = recovery_event_date
         plan.post_recovery.display_exercises = False
 
-    store.put(plan)
+    daily_plan_datastore.put(plan)
 
     if save_exercises:
         save_completed_exercises(completed_exercises, user_id, recovery_event_date)
@@ -84,7 +78,8 @@ def handle_active_recovery_update():
 @app.route('/', methods=['POST'])
 @require.authenticated.any
 @xray_recorder.capture('routes.active_recovery.start')
-def handle_active_recovery_start():
+def handle_active_recovery_start(principal_id=None):
+    user_id = principal_id
     if not isinstance(request.json, dict):
         raise InvalidSchemaException('Request body must be a dictionary')
     if 'event_date' not in request.json:
@@ -92,23 +87,16 @@ def handle_active_recovery_start():
     else:
         event_date = parse_datetime(request.json['event_date'])
     try:
-        user_id = request.json['user_id']
-    except:
-        raise InvalidSchemaException('user_id is required')
-    try:
         recovery_type = request.json['recovery_type']
     except:
         raise InvalidSchemaException('recovery_type is required')
 
     plan_event_date = format_date(event_date)
     recovery_start_date = format_datetime(event_date)
-    # if event_date.hour < 3:
-    #     plan_event_date = format_date(event_date - datetime.timedelta(days=1))
     if not _check_plan_exists(user_id, plan_event_date):
         raise NoSuchEntityException('Plan not found for the user')
-    store = DailyPlanDatastore()
 
-    plan = store.get(user_id=user_id,
+    plan = daily_plan_datastore.get(user_id=user_id,
                      start_date=plan_event_date,
                      end_date=plan_event_date)[0]
     plans_service = Service('plans', Config.get('API_VERSION'))
@@ -125,7 +113,7 @@ def handle_active_recovery_start():
                                             endpoint=f'/athlete/{user_id}/recovery_started',
                                             body=body)
 
-    store.put(plan)
+    daily_plan_datastore.put(plan)
 
     return {'message': 'success'}, 200
 
@@ -133,18 +121,14 @@ def handle_active_recovery_start():
 @app.route('/active_time', methods=['PATCH'])
 @require.authenticated.any
 @xray_recorder.capture('routes.active_time')
-def handle_workout_active_time():
+def handle_workout_active_time(principal_id=None):
+    user_id = principal_id
     if not isinstance(request.json, dict):
         raise InvalidSchemaException('Request body must be a dictionary')
     if 'event_date' not in request.json:
         raise InvalidSchemaException('Missing required parameter event_date')
     else:
         event_date = parse_datetime(request.json['event_date'])
-
-    try:
-        user_id = request.json['user_id']
-    except:
-        raise InvalidSchemaException('user_id is required')
     try:
         target_minutes = request.json['active_time']
     except:
@@ -153,27 +137,16 @@ def handle_workout_active_time():
     plan_event_date = format_date(event_date)
     if not _check_plan_exists(user_id, plan_event_date):
         raise NoSuchEntityException('Plan not found for the user')
-    store = DailyPlanDatastore()
 
-    body = {"event_date": plan_event_date,
-            "target_minutes": target_minutes,
-            "last_updated": format_datetime(event_date)}
-    Service('plans', Config.get('API_VERSION')).call_apigateway_async('POST',
-                                                                      f"athlete/{user_id}/daily_plan",
-                                                                      body)
+    plan = create_plan(user_id, event_date, target_minutes=target_minutes, update_stats=False, datastore_collection=datastore_collection)
 
-    return {'message': 'success'}, 200
-
-
-
+    return {'daily_plans': [plan]}, 200
 
 def save_completed_exercises(exercise_list, user_id, event_date):
-    exercise_store = CompletedExerciseDatastore()
-
     for exercise in exercise_list:
-        exercise_store.put(CompletedExercise(athlete_id=user_id,
-                                             exercise_id=exercise,
-                                             event_date=event_date))
+        completed_exercise_datastore.put(CompletedExercise(athlete_id=user_id,
+                                                          exercise_id=exercise,
+                                                          event_date=event_date))
 
 
 def _check_plan_exists(user_id, event_date):

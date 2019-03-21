@@ -1,8 +1,10 @@
-from models.metrics import AthleteMetric, AthleteSorenessMetricGenerator, AthleteTrainingVolumeMetricGenerator, DailyHighLevelInsight, MetricColor, MetricType, ThresholdRecommendation, WeeklyHighLevelInsight
+from fathomapi.utils.xray import xray_recorder
+from models.metrics import AthleteSorenessMetricGenerator, AthleteTrainingVolumeMetricGenerator, DailyHighLevelInsight, MetricColor, MetricType, ThresholdRecommendation, WeeklyHighLevelInsight
 from models.soreness import HistoricSorenessStatus
 
 class MetricsProcessing(object):
 
+    @xray_recorder.capture('logic.MetricsProcessing.get_athlete_metrics_from_stats')
     def get_athlete_metrics_from_stats(self, athlete_stats, event_date):
 
         metrics = []

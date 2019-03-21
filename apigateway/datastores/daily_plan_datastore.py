@@ -10,8 +10,8 @@ class DailyPlanDatastore(object):
     def __init__(self, mongo_collection='dailyplan'):
         self.mongo_collection = mongo_collection
 
-    def get(self, user_id=None, start_date=None, end_date=None, day_of_week=None):
-        return self._query_mongodb(user_id, start_date, end_date, day_of_week)
+    def get(self, user_id=None, start_date=None, end_date=None, day_of_week=None, stats_processing=False):
+        return self._query_mongodb(user_id, start_date, end_date, day_of_week, stats_processing)
 
     def put(self, items):
         if not isinstance(items, list):
@@ -34,7 +34,7 @@ class DailyPlanDatastore(object):
             self._delete_mongodb(item=items, user_id=user_id, start_date=start_date, end_date=end_date)
 
     @xray_recorder.capture('datastore.DailyPlanDatastore._query_mongodb')
-    def _query_mongodb(self, user_id, start_date, end_date, day_of_week):
+    def _query_mongodb(self, user_id, start_date, end_date, day_of_week, stats_processing):
         mongo_collection = get_mongo_collection(self.mongo_collection)
         query = {}
         if isinstance(user_id, list):
@@ -65,13 +65,15 @@ class DailyPlanDatastore(object):
             # daily_plan.tournaments = \
             #     [_external_session_from_mongodb(s, session.SessionType.tournament)
             #      for s in plan['tournament_sessions']]
-            daily_plan.pre_recovery = _recovery_session_from_mongodb(plan['pre_recovery']) if plan.get('pre_recovery', None) is not None else None
-            daily_plan.post_recovery = _recovery_session_from_mongodb(plan['post_recovery']) if plan.get('post_recovery', None) is not None else None
-            daily_plan.completed_post_recovery_sessions = \
-                [_recovery_session_from_mongodb(s) for s in plan.get('completed_post_recovery_sessions', [])]
-            # daily_plan.corrective_sessions = \
-            #    [_external_session_from_mongodb(s, session.SessionType.corrective)
-            #     for s in plan['corrective_sessions']]
+            if not stats_processing:
+                daily_plan.pre_recovery = _recovery_session_from_mongodb(plan['pre_recovery']) if plan.get('pre_recovery', None) is not None else None
+                daily_plan.post_recovery = _recovery_session_from_mongodb(plan['post_recovery']) if plan.get('post_recovery', None) is not None else None
+                daily_plan.completed_post_recovery_sessions = \
+                    [_recovery_session_from_mongodb(s) for s in plan.get('completed_post_recovery_sessions', [])]
+                daily_plan.functional_strength_session = _functional_strength_session_from_mongodb(plan['functional_strength_session']) if plan.get('functional_strength_session', None) is not None else None
+                # daily_plan.corrective_sessions = \
+                #    [_external_session_from_mongodb(s, session.SessionType.corrective)
+                #     for s in plan['corrective_sessions']]
             daily_plan.bump_up_sessions = \
                 [_external_session_from_mongodb(s, session.SessionType.bump_up)
                  for s in plan.get('bump_up_sessions', [])]
@@ -84,7 +86,6 @@ class DailyPlanDatastore(object):
             daily_plan.sessions_planned = plan.get('sessions_planned', True)
             daily_plan.functional_strength_eligible = plan.get('functional_strength_eligible', False)
             daily_plan.completed_functional_strength_sessions = plan.get('completed_functional_strength_sessions', 0)
-            daily_plan.functional_strength_session = _functional_strength_session_from_mongodb(plan['functional_strength_session']) if plan.get('functional_strength_session', None) is not None else None
             daily_plan.functional_strength_completed = plan.get('functional_strength_completed', False)
             daily_plan.session_from_readiness = plan.get('session_from_readiness', False)
             daily_plan.sessions_planned_readiness = plan.get('sessions_planned_readiness', True)
