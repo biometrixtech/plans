@@ -16,6 +16,10 @@ class SessionType(Enum):
     corrective = 5
     sport_training = 6
 
+    @classmethod
+    def has_value(cls, value):
+        return any(value == item.value for item in cls)
+
 class StrengthConditioningType(Enum):
     "sub-type for session_type=1"
     endurance = 0

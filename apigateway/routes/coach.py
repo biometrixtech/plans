@@ -15,7 +15,7 @@ USERS_API_VERSION = os.environ['USERS_API_VERSION']
 
 
 @app.route('/<uuid:coach_id>/dashboard', methods=['GET'])
-@require.authenticated.any
+@require.authenticated.self
 @xray_recorder.capture('routes.team.dashboard.get')
 def get_dashboard_data(coach_id):
     try:

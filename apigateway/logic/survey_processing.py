@@ -1,4 +1,3 @@
-import datetime
 from fathomapi.utils.xray import xray_recorder
 from models.session import SessionType, SessionFactory, StrengthConditioningType, SessionSource
 from models.post_session_survey import PostSurvey
@@ -73,8 +72,8 @@ class SurveyProcessing(object):
             survey = PostSurvey(event_date=session['post_session_survey']['event_date'],
                                 survey=session['post_session_survey'])
             # TODO: if the frontend error is fixed, this needs to be removed
-            if survey.event_date.hour < 3 and event_date.hour >= 3:
-                session_data['event_date'] = format_datetime(event_date - datetime.timedelta(days=1))
+            # if survey.event_date.hour < 3 and event_date.hour >= 3:
+            #     session_data['event_date'] = format_datetime(event_date - datetime.timedelta(days=1))
             survey.event_date = fix_early_survey_event_date(survey.event_date)
             if "clear_candidates" in session['post_session_survey'] and len(session['post_session_survey']['clear_candidates']) > 0:
                 self.process_clear_status_answers(session['post_session_survey']['clear_candidates'],
@@ -113,18 +112,13 @@ class SurveyProcessing(object):
             else:
                 self.athlete_stats.update_readiness_soreness(severe_soreness)
                 self.athlete_stats.update_readiness_pain(severe_pain)
-            # self.athlete_stats.update_daily_soreness()
-            # self.athlete_stats.update_daily_pain()
-            # update historic soreness
-            # for s in self.soreness:
-            #     self.athlete_stats.update_historic_soreness(s, self.event_date)
 
     def process_clear_status_answers(self, clear_candidates, event_date, soreness):
 
         plan_event_date = format_date(event_date)
         self.stats_processor = StatsProcessing(self.athlete_stats.athlete_id,
-                                           plan_event_date,
-                                           self.datastore_collection)
+                                               plan_event_date,
+                                               self.datastore_collection)
         self.stats_processor.set_start_end_times()
         self.stats_processor.load_historical_data()
         soreness_list_25 = self.stats_processor.merge_soreness_from_surveys(
@@ -134,7 +128,7 @@ class SurveyProcessing(object):
         for q3_response in clear_candidates:
             body_part_location = BodyPartLocation(q3_response['body_part'])
             side = q3_response['side']
-            severity = q3_response.get('severity', 0) # don't error out because of mobile bug
+            severity = q3_response.get('severity', 0)  # don't error out because of mobile bug
             movement = q3_response.get('movement', None)
             pain = q3_response.get('pain', False)
             status = q3_response.get('status', 'dormant_cleared')
@@ -151,21 +145,21 @@ class SurveyProcessing(object):
                 soreness.append(sore_part)
             if status in ['acute_pain', 'almost_persistent_2_pain_acute']:
                 self.athlete_stats.historic_soreness = self.stats_processor.answer_acute_pain_question(self.athlete_stats.historic_soreness,
-                                           soreness_list_25,
-                                           body_part_location=body_part_location,
-                                           side=side,
-                                           is_pain=pain,
-                                           question_response_date=plan_event_date,
-                                           severity_value=SorenessCalculator().get_severity(severity, movement))
+                                                                                                       soreness_list_25,
+                                                                                                       body_part_location=body_part_location,
+                                                                                                       side=side,
+                                                                                                       is_pain=pain,
+                                                                                                       question_response_date=plan_event_date,
+                                                                                                       severity_value=SorenessCalculator().get_severity(severity, movement))
             else:
                 self.athlete_stats.historic_soreness = self.stats_processor.answer_persistent_2_question(self.athlete_stats.historic_soreness,
-                                           soreness_list_25,
-                                           body_part_location=body_part_location,
-                                           side=side,
-                                           is_pain=pain,
-                                           question_response_date=plan_event_date,
-                                           severity_value=SorenessCalculator().get_severity(severity, movement),
-                                           current_status=HistoricSorenessStatus[status])
+                                                                                                         soreness_list_25,
+                                                                                                         body_part_location=body_part_location,
+                                                                                                         side=side,
+                                                                                                         is_pain=pain,
+                                                                                                         question_response_date=plan_event_date,
+                                                                                                         severity_value=SorenessCalculator().get_severity(severity, movement),
+                                                                                                         current_status=HistoricSorenessStatus[status])
 
     @xray_recorder.capture('logic.survey_processing.historic_workout_data')
     def process_historic_health_data(self, sessions, event_date):
@@ -211,6 +205,7 @@ class SurveyProcessing(object):
         session_heart_rate.hr_workout = [HeartRateData(cleanup_hr_data_from_api(hr)) for hr in hr_data]
         self.heart_rate_data.append(session_heart_rate)
 
+
 def create_session(session_type, data):
     session = SessionFactory().create(SessionType(session_type))
     update_session(session, data)
@@ -221,12 +216,14 @@ def update_session(session, data):
     for key, value in data.items():
         setattr(session, key, value)
 
+
 def cleanup_hr_data_from_api(hr_data):
     return {
             'start_date': force_datetime_iso(hr_data['startDate']),
             'end_date': force_datetime_iso(hr_data['endDate']),
             'value': hr_data['value']
             }
+
 
 def cleanup_sleep_data_from_api(sleep_data):
     return {
@@ -235,14 +232,16 @@ def cleanup_sleep_data_from_api(sleep_data):
             'sleep_type': sleep_data['value']
             }
 
+
 def force_datetime_iso(event_date):
     if len(event_date.split('.')) == 2:
         event_date = event_date.split(".")[0] + 'Z'
     return event_date
 
+
 def match_sessions(user_sessions, health_session):
     for user_session in user_sessions:
-        if user_session.sport_name  == health_session.sport_name:
+        if user_session.sport_name == health_session.sport_name:
             if user_session.created_date is None:
                 if user_session.post_session_survey is not None:
                     user_session.created_date = user_session.post_session_survey.event_date
@@ -255,6 +254,7 @@ def match_sessions(user_sessions, health_session):
                 user_session.source = SessionSource.combined
                 return user_session
     return health_session
+
 
 def create_plan(user_id, event_date, target_minutes=15, update_stats=True, athlete_stats=None, stats_processor=None, datastore_collection=None):
     if datastore_collection is None:
@@ -284,6 +284,7 @@ def create_plan(user_id, event_date, target_minutes=15, update_stats=True, athle
 
     return plan
 
+
 def cleanup_plan(plan):
     survey_complete = plan.daily_readiness_survey_completed()
     landing_screen, nav_bar_indicator = plan.define_landing_screen()
@@ -294,4 +295,3 @@ def cleanup_plan(plan):
     del plan['daily_readiness_survey'], plan['user_id']
 
     return plan
-

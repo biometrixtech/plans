@@ -19,26 +19,20 @@ app = Blueprint('functional_strength', __name__)
 @app.route('/', methods=['PATCH'])
 @require.authenticated.any
 @xray_recorder.capture('routes.functional_strength')
-def handle_functional_strength_update():
+def handle_functional_strength_update(principal_id=None):
+    user_id = principal_id
     if not isinstance(request.json, dict):
         raise InvalidSchemaException('Request body must be a dictionary')
     if 'event_date' not in request.json:
         raise InvalidSchemaException('Missing required parameter event_date')
     else:
         event_date = parse_datetime(request.json['event_date'])
-    try:
-        user_id = request.json['user_id']
-    except:
-        raise InvalidSchemaException('user_id is required')
-    try:
-        completed_exercises = request.json['completed_exercises']
-    except:
-        completed_exercises = []
+
+    completed_exercises = request.json.get('completed_exercises', [])
 
     plan_event_date = format_date(event_date)
     fs_event_date = format_datetime(event_date)
-    # if event_date.hour < 3:
-    #     plan_event_date = format_date(event_date - timedelta(days=1))
+
     if not _check_plan_exists(user_id, plan_event_date):
         raise NoSuchEntityException('Plan not found for the user')
     store = DailyPlanDatastore()
@@ -78,22 +72,18 @@ def handle_functional_strength_update():
 @app.route('/', methods=['POST'])
 @require.authenticated.any
 @xray_recorder.capture('routes.functional_strength')
-def handle_functional_strength_start():
+def handle_functional_strength_start(principal_id=None):
+    user_id = principal_id
     if not isinstance(request.json, dict):
         raise InvalidSchemaException('Request body must be a dictionary')
     if 'event_date' not in request.json:
         raise InvalidSchemaException('Missing required parameter event_date')
     else:
         event_date = parse_datetime(request.json['event_date'])
-    try:
-        user_id = request.json['user_id']
-    except:
-        raise InvalidSchemaException('user_id is required')
 
     plan_event_date = format_date(event_date)
     fs_start_date = format_datetime(event_date)
-    # if event_date.hour < 3:
-    #     plan_event_date = format_date(event_date - timedelta(days=1))
+
     if not _check_plan_exists(user_id, plan_event_date):
         raise NoSuchEntityException('Plan not found for the user')
     store = DailyPlanDatastore()

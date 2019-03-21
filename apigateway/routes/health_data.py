@@ -19,8 +19,8 @@ app = Blueprint('health_data', __name__)
 @app.route('/', methods=['POST'])
 @require.authenticated.any
 @xray_recorder.capture('routes.health_data.write')
-def handle_previous_health_data_write():
-    user_id = request.json['user_id']
+def handle_previous_health_data_write(principal_id=None):
+    user_id = principal_id
     event_date = request.json['event_date']
     start_date = format_date(request.json['start_date'])
     end_date = format_date(request.json['end_date'])
