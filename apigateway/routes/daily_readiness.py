@@ -1,6 +1,7 @@
 from flask import request, Blueprint
 import datetime
 import os
+import copy
 
 from datastores.datastore_collection import DatastoreCollection
 from fathomapi.comms.service import Service
@@ -98,6 +99,8 @@ def handle_daily_readiness_create(principal_id=None):
     if "clear_candidates" in request.json and len(request.json['clear_candidates']) > 0:
         survey_processor.process_clear_status_answers(request.json['clear_candidates'], event_date,
                                                       daily_readiness.soreness)
+        readiness_copy = copy.deepcopy(daily_readiness)
+        survey_processor.stats_processor.all_daily_readiness_surveys.append(readiness_copy)
 
     daily_readiness_datastore.put(daily_readiness)
 

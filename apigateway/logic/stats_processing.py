@@ -56,6 +56,7 @@ class StatsProcessing(object):
         self.days_8_14_readiness_surveys = []
         self.daily_internal_plans = []
         self.all_plans = []
+        self.all_daily_readiness_surveys = []
         self.historic_data_loaded = False
 
     def set_start_end_times(self):
@@ -91,8 +92,7 @@ class StatsProcessing(object):
         else:
             success = True
         if success:
-            if not self.historic_data_loaded:
-                self.load_historical_data()
+            self.load_historical_data()
             athlete_stats = AthleteStats(self.athlete_id)
             athlete_stats.event_date = self.event_date
             athlete_stats = self.calc_survey_stats(athlete_stats)
@@ -133,19 +133,19 @@ class StatsProcessing(object):
 
     @xray_recorder.capture('logic.StatsProcessing.load_historical_data')
     def load_historical_data(self):
-
-        daily_readiness_surveys = self.daily_readiness_datastore.get(self.athlete_id, self.start_date_time,
-                                                                     self.end_date_time, last_only=False)
-        self.all_plans = self.daily_plan_datastore.get(self.athlete_id, self.start_date, self.end_date, stats_processing=True)
+        if not self.historic_data_loaded:
+            self.all_daily_readiness_surveys = self.daily_readiness_datastore.get(self.athlete_id, self.start_date_time,
+                                                                                  self.end_date_time, last_only=False)
+            self.all_plans = self.daily_plan_datastore.get(self.athlete_id, self.start_date, self.end_date, stats_processing=True)
         post_session_surveys = []
         for plan in self.all_plans:
             post_surveys = \
                 [_post_session_survey_from_training_session(session.post_session_survey, self.athlete_id, session.id, session.session_type().value, plan.event_date)
                  for session in plan.training_sessions if session is not None]
             post_session_surveys.extend([s for s in post_surveys if s is not None])
-        self.update_start_times(daily_readiness_surveys, post_session_surveys, self.all_plans)
+        self.update_start_times(self.all_daily_readiness_surveys, post_session_surveys, self.all_plans)
         self.set_acute_chronic_periods()
-        self.load_historical_readiness_surveys(daily_readiness_surveys)
+        self.load_historical_readiness_surveys(self.all_daily_readiness_surveys)
         self.load_historical_post_session_surveys(post_session_surveys)
         self.load_historical_plans()
         self.historic_data_loaded = True
@@ -582,6 +582,7 @@ class StatsProcessing(object):
                         body_part_history.sort(key=lambda x: x.reported_date_time, reverse=True)
 
                         last_ten_day_count += 1
+                        last_fourteen_day_count += 1
                         e.ask_acute_pain_question = False
                         # should we migrate to persistent-2?
                         if (parse_date(question_response_date) - parse_date(e.streak_start_date)).days >= 7:
@@ -639,6 +640,7 @@ class StatsProcessing(object):
                         body_part_history.sort(key=lambda x: x.reported_date_time, reverse=True)
 
                         last_ten_day_count += 1
+                        last_fourteen_day_count += 1
 
                         if e.is_persistent_soreness() or e.is_persistent_pain():
                             e = self.process_persistent_status(is_pain, e, question_response_date, last_ten_day_count,
