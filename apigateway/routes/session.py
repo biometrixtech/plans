@@ -1,5 +1,6 @@
 from flask import request, Blueprint
 import os
+import copy
 
 from datastores.datastore_collection import DatastoreCollection
 from fathomapi.comms.service import Service
@@ -70,6 +71,9 @@ def handle_session_create(principal_id=None):
 
     # update plan
     if plan_update_required:
+        if survey_processor.stats_processor is not None and survey_processor.stats_processor.historic_data_loaded:
+            plan_copy = copy.deepcopy(plan)
+            survey_processor.stats_processor.all_plans.extend(plan_copy)
         plan = create_plan(user_id,
                            event_date,
                            athlete_stats=survey_processor.athlete_stats,
