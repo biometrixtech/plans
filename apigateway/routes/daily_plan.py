@@ -79,13 +79,13 @@ def handle_daily_plan_get(principal_id=None):
 
 def validate_input():
     if not isinstance(request.json, dict):
-        raise InvalidSchemaException('Bad Request')
+        raise InvalidSchemaException('Request body must be a dictionary')
     try:
         format_date(request.json['start_date'])
     except Exception:
-        raise InvalidSchemaException('Bad Request')
+        raise InvalidSchemaException('Missing/incorrectly formattted start date')
     if 'end_date' in request.json:
         try:
             format_date(request.json['end_date'])
         except Exception:
-            raise InvalidSchemaException('Bad Request')
+            raise InvalidSchemaException('Incorrectly formatted end date')

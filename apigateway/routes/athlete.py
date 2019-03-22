@@ -50,12 +50,12 @@ def create_daily_plan(athlete_id):
 def update_athlete_stats(athlete_id):
     event_date = request.json.get('event_date', None)
     athlete_stats = StatsProcessing(athlete_id, event_date=event_date, datastore_collection=DatastoreCollection()).process_athlete_stats()
-    DatastoreCollection().athlete_stats_datastore.put(athlete_stats)
 
     if event_date is not None:
-        Service('plans', Config.get('API_VERSION')).call_apigateway_async(method='POST',
-                                                                          endpoint=f"athlete/{athlete_id}/metrics",
-                                                                          body={"event_date": event_date})
+        metrics = MetricsProcessing().get_athlete_metrics_from_stats(athlete_stats, event_date)
+        athlete_stats.metrics = metrics
+
+    DatastoreCollection().athlete_stats_datastore.put(athlete_stats)
     return {'message': 'Update requested'}, 202
 
 
@@ -79,7 +79,7 @@ def manage_athlete_push_notification(athlete_id):
     try:
         minute_offset = _get_offset()
         event_date = format_date(datetime.datetime.now())
-        stats_update_time = event_date + 'T03:00:00Z'
+        stats_update_time = event_date + 'T03:30:00Z'
         trigger_event_date = _randomize_trigger_time(stats_update_time, 10*60, minute_offset)
 
         Service('plans', Config.get('API_VERSION')).call_apigateway_async(method='POST',

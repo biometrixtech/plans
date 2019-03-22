@@ -4,8 +4,8 @@ import uuid
 import datetime
 from serialisable import Serialisable
 from utils import format_datetime, parse_datetime
-from models.soreness import HistoricSorenessStatus
 from models.sport import SportName, BaseballPosition, BasketballPosition, FootballPosition, LacrossePosition, SoccerPosition, SoftballPosition, TrackAndFieldPosition, FieldHockeyPosition, VolleyballPosition
+
 
 class SessionType(Enum):
     practice = 0
@@ -20,6 +20,7 @@ class SessionType(Enum):
     def has_value(cls, value):
         return any(value == item.value for item in cls)
 
+
 class StrengthConditioningType(Enum):
     "sub-type for session_type=1"
     endurance = 0
@@ -28,6 +29,7 @@ class StrengthConditioningType(Enum):
     strength = 3
     cross_training = 4
     none = None
+
 
 class DayOfWeek(Enum):
     monday = 0
@@ -38,10 +40,12 @@ class DayOfWeek(Enum):
     saturday = 5
     sunday = 6
 
+
 class SessionSource(Enum):
     user = 0
     health = 1
     combined = 2
+
 
 class Session(Serialisable, metaclass=abc.ABCMeta):
 

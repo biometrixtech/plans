@@ -22,7 +22,7 @@ def get_dashboard_data(coach_id):
         team_ids, tz = _get_teams(coach_id)
     except NoSuchEntityException as e:
         raise e
-    except:
+    except Exception:
         return {'message': 'Could not get the teams associated with the user'}, 500
     else:
         minute_offset = _get_offset(tz)
@@ -36,7 +36,7 @@ def get_dashboard_data(coach_id):
                 team_name, user_ids, users = _get_team_info(coach_id, team_id)
             except ForbiddenException as e:
                 raise e
-            except:
+            except Exception:
                 return {'message': 'Error Getting users for the team'}, 500
             else:
                 team = TeamDashboardData(team_name)
