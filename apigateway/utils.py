@@ -1,9 +1,5 @@
-import boto3
 import datetime
-import json
-import os
 import uuid
-from flask import request
 from fathomapi.utils.exceptions import InvalidSchemaException
 
 
@@ -72,6 +68,7 @@ def validate_uuid4(uuid_string):
     except ValueError:
         # If it's a value error, then the string is not a valid hex code for a UUID.
         return False
+
 
 def fix_early_survey_event_date(event_date):
     if event_date.hour < 3:

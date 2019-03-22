@@ -18,6 +18,7 @@ from models.app_logs import AppLogs
 app = Blueprint('misc', __name__)
 USERS_API_VERSION = os.environ['USERS_API_VERSION']
 
+
 @app.route('/clear_user_data', methods=['POST'])
 @require.body({'event_date': str})
 @require.authenticated.any
@@ -203,6 +204,7 @@ def handle_test_data_copy(principal_id=None):
     athlete_stats_datastore.put(athlete_stats)
 
     return {'message': 'success'}, 202
+
 
 def update_dates(rs_surveys, daily_plans, athlete_stats, event_date):
     athlete_today = parse_date(athlete_stats[0].event_date)

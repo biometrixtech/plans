@@ -24,6 +24,7 @@ def login_user(email):
     url = f"{USERS_URL}/user/login"
     response = requests.post(url, data=json.dumps(body), headers=HEADERS).json()
     USER['id'] = response['user']['id']
+    print(USER['id'])
     HEADERS['Authorization'] = response['authorization']['jwt']
 
 
@@ -176,7 +177,7 @@ def test_submit_readiness_one_soreness():
         login_user(USER['email'])
         reset_user()
     event_date = datetime.datetime.now()
-    soreness = [get_soreness(body_part=14, side=1, pain=False, severity=2)]
+    soreness = [get_soreness(body_part=14, side=1, pain=False, severity=2, movement=1)]
     response = submit_readiness(event_date,
                                 soreness=soreness,
                                 clear_candidates=[],

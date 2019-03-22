@@ -31,7 +31,7 @@ def handle_active_recovery_update(principal_id=None):
 
     try:
         recovery_type = request.json['recovery_type']
-    except:
+    except KeyError:
         raise InvalidSchemaException('recovery_type is required')
     completed_exercises = request.json.get('completed_exercises', [])
 
@@ -46,16 +46,16 @@ def handle_active_recovery_update(principal_id=None):
     if recovery_type == 'pre':
         if plan.pre_recovery_completed:
             save_exercises = False
-        plan.pre_recovery_completed = True # plan
-        plan.pre_recovery.completed = True # recovery
+        plan.pre_recovery_completed = True  # plan
+        plan.pre_recovery.completed = True  # recovery
         plan.pre_recovery.event_date = recovery_event_date
         plan.pre_recovery.display_exercises = False
 
     elif recovery_type == 'post':
         if plan.post_recovery.completed:
             save_exercises = False
-        plan.post_recovery_completed = True # plan
-        plan.post_recovery.completed = True # recovery
+        plan.post_recovery_completed = True  # plan
+        plan.post_recovery.completed = True  # recovery
         plan.post_recovery.event_date = recovery_event_date
         plan.post_recovery.display_exercises = False
 
@@ -88,7 +88,7 @@ def handle_active_recovery_start(principal_id=None):
         event_date = parse_datetime(request.json['event_date'])
     try:
         recovery_type = request.json['recovery_type']
-    except:
+    except KeyError:
         raise InvalidSchemaException('recovery_type is required')
 
     plan_event_date = format_date(event_date)
@@ -97,8 +97,8 @@ def handle_active_recovery_start(principal_id=None):
         raise NoSuchEntityException('Plan not found for the user')
 
     plan = daily_plan_datastore.get(user_id=user_id,
-                     start_date=plan_event_date,
-                     end_date=plan_event_date)[0]
+                                    start_date=plan_event_date,
+                                    end_date=plan_event_date)[0]
     plans_service = Service('plans', Config.get('API_VERSION'))
     body = {"event_date": recovery_start_date}
     if recovery_type == 'pre':
@@ -131,7 +131,7 @@ def handle_workout_active_time(principal_id=None):
         event_date = parse_datetime(request.json['event_date'])
     try:
         target_minutes = request.json['active_time']
-    except:
+    except KeyError:
         raise InvalidSchemaException('active_time is required')
 
     plan_event_date = format_date(event_date)
@@ -142,11 +142,12 @@ def handle_workout_active_time(principal_id=None):
 
     return {'daily_plans': [plan]}, 200
 
+
 def save_completed_exercises(exercise_list, user_id, event_date):
     for exercise in exercise_list:
         completed_exercise_datastore.put(CompletedExercise(athlete_id=user_id,
-                                                          exercise_id=exercise,
-                                                          event_date=event_date))
+                                                           exercise_id=exercise,
+                                                           event_date=event_date))
 
 
 def _check_plan_exists(user_id, event_date):

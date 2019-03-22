@@ -6,6 +6,7 @@ import models.session as session
 from models.post_session_survey import PostSurvey
 from fathomapi.utils.exceptions import InvalidSchemaException
 
+
 class DailyPlanDatastore(object):
     def __init__(self, mongo_collection='dailyplan'):
         self.mongo_collection = mongo_collection
@@ -70,7 +71,8 @@ class DailyPlanDatastore(object):
                 daily_plan.post_recovery = _recovery_session_from_mongodb(plan['post_recovery']) if plan.get('post_recovery', None) is not None else None
                 daily_plan.completed_post_recovery_sessions = \
                     [_recovery_session_from_mongodb(s) for s in plan.get('completed_post_recovery_sessions', [])]
-                daily_plan.functional_strength_session = _functional_strength_session_from_mongodb(plan['functional_strength_session']) if plan.get('functional_strength_session', None) is not None else None
+                daily_plan.functional_strength_session = \
+                    _functional_strength_session_from_mongodb(plan['functional_strength_session']) if plan.get('functional_strength_session', None) is not None else None
                 # daily_plan.corrective_sessions = \
                 #    [_external_session_from_mongodb(s, session.SessionType.corrective)
                 #     for s in plan['corrective_sessions']]
@@ -124,7 +126,7 @@ class DailyPlanDatastore(object):
 
     def get_last_sensor_sync(self, user_id, event_date):
         mongo_collection = get_mongo_collection(self.mongo_collection)
-        query0 = {'user_id': user_id, 'date': {'$lte': event_date}, 'last_sensor_sync': {'$exists': True, '$ne': None } }
+        query0 = {'user_id': user_id, 'date': {'$lte': event_date}, 'last_sensor_sync': {'$exists': True, '$ne': None}}
         query1 = {'_id': 0, "last_sensor_sync": 1, "date": 1}
         mongo_cursor = mongo_collection.find_one(query0, query1, sort=[("date", -1)])
         if mongo_cursor is not None:
@@ -132,7 +134,6 @@ class DailyPlanDatastore(object):
             return last_sensor_sync
         else:
             return None
-
 
 
 def _external_session_from_mongodb(mongo_result, session_type):
@@ -176,6 +177,7 @@ def _external_session_from_mongodb(mongo_result, session_type):
 
     return mongo_session
 
+
 def _recovery_session_from_mongodb(mongo_result):
 
     recovery_session = session.RecoverySession()
@@ -190,7 +192,7 @@ def _recovery_session_from_mongodb(mongo_result):
     recovery_session.inhibit_exercises = [_assigned_exercises_from_mongodb(s)
                                           for s in mongo_result['inhibit_exercises']]
     recovery_session.lengthen_exercises = [_assigned_exercises_from_mongodb(s)
-                                         for s in mongo_result['lengthen_exercises']]
+                                           for s in mongo_result['lengthen_exercises']]
     recovery_session.activate_exercises = [_assigned_exercises_from_mongodb(s)
                                            for s in mongo_result['activate_exercises']]
     recovery_session.integrate_exercises = [_assigned_exercises_from_mongodb(s)
@@ -202,18 +204,17 @@ def _recovery_session_from_mongodb(mongo_result):
     return recovery_session
 
 
-
 def _functional_strength_session_from_mongodb(mongo_result):
     functional_strength_session = session.FunctionalStrengthSession()
     functional_strength_session.equipment_required = mongo_result.get("equipment_required", [])
     functional_strength_session.warm_up = [_assigned_exercises_from_mongodb(s)
-                                          for s in mongo_result['warm_up']]
+                                           for s in mongo_result['warm_up']]
     functional_strength_session.dynamic_movement = [_assigned_exercises_from_mongodb(s)
-                                          for s in mongo_result['dynamic_movement']]
+                                                    for s in mongo_result['dynamic_movement']]
     functional_strength_session.stability_work = [_assigned_exercises_from_mongodb(s)
-                                          for s in mongo_result['stability_work']]
+                                                  for s in mongo_result['stability_work']]
     functional_strength_session.victory_lap = [_assigned_exercises_from_mongodb(s)
-                                          for s in mongo_result['victory_lap']]
+                                               for s in mongo_result['victory_lap']]
     functional_strength_session.duration_minutes = _key_present("minutes_duration", mongo_result)
     functional_strength_session.warm_up_target_minutes = _key_present("warm_up_target_minutes", mongo_result)
     functional_strength_session.dynamic_movement_target_minutes = _key_present("dynamic_movement_target_minutes", mongo_result)
@@ -229,6 +230,7 @@ def _functional_strength_session_from_mongodb(mongo_result):
     functional_strength_session.sport_name = _key_present("sport_name", mongo_result)
     functional_strength_session.position = _key_present("position", mongo_result)
     return functional_strength_session
+
 
 def _assigned_exercises_from_mongodb(mongo_result):
 
@@ -247,7 +249,6 @@ def _assigned_exercises_from_mongodb(mongo_result):
     assigned_exercise.goal_text = _key_present("goal_text", mongo_result)
     assigned_exercise.equipment_required = mongo_result.get("equipment_required", [])
     return assigned_exercise
-
 
 
 def _key_present(key_name, dictionary):

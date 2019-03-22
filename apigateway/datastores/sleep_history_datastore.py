@@ -57,8 +57,8 @@ class SleepHistoryDatastore(object):
                                          item,
                                          upsert=True)
 
-
-    def sleep_data_from_mongo(self, mongo_result):
+    @staticmethod
+    def sleep_data_from_mongo(mongo_result):
         daily_sleep_data = DailySleepData(user_id=mongo_result['user_id'],
                                           event_date=mongo_result['event_date'])
         daily_sleep_data.sleep_events = [SleepEvent(se) for se in mongo_result['sleep_events']]

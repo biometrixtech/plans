@@ -50,6 +50,4 @@ def handle_previous_health_data_write(principal_id=None):
                                                                             endpoint=f"user/{user_id}",
                                                                             body={"historic_health_sync_date": event_date})
 
-
-
     return {'message': "success"}, 200

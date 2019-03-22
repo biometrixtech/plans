@@ -43,7 +43,8 @@ class HeartRateDatastore(object):
                                      item,
                                      upsert=True)
 
-    def session_heart_rate_from_mongo(self, mongo_result):
+    @staticmethod
+    def session_heart_rate_from_mongo(mongo_result):
         session_heart_rate = SessionHeartRate(user_id=mongo_result['user_id'], 
                                               session_id=mongo_result['session_id'],
                                               event_date=mongo_result['event_date'])

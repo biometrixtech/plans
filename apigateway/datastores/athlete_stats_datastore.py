@@ -77,10 +77,10 @@ class AthleteStatsDatastore(object):
 
         athlete_stats.internal_monotony = self._standard_error_from_monogodb(mongo_result.get('internal_monotony', None))
         athlete_stats.historical_internal_monotony = [self._standard_error_from_monogodb(s)
-                                           for s in mongo_result.get('historic_internal_monotony', [])]
+                                                      for s in mongo_result.get('historic_internal_monotony', [])]
         athlete_stats.internal_strain = self._standard_error_from_monogodb(mongo_result.get('internal_strain', None))
         athlete_stats.historical_internal_strain = [self._standard_error_from_monogodb(s)
-                                                      for s in mongo_result.get('historic_internal_strain', [])]
+                                                    for s in mongo_result.get('historic_internal_strain', [])]
         athlete_stats.internal_strain_events = self._standard_error_from_monogodb(mongo_result.get('internal_strain_events', None))
         athlete_stats.external_monotony = self._standard_error_from_monogodb(mongo_result.get('external_monotony', None))
         athlete_stats.external_strain = self._standard_error_from_monogodb(mongo_result.get('external_strain', None))
@@ -137,7 +137,8 @@ class AthleteStatsDatastore(object):
         if len(query) > 0:
             mongo_collection.delete_many(query)
 
-    def _standard_error_from_monogodb(self, std_error):
+    @staticmethod
+    def _standard_error_from_monogodb(std_error):
 
         standard_error_range = StandardErrorRange()
 
@@ -154,7 +155,8 @@ class AthleteStatsDatastore(object):
 
         return standard_error_range
 
-    def _historic_soreness_from_mongodb(self, historic_soreness):
+    @staticmethod
+    def _historic_soreness_from_mongodb(historic_soreness):
 
         hs = HistoricSoreness(BodyPartLocation(historic_soreness["body_part_location"]), historic_soreness["side"],
                               historic_soreness["is_pain"])
@@ -168,7 +170,8 @@ class AthleteStatsDatastore(object):
 
         return hs
 
-    def _soreness_from_mongodb(self, soreness_dict):
+    @staticmethod
+    def _soreness_from_mongodb(soreness_dict):
         soreness = Soreness()
         soreness.body_part = BodyPart(BodyPartLocation(soreness_dict['body_part']), None)
         soreness.pain = soreness_dict.get('pain', False)
@@ -195,8 +198,10 @@ class AthleteStatsDatastore(object):
         rec.specific_actions = [self._get_specific_actions_from_mongodb(sa)for sa in metric.get('specific_actions', [])]
         return rec
 
-    def _get_specific_actions_from_mongodb(self, action):
+    @staticmethod
+    def _get_specific_actions_from_mongodb(action):
         return SpecificAction(action['code'], action['text'], action['display'])
+
 
 def _expected_workouts_from_mongo(mongo_result):
     typ_sessions_exp_workout = {"0-1": 0.5, "2-4": 3.0, "5+": 5.0, None: None}
@@ -205,5 +210,3 @@ def _expected_workouts_from_mongo(mongo_result):
         typical_weekly_sessions = mongo_result.get('typical_weekly_sessions', None)
         exp_workouts = typ_sessions_exp_workout[typical_weekly_sessions]
     return exp_workouts
-
-
