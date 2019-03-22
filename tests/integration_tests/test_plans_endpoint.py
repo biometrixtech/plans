@@ -3,7 +3,7 @@ import os
 import datetime
 import json
 from utils import format_date, format_datetime
-BASE_URL = f"https://apis.{os.getenv('ENVIRONMENT', 'dev')}.fathomai.com"
+BASE_URL = f"https://apis.{os.getenv('ENVIRONMENT', 'test')}.fathomai.com"
 USERS_API_VERSION = os.getenv('USERS_API_VERSION', '2_1')
 PLANS_API_VERSION = os.getenv('PLANS_API_VERSION', '3_1')
 
@@ -72,7 +72,7 @@ def change_active_time(event_date, active_time):
     return response
 
 
-def start_prep(event_date, recovery_type="pre"):
+def start_recovery(event_date, recovery_type="pre"):
     body = {"event_date": format_datetime(event_date),
             "recovery_type": recovery_type}
     response = requests.post(f"{PLANS_URL}/active_recovery",
@@ -81,7 +81,7 @@ def start_prep(event_date, recovery_type="pre"):
     return response
 
 
-def complete_prep(event_date, completed_exercises, recovery_type="pre"):
+def complete_recovery(event_date, completed_exercises, recovery_type="pre"):
     body = {"event_date": format_datetime(event_date),
             "recovery_type": recovery_type,
             "completed_exercises": completed_exercises}
@@ -167,7 +167,7 @@ def test_submit_one_session():
     assert response.status_code == 201
     assert len(response.json()['daily_plans']) == 1
     plan = response.json()['daily_plans'][0]
-    assert len(plan['training_sessions']) == 1
+    assert len(plan['training_sessions']) == 2
     assert plan['post_recovery']['minutes_duration'] == 15
 
 
@@ -210,12 +210,12 @@ def test_submit_readiness_max_pain_no_prep():
     assert plan['landing_screen'] == 0
 
 
-def test_change_active_time_start_and_complete_prep():
+def test_change_active_time_start_and_complete_recovery():
     if HEADERS['Authorization'] is None:
         login_user(USER['email'])
         reset_user()
     event_date = datetime.datetime.now() - datetime.timedelta(days=4)
-    existing_active_time = get_plan(format_date(event_date), format_datetime(event_date)).json()['daily_plans'][0]['pre_recovery']['minutes_duration']
+    existing_active_time = get_plan(format_date(event_date), format_datetime(event_date)).json()['daily_plans'][0]['post_recovery']['minutes_duration']
 
     active_time = 15
     if existing_active_time == 15:
@@ -224,17 +224,18 @@ def test_change_active_time_start_and_complete_prep():
     assert response.status_code == 200
     plan = response.json()['daily_plans'][0]
 
-    assert plan['pre_recovery']['minutes_duration'] == active_time
-    assert plan['landing_screen'] == 0
+    assert plan['post_recovery']['minutes_duration'] == active_time
+    assert plan['landing_screen'] == 2
 
-    response2 = start_prep(event_date + datetime.timedelta(minutes=2))
+    response2 = start_recovery(event_date + datetime.timedelta(minutes=2), recovery_type='post')
     assert response2.status_code == 200
 
-    response3 = complete_prep(event_date + datetime.timedelta(minutes=12),
-                              completed_exercises=[plan["pre_recovery"]["inhibit_exercises"][0]['library_id']])
+    response3 = complete_recovery(event_date + datetime.timedelta(minutes=12),
+                                  completed_exercises=[plan["post_recovery"]["inhibit_exercises"][0]['library_id']],
+                                  recovery_type='post')
     assert response3.status_code == 202
     plan = response3.json()["daily_plans"][0]
-    assert plan["pre_recovery_completed"]
-    assert plan["pre_recovery"]["completed"]
-    assert plan["landing_screen"] == 1
-    assert not plan["pre_recovery"]["display_exercises"]
+    assert plan["post_recovery_completed"]
+    assert plan["post_recovery"]["completed"]
+    assert plan["landing_screen"] == 2
+    assert not plan["post_recovery"]["display_exercises"]
