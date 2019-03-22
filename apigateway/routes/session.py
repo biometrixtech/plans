@@ -73,7 +73,9 @@ def handle_session_create(principal_id=None):
     if plan_update_required:
         if survey_processor.stats_processor is not None and survey_processor.stats_processor.historic_data_loaded:
             plan_copy = copy.deepcopy(plan)
-            survey_processor.stats_processor.all_plans.extend(plan_copy)
+            if plan_event_date in [p.event_date for p in survey_processor.stats_processor.all_plans]:
+                survey_processor.stats_processor.all_plans.remove([p for p in survey_processor.stats_processor.all_plans if p.event_date == plan_event_date][0])
+            survey_processor.stats_processor.all_plans.append(plan_copy)
         plan = create_plan(user_id,
                            event_date,
                            athlete_stats=survey_processor.athlete_stats,
