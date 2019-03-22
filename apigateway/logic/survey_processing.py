@@ -116,11 +116,12 @@ class SurveyProcessing(object):
     def process_clear_status_answers(self, clear_candidates, event_date, soreness):
 
         plan_event_date = format_date(event_date)
-        self.stats_processor = StatsProcessing(self.athlete_stats.athlete_id,
-                                               plan_event_date,
-                                               self.datastore_collection)
-        self.stats_processor.set_start_end_times()
-        self.stats_processor.load_historical_data()
+        if self.stats_processor is None:
+            self.stats_processor = StatsProcessing(self.athlete_stats.athlete_id,
+                                                   plan_event_date,
+                                                   self.datastore_collection)
+            self.stats_processor.set_start_end_times()
+            self.stats_processor.load_historical_data()
         soreness_list_25 = self.stats_processor.merge_soreness_from_surveys(
             self.stats_processor.get_readiness_soreness_list(self.stats_processor.last_25_days_readiness_surveys),
             self.stats_processor.get_ps_survey_soreness_list(self.stats_processor.last_25_days_ps_surveys)

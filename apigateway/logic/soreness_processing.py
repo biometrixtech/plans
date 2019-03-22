@@ -32,7 +32,7 @@ class SorenessCalculator(object):
 
         if severity is None:
             return None
-        elif movement is None or severity == 0:
+        elif movement in [None, 0] or severity == 0:
             return severity
         elif severity == 1:
             if movement == 1:
