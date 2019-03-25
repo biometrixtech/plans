@@ -31,6 +31,7 @@ app = Blueprint('daily_readiness', __name__)
 
 @app.route('/', methods=['POST'])
 @require.authenticated.any
+@require.body({'date_time': str, "soreness": str})
 @xray_recorder.capture('routes.daily_readiness.create')
 def handle_daily_readiness_create(principal_id=None):
     validate_data()
@@ -166,15 +167,15 @@ def handle_daily_readiness_get(principal_id=None):
 
 @xray_recorder.capture('routes.daily_readiness.validate')
 def validate_data():
-    required_parameters = {'date_time', 'soreness'}
-    validate_request_body(required_parameters, request.json)
+    # required_parameters = {'date_time', 'soreness'}
+    # validate_request_body(required_parameters, request.json)
     parse_datetime(request.json['date_time'])
 
     # validate soreness
-    if 'soreness' not in request.json:
-        raise InvalidSchemaException('Missing required parameter soreness')
+    # if 'soreness' not in request.json:
+    #     raise InvalidSchemaException('Missing required parameter soreness')
     if not isinstance(request.json['soreness'], list):
-        raise InvalidSchemaException('soreness must be a list')
+        raise InvalidSchemaException(f"Property soreness must be of type list")
     for soreness in request.json['soreness']:
         try:
             BodyPartLocation(soreness['body_part'])

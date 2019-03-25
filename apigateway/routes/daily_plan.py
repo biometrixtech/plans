@@ -1,7 +1,7 @@
 from flask import request, Blueprint
 import datetime
 
-from utils import format_date, format_datetime, parse_datetime, validate_request_body
+from utils import format_date, format_datetime, parse_datetime
 from datastores.datastore_collection import DatastoreCollection
 from logic.athlete_status_processing import AthleteStatusProcessing
 
@@ -17,6 +17,7 @@ app = Blueprint('daily_plan', __name__)
 
 @app.route('/', methods=['POST'])
 @require.authenticated.any
+@require.body({'start_date': str})
 @xray_recorder.capture('routes.daily_plan.get')
 def handle_daily_plan_get(principal_id=None):
     validate_input()
@@ -78,13 +79,9 @@ def handle_daily_plan_get(principal_id=None):
 
 
 def validate_input():
-    validate_request_body({'start_date'}, request.json)
     try:
         format_date(request.json['start_date'])
+        format_date(request.json.get('end_date', None))
+        format_datetime(request.json.get('event_date', None))
     except Exception:
-        raise InvalidSchemaException('Incorrectly formatted start date')
-    if 'end_date' in request.json:
-        try:
-            format_date(request.json['end_date'])
-        except Exception:
-            raise InvalidSchemaException('Incorrectly formatted end date')
+        raise InvalidSchemaException('Incorrectly formatted date')

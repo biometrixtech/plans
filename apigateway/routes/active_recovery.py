@@ -2,12 +2,12 @@ from flask import request, Blueprint
 from fathomapi.api.config import Config
 from fathomapi.comms.service import Service
 from fathomapi.utils.decorators import require
-from fathomapi.utils.exceptions import InvalidSchemaException, NoSuchEntityException
+from fathomapi.utils.exceptions import NoSuchEntityException
 from fathomapi.utils.xray import xray_recorder
 from datastores.datastore_collection import DatastoreCollection
 from models.soreness import CompletedExercise
 from logic.survey_processing import create_plan
-from utils import format_date, parse_datetime, format_datetime, validate_request_body
+from utils import format_date, parse_datetime, format_datetime
 from config import get_mongo_collection
 
 datastore_collection = DatastoreCollection()
@@ -19,15 +19,10 @@ app = Blueprint('active_recovery', __name__)
 
 @app.route('/', methods=['PATCH'])
 @require.authenticated.any
+@require.body({'event_date': str, 'recovery_type': str})
 @xray_recorder.capture('routes.active_recovery')
 def handle_active_recovery_update(principal_id=None):
     user_id = principal_id
-    required_parameters = {'event_date', 'recovery_type'}
-    validate_request_body(required_parameters, request.json)
-    # if not isinstance(request.json, dict):
-    #     raise InvalidSchemaException('Request body must be a dictionary')
-    # if not required_parameters <= request.json.keys():
-    #     InvalidSchemaException(f"Missing required parameter(s): {', '.join(required_parameters - request.json.keys())}")
 
     event_date = parse_datetime(request.json['event_date'])
     recovery_type = request.json['recovery_type']
@@ -75,11 +70,10 @@ def handle_active_recovery_update(principal_id=None):
 
 @app.route('/', methods=['POST'])
 @require.authenticated.any
+@require.body({'event_date': str, 'recovery_type': str})
 @xray_recorder.capture('routes.active_recovery.start')
 def handle_active_recovery_start(principal_id=None):
     user_id = principal_id
-    required_parameters = {'event_date', 'recovery_type'}
-    validate_request_body(required_parameters, request.json)
 
     event_date = parse_datetime(request.json['event_date'])
     recovery_type = request.json['recovery_type']
@@ -112,11 +106,10 @@ def handle_active_recovery_start(principal_id=None):
 
 @app.route('/active_time', methods=['PATCH'])
 @require.authenticated.any
+@require.body({'event_date': str, 'active_time': int})
 @xray_recorder.capture('routes.active_time')
 def handle_workout_active_time(principal_id=None):
     user_id = principal_id
-    required_parameters = {'event_date', 'active_time'}
-    validate_request_body(required_parameters, request.json)
 
     event_date = parse_datetime(request.json['event_date'])
     target_minutes = request.json['active_time']
