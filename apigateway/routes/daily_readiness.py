@@ -31,7 +31,7 @@ app = Blueprint('daily_readiness', __name__)
 
 @app.route('/', methods=['POST'])
 @require.authenticated.any
-@require.body({'date_time': str, "soreness": str})
+@require.body({'date_time': str, "soreness": list})
 @xray_recorder.capture('routes.daily_readiness.create')
 def handle_daily_readiness_create(principal_id=None):
     validate_data()
@@ -127,17 +127,13 @@ def handle_daily_readiness_create(principal_id=None):
     return {'daily_plans': [plan]}, 201
 
 
-@app.route('/previous', methods=['POST', 'GET'])
+@app.route('/previous', methods=['POST'])
 @require.authenticated.any
+@require.body({'event_date': str})
 @xray_recorder.capture('routes.daily_readiness.previous')
 def handle_daily_readiness_get(principal_id=None):
     user_id = principal_id
-
-    if request.method == 'POST':
-        validate_request_body({'event_date'}, request.json)
-        current_time = parse_datetime(request.json['event_date'])
-    else:
-        current_time = datetime.datetime.now()
+    current_time = parse_datetime(request.json['event_date'])
     previous_soreness_processor = AthleteStatusProcessing(user_id, current_time, datastore_collection)
     (
         sore_body_parts,
@@ -167,13 +163,8 @@ def handle_daily_readiness_get(principal_id=None):
 
 @xray_recorder.capture('routes.daily_readiness.validate')
 def validate_data():
-    # required_parameters = {'date_time', 'soreness'}
-    # validate_request_body(required_parameters, request.json)
     parse_datetime(request.json['date_time'])
 
-    # validate soreness
-    # if 'soreness' not in request.json:
-    #     raise InvalidSchemaException('Missing required parameter soreness')
     if not isinstance(request.json['soreness'], list):
         raise InvalidSchemaException(f"Property soreness must be of type list")
     for soreness in request.json['soreness']:

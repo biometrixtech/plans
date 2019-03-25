@@ -25,7 +25,7 @@ app = Blueprint('session', __name__)
 
 @app.route('/', methods=['POST'])
 @require.authenticated.any
-@require.body({'event_date': str})
+@require.body({'event_date': str, 'sessions': list})
 @xray_recorder.capture('routes.session.create')
 def handle_session_create(principal_id=None):
     user_id = principal_id
