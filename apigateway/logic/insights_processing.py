@@ -42,13 +42,20 @@ class InsightsProcessing(object):
         contingency_tables = []
         loading_events = []
 
+        # create a list of loading events first
         for t in range(0, len(self.rpe_load_tuples) - 1):
 
             if self.rpe_load_tuples[t][0] <= load_end_date:
                 loading_event = LoadingEvent(self.rpe_load_tuples[t][0], self.rpe_load_tuples[t][1], self.rpe_load_tuples[t][2], self.rpe_load_tuples[t][3])
-                first_load_date = loading_event.loading_date
-                if len(loading_events) > 0:
-                    first_load_date = loading_events[0].loading_date
+                loading_events.append(loading_event)
+
+        for t in range(0, len(loading_events) - 1):
+
+            if loading_events[t].loading_date <= load_end_date:
+                #loading_event = LoadingEvent(self.rpe_load_tuples[t][0], self.rpe_load_tuples[t][1], self.rpe_load_tuples[t][2], self.rpe_load_tuples[t][3])
+                loading_event = loading_events[t]
+                first_load_date = loading_events[0].loading_date
+
                 if (loading_event.loading_date.date() - first_load_date.date()).days >= 4:
                     chronic_load = list(v.load for v in loading_events if v.load is not None and 4 >= (loading_event.loading_date.date() - v.loading_date.date()).days >= 2)
                     acute_load = list(v.load for v in loading_events if v.load is not None and 1 >= (loading_event.loading_date.date() - v.loading_date.date()).days >= 0)
@@ -72,8 +79,6 @@ class InsightsProcessing(object):
                     loading_event.lagged_load = loading_events[len(loading_events) - 1].load
                     loading_event.lagged_load_z_score = loading_events[len(loading_events) - 1].z_score
                     loading_event.days_rest = (loading_event.loading_date.date() - loading_events[len(loading_events) - 1].loading_date.date()).days
-
-
 
                 # get all affected body parts that could be attributed to this training session
                 base_soreness_tuples = list((s[0], s[1]) for s in self.post_session_survey_tuples
@@ -106,7 +111,22 @@ class InsightsProcessing(object):
                                 else:
                                     a.days_sore += (body_parts_present[0][0].date() - a.last_reported_date.date()).days
                                     a.last_reported_date = body_parts_present[0][0]
-                                a.max_severity = max(a.max_severity, body_parts_present[0][3]) # first element which contains a tuple... :(
+                                a.max_severity = max(a.max_severity, body_parts_present[0][3])
+                                # let's look at future loading events and update it's previous affected soreness
+                                future_loading_events = list(f for f in loading_events if f.loading_date > dt)
+                                if len(future_loading_events) > 0:
+                                    f = future_loading_events[0]
+                                    body_part_in_future = list(g for g in f.previous_affected_body_parts if g.body_part == a.body_part and g.side == a.side)
+                                    if len(body_part_in_future) > 0:
+                                        for p in body_part_in_future:
+                                            if p.first_reported_date is not None:
+                                                p.first_reported_date = min(p.first_reported_date, body_parts_present[0][0])
+                                            else:
+                                                p.first_reported_date = body_parts_present[0][0]
+                                    else:
+                                        previous_affected_part = AffectedBodyPart(a.body_part, a.side, a.days_sore, a.max_severity, a.cleared)
+                                        previous_affected_part.first_reported_date = body_parts_present[0][0]
+                                        f.previous_affected_body_parts.append(previous_affected_part)
                             elif a.days_sore > 0:
                                 a.cleared = True
                 # need to pick the oldest date for each body part
@@ -206,6 +226,7 @@ class AffectedBodyPart(object):
         self.days_sore = days_sore
         self.max_severity = max_severity
         self.cleared = cleared
+        self.first_reported_date = None
         self.last_reported_date = None
 
 
@@ -216,8 +237,19 @@ class LoadingEvent(object):
         self.sport_name = sport_name
         self.strength_conditioning_type = strength_conditioning_type
         self.affected_body_parts = []
+        self.previous_affected_body_parts = []
         self.z_score = None
         self.lagged_load = None
         self.lagged_load_z_score = None
         self.acwr_2_3 = None
         self.days_rest = None
+
+    def has_existing_soreness(self, days=1):
+
+        for a in self.affected_body_parts:
+            matched_soreness = list(p for p in self.previous_affected_body_parts if p.body_part == a.body_part
+                                    and p.side == a.side and p.days_sore >= days)
+            if len(matched_soreness) > 0:
+                return True
+
+        return False
