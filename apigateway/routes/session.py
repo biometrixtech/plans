@@ -9,7 +9,7 @@ from fathomapi.utils.exceptions import InvalidSchemaException, NoSuchEntityExcep
 from fathomapi.utils.xray import xray_recorder
 from models.session import SessionType, SessionSource
 from models.daily_plan import DailyPlan
-from utils import parse_datetime, format_date, format_datetime
+from utils import parse_datetime, format_date, format_datetime, validate_request_body
 from config import get_mongo_collection
 from logic.survey_processing import SurveyProcessing, create_session, update_session, create_plan, cleanup_plan
 from logic.athlete_status_processing import AthleteStatusProcessing
@@ -334,14 +334,9 @@ def _check_plan_exists(user_id, event_date):
 
 
 def _validate_schema():
-    if not isinstance(request.json, dict):
-        raise InvalidSchemaException('Request body must be a dictionary')
-    if 'event_date' not in request.json:
-        raise InvalidSchemaException('Missing required parameter event_date')
-    else:
-        parse_datetime(request.json['event_date'])
-    if 'session_type' not in request.json:
-        raise InvalidSchemaException('Missing required parameter session_type')
-    else:
-        if not SessionType.has_value(request.json['session_type']):
-            raise InvalidSchemaException('session_type not recognized')
+    required_parameters = {'event_date', 'session_type'}
+    validate_request_body(required_parameters, request.json)
+
+    parse_datetime(request.json['event_date'])
+    if not SessionType.has_value(request.json['session_type']):
+        raise InvalidSchemaException('session_type not recognized')

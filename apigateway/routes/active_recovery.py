@@ -7,7 +7,7 @@ from fathomapi.utils.xray import xray_recorder
 from datastores.datastore_collection import DatastoreCollection
 from models.soreness import CompletedExercise
 from logic.survey_processing import create_plan
-from utils import format_date, parse_datetime, format_datetime
+from utils import format_date, parse_datetime, format_datetime, validate_request_body
 from config import get_mongo_collection
 
 datastore_collection = DatastoreCollection()
@@ -22,17 +22,15 @@ app = Blueprint('active_recovery', __name__)
 @xray_recorder.capture('routes.active_recovery')
 def handle_active_recovery_update(principal_id=None):
     user_id = principal_id
-    if not isinstance(request.json, dict):
-        raise InvalidSchemaException('Request body must be a dictionary')
-    if 'event_date' not in request.json:
-        raise InvalidSchemaException('Missing required parameter event_date')
-    else:
-        event_date = parse_datetime(request.json['event_date'])
+    required_parameters = {'event_date', 'recovery_type'}
+    validate_request_body(required_parameters, request.json)
+    # if not isinstance(request.json, dict):
+    #     raise InvalidSchemaException('Request body must be a dictionary')
+    # if not required_parameters <= request.json.keys():
+    #     InvalidSchemaException(f"Missing required parameter(s): {', '.join(required_parameters - request.json.keys())}")
 
-    try:
-        recovery_type = request.json['recovery_type']
-    except KeyError:
-        raise InvalidSchemaException('recovery_type is required')
+    event_date = parse_datetime(request.json['event_date'])
+    recovery_type = request.json['recovery_type']
     completed_exercises = request.json.get('completed_exercises', [])
 
     plan_event_date = format_date(event_date)
@@ -80,17 +78,11 @@ def handle_active_recovery_update(principal_id=None):
 @xray_recorder.capture('routes.active_recovery.start')
 def handle_active_recovery_start(principal_id=None):
     user_id = principal_id
-    if not isinstance(request.json, dict):
-        raise InvalidSchemaException('Request body must be a dictionary')
-    if 'event_date' not in request.json:
-        raise InvalidSchemaException('Missing required parameter event_date')
-    else:
-        event_date = parse_datetime(request.json['event_date'])
-    try:
-        recovery_type = request.json['recovery_type']
-    except KeyError:
-        raise InvalidSchemaException('recovery_type is required')
+    required_parameters = {'event_date', 'recovery_type'}
+    validate_request_body(required_parameters, request.json)
 
+    event_date = parse_datetime(request.json['event_date'])
+    recovery_type = request.json['recovery_type']
     plan_event_date = format_date(event_date)
     recovery_start_date = format_datetime(event_date)
     if not _check_plan_exists(user_id, plan_event_date):
@@ -123,17 +115,11 @@ def handle_active_recovery_start(principal_id=None):
 @xray_recorder.capture('routes.active_time')
 def handle_workout_active_time(principal_id=None):
     user_id = principal_id
-    if not isinstance(request.json, dict):
-        raise InvalidSchemaException('Request body must be a dictionary')
-    if 'event_date' not in request.json:
-        raise InvalidSchemaException('Missing required parameter event_date')
-    else:
-        event_date = parse_datetime(request.json['event_date'])
-    try:
-        target_minutes = request.json['active_time']
-    except KeyError:
-        raise InvalidSchemaException('active_time is required')
+    required_parameters = {'event_date', 'active_time'}
+    validate_request_body(required_parameters, request.json)
 
+    event_date = parse_datetime(request.json['event_date'])
+    target_minutes = request.json['active_time']
     plan_event_date = format_date(event_date)
     if not _check_plan_exists(user_id, plan_event_date):
         raise NoSuchEntityException('Plan not found for the user')

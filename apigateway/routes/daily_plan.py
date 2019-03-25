@@ -1,7 +1,7 @@
 from flask import request, Blueprint
 import datetime
 
-from utils import format_date, format_datetime, parse_datetime
+from utils import format_date, format_datetime, parse_datetime, validate_request_body
 from datastores.datastore_collection import DatastoreCollection
 from logic.athlete_status_processing import AthleteStatusProcessing
 
@@ -78,12 +78,11 @@ def handle_daily_plan_get(principal_id=None):
 
 
 def validate_input():
-    if not isinstance(request.json, dict):
-        raise InvalidSchemaException('Request body must be a dictionary')
+    validate_request_body({'start_date'}, request.json)
     try:
         format_date(request.json['start_date'])
     except Exception:
-        raise InvalidSchemaException('Missing/incorrectly formattted start date')
+        raise InvalidSchemaException('Incorrectly formatted start date')
     if 'end_date' in request.json:
         try:
             format_date(request.json['end_date'])

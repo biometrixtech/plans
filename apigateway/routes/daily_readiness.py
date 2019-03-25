@@ -16,7 +16,7 @@ from models.sleep_data import DailySleepData, SleepEvent
 from logic.survey_processing import SurveyProcessing, cleanup_sleep_data_from_api, create_plan
 from logic.athlete_status_processing import AthleteStatusProcessing
 from config import get_mongo_collection
-from utils import parse_datetime, format_date, format_datetime, fix_early_survey_event_date
+from utils import parse_datetime, format_date, format_datetime, fix_early_survey_event_date, validate_request_body
 
 datastore_collection = DatastoreCollection()
 athlete_stats_datastore = datastore_collection.athlete_stats_datastore
@@ -133,10 +133,8 @@ def handle_daily_readiness_get(principal_id=None):
     user_id = principal_id
 
     if request.method == 'POST':
-        if 'event_date' not in request.json:
-            raise InvalidSchemaException('Missing required parameter event_date')
-        else:
-            current_time = parse_datetime(request.json['event_date'])
+        validate_request_body({'event_date'}, request.json)
+        current_time = parse_datetime(request.json['event_date'])
     else:
         current_time = datetime.datetime.now()
     previous_soreness_processor = AthleteStatusProcessing(user_id, current_time, datastore_collection)
@@ -168,11 +166,8 @@ def handle_daily_readiness_get(principal_id=None):
 
 @xray_recorder.capture('routes.daily_readiness.validate')
 def validate_data():
-    if not isinstance(request.json, dict):
-        raise InvalidSchemaException('Request body must be a dictionary')
-
-    if 'date_time' not in request.json:
-        raise InvalidSchemaException('Missing required parameter date_time')
+    required_parameters = {'date_time', 'soreness'}
+    validate_request_body(required_parameters, request.json)
     parse_datetime(request.json['date_time'])
 
     # validate soreness
