@@ -48,6 +48,8 @@ class ContingencyTable(object):
                 row_total += self.table[r][c]
             self.table[r][self.number_columns] = row_total
 
+        self.table[self.number_rows][self.number_columns] = total
+
         # now calc expected values and chi-square
         for c in range(self.number_columns):
             for r in range(self.number_rows):

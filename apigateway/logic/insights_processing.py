@@ -11,6 +11,10 @@ class InsightsProcessing(object):
         self.daily_readiness_tuples = []
         self.post_session_survey_tuples = []
         self.rpe_load_tuples = []
+        self.no_soreness_load_tuples = {}
+        self.no_soreness_rpe_tuples = {}
+        self.soreness_load_tuples = {}
+        self.soreness_rpe_tuples = {}
 
     def load_surveys(self, readiness_surveys, plans):
 
@@ -28,7 +32,7 @@ class InsightsProcessing(object):
                         self.post_session_survey_tuples.append((t.event_date, (s.body_part.location.value, s.side, s.severity)))
 
             if t.session_RPE is not None and t.duration_minutes is not None:
-                self.rpe_load_tuples.append((t.event_date, t.session_RPE * t.duration_minutes, t.sport_name, t.strength_and_conditioning_type))
+                self.rpe_load_tuples.append((t.event_date, t.session_RPE, t.duration_minutes, t.sport_name, t.strength_and_conditioning_type))
 
         self.daily_readiness_tuples.sort(key=self.get_tuple_datetime)
         self.post_session_survey_tuples.sort(key=self.get_tuple_datetime)
@@ -46,12 +50,33 @@ class InsightsProcessing(object):
         for t in range(0, len(self.rpe_load_tuples) - 1):
 
             if self.rpe_load_tuples[t][0] <= load_end_date:
-                loading_event = LoadingEvent(self.rpe_load_tuples[t][0], self.rpe_load_tuples[t][1], self.rpe_load_tuples[t][2], self.rpe_load_tuples[t][3])
+                loading_event = LoadingEvent(self.rpe_load_tuples[t][0], self.rpe_load_tuples[t][1], self.rpe_load_tuples[t][2], self.rpe_load_tuples[t][3], self.rpe_load_tuples[t][4])
                 loading_events.append(loading_event)
+
+        early_soreness_tuples = list(s[0] for s in self.post_session_survey_tuples
+                                   if s[0] >= loading_events[0].loading_date and
+                                   s[0] <= loading_events[0].loading_date + timedelta(hours=72))
+        early_soreness_tuples.extend(list(s[0] for s in self.daily_readiness_tuples
+                                        if s[0] >= loading_events[0].loading_date and
+                                        s[0] <= loading_events[0].loading_date + timedelta(hours=72)))
+        early_soreness_history = list(set(early_soreness_tuples))
+
+        # let's reduce this down to only the loading events that can have soreness (the highest RPE within a rolling 72 hour window)
+        for t in range(0, len(loading_events)):
+
+            test_date = loading_events[t].loading_date + timedelta(hours=72)
+            if len(early_soreness_history) > t:
+                test_date = min(early_soreness_history[t], loading_events[t].loading_date + timedelta(hours=72))
+            window_events = list(d for d in loading_events if d.loading_date >= loading_events[t].loading_date and d.loading_date <= test_date)
+            if len(window_events) > 0:
+                window_events.sort(key=lambda x: x.RPE, reverse=True)
+                window_events[0].highest_rpe_in_72_hrs = True
+                #for w in range(1, len(window_events)):
+                #    window_events[w].highest_rpe_in_72_hrs = False
 
         for t in range(0, len(loading_events) - 1):
 
-            if loading_events[t].loading_date <= load_end_date:
+            if loading_events[t].loading_date <= load_end_date and loading_events[t].highest_rpe_in_72_hrs:
                 #loading_event = LoadingEvent(self.rpe_load_tuples[t][0], self.rpe_load_tuples[t][1], self.rpe_load_tuples[t][2], self.rpe_load_tuples[t][3])
                 loading_event = loading_events[t]
                 first_load_date = loading_events[0].loading_date
@@ -81,20 +106,35 @@ class InsightsProcessing(object):
                     loading_event.days_rest = (loading_event.loading_date.date() - loading_events[len(loading_events) - 1].loading_date.date()).days
 
                 # get all affected body parts that could be attributed to this training session
+                #base_soreness_tuples = list((s[0], s[1]) for s in self.post_session_survey_tuples
+                #                       if s[0] >= self.rpe_load_tuples[t][0] and
+                #                       s[0] < self.rpe_load_tuples[t + 1][0])
+                next_highest_rpe_date = loading_events[t].loading_date + timedelta(hours=72)
+                candidates = list(r for r in loading_events if r.loading_date > loading_events[t].loading_date
+                                  and r.loading_date <= next_highest_rpe_date and r.RPE > loading_events[t].RPE and r.highest_rpe_in_72_hrs)
+                candidates.sort(key=lambda x: x.loading_date)
+                if len(candidates) > 0:
+                    next_highest_rpe_date = candidates[0].loading_date
+
+
                 base_soreness_tuples = list((s[0], s[1]) for s in self.post_session_survey_tuples
-                                       if s[0] >= self.rpe_load_tuples[t][0] and
-                                       s[0] < self.rpe_load_tuples[t + 1][0])
+                                            if s[0] >= loading_events[t].loading_date and
+                                            s[0] <= next_highest_rpe_date)
+                #base_soreness_tuples.extend(list((s[0], s[1]) for s in self.daily_readiness_tuples
+                #                            if s[0] >= self.rpe_load_tuples[t][0] and
+                #                            s[0] < self.rpe_load_tuples[t + 1][0]))
                 base_soreness_tuples.extend(list((s[0], s[1]) for s in self.daily_readiness_tuples
-                                            if s[0] >= self.rpe_load_tuples[t][0] and
-                                            s[0] < self.rpe_load_tuples[t + 1][0]))
+                                                 if s[0] >= loading_events[t].loading_date and
+                                                 s[0] <= next_highest_rpe_date))
+
                 body_parts = list(AffectedBodyPart(b[1][0], b[1][1], 0, 0, False) for b in base_soreness_tuples) # body part, side, days sore, max_severity, cleared
                 affected_body_parts = list(set(body_parts))
                 all_soreness_tuples = list((s[0], s[1]) for s in self.post_session_survey_tuples
                                             if s[0] >= self.rpe_load_tuples[t][0] and
-                                            s[0] < self.rpe_load_tuples[t][0] + timedelta(days=9))
+                                            s[0] < self.rpe_load_tuples[t][0] + timedelta(days=12))
                 all_soreness_tuples.extend(list((s[0], s[1]) for s in self.daily_readiness_tuples
                                                  if s[0] >= self.rpe_load_tuples[t][0] and
-                                                 s[0] < self.rpe_load_tuples[t][0] + timedelta(days=9)))
+                                                 s[0] < self.rpe_load_tuples[t][0] + timedelta(days=12)))
                 soreness_history = list((h[0], h[1][0], h[1][1], h[1][2]) for h in all_soreness_tuples)
                 unique_soreness_history = list(set(soreness_history))
                 unique_soreness_history.sort(key=self.get_tuple_datetime)
@@ -138,6 +178,22 @@ class InsightsProcessing(object):
                     grouped_parts.append(part_list[0])
 
                 loading_event.affected_body_parts = grouped_parts
+
+                level_one_soreness = list(a for a in loading_event.affected_body_parts if a.max_severity <= 1)
+
+                if len(grouped_parts) == len(level_one_soreness): # no soreness
+                    if loading_event.sport_name not in self.no_soreness_load_tuples:
+                        self.no_soreness_load_tuples[loading_event.sport_name] = []
+                        self.no_soreness_rpe_tuples[loading_event.sport_name] = []
+                    self.no_soreness_load_tuples[loading_event.sport_name].append((loading_event.loading_date, loading_event.load))
+                    self.no_soreness_rpe_tuples[loading_event.sport_name].append((loading_event.loading_date, loading_event.RPE))
+                else:
+                    if loading_event.sport_name not in self.soreness_load_tuples:
+                        self.soreness_load_tuples[loading_event.sport_name] = []
+                        self.soreness_rpe_tuples[loading_event.sport_name] = []
+                    self.soreness_load_tuples[loading_event.sport_name].append((loading_event.loading_date, loading_event.load))
+                    self.soreness_rpe_tuples[loading_event.sport_name].append((loading_event.loading_date, loading_event.RPE))
+
                 loading_events.append(loading_event)
 
         # all loading events
@@ -231,9 +287,11 @@ class AffectedBodyPart(object):
 
 
 class LoadingEvent(object):
-    def __init__(self, loading_date, load, sport_name, strength_conditioning_type):
+    def __init__(self, loading_date, rpe, duration, sport_name, strength_conditioning_type):
         self.loading_date = loading_date
-        self.load = load
+        self.RPE = rpe
+        self.duration = duration
+        self.load = rpe * duration
         self.sport_name = sport_name
         self.strength_conditioning_type = strength_conditioning_type
         self.affected_body_parts = []
@@ -243,6 +301,7 @@ class LoadingEvent(object):
         self.lagged_load_z_score = None
         self.acwr_2_3 = None
         self.days_rest = None
+        self.highest_rpe_in_72_hrs = False
 
     def has_existing_soreness(self, days=1):
 
