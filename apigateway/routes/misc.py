@@ -184,7 +184,6 @@ def handle_test_data_copy(principal_id=None):
     else:
         athlete_stats = [athlete_stats_datastore_test.get(user_id)]
 
-    print(user_id)
     # clear all existing data
     rs_datastore.delete(user_id=user_id)
     daily_plan_datastore.delete(user_id=user_id)
