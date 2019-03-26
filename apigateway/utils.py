@@ -82,12 +82,3 @@ def fix_early_survey_event_date(event_date):
                             )
     else:
         return event_date
-
-
-def validate_request_body(required_parameters, body):
-    if not isinstance(body, dict):
-        raise InvalidSchemaException('Request body must be a dictionary')
-    if not required_parameters <= body.keys():
-        raise InvalidSchemaException(f"Missing required parameter(s): {', '.join(required_parameters - body.keys())}")
-
-    return True
