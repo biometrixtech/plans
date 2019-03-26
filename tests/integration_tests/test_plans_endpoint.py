@@ -3,7 +3,7 @@ import os
 import datetime
 import json
 from utils import format_date, format_datetime
-BASE_URL = f"https://apis.{os.getenv('ENVIRONMENT', 'test')}.fathomai.com"
+BASE_URL = f"https://apis.{os.getenv('ENVIRONMENT', 'dev')}.fathomai.com"
 USERS_API_VERSION = os.getenv('USERS_API_VERSION', '2_1')
 PLANS_API_VERSION = os.getenv('PLANS_API_VERSION', '3_1')
 
@@ -219,7 +219,7 @@ def test_change_active_time_start_and_complete_recovery():
     existing_active_time = get_plan(format_date(event_date), format_datetime(event_date)).json()['daily_plans'][0]['post_recovery']['minutes_duration']
 
     active_time = 15
-    if existing_active_time == 15:
+    if existing_active_time in [15, 0]:
         active_time = 20
     response = change_active_time(event_date, active_time)
     assert response.status_code == 200
