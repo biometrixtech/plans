@@ -184,6 +184,7 @@ def handle_test_data_copy(principal_id=None):
     else:
         athlete_stats = [athlete_stats_datastore_test.get(user_id)]
 
+    print(user_id)
     # clear all existing data
     rs_datastore.delete(user_id=user_id)
     daily_plan_datastore.delete(user_id=user_id)
@@ -217,8 +218,8 @@ def update_dates(rs_surveys, daily_plans, athlete_stats, event_date):
     for plan in daily_plans:
         plan.event_date = format_date(parse_date(plan.event_date) + delta)
         for ts in plan.training_sessions:
-            ts.event_date = format_datetime(parse_datetime(ts.event_date) + delta)
+            ts.event_date += delta
             if ts.post_session_survey is not None:
-                ts.post_session_survey.event_date = format_datetime(parse_datetime(ts.post_session_survey.event_date) + delta)
+                ts.post_session_survey.event_date += delta
     for stat in athlete_stats:
         stat.event_date = format_date(event_date)
