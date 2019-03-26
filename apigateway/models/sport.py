@@ -109,6 +109,10 @@ class SportName(Enum):
     other = 83
     no_sport = None
 
+    @classmethod
+    def has_value(cls, value):
+        return any(value == item.value for item in cls)
+
 
 class BaseballPosition(Enum):
     catcher = 0
@@ -147,11 +151,13 @@ class SoccerPosition(Enum):
     midfielder = 3
     striker = 4
 
+
 class SoftballPosition(Enum):
     catcher = 0
     infielder = 1
     pitcher = 2
     outfielder = 3
+
 
 class FieldHockeyPosition(Enum):
     goalie = 0
@@ -159,15 +165,16 @@ class FieldHockeyPosition(Enum):
     midfielder = 2
     forward = 3
 
+
 class TrackAndFieldPosition(Enum):
     sprinter = 0
     jumper = 1
     thrower = 2
     distance = 3
 
+
 class VolleyballPosition(Enum):
     hitter = 0
     setter = 1
     middle_blocker = 2
     libero = 3
-

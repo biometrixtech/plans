@@ -50,12 +50,12 @@ def create_daily_plan(athlete_id):
 def update_athlete_stats(athlete_id):
     event_date = request.json.get('event_date', None)
     athlete_stats = StatsProcessing(athlete_id, event_date=event_date, datastore_collection=DatastoreCollection()).process_athlete_stats()
-    DatastoreCollection().athlete_stats_datastore.put(athlete_stats)
 
     if event_date is not None:
-        Service('plans', Config.get('API_VERSION')).call_apigateway_async(method='POST',
-                                                                          endpoint=f"athlete/{athlete_id}/metrics",
-                                                                          body={"event_date": event_date})
+        metrics = MetricsProcessing().get_athlete_metrics_from_stats(athlete_stats, event_date)
+        athlete_stats.metrics = metrics
+
+    DatastoreCollection().athlete_stats_datastore.put(athlete_stats)
     return {'message': 'Update requested'}, 202
 
 
@@ -79,14 +79,15 @@ def manage_athlete_push_notification(athlete_id):
     try:
         minute_offset = _get_offset()
         event_date = format_date(datetime.datetime.now())
-        stats_update_time = event_date + 'T03:00:00Z'
+        stats_update_time = event_date + 'T03:30:00Z'
         trigger_event_date = _randomize_trigger_time(stats_update_time, 10*60, minute_offset)
 
         Service('plans', Config.get('API_VERSION')).call_apigateway_async(method='POST',
                                                                           endpoint=f"athlete/{athlete_id}/stats",
                                                                           body={"event_date": event_date},
                                                                           execute_at=trigger_event_date)
-    except:
+    except Exception as e:
+        print(e)
         pass
     if not _is_athlete_active(athlete_id):
         return {'message': 'Athlete is not active'}, 200
@@ -172,7 +173,7 @@ def manage_readiness_push_notification(athlete_id):
 def manage_prep_push_notification(athlete_id):
     event_date = request.json['event_date']
     plan = _get_plan(athlete_id, event_date)
-    if plan and not plan.pre_recovery_completed and plan.pre_recovery.start_date is None and plan.pre_recovery.impact_score >= 3 and _are_exercises_assigned(plan.pre_recovery) and plan.post_recovery.goal_text == "":
+    if plan and not plan.pre_recovery_completed and plan.pre_recovery.start_date is None and _are_exercises_assigned(plan.pre_recovery) and plan.pre_recovery.display_exercises:
         body = {"message": "Your prep exercises are ready! Tap to to get started!",
                 "call_to_action": "COMPLETE_ACTIVE_PREP"}
         _notify_user(athlete_id, body)
@@ -187,7 +188,7 @@ def manage_prep_push_notification(athlete_id):
 def manage_recovery_push_notification(athlete_id):
     event_date = request.json['event_date']
     plan = _get_plan(athlete_id, event_date)
-    if plan and not plan.post_recovery_completed and plan.post_recovery.start_date is None and plan.post_recovery.impact_score >= 3 and _are_exercises_assigned(plan.post_recovery):
+    if plan and not plan.post_recovery_completed and plan.post_recovery.start_date is None and _are_exercises_assigned(plan.post_recovery) and plan.post_recovery.display_exercises:
         body = {"message": "Your recovery exercises are ready! Tap to begin taking care!",
                 "call_to_action": "COMPLETE_ACTIVE_RECOVERY"}
         _notify_user(athlete_id, body)
@@ -209,7 +210,8 @@ def schedule_prep_completion_push_notification(athlete_id):
                                         endpoint=f'/athlete/{athlete_id}/send_completion_notification',
                                         body=body,
                                         execute_at=execute_at)
-    return {"messate": "Scheduled"}, 202
+    return {"message": "Scheduled"}, 202
+
 
 @app.route('/<uuid:athlete_id>/recovery_started', methods=['POST'])
 @require.authenticated.service
@@ -224,7 +226,8 @@ def schedule_recovery_completion_push_notification(athlete_id):
                                         endpoint=f'/athlete/{athlete_id}/send_completion_notification',
                                         body=body,
                                         execute_at=execute_at)
-    return {"messate": "Scheduled"}, 202
+    return {"message": "Scheduled"}, 202
+
 
 @app.route('/<uuid:athlete_id>/send_completion_notification', methods=['POST'])
 @require.authenticated.service
@@ -233,13 +236,13 @@ def manage_recovery_completion_push_notification(athlete_id):
     recovery_type = request.json['recovery_type']
     event_date = request.json['event_date']
     plan = _get_plan(athlete_id, event_date)
-    if recovery_type=='prep' and plan and plan.pre_recovery.start_date is not None and not plan.pre_recovery_completed and plan.post_recovery.goal_text == "":
+    if recovery_type == 'prep' and plan and plan.pre_recovery.start_date is not None and plan.pre_recovery.display_exercises and not plan.pre_recovery.completed:
         body = {"message": "Take time to invest in yourself. Let's finish your exercises!",
                 "call_to_action": "COMPLETE_ACTIVE_PREP"}
         _notify_user(athlete_id, body)
         return {'message': 'User Notified'}, 200
 
-    elif recovery_type=='recovery' and plan and plan.post_recovery.start_date is not None and not plan.post_recovery.completed:
+    elif recovery_type == 'recovery' and plan and plan.post_recovery.start_date is not None and not plan.post_recovery.completed:
         body = {"message": "Take time to invest in yourself. Let's finish your exercises!",
                 "call_to_action": "COMPLETE_ACTIVE_RECOVERY"}
         _notify_user(athlete_id, body)
@@ -271,8 +274,8 @@ def _is_athlete_active(athlete_id):
 def _notify_user(athlete_id, body):
     users_service = Service('users', USERS_API_VERSION)
     users_service.call_apigateway_async(method='POST',
-                                       endpoint=f'/user/{athlete_id}/notify',
-                                       body=body)
+                                        endpoint=f'/user/{athlete_id}/notify',
+                                        body=body)
 
 
 def _randomize_trigger_time(start_time, window, tz_offset):
@@ -281,15 +284,14 @@ def _randomize_trigger_time(start_time, window, tz_offset):
     utc_date = local_date - datetime.timedelta(minutes=tz_offset)
     return utc_date
 
+
 def _are_exercises_assigned(rec):
     exercises = (len(rec.inhibit_exercises) +
                  len(rec.lengthen_exercises) +
                  len(rec.activate_exercises) +
-                 len (rec.integrate_exercises))
-    if exercises > 0:
-        return True
-    else:
-        return False
+                 len(rec.integrate_exercises))
+    return exercises > 0
+
 
 def _get_offset():
     tz = request.json['timezone']

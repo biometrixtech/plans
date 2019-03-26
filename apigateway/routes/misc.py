@@ -1,22 +1,24 @@
 from flask import request, Blueprint
 import datetime
 import os
-from utils import format_date, parse_datetime, parse_date
-from datastores.daily_readiness_datastore import DailyReadinessDatastore
-from datastores.daily_plan_datastore import DailyPlanDatastore
-from datastores.athlete_stats_datastore import AthleteStatsDatastore
-from datastores.completed_exercise_datastore import CompletedExerciseDatastore
-from config import get_mongo_collection, get_mongo_database
+
 from fathomapi.api.config import Config
 from fathomapi.comms.service import Service
 from fathomapi.utils.decorators import require
 from fathomapi.utils.exceptions import ForbiddenException
 from fathomapi.utils.xray import xray_recorder
+from config import get_mongo_collection, get_mongo_database
+from datastores.daily_readiness_datastore import DailyReadinessDatastore
+from datastores.daily_plan_datastore import DailyPlanDatastore
+from datastores.athlete_stats_datastore import AthleteStatsDatastore
+from datastores.completed_exercise_datastore import CompletedExerciseDatastore
+from utils import format_date, parse_datetime, parse_date, format_datetime
 
 from models.app_logs import AppLogs
 
 app = Blueprint('misc', __name__)
 USERS_API_VERSION = os.environ['USERS_API_VERSION']
+
 
 @app.route('/clear_user_data', methods=['POST'])
 @require.body({'event_date': str})
@@ -204,13 +206,19 @@ def handle_test_data_copy(principal_id=None):
 
     return {'message': 'success'}, 202
 
+
 def update_dates(rs_surveys, daily_plans, athlete_stats, event_date):
     athlete_today = parse_date(athlete_stats[0].event_date)
     day_diff = (event_date - athlete_today).days
+    delta = datetime.timedelta(days=day_diff)
     for rs_survey in rs_surveys:
-        rs_survey.event_date += datetime.timedelta(days=day_diff)
+        rs_survey.event_date += delta
 
     for plan in daily_plans:
-        plan.event_date = format_date(parse_date(plan.event_date) + datetime.timedelta(days=day_diff))
+        plan.event_date = format_date(parse_date(plan.event_date) + delta)
+        for ts in plan.training_sessions:
+            ts.event_date += delta
+            if ts.post_session_survey is not None:
+                ts.post_session_survey.event_date += delta
     for stat in athlete_stats:
         stat.event_date = format_date(event_date)
