@@ -73,9 +73,9 @@ def handle_active_recovery_update(principal_id=None):
 @xray_recorder.capture('routes.active_recovery.start')
 def handle_active_recovery_start(principal_id=None):
     user_id = principal_id
-
     event_date = parse_datetime(request.json['event_date'])
     recovery_type = request.json['recovery_type']
+
     plan_event_date = format_date(event_date)
     recovery_start_date = format_datetime(event_date)
     if not _check_plan_exists(user_id, plan_event_date):
@@ -109,9 +109,9 @@ def handle_active_recovery_start(principal_id=None):
 @xray_recorder.capture('routes.active_time')
 def handle_workout_active_time(principal_id=None):
     user_id = principal_id
-
     event_date = parse_datetime(request.json['event_date'])
     target_minutes = request.json['active_time']
+
     plan_event_date = format_date(event_date)
     if not _check_plan_exists(user_id, plan_event_date):
         raise NoSuchEntityException('Plan not found for the user')
