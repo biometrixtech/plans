@@ -2,6 +2,7 @@ import datetime
 
 from datastores.datastore_collection import DatastoreCollection
 from fathomapi.utils.exceptions import NoSuchEntityException
+from logic.soreness_processing import SorenessCalculator
 from utils import parse_datetime, format_datetime, parse_date, format_date
 
 
@@ -35,7 +36,7 @@ class AthleteStatusProcessing(object):
                                                                end_date=self.current_time,
                                                                last_only=False)
             for rs_survey in readiness_surveys:
-                self.sore_body_parts.extend([s for s in rs_survey.soreness if s.severity > 1])
+                self.sore_body_parts.extend([s for s in rs_survey.soreness if SorenessCalculator().get_severity(s.severity, s.movement) > 1])
         except NoSuchEntityException:
             pass
         # get soreness from ps_survey
@@ -44,9 +45,11 @@ class AthleteStatusProcessing(object):
                                                            end_date=self.current_time)
         post_session_surveys = [s for s in post_session_surveys if s is not None and self.soreness_start_time <= s.event_date_time < self.current_time]
         for ps_survey in post_session_surveys:
-            self.sore_body_parts.extend([s for s in ps_survey.survey.soreness if s.severity > 1])
+            self.sore_body_parts.extend([s for s in ps_survey.survey.soreness if SorenessCalculator().get_severity(s.severity, s.movement) > 1])
         # check for severe pain yesterday or today
-        severe_pain_dates = [s.reported_date_time for s in self.sore_body_parts if s.pain and s.severity >= 3 and s.reported_date_time > self.soreness_start_time + datetime.timedelta(days=1)]
+        severe_pain_dates = [s.reported_date_time for s in self.sore_body_parts if s.pain and
+                             SorenessCalculator().get_severity(s.severity, s.movement) >= 3 and
+                             s.reported_date_time > self.soreness_start_time + datetime.timedelta(days=1)]
         if len(severe_pain_dates) > 0:
             self.severe_pain_today_yesterday = True
         self.cleaned_sore_body_parts = self.remove_duplicate_sore_body_parts()
