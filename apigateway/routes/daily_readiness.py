@@ -16,7 +16,7 @@ from models.sleep_data import DailySleepData, SleepEvent
 from logic.survey_processing import SurveyProcessing, cleanup_sleep_data_from_api, create_plan
 from logic.athlete_status_processing import AthleteStatusProcessing
 from config import get_mongo_collection
-from utils import parse_datetime, format_date, format_datetime, fix_early_survey_event_date, validate_request_body
+from utils import parse_datetime, format_date, format_datetime, fix_early_survey_event_date
 
 datastore_collection = DatastoreCollection()
 athlete_stats_datastore = datastore_collection.athlete_stats_datastore

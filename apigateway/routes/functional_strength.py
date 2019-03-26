@@ -9,7 +9,7 @@ from datastores.athlete_stats_datastore import AthleteStatsDatastore
 from datastores.completed_exercise_datastore import CompletedExerciseDatastore
 from logic.training_plan_management import TrainingPlanManager
 from models.soreness import CompletedExercise
-from utils import format_date, parse_datetime, format_datetime, validate_request_body
+from utils import format_date, parse_datetime, format_datetime
 from config import get_mongo_collection
 from datetime import timedelta
 

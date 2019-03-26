@@ -9,7 +9,7 @@ from fathomapi.utils.exceptions import InvalidSchemaException, NoSuchEntityExcep
 from fathomapi.utils.xray import xray_recorder
 from models.session import SessionType, SessionSource
 from models.daily_plan import DailyPlan
-from utils import parse_datetime, format_date, format_datetime, validate_request_body
+from utils import parse_datetime, format_date, format_datetime
 from config import get_mongo_collection
 from logic.survey_processing import SurveyProcessing, create_session, update_session, create_plan, cleanup_plan
 from logic.athlete_status_processing import AthleteStatusProcessing
