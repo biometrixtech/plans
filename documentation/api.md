@@ -107,7 +107,6 @@ The client __must__ submit a request body containing a JSON object with the foll
 ```
 {
     "date_time": Datetime,
-    "user_id": Uuid,
     "soreness": [sore_part, sore_part],
     "clear_candidates": [sore_part, sore_part]
     "sleep_quality": number,
@@ -159,7 +158,6 @@ Authorization: eyJraWQ...ajBc4VQ
 
 {
     "date_time": "2018-12-10T17:45:24Z",
-    "user_id":"a1233423-73d3-4761-ac92-89cc15921d34",
     "soreness":[{"body_part": 18, "severity": 2, "side": 0}],
     "clear_candidates": [{"body_part": 5, "severity": 0, "side": 1, "pain":true, "status": "persistant_2_pain"}]
     "sleep_quality":4,
@@ -345,7 +343,6 @@ The client __must__ submit a request to the endpoint `/plans/version/session`. T
 The client __must__ submit a request body containing a JSON object with the following schema:
 ```
 {
-    "user_id": Uuid,
     "event_date": Datetime,
     "sessions": [session, session],
     "health_sync_date": Datetime
@@ -398,7 +395,6 @@ Cache-Control: no-cache
 Postman-Token: 4b6c3946-89fd-4cde-ae29-3a4984d5f373
 
 {
-    "user_id": "fd263811-b299-461f-9e79-895c69612bac",
     "event_date": "2019-01-12T16:54:57Z",
     "sessions":[
                 {
@@ -457,7 +453,6 @@ The client __must__ submit a request to the endpoint `/plans/version/session/typ
 The client __must__ submit a request body containing a JSON object with the following schema:
 ```
 {
-    "user_id": Uuid,
     "event_date": Datetime
 }
 ```
@@ -472,7 +467,6 @@ Cache-Control: no-cache
 Postman-Token: 4b6c3946-89fd-4cde-ae29-3a4984d5f373
 
 {
-    "user_id":"a1233423-73d3-4761-ac92-89cc15921d34",
     "event_date": "2018-09-14T19:54:48Z"
 }
 ```
@@ -511,7 +505,6 @@ The client __must__ submit a request to the endpoint `/plans/version/session/no_
 The client __must__ submit a request body containing a JSON object with the following schema:
 ```
 {
-    "user_id": Uuid,
     "event_date": Datetime
 }
 ```
@@ -526,7 +519,6 @@ Cache-Control: no-cache
 Postman-Token: 4b6c3946-89fd-4cde-ae29-3a4984d5f373
 
 {
-    "user_id":"a1233423-73d3-4761-ac92-89cc15921d34",
     "event_date": "2018-09-14T19:54:48Z"
 
 }
@@ -555,7 +547,6 @@ The client __must__ submit a request to the endpoint `/plans/version/session/{se
 The client __must__ submit a request body containing a JSON object with the following schema:
 ```
 {
-    "user_id": Uuid,
     "event_date": Datetime,
     "session_type": number
 }
@@ -570,7 +561,6 @@ Content-Type: application/json
 Authorization: eyJraWQ...ajBc4VQ
 
 {
-    "user_id": "02cb7965-7921-493a-80d4-6b278c928fad",
     "event_date": "2018-08-10T16:30:00Z",
     "session_type": 0
 }
@@ -598,7 +588,6 @@ The client __must__ submit a request to the endpoint `/plans/version/session/{se
 The client __must__ submit a request body containing a JSON object with the following schema:
 ```
 {
-    "user_id": Uuid,
     "event_date": Datetime,
     "sessions": [session],
     "health_sync_date": Datetime
@@ -615,7 +604,6 @@ Content-Type: application/json
 Authorization: eyJraWQ...ajBc4VQ
 
 {
-    "user_id": "02cb7965-7921-493a-80d4-6b278c928fad",
     "event_date": "2019-02-08T16:30:00Z",
     "sessions": [
                  {
@@ -663,7 +651,6 @@ The client __must__ submit a request to the endpoint `/plans/version/session/sen
 The client __must__ submit a request body containing a JSON object with the following schema:
 ```
 {
-    "user_id": Uuid,
     "last_sensor_sync": Datetime
     "sessions": [Session]
 }
@@ -698,7 +685,6 @@ Content-Type: application/json
 Authorization: eyJraWQ...ajBc4VQ
 
 {
-    "user_id": "02cb7965-7921-493a-80d4-6b278c928fad",
     "last_sensor_sync": "2018-09-05T14:06:44Z",
     "sessions":
     [
@@ -743,7 +729,6 @@ The client __must__ submit a request to the endpoint `/plans/version/active_reco
 The client __must__ submit a request body containing a JSON object with the following schema:
 ```
 {
-    "user_id": Uuid,
     "event_date": Datetime,
     "recovery_type": string
 }
@@ -757,7 +742,6 @@ Host: apis.env.fathomai.com
 Content-Type: application/json
 Authorization: eyJraWQ...ajBc4VQ
 {
-    "user_id":"a1233423-73d3-4761-ac92-89cc15921d34",
     "event_date": "2018-09-21T17:53:39Z",
     "recovery_type": "pre"
 }
@@ -785,7 +769,6 @@ The client __must__ submit a request to the endpoint `/plans/version/active_reco
 The client __must__ submit a request body containing a JSON object with the following schema:
 ```
 {
-    "user_id": Uuid,
     "event_date": Datetime,
     "recovery_type": string
     "completed_exercises": [string]
@@ -800,7 +783,6 @@ Host: apis.env.fathomai.com
 Content-Type: application/json
 Authorization: eyJraWQ...ajBc4VQ
 {
-    "user_id":"a1233423-73d3-4761-ac92-89cc15921d34",
     "event_date": "2018-09-21T17:53:39Z",
     "recovery_type": "post",
     "completed_exercises": ["3", "5", "20", "142"]
@@ -831,7 +813,6 @@ The client __must__ submit a request to the endpoint `/plans/version/active_reco
 The client __must__ submit a request body containing a JSON object with the following schema:
 ```
 {
-    "user_id": Uuid,
     "event_date": Datetime,
     "active_time": number
 }
@@ -845,7 +826,6 @@ Host: apis.env.fathomai.com
 Content-Type: application/json
 Authorization: eyJraWQ...ajBc4VQ
 {
-    "user_id":"a1233423-73d3-4761-ac92-89cc15921d34",
     "event_date": "2018-09-21T17:53:39Z",
     "active_time": 20
 }
@@ -920,7 +900,6 @@ The client __must__ submit a request to the endpoint `/plans/version/functional_
 The client __must__ submit a request body containing a JSON object with the following schema:
 ```
 {
-    "user_id": Uuid,
     "event_date": Datetime,
 }
 ```
@@ -933,7 +912,6 @@ Content-Type: application/json
 Authorization: eyJraWQ...ajBc4VQ
 
 {
-    "user_id":"a1233423-73d3-4761-ac92-89cc15921d34",
     "event_date": "2018-09-21T17:53:39Z"
 }
 ```
@@ -960,7 +938,6 @@ The client __must__ submit a request to the endpoint `/plans/version/functional_
 The client __must__ submit a request body containing a JSON object with the following schema:
 ```
 {
-    "user_id": Uuid,
     "event_date": Datetime,
     "completed_exercises": [string]
 }
@@ -974,7 +951,6 @@ Content-Type: application/json
 Authorization: eyJraWQ...ajBc4VQ
 
 {
-    "user_id":"a1233423-73d3-4761-ac92-89cc15921d34",
     "event_date": "2018-09-21T17:53:39Z",
     "completed_exercises": ["3", "5", "20", "142"]
 }
@@ -1003,7 +979,6 @@ The client __must__ submit a request to the endpoint `/plans/version/daily_plan`
 The client __must__ submit a request body containing a JSON object with the following schema:
 ```
 {
-    "user_id": Uuid,
     "event_date": Datetime
     "start_date": string,
     "end_date": string
@@ -1020,7 +995,6 @@ Content-Type: application/json
 Authorization: eyJraWQ...ajBc4VQ
 
 {
-    "user_id": "02cb7965-7921-493a-80d4-6b278c928fad",
     "event_date": "2018-07-31T02:50:02Z",
     "start_date": "2018-07-31"
 }
@@ -1385,7 +1359,6 @@ The client __must__ submit a request to the endpoint `/plans/version/health_data
 The client __must__ submit a request body containing a JSON object with the following schema:
 ```
 {
-    "user_id": string,
     "event_date": Datetime,
     "start_date": Date,
     "end_date": Date,
@@ -1406,7 +1379,6 @@ Content-Type: application/json
 Authorization: eyJraWQ...ajBc4VQ
 
 {
-    "user_id": "fd263811-b299-461f-9e79-895c69612bac",
     "event_date": "2019-01-31T16:12:02Z",
     "start_date": "2019-01-29",
     "end_date": "2019-01-30",
