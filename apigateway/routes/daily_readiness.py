@@ -120,7 +120,6 @@ def handle_daily_readiness_create(principal_id=None):
                                                                                 endpoint=f"user/{user_id}",
                                                                                 body={"health_sync_date": request.json['health_sync_date']})
 
-
     return {'daily_plans': [plan]}, 201
 
 
@@ -161,7 +160,7 @@ def handle_daily_readiness_get(principal_id=None):
                           'functional_strength_eligible': functional_strength_eligible,
                           'completed_functional_strength_sessions': completed_functional_strength_sessions
                          },
-            "typical_sessions": typical_sessions} , 200
+            "typical_sessions": typical_sessions}, 200
 
 
 @xray_recorder.capture('routes.daily_readiness.validate')
@@ -190,6 +189,7 @@ def validate_data():
         # for valid ones, force values to be integer
         soreness['body_part'] = int(soreness['body_part'])
         soreness['severity'] = int(soreness['severity'])
+
 
 def _check_plan_exists(user_id, event_date):
     mongo_collection = get_mongo_collection('dailyplan')

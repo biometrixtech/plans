@@ -17,11 +17,10 @@ def handle_season_create():
     seasons = []
     for season in request.json['seasons']:
         seasons.append(Season(sport=season['sport'],
-                             competition_level=season['competition_level'],
-                             positions=season['positions'],
-                             start_date=season['start_date'],
-                             end_date=season['end_date'])
-                     )       
+                              competition_level=season['competition_level'],
+                              positions=season['positions'],
+                              start_date=season['start_date'],
+                              end_date=season['end_date']))
     athlete_season = AthleteSeason(user_id=request.json['user_id'],
                                    seasons=seasons)
     store = AthleteSeasonDatastore()
@@ -29,6 +28,3 @@ def handle_season_create():
     store.put(athlete_season)
 
     return {'message': 'success'}, 201
-
-
-

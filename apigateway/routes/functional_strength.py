@@ -18,22 +18,12 @@ app = Blueprint('functional_strength', __name__)
 
 @app.route('/', methods=['PATCH'])
 @require.authenticated.any
+@require.body({'event_date': str, 'user_id': str})
 @xray_recorder.capture('routes.functional_strength')
 def handle_functional_strength_update():
-    if not isinstance(request.json, dict):
-        raise InvalidSchemaException('Request body must be a dictionary')
-    if 'event_date' not in request.json:
-        raise InvalidSchemaException('Missing required parameter event_date')
-    else:
-        event_date = parse_datetime(request.json['event_date'])
-    try:
-        user_id = request.json['user_id']
-    except:
-        raise InvalidSchemaException('user_id is required')
-    try:
-        completed_exercises = request.json['completed_exercises']
-    except:
-        completed_exercises = []
+    event_date = parse_datetime(request.json['event_date'])
+    user_id = request.json['user_id']
+    completed_exercises = request.json.get('completed_exercises', [])
 
     plan_event_date = format_date(event_date)
     fs_event_date = format_datetime(event_date)
@@ -77,18 +67,11 @@ def handle_functional_strength_update():
 
 @app.route('/', methods=['POST'])
 @require.authenticated.any
+@require.body({'event_date': str, 'user_id': str})
 @xray_recorder.capture('routes.functional_strength')
 def handle_functional_strength_start():
-    if not isinstance(request.json, dict):
-        raise InvalidSchemaException('Request body must be a dictionary')
-    if 'event_date' not in request.json:
-        raise InvalidSchemaException('Missing required parameter event_date')
-    else:
-        event_date = parse_datetime(request.json['event_date'])
-    try:
-        user_id = request.json['user_id']
-    except:
-        raise InvalidSchemaException('user_id is required')
+    event_date = parse_datetime(request.json['event_date'])
+    user_id = request.json['user_id']
 
     plan_event_date = format_date(event_date)
     fs_start_date = format_datetime(event_date)
@@ -117,29 +100,16 @@ def handle_functional_strength_start():
 
 @app.route('/activate', methods=['POST'])
 @require.authenticated.any
+@require.body({'event_date': str, 'current_sport_name': str, 'current_position': str})
 @xray_recorder.capture('routes.functional_strength.activate')
 def handle_functional_strength_activate(principal_id=None):
-    if not isinstance(request.json, dict):
-        raise InvalidSchemaException('Request body must be a dictionary')
-    if 'event_date' not in request.json:
-        raise InvalidSchemaException('Missing required parameter event_date')
-    else:
-        event_date = parse_datetime(request.json['event_date'])
-    if 'current_sport_name' not in request.json:
-        raise InvalidSchemaException('Missing required parameter current_sport_name')
-    if 'current_position' not in request.json:
-        raise InvalidSchemaException('Missing required parameter current_position')
-
     user_id = principal_id
-    plan_event_date = format_date(event_date)
+    plan_event_date = format_date(parse_datetime(request.json['event_date']))
 
     # update athlete stats with sport/position information
     athlete_stats_store = AthleteStatsDatastore()
     athlete_stats = athlete_stats_store.get(athlete_id=user_id)
-    if request.json['current_sport_name'] is not None:
-        athlete_stats.current_sport_name = request.json['current_sport_name']
-    else:
-        raise InvalidSchemaException("current_sport_name cannot be null")
+    athlete_stats.current_sport_name = request.json['current_sport_name']
     athlete_stats.current_position = request.json['current_position']
     athlete_stats_store.put(athlete_stats)
 
