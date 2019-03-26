@@ -168,12 +168,9 @@ def handle_session_update(session_id, principal_id=None):
 
 @app.route('/sensor_data', methods=['POST'])
 @require.authenticated.any
+@require.body({'last_sensor_sync': str, 'sessions': list})
 @xray_recorder.capture('routes.session.add_sensor_data')
 def handle_session_sensor_data(principal_id=None):
-    if not isinstance(request.json, dict):
-        raise InvalidSchemaException('Request body must be a dictionary')
-    if 'last_sensor_sync' not in request.json:
-        raise InvalidSchemaException('Missing required parameter user_id')
     user_id = principal_id
 
     # update last_sensor_syc date

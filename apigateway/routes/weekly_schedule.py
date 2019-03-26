@@ -13,9 +13,9 @@ app = Blueprint('weekly_schedule', __name__)
 
 @app.route('/cross_training', methods=['POST'])
 @require.authenticated.any
+@require.body({'user_id': str})
 @xray_recorder.capture('routes.weekly_schedule.cross_training.create')
 def handle_crosstraining_schedule_create():
-    validate_data(request)
     validate_crosstraining_data(request)
     today = datetime.datetime.today()
     today_weekday = today.weekday()
@@ -59,9 +59,9 @@ def handle_crosstraining_schedule_update():
 
 @app.route('/training', methods=['POST'])
 @require.authenticated.any
+@require.body({'user_id': str})
 @xray_recorder.capture('routes.weekly_schedule.training.create')
 def handle_training_schedule_create():
-    validate_data(request)
     validate_training_data(request)
     today = datetime.datetime.today()
     today_weekday = today.weekday()
@@ -95,14 +95,6 @@ def handle_training_schedule_get():
 @xray_recorder.capture('routes.weekly_schedule.cross_training.update')
 def handle_training_schedule_update():
     pass
-
-
-@xray_recorder.capture('routes.weekly_schedule.validate')
-def validate_data(request):
-    if not isinstance(request.json, dict):
-        raise InvalidSchemaException('Request body must be a dictionary')
-    if 'user_id' not in request.json:
-        raise InvalidSchemaException('Missing required parameter user_id')
 
 
 @xray_recorder.capture('routes.weekly_schedule.validate_crosstraining')

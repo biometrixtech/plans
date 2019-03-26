@@ -17,18 +17,11 @@ app = Blueprint('daily_schedule', __name__)
 
 @app.route('/', methods=['POST'])
 @require.authenticated.any
+@require.body({'event_date': str, 'user_id': str})
 @xray_recorder.capture('routes.daily_schedule')
 def handle_daily_schedule_create():
-    if not isinstance(request.json, dict):
-        raise InvalidSchemaException('Request body must be a dictionary')
-    if 'event_date' not in request.json:
-        raise InvalidSchemaException('Missing required parameter event_date')
-    else:
-        event_date = parse_datetime(request.json['event_date'])
-    if 'user_id' not in request.json:
-        raise InvalidSchemaException('Missing required parameter event_date')
-    else:
-        user_id = request.json['user_id']
+    event_date = parse_datetime(request.json['event_date'])
+    user_id = request.json['user_id']
 
     cutoff_time = 3
     if event_date.hour < cutoff_time:
@@ -51,7 +44,6 @@ def handle_daily_schedule_create():
                                               end_date=plan_event_date)[0]
         sessions = daily_plan.get_past_sessions(event_date)
         past_sessions.extend([s.json_serialise() for s in sessions])
-        
 
     sessions = request.json['sessions']
     for session in sessions:
@@ -114,7 +106,7 @@ def handle_get_typical_schedule():
         if len(filtered_sessions) == 0:
             filtered_sessions.append(session)
         else:
-            exists = [session['sport_name'] == s['sport_name'] and \
+            exists = [session['sport_name'] == s['sport_name'] and
                       session['session_type'] == s['session_type'] for s in filtered_sessions]
             if any(exists):
                 pass
@@ -124,7 +116,6 @@ def handle_get_typical_schedule():
     return {'typical_sessions': sessions}, 200
 
 
-
 def _check_plan_exists(user_id, event_date):
     mongo_collection = get_mongo_collection('dailyplan')
     if mongo_collection.count({"user_id": user_id,
@@ -132,6 +123,7 @@ def _check_plan_exists(user_id, event_date):
         return True
     else:
         return False
+
 
 def _get_session_data(session):
     event_date = parse_datetime(session['event_date'])
@@ -152,6 +144,7 @@ def _get_session_data(session):
                    }
     return session_data
 
+
 def _create_session(user_id, session_type, data):
     factory = SessionFactory()
     session = factory.create(SessionType(session_type))
@@ -164,7 +157,8 @@ def _update_session(session, data):
     for key, value in data.items():
         setattr(session, key, value)
 
+
 def _filter_response_data(past_sessions):
     keys_to_return = ['session_id', 'event_date', 'description', 'duration_minutes']
-    past_sessions = [{ key: s[key] for key in keys_to_return } for s in past_sessions]
+    past_sessions = [{key: s[key] for key in keys_to_return} for s in past_sessions]
     return past_sessions

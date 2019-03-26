@@ -86,7 +86,8 @@ def manage_athlete_push_notification(athlete_id):
                                                                           endpoint=f"athlete/{athlete_id}/stats",
                                                                           body={"event_date": event_date},
                                                                           execute_at=trigger_event_date)
-    except Exception:
+    except Exception as e:
+        print(e)
         pass
     if not _is_athlete_active(athlete_id):
         return {'message': 'Athlete is not active'}, 200
@@ -289,10 +290,7 @@ def _are_exercises_assigned(rec):
                  len(rec.lengthen_exercises) +
                  len(rec.activate_exercises) +
                  len(rec.integrate_exercises))
-    if exercises > 0:
-        return True
-    else:
-        return False
+    return exercises > 0
 
 
 def _get_offset():

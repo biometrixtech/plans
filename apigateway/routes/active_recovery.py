@@ -23,7 +23,6 @@ app = Blueprint('active_recovery', __name__)
 @xray_recorder.capture('routes.active_recovery')
 def handle_active_recovery_update(principal_id=None):
     user_id = principal_id
-
     event_date = parse_datetime(request.json['event_date'])
     recovery_type = request.json['recovery_type']
     completed_exercises = request.json.get('completed_exercises', [])
@@ -131,8 +130,4 @@ def save_completed_exercises(exercise_list, user_id, event_date):
 
 def _check_plan_exists(user_id, event_date):
     mongo_collection = get_mongo_collection('dailyplan')
-    if mongo_collection.count({"user_id": user_id,
-                               "date": event_date}) == 1:
-        return True
-    else:
-        return False
+    return mongo_collection.count({"user_id": user_id, "date": event_date}) == 1

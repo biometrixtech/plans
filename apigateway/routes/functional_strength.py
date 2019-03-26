@@ -110,10 +110,7 @@ def handle_functional_strength_activate(principal_id=None):
     # update athlete stats with sport/position information
     athlete_stats_store = AthleteStatsDatastore()
     athlete_stats = athlete_stats_store.get(athlete_id=user_id)
-    if request.json['current_sport_name'] is not None:
-        athlete_stats.current_sport_name = request.json['current_sport_name']
-    else:
-        raise InvalidSchemaException("current_sport_name cannot be null")
+    athlete_stats.current_sport_name = request.json['current_sport_name']
     athlete_stats.current_position = request.json['current_position']
     athlete_stats_store.put(athlete_stats)
 

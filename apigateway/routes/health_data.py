@@ -18,6 +18,7 @@ app = Blueprint('health_data', __name__)
 
 @app.route('/', methods=['POST'])
 @require.authenticated.any
+@require.body({'event_date': str, 'start_date': str, 'end_date': str})
 @xray_recorder.capture('routes.health_data.write')
 def handle_previous_health_data_write(principal_id=None):
     user_id = principal_id
@@ -49,5 +50,4 @@ def handle_previous_health_data_write(principal_id=None):
     Service('users', os.environ['USERS_API_VERSION']).call_apigateway_async(method='PATCH',
                                                                             endpoint=f"user/{user_id}",
                                                                             body={"historic_health_sync_date": event_date})
-
     return {'message': "success"}, 200
