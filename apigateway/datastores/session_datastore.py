@@ -27,7 +27,6 @@ class SessionDatastore(object):
 
     @xray_recorder.capture('datastore.SessionDatastore.update')
     def update(self, item, user_id, event_date):
-        session_type = item.session_type().value
         session = item.json_serialise()
         query = {"user_id": user_id, "date": event_date}
         mongo_collection = get_mongo_collection(self.mongo_collection)
@@ -41,12 +40,12 @@ class SessionDatastore(object):
     def delete(self, user_id, event_date, session_type, session_id):
         query = {"user_id": user_id, "date": event_date}
         mongo_collection = get_mongo_collection(self.mongo_collection)
-        session = self.get(user_id, event_date, session_type, session_id)
         result = mongo_collection.update_one(query, {'$pull': {'training_sessions': {'session_id': session_id, 'post_session_survey': None, 'session_type': session_type}}})
         if result.modified_count == 0:
             raise ForbiddenException("Cannot delete a session that's already logged")
 
-    def _get_sessions_from_mongo(self, user_id, event_date, session_type=None, session_id=None):
+    @staticmethod
+    def _get_sessions_from_mongo(user_id, event_date, session_type=None, session_id=None):
         daily_plan_store = DailyPlanDatastore()
         plan = daily_plan_store.get(user_id=user_id,
                                     start_date=event_date,

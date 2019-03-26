@@ -1,11 +1,11 @@
 import os
 import time
 import json
+import requests
 from aws_xray_sdk.core import xray_recorder
 os.environ['ENVIRONMENT'] = 'test'
 xray_recorder.configure(sampling=False)
 xray_recorder.begin_segment(name="test")
-import requests
 
 from persona import Persona
 import soreness_history as sh

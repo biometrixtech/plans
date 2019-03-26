@@ -2,7 +2,9 @@ import datetime
 
 from datastores.datastore_collection import DatastoreCollection
 from fathomapi.utils.exceptions import NoSuchEntityException
+from logic.soreness_processing import SorenessCalculator
 from utils import parse_datetime, format_datetime, parse_date, format_date
+
 
 class AthleteStatusProcessing(object):
     def __init__(self, user_id, event_date, datastore_collection=DatastoreCollection()):
@@ -26,7 +28,6 @@ class AthleteStatusProcessing(object):
         self.functional_strength_eligible = False
         self.completed_functional_strength_sessions = 0
 
-
     def get_previous_soreness(self):
         # get soreness from readiness
         try:
@@ -35,7 +36,7 @@ class AthleteStatusProcessing(object):
                                                                end_date=self.current_time,
                                                                last_only=False)
             for rs_survey in readiness_surveys:
-                self.sore_body_parts.extend([s for s in rs_survey.soreness if s.severity > 1])
+                self.sore_body_parts.extend([s for s in rs_survey.soreness if SorenessCalculator().get_severity(s.severity, s.movement) > 1])
         except NoSuchEntityException:
             pass
         # get soreness from ps_survey
@@ -44,9 +45,11 @@ class AthleteStatusProcessing(object):
                                                            end_date=self.current_time)
         post_session_surveys = [s for s in post_session_surveys if s is not None and self.soreness_start_time <= s.event_date_time < self.current_time]
         for ps_survey in post_session_surveys:
-            self.sore_body_parts.extend([s for s in ps_survey.survey.soreness if s.severity > 1])
+            self.sore_body_parts.extend([s for s in ps_survey.survey.soreness if SorenessCalculator().get_severity(s.severity, s.movement) > 1])
         # check for severe pain yesterday or today
-        severe_pain_dates = [s.reported_date_time for s in self.sore_body_parts if s.pain and s.severity >= 3 and s.reported_date_time > self.soreness_start_time + datetime.timedelta(days=1)]
+        severe_pain_dates = [s.reported_date_time for s in self.sore_body_parts if s.pain and
+                             SorenessCalculator().get_severity(s.severity, s.movement) >= 3 and
+                             s.reported_date_time > self.soreness_start_time + datetime.timedelta(days=1)]
         if len(severe_pain_dates) > 0:
             self.severe_pain_today_yesterday = True
         self.cleaned_sore_body_parts = self.remove_duplicate_sore_body_parts()
@@ -59,8 +62,8 @@ class AthleteStatusProcessing(object):
             self.current_sport_name = athlete_stats.current_sport_name.value if athlete_stats.current_sport_name is not None else None
             self.current_position = athlete_stats.current_position.value if athlete_stats.current_position is not None else None
             if (athlete_stats.functional_strength_eligible and (athlete_stats.next_functional_strength_eligible_date is None
-                    or parse_datetime(athlete_stats.next_functional_strength_eligible_date) < self.current_time) and
-                not self.severe_pain_today_yesterday):
+                                                                or parse_datetime(athlete_stats.next_functional_strength_eligible_date) < self.current_time) and
+                    not self.severe_pain_today_yesterday):
                 self.functional_strength_eligible = True
             self.completed_functional_strength_sessions = athlete_stats.completed_functional_strength_sessions
             self.remove_duplicates_sore_body_parts_historic_soreness()
@@ -140,8 +143,8 @@ class AthleteStatusProcessing(object):
             elif len(filtered_sessions) == 0:
                 filtered_sessions.append(session)
             else:
-                exists = [session['sport_name'] == s['sport_name'] and \
-                          session['strength_and_conditioning_type'] == s['strength_and_conditioning_type'] and \
+                exists = [session['sport_name'] == s['sport_name'] and
+                          session['strength_and_conditioning_type'] == s['strength_and_conditioning_type'] and
                           session['session_type'] == s['session_type'] for s in filtered_sessions]
                 if any(exists):
                     session = [filtered_sessions[i] for i in range(len(exists)) if exists[i]][0]
@@ -152,6 +155,7 @@ class AthleteStatusProcessing(object):
 
         return filtered_sessions[0:5]
 
+
 def remap_strength_conditioning_sessions(session):
     sc_sport_map = {0: 52,
                     1: 53,
@@ -161,5 +165,3 @@ def remap_strength_conditioning_sessions(session):
     session['sport_name'] = sc_sport_map[session['strength_and_conditioning_type']]
     session['strength_and_conditioning_type'] = None
     return session
-
-
