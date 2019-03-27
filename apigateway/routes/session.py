@@ -25,6 +25,7 @@ app = Blueprint('session', __name__)
 
 @app.route('/', methods=['POST'])
 @require.authenticated.any
+@require.body({'event_date': str, 'sessions': list})
 @xray_recorder.capture('routes.session.create')
 def handle_session_create(principal_id=None):
     user_id = principal_id
@@ -94,13 +95,14 @@ def handle_session_create(principal_id=None):
 
 @app.route('/<uuid:session_id>', methods=['DELETE'])
 @require.authenticated.any
+@require.body({'event_date': str, 'session_type': int})
 @xray_recorder.capture('routes.session.delete')
-def handle_session_delete(session_id):
+def handle_session_delete(session_id, principal_id=None):
     _validate_schema()
+    user_id = principal_id
 
     event_date = parse_datetime(request.json['event_date'])
     session_type = request.json['session_type']
-    user_id = request.json['user_id']
     plan_event_date = format_date(event_date)
     if not _check_plan_exists(user_id, plan_event_date):
         raise NoSuchEntityException("Plan does not exist for the user to delete session")
@@ -118,9 +120,10 @@ def handle_session_delete(session_id):
 
 @app.route('/<uuid:session_id>', methods=['PATCH'])
 @require.authenticated.any
+@require.body({'event_date': str})
 @xray_recorder.capture('routes.session.update')
-def handle_session_update(session_id):
-    user_id = request.json['user_id']
+def handle_session_update(session_id, principal_id=None):
+    user_id = principal_id
     event_date = parse_datetime(request.json['event_date'])
     plan_event_date = format_date(event_date)
 
@@ -165,15 +168,10 @@ def handle_session_update(session_id):
 
 @app.route('/sensor_data', methods=['POST'])
 @require.authenticated.any
+@require.body({'last_sensor_sync': str, 'sessions': list})
 @xray_recorder.capture('routes.session.add_sensor_data')
-def handle_session_sensor_data():
-    if not isinstance(request.json, dict):
-        raise InvalidSchemaException('Request body must be a dictionary')
-    if 'user_id' not in request.json:
-        raise InvalidSchemaException('Missing required parameter user_id')
-    if 'last_sensor_sync' not in request.json:
-        raise InvalidSchemaException('Missing required parameter user_id')
-    user_id = request.json['user_id']
+def handle_session_sensor_data(principal_id=None):
+    user_id = principal_id
 
     # update last_sensor_syc date
     last_sensor_sync = request.json['last_sensor_sync']
@@ -186,7 +184,6 @@ def handle_session_sensor_data():
     plan.last_sensor_sync = last_sensor_sync
     daily_plan_datastore.put(plan)
     updated_dates = [sensor_sync_date]
-
 
     sessions = request.json['sessions']
     for session in sessions:
@@ -226,7 +223,6 @@ def handle_session_sensor_data():
             daily_plan_datastore.put(plan)
             updated_dates.append(plan_event_date)
 
-
     # update_plan(user_id, event_date)
     plan = daily_plan_datastore.get(user_id, sensor_sync_date, sensor_sync_date)[0]
     survey_complete = plan.daily_readiness_survey_completed()
@@ -242,16 +238,11 @@ def handle_session_sensor_data():
 
 @app.route('/typical', methods=['POST'])
 @require.authenticated.any
+@require.body({'event_date': str})
 @xray_recorder.capture('routes.typical_sessions')
-def handle_get_typical_sessions():
-    if 'event_date' not in request.json:
-        raise InvalidSchemaException('Missing required parameter event_date')
-    else:
-        event_date = parse_datetime(request.json['event_date'])
-    if 'user_id' not in request.json:
-        raise InvalidSchemaException('Missing required parameter event_date')
-    else:
-        user_id = request.json['user_id']
+def handle_get_typical_sessions(principal_id=None):
+    user_id = principal_id
+    event_date = parse_datetime(request.json['event_date'])
 
     filtered_sessions = AthleteStatusProcessing(user_id, event_date, datastore_collection).get_typical_sessions()
     
@@ -260,16 +251,11 @@ def handle_get_typical_sessions():
 
 @app.route('/no_sessions', methods=['POST'])
 @require.authenticated.any
+@require.body({'event_date': str})
 @xray_recorder.capture('routes.no_sessions_planned')
-def handle_no_sessions_planned():
-    if 'event_date' not in request.json:
-        raise InvalidSchemaException('Missing required parameter event_date')
-    else:
-        event_date = parse_datetime(request.json['event_date'])
-    if 'user_id' not in request.json:
-        raise InvalidSchemaException('Missing required parameter event_date')
-    else:
-        user_id = request.json['user_id']
+def handle_no_sessions_planned(principal_id=None):
+    user_id = principal_id
+    event_date = parse_datetime(request.json['event_date'])
 
     plan_event_date = format_date(event_date)
     if not _check_plan_exists(user_id, plan_event_date):
@@ -311,8 +297,7 @@ def get_sensor_data(session):
     high_duration = round(high_duration / 60, 2)
     inactive_duration = round(inactive_duration / 60, 2)
     duration = low_duration + mod_duration + high_duration
-    
-    
+
     low_accel = session['low_accel'] if session['low_accel'] is not None else 0
     mod_accel = session['mod_accel'] if session['mod_accel'] is not None else 0
     high_accel = session['high_accel'] if session['high_accel'] is not None else 0
@@ -345,18 +330,5 @@ def _check_plan_exists(user_id, event_date):
 
 
 def _validate_schema():
-    if not isinstance(request.json, dict):
-        raise InvalidSchemaException('Request body must be a dictionary')
-    if 'event_date' not in request.json:
-        raise InvalidSchemaException('Missing required parameter event_date')
-    else:
-        parse_datetime(request.json['event_date'])
-    if 'session_type' not in request.json:
-        raise InvalidSchemaException('Missing required parameter session_type')
-    else:
-        try:
-            SessionType(request.json['session_type']).value
-        except ValueError:
-            raise InvalidSchemaException('session_type not recognized')
-    if 'user_id' not in request.json:
-        raise InvalidSchemaException('Missing required parameter user_id')
+    if not SessionType.has_value(request.json['session_type']):
+        raise InvalidSchemaException('session_type not recognized')

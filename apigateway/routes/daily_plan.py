@@ -17,6 +17,7 @@ app = Blueprint('daily_plan', __name__)
 
 @app.route('/', methods=['POST'])
 @require.authenticated.any
+@require.body({'start_date': str})
 @xray_recorder.capture('routes.daily_plan.get')
 def handle_daily_plan_get(principal_id=None):
     validate_input()
@@ -78,17 +79,9 @@ def handle_daily_plan_get(principal_id=None):
 
 
 def validate_input():
-    if not isinstance(request.json, dict):
-        raise InvalidSchemaException('Request body must be a dictionary')
-    if 'start_date' not in request.json:
-        raise InvalidSchemaException('Missing required parameter start_date')
-    else:
-        try:
-            datetime.datetime.strptime(request.json['start_date'], "%Y-%m-%d")
-        except:
-            raise InvalidSchemaException('start_date needs to be in format yyyy-mm-dd')
-    if 'end_date' in request.json:
-        try:
-            datetime.datetime.strptime(request.json['end_date'], "%Y-%m-%d")
-        except:
-            raise InvalidSchemaException('end_date needs to be in format yyyy-mm-dd')
+    try:
+        format_date(request.json['start_date'])
+        format_date(request.json.get('end_date', None))
+        format_datetime(request.json.get('event_date', None))
+    except Exception:
+        raise InvalidSchemaException('Incorrectly formatted date')
