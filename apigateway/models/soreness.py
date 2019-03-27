@@ -44,7 +44,7 @@ class Soreness(Serialisable):
 
     def is_dormant_cleared(self):
         try:
-            if (self.historic_soreness_status == None or
+            if (self.historic_soreness_status is None or
                 self.historic_soreness_status == HistoricSorenessStatus.dormant_cleared or
                 self.historic_soreness_status == HistoricSorenessStatus.almost_acute_pain or 
                 self.historic_soreness_status == HistoricSorenessStatus.almost_persistent_pain or
@@ -128,7 +128,8 @@ class BodyPart(object):
         self.activate_exercises = []
         self.integrate_exercises = []
 
-    def add_exercises(self, exercise_list, exercise_dict, treatment_priority, randomize=False):
+    @staticmethod
+    def add_exercises(exercise_list, exercise_dict, treatment_priority, randomize=False):
 
         priority = 1
 
@@ -230,7 +231,7 @@ class HistoricSoreness(Serialisable):
             return False
 
     def is_dormant_cleared(self):
-        if (self.historic_soreness_status == None or
+        if (self.historic_soreness_status is None or
             self.historic_soreness_status == HistoricSorenessStatus.dormant_cleared or
             self.historic_soreness_status == HistoricSorenessStatus.almost_acute_pain or 
             self.historic_soreness_status == HistoricSorenessStatus.almost_persistent_pain or
@@ -327,7 +328,7 @@ class AssignedExercise(Serialisable):
                'seconds_duration': self.duration(),
                'goal_text': self.goal_text,
                'equipment_required': self.equipment_required
-              }
+               }
         return ret
 
 

@@ -12,7 +12,7 @@ from datastores.daily_readiness_datastore import DailyReadinessDatastore
 from datastores.daily_plan_datastore import DailyPlanDatastore
 from datastores.athlete_stats_datastore import AthleteStatsDatastore
 from datastores.completed_exercise_datastore import CompletedExerciseDatastore
-from utils import format_date, parse_datetime, parse_date, format_datetime
+from utils import format_date, parse_datetime, parse_date
 
 from models.app_logs import AppLogs
 

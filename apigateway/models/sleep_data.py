@@ -3,6 +3,7 @@ import datetime
 from serialisable import Serialisable
 from utils import format_datetime, parse_datetime, format_date
 
+
 class DailySleepData(Serialisable):
     
     def __init__(self, user_id, event_date):
@@ -18,6 +19,7 @@ class DailySleepData(Serialisable):
         }
         return ret
 
+
 class SleepEvent(Serialisable):
     def __init__(self, sleep_event):
         self.start_date = parse_datetime(sleep_event['start_date'])
@@ -30,6 +32,7 @@ class SleepEvent(Serialisable):
                'end_date': format_datetime(self.end_date),
                'sleep_type': self.sleep_type.value}
         return ret
+
     def get_event_date(self):
         if self.start_date.hour < 17:
             event_date = format_datetime(self.start_date).split("T")[0]
@@ -44,6 +47,7 @@ class SleepEvent(Serialisable):
             elif isinstance(value, int):
                 value = SleepType(value)
         super().__setattr__(name, value)
+
 
 class SleepType(Enum):
     INBED = 0

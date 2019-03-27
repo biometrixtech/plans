@@ -5,6 +5,7 @@ from models.session import SessionType
 import datetime
 from utils import parse_datetime, format_datetime
 
+
 class PostSessionSurvey(Serialisable):
     
     def __init__(self,
@@ -20,7 +21,6 @@ class PostSessionSurvey(Serialisable):
         self.session_id = session_id
         self.session_type = SessionType(session_type)
         self.survey = PostSurvey(survey, event_date_time)
-
 
     def get_id(self):
         return self.user_id
@@ -57,18 +57,13 @@ class PostSurvey(Serialisable):
         }
         return ret
 
-    def _soreness_from_dict(self, soreness_dict, event_date):
+    @staticmethod
+    def _soreness_from_dict(soreness_dict, event_date):
         soreness = Soreness()
         soreness.body_part = BodyPart(BodyPartLocation(soreness_dict['body_part']), None)
         soreness.pain = soreness_dict.get('pain', False)
         soreness.severity = soreness_dict['severity']
         soreness.movement = soreness_dict.get('movement', None)
-        soreness.side = self._key_present('side', soreness_dict)
+        soreness.side = soreness_dict.get('side', None)
         soreness.reported_date_time = parse_datetime(event_date)
         return soreness
-
-    def _key_present(self, key_name, dictionary):
-        if key_name in dictionary:
-            return dictionary[key_name]
-        else:
-            return None

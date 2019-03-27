@@ -30,6 +30,10 @@ class StrengthConditioningType(Enum):
     cross_training = 4
     none = None
 
+    @classmethod
+    def has_value(cls, value):
+        return any(value == item.value for item in cls)
+
 
 class DayOfWeek(Enum):
     monday = 0
