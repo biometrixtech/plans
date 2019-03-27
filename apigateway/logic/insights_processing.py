@@ -15,6 +15,10 @@ class InsightsProcessing(object):
         self.no_soreness_rpe_tuples = {}
         self.soreness_load_tuples = {}
         self.soreness_rpe_tuples = {}
+        self.last_14_max_no_soreness_load_tuples = {}
+        self.last_14_max_no_soreness_rpe_tuples = {}
+        self.last_14_max_soreness_load_tuples = {}
+        self.last_14_max_soreness_rpe_tuples = {}
 
     def load_surveys(self, readiness_surveys, plans):
 
@@ -185,14 +189,41 @@ class InsightsProcessing(object):
                     if loading_event.sport_name not in self.no_soreness_load_tuples:
                         self.no_soreness_load_tuples[loading_event.sport_name] = []
                         self.no_soreness_rpe_tuples[loading_event.sport_name] = []
+                        self.last_14_max_no_soreness_load_tuples[loading_event.sport_name] = []
+                        self.last_14_max_no_soreness_rpe_tuples[loading_event.sport_name] = []
                     self.no_soreness_load_tuples[loading_event.sport_name].append((loading_event.loading_date, loading_event.load))
                     self.no_soreness_rpe_tuples[loading_event.sport_name].append((loading_event.loading_date, loading_event.RPE))
+
+                    for k in self.no_soreness_load_tuples.keys():
+                        no_soreness_list = self.no_soreness_load_tuples[k]
+                        if len(no_soreness_list) > 0:
+                            sore_values = list(s[1] for s in no_soreness_list)
+                            self.last_14_max_no_soreness_load_tuples[k].append((no_soreness_list[len(no_soreness_list) - 1][0], max(sore_values[-min(3, len(sore_values)):])))
+                    for k in self.no_soreness_rpe_tuples.keys():
+                        no_soreness_RPE_list = self.no_soreness_rpe_tuples[k]
+                        if len(no_soreness_RPE_list) > 0:
+                            sore_values = list(s[1] for s in no_soreness_RPE_list)
+                            self.last_14_max_no_soreness_rpe_tuples[k].append((no_soreness_RPE_list[len(no_soreness_RPE_list) - 1][0], max(sore_values[-min(3, len(sore_values)):])))
+
                 else:
                     if loading_event.sport_name not in self.soreness_load_tuples:
                         self.soreness_load_tuples[loading_event.sport_name] = []
                         self.soreness_rpe_tuples[loading_event.sport_name] = []
+                        self.last_14_max_soreness_load_tuples[loading_event.sport_name] = []
+                        self.last_14_max_soreness_rpe_tuples[loading_event.sport_name] = []
                     self.soreness_load_tuples[loading_event.sport_name].append((loading_event.loading_date, loading_event.load))
                     self.soreness_rpe_tuples[loading_event.sport_name].append((loading_event.loading_date, loading_event.RPE))
+
+                    for k in self.soreness_load_tuples.keys():
+                        soreness_list = self.soreness_load_tuples[k]
+                        if len(soreness_list) > 0:
+                            sore_values = list(s[1] for s in soreness_list)
+                            self.last_14_max_soreness_load_tuples[k].append((soreness_list[len(soreness_list) - 1][0], min(sore_values[-min(3, len(sore_values)):])))
+                    for k in self.soreness_rpe_tuples.keys():
+                        soreness_RPE_list = self.soreness_rpe_tuples[k]
+                        if len(soreness_RPE_list) > 0:
+                            sore_values = list(s[1] for s in soreness_RPE_list)
+                            self.last_14_max_soreness_rpe_tuples[k].append((soreness_RPE_list[len(soreness_RPE_list) - 1][0], min(sore_values[-min(3, len(sore_values)):])))
 
                 loading_events.append(loading_event)
 
@@ -257,6 +288,71 @@ class InsightsProcessing(object):
 
     def get_event_date_from_session(self, session):
         return session.event_date
+
+    def update_load_thresholds(self):
+
+        #TODO
+        return True
+
+    def is_acute_fatigue_FO_soreness(self, soreness_list):
+
+        #TODO
+        return True
+
+    def is_possible_non_functional_overreaching_soreness(self, soreness_list):
+
+        #TODO
+        return True
+
+    def is_recovery_load(self, loading_event):
+
+        #TODO: look at low RPE, low volume, low perceived fatigue
+        #TODO: look at self.thresholds to determine if it's in the threshold for recovery
+        return True
+
+    def is_maintenance_load(self, loading_event):
+
+        # TODO: look at self.thresholds to determine if it's in the threshold for maintenance
+        return True
+
+    def is_acute_fatigue_FO_load(self, loading_event):
+
+        # TODO: look at self.thresholds to determine if it's in the threshold for acute_fatigue/FO
+        return True
+
+    def is_FO_Possible_NFO_load(self, loading_event):
+
+        # TODO: look at self.thresholds to determine if it's in the threshold for FO/Possible NFO
+        return True
+
+    def get_near_term_status(self, loading_event, soreness_list):
+
+        # if all we have is load, we may not know much
+        # TODO: need to make decision based purely on intensity and volume ?
+
+        # only interested in the soreness that came after that load
+        filtered_soreness_list = list(s for s in soreness_list if s.event_date >= loading_event.loading_date)
+
+        if self.is_recovery_load(loading_event) and len(filtered_soreness_list) == 0:
+            return "Recovery"
+        elif self.is_maintenance_load(loading_event) and len(filtered_soreness_list) == 0:
+            return "Maintenance"
+        elif (self.is_recovery_load(loading_event) or self.is_maintenance_load(loading_event)) and len(filtered_soreness_list) > 0:
+            self.update_load_thresholds()
+            return "Failed"
+        elif self.is_acute_fatigue_FO_load(loading_event) and self.is_acute_fatigue_FO_soreness(filtered_soreness_list):
+            return "Acute Fatigue - Functional Overreaching"
+        elif self.is_acute_fatigue_FO_load(loading_event) and not self.is_acute_fatigue_FO_soreness(filtered_soreness_list):
+            return "FAILED!"
+        elif self.is_FO_Possible_NFO_load(loading_event) and self.is_possible_non_functional_overreaching_soreness(filtered_soreness_list):
+            return "FO Potential NFO"
+        elif self.is_FO_Possible_NFO_load(loading_event) and not self.is_possible_non_functional_overreaching_soreness(filtered_soreness_list):
+            return "FAILED!"
+
+        # if all we have is soreness, we need the last load - or if the last load is too long ago, we need to know what to do with this soreness
+        # at which point should we predict the future - and does that affect status?
+        # how/when do we identify positive/negative adaptation to load? does it come into play here?
+
 
     def get_training_sessions(self, daily_plans):
 
