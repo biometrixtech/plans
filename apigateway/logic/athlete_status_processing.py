@@ -30,14 +30,14 @@ class AthleteStatusProcessing(object):
         self.completed_functional_strength_sessions = 0
 
     def get_previous_soreness(self):
-        daily_plans = self.daily_plan_store.get(self.user, format_date(parse_date(self.event_date) - datetime.timedelta(days=1)), event_date)
-        readiness_surveys = [plan.daily_readiness_survey for plan in daily_plans]
+        daily_plans = self.daily_plan_store.get(self.user_id, format_date(parse_date(self.event_date) - datetime.timedelta(days=1)), self.event_date)
+        readiness_surveys = [plan.daily_readiness_survey for plan in daily_plans if plan.daily_readiness_survey is not None]
         for rs_survey in readiness_surveys:
             self.sore_body_parts.extend([s for s in rs_survey.soreness if SorenessCalculator.get_severity(s.severity, s.movement) > 1])
         post_session_surveys = []
         for plan in daily_plans:
             post_surveys = \
-                [PostSessionSurvey.post_session_survey_from_training_session(ts.post_session_survey, self.athlete_id, ts.id, ts.session_type().value, plan.event_date)
+                [PostSessionSurvey.post_session_survey_from_training_session(ts.post_session_survey, self.user_id, ts.id, ts.session_type().value, plan.event_date)
                  for ts in plan.training_sessions if ts is not None]
             post_session_surveys.extend([s for s in post_surveys if s is not None])
         post_session_surveys = [s for s in post_session_surveys if s is not None and self.soreness_start_time <= s.event_date_time < self.current_time]
