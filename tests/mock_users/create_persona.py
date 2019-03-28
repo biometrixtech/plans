@@ -3,7 +3,7 @@ import time
 import json
 import requests
 from aws_xray_sdk.core import xray_recorder
-os.environ['ENVIRONMENT'] = 'test'
+os.environ['ENVIRONMENT'] = 'dev'
 xray_recorder.configure(sampling=False)
 xray_recorder.begin_segment(name="test")
 

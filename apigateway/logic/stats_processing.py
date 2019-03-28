@@ -136,7 +136,7 @@ class StatsProcessing(object):
             # self.all_daily_readiness_surveys = self.daily_readiness_datastore.get(self.athlete_id, self.start_date_time,
             #                                                                       self.end_date_time, last_only=False)
             self.all_plans = self.daily_plan_datastore.get(self.athlete_id, self.start_date, self.end_date, stats_processing=True)
-            self.all_daily_readiness_surveys = [plan.daily_readiness_survey for plan in self.all_plans]
+            self.all_daily_readiness_surveys = [plan.daily_readiness_survey for plan in self.all_plans if plan.daily_readiness_survey is not None]
         post_session_surveys = []
         for plan in self.all_plans:
             post_surveys = \

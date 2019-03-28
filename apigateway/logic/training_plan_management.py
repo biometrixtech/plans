@@ -57,7 +57,7 @@ class TrainingPlanManager(object):
             daily_plan = DailyPlan(event_date)
         else:
             daily_plan = daily_plan[0]
-        readiness_surveys = [plan.daily_readiness_survey for plan in daily_plans]
+        readiness_surveys = [plan.daily_readiness_survey for plan in daily_plans if plan.daily_readiness_survey is not None]
         readiness_surveys = sorted(readiness_surveys, key=lambda k: k.event_date, reverse=True)
         last_daily_readiness_survey = readiness_surveys[0]
         post_session_surveys = []
