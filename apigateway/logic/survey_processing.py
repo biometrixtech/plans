@@ -151,7 +151,7 @@ class SurveyProcessing(object):
                                                                                                        side=side,
                                                                                                        is_pain=pain,
                                                                                                        question_response_date=plan_event_date,
-                                                                                                       severity_value=SorenessCalculator().get_severity(severity, movement))
+                                                                                                       severity_value=SorenessCalculator.get_severity(severity, movement))
             else:
                 self.athlete_stats.historic_soreness = self.stats_processor.answer_persistent_2_question(self.athlete_stats.historic_soreness,
                                                                                                          soreness_list_25,
@@ -159,7 +159,7 @@ class SurveyProcessing(object):
                                                                                                          side=side,
                                                                                                          is_pain=pain,
                                                                                                          question_response_date=plan_event_date,
-                                                                                                         severity_value=SorenessCalculator().get_severity(severity, movement),
+                                                                                                         severity_value=SorenessCalculator.get_severity(severity, movement),
                                                                                                          current_status=HistoricSorenessStatus[status])
 
     @xray_recorder.capture('logic.survey_processing.historic_workout_data')
