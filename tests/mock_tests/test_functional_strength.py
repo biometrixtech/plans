@@ -62,6 +62,7 @@ def get_daily_plans(start_date, end_date):
         post_survey = TestUtilities().get_post_survey(6, soreness_list)
         practice_session.post_session_survey = PostSurvey(post_survey, d.strftime("%Y-%m-%dT%H:%M:%SZ"))
         daily_plan.training_sessions.append(practice_session)
+        daily_plan.daily_readiness_survey = DailyReadiness(d.strftime("%Y-%m-%dT%H:%M:%SZ"), "tester", [soreness], 4, 5)
         plans.append(daily_plan)
         i += 1
 
@@ -469,7 +470,7 @@ def test_no_fs_with_high_post_session_soreness():
     daily_plan = get_daily_plans(datetime(2018, 7, 24, 0, 0, 0), datetime(2018, 7, 25, 0, 0, 0))[0]
     daily_plan.functional_strength_session = FunctionalStrengthSession()
     survey = get_daily_readiness_survey_high_soreness(datetime(2018, 7, 24, 12, 0, 0), 1)
-
+    daily_plan.daily_readiness_survey = survey
     athlete_stats = AthleteStats("tester")
 
     daily_plan_datastore = DailyPlanDatastore()
@@ -486,11 +487,12 @@ def test_no_fs_with_high_post_session_soreness():
                           1, post_survey)
 
     post_session_datastore.side_load_surveys([post_session_survey])
+    daily_plan.training_sessions[0].post_session_survey.soreness.extend(post_session_survey.survey.soreness)
 
     datastore_collection = DatastoreCollection()
     datastore_collection.daily_plan_datastore = daily_plan_datastore
-    datastore_collection.daily_readiness_datastore = daily_readiness_datastore
-    datastore_collection.post_session_survey_datastore = post_session_datastore
+    # datastore_collection.daily_readiness_datastore = daily_readiness_datastore
+    # datastore_collection.post_session_survey_datastore = post_session_datastore
     datastore_collection.athlete_stats_datastore = athlete_stats_datastore
     datastore_collection.exercise_datastore = exercise_library_datastore
     tpm = TrainingPlanManager("tester", datastore_collection)
