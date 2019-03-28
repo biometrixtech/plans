@@ -42,9 +42,9 @@ class PostSessionSurvey(Serialisable):
     def post_session_survey_from_training_session(cls, survey, user_id, session_id, session_type, event_date):
         if survey is not None:
             if survey.event_date is not None:
-                post_session_survey = PostSessionSurvey(format_datetime(survey.event_date), user_id, session_id, session_type)
+                post_session_survey = cls(format_datetime(survey.event_date), user_id, session_id, session_type)
             else:
-                post_session_survey = PostSessionSurvey(format_datetime(parse_date(event_date)), user_id, session_id, session_type)
+                post_session_survey = cls(format_datetime(parse_date(event_date)), user_id, session_id, session_type)
             post_session_survey.survey = survey
             return post_session_survey
         else:

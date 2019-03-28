@@ -15,7 +15,6 @@ class TrainingPlanManager(object):
 
     def __init__(self, athlete_id, datastore_collection):
         self.athlete_id = athlete_id
-        self.daily_readiness_datastore = datastore_collection.daily_readiness_datastore
         self.post_session_survey_datastore = datastore_collection.post_session_survey_datastore
         self.daily_plan_datastore = datastore_collection.daily_plan_datastore
         self.exercise_library_datastore = datastore_collection.exercise_datastore
@@ -52,34 +51,21 @@ class TrainingPlanManager(object):
     @xray_recorder.capture('logic.TrainingPlanManager.create_daily_plan')
     def create_daily_plan(self, event_date=None, target_minutes=15, last_updated=None, athlete_stats=None):
 
-        if event_date is not None:
-            daily_plans = self.daily_plan_datastore.get(self.athlete_id, format_date(parse_date(event_date) - datetime.timedelta(days=1)), event_date)
-            daily_plan = [plan for plan in daily_plans if plan.event_date == event_date]
-            if len(daily_plan) == 0:
-                daily_plan = DailyPlan(event_date)
-            else:
-                daily_plan = daily_plan[0]
-            readiness_surveys = [plan.daily_readiness_survey for plan in daily_plans]
-            readiness_surveys = sorted(readiness_surveys, key=lambda k: k.event_date, reverse=True)
-            last_daily_readiness_survey = readiness_surveys[0]
-            post_session_surveys = []
-            for plan in daily_plans:
-                post_surveys = \
-                    [PostSessionSurvey.post_session_survey_from_training_session(ts.post_session_survey, self.athlete_id, ts.id, ts.session_type().value, plan.event_date)
-                     for ts in plan.training_sessions if ts is not None]
-                post_session_surveys.extend([s for s in post_surveys if s is not None])
+        daily_plans = self.daily_plan_datastore.get(self.athlete_id, format_date(parse_date(event_date) - datetime.timedelta(days=1)), event_date)
+        daily_plan = [plan for plan in daily_plans if plan.event_date == event_date]
+        if len(daily_plan) == 0:
+            daily_plan = DailyPlan(event_date)
         else:
-            readiness_surveys = self.daily_readiness_datastore.get(self.athlete_id)
-            last_daily_readiness_survey = readiness_surveys[0]
-            event_date = format_date(last_daily_readiness_survey.get_event_date())
-            start_time = format_datetime(parse_date(event_date) - datetime.timedelta(days=1))
-            end_time = format_datetime(parse_date(event_date) + datetime.timedelta(days=1))
-            post_session_surveys = self.post_session_survey_datastore.get(self.athlete_id, parse_datetime(start_time), parse_datetime(end_time))
-            daily_plans = self.daily_plan_datastore.get(self.athlete_id, event_date, event_date)
-            if daily_plans is None or len(daily_plans) == 0:
-                daily_plan = DailyPlan(event_date)
-            else:
-                daily_plan = daily_plans[len(daily_plans) - 1]
+            daily_plan = daily_plan[0]
+        readiness_surveys = [plan.daily_readiness_survey for plan in daily_plans]
+        readiness_surveys = sorted(readiness_surveys, key=lambda k: k.event_date, reverse=True)
+        last_daily_readiness_survey = readiness_surveys[0]
+        post_session_surveys = []
+        for plan in daily_plans:
+            post_surveys = \
+                [PostSessionSurvey.post_session_survey_from_training_session(ts.post_session_survey, self.athlete_id, ts.id, ts.session_type().value, plan.event_date)
+                 for ts in plan.training_sessions if ts is not None]
+            post_session_surveys.extend([s for s in post_surveys if s is not None])
 
         if last_updated is None:
             last_updated = format_datetime(datetime.datetime.utcnow())

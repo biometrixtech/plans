@@ -20,7 +20,6 @@ from utils import parse_datetime, format_date, format_datetime, fix_early_survey
 datastore_collection = DatastoreCollection()
 athlete_stats_datastore = datastore_collection.athlete_stats_datastore
 daily_plan_datastore = datastore_collection.daily_plan_datastore
-daily_readiness_datastore = datastore_collection.daily_readiness_datastore
 heart_rate_datastore = datastore_collection.heart_rate_datastore
 session_datastore = datastore_collection.session_datastore
 sleep_history_datastore = datastore_collection.sleep_history_datastore

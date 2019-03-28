@@ -9,7 +9,7 @@ from logic.training_volume_processing import TrainingVolumeProcessing
 from models.stats import AthleteStats
 from models.soreness import Soreness, BodyPart, HistoricSoreness, HistoricSorenessStatus
 from models.post_session_survey import PostSessionSurvey
-from utils import parse_date, format_date, format_datetime
+from utils import parse_date, format_date
 
 
 class StatsProcessing(object):
@@ -17,7 +17,6 @@ class StatsProcessing(object):
     def __init__(self, athlete_id, event_date, datastore_collection):
         self.athlete_id = athlete_id
         self.event_date = event_date
-        self.daily_readiness_datastore = datastore_collection.daily_readiness_datastore
         self.post_session_survey_datastore = datastore_collection.post_session_survey_datastore
         self.athlete_stats_datastore = datastore_collection.athlete_stats_datastore
         self.daily_plan_datastore = datastore_collection.daily_plan_datastore
@@ -273,9 +272,9 @@ class StatsProcessing(object):
 
             if len(body_part_history) > 0:
                 last_reported_date = max(historic_soreness.last_reported, body_part_history[0].reported_date_time)
-                if (historic_soreness.last_reported == last_reported_date and
-                    historic_soreness.last_reported != body_part_history[0].reported_date_time and
-                    historic_soreness.historic_soreness_status == HistoricSorenessStatus.dormant_cleared):
+                if historic_soreness.last_reported == last_reported_date and \
+                   historic_soreness.last_reported != body_part_history[0].reported_date_time and \
+                   historic_soreness.historic_soreness_status == HistoricSorenessStatus.dormant_cleared:
                     body_part_history = []
 
             for b in range(0, len(body_part_history)):
@@ -514,7 +513,8 @@ class StatsProcessing(object):
 
         return historic_soreness
 
-    def calc_avg_severity_acute_pain(self, body_part_history, streak):
+    @staticmethod
+    def calc_avg_severity_acute_pain(body_part_history, streak):
         # days_for_severity = (last_reported_date_time - parse_date(streak_start_date)).days
         denom_sum = 0
         severity = 0.0
@@ -529,7 +529,8 @@ class StatsProcessing(object):
 
         return avg_severity
 
-    def calc_avg_severity_persistent_2(self, body_part_history, current_date):
+    @staticmethod
+    def calc_avg_severity_persistent_2(body_part_history, current_date):
 
         denom_sum = 0
         severity = 0.0
