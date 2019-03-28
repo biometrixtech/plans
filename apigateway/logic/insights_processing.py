@@ -59,18 +59,18 @@ class InsightsProcessing(object):
 
         early_soreness_tuples = list(s[0] for s in self.post_session_survey_tuples
                                    if s[0] >= loading_events[0].loading_date and
-                                   s[0] <= loading_events[0].loading_date + timedelta(hours=72))
+                                   s[0] <= loading_events[0].loading_date + timedelta(hours=36))
         early_soreness_tuples.extend(list(s[0] for s in self.daily_readiness_tuples
                                         if s[0] >= loading_events[0].loading_date and
-                                        s[0] <= loading_events[0].loading_date + timedelta(hours=72)))
+                                        s[0] <= loading_events[0].loading_date + timedelta(hours=36)))
         early_soreness_history = list(set(early_soreness_tuples))
 
         # let's reduce this down to only the loading events that can have soreness (the highest RPE within a rolling 72 hour window)
         for t in range(0, len(loading_events)):
 
-            test_date = loading_events[t].loading_date + timedelta(hours=72)
+            test_date = loading_events[t].loading_date + timedelta(hours=36)
             if len(early_soreness_history) > t:
-                test_date = min(early_soreness_history[t], loading_events[t].loading_date + timedelta(hours=72))
+                test_date = min(early_soreness_history[t], loading_events[t].loading_date + timedelta(hours=36))
             window_events = list(d for d in loading_events if d.loading_date >= loading_events[t].loading_date and d.loading_date <= test_date)
             if len(window_events) > 0:
                 window_events.sort(key=lambda x: x.RPE, reverse=True)
@@ -113,7 +113,7 @@ class InsightsProcessing(object):
                 #base_soreness_tuples = list((s[0], s[1]) for s in self.post_session_survey_tuples
                 #                       if s[0] >= self.rpe_load_tuples[t][0] and
                 #                       s[0] < self.rpe_load_tuples[t + 1][0])
-                next_highest_rpe_date = loading_events[t].loading_date + timedelta(hours=72)
+                next_highest_rpe_date = loading_events[t].loading_date + timedelta(hours=36)
                 candidates = list(r for r in loading_events if r.loading_date > loading_events[t].loading_date
                                   and r.loading_date <= next_highest_rpe_date and r.RPE > loading_events[t].RPE and r.highest_rpe_in_72_hrs)
                 candidates.sort(key=lambda x: x.loading_date)
@@ -182,50 +182,58 @@ class InsightsProcessing(object):
                     grouped_parts.append(part_list[0])
 
                 loading_event.affected_body_parts = grouped_parts
+                #loading_events.append(loading_event)
 
-                level_one_soreness = list(a for a in loading_event.affected_body_parts if a.max_severity <= 1)
+        for loading_event in loading_events:
+            level_one_soreness = list(a for a in loading_event.affected_body_parts if a.max_severity <= 1 and a.cleared and a.days_sore <= 1)
 
-                if len(grouped_parts) == len(level_one_soreness): # no soreness
-                    if loading_event.sport_name not in self.no_soreness_load_tuples:
-                        self.no_soreness_load_tuples[loading_event.sport_name] = []
-                        self.no_soreness_rpe_tuples[loading_event.sport_name] = []
-                        self.last_14_max_no_soreness_load_tuples[loading_event.sport_name] = []
-                        self.last_14_max_no_soreness_rpe_tuples[loading_event.sport_name] = []
-                    self.no_soreness_load_tuples[loading_event.sport_name].append((loading_event.loading_date, loading_event.load))
-                    self.no_soreness_rpe_tuples[loading_event.sport_name].append((loading_event.loading_date, loading_event.RPE))
+            if len(loading_event.affected_body_parts) == len(level_one_soreness): # no soreness
+                if loading_event.sport_name not in self.no_soreness_load_tuples:
+                    self.no_soreness_load_tuples[loading_event.sport_name] = []
+                    self.no_soreness_rpe_tuples[loading_event.sport_name] = []
+                    self.last_14_max_no_soreness_load_tuples[loading_event.sport_name] = []
+                    self.last_14_max_no_soreness_rpe_tuples[loading_event.sport_name] = []
+                self.no_soreness_load_tuples[loading_event.sport_name].append((loading_event.loading_date, loading_event.load))
+                self.no_soreness_rpe_tuples[loading_event.sport_name].append((loading_event.loading_date, loading_event.RPE))
 
-                    for k in self.no_soreness_load_tuples.keys():
-                        no_soreness_list = self.no_soreness_load_tuples[k]
-                        if len(no_soreness_list) > 0:
-                            sore_values = list(s[1] for s in no_soreness_list)
+                '''who cares nothing matters
+                for k in self.no_soreness_load_tuples.keys():
+                    no_soreness_list = self.no_soreness_load_tuples[k]
+                    if len(no_soreness_list) > 0:
+                        sore_values = list(s[1] for s in no_soreness_list)
+                        if len(sore_values) > 0:
                             self.last_14_max_no_soreness_load_tuples[k].append((no_soreness_list[len(no_soreness_list) - 1][0], max(sore_values[-min(3, len(sore_values)):])))
-                    for k in self.no_soreness_rpe_tuples.keys():
-                        no_soreness_RPE_list = self.no_soreness_rpe_tuples[k]
-                        if len(no_soreness_RPE_list) > 0:
-                            sore_values = list(s[1] for s in no_soreness_RPE_list)
+                for k in self.no_soreness_rpe_tuples.keys():
+                    no_soreness_RPE_list = self.no_soreness_rpe_tuples[k]
+                    if len(no_soreness_RPE_list) > 0:
+                        sore_values = list(s[1] for s in no_soreness_RPE_list)
+                        if len(sore_values) > 0:
                             self.last_14_max_no_soreness_rpe_tuples[k].append((no_soreness_RPE_list[len(no_soreness_RPE_list) - 1][0], max(sore_values[-min(3, len(sore_values)):])))
+                '''
 
-                else:
-                    if loading_event.sport_name not in self.soreness_load_tuples:
-                        self.soreness_load_tuples[loading_event.sport_name] = []
-                        self.soreness_rpe_tuples[loading_event.sport_name] = []
-                        self.last_14_max_soreness_load_tuples[loading_event.sport_name] = []
-                        self.last_14_max_soreness_rpe_tuples[loading_event.sport_name] = []
-                    self.soreness_load_tuples[loading_event.sport_name].append((loading_event.loading_date, loading_event.load))
-                    self.soreness_rpe_tuples[loading_event.sport_name].append((loading_event.loading_date, loading_event.RPE))
+            else:
+                if loading_event.sport_name not in self.soreness_load_tuples:
+                    self.soreness_load_tuples[loading_event.sport_name] = []
+                    self.soreness_rpe_tuples[loading_event.sport_name] = []
+                    self.last_14_max_soreness_load_tuples[loading_event.sport_name] = []
+                    self.last_14_max_soreness_rpe_tuples[loading_event.sport_name] = []
+                self.soreness_load_tuples[loading_event.sport_name].append((loading_event.loading_date, loading_event.load))
+                self.soreness_rpe_tuples[loading_event.sport_name].append((loading_event.loading_date, loading_event.RPE))
 
-                    for k in self.soreness_load_tuples.keys():
-                        soreness_list = self.soreness_load_tuples[k]
-                        if len(soreness_list) > 0:
-                            sore_values = list(s[1] for s in soreness_list)
+                '''deprecate this!
+                for k in self.soreness_load_tuples.keys():
+                    soreness_list = self.soreness_load_tuples[k]
+                    if len(soreness_list) > 0:
+                        sore_values = list(s[1] for s in soreness_list)
+                        if len(sore_values) > 0:
                             self.last_14_max_soreness_load_tuples[k].append((soreness_list[len(soreness_list) - 1][0], min(sore_values[-min(3, len(sore_values)):])))
-                    for k in self.soreness_rpe_tuples.keys():
-                        soreness_RPE_list = self.soreness_rpe_tuples[k]
-                        if len(soreness_RPE_list) > 0:
-                            sore_values = list(s[1] for s in soreness_RPE_list)
+                for k in self.soreness_rpe_tuples.keys():
+                    soreness_RPE_list = self.soreness_rpe_tuples[k]
+                    if len(soreness_RPE_list) > 0:
+                        sore_values = list(s[1] for s in soreness_RPE_list)
+                        if len(sore_values) > 0:
                             self.last_14_max_soreness_rpe_tuples[k].append((soreness_RPE_list[len(soreness_RPE_list) - 1][0], min(sore_values[-min(3, len(sore_values)):])))
-
-                loading_events.append(loading_event)
+                '''
 
         self.get_adaptation_history()
 
@@ -252,21 +260,34 @@ class InsightsProcessing(object):
     def get_adaptation_history(self):
 
         all_sesssion_types = []
-        all_sesssion_types.extend(self.last_14_max_soreness_load_tuples.keys())
-        all_sesssion_types.extend(self.last_14_max_no_soreness_load_tuples.keys())
+        #all_sesssion_types.extend(self.last_14_max_soreness_load_tuples.keys())
+        all_sesssion_types.extend(self.soreness_load_tuples.keys())
+        #all_sesssion_types.extend(self.last_14_max_no_soreness_load_tuples.keys())
+        all_sesssion_types.extend(self.no_soreness_load_tuples.keys())
         session_types = list(set(all_sesssion_types))
 
         all_dates = []
-        for k in self.last_14_max_soreness_load_tuples.keys():
-            all_dates.extend(list(x[0] for x in self.last_14_max_soreness_load_tuples[k]))
+        #for k in self.last_14_max_soreness_load_tuples.keys():
+        for k in self.soreness_load_tuples.keys():
+            #all_dates.extend(list(x[0] for x in self.last_14_max_soreness_load_tuples[k]))
+            all_dates.extend(list(x[0] for x in self.soreness_load_tuples[k]))
 
-        for k in self.last_14_max_no_soreness_load_tuples.keys():
-            all_dates.extend(list(x[0] for x in self.last_14_max_no_soreness_load_tuples[k]))
+        #for k in self.last_14_max_no_soreness_load_tuples.keys():
+        for k in self.no_soreness_load_tuples.keys():
+            #all_dates.extend(list(x[0] for x in self.last_14_max_no_soreness_load_tuples[k]))
+            all_dates.extend(list(x[0] for x in self.no_soreness_load_tuples[k]))
 
         dates = list(set(all_dates))
         dates.sort()
 
         history = {}
+
+        last_min_load = None
+        last_min_load_date = None
+        last_max_load = None
+        last_max_load_date = None
+        load_capacity = None
+        load_capacity_date = None
 
         for s in session_types:
             history[s] = []
@@ -274,12 +295,45 @@ class InsightsProcessing(object):
                 # get all the min values for this session for this date
                 min_vals = []
                 max_vals = []
-                if s in self.last_14_max_no_soreness_load_tuples.keys():
-                    min_vals = list(x[1] for x in self.last_14_max_no_soreness_load_tuples[s] if x[0] == d)
-                if s in self.last_14_max_soreness_load_tuples.keys():
-                    max_vals = list(x[1] for x in self.last_14_max_soreness_load_tuples[s] if x[0] == d)
+                #if s in self.last_14_max_no_soreness_load_tuples.keys():
+                if s in self.no_soreness_load_tuples.keys():
+                    #min_vals = list(x[1] for x in self.last_14_max_no_soreness_load_tuples[s] if x[0] == d)
+                    min_vals = list(x[1] for x in self.no_soreness_load_tuples[s] if x[0] == d)
+                    if len(min_vals) > 0:
+                        max_min_vals = max(min_vals)
+                        if last_min_load is None:
+                            last_min_load = max_min_vals
+                            last_min_load_date = d
+                        else:
+                            if last_min_load_date > load_capacity_date:
+                                last_min_load = max(last_min_load, max_min_vals)
+                            else:
+                                last_min_load = max_min_vals
+                                last_min_load_date = d
+                        load_capacity = max(load_capacity if load_capacity is not None else 0, last_min_load if last_min_load is not None else 0)
+                        load_capacity_date = d
 
-                history[s].append((d, tuple(min_vals), tuple(max_vals)))
+                #if s in self.last_14_max_soreness_load_tuples.keys():
+                if s in self.soreness_load_tuples.keys():
+                    #max_vals = list(x[1] for x in self.last_14_max_soreness_load_tuples[s] if x[0] == d)
+                    max_vals = list(x[1] for x in self.soreness_load_tuples[s] if x[0] == d)
+
+                    if len(max_vals) > 0:
+                        min_max_vals = min(max_vals)
+                        if last_max_load is None:
+                            last_max_load = min_max_vals
+                            last_max_load_date = d
+                        else:
+                            if last_max_load_date > load_capacity_date:
+                                last_max_load = min(last_max_load, min_max_vals)
+                            else:
+                                last_max_load = min_max_vals
+                                last_max_load_date = d
+
+                        if load_capacity is None or load_capacity >= last_max_load:
+                            load_capacity = .90 * last_max_load
+
+                history[s].append((d, tuple(min_vals), tuple(max_vals), load_capacity))
         i=0
 
     def populate_contingency_table(self, loading_events, columns):
