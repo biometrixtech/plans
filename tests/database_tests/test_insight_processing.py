@@ -47,7 +47,7 @@ def test_get_training_plan_from_database():
 
     users = []
     #users.append('0dd21808-55f9-45f2-a408-b1713d40681f') #mw
-    #users.append('93176a69-2d5d-4326-b986-ca6b04a9a29d') #liz
+    users.append('93176a69-2d5d-4326-b986-ca6b04a9a29d') #liz
     users.append('e4fff5dc-6467-4717-8cef-3f2cb13e5c33')  #abbey
     users.append('82ccf294-7c1e-48e6-8149-c5a001e76f78')  #pene
     users.append('8bca10bf-8bdd-4971-85ca-cb2712c32478') #rhonda
@@ -57,7 +57,7 @@ def test_get_training_plan_from_database():
 
     for user_id in users:
         start_date = "2018-11-23"
-        end_date = "2019-01-23"
+        end_date = "2019-03-23"
 
         drs_dao = DailyReadinessDatastore()
         daily_readiness_surveys = drs_dao.get(user_id, parse_date(start_date), parse_date(end_date), False)
@@ -82,7 +82,7 @@ def test_get_training_plan_from_database():
 
         insights_processing = InsightsProcessing(user_id)
         insights_processing.load_surveys(daily_readiness_surveys, plans)
-        contingency_tables = insights_processing.get_contingency_tables(datetime(2018, 11, 23), datetime(2019, 1, 16), 5)
+        contingency_tables = insights_processing.get_contingency_tables(datetime(2018, 11, 23), datetime(2019, 3, 23), 5)
         for c in contingency_tables:
             if c.chi_square_significant_05:
                 k=1

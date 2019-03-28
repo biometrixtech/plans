@@ -49,13 +49,26 @@ class InsightsProcessing(object):
 
         contingency_tables = []
         loading_events = []
+        initial_loading_events = []
 
         # create a list of loading events first
         for t in range(0, len(self.rpe_load_tuples) - 1):
 
             if self.rpe_load_tuples[t][0] <= load_end_date:
                 loading_event = LoadingEvent(self.rpe_load_tuples[t][0], self.rpe_load_tuples[t][1], self.rpe_load_tuples[t][2], self.rpe_load_tuples[t][3], self.rpe_load_tuples[t][4])
-                loading_events.append(loading_event)
+                initial_loading_events.append(loading_event)
+
+        # sum load by day, type
+        load_grouper = attrgetter('loading_date', 'sport_name.name', 'strength_conditioning_type.name')
+        for k, g in groupby(sorted(initial_loading_events, key=load_grouper), load_grouper):
+            part_list = list(g)
+            part_list.sort(key=lambda x: x.loading_date)
+            #load_sum = sum(list(g.load for g in part_list))
+            avg_rpe = mean(list(g.RPE for g in part_list))
+            avg_duration = sum(list(g.duration for g in part_list))
+            loading_event = LoadingEvent(k[0], avg_rpe, avg_duration, k[1], k[2])
+            loading_events.append(loading_event)
+
 
         early_soreness_tuples = list(s[0] for s in self.post_session_survey_tuples
                                    if s[0] >= loading_events[0].loading_date and
@@ -245,7 +258,7 @@ class InsightsProcessing(object):
 
         # loading events by activity
         event_parts = []
-        grouper = attrgetter('sport_name.name')
+        grouper = attrgetter('sport_name')
         for k, g in groupby(sorted(loading_events, key=grouper), grouper):
             part_list = list(g)
             part_list.sort(key=lambda x: x.loading_date)
@@ -282,14 +295,14 @@ class InsightsProcessing(object):
 
         history = {}
 
-        last_min_load = None
-        last_min_load_date = None
-        last_max_load = None
-        last_max_load_date = None
-        load_capacity = None
-        load_capacity_date = None
-
         for s in session_types:
+            last_min_load = None
+            last_min_load_date = None
+            last_max_load = None
+            last_max_load_date = None
+            load_capacity = None
+            load_capacity_date = None
+
             history[s] = []
             for d in dates:
                 # get all the min values for this session for this date
@@ -332,6 +345,7 @@ class InsightsProcessing(object):
 
                         if load_capacity is None or load_capacity >= last_max_load:
                             load_capacity = .90 * last_max_load
+                            load_capacity_date = d
 
                 history[s].append((d, tuple(min_vals), tuple(max_vals), load_capacity))
         i=0
