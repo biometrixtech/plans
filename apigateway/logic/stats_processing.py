@@ -134,13 +134,14 @@ class StatsProcessing(object):
     @xray_recorder.capture('logic.StatsProcessing.load_historical_data')
     def load_historical_data(self):
         if not self.historic_data_loaded:
-            self.all_daily_readiness_surveys = self.daily_readiness_datastore.get(self.athlete_id, self.start_date_time,
-                                                                                  self.end_date_time, last_only=False)
+            # self.all_daily_readiness_surveys = self.daily_readiness_datastore.get(self.athlete_id, self.start_date_time,
+            #                                                                       self.end_date_time, last_only=False)
             self.all_plans = self.daily_plan_datastore.get(self.athlete_id, self.start_date, self.end_date, stats_processing=True)
+            self.all_daily_readiness_surveys = [plan.daily_readiness_survey for plan in self.all_plans]
         post_session_surveys = []
         for plan in self.all_plans:
             post_surveys = \
-                [_post_session_survey_from_training_session(session.post_session_survey, self.athlete_id, session.id, session.session_type().value, plan.event_date)
+                [PostSessionSurvey.post_session_survey_from_training_session(session.post_session_survey, self.athlete_id, session.id, session.session_type().value, plan.event_date)
                  for session in plan.training_sessions if session is not None]
             post_session_surveys.extend([s for s in post_surveys if s is not None])
         self.update_start_times(self.all_daily_readiness_surveys, post_session_surveys, self.all_plans)
@@ -1200,15 +1201,3 @@ class StatsProcessing(object):
         self.last_7_13_days_plans = [p for p in self.all_plans if self.last_6_days > p.get_event_datetime() >= self.days_7_13]
 
         self.days_8_14_plans = [p for p in self.all_plans if self.last_week > p.get_event_datetime() >= self.previous_week]
-
-
-def _post_session_survey_from_training_session(survey, user_id, session_id, session_type, event_date):
-    if survey is not None:
-        if survey.event_date is not None:
-            post_session_survey = PostSessionSurvey(format_datetime(survey.event_date), user_id, session_id, session_type)
-        else:
-            post_session_survey = PostSessionSurvey(format_datetime(parse_date(event_date)), user_id, session_id, session_type)
-        post_session_survey.survey = survey
-        return post_session_survey
-    else:
-        return None

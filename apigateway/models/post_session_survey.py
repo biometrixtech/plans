@@ -3,7 +3,7 @@ from serialisable import Serialisable
 from models.soreness import Soreness, BodyPartLocation, BodyPart
 from models.session import SessionType
 import datetime
-from utils import parse_datetime, format_datetime
+from utils import parse_datetime, format_datetime, parse_date
 
 
 class PostSessionSurvey(Serialisable):
@@ -37,6 +37,18 @@ class PostSessionSurvey(Serialisable):
             'survey': self.survey.json_serialise()
         }
         return ret
+
+    @classmethod
+    def post_session_survey_from_training_session(cls, survey, user_id, session_id, session_type, event_date):
+        if survey is not None:
+            if survey.event_date is not None:
+                post_session_survey = PostSessionSurvey(format_datetime(survey.event_date), user_id, session_id, session_type)
+            else:
+                post_session_survey = PostSessionSurvey(format_datetime(parse_date(event_date)), user_id, session_id, session_type)
+            post_session_survey.survey = survey
+            return post_session_survey
+        else:
+            return None
 
 
 class PostSurvey(Serialisable):

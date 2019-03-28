@@ -75,7 +75,7 @@ class AthleteStats(Serialisable):
 
     def update_historic_soreness(self, soreness, event_date):
 
-        soreness_calc = SorenessCalculator()
+        soreness_calc = SorenessCalculator
 
         for h in self.historic_soreness:
             if (h.body_part_location == soreness.body_part.location and

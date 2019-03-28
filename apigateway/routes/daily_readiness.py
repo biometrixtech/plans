@@ -48,7 +48,6 @@ def handle_daily_readiness_create(principal_id=None):
                                    if 'wants_functional_strength' in request.json else False)
     )
 
-    need_new_plan = False
     sessions_planned = True
     sessions_planned_readiness = True
     session_from_readiness = False
@@ -60,11 +59,9 @@ def handle_daily_readiness_create(principal_id=None):
     survey_processor = SurveyProcessing(user_id, event_date, athlete_stats, datastore_collection)
 
     if 'sessions_planned' in request.json and not request.json['sessions_planned']:
-        need_new_plan = True
         sessions_planned = False
         sessions_planned_readiness = False
     if 'sessions' in request.json and len(request.json['sessions']) > 0:
-        need_new_plan = True
         sessions_planned = True
         session_from_readiness = True
         for session in request.json['sessions']:
@@ -79,30 +76,28 @@ def handle_daily_readiness_create(principal_id=None):
                                          request.json['sleep_data']]
         sleep_history_datastore.put(daily_sleep_data)
 
-    if need_new_plan:
-        if _check_plan_exists(user_id, plan_event_date):
-            plan = daily_plan_datastore.get(user_id, plan_event_date, plan_event_date)[0]
-            plan.user_id = user_id
-            plan.training_sessions.extend(survey_processor.sessions)
-        else:
-            plan = DailyPlan(event_date=plan_event_date)
-            plan.user_id = user_id
-            # plan.last_sensor_sync = DailyPlanDatastore().get_last_sensor_sync(user_id, plan_event_date)
-            plan.training_sessions = survey_processor.sessions
-        plan.sessions_planned = sessions_planned
-        plan.session_from_readiness = session_from_readiness
-        plan.sessions_planned_readiness = sessions_planned_readiness
-        daily_plan_datastore.put(plan)
-        if len(survey_processor.heart_rate_data) > 0:
-            heart_rate_datastore.put(survey_processor.heart_rate_data)
+    # if need_new_plan:
+    if _check_plan_exists(user_id, plan_event_date):
+        plan = daily_plan_datastore.get(user_id, plan_event_date, plan_event_date)[0]
+        plan.user_id = user_id
+        plan.training_sessions.extend(survey_processor.sessions)
+    else:
+        plan = DailyPlan(event_date=plan_event_date)
+        plan.user_id = user_id
+        plan.training_sessions = survey_processor.sessions
+    plan.sessions_planned = sessions_planned
+    plan.session_from_readiness = session_from_readiness
+    plan.sessions_planned_readiness = sessions_planned_readiness
+    if len(survey_processor.heart_rate_data) > 0:
+        heart_rate_datastore.put(survey_processor.heart_rate_data)
 
     if "clear_candidates" in request.json and len(request.json['clear_candidates']) > 0:
         survey_processor.process_clear_status_answers(request.json['clear_candidates'], event_date,
                                                       daily_readiness.soreness)
         readiness_copy = copy.deepcopy(daily_readiness)
         survey_processor.stats_processor.all_daily_readiness_surveys.append(readiness_copy)
-
-    daily_readiness_datastore.put(daily_readiness)
+    plan.daily_readiness_survey = daily_readiness
+    daily_plan_datastore.put(plan)
 
     survey_processor.soreness = daily_readiness.soreness
     survey_processor.patch_daily_and_historic_soreness(survey='readiness')

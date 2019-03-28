@@ -1,10 +1,14 @@
-import models.soreness
+import datetime
 from aws_xray_sdk.core import xray_recorder
 from config import get_mongo_collection
+from fathomapi.utils.exceptions import InvalidSchemaException
 from models.daily_plan import DailyPlan
 import models.session as session
+import models.soreness
 from models.post_session_survey import PostSurvey
-from fathomapi.utils.exceptions import InvalidSchemaException
+from models.daily_readiness import DailyReadiness
+from datastores.daily_readiness_datastore import DailyReadinessDatastore
+from utils import parse_date
 
 
 class DailyPlanDatastore(object):
@@ -79,7 +83,7 @@ class DailyPlanDatastore(object):
             daily_plan.bump_up_sessions = \
                 [_external_session_from_mongodb(s, session.SessionType.bump_up)
                  for s in plan.get('bump_up_sessions', [])]
-            daily_plan.daily_readiness_survey = plan.get('daily_readiness_survey', None)
+            daily_plan.daily_readiness_survey = _daily_readiness_from_mongo(plan.get('daily_readiness_survey', None), user_id)
             daily_plan.updated = plan.get('updated', None)
             daily_plan.last_updated = plan.get('last_updated', None)
             daily_plan.pre_recovery_completed = plan.get('pre_recovery_completed', False)
@@ -249,3 +253,23 @@ def _assigned_exercises_from_mongodb(mongo_result):
     assigned_exercise.goal_text = mongo_result.get("goal_text", "")
     assigned_exercise.equipment_required = mongo_result.get("equipment_required", [])
     return assigned_exercise
+
+
+def _daily_readiness_from_mongo(mongo_result, user_id):
+    if mongo_result is None:
+        return None
+    if isinstance(mongo_result, dict):
+        return DailyReadiness(
+                               event_date=mongo_result['event_date'],
+                               user_id=mongo_result['user_id'],
+                               soreness=mongo_result['soreness'],
+                               readiness=mongo_result['readiness'],
+                               sleep_quality=mongo_result['sleep_quality'],
+                               wants_functional_strength=mongo_result.get('wants_functional_strength', False)
+                             )
+    elif isinstance(mongo_result, str):
+        start_date = parse_date(mongo_result)
+        end_date = start_date + datetime.timedelta(days=1)
+        return DailyReadinessDatastore().get(user_id, start_date=start_date, end_date=end_date)[0]
+    else:
+        return None

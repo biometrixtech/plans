@@ -1,6 +1,7 @@
 from serialisable import Serialisable
 from utils import parse_date
 import models.session as session
+from models.daily_readiness import DailyReadiness
 
 
 class DailyPlan(Serialisable):
@@ -58,7 +59,7 @@ class DailyPlan(Serialisable):
                'post_recovery': self.post_recovery.json_serialise() if self.post_recovery is not None else None,
                'completed_post_recovery_sessions': [c.json_serialise() for c in self.completed_post_recovery_sessions],
                'last_updated': self.last_updated,
-               'daily_readiness_survey': self.daily_readiness_survey,
+               'daily_readiness_survey': self.daily_readiness_survey.json_serialise() if isinstance(self.daily_readiness_survey, DailyReadiness) else self.daily_readiness_survey,
                'last_sensor_sync': self.last_sensor_sync,
                'sessions_planned': self.sessions_planned,
                'functional_strength_completed': self.functional_strength_completed,
