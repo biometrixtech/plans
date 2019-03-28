@@ -227,6 +227,8 @@ class InsightsProcessing(object):
 
                 loading_events.append(loading_event)
 
+        self.get_adaptation_history()
+
         # all loading events
         contingency_table = self.populate_contingency_table(loading_events, columns)
 
@@ -245,6 +247,40 @@ class InsightsProcessing(object):
             contingency_tables.append(contingency_table)
 
         return contingency_tables
+
+
+    def get_adaptation_history(self):
+
+        all_sesssion_types = []
+        all_sesssion_types.extend(self.last_14_max_soreness_load_tuples.keys())
+        all_sesssion_types.extend(self.last_14_max_no_soreness_load_tuples.keys())
+        session_types = list(set(all_sesssion_types))
+
+        all_dates = []
+        for k in self.last_14_max_soreness_load_tuples.keys():
+            all_dates.extend(list(x[0] for x in self.last_14_max_soreness_load_tuples[k]))
+
+        for k in self.last_14_max_no_soreness_load_tuples.keys():
+            all_dates.extend(list(x[0] for x in self.last_14_max_no_soreness_load_tuples[k]))
+
+        dates = list(set(all_dates))
+        dates.sort()
+
+        history = {}
+
+        for s in session_types:
+            history[s] = []
+            for d in dates:
+                # get all the min values for this session for this date
+                min_vals = []
+                max_vals = []
+                if s in self.last_14_max_no_soreness_load_tuples.keys():
+                    min_vals = list(x[1] for x in self.last_14_max_no_soreness_load_tuples[s] if x[0] == d)
+                if s in self.last_14_max_soreness_load_tuples.keys():
+                    max_vals = list(x[1] for x in self.last_14_max_soreness_load_tuples[s] if x[0] == d)
+
+                history[s].append((d, tuple(min_vals), tuple(max_vals)))
+        i=0
 
     def populate_contingency_table(self, loading_events, columns):
 
