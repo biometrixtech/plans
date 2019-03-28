@@ -191,28 +191,28 @@ def handle_test_data_copy(principal_id=None):
     athlete_stats_datastore.delete(athlete_id=user_id)
 
     # get data from test collections
-    readiness_surveys = rs_datastore_test.get(user_id, last_only=False)
-    if len(readiness_surveys) == 0:
-        raise ForbiddenException("No data present to copy")
+    # readiness_surveys = rs_datastore_test.get(user_id, last_only=False)
+    # if len(readiness_surveys) == 0:
+    #     raise ForbiddenException("No data present to copy")
     daily_plans = daily_plan_datastore_test.get(user_id)
 
     # update to current date
-    update_dates(readiness_surveys, daily_plans, athlete_stats, event_date)
+    update_dates(daily_plans, athlete_stats, event_date)
 
     # write the updated data
-    rs_datastore.put(readiness_surveys)
+    # rs_datastore.put(readiness_surveys)
     daily_plan_datastore.put(daily_plans)
     athlete_stats_datastore.put(athlete_stats)
 
     return {'message': 'success'}, 202
 
 
-def update_dates(rs_surveys, daily_plans, athlete_stats, event_date):
+def update_dates(daily_plans, athlete_stats, event_date):
     athlete_today = parse_date(athlete_stats[0].event_date)
     day_diff = (event_date - athlete_today).days
     delta = datetime.timedelta(days=day_diff)
-    for rs_survey in rs_surveys:
-        rs_survey.event_date += delta
+    # for rs_survey in rs_surveys:
+    #     rs_survey.event_date += delta
 
     for plan in daily_plans:
         plan.event_date = format_date(parse_date(plan.event_date) + delta)

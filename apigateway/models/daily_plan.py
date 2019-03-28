@@ -41,6 +41,11 @@ class DailyPlan(Serialisable):
         return parse_date(self.event_date)
 
     def json_serialise(self):
+        if isinstance(self.daily_readiness_survey, DailyReadiness):
+            readiness = self.daily_readiness_survey.json_serialise()
+            del readiness['sore_body_parts']
+        else:
+            readiness = self.daily_readiness_survey,
         ret = {'user_id': self.user_id,
                'date': self.event_date,
                'day_of_week': self.day_of_week,
@@ -59,7 +64,7 @@ class DailyPlan(Serialisable):
                'post_recovery': self.post_recovery.json_serialise() if self.post_recovery is not None else None,
                'completed_post_recovery_sessions': [c.json_serialise() for c in self.completed_post_recovery_sessions],
                'last_updated': self.last_updated,
-               'daily_readiness_survey': self.daily_readiness_survey.json_serialise() if isinstance(self.daily_readiness_survey, DailyReadiness) else self.daily_readiness_survey,
+               'daily_readiness_survey': readiness,
                'last_sensor_sync': self.last_sensor_sync,
                'sessions_planned': self.sessions_planned,
                'functional_strength_completed': self.functional_strength_completed,
