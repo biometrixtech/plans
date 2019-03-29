@@ -6,7 +6,6 @@ import logic.exercise_mapping as exercise_mapping
 from logic.soreness_processing import SorenessCalculator
 from logic.functional_strength_mapping import FSProgramGenerator
 import models.session as session
-from models.soreness import HistoricSorenessStatus
 from models.post_session_survey import PostSessionSurvey
 from utils import format_date, parse_datetime, parse_date
 
@@ -26,24 +25,14 @@ class TrainingPlanManager(object):
         self.post_session_surveys = []
         self.athlete_stats = None
 
-    def post_session_surveys_today(self, trigger_date):
-
-        try:
-            todays_date_time = datetime.datetime.strptime(trigger_date, '%Y-%m-%d')
-        except ValueError:
-            todays_date_time = datetime.datetime.strptime(trigger_date, '%Y-%m-%dT%H:%M:%SZ')
-
-        todays_date = todays_date_time.strftime("%Y-%m-%d")
-
-        for p in self.post_session_surveys:
-            event_date_time = datetime.datetime.strptime(p.event_date, "%Y-%m-%d")
-            if event_date_time.strftime("%Y-%m-%d") == todays_date:
+    def post_session_surveys_today(self):
+        for ps_survey in self.post_session_surveys:
+            if format_date(ps_survey.event_date) == format_date(self.trigger_date_time):
                 return True
-
         return False
 
-    def show_post_recovery(self, post_surveys_today):
-        if post_surveys_today and not self.daily_plan.session_from_readiness:
+    def show_post_recovery(self, surveys_today):
+        if surveys_today and not self.daily_plan.session_from_readiness:
             return True
         else:
             if self.daily_plan.sessions_planned_readiness:
@@ -53,11 +42,11 @@ class TrainingPlanManager(object):
 
     def load_data(self, event_date):
         daily_plans = self.daily_plan_datastore.get(self.athlete_id, format_date(parse_date(event_date) - datetime.timedelta(days=1)), event_date)
-        daily_plan = [plan for plan in daily_plans if plan.event_date == event_date]
-        if len(daily_plan) == 0:
+        plan_today = [plan for plan in daily_plans if plan.event_date == event_date]
+        if len(plan_today) == 0:
             raise NoSuchEntityException("Plan not found for the day")
         else:
-            self.daily_plan = daily_plan[0]
+            self.daily_plan = plan_today[0]
         self.readiness_surveys = [plan.daily_readiness_survey for plan in daily_plans if plan.daily_readiness_survey is not None]
         for plan in daily_plans:
             post_surveys = \
@@ -78,21 +67,15 @@ class TrainingPlanManager(object):
         if self.athlete_stats is None:
             historic_soreness = []
         else:
-            historic_soreness = [hs for hs in self.athlete_stats.historic_soreness if hs.historic_soreness_status is not None and
-                                 hs.historic_soreness_status is not HistoricSorenessStatus.dormant_cleared and
-                                 hs.historic_soreness_status is not HistoricSorenessStatus.almost_persistent_soreness and
-                                 hs.historic_soreness_status is not HistoricSorenessStatus.almost_persistent_pain]
+            historic_soreness = [hs for hs in self.athlete_stats.historic_soreness if not hs.is_dormant_cleared()]
             historic_soreness_present = len(historic_soreness) > 0
-            is_functional_strength_eligible(self.athlete_stats, last_updated)
+            self.is_functional_strength_eligible()
 
         soreness_list = SorenessCalculator().get_soreness_summary_from_surveys(self.readiness_surveys,
                                                                                self.post_session_surveys,
                                                                                self.trigger_date_time,
                                                                                historic_soreness)
-
-        post_surveys_today = self.post_session_surveys_today(event_date)
-
-        show_post_recovery = self.show_post_recovery(post_surveys_today)
+        show_post_recovery = self.show_post_recovery(self.post_session_surveys_today())
         self.add_recovery_times(show_post_recovery)
 
         calc = exercise_mapping.ExerciseAssignmentCalculator(self.athlete_id, self.exercise_library_datastore,
@@ -173,12 +156,11 @@ class TrainingPlanManager(object):
             self.daily_plan.post_recovery = session.RecoverySession()
             self.daily_plan.post_recovery.display_exercises = True
 
-
-def is_functional_strength_eligible(athlete_stats, last_updated):
-    if (athlete_stats.functional_strength_eligible and
-        not athlete_stats.severe_pain_soreness_today() and  # these are updated from surveys but update doesn't make it to stats until after plan is created
-        (athlete_stats.next_functional_strength_eligible_date is None or 
-         parse_datetime(athlete_stats.next_functional_strength_eligible_date) < parse_datetime(last_updated))):  # need to check if 24 hours have passed since last completed
-        athlete_stats.functional_strength_eligible = True
-    else:
-        athlete_stats.functional_strength_eligible = False
+    def is_functional_strength_eligible(self):
+        if (self.athlete_stats.functional_strength_eligible and
+            not self.athlete_stats.severe_pain_soreness_today() and  # these are updated from surveys but update doesn't make it to stats until after plan is created
+            (self.athlete_stats.next_functional_strength_eligible_date is None or
+             parse_datetime(self.athlete_stats.next_functional_strength_eligible_date) < self.trigger_date_time)):  # need to check if 24 hours have passed since last completed
+            self.athlete_stats.functional_strength_eligible = True
+        else:
+            self.athlete_stats.functional_strength_eligible = False
