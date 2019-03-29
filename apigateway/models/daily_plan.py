@@ -44,6 +44,7 @@ class DailyPlan(Serialisable):
         if isinstance(self.daily_readiness_survey, DailyReadiness):
             readiness = self.daily_readiness_survey.json_serialise()
             del readiness['sore_body_parts']
+            del readiness['user_id']
         else:
             readiness = self.daily_readiness_survey,
         ret = {'user_id': self.user_id,
