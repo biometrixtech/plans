@@ -13,7 +13,7 @@ class AthleteStatsDatastore(object):
     def __init__(self, mongo_collection='athletestats'):
         self.mongo_collection = mongo_collection
 
-    @xray_recorder.capture('datastore.AthlteStatsDatastore.get')
+    @xray_recorder.capture('datastore.AthleteStatsDatastore.get')
     def get(self, athlete_id):
         return self._query_mongodb(athlete_id)
 

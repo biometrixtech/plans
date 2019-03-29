@@ -59,14 +59,6 @@ class StatsProcessing(object):
         self.historic_data_loaded = False
 
     def set_start_end_times(self):
-        if self.event_date is None:
-            try:
-                readiness_surveys = self.daily_readiness_datastore.get(self.athlete_id)
-            except NoSuchEntityException:
-                return False
-            last_daily_readiness_survey = readiness_surveys[0]
-            event_date_time = last_daily_readiness_survey.get_event_date()
-            self.event_date = event_date_time.date().strftime('%Y-%m-%d')
         start_date = datetime.strptime(self.event_date, "%Y-%m-%d")
         end_date = datetime.strptime(self.event_date, "%Y-%m-%d")
         self.start_date_time = start_date - timedelta(days=35)  # used to be 28, this allows for non-overlapping 7/28
@@ -87,48 +79,44 @@ class StatsProcessing(object):
     @xray_recorder.capture('logic.StatsProcessing.process_athlete_stats')
     def process_athlete_stats(self, current_athlete_stats=None):
         if self.start_date is None:
-            success = self.set_start_end_times()
-        else:
-            success = True
-        if success:
-            self.load_historical_data()
-            athlete_stats = AthleteStats(self.athlete_id)
-            athlete_stats.event_date = self.event_date
-            athlete_stats = self.calc_survey_stats(athlete_stats)
-            training_volume_processing = TrainingVolumeProcessing(self.start_date, self.end_date)
-            training_volume_processing.load_plan_values(self.last_7_days_plans,
-                                                        self.days_8_14_plans,
-                                                        self.acute_daily_plans,
-                                                        self.get_chronic_weeks_plans(),
-                                                        self.chronic_daily_plans)
-            athlete_stats = training_volume_processing.calc_training_volume_metrics(athlete_stats)
-            # athlete_stats.acute_pain = self.get_acute_pain_list()
-            if current_athlete_stats is None:
-                current_athlete_stats = self.athlete_stats_datastore.get(athlete_id=self.athlete_id)
-            athlete_stats.historic_soreness = self.get_historic_soreness(current_athlete_stats.historic_soreness if current_athlete_stats is not None else None)
-            if current_athlete_stats is not None:
-                athlete_stats.current_sport_name = current_athlete_stats.current_sport_name
-                athlete_stats.current_position = current_athlete_stats.current_position
-                athlete_stats.expected_weekly_workouts = current_athlete_stats.expected_weekly_workouts
-                # Only persist readiness and ps soreness from today and yesterday
-                athlete_stats.readiness_soreness = [s for s in current_athlete_stats.readiness_soreness if self.persist_soreness(s)]
-                athlete_stats.post_session_soreness = [s for s in current_athlete_stats.post_session_soreness if self.persist_soreness(s)]
-                athlete_stats.update_daily_soreness()
-                athlete_stats.readiness_pain = [s for s in current_athlete_stats.readiness_pain if self.persist_soreness(s)]
-                athlete_stats.post_session_pain = [s for s in current_athlete_stats.post_session_pain if self.persist_soreness(s)]
-                athlete_stats.update_daily_pain()
-                athlete_stats.daily_severe_soreness_event_date = self.event_date
-                athlete_stats.daily_severe_pain_event_date = self.event_date
-                athlete_stats.typical_weekly_sessions = current_athlete_stats.typical_weekly_sessions
-                athlete_stats.wearable_devices = current_athlete_stats.wearable_devices
-                if current_athlete_stats.event_date == self.event_date:
-                    # persist all of soreness/pain and session_RPE
-                    athlete_stats.session_RPE = current_athlete_stats.session_RPE
-                    athlete_stats.session_RPE_event_date = current_athlete_stats.session_RPE_event_date
-            athlete_stats.completed_functional_strength_sessions = self.get_completed_functional_strength_sessions()
-            athlete_stats.functional_strength_eligible = self.is_athlete_functional_strength_eligible(athlete_stats)
+            self.set_start_end_times()
+        self.load_historical_data()
+        athlete_stats = AthleteStats(self.athlete_id)
+        athlete_stats.event_date = self.event_date
+        athlete_stats = self.calc_survey_stats(athlete_stats)
+        training_volume_processing = TrainingVolumeProcessing(self.start_date, self.end_date)
+        training_volume_processing.load_plan_values(self.last_7_days_plans,
+                                                    self.days_8_14_plans,
+                                                    self.acute_daily_plans,
+                                                    self.get_chronic_weeks_plans(),
+                                                    self.chronic_daily_plans)
+        athlete_stats = training_volume_processing.calc_training_volume_metrics(athlete_stats)
+        if current_athlete_stats is None:
+            current_athlete_stats = self.athlete_stats_datastore.get(athlete_id=self.athlete_id)
+        athlete_stats.historic_soreness = self.get_historic_soreness(current_athlete_stats.historic_soreness if current_athlete_stats is not None else None)
+        if current_athlete_stats is not None:
+            athlete_stats.current_sport_name = current_athlete_stats.current_sport_name
+            athlete_stats.current_position = current_athlete_stats.current_position
+            athlete_stats.expected_weekly_workouts = current_athlete_stats.expected_weekly_workouts
+            # Only persist readiness and ps soreness from today and yesterday
+            athlete_stats.readiness_soreness = [s for s in current_athlete_stats.readiness_soreness if self.persist_soreness(s)]
+            athlete_stats.post_session_soreness = [s for s in current_athlete_stats.post_session_soreness if self.persist_soreness(s)]
+            athlete_stats.update_daily_soreness()
+            athlete_stats.readiness_pain = [s for s in current_athlete_stats.readiness_pain if self.persist_soreness(s)]
+            athlete_stats.post_session_pain = [s for s in current_athlete_stats.post_session_pain if self.persist_soreness(s)]
+            athlete_stats.update_daily_pain()
+            athlete_stats.daily_severe_soreness_event_date = self.event_date
+            athlete_stats.daily_severe_pain_event_date = self.event_date
+            athlete_stats.typical_weekly_sessions = current_athlete_stats.typical_weekly_sessions
+            athlete_stats.wearable_devices = current_athlete_stats.wearable_devices
+            if current_athlete_stats.event_date == self.event_date:
+                # persist all of soreness/pain and session_RPE
+                athlete_stats.session_RPE = current_athlete_stats.session_RPE
+                athlete_stats.session_RPE_event_date = current_athlete_stats.session_RPE_event_date
+        athlete_stats.completed_functional_strength_sessions = self.get_completed_functional_strength_sessions()
+        athlete_stats.functional_strength_eligible = self.is_athlete_functional_strength_eligible(athlete_stats)
 
-            return athlete_stats
+        return athlete_stats
 
     @xray_recorder.capture('logic.StatsProcessing.load_historical_data')
     def load_historical_data(self):

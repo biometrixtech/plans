@@ -67,9 +67,6 @@ class DailyPlanDatastore(object):
             daily_plan.games = \
                 [_external_session_from_mongodb(s, session.SessionType.game)
                  for s in plan.get('game_sessions', [])]
-            # daily_plan.tournaments = \
-            #     [_external_session_from_mongodb(s, session.SessionType.tournament)
-            #      for s in plan['tournament_sessions']]
             if not stats_processing:
                 daily_plan.pre_recovery = _recovery_session_from_mongodb(plan['pre_recovery']) if plan.get('pre_recovery', None) is not None else None
                 daily_plan.post_recovery = _recovery_session_from_mongodb(plan['post_recovery']) if plan.get('post_recovery', None) is not None else None
@@ -77,9 +74,6 @@ class DailyPlanDatastore(object):
                     [_recovery_session_from_mongodb(s) for s in plan.get('completed_post_recovery_sessions', [])]
                 daily_plan.functional_strength_session = \
                     _functional_strength_session_from_mongodb(plan['functional_strength_session']) if plan.get('functional_strength_session', None) is not None else None
-                # daily_plan.corrective_sessions = \
-                #    [_external_session_from_mongodb(s, session.SessionType.corrective)
-                #     for s in plan['corrective_sessions']]
             daily_plan.bump_up_sessions = \
                 [_external_session_from_mongodb(s, session.SessionType.bump_up)
                  for s in plan.get('bump_up_sessions', [])]
