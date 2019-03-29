@@ -5,7 +5,7 @@ import json
 from utils import format_datetime
 BASE_URL = f"https://apis.{os.getenv('ENVIRONMENT', 'dev')}.fathomai.com"
 USERS_API_VERSION = os.getenv('USERS_API_VERSION', '2_2')
-PLANS_API_VERSION = os.getenv('PLANS_API_VERSION', '3_1_1-dev_0')
+PLANS_API_VERSION = os.getenv('PLANS_API_VERSION', '3_1_1-dev_1')
 
 USERS_URL = f"{BASE_URL}/users/{USERS_API_VERSION}"
 PLANS_URL = f"{BASE_URL}/plans/{PLANS_API_VERSION}"

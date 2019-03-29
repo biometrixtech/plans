@@ -462,7 +462,7 @@ def test_no_fs_with_high_readiness_soreness():
     datastore_collection.exercise_datastore = exercise_library_datastore
 
     tpm = TrainingPlanManager("tester", datastore_collection)
-    plan = tpm.create_daily_plan("2018-07-24")
+    plan = tpm.create_daily_plan("2018-07-24", '2018-07-24T12:00:00Z')
     assert(None is plan.functional_strength_session)
 
 
@@ -496,5 +496,5 @@ def test_no_fs_with_high_post_session_soreness():
     datastore_collection.athlete_stats_datastore = athlete_stats_datastore
     datastore_collection.exercise_datastore = exercise_library_datastore
     tpm = TrainingPlanManager("tester", datastore_collection)
-    plan = tpm.create_daily_plan("2018-07-24")
+    plan = tpm.create_daily_plan("2018-07-24", '2018-07-24T12:00:00Z')
     assert(None is plan.functional_strength_session)

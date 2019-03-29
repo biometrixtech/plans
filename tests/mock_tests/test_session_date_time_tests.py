@@ -46,7 +46,7 @@ def create_plan():
 
     mgr = TrainingPlanManager(user_id, DatastoreCollection())
 
-    daily_plan = mgr.create_daily_plan(format_date(current_date))
+    daily_plan = mgr.create_daily_plan(format_date(current_date), format_datetime(current_date_time))
 
     return daily_plan
 
@@ -81,7 +81,7 @@ def create_no_soreness_plan():
 
     mgr = TrainingPlanManager(user_id, datastore_collection)
 
-    daily_plan = mgr.create_daily_plan(format_date(current_date))
+    daily_plan = mgr.create_daily_plan(format_date(current_date), last_updated=format_datetime(current_date_time))
 
     return daily_plan
 

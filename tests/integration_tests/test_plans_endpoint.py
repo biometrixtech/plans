@@ -57,21 +57,21 @@ def test_change_active_time_start_and_complete_recovery():
     assert response.status_code == 200
     plan = response.json()['daily_plans'][0]
 
-    assert plan['post_recovery']['minutes_duration'] == active_time
-    assert plan['landing_screen'] == 2
+    assert plan['pre_recovery']['minutes_duration'] == active_time
+    assert plan['landing_screen'] == 0
 
-    response2 = utils.start_recovery(event_date + datetime.timedelta(minutes=2), recovery_type='post')
+    response2 = utils.start_recovery(event_date + datetime.timedelta(minutes=2), recovery_type='pre')
     assert response2.status_code == 200
 
     response3 = utils.complete_recovery(event_date + datetime.timedelta(minutes=12),
-                                        completed_exercises=[plan["post_recovery"]["inhibit_exercises"][0]['library_id']],
-                                        recovery_type='post')
+                                        completed_exercises=[plan["pre_recovery"]["inhibit_exercises"][0]['library_id']],
+                                        recovery_type='pre')
     assert response3.status_code == 202
     plan = response3.json()["daily_plans"][0]
-    assert plan["post_recovery_completed"]
-    assert plan["post_recovery"]["completed"]
-    assert plan["landing_screen"] == 2
-    assert not plan["post_recovery"]["display_exercises"]
+    assert plan["pre_recovery_completed"]
+    assert plan["pre_recovery"]["completed"]
+    assert plan["landing_screen"] == 1
+    assert not plan["pre_recovery"]["display_exercises"]
 
 
 # two days ago

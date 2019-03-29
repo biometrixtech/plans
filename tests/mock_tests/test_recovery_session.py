@@ -21,7 +21,7 @@ def training_plan_manager():
 def test_no_surveys_available_with_date():
 
     mgr = training_plan_manager()
-    surveys_today = mgr.post_session_surveys_today([], "2018-07-01")
+    surveys_today = mgr.post_session_surveys_today("2018-07-01")
 
     assert False is surveys_today
 
@@ -38,14 +38,16 @@ def test_one_survey_available_with_date():
         PostSessionSurvey(datetime.datetime(2018, 7, 12, 17, 30, 0).strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, None,
                           1, post_survey)
 
-    surveys_today = mgr.post_session_surveys_today([post_session_survey], "2018-07-12")
+    mgr.post_session_surveys = [post_session_survey]
+    surveys_today = mgr.post_session_surveys_today("2018-07-12")
 
     assert True is surveys_today
 
 def test_no_surveys_available_wrong_date_format():
 
     mgr = training_plan_manager()
-    surveys_today = mgr.post_session_surveys_today([], datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"))
+    mgr.post_session_surveys = []
+    surveys_today = mgr.post_session_surveys_today(datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"))
 
     assert False is surveys_today
 
@@ -62,7 +64,8 @@ def test_one_survey_available_wrong_date_format():
         PostSessionSurvey(datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, None,
                           1, post_survey)
 
-    surveys_today = mgr.post_session_surveys_today([post_session_survey], datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"))
+    mgr.post_session_surveys = [post_session_survey]
+    surveys_today = mgr.post_session_surveys_today(datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"))
 
     assert True is surveys_today
 
@@ -75,8 +78,9 @@ def test_no_session_submitted_no_session_planned():
     daily_plan.session_from_readiness = False
     daily_plan.sessions_planned_readiness = False
     surveys_today = False
+    mgr.daily_plan = daily_plan
 
-    assert mgr.show_post_recovery(surveys_today, daily_plan)
+    assert mgr.show_post_recovery(surveys_today)
 
 def test_no_session_submitted_session_planned():
     user_id = "tester"
@@ -86,8 +90,9 @@ def test_no_session_submitted_session_planned():
     daily_plan.session_from_readiness = False
     daily_plan.sessions_planned_readiness = True
     surveys_today = False
+    mgr.daily_plan = daily_plan
 
-    assert not mgr.show_post_recovery(surveys_today, daily_plan)
+    assert not mgr.show_post_recovery(surveys_today)
 
 def test_session_submitted_session_planned():
     user_id = "tester"
@@ -97,8 +102,8 @@ def test_session_submitted_session_planned():
     daily_plan.session_from_readiness = True
     daily_plan.sessions_planned_readiness = True
     surveys_today = True
-
-    assert not mgr.show_post_recovery(surveys_today, daily_plan)
+    mgr.daily_plan = daily_plan
+    assert not mgr.show_post_recovery(surveys_today)
 
 def test_session_submitted_no_session_planned():
     user_id = "tester"
@@ -108,8 +113,9 @@ def test_session_submitted_no_session_planned():
     daily_plan.session_from_readiness = True
     daily_plan.sessions_planned_readiness = False
     surveys_today = True
+    mgr.daily_plan = daily_plan
 
-    assert mgr.show_post_recovery(surveys_today, daily_plan)
+    assert mgr.show_post_recovery(surveys_today)
 
 
 def test_readiness_nosession_session_planned_post_sessionpresent():
@@ -120,8 +126,9 @@ def test_readiness_nosession_session_planned_post_sessionpresent():
     daily_plan.session_from_readiness = False
     daily_plan.sessions_planned_readiness = True
     surveys_today = True
+    mgr.daily_plan = daily_plan
 
-    assert mgr.show_post_recovery(surveys_today, daily_plan)
+    assert mgr.show_post_recovery(surveys_today)
 
 
 def test_readiness_nosession_nosession_planned_post_sessionpresent():
@@ -132,8 +139,9 @@ def test_readiness_nosession_nosession_planned_post_sessionpresent():
     daily_plan.session_from_readiness = False
     daily_plan.sessions_planned_readiness = False
     surveys_today = True
+    mgr.daily_plan = daily_plan
 
-    assert mgr.show_post_recovery(surveys_today, daily_plan)
+    assert mgr.show_post_recovery(surveys_today)
 
 '''
 def test_get_start_time_from_morning_trigger_recovery_0():

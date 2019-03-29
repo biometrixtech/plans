@@ -1,7 +1,7 @@
 import datetime
 from aws_xray_sdk.core import xray_recorder
 from config import get_mongo_collection
-from fathomapi.utils.exceptions import InvalidSchemaException
+from fathomapi.utils.exceptions import InvalidSchemaException, NoSuchEntityException
 from models.daily_plan import DailyPlan
 import models.session as session
 import models.soreness
@@ -261,7 +261,7 @@ def _daily_readiness_from_mongo(mongo_result, user_id):
     if isinstance(mongo_result, dict):
         return DailyReadiness(
                                event_date=mongo_result['event_date'],
-                               user_id=mongo_result['user_id'],
+                               user_id=user_id,
                                soreness=mongo_result['soreness'],
                                readiness=mongo_result['readiness'],
                                sleep_quality=mongo_result['sleep_quality'],
@@ -270,6 +270,9 @@ def _daily_readiness_from_mongo(mongo_result, user_id):
     elif isinstance(mongo_result, str):
         start_date = parse_date(mongo_result)
         end_date = start_date + datetime.timedelta(days=1)
-        return DailyReadinessDatastore().get(user_id, start_date=start_date, end_date=end_date)[0]
+        try:
+            return DailyReadinessDatastore().get(user_id, start_date=start_date, end_date=end_date)[0]
+        except NoSuchEntityException:
+            return None
     else:
         return None
