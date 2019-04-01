@@ -295,6 +295,8 @@ class InsightsProcessing(object):
 
         history = {}
 
+
+
         for s in session_types:
             last_min_load = None
             last_min_load_date = None
@@ -302,18 +304,29 @@ class InsightsProcessing(object):
             last_max_load_date = None
             load_capacity = None
             load_capacity_date = None
+            total_load = []
+            pos_load = []
+            neg_load = []
 
             history[s] = []
+
+
             for d in dates:
                 # get all the min values for this session for this date
                 min_vals = []
                 max_vals = []
+                added = False
+
                 #if s in self.last_14_max_no_soreness_load_tuples.keys():
                 if s in self.no_soreness_load_tuples.keys():
                     #min_vals = list(x[1] for x in self.last_14_max_no_soreness_load_tuples[s] if x[0] == d)
                     min_vals = list(x[1] for x in self.no_soreness_load_tuples[s] if x[0] == d)
                     if len(min_vals) > 0:
+                        added = True
                         max_min_vals = max(min_vals)
+                        total_load.append(sum(min_vals))
+                        pos_load.append(sum(min_vals))
+                        neg_load.append(0)
                         if last_min_load is None:
                             last_min_load = max_min_vals
                             last_min_load_date = d
@@ -332,7 +345,11 @@ class InsightsProcessing(object):
                     max_vals = list(x[1] for x in self.soreness_load_tuples[s] if x[0] == d)
 
                     if len(max_vals) > 0:
+                        added = True
                         min_max_vals = min(max_vals)
+                        total_load.append(sum(max_vals))
+                        neg_load.append(sum(max_vals))
+                        pos_load.append(0)
                         if last_max_load is None:
                             last_max_load = min_max_vals
                             last_max_load_date = d
@@ -347,7 +364,19 @@ class InsightsProcessing(object):
                             load_capacity = .90 * last_max_load
                             load_capacity_date = d
 
-                history[s].append((d, tuple(min_vals), tuple(max_vals), load_capacity))
+                if added:
+                    if len(total_load) > 0 and sum(total_load[-min(14, len(total_load)):]) > 0:
+                        if len(pos_load) > 0:
+                            history[s].append(
+                                (d, tuple(min_vals), tuple(max_vals), load_capacity, (float(sum(pos_load[-min(14, len(pos_load)):])) / float(sum(total_load[-min(14, len(total_load)):]))) * 100))
+                        else:
+                            history[s].append(
+                                (d, tuple(min_vals), tuple(max_vals), load_capacity,
+                                 (0 / float(sum(total_load[-min(14, len(total_load)):]))) * 100))
+                    else:
+                        history[s].append(
+                            (d, tuple(min_vals), tuple(max_vals), load_capacity, 0.00))
+
         i=0
 
     def populate_contingency_table(self, loading_events, columns):
