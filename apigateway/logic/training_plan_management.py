@@ -7,6 +7,7 @@ from logic.soreness_processing import SorenessCalculator
 from logic.functional_strength_mapping import FSProgramGenerator
 import models.session as session
 from models.post_session_survey import PostSessionSurvey
+from models.daily_plan import DailyPlan
 from utils import format_date, parse_datetime, parse_date
 
 
@@ -44,7 +45,8 @@ class TrainingPlanManager(object):
         daily_plans = self.daily_plan_datastore.get(self.athlete_id, format_date(parse_date(event_date) - datetime.timedelta(days=1)), event_date)
         plan_today = [plan for plan in daily_plans if plan.event_date == event_date]
         if len(plan_today) == 0:
-            raise NoSuchEntityException("Plan not found for the day")
+            self.daily_plan = DailyPlan(event_date)
+            self.daily_plan.user_id = self.athlete_id
         else:
             self.daily_plan = plan_today[0]
         self.readiness_surveys = [plan.daily_readiness_survey for plan in daily_plans if plan.daily_readiness_survey is not None]
