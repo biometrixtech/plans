@@ -58,6 +58,6 @@ if __name__ == '__main__':
     start = time.time()
     history_length = 35
     create_persona_with_two_historic_soreness(history_length)
-    # create_persona_with_eight_historic_soreness(history_length)
+    create_persona_with_eight_historic_soreness(history_length)
     print(time.time() - start)
 #    update_metrics(user_id, event_date)

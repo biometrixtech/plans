@@ -8,7 +8,6 @@ from models.session import SessionFactory, SessionType
 from models.post_session_survey import PostSurvey
 from logic.stats_processing import StatsProcessing
 from logic.training_plan_management import TrainingPlanManager
-from datastores.daily_readiness_datastore import DailyReadinessDatastore
 from datastores.daily_plan_datastore import DailyPlanDatastore
 from datastores.completed_exercise_datastore import CompletedExerciseDatastore
 from datastores.session_datastore import SessionDatastore
@@ -70,10 +69,8 @@ class Persona(object):
         self.add_session(event_date)
         store = DailyPlanDatastore()
         store.put(self.daily_plan)
-        plan_manager = TrainingPlanManager(self.user_id, DatastoreCollection())
-        self.daily_plan = plan_manager.create_daily_plan(event_date=format_date(event_date))
-        # self.add_session(event_date)
-
+        plan_manager = TrainingPlanManager(self.user_id, DatastoreCollection(), )
+        self.daily_plan = plan_manager.create_daily_plan(event_date=format_date(event_date), last_updated=format_datetime(event_date))
 
     def update_stats(self, event_date):
         athlete_stats = StatsProcessing(self.user_id, event_date=event_date, datastore_collection=DatastoreCollection()).process_athlete_stats()
