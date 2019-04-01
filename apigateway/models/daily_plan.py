@@ -46,7 +46,7 @@ class DailyPlan(Serialisable):
             del readiness['sore_body_parts']
             del readiness['user_id']
         else:
-            readiness = self.daily_readiness_survey,
+            readiness = self.daily_readiness_survey
         ret = {'user_id': self.user_id,
                'date': self.event_date,
                'day_of_week': self.day_of_week,
