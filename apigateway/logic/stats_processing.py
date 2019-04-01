@@ -16,7 +16,6 @@ class StatsProcessing(object):
     def __init__(self, athlete_id, event_date, datastore_collection):
         self.athlete_id = athlete_id
         self.event_date = event_date
-        self.post_session_survey_datastore = datastore_collection.post_session_survey_datastore
         self.athlete_stats_datastore = datastore_collection.athlete_stats_datastore
         self.daily_plan_datastore = datastore_collection.daily_plan_datastore
         self.start_date = None

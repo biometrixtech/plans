@@ -1,7 +1,6 @@
 import datetime
 
 from fathomapi.utils.xray import xray_recorder
-from fathomapi.utils.exceptions import NoSuchEntityException
 import logic.exercise_mapping as exercise_mapping
 from logic.soreness_processing import SorenessCalculator
 from logic.functional_strength_mapping import FSProgramGenerator
@@ -15,7 +14,6 @@ class TrainingPlanManager(object):
 
     def __init__(self, athlete_id, datastore_collection):
         self.athlete_id = athlete_id
-        self.post_session_survey_datastore = datastore_collection.post_session_survey_datastore
         self.daily_plan_datastore = datastore_collection.daily_plan_datastore
         self.exercise_library_datastore = datastore_collection.exercise_datastore
         self.athlete_stats_datastore = datastore_collection.athlete_stats_datastore
