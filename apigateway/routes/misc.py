@@ -211,8 +211,6 @@ def update_dates(daily_plans, athlete_stats, event_date):
     athlete_today = parse_date(athlete_stats[0].event_date)
     day_diff = (event_date - athlete_today).days
     delta = datetime.timedelta(days=day_diff)
-    # for rs_survey in rs_surveys:
-    #     rs_survey.event_date += delta
 
     for plan in daily_plans:
         plan.event_date = format_date(parse_date(plan.event_date) + delta)
@@ -222,3 +220,8 @@ def update_dates(daily_plans, athlete_stats, event_date):
                 ts.post_session_survey.event_date += delta
     for stat in athlete_stats:
         stat.event_date = format_date(event_date)
+        for hs in stat.historic_soreness:
+            if hs.streak_start_date is not None:
+                hs.streak_start_date = format_date(parse_date(hs.streak_start_date) + delta)
+            if hs.last_reported is not None:
+                hs.last_reported = format_date(parse_date(hs.last_reported) + delta)
