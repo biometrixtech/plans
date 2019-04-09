@@ -71,7 +71,7 @@ def generate_plan(user_id, survey, plan_date, file_name, plan_letter):
         post_session_store.put([survey])
 
     manager = training_plan_management.TrainingPlanManager(user_id, DatastoreCollection())
-    plan = manager.create_daily_plan(plan_date)
+    plan = manager.create_daily_plan(plan_date, plan_date+'T12:00:00Z')
 
     if plan is not None:
 

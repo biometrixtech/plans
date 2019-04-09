@@ -1,7 +1,7 @@
 from flask import request, Blueprint
 
 from fathomapi.utils.decorators import require
-from fathomapi.utils.exceptions import InvalidSchemaException, NoSuchEntityException
+from fathomapi.utils.exceptions import NoSuchEntityException
 from fathomapi.utils.xray import xray_recorder
 from datastores.datastore_collection import DatastoreCollection
 from datastores.daily_plan_datastore import DailyPlanDatastore

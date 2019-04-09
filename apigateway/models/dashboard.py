@@ -12,14 +12,13 @@ class TeamDashboardData(Serialisable):
         self.weekly_insights = WeeklySummary()
         self.athletes = []
 
-
     def json_serialise(self):
         ret = {'name': self.name,
                'compliance': self.compliance,
                'daily_insights': self.daily_insights.json_serialise(),
                'weekly_insights': self.weekly_insights.json_serialise(),
                'athletes': [a.json_serialise() for a in self.athletes]
-                }
+               }
         return ret
 
     def get_compliance_data(self, user_ids, users, daily_plan_list):
@@ -87,8 +86,9 @@ class TrainingCompliance(Serialisable):
         ret = {"no_response": self.no_response,
                "rest_day": self.rest_day,
                "sessions_logged": self.sessions_logged
-              }
+               }
         return ret
+
 
 class DailySummary(Serialisable):
     def __init__(self):
@@ -104,7 +104,6 @@ class DailySummary(Serialisable):
         self.monitor_in_training = []
         self.not_cleared_for_training = []
 
-
     def json_serialise(self):
         ret = {'all_good': [a.json_serialise() for a in self.all_good],
                'recovery_day_recommended': [a.json_serialise() for a in self.recovery_day_recommended],
@@ -117,8 +116,9 @@ class DailySummary(Serialisable):
                'limit_time_intensity_of_training': [a.json_serialise() for a in self.adapt_training_to_avoid_symptoms],
                'monitor_in_training': [a.json_serialise() for a in self.monitor_modify_if_needed],
                'not_cleared_for_training': [a.json_serialise() for a in self.seek_med_eval_to_clear_for_training]
-                }
+               }
         return ret
+
 
 class WeeklySummary(Serialisable):
     def __init__(self):
@@ -136,7 +136,6 @@ class WeeklySummary(Serialisable):
         self.address_pain_or_soreness = []
         self.evaluate_health_status = []
 
-
     def json_serialise(self):
         ret = {'all_good': [a.json_serialise() for a in self.all_good],
                'seek_med_eval_to_clear_for_training': [a.json_serialise() for a in self.seek_med_eval_to_clear_for_training],
@@ -151,8 +150,9 @@ class WeeklySummary(Serialisable):
                'increase_weekly_workload': [a.json_serialise() for a in self.at_risk_of_undertraining],
                'address_pain_or_soreness': [a.json_serialise() for a in self.at_risk_of_time_loss_injury],
                'evaluate_health_status': [a.json_serialise() for a in self.seek_med_eval_to_clear_for_training]
-              }
+               }
         return ret
+
 
 class AthleteDashboardSummary(Serialisable):
     def __init__(self, user_id, first_name, last_name):
@@ -170,7 +170,7 @@ class AthleteDashboardSummary(Serialisable):
                'cleared_to_train': self.cleared_to_train,
                'color': self.color.value,
                'insufficient_data': self.insufficient_data
-              }
+               }
         return ret
 
 
@@ -182,8 +182,10 @@ class AthleteDashboardData(Serialisable):
         self.last_name = last_name
         self.cleared_to_train = True
         self.color = MetricColor(0)
-        self.daily_recommendation = set()
-        self.weekly_recommendation = set()
+        self.daily_recs = set()
+        self.daily_recommendation = []
+        self.weekly_recs = set()
+        self.weekly_recommendation = []
         self.insights = []
         self.daily_insights_text = []
         self.weekly_insights_text = []
@@ -198,8 +200,8 @@ class AthleteDashboardData(Serialisable):
         self.remove_acwr_increasing_decreasing_conflict(metrics)
         if len(metrics) == 0:
             self.daily_recommendation = ['Survey responses indicate ready to train as normal if no other medical limitations']
-            self.insights =["No signs of overtraining or injury risk"]
-            self.daily_insights_text =["No signs of overtraining or injury risk"]
+            self.insights = ["No signs of overtraining or injury risk"]
+            self.daily_insights_text = ["No signs of overtraining or injury risk"]
             self.insufficient_data = self.insufficient_data_tv
         else:
             not_cleared_recs_day = []
@@ -211,19 +213,19 @@ class AthleteDashboardData(Serialisable):
                 # pain_soreness = 1 if metric.specific_insight_recovery != "" else 0
                 daily_recs = [(m.text, metric.insufficient_data_for_thresholds, m.code[0]) for m in metric.specific_actions if m.display and m.code[0] in ["2", "5", "6", "7"]]
                 weekly_recs = [(m.text, metric.insufficient_data_for_thresholds, m.code[0]) for m in metric.specific_actions if m.display and m.code[0] in ["1", "3"]]
-                if metric.color == MetricColor.red: # not cleared to train
+                if metric.color == MetricColor.red:  # not cleared to train
                     not_cleared_recs_day.extend(daily_recs)
                     not_cleared_recs_week.extend(weekly_recs)
                 elif metric.color != MetricColor.red and self.cleared_to_train:
-                    self.daily_recommendation.update(daily_recs)
-                    self.weekly_recommendation.update(weekly_recs)
-                else: # not cleared to train but current metric is yellow
+                    self.daily_recs.update(daily_recs)
+                    self.weekly_recs.update(weekly_recs)
+                else:  # not cleared to train but current metric is yellow
                     pass
 
             # if not cleared to train, removed recs from other insights
             if not self.cleared_to_train:
-                self.daily_recommendation = set(not_cleared_recs_day)
-                self.weekly_recommendation = set(not_cleared_recs_week)
+                self.daily_recs = set(not_cleared_recs_day)
+                self.weekly_recs = set(not_cleared_recs_week)
             elif self.color == MetricColor.yellow and len(self.daily_insights) == 0:
                 if "pain" in " ".join(self.weekly_metrics).lower():
                     self.daily_insights.add(DailyHighLevelInsight.adapt_training_to_avoid_symptoms)
@@ -258,15 +260,16 @@ class AthleteDashboardData(Serialisable):
                 self.weekly_insights.add(metric.high_level_insight)
                 self.weekly_metrics.append(metric.name)
 
-
     def cleanup_recs(self, rec_type='daily'):
 
         if rec_type == 'daily':
-            all_recs = [Recommendation(rec[0], rec[1], rec[2])for rec in self.daily_recommendation]
-            order = {"5":0, "6":1, "2":2, "7":3}
+            all_recs = [Recommendation(rec[0], rec[1], rec[2])for rec in self.daily_recs]
+            order = {"5": 0, "6": 1, "2": 2, "7": 3}
         elif rec_type == 'weekly':
-            all_recs = [Recommendation(rec[0], rec[1], rec[2]) for rec in self.weekly_recommendation]
-            order = {"3":0, "1":1}
+            all_recs = [Recommendation(rec[0], rec[1], rec[2]) for rec in self.weekly_recs]
+            order = {"3": 0, "1": 1}
+        else:
+            all_recs = []
 
         recs = {}
         for rec in all_recs:
@@ -279,19 +282,17 @@ class AthleteDashboardData(Serialisable):
         for rec in recs.values():
             rec.is_insufficient_data()
             cleaned_recs.append(rec)
-        sorted_recs = sorted(cleaned_recs, key=lambda x:order[x.code])
+        sorted_recs = sorted(cleaned_recs, key=lambda x: order[x.code])
         sorted_recs = [rec.text for rec in sorted_recs]
 
         return sorted_recs
-
 
     def remove_tv_metrics_out_of_range(self, metrics):
         metrics_to_remove = set()
         for metric in metrics:
             if ((metric.name in ["Increasing IACWR",
                                  "Decreasing IACWR",
-                                 "Increasing Internal Ramp"]) and
-                metric.range_wider_than_thresholds):
+                                 "Increasing Internal Ramp"]) and metric.range_wider_than_thresholds):
                 metrics_to_remove.add(metric)
         if len(metrics_to_remove) > 0:
             metrics = set(metrics)
@@ -320,8 +321,9 @@ class AthleteDashboardData(Serialisable):
                'daily_insights': self.daily_insights_text,
                'weekly_insights': self.weekly_insights_text,
                'insufficient_data': self.insufficient_data
-              }
+               }
         return ret
+
 
 class Recommendation(object):
     def __init__(self, text, insufficient_data, code):
@@ -337,4 +339,3 @@ class Recommendation(object):
     def is_insufficient_data(self):
         if self.insufficient_data:
             self.text = "".join(["*", self.text])
-

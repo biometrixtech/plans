@@ -3,7 +3,8 @@ from serialisable import Serialisable
 from models.soreness import Soreness, BodyPartLocation, BodyPart
 from models.session import SessionType
 import datetime
-from utils import parse_datetime, format_datetime
+from utils import parse_datetime, format_datetime, parse_date
+
 
 class PostSessionSurvey(Serialisable):
     
@@ -21,7 +22,6 @@ class PostSessionSurvey(Serialisable):
         self.session_type = SessionType(session_type)
         self.survey = PostSurvey(survey, event_date_time)
 
-
     def get_id(self):
         return self.user_id
 
@@ -37,6 +37,18 @@ class PostSessionSurvey(Serialisable):
             'survey': self.survey.json_serialise()
         }
         return ret
+
+    @classmethod
+    def post_session_survey_from_training_session(cls, survey, user_id, session_id, session_type, event_date):
+        if survey is not None:
+            if survey.event_date is not None:
+                post_session_survey = cls(format_datetime(survey.event_date), user_id, session_id, session_type)
+            else:
+                post_session_survey = cls(format_datetime(parse_date(event_date)), user_id, session_id, session_type)
+            post_session_survey.survey = survey
+            return post_session_survey
+        else:
+            return None
 
 
 class PostSurvey(Serialisable):
@@ -57,18 +69,13 @@ class PostSurvey(Serialisable):
         }
         return ret
 
-    def _soreness_from_dict(self, soreness_dict, event_date):
+    @staticmethod
+    def _soreness_from_dict(soreness_dict, event_date):
         soreness = Soreness()
         soreness.body_part = BodyPart(BodyPartLocation(soreness_dict['body_part']), None)
         soreness.pain = soreness_dict.get('pain', False)
         soreness.severity = soreness_dict['severity']
         soreness.movement = soreness_dict.get('movement', None)
-        soreness.side = self._key_present('side', soreness_dict)
+        soreness.side = soreness_dict.get('side', None)
         soreness.reported_date_time = parse_datetime(event_date)
         return soreness
-
-    def _key_present(self, key_name, dictionary):
-        if key_name in dictionary:
-            return dictionary[key_name]
-        else:
-            return None

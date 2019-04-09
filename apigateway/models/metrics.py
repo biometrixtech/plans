@@ -13,13 +13,9 @@ class AthleteMetric(Serialisable):
         self.high_level_action_description = ""
         self.specific_insight_training_volume = ""
         self.specific_insight_recovery = ""
-        #self.body_part_location = None
-        #self.body_part_side = 0
-
         self.specific_actions = []
         self.insufficient_data_for_thresholds = False
         self.range_wider_than_thresholds = False
-
 
     def json_serialise(self):
         ret = {
@@ -32,11 +28,8 @@ class AthleteMetric(Serialisable):
                'specific_insight_recovery': self.specific_insight_recovery,
                'insufficient_data_for_thresholds': self.insufficient_data_for_thresholds,
                'range_wider_than_thresholds': self.range_wider_than_thresholds,
-               # 'body_part_location': self.body_part_location,
-               # 'body_part_side': self.body_part_side,
-               # 'soreness': [s.json_serialise() for s in self.soreness],
                'specific_actions': [s.json_serialise() for s in self.specific_actions]
-              }
+        }
         return ret
 
 
@@ -98,9 +91,9 @@ class AthleteTrainingVolumeMetricGenerator(object):
                      attribute_list[a].observed_value is not None and attribute_list[a].observed_value < lowest_threshold_value or
                      attribute_list[a].upper_bound is not None and attribute_list[a].upper_bound < lowest_threshold_value)):
                     is_lower = True
-                if((attribute_list[a].lower_bound is not None and attribute_list[a].lower_bound > highest_threshold_value or
-                         attribute_list[a].observed_value is not None and attribute_list[a].observed_value > highest_threshold_value or
-                         attribute_list[a].upper_bound is not None and attribute_list[a].upper_bound > highest_threshold_value)):
+                if ((attribute_list[a].lower_bound is not None and attribute_list[a].lower_bound > highest_threshold_value or
+                     attribute_list[a].observed_value is not None and attribute_list[a].observed_value > highest_threshold_value or
+                     attribute_list[a].upper_bound is not None and attribute_list[a].upper_bound > highest_threshold_value)):
                     is_higher = True
                 if is_lower and is_higher:
                     self.range_wider_than_thresholds = True
@@ -209,7 +202,7 @@ class AthleteSorenessMetricGenerator(object):
                 metric = AthleteMetric(self.name, self.metric_type)
                 metric.high_level_action_description = self.thresholds[key].high_level_action_description
                 metric.specific_insight_recovery = TextGenerator().get_body_part_text(self.thresholds[key].specific_insight_recovery,
-                                                                                    self.thresholds[key].soreness_list)
+                                                                                      self.thresholds[key].soreness_list)
                 metric.high_level_insight = self.thresholds[key].high_level_insight
                 metric.specific_actions = [TextGenerator().get_specific_action(rec=rec, soreness=self.thresholds[key].soreness_list) for rec in self.thresholds[key].specific_actions]
                 metric.color = self.thresholds[key].color
@@ -246,12 +239,6 @@ class DailyHighLevelInsight(Enum):
     seek_med_eval_to_clear_for_training = 4
     recovery_day_recommended = 5
 
-    # all_good = 0
-    # seek_med_eval_to_clear_for_training = 1
-    # monitor_modify_if_needed = 2
-    # adapt_training_to_avoid_symptoms = 3
-    # recovery_day_recommended = 4
-
 
 class WeeklyHighLevelInsight(Enum):
     all_good = 0
@@ -260,13 +247,6 @@ class WeeklyHighLevelInsight(Enum):
     at_risk_of_undertraining = 3
     at_risk_of_time_loss_injury = 4
     seek_med_eval_to_clear_for_training = 5
-
-    # all_good = 0
-    # seek_med_eval_to_clear_for_training = 1
-    # at_risk_of_overtraining = 2
-    # low_variability_inhibiting_recovery = 3
-    # at_risk_of_undertraining = 4
-    # at_risk_of_time_loss_injury = 5
 
 
 class MetricColor(IntEnum):
@@ -303,18 +283,18 @@ class TextGenerator(object):
         else:
             return SpecificAction(rec, self.get_body_part_text(text, soreness), True)
 
-    def get_body_part_text(self, text, soreness_list=[], pain_type=None):
+    def get_body_part_text(self, text, soreness_list):
 
         body_part_list = []
 
         is_historic = False
+        is_pain = False
 
         try:
             soreness_list.sort(key=lambda x: x.body_part.location.value, reverse=False)
-        except:
+        except AttributeError:
             soreness_list.sort(key=lambda x: x.body_part_location.value, reverse=False)
             is_historic = True
-
         for soreness in soreness_list:
             if is_historic:
                 part = BodyPartLocationText(soreness.body_part_location).value()
@@ -359,7 +339,8 @@ class TextGenerator(object):
         else:
             return text
 
-    def merge_bilaterals(self, body_part_list):
+    @staticmethod
+    def merge_bilaterals(body_part_list):
 
         last_part = ""
 
@@ -374,6 +355,7 @@ class TextGenerator(object):
         new_body_part_list = [x for x in body_part_list if x != ""]
 
         return new_body_part_list
+
 
 class RecommendationText(object):
     def __init__(self, rec):
@@ -401,4 +383,3 @@ class RecommendationText(object):
                 }
 
         return recs[self.rec]
-

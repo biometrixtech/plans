@@ -1,4 +1,4 @@
-from models.soreness import BodyPart, BodyPartLocation, HistoricSoreness, Soreness, SorenessType
+from models.soreness import BodyPart, BodyPartLocation, Soreness, SorenessType
 
 
 class SorenessCalculator(object):
@@ -11,8 +11,8 @@ class SorenessCalculator(object):
         """
         :param historic_soreness:
         :param readiness_surveys: DailyReadiness
-        :param post_session_survey:
         :param trigger_date_time: datetime
+        :param post_session_surveys: PostSurveys
         :return:
         """
 
@@ -28,7 +28,8 @@ class SorenessCalculator(object):
         soreness_list = self.merge_current_historic_soreness(soreness_list, historic_soreness)
         return soreness_list
 
-    def get_severity(self, severity, movement):
+    @classmethod
+    def get_severity(cls, severity, movement):
 
         if severity is None:
             return None
@@ -60,7 +61,7 @@ class SorenessCalculator(object):
         for s in soreness_from_survey:
             updated = False
             for r in soreness_list:
-                if (r.body_part.location.value == s.body_part.location.value and r.side == s.side and r.pain == s.pain):
+                if r.body_part.location.value == s.body_part.location.value and r.side == s.side and r.pain == s.pain:
                     r.severity = max([self.get_severity(r.severity, r.movement), self.get_severity(s.severity, s.movement)])
                     updated = True
             if not updated:
@@ -68,7 +69,8 @@ class SorenessCalculator(object):
                 soreness_list.append(s)
         return soreness_list
 
-    def merge_current_historic_soreness(self, soreness_list, historic_soreness):
+    @staticmethod
+    def merge_current_historic_soreness(soreness_list, historic_soreness):
 
         for h in range(0, len(historic_soreness)):
             historic_soreness_found = False
@@ -92,8 +94,8 @@ class SorenessCalculator(object):
 
 
 class BodyPartMapping(object):
-
-    def get_soreness_type(self, body_part_location):
+    @staticmethod
+    def get_soreness_type(body_part_location):
 
         if (body_part_location == BodyPartLocation.hip_flexor or body_part_location == BodyPartLocation.knee
                 or body_part_location == BodyPartLocation.ankle or body_part_location == BodyPartLocation.foot

@@ -12,7 +12,7 @@ from datastores.daily_readiness_datastore import DailyReadinessDatastore
 from datastores.daily_plan_datastore import DailyPlanDatastore
 from datastores.athlete_stats_datastore import AthleteStatsDatastore
 from datastores.completed_exercise_datastore import CompletedExerciseDatastore
-from utils import format_date, parse_datetime, parse_date, format_datetime
+from utils import format_date, parse_datetime, parse_date
 
 from models.app_logs import AppLogs
 
@@ -191,28 +191,28 @@ def handle_test_data_copy(principal_id=None):
     athlete_stats_datastore.delete(athlete_id=user_id)
 
     # get data from test collections
-    readiness_surveys = rs_datastore_test.get(user_id, last_only=False)
-    if len(readiness_surveys) == 0:
-        raise ForbiddenException("No data present to copy")
+    # readiness_surveys = rs_datastore_test.get(user_id, last_only=False)
+    # if len(readiness_surveys) == 0:
+    #     raise ForbiddenException("No data present to copy")
     daily_plans = daily_plan_datastore_test.get(user_id)
 
     # update to current date
-    update_dates(readiness_surveys, daily_plans, athlete_stats, event_date)
+    update_dates(daily_plans, athlete_stats, event_date)
 
     # write the updated data
-    rs_datastore.put(readiness_surveys)
+    # rs_datastore.put(readiness_surveys)
     daily_plan_datastore.put(daily_plans)
     athlete_stats_datastore.put(athlete_stats)
 
     return {'message': 'success'}, 202
 
 
-def update_dates(rs_surveys, daily_plans, athlete_stats, event_date):
+def update_dates(daily_plans, athlete_stats, event_date):
     athlete_today = parse_date(athlete_stats[0].event_date)
     day_diff = (event_date - athlete_today).days
     delta = datetime.timedelta(days=day_diff)
-    for rs_survey in rs_surveys:
-        rs_survey.event_date += delta
+    # for rs_survey in rs_surveys:
+    #     rs_survey.event_date += delta
 
     for plan in daily_plans:
         plan.event_date = format_date(parse_date(plan.event_date) + delta)
@@ -220,5 +220,12 @@ def update_dates(rs_surveys, daily_plans, athlete_stats, event_date):
             ts.event_date += delta
             if ts.post_session_survey is not None:
                 ts.post_session_survey.event_date += delta
+        if plan.daily_readiness_survey is not None:
+            plan.daily_readiness_survey.event_date += delta
     for stat in athlete_stats:
         stat.event_date = format_date(event_date)
+        for hs in stat.historic_soreness:
+            if hs.streak_start_date is not None:
+                hs.streak_start_date = format_date(parse_date(hs.streak_start_date) + delta)
+            if hs.last_reported is not None:
+                hs.last_reported = format_date(parse_date(hs.last_reported) + delta)
