@@ -33,15 +33,15 @@ class SurveyProcessing(object):
         if end_date is not None:
             end_date = parse_datetime(end_date)
         session_type = session['session_type']
-        try:
-            sport_name = session['sport_name']
+        sport_name = session.get('sport_name', None)
+        if SportName.has_value(sport_name):
             sport_name = SportName(sport_name)
-        except:
+        else:
             sport_name = SportName(None)
-        try:
-            strength_and_conditioning_type = session['strength_and_conditioning_type']
+        strength_and_conditioning_type = session.get('strength_and_conditioning_type', None)
+        if StrengthConditioningType.has_value(strength_and_conditioning_type):
             strength_and_conditioning_type = StrengthConditioningType(strength_and_conditioning_type)
-        except:
+        else:
             strength_and_conditioning_type = StrengthConditioningType(None)
         duration = session.get("duration", None)
         description = session.get('description', "")
@@ -151,7 +151,7 @@ class SurveyProcessing(object):
                                                                                                        side=side,
                                                                                                        is_pain=pain,
                                                                                                        question_response_date=plan_event_date,
-                                                                                                       severity_value=SorenessCalculator().get_severity(severity, movement))
+                                                                                                       severity_value=SorenessCalculator.get_severity(severity, movement))
             else:
                 self.athlete_stats.historic_soreness = self.stats_processor.answer_persistent_2_question(self.athlete_stats.historic_soreness,
                                                                                                          soreness_list_25,
@@ -159,7 +159,7 @@ class SurveyProcessing(object):
                                                                                                          side=side,
                                                                                                          is_pain=pain,
                                                                                                          question_response_date=plan_event_date,
-                                                                                                         severity_value=SorenessCalculator().get_severity(severity, movement),
+                                                                                                         severity_value=SorenessCalculator.get_severity(severity, movement),
                                                                                                          current_status=HistoricSorenessStatus[status])
 
     @xray_recorder.capture('logic.survey_processing.historic_workout_data')

@@ -1,6 +1,6 @@
-# import numpy as np
 import random
 from models.exercise import ExerciseBuckets
+
 
 class ExerciseAssignments(object):
 
@@ -34,7 +34,8 @@ class ExerciseAssignments(object):
     def duration_minutes(self):
         return self.inhibit_minutes + self.lengthen_minutes + self.activate_minutes + self.integrate_minutes
 
-    def sort_reverse_priority(self, assigned_exercise_list):
+    @staticmethod
+    def sort_reverse_priority(assigned_exercise_list):
         # rank all exercise by reverse priority, assumes all body parts have same level of severity
         sorted_list = []
         severity_5_list = [a for a in assigned_exercise_list if 4 < a.body_part_soreness_level]
@@ -67,7 +68,8 @@ class ExerciseAssignments(object):
 
         return sorted_list
 
-    def sort_priority(self, assigned_exercise_list):
+    @staticmethod
+    def sort_priority(assigned_exercise_list):
         # rank all exercise by priority, assumes all body parts have same level of severity
         sorted_list = sorted(assigned_exercise_list,
                              key=lambda x: (x.body_part_exercise_priority, x.body_part_priority),
@@ -75,7 +77,8 @@ class ExerciseAssignments(object):
 
         return sorted_list
 
-    def get_reduced_rep_value(self, current_reps_assigned):
+    @staticmethod
+    def get_reduced_rep_value(current_reps_assigned):
 
         if current_reps_assigned == 15:
             return 3
@@ -126,7 +129,8 @@ class ExerciseAssignments(object):
 
         return assigned_exercise_list, iterations
 
-    def remove_duplicate_assigned_exercises(self, assigned_exercise_list):
+    @staticmethod
+    def remove_duplicate_assigned_exercises(assigned_exercise_list):
 
         unified_list = []
 
@@ -158,11 +162,11 @@ class ExerciseAssignments(object):
 
         return exercise_id
 
-    def pick_element_from_group(self, group):
+    @staticmethod
+    def pick_element_from_group(group):
 
         position = random.randint(0, len(group) - 1)
         return group[position]
-
 
     def randomize_exercise_selection(self, assigned_exercise_list, exercise_list):
 
@@ -280,5 +284,3 @@ class ExerciseAssignments(object):
         else:
             return exercise_priority.avoid
     '''
-
-

@@ -1,4 +1,4 @@
-from models.training_volume import FitFatigueStatus, StandardErrorRange
+from models.training_volume import FitFatigueStatus
 from serialisable import Serialisable
 from models.sport import SportName, BaseballPosition, BasketballPosition, FootballPosition, LacrossePosition, SoccerPosition, SoftballPosition, FieldHockeyPosition, TrackAndFieldPosition, VolleyballPosition
 from models.session import StrengthConditioningType
@@ -75,13 +75,13 @@ class AthleteStats(Serialisable):
 
     def update_historic_soreness(self, soreness, event_date):
 
-        soreness_calc = SorenessCalculator()
+        soreness_calc = SorenessCalculator
 
         for h in self.historic_soreness:
             if (h.body_part_location == soreness.body_part.location and
                     h.side == soreness.side and h.is_pain == soreness.pain):
                 # was historic_soreness already updated today?
-                if format_date(event_date) != h.last_reported: #not updated
+                if format_date(event_date) != h.last_reported:  # not updated
                     if h.is_pain:
                         if h.historic_soreness_status == HistoricSorenessStatus.almost_persistent_pain:
                             h.historic_soreness_status = HistoricSorenessStatus.persistent_pain
@@ -100,7 +100,6 @@ class AthleteStats(Serialisable):
                     # weighted average
                     h.average_severity = round(h.average_severity * float(h.streak) / (float(h.streak) + 1) +
                                                soreness_calc.get_severity(soreness.severity, soreness.movement) * float(1) / (float(h.streak) + 1), 2)
-                    
 
                     h.streak = h.streak + 1
                     break
@@ -173,13 +172,13 @@ class AthleteStats(Serialisable):
         else:
             return True
 
-    #def acute_to_chronic_external_ratio(self):
+    # def acute_to_chronic_external_ratio(self):
     #    if self.acute_external_total_load is not None and self.chronic_external_total_load is not None:
     #        return self.acute_external_total_load / self.chronic_external_total_load
     #    else:
     #        return None
-
-    #def acute_to_chronic_internal_ratio(self):
+    #
+    # def acute_to_chronic_internal_ratio(self):
     #    if self.acute_internal_total_load is not None and self.chronic_internal_total_load is not None:
     #        return self.acute_internal_total_load / self.chronic_internal_total_load
     #    else:
@@ -252,8 +251,9 @@ class AthleteStats(Serialisable):
 
         return q2, q3, tipping_status
 
-    def _add_body_part(self, new_part, full_list, unique_list):
-        ## add body part to the list if it doesn't already exist. update to pain if new is pain and existing is soreness
+    @staticmethod
+    def _add_body_part(new_part, full_list, unique_list):
+        # add body part to the list if it doesn't already exist. update to pain if new is pain and existing is soreness
         if {new_part["body_part"]: new_part["side"]} in unique_list:
             for part in full_list:
                 if part['body_part'] == new_part['body_part'] and part['side'] == new_part['side']:
@@ -264,7 +264,6 @@ class AthleteStats(Serialisable):
         else:
             unique_list.append({new_part["body_part"]: new_part["side"]})
             full_list.append(new_part)
-
 
     def __setattr__(self, name, value):
         if name == "current_sport_name":

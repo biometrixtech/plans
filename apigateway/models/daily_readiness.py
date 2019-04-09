@@ -45,12 +45,6 @@ class DailyReadiness(Serialisable):
         soreness.pain = soreness_dict.get('pain', False)
         soreness.severity = soreness_dict['severity']
         soreness.movement = soreness_dict.get('movement', None)
-        soreness.side = self._key_present('side', soreness_dict)
+        soreness.side = soreness_dict.get('side', None)
         soreness.reported_date_time = self.event_date
         return soreness
-
-    def _key_present(self, key_name, dictionary):
-        if key_name in dictionary:
-            return dictionary[key_name]
-        else:
-            return None

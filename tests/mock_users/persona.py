@@ -1,13 +1,14 @@
 # import datetime
 from config import get_mongo_collection
 import datetime
+from models.daily_plan import DailyPlan
 from models.daily_readiness import DailyReadiness
 from models.soreness import CompletedExercise
 from models.session import SessionFactory, SessionType
 from models.post_session_survey import PostSurvey
 from logic.stats_processing import StatsProcessing
 from logic.training_plan_management import TrainingPlanManager
-from datastores.daily_readiness_datastore import DailyReadinessDatastore
+from datastores.daily_plan_datastore import DailyPlanDatastore
 from datastores.completed_exercise_datastore import CompletedExerciseDatastore
 from datastores.session_datastore import SessionDatastore
 from datastores.datastore_collection import DatastoreCollection
@@ -20,6 +21,7 @@ class Persona(object):
         self.soreness_history = None
         self.session_history = None
         self.daily_plan = None
+        self.daily_readiness = None
 
     def create_history(self, days):
         self.clear_user()
@@ -60,25 +62,30 @@ class Persona(object):
         stats.delete_one({"athlete_id": self.user_id})
 
     def create_plan(self, event_date):
-        plan_manager = TrainingPlanManager(self.user_id, DatastoreCollection())
-        self.daily_plan = plan_manager.create_daily_plan(event_date=format_date(event_date))
+        self.daily_plan = DailyPlan(format_date(event_date))
+        self.daily_plan.user_id = self.user_id
+        self.daily_plan.daily_readiness_survey = self.daily_readiness
+        self.daily_plan.session_from_readiness = True
         self.add_session(event_date)
-
+        store = DailyPlanDatastore()
+        store.put(self.daily_plan)
+        plan_manager = TrainingPlanManager(self.user_id, DatastoreCollection(), )
+        self.daily_plan = plan_manager.create_daily_plan(event_date=format_date(event_date), last_updated=format_datetime(event_date))
 
     def update_stats(self, event_date):
         athlete_stats = StatsProcessing(self.user_id, event_date=event_date, datastore_collection=DatastoreCollection()).process_athlete_stats()
         DatastoreCollection().athlete_stats_datastore.put(athlete_stats)
 
     def create_readiness(self, data):
-        daily_readiness = DailyReadiness(
-                                        user_id=self.user_id,
-                                        event_date=data['date_time'],
-                                        soreness=data['soreness'],  # dailysoreness object array
-                                        sleep_quality=None,
-                                        readiness=None
-                                    )
-        store = DailyReadinessDatastore()
-        store.put(daily_readiness)
+        self.daily_readiness = DailyReadiness(
+                                            user_id=self.user_id,
+                                            event_date=data['date_time'],
+                                            soreness=data['soreness'],  # dailysoreness object array
+                                            sleep_quality=None,
+                                            readiness=None
+                                        )
+        # store = DailyReadinessDatastore()
+        # store.put(daily_readiness)
 
     def complete_exercises(self, exercise_list, event_date):
         exercise_store = CompletedExerciseDatastore()

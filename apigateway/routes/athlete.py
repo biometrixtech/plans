@@ -2,7 +2,6 @@ from fathomapi.api.config import Config
 from fathomapi.comms.service import Service
 from fathomapi.utils.decorators import require
 from fathomapi.utils.xray import xray_recorder
-from fathomapi.utils.exceptions import NoSuchEntityException
 from flask import Blueprint, request
 from datastores.datastore_collection import DatastoreCollection
 from logic.training_plan_management import TrainingPlanManager
@@ -261,13 +260,12 @@ def _get_plan(user_id, event_date):
 
 
 def _is_athlete_active(athlete_id):
-    try:
-        daily_readiness = DatastoreCollection().daily_readiness_datastore.get(user_id=athlete_id, last_only=True)[0]
-        if format_date(daily_readiness.event_date) >= format_date(datetime.datetime.now() - datetime.timedelta(days=14)):
-            return True
-        else:
-            return False
-    except NoSuchEntityException:
+    today = datetime.datetime.now()
+    fourteen_days = today - datetime.timedelta(days=14)
+    daily_plans = DatastoreCollection().daily_plan_datastore.get(user_id=athlete_id, start_date=format_date(fourteen_days), end_date=format_date(today))
+    if any([plan.daily_readiness_survey_completed() for plan in daily_plans]):
+        return True
+    else:
         return False
 
 
