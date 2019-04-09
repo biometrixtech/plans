@@ -14,6 +14,8 @@ class InsightsProcessing(object):
         self.no_soreness_load_tuples = {}
         self.no_soreness_rpe_tuples = {}
         self.soreness_load_tuples = {}
+        self.mod_soreness_load_tuples = {}
+        self.sev_soreness_load_tuples = {}
         self.soreness_rpe_tuples = {}
         self.last_14_max_no_soreness_load_tuples = {}
         self.last_14_max_no_soreness_rpe_tuples = {}
@@ -87,13 +89,13 @@ class InsightsProcessing(object):
             window_events = list(d for d in loading_events if d.loading_date >= loading_events[t].loading_date and d.loading_date <= test_date)
             if len(window_events) > 0:
                 window_events.sort(key=lambda x: x.RPE, reverse=True)
-                window_events[0].highest_rpe_in_72_hrs = True
+                window_events[0].highest_rpe_in_36_hrs = True
                 #for w in range(1, len(window_events)):
-                #    window_events[w].highest_rpe_in_72_hrs = False
+                #    window_events[w].highest_rpe_in_36_hrs = False
 
         for t in range(0, len(loading_events) - 1):
 
-            if loading_events[t].loading_date <= load_end_date and loading_events[t].highest_rpe_in_72_hrs:
+            if loading_events[t].loading_date <= load_end_date and loading_events[t].highest_rpe_in_36_hrs:
                 #loading_event = LoadingEvent(self.rpe_load_tuples[t][0], self.rpe_load_tuples[t][1], self.rpe_load_tuples[t][2], self.rpe_load_tuples[t][3])
                 loading_event = loading_events[t]
                 first_load_date = loading_events[0].loading_date
@@ -128,7 +130,7 @@ class InsightsProcessing(object):
                 #                       s[0] < self.rpe_load_tuples[t + 1][0])
                 next_highest_rpe_date = loading_events[t].loading_date + timedelta(hours=36)
                 candidates = list(r for r in loading_events if r.loading_date > loading_events[t].loading_date
-                                  and r.loading_date <= next_highest_rpe_date and r.RPE > loading_events[t].RPE and r.highest_rpe_in_72_hrs)
+                                  and r.loading_date <= next_highest_rpe_date and r.RPE > loading_events[t].RPE and r.highest_rpe_in_36_hrs)
                 candidates.sort(key=lambda x: x.loading_date)
                 if len(candidates) > 0:
                     next_highest_rpe_date = candidates[0].loading_date
@@ -186,6 +188,11 @@ class InsightsProcessing(object):
                                         f.previous_affected_body_parts.append(previous_affected_part)
                             elif a.days_sore > 0:
                                 a.cleared = True
+                # close out any soreness not cleared
+                for a in affected_body_parts:
+                    if not a.cleared:
+                        a.cleared = True
+
                 # need to pick the oldest date for each body part
                 grouped_parts = []
                 grouper = attrgetter('body_part', 'side')
@@ -198,7 +205,10 @@ class InsightsProcessing(object):
                 #loading_events.append(loading_event)
 
         for loading_event in loading_events:
-            level_one_soreness = list(a for a in loading_event.affected_body_parts if a.max_severity <= 1 and a.cleared and a.days_sore <= 1)
+            #level_one_soreness = list(a for a in loading_event.affected_body_parts if a.max_severity <= 1 and a.cleared and a.days_sore <= 1)
+            #TODO clean up defitions of soreness
+            level_one_soreness = list(
+                a for a in loading_event.affected_body_parts if a.cleared and a.days_sore <= 1)
 
             if len(loading_event.affected_body_parts) == len(level_one_soreness): # no soreness
                 if loading_event.sport_name not in self.no_soreness_load_tuples:
@@ -230,8 +240,23 @@ class InsightsProcessing(object):
                     self.soreness_rpe_tuples[loading_event.sport_name] = []
                     self.last_14_max_soreness_load_tuples[loading_event.sport_name] = []
                     self.last_14_max_soreness_rpe_tuples[loading_event.sport_name] = []
+                if loading_event.sport_name not in self.mod_soreness_load_tuples:
+                    self.mod_soreness_load_tuples[loading_event.sport_name] = []
+                if loading_event.sport_name not in self.sev_soreness_load_tuples:
+                    self.sev_soreness_load_tuples[loading_event.sport_name] = []
+
                 self.soreness_load_tuples[loading_event.sport_name].append((loading_event.loading_date, loading_event.load))
                 self.soreness_rpe_tuples[loading_event.sport_name].append((loading_event.loading_date, loading_event.RPE))
+                mod_soreness_list = list(a for a in loading_event.affected_body_parts if a.cleared and (0 < a.max_severity <= 3 and
+                                                     a.days_sore > 1))
+                if len(mod_soreness_list) > 0:
+                    self.mod_soreness_load_tuples[loading_event.sport_name].append((loading_event.loading_date, loading_event.load))
+
+                sev_soreness_list = list(a for a in loading_event.affected_body_parts if a.cleared and (3 < a.max_severity and
+                                                     a.days_sore > 1))
+
+                if len(sev_soreness_list) > 0:
+                    self.sev_soreness_load_tuples[loading_event.sport_name].append((loading_event.loading_date, loading_event.load))
 
                 '''deprecate this!
                 for k in self.soreness_load_tuples.keys():
@@ -295,8 +320,6 @@ class InsightsProcessing(object):
 
         history = {}
 
-
-
         for s in session_types:
             last_min_load = None
             last_min_load_date = None
@@ -307,49 +330,76 @@ class InsightsProcessing(object):
             total_load = []
             pos_load = []
             neg_load = []
+            mod_neg_load = []
+            sev_neg_load = []
+            load_capacities = []
+            load_measures = []
 
             history[s] = []
 
-
             for d in dates:
                 # get all the min values for this session for this date
-                min_vals = []
+                load_vals = []
                 max_vals = []
+
                 added = False
 
-                #if s in self.last_14_max_no_soreness_load_tuples.keys():
                 if s in self.no_soreness_load_tuples.keys():
-                    #min_vals = list(x[1] for x in self.last_14_max_no_soreness_load_tuples[s] if x[0] == d)
-                    min_vals = list(x[1] for x in self.no_soreness_load_tuples[s] if x[0] == d)
-                    if len(min_vals) > 0:
+                    load_vals = list(x[1] for x in self.no_soreness_load_tuples[s] if x[0] == d)
+                    if len(load_vals) > 0:
                         added = True
-                        max_min_vals = max(min_vals)
-                        total_load.append(sum(min_vals))
-                        pos_load.append(sum(min_vals))
-                        neg_load.append(0)
+                        max_load_vals = sum(load_vals)
+                        total_load.append(sum(load_vals))
+                        pos_load.append(sum(load_vals))
+                        # adding None's as we will be filtering these out but still want them to influence what sessions are included
+                        neg_load.append(None)
+                        mod_neg_load.append(None)
+                        sev_neg_load.append(None)
                         if last_min_load is None:
-                            last_min_load = max_min_vals
+                            last_min_load = max_load_vals
                             last_min_load_date = d
                         else:
                             if last_min_load_date > load_capacity_date:
-                                last_min_load = max(last_min_load, max_min_vals)
+                                last_min_load = max(last_min_load, max_load_vals)
                             else:
-                                last_min_load = max_min_vals
+                                last_min_load = max_load_vals
                                 last_min_load_date = d
+                        load_measures.append(last_min_load)
+                        last_load_measures = list(n for n in load_measures[-min(4, len(load_measures)):]) # tied to expected workout frequency!! TODO
                         load_capacity = max(load_capacity if load_capacity is not None else 0, last_min_load if last_min_load is not None else 0)
+                        if len(last_load_measures) > 0:
+                            load_capacity = min(load_capacity, mean(last_load_measures))
                         load_capacity_date = d
+                        load_capacities.append(load_capacity)
 
                 #if s in self.last_14_max_soreness_load_tuples.keys():
                 if s in self.soreness_load_tuples.keys():
                     #max_vals = list(x[1] for x in self.last_14_max_soreness_load_tuples[s] if x[0] == d)
                     max_vals = list(x[1] for x in self.soreness_load_tuples[s] if x[0] == d)
+                    max_mod_vals = list(x[1] for x in self.mod_soreness_load_tuples[s] if s in self.mod_soreness_load_tuples.keys() and x[0] == d)
+                    max_sev_vals = list(x[1] for x in self.sev_soreness_load_tuples[s] if
+                                         s in self.sev_soreness_load_tuples.keys() and x[0] == d)
 
                     if len(max_vals) > 0:
                         added = True
-                        min_max_vals = min(max_vals)
+                        min_max_vals = sum(max_vals)
+
+                        if len(max_mod_vals) > 0:
+                            min_max_mod_vals = min(max_mod_vals)
+                            mod_neg_load.append(sum(max_mod_vals))
+                        else:
+                            mod_neg_load.append(None)
+                        if len(max_sev_vals) > 0:
+                            min_max_sev_vals = min(max_sev_vals)
+                            sev_neg_load.append(sum(max_sev_vals))
+                        else:
+                            sev_neg_load.append(None)
+
                         total_load.append(sum(max_vals))
                         neg_load.append(sum(max_vals))
-                        pos_load.append(0)
+
+                        pos_load.append(None)
+
                         if last_max_load is None:
                             last_max_load = min_max_vals
                             last_max_load_date = d
@@ -363,19 +413,78 @@ class InsightsProcessing(object):
                         if load_capacity is None or load_capacity >= last_max_load:
                             load_capacity = .90 * last_max_load
                             load_capacity_date = d
+                            load_capacities.append(load_capacity)
+
+                        load_measures.append(load_capacity)
 
                 if added:
                     if len(total_load) > 0 and sum(total_load[-min(14, len(total_load)):]) > 0:
                         if len(pos_load) > 0:
+                            adj_pos = list(n for n in pos_load[-min(7, len(pos_load)):] if n is not None)
+                            if len(adj_pos) > 0:
+                                max_pos = float(max(adj_pos))
+                            else:
+                                max_pos = None
+
+                            pos_limt = [max_pos]
+                            mod_limit = []
+                            adj_neg = list(n for n in neg_load[-min(7, len(neg_load)):] if n is not None)
+                            if len(adj_neg) > 0:
+                                min_neg = float(min(adj_neg))
+                            else:
+                                min_neg = 0.0
+
+                            adj_mod_neg = list(n for n in mod_neg_load[-min(7, len(mod_neg_load)):] if n is not None)
+                            if len(adj_mod_neg) > 0:
+                                min_mod_neg = float(min(adj_mod_neg))
+                                max_mod_neg = float(max(adj_mod_neg))
+                                pos_limt.append(min_mod_neg)
+                                mod_limit.append(max_mod_neg)
+                            else:
+                                min_mod_neg = None
+
+                            adj_sev_neg = list(n for n in sev_neg_load[-min(7, len(sev_neg_load)):] if n is not None)
+                            if len(adj_sev_neg) > 0:
+                                min_sev_neg = float(min(adj_sev_neg))
+                                mod_limit.append(min_sev_neg)
+                            else:
+                                min_sev_neg = None
+
+                            total_max = float(max(total_load[-min(7, len(total_load)):]))
+                            adj_pos_limit = list(p for p in pos_limt if p is not None)
+                            if len(adj_pos_limit) > 0:
+                                pos_capacity = mean(adj_pos_limit)
+                            else:
+                                pos_capacity = 0
+                            if len(mod_limit) > 0:
+                                mod_capacity = mean(mod_limit)
+                            else:
+                                mod_capacity = None
+                            pos_perc = max_pos #/ total_max
+                            neg_mod_perc = min_mod_neg #/ total_max
+                            neg_sev_perc = min_sev_neg #/ total_max
+                            adj_load_capacity = list(n for n in load_capacities[-min(4, len(load_capacities)):] if n is not None) #going with 4 for average weekly usage
+                            avg_load_capacity = load_capacities[len(load_capacities) - 1]
+                            #if len(adj_load_capacity) > 0:
+                            #    avg_load_capacity = mean(adj_load_capacity)
+                            #else:
+                            #    avg_load_capacity = None
+                            adj_positive_load = list(p for p in pos_load[-min(14, len(pos_load)):] if p is not None)
+                            adj_pos_sum = 0
+                            if len(adj_positive_load)> 0:
+                                adj_pos_sum = sum(adj_positive_load)
                             history[s].append(
-                                (d, tuple(min_vals), tuple(max_vals), load_capacity, (float(sum(pos_load[-min(14, len(pos_load)):])) / float(sum(total_load[-min(14, len(total_load)):]))) * 100))
+                                (d, tuple(load_vals), tuple(max_vals), load_capacity,
+                                 round((float(adj_pos_sum) / float(sum(total_load[-min(14, len(total_load)):]))) * 100, 2),
+                                 "pos_cap:" + str(pos_capacity)+";mod_cap:"+str(mod_capacity)))
+                                # "Pos:"+str(round(pos_perc,2))+";neg_mod:"+str(round(neg_mod_perc,2))+";neg_sev:"+str(round(neg_sev_perc,2)
                         else:
                             history[s].append(
-                                (d, tuple(min_vals), tuple(max_vals), load_capacity,
-                                 (0 / float(sum(total_load[-min(14, len(total_load)):]))) * 100))
+                                (d, tuple(load_vals), tuple(max_vals), avg_load_capacity,
+                                 (0 / float(sum(total_load[-min(14, len(total_load)):]))) * 100, ""))
                     else:
                         history[s].append(
-                            (d, tuple(min_vals), tuple(max_vals), load_capacity, 0.00))
+                            (d, tuple(load_vals), tuple(max_vals), avg_load_capacity, 0.00, ""))
 
         i=0
 
@@ -530,7 +639,7 @@ class LoadingEvent(object):
         self.lagged_load_z_score = None
         self.acwr_2_3 = None
         self.days_rest = None
-        self.highest_rpe_in_72_hrs = False
+        self.highest_rpe_in_36_hrs = False
 
     def has_existing_soreness(self, days=1):
 

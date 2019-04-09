@@ -56,6 +56,7 @@ def test_get_training_plan_from_database():
     users.append('fac4be57-35d6-4952-8af9-02aadf979982')  #bay
     users.append('e9d78b6f-8695-4556-9369-d6a5702c6cc7') #mwoodard
     users.append('5756fac1-3080-4979-9746-9d4c9a700acf') #lillian
+    users.append('06f2c55d-780c-47cf-9742-a74535bea45f')  #RG (aka User 6 from usability report 4/2/19)
 
     for user_id in users:
         start_date = "2018-11-23"
