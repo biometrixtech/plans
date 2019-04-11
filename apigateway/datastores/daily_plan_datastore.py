@@ -1,10 +1,14 @@
-import models.soreness
+import datetime
 from aws_xray_sdk.core import xray_recorder
 from config import get_mongo_collection
+from fathomapi.utils.exceptions import InvalidSchemaException, NoSuchEntityException
 from models.daily_plan import DailyPlan
 import models.session as session
+import models.soreness
 from models.post_session_survey import PostSurvey
-from fathomapi.utils.exceptions import InvalidSchemaException
+from models.daily_readiness import DailyReadiness
+from datastores.daily_readiness_datastore import DailyReadinessDatastore
+from utils import parse_date
 
 
 class DailyPlanDatastore(object):
@@ -63,9 +67,6 @@ class DailyPlanDatastore(object):
             daily_plan.games = \
                 [_external_session_from_mongodb(s, session.SessionType.game)
                  for s in plan.get('game_sessions', [])]
-            # daily_plan.tournaments = \
-            #     [_external_session_from_mongodb(s, session.SessionType.tournament)
-            #      for s in plan['tournament_sessions']]
             if not stats_processing:
                 daily_plan.pre_recovery = _recovery_session_from_mongodb(plan['pre_recovery']) if plan.get('pre_recovery', None) is not None else None
                 daily_plan.post_recovery = _recovery_session_from_mongodb(plan['post_recovery']) if plan.get('post_recovery', None) is not None else None
@@ -73,13 +74,10 @@ class DailyPlanDatastore(object):
                     [_recovery_session_from_mongodb(s) for s in plan.get('completed_post_recovery_sessions', [])]
                 daily_plan.functional_strength_session = \
                     _functional_strength_session_from_mongodb(plan['functional_strength_session']) if plan.get('functional_strength_session', None) is not None else None
-                # daily_plan.corrective_sessions = \
-                #    [_external_session_from_mongodb(s, session.SessionType.corrective)
-                #     for s in plan['corrective_sessions']]
             daily_plan.bump_up_sessions = \
                 [_external_session_from_mongodb(s, session.SessionType.bump_up)
                  for s in plan.get('bump_up_sessions', [])]
-            daily_plan.daily_readiness_survey = plan.get('daily_readiness_survey', None)
+            daily_plan.daily_readiness_survey = _daily_readiness_from_mongo(plan.get('daily_readiness_survey', None), user_id)
             daily_plan.updated = plan.get('updated', None)
             daily_plan.last_updated = plan.get('last_updated', None)
             daily_plan.pre_recovery_completed = plan.get('pre_recovery_completed', False)
@@ -168,7 +166,7 @@ def _external_session_from_mongodb(mongo_result, session_type):
                         "distance",
                         "source"]
     for key in attrs_from_mongo:
-        setattr(mongo_session, key, _key_present(key, mongo_result))
+        setattr(mongo_session, key, mongo_result.get(key, None))
     if "post_session_survey" in mongo_result and mongo_result["post_session_survey"] is not None:
         mongo_session.post_session_survey = PostSurvey(mongo_result["post_session_survey"], mongo_result["post_session_survey"]["event_date"])
         mongo_session.session_RPE = mongo_session.post_session_survey.RPE if mongo_session.post_session_survey.RPE is not None else None
@@ -181,12 +179,12 @@ def _external_session_from_mongodb(mongo_result, session_type):
 def _recovery_session_from_mongodb(mongo_result):
 
     recovery_session = session.RecoverySession()
-    recovery_session.start_date = _key_present("start_date", mongo_result)
-    recovery_session.event_date = _key_present("event_date", mongo_result)
-    recovery_session.impact_score = _key_present("impact_score", mongo_result)
-    recovery_session.goal_text = _key_present("goal_text", mongo_result)
-    recovery_session.why_text = _key_present("why_text", mongo_result)
-    recovery_session.duration_minutes = _key_present("minutes_duration", mongo_result)
+    recovery_session.start_date = mongo_result.get("start_date", None)
+    recovery_session.event_date = mongo_result.get("event_date", None)
+    recovery_session.impact_score = mongo_result.get("impact_score", 0)
+    recovery_session.goal_text = mongo_result.get("goal_text", "")
+    recovery_session.why_text = mongo_result.get("why_text", "")
+    recovery_session.duration_minutes = mongo_result.get("minutes_duration", 0)
     recovery_session.completed = mongo_result.get("completed", False)
     recovery_session.display_exercises = mongo_result.get("display_exercises", False)
     recovery_session.inhibit_exercises = [_assigned_exercises_from_mongodb(s)
@@ -215,44 +213,60 @@ def _functional_strength_session_from_mongodb(mongo_result):
                                                   for s in mongo_result['stability_work']]
     functional_strength_session.victory_lap = [_assigned_exercises_from_mongodb(s)
                                                for s in mongo_result['victory_lap']]
-    functional_strength_session.duration_minutes = _key_present("minutes_duration", mongo_result)
-    functional_strength_session.warm_up_target_minutes = _key_present("warm_up_target_minutes", mongo_result)
-    functional_strength_session.dynamic_movement_target_minutes = _key_present("dynamic_movement_target_minutes", mongo_result)
-    functional_strength_session.stability_work_target_minutes = _key_present("stability_work_target_minutes", mongo_result)
-    functional_strength_session.victory_lap_target_minutes = _key_present("victory_lap_target_minutes", mongo_result)
-    functional_strength_session.warm_up_max_percentage = _key_present("warm_up_max_percentage", mongo_result)
-    functional_strength_session.dynamic_movement_max_percentage = _key_present("dynamic_movement_max_percentage", mongo_result)
-    functional_strength_session.stability_work_max_percentage = _key_present("stability_work_max_percentage", mongo_result)
-    functional_strength_session.victory_lap_max_percentage = _key_present("victory_lap_max_percentage", mongo_result)
+    functional_strength_session.duration_minutes = mongo_result.get("minutes_duration", 0)
+    functional_strength_session.warm_up_target_minutes = mongo_result.get("warm_up_target_minutes", 0)
+    functional_strength_session.dynamic_movement_target_minutes = mongo_result.get("dynamic_movement_target_minutes", 0)
+    functional_strength_session.stability_work_target_minutes = mongo_result.get("stability_work_target_minutes", 0)
+    functional_strength_session.victory_lap_target_minutes = mongo_result.get("victory_lap_target_minutes", 0)
+    functional_strength_session.warm_up_max_percentage = mongo_result.get("warm_up_max_percentage", 0)
+    functional_strength_session.dynamic_movement_max_percentage = mongo_result.get("dynamic_movement_max_percentage", 0)
+    functional_strength_session.stability_work_max_percentage = mongo_result.get("stability_work_max_percentage", 0)
+    functional_strength_session.victory_lap_max_percentage = mongo_result.get("victory_lap_max_percentage", 0)
     functional_strength_session.completed = mongo_result.get("completed", False)
-    functional_strength_session.start_date = _key_present("start_date", mongo_result)
-    functional_strength_session.event_date = _key_present("event_date", mongo_result)
-    functional_strength_session.sport_name = _key_present("sport_name", mongo_result)
-    functional_strength_session.position = _key_present("position", mongo_result)
+    functional_strength_session.start_date = mongo_result.get("start_date", None)
+    functional_strength_session.event_date = mongo_result.get("event_date", None)
+    functional_strength_session.sport_name = mongo_result.get("sport_name", None)
+    functional_strength_session.position = mongo_result.get("position", None)
     return functional_strength_session
 
 
 def _assigned_exercises_from_mongodb(mongo_result):
 
-    assigned_exercise = models.soreness.AssignedExercise(_key_present("library_id", mongo_result))
-    assigned_exercise.exercise.name = _key_present("name", mongo_result)
-    assigned_exercise.exercise.display_name = _key_present("display_name", mongo_result)
-    assigned_exercise.exercise.youtube_id = _key_present("youtube_id", mongo_result)
-    assigned_exercise.exercise.description = _key_present("description", mongo_result)
-    assigned_exercise.exercise.bilateral = _key_present("bilateral", mongo_result)
-    assigned_exercise.exercise.unit_of_measure = _key_present("unit_of_measure", mongo_result)
-    assigned_exercise.position_order = _key_present("position_order", mongo_result)
-    assigned_exercise.reps_assigned = _key_present("reps_assigned", mongo_result)
-    assigned_exercise.sets_assigned = _key_present("sets_assigned", mongo_result)
-    assigned_exercise.exercise.seconds_per_set = _key_present("seconds_per_set", mongo_result)
-    assigned_exercise.exercise.seconds_per_rep = _key_present("seconds_per_rep", mongo_result)
-    assigned_exercise.goal_text = _key_present("goal_text", mongo_result)
+    assigned_exercise = models.soreness.AssignedExercise(mongo_result.get("library_id", None))
+    assigned_exercise.exercise.name = mongo_result.get("name", "")
+    assigned_exercise.exercise.display_name = mongo_result.get("display_name", "")
+    assigned_exercise.exercise.youtube_id = mongo_result.get("youtube_id", "")
+    assigned_exercise.exercise.description = mongo_result.get("description", "")
+    assigned_exercise.exercise.bilateral = mongo_result.get("bilateral", False)
+    assigned_exercise.exercise.unit_of_measure = mongo_result.get("unit_of_measure", None)
+    assigned_exercise.position_order = mongo_result.get("position_order", 0)
+    assigned_exercise.reps_assigned = mongo_result.get("reps_assigned", 0)
+    assigned_exercise.sets_assigned = mongo_result.get("sets_assigned", 0)
+    assigned_exercise.exercise.seconds_per_set = mongo_result.get("seconds_per_set", 0)
+    assigned_exercise.exercise.seconds_per_rep = mongo_result.get("seconds_per_rep", 0)
+    assigned_exercise.goal_text = mongo_result.get("goal_text", "")
     assigned_exercise.equipment_required = mongo_result.get("equipment_required", [])
     return assigned_exercise
 
 
-def _key_present(key_name, dictionary):
-    if key_name in dictionary:
-        return dictionary[key_name]
+def _daily_readiness_from_mongo(mongo_result, user_id):
+    if mongo_result is None:
+        return None
+    if isinstance(mongo_result, dict):
+        return DailyReadiness(
+                               event_date=mongo_result['event_date'],
+                               user_id=user_id,
+                               soreness=mongo_result['soreness'],
+                               readiness=mongo_result['readiness'],
+                               sleep_quality=mongo_result['sleep_quality'],
+                               wants_functional_strength=mongo_result.get('wants_functional_strength', False)
+                             )
+    elif isinstance(mongo_result, str):
+        start_date = parse_date(mongo_result)
+        end_date = start_date + datetime.timedelta(days=1)
+        try:
+            return DailyReadinessDatastore().get(user_id, start_date=start_date, end_date=end_date)[0]
+        except NoSuchEntityException:
+            return None
     else:
         return None

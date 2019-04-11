@@ -1,8 +1,8 @@
 import datetime
 
 from datastores.datastore_collection import DatastoreCollection
-from fathomapi.utils.exceptions import NoSuchEntityException
 from logic.soreness_processing import SorenessCalculator
+from models.post_session_survey import PostSessionSurvey
 from utils import parse_datetime, format_datetime, parse_date, format_date
 
 
@@ -13,7 +13,6 @@ class AthleteStatusProcessing(object):
         self.current_time = event_date
         self.soreness_start_time = parse_date(format_date(event_date - datetime.timedelta(days=2)))
         self.typical_sessions_start_date = format_date(event_date - datetime.timedelta(days=14))
-        self.daily_readiness_store = datastore_collection.daily_readiness_datastore
         self.post_session_store = datastore_collection.post_session_survey_datastore
         self.athlete_stats_store = datastore_collection.athlete_stats_datastore
         self.daily_plan_store = datastore_collection.daily_plan_datastore
@@ -29,26 +28,26 @@ class AthleteStatusProcessing(object):
         self.completed_functional_strength_sessions = 0
 
     def get_previous_soreness(self):
+        # read plans from yesterday and today
+        daily_plans = self.daily_plan_store.get(self.user_id, format_date(parse_date(self.event_date) - datetime.timedelta(days=1)), self.event_date)
         # get soreness from readiness
-        try:
-            readiness_surveys = self.daily_readiness_store.get(self.user_id,
-                                                               start_date=self.soreness_start_time,
-                                                               end_date=self.current_time,
-                                                               last_only=False)
-            for rs_survey in readiness_surveys:
-                self.sore_body_parts.extend([s for s in rs_survey.soreness if SorenessCalculator().get_severity(s.severity, s.movement) > 1])
-        except NoSuchEntityException:
-            pass
-        # get soreness from ps_survey
-        post_session_surveys = self.post_session_store.get(user_id=self.user_id,
-                                                           start_date=self.soreness_start_time,
-                                                           end_date=self.current_time)
+        readiness_surveys = [plan.daily_readiness_survey for plan in daily_plans if plan.daily_readiness_survey is not None]
+        for rs_survey in readiness_surveys:
+            self.sore_body_parts.extend([s for s in rs_survey.soreness if SorenessCalculator.get_severity(s.severity, s.movement) > 1])
+        # get soreness from post session survey
+        post_session_surveys = []
+        for plan in daily_plans:
+            post_surveys = \
+                [PostSessionSurvey.post_session_survey_from_training_session(ts.post_session_survey, self.user_id, ts.id, ts.session_type().value, plan.event_date)
+                 for ts in plan.training_sessions if ts is not None]
+            post_session_surveys.extend([s for s in post_surveys if s is not None])
         post_session_surveys = [s for s in post_session_surveys if s is not None and self.soreness_start_time <= s.event_date_time < self.current_time]
         for ps_survey in post_session_surveys:
-            self.sore_body_parts.extend([s for s in ps_survey.survey.soreness if SorenessCalculator().get_severity(s.severity, s.movement) > 1])
+            self.sore_body_parts.extend([s for s in ps_survey.survey.soreness if SorenessCalculator.get_severity(s.severity, s.movement) > 1])
+
         # check for severe pain yesterday or today
         severe_pain_dates = [s.reported_date_time for s in self.sore_body_parts if s.pain and
-                             SorenessCalculator().get_severity(s.severity, s.movement) >= 3 and
+                             SorenessCalculator.get_severity(s.severity, s.movement) >= 3 and
                              s.reported_date_time > self.soreness_start_time + datetime.timedelta(days=1)]
         if len(severe_pain_dates) > 0:
             self.severe_pain_today_yesterday = True

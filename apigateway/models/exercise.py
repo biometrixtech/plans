@@ -34,24 +34,16 @@ class Tempo(Enum):
     controlled = 0
 
 
-'''Deprecated
-class ExercisePriority(IntEnum):
-    present = 0
-    high = 1
-    avoid = 2
-'''
-
 class ExerciseBuckets(object):
+    @staticmethod
+    def get_exercise_bucket_list():
 
-    def get_exercise_bucket_list(self):
-
-        group = {}
+        group = dict()
 
         group[0] = ["9", "121", "116", "216", "217", "218", "219", "220"]
         group[1] = ["119", "122"]
         group[2] = ["6", "46", "221"]
         group[3] = ["28", "49", "222", "223", "224"]
-        #group[4] = ["56", "127", "128", "129", "130"]
         group[4] = ["7", "26", "214", "215"]
         group[5] = ["81", "50", "226", "227"]
         group[6] = ["108", "14", "228", "229", "230"]
@@ -74,6 +66,7 @@ class ExerciseBuckets(object):
                 return v
 
         return [exercise]
+
 
 class Exercise(Serialisable):
     def __init__(self, library_id):
@@ -132,7 +125,5 @@ class Exercise(Serialisable):
                'progresses_to': self.progresses_to,
                'technical_difficulty': self.technical_difficulty,
                'equipment_required': self.equipment_required
-         }
+               }
         return ret
-
-

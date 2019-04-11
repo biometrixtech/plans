@@ -1,5 +1,6 @@
 from serialisable import Serialisable
-from utils import format_datetime, parse_datetime
+from utils import format_datetime
+
 
 class SessionHeartRate(Serialisable):
     
@@ -21,6 +22,7 @@ class SessionHeartRate(Serialisable):
             'hr_post_workout': [hr.json_serialise() for hr in self.hr_post_workout]
         }
         return ret
+
 
 class HeartRateData(Serialisable):
     def __init__(self, hr_data):

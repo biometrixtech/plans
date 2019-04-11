@@ -1,5 +1,5 @@
 from serialisable import Serialisable
-from utils import format_date
+
 
 class AppLogs(Serialisable):
     
@@ -27,6 +27,3 @@ class AppLogs(Serialisable):
     def get_filter_condition(self):
         return {"user_id": self.user_id,
                 "event_date": self.event_date}
-
-
-

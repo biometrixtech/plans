@@ -1,6 +1,7 @@
 from serialisable import Serialisable
 from utils import parse_date
 import models.session as session
+from models.daily_readiness import DailyReadiness
 
 
 class DailyPlan(Serialisable):
@@ -40,6 +41,12 @@ class DailyPlan(Serialisable):
         return parse_date(self.event_date)
 
     def json_serialise(self):
+        if isinstance(self.daily_readiness_survey, DailyReadiness):
+            readiness = self.daily_readiness_survey.json_serialise()
+            del readiness['sore_body_parts']
+            del readiness['user_id']
+        else:
+            readiness = self.daily_readiness_survey
         ret = {'user_id': self.user_id,
                'date': self.event_date,
                'day_of_week': self.day_of_week,
@@ -58,7 +65,7 @@ class DailyPlan(Serialisable):
                'post_recovery': self.post_recovery.json_serialise() if self.post_recovery is not None else None,
                'completed_post_recovery_sessions': [c.json_serialise() for c in self.completed_post_recovery_sessions],
                'last_updated': self.last_updated,
-               'daily_readiness_survey': self.daily_readiness_survey,
+               'daily_readiness_survey': readiness,
                'last_sensor_sync': self.last_sensor_sync,
                'sessions_planned': self.sessions_planned,
                'functional_strength_completed': self.functional_strength_completed,
@@ -78,9 +85,6 @@ class DailyPlan(Serialisable):
     def define_landing_screen(self):
         if not self.daily_readiness_survey_completed():
             return 0.0, 0.0
-        #elif len(self.training_sessions) > 0 and self.post_recovery is not None and self.post_recovery.goal_text != "" and self.post_recovery.impact_score < 1.5:
-        #    self.post_recovery.display_exercises = True
-        #    return 2.0, None
         elif self.post_recovery is not None and self.post_recovery.display_exercises:
             if self.post_recovery.duration_minutes == 0.0:
                 return 2.0, None
@@ -88,15 +92,16 @@ class DailyPlan(Serialisable):
                 return 2.0, 2.0
         elif self.post_recovery is not None and not self.post_recovery.display_exercises and self.post_recovery.completed:
             return 2.0, None
-        # elif self.pre_recovery is not None and self.pre_recovery.impact_score < 1.5 and len(self.training_sessions) == 0:
-        #    self.pre_recovery.display_exercises = True
-        #    return 0.0, 1.0
         elif self.pre_recovery is not None and self.pre_recovery.display_exercises:
             if self.pre_recovery.duration_minutes == 0.0:
                 return 0.0, 1.0
             else:
                 return 0.0, 0.0
-        elif self.pre_recovery is not None and self.post_recovery is not None and not self.pre_recovery.display_exercises and not self.post_recovery.display_exercises and not self.post_recovery.completed:
+        elif (self.pre_recovery is not None and
+              self.post_recovery is not None and
+              not self.pre_recovery.display_exercises and
+              not self.post_recovery.display_exercises and
+              not self.post_recovery.completed):
             return 1.0, 1.0
         else:
             return 0.0, None
@@ -139,55 +144,3 @@ class DailyPlan(Serialisable):
         sessions.extend(training_sessions)
 
         return sessions
-
-    ''' Deprecated
-    def add_scheduled_sessions(self, scheduled_sessions):
-
-        # this will expand in complexity once an athlete can add a new session
-
-        # first add any that are already completed
-
-        practice_sessions = [s for s in self.practice_sessions if isinstance(s, session.PracticeSession)
-                             and (s.data_transferred or s.post_session_survey is not None)]
-        cross_training_sessions = [s for s in self.strength_conditioning_sessions if isinstance(s, session.StrengthConditioningSession)
-                                   and (s.data_transferred or s.post_session_survey is not None)]
-        game_sessions = [s for s in self.games if isinstance(s, session.Game)
-                         and (s.data_transferred or s.post_session_survey is not None)]
-        tournament_sessions = [s for s in self.tournaments if isinstance(s, session.Tournament)
-                               and (s.data_transferred or s.post_session_survey is not None)]
-
-        new_practice_sessions = [s for s in scheduled_sessions if isinstance(s, session.PracticeSession)]
-        new_cross_training_sessions = [s for s in scheduled_sessions if isinstance(s, session.StrengthConditioningSession)]
-        new_game_sessions = [s for s in scheduled_sessions if isinstance(s, session.Game)]
-        new_tournament_sessions = [s for s in scheduled_sessions if isinstance(s, session.Tournament)]
-
-        if len(practice_sessions) < len(new_practice_sessions):
-            self.practice_sessions = practice_sessions
-            for p in range(len(practice_sessions), len(new_practice_sessions)):
-                self.practice_sessions.append(new_practice_sessions[p])
-
-        if len(cross_training_sessions) < len(new_cross_training_sessions):
-            self.strength_conditioning_sessions = cross_training_sessions
-            for p in range(len(cross_training_sessions), len(new_cross_training_sessions)):
-                self.strength_conditioning_sessions.append(new_cross_training_sessions[p])
-
-        if len(game_sessions) < len(new_game_sessions):
-            self.games = game_sessions
-            for p in range(len(game_sessions), len(new_game_sessions)):
-                self.games.append(new_game_sessions[p])
-
-        if len(tournament_sessions) < len(new_tournament_sessions):
-            self.tournaments = tournament_sessions
-            for p in range(len(tournament_sessions), len(new_tournament_sessions)):
-                self.tournaments.append(new_tournament_sessions[p])
-
-        #if isinstance(scheduled_session, session.PracticeSession):
-        #    self.practice_sessions.append(scheduled_session)
-        #elif isinstance(scheduled_session, session.StrengthConditioningSession):
-        #    self.strength_conditioning_sessions.append(scheduled_session)
-        #elif isinstance(scheduled_session, session.Game):
-        #    self.games.append(scheduled_session)
-        #elif isinstance(scheduled_session, session.Tournament):
-        #    self.tournaments.append(scheduled_session)
-    '''
-
