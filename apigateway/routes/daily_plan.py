@@ -76,7 +76,7 @@ def handle_daily_plan_get(principal_id=None):
     # return {'daily_plans': daily_plans,
     #         'readiness': readiness,
     #         'typical_sessions': typical_sessions}, 200
-    return {'daily_plans': temp_plan(format_date(event_date)),
+    return {'daily_plans': [temp_plan(format_date(event_date))],
             'readiness': {},
             'typical_sessions': {}}
 
