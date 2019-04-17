@@ -92,286 +92,33 @@ def validate_input():
 def temp_plan(date):
     return {
             "completed_functional_strength_sessions": 0,
-            "completed_post_recovery_sessions": [],
+            # "completed_post_recovery_sessions": [],
             "daily_readiness_survey_completed": True,
             "date": date,
-            "day_of_week": 1,
+            # "day_of_week": 1,
             "functional_strength_completed": False,
             "functional_strength_eligible": False,
             "functional_strength_session": None,
             "landing_screen": 0,
-            "last_updated": "2019-04-16T16:40:57Z",
+            "last_sensor_sync": None,
+            # "last_updated": "2019-04-16T16:40:57Z",
+
             "nav_bar_indicator": 0,
             "post_recovery": {
-                "1": {
                         "activate_exercises": [],
-                        "activate_iterations": 0,
                         "completed": False,
                         "display_exercises": False,
                         "event_date": None,
+                        "goal_text": "",
+                        "impact_score": 0.0,
                         "inhibit_exercises": [],
                         "integrate_exercises": [],
                         "lengthen_exercises": [],
                         "minutes_duration": 0,
-                        "start_date": None},
-                "2": {
-                        "activate_exercises": [],
-                        "activate_iterations": 0,
-                        "completed": False,
-                        "display_exercises": False,
-                        "event_date": None,
-                        "inhibit_exercises": [],
-                        "integrate_exercises": [],
-                        "lengthen_exercises": [],
-                        "minutes_duration": 0,
-                        "start_date": None},
-                "3": {
-                        "activate_exercises": [],
-                        "activate_iterations": 0,
-                        "completed": False,
-                        "display_exercises": False,
-                        "event_date": None,
-                        "inhibit_exercises": [],
-                        "integrate_exercises": [],
-                        "lengthen_exercises": [],
-                        "minutes_duration": 0,
-                        "start_date": None}
-            },
+                        "start_date": None,
+                        "why_text": ""},
             "pre_recovery": {
-                "1": {
-                    "activate_exercises": [
-                        {
-                            "bilateral": False,
-                            "description": "Begin on your hands and knees with your back flat. Simultaneously raise the right arm and left leg until the extended arm and leg are horizontal. Hold for 1-2 seconds, then bring your arm and leg back down. Alternate sides as you complete the set number of reps.",
-                            "display_name": "Bird-dog",
-                            "equipment_required": [
-                                "None"
-                            ],
-                            "goal_text": "Increase strength",
-                            "library_id": "50",
-                            "name": "Quadruped Arm/Opposite Leg Raise",
-                            "position_order": 6,
-                            "reps_assigned": 10,
-                            "seconds_duration": 90,
-                            "seconds_per_rep": 3,
-                            "seconds_per_set": None,
-                            "sets_assigned": 3,
-                            "unit_of_measure": "count",
-                            "youtube_id": None,
-                            "goals": [0]
-                        },
-                        {
-                            "bilateral": True,
-                            "description": "Lay on your side on a bed or table with your lower legs hanging off. Pull the knee of your top leg toward you and keep it at the same height as you rotate your hips so your foot moves above and below your knee. ",
-                            "display_name": "Windshield Wipers",
-                            "equipment_required": [
-                                "None"
-                            ],
-                            "goal_text": "Increase strength",
-                            "library_id": "229",
-                            "name": "Windshield Wipers",
-                            "position_order": 7,
-                            "reps_assigned": 10,
-                            "seconds_duration": 80,
-                            "seconds_per_rep": 2,
-                            "seconds_per_set": None,
-                            "sets_assigned": 2,
-                            "unit_of_measure": "count",
-                            "youtube_id": None,
-                            "goals": [0]
-                        },
-                        {
-                            "bilateral": True,
-                            "description": "On your side with one leg lifted off the ground and slightly behind your body, move your leg in small clockwise circles. Maintain a flexed foot so your toes are pointing towards you.",
-                            "display_name": "Leg Circles",
-                            "equipment_required": [
-                                "None"
-                            ],
-                            "goal_text": "Increase strength",
-                            "library_id": "232",
-                            "name": "Small Clockwise Circles",
-                            "position_order": 8,
-                            "reps_assigned": 10,
-                            "seconds_duration": 80,
-                            "seconds_per_rep": 2,
-                            "seconds_per_set": None,
-                            "sets_assigned": 2,
-                            "unit_of_measure": "count",
-                            "youtube_id": None,
-                            "goals": [0]
-                        },
-                        {
-                            "bilateral": True,
-                            "description": "Begin on your side with your elbow positioned under your shoulder and your legs stacked, knees bent. Place your other hand on your hip and lift off the ground, keeping your body in a straight line.",
-                            "display_name": "Side Plank (Knees Bent)",
-                            "equipment_required": [
-                                "None"
-                            ],
-                            "goal_text": "Increase strength",
-                            "library_id": "89",
-                            "name": "Side Plank Knees Bent",
-                            "position_order": 9,
-                            "reps_assigned": 30,
-                            "seconds_duration": 120,
-                            "seconds_per_rep": None,
-                            "seconds_per_set": 30,
-                            "sets_assigned": 2,
-                            "unit_of_measure": "seconds",
-                            "youtube_id": None,
-                            "goals": [0, 1]
-                        },
-                        {
-                            "bilateral": False,
-                            "description": "Lie on your back with your legs straight and your arms overhead. Bend your hips and knees. Contract your abdomen so your low back is flush with the ground. Move one leg and the opposite arm to the ground, straightening the knee and hip to bring the leg just above the ground. Engage your core and return the working limbs to the starting position.",
-                            "display_name": "Dead Bugs",
-                            "equipment_required": [
-                                "None"
-                            ],
-                            "goal_text": "Increase strength",
-                            "library_id": "84",
-                            "name": "Supine Arm/Leg Raise - Dying Bugs",
-                            "position_order": 10,
-                            "reps_assigned": 10,
-                            "seconds_duration": 40,
-                            "seconds_per_rep": 2,
-                            "seconds_per_set": None,
-                            "sets_assigned": 2,
-                            "unit_of_measure": "count",
-                            "youtube_id": None,
-                            "goals": [1]
-                        }
-                    ],
-                    "completed": False,
-                    "display_exercises": True,
-                    "event_date": None,
-                    "inhibit_exercises": [
-                        {
-                            "bilateral": True,
-                            "description": "Begin on your stomach with a foam roller beneath one thigh. Keeping that foot off of the ground, shift your weight onto that leg as you roll the length of the muscle from the knee to the hip, holding points of tension for 30 seconds. Switch sides and repeat. Don’t have a foam roller? You can use a tennis ball or water bottle.",
-                            "display_name": "Foam Roll - Quads",
-                            "equipment_required": [
-                                "Foam Roller"
-                            ],
-                            "goal_text": "Increase flexibility",
-                            "library_id": "48",
-                            "name": "Foam Roller Quadriceps",
-                            "position_order": 0,
-                            "reps_assigned": 30,
-                            "seconds_duration": 60,
-                            "seconds_per_rep": None,
-                            "seconds_per_set": 30,
-                            "sets_assigned": 1,
-                            "unit_of_measure": "seconds",
-                            "youtube_id": None,
-                            "goals": [0]
-                        },
-                        {
-                            "bilateral": True,
-                            "description": "Place foam roller just before the glute & roll the length of your hamstring. If you find a tender spot, hold for 30 seconds. Don’t have a foam roller? You can use a tennis ball or water bottle. ",
-                            "display_name": "Foam Roll - Hamstrings",
-                            "equipment_required": [
-                                "Foam Roller"
-                            ],
-                            "goal_text": "Increase flexibility",
-                            "library_id": "3",
-                            "name": "Foam Roller - Hamstrings",
-                            "position_order": 1,
-                            "reps_assigned": 30,
-                            "seconds_duration": 60,
-                            "seconds_per_rep": None,
-                            "seconds_per_set": 30,
-                            "sets_assigned": 1,
-                            "unit_of_measure": "seconds",
-                            "youtube_id": None,
-                            "goals": [0]
-                        },
-                        {
-                            "bilateral": True,
-                            "description": "On your side, slowly foam roll from the outer hip joint down toward the knee. If you find a tender spot, hold for 30 seconds. Don’t have a foam roller? You can use a tennis ball or water bottle.",
-                            "display_name": "Foam Roll - Outer Thigh",
-                            "equipment_required": [
-                                "Foam Roller"
-                            ],
-                            "goal_text": "Increase flexibility",
-                            "library_id": "4",
-                            "name": "Foam Roller - IT-Band",
-                            "position_order": 2,
-                            "reps_assigned": 30,
-                            "seconds_duration": 60,
-                            "seconds_per_rep": None,
-                            "seconds_per_set": 30,
-                            "sets_assigned": 1,
-                            "unit_of_measure": "seconds",
-                            "youtube_id": None,
-                            "goals": [2]
-                        }],
-                    "integrate_exercises": [],
-                    "lengthen_exercises": [
-                        {
-                            "bilateral": True,
-                            "description": "In a plank position, raise your hips up and back and lengthen through your shoulders. Try to press your heels toward the ground to feel a stretch through the back of your lower leg.",
-                            "display_name": "Kneeling Hamstring Stretch",
-                            "equipment_required": [
-                                "None"
-                            ],
-                            "goal_text": "Prepare for movement",
-                            "library_id": "216",
-                            "name": "Kneeling Hamstring Stretch",
-                            "position_order": 3,
-                            "reps_assigned": 30,
-                            "seconds_duration": 60,
-                            "seconds_per_rep": None,
-                            "seconds_per_set": 30,
-                            "sets_assigned": 1,
-                            "unit_of_measure": "seconds",
-                            "youtube_id": None,
-                            "goals": [0]
-                        },
-                        {
-                            "bilateral": True,
-                            "description": "Stand with one leg in front of the other. Raise the arm that is on the same side as your back leg, engaging your core as you lean backward until a stretch is felt in your hip. Rotate the shoulder of your raised arm back to deepen the stretch. ",
-                            "display_name": "Standing Hip Stretch",
-                            "equipment_required": [
-                                "None"
-                            ],
-                            "goal_text": "Prepare for movement",
-                            "library_id": "6",
-                            "name": "Hip Flexor Static Stretch (Standing)",
-                            "position_order": 4,
-                            "reps_assigned": 30,
-                            "seconds_duration": 60,
-                            "seconds_per_rep": None,
-                            "seconds_per_set": 30,
-                            "sets_assigned": 1,
-                            "unit_of_measure": "seconds",
-                            "youtube_id": None,
-                            "goals": [2]
-                        },
-                        {
-                            "bilateral": True,
-                            "description": "Begin in a standing position with your toes pointing forward. Turn one foot to the outisde. With the opposite foot step forward into a lunge position, keeping your hips facing the front. Place your hands on your hips for balance.",
-                            "display_name": "Standing Outer Hip Stretch",
-                            "equipment_required": [
-                                "None"
-                            ],
-                            "goal_text": "Prepare for movement",
-                            "library_id": "28",
-                            "name": "Standing TFL Static Stretch",
-                            "position_order": 5,
-                            "reps_assigned": 30,
-                            "seconds_duration": 60,
-                            "seconds_per_rep": None,
-                            "seconds_per_set": 30,
-                            "sets_assigned": 1,
-                            "unit_of_measure": "seconds",
-                            "youtube_id": None,
-                            "goals": [2]
-                        }],
-                    "minutes_duration": 15,
-                    "start_date": None
-                },
-                "2": {
-                    "activate_exercises": [
+                        "activate_exercises": [
                             {
                                 "bilateral": False,
                                 "description": "Begin on your hands and knees with your back flat. Simultaneously raise the right arm and left leg until the extended arm and leg are horizontal. Hold for 1-2 seconds, then bring your arm and leg back down. Alternate sides as you complete the set number of reps.",
@@ -390,7 +137,8 @@ def temp_plan(date):
                                 "sets_assigned": 3,
                                 "unit_of_measure": "count",
                                 "youtube_id": None,
-                                "goals": [0]
+                                "goals": [0],
+                                "priority": [1]
                             },
                             {
                                 "bilateral": True,
@@ -410,7 +158,8 @@ def temp_plan(date):
                                 "sets_assigned": 2,
                                 "unit_of_measure": "count",
                                 "youtube_id": None,
-                                "goals": [0]
+                                "goals": [0],
+                                "priority": [1]
                             },
                             {
                                 "bilateral": True,
@@ -430,7 +179,8 @@ def temp_plan(date):
                                 "sets_assigned": 2,
                                 "unit_of_measure": "count",
                                 "youtube_id": None,
-                                "goals": [0]
+                                "goals": [0],
+                                "priority": [1]
                             },
                             {
                                 "bilateral": True,
@@ -450,7 +200,8 @@ def temp_plan(date):
                                 "sets_assigned": 2,
                                 "unit_of_measure": "seconds",
                                 "youtube_id": None,
-                                "goals": [0, 1]
+                                "goals": [0, 1],
+                                "priority": [1, 2]
                             },
                             {
                                 "bilateral": False,
@@ -470,12 +221,15 @@ def temp_plan(date):
                                 "sets_assigned": 2,
                                 "unit_of_measure": "count",
                                 "youtube_id": None,
-                                "goals": [1]
+                                "goals": [1],
+                                "priority": [1, 2]
                             }
                         ],
                         "completed": False,
                         "display_exercises": True,
                         "event_date": None,
+                        "goal_text": "",
+                        "impact_score": 0.0,
                         "inhibit_exercises": [
                             {
                                 "bilateral": True,
@@ -495,7 +249,8 @@ def temp_plan(date):
                                 "sets_assigned": 1,
                                 "unit_of_measure": "seconds",
                                 "youtube_id": None,
-                                "goals": [0]
+                                "goals": [0],
+                                "priority": [3]
                             },
                             {
                                 "bilateral": True,
@@ -515,7 +270,8 @@ def temp_plan(date):
                                 "sets_assigned": 1,
                                 "unit_of_measure": "seconds",
                                 "youtube_id": None,
-                                "goals": [0]
+                                "goals": [0],
+                                "priority": [1]
                             },
                             {
                                 "bilateral": True,
@@ -535,9 +291,9 @@ def temp_plan(date):
                                 "sets_assigned": 1,
                                 "unit_of_measure": "seconds",
                                 "youtube_id": None,
-                                "goals": [2]
-                            }
-                        ],
+                                "goals": [2],
+                                "priority": [2, 3]
+                            }],
                         "integrate_exercises": [],
                         "lengthen_exercises": [
                             {
@@ -558,7 +314,8 @@ def temp_plan(date):
                                 "sets_assigned": 1,
                                 "unit_of_measure": "seconds",
                                 "youtube_id": None,
-                                "goals": [0]
+                                "goals": [0],
+                                "priority": [1]
                             },
                             {
                                 "bilateral": True,
@@ -578,7 +335,8 @@ def temp_plan(date):
                                 "sets_assigned": 1,
                                 "unit_of_measure": "seconds",
                                 "youtube_id": None,
-                                "goals": [2]
+                                "goals": [2],
+                                "priority": [2]
                             },
                             {
                                 "bilateral": True,
@@ -598,248 +356,13 @@ def temp_plan(date):
                                 "sets_assigned": 1,
                                 "unit_of_measure": "seconds",
                                 "youtube_id": None,
-                                "goals": [2]
-                            }
-                        ],
+                                "goals": [2],
+                                "priority": [1, 2, 3]
+                            }],
                         "minutes_duration": 15,
-                        "start_date": None
-                    },
-                "3": {
-                    "activate_exercises": [
-                        {
-                            "bilateral": False,
-                            "description": "Begin on your hands and knees with your back flat. Simultaneously raise the right arm and left leg until the extended arm and leg are horizontal. Hold for 1-2 seconds, then bring your arm and leg back down. Alternate sides as you complete the set number of reps.",
-                            "display_name": "Bird-dog",
-                            "equipment_required": [
-                                "None"
-                            ],
-                            "goal_text": "Increase strength",
-                            "library_id": "50",
-                            "name": "Quadruped Arm/Opposite Leg Raise",
-                            "position_order": 6,
-                            "reps_assigned": 10,
-                            "seconds_duration": 90,
-                            "seconds_per_rep": 3,
-                            "seconds_per_set": None,
-                            "sets_assigned": 3,
-                            "unit_of_measure": "count",
-                            "youtube_id": None,
-                            "goals": [0]
+                        "start_date": None,
+                        "why_text": ""
                         },
-                        {
-                            "bilateral": True,
-                            "description": "Lay on your side on a bed or table with your lower legs hanging off. Pull the knee of your top leg toward you and keep it at the same height as you rotate your hips so your foot moves above and below your knee. ",
-                            "display_name": "Windshield Wipers",
-                            "equipment_required": [
-                                "None"
-                            ],
-                            "goal_text": "Increase strength",
-                            "library_id": "229",
-                            "name": "Windshield Wipers",
-                            "position_order": 7,
-                            "reps_assigned": 10,
-                            "seconds_duration": 80,
-                            "seconds_per_rep": 2,
-                            "seconds_per_set": None,
-                            "sets_assigned": 2,
-                            "unit_of_measure": "count",
-                            "youtube_id": None,
-                            "goals": [0]
-                        },
-                        {
-                            "bilateral": True,
-                            "description": "On your side with one leg lifted off the ground and slightly behind your body, move your leg in small clockwise circles. Maintain a flexed foot so your toes are pointing towards you.",
-                            "display_name": "Leg Circles",
-                            "equipment_required": [
-                                "None"
-                            ],
-                            "goal_text": "Increase strength",
-                            "library_id": "232",
-                            "name": "Small Clockwise Circles",
-                            "position_order": 8,
-                            "reps_assigned": 10,
-                            "seconds_duration": 80,
-                            "seconds_per_rep": 2,
-                            "seconds_per_set": None,
-                            "sets_assigned": 2,
-                            "unit_of_measure": "count",
-                            "youtube_id": None,
-                            "goals": [0]
-                        },
-                        {
-                            "bilateral": True,
-                            "description": "Begin on your side with your elbow positioned under your shoulder and your legs stacked, knees bent. Place your other hand on your hip and lift off the ground, keeping your body in a straight line.",
-                            "display_name": "Side Plank (Knees Bent)",
-                            "equipment_required": [
-                                "None"
-                            ],
-                            "goal_text": "Increase strength",
-                            "library_id": "89",
-                            "name": "Side Plank Knees Bent",
-                            "position_order": 9,
-                            "reps_assigned": 30,
-                            "seconds_duration": 120,
-                            "seconds_per_rep": None,
-                            "seconds_per_set": 30,
-                            "sets_assigned": 2,
-                            "unit_of_measure": "seconds",
-                            "youtube_id": None,
-                            "goals": [0, 1]
-                        },
-                        {
-                            "bilateral": False,
-                            "description": "Lie on your back with your legs straight and your arms overhead. Bend your hips and knees. Contract your abdomen so your low back is flush with the ground. Move one leg and the opposite arm to the ground, straightening the knee and hip to bring the leg just above the ground. Engage your core and return the working limbs to the starting position.",
-                            "display_name": "Dead Bugs",
-                            "equipment_required": [
-                                "None"
-                            ],
-                            "goal_text": "Increase strength",
-                            "library_id": "84",
-                            "name": "Supine Arm/Leg Raise - Dying Bugs",
-                            "position_order": 10,
-                            "reps_assigned": 10,
-                            "seconds_duration": 40,
-                            "seconds_per_rep": 2,
-                            "seconds_per_set": None,
-                            "sets_assigned": 2,
-                            "unit_of_measure": "count",
-                            "youtube_id": None,
-                            "goals": [1]
-                        }
-                    ],
-                    "completed": False,
-                    "display_exercises": True,
-                    "event_date": None,
-                    "inhibit_exercises": [
-                        {
-                            "bilateral": True,
-                            "description": "Begin on your stomach with a foam roller beneath one thigh. Keeping that foot off of the ground, shift your weight onto that leg as you roll the length of the muscle from the knee to the hip, holding points of tension for 30 seconds. Switch sides and repeat. Don’t have a foam roller? You can use a tennis ball or water bottle.",
-                            "display_name": "Foam Roll - Quads",
-                            "equipment_required": [
-                                "Foam Roller"
-                            ],
-                            "goal_text": "Increase flexibility",
-                            "library_id": "48",
-                            "name": "Foam Roller Quadriceps",
-                            "position_order": 0,
-                            "reps_assigned": 30,
-                            "seconds_duration": 60,
-                            "seconds_per_rep": None,
-                            "seconds_per_set": 30,
-                            "sets_assigned": 1,
-                            "unit_of_measure": "seconds",
-                            "youtube_id": None,
-                            "goals": [0]
-                        },
-                        {
-                            "bilateral": True,
-                            "description": "Place foam roller just before the glute & roll the length of your hamstring. If you find a tender spot, hold for 30 seconds. Don’t have a foam roller? You can use a tennis ball or water bottle. ",
-                            "display_name": "Foam Roll - Hamstrings",
-                            "equipment_required": [
-                                "Foam Roller"
-                            ],
-                            "goal_text": "Increase flexibility",
-                            "library_id": "3",
-                            "name": "Foam Roller - Hamstrings",
-                            "position_order": 1,
-                            "reps_assigned": 30,
-                            "seconds_duration": 60,
-                            "seconds_per_rep": None,
-                            "seconds_per_set": 30,
-                            "sets_assigned": 1,
-                            "unit_of_measure": "seconds",
-                            "youtube_id": None,
-                            "goals": [0]
-                        },
-                        {
-                            "bilateral": True,
-                            "description": "On your side, slowly foam roll from the outer hip joint down toward the knee. If you find a tender spot, hold for 30 seconds. Don’t have a foam roller? You can use a tennis ball or water bottle.",
-                            "display_name": "Foam Roll - Outer Thigh",
-                            "equipment_required": [
-                                "Foam Roller"
-                            ],
-                            "goal_text": "Increase flexibility",
-                            "library_id": "4",
-                            "name": "Foam Roller - IT-Band",
-                            "position_order": 2,
-                            "reps_assigned": 30,
-                            "seconds_duration": 60,
-                            "seconds_per_rep": None,
-                            "seconds_per_set": 30,
-                            "sets_assigned": 1,
-                            "unit_of_measure": "seconds",
-                            "youtube_id": None,
-                            "goals": [2]
-                        }
-                    ],
-                    "integrate_exercises": [],
-                    "lengthen_exercises": [
-                        {
-                            "bilateral": True,
-                            "description": "In a plank position, raise your hips up and back and lengthen through your shoulders. Try to press your heels toward the ground to feel a stretch through the back of your lower leg.",
-                            "display_name": "Kneeling Hamstring Stretch",
-                            "equipment_required": [
-                                "None"
-                            ],
-                            "goal_text": "Prepare for movement",
-                            "library_id": "216",
-                            "name": "Kneeling Hamstring Stretch",
-                            "position_order": 3,
-                            "reps_assigned": 30,
-                            "seconds_duration": 60,
-                            "seconds_per_rep": None,
-                            "seconds_per_set": 30,
-                            "sets_assigned": 1,
-                            "unit_of_measure": "seconds",
-                            "youtube_id": None,
-                            "goals": [0]
-                        },
-                        {
-                            "bilateral": True,
-                            "description": "Stand with one leg in front of the other. Raise the arm that is on the same side as your back leg, engaging your core as you lean backward until a stretch is felt in your hip. Rotate the shoulder of your raised arm back to deepen the stretch. ",
-                            "display_name": "Standing Hip Stretch",
-                            "equipment_required": [
-                                "None"
-                            ],
-                            "goal_text": "Prepare for movement",
-                            "library_id": "6",
-                            "name": "Hip Flexor Static Stretch (Standing)",
-                            "position_order": 4,
-                            "reps_assigned": 30,
-                            "seconds_duration": 60,
-                            "seconds_per_rep": None,
-                            "seconds_per_set": 30,
-                            "sets_assigned": 1,
-                            "unit_of_measure": "seconds",
-                            "youtube_id": None,
-                            "goals": [2]
-                        },
-                        {
-                            "bilateral": True,
-                            "description": "Begin in a standing position with your toes pointing forward. Turn one foot to the outisde. With the opposite foot step forward into a lunge position, keeping your hips facing the front. Place your hands on your hips for balance.",
-                            "display_name": "Standing Outer Hip Stretch",
-                            "equipment_required": [
-                                "None"
-                            ],
-                            "goal_text": "Prepare for movement",
-                            "library_id": "28",
-                            "name": "Standing TFL Static Stretch",
-                            "position_order": 5,
-                            "reps_assigned": 30,
-                            "seconds_duration": 60,
-                            "seconds_per_rep": None,
-                            "seconds_per_set": 30,
-                            "sets_assigned": 1,
-                            "unit_of_measure": "seconds",
-                            "youtube_id": None,
-                            "goals": [2]
-                        }
-                    ],
-                    "minutes_duration": 15,
-                    "start_date": None
-                    }
-                },
-            
             "post_recovery_completed": False,
             "pre_recovery_completed": False,
             "session_from_readiness": False,
