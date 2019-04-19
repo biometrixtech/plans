@@ -86,10 +86,13 @@ class TrainingPlanManager(object):
 
         #new modalities
         self.daily_plan.heat = calc.get_heat(event_date, historic_soreness)
-        self.daily_plan.pre_active_rest = calc.get_pre_active_rest(event_date, historic_soreness)
-        self.daily_plan.warm_up = calc.get_warm_up(event_date, historic_soreness)
-        self.daily_plan.post_active_rests = calc.get_post_active_rest(event_date, historic_soreness)
+        self.daily_plan.pre_active_rest = calc.get_pre_active_rest(historic_soreness)
+        self.daily_plan.warm_up = calc.get_warm_up(historic_soreness)
+        self.daily_plan.cool_down = calc.get_cool_down(event_date, historic_soreness)
+        self.daily_plan.post_active_rest = calc.get_post_active_rest(historic_soreness)
+        self.daily_plan.active_recovery = calc.get_active_recovery(event_date, historic_soreness)
         self.daily_plan.ice = calc.get_ice(event_date, historic_soreness)
+        self.daily_plan.cold_water_immersion = calc.get_cold_water_immersion(event_date, historic_soreness)
 
         if soreness_values is not None and len(soreness_values) > 0:
             max_soreness = max(soreness_values)
