@@ -727,6 +727,6 @@ class ExerciseAssignmentCalculator(object):
             if h.first_reported is not None and not h.is_dormant_cleared():
                 days_diff = (current_date_time - h.first_reported).days
                 if days_diff >= 30:
-                    heat = Heat(minutes=0)
+                    heat = Heat(minutes=0, body_part_location=h.body_part_location, side=h.side)
 
         return heat
