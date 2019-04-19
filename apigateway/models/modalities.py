@@ -85,12 +85,16 @@ class ActiveRecovery(Serialisable):
 
 
 class Ice(Serialisable):
-    def __init__(self, minutes=0):
+    def __init__(self, minutes=0, body_part_location=None, side=0):
         self.minutes = minutes
+        self.body_part_location = body_part_location
+        self.side = side
 
     def json_serialise(self):
         ret = {
             'minutes': self.minutes,
+            'body_part_location': self.body_part_location.value,
+            'side': self.side
         }
 
         return ret

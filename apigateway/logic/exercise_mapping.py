@@ -6,7 +6,7 @@ from models.soreness import AssignedExercise, BodyPartLocation, HistoricSoreness
 from logic.goal_focus_text_generator import RecoveryTextGenerator
 from datetime import  timedelta
 from utils import format_datetime
-from models.modalities import Heat
+from models.modalities import ActiveRest, Heat, WarmUp, Ice
 
 
 class ExerciseAssignmentCalculator(object):
@@ -726,7 +726,65 @@ class ExerciseAssignmentCalculator(object):
         for h in historic_soreness_list:
             if h.first_reported is not None and not h.is_dormant_cleared():
                 days_diff = (current_date_time - h.first_reported).days
-                if days_diff >= 30:
+                if ((not h.is_pain and days_diff >= 30) or
+                        (h.historic_soreness_status == HistoricSorenessStatus.persistent_2_pain) or
+                        h.is_persistent_pain()):
                     heat = Heat(minutes=0, body_part_location=h.body_part_location, side=h.side)
 
         return heat
+
+    def get_pre_active_rest(self, current_date_time, historic_soreness_list):
+
+        active_rest = None
+
+        for h in historic_soreness_list:
+            if h.first_reported is not None and not h.is_dormant_cleared():
+                days_diff = (current_date_time - h.first_reported).days
+                if ((not h.is_pain and days_diff >= 30) or
+                        (h.historic_soreness_status == HistoricSorenessStatus.persistent_2_pain) or
+                        h.is_persistent_pain()):
+                    active_rest = ActiveRest()
+
+        return active_rest
+
+    def get_post_active_rest(self, current_date_time, historic_soreness_list):
+
+        active_rest = None
+
+        for h in historic_soreness_list:
+            if h.first_reported is not None and not h.is_dormant_cleared():
+                days_diff = (current_date_time - h.first_reported).days
+                if ((not h.is_pain and days_diff >= 30) or
+                        (h.historic_soreness_status == HistoricSorenessStatus.persistent_2_pain) or
+                        h.is_persistent_pain()):
+                    active_rest = ActiveRest()
+
+        return active_rest
+
+    def get_warm_up(self, current_date_time, historic_soreness_list):
+
+        warm_up = None
+
+        for h in historic_soreness_list:
+            if h.first_reported is not None and not h.is_dormant_cleared():
+                days_diff = (current_date_time - h.first_reported).days
+                if ((not h.is_pain and days_diff >= 30) or
+                        (h.historic_soreness_status == HistoricSorenessStatus.persistent_2_pain) or
+                        h.is_persistent_pain()):
+                    warm_up = WarmUp()
+
+        return warm_up
+
+    def get_ice(self, current_date_time, historic_soreness_list):
+
+        ice = None
+
+        for h in historic_soreness_list:
+            if h.first_reported is not None and not h.is_dormant_cleared():
+                days_diff = (current_date_time - h.first_reported).days
+                if ((not h.is_pain and days_diff >= 30) or
+                        (h.historic_soreness_status == HistoricSorenessStatus.persistent_2_pain) or
+                        h.is_persistent_pain()):
+                    ice = Ice(minutes=0, body_part_location=h.body_part_location, side=h.side)
+
+        return ice
