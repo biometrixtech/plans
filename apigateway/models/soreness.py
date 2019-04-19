@@ -184,6 +184,7 @@ class HistoricSoreness(Serialisable):
         self.streak = 0
         self.streak_start_date = None
         self.average_severity = 0.0
+        self.first_reported = ""
         self.last_reported = ""
         self.ask_acute_pain_question = False
         self.ask_persistent_2_question = False
@@ -203,6 +204,7 @@ class HistoricSoreness(Serialisable):
                    'streak': self.streak,
                    'streak_start_date': self.streak_start_date,
                    'average_severity': self.average_severity,
+                   'first_reported': self.first_reported,
                    'last_reported': self.last_reported,
                    'ask_acute_pain_question': self.ask_acute_pain_question,
                    'ask_persistent_2_question': self.ask_persistent_2_question

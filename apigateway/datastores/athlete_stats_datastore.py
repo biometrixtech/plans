@@ -163,6 +163,7 @@ class AthleteStatsDatastore(object):
         hs.historic_soreness_status = HistoricSorenessStatus(historic_soreness["historic_soreness_status"])
         hs.streak = historic_soreness.get('streak', 0.0)
         hs.average_severity = historic_soreness.get('average_severity', 0.0)
+        hs.first_reported = historic_soreness.get('first_reported', "")
         hs.last_reported = historic_soreness.get('last_reported', "")
         hs.streak_start_date = historic_soreness.get('streak_start_date', "")
         hs.ask_acute_pain_question = historic_soreness.get('ask_acute_pain_question', False)

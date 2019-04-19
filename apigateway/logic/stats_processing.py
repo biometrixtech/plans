@@ -170,6 +170,7 @@ class StatsProcessing(object):
 
         ns = namedtuple("ns", ["location", "side", "is_pain"])
 
+        first_reported_date = None
         last_reported_date = None
         last_reported_date_time = None
         days_since_last_report = None
@@ -181,6 +182,8 @@ class StatsProcessing(object):
                 grouped_soreness[ns_new] = grouped_soreness[ns_new] + 1
             else:
                 grouped_soreness[ns_new] = 1
+            if last_reported_date_time is None:
+                first_reported_date = s.reported_date_time
             if last_reported_date_time is None or parse_date(s.reported_date_time) > last_reported_date_time:
                 last_reported_date_time = parse_date(s.reported_date_time)
                 last_reported_date = s.reported_date_time
@@ -277,6 +280,7 @@ class StatsProcessing(object):
                     soreness.ask_acute_pain_question = ask_acute_pain_question
                     soreness.ask_persistent_2_question = False
                     soreness.average_severity = avg_severity
+                    soreness.first_reported = first_reported_date
                     soreness.last_reported = last_reported_date
                     soreness.streak_start_date = streak_start_date
                     soreness.streak = streak
@@ -293,6 +297,7 @@ class StatsProcessing(object):
                     soreness.ask_acute_pain_question = False
                     soreness.ask_persistent_2_question = False
                     soreness.average_severity = avg_severity
+                    soreness.first_reported = first_reported_date
                     soreness.last_reported = last_reported_date
                     soreness.streak_start_date = streak_start_date
 
@@ -310,6 +315,7 @@ class StatsProcessing(object):
                     soreness.ask_acute_pain_question = False
                     soreness.ask_persistent_2_question = False
                     soreness.average_severity = avg_severity
+                    soreness.first_reported = first_reported_date
                     soreness.last_reported = last_reported_date
                     soreness.streak_start_date = None
 
@@ -327,6 +333,7 @@ class StatsProcessing(object):
                     soreness.ask_acute_pain_question = False
                     soreness.ask_persistent_2_question = False
                     soreness.average_severity = avg_severity
+                    soreness.first_reported = first_reported_date
                     soreness.last_reported = last_reported_date
                     soreness.streak_start_date = None
 
@@ -340,6 +347,7 @@ class StatsProcessing(object):
                     soreness.ask_acute_pain_question = False
                     soreness.ask_persistent_2_question = False
                     soreness.average_severity = avg_severity
+                    soreness.first_reported = first_reported_date
                     soreness.last_reported = last_reported_date
                     soreness.streak_start_date = None
 
@@ -357,6 +365,7 @@ class StatsProcessing(object):
                     soreness.ask_acute_pain_question = False
                     soreness.ask_persistent_2_question = False
                     soreness.average_severity = avg_severity
+                    soreness.first_reported = first_reported_date
                     soreness.last_reported = last_reported_date
                     soreness.streak_start_date = None
 
@@ -365,10 +374,12 @@ class StatsProcessing(object):
                 else:
 
                     soreness = HistoricSoreness(g.location, g.side, g.is_pain)
+
                     soreness.historic_soreness_status = HistoricSorenessStatus.dormant_cleared
                     soreness.ask_acute_pain_question = False
                     soreness.ask_persistent_2_question = False
                     soreness.average_severity = 0.0
+                    soreness.first_reported = first_reported_date
                     soreness.last_reported = last_reported_date
                     soreness.streak_start_date = None
 

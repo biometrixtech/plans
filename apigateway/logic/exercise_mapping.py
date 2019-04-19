@@ -724,8 +724,8 @@ class ExerciseAssignmentCalculator(object):
         heat = None
 
         for h in historic_soreness_list:
-            if h.streak_start_date is not None:
-                days_diff = (current_date_time - h.streak_start_date).days
+            if h.first_reported is not None and not h.is_dormant_cleared():
+                days_diff = (current_date_time - h.first_reported).days
                 if days_diff >= 30:
                     heat = Heat(minutes=0)
 
