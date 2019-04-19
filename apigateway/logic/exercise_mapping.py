@@ -6,6 +6,7 @@ from models.soreness import AssignedExercise, BodyPartLocation, HistoricSoreness
 from logic.goal_focus_text_generator import RecoveryTextGenerator
 from datetime import  timedelta
 from utils import format_datetime
+from models.modalities import Heat
 
 
 class ExerciseAssignmentCalculator(object):
@@ -717,3 +718,15 @@ class ExerciseAssignmentCalculator(object):
             return True
         else:
             return False
+
+    def get_heat(self, current_date_time, historic_soreness_list):
+
+        heat = None
+
+        for h in historic_soreness_list:
+            if h.streak_start_date is not None:
+                days_diff = (current_date_time - h.streak_start_date).days
+                if days_diff >= 30:
+                    heat = Heat(minutes=0)
+
+        return heat

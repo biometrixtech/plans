@@ -84,6 +84,10 @@ class TrainingPlanManager(object):
 
         soreness_values = [s.severity for s in soreness_list if s.severity is not None and s.daily]
 
+        #heat modality
+        #does this depend on being before training for the day or is it okay if this shows up at any time?
+        self.daily_plan.heat = calc.get_heat(event_date, historic_soreness)
+
         if soreness_values is not None and len(soreness_values) > 0:
             max_soreness = max(soreness_values)
         else:

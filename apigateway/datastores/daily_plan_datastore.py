@@ -59,14 +59,14 @@ class DailyPlanDatastore(object):
             daily_plan.user_id = plan.get('user_id', None)
             daily_plan.training_sessions = \
                 [_external_session_from_mongodb(s, session.SessionType(s['session_type'])) for s in plan.get('training_sessions', [])]
-            daily_plan.practice_sessions = \
-                [_external_session_from_mongodb(s, session.SessionType.practice) for s in plan.get('practice_sessions', [])]
+            #daily_plan.practice_sessions = \
+            #    [_external_session_from_mongodb(s, session.SessionType.practice) for s in plan.get('practice_sessions', [])]
             daily_plan.strength_conditioning_sessions = \
                 [_external_session_from_mongodb(s, session.SessionType.strength_and_conditioning)
                  for s in plan.get('cross_training_sessions', [])]
-            daily_plan.games = \
-                [_external_session_from_mongodb(s, session.SessionType.game)
-                 for s in plan.get('game_sessions', [])]
+            #daily_plan.games = \
+            #    [_external_session_from_mongodb(s, session.SessionType.game)
+            #     for s in plan.get('game_sessions', [])]
             if not stats_processing:
                 daily_plan.pre_recovery = _recovery_session_from_mongodb(plan['pre_recovery']) if plan.get('pre_recovery', None) is not None else None
                 daily_plan.post_recovery = _recovery_session_from_mongodb(plan['post_recovery']) if plan.get('post_recovery', None) is not None else None
@@ -74,9 +74,9 @@ class DailyPlanDatastore(object):
                     [_recovery_session_from_mongodb(s) for s in plan.get('completed_post_recovery_sessions', [])]
                 daily_plan.functional_strength_session = \
                     _functional_strength_session_from_mongodb(plan['functional_strength_session']) if plan.get('functional_strength_session', None) is not None else None
-            daily_plan.bump_up_sessions = \
-                [_external_session_from_mongodb(s, session.SessionType.bump_up)
-                 for s in plan.get('bump_up_sessions', [])]
+            #daily_plan.bump_up_sessions = \
+            #    [_external_session_from_mongodb(s, session.SessionType.bump_up)
+            #     for s in plan.get('bump_up_sessions', [])]
             daily_plan.daily_readiness_survey = _daily_readiness_from_mongo(plan.get('daily_readiness_survey', None), user_id)
             daily_plan.updated = plan.get('updated', None)
             daily_plan.last_updated = plan.get('last_updated', None)

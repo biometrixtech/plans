@@ -9,6 +9,17 @@ class ExerciseAssignments(object):
         self.lengthen_exercises = []
         self.activate_exercises = []
         self.integrate_exercises = []
+
+        self.static_stretch_exercises = []
+        self.static_then_active_stretch_exercises = []
+        self.static_then_active_or_dynamic_stretch_exercises = []
+        self.active_stretch_exercises = []
+        self.active_or_dynamic_stretch_exercises = []
+        self.isolated_activation_exercises = []
+        self.dynamic_integrate_exercises = []
+        self.dynamic_integrate_with_speed_exercises = []
+        self.static_integrate_exercises = []
+
         self.inhibit_minutes = 0
         self.lengthen_minutes = 0
         self.activate_minutes = 0
@@ -240,6 +251,7 @@ class ExerciseAssignments(object):
             self.lengthen_percentage = self.lengthen_minutes / total_minutes
             self.activate_percentage = self.activate_minutes / total_minutes
             self.integrate_percentage = self.integrate_minutes / total_minutes
+
     '''
     def update(self, soreness_severity, soreness_exercises):
 

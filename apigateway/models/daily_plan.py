@@ -11,18 +11,26 @@ class DailyPlan(Serialisable):
         self.event_date = event_date
         self.day_of_week = self.get_event_datetime().weekday()
         self.training_sessions = []
-        self.practice_sessions = []
+        #self.practice_sessions = []
         self.strength_conditioning_sessions = []  # includes cross training
-        self.games = []
-        self.tournaments = []
+        #self.games = []
+        #self.tournaments = []
+        self.heat = None
+        self.pre_active_rest = None
+        self.warm_up = None
+        self.cool_down = None
+        self.active_recovery = None
+        self.post_active_rest = None
+        self.ice = None
+        self.cold_water_immersion = None
         self.pre_recovery_completed = False
         self.post_recovery_completed = False
         self.functional_strength_completed = False
         self.pre_recovery = session.RecoverySession()
         self.post_recovery = session.RecoverySession()
         self.completed_post_recovery_sessions = []
-        self.corrective_sessions = []
-        self.bump_up_sessions = []
+        #self.corrective_sessions = []
+        #self.bump_up_sessions = []
         self.daily_readiness_survey = None
         self.updated = False
         self.last_updated = None
@@ -51,10 +59,10 @@ class DailyPlan(Serialisable):
                'date': self.event_date,
                'day_of_week': self.day_of_week,
                'training_sessions': [p.json_serialise() for p in self.training_sessions],
-               'practice_sessions': [p.json_serialise() for p in self.practice_sessions],
-               'bump_up_sessions': [b.json_serialise() for b in self.bump_up_sessions],
+               #'practice_sessions': [p.json_serialise() for p in self.practice_sessions],
+               #'bump_up_sessions': [b.json_serialise() for b in self.bump_up_sessions],
                'cross_training_sessions': [c.json_serialise() for c in self.strength_conditioning_sessions],
-               'game_sessions': [g.json_serialise() for g in self.games],
+               #'game_sessions': [g.json_serialise() for g in self.games],
                'pre_recovery_completed': self.pre_recovery_completed,
                'post_recovery_completed': self.post_recovery_completed,
                'functional_strength_session': (self.functional_strength_session.json_serialise()
@@ -63,6 +71,7 @@ class DailyPlan(Serialisable):
                # 'recovery_pm': self.post_recovery.json_serialise() if self.post_recovery is not None else None,
                'pre_recovery': self.pre_recovery.json_serialise() if self.pre_recovery is not None else None,
                'post_recovery': self.post_recovery.json_serialise() if self.post_recovery is not None else None,
+               'heat': self.heat.json_serialise(),
                'completed_post_recovery_sessions': [c.json_serialise() for c in self.completed_post_recovery_sessions],
                'last_updated': self.last_updated,
                'daily_readiness_survey': readiness,
