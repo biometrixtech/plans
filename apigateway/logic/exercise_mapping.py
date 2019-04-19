@@ -6,7 +6,7 @@ from models.soreness import AssignedExercise, BodyPartLocation, HistoricSoreness
 from logic.goal_focus_text_generator import RecoveryTextGenerator
 from datetime import  timedelta
 from utils import format_datetime
-from models.modalities import ActiveRecovery, ActiveRest, ColdWaterImmersion, CoolDown, Heat, WarmUp, Ice
+from models.modalities import ActiveRecovery, ActiveRestBeforeTraining, ColdWaterImmersion, CoolDown, Heat, WarmUp, Ice
 
 
 class ExerciseAssignmentCalculator(object):
@@ -396,6 +396,19 @@ class ExerciseAssignmentCalculator(object):
 
             return self.get_chest_exercises(soreness)
 
+    def get_constituent_exercises(self, primary_body_part, constituent_body_parts, soreness):
+
+        for c in constituent_body_parts:
+            body_part = self.get_exercises_for_body_parts(soreness)
+            primary_body_part.inhibit_exercises.extend(body_part.inhibit_exercises)
+            primary_body_part.static_stretch_exercises.extend(body_part.static_stretch_exercises)
+            primary_body_part.active_stretch_exercises.extend(body_part.active_stretch_exercises)
+            primary_body_part.dynamic_stretch_exercises.extend(body_part.dynamic_stretch_exercises)
+            primary_body_part.isolated_activation_exercises.extend(body_part.isolated_activation_exercises)
+            primary_body_part.static_integrate_exercises.extend(body_part.static_integrate_exercises)
+
+        return primary_body_part
+
     def is_soreness_historic(self, soreness):
 
         if (soreness.historic_soreness_status == HistoricSorenessStatus.almost_persistent_2_pain or
@@ -456,7 +469,6 @@ class ExerciseAssignmentCalculator(object):
         activate = self.get_exercise_dictionary(["53", "75", "115", "106"])
         foot.add_exercise_phases(inhibit, lengthen, activate)
         return foot
-
 
     def get_chest_exercises(self, soreness):
         chest = models.soreness.BodyPart(models.soreness.BodyPartLocation.chest, self.get_body_part_priority(16, soreness))
@@ -527,6 +539,7 @@ class ExerciseAssignmentCalculator(object):
         lengthen = self.get_exercise_dictionary(["7", "26", "9"])
         activate = self.get_exercise_dictionary(["67", "115", "106"])
         calves.add_exercise_phases(inhibit, lengthen, activate)
+        calves.add_muscle_groups([16], [9], [17], [8, 9, 10])
         return calves
 
     def get_knee_exercises(self, soreness):
@@ -550,6 +563,7 @@ class ExerciseAssignmentCalculator(object):
                 activate = self.get_exercise_dictionary(["115", "75", "67"])
 
             knee.add_exercise_phases(inhibit, lengthen, activate, True)
+
         return knee
 
     def get_quads_exercises(self, soreness):
@@ -558,6 +572,7 @@ class ExerciseAssignmentCalculator(object):
         lengthen = self.get_exercise_dictionary(["49", "118", "8", "28", "98", "46", "9", "7"])
         activate = self.get_exercise_dictionary(["84", "81", "14", "108", "77", "29"])
         quads.add_exercise_phases(inhibit, lengthen, activate)
+
         return quads
 
     def get_groin_exercises(self, soreness):
@@ -589,6 +604,7 @@ class ExerciseAssignmentCalculator(object):
         lengthen = self.get_exercise_dictionary(["28", "6", "118", "8", "7"])
         activate = self.get_exercise_dictionary(["108", "14", "81", "10"])
         outer_thigh.add_exercise_phases(inhibit, lengthen, activate)
+
         return outer_thigh
 
     def get_hamstrings_exercises(self, soreness):
@@ -642,6 +658,7 @@ class ExerciseAssignmentCalculator(object):
                 lengthen = self.get_exercise_dictionary(["9", "46", "49", "118"])
                 activate = self.get_exercise_dictionary(["10", "50"])
             glutes.add_exercise_phases(inhibit, lengthen, activate, True)
+
         return glutes
 
     def get_hip_exercises(self, soreness):
@@ -740,7 +757,7 @@ class ExerciseAssignmentCalculator(object):
         for h in historic_soreness_list:
             if h.first_reported is not None and not h.is_dormant_cleared():
                 if not h.is_pain:
-                    active_rest = ActiveRest()
+                    active_rest = ActiveRestBeforeTraining()
 
         return active_rest
 
@@ -751,7 +768,7 @@ class ExerciseAssignmentCalculator(object):
         for h in historic_soreness_list:
             if h.first_reported is not None and not h.is_dormant_cleared():
                 if not h.is_pain:
-                    active_rest = ActiveRest()
+                    active_rest = ActiveRestBeforeTraining()
 
         return active_rest
 

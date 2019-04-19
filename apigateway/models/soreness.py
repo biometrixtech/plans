@@ -128,6 +128,17 @@ class BodyPart(object):
         self.activate_exercises = []
         self.integrate_exercises = []
 
+        self.static_stretch_exercises = []
+        self.active_stretch_exercises = []
+        self.dynamic_stretch_exercises = []
+        self.isolated_activation_exercises = []
+        self.static_integrate_exercises = []
+
+        self.agonists = []
+        self.synergists = []
+        self.stabilizers = []
+        self.antagonists = []
+
     @staticmethod
     def add_exercises(exercise_list, exercise_dict, treatment_priority, randomize=False):
 
@@ -157,6 +168,33 @@ class BodyPart(object):
                                                      self.treatment_priority, randomize)
         self.activate_exercises = self.add_exercises(self.activate_exercises, activate,
                                                      self.treatment_priority, randomize)
+
+    def add_extended_exercise_phases(self, inhibit, static_stretch, active_stretch, dynamic_stretch, isolated_activation, static_integrate, randomize=False):
+
+        self.inhibit_exercises = self.add_exercises(self.inhibit_exercises, inhibit,
+                                                    self.treatment_priority, randomize)
+
+        self.static_stretch_exercises = self.add_exercises(self.static_stretch_exercises, static_stretch,
+                                                           self.treatment_priority, randomize)
+
+        self.active_stretch_exercises = self.add_exercises(self.active_stretch_exercises, active_stretch,
+                                                           self.treatment_priority, randomize)
+
+        self.dynamic_stretch_exercises = self.add_exercises(self.dynamic_stretch_exercises, dynamic_stretch,
+                                                            self.treatment_priority, randomize)
+
+        self.isolated_activation_exercises = self.add_exercises(self.isolated_activation_exercises, isolated_activation,
+                                                                self.treatment_priority, randomize)
+
+        self.static_integrate_exercises = self.add_exercises(self.static_integrate_exercises, static_integrate,
+                                                             self.treatment_priority, randomize)
+
+    def add_muscle_groups(self, agonists, synergists, stabilizers, antagonists):
+
+        self.agonists = agonists
+        self.synergists = synergists
+        self.stabilizers = stabilizers
+        self.antagonists = antagonists
 
 
 class HistoricSorenessStatus(IntEnum):
@@ -290,6 +328,8 @@ class AssignedExercise(Serialisable):
         self.position_order = 0
         self.goal_text = ""
         self.equipment_required = []
+        self.goals = []
+        self.priorities = []
 
     '''
     def soreness_priority(self):

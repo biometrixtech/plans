@@ -1,5 +1,6 @@
 from serialisable import Serialisable
-
+from models.soreness import BodyPart, BodyPartLocation, AssignedExercise
+from models.body_parts import BodyPartFactory
 
 class Heat(Serialisable):
     def __init__(self, minutes=0, body_part_location=None, side=0):
@@ -17,11 +18,10 @@ class Heat(Serialisable):
         return ret
 
 
-class ActiveRest(Serialisable):
+class ActiveRestBeforeTraining(Serialisable):
     def __init__(self):
         self.inhibit_exercises = []
         self.static_then_active_stretch_exercises = []
-        self.static_stretch_exercises = []
         self.active_stretch_exercises = []
         self.isolated_activate_exercises = []
         self.static_integrate_exercises = []
@@ -30,12 +30,79 @@ class ActiveRest(Serialisable):
         ret = {
             'inhibit_exercises': [p.json_serialise() for p in self.inhibit_exercises],
             'static_then_active_stretch_exercises': [p.json_serialise() for p in self.static_then_active_stretch_exercises],
-            'static_stretch_exercises': [p.json_serialise() for p in self.static_stretch_exercises],
             'active_stretch_exercises': [p.json_serialise() for p in self.active_stretch_exercises],
             'isolated_activate_exercises': [p.json_serialise() for p in self.isolated_activate_exercises],
             'static_integrate_exercises': [p.json_serialise() for p in self.static_integrate_exercises],
         }
         return ret
+
+
+class ActiveRestAfterTraining(Serialisable):
+    def __init__(self):
+        self.inhibit_exercises = []
+        self.static_stretch_exercises = []
+        self.isolated_activate_exercises = []
+        self.static_integrate_exercises = []
+
+    def json_serialise(self):
+        ret = {
+            'inhibit_exercises': [p.json_serialise() for p in self.inhibit_exercises],
+            'static_stretch_exercises': [p.json_serialise() for p in self.static_stretch_exercises],
+            'isolated_activate_exercises': [p.json_serialise() for p in self.isolated_activate_exercises],
+            'static_integrate_exercises': [p.json_serialise() for p in self.static_integrate_exercises],
+        }
+        return ret
+
+    def fill_exercises(self, soreness_list, historic_soreness_list):
+
+        for s in soreness_list:
+            body_part_factory = BodyPartFactory()
+            body_part = body_part_factory.get_body_part(s.body_part_location)
+            for a in body_part.agonists:
+                for e, progressions_list in a.inhibit_exercises.items():
+                    assigned_exercise = AssignedExercise(library_id=e,
+                                                         body_part_location=s.body_part_location,
+                                                         progressions=progressions_list)
+                    if s.pain:
+                        assigned_exercise.goals.append("Care")
+                    else:
+                        assigned_exercise.goals.append("Recovery")
+                    assigned_exercise.priorities.append("1")
+                    self.inhibit_exercises.append(assigned_exercise)
+
+                for e, progressions_list in a.static_stretch_exercises.items():
+                    assigned_exercise = AssignedExercise(library_id=e,
+                                                         body_part_location=s.body_part_location,
+                                                         progressions=progressions_list)
+                    if s.pain:
+                        assigned_exercise.goals.append("Care")
+                    else:
+                        assigned_exercise.goals.append("Recovery")
+                    assigned_exercise.priorities.append("1")
+                    self.static_stretch_exercises.append(assigned_exercise)
+
+            for y in body_part.synergists:
+                for e, progressions_list in y.inhibit_exercises.items():
+                    assigned_exercise = AssignedExercise(library_id=e,
+                                                         body_part_location=s.body_part_location,
+                                                         progressions=progressions_list)
+                    if s.pain:
+                        assigned_exercise.goals.append("Care")
+                    else:
+                        assigned_exercise.goals.append("Recovery")
+                    assigned_exercise.priorities.append("2")
+                    self.inhibit_exercises.append(assigned_exercise)
+
+                for e, progressions_list in y.static_stretch_exercises.items():
+                    assigned_exercise = AssignedExercise(library_id=e,
+                                                         body_part_location=s.body_part_location,
+                                                         progressions=progressions_list)
+                    if s.pain:
+                        assigned_exercise.goals.append("Care")
+                    else:
+                        assigned_exercise.goals.append("Recovery")
+                    assigned_exercise.priorities.append("2")
+                    self.static_stretch_exercises.append(assigned_exercise)
 
 
 class WarmUp(Serialisable):
