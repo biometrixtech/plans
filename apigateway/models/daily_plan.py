@@ -120,15 +120,15 @@ class DailyPlan(Serialisable):
         sessions = []
         training_sessions = [x for x in self.training_sessions if x.event_date is not None and
                              x.event_date < trigger_date_time]
-        practice_sessions = [x for x in self.practice_sessions if x.event_date is not None and
-                             x.event_date < trigger_date_time]
-        game_sessions = [x for x in self.games if x.event_date is not None and
-                         x.event_date < trigger_date_time]
+        #practice_sessions = [x for x in self.practice_sessions if x.event_date is not None and
+        #                     x.event_date < trigger_date_time]
+        #game_sessions = [x for x in self.games if x.event_date is not None and
+        #                 x.event_date < trigger_date_time]
         cross_training_sessions = [x for x in self.strength_conditioning_sessions if x.event_date is not None and
                                    x.event_date < trigger_date_time]
 
-        sessions.extend(practice_sessions)
-        sessions.extend(game_sessions)
+        #sessions.extend(practice_sessions)
+        #sessions.extend(game_sessions)
         sessions.extend(cross_training_sessions)
         sessions.extend(training_sessions)
 
@@ -140,15 +140,15 @@ class DailyPlan(Serialisable):
 
         training_sessions = [x for x in self.training_sessions if x.event_date is not None and
                              x.event_date > trigger_date_time]
-        practice_sessions = [x for x in self.practice_sessions if x.event_date is not None and
-                             x.event_date > trigger_date_time]
-        game_sessions = [x for x in self.games if x.event_date is not None and
-                         x.event_date > trigger_date_time]
+        #practice_sessions = [x for x in self.practice_sessions if x.event_date is not None and
+        #                     x.event_date > trigger_date_time]
+        #game_sessions = [x for x in self.games if x.event_date is not None and
+        #                 x.event_date > trigger_date_time]
         cross_training_sessions = [x for x in self.strength_conditioning_sessions if x.event_date is not None and
                                    x.event_date > trigger_date_time]
 
-        sessions.extend(practice_sessions)
-        sessions.extend(game_sessions)
+        #sessions.extend(practice_sessions)
+        #sessions.extend(game_sessions)
         sessions.extend(cross_training_sessions)
         sessions.extend(training_sessions)
 

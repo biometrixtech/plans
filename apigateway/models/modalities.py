@@ -60,31 +60,32 @@ class ActiveRestAfterTraining(Serialisable):
 
         for s in soreness_list:
 
-            body_part = body_part_factory.get_body_part(s.body_part_location)
+            body_part = body_part_factory.get_body_part(s.body_part)
 
-            for a in body_part.agonists:
-                for e, progressions_list in a.inhibit_exercises.items():
-                    self.update_assigned_exercises(e, self.inhibit_exercises, event_date_time,
-                                                   progressions_list, s, "1")
+            if body_part is not None:
+                for a in body_part.agonists:
+                    for e, progressions_list in a.inhibit_exercises.items():
+                        self.update_assigned_exercises(e, self.inhibit_exercises, event_date_time,
+                                                       progressions_list, s, "1")
 
-                for e, progressions_list in a.static_stretch_exercises.items():
-                    self.update_assigned_exercises(e, self.static_stretch_exercises, event_date_time,
-                                                   progressions_list, s, "1")
+                    for e, progressions_list in a.static_stretch_exercises.items():
+                        self.update_assigned_exercises(e, self.static_stretch_exercises, event_date_time,
+                                                       progressions_list, s, "1")
 
-                for e, progressions_list in a.isolated_activate_exercises.items():
-                    self.update_assigned_exercises(e, self.isolated_activate_exercises, event_date_time,
-                                                   progressions_list, s, "1")
+                    for e, progressions_list in a.isolated_activate_exercises.items():
+                        self.update_assigned_exercises(e, self.isolated_activate_exercises, event_date_time,
+                                                       progressions_list, s, "1")
 
-            for y in body_part.synergists:
-                for e, progressions_list in y.inhibit_exercises.items():
-                    self.update_assigned_exercises(e, self.inhibit_exercises, event_date_time,
-                                                   progressions_list, s, "2")
+                for y in body_part.synergists:
+                    for e, progressions_list in y.inhibit_exercises.items():
+                        self.update_assigned_exercises(e, self.inhibit_exercises, event_date_time,
+                                                       progressions_list, s, "2")
 
-                # no priority 2 synergist static stretch exercises for Active Rest after training
+                    # no priority 2 synergist static stretch exercises for Active Rest after training
 
-                for e, progressions_list in y.isolated_activate_exercises.items():
-                    self.update_assigned_exercises(e, self.isolated_activate_exercises, event_date_time,
-                                                   progressions_list, s, "2")
+                    for e, progressions_list in y.isolated_activate_exercises.items():
+                        self.update_assigned_exercises(e, self.isolated_activate_exercises, event_date_time,
+                                                       progressions_list, s, "2")
 
         # get general for static integrate
         # not sure how to tag general items

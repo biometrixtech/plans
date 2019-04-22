@@ -43,17 +43,17 @@ class BodyPartFactory(object):
 
         return exercise_dict
 
-    def get_body_part(self, body_part_location):
+    def get_body_part(self, body_part):
 
-        if body_part_location == BodyPartLocation.knee:
+        if body_part.location == BodyPartLocation.knee:
             return self.get_knee()
-        elif body_part_location == BodyPartLocation.quads:
+        elif body_part.location == BodyPartLocation.quads:
             return self.get_quads()
-        elif body_part_location == BodyPartLocation.outer_thigh:
+        elif body_part.location == BodyPartLocation.outer_thigh:
             return self.get_outer_thigh()
-        elif body_part_location == BodyPartLocation.glutes:
+        elif body_part.location == BodyPartLocation.glutes:
             return self.get_glutes()
-        elif body_part_location == BodyPartLocation.calves:
+        elif body_part.location == BodyPartLocation.calves:
             return self.get_calves()
 
     def get_general(self):

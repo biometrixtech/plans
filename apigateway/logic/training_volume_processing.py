@@ -663,10 +663,10 @@ class TrainingVolumeProcessing(object):
         for c in daily_plan_collection:
 
             values.extend(self.get_values_for_session_attribute(attribute_name, c.training_sessions))
-            values.extend(self.get_values_for_session_attribute(attribute_name, c.practice_sessions))
+            #values.extend(self.get_values_for_session_attribute(attribute_name, c.practice_sessions))
             values.extend(self.get_values_for_session_attribute(attribute_name, c.strength_conditioning_sessions))
-            values.extend(self.get_values_for_session_attribute(attribute_name, c.games))
-            values.extend(self.get_values_for_session_attribute(attribute_name, c.bump_up_sessions))
+            #values.extend(self.get_values_for_session_attribute(attribute_name, c.games))
+            #values.extend(self.get_values_for_session_attribute(attribute_name, c.bump_up_sessions))
 
         if len(values) > 0:
             sum_value = sum(values)
@@ -684,10 +684,10 @@ class TrainingVolumeProcessing(object):
             sub_values = []
 
             sub_values.extend(self.get_values_for_session_attribute(attribute_name, c.training_sessions))
-            sub_values.extend(self.get_values_for_session_attribute(attribute_name, c.practice_sessions))
+            #sub_values.extend(self.get_values_for_session_attribute(attribute_name, c.practice_sessions))
             sub_values.extend(self.get_values_for_session_attribute(attribute_name, c.strength_conditioning_sessions))
-            sub_values.extend(self.get_values_for_session_attribute(attribute_name, c.games))
-            sub_values.extend(self.get_values_for_session_attribute(attribute_name, c.bump_up_sessions))
+            #sub_values.extend(self.get_values_for_session_attribute(attribute_name, c.games))
+            #sub_values.extend(self.get_values_for_session_attribute(attribute_name, c.bump_up_sessions))
 
             if len(sub_values) > 0:
                 sum_value = sum(sub_values)
@@ -707,14 +707,14 @@ class TrainingVolumeProcessing(object):
 
             sub_values.extend(self.get_product_of_session_attributes(attribute_1_name, attribute_2_name,
                                                                      c.training_sessions))
-            sub_values.extend(self.get_product_of_session_attributes(attribute_1_name, attribute_2_name,
-                                                                     c.practice_sessions))
+            #sub_values.extend(self.get_product_of_session_attributes(attribute_1_name, attribute_2_name,
+            #                                                         c.practice_sessions))
             sub_values.extend(self.get_product_of_session_attributes(attribute_1_name, attribute_2_name,
                                                                      c.strength_conditioning_sessions))
-            sub_values.extend(self.get_product_of_session_attributes(attribute_1_name, attribute_2_name,
-                                                                     c.games))
-            sub_values.extend(self.get_product_of_session_attributes(attribute_1_name, attribute_2_name,
-                                                                     c.bump_up_sessions))
+            #sub_values.extend(self.get_product_of_session_attributes(attribute_1_name, attribute_2_name,
+            #                                                         c.games))
+            #sub_values.extend(self.get_product_of_session_attributes(attribute_1_name, attribute_2_name,
+            #                                                         c.bump_up_sessions))
             if len(sub_values) > 0:
                 sum_value = sum(sub_values)
                 values.append(sum_value)
@@ -733,14 +733,14 @@ class TrainingVolumeProcessing(object):
 
             values.extend(self.get_tuple_product_of_session_attributes(c.get_event_datetime(), attribute_1_name, attribute_2_name,
                                                                      c.training_sessions))
-            values.extend(self.get_tuple_product_of_session_attributes(c.get_event_datetime(), attribute_1_name, attribute_2_name,
-                                                                     c.practice_sessions))
+            #values.extend(self.get_tuple_product_of_session_attributes(c.get_event_datetime(), attribute_1_name, attribute_2_name,
+            #                                                         c.practice_sessions))
             values.extend(self.get_tuple_product_of_session_attributes(c.get_event_datetime(), attribute_1_name, attribute_2_name,
                                                                      c.strength_conditioning_sessions))
-            values.extend(self.get_tuple_product_of_session_attributes(c.get_event_datetime(), attribute_1_name, attribute_2_name,
-                                                                     c.games))
-            values.extend(self.get_tuple_product_of_session_attributes(c.get_event_datetime(), attribute_1_name, attribute_2_name,
-                                                                     c.bump_up_sessions))
+            #values.extend(self.get_tuple_product_of_session_attributes(c.get_event_datetime(), attribute_1_name, attribute_2_name,
+            #                                                         c.games))
+            #values.extend(self.get_tuple_product_of_session_attributes(c.get_event_datetime(), attribute_1_name, attribute_2_name,
+            #                                                         c.bump_up_sessions))
             #if len(sub_values) > 0:
             #    sum_value = sum(sub_values)
             #    values.append(sum_value)
@@ -756,14 +756,14 @@ class TrainingVolumeProcessing(object):
         for c in daily_plan_collection:
             values.extend(self.get_product_of_session_attributes(attribute_1_name, attribute_2_name,
                                                                  c.training_sessions))
-            values.extend(self.get_product_of_session_attributes(attribute_1_name, attribute_2_name,
-                                                                 c.practice_sessions))
+            #values.extend(self.get_product_of_session_attributes(attribute_1_name, attribute_2_name,
+            #                                                     c.practice_sessions))
             values.extend(self.get_product_of_session_attributes(attribute_1_name, attribute_2_name,
                                                                  c.strength_conditioning_sessions))
-            values.extend(self.get_product_of_session_attributes(attribute_1_name, attribute_2_name,
-                                                                 c.games))
-            values.extend(self.get_product_of_session_attributes(attribute_1_name, attribute_2_name,
-                                                                 c.bump_up_sessions))
+            #values.extend(self.get_product_of_session_attributes(attribute_1_name, attribute_2_name,
+            #                                                     c.games))
+            #values.extend(self.get_product_of_session_attributes(attribute_1_name, attribute_2_name,
+            #                                                     c.bump_up_sessions))
         if len(values) > 0:
             sum_value = sum(values)
 
