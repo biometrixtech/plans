@@ -30,7 +30,7 @@ class JointSorenessSeverity(IntEnum):
 
 class BaseSoreness(object):
     def __init__(self):
-        self.historic_soreness_status = None
+        self.historic_soreness_status = HistoricSorenessStatus.dormant_cleared
 
     def is_acute_pain(self):
         if (self.historic_soreness_status is not None and (self.historic_soreness_status == HistoricSorenessStatus.acute_pain or
@@ -68,7 +68,7 @@ class Soreness(BaseSoreness, Serialisable):
     def __init__(self):
         super().__init__()
         self.body_part = None
-        #self.historic_soreness_status = None
+        self.historic_soreness_status = None
         self.pain = False
         self.reported_date_time = None
         self.severity = None  # muscle_soreness_severity or joint_soreness_severity
