@@ -1,5 +1,5 @@
 from serialisable import Serialisable
-from models.soreness import BodyPart, BodyPartLocation, AssignedExercise
+from models.soreness import BodyPart, BodyPartLocation, AssignedExercise, HistoricSorenessStatus
 from models.body_parts import BodyPartFactory
 
 
@@ -54,7 +54,7 @@ class ActiveRestAfterTraining(Serialisable):
         }
         return ret
 
-    def fill_exercises(self, soreness_list, historic_soreness_list):
+    def fill_exercises(self, soreness_list, event_date_time):
 
         body_part_factory = BodyPartFactory()
 
@@ -64,50 +64,57 @@ class ActiveRestAfterTraining(Serialisable):
 
             for a in body_part.agonists:
                 for e, progressions_list in a.inhibit_exercises.items():
-                    if e not in self.inhibit_exercises:
-                        self.inhibit_exercises[e] = AssignedExercise(library_id=e, progressions=progressions_list)
-
-                    if s.pain:
-                        self.inhibit_exercises[e].goals.add("Care")
-                    else:
-                        self.inhibit_exercises[e].goals.add("Recovery")
-                    self.inhibit_exercises[e].priorities.add("1")
-                    self.inhibit_exercises[e].soreness_sources.add(s)
+                    self.update_assigned_exercises(e, self.inhibit_exercises, event_date_time,
+                                                   progressions_list, s, "1")
 
                 for e, progressions_list in a.static_stretch_exercises.items():
-                    if e not in self.inhibit_exercises:
-                        self.static_stretch_exercises[e] = AssignedExercise(library_id=e, progressions=progressions_list)
+                    self.update_assigned_exercises(e, self.static_stretch_exercises, event_date_time,
+                                                   progressions_list, s, "1")
 
-                    if s.pain:
-                        self.static_stretch_exercises[e].goals.add("Care")
-                    else:
-                        self.static_stretch_exercises[e].goals.add("Recovery")
-                    self.static_stretch_exercises[e].priorities.add("1")
-                    self.static_stretch_exercises[e].soreness_sources.add(s)
+                for e, progressions_list in a.isolated_activate_exercises.items():
+                    self.update_assigned_exercises(e, self.isolated_activate_exercises, event_date_time,
+                                                   progressions_list, s, "1")
 
             for y in body_part.synergists:
                 for e, progressions_list in y.inhibit_exercises.items():
-                    if e not in self.inhibit_exercises:
-                        self.inhibit_exercises[e] = AssignedExercise(library_id=e, progressions=progressions_list)
+                    self.update_assigned_exercises(e, self.inhibit_exercises, event_date_time,
+                                                   progressions_list, s, "2")
 
-                    if s.pain:
-                        self.inhibit_exercises[e].goals.add("Care")
-                    else:
-                        self.inhibit_exercises[e].goals.add("Recovery")
-                    self.inhibit_exercises[e].priorities.add("2")
-                    self.inhibit_exercises[e].soreness_sources.add(s)
+                # no priority 2 synergist static stretch exercises for Active Rest after training
 
-                for e, progressions_list in y.static_stretch_exercises.items():
-                    if e not in self.inhibit_exercises:
-                        self.static_stretch_exercises[e] = AssignedExercise(library_id=e,
-                                                                            progressions=progressions_list)
+                for e, progressions_list in y.isolated_activate_exercises.items():
+                    self.update_assigned_exercises(e, self.isolated_activate_exercises, event_date_time,
+                                                   progressions_list, s, "2")
 
-                    if s.pain:
-                        self.static_stretch_exercises[e].goals.add("Care")
-                    else:
-                        self.static_stretch_exercises[e].goals.add("Recovery")
-                    self.static_stretch_exercises[e].priorities.add("2")
-                    self.static_stretch_exercises[e].soreness_sources.add(s)
+        # get general for static integrate
+        # not sure how to tag general items
+        #general_body_part = body_part_factory.get_body_part(BodyPartLocation.general)
+
+        #for e, progressions_list in general_body_part.static_integrate_exercises.items():
+        #    self.update_assigned_exercises(e, self.static_integrate_exercises, event_date_time,
+        #                                   progressions_list, None, "1")
+
+    def update_assigned_exercises(self, exercise_id, exercise_collection, event_date_time, progressions_list, soreness, priority):
+
+        if exercise_id not in exercise_collection:
+            exercise_collection[exercise_id] = AssignedExercise(library_id=exercise_id, progressions=progressions_list)
+        if soreness.historic_soreness_status is None:
+            if soreness.pain:
+                exercise_collection[exercise_id].goals.add("Care")
+            else:
+                exercise_collection[exercise_id].goals.add("Recovery")
+        else:
+            days_sore = 0
+            if soreness.first_reported is not None:
+                days_sore = (event_date_time - soreness.first_reported).days
+            if not soreness.pain and 15 <= days_sore < 30:
+                exercise_collection[exercise_id].goals.add("Recovery")
+            elif not soreness.pain and days_sore >= 30:
+                exercise_collection[exercise_id].goals.add("Prevention")
+            elif soreness.is_acute_pain() or soreness.is_persistent_pain():
+                exercise_collection[exercise_id].goals.add("Prevention")
+        exercise_collection[exercise_id].priorities.add(priority)
+        exercise_collection[exercise_id].soreness_sources.add(soreness)
 
 
 class WarmUp(Serialisable):

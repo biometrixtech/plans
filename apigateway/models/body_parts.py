@@ -56,6 +56,19 @@ class BodyPartFactory(object):
         elif body_part_location == BodyPartLocation.calves:
             return self.get_calves()
 
+    def get_general(self):
+
+        general = BodyPart(BodyPartLocation.general, 21)
+
+        inhibit = self.get_exercise_dictionary([48, 3, 4, 54, 2, 44, 55])
+        lengthen = self.get_exercise_dictionary([9, 6, 28, 56, 7, 46, 103])
+        activate = self.get_exercise_dictionary([81, 108, 10, 85, 89])
+        static_integrate = self.get_exercise_dictionary([15, 14, 231])
+
+        general.add_extended_exercise_phases(inhibit, [], [], [], [], static_integrate)
+
+        return general
+
     def get_knee(self):
 
         knee = BodyPart(BodyPartLocation.knee, 9)

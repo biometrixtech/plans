@@ -88,6 +88,7 @@ class SorenessCalculator(object):
                 new_soreness.body_part = BodyPart(historic_soreness[h].body_part_location, None)
                 new_soreness.historic_soreness_status = historic_soreness[h].historic_soreness_status
                 new_soreness.daily = False
+                new_soreness.first_reported = historic_soreness[h].first_reported
                 soreness_list.append(new_soreness)
 
         return soreness_list

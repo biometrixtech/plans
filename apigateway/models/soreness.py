@@ -28,10 +28,47 @@ class JointSorenessSeverity(IntEnum):
     inability_to_move = 5
 
 
-class Soreness(Serialisable):
+class BaseSoreness(object):
     def __init__(self):
-        self.body_part = None
         self.historic_soreness_status = None
+
+    def is_acute_pain(self):
+        if (self.historic_soreness_status is not None and (self.historic_soreness_status == HistoricSorenessStatus.acute_pain or
+                                                           self.historic_soreness_status == HistoricSorenessStatus.almost_persistent_2_pain_acute)):
+            return True
+        else:
+            return False
+
+    def is_persistent_soreness(self):
+        if (self.historic_soreness_status is not None and (self.historic_soreness_status == HistoricSorenessStatus.persistent_soreness or
+                                                           self.historic_soreness_status == HistoricSorenessStatus.almost_persistent_2_soreness)):
+            return True
+        else:
+            return False
+
+    def is_persistent_pain(self):
+        if (self.historic_soreness_status is not None and (self.historic_soreness_status == HistoricSorenessStatus.persistent_pain or
+                                                           self.historic_soreness_status == HistoricSorenessStatus.almost_persistent_2_pain)):
+            return True
+        else:
+            return False
+
+    def is_dormant_cleared(self):
+        if (self.historic_soreness_status is None or
+                self.historic_soreness_status == HistoricSorenessStatus.dormant_cleared or
+                self.historic_soreness_status == HistoricSorenessStatus.almost_acute_pain or
+                self.historic_soreness_status == HistoricSorenessStatus.almost_persistent_pain or
+                self.historic_soreness_status == HistoricSorenessStatus.almost_persistent_soreness):
+            return True
+        else:
+            return False
+
+
+class Soreness(BaseSoreness, Serialisable):
+    def __init__(self):
+        super().__init__()
+        self.body_part = None
+        #self.historic_soreness_status = None
         self.pain = False
         self.reported_date_time = None
         self.severity = None  # muscle_soreness_severity or joint_soreness_severity
@@ -40,6 +77,7 @@ class Soreness(Serialisable):
         self.type = None  # soreness_type
         self.count = 1
         self.streak = 0
+        self.first_reported = None
         self.daily = True
 
     def __hash__(self):
@@ -49,10 +87,11 @@ class Soreness(Serialisable):
         return ((self.body_part.location == other.body_part.location,
                  self.side == other.side))
 
+    '''deprecated
     def is_dormant_cleared(self):
         try:
             if (self.historic_soreness_status is None or
-                self.historic_soreness_status == HistoricSorenessStatus.dormant_cleared or
+               self.historic_soreness_status == HistoricSorenessStatus.dormant_cleared or
                 self.historic_soreness_status == HistoricSorenessStatus.almost_acute_pain or 
                 self.historic_soreness_status == HistoricSorenessStatus.almost_persistent_pain or
                 self.historic_soreness_status == HistoricSorenessStatus.almost_persistent_soreness):
@@ -61,6 +100,7 @@ class Soreness(Serialisable):
                 return False
         except AttributeError:
             return False
+    '''
 
     def json_serialise(self, api=False, daily=False):
         if api:
@@ -138,7 +178,7 @@ class BodyPart(object):
         self.static_stretch_exercises = []
         self.active_stretch_exercises = []
         self.dynamic_stretch_exercises = []
-        self.isolated_activation_exercises = []
+        self.isolated_activate_exercises = []
         self.static_integrate_exercises = []
 
         self.agonists = []
@@ -219,17 +259,18 @@ class HistoricSorenessStatus(IntEnum):
     almost_acute_pain = 11
 
 
-class HistoricSoreness(Serialisable):
+class HistoricSoreness(BaseSoreness, Serialisable):
 
     def __init__(self, body_part_location, side, is_pain):
+        super().__init__()
         self.body_part_location = body_part_location
-        self.historic_soreness_status = HistoricSorenessStatus.dormant_cleared
+        #self.historic_soreness_status = HistoricSorenessStatus.dormant_cleared
         self.is_pain = is_pain
         self.side = side
         self.streak = 0
         self.streak_start_date = None
         self.average_severity = 0.0
-        self.first_reported = ""
+        self.first_reported = None
         self.last_reported = ""
         self.ask_acute_pain_question = False
         self.ask_persistent_2_question = False
@@ -256,33 +297,32 @@ class HistoricSoreness(Serialisable):
                   }
         return ret
 
-    def is_acute_pain(self):
-        if (self.historic_soreness_status == HistoricSorenessStatus.acute_pain or
-                self.historic_soreness_status == HistoricSorenessStatus.almost_persistent_2_pain_acute):
+    def is_joint(self):
+        if (self.body_part_location == BodyPartLocation.hip_flexor or
+                self.body_part_location == BodyPartLocation.knee or
+                self.body_part_location == BodyPartLocation.ankle or
+                self.body_part_location == BodyPartLocation.foot or
+                self.body_part_location == BodyPartLocation.achilles or
+                self.body_part_location == BodyPartLocation.elbow or
+                self.body_part_location == BodyPartLocation.wrist):
             return True
         else:
             return False
 
-    def is_persistent_soreness(self):
-        if (self.historic_soreness_status == HistoricSorenessStatus.persistent_soreness
-                or self.historic_soreness_status == HistoricSorenessStatus.almost_persistent_2_soreness):
-            return True
-        else:
-            return False
-
-    def is_persistent_pain(self):
-        if (self.historic_soreness_status == HistoricSorenessStatus.persistent_pain
-                or self.historic_soreness_status == HistoricSorenessStatus.almost_persistent_2_pain):
-            return True
-        else:
-            return False
-
-    def is_dormant_cleared(self):
-        if (self.historic_soreness_status is None or
-            self.historic_soreness_status == HistoricSorenessStatus.dormant_cleared or
-            self.historic_soreness_status == HistoricSorenessStatus.almost_acute_pain or 
-            self.historic_soreness_status == HistoricSorenessStatus.almost_persistent_pain or
-            self.historic_soreness_status == HistoricSorenessStatus.almost_persistent_soreness):
+    def is_muscle(self):
+        if (self.body_part_location == BodyPartLocation.shoulder or
+                self.body_part_location == BodyPartLocation.chest or
+                self.body_part_location == BodyPartLocation.abdominals or
+                self.body_part_location == BodyPartLocation.groin or
+                self.body_part_location == BodyPartLocation.quads or
+                self.body_part_location == BodyPartLocation.shin or
+                self.body_part_location == BodyPartLocation.outer_thigh or
+                self.body_part_location == BodyPartLocation.lower_back or
+                self.body_part_location == BodyPartLocation.glutes or
+                self.body_part_location == BodyPartLocation.hamstrings or
+                self.body_part_location == BodyPartLocation.calves or
+                self.body_part_location == BodyPartLocation.upper_back_neck or
+                self.body_part_location == BodyPartLocation.lats):
             return True
         else:
             return False
