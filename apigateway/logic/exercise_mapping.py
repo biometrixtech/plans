@@ -6,7 +6,7 @@ from models.soreness import AssignedExercise, BodyPartLocation, HistoricSoreness
 from logic.goal_focus_text_generator import RecoveryTextGenerator
 from datetime import  timedelta
 from utils import format_datetime
-from models.modalities import ActiveRecovery, ActiveRestBeforeTraining, ColdWaterImmersion, CoolDown, Heat, WarmUp, Ice
+from models.modalities import ActiveRecovery, ActiveRestBeforeTraining, ActiveRestAfterTraining,ColdWaterImmersion, CoolDown, Heat, WarmUp, Ice
 
 
 class ExerciseAssignmentCalculator(object):
@@ -768,7 +768,7 @@ class ExerciseAssignmentCalculator(object):
         for h in historic_soreness_list:
             if h.first_reported is not None and not h.is_dormant_cleared():
                 if not h.is_pain:
-                    active_rest = ActiveRestBeforeTraining()
+                    active_rest = ActiveRestAfterTraining()
 
         return active_rest
 

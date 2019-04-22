@@ -42,6 +42,13 @@ class Soreness(Serialisable):
         self.streak = 0
         self.daily = True
 
+    def __hash__(self):
+        return hash((self.body_part.location, self.side))
+
+    def __eq__(self, other):
+        return ((self.body_part.location == other.body_part.location,
+                 self.side == other.side))
+
     def is_dormant_cleared(self):
         try:
             if (self.historic_soreness_status is None or
@@ -328,8 +335,9 @@ class AssignedExercise(Serialisable):
         self.position_order = 0
         self.goal_text = ""
         self.equipment_required = []
-        self.goals = []
-        self.priorities = []
+        self.goals = set()
+        self.priorities = set()
+        self.soreness_sources = set()
 
     '''
     def soreness_priority(self):
