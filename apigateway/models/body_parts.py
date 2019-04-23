@@ -136,7 +136,7 @@ class BodyPartFactory(object):
         inhibit = self.get_exercise_dictionary([2, 71])
         static_stretch = self.get_exercise_dictionary([7, 26, 59, 61])
         active_stretch = self.get_exercise_dictionary([29, 63, 66, 68])
-        dynamic_stretch = []
+        dynamic_stretch = {}
         isolated_activation = self.get_exercise_dictionary([31, 67, 78])
         calves.add_extended_exercise_phases(inhibit, static_stretch, active_stretch, dynamic_stretch, isolated_activation, {})
         calves.add_muscle_groups([16], [9], [17], [8, 9, 10])

@@ -77,12 +77,14 @@ class ActiveRestAfterTraining(Serialisable):
             if body_part is not None:
                 for a in body_part.agonists:
                     agonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None))
-                    self.copy_exercises(agonist.inhibit_exercises, self.inhibit_exercises, goal, "1", soreness)
-                    self.copy_exercises(agonist.static_stretch_exercises, self.static_stretch_exercises, goal, "1", soreness)
+                    if agonist is not None:
+                        self.copy_exercises(agonist.inhibit_exercises, self.inhibit_exercises, goal, "1", soreness)
+                        self.copy_exercises(agonist.static_stretch_exercises, self.static_stretch_exercises, goal, "1", soreness)
 
                 for y in body_part.synergists:
                     synergist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(y), None))
-                    self.copy_exercises(synergist.inhibit_exercises, self.inhibit_exercises, goal, "2", soreness)
+                    if synergist is not None:
+                        self.copy_exercises(synergist.inhibit_exercises, self.inhibit_exercises, goal, "2", soreness)
 
     def check_preemptive_recovery(self, soreness, event_date_time):
 
@@ -99,13 +101,15 @@ class ActiveRestAfterTraining(Serialisable):
                 if body_part is not None:
                     for a in body_part.agonists:
                         agonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None))
-                        self.copy_exercises(agonist.inhibit_exercises, self.inhibit_exercises, goal, "1", soreness)
-                        self.copy_exercises(agonist.static_stretch_exercises, self.static_stretch_exercises, goal, "1", soreness)
-                        self.copy_exercises(agonist.isolated_activate_exercises, self.isolated_activate_exercises, goal, "1", soreness)
+                        if agonist is not None:
+                            self.copy_exercises(agonist.inhibit_exercises, self.inhibit_exercises, goal, "1", soreness)
+                            self.copy_exercises(agonist.static_stretch_exercises, self.static_stretch_exercises, goal, "1", soreness)
+                            self.copy_exercises(agonist.isolated_activate_exercises, self.isolated_activate_exercises, goal, "1", soreness)
                     for y in body_part.synergists:
                         synergist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(y), None))
-                        self.copy_exercises(synergist.inhibit_exercises, self.inhibit_exercises, goal, "2", soreness)
-                        self.copy_exercises(synergist.isolated_activate_exercises, self.isolated_activate_exercises, goal, "2", soreness)
+                        if synergist is not None:
+                            self.copy_exercises(synergist.inhibit_exercises, self.inhibit_exercises, goal, "2", soreness)
+                            self.copy_exercises(synergist.isolated_activate_exercises, self.isolated_activate_exercises, goal, "2", soreness)
                     general_body_part = body_part_factory.get_body_part(BodyPart(BodyPartLocation.general, None))
                     self.copy_exercises(general_body_part.static_integrate_exercises, self.static_integrate_exercises, goal, "1", soreness)
 
@@ -124,15 +128,17 @@ class ActiveRestAfterTraining(Serialisable):
                 if body_part is not None:
                     for a in body_part.agonists:
                         agonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None))
-                        self.copy_exercises(agonist.inhibit_exercises, self.inhibit_exercises, goal, "1", soreness)
-                        self.copy_exercises(agonist.static_stretch_exercises, self.static_stretch_exercises, goal, "1", soreness)
-                        self.copy_exercises(agonist.isolated_activate_exercises, self.isolated_activate_exercises, goal,
-                                            "1", soreness)
+                        if agonist is not None:
+                            self.copy_exercises(agonist.inhibit_exercises, self.inhibit_exercises, goal, "1", soreness)
+                            self.copy_exercises(agonist.static_stretch_exercises, self.static_stretch_exercises, goal, "1", soreness)
+                            self.copy_exercises(agonist.isolated_activate_exercises, self.isolated_activate_exercises, goal,
+                                                "1", soreness)
                     for y in body_part.synergists:
                         synergist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(y), None))
-                        self.copy_exercises(synergist.inhibit_exercises, self.inhibit_exercises, goal, "2", soreness)
-                        self.copy_exercises(synergist.isolated_activate_exercises, self.isolated_activate_exercises,
-                                            goal, "2", soreness)
+                        if synergist is not None:
+                            self.copy_exercises(synergist.inhibit_exercises, self.inhibit_exercises, goal, "2", soreness)
+                            self.copy_exercises(synergist.isolated_activate_exercises, self.isolated_activate_exercises,
+                                                goal, "2", soreness)
                     general_body_part = body_part_factory.get_body_part(BodyPart(BodyPartLocation.general, None))
                     self.copy_exercises(general_body_part.static_integrate_exercises, self.static_integrate_exercises,
                                         goal, "1", soreness)
@@ -150,21 +156,23 @@ class ActiveRestAfterTraining(Serialisable):
             if body_part is not None:
                 for a in body_part.agonists:
                     agonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None))
-                    self.copy_exercises(agonist.inhibit_exercises, self.inhibit_exercises, goal, "1", soreness)
-                    self.copy_exercises(agonist.static_stretch_exercises, self.static_stretch_exercises, goal, "1", soreness)
+                    if agonist is not None:
+                        self.copy_exercises(agonist.inhibit_exercises, self.inhibit_exercises, goal, "1", soreness)
+                        self.copy_exercises(agonist.static_stretch_exercises, self.static_stretch_exercises, goal, "1", soreness)
 
                 for y in body_part.synergists:
                     synergist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(y), None))
-                    self.copy_exercises(synergist.inhibit_exercises, self.inhibit_exercises, goal, "2", soreness)
+                    if synergist is not None:
+                        self.copy_exercises(synergist.inhibit_exercises, self.inhibit_exercises, goal, "2", soreness)
 
     def copy_exercises(self, source_collection, target_collection, goal, priority, soreness):
 
         for s in source_collection:
-            if s not in target_collection:
-                target_collection[s] = AssignedExercise(library_id=s)
-            target_collection[s].goals.add(goal)
-            target_collection[s].priorities.add(priority)
-            target_collection[s].soreness_sources.add(soreness)
+            if s.exercise.id not in target_collection:
+                target_collection[s.exercise.id] = AssignedExercise(library_id=s.exercise.id)
+            target_collection[s.exercise.id].goals.add(goal)
+            target_collection[s.exercise.id].priorities.add(priority)
+            target_collection[s.exercise.id].soreness_sources.add(soreness)
 
 
 class WarmUp(Serialisable):
