@@ -57,6 +57,8 @@ class BodyPartFactory(object):
             return self.get_hamstrings()
         elif body_part.location == BodyPartLocation.calves:
             return self.get_calves()
+        elif body_part.location == BodyPartLocation.general:
+            return self.get_general()
 
     def get_general(self):
 

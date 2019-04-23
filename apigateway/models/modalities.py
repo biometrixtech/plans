@@ -1,6 +1,7 @@
 from serialisable import Serialisable
 from models.soreness import BodyPart, BodyPartLocation, AssignedExercise, HistoricSorenessStatus
 from models.body_parts import BodyPartFactory
+from utils import parse_date
 
 
 class Heat(Serialisable):
@@ -60,8 +61,8 @@ class ActiveRestAfterTraining(Serialisable):
 
             self.check_reactive_recovery(s)
             self.check_reactive_care(s)
-            self.check_preemptive_recovery(s, event_date_time)
-            self.check_preemptive_prevention(s, event_date_time)
+            self.check_preemptive_recovery(s, parse_date(event_date_time))
+            self.check_preemptive_prevention(s, parse_date(event_date_time))
 
     def check_reactive_recovery(self, soreness):
 
@@ -105,7 +106,7 @@ class ActiveRestAfterTraining(Serialisable):
                         synergist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(y), None))
                         self.copy_exercises(synergist.inhibit_exercises, self.inhibit_exercises, goal, "2", soreness)
                         self.copy_exercises(synergist.isolated_activate_exercises, self.isolated_activate_exercises, goal, "2", soreness)
-                    general_body_part = body_part_factory.get_body_part(BodyPartLocation.general)
+                    general_body_part = body_part_factory.get_body_part(BodyPart(BodyPartLocation.general, None))
                     self.copy_exercises(general_body_part.static_integrate_exercises, self.static_integrate_exercises, goal, "1", soreness)
 
     def check_preemptive_prevention(self, soreness, event_date_time):
@@ -132,7 +133,7 @@ class ActiveRestAfterTraining(Serialisable):
                         self.copy_exercises(synergist.inhibit_exercises, self.inhibit_exercises, goal, "2", soreness)
                         self.copy_exercises(synergist.isolated_activate_exercises, self.isolated_activate_exercises,
                                             goal, "2", soreness)
-                    general_body_part = body_part_factory.get_body_part(BodyPartLocation.general)
+                    general_body_part = body_part_factory.get_body_part(BodyPart(BodyPartLocation.general, None))
                     self.copy_exercises(general_body_part.static_integrate_exercises, self.static_integrate_exercises,
                                         goal, "1", soreness)
 
