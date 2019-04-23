@@ -17,6 +17,7 @@ from models.daily_plan import DailyPlan
 from tests.mocks.mock_exercise_datastore import ExerciseLibraryDatastore
 from tests.mocks.mock_completed_exercise_datastore import CompletedExerciseDatastore
 from tests.mocks.mock_athlete_stats_datastore import AthleteStatsDatastore
+from tests.mocks.mock_daily_readiness_datastore import DailyReadinessDatastore
 
 exercise_library_datastore = ExerciseLibraryDatastore()
 completed_exercise_datastore = CompletedExerciseDatastore()
@@ -45,6 +46,7 @@ def create_plan():
     daily_plan_datastore.side_load_plans([daily_plan])
 
     mgr = TrainingPlanManager(user_id, DatastoreCollection())
+    mgr.load_data(format_date(current_date_time))
 
     daily_plan = mgr.create_daily_plan(format_date(current_date), format_datetime(current_date_time))
 
@@ -84,6 +86,12 @@ def create_no_soreness_plan():
     daily_plan = mgr.create_daily_plan(format_date(current_date), last_updated=format_datetime(current_date_time))
 
     return daily_plan
+
+def test_active_rest_after_training_knee():
+
+    daily_plan = create_plan()
+    current_date = date.today()
+    current_date_time = datetime.combine(current_date, time(12, 0, 0))
 
 
 def test_find_earlier_practice_sessions():
