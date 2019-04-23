@@ -56,66 +56,114 @@ class ActiveRestAfterTraining(Serialisable):
 
     def fill_exercises(self, soreness_list, event_date_time):
 
-        body_part_factory = BodyPartFactory()
-
         for s in soreness_list:
 
-            body_part = body_part_factory.get_body_part(s.body_part)
+            self.check_reactive_recovery(s)
+            self.check_reactive_care(s)
+            self.check_preemptive_recovery(s, event_date_time)
+            self.check_preemptive_prevention(s, event_date_time)
+
+    def check_reactive_recovery(self, soreness):
+
+        body_part_factory = BodyPartFactory()
+
+        if soreness.historic_soreness_status is None and not soreness.pain:
+
+            body_part = body_part_factory.get_body_part(soreness.body_part)
+
+            goal = "Recovery"
 
             if body_part is not None:
                 for a in body_part.agonists:
-                    for e, progressions_list in a.inhibit_exercises.items():
-                        self.update_assigned_exercises(e, self.inhibit_exercises, event_date_time,
-                                                       progressions_list, s, "1")
-
-                    for e, progressions_list in a.static_stretch_exercises.items():
-                        self.update_assigned_exercises(e, self.static_stretch_exercises, event_date_time,
-                                                       progressions_list, s, "1")
-
-                    for e, progressions_list in a.isolated_activate_exercises.items():
-                        self.update_assigned_exercises(e, self.isolated_activate_exercises, event_date_time,
-                                                       progressions_list, s, "1")
+                    agonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None))
+                    self.copy_exercises(agonist.inhibit_exercises, self.inhibit_exercises, goal, "1", soreness)
+                    self.copy_exercises(agonist.static_stretch_exercises, self.static_stretch_exercises, goal, "1", soreness)
 
                 for y in body_part.synergists:
-                    for e, progressions_list in y.inhibit_exercises.items():
-                        self.update_assigned_exercises(e, self.inhibit_exercises, event_date_time,
-                                                       progressions_list, s, "2")
+                    synergist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(y), None))
+                    self.copy_exercises(synergist.inhibit_exercises, self.inhibit_exercises, goal, "2", soreness)
 
-                    # no priority 2 synergist static stretch exercises for Active Rest after training
+    def check_preemptive_recovery(self, soreness, event_date_time):
 
-                    for e, progressions_list in y.isolated_activate_exercises.items():
-                        self.update_assigned_exercises(e, self.isolated_activate_exercises, event_date_time,
-                                                       progressions_list, s, "2")
+        body_part_factory = BodyPartFactory()
 
-        # get general for static integrate
-        # not sure how to tag general items
-        #general_body_part = body_part_factory.get_body_part(BodyPartLocation.general)
-
-        #for e, progressions_list in general_body_part.static_integrate_exercises.items():
-        #    self.update_assigned_exercises(e, self.static_integrate_exercises, event_date_time,
-        #                                   progressions_list, None, "1")
-
-    def update_assigned_exercises(self, exercise_id, exercise_collection, event_date_time, progressions_list, soreness, priority):
-
-        if exercise_id not in exercise_collection:
-            exercise_collection[exercise_id] = AssignedExercise(library_id=exercise_id, progressions=progressions_list)
-        if soreness.historic_soreness_status is None:
-            if soreness.pain:
-                exercise_collection[exercise_id].goals.add("Care")
-            else:
-                exercise_collection[exercise_id].goals.add("Recovery")
-        else:
-            days_sore = 0
-            if soreness.first_reported is not None:
-                days_sore = (event_date_time - soreness.first_reported).days
+        if soreness.historic_soreness_status is not None and soreness.first_reported is not None:
+            days_sore = (event_date_time - soreness.first_reported).days
             if not soreness.pain and 15 <= days_sore < 30:
-                exercise_collection[exercise_id].goals.add("Recovery")
-            elif not soreness.pain and days_sore >= 30:
-                exercise_collection[exercise_id].goals.add("Prevention")
-            elif soreness.is_acute_pain() or soreness.is_persistent_pain():
-                exercise_collection[exercise_id].goals.add("Prevention")
-        exercise_collection[exercise_id].priorities.add(priority)
-        exercise_collection[exercise_id].soreness_sources.add(soreness)
+
+                body_part = body_part_factory.get_body_part(soreness.body_part)
+
+                goal = "Recovery"
+
+                if body_part is not None:
+                    for a in body_part.agonists:
+                        agonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None))
+                        self.copy_exercises(agonist.inhibit_exercises, self.inhibit_exercises, goal, "1", soreness)
+                        self.copy_exercises(agonist.static_stretch_exercises, self.static_stretch_exercises, goal, "1", soreness)
+                        self.copy_exercises(agonist.isolated_activate_exercises, self.isolated_activate_exercises, goal, "1", soreness)
+                    for y in body_part.synergists:
+                        synergist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(y), None))
+                        self.copy_exercises(synergist.inhibit_exercises, self.inhibit_exercises, goal, "2", soreness)
+                        self.copy_exercises(synergist.isolated_activate_exercises, self.isolated_activate_exercises, goal, "2", soreness)
+                    general_body_part = body_part_factory.get_body_part(BodyPartLocation.general)
+                    self.copy_exercises(general_body_part.static_integrate_exercises, self.static_integrate_exercises, goal, "1", soreness)
+
+    def check_preemptive_prevention(self, soreness, event_date_time):
+
+        body_part_factory = BodyPartFactory()
+
+        if soreness.historic_soreness_status is not None and soreness.first_reported is not None:
+            days_sore = (event_date_time - soreness.first_reported).days
+            if (not soreness.pain and days_sore >= 30) or soreness.is_acute_pain() or soreness.is_persistent_pain():
+
+                body_part = body_part_factory.get_body_part(soreness.body_part)
+
+                goal = "Prevention"
+
+                if body_part is not None:
+                    for a in body_part.agonists:
+                        agonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None))
+                        self.copy_exercises(agonist.inhibit_exercises, self.inhibit_exercises, goal, "1", soreness)
+                        self.copy_exercises(agonist.static_stretch_exercises, self.static_stretch_exercises, goal, "1", soreness)
+                        self.copy_exercises(agonist.isolated_activate_exercises, self.isolated_activate_exercises, goal,
+                                            "1", soreness)
+                    for y in body_part.synergists:
+                        synergist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(y), None))
+                        self.copy_exercises(synergist.inhibit_exercises, self.inhibit_exercises, goal, "2", soreness)
+                        self.copy_exercises(synergist.isolated_activate_exercises, self.isolated_activate_exercises,
+                                            goal, "2", soreness)
+                    general_body_part = body_part_factory.get_body_part(BodyPartLocation.general)
+                    self.copy_exercises(general_body_part.static_integrate_exercises, self.static_integrate_exercises,
+                                        goal, "1", soreness)
+
+    def check_reactive_care(self, soreness):
+
+        body_part_factory = BodyPartFactory()
+
+        if soreness.historic_soreness_status is None and soreness.pain:
+
+            body_part = body_part_factory.get_body_part(soreness.body_part)
+
+            goal = "Care"
+
+            if body_part is not None:
+                for a in body_part.agonists:
+                    agonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None))
+                    self.copy_exercises(agonist.inhibit_exercises, self.inhibit_exercises, goal, "1", soreness)
+                    self.copy_exercises(agonist.static_stretch_exercises, self.static_stretch_exercises, goal, "1", soreness)
+
+                for y in body_part.synergists:
+                    synergist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(y), None))
+                    self.copy_exercises(synergist.inhibit_exercises, self.inhibit_exercises, goal, "2", soreness)
+
+    def copy_exercises(self, source_collection, target_collection, goal, priority, soreness):
+
+        for s in source_collection:
+            if s not in target_collection:
+                target_collection[s] = AssignedExercise(library_id=s)
+            target_collection[s].goals.add(goal)
+            target_collection[s].priorities.add(priority)
+            target_collection[s].soreness_sources.add(soreness)
 
 
 class WarmUp(Serialisable):

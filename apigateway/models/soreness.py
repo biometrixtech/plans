@@ -230,7 +230,7 @@ class BodyPart(object):
         self.dynamic_stretch_exercises = self.add_exercises(self.dynamic_stretch_exercises, dynamic_stretch,
                                                             self.treatment_priority, randomize)
 
-        self.isolated_activation_exercises = self.add_exercises(self.isolated_activation_exercises, isolated_activation,
+        self.isolated_activate_exercises = self.add_exercises(self.isolated_activate_exercises, isolated_activation,
                                                                 self.treatment_priority, randomize)
 
         self.static_integrate_exercises = self.add_exercises(self.static_integrate_exercises, static_integrate,
@@ -364,10 +364,10 @@ class AssignedExercise(Serialisable):
                  body_part_location=BodyPartLocation.general, progressions=[]):
         self.exercise = Exercise(library_id)
         self.exercise.progressions = progressions
-        self.body_part_priority = body_part_priority
-        self.body_part_exercise_priority = body_part_exercise_priority
-        self.body_part_soreness_level = body_part_soreness_level
-        self.body_part_location = body_part_location
+        #self.body_part_priority = body_part_priority
+        #self.body_part_exercise_priority = body_part_exercise_priority
+        #self.body_part_soreness_level = body_part_soreness_level
+        #self.body_part_location = body_part_location
         self.athlete_id = ""
         self.reps_assigned = 0
         self.sets_assigned = 0

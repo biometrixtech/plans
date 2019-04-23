@@ -28,7 +28,7 @@ def load_exercises():
     exercise_library_datastore.side_load_exericse_list_from_csv()
 
 
-def create_plan():
+def create_plan(body_part):
     user_id = "tester"
 
     current_date = date.today()
@@ -36,7 +36,7 @@ def create_plan():
 
     daily_plan_datastore = DailyPlanDatastore()
 
-    soreness_list = [TestUtilities().body_part_soreness(12, 1)]
+    soreness_list = [TestUtilities().body_part_soreness(body_part, 1)]
 
     survey = DailyReadiness(current_date_time.strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, soreness_list, 7, 9)
 
@@ -44,9 +44,10 @@ def create_plan():
     daily_plan.user_id = user_id
     daily_plan.daily_readiness_survey = survey
     daily_plan_datastore.side_load_plans([daily_plan])
+    data_store_collection = DatastoreCollection()
+    data_store_collection.daily_plan_datastore = daily_plan_datastore
 
-    mgr = TrainingPlanManager(user_id, DatastoreCollection())
-    mgr.load_data(format_date(current_date_time))
+    mgr = TrainingPlanManager(user_id, data_store_collection)
 
     daily_plan = mgr.create_daily_plan(format_date(current_date), format_datetime(current_date_time))
 
@@ -89,9 +90,11 @@ def create_no_soreness_plan():
 
 def test_active_rest_after_training_knee():
 
-    daily_plan = create_plan()
-    current_date = date.today()
-    current_date_time = datetime.combine(current_date, time(12, 0, 0))
+    daily_plan = create_plan(7)
+    assert len(daily_plan.post_active_rest.inhibit_exercises) > 0
+    assert len(daily_plan.post_active_rest.static_stretch_exercises) > 0
+    assert len(daily_plan.post_active_rest.isolated_activate_exercises) == 0
+    assert len(daily_plan.post_active_rest.static_integrate_exercises) == 0
 
 
 def test_find_earlier_practice_sessions():

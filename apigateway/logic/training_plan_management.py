@@ -110,9 +110,9 @@ class TrainingPlanManager(object):
                                                                          historic_soreness_present,
                                                                          functional_strength_active,
                                                                          is_active_prep=True)
-                am_exercise_assignments = calc.create_exercise_assignments(self.daily_plan.pre_recovery, soreness_list,
-                                                                           self.trigger_date_time, target_minutes)
-                self.daily_plan.pre_recovery.update_from_exercise_assignments(am_exercise_assignments)
+                #am_exercise_assignments = calc.create_exercise_assignments(self.daily_plan.pre_recovery, soreness_list,
+                #                                                           self.trigger_date_time, target_minutes)
+                #self.daily_plan.pre_recovery.update_from_exercise_assignments(am_exercise_assignments)
                 self.daily_plan.pre_recovery.display_exercises = True
             else:
                 self.daily_plan.pre_recovery.display_exercises = False
@@ -123,12 +123,12 @@ class TrainingPlanManager(object):
                                                                           historic_soreness_present,
                                                                           functional_strength_active,
                                                                           is_active_prep=False)
-                pm_exercise_assignments = calc.create_exercise_assignments(self.daily_plan.post_recovery, soreness_list,
-                                                                           self.trigger_date_time, target_minutes)
-                self.daily_plan.post_recovery.update_from_exercise_assignments(pm_exercise_assignments)
-                if not self.daily_plan.functional_strength_completed and (pm_exercise_assignments is None or pm_exercise_assignments.duration_minutes() == 0):
-                    self.daily_plan.functional_strength_session = None
-                    self.daily_plan.functional_strength_eligible = False
+                #pm_exercise_assignments = calc.create_exercise_assignments(self.daily_plan.post_recovery, soreness_list,
+                #                                                           self.trigger_date_time, target_minutes)
+                #self.daily_plan.post_recovery.update_from_exercise_assignments(pm_exercise_assignments)
+                #if not self.daily_plan.functional_strength_completed and (pm_exercise_assignments is None or pm_exercise_assignments.duration_minutes() == 0):
+                #    self.daily_plan.functional_strength_session = None
+                #    self.daily_plan.functional_strength_eligible = False
 
                 self.daily_plan.post_recovery.display_exercises = True
             else:
