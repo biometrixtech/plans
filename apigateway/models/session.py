@@ -331,6 +331,7 @@ class CorrectiveSession(Session):
             return False
 
 
+'''deprecated
 class FunctionalStrengthSession(Serialisable):
 
     def __init__(self):
@@ -400,7 +401,7 @@ class FunctionalStrengthSession(Serialisable):
                    'position': self.position.value if self.position is not None else None
                    }
             return ret
-
+'''
 
 # class CompletedFunctionalStrengthSession(Serialisable):
 
@@ -551,7 +552,8 @@ class RecoverySession(Serialisable):
             self.integrate_exercises[s].position_order = num
             num = num + 1
 
-    def set_exercise_target_minutes(self, soreness_list, total_minutes_target, max_severity, historic_soreness_present=False, functional_strength_active=False, is_active_prep=True):
+    #def set_exercise_target_minutes(self, soreness_list, total_minutes_target, max_severity, historic_soreness_present=False, functional_strength_active=False, is_active_prep=True):
+    def set_exercise_target_minutes(self, soreness_list, total_minutes_target, max_severity, historic_soreness_present=False, is_active_prep=True):
         max_severity_and_historic_soreness = False
         high_severity_is_pain = False
 

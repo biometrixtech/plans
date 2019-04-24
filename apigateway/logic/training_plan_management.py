@@ -3,7 +3,7 @@ import datetime
 from fathomapi.utils.xray import xray_recorder
 import logic.exercise_mapping as exercise_mapping
 from logic.soreness_processing import SorenessCalculator
-from logic.functional_strength_mapping import FSProgramGenerator
+#from logic.functional_strength_mapping import FSProgramGenerator
 import models.session as session
 from models.post_session_survey import PostSessionSurvey
 from models.daily_plan import DailyPlan
@@ -69,7 +69,7 @@ class TrainingPlanManager(object):
         else:
             historic_soreness = [hs for hs in self.athlete_stats.historic_soreness if not hs.is_dormant_cleared()]
             historic_soreness_present = len(historic_soreness) > 0
-            self.is_functional_strength_eligible()
+            #self.is_functional_strength_eligible()
 
         soreness_list = SorenessCalculator().get_soreness_summary_from_surveys(self.readiness_surveys,
                                                                                self.post_session_surveys,
@@ -99,16 +99,16 @@ class TrainingPlanManager(object):
         else:
             max_soreness = 0
 
-        if self.daily_plan.functional_strength_session is None:
-            self.populate_functional_strength(True)
+        #if self.daily_plan.functional_strength_session is None:
+        #    self.populate_functional_strength(True)
 
-        functional_strength_active = (self.daily_plan.functional_strength_session is not None)
+        #functional_strength_active = (self.daily_plan.functional_strength_session is not None)
 
         if not show_post_recovery:
             if self.daily_plan.pre_recovery is not None and not self.daily_plan.pre_recovery.completed:
                 self.daily_plan.pre_recovery.set_exercise_target_minutes(soreness_list, target_minutes, max_soreness,
                                                                          historic_soreness_present,
-                                                                         functional_strength_active,
+                                                                         #functional_strength_active,
                                                                          is_active_prep=True)
                 #am_exercise_assignments = calc.create_exercise_assignments(self.daily_plan.pre_recovery, soreness_list,
                 #                                                           self.trigger_date_time, target_minutes)
@@ -121,7 +121,7 @@ class TrainingPlanManager(object):
             if self.daily_plan.post_recovery is not None and not self.daily_plan.post_recovery.completed:
                 self.daily_plan.post_recovery.set_exercise_target_minutes(soreness_list, target_minutes, max_soreness,
                                                                           historic_soreness_present,
-                                                                          functional_strength_active,
+                                                                          #functional_strength_active,
                                                                           is_active_prep=False)
                 #pm_exercise_assignments = calc.create_exercise_assignments(self.daily_plan.post_recovery, soreness_list,
                 #                                                           self.trigger_date_time, target_minutes)
@@ -140,6 +140,7 @@ class TrainingPlanManager(object):
 
         return self.daily_plan
 
+    '''deprecated
     def populate_functional_strength(self, wants_functional_strength):
 
         if self.athlete_stats is not None:
@@ -151,6 +152,7 @@ class TrainingPlanManager(object):
                     self.daily_plan.functional_strength_session = fs_mapping.getFunctionalStrengthForSportPosition(
                         self.athlete_stats.current_sport_name,
                         self.athlete_stats.current_position)
+    '''
 
     def add_recovery_times(self, show_post_recovery):
 
@@ -166,6 +168,7 @@ class TrainingPlanManager(object):
             self.daily_plan.post_recovery = session.RecoverySession()
             self.daily_plan.post_recovery.display_exercises = True
 
+    '''deprecated
     def is_functional_strength_eligible(self):
         if (self.athlete_stats.functional_strength_eligible and
             not self.athlete_stats.severe_pain_soreness_today() and  # these are updated from surveys but update doesn't make it to stats until after plan is created
@@ -174,3 +177,4 @@ class TrainingPlanManager(object):
             self.athlete_stats.functional_strength_eligible = True
         else:
             self.athlete_stats.functional_strength_eligible = False
+    '''

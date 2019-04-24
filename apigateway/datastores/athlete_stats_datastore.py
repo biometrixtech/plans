@@ -89,11 +89,11 @@ class AthleteStatsDatastore(object):
         athlete_stats.internal_acwr = self._standard_error_from_monogodb(mongo_result.get('internal_acwr', None))
         athlete_stats.external_acwr = self._standard_error_from_monogodb(mongo_result.get('external_acwr', None))
 
-        athlete_stats.functional_strength_eligible = mongo_result.get('functional_strength_eligible', False)
-        athlete_stats.completed_functional_strength_sessions = mongo_result.get(
-            'completed_functional_strength_sessions', 0)
-        athlete_stats.next_functional_strength_eligible_date = mongo_result.get(
-            'next_functional_strength_eligible_date', None)
+        #athlete_stats.functional_strength_eligible = mongo_result.get('functional_strength_eligible', False)
+        #athlete_stats.completed_functional_strength_sessions = mongo_result.get(
+        #    'completed_functional_strength_sessions', 0)
+        #athlete_stats.next_functional_strength_eligible_date = mongo_result.get(
+        #    'next_functional_strength_eligible_date', None)
         athlete_stats.current_sport_name = mongo_result.get('current_sport_name', None)
         athlete_stats.current_position = mongo_result.get('current_position', None)
         athlete_stats.expected_weekly_workouts = _expected_workouts_from_mongo(mongo_result)

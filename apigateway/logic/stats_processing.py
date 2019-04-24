@@ -111,8 +111,8 @@ class StatsProcessing(object):
                 # persist all of soreness/pain and session_RPE
                 athlete_stats.session_RPE = current_athlete_stats.session_RPE
                 athlete_stats.session_RPE_event_date = current_athlete_stats.session_RPE_event_date
-        athlete_stats.completed_functional_strength_sessions = self.get_completed_functional_strength_sessions()
-        athlete_stats.functional_strength_eligible = self.is_athlete_functional_strength_eligible(athlete_stats)
+        #athlete_stats.completed_functional_strength_sessions = self.get_completed_functional_strength_sessions()
+        #athlete_stats.functional_strength_eligible = self.is_athlete_functional_strength_eligible(athlete_stats)
 
         return athlete_stats
 
@@ -744,6 +744,7 @@ class StatsProcessing(object):
 
         return soreness_list
 
+    '''deprecated
     def is_athlete_functional_strength_eligible(self, athlete_stats):
 
         # completed yesterday?
@@ -782,7 +783,7 @@ class StatsProcessing(object):
             return True
 
         return False
-
+    
     def athlete_logged_enough_sessions(self):
 
         four_plus_training_sessions_logged = False
@@ -839,7 +840,7 @@ class StatsProcessing(object):
         completed_sesions = [a for a in self.last_7_days_plans if a.functional_strength_completed if a is not None]
 
         return len(completed_sesions)
-
+    '''
     def calc_survey_stats(self, athlete_stats):
 
         if len(self.acute_readiness_surveys) > 0:

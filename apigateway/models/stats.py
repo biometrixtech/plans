@@ -52,9 +52,9 @@ class AthleteStats(Serialisable):
         self.historical_internal_monotony = []
         self.historical_external_strain = []
         self.internal_strain_events = None
-        self.functional_strength_eligible = False
-        self.next_functional_strength_eligible_date = None
-        self.completed_functional_strength_sessions = 0
+        #self.functional_strength_eligible = False
+        #self.next_functional_strength_eligible_date = None
+        #self.completed_functional_strength_sessions = 0
         self.current_sport_name = None
         self.current_position = None
 
@@ -337,9 +337,9 @@ class AthleteStats(Serialisable):
             'external_ramp': self.external_ramp.json_serialise() if self.external_ramp is not None else None,
             'internal_acwr': self.internal_acwr.json_serialise() if self.internal_acwr is not None else None,
             'external_acwr': self.external_acwr.json_serialise() if self.external_acwr is not None else None,
-            'functional_strength_eligible': self.functional_strength_eligible,
-            'completed_functional_strength_sessions': self.completed_functional_strength_sessions,
-            'next_functional_strength_eligible_date': self.next_functional_strength_eligible_date,
+            #'functional_strength_eligible': self.functional_strength_eligible,
+            #'completed_functional_strength_sessions': self.completed_functional_strength_sessions,
+            #'next_functional_strength_eligible_date': self.next_functional_strength_eligible_date,
             'current_sport_name': self.current_sport_name.value,
             'current_position': self.current_position.value if self.current_position is not None else None,
             'expected_weekly_workouts': self.expected_weekly_workouts,

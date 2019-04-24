@@ -72,8 +72,8 @@ class DailyPlanDatastore(object):
                 daily_plan.post_recovery = _recovery_session_from_mongodb(plan['post_recovery']) if plan.get('post_recovery', None) is not None else None
                 daily_plan.completed_post_recovery_sessions = \
                     [_recovery_session_from_mongodb(s) for s in plan.get('completed_post_recovery_sessions', [])]
-                daily_plan.functional_strength_session = \
-                    _functional_strength_session_from_mongodb(plan['functional_strength_session']) if plan.get('functional_strength_session', None) is not None else None
+                #daily_plan.functional_strength_session = \
+                #    _functional_strength_session_from_mongodb(plan['functional_strength_session']) if plan.get('functional_strength_session', None) is not None else None
             #daily_plan.bump_up_sessions = \
             #    [_external_session_from_mongodb(s, session.SessionType.bump_up)
             #     for s in plan.get('bump_up_sessions', [])]
@@ -84,9 +84,9 @@ class DailyPlanDatastore(object):
             daily_plan.post_recovery_completed = plan.get('post_recovery_completed', False)
             daily_plan.last_sensor_sync = plan.get('last_sensor_sync', None)
             daily_plan.sessions_planned = plan.get('sessions_planned', True)
-            daily_plan.functional_strength_eligible = plan.get('functional_strength_eligible', False)
-            daily_plan.completed_functional_strength_sessions = plan.get('completed_functional_strength_sessions', 0)
-            daily_plan.functional_strength_completed = plan.get('functional_strength_completed', False)
+            #daily_plan.functional_strength_eligible = plan.get('functional_strength_eligible', False)
+            #daily_plan.completed_functional_strength_sessions = plan.get('completed_functional_strength_sessions', 0)
+            #daily_plan.functional_strength_completed = plan.get('functional_strength_completed', False)
             daily_plan.session_from_readiness = plan.get('session_from_readiness', False)
             daily_plan.sessions_planned_readiness = plan.get('sessions_planned_readiness', True)
             ret.append(daily_plan)
@@ -201,7 +201,7 @@ def _recovery_session_from_mongodb(mongo_result):
     recovery_session.integrate_iterations = mongo_result.get("integrate_iterations", 0)
     return recovery_session
 
-
+'''deprecated
 def _functional_strength_session_from_mongodb(mongo_result):
     functional_strength_session = session.FunctionalStrengthSession()
     functional_strength_session.equipment_required = mongo_result.get("equipment_required", [])
@@ -228,7 +228,7 @@ def _functional_strength_session_from_mongodb(mongo_result):
     functional_strength_session.sport_name = mongo_result.get("sport_name", None)
     functional_strength_session.position = mongo_result.get("position", None)
     return functional_strength_session
-
+'''
 
 def _assigned_exercises_from_mongodb(mongo_result):
 
@@ -259,7 +259,7 @@ def _daily_readiness_from_mongo(mongo_result, user_id):
                                soreness=mongo_result['soreness'],
                                readiness=mongo_result['readiness'],
                                sleep_quality=mongo_result['sleep_quality'],
-                               wants_functional_strength=mongo_result.get('wants_functional_strength', False)
+                               #wants_functional_strength=mongo_result.get('wants_functional_strength', False)
                              )
     elif isinstance(mongo_result, str):
         start_date = parse_date(mongo_result)

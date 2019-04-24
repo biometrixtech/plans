@@ -24,8 +24,8 @@ class AthleteStatusProcessing(object):
         self.dormant_tipping_candidates = []
         self.current_sport_name = None
         self.current_position = None
-        self.functional_strength_eligible = False
-        self.completed_functional_strength_sessions = 0
+        #self.functional_strength_eligible = False
+        #self.completed_functional_strength_sessions = 0
 
     def get_previous_soreness(self):
         # read plans from yesterday and today
@@ -60,11 +60,11 @@ class AthleteStatusProcessing(object):
             # get fs eligibility and sports
             self.current_sport_name = athlete_stats.current_sport_name.value if athlete_stats.current_sport_name is not None else None
             self.current_position = athlete_stats.current_position.value if athlete_stats.current_position is not None else None
-            if (athlete_stats.functional_strength_eligible and (athlete_stats.next_functional_strength_eligible_date is None
-                                                                or parse_datetime(athlete_stats.next_functional_strength_eligible_date) < self.current_time) and
-                    not self.severe_pain_today_yesterday):
-                self.functional_strength_eligible = True
-            self.completed_functional_strength_sessions = athlete_stats.completed_functional_strength_sessions
+            #if (athlete_stats.functional_strength_eligible and (athlete_stats.next_functional_strength_eligible_date is None
+            #                                                    or parse_datetime(athlete_stats.next_functional_strength_eligible_date) < self.current_time) and
+            #        not self.severe_pain_today_yesterday):
+            #    self.functional_strength_eligible = True
+            #self.completed_functional_strength_sessions = athlete_stats.completed_functional_strength_sessions
             self.remove_duplicates_sore_body_parts_historic_soreness()
         return (self.cleaned_sore_body_parts,
                 self.hist_sore_status,
@@ -72,8 +72,9 @@ class AthleteStatusProcessing(object):
                 self.dormant_tipping_candidates,
                 self.current_sport_name,
                 self.current_position,
-                self.functional_strength_eligible,
-                self.completed_functional_strength_sessions)
+                #self.functional_strength_eligible,
+                #self.completed_functional_strength_sessions
+                )
 
     def remove_duplicates_sore_body_parts_historic_soreness(self):
         q3_list = [{"body_part": q["body_part"], "side": q["side"]} for q in self.clear_candidates]
