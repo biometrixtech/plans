@@ -29,7 +29,7 @@ def load_exercises():
     exercise_library_datastore.side_load_exericse_list_from_csv()
 
 
-def create_plan(body_part, historic_soreness_list=None):
+def create_plan(body_part_list, severity_list, side_list, pain_list, historic_soreness_list=None):
     user_id = "tester"
 
     current_date = date.today()
@@ -38,8 +38,17 @@ def create_plan(body_part, historic_soreness_list=None):
     daily_plan_datastore = DailyPlanDatastore()
 
     soreness_list = []
-    for b in body_part:
-        soreness_list.append(TestUtilities().body_part_soreness(b, 2))
+    for b in range(0, len(body_part_list)):
+        if len(pain_list) > 0 and pain_list[b]:
+            soreness_list.append(TestUtilities().body_part_pain(body_part_list[b], severity_list[b], side_list[b]))
+        else:
+            if len(severity_list) == 0:
+                soreness_list.append(TestUtilities().body_part_soreness(body_part_list[b], 2))
+            else:
+                soreness_list.append(TestUtilities().body_part_soreness(body_part_list[b], severity_list[b]))
+
+
+
 
     survey = DailyReadiness(current_date_time.strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, soreness_list, 7, 9)
 
@@ -101,7 +110,7 @@ def create_no_soreness_plan():
 
 def test_active_rest_after_training_knee():
 
-    daily_plan = create_plan([7])
+    daily_plan = create_plan([7], [], [], [])
     assert len(daily_plan.post_active_rest.inhibit_exercises) > 0
     assert len(daily_plan.post_active_rest.static_stretch_exercises) > 0
     assert len(daily_plan.post_active_rest.isolated_activate_exercises) == 0
@@ -119,7 +128,7 @@ def test_active_rest_after_training_outer_thigh_hist_soreness_knee():
     historic_soreness.historic_soreness_status = HistoricSorenessStatus.acute_pain
     historic_soreness_list = [historic_soreness]
 
-    daily_plan = create_plan([11], historic_soreness_list)
+    daily_plan = create_plan([11], [], [], [], historic_soreness_list)
     assert len(daily_plan.post_active_rest.inhibit_exercises) > 0
     assert len(daily_plan.post_active_rest.static_stretch_exercises) > 0
     assert len(daily_plan.post_active_rest.isolated_activate_exercises) > 0
@@ -136,7 +145,7 @@ def test_active_rest_after_training_outer_thigh_hist_soreness_glutes():
     historic_soreness.historic_soreness_status = HistoricSorenessStatus.acute_pain
     historic_soreness_list = [historic_soreness]
 
-    daily_plan = create_plan([11], historic_soreness_list)
+    daily_plan = create_plan([11], [], [], [], historic_soreness_list)
     assert len(daily_plan.post_active_rest.inhibit_exercises) > 0
     assert len(daily_plan.post_active_rest.static_stretch_exercises) > 0
     assert len(daily_plan.post_active_rest.isolated_activate_exercises) > 0
@@ -163,7 +172,27 @@ def test_active_rest_after_training_various_hist_soreness_glutes():
 
     historic_soreness_list = [historic_soreness, historic_soreness_2, historic_soreness_3]
 
-    daily_plan = create_plan([6, 7, 11, 14, 16], historic_soreness_list)
+    daily_plan = create_plan([6, 7, 11, 14, 16], [], [], [], historic_soreness_list)
+    assert len(daily_plan.post_active_rest.inhibit_exercises) > 0
+    assert len(daily_plan.post_active_rest.static_stretch_exercises) > 0
+    assert len(daily_plan.post_active_rest.isolated_activate_exercises) > 0
+    assert len(daily_plan.post_active_rest.static_integrate_exercises) > 0
+
+
+def test_active_rest_after_training_quad_hist_soreness_knee():
+
+    current_date = date.today()
+    current_date_time = datetime.combine(current_date, time(9, 0, 0))
+    current_date_time = current_date_time - timedelta(days=16)
+
+    historic_soreness = HistoricSoreness(BodyPartLocation(7), 1, True)
+    historic_soreness.first_reported = current_date_time
+    historic_soreness.historic_soreness_status = HistoricSorenessStatus.persistent_2_pain
+    historic_soreness.average_severity = 1.3
+
+    historic_soreness_list = [historic_soreness]
+
+    daily_plan = create_plan(body_part_list=[7, 6], severity_list=[2, 1], side_list=[1, 1], pain_list=[True, False], historic_soreness_list=historic_soreness_list)
     assert len(daily_plan.post_active_rest.inhibit_exercises) > 0
     assert len(daily_plan.post_active_rest.static_stretch_exercises) > 0
     assert len(daily_plan.post_active_rest.isolated_activate_exercises) > 0

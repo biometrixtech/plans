@@ -92,7 +92,7 @@ class ActiveRestAfterTraining(Serialisable):
 
         body_part_factory = BodyPartFactory()
 
-        if soreness.historic_soreness_status is None and not soreness.pain:
+        if soreness.daily and not soreness.pain:
 
             body_part = body_part_factory.get_body_part(soreness.body_part)
 
@@ -147,7 +147,7 @@ class ActiveRestAfterTraining(Serialisable):
 
         if soreness.historic_soreness_status is not None and soreness.first_reported is not None:
             days_sore = (event_date_time - soreness.first_reported).days
-            if (not soreness.pain and days_sore >= 30) or soreness.is_acute_pain() or soreness.is_persistent_pain():
+            if (not soreness.pain and days_sore >= 30) or soreness.is_acute_pain() or soreness.is_persistent_pain() or soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_pain:
 
                 body_part = body_part_factory.get_body_part(soreness.body_part)
 
@@ -178,7 +178,7 @@ class ActiveRestAfterTraining(Serialisable):
 
         body_part_factory = BodyPartFactory()
 
-        if soreness.historic_soreness_status is None and soreness.pain:
+        if soreness.daily and soreness.pain:
 
             body_part = body_part_factory.get_body_part(soreness.body_part)
 

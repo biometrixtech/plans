@@ -396,19 +396,6 @@ class ExerciseAssignmentCalculator(object):
 
             return self.get_chest_exercises(soreness)
 
-    def get_constituent_exercises(self, primary_body_part, constituent_body_parts, soreness):
-
-        for c in constituent_body_parts:
-            body_part = self.get_exercises_for_body_parts(soreness)
-            primary_body_part.inhibit_exercises.extend(body_part.inhibit_exercises)
-            primary_body_part.static_stretch_exercises.extend(body_part.static_stretch_exercises)
-            primary_body_part.active_stretch_exercises.extend(body_part.active_stretch_exercises)
-            primary_body_part.dynamic_stretch_exercises.extend(body_part.dynamic_stretch_exercises)
-            primary_body_part.isolated_activation_exercises.extend(body_part.isolated_activation_exercises)
-            primary_body_part.static_integrate_exercises.extend(body_part.static_integrate_exercises)
-
-        return primary_body_part
-
     def is_soreness_historic(self, soreness):
 
         if (soreness.historic_soreness_status == HistoricSorenessStatus.almost_persistent_2_pain or
