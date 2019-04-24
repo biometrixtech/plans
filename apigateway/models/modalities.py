@@ -130,6 +130,7 @@ class ActiveRestAfterTraining(Serialisable):
                             self.copy_exercises(agonist.inhibit_exercises, self.inhibit_exercises, goal, "1", soreness)
                             if soreness.severity < 3.5:
                                 self.copy_exercises(agonist.static_stretch_exercises, self.static_stretch_exercises, goal, "1", soreness)
+                            if soreness.severity < 2.5:
                                 self.copy_exercises(agonist.isolated_activate_exercises, self.isolated_activate_exercises, goal, "1", soreness)
                     for y in body_part.synergists:
                         synergist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(y), None))
@@ -137,7 +138,7 @@ class ActiveRestAfterTraining(Serialisable):
                             self.copy_exercises(synergist.inhibit_exercises, self.inhibit_exercises, goal, "2", soreness)
                             if soreness.severity < 3.5:
                                 self.copy_exercises(synergist.isolated_activate_exercises, self.isolated_activate_exercises, goal, "2", soreness)
-                    if soreness.severity < 3.5:
+                    if soreness.severity < 2.5:
                         general_body_part = body_part_factory.get_body_part(BodyPart(BodyPartLocation.general, None))
                         self.copy_exercises(general_body_part.static_integrate_exercises, self.static_integrate_exercises, goal, "1", soreness)
 
@@ -158,8 +159,9 @@ class ActiveRestAfterTraining(Serialisable):
                         agonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None))
                         if agonist is not None:
                             self.copy_exercises(agonist.inhibit_exercises, self.inhibit_exercises, goal, "1", soreness)
-                            self.copy_exercises(agonist.static_stretch_exercises, self.static_stretch_exercises, goal, "1", soreness)
                             if soreness.severity < 3.5:
+                                self.copy_exercises(agonist.static_stretch_exercises, self.static_stretch_exercises, goal, "1", soreness)
+                            if soreness.severity < 2.5:
                                 self.copy_exercises(agonist.isolated_activate_exercises, self.isolated_activate_exercises, goal,
                                                     "1", soreness)
                     for y in body_part.synergists:
@@ -169,7 +171,7 @@ class ActiveRestAfterTraining(Serialisable):
                             if soreness.severity < 3.5:
                                 self.copy_exercises(synergist.isolated_activate_exercises, self.isolated_activate_exercises,
                                                     goal, "2", soreness)
-                    if soreness.severity < 3.5:
+                    if soreness.severity < 2.5:
                         general_body_part = body_part_factory.get_body_part(BodyPart(BodyPartLocation.general, None))
                         self.copy_exercises(general_body_part.static_integrate_exercises, self.static_integrate_exercises,
                                             goal, "1", soreness)
