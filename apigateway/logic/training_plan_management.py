@@ -94,10 +94,10 @@ class TrainingPlanManager(object):
         #self.daily_plan.ice = calc.get_ice(event_date, soreness_list)
         #self.daily_plan.cold_water_immersion = calc.get_cold_water_immersion(event_date, soreness_list)
 
-        if soreness_values is not None and len(soreness_values) > 0:
-            max_soreness = max(soreness_values)
-        else:
-            max_soreness = 0
+        #if soreness_values is not None and len(soreness_values) > 0:
+        #    max_soreness = max(soreness_values)
+        #else:
+        #    max_soreness = 0
 
         #if self.daily_plan.functional_strength_session is None:
         #    self.populate_functional_strength(True)
@@ -106,10 +106,10 @@ class TrainingPlanManager(object):
 
         if not show_post_recovery:
             if self.daily_plan.pre_recovery is not None and not self.daily_plan.pre_recovery.completed:
-                self.daily_plan.pre_recovery.set_exercise_target_minutes(soreness_list, target_minutes, max_soreness,
-                                                                         historic_soreness_present,
+                #self.daily_plan.pre_recovery.set_exercise_target_minutes(soreness_list, target_minutes, max_soreness,
+                #                                                         historic_soreness_present,
                                                                          #functional_strength_active,
-                                                                         is_active_prep=True)
+                #                                                         is_active_prep=True)
                 #am_exercise_assignments = calc.create_exercise_assignments(self.daily_plan.pre_recovery, soreness_list,
                 #                                                           self.trigger_date_time, target_minutes)
                 #self.daily_plan.pre_recovery.update_from_exercise_assignments(am_exercise_assignments)
@@ -119,10 +119,10 @@ class TrainingPlanManager(object):
 
         if show_post_recovery:
             if self.daily_plan.post_recovery is not None and not self.daily_plan.post_recovery.completed:
-                self.daily_plan.post_recovery.set_exercise_target_minutes(soreness_list, target_minutes, max_soreness,
-                                                                          historic_soreness_present,
+                #self.daily_plan.post_recovery.set_exercise_target_minutes(soreness_list, target_minutes, max_soreness,
+                #                                                          historic_soreness_present,
                                                                           #functional_strength_active,
-                                                                          is_active_prep=False)
+                #                                                          is_active_prep=False)
                 #pm_exercise_assignments = calc.create_exercise_assignments(self.daily_plan.post_recovery, soreness_list,
                 #                                                           self.trigger_date_time, target_minutes)
                 #self.daily_plan.post_recovery.update_from_exercise_assignments(pm_exercise_assignments)

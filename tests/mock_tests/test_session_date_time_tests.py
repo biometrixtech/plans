@@ -49,6 +49,7 @@ def create_plan(body_part, historic_soreness_list=None):
     daily_plan_datastore.side_load_plans([daily_plan])
     data_store_collection = DatastoreCollection()
     data_store_collection.daily_plan_datastore = daily_plan_datastore
+    data_store_collection.exercise_datastore = exercise_library_datastore
 
     if historic_soreness_list is not None and len(historic_soreness_list) > 0:
         athlete_stats_datastore = AthleteStatsDatastore()
