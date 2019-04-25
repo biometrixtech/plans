@@ -150,7 +150,7 @@ class BodyPartFactory(object):
 
         inhibit = self.get_exercise_dictionary([4])
         static_stretch = self.get_exercise_dictionary([28, 46])
-        active_stretch = self.get_exercise_dictionary([112, 117])
+        active_stretch = self.get_exercise_dictionary([122, 117])
         dynamic_stretch = {}
         isolated_activation = self.get_exercise_dictionary([124, 227])
         outer_thigh.add_extended_exercise_phases(inhibit, static_stretch, active_stretch, dynamic_stretch, isolated_activation, {})

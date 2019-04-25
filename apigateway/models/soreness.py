@@ -369,8 +369,8 @@ class AssignedExercise(Serialisable):
         #self.body_part_soreness_level = body_part_soreness_level
         #self.body_part_location = body_part_location
         self.athlete_id = ""
-        self.reps_assigned = 0
-        self.sets_assigned = 0
+        self.complete_reps_assigned = 0
+        self.complete_sets_assigned = 0
         self.expire_date_time = None
         self.position_order = 0
         self.goal_text = ""
@@ -386,14 +386,14 @@ class AssignedExercise(Serialisable):
     def duration(self):
         if self.exercise.unit_of_measure.name == "count":
             if not self.exercise.bilateral:
-                return self.exercise.seconds_per_rep * self.reps_assigned * self.sets_assigned
+                return self.exercise.seconds_per_rep * self.complete_reps_assigned * self.complete_sets_assigned
             else:
-                return (self.exercise.seconds_per_rep * self.reps_assigned * self.sets_assigned) * 2
+                return (self.exercise.seconds_per_rep * self.complete_reps_assigned * self.complete_sets_assigned) * 2
         elif self.exercise.unit_of_measure.name == "seconds":
             if not self.exercise.bilateral:
-                return self.exercise.seconds_per_set * self.sets_assigned
+                return self.exercise.seconds_per_set * self.complete_sets_assigned
             else:
-                return (self.exercise.seconds_per_set * self.sets_assigned) * 2
+                return (self.exercise.seconds_per_set * self.complete_sets_assigned) * 2
         else:
             return None
 
@@ -413,8 +413,8 @@ class AssignedExercise(Serialisable):
                'seconds_per_set': self.exercise.seconds_per_set,
                'unit_of_measure': self.exercise.unit_of_measure.name,
                'position_order': self.position_order,
-               'reps_assigned': self.reps_assigned,
-               'sets_assigned': self.sets_assigned,
+               'complete_reps_assigned': self.complete_reps_assigned,
+               'complete_sets_assigned': self.complete_sets_assigned,
                'seconds_duration': self.duration(),
                'goal_text': self.goal_text,
                'equipment_required': self.equipment_required
