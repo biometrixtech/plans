@@ -10,6 +10,7 @@ class AthleteGoal(object):
     def __init__(self, text, priority):
         self.text = text
         self.priority = priority
+        self.trigger = ''
 
 
 class Heat(Serialisable):
@@ -81,33 +82,30 @@ class ActiveRest(object):
 
     def update_dosage(self, soreness, assigned_exercise):
 
-        try:
-            if soreness.severity < 0.5:
-                assigned_exercise.complete_reps_assigned = max(assigned_exercise.complete_reps_assigned,
-                                                      assigned_exercise.exercise.min_reps)
-                assigned_exercise.complete_sets_assigned = max(assigned_exercise.complete_sets_assigned, 1)
-            elif 0.5 <= soreness.severity < 1.5:
-                assigned_exercise.complete_reps_assigned = max(assigned_exercise.complete_reps_assigned,
-                                                      assigned_exercise.exercise.min_reps)
-                assigned_exercise.complete_sets_assigned = max(assigned_exercise.complete_sets_assigned, 1)
-            elif 1.5 <= soreness.severity < 2.5:
-                assigned_exercise.complete_reps_assigned = max(assigned_exercise.complete_reps_assigned,
-                                                      assigned_exercise.exercise.max_reps)
-                assigned_exercise.complete_sets_assigned = max(assigned_exercise.complete_sets_assigned, 1)
-            elif 2.5 <= soreness.severity < 3.5:
-                assigned_exercise.complete_reps_assigned = max(assigned_exercise.complete_reps_assigned,
-                                                      assigned_exercise.exercise.max_reps)
-                assigned_exercise.complete_sets_assigned = max(assigned_exercise.complete_sets_assigned, 1)
-            elif 3.5 <= soreness.severity < 4.5:
-                assigned_exercise.complete_reps_assigned = max(assigned_exercise.complete_reps_assigned,
-                                                      assigned_exercise.exercise.max_reps)
-                assigned_exercise.complete_sets_assigned = max(assigned_exercise.complete_sets_assigned, 1)
-            elif soreness >= 4.5:
-                assigned_exercise.complete_reps_assigned = max(assigned_exercise.complete_reps_assigned,
-                                                      assigned_exercise.exercise.max_reps)
-                assigned_exercise.complete_sets_assigned = max(assigned_exercise.complete_sets_assigned, 2)
-        except:
-            assigned_exercise = None
+        if soreness.severity < 0.5:
+            assigned_exercise.complete_reps_assigned = max(assigned_exercise.complete_reps_assigned,
+                                                  assigned_exercise.exercise.min_reps)
+            assigned_exercise.complete_sets_assigned = max(assigned_exercise.complete_sets_assigned, 1)
+        elif 0.5 <= soreness.severity < 1.5:
+            assigned_exercise.complete_reps_assigned = max(assigned_exercise.complete_reps_assigned,
+                                                  assigned_exercise.exercise.min_reps)
+            assigned_exercise.complete_sets_assigned = max(assigned_exercise.complete_sets_assigned, 1)
+        elif 1.5 <= soreness.severity < 2.5:
+            assigned_exercise.complete_reps_assigned = max(assigned_exercise.complete_reps_assigned,
+                                                  assigned_exercise.exercise.max_reps)
+            assigned_exercise.complete_sets_assigned = max(assigned_exercise.complete_sets_assigned, 1)
+        elif 2.5 <= soreness.severity < 3.5:
+            assigned_exercise.complete_reps_assigned = max(assigned_exercise.complete_reps_assigned,
+                                                  assigned_exercise.exercise.max_reps)
+            assigned_exercise.complete_sets_assigned = max(assigned_exercise.complete_sets_assigned, 1)
+        elif 3.5 <= soreness.severity < 4.5:
+            assigned_exercise.complete_reps_assigned = max(assigned_exercise.complete_reps_assigned,
+                                                  assigned_exercise.exercise.max_reps)
+            assigned_exercise.complete_sets_assigned = max(assigned_exercise.complete_sets_assigned, 1)
+        elif soreness >= 4.5:
+            assigned_exercise.complete_reps_assigned = max(assigned_exercise.complete_reps_assigned,
+                                                  assigned_exercise.exercise.max_reps)
+            assigned_exercise.complete_sets_assigned = max(assigned_exercise.complete_sets_assigned, 2)
 
         return assigned_exercise
 
@@ -156,6 +154,7 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
             body_part = body_part_factory.get_body_part(soreness.body_part)
 
             goal = AthleteGoal("Care for Soreness", 1)
+            goal.trigger = "Sore reported today"
 
             if body_part is not None:
                 for a in body_part.agonists:
@@ -193,6 +192,7 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
                 body_part = body_part_factory.get_body_part(soreness.body_part)
 
                 goal = AthleteGoal("Prevention", 1)
+                goal.trigger = "Pers, Pers-2 Soreness > 30d"
 
                 if body_part is not None:
                     for a in body_part.agonists:
@@ -229,11 +229,12 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
 
         if soreness.historic_soreness_status is not None and soreness.first_reported is not None:
             days_sore = (event_date_time - soreness.first_reported).days
-            if days_sore >= 30 and (soreness.is_acute_pain() or soreness.is_persistent_pain() or soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_pain):
+            if soreness.is_acute_pain() or soreness.is_persistent_pain() or soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_pain:
 
                 body_part = body_part_factory.get_body_part(soreness.body_part)
 
                 goal = AthleteGoal("Prevention", 1)
+                goal.trigger = "Acute, Pers, Pers-2 Pain"
 
                 if body_part is not None:
                     for a in body_part.agonists:
@@ -273,6 +274,7 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
             body_part = body_part_factory.get_body_part(soreness.body_part)
 
             goal = AthleteGoal("Care for Pain", 1)
+            goal.trigger = "Pain reported today"
 
             if body_part is not None:
                 for a in body_part.agonists:
@@ -331,6 +333,7 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
             body_part = body_part_factory.get_body_part(soreness.body_part)
 
             goal = AthleteGoal("Care for Soreness", 1)
+            goal.trigger = "Sore reported today"
 
             if body_part is not None:
                 for a in body_part.agonists:
@@ -361,11 +364,12 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
 
         if soreness.historic_soreness_status is not None and soreness.first_reported is not None:
             days_sore = (event_date_time - soreness.first_reported).days
-            if not soreness.pain and 15 <= days_sore < 30:
+            if not soreness.pain and days_sore > 30:
 
                 body_part = body_part_factory.get_body_part(soreness.body_part)
 
                 goal = AthleteGoal("Prevention", 1)
+                goal.trigger = "Pers, Pers-2 Soreness > 30d"
 
                 if body_part is not None:
                     for a in body_part.agonists:
@@ -402,11 +406,12 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
 
         if soreness.historic_soreness_status is not None and soreness.first_reported is not None:
             days_sore = (event_date_time - soreness.first_reported).days
-            if (not soreness.pain and days_sore >= 30) or soreness.is_acute_pain() or soreness.is_persistent_pain() or soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_pain:
+            if soreness.is_acute_pain() or soreness.is_persistent_pain() or soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_pain:
 
                 body_part = body_part_factory.get_body_part(soreness.body_part)
 
                 goal = AthleteGoal("Prevention", 1)
+                goal.trigger = "Acute, Pers, Pers-2 Pain"
 
                 if body_part is not None:
                     for a in body_part.agonists:
@@ -446,6 +451,7 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
             body_part = body_part_factory.get_body_part(soreness.body_part)
 
             goal = AthleteGoal("Care for Pain", 1)
+            goal.trigger = "Pain reported today"
 
             if body_part is not None:
                 for a in body_part.agonists:

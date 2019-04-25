@@ -728,7 +728,7 @@ class ExerciseAssignmentCalculator(object):
         bring_the_heat = []
 
         for s in soreness_list:
-            if 2 <= s.severity <= 5:
+            if 2 <= s.severity <= 5 and s.first_reported is not None:
                 days_diff = (parse_date(event_date_time) - s.first_reported).days
                 if ((not s.pain and days_diff >= 30) or
                         (s.historic_soreness_status == HistoricSorenessStatus.persistent_2_pain) or
