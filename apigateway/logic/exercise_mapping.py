@@ -751,8 +751,8 @@ class ExerciseAssignmentCalculator(object):
     def get_post_active_rest(self, soreness_list, event_date_time):
 
         if len(soreness_list) > 0:
-            active_rest = ActiveRestAfterTraining(self.exercise_library)
-            active_rest.fill_exercises(soreness_list, event_date_time)
+            active_rest = ActiveRestAfterTraining()
+            active_rest.fill_exercises(soreness_list, event_date_time, self.exercise_library)
             active_rest.calc_durations()
             return active_rest
         else:
