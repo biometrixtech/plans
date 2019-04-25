@@ -26,8 +26,8 @@ class DailyPlan(Serialisable):
         self.pre_recovery_completed = False
         self.post_recovery_completed = False
         #self.functional_strength_completed = False
-        self.pre_recovery = session.RecoverySession()
-        self.post_recovery = session.RecoverySession()
+        #self.pre_recovery = session.RecoverySession()
+        #self.post_recovery = session.RecoverySession()
         self.completed_post_recovery_sessions = []
         #self.corrective_sessions = []
         #self.bump_up_sessions = []

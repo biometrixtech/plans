@@ -76,7 +76,7 @@ class TrainingPlanManager(object):
                                                                                self.trigger_date_time,
                                                                                historic_soreness)
         show_post_recovery = self.show_post_recovery(self.post_session_surveys_today())
-        self.add_recovery_times(show_post_recovery)
+        #self.add_recovery_times(show_post_recovery)
 
         calc = exercise_mapping.ExerciseAssignmentCalculator(self.athlete_id, self.exercise_library_datastore,
                                                              self.completed_exercise_datastore,
@@ -86,7 +86,7 @@ class TrainingPlanManager(object):
 
         #new modalities
         #self.daily_plan.heat = calc.get_heat(event_date, soreness_list)
-        #self.daily_plan.pre_active_rest = calc.get_pre_active_rest(soreness_list)
+        self.daily_plan.pre_active_rest = calc.get_pre_active_rest(soreness_list, event_date)
         #self.daily_plan.warm_up = calc.get_warm_up(soreness_list)
         #self.daily_plan.cool_down = calc.get_cool_down(event_date, soreness_list)
         self.daily_plan.post_active_rest = calc.get_post_active_rest(soreness_list, event_date)
@@ -104,8 +104,8 @@ class TrainingPlanManager(object):
 
         #functional_strength_active = (self.daily_plan.functional_strength_session is not None)
 
-        if not show_post_recovery:
-            if self.daily_plan.pre_recovery is not None and not self.daily_plan.pre_recovery.completed:
+        #if not show_post_recovery:
+        #    if self.daily_plan.pre_recovery is not None and not self.daily_plan.pre_recovery.completed:
                 #self.daily_plan.pre_recovery.set_exercise_target_minutes(soreness_list, target_minutes, max_soreness,
                 #                                                         historic_soreness_present,
                                                                          #functional_strength_active,
@@ -113,12 +113,12 @@ class TrainingPlanManager(object):
                 #am_exercise_assignments = calc.create_exercise_assignments(self.daily_plan.pre_recovery, soreness_list,
                 #                                                           self.trigger_date_time, target_minutes)
                 #self.daily_plan.pre_recovery.update_from_exercise_assignments(am_exercise_assignments)
-                self.daily_plan.pre_recovery.display_exercises = True
-            else:
-                self.daily_plan.pre_recovery.display_exercises = False
+        #        self.daily_plan.pre_recovery.display_exercises = True
+        #    else:
+        #        self.daily_plan.pre_recovery.display_exercises = False
 
-        if show_post_recovery:
-            if self.daily_plan.post_recovery is not None and not self.daily_plan.post_recovery.completed:
+        #if show_post_recovery:
+        #    if self.daily_plan.post_recovery is not None and not self.daily_plan.post_recovery.completed:
                 #self.daily_plan.post_recovery.set_exercise_target_minutes(soreness_list, target_minutes, max_soreness,
                 #                                                          historic_soreness_present,
                                                                           #functional_strength_active,
@@ -130,9 +130,9 @@ class TrainingPlanManager(object):
                 #    self.daily_plan.functional_strength_session = None
                 #    self.daily_plan.functional_strength_eligible = False
 
-                self.daily_plan.post_recovery.display_exercises = True
-            else:
-                self.daily_plan.post_recovery.display_exercises = False
+        #        self.daily_plan.post_recovery.display_exercises = True
+        #    else:
+        #        self.daily_plan.post_recovery.display_exercises = False
 
         self.daily_plan.last_updated = last_updated
 

@@ -281,7 +281,7 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
         self.inhibit_minutes = self.calc_active_time(self.inhibit_exercises)
         self.static_stretch_minutes = self.calc_active_time(self.static_stretch_exercises)
         self.isolated_activate_minutes = self.calc_active_time(self.isolated_activate_exercises)
-        self.static_integrate_minutes = self.calc_active_time(self.static_integrate_minutes)
+        self.static_integrate_minutes = self.calc_active_time(self.static_integrate_exercises)
 
     def check_reactive_recovery(self, soreness, exercise_library):
 

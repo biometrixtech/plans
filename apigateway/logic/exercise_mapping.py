@@ -737,16 +737,15 @@ class ExerciseAssignmentCalculator(object):
 
         return heat
 
-    def get_pre_active_rest(self, historic_soreness_list):
+    def get_pre_active_rest(self, soreness_list, event_date_time):
 
-        active_rest = None
-
-        for h in historic_soreness_list:
-            if h.first_reported is not None and not h.is_dormant_cleared():
-                if not h.is_pain:
-                    active_rest = ActiveRestBeforeTraining()
-
-        return active_rest
+        if len(soreness_list) > 0:
+            active_rest = ActiveRestBeforeTraining()
+            active_rest.fill_exercises(soreness_list, event_date_time, self.exercise_library)
+            active_rest.calc_durations()
+            return active_rest
+        else:
+            return None
 
     def get_post_active_rest(self, soreness_list, event_date_time):
 
