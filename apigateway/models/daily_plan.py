@@ -15,13 +15,13 @@ class DailyPlan(Serialisable):
         self.strength_conditioning_sessions = []  # includes cross training
         #self.games = []
         #self.tournaments = []
-        self.heat = None
+        self.heat = []
         self.pre_active_rest = None
         self.warm_up = None
         self.cool_down = None
         self.active_recovery = None
         self.post_active_rest = None
-        self.ice = None
+        self.ice = []
         self.cold_water_immersion = None
         self.pre_recovery_completed = False
         self.post_recovery_completed = False

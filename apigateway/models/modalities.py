@@ -17,6 +17,7 @@ class Heat(Serialisable):
         self.minutes = minutes
         self.body_part_location = body_part_location
         self.side = side
+        self.before_training = True
 
     def json_serialise(self):
         ret = {
@@ -447,6 +448,9 @@ class Ice(Serialisable):
         self.minutes = minutes
         self.body_part_location = body_part_location
         self.side = side
+        self.after_training = True
+        self.immediately_after_training = False
+        self.repeat_every_3hrs_for_24hrs = False
 
     def json_serialise(self):
         ret = {
@@ -459,8 +463,9 @@ class Ice(Serialisable):
 
 
 class ColdWaterImmersion(Serialisable):
-    def __init__(self, minutes=0):
+    def __init__(self, minutes=10):
         self.minutes = minutes
+        self.after_training = True
 
     def json_serialise(self):
         ret = {

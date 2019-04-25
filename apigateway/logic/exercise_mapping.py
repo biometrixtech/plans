@@ -5,7 +5,7 @@ from models.exercise import ExerciseBuckets, Phase
 from models.soreness import AssignedExercise, BodyPartLocation, HistoricSorenessStatus
 from logic.goal_focus_text_generator import RecoveryTextGenerator
 from datetime import  timedelta
-from utils import format_datetime
+from utils import format_datetime, parse_date
 from models.modalities import ActiveRecovery, ActiveRestBeforeTraining, ActiveRestAfterTraining,ColdWaterImmersion, CoolDown, Heat, WarmUp, Ice
 
 
@@ -723,19 +723,19 @@ class ExerciseAssignmentCalculator(object):
         else:
             return False
 
-    def get_heat(self, current_date_time, historic_soreness_list):
+    def get_heat(self, soreness_list, event_date_time):
 
-        heat = None
+        bring_the_heat = []
 
-        for h in historic_soreness_list:
-            if h.first_reported is not None and not h.is_dormant_cleared():
-                days_diff = (current_date_time - h.first_reported).days
-                if ((not h.is_pain and days_diff >= 30) or
-                        (h.historic_soreness_status == HistoricSorenessStatus.persistent_2_pain) or
-                        h.is_persistent_pain()):
-                    heat = Heat(minutes=0, body_part_location=h.body_part_location, side=h.side)
+        for s in soreness_list:
+            if 2 <= s.severity <= 5:
+                days_diff = (parse_date(event_date_time) - s.first_reported).days
+                if ((not s.pain and days_diff >= 30) or
+                        (s.historic_soreness_status == HistoricSorenessStatus.persistent_2_pain) or
+                        s.is_persistent_pain()):
+                    bring_the_heat.append(Heat(minutes=10, body_part_location=s.body_part.location, side=s.side))
 
-        return heat
+        return bring_the_heat
 
     def get_pre_active_rest(self, soreness_list, event_date_time):
 
@@ -794,28 +794,30 @@ class ExerciseAssignmentCalculator(object):
 
         return active_recovery
 
-    def get_ice(self, current_date_time, historic_soreness_list):
+    def get_ice(self, soreness_list):
 
-        ice = None
+        ice_list = []
 
-        for h in historic_soreness_list:
-            if h.first_reported is not None and not h.is_dormant_cleared():
-                days_diff = (current_date_time - h.first_reported).days
-                if ((not h.is_pain and days_diff >= 30) or
-                        (h.historic_soreness_status == HistoricSorenessStatus.persistent_2_pain) or
-                        h.is_persistent_pain()):
-                    ice = Ice(minutes=0, body_part_location=h.body_part_location, side=h.side)
+        for s in soreness_list:
+            if s.daily and s.pain:
+                if 1 <= s.severity <= 2:
+                    ice = Ice(minutes=20, body_part_location=s.body_part.location, side=s.side)
+                    ice_list.append(ice)
+                elif 2 < s.severity < 4:
+                    ice = Ice(minutes=20, body_part_location=s.body_part.location, side=s.side)
+                    ice.repeat_every_3hrs_for_24hrs = True
+                    ice.immediately_after_training = True
+                    ice_list.append(ice)
 
-        return ice
+        return ice_list
 
-    def get_cold_water_immersion(self, current_date_time, historic_soreness_list):
+    def get_cold_water_immersion(self, soreness_list):
 
         cold_water_immersion = None
 
-        for h in historic_soreness_list:
-            if h.first_reported is not None and not h.is_dormant_cleared():
-                days_diff = (current_date_time - h.first_reported).days
-                if not h.is_pain and days_diff < 30:
+        for s in soreness_list:
+            if s.daily and s.pain:
+                if 4 <= s.severity <= 5:
                     cold_water_immersion = ColdWaterImmersion()
 
         return cold_water_immersion
