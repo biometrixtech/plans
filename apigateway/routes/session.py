@@ -31,6 +31,9 @@ def handle_session_create(principal_id=None):
     user_id = principal_id
     event_date = parse_datetime(request.json['event_date'])
     plan_update_required = False
+    train_later = True
+    if 'sessions_planned' in request.json and not request.json['sessions_planned']:
+        train_later = False
     athlete_stats = athlete_stats_datastore.get(athlete_id=user_id)
     plan_event_date = format_date(event_date)
     survey_processor = SurveyProcessing(user_id, event_date,
@@ -58,9 +61,10 @@ def handle_session_create(principal_id=None):
         plan.last_sensor_sync = daily_plan_datastore.get_last_sensor_sync(user_id, plan_event_date)
     else:
         plan = daily_plan_datastore.get(user_id, plan_event_date, plan_event_date)[0]
+        plan.train_later = train_later
         if plan_update_required and (not plan.sessions_planned or plan.session_from_readiness):
             plan.sessions_planned = True
-            plan.session_from_readiness = False
+            # plan.session_from_readiness = False
 
     # add sessions to plan and write to mongo
     plan.training_sessions.extend(survey_processor.sessions)
