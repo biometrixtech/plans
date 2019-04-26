@@ -393,8 +393,12 @@ class AssignedExercise(Serialisable):
         # self.body_part_soreness_level = body_part_soreness_level
         # self.body_part_location = body_part_location
         self.athlete_id = ""
+        self.efficient_reps_assigned = 0
+        self.efficient_sets_assigned = 0
         self.complete_reps_assigned = 0
         self.complete_sets_assigned = 0
+        self.comprehensive_reps_assigned = 0
+        self.comprehensive_sets_assigned = 0
         self.expire_date_time = None
         self.position_order = 0
         self.goal_text = ""
@@ -407,17 +411,29 @@ class AssignedExercise(Serialisable):
     def soreness_priority(self):
         return ExercisePriority.neutral
     '''
-    def duration(self):
+    def duration_efficient(self):
+
+        return self.duration(self.efficient_reps_assigned, self.efficient_sets_assigned)
+
+    def duration_complete(self):
+
+        return self.duration(self.complete_reps_assigned, self.complete_sets_assigned)
+
+    def duration_comprehensive(self):
+
+        return self.duration(self.comprehensive_reps_assigned, self.comprehensive_sets_assigned)
+
+    def duration(self, reps_assigned, sets_assigned):
         if self.exercise.unit_of_measure.name == "count":
             if not self.exercise.bilateral:
-                return self.exercise.seconds_per_rep * self.complete_reps_assigned * self.complete_sets_assigned
+                return self.exercise.seconds_per_rep * reps_assigned * sets_assigned
             else:
-                return (self.exercise.seconds_per_rep * self.complete_reps_assigned * self.complete_sets_assigned) * 2
+                return (self.exercise.seconds_per_rep * reps_assigned * sets_assigned) * 2
         elif self.exercise.unit_of_measure.name == "seconds":
             if not self.exercise.bilateral:
-                return self.exercise.seconds_per_set * self.complete_sets_assigned
+                return self.exercise.seconds_per_set * sets_assigned
             else:
-                return (self.exercise.seconds_per_set * self.complete_sets_assigned) * 2
+                return (self.exercise.seconds_per_set * sets_assigned) * 2
         else:
             return None
 
@@ -436,8 +452,12 @@ class AssignedExercise(Serialisable):
         assigned_exercise.exercise.bilateral = input_dict.get("bilateral", False)
         assigned_exercise.exercise.unit_of_measure = input_dict.get("unit_of_measure", None)
         assigned_exercise.position_order = input_dict.get("position_order", 0)
+        assigned_exercise.efficient_reps_assigned = input_dict.get("efficient_reps_assigned", 0)
+        assigned_exercise.efficient_sets_assigned = input_dict.get("efficient_sets_assigned", 0)
         assigned_exercise.complete_reps_assigned = input_dict.get("complete_reps_assigned", 0)
         assigned_exercise.complete_sets_assigned = input_dict.get("complete_sets_assigned", 0)
+        assigned_exercise.comprehensive_reps_assigned = input_dict.get("comprehensive_reps_assigned", 0)
+        assigned_exercise.comprehensive_sets_assigned = input_dict.get("comprehensive_sets_assigned", 0)
         assigned_exercise.exercise.seconds_per_set = input_dict.get("seconds_per_set", 0)
         assigned_exercise.exercise.seconds_per_rep = input_dict.get("seconds_per_rep", 0)
         assigned_exercise.goal_text = input_dict.get("goal_text", "")
@@ -459,9 +479,15 @@ class AssignedExercise(Serialisable):
                'seconds_per_set': self.exercise.seconds_per_set,
                'unit_of_measure': self.exercise.unit_of_measure.name,
                'position_order': self.position_order,
+               'efficient_reps_assigned': self.efficient_reps_assigned,
+               'efficient_sets_assigned': self.efficient_sets_assigned,
                'complete_reps_assigned': self.complete_reps_assigned,
                'complete_sets_assigned': self.complete_sets_assigned,
-               'seconds_duration': self.duration(),
+               'comprehensive_reps_assigned': self.comprehensive_reps_assigned,
+               'comprehensive_sets_assigned': self.comprehensive_sets_assigned,
+               'duration_efficient': self.duration_efficient(),
+               'duration_complete': self.duration_complete(),
+               'duration_comprehensive': self.duration_comprehensive(),
                'goal_text': self.goal_text,
                'equipment_required': self.equipment_required,
                'goals': [goal.json_serialise() for goal in self.goals],

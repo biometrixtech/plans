@@ -155,6 +155,15 @@ def get_goals_triggers(assigned_exercises):
 
     return list(set(goal_trigger_list))
 
+def calc_active_time_complete(exercise_dictionary):
+
+    active_time = 0
+
+    for id, assigned_excercise in exercise_dictionary.items():
+        active_time += assigned_excercise.duration_complete() / 60
+
+    return active_time
+
 def test_pre_active_rest_limited_body_parts():
 
     current_date = date.today()
@@ -185,9 +194,9 @@ def test_pre_active_rest_limited_body_parts():
 
     f = open('pre_ar_plans_time.csv', 'w')
     line = ('BodyPart,is_pain,severity,hs_status,'+
-            'inhibit_goals_triggers,inhibit_minutes,inhibit_exercises,static_stretch_goals_triggers,static_stretch_minutes,static_stretch_exercises,' +
-            'active_stretch_goals_triggers, active_stretch_minutes,active_stretch_exercises,isolated_activate_goals_triggers,isolated_activate_minutes,isolated_activate_exercises,' +
-            'static_integrate_goals_triggers,static_integrate_minutes,static_integrate_exercises,total_minutes')
+            'inhibit_goals_triggers,inhibit_minutes_complete,inhibit_exercises,static_stretch_goals_triggers,static_stretch_minutes_complete,static_stretch_exercises,' +
+            'active_stretch_goals_triggers, active_stretch_minutes_complete,active_stretch_exercises,isolated_activate_goals_triggers,isolated_activate_minutes_complete,isolated_activate_exercises,' +
+            'static_integrate_goals_triggers,static_integrate_minutes_complete,static_integrate_exercises,total_minutes_complete')
     f.write(line + '\n')
 
     for b1 in body_parts_1:
@@ -217,56 +226,51 @@ def test_pre_active_rest_limited_body_parts():
                     isolated_activate_goals_triggers = get_goals_triggers(daily_plan.pre_active_rest.isolated_activate_exercises)
                     static_integrate_goals_triggers = get_goals_triggers(daily_plan.pre_active_rest.static_integrate_exercises)
 
+                    complete_inhibit_minutes = calc_active_time_complete(daily_plan.pre_active_rest.inhibit_exercises)
+                    complete_static_stretch_minutes = calc_active_time_complete(daily_plan.pre_active_rest.static_stretch_exercises)
+                    complete_active_stretch_minutes = calc_active_time_complete(daily_plan.pre_active_rest.active_stretch_exercises)
+                    complete_isolated_activate_minutes = calc_active_time_complete(daily_plan.pre_active_rest.isolated_activate_exercises)
+                    complete_static_integrate_minutes = calc_active_time_complete(daily_plan.pre_active_rest.static_integrate_exercises)
+                    complete_total_minutes = complete_inhibit_minutes + complete_static_stretch_minutes + complete_active_stretch_minutes + complete_isolated_activate_minutes + complete_static_integrate_minutes
+
                     line = (body_part_line + ',' +
 
                             ' ** '.join(inhibit_goals_triggers) + ',' +
 
-                            str(round(
-                                daily_plan.pre_active_rest.inhibit_minutes if daily_plan.pre_active_rest.inhibit_minutes is not None else 0,
-                                2)) + ',' +
+                            str(round(complete_inhibit_minutes, 2)) + ',' +
 
                             ';'.join(convert_assigned_dict_exercises(
                                 daily_plan.pre_active_rest.inhibit_exercises)) + ',' +
 
                             ' ** '.join(static_stretch_goals_triggers) + ',' +
 
-                            str(round(
-                                daily_plan.pre_active_rest.static_stretch_minutes if daily_plan.pre_active_rest.static_stretch_minutes is not None else 0,
-                                2)) + ',' +
+                            str(round(complete_static_stretch_minutes, 2)) + ',' +
 
                             ';'.join(convert_assigned_dict_exercises(
                                 daily_plan.pre_active_rest.static_stretch_exercises)) + ',' +
 
                             ' ** '.join(active_stretch_goals_triggers) + ',' +
 
-                            str(round(
-                                daily_plan.pre_active_rest.active_stretch_minutes if daily_plan.pre_active_rest.active_stretch_minutes is not None else 0,
-                                2)) + ',' +
+                            str(round(complete_active_stretch_minutes, 2)) + ',' +
 
                             ';'.join(convert_assigned_dict_exercises(
                                 daily_plan.pre_active_rest.active_stretch_exercises)) + ',' +
 
                             ' ** '.join(isolated_activate_goals_triggers) + ',' +
 
-                            str(round(
-                                daily_plan.pre_active_rest.isolated_activate_minutes if daily_plan.pre_active_rest.isolated_activate_minutes is not None else 0,
-                                2)) + ',' +
+                            str(round(complete_isolated_activate_minutes, 2)) + ',' +
 
                             ';'.join(convert_assigned_dict_exercises(
                                 daily_plan.pre_active_rest.isolated_activate_exercises)) + ',' +
 
                             ' ** '.join(static_integrate_goals_triggers) + ',' +
 
-                            str(round(
-                                daily_plan.pre_active_rest.static_integrate_minutes if daily_plan.pre_active_rest.static_integrate_minutes is not None else 0,
-                                2)) + ',' +
+                            str(round(complete_static_integrate_minutes, 2)) + ',' +
 
                             ';'.join(convert_assigned_dict_exercises(
                                 daily_plan.pre_active_rest.static_integrate_exercises)) + ',' +
 
-                            str(round(
-                                daily_plan.pre_active_rest.inhibit_minutes + daily_plan.pre_active_rest.active_stretch_minutes + daily_plan.pre_active_rest.static_stretch_minutes + daily_plan.pre_active_rest.isolated_activate_minutes + daily_plan.pre_active_rest.static_integrate_minutes,
-                                2))
+                            str(round(complete_total_minutes, 2))
 
                             )
                     f.write(line + '\n')

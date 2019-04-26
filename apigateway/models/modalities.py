@@ -45,11 +45,8 @@ class Heat(Serialisable):
 class ActiveRest(object):
     def __init__(self):
         self.inhibit_exercises = {}
-        self.inhibit_minutes = 0
         self.static_integrate_exercises = {}
-        self.static_integrate_minutes = 0
         self.static_stretch_exercises = {}
-        self.static_stretch_minutes = 0
         self.completed = False
         self.active = True
 
@@ -69,9 +66,11 @@ class ActiveRest(object):
     def check_prevention_pain(self, soreness, event_date_time, exercise_library):
         pass
 
+    '''deprecated
     @abc.abstractmethod
     def calc_durations(self):
         pass
+    '''
 
     def fill_exercises(self, soreness_list, event_date_time, exercise_library):
 
@@ -123,6 +122,7 @@ class ActiveRest(object):
 
         return assigned_exercise
 
+    '''dprecated
     def calc_active_time(self, exercise_dictionary):
 
         active_time = 0
@@ -131,6 +131,7 @@ class ActiveRest(object):
             active_time += assigned_excercise.duration() / 60
 
         return active_time
+    '''
 
 
 class ActiveRestBeforeTraining(ActiveRest, Serialisable):
@@ -138,21 +139,14 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
         super().__init__()
         self.active_stretch_exercises = {}
         self.isolated_activate_exercises = {}
-        self.active_stretch_minutes = 0
-        self.isolated_activate_minutes = 0
 
     def json_serialise(self):
         ret = {
             'inhibit_exercises': [p.json_serialise() for p in self.inhibit_exercises.values()],
-            'inhibit_minutes': self.inhibit_minutes,
             'static_stretch_exercises': [p.json_serialise() for p in self.static_stretch_exercises.values()],
-            'static_stretch_minutes': self.static_stretch_minutes,
             'active_stretch_exercises': [p.json_serialise() for p in self.active_stretch_exercises.values()],
-            'active_stretch_minutes': self.active_stretch_minutes,
             'isolated_activate_exercises': [p.json_serialise() for p in self.isolated_activate_exercises.values()],
-            'isolated_activate_minutes': self.isolated_activate_minutes,
             'static_integrate_exercises': [p.json_serialise() for p in self.static_integrate_exercises.values()],
-            'static_integrate_minutes': self.static_integrate_minutes,
             'completed': self.completed,
             'active': self.active
         }
@@ -165,22 +159,18 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
         pre_active_rest.completed = input_dict.get("completed", False)
         pre_active_rest.inhibit_exercises = {s['library_id']: AssignedExercise.json_deserialise(s)
                                               for s in input_dict['inhibit_exercises']}
-        pre_active_rest.inhibit_minutes = input_dict.get('inhibit_minutes', 0)
         pre_active_rest.static_stretch_exercises = {s['library_id']: AssignedExercise.json_deserialise(s)
                                               for s in input_dict['static_stretch_exercises']}
-        pre_active_rest.static_stretch_minutes = input_dict.get('static_stretch_minutes', 0)
         pre_active_rest.static_integrate_exercises = {s['library_id']: AssignedExercise.json_deserialise(s)
                                               for s in input_dict['static_integrate_exercises']}
-        pre_active_rest.static_integrate_minutes = input_dict.get('static_integrate_minutes', 0)
         pre_active_rest.active_stretch_exercises = {s['library_id']: AssignedExercise.json_deserialise(s)
                                               for s in input_dict['active_stretch_exercises']}
-        pre_active_rest.active_stretch_minutes = input_dict.get('active_stretch_minutes', 0)
         pre_active_rest.isolated_activate_exercises = {s['library_id']: AssignedExercise.json_deserialise(s)
                                               for s in input_dict['isolated_activate_exercises']}
-        pre_active_rest.isolated_activate_minutes = input_dict.get('isolated_activate_minutes', 0)
 
         return pre_active_rest
 
+    '''deprecated
     def calc_durations(self):
 
         self.inhibit_minutes = self.calc_active_time(self.inhibit_exercises)
@@ -188,6 +178,7 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
         self.active_stretch_minutes = self.calc_active_time(self.active_stretch_exercises)
         self.isolated_activate_minutes = self.calc_active_time(self.isolated_activate_exercises)
         self.static_integrate_minutes = self.calc_active_time(self.static_integrate_exercises)
+    '''
 
     def check_reactive_care_soreness(self, soreness, exercise_library):
 
@@ -350,18 +341,13 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
     def __init__(self):
         super().__init__()
         self.isolated_activate_exercises = {}
-        self.isolated_activate_minutes = 0
 
     def json_serialise(self):
         ret = {
             'inhibit_exercises': [p.json_serialise() for p in self.inhibit_exercises.values()],
-            'inhibit_minutes': self.inhibit_minutes,
             'static_stretch_exercises': [p.json_serialise() for p in self.static_stretch_exercises.values()],
-            'static_stretch_minutes': self.static_stretch_minutes,
             'isolated_activate_exercises': [p.json_serialise() for p in self.isolated_activate_exercises.values()],
-            'isolated_activate_minutes': self.isolated_activate_minutes,
             'static_integrate_exercises': [p.json_serialise() for p in self.static_integrate_exercises.values()],
-            'static_integrate_minutes': self.static_integrate_minutes,
             'completed': self.completed,
             'active': self.active
         }
@@ -387,12 +373,14 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
 
         return post_active_rest
 
+    '''deprecated
     def calc_durations(self):
 
         self.inhibit_minutes = self.calc_active_time(self.inhibit_exercises)
         self.static_stretch_minutes = self.calc_active_time(self.static_stretch_exercises)
         self.isolated_activate_minutes = self.calc_active_time(self.isolated_activate_exercises)
         self.static_integrate_minutes = self.calc_active_time(self.static_integrate_exercises)
+    '''
 
     def check_reactive_care_soreness(self, soreness, exercise_library):
 
