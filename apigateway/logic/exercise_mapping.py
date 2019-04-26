@@ -6,7 +6,7 @@ from models.soreness import AssignedExercise, BodyPartLocation, HistoricSoreness
 from logic.goal_focus_text_generator import RecoveryTextGenerator
 from datetime import  timedelta
 from utils import format_datetime, parse_date
-from models.modalities import ActiveRecovery, ActiveRestBeforeTraining, ActiveRestAfterTraining,ColdWaterImmersion, CoolDown, Heat, WarmUp, Ice
+from models.modalities import ActiveRecovery, ActiveRestBeforeTraining, ActiveRestAfterTraining, AthleteGoal, ColdWaterImmersion, CoolDown, Heat, WarmUp, Ice
 
 
 class ExerciseAssignmentCalculator(object):
@@ -728,12 +728,22 @@ class ExerciseAssignmentCalculator(object):
         bring_the_heat = []
 
         for s in soreness_list:
+
+            goal = AthleteGoal("Preemptive, Prepare for Training", 1)
+
             if 1.5 <= s.severity <= 5 and s.first_reported is not None:
                 days_diff = (parse_date(event_date_time) - s.first_reported).days
-                if ((not s.pain and days_diff >= 30) or
-                        (s.historic_soreness_status == HistoricSorenessStatus.persistent_2_pain) or
-                        s.is_persistent_pain() or s.is_acute_pain()):
-                    bring_the_heat.append(Heat(minutes=10, body_part_location=s.body_part.location, side=s.side))
+                heat = Heat(minutes=10, body_part_location=s.body_part.location, side=s.side)
+                if not s.pain and days_diff >= 30:
+                    goal.trigger = "Pers, Pers-2 Soreness > 30d"
+
+                elif (s.historic_soreness_status == HistoricSorenessStatus.persistent_2_pain or s.is_persistent_pain()
+                      or s.is_acute_pain()):
+
+                    goal.trigger = "Acute, Pers, Pers-2 Pain"
+
+                heat.goals.add(goal)
+                bring_the_heat.append(heat)
 
         return bring_the_heat
 
