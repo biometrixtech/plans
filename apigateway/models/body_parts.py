@@ -51,6 +51,8 @@ class BodyPartFactory(object):
             return self.get_calves()
         elif body_part.location == BodyPartLocation.glutes:
             return self.get_glutes()
+        elif body_part.location == BodyPartLocation.groin:
+            return self.get_groin()
         elif body_part.location == BodyPartLocation.hamstrings:
             return self.get_hamstrings()
         elif body_part.location == BodyPartLocation.hip_flexor:
@@ -61,6 +63,8 @@ class BodyPartFactory(object):
             return self.get_outer_thigh()
         elif body_part.location == BodyPartLocation.quads:
             return self.get_quads()
+        elif body_part.location == BodyPartLocation.shin:
+            return self.get_shin()
 
     def get_constituent_exercises(self, primary_body_part, constituent_body_parts, soreness):
 
@@ -110,6 +114,18 @@ class BodyPartFactory(object):
         glutes.add_extended_exercise_phases(inhibit, static_stretch, active_stretch, dynamic_stretch, isolated_activation, {})
         glutes.add_muscle_groups([14], [5, 6, 15], [11], [4])
         return glutes
+
+    def get_groin(self):
+
+        groin = BodyPart(BodyPartLocation.groin, 7)
+        inhibit = self.get_exercise_dictionary([1])
+        static_stretch = self.get_exercise_dictionary([8])
+        active_stretch = self.get_exercise_dictionary([122])
+        dynamic_stretch = {}
+        isolated_activation = self.get_exercise_dictionary([232])
+        groin.add_extended_exercise_phases(inhibit, static_stretch, active_stretch, dynamic_stretch, isolated_activation, {})
+        groin.add_muscle_groups([5], [4], [3, 6], [11, 14])
+        return groin
 
     def get_hamstrings(self):
 
@@ -170,3 +186,15 @@ class BodyPartFactory(object):
         quads.add_muscle_groups([6], [11, 5], [4, 16], [14, 15])
         return quads
 
+    def get_shin(self):
+
+        shin = BodyPart(BodyPartLocation.shin, 11)
+
+        inhibit = self.get_exercise_dictionary([72, 73])
+        static_stretch = self.get_exercise_dictionary([60, 62])
+        active_stretch = self.get_exercise_dictionary([64, 65])
+        dynamic_stretch = {}
+        isolated_activation = self.get_exercise_dictionary([75, 29])
+        shin.add_extended_exercise_phases(inhibit, static_stretch, active_stretch, dynamic_stretch, isolated_activation, {})
+        shin.add_muscle_groups([8], [15], [5], [16, 9, 10])
+        return shin

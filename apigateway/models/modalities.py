@@ -120,7 +120,7 @@ class ActiveRest(object):
             assigned_exercise.complete_reps_assigned = max(assigned_exercise.complete_reps_assigned,
                                                   assigned_exercise.exercise.max_reps)
             assigned_exercise.complete_sets_assigned = max(assigned_exercise.complete_sets_assigned, 1)
-        elif soreness >= 4.5:
+        elif soreness.severity >= 4.5:
             assigned_exercise.complete_reps_assigned = max(assigned_exercise.complete_reps_assigned,
                                                   assigned_exercise.exercise.max_reps)
             assigned_exercise.complete_sets_assigned = max(assigned_exercise.complete_sets_assigned, 2)
