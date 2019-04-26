@@ -1,7 +1,6 @@
 from enum import Enum, IntEnum
 
 from models.exercise import Exercise, UnitOfMeasure
-import models.modalities as modalities
 from serialisable import Serialisable
 from random import shuffle
 
@@ -443,7 +442,7 @@ class AssignedExercise(Serialisable):
         assigned_exercise.exercise.seconds_per_rep = input_dict.get("seconds_per_rep", 0)
         assigned_exercise.goal_text = input_dict.get("goal_text", "")
         assigned_exercise.equipment_required = input_dict.get("equipment_required", [])
-        assigned_exercise.goals = set([modalities.AthleteGoal.json_deserialise(goal) for goal in input_dict.get('goals', [])])
+        assigned_exercise.goals = set([AthleteGoal.json_deserialise(goal) for goal in input_dict.get('goals', [])])
         assigned_exercise.priorities = set(input_dict.get('priorities', []))
         assigned_exercise.soreness_sources = set([Soreness.json_deserialise(soreness) for soreness in input_dict.get('soreness_sources', [])])
 
@@ -500,3 +499,25 @@ class CompletedExerciseSummary(Serialisable):
                'exposures': self.exposures,
                }
         return ret
+
+
+class AthleteGoal(object):
+    def __init__(self, text, priority):
+        self.text = text
+        self.priority = priority
+        self.trigger = ''
+
+    def json_serialise(self):
+        ret = {
+            'text': self.text,
+            'priority': self.priority,
+            'trigger': self.trigger
+        }
+        return ret
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        goal = cls(text=input_dict['text'], priority=input_dict['priority'])
+        goal.trigger = input_dict.get('trigger', "")
+
+        return goal

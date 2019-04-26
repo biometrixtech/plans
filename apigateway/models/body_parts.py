@@ -1,12 +1,11 @@
-import models.soreness as sm
-# from models.soreness import BodyPart, BodyPartLocation
+from models.soreness import BodyPart, BodyPartLocation
 
 
 class BodyPartFactory(object):
     def get_progression_list(self, exercise):
 
         dict = {}
-        #dict["9"] = ["121"]
+        #dict["9"] = ["121"]zz
 
         dict["10"] = ["12", "11", "13", "120"]
 
@@ -46,27 +45,27 @@ class BodyPartFactory(object):
 
     def get_body_part(self, body_part):
 
-        if body_part.location == sm.BodyPartLocation.general:
+        if body_part.location == BodyPartLocation.general:
             return self.get_general()
-        elif body_part.location == sm.BodyPartLocation.calves:
+        elif body_part.location == BodyPartLocation.calves:
             return self.get_calves()
-        elif body_part.location == sm.BodyPartLocation.glutes:
+        elif body_part.location == BodyPartLocation.glutes:
             return self.get_glutes()
-        elif body_part.location == sm.BodyPartLocation.hamstrings:
+        elif body_part.location == BodyPartLocation.hamstrings:
             return self.get_hamstrings()
-        elif body_part.location == sm.BodyPartLocation.hip_flexor:
+        elif body_part.location == BodyPartLocation.hip_flexor:
             return self.get_hip()
-        elif body_part.location == sm.BodyPartLocation.knee:
+        elif body_part.location == BodyPartLocation.knee:
             return self.get_knee()
-        elif body_part.location == sm.BodyPartLocation.outer_thigh:
+        elif body_part.location == BodyPartLocation.outer_thigh:
             return self.get_outer_thigh()
-        elif body_part.location == sm.BodyPartLocation.quads:
+        elif body_part.location == BodyPartLocation.quads:
             return self.get_quads()
 
     def get_constituent_exercises(self, primary_body_part, constituent_body_parts, soreness):
 
         for c in constituent_body_parts:
-            body_part = self.get_body_part(sm.BodyPart(sm.BodyPartLocation(c), None))
+            body_part = self.get_body_part(BodyPart(BodyPartLocation(c), None))
             primary_body_part.inhibit_exercises.extend(body_part.inhibit_exercises)
             primary_body_part.static_stretch_exercises.extend(body_part.static_stretch_exercises)
             primary_body_part.active_stretch_exercises.extend(body_part.active_stretch_exercises)
@@ -78,7 +77,7 @@ class BodyPartFactory(object):
 
     def get_general(self):
 
-        general = sm.BodyPart(sm.BodyPartLocation.general, 21)
+        general = BodyPart(BodyPartLocation.general, 21)
 
         inhibit = self.get_exercise_dictionary([48, 3, 4, 54, 2, 44, 55])
         lengthen = self.get_exercise_dictionary([9, 6, 28, 56, 7, 46, 103])
@@ -90,7 +89,7 @@ class BodyPartFactory(object):
         return general
 
     def get_calves(self):
-        calves = sm.BodyPart(sm.BodyPartLocation.calves, 10)
+        calves = BodyPart(BodyPartLocation.calves, 10)
         inhibit = self.get_exercise_dictionary([2, 71])
         static_stretch = self.get_exercise_dictionary([7, 26, 59, 61])
         active_stretch = self.get_exercise_dictionary([29, 63, 66, 68])
@@ -102,7 +101,7 @@ class BodyPartFactory(object):
 
     def get_glutes(self):
 
-        glutes = sm.BodyPart(sm.BodyPartLocation.glutes, 3)
+        glutes = BodyPart(BodyPartLocation.glutes, 3)
         inhibit = self.get_exercise_dictionary([44])
         static_stretch = self.get_exercise_dictionary([46, 56])
         active_stretch = self.get_exercise_dictionary([116])
@@ -114,7 +113,7 @@ class BodyPartFactory(object):
 
     def get_hamstrings(self):
 
-        hamstrings = sm.BodyPart(sm.BodyPartLocation.hamstrings, 5)
+        hamstrings = BodyPart(BodyPartLocation.hamstrings, 5)
         inhibit = self.get_exercise_dictionary([3])
         static_stretch = self.get_exercise_dictionary([9, 46])
         active_stretch = self.get_exercise_dictionary([116])
@@ -126,7 +125,7 @@ class BodyPartFactory(object):
 
     def get_hip(self):
 
-        hip = sm.BodyPart(sm.BodyPartLocation.hip_flexor, 2)
+        hip = BodyPart(BodyPartLocation.hip_flexor, 2)
         inhibit = self.get_exercise_dictionary([54])
         static_stretch = self.get_exercise_dictionary([6, 28])
         active_stretch = self.get_exercise_dictionary([117])
@@ -138,7 +137,7 @@ class BodyPartFactory(object):
 
     def get_knee(self):
 
-        knee = sm.BodyPart(sm.BodyPartLocation.knee, 9)
+        knee = BodyPart(BodyPartLocation.knee, 9)
 
         knee.add_muscle_groups([11, 6], [15], [16, 8], [14])
 
@@ -147,7 +146,7 @@ class BodyPartFactory(object):
 
     def get_outer_thigh(self):
 
-        outer_thigh = sm.BodyPart(sm.BodyPartLocation.outer_thigh, 6)
+        outer_thigh = BodyPart(BodyPartLocation.outer_thigh, 6)
 
         inhibit = self.get_exercise_dictionary([4])
         static_stretch = self.get_exercise_dictionary([28, 46])
@@ -160,7 +159,7 @@ class BodyPartFactory(object):
 
     def get_quads(self):
 
-        quads = sm.BodyPart(sm.BodyPartLocation.quads, 8)
+        quads = BodyPart(BodyPartLocation.quads, 8)
 
         inhibit = self.get_exercise_dictionary([48])
         static_stretch = self.get_exercise_dictionary([118])
