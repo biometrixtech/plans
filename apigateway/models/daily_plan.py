@@ -12,7 +12,7 @@ class DailyPlan(Serialisable):
         self.day_of_week = self.get_event_datetime().weekday()
         self.training_sessions = []
         #self.practice_sessions = []
-        # self.strength_conditioning_sessions = []  # includes cross training
+        self.strength_conditioning_sessions = []  # includes cross training
         #self.games = []
         #self.tournaments = []
         self.heat = []
@@ -62,7 +62,7 @@ class DailyPlan(Serialisable):
                'training_sessions': [p.json_serialise() for p in self.training_sessions],
                #'practice_sessions': [p.json_serialise() for p in self.practice_sessions],
                #'bump_up_sessions': [b.json_serialise() for b in self.bump_up_sessions],
-               # 'cross_training_sessions': [c.json_serialise() for c in self.strength_conditioning_sessions],
+               'cross_training_sessions': [c.json_serialise() for c in self.strength_conditioning_sessions],
                #'game_sessions': [g.json_serialise() for g in self.games],
                'pre_recovery_completed': self.pre_recovery_completed,
                'post_recovery_completed': self.post_recovery_completed,
@@ -134,12 +134,12 @@ class DailyPlan(Serialisable):
         #                     x.event_date < trigger_date_time]
         #game_sessions = [x for x in self.games if x.event_date is not None and
         #                 x.event_date < trigger_date_time]
-        # cross_training_sessions = [x for x in self.strength_conditioning_sessions if x.event_date is not None and
-        #                            x.event_date < trigger_date_time]
+        cross_training_sessions = [x for x in self.strength_conditioning_sessions if x.event_date is not None and
+                                   x.event_date < trigger_date_time]
 
         #sessions.extend(practice_sessions)
         #sessions.extend(game_sessions)
-        # sessions.extend(cross_training_sessions)
+        sessions.extend(cross_training_sessions)
         sessions.extend(training_sessions)
 
         return sessions
@@ -154,12 +154,12 @@ class DailyPlan(Serialisable):
         #                     x.event_date > trigger_date_time]
         #game_sessions = [x for x in self.games if x.event_date is not None and
         #                 x.event_date > trigger_date_time]
-        # cross_training_sessions = [x for x in self.strength_conditioning_sessions if x.event_date is not None and
-        #                            x.event_date > trigger_date_time]
+        cross_training_sessions = [x for x in self.strength_conditioning_sessions if x.event_date is not None and
+                                   x.event_date > trigger_date_time]
 
         #sessions.extend(practice_sessions)
         #sessions.extend(game_sessions)
-        # sessions.extend(cross_training_sessions)
+        sessions.extend(cross_training_sessions)
         sessions.extend(training_sessions)
 
         return sessions
