@@ -88,47 +88,79 @@ class ActiveRest(object):
                 exercise_list = [ex for ex in exercise_library if ex.id == str(s.exercise.id)]
                 target_collection[s.exercise.id].exercise = exercise_list[0]
 
-            target_collection[s.exercise.id] = self.update_dosage(soreness, target_collection[s.exercise.id])
             target_collection[s.exercise.id].goals.add(goal)
             target_collection[s.exercise.id].priorities.add(priority)
             target_collection[s.exercise.id].soreness_sources.add(soreness)
 
+            target_collection[s.exercise.id] = self.update_dosage(soreness, target_collection[s.exercise.id])
+
     def update_dosage(self, soreness, assigned_exercise):
 
         if soreness.severity < 0.5:
-            assigned_exercise.efficient_reps_assigned = max(assigned_exercise.efficient_reps_assigned,
-                                                  assigned_exercise.exercise.min_reps)
-            assigned_exercise.efficient_sets_assigned = max(assigned_exercise.efficient_sets_assigned, 1)
-            assigned_exercise.complete_reps_assigned = max(assigned_exercise.complete_reps_assigned,
-                                                           assigned_exercise.exercise.min_reps)
-            assigned_exercise.complete_sets_assigned = max(assigned_exercise.complete_sets_assigned, 1)
+            if "1" in assigned_exercise.priorities:
+                assigned_exercise.efficient_reps_assigned = max(assigned_exercise.efficient_reps_assigned,
+                                                      assigned_exercise.exercise.min_reps)
+                assigned_exercise.efficient_sets_assigned = max(assigned_exercise.efficient_sets_assigned, 1)
+            else:
+                assigned_exercise.efficient_reps_assigned = 0
+                assigned_exercise.efficient_sets_assigned = 0
+            if "1" in assigned_exercise.priorities or "2" in assigned_exercise.priorities:
+                assigned_exercise.complete_reps_assigned = max(assigned_exercise.complete_reps_assigned,
+                                                               assigned_exercise.exercise.min_reps)
+                assigned_exercise.complete_sets_assigned = max(assigned_exercise.complete_sets_assigned, 1)
+            else:
+                assigned_exercise.complete_reps_assigned = 0
+                assigned_exercise.complete_sets_assigned = 0
+
             assigned_exercise.comprehensive_reps_assigned = max(assigned_exercise.comprehensive_reps_assigned,
                                                            assigned_exercise.exercise.min_reps)
             assigned_exercise.comprehensive_sets_assigned = max(assigned_exercise.comprehensive_sets_assigned, 1)
         elif 0.5 <= soreness.severity < 1.5:
-            assigned_exercise.efficient_reps_assigned = max(assigned_exercise.efficient_reps_assigned,
-                                                  assigned_exercise.exercise.min_reps)
-            assigned_exercise.efficient_sets_assigned = max(assigned_exercise.efficient_sets_assigned, 1)
-            assigned_exercise.complete_reps_assigned = max(assigned_exercise.complete_reps_assigned,
-                                                           assigned_exercise.exercise.min_reps)
-            assigned_exercise.complete_sets_assigned = max(assigned_exercise.complete_sets_assigned, 1)
+            if "1" in assigned_exercise.priorities:
+                assigned_exercise.efficient_reps_assigned = max(assigned_exercise.efficient_reps_assigned,
+                                                      assigned_exercise.exercise.min_reps)
+                assigned_exercise.efficient_sets_assigned = max(assigned_exercise.efficient_sets_assigned, 1)
+            else:
+                assigned_exercise.efficient_reps_assigned = 0
+                assigned_exercise.efficient_sets_assigned = 0
+
+            if "1" in assigned_exercise.priorities or "2" in assigned_exercise.priorities:
+                assigned_exercise.complete_reps_assigned = max(assigned_exercise.complete_reps_assigned,
+                                                               assigned_exercise.exercise.min_reps)
+                assigned_exercise.complete_sets_assigned = max(assigned_exercise.complete_sets_assigned, 1)
+            else:
+                assigned_exercise.complete_reps_assigned = 0
+                assigned_exercise.complete_sets_assigned = 0
             assigned_exercise.comprehensive_reps_assigned = max(assigned_exercise.comprehensive_reps_assigned,
                                                            assigned_exercise.exercise.min_reps)
             assigned_exercise.comprehensive_sets_assigned = max(assigned_exercise.comprehensive_sets_assigned, 1)
         elif 1.5 <= soreness.severity < 2.5:
-            assigned_exercise.efficient_reps_assigned = max(assigned_exercise.efficient_reps_assigned,
-                                                           assigned_exercise.exercise.min_reps)
-            assigned_exercise.efficient_sets_assigned = max(assigned_exercise.efficient_sets_assigned, 1)
-            assigned_exercise.complete_reps_assigned = max(assigned_exercise.complete_reps_assigned,
+            if "1" in assigned_exercise.priorities:
+                assigned_exercise.efficient_reps_assigned = max(assigned_exercise.efficient_reps_assigned,
+                                                               assigned_exercise.exercise.min_reps)
+                assigned_exercise.efficient_sets_assigned = max(assigned_exercise.efficient_sets_assigned, 1)
+            else:
+                assigned_exercise.efficient_reps_assigned = 0
+                assigned_exercise.efficient_sets_assigned = 0
+            if "1" in assigned_exercise.priorities or "2" in assigned_exercise.priorities:
+                assigned_exercise.complete_reps_assigned = max(assigned_exercise.complete_reps_assigned,
                                                   assigned_exercise.exercise.max_reps)
-            assigned_exercise.complete_sets_assigned = max(assigned_exercise.complete_sets_assigned, 1)
+                assigned_exercise.complete_sets_assigned = max(assigned_exercise.complete_sets_assigned, 1)
+            else:
+                assigned_exercise.complete_reps_assigned = 0
+                assigned_exercise.complete_sets_assigned = 0
             assigned_exercise.comprehensive_reps_assigned = max(assigned_exercise.comprehensive_reps_assigned,
                                                            assigned_exercise.exercise.max_reps)
             assigned_exercise.comprehensive_sets_assigned = max(assigned_exercise.comprehensive_sets_assigned, 1)
         elif 2.5 <= soreness.severity < 3.5:
-            assigned_exercise.efficient_reps_assigned = max(assigned_exercise.efficient_reps_assigned,
-                                                            assigned_exercise.exercise.min_reps)
-            assigned_exercise.efficient_sets_assigned = max(assigned_exercise.efficient_sets_assigned, 1)
+            if "1" in assigned_exercise.priorities or "2" in assigned_exercise.priorities:
+                assigned_exercise.efficient_reps_assigned = max(assigned_exercise.efficient_reps_assigned,
+                                                                assigned_exercise.exercise.min_reps)
+                assigned_exercise.efficient_sets_assigned = max(assigned_exercise.efficient_sets_assigned, 1)
+            else:
+                assigned_exercise.efficient_reps_assigned = 0
+                assigned_exercise.efficient_sets_assigned = 0
+
             assigned_exercise.complete_reps_assigned = max(assigned_exercise.complete_reps_assigned,
                                                   assigned_exercise.exercise.max_reps)
             assigned_exercise.complete_sets_assigned = max(assigned_exercise.complete_sets_assigned, 1)
