@@ -32,7 +32,7 @@ class Heat(Serialisable):
     @classmethod
     def json_deserialise(cls, input_dict):
         heat = cls(minutes=input_dict['minutes'],
-                   body_part_location=input_dict['body_part_location'],
+                   body_part_location=BodyPartLocation(input_dict['body_part_location']),
                    side=input_dict['side'])
         heat.before_training = input_dict.get('before_training', True)
         heat.goals = set([AthleteGoal.json_deserialise(goal) for goal in input_dict.get('goals', [])])
@@ -717,7 +717,7 @@ class Ice(Serialisable):
     @classmethod
     def json_deserialise(cls, input_dict):
         ice = cls(minutes=input_dict['minutes'],
-                  body_part_location=input_dict['body_part_location'],
+                  body_part_location=BodyPartLocation(input_dict['body_part_location']),
                   side=input_dict['side'])
         ice.after_training = input_dict.get('after_training', False)
         ice.immediately_after_training = input_dict.get('immediately_after_training', False)

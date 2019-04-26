@@ -232,28 +232,6 @@ def _functional_strength_session_from_mongodb(mongo_result):
     return functional_strength_session
 '''
 
-# def _assigned_exercises_from_mongodb(mongo_result):
-
-#     assigned_exercise = AssignedExercise(mongo_result.get("library_id", None))
-#     assigned_exercise.exercise.name = mongo_result.get("name", "")
-#     assigned_exercise.exercise.display_name = mongo_result.get("display_name", "")
-#     assigned_exercise.exercise.youtube_id = mongo_result.get("youtube_id", "")
-#     assigned_exercise.exercise.description = mongo_result.get("description", "")
-#     assigned_exercise.exercise.bilateral = mongo_result.get("bilateral", False)
-#     assigned_exercise.exercise.unit_of_measure = mongo_result.get("unit_of_measure", None)
-#     assigned_exercise.position_order = mongo_result.get("position_order", 0)
-#     assigned_exercise.complete_reps_assigned = mongo_result.get("complete_reps_assigned", 0)
-#     assigned_exercise.complete_sets_assigned = mongo_result.get("complete_sets_assigned", 0)
-#     assigned_exercise.exercise.seconds_per_set = mongo_result.get("seconds_per_set", 0)
-#     assigned_exercise.exercise.seconds_per_rep = mongo_result.get("seconds_per_rep", 0)
-#     assigned_exercise.goal_text = mongo_result.get("goal_text", "")
-#     assigned_exercise.equipment_required = mongo_result.get("equipment_required", [])
-#     assigned_exercise.goals = set([AthleteGoal.json_deserialise(goal) for goal in mongo_result.get('goals', [])])
-#     assigned_exercise.priorities = set(mongo_result.get('priorities', []))
-#     assigned_exercise.soreness_sources = set([Soreness.json_deserialise(soreness) for soreness in mongo_result.get('soreness_sources', [])])
-#     return assigned_exercise
-
-
 def _daily_readiness_from_mongo(mongo_result, user_id):
     if mongo_result is None:
         return None
