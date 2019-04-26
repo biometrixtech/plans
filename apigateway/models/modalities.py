@@ -430,16 +430,12 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
         post_active_rest.completed = input_dict.get("completed", False)
         post_active_rest.inhibit_exercises = {s['library_id']: AssignedExercise.json_deserialise(s)
                                               for s in input_dict['inhibit_exercises']}
-        post_active_rest.inhibit_minutes = input_dict.get('inhibit_minutes', 0)
         post_active_rest.static_stretch_exercises = {s['library_id']: AssignedExercise.json_deserialise(s)
                                               for s in input_dict['static_stretch_exercises']}
-        post_active_rest.static_stretch_minutes = input_dict.get('static_stretch_minutes', 0)
         post_active_rest.static_integrate_exercises = {s['library_id']: AssignedExercise.json_deserialise(s)
                                               for s in input_dict['static_integrate_exercises']}
-        post_active_rest.static_integrate_minutes = input_dict.get('static_integrate_minutes', 0)
         post_active_rest.isolated_activate_exercises = {s['library_id']: AssignedExercise.json_deserialise(s)
                                               for s in input_dict['isolated_activate_exercises']}
-        post_active_rest.isolated_activate_minutes = input_dict.get('isolated_activate_minutes', 0)
 
         return post_active_rest
 
@@ -628,6 +624,20 @@ class WarmUp(Serialisable):
         }
         return ret
 
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        warmup = cls()
+        warmup.inhibit_exercises = {s['library_id']: AssignedExercise.json_deserialise(s) for s in input_dict['inhibit_exercises']}
+        warmup.static_then_active_or_dynamic_stretch_exercises = {s['library_id']: AssignedExercise.json_deserialise(s) for s in input_dict['static_then_active_or_dynamic_stretch_exercises']}
+        warmup.active_or_dynamic_stretch_exercises = {s['library_id']: AssignedExercise.json_deserialise(s) for s in input_dict['active_or_dynamic_stretch_exercises']}
+        warmup.isolated_activate_exercises = {s['library_id']: AssignedExercise.json_deserialise(s) for s in input_dict['isolated_activate_exercises']}
+        warmup.dynamic_integrate_exercises = {s['library_id']: AssignedExercise.json_deserialise(s) for s in input_dict['dynamic_integrate_exercises']}
+        warmup.dynamic_integrate_with_speed_exercises = {s['library_id']: AssignedExercise.json_deserialise(s) for s in input_dict['dynamic_integrate_with_speed_exercises']}
+        warmup.completed = input_dict.get('completed', False)
+        warmup.active = input_dict.get('active', True)
+
+        return warmup
+
 
 class CoolDown(Serialisable):
     def __init__(self):
@@ -643,6 +653,15 @@ class CoolDown(Serialisable):
         }
         return ret
 
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        cooldown = cls()
+        cooldown.active_or_dynamic_stretch_exercises = {s['library_id']: AssignedExercise.json_deserialise(s) for s in input_dict['active_or_dynamic_stretch_exercises']}
+        cooldown.completed = input_dict.get('completed', False)
+        cooldown.active = input_dict.get('active', True)
+
+        return cooldown
+
 
 class ActiveRecovery(Serialisable):
     def __init__(self):
@@ -654,12 +673,21 @@ class ActiveRecovery(Serialisable):
     def json_serialise(self):
         ret = {
             'dynamic_integrate_exercises': [p.json_serialise() for p in self.dynamic_integrate_exercises.values()],
-            'dynamic_integrate_with_speed_exercises': [p.json_serialise() for p in
-                                                       self.dynamic_integrate_with_speed_exercises.values()],
+            'dynamic_integrate_with_speed_exercises': [p.json_serialise() for p in self.dynamic_integrate_with_speed_exercises.values()],
             'completed': self.completed,
             'active': self.active
         }
         return ret
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        active_recovery = cls()
+        active_recovery.dynamic_integrate_exercises = {s['library_id']: AssignedExercise.json_deserialise(s) for s in input_dict['dynamic_integrate_exercises']}
+        active_recovery.dynamic_integrate_with_speed_exercises = {s['library_id']: AssignedExercise.json_deserialise(s) for s in input_dict['dynamic_integrate_with_speed_exercises']}
+        active_recovery.completed = input_dict.get('completed', False)
+        active_recovery.active = input_dict.get('active', True)
+
+        return active_recovery
 
 
 class Ice(Serialisable):
@@ -719,3 +747,13 @@ class ColdWaterImmersion(Serialisable):
         }
 
         return ret
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        cold_water_immersion = cls(minutes=input_dict['minutes'])
+        cold_water_immersion.after_training = input_dict.get('after_training', True)
+        cold_water_immersion.completed = input_dict.get('completed', False)
+        cold_water_immersion.active = input_dict.get('active', True)
+        cold_water_immersion.goals = set([AthleteGoal.json_deserialise(goal) for goal in input_dict.get('goals', [])])
+
+        return cold_water_immersion

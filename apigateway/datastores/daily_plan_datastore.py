@@ -7,7 +7,7 @@ import models.session as session
 from models.soreness import AssignedExercise, Soreness
 from models.post_session_survey import PostSurvey
 from models.daily_readiness import DailyReadiness
-from models.modalities import ActiveRecovery, ActiveRestAfterTraining, ActiveRestBeforeTraining, Heat, Ice, AthleteGoal
+from models.modalities import ActiveRecovery, ActiveRestAfterTraining, ActiveRestBeforeTraining, Heat, Ice, ColdWaterImmersion, WarmUp, CoolDown, ActiveRecovery
 from datastores.daily_readiness_datastore import DailyReadinessDatastore
 from utils import parse_date
 
@@ -70,9 +70,10 @@ class DailyPlanDatastore(object):
                 daily_plan.post_active_rest = ActiveRestAfterTraining.json_deserialise(plan['post_active_rest']) if plan.get('post_active_rest', None) is not None else None
                 daily_plan.heat = [Heat.json_deserialise(heat) for heat in plan.get('heat', [])]
                 daily_plan.ice = [Ice.json_deserialise(ice) for ice in plan.get('ice', [])]
-                # daily_plan.warm_up = plan.get('warm_up', None)
-                # daily_plan.cool_down = plan.get('cool_down', None)
-                # daily_plan.active_recovery = plan.get('active_recovery', None)
+                daily_plan.warm_up = WarmUp.json_deserialise(plan['warm_up']) if plan.get('warm_up', None) is not None else None
+                daily_plan.cool_down = CoolDown.json_deserialise(plan['cool_down']) if plan.get('cool_down', None) is not None else None
+                daily_plan.active_recovery = ActiveRecovery.json_deserialise(plan['active_recovery']) if plan.get('active_recovery', None) is not None else None
+                daily_plan.cold_water_immersion = ColdWaterImmersion.json_deserialise(plan['cold_water_immersion']) if plan.get('cold_water_immersion', None) is not None else None
                 #daily_plan.functional_strength_session = \
                 #    _functional_strength_session_from_mongodb(plan['functional_strength_session']) if plan.get('functional_strength_session', None) is not None else None
             #daily_plan.bump_up_sessions = \
