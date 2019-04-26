@@ -1,5 +1,5 @@
 import models.soreness
-from logic.exercise_generator import ExerciseAssignments
+#from logic.exercise_generator import ExerciseAssignments
 import logic.soreness_processing as soreness_and_injury
 from models.exercise import ExerciseBuckets, Phase
 from models.soreness import AssignedExercise, BodyPartLocation, HistoricSorenessStatus
@@ -22,6 +22,7 @@ class ExerciseAssignmentCalculator(object):
 
     # def create_assigned_exercise(self, target_exercise, body_part_priority, body_part_exercise_priority, body_part_soreness_level):
 
+    '''deprecated
     def get_exercise_list_for_body_part(self, body_part_exercises, exercise_list, completed_exercises, soreness_severity):
 
         assigned_exercise_list = []
@@ -46,6 +47,7 @@ class ExerciseAssignmentCalculator(object):
             assigned_exercise_list.append(assigned_exercise)
 
         return assigned_exercise_list
+
 
     def create_exercise_assignments(self, exercise_session, soreness_list, trigger_date_time, duration_minutes_target):
 
@@ -162,7 +164,7 @@ class ExerciseAssignmentCalculator(object):
         exercise_assignments.scale_to_targets(self.exercise_library)
 
         return exercise_assignments
-
+    '''
     def get_current_exercise(self, body_part_exercise, exercise_list, completed_exercises):
 
         exercise_bucket_list = ExerciseBuckets().get_bucket_for_exercise(body_part_exercise.exercise.id)
@@ -752,7 +754,7 @@ class ExerciseAssignmentCalculator(object):
         if len(soreness_list) > 0:
             active_rest = ActiveRestBeforeTraining()
             active_rest.fill_exercises(soreness_list, event_date_time, self.exercise_library)
-            active_rest.calc_durations()
+            #active_rest.calc_durations()
             return active_rest
         else:
             return None
@@ -762,7 +764,7 @@ class ExerciseAssignmentCalculator(object):
         if len(soreness_list) > 0:
             active_rest = ActiveRestAfterTraining()
             active_rest.fill_exercises(soreness_list, event_date_time, self.exercise_library)
-            active_rest.calc_durations()
+            #active_rest.calc_durations()
             return active_rest
         else:
             return None
