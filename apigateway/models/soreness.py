@@ -417,7 +417,10 @@ class AssignedExercise(Serialisable):
                'complete_sets_assigned': self.complete_sets_assigned,
                'seconds_duration': self.duration(),
                'goal_text': self.goal_text,
-               'equipment_required': self.equipment_required
+               'equipment_required': self.equipment_required,
+               'goals': [goal.json_serialise() for goal in self.goals],
+               'priorities': list(self.priorities),
+               'soreness_sources': [soreness.json_serialise() for soreness in self.soreness_sources]
                }
         return ret
 

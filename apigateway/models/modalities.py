@@ -12,6 +12,14 @@ class AthleteGoal(object):
         self.priority = priority
         self.trigger = ''
 
+    def json_serialise(self):
+        ret = {
+            'text': self.text,
+            'priority': self.priority,
+            'trigger': self.trigger
+        }
+        return ret
+
 
 class Heat(Serialisable):
     def __init__(self, minutes=0, body_part_location=None, side=0):
@@ -30,6 +38,7 @@ class Heat(Serialisable):
             'body_part_location': self.body_part_location.value,
             'side': self.side,
             'before_training': self.before_training,
+            'goals': [goal.json_serialise() for goal in self.goals],
             'completed': self.completed,
             'active': self.active
         }
@@ -563,6 +572,7 @@ class Ice(Serialisable):
         ret = {
             'minutes': self.minutes,
             'body_part_location': self.body_part_location.value,
+            'goals': [goal.json_serialise() for goal in self.goals],
             'side': self.side,
             'completed': self.completed,
             'active': self.active
@@ -582,6 +592,8 @@ class ColdWaterImmersion(Serialisable):
     def json_serialise(self):
         ret = {
             'minutes': self.minutes,
+            'after_training': self.after_training,
+            'goals': [goal.json_serialise() for goal in self.goals],
             'completed': self.completed,
             'active': self.active
         }
