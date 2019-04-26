@@ -728,11 +728,11 @@ class ExerciseAssignmentCalculator(object):
         bring_the_heat = []
 
         for s in soreness_list:
-            if 2 <= s.severity <= 5 and s.first_reported is not None:
+            if 1.5 <= s.severity <= 5 and s.first_reported is not None:
                 days_diff = (parse_date(event_date_time) - s.first_reported).days
                 if ((not s.pain and days_diff >= 30) or
                         (s.historic_soreness_status == HistoricSorenessStatus.persistent_2_pain) or
-                        s.is_persistent_pain()):
+                        s.is_persistent_pain() or s.is_acute_pain()):
                     bring_the_heat.append(Heat(minutes=10, body_part_location=s.body_part.location, side=s.side))
 
         return bring_the_heat

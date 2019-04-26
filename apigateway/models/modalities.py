@@ -19,12 +19,15 @@ class Heat(Serialisable):
         self.body_part_location = body_part_location
         self.side = side
         self.before_training = True
+        self.goals = set()
 
     def json_serialise(self):
+
         ret = {
             'minutes': self.minutes,
             'body_part_location': self.body_part_location.value,
-            'side': self.side
+            'side': self.side,
+            'before_training': self.before_training
         }
 
         return ret
