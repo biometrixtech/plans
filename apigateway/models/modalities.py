@@ -188,7 +188,7 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
 
         body_part_factory = BodyPartFactory()
 
-        if soreness.historic_soreness_status is not None and soreness.first_reported is not None:
+        if soreness.historic_soreness_status is not None and soreness.first_reported is not None and not soreness.is_dormant_cleared():
             days_sore = (event_date_time - soreness.first_reported).days
             if not soreness.pain and days_sore > 30:
 
@@ -365,7 +365,7 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
 
         body_part_factory = BodyPartFactory()
 
-        if soreness.historic_soreness_status is not None and soreness.first_reported is not None:
+        if soreness.historic_soreness_status is not None and soreness.first_reported is not None and not soreness.is_dormant_cleared():
             days_sore = (event_date_time - soreness.first_reported).days
             if not soreness.pain and days_sore > 30:
 
@@ -533,6 +533,7 @@ class Ice(Serialisable):
         self.after_training = True
         self.immediately_after_training = False
         self.repeat_every_3hrs_for_24hrs = False
+        self.goals = set()
 
     def json_serialise(self):
         ret = {
@@ -548,6 +549,7 @@ class ColdWaterImmersion(Serialisable):
     def __init__(self, minutes=10):
         self.minutes = minutes
         self.after_training = True
+        self.goals = set()
 
     def json_serialise(self):
         ret = {

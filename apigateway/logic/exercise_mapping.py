@@ -731,7 +731,7 @@ class ExerciseAssignmentCalculator(object):
 
             goal = AthleteGoal("Preemptive, Prepare for Training", 1)
 
-            if 1.5 <= s.severity <= 5 and s.first_reported is not None:
+            if 1.5 <= s.severity <= 5 and s.first_reported is not None and not s.is_dormant_cleared():
                 days_diff = (parse_date(event_date_time) - s.first_reported).days
                 heat = Heat(minutes=10, body_part_location=s.body_part.location, side=s.side)
                 if not s.pain and days_diff >= 30:
@@ -804,30 +804,99 @@ class ExerciseAssignmentCalculator(object):
 
         return active_recovery
 
-    def get_ice(self, soreness_list):
+    def get_ice(self, soreness_list, event_date_time):
 
         ice_list = []
 
         for s in soreness_list:
             if s.daily and s.pain:
-                if 1 <= s.severity <= 2:
+                if not self.is_lower_body_part(s) or s.severity < 3.5:
+                    goal = AthleteGoal("Care for Pain", 1)
+                    goal.trigger = "Pain Reported Today"
                     ice = Ice(minutes=20, body_part_location=s.body_part.location, side=s.side)
+
+                    if s.severity < 2.5:
+                        ice.repeat_every_3hrs_for_24hrs = False
+                        ice.immediately_after_training = False
+                    elif 2.5 < s.severity < 3.5:
+                        ice.repeat_every_3hrs_for_24hrs = True
+                        ice.immediately_after_training = True
+                    elif not self.is_lower_body_part(s) and s.severity <= 5.0:
+                        ice.repeat_every_3hrs_for_24hrs = True
+                        ice.immediately_after_training = True
+                    ice.goals.add(goal)
                     ice_list.append(ice)
-                elif 2 < s.severity < 4:
+            elif s.daily and not s.pain and s.historic_soreness_status is not None and s.historic_soreness_status is not s.is_dormant_cleared() and s.first_reported is not None:
+                days_diff = (parse_date(event_date_time) - s.first_reported).days
+                if days_diff > 30 and s.severity >= 1.5:
+                    goal = AthleteGoal("Care for Soreness", 1)
+                    goal.trigger = "Soreness Reported Today + Pers, Pers-2 Soreness > 30d"
                     ice = Ice(minutes=20, body_part_location=s.body_part.location, side=s.side)
-                    ice.repeat_every_3hrs_for_24hrs = True
-                    ice.immediately_after_training = True
+                    if 1.5 <= s.severity < 2.5:
+                        ice.repeat_every_3hrs_for_24hrs = False
+                        ice.immediately_after_training = False
+                    elif 2.5 < s.severity < 3.5:
+                        ice.repeat_every_3hrs_for_24hrs = True
+                        ice.immediately_after_training = True
+                    elif not self.is_lower_body_part(s) and s.severity <= 5.0:
+                        ice.repeat_every_3hrs_for_24hrs = True
+                        ice.immediately_after_training = True
+                    ice.goals.add(goal)
+                    ice_list.append(ice)
+
+            elif (not s.daily and s.historic_soreness_status is not None and s.severity >= 1.5 and
+                    (s.historic_soreness_status is s.is_persistent_pain() or
+                     s.historic_soreness_status is s.is_acute_pain() or
+                     s.historic_soreness_status == HistoricSorenessStatus.persistent_2_pain)):
+
+                    goal = AthleteGoal("Preemptive, Prepare for Training", 1)
+                    goal.trigger = "No Pain Reported Today + Acute, Pers, Pers-2 Pain"
+                    ice = Ice(minutes=20, body_part_location=s.body_part.location, side=s.side)
+                    ice.repeat_every_3hrs_for_24hrs = False
+                    ice.immediately_after_training = False
+                    ice.goals.add(goal)
                     ice_list.append(ice)
 
         return ice_list
 
-    def get_cold_water_immersion(self, soreness_list):
+    def get_cold_water_immersion(self, soreness_list, event_date_time):
 
         cold_water_immersion = None
 
         for s in soreness_list:
-            if s.daily and s.pain:
-                if 4 <= s.severity <= 5:
+            if self.is_lower_body_part(s) and s.daily and s.severity >= 3.5:
+                if s.pain:
+
+                    goal = AthleteGoal("Care for Pain", 1)
+                    goal.trigger = "Pain Reported Today"
                     cold_water_immersion = ColdWaterImmersion()
+                    cold_water_immersion.goals.add(goal)
+
+                elif not s.pain and s.historic_soreness_status is not None and s.historic_soreness_status is not s.is_dormant_cleared() and s.first_reported is not None:
+                    days_diff = (parse_date(event_date_time) - s.first_reported).days
+                    if days_diff > 30 and s.severity >= 3.5:
+                        goal = AthleteGoal("Care for Soreness", 1)
+                        goal.trigger = "Soreness Reported Today + Pers, Pers-2 Soreness > 30d"
+                        cold_water_immersion = ColdWaterImmersion()
+                        cold_water_immersion.goals.add(goal)
 
         return cold_water_immersion
+
+    def is_lower_body_part(self, soreness):
+
+        if (soreness.body_part.location == BodyPartLocation.hip_flexor or
+                soreness.body_part.location == BodyPartLocation.knee or
+                soreness.body_part.location == BodyPartLocation.ankle or
+                soreness.body_part.location == BodyPartLocation.foot or
+                soreness.body_part.location == BodyPartLocation.achilles or
+                soreness.body_part.location == BodyPartLocation.groin or
+                soreness.body_part.location == BodyPartLocation.quads or
+                soreness.body_part.location == BodyPartLocation.shin or
+                soreness.body_part.location == BodyPartLocation.outer_thigh or
+                soreness.body_part.location == BodyPartLocation.glutes or
+                soreness.body_part.location == BodyPartLocation.hamstrings or
+                soreness.body_part.location == BodyPartLocation.calves
+        ):
+            return True
+        else:
+            return False

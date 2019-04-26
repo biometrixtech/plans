@@ -91,8 +91,8 @@ class TrainingPlanManager(object):
         #self.daily_plan.cool_down = calc.get_cool_down(event_date, soreness_list)
         self.daily_plan.post_active_rest = calc.get_post_active_rest(soreness_list, event_date)
         #self.daily_plan.active_recovery = calc.get_active_recovery(event_date, soreness_list)
-        self.daily_plan.ice = calc.get_ice(soreness_list)
-        self.daily_plan.cold_water_immersion = calc.get_cold_water_immersion(soreness_list)
+        self.daily_plan.ice = calc.get_ice(soreness_list, event_date)
+        self.daily_plan.cold_water_immersion = calc.get_cold_water_immersion(soreness_list, event_date)
 
         #if soreness_values is not None and len(soreness_values) > 0:
         #    max_soreness = max(soreness_values)
