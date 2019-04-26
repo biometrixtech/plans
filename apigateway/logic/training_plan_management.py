@@ -34,7 +34,7 @@ class TrainingPlanManager(object):
         if surveys_today and not self.daily_plan.session_from_readiness:
             return True
         else:
-            if self.daily_plan.sessions_planned_readiness:
+            if self.daily_plan.train_later:
                 return False
             else:
                 return True
@@ -75,24 +75,31 @@ class TrainingPlanManager(object):
                                                                                self.post_session_surveys,
                                                                                self.trigger_date_time,
                                                                                historic_soreness)
-        show_post_recovery = self.show_post_recovery(self.post_session_surveys_today())
-        #self.add_recovery_times(show_post_recovery)
+        # show_post_recovery = self.show_post_recovery(self.post_session_surveys_today())
+        # #self.add_recovery_times(show_post_recovery)
 
         calc = exercise_mapping.ExerciseAssignmentCalculator(self.athlete_id, self.exercise_library_datastore,
                                                              self.completed_exercise_datastore,
                                                              historic_soreness_present)
 
-        soreness_values = [s.severity for s in soreness_list if s.severity is not None and s.daily]
+        # soreness_values = [s.severity for s in soreness_list if s.severity is not None and s.daily]
 
         #new modalities
-        self.daily_plan.heat = calc.get_heat(soreness_list, event_date)
-        self.daily_plan.pre_active_rest = calc.get_pre_active_rest(soreness_list, event_date)
+        if self.post_session_surveys_today() and not self.daily_plan.train_later:
+            self.daily_plan.post_active_rest = calc.get_post_active_rest(soreness_list, event_date)
+            self.daily_plan.ice = calc.get_ice(soreness_list)
+            self.daily_plan.cold_water_immersion = calc.get_cold_water_immersion(soreness_list)
+            self.daily_plan.heat.active = False
+            self.daily_plan.pre_active_rest.active = False
+        else:
+            self.daily_plan.heat = calc.get_heat(soreness_list, event_date)
+            self.daily_plan.pre_active_rest = calc.get_pre_active_rest(soreness_list, event_date)
         #self.daily_plan.warm_up = calc.get_warm_up(soreness_list)
         #self.daily_plan.cool_down = calc.get_cool_down(event_date, soreness_list)
-        self.daily_plan.post_active_rest = calc.get_post_active_rest(soreness_list, event_date)
+        # self.daily_plan.post_active_rest = calc.get_post_active_rest(soreness_list, event_date)
         #self.daily_plan.active_recovery = calc.get_active_recovery(event_date, soreness_list)
-        self.daily_plan.ice = calc.get_ice(soreness_list)
-        self.daily_plan.cold_water_immersion = calc.get_cold_water_immersion(soreness_list)
+        # self.daily_plan.ice = calc.get_ice(soreness_list)
+        # self.daily_plan.cold_water_immersion = calc.get_cold_water_immersion(soreness_list)
 
         #if soreness_values is not None and len(soreness_values) > 0:
         #    max_soreness = max(soreness_values)

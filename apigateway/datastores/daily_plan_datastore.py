@@ -61,9 +61,9 @@ class DailyPlanDatastore(object):
                 [_external_session_from_mongodb(s, session.SessionType(s['session_type'])) for s in plan.get('training_sessions', [])]
             #daily_plan.practice_sessions = \
             #    [_external_session_from_mongodb(s, session.SessionType.practice) for s in plan.get('practice_sessions', [])]
-            daily_plan.strength_conditioning_sessions = \
-                [_external_session_from_mongodb(s, session.SessionType.strength_and_conditioning)
-                 for s in plan.get('cross_training_sessions', [])]
+            # daily_plan.strength_conditioning_sessions = \
+            #     [_external_session_from_mongodb(s, session.SessionType.strength_and_conditioning)
+            #      for s in plan.get('cross_training_sessions', [])]
             #daily_plan.games = \
             #    [_external_session_from_mongodb(s, session.SessionType.game)
             #     for s in plan.get('game_sessions', [])]
@@ -88,7 +88,7 @@ class DailyPlanDatastore(object):
             #daily_plan.completed_functional_strength_sessions = plan.get('completed_functional_strength_sessions', 0)
             #daily_plan.functional_strength_completed = plan.get('functional_strength_completed', False)
             daily_plan.session_from_readiness = plan.get('session_from_readiness', False)
-            daily_plan.sessions_planned_readiness = plan.get('sessions_planned_readiness', True)
+            daily_plan.train_later = plan.get('train_later', plan.get('sessions_planned_readiness', True))
             ret.append(daily_plan)
 
         if len(ret) == 0 and not isinstance(user_id, list):

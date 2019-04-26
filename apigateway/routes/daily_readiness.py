@@ -48,7 +48,7 @@ def handle_daily_readiness_create(principal_id=None):
     )
 
     sessions_planned = True
-    sessions_planned_readiness = True
+    train_later = True
     session_from_readiness = False
     plan_event_date = format_date(event_date)
     athlete_stats = athlete_stats_datastore.get(athlete_id=user_id)
@@ -59,7 +59,7 @@ def handle_daily_readiness_create(principal_id=None):
 
     if 'sessions_planned' in request.json and not request.json['sessions_planned']:
         sessions_planned = False
-        sessions_planned_readiness = False
+        train_later = False
     if 'sessions' in request.json and len(request.json['sessions']) > 0:
         sessions_planned = True
         session_from_readiness = True
@@ -86,7 +86,7 @@ def handle_daily_readiness_create(principal_id=None):
         plan.training_sessions = survey_processor.sessions
     plan.sessions_planned = sessions_planned
     plan.session_from_readiness = session_from_readiness
-    plan.sessions_planned_readiness = sessions_planned_readiness
+    plan.train_later = train_later
     if len(survey_processor.heart_rate_data) > 0:
         heart_rate_datastore.put(survey_processor.heart_rate_data)
 

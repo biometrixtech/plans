@@ -20,6 +20,8 @@ class Heat(Serialisable):
         self.side = side
         self.before_training = True
         self.goals = set()
+        self.completed = False
+        self.active = True
 
     def json_serialise(self):
 
@@ -27,7 +29,9 @@ class Heat(Serialisable):
             'minutes': self.minutes,
             'body_part_location': self.body_part_location.value,
             'side': self.side,
-            'before_training': self.before_training
+            'before_training': self.before_training,
+            'completed': self.completed,
+            'active': self.active
         }
 
         return ret
@@ -41,6 +45,8 @@ class ActiveRest(object):
         self.static_integrate_minutes = 0
         self.static_stretch_exercises = {}
         self.static_stretch_minutes = 0
+        self.completed = False
+        self.active = True
 
     @abc.abstractmethod
     def check_reactive_care_soreness(self, soreness, exercise_library):
@@ -132,11 +138,13 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
 
     def json_serialise(self):
         ret = {
-            'inhibit_exercises': [p.json_serialise() for p in self.inhibit_exercises],
-            'static_stretch_exercises': [p.json_serialise() for p in self.static_stretch_exercises],
-            'active_stretch_exercises': [p.json_serialise() for p in self.active_stretch_exercises],
-            'isolated_activate_exercises': [p.json_serialise() for p in self.isolated_activate_exercises],
-            'static_integrate_exercises': [p.json_serialise() for p in self.static_integrate_exercises],
+            'inhibit_exercises': [p.json_serialise() for p in self.inhibit_exercises.values()],
+            'static_stretch_exercises': [p.json_serialise() for p in self.static_stretch_exercises.values()],
+            'active_stretch_exercises': [p.json_serialise() for p in self.active_stretch_exercises.values()],
+            'isolated_activate_exercises': [p.json_serialise() for p in self.isolated_activate_exercises.values()],
+            'static_integrate_exercises': [p.json_serialise() for p in self.static_integrate_exercises.values()],
+            'completed': self.completed,
+            'active': self.active
         }
         return ret
 
@@ -313,10 +321,12 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
 
     def json_serialise(self):
         ret = {
-            'inhibit_exercises': [p.json_serialise() for p in self.inhibit_exercises],
-            'static_stretch_exercises': [p.json_serialise() for p in self.static_stretch_exercises],
-            'isolated_activate_exercises': [p.json_serialise() for p in self.isolated_activate_exercises],
-            'static_integrate_exercises': [p.json_serialise() for p in self.static_integrate_exercises],
+            'inhibit_exercises': [p.json_serialise() for p in self.inhibit_exercises.values()],
+            'static_stretch_exercises': [p.json_serialise() for p in self.static_stretch_exercises.values()],
+            'isolated_activate_exercises': [p.json_serialise() for p in self.isolated_activate_exercises.values()],
+            'static_integrate_exercises': [p.json_serialise() for p in self.static_integrate_exercises.values()],
+            'completed': self.completed,
+            'active': self.active
         }
         return ret
 
@@ -487,15 +497,19 @@ class WarmUp(Serialisable):
         self.isolated_activate_exercises = {}
         self.dynamic_integrate_exercises = {}
         self.dynamic_integrate_with_speed_exercises = {}
+        self.completed = False
+        self.active = True
 
     def json_serialise(self):
         ret = {
-            'inhibit_exercises': [p.json_serialise() for p in self.inhibit_exercises],
-            'static_then_active_or_dynamic_stretch_exercises': [p.json_serialise() for p in self.static_then_active_or_dynamic_stretch_exercises],
-            'active_or_dynamic_stretch_exercises': [p.json_serialise() for p in self.active_or_dynamic_stretch_exercises],
-            'isolated_activate_exercises': [p.json_serialise() for p in self.isolated_activate_exercises],
-            'dynamic_integrate_exercises': [p.json_serialise() for p in self.dynamic_integrate_exercises],
-            'dynamic_integrate_with_speed_exercises': [p.json_serialise() for p in self.dynamic_integrate_with_speed_exercises],
+            'inhibit_exercises': [p.json_serialise() for p in self.inhibit_exercises.values()],
+            'static_then_active_or_dynamic_stretch_exercises': [p.json_serialise() for p in self.static_then_active_or_dynamic_stretch_exercises.values()],
+            'active_or_dynamic_stretch_exercises': [p.json_serialise() for p in self.active_or_dynamic_stretch_exercises.values()],
+            'isolated_activate_exercises': [p.json_serialise() for p in self.isolated_activate_exercises.values()],
+            'dynamic_integrate_exercises': [p.json_serialise() for p in self.dynamic_integrate_exercises.values()],
+            'dynamic_integrate_with_speed_exercises': [p.json_serialise() for p in self.dynamic_integrate_with_speed_exercises.values()],
+            'completed': self.completed,
+            'active': self.active
         }
         return ret
 
@@ -503,10 +517,14 @@ class WarmUp(Serialisable):
 class CoolDown(Serialisable):
     def __init__(self):
         self.active_or_dynamic_stretch_exercises = {}
+        self.completed = False
+        self.active = True
 
     def json_serialise(self):
         ret = {
-            'active_or_dynamic_stretch_exercises': [p.json_serialise() for p in self.active_or_dynamic_stretch_exercises],
+            'active_or_dynamic_stretch_exercises': [p.json_serialise() for p in self.active_or_dynamic_stretch_exercises.values()],
+            'completed': self.completed,
+            'active': self.active
         }
         return ret
 
@@ -515,12 +533,16 @@ class ActiveRecovery(Serialisable):
     def __init__(self):
         self.dynamic_integrate_exercises = {}
         self.dynamic_integrate_with_speed_exercises = {}
+        self.completed = False
+        self.active = True
 
     def json_serialise(self):
         ret = {
-            'dynamic_integrate_exercises': [p.json_serialise() for p in self.dynamic_integrate_exercises],
+            'dynamic_integrate_exercises': [p.json_serialise() for p in self.dynamic_integrate_exercises.values()],
             'dynamic_integrate_with_speed_exercises': [p.json_serialise() for p in
-                                                       self.dynamic_integrate_with_speed_exercises],
+                                                       self.dynamic_integrate_with_speed_exercises.values()],
+            'completed': self.completed,
+            'active': self.active
         }
         return ret
 
@@ -533,12 +555,16 @@ class Ice(Serialisable):
         self.after_training = True
         self.immediately_after_training = False
         self.repeat_every_3hrs_for_24hrs = False
+        self.completed = False
+        self.active = True
 
     def json_serialise(self):
         ret = {
             'minutes': self.minutes,
             'body_part_location': self.body_part_location.value,
-            'side': self.side
+            'side': self.side,
+            'completed': self.completed,
+            'active': self.active
         }
 
         return ret
@@ -548,10 +574,14 @@ class ColdWaterImmersion(Serialisable):
     def __init__(self, minutes=10):
         self.minutes = minutes
         self.after_training = True
+        self.completed = False
+        self.active = True
 
     def json_serialise(self):
         ret = {
             'minutes': self.minutes,
+            'completed': self.completed,
+            'active': self.active
         }
 
         return ret

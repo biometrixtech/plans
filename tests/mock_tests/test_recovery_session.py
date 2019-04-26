@@ -69,7 +69,7 @@ def test_no_session_submitted_no_session_planned():
     mgr = training_plan_manager()
     daily_plan = DailyPlan(event_date='2018-12-10')
     daily_plan.session_from_readiness = False
-    daily_plan.sessions_planned_readiness = False
+    daily_plan.train_later = False
     surveys_today = False
     mgr.daily_plan = daily_plan
 
@@ -80,7 +80,7 @@ def test_no_session_submitted_session_planned():
     mgr = training_plan_manager()
     daily_plan = DailyPlan(event_date='2018-12-10')
     daily_plan.session_from_readiness = False
-    daily_plan.sessions_planned_readiness = True
+    daily_plan.train_later = True
     surveys_today = False
     mgr.daily_plan = daily_plan
 
@@ -91,7 +91,7 @@ def test_session_submitted_session_planned():
     mgr = training_plan_manager()
     daily_plan = DailyPlan(event_date='2018-12-10')
     daily_plan.session_from_readiness = True
-    daily_plan.sessions_planned_readiness = True
+    daily_plan.train_later = True
     surveys_today = True
     mgr.daily_plan = daily_plan
     assert not mgr.show_post_recovery(surveys_today)
@@ -101,7 +101,7 @@ def test_session_submitted_no_session_planned():
     mgr = training_plan_manager()
     daily_plan = DailyPlan(event_date='2018-12-10')
     daily_plan.session_from_readiness = True
-    daily_plan.sessions_planned_readiness = False
+    daily_plan.train_later = False
     surveys_today = True
     mgr.daily_plan = daily_plan
 
@@ -112,7 +112,7 @@ def test_readiness_nosession_session_planned_post_sessionpresent():
     mgr = training_plan_manager()
     daily_plan = DailyPlan(event_date='2018-12-10')
     daily_plan.session_from_readiness = False
-    daily_plan.sessions_planned_readiness = True
+    daily_plan.train_later = True
     surveys_today = True
     mgr.daily_plan = daily_plan
 
@@ -123,7 +123,7 @@ def test_readiness_nosession_nosession_planned_post_sessionpresent():
     mgr = training_plan_manager()
     daily_plan = DailyPlan(event_date='2018-12-10')
     daily_plan.session_from_readiness = False
-    daily_plan.sessions_planned_readiness = False
+    daily_plan.train_later = False
     surveys_today = True
     mgr.daily_plan = daily_plan
 
