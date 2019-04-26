@@ -1,6 +1,7 @@
 from serialisable import Serialisable
-from models.soreness import BodyPart, BodyPartLocation, AssignedExercise, HistoricSorenessStatus
-from models.body_parts import BodyPartFactory
+import models.soreness as sm
+# from models.soreness import BodyPart, BodyPartLocation, AssignedExercise, HistoricSorenessStatus
+import models.body_parts as bp
 from models.exercise import ExerciseBuckets
 from utils import parse_date
 import abc
@@ -108,7 +109,7 @@ class ActiveRest(object):
 
         for s in source_collection:
             if s.exercise.id not in target_collection:
-                target_collection[s.exercise.id] = AssignedExercise(library_id=str(s.exercise.id))
+                target_collection[s.exercise.id] = sm.AssignedExercise(library_id=str(s.exercise.id))
                 exercise_list = [ex for ex in exercise_library if ex.id == str(s.exercise.id)]
                 target_collection[s.exercise.id].exercise = exercise_list[0]
 
@@ -167,14 +168,42 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
     def json_serialise(self):
         ret = {
             'inhibit_exercises': [p.json_serialise() for p in self.inhibit_exercises.values()],
+            'inhibit_minutes': self.inhibit_minutes,
             'static_stretch_exercises': [p.json_serialise() for p in self.static_stretch_exercises.values()],
+            'static_stretch_minutes': self.static_stretch_minutes,
             'active_stretch_exercises': [p.json_serialise() for p in self.active_stretch_exercises.values()],
+            'active_stretch_minutes': self.active_stretch_minutes,
             'isolated_activate_exercises': [p.json_serialise() for p in self.isolated_activate_exercises.values()],
+            'isolated_activate_minutes': self.isolated_activate_minutes,
             'static_integrate_exercises': [p.json_serialise() for p in self.static_integrate_exercises.values()],
+            'static_integrate_minutes': self.static_integrate_minutes,
             'completed': self.completed,
             'active': self.active
         }
         return ret
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        pre_active_rest = cls()
+        pre_active_rest.active = input_dict.get("active", True)
+        pre_active_rest.completed = input_dict.get("completed", False)
+        pre_active_rest.inhibit_exercises = {s['library_id']: sm.AssignedExercise.json_deserialise(s)
+                                              for s in input_dict['inhibit_exercises']}
+        pre_active_rest.inhibit_minutes = input_dict.get('inhibit_minutes', 0)
+        pre_active_rest.static_stretch_exercises = {s['library_id']: sm.AssignedExercise.json_deserialise(s)
+                                              for s in input_dict['static_stretch_exercises']}
+        pre_active_rest.static_stretch_minutes = input_dict.get('static_stretch_minutes', 0)
+        pre_active_rest.static_integrate_exercises = {s['library_id']: sm.AssignedExercise.json_deserialise(s)
+                                              for s in input_dict['static_integrate_exercises']}
+        pre_active_rest.static_integrate_minutes = input_dict.get('static_integrate_minutes', 0)
+        pre_active_rest.active_stretch_exercises = {s['library_id']: sm.AssignedExercise.json_deserialise(s)
+                                              for s in input_dict['active_stretch_exercises']}
+        pre_active_rest.active_stretch_minutes = input_dict.get('active_stretch_minutes', 0)
+        pre_active_rest.isolated_activate_exercises = {s['library_id']: sm.AssignedExercise.json_deserialise(s)
+                                              for s in input_dict['isolated_activate_exercises']}
+        pre_active_rest.isolated_activate_minutes = input_dict.get('isolated_activate_minutes', 0)
+
+        return pre_active_rest
 
     def calc_durations(self):
 
@@ -186,7 +215,7 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
 
     def check_reactive_care_soreness(self, soreness, exercise_library):
 
-        body_part_factory = BodyPartFactory()
+        body_part_factory = bp.BodyPartFactory()
 
         if soreness.daily and not soreness.pain:
 
@@ -197,7 +226,7 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
 
             if body_part is not None:
                 for a in body_part.agonists:
-                    agonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None))
+                    agonist = body_part_factory.get_body_part(sm.BodyPart(sm.BodyPartLocation(a), None))
                     if agonist is not None:
                         self.copy_exercises(agonist.inhibit_exercises, self.inhibit_exercises, goal, "1", soreness, exercise_library)
                         if soreness.severity < 3.5:
@@ -205,7 +234,7 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
                             self.copy_exercises(agonist.active_stretch_exercises, self.active_stretch_exercises, goal, "1", soreness, exercise_library)
 
                 for y in body_part.synergists:
-                    synergist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(y), None))
+                    synergist = body_part_factory.get_body_part(sm.BodyPart(sm.BodyPartLocation(y), None))
                     if synergist is not None:
                         self.copy_exercises(synergist.inhibit_exercises, self.inhibit_exercises, goal, "2", soreness, exercise_library)
                         if soreness.severity < 3.5:
@@ -213,7 +242,7 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
                                                 exercise_library)
 
                 for t in body_part.stabilizers:
-                    stabilizer = body_part_factory.get_body_part(BodyPart(BodyPartLocation(t), None))
+                    stabilizer = body_part_factory.get_body_part(sm.BodyPart(sm.BodyPartLocation(t), None))
                     if stabilizer is not None:
                         self.copy_exercises(stabilizer.inhibit_exercises, self.inhibit_exercises, goal, "3", soreness, exercise_library)
                         if soreness.severity < 3.5:
@@ -222,7 +251,7 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
 
     def check_prevention_soreness(self, soreness, event_date_time, exercise_library):
 
-        body_part_factory = BodyPartFactory()
+        body_part_factory = bp.BodyPartFactory()
 
         if soreness.historic_soreness_status is not None and soreness.first_reported is not None and not soreness.is_dormant_cleared():
             days_sore = (event_date_time - soreness.first_reported).days
@@ -235,14 +264,14 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
 
                 if body_part is not None:
                     for a in body_part.agonists:
-                        agonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None))
+                        agonist = body_part_factory.get_body_part(sm.BodyPart(sm.BodyPartLocation(a), None))
                         if agonist is not None:
                             self.copy_exercises(agonist.inhibit_exercises, self.inhibit_exercises, goal, "1", soreness, exercise_library)
                             if soreness.severity < 3.5:
                                 self.copy_exercises(agonist.static_stretch_exercises, self.static_stretch_exercises, goal, "1", soreness, exercise_library)
 
                     for y in body_part.synergists:
-                        synergist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(y), None))
+                        synergist = body_part_factory.get_body_part(sm.BodyPart(sm.BodyPartLocation(y), None))
                         if synergist is not None:
                             self.copy_exercises(synergist.inhibit_exercises, self.inhibit_exercises, goal, "2", soreness, exercise_library)
                             if soreness.severity < 3.5:
@@ -250,7 +279,7 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
                                                     goal, "2", soreness, exercise_library)
 
                     for g in body_part.antagonists:
-                        antagonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(g), None))
+                        antagonist = body_part_factory.get_body_part(sm.BodyPart(sm.BodyPartLocation(g), None))
                         if antagonist is not None:
                             if soreness.severity < 2.5:
                                 self.copy_exercises(antagonist.isolated_activate_exercises,
@@ -258,17 +287,17 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
                                                     "1", soreness, exercise_library)
 
                     if soreness.severity < 2.5:
-                        general_body_part = body_part_factory.get_body_part(BodyPart(BodyPartLocation.general, None))
+                        general_body_part = body_part_factory.get_body_part(sm.BodyPart(sm.BodyPartLocation.general, None))
                         self.copy_exercises(general_body_part.static_integrate_exercises, self.static_integrate_exercises,
                                             goal, "1", soreness, exercise_library)
 
     def check_prevention_pain(self, soreness, event_date_time, exercise_library):
 
-        body_part_factory = BodyPartFactory()
+        body_part_factory = bp.BodyPartFactory()
 
         if soreness.historic_soreness_status is not None and soreness.first_reported is not None:
             days_sore = (event_date_time - soreness.first_reported).days
-            if soreness.is_acute_pain() or soreness.is_persistent_pain() or soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_pain:
+            if soreness.is_acute_pain() or soreness.is_persistent_pain() or soreness.historic_soreness_status == sm.HistoricSorenessStatus.persistent_2_pain:
 
                 body_part = body_part_factory.get_body_part(soreness.body_part)
 
@@ -277,14 +306,14 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
 
                 if body_part is not None:
                     for a in body_part.agonists:
-                        agonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None))
+                        agonist = body_part_factory.get_body_part(sm.BodyPart(sm.BodyPartLocation(a), None))
                         if agonist is not None:
                             self.copy_exercises(agonist.inhibit_exercises, self.inhibit_exercises, goal, "1", soreness, exercise_library)
                             if soreness.severity < 3.5:
                                 self.copy_exercises(agonist.static_stretch_exercises, self.static_stretch_exercises, goal, "1", soreness, exercise_library)
 
                     for y in body_part.synergists:
-                        synergist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(y), None))
+                        synergist = body_part_factory.get_body_part(sm.BodyPart(sm.BodyPartLocation(y), None))
                         if synergist is not None:
                             self.copy_exercises(synergist.inhibit_exercises, self.inhibit_exercises, goal, "2", soreness, exercise_library)
                             if soreness.severity < 3.5:
@@ -292,7 +321,7 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
                                                     goal, "2", soreness, exercise_library)
 
                     for g in body_part.antagonists:
-                        antagonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(g), None))
+                        antagonist = body_part_factory.get_body_part(sm.BodyPart(sm.BodyPartLocation(g), None))
                         if antagonist is not None:
                             if soreness.severity < 2.5:
                                 self.copy_exercises(antagonist.isolated_activate_exercises,
@@ -300,13 +329,13 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
                                                     "1", soreness, exercise_library)
 
                     if soreness.severity < 2.5:
-                        general_body_part = body_part_factory.get_body_part(BodyPart(BodyPartLocation.general, None))
+                        general_body_part = body_part_factory.get_body_part(sm.BodyPart(sm.BodyPartLocation.general, None))
                         self.copy_exercises(general_body_part.static_integrate_exercises, self.static_integrate_exercises,
                                             goal, "1", soreness, exercise_library)
 
     def check_reactive_care_pain(self, soreness, exercise_library):
 
-        body_part_factory = BodyPartFactory()
+        body_part_factory = bp.BodyPartFactory()
 
         if soreness.daily and soreness.pain:
 
@@ -317,7 +346,7 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
 
             if body_part is not None:
                 for a in body_part.agonists:
-                    agonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None))
+                    agonist = body_part_factory.get_body_part(sm.BodyPart(sm.BodyPartLocation(a), None))
                     if agonist is not None:
                         self.copy_exercises(agonist.inhibit_exercises, self.inhibit_exercises, goal, "1", soreness, exercise_library)
                         if soreness.severity < 3.5:
@@ -325,7 +354,7 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
                             self.copy_exercises(agonist.active_stretch_exercises, self.active_stretch_exercises, goal, "1", soreness, exercise_library)
 
                 for y in body_part.synergists:
-                    synergist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(y), None))
+                    synergist = body_part_factory.get_body_part(sm.BodyPart(sm.BodyPartLocation(y), None))
                     if synergist is not None:
                         self.copy_exercises(synergist.inhibit_exercises, self.inhibit_exercises, goal, "2", soreness, exercise_library)
                         if soreness.severity < 3.5:
@@ -333,7 +362,7 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
                                                 exercise_library)
 
                 for t in body_part.stabilizers:
-                    stabilizer = body_part_factory.get_body_part(BodyPart(BodyPartLocation(t), None))
+                    stabilizer = body_part_factory.get_body_part(sm.BodyPart(sm.BodyPartLocation(t), None))
                     if stabilizer is not None:
                         self.copy_exercises(stabilizer.inhibit_exercises, self.inhibit_exercises, goal, "3", soreness, exercise_library)
                         if soreness.severity < 3.5:
@@ -350,13 +379,37 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
     def json_serialise(self):
         ret = {
             'inhibit_exercises': [p.json_serialise() for p in self.inhibit_exercises.values()],
+            'inhibit_minutes': self.inhibit_minutes,
             'static_stretch_exercises': [p.json_serialise() for p in self.static_stretch_exercises.values()],
+            'static_stretch_minutes': self.static_stretch_minutes,
             'isolated_activate_exercises': [p.json_serialise() for p in self.isolated_activate_exercises.values()],
+            'isolated_activate_minutes': self.isolated_activate_minutes,
             'static_integrate_exercises': [p.json_serialise() for p in self.static_integrate_exercises.values()],
+            'static_integrate_minutes': self.static_integrate_minutes,
             'completed': self.completed,
             'active': self.active
         }
         return ret
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        post_active_rest = cls()
+        post_active_rest.active = input_dict.get("active", True)
+        post_active_rest.completed = input_dict.get("completed", False)
+        post_active_rest.inhibit_exercises = {s['library_id']: sm.AssignedExercise.json_deserialise(s)
+                                              for s in input_dict['inhibit_exercises']}
+        post_active_rest.inhibit_minutes = input_dict.get('inhibit_minutes', 0)
+        post_active_rest.static_stretch_exercises = {s['library_id']: sm.AssignedExercise.json_deserialise(s)
+                                              for s in input_dict['static_stretch_exercises']}
+        post_active_rest.static_stretch_minutes = input_dict.get('static_stretch_minutes', 0)
+        post_active_rest.static_integrate_exercises = {s['library_id']: sm.AssignedExercise.json_deserialise(s)
+                                              for s in input_dict['static_integrate_exercises']}
+        post_active_rest.static_integrate_minutes = input_dict.get('static_integrate_minutes', 0)
+        post_active_rest.isolated_activate_exercises = {s['library_id']: sm.AssignedExercise.json_deserialise(s)
+                                              for s in input_dict['isolated_activate_exercises']}
+        post_active_rest.isolated_activate_minutes = input_dict.get('isolated_activate_minutes', 0)
+
+        return post_active_rest
 
     def calc_durations(self):
 
@@ -367,7 +420,7 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
 
     def check_reactive_care_soreness(self, soreness, exercise_library):
 
-        body_part_factory = BodyPartFactory()
+        body_part_factory = bp.BodyPartFactory()
 
         if soreness.daily and not soreness.pain:
 
@@ -378,21 +431,21 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
 
             if body_part is not None:
                 for a in body_part.agonists:
-                    agonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None))
+                    agonist = body_part_factory.get_body_part(sm.BodyPart(sm.BodyPartLocation(a), None))
                     if agonist is not None:
                         self.copy_exercises(agonist.inhibit_exercises, self.inhibit_exercises, goal, "1", soreness, exercise_library)
                         if soreness.severity < 3.5:
                             self.copy_exercises(agonist.static_stretch_exercises, self.static_stretch_exercises, goal, "1", soreness, exercise_library)
 
                 for y in body_part.synergists:
-                    synergist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(y), None))
+                    synergist = body_part_factory.get_body_part(sm.BodyPart(sm.BodyPartLocation(y), None))
                     if synergist is not None:
                         self.copy_exercises(synergist.inhibit_exercises, self.inhibit_exercises, goal, "2", soreness, exercise_library)
                         if soreness.severity < 3.5:
                             self.copy_exercises(synergist.static_stretch_exercises, self.static_stretch_exercises, goal, "2", soreness, exercise_library)
 
                 for t in body_part.stabilizers:
-                    stabilizer = body_part_factory.get_body_part(BodyPart(BodyPartLocation(t), None))
+                    stabilizer = body_part_factory.get_body_part(sm.BodyPart(sm.BodyPartLocation(t), None))
                     if stabilizer is not None:
                         self.copy_exercises(stabilizer.inhibit_exercises, self.inhibit_exercises, goal, "3", soreness, exercise_library)
                         if soreness.severity < 3.5:
@@ -401,7 +454,7 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
 
     def check_prevention_soreness(self, soreness, event_date_time, exercise_library):
 
-        body_part_factory = BodyPartFactory()
+        body_part_factory = bp.BodyPartFactory()
 
         if soreness.historic_soreness_status is not None and soreness.first_reported is not None and not soreness.is_dormant_cleared():
             days_sore = (event_date_time - soreness.first_reported).days
@@ -414,14 +467,14 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
 
                 if body_part is not None:
                     for a in body_part.agonists:
-                        agonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None))
+                        agonist = body_part_factory.get_body_part(sm.BodyPart(sm.BodyPartLocation(a), None))
                         if agonist is not None:
                             self.copy_exercises(agonist.inhibit_exercises, self.inhibit_exercises, goal, "1", soreness, exercise_library)
                             if soreness.severity < 3.5:
                                 self.copy_exercises(agonist.static_stretch_exercises, self.static_stretch_exercises, goal, "1", soreness, exercise_library)
 
                     for y in body_part.synergists:
-                        synergist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(y), None))
+                        synergist = body_part_factory.get_body_part(sm.BodyPart(sm.BodyPartLocation(y), None))
                         if synergist is not None:
                             self.copy_exercises(synergist.inhibit_exercises, self.inhibit_exercises, goal, "2", soreness, exercise_library)
                             if soreness.severity < 3.5:
@@ -429,7 +482,7 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
                                                     goal, "2", soreness, exercise_library)
 
                     for g in body_part.antagonists:
-                        antagonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(g), None))
+                        antagonist = body_part_factory.get_body_part(sm.BodyPart(sm.BodyPartLocation(g), None))
                         if antagonist is not None:
                             if soreness.severity < 2.5:
                                 self.copy_exercises(antagonist.isolated_activate_exercises,
@@ -437,17 +490,17 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
                                                     "1", soreness, exercise_library)
 
                     if soreness.severity < 2.5:
-                        general_body_part = body_part_factory.get_body_part(BodyPart(BodyPartLocation.general, None))
+                        general_body_part = body_part_factory.get_body_part(sm.BodyPart(sm.BodyPartLocation.general, None))
                         self.copy_exercises(general_body_part.static_integrate_exercises, self.static_integrate_exercises,
                                             goal, "1", soreness, exercise_library)
 
     def check_prevention_pain(self, soreness, event_date_time, exercise_library):
 
-        body_part_factory = BodyPartFactory()
+        body_part_factory = bp.BodyPartFactory()
 
         if soreness.historic_soreness_status is not None and soreness.first_reported is not None:
             days_sore = (event_date_time - soreness.first_reported).days
-            if soreness.is_acute_pain() or soreness.is_persistent_pain() or soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_pain:
+            if soreness.is_acute_pain() or soreness.is_persistent_pain() or soreness.historic_soreness_status == sm.HistoricSorenessStatus.persistent_2_pain:
 
                 body_part = body_part_factory.get_body_part(soreness.body_part)
 
@@ -456,14 +509,14 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
 
                 if body_part is not None:
                     for a in body_part.agonists:
-                        agonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None))
+                        agonist = body_part_factory.get_body_part(sm.BodyPart(sm.BodyPartLocation(a), None))
                         if agonist is not None:
                             self.copy_exercises(agonist.inhibit_exercises, self.inhibit_exercises, goal, "1", soreness, exercise_library)
                             if soreness.severity < 3.5:
                                 self.copy_exercises(agonist.static_stretch_exercises, self.static_stretch_exercises, goal, "1", soreness, exercise_library)
 
                     for y in body_part.synergists:
-                        synergist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(y), None))
+                        synergist = body_part_factory.get_body_part(sm.BodyPart(sm.BodyPartLocation(y), None))
                         if synergist is not None:
                             self.copy_exercises(synergist.inhibit_exercises, self.inhibit_exercises, goal, "2", soreness, exercise_library)
                             if soreness.severity < 3.5:
@@ -471,7 +524,7 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
                                                     goal, "2", soreness, exercise_library)
 
                     for g in body_part.antagonists:
-                        antagonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(g), None))
+                        antagonist = body_part_factory.get_body_part(sm.BodyPart(sm.BodyPartLocation(g), None))
                         if antagonist is not None:
                             if soreness.severity < 2.5:
                                 self.copy_exercises(antagonist.isolated_activate_exercises,
@@ -479,13 +532,13 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
                                                     "1", soreness, exercise_library)
 
                     if soreness.severity < 2.5:
-                        general_body_part = body_part_factory.get_body_part(BodyPart(BodyPartLocation.general, None))
+                        general_body_part = body_part_factory.get_body_part(sm.BodyPart(sm.BodyPartLocation.general, None))
                         self.copy_exercises(general_body_part.static_integrate_exercises, self.static_integrate_exercises,
                                             goal, "1", soreness, exercise_library)
 
     def check_reactive_care_pain(self, soreness, exercise_library):
 
-        body_part_factory = BodyPartFactory()
+        body_part_factory = bp.BodyPartFactory()
 
         if soreness.daily and soreness.pain:
 
@@ -496,21 +549,21 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
 
             if body_part is not None:
                 for a in body_part.agonists:
-                    agonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None))
+                    agonist = body_part_factory.get_body_part(sm.BodyPart(sm.BodyPartLocation(a), None))
                     if agonist is not None:
                         self.copy_exercises(agonist.inhibit_exercises, self.inhibit_exercises, goal, "1", soreness, exercise_library)
                         if soreness.severity < 3.5:
                             self.copy_exercises(agonist.static_stretch_exercises, self.static_stretch_exercises, goal, "1", soreness, exercise_library)
 
                 for y in body_part.synergists:
-                    synergist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(y), None))
+                    synergist = body_part_factory.get_body_part(sm.BodyPart(sm.BodyPartLocation(y), None))
                     if synergist is not None:
                         self.copy_exercises(synergist.inhibit_exercises, self.inhibit_exercises, goal, "2", soreness, exercise_library)
                         if soreness.severity < 3.5:
                             self.copy_exercises(synergist.static_stretch_exercises, self.static_stretch_exercises, goal, "2", soreness, exercise_library)
 
                 for t in body_part.stabilizers:
-                    stabilizer = body_part_factory.get_body_part(BodyPart(BodyPartLocation(t), None))
+                    stabilizer = body_part_factory.get_body_part(sm.BodyPart(sm.BodyPartLocation(t), None))
                     if stabilizer is not None:
                         self.copy_exercises(stabilizer.inhibit_exercises, self.inhibit_exercises, goal, "3", soreness, exercise_library)
                         if soreness.severity < 3.5:

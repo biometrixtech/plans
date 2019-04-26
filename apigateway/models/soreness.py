@@ -1,6 +1,7 @@
 from enum import Enum, IntEnum
 
 from models.exercise import Exercise, UnitOfMeasure
+import models.modalities as modalities
 from serialisable import Serialisable
 from random import shuffle
 
@@ -288,7 +289,7 @@ class HistoricSoreness(BaseSoreness, Serialisable):
     def __init__(self, body_part_location, side, is_pain):
         super().__init__()
         self.body_part_location = body_part_location
-        #self.historic_soreness_status = HistoricSorenessStatus.dormant_cleared
+        # self.historic_soreness_status = HistoricSorenessStatus.dormant_cleared
         self.is_pain = is_pain
         self.side = side
         self.streak = 0
@@ -388,10 +389,10 @@ class AssignedExercise(Serialisable):
                  body_part_location=BodyPartLocation.general, progressions=[]):
         self.exercise = Exercise(library_id)
         self.exercise.progressions = progressions
-        #self.body_part_priority = body_part_priority
-        #self.body_part_exercise_priority = body_part_exercise_priority
-        #self.body_part_soreness_level = body_part_soreness_level
-        #self.body_part_location = body_part_location
+        # self.body_part_priority = body_part_priority
+        # self.body_part_exercise_priority = body_part_exercise_priority
+        # self.body_part_soreness_level = body_part_soreness_level
+        # self.body_part_location = body_part_location
         self.athlete_id = ""
         self.complete_reps_assigned = 0
         self.complete_sets_assigned = 0
@@ -425,6 +426,28 @@ class AssignedExercise(Serialisable):
         if name == "unit_of_measure" and not isinstance(value, UnitOfMeasure):
             value = UnitOfMeasure[value]
         super().__setattr__(name, value)
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        assigned_exercise = AssignedExercise(input_dict.get("library_id", None))
+        assigned_exercise.exercise.name = input_dict.get("name", "")
+        assigned_exercise.exercise.display_name = input_dict.get("display_name", "")
+        assigned_exercise.exercise.youtube_id = input_dict.get("youtube_id", "")
+        assigned_exercise.exercise.description = input_dict.get("description", "")
+        assigned_exercise.exercise.bilateral = input_dict.get("bilateral", False)
+        assigned_exercise.exercise.unit_of_measure = input_dict.get("unit_of_measure", None)
+        assigned_exercise.position_order = input_dict.get("position_order", 0)
+        assigned_exercise.complete_reps_assigned = input_dict.get("complete_reps_assigned", 0)
+        assigned_exercise.complete_sets_assigned = input_dict.get("complete_sets_assigned", 0)
+        assigned_exercise.exercise.seconds_per_set = input_dict.get("seconds_per_set", 0)
+        assigned_exercise.exercise.seconds_per_rep = input_dict.get("seconds_per_rep", 0)
+        assigned_exercise.goal_text = input_dict.get("goal_text", "")
+        assigned_exercise.equipment_required = input_dict.get("equipment_required", [])
+        assigned_exercise.goals = set([modalities.AthleteGoal.json_deserialise(goal) for goal in input_dict.get('goals', [])])
+        assigned_exercise.priorities = set(input_dict.get('priorities', []))
+        assigned_exercise.soreness_sources = set([Soreness.json_deserialise(soreness) for soreness in input_dict.get('soreness_sources', [])])
+
+        return assigned_exercise
 
     def json_serialise(self):
         ret = {'name': self.exercise.name,
