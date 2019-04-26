@@ -89,7 +89,8 @@ class TrainingPlanManager(object):
             self.daily_plan.post_active_rest = calc.get_post_active_rest(soreness_list, event_date)
             self.daily_plan.ice = calc.get_ice(soreness_list, event_date)
             self.daily_plan.cold_water_immersion = calc.get_cold_water_immersion(soreness_list, event_date)
-            self.daily_plan.heat.active = False
+            for heat in self.daily_plan.heat:
+                heat.active = False
             self.daily_plan.pre_active_rest.active = False
         else:
             self.daily_plan.heat = calc.get_heat(soreness_list, event_date)
