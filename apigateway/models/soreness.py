@@ -4,7 +4,7 @@ from models.exercise import Exercise, UnitOfMeasure
 from serialisable import Serialisable
 from random import shuffle
 
-from utils import format_datetime
+from utils import format_datetime, parse_datetime
 
 
 class SorenessType(Enum):
@@ -80,6 +80,20 @@ class Soreness(BaseSoreness, Serialisable):
         self.first_reported = None
         self.daily = True
 
+    @classmethod
+    def json_deserialise(cls, soreness_json):
+        soreness = cls()
+        soreness.body_part = BodyPart(BodyPartLocation(soreness_json['body_part']), None)
+        soreness.pain = soreness_json.get('pain', False)
+        soreness.severity = soreness_json['severity']
+        soreness.movement = soreness_json.get('movement', None)
+        soreness.side = soreness_json.get('side', None)
+        if soreness_json.get('first_reported', None) is not None:
+            soreness.first_reported = parse_datetime(soreness_json['first_reported'])
+        if soreness_json.get('reported_date_time', None) is not None:
+            soreness.reported_date_time = parse_datetime(soreness_json['reported_date_time'])
+        return soreness
+
     def __hash__(self):
         return hash((self.body_part.location, self.side))
 
@@ -102,7 +116,7 @@ class Soreness(BaseSoreness, Serialisable):
             return False
     '''
 
-    def json_serialise(self, api=False, daily=False):
+    def json_serialise(self, api=False, daily=False, trigger=False):
         if api:
             ret = {
                    'body_part': self.body_part.location.value,
@@ -119,6 +133,16 @@ class Soreness(BaseSoreness, Serialisable):
                    'side': self.side,
                    'reported_date_time': format_datetime(self.reported_date_time)
                    }
+        elif trigger:
+            ret = {
+                   'body_part': self.body_part.location.value,
+                   'pain': self.pain,
+                   'severity': self.severity,
+                   'movement': self.movement,
+                   'side': self.side,
+                   'first_reported': format_datetime(self.first_reported) if self.first_reported is not None else None,
+                  }
+
         else:
             ret = {
                    'body_part': self.body_part.location.value,
@@ -264,7 +288,7 @@ class HistoricSoreness(BaseSoreness, Serialisable):
     def __init__(self, body_part_location, side, is_pain):
         super().__init__()
         self.body_part_location = body_part_location
-        #self.historic_soreness_status = HistoricSorenessStatus.dormant_cleared
+        # self.historic_soreness_status = HistoricSorenessStatus.dormant_cleared
         self.is_pain = is_pain
         self.side = side
         self.streak = 0
@@ -364,10 +388,10 @@ class AssignedExercise(Serialisable):
                  body_part_location=BodyPartLocation.general, progressions=[]):
         self.exercise = Exercise(library_id)
         self.exercise.progressions = progressions
-        #self.body_part_priority = body_part_priority
-        #self.body_part_exercise_priority = body_part_exercise_priority
-        #self.body_part_soreness_level = body_part_soreness_level
-        #self.body_part_location = body_part_location
+        # self.body_part_priority = body_part_priority
+        # self.body_part_exercise_priority = body_part_exercise_priority
+        # self.body_part_soreness_level = body_part_soreness_level
+        # self.body_part_location = body_part_location
         self.athlete_id = ""
         self.complete_reps_assigned = 0
         self.complete_sets_assigned = 0
@@ -402,6 +426,28 @@ class AssignedExercise(Serialisable):
             value = UnitOfMeasure[value]
         super().__setattr__(name, value)
 
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        assigned_exercise = AssignedExercise(input_dict.get("library_id", None))
+        assigned_exercise.exercise.name = input_dict.get("name", "")
+        assigned_exercise.exercise.display_name = input_dict.get("display_name", "")
+        assigned_exercise.exercise.youtube_id = input_dict.get("youtube_id", "")
+        assigned_exercise.exercise.description = input_dict.get("description", "")
+        assigned_exercise.exercise.bilateral = input_dict.get("bilateral", False)
+        assigned_exercise.exercise.unit_of_measure = input_dict.get("unit_of_measure", None)
+        assigned_exercise.position_order = input_dict.get("position_order", 0)
+        assigned_exercise.complete_reps_assigned = input_dict.get("complete_reps_assigned", 0)
+        assigned_exercise.complete_sets_assigned = input_dict.get("complete_sets_assigned", 0)
+        assigned_exercise.exercise.seconds_per_set = input_dict.get("seconds_per_set", 0)
+        assigned_exercise.exercise.seconds_per_rep = input_dict.get("seconds_per_rep", 0)
+        assigned_exercise.goal_text = input_dict.get("goal_text", "")
+        assigned_exercise.equipment_required = input_dict.get("equipment_required", [])
+        assigned_exercise.goals = set([AthleteGoal.json_deserialise(goal) for goal in input_dict.get('goals', [])])
+        assigned_exercise.priorities = set(input_dict.get('priorities', []))
+        assigned_exercise.soreness_sources = set([Soreness.json_deserialise(soreness) for soreness in input_dict.get('soreness_sources', [])])
+
+        return assigned_exercise
+
     def json_serialise(self):
         ret = {'name': self.exercise.name,
                'display_name': self.exercise.display_name,
@@ -420,7 +466,7 @@ class AssignedExercise(Serialisable):
                'equipment_required': self.equipment_required,
                'goals': [goal.json_serialise() for goal in self.goals],
                'priorities': list(self.priorities),
-               'soreness_sources': [soreness.json_serialise() for soreness in self.soreness_sources]
+               'soreness_sources': [soreness.json_serialise(trigger=True) for soreness in self.soreness_sources]
                }
         return ret
 
@@ -453,3 +499,25 @@ class CompletedExerciseSummary(Serialisable):
                'exposures': self.exposures,
                }
         return ret
+
+
+class AthleteGoal(object):
+    def __init__(self, text, priority):
+        self.text = text
+        self.priority = priority
+        self.trigger = ''
+
+    def json_serialise(self):
+        ret = {
+            'text': self.text,
+            'priority': self.priority,
+            'trigger': self.trigger
+        }
+        return ret
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        goal = cls(text=input_dict['text'], priority=input_dict['priority'])
+        goal.trigger = input_dict.get('trigger', "")
+
+        return goal

@@ -5,7 +5,7 @@ class BodyPartFactory(object):
     def get_progression_list(self, exercise):
 
         dict = {}
-        #dict["9"] = ["121"]
+        #dict["9"] = ["121"]zz
 
         dict["10"] = ["12", "11", "13", "120"]
 
