@@ -4,7 +4,7 @@ from models.exercise import Exercise, UnitOfMeasure
 from serialisable import Serialisable
 from random import shuffle
 
-from utils import format_datetime
+from utils import format_datetime, parse_datetime
 
 
 class SorenessType(Enum):
@@ -80,6 +80,17 @@ class Soreness(BaseSoreness, Serialisable):
         self.first_reported = None
         self.daily = True
 
+    def soreness_from_dict(self, soreness_dict):
+        self.body_part = BodyPart(BodyPartLocation(soreness_dict['body_part']), None)
+        self.pain = soreness_dict.get('pain', False)
+        self.severity = soreness_dict['severity']
+        self.movement = soreness_dict.get('movement', None)
+        self.side = soreness_dict.get('side', None)
+        if soreness_dict.get('first_reported', None) is not None:
+            self.first_reported = parse_datetime(soreness_dict['first_reported'])
+        if soreness_dict.get('reported_date_time', None) is not None:
+            self.reported_date_time = parse_datetime(soreness_dict['reported_date_time'])
+
     def __hash__(self):
         return hash((self.body_part.location, self.side))
 
@@ -102,7 +113,7 @@ class Soreness(BaseSoreness, Serialisable):
             return False
     '''
 
-    def json_serialise(self, api=False, daily=False):
+    def json_serialise(self, api=False, daily=False, trigger=False):
         if api:
             ret = {
                    'body_part': self.body_part.location.value,
@@ -119,6 +130,16 @@ class Soreness(BaseSoreness, Serialisable):
                    'side': self.side,
                    'reported_date_time': format_datetime(self.reported_date_time)
                    }
+        elif trigger:
+            ret = {
+                   'body_part': self.body_part.location.value,
+                   'pain': self.pain,
+                   'severity': self.severity,
+                   'movement': self.movement,
+                   'side': self.side,
+                   'first_reported': format_datetime(self.first_reported) if self.first_reported is not None else None,
+                  }
+
         else:
             ret = {
                    'body_part': self.body_part.location.value,
@@ -420,7 +441,7 @@ class AssignedExercise(Serialisable):
                'equipment_required': self.equipment_required,
                'goals': [goal.json_serialise() for goal in self.goals],
                'priorities': list(self.priorities),
-               'soreness_sources': [soreness.json_serialise() for soreness in self.soreness_sources]
+               'soreness_sources': [soreness.json_serialise(trigger=True) for soreness in self.soreness_sources]
                }
         return ret
 

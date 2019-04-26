@@ -4,9 +4,10 @@ from config import get_mongo_collection
 from fathomapi.utils.exceptions import InvalidSchemaException, NoSuchEntityException
 from models.daily_plan import DailyPlan
 import models.session as session
-import models.soreness
+from models.soreness import AssignedExercise, Soreness
 from models.post_session_survey import PostSurvey
 from models.daily_readiness import DailyReadiness
+from models.modalities import ActiveRecovery, ActiveRestAfterTraining, ActiveRestBeforeTraining, Heat, Ice, AthleteGoal
 from datastores.daily_readiness_datastore import DailyReadinessDatastore
 from utils import parse_date
 
@@ -72,6 +73,14 @@ class DailyPlanDatastore(object):
                 daily_plan.post_recovery = _recovery_session_from_mongodb(plan['post_recovery']) if plan.get('post_recovery', None) is not None else None
                 daily_plan.completed_post_recovery_sessions = \
                     [_recovery_session_from_mongodb(s) for s in plan.get('completed_post_recovery_sessions', [])]
+
+                daily_plan.pre_active_rest = _pre_active_rest_from_mongodb(plan['pre_active_rest']) if plan.get('pre_active_rest', None) is not None else None
+                daily_plan.post_active_rest = _post_active_rest_from_mongodb(plan['post_active_rest']) if plan.get('post_active_rest', None) is not None else None
+                daily_plan.heat = [_heat_from_mongo(heat) for heat in plan.get('heat', [])]
+                # daily_plan.warm_up = plan.get('warm_up', None)
+                # daily_plan.cool_down = plan.get('cool_down', None)
+                # daily_plan.active_recovery = plan.get('active_recovery', None)
+                daily_plan.ice = [_ice_from_mongo(ice) for ice in plan.get('ice', [])]
                 #daily_plan.functional_strength_session = \
                 #    _functional_strength_session_from_mongodb(plan['functional_strength_session']) if plan.get('functional_strength_session', None) is not None else None
             #daily_plan.bump_up_sessions = \
@@ -232,7 +241,7 @@ def _functional_strength_session_from_mongodb(mongo_result):
 
 def _assigned_exercises_from_mongodb(mongo_result):
 
-    assigned_exercise = models.soreness.AssignedExercise(mongo_result.get("library_id", None))
+    assigned_exercise = AssignedExercise(mongo_result.get("library_id", None))
     assigned_exercise.exercise.name = mongo_result.get("name", "")
     assigned_exercise.exercise.display_name = mongo_result.get("display_name", "")
     assigned_exercise.exercise.youtube_id = mongo_result.get("youtube_id", "")
@@ -246,7 +255,22 @@ def _assigned_exercises_from_mongodb(mongo_result):
     assigned_exercise.exercise.seconds_per_rep = mongo_result.get("seconds_per_rep", 0)
     assigned_exercise.goal_text = mongo_result.get("goal_text", "")
     assigned_exercise.equipment_required = mongo_result.get("equipment_required", [])
+    assigned_exercise.goals = set([_athlete_goal_from_mongo(goal) for goal in mongo_result.get('goals', [])])
+    assigned_exercise.priorities = set(mongo_result.get('priorities', []))
+    assigned_exercise.soreness_sources = set([_soreness_from_mongo(soreness) for soreness in mongo_result.get('soreness_sources', [])])
     return assigned_exercise
+
+
+def _athlete_goal_from_mongo(mongo_result):
+    goal = AthleteGoal(text=mongo_result['text'], priority=mongo_result['priority'])
+    goal.trigger = mongo_result.get('trigger', '')
+    return goal
+
+
+def _soreness_from_mongo(mongo_result):
+    soreness = Soreness()
+    soreness.soreness_from_dict(mongo_result)
+    return soreness
 
 
 def _daily_readiness_from_mongo(mongo_result, user_id):
@@ -270,3 +294,61 @@ def _daily_readiness_from_mongo(mongo_result, user_id):
             return None
     else:
         return None
+
+def _post_active_rest_from_mongodb(mongo_result):
+    post_active_rest = ActiveRestBeforeTraining()
+    post_active_rest.active = mongo_result.get("active", True)
+    post_active_rest.completed = mongo_result.get("completed", False)
+    post_active_rest.inhibit_exercises = {s['library_id']: _assigned_exercises_from_mongodb(s)
+                                          for s in mongo_result['inhibit_exercises']}
+    post_active_rest.static_stretch_exercises = {s['library_id']: _assigned_exercises_from_mongodb(s)
+                                          for s in mongo_result['inhibit_exercises']}
+    post_active_rest.static_integrate_exercises = {s['library_id']: _assigned_exercises_from_mongodb(s)
+                                          for s in mongo_result['inhibit_exercises']}
+    post_active_rest.isolated_activate_exercises = {s['library_id']: _assigned_exercises_from_mongodb(s)
+                                          for s in mongo_result['inhibit_exercises']}
+
+    return post_active_rest
+
+
+def _pre_active_rest_from_mongodb(mongo_result):
+    pre_active_rest = ActiveRestBeforeTraining()
+    pre_active_rest.active = mongo_result.get("active", True)
+    pre_active_rest.completed = mongo_result.get("completed", False)
+    pre_active_rest.inhibit_exercises = {s['library_id']: _assigned_exercises_from_mongodb(s)
+                                          for s in mongo_result['inhibit_exercises']}
+    pre_active_rest.static_stretch_exercises = {s['library_id']: _assigned_exercises_from_mongodb(s)
+                                          for s in mongo_result['static_stretch_exercises']}
+    pre_active_rest.static_integrate_exercises = {s['library_id']: _assigned_exercises_from_mongodb(s)
+                                          for s in mongo_result['static_integrate_exercises']}
+    pre_active_rest.active_stretch_exercises = {s['library_id']: _assigned_exercises_from_mongodb(s)
+                                          for s in mongo_result['active_stretch_exercises']}
+    pre_active_rest.isolated_activate_exercises = {s['library_id']: _assigned_exercises_from_mongodb(s)
+                                          for s in mongo_result['isolated_activate_exercises']}
+
+    return pre_active_rest
+
+
+def _heat_from_mongo(mongo_result):
+    heat = Heat(minutes=mongo_result['minutes'],
+                body_part_location=mongo_result['body_part_location'],
+                side=mongo_result['side'])
+    heat.before_training = mongo_result.get('before_training', True)
+    heat.goals = set([_athlete_goal_from_mongo(goal) for goal in mongo_result.get('goals', [])])
+    heat.completed = mongo_result.get('completed', False)
+    heat.active = mongo_result.get('active', False)
+    return heat
+
+
+def _ice_from_mongo(mongo_result):
+    ice = Ice(minutes=mongo_result['minutes'],
+                body_part_location=mongo_result['body_part_location'],
+                side=mongo_result['side'])
+    ice.before_training = mongo_result.get('before_training', True)
+    ice.goals = set([_athlete_goal_from_mongo(goal) for goal in mongo_result.get('goals', [])])
+    ice.completed = mongo_result.get('completed', False)
+    ice.active = mongo_result.get('active', False)
+    return ice
+
+
+
