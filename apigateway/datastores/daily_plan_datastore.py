@@ -74,13 +74,15 @@ class DailyPlanDatastore(object):
                 daily_plan.completed_post_recovery_sessions = \
                     [_recovery_session_from_mongodb(s) for s in plan.get('completed_post_recovery_sessions', [])]
 
+                # daily_plan.pre_active_rest = ActiveRestBeforeTraining.json_deserialise(plan['pre_active_rest']) if plan.get('pre_active_rest', None) is not None else None
+                # daily_plan.post_active_rest = ActiveRestAfterTraining.json_deserialise(plan['post_active_rest']) if plan.get('post_active_rest', None) is not None else None
                 daily_plan.pre_active_rest = _pre_active_rest_from_mongodb(plan['pre_active_rest']) if plan.get('pre_active_rest', None) is not None else None
                 daily_plan.post_active_rest = _post_active_rest_from_mongodb(plan['post_active_rest']) if plan.get('post_active_rest', None) is not None else None
-                daily_plan.heat = [_heat_from_mongo(heat) for heat in plan.get('heat', [])]
+                daily_plan.heat = [Heat.json_deserialise(heat) for heat in plan.get('heat', [])]
                 # daily_plan.warm_up = plan.get('warm_up', None)
                 # daily_plan.cool_down = plan.get('cool_down', None)
                 # daily_plan.active_recovery = plan.get('active_recovery', None)
-                daily_plan.ice = [_ice_from_mongo(ice) for ice in plan.get('ice', [])]
+                daily_plan.ice = [Ice.json_deserialise(ice) for ice in plan.get('ice', [])]
                 #daily_plan.functional_strength_session = \
                 #    _functional_strength_session_from_mongodb(plan['functional_strength_session']) if plan.get('functional_strength_session', None) is not None else None
             #daily_plan.bump_up_sessions = \
@@ -255,22 +257,10 @@ def _assigned_exercises_from_mongodb(mongo_result):
     assigned_exercise.exercise.seconds_per_rep = mongo_result.get("seconds_per_rep", 0)
     assigned_exercise.goal_text = mongo_result.get("goal_text", "")
     assigned_exercise.equipment_required = mongo_result.get("equipment_required", [])
-    assigned_exercise.goals = set([_athlete_goal_from_mongo(goal) for goal in mongo_result.get('goals', [])])
+    assigned_exercise.goals = set([AthleteGoal.json_deserialise(goal) for goal in mongo_result.get('goals', [])])
     assigned_exercise.priorities = set(mongo_result.get('priorities', []))
-    assigned_exercise.soreness_sources = set([_soreness_from_mongo(soreness) for soreness in mongo_result.get('soreness_sources', [])])
+    assigned_exercise.soreness_sources = set([Soreness.json_deserialise(soreness) for soreness in mongo_result.get('soreness_sources', [])])
     return assigned_exercise
-
-
-def _athlete_goal_from_mongo(mongo_result):
-    goal = AthleteGoal(text=mongo_result['text'], priority=mongo_result['priority'])
-    goal.trigger = mongo_result.get('trigger', '')
-    return goal
-
-
-def _soreness_from_mongo(mongo_result):
-    soreness = Soreness()
-    soreness.soreness_from_dict(mongo_result)
-    return soreness
 
 
 def _daily_readiness_from_mongo(mongo_result, user_id):
@@ -334,7 +324,7 @@ def _heat_from_mongo(mongo_result):
                 body_part_location=mongo_result['body_part_location'],
                 side=mongo_result['side'])
     heat.before_training = mongo_result.get('before_training', True)
-    heat.goals = set([_athlete_goal_from_mongo(goal) for goal in mongo_result.get('goals', [])])
+    heat.goals = set([AthleteGoal.json_deserialise(goal) for goal in mongo_result.get('goals', [])])
     heat.completed = mongo_result.get('completed', False)
     heat.active = mongo_result.get('active', False)
     return heat
@@ -345,10 +335,7 @@ def _ice_from_mongo(mongo_result):
                 body_part_location=mongo_result['body_part_location'],
                 side=mongo_result['side'])
     ice.before_training = mongo_result.get('before_training', True)
-    ice.goals = set([_athlete_goal_from_mongo(goal) for goal in mongo_result.get('goals', [])])
+    ice.goals = set([AthleteGoal.json_deserialise(goal) for goal in mongo_result.get('goals', [])])
     ice.completed = mongo_result.get('completed', False)
     ice.active = mongo_result.get('active', False)
     return ice
-
-
-

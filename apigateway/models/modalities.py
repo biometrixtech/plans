@@ -20,6 +20,13 @@ class AthleteGoal(object):
         }
         return ret
 
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        goal = cls(text=input_dict['text'], priority=input_dict['priority'])
+        goal.trigger = input_dict.get('trigger', "")
+
+        return goal
+
 
 class Heat(Serialisable):
     def __init__(self, minutes=0, body_part_location=None, side=0):
@@ -44,6 +51,18 @@ class Heat(Serialisable):
         }
 
         return ret
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        heat = cls(minutes=input_dict['minutes'],
+                   body_part_location=input_dict['body_part_location'],
+                   side=input_dict['side'])
+        heat.before_training = input_dict.get('before_training', True)
+        heat.goals = set([AthleteGoal.json_deserialise(goal) for goal in input_dict.get('goals', [])])
+        heat.completed = input_dict.get('completed', False)
+        heat.active = input_dict.get('active', True)
+
+        return heat
 
 
 class ActiveRest(object):
@@ -579,6 +598,20 @@ class Ice(Serialisable):
         }
 
         return ret
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        ice = cls(minutes=input_dict['minutes'],
+                   body_part_location=input_dict['body_part_location'],
+                   side=input_dict['side'])
+        ice.after_training = input_dict.get('after_training', False)
+        ice.immediately_after_training = input_dict.get('immediately_after_training', False)
+        ice.repeat_every_3hrs_for_24hrs = input_dict.get('repeat_every_3hrs_for_24hrs', False)
+        ice.completed = input_dict.get('completed', False)
+        ice.active = input_dict.get('active', True)
+        ice.goals = set([AthleteGoal.json_deserialise(goal) for goal in input_dict.get('goals', [])])
+
+        return ice
 
 
 class ColdWaterImmersion(Serialisable):

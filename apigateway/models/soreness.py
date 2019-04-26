@@ -80,16 +80,19 @@ class Soreness(BaseSoreness, Serialisable):
         self.first_reported = None
         self.daily = True
 
-    def soreness_from_dict(self, soreness_dict):
-        self.body_part = BodyPart(BodyPartLocation(soreness_dict['body_part']), None)
-        self.pain = soreness_dict.get('pain', False)
-        self.severity = soreness_dict['severity']
-        self.movement = soreness_dict.get('movement', None)
-        self.side = soreness_dict.get('side', None)
-        if soreness_dict.get('first_reported', None) is not None:
-            self.first_reported = parse_datetime(soreness_dict['first_reported'])
-        if soreness_dict.get('reported_date_time', None) is not None:
-            self.reported_date_time = parse_datetime(soreness_dict['reported_date_time'])
+    @classmethod
+    def json_deserialise(cls, soreness_json):
+        soreness = cls()
+        soreness.body_part = BodyPart(BodyPartLocation(soreness_json['body_part']), None)
+        soreness.pain = soreness_json.get('pain', False)
+        soreness.severity = soreness_json['severity']
+        soreness.movement = soreness_json.get('movement', None)
+        soreness.side = soreness_json.get('side', None)
+        if soreness_json.get('first_reported', None) is not None:
+            soreness.first_reported = parse_datetime(soreness_json['first_reported'])
+        if soreness_json.get('reported_date_time', None) is not None:
+            soreness.reported_date_time = parse_datetime(soreness_json['reported_date_time'])
+        return soreness
 
     def __hash__(self):
         return hash((self.body_part.location, self.side))
