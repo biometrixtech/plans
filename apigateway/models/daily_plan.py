@@ -101,29 +101,12 @@ class DailyPlan(Serialisable):
             return False
 
     def define_landing_screen(self):
-        return 0.0, 0.0
-        # if not self.daily_readiness_survey_completed():
-        #     return 0.0, 0.0
-        # elif self.post_active_rest is not None and self.post_active_rest.display_exercises:
-        #     if self.post_active_rest.duration_minutes == 0.0:
-        #         return 2.0, None
-        #     else:
-        #         return 2.0, 2.0
-        # elif self.post_active_rest is not None and not self.post_active_rest.display_exercises and self.post_active_rest.completed:
-        #     return 2.0, None
-        # elif self.pre_active_rest is not None and self.pre_active_rest.display_exercises:
-        #     if self.pre_active_rest.duration_minutes == 0.0:
-        #         return 0.0, 1.0
-        #     else:
-        #         return 0.0, 0.0
-        # elif (self.pre_active_rest is not None and
-        #       self.post_active_rest is not None and
-        #       not self.pre_active_rest.display_exercises and
-        #       not self.post_active_rest.display_exercises and
-        #       not self.post_active_rest.completed):
-        #     return 1.0, 1.0
-        # else:
-        #     return 0.0, None
+        if self.post_active_rest is not None:
+            return 2.0, None
+        elif self.post_active_rest is None and self.pre_active_rest is not None and self.pre_active_rest.completed:
+            return 1.0, None
+        else:
+            return 0.0, None
 
     def get_past_sessions(self, trigger_date_time):
 
