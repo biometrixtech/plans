@@ -96,29 +96,66 @@ class ActiveRest(object):
     def update_dosage(self, soreness, assigned_exercise):
 
         if soreness.severity < 0.5:
-            assigned_exercise.complete_reps_assigned = max(assigned_exercise.complete_reps_assigned,
+            assigned_exercise.efficient_reps_assigned = max(assigned_exercise.efficient_reps_assigned,
                                                   assigned_exercise.exercise.min_reps)
+            assigned_exercise.efficient_sets_assigned = max(assigned_exercise.efficient_sets_assigned, 1)
+            assigned_exercise.complete_reps_assigned = max(assigned_exercise.complete_reps_assigned,
+                                                           assigned_exercise.exercise.min_reps)
             assigned_exercise.complete_sets_assigned = max(assigned_exercise.complete_sets_assigned, 1)
+            assigned_exercise.comprehensive_reps_assigned = max(assigned_exercise.comprehensive_reps_assigned,
+                                                           assigned_exercise.exercise.min_reps)
+            assigned_exercise.comprehensive_sets_assigned = max(assigned_exercise.comprehensive_sets_assigned, 1)
         elif 0.5 <= soreness.severity < 1.5:
-            assigned_exercise.complete_reps_assigned = max(assigned_exercise.complete_reps_assigned,
+            assigned_exercise.efficient_reps_assigned = max(assigned_exercise.efficient_reps_assigned,
                                                   assigned_exercise.exercise.min_reps)
+            assigned_exercise.efficient_sets_assigned = max(assigned_exercise.efficient_sets_assigned, 1)
+            assigned_exercise.complete_reps_assigned = max(assigned_exercise.complete_reps_assigned,
+                                                           assigned_exercise.exercise.min_reps)
             assigned_exercise.complete_sets_assigned = max(assigned_exercise.complete_sets_assigned, 1)
+            assigned_exercise.comprehensive_reps_assigned = max(assigned_exercise.comprehensive_reps_assigned,
+                                                           assigned_exercise.exercise.min_reps)
+            assigned_exercise.comprehensive_sets_assigned = max(assigned_exercise.comprehensive_sets_assigned, 1)
         elif 1.5 <= soreness.severity < 2.5:
+            assigned_exercise.efficient_reps_assigned = max(assigned_exercise.efficient_reps_assigned,
+                                                           assigned_exercise.exercise.min_reps)
+            assigned_exercise.efficient_sets_assigned = max(assigned_exercise.efficient_sets_assigned, 1)
             assigned_exercise.complete_reps_assigned = max(assigned_exercise.complete_reps_assigned,
                                                   assigned_exercise.exercise.max_reps)
             assigned_exercise.complete_sets_assigned = max(assigned_exercise.complete_sets_assigned, 1)
+            assigned_exercise.comprehensive_reps_assigned = max(assigned_exercise.comprehensive_reps_assigned,
+                                                           assigned_exercise.exercise.max_reps)
+            assigned_exercise.comprehensive_sets_assigned = max(assigned_exercise.comprehensive_sets_assigned, 1)
         elif 2.5 <= soreness.severity < 3.5:
+            assigned_exercise.efficient_reps_assigned = max(assigned_exercise.efficient_reps_assigned,
+                                                            assigned_exercise.exercise.min_reps)
+            assigned_exercise.efficient_sets_assigned = max(assigned_exercise.efficient_sets_assigned, 1)
             assigned_exercise.complete_reps_assigned = max(assigned_exercise.complete_reps_assigned,
                                                   assigned_exercise.exercise.max_reps)
             assigned_exercise.complete_sets_assigned = max(assigned_exercise.complete_sets_assigned, 1)
+            assigned_exercise.comprehensive_reps_assigned = max(assigned_exercise.comprehensive_reps_assigned,
+                                                                assigned_exercise.exercise.max_reps)
+            assigned_exercise.comprehensive_sets_assigned = max(assigned_exercise.comprehensive_sets_assigned, 2)
         elif 3.5 <= soreness.severity < 4.5:
+            assigned_exercise.efficient_reps_assigned = max(assigned_exercise.efficient_reps_assigned,
+                                                            assigned_exercise.exercise.min_reps)
+            assigned_exercise.efficient_sets_assigned = max(assigned_exercise.efficient_sets_assigned, 1)
             assigned_exercise.complete_reps_assigned = max(assigned_exercise.complete_reps_assigned,
                                                   assigned_exercise.exercise.max_reps)
             assigned_exercise.complete_sets_assigned = max(assigned_exercise.complete_sets_assigned, 1)
+            assigned_exercise.comprehensive_reps_assigned = max(assigned_exercise.comprehensive_reps_assigned,
+                                                                assigned_exercise.exercise.max_reps)
+            assigned_exercise.comprehensive_sets_assigned = max(assigned_exercise.comprehensive_sets_assigned, 2)
         elif soreness.severity >= 4.5:
+            assigned_exercise.efficient_reps_assigned = max(assigned_exercise.efficient_reps_assigned,
+                                                           assigned_exercise.exercise.max_reps)
+            assigned_exercise.efficient_sets_assigned = max(assigned_exercise.efficient_sets_assigned, 1)
+
             assigned_exercise.complete_reps_assigned = max(assigned_exercise.complete_reps_assigned,
                                                   assigned_exercise.exercise.max_reps)
             assigned_exercise.complete_sets_assigned = max(assigned_exercise.complete_sets_assigned, 2)
+            assigned_exercise.comprehensive_reps_assigned = max(assigned_exercise.comprehensive_reps_assigned,
+                                                                assigned_exercise.exercise.max_reps)
+            assigned_exercise.comprehensive_sets_assigned = max(assigned_exercise.comprehensive_sets_assigned, 3)
 
         return assigned_exercise
 
