@@ -77,7 +77,7 @@ class ExerciseLibraryDatastore(object):
                             exercise_item.seconds_per_rep = int(row[21])
                         exercise_item.progresses_to = row[22]
                         exercise_item.technical_difficulty = row[24]
-                        exercise_item.equipment_required = row[25]
+                        exercise_item.equipment_required = [row[25]]
                         exercise_item.youtube_id = None
                     except KeyError:
                         pass # just an empty line

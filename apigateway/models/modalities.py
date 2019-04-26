@@ -88,6 +88,7 @@ class ActiveRest(object):
                 target_collection[s.exercise.id] = AssignedExercise(library_id=str(s.exercise.id))
                 exercise_list = [ex for ex in exercise_library if ex.id == str(s.exercise.id)]
                 target_collection[s.exercise.id].exercise = exercise_list[0]
+                target_collection[s.exercise.id].equipment_required = target_collection[s.exercise.id].exercise.equipment_required
 
             target_collection[s.exercise.id] = self.update_dosage(soreness, target_collection[s.exercise.id])
             target_collection[s.exercise.id].goals.add(goal)
