@@ -150,10 +150,18 @@ def get_goals_triggers(assigned_exercises):
     goal_trigger_list = []
 
     for key, assigned_exercise in assigned_exercises.items():
-        goals = list(g.text.replace(',','-') + '-->' + g.trigger.replace(',',';') for g in assigned_exercises[key].goals)
-        goal_trigger_list.extend(goals)
+        for d in assigned_exercises[key].dosages:
+            goals = 'Goal=' + d.goal.text.replace(',','-') + '-->' + d.goal.trigger.replace(',',';') + ' Priority=' + d.priority + ' Dosages='
+            goals += "Eff Reps="+ str(d.efficient_reps_assigned) + ' & Eff Sets=' + str(d.efficient_sets_assigned)
+            goals += " & Complete Reps=" + str(d.complete_reps_assigned) + ' & Complete Sets=' + str(
+                d.complete_sets_assigned)
+            goals += " & Compr Reps=" + str(d.comprehensive_reps_assigned) + ' & Compr Sets=' + str(
+                d.comprehensive_sets_assigned)
+            goal_trigger_list.append(goals)
 
-    return list(set(goal_trigger_list))
+    unique_list = set(goal_trigger_list)
+
+    return unique_list
 
 def calc_active_time_efficient(exercise_dictionary):
 
@@ -211,7 +219,7 @@ def test_pre_active_rest_limited_body_parts():
                                   HistoricSorenessStatus.persistent_2_soreness]
 
     f = open('pre_ar_plans_time.csv', 'w')
-    line = ('BodyPart,is_pain,severity,hs_status,'+
+    line = ('BodyPart,is_pain,severity,hs_status,default_plan'+
             'inhibit_goals_triggers,inhibit_minutes_efficient,inhibit_miniutes_complete, inhibit_minutes_comprehensive,'+
             'inhibit_exercises,static_stretch_goals_triggers,static_stretch_minutes_efficient,'+
             'static_stretch_minutes_complete,static_stretch_minutes_comprehensive, static_stretch_exercises,' +
@@ -243,6 +251,8 @@ def test_pre_active_rest_limited_body_parts():
 
                     daily_plan = create_plan(body_part_list=[b1], severity_list=[m1], side_list=[1],
                                              pain_list=[p], historic_soreness_list=[historic_soreness])
+
+                    body_part_line += ',' + daily_plan.pre_active_rest.default_plan
 
                     inhibit_goals_triggers = get_goals_triggers(daily_plan.pre_active_rest.inhibit_exercises)
                     static_stretch_goals_triggers = get_goals_triggers(daily_plan.pre_active_rest.static_stretch_exercises)
