@@ -94,6 +94,11 @@ class ActiveRest(object):
         else:
             self.default_plan = "Complete"
 
+    def rank_dosages(self, target_collections):
+        for target_collection in target_collections:
+            for ex in target_collection.values():
+                ex.set_dosage_ranking()
+
     def fill_exercises(self, soreness_list, event_date_time, exercise_library):
 
         for s in soreness_list:
@@ -117,6 +122,7 @@ class ActiveRest(object):
             dosage.goal = goal
             dosage = self.update_dosage(dosage, target_collection[s.exercise.id].exercise)
             target_collection[s.exercise.id].dosages.append(dosage)
+            # target_collection[s.exercise.id].set_dosage_ranking()
 
     def update_dosage(self, dosage, exercise):
 
@@ -128,151 +134,151 @@ class ActiveRest(object):
                 dosage.goal.goal_type == AthleteGoalType.preempt_corrective):
             if dosage.soreness_source.severity < 0.5:
                 if dosage.priority == "1":
-                    dosage.efficient_reps_assigned = max(dosage.efficient_reps_assigned, exercise.min_reps)
-                    dosage.efficient_sets_assigned = max(dosage.efficient_sets_assigned, 1)
+                    dosage.efficient_reps_assigned = exercise.min_reps
+                    dosage.efficient_sets_assigned = 1
                 else:
                     dosage.efficient_reps_assigned = 0
                     dosage.efficient_sets_assigned = 0
                 if dosage.priority == "1" or dosage.priority == "2":
-                    dosage.complete_reps_assigned = max(dosage.complete_reps_assigned, exercise.min_reps)
-                    dosage.complete_sets_assigned = max(dosage.complete_sets_assigned, 1)
+                    dosage.complete_reps_assigned = exercise.min_reps
+                    dosage.complete_sets_assigned = 1
                 else:
                     dosage.complete_reps_assigned = 0
                     dosage.complete_sets_assigned = 0
 
-                dosage.comprehensive_reps_assigned = max(dosage.comprehensive_reps_assigned, exercise.min_reps)
-                dosage.comprehensive_sets_assigned = max(dosage.comprehensive_sets_assigned, 1)
+                dosage.comprehensive_reps_assigned = exercise.min_reps
+                dosage.comprehensive_sets_assigned = 1
             elif 0.5 <= dosage.soreness_source.severity < 1.5:
                 if dosage.priority == "1":
-                    dosage.efficient_reps_assigned = max(dosage.efficient_reps_assigned, exercise.min_reps)
-                    dosage.efficient_sets_assigned = max(dosage.efficient_sets_assigned, 1)
+                    dosage.efficient_reps_assigned = exercise.min_reps
+                    dosage.efficient_sets_assigned = 1
                 else:
                     dosage.efficient_reps_assigned = 0
                     dosage.efficient_sets_assigned = 0
 
                 if dosage.priority == "1" or dosage.priority == "2":
-                    dosage.complete_reps_assigned = max(dosage.complete_reps_assigned, exercise.min_reps)
-                    dosage.complete_sets_assigned = max(dosage.complete_sets_assigned, 1)
+                    dosage.complete_reps_assigned = exercise.min_reps
+                    dosage.complete_sets_assigned = 1
                 else:
                     dosage.complete_reps_assigned = 0
                     dosage.complete_sets_assigned = 0
-                dosage.comprehensive_reps_assigned = max(dosage.comprehensive_reps_assigned, exercise.min_reps)
-                dosage.comprehensive_sets_assigned = max(dosage.comprehensive_sets_assigned, 1)
+                dosage.comprehensive_reps_assigned = exercise.min_reps
+                dosage.comprehensive_sets_assigned = 1
             elif 1.5 <= dosage.soreness_source.severity < 2.5:
                 if dosage.priority == "1":
-                    dosage.efficient_reps_assigned = max(dosage.efficient_reps_assigned, exercise.min_reps)
-                    dosage.efficient_sets_assigned = max(dosage.efficient_sets_assigned, 1)
+                    dosage.efficient_reps_assigned = exercise.min_reps
+                    dosage.efficient_sets_assigned = 1
                 else:
                     dosage.efficient_reps_assigned = 0
                     dosage.efficient_sets_assigned = 0
                 if dosage.priority == "1" or dosage.priority == "2":
-                    dosage.complete_reps_assigned = max(dosage.complete_reps_assigned, exercise.max_reps)
-                    dosage.complete_sets_assigned = max(dosage.complete_sets_assigned, 1)
+                    dosage.complete_reps_assigned = exercise.max_reps
+                    dosage.complete_sets_assigned = 1
                 else:
                     dosage.complete_reps_assigned = 0
                     dosage.complete_sets_assigned = 0
-                dosage.comprehensive_reps_assigned = max(dosage.comprehensive_reps_assigned, exercise.max_reps)
-                dosage.comprehensive_sets_assigned = max(dosage.comprehensive_sets_assigned, 1)
+                dosage.comprehensive_reps_assigned = exercise.max_reps
+                dosage.comprehensive_sets_assigned = 1
             elif 2.5 <= dosage.soreness_source.severity < 3.5:
                 if dosage.priority == "1" or dosage.priority == "2":
-                    dosage.efficient_reps_assigned = max(dosage.efficient_reps_assigned, exercise.min_reps)
-                    dosage.efficient_sets_assigned = max(dosage.efficient_sets_assigned, 1)
+                    dosage.efficient_reps_assigned = exercise.min_reps
+                    dosage.efficient_sets_assigned = 1
                 else:
                     dosage.efficient_reps_assigned = 0
                     dosage.efficient_sets_assigned = 0
 
-                dosage.complete_reps_assigned = max(dosage.complete_reps_assigned, exercise.max_reps)
-                dosage.complete_sets_assigned = max(dosage.complete_sets_assigned, 1)
-                dosage.comprehensive_reps_assigned = max(dosage.comprehensive_reps_assigned, exercise.max_reps)
-                dosage.comprehensive_sets_assigned = max(dosage.comprehensive_sets_assigned, 2)
+                dosage.complete_reps_assigned = exercise.max_reps
+                dosage.complete_sets_assigned = 1
+                dosage.comprehensive_reps_assigned = exercise.max_reps
+                dosage.comprehensive_sets_assigned = 2
             elif 3.5 <= dosage.soreness_source.severity < 4.5:
-                dosage.efficient_reps_assigned = max(dosage.efficient_reps_assigned, exercise.min_reps)
-                dosage.efficient_sets_assigned = max(dosage.efficient_sets_assigned, 1)
-                dosage.complete_reps_assigned = max(dosage.complete_reps_assigned, exercise.max_reps)
-                dosage.complete_sets_assigned = max(dosage.complete_sets_assigned, 1)
-                dosage.comprehensive_reps_assigned = max(dosage.comprehensive_reps_assigned, exercise.max_reps)
-                dosage.comprehensive_sets_assigned = max(dosage.comprehensive_sets_assigned, 2)
+                dosage.efficient_reps_assigned = exercise.min_reps
+                dosage.efficient_sets_assigned = 1
+                dosage.complete_reps_assigned = exercise.max_reps
+                dosage.complete_sets_assigned = 1
+                dosage.comprehensive_reps_assigned = exercise.max_reps
+                dosage.comprehensive_sets_assigned = 2
             elif dosage.soreness_source.severity >= 4.5:
-                dosage.efficient_reps_assigned = max(dosage.efficient_reps_assigned, exercise.max_reps)
-                dosage.efficient_sets_assigned = max(dosage.efficient_sets_assigned, 1)
+                dosage.efficient_reps_assigned = exercise.max_reps
+                dosage.efficient_sets_assigned = 1
 
-                dosage.complete_reps_assigned = max(dosage.complete_reps_assigned, exercise.max_reps)
-                dosage.complete_sets_assigned = max(dosage.complete_sets_assigned, 2)
-                dosage.comprehensive_reps_assigned = max(dosage.comprehensive_reps_assigned, exercise.max_reps)
-                dosage.comprehensive_sets_assigned = max(dosage.comprehensive_sets_assigned, 3)
+                dosage.complete_reps_assigned = exercise.max_reps
+                dosage.complete_sets_assigned = 2
+                dosage.comprehensive_reps_assigned = exercise.max_reps
+                dosage.comprehensive_sets_assigned = 3
 
         else:
             if dosage.soreness_source.severity < 0.5:
                 if dosage.priority == "1":
-                    dosage.efficient_reps_assigned = max(dosage.efficient_reps_assigned, exercise.min_reps)
-                    dosage.efficient_sets_assigned = max(dosage.efficient_sets_assigned, 1)
+                    dosage.efficient_reps_assigned = exercise.min_reps
+                    dosage.efficient_sets_assigned = 1
                 else:
                     dosage.efficient_reps_assigned = 0
                     dosage.efficient_sets_assigned = 0
                 if dosage.priority == "1" or dosage.priority == "2":
-                    dosage.complete_reps_assigned = max(dosage.complete_reps_assigned, exercise.min_reps)
-                    dosage.complete_sets_assigned = max(dosage.complete_sets_assigned, 1)
+                    dosage.complete_reps_assigned = exercise.min_reps
+                    dosage.complete_sets_assigned = 1
                 else:
                     dosage.complete_reps_assigned = 0
                     dosage.complete_sets_assigned = 0
 
-                dosage.comprehensive_reps_assigned = max(dosage.comprehensive_reps_assigned, exercise.min_reps)
-                dosage.comprehensive_sets_assigned = max(dosage.comprehensive_sets_assigned, 1)
+                dosage.comprehensive_reps_assigned = exercise.min_reps
+                dosage.comprehensive_sets_assigned = 1
             elif 0.5 <= dosage.soreness_source.severity < 1.5:
                 if dosage.priority == "1":
-                    dosage.efficient_reps_assigned = max(dosage.efficient_reps_assigned, exercise.min_reps)
-                    dosage.efficient_sets_assigned = max(dosage.efficient_sets_assigned, 1)
+                    dosage.efficient_reps_assigned = exercise.min_reps
+                    dosage.efficient_sets_assigned = 1
                 else:
                     dosage.efficient_reps_assigned = 0
                     dosage.efficient_sets_assigned = 0
 
                 if dosage.priority == "1" or dosage.priority == "2":
-                    dosage.complete_reps_assigned = max(dosage.complete_reps_assigned, exercise.max_reps)
-                    dosage.complete_sets_assigned = max(dosage.complete_sets_assigned, 1)
+                    dosage.complete_reps_assigned = exercise.max_reps
+                    dosage.complete_sets_assigned = 1
                 else:
                     dosage.complete_reps_assigned = 0
                     dosage.complete_sets_assigned = 0
-                dosage.comprehensive_reps_assigned = max(dosage.comprehensive_reps_assigned, exercise.max_reps)
-                dosage.comprehensive_sets_assigned = max(dosage.comprehensive_sets_assigned, 1)
+                dosage.comprehensive_reps_assigned = exercise.max_reps
+                dosage.comprehensive_sets_assigned = 1
             elif 1.5 <= dosage.soreness_source.severity < 2.5:
                 if dosage.priority == "1":
-                    dosage.efficient_reps_assigned = max(dosage.efficient_reps_assigned, exercise.min_reps)
-                    dosage.efficient_sets_assigned = max(dosage.efficient_sets_assigned, 1)
+                    dosage.efficient_reps_assigned = exercise.min_reps
+                    dosage.efficient_sets_assigned = 1
                 else:
                     dosage.efficient_reps_assigned = 0
                     dosage.efficient_sets_assigned = 0
 
-                dosage.complete_reps_assigned = max(dosage.complete_reps_assigned, exercise.max_reps)
-                dosage.complete_sets_assigned = max(dosage.complete_sets_assigned, 1)
+                dosage.complete_reps_assigned = exercise.max_reps
+                dosage.complete_sets_assigned = 1
 
-                dosage.comprehensive_reps_assigned = max(dosage.comprehensive_reps_assigned, exercise.max_reps)
-                dosage.comprehensive_sets_assigned = max(dosage.comprehensive_sets_assigned, 1)
+                dosage.comprehensive_reps_assigned = exercise.max_reps
+                dosage.comprehensive_sets_assigned = 1
 
             elif 2.5 <= dosage.soreness_source.severity < 3.5:
 
-                dosage.efficient_reps_assigned = max(dosage.efficient_reps_assigned, exercise.min_reps)
-                dosage.efficient_sets_assigned = max(dosage.efficient_sets_assigned, 1)
-                dosage.complete_reps_assigned = max(dosage.complete_reps_assigned, exercise.max_reps)
-                dosage.complete_sets_assigned = max(dosage.complete_sets_assigned, 1)
-                dosage.comprehensive_reps_assigned = max(dosage.comprehensive_reps_assigned, exercise.max_reps)
-                dosage.comprehensive_sets_assigned = max(dosage.comprehensive_sets_assigned, 2)
+                dosage.efficient_reps_assigned = exercise.min_reps
+                dosage.efficient_sets_assigned = 1
+                dosage.complete_reps_assigned = exercise.max_reps
+                dosage.complete_sets_assigned = 1
+                dosage.comprehensive_reps_assigned = exercise.max_reps
+                dosage.comprehensive_sets_assigned = 2
 
             elif 3.5 <= dosage.soreness_source.severity < 4.5:
-                dosage.efficient_reps_assigned = max(dosage.efficient_reps_assigned, exercise.max_reps)
-                dosage.efficient_sets_assigned = max(dosage.efficient_sets_assigned, 1)
+                dosage.efficient_reps_assigned = exercise.max_reps
+                dosage.efficient_sets_assigned = 1
 
-                dosage.complete_reps_assigned = max(dosage.complete_reps_assigned, exercise.max_reps)
-                dosage.complete_sets_assigned = max(dosage.complete_sets_assigned, 2)
-                dosage.comprehensive_reps_assigned = max(dosage.comprehensive_reps_assigned, exercise.max_reps)
-                dosage.comprehensive_sets_assigned = max(dosage.comprehensive_sets_assigned, 3)
+                dosage.complete_reps_assigned = exercise.max_reps
+                dosage.complete_sets_assigned = 2
+                dosage.comprehensive_reps_assigned = exercise.max_reps
+                dosage.comprehensive_sets_assigned = 3
             elif dosage.soreness_source.severity >= 4.5:
-                dosage.efficient_reps_assigned = max(dosage.efficient_reps_assigned, exercise.max_reps)
-                dosage.efficient_sets_assigned = max(dosage.efficient_sets_assigned, 1)
+                dosage.efficient_reps_assigned = exercise.max_reps
+                dosage.efficient_sets_assigned = 1
 
-                dosage.complete_reps_assigned = max(dosage.complete_reps_assigned, exercise.max_reps)
-                dosage.complete_sets_assigned = max(dosage.complete_sets_assigned, 2)
-                dosage.comprehensive_reps_assigned = max(dosage.comprehensive_reps_assigned, exercise.max_reps)
-                dosage.comprehensive_sets_assigned = max(dosage.comprehensive_sets_assigned, 3)
+                dosage.complete_reps_assigned = exercise.max_reps
+                dosage.complete_sets_assigned = 2
+                dosage.comprehensive_reps_assigned = exercise.max_reps
+                dosage.comprehensive_sets_assigned = 3
 
         return dosage
 
@@ -492,6 +498,13 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
                             self.copy_exercises(stabilizer.active_stretch_exercises, self.active_stretch_exercises, goal, "3", soreness,
                                                 exercise_library)
 
+    def set_exercise_dosage_ranking(self):
+        self.rank_dosages([self.inhibit_exercises,
+                           self.static_stretch_exercises,
+                           self.active_stretch_exercises,
+                           self.isolated_activate_exercises,
+                           self.static_integrate_exercises])
+
 
 class ActiveRestAfterTraining(ActiveRest, Serialisable):
     def __init__(self):
@@ -686,6 +699,12 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
                         self.copy_exercises(stabilizer.inhibit_exercises, self.inhibit_exercises, goal, "3", soreness, exercise_library)
                         if soreness.severity < 3.5:
                             self.copy_exercises(stabilizer.static_stretch_exercises, self.static_stretch_exercises, goal, "3", soreness, exercise_library)
+
+    def set_exercise_dosage_ranking(self):
+        self.rank_dosages([self.inhibit_exercises,
+                           self.static_stretch_exercises,
+                           self.isolated_activate_exercises,
+                           self.static_integrate_exercises])
 
 
 class WarmUp(Serialisable):

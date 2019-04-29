@@ -394,7 +394,12 @@ class ExerciseDosage(object):
         self.complete_sets_assigned = 0
         self.comprehensive_reps_assigned = 0
         self.comprehensive_sets_assigned = 0
+        self.ranking = 0
 
+    def get_total_dosage(self):
+        return self.efficient_reps_assigned * self.efficient_sets_assigned + \
+         self.complete_reps_assigned * self.complete_sets_assigned + \
+         self.comprehensive_reps_assigned * self.comprehensive_sets_assigned
 
     def json_serialise(self):
         ret = {'goal': self.goal.json_serialise() if self.goal is not None else None,
@@ -405,7 +410,8 @@ class ExerciseDosage(object):
                'complete_reps_assigned': self.complete_reps_assigned,
                'complete_sets_assigned': self.complete_sets_assigned,
                'comprehensive_reps_assigned': self.comprehensive_reps_assigned,
-               'comprehensive_sets_assigned': self.comprehensive_sets_assigned
+               'comprehensive_sets_assigned': self.comprehensive_sets_assigned,
+               'ranking': self.ranking
                }
         return ret
 
@@ -423,6 +429,7 @@ class ExerciseDosage(object):
         dosage.complete_sets_assigned = input_dict.get('complete_sets_assigned', 0)
         dosage.comprehensive_reps_assigned = input_dict.get('comprehensive_reps_assigned', 0)
         dosage.comprehensive_sets_assigned = input_dict.get('comprehensive_sets_assigned', 0)
+        dosage.ranking = input_dict.get('ranking', 0)
 
         return dosage
 
@@ -446,6 +453,15 @@ class AssignedExercise(Serialisable):
         #self.priorities = set()
         #self.soreness_sources = set()
         self.dosages = []
+
+
+    def set_dosage_ranking(self):
+        if len(self.dosages) > 1:
+            self.dosages = sorted(self.dosages, key=lambda x: x.get_total_dosage(), reverse=True)
+            rank = 0
+            for dosage in self.dosages:
+                dosage.ranking = rank
+                rank += 1
 
     def duration_efficient(self):
 

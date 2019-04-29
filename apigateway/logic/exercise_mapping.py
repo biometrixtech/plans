@@ -755,6 +755,7 @@ class ExerciseAssignmentCalculator(object):
             active_rest = ActiveRestBeforeTraining()
             active_rest.fill_exercises(soreness_list, event_date_time, self.exercise_library)
             active_rest.set_plan_dosage(soreness_list)
+            active_rest.set_exercise_dosage_ranking()
             return active_rest
         else:
             return None
@@ -765,6 +766,7 @@ class ExerciseAssignmentCalculator(object):
             active_rest = ActiveRestAfterTraining()
             active_rest.fill_exercises(soreness_list, event_date_time, self.exercise_library)
             active_rest.set_plan_dosage(soreness_list)
+            active_rest.set_exercise_dosage_ranking()
             return active_rest
         else:
             return None

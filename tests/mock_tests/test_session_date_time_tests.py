@@ -196,6 +196,11 @@ def test_active_rest_after_training_quad_hist_soreness_knee():
     daily_plan = create_plan(body_part_list=[7, 6], severity_list=[2, 1], side_list=[1, 1], pain_list=[True, False], historic_soreness_list=historic_soreness_list)
     daily_plan_json = daily_plan.json_serialise()
     pre_active_rest = ActiveRestBeforeTraining.json_deserialise(daily_plan_json['pre_active_rest'])
+    # for exercise in pre_active_rest.active_stretch_exercises.values():
+    #     exercise_before = exercise.json_serialise()
+    #     exercise.get_dosage_ranking()
+    #     exercise_after = exercise.json_serialise()
+    #     print('a')
     assert len(daily_plan.pre_active_rest.inhibit_exercises) > 0
     assert len(daily_plan.pre_active_rest.static_stretch_exercises) > 0
     assert len(daily_plan.pre_active_rest.isolated_activate_exercises) > 0
