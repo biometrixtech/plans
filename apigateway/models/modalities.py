@@ -302,7 +302,8 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
             'isolated_activate_exercises': [p.json_serialise() for p in self.isolated_activate_exercises.values()],
             'static_integrate_exercises': [p.json_serialise() for p in self.static_integrate_exercises.values()],
             'completed': self.completed,
-            'active': self.active
+            'active': self.active,
+            'default_plan': self.default_plan
         }
         return ret
 
@@ -321,6 +322,7 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
                                               for s in input_dict['active_stretch_exercises']}
         pre_active_rest.isolated_activate_exercises = {s['library_id']: AssignedExercise.json_deserialise(s)
                                               for s in input_dict['isolated_activate_exercises']}
+        pre_active_rest.default_plan = input_dict.get('default_plan', 'complete')
 
         return pre_active_rest
 
@@ -503,7 +505,8 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
             'isolated_activate_exercises': [p.json_serialise() for p in self.isolated_activate_exercises.values()],
             'static_integrate_exercises': [p.json_serialise() for p in self.static_integrate_exercises.values()],
             'completed': self.completed,
-            'active': self.active
+            'active': self.active,
+            'default_plan': self.default_plan
         }
         return ret
 
@@ -520,6 +523,7 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
                                               for s in input_dict['static_integrate_exercises']}
         post_active_rest.isolated_activate_exercises = {s['library_id']: AssignedExercise.json_deserialise(s)
                                               for s in input_dict['isolated_activate_exercises']}
+        post_active_rest.default_plan = input_dict.get('default_plan', 'complete')
 
         return post_active_rest
 

@@ -396,6 +396,37 @@ class ExerciseDosage(object):
         self.comprehensive_sets_assigned = 0
 
 
+    def json_serialise(self):
+        ret = {'goal': self.goal.json_serialise() if self.goal is not None else None,
+               'priority': self.priority,
+               'soreness_source': self.soreness_source.json_serialise(trigger=True) if self.soreness_source is not None else None,
+               'efficient_reps_assigned': self.efficient_reps_assigned,
+               'efficient_sets_assigned': self.efficient_sets_assigned,
+               'complete_reps_assigned': self.complete_reps_assigned,
+               'complete_sets_assigned': self.complete_sets_assigned,
+               'comprehensive_reps_assigned': self.comprehensive_reps_assigned,
+               'comprehensive_sets_assigned': self.comprehensive_sets_assigned
+               }
+        return ret
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        goal = input_dict.get('goal', None)
+        soreness_source = input_dict.get('soreness_source', None)
+        dosage = cls()
+        dosage.goal = AthleteGoal.json_deserialise(goal) if goal is not None else None
+        dosage.priority = input_dict.get('priority', 0)
+        dosage.soreness_source = Soreness.json_deserialise(soreness_source) if soreness_source is not None else None
+        dosage.efficient_reps_assigned = input_dict.get('efficient_reps_assigned', 0)
+        dosage.efficient_sets_assigned = input_dict.get('efficient_sets_assigned', 0)
+        dosage.complete_reps_assigned = input_dict.get('complete_reps_assigned', 0)
+        dosage.complete_sets_assigned = input_dict.get('complete_sets_assigned', 0)
+        dosage.comprehensive_reps_assigned = input_dict.get('comprehensive_reps_assigned', 0)
+        dosage.comprehensive_sets_assigned = input_dict.get('comprehensive_sets_assigned', 0)
+
+        return dosage
+
+
 class AssignedExercise(Serialisable):
     def __init__(self, library_id, body_part_priority=0, body_part_exercise_priority=0, body_part_soreness_level=0,
                  body_part_location=BodyPartLocation.general, progressions=[]):
@@ -469,7 +500,7 @@ class AssignedExercise(Serialisable):
 
     @classmethod
     def json_deserialise(cls, input_dict):
-        assigned_exercise = AssignedExercise(input_dict.get("library_id", None))
+        assigned_exercise = cls(input_dict.get("library_id", None))
         assigned_exercise.exercise.name = input_dict.get("name", "")
         assigned_exercise.exercise.display_name = input_dict.get("display_name", "")
         assigned_exercise.exercise.youtube_id = input_dict.get("youtube_id", "")
@@ -490,6 +521,7 @@ class AssignedExercise(Serialisable):
         #assigned_exercise.goals = set([AthleteGoal.json_deserialise(goal) for goal in input_dict.get('goals', [])])
         #assigned_exercise.priorities = set(input_dict.get('priorities', []))
         #assigned_exercise.soreness_sources = set([Soreness.json_deserialise(soreness) for soreness in input_dict.get('soreness_sources', [])])
+        assigned_exercise.dosages = [ExerciseDosage.json_deserialise(dosage) for dosage in input_dict.get('dosages', [])]
 
         return assigned_exercise
 
@@ -511,7 +543,8 @@ class AssignedExercise(Serialisable):
                'equipment_required': self.equipment_required,
                #'goals': [goal.json_serialise() for goal in self.goals],
                #'priorities': list(self.priorities),
-               #'soreness_sources': [soreness.json_serialise(trigger=True) for soreness in self.soreness_sources]
+               #'soreness_sources': [soreness.json_serialise(trigger=True) for soreness in self.soreness_sources],
+               'dosages': [dosage.json_serialise() for dosage in self.dosages]
                }
         return ret
 
@@ -569,13 +602,14 @@ class AthleteGoal(object):
             'text': self.text,
             'priority': self.priority,
             'trigger': self.trigger,
-            'goal_type': self.goal_type.value
+            'goal_type': self.goal_type.value if self.goal_type is not None else None
         }
         return ret
 
     @classmethod
     def json_deserialise(cls, input_dict):
-        goal = cls(text=input_dict['text'], priority=input_dict['priority'])
+        goal_type = input_dict.get('goal_type', None)
+        athlete_goal_type = AthleteGoalType(goal_type) if goal_type is not None else None
+        goal = cls(text=input_dict['text'], priority=input_dict['priority'], athlete_goal_type=athlete_goal_type)
         goal.trigger = input_dict.get('trigger', "")
-        goal.goal_type = input_dict.get('goal_type', None)
         return goal

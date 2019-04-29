@@ -15,6 +15,7 @@ from tests.testing_utilities import TestUtilities
 from models.daily_readiness import DailyReadiness
 from models.daily_plan import DailyPlan
 from models.soreness import BodyPartLocation, HistoricSoreness, HistoricSorenessStatus
+from models.modalities import ActiveRestBeforeTraining
 from tests.mocks.mock_exercise_datastore import ExerciseLibraryDatastore
 from tests.mocks.mock_completed_exercise_datastore import CompletedExerciseDatastore
 from tests.mocks.mock_athlete_stats_datastore import AthleteStatsDatastore
@@ -194,6 +195,7 @@ def test_active_rest_after_training_quad_hist_soreness_knee():
 
     daily_plan = create_plan(body_part_list=[7, 6], severity_list=[2, 1], side_list=[1, 1], pain_list=[True, False], historic_soreness_list=historic_soreness_list)
     daily_plan_json = daily_plan.json_serialise()
+    pre_active_rest = ActiveRestBeforeTraining.json_deserialise(daily_plan_json['pre_active_rest'])
     assert len(daily_plan.pre_active_rest.inhibit_exercises) > 0
     assert len(daily_plan.pre_active_rest.static_stretch_exercises) > 0
     assert len(daily_plan.pre_active_rest.isolated_activate_exercises) > 0
