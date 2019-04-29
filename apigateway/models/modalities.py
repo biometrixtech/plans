@@ -814,6 +814,9 @@ class Ice(Serialisable):
             'minutes': self.minutes,
             'body_part_location': self.body_part_location.value,
             'goals': [goal.json_serialise() for goal in self.goals],
+            'after_training': self.after_training,
+            'immediately_after_training': self.immediately_after_training,
+            'repeat_every_3hrs_for_24hrs': self.repeat_every_3hrs_for_24hrs,
             'side': self.side,
             'completed': self.completed,
             'active': self.active
