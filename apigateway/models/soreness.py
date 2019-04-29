@@ -4,7 +4,7 @@ from models.exercise import Exercise, UnitOfMeasure
 from serialisable import Serialisable
 from random import shuffle
 
-from utils import format_datetime, parse_datetime
+from utils import format_datetime, parse_datetime, format_date, parse_date
 
 
 class SorenessType(Enum):
@@ -81,17 +81,18 @@ class Soreness(BaseSoreness, Serialisable):
         self.daily = True
 
     @classmethod
-    def json_deserialise(cls, soreness_json):
+    def json_deserialise(cls, input_dict):
         soreness = cls()
-        soreness.body_part = BodyPart(BodyPartLocation(soreness_json['body_part']), None)
-        soreness.pain = soreness_json.get('pain', False)
-        soreness.severity = soreness_json['severity']
-        soreness.movement = soreness_json.get('movement', None)
-        soreness.side = soreness_json.get('side', None)
-        if soreness_json.get('first_reported', None) is not None:
-            soreness.first_reported = parse_datetime(soreness_json['first_reported'])
-        if soreness_json.get('reported_date_time', None) is not None:
-            soreness.reported_date_time = parse_datetime(soreness_json['reported_date_time'])
+        soreness.body_part = BodyPart(BodyPartLocation(input_dict['body_part']), None)
+        soreness.pain = input_dict.get('pain', False)
+        soreness.severity = input_dict['severity']
+        soreness.movement = input_dict.get('movement', None)
+        soreness.side = input_dict.get('side', None)
+        soreness.first_reported = input_dict.get('first_reported', None)
+        # if input_dict.get('first_reported', None) is not None:
+        #     soreness.first_reported = parse_date(input_dict['first_reported'])
+        if input_dict.get('reported_date_time', None) is not None:
+            soreness.reported_date_time = parse_datetime(input_dict['reported_date_time'])
         return soreness
 
     def __hash__(self):
@@ -140,7 +141,7 @@ class Soreness(BaseSoreness, Serialisable):
                    'severity': self.severity,
                    'movement': self.movement,
                    'side': self.side,
-                   'first_reported': format_datetime(self.first_reported) if self.first_reported is not None else None,
+                   'first_reported': self.first_reported,  # format_date(self.first_reported) if self.first_reported is not None else None,
                   }
 
         else:
@@ -320,6 +321,23 @@ class HistoricSoreness(BaseSoreness, Serialisable):
                    'ask_persistent_2_question': self.ask_persistent_2_question
                   }
         return ret
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        soreness = cls(BodyPartLocation(input_dict['body_part_location']), input_dict.get('side', None), input_dict.get('is_pain', False))
+        hist_sore_status = input_dict.get('historic_soreness_status', None)
+        soreness.historic_soreness_status = HistoricSorenessStatus(hist_sore_status) if hist_sore_status is not None else HistoricSorenessStatus.dormant_cleared
+        soreness.streak = input_dict.get('streak', 0)
+        soreness.streak_start_date = input_dict.get("streak_start_date", None)
+        soreness.average_severity = input_dict.get('average_severity', 0.0)
+        soreness.first_reported = input_dict.get("first_reported", None)
+        if soreness.first_reported == "":
+            soreness.first_reported = None
+        soreness.last_reported = input_dict.get("last_reported", "")
+        soreness.ask_acute_pain_question = input_dict.get("ask_acute_pain_question", False)
+        soreness.ask_persistent_2_question = input_dict.get("ask_persistent_2_question", False)
+
+        return soreness
 
     def is_joint(self):
         if (self.body_part_location == BodyPartLocation.hip_flexor or

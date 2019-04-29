@@ -97,20 +97,25 @@ class AthleteStatsDatastore(object):
         athlete_stats.current_sport_name = mongo_result.get('current_sport_name', None)
         athlete_stats.current_position = mongo_result.get('current_position', None)
         athlete_stats.expected_weekly_workouts = _expected_workouts_from_mongo(mongo_result)
-        athlete_stats.historic_soreness = [self._historic_soreness_from_mongodb(s)
-                                           for s in mongo_result.get('historic_soreness', [])]
-        athlete_stats.daily_severe_soreness = [self._soreness_from_mongodb(s)
-                                               for s in mongo_result.get('daily_severe_soreness', [])]
-        athlete_stats.daily_severe_pain = [self._soreness_from_mongodb(s)
-                                           for s in mongo_result.get('daily_severe_pain', [])]
+        athlete_stats.historic_soreness = [HistoricSoreness.json_deserialise(s) for s in mongo_result.get('historic_soreness', [])]
+        athlete_stats.daily_severe_soreness = [Soreness.json_deserialise(s) for s in mongo_result.get('daily_severe_soreness', [])]
+        athlete_stats.daily_severe_pain = [Soreness.json_deserialise(s) for s in mongo_result.get('daily_severe_pain', [])]
+        # athlete_stats.readiness_soreness = [Soreness.json_deserialise(s) for s in mongo_result.get('readiness_soreness', [])]
+        athlete_stats.post_session_soreness = [Soreness.json_deserialise(s) for s in mongo_result.get('post_session_soreness', [])]
+        athlete_stats.readiness_pain = [Soreness.json_deserialise(s) for s in mongo_result.get('readiness_pain', [])]
+        athlete_stats.post_session_pain = [Soreness.json_deserialise(s) for s in mongo_result.get('post_session_pain', [])]
+        # athlete_stats.daily_severe_soreness = [self._soreness_from_mongodb(s)
+        #                                        for s in mongo_result.get('daily_severe_soreness', [])]
+        # athlete_stats.daily_severe_pain = [self._soreness_from_mongodb(s)
+        #                                    for s in mongo_result.get('daily_severe_pain', [])]
         athlete_stats.readiness_soreness = [self._soreness_from_mongodb(s)
                                             for s in mongo_result.get('readiness_soreness', [])]
-        athlete_stats.post_session_soreness = [self._soreness_from_mongodb(s)
-                                               for s in mongo_result.get('post_session_soreness', [])]
-        athlete_stats.readiness_pain = [self._soreness_from_mongodb(s)
-                                        for s in mongo_result.get('readiness_pain', [])]
-        athlete_stats.post_session_pain = [self._soreness_from_mongodb(s)
-                                           for s in mongo_result.get('post_session_pain', [])]
+        # athlete_stats.post_session_soreness = [self._soreness_from_mongodb(s)
+        #                                        for s in mongo_result.get('post_session_soreness', [])]
+        # athlete_stats.readiness_pain = [self._soreness_from_mongodb(s)
+        #                                 for s in mongo_result.get('readiness_pain', [])]
+        # athlete_stats.post_session_pain = [self._soreness_from_mongodb(s)
+        #                                    for s in mongo_result.get('post_session_pain', [])]
         athlete_stats.daily_severe_soreness_event_date = mongo_result.get('daily_severe_soreness_event_date', None)
         athlete_stats.daily_severe_pain_event_date = mongo_result.get('daily_severe_soreness_event_date', None)
         athlete_stats.metrics = [self._metrics_from_mongodb(s) for s in mongo_result.get('metrics', [])]
@@ -154,22 +159,6 @@ class AthleteStatsDatastore(object):
             standard_error_range.insufficient_data = std_error.get("insufficient_data", False)
 
         return standard_error_range
-
-    @staticmethod
-    def _historic_soreness_from_mongodb(historic_soreness):
-
-        hs = HistoricSoreness(BodyPartLocation(historic_soreness["body_part_location"]), historic_soreness["side"],
-                              historic_soreness["is_pain"])
-        hs.historic_soreness_status = HistoricSorenessStatus(historic_soreness["historic_soreness_status"])
-        hs.streak = historic_soreness.get('streak', 0.0)
-        hs.average_severity = historic_soreness.get('average_severity', 0.0)
-        hs.first_reported = historic_soreness.get('first_reported', None)
-        hs.last_reported = historic_soreness.get('last_reported', "")
-        hs.streak_start_date = historic_soreness.get('streak_start_date', None)
-        hs.ask_acute_pain_question = historic_soreness.get('ask_acute_pain_question', False)
-        hs.ask_persistent_2_question = historic_soreness.get('ask_persistent_2_question', False)
-
-        return hs
 
     @staticmethod
     def _soreness_from_mongodb(soreness_dict):
