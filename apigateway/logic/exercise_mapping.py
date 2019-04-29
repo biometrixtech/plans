@@ -2,11 +2,11 @@ import models.soreness
 #from logic.exercise_generator import ExerciseAssignments
 import logic.soreness_processing as soreness_and_injury
 from models.exercise import ExerciseBuckets, Phase
-from models.soreness import AssignedExercise, BodyPartLocation, HistoricSorenessStatus
+from models.soreness import AthleteGoal, AthleteGoalType, AssignedExercise, BodyPartLocation, HistoricSorenessStatus
 from logic.goal_focus_text_generator import RecoveryTextGenerator
 from datetime import  timedelta
 from utils import format_datetime, parse_date
-from models.modalities import ActiveRecovery, ActiveRestBeforeTraining, ActiveRestAfterTraining, AthleteGoal, ColdWaterImmersion, CoolDown, Heat, WarmUp, Ice
+from models.modalities import ActiveRecovery, ActiveRestBeforeTraining, ActiveRestAfterTraining, ColdWaterImmersion, CoolDown, Heat, WarmUp, Ice
 
 
 class ExerciseAssignmentCalculator(object):
@@ -731,7 +731,7 @@ class ExerciseAssignmentCalculator(object):
 
         for s in soreness_list:
 
-            goal = AthleteGoal("Preemptive, Prepare for Training", 1)
+            goal = AthleteGoal("Preemptive, Prepare for Training", 1, AthleteGoalType.preempt_corrective)
 
             if 1.5 <= s.severity <= 5 and s.first_reported is not None and not s.is_dormant_cleared():
                 days_diff = (parse_date(event_date_time) - s.first_reported).days
@@ -754,7 +754,7 @@ class ExerciseAssignmentCalculator(object):
         if len(soreness_list) > 0:
             active_rest = ActiveRestBeforeTraining()
             active_rest.fill_exercises(soreness_list, event_date_time, self.exercise_library)
-            #active_rest.calc_durations()
+            active_rest.set_plan_dosage(soreness_list)
             return active_rest
         else:
             return None
@@ -764,7 +764,7 @@ class ExerciseAssignmentCalculator(object):
         if len(soreness_list) > 0:
             active_rest = ActiveRestAfterTraining()
             active_rest.fill_exercises(soreness_list, event_date_time, self.exercise_library)
-            #active_rest.calc_durations()
+            active_rest.set_plan_dosage(soreness_list)
             return active_rest
         else:
             return None
@@ -813,7 +813,7 @@ class ExerciseAssignmentCalculator(object):
         for s in soreness_list:
             if s.daily and s.pain:
                 if not self.is_lower_body_part(s) or s.severity < 3.5:
-                    goal = AthleteGoal("Care for Pain", 1)
+                    goal = AthleteGoal("Care for Pain", 1, AthleteGoalType.pain)
                     goal.trigger = "Pain Reported Today"
                     ice = Ice(minutes=20, body_part_location=s.body_part.location, side=s.side)
 
@@ -831,7 +831,7 @@ class ExerciseAssignmentCalculator(object):
             elif s.daily and not s.pain and s.historic_soreness_status is not None and s.historic_soreness_status is not s.is_dormant_cleared() and s.first_reported is not None:
                 days_diff = (parse_date(event_date_time) - s.first_reported).days
                 if days_diff > 30 and s.severity >= 1.5:
-                    goal = AthleteGoal("Care for Soreness", 1)
+                    goal = AthleteGoal("Care for Soreness", 1, AthleteGoalType.sore)
                     goal.trigger = "Soreness Reported Today + Pers, Pers-2 Soreness > 30d"
                     ice = Ice(minutes=20, body_part_location=s.body_part.location, side=s.side)
                     if 1.5 <= s.severity < 2.5:
@@ -851,7 +851,7 @@ class ExerciseAssignmentCalculator(object):
                      s.historic_soreness_status is s.is_acute_pain() or
                      s.historic_soreness_status == HistoricSorenessStatus.persistent_2_pain)):
 
-                    goal = AthleteGoal("Preemptive, Prepare for Training", 1)
+                    goal = AthleteGoal("Preemptive, Prepare for Training", 1, AthleteGoalType.preempt_corrective)
                     goal.trigger = "No Pain Reported Today + Acute, Pers, Pers-2 Pain"
                     ice = Ice(minutes=20, body_part_location=s.body_part.location, side=s.side)
                     ice.repeat_every_3hrs_for_24hrs = False
@@ -869,7 +869,7 @@ class ExerciseAssignmentCalculator(object):
             if self.is_lower_body_part(s) and s.daily and s.severity >= 3.5:
                 if s.pain:
 
-                    goal = AthleteGoal("Care for Pain", 1)
+                    goal = AthleteGoal("Care for Pain", 1, AthleteGoalType.pain)
                     goal.trigger = "Pain Reported Today"
                     cold_water_immersion = ColdWaterImmersion()
                     cold_water_immersion.goals.add(goal)
@@ -877,7 +877,7 @@ class ExerciseAssignmentCalculator(object):
                 elif not s.pain and s.historic_soreness_status is not None and s.historic_soreness_status is not s.is_dormant_cleared() and s.first_reported is not None:
                     days_diff = (parse_date(event_date_time) - s.first_reported).days
                     if days_diff > 30 and s.severity >= 3.5:
-                        goal = AthleteGoal("Care for Soreness", 1)
+                        goal = AthleteGoal("Care for Soreness", 1, AthleteGoalType.sore)
                         goal.trigger = "Soreness Reported Today + Pers, Pers-2 Soreness > 30d"
                         cold_water_immersion = ColdWaterImmersion()
                         cold_water_immersion.goals.add(goal)

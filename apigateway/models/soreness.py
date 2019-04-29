@@ -383,6 +383,19 @@ class BodyPartLocationText(object):
         return body_part_text[self.body_part_location.name]
 
 
+class ExerciseDosage(object):
+    def __init__(self):
+        self.goal = None
+        self.priority = 0
+        self.soreness_source = None
+        self.efficient_reps_assigned = 0
+        self.efficient_sets_assigned = 0
+        self.complete_reps_assigned = 0
+        self.complete_sets_assigned = 0
+        self.comprehensive_reps_assigned = 0
+        self.comprehensive_sets_assigned = 0
+
+
 class AssignedExercise(Serialisable):
     def __init__(self, library_id, body_part_priority=0, body_part_exercise_priority=0, body_part_soreness_level=0,
                  body_part_location=BodyPartLocation.general, progressions=[]):
@@ -393,35 +406,42 @@ class AssignedExercise(Serialisable):
         # self.body_part_soreness_level = body_part_soreness_level
         # self.body_part_location = body_part_location
         self.athlete_id = ""
-        self.efficient_reps_assigned = 0
-        self.efficient_sets_assigned = 0
-        self.complete_reps_assigned = 0
-        self.complete_sets_assigned = 0
-        self.comprehensive_reps_assigned = 0
-        self.comprehensive_sets_assigned = 0
+
         self.expire_date_time = None
         self.position_order = 0
         self.goal_text = ""
         self.equipment_required = []
-        self.goals = set()
-        self.priorities = set()
-        self.soreness_sources = set()
+        #self.goals = set()
+        #self.priorities = set()
+        #self.soreness_sources = set()
+        self.dosages = []
 
-    '''
-    def soreness_priority(self):
-        return ExercisePriority.neutral
-    '''
     def duration_efficient(self):
 
-        return self.duration(self.efficient_reps_assigned, self.efficient_sets_assigned)
+        if len(self.dosages) > 0:
+            dosages = sorted(self.dosages, key=lambda x: (x.efficient_sets_assigned, x.efficient_reps_assigned), reverse=True)
+
+            return self.duration(dosages[0].efficient_reps_assigned, dosages[0].efficient_sets_assigned)
+        else:
+            return 0
 
     def duration_complete(self):
 
-        return self.duration(self.complete_reps_assigned, self.complete_sets_assigned)
+        if len(self.dosages) > 0:
+            dosages = sorted(self.dosages, key=lambda x: (x.complete_sets_assigned, x.complete_reps_assigned), reverse=True)
+
+            return self.duration(dosages[0].complete_reps_assigned, dosages[0].complete_sets_assigned)
+        else:
+            return 0
 
     def duration_comprehensive(self):
 
-        return self.duration(self.comprehensive_reps_assigned, self.comprehensive_sets_assigned)
+        if len(self.dosages) > 0:
+            dosages = sorted(self.dosages, key=lambda x: (x.comprehensive_sets_assigned, x.comprehensive_reps_assigned), reverse=True)
+
+            return self.duration(dosages[0].comprehensive_reps_assigned, dosages[0].comprehensive_sets_assigned)
+        else:
+            return 0
 
     def duration(self, reps_assigned, sets_assigned):
         if self.exercise.unit_of_measure.name == "count":
@@ -436,6 +456,11 @@ class AssignedExercise(Serialisable):
                 return (self.exercise.seconds_per_set * sets_assigned) * 2
         else:
             return None
+
+    '''
+    def soreness_priority(self):
+        return ExercisePriority.neutral
+    '''
 
     def __setattr__(self, name, value):
         if name == "unit_of_measure" and not isinstance(value, UnitOfMeasure):
@@ -452,19 +477,19 @@ class AssignedExercise(Serialisable):
         assigned_exercise.exercise.bilateral = input_dict.get("bilateral", False)
         assigned_exercise.exercise.unit_of_measure = input_dict.get("unit_of_measure", None)
         assigned_exercise.position_order = input_dict.get("position_order", 0)
-        assigned_exercise.efficient_reps_assigned = input_dict.get("efficient_reps_assigned", 0)
-        assigned_exercise.efficient_sets_assigned = input_dict.get("efficient_sets_assigned", 0)
-        assigned_exercise.complete_reps_assigned = input_dict.get("complete_reps_assigned", 0)
-        assigned_exercise.complete_sets_assigned = input_dict.get("complete_sets_assigned", 0)
-        assigned_exercise.comprehensive_reps_assigned = input_dict.get("comprehensive_reps_assigned", 0)
-        assigned_exercise.comprehensive_sets_assigned = input_dict.get("comprehensive_sets_assigned", 0)
+        #assigned_exercise.efficient_reps_assigned = input_dict.get("efficient_reps_assigned", 0)
+        #assigned_exercise.efficient_sets_assigned = input_dict.get("efficient_sets_assigned", 0)
+        #assigned_exercise.complete_reps_assigned = input_dict.get("complete_reps_assigned", 0)
+        #assigned_exercise.complete_sets_assigned = input_dict.get("complete_sets_assigned", 0)
+        #assigned_exercise.comprehensive_reps_assigned = input_dict.get("comprehensive_reps_assigned", 0)
+        #assigned_exercise.comprehensive_sets_assigned = input_dict.get("comprehensive_sets_assigned", 0)
         assigned_exercise.exercise.seconds_per_set = input_dict.get("seconds_per_set", 0)
         assigned_exercise.exercise.seconds_per_rep = input_dict.get("seconds_per_rep", 0)
         assigned_exercise.goal_text = input_dict.get("goal_text", "")
         assigned_exercise.equipment_required = input_dict.get("equipment_required", [])
-        assigned_exercise.goals = set([AthleteGoal.json_deserialise(goal) for goal in input_dict.get('goals', [])])
-        assigned_exercise.priorities = set(input_dict.get('priorities', []))
-        assigned_exercise.soreness_sources = set([Soreness.json_deserialise(soreness) for soreness in input_dict.get('soreness_sources', [])])
+        #assigned_exercise.goals = set([AthleteGoal.json_deserialise(goal) for goal in input_dict.get('goals', [])])
+        #assigned_exercise.priorities = set(input_dict.get('priorities', []))
+        #assigned_exercise.soreness_sources = set([Soreness.json_deserialise(soreness) for soreness in input_dict.get('soreness_sources', [])])
 
         return assigned_exercise
 
@@ -479,20 +504,14 @@ class AssignedExercise(Serialisable):
                'seconds_per_set': self.exercise.seconds_per_set,
                'unit_of_measure': self.exercise.unit_of_measure.name,
                'position_order': self.position_order,
-               'efficient_reps_assigned': self.efficient_reps_assigned,
-               'efficient_sets_assigned': self.efficient_sets_assigned,
-               'complete_reps_assigned': self.complete_reps_assigned,
-               'complete_sets_assigned': self.complete_sets_assigned,
-               'comprehensive_reps_assigned': self.comprehensive_reps_assigned,
-               'comprehensive_sets_assigned': self.comprehensive_sets_assigned,
                'duration_efficient': self.duration_efficient(),
                'duration_complete': self.duration_complete(),
                'duration_comprehensive': self.duration_comprehensive(),
                'goal_text': self.goal_text,
                'equipment_required': self.equipment_required,
-               'goals': [goal.json_serialise() for goal in self.goals],
-               'priorities': list(self.priorities),
-               'soreness_sources': [soreness.json_serialise(trigger=True) for soreness in self.soreness_sources]
+               #'goals': [goal.json_serialise() for goal in self.goals],
+               #'priorities': list(self.priorities),
+               #'soreness_sources': [soreness.json_serialise(trigger=True) for soreness in self.soreness_sources]
                }
         return ret
 
@@ -527,9 +546,21 @@ class CompletedExerciseSummary(Serialisable):
         return ret
 
 
+class AthleteGoalType(Enum):
+    pain = 0
+    sore = 1
+    sport = 2
+    preempt_sport = 3
+    preempt_soreness = 4
+    preempt_corrective = 5
+    corrective = 6
+    injury_history = 7
+
+
 class AthleteGoal(object):
-    def __init__(self, text, priority):
+    def __init__(self, text, priority, athlete_goal_type):
         self.text = text
+        self.goal_type = athlete_goal_type
         self.priority = priority
         self.trigger = ''
 
@@ -537,7 +568,8 @@ class AthleteGoal(object):
         ret = {
             'text': self.text,
             'priority': self.priority,
-            'trigger': self.trigger
+            'trigger': self.trigger,
+            'goal_type': self.goal_type.value
         }
         return ret
 
@@ -545,5 +577,5 @@ class AthleteGoal(object):
     def json_deserialise(cls, input_dict):
         goal = cls(text=input_dict['text'], priority=input_dict['priority'])
         goal.trigger = input_dict.get('trigger', "")
-
+        goal.goal_type = input_dict.get('goal_type', None)
         return goal
