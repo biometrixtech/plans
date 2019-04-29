@@ -100,25 +100,14 @@ class AthleteStatsDatastore(object):
         athlete_stats.historic_soreness = [HistoricSoreness.json_deserialise(s) for s in mongo_result.get('historic_soreness', [])]
         athlete_stats.daily_severe_soreness = [Soreness.json_deserialise(s) for s in mongo_result.get('daily_severe_soreness', [])]
         athlete_stats.daily_severe_pain = [Soreness.json_deserialise(s) for s in mongo_result.get('daily_severe_pain', [])]
-        # athlete_stats.readiness_soreness = [Soreness.json_deserialise(s) for s in mongo_result.get('readiness_soreness', [])]
+        athlete_stats.readiness_soreness = [Soreness.json_deserialise(s) for s in mongo_result.get('readiness_soreness', [])]
         athlete_stats.post_session_soreness = [Soreness.json_deserialise(s) for s in mongo_result.get('post_session_soreness', [])]
         athlete_stats.readiness_pain = [Soreness.json_deserialise(s) for s in mongo_result.get('readiness_pain', [])]
         athlete_stats.post_session_pain = [Soreness.json_deserialise(s) for s in mongo_result.get('post_session_pain', [])]
-        # athlete_stats.daily_severe_soreness = [self._soreness_from_mongodb(s)
-        #                                        for s in mongo_result.get('daily_severe_soreness', [])]
-        # athlete_stats.daily_severe_pain = [self._soreness_from_mongodb(s)
-        #                                    for s in mongo_result.get('daily_severe_pain', [])]
-        athlete_stats.readiness_soreness = [self._soreness_from_mongodb(s)
-                                            for s in mongo_result.get('readiness_soreness', [])]
-        # athlete_stats.post_session_soreness = [self._soreness_from_mongodb(s)
-        #                                        for s in mongo_result.get('post_session_soreness', [])]
-        # athlete_stats.readiness_pain = [self._soreness_from_mongodb(s)
-        #                                 for s in mongo_result.get('readiness_pain', [])]
-        # athlete_stats.post_session_pain = [self._soreness_from_mongodb(s)
-        #                                    for s in mongo_result.get('post_session_pain', [])]
         athlete_stats.daily_severe_soreness_event_date = mongo_result.get('daily_severe_soreness_event_date', None)
         athlete_stats.daily_severe_pain_event_date = mongo_result.get('daily_severe_soreness_event_date', None)
-        athlete_stats.metrics = [self._metrics_from_mongodb(s) for s in mongo_result.get('metrics', [])]
+        athlete_stats.metrics = [AthleteMetric.json_deserialise(s) for s in mongo_result.get('metrics', [])]
+        # athlete_stats.metrics = [self._metrics_from_mongodb(s) for s in mongo_result.get('metrics', [])]
         athlete_stats.typical_weekly_sessions = mongo_result.get('typical_weekly_sessions', None)
         athlete_stats.wearable_devices = mongo_result.get('wearable_devices', [])
         return athlete_stats
@@ -159,38 +148,26 @@ class AthleteStatsDatastore(object):
             standard_error_range.insufficient_data = std_error.get("insufficient_data", False)
 
         return standard_error_range
-
-    @staticmethod
-    def _soreness_from_mongodb(soreness_dict):
-        soreness = Soreness()
-        soreness.body_part = BodyPart(BodyPartLocation(soreness_dict['body_part']), None)
-        soreness.pain = soreness_dict.get('pain', False)
-        soreness.severity = soreness_dict['severity']
-        soreness.side = soreness_dict.get('side', None)
-        soreness.reported_date_time = soreness_dict.get('reported_date_time', None)
-        if soreness.reported_date_time is not None:
-            soreness.reported_date_time = parse_datetime(soreness.reported_date_time)
-        return soreness
-
-    def _metrics_from_mongodb(self, metric):
-        rec = AthleteMetric(metric['name'], MetricType(metric['metric_type']))
-        rec.color = MetricColor(metric.get('color', 0))
-        high_level_insight = metric.get('high_level_insight', 0)
-        if rec.metric_type == MetricType.daily:
-            rec.high_level_insight = DailyHighLevelInsight(high_level_insight)
-        else:
-            rec.high_level_insight = WeeklyHighLevelInsight(high_level_insight)
-        rec.high_level_action_description = metric.get('high_level_action_description', "")
-        rec.specific_insight_training_volume = metric.get('specific_insight_training_volume', "")
-        rec.specific_insight_recovery = metric.get('specific_insight_recovery', 0)
-        rec.insufficient_data_for_thresholds = metric.get('insufficient_data_for_thresholds', False)
-        rec.range_wider_than_thresholds = metric.get('range_wider_than_thresholds', False)
-        rec.specific_actions = [self._get_specific_actions_from_mongodb(sa)for sa in metric.get('specific_actions', [])]
-        return rec
-
-    @staticmethod
-    def _get_specific_actions_from_mongodb(action):
-        return SpecificAction(action['code'], action['text'], action['display'])
+    #
+    # def _metrics_from_mongodb(self, metric):
+    #     rec = AthleteMetric(metric['name'], MetricType(metric['metric_type']))
+    #     rec.color = MetricColor(metric.get('color', 0))
+    #     high_level_insight = metric.get('high_level_insight', 0)
+    #     if rec.metric_type == MetricType.daily:
+    #         rec.high_level_insight = DailyHighLevelInsight(high_level_insight)
+    #     else:
+    #         rec.high_level_insight = WeeklyHighLevelInsight(high_level_insight)
+    #     rec.high_level_action_description = metric.get('high_level_action_description', "")
+    #     rec.specific_insight_training_volume = metric.get('specific_insight_training_volume', "")
+    #     rec.specific_insight_recovery = metric.get('specific_insight_recovery', 0)
+    #     rec.insufficient_data_for_thresholds = metric.get('insufficient_data_for_thresholds', False)
+    #     rec.range_wider_than_thresholds = metric.get('range_wider_than_thresholds', False)
+    #     rec.specific_actions = [self._get_specific_actions_from_mongodb(sa)for sa in metric.get('specific_actions', [])]
+    #     return rec
+    #
+    # @staticmethod
+    # def _get_specific_actions_from_mongodb(action):
+    #     return SpecificAction(action['code'], action['text'], action['display'])
 
 
 def _expected_workouts_from_mongo(mongo_result):
