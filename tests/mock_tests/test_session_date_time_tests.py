@@ -30,7 +30,7 @@ def load_exercises():
     exercise_library_datastore.side_load_exericse_list_from_csv()
 
 
-def create_plan(body_part_list, severity_list, side_list, pain_list, historic_soreness_list=None):
+def create_plan(body_part_list, severity_list, side_list, pain_list, historic_soreness_list=None, train_later=True):
     user_id = "tester"
 
     current_date = date.today()
@@ -56,6 +56,7 @@ def create_plan(body_part_list, severity_list, side_list, pain_list, historic_so
     daily_plan = DailyPlan(format_date(current_date))
     daily_plan.user_id = user_id
     daily_plan.daily_readiness_survey = survey
+    daily_plan.train_later = train_later
     daily_plan_datastore.side_load_plans([daily_plan])
     data_store_collection = DatastoreCollection()
     data_store_collection.daily_plan_datastore = daily_plan_datastore
@@ -111,7 +112,7 @@ def create_no_soreness_plan():
 
 def test_active_rest_after_training_knee():
 
-    daily_plan = create_plan([7], [], [], [])
+    daily_plan = create_plan([7], [], [], [], train_later=False)
     assert len(daily_plan.post_active_rest.inhibit_exercises) > 0
     assert len(daily_plan.post_active_rest.static_stretch_exercises) > 0
     assert len(daily_plan.post_active_rest.isolated_activate_exercises) == 0
@@ -129,7 +130,7 @@ def test_active_rest_after_training_outer_thigh_hist_soreness_knee():
     historic_soreness.historic_soreness_status = HistoricSorenessStatus.acute_pain
     historic_soreness_list = [historic_soreness]
 
-    daily_plan = create_plan([11], [], [], [], historic_soreness_list)
+    daily_plan = create_plan([11], [], [], [], historic_soreness_list, train_later=False)
     assert len(daily_plan.post_active_rest.inhibit_exercises) > 0
     assert len(daily_plan.post_active_rest.static_stretch_exercises) > 0
     assert len(daily_plan.post_active_rest.isolated_activate_exercises) > 0
@@ -146,7 +147,7 @@ def test_active_rest_after_training_outer_thigh_hist_soreness_glutes():
     historic_soreness.historic_soreness_status = HistoricSorenessStatus.acute_pain
     historic_soreness_list = [historic_soreness]
 
-    daily_plan = create_plan([11], [], [], [], historic_soreness_list)
+    daily_plan = create_plan([11], [], [], [], historic_soreness_list, train_later=False)
     assert len(daily_plan.post_active_rest.inhibit_exercises) > 0
     assert len(daily_plan.post_active_rest.static_stretch_exercises) > 0
     assert len(daily_plan.post_active_rest.isolated_activate_exercises) > 0
@@ -173,7 +174,7 @@ def test_active_rest_after_training_various_hist_soreness_glutes():
 
     historic_soreness_list = [historic_soreness, historic_soreness_2, historic_soreness_3]
 
-    daily_plan = create_plan([6, 7, 11, 14, 16], [], [], [], historic_soreness_list)
+    daily_plan = create_plan([6, 7, 11, 14, 16], [], [], [], historic_soreness_list, train_later=False)
     assert len(daily_plan.post_active_rest.inhibit_exercises) > 0
     assert len(daily_plan.post_active_rest.static_stretch_exercises) > 0
     assert len(daily_plan.post_active_rest.isolated_activate_exercises) > 0
