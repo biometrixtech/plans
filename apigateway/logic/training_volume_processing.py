@@ -1,5 +1,6 @@
 from fathomapi.utils.xray import xray_recorder
-from models.training_volume import StandardErrorRange, StandardErrorRangeMetric
+from models.training_volume import LoadMonitoringType, StandardErrorRange, StandardErrorRangeMetric
+from models.sport import SportName, SportType
 from datetime import timedelta
 import statistics, math
 from utils import format_date, parse_date
@@ -34,6 +35,66 @@ class TrainingVolumeProcessing(object):
         self.low_internal_load_day_upper_bound = None
         self.mod_internal_load_day_upper_bound = None
         self.high_internal_load_day_upper_bound = None
+        self.load_monitoring_measures = []
+
+    def fill_load_monitoring_measures(self, acute_daily_plans, chronic_daily_plans):
+
+        all_plans = []
+        all_plans.extend(acute_daily_plans)
+        all_plans.extend(chronic_daily_plans)
+        training_sessions = []
+        load_monitoring_measures = {}
+
+        distance_sports = [SportName.swimming, SportName.cycling, SportName.distance_running, SportName.walking]
+
+        for a in all_plans:
+            for t in a.training_sessions:
+                training_sessions.append((a.event_date, t))
+            for s in a.strength_conditioning_sessions:
+                training_sessions.append((a.event_date, s))
+
+        swimming_sessions = list((t[0], t[1] for t in training_sessions if t[1].sport_name == SportName.swimming and
+                                 t[1].session_RPE is not None and t[1].distance is not None))
+
+        cycling_sessions = list((t[0], t[1] for t in training_sessions if t[1].sport_name == SportName.cycling and
+                                t[1].session_RPE is not None and t[1].distance is not None))
+
+        running_sessions = list((t[0], t[1] for t in training_sessions if t[1].sport_name == SportName.distance_running and
+                                t[1].session_RPE is not None and t[1].distance is not None))
+
+        walking_sessions = list((t[0], t[1] for t in training_sessions if t[1].sport_name == SportName.walking and
+                                t[1].session_RPE is not None and t[1].distance is not None))
+
+        sport_endurance_sessions_health = list((t[0], t[1] for t in training_sessions if t[1].sport_type is not None and
+                                               t[1].duration_health is not None and t[1].duration_minutes is None and
+                                               t[1].sport_type == SportType.sport_endurance
+                                               and t[1].sport_name not in distance_sports))
+        sport_endurance_sessions_minutes = list((t[0], t[1] for t in training_sessions if t[1].sport_type is not None and
+                                                t[1].duration_minutes is not None and
+                                                t[1].sport_type == SportType.sport_endurance
+                                                and t[1].sport_name not in distance_sports))
+
+        load_monitoring_measures[LoadMonitoringType.RPExSwimmingDistance] = \
+            self.get_session_attributes_product_sum_tuple_list("session_RPE", "distance", swimming_sessions)
+
+        load_monitoring_measures[LoadMonitoringType.RPExCyclingDistance] = \
+            self.get_session_attributes_product_sum_tuple_list("session_RPE", "distance", cycling_sessions)
+
+        load_monitoring_measures[LoadMonitoringType.RPExRunningDistance] = \
+            self.get_session_attributes_product_sum_tuple_list("session_RPE", "distance", running_sessions)
+
+        load_monitoring_measures[LoadMonitoringType.RPExWalkingDistance] = \
+            self.get_session_attributes_product_sum_tuple_list("session_RPE", "distance", walking_sessions)
+
+        load_monitoring_measures[LoadMonitoringType.RPExDuration] = []
+
+        load_monitoring_measures[LoadMonitoringType.RPExDuration].extend(
+            self.get_session_attributes_product_sum_tuple_list("session_RPE", "duration_health",
+                                                               sport_endurance_sessions_health))
+        load_monitoring_measures[LoadMonitoringType.RPExDuration].extend(
+            self.get_session_attributes_product_sum_tuple_list("session_RPE", "duration_minutes",
+                                                               sport_endurance_sessions_minutes))
+
 
     @xray_recorder.capture('logic.TrainingVolumeProcessing.load_plan_values')
     def load_plan_values(self, last_7_days_plans, days_8_14_plans, acute_daily_plans, chronic_weeks_plans, chronic_daily_plans):
