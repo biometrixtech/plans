@@ -85,13 +85,14 @@ class TrainingPlanManager(object):
         # soreness_values = [s.severity for s in soreness_list if s.severity is not None and s.daily]
 
         #new modalities
-        if self.post_session_surveys_today() and not self.daily_plan.train_later:
+        if not self.daily_plan.train_later:
             self.daily_plan.post_active_rest = calc.get_post_active_rest(soreness_list, event_date)
             self.daily_plan.ice = calc.get_ice(soreness_list, event_date)
             self.daily_plan.cold_water_immersion = calc.get_cold_water_immersion(soreness_list, event_date)
             for heat in self.daily_plan.heat:
                 heat.active = False
-            self.daily_plan.pre_active_rest.active = False
+            if self.daily_plan.pre_active_rest is not None:
+                self.daily_plan.pre_active_rest.active = False
         else:
             self.daily_plan.heat = calc.get_heat(soreness_list, event_date)
             self.daily_plan.pre_active_rest = calc.get_pre_active_rest(soreness_list, event_date)

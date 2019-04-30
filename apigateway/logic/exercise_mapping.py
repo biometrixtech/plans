@@ -734,7 +734,7 @@ class ExerciseAssignmentCalculator(object):
             goal = AthleteGoal("Preemptive, Prepare for Training", 1, AthleteGoalType.preempt_corrective)
 
             if 1.5 <= s.severity <= 5 and s.first_reported is not None and not s.is_dormant_cleared():
-                days_diff = (parse_date(event_date_time) - s.first_reported).days
+                days_diff = (parse_date(event_date_time) - parse_date(s.first_reported)).days
                 heat = Heat(minutes=10, body_part_location=s.body_part.location, side=s.side)
                 if not s.pain and days_diff >= 30:
                     goal.trigger = "Pers, Pers-2 Soreness > 30d"
@@ -790,7 +790,7 @@ class ExerciseAssignmentCalculator(object):
 
         for h in historic_soreness_list:
             if h.first_reported is not None and not h.is_dormant_cleared():
-                days_diff = (current_date_time - h.first_reported).days
+                days_diff = (current_date_time - parse_date(h.first_reported)).days
                 if not h.is_pain and days_diff < 30:
                     cool_down = CoolDown()
 
@@ -802,7 +802,7 @@ class ExerciseAssignmentCalculator(object):
 
         for h in historic_soreness_list:
             if h.first_reported is not None and not h.is_dormant_cleared():
-                days_diff = (current_date_time - h.first_reported).days
+                days_diff = (current_date_time - parse_date(h.first_reported)).days
                 if not h.is_pain and days_diff < 30:
                     active_recovery = ActiveRecovery()
 
@@ -831,7 +831,7 @@ class ExerciseAssignmentCalculator(object):
                     ice.goals.add(goal)
                     ice_list.append(ice)
             elif s.daily and not s.pain and s.historic_soreness_status is not None and s.historic_soreness_status is not s.is_dormant_cleared() and s.first_reported is not None:
-                days_diff = (parse_date(event_date_time) - s.first_reported).days
+                days_diff = (parse_date(event_date_time) - parse_date(s.first_reported)).days
                 if days_diff > 30 and s.severity >= 1.5:
                     goal = AthleteGoal("Care for Soreness", 1, AthleteGoalType.sore)
                     goal.trigger = "Soreness Reported Today + Pers, Pers-2 Soreness > 30d"
@@ -877,7 +877,7 @@ class ExerciseAssignmentCalculator(object):
                     cold_water_immersion.goals.add(goal)
 
                 elif not s.pain and s.historic_soreness_status is not None and s.historic_soreness_status is not s.is_dormant_cleared() and s.first_reported is not None:
-                    days_diff = (parse_date(event_date_time) - s.first_reported).days
+                    days_diff = (parse_date(event_date_time) - parse_date(s.first_reported)).days
                     if days_diff > 30 and s.severity >= 3.5:
                         goal = AthleteGoal("Care for Soreness", 1, AthleteGoalType.sore)
                         goal.trigger = "Soreness Reported Today + Pers, Pers-2 Soreness > 30d"

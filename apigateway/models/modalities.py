@@ -382,8 +382,8 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
 
         body_part_factory = BodyPartFactory()
 
-        if soreness.historic_soreness_status is not None and soreness.first_reported is not None and soreness.first_reported != "" and not soreness.is_dormant_cleared():
-            days_sore = (event_date_time - soreness.first_reported).days
+        if soreness.historic_soreness_status is not None and soreness.first_reported is not None and not soreness.is_dormant_cleared():
+            days_sore = (event_date_time - parse_date(soreness.first_reported)).days
             if not soreness.pain and days_sore > 30:
 
                 body_part = body_part_factory.get_body_part(soreness.body_part)
@@ -425,7 +425,7 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
         body_part_factory = BodyPartFactory()
 
         if soreness.historic_soreness_status is not None and soreness.first_reported is not None:
-            # days_sore = (event_date_time - soreness.first_reported).days
+            # days_sore = (event_date_time - parse_date(soreness.first_reported)).days
             if soreness.is_acute_pain() or soreness.is_persistent_pain() or soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_pain:
 
                 body_part = body_part_factory.get_body_part(soreness.body_part)
@@ -587,8 +587,8 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
 
         body_part_factory = BodyPartFactory()
 
-        if soreness.historic_soreness_status is not None and soreness.first_reported is not None and soreness.first_reported != "" and not soreness.is_dormant_cleared():
-            days_sore = (event_date_time - soreness.first_reported).days
+        if soreness.historic_soreness_status is not None and soreness.first_reported is not None and not soreness.is_dormant_cleared():
+            days_sore = (event_date_time - parse_date(soreness.first_reported)).days
             if not soreness.pain and days_sore > 30:
 
                 body_part = body_part_factory.get_body_part(soreness.body_part)
@@ -630,7 +630,7 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
         body_part_factory = BodyPartFactory()
 
         if soreness.historic_soreness_status is not None and soreness.first_reported is not None:
-            # days_sore = (event_date_time - soreness.first_reported).days
+            # days_sore = (event_date_time - parse_date(soreness.first_reported)).days
             if soreness.is_acute_pain() or soreness.is_persistent_pain() or soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_pain:
 
                 body_part = body_part_factory.get_body_part(soreness.body_part)

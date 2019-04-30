@@ -30,7 +30,7 @@ def load_exercises():
     exercise_library_datastore.side_load_exericse_list_from_csv()
 
 
-def create_plan(body_part_list, severity_list, side_list, pain_list, historic_soreness_list=None):
+def create_plan(body_part_list, severity_list, side_list, pain_list, historic_soreness_list=None, train_later=True):
     user_id = "tester"
 
     current_date = date.today()
@@ -56,6 +56,7 @@ def create_plan(body_part_list, severity_list, side_list, pain_list, historic_so
     daily_plan = DailyPlan(format_date(current_date))
     daily_plan.user_id = user_id
     daily_plan.daily_readiness_survey = survey
+    daily_plan.train_later = train_later
     daily_plan_datastore.side_load_plans([daily_plan])
     data_store_collection = DatastoreCollection()
     data_store_collection.daily_plan_datastore = daily_plan_datastore
@@ -111,7 +112,7 @@ def create_no_soreness_plan():
 
 def test_active_rest_after_training_knee():
 
-    daily_plan = create_plan([7], [], [], [])
+    daily_plan = create_plan([7], [], [], [], train_later=False)
     assert len(daily_plan.post_active_rest.inhibit_exercises) > 0
     assert len(daily_plan.post_active_rest.static_stretch_exercises) > 0
     assert len(daily_plan.post_active_rest.isolated_activate_exercises) == 0
@@ -125,11 +126,12 @@ def test_active_rest_after_training_outer_thigh_hist_soreness_knee():
     current_date_time = current_date_time - timedelta(days=16)
 
     historic_soreness = HistoricSoreness(BodyPartLocation(7), 1, True)
-    historic_soreness.first_reported = current_date_time
+    historic_soreness.first_reported = format_date(current_date_time)
+    historic_soreness.average_severity = 1.7
     historic_soreness.historic_soreness_status = HistoricSorenessStatus.acute_pain
     historic_soreness_list = [historic_soreness]
 
-    daily_plan = create_plan([11], [], [], [], historic_soreness_list)
+    daily_plan = create_plan([11], [], [], [], historic_soreness_list, train_later=False)
     assert len(daily_plan.post_active_rest.inhibit_exercises) > 0
     assert len(daily_plan.post_active_rest.static_stretch_exercises) > 0
     assert len(daily_plan.post_active_rest.isolated_activate_exercises) > 0
@@ -142,11 +144,11 @@ def test_active_rest_after_training_outer_thigh_hist_soreness_glutes():
     current_date_time = current_date_time - timedelta(days=16)
 
     historic_soreness = HistoricSoreness(BodyPartLocation(14), 1, True)
-    historic_soreness.first_reported = current_date_time
+    historic_soreness.first_reported = format_date(current_date_time)
     historic_soreness.historic_soreness_status = HistoricSorenessStatus.acute_pain
     historic_soreness_list = [historic_soreness]
 
-    daily_plan = create_plan([11], [], [], [], historic_soreness_list)
+    daily_plan = create_plan([11], [], [], [], historic_soreness_list, train_later=False)
     assert len(daily_plan.post_active_rest.inhibit_exercises) > 0
     assert len(daily_plan.post_active_rest.static_stretch_exercises) > 0
     assert len(daily_plan.post_active_rest.isolated_activate_exercises) > 0
@@ -162,18 +164,18 @@ def test_active_rest_after_training_various_hist_soreness_glutes():
     current_date_time_3 = current_date_time - timedelta(days=31)
 
     historic_soreness = HistoricSoreness(BodyPartLocation(14), 1, True)
-    historic_soreness.first_reported = current_date_time
+    historic_soreness.first_reported = format_date(current_date_time)
     historic_soreness.historic_soreness_status = HistoricSorenessStatus.acute_pain
     historic_soreness_2 = HistoricSoreness(BodyPartLocation(16), 1, False)
-    historic_soreness_2.first_reported = current_date_time_2
+    historic_soreness_2.first_reported = format_date(current_date_time_2)
     historic_soreness_2.historic_soreness_status = HistoricSorenessStatus.persistent_soreness
     historic_soreness_3 = HistoricSoreness(BodyPartLocation(17), 1, False)
-    historic_soreness_3.first_reported = current_date_time_3
+    historic_soreness_3.first_reported = format_date(current_date_time_3)
     historic_soreness_3.historic_soreness_status = HistoricSorenessStatus.persistent_soreness
 
     historic_soreness_list = [historic_soreness, historic_soreness_2, historic_soreness_3]
 
-    daily_plan = create_plan([6, 7, 11, 14, 16], [], [], [], historic_soreness_list)
+    daily_plan = create_plan([6, 7, 11, 14, 16], [], [], [], historic_soreness_list, train_later=False)
     assert len(daily_plan.post_active_rest.inhibit_exercises) > 0
     assert len(daily_plan.post_active_rest.static_stretch_exercises) > 0
     assert len(daily_plan.post_active_rest.isolated_activate_exercises) > 0
@@ -187,7 +189,7 @@ def test_active_rest_after_training_quad_hist_soreness_knee():
     current_date_time = current_date_time - timedelta(days=16)
 
     historic_soreness = HistoricSoreness(BodyPartLocation(7), 1, True)
-    historic_soreness.first_reported = current_date_time
+    historic_soreness.first_reported = format_date(current_date_time)
     historic_soreness.historic_soreness_status = HistoricSorenessStatus.persistent_2_pain
     historic_soreness.average_severity = 1.3
 
@@ -195,12 +197,6 @@ def test_active_rest_after_training_quad_hist_soreness_knee():
 
     daily_plan = create_plan(body_part_list=[7, 6], severity_list=[2, 1], side_list=[1, 1], pain_list=[True, False], historic_soreness_list=historic_soreness_list)
     daily_plan_json = daily_plan.json_serialise()
-    pre_active_rest = ActiveRestBeforeTraining.json_deserialise(daily_plan_json['pre_active_rest'])
-    # for exercise in pre_active_rest.active_stretch_exercises.values():
-    #     exercise_before = exercise.json_serialise()
-    #     exercise.get_dosage_ranking()
-    #     exercise_after = exercise.json_serialise()
-    #     print('a')
     assert len(daily_plan.pre_active_rest.inhibit_exercises) > 0
     assert len(daily_plan.pre_active_rest.static_stretch_exercises) > 0
     assert len(daily_plan.pre_active_rest.isolated_activate_exercises) > 0
