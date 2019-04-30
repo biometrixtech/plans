@@ -9,10 +9,57 @@ class TrainingStatus(object):
         self.limiting_metric = None
 '''
 
+
+class LoadMonitoringType(Enum):
+    RPExDuration = 0
+    HeartRateSHRZ = 1
+    HeartRateTRIMP = 2
+    RPExRunningDistance = 3
+    RPExWalkingDistance = 4
+    RPExCyclingDistance = 5
+    RPExSwimmingDistance = 6
+    AccumulatedGRF = 7
+    CenterOfMassAcceleration = 8
+
+
 class FitFatigueStatus(Enum):
     undefined = 0
     trending_toward_fatigue = 1
     trending_toward_fitness = 2
+
+
+class LoadMonitoringMeasures(object):
+    def __init__(self, load_monitoring_type, update_date):
+        self.load_monitoring_type = load_monitoring_type
+        self.acwr = None
+        self.ramp = None
+        self.monotony = None
+        self.strain = None
+        self.muscular_strain = None
+        self.date_updated = update_date
+        self.maintenance_level = None
+        self.functional_overreaching_level = None
+        self.potentially_nfo_level = None
+        self.non_functional_overreaching_level = None
+
+
+class MuscularStrain(object):
+    def __init__(self):
+        self.previous_muscular_strain = None
+        self.current_muscular_strain = None
+
+
+class TrainingStrain(object):
+    def __init__(self):
+        self.value = None
+        self.events = 0
+        self.historical = []
+
+
+class Monotony(object):
+    def __init__(self):
+        self.value = None
+        self.historical = []
 
 
 '''deprecated for now
