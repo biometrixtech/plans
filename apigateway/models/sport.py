@@ -17,6 +17,7 @@ class SportType(Enum):
     ultra_high_intensity = 1
     unique_activity = 2
     load_not_managed = 3
+    no_type = None
 
 
 class Sport(object):

@@ -28,14 +28,38 @@ class FitFatigueStatus(Enum):
     trending_toward_fitness = 2
 
 
-class MuscularStrain(object):
-    def __init__(self, load_type, sport, update_date):
-        self.load_type = load_type
-        self.sport = sport
+class LoadMonitoringMeasures(object):
+    def __init__(self, load_monitoring_type, update_date):
+        self.load_monitoring_type = load_monitoring_type
+        self.acwr = None
+        self.ramp = None
+        self.monotony = None
+        self.strain = None
+        self.muscular_strain = None
         self.date_updated = update_date
-        self.previous_week_muscular_strain = None
-        self.current_week_muscular_strain = None
+        self.maintenance_level = None
+        self.functional_overreaching_level = None
+        self.potentially_nfo_level = None
+        self.non_functional_overreaching_level = None
 
+
+class MuscularStrain(object):
+    def __init__(self):
+        self.previous_muscular_strain = None
+        self.current_muscular_strain = None
+
+
+class TrainingStrain(object):
+    def __init__(self):
+        self.value = None
+        self.events = 0
+        self.historical = []
+
+
+class Monotony(object):
+    def __init__(self):
+        self.value = None
+        self.historical = []
 
 
 '''deprecated for now
