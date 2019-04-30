@@ -52,8 +52,6 @@ class DailyPlanDatastore(object):
 
         for plan in mongo_cursor:
             daily_plan = DailyPlan.json_deserialise(plan, stats_processing)
-            # daily_plan.training_sessions = \
-            #     [_external_session_from_mongodb(s, session.SessionType(s['session_type'])) for s in plan.get('training_sessions', [])]
             daily_plan.daily_readiness_survey = _daily_readiness_from_mongo(plan.get('daily_readiness_survey', None), user_id)
             ret.append(daily_plan)
 
@@ -100,74 +98,33 @@ class DailyPlanDatastore(object):
             return None
 
 
-# def _external_session_from_mongodb(mongo_result, session_type):
-
-#     factory = session.SessionFactory()
-#     mongo_session = factory.create(session_type)
-#     mongo_session.id = mongo_result["session_id"]
-#     attrs_from_mongo = ["description",
-#                         "sport_name",
-#                         "strength_and_conditioning_type",
-#                         "created_date",
-#                         "event_date",
-#                         "end_date",
-#                         "duration_minutes",
-#                         "data_transferred",
-#                         "duration_sensor",
-#                         "external_load",
-#                         "high_intensity_minutes",
-#                         "mod_intensity_minutes",
-#                         "low_intensity_minutes",
-#                         "inactive_minutes",
-#                         "high_intensity_load",
-#                         "mod_intensity_load",
-#                         "low_intensity_load",
-#                         "inactive_load",
-#                         "sensor_start_date_time",
-#                         "sensor_end_date_time",
-#                         "deleted",
-#                         "ignored",
-#                         "duration_health",
-#                         "calories",
-#                         "distance",
-#                         "source"]
-#     for key in attrs_from_mongo:
-#         setattr(mongo_session, key, mongo_result.get(key, None))
-#     if "post_session_survey" in mongo_result and mongo_result["post_session_survey"] is not None:
-#         mongo_session.post_session_survey = PostSurvey(mongo_result["post_session_survey"], mongo_result["post_session_survey"]["event_date"])
-#         mongo_session.session_RPE = mongo_session.post_session_survey.RPE if mongo_session.post_session_survey.RPE is not None else None
-#     else:
-#         mongo_session.post_session_survey = None
-
-#     return mongo_session
-
-
-# def _recovery_session_from_mongodb(mongo_result):
-
-#     recovery_session = session.RecoverySession()
-#     recovery_session.start_date = mongo_result.get("start_date", None)
-#     recovery_session.event_date = mongo_result.get("event_date", None)
-#     recovery_session.impact_score = mongo_result.get("impact_score", 0)
-#     recovery_session.goal_text = mongo_result.get("goal_text", "")
-#     recovery_session.why_text = mongo_result.get("why_text", "")
-#     recovery_session.duration_minutes = mongo_result.get("minutes_duration", 0)
-#     recovery_session.completed = mongo_result.get("completed", False)
-#     recovery_session.display_exercises = mongo_result.get("display_exercises", False)
-#     recovery_session.inhibit_exercises = [AssignedExercise.json_deserialise(s)
-#                                           for s in mongo_result['inhibit_exercises']]
-#     recovery_session.lengthen_exercises = [AssignedExercise.json_deserialise(s)
-#                                            for s in mongo_result['lengthen_exercises']]
-#     recovery_session.activate_exercises = [AssignedExercise.json_deserialise(s)
-#                                            for s in mongo_result['activate_exercises']]
-#     recovery_session.integrate_exercises = [AssignedExercise.json_deserialise(s)
-#                                             for s in mongo_result['integrate_exercises']]
-#     recovery_session.inhibit_iterations = mongo_result.get("inhibit_iterations", 0)
-#     recovery_session.lengthen_iterations = mongo_result.get("lengthen_iterations", 0)
-#     recovery_session.activate_iterations = mongo_result.get("activate_iterations", 0)
-#     recovery_session.integrate_iterations = mongo_result.get("integrate_iterations", 0)
-#     return recovery_session
-
 '''deprecated
+def _recovery_session_from_mongodb(mongo_result):
+
+    recovery_session = session.RecoverySession()
+    recovery_session.start_date = mongo_result.get("start_date", None)
+    recovery_session.event_date = mongo_result.get("event_date", None)
+    recovery_session.impact_score = mongo_result.get("impact_score", 0)
+    recovery_session.goal_text = mongo_result.get("goal_text", "")
+    recovery_session.why_text = mongo_result.get("why_text", "")
+    recovery_session.duration_minutes = mongo_result.get("minutes_duration", 0)
+    recovery_session.completed = mongo_result.get("completed", False)
+    recovery_session.display_exercises = mongo_result.get("display_exercises", False)
+    recovery_session.inhibit_exercises = [AssignedExercise.json_deserialise(s)
+                                          for s in mongo_result['inhibit_exercises']]
+    recovery_session.lengthen_exercises = [AssignedExercise.json_deserialise(s)
+                                           for s in mongo_result['lengthen_exercises']]
+    recovery_session.activate_exercises = [AssignedExercise.json_deserialise(s)
+                                           for s in mongo_result['activate_exercises']]
+    recovery_session.integrate_exercises = [AssignedExercise.json_deserialise(s)
+                                            for s in mongo_result['integrate_exercises']]
+    recovery_session.inhibit_iterations = mongo_result.get("inhibit_iterations", 0)
+    recovery_session.lengthen_iterations = mongo_result.get("lengthen_iterations", 0)
+    recovery_session.activate_iterations = mongo_result.get("activate_iterations", 0)
+    recovery_session.integrate_iterations = mongo_result.get("integrate_iterations", 0)
+    return recovery_session
+
+
 def _functional_strength_session_from_mongodb(mongo_result):
     functional_strength_session = session.FunctionalStrengthSession()
     functional_strength_session.equipment_required = mongo_result.get("equipment_required", [])
