@@ -127,7 +127,9 @@ class DailyPlan(Serialisable):
     def define_landing_screen(self):
         if self.post_active_rest is not None and self.post_active_rest.active:
             return 2.0, None
-        elif self.post_active_rest is None and self.pre_active_rest is not None and self.pre_active_rest.completed:
+        elif ((self.post_active_rest is None or not self.post_active_rest.active) and
+              self.pre_active_rest is not None and
+              self.pre_active_rest.completed):
             return 1.0, None
         else:
             return 0.0, None
