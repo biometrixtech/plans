@@ -9,10 +9,34 @@ class TrainingStatus(object):
         self.limiting_metric = None
 '''
 
+
+class LoadType(Enum):
+    RPE = 0
+    RPExDuration = 1
+    HeartRateSHRZ = 2
+    HeartRateTRIMP = 3
+    DurationMinutes = 4
+    DistanceTraveled = 5
+    AccumulatedGRF = 6
+    CenterOfMassAcceleration = 7
+    PeakGRFCount = 8
+    CMABursts = 9
+
+
 class FitFatigueStatus(Enum):
     undefined = 0
     trending_toward_fatigue = 1
     trending_toward_fitness = 2
+
+
+class MuscularStrain(object):
+    def __init__(self, load_type, sport, update_date):
+        self.load_type = load_type
+        self.sport = sport
+        self.date_updated = update_date
+        self.previous_week_muscular_strain = None
+        self.current_week_muscular_strain = None
+
 
 
 '''deprecated for now
