@@ -69,14 +69,14 @@ class TrainingPlanManager(object):
         else:
             historic_soreness = [hs for hs in self.athlete_stats.historic_soreness if not hs.is_dormant_cleared()]
             historic_soreness_present = len(historic_soreness) > 0
-            #self.is_functional_strength_eligible()
+            # self.is_functional_strength_eligible()
 
         soreness_list = SorenessCalculator().get_soreness_summary_from_surveys(self.readiness_surveys,
                                                                                self.post_session_surveys,
                                                                                self.trigger_date_time,
                                                                                historic_soreness)
         # show_post_recovery = self.show_post_recovery(self.post_session_surveys_today())
-        # #self.add_recovery_times(show_post_recovery)
+        # self.add_recovery_times(show_post_recovery)
 
         calc = exercise_mapping.ExerciseAssignmentCalculator(self.athlete_id, self.exercise_library_datastore,
                                                              self.completed_exercise_datastore,
@@ -84,71 +84,96 @@ class TrainingPlanManager(object):
 
         # soreness_values = [s.severity for s in soreness_list if s.severity is not None and s.daily]
 
-        #new modalities
+        # new modalities
         if not self.daily_plan.train_later:
+            # if any completed post-training modalities exist, preserve them
+            for ice in self.daily_plan.heat:
+                if ice.completed:
+                    self.daily_plan.completed_ice.append(ice)
             if self.daily_plan.post_active_rest is not None and self.daily_plan.post_active_rest.completed:
-                self.daily_plan.completed_post_active_rest_sessions.append(self.daily_plan.post_active_rest)
-            self.daily_plan.post_active_rest = calc.get_post_active_rest(soreness_list, event_date)
-            self.daily_plan.ice = calc.get_ice(soreness_list, event_date)
-            self.daily_plan.cold_water_immersion = calc.get_cold_water_immersion(soreness_list, event_date)
+                self.daily_plan.completed_post_active_rest.append(self.daily_plan.post_active_rest)
+            if self.daily_plan.cold_water_immersion is not None and self.daily_plan.cold_water_immersion.completed:
+                self.daily_plan.completed_cold_water_immersion.append(self.daily_plan.cold_water_immersion)
+            # make pre-training modalities inactive
             for heat in self.daily_plan.heat:
                 heat.active = False
             if self.daily_plan.pre_active_rest is not None:
                 self.daily_plan.pre_active_rest.active = False
+            # create new post-training modalities
+            self.daily_plan.post_active_rest = calc.get_post_active_rest(soreness_list, event_date)
+            self.daily_plan.ice = calc.get_ice(soreness_list, event_date)
+            self.daily_plan.cold_water_immersion = calc.get_cold_water_immersion(soreness_list, event_date)
         else:
-            if self.daily_plan.pre_active_rest is not None and self.daily_plan.pre_active_rest.completed:
-                self.daily_plan.completed_pre_active_rest_sessions.append(self.daily_plan.pre_active_rest)
-            self.daily_plan.heat = calc.get_heat(soreness_list, event_date)
-            self.daily_plan.pre_active_rest = calc.get_pre_active_rest(soreness_list, event_date)
+            # if any post-training modalities are present and complete, preserve the completed ones
             if self.daily_plan.post_active_rest is not None:
-                self.daily_plan.post_active_rest.active = False
+                if not self.daily_plan.post_active_rest.completed:
+                    self.daily_plan.post_active_rest = None
+                else:
+                    self.daily_plan.post_active_rest.active = False
             if self.daily_plan.cold_water_immersion is not None:
-                self.daily_plan.cold_water_immersion.active = False
+                if not self.daily_plan.cold_water_immersion.completed:
+                    self.daily_plan.cold_water_immersion = None
+                else:
+                    self.daily_plan.cold_water_immersion.active = False
+            ice_completed = False
             for ice in self.daily_plan.ice:
                 ice.active = False
-        #self.daily_plan.warm_up = calc.get_warm_up(soreness_list)
-        #self.daily_plan.cool_down = calc.get_cool_down(event_date, soreness_list)
+                if ice.completed:
+                    ice_completed = True
+            if not ice_completed:
+                self.daily_plan.ice = []
+            # if any completed pre-training modalities exist, preserve them
+            for heat in self.daily_plan.heat:
+                if heat.completed:
+                    self.daily_plan.completed_heat.append(heat)
+            if self.daily_plan.pre_active_rest is not None and self.daily_plan.pre_active_rest.completed:
+                self.daily_plan.completed_pre_active_rest.append(self.daily_plan.pre_active_rest)
+            # create new pre-training modalities
+            self.daily_plan.heat = calc.get_heat(soreness_list, event_date)
+            self.daily_plan.pre_active_rest = calc.get_pre_active_rest(soreness_list, event_date)
+        # self.daily_plan.warm_up = calc.get_warm_up(soreness_list)
+        # self.daily_plan.cool_down = calc.get_cool_down(event_date, soreness_list)
         # self.daily_plan.post_active_rest = calc.get_post_active_rest(soreness_list, event_date)
-        #self.daily_plan.active_recovery = calc.get_active_recovery(event_date, soreness_list)
+        # self.daily_plan.active_recovery = calc.get_active_recovery(event_date, soreness_list)
         # self.daily_plan.ice = calc.get_ice(soreness_list, event_date)
         # self.daily_plan.cold_water_immersion = calc.get_cold_water_immersion(soreness_list, event_date)
-
-        #if soreness_values is not None and len(soreness_values) > 0:
+        #
+        # if soreness_values is not None and len(soreness_values) > 0:
         #    max_soreness = max(soreness_values)
-        #else:
+        # else:
         #    max_soreness = 0
-
-        #if self.daily_plan.functional_strength_session is None:
+        #
+        # if self.daily_plan.functional_strength_session is None:
         #    self.populate_functional_strength(True)
-
-        #functional_strength_active = (self.daily_plan.functional_strength_session is not None)
-
-        #if not show_post_recovery:
+        #
+        # functional_strength_active = (self.daily_plan.functional_strength_session is not None)
+        #
+        # if not show_post_recovery:
         #    if self.daily_plan.pre_recovery is not None and not self.daily_plan.pre_recovery.completed:
-                #self.daily_plan.pre_recovery.set_exercise_target_minutes(soreness_list, target_minutes, max_soreness,
-                #                                                         historic_soreness_present,
-                                                                         #functional_strength_active,
-                #                                                         is_active_prep=True)
-                #am_exercise_assignments = calc.create_exercise_assignments(self.daily_plan.pre_recovery, soreness_list,
-                #                                                           self.trigger_date_time, target_minutes)
-                #self.daily_plan.pre_recovery.update_from_exercise_assignments(am_exercise_assignments)
+        #         self.daily_plan.pre_recovery.set_exercise_target_minutes(soreness_list, target_minutes, max_soreness,
+        #                                                                 historic_soreness_present,
+        #                                                                  functional_strength_active,
+        #                                                                 is_active_prep=True)
+        #         am_exercise_assignments = calc.create_exercise_assignments(self.daily_plan.pre_recovery, soreness_list,
+        #                                                                   self.trigger_date_time, target_minutes)
+        #         self.daily_plan.pre_recovery.update_from_exercise_assignments(am_exercise_assignments)
         #        self.daily_plan.pre_recovery.display_exercises = True
         #    else:
         #        self.daily_plan.pre_recovery.display_exercises = False
-
-        #if show_post_recovery:
+        #
+        # if show_post_recovery:
         #    if self.daily_plan.post_recovery is not None and not self.daily_plan.post_recovery.completed:
-                #self.daily_plan.post_recovery.set_exercise_target_minutes(soreness_list, target_minutes, max_soreness,
-                #                                                          historic_soreness_present,
-                                                                          #functional_strength_active,
-                #                                                          is_active_prep=False)
-                #pm_exercise_assignments = calc.create_exercise_assignments(self.daily_plan.post_recovery, soreness_list,
-                #                                                           self.trigger_date_time, target_minutes)
-                #self.daily_plan.post_recovery.update_from_exercise_assignments(pm_exercise_assignments)
-                #if not self.daily_plan.functional_strength_completed and (pm_exercise_assignments is None or pm_exercise_assignments.duration_minutes() == 0):
-                #    self.daily_plan.functional_strength_session = None
-                #    self.daily_plan.functional_strength_eligible = False
-
+        #         self.daily_plan.post_recovery.set_exercise_target_minutes(soreness_list, target_minutes, max_soreness,
+        #                                                                  historic_soreness_present,
+        #                                                                   functional_strength_active,
+        #                                                                  is_active_prep=False)
+        #         pm_exercise_assignments = calc.create_exercise_assignments(self.daily_plan.post_recovery, soreness_list,
+        #                                                                   self.trigger_date_time, target_minutes)
+        #         self.daily_plan.post_recovery.update_from_exercise_assignments(pm_exercise_assignments)
+        #         if not self.daily_plan.functional_strength_completed and (pm_exercise_assignments is None or pm_exercise_assignments.duration_minutes() == 0):
+        #            self.daily_plan.functional_strength_session = None
+        #            self.daily_plan.functional_strength_eligible = False
+        #
         #        self.daily_plan.post_recovery.display_exercises = True
         #    else:
         #        self.daily_plan.post_recovery.display_exercises = False
