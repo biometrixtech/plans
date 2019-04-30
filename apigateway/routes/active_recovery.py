@@ -36,20 +36,18 @@ def handle_active_recovery_update(principal_id=None):
     save_exercises = True
     plan = daily_plan_datastore.get(user_id=user_id, start_date=plan_event_date, end_date=plan_event_date)[0]
     if recovery_type == 'pre':
-        if plan.pre_recovery_completed:
+        if plan.pre_active_rest.completed:
             save_exercises = False
-        plan.pre_recovery_completed = True  # plan
-        plan.pre_recovery.completed = True  # recovery
-        plan.pre_recovery.event_date = recovery_event_date
-        plan.pre_recovery.display_exercises = False
+        plan.pre_active_rest_completed = True  # plan
+        plan.pre_active_rest.completed = True  # recovery
+        plan.pre_active_rest.event_date = recovery_event_date
 
     elif recovery_type == 'post':
-        if plan.post_recovery.completed:
+        if plan.post_active_rest.completed:
             save_exercises = False
-        plan.post_recovery_completed = True  # plan
-        plan.post_recovery.completed = True  # recovery
-        plan.post_recovery.event_date = recovery_event_date
-        plan.post_recovery.display_exercises = False
+        plan.post_active_rest_completed = True  # plan
+        plan.post_active_rest.completed = True  # recovery
+        plan.post_active_rest.event_date = recovery_event_date
 
     daily_plan_datastore.put(plan)
 
@@ -87,13 +85,13 @@ def handle_active_recovery_start(principal_id=None):
     plans_service = Service('plans', Config.get('API_VERSION'))
     body = {"event_date": recovery_start_date}
     if recovery_type == 'pre':
-        plan.pre_recovery.start_date = recovery_start_date
+        plan.pre_active_rest.start_date = recovery_start_date
         plans_service.call_apigateway_async(method='POST',
                                             endpoint=f'/athlete/{user_id}/prep_started',
                                             body=body)
 
     elif recovery_type == 'post':
-        plan.post_recovery.start_date = recovery_start_date
+        plan.post_active_rest.start_date = recovery_start_date
         plans_service.call_apigateway_async(method='POST',
                                             endpoint=f'/athlete/{user_id}/recovery_started',
                                             body=body)

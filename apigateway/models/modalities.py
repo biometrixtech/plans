@@ -1,9 +1,10 @@
 from serialisable import Serialisable
 from models.soreness import BodyPart, BodyPartLocation, AssignedExercise, HistoricSorenessStatus, AthleteGoal, AthleteGoalType, ExerciseDosage
 from models.body_parts import BodyPartFactory
-from models.exercise import ExerciseBuckets
-from utils import parse_date
+from utils import parse_date, parse_datetime, format_datetime
 import abc
+import datetime
+
 
 class Heat(Serialisable):
     def __init__(self, minutes=0, body_part_location=None, side=0):
@@ -47,6 +48,8 @@ class ActiveRest(object):
         self.inhibit_exercises = {}
         self.static_integrate_exercises = {}
         self.static_stretch_exercises = {}
+        self.start_date = None
+        self.event_date = None
         self.completed = False
         self.active = True
         self.default_plan = "Complete"
@@ -83,7 +86,7 @@ class ActiveRest(object):
             if s.pain:
                 care_for_pain_present = True
             if s.historic_soreness_status is not None and not s.is_dormant_cleared():
-                 historic_status_present = True
+                historic_status_present = True
             if s.severity >= 2:
                 severity_greater_than_2 = True
 
@@ -94,7 +97,8 @@ class ActiveRest(object):
         else:
             self.default_plan = "Complete"
 
-    def rank_dosages(self, target_collections):
+    @staticmethod
+    def rank_dosages(target_collections):
         for target_collection in target_collections:
             for ex in target_collection.values():
                 ex.set_dosage_ranking()
@@ -122,12 +126,13 @@ class ActiveRest(object):
             dosage.goal = goal
             dosage = self.update_dosage(dosage, target_collection[s.exercise.id].exercise)
             target_collection[s.exercise.id].dosages.append(dosage)
-            # target_collection[s.exercise.id].set_dosage_ranking()
 
-    def update_dosage(self, dosage, exercise):
+    @staticmethod
+    def update_dosage(dosage, exercise):
 
-        if (dosage.goal.goal_type == AthleteGoalType.sore and (dosage.soreness_source.historic_soreness_status is None
-                or dosage.soreness_source.historic_soreness_status.is_dormant_cleared()) or
+        if (dosage.goal.goal_type == AthleteGoalType.sore and
+                (dosage.soreness_source.historic_soreness_status is None or
+                 dosage.soreness_source.historic_soreness_status.is_dormant_cleared()) or
                 dosage.goal.goal_type == AthleteGoalType.sport or
                 dosage.goal.goal_type == AthleteGoalType.preempt_sport or
                 dosage.goal.goal_type == AthleteGoalType.preempt_soreness or
@@ -293,6 +298,12 @@ class ActiveRest(object):
         return active_time
     '''
 
+    def __setattr__(self, name, value):
+        if name in ['event_date', 'start_date']:
+            if value is not None and not isinstance(value, datetime.datetime):
+                value = parse_datetime(value)
+        super().__setattr__(name, value)
+
 
 class ActiveRestBeforeTraining(ActiveRest, Serialisable):
     def __init__(self):
@@ -307,6 +318,8 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
             'active_stretch_exercises': [p.json_serialise() for p in self.active_stretch_exercises.values()],
             'isolated_activate_exercises': [p.json_serialise() for p in self.isolated_activate_exercises.values()],
             'static_integrate_exercises': [p.json_serialise() for p in self.static_integrate_exercises.values()],
+            'start_date': format_datetime(self.start_date) if self.start_date is not None else None,
+            'event_date': format_datetime(self.event_date) if self.event_date is not None else None,
             'completed': self.completed,
             'active': self.active,
             'default_plan': self.default_plan
@@ -317,17 +330,19 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
     def json_deserialise(cls, input_dict):
         pre_active_rest = cls()
         pre_active_rest.active = input_dict.get("active", True)
+        pre_active_rest.start_date = input_dict.get("start_date", None)
+        pre_active_rest.event_date = input_dict.get("event_date", None)
         pre_active_rest.completed = input_dict.get("completed", False)
         pre_active_rest.inhibit_exercises = {s['library_id']: AssignedExercise.json_deserialise(s)
-                                              for s in input_dict['inhibit_exercises']}
+                                             for s in input_dict['inhibit_exercises']}
         pre_active_rest.static_stretch_exercises = {s['library_id']: AssignedExercise.json_deserialise(s)
-                                              for s in input_dict['static_stretch_exercises']}
+                                                    for s in input_dict['static_stretch_exercises']}
         pre_active_rest.static_integrate_exercises = {s['library_id']: AssignedExercise.json_deserialise(s)
-                                              for s in input_dict['static_integrate_exercises']}
+                                                      for s in input_dict['static_integrate_exercises']}
         pre_active_rest.active_stretch_exercises = {s['library_id']: AssignedExercise.json_deserialise(s)
-                                              for s in input_dict['active_stretch_exercises']}
+                                                    for s in input_dict['active_stretch_exercises']}
         pre_active_rest.isolated_activate_exercises = {s['library_id']: AssignedExercise.json_deserialise(s)
-                                              for s in input_dict['isolated_activate_exercises']}
+                                                       for s in input_dict['isolated_activate_exercises']}
         pre_active_rest.default_plan = input_dict.get('default_plan', 'complete')
 
         return pre_active_rest
@@ -517,6 +532,8 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
             'static_stretch_exercises': [p.json_serialise() for p in self.static_stretch_exercises.values()],
             'isolated_activate_exercises': [p.json_serialise() for p in self.isolated_activate_exercises.values()],
             'static_integrate_exercises': [p.json_serialise() for p in self.static_integrate_exercises.values()],
+            'start_date': format_datetime(self.start_date) if self.start_date is not None else None,
+            'event_date': format_datetime(self.event_date) if self.event_date is not None else None,
             'completed': self.completed,
             'active': self.active,
             'default_plan': self.default_plan
@@ -527,15 +544,17 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
     def json_deserialise(cls, input_dict):
         post_active_rest = cls()
         post_active_rest.active = input_dict.get("active", True)
+        post_active_rest.start_date = input_dict.get("start_date", None)
+        post_active_rest.event_date = input_dict.get("event_date", None)
         post_active_rest.completed = input_dict.get("completed", False)
         post_active_rest.inhibit_exercises = {s['library_id']: AssignedExercise.json_deserialise(s)
                                               for s in input_dict['inhibit_exercises']}
         post_active_rest.static_stretch_exercises = {s['library_id']: AssignedExercise.json_deserialise(s)
-                                              for s in input_dict['static_stretch_exercises']}
+                                                     for s in input_dict['static_stretch_exercises']}
         post_active_rest.static_integrate_exercises = {s['library_id']: AssignedExercise.json_deserialise(s)
-                                              for s in input_dict['static_integrate_exercises']}
+                                                       for s in input_dict['static_integrate_exercises']}
         post_active_rest.isolated_activate_exercises = {s['library_id']: AssignedExercise.json_deserialise(s)
-                                              for s in input_dict['isolated_activate_exercises']}
+                                                        for s in input_dict['isolated_activate_exercises']}
         post_active_rest.default_plan = input_dict.get('default_plan', 'complete')
 
         return post_active_rest
@@ -581,7 +600,6 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
                         self.copy_exercises(stabilizer.inhibit_exercises, self.inhibit_exercises, goal, "3", soreness, exercise_library)
                         if soreness.severity < 3.5:
                             self.copy_exercises(stabilizer.static_stretch_exercises, self.static_stretch_exercises, goal, "3", soreness, exercise_library)
-
 
     def check_prevention_soreness(self, soreness, event_date_time, exercise_library):
 
