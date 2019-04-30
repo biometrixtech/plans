@@ -10,17 +10,16 @@ class TrainingStatus(object):
 '''
 
 
-class LoadType(Enum):
-    RPE = 0
-    RPExDuration = 1
-    HeartRateSHRZ = 2
-    HeartRateTRIMP = 3
-    DurationMinutes = 4
-    DistanceTraveled = 5
-    AccumulatedGRF = 6
-    CenterOfMassAcceleration = 7
-    PeakGRFCount = 8
-    CMABursts = 9
+class LoadMonitoringType(Enum):
+    RPExDuration = 0
+    HeartRateSHRZ = 1
+    HeartRateTRIMP = 2
+    RPExRunningDistance = 3
+    RPExWalkingDistance = 4
+    RPExCyclingDistance = 5
+    RPExSwimmingDistance = 6
+    AccumulatedGRF = 7
+    CenterOfMassAcceleration = 8
 
 
 class FitFatigueStatus(Enum):
