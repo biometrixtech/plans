@@ -51,11 +51,11 @@ class TrainingVolumeProcessing(object):
         duration_sessions = []
 
         for a in all_plans:
-            swimming_sessions = self.get_distance_tuple_list(SportName.swimming, a)
-            cycling_sessions = self.get_distance_tuple_list(SportName.cycling, a)
-            running_sessions = self.get_distance_tuple_list(SportName.distance_running, a)
-            walking_sessions = self.get_distance_tuple_list(SportName.walking, a)
-            duration_sessions = self.get_duration_tuple_list(a)
+            swimming_sessions.extend(self.get_distance_tuple_list(SportName.swimming, a))
+            cycling_sessions.extend(self.get_distance_tuple_list(SportName.cycling, a))
+            running_sessions.extend(self.get_distance_tuple_list(SportName.distance_running, a))
+            walking_sessions.extend(self.get_distance_tuple_list(SportName.walking, a))
+            duration_sessions.extend(self.get_duration_tuple_list(a))
 
         load_monitoring_measures[LoadMonitoringType.RPExSwimmingDistance] = swimming_sessions
 
@@ -66,7 +66,7 @@ class TrainingVolumeProcessing(object):
         load_monitoring_measures[LoadMonitoringType.RPExWalkingDistance] = walking_sessions
 
         load_monitoring_measures[LoadMonitoringType.RPExDuration] = duration_sessions
-        
+
     def get_distance_tuple_list(self, sport_name, daily_plan):
         sessions = []
         sessions.extend(
