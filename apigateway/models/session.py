@@ -113,6 +113,8 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
                     self.sport_type = self.get_sport_type(value)
                 except ValueError:
                     value = SportName(None)
+        elif name == "sport_name" and isinstance(value, SportName):
+            self.sport_type = self.get_sport_type(value)
         elif name == "strength_and_conditioning_type" and not isinstance(value, StrengthConditioningType):
             if value == '':
                 value = StrengthConditioningType(None)
