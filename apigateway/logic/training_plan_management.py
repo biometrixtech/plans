@@ -24,20 +24,20 @@ class TrainingPlanManager(object):
         self.post_session_surveys = []
         self.athlete_stats = None
 
-    def post_session_surveys_today(self):
-        for ps_survey in self.post_session_surveys:
-            if format_date(ps_survey.event_date) == format_date(self.trigger_date_time):
-                return True
-        return False
-
-    def show_post_recovery(self, surveys_today):
-        if surveys_today and not self.daily_plan.session_from_readiness:
-            return True
-        else:
-            if self.daily_plan.train_later:
-                return False
-            else:
-                return True
+    # def post_session_surveys_today(self):
+    #     for ps_survey in self.post_session_surveys:
+    #         if format_date(ps_survey.event_date) == format_date(self.trigger_date_time):
+    #             return True
+    #     return False
+    #
+    # def show_post_recovery(self, surveys_today):
+    #     if surveys_today and not self.daily_plan.session_from_readiness:
+    #         return True
+    #     else:
+    #         if self.daily_plan.train_later:
+    #             return False
+    #         else:
+    #             return True
 
     def load_data(self, event_date):
         daily_plans = self.daily_plan_datastore.get(self.athlete_id, format_date(parse_date(event_date) - datetime.timedelta(days=1)), event_date)
@@ -198,19 +198,19 @@ class TrainingPlanManager(object):
                         self.athlete_stats.current_position)
     '''
 
-    def add_recovery_times(self, show_post_recovery):
-
-        if not show_post_recovery:
-            if self.daily_plan.pre_recovery is None:
-                self.daily_plan.pre_recovery = session.RecoverySession()
-                self.daily_plan.pre_recovery.display_exercises = True
-            self.daily_plan.post_recovery.display_exercises = False
-        else:
-            self.daily_plan.pre_recovery.display_exercises = False
-            if self.daily_plan.post_recovery is not None and self.daily_plan.post_recovery.completed:
-                self.daily_plan.completed_post_recovery_sessions.append(self.daily_plan.post_recovery)
-            self.daily_plan.post_recovery = session.RecoverySession()
-            self.daily_plan.post_recovery.display_exercises = True
+    # def add_recovery_times(self, show_post_recovery):
+    #
+    #     if not show_post_recovery:
+    #         if self.daily_plan.pre_recovery is None:
+    #             self.daily_plan.pre_recovery = session.RecoverySession()
+    #             self.daily_plan.pre_recovery.display_exercises = True
+    #         self.daily_plan.post_recovery.display_exercises = False
+    #     else:
+    #         self.daily_plan.pre_recovery.display_exercises = False
+    #         if self.daily_plan.post_recovery is not None and self.daily_plan.post_recovery.completed:
+    #             self.daily_plan.completed_post_recovery_sessions.append(self.daily_plan.post_recovery)
+    #         self.daily_plan.post_recovery = session.RecoverySession()
+    #         self.daily_plan.post_recovery.display_exercises = True
 
     '''deprecated
     def is_functional_strength_eligible(self):
