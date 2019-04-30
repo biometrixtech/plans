@@ -4,7 +4,7 @@ import uuid
 import datetime
 from serialisable import Serialisable
 from utils import format_datetime, parse_datetime
-from models.sport import SportName, BaseballPosition, BasketballPosition, FootballPosition, LacrossePosition, SoccerPosition, SoftballPosition, TrackAndFieldPosition, FieldHockeyPosition, VolleyballPosition
+from models.sport import SportName, SportType, BaseballPosition, BasketballPosition, FootballPosition, LacrossePosition, SoccerPosition, SoftballPosition, TrackAndFieldPosition, FieldHockeyPosition, VolleyballPosition
 
 
 class SessionType(Enum):
@@ -56,6 +56,7 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
     def __init__(self):
         self.id = None
         self.sport_name = None
+        self.sport_type = None
         self.strength_and_conditioning_type = None
         self.duration_sensor = None
         self.external_load = None
@@ -109,6 +110,7 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
             else:
                 try:
                     value = SportName(value)
+                    self.sport_type = self.get_sport_type(value)
                 except ValueError:
                     value = SportName(None)
         elif name == "strength_and_conditioning_type" and not isinstance(value, StrengthConditioningType):
@@ -120,6 +122,7 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
             value = SessionSource(value) if value is not None else SessionSource.user
         elif name == ["deleted", "ignored"]:
             value = value if value is not None else False
+
         super().__setattr__(name, value)
 
     @abc.abstractmethod
@@ -138,6 +141,26 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
             return True
         else:
             return False
+
+    def get_sport_type(self, sport_name):
+
+        ultra_high = [SportName.diving, SportName.jumps, SportName.throws, SportName.weightlifting, SportName.strength,
+                      SportName.functional_strength_training, SportName.traditional_strength_training,
+                      SportName.core_training, SportName.high_intensity_interval_training, SportName.pilates]
+
+        unique_activites = [SportName.archery, SportName.bowling]
+
+        load_not_managed = [SportName.fishing, SportName.mind_and_body, SportName.preparation_and_recovery,
+                            SportName.flexibility]
+
+        if sport_name in ultra_high:
+            return SportType.ultra_high_intensity
+        elif sport_name in unique_activites:
+            return SportType.unique_activity
+        elif sport_name in load_not_managed:
+            return SportType.load_not_managed
+        else:
+            return SportType.sport_endurance
 
     def json_serialise(self):
         session_type = self.session_type()

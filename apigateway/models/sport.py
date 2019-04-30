@@ -12,6 +12,13 @@ class SportLevel(IntEnum):
     professional = 7
 
 
+class SportType(Enum):
+    sport_endurance = 0
+    ultra_high_intensity = 1
+    unique_activity = 2
+    load_not_managed = 3
+
+
 class Sport(object):
 
     def __init__(self):
