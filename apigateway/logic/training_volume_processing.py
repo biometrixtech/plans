@@ -42,7 +42,6 @@ class TrainingVolumeProcessing(object):
         all_plans = []
         all_plans.extend(acute_daily_plans)
         all_plans.extend(chronic_daily_plans)
-        training_sessions = []
         load_monitoring_measures = {}
         swimming_sessions = []
         cycling_sessions = []
@@ -75,12 +74,6 @@ class TrainingVolumeProcessing(object):
                                                               if t.sport_name == sport_name and
                                                               t.session_RPE is not None and
                                                               t.distance is not None)))
-        sessions.extend(
-            self.get_tuple_product_of_session_attributes(daily_plan.get_event_date_time(), "session_RPE", "distance",
-                                                         list(t for t in daily_plan.strength_conditioning_sessions
-                                                              if t.sport_name == sport_name and
-                                                              t.session_RPE is not None and
-                                                              t.distance is not None)))
         return sessions
 
     def get_duration_tuple_list(self, daily_plan):
@@ -102,23 +95,8 @@ class TrainingVolumeProcessing(object):
                                                               t.duration_minutes is not None and
                                                               t.session_RPE is not None and
                                                               t.sport_name not in distance_sports)))
-        sessions.extend(
-            self.get_tuple_product_of_session_attributes(daily_plan.get_event_date_time(), "session_RPE", "duration_health",
-                                                         list(t for t in daily_plan.strength_conditioning_sessions
-                                                              if t.sport_type == SportType.sport_endurance and
-                                                              t.duration_health is not None and t.duration_minutes is None and
-                                                              t.session_RPE is not None and
-                                                              t.sport_name not in distance_sports)))
-        sessions.extend(
-            self.get_tuple_product_of_session_attributes(daily_plan.get_event_date_time(), "session_RPE", "duration_minutes",
-                                                         list(t for t in daily_plan.strength_conditioning_sessions
-                                                              if t.sport_type == SportType.sport_endurance and
-                                                              t.duration_minutes is not None and
-                                                              t.session_RPE is not None and
-                                                              t.sport_name not in distance_sports)))
 
         return sessions
-
 
     @xray_recorder.capture('logic.TrainingVolumeProcessing.load_plan_values')
     def load_plan_values(self, last_7_days_plans, days_8_14_plans, acute_daily_plans, chronic_weeks_plans, chronic_daily_plans):
