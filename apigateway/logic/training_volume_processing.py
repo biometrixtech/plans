@@ -42,34 +42,28 @@ class TrainingVolumeProcessing(object):
         all_plans = []
         all_plans.extend(acute_daily_plans)
         all_plans.extend(chronic_daily_plans)
-        training_sessions = []
+        
         load_monitoring_measures = {}
 
         distance_sports = [SportName.swimming, SportName.cycling, SportName.distance_running, SportName.walking]
 
-        for a in all_plans:
-            for t in a.training_sessions:
-                training_sessions.append((a.event_date, t))
-            for s in a.strength_conditioning_sessions:
-                training_sessions.append((a.event_date, s))
-
-        swimming_sessions = list((t[0], t[1] for t in training_sessions if t[1].sport_name == SportName.swimming and
+        swimming_sessions = list((t[0], t[1] for t in all_plans if t[1].sport_name == SportName.swimming and
                                  t[1].session_RPE is not None and t[1].distance is not None))
 
-        cycling_sessions = list((t[0], t[1] for t in training_sessions if t[1].sport_name == SportName.cycling and
+        cycling_sessions = list((t[0], t[1] for t in all_plans if t[1].sport_name == SportName.cycling and
                                 t[1].session_RPE is not None and t[1].distance is not None))
 
-        running_sessions = list((t[0], t[1] for t in training_sessions if t[1].sport_name == SportName.distance_running and
+        running_sessions = list((t[0], t[1] for t in all_plans if t[1].sport_name == SportName.distance_running and
                                 t[1].session_RPE is not None and t[1].distance is not None))
 
-        walking_sessions = list((t[0], t[1] for t in training_sessions if t[1].sport_name == SportName.walking and
+        walking_sessions = list((t[0], t[1] for t in all_plans if t[1].sport_name == SportName.walking and
                                 t[1].session_RPE is not None and t[1].distance is not None))
 
-        sport_endurance_sessions_health = list((t[0], t[1] for t in training_sessions if t[1].sport_type is not None and
+        sport_endurance_sessions_health = list((t[0], t[1] for t in all_plans if t[1].sport_type is not None and
                                                t[1].duration_health is not None and t[1].duration_minutes is None and
                                                t[1].sport_type == SportType.sport_endurance
                                                and t[1].sport_name not in distance_sports))
-        sport_endurance_sessions_minutes = list((t[0], t[1] for t in training_sessions if t[1].sport_type is not None and
+        sport_endurance_sessions_minutes = list((t[0], t[1] for t in all_plans if t[1].sport_type is not None and
                                                 t[1].duration_minutes is not None and
                                                 t[1].sport_type == SportType.sport_endurance
                                                 and t[1].sport_name not in distance_sports))
