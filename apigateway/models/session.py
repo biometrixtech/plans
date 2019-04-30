@@ -5,7 +5,7 @@ import datetime
 from serialisable import Serialisable
 from utils import format_datetime, parse_datetime
 from models.sport import SportName, BaseballPosition, BasketballPosition, FootballPosition, LacrossePosition, SoccerPosition, SoftballPosition, TrackAndFieldPosition, FieldHockeyPosition, VolleyballPosition
-
+from models.post_session_survey import PostSurvey
 
 class SessionType(Enum):
     practice = 0
@@ -173,6 +173,46 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
             'source': self.source.value if self.source is not None else SessionSource.user.value
         }
         return ret
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        session = SessionFactory().create(SessionType(input_dict['session_type']))
+        session.id = input_dict["session_id"]
+        attrs_from_mongo = ["description",
+                            "sport_name",
+                            "strength_and_conditioning_type",
+                            "created_date",
+                            "event_date",
+                            "end_date",
+                            "duration_minutes",
+                            "data_transferred",
+                            "duration_sensor",
+                            "external_load",
+                            "high_intensity_minutes",
+                            "mod_intensity_minutes",
+                            "low_intensity_minutes",
+                            "inactive_minutes",
+                            "high_intensity_load",
+                            "mod_intensity_load",
+                            "low_intensity_load",
+                            "inactive_load",
+                            "sensor_start_date_time",
+                            "sensor_end_date_time",
+                            "deleted",
+                            "ignored",
+                            "duration_health",
+                            "calories",
+                            "distance",
+                            "source"]
+        for key in attrs_from_mongo:
+            setattr(session, key, input_dict.get(key, None))
+        if "post_session_survey" in input_dict and input_dict["post_session_survey"] is not None:
+            session.post_session_survey = PostSurvey(input_dict["post_session_survey"], input_dict["post_session_survey"]["event_date"])
+            session.session_RPE = session.post_session_survey.RPE if session.post_session_survey.RPE is not None else None
+        else:
+            session.post_session_survey = None
+
+        return session
 
     def internal_load(self):
         if self.session_RPE is not None and self.duration_minutes is not None:
