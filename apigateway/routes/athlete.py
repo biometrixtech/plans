@@ -174,7 +174,7 @@ def manage_prep_push_notification(athlete_id):
     plan = _get_plan(athlete_id, event_date)
     if (plan and  # plan exists
             plan.pre_active_rest is not None and  # pre_active_rest is assigned
-            _are_exercises_assigned(plan.pre_active_rest) and  # and exercises are present
+            _are_exercises_assigned(plan.pre_active_rest, 'pre') and  # and exercises are present
             plan.pre_active_rest.start_date is None and  # and not started
             plan.pre_active_rest.active and  # and still active
             not plan.pre_active_rest_completed):  # and one hasn't been completed previously
@@ -194,7 +194,7 @@ def manage_recovery_push_notification(athlete_id):
     plan = _get_plan(athlete_id, event_date)
     if (plan and  # plan is present
             plan.post_active_rest is not None and  # post_active_rest is assigned
-            _are_exercises_assigned(plan.post_active_rest) and  # and exercises are present
+            _are_exercises_assigned(plan.post_active_rest, 'post') and  # and exercises are present
             plan.post_active_rest.start_date is None and  # and not started
             plan.post_active_rest.active and  # is still active
             not plan.post_active_rest_completed):  # and one hasn't been completed previously
@@ -300,11 +300,13 @@ def _randomize_trigger_time(start_time, window, tz_offset):
     return utc_date
 
 
-def _are_exercises_assigned(rec):
+def _are_exercises_assigned(rec, rec_type):
     exercises = (len(rec.inhibit_exercises) +
-                 len(rec.lengthen_exercises) +
-                 len(rec.activate_exercises) +
-                 len(rec.integrate_exercises))
+                 len(rec.static_stretch_exercises) +
+                 len(rec.static_integrate_exercises) +
+                 len(rec.isolated_activate_exercises))
+    if rec_type == 'pre':
+        exercises += len(rec.active_stretch_exercises)
     return exercises > 0
 
 

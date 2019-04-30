@@ -3,8 +3,8 @@ import datetime
 from fathomapi.utils.xray import xray_recorder
 import logic.exercise_mapping as exercise_mapping
 from logic.soreness_processing import SorenessCalculator
-#from logic.functional_strength_mapping import FSProgramGenerator
-import models.session as session
+# from logic.functional_strength_mapping import FSProgramGenerator
+# import models.session as session
 from models.post_session_survey import PostSessionSurvey
 from models.daily_plan import DailyPlan
 from utils import format_date, parse_datetime, parse_date
