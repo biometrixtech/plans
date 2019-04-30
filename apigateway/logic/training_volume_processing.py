@@ -42,52 +42,82 @@ class TrainingVolumeProcessing(object):
         all_plans = []
         all_plans.extend(acute_daily_plans)
         all_plans.extend(chronic_daily_plans)
-        
+        training_sessions = []
         load_monitoring_measures = {}
+        swimming_sessions = []
+        cycling_sessions = []
+        running_sessions = []
+        walking_sessions = []
+        duration_sessions = []
+
+        for a in all_plans:
+            swimming_sessions = self.get_distance_tuple_list(SportName.swimming, a)
+            cycling_sessions = self.get_distance_tuple_list(SportName.cycling, a)
+            running_sessions = self.get_distance_tuple_list(SportName.distance_running, a)
+            walking_sessions = self.get_distance_tuple_list(SportName.walking, a)
+            duration_sessions = self.get_duration_tuple_list(a)
+
+        load_monitoring_measures[LoadMonitoringType.RPExSwimmingDistance] = swimming_sessions
+
+        load_monitoring_measures[LoadMonitoringType.RPExCyclingDistance] = cycling_sessions
+
+        load_monitoring_measures[LoadMonitoringType.RPExRunningDistance] = running_sessions
+
+        load_monitoring_measures[LoadMonitoringType.RPExWalkingDistance] = walking_sessions
+
+        load_monitoring_measures[LoadMonitoringType.RPExDuration] = duration_sessions
+        
+    def get_distance_tuple_list(self, sport_name, daily_plan):
+        sessions = []
+        sessions.extend(
+            self.get_tuple_product_of_session_attributes(daily_plan.get_event_date_time(), "session_RPE", "distance",
+                                                         list(t for t in daily_plan.training_sessions
+                                                              if t.sport_name == sport_name and
+                                                              t.session_RPE is not None and
+                                                              t.distance is not None)))
+        sessions.extend(
+            self.get_tuple_product_of_session_attributes(daily_plan.get_event_date_time(), "session_RPE", "distance",
+                                                         list(t for t in daily_plan.strength_conditioning_sessions
+                                                              if t.sport_name == sport_name and
+                                                              t.session_RPE is not None and
+                                                              t.distance is not None)))
+        return sessions
+
+    def get_duration_tuple_list(self, daily_plan):
 
         distance_sports = [SportName.swimming, SportName.cycling, SportName.distance_running, SportName.walking]
 
-        swimming_sessions = list((t[0], t[1] for t in all_plans if t[1].sport_name == SportName.swimming and
-                                 t[1].session_RPE is not None and t[1].distance is not None))
+        sessions = []
+        sessions.extend(
+            self.get_tuple_product_of_session_attributes(daily_plan.get_event_date_time(), "session_RPE", "duration_health",
+                                                         list(t for t in daily_plan.training_sessions
+                                                              if t.sport_type == SportType.sport_endurance and
+                                                              t.duration_health is not None and t.duration_minutes is None and
+                                                              t.session_RPE is not None and
+                                                              t.sport_name not in distance_sports)))
+        sessions.extend(
+            self.get_tuple_product_of_session_attributes(daily_plan.get_event_date_time(), "session_RPE", "duration_minutes",
+                                                         list(t for t in daily_plan.training_sessions
+                                                              if t.sport_type == SportType.sport_endurance and
+                                                              t.duration_minutes is not None and
+                                                              t.session_RPE is not None and
+                                                              t.sport_name not in distance_sports)))
+        sessions.extend(
+            self.get_tuple_product_of_session_attributes(daily_plan.get_event_date_time(), "session_RPE", "duration_health",
+                                                         list(t for t in daily_plan.strength_conditioning_sessions
+                                                              if t.sport_type == SportType.sport_endurance and
+                                                              t.duration_health is not None and t.duration_minutes is None and
+                                                              t.session_RPE is not None and
+                                                              t.sport_name not in distance_sports)))
+        sessions.extend(
+            self.get_tuple_product_of_session_attributes(daily_plan.get_event_date_time(), "session_RPE", "duration_minutes",
+                                                         list(t for t in daily_plan.strength_conditioning_sessions
+                                                              if t.sport_type == SportType.sport_endurance and
+                                                              t.duration_minutes is not None and
+                                                              t.session_RPE is not None and
+                                                              t.sport_name not in distance_sports)))
 
-        cycling_sessions = list((t[0], t[1] for t in all_plans if t[1].sport_name == SportName.cycling and
-                                t[1].session_RPE is not None and t[1].distance is not None))
-
-        running_sessions = list((t[0], t[1] for t in all_plans if t[1].sport_name == SportName.distance_running and
-                                t[1].session_RPE is not None and t[1].distance is not None))
-
-        walking_sessions = list((t[0], t[1] for t in all_plans if t[1].sport_name == SportName.walking and
-                                t[1].session_RPE is not None and t[1].distance is not None))
-
-        sport_endurance_sessions_health = list((t[0], t[1] for t in all_plans if t[1].sport_type is not None and
-                                               t[1].duration_health is not None and t[1].duration_minutes is None and
-                                               t[1].sport_type == SportType.sport_endurance
-                                               and t[1].sport_name not in distance_sports))
-        sport_endurance_sessions_minutes = list((t[0], t[1] for t in all_plans if t[1].sport_type is not None and
-                                                t[1].duration_minutes is not None and
-                                                t[1].sport_type == SportType.sport_endurance
-                                                and t[1].sport_name not in distance_sports))
-
-        load_monitoring_measures[LoadMonitoringType.RPExSwimmingDistance] = \
-            self.get_session_attributes_product_sum_tuple_list("session_RPE", "distance", swimming_sessions)
-
-        load_monitoring_measures[LoadMonitoringType.RPExCyclingDistance] = \
-            self.get_session_attributes_product_sum_tuple_list("session_RPE", "distance", cycling_sessions)
-
-        load_monitoring_measures[LoadMonitoringType.RPExRunningDistance] = \
-            self.get_session_attributes_product_sum_tuple_list("session_RPE", "distance", running_sessions)
-
-        load_monitoring_measures[LoadMonitoringType.RPExWalkingDistance] = \
-            self.get_session_attributes_product_sum_tuple_list("session_RPE", "distance", walking_sessions)
-
-        load_monitoring_measures[LoadMonitoringType.RPExDuration] = []
-
-        load_monitoring_measures[LoadMonitoringType.RPExDuration].extend(
-            self.get_session_attributes_product_sum_tuple_list("session_RPE", "duration_health",
-                                                               sport_endurance_sessions_health))
-        load_monitoring_measures[LoadMonitoringType.RPExDuration].extend(
-            self.get_session_attributes_product_sum_tuple_list("session_RPE", "duration_minutes",
-                                                               sport_endurance_sessions_minutes))
+        return sessions
 
 
     @xray_recorder.capture('logic.TrainingVolumeProcessing.load_plan_values')
