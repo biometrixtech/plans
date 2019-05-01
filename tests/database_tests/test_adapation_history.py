@@ -57,16 +57,30 @@ def test_get_adaptation_history_from_database():
         training_volume_processing = TrainingVolumeProcessing(start_date, end_date)
         training_volume_processing.fill_load_monitoring_measures(daily_readiness_surveys, plans, parse_date(end_date))
         training_volume_processing.calc_muscular_strain()
+
+        mean_maintenance_loads = {}
+        min_maintenance_loads = {}
+        max_maintenance_loads = {}
+        mean_fo_loads = {}
+        min_fo_loads = {}
+        max_fo_loads = {}
+        mean_fo_nfo_loads = {}
+        min_fo_nfo_loads = {}
+        max_fo_nfo_loads = {}
+
         if len(training_volume_processing.maintenance_loads) > 0:
-            mean_maintenance_loads = mean(training_volume_processing.maintenance_loads)
-            min_maintenance_loads = min(training_volume_processing.maintenance_loads)
-            max_maintenance_loads = max(training_volume_processing.maintenance_loads)
+            for k, l in training_volume_processing.maintenance_loads.items():
+                mean_maintenance_loads[k] = mean(l)
+                min_maintenance_loads[k] = min(l)
+                max_maintenance_loads[k] = max(l)
         if len(training_volume_processing.functional_overreaching_loads) > 0:
-            mean_fo_loads = mean(training_volume_processing.functional_overreaching_loads)
-            min_fo_loads = min(training_volume_processing.functional_overreaching_loads)
-            max_fo_loads = max(training_volume_processing.functional_overreaching_loads)
+            for k, l in training_volume_processing.functional_overreaching_loads.items():
+                mean_fo_loads[k] = mean(l)
+                min_fo_loads[k] = min(l)
+                max_fo_loads[k] = max(l)
         if len(training_volume_processing.functional_overreaching_NFO_loads) > 0:
-            mean_fo_nfo_loads = mean(training_volume_processing.functional_overreaching_NFO_loads)
-            min_fo_nfo_loads = min(training_volume_processing.functional_overreaching_NFO_loads)
-            max_fo_nfo_loads = max(training_volume_processing.functional_overreaching_NFO_loads)
+            for k, l in training_volume_processing.functional_overreaching_NFO_loads.items():
+                mean_fo_nfo_loads[k] = mean(l)
+                min_fo_nfo_loads[k] = min(l)
+                max_fo_nfo_loads[k] = max(l)
         k=1

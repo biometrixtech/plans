@@ -10,9 +10,10 @@ from statistics import stdev, mean
 
 
 class LoadingEvent(object):
-    def __init__(self, loading_date, load):
+    def __init__(self, loading_date, load, sport_name):
         self.loading_date = loading_date
         self.load = load
+        self.sport_name = sport_name
         self.affected_body_parts = []
         self.previous_affected_body_parts = []
         self.days_rest = None
@@ -81,9 +82,9 @@ class TrainingVolumeProcessing(object):
         self.no_soreness_load_tuples_last_2_4_weeks = []
         self.muscular_strain_last_2_weeks = None
         self.muscular_strain_last_2_4_weeks = None
-        self.maintenance_loads = []
-        self.functional_overreaching_loads = []
-        self.functional_overreaching_NFO_loads = []
+        self.maintenance_loads = {}
+        self.functional_overreaching_loads = {}
+        self.functional_overreaching_NFO_loads = {}
 
     def fill_load_monitoring_measures(self, readiness_surveys, daily_plans, load_end_date):
 
@@ -96,11 +97,12 @@ class TrainingVolumeProcessing(object):
         training_sessions = self.get_training_sessions(daily_plans)
 
         for t in training_sessions:
-            swimming_sessions.append((t.event_date, t.swimming_load()))
-            cycling_sessions.append((t.event_date, t.cycling_load()))
-            running_sessions.append((t.event_date, t.running_load()))
-            walking_sessions.append((t.event_date, t.walking_load()))
-            duration_sessions.append((t.event_date, t.duration_load()))
+            swimming_sessions.append((t.event_date, t.swimming_load(), t.sport_name))
+            cycling_sessions.append((t.event_date, t.cycling_load(), t.sport_name))
+            running_sessions.append((t.event_date, t.running_load(), t.sport_name))
+            walking_sessions.append((t.event_date, t.walking_load(), t.sport_name))
+            if t.duration_load() is not None:
+                duration_sessions.append((t.event_date, t.duration_load(), t.sport_name))
 
         self.load_monitoring_measures[LoadMonitoringType.RPExSwimmingDistance] = swimming_sessions
         self.load_monitoring_measures[LoadMonitoringType.RPExCyclingDistance] = cycling_sessions
@@ -334,16 +336,16 @@ class TrainingVolumeProcessing(object):
         for t in range(0, len(load_tuples) - 1):
 
             if load_tuples[t][0] <= load_end_date:
-                loading_event = LoadingEvent(load_tuples[t][0], load_tuples[t][1])
+                loading_event = LoadingEvent(load_tuples[t][0], load_tuples[t][1], load_tuples[t][2])
                 initial_loading_events.append(loading_event)
 
         # sum load by day
         load_grouper = attrgetter('loading_date')
         for k, g in groupby(sorted(initial_loading_events, key=load_grouper), load_grouper):
             part_list = list(g)
-            part_list.sort(key=lambda x: x.loading_date)
+            part_list.sort(key=lambda x: (x.loading_date, x.load))
             load_sum = sum(list(g.load for g in part_list if g.load is not None))
-            loading_event = LoadingEvent(k, load_sum)
+            loading_event = LoadingEvent(k, load_sum, part_list[len(part_list) - 1].sport_name)
             loading_events.append(loading_event)
 
         early_soreness_tuples = list(s[0] for s in self.post_session_survey_tuples
@@ -455,7 +457,9 @@ class TrainingVolumeProcessing(object):
             if len(loading_event.affected_body_parts) == len(level_one_soreness): # no soreness
                 self.no_soreness_load_tuples.append((loading_event.loading_date, loading_event.load))
                 if loading_event.loading_date >= last_2_4_week_date:
-                    self.maintenance_loads.append(loading_event.load)
+                    if loading_event.sport_name not in self.maintenance_loads:
+                        self.maintenance_loads[loading_event.sport_name] = []
+                    self.maintenance_loads[loading_event.sport_name].append(loading_event.load)
 
                 if last_2_week_date > loading_event.loading_date >= last_2_4_week_date:
                     self.no_soreness_load_tuples_last_2_4_weeks.append((loading_event.loading_date, loading_event.load))
@@ -465,16 +469,20 @@ class TrainingVolumeProcessing(object):
             else:
                 self.soreness_load_tuples.append((loading_event.loading_date, loading_event.load))
                 if loading_event.loading_date >= last_2_4_week_date:
-                    fo_soreness_list = list(a for a in loading_event.affected_body_parts if a.cleared and (0 < a.max_severity <= 1 and
-                                                         0 < a.days_sore < 3))
+                    fo_soreness_list = list(a for a in loading_event.affected_body_parts if a.cleared and (a.max_severity <= 1 and
+                                                         a.days_sore < 3))
                     if len(fo_soreness_list) > 0:
-                        self.functional_overreaching_loads.append(loading_event.load)
+                        if loading_event.sport_name not in self.functional_overreaching_loads:
+                            self.functional_overreaching_loads[loading_event.sport_name] = []
+                        self.functional_overreaching_loads[loading_event.sport_name].append(loading_event.load)
 
                     fo_nfo_list = list(a for a in loading_event.affected_body_parts if a.cleared and (1 < a.max_severity or
                                                          a.days_sore > 2))
 
                     if len(fo_nfo_list) > 0:
-                        self.functional_overreaching_NFO_loads.append(loading_event.load)
+                        if loading_event.sport_name not in self.functional_overreaching_NFO_loads:
+                            self.functional_overreaching_NFO_loads[loading_event.sport_name] = []
+                        self.functional_overreaching_NFO_loads[loading_event.sport_name].append(loading_event.load)
 
             if last_2_week_date > loading_event.loading_date >= last_2_4_week_date:
                 self.load_tuples_last_2_4_weeks.append((loading_event.loading_date, loading_event.load))
