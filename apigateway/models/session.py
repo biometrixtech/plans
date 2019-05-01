@@ -166,7 +166,7 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
             return self.duration_health * self.session_RPE
         elif (self.sport_type == SportType.sport_endurance and self.duration_minutes is not None and
               self.session_RPE is not None and self.sport_name not in distance_sports):
-            return self.duration_health * self.session_RPE
+            return self.duration_minutes * self.session_RPE
         else:
             return None
 
