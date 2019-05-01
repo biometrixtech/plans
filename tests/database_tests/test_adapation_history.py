@@ -69,4 +69,5 @@ def test_get_adaptation_history_from_database():
 
         training_volume_processing = TrainingVolumeProcessing(start_date, end_date)
         training_volume_processing.fill_load_monitoring_measures(daily_readiness_surveys, plans, parse_date(end_date))
+        training_volume_processing.calc_muscular_strain()
         k=1

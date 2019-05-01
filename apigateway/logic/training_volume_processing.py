@@ -74,12 +74,15 @@ class TrainingVolumeProcessing(object):
         self.daily_readiness_tuples = []
         self.post_session_survey_tuples = []
         self.no_soreness_load_tuples = []
-        self.last_14_max_no_soreness_load_tuples = []
-        self.last_14_max_soreness_load_tuples = []
-
         self.soreness_load_tuples = []
         self.mod_soreness_load_tuples = []
         self.sev_soreness_load_tuples = []
+        self.load_tuples_last_2_weeks = []
+        self.load_tuples_last_2_4_weeks = []
+        self.no_soreness_load_tuples_last_2_weeks = []
+        self.no_soreness_load_tuples_last_2_4_weeks = []
+        self.muscular_strain_last_2_weeks = None
+        self.muscular_strain_last_2_4_weeks = None
 
     def fill_load_monitoring_measures(self, readiness_surveys, daily_plans, load_end_date):
 
@@ -264,6 +267,22 @@ class TrainingVolumeProcessing(object):
 
         return athlete_stats
 
+    def calc_muscular_strain(self):
+
+        last_2_weeks_load_sum = sum(
+            list(l[1] for l in self.load_tuples_last_2_weeks if l[1] is not None))
+        last_2_4_weeks_load_sum = sum(
+            list(l[1] for l in self.load_tuples_last_2_4_weeks if l[1] is not None))
+        last_2_weeks_no_soreness_load_sum = sum(
+            list(l[1] for l in self.no_soreness_load_tuples_last_2_weeks if l[1] is not None))
+        last_2_4_weeks_no_soreness_load_sum = sum(
+            list(l[1] for l in self.no_soreness_load_tuples_last_2_4_weeks if l[1] is not None))
+
+        if last_2_weeks_load_sum > 0:
+            self.muscular_strain_last_2_weeks = (last_2_weeks_no_soreness_load_sum / last_2_weeks_load_sum) * 100
+        if last_2_4_weeks_load_sum > 0:
+            self.muscular_strain_last_2_4_weeks = (last_2_4_weeks_no_soreness_load_sum / last_2_4_weeks_load_sum) * 100
+
     def get_training_sessions(self, daily_plans):
 
         training_sessions = []
@@ -307,6 +326,8 @@ class TrainingVolumeProcessing(object):
 
         loading_events = []
         initial_loading_events = []
+        last_2_week_date = load_end_date - timedelta(days=14)
+        last_2_4_week_date = load_end_date - timedelta(days=28)
 
         # create a list of loading events first
         for t in range(0, len(load_tuples) - 1):
@@ -433,6 +454,11 @@ class TrainingVolumeProcessing(object):
             if len(loading_event.affected_body_parts) == len(level_one_soreness): # no soreness
                 self.no_soreness_load_tuples.append((loading_event.loading_date, loading_event.load))
 
+                if last_2_week_date > loading_event.loading_date >= last_2_4_week_date:
+                    self.no_soreness_load_tuples_last_2_4_weeks.append((loading_event.loading_date, loading_event.load))
+                if 0 <= (loading_event.loading_date - last_2_week_date).days <= 14:
+                    self.no_soreness_load_tuples_last_2_weeks.append((loading_event.loading_date, loading_event.load))
+
             else:
                 self.soreness_load_tuples.append((loading_event.loading_date, loading_event.load))
                 mod_soreness_list = list(a for a in loading_event.affected_body_parts if a.cleared and (0 < a.max_severity <= 3 and
@@ -445,6 +471,11 @@ class TrainingVolumeProcessing(object):
 
                 if len(sev_soreness_list) > 0:
                     self.sev_soreness_load_tuples.append((loading_event.loading_date, loading_event.load))
+
+            if last_2_week_date > loading_event.loading_date >= last_2_4_week_date:
+                self.load_tuples_last_2_4_weeks.append((loading_event.loading_date, loading_event.load))
+            if 0 <= (loading_event.loading_date - last_2_week_date).days <= 14:
+                self.load_tuples_last_2_weeks.append((loading_event.loading_date, loading_event.load))
 
     def get_acwr(self, acute_load_error, chronic_load_error, factor=1.3):
 
