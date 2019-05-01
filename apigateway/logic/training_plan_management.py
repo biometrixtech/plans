@@ -131,7 +131,7 @@ class TrainingPlanManager(object):
             # create new pre-training modalities
             self.daily_plan.heat = calc.get_heat(soreness_list, event_date)
             self.daily_plan.pre_active_rest = calc.get_pre_active_rest(soreness_list, event_date)
-        # self.daily_plan.warm_up = calc.get_warm_up(soreness_list)
+            self.daily_plan.warm_up = calc.get_warm_up(soreness_list, event_date)
         # self.daily_plan.cool_down = calc.get_cool_down(event_date, soreness_list)
         # self.daily_plan.post_active_rest = calc.get_post_active_rest(soreness_list, event_date)
         # self.daily_plan.active_recovery = calc.get_active_recovery(event_date, soreness_list)

@@ -203,8 +203,10 @@ class BodyPart(object):
         self.static_stretch_exercises = []
         self.active_stretch_exercises = []
         self.dynamic_stretch_exercises = []
+        self.active_or_dynamic_stretch_exercises = []
         self.isolated_activate_exercises = []
         self.static_integrate_exercises = []
+        self.dynamic_integrate_exercises = []
 
         self.agonists = []
         self.synergists = []
