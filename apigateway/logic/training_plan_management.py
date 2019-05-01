@@ -49,10 +49,7 @@ class TrainingPlanManager(object):
             self.daily_plan = plan_today[0]
         self.readiness_surveys = [plan.daily_readiness_survey for plan in daily_plans if plan.daily_readiness_survey is not None]
         for plan in daily_plans:
-            post_surveys = \
-                [PostSessionSurvey.post_session_survey_from_training_session(ts.post_session_survey, self.athlete_id, ts.id, ts.session_type().value, plan.event_date)
-                 for ts in plan.training_sessions if ts is not None]
-            self.post_session_surveys.extend([s for s in post_surveys if s is not None])
+            self.post_session_surveys.extend([ts.post_session_survey for ts in plan.training_sessions if ts is not None and ts.post_session_survey is not None])
 
         if self.athlete_stats is None:
             self.athlete_stats = self.athlete_stats_datastore.get(self.athlete_id)
