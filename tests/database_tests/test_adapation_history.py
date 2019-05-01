@@ -1,25 +1,12 @@
 import pytest
 import os
-import json
 from aws_xray_sdk.core import xray_recorder
 from datastores.daily_readiness_datastore import DailyReadinessDatastore
 from datastores.daily_plan_datastore import DailyPlanDatastore
-from datastores.athlete_stats_datastore import AthleteStatsDatastore
-from tests.mocks.mock_daily_readiness_datastore import DailyReadinessDatastore as mock_readiness
-from tests.mocks.mock_daily_plan_datastore import DailyPlanDatastore as mock_plans
-from tests.mocks.mock_post_session_survey_datastore import PostSessionSurveyDatastore as mock_pss
-from tests.mocks.mock_datastore_collection import DatastoreCollection
-from datastores.post_session_survey_datastore import PostSessionSurveyDatastore
 from logic.training_volume_processing import TrainingVolumeProcessing
-from logic.stats_processing import StatsProcessing
-from logic.training_volume_processing import TrainingVolumeProcessing
-from models.stats import AthleteStats
-# from models.training_volume import TrainingLevel
-from datastores.completed_exercise_datastore import CompletedExerciseDatastore
-from models.soreness import CompletedExercise
-from datetime import datetime, timedelta
 from config import get_secret
 from utils import parse_date, format_date
+from statistics import stdev, mean
 
 @pytest.fixture(scope="session", autouse=True)
 def add_xray_support(request):
@@ -70,4 +57,16 @@ def test_get_adaptation_history_from_database():
         training_volume_processing = TrainingVolumeProcessing(start_date, end_date)
         training_volume_processing.fill_load_monitoring_measures(daily_readiness_surveys, plans, parse_date(end_date))
         training_volume_processing.calc_muscular_strain()
+        if len(training_volume_processing.maintenance_loads) > 0:
+            mean_maintenance_loads = mean(training_volume_processing.maintenance_loads)
+            min_maintenance_loads = min(training_volume_processing.maintenance_loads)
+            max_maintenance_loads = max(training_volume_processing.maintenance_loads)
+        if len(training_volume_processing.functional_overreaching_loads) > 0:
+            mean_fo_loads = mean(training_volume_processing.functional_overreaching_loads)
+            min_fo_loads = min(training_volume_processing.functional_overreaching_loads)
+            max_fo_loads = max(training_volume_processing.functional_overreaching_loads)
+        if len(training_volume_processing.functional_overreaching_NFO_loads) > 0:
+            mean_fo_nfo_loads = mean(training_volume_processing.functional_overreaching_NFO_loads)
+            min_fo_nfo_loads = min(training_volume_processing.functional_overreaching_NFO_loads)
+            max_fo_nfo_loads = max(training_volume_processing.functional_overreaching_NFO_loads)
         k=1

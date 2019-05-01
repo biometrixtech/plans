@@ -75,14 +75,15 @@ class TrainingVolumeProcessing(object):
         self.post_session_survey_tuples = []
         self.no_soreness_load_tuples = []
         self.soreness_load_tuples = []
-        self.mod_soreness_load_tuples = []
-        self.sev_soreness_load_tuples = []
         self.load_tuples_last_2_weeks = []
         self.load_tuples_last_2_4_weeks = []
         self.no_soreness_load_tuples_last_2_weeks = []
         self.no_soreness_load_tuples_last_2_4_weeks = []
         self.muscular_strain_last_2_weeks = None
         self.muscular_strain_last_2_4_weeks = None
+        self.maintenance_loads = []
+        self.functional_overreaching_loads = []
+        self.functional_overreaching_NFO_loads = []
 
     def fill_load_monitoring_measures(self, readiness_surveys, daily_plans, load_end_date):
 
@@ -453,6 +454,8 @@ class TrainingVolumeProcessing(object):
 
             if len(loading_event.affected_body_parts) == len(level_one_soreness): # no soreness
                 self.no_soreness_load_tuples.append((loading_event.loading_date, loading_event.load))
+                if loading_event.loading_date >= last_2_4_week_date:
+                    self.maintenance_loads.append(loading_event.load)
 
                 if last_2_week_date > loading_event.loading_date >= last_2_4_week_date:
                     self.no_soreness_load_tuples_last_2_4_weeks.append((loading_event.loading_date, loading_event.load))
@@ -461,16 +464,17 @@ class TrainingVolumeProcessing(object):
 
             else:
                 self.soreness_load_tuples.append((loading_event.loading_date, loading_event.load))
-                mod_soreness_list = list(a for a in loading_event.affected_body_parts if a.cleared and (0 < a.max_severity <= 3 and
-                                                     a.days_sore > 1))
-                if len(mod_soreness_list) > 0:
-                    self.mod_soreness_load_tuples.append((loading_event.loading_date, loading_event.load))
+                if loading_event.loading_date >= last_2_4_week_date:
+                    fo_soreness_list = list(a for a in loading_event.affected_body_parts if a.cleared and (0 < a.max_severity <= 1 and
+                                                         0 < a.days_sore < 3))
+                    if len(fo_soreness_list) > 0:
+                        self.functional_overreaching_loads.append(loading_event.load)
 
-                sev_soreness_list = list(a for a in loading_event.affected_body_parts if a.cleared and (3 < a.max_severity and
-                                                     a.days_sore > 1))
+                    fo_nfo_list = list(a for a in loading_event.affected_body_parts if a.cleared and (1 < a.max_severity or
+                                                         a.days_sore > 2))
 
-                if len(sev_soreness_list) > 0:
-                    self.sev_soreness_load_tuples.append((loading_event.loading_date, loading_event.load))
+                    if len(fo_nfo_list) > 0:
+                        self.functional_overreaching_NFO_loads.append(loading_event.load)
 
             if last_2_week_date > loading_event.loading_date >= last_2_4_week_date:
                 self.load_tuples_last_2_4_weeks.append((loading_event.loading_date, loading_event.load))
