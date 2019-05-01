@@ -144,8 +144,34 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         else:
             return False
 
+    def cycling_load(self):
+        return self.get_distance_load(SportName.cycling)
+
+    def running_load(self):
+        return self.get_distance_load(SportName.distance_running)
+
     def swimming_load(self):
-        if self.sport_name == SportName.swimming and self.session_RPE is not None and self.distance is not None:
+        return self.get_distance_load(SportName.swimming)
+
+    def walking_load(self):
+        return self.get_distance_load(SportName.walking)
+
+    def duration_load(self):
+
+        distance_sports = [SportName.swimming, SportName.cycling, SportName.distance_running, SportName.walking]
+
+        if (self.sport_type == SportType.sport_endurance and self.duration_health is not None and
+                self.duration_minutes is None and self.session_RPE is not None and
+                self.sport_name not in distance_sports):
+            return self.duration_health * self.session_RPE
+        elif (self.sport_type == SportType.sport_endurance and self.duration_minutes is not None and
+              self.session_RPE is not None and self.sport_name not in distance_sports):
+            return self.duration_health * self.session_RPE
+        else:
+            return None
+
+    def get_distance_load(self, sport_name):
+        if self.sport_name == sport_name and self.session_RPE is not None and self.distance is not None:
             return self.session_RPE * self.distance
         else:
             return None

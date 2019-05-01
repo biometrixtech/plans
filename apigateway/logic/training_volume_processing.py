@@ -50,10 +50,10 @@ class TrainingVolumeProcessing(object):
         duration_sessions = []
 
         for a in all_plans:
-            swimming_sessions.extend(self.get_distance_tuple_list(SportName.swimming, a))
-            cycling_sessions.extend(self.get_distance_tuple_list(SportName.cycling, a))
-            running_sessions.extend(self.get_distance_tuple_list(SportName.distance_running, a))
-            walking_sessions.extend(self.get_distance_tuple_list(SportName.walking, a))
+            swimming_sessions.extend(self.get_distance_tuple_list("swimming_load", a))
+            cycling_sessions.extend(self.get_distance_tuple_list("cycling_load", a))
+            running_sessions.extend(self.get_distance_tuple_list("running_load", a))
+            walking_sessions.extend(self.get_distance_tuple_list("walking_load", a))
             duration_sessions.extend(self.get_duration_tuple_list(a))
 
         load_monitoring_measures[LoadMonitoringType.RPExSwimmingDistance] = swimming_sessions
@@ -69,33 +69,17 @@ class TrainingVolumeProcessing(object):
     def get_distance_tuple_list(self, sport_name, daily_plan):
         sessions = []
         sessions.extend(
-            self.get_tuple_product_of_session_attributes(daily_plan.get_event_date_time(), "session_RPE", "distance",
-                                                         list(t for t in daily_plan.training_sessions
-                                                              if t.sport_name == sport_name and
-                                                              t.session_RPE is not None and
-                                                              t.distance is not None)))
+            self.get_tuple_product_of_session_method(daily_plan.get_event_date_time(), sport_name,
+                                                     list(t for t in daily_plan.training_sessions)))
         return sessions
 
     def get_duration_tuple_list(self, daily_plan):
 
-        distance_sports = [SportName.swimming, SportName.cycling, SportName.distance_running, SportName.walking]
-
         sessions = []
         sessions.extend(
-            self.get_tuple_product_of_session_attributes(daily_plan.get_event_date_time(), "session_RPE", "duration_health",
-                                                         list(t for t in daily_plan.training_sessions
-                                                              if t.sport_type == SportType.sport_endurance and
-                                                              t.duration_health is not None and t.duration_minutes is None and
-                                                              t.session_RPE is not None and
-                                                              t.sport_name not in distance_sports)))
-        sessions.extend(
-            self.get_tuple_product_of_session_attributes(daily_plan.get_event_date_time(), "session_RPE", "duration_minutes",
-                                                         list(t for t in daily_plan.training_sessions
-                                                              if t.sport_type == SportType.sport_endurance and
-                                                              t.duration_minutes is not None and
-                                                              t.session_RPE is not None and
-                                                              t.sport_name not in distance_sports)))
-
+            self.get_tuple_product_of_session_method(daily_plan.get_event_date_time(), "duration_load",
+                                                     list(t for t in daily_plan.training_sessions)))
+        
         return sessions
 
     @xray_recorder.capture('logic.TrainingVolumeProcessing.load_plan_values')
@@ -851,6 +835,15 @@ class TrainingVolumeProcessing(object):
         values = []
         values_list = list(getattr(c, attribute_1_name) * getattr(c, attribute_2_name) for c in session_collection
                       if getattr(c, attribute_1_name) is not None and getattr(c, attribute_2_name) is not None)
+        for v in values_list:
+            values.append((event_date_time, v))
+
+        return values
+
+    def get_tuple_product_of_session_method(self, event_date_time, method_name, session_collection):
+
+        values = []
+        values_list = list(getattr(c, method_name) for c in session_collection if getattr(c, method_name) is not None)
         for v in values_list:
             values.append((event_date_time, v))
 
