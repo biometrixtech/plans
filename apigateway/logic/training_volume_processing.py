@@ -1,5 +1,6 @@
 from fathomapi.utils.xray import xray_recorder
-from models.training_volume import StandardErrorRange, StandardErrorRangeMetric
+from models.training_volume import LoadMonitoringType, StandardErrorRange, StandardErrorRangeMetric
+from models.sport import SportName, SportType
 from datetime import timedelta
 import statistics, math
 from utils import format_date, parse_date
@@ -34,6 +35,52 @@ class TrainingVolumeProcessing(object):
         self.low_internal_load_day_upper_bound = None
         self.mod_internal_load_day_upper_bound = None
         self.high_internal_load_day_upper_bound = None
+        self.load_monitoring_measures = []
+
+    def fill_load_monitoring_measures(self, acute_daily_plans, chronic_daily_plans):
+
+        all_plans = []
+        all_plans.extend(acute_daily_plans)
+        all_plans.extend(chronic_daily_plans)
+        load_monitoring_measures = {}
+        swimming_sessions = []
+        cycling_sessions = []
+        running_sessions = []
+        walking_sessions = []
+        duration_sessions = []
+
+        for a in all_plans:
+            swimming_sessions.extend(self.get_distance_tuple_list("swimming_load", a))
+            cycling_sessions.extend(self.get_distance_tuple_list("cycling_load", a))
+            running_sessions.extend(self.get_distance_tuple_list("running_load", a))
+            walking_sessions.extend(self.get_distance_tuple_list("walking_load", a))
+            duration_sessions.extend(self.get_duration_tuple_list(a))
+
+        load_monitoring_measures[LoadMonitoringType.RPExSwimmingDistance] = swimming_sessions
+
+        load_monitoring_measures[LoadMonitoringType.RPExCyclingDistance] = cycling_sessions
+
+        load_monitoring_measures[LoadMonitoringType.RPExRunningDistance] = running_sessions
+
+        load_monitoring_measures[LoadMonitoringType.RPExWalkingDistance] = walking_sessions
+
+        load_monitoring_measures[LoadMonitoringType.RPExDuration] = duration_sessions
+
+    def get_distance_tuple_list(self, sport_name, daily_plan):
+        sessions = []
+        sessions.extend(
+            self.get_tuple_product_of_session_method(daily_plan.get_event_date_time(), sport_name,
+                                                     list(t for t in daily_plan.training_sessions)))
+        return sessions
+
+    def get_duration_tuple_list(self, daily_plan):
+
+        sessions = []
+        sessions.extend(
+            self.get_tuple_product_of_session_method(daily_plan.get_event_date_time(), "duration_load",
+                                                     list(t for t in daily_plan.training_sessions)))
+        
+        return sessions
 
     @xray_recorder.capture('logic.TrainingVolumeProcessing.load_plan_values')
     def load_plan_values(self, last_7_days_plans, days_8_14_plans, acute_daily_plans, chronic_weeks_plans, chronic_daily_plans):
@@ -788,6 +835,15 @@ class TrainingVolumeProcessing(object):
         values = []
         values_list = list(getattr(c, attribute_1_name) * getattr(c, attribute_2_name) for c in session_collection
                       if getattr(c, attribute_1_name) is not None and getattr(c, attribute_2_name) is not None)
+        for v in values_list:
+            values.append((event_date_time, v))
+
+        return values
+
+    def get_tuple_product_of_session_method(self, event_date_time, method_name, session_collection):
+
+        values = []
+        values_list = list(getattr(c, method_name) for c in session_collection if getattr(c, method_name) is not None)
         for v in values_list:
             values.append((event_date_time, v))
 
