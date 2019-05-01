@@ -54,6 +54,14 @@ class TrainingPlanManager(object):
         if self.athlete_stats is None:
             self.athlete_stats = self.athlete_stats_datastore.get(self.athlete_id)
 
+    @staticmethod
+    def preserve_completed_modality(modality):
+        if modality is not None:
+            if not modality.completed:
+                modality = None
+            else:
+                modality.active = False
+
     @xray_recorder.capture('logic.TrainingPlanManager.create_daily_plan')
     def create_daily_plan(self, event_date, last_updated, target_minutes=15, athlete_stats=None):
         self.athlete_stats = athlete_stats
@@ -84,56 +92,63 @@ class TrainingPlanManager(object):
         # new modalities
         if not self.daily_plan.train_later:
             # if any completed post-training modalities exist, preserve them
-            for ice in self.daily_plan.heat:
-                if ice.completed:
-                    self.daily_plan.completed_ice.append(ice)
+            if self.daily_plan.active_recovery is not None and self.daily_plan.active_recovery.completed:
+                self.daily_plan.completed_active_recovery.append(self.daily_plan.active_recovery)
             if self.daily_plan.post_active_rest is not None and self.daily_plan.post_active_rest.completed:
                 self.daily_plan.completed_post_active_rest.append(self.daily_plan.post_active_rest)
+            if self.daily_plan.ice is not None and self.daily_plan.ice.completed:
+                self.daily_plan.completed_ice.append(self.daily_plan.ice)
             if self.daily_plan.cold_water_immersion is not None and self.daily_plan.cold_water_immersion.completed:
                 self.daily_plan.completed_cold_water_immersion.append(self.daily_plan.cold_water_immersion)
             # make pre-training modalities inactive
-            for heat in self.daily_plan.heat:
-                heat.active = False
+            if self.daily_plan.heat is not None:
+                self.daily_plan.heat.active = False
             if self.daily_plan.pre_active_rest is not None:
                 self.daily_plan.pre_active_rest.active = False
+            if self.daily_plan.warm_up is not None:
+                self.daily_plan.warm_up.active = False
             # create new post-training modalities
+            # self.daily_plan.active_recovery = calc.get_active_recovery(event_date, soreness_list)
             self.daily_plan.post_active_rest = calc.get_post_active_rest(soreness_list, event_date)
             self.daily_plan.ice = calc.get_ice(soreness_list, event_date)
             self.daily_plan.cold_water_immersion = calc.get_cold_water_immersion(soreness_list, event_date)
         else:
             # if any post-training modalities are present and complete, preserve the completed ones
-            if self.daily_plan.post_active_rest is not None:
-                if not self.daily_plan.post_active_rest.completed:
-                    self.daily_plan.post_active_rest = None
-                else:
-                    self.daily_plan.post_active_rest.active = False
-            if self.daily_plan.cold_water_immersion is not None:
-                if not self.daily_plan.cold_water_immersion.completed:
-                    self.daily_plan.cold_water_immersion = None
-                else:
-                    self.daily_plan.cold_water_immersion.active = False
-            ice_completed = False
-            for ice in self.daily_plan.ice:
-                ice.active = False
-                if ice.completed:
-                    ice_completed = True
-            if not ice_completed:
-                self.daily_plan.ice = []
+            self.preserve_completed_modality(self.daily_plan.active_recovery)
+            self.preserve_completed_modality(self.daily_plan.post_active_rest)
+            self.preserve_completed_modality(self.daily_plan.ice)
+            self.preserve_completed_modality(self.daily_plan.cold_water_immersion)
+            # if self.daily_plan.active_recovery is not None:
+            #     if not self.daily_plan.active_recovery.completed:
+            #         self.daily_plan.active_recovery = None
+            #     else:
+            #         self.daily_plan.active_recovery.active = False
+            # if self.daily_plan.post_active_rest is not None:
+            #     if not self.daily_plan.post_active_rest.completed:
+            #         self.daily_plan.post_active_rest = None
+            #     else:
+            #         self.daily_plan.post_active_rest.active = False
+            # if self.daily_plan.cold_water_immersion is not None:
+            #     if not self.daily_plan.cold_water_immersion.completed:
+            #         self.daily_plan.cold_water_immersion = None
+            #     else:
+            #         self.daily_plan.cold_water_immersion.active = False
+            # if self.daily_plan.ice is not None:
+            #     if not self.daily_plan.ice.completed:
+            #         self.daily_plan.ice = None
+            #     else:
+            #         self.daily_plan.ice.active = False
             # if any completed pre-training modalities exist, preserve them
-            for heat in self.daily_plan.heat:
-                if heat.completed:
-                    self.daily_plan.completed_heat.append(heat)
+            if self.daily_plan.heat is not None and self.daily_plan.heat.completed:
+                self.daily_plan.completed_heat.append(self.daily_plan.heat)
             if self.daily_plan.pre_active_rest is not None and self.daily_plan.pre_active_rest.completed:
                 self.daily_plan.completed_pre_active_rest.append(self.daily_plan.pre_active_rest)
+            if self.daily_plan.warm_up is not None and self.daily_plan.warm_up.completed:
+                self.daily_plan.completed_warm_up.append(self.daily_plan.warm_up)
             # create new pre-training modalities
             self.daily_plan.heat = calc.get_heat(soreness_list, event_date)
             self.daily_plan.pre_active_rest = calc.get_pre_active_rest(soreness_list, event_date)
-        # self.daily_plan.warm_up = calc.get_warm_up(soreness_list)
-        # self.daily_plan.cool_down = calc.get_cool_down(event_date, soreness_list)
-        # self.daily_plan.post_active_rest = calc.get_post_active_rest(soreness_list, event_date)
-        # self.daily_plan.active_recovery = calc.get_active_recovery(event_date, soreness_list)
-        # self.daily_plan.ice = calc.get_ice(soreness_list, event_date)
-        # self.daily_plan.cold_water_immersion = calc.get_cold_water_immersion(soreness_list, event_date)
+            # self.daily_plan.warm_up = calc.get_warm_up(soreness_list)
         #
         # if soreness_values is not None and len(soreness_values) > 0:
         #    max_soreness = max(soreness_values)
