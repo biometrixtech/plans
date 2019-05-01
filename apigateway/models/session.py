@@ -144,6 +144,12 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         else:
             return False
 
+    def swimming_load(self):
+        if self.sport_name == SportName.swimming and self.session_RPE is not None and self.distance is not None:
+            return self.session_RPE * self.distance
+        else:
+            return None
+
     def get_sport_type(self, sport_name):
 
         ultra_high = [SportName.diving, SportName.jumps, SportName.throws, SportName.weightlifting, SportName.strength,
