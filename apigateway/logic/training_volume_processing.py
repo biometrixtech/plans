@@ -82,6 +82,7 @@ class TrainingVolumeProcessing(object):
         self.no_soreness_load_tuples_last_2_4_weeks = []
         self.muscular_strain_last_2_weeks = None
         self.muscular_strain_last_2_4_weeks = None
+        self.recovery_loads = {}
         self.maintenance_loads = {}
         self.functional_overreaching_loads = {}
         self.functional_overreaching_NFO_loads = {}
@@ -331,6 +332,7 @@ class TrainingVolumeProcessing(object):
         initial_loading_events = []
         last_2_week_date = load_end_date - timedelta(days=14)
         last_2_4_week_date = load_end_date - timedelta(days=28)
+        max_load = 0
 
         # create a list of loading events first
         for t in range(0, len(load_tuples) - 1):
@@ -346,6 +348,7 @@ class TrainingVolumeProcessing(object):
             part_list.sort(key=lambda x: (x.loading_date, x.load))
             load_sum = sum(list(g.load for g in part_list if g.load is not None))
             loading_event = LoadingEvent(k, load_sum, part_list[len(part_list) - 1].sport_name)
+            max_load = max(loading_event.load, max_load)
             loading_events.append(loading_event)
 
         early_soreness_tuples = list(s[0] for s in self.post_session_survey_tuples
@@ -457,13 +460,18 @@ class TrainingVolumeProcessing(object):
             if len(loading_event.affected_body_parts) == len(level_one_soreness): # no soreness
                 self.no_soreness_load_tuples.append((loading_event.loading_date, loading_event.load))
                 if loading_event.loading_date >= last_2_4_week_date:
-                    if loading_event.sport_name not in self.maintenance_loads:
-                        self.maintenance_loads[loading_event.sport_name] = []
-                    self.maintenance_loads[loading_event.sport_name].append(loading_event.load)
+                    if loading_event.load / max_load <= .10:
+                        if loading_event.sport_name not in self.recovery_loads:
+                            self.recovery_loads[loading_event.sport_name] = []
+                        self.recovery_loads[loading_event.sport_name].append(loading_event.load)
+                    else:
+                        if loading_event.sport_name not in self.maintenance_loads:
+                            self.maintenance_loads[loading_event.sport_name] = []
+                        self.maintenance_loads[loading_event.sport_name].append(loading_event.load)
 
-                if last_2_week_date > loading_event.loading_date >= last_2_4_week_date:
+                if last_2_week_date - timedelta(days=3) > loading_event.loading_date >= last_2_4_week_date - timedelta(days=3):
                     self.no_soreness_load_tuples_last_2_4_weeks.append((loading_event.loading_date, loading_event.load))
-                if 0 <= (loading_event.loading_date - last_2_week_date).days <= 14:
+                if 0 <= (loading_event.loading_date - last_2_week_date - timedelta(days=3)).days <= 14:
                     self.no_soreness_load_tuples_last_2_weeks.append((loading_event.loading_date, loading_event.load))
 
             else:
@@ -484,9 +492,9 @@ class TrainingVolumeProcessing(object):
                             self.functional_overreaching_NFO_loads[loading_event.sport_name] = []
                         self.functional_overreaching_NFO_loads[loading_event.sport_name].append(loading_event.load)
 
-            if last_2_week_date > loading_event.loading_date >= last_2_4_week_date:
+            if last_2_week_date - timedelta(days=3) > loading_event.loading_date >= last_2_4_week_date - timedelta(days=3):
                 self.load_tuples_last_2_4_weeks.append((loading_event.loading_date, loading_event.load))
-            if 0 <= (loading_event.loading_date - last_2_week_date).days <= 14:
+            if 0 <= (loading_event.loading_date - last_2_week_date - timedelta(days=3)).days <= 14:
                 self.load_tuples_last_2_weeks.append((loading_event.loading_date, loading_event.load))
 
     def get_acwr(self, acute_load_error, chronic_load_error, factor=1.3):
