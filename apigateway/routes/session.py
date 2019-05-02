@@ -13,6 +13,7 @@ from utils import parse_datetime, format_date, format_datetime
 from config import get_mongo_collection
 from logic.survey_processing import SurveyProcessing, create_session, update_session, create_plan, cleanup_plan
 from logic.athlete_status_processing import AthleteStatusProcessing
+from logic.training_volume_processing import TrainingVolumeProcessing
 
 datastore_collection = DatastoreCollection()
 athlete_stats_datastore = datastore_collection.athlete_stats_datastore
@@ -28,8 +29,10 @@ app = Blueprint('session', __name__)
 @require.body({'event_date': str, 'sessions': list})
 @xray_recorder.capture('routes.session.create')
 def handle_session_create(principal_id=None):
+
     user_id = principal_id
     event_date = parse_datetime(request.json['event_date'])
+    training_volume_processing = TrainingVolumeProcessing(event_date, event_date)
     plan_update_required = False
     train_later = True
     if 'sessions_planned' in request.json and not request.json['sessions_planned']:
@@ -51,7 +54,10 @@ def handle_session_create(principal_id=None):
     for session in survey_processor.sessions:
         if not session.deleted and not session.ignored:
             plan_update_required = True
-            break
+            if training_volume_processing.is_last_session_high_relative_load(event_date, session, athlete_stats.high_relative_load_benchmarks):
+                athlete_stats.high_relative_load_session = True
+                athlete_stats_datastore.put(athlete_stats)
+            #break (need to check if any of the sessions are high load)
 
     # check if plan exists, if not create a new one and save it to database, also check if existing one needs updating flags
 

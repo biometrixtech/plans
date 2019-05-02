@@ -4,6 +4,7 @@ from models.stats import AthleteStats
 from models.soreness import BodyPartLocation, HistoricSoreness, HistoricSorenessStatus, Soreness, BodyPart
 from models.metrics import AthleteMetric, MetricType, DailyHighLevelInsight, WeeklyHighLevelInsight, MetricColor, SpecificAction
 from models.training_volume import StandardErrorRange
+from models.sport import SportName
 from utils import parse_datetime
 from fathomapi.utils.exceptions import InvalidSchemaException
 import numbers
@@ -112,6 +113,7 @@ class AthleteStatsDatastore(object):
         athlete_stats.wearable_devices = mongo_result.get('wearable_devices', [])
         athlete_stats.muscular_strain_increasing = mongo_result.get('muscular_strain_increasing', False)
         athlete_stats.high_relative_load_session = mongo_result.get('high_relative_load_session', False)
+        athlete_stats.high_relative_load_benchmarks = {SportName(value): load for (value, load) in mongo_result.get('high_relative_load_benchmarks', {}).items()}
         return athlete_stats
 
     @xray_recorder.capture('datastore.AthleteStatsDatastore._put_mongodb')
