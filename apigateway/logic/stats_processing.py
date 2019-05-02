@@ -187,8 +187,8 @@ class StatsProcessing(object):
                 grouped_soreness[ns_new] = grouped_soreness[ns_new] + 1
             else:
                 grouped_soreness[ns_new] = 1
-            if last_reported_date_time is None:
-                first_reported_date = s.reported_date_time
+            # if last_reported_date_time is None:
+            #     first_reported_date = s.reported_date_time
             if last_reported_date_time is None or parse_date(s.reported_date_time) > last_reported_date_time:
                 last_reported_date_time = parse_date(s.reported_date_time)
                 last_reported_date = s.reported_date_time
@@ -203,8 +203,6 @@ class StatsProcessing(object):
                 for h in existing_historic_soreness:
                     if h.is_pain == g.is_pain and h.side == g.side and h.body_part_location == g.location:
                         historic_soreness = h
-                        if historic_soreness.first_reported_date is None:
-                            historic_soreness.first_reported_date = first_reported_date
 
             ask_acute_pain_question = False
             streak = 0
@@ -220,7 +218,10 @@ class StatsProcessing(object):
             days_diff = 0
 
             if len(body_part_history) > 0:
+                first_reported_date = min([s.reported_date_time for s in body_part_history])
                 last_reported_date = max(historic_soreness.last_reported, body_part_history[0].reported_date_time)
+                if historic_soreness.first_reported_date is None:
+                    historic_soreness.first_reported_date = first_reported_date
                 if historic_soreness.last_reported == last_reported_date and \
                    historic_soreness.last_reported != body_part_history[0].reported_date_time and \
                    historic_soreness.historic_soreness_status == HistoricSorenessStatus.dormant_cleared:
