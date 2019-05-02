@@ -21,7 +21,7 @@ app = Blueprint('active_recovery', __name__)
 @require.authenticated.any
 @require.body({'event_date': str, 'recovery_type': str})
 @xray_recorder.capture('routes.active_recovery.exercise_modalities.complete')
-def handle_active_recovery_update(principal_id=None):
+def handle_exercise_modalities_complete(principal_id=None):
     user_id = principal_id
     event_date = parse_datetime(request.json['event_date'])
     recovery_type = request.json['recovery_type']
@@ -75,7 +75,7 @@ def handle_active_recovery_update(principal_id=None):
 @require.authenticated.any
 @require.body({'event_date': str, 'recovery_type': str})
 @xray_recorder.capture('routes.active_recovery.exercise_modalities.start')
-def handle_active_recovery_start(principal_id=None):
+def handle_exercise_modalities_start(principal_id=None):
     user_id = principal_id
     event_date = parse_datetime(request.json['event_date'])
     recovery_type = request.json['recovery_type']
@@ -114,7 +114,7 @@ def handle_active_recovery_start(principal_id=None):
 @require.authenticated.any
 @require.body({'event_date': str, 'recovery_type': str})
 @xray_recorder.capture('routes.active_recovery.body_part_modalities.complete')
-def handle_active_recovery_update(principal_id=None):
+def handle_body_part_modalities_complete(principal_id=None):
     user_id = principal_id
     event_date = parse_datetime(request.json['event_date'])
     recovery_type = request.json['recovery_type']
@@ -163,7 +163,7 @@ def handle_active_recovery_update(principal_id=None):
 @require.authenticated.any
 @require.body({'event_date': str, 'recovery_type': str})
 @xray_recorder.capture('routes.active_recovery.body_part_modalities.start')
-def handle_active_recovery_start(principal_id=None):
+def handle_body_part_modalities_start(principal_id=None):
     user_id = principal_id
     event_date = parse_datetime(request.json['event_date'])
     recovery_type = request.json['recovery_type']
