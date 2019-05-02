@@ -79,7 +79,6 @@ class ModalityBase(object):
                  dosage.soreness_source.historic_soreness_status.is_dormant_cleared()) or
                 dosage.goal.goal_type == AthleteGoalType.sport or
                 dosage.goal.goal_type == AthleteGoalType.preempt_sport or
-                dosage.goal.goal_type == AthleteGoalType.preempt_soreness or
                 dosage.goal.goal_type == AthleteGoalType.preempt_corrective):
             if dosage.soreness_source.severity < 0.5:
                 if dosage.priority == "1":
