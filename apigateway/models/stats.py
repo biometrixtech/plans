@@ -360,6 +360,8 @@ class AthleteStats(Serialisable):
             'typical_weekly_sessions': self.typical_weekly_sessions,
             'wearable_devices': self.wearable_devices,
             'muscular_strain_increasing': self.muscular_strain_increasing,
-            'high_relative_load_session': self.high_relative_load_session
+            'high_relative_load_session': self.high_relative_load_session,
+            'high_relative_load_benchmarks': {sport_name.value: load for (sport_name, load) in
+                                              self.high_relative_load_benchmarks.items()}
         }
         return ret
