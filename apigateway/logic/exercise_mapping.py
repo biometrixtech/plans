@@ -754,9 +754,10 @@ class ExerciseAssignmentCalculator(object):
         else:
             return None
 
-    def get_pre_active_rest(self, soreness_list, event_date_time):
+    def get_pre_active_rest(self, athlete_stats, soreness_list, event_date_time):
 
-        if len(soreness_list) > 0:
+        if (len(soreness_list) > 0 or athlete_stats.muscular_strain_increasing
+                or athlete_stats.high_relative_load_session):
             active_rest = ActiveRestBeforeTraining()
             active_rest.fill_exercises(soreness_list, event_date_time, self.exercise_library)
             active_rest.set_plan_dosage(soreness_list)
@@ -765,9 +766,10 @@ class ExerciseAssignmentCalculator(object):
         else:
             return None
 
-    def get_post_active_rest(self, soreness_list, event_date_time):
+    def get_post_active_rest(self, athlete_stats, soreness_list, event_date_time):
 
-        if len(soreness_list) > 0:
+        if (len(soreness_list) > 0 or athlete_stats.muscular_strain_increasing
+                or athlete_stats.high_relative_load_session):
             active_rest = ActiveRestAfterTraining()
             active_rest.fill_exercises(soreness_list, event_date_time, self.exercise_library)
             active_rest.set_plan_dosage(soreness_list)

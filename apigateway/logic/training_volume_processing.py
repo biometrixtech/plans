@@ -86,7 +86,7 @@ class TrainingVolumeProcessing(object):
         self.maintenance_loads = {}
         self.functional_overreaching_loads = {}
         self.functional_overreaching_NFO_loads = {}
-        self.high_relative_load = False
+        self.high_relative_load_session = False
 
     def muscular_strain_increasing(self):
 
@@ -148,7 +148,7 @@ class TrainingVolumeProcessing(object):
 
         if len(training_sessions) > 0:
             last_training_session = training_sessions[len(training_sessions) - 1]
-            self.high_relative_load = self.is_last_session_high_relative_load(load_end_date, last_training_session)
+            self.high_relative_load_session = self.is_last_session_high_relative_load(load_end_date, last_training_session)
 
     def is_last_session_high_relative_load(self, event_date, last_training_session):
         if (event_date - last_training_session.event_date).days <= 2:
