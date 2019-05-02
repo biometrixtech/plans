@@ -68,10 +68,12 @@ def create_plan(body_part_list, severity_list, side_list, pain_list, historic_so
         athlete_stats.historic_soreness = historic_soreness_list
         athlete_stats_datastore.side_load_athlete_stats(athlete_stats)
         data_store_collection.athlete_stats_datastore = athlete_stats_datastore
+    else:
+        athlete_stats = AthleteStats(user_id)
 
     mgr = TrainingPlanManager(user_id, data_store_collection)
 
-    daily_plan = mgr.create_daily_plan(format_date(current_date), format_datetime(current_date_time))
+    daily_plan = mgr.create_daily_plan(format_date(current_date), format_datetime(current_date_time), athlete_stats=athlete_stats)
 
     return daily_plan
 
@@ -106,7 +108,8 @@ def create_no_soreness_plan():
 
     mgr = TrainingPlanManager(user_id, datastore_collection)
 
-    daily_plan = mgr.create_daily_plan(format_date(current_date), last_updated=format_datetime(current_date_time))
+
+    daily_plan = mgr.create_daily_plan(format_date(current_date), last_updated=format_datetime(current_date_time), athlete_stats=AthleteStats(user_id))
 
     return daily_plan
 

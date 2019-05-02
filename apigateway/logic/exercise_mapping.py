@@ -6,7 +6,7 @@ from models.soreness import AthleteGoal, AthleteGoalType, AssignedExercise, Body
 from logic.goal_focus_text_generator import RecoveryTextGenerator
 from datetime import  timedelta
 from utils import format_datetime, parse_date
-from models.modalities import ActiveRecovery, ActiveRestBeforeTraining, ActiveRestAfterTraining, ColdWaterImmersion, CoolDown, Heat, WarmUp, Ice, HeatSession, IceSession
+from models.modalities import ActiveRestBeforeTraining, ActiveRestAfterTraining, ColdWaterImmersion, CoolDown, Heat, WarmUp, Ice, HeatSession, IceSession
 
 
 class ExerciseAssignmentCalculator(object):
