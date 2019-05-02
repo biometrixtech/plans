@@ -778,29 +778,37 @@ class ExerciseAssignmentCalculator(object):
         else:
             return None
 
-    def get_warm_up(self, soreness_list, event_date_time):
+    def get_warm_up(self, athlete_stats, soreness_list, event_date_time):
 
-        for s in soreness_list:
-            if s.historic_soreness_status is not None and not s.is_dormant_cleared():
-                warm_up = WarmUp()
-                warm_up.fill_exercises(soreness_list, event_date_time, self.exercise_library)
-                warm_up.set_exercise_dosage_ranking()
-                return warm_up
+        warm_up = None
 
-        return None
+        if (athlete_stats.muscular_strain_increasing or athlete_stats.high_relative_load_session
+                or len(soreness_list) > 0):
+            warm_up = WarmUp()
+            warm_up.fill_exercises(soreness_list, event_date_time, self.exercise_library)
+            warm_up.set_exercise_dosage_ranking()
 
-    def get_cool_down(self, current_date_time, historic_soreness_list):
+        return warm_up
+
+    def get_cool_down(self, athlete_stats, soreness_list, event_date_time):
 
         cool_down = None
 
-        for h in historic_soreness_list:
-            if h.first_reported_date is not None and not h.is_dormant_cleared():
-                days_diff = (current_date_time - h.first_reported_date).days
-                if not h.is_pain and days_diff < 30:
+        if athlete_stats.muscular_strain_increasing or athlete_stats.high_relative_load_session:
+            cool_down = CoolDown()
+        else:
+            for s in soreness_list:
+                if s.first_reported_date is not None and not s.is_dormant_cleared():
                     cool_down = CoolDown()
+                    break
+
+        if cool_down is not None:
+            cool_down.fill_exercises(soreness_list, event_date_time, self.exercise_library)
+            cool_down.set_exercise_dosage_ranking()
 
         return cool_down
 
+    '''Nope, never!
     def get_active_recovery(self, current_date_time, historic_soreness_list):
 
         active_recovery = None
@@ -812,6 +820,7 @@ class ExerciseAssignmentCalculator(object):
                     active_recovery = ActiveRecovery()
 
         return active_recovery
+    '''
 
     def get_ice(self, soreness_list, event_date_time):
 
