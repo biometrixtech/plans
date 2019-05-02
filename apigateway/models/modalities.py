@@ -89,6 +89,14 @@ class ModalityBase(object):
         self.completed = False
         self.active = True
 
+
+    def __setattr__(self, name, value):
+        if name in ['event_date', 'start_date']:
+            if value is not None and not isinstance(value, datetime.datetime):
+                value = parse_datetime(value)
+        super().__setattr__(name, value)
+
+
     def copy_exercises(self, source_collection, target_collection, goal, priority, soreness, exercise_library):
 
         for s in source_collection:
@@ -346,12 +354,6 @@ class ActiveRest(ModalityBase):
 
         return active_time
     '''
-
-    def __setattr__(self, name, value):
-        if name in ['event_date', 'start_date']:
-            if value is not None and not isinstance(value, datetime.datetime):
-                value = parse_datetime(value)
-        super().__setattr__(name, value)
 
 
 class ActiveRestBeforeTraining(ActiveRest, Serialisable):
@@ -815,12 +817,6 @@ class WarmUp(ModalityBase, Serialisable):
         return warmup
 
     def fill_exercises(self, soreness_list, event_date_time, exercise_library):
-    def __setattr__(self, name, value):
-        if name in ['event_date', 'start_date']:
-            if value is not None and not isinstance(value, datetime.datetime):
-                value = parse_datetime(value)
-        super().__setattr__(name, value)
-
         for s in soreness_list:
             self.check_corrective_soreness(s, parse_date(event_date_time), exercise_library)
             self.check_preempt_soreness(s, parse_date(event_date_time), exercise_library)
