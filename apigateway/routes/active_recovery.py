@@ -17,10 +17,10 @@ completed_exercise_datastore = datastore_collection.completed_exercise_datastore
 app = Blueprint('active_recovery', __name__)
 
 
-@app.route('/', methods=['PATCH'])
+@app.route('/exercise_modalities', methods=['PATCH'])
 @require.authenticated.any
 @require.body({'event_date': str, 'recovery_type': str})
-@xray_recorder.capture('routes.active_recovery')
+@xray_recorder.capture('routes.active_recovery.exercise_modalities.complete')
 def handle_active_recovery_update(principal_id=None):
     user_id = principal_id
     event_date = parse_datetime(request.json['event_date'])
@@ -35,19 +35,25 @@ def handle_active_recovery_update(principal_id=None):
 
     save_exercises = True
     plan = daily_plan_datastore.get(user_id=user_id, start_date=plan_event_date, end_date=plan_event_date)[0]
-    if recovery_type == 'pre':
+    if recovery_type == 'pre_active_rest':
         if plan.pre_active_rest.completed:
             save_exercises = False
         plan.pre_active_rest_completed = True  # plan
         plan.pre_active_rest.completed = True  # recovery
-        plan.pre_active_rest.event_date = recovery_event_date
+        plan.pre_active_rest.event_date_time = recovery_event_date
 
-    elif recovery_type == 'post':
+    elif recovery_type == 'post_active_rest':
         if plan.post_active_rest.completed:
             save_exercises = False
         plan.post_active_rest_completed = True  # plan
         plan.post_active_rest.completed = True  # recovery
-        plan.post_active_rest.event_date = recovery_event_date
+        plan.post_active_rest.event_date_time = recovery_event_date
+
+    elif recovery_type == 'warm_up':
+        plan.warm_up.event_date_time = recovery_event_date
+        plan.warm_up.completed = True
+        if plan.warm_up.completed:
+            save_exercises = False
 
     daily_plan_datastore.put(plan)
 
@@ -65,10 +71,10 @@ def handle_active_recovery_update(principal_id=None):
     return {'daily_plans': [plan]}, 202
 
 
-@app.route('/', methods=['POST'])
+@app.route('/exercise_modalities', methods=['POST'])
 @require.authenticated.any
 @require.body({'event_date': str, 'recovery_type': str})
-@xray_recorder.capture('routes.active_recovery.start')
+@xray_recorder.capture('routes.active_recovery.exercise_modalities.start')
 def handle_active_recovery_start(principal_id=None):
     user_id = principal_id
     event_date = parse_datetime(request.json['event_date'])
@@ -84,17 +90,97 @@ def handle_active_recovery_start(principal_id=None):
                                     end_date=plan_event_date)[0]
     plans_service = Service('plans', Config.get('API_VERSION'))
     body = {"event_date": recovery_start_date}
-    if recovery_type == 'pre':
-        plan.pre_active_rest.start_date = recovery_start_date
+    if recovery_type == 'pre_active_rest':
+        plan.pre_active_rest.start_date_time = recovery_start_date
         plans_service.call_apigateway_async(method='POST',
                                             endpoint=f'/athlete/{user_id}/prep_started',
                                             body=body)
 
-    elif recovery_type == 'post':
-        plan.post_active_rest.start_date = recovery_start_date
+    elif recovery_type == 'post_active_rest':
+        plan.post_active_rest.start_date_time = recovery_start_date
         plans_service.call_apigateway_async(method='POST',
                                             endpoint=f'/athlete/{user_id}/recovery_started',
                                             body=body)
+
+    elif recovery_type == 'warm_up':
+        plan.warm_up.start_date_time = recovery_start_date
+
+    daily_plan_datastore.put(plan)
+
+    return {'message': 'success'}, 200
+
+
+@app.route('/body_part_modalities', methods=['PATCH'])
+@require.authenticated.any
+@require.body({'event_date': str, 'recovery_type': str})
+@xray_recorder.capture('routes.active_recovery.body_part_modalities.complete')
+def handle_active_recovery_update(principal_id=None):
+    user_id = principal_id
+    event_date = parse_datetime(request.json['event_date'])
+    recovery_type = request.json['recovery_type']
+    completed_body_parts = request.json.get('completed_body_parts', [])
+
+    plan_event_date = format_date(event_date)
+    recovery_event_date = format_datetime(event_date)
+
+    if not _check_plan_exists(user_id, plan_event_date):
+        raise NoSuchEntityException('Plan not found for the user')
+
+    plan = daily_plan_datastore.get(user_id=user_id, start_date=plan_event_date, end_date=plan_event_date)[0]
+
+    if recovery_type == 'heat':
+        plan.heat.event_date_time = recovery_event_date
+        plan.heat.completed = True
+        for completed_body_part in completed_body_parts:
+            assigned_body_part = [body_part for body_part in plan.ice.body_parts if
+                                  body_part.body_part_location.value == completed_body_part.body_part_location and
+                                  body_part.side == completed_body_part.side][0]
+            assigned_body_part.completed = True
+
+    elif recovery_type == 'ice':
+        plan.ice.event_date_time = recovery_event_date
+        plan.ice.completed = True
+        for completed_body_part in completed_body_parts:
+            assigned_body_part = [body_part for body_part in plan.ice.body_parts if
+                                  body_part.body_part_location.value == completed_body_part.body_part_location and
+                                  body_part.side == completed_body_part.side][0]
+            assigned_body_part.completed = True
+
+    daily_plan_datastore.put(plan)
+
+    survey_complete = plan.daily_readiness_survey_completed()
+    landing_screen, nav_bar_indicator = plan.define_landing_screen()
+    plan = plan.json_serialise()
+    plan['daily_readiness_survey_completed'] = survey_complete
+    plan['landing_screen'] = landing_screen
+    plan['nav_bar_indicator'] = nav_bar_indicator
+    del plan['daily_readiness_survey'], plan['user_id']
+
+    return {'daily_plans': [plan]}, 202
+
+
+@app.route('/body_part_modalities', methods=['POST'])
+@require.authenticated.any
+@require.body({'event_date': str, 'recovery_type': str})
+@xray_recorder.capture('routes.active_recovery.body_part_modalities.start')
+def handle_active_recovery_start(principal_id=None):
+    user_id = principal_id
+    event_date = parse_datetime(request.json['event_date'])
+    recovery_type = request.json['recovery_type']
+
+    plan_event_date = format_date(event_date)
+    recovery_start_date = format_datetime(event_date)
+    if not _check_plan_exists(user_id, plan_event_date):
+        raise NoSuchEntityException('Plan not found for the user')
+
+    plan = daily_plan_datastore.get(user_id=user_id,
+                                    start_date=plan_event_date,
+                                    end_date=plan_event_date)[0]
+    if recovery_type == 'heat':
+        plan.heat.start_date_time = recovery_start_date
+
+    elif recovery_type == 'ice':
+        plan.ice.start_date_time = recovery_start_date
 
     daily_plan_datastore.put(plan)
 
