@@ -86,6 +86,37 @@ class TrainingVolumeProcessing(object):
         self.maintenance_loads = {}
         self.functional_overreaching_loads = {}
         self.functional_overreaching_NFO_loads = {}
+        self.high_relative_load = False
+
+    def muscular_strain_increasing(self):
+
+        if self.muscular_strain_last_2_weeks is not None and self.muscular_strain_last_2_4_weeks is not None:
+            if self.muscular_strain_last_2_weeks > self.muscular_strain_last_2_4_weeks:
+                return True
+            else:
+                return False
+        else:
+            return False
+
+    def calc_high_relative_load_benchmarks(self):
+
+        benchmarks = {}
+
+        for sport, load_list in self.functional_overreaching_loads.items():
+            if len(benchmarks[sport]) > 0:
+                if sport not in benchmarks:
+                    benchmarks[sport] = mean(load_list)
+                else:
+                    benchmarks[sport] = min(benchmarks[sport], mean(load_list))
+
+        for sport, load_list in self.functional_overreaching_NFO_loads.items():
+            if len(benchmarks[sport]) > 0:
+                if sport not in benchmarks:
+                    benchmarks[sport] = mean(load_list)
+                else:
+                    benchmarks[sport] = min(benchmarks[sport], mean(load_list))
+
+        return benchmarks
 
     def fill_load_monitoring_measures(self, readiness_surveys, daily_plans, load_end_date):
 
@@ -114,6 +145,19 @@ class TrainingVolumeProcessing(object):
         self.load_surveys(readiness_surveys, training_sessions)
 
         self.load_adaptation_history(duration_sessions, load_end_date)
+
+        if len(training_sessions) > 0:
+            last_training_session = training_sessions[len(training_sessions) - 1]
+            self.high_relative_load = self.is_last_session_high_relative_load(load_end_date, last_training_session)
+
+    def is_last_session_high_relative_load(self, event_date, last_training_session):
+        if (event_date - last_training_session.event_date).days <= 2:
+            benchmarks = self.calc_high_relative_load_benchmarks()
+            if last_training_session.sport_name in benchmarks:
+                if last_training_session.duration_load() >= benchmarks[last_training_session.sport_name]:
+                    return True
+        else:
+            return False
 
     @xray_recorder.capture('logic.TrainingVolumeProcessing.load_plan_values')
     def load_plan_values(self, last_7_days_plans, days_8_14_plans, acute_daily_plans, chronic_weeks_plans, chronic_daily_plans):

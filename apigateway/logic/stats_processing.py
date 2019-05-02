@@ -111,6 +111,10 @@ class StatsProcessing(object):
                 # persist all of soreness/pain and session_RPE
                 athlete_stats.session_RPE = current_athlete_stats.session_RPE
                 athlete_stats.session_RPE_event_date = current_athlete_stats.session_RPE_event_date
+            else:
+                training_volume_processing.fill_load_monitoring_measures(self.all_daily_readiness_surveys, self.all_plans, parse_date(self.event_date))
+                athlete_stats.muscular_strain_increasing = training_volume_processing.muscular_strain_increasing()
+                athlete_stats.high_relative_load = training_volume_processing.high_relative_load
         #athlete_stats.completed_functional_strength_sessions = self.get_completed_functional_strength_sessions()
         #athlete_stats.functional_strength_eligible = self.is_athlete_functional_strength_eligible(athlete_stats)
 
