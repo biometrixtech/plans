@@ -945,6 +945,7 @@ class CoolDown(ModalityBase, Serialisable):
                                         exercise_library)
 
 
+'''Heck NO!
 class ActiveRecovery(Serialisable):
     def __init__(self):
         self.dynamic_integrate_exercises = {}
@@ -982,6 +983,8 @@ class ActiveRecovery(Serialisable):
             if value is not None and not isinstance(value, datetime.datetime):
                 value = parse_datetime(value)
         super().__setattr__(name, value)
+
+'''
 
 
 class IceSession(Serialisable):
