@@ -112,7 +112,7 @@ class DailyPlan(Serialisable):
         daily_plan.training_sessions = [Session.json_deserialise(s) for s in input_dict.get('training_sessions', [])]
         if not stats_processing:
             daily_plan.heat = HeatSession.json_deserialise(input_dict['heat']) if input_dict.get('heat', None) is not None else None
-            daily_plan.completed_heat = [Heat.json_deserialise(heat) for heat in input_dict.get('completed_heat', [])]
+            daily_plan.completed_heat = [HeatSession.json_deserialise(heat) for heat in input_dict.get('completed_heat', [])]
             daily_plan.pre_active_rest = ActiveRestBeforeTraining.json_deserialise(input_dict['pre_active_rest']) if input_dict.get('pre_active_rest', None) is not None else None
             daily_plan.completed_pre_active_rest = [ActiveRestBeforeTraining.json_deserialise(ar) for ar in input_dict.get('completed_pre_active_rest', [])]
             daily_plan.warm_up = WarmUp.json_deserialise(input_dict['warm_up']) if input_dict.get('warm_up', None) is not None else None
@@ -124,7 +124,7 @@ class DailyPlan(Serialisable):
             daily_plan.post_active_rest = ActiveRestAfterTraining.json_deserialise(input_dict['post_active_rest']) if input_dict.get('post_active_rest', None) is not None else None
             daily_plan.completed_post_active_rest = [ActiveRestAfterTraining.json_deserialise(ar) for ar in input_dict.get('completed_post_active_rest', [])]
             daily_plan.ice = IceSession.json_deserialise(input_dict['ice']) if input_dict.get('ice', None) is not None else None
-            daily_plan.completed_ice = [Ice.json_deserialise(ice) for ice in input_dict.get('completed_ice', [])]
+            daily_plan.completed_ice = [IceSession.json_deserialise(ice) for ice in input_dict.get('completed_ice', [])]
             daily_plan.cold_water_immersion = ColdWaterImmersion.json_deserialise(input_dict['cold_water_immersion']) if input_dict.get('cold_water_immersion', None) is not None else None
             daily_plan.completed_cold_water_immersion = [ColdWaterImmersion.json_deserialise(cwi) for cwi in input_dict.get('completed_cold_water_immersion', [])]
         # daily_plan.daily_readiness_survey = _daily_readiness_from_mongo(input_dict.get('daily_readiness_survey', None), daily_plan.user_id)
