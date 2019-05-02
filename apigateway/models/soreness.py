@@ -631,7 +631,7 @@ class AthleteGoalType(Enum):
     sore = 1
     sport = 2
     preempt_sport = 3
-    preempt_soreness = 4
+    preempt_personalized_sport = 4
     preempt_corrective = 5
     corrective = 6
     injury_history = 7

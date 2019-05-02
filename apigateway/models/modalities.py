@@ -86,12 +86,10 @@ class Heat(Serialisable):
 
 class ModalityBase(object):
     def __init__(self):
-        self.inhibit_exercises = {}
         self.start_date_time = None
         self.event_date_time = None
         self.completed = False
         self.active = True
-
 
     def __setattr__(self, name, value):
         if name in ['event_date_time', 'start_date_time']:
@@ -128,6 +126,7 @@ class ModalityBase(object):
                  dosage.soreness_source.historic_soreness_status.is_dormant_cleared()) or
                 dosage.goal.goal_type == AthleteGoalType.sport or
                 dosage.goal.goal_type == AthleteGoalType.preempt_sport or
+                dosage.goal.goal_type == AthleteGoalType.preempt_personalized_sport or
                 dosage.goal.goal_type == AthleteGoalType.preempt_corrective):
             if dosage.soreness_source.severity < 0.5:
                 if dosage.priority == "1":
@@ -289,6 +288,7 @@ class ModalityBase(object):
 class ActiveRest(ModalityBase):
     def __init__(self):
         super().__init__()
+        self.inhibit_exercises = {}
         self.static_integrate_exercises = {}
         self.static_stretch_exercises = {}
         self.default_plan = "Complete"
@@ -781,6 +781,7 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
 class WarmUp(ModalityBase, Serialisable):
     def __init__(self):
         super().__init__()
+        self.inhibit_exercises = {}
         self.static_stretch_exercises = {}
         self.active_or_dynamic_stretch_exercises = {}
         self.isolated_activate_exercises = {}
@@ -829,7 +830,7 @@ class WarmUp(ModalityBase, Serialisable):
             days_sore = (event_date_time - soreness.first_reported_date).days
             if not soreness.pain and days_sore < 30:
 
-                goal = AthleteGoal("Personalized Prepare for Training", 1, AthleteGoalType.preempt_soreness)
+                goal = AthleteGoal("Personalized Prepare for Training", 1, AthleteGoalType.preempt_personalized_sport)
                 goal.trigger = "Pers, Pers-2 Soreness > 30d"
 
                 self.assign_exercises(soreness, goal, exercise_library)
@@ -885,11 +886,10 @@ class WarmUp(ModalityBase, Serialisable):
                            self.dynamic_integrate_with_speed_exercises])
 
 
-class CoolDown(Serialisable):
+class CoolDown(ModalityBase, Serialisable):
     def __init__(self):
+        super().__init__()
         self.dynamic_stretch_integrate_exercises = {}
-        self.completed = False
-        self.active = True
 
     def json_serialise(self):
         ret = {
@@ -908,7 +908,47 @@ class CoolDown(Serialisable):
 
         return cooldown
 
+    def set_exercise_dosage_ranking(self):
+        self.rank_dosages([self.dynamic_stretch_integrate_exercises])
 
+    def check_corrective(self, soreness, event_date_time, exercise_library):
+
+        if soreness.historic_soreness_status is not None and soreness.first_reported_date is not None and not soreness.is_dormant_cleared():
+            days_sore = (event_date_time - soreness.first_reported_date).days
+            if soreness.pain or days_sore > 30:
+                goal = AthleteGoal("Personalized Prepare for Training (Identified Dysfunction)", 1, AthleteGoalType.preempt_corrective)
+                goal.trigger = "Pers, Pers-2 Soreness > 30d or Historic Pain"
+
+                self.assign_exercises(soreness, goal, exercise_library)
+
+    def fill_exercises(self, soreness_list, event_date_time, exercise_library):
+        for s in soreness_list:
+            self.check_corrective(s, event_date_time, exercise_library)
+
+    def assign_exercises(self, soreness, goal, exercise_library):
+
+        body_part_factory = BodyPartFactory()
+
+        body_part = body_part_factory.get_body_part(soreness.body_part)
+
+        if body_part is not None:
+            for a in body_part.agonists:
+                agonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None))
+                if agonist is not None:
+                    if soreness.severity < 3.5:
+                        self.copy_exercises(agonist.dynamic_stretch_integrate_exercises, self.dynamic_stretch_integrate_exercises, goal,
+                                            "1", soreness,
+                                            exercise_library)
+
+            for y in body_part.synergists:
+                synergist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(y), None))
+                if synergist is not None:
+                    self.copy_exercises(synergist.dynamic_stretch_integrate_exercises, self.dynamic_stretch_integrate_exercises, goal, "2",
+                                        soreness,
+                                        exercise_library)
+
+
+'''Heck NO!
 class ActiveRecovery(Serialisable):
     def __init__(self):
         self.dynamic_integrate_exercises = {}
@@ -946,6 +986,8 @@ class ActiveRecovery(Serialisable):
             if value is not None and not isinstance(value, datetime.datetime):
                 value = parse_datetime(value)
         super().__setattr__(name, value)
+
+'''
 
 
 class IceSession(Serialisable):
