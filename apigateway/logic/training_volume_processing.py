@@ -87,6 +87,7 @@ class TrainingVolumeProcessing(object):
         self.functional_overreaching_loads = {}
         self.functional_overreaching_NFO_loads = {}
         self.high_relative_load_session = False
+        self.doms = []
 
     def muscular_strain_increasing(self):
 
@@ -497,7 +498,11 @@ class TrainingVolumeProcessing(object):
 
                     loading_event.affected_body_parts = grouped_parts
 
+            self.doms = []
+
             for loading_event in loading_events:
+
+                self.doms.extend(list(a for a in loading_event.affected_body_parts if not a.cleared))
 
                 level_one_soreness = list(
                     a for a in loading_event.affected_body_parts if a.cleared and a.days_sore <= 1)
