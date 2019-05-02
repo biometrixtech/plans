@@ -775,8 +775,8 @@ class WarmUp(ModalityBase, Serialisable):
     def fill_exercises(self, soreness_list, event_date_time, exercise_library):
 
         for s in soreness_list:
-            self.check_corrective_soreness(s, event_date_time, exercise_library)
-            self.check_preempt_soreness(s, event_date_time, exercise_library)
+            self.check_corrective_soreness(s, parse_date(event_date_time), exercise_library)
+            self.check_preempt_soreness(s, parse_date(event_date_time), exercise_library)
 
     def check_preempt_soreness(self, soreness, event_date_time, exercise_library):
 
