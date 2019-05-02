@@ -1,10 +1,9 @@
 from serialisable import Serialisable
 from models.soreness import BodyPart, BodyPartLocation, AssignedExercise, HistoricSorenessStatus, AthleteGoal, AthleteGoalType, ExerciseDosage
 from models.body_parts import BodyPartFactory
-from utils import parse_date, parse_datetime, format_datetime
+from utils import parse_datetime, format_datetime
 import abc
 import datetime
-
 
 
 class HeatSession(Serialisable):
@@ -96,7 +95,6 @@ class ModalityBase(object):
             if value is not None and not isinstance(value, datetime.datetime):
                 value = parse_datetime(value)
         super().__setattr__(name, value)
-
 
     def copy_exercises(self, source_collection, target_collection, goal, priority, soreness, exercise_library):
 
@@ -343,8 +341,6 @@ class ActiveRest(ModalityBase):
             self.check_reactive_care_pain(s, exercise_library)
             self.check_prevention_soreness(s, event_date_time, exercise_library)
             self.check_prevention_pain(s, event_date_time, exercise_library)
-
-
 
     '''dprecated
     def calc_active_time(self, exercise_dictionary):
@@ -894,6 +890,8 @@ class CoolDown(ModalityBase, Serialisable):
     def json_serialise(self):
         ret = {
             'dynamic_stretch_integrate_exercises': [p.json_serialise() for p in self.dynamic_stretch_integrate_exercises.values()],
+            'start_date_time': format_datetime(self.start_date_time) if self.start_date_time is not None else None,
+            'event_date_time': format_datetime(self.event_date_time) if self.event_date_time is not None else None,
             'completed': self.completed,
             'active': self.active
         }
@@ -903,6 +901,8 @@ class CoolDown(ModalityBase, Serialisable):
     def json_deserialise(cls, input_dict):
         cooldown = cls()
         cooldown.dynamic_stretch_integrate_exercises = {s['library_id']: AssignedExercise.json_deserialise(s) for s in input_dict['dynamic_stretch_integrate_exercises']}
+        cooldown.start_date_time = input_dict.get('start_date_time', None)
+        cooldown.event_date_time = input_dict.get('event_date_time', None)
         cooldown.completed = input_dict.get('completed', False)
         cooldown.active = input_dict.get('active', True)
 
