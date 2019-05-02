@@ -110,6 +110,8 @@ class AthleteStatsDatastore(object):
         # athlete_stats.metrics = [self._metrics_from_mongodb(s) for s in mongo_result.get('metrics', [])]
         athlete_stats.typical_weekly_sessions = mongo_result.get('typical_weekly_sessions', None)
         athlete_stats.wearable_devices = mongo_result.get('wearable_devices', [])
+        athlete_stats.muscular_strain_increasing = mongo_result.get('muscular_strain_increasing', False)
+        athlete_stats.high_relative_load = mongo_result.get('high_relative_load', False)
         return athlete_stats
 
     @xray_recorder.capture('datastore.AthleteStatsDatastore._put_mongodb')

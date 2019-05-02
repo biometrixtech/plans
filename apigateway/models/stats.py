@@ -73,6 +73,9 @@ class AthleteStats(Serialisable):
         self.typical_weekly_sessions = None
         self.wearable_devices = []
 
+        self.muscular_strain_increasing = False
+        self.high_relative_load = False
+
     def update_historic_soreness(self, soreness, event_date):
 
         soreness_calc = SorenessCalculator
@@ -354,6 +357,8 @@ class AthleteStats(Serialisable):
             'daily_severe_pain_event_date': self.daily_severe_pain_event_date,
             'metrics': [m.json_serialise() for m in self.metrics],
             'typical_weekly_sessions': self.typical_weekly_sessions,
-            'wearable_devices': self.wearable_devices
+            'wearable_devices': self.wearable_devices,
+            'muscular_strain_increasing': self.muscular_strain_increasing,
+            'high_relative_load': self.high_relative_load
         }
         return ret
