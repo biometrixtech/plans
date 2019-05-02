@@ -776,18 +776,16 @@ class ExerciseAssignmentCalculator(object):
         else:
             return None
 
-    def get_warm_up(self, historic_soreness_list):
+    def get_warm_up(self, soreness_list, event_date_time):
 
-        warm_up = None
+        for s in soreness_list:
+            if s.historic_soreness_status is not None and not s.is_dormant_cleared():
+                warm_up = WarmUp()
+                warm_up.fill_exercises(soreness_list, event_date_time, self.exercise_library)
+                warm_up.set_exercise_dosage_ranking()
+                return warm_up
 
-        for h in historic_soreness_list:
-            if h.first_reported is not None and not h.is_dormant_cleared():
-                if (not h.is_pain or
-                        (h.historic_soreness_status == HistoricSorenessStatus.persistent_2_pain) or
-                        h.is_persistent_pain()):
-                    warm_up = WarmUp()
-
-        return warm_up
+        return None
 
     def get_cool_down(self, current_date_time, historic_soreness_list):
 

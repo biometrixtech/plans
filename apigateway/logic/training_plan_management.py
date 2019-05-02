@@ -148,7 +148,7 @@ class TrainingPlanManager(object):
             # create new pre-training modalities
             self.daily_plan.heat = calc.get_heat(soreness_list, event_date)
             self.daily_plan.pre_active_rest = calc.get_pre_active_rest(soreness_list, event_date)
-            # self.daily_plan.warm_up = calc.get_warm_up(soreness_list)
+            self.daily_plan.warm_up = calc.get_warm_up(soreness_list, event_date)
         #
         # if soreness_values is not None and len(soreness_values) > 0:
         #    max_soreness = max(soreness_values)

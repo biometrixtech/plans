@@ -81,73 +81,13 @@ class Heat(Serialisable):
         return heat
 
 
-class ActiveRest(object):
+class ModalityBase(object):
     def __init__(self):
         self.inhibit_exercises = {}
-        self.static_integrate_exercises = {}
-        self.static_stretch_exercises = {}
         self.start_date = None
         self.event_date = None
         self.completed = False
         self.active = True
-        self.default_plan = "Complete"
-
-    @abc.abstractmethod
-    def check_reactive_care_soreness(self, soreness, exercise_library):
-        pass
-
-    @abc.abstractmethod
-    def check_reactive_care_pain(self, soreness, exercise_library):
-        pass
-
-    @abc.abstractmethod
-    def check_prevention_soreness(self, soreness, event_date_time, exercise_library):
-        pass
-
-    @abc.abstractmethod
-    def check_prevention_pain(self, soreness, event_date_time, exercise_library):
-        pass
-
-    '''deprecated
-    @abc.abstractmethod
-    def calc_durations(self):
-        pass
-    '''
-
-    def set_plan_dosage(self, soreness_list):
-
-        care_for_pain_present = False
-        historic_status_present = False
-        severity_greater_than_2 = False
-
-        for s in soreness_list:
-            if s.pain:
-                care_for_pain_present = True
-            if s.historic_soreness_status is not None and not s.is_dormant_cleared():
-                historic_status_present = True
-            if s.severity >= 2:
-                severity_greater_than_2 = True
-
-        if care_for_pain_present and not historic_status_present:
-            self.default_plan = "Comprehensive"
-        elif not severity_greater_than_2 and not care_for_pain_present and not historic_status_present:
-            self.default_plan = "Efficient"
-        else:
-            self.default_plan = "Complete"
-
-    @staticmethod
-    def rank_dosages(target_collections):
-        for target_collection in target_collections:
-            for ex in target_collection.values():
-                ex.set_dosage_ranking()
-
-    def fill_exercises(self, soreness_list, event_date_time, exercise_library):
-
-        for s in soreness_list:
-            self.check_reactive_care_soreness(s, exercise_library)
-            self.check_reactive_care_pain(s, exercise_library)
-            self.check_prevention_soreness(s, parse_date(event_date_time), exercise_library)
-            self.check_prevention_pain(s, parse_date(event_date_time), exercise_library)
 
     def copy_exercises(self, source_collection, target_collection, goal, priority, soreness, exercise_library):
 
@@ -164,6 +104,10 @@ class ActiveRest(object):
             dosage.goal = goal
             dosage = self.update_dosage(dosage, target_collection[s.exercise.id].exercise)
             target_collection[s.exercise.id].dosages.append(dosage)
+
+    @abc.abstractmethod
+    def fill_exercises(self, soreness_list, event_date_time, exercise_library):
+        pass
 
     @staticmethod
     def update_dosage(dosage, exercise):
@@ -324,6 +268,73 @@ class ActiveRest(object):
                 dosage.comprehensive_sets_assigned = 3
 
         return dosage
+
+    @staticmethod
+    def rank_dosages(target_collections):
+        for target_collection in target_collections:
+            for ex in target_collection.values():
+                ex.set_dosage_ranking()
+
+
+class ActiveRest(ModalityBase):
+    def __init__(self):
+        super().__init__()
+        self.static_integrate_exercises = {}
+        self.static_stretch_exercises = {}
+        self.default_plan = "Complete"
+
+    @abc.abstractmethod
+    def check_reactive_care_soreness(self, soreness, exercise_library):
+        pass
+
+    @abc.abstractmethod
+    def check_reactive_care_pain(self, soreness, exercise_library):
+        pass
+
+    @abc.abstractmethod
+    def check_prevention_soreness(self, soreness, event_date_time, exercise_library):
+        pass
+
+    @abc.abstractmethod
+    def check_prevention_pain(self, soreness, event_date_time, exercise_library):
+        pass
+
+    '''deprecated
+    @abc.abstractmethod
+    def calc_durations(self):
+        pass
+    '''
+
+    def set_plan_dosage(self, soreness_list):
+
+        care_for_pain_present = False
+        historic_status_present = False
+        severity_greater_than_2 = False
+
+        for s in soreness_list:
+            if s.pain:
+                care_for_pain_present = True
+            if s.historic_soreness_status is not None and not s.is_dormant_cleared():
+                historic_status_present = True
+            if s.severity >= 2:
+                severity_greater_than_2 = True
+
+        if care_for_pain_present and not historic_status_present:
+            self.default_plan = "Comprehensive"
+        elif not severity_greater_than_2 and not care_for_pain_present and not historic_status_present:
+            self.default_plan = "Efficient"
+        else:
+            self.default_plan = "Complete"
+
+    def fill_exercises(self, soreness_list, event_date_time, exercise_library):
+
+        for s in soreness_list:
+            self.check_reactive_care_soreness(s, exercise_library)
+            self.check_reactive_care_pain(s, exercise_library)
+            self.check_prevention_soreness(s, parse_date(event_date_time), exercise_library)
+            self.check_prevention_pain(s, parse_date(event_date_time), exercise_library)
+
+
 
     '''dprecated
     def calc_active_time(self, exercise_dictionary):
@@ -763,23 +774,19 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
                            self.static_integrate_exercises])
 
 
-class WarmUp(Serialisable):
+class WarmUp(ModalityBase, Serialisable):
     def __init__(self):
-        self.inhibit_exercises = {}
-        self.static_then_active_or_dynamic_stretch_exercises = {}
+        super().__init__()
+        self.static_stretch_exercises = {}
         self.active_or_dynamic_stretch_exercises = {}
         self.isolated_activate_exercises = {}
         self.dynamic_integrate_exercises = {}
         self.dynamic_integrate_with_speed_exercises = {}
-        self.start_date = None
-        self.event_date = None
-        self.completed = False
-        self.active = True
 
     def json_serialise(self):
         ret = {
             'inhibit_exercises': [p.json_serialise() for p in self.inhibit_exercises.values()],
-            'static_then_active_or_dynamic_stretch_exercises': [p.json_serialise() for p in self.static_then_active_or_dynamic_stretch_exercises.values()],
+            'static_stretch_exercises': [p.json_serialise() for p in self.static_stretch_exercises.values()],
             'active_or_dynamic_stretch_exercises': [p.json_serialise() for p in self.active_or_dynamic_stretch_exercises.values()],
             'isolated_activate_exercises': [p.json_serialise() for p in self.isolated_activate_exercises.values()],
             'dynamic_integrate_exercises': [p.json_serialise() for p in self.dynamic_integrate_exercises.values()],
@@ -795,7 +802,7 @@ class WarmUp(Serialisable):
     def json_deserialise(cls, input_dict):
         warmup = cls()
         warmup.inhibit_exercises = {s['library_id']: AssignedExercise.json_deserialise(s) for s in input_dict['inhibit_exercises']}
-        warmup.static_then_active_or_dynamic_stretch_exercises = {s['library_id']: AssignedExercise.json_deserialise(s) for s in input_dict['static_then_active_or_dynamic_stretch_exercises']}
+        warmup.static_stretch_exercises = {s['library_id']: AssignedExercise.json_deserialise(s) for s in input_dict['static_stretch_exercises']}
         warmup.active_or_dynamic_stretch_exercises = {s['library_id']: AssignedExercise.json_deserialise(s) for s in input_dict['active_or_dynamic_stretch_exercises']}
         warmup.isolated_activate_exercises = {s['library_id']: AssignedExercise.json_deserialise(s) for s in input_dict['isolated_activate_exercises']}
         warmup.dynamic_integrate_exercises = {s['library_id']: AssignedExercise.json_deserialise(s) for s in input_dict['dynamic_integrate_exercises']}
@@ -807,22 +814,88 @@ class WarmUp(Serialisable):
 
         return warmup
 
+    def fill_exercises(self, soreness_list, event_date_time, exercise_library):
     def __setattr__(self, name, value):
         if name in ['event_date', 'start_date']:
             if value is not None and not isinstance(value, datetime.datetime):
                 value = parse_datetime(value)
         super().__setattr__(name, value)
 
+        for s in soreness_list:
+            self.check_corrective_soreness(s, parse_date(event_date_time), exercise_library)
+            self.check_preempt_soreness(s, parse_date(event_date_time), exercise_library)
+
+    def check_preempt_soreness(self, soreness, event_date_time, exercise_library):
+
+        if soreness.historic_soreness_status is not None and soreness.first_reported is not None and not soreness.is_dormant_cleared():
+            days_sore = (event_date_time - parse_date(soreness.first_reported)).days
+            if not soreness.pain and days_sore < 30:
+
+                goal = AthleteGoal("Personalized Prepare for Training", 1, AthleteGoalType.preempt_soreness)
+                goal.trigger = "Pers, Pers-2 Soreness > 30d"
+
+                self.assign_exercises(soreness, goal, exercise_library)
+
+    def check_corrective_soreness(self, soreness, event_date_time, exercise_library):
+
+        if soreness.historic_soreness_status is not None and soreness.first_reported is not None and not soreness.is_dormant_cleared():
+            days_sore = (event_date_time - parse_date(soreness.first_reported)).days
+            if soreness.pain or days_sore > 30:
+                goal = AthleteGoal("Personalized Prepare for Training (Identified Dysfunction)", 1, AthleteGoalType.preempt_corrective)
+                goal.trigger = "Pers, Pers-2 Soreness > 30d"
+
+                self.assign_exercises(soreness, goal, exercise_library)
+
+    def assign_exercises(self, soreness, goal, exercise_library):
+
+        body_part_factory = BodyPartFactory()
+
+        body_part = body_part_factory.get_body_part(soreness.body_part)
+
+        if body_part is not None:
+            for a in body_part.agonists:
+                agonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None))
+                if agonist is not None:
+                    self.copy_exercises(agonist.inhibit_exercises, self.inhibit_exercises, goal, "1", soreness,
+                                        exercise_library)
+                    if soreness.severity < 3.5:
+                        self.copy_exercises(agonist.static_stretch_exercises, self.static_stretch_exercises, goal, "1",
+                                            soreness, exercise_library)
+                        self.copy_exercises(agonist.isolated_activate_exercises, self.isolated_activate_exercises,
+                                            goal, "1", soreness, exercise_library)
+                        self.copy_exercises(agonist.active_or_dynamic_stretch_exercises,
+                                            self.active_or_dynamic_stretch_exercises,
+                                            goal, "1", soreness, exercise_library)
+            for y in body_part.synergists:
+                synergist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(y), None))
+                if synergist is not None:
+                    self.copy_exercises(synergist.inhibit_exercises, self.inhibit_exercises, goal, "2", soreness,
+                                        exercise_library)
+                    if soreness.severity < 3.5:
+                        self.copy_exercises(synergist.isolated_activate_exercises, self.isolated_activate_exercises,
+                                            goal, "2", soreness, exercise_library)
+                        self.copy_exercises(synergist.active_or_dynamic_stretch_exercises,
+                                            self.active_or_dynamic_stretch_exercises,
+                                            goal, "2", soreness, exercise_library)
+
+    def set_exercise_dosage_ranking(self):
+        self.rank_dosages([self.inhibit_exercises,
+                           self.static_stretch_exercises,
+                           self.isolated_activate_exercises,
+                           self.active_or_dynamic_stretch_exercises,
+                           self.dynamic_integrate_exercises,
+                           self.dynamic_integrate_with_speed_exercises])
+
 
 class CoolDown(Serialisable):
     def __init__(self):
-        self.active_or_dynamic_stretch_exercises = {}
+        self.dynamic_stretch_integrate_exercises = {}
         self.completed = False
         self.active = True
 
     def json_serialise(self):
         ret = {
-            'active_or_dynamic_stretch_exercises': [p.json_serialise() for p in self.active_or_dynamic_stretch_exercises.values()],
+            'dynamic_stretch_integrate_exercises': [p.json_serialise() for p in self.dynamic_stretch_integrate_exercises.values()],
             'completed': self.completed,
             'active': self.active
         }
@@ -831,7 +904,7 @@ class CoolDown(Serialisable):
     @classmethod
     def json_deserialise(cls, input_dict):
         cooldown = cls()
-        cooldown.active_or_dynamic_stretch_exercises = {s['library_id']: AssignedExercise.json_deserialise(s) for s in input_dict['active_or_dynamic_stretch_exercises']}
+        cooldown.dynamic_stretch_integrate_exercises = {s['library_id']: AssignedExercise.json_deserialise(s) for s in input_dict['dynamic_stretch_integrate_exercises']}
         cooldown.completed = input_dict.get('completed', False)
         cooldown.active = input_dict.get('active', True)
 
