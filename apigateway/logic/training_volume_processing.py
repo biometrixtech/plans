@@ -148,13 +148,16 @@ class TrainingVolumeProcessing(object):
 
         if len(training_sessions) > 0:
             last_training_session = training_sessions[len(training_sessions) - 1]
-            if (load_end_date - last_training_session.event_date).days <= 2:
-                benchmarks = self.calc_high_relative_load_benchmarks()
-                if last_training_session.sport_name in benchmarks:
-                    if last_training_session.duration_load() >= benchmarks[last_training_session.sport_name]:
-                        self.high_relative_load = True
-            else:
-                self.high_relative_load = False
+            self.high_relative_load = self.is_last_session_high_relative_load(load_end_date, last_training_session)
+
+    def is_last_session_high_relative_load(self, event_date, last_training_session):
+        if (event_date - last_training_session.event_date).days <= 2:
+            benchmarks = self.calc_high_relative_load_benchmarks()
+            if last_training_session.sport_name in benchmarks:
+                if last_training_session.duration_load() >= benchmarks[last_training_session.sport_name]:
+                    return True
+        else:
+            return False
 
     @xray_recorder.capture('logic.TrainingVolumeProcessing.load_plan_values')
     def load_plan_values(self, last_7_days_plans, days_8_14_plans, acute_daily_plans, chronic_weeks_plans, chronic_daily_plans):
