@@ -71,7 +71,7 @@ def post_session_survey_24_hours_ankle(severity_score, movement=None):
                                             "tester",
                                             "test_session", 0, post_survey)
 
-    surveys.append(post_session_survey)
+    surveys.append(post_session_survey.survey)
 
     return surveys
 
@@ -87,7 +87,7 @@ def post_session_survey_0_hours_ankle(severity_score, movement=None):
                                             "tester",
                                             "test_session", 0, post_survey)
 
-    surveys.append(post_session_survey)
+    surveys.append(post_session_survey.survey)
 
     return surveys
 
@@ -103,7 +103,7 @@ def post_session_survey_24_hours_foot(severity_score, movement=None):
                                             "tester",
                                             "test_session", 0, post_survey)
 
-    surveys.append(post_session_survey)
+    surveys.append(post_session_survey.survey)
 
     return surveys
 
@@ -120,7 +120,7 @@ def post_session_survey_24_hrs_ankle_foot(severity_score_1, severity_score_2, mo
                                             "tester",
                                             "test_session", 0, post_survey)
 
-    surveys.append(post_session_survey)
+    surveys.append(post_session_survey.survey)
 
     return surveys
 
@@ -136,7 +136,7 @@ def post_session_survey_after_ankle_foot(severity_score_1, severity_score_2, mov
                                             "tester",
                                             "test_session", 0, post_survey)
 
-    surveys.append(post_session_survey)
+    surveys.append(post_session_survey.survey)
 
     return surveys
 
@@ -152,7 +152,7 @@ def post_session_survey_48_hours_ankle(severity_score, movement=None):
                                             "tester",
                                             "test_session", 0, post_survey)
 
-    surveys.append(post_session_survey)
+    surveys.append(post_session_survey.survey)
 
     return surveys
 
@@ -169,7 +169,7 @@ def post_session_surveys_24_48_hours_foot(severity_score_1, severity_score_2, mo
                                             "tester",
                                             "test_session", 0, post_survey_1)
 
-    surveys.append(post_session_survey)
+    surveys.append(post_session_survey.survey)
 
     soreness_list_2 = [TestUtilities().body_part_soreness(10, severity_score_2, movement_2)]
 
@@ -179,7 +179,7 @@ def post_session_surveys_24_48_hours_foot(severity_score_1, severity_score_2, mo
                                             "tester",
                                             "test_session", 0, post_survey_2)
 
-    surveys.append(post_session_survey_2)
+    surveys.append(post_session_survey_2.survey)
 
     return surveys
 
@@ -197,7 +197,7 @@ def post_session_survey_24_0_hours_ankle(severity_score_1, severity_score_2, mov
                                             "tester",
                                             "test_session", 0, post_survey_1)
 
-    surveys.append(post_session_survey)
+    surveys.append(post_session_survey.survey)
 
     soreness_list_2 = [TestUtilities().body_part_soreness(9, severity_score_2, movement_2)]
 
@@ -207,7 +207,7 @@ def post_session_survey_24_0_hours_ankle(severity_score_1, severity_score_2, mov
                                             "tester",
                                             "test_session", 0, post_survey_2)
 
-    surveys.append(post_session_survey_2)
+    surveys.append(post_session_survey_2.survey)
 
     return surveys
 
@@ -223,7 +223,7 @@ def post_session_survey_49_hours_ankle(severity_score, movement=None):
                                             "tester",
                                             "test_session", 0, post_survey)
 
-    surveys.append(post_session_survey)
+    surveys.append(post_session_survey.survey)
 
     return surveys
 
@@ -240,7 +240,8 @@ def post_session_survey_24_hours_no_soreness():
                                             "tester",
                                             "test_session", 0, post_survey)
 
-    surveys.append(post_session_survey)
+    # surveys.append(post_session_survey)
+    surveys.append(post_session_survey.survey)
 
     return surveys
 
@@ -256,7 +257,7 @@ def three_post_session_survey_24_hours_mixed_soreness():
                                             "tester",
                                             "test_session", 0, post_survey_1)
 
-    surveys.append(post_session_survey_1)
+    surveys.append(post_session_survey_1.survey)
 
     soreness_list_2 = [TestUtilities().body_part_soreness(15, 4)]
 
@@ -266,7 +267,7 @@ def three_post_session_survey_24_hours_mixed_soreness():
                                               "tester",
                                               "test_session", 0, post_survey_2)
 
-    surveys.append(post_session_survey_2)
+    surveys.append(post_session_survey_2.survey)
 
     soreness_list_3 = []
 
@@ -276,7 +277,7 @@ def three_post_session_survey_24_hours_mixed_soreness():
                                               "tester",
                                               "test_session", 0, post_survey_3)
 
-    surveys.append(post_session_survey_3)
+    surveys.append(post_session_survey_3.survey)
 
     return surveys
 

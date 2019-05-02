@@ -6,7 +6,7 @@ from models.soreness import AthleteGoal, AthleteGoalType, AssignedExercise, Body
 from logic.goal_focus_text_generator import RecoveryTextGenerator
 from datetime import  timedelta
 from utils import format_datetime, parse_date
-from models.modalities import ActiveRecovery, ActiveRestBeforeTraining, ActiveRestAfterTraining, ColdWaterImmersion, CoolDown, Heat, WarmUp, Ice
+from models.modalities import ActiveRecovery, ActiveRestBeforeTraining, ActiveRestAfterTraining, ColdWaterImmersion, CoolDown, Heat, WarmUp, Ice, HeatSession, IceSession
 
 
 class ExerciseAssignmentCalculator(object):
@@ -746,8 +746,13 @@ class ExerciseAssignmentCalculator(object):
 
                 heat.goals.add(goal)
                 bring_the_heat.append(heat)
+        if len(bring_the_heat) > 0:
+            heat_session = HeatSession()
+            heat_session.body_parts = bring_the_heat
 
-        return bring_the_heat
+            return heat_session
+        else:
+            return None
 
     def get_pre_active_rest(self, soreness_list, event_date_time):
 
@@ -858,8 +863,13 @@ class ExerciseAssignmentCalculator(object):
                     ice.immediately_after_training = False
                     ice.goals.add(goal)
                     ice_list.append(ice)
+        if len(ice_list) > 0:
+            ice_session = IceSession()
+            ice_session.body_parts = ice_list
 
-        return ice_list
+            return ice_session
+        else:
+            return None
 
     def get_cold_water_immersion(self, soreness_list, event_date_time):
 

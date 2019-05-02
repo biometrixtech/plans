@@ -5,7 +5,7 @@ import json
 from utils import format_datetime
 BASE_URL = f"https://apis.{os.getenv('ENVIRONMENT', 'dev')}.fathomai.com"
 USERS_API_VERSION = os.getenv('USERS_API_VERSION', '2_2')
-PLANS_API_VERSION = os.getenv('PLANS_API_VERSION', '3_1_1-dev_1')
+PLANS_API_VERSION = os.getenv('PLANS_API_VERSION', '4_0')
 
 USERS_URL = f"{BASE_URL}/users/{USERS_API_VERSION}"
 PLANS_URL = f"{BASE_URL}/plans/{PLANS_API_VERSION}"
@@ -17,7 +17,6 @@ HEADERS = {
     "Authorization": None,
     "Content-Type": "application/json"
   }
-
 
 
 def get_soreness(body_part, side, pain, severity, movement=None, status="dormant_cleared"):
@@ -62,10 +61,11 @@ def get_plan(start_date, event_date):
     return response
 
 
-def submit_readiness(event_date, soreness, clear_candidates, sessions):
+def submit_readiness(event_date, soreness, clear_candidates, sessions, sessions_planned=True):
     body = {"date_time": format_datetime(event_date),
             "soreness": soreness,
             "clear_candidates": clear_candidates,
+            "sessions_planned": sessions_planned,
             "sessions": sessions}
     response = requests.post(f"{PLANS_URL}/daily_readiness",
                              headers=HEADERS,
@@ -101,7 +101,7 @@ def complete_recovery(event_date, completed_exercises, recovery_type="pre"):
     return response
 
 
-def submit_session(event_date, sport_name, duration, rpe, soreness, clear_candidates):
+def submit_session(event_date, sport_name, duration, rpe, soreness, clear_candidates, sessions_planned=False):
     post_session_survey = {"event_date": event_date,
                            "RPE": rpe,
                            "soreness": soreness,
@@ -113,6 +113,7 @@ def submit_session(event_date, sport_name, duration, rpe, soreness, clear_candid
                "duration": duration,
                "post_session_survey": post_session_survey}
     body = {"event_date": event_date,
+            "sessions_planned": sessions_planned,
             "sessions": [session]}
     response = requests.post(f"{PLANS_URL}/session",
                              headers=HEADERS,

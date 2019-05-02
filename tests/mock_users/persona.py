@@ -42,7 +42,7 @@ class Persona(object):
                                   'soreness': soreness}
                 self.create_readiness(readiness_data)
                 self.create_plan(event_date)
-                exercise_list = [ex.exercise.id for ex in self.daily_plan.pre_recovery.inhibit_exercises]
+                exercise_list = [ex.exercise.id for ex in self.daily_plan.pre_active_rest.inhibit_exercises.values()]
                 self.complete_exercises(exercise_list, format_datetime(event_date + datetime.timedelta(hours=1)))
                 print(today_date)
             self.update_stats(format_date(event_date))
