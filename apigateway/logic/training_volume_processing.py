@@ -396,150 +396,151 @@ class TrainingVolumeProcessing(object):
             loading_events.append(loading_event)
 
         early_soreness_tuples = list(s[0] for s in self.post_session_survey_tuples
-                                     if s[0] >= loading_events[0].loading_date and
+                                     if s is not None and s[0] >= loading_events[0].loading_date and
                                      s[0] <= loading_events[0].loading_date + timedelta(hours=36))
         early_soreness_tuples.extend(list(s[0] for s in self.daily_readiness_tuples
-                                          if s[0] >= loading_events[0].loading_date and
+                                          if s is not None and s[0] >= loading_events[0].loading_date and
                                           s[0] <= loading_events[0].loading_date + timedelta(hours=36)))
-        early_soreness_history = list(set(early_soreness_tuples))
+        if len(early_soreness_tuples) > 0:
+            early_soreness_history = list(set(early_soreness_tuples))
 
-        # let's reduce this down to only the loading events that can have soreness
-        # (the highest load within a rolling 36 hour window)
-        for t in range(0, len(loading_events)):
+            # let's reduce this down to only the loading events that can have soreness
+            # (the highest load within a rolling 36 hour window)
+            for t in range(0, len(loading_events)):
 
-            test_date = loading_events[t].loading_date + timedelta(hours=36)
-            if len(early_soreness_history) > t:
-                test_date = min(early_soreness_history[t], loading_events[t].loading_date + timedelta(hours=36))
-            window_events = list(d for d in loading_events if
-                                 d.loading_date >= loading_events[t].loading_date and d.loading_date <= test_date)
-            if len(window_events) > 0:
-                window_events.sort(key=lambda x: x.load, reverse=True)
-                window_events[0].highest_load_in_36_hrs = True
+                test_date = loading_events[t].loading_date + timedelta(hours=36)
+                if len(early_soreness_history) > t:
+                    test_date = min(early_soreness_history[t], loading_events[t].loading_date + timedelta(hours=36))
+                window_events = list(d for d in loading_events if
+                                     d.loading_date >= loading_events[t].loading_date and d.loading_date <= test_date)
+                if len(window_events) > 0:
+                    window_events.sort(key=lambda x: x.load, reverse=True)
+                    window_events[0].highest_load_in_36_hrs = True
 
-        for t in range(0, len(loading_events) - 1):
+            for t in range(0, len(loading_events) - 1):
 
-            if loading_events[t].loading_date <= load_end_date and loading_events[t].highest_load_in_36_hrs:
-                #loading_event = LoadingEvent(self.rpe_load_tuples[t][0], self.rpe_load_tuples[t][1], self.rpe_load_tuples[t][2], self.rpe_load_tuples[t][3])
-                loading_event = loading_events[t]
-                first_load_date = loading_events[0].loading_date
+                if loading_events[t].loading_date <= load_end_date and loading_events[t].highest_load_in_36_hrs:
+                    #loading_event = LoadingEvent(self.rpe_load_tuples[t][0], self.rpe_load_tuples[t][1], self.rpe_load_tuples[t][2], self.rpe_load_tuples[t][3])
+                    loading_event = loading_events[t]
+                    first_load_date = loading_events[0].loading_date
 
-                # get all affected body parts that could be attributed to this training session
-                next_highest_load_date = loading_events[t].loading_date + timedelta(hours=36)
-                candidates = list(r for r in loading_events if r.loading_date > loading_events[t].loading_date
-                                  and r.loading_date <= next_highest_load_date and r.load > loading_events[t].load and r.highest_load_in_36_hrs)
-                candidates.sort(key=lambda x: x.loading_date)
-                if len(candidates) > 0:
-                    next_highest_load_date = candidates[0].loading_date
+                    # get all affected body parts that could be attributed to this training session
+                    next_highest_load_date = loading_events[t].loading_date + timedelta(hours=36)
+                    candidates = list(r for r in loading_events if r.loading_date > loading_events[t].loading_date
+                                      and r.loading_date <= next_highest_load_date and r.load > loading_events[t].load and r.highest_load_in_36_hrs)
+                    candidates.sort(key=lambda x: x.loading_date)
+                    if len(candidates) > 0:
+                        next_highest_load_date = candidates[0].loading_date
 
 
-                base_soreness_tuples = list((s[0], s[1]) for s in self.post_session_survey_tuples
-                                            if s[0] >= loading_events[t].loading_date and
-                                            s[0] <= next_highest_load_date)
-                base_soreness_tuples.extend(list((s[0], s[1]) for s in self.daily_readiness_tuples
-                                                 if s[0] >= loading_events[t].loading_date and
-                                                 s[0] <= next_highest_load_date))
+                    base_soreness_tuples = list((s[0], s[1]) for s in self.post_session_survey_tuples
+                                                if s[0] >= loading_events[t].loading_date and
+                                                s[0] <= next_highest_load_date)
+                    base_soreness_tuples.extend(list((s[0], s[1]) for s in self.daily_readiness_tuples
+                                                     if s[0] >= loading_events[t].loading_date and
+                                                     s[0] <= next_highest_load_date))
 
-                body_parts = list(AffectedBodyPart(b[1][0], b[1][1], 0, 0, False) for b in base_soreness_tuples) # body part, side, days sore, max_severity, cleared
-                affected_body_parts = list(set(body_parts))
-                all_soreness_tuples = list((s[0], s[1]) for s in self.post_session_survey_tuples
-                                            if s[0] >= load_tuples[t][0] and
-                                            s[0] < load_tuples[t][0] + timedelta(days=12))
-                all_soreness_tuples.extend(list((s[0], s[1]) for s in self.daily_readiness_tuples
-                                                 if s[0] >= load_tuples[t][0] and
-                                                 s[0] < load_tuples[t][0] + timedelta(days=12)))
-                soreness_history = list((h[0], h[1][0], h[1][1], h[1][2]) for h in all_soreness_tuples)
-                unique_soreness_history = list(set(soreness_history))
-                unique_soreness_history.sort(key=self.get_tuple_datetime)
-                unique_soreness_dates = list(dt[0] for dt in unique_soreness_history)
-                for dt in unique_soreness_dates:
-                    unique_soreness_events = list(u for u in unique_soreness_history if u[0] == dt)
-                    for a in affected_body_parts:  # looping through only the body parts we care about
-                        if not a.cleared:
-                            body_parts_present = list(u for u in unique_soreness_events if a.body_part == u[1] and a.side == u[2])
-                            if len(body_parts_present) > 0:
-                                if a.last_reported_date is None:
-                                    a.last_reported_date = body_parts_present[0][0]
-                                    a.days_sore = 1
-                                else:
-                                    a.days_sore += (body_parts_present[0][0].date() - a.last_reported_date.date()).days
-                                    a.last_reported_date = body_parts_present[0][0]
-                                a.max_severity = max(a.max_severity, body_parts_present[0][3])
-                                # let's look at future loading events and update it's previous affected soreness
-                                future_loading_events = list(f for f in loading_events if f.loading_date > dt)
-                                if len(future_loading_events) > 0:
-                                    f = future_loading_events[0]
-                                    body_part_in_future = list(g for g in f.previous_affected_body_parts if g.body_part == a.body_part and g.side == a.side)
-                                    if len(body_part_in_future) > 0:
-                                        for p in body_part_in_future:
-                                            if p.first_reported_date is not None:
-                                                p.first_reported_date = min(p.first_reported_date, body_parts_present[0][0])
-                                            else:
-                                                p.first_reported_date = body_parts_present[0][0]
+                    body_parts = list(AffectedBodyPart(b[1][0], b[1][1], 0, 0, False) for b in base_soreness_tuples) # body part, side, days sore, max_severity, cleared
+                    affected_body_parts = list(set(body_parts))
+                    all_soreness_tuples = list((s[0], s[1]) for s in self.post_session_survey_tuples
+                                                if s[0] >= load_tuples[t][0] and
+                                                s[0] < load_tuples[t][0] + timedelta(days=12))
+                    all_soreness_tuples.extend(list((s[0], s[1]) for s in self.daily_readiness_tuples
+                                                     if s[0] >= load_tuples[t][0] and
+                                                     s[0] < load_tuples[t][0] + timedelta(days=12)))
+                    soreness_history = list((h[0], h[1][0], h[1][1], h[1][2]) for h in all_soreness_tuples)
+                    unique_soreness_history = list(set(soreness_history))
+                    unique_soreness_history.sort(key=self.get_tuple_datetime)
+                    unique_soreness_dates = list(dt[0] for dt in unique_soreness_history)
+                    for dt in unique_soreness_dates:
+                        unique_soreness_events = list(u for u in unique_soreness_history if u[0] == dt)
+                        for a in affected_body_parts:  # looping through only the body parts we care about
+                            if not a.cleared:
+                                body_parts_present = list(u for u in unique_soreness_events if a.body_part == u[1] and a.side == u[2])
+                                if len(body_parts_present) > 0:
+                                    if a.last_reported_date is None:
+                                        a.last_reported_date = body_parts_present[0][0]
+                                        a.days_sore = 1
                                     else:
-                                        previous_affected_part = AffectedBodyPart(a.body_part, a.side, a.days_sore, a.max_severity, a.cleared)
-                                        previous_affected_part.first_reported_date = body_parts_present[0][0]
-                                        f.previous_affected_body_parts.append(previous_affected_part)
-                            elif a.days_sore > 0:
-                                a.cleared = True
-                # close out any soreness not cleared
-                for a in affected_body_parts:
-                    if not a.cleared:
-                        a.cleared = True
+                                        a.days_sore += (body_parts_present[0][0].date() - a.last_reported_date.date()).days
+                                        a.last_reported_date = body_parts_present[0][0]
+                                    a.max_severity = max(a.max_severity, body_parts_present[0][3])
+                                    # let's look at future loading events and update it's previous affected soreness
+                                    future_loading_events = list(f for f in loading_events if f.loading_date > dt)
+                                    if len(future_loading_events) > 0:
+                                        f = future_loading_events[0]
+                                        body_part_in_future = list(g for g in f.previous_affected_body_parts if g.body_part == a.body_part and g.side == a.side)
+                                        if len(body_part_in_future) > 0:
+                                            for p in body_part_in_future:
+                                                if p.first_reported_date is not None:
+                                                    p.first_reported_date = min(p.first_reported_date, body_parts_present[0][0])
+                                                else:
+                                                    p.first_reported_date = body_parts_present[0][0]
+                                        else:
+                                            previous_affected_part = AffectedBodyPart(a.body_part, a.side, a.days_sore, a.max_severity, a.cleared)
+                                            previous_affected_part.first_reported_date = body_parts_present[0][0]
+                                            f.previous_affected_body_parts.append(previous_affected_part)
+                                elif a.days_sore > 0:
+                                    a.cleared = True
+                    # close out any soreness not cleared
+                    for a in affected_body_parts:
+                        if not a.cleared:
+                            a.cleared = True
 
-                # need to pick the oldest date for each body part
-                grouped_parts = []
-                grouper = attrgetter('body_part', 'side')
-                for k, g in groupby(sorted(affected_body_parts, key=grouper), grouper):
-                    part_list = list(g)
-                    part_list.sort(key=lambda x: x.last_reported_date)
-                    grouped_parts.append(part_list[0])
+                    # need to pick the oldest date for each body part
+                    grouped_parts = []
+                    grouper = attrgetter('body_part', 'side')
+                    for k, g in groupby(sorted(affected_body_parts, key=grouper), grouper):
+                        part_list = list(g)
+                        part_list.sort(key=lambda x: x.last_reported_date)
+                        grouped_parts.append(part_list[0])
 
-                loading_event.affected_body_parts = grouped_parts
+                    loading_event.affected_body_parts = grouped_parts
 
-        for loading_event in loading_events:
+            for loading_event in loading_events:
 
-            level_one_soreness = list(
-                a for a in loading_event.affected_body_parts if a.cleared and a.days_sore <= 1)
+                level_one_soreness = list(
+                    a for a in loading_event.affected_body_parts if a.cleared and a.days_sore <= 1)
 
-            if len(loading_event.affected_body_parts) == len(level_one_soreness): # no soreness
-                self.no_soreness_load_tuples.append((loading_event.loading_date, loading_event.load))
-                if loading_event.loading_date >= last_2_4_week_date:
-                    if loading_event.load / max_load <= .10:
-                        if loading_event.sport_name not in self.recovery_loads:
-                            self.recovery_loads[loading_event.sport_name] = []
-                        self.recovery_loads[loading_event.sport_name].append(loading_event.load)
-                    else:
-                        if loading_event.sport_name not in self.maintenance_loads:
-                            self.maintenance_loads[loading_event.sport_name] = []
-                        self.maintenance_loads[loading_event.sport_name].append(loading_event.load)
+                if len(loading_event.affected_body_parts) == len(level_one_soreness): # no soreness
+                    self.no_soreness_load_tuples.append((loading_event.loading_date, loading_event.load))
+                    if loading_event.loading_date >= last_2_4_week_date:
+                        if loading_event.load / max_load <= .10:
+                            if loading_event.sport_name not in self.recovery_loads:
+                                self.recovery_loads[loading_event.sport_name] = []
+                            self.recovery_loads[loading_event.sport_name].append(loading_event.load)
+                        else:
+                            if loading_event.sport_name not in self.maintenance_loads:
+                                self.maintenance_loads[loading_event.sport_name] = []
+                            self.maintenance_loads[loading_event.sport_name].append(loading_event.load)
+
+                    if last_2_week_date - timedelta(days=3) > loading_event.loading_date >= last_2_4_week_date - timedelta(days=3):
+                        self.no_soreness_load_tuples_last_2_4_weeks.append((loading_event.loading_date, loading_event.load))
+                    if 0 <= (loading_event.loading_date - last_2_week_date - timedelta(days=3)).days <= 14:
+                        self.no_soreness_load_tuples_last_2_weeks.append((loading_event.loading_date, loading_event.load))
+
+                else:
+                    self.soreness_load_tuples.append((loading_event.loading_date, loading_event.load))
+                    if loading_event.loading_date >= last_2_4_week_date:
+                        fo_soreness_list = list(a for a in loading_event.affected_body_parts if a.cleared and (a.max_severity <= 1 and
+                                                             a.days_sore < 3))
+                        if len(fo_soreness_list) > 0:
+                            if loading_event.sport_name not in self.functional_overreaching_loads:
+                                self.functional_overreaching_loads[loading_event.sport_name] = []
+                            self.functional_overreaching_loads[loading_event.sport_name].append(loading_event.load)
+
+                        fo_nfo_list = list(a for a in loading_event.affected_body_parts if a.cleared and (1 < a.max_severity or
+                                                             a.days_sore > 2))
+
+                        if len(fo_nfo_list) > 0:
+                            if loading_event.sport_name not in self.functional_overreaching_NFO_loads:
+                                self.functional_overreaching_NFO_loads[loading_event.sport_name] = []
+                            self.functional_overreaching_NFO_loads[loading_event.sport_name].append(loading_event.load)
 
                 if last_2_week_date - timedelta(days=3) > loading_event.loading_date >= last_2_4_week_date - timedelta(days=3):
-                    self.no_soreness_load_tuples_last_2_4_weeks.append((loading_event.loading_date, loading_event.load))
+                    self.load_tuples_last_2_4_weeks.append((loading_event.loading_date, loading_event.load))
                 if 0 <= (loading_event.loading_date - last_2_week_date - timedelta(days=3)).days <= 14:
-                    self.no_soreness_load_tuples_last_2_weeks.append((loading_event.loading_date, loading_event.load))
-
-            else:
-                self.soreness_load_tuples.append((loading_event.loading_date, loading_event.load))
-                if loading_event.loading_date >= last_2_4_week_date:
-                    fo_soreness_list = list(a for a in loading_event.affected_body_parts if a.cleared and (a.max_severity <= 1 and
-                                                         a.days_sore < 3))
-                    if len(fo_soreness_list) > 0:
-                        if loading_event.sport_name not in self.functional_overreaching_loads:
-                            self.functional_overreaching_loads[loading_event.sport_name] = []
-                        self.functional_overreaching_loads[loading_event.sport_name].append(loading_event.load)
-
-                    fo_nfo_list = list(a for a in loading_event.affected_body_parts if a.cleared and (1 < a.max_severity or
-                                                         a.days_sore > 2))
-
-                    if len(fo_nfo_list) > 0:
-                        if loading_event.sport_name not in self.functional_overreaching_NFO_loads:
-                            self.functional_overreaching_NFO_loads[loading_event.sport_name] = []
-                        self.functional_overreaching_NFO_loads[loading_event.sport_name].append(loading_event.load)
-
-            if last_2_week_date - timedelta(days=3) > loading_event.loading_date >= last_2_4_week_date - timedelta(days=3):
-                self.load_tuples_last_2_4_weeks.append((loading_event.loading_date, loading_event.load))
-            if 0 <= (loading_event.loading_date - last_2_week_date - timedelta(days=3)).days <= 14:
-                self.load_tuples_last_2_weeks.append((loading_event.loading_date, loading_event.load))
+                    self.load_tuples_last_2_weeks.append((loading_event.loading_date, loading_event.load))
 
     def get_acwr(self, acute_load_error, chronic_load_error, factor=1.3):
 
