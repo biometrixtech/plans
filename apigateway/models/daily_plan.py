@@ -3,7 +3,7 @@ from utils import parse_date
 # import models.session as session
 from models.session import Session
 from models.daily_readiness import DailyReadiness
-from models.modalities import ActiveRestBeforeTraining, ActiveRestAfterTraining, ActiveRecovery, IceSession, HeatSession, ColdWaterImmersion, WarmUp, CoolDown
+from models.modalities import ActiveRestBeforeTraining, ActiveRestAfterTraining, IceSession, HeatSession, ColdWaterImmersion, WarmUp, CoolDown
 
 
 class DailyPlan(Serialisable):
