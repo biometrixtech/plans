@@ -55,6 +55,12 @@ def handle_exercise_modalities_complete(principal_id=None):
         if plan.warm_up.completed:
             save_exercises = False
 
+    elif recovery_type == 'cool_down':
+        plan.cool_down.event_date_time = recovery_event_date
+        plan.cool_down.completed = True
+        if plan.cool_down.completed:
+            save_exercises = False
+
     daily_plan_datastore.put(plan)
 
     if save_exercises:
@@ -105,6 +111,9 @@ def handle_exercise_modalities_start(principal_id=None):
     elif recovery_type == 'warm_up':
         plan.warm_up.start_date_time = recovery_start_date
 
+    elif recovery_type == 'cool_down':
+        plan.cool_down.start_date_time = recovery_start_date
+
     daily_plan_datastore.put(plan)
 
     return {'message': 'success'}, 200
@@ -132,7 +141,7 @@ def handle_body_part_modalities_complete(principal_id=None):
         plan.heat.event_date_time = recovery_event_date
         plan.heat.completed = True
         for completed_body_part in completed_body_parts:
-            assigned_body_part = [body_part for body_part in plan.ice.body_parts if
+            assigned_body_part = [body_part for body_part in plan.heat.body_parts if
                                   body_part.body_part_location.value == completed_body_part.body_part_location and
                                   body_part.side == completed_body_part.side][0]
             assigned_body_part.completed = True
