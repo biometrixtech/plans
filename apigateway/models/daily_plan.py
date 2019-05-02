@@ -150,8 +150,8 @@ class DailyPlan(Serialisable):
         if self.post_active_rest is not None and self.post_active_rest.active:
             return 2.0, None
         elif ((self.post_active_rest is None or not self.post_active_rest.active) and
-              self.pre_active_rest is not None and
-              self.pre_active_rest.completed):
+               self.warm_up is not None and
+               self.warm_up.completed):
             return 1.0, None
         else:
             return 0.0, None
