@@ -148,11 +148,11 @@ class TrainingVolumeProcessing(object):
 
         if len(training_sessions) > 0:
             last_training_session = training_sessions[len(training_sessions) - 1]
-            self.high_relative_load_session = self.is_last_session_high_relative_load(load_end_date, last_training_session)
-
-    def is_last_session_high_relative_load(self, event_date, last_training_session):
-        if (event_date - last_training_session.event_date).days <= 2:
             benchmarks = self.calc_high_relative_load_benchmarks()
+            self.high_relative_load_session = self.is_last_session_high_relative_load(load_end_date, last_training_session, benchmarks)
+
+    def is_last_session_high_relative_load(self, event_date, last_training_session, benchmarks):
+        if (event_date - last_training_session.event_date).days <= 2:
             if last_training_session.sport_name in benchmarks:
                 if last_training_session.duration_load() >= benchmarks[last_training_session.sport_name]:
                     return True
