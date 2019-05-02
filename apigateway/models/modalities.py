@@ -34,8 +34,11 @@ class HeatSession(Serialisable):
         heat_session.event_date_time = input_dict.get('event_date_time', None)
         heat_session.completed = input_dict.get('completed', False)
         heat_session.active = input_dict.get('active', True)
-
-        return heat_session
+        heat_session.body_parts = [Heat.json_deserialise(body_part) for body_part in input_dict.get('body_parts', [])]
+        if len(heat_session.body_parts) > 0:
+            return heat_session
+        else:
+            return None
 
     def __setattr__(self, name, value):
         if name in ['event_date_time', 'start_date_time']:
@@ -972,8 +975,11 @@ class IceSession(Serialisable):
         ice_session.event_date_time = input_dict.get('event_date_time', None)
         ice_session.completed = input_dict.get('completed', False)
         ice_session.active = input_dict.get('active', True)
-
-        return ice_session
+        ice_session.body_parts = [Ice.json_deserialise(body_part) for body_part in input_dict.get('body_parts', [])]
+        if len(ice_session.body_parts) > 0:
+            return ice_session
+        else:
+            return None
 
     def __setattr__(self, name, value):
         if name in ['event_date_time', 'start_date_time']:

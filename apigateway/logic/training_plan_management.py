@@ -108,7 +108,7 @@ class TrainingPlanManager(object):
             if self.daily_plan.warm_up is not None:
                 self.daily_plan.warm_up.active = False
             # create new post-training modalities
-            # self.daily_plan.active_recovery = calc.get_active_recovery(event_date, soreness_list)
+            # self.daily_plan.active_recovery = calc.get_active_recovery(parse_date(event_date), soreness_list)
             self.daily_plan.post_active_rest = calc.get_post_active_rest(athlete_stats, soreness_list, parse_date(event_date))
             self.daily_plan.ice = calc.get_ice(soreness_list, parse_date(event_date))
             self.daily_plan.cold_water_immersion = calc.get_cold_water_immersion(soreness_list, parse_date(event_date))
@@ -118,26 +118,6 @@ class TrainingPlanManager(object):
             self.preserve_completed_modality(self.daily_plan.post_active_rest)
             self.preserve_completed_modality(self.daily_plan.ice)
             self.preserve_completed_modality(self.daily_plan.cold_water_immersion)
-            # if self.daily_plan.active_recovery is not None:
-            #     if not self.daily_plan.active_recovery.completed:
-            #         self.daily_plan.active_recovery = None
-            #     else:
-            #         self.daily_plan.active_recovery.active = False
-            # if self.daily_plan.post_active_rest is not None:
-            #     if not self.daily_plan.post_active_rest.completed:
-            #         self.daily_plan.post_active_rest = None
-            #     else:
-            #         self.daily_plan.post_active_rest.active = False
-            # if self.daily_plan.cold_water_immersion is not None:
-            #     if not self.daily_plan.cold_water_immersion.completed:
-            #         self.daily_plan.cold_water_immersion = None
-            #     else:
-            #         self.daily_plan.cold_water_immersion.active = False
-            # if self.daily_plan.ice is not None:
-            #     if not self.daily_plan.ice.completed:
-            #         self.daily_plan.ice = None
-            #     else:
-            #         self.daily_plan.ice.active = False
             # if any completed pre-training modalities exist, preserve them
             if self.daily_plan.heat is not None and self.daily_plan.heat.completed:
                 self.daily_plan.completed_heat.append(self.daily_plan.heat)
