@@ -202,6 +202,8 @@ class StatsProcessing(object):
                 for h in existing_historic_soreness:
                     if h.is_pain == g.is_pain and h.side == g.side and h.body_part_location == g.location:
                         historic_soreness = h
+                        if historic_soreness.first_reported_date is None:
+                            historic_soreness.first_reported_date = first_reported_date
 
             ask_acute_pain_question = False
             streak = 0
