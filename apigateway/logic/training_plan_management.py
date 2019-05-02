@@ -109,9 +109,9 @@ class TrainingPlanManager(object):
                 self.daily_plan.warm_up.active = False
             # create new post-training modalities
             # self.daily_plan.active_recovery = calc.get_active_recovery(event_date, soreness_list)
-            self.daily_plan.post_active_rest = calc.get_post_active_rest(soreness_list, event_date)
-            self.daily_plan.ice = calc.get_ice(soreness_list, event_date)
-            self.daily_plan.cold_water_immersion = calc.get_cold_water_immersion(soreness_list, event_date)
+            self.daily_plan.post_active_rest = calc.get_post_active_rest(soreness_list, parse_date(event_date))
+            self.daily_plan.ice = calc.get_ice(soreness_list, parse_date(event_date))
+            self.daily_plan.cold_water_immersion = calc.get_cold_water_immersion(soreness_list, parse_date(event_date))
         else:
             # if any post-training modalities are present and complete, preserve the completed ones
             self.preserve_completed_modality(self.daily_plan.active_recovery)
@@ -146,9 +146,9 @@ class TrainingPlanManager(object):
             if self.daily_plan.warm_up is not None and self.daily_plan.warm_up.completed:
                 self.daily_plan.completed_warm_up.append(self.daily_plan.warm_up)
             # create new pre-training modalities
-            self.daily_plan.heat = calc.get_heat(soreness_list, event_date)
-            self.daily_plan.pre_active_rest = calc.get_pre_active_rest(soreness_list, event_date)
-            self.daily_plan.warm_up = calc.get_warm_up(soreness_list, event_date)
+            self.daily_plan.heat = calc.get_heat(soreness_list, parse_date(event_date))
+            self.daily_plan.pre_active_rest = calc.get_pre_active_rest(soreness_list, parse_date(event_date))
+            self.daily_plan.warm_up = calc.get_warm_up(soreness_list, parse_date(event_date))
         #
         # if soreness_values is not None and len(soreness_values) > 0:
         #    max_soreness = max(soreness_values)

@@ -9,8 +9,8 @@ import datetime
 
 class HeatSession(Serialisable):
     def __init__(self):
-        self.start_date = None
-        self.event_date = None
+        self.start_date_time = None
+        self.event_date_time = None
         self.completed = False
         self.active = True
         self.body_parts = []
@@ -18,8 +18,8 @@ class HeatSession(Serialisable):
     def json_serialise(self):
 
         ret = {
-            'start_date': format_datetime(self.start_date) if self.start_date is not None else None,
-            'event_date': format_datetime(self.event_date) if self.event_date is not None else None,
+            'start_date_time': format_datetime(self.start_date_time) if self.start_date_time is not None else None,
+            'event_date_time': format_datetime(self.event_date_time) if self.event_date_time is not None else None,
             'completed': self.completed,
             'active': self.active,
             'body_parts': [heat.json_serialise() for heat in self.body_parts]
@@ -30,15 +30,15 @@ class HeatSession(Serialisable):
     @classmethod
     def json_deserialise(cls, input_dict):
         heat_session = cls()
-        heat_session.start_date = input_dict.get('start_date', None)
-        heat_session.event_date = input_dict.get('event_date', None)
+        heat_session.start_date_time = input_dict.get('start_date_time', None)
+        heat_session.event_date_time = input_dict.get('event_date_time', None)
         heat_session.completed = input_dict.get('completed', False)
         heat_session.active = input_dict.get('active', True)
 
         return heat_session
 
     def __setattr__(self, name, value):
-        if name in ['event_date', 'start_date']:
+        if name in ['event_date_time', 'start_date_time']:
             if value is not None and not isinstance(value, datetime.datetime):
                 value = parse_datetime(value)
         super().__setattr__(name, value)
@@ -84,14 +84,14 @@ class Heat(Serialisable):
 class ModalityBase(object):
     def __init__(self):
         self.inhibit_exercises = {}
-        self.start_date = None
-        self.event_date = None
+        self.start_date_time = None
+        self.event_date_time = None
         self.completed = False
         self.active = True
 
 
     def __setattr__(self, name, value):
-        if name in ['event_date', 'start_date']:
+        if name in ['event_date_time', 'start_date_time']:
             if value is not None and not isinstance(value, datetime.datetime):
                 value = parse_datetime(value)
         super().__setattr__(name, value)
@@ -339,8 +339,8 @@ class ActiveRest(ModalityBase):
         for s in soreness_list:
             self.check_reactive_care_soreness(s, exercise_library)
             self.check_reactive_care_pain(s, exercise_library)
-            self.check_prevention_soreness(s, parse_date(event_date_time), exercise_library)
-            self.check_prevention_pain(s, parse_date(event_date_time), exercise_library)
+            self.check_prevention_soreness(s, event_date_time, exercise_library)
+            self.check_prevention_pain(s, event_date_time, exercise_library)
 
 
 
@@ -369,8 +369,8 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
             'active_stretch_exercises': [p.json_serialise() for p in self.active_stretch_exercises.values()],
             'isolated_activate_exercises': [p.json_serialise() for p in self.isolated_activate_exercises.values()],
             'static_integrate_exercises': [p.json_serialise() for p in self.static_integrate_exercises.values()],
-            'start_date': format_datetime(self.start_date) if self.start_date is not None else None,
-            'event_date': format_datetime(self.event_date) if self.event_date is not None else None,
+            'start_date_time': format_datetime(self.start_date_time) if self.start_date_time is not None else None,
+            'event_date_time': format_datetime(self.event_date_time) if self.event_date_time is not None else None,
             'completed': self.completed,
             'active': self.active,
             'default_plan': self.default_plan
@@ -381,8 +381,8 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
     def json_deserialise(cls, input_dict):
         pre_active_rest = cls()
         pre_active_rest.active = input_dict.get("active", True)
-        pre_active_rest.start_date = input_dict.get("start_date", None)
-        pre_active_rest.event_date = input_dict.get("event_date", None)
+        pre_active_rest.start_date_time = input_dict.get("start_date_time", None)
+        pre_active_rest.event_date_time = input_dict.get("event_date_time", None)
         pre_active_rest.completed = input_dict.get("completed", False)
         pre_active_rest.inhibit_exercises = {s['library_id']: AssignedExercise.json_deserialise(s)
                                              for s in input_dict['inhibit_exercises']}
@@ -448,8 +448,8 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
 
         body_part_factory = BodyPartFactory()
 
-        if soreness.historic_soreness_status is not None and soreness.first_reported is not None and not soreness.is_dormant_cleared():
-            days_sore = (event_date_time - parse_date(soreness.first_reported)).days
+        if soreness.historic_soreness_status is not None and soreness.first_reported_date is not None and not soreness.is_dormant_cleared():
+            days_sore = (event_date_time - soreness.first_reported_date).days
             if not soreness.pain and days_sore > 30:
 
                 body_part = body_part_factory.get_body_part(soreness.body_part)
@@ -490,8 +490,8 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
 
         body_part_factory = BodyPartFactory()
 
-        if soreness.historic_soreness_status is not None and soreness.first_reported is not None:
-            # days_sore = (event_date_time - parse_date(soreness.first_reported)).days
+        if soreness.historic_soreness_status is not None and soreness.first_reported_date is not None:
+            # days_sore = (event_date_time - soreness.first_reported_date).days
             if soreness.is_acute_pain() or soreness.is_persistent_pain() or soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_pain:
 
                 body_part = body_part_factory.get_body_part(soreness.body_part)
@@ -583,8 +583,8 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
             'static_stretch_exercises': [p.json_serialise() for p in self.static_stretch_exercises.values()],
             'isolated_activate_exercises': [p.json_serialise() for p in self.isolated_activate_exercises.values()],
             'static_integrate_exercises': [p.json_serialise() for p in self.static_integrate_exercises.values()],
-            'start_date': format_datetime(self.start_date) if self.start_date is not None else None,
-            'event_date': format_datetime(self.event_date) if self.event_date is not None else None,
+            'start_date_time': format_datetime(self.start_date_time) if self.start_date_time is not None else None,
+            'event_date_time': format_datetime(self.event_date_time) if self.event_date_time is not None else None,
             'completed': self.completed,
             'active': self.active,
             'default_plan': self.default_plan
@@ -595,8 +595,8 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
     def json_deserialise(cls, input_dict):
         post_active_rest = cls()
         post_active_rest.active = input_dict.get("active", True)
-        post_active_rest.start_date = input_dict.get("start_date", None)
-        post_active_rest.event_date = input_dict.get("event_date", None)
+        post_active_rest.start_date_time = input_dict.get("start_date_time", None)
+        post_active_rest.event_date_time = input_dict.get("event_date_time", None)
         post_active_rest.completed = input_dict.get("completed", False)
         post_active_rest.inhibit_exercises = {s['library_id']: AssignedExercise.json_deserialise(s)
                                               for s in input_dict['inhibit_exercises']}
@@ -656,8 +656,8 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
 
         body_part_factory = BodyPartFactory()
 
-        if soreness.historic_soreness_status is not None and soreness.first_reported is not None and not soreness.is_dormant_cleared():
-            days_sore = (event_date_time - parse_date(soreness.first_reported)).days
+        if soreness.historic_soreness_status is not None and soreness.first_reported_date is not None and not soreness.is_dormant_cleared():
+            days_sore = (event_date_time - soreness.first_reported_date).days
             if not soreness.pain and days_sore > 30:
 
                 body_part = body_part_factory.get_body_part(soreness.body_part)
@@ -698,8 +698,8 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
 
         body_part_factory = BodyPartFactory()
 
-        if soreness.historic_soreness_status is not None and soreness.first_reported is not None:
-            # days_sore = (event_date_time - parse_date(soreness.first_reported)).days
+        if soreness.historic_soreness_status is not None and soreness.first_reported_date is not None:
+            # days_sore = (event_date_time - soreness.first_reported_date).days
             if soreness.is_acute_pain() or soreness.is_persistent_pain() or soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_pain:
 
                 body_part = body_part_factory.get_body_part(soreness.body_part)
@@ -793,8 +793,8 @@ class WarmUp(ModalityBase, Serialisable):
             'isolated_activate_exercises': [p.json_serialise() for p in self.isolated_activate_exercises.values()],
             'dynamic_integrate_exercises': [p.json_serialise() for p in self.dynamic_integrate_exercises.values()],
             'dynamic_integrate_with_speed_exercises': [p.json_serialise() for p in self.dynamic_integrate_with_speed_exercises.values()],
-            'start_date': format_datetime(self.start_date) if self.start_date is not None else None,
-            'event_date': format_datetime(self.event_date) if self.event_date is not None else None,
+            'start_date_time': format_datetime(self.start_date_time) if self.start_date_time is not None else None,
+            'event_date_time': format_datetime(self.event_date_time) if self.event_date_time is not None else None,
             'completed': self.completed,
             'active': self.active
         }
@@ -809,8 +809,8 @@ class WarmUp(ModalityBase, Serialisable):
         warmup.isolated_activate_exercises = {s['library_id']: AssignedExercise.json_deserialise(s) for s in input_dict['isolated_activate_exercises']}
         warmup.dynamic_integrate_exercises = {s['library_id']: AssignedExercise.json_deserialise(s) for s in input_dict['dynamic_integrate_exercises']}
         warmup.dynamic_integrate_with_speed_exercises = {s['library_id']: AssignedExercise.json_deserialise(s) for s in input_dict['dynamic_integrate_with_speed_exercises']}
-        warmup.start_date = input_dict.get('start_date', None)
-        warmup.event_date = input_dict.get('event_date', None)
+        warmup.start_date_time = input_dict.get('start_date_time', None)
+        warmup.event_date_time = input_dict.get('event_date_time', None)
         warmup.completed = input_dict.get('completed', False)
         warmup.active = input_dict.get('active', True)
 
@@ -818,13 +818,13 @@ class WarmUp(ModalityBase, Serialisable):
 
     def fill_exercises(self, soreness_list, event_date_time, exercise_library):
         for s in soreness_list:
-            self.check_corrective_soreness(s, parse_date(event_date_time), exercise_library)
-            self.check_preempt_soreness(s, parse_date(event_date_time), exercise_library)
+            self.check_corrective_soreness(s, event_date_time, exercise_library)
+            self.check_preempt_soreness(s, event_date_time, exercise_library)
 
     def check_preempt_soreness(self, soreness, event_date_time, exercise_library):
 
-        if soreness.historic_soreness_status is not None and soreness.first_reported is not None and not soreness.is_dormant_cleared():
-            days_sore = (event_date_time - parse_date(soreness.first_reported)).days
+        if soreness.historic_soreness_status is not None and soreness.first_reported_date is not None and not soreness.is_dormant_cleared():
+            days_sore = (event_date_time - soreness.first_reported_date).days
             if not soreness.pain and days_sore < 30:
 
                 goal = AthleteGoal("Personalized Prepare for Training", 1, AthleteGoalType.preempt_soreness)
@@ -834,8 +834,8 @@ class WarmUp(ModalityBase, Serialisable):
 
     def check_corrective_soreness(self, soreness, event_date_time, exercise_library):
 
-        if soreness.historic_soreness_status is not None and soreness.first_reported is not None and not soreness.is_dormant_cleared():
-            days_sore = (event_date_time - parse_date(soreness.first_reported)).days
+        if soreness.historic_soreness_status is not None and soreness.first_reported_date is not None and not soreness.is_dormant_cleared():
+            days_sore = (event_date_time - soreness.first_reported_date).days
             if soreness.pain or days_sore > 30:
                 goal = AthleteGoal("Personalized Prepare for Training (Identified Dysfunction)", 1, AthleteGoalType.preempt_corrective)
                 goal.trigger = "Pers, Pers-2 Soreness > 30d"
@@ -911,8 +911,8 @@ class ActiveRecovery(Serialisable):
     def __init__(self):
         self.dynamic_integrate_exercises = {}
         self.dynamic_integrate_with_speed_exercises = {}
-        self.start_date = None
-        self.event_date = None
+        self.start_date_time = None
+        self.event_date_time = None
         self.completed = False
         self.active = True
 
@@ -920,8 +920,8 @@ class ActiveRecovery(Serialisable):
         ret = {
             'dynamic_integrate_exercises': [p.json_serialise() for p in self.dynamic_integrate_exercises.values()],
             'dynamic_integrate_with_speed_exercises': [p.json_serialise() for p in self.dynamic_integrate_with_speed_exercises.values()],
-            'start_date': format_datetime(self.start_date) if self.start_date is not None else None,
-            'event_date': format_datetime(self.event_date) if self.event_date is not None else None,
+            'start_date_time': format_datetime(self.start_date_time) if self.start_date_time is not None else None,
+            'event_date_time': format_datetime(self.event_date_time) if self.event_date_time is not None else None,
             'completed': self.completed,
             'active': self.active
         }
@@ -932,15 +932,15 @@ class ActiveRecovery(Serialisable):
         active_recovery = cls()
         active_recovery.dynamic_integrate_exercises = {s['library_id']: AssignedExercise.json_deserialise(s) for s in input_dict['dynamic_integrate_exercises']}
         active_recovery.dynamic_integrate_with_speed_exercises = {s['library_id']: AssignedExercise.json_deserialise(s) for s in input_dict['dynamic_integrate_with_speed_exercises']}
-        active_recovery.start_date = input_dict.get('start_date', None)
-        active_recovery.event_date = input_dict.get('event_date', None)
+        active_recovery.start_date_time = input_dict.get('start_date_time', None)
+        active_recovery.event_date_time = input_dict.get('event_date_time', None)
         active_recovery.completed = input_dict.get('completed', False)
         active_recovery.active = input_dict.get('active', True)
 
         return active_recovery
 
     def __setattr__(self, name, value):
-        if name in ['event_date', 'start_date']:
+        if name in ['event_date_time', 'start_date_time']:
             if value is not None and not isinstance(value, datetime.datetime):
                 value = parse_datetime(value)
         super().__setattr__(name, value)
@@ -948,8 +948,8 @@ class ActiveRecovery(Serialisable):
 
 class IceSession(Serialisable):
     def __init__(self):
-        self.start_date = None
-        self.event_date = None
+        self.start_date_time = None
+        self.event_date_time = None
         self.completed = False
         self.active = True
         self.body_parts = []
@@ -957,8 +957,8 @@ class IceSession(Serialisable):
     def json_serialise(self):
 
         ret = {
-            'start_date': format_datetime(self.start_date) if self.start_date is not None else None,
-            'event_date': format_datetime(self.event_date) if self.event_date is not None else None,
+            'start_date_time': format_datetime(self.start_date_time) if self.start_date_time is not None else None,
+            'event_date_time': format_datetime(self.event_date_time) if self.event_date_time is not None else None,
             'completed': self.completed,
             'active': self.active,
             'body_parts': [ice.json_serialise() for ice in self.body_parts]
@@ -969,15 +969,15 @@ class IceSession(Serialisable):
     @classmethod
     def json_deserialise(cls, input_dict):
         ice_session = cls()
-        ice_session.start_date = input_dict.get('start_date', None)
-        ice_session.event_date = input_dict.get('event_date', None)
+        ice_session.start_date_time = input_dict.get('start_date_time', None)
+        ice_session.event_date_time = input_dict.get('event_date_time', None)
         ice_session.completed = input_dict.get('completed', False)
         ice_session.active = input_dict.get('active', True)
 
         return ice_session
 
     def __setattr__(self, name, value):
-        if name in ['event_date', 'start_date']:
+        if name in ['event_date_time', 'start_date_time']:
             if value is not None and not isinstance(value, datetime.datetime):
                 value = parse_datetime(value)
         super().__setattr__(name, value)
@@ -1029,8 +1029,8 @@ class ColdWaterImmersion(Serialisable):
     def __init__(self, minutes=10):
         self.minutes = minutes
         self.after_training = True
-        self.start_date = None
-        self.event_date = None
+        self.start_date_time = None
+        self.event_date_time = None
         self.completed = False
         self.active = True
         self.goals = set()
@@ -1040,8 +1040,8 @@ class ColdWaterImmersion(Serialisable):
             'minutes': self.minutes,
             'after_training': self.after_training,
             'goals': [goal.json_serialise() for goal in self.goals],
-            'start_date': format_datetime(self.start_date) if self.start_date is not None else None,
-            'event_date': format_datetime(self.event_date) if self.event_date is not None else None,
+            'start_date_time': format_datetime(self.start_date_time) if self.start_date_time is not None else None,
+            'event_date_time': format_datetime(self.event_date_time) if self.event_date_time is not None else None,
             'completed': self.completed,
             'active': self.active
         }
@@ -1052,8 +1052,8 @@ class ColdWaterImmersion(Serialisable):
     def json_deserialise(cls, input_dict):
         cold_water_immersion = cls(minutes=input_dict['minutes'])
         cold_water_immersion.after_training = input_dict.get('after_training', True)
-        cold_water_immersion.start_date = input_dict.get('start_date', None)
-        cold_water_immersion.event_date = input_dict.get('event_date', None)
+        cold_water_immersion.start_date_time = input_dict.get('start_date_time', None)
+        cold_water_immersion.event_date_time = input_dict.get('event_date_time', None)
         cold_water_immersion.completed = input_dict.get('completed', False)
         cold_water_immersion.active = input_dict.get('active', True)
         cold_water_immersion.goals = set([AthleteGoal.json_deserialise(goal) for goal in input_dict.get('goals', [])])
@@ -1061,7 +1061,7 @@ class ColdWaterImmersion(Serialisable):
         return cold_water_immersion
 
     def __setattr__(self, name, value):
-        if name in ['event_date', 'start_date']:
+        if name in ['event_date_time', 'start_date_time']:
             if value is not None and not isinstance(value, datetime.datetime):
                 value = parse_datetime(value)
         super().__setattr__(name, value)

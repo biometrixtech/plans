@@ -29,31 +29,31 @@ def format_date(date_input):
         # raise ValueError('no valid date format found')
 
 
-def format_datetime(date_input):
+def format_datetime(datetime_input):
     """
     Formats a date in ISO8601 short format.
     Handles the case where the input is None
-    :param date_input:
+    :param datetime_input:
     :return:
     """
-    if date_input is None:
+    if datetime_input is None:
         return None
-    if not isinstance(date_input, datetime.datetime):
-        date_input = datetime.datetime.strptime(date_input, "%Y-%m-%dT%H:%M:%SZ")
-    return date_input.strftime("%Y-%m-%dT%H:%M:%SZ")
+    if not isinstance(datetime_input, datetime.datetime):
+        datetime_input = datetime.datetime.strptime(datetime_input, "%Y-%m-%dT%H:%M:%SZ")
+    return datetime_input.strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
-def parse_datetime(date_input):
+def parse_datetime(datetime_string):
     try:
-        return datetime.datetime.strptime(date_input, "%Y-%m-%dT%H:%M:%SZ")
+        return datetime.datetime.strptime(datetime_string, "%Y-%m-%dT%H:%M:%SZ")
     except ValueError:
         raise InvalidSchemaException('date_time must be in ISO8601 format')
 
 
-def parse_date(date_input):
+def parse_date(date_string):
     for format_string in ('%Y-%m-%d', '%m/%d/%y'):
         try:
-            return datetime.datetime.strptime(date_input, format_string)
+            return datetime.datetime.strptime(date_string, format_string)
         except ValueError:
             pass
     raise InvalidSchemaException('date_time must be in ISO8601 format')

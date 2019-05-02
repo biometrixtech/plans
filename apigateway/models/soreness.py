@@ -3,6 +3,7 @@ from enum import Enum, IntEnum
 from models.exercise import Exercise, UnitOfMeasure
 from serialisable import Serialisable
 from random import shuffle
+import datetime
 
 from utils import format_datetime, parse_datetime, format_date, parse_date
 
@@ -77,7 +78,7 @@ class Soreness(BaseSoreness, Serialisable):
         self.type = None  # soreness_type
         self.count = 1
         self.streak = 0
-        self.first_reported = None
+        self.first_reported_date = None
         self.daily = True
 
     @classmethod
@@ -88,9 +89,9 @@ class Soreness(BaseSoreness, Serialisable):
         soreness.severity = input_dict['severity']
         soreness.movement = input_dict.get('movement', None)
         soreness.side = input_dict.get('side', None)
-        soreness.first_reported = input_dict.get('first_reported', None)
-        # if input_dict.get('first_reported', None) is not None:
-        #     soreness.first_reported = parse_date(input_dict['first_reported'])
+        soreness.first_reported_date = input_dict.get('first_reported_date', None)
+        # if input_dict.get('first_reported_date', None) is not None:
+        #     soreness.first_reported_date = parse_date(input_dict['first_reported_date'])
         if input_dict.get('reported_date_time', None) is not None:
             soreness.reported_date_time = parse_datetime(input_dict['reported_date_time'])
         return soreness
@@ -101,6 +102,12 @@ class Soreness(BaseSoreness, Serialisable):
     def __eq__(self, other):
         return ((self.body_part.location == other.body_part.location,
                  self.side == other.side))
+
+    def __setattr__(self, name, value):
+        if name in ['first_reported_date']:
+            if value is not None and not isinstance(value, datetime.datetime):
+                value = parse_date(value)
+        super().__setattr__(name, value)
 
     '''deprecated
     def is_dormant_cleared(self):
@@ -141,7 +148,7 @@ class Soreness(BaseSoreness, Serialisable):
                    'severity': self.severity,
                    'movement': self.movement,
                    'side': self.side,
-                   'first_reported': self.first_reported,  # format_date(self.first_reported) if self.first_reported is not None else None,
+                   'first_reported_date': format_date(self.first_reported_date) if self.first_reported_date is not None else None,
                   }
 
         else:
@@ -297,10 +304,16 @@ class HistoricSoreness(BaseSoreness, Serialisable):
         self.streak = 0
         self.streak_start_date = None
         self.average_severity = 0.0
-        self.first_reported = None
+        self.first_reported_date = None
         self.last_reported = ""
         self.ask_acute_pain_question = False
         self.ask_persistent_2_question = False
+
+    def __setattr__(self, name, value):
+        if name in ['first_reported_date']:
+            if value is not None and not isinstance(value, datetime.datetime):
+                value = parse_date(value)
+        super().__setattr__(name, value)
 
     def json_serialise(self, api=False):
         if api:
@@ -317,7 +330,7 @@ class HistoricSoreness(BaseSoreness, Serialisable):
                    'streak': self.streak,
                    'streak_start_date': self.streak_start_date,
                    'average_severity': self.average_severity,
-                   'first_reported': self.first_reported,
+                   'first_reported_date': format_date(self.first_reported_date) if self.first_reported_date is not None else None,
                    'last_reported': self.last_reported,
                    'ask_acute_pain_question': self.ask_acute_pain_question,
                    'ask_persistent_2_question': self.ask_persistent_2_question
@@ -332,9 +345,7 @@ class HistoricSoreness(BaseSoreness, Serialisable):
         soreness.streak = input_dict.get('streak', 0)
         soreness.streak_start_date = input_dict.get("streak_start_date", None)
         soreness.average_severity = input_dict.get('average_severity', 0.0)
-        soreness.first_reported = input_dict.get("first_reported", None)
-        if soreness.first_reported == "":
-            soreness.first_reported = None
+        soreness.first_reported_date = input_dict.get("first_reported_date", None) if input_dict.get("first_reported_date", None) != "" else None
         soreness.last_reported = input_dict.get("last_reported", "")
         soreness.ask_acute_pain_question = input_dict.get("ask_acute_pain_question", False)
         soreness.ask_persistent_2_question = input_dict.get("ask_persistent_2_question", False)
