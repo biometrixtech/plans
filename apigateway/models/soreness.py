@@ -214,6 +214,7 @@ class BodyPart(object):
         self.isolated_activate_exercises = []
         self.static_integrate_exercises = []
         self.dynamic_integrate_exercises = []
+        self.dynamic_stretch_integrate_exercises = []
 
         self.agonists = []
         self.synergists = []
