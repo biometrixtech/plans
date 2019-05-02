@@ -195,6 +195,9 @@ class BodyPartLocation(Enum):
     elbow = 19
     wrist = 20
     lats = 21
+    upper_body = 22
+    lower_body = 23
+    full_body = 24
 
 
 class BodyPart(object):
@@ -215,6 +218,7 @@ class BodyPart(object):
         self.static_integrate_exercises = []
         self.dynamic_integrate_exercises = []
         self.dynamic_stretch_integrate_exercises = []
+        self.dynamic_integrate_with_speed_exercises = []
 
         self.agonists = []
         self.synergists = []
@@ -250,6 +254,12 @@ class BodyPart(object):
                                                      self.treatment_priority, randomize)
         self.activate_exercises = self.add_exercises(self.activate_exercises, activate,
                                                      self.treatment_priority, randomize)
+
+    def add_dynamic_exercise_phases(self, dynamic_stretch, dynamic_integrate, dynamic_integrate_with_speed):
+
+        self.dynamic_stretch_exercises = self.add_exercises(self.dynamic_stretch_exercises, dynamic_stretch, self.treatment_priority, False)
+        self.dynamic_integrate_exercises = self.add_exercises(self.dynamic_integrate_exercises, dynamic_integrate, self.treatment_priority, False)
+        self.dynamic_integrate_with_speed_exercises = self.add_exercises(self.dynamic_integrate_with_speed_exercises, dynamic_integrate_with_speed, self.treatment_priority, False)
 
     def add_extended_exercise_phases(self, inhibit, static_stretch, active_stretch, dynamic_stretch, isolated_activation, static_integrate, randomize=False):
 
