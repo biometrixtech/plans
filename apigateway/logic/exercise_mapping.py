@@ -897,7 +897,7 @@ class ExerciseAssignmentCalculator(object):
                 days_diff = (event_date_time - s.first_reported_date).days
                 if days_diff > 30 and s.severity >= 1.5:
                     goal = AthleteGoal("Preemptive, Prepare for Training", 1, AthleteGoalType.preempt_corrective)
-                    goal.trigger = "No Soreness Reported Today + Acute, Pers, Pers-2 Pain"
+                    goal.trigger = "No Soreness Reported Today + Historic Soreness"
                     ice = Ice(body_part_location=s.body_part.location, side=s.side)
                     ice.repeat_every_3hrs_for_24hrs = False
                     if s.body_part.location in low_parts:
