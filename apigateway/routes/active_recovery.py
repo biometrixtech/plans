@@ -6,7 +6,6 @@ from fathomapi.utils.exceptions import NoSuchEntityException
 from fathomapi.utils.xray import xray_recorder
 from datastores.datastore_collection import DatastoreCollection
 from models.soreness import CompletedExercise
-from logic.survey_processing import create_plan
 from utils import format_date, parse_datetime, format_datetime
 from config import get_mongo_collection
 
@@ -195,6 +194,7 @@ def handle_body_part_modalities_start(principal_id=None):
 
     return {'message': 'success'}, 200
 
+
 '''deprecated
 @app.route('/active_time', methods=['PATCH'])
 @require.authenticated.any
@@ -213,6 +213,7 @@ def handle_workout_active_time(principal_id=None):
 
     return {'daily_plans': [plan]}, 200
 '''
+
 
 def save_completed_exercises(exercise_list, user_id, event_date):
     for exercise in exercise_list:

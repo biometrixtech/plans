@@ -2,8 +2,8 @@ import datetime
 
 from datastores.datastore_collection import DatastoreCollection
 from logic.soreness_processing import SorenessCalculator
-from models.post_session_survey import PostSessionSurvey
-from utils import parse_datetime, format_datetime, parse_date, format_date
+# from models.post_session_survey import PostSessionSurvey
+from utils import format_datetime, parse_date, format_date
 
 
 class AthleteStatusProcessing(object):
@@ -24,8 +24,8 @@ class AthleteStatusProcessing(object):
         self.dormant_tipping_candidates = []
         self.current_sport_name = None
         self.current_position = None
-        #self.functional_strength_eligible = False
-        #self.completed_functional_strength_sessions = 0
+        # self.functional_strength_eligible = False
+        # self.completed_functional_strength_sessions = 0
 
     def get_previous_soreness(self):
         # read plans from yesterday and today
@@ -37,13 +37,15 @@ class AthleteStatusProcessing(object):
         # get soreness from post session survey
         post_session_surveys = []
         for plan in daily_plans:
-            post_surveys = \
-                [PostSessionSurvey.post_session_survey_from_training_session(ts.post_session_survey, self.user_id, ts.id, ts.session_type().value, plan.event_date)
-                 for ts in plan.training_sessions if ts is not None]
-            post_session_surveys.extend([s for s in post_surveys if s is not None])
-        post_session_surveys = [s for s in post_session_surveys if s is not None and self.soreness_start_time <= s.event_date_time < self.current_time]
+            post_session_surveys.extend([ts.post_session_survey for ts in plan.training_sessions if ts is not None and
+                                         ts.post_session_survey is not None])
+            #     [PostSessionSurvey.post_session_survey_from_training_session(ts.post_session_survey, self.user_id, ts.id, ts.session_type().value, plan.event_date)
+            #      for ts in plan.training_sessions if ts is not None]
+            # post_session_surveys.extend([s for s in post_surveys if s is not None])
+        post_session_surveys = [s for s in post_session_surveys if s is not None and
+                                self.soreness_start_time <= s.event_date < self.current_time]
         for ps_survey in post_session_surveys:
-            self.sore_body_parts.extend([s for s in ps_survey.survey.soreness if SorenessCalculator.get_severity(s.severity, s.movement) > 1])
+            self.sore_body_parts.extend([s for s in ps_survey.soreness if SorenessCalculator.get_severity(s.severity, s.movement) > 1])
 
         # check for severe pain yesterday or today
         severe_pain_dates = [s.reported_date_time for s in self.sore_body_parts if s.pain and
@@ -60,11 +62,11 @@ class AthleteStatusProcessing(object):
             # get fs eligibility and sports
             self.current_sport_name = athlete_stats.current_sport_name.value if athlete_stats.current_sport_name is not None else None
             self.current_position = athlete_stats.current_position.value if athlete_stats.current_position is not None else None
-            #if (athlete_stats.functional_strength_eligible and (athlete_stats.next_functional_strength_eligible_date is None
+            # if (athlete_stats.functional_strength_eligible and (athlete_stats.next_functional_strength_eligible_date is None
             #                                                    or parse_datetime(athlete_stats.next_functional_strength_eligible_date) < self.current_time) and
             #        not self.severe_pain_today_yesterday):
             #    self.functional_strength_eligible = True
-            #self.completed_functional_strength_sessions = athlete_stats.completed_functional_strength_sessions
+            # self.completed_functional_strength_sessions = athlete_stats.completed_functional_strength_sessions
             self.remove_duplicates_sore_body_parts_historic_soreness()
         return (self.cleaned_sore_body_parts,
                 self.hist_sore_status,
@@ -72,8 +74,8 @@ class AthleteStatusProcessing(object):
                 self.dormant_tipping_candidates,
                 self.current_sport_name,
                 self.current_position,
-                #self.functional_strength_eligible,
-                #self.completed_functional_strength_sessions
+                # self.functional_strength_eligible,
+                # self.completed_functional_strength_sessions
                 )
 
     def remove_duplicates_sore_body_parts_historic_soreness(self):

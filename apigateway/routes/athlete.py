@@ -9,14 +9,12 @@ from logic.stats_processing import StatsProcessing
 from logic.metrics_processing import MetricsProcessing
 from models.stats import AthleteStats
 from utils import parse_datetime, format_date
-import boto3
 import datetime
 import random
 import os
 
 
 app = Blueprint('athlete', __name__)
-iotd_client = boto3.client('iot-data')
 USERS_API_VERSION = os.environ['USERS_API_VERSION']
 
 

@@ -34,9 +34,9 @@ def handle_session_create(principal_id=None):
     event_date = parse_datetime(request.json['event_date'])
     training_volume_processing = TrainingVolumeProcessing(event_date, event_date)
     plan_update_required = False
-    train_later = True
-    if 'sessions_planned' in request.json and not request.json['sessions_planned']:
-        train_later = False
+    train_later = False
+    if 'sessions_planned' in request.json and request.json['sessions_planned']:
+        train_later = True
     athlete_stats = athlete_stats_datastore.get(athlete_id=user_id)
     plan_event_date = format_date(event_date)
     survey_processor = SurveyProcessing(user_id, event_date,
@@ -57,7 +57,7 @@ def handle_session_create(principal_id=None):
             if training_volume_processing.is_last_session_high_relative_load(event_date, session, athlete_stats.high_relative_load_benchmarks):
                 athlete_stats.high_relative_load_session = True
                 athlete_stats_datastore.put(athlete_stats)
-            #break (need to check if any of the sessions are high load)
+            # break (need to check if any of the sessions are high load)
 
     # check if plan exists, if not create a new one and save it to database, also check if existing one needs updating flags
 
