@@ -13,7 +13,6 @@ from utils import parse_datetime, format_date, format_datetime
 from config import get_mongo_collection
 from logic.survey_processing import SurveyProcessing, create_session, update_session, create_plan, cleanup_plan
 from logic.athlete_status_processing import AthleteStatusProcessing
-from logic.training_volume_processing import TrainingVolumeProcessing
 
 datastore_collection = DatastoreCollection()
 athlete_stats_datastore = datastore_collection.athlete_stats_datastore
@@ -32,7 +31,6 @@ def handle_session_create(principal_id=None):
 
     user_id = principal_id
     event_date = parse_datetime(request.json['event_date'])
-    training_volume_processing = TrainingVolumeProcessing(event_date, event_date)
     plan_update_required = False
     train_later = False
     if 'sessions_planned' in request.json and request.json['sessions_planned']:
@@ -51,16 +49,11 @@ def handle_session_create(principal_id=None):
     survey_processor.patch_daily_and_historic_soreness(survey='post_session')
 
     # check if any of the non-ignored and non-deleted sessions are high load
-    high_relative_load_session_present = False
-    sport_name = None
     for session in survey_processor.sessions:
         if not session.deleted and not session.ignored:
             plan_update_required = True
-            if training_volume_processing.is_last_session_high_relative_load(event_date, session, athlete_stats.high_relative_load_benchmarks):
-                high_relative_load_session_present = True
-                sport_name = session.sport_name
-    survey_processor.athlete_stats.high_relative_load_session = high_relative_load_session_present
-    survey_processor.athlete_stats.high_relative_load_session_sport_name = sport_name
+            break
+    survey_processor.check_high_relative_load_sessions(survey_processor.sessions)
 
     # check if plan exists, if not create a new one and save it to database, also check if existing one needs updating flags
 
@@ -70,12 +63,13 @@ def handle_session_create(principal_id=None):
         plan.last_sensor_sync = daily_plan_datastore.get_last_sensor_sync(user_id, plan_event_date)
     else:
         plan = daily_plan_datastore.get(user_id, plan_event_date, plan_event_date)[0]
-        plan.train_later = train_later
-        if plan_update_required and (not plan.sessions_planned or plan.session_from_readiness):
+        if plan_update_required and not plan.sessions_planned:
             plan.sessions_planned = True
-            # plan.session_from_readiness = False
+        if not survey_processor.athlete_stats.high_relative_load_session and len(plan.training_sessions) > 0:
+            survey_processor.check_high_relative_load_sessions(plan.training_sessions)
 
     # add sessions to plan and write to mongo
+    plan.train_later = train_later
     plan.training_sessions.extend(survey_processor.sessions)
     daily_plan_datastore.put(plan)
 

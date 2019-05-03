@@ -67,7 +67,7 @@ class Persona(object):
         self.daily_plan = DailyPlan(format_date(event_date))
         self.daily_plan.user_id = self.user_id
         self.daily_plan.daily_readiness_survey = self.daily_readiness
-        self.daily_plan.session_from_readiness = True
+        # self.daily_plan.session_from_readiness = True
         self.add_session(event_date)
         store = DailyPlanDatastore()
         store.put(self.daily_plan)

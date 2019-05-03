@@ -3,9 +3,6 @@ import datetime
 from fathomapi.utils.xray import xray_recorder
 import logic.exercise_mapping as exercise_mapping
 from logic.soreness_processing import SorenessCalculator
-# from logic.functional_strength_mapping import FSProgramGenerator
-# import models.session as session
-from models.post_session_survey import PostSessionSurvey
 from models.daily_plan import DailyPlan
 from utils import format_date, parse_datetime, parse_date
 
@@ -91,6 +88,7 @@ class TrainingPlanManager(object):
         # soreness_values = [s.severity for s in soreness_list if s.severity is not None and s.daily]
 
         # new modalities
+        self.daily_plan.train_later = False
         if not self.daily_plan.train_later:
             # if any completed post-training modalities exist, preserve them
             if self.daily_plan.cool_down is not None and self.daily_plan.cool_down.completed:

@@ -25,8 +25,8 @@ class DailyPlan(Serialisable):
         self.completed_warm_up = []
         self.cool_down = None
         self.completed_cool_down = []
-        self.active_recovery = None
-        self.completed_active_recovery = []
+        # self.active_recovery = None
+        # self.completed_active_recovery = []
         self.post_active_rest = None
         self.completed_post_active_rest = []
         self.ice = None
@@ -35,21 +35,14 @@ class DailyPlan(Serialisable):
         self.completed_cold_water_immersion = []
         self.pre_active_rest_completed = False
         self.post_active_rest_completed = False
-        #self.functional_strength_completed = False
-        #self.pre_recovery = session.RecoverySession()
-        #self.post_recovery = session.RecoverySession()
-        # self.completed_post_recovery_sessions = []
-        #self.corrective_sessions = []
-        #self.bump_up_sessions = []
         self.daily_readiness_survey = None
         # self.updated = False
         self.last_updated = None
         self.last_sensor_sync = None
         self.sessions_planned = True
-        #self.functional_strength_eligible = False
-        #self.completed_functional_strength_sessions = 0
-        #self.functional_strength_session = None
-        self.session_from_readiness = False
+        # self.functional_strength_eligible = False
+        # self.completed_functional_strength_sessions = 0
+        # self.functional_strength_session = None
         self.train_later = True
 
     def get_id(self):
@@ -83,8 +76,8 @@ class DailyPlan(Serialisable):
                'completed_warm_up': [warm_up.json_serialise() for warm_up in self.completed_warm_up],
                'cool_down': self.cool_down.json_serialise() if self.cool_down is not None else None,
                'completed_cool_down': [cool_down.json_serialise() for cool_down in self.completed_cool_down],
-               'active_recovery': self.active_recovery.json_serialise() if self.active_recovery is not None else None,
-               'completed_active_recovery': [active_recovery.json_serialise() for active_recovery in self.completed_active_recovery],
+               # 'active_recovery': self.active_recovery.json_serialise() if self.active_recovery is not None else None,
+               # 'completed_active_recovery': [active_recovery.json_serialise() for active_recovery in self.completed_active_recovery],
                'post_active_rest': self.post_active_rest.json_serialise() if self.post_active_rest is not None else None,
                'completed_post_active_rest': [c.json_serialise() for c in self.completed_post_active_rest],
                # 'ice': [ice.json_serialise() for ice in self.ice],
@@ -100,7 +93,6 @@ class DailyPlan(Serialisable):
                # 'functional_strength_completed': self.functional_strength_completed,
                # 'functional_strength_eligible': self.functional_strength_eligible,
                # 'completed_functional_strength_sessions': self.completed_functional_strength_sessions,
-               # 'session_from_readiness': self.session_from_readiness,
                'train_later': self.train_later
                }
         return ret

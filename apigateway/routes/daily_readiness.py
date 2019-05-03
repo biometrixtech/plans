@@ -14,7 +14,6 @@ from models.daily_plan import DailyPlan
 from models.sleep_data import DailySleepData, SleepEvent
 from logic.survey_processing import SurveyProcessing, cleanup_sleep_data_from_api, create_plan
 from logic.athlete_status_processing import AthleteStatusProcessing
-from logic.training_volume_processing import TrainingVolumeProcessing
 from config import get_mongo_collection
 from utils import parse_datetime, format_date, format_datetime, fix_early_survey_event_date
 
@@ -50,35 +49,25 @@ def handle_daily_readiness_create(principal_id=None):
 
     sessions_planned = True
     train_later = True
-    session_from_readiness = False
     plan_event_date = format_date(event_date)
     athlete_stats = athlete_stats_datastore.get(athlete_id=user_id)
     if athlete_stats is None:
         athlete_stats = AthleteStats(user_id)
         athlete_stats.event_date = plan_event_date
     survey_processor = SurveyProcessing(user_id, event_date, athlete_stats, datastore_collection)
-    training_volume_processing = TrainingVolumeProcessing(event_date, event_date)
 
     if 'sessions_planned' in request.json and not request.json['sessions_planned']:
         sessions_planned = False
         train_later = False
     if 'sessions' in request.json and len(request.json['sessions']) > 0:
         sessions_planned = True
-        session_from_readiness = True
         for session in request.json['sessions']:
             if session is None:
                 continue
             survey_processor.create_session_from_survey(session)
 
         # check if any of the non-ignored and non-deleted sessions are high load
-        high_relative_load_session_present = False
-        sport_name = None
-        for session in survey_processor.sessions:
-            if training_volume_processing.is_last_session_high_relative_load(event_date, session, athlete_stats.high_relative_load_benchmarks):
-                high_relative_load_session_present = True
-                sport_name = session.sport_name
-        survey_processor.athlete_stats.high_relative_load_session = high_relative_load_session_present
-        survey_processor.athlete_stats.high_relative_load_session_sport_name = sport_name
+        survey_processor.check_high_relative_load_sessions(survey_processor.sessions)
 
     if "sleep_data" in request.json and len(request.json['sleep_data']) > 0:
         daily_sleep_data = DailySleepData(user_id=user_id,
@@ -97,7 +86,6 @@ def handle_daily_readiness_create(principal_id=None):
         plan.user_id = user_id
         plan.training_sessions = survey_processor.sessions
     plan.sessions_planned = sessions_planned
-    plan.session_from_readiness = session_from_readiness
     plan.train_later = train_later
     if len(survey_processor.heart_rate_data) > 0:
         heart_rate_datastore.put(survey_processor.heart_rate_data)

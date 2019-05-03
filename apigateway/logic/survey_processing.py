@@ -9,6 +9,7 @@ from models.sleep_data import DailySleepData, SleepEvent
 from logic.stats_processing import StatsProcessing
 from logic.soreness_processing import SorenessCalculator
 from logic.training_plan_management import TrainingPlanManager
+from logic.training_volume_processing import TrainingVolumeProcessing
 from logic.metrics_processing import MetricsProcessing
 from datastores.datastore_collection import DatastoreCollection
 from utils import parse_datetime, format_datetime, fix_early_survey_event_date, format_date
@@ -18,6 +19,7 @@ class SurveyProcessing(object):
     def __init__(self, user_id, event_date, athlete_stats=None, datastore_collection=DatastoreCollection()):
         self.user_id = user_id
         self.event_date = format_date(event_date)
+        self.event_date_time = event_date
         self.athlete_stats = athlete_stats
         self.sessions = []
         self.sleep_history = []
@@ -205,6 +207,21 @@ class SurveyProcessing(object):
                                               event_date=session.event_date)
         session_heart_rate.hr_workout = [HeartRateData(cleanup_hr_data_from_api(hr)) for hr in hr_data]
         self.heart_rate_data.append(session_heart_rate)
+
+    def check_high_relative_load_sessions(self, sessions):
+        training_volume_processing = TrainingVolumeProcessing(self.event_date_time, self.event_date_time)
+        high_relative_load_session_present = False
+        sport_name = None
+        load = 0
+        for session in sessions:
+            if not session.deleted and not session.ignored:
+                if training_volume_processing.is_last_session_high_relative_load(self.event_date_time, session, self.athlete_stats.high_relative_load_benchmarks):
+                    high_relative_load_session_present = True
+                    session_load = session.duration_minutes * session.session_RPE
+                    if session_load > load:
+                        sport_name = session.sport_name
+        self.athlete_stats.high_relative_load_session = high_relative_load_session_present
+        self.athlete_stats.high_relative_load_session_sport_name = sport_name
 
 
 def create_session(session_type, data):
