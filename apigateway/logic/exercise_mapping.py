@@ -757,7 +757,7 @@ class ExerciseAssignmentCalculator(object):
     def get_pre_active_rest(self, athlete_stats, soreness_list, event_date_time):
 
         if (len(soreness_list) > 0 or athlete_stats.muscular_strain_increasing
-                or athlete_stats.high_relative_load_session):
+                or athlete_stats.high_relative_load_session or athlete_stats.high_relative_intensity_session):
             active_rest = ActiveRestBeforeTraining(athlete_stats.high_relative_load_session,
                                                    athlete_stats.high_relative_intensity_session,
                                                    athlete_stats.muscular_strain_increasing, event_date_time)
@@ -771,7 +771,7 @@ class ExerciseAssignmentCalculator(object):
     def get_post_active_rest(self, athlete_stats, soreness_list, event_date_time):
 
         if (len(soreness_list) > 0 or athlete_stats.muscular_strain_increasing
-                or athlete_stats.high_relative_load_session):
+                or athlete_stats.high_relative_load_session or athlete_stats.high_relative_intensity_session):
             active_rest = ActiveRestAfterTraining(athlete_stats.high_relative_load_session,
                                                   athlete_stats.high_relative_intensity_session,
                                                   athlete_stats.muscular_strain_increasing, event_date_time)
@@ -798,18 +798,18 @@ class ExerciseAssignmentCalculator(object):
 
         cool_down = None
 
-        if athlete_stats.muscular_strain_increasing or athlete_stats.high_relative_load_session:
-            for s in soreness_list:
-                if s.first_reported_date is not None and not s.is_dormant_cleared():
-                    days_diff = (event_date_time - s.first_reported_date).days
-                    if (not s.pain and days_diff > 30) or s.pain:
-                        cool_down = CoolDown(sport_name, athlete_stats.high_relative_load_session,
-                                             athlete_stats.high_relative_intensity_session,
-                                             athlete_stats.muscular_strain_increasing, event_date_time)
-                        cool_down.fill_exercises(soreness_list, self.exercise_library)
-                        cool_down.set_plan_dosage(soreness_list)
-                        cool_down.set_exercise_dosage_ranking()
-                        break
+        if athlete_stats.muscular_strain_increasing or athlete_stats.high_relative_load_session or athlete_stats.high_relative_intensity_session:
+            #for s in soreness_list:
+            #    if s.first_reported_date is not None and not s.is_dormant_cleared():
+            #        days_diff = (event_date_time - s.first_reported_date).days
+            #        if (not s.pain and days_diff > 30) or s.pain:
+            cool_down = CoolDown(sport_name, athlete_stats.high_relative_load_session,
+                                 athlete_stats.high_relative_intensity_session,
+                                 athlete_stats.muscular_strain_increasing, event_date_time)
+            cool_down.fill_exercises(soreness_list, self.exercise_library)
+            cool_down.set_plan_dosage(soreness_list)
+            cool_down.set_exercise_dosage_ranking()
+            #    break
 
         return cool_down
 
