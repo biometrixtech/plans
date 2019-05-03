@@ -27,14 +27,16 @@ def handle_exercise_modalities_complete(principal_id=None):
     recovery_type = request.json['recovery_type']
     completed_exercises = request.json.get('completed_exercises', [])
 
-    plan_event_date = format_date(event_date)
+    plan_event_day = format_date(event_date)
     recovery_event_date = format_datetime(event_date)
 
-    if not _check_plan_exists(user_id, plan_event_date):
+    if not _check_plan_exists(user_id, plan_event_day):
         raise NoSuchEntityException('Plan not found for the user')
 
     save_exercises = True
-    plan = daily_plan_datastore.get(user_id=user_id, start_date=plan_event_date, end_date=plan_event_date)[0]
+    plan = daily_plan_datastore.get(user_id=user_id,
+                                    start_date=plan_event_day,
+                                    end_date=plan_event_day)[0]
     if recovery_type == 'pre_active_rest':
         if plan.pre_active_rest.completed:
             save_exercises = False
@@ -86,14 +88,14 @@ def handle_exercise_modalities_start(principal_id=None):
     event_date = parse_datetime(request.json['event_date'])
     recovery_type = request.json['recovery_type']
 
-    plan_event_date = format_date(event_date)
+    plan_event_day = format_date(event_date)
     recovery_start_date = format_datetime(event_date)
-    if not _check_plan_exists(user_id, plan_event_date):
+    if not _check_plan_exists(user_id, plan_event_day):
         raise NoSuchEntityException('Plan not found for the user')
 
     plan = daily_plan_datastore.get(user_id=user_id,
-                                    start_date=plan_event_date,
-                                    end_date=plan_event_date)[0]
+                                    start_date=plan_event_day,
+                                    end_date=plan_event_day)[0]
     plans_service = Service('plans', Config.get('API_VERSION'))
     body = {"event_date": recovery_start_date}
     if recovery_type == 'pre_active_rest':
@@ -129,16 +131,15 @@ def handle_body_part_modalities_complete(principal_id=None):
     recovery_type = request.json['recovery_type']
     completed_body_parts = request.json.get('completed_body_parts', [])
 
-    plan_event_date = format_date(event_date)
-    recovery_event_date = format_datetime(event_date)
+    plan_event_day = format_date(event_date)
 
-    if not _check_plan_exists(user_id, plan_event_date):
+    if not _check_plan_exists(user_id, plan_event_day):
         raise NoSuchEntityException('Plan not found for the user')
 
-    plan = daily_plan_datastore.get(user_id=user_id, start_date=plan_event_date, end_date=plan_event_date)[0]
+    plan = daily_plan_datastore.get(user_id=user_id, start_date=plan_event_day, end_date=plan_event_day)[0]
 
     if recovery_type == 'heat':
-        plan.heat.event_date_time = recovery_event_date
+        plan.heat.event_date_time = event_date
         plan.heat.completed = True
         for completed_body_part in completed_body_parts:
             assigned_body_part = [body_part for body_part in plan.heat.body_parts if
@@ -147,7 +148,7 @@ def handle_body_part_modalities_complete(principal_id=None):
             assigned_body_part.completed = True
 
     elif recovery_type == 'ice':
-        plan.ice.event_date_time = recovery_event_date
+        plan.ice.event_date_time = event_date
         plan.ice.completed = True
         for completed_body_part in completed_body_parts:
             assigned_body_part = [body_part for body_part in plan.ice.body_parts if
@@ -174,28 +175,27 @@ def handle_body_part_modalities_complete(principal_id=None):
 @xray_recorder.capture('routes.active_recovery.body_part_modalities.start')
 def handle_body_part_modalities_start(principal_id=None):
     user_id = principal_id
-    event_date = parse_datetime(request.json['event_date'])
+    event_date_time = parse_datetime(request.json['event_date'])
     recovery_type = request.json['recovery_type']
 
-    plan_event_date = format_date(event_date)
-    recovery_start_date = format_datetime(event_date)
-    if not _check_plan_exists(user_id, plan_event_date):
+    plan_event_day = format_date(event_date_time)
+    if not _check_plan_exists(user_id, plan_event_day):
         raise NoSuchEntityException('Plan not found for the user')
 
     plan = daily_plan_datastore.get(user_id=user_id,
-                                    start_date=plan_event_date,
-                                    end_date=plan_event_date)[0]
+                                    start_date=plan_event_day,
+                                    end_date=plan_event_day)[0]
     if recovery_type == 'heat':
-        plan.heat.start_date_time = recovery_start_date
+        plan.heat.start_date_time = event_date_time
 
     elif recovery_type == 'ice':
-        plan.ice.start_date_time = recovery_start_date
+        plan.ice.start_date_time = event_date_time
 
     daily_plan_datastore.put(plan)
 
     return {'message': 'success'}, 200
 
-
+'''deprecated
 @app.route('/active_time', methods=['PATCH'])
 @require.authenticated.any
 @require.body({'event_date': str, 'active_time': int})
@@ -205,14 +205,14 @@ def handle_workout_active_time(principal_id=None):
     event_date = parse_datetime(request.json['event_date'])
     target_minutes = request.json['active_time']
 
-    plan_event_date = format_date(event_date)
-    if not _check_plan_exists(user_id, plan_event_date):
+    plan_event_day = format_date(event_date)
+    if not _check_plan_exists(user_id, plan_event_day):
         raise NoSuchEntityException('Plan not found for the user')
 
     plan = create_plan(user_id, event_date, target_minutes=target_minutes, update_stats=False, datastore_collection=datastore_collection)
 
     return {'daily_plans': [plan]}, 200
-
+'''
 
 def save_completed_exercises(exercise_list, user_id, event_date):
     for exercise in exercise_list:

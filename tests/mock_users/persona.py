@@ -22,10 +22,12 @@ class Persona(object):
         self.session_history = None
         self.daily_plan = None
         self.daily_readiness = None
+        self.athlete_stats = None
 
     def create_history(self, days):
         self.clear_user()
         event_date = datetime.datetime.now() - datetime.timedelta(days=days)
+        self.update_stats(format_date(event_date))
         for i in range(days):
             date_time = format_datetime(event_date)
             today_date = format_date(event_date)
@@ -70,11 +72,11 @@ class Persona(object):
         store = DailyPlanDatastore()
         store.put(self.daily_plan)
         plan_manager = TrainingPlanManager(self.user_id, DatastoreCollection(), )
-        self.daily_plan = plan_manager.create_daily_plan(event_date=format_date(event_date), last_updated=format_datetime(event_date))
+        self.daily_plan = plan_manager.create_daily_plan(event_date=format_date(event_date), last_updated=format_datetime(event_date), athlete_stats=self.athlete_stats)
 
     def update_stats(self, event_date):
-        athlete_stats = StatsProcessing(self.user_id, event_date=event_date, datastore_collection=DatastoreCollection()).process_athlete_stats()
-        DatastoreCollection().athlete_stats_datastore.put(athlete_stats)
+        self.athlete_stats = StatsProcessing(self.user_id, event_date=event_date, datastore_collection=DatastoreCollection()).process_athlete_stats()
+        DatastoreCollection().athlete_stats_datastore.put(self.athlete_stats)
 
     def create_readiness(self, data):
         self.daily_readiness = DailyReadiness(
