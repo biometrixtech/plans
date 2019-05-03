@@ -155,6 +155,10 @@ def handle_body_part_modalities_complete(principal_id=None):
                                   body_part.side == completed_body_part['side']][0]
             assigned_body_part.completed = True
 
+    elif recovery_type == 'cold_water_immersion':
+        plan.cold_water_immersion.completed_date_time = event_date
+        plan.cold_water_immersion.completed = True
+
     daily_plan_datastore.put(plan)
 
     survey_complete = plan.daily_readiness_survey_completed()
@@ -189,6 +193,9 @@ def handle_body_part_modalities_start(principal_id=None):
 
     elif recovery_type == 'ice':
         plan.ice.start_date_time = start_date_time
+
+    elif recovery_type == 'cold_water_immersion':
+        plan.cold_water_immersion.start_date_time = event_date
 
     daily_plan_datastore.put(plan)
 
