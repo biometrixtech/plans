@@ -82,11 +82,12 @@ class Heat(Serialisable):
 
 
 class ModalityBase(object):
-    def __init__(self):
+    def __init__(self, event_date_time):
         self.start_date_time = None
-        self.event_date_time = None
+        self.event_date_time = event_date_time
         self.completed = False
         self.active = True
+        self.default_plan = "Complete"
 
     def __setattr__(self, name, value):
         if name in ['event_date_time', 'start_date_time']:
@@ -94,6 +95,38 @@ class ModalityBase(object):
                 value = parse_datetime(value)
         super().__setattr__(name, value)
 
+    @abc.abstractmethod
+    def conditions_for_increased_sensitivity_met(self, soreness_list):
+        return False
+
+    def set_plan_dosage(self, soreness_list):
+
+        care_for_pain_present = False
+        historic_status_present = False
+        severity_greater_than_2 = False
+
+        for s in soreness_list:
+            if s.pain:
+                care_for_pain_present = True
+            if s.historic_soreness_status is not None and not s.is_dormant_cleared():
+                historic_status_present = True
+            if s.severity >= 2:
+                severity_greater_than_2 = True
+
+        increased_sensitivity = self.conditions_for_increased_sensitivity_met(soreness_list)
+
+        if care_for_pain_present and not historic_status_present:
+            self.default_plan = "Comprehensive"
+        elif not severity_greater_than_2 and not care_for_pain_present and not historic_status_present:
+            if not increased_sensitivity:
+                self.default_plan = "Efficient"
+            else:
+                self.default_plan = "Complete"
+        else:
+            if not increased_sensitivity:
+                self.default_plan = "Complete"
+            else:
+                self.default_plan = "Comprehensive"
 
     def copy_exercises(self, source_collection, target_collection, goal, priority, soreness, exercise_library):
 
@@ -112,7 +145,7 @@ class ModalityBase(object):
             target_collection[s.exercise.id].dosages.append(dosage)
 
     @abc.abstractmethod
-    def fill_exercises(self, soreness_list, event_date_time, exercise_library):
+    def fill_exercises(self, soreness_list, exercise_library):
         pass
 
     @staticmethod
@@ -283,12 +316,15 @@ class ModalityBase(object):
 
 
 class ActiveRest(ModalityBase):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, high_relative_load_session, high_relative_intensity_logged, muscular_strain_increasing, event_date_time):
+        super().__init__(event_date_time)
+        self.high_relative_load_session = high_relative_load_session
+        self.high_relative_intensity_logged = high_relative_intensity_logged
+        self.muscular_strain_increasing = muscular_strain_increasing
+        self.event_date_time = event_date_time
         self.inhibit_exercises = {}
         self.static_integrate_exercises = {}
         self.static_stretch_exercises = {}
-        self.default_plan = "Complete"
 
     @abc.abstractmethod
     def check_reactive_care_soreness(self, soreness, exercise_library):
@@ -312,34 +348,25 @@ class ActiveRest(ModalityBase):
         pass
     '''
 
-    def set_plan_dosage(self, soreness_list):
+    def conditions_for_increased_sensitivity_met(self, soreness_list):
 
-        care_for_pain_present = False
-        historic_status_present = False
-        severity_greater_than_2 = False
-
-        for s in soreness_list:
-            if s.pain:
-                care_for_pain_present = True
-            if s.historic_soreness_status is not None and not s.is_dormant_cleared():
-                historic_status_present = True
-            if s.severity >= 2:
-                severity_greater_than_2 = True
-
-        if care_for_pain_present and not historic_status_present:
-            self.default_plan = "Comprehensive"
-        elif not severity_greater_than_2 and not care_for_pain_present and not historic_status_present:
-            self.default_plan = "Efficient"
+        if self.muscular_strain_increasing:
+            return True
         else:
-            self.default_plan = "Complete"
+            for s in soreness_list:
+                if s.first_reported_date is not None and not s.is_dormant_cleared():
+                    days_sore = (self.event_date_time - s.first_reported_date).days
+                    if not s.pain and days_sore < 30:
+                        return True
+        return False
 
-    def fill_exercises(self, soreness_list, event_date_time, exercise_library):
+    def fill_exercises(self, soreness_list, exercise_library):
 
         for s in soreness_list:
             self.check_reactive_care_soreness(s, exercise_library)
             self.check_reactive_care_pain(s, exercise_library)
-            self.check_prevention_soreness(s, event_date_time, exercise_library)
-            self.check_prevention_pain(s, event_date_time, exercise_library)
+            self.check_prevention_soreness(s, self.event_date_time, exercise_library)
+            self.check_prevention_pain(s, self.event_date_time, exercise_library)
 
 
 
@@ -356,8 +383,8 @@ class ActiveRest(ModalityBase):
 
 
 class ActiveRestBeforeTraining(ActiveRest, Serialisable):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, high_relative_load_session, high_relative_intensity_logged, muscular_strain_increasing, event_date_time):
+        super().__init__(high_relative_load_session, high_relative_intensity_logged, muscular_strain_increasing, event_date_time)
         self.active_stretch_exercises = {}
         self.isolated_activate_exercises = {}
 
@@ -572,8 +599,8 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
 
 
 class ActiveRestAfterTraining(ActiveRest, Serialisable):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, high_relative_load_session, high_relative_intensity_logged, muscular_strain_increasing, event_date_time):
+        super().__init__(high_relative_load_session, high_relative_intensity_logged, muscular_strain_increasing, event_date_time)
         self.isolated_activate_exercises = {}
 
     def json_serialise(self):
@@ -776,8 +803,8 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
 
 
 class WarmUp(ModalityBase, Serialisable):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, event_date_time):
+        super().__init__(event_date_time)
         self.inhibit_exercises = {}
         self.static_stretch_exercises = {}
         self.active_or_dynamic_stretch_exercises = {}
@@ -816,10 +843,10 @@ class WarmUp(ModalityBase, Serialisable):
 
         return warmup
 
-    def fill_exercises(self, soreness_list, event_date_time, exercise_library):
+    def fill_exercises(self, soreness_list, exercise_library):
         for s in soreness_list:
-            self.check_corrective_soreness(s, event_date_time, exercise_library)
-            self.check_preempt_soreness(s, event_date_time, exercise_library)
+            self.check_corrective_soreness(s, self.event_date_time, exercise_library)
+            self.check_preempt_soreness(s, self.event_date_time, exercise_library)
 
     def check_preempt_soreness(self, soreness, event_date_time, exercise_library):
 
@@ -884,11 +911,12 @@ class WarmUp(ModalityBase, Serialisable):
 
 
 class CoolDown(ModalityBase, Serialisable):
-    def __init__(self, sport_name, high_relative_volume_logged, high_relative_intensity_logged):
-        super().__init__()
+    def __init__(self, sport_name, high_relative_load_session, high_relative_intensity_logged, muscular_strain_increasing, event_date_time):
+        super().__init__(event_date_time)
         self.sport_name = sport_name
-        self.high_relative_volume_logged = high_relative_volume_logged
+        self.high_relative_volume_logged = high_relative_load_session
         self.high_relative_intensity_logged = high_relative_intensity_logged
+        self.muscular_strain_increasing = muscular_strain_increasing
         self.dynamic_stretch_integrate_exercises = {}
 
     def json_serialise(self):
@@ -907,6 +935,18 @@ class CoolDown(ModalityBase, Serialisable):
         cooldown.active = input_dict.get('active', True)
 
         return cooldown
+
+    def conditions_for_increased_sensitivity_met(self, soreness_list):
+
+        if self.muscular_strain_increasing:
+            return True
+        else:
+            for s in soreness_list:
+                if s.first_reported_date is not None and not s.is_dormant_cleared():
+                    days_sore = (self.event_date_time - s.first_reported_date).days
+                    if not s.pain and days_sore < 30:
+                        return True
+        return False
 
     def set_exercise_dosage_ranking(self):
         self.rank_dosages([self.dynamic_stretch_integrate_exercises])
@@ -943,11 +983,11 @@ class CoolDown(ModalityBase, Serialisable):
 
                 self.assign_exercises(soreness, goal, exercise_library)
 
-    def fill_exercises(self, soreness_list, event_date_time, exercise_library):
+    def fill_exercises(self, soreness_list, exercise_library):
 
         self.check_recover_from_sport(soreness_list, exercise_library)
         for s in soreness_list:
-            self.check_corrective(s, event_date_time, exercise_library)
+            self.check_corrective(s, self.event_date_time, exercise_library)
 
     def assign_exercises(self, soreness, goal, exercise_library):
 
