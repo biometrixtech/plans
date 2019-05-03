@@ -61,6 +61,7 @@ class TrainingPlanManager(object):
                 modality = None
             else:
                 modality.active = False
+        return modality
 
     @xray_recorder.capture('logic.TrainingPlanManager.create_daily_plan')
     def create_daily_plan(self, event_date, last_updated, target_minutes=15, athlete_stats=None):
@@ -114,10 +115,10 @@ class TrainingPlanManager(object):
             self.daily_plan.cold_water_immersion = calc.get_cold_water_immersion(soreness_list, parse_date(event_date))
         else:
             # if any post-training modalities are present and complete, preserve the completed ones
-            self.preserve_completed_modality(self.daily_plan.cool_down)
-            self.preserve_completed_modality(self.daily_plan.post_active_rest)
-            self.preserve_completed_modality(self.daily_plan.ice)
-            self.preserve_completed_modality(self.daily_plan.cold_water_immersion)
+            self.daily_plan.cool_down = self.preserve_completed_modality(self.daily_plan.cool_down)
+            self.daily_plan.post_active_rest = self.preserve_completed_modality(self.daily_plan.post_active_rest)
+            self.daily_plan.ice = self.preserve_completed_modality(self.daily_plan.ice)
+            self.daily_plan.cold_water_immersion = self.preserve_completed_modality(self.daily_plan.cold_water_immersion)
             # if any completed pre-training modalities exist, preserve them
             if self.daily_plan.heat is not None and self.daily_plan.heat.completed:
                 self.daily_plan.completed_heat.append(self.daily_plan.heat)
