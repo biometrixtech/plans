@@ -884,8 +884,11 @@ class WarmUp(ModalityBase, Serialisable):
 
 
 class CoolDown(ModalityBase, Serialisable):
-    def __init__(self):
+    def __init__(self, sport_name, high_relative_volume_logged, high_relative_intensity_logged):
         super().__init__()
+        self.sport_name = sport_name
+        self.high_relative_volume_logged = high_relative_volume_logged
+        self.high_relative_intensity_logged = high_relative_intensity_logged
         self.dynamic_stretch_integrate_exercises = {}
 
     def json_serialise(self):
@@ -908,6 +911,28 @@ class CoolDown(ModalityBase, Serialisable):
     def set_exercise_dosage_ranking(self):
         self.rank_dosages([self.dynamic_stretch_integrate_exercises])
 
+    def check_recover_from_sport(self, soreness_list, exercise_library):
+
+        if self.high_relative_volume_logged or self.high_relative_intensity_logged:
+            goal = AthleteGoal("Recover from Sport", 1, AthleteGoalType.sport)
+            goal.trigger = "High Relative Volume or Intensity of Logged Session"
+
+            body_part_factory = BodyPartFactory()
+
+            body_part = body_part_factory.get_body_part_for_sport(self.sport_name)
+
+            prohibiting_soreness = False
+
+            high_severity_list = list(s for s in soreness_list if s.severity >= 3.5)
+
+            if len(high_severity_list) > 0:
+                prohibiting_soreness = True
+
+            # Note: this is just returning the primary mover related exercises for sport
+            if body_part is not None and not prohibiting_soreness:
+                self.copy_exercises(body_part.dynamic_stretch_integrate_exercises,
+                                    self.dynamic_stretch_integrate_exercises, goal, "1", None, exercise_library)
+
     def check_corrective(self, soreness, event_date_time, exercise_library):
 
         if soreness.historic_soreness_status is not None and soreness.first_reported_date is not None and not soreness.is_dormant_cleared():
@@ -919,6 +944,8 @@ class CoolDown(ModalityBase, Serialisable):
                 self.assign_exercises(soreness, goal, exercise_library)
 
     def fill_exercises(self, soreness_list, event_date_time, exercise_library):
+
+        self.check_recover_from_sport(soreness_list, exercise_library)
         for s in soreness_list:
             self.check_corrective(s, event_date_time, exercise_library)
 

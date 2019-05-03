@@ -790,21 +790,19 @@ class ExerciseAssignmentCalculator(object):
 
         return warm_up
 
-    def get_cool_down(self, athlete_stats, soreness_list, event_date_time):
+    def get_cool_down(self, athlete_stats, soreness_list, event_date_time, sport_name):
 
         cool_down = None
 
         if athlete_stats.muscular_strain_increasing or athlete_stats.high_relative_load_session:
-            cool_down = CoolDown()
-        else:
             for s in soreness_list:
                 if s.first_reported_date is not None and not s.is_dormant_cleared():
-                    cool_down = CoolDown()
-                    break
-
-        if cool_down is not None:
-            cool_down.fill_exercises(soreness_list, event_date_time, self.exercise_library)
-            cool_down.set_exercise_dosage_ranking()
+                    days_diff = (event_date_time - s.first_reported_date).days
+                    if (not s.pain and days_diff > 30) or s.pain:
+                        cool_down = CoolDown(sport_name, athlete_stats.high_relative_load_session, False)
+                        cool_down.fill_exercises(soreness_list, event_date_time, self.exercise_library)
+                        cool_down.set_exercise_dosage_ranking()
+                        break
 
         return cool_down
 
