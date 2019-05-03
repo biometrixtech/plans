@@ -934,7 +934,7 @@ class ExerciseAssignmentCalculator(object):
         else:
             return None
 
-    def get_cold_water_immersion(self, soreness_list, event_date_time):
+    def get_cold_water_immersion(self, soreness_list, event_date_time, ice_session):
 
         cold_water_immersion = None
 
@@ -956,6 +956,13 @@ class ExerciseAssignmentCalculator(object):
                         cold_water_immersion.goals.add(goal)
 
         return cold_water_immersion
+
+    def adjust_ice_session(self, ice_session, cold_water_immersion_session):
+
+        if ice_session is not None and cold_water_immersion_session is not None:
+            ice_session.body_parts = list(b for b in ice_session.body_parts if not self.is_lower_body_part(b))
+
+        return ice_session
 
     def is_lower_body_part(self, soreness):
 
