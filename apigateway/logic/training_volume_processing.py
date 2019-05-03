@@ -104,18 +104,16 @@ class TrainingVolumeProcessing(object):
         benchmarks = {}
 
         for sport, load_list in self.functional_overreaching_loads.items():
-            if len(benchmarks[sport]) > 0:
-                if sport not in benchmarks:
-                    benchmarks[sport] = mean(load_list)
-                else:
-                    benchmarks[sport] = min(benchmarks[sport], mean(load_list))
+            if sport not in benchmarks:
+                benchmarks[sport] = mean(load_list)
+            else:
+                benchmarks[sport] = min(benchmarks[sport], mean(load_list))
 
         for sport, load_list in self.functional_overreaching_NFO_loads.items():
-            if len(benchmarks[sport]) > 0:
-                if sport not in benchmarks:
-                    benchmarks[sport] = mean(load_list)
-                else:
-                    benchmarks[sport] = min(benchmarks[sport], mean(load_list))
+            if sport not in benchmarks:
+                benchmarks[sport] = mean(load_list)
+            else:
+                benchmarks[sport] = min(benchmarks[sport], mean(load_list))
 
         return benchmarks
 
@@ -378,6 +376,7 @@ class TrainingVolumeProcessing(object):
         last_2_week_date = load_end_date - timedelta(days=14)
         last_2_4_week_date = load_end_date - timedelta(days=28)
         max_load = 0
+        self.doms = []
 
         # create a list of loading events first
         for t in range(0, len(load_tuples) - 1):
@@ -428,7 +427,9 @@ class TrainingVolumeProcessing(object):
                     # get all affected body parts that could be attributed to this training session
                     next_highest_load_date = loading_events[t].loading_date + timedelta(hours=36)
                     candidates = list(r for r in loading_events if r.loading_date > loading_events[t].loading_date
-                                      and r.loading_date <= next_highest_load_date and r.load > loading_events[t].load and r.highest_load_in_36_hrs)
+                                      #and r.loading_date <= next_highest_load_date
+                                      #and r.load > loading_events[t].load
+                                      and r.highest_load_in_36_hrs)
                     candidates.sort(key=lambda x: x.loading_date)
                     if len(candidates) > 0:
                         next_highest_load_date = candidates[0].loading_date
@@ -443,14 +444,30 @@ class TrainingVolumeProcessing(object):
 
                     body_parts = list(AffectedBodyPart(b[1][0], b[1][1], 0, 0, False) for b in base_soreness_tuples) # body part, side, days sore, max_severity, cleared
                     affected_body_parts = list(set(body_parts))
+                    for d in self.doms:
+                        matched_list = list(a for a in affected_body_parts if a.body_part==d.body_part and a.side==d.side)
+                        if len(matched_list) > 0:
+                            affected_body_parts.remove(matched_list[0])
+                        aff_body_part = AffectedBodyPart(d.body_part, d.side, d.days_sore, d.max_severity, d.cleared)
+                        aff_body_part.last_reported_date = d.last_reported_date
+                        affected_body_parts.append(aff_body_part)
+                        d.cleared = True
+
+                    self.doms = list(d for d in self.doms if not d.cleared)
+
                     all_soreness_tuples = list((s[0], s[1]) for s in self.post_session_survey_tuples
                                                 if s[0] >= load_tuples[t][0] and
                                                 s[0] < load_tuples[t][0] + timedelta(days=12))
                     all_soreness_tuples.extend(list((s[0], s[1]) for s in self.daily_readiness_tuples
                                                      if s[0] >= load_tuples[t][0] and
                                                      s[0] < load_tuples[t][0] + timedelta(days=12)))
+
+                    if len(all_soreness_tuples) == 0:
+                        self.doms = []
+
                     soreness_history = list((h[0], h[1][0], h[1][1], h[1][2]) for h in all_soreness_tuples)
                     unique_soreness_history = list(set(soreness_history))
+
                     unique_soreness_history.sort(key=self.get_tuple_datetime)
                     unique_soreness_dates = list(dt[0] for dt in unique_soreness_history)
                     for dt in unique_soreness_dates:
@@ -461,7 +478,7 @@ class TrainingVolumeProcessing(object):
                                 if len(body_parts_present) > 0:
                                     if a.last_reported_date is None:
                                         a.last_reported_date = body_parts_present[0][0]
-                                        a.days_sore = 1
+                                        a.days_sore += 1
                                     else:
                                         a.days_sore += (body_parts_present[0][0].date() - a.last_reported_date.date()).days
                                         a.last_reported_date = body_parts_present[0][0]
@@ -486,7 +503,16 @@ class TrainingVolumeProcessing(object):
                     # close out any soreness not cleared
                     for a in affected_body_parts:
                         if not a.cleared:
-                            a.cleared = True
+                            found = False
+                            for d in self.doms:
+                                if d.body_part == a.body_part and d.side == a.side:
+                                    if loading_events[t].loading_date > d.last_reported_date:
+                                        d.days_sore += (loading_events[t].loading_date - d.last_reported_date.date()).days
+                                        d.last_reported_date = loading_events[t].loading_date
+                                    found = True
+                            if not found:
+                                self.doms.append(a)
+                            #a.cleared = True
 
                     # need to pick the oldest date for each body part
                     grouped_parts = []
@@ -498,11 +524,7 @@ class TrainingVolumeProcessing(object):
 
                     loading_event.affected_body_parts = grouped_parts
 
-            self.doms = []
-
             for loading_event in loading_events:
-
-                self.doms.extend(list(a for a in loading_event.affected_body_parts if not a.cleared))
 
                 level_one_soreness = list(
                     a for a in loading_event.affected_body_parts if a.cleared and a.days_sore <= 1)
