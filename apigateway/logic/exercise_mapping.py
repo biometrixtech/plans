@@ -728,26 +728,39 @@ class ExerciseAssignmentCalculator(object):
     def get_heat(self, soreness_list, event_date_time):
 
         bring_the_heat = []
-
+        minutes = []
         for s in soreness_list:
 
             goal = AthleteGoal("Preemptive, Prepare for Training", 1, AthleteGoalType.preempt_corrective)
+            heat = None
 
             if 1.5 <= s.severity <= 5 and s.first_reported_date is not None and not s.is_dormant_cleared():
                 days_diff = (event_date_time - s.first_reported_date).days
-                heat = Heat(minutes=10, body_part_location=s.body_part.location, side=s.side)
+
                 if not s.pain and days_diff >= 30:
+                    if 1.5 <= s.severity < 3.5:
+                        minutes.append(10)
+                    else:
+                        minutes.append(15)
+                    heat = Heat(body_part_location=s.body_part.location, side=s.side)
                     goal.trigger = "Pers, Pers-2 Soreness > 30d"
 
                 elif (s.historic_soreness_status == HistoricSorenessStatus.persistent_2_pain or s.is_persistent_pain()
                       or s.is_acute_pain()):
+                    if days_diff <= 30:
+                        goal.trigger = "Acute, Pers, Pers-2 Pain <= 30d"
+                        minutes.append(10)
+                    else:
+                        goal.trigger = "Acute, Pers, Pers-2 Pain > 30d"
+                        minutes.append(15)
+                    heat = Heat(body_part_location=s.body_part.location, side=s.side)
 
-                    goal.trigger = "Acute, Pers, Pers-2 Pain"
-
+            if heat is not None:
                 heat.goals.add(goal)
                 bring_the_heat.append(heat)
+
         if len(bring_the_heat) > 0:
-            heat_session = HeatSession()
+            heat_session = HeatSession(minutes=max(minutes))
             heat_session.body_parts = bring_the_heat
 
             return heat_session
