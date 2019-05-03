@@ -943,9 +943,7 @@ class CoolDown(ModalityBase, Serialisable):
         else:
             for s in soreness_list:
                 if s.first_reported_date is not None and not s.is_dormant_cleared():
-                    days_sore = (self.event_date_time - s.first_reported_date).days
-                    if not s.pain and days_sore < 30:
-                        return True
+                    return True
         return False
 
     def set_exercise_dosage_ranking(self):
