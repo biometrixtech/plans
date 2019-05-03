@@ -57,6 +57,7 @@ def handle_daily_readiness_create(principal_id=None):
         athlete_stats = AthleteStats(user_id)
         athlete_stats.event_date = plan_event_date
     survey_processor = SurveyProcessing(user_id, event_date, athlete_stats, datastore_collection)
+    training_volume_processing = TrainingVolumeProcessing(event_date, event_date)
 
     if 'sessions_planned' in request.json and not request.json['sessions_planned']:
         sessions_planned = False
@@ -73,7 +74,7 @@ def handle_daily_readiness_create(principal_id=None):
         high_relative_load_session_present = False
         sport_name = None
         for session in survey_processor.sessions:
-            if TrainingVolumeProcessing.is_last_session_high_relative_load(event_date, session, athlete_stats.high_relative_load_benchmarks):
+            if training_volume_processing.is_last_session_high_relative_load(event_date, session, athlete_stats.high_relative_load_benchmarks):
                 high_relative_load_session_present = True
                 sport_name = session.sport_name
         survey_processor.athlete_stats.high_relative_load_session = high_relative_load_session_present

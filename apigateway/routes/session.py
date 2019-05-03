@@ -32,7 +32,7 @@ def handle_session_create(principal_id=None):
 
     user_id = principal_id
     event_date = parse_datetime(request.json['event_date'])
-    # training_volume_processing = TrainingVolumeProcessing(event_date, event_date)
+    training_volume_processing = TrainingVolumeProcessing(event_date, event_date)
     plan_update_required = False
     train_later = False
     if 'sessions_planned' in request.json and request.json['sessions_planned']:
@@ -56,7 +56,7 @@ def handle_session_create(principal_id=None):
     for session in survey_processor.sessions:
         if not session.deleted and not session.ignored:
             plan_update_required = True
-            if TrainingVolumeProcessing.is_last_session_high_relative_load(event_date, session, athlete_stats.high_relative_load_benchmarks):
+            if training_volume_processing.is_last_session_high_relative_load(event_date, session, athlete_stats.high_relative_load_benchmarks):
                 high_relative_load_session_present = True
                 sport_name = session.sport_name
     survey_processor.athlete_stats.high_relative_load_session = high_relative_load_session_present
