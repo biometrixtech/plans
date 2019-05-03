@@ -112,7 +112,7 @@ class TrainingPlanManager(object):
             self.daily_plan.cool_down = calc.get_cool_down(athlete_stats, soreness_list, parse_date(event_date))
             self.daily_plan.post_active_rest = calc.get_post_active_rest(athlete_stats, soreness_list, parse_date(event_date))
             self.daily_plan.ice = calc.get_ice(soreness_list, parse_date(event_date))
-            self.daily_plan.cold_water_immersion = calc.get_cold_water_immersion(soreness_list, parse_date(event_date))
+            self.daily_plan.cold_water_immersion = calc.get_cold_water_immersion(soreness_list, parse_date(event_date), self.daily_plan.ice)
         else:
             # if any post-training modalities are present and complete, preserve the completed ones
             self.daily_plan.cool_down = self.preserve_completed_modality(self.daily_plan.cool_down)
