@@ -48,11 +48,6 @@ class HeatSession(Serialisable):
         if name in ['event_date_time', 'start_date_time', 'completed_date_time']:
             if value is not None and not isinstance(value, datetime.datetime):
                 value = parse_datetime(value)
-        elif name == 'sport_name':
-            try:
-                value = SportName(value)
-            except ValueError:
-                value = SportName(None)
 
         super().__setattr__(name, value)
 
@@ -104,6 +99,11 @@ class ModalityBase(object):
         if name in ['event_date_time', 'start_date_time', 'completed_date_time']:
             if value is not None and not isinstance(value, datetime.datetime):
                 value = parse_datetime(value)
+        elif name == 'sport_name':
+            try:
+                value = SportName(value)
+            except ValueError:
+                value = SportName(None)
         super().__setattr__(name, value)
 
     @abc.abstractmethod
