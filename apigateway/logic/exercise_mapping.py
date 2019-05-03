@@ -811,7 +811,7 @@ class ExerciseAssignmentCalculator(object):
 
         cool_down = None
 
-        if athlete_stats.muscular_strain_increasing or athlete_stats.high_relative_load_session or athlete_stats.high_relative_intensity_session:
+        if athlete_stats.high_relative_load_session or athlete_stats.high_relative_intensity_session:
             #for s in soreness_list:
             #    if s.first_reported_date is not None and not s.is_dormant_cleared():
             #        days_diff = (event_date_time - s.first_reported_date).days
