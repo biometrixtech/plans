@@ -19,6 +19,7 @@ class HeatSession(Serialisable):
 
         ret = {
             'start_date_time': format_datetime(self.start_date_time) if self.start_date_time is not None else None,
+            'completed_date_time': format_datetime(self.completed_date_time) if self.completed_date_time is not None else None,
             'event_date_time': format_datetime(self.event_date_time) if self.event_date_time is not None else None,
             'completed': self.completed,
             'active': self.active,
@@ -632,10 +633,10 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
 
     @classmethod
     def json_deserialise(cls, input_dict):
-        post_active_rest = cls(high_relative_load_session=input_dict['high_relative_load_session'],
-                               high_relative_intensity_logged=input_dict['high_relative_intensity_logged'],
-                               muscular_strain_increasing=input_dict['muscular_strain_increasing'],
-                               event_date_time=input_dict['event_date_time'])
+        post_active_rest = cls(high_relative_load_session=input_dict.get('high_relative_load_session', False),
+                               high_relative_intensity_logged=input_dict.get('high_relative_intensity_logged', False),
+                               muscular_strain_increasing=input_dict.get('muscular_strain_increasing', False),
+                               event_date_time=input_dict.get('event_date_time', None))
         post_active_rest.active = input_dict.get("active", True)
         post_active_rest.start_date_time = input_dict.get("start_date_time", None)
         post_active_rest.completed_date_time = input_dict.get("completed_date_time", None)
@@ -953,7 +954,7 @@ class CoolDown(ModalityBase, Serialisable):
 
     @classmethod
     def json_deserialise(cls, input_dict):
-        cooldown = cls(sport_name=input_dict['sport_name'],
+        cooldown = cls(sport_name=input_dict.get('sport_name', 0),
                        high_relative_load_session=input_dict.get('high_relative_load_session', False),
                        high_relative_intensity_logged=input_dict.get('high_relative_intensity_logged', False),
                        muscular_strain_increasing=input_dict.get('muscular_strain_increasing', False),
