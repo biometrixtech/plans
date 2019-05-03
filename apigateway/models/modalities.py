@@ -8,17 +8,18 @@ import datetime
 
 class HeatSession(Serialisable):
     def __init__(self, minutes=0):
+        self.minutes = minutes
         self.start_date_time = None
         self.completed_date_time = None
         self.event_date_time = None
         self.completed = False
         self.active = True
         self.body_parts = []
-        self.minutes = minutes
 
     def json_serialise(self):
 
         ret = {
+            'minutes': self.minutes,
             'start_date_time': format_datetime(self.start_date_time) if self.start_date_time is not None else None,
             'completed_date_time': format_datetime(self.completed_date_time) if self.completed_date_time is not None else None,
             'event_date_time': format_datetime(self.event_date_time) if self.event_date_time is not None else None,
@@ -31,7 +32,7 @@ class HeatSession(Serialisable):
 
     @classmethod
     def json_deserialise(cls, input_dict):
-        heat_session = cls()
+        heat_session = cls(input_dict.get('minutes', 0))
         heat_session.start_date_time = input_dict.get('start_date_time', None)
         heat_session.event_date_time = input_dict.get('event_date_time', None)
         heat_session.completed = input_dict.get('completed', False)
@@ -51,7 +52,6 @@ class HeatSession(Serialisable):
 
 class Heat(Serialisable):
     def __init__(self, body_part_location=None, side=0):
-
         self.body_part_location = body_part_location
         self.side = side
         self.before_training = True
@@ -62,7 +62,6 @@ class Heat(Serialisable):
     def json_serialise(self):
 
         ret = {
-            'minutes': self.minutes,
             'body_part_location': self.body_part_location.value,
             'side': self.side,
             'before_training': self.before_training,
@@ -75,8 +74,7 @@ class Heat(Serialisable):
 
     @classmethod
     def json_deserialise(cls, input_dict):
-        heat = cls(minutes=input_dict['minutes'],
-                   body_part_location=BodyPartLocation(input_dict['body_part_location']),
+        heat = cls(body_part_location=BodyPartLocation(input_dict['body_part_location']),
                    side=input_dict['side'])
         heat.before_training = input_dict.get('before_training', True)
         heat.goals = set([AthleteGoal.json_deserialise(goal) for goal in input_dict.get('goals', [])])
@@ -1099,6 +1097,7 @@ class IceSession(Serialisable):
     def json_serialise(self):
 
         ret = {
+            'minutes': self.minutes,
             'start_date_time': format_datetime(self.start_date_time) if self.start_date_time is not None else None,
             'completed_date_time': format_datetime(self.completed_date_time) if self.completed_date_time is not None else None,
             'event_date_time': format_datetime(self.event_date_time) if self.event_date_time is not None else None,
@@ -1111,7 +1110,7 @@ class IceSession(Serialisable):
 
     @classmethod
     def json_deserialise(cls, input_dict):
-        ice_session = cls()
+        ice_session = cls(input_dict.get('minutes', 0))
         ice_session.start_date_time = input_dict.get('start_date_time', None)
         ice_session.completed_date_time = input_dict.get('completed_date_time', None)
         ice_session.event_date_time = input_dict.get('event_date_time', None)
@@ -1132,7 +1131,6 @@ class IceSession(Serialisable):
 
 class Ice(Serialisable):
     def __init__(self, body_part_location=None, side=0):
-
         self.body_part_location = body_part_location
         self.side = side
         self.after_training = True
@@ -1144,7 +1142,6 @@ class Ice(Serialisable):
 
     def json_serialise(self):
         ret = {
-            'minutes': self.minutes,
             'body_part_location': self.body_part_location.value,
             'goals': [goal.json_serialise() for goal in self.goals],
             'after_training': self.after_training,
@@ -1159,8 +1156,7 @@ class Ice(Serialisable):
 
     @classmethod
     def json_deserialise(cls, input_dict):
-        ice = cls(minutes=input_dict['minutes'],
-                  body_part_location=BodyPartLocation(input_dict['body_part_location']),
+        ice = cls(body_part_location=BodyPartLocation(input_dict['body_part_location']),
                   side=input_dict['side'])
         ice.after_training = input_dict.get('after_training', False)
         ice.immediately_after_training = input_dict.get('immediately_after_training', False)
