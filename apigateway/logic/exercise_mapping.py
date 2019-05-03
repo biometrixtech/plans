@@ -2,7 +2,7 @@ import models.soreness
 #from logic.exercise_generator import ExerciseAssignments
 import logic.soreness_processing as soreness_and_injury
 from models.exercise import ExerciseBuckets, Phase
-from models.soreness import AthleteGoal, AthleteGoalType, AssignedExercise, BodyPartLocation, HistoricSorenessStatus
+from models.soreness import AthleteGoal, AthleteGoalType, AssignedExercise, BodyPartLocation, HistoricSorenessStatus, Soreness, BodyPart
 from logic.goal_focus_text_generator import RecoveryTextGenerator
 from datetime import  timedelta
 from utils import format_datetime, parse_date
@@ -861,7 +861,7 @@ class ExerciseAssignmentCalculator(object):
                         minutes.append(10)
                     else:
                         minutes.append(15)
-                elif 3.5 <= s.severity < 4.5 and not self.is_lower_body_part(s):
+                elif 3.5 <= s.severity < 4.5 and not self.is_lower_body_part(s.body_part.location):
                     ice = Ice(body_part_location=s.body_part.location, side=s.side)
                     ice.repeat_every_3hrs_for_24hrs = True
                     if s.body_part.location == BodyPartLocation.elbow:
@@ -881,7 +881,7 @@ class ExerciseAssignmentCalculator(object):
                     if 1.5 <= s.severity < 3.5:
                         ice.repeat_every_3hrs_for_24hrs = False
                         minutes.append(15)
-                    elif not self.is_lower_body_part(s) and 3.5 <= s.severity <= 5.0:
+                    elif not self.is_lower_body_part(s.body_part.location) and 3.5 <= s.severity <= 5.0:
                         ice.repeat_every_3hrs_for_24hrs = True
                         if s.body_part.location == BodyPartLocation.elbow:
                             minutes.append(10)
@@ -940,7 +940,7 @@ class ExerciseAssignmentCalculator(object):
         cold_water_immersion = None
 
         for s in soreness_list:
-            if self.is_lower_body_part(s) and s.daily and s.severity >= 3.5:
+            if self.is_lower_body_part(s.body_part.location) and s.daily and s.severity >= 3.5:
                 if s.pain:
 
                     goal = AthleteGoal("Care for Pain", 1, AthleteGoalType.pain)
@@ -961,24 +961,24 @@ class ExerciseAssignmentCalculator(object):
     def adjust_ice_session(self, ice_session, cold_water_immersion_session):
 
         if ice_session is not None and cold_water_immersion_session is not None:
-            ice_session.body_parts = list(b for b in ice_session.body_parts if not self.is_lower_body_part(b))
+            ice_session.body_parts = list(b for b in ice_session.body_parts if not self.is_lower_body_part(b.body_part_location))
 
         return ice_session
 
-    def is_lower_body_part(self, soreness):
+    def is_lower_body_part(self, body_part_location):
 
-        if (soreness.body_part.location == BodyPartLocation.hip_flexor or
-                soreness.body_part.location == BodyPartLocation.knee or
-                soreness.body_part.location == BodyPartLocation.ankle or
-                soreness.body_part.location == BodyPartLocation.foot or
-                soreness.body_part.location == BodyPartLocation.achilles or
-                soreness.body_part.location == BodyPartLocation.groin or
-                soreness.body_part.location == BodyPartLocation.quads or
-                soreness.body_part.location == BodyPartLocation.shin or
-                soreness.body_part.location == BodyPartLocation.outer_thigh or
-                soreness.body_part.location == BodyPartLocation.glutes or
-                soreness.body_part.location == BodyPartLocation.hamstrings or
-                soreness.body_part.location == BodyPartLocation.calves
+        if (body_part_location == BodyPartLocation.hip_flexor or
+                body_part_location == BodyPartLocation.knee or
+                body_part_location == BodyPartLocation.ankle or
+                body_part_location == BodyPartLocation.foot or
+                body_part_location == BodyPartLocation.achilles or
+                body_part_location == BodyPartLocation.groin or
+                body_part_location == BodyPartLocation.quads or
+                body_part_location == BodyPartLocation.shin or
+                body_part_location == BodyPartLocation.outer_thigh or
+                body_part_location == BodyPartLocation.glutes or
+                body_part_location == BodyPartLocation.hamstrings or
+                body_part_location == BodyPartLocation.calves
         ):
             return True
         else:
