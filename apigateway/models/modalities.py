@@ -1055,7 +1055,8 @@ class ActiveRecovery(Serialisable):
 
 
 class IceSession(Serialisable):
-    def __init__(self):
+    def __init__(self, minutes=0):
+        self.minutes = minutes
         self.start_date_time = None
         self.event_date_time = None
         self.completed = False
@@ -1092,8 +1093,8 @@ class IceSession(Serialisable):
 
 
 class Ice(Serialisable):
-    def __init__(self, minutes=0, body_part_location=None, side=0):
-        self.minutes = minutes
+    def __init__(self, body_part_location=None, side=0):
+
         self.body_part_location = body_part_location
         self.side = side
         self.after_training = True

@@ -843,57 +843,91 @@ class ExerciseAssignmentCalculator(object):
     def get_ice(self, soreness_list, event_date_time):
 
         ice_list = []
+        minutes = []
+        low_parts = [BodyPartLocation.ankle, BodyPartLocation.knee, BodyPartLocation.elbow]
 
         for s in soreness_list:
+            ice = None
             if s.daily and s.pain:
-                if not self.is_lower_body_part(s) or s.severity < 3.5:
-                    goal = AthleteGoal("Care for Pain", 1, AthleteGoalType.pain)
-                    goal.trigger = "Pain Reported Today"
-                    ice = Ice(minutes=20, body_part_location=s.body_part.location, side=s.side)
+                goal = AthleteGoal("Care for Pain", 1, AthleteGoalType.pain)
+                goal.trigger = "Pain Reported Today"
 
-                    if s.severity < 2.5:
-                        ice.repeat_every_3hrs_for_24hrs = False
-                        ice.immediately_after_training = False
-                    elif 2.5 < s.severity < 3.5:
-                        ice.repeat_every_3hrs_for_24hrs = True
-                        ice.immediately_after_training = True
-                    elif not self.is_lower_body_part(s) and s.severity <= 5.0:
-                        ice.repeat_every_3hrs_for_24hrs = True
-                        ice.immediately_after_training = True
+                if s.severity < 3.5:
+                    ice = Ice(body_part_location=s.body_part.location, side=s.side)
+                    ice.repeat_every_3hrs_for_24hrs = False
+
+                    if s.body_part.location in low_parts:
+                        minutes.append(10)
+                    else:
+                        minutes.append(15)
+                elif 3.5 <= s.severity < 4.5 and not self.is_lower_body_part(s):
+                    ice = Ice(body_part_location=s.body_part.location, side=s.side)
+                    ice.repeat_every_3hrs_for_24hrs = True
+                    if s.body_part.location == BodyPartLocation.elbow:
+                        minutes.append(10)
+                    else:
+                        minutes.append(15)
+                if ice is not None:
                     ice.goals.add(goal)
                     ice_list.append(ice)
+
             elif s.daily and not s.pain and s.historic_soreness_status is not None and s.historic_soreness_status is not s.is_dormant_cleared() and s.first_reported_date is not None:
                 days_diff = (event_date_time - s.first_reported_date).days
                 if days_diff > 30 and s.severity >= 1.5:
                     goal = AthleteGoal("Care for Soreness", 1, AthleteGoalType.sore)
                     goal.trigger = "Soreness Reported Today + Pers, Pers-2 Soreness > 30d"
-                    ice = Ice(minutes=20, body_part_location=s.body_part.location, side=s.side)
-                    if 1.5 <= s.severity < 2.5:
+                    ice = Ice(body_part_location=s.body_part.location, side=s.side)
+                    if 1.5 <= s.severity < 3.5:
                         ice.repeat_every_3hrs_for_24hrs = False
-                        ice.immediately_after_training = False
-                    elif 2.5 < s.severity < 3.5:
+                        minutes.append(15)
+                    elif not self.is_lower_body_part(s) and 3.5 <= s.severity <= 5.0:
                         ice.repeat_every_3hrs_for_24hrs = True
-                        ice.immediately_after_training = True
-                    elif not self.is_lower_body_part(s) and s.severity <= 5.0:
-                        ice.repeat_every_3hrs_for_24hrs = True
-                        ice.immediately_after_training = True
-                    ice.goals.add(goal)
-                    ice_list.append(ice)
+                        if s.body_part.location == BodyPartLocation.elbow:
+                            minutes.append(10)
+                        else:
+                            minutes.append(15)
 
-            elif (not s.daily and s.historic_soreness_status is not None and s.severity >= 1.5 and
-                    (s.historic_soreness_status is s.is_persistent_pain() or
-                     s.historic_soreness_status is s.is_acute_pain() or
-                     s.historic_soreness_status == HistoricSorenessStatus.persistent_2_pain)):
+                    if ice is not None:
+                        ice.goals.add(goal)
+                        ice_list.append(ice)
 
+            elif (not s.daily and s.historic_soreness_status is not None and not s.is_dormant_cleared()
+                  and s.severity >= 1.5 and not s.pain):
+
+                days_diff = (event_date_time - s.first_reported_date).days
+                if days_diff > 30 and s.severity >= 1.5:
                     goal = AthleteGoal("Preemptive, Prepare for Training", 1, AthleteGoalType.preempt_corrective)
-                    goal.trigger = "No Pain Reported Today + Acute, Pers, Pers-2 Pain"
-                    ice = Ice(minutes=20, body_part_location=s.body_part.location, side=s.side)
+                    goal.trigger = "No Soreness Reported Today + Acute, Pers, Pers-2 Pain"
+                    ice = Ice(body_part_location=s.body_part.location, side=s.side)
                     ice.repeat_every_3hrs_for_24hrs = False
-                    ice.immediately_after_training = False
+                    if s.body_part.location in low_parts:
+                        minutes.append(10)
+                    else:
+                        minutes.append(15)
+
+                    if ice is not None:
+                        ice.goals.add(goal)
+                        ice_list.append(ice)
+
+            elif (not s.daily and s.historic_soreness_status is not None and not s.is_dormant_cleared()
+                  and s.severity >= 1.5 and s.pain):
+
+                goal = AthleteGoal("Preemptive, Prepare for Training", 1, AthleteGoalType.preempt_corrective)
+                goal.trigger = "No Pain Reported Today + Acute, Pers, Pers-2 Pain"
+                ice = Ice(body_part_location=s.body_part.location, side=s.side)
+                ice.repeat_every_3hrs_for_24hrs = False
+
+                if s.body_part.location in low_parts:
+                    minutes.append(10)
+                else:
+                    minutes.append(15)
+
+                if ice is not None:
                     ice.goals.add(goal)
                     ice_list.append(ice)
+
         if len(ice_list) > 0:
-            ice_session = IceSession()
+            ice_session = IceSession(minutes=min(minutes))
             ice_session.body_parts = ice_list
 
             return ice_session
