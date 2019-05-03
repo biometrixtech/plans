@@ -595,8 +595,8 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
                             self.copy_exercises(agonist.active_stretch_exercises, self.active_stretch_exercises, goal, "1", soreness, exercise_library)
 
                 if soreness.is_joint():
-                    for paul in body_part.antagonists:
-                        antagonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(paul), None))
+                    for g in body_part.antagonists:
+                        antagonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(g), None))
                         if antagonist is not None:
                             self.copy_exercises(antagonist.inhibit_exercises, self.inhibit_exercises, goal, "1", soreness, exercise_library)
                             if soreness.severity < 3.5:
@@ -814,7 +814,7 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
             else:
                 goal.trigger = "Painful muscle reported today"
                 priority = "2"
-                
+
             if body_part is not None:
                 for a in body_part.agonists:
                     agonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None))
@@ -824,8 +824,8 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
                             self.copy_exercises(agonist.static_stretch_exercises, self.static_stretch_exercises, goal, "1", soreness, exercise_library)
 
                 if soreness.is_joint():
-                    for paul in body_part.antagonists:
-                        antagonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(paul), None))
+                    for g in body_part.antagonists:
+                        antagonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(g), None))
                         if antagonist is not None:
                             self.copy_exercises(antagonist.inhibit_exercises, self.inhibit_exercises, goal, "1", soreness,
                                                 exercise_library)
