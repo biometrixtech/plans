@@ -123,6 +123,36 @@ class Soreness(BaseSoreness, Serialisable):
         except AttributeError:
             return False
     '''
+    def is_joint(self):
+        if (self.body_part.location == BodyPartLocation.hip_flexor or
+                self.body_part.location == BodyPartLocation.knee or
+                self.body_part.location == BodyPartLocation.ankle or
+                self.body_part.location == BodyPartLocation.foot or
+                self.body_part.location == BodyPartLocation.achilles or
+                self.body_part.location == BodyPartLocation.elbow or
+                self.body_part.location == BodyPartLocation.wrist):
+            return True
+        else:
+            return False
+
+    def is_muscle(self):
+        if (self.body_part.location == BodyPartLocation.shoulder or
+                self.body_part.location == BodyPartLocation.chest or
+                self.body_part.location == BodyPartLocation.abdominals or
+                self.body_part.location == BodyPartLocation.groin or
+                self.body_part.location == BodyPartLocation.quads or
+                self.body_part.location == BodyPartLocation.shin or
+                self.body_part.location == BodyPartLocation.outer_thigh or
+                self.body_part.location == BodyPartLocation.lower_back or
+                self.body_part.location == BodyPartLocation.glutes or
+                self.body_part.location == BodyPartLocation.hamstrings or
+                self.body_part.location == BodyPartLocation.calves or
+                self.body_part.location == BodyPartLocation.upper_back_neck or
+                self.body_part.location == BodyPartLocation.lats):
+            return True
+        else:
+            return False
+
 
     def json_serialise(self, api=False, daily=False, trigger=False):
         if api:
