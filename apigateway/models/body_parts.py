@@ -1,4 +1,5 @@
 from models.soreness import BodyPart, BodyPartLocation
+from models.sport import SportName
 
 
 class BodyPartFactory(object):
@@ -43,6 +44,36 @@ class BodyPartFactory(object):
 
         return exercise_dict
 
+    def get_body_part_for_sport(self, sport_name):
+
+        full_body_list = [SportName.basketball, SportName.football, SportName.general_fitness, SportName.gymnastics,
+                          SportName.rugby, SportName.pool_sports, SportName.volleyball, SportName.wrestling,
+                          SportName.weightlifting, SportName.track_field, SportName.australian_football,
+                          SportName.cricket, SportName.dance, SportName.equestrian_sports, SportName.fencing,
+                          SportName.martial_arts, SportName.swimming, SportName.water_polo,SportName.kick_boxing,
+                          SportName.endurance, SportName.power, SportName.strength, SportName.cross_training,
+                          SportName.functional_strength_training, SportName.mind_and_body, SportName.play,
+                          SportName.preparation_and_recovery, SportName.traditional_strength_training,
+                          SportName.water_fitness, SportName.yoga, SportName.barre, SportName.core_training,
+                          SportName.flexibility, SportName.high_intensity_interval_training,
+                          SportName.pilates, SportName.taichi, SportName.mixed_cardio, SportName.climbing,
+                          SportName.other, SportName.no_sport]
+
+        lower_body_list = [SportName.cycling, SportName.field_hockey, SportName.skate_sports, SportName.lacrosse,
+                           SportName.diving, SportName.soccer, SportName.distance_running, SportName.sprints,
+                           SportName.jumps, SportName.curling, SportName.hockey, SportName.snow_sports,
+                           SportName.surfing_sports, SportName.cross_country_skiing, SportName.downhill_skiing,
+                           SportName.snowboarding, SportName.speed_agility, SportName.elliptical,
+                           SportName.hiking, SportName.stair_climbing, SportName.walking, SportName.jump_rope,
+                           SportName.stairs, SportName.step_training]
+
+        if sport_name in full_body_list:
+            return self.get_body_part(BodyPart(BodyPartLocation.full_body, None))
+        elif sport_name in lower_body_list:
+            return self.get_body_part(BodyPart(BodyPartLocation.lower_body, None))
+        else:
+            return self.get_body_part(BodyPart(BodyPartLocation.upper_body, None))
+
     def get_body_part(self, body_part):
 
         if body_part.location == BodyPartLocation.general:
@@ -65,6 +96,13 @@ class BodyPartFactory(object):
             return self.get_quads()
         elif body_part.location == BodyPartLocation.shin:
             return self.get_shin()
+
+        elif body_part.location == BodyPartLocation.lower_body:
+            return self.get_lower_body()
+        elif body_part.location == BodyPartLocation.upper_body:
+            return self.get_upper_body()
+        elif body_part.location == BodyPartLocation.full_body:
+            return self.get_full_body()
 
     def get_constituent_exercises(self, primary_body_part, constituent_body_parts, soreness):
 
@@ -91,6 +129,33 @@ class BodyPartFactory(object):
         general.add_extended_exercise_phases(inhibit, {}, {}, {}, {}, static_integrate)
 
         return general
+
+    def get_upper_body(self):
+
+        upper_body = BodyPart(BodyPartLocation.upper_body, 22)
+        dynamic_stretch = self.get_exercise_dictionary([162, 180, 181, 179])
+        dynamic_integrate = self.get_exercise_dictionary([145, 184, 148, 185])
+        dynamic_integrate_with_speed = {}
+
+        upper_body.add_dynamic_exercise_phases(dynamic_stretch, dynamic_integrate, dynamic_integrate_with_speed)
+
+    def get_lower_body(self):
+
+        lower_body = BodyPart(BodyPartLocation.lower_body, 23)
+        dynamic_stretch = self.get_exercise_dictionary([139, 142, 143, 163, 161, 176])
+        dynamic_integrate = self.get_exercise_dictionary([147, 149, 150, 206, 183, 182])
+        dynamic_integrate_with_speed = {}
+
+        lower_body.add_dynamic_exercise_phases(dynamic_stretch, dynamic_integrate, dynamic_integrate_with_speed)
+
+    def get_full_body(self):
+
+        full_body = BodyPart(BodyPartLocation.full_body, 24)
+        dynamic_stretch = self.get_exercise_dictionary([141, 144, 164, 177, 178, 193, 165, 140])
+        dynamic_integrate = self.get_exercise_dictionary([146, 203, 204, 205, 207, 151, 169])
+        dynamic_integrate_with_speed = {}
+
+        full_body.add_dynamic_exercise_phases(dynamic_stretch, dynamic_integrate, dynamic_integrate_with_speed)
 
     def get_calves(self):
         calves = BodyPart(BodyPartLocation.calves, 10)
