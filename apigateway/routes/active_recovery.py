@@ -41,23 +41,23 @@ def handle_exercise_modalities_complete(principal_id=None):
             save_exercises = False
         plan.pre_active_rest_completed = True  # plan
         plan.pre_active_rest.completed = True  # recovery
-        plan.pre_active_rest.event_date_time = recovery_event_date
+        plan.pre_active_rest.completed_date_time = recovery_event_date
 
     elif recovery_type == 'post_active_rest':
         if plan.post_active_rest.completed:
             save_exercises = False
         plan.post_active_rest_completed = True  # plan
         plan.post_active_rest.completed = True  # recovery
-        plan.post_active_rest.event_date_time = recovery_event_date
+        plan.post_active_rest.completed_date_time = recovery_event_date
 
     elif recovery_type == 'warm_up':
-        plan.warm_up.event_date_time = recovery_event_date
+        plan.warm_up.completed_date_time = recovery_event_date
         plan.warm_up.completed = True
         if plan.warm_up.completed:
             save_exercises = False
 
     elif recovery_type == 'cool_down':
-        plan.cool_down.event_date_time = recovery_event_date
+        plan.cool_down.completed_date_time = recovery_event_date
         plan.cool_down.completed = True
         if plan.cool_down.completed:
             save_exercises = False
@@ -138,7 +138,7 @@ def handle_body_part_modalities_complete(principal_id=None):
     plan = daily_plan_datastore.get(user_id=user_id, start_date=plan_event_day, end_date=plan_event_day)[0]
 
     if recovery_type == 'heat':
-        plan.heat.event_date_time = event_date
+        plan.heat.completed_date_time = event_date
         plan.heat.completed = True
         for completed_body_part in completed_body_parts:
             assigned_body_part = [body_part for body_part in plan.heat.body_parts if
@@ -147,7 +147,7 @@ def handle_body_part_modalities_complete(principal_id=None):
             assigned_body_part.completed = True
 
     elif recovery_type == 'ice':
-        plan.ice.event_date_time = event_date
+        plan.ice.completed_date_time = event_date
         plan.ice.completed = True
         for completed_body_part in completed_body_parts:
             assigned_body_part = [body_part for body_part in plan.ice.body_parts if
@@ -174,10 +174,10 @@ def handle_body_part_modalities_complete(principal_id=None):
 @xray_recorder.capture('routes.active_recovery.body_part_modalities.start')
 def handle_body_part_modalities_start(principal_id=None):
     user_id = principal_id
-    event_date_time = parse_datetime(request.json['event_date'])
+    start_date_time = parse_datetime(request.json['event_date'])
     recovery_type = request.json['recovery_type']
 
-    plan_event_day = format_date(event_date_time)
+    plan_event_day = format_date(start_date_time)
     if not _check_plan_exists(user_id, plan_event_day):
         raise NoSuchEntityException('Plan not found for the user')
 
@@ -185,10 +185,10 @@ def handle_body_part_modalities_start(principal_id=None):
                                     start_date=plan_event_day,
                                     end_date=plan_event_day)[0]
     if recovery_type == 'heat':
-        plan.heat.start_date_time = event_date_time
+        plan.heat.start_date_time = start_date_time
 
     elif recovery_type == 'ice':
-        plan.ice.start_date_time = event_date_time
+        plan.ice.start_date_time = start_date_time
 
     daily_plan_datastore.put(plan)
 
