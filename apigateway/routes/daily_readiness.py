@@ -14,6 +14,7 @@ from models.daily_plan import DailyPlan
 from models.sleep_data import DailySleepData, SleepEvent
 from logic.survey_processing import SurveyProcessing, cleanup_sleep_data_from_api, create_plan
 from logic.athlete_status_processing import AthleteStatusProcessing
+from logic.training_volume_processing import TrainingVolumeProcessing
 from config import get_mongo_collection
 from utils import parse_datetime, format_date, format_datetime, fix_early_survey_event_date
 
@@ -67,6 +68,16 @@ def handle_daily_readiness_create(principal_id=None):
             if session is None:
                 continue
             survey_processor.create_session_from_survey(session)
+
+        # check if any of the non-ignored and non-deleted sessions are high load
+        high_relative_load_session_present = False
+        sport_name = None
+        for session in survey_processor.sessions:
+            if TrainingVolumeProcessing.is_last_session_high_relative_load(event_date, session, athlete_stats.high_relative_load_benchmarks):
+                high_relative_load_session_present = True
+                sport_name = session.sport_name
+        survey_processor.athlete_stats.high_relative_load_session = high_relative_load_session_present
+        survey_processor.athlete_stats.high_relative_load_session_sport_name = sport_name
 
     if "sleep_data" in request.json and len(request.json['sleep_data']) > 0:
         daily_sleep_data = DailySleepData(user_id=user_id,

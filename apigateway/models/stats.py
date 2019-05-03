@@ -75,6 +75,7 @@ class AthleteStats(Serialisable):
 
         self.muscular_strain_increasing = False
         self.high_relative_load_session = False
+        self.high_relative_load_session_sport_name = None
         self.high_relative_intensity_session = False
         self.high_relative_load_benchmarks = {}
 
@@ -271,7 +272,7 @@ class AthleteStats(Serialisable):
             full_list.append(new_part)
 
     def __setattr__(self, name, value):
-        if name == "current_sport_name":
+        if name in ["current_sport_name", "high_relative_load_session_sport_name"]:
             try:
                 value = SportName(value)
             except ValueError:
@@ -362,6 +363,7 @@ class AthleteStats(Serialisable):
             'wearable_devices': self.wearable_devices,
             'muscular_strain_increasing': self.muscular_strain_increasing,
             'high_relative_load_session': self.high_relative_load_session,
+            'high_relative_load_session_sport_name': self.high_relative_load_session_sport_name.value,
             'high_relative_intensity_session': self.high_relative_intensity_session,
             'high_relative_load_benchmarks': {sport_name.value: load for (sport_name, load) in
                                               self.high_relative_load_benchmarks.items()}

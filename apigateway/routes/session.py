@@ -32,7 +32,7 @@ def handle_session_create(principal_id=None):
 
     user_id = principal_id
     event_date = parse_datetime(request.json['event_date'])
-    training_volume_processing = TrainingVolumeProcessing(event_date, event_date)
+    # training_volume_processing = TrainingVolumeProcessing(event_date, event_date)
     plan_update_required = False
     train_later = False
     if 'sessions_planned' in request.json and request.json['sessions_planned']:
@@ -50,14 +50,17 @@ def handle_session_create(principal_id=None):
     # update daily pain and soreness in athlete_stats
     survey_processor.patch_daily_and_historic_soreness(survey='post_session')
 
-    # check that not all sessions are deleted or ignored
+    # check if any of the non-ignored and non-deleted sessions are high load
+    high_relative_load_session_present = False
+    sport_name = None
     for session in survey_processor.sessions:
         if not session.deleted and not session.ignored:
             plan_update_required = True
-            if training_volume_processing.is_last_session_high_relative_load(event_date, session, athlete_stats.high_relative_load_benchmarks):
-                athlete_stats.high_relative_load_session = True
-                athlete_stats_datastore.put(athlete_stats)
-            # break (need to check if any of the sessions are high load)
+            if TrainingVolumeProcessing.is_last_session_high_relative_load(event_date, session, athlete_stats.high_relative_load_benchmarks):
+                high_relative_load_session_present = True
+                sport_name = session.sport_name
+    survey_processor.athlete_stats.high_relative_load_session = high_relative_load_session_present
+    survey_processor.athlete_stats.high_relative_load_session_sport_name = sport_name
 
     # check if plan exists, if not create a new one and save it to database, also check if existing one needs updating flags
 
