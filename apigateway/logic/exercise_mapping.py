@@ -935,7 +935,7 @@ class ExerciseAssignmentCalculator(object):
         else:
             return None
 
-    def get_cold_water_immersion(self, soreness_list, event_date_time, ice_session):
+    def get_cold_water_immersion(self, soreness_list, event_date_time):
 
         cold_water_immersion = None
 
