@@ -970,7 +970,8 @@ class CoolDown(ModalityBase, Serialisable):
         self.high_relative_volume_logged = high_relative_load_session
         self.high_relative_intensity_logged = high_relative_intensity_logged
         self.muscular_strain_increasing = muscular_strain_increasing
-        self.dynamic_stretch_integrate_exercises = {}
+        self.dynamic_stretch_exercises = {}
+        self.dynamic_integrate_exercises = {}
 
     def json_serialise(self):
         ret = {
@@ -978,7 +979,8 @@ class CoolDown(ModalityBase, Serialisable):
             'high_relative_load_session': self.high_relative_volume_logged,
             'high_relative_intensity_logged': self.high_relative_intensity_logged,
             'muscular_strain_increasing': self.muscular_strain_increasing,
-            'dynamic_stretch_integrate_exercises': [p.json_serialise() for p in self.dynamic_stretch_integrate_exercises.values()],
+            'dynamic_stretch_exercises': [p.json_serialise() for p in self.dynamic_stretch_exercises.values()],
+            'dynamic_integrate_exercises': [p.json_serialise() for p in self.dynamic_integrate_exercises.values()],
             'start_date_time': format_datetime(self.start_date_time) if self.start_date_time is not None else None,
             'completed_date_time': format_datetime(self.completed_date_time) if self.completed_date_time is not None else None,
             'event_date_time': format_datetime(self.event_date_time) if self.event_date_time is not None else None,
@@ -994,7 +996,9 @@ class CoolDown(ModalityBase, Serialisable):
                        high_relative_intensity_logged=input_dict.get('high_relative_intensity_logged', False),
                        muscular_strain_increasing=input_dict.get('muscular_strain_increasing', False),
                        event_date_time=input_dict.get('event_date_time', None))
-        cooldown.dynamic_stretch_integrate_exercises = {s['library_id']: AssignedExercise.json_deserialise(s) for s in input_dict['dynamic_stretch_integrate_exercises']}
+        cooldown.dynamic_stretch_exercises = {s['library_id']: AssignedExercise.json_deserialise(s) for s in input_dict['dynamic_stretch_exercises']}
+        cooldown.dynamic_integrate_exercises = {s['library_id']: AssignedExercise.json_deserialise(s) for s in
+                                                        input_dict['dynamic_integrate_exercises']}
         cooldown.start_date_time = input_dict.get('start_date_time', None)
         cooldown.completed_date_time = input_dict.get('completed_date_time', None)
         cooldown.completed = input_dict.get('completed', False)
@@ -1015,7 +1019,8 @@ class CoolDown(ModalityBase, Serialisable):
         return False
 
     def set_exercise_dosage_ranking(self):
-        self.rank_dosages([self.dynamic_stretch_integrate_exercises])
+        self.rank_dosages([self.dynamic_stretch_exercises])
+        self.rank_dosages([self.dynamic_integrate_exercises])
 
     def check_recover_from_sport(self, soreness_list, exercise_library):
 
@@ -1036,8 +1041,10 @@ class CoolDown(ModalityBase, Serialisable):
 
             # Note: this is just returning the primary mover related exercises for sport
             if body_part is not None and not prohibiting_soreness:
-                self.copy_exercises(body_part.dynamic_stretch_integrate_exercises,
-                                    self.dynamic_stretch_integrate_exercises, goal, "1", None, exercise_library)
+                self.copy_exercises(body_part.dynamic_stretch_exercises,
+                                    self.dynamic_stretch_exercises, goal, "1", None, exercise_library)
+                self.copy_exercises(body_part.dynamic_integrate_exercises,
+                                    self.dynamic_integrate_exercises, goal, "1", None, exercise_library)
 
     def check_corrective(self, soreness, event_date_time, exercise_library):
 
