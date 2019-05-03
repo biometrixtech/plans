@@ -758,8 +758,10 @@ class ExerciseAssignmentCalculator(object):
 
         if (len(soreness_list) > 0 or athlete_stats.muscular_strain_increasing
                 or athlete_stats.high_relative_load_session):
-            active_rest = ActiveRestBeforeTraining()
-            active_rest.fill_exercises(soreness_list, event_date_time, self.exercise_library)
+            active_rest = ActiveRestBeforeTraining(athlete_stats.high_relative_load_session,
+                                                   athlete_stats.high_relative_intensity_session,
+                                                   athlete_stats.muscular_strain_increasing, event_date_time)
+            active_rest.fill_exercises(soreness_list, self.exercise_library)
             active_rest.set_plan_dosage(soreness_list)
             active_rest.set_exercise_dosage_ranking()
             return active_rest
@@ -770,8 +772,10 @@ class ExerciseAssignmentCalculator(object):
 
         if (len(soreness_list) > 0 or athlete_stats.muscular_strain_increasing
                 or athlete_stats.high_relative_load_session):
-            active_rest = ActiveRestAfterTraining()
-            active_rest.fill_exercises(soreness_list, event_date_time, self.exercise_library)
+            active_rest = ActiveRestAfterTraining(athlete_stats.high_relative_load_session,
+                                                  athlete_stats.high_relative_intensity_session,
+                                                  athlete_stats.muscular_strain_increasing, event_date_time)
+            active_rest.fill_exercises(soreness_list, self.exercise_library)
             active_rest.set_plan_dosage(soreness_list)
             active_rest.set_exercise_dosage_ranking()
             return active_rest
@@ -784,8 +788,8 @@ class ExerciseAssignmentCalculator(object):
 
         if (athlete_stats.muscular_strain_increasing or athlete_stats.high_relative_load_session
                 or len(soreness_list) > 0):
-            warm_up = WarmUp()
-            warm_up.fill_exercises(soreness_list, event_date_time, self.exercise_library)
+            warm_up = WarmUp(event_date_time)
+            warm_up.fill_exercises(soreness_list, self.exercise_library)
             warm_up.set_exercise_dosage_ranking()
 
         return warm_up
@@ -799,8 +803,11 @@ class ExerciseAssignmentCalculator(object):
                 if s.first_reported_date is not None and not s.is_dormant_cleared():
                     days_diff = (event_date_time - s.first_reported_date).days
                     if (not s.pain and days_diff > 30) or s.pain:
-                        cool_down = CoolDown(sport_name, athlete_stats.high_relative_load_session, False)
-                        cool_down.fill_exercises(soreness_list, event_date_time, self.exercise_library)
+                        cool_down = CoolDown(sport_name, athlete_stats.high_relative_load_session,
+                                             athlete_stats.high_relative_intensity_session,
+                                             athlete_stats.muscular_strain_increasing, event_date_time)
+                        cool_down.fill_exercises(soreness_list, self.exercise_library)
+                        cool_down.set_plan_dosage(soreness_list)
                         cool_down.set_exercise_dosage_ranking()
                         break
 
