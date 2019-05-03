@@ -138,6 +138,7 @@ class BodyPartFactory(object):
         dynamic_integrate_with_speed = {}
 
         upper_body.add_dynamic_exercise_phases(dynamic_stretch, dynamic_integrate, dynamic_integrate_with_speed)
+        return upper_body
 
     def get_lower_body(self):
 
@@ -147,6 +148,7 @@ class BodyPartFactory(object):
         dynamic_integrate_with_speed = {}
 
         lower_body.add_dynamic_exercise_phases(dynamic_stretch, dynamic_integrate, dynamic_integrate_with_speed)
+        return lower_body
 
     def get_full_body(self):
 
@@ -156,6 +158,7 @@ class BodyPartFactory(object):
         dynamic_integrate_with_speed = {}
 
         full_body.add_dynamic_exercise_phases(dynamic_stretch, dynamic_integrate, dynamic_integrate_with_speed)
+        return full_body
 
     def get_calves(self):
         calves = BodyPart(BodyPartLocation.calves, 10)
