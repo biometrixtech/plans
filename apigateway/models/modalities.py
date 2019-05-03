@@ -1,6 +1,7 @@
 from serialisable import Serialisable
 from models.soreness import BodyPart, BodyPartLocation, AssignedExercise, HistoricSorenessStatus, AthleteGoal, AthleteGoalType, ExerciseDosage
 from models.body_parts import BodyPartFactory
+from models.sport import SportName
 from utils import parse_datetime, format_datetime
 import abc
 import datetime
@@ -47,6 +48,12 @@ class HeatSession(Serialisable):
         if name in ['event_date_time', 'start_date_time', 'completed_date_time']:
             if value is not None and not isinstance(value, datetime.datetime):
                 value = parse_datetime(value)
+        elif name == 'sport_name':
+            try:
+                value = SportName(value)
+            except ValueError:
+                value = SportName(None)
+
         super().__setattr__(name, value)
 
 
@@ -938,7 +945,7 @@ class CoolDown(ModalityBase, Serialisable):
 
     def json_serialise(self):
         ret = {
-            'sport_name': self.sport_name,
+            'sport_name': self.sport_name.value,
             'high_relative_load_session': self.high_relative_volume_logged,
             'high_relative_intensity_logged': self.high_relative_intensity_logged,
             'muscular_strain_increasing': self.muscular_strain_increasing,
