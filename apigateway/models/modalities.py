@@ -6,14 +6,14 @@ import abc
 import datetime
 
 
-
 class HeatSession(Serialisable):
-    def __init__(self):
+    def __init__(self, minutes=0):
         self.start_date_time = None
         self.event_date_time = None
         self.completed = False
         self.active = True
         self.body_parts = []
+        self.minutes = minutes
 
     def json_serialise(self):
 
@@ -45,8 +45,8 @@ class HeatSession(Serialisable):
 
 
 class Heat(Serialisable):
-    def __init__(self, minutes=0, body_part_location=None, side=0):
-        self.minutes = minutes
+    def __init__(self, body_part_location=None, side=0):
+
         self.body_part_location = body_part_location
         self.side = side
         self.before_training = True
