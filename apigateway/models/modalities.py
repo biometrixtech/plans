@@ -164,7 +164,7 @@ class ModalityBase(object):
 
         if (dosage.goal.goal_type == AthleteGoalType.sore and
                 (dosage.soreness_source.historic_soreness_status is None or
-                 dosage.soreness_source.historic_soreness_status.is_dormant_cleared()) or
+                 dosage.soreness_source.is_dormant_cleared()) or
                 dosage.goal.goal_type == AthleteGoalType.sport or
                 dosage.goal.goal_type == AthleteGoalType.preempt_sport or
                 dosage.goal.goal_type == AthleteGoalType.preempt_personalized_sport or
