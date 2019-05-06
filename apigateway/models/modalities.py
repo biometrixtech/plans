@@ -166,6 +166,7 @@ class ModalityBase(object):
 
         if dosage.soreness_source is None:
             dosage.soreness_source = Soreness()
+            dosage.soreness_source.body_part = BodyPart(BodyPartLocation(13), 0)
             dosage.soreness_source.severity = 0.4
 
         # end temporary fix
