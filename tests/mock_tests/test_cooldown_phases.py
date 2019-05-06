@@ -50,7 +50,7 @@ def test_cooldown_check_soreness_severity_4():
     assert len(cooldown.dynamic_integrate_exercises) == 0
 
 
-def test_cooldown_check_corrective_severity_3():
+def test_cooldown_check_corrective_soreness_severity_3():
 
     current_date_time = datetime.today()
     cooldown = CoolDown(SportName.cycling, True, False, False, event_date_time=current_date_time)
@@ -70,7 +70,7 @@ def test_cooldown_check_corrective_severity_3():
     # assert len(cooldown.dynamic_integrate_exercises) > 0
 
 
-def test_cooldown_check_corrective_severity_4():
+def test_cooldown_check_corrective_soreness_severity_4():
 
     current_date_time = datetime.today()
     cooldown = CoolDown(SportName.cycling, True, False, False, event_date_time=current_date_time)
@@ -80,6 +80,45 @@ def test_cooldown_check_corrective_severity_4():
     soreness.severity = 4
     soreness.side = 1
     soreness.historic_soreness_status = HistoricSorenessStatus.persistent_soreness
+    historic_date_time = current_date_time - timedelta(days=31)
+    soreness.first_reported_date = historic_date_time
+    exercise_library = exercise_library_datastore.get()
+    cooldown.check_corrective(soreness, current_date_time, exercise_library)
+
+    assert len(cooldown.dynamic_stretch_exercises) == 0
+    assert len(cooldown.dynamic_integrate_exercises) == 0
+
+
+def test_cooldown_check_corrective_pain_severity_3():
+
+    current_date_time = datetime.today()
+    cooldown = CoolDown(SportName.cycling, True, False, False, event_date_time=current_date_time)
+
+    soreness = Soreness()
+    soreness.body_part = BodyPart(BodyPartLocation.lower_back, None)
+    soreness.severity = 3
+    soreness.side = 1
+    soreness.historic_soreness_status = HistoricSorenessStatus.persistent_pain
+    historic_date_time = current_date_time - timedelta(days=31)
+    soreness.first_reported_date = historic_date_time
+    exercise_library = exercise_library_datastore.get()
+    cooldown.check_corrective(soreness, current_date_time, exercise_library)
+
+    assert len(cooldown.dynamic_stretch_exercises) > 0
+    # dynamic integrate not defined yet
+    # assert len(cooldown.dynamic_integrate_exercises) > 0
+
+
+def test_cooldown_check_corrective_pain_severity_4():
+
+    current_date_time = datetime.today()
+    cooldown = CoolDown(SportName.cycling, True, False, False, event_date_time=current_date_time)
+
+    soreness = Soreness()
+    soreness.body_part = BodyPart(BodyPartLocation.hip_flexor, None)
+    soreness.severity = 4
+    soreness.side = 1
+    soreness.historic_soreness_status = HistoricSorenessStatus.persistent_pain
     historic_date_time = current_date_time - timedelta(days=31)
     soreness.first_reported_date = historic_date_time
     exercise_library = exercise_library_datastore.get()

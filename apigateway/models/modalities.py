@@ -1059,7 +1059,8 @@ class CoolDown(ModalityBase, Serialisable):
 
         if soreness.historic_soreness_status is not None and soreness.first_reported_date is not None and not soreness.is_dormant_cleared():
             days_sore = (event_date_time - soreness.first_reported_date).days
-            if soreness.pain or days_sore > 30:
+            if (soreness.is_acute_pain() or soreness.is_persistent_pain() or soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_pain or
+                (soreness.is_persistent_soreness() or soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_soreness and days_sore > 30)):
                 goal = AthleteGoal("Personalized Prepare for Training (Identified Dysfunction)", 1, AthleteGoalType.preempt_corrective)
                 goal.trigger = "Pers, Pers-2 Soreness > 30d or Historic Pain"
 
