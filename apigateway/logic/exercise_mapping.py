@@ -1,12 +1,13 @@
 import models.soreness
-#from logic.exercise_generator import ExerciseAssignments
-import logic.soreness_processing as soreness_and_injury
+# from logic.exercise_generator import ExerciseAssignments
+# import logic.soreness_processing as soreness_and_injury
 from models.exercise import ExerciseBuckets, Phase
-from models.soreness import AthleteGoal, AthleteGoalType, AssignedExercise, BodyPartLocation, HistoricSorenessStatus, Soreness, BodyPart
-from logic.goal_focus_text_generator import RecoveryTextGenerator
-from datetime import  timedelta
-from utils import format_datetime, parse_date
 from models.modalities import ActiveRestBeforeTraining, ActiveRestAfterTraining, ColdWaterImmersion, CoolDown, Heat, WarmUp, Ice, HeatSession, IceSession
+from models.soreness import AthleteGoal, AthleteGoalType, AssignedExercise, BodyPartLocation, HistoricSorenessStatus, Soreness, BodyPart
+from models.sport import SportName
+# from logic.goal_focus_text_generator import RecoveryTextGenerator
+# from datetime import  timedelta
+# from utils import format_datetime, parse_date
 
 
 class ExerciseAssignmentCalculator(object):
@@ -810,7 +811,9 @@ class ExerciseAssignmentCalculator(object):
     def get_cool_down(self, athlete_stats, soreness_list, event_date_time):
 
         cool_down = None
-
+        # defaults so that we always get cool down
+        athlete_stats.high_relative_load_session = True
+        athlete_stats.high_relative_load_session_sport_name = SportName.distance_running
         if athlete_stats.high_relative_load_session or athlete_stats.high_relative_intensity_session:
             #for s in soreness_list:
             #    if s.first_reported_date is not None and not s.is_dormant_cleared():
@@ -965,9 +968,11 @@ class ExerciseAssignmentCalculator(object):
 
         return ice_session
 
-    def is_lower_body_part(self, body_part_location):
+    @staticmethod
+    def is_lower_body_part(body_part_location):
 
-        if (body_part_location == BodyPartLocation.hip_flexor or
+        if (
+                body_part_location == BodyPartLocation.hip_flexor or
                 body_part_location == BodyPartLocation.knee or
                 body_part_location == BodyPartLocation.ankle or
                 body_part_location == BodyPartLocation.foot or
