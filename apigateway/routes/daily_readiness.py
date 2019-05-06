@@ -57,9 +57,11 @@ def handle_daily_readiness_create(principal_id=None):
     survey_processor = SurveyProcessing(user_id, event_date, athlete_stats, datastore_collection)
 
     if 'sessions_planned' in request.json and not request.json['sessions_planned']:
+        print('sessions_planned_false')
         sessions_planned = False
         train_later = False
     if 'sessions' in request.json and len(request.json['sessions']) > 0:
+        print('len_sessions>0')
         sessions_planned = True
         for session in request.json['sessions']:
             if session is None:
@@ -87,6 +89,7 @@ def handle_daily_readiness_create(principal_id=None):
         plan.training_sessions = survey_processor.sessions
     plan.sessions_planned = sessions_planned
     plan.train_later = train_later
+    print(plan.train_later)
     if len(survey_processor.heart_rate_data) > 0:
         heart_rate_datastore.put(survey_processor.heart_rate_data)
 
