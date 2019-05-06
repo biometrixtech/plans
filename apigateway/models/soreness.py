@@ -225,9 +225,11 @@ class BodyPartLocation(Enum):
     elbow = 19
     wrist = 20
     lats = 21
-    upper_body = 22
-    lower_body = 23
-    full_body = 24
+    biceps = 22
+    triceps = 23
+    upper_body = 91
+    lower_body = 92
+    full_body = 93
 
 
 class BodyPart(object):
