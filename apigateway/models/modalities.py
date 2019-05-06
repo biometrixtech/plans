@@ -1,5 +1,5 @@
 from serialisable import Serialisable
-from models.soreness import BodyPart, BodyPartLocation, AssignedExercise, HistoricSorenessStatus, AthleteGoal, AthleteGoalType, ExerciseDosage
+from models.soreness import BodyPart, BodyPartLocation, AssignedExercise, HistoricSorenessStatus, AthleteGoal, AthleteGoalType, ExerciseDosage, Soreness
 from models.body_parts import BodyPartFactory
 from models.sport import SportName
 from utils import parse_datetime, format_datetime
@@ -161,6 +161,14 @@ class ModalityBase(object):
 
     @staticmethod
     def update_dosage(dosage, exercise):
+
+        # temporary fix for cooldown
+
+        if dosage.soreness_source is None:
+            dosage.soreness_source = Soreness()
+            dosage.soreness_source.severity = 0.4
+
+        # end temporary fix
 
         if (dosage.goal.goal_type == AthleteGoalType.sore and
                 (dosage.soreness_source.historic_soreness_status is None or
