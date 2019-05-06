@@ -88,7 +88,6 @@ class TrainingPlanManager(object):
         # soreness_values = [s.severity for s in soreness_list if s.severity is not None and s.daily]
 
         # new modalities
-        self.daily_plan.train_later = False
         if not self.daily_plan.train_later:
             # if any completed post-training modalities exist, preserve them
             if self.daily_plan.cool_down is not None and self.daily_plan.cool_down.completed:
