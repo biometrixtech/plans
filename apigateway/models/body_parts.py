@@ -1,6 +1,6 @@
 from models.soreness import BodyPart, BodyPartLocation
 from models.sport import SportName
-
+import random
 
 class BodyPartFactory(object):
     def get_progression_list(self, exercise):
@@ -39,8 +39,14 @@ class BodyPartFactory(object):
 
         exercise_dict = {}
 
-        for e in exercise_list:
-            exercise_dict[e] = self.get_progression_list(e)
+        # pick on exercise from the list:
+        position = random.randint(0, len(exercise_list) - 1)
+
+        # ignoring progressions for now
+        #for e in exercise_list:
+        #    exercise_dict[e] = self.get_progression_list(e)
+
+        exercise_dict[exercise_list[position]] = []
 
         return exercise_dict
 
