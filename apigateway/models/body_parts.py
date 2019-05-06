@@ -50,6 +50,16 @@ class BodyPartFactory(object):
 
         return exercise_dict
 
+    def get_full_exercise_dictionary(self, exercise_list):
+
+        exercise_dict = {}
+
+        # ignoring progressions for now
+        for e in exercise_list:
+            exercise_dict[e] = []
+
+        return exercise_dict
+
     def get_body_part_for_sport(self, sport_name):
 
         full_body_list = [SportName.basketball, SportName.football, SportName.general_fitness, SportName.gymnastics,
@@ -165,8 +175,8 @@ class BodyPartFactory(object):
     def get_upper_body(self):
 
         upper_body = BodyPart(BodyPartLocation.upper_body, 22)
-        dynamic_stretch = self.get_exercise_dictionary([162, 180, 181, 179])
-        dynamic_integrate = self.get_exercise_dictionary([145, 184, 148, 185])
+        dynamic_stretch = self.get_full_exercise_dictionary([162, 180, 181, 179])
+        dynamic_integrate = self.get_full_exercise_dictionary([145, 184, 148, 185])
         dynamic_integrate_with_speed = {}
 
         upper_body.add_dynamic_exercise_phases(dynamic_stretch, dynamic_integrate, dynamic_integrate_with_speed)
@@ -175,8 +185,8 @@ class BodyPartFactory(object):
     def get_lower_body(self):
 
         lower_body = BodyPart(BodyPartLocation.lower_body, 23)
-        dynamic_stretch = self.get_exercise_dictionary([139, 142, 143, 163, 161, 176])
-        dynamic_integrate = self.get_exercise_dictionary([147, 149, 150, 206, 183, 182])
+        dynamic_stretch = self.get_full_exercise_dictionary([139, 142, 143, 163, 161, 176])
+        dynamic_integrate = self.get_full_exercise_dictionary([147, 149, 150, 206, 183, 182])
         dynamic_integrate_with_speed = {}
 
         lower_body.add_dynamic_exercise_phases(dynamic_stretch, dynamic_integrate, dynamic_integrate_with_speed)
@@ -185,8 +195,8 @@ class BodyPartFactory(object):
     def get_full_body(self):
 
         full_body = BodyPart(BodyPartLocation.full_body, 24)
-        dynamic_stretch = self.get_exercise_dictionary([141, 144, 164, 177, 178, 193, 165, 140])
-        dynamic_integrate = self.get_exercise_dictionary([146, 203, 204, 205, 207, 151, 169])
+        dynamic_stretch = self.get_full_exercise_dictionary([141, 144, 164, 177, 178, 193, 165, 140])
+        dynamic_integrate = self.get_full_exercise_dictionary([146, 203, 204, 205, 207, 151, 169])
         dynamic_integrate_with_speed = {}
 
         full_body.add_dynamic_exercise_phases(dynamic_stretch, dynamic_integrate, dynamic_integrate_with_speed)
