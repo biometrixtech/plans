@@ -3,10 +3,10 @@ xray_recorder.configure(sampling=False)
 xray_recorder.begin_segment(name="test")
 
 import pytest
-from datetime import datetime
-from utils import format_datetime
+from datetime import datetime, timedelta
+from utils import format_datetime, parse_datetime
 from models.soreness import BodyPart, BodyPartLocation, HistoricSoreness, HistoricSorenessStatus, Soreness
-from models.modalities import ActiveRestAfterTraining
+from models.modalities import ActiveRestAfterTraining, ActiveRestBeforeTraining
 from tests.mocks.mock_exercise_datastore import ExerciseLibraryDatastore
 from tests.mocks.mock_completed_exercise_datastore import CompletedExerciseDatastore
 
@@ -18,10 +18,12 @@ completed_exercise_datastore = CompletedExerciseDatastore()
 def load_exercises():
     exercise_library_datastore.side_load_exericse_list_from_csv()
 
+# post active rest
+
 
 def test_active_rest_after_training_check_soreness_severity_3():
 
-    active_rest = ActiveRestAfterTraining(False, False, False, event_date_time=format_datetime(datetime.today()))
+    active_rest = ActiveRestAfterTraining(False, False, False, event_date_time=datetime.today())
 
     soreness = Soreness()
     soreness.body_part = BodyPart(BodyPartLocation.ankle, None)
@@ -38,7 +40,7 @@ def test_active_rest_after_training_check_soreness_severity_3():
 
 def test_active_rest_after_training_check_soreness_severity_4():
 
-    active_rest = ActiveRestAfterTraining(False, False, False, event_date_time=format_datetime(datetime.today()))
+    active_rest = ActiveRestAfterTraining(False, False, False, event_date_time=datetime.today())
 
     soreness = Soreness()
     soreness.body_part = BodyPart(BodyPartLocation.ankle, None)
@@ -53,9 +55,135 @@ def test_active_rest_after_training_check_soreness_severity_4():
     assert len(active_rest.static_integrate_exercises) == 0
 
 
+def test_active_rest_after_training_check_prevention_soreness_severity_2():
+
+    current_date_time = datetime.today()
+    active_rest = ActiveRestAfterTraining(False, False, False, event_date_time=current_date_time)
+
+    soreness = Soreness()
+    soreness.body_part = BodyPart(BodyPartLocation.ankle, None)
+    soreness.severity = 2
+    soreness.side = 1
+    soreness.historic_soreness_status = HistoricSorenessStatus.persistent_soreness
+    historic_date_time = current_date_time - timedelta(days=31)
+    soreness.first_reported_date = historic_date_time
+    exercise_library = exercise_library_datastore.get()
+    active_rest.check_prevention_soreness(soreness, current_date_time, exercise_library)
+
+    assert len(active_rest.inhibit_exercises) > 0
+    assert len(active_rest.static_stretch_exercises) > 0
+    assert len(active_rest.isolated_activate_exercises) > 0
+    assert len(active_rest.static_integrate_exercises) > 0
+
+
+def test_active_rest_after_training_check_prevention_soreness_severity_3():
+
+    current_date_time = datetime.today()
+    active_rest = ActiveRestAfterTraining(False, False, False, event_date_time=current_date_time)
+
+    soreness = Soreness()
+    soreness.body_part = BodyPart(BodyPartLocation.ankle, None)
+    soreness.severity = 3
+    soreness.side = 1
+    soreness.historic_soreness_status = HistoricSorenessStatus.persistent_soreness
+    historic_date_time = current_date_time - timedelta(days=31)
+    soreness.first_reported_date = historic_date_time
+    exercise_library = exercise_library_datastore.get()
+    active_rest.check_prevention_soreness(soreness, current_date_time, exercise_library)
+
+    assert len(active_rest.inhibit_exercises) > 0
+    assert len(active_rest.static_stretch_exercises) > 0
+    assert len(active_rest.isolated_activate_exercises) > 0
+    assert len(active_rest.static_integrate_exercises) == 0
+
+
+def test_active_rest_after_training_check_prevention_soreness_severity_4():
+
+    current_date_time = datetime.today()
+    active_rest = ActiveRestAfterTraining(False, False, False, event_date_time=current_date_time)
+
+    soreness = Soreness()
+    soreness.body_part = BodyPart(BodyPartLocation.ankle, None)
+    soreness.severity = 4
+    soreness.side = 1
+    soreness.historic_soreness_status = HistoricSorenessStatus.persistent_soreness
+    historic_date_time = current_date_time - timedelta(days=31)
+    soreness.first_reported_date = historic_date_time
+    exercise_library = exercise_library_datastore.get()
+    active_rest.check_prevention_soreness(soreness, current_date_time, exercise_library)
+
+    assert len(active_rest.inhibit_exercises) > 0
+    assert len(active_rest.static_stretch_exercises) == 0
+    assert len(active_rest.isolated_activate_exercises) == 0
+    assert len(active_rest.static_integrate_exercises) == 0
+
+
+def test_active_rest_after_training_check_prevention_pain_severity_2():
+
+    current_date_time = datetime.today()
+    active_rest = ActiveRestAfterTraining(False, False, False, event_date_time=current_date_time)
+
+    soreness = Soreness()
+    soreness.body_part = BodyPart(BodyPartLocation.ankle, None)
+    soreness.severity = 2
+    soreness.side = 1
+    soreness.historic_soreness_status = HistoricSorenessStatus.persistent_pain
+    historic_date_time = current_date_time - timedelta(days=31)
+    soreness.first_reported_date = historic_date_time
+    exercise_library = exercise_library_datastore.get()
+    active_rest.check_prevention_pain(soreness, current_date_time, exercise_library)
+
+    assert len(active_rest.inhibit_exercises) > 0
+    assert len(active_rest.static_stretch_exercises) > 0
+    assert len(active_rest.isolated_activate_exercises) > 0
+    assert len(active_rest.static_integrate_exercises) > 0
+
+
+def test_active_rest_after_training_check_prevention_pain_severity_3():
+
+    current_date_time = datetime.today()
+    active_rest = ActiveRestAfterTraining(False, False, False, event_date_time=current_date_time)
+
+    soreness = Soreness()
+    soreness.body_part = BodyPart(BodyPartLocation.ankle, None)
+    soreness.severity = 3
+    soreness.side = 1
+    soreness.historic_soreness_status = HistoricSorenessStatus.persistent_pain
+    historic_date_time = current_date_time - timedelta(days=31)
+    soreness.first_reported_date = historic_date_time
+    exercise_library = exercise_library_datastore.get()
+    active_rest.check_prevention_pain(soreness, current_date_time, exercise_library)
+
+    assert len(active_rest.inhibit_exercises) > 0
+    assert len(active_rest.static_stretch_exercises) > 0
+    assert len(active_rest.isolated_activate_exercises) > 0
+    assert len(active_rest.static_integrate_exercises) == 0
+
+
+def test_active_rest_after_training_check_prevention_pain_severity_4():
+
+    current_date_time = datetime.today()
+    active_rest = ActiveRestAfterTraining(False, False, False, event_date_time=current_date_time)
+
+    soreness = Soreness()
+    soreness.body_part = BodyPart(BodyPartLocation.ankle, None)
+    soreness.severity = 4
+    soreness.side = 1
+    soreness.historic_soreness_status = HistoricSorenessStatus.persistent_pain
+    historic_date_time = current_date_time - timedelta(days=31)
+    soreness.first_reported_date = historic_date_time
+    exercise_library = exercise_library_datastore.get()
+    active_rest.check_prevention_pain(soreness, current_date_time, exercise_library)
+
+    assert len(active_rest.inhibit_exercises) > 0
+    assert len(active_rest.static_stretch_exercises) == 0
+    assert len(active_rest.isolated_activate_exercises) == 0
+    assert len(active_rest.static_integrate_exercises) == 0
+
+
 def test_active_rest_after_training_check_pain_severity_3():
 
-    active_rest = ActiveRestAfterTraining(False, False, False, event_date_time=format_datetime(datetime.today()))
+    active_rest = ActiveRestAfterTraining(False, False, False, event_date_time=datetime.today())
 
     soreness = Soreness()
     soreness.body_part = BodyPart(BodyPartLocation.ankle, None)
@@ -73,7 +201,7 @@ def test_active_rest_after_training_check_pain_severity_3():
 
 def test_active_rest_after_training_check_pain_severity_4():
 
-    active_rest = ActiveRestAfterTraining(False, False, False, event_date_time=format_datetime(datetime.today()))
+    active_rest = ActiveRestAfterTraining(False, False, False, event_date_time=datetime.today())
 
     soreness = Soreness()
     soreness.body_part = BodyPart(BodyPartLocation.ankle, None)
@@ -89,6 +217,203 @@ def test_active_rest_after_training_check_pain_severity_4():
     assert len(active_rest.static_integrate_exercises) == 0
 
 
+# pre active rest
+
+
+def test_active_rest_before_training_check_soreness_severity_3():
+
+    active_rest = ActiveRestBeforeTraining(False, False, False, event_date_time=datetime.today())
+
+    soreness = Soreness()
+    soreness.body_part = BodyPart(BodyPartLocation.ankle, None)
+    soreness.severity = 3
+    soreness.side = 1
+    exercise_library = exercise_library_datastore.get()
+    active_rest.check_reactive_care_soreness(soreness, exercise_library)
+
+    assert len(active_rest.inhibit_exercises) > 0
+    assert len(active_rest.static_stretch_exercises) > 0
+    assert len(active_rest.isolated_activate_exercises) == 0
+    assert len(active_rest.static_integrate_exercises) == 0
+
+
+def test_active_rest_before_training_check_soreness_severity_4():
+
+    active_rest = ActiveRestBeforeTraining(False, False, False, event_date_time=datetime.today())
+
+    soreness = Soreness()
+    soreness.body_part = BodyPart(BodyPartLocation.ankle, None)
+    soreness.severity = 4
+    soreness.side = 1
+    exercise_library = exercise_library_datastore.get()
+    active_rest.check_reactive_care_soreness(soreness, exercise_library)
+
+    assert len(active_rest.inhibit_exercises) > 0
+    assert len(active_rest.static_stretch_exercises) == 0
+    assert len(active_rest.isolated_activate_exercises) == 0
+    assert len(active_rest.static_integrate_exercises) == 0
+
+
+def test_active_rest_before_training_check_prevention_soreness_severity_2():
+
+    current_date_time = datetime.today()
+    active_rest = ActiveRestBeforeTraining(False, False, False, event_date_time=current_date_time)
+
+    soreness = Soreness()
+    soreness.body_part = BodyPart(BodyPartLocation.ankle, None)
+    soreness.severity = 2
+    soreness.side = 1
+    soreness.historic_soreness_status = HistoricSorenessStatus.persistent_soreness
+    historic_date_time = current_date_time - timedelta(days=31)
+    soreness.first_reported_date = historic_date_time
+    exercise_library = exercise_library_datastore.get()
+    active_rest.check_prevention_soreness(soreness, current_date_time, exercise_library)
+
+    assert len(active_rest.inhibit_exercises) > 0
+    assert len(active_rest.static_stretch_exercises) > 0
+    assert len(active_rest.isolated_activate_exercises) > 0
+    assert len(active_rest.static_integrate_exercises) > 0
+
+
+def test_active_rest_before_training_check_prevention_soreness_severity_3():
+
+    current_date_time = datetime.today()
+    active_rest = ActiveRestBeforeTraining(False, False, False, event_date_time=current_date_time)
+
+    soreness = Soreness()
+    soreness.body_part = BodyPart(BodyPartLocation.ankle, None)
+    soreness.severity = 3
+    soreness.side = 1
+    soreness.historic_soreness_status = HistoricSorenessStatus.persistent_soreness
+    historic_date_time = current_date_time - timedelta(days=31)
+    soreness.first_reported_date = historic_date_time
+    exercise_library = exercise_library_datastore.get()
+    active_rest.check_prevention_soreness(soreness, current_date_time, exercise_library)
+
+    assert len(active_rest.inhibit_exercises) > 0
+    assert len(active_rest.static_stretch_exercises) > 0
+    assert len(active_rest.isolated_activate_exercises) > 0
+    assert len(active_rest.static_integrate_exercises) == 0
+
+
+def test_active_rest_befpre_training_check_prevention_soreness_severity_4():
+
+    current_date_time = datetime.today()
+    active_rest = ActiveRestBeforeTraining(False, False, False, event_date_time=current_date_time)
+
+    soreness = Soreness()
+    soreness.body_part = BodyPart(BodyPartLocation.ankle, None)
+    soreness.severity = 4
+    soreness.side = 1
+    soreness.historic_soreness_status = HistoricSorenessStatus.persistent_soreness
+    historic_date_time = current_date_time - timedelta(days=31)
+    soreness.first_reported_date = historic_date_time
+    exercise_library = exercise_library_datastore.get()
+    active_rest.check_prevention_soreness(soreness, current_date_time, exercise_library)
+
+    assert len(active_rest.inhibit_exercises) > 0
+    assert len(active_rest.static_stretch_exercises) == 0
+    assert len(active_rest.isolated_activate_exercises) == 0
+    assert len(active_rest.static_integrate_exercises) == 0
+
+
+def test_active_rest_before_training_check_prevention_pain_severity_2():
+
+    current_date_time = datetime.today()
+    active_rest = ActiveRestBeforeTraining(False, False, False, event_date_time=current_date_time)
+
+    soreness = Soreness()
+    soreness.body_part = BodyPart(BodyPartLocation.ankle, None)
+    soreness.severity = 2
+    soreness.side = 1
+    soreness.historic_soreness_status = HistoricSorenessStatus.persistent_pain
+    historic_date_time = current_date_time - timedelta(days=31)
+    soreness.first_reported_date = historic_date_time
+    exercise_library = exercise_library_datastore.get()
+    active_rest.check_prevention_pain(soreness, current_date_time, exercise_library)
+
+    assert len(active_rest.inhibit_exercises) > 0
+    assert len(active_rest.static_stretch_exercises) > 0
+    assert len(active_rest.isolated_activate_exercises) > 0
+    assert len(active_rest.static_integrate_exercises) > 0
+
+
+def test_active_rest_before_training_check_prevention_pain_severity_3():
+
+    current_date_time = datetime.today()
+    active_rest = ActiveRestBeforeTraining(False, False, False, event_date_time=current_date_time)
+
+    soreness = Soreness()
+    soreness.body_part = BodyPart(BodyPartLocation.ankle, None)
+    soreness.severity = 3
+    soreness.side = 1
+    soreness.historic_soreness_status = HistoricSorenessStatus.persistent_pain
+    historic_date_time = current_date_time - timedelta(days=31)
+    soreness.first_reported_date = historic_date_time
+    exercise_library = exercise_library_datastore.get()
+    active_rest.check_prevention_pain(soreness, current_date_time, exercise_library)
+
+    assert len(active_rest.inhibit_exercises) > 0
+    assert len(active_rest.static_stretch_exercises) > 0
+    assert len(active_rest.isolated_activate_exercises) > 0
+    assert len(active_rest.static_integrate_exercises) == 0
+
+
+def test_active_rest_before_training_check_prevention_pain_severity_4():
+
+    current_date_time = datetime.today()
+    active_rest = ActiveRestBeforeTraining(False, False, False, event_date_time=current_date_time)
+
+    soreness = Soreness()
+    soreness.body_part = BodyPart(BodyPartLocation.ankle, None)
+    soreness.severity = 4
+    soreness.side = 1
+    soreness.historic_soreness_status = HistoricSorenessStatus.persistent_pain
+    historic_date_time = current_date_time - timedelta(days=31)
+    soreness.first_reported_date = historic_date_time
+    exercise_library = exercise_library_datastore.get()
+    active_rest.check_prevention_pain(soreness, current_date_time, exercise_library)
+
+    assert len(active_rest.inhibit_exercises) > 0
+    assert len(active_rest.static_stretch_exercises) == 0
+    assert len(active_rest.isolated_activate_exercises) == 0
+    assert len(active_rest.static_integrate_exercises) == 0
+
+
+def test_active_rest_before_training_check_pain_severity_3():
+
+    active_rest = ActiveRestBeforeTraining(False, False, False, event_date_time=datetime.today())
+
+    soreness = Soreness()
+    soreness.body_part = BodyPart(BodyPartLocation.ankle, None)
+    soreness.severity = 3
+    soreness.side = 1
+    soreness.pain = True
+    exercise_library = exercise_library_datastore.get()
+    active_rest.check_reactive_care_pain(soreness, exercise_library)
+
+    assert len(active_rest.inhibit_exercises) > 0
+    assert len(active_rest.static_stretch_exercises) > 0
+    assert len(active_rest.isolated_activate_exercises) == 0
+    assert len(active_rest.static_integrate_exercises) == 0
+
+
+def test_active_rest_before_training_check_pain_severity_4():
+
+    active_rest = ActiveRestBeforeTraining(False, False, False, event_date_time=datetime.today())
+
+    soreness = Soreness()
+    soreness.body_part = BodyPart(BodyPartLocation.ankle, None)
+    soreness.severity = 4
+    soreness.side = 1
+    soreness.pain = True
+    exercise_library = exercise_library_datastore.get()
+    active_rest.check_reactive_care_pain(soreness, exercise_library)
+
+    assert len(active_rest.inhibit_exercises) > 0
+    assert len(active_rest.static_stretch_exercises) == 0
+    assert len(active_rest.isolated_activate_exercises) == 0
+    assert len(active_rest.static_integrate_exercises) == 0
 
 
 '''deprecated
