@@ -1081,14 +1081,20 @@ class CoolDown(ModalityBase, Serialisable):
                 agonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None))
                 if agonist is not None:
                     if soreness.severity < 3.5:
-                        self.copy_exercises(agonist.dynamic_stretch_integrate_exercises, self.dynamic_stretch_integrate_exercises, goal,
+                        self.copy_exercises(agonist.dynamic_stretch_exercises, self.dynamic_stretch_exercises, goal,
+                                            "1", soreness,
+                                            exercise_library)
+                        self.copy_exercises(agonist.dynamic_integrate_exercises, self.dynamic_integrate_exercises, goal,
                                             "1", soreness,
                                             exercise_library)
 
             for y in body_part.synergists:
                 synergist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(y), None))
                 if synergist is not None:
-                    self.copy_exercises(synergist.dynamic_stretch_integrate_exercises, self.dynamic_stretch_integrate_exercises, goal, "2",
+                    self.copy_exercises(synergist.dynamic_stretch_exercises, self.dynamic_stretch_exercises, goal, "2",
+                                        soreness,
+                                        exercise_library)
+                    self.copy_exercises(synergist.dynamic_integrate_exercises, self.dynamic_integrate_exercises, goal, "2",
                                         soreness,
                                         exercise_library)
 
