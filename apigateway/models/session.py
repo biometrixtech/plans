@@ -288,9 +288,9 @@ class SessionFactory(object):
 
     def create(self, session_type: SessionType):
 
-        if session_type == SessionType.practice:
-            session_object = PracticeSession()
-        elif session_type == SessionType.game:
+        #if session_type == SessionType.practice:
+        #    session_object = PracticeSession()
+        if session_type == SessionType.game:
             session_object = Game()
         elif session_type == SessionType.bump_up:
             session_object = BumpUpSession()
@@ -324,7 +324,7 @@ class BumpUpSession(Session):
     def missing_post_session_survey(self):
         return Session.missing_post_session_survey()
 
-
+'''Deprecated
 class PracticeSession(Session):
     def __init__(self):
         Session.__init__(self)
@@ -339,7 +339,7 @@ class PracticeSession(Session):
 
     def missing_post_session_survey(self):
         return Session.missing_post_session_survey()
-
+'''
 
 class SportTrainingSession(Session):
     def __init__(self):

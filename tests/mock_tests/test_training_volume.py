@@ -1,5 +1,9 @@
+from aws_xray_sdk.core import xray_recorder
+xray_recorder.configure(sampling=False)
+xray_recorder.begin_segment(name="test")
+
 from models.daily_plan import DailyPlan
-from models.session import PracticeSession, SessionType
+from models.session import SportTrainingSession, SessionType
 from models.post_session_survey import PostSurvey, PostSessionSurvey
 from models.daily_readiness import DailyReadiness
 from models.stats import AthleteStats
@@ -33,13 +37,13 @@ def get_daily_plans(start_date, rpe_list, time_list):
 
     for d in range(0, len(dates)):
         daily_plan = DailyPlan(event_date=dates[d].strftime("%Y-%m-%d"))
-        practice_session = PracticeSession()
-        practice_session.event_date = dates[d]
+        session = SportTrainingSession()
+        session.event_date = dates[d]
         post_survey = TestUtilities().get_post_survey(rpe_list[d], [])
         post_session = PostSurvey(survey=post_survey, event_date=dates[d].strftime("%Y-%m-%dT%H:%M:%SZ"))
-        practice_session.post_session_survey = post_session
-        practice_session.duration_minutes = time_list[d]
-        daily_plan.training_sessions.append(practice_session)
+        session.post_session_survey = post_session
+        session.duration_minutes = time_list[d]
+        daily_plan.training_sessions.append(session)
         plans.append(daily_plan)
 
     return plans

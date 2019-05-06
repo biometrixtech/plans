@@ -1,6 +1,10 @@
+from aws_xray_sdk.core import xray_recorder
+xray_recorder.configure(sampling=False)
+xray_recorder.begin_segment(name="test")
+
 from datetime import datetime, timedelta
 from models.daily_plan import DailyPlan
-from models.session import PracticeSession
+from models.session import SportTrainingSession
 from models.daily_readiness import DailyReadiness
 from models.stats import AthleteStats
 from logic.stats_processing import StatsProcessing
@@ -33,14 +37,13 @@ def get_daily_plans(start_date, end_date):
 
     for d in dates:
         daily_plan = DailyPlan(event_date=d.strftime("%Y-%m-%d"))
-        practice_session = PracticeSession()
-        practice_session.event_date = d
-        practice_session.external_load = 10 * i
-        practice_session.high_intensity_load = 2 * i
-        practice_session.mod_intensity_load = 5 * i
-        practice_session.low_intensity_load = 3 * i
-        # daily_plan.practice_sessions.append(practice_session)
-        daily_plan.training_sessions.append(practice_session)
+        session = SportTrainingSession()
+        session.event_date = d
+        session.external_load = 10 * i
+        session.high_intensity_load = 2 * i
+        session.mod_intensity_load = 5 * i
+        session.low_intensity_load = 3 * i
+        daily_plan.training_sessions.append(session)
         plans.append(daily_plan)
         i += 1
 
@@ -56,12 +59,11 @@ def get_daily_internal_plans(start_date, end_date):
 
     for d in dates:
         daily_plan = DailyPlan(event_date=d.strftime("%Y-%m-%d"))
-        practice_session = PracticeSession()
-        practice_session.event_date = d
-        practice_session.session_RPE = 5
-        practice_session.duration_minutes = 60
-        # daily_plan.practice_sessions.append(practice_session)
-        daily_plan.training_sessions.append(practice_session)
+        session = SportTrainingSession()
+        session.event_date = d
+        session.session_RPE = 5
+        session.duration_minutes = 60
+        daily_plan.training_sessions.append(session)
         plans.append(daily_plan)
         i += 1
 
