@@ -104,10 +104,10 @@ def create_no_soreness_plan():
 
     mgr = TrainingPlanManager(user_id, datastore_collection)
 
-
     daily_plan = mgr.create_daily_plan(format_date(current_date), last_updated=format_datetime(current_date_time), athlete_stats=AthleteStats(user_id))
 
     return daily_plan
+
 
 def test_active_rest_after_training_knee():
 
@@ -116,6 +116,10 @@ def test_active_rest_after_training_knee():
     assert len(daily_plan.post_active_rest.static_stretch_exercises) > 0
     assert len(daily_plan.post_active_rest.isolated_activate_exercises) == 0
     assert len(daily_plan.post_active_rest.static_integrate_exercises) == 0
+    assert daily_plan.cool_down is not None
+    assert daily_plan.heat is None
+    assert daily_plan.ice is None
+    assert daily_plan.pre_active_rest is None
 
 
 def test_active_rest_after_training_outer_thigh_hist_soreness_knee():
@@ -135,6 +139,11 @@ def test_active_rest_after_training_outer_thigh_hist_soreness_knee():
     assert len(daily_plan.post_active_rest.static_stretch_exercises) > 0
     assert len(daily_plan.post_active_rest.isolated_activate_exercises) > 0
     assert len(daily_plan.post_active_rest.static_integrate_exercises) > 0
+    assert daily_plan.cool_down is not None
+    assert daily_plan.heat is None
+    assert daily_plan.ice is not None
+    assert daily_plan.pre_active_rest is None
+
 
 def test_active_rest_after_training_outer_thigh_hist_soreness_glutes():
 
@@ -152,6 +161,10 @@ def test_active_rest_after_training_outer_thigh_hist_soreness_glutes():
     assert len(daily_plan.post_active_rest.static_stretch_exercises) > 0
     assert len(daily_plan.post_active_rest.isolated_activate_exercises) > 0
     assert len(daily_plan.post_active_rest.static_integrate_exercises) > 0
+    assert daily_plan.cool_down is not None
+    assert daily_plan.heat is None
+    assert daily_plan.ice is None
+    assert daily_plan.pre_active_rest is None
 
 
 def test_active_rest_after_training_various_hist_soreness_glutes():
@@ -179,6 +192,10 @@ def test_active_rest_after_training_various_hist_soreness_glutes():
     assert len(daily_plan.post_active_rest.static_stretch_exercises) > 0
     assert len(daily_plan.post_active_rest.isolated_activate_exercises) > 0
     assert len(daily_plan.post_active_rest.static_integrate_exercises) > 0
+    assert daily_plan.cool_down is not None
+    assert daily_plan.heat is None
+    assert daily_plan.ice is None
+    assert daily_plan.pre_active_rest is None
 
 
 def test_active_rest_before_training_quad_hist_soreness_knee():
@@ -200,3 +217,7 @@ def test_active_rest_before_training_quad_hist_soreness_knee():
     assert len(daily_plan.pre_active_rest.static_stretch_exercises) > 0
     assert len(daily_plan.pre_active_rest.isolated_activate_exercises) > 0
     assert len(daily_plan.pre_active_rest.static_integrate_exercises) > 0
+    assert daily_plan.cool_down is None
+    assert daily_plan.heat is not None
+    assert daily_plan.ice is None
+    assert daily_plan.post_active_rest is None
