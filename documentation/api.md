@@ -25,13 +25,15 @@
       - [Update](#update)
       - [Send sensor data](#send-sensor-data)
     - [Active Recovery](#active-recovery)
-      - [Mark Started](#mark-started)
-      - [Mark Completed](#mark-completed)
-      - [Adjust active time](#adjust-active-time)
+      - [Mark Started (Exercise Modalities)](#mark-started-exercise-modalities)
+      - [Mark Completed (Exercise Modalities)](#mark-completed-exercise-modalities)
+      - [Mark Started (Body Part Modalities)](#mark-started-body-part-modalities)
+      - [Mark Completed (Body Part Modalities)](#mark-completed-body-part-modalities)
+      - [Adjust active time (Deprecated)](#adjust-active-time-deprecated)
     - [Functional Strength](#functional-strength)
       - [Activate](#activate)
-      - [Mark Started](#mark-started-1)
-      - [Mark Completed](#mark-completed-1)
+      - [Mark Started](#mark-started)
+      - [Mark Completed](#mark-completed)
     - [Daily Plans](#daily-plans)
       - [Get daily plan](#get-daily-plan)
     - [Coach Dashboard](#coach-dashboard)
@@ -345,12 +347,14 @@ The client __must__ submit a request body containing a JSON object with the foll
 {
     "event_date": Datetime,
     "sessions": [session, session],
-    "health_sync_date": Datetime
+    "health_sync_date": Datetime,
+    "sessions_planned": Boolean
 }
 ```
 * `event_date` __should__ reflect the date and time when the survey is submitted.
 * `health_sync_date` is __optional__ and only provided if one of the sessions is obtained from health app
 * `session` __should__ be of the following schema
+* `sessions_planned` __should__ be a boolean representing whether the user plans to train again that day.
 ```
 {
     "event_date": Datetime,
@@ -370,7 +374,7 @@ The client __must__ submit a request body containing a JSON object with the foll
                             "soreness": [sore_part, sore_part],
                             "clear_candidates": [sore_part]}
                         },
-    "hr_data": [hr, hr, hr]
+    "hr_data": [hr, hr, hr],
 }
 ```
 * `event_date` __should__ reflect the start time of the session (health data) or default date (manually logged session)
@@ -426,7 +430,9 @@ Postman-Token: 4b6c3946-89fd-4cde-ae29-3a4984d5f373
                                             }
                     }
                     
-                ]
+                ],
+    "sessions_planned": true,
+    "health_sync_date": "2019-02-08T16:54:57Z"
 }
 ```
 ##### Responses
@@ -716,13 +722,13 @@ Authorization: eyJraWQ...ajBc4VQ
 
 ### Active Recovery
 
-#### Mark Started
+#### Mark Started (Exercise Modalities)
 
-This endpoint can be called to mark either the pre- or post-recovery started.
+This endpoint can be called to mark the start of exercise-based modalities.
 
 ##### Query String
  
-The client __must__ submit a request to the endpoint `/plans/version/active_recovery`. The request method __must__ be `POST`.
+The client __must__ submit a request to the endpoint `/plans/version/active_recovery/exercise_modalities`. The request method __must__ be `POST`.
 
 ##### Request
 
@@ -734,16 +740,16 @@ The client __must__ submit a request body containing a JSON object with the foll
 }
 ```
 * `event_date` __should__ be the time when user checks the first exercise for the session.
-* `recovery_type` __should__ be either `pre` or `post`
+* `recovery_type` __should__ be one of `pre_active_rest`, `post_active_rest` or `cool_down`
 
 ```
-POST /plans/version/active_recovery HTTPS/1.1
+POST /plans/version/active_recovery/exercise_modalities HTTPS/1.1
 Host: apis.env.fathomai.com
 Content-Type: application/json
 Authorization: eyJraWQ...ajBc4VQ
 {
     "event_date": "2018-09-21T17:53:39Z",
-    "recovery_type": "pre"
+    "recovery_type": "pre_active_rest"
 }
 ```
 ##### Responses
@@ -756,13 +762,13 @@ Authorization: eyJraWQ...ajBc4VQ
 }
 ```
 
-#### Mark Completed
+#### Mark Completed (Exercise Modalities)
 
-This endpoint can be called to mark either the pre- or post-recovery completed.
+This endpoint can be called to mark the completion of exercise-based modalities.
 
 ##### Query String
  
-The client __must__ submit a request to the endpoint `/plans/version/active_recovery`. The request method __must__ be `PATCH`.
+The client __must__ submit a request to the endpoint `/plans/version/active_recovery/exercise_modalities`. The request method __must__ be `PATCH`.
 
 ##### Request
 
@@ -775,16 +781,17 @@ The client __must__ submit a request body containing a JSON object with the foll
 }
 ```
 * `event_date` __should__ be the time when user completes the session.
-* `recovery_type` __should__ be either `pre` or `post`
+* `recovery_type` __should__ be one of `pre_active_rest`, `post_active_rest` or `cool_down`
+* `completed_exercises` __should__ be a list representing the exercises that the user checked off
 
 ```
-PATCH /plans/version/active_recovery HTTPS/1.1
+PATCH /plans/version/active_recovery/exercise_modalities HTTPS/1.1
 Host: apis.env.fathomai.com
 Content-Type: application/json
 Authorization: eyJraWQ...ajBc4VQ
 {
     "event_date": "2018-09-21T17:53:39Z",
-    "recovery_type": "post",
+    "recovery_type": "post_active_rest",
     "completed_exercises": ["3", "5", "20", "142"]
 }
 ```
@@ -800,7 +807,110 @@ Authorization: eyJraWQ...ajBc4VQ
 * `daily_plan` will have the same structure as defined in output of [Get daily plan](#get-daily-plan) route.
 
 
-#### Adjust active time
+
+#### Mark Started (Body Part Modalities)
+
+This endpoint can be called to mark the start of body part based modalities.
+
+##### Query String
+ 
+The client __must__ submit a request to the endpoint `/plans/version/active_recovery/body_part_modalities`. The request method __must__ be `POST`.
+
+##### Request
+
+The client __must__ submit a request body containing a JSON object with the following schema:
+```
+{
+    "event_date": Datetime,
+    "recovery_type": string
+}
+```
+* `event_date` __should__ be the time when user checks the starts the session
+* `recovery_type` __should__ be one of `heat`, `ice` or `cold_water_immersion`
+
+```
+POST /plans/version/active_recovery/body_part_modalities HTTPS/1.1
+Host: apis.env.fathomai.com
+Content-Type: application/json
+Authorization: eyJraWQ...ajBc4VQ
+{
+    "event_date": "2018-09-21T17:53:39Z",
+    "recovery_type": "pre_active_rest"
+}
+```
+##### Responses
+ 
+ If the write was successful, the Service __will__ respond with HTTP Status `200 OK`, with a body with the following syntax:
+ 
+```
+{
+    "message": "success"
+}
+```
+
+#### Mark Completed (Body Part Modalities)
+
+This endpoint can be called to mark the completion of body part based modalities.
+
+##### Query String
+ 
+The client __must__ submit a request to the endpoint `/plans/version/active_recovery/body_part_modalities`. The request method __must__ be `PATCH`.
+
+##### Request
+
+The client __must__ submit a request body containing a JSON object with the following schema:
+```
+{
+    "event_date": Datetime,
+    "recovery_type": string
+    "completed_body_parts": [body_part]
+}
+```
+* `event_date` __should__ be the time when user completes the session.
+* `recovery_type` __should__ be one of `heat`, `ice` or `cold_water_immersion`
+* `completed_body_parts` __should__ be a list representing the body parts that the user selected from the provided list. It should be empty for `cold_water_immersion`.
+* `body_part` __should__ be of the following schema. Note that there will be additional items based on whether it's `heat` or `ice`. They should just be passed along as is.
+```
+{
+    "active": true,
+    "body_part_location": 7,
+    "completed": false,
+    "goals": [
+        {
+            "goal_type": 0,
+            "priority": 1,
+            "text": "Care for Pain",
+            "trigger": "Pain Reported Today"
+        }
+    ]
+    "side": 1
+}
+```
+
+```
+PATCH /plans/version/active_recovery/body_part_modalities HTTPS/1.1
+Host: apis.env.fathomai.com
+Content-Type: application/json
+Authorization: eyJraWQ...ajBc4VQ
+{
+    "event_date": "2018-09-21T17:53:39Z",
+    "recovery_type": "ice",
+    "completed_body_parts": ["3", "5", "20", "142"]
+}
+```
+##### Responses
+ 
+ If the write was successful, the Service __will__ respond with HTTP Status `202 Accepted`, and return the daily_plan in the body with following syntax.
+ 
+```
+{
+    "daily_plans": [daily_plan]
+}
+```
+* `daily_plan` will have the same structure as defined in output of [Get daily plan](#get-daily-plan) route.
+
+
+#### Adjust active time (Deprecated)
 
 This endpoint can be called to adjust the active time for either pre- or post-recovery.
 
