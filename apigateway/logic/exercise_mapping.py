@@ -778,9 +778,9 @@ class ExerciseAssignmentCalculator(object):
             active_rest.fill_exercises(soreness_list, self.exercise_library)
             active_rest.set_plan_dosage(soreness_list)
             active_rest.set_exercise_dosage_ranking()
-            return active_rest
+            return [active_rest]
         else:
-            return None
+            return []
 
     def get_post_active_rest(self, athlete_stats, soreness_list, event_date_time):
 
@@ -792,13 +792,13 @@ class ExerciseAssignmentCalculator(object):
             active_rest.fill_exercises(soreness_list, self.exercise_library)
             active_rest.set_plan_dosage(soreness_list)
             active_rest.set_exercise_dosage_ranking()
-            return active_rest
+            return [active_rest]
         else:
-            return None
+            return []
 
     def get_warm_up(self, athlete_stats, soreness_list, event_date_time):
 
-        warm_up = None
+        # warm_up = None
 
         if (athlete_stats.muscular_strain_increasing or athlete_stats.high_relative_load_session
                 or len(soreness_list) > 0):
@@ -806,11 +806,13 @@ class ExerciseAssignmentCalculator(object):
             warm_up.fill_exercises(soreness_list, self.exercise_library)
             warm_up.set_exercise_dosage_ranking()
 
-        return warm_up
+            return [warm_up]
+        else:
+            return []
 
     def get_cool_down(self, athlete_stats, soreness_list, event_date_time):
 
-        cool_down = None
+        # cool_down = None
         # defaults so that we always get cool down
         athlete_stats.high_relative_load_session = True
         athlete_stats.high_relative_load_session_sport_name = SportName.distance_running
@@ -828,7 +830,9 @@ class ExerciseAssignmentCalculator(object):
             cool_down.set_exercise_dosage_ranking()
             #    break
 
-        return cool_down
+            return [cool_down]
+        else:
+            return []
 
     '''Nope, never!
     def get_active_recovery(self, current_date_time, historic_soreness_list):

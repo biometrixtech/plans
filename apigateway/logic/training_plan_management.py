@@ -52,13 +52,21 @@ class TrainingPlanManager(object):
             self.athlete_stats = self.athlete_stats_datastore.get(self.athlete_id)
 
     @staticmethod
-    def preserve_completed_modality(modality):
-        if modality is not None:
-            if not modality.completed:
-                modality = None
-            else:
-                modality.active = False
-        return modality
+    def preserve_completed_modality(modalities):
+        if isinstance(modalities, list):
+            for modality in modalities:
+                if not modality.completed:
+                    modality.delete = True
+                else:
+                    modality.active = False
+            return [modality for modality in modalities if not modality.delete]
+        else:
+            if modalities is not None:
+                if not modalities.completed:
+                    modalities = None
+                else:
+                    modalities.active = False
+            return modalities
 
     @xray_recorder.capture('logic.TrainingPlanManager.create_daily_plan')
     def create_daily_plan(self, event_date, last_updated, target_minutes=15, athlete_stats=None):
@@ -90,10 +98,12 @@ class TrainingPlanManager(object):
         # new modalities
         if not self.daily_plan.train_later:
             # if any completed post-training modalities exist, preserve them
-            if self.daily_plan.cool_down is not None and self.daily_plan.cool_down.completed:
-                self.daily_plan.completed_cool_down.append(self.daily_plan.cool_down)
-            if self.daily_plan.post_active_rest is not None and self.daily_plan.post_active_rest.completed:
-                self.daily_plan.completed_post_active_rest.append(self.daily_plan.post_active_rest)
+            for cool_down in self.daily_plan.cool_down:
+                if cool_down.completed:
+                    self.daily_plan.completed_cool_down.append(cool_down)
+            for post_active_rest in self.daily_plan.post_active_rest:
+                if post_active_rest.completed:
+                    self.daily_plan.completed_post_active_rest.append(post_active_rest)
             if self.daily_plan.ice is not None and self.daily_plan.ice.completed:
                 self.daily_plan.completed_ice.append(self.daily_plan.ice)
             if self.daily_plan.cold_water_immersion is not None and self.daily_plan.cold_water_immersion.completed:
@@ -101,10 +111,10 @@ class TrainingPlanManager(object):
             # make pre-training modalities inactive
             if self.daily_plan.heat is not None:
                 self.daily_plan.heat.active = False
-            if self.daily_plan.pre_active_rest is not None:
-                self.daily_plan.pre_active_rest.active = False
-            if self.daily_plan.warm_up is not None:
-                self.daily_plan.warm_up.active = False
+            for pre_active_rest in self.daily_plan.pre_active_rest:
+                pre_active_rest.active = False
+            for warm_up in self.daily_plan.warm_up:
+                warm_up.active = False
             # create new post-training modalitiesathlete_stats, soreness_list, event_date_time
             self.daily_plan.cool_down = calc.get_cool_down(athlete_stats, soreness_list, parse_date(event_date))
             self.daily_plan.post_active_rest = calc.get_post_active_rest(athlete_stats, soreness_list, parse_date(event_date))
@@ -120,11 +130,13 @@ class TrainingPlanManager(object):
             self.daily_plan.cold_water_immersion = self.preserve_completed_modality(self.daily_plan.cold_water_immersion)
             # if any completed pre-training modalities exist, preserve them
             if self.daily_plan.heat is not None and self.daily_plan.heat.completed:
-                self.daily_plan.completed_heat.append(self.daily_plan.heat)
-            if self.daily_plan.pre_active_rest is not None and self.daily_plan.pre_active_rest.completed:
-                self.daily_plan.completed_pre_active_rest.append(self.daily_plan.pre_active_rest)
-            if self.daily_plan.warm_up is not None and self.daily_plan.warm_up.completed:
-                self.daily_plan.completed_warm_up.append(self.daily_plan.warm_up)
+                self.daily_plan.completed_heat.append(heat)
+            for pre_active_rest in self.daily_plan.pre_active_rest:
+                if pre_active_rest.completed:
+                    self.daily_plan.completed_pre_active_rest.append(pre_active_rest)
+            for warm_up in self.daily_plan.warm_up:
+                if warm_up.completed:
+                    self.daily_plan.completed_warm_up.append(warm_up)
             # create new pre-training modalities
             self.daily_plan.heat = calc.get_heat(soreness_list, parse_date(event_date))
             self.daily_plan.pre_active_rest = calc.get_pre_active_rest(athlete_stats, soreness_list, parse_date(event_date))

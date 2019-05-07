@@ -19,15 +19,15 @@ class DailyPlan(Serialisable):
         #self.tournaments = []
         self.heat = None
         self.completed_heat = []
-        self.pre_active_rest = None
+        self.pre_active_rest = []
         self.completed_pre_active_rest = []
-        self.warm_up = None
+        self.warm_up = []
         self.completed_warm_up = []
-        self.cool_down = None
+        self.cool_down = []
         self.completed_cool_down = []
         # self.active_recovery = None
         # self.completed_active_recovery = []
-        self.post_active_rest = None
+        self.post_active_rest = []
         self.completed_post_active_rest = []
         self.ice = None
         self.completed_ice = []
@@ -66,26 +66,23 @@ class DailyPlan(Serialisable):
                'pre_active_rest_completed': self.pre_active_rest_completed,
                'post_active_rest_completed': self.post_active_rest_completed,
                # 'functional_strength_session': (self.functional_strength_session.json_serialise()
-               # #                                if self.functional_strength_session is not None else None),
-               # 'heat': [heat.json_serialise() for heat in self.heat],
+               #                                 if self.functional_strength_session is not None else None),
                'heat': self.heat.json_serialise() if self.heat is not None else None,
                'completed_heat': [heat.json_serialise() for heat in self.completed_heat],
-               'pre_active_rest': self.pre_active_rest.json_serialise() if self.pre_active_rest is not None else None,
-               'completed_pre_active_rest': [c.json_serialise() for c in self.completed_pre_active_rest],
-               'warm_up': self.warm_up.json_serialise() if self.warm_up is not None else None,
+               'pre_active_rest': [ar.json_serialise() for ar in self.pre_active_rest],
+               'completed_pre_active_rest': [ar.json_serialise() for ar in self.completed_pre_active_rest],
+               'warm_up': [warm_up.json_serialise() for warm_up in self.warm_up],
                'completed_warm_up': [warm_up.json_serialise() for warm_up in self.completed_warm_up],
-               'cool_down': self.cool_down.json_serialise() if self.cool_down is not None else None,
+               'cool_down': [cool_down.json_serialise() for cool_down in self.cool_down],
                'completed_cool_down': [cool_down.json_serialise() for cool_down in self.completed_cool_down],
                # 'active_recovery': self.active_recovery.json_serialise() if self.active_recovery is not None else None,
                # 'completed_active_recovery': [active_recovery.json_serialise() for active_recovery in self.completed_active_recovery],
-               'post_active_rest': self.post_active_rest.json_serialise() if self.post_active_rest is not None else None,
-               'completed_post_active_rest': [c.json_serialise() for c in self.completed_post_active_rest],
-               # 'ice': [ice.json_serialise() for ice in self.ice],
+               'post_active_rest': [ar.json_serialise() for ar in self.post_active_rest],
+               'completed_post_active_rest': [ar.json_serialise() for ar in self.completed_post_active_rest],
                'ice': self.ice.json_serialise() if self.ice is not None else None,
                'completed_ice': [ice.json_serialise() for ice in self.completed_ice],
                'cold_water_immersion': self.cold_water_immersion.json_serialise() if self.cold_water_immersion is not None else None,
-               'completed_cold_water_immersion': [c.json_serialise() for c in self.completed_cold_water_immersion],
-               # 'completed_post_recovery_sessions': [c.json_serialise() for c in self.completed_post_recovery_sessions],
+               'completed_cold_water_immersion': [cwi.json_serialise() for cwi in self.completed_cold_water_immersion],
                'last_updated': self.last_updated,
                'daily_readiness_survey': readiness,
                'last_sensor_sync': self.last_sensor_sync,
@@ -105,15 +102,15 @@ class DailyPlan(Serialisable):
         if not stats_processing:
             daily_plan.heat = HeatSession.json_deserialise(input_dict['heat']) if input_dict.get('heat', None) is not None else None
             daily_plan.completed_heat = [HeatSession.json_deserialise(heat) for heat in input_dict.get('completed_heat', [])]
-            daily_plan.pre_active_rest = ActiveRestBeforeTraining.json_deserialise(input_dict['pre_active_rest']) if input_dict.get('pre_active_rest', None) is not None else None
+            daily_plan.pre_active_rest = [ActiveRestBeforeTraining.json_deserialise(ar) for ar in input_dict.get('pre_active_rest', None)]
             daily_plan.completed_pre_active_rest = [ActiveRestBeforeTraining.json_deserialise(ar) for ar in input_dict.get('completed_pre_active_rest', [])]
-            daily_plan.warm_up = WarmUp.json_deserialise(input_dict['warm_up']) if input_dict.get('warm_up', None) is not None else None
+            daily_plan.warm_up = [WarmUp.json_deserialise(warm_up) for warm_up in input_dict.get('warm_up', [])]
             daily_plan.completed_warm_up = [WarmUp.json_deserialise(w) for w in input_dict.get('completed_warm_up', [])]
-            daily_plan.cool_down = CoolDown.json_deserialise(input_dict['cool_down']) if input_dict.get('cool_down', None) is not None else None
+            daily_plan.cool_down = [CoolDown.json_deserialise(cool_down) for cool_down in input_dict.get('cool_down', [])]
             daily_plan.completed_cool_down = [CoolDown.json_deserialise(cd) for cd in input_dict.get('completed_cool_down', [])]
             # daily_plan.active_recovery = ActiveRecovery.json_deserialise(input_dict['active_recovery']) if input_dict.get('active_recovery', None) is not None else None
             # daily_plan.completed_active_recovery = [ActiveRecovery.json_deserialise(ar) for ar in input_dict.get('completed_active_recovery', [])]
-            daily_plan.post_active_rest = ActiveRestAfterTraining.json_deserialise(input_dict['post_active_rest']) if input_dict.get('post_active_rest', None) is not None else None
+            daily_plan.post_active_rest = [ActiveRestAfterTraining.json_deserialise(ar) for ar in input_dict.get('post_active_rest', [])]
             daily_plan.completed_post_active_rest = [ActiveRestAfterTraining.json_deserialise(ar) for ar in input_dict.get('completed_post_active_rest', [])]
             daily_plan.ice = IceSession.json_deserialise(input_dict['ice']) if input_dict.get('ice', None) is not None else None
             daily_plan.completed_ice = [IceSession.json_deserialise(ice) for ice in input_dict.get('completed_ice', [])]
@@ -137,11 +134,11 @@ class DailyPlan(Serialisable):
             return False
 
     def define_landing_screen(self):
-        if self.post_active_rest is not None and self.post_active_rest.active:
+        if len(self.post_active_rest) > 0 and self.post_active_rest[0].active:
             return 2.0, None
-        elif ((self.post_active_rest is None or not self.post_active_rest.active) and
-               self.pre_active_rest is not None and
-               self.pre_active_rest.completed):
+        elif ((len(self.post_active_rest) == 0 or not self.post_active_rest[0].active) and
+               len(self.pre_active_rest) > 0 and
+               self.pre_active_rest[0].completed):
             return 1.0, None
         else:
             return 0.0, None
