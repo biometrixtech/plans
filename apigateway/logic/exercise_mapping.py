@@ -165,7 +165,7 @@ class ExerciseAssignmentCalculator(object):
         exercise_assignments.scale_to_targets(self.exercise_library)
 
         return exercise_assignments
-    '''
+    
     def get_current_exercise(self, body_part_exercise, exercise_list, completed_exercises):
 
         exercise_bucket_list = ExerciseBuckets().get_bucket_for_exercise(body_part_exercise.exercise.id)
@@ -275,7 +275,7 @@ class ExerciseAssignmentCalculator(object):
         #body_parts.append(general)
 
         return general
-
+'''
     def get_progression_list(self, exercise):
 
         dict = {}
@@ -317,6 +317,7 @@ class ExerciseAssignmentCalculator(object):
 
         return exercise_dict
 
+    '''deprecated
     def get_exercises_for_body_parts(self, soreness):
 
         if soreness.body_part.location == BodyPartLocation.lower_back:
@@ -696,7 +697,7 @@ class ExerciseAssignmentCalculator(object):
             lower_back.add_exercise_phases(inhibit, lengthen, activate, True)
 
         return lower_back
-
+    
     def get_body_part_priority(self, base_priority, soreness):
 
         if (soreness.historic_soreness_status == HistoricSorenessStatus.acute_pain or
@@ -725,7 +726,7 @@ class ExerciseAssignmentCalculator(object):
             return True
         else:
             return False
-
+   '''
     def get_heat(self, soreness_list, event_date_time):
 
         bring_the_heat = []
