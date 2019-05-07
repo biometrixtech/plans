@@ -38,6 +38,8 @@ def handle_exercise_modalities_complete(principal_id=None):
                                     start_date=plan_event_day,
                                     end_date=plan_event_day)[0]
     if recovery_type == 'pre_active_rest':
+        if recovery_index + 1 > len(plan.pre_active_rest):
+            raise NoSuchEntityException('No pre active rest found with that index')
         if plan.pre_active_rest[recovery_index].completed:
             save_exercises = False
         plan.pre_active_rest_completed = True  # plan
@@ -45,6 +47,8 @@ def handle_exercise_modalities_complete(principal_id=None):
         plan.pre_active_rest[recovery_index].completed_date_time = recovery_event_date
 
     elif recovery_type == 'post_active_rest':
+        if recovery_index + 1 > len(plan.post_active_rest):
+            raise NoSuchEntityException('No post active rest found with that index')
         if plan.post_active_rest[recovery_index].completed:
             save_exercises = False
         plan.post_active_rest_completed = True  # plan
@@ -52,12 +56,16 @@ def handle_exercise_modalities_complete(principal_id=None):
         plan.post_active_rest[recovery_index].completed_date_time = recovery_event_date
 
     elif recovery_type == 'warm_up':
+        if recovery_index + 1 > len(plan.warm_up):
+            raise NoSuchEntityException('No warm_up found with that index')
         plan.warm_up[recovery_index].completed_date_time = recovery_event_date
         plan.warm_up[recovery_index].completed = True
         if plan.warm_up[recovery_index].completed:
             save_exercises = False
 
     elif recovery_type == 'cool_down':
+        if recovery_index + 1 > len(plan.cool_down):
+            raise NoSuchEntityException('No cool down found with that index')
         plan.cool_down[recovery_index].completed_date_time = recovery_event_date
         plan.cool_down[recovery_index].completed = True
         if plan.cool_down[recovery_index].completed:
@@ -100,21 +108,29 @@ def handle_exercise_modalities_start(principal_id=None):
     plans_service = Service('plans', Config.get('API_VERSION'))
     body = {"event_date": recovery_start_date}
     if recovery_type == 'pre_active_rest':
+        if recovery_index + 1 > len(plan.pre_active_rest):
+            raise NoSuchEntityException('No pre active rest found with that index')
         plan.pre_active_rest[recovery_index].start_date_time = recovery_start_date
         plans_service.call_apigateway_async(method='POST',
                                             endpoint=f'/athlete/{user_id}/prep_started',
                                             body=body)
 
     elif recovery_type == 'post_active_rest':
+        if recovery_index + 1 > len(plan.post_active_rest):
+            raise NoSuchEntityException('No post active rest found with that index')
         plan.post_active_rest[recovery_index].start_date_time = recovery_start_date
         plans_service.call_apigateway_async(method='POST',
                                             endpoint=f'/athlete/{user_id}/recovery_started',
                                             body=body)
 
     elif recovery_type == 'warm_up':
+        if recovery_index + 1 > len(plan.warm_up):
+            raise NoSuchEntityException('No warm up found with that index')
         plan.warm_up[recovery_index].start_date_time = recovery_start_date
 
     elif recovery_type == 'cool_down':
+        if recovery_index + 1 > len(plan.cool_down):
+            raise NoSuchEntityException('No cool down found with that index')
         plan.cool_down[recovery_index].start_date_time = recovery_start_date
 
     daily_plan_datastore.put(plan)
