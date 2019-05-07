@@ -875,7 +875,10 @@ class ExerciseAssignmentCalculator(object):
                     ice.goals.add(goal)
                     ice_list.append(ice)
 
-            elif s.daily and not s.pain and s.historic_soreness_status is not None and s.historic_soreness_status is not s.is_dormant_cleared() and s.first_reported_date is not None:
+            elif (s.daily and not s.pain and s.historic_soreness_status is not None and s.historic_soreness_status
+                    is not s.is_dormant_cleared() and
+                  (s.is_persistent_soreness() or s.historic_soreness_status ==
+                    HistoricSorenessStatus.persistent_2_soreness) and s.first_reported_date is not None):
                 days_diff = (event_date_time - s.first_reported_date).days
                 if days_diff > 30 and s.severity >= 1.5:
                     goal = AthleteGoal("Care for Soreness", 1, AthleteGoalType.sore)
@@ -965,6 +968,9 @@ class ExerciseAssignmentCalculator(object):
 
         if ice_session is not None and cold_water_immersion_session is not None:
             ice_session.body_parts = list(b for b in ice_session.body_parts if not self.is_lower_body_part(b.body_part_location))
+
+        if len(ice_session.body_parts) == 0:
+            ice_session = None
 
         return ice_session
 
