@@ -25,6 +25,7 @@ def handle_exercise_modalities_complete(principal_id=None):
     event_date = parse_datetime(request.json['event_date'])
     recovery_type = request.json['recovery_type']
     completed_exercises = request.json.get('completed_exercises', [])
+    recovery_index = request.json.get('recovery_index', 0)
 
     plan_event_day = format_date(event_date)
     recovery_event_date = format_datetime(event_date)
@@ -37,29 +38,29 @@ def handle_exercise_modalities_complete(principal_id=None):
                                     start_date=plan_event_day,
                                     end_date=plan_event_day)[0]
     if recovery_type == 'pre_active_rest':
-        if plan.pre_active_rest.completed:
+        if plan.pre_active_rest[recovery_index].completed:
             save_exercises = False
         plan.pre_active_rest_completed = True  # plan
-        plan.pre_active_rest.completed = True  # recovery
-        plan.pre_active_rest.completed_date_time = recovery_event_date
+        plan.pre_active_rest[recovery_index].completed = True  # recovery
+        plan.pre_active_rest[recovery_index].completed_date_time = recovery_event_date
 
     elif recovery_type == 'post_active_rest':
-        if plan.post_active_rest.completed:
+        if plan.post_active_rest[recovery_index].completed:
             save_exercises = False
         plan.post_active_rest_completed = True  # plan
-        plan.post_active_rest.completed = True  # recovery
-        plan.post_active_rest.completed_date_time = recovery_event_date
+        plan.post_active_rest[recovery_index].completed = True  # recovery
+        plan.post_active_rest[recovery_index].completed_date_time = recovery_event_date
 
     elif recovery_type == 'warm_up':
-        plan.warm_up.completed_date_time = recovery_event_date
-        plan.warm_up.completed = True
-        if plan.warm_up.completed:
+        plan.warm_up[recovery_index].completed_date_time = recovery_event_date
+        plan.warm_up[recovery_index].completed = True
+        if plan.warm_up[recovery_index].completed:
             save_exercises = False
 
     elif recovery_type == 'cool_down':
-        plan.cool_down.completed_date_time = recovery_event_date
-        plan.cool_down.completed = True
-        if plan.cool_down.completed:
+        plan.cool_down[recovery_index].completed_date_time = recovery_event_date
+        plan.cool_down[recovery_index].completed = True
+        if plan.cool_down[recovery_index].completed:
             save_exercises = False
 
     daily_plan_datastore.put(plan)
@@ -86,6 +87,7 @@ def handle_exercise_modalities_start(principal_id=None):
     user_id = principal_id
     event_date = parse_datetime(request.json['event_date'])
     recovery_type = request.json['recovery_type']
+    recovery_index = request.json.get('recovery_index', 0)
 
     plan_event_day = format_date(event_date)
     recovery_start_date = format_datetime(event_date)
@@ -98,22 +100,22 @@ def handle_exercise_modalities_start(principal_id=None):
     plans_service = Service('plans', Config.get('API_VERSION'))
     body = {"event_date": recovery_start_date}
     if recovery_type == 'pre_active_rest':
-        plan.pre_active_rest.start_date_time = recovery_start_date
+        plan.pre_active_rest[recovery_index].start_date_time = recovery_start_date
         plans_service.call_apigateway_async(method='POST',
                                             endpoint=f'/athlete/{user_id}/prep_started',
                                             body=body)
 
     elif recovery_type == 'post_active_rest':
-        plan.post_active_rest.start_date_time = recovery_start_date
+        plan.post_active_rest[recovery_index].start_date_time = recovery_start_date
         plans_service.call_apigateway_async(method='POST',
                                             endpoint=f'/athlete/{user_id}/recovery_started',
                                             body=body)
 
     elif recovery_type == 'warm_up':
-        plan.warm_up.start_date_time = recovery_start_date
+        plan.warm_up[recovery_index].start_date_time = recovery_start_date
 
     elif recovery_type == 'cool_down':
-        plan.cool_down.start_date_time = recovery_start_date
+        plan.cool_down[recovery_index].start_date_time = recovery_start_date
 
     daily_plan_datastore.put(plan)
 
@@ -195,7 +197,7 @@ def handle_body_part_modalities_start(principal_id=None):
         plan.ice.start_date_time = start_date_time
 
     elif recovery_type == 'cold_water_immersion':
-        plan.cold_water_immersion.start_date_time = event_date
+        plan.cold_water_immersion.start_date_time = start_date_time
 
     daily_plan_datastore.put(plan)
 
