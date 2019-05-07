@@ -835,7 +835,7 @@ Content-Type: application/json
 Authorization: eyJraWQ...ajBc4VQ
 {
     "event_date": "2018-09-21T17:53:39Z",
-    "recovery_type": "pre_active_rest"
+    "recovery_type": "heat"
 }
 ```
 ##### Responses
@@ -869,7 +869,7 @@ The client __must__ submit a request body containing a JSON object with the foll
 * `event_date` __should__ be the time when user completes the session.
 * `recovery_type` __should__ be one of `heat`, `ice` or `cold_water_immersion`
 * `completed_body_parts` __should__ be a list representing the body parts that the user selected from the provided list. It should be empty for `cold_water_immersion`.
-* `body_part` __should__ be of the following schema. Note that there will be additional items based on whether it's `heat` or `ice`. They should just be passed along as is.
+* `body_part` __should__ be of the following schema. Note that there will be additional attributes based on whether it's `heat` or `ice`. They should just be passed along as is.
 ```
 {
     "active": true,
@@ -950,7 +950,7 @@ Authorization: eyJraWQ...ajBc4VQ
 ```
 * `daily_plan` will have the same structure as defined in output of [Get daily plan](#get-daily-plan) route.
 
-### Functional Strength
+### Functional Strength (Deprecated)
 
 #### Activate
 
