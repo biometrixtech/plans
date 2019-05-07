@@ -55,11 +55,9 @@ class TrainingPlanManager(object):
     def preserve_completed_modality(modalities):
         if isinstance(modalities, list):
             for modality in modalities:
-                if not modality.completed:
-                    modality.delete = True
-                else:
+                if modality.completed:
                     modality.active = False
-            return [modality for modality in modalities if not modality.delete]
+            return [modality for modality in modalities if modality.completed]
         else:
             if modalities is not None:
                 if not modalities.completed:
@@ -130,7 +128,7 @@ class TrainingPlanManager(object):
             self.daily_plan.cold_water_immersion = self.preserve_completed_modality(self.daily_plan.cold_water_immersion)
             # if any completed pre-training modalities exist, preserve them
             if self.daily_plan.heat is not None and self.daily_plan.heat.completed:
-                self.daily_plan.completed_heat.append(heat)
+                self.daily_plan.completed_heat.append(self.daily_plan.heat)
             for pre_active_rest in self.daily_plan.pre_active_rest:
                 if pre_active_rest.completed:
                     self.daily_plan.completed_pre_active_rest.append(pre_active_rest)
