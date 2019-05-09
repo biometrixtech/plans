@@ -1,7 +1,7 @@
 from aws_xray_sdk.core import xray_recorder
 from config import get_mongo_collection
 from models.stats import AthleteStats
-from models.soreness import BodyPartLocation, HistoricSoreness, HistoricSorenessStatus, Soreness, BodyPart
+from models.soreness import BodyPartLocation, DelayedOnsetMuscleSoreness, HistoricSoreness, HistoricSorenessStatus, Soreness, BodyPart
 from models.metrics import AthleteMetric, MetricType, DailyHighLevelInsight, WeeklyHighLevelInsight, MetricColor, SpecificAction
 from models.training_volume import StandardErrorRange
 from models.sport import SportName
@@ -107,6 +107,8 @@ class AthleteStatsDatastore(object):
         athlete_stats.post_session_pain = [Soreness.json_deserialise(s) for s in mongo_result.get('post_session_pain', [])]
         athlete_stats.daily_severe_soreness_event_date = mongo_result.get('daily_severe_soreness_event_date', None)
         athlete_stats.daily_severe_pain_event_date = mongo_result.get('daily_severe_soreness_event_date', None)
+        athlete_stats.delayed_onset_muscle_soreness = [DelayedOnsetMuscleSoreness.json_deserialise(d) for d in
+                                                       mongo_result.get('delayed_onset_muscle_soreness', [])]
         athlete_stats.metrics = [AthleteMetric.json_deserialise(s) for s in mongo_result.get('metrics', [])]
         # athlete_stats.metrics = [self._metrics_from_mongodb(s) for s in mongo_result.get('metrics', [])]
         athlete_stats.typical_weekly_sessions = mongo_result.get('typical_weekly_sessions', None)

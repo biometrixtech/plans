@@ -4,6 +4,7 @@ from models.exercise import Exercise, UnitOfMeasure
 from serialisable import Serialisable
 from random import shuffle
 import datetime
+from fathomapi.utils.exceptions import InvalidSchemaException
 
 from utils import format_datetime, parse_datetime, format_date, parse_date
 
@@ -84,6 +85,17 @@ class DelayedOnsetMuscleSoreness(Serialisable):
         }
         return ret
 
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        soreness = cls()
+        soreness.body_part = BodyPart(BodyPartLocation(input_dict['body_part']), None)
+        soreness.severity = input_dict['severity']
+        soreness.movement = input_dict.get('movement', None)
+        soreness.side = input_dict.get('side', None)
+        soreness.first_reported_date_time = input_dict.get('first_reported_date_time', None)
+
+        return soreness
+
 
 class Soreness(BaseSoreness, Serialisable):
     def __init__(self):
@@ -126,7 +138,10 @@ class Soreness(BaseSoreness, Serialisable):
     def __setattr__(self, name, value):
         if name in ['first_reported_date_time']:
             if value is not None and not isinstance(value, datetime.datetime):
-                value = parse_date(value)
+                try:
+                    value = parse_datetime(value)
+                except InvalidSchemaException:
+                    value = parse_date(value)
         super().__setattr__(name, value)
 
     '''deprecated
@@ -374,7 +389,10 @@ class HistoricSoreness(BaseSoreness, Serialisable):
     def __setattr__(self, name, value):
         if name in ['first_reported_date_time']:
             if value is not None and not isinstance(value, datetime.datetime):
-                value = parse_date(value)
+                try:
+                    value = parse_datetime(value)
+                except InvalidSchemaException:
+                    value = parse_date(value)
         super().__setattr__(name, value)
 
     def json_serialise(self, api=False):
