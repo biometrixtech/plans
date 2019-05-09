@@ -835,7 +835,7 @@ Content-Type: application/json
 Authorization: eyJraWQ...ajBc4VQ
 {
     "event_date": "2018-09-21T17:53:39Z",
-    "recovery_type": "pre_active_rest"
+    "recovery_type": "heat"
 }
 ```
 ##### Responses
@@ -869,7 +869,7 @@ The client __must__ submit a request body containing a JSON object with the foll
 * `event_date` __should__ be the time when user completes the session.
 * `recovery_type` __should__ be one of `heat`, `ice` or `cold_water_immersion`
 * `completed_body_parts` __should__ be a list representing the body parts that the user selected from the provided list. It should be empty for `cold_water_immersion`.
-* `body_part` __should__ be of the following schema. Note that there will be additional items based on whether it's `heat` or `ice`. They should just be passed along as is.
+* `body_part` __should__ be of the following schema. Note that there will be additional attributes based on whether it's `heat` or `ice`. They should just be passed along as is.
 ```
 {
     "active": true,
@@ -950,7 +950,7 @@ Authorization: eyJraWQ...ajBc4VQ
 ```
 * `daily_plan` will have the same structure as defined in output of [Get daily plan](#get-daily-plan) route.
 
-### Functional Strength
+### Functional Strength (Deprecated)
 
 #### Activate
 
@@ -1123,197 +1123,221 @@ The Service __will__ respond with HTTP Status `200 OK`, with a body with the fol
 * `readiness` is only returned if readiness survey hasn't been completed for the day and will follow the schema defined [here](#sorenesstypical-session-history)
 * `typical_sessions` is only returned if readiness survey hasn't been completed for the day and will follow the schema defined [here](#sorenesstypical-session-history)
 * `daily_plans` __could__ be emply list
-* each `daily_plan*` will be of following syntax:
+* each `daily_plan*` will be of following schema:
 ```
 {
-    "bump_up_sessions": [],
-    "completed_functional_strength_sessions": 2,
-    "completed_post_recovery_sessions": [],
+    "date": Date,
+    "day_of_week": Number,
+    "pre_active_rest": [PreActiveRest],
+    "completed_pre_active_rest": [PreActiveRest],
+    "heat": Heat,
+    "completed_heat": [Heat],
+    "warm_up": [WarmUp],
+    "completed_warm_up": [WarmUp],
+    "training_sessions": [Session],
+    "cool_down": [CoolDown],
+    "completed_cool_down": [CoolDown],
+    "post_active_rest": [PostActiveRest],
+    "completed_post_active_rest": [PostActiveRest],
+    "ice": Ice,
+    "completed_ice": [Ice],
+    "cold_water_immersion": ColdWaterImmersion,
+    "completed_cold_water_immersion": [ColdWaterImmersion],
     "cross_training_sessions": [],
-    "daily_readiness_survey_completed": true,
-    "date": "2018-10-01",
-    "day_of_week": 0,
-    "functional_strength_completed": false,
-    "functional_strength_eligible": true,
-    "functional_strength_session": {
-        "completed": false,
-        "dynamic_movement": [
-            {
-                "bilateral": true,
-                "description": "Place a small resistance band around your ankles. Step out until you feel adequate resistance in the band. Stand up onto your toes to perform a calf raise against the resistance of the band. Repeat for the designated reps.",
-                "display_name": "Banded Calf Raises",
-                "goal_text": "",
-                "library_id": "184",
-                "name": "Banded Calf Raises",
-                "position_order": 0,
-                "reps_assigned": 15,
-                "seconds_duration": 90,
-                "seconds_per_rep": 3,
-                "seconds_per_set": null,
-                "sets_assigned": 1,
-                "unit_of_measure": "count",
-                "youtube_id": null
-            }
-        ],
-        "equipment_required": [],
-        "event_date": null,
-        "minutes_duration": 31.449999999999996,
-        "position": 0,
-        "sport_name": null,
-        "stability_work": [
-            {
-                "bilateral": false,
-                "description": "Lay down on your back. Keep your hands by your sides, engage your core, and lift your legs up as far as you can. Make sure your back stays flush with the ground as your lower back to the ground. Do not let your feet touch the floor between reps. Complete for the designated reps.",
-                "display_name": "Leg Lifts",
-                "goal_text": "",
-                "library_id": "198",
-                "name": "Leg Lifts",
-                "position_order": 0,
-                "reps_assigned": 15,
-                "seconds_duration": 45,
-                "seconds_per_rep": 3,
-                "seconds_per_set": null,
-                "sets_assigned": 1,
-                "unit_of_measure": "count",
-                "youtube_id": null
-            }
-        ],
-        "start_date": null,
-        "victory_lap": [
-            {
-                "bilateral": true,
-                "description": "Begin in a plank position on your hands. Alternate tapping your shoulders with the opposite arms. Be sure to keep your body in line and core tight as you move. Complete for the designated time.",
-                "display_name": "Plank with Shoulder Taps",
-                "goal_text": "",
-                "library_id": "202",
-                "name": "Plank with Shoulder Taps",
-                "position_order": 0,
-                "reps_assigned": 30,
-                "seconds_duration": 60,
-                "seconds_per_rep": null,
-                "seconds_per_set": 30,
-                "sets_assigned": 1,
-                "unit_of_measure": "seconds",
-                "youtube_id": null
-            }
-        ],
-        "warm_up": [
-            {
-                "bilateral": true,
-                "description": "Laying on your back with your arms in a T-position, bring one leg up toward the opposite arm as far as you can without lifting your midback off the ground. Bring that leg back down to the starting position, then repeat on the other side. Complete for the set number of reps.",
-                "display_name": "Iron Cross",
-                "goal_text": "",
-                "library_id": "144",
-                "name": "Iron Cross",
-                "position_order": 0,
-                "reps_assigned": 10,
-                "seconds_duration": 60,
-                "seconds_per_rep": 3,
-                "seconds_per_set": null,
-                "sets_assigned": 1,
-                "unit_of_measure": "count",
-                "youtube_id": null
-            }
-        ]
-    },
-    "game_sessions": [],
-    "landing_screen": 0,
-    "last_sensor_sync": "2018-09-14T10:00:41Z",
-    "last_updated": "2018-10-01T17:53:28Z",
-    "nav_bar_indicator": 0,
-    "post_recovery": {
-        "activate_exercises": [],
-        "activate_iterations": 0,
-        "completed": false,
-        "display_exercises": false,
-        "event_date": null,
-        "goal_text": "",
-        "impact_score": 0,
-        "inhibit_exercises": [],
-        "inhibit_iterations": 0,
-        "integrate_exercises": [],
-        "integrate_iterations": 0,
-        "lengthen_exercises": [],
-        "lengthen_iterations": 0,
-        "minutes_duration": 0,
-        "start_date": null,
-        "why_text": ""
-    },
-    "post_recovery_completed": false,
-    "practice_sessions": [],
-    "pre_recovery": {
-        "activate_exercises": [
-            {
-                "bilateral": true,
-                "description": "Sit or stand with your shoulders level and your back straight. Bring your shoulders up into shrug, bringing them as close to your ears as you can. Relax and let your shoulders fall back to the starting position. Repeat for the recommended number of reps.",
-                "display_name": "Shoulder Shrugs",
-                "goal_text": "Focused muscle activation",
-                "library_id": "137",
-                "name": "Scapular Elevation",
-                "position_order": 13,
-                "reps_assigned": 10,
-                "seconds_duration": 40,
-                "seconds_per_rep": 2,
-                "seconds_per_set": null,
-                "sets_assigned": 1,
-                "unit_of_measure": "count",
-                "youtube_id": null
-            }
-        ],
-        "activate_iterations": 10,
-        "completed": false,
-        "display_exercises": true,
-        "event_date": null,
-        "goal_text": "Stay loose! Focus on increasing flexibility and building stamina!",
-        "impact_score": 2.9047619047619047,
-        "inhibit_exercises": [
-            {
-                "bilateral": true,
-                "description": "Stand with your back against a wall. Place a ball between the wall and on your upper back, in between your shoulder and neck. If you feel have any points of tenderness in this area, you may place the ball over those. Keeping the ball in contact with the wall, push your thumb into the muscle from the front. Bend your neck as far as you can and look straight down. Apply pressure for 30 seconds, then release. ",
-                "display_name": "Upper Back Release",
-                "goal_text": "Increase blood flow",
-                "library_id": "126",
-                "name": "SMR - Upper Trapezius",
-                "position_order": 3,
-                "reps_assigned": 30,
-                "seconds_duration": 60,
-                "seconds_per_rep": null,
-                "seconds_per_set": 30,
-                "sets_assigned": 1,
-                "unit_of_measure": "seconds",
-                "youtube_id": null
-            }
-        ],
-        "inhibit_iterations": 1,
-        "integrate_exercises": [],
-        "integrate_iterations": 0,
-        "lengthen_exercises": [
-            {
-                "bilateral": true,
-                "description": "Stand feet shoulder-width apart and cross one arm over your body at chest-level. Apply pressure on your forearm with your other hand to stretch the back of your shoulder. Hold for 30 seconds, then repeat on the othe side.",
-                "display_name": "Cross Body Arm Stretch",
-                "goal_text": "Increase flexibility",
-                "library_id": "130",
-                "name": "Posterior Deltoid Static Stretch",
-                "position_order": 7,
-                "reps_assigned": 30,
-                "seconds_duration": 60,
-                "seconds_per_rep": null,
-                "seconds_per_set": 30,
-                "sets_assigned": 1,
-                "unit_of_measure": "seconds",
-                "youtube_id": null
-            }
-        ],
-        "lengthen_iterations": 8,
-        "minutes_duration": 14.133333333333333,
-        "start_date": null,
-        "why_text": "mild soreness and discomfort"
-    },
-    "pre_recovery_completed": false,
-    "sessions_planned": true,
-    "training_sessions": []
+    "daily_readiness_survey_completed": Boolean,
+    "landing_screen": Number,
+    "last_sensor_sync": Datetime,
+    "last_updated": Datetime,
+    "nav_bar_indicator": null,
+    "post_active_rest_completed": Boolean,
+    "pre_active_rest_completed": Boolean,
+    "sessions_planned": Boolean,
+    "train_later": Bolean
+}
+```
+* Any of the `completed_*` attributes could be empty list
+* Any of the exercise modalities (`pre_active_rest`, `post_active_rest`, `warm_up` and `cool_down`) could be empty list
+* Any of the body part modalities (`heat`, `ice`, `cold_water_immersion`) could be null
+* `Heat` has following example schema
+```
+{
+    "active": true,
+    "body_parts": [
+        {
+            "active": true,
+            "before_training": true,
+            "body_part_location": 7,
+            "completed": false,
+            "goals": [
+                {
+                    "goal_type": 0,
+                    "priority": 1,
+                    "text": "Care for Pain",
+                    "trigger": "Pain Reported Today"
+                }
+            ],
+            "side": 1
+        }
+    ],
+    "completed": false,
+    "completed_date_time": null,
+    "event_date_time": null,
+    "minutes": 10,
+    "start_date_time": null
+}
+```
+* `Ice` has following example schema
+```
+{
+    "active": true,
+    "body_parts": [
+        {
+            "active": true,
+            "after_training": true,
+            "body_part_location": 7,
+            "completed": false,
+            "goals": [
+                {
+                    "goal_type": 0,
+                    "priority": 1,
+                    "text": "Care for Pain",
+                    "trigger": "Pain Reported Today"
+                }
+            ],
+            "immediately_after_training": false,
+            "repeat_every_3hrs_for_24hrs": false,
+            "side": 1
+        }
+    ],
+    "completed": false,
+    "completed_date_time": null,
+    "event_date_time": null,
+    "minutes": 10,
+    "start_date_time": null
+}
+```
+* `ColdWaterImmersion` has following example schema
+```
+{
+    "minutes": 10,
+    "after_training"': true,
+    "goals": [
+        {
+            "goal_type": 0,
+            "priority": 1,
+            "text": "Care for Pain",
+            "trigger": "Pain Reported Today"
+        }
+    ],
+    "start_date_time": null,
+    "completed_date_time": null,
+    "event_date_time": null,
+    "completed": false,
+    "active": true
+}
+
+```
+* `PretActiveRest` has the following example schema
+```
+{
+    "active": true,
+    "completed": false,
+    "completed_date_time": null,
+    "default_plan": "Complete",
+    "event_date_time": "2019-05-07T00:00:00Z",
+    "high_relative_intensity_logged": false,
+    "high_relative_load_session": true,
+    "active_stretch_exercises": [AssignedExercise, AssignedExercise]
+    "inhibit_exercises": [AssignedExercise, AssignedExercise],
+    "isolated_activate_exercises": [AssignedExercise, AssignedExercise],
+    "static_integrate_exercises": [AssignedExercise, AssignedExercise],
+    "static_stretch_exercises": [AssignedExercise, AssignedExercise]
+    "muscular_strain_increasing": false,
+    "start_date_time": null,
+}
+```
+* `PostActiveRest` has following example schema
+```
+{
+    "active": true,
+    "completed": false,
+    "completed_date_time": null,
+    "default_plan": "Complete",
+    "event_date_time": "2019-05-07T00:00:00Z",
+    "high_relative_intensity_logged": false,
+    "high_relative_load_session": true,
+    "inhibit_exercises": [AssignedExercise, AssignedExercise],
+    "isolated_activate_exercises": [AssignedExercise, AssignedExercise],
+    "muscular_strain_increasing": false,
+    "start_date_time": null,
+    "static_integrate_exercises": [AssignedExercise, AssignedExercise],
+    "static_stretch_exercises": [AssignedExercise, AssignedExercise]
+}
+```
+* `CoolDown` has the following example schema
+```
+{
+    "active": true,
+    "completed": false,
+    "completed_date_time": null,
+    "dynamic_integrate_exercises": [AssignedExercise, AssignedExercise],
+    "dynamic_stretch_exercises": [AssignedExercise, AssignedExercise],
+    "event_date_time": "2019-05-07T00:00:00Z",
+    "high_relative_intensity_logged": false,
+    "high_relative_load_session": true,
+    "muscular_strain_increasing": false,
+    "sport_name": 17,
+    "start_date_time": null
     }
+```
+
+* `AssignedExercise` has the following example schema
+```
+{
+    "bilateral": true,
+    "description": "Step forward and straighten your leg, lifting your toes off the ground as you lean down, moving your arms in a scooping motion. Straighten back up and repeat on the other leg as you take another step forward. ",
+    "display_name": "Walking Hamstring Scoops",
+    "dosages": [
+        {
+            "complete_reps_assigned": 12,
+            "complete_sets_assigned": 1,
+            "comprehensive_reps_assigned": 12,
+            "comprehensive_sets_assigned": 1,
+            "efficient_reps_assigned": 12,
+            "efficient_sets_assigned": 1,
+            "goal": {
+                "goal_type": 2,
+                "priority": 1,
+                "text": "Recover from Sport",
+                "trigger": "High Relative Volume or Intensity of Logged Session"
+            },
+            "priority": "1",
+            "ranking": 0,
+            "soreness_source": {
+                "body_part": 13,
+                "first_reported_date": null,
+                "movement": null,
+                "pain": false,
+                "severity": 0.4,
+                "side": null
+            }
+        }
+    ],
+    "duration_complete": null,
+    "duration_comprehensive": null,
+    "duration_efficient": null,
+    "equipment_required": [
+        "None"
+    ],
+    "goal_text": "",
+    "library_id": "139",
+    "name": "Walking Hamstring Scoops",
+    "position_order": 0,
+    "seconds_per_rep": null,
+    "seconds_per_set": 30,
+    "unit_of_measure": "yards",
+    "youtube_id": null
+}
 ```
 
 ### Coach Dashboard
