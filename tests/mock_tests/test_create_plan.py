@@ -129,7 +129,7 @@ def test_active_rest_after_training_outer_thigh_hist_soreness_knee():
     current_date_time = current_date_time - timedelta(days=16)
 
     historic_soreness = HistoricSoreness(BodyPartLocation(7), 1, True)
-    historic_soreness.first_reported_date = current_date_time
+    historic_soreness.first_reported_date_time = current_date_time
     historic_soreness.average_severity = 1.7
     historic_soreness.historic_soreness_status = HistoricSorenessStatus.acute_pain
     historic_soreness_list = [historic_soreness]
@@ -152,7 +152,7 @@ def test_active_rest_after_training_outer_thigh_hist_soreness_glutes():
     current_date_time = current_date_time - timedelta(days=16)
 
     historic_soreness = HistoricSoreness(BodyPartLocation(14), 1, True)
-    historic_soreness.first_reported_date = current_date_time
+    historic_soreness.first_reported_date_time = current_date_time
     historic_soreness.historic_soreness_status = HistoricSorenessStatus.acute_pain
     historic_soreness_list = [historic_soreness]
 
@@ -176,13 +176,13 @@ def test_active_rest_after_training_various_hist_soreness_glutes():
     current_date_time_3 = current_date_time - timedelta(days=31)
 
     historic_soreness = HistoricSoreness(BodyPartLocation(14), 1, True)
-    historic_soreness.first_reported_date = current_date_time
+    historic_soreness.first_reported_date_time = current_date_time
     historic_soreness.historic_soreness_status = HistoricSorenessStatus.acute_pain
     historic_soreness_2 = HistoricSoreness(BodyPartLocation(16), 1, False)
-    historic_soreness_2.first_reported_date = current_date_time_2
+    historic_soreness_2.first_reported_date_time = current_date_time_2
     historic_soreness_2.historic_soreness_status = HistoricSorenessStatus.persistent_soreness
     historic_soreness_3 = HistoricSoreness(BodyPartLocation(17), 1, False)
-    historic_soreness_3.first_reported_date = current_date_time_3
+    historic_soreness_3.first_reported_date_time = current_date_time_3
     historic_soreness_3.historic_soreness_status = HistoricSorenessStatus.persistent_soreness
 
     historic_soreness_list = [historic_soreness, historic_soreness_2, historic_soreness_3]
@@ -205,7 +205,7 @@ def test_active_rest_before_training_quad_hist_soreness_knee():
     current_date_time = current_date_time - timedelta(days=16)
 
     historic_soreness = HistoricSoreness(BodyPartLocation(7), 1, True)
-    historic_soreness.first_reported_date = current_date_time
+    historic_soreness.first_reported_date_time = current_date_time
     historic_soreness.historic_soreness_status = HistoricSorenessStatus.persistent_2_pain
     historic_soreness.average_severity = 1.3
 

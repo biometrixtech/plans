@@ -59,7 +59,7 @@ def test_efficient_sensitivity_pers_soreness_today_plan():
     soreness.side = 1
     soreness.historic_soreness_status = HistoricSorenessStatus.persistent_2_soreness
     historic_date_time = current_date_time - timedelta(days=31)
-    soreness.first_reported_date = historic_date_time
+    soreness.first_reported_date_time = historic_date_time
     soreness.daily = True
 
     base = ModalityBase(current_date_time)
@@ -78,7 +78,7 @@ def test_efficient_sensitivity_pers_pain_today_plan():
     soreness.side = 1
     soreness.historic_soreness_status = HistoricSorenessStatus.persistent_pain
     historic_date_time = current_date_time - timedelta(days=31)
-    soreness.first_reported_date = historic_date_time
+    soreness.first_reported_date_time = historic_date_time
     soreness.daily = False
 
     base = ModalityBase(current_date_time)
@@ -97,7 +97,7 @@ def test_efficient_sensitivity_pers_soreness_plan():
     soreness.side = 1
     soreness.historic_soreness_status = HistoricSorenessStatus.persistent_pain
     historic_date_time = current_date_time - timedelta(days=15)
-    soreness.first_reported_date = historic_date_time
+    soreness.first_reported_date_time = historic_date_time
     soreness.daily = False
 
     base = ModalityBase(current_date_time)
@@ -115,7 +115,7 @@ def test_complete_sensitivity_pers_soreness_today_plan():
     soreness.side = 1
     soreness.historic_soreness_status = HistoricSorenessStatus.persistent_2_soreness
     historic_date_time = current_date_time - timedelta(days=31)
-    soreness.first_reported_date = historic_date_time
+    soreness.first_reported_date_time = historic_date_time
     soreness.daily = True
 
     base = ModalityBase(current_date_time)
@@ -133,7 +133,7 @@ def test_complete_sensitivity_pers_pain_today_plan():
     soreness.side = 1
     soreness.historic_soreness_status = HistoricSorenessStatus.persistent_pain
     historic_date_time = current_date_time - timedelta(days=31)
-    soreness.first_reported_date = historic_date_time
+    soreness.first_reported_date_time = historic_date_time
     soreness.daily = False
 
     base = ModalityBase(current_date_time)
@@ -151,7 +151,7 @@ def test_complete_sensitivity_pers_soreness_plan():
     soreness.side = 1
     soreness.historic_soreness_status = HistoricSorenessStatus.persistent_pain
     historic_date_time = current_date_time - timedelta(days=15)
-    soreness.first_reported_date = historic_date_time
+    soreness.first_reported_date_time = historic_date_time
     soreness.daily = False
 
     base = ModalityBase(current_date_time)

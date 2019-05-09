@@ -1315,7 +1315,7 @@ The Service __will__ respond with HTTP Status `200 OK`, with a body with the fol
             "ranking": 0,
             "soreness_source": {
                 "body_part": 13,
-                "first_reported_date": null,
+                "first_reported_date_time": null,
                 "movement": null,
                 "pain": false,
                 "severity": 0.4,

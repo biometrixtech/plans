@@ -69,6 +69,8 @@ class AthleteStats(Serialisable):
         self.daily_severe_pain = []
         self.daily_severe_pain_event_date = None
         self.daily_severe_soreness_event_date = None
+        self.delayed_onset_muscle_soreness = []
+
         self.metrics = []
         self.typical_weekly_sessions = None
         self.wearable_devices = []
