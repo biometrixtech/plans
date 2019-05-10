@@ -769,12 +769,11 @@ class ExerciseAssignmentCalculator(object):
         else:
             return None
 
-    def get_pre_active_rest(self, athlete_stats, soreness_list, event_date_time):
+    def get_pre_active_rest(self, athlete_stats, soreness_list, training_sessions,event_date_time):
 
         if (len(soreness_list) > 0 or athlete_stats.muscular_strain_increasing
                 or athlete_stats.high_relative_load_session or athlete_stats.high_relative_intensity_session):
-            active_rest = ActiveRestBeforeTraining(athlete_stats.high_relative_load_session,
-                                                   athlete_stats.high_relative_intensity_session,
+            active_rest = ActiveRestBeforeTraining(training_sessions,
                                                    athlete_stats.muscular_strain_increasing, event_date_time)
             active_rest.fill_exercises(soreness_list, self.exercise_library)
             active_rest.set_plan_dosage(soreness_list)
@@ -783,12 +782,11 @@ class ExerciseAssignmentCalculator(object):
         else:
             return []
 
-    def get_post_active_rest(self, athlete_stats, soreness_list, event_date_time):
+    def get_post_active_rest(self, athlete_stats, soreness_list, training_sessions, event_date_time):
 
         if (len(soreness_list) > 0 or athlete_stats.muscular_strain_increasing
                 or athlete_stats.high_relative_load_session or athlete_stats.high_relative_intensity_session):
-            active_rest = ActiveRestAfterTraining(athlete_stats.high_relative_load_session,
-                                                  athlete_stats.high_relative_intensity_session,
+            active_rest = ActiveRestAfterTraining(training_sessions,
                                                   athlete_stats.muscular_strain_increasing, event_date_time)
             active_rest.fill_exercises(soreness_list, self.exercise_library)
             active_rest.set_plan_dosage(soreness_list)
@@ -811,20 +809,29 @@ class ExerciseAssignmentCalculator(object):
         else:
             return []
 
-    def get_cool_down(self, athlete_stats, soreness_list, event_date_time):
+    def get_cool_down(self, athlete_stats, soreness_list, training_sessions, event_date_time):
 
         # cool_down = None
         # defaults so that we always get cool down
-        athlete_stats.high_relative_load_session = True
-        athlete_stats.high_relative_load_session_sport_name = SportName.distance_running
-        if athlete_stats.high_relative_load_session or athlete_stats.high_relative_intensity_session:
+
+        high_relative_load_session = False
+        high_relative_intensity_session = False
+        high_relative_load_session_sport_name = None
+
+        for t in training_sessions:
+            if t.ultra_high_intensity_session() or t.high_intensity_RPE():
+                high_relative_intensity_session = True
+
+        high_relative_load_session = True
+        high_relative_load_session_sport_name = SportName.distance_running
+
+        if high_relative_load_session or high_relative_intensity_session:
             #for s in soreness_list:
             #    if s.first_reported_date_time is not None and not s.is_dormant_cleared():
             #        days_diff = (event_date_time - s.first_reported_date_time).days
             #        if (not s.pain and days_diff > 30) or s.pain:
-            sport_name = athlete_stats.high_relative_load_session_sport_name
-            cool_down = CoolDown(sport_name, athlete_stats.high_relative_load_session,
-                                 athlete_stats.high_relative_intensity_session,
+            sport_name = high_relative_load_session_sport_name
+            cool_down = CoolDown(sport_name, high_relative_load_session, high_relative_intensity_session,
                                  athlete_stats.muscular_strain_increasing, event_date_time)
             cool_down.fill_exercises(soreness_list, self.exercise_library)
             cool_down.set_plan_dosage(soreness_list)

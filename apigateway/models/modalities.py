@@ -336,15 +336,16 @@ class ModalityBase(object):
 
 
 class ActiveRest(ModalityBase):
-    def __init__(self, high_relative_load_session, high_relative_intensity_logged, muscular_strain_increasing, event_date_time):
+    def __init__(self, training_sessions, muscular_strain_increasing, event_date_time):
         super().__init__(event_date_time)
-        self.high_relative_load_session = high_relative_load_session
-        self.high_relative_intensity_logged = high_relative_intensity_logged
+        self.high_relative_load_session = False
+        self.high_relative_intensity_logged = False
         self.muscular_strain_increasing = muscular_strain_increasing
         self.event_date_time = event_date_time
         self.inhibit_exercises = {}
         self.static_integrate_exercises = {}
         self.static_stretch_exercises = {}
+        self.high_relative_intensity_logged = self.process_training_sessions_intensity(training_sessions)
 
     @abc.abstractmethod
     def check_reactive_care_soreness(self, soreness, exercise_library):
@@ -361,6 +362,16 @@ class ActiveRest(ModalityBase):
     @abc.abstractmethod
     def check_prevention_pain(self, soreness, event_date_time, exercise_library):
         pass
+
+    def process_training_sessions_intensity(self, training_sessions):
+
+        high_relative_intensity_session = False
+
+        for t in training_sessions:
+            if t.ultra_high_intensity_session() or t.high_intensity_RPE():
+                high_relative_intensity_session = True
+
+        return high_relative_intensity_session
 
     '''deprecated
     @abc.abstractmethod
@@ -401,8 +412,8 @@ class ActiveRest(ModalityBase):
 
 
 class ActiveRestBeforeTraining(ActiveRest, Serialisable):
-    def __init__(self, high_relative_load_session, high_relative_intensity_logged, muscular_strain_increasing, event_date_time):
-        super().__init__(high_relative_load_session, high_relative_intensity_logged, muscular_strain_increasing, event_date_time)
+    def __init__(self, training_sessions, muscular_strain_increasing, event_date_time):
+        super().__init__(training_sessions, muscular_strain_increasing, event_date_time)
         self.active_stretch_exercises = {}
         self.isolated_activate_exercises = {}
 
@@ -637,8 +648,8 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
 
 
 class ActiveRestAfterTraining(ActiveRest, Serialisable):
-    def __init__(self, high_relative_load_session, high_relative_intensity_logged, muscular_strain_increasing, event_date_time):
-        super().__init__(high_relative_load_session, high_relative_intensity_logged, muscular_strain_increasing, event_date_time)
+    def __init__(self, training_sessions, muscular_strain_increasing, event_date_time):
+        super().__init__(training_sessions, muscular_strain_increasing, event_date_time)
         self.isolated_activate_exercises = {}
 
     def json_serialise(self):
