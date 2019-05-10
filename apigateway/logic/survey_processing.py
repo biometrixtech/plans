@@ -114,6 +114,9 @@ class SurveyProcessing(object):
             else:
                 self.athlete_stats.update_readiness_soreness(severe_soreness)
                 self.athlete_stats.update_readiness_pain(severe_pain)
+        muscle_soreness = [s for s in severe_soreness if s.is_muscle()]
+        for soreness in muscle_soreness:
+            self.athlete_stats.update_delayed_onset_muscle_soreness(soreness)
 
     def process_clear_status_answers(self, clear_candidates, event_date, soreness):
 

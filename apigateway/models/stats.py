@@ -4,6 +4,7 @@ from models.sport import SportName, BaseballPosition, BasketballPosition, Footba
 from models.session import StrengthConditioningType
 from utils import format_date, parse_date
 from models.soreness import HistoricSorenessStatus
+from models.delayed_onset_muscle_soreness import HistoricSeverity,DelayedOnsetMuscleSoreness
 from logic.soreness_processing import SorenessCalculator
 from fathomapi.utils.exceptions import InvalidSchemaException
 
@@ -171,6 +172,29 @@ class AthleteStats(Serialisable):
         pain_list = SorenessCalculator().update_soreness_list(pain_list, self.readiness_pain)
         pain_list = SorenessCalculator().update_soreness_list(pain_list, self.post_session_pain)
         self.daily_severe_pain = pain_list
+
+
+    def update_delayed_onset_muscle_soreness(self, soreness):
+        existing_doms = False
+        current_soreness = HistoricSeverity(soreness.reported_date_time, soreness.severity, soreness.movement)
+        current_severity = SorenessCalculator.get_severity(soreness.severity, soreness.movement)
+        for doms in self.delayed_onset_muscle_soreness:
+            if (doms.body_part.location == soreness.body_part.location and
+                    doms.side == soreness.side):
+                doms.historic_severity.append(current_soreness)
+                existing_doms = True
+                if current_severity > doms.max_severity:
+                    doms.max_severity = current_severity
+                    doms.max_severity_date_time = current_soreness.reported_date_time
+        if not existing_doms:
+            doms = DelayedOnsetMuscleSoreness()
+            doms.body_part = soreness.body_part
+            doms.side = soreness.side
+            doms.first_reported_date_time = soreness.reported_date_time
+            doms.max_severity = current_severity
+            doms.max_severity_date_time = soreness.reported_date_time
+            doms.historic_severity.append(current_soreness)
+            self.delayed_onset_muscle_soreness.append(doms)
 
     def severe_pain_soreness_today(self):
         severe_pain = [s for s in self.daily_severe_pain if s.severity >= 3]
