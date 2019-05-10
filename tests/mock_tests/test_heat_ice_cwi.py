@@ -25,7 +25,7 @@ def test_get_heat():
     soreness.side = 1
     soreness.historic_soreness_status = HistoricSorenessStatus.persistent_pain
     historic_date_time = current_date_time - timedelta(days=31)
-    soreness.first_reported_date = historic_date_time
+    soreness.first_reported_date_time = historic_date_time
 
     calc = ExerciseAssignmentCalculator("tester", exercise_library_datastore, completed_exercise_datastore, False)
 
@@ -44,7 +44,7 @@ def test_get_ice_historic_soreness_no_soreness_today():
     soreness.side = 1
     soreness.historic_soreness_status = HistoricSorenessStatus.persistent_pain
     historic_date_time = current_date_time - timedelta(days=31)
-    soreness.first_reported_date = historic_date_time
+    soreness.first_reported_date_time = historic_date_time
     soreness.daily = False
 
     calc = ExerciseAssignmentCalculator("tester", exercise_library_datastore, completed_exercise_datastore, False)
@@ -66,7 +66,7 @@ def test_get_ice_historic_soreness_pain_today():
     soreness.side = 1
     soreness.historic_soreness_status = HistoricSorenessStatus.persistent_pain
     historic_date_time = current_date_time - timedelta(days=31)
-    soreness.first_reported_date = historic_date_time
+    soreness.first_reported_date_time = historic_date_time
     soreness.daily = True
     soreness.pain = True
 
@@ -89,7 +89,7 @@ def test_get_ice_historic_soreness_no_pain_today():
     soreness.side = 1
     soreness.historic_soreness_status = HistoricSorenessStatus.persistent_pain
     historic_date_time = current_date_time - timedelta(days=31)
-    soreness.first_reported_date = historic_date_time
+    soreness.first_reported_date_time = historic_date_time
     soreness.daily = False
     soreness.pain = True
 

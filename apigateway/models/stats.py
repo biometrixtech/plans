@@ -69,6 +69,8 @@ class AthleteStats(Serialisable):
         self.daily_severe_pain = []
         self.daily_severe_pain_event_date = None
         self.daily_severe_soreness_event_date = None
+        self.delayed_onset_muscle_soreness = []
+
         self.metrics = []
         self.typical_weekly_sessions = None
         self.wearable_devices = []
@@ -358,6 +360,7 @@ class AthleteStats(Serialisable):
             'daily_severe_soreness': [s.json_serialise(daily=True) for s in self.daily_severe_soreness],
             'daily_severe_soreness_event_date': self.daily_severe_soreness_event_date,
             'daily_severe_pain_event_date': self.daily_severe_pain_event_date,
+            'delayed_muscle_onset_soreness': [s.json_serialise() for s in self.delayed_onset_muscle_soreness],
             'metrics': [m.json_serialise() for m in self.metrics],
             'typical_weekly_sessions': self.typical_weekly_sessions,
             'wearable_devices': self.wearable_devices,

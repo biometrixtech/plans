@@ -66,7 +66,7 @@ def test_active_rest_after_training_check_prevention_soreness_severity_2():
     soreness.side = 1
     soreness.historic_soreness_status = HistoricSorenessStatus.persistent_soreness
     historic_date_time = current_date_time - timedelta(days=31)
-    soreness.first_reported_date = historic_date_time
+    soreness.first_reported_date_time = historic_date_time
     exercise_library = exercise_library_datastore.get()
     active_rest.check_prevention_soreness(soreness, current_date_time, exercise_library)
 
@@ -87,7 +87,7 @@ def test_active_rest_after_training_check_prevention_soreness_severity_3():
     soreness.side = 1
     soreness.historic_soreness_status = HistoricSorenessStatus.persistent_soreness
     historic_date_time = current_date_time - timedelta(days=31)
-    soreness.first_reported_date = historic_date_time
+    soreness.first_reported_date_time = historic_date_time
     exercise_library = exercise_library_datastore.get()
     active_rest.check_prevention_soreness(soreness, current_date_time, exercise_library)
 
@@ -108,7 +108,7 @@ def test_active_rest_after_training_check_prevention_soreness_severity_4():
     soreness.side = 1
     soreness.historic_soreness_status = HistoricSorenessStatus.persistent_soreness
     historic_date_time = current_date_time - timedelta(days=31)
-    soreness.first_reported_date = historic_date_time
+    soreness.first_reported_date_time = historic_date_time
     exercise_library = exercise_library_datastore.get()
     active_rest.check_prevention_soreness(soreness, current_date_time, exercise_library)
 
@@ -129,7 +129,7 @@ def test_active_rest_after_training_check_prevention_pain_severity_2():
     soreness.side = 1
     soreness.historic_soreness_status = HistoricSorenessStatus.persistent_pain
     historic_date_time = current_date_time - timedelta(days=31)
-    soreness.first_reported_date = historic_date_time
+    soreness.first_reported_date_time = historic_date_time
     exercise_library = exercise_library_datastore.get()
     active_rest.check_prevention_pain(soreness, current_date_time, exercise_library)
 
@@ -150,7 +150,7 @@ def test_active_rest_after_training_check_prevention_pain_severity_3():
     soreness.side = 1
     soreness.historic_soreness_status = HistoricSorenessStatus.persistent_pain
     historic_date_time = current_date_time - timedelta(days=31)
-    soreness.first_reported_date = historic_date_time
+    soreness.first_reported_date_time = historic_date_time
     exercise_library = exercise_library_datastore.get()
     active_rest.check_prevention_pain(soreness, current_date_time, exercise_library)
 
@@ -171,7 +171,7 @@ def test_active_rest_after_training_check_prevention_pain_severity_4():
     soreness.side = 1
     soreness.historic_soreness_status = HistoricSorenessStatus.persistent_pain
     historic_date_time = current_date_time - timedelta(days=31)
-    soreness.first_reported_date = historic_date_time
+    soreness.first_reported_date_time = historic_date_time
     exercise_library = exercise_library_datastore.get()
     active_rest.check_prevention_pain(soreness, current_date_time, exercise_library)
 
@@ -265,7 +265,7 @@ def test_active_rest_before_training_check_prevention_soreness_severity_2():
     soreness.side = 1
     soreness.historic_soreness_status = HistoricSorenessStatus.persistent_soreness
     historic_date_time = current_date_time - timedelta(days=31)
-    soreness.first_reported_date = historic_date_time
+    soreness.first_reported_date_time = historic_date_time
     exercise_library = exercise_library_datastore.get()
     active_rest.check_prevention_soreness(soreness, current_date_time, exercise_library)
 
@@ -286,7 +286,7 @@ def test_active_rest_before_training_check_prevention_soreness_severity_3():
     soreness.side = 1
     soreness.historic_soreness_status = HistoricSorenessStatus.persistent_soreness
     historic_date_time = current_date_time - timedelta(days=31)
-    soreness.first_reported_date = historic_date_time
+    soreness.first_reported_date_time = historic_date_time
     exercise_library = exercise_library_datastore.get()
     active_rest.check_prevention_soreness(soreness, current_date_time, exercise_library)
 
@@ -307,7 +307,7 @@ def test_active_rest_befpre_training_check_prevention_soreness_severity_4():
     soreness.side = 1
     soreness.historic_soreness_status = HistoricSorenessStatus.persistent_soreness
     historic_date_time = current_date_time - timedelta(days=31)
-    soreness.first_reported_date = historic_date_time
+    soreness.first_reported_date_time = historic_date_time
     exercise_library = exercise_library_datastore.get()
     active_rest.check_prevention_soreness(soreness, current_date_time, exercise_library)
 
@@ -328,7 +328,7 @@ def test_active_rest_before_training_check_prevention_pain_severity_2():
     soreness.side = 1
     soreness.historic_soreness_status = HistoricSorenessStatus.persistent_pain
     historic_date_time = current_date_time - timedelta(days=31)
-    soreness.first_reported_date = historic_date_time
+    soreness.first_reported_date_time = historic_date_time
     exercise_library = exercise_library_datastore.get()
     active_rest.check_prevention_pain(soreness, current_date_time, exercise_library)
 
@@ -349,7 +349,7 @@ def test_active_rest_before_training_check_prevention_pain_severity_3():
     soreness.side = 1
     soreness.historic_soreness_status = HistoricSorenessStatus.persistent_pain
     historic_date_time = current_date_time - timedelta(days=31)
-    soreness.first_reported_date = historic_date_time
+    soreness.first_reported_date_time = historic_date_time
     exercise_library = exercise_library_datastore.get()
     active_rest.check_prevention_pain(soreness, current_date_time, exercise_library)
 
@@ -370,7 +370,7 @@ def test_active_rest_before_training_check_prevention_pain_severity_4():
     soreness.side = 1
     soreness.historic_soreness_status = HistoricSorenessStatus.persistent_pain
     historic_date_time = current_date_time - timedelta(days=31)
-    soreness.first_reported_date = historic_date_time
+    soreness.first_reported_date_time = historic_date_time
     exercise_library = exercise_library_datastore.get()
     active_rest.check_prevention_pain(soreness, current_date_time, exercise_library)
 

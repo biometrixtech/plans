@@ -4,6 +4,7 @@ from models.exercise import Exercise, UnitOfMeasure
 from serialisable import Serialisable
 from random import shuffle
 import datetime
+from fathomapi.utils.exceptions import InvalidSchemaException
 
 from utils import format_datetime, parse_datetime, format_date, parse_date
 
@@ -65,6 +66,37 @@ class BaseSoreness(object):
             return False
 
 
+class DelayedOnsetMuscleSoreness(Serialisable):
+    def __init__(self):
+        self.body_part = None
+        self.severity = None  # muscle_soreness_severity
+        self.movement = None
+        self.side = None
+        self.first_reported_date_time = None
+
+    def json_serialise(self):
+        ret = {
+            'body_part': self.body_part.location.value,
+            'severity': self.severity,
+            'movement': self.movement,
+            'side': self.side,
+            'first_reported_date_time': format_date(
+                self.first_reported_date_time) if self.first_reported_date_time is not None else None
+        }
+        return ret
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        soreness = cls()
+        soreness.body_part = BodyPart(BodyPartLocation(input_dict['body_part']), None)
+        soreness.severity = input_dict['severity']
+        soreness.movement = input_dict.get('movement', None)
+        soreness.side = input_dict.get('side', None)
+        soreness.first_reported_date_time = input_dict.get('first_reported_date_time', None)
+
+        return soreness
+
+
 class Soreness(BaseSoreness, Serialisable):
     def __init__(self):
         super().__init__()
@@ -78,7 +110,7 @@ class Soreness(BaseSoreness, Serialisable):
         self.type = None  # soreness_type
         self.count = 1
         self.streak = 0
-        self.first_reported_date = None
+        self.first_reported_date_time = None
         self.daily = True
 
     @classmethod
@@ -89,9 +121,9 @@ class Soreness(BaseSoreness, Serialisable):
         soreness.severity = input_dict['severity']
         soreness.movement = input_dict.get('movement', None)
         soreness.side = input_dict.get('side', None)
-        soreness.first_reported_date = input_dict.get('first_reported_date', None)
-        # if input_dict.get('first_reported_date', None) is not None:
-        #     soreness.first_reported_date = parse_date(input_dict['first_reported_date'])
+        soreness.first_reported_date_time = input_dict.get('first_reported_date_time', None)
+        # if input_dict.get('first_reported_date_time', None) is not None:
+        #     soreness.first_reported_date_time = parse_date(input_dict['first_reported_date_time'])
         if input_dict.get('reported_date_time', None) is not None:
             soreness.reported_date_time = parse_datetime(input_dict['reported_date_time'])
         return soreness
@@ -104,9 +136,12 @@ class Soreness(BaseSoreness, Serialisable):
                  self.side == other.side))
 
     def __setattr__(self, name, value):
-        if name in ['first_reported_date']:
+        if name in ['first_reported_date_time']:
             if value is not None and not isinstance(value, datetime.datetime):
-                value = parse_date(value)
+                try:
+                    value = parse_datetime(value)
+                except InvalidSchemaException:
+                    value = parse_date(value)
         super().__setattr__(name, value)
 
     '''deprecated
@@ -153,7 +188,6 @@ class Soreness(BaseSoreness, Serialisable):
         else:
             return False
 
-
     def json_serialise(self, api=False, daily=False, trigger=False):
         if api:
             ret = {
@@ -178,7 +212,7 @@ class Soreness(BaseSoreness, Serialisable):
                    'severity': self.severity,
                    'movement': self.movement,
                    'side': self.side,
-                   'first_reported_date': format_date(self.first_reported_date) if self.first_reported_date is not None else None,
+                   'first_reported_date_time': format_date(self.first_reported_date_time) if self.first_reported_date_time is not None else None,
                   }
 
         else:
@@ -347,15 +381,18 @@ class HistoricSoreness(BaseSoreness, Serialisable):
         self.streak = 0
         self.streak_start_date = None
         self.average_severity = 0.0
-        self.first_reported_date = None
+        self.first_reported_date_time = None
         self.last_reported = ""
         self.ask_acute_pain_question = False
         self.ask_persistent_2_question = False
 
     def __setattr__(self, name, value):
-        if name in ['first_reported_date']:
+        if name in ['first_reported_date_time']:
             if value is not None and not isinstance(value, datetime.datetime):
-                value = parse_date(value)
+                try:
+                    value = parse_datetime(value)
+                except InvalidSchemaException:
+                    value = parse_date(value)
         super().__setattr__(name, value)
 
     def json_serialise(self, api=False):
@@ -373,7 +410,7 @@ class HistoricSoreness(BaseSoreness, Serialisable):
                    'streak': self.streak,
                    'streak_start_date': self.streak_start_date,
                    'average_severity': self.average_severity,
-                   'first_reported_date': format_date(self.first_reported_date) if self.first_reported_date is not None else None,
+                   'first_reported_date_time': format_date(self.first_reported_date_time) if self.first_reported_date_time is not None else None,
                    'last_reported': self.last_reported,
                    'ask_acute_pain_question': self.ask_acute_pain_question,
                    'ask_persistent_2_question': self.ask_persistent_2_question
@@ -388,7 +425,7 @@ class HistoricSoreness(BaseSoreness, Serialisable):
         soreness.streak = input_dict.get('streak', 0)
         soreness.streak_start_date = input_dict.get("streak_start_date", None)
         soreness.average_severity = input_dict.get('average_severity', 0.0)
-        soreness.first_reported_date = input_dict.get("first_reported_date", None) if input_dict.get("first_reported_date", None) != "" else None
+        soreness.first_reported_date_time = input_dict.get("first_reported_date_time", None) if input_dict.get("first_reported_date_time", None) != "" else None
         soreness.last_reported = input_dict.get("last_reported", "")
         soreness.ask_acute_pain_question = input_dict.get("ask_acute_pain_question", False)
         soreness.ask_persistent_2_question = input_dict.get("ask_persistent_2_question", False)

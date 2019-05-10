@@ -68,9 +68,9 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         self.mod_intensity_minutes = None
         self.low_intensity_minutes = None
         self.inactive_minutes = None
-        self.high_intensity_RPE = None
-        self.mod_intensity_RPE = None
-        self.low_intensity_RPE = None
+        #self.high_intensity_RPE = None
+        #self.mod_intensity_RPE = None
+        #self.low_intensity_RPE = None
         self.post_session_soreness = []     # post_session_soreness object array
         self.duration_minutes = None
         self.created_date = None
@@ -341,9 +341,15 @@ class PracticeSession(Session):
         return Session.missing_post_session_survey()
 '''
 
+
 class SportTrainingSession(Session):
     def __init__(self):
         Session.__init__(self)
+        self.leads_to_soreness = False
+        self.atypical_session_type = False
+        self.atypical_high_load = False
+        self.ultra_high_intensity_session = False
+        self.high_intensity_RPE = False
 
     def session_type(self):
         return SessionType.sport_training
