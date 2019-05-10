@@ -348,8 +348,6 @@ class SportTrainingSession(Session):
         self.leads_to_soreness = False
         self.atypical_session_type = False
         self.atypical_high_load = False
-        self.ultra_high_intensity_session = False
-        self.high_intensity_RPE = False
 
     def session_type(self):
         return SessionType.sport_training
@@ -361,6 +359,25 @@ class SportTrainingSession(Session):
 
     def missing_post_session_survey(self):
         return Session.missing_post_session_survey()
+
+    def ultra_high_intensity_session(self):
+
+        ultra_high_intensity_sports = [SportName.diving, SportName.jumps, SportName.throws, SportName.weightlifting,
+                                       SportName.strength, SportName.functional_strength_training,
+                                       SportName.traditional_strength_training, SportName.core_training,
+                                       SportName.high_intensity_interval_training, SportName.pilates]
+
+        if self.sport_name in ultra_high_intensity_sports:
+            return True
+        else:
+            return False
+
+    def high_intensity_RPE(self):
+
+        if self.session_RPE > 5:
+            return True
+        else:
+            return False
 
 
 class StrengthConditioningSession(Session):
