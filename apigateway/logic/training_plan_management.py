@@ -116,8 +116,8 @@ class TrainingPlanManager(object):
             # create new post-training modalitiesathlete_stats, soreness_list, event_date_time
             self.daily_plan.cool_down = calc.get_cool_down(athlete_stats, soreness_list, parse_date(event_date))
             self.daily_plan.post_active_rest = calc.get_post_active_rest(athlete_stats, soreness_list, parse_date(event_date))
-            self.daily_plan.ice = calc.get_ice(soreness_list, parse_date(event_date))
-            self.daily_plan.cold_water_immersion = calc.get_cold_water_immersion(soreness_list, parse_date(event_date))
+            self.daily_plan.ice = calc.get_ice(soreness_list, athlete_stats.delayed_onset_muscle_soreness, parse_date(event_date))
+            self.daily_plan.cold_water_immersion = calc.get_cold_water_immersion(soreness_list, athlete_stats.delayed_onset_muscle_soreness, parse_date(event_date))
             if self.daily_plan.cold_water_immersion is not None:
                 self.daily_plan.ice = calc.adjust_ice_session(self.daily_plan.ice, self.daily_plan.cold_water_immersion)
         else:
