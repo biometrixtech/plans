@@ -314,6 +314,47 @@ class TrainingVolumeProcessing(object):
 
         return athlete_stats
 
+    def find_doms_causal_sessions(self, athlete_stats, training_sessions):
+
+        # training sessions are all the sessions from all_plans
+
+        for d in athlete_stats.delayed_onset_muscle_soreness:
+            if d.causal_session is None:
+                end_date_time = d.first_reported_date_time
+                mid_point_time = d.first_reported_date_time - timedelta(hours=24)
+                start_date_time = d.first_reported_date_time - timedelta(hours=48)
+                target_sessions = list(t for t in training_sessions if start_date_time <= t.event_date <= end_date_time)
+                high_target_sessions = list(
+                    t for t in training_sessions if start_date_time <= t.event_date <= mid_point_time and
+                    t.ultra_high_intensity_session() or t.high_intensity_RPE())
+                high_sessions = list(
+                    t for t in target_sessions if t.ultra_high_intensity_session() or t.high_intensity_RPE())
+                midpoint_sessions = list(t for t in training_sessions if start_date_time <= t.event_date <= mid_point_time)
+                # what to do if there are no sessions? leave it None (will only affect historical analysis)
+                if len(high_target_sessions) == 1:
+                    d.causal_session = high_target_sessions[0]
+                elif len(high_sessions) == 1:
+                    d.causal_session = high_sessions[0]
+                elif len(midpoint_sessions) == 1:
+                    d.causal_session = midpoint_sessions[0]
+                elif len(target_sessions) == 1:
+                    d.causal_session = target_sessions[0]
+                elif len(high_target_sessions) > 1:
+                    high_target_sessions.sort(key=self.get_event_date_from_session, reverse=True)
+                    d.causal_session = high_target_sessions[0]
+                elif len(high_sessions) > 1:
+                    high_sessions.sort(key=self.get_event_date_from_session, reverse=True)
+                    d.causal_session = high_sessions[0]
+                elif len(midpoint_sessions) > 1:
+                    midpoint_sessions.sort(key=self.get_event_date_from_session, reverse=True)
+                    d.causal_session = midpoint_sessions[0]
+                elif len(target_sessions) > 1:
+                    # keep searching
+                    target_sessions.sort(key=self.get_event_date_from_session,
+                                         reverse=False)  # DOMS may need 24 hours to manifest; start with earliest
+                    d.causal_session = target_sessions[0]
+                # else:  we will do nothing if we can't find anything yet
+
     def calc_muscular_strain(self):
 
         last_2_weeks_load_sum = sum(
