@@ -6,7 +6,7 @@ from random import shuffle
 import datetime
 from fathomapi.utils.exceptions import InvalidSchemaException
 
-from utils import format_datetime, parse_datetime, format_date, parse_date
+from utils import format_datetime, parse_datetime, parse_date
 
 
 class SorenessType(Enum):
@@ -64,37 +64,6 @@ class BaseSoreness(object):
             return True
         else:
             return False
-
-
-class DelayedOnsetMuscleSoreness(Serialisable):
-    def __init__(self):
-        self.body_part = None
-        self.severity = None  # muscle_soreness_severity
-        self.movement = None
-        self.side = None
-        self.first_reported_date_time = None
-
-    def json_serialise(self):
-        ret = {
-            'body_part': self.body_part.location.value,
-            'severity': self.severity,
-            'movement': self.movement,
-            'side': self.side,
-            'first_reported_date_time': format_date(
-                self.first_reported_date_time) if self.first_reported_date_time is not None else None
-        }
-        return ret
-
-    @classmethod
-    def json_deserialise(cls, input_dict):
-        soreness = cls()
-        soreness.body_part = BodyPart(BodyPartLocation(input_dict['body_part']), None)
-        soreness.severity = input_dict['severity']
-        soreness.movement = input_dict.get('movement', None)
-        soreness.side = input_dict.get('side', None)
-        soreness.first_reported_date_time = input_dict.get('first_reported_date_time', None)
-
-        return soreness
 
 
 class Soreness(BaseSoreness, Serialisable):
@@ -212,7 +181,7 @@ class Soreness(BaseSoreness, Serialisable):
                    'severity': self.severity,
                    'movement': self.movement,
                    'side': self.side,
-                   'first_reported_date_time': format_date(self.first_reported_date_time) if self.first_reported_date_time is not None else None,
+                   'first_reported_date_time': format_datetime(self.first_reported_date_time) if self.first_reported_date_time is not None else None,
                   }
 
         else:
@@ -410,7 +379,7 @@ class HistoricSoreness(BaseSoreness, Serialisable):
                    'streak': self.streak,
                    'streak_start_date': self.streak_start_date,
                    'average_severity': self.average_severity,
-                   'first_reported_date_time': format_date(self.first_reported_date_time) if self.first_reported_date_time is not None else None,
+                   'first_reported_date_time': format_datetime(self.first_reported_date_time) if self.first_reported_date_time is not None else None,
                    'last_reported': self.last_reported,
                    'ask_acute_pain_question': self.ask_acute_pain_question,
                    'ask_persistent_2_question': self.ask_persistent_2_question
