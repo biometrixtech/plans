@@ -49,7 +49,7 @@ def test_get_ice_historic_soreness_no_soreness_today():
 
     calc = ExerciseAssignmentCalculator("tester", exercise_library_datastore, completed_exercise_datastore, False)
 
-    ice_session = calc.get_ice([soreness], current_date_time)
+    ice_session = calc.get_ice([soreness], [], current_date_time)
 
     assert len(ice_session.body_parts) > 0
     for g in ice_session.body_parts[0].goals:
@@ -72,7 +72,7 @@ def test_get_ice_historic_soreness_pain_today():
 
     calc = ExerciseAssignmentCalculator("tester", exercise_library_datastore, completed_exercise_datastore, False)
 
-    ice_session = calc.get_ice([soreness], current_date_time)
+    ice_session = calc.get_ice([soreness], [], current_date_time)
 
     assert len(ice_session.body_parts) > 0
     for g in ice_session.body_parts[0].goals:
@@ -95,7 +95,7 @@ def test_get_ice_historic_soreness_no_pain_today():
 
     calc = ExerciseAssignmentCalculator("tester", exercise_library_datastore, completed_exercise_datastore, False)
 
-    ice_session = calc.get_ice([soreness], current_date_time)
+    ice_session = calc.get_ice([soreness], [], current_date_time)
 
     assert len(ice_session.body_parts) > 0
     for g in ice_session.body_parts[0].goals:
@@ -114,7 +114,7 @@ def test_get_no_ice_daily_soreness():
 
     calc = ExerciseAssignmentCalculator("tester", exercise_library_datastore, completed_exercise_datastore, False)
 
-    ice_session = calc.get_ice([soreness], current_date_time)
+    ice_session = calc.get_ice([soreness], [], current_date_time)
 
     assert ice_session is None
 
@@ -131,7 +131,7 @@ def test_get_ice_daily_pain():
 
     calc = ExerciseAssignmentCalculator("tester", exercise_library_datastore, completed_exercise_datastore, False)
 
-    ice_session = calc.get_ice([soreness], current_date_time)
+    ice_session = calc.get_ice([soreness], [], current_date_time)
 
     assert len(ice_session.body_parts) > 0
 
@@ -148,7 +148,7 @@ def test_get_no_ice_daily_pain_severity_4():
 
     calc = ExerciseAssignmentCalculator("tester", exercise_library_datastore, completed_exercise_datastore, False)
 
-    ice_session = calc.get_ice([soreness], current_date_time)
+    ice_session = calc.get_ice([soreness], [], current_date_time)
 
     assert ice_session is None
 
@@ -165,7 +165,7 @@ def test_get_ice_daily_pain_severity_4():
 
     calc = ExerciseAssignmentCalculator("tester", exercise_library_datastore, completed_exercise_datastore, False)
 
-    ice_session = calc.get_ice([soreness], current_date_time)
+    ice_session = calc.get_ice([soreness], [], current_date_time)
 
     assert ice_session is not None
 
@@ -182,7 +182,7 @@ def test_get_cwi_daily_pain_severity_4():
 
     calc = ExerciseAssignmentCalculator("tester", exercise_library_datastore, completed_exercise_datastore, False)
 
-    cwi = calc.get_cold_water_immersion([soreness], current_date_time)
+    cwi = calc.get_cold_water_immersion([soreness], [], current_date_time)
 
     assert cwi is not None
 
@@ -199,7 +199,7 @@ def test_get_no_cwi_daily_pain_severity_4_upper_body():
 
     calc = ExerciseAssignmentCalculator("tester", exercise_library_datastore, completed_exercise_datastore, False)
 
-    cwi = calc.get_cold_water_immersion([soreness], current_date_time)
+    cwi = calc.get_cold_water_immersion([soreness], [], current_date_time)
 
     assert cwi is None
 

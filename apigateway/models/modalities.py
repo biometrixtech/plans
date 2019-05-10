@@ -1213,6 +1213,9 @@ class Ice(Serialisable):
 
         return ret
 
+    def __eq__(self, other):
+        return self.body_part_location == other.body_part_location and self.side == other.side
+
     @classmethod
     def json_deserialise(cls, input_dict):
         ice = cls(body_part_location=BodyPartLocation(input_dict['body_part_location']),

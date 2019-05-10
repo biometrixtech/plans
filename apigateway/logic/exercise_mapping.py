@@ -849,7 +849,7 @@ class ExerciseAssignmentCalculator(object):
         return active_recovery
     '''
 
-    def get_ice(self, soreness_list, event_date_time):
+    def get_ice(self, soreness_list, doms, event_date_time):
 
         ice_list = []
         minutes = []
@@ -938,6 +938,22 @@ class ExerciseAssignmentCalculator(object):
                     ice.goals.add(goal)
                     ice_list.append(ice)
 
+        for d in doms:
+            days = (event_date_time - d.first_reported_date_time).days
+            if ((days == 2 and d.max_severity < 2) or  # minor DOMS
+                    (days <= 2 and 2 <= d.max_severity <= 3) or  # moderate DOMS
+                    (days <= 2 and 3 < d.max_severity <= 5)):  # severe DOMS
+                if d.body_part.location not in low_parts:
+                    goal = AthleteGoal("Care for Soreness, Reactive", 1, AthleteGoalType.sore)
+                    goal.trigger = "Soreness Reported Today as DOMS"
+
+                    minutes.append(15)
+                    ice = Ice(body_part_location=d.body_part.location, side=d.side)
+                    ice.repeat_every_3hrs_for_24hrs = True
+                    ice.goals.add(goal)
+                    if ice not in ice_list:
+                        ice_list.append(ice)
+
         if len(ice_list) > 0:
             ice_session = IceSession(minutes=min(minutes))
             ice_session.body_parts = ice_list
@@ -946,9 +962,11 @@ class ExerciseAssignmentCalculator(object):
         else:
             return None
 
-    def get_cold_water_immersion(self, soreness_list, event_date_time):
+    def get_cold_water_immersion(self, soreness_list, doms, event_date_time):
 
         cold_water_immersion = None
+
+        low_parts = [BodyPartLocation.ankle, BodyPartLocation.knee, BodyPartLocation.elbow]
 
         for s in soreness_list:
             if self.is_lower_body_part(s.body_part.location) and s.daily and s.severity >= 3.5:
@@ -956,7 +974,8 @@ class ExerciseAssignmentCalculator(object):
 
                     goal = AthleteGoal("Care for Pain", 1, AthleteGoalType.pain)
                     goal.trigger = "Pain Reported Today"
-                    cold_water_immersion = ColdWaterImmersion()
+                    if cold_water_immersion is None:
+                        cold_water_immersion = ColdWaterImmersion()
                     cold_water_immersion.goals.add(goal)
 
                 elif not s.pain and s.historic_soreness_status is not None and s.historic_soreness_status is not s.is_dormant_cleared() and s.first_reported_date_time is not None:
@@ -964,8 +983,21 @@ class ExerciseAssignmentCalculator(object):
                     if days_diff > 30 and s.severity >= 3.5:
                         goal = AthleteGoal("Care for Soreness", 1, AthleteGoalType.sore)
                         goal.trigger = "Soreness Reported Today + Pers, Pers-2 Soreness > 30d"
-                        cold_water_immersion = ColdWaterImmersion()
+                        if cold_water_immersion is None:
+                            cold_water_immersion = ColdWaterImmersion()
                         cold_water_immersion.goals.add(goal)
+
+        for d in doms:
+            days = (event_date_time - d.first_reported_date_time).days
+            if ((days == 2 and d.max_severity < 2) or  # minor DOMS
+                    (days <= 2 and 2 <= d.max_severity <= 3) or  # moderate DOMS
+                    (days <= 2 and 3 < d.max_severity <= 5)):  # severe DOMS
+                if d.body_part.location in low_parts:
+                    goal = AthleteGoal("Care for Soreness, Reactive", 1, AthleteGoalType.sore)
+                    goal.trigger = "Soreness Reported Today as DOMS"
+                    if cold_water_immersion is None:
+                        cold_water_immersion = ColdWaterImmersion()
+                    cold_water_immersion.goals.add(goal)
 
         return cold_water_immersion
 
