@@ -107,10 +107,10 @@ class ModalityBase(object):
         super().__setattr__(name, value)
 
     @abc.abstractmethod
-    def conditions_for_increased_sensitivity_met(self, soreness_list):
+    def conditions_for_increased_sensitivity_met(self, soreness_list, muscular_strain_increasing):
         return False
 
-    def set_plan_dosage(self, soreness_list):
+    def set_plan_dosage(self, soreness_list, muscular_strain_increasing):
 
         care_for_pain_present = False
         historic_status_present = False
@@ -124,7 +124,7 @@ class ModalityBase(object):
             if s.severity >= 2:
                 severity_greater_than_2 = True
 
-        increased_sensitivity = self.conditions_for_increased_sensitivity_met(soreness_list)
+        increased_sensitivity = self.conditions_for_increased_sensitivity_met(soreness_list, muscular_strain_increasing)
 
         if care_for_pain_present and not historic_status_present:
             self.default_plan = "Comprehensive"
@@ -156,7 +156,7 @@ class ModalityBase(object):
             target_collection[s.exercise.id].dosages.append(dosage)
 
     @abc.abstractmethod
-    def fill_exercises(self, soreness_list, exercise_library):
+    def fill_exercises(self, soreness_list, exercise_library, high_relative_load_session, high_relative_intensity_logged, muscular_strain_increasing, sports):
         pass
 
     @staticmethod
@@ -336,16 +336,16 @@ class ModalityBase(object):
 
 
 class ActiveRest(ModalityBase):
-    def __init__(self, training_sessions, muscular_strain_increasing, event_date_time):
+    def __init__(self, event_date_time):
         super().__init__(event_date_time)
-        self.high_relative_load_session = False
-        self.high_relative_intensity_logged = False
-        self.muscular_strain_increasing = muscular_strain_increasing
+        #self.high_relative_load_session = high_relative_load_session
+        #self.high_relative_intensity_logged = high_relative_intensity_logged
+        #self.muscular_strain_increasing = muscular_strain_increasing
         self.event_date_time = event_date_time
         self.inhibit_exercises = {}
         self.static_integrate_exercises = {}
         self.static_stretch_exercises = {}
-        self.high_relative_intensity_logged = self.process_training_sessions_intensity(training_sessions)
+        self.isolated_activate_exercises = {}
 
     @abc.abstractmethod
     def check_reactive_care_soreness(self, soreness, exercise_library):
@@ -363,25 +363,15 @@ class ActiveRest(ModalityBase):
     def check_prevention_pain(self, soreness, event_date_time, exercise_library):
         pass
 
-    def process_training_sessions_intensity(self, training_sessions):
-
-        high_relative_intensity_session = False
-
-        for t in training_sessions:
-            if t.ultra_high_intensity_session() or t.high_intensity_RPE():
-                high_relative_intensity_session = True
-
-        return high_relative_intensity_session
-
     '''deprecated
     @abc.abstractmethod
     def calc_durations(self):
         pass
     '''
 
-    def conditions_for_increased_sensitivity_met(self, soreness_list):
+    def conditions_for_increased_sensitivity_met(self, soreness_list, muscular_strain_increasing):
 
-        if self.muscular_strain_increasing:
+        if muscular_strain_increasing:
             return True
         else:
             for s in soreness_list:
@@ -391,37 +381,54 @@ class ActiveRest(ModalityBase):
                         return True
         return False
 
-    def fill_exercises(self, soreness_list, exercise_library):
+    def fill_exercises(self, soreness_list, exercise_library, high_relative_load_session, high_relative_intensity_logged, muscular_strain_increasing, sports):
 
         for s in soreness_list:
+            self.check_reactive_recover_from_sport(soreness_list, exercise_library, high_relative_load_session, high_relative_intensity_logged, sports)
             self.check_reactive_care_soreness(s, exercise_library)
             self.check_reactive_care_pain(s, exercise_library)
             self.check_prevention_soreness(s, self.event_date_time, exercise_library)
             self.check_prevention_pain(s, self.event_date_time, exercise_library)
 
-    '''dprecated
-    def calc_active_time(self, exercise_dictionary):
+    def check_reactive_recover_from_sport(self, soreness_list, exercise_library, high_relative_load_session,
+                                          high_relative_intensity_logged, sports):
+        if high_relative_load_session or high_relative_intensity_logged:
+            goal = AthleteGoal("Recover from Sport", 1, AthleteGoalType.sport)
+            goal.trigger = "High Relative Volume or Intensity of Logged Session"
 
-        active_time = 0
+            body_part_factory = BodyPartFactory()
 
-        for id, assigned_excercise in exercise_dictionary.items():
-            active_time += assigned_excercise.duration() / 60
+            for sport_name in sports:
+                body_part = body_part_factory.get_body_part_for_sport(sport_name)
 
-        return active_time
-    '''
+                prohibiting_soreness = False
+
+                high_severity_list = list(s for s in soreness_list if s.severity >= 3.5)
+
+                if len(high_severity_list) > 0:
+                    prohibiting_soreness = True
+
+                # Note: this is just returning the primary mover related exercises for sport
+                if body_part is not None and not prohibiting_soreness:
+                    self.copy_exercises(body_part.inhibit_exercises,
+                                        self.inhibit_exercises, goal, "1", None, exercise_library)
+                    if not prohibiting_soreness:
+                        self.copy_exercises(body_part.static_stretch_exercises,
+                                            self.static_stretch_exercises, goal, "1", None, exercise_library)
+                        self.copy_exercises(body_part.isolated_activate_exercises,
+                                            self.isolated_activate_exercises, goal, "1", None, exercise_library)
 
 
 class ActiveRestBeforeTraining(ActiveRest, Serialisable):
-    def __init__(self, training_sessions, muscular_strain_increasing, event_date_time):
-        super().__init__(training_sessions, muscular_strain_increasing, event_date_time)
+    def __init__(self, event_date_time):
+        super().__init__(event_date_time)
         self.active_stretch_exercises = {}
-        self.isolated_activate_exercises = {}
 
     def json_serialise(self):
         ret = {
-            'high_relative_load_session': self.high_relative_load_session,
-            'high_relative_intensity_logged': self.high_relative_intensity_logged,
-            'muscular_strain_increasing': self.muscular_strain_increasing,
+            #'high_relative_load_session': self.high_relative_load_session,
+            #'high_relative_intensity_logged': self.high_relative_intensity_logged,
+            #'muscular_strain_increasing': self.muscular_strain_increasing,
             'inhibit_exercises': [p.json_serialise() for p in self.inhibit_exercises.values()],
             'static_stretch_exercises': [p.json_serialise() for p in self.static_stretch_exercises.values()],
             'active_stretch_exercises': [p.json_serialise() for p in self.active_stretch_exercises.values()],
@@ -438,9 +445,9 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
 
     @classmethod
     def json_deserialise(cls, input_dict):
-        pre_active_rest = cls(high_relative_load_session=input_dict.get('high_relative_load_session', False),
-                              high_relative_intensity_logged=input_dict.get('high_relative_intensity_logged', False),
-                              muscular_strain_increasing=input_dict.get('muscular_strain_increasing', False),
+        pre_active_rest = cls(#high_relative_load_session=input_dict.get('high_relative_load_session', False),
+                              #high_relative_intensity_logged=input_dict.get('high_relative_intensity_logged', False),
+                              #muscular_strain_increasing=input_dict.get('muscular_strain_increasing', False),
                               event_date_time=input_dict.get('event_date_time', None))
         pre_active_rest.active = input_dict.get("active", True)
         pre_active_rest.start_date_time = input_dict.get("start_date_time", None)
@@ -648,15 +655,14 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
 
 
 class ActiveRestAfterTraining(ActiveRest, Serialisable):
-    def __init__(self, training_sessions, muscular_strain_increasing, event_date_time):
-        super().__init__(training_sessions, muscular_strain_increasing, event_date_time)
-        self.isolated_activate_exercises = {}
+    def __init__(self, event_date_time):
+        super().__init__(event_date_time)
 
     def json_serialise(self):
         ret = {
-            'high_relative_load_session': self.high_relative_load_session,
-            'high_relative_intensity_logged': self.high_relative_intensity_logged,
-            'muscular_strain_increasing': self.muscular_strain_increasing,
+            #'high_relative_load_session': self.high_relative_load_session,
+            #'high_relative_intensity_logged': self.high_relative_intensity_logged,
+            #'muscular_strain_increasing': self.muscular_strain_increasing,
             'inhibit_exercises': [p.json_serialise() for p in self.inhibit_exercises.values()],
             'static_stretch_exercises': [p.json_serialise() for p in self.static_stretch_exercises.values()],
             'isolated_activate_exercises': [p.json_serialise() for p in self.isolated_activate_exercises.values()],
@@ -672,9 +678,9 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
 
     @classmethod
     def json_deserialise(cls, input_dict):
-        post_active_rest = cls(high_relative_load_session=input_dict.get('high_relative_load_session', False),
-                               high_relative_intensity_logged=input_dict.get('high_relative_intensity_logged', False),
-                               muscular_strain_increasing=input_dict.get('muscular_strain_increasing', False),
+        post_active_rest = cls(#high_relative_load_session=input_dict.get('high_relative_load_session', False),
+                               #high_relative_intensity_logged=input_dict.get('high_relative_intensity_logged', False),
+                               #muscular_strain_increasing=input_dict.get('muscular_strain_increasing', False),
                                event_date_time=input_dict.get('event_date_time', None))
         post_active_rest.active = input_dict.get("active", True)
         post_active_rest.start_date_time = input_dict.get("start_date_time", None)
@@ -916,7 +922,7 @@ class WarmUp(ModalityBase, Serialisable):
 
         return warmup
 
-    def fill_exercises(self, soreness_list, exercise_library):
+    def fill_exercises(self, soreness_list, exercise_library, high_relative_load_session, high_relative_intensity_logged, muscular_strain_increasing, sports):
         for s in soreness_list:
             self.check_corrective_soreness(s, self.event_date_time, exercise_library)
             self.check_preempt_soreness(s, self.event_date_time, exercise_library)
@@ -1026,7 +1032,7 @@ class CoolDown(ModalityBase, Serialisable):
 
         return cooldown
 
-    def conditions_for_increased_sensitivity_met(self, soreness_list):
+    def conditions_for_increased_sensitivity_met(self, soreness_list, muscular_strain_increasing):
 
         if self.muscular_strain_increasing:
             return True
@@ -1077,7 +1083,7 @@ class CoolDown(ModalityBase, Serialisable):
 
                 self.assign_exercises(soreness, goal, exercise_library)
 
-    def fill_exercises(self, soreness_list, exercise_library):
+    def fill_exercises(self, soreness_list, exercise_library, high_relative_load_session, high_relative_intensity_logged, muscular_strain_increasing, sports):
 
         self.check_recover_from_sport(soreness_list, exercise_library)
         for s in soreness_list:
@@ -1110,48 +1116,6 @@ class CoolDown(ModalityBase, Serialisable):
                     self.copy_exercises(synergist.dynamic_integrate_exercises, self.dynamic_integrate_exercises, goal, "2",
                                         soreness,
                                         exercise_library)
-
-
-'''Heck NO!
-class ActiveRecovery(Serialisable):
-    def __init__(self):
-        self.dynamic_integrate_exercises = {}
-        self.dynamic_integrate_with_speed_exercises = {}
-        self.start_date_time = None
-        self.event_date_time = None
-        self.completed = False
-        self.active = True
-
-    def json_serialise(self):
-        ret = {
-            'dynamic_integrate_exercises': [p.json_serialise() for p in self.dynamic_integrate_exercises.values()],
-            'dynamic_integrate_with_speed_exercises': [p.json_serialise() for p in self.dynamic_integrate_with_speed_exercises.values()],
-            'start_date_time': format_datetime(self.start_date_time) if self.start_date_time is not None else None,
-            'event_date_time': format_datetime(self.event_date_time) if self.event_date_time is not None else None,
-            'completed': self.completed,
-            'active': self.active
-        }
-        return ret
-
-    @classmethod
-    def json_deserialise(cls, input_dict):
-        active_recovery = cls()
-        active_recovery.dynamic_integrate_exercises = {s['library_id']: AssignedExercise.json_deserialise(s) for s in input_dict['dynamic_integrate_exercises']}
-        active_recovery.dynamic_integrate_with_speed_exercises = {s['library_id']: AssignedExercise.json_deserialise(s) for s in input_dict['dynamic_integrate_with_speed_exercises']}
-        active_recovery.start_date_time = input_dict.get('start_date_time', None)
-        active_recovery.event_date_time = input_dict.get('event_date_time', None)
-        active_recovery.completed = input_dict.get('completed', False)
-        active_recovery.active = input_dict.get('active', True)
-
-        return active_recovery
-
-    def __setattr__(self, name, value):
-        if name in ['event_date_time', 'start_date_time']:
-            if value is not None and not isinstance(value, datetime.datetime):
-                value = parse_datetime(value)
-        super().__setattr__(name, value)
-
-'''
 
 
 class IceSession(Serialisable):
