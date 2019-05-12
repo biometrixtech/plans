@@ -182,6 +182,7 @@ class AthleteStats(Serialisable):
             if (doms.body_part.location == soreness.body_part.location and
                     doms.side == soreness.side):
                 doms.historic_severity.append(current_soreness)
+                doms.last_reported_date_time = current_soreness.reported_date_time
                 existing_doms = True
                 if current_severity > doms.max_severity:
                     doms.max_severity = current_severity
@@ -191,10 +192,29 @@ class AthleteStats(Serialisable):
             doms.body_part = soreness.body_part
             doms.side = soreness.side
             doms.first_reported_date_time = soreness.reported_date_time
+            doms.last_reported_date_time = soreness.reported_date_time
             doms.max_severity = current_severity
             doms.max_severity_date_time = soreness.reported_date_time
             doms.historic_severity.append(current_soreness)
             self.delayed_onset_muscle_soreness.append(doms)
+
+
+    def clear_delayed_onset_muscle_soreness(self, current_date_time):
+        cleared_doms = []
+        for doms in self.delayed_onset_muscle_soreness:
+            last_reported_severity = [hist for hist in doms.historic_severity if hist.reported_date_time == doms.last_reported_date_time][0]
+            last_severity_value = SorenessCalculator.get_severity(last_reported_severity.severity, last_reported_severity.movement)
+            if last_severity_value <= 2:
+                clearance_window = 1
+            else:
+                clearance_window = 2
+            days_since_last_report = (current_date_time - doms.last_reported_date_time).days
+            if (current_date_time - doms.last_reported_date_time).days >= clearance_window:
+                doms.user_id = self.athlete_id
+                doms.cleared_date_time = current_date_time
+                cleared_doms.append(doms)
+        self.delayed_onset_muscle_soreness = [doms for doms in self.delayed_onset_muscle_soreness if doms.cleared_date_time is None]
+        return cleared_doms
 
     def severe_pain_soreness_today(self):
         severe_pain = [s for s in self.daily_severe_pain if s.severity >= 3]
@@ -384,7 +404,7 @@ class AthleteStats(Serialisable):
             'daily_severe_soreness': [s.json_serialise(daily=True) for s in self.daily_severe_soreness],
             'daily_severe_soreness_event_date': self.daily_severe_soreness_event_date,
             'daily_severe_pain_event_date': self.daily_severe_pain_event_date,
-            'delayed_muscle_onset_soreness': [s.json_serialise() for s in self.delayed_onset_muscle_soreness],
+            'delayed_onset_muscle_soreness': [s.json_serialise() for s in self.delayed_onset_muscle_soreness],
             'metrics': [m.json_serialise() for m in self.metrics],
             'typical_weekly_sessions': self.typical_weekly_sessions,
             'wearable_devices': self.wearable_devices,
