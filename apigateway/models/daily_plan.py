@@ -44,6 +44,7 @@ class DailyPlan(Serialisable):
         # self.completed_functional_strength_sessions = 0
         # self.functional_strength_session = None
         self.train_later = True
+        self.insights = []
 
     def get_id(self):
         return self.user_id
@@ -90,8 +91,40 @@ class DailyPlan(Serialisable):
                # 'functional_strength_completed': self.functional_strength_completed,
                # 'functional_strength_eligible': self.functional_strength_eligible,
                # 'completed_functional_strength_sessions': self.completed_functional_strength_sessions,
-               'train_later': self.train_later
+               'train_later': self.train_later,
+               # 'insights': [insight.json_serialise() for insight in self.insights]
                }
+
+        ret['insights'] = [
+                            {
+                            "title": "How Soreness Turns to Strength:", 
+                            "text": "We've added Care for Soreness to your plan today, to help retain mobility and expodite healing of tissue damage indicated by muscle soreness.",
+                            "goal_targeted": ["Care for Soreness"],
+                            "start_date": "2019-05-13T11:23:00Z",
+                            "read": False
+                            },
+                            {
+                            "title": 'Sign of Possible Injury',
+                            "text": "We added activities to Prevention to your plan because left knee pain for several days could be sign of injury. We'll remove heat to avoid aggrivating the issue and encourage you to ice, rest and see a doctor if the pain worsens.",
+                            "goal_targeted": ["Prevention"],
+                            "start_date": "2019-05-10T11:23:00Z",
+                            "read": False
+                            },
+                            {
+                            "title": "Possible Strength Imbalance",
+                            "text": "We've added activities to Prevention to your plan. Given your training patterns and persistant right glute soreness response, you may have a strength imbalance or movement dysfuntion which elevates your risk of injury. With these ativities we'll try to address the most likely source given what we've observed.",
+                            "goal_targeted": ["Prevention"],
+                            "start_date": "2019-05-13T11:23:00Z",
+                            "read": False
+                            },
+                            {
+                            "title": "How We Help Mitigate Pain: ",
+                            "text": "When you report pain we try to provide you with Care for Pain and Personalized Prepare for Sport activities to encourage proper biomechanical alignment & balance mucle tension to help mitigate the pain, but please remember to avoid any activities that hurt. ",
+                            "goal_targeted": ["Care for Pain", "Personalized Prepare for Sport"],
+                            "start_date": "2019-05-13T11:23:00Z",
+                            "read": True
+                            }
+                        ]
         return ret
 
     @classmethod
@@ -124,6 +157,8 @@ class DailyPlan(Serialisable):
         daily_plan.last_sensor_sync = input_dict.get('last_sensor_sync', None)
         daily_plan.sessions_planned = input_dict.get('sessions_planned', True)
         daily_plan.train_later = input_dict.get('train_later', True)
+        # daily_plan.insights = [AthleteInsights.json_deserialise() for insight in input_dict.get('insights', [])]
+        daily_plan.insights = []
 
         return daily_plan
 

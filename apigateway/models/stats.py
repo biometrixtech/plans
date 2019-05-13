@@ -211,8 +211,8 @@ class AthleteStats(Serialisable):
                 clearance_window = 1
             else:
                 clearance_window = 2
-            days_since_last_report = (current_date_time - doms.last_reported_date_time).days
-            if (current_date_time - doms.last_reported_date_time).days >= clearance_window:
+            days_since_last_report = (current_date_time.date() - doms.last_reported_date_time.date()).days
+            if days_since_last_report >= clearance_window:
                 doms.user_id = self.athlete_id
                 doms.cleared_date_time = current_date_time
                 cleared_doms.append(doms)
