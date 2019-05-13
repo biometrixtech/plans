@@ -45,6 +45,9 @@ class AthleteStats(Serialisable):
         self.external_strain = None
         self.internal_ramp = None
         self.external_ramp = None
+
+        self.duration_load_ramp = {}
+
         self.internal_acwr = None
         self.external_acwr = None
         self.internal_freshness_index = None
