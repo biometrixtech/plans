@@ -3,6 +3,7 @@ import os
 from aws_xray_sdk.core import xray_recorder
 from datastores.daily_readiness_datastore import DailyReadinessDatastore
 from datastores.daily_plan_datastore import DailyPlanDatastore
+from datastores.athlete_stats_datastore import AthleteStatsDatastore
 from datastore_collection import DatastoreCollection
 from logic.stats_processing import StatsProcessing
 from logic.training_volume_processing import TrainingVolumeProcessing
@@ -56,10 +57,13 @@ def test_get_adaptation_history_from_database():
         daily_readiness_surveys = drs_dao.get(user_id, parse_date(start_date), parse_date(end_date), False)
         dpo_dao = DailyPlanDatastore()
         plans = dpo_dao.get(user_id, start_date, end_date)
+        as_dao = AthleteStatsDatastore()
+        ath_stats = as_dao.get(user_id)
 
         data_store_collection = DatastoreCollection()
         data_store_collection.daily_readiness_datastore = drs_dao
         data_store_collection.daily_plan_datastore = dpo_dao
+
 
         athlete_stats = AthleteStats(user_id)
         athlete_stats.event_date = end_date

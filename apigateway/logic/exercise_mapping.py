@@ -25,13 +25,27 @@ class ExerciseAssignmentCalculator(object):
         self.soreness_list = soreness_list
         self.event_date_time = event_date_time
         self.high_relative_intensity_session = self.process_training_sessions_intensity()
-        self.high_relative_load_session_sport_names = []
+        self.high_relative_load_session_sport_names = set()
 
         #forcing a cooldown!
         self.high_relative_load_session = True
 
         self.muscular_strain_increasing = athlete_stats.muscular_strain_increasing
         self.doms = athlete_stats.delayed_onset_muscle_soreness
+
+        self.set_high_relative_load_session(athlete_stats, training_sessions)
+
+    def set_high_relative_load_session(self, athlete_stats, training_sessions):
+
+        for t in training_sessions:
+            if t.sport_name in athlete_stats.duration_load_ramp:
+                if (athlete_stats.duration_load_ramp[t.sport_name].observed_value is None or
+                        athlete_stats.duration_load_ramp[t.sport_name].observed_value > 1.1):
+                    self.high_relative_load_session = True
+                    self.high_relative_load_session_sport_names.add(t.sport_name)
+            else:
+                self.high_relative_load_session = True
+                self.high_relative_load_session_sport_names.add(t.sport_name)
 
     def get_progression_list(self, exercise):
 
