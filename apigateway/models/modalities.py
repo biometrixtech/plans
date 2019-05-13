@@ -7,6 +7,13 @@ import abc
 import datetime
 
 
+class DosageDuration(object):
+    def __init__(self, efficient_duration, complete_duration, comprehensive_duration):
+        self.efficient_duration = efficient_duration
+        self.complete_duration = complete_duration
+        self.comprehensive_duration = comprehensive_duration
+
+
 class HeatSession(Serialisable):
     def __init__(self, minutes=0):
         self.minutes = minutes
@@ -94,6 +101,17 @@ class ModalityBase(object):
         self.completed = False
         self.active = True
         self.default_plan = "Complete"
+        self.dosage_durations = {}
+        self.initialize_dosage_durations()
+
+    def initialize_dosage_durations(self):
+
+        self.dosage_durations[0.5] = DosageDuration(0, 0, 0)
+        self.dosage_durations[1.5] = DosageDuration(0, 0, 0)
+        self.dosage_durations[2.5] = DosageDuration(0, 0, 0)
+        self.dosage_durations[3.5] = DosageDuration(0, 0, 0)
+        self.dosage_durations[4.5] = DosageDuration(0, 0, 0)
+        self.dosage_durations[5.0] = DosageDuration(0, 0, 0)
 
     def __setattr__(self, name, value):
         if name in ['event_date_time', 'start_date_time', 'completed_date_time']:
@@ -154,6 +172,30 @@ class ModalityBase(object):
             dosage.goal = goal
             dosage = self.update_dosage(dosage, target_collection[s.exercise.id].exercise)
             target_collection[s.exercise.id].dosages.append(dosage)
+
+            if dosage.soreness_source.severity < 0.5:
+                self.calc_dosage_durations(0.5, target_collection[s.exercise.id], dosage)
+            elif 0.5 <= dosage.soreness_source.severity < 1.5:
+                    self.calc_dosage_durations(1.5, target_collection[s.exercise.id], dosage)
+            elif 1.5 <= dosage.soreness_source.severity < 2.5:
+                    self.calc_dosage_durations(2.5, target_collection[s.exercise.id], dosage)
+            elif 2.5 <= dosage.soreness_source.severity < 3.5:
+                    self.calc_dosage_durations(3.5, target_collection[s.exercise.id], dosage)
+            elif 3.5 <= dosage.soreness_source.severity < 4.5:
+                    self.calc_dosage_durations(4.5, target_collection[s.exercise.id], dosage)
+            elif 4.5 <= dosage.soreness_source.severity <= 5.0:
+                    self.calc_dosage_durations(5.0, target_collection[s.exercise.id], dosage)
+
+    def calc_dosage_durations(self, benchmark_value, assigned_exercise, dosage):
+        if dosage.efficient_reps_assigned is not None and dosage.efficient_sets_assigned is not None:
+            self.dosage_durations[benchmark_value].efficient_duration += assigned_exercise.duration(
+                dosage.efficient_reps_assigned, dosage.efficient_sets_assigned)
+        if dosage.complete_reps_assigned is not None and dosage.complete_sets_assigned is not None:
+            self.dosage_durations[benchmark_value].complete_duration += assigned_exercise.duration(
+                dosage.complete_reps_assigned, dosage.complete_sets_assigned)
+        if dosage.comprehensive_reps_assigned is not None and dosage.comprehensive_sets_assigned is not None:
+            self.dosage_durations[benchmark_value].comprehensive_duration += assigned_exercise.duration(
+                dosage.comprehensive_reps_assigned, dosage.comprehensive_sets_assigned)
 
     @abc.abstractmethod
     def fill_exercises(self, soreness_list, exercise_library, high_relative_load_session, high_relative_intensity_logged, muscular_strain_increasing, sports):
