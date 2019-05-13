@@ -13,7 +13,7 @@ def test_complete_plan():
     soreness.side = 1
 
     base = ModalityBase(current_date_time)
-    base.set_plan_dosage([soreness])
+    base.set_plan_dosage([soreness], False)
 
     assert base.default_plan == "Complete"
 
@@ -29,7 +29,7 @@ def test_comprehensive_plan():
     soreness.pain = True
 
     base = ModalityBase(current_date_time)
-    base.set_plan_dosage([soreness])
+    base.set_plan_dosage([soreness], False)
 
     assert base.default_plan == "Comprehensive"
 
@@ -44,7 +44,7 @@ def test_efficient_plan():
     soreness.side = 1
 
     base = ModalityBase(current_date_time)
-    base.set_plan_dosage([soreness])
+    base.set_plan_dosage([soreness], False)
 
     assert base.default_plan == "Efficient"
 
@@ -63,7 +63,7 @@ def test_efficient_sensitivity_pers_soreness_today_plan():
     soreness.daily = True
 
     base = ModalityBase(current_date_time)
-    base.set_plan_dosage([soreness])
+    base.set_plan_dosage([soreness], False)
 
     assert base.default_plan == "Complete"
 
@@ -82,7 +82,7 @@ def test_efficient_sensitivity_pers_pain_today_plan():
     soreness.daily = False
 
     base = ModalityBase(current_date_time)
-    base.set_plan_dosage([soreness])
+    base.set_plan_dosage([soreness], False)
 
     assert base.default_plan == "Complete"
 
@@ -101,7 +101,7 @@ def test_efficient_sensitivity_pers_soreness_plan():
     soreness.daily = False
 
     base = ModalityBase(current_date_time)
-    base.set_plan_dosage([soreness])
+    base.set_plan_dosage([soreness], False)
 
     assert base.default_plan == "Complete"
 
@@ -119,7 +119,7 @@ def test_complete_sensitivity_pers_soreness_today_plan():
     soreness.daily = True
 
     base = ModalityBase(current_date_time)
-    base.set_plan_dosage([soreness])
+    base.set_plan_dosage([soreness], False)
 
     assert base.default_plan == "Complete"
 
@@ -137,7 +137,7 @@ def test_complete_sensitivity_pers_pain_today_plan():
     soreness.daily = False
 
     base = ModalityBase(current_date_time)
-    base.set_plan_dosage([soreness])
+    base.set_plan_dosage([soreness], False)
 
     assert base.default_plan == "Complete"
 
@@ -155,6 +155,6 @@ def test_complete_sensitivity_pers_soreness_plan():
     soreness.daily = False
 
     base = ModalityBase(current_date_time)
-    base.set_plan_dosage([soreness])
+    base.set_plan_dosage([soreness], False)
 
     assert base.default_plan == "Complete"

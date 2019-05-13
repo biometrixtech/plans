@@ -45,6 +45,9 @@ class AthleteStats(Serialisable):
         self.external_strain = None
         self.internal_ramp = None
         self.external_ramp = None
+
+        self.duration_load_ramp = {}
+
         self.internal_acwr = None
         self.external_acwr = None
         self.internal_freshness_index = None
@@ -77,9 +80,9 @@ class AthleteStats(Serialisable):
         self.wearable_devices = []
 
         self.muscular_strain_increasing = False
-        self.high_relative_load_session = False
-        self.high_relative_load_session_sport_name = None
-        self.high_relative_intensity_session = False
+        #self.high_relative_load_session = False
+        #self.high_relative_load_session_sport_name = None
+        #self.high_relative_intensity_session = False
         self.high_relative_load_benchmarks = {}
 
     def update_historic_soreness(self, soreness, event_date):
@@ -409,9 +412,9 @@ class AthleteStats(Serialisable):
             'typical_weekly_sessions': self.typical_weekly_sessions,
             'wearable_devices': self.wearable_devices,
             'muscular_strain_increasing': self.muscular_strain_increasing,
-            'high_relative_load_session': self.high_relative_load_session,
-            'high_relative_load_session_sport_name': self.high_relative_load_session_sport_name.value,
-            'high_relative_intensity_session': self.high_relative_intensity_session,
+            #'high_relative_load_session': self.high_relative_load_session,
+            #'high_relative_load_session_sport_name': self.high_relative_load_session_sport_name.value,
+            #'high_relative_intensity_session': self.high_relative_intensity_session,
             'high_relative_load_benchmarks': {sport_name.value: load for (sport_name, load) in
                                               self.high_relative_load_benchmarks.items()}
         }

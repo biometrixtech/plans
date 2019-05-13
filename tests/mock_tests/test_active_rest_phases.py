@@ -23,7 +23,7 @@ def load_exercises():
 
 def test_active_rest_after_training_check_soreness_severity_3():
 
-    active_rest = ActiveRestAfterTraining(False, False, False, event_date_time=datetime.today())
+    active_rest = ActiveRestAfterTraining(event_date_time=datetime.today())
 
     soreness = Soreness()
     soreness.body_part = BodyPart(BodyPartLocation.ankle, None)
@@ -40,7 +40,7 @@ def test_active_rest_after_training_check_soreness_severity_3():
 
 def test_active_rest_after_training_check_soreness_severity_4():
 
-    active_rest = ActiveRestAfterTraining(False, False, False, event_date_time=datetime.today())
+    active_rest = ActiveRestAfterTraining(event_date_time=datetime.today())
 
     soreness = Soreness()
     soreness.body_part = BodyPart(BodyPartLocation.ankle, None)
@@ -58,7 +58,7 @@ def test_active_rest_after_training_check_soreness_severity_4():
 def test_active_rest_after_training_check_prevention_soreness_severity_2():
 
     current_date_time = datetime.today()
-    active_rest = ActiveRestAfterTraining(False, False, False, event_date_time=current_date_time)
+    active_rest = ActiveRestAfterTraining(event_date_time=current_date_time)
 
     soreness = Soreness()
     soreness.body_part = BodyPart(BodyPartLocation.ankle, None)
@@ -79,7 +79,7 @@ def test_active_rest_after_training_check_prevention_soreness_severity_2():
 def test_active_rest_after_training_check_prevention_soreness_severity_3():
 
     current_date_time = datetime.today()
-    active_rest = ActiveRestAfterTraining(False, False, False, event_date_time=current_date_time)
+    active_rest = ActiveRestAfterTraining(event_date_time=current_date_time)
 
     soreness = Soreness()
     soreness.body_part = BodyPart(BodyPartLocation.ankle, None)
@@ -100,7 +100,7 @@ def test_active_rest_after_training_check_prevention_soreness_severity_3():
 def test_active_rest_after_training_check_prevention_soreness_severity_4():
 
     current_date_time = datetime.today()
-    active_rest = ActiveRestAfterTraining(False, False, False, event_date_time=current_date_time)
+    active_rest = ActiveRestAfterTraining(event_date_time=current_date_time)
 
     soreness = Soreness()
     soreness.body_part = BodyPart(BodyPartLocation.ankle, None)
@@ -121,7 +121,7 @@ def test_active_rest_after_training_check_prevention_soreness_severity_4():
 def test_active_rest_after_training_check_prevention_pain_severity_2():
 
     current_date_time = datetime.today()
-    active_rest = ActiveRestAfterTraining(False, False, False, event_date_time=current_date_time)
+    active_rest = ActiveRestAfterTraining(event_date_time=current_date_time)
 
     soreness = Soreness()
     soreness.body_part = BodyPart(BodyPartLocation.ankle, None)
@@ -142,7 +142,7 @@ def test_active_rest_after_training_check_prevention_pain_severity_2():
 def test_active_rest_after_training_check_prevention_pain_severity_3():
 
     current_date_time = datetime.today()
-    active_rest = ActiveRestAfterTraining(False, False, False, event_date_time=current_date_time)
+    active_rest = ActiveRestAfterTraining(event_date_time=current_date_time)
 
     soreness = Soreness()
     soreness.body_part = BodyPart(BodyPartLocation.ankle, None)
@@ -163,7 +163,7 @@ def test_active_rest_after_training_check_prevention_pain_severity_3():
 def test_active_rest_after_training_check_prevention_pain_severity_4():
 
     current_date_time = datetime.today()
-    active_rest = ActiveRestAfterTraining(False, False, False, event_date_time=current_date_time)
+    active_rest = ActiveRestAfterTraining(event_date_time=current_date_time)
 
     soreness = Soreness()
     soreness.body_part = BodyPart(BodyPartLocation.ankle, None)
@@ -183,7 +183,7 @@ def test_active_rest_after_training_check_prevention_pain_severity_4():
 
 def test_active_rest_after_training_check_pain_severity_3():
 
-    active_rest = ActiveRestAfterTraining(False, False, False, event_date_time=datetime.today())
+    active_rest = ActiveRestAfterTraining(event_date_time=datetime.today())
 
     soreness = Soreness()
     soreness.body_part = BodyPart(BodyPartLocation.ankle, None)
@@ -201,7 +201,7 @@ def test_active_rest_after_training_check_pain_severity_3():
 
 def test_active_rest_after_training_check_pain_severity_4():
 
-    active_rest = ActiveRestAfterTraining(False, False, False, event_date_time=datetime.today())
+    active_rest = ActiveRestAfterTraining(event_date_time=datetime.today())
 
     soreness = Soreness()
     soreness.body_part = BodyPart(BodyPartLocation.ankle, None)
@@ -222,7 +222,7 @@ def test_active_rest_after_training_check_pain_severity_4():
 
 def test_active_rest_before_training_check_soreness_severity_3():
 
-    active_rest = ActiveRestBeforeTraining(False, False, False, event_date_time=datetime.today())
+    active_rest = ActiveRestBeforeTraining(event_date_time=datetime.today())
 
     soreness = Soreness()
     soreness.body_part = BodyPart(BodyPartLocation.ankle, None)
@@ -239,7 +239,7 @@ def test_active_rest_before_training_check_soreness_severity_3():
 
 def test_active_rest_before_training_check_soreness_severity_4():
 
-    active_rest = ActiveRestBeforeTraining(False, False, False, event_date_time=datetime.today())
+    active_rest = ActiveRestBeforeTraining(event_date_time=datetime.today())
 
     soreness = Soreness()
     soreness.body_part = BodyPart(BodyPartLocation.ankle, None)
@@ -257,7 +257,7 @@ def test_active_rest_before_training_check_soreness_severity_4():
 def test_active_rest_before_training_check_prevention_soreness_severity_2():
 
     current_date_time = datetime.today()
-    active_rest = ActiveRestBeforeTraining(False, False, False, event_date_time=current_date_time)
+    active_rest = ActiveRestBeforeTraining(event_date_time=current_date_time)
 
     soreness = Soreness()
     soreness.body_part = BodyPart(BodyPartLocation.ankle, None)
@@ -278,7 +278,7 @@ def test_active_rest_before_training_check_prevention_soreness_severity_2():
 def test_active_rest_before_training_check_prevention_soreness_severity_3():
 
     current_date_time = datetime.today()
-    active_rest = ActiveRestBeforeTraining(False, False, False, event_date_time=current_date_time)
+    active_rest = ActiveRestBeforeTraining(event_date_time=current_date_time)
 
     soreness = Soreness()
     soreness.body_part = BodyPart(BodyPartLocation.ankle, None)
@@ -299,7 +299,7 @@ def test_active_rest_before_training_check_prevention_soreness_severity_3():
 def test_active_rest_befpre_training_check_prevention_soreness_severity_4():
 
     current_date_time = datetime.today()
-    active_rest = ActiveRestBeforeTraining(False, False, False, event_date_time=current_date_time)
+    active_rest = ActiveRestBeforeTraining(event_date_time=current_date_time)
 
     soreness = Soreness()
     soreness.body_part = BodyPart(BodyPartLocation.ankle, None)
@@ -320,7 +320,7 @@ def test_active_rest_befpre_training_check_prevention_soreness_severity_4():
 def test_active_rest_before_training_check_prevention_pain_severity_2():
 
     current_date_time = datetime.today()
-    active_rest = ActiveRestBeforeTraining(False, False, False, event_date_time=current_date_time)
+    active_rest = ActiveRestBeforeTraining(event_date_time=current_date_time)
 
     soreness = Soreness()
     soreness.body_part = BodyPart(BodyPartLocation.ankle, None)
@@ -341,7 +341,7 @@ def test_active_rest_before_training_check_prevention_pain_severity_2():
 def test_active_rest_before_training_check_prevention_pain_severity_3():
 
     current_date_time = datetime.today()
-    active_rest = ActiveRestBeforeTraining(False, False, False, event_date_time=current_date_time)
+    active_rest = ActiveRestBeforeTraining(event_date_time=current_date_time)
 
     soreness = Soreness()
     soreness.body_part = BodyPart(BodyPartLocation.ankle, None)
@@ -362,7 +362,7 @@ def test_active_rest_before_training_check_prevention_pain_severity_3():
 def test_active_rest_before_training_check_prevention_pain_severity_4():
 
     current_date_time = datetime.today()
-    active_rest = ActiveRestBeforeTraining(False, False, False, event_date_time=current_date_time)
+    active_rest = ActiveRestBeforeTraining(event_date_time=current_date_time)
 
     soreness = Soreness()
     soreness.body_part = BodyPart(BodyPartLocation.ankle, None)
@@ -382,7 +382,7 @@ def test_active_rest_before_training_check_prevention_pain_severity_4():
 
 def test_active_rest_before_training_check_pain_severity_3():
 
-    active_rest = ActiveRestBeforeTraining(False, False, False, event_date_time=datetime.today())
+    active_rest = ActiveRestBeforeTraining(event_date_time=datetime.today())
 
     soreness = Soreness()
     soreness.body_part = BodyPart(BodyPartLocation.ankle, None)
@@ -400,7 +400,7 @@ def test_active_rest_before_training_check_pain_severity_3():
 
 def test_active_rest_before_training_check_pain_severity_4():
 
-    active_rest = ActiveRestBeforeTraining(False, False, False, event_date_time=datetime.today())
+    active_rest = ActiveRestBeforeTraining(event_date_time=datetime.today())
 
     soreness = Soreness()
     soreness.body_part = BodyPart(BodyPartLocation.ankle, None)

@@ -20,6 +20,7 @@ class TrainingPlanManager(object):
         self.readiness_surveys = []
         self.post_session_surveys = []
         self.athlete_stats = None
+        self.training_sessions = []
 
     # def post_session_surveys_today(self):
     #     for ps_survey in self.post_session_surveys:
@@ -50,6 +51,9 @@ class TrainingPlanManager(object):
 
         if self.athlete_stats is None:
             self.athlete_stats = self.athlete_stats_datastore.get(self.athlete_id)
+
+        for c in plan_today:
+            self.training_sessions.extend(c.training_sessions)
 
     @staticmethod
     def preserve_completed_modality(modalities):
@@ -87,9 +91,10 @@ class TrainingPlanManager(object):
         # show_post_recovery = self.show_post_recovery(self.post_session_surveys_today())
         # self.add_recovery_times(show_post_recovery)
 
-        calc = exercise_mapping.ExerciseAssignmentCalculator(self.athlete_id, self.exercise_library_datastore,
+        calc = exercise_mapping.ExerciseAssignmentCalculator(athlete_stats, self.exercise_library_datastore,
                                                              self.completed_exercise_datastore,
-                                                             historic_soreness_present)
+                                                             self.training_sessions, soreness_list,
+                                                             parse_date(event_date))
 
         # soreness_values = [s.severity for s in soreness_list if s.severity is not None and s.daily]
 
@@ -114,10 +119,10 @@ class TrainingPlanManager(object):
             for warm_up in self.daily_plan.warm_up:
                 warm_up.active = False
             # create new post-training modalitiesathlete_stats, soreness_list, event_date_time
-            self.daily_plan.cool_down = calc.get_cool_down(athlete_stats, soreness_list, parse_date(event_date))
-            self.daily_plan.post_active_rest = calc.get_post_active_rest(athlete_stats, soreness_list, parse_date(event_date))
-            self.daily_plan.ice = calc.get_ice(soreness_list, athlete_stats.delayed_onset_muscle_soreness, parse_date(event_date))
-            self.daily_plan.cold_water_immersion = calc.get_cold_water_immersion(soreness_list, athlete_stats.delayed_onset_muscle_soreness, parse_date(event_date))
+            self.daily_plan.cool_down = calc.get_cool_down()
+            self.daily_plan.post_active_rest = calc.get_post_active_rest()
+            self.daily_plan.ice = calc.get_ice()
+            self.daily_plan.cold_water_immersion = calc.get_cold_water_immersion()
             if self.daily_plan.cold_water_immersion is not None:
                 self.daily_plan.ice = calc.adjust_ice_session(self.daily_plan.ice, self.daily_plan.cold_water_immersion)
         else:
@@ -136,8 +141,8 @@ class TrainingPlanManager(object):
                 if warm_up.completed:
                     self.daily_plan.completed_warm_up.append(warm_up)
             # create new pre-training modalities
-            self.daily_plan.heat = calc.get_heat(soreness_list, parse_date(event_date))
-            self.daily_plan.pre_active_rest = calc.get_pre_active_rest(athlete_stats, soreness_list, parse_date(event_date))
+            self.daily_plan.heat = calc.get_heat()
+            self.daily_plan.pre_active_rest = calc.get_pre_active_rest()
             # self.daily_plan.warm_up = calc.get_warm_up(athlete_stats, soreness_list, parse_date(event_date))
         #
         # if soreness_values is not None and len(soreness_values) > 0:

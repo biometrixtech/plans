@@ -88,6 +88,8 @@ class TrainingVolumeProcessing(object):
         self.functional_overreaching_NFO_loads = {}
         self.high_relative_load_session = False
         self.doms = []
+        self.last_week_sport_duration_loads = {}
+        self.previous_week_sport_duration_loads = {}
 
     def muscular_strain_increasing(self):
 
@@ -163,6 +165,8 @@ class TrainingVolumeProcessing(object):
 
         self.last_week_external_values = []
         self.last_week_internal_values = []
+        self.last_week_sport_duration_loads = {}
+        self.previous_week_sport_duration_loads = {}
         self.previous_week_external_values = []
         self.previous_week_internal_values = []
         self.a_internal_load_values = []
@@ -175,6 +179,24 @@ class TrainingVolumeProcessing(object):
         self.c_mod_intensity_values = []
         self.c_low_intensity_values = []
         self.internal_load_tuples = []
+
+        last_7_day_training_sessions = self.get_training_sessions(last_7_days_plans)
+        previous_7_day_training_sessions = self.get_training_sessions(days_8_14_plans)
+
+        for l in last_7_day_training_sessions:
+            if l.sport_name not in self.last_week_sport_duration_loads:
+                self.last_week_sport_duration_loads[l.sport_name] = 0
+            duration_load = l.duration_load()
+            if duration_load is not None:
+                self.last_week_sport_duration_loads[l.sport_name] += duration_load
+
+        for p in previous_7_day_training_sessions:
+            if p.sport_name not in self.previous_week_sport_duration_loads:
+                self.previous_week_sport_duration_loads[p.sport_name] = 0
+            duration_load = p.duration_load()
+            if duration_load is not None:
+                self.previous_week_sport_duration_loads[p.sport_name] += duration_load
+
 
         self.last_week_external_values.extend(
             x for x in self.get_plan_session_attribute_sum_list("external_load", last_7_days_plans) if x is not None)
@@ -246,6 +268,9 @@ class TrainingVolumeProcessing(object):
 
     @xray_recorder.capture('logic.TrainingVolumeProcessing.calc_training_volume_metrics')
     def calc_training_volume_metrics(self, athlete_stats):
+
+
+
 
         athlete_stats.external_ramp = self.get_ramp(athlete_stats.expected_weekly_workouts,
                                                     self.last_week_external_values, self.previous_week_external_values)

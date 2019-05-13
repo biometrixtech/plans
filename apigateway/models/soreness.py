@@ -576,7 +576,7 @@ class AssignedExercise(Serialisable):
                 return self.exercise.seconds_per_rep * reps_assigned * sets_assigned
             else:
                 return (self.exercise.seconds_per_rep * reps_assigned * sets_assigned) * 2
-        elif self.exercise.unit_of_measure.name == "seconds":
+        elif self.exercise.unit_of_measure.name == "seconds" or self.exercise.unit_of_measure.name == 'yards':
             if not self.exercise.bilateral:
                 return self.exercise.seconds_per_set * sets_assigned
             else:
