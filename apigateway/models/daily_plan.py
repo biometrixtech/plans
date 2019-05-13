@@ -98,28 +98,28 @@ class DailyPlan(Serialisable):
         ret['insights'] = [
                             {
                             "title": "How Soreness Turns to Strength:", 
-                            "text": "We've added {goal} to your plan today, to help retain mobility and expodite healing of tissue damage indicated by muscle soreness.",
+                            "text": "We've added Care for Soreness to your plan today, to help retain mobility and expodite healing of tissue damage indicated by muscle soreness.",
                             "goal_targeted": ["Care for Soreness"],
                             "start_date": "2019-05-13T11:23:00Z",
                             "read": False
                             },
                             {
                             "title": 'Sign of Possible Injury',
-                            "text": "We added activities to {goal} to your plan because left knee pain for several days could be sign of injury. We'll remove heat to avoid aggrivating the issue and encourage you to ice, rest and see a doctor if the pain worsens.",
+                            "text": "We added activities to Prevention to your plan because left knee pain for several days could be sign of injury. We'll remove heat to avoid aggrivating the issue and encourage you to ice, rest and see a doctor if the pain worsens.",
                             "goal_targeted": ["Prevention"],
                             "start_date": "2019-05-10T11:23:00Z",
                             "read": False
                             },
                             {
                             "title": "Possible Strength Imbalance",
-                            "text": "We've added activities to {goal} to your plan. Given your training patterns and persistant right glute soreness response, you may have a strength imbalance or movement dysfuntion which elevates your risk of injury. With these ativities we'll try to address the most likely source given what we've observed.",
+                            "text": "We've added activities to Prevention to your plan. Given your training patterns and persistant right glute soreness response, you may have a strength imbalance or movement dysfuntion which elevates your risk of injury. With these ativities we'll try to address the most likely source given what we've observed.",
                             "goal_targeted": ["Prevention"],
                             "start_date": "2019-05-13T11:23:00Z",
                             "read": False
                             },
                             {
                             "title": "How We Help Mitigate Pain: ",
-                            "text": "When you report pain we try to provide you with {goal} activities to encourage proper biomechanical alignment & balance mucle tension to help mitigate the pain, but please remember to avoid any activities that hurt. ",
+                            "text": "When you report pain we try to provide you with Care for Pain and Personalized Prepare for Sport activities to encourage proper biomechanical alignment & balance mucle tension to help mitigate the pain, but please remember to avoid any activities that hurt. ",
                             "goal_targeted": ["Care for Pain", "Personalized Prepare for Sport"],
                             "start_date": "2019-05-13T11:23:00Z",
                             "read": True
