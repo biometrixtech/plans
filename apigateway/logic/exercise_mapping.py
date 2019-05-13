@@ -137,6 +137,7 @@ class ExerciseAssignmentCalculator(object):
                                        self.high_relative_load_session_sport_names)
             active_rest.set_plan_dosage(self.soreness_list, self.muscular_strain_increasing)
             active_rest.set_exercise_dosage_ranking()
+            active_rest.aggregate_dosages()
             return [active_rest]
         else:
             return []
@@ -152,6 +153,7 @@ class ExerciseAssignmentCalculator(object):
                                        self.high_relative_load_session_sport_names)
             active_rest.set_plan_dosage(self.soreness_list, self.muscular_strain_increasing)
             active_rest.set_exercise_dosage_ranking()
+            active_rest.aggregate_dosages()
             return [active_rest]
         else:
             return []
@@ -191,6 +193,7 @@ class ExerciseAssignmentCalculator(object):
                                      [high_relative_load_session_sport_name])
             cool_down.set_plan_dosage(self.soreness_list, self.muscular_strain_increasing)
             cool_down.set_exercise_dosage_ranking()
+            cool_down.aggregate_dosages()
             #    break
 
             return [cool_down]

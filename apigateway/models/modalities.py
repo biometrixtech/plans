@@ -174,18 +174,141 @@ class ModalityBase(object):
             dosage = self.update_dosage(dosage, target_collection[s.exercise.id].exercise)
             target_collection[s.exercise.id].dosages.append(dosage)
 
-            if dosage.soreness_source.severity < 0.5:
-                self.calc_dosage_durations(0.5, target_collection[s.exercise.id], dosage)
-            elif 0.5 <= dosage.soreness_source.severity < 1.5:
-                    self.calc_dosage_durations(1.5, target_collection[s.exercise.id], dosage)
-            elif 1.5 <= dosage.soreness_source.severity < 2.5:
-                    self.calc_dosage_durations(2.5, target_collection[s.exercise.id], dosage)
-            elif 2.5 <= dosage.soreness_source.severity < 3.5:
-                    self.calc_dosage_durations(3.5, target_collection[s.exercise.id], dosage)
-            elif 3.5 <= dosage.soreness_source.severity < 4.5:
-                    self.calc_dosage_durations(4.5, target_collection[s.exercise.id], dosage)
-            elif 4.5 <= dosage.soreness_source.severity <= 5.0:
-                    self.calc_dosage_durations(5.0, target_collection[s.exercise.id], dosage)
+    def aggregate_dosages(self):
+        pass
+
+    def aggregate_dosage_by_severity_exercise_collection(self, assigned_exercises):
+
+        for ex, a in assigned_exercises.items():
+            if len(a.dosages) > 0:
+                a.dosages = sorted(a.dosages, key=lambda x: (x.soreness_source.severity,
+                                                             x.comprehensive_sets_assigned,
+                                                             x.comprehensive_reps_assigned,
+                                                             x.complete_sets_assigned,
+                                                             x.complete_reps_assigned,
+                                                             x.efficient_sets_assigned,
+                                                             x.efficient_reps_assigned), reverse=True)
+
+                dosage = a.dosages[0]
+
+                if dosage.soreness_source.severity < 0.5:
+                    self.calc_dosage_durations(0.5, a, dosage)
+                elif 0.5 <= dosage.soreness_source.severity < 1.5:
+                        self.calc_dosage_durations(1.5, a, dosage)
+                elif 1.5 <= dosage.soreness_source.severity < 2.5:
+                        self.calc_dosage_durations(2.5, a, dosage)
+                elif 2.5 <= dosage.soreness_source.severity < 3.5:
+                        self.calc_dosage_durations(3.5, a, dosage)
+                elif 3.5 <= dosage.soreness_source.severity < 4.5:
+                        self.calc_dosage_durations(4.5, a, dosage)
+                elif 4.5 <= dosage.soreness_source.severity <= 5.0:
+                        self.calc_dosage_durations(5.0, a, dosage)
+
+        # key off efficient as the guide
+        total_efficient = 0
+        total_complete = 0
+        total_comprehensive = 0
+        benchmarks = [5.0, 4.5, 3.5, 2.5, 1.5, 0.5]
+
+        efficient_winner = None
+        complete_winner = None
+        comprehensive_winner = None
+
+        for b in range(0, len(benchmarks) - 1):
+            total_efficient += self.dosage_durations[benchmarks[b]].efficient_duration
+            proposed_efficient = total_efficient + self.dosage_durations[benchmarks[b + 1]].efficient_duration
+            if proposed_efficient < 400:
+                continue
+            elif abs(total_efficient - 400) < abs(proposed_efficient - 400):
+                efficient_winner = benchmarks[b]
+                break
+            else:
+                efficient_winner = benchmarks[b + 1]
+                break
+
+        for b in range(0, len(benchmarks) - 1):
+            total_complete += self.dosage_durations[benchmarks[b]].complete_duration
+            proposed_complete = total_complete + self.dosage_durations[benchmarks[b + 1]].complete_duration
+            if proposed_complete < 1000:
+                continue
+            elif abs(total_complete - 1000) < abs(proposed_complete - 1000):
+                complete_winner = benchmarks[b]
+                break
+            else:
+                complete_winner = benchmarks[b + 1]
+                break
+
+        for b in range(0, len(benchmarks) - 1):
+            total_comprehensive += self.dosage_durations[benchmarks[b]].comprehensive_duration
+            proposed_comprehensive = total_comprehensive + self.dosage_durations[benchmarks[b + 1]].comprehensive_duration
+            if proposed_comprehensive < 1600:
+                continue
+            elif abs(total_comprehensive - 1600) < abs(proposed_comprehensive - 1000):
+                comprehensive_winner = benchmarks[b]
+                break
+            else:
+                comprehensive_winner = benchmarks[b + 1]
+                break
+
+        if efficient_winner is not None:  # if None, don't reduce
+            for ex, a in assigned_exercises.items():
+                if len(a.dosages) > 0:
+
+                    if efficient_winner == 5.0:
+                        for d in a.dosages:
+                            if d.soreness_source.severity < 4.5:
+                                d.efficient_reps_assigned = 0
+                                d.efficient_sets_assigned = 0
+                    elif efficient_winner == 4.5:
+                        for d in a.dosages:
+                            if d.soreness_source.severity < 3.5:
+                                d.efficient_reps_assigned = 0
+                                d.efficient_sets_assigned = 0
+                    elif efficient_winner == 3.5:
+                        for d in a.dosages:
+                            if d.soreness_source.severity < 2.5:
+                                d.efficient_reps_assigned = 0
+                                d.efficient_sets_assigned = 0
+                    elif efficient_winner == 2.5:
+                        for d in a.dosages:
+                            if d.soreness_source.severity < 1.5:
+                                d.efficient_reps_assigned = 0
+                                d.efficient_sets_assigned = 0
+                    elif efficient_winner == 1.5:
+                        for d in a.dosages:
+                            if d.soreness_source.severity < 0.5:
+                                d.efficient_reps_assigned = 0
+                                d.efficient_sets_assigned = 0
+                    elif efficient_winner == 0.5:
+                        pass
+
+                    if complete_winner == 5.0:
+                        for d in a.dosages:
+                            if d.soreness_source.severity < 4.5:
+                                d.complete_reps_assigned = 0
+                                d.complete_sets_assigned = 0
+                    elif complete_winner == 4.5:
+                        for d in a.dosages:
+                            if d.soreness_source.severity < 3.5:
+                                d.complete_reps_assigned = 0
+                                d.complete_sets_assigned = 0
+                    elif complete_winner == 3.5:
+                        for d in a.dosages:
+                            if d.soreness_source.severity < 2.5:
+                                d.complete_reps_assigned = 0
+                                d.complete_sets_assigned = 0
+                    elif complete_winner == 2.5:
+                        for d in a.dosages:
+                            if d.soreness_source.severity < 1.5:
+                                d.complete_reps_assigned = 0
+                                d.complete_sets_assigned = 0
+                    elif complete_winner == 1.5:
+                        for d in a.dosages:
+                            if d.soreness_source.severity < 0.5:
+                                d.complete_reps_assigned = 0
+                                d.complete_sets_assigned = 0
+                    elif complete_winner == 0.5:
+                        pass
 
     def calc_dosage_durations(self, benchmark_value, assigned_exercise, dosage):
         if dosage.efficient_reps_assigned is not None and dosage.efficient_sets_assigned is not None:
@@ -522,6 +645,14 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
         self.static_integrate_minutes = self.calc_active_time(self.static_integrate_exercises)
     '''
 
+    def aggregate_dosages(self):
+
+        self.aggregate_dosage_by_severity_exercise_collection(self.inhibit_exercises)
+        self.aggregate_dosage_by_severity_exercise_collection(self.static_stretch_exercises)
+        self.aggregate_dosage_by_severity_exercise_collection(self.active_stretch_exercises)
+        self.aggregate_dosage_by_severity_exercise_collection(self.static_integrate_exercises)
+        self.aggregate_dosage_by_severity_exercise_collection(self.isolated_activate_exercises)
+
     def check_reactive_care_soreness(self, soreness, exercise_library):
 
         body_part_factory = BodyPartFactory()
@@ -757,6 +888,13 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
         self.isolated_activate_minutes = self.calc_active_time(self.isolated_activate_exercises)
         self.static_integrate_minutes = self.calc_active_time(self.static_integrate_exercises)
     '''
+
+    def aggregate_dosages(self):
+
+        self.aggregate_dosage_by_severity_exercise_collection(self.inhibit_exercises)
+        self.aggregate_dosage_by_severity_exercise_collection(self.static_stretch_exercises)
+        self.aggregate_dosage_by_severity_exercise_collection(self.static_integrate_exercises)
+        self.aggregate_dosage_by_severity_exercise_collection(self.isolated_activate_exercises)
 
     def check_reactive_care_soreness(self, soreness, exercise_library):
 
@@ -1089,6 +1227,11 @@ class CoolDown(ModalityBase, Serialisable):
         cooldown.triggers = [AthleteGoal.json_deserialise(goal) for goal in input_dict.get('triggers', [])]
 
         return cooldown
+
+    def aggregate_dosages(self):
+
+        self.aggregate_dosage_by_severity_exercise_collection(self.dynamic_stretch_exercises)
+        self.aggregate_dosage_by_severity_exercise_collection(self.dynamic_integrate_exercises)
 
     def conditions_for_increased_sensitivity_met(self, soreness_list, muscular_strain_increasing):
 
