@@ -374,7 +374,7 @@ class SportTrainingSession(Session):
 
     def high_intensity_RPE(self):
 
-        if self.session_RPE > 5:
+        if self.session_RPE is not None and self.session_RPE > 5:
             return True
         else:
             return False
