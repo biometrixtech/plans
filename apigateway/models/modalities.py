@@ -617,9 +617,9 @@ class ActiveRest(ModalityBase):
                                         self.inhibit_exercises, goal, "1", None, exercise_library)
                     if not prohibiting_soreness:
                         self.copy_exercises(body_part.static_stretch_exercises,
-                                            self.static_stretch_exercises, goal, "1", None, exercise_library)
+                                            self.static_stretch_exercises, goal, "1", None, exercise_library, sport_name)
                         self.copy_exercises(body_part.isolated_activate_exercises,
-                                            self.isolated_activate_exercises, goal, "1", None, exercise_library)
+                                            self.isolated_activate_exercises, goal, "1", None, exercise_library, sport_name)
 
 
 class ActiveRestBeforeTraining(ActiveRest, Serialisable):
@@ -1306,9 +1306,9 @@ class CoolDown(ModalityBase, Serialisable):
             # Note: this is just returning the primary mover related exercises for sport
             if body_part is not None and not prohibiting_soreness:
                 self.copy_exercises(body_part.dynamic_stretch_exercises,
-                                    self.dynamic_stretch_exercises, goal, "1", None, exercise_library)
+                                    self.dynamic_stretch_exercises, goal, "1", None, exercise_library, sport_name)
                 self.copy_exercises(body_part.dynamic_integrate_exercises,
-                                    self.dynamic_integrate_exercises, goal, "1", None, exercise_library)
+                                    self.dynamic_integrate_exercises, goal, "1", None, exercise_library, sport_name)
 
     def check_corrective(self, soreness, event_date_time, exercise_library):
 
