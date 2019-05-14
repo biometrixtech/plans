@@ -597,7 +597,8 @@ class ActiveRest(ModalityBase):
                                           high_relative_intensity_logged, sports):
         if high_relative_load_session or high_relative_intensity_logged:
             goal = AthleteGoal("Recover from Sport", 1, AthleteGoalType.sport)
-            goal.trigger = "High Relative Volume or Intensity of Logged Session"
+            #goal.trigger = "High Relative Volume or Intensity of Logged Session"
+            goal.trigger_type = TriggerType.high_volume_intensity
 
             body_part_factory = BodyPartFactory()
 
@@ -702,7 +703,8 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
             body_part = body_part_factory.get_body_part(soreness.body_part)
 
             goal = AthleteGoal("Care for Soreness", 1, AthleteGoalType.sore)
-            goal.trigger = "Sore reported today"
+            #goal.trigger = "Sore reported today"
+            goal.trigger_type = TriggerType.sore_today
 
             if body_part is not None:
                 alert = Alert(goal)
@@ -743,7 +745,8 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
                 body_part = body_part_factory.get_body_part(soreness.body_part)
 
                 goal = AthleteGoal("Prevention", 1, AthleteGoalType.corrective)
-                goal.trigger = "Pers, Pers-2 Soreness > 30d"
+                #goal.trigger = "Pers, Pers-2 Soreness > 30d"
+                goal.trigger_type = TriggerType.hist_sore_greater_30
 
                 if body_part is not None:
                     alert = Alert(goal)
@@ -788,7 +791,8 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
                 body_part = body_part_factory.get_body_part(soreness.body_part)
 
                 goal = AthleteGoal("Prevention", 1, AthleteGoalType.corrective)
-                goal.trigger = "Acute, Pers, Pers-2 Pain"
+                #goal.trigger = "Acute, Pers, Pers-2 Pain"
+                goal.trigger_type = TriggerType.hist_pain
 
                 if body_part is not None:
                     alert = Alert(goal)
@@ -833,9 +837,11 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
             goal = AthleteGoal("Care for Pain", 1, AthleteGoalType.pain)
 
             if not soreness.is_joint():
-                goal.trigger = "Painful joint reported today"
+                #goal.trigger = "Painful joint reported today"
+                goal.trigger_type = TriggerType.pain_today
             else:
-                goal.trigger = "Painful muscle reported today"
+                #goal.trigger = "Painful muscle reported today"
+                goal.trigger_type = TriggerType.pain_today
 
             if body_part is not None:
                 alert = Alert(goal)
@@ -953,7 +959,8 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
             body_part = body_part_factory.get_body_part(soreness.body_part)
 
             goal = AthleteGoal("Care for Soreness", 1, AthleteGoalType.sore)
-            goal.trigger = "Sore reported today"
+            #goal.trigger = "Sore reported today"
+            goal.trigger_type = TriggerType.sore_today
 
             if body_part is not None:
                 alert = Alert(goal)
@@ -991,7 +998,8 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
                 body_part = body_part_factory.get_body_part(soreness.body_part)
 
                 goal = AthleteGoal("Prevention", 1, AthleteGoalType.corrective)
-                goal.trigger = "Pers, Pers-2 Soreness > 30d"
+                #goal.trigger = "Pers, Pers-2 Soreness > 30d"
+                goal.trigger_type = TriggerType.hist_sore_greater_30
 
                 if body_part is not None:
                     alert = Alert(goal)
@@ -1036,7 +1044,8 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
                 body_part = body_part_factory.get_body_part(soreness.body_part)
 
                 goal = AthleteGoal("Prevention", 1, AthleteGoalType.corrective)
-                goal.trigger = "Acute, Pers, Pers-2 Pain"
+                #goal.trigger = "Acute, Pers, Pers-2 Pain"
+                goal.trigger_type = TriggerType.hist_pain
 
                 if body_part is not None:
                     alert = Alert(goal)
@@ -1081,10 +1090,12 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
             goal = AthleteGoal("Care for Pain", 1, AthleteGoalType.pain)
 
             if soreness.is_joint():
-                goal.trigger = "Painful joint reported today"
+                #goal.trigger = "Painful joint reported today"
+                goal.trigger_type = TriggerType.pain_today
                 priority = "1"
             else:
-                goal.trigger = "Painful muscle reported today"
+                #goal.trigger = "Painful muscle reported today"
+                goal.trigger_type = TriggerType.pain_today
                 priority = "2"
 
             if body_part is not None:
@@ -1183,7 +1194,8 @@ class WarmUp(ModalityBase, Serialisable):
             if not soreness.pain and days_sore < 30:
 
                 goal = AthleteGoal("Personalized Prepare for Training", 1, AthleteGoalType.preempt_personalized_sport)
-                goal.trigger = "Pers, Pers-2 Soreness > 30d"
+                #goal.trigger = "Pers, Pers-2 Soreness > 30d"
+                goal.trigger_type = TriggerType.hist_sore_greater_30
 
                 self.assign_exercises(soreness, goal, exercise_library)
 
@@ -1193,7 +1205,8 @@ class WarmUp(ModalityBase, Serialisable):
             days_sore = (event_date_time - soreness.first_reported_date_time).days
             if soreness.pain or days_sore > 30:
                 goal = AthleteGoal("Personalized Prepare for Training (Identified Dysfunction)", 1, AthleteGoalType.preempt_corrective)
-                goal.trigger = "Pers, Pers-2 Soreness > 30d"
+                #goal.trigger = "Pers, Pers-2 Soreness > 30d"
+                goal.trigger_type = TriggerType.hist_sore_greater_30
 
                 self.assign_exercises(soreness, goal, exercise_library)
 
@@ -1311,7 +1324,8 @@ class CoolDown(ModalityBase, Serialisable):
 
         if self.high_relative_volume_logged or self.high_relative_intensity_logged:
             goal = AthleteGoal("Recover from Sport", 1, AthleteGoalType.sport)
-            goal.trigger = "High Relative Volume or Intensity of Logged Session"
+            #goal.trigger = "High Relative Volume or Intensity of Logged Session"
+            goal.trigger_type = TriggerType.high_volume_intensity
             alert = Alert(goal)
             alert.sport_name = sport_name
             self.alerts.append(alert)
@@ -1338,10 +1352,15 @@ class CoolDown(ModalityBase, Serialisable):
 
         if soreness.historic_soreness_status is not None and soreness.first_reported_date_time is not None and not soreness.is_dormant_cleared():
             days_sore = (event_date_time - soreness.first_reported_date_time).days
-            if (soreness.is_acute_pain() or soreness.is_persistent_pain() or soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_pain or
-                (soreness.is_persistent_soreness() or soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_soreness and days_sore > 30)):
+            if soreness.is_acute_pain() or soreness.is_persistent_pain() or soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_pain:
                 goal = AthleteGoal("Personalized Prepare for Training (Identified Dysfunction)", 1, AthleteGoalType.preempt_corrective)
-                goal.trigger = "Pers, Pers-2 Soreness > 30d or Historic Pain"
+                goal.trigger_type = TriggerType.hist_sore_greater_30
+                self.assign_exercises(soreness, goal, exercise_library)
+
+            elif (soreness.is_persistent_soreness() or soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_soreness and days_sore > 30):
+                goal = AthleteGoal("Personalized Prepare for Training (Identified Dysfunction)", 1, AthleteGoalType.preempt_corrective)
+                #goal.trigger = "Pers, Pers-2 Soreness > 30d or Historic Pain"
+                goal.trigger_type = TriggerType.hist_pain
                 alert = Alert(goal)
                 alert.body_parts.append(BodyPartSide(soreness.body_part.location, soreness.side))
                 self.alerts.append(alert)
