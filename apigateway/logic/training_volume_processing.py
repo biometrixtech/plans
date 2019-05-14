@@ -357,7 +357,7 @@ class TrainingVolumeProcessing(object):
                 target_sessions = list(t for t in training_sessions if start_date_time <= t.event_date <= end_date_time)
                 high_target_sessions = list(
                     t for t in training_sessions if start_date_time <= t.event_date <= mid_point_time and
-                    t.ultra_high_intensity_session() or t.high_intensity_RPE())
+                    t.high_intensity())
                 high_sessions = list(
                     t for t in target_sessions if t.ultra_high_intensity_session() or t.high_intensity_RPE())
                 midpoint_sessions = list(t for t in training_sessions if start_date_time <= t.event_date <= mid_point_time)
