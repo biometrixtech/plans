@@ -206,6 +206,22 @@ class InjuryStatus(Enum):
     returning_from_chronic_injury = 3
 
 
+class BodyPartSide(object):
+    def __init__(self, body_part_location, side):
+        self.body_part_location = body_part_location
+        self.side = side
+
+    def json_serialise(self):
+        return {
+            "body_part_location": self.body_part_location.value,
+            "side": self.side
+        }
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        return cls(BodyPartLocation(input_dict['body_part_location']), input_dict['side'])
+
+
 class BodyPartLocation(Enum):
     head = 0
     shoulder = 1
@@ -718,31 +734,32 @@ class AthleteGoal(object):
         return goal
 
 
-class Trigger(object):
-    def __init__(self, trigger_type):
-        self.trigger_type = trigger_type
-        self.soreness = []
+class Alert(object):
+    def __init__(self, goal):
+        self.goal = goal
+        self.body_parts = []
         self.sport_name = None
+        self.severity = None
 
     def json_serialise(self):
         return {
-            "trigger_type": self.trigger_type.value,
-            "soreness": [sore.json_serialise() for sore in self.soreness],
-            "sport_name": self.sport_name.value
+            "goal": self.goal.json_serialise(),
+            "body_parts": [body_part.json_serialise() for body_part in self.body_parts],
+            "sport_name": self.sport_name.value,
+            "severity": self.severity
         }
 
     @classmethod
     def json_deserialise(cls, input_dict):
-        trigger = cls(input_dict['trigger_type'])
-        trigger.soreness = [Soreness.json_deserialise(sore) for sore in input_dict['soreness']]
-        trigger.sport_name = input_dict['sport_name']
-        return trigger
+        alert = cls(AthleteGoal.json_deserialise(input_dict['goal']))
+        alert.body_parts = [BodyPartSide.json_deserialise(body_part) for body_part in input_dict['body_parts']]
+        alert.sport_name = input_dict['sport_name']
+        alert.severity = input_dict['severity']
+        return alert
 
     def __setattr__(self, name, value):
         if name == "sport_name" and not isinstance(value, SportName):
-            value = SportName[value]
-        elif name == "trigger_type" and not isinstance(value, TriggerType):
-            value = TriggerType(value)
+            value = SportName(value)
         super().__setattr__(name, value)
 
 

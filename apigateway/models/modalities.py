@@ -1,5 +1,5 @@
 from serialisable import Serialisable
-from models.soreness import BodyPart, BodyPartLocation, AssignedExercise, HistoricSorenessStatus, AthleteGoal, AthleteGoalType, ExerciseDosage, Soreness
+from models.soreness import BodyPart, BodyPartLocation, AssignedExercise, HistoricSorenessStatus, AthleteGoal, AthleteGoalType, ExerciseDosage, Soreness, Alert, BodyPartSide, TriggerType
 from models.body_parts import BodyPartFactory
 from models.sport import SportName
 from utils import parse_datetime, format_datetime
@@ -101,7 +101,7 @@ class ModalityBase(object):
         self.completed = False
         self.active = True
         self.default_plan = "Complete"
-        self.triggers = []
+        self.alerts = []
         self.dosage_durations = {}
         self.initialize_dosage_durations()
 
@@ -602,6 +602,9 @@ class ActiveRest(ModalityBase):
             body_part_factory = BodyPartFactory()
 
             for sport_name in sports:
+                alert = Alert(goal)
+                alert.sport_name = sport_name
+                self.alerts.append(alert)
                 body_part = body_part_factory.get_body_part_for_sport(sport_name)
 
                 prohibiting_soreness = False
@@ -643,7 +646,7 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
             'completed': self.completed,
             'active': self.active,
             'default_plan': self.default_plan,
-            'triggers': [g.json_serialise() for g in self.triggers]
+            'alerts': [g.json_serialise() for g in self.alerts]
         }
         return ret
 
@@ -668,7 +671,7 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
         pre_active_rest.isolated_activate_exercises = {s['library_id']: AssignedExercise.json_deserialise(s)
                                                        for s in input_dict['isolated_activate_exercises']}
         pre_active_rest.default_plan = input_dict.get('default_plan', 'complete')
-        pre_active_rest.triggers = [AthleteGoal.json_deserialise(goal) for goal in input_dict.get('triggers', [])]
+        pre_active_rest.alerts = [Alert.json_deserialise(alert) for alert in input_dict.get('alerts', [])]
 
         return pre_active_rest
 
@@ -702,7 +705,9 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
             goal.trigger = "Sore reported today"
 
             if body_part is not None:
-                self.triggers.append(goal)
+                alert = Alert(goal)
+                alert.body_parts.append(BodyPartSide(soreness.body_part.location, soreness.side))
+                self.alerts.append(alert)
                 for a in body_part.agonists:
                     agonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None))
                     if agonist is not None:
@@ -741,7 +746,9 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
                 goal.trigger = "Pers, Pers-2 Soreness > 30d"
 
                 if body_part is not None:
-                    self.triggers.append(goal)
+                    alert = Alert(goal)
+                    alert.body_parts.append(BodyPartSide(soreness.body_part.location, soreness.side))
+                    self.alerts.append(alert)
                     for a in body_part.agonists:
                         agonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None))
                         if agonist is not None:
@@ -784,7 +791,9 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
                 goal.trigger = "Acute, Pers, Pers-2 Pain"
 
                 if body_part is not None:
-                    self.triggers.append(goal)
+                    alert = Alert(goal)
+                    alert.body_parts.append(BodyPartSide(soreness.body_part.location, soreness.side))
+                    self.alerts.append(alert)
                     for a in body_part.agonists:
                         agonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None))
                         if agonist is not None:
@@ -829,7 +838,9 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
                 goal.trigger = "Painful muscle reported today"
 
             if body_part is not None:
-                self.triggers.append(goal)
+                alert = Alert(goal)
+                alert.body_parts.append(BodyPartSide(soreness.body_part.location, soreness.side))
+                self.alerts.append(alert)
                 for a in body_part.agonists:
                     agonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None))
                     if agonist is not None:
@@ -890,7 +901,7 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
             'completed': self.completed,
             'active': self.active,
             'default_plan': self.default_plan,
-            'triggers': [g.json_serialise() for g in self.triggers]
+            'alerts': [g.json_serialise() for g in self.alerts]
         }
         return ret
 
@@ -913,7 +924,7 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
         post_active_rest.isolated_activate_exercises = {s['library_id']: AssignedExercise.json_deserialise(s)
                                                         for s in input_dict['isolated_activate_exercises']}
         post_active_rest.default_plan = input_dict.get('default_plan', 'complete')
-        post_active_rest.triggers = [AthleteGoal.json_deserialise(goal) for goal in input_dict.get('triggers', [])]
+        post_active_rest.alerts = [Alert.json_deserialise(alert) for alert in input_dict.get('alerts', [])]
 
         return post_active_rest
 
@@ -945,7 +956,9 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
             goal.trigger = "Sore reported today"
 
             if body_part is not None:
-                self.triggers.append(goal)
+                alert = Alert(goal)
+                alert.body_parts.append(BodyPartSide(soreness.body_part.location, soreness.side))
+                self.alerts.append(alert)
                 for a in body_part.agonists:
                     agonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None))
                     if agonist is not None:
@@ -981,7 +994,9 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
                 goal.trigger = "Pers, Pers-2 Soreness > 30d"
 
                 if body_part is not None:
-                    self.triggers.append(goal)
+                    alert = Alert(goal)
+                    alert.body_parts.append(BodyPartSide(soreness.body_part.location, soreness.side))
+                    self.alerts.append(alert)
                     for a in body_part.agonists:
                         agonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None))
                         if agonist is not None:
@@ -1024,7 +1039,9 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
                 goal.trigger = "Acute, Pers, Pers-2 Pain"
 
                 if body_part is not None:
-                    self.triggers.append(goal)
+                    alert = Alert(goal)
+                    alert.body_parts.append(BodyPartSide(soreness.body_part.location, soreness.side))
+                    self.alerts.append(alert)
                     for a in body_part.agonists:
                         agonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None))
                         if agonist is not None:
@@ -1071,7 +1088,9 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
                 priority = "2"
 
             if body_part is not None:
-                self.triggers.append(goal)
+                alert = Alert(goal)
+                alert.body_parts.append(BodyPartSide(soreness.body_part.location, soreness.side))
+                self.alerts.append(alert)
                 for a in body_part.agonists:
                     agonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None))
                     if agonist is not None:
@@ -1185,7 +1204,9 @@ class WarmUp(ModalityBase, Serialisable):
         body_part = body_part_factory.get_body_part(soreness.body_part)
 
         if body_part is not None:
-            self.triggers.append(goal)
+            alert = Alert(goal)
+            alert.body_parts.append(BodyPartSide(soreness.body_part.location, soreness.side))
+            self.alerts.append(alert)
             for a in body_part.agonists:
                 agonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None))
                 if agonist is not None:
@@ -1243,7 +1264,7 @@ class CoolDown(ModalityBase, Serialisable):
             'event_date_time': format_datetime(self.event_date_time) if self.event_date_time is not None else None,
             'completed': self.completed,
             'active': self.active,
-            'triggers': [g.json_serialise() for g in self.triggers]
+            'alerts': [alert.json_serialise() for alert in self.alerts]
         }
         return ret
 
@@ -1261,7 +1282,7 @@ class CoolDown(ModalityBase, Serialisable):
         cooldown.completed_date_time = input_dict.get('completed_date_time', None)
         cooldown.completed = input_dict.get('completed', False)
         cooldown.active = input_dict.get('active', True)
-        cooldown.triggers = [AthleteGoal.json_deserialise(goal) for goal in input_dict.get('triggers', [])]
+        cooldown.alerts = [Alert.json_deserialise(alert) for alert in input_dict.get('alerts', [])]
 
         return cooldown
 
@@ -1291,6 +1312,9 @@ class CoolDown(ModalityBase, Serialisable):
         if self.high_relative_volume_logged or self.high_relative_intensity_logged:
             goal = AthleteGoal("Recover from Sport", 1, AthleteGoalType.sport)
             goal.trigger = "High Relative Volume or Intensity of Logged Session"
+            alert = Alert(goal)
+            alert.sport_name = sport_name
+            self.alerts.append(alert)
 
             body_part_factory = BodyPartFactory()
 
@@ -1318,6 +1342,9 @@ class CoolDown(ModalityBase, Serialisable):
                 (soreness.is_persistent_soreness() or soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_soreness and days_sore > 30)):
                 goal = AthleteGoal("Personalized Prepare for Training (Identified Dysfunction)", 1, AthleteGoalType.preempt_corrective)
                 goal.trigger = "Pers, Pers-2 Soreness > 30d or Historic Pain"
+                alert = Alert(goal)
+                alert.body_parts.append(BodyPartSide(soreness.body_part.location, soreness.side))
+                self.alerts.append(alert)
 
                 self.assign_exercises(soreness, goal, exercise_library)
 
@@ -1335,7 +1362,9 @@ class CoolDown(ModalityBase, Serialisable):
         body_part = body_part_factory.get_body_part(soreness.body_part)
 
         if body_part is not None:
-            self.triggers.append(goal)
+            alert = Alert(goal)
+            alert.body_parts.append(BodyPartSide(soreness.body_part.location, soreness.side))
+            self.alerts.append(alert)
             for a in body_part.agonists:
                 agonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None))
                 if agonist is not None:
