@@ -791,7 +791,7 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
 
             if body_part is not None:
                 alert = Alert(goal)
-                alert.body_parts.append(BodyPartSide(soreness.body_part.location, soreness.side))
+                alert.body_part = BodyPartSide(soreness.body_part.location, soreness.side)
                 self.alerts.append(alert)
                 for a in body_part.agonists:
                     agonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None))
@@ -833,7 +833,7 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
 
                 if body_part is not None:
                     alert = Alert(goal)
-                    alert.body_parts.append(BodyPartSide(soreness.body_part.location, soreness.side))
+                    alert.body_part = BodyPartSide(soreness.body_part.location, soreness.side)
                     self.alerts.append(alert)
                     for a in body_part.agonists:
                         agonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None))
@@ -879,7 +879,7 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
 
                 if body_part is not None:
                     alert = Alert(goal)
-                    alert.body_parts.append(BodyPartSide(soreness.body_part.location, soreness.side))
+                    alert.body_part = BodyPartSide(soreness.body_part.location, soreness.side)
                     self.alerts.append(alert)
                     for a in body_part.agonists:
                         agonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None))
@@ -928,7 +928,7 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
 
             if body_part is not None:
                 alert = Alert(goal)
-                alert.body_parts.append(BodyPartSide(soreness.body_part.location, soreness.side))
+                alert.body_part = BodyPartSide(soreness.body_part.location, soreness.side)
                 self.alerts.append(alert)
                 for a in body_part.agonists:
                     agonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None))
@@ -1103,7 +1103,7 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
 
             if body_part is not None:
                 alert = Alert(goal)
-                alert.body_parts.append(BodyPartSide(soreness.body_part.location, soreness.side))
+                alert.body_part = BodyPartSide(soreness.body_part.location, soreness.side)
                 self.alerts.append(alert)
                 for a in body_part.agonists:
                     agonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None))
@@ -1142,7 +1142,7 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
 
                 if body_part is not None:
                     alert = Alert(goal)
-                    alert.body_parts.append(BodyPartSide(soreness.body_part.location, soreness.side))
+                    alert.body_part = BodyPartSide(soreness.body_part.location, soreness.side)
                     self.alerts.append(alert)
                     for a in body_part.agonists:
                         agonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None))
@@ -1188,7 +1188,7 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
 
                 if body_part is not None:
                     alert = Alert(goal)
-                    alert.body_parts.append(BodyPartSide(soreness.body_part.location, soreness.side))
+                    alert.body_part = BodyPartSide(soreness.body_part.location, soreness.side)
                     self.alerts.append(alert)
                     for a in body_part.agonists:
                         agonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None))
@@ -1239,7 +1239,7 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
 
             if body_part is not None:
                 alert = Alert(goal)
-                alert.body_parts.append(BodyPartSide(soreness.body_part.location, soreness.side))
+                alert.body_part = BodyPartSide(soreness.body_part.location, soreness.side)
                 self.alerts.append(alert)
                 for a in body_part.agonists:
                     agonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None))
@@ -1336,7 +1336,7 @@ class WarmUp(ModalityBase, Serialisable):
                 #goal.trigger = "Pers, Pers-2 Soreness > 30d"
                 goal.trigger_type = TriggerType.hist_sore_greater_30
                 alert = Alert(goal)
-                alert.body_parts.append(BodyPartSide(soreness.body_part.location, soreness.side))
+                alert.body_part = BodyPartSide(soreness.body_part.location, soreness.side)
                 self.alerts.append(alert)
 
                 self.assign_exercises(soreness, goal, exercise_library)
@@ -1350,7 +1350,7 @@ class WarmUp(ModalityBase, Serialisable):
                 #goal.trigger = "Pers, Pers-2 Soreness > 30d"
                 goal.trigger_type = TriggerType.hist_sore_greater_30
                 alert = Alert(goal)
-                alert.body_parts.append(BodyPartSide(soreness.body_part.location, soreness.side))
+                alert.body_part = BodyPartSide(soreness.body_part.location, soreness.side)
                 self.alerts.append(alert)
 
                 self.assign_exercises(soreness, goal, exercise_library)
@@ -1363,7 +1363,7 @@ class WarmUp(ModalityBase, Serialisable):
 
         if body_part is not None:
             alert = Alert(goal)
-            alert.body_parts.append(BodyPartSide(soreness.body_part.location, soreness.side))
+            alert.body_part = BodyPartSide(soreness.body_part.location, soreness.side)
             self.alerts.append(alert)
             for a in body_part.agonists:
                 agonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None))
@@ -1501,7 +1501,7 @@ class CoolDown(ModalityBase, Serialisable):
                 goal = AthleteGoal("Personalized Prepare for Training (Identified Dysfunction)", 1, AthleteGoalType.preempt_corrective)
                 goal.trigger_type = TriggerType.hist_sore_greater_30
                 alert = Alert(goal)
-                alert.body_parts.append(BodyPartSide(soreness.body_part.location, soreness.side))
+                alert.body_part = BodyPartSide(soreness.body_part.location, soreness.side)
                 self.alerts.append(alert)
                 self.assign_exercises(soreness, goal, exercise_library)
 
@@ -1510,7 +1510,7 @@ class CoolDown(ModalityBase, Serialisable):
                 #goal.trigger = "Pers, Pers-2 Soreness > 30d or Historic Pain"
                 goal.trigger_type = TriggerType.hist_pain
                 alert = Alert(goal)
-                alert.body_parts.append(BodyPartSide(soreness.body_part.location, soreness.side))
+                alert.body_part = BodyPartSide(soreness.body_part.location, soreness.side)
                 self.alerts.append(alert)
 
                 self.assign_exercises(soreness, goal, exercise_library)
@@ -1530,7 +1530,7 @@ class CoolDown(ModalityBase, Serialisable):
 
         if body_part is not None:
             alert = Alert(goal)
-            alert.body_parts.append(BodyPartSide(soreness.body_part.location, soreness.side))
+            alert.body_part = BodyPartSide(soreness.body_part.location, soreness.side)
             self.alerts.append(alert)
             for a in body_part.agonists:
                 agonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None))

@@ -3,6 +3,7 @@ import datetime
 from fathomapi.utils.xray import xray_recorder
 import logic.exercise_mapping as exercise_mapping
 from logic.soreness_processing import SorenessCalculator
+from logic.alerts_processing import AlertsProcessing
 from models.daily_plan import DailyPlan
 from utils import format_date, parse_datetime, parse_date
 
@@ -186,6 +187,8 @@ class TrainingPlanManager(object):
         #        self.daily_plan.post_recovery.display_exercises = False
 
         self.daily_plan.last_updated = last_updated
+        alerts = self.daily_plan.get_alerts()
+        self.daily_plan.insights = AlertsProcessing.aggregate_alerts(alerts, [])
 
         self.daily_plan_datastore.put(self.daily_plan)
 

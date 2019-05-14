@@ -761,14 +761,14 @@ class AthleteGoal(object):
 class Alert(object):
     def __init__(self, goal):
         self.goal = goal
-        self.body_parts = []
+        self.body_part = None
         self.sport_name = None
         self.severity = None
 
     def json_serialise(self):
         return {
             "goal": self.goal.json_serialise(),
-            "body_parts": [body_part.json_serialise() for body_part in self.body_parts],
+            "body_part": self.body_part.json_serialise() if self.body_part is not None else None,
             "sport_name": self.sport_name.value,
             "severity": self.severity
         }
@@ -776,7 +776,7 @@ class Alert(object):
     @classmethod
     def json_deserialise(cls, input_dict):
         alert = cls(AthleteGoal.json_deserialise(input_dict['goal']))
-        alert.body_parts = [BodyPartSide.json_deserialise(body_part) for body_part in input_dict['body_parts']]
+        alert.body_part = BodyPartSide.json_deserialise(input_dict['body_part']) if input_dict['body_part'] is not None else None
         alert.sport_name = input_dict['sport_name']
         alert.severity = input_dict['severity']
         return alert
@@ -803,10 +803,11 @@ class TriggerType(IntEnum):
     hist_sore_less_30_sore_today = 12  # "Pers, Pers-2 Soreness < 30d + Soreness reported today"
     hist_sore_greater_30_sore_today = 13  # "Pers, Pers-2 Soreness > 30d + Soreness Reported Today"
     pain_today = 14  # "Pain reported today"
-    hist_pain = 15  # "Acute, Pers, Pers-2 Pain"
-    hist_pain_sport = 16  # "Acute, Pers, Pers_2 Pain + Correlated to Sport"
-    pain_injury = 17  # 'Pain - Injury'
-    hist_sore_greater_30 = 18  # "Pers, Pers-2 Soreness > 30d"
-    hist_sore_greater_30_sport = 19  # "Pers, Pers-2 Soreness > 30d + Correlated to Sport"
+    pain_today_high = 15  # "Pain reported today high severity"
+    hist_pain = 16  # "Acute, Pers, Pers-2 Pain"
+    hist_pain_sport = 17  # "Acute, Pers, Pers_2 Pain + Correlated to Sport"
+    pain_injury = 18  # 'Pain - Injury'
+    hist_sore_greater_30 = 19  # "Pers, Pers-2 Soreness > 30d"
+    hist_sore_greater_30_sport = 20  # "Pers, Pers-2 Soreness > 30d + Correlated to Sport"
     pers_pers2_pain_less_30_no_pain_today = 21
     pers_pers2_pain_greater_30_no_pain_today = 22
