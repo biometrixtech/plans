@@ -728,7 +728,7 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
         goal = AthleteGoal("On Request", 1, AthleteGoalType.on_request)
 
         alert = Alert(goal)
-        alert.body_parts.append(BodyPartSide(BodyPartLocation.general, 1))
+        alert.body_part = BodyPartSide(BodyPartLocation.general, 1)
         self.alerts.append(alert)
         for a in body_part.agonists:
             agonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None))
@@ -1042,7 +1042,7 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
         goal = AthleteGoal("On Request", 1, AthleteGoalType.on_request)
 
         alert = Alert(goal)
-        alert.body_parts.append(BodyPartSide(BodyPartLocation.general, 1))
+        alert.body_part = BodyPartSide(BodyPartLocation.general, 1)
         self.alerts.append(alert)
         for a in body_part.agonists:
             agonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None))
