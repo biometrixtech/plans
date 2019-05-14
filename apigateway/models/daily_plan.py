@@ -4,6 +4,7 @@ from utils import parse_date
 from models.session import Session
 from models.daily_readiness import DailyReadiness
 from models.modalities import ActiveRestBeforeTraining, ActiveRestAfterTraining, IceSession, HeatSession, ColdWaterImmersion, WarmUp, CoolDown
+from models.insights import AthleteInsight
 
 
 class DailyPlan(Serialisable):
@@ -92,39 +93,39 @@ class DailyPlan(Serialisable):
                # 'functional_strength_eligible': self.functional_strength_eligible,
                # 'completed_functional_strength_sessions': self.completed_functional_strength_sessions,
                'train_later': self.train_later,
-               # 'insights': [insight.json_serialise() for insight in self.insights]
+               'insights': [insight.json_serialise() for insight in self.insights]
                }
 
-        ret['insights'] = [
-                            {
-                            "title": "How Soreness Turns to Strength:", 
-                            "text": "We've added Care for Soreness to your plan today, to help retain mobility and expodite healing of tissue damage indicated by muscle soreness.",
-                            "goal_targeted": ["Care for Soreness"],
-                            "start_date": "2019-05-13T11:23:00Z",
-                            "read": False
-                            },
-                            {
-                            "title": 'Sign of Possible Injury',
-                            "text": "We added activities to Prevention to your plan because left knee pain for several days could be sign of injury. We'll remove heat to avoid aggrivating the issue and encourage you to ice, rest and see a doctor if the pain worsens.",
-                            "goal_targeted": ["Prevention"],
-                            "start_date": "2019-05-10T11:23:00Z",
-                            "read": False
-                            },
-                            {
-                            "title": "Possible Strength Imbalance",
-                            "text": "We've added activities to Prevention to your plan. Given your training patterns and persistant right glute soreness response, you may have a strength imbalance or movement dysfuntion which elevates your risk of injury. With these ativities we'll try to address the most likely source given what we've observed.",
-                            "goal_targeted": ["Prevention"],
-                            "start_date": "2019-05-13T11:23:00Z",
-                            "read": False
-                            },
-                            {
-                            "title": "How We Help Mitigate Pain: ",
-                            "text": "When you report pain we try to provide you with Care for Pain and Personalized Prepare for Sport activities to encourage proper biomechanical alignment & balance mucle tension to help mitigate the pain, but please remember to avoid any activities that hurt. ",
-                            "goal_targeted": ["Care for Pain", "Personalized Prepare for Sport"],
-                            "start_date": "2019-05-13T11:23:00Z",
-                            "read": True
-                            }
-                        ]
+        # ret['insights'] = [
+        #                     {
+        #                     "title": "How Soreness Turns to Strength:",
+        #                     "text": "We've added Care for Soreness to your plan today, to help retain mobility and expodite healing of tissue damage indicated by muscle soreness.",
+        #                     "goal_targeted": ["Care for Soreness"],
+        #                     "start_date": "2019-05-13T11:23:00Z",
+        #                     "read": False
+        #                     },
+        #                     {
+        #                     "title": 'Sign of Possible Injury',
+        #                     "text": "We added activities to Prevention to your plan because left knee pain for several days could be sign of injury. We'll remove heat to avoid aggrivating the issue and encourage you to ice, rest and see a doctor if the pain worsens.",
+        #                     "goal_targeted": ["Prevention"],
+        #                     "start_date": "2019-05-10T11:23:00Z",
+        #                     "read": False
+        #                     },
+        #                     {
+        #                     "title": "Possible Strength Imbalance",
+        #                     "text": "We've added activities to Prevention to your plan. Given your training patterns and persistant right glute soreness response, you may have a strength imbalance or movement dysfuntion which elevates your risk of injury. With these ativities we'll try to address the most likely source given what we've observed.",
+        #                     "goal_targeted": ["Prevention"],
+        #                     "start_date": "2019-05-13T11:23:00Z",
+        #                     "read": False
+        #                     },
+        #                     {
+        #                     "title": "How We Help Mitigate Pain: ",
+        #                     "text": "When you report pain we try to provide you with Care for Pain and Personalized Prepare for Sport activities to encourage proper biomechanical alignment & balance mucle tension to help mitigate the pain, but please remember to avoid any activities that hurt. ",
+        #                     "goal_targeted": ["Care for Pain", "Personalized Prepare for Sport"],
+        #                     "start_date": "2019-05-13T11:23:00Z",
+        #                     "read": True
+        #                     }
+        #                 ]
         return ret
 
     @classmethod
@@ -157,7 +158,7 @@ class DailyPlan(Serialisable):
         daily_plan.last_sensor_sync = input_dict.get('last_sensor_sync', None)
         daily_plan.sessions_planned = input_dict.get('sessions_planned', True)
         daily_plan.train_later = input_dict.get('train_later', True)
-        # daily_plan.insights = [AthleteInsights.json_deserialise() for insight in input_dict.get('insights', [])]
+        daily_plan.insights = [AthleteInsight.json_deserialise(insight) for insight in input_dict.get('insights', [])]
         daily_plan.insights = []
 
         return daily_plan
@@ -202,3 +203,23 @@ class DailyPlan(Serialisable):
         sessions.extend(training_sessions)
 
         return sessions
+
+    def get_alerts(self):
+        alerts = []
+        if self.train_later:
+            for active_rest in self.pre_active_rest:
+                alerts.extend(active_rest.alerts)
+            for warm_up in self.warm_up:
+                alerts.extend(warm_up.alerts)
+            if self.heat is not None:
+                alerts.extend(self.heat.alerts)
+        else:
+            for active_rest in self.post_active_rest:
+                alerts.extend(active_rest.alerts)
+            for cool_down in self.cool_down:
+                alerts.extend(cool_down.alerts)
+            if self.ice is not None:
+                alerts.extend(self.ice.alerts)
+            if self.cold_water_immersion is not None:
+                alerts.extend(self.cold_water_immersion.alerts)
+        return alerts
