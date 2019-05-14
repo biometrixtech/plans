@@ -193,17 +193,17 @@ class ModalityBase(object):
 
                 dosage = a.dosages[0]
 
-                if dosage.soreness_source.severity < 0.5:
+                if dosage.severity() < 0.5:
                     self.calc_dosage_durations(0.5, a, dosage)
-                elif 0.5 <= dosage.soreness_source.severity < 1.5:
+                elif 0.5 <= dosage.severity() < 1.5:
                         self.calc_dosage_durations(1.5, a, dosage)
-                elif 1.5 <= dosage.soreness_source.severity < 2.5:
+                elif 1.5 <= dosage.severity() < 2.5:
                         self.calc_dosage_durations(2.5, a, dosage)
-                elif 2.5 <= dosage.soreness_source.severity < 3.5:
+                elif 2.5 <= dosage.severity() < 3.5:
                         self.calc_dosage_durations(3.5, a, dosage)
-                elif 3.5 <= dosage.soreness_source.severity < 4.5:
+                elif 3.5 <= dosage.severity() < 4.5:
                         self.calc_dosage_durations(4.5, a, dosage)
-                elif 4.5 <= dosage.soreness_source.severity <= 5.0:
+                elif 4.5 <= dosage.severity() <= 5.0:
                         self.calc_dosage_durations(5.0, a, dosage)
 
         # key off efficient as the guide
@@ -258,27 +258,27 @@ class ModalityBase(object):
 
                     if efficient_winner == 5.0:
                         for d in a.dosages:
-                            if d.soreness_source.severity < 4.5:
+                            if d.severity() < 4.5:
                                 d.efficient_reps_assigned = 0
                                 d.efficient_sets_assigned = 0
                     elif efficient_winner == 4.5:
                         for d in a.dosages:
-                            if d.soreness_source.severity < 3.5:
+                            if d.severity() < 3.5:
                                 d.efficient_reps_assigned = 0
                                 d.efficient_sets_assigned = 0
                     elif efficient_winner == 3.5:
                         for d in a.dosages:
-                            if d.soreness_source.severity < 2.5:
+                            if d.severity() < 2.5:
                                 d.efficient_reps_assigned = 0
                                 d.efficient_sets_assigned = 0
                     elif efficient_winner == 2.5:
                         for d in a.dosages:
-                            if d.soreness_source.severity < 1.5:
+                            if d.severity() < 1.5:
                                 d.efficient_reps_assigned = 0
                                 d.efficient_sets_assigned = 0
                     elif efficient_winner == 1.5:
                         for d in a.dosages:
-                            if d.soreness_source.severity < 0.5:
+                            if d.severity() < 0.5:
                                 d.efficient_reps_assigned = 0
                                 d.efficient_sets_assigned = 0
                     elif efficient_winner == 0.5:
@@ -286,27 +286,27 @@ class ModalityBase(object):
 
                     if complete_winner == 5.0:
                         for d in a.dosages:
-                            if d.soreness_source.severity < 4.5:
+                            if d.severity() < 4.5:
                                 d.complete_reps_assigned = 0
                                 d.complete_sets_assigned = 0
                     elif complete_winner == 4.5:
                         for d in a.dosages:
-                            if d.soreness_source.severity < 3.5:
+                            if d.severity() < 3.5:
                                 d.complete_reps_assigned = 0
                                 d.complete_sets_assigned = 0
                     elif complete_winner == 3.5:
                         for d in a.dosages:
-                            if d.soreness_source.severity < 2.5:
+                            if d.severity() < 2.5:
                                 d.complete_reps_assigned = 0
                                 d.complete_sets_assigned = 0
                     elif complete_winner == 2.5:
                         for d in a.dosages:
-                            if d.soreness_source.severity < 1.5:
+                            if d.severity() < 1.5:
                                 d.complete_reps_assigned = 0
                                 d.complete_sets_assigned = 0
                     elif complete_winner == 1.5:
                         for d in a.dosages:
-                            if d.soreness_source.severity < 0.5:
+                            if d.severity() < 0.5:
                                 d.complete_reps_assigned = 0
                                 d.complete_sets_assigned = 0
                     elif complete_winner == 0.5:
@@ -314,27 +314,27 @@ class ModalityBase(object):
 
                     if comprehensive_winner == 5.0:
                         for d in a.dosages:
-                            if d.soreness_source.severity < 4.5:
+                            if d.severity() < 4.5:
                                 d.comprehensive_reps_assigned = 0
                                 d.comprehensive_sets_assigned = 0
                     elif comprehensive_winner == 4.5:
                         for d in a.dosages:
-                            if d.soreness_source.severity < 3.5:
+                            if d.severity() < 3.5:
                                 d.comprehensive_reps_assigned = 0
                                 d.comprehensive_sets_assigned = 0
                     elif comprehensive_winner == 3.5:
                         for d in a.dosages:
-                            if d.soreness_source.severity < 2.5:
+                            if d.severity() < 2.5:
                                 d.comprehensive_reps_assigned = 0
                                 d.comprehensive_sets_assigned = 0
                     elif comprehensive_winner == 2.5:
                         for d in a.dosages:
-                            if d.soreness_source.severity < 1.5:
+                            if d.severity() < 1.5:
                                 d.comprehensive_reps_assigned = 0
                                 d.comprehensive_sets_assigned = 0
                     elif comprehensive_winner == 1.5:
                         for d in a.dosages:
-                            if d.soreness_source.severity < 0.5:
+                            if d.severity() < 0.5:
                                 d.comprehensive_reps_assigned = 0
                                 d.comprehensive_sets_assigned = 0
                     elif comprehensive_winner == 0.5:
