@@ -468,12 +468,15 @@ class ExerciseDosage(object):
         self.goal = None
         self.priority = 0
         self.soreness_source = None
+        self.sport_name = None
         self.efficient_reps_assigned = 0
         self.efficient_sets_assigned = 0
         self.complete_reps_assigned = 0
         self.complete_sets_assigned = 0
         self.comprehensive_reps_assigned = 0
         self.comprehensive_sets_assigned = 0
+        self.default_reps_assigned = 0
+        self.default_sets_assigned = 0
         self.ranking = 0
 
     def get_total_dosage(self):

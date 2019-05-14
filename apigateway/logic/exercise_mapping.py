@@ -25,10 +25,8 @@ class ExerciseAssignmentCalculator(object):
         self.soreness_list = soreness_list
         self.event_date_time = event_date_time
         self.high_relative_intensity_session = self.process_training_sessions_intensity()
+        self.high_relative_load_session = False
         self.high_relative_load_session_sport_names = set()
-
-        #forcing a cooldown!
-        self.high_relative_load_session = True
 
         self.muscular_strain_increasing = athlete_stats.muscular_strain_increasing
         self.doms = athlete_stats.delayed_onset_muscle_soreness
@@ -190,24 +188,21 @@ class ExerciseAssignmentCalculator(object):
 
     def get_cool_down(self):
 
-        # cool_down = None
-        # defaults so that we always get cool down
-
-        high_relative_load_session_sport_name = SportName.distance_running
+        cool_down = None
 
         if self.high_relative_load_session or self.high_relative_intensity_session:
             #for s in soreness_list:
             #    if s.first_reported_date_time is not None and not s.is_dormant_cleared():
             #        days_diff = (event_date_time - s.first_reported_date_time).days
             #        if (not s.pain and days_diff > 30) or s.pain:
-            sport_name = high_relative_load_session_sport_name
-            cool_down = CoolDown(sport_name, self.high_relative_load_session, self.high_relative_intensity_session,
-                                 self.muscular_strain_increasing, self.event_date_time)
-            cool_down.fill_exercises(self.soreness_list, self.exercise_library, self.high_relative_load_session, self.high_relative_intensity_session, self.muscular_strain_increasing,
-                                     [high_relative_load_session_sport_name])
-            cool_down.set_plan_dosage(self.soreness_list, self.muscular_strain_increasing)
-            cool_down.set_exercise_dosage_ranking()
-            cool_down.aggregate_dosages()
+            for sport_name in self.high_relative_load_session_sport_names:
+                cool_down = CoolDown(self.high_relative_load_session, self.high_relative_intensity_session,
+                                     self.muscular_strain_increasing, self.event_date_time)
+                cool_down.fill_exercises(self.soreness_list, self.exercise_library, self.high_relative_load_session, self.high_relative_intensity_session, self.muscular_strain_increasing,
+                                         [sport_name])
+                cool_down.set_plan_dosage(self.soreness_list, self.muscular_strain_increasing)
+                cool_down.set_exercise_dosage_ranking()
+                cool_down.aggregate_dosages()
             #    break
 
             return [cool_down]
