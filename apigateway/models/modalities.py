@@ -557,11 +557,12 @@ class ModalityBase(object):
 
 
 class ActiveRest(ModalityBase):
-    def __init__(self, event_date_time):
+    def __init__(self, event_date_time, force_data=False):
         super().__init__(event_date_time)
         #self.high_relative_load_session = high_relative_load_session
         #self.high_relative_intensity_logged = high_relative_intensity_logged
         #self.muscular_strain_increasing = muscular_strain_increasing
+        self.force_data = force_data
         self.event_date_time = event_date_time
         self.inhibit_exercises = {}
         self.static_integrate_exercises = {}
@@ -612,7 +613,8 @@ class ActiveRest(ModalityBase):
                 self.check_prevention_soreness(s, self.event_date_time, exercise_library)
                 self.check_prevention_pain(s, self.event_date_time, exercise_library)
         else:
-            self.get_general_exercises(exercise_library)
+            if self.force_data:
+                self.get_general_exercises(exercise_library)
 
     def get_general_exercises(self, exercise_library):
 
@@ -727,9 +729,6 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
 
         goal = AthleteGoal("On Request", 1, AthleteGoalType.on_request)
 
-        alert = Alert(goal)
-        alert.body_part = BodyPartSide(BodyPartLocation.general, 1)
-        self.alerts.append(alert)
         for a in body_part.agonists:
             agonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None))
             if agonist is not None:
@@ -1041,9 +1040,6 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
 
         goal = AthleteGoal("On Request", 1, AthleteGoalType.on_request)
 
-        alert = Alert(goal)
-        alert.body_part = BodyPartSide(BodyPartLocation.general, 1)
-        self.alerts.append(alert)
         for a in body_part.agonists:
             agonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None))
             if agonist is not None:
