@@ -2,8 +2,7 @@ from models.modalities import ModalityBase
 from models.soreness import AthleteGoal, AthleteGoalType, Exercise, ExerciseDosage, Soreness
 from datetime import datetime
 
-goal_types = [AthleteGoalType.sore, AthleteGoalType.sport, AthleteGoalType.preempt_personalized_sport,
-              AthleteGoalType.preempt_sport, AthleteGoalType.preempt_corrective]
+goal_types = [AthleteGoalType.sore, AthleteGoalType.preempt_personalized_sport, AthleteGoalType.preempt_corrective]
 
 
 def get_daily_dosage(goal, soreness, priority):

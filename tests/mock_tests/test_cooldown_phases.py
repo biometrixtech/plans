@@ -22,14 +22,14 @@ def load_exercises():
 
 def test_cooldown_check_soreness_severity_3():
 
-    cooldown = CoolDown(SportName.cycling, True, False, False, event_date_time=datetime.today())
+    cooldown = CoolDown(True, False, False, event_date_time=datetime.today())
 
     soreness = Soreness()
     soreness.body_part = BodyPart(BodyPartLocation.ankle, None)
     soreness.severity = 3
     soreness.side = 1
     exercise_library = exercise_library_datastore.get()
-    cooldown.check_recover_from_sport([soreness], exercise_library)
+    cooldown.check_recover_from_sport([soreness], [SportName.cycling], exercise_library)
 
     assert len(cooldown.dynamic_stretch_exercises) > 0
     assert len(cooldown.dynamic_integrate_exercises) > 0
@@ -37,14 +37,14 @@ def test_cooldown_check_soreness_severity_3():
 
 def test_cooldown_check_soreness_severity_4():
 
-    cooldown = CoolDown(SportName.cycling, True, False, False, event_date_time=datetime.today())
+    cooldown = CoolDown(True, False, False, event_date_time=datetime.today())
 
     soreness = Soreness()
     soreness.body_part = BodyPart(BodyPartLocation.ankle, None)
     soreness.severity = 4
     soreness.side = 1
     exercise_library = exercise_library_datastore.get()
-    cooldown.check_recover_from_sport([soreness], exercise_library)
+    cooldown.check_recover_from_sport([soreness], [SportName.cycling], exercise_library)
 
     assert len(cooldown.dynamic_stretch_exercises) == 0
     assert len(cooldown.dynamic_integrate_exercises) == 0
@@ -53,7 +53,7 @@ def test_cooldown_check_soreness_severity_4():
 def test_cooldown_check_corrective_soreness_severity_3():
 
     current_date_time = datetime.today()
-    cooldown = CoolDown(SportName.cycling, True, False, False, event_date_time=current_date_time)
+    cooldown = CoolDown(True, False, False, event_date_time=current_date_time)
 
     soreness = Soreness()
     soreness.body_part = BodyPart(BodyPartLocation.lower_back, None)
@@ -73,7 +73,7 @@ def test_cooldown_check_corrective_soreness_severity_3():
 def test_cooldown_check_corrective_soreness_severity_4():
 
     current_date_time = datetime.today()
-    cooldown = CoolDown(SportName.cycling, True, False, False, event_date_time=current_date_time)
+    cooldown = CoolDown(True, False, False, event_date_time=current_date_time)
 
     soreness = Soreness()
     soreness.body_part = BodyPart(BodyPartLocation.hip_flexor, None)
@@ -92,7 +92,7 @@ def test_cooldown_check_corrective_soreness_severity_4():
 def test_cooldown_check_corrective_pain_severity_3():
 
     current_date_time = datetime.today()
-    cooldown = CoolDown(SportName.cycling, True, False, False, event_date_time=current_date_time)
+    cooldown = CoolDown(True, False, False, event_date_time=current_date_time)
 
     soreness = Soreness()
     soreness.body_part = BodyPart(BodyPartLocation.lower_back, None)
@@ -112,7 +112,7 @@ def test_cooldown_check_corrective_pain_severity_3():
 def test_cooldown_check_corrective_pain_severity_4():
 
     current_date_time = datetime.today()
-    cooldown = CoolDown(SportName.cycling, True, False, False, event_date_time=current_date_time)
+    cooldown = CoolDown(True, False, False, event_date_time=current_date_time)
 
     soreness = Soreness()
     soreness.body_part = BodyPart(BodyPartLocation.hip_flexor, None)
