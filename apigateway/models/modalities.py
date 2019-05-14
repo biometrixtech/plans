@@ -158,7 +158,7 @@ class ModalityBase(object):
             else:
                 self.default_plan = "Comprehensive"
 
-    def copy_exercises(self, source_collection, target_collection, goal, priority, soreness, exercise_library):
+    def copy_exercises(self, source_collection, target_collection, goal, priority, soreness, exercise_library, sport_name=None):
 
         for s in source_collection:
             if s.exercise.id not in target_collection:
@@ -170,6 +170,7 @@ class ModalityBase(object):
             dosage = ExerciseDosage()
             dosage.priority = priority
             dosage.soreness_source = soreness
+            dosage.sport_name = sport_name
             dosage.goal = goal
             dosage = self.update_dosage(dosage, target_collection[s.exercise.id].exercise)
             target_collection[s.exercise.id].dosages.append(dosage)
@@ -217,9 +218,9 @@ class ModalityBase(object):
         for b in range(0, len(benchmarks) - 1):
             total_efficient += self.dosage_durations[benchmarks[b]].efficient_duration
             proposed_efficient = total_efficient + self.dosage_durations[benchmarks[b + 1]].efficient_duration
-            if proposed_efficient < 400:
+            if proposed_efficient < 300:
                 continue
-            elif abs(total_efficient - 400) < abs(proposed_efficient - 400):
+            elif abs(total_efficient - 300) < abs(proposed_efficient - 300):
                 efficient_winner = benchmarks[b]
                 break
             else:
@@ -229,9 +230,9 @@ class ModalityBase(object):
         for b in range(0, len(benchmarks) - 1):
             total_complete += self.dosage_durations[benchmarks[b]].complete_duration
             proposed_complete = total_complete + self.dosage_durations[benchmarks[b + 1]].complete_duration
-            if proposed_complete < 1000:
+            if proposed_complete < 900:
                 continue
-            elif abs(total_complete - 1000) < abs(proposed_complete - 1000):
+            elif abs(total_complete - 900) < abs(proposed_complete - 900):
                 complete_winner = benchmarks[b]
                 break
             else:
@@ -241,9 +242,9 @@ class ModalityBase(object):
         for b in range(0, len(benchmarks) - 1):
             total_comprehensive += self.dosage_durations[benchmarks[b]].comprehensive_duration
             proposed_comprehensive = total_comprehensive + self.dosage_durations[benchmarks[b + 1]].comprehensive_duration
-            if proposed_comprehensive < 1600:
+            if proposed_comprehensive < 1800:
                 continue
-            elif abs(total_comprehensive - 1600) < abs(proposed_comprehensive - 1000):
+            elif abs(total_comprehensive - 1800) < abs(proposed_comprehensive - 1000):
                 comprehensive_winner = benchmarks[b]
                 break
             else:
@@ -310,6 +311,34 @@ class ModalityBase(object):
                     elif complete_winner == 0.5:
                         pass
 
+                    if comprehensive_winner == 5.0:
+                        for d in a.dosages:
+                            if d.soreness_source.severity < 4.5:
+                                d.comprehensive_reps_assigned = 0
+                                d.comprehensive_sets_assigned = 0
+                    elif comprehensive_winner == 4.5:
+                        for d in a.dosages:
+                            if d.soreness_source.severity < 3.5:
+                                d.comprehensive_reps_assigned = 0
+                                d.comprehensive_sets_assigned = 0
+                    elif comprehensive_winner == 3.5:
+                        for d in a.dosages:
+                            if d.soreness_source.severity < 2.5:
+                                d.comprehensive_reps_assigned = 0
+                                d.comprehensive_sets_assigned = 0
+                    elif comprehensive_winner == 2.5:
+                        for d in a.dosages:
+                            if d.soreness_source.severity < 1.5:
+                                d.comprehensive_reps_assigned = 0
+                                d.comprehensive_sets_assigned = 0
+                    elif comprehensive_winner == 1.5:
+                        for d in a.dosages:
+                            if d.soreness_source.severity < 0.5:
+                                d.comprehensive_reps_assigned = 0
+                                d.comprehensive_sets_assigned = 0
+                    elif comprehensive_winner == 0.5:
+                        pass
+
     def calc_dosage_durations(self, benchmark_value, assigned_exercise, dosage):
         if dosage.efficient_reps_assigned is not None and dosage.efficient_sets_assigned is not None:
             self.dosage_durations[benchmark_value].efficient_duration += assigned_exercise.duration(
@@ -328,20 +357,25 @@ class ModalityBase(object):
     @staticmethod
     def update_dosage(dosage, exercise):
 
-        # temporary fix for cooldown
+        if dosage.goal.goal_type == AthleteGoalType.sport or dosage.goal.goal_type == AthleteGoalType.preempt_sport:
+            if dosage.priority == "1" or dosage.priority == "2":
+                dosage.efficient_reps_assigned = exercise.min_reps
+                dosage.efficient_sets_assigned = 1
+                dosage.complete_reps_assigned = exercise.max_reps
+                dosage.complete_sets_assigned = 1
+                dosage.comprehensive_reps_assigned = exercise.max_reps
+                dosage.comprehensive_sets_assigned = 2
+            else:
+                dosage.efficient_reps_assigned = 0
+                dosage.efficient_sets_assigned = 0
+                dosage.complete_reps_assigned = 0
+                dosage.complete_sets_assigned = 0
+                dosage.comprehensive_reps_assigned = 0
+                dosage.comprehensive_sets_assigned = 0
 
-        if dosage.soreness_source is None:
-            dosage.soreness_source = Soreness()
-            dosage.soreness_source.body_part = BodyPart(BodyPartLocation(13), 0)
-            dosage.soreness_source.severity = 0.4
-
-        # end temporary fix
-
-        if (dosage.goal.goal_type == AthleteGoalType.sore and
+        elif (dosage.goal.goal_type == AthleteGoalType.sore and
                 (dosage.soreness_source.historic_soreness_status is None or
                  dosage.soreness_source.is_dormant_cleared()) or
-                dosage.goal.goal_type == AthleteGoalType.sport or
-                dosage.goal.goal_type == AthleteGoalType.preempt_sport or
                 dosage.goal.goal_type == AthleteGoalType.preempt_personalized_sport or
                 dosage.goal.goal_type == AthleteGoalType.preempt_corrective):
             if dosage.soreness_source.severity < 0.5:
@@ -492,6 +526,9 @@ class ModalityBase(object):
                 dosage.comprehensive_reps_assigned = exercise.max_reps
                 dosage.comprehensive_sets_assigned = 3
 
+        dosage.default_reps_assigned = dosage.comprehensive_reps_assigned
+        dosage.default_sets_assigned = dosage.comprehensive_sets_assigned
+
         return dosage
 
     @staticmethod
@@ -580,9 +617,9 @@ class ActiveRest(ModalityBase):
                                         self.inhibit_exercises, goal, "1", None, exercise_library)
                     if not prohibiting_soreness:
                         self.copy_exercises(body_part.static_stretch_exercises,
-                                            self.static_stretch_exercises, goal, "1", None, exercise_library)
+                                            self.static_stretch_exercises, goal, "1", None, exercise_library, sport_name)
                         self.copy_exercises(body_part.isolated_activate_exercises,
-                                            self.isolated_activate_exercises, goal, "1", None, exercise_library)
+                                            self.isolated_activate_exercises, goal, "1", None, exercise_library, sport_name)
 
 
 class ActiveRestBeforeTraining(ActiveRest, Serialisable):
@@ -1184,9 +1221,9 @@ class WarmUp(ModalityBase, Serialisable):
 
 
 class CoolDown(ModalityBase, Serialisable):
-    def __init__(self, sport_name, high_relative_load_session, high_relative_intensity_logged, muscular_strain_increasing, event_date_time):
+    def __init__(self, high_relative_load_session, high_relative_intensity_logged, muscular_strain_increasing, event_date_time):
         super().__init__(event_date_time)
-        self.sport_name = sport_name
+        #self.sport_name = sport_name
         self.high_relative_volume_logged = high_relative_load_session
         self.high_relative_intensity_logged = high_relative_intensity_logged
         self.muscular_strain_increasing = muscular_strain_increasing
@@ -1195,7 +1232,7 @@ class CoolDown(ModalityBase, Serialisable):
 
     def json_serialise(self):
         ret = {
-            'sport_name': self.sport_name.value,
+            #'sport_name': self.sport_name.value,
             'high_relative_load_session': self.high_relative_volume_logged,
             'high_relative_intensity_logged': self.high_relative_intensity_logged,
             'muscular_strain_increasing': self.muscular_strain_increasing,
@@ -1212,7 +1249,7 @@ class CoolDown(ModalityBase, Serialisable):
 
     @classmethod
     def json_deserialise(cls, input_dict):
-        cooldown = cls(sport_name=input_dict.get('sport_name', 0),
+        cooldown = cls(#sport_name=input_dict.get('sport_name', 0),
                        high_relative_load_session=input_dict.get('high_relative_load_session', False),
                        high_relative_intensity_logged=input_dict.get('high_relative_intensity_logged', False),
                        muscular_strain_increasing=input_dict.get('muscular_strain_increasing', False),
@@ -1249,7 +1286,7 @@ class CoolDown(ModalityBase, Serialisable):
         self.rank_dosages([self.dynamic_stretch_exercises])
         self.rank_dosages([self.dynamic_integrate_exercises])
 
-    def check_recover_from_sport(self, soreness_list, exercise_library):
+    def check_recover_from_sport(self, soreness_list, sport_name, exercise_library):
 
         if self.high_relative_volume_logged or self.high_relative_intensity_logged:
             goal = AthleteGoal("Recover from Sport", 1, AthleteGoalType.sport)
@@ -1257,7 +1294,7 @@ class CoolDown(ModalityBase, Serialisable):
 
             body_part_factory = BodyPartFactory()
 
-            body_part = body_part_factory.get_body_part_for_sport(self.sport_name)
+            body_part = body_part_factory.get_body_part_for_sport(sport_name)
 
             prohibiting_soreness = False
 
@@ -1269,9 +1306,9 @@ class CoolDown(ModalityBase, Serialisable):
             # Note: this is just returning the primary mover related exercises for sport
             if body_part is not None and not prohibiting_soreness:
                 self.copy_exercises(body_part.dynamic_stretch_exercises,
-                                    self.dynamic_stretch_exercises, goal, "1", None, exercise_library)
+                                    self.dynamic_stretch_exercises, goal, "1", None, exercise_library, sport_name)
                 self.copy_exercises(body_part.dynamic_integrate_exercises,
-                                    self.dynamic_integrate_exercises, goal, "1", None, exercise_library)
+                                    self.dynamic_integrate_exercises, goal, "1", None, exercise_library, sport_name)
 
     def check_corrective(self, soreness, event_date_time, exercise_library):
 
@@ -1286,7 +1323,8 @@ class CoolDown(ModalityBase, Serialisable):
 
     def fill_exercises(self, soreness_list, exercise_library, high_relative_load_session, high_relative_intensity_logged, muscular_strain_increasing, sports):
 
-        self.check_recover_from_sport(soreness_list, exercise_library)
+        for sport_name in sports:
+            self.check_recover_from_sport(soreness_list, sport_name, exercise_library)
         for s in soreness_list:
             self.check_corrective(s, self.event_date_time, exercise_library)
 
