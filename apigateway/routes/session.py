@@ -269,14 +269,16 @@ def handle_no_sessions_planned(principal_id=None):
         plan = DailyPlan(event_date=plan_event_date)
         plan.user_id = user_id
         plan.last_sensor_sync = daily_plan_datastore.get_last_sensor_sync(user_id, plan_event_date)
-        plan.sessions_planned = False
-        daily_plan_datastore.put(plan)
     else:
         plan = daily_plan_datastore.get(user_id, plan_event_date, plan_event_date)[0]
-        if plan.sessions_planned:
-            plan.sessions_planned = False
-            daily_plan_datastore.put(plan)
 
+    plan.sessions_planned = False
+    plan.train_later = False
+    daily_plan_datastore.put(plan)
+    plan = create_plan(user_id,
+                       event_date,
+                       update_stats=False,
+                       datastore_collection=datastore_collection)
     survey_complete = plan.daily_readiness_survey_completed()
     plan = plan.json_serialise()
     plan['daily_readiness_survey_completed'] = survey_complete
@@ -284,8 +286,7 @@ def handle_no_sessions_planned(principal_id=None):
     plan['nav_bar_indicator'] = None
 
     del plan['daily_readiness_survey'], plan['user_id']
-    return {'message': 'success',
-            'daily_plan': plan}, 200
+    return {'daily_plans': [plan]}, 200
 
 
 def get_sensor_data(session):
