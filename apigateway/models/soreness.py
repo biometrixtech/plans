@@ -688,6 +688,8 @@ class AthleteGoalType(Enum):
     preempt_corrective = 5
     corrective = 6
     injury_history = 7
+    counter_overreaching = 8
+    respond_risk = 9
 
 
 class AthleteGoal(object):
@@ -695,13 +697,13 @@ class AthleteGoal(object):
         self.text = text
         self.goal_type = athlete_goal_type
         self.priority = priority
-        self.trigger = ''
+        self.trigger_type = None
 
     def json_serialise(self):
         ret = {
             'text': self.text,
             'priority': self.priority,
-            'trigger': self.trigger,
+            'trigger_type': self.trigger_type.value if self.trigger_type is not None else None,
             'goal_type': self.goal_type.value if self.goal_type is not None else None
         }
         return ret
@@ -711,38 +713,40 @@ class AthleteGoal(object):
         goal_type = input_dict.get('goal_type', None)
         athlete_goal_type = AthleteGoalType(goal_type) if goal_type is not None else None
         goal = cls(text=input_dict['text'], priority=input_dict['priority'], athlete_goal_type=athlete_goal_type)
-        goal.trigger = input_dict.get('trigger', "")
+        trigger_type = input_dict.get('trigger_type', None)
+        goal.trigger_type = TriggerType(trigger_type) if trigger_type is not None else None
         return goal
 
 
 class Trigger(object):
-    def __init__(self, trigger_id):
-        self.trigger_id = trigger_id
+    def __init__(self, trigger_type):
+        self.trigger_type = trigger_type
         self.soreness = []
         self.sport_name = None
 
     def json_serialise(self):
         return {
-            "trigger_id": self.trigger_id.value,
+            "trigger_type": self.trigger_type.value,
             "soreness": [sore.json_serialise() for sore in self.soreness],
             "sport_name": self.sport_name.value
         }
 
     @classmethod
     def json_deserialise(cls, input_dict):
-        trigger = cls(input_dict['trigger_id'])
+        trigger = cls(input_dict['trigger_type'])
         trigger.soreness = [Soreness.json_deserialise(sore) for sore in input_dict['soreness']]
         trigger.sport_name = input_dict['sport_name']
+        return trigger
 
     def __setattr__(self, name, value):
         if name == "sport_name" and not isinstance(value, SportName):
             value = SportName[value]
-        if name == "trigger_id" and not isinstance(value, TriggerId):
-            value = TriggerId(value)
+        elif name == "trigger_type" and not isinstance(value, TriggerType):
+            value = TriggerType(value)
         super().__setattr__(name, value)
 
 
-class TriggerId(Enum):
+class TriggerType(IntEnum):
     high_volume_intensity = 0  # "High Relative Volume or Intensity of Logged Session"
     hist_sore_greater_30_high_volume_intensity = 1  # "Pers, Pers-2 Soreness > 30d + High Relative Volume or Intensity of Logged Session" 
     hist_pain_high_volume_intensity = 2  # "Acute, Pers, Pers_2 Pain  + High Relative Volume or Intensity of Logged Session" 

@@ -105,6 +105,7 @@ class ExerciseAssignmentCalculator(object):
                         minutes.append(15)
                     heat = Heat(body_part_location=s.body_part.location, side=s.side)
                     goal.trigger = "Pers, Pers-2 Soreness > 30d"
+                    goal.trigger = Tr
 
                 elif (s.historic_soreness_status == HistoricSorenessStatus.persistent_2_pain or s.is_persistent_pain()
                       or s.is_acute_pain()):
