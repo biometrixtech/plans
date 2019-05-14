@@ -17,6 +17,9 @@ class AthleteInsight(Serialisable):
         self.sport_names = []
         self.severity = []
         self.cleared = False
+        self.insight_type = InsightType.daily
+        self.priority = 0
+        self.styling = 0
 
     def json_serialise(self):
         ret = {
@@ -30,7 +33,10 @@ class AthleteInsight(Serialisable):
             'body_parts': [body_part.json_serialise() for body_part in self.body_parts],
             'sport_names': [sport_name.value for sport_name in self.sport_names],
             'severity': self.severity,
-            'cleared': self.cleared
+            'cleared': self.cleared,
+            'insight_type': self.insight_type.value,
+            'priority': self.priority,
+            'styling': self.styling
         }
         return ret
 
@@ -47,6 +53,9 @@ class AthleteInsight(Serialisable):
         insight.sport_names = [SportName(sport_name) for sport_name in input_dict['sport_names']]
         insight.severity =  input_dict['severity']
         insight.cleared = input_dict['cleared']
+        insight.insight_type = InsightType(input_dict['insight_type'])
+        insight.priority = InsightType(input_dict['priority'])
+        insight.styling = InsightType(input_dict['styling'])
 
         return insight
 
