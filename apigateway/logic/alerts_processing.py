@@ -13,7 +13,7 @@ class AlertsProcessing(object):
                 insight = AthleteInsight(alert.goal.trigger_type)
                 insight.goal_targeted.append(alert.goal.text)
                 if alert.body_part is not None:
-                    insight.body_parts.append(alert.body_parts)
+                    insight.body_parts.append(alert.body_part)
                 if alert.sport_name is not None:
                     insight.sport_names.append(alert.sport_name)
                 if alert.severity is not None:
@@ -24,7 +24,7 @@ class AlertsProcessing(object):
                 insight = [insight for insight in insights if insight.trigger_type == alert.goal.trigger_type][0]
                 insight.goal_targeted.append(alert.goal.text)
                 if alert.body_part is not None:
-                    insight.body_parts.append(alert.body_parts)
+                    insight.body_parts.append(alert.body_part)
                 if alert.sport_name is not None:
                     insight.sport_names.append(alert.sport_name)
                 if alert.severity is not None:
@@ -33,8 +33,8 @@ class AlertsProcessing(object):
         for insight in insights:
             if insight.trigger_type not in displayed_alerts:
                 insight.first = True
-            if len(insight.trigger_type) > 0:
-                insight.parent = True
+            # if len(insight.trigger_type) > 0:
+            #     insight.parent = True
             insight.get_title_and_text()
         return insights
 
