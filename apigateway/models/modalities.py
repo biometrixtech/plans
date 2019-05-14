@@ -42,6 +42,7 @@ class HeatSession(Serialisable):
     def json_deserialise(cls, input_dict):
         heat_session = cls(input_dict.get('minutes', 0))
         heat_session.start_date_time = input_dict.get('start_date_time', None)
+        heat_session.completed_date_time = input_dict.get('completed_date_time', None)
         heat_session.event_date_time = input_dict.get('event_date_time', None)
         heat_session.completed = input_dict.get('completed', False)
         heat_session.active = input_dict.get('active', True)
