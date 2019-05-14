@@ -718,13 +718,26 @@ class AthleteGoal(object):
 class Trigger(object):
     def __init__(self, trigger_id):
         self.trigger_id = trigger_id
-        self.body_parts = []
-        self.sport = None
+        self.soreness = []
+        self.sport_name = None
 
-    def __setattr__(self):
-        if name == "sport" and not isinstance(value, SportName):
+    def json_serialise(self):
+        return {
+            "trigger_id": self.trigger_id.value,
+            "soreness": [sore.json_serialise() for sore in self.soreness],
+            "sport_name": self.sport_name.value
+        }
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        trigger = cls(input_dict['trigger_id'])
+        trigger.soreness = [Soreness.json_deserialise(sore) for sore in input_dict['soreness']]
+        trigger.sport_name = input_dict['sport_name']
+
+    def __setattr__(self, name, value):
+        if name == "sport_name" and not isinstance(value, SportName):
             value = SportName[value]
-        if name == trigger_id and not isinstance(value, TriggerId):
+        if name == "trigger_id" and not isinstance(value, TriggerId):
             value = TriggerId(value)
         super().__setattr__(name, value)
 
@@ -736,24 +749,17 @@ class TriggerId(Enum):
     hist_sore_greater_30_no_sore_today_3_high_volume_intensity = 3  # "Pers, Pers-2 Soreness > 30d + No soreness reported today + Logged High Relative Volume or Intensity" 
     acute_pain_no_pain_today_high_volume_intensity = 4  # "Acute Pain + No pain reported today + High Relative Volume or Intensity of Logged Session" 
     pers_pers2_pain_no_pain_sore_today_high_volume_intensity = 5  # "Pers, Pers_2 Pain + No pain Reported Today + High Relative Volume or Intensity of Logged Session"
-
     hist_sore_less_30_sport = 6  # "Pers, Pers-2 Soreness < 30d + Correlated to Sport"
     hist_sore_less_30_no_sport = 7  # "Pers, Pers-2 Soreness < 30d + Not Correlated to Sport"  
     overreaching_increasing_strain = 8  # "Overreaching as increasing Muscular Strain (with context for Training Volume)"
-
-
     sore_today_no_session = 9  # "Sore reported today + not linked to session"    
     sore_today = 10  # "Sore reported today"
     sore_today_doms = 11  # "Soreness Reported Today as DOMs"
     hist_sore_less_30_sore_today = 12  # "Pers, Pers-2 Soreness < 30d + Soreness reported today"
     hist_sore_greater_30_sore_today = 13  # "Pers, Pers-2 Soreness > 30d + Soreness Reported Today"
-
-
     pain_today = 14  # "Pain reported today"
-
     hist_pain = 15  # "Acute, Pers, Pers-2 Pain"
     hist_pain_sport = 16  # "Acute, Pers, Pers_2 Pain + Correlated to Sport"
     pain_injury = 17  # 'Pain - Injury'
-             
     hist_sore_greater_30 = 18  # "Pers, Pers-2 Soreness > 30d"
     hist_sore_greater_30_sport = 19  # "Pers, Pers-2 Soreness > 30d + Correlated to Sport"
