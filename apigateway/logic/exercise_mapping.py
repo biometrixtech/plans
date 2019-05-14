@@ -133,7 +133,7 @@ class ExerciseAssignmentCalculator(object):
         high_relative_intensity_session = False
 
         for t in self.training_sessions:
-            if t.ultra_high_intensity_session() or t.high_intensity_RPE():
+            if t.high_intensity():
                 high_relative_intensity_session = True
 
         return high_relative_intensity_session
