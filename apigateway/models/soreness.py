@@ -690,6 +690,7 @@ class AthleteGoalType(Enum):
     injury_history = 7
     counter_overreaching = 8
     respond_risk = 9
+    on_request = 10
 
 
 class AthleteGoal(object):
@@ -698,6 +699,29 @@ class AthleteGoal(object):
         self.goal_type = athlete_goal_type
         self.priority = priority
         self.trigger_type = None
+
+    def display_order(self):
+
+        if self.goal_type == AthleteGoalType.pain:
+            return 1
+        elif self.goal_type == AthleteGoalType.sore:
+            return 2
+        elif self.goal_type == AthleteGoalType.counter_overreaching:
+            return 3
+        elif self.goal_type == AthleteGoalType.respond_risk:
+            return 4
+        elif self.goal_type == AthleteGoalType.sport:
+            return 5
+        elif self.goal_type == AthleteGoalType.preempt_corrective:
+            return 6
+        elif self.goal_type == AthleteGoalType.preempt_personalized_sport:
+            return 7
+        elif self.goal_type == AthleteGoalType.preempt_sport:
+            return 8
+        elif self.goal_type == AthleteGoalType.corrective:
+            return 9
+        elif self.goal_type == AthleteGoalType.injury_history:
+            return 10
 
     def json_serialise(self):
         ret = {
@@ -767,3 +791,5 @@ class TriggerType(IntEnum):
     pain_injury = 17  # 'Pain - Injury'
     hist_sore_greater_30 = 18  # "Pers, Pers-2 Soreness > 30d"
     hist_sore_greater_30_sport = 19  # "Pers, Pers-2 Soreness > 30d + Correlated to Sport"
+    pers_pers2_pain_less_30_no_pain_today = 21
+    pers_pers2_pain_greater_30_no_pain_today = 22

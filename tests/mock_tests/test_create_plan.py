@@ -141,7 +141,7 @@ def test_active_rest_after_training_outer_thigh_hist_soreness_knee():
     assert len(daily_plan.post_active_rest[0].static_integrate_exercises) > 0
     assert daily_plan.cool_down is not None
     assert daily_plan.heat is None
-    assert daily_plan.ice is not None
+    assert daily_plan.ice is None
     assert len(daily_plan.pre_active_rest) == 0
 
 
@@ -218,7 +218,7 @@ def test_active_rest_before_training_quad_hist_soreness_knee():
     assert len(daily_plan.pre_active_rest[0].isolated_activate_exercises) > 0
     assert len(daily_plan.pre_active_rest[0].static_integrate_exercises) > 0
     assert len(daily_plan.cool_down) == 0
-    assert daily_plan.heat is not None
+    assert daily_plan.heat is  None
     assert daily_plan.ice is None
     assert len(daily_plan.post_active_rest) == 0
 

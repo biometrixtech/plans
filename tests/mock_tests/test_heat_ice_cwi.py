@@ -56,6 +56,7 @@ def test_get_ice_historic_soreness_no_soreness_today():
     calc = ExerciseAssignmentCalculator(athlete_stats, exercise_library_datastore, completed_exercise_datastore, [],
                                         [soreness], current_date_time)
 
+    calc.high_relative_intensity_session = True
     ice_session = calc.get_ice()
 
     assert len(ice_session.body_parts) > 0
@@ -107,7 +108,7 @@ def test_get_ice_historic_soreness_no_pain_today():
 
     calc = ExerciseAssignmentCalculator(athlete_stats, exercise_library_datastore, completed_exercise_datastore, [],
                                         [soreness], current_date_time)
-
+    calc.high_relative_intensity_session = True
     ice_session = calc.get_ice()
 
     assert len(ice_session.body_parts) > 0
