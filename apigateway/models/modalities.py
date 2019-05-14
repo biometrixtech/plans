@@ -1196,6 +1196,9 @@ class WarmUp(ModalityBase, Serialisable):
                 goal = AthleteGoal("Personalized Prepare for Training", 1, AthleteGoalType.preempt_personalized_sport)
                 #goal.trigger = "Pers, Pers-2 Soreness > 30d"
                 goal.trigger_type = TriggerType.hist_sore_greater_30
+                alert = Alert(goal)
+                alert.body_parts.append(BodyPartSide(soreness.body_part.location, soreness.side))
+                self.alerts.append(alert)
 
                 self.assign_exercises(soreness, goal, exercise_library)
 
@@ -1207,6 +1210,9 @@ class WarmUp(ModalityBase, Serialisable):
                 goal = AthleteGoal("Personalized Prepare for Training (Identified Dysfunction)", 1, AthleteGoalType.preempt_corrective)
                 #goal.trigger = "Pers, Pers-2 Soreness > 30d"
                 goal.trigger_type = TriggerType.hist_sore_greater_30
+                alert = Alert(goal)
+                alert.body_parts.append(BodyPartSide(soreness.body_part.location, soreness.side))
+                self.alerts.append(alert)
 
                 self.assign_exercises(soreness, goal, exercise_library)
 
@@ -1355,6 +1361,9 @@ class CoolDown(ModalityBase, Serialisable):
             if soreness.is_acute_pain() or soreness.is_persistent_pain() or soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_pain:
                 goal = AthleteGoal("Personalized Prepare for Training (Identified Dysfunction)", 1, AthleteGoalType.preempt_corrective)
                 goal.trigger_type = TriggerType.hist_sore_greater_30
+                alert = Alert(goal)
+                alert.body_parts.append(BodyPartSide(soreness.body_part.location, soreness.side))
+                self.alerts.append(alert)
                 self.assign_exercises(soreness, goal, exercise_library)
 
             elif (soreness.is_persistent_soreness() or soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_soreness and days_sore > 30):
