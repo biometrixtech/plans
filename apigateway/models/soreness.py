@@ -496,6 +496,12 @@ class ExerciseDosage(object):
         self.default_sets_assigned = 0
         self.ranking = 0
 
+    def severity(self):
+        if self.soreness_source is not None:
+            return self.soreness_source.severity
+        else:
+            return 0.5
+
     def get_total_dosage(self):
         return self.efficient_reps_assigned * self.efficient_sets_assigned + \
          self.complete_reps_assigned * self.complete_sets_assigned + \
