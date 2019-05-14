@@ -3,7 +3,11 @@ import os
 from aws_xray_sdk.core import xray_recorder
 from datastores.daily_readiness_datastore import DailyReadinessDatastore
 from datastores.daily_plan_datastore import DailyPlanDatastore
+from datastores.athlete_stats_datastore import AthleteStatsDatastore
+from datastore_collection import DatastoreCollection
+from logic.stats_processing import StatsProcessing
 from logic.training_volume_processing import TrainingVolumeProcessing
+from models.stats import AthleteStats
 from config import get_secret
 from utils import parse_date, format_date
 from statistics import stdev, mean
@@ -47,14 +51,35 @@ def test_get_adaptation_history_from_database():
 
     for user_id in users:
         start_date = "2018-11-23"
-        end_date = "2019-03-23"
+        end_date = "2019-01-23"
 
         drs_dao = DailyReadinessDatastore()
         daily_readiness_surveys = drs_dao.get(user_id, parse_date(start_date), parse_date(end_date), False)
         dpo_dao = DailyPlanDatastore()
         plans = dpo_dao.get(user_id, start_date, end_date)
+        as_dao = AthleteStatsDatastore()
+        ath_stats = as_dao.get(user_id)
 
+        data_store_collection = DatastoreCollection()
+        data_store_collection.daily_readiness_datastore = drs_dao
+        data_store_collection.daily_plan_datastore = dpo_dao
+
+
+        athlete_stats = AthleteStats(user_id)
+        athlete_stats.event_date = end_date
+
+        stats_processing = StatsProcessing(user_id, end_date, data_store_collection)
+        stats_processing.set_start_end_times()
+        stats_processing.load_historical_data()
+        athlete_stats = stats_processing.calc_survey_stats(athlete_stats)
         training_volume_processing = TrainingVolumeProcessing(start_date, end_date)
+        training_volume_processing.load_plan_values(stats_processing.last_7_days_plans,
+                                                    stats_processing.days_8_14_plans,
+                                                    stats_processing.acute_daily_plans,
+                                                    stats_processing.get_chronic_weeks_plans(),
+                                                    stats_processing.chronic_daily_plans)
+        athlete_stats = training_volume_processing.calc_training_volume_metrics(athlete_stats)
+        '''
         training_volume_processing.fill_load_monitoring_measures(daily_readiness_surveys, plans, parse_date(end_date))
         training_volume_processing.calc_muscular_strain()
 
@@ -83,4 +108,5 @@ def test_get_adaptation_history_from_database():
                 mean_fo_nfo_loads[k] = mean(l)
                 min_fo_nfo_loads[k] = min(l)
                 max_fo_nfo_loads[k] = max(l)
+        '''
         k=1

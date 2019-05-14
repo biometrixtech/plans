@@ -185,18 +185,19 @@ class TrainingVolumeProcessing(object):
 
         for l in last_7_day_training_sessions:
             if l.sport_name not in self.last_week_sport_duration_loads:
-                self.last_week_sport_duration_loads[l.sport_name] = 0
+                self.last_week_sport_duration_loads[l.sport_name] = []
+                self.previous_week_sport_duration_loads[l.sport_name] = []
             duration_load = l.duration_load()
             if duration_load is not None:
-                self.last_week_sport_duration_loads[l.sport_name] += duration_load
+                self.last_week_sport_duration_loads[l.sport_name].append(duration_load)
 
         for p in previous_7_day_training_sessions:
             if p.sport_name not in self.previous_week_sport_duration_loads:
-                self.previous_week_sport_duration_loads[p.sport_name] = 0
+                self.last_week_sport_duration_loads[p.sport_name] = []
+                self.previous_week_sport_duration_loads[p.sport_name] = []
             duration_load = p.duration_load()
             if duration_load is not None:
-                self.previous_week_sport_duration_loads[p.sport_name] += duration_load
-
+                self.previous_week_sport_duration_loads[p.sport_name].append(duration_load)
 
         self.last_week_external_values.extend(
             x for x in self.get_plan_session_attribute_sum_list("external_load", last_7_days_plans) if x is not None)
@@ -269,8 +270,13 @@ class TrainingVolumeProcessing(object):
     @xray_recorder.capture('logic.TrainingVolumeProcessing.calc_training_volume_metrics')
     def calc_training_volume_metrics(self, athlete_stats):
 
+        athlete_stats.duration_load_ramp = {}
 
-
+        for sport_name, load in self.previous_week_sport_duration_loads.items():
+            athlete_stats.duration_load_ramp[sport_name] = self.get_ramp(athlete_stats.expected_weekly_workouts,
+                                                                         self.last_week_sport_duration_loads[sport_name],
+                                                                         self.previous_week_sport_duration_loads[sport_name]
+                                                                         )
 
         athlete_stats.external_ramp = self.get_ramp(athlete_stats.expected_weekly_workouts,
                                                     self.last_week_external_values, self.previous_week_external_values)

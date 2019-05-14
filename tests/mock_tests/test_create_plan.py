@@ -221,3 +221,29 @@ def test_active_rest_before_training_quad_hist_soreness_knee():
     assert daily_plan.heat is not None
     assert daily_plan.ice is None
     assert len(daily_plan.post_active_rest) == 0
+
+
+def test_active_rest_before_training_spectrum_soreness():
+
+    current_date = date.today()
+    current_date_time = datetime.combine(current_date, time(9, 0, 0))
+    current_date_time = current_date_time - timedelta(days=16)
+
+    historic_soreness = HistoricSoreness(BodyPartLocation(7), 1, True)
+    historic_soreness.first_reported_date_time = current_date_time
+    historic_soreness.historic_soreness_status = HistoricSorenessStatus.persistent_2_pain
+    historic_soreness.average_severity = 1.3
+
+    historic_soreness_list = [historic_soreness]
+
+    daily_plan = create_plan(body_part_list=[7, 6, 5, 4, 3], severity_list=[5, 4, 3, 2, 1], side_list=[1, 1, 1, 1, 1],
+                             pain_list=[False, False, True, False, False], historic_soreness_list=historic_soreness_list)
+    daily_plan_json = daily_plan.json_serialise()
+    assert len(daily_plan.pre_active_rest[0].inhibit_exercises) > 0
+    assert len(daily_plan.pre_active_rest[0].static_stretch_exercises) > 0
+    assert len(daily_plan.pre_active_rest[0].isolated_activate_exercises) > 0
+    assert len(daily_plan.pre_active_rest[0].static_integrate_exercises) > 0
+    assert len(daily_plan.cool_down) == 0
+    assert daily_plan.heat is None
+    assert daily_plan.ice is None
+    assert len(daily_plan.post_active_rest) == 0

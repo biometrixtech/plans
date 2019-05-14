@@ -390,6 +390,8 @@ class AthleteStats(Serialisable):
             'external_strain': self.external_strain.json_serialise() if self.external_strain is not None else None,
             'internal_ramp': self.internal_ramp.json_serialise() if self.internal_ramp is not None else None,
             'external_ramp': self.external_ramp.json_serialise() if self.external_ramp is not None else None,
+            'duration_load_ramp' : {sport_name.value: standardard_error_range
+                                    for (sport_name, standardard_error_range) in self.duration_load_ramp.items()},
             'internal_acwr': self.internal_acwr.json_serialise() if self.internal_acwr is not None else None,
             'external_acwr': self.external_acwr.json_serialise() if self.external_acwr is not None else None,
             #'functional_strength_eligible': self.functional_strength_eligible,
