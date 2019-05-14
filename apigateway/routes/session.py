@@ -281,13 +281,7 @@ def handle_no_sessions_planned(principal_id=None):
                        athlete_stats=athlete_stats,
                        update_stats=False,
                        datastore_collection=datastore_collection)
-    survey_complete = plan.daily_readiness_survey_completed()
-    plan = plan.json_serialise()
-    plan['daily_readiness_survey_completed'] = survey_complete
-    plan['landing_screen'] = 1.0
-    plan['nav_bar_indicator'] = None
 
-    del plan['daily_readiness_survey'], plan['user_id']
     return {'daily_plans': [plan]}, 200
 
 
