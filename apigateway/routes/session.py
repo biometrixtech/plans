@@ -275,8 +275,10 @@ def handle_no_sessions_planned(principal_id=None):
     plan.sessions_planned = False
     plan.train_later = False
     daily_plan_datastore.put(plan)
+    athlete_stats = athlete_stats_datastore.get(athlete_id=user_id)
     plan = create_plan(user_id,
                        event_date,
+                       athlete_stats=athlete_stats,
                        update_stats=False,
                        datastore_collection=datastore_collection)
     survey_complete = plan.daily_readiness_survey_completed()
