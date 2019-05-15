@@ -3,7 +3,7 @@ import models.soreness
 # import logic.soreness_processing as soreness_and_injury
 from models.exercise import ExerciseBuckets, Phase
 from models.modalities import ActiveRestBeforeTraining, ActiveRestAfterTraining, ColdWaterImmersion, CoolDown, Heat, WarmUp, Ice, HeatSession, IceSession
-from models.soreness import AthleteGoal, AthleteGoalType, AssignedExercise, BodyPartLocation, HistoricSorenessStatus, Soreness, BodyPart, TriggerType
+from models.soreness import AthleteGoal, AthleteGoalType, AssignedExercise, BodyPartLocation, HistoricSorenessStatus, Soreness, BodyPart, TriggerType, Alert, BodyPartSide
 from models.sport import SportName
 # from logic.goal_focus_text_generator import RecoveryTextGenerator
 # from datetime import  timedelta
@@ -90,6 +90,7 @@ class ExerciseAssignmentCalculator(object):
 
         bring_the_heat = []
         minutes = []
+        alerts = []
 
         pain_reported_today = False
 
@@ -129,10 +130,14 @@ class ExerciseAssignmentCalculator(object):
             if heat is not None:
                 heat.goals.add(goal)
                 bring_the_heat.append(heat)
+                alert = Alert(goal)
+                alert.body_part = BodyPartSide(s.body_part.location, s.side)
+                alerts.append(alert)
 
         if len(bring_the_heat) > 0:
             heat_session = HeatSession(minutes=max(minutes))
             heat_session.body_parts = bring_the_heat
+            heat_session.alerts = alerts
 
             return heat_session
         else:
@@ -223,6 +228,7 @@ class ExerciseAssignmentCalculator(object):
 
         ice_list = []
         minutes = []
+        alerts = []
         low_parts = [BodyPartLocation.ankle, BodyPartLocation.knee, BodyPartLocation.elbow]
 
         for s in self.soreness_list:
@@ -247,9 +253,9 @@ class ExerciseAssignmentCalculator(object):
                         minutes.append(10)
                     else:
                         minutes.append(15)
-                if ice is not None:
-                    ice.goals.add(goal)
-                    ice_list.append(ice)
+                # if ice is not None:
+                #     ice.goals.add(goal)
+                #     ice_list.append(ice)
 
             elif (s.daily and not s.pain and s.historic_soreness_status is not None and s.historic_soreness_status
                     is not s.is_dormant_cleared() and
@@ -271,9 +277,9 @@ class ExerciseAssignmentCalculator(object):
                         else:
                             minutes.append(15)
 
-                    if ice is not None:
-                        ice.goals.add(goal)
-                        ice_list.append(ice)
+                    # if ice is not None:
+                    #     ice.goals.add(goal)
+                    #     ice_list.append(ice)
 
             elif (not s.daily and s.historic_soreness_status is not None and not s.is_dormant_cleared()
                   and s.severity >= 1.5 and not s.pain and (self.high_relative_load_session or self.high_relative_intensity_session)):
@@ -290,9 +296,9 @@ class ExerciseAssignmentCalculator(object):
                     else:
                         minutes.append(15)
 
-                    if ice is not None:
-                        ice.goals.add(goal)
-                        ice_list.append(ice)
+                    # if ice is not None:
+                    #     ice.goals.add(goal)
+                    #     ice_list.append(ice)
 
             elif (not s.daily and s.historic_soreness_status is not None and not s.is_dormant_cleared()
                   and s.severity >= 1.5 and s.pain and (self.high_relative_load_session or self.high_relative_intensity_session)):
@@ -308,9 +314,12 @@ class ExerciseAssignmentCalculator(object):
                 else:
                     minutes.append(15)
 
-                if ice is not None:
-                    ice.goals.add(goal)
-                    ice_list.append(ice)
+            if ice is not None:
+                ice.goals.add(goal)
+                ice_list.append(ice)
+                alert = Alert(goal)
+                alert.body_part = BodyPartSide(s.body_part.location, s.side)
+                alerts.append(alert)
 
         for d in self.doms:
             days = (self.event_date_time - d.first_reported_date_time).days
@@ -330,12 +339,16 @@ class ExerciseAssignmentCalculator(object):
                     ice = Ice(body_part_location=d.body_part.location, side=d.side)
                     ice.repeat_every_3hrs_for_24hrs = True
                     ice.goals.add(goal)
+                    alert = Alert(goal)
+                    alert.body_part = BodyPartSide(d.body_part.location, d.side)
+                    alerts.append(alert)
                     if ice not in ice_list:
                         ice_list.append(ice)
 
         if len(ice_list) > 0:
             ice_session = IceSession(minutes=min(minutes))
             ice_session.body_parts = ice_list
+            ice_session.alerts = alerts
 
             return ice_session
         else:
