@@ -60,7 +60,7 @@ class DelayedOnsetMuscleSoreness(object):
     @classmethod
     def json_deserialise(cls, input_dict):
         soreness = cls()
-        soreness.user_id = user_id
+        soreness.user_id = input_dict.get('user_id', None)
         soreness.body_part = BodyPart(BodyPartLocation(input_dict['body_part']), None)
         soreness.max_severity = input_dict.get('max_severity', None)
         soreness.max_severity_date_time = input_dict.get('max_severity_date_time', None)
