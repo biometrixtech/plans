@@ -263,7 +263,7 @@ def test_pre_active_rest_limited_body_parts():
                                       HistoricSorenessStatus.almost_persistent_2_soreness,
                                       HistoricSorenessStatus.persistent_2_soreness]
 
-        f = open(test_parm.file_name, 'w')
+        f = open('../../output/' + test_parm.file_name, 'w')
         line = ('BodyPart,is_pain,severity,hs_status,default_plan'+
                 'inhibit_goals_triggers,inhibit_minutes_efficient,inhibit_miniutes_complete, inhibit_minutes_comprehensive,'+
                 'inhibit_exercises,static_stretch_goals_triggers,static_stretch_minutes_efficient,'+
