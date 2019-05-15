@@ -49,7 +49,7 @@ class AthleteInsight(Serialisable):
         insight.text = input_dict['text']
         insight.parent = input_dict['parent']
         insight.first = input_dict['first']
-        insight.body_parts = [BodyPartSide.json_serialise(body_part) for body_part in input_dict['body_parts']]
+        insight.body_parts = [BodyPartSide.json_deserialise(body_part) for body_part in input_dict['body_parts']]
         insight.sport_names = [SportName(sport_name) for sport_name in input_dict['sport_names']]
         insight.severity =  input_dict['severity']
         insight.cleared = input_dict['cleared']
