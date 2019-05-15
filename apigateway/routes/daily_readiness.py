@@ -31,7 +31,7 @@ app = Blueprint('daily_readiness', __name__)
 @require.authenticated.any
 @require.body({'date_time': str, "soreness": list})
 @xray_recorder.capture('routes.daily_readiness.create')
-def handle_daily_readiness_create(principal_id=None):
+def handle_daily_readiness_create(principal_id):
     validate_data()
     event_date = parse_datetime(request.json['date_time'])
     event_date = fix_early_survey_event_date(event_date)

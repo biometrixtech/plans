@@ -42,7 +42,6 @@ class AthleteInsight(Serialisable):
 
     @classmethod
     def json_deserialise(cls, input_dict):
-        print(input_dict)
         insight = cls(TriggerType(input_dict['trigger_type']))
         insight.title = input_dict.get('title', "")
         insight.goal_targeted = input_dict.get('goal_targeted', [])
@@ -75,7 +74,7 @@ class AthleteInsight(Serialisable):
             else:
                 text = alert_text['child']['subsequent']
         self.text = TextGenerator().get_cleaned_text(text, self.goal_targeted, self.body_parts, self.sport_names, severity=self.severity)
-        self.title = TextGenerator().get_cleaned_text(title, self.goal_targeted, self.body_parts, self.sport_names, seveiryt=self.severity)
+        self.title = TextGenerator().get_cleaned_text(title, self.goal_targeted, self.body_parts, self.sport_names, severity=self.severity)
 
 
 class InsightType(Enum):
