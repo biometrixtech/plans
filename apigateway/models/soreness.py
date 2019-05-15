@@ -328,7 +328,7 @@ class BodyPart(object):
                                                             self.treatment_priority, randomize)
 
         self.isolated_activate_exercises = self.add_exercises(self.isolated_activate_exercises, isolated_activation,
-                                                                self.treatment_priority, randomize)
+                                                              self.treatment_priority, randomize)
 
         self.static_integrate_exercises = self.add_exercises(self.static_integrate_exercises, static_integrate,
                                                              self.treatment_priority, randomize)
@@ -555,11 +555,10 @@ class AssignedExercise(Serialisable):
         self.position_order = 0
         self.goal_text = ""
         self.equipment_required = []
-        #self.goals = set()
-        #self.priorities = set()
-        #self.soreness_sources = set()
+        # self.goals = set()
+        # self.priorities = set()
+        # self.soreness_sources = set()
         self.dosages = []
-
 
     def set_dosage_ranking(self):
         if len(self.dosages) > 1:
@@ -630,19 +629,19 @@ class AssignedExercise(Serialisable):
         assigned_exercise.exercise.bilateral = input_dict.get("bilateral", False)
         assigned_exercise.exercise.unit_of_measure = input_dict.get("unit_of_measure", None)
         assigned_exercise.position_order = input_dict.get("position_order", 0)
-        #assigned_exercise.efficient_reps_assigned = input_dict.get("efficient_reps_assigned", 0)
-        #assigned_exercise.efficient_sets_assigned = input_dict.get("efficient_sets_assigned", 0)
-        #assigned_exercise.complete_reps_assigned = input_dict.get("complete_reps_assigned", 0)
-        #assigned_exercise.complete_sets_assigned = input_dict.get("complete_sets_assigned", 0)
-        #assigned_exercise.comprehensive_reps_assigned = input_dict.get("comprehensive_reps_assigned", 0)
-        #assigned_exercise.comprehensive_sets_assigned = input_dict.get("comprehensive_sets_assigned", 0)
+        # assigned_exercise.efficient_reps_assigned = input_dict.get("efficient_reps_assigned", 0)
+        # assigned_exercise.efficient_sets_assigned = input_dict.get("efficient_sets_assigned", 0)
+        # assigned_exercise.complete_reps_assigned = input_dict.get("complete_reps_assigned", 0)
+        # assigned_exercise.complete_sets_assigned = input_dict.get("complete_sets_assigned", 0)
+        # assigned_exercise.comprehensive_reps_assigned = input_dict.get("comprehensive_reps_assigned", 0)
+        # assigned_exercise.comprehensive_sets_assigned = input_dict.get("comprehensive_sets_assigned", 0)
         assigned_exercise.exercise.seconds_per_set = input_dict.get("seconds_per_set", 0)
         assigned_exercise.exercise.seconds_per_rep = input_dict.get("seconds_per_rep", 0)
         assigned_exercise.goal_text = input_dict.get("goal_text", "")
         assigned_exercise.equipment_required = input_dict.get("equipment_required", [])
-        #assigned_exercise.goals = set([AthleteGoal.json_deserialise(goal) for goal in input_dict.get('goals', [])])
-        #assigned_exercise.priorities = set(input_dict.get('priorities', []))
-        #assigned_exercise.soreness_sources = set([Soreness.json_deserialise(soreness) for soreness in input_dict.get('soreness_sources', [])])
+        # assigned_exercise.goals = set([AthleteGoal.json_deserialise(goal) for goal in input_dict.get('goals', [])])
+        # assigned_exercise.priorities = set(input_dict.get('priorities', []))
+        # assigned_exercise.soreness_sources = set([Soreness.json_deserialise(soreness) for soreness in input_dict.get('soreness_sources', [])])
         assigned_exercise.dosages = [ExerciseDosage.json_deserialise(dosage) for dosage in input_dict.get('dosages', [])]
 
         return assigned_exercise
@@ -663,9 +662,9 @@ class AssignedExercise(Serialisable):
                'duration_comprehensive': self.duration_comprehensive(),
                'goal_text': self.goal_text,
                'equipment_required': self.equipment_required,
-               #'goals': [goal.json_serialise() for goal in self.goals],
-               #'priorities': list(self.priorities),
-               #'soreness_sources': [soreness.json_serialise(trigger=True) for soreness in self.soreness_sources],
+               # 'goals': [goal.json_serialise() for goal in self.goals],
+               # 'priorities': list(self.priorities),
+               # 'soreness_sources': [soreness.json_serialise(trigger=True) for soreness in self.soreness_sources],
                'dosages': [dosage.json_serialise() for dosage in self.dosages]
                }
         return ret
@@ -817,3 +816,17 @@ class TriggerType(IntEnum):
     hist_sore_greater_30_sport = 20  # "Pers, Pers-2 Soreness > 30d + Correlated to Sport"
     pers_pers2_pain_less_30_no_pain_today = 21
     pers_pers2_pain_greater_30_no_pain_today = 22
+
+    def is_grouped_trigger(self):
+        if self.value in [6, 7, 8, 10, 11]:
+            return True
+        else:
+            return False
+
+    def belongs_to_same_group(self, other):
+        groups = {0: [6, 7, 8],
+                  1: [10, 11]}
+        for group in groups.values():
+            if self.value in group and other.value in group:
+                return True
+        return False

@@ -236,7 +236,10 @@ class ExerciseAssignmentCalculator(object):
             if s.daily and s.pain:
                 goal = AthleteGoal("Care for Pain", 1, AthleteGoalType.pain)
                 #goal.trigger = "Pain Reported Today"
-                goal.trigger_type = TriggerType.pain_today
+                if s.severity < 3:
+                    goal.trigger_type = TriggerType.pain_today
+                else:
+                    goal.trigger_type = TriggerType.pain_today_high
 
                 if s.severity < 3.5:
                     ice = Ice(body_part_location=s.body_part.location, side=s.side)
@@ -366,7 +369,10 @@ class ExerciseAssignmentCalculator(object):
 
                     goal = AthleteGoal("Care for Pain", 1, AthleteGoalType.pain)
                     #goal.trigger = "Pain Reported Today"
-                    goal.trigger_type = TriggerType.pain_today
+                    if s.severity < 3:
+                        goal.trigger_type = TriggerType.pain_today
+                    else:
+                        goal.trigger_type = TriggerType.pain_today_high
                     if cold_water_immersion is None:
                         cold_water_immersion = ColdWaterImmersion()
                     cold_water_immersion.goals.add(goal)

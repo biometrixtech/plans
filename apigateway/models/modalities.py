@@ -923,11 +923,17 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
 
             if not soreness.is_joint():
                 #goal.trigger = "Painful joint reported today"
-                goal.trigger_type = TriggerType.pain_today
+                if soreness.severity < 3:
+                    goal.trigger_type = TriggerType.pain_today
+                else:
+                    goal.trigger_type = TriggerType.pain_today_high
                 synergist_priority = "1"
             else:
                 #goal.trigger = "Painful muscle reported today"
-                goal.trigger_type = TriggerType.pain_today
+                if soreness.severity < 3:
+                    goal.trigger_type = TriggerType.pain_today
+                else:
+                    goal.trigger_type = TriggerType.pain_today_high
                 synergist_priority = "2"
             if body_part is not None:
                 alert = Alert(goal)
@@ -1231,11 +1237,17 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
 
             if soreness.is_joint():
                 #goal.trigger = "Painful joint reported today"
-                goal.trigger_type = TriggerType.pain_today
+                if soreness.severity < 3:
+                    goal.trigger_type = TriggerType.pain_today
+                else:
+                    goal.trigger_type = TriggerType.pain_today_high
                 synergist_priority = "1"
             else:
                 #goal.trigger = "Painful muscle reported today"
-                goal.trigger_type = TriggerType.pain_today
+                if soreness.severity < 3:
+                    goal.trigger_type = TriggerType.pain_today
+                else:
+                    goal.trigger_type = TriggerType.pain_today_high
                 synergist_priority = "2"
 
             if body_part is not None:

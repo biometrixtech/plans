@@ -21,7 +21,7 @@ class AthleteInsight(Serialisable):
         self.cleared = False
         self.insight_type = self.get_insight_type()
         self.priority = 0
-        self.styling = 0
+        self.styling = self.get_styling()
 
     def json_serialise(self):
         ret = {
@@ -83,10 +83,17 @@ class AthleteInsight(Serialisable):
         else:
             return InsightType.daily
 
+    def get_styling(self):
+        if self.trigger_type.value in [15]:
+            return 1
+        else:
+            return 0
+
     def __setattr__(self, name, value):
         if name in ['start_date_time'] and value is not None and not isinstance(value, datetime.datetime):
             value = parse_datetime(value)
         super().__setattr__(name, value)
+
 
 class InsightType(Enum):
     daily = 0
@@ -197,8 +204,8 @@ class InsightsText(object):
                 },
                 "child": {
                     "title": "Recovery Measures Upgraded",
-                    "first": "We added activities to {goal} because today's workout is likely to exaserbate & cause symptoms accociated with strength & movement imbalances we've noticed from your prior pain, soreness, & training history. These activities will help mitigate the effects.",
-                    "subsequent": "We added activities to {goal} because today's workout is likely to exacerbate some of the possible strength and movement imbalances we've previously noticed.",
+                    "first": "We added activities to {goal} because today's workout is likely to exaserbate & cause symptoms accociated with strength & movement imbalances we've noticed in your prior pain, soreness, & training history. These activities will help mitigate the effects.",
+                    "subsequent": "We added activities to {goal} because today's workout is likely to exacerbate some imbalances we've previously noticed.",
                     "clear": ""
                 }
             },
@@ -211,8 +218,8 @@ class InsightsText(object):
                 },
                 "child": {
                     "title": "Recovery Measures Upgraded",
-                    "first": "We added activities to {goal} because today's workout is likely to exaserbate & cause symptoms accociated with strength & movement imbalances we've noticed from your prior pain, soreness, & training history. These activities will help mitigate the effects.",
-                    "subsequent": "We added activities to {goal} because today's workout is likely to exacerbate some of the possible strength and movement imbalances we've previously noticed.",
+                    "first": "We added activities to {goal} because today's workout is likely to exaserbate & cause symptoms accociated with strength & movement imbalances we've noticed in your prior pain, soreness, & training history. These activities will help mitigate the effects.",
+                    "subsequent": "We added activities to {goal} because today's workout is likely to exacerbate some imbalances we've previously noticed.",
                     "clear": ""
                 }
             },
@@ -225,8 +232,8 @@ class InsightsText(object):
                 },
                 "child": {
                     "title": "Recovery Measures Upgraded",
-                    "first": "We added activities to {goal} because today's workout is likely to exaserbate & cause symptoms accociated with strength & movement imbalances we've noticed from your prior pain, soreness, & training history. These activities will help mitigate the effects.",
-                    "subsequent": "We added activities to {goal} because today's workout is likely to exacerbate some of the possible strength and movement imbalances we've previously noticed.",
+                    "first": "We added activities to {goal} because today's workout is likely to exaserbate & cause symptoms accociated with strength & movement imbalances we've noticed in your prior pain, soreness, & training history. These activities will help mitigate the effects.",
+                    "subsequent": "We added activities to {goal} because today's workout is likely to exacerbate some imbalances we've previously noticed.",
                     "clear": ""
                 }
             },
@@ -239,8 +246,8 @@ class InsightsText(object):
                 },
                 "child": {
                     "title": "Recovery Measures Upgraded",
-                    "first": "We added activities to {goal} because today's workout is likely to exaserbate & cause symptoms accociated with strength & movement imbalances we've noticed from your prior pain, soreness, & training history. These activities will help mitigate the effects.",
-                    "subsequent": "We added activities to {goal} because today's workout is likely to exacerbate some of the possible strength and movement imbalances we've previously noticed.",
+                    "first": "We added activities to {goal} because today's workout is likely to exaserbate & cause symptoms accociated with strength & movement imbalances we've noticed in your prior pain, soreness, & training history. These activities will help mitigate the effects.",
+                    "subsequent": "We added activities to {goal} because today's workout is likely to exacerbate some imbalances we've previously noticed.",
                     "clear": ""
                 }
             },
@@ -253,50 +260,50 @@ class InsightsText(object):
                 },
                 "child": {
                     "title": "Recovery Measures Upgraded",
-                    "first": "We added activities to {goal} because today's workout is likely to exaserbate & cause symptoms accociated with strength & movement imbalances we've noticed from your prior pain, soreness, & training history. These activities will help mitigate the effects.",
-                    "subsequent": "We added activities to {goal} because today's workout is likely to exacerbate some of the possible strength and movement imbalances we've previously noticed.",
+                    "first": "We added activities to {goal} because today's workout is likely to exaserbate & cause symptoms accociated with strength & movement imbalances we've noticed in your prior pain, soreness, & training history. These activities will help mitigate the effects.",
+                    "subsequent": "We added activities to {goal} because today's workout is likely to exacerbate some imbalances we've previously noticed.",
                     "clear": ""
                 }
             },
             6: {
                 "parent": {
                     "title": "Signs of Poor Adaptation",
-                    "first": "We added activities to {goal} because it seems your body is struggling to adequately adapt to your current training cadence. ",
+                    "first": "We added activities to {goal} because it seems your body is struggling to adequately adapt to your current training cadence.",
                     "subsequent": "We added activities to {goal} because it seems your body is struggling to adequately adapt to your current training cadence.",
                     "clear": "Great work! Your body is showing signs that it's adapting well and no longer overstressing or overreaching in response to training."
                 },
                 "child": {
                     "title": "Overstressing Your {bodypart}",
                     "first": "We add activities to {goal} because we've noticed a pattern of post-workout soreness which indicates you may be overstressing or underrecovering your {bodypart}. It should resolve with adequate recovery measures so we've updated your plan to help.",
-                    "subsequent": "We add activities to {goal} to help address a pattern of soreness which indicates possible {bodypart} overstressing.",
+                    "subsequent": "We add activities to {goal} to help address a pattern of soreness which indicates possible {bodypart} overstressing. ",
                     "clear": "Nicely done! Your no longer showing signs of {bodypart} overstressing! Your plan will be updated to reflect it!"
                 }
             },
             7: {
                 "parent": {
                     "title": "Signs of Poor Adaptation",
-                    "first": "We added {goal} because it seems your body is struggling to adequately adapt to your current training cadence.",
-                    "subsequent": "We added {goal} because it seems your body is struggling to adequately adapt to your current training cadence.",
+                    "first": "We added activities to {goal} because it seems your body is struggling to adequately adapt to your current training cadence.",
+                    "subsequent": "We added activities to {goal} because it seems your body is struggling to adequately adapt to your current training cadence.",
                     "clear": "Great work! Your body is showing signs that it's adapting well and no longer overstressing or overreaching in response to training."
                 },
                 "child": {
                     "title": "Overstressing Your {bodypart}",
                     "first": "We added activities to {goal} because we've noticed you may be trending toward Overreaching. Increasing the comprehensiveness of your prep & recovery practces can expedite tissue healing to sustain your current training cadence so we've updated our recommendations to help.",
-                    "subsequent": "We add activities to {goal} because we've noticed a pattern negative response which is trending toward non-functional \"Overreaching\".",
-                    "clear": "Great work! Your body is showing signs that it's adapting well and no longer overstressing or overreaching in response to training."
+                    "subsequent": "We add activities to {goal} because we've noticed a pattern negative response which is trending toward \"Overreaching\".",
+                    "clear": "Good work! Your no longer trending toward overreaching! We'll scale your recommnedations to reflect that!"
                 }
             },
             8: {
                 "parent": {
                     "title": "Signs of Poor Adaptation",
-                    "first": "We added activities to {goal} because it seems your body is struggling to adequately adapt to your current training cadence. ",
+                    "first": "We added activities to {goal} because it seems your body is struggling to adequately adapt to your current training cadence.",
                     "subsequent": "We added activities to {goal} because it seems your body is struggling to adequately adapt to your current training cadence.",
                     "clear": "Great work! Your body is showing signs that it's adapting well and no longer overstressing or overreaching in response to training."
                 },
                 "child": {
                     "title": "Signs of Overreaching",
                     "first": "We added activities to {goal} because we've noticed signs that your body is now in a cycle of negative adaptation called \"Overreaching\". To help sustain your current training we suggest significantly increasing recovery practices to expodite healing of training-enduced muscle damage.",
-                    "subsequent": "We added activities to {goal} because we've noticed signs that your body is now in a cycle of negative adaptation to training called \"Overreaching\".",
+                    "subsequent": "We added activities to {goal} because you've shown signs of negative adaptation to training called \"Overreaching\".",
                     "clear": "Kudos! You've broken the cycle of negative adaptation (Overreaching) and are on track for healthy, sustainable training! We'll update your plan accordingly."
                 }
             },
@@ -323,7 +330,7 @@ class InsightsText(object):
                 },
                 "child": {
                     "title": "How Soreness Turns to Strength:",
-                    "first": "When you report soreness, we provide {goal} activities to expedite tissue healing & retain range of motion. Our recommendations become more personalized as we learn your patterns of training, response, & recovery in order to sustainably turn the minor tissue damage responsible for post-workout soreness into strength.",
+                    "first": "MILD SORENESS, LINKED TO A SESSION \n When you report soreness, we provide {goal} activities to expedite tissue healing & retain range of motion. Our recommendations become more personalized as we learn your patterns of training, response, & recovery in order to sustainably turn the minor tissue damage responsible for post-workout soreness into strength.",
                     "subsequent": "",
                     "clear": ""
                 }
@@ -338,7 +345,7 @@ class InsightsText(object):
                 "child": {
                     "title": "",
                     "first": "",
-                    "subsequent": "We've added {goal} because we've noticed DOMS has set in. These activities should help reduce the severity of DOMS and expedite tissue recovery.",
+                    "subsequent": "We've added {goal} to help reduce the severity of DOMS and expedite tissue recovery.",
                     "clear": ""
                 }
             },
@@ -372,29 +379,29 @@ class InsightsText(object):
             },
             14: {
                 "parent": {
-                    "title": "",
-                    "first": "",
-                    "subsequent": "",
+                    "title": "Listen to your body",
+                    "first": "Your pain could be a sign that something is wrong. Please avoid and modify any movements that cause discomfort or aggravate your pain.",
+                    "subsequent": "Your pain could be a sign that something is wrong. Please avoid and modify any movements that cause discomfort or aggravate your pain.",
                     "clear": ""
                 },
                 "child": {
                     "title": "How We Help Address Pain:",
-                    "first": "When you report pain we try to provide you with activities to {goal} by balancing mucle tension and encouraging proper biomechanical alignment, but please remember to avoid any activities which trigger pain.",
-                    "subsequent": "We added activities to {goal} to help mitigate your {bodypart} pain, but please remember to avoid any activities which trigger pain.",
+                    "first": "{bodypart} pain is typically a sign of misalignments or movement impairments elsewhere. When you have pain, we provide activities to {goal} by correcting the most likely source of these misalignments. Please remember to avoid any activity which aggravates your pain.",
+                    "subsequent": "We added activities to [goals] that address the most likely source of misalignment. Pease avoid any modify any movements which cause pain.",
                     "clear": ""
                 }
             },
             15: {
                 "parent": {
-                    "title": "",
-                    "first": "",
-                    "subsequent": "",
+                    "title": "Listen to your body",
+                    "first": "Your pain could be a sign that something is wrong. Please avoid and modify any movements that cause discomfort or aggravate your pain.",
+                    "subsequent": "Your pain could be a sign that something is wrong. Please avoid and modify any movements that cause discomfort or aggravate your pain.",
                     "clear": ""
                 },
                 "child": {
-                    "title": "",
-                    "first": "",
-                    "subsequent": "",
+                    "title": "Listen to your body",
+                    "first": "Your pain could be a sign that something is wrong. Please avoid and modify any movements that cause discomfort or aggravate your pain.",
+                    "subsequent": "Your pain could be a sign that something is wrong. Please avoid and modify any movements that cause discomfort or aggravate your pain.",
                     "clear": ""
                 }
             },
@@ -435,9 +442,9 @@ class InsightsText(object):
                 },
                 "child": {
                     "title": "Sign of Possible Injury",
-                    "first": "We added activities to {goal} because recurring {bodypart} pain could be a sign of injury. We've made some changes to avoid aggrevating the issue and encourage you to see a doctor if the pain worsens.",
-                    "subsequent": "We added activities to {goal} to try to help your {bodypart} pain, but it could be sign of injury. Please see a doctor if it persists or worsens.",
-                    "clear": ""
+                    "first": "Recurring pain is often caused by movement impairments which frequently result in chronic & overuse injury so we'll help you {goal} which are likely to cause {bodypart} pain. Please avoid any activity which aggravate your pain.",
+                    "subsequent": "We've added preventitive activities to {goal} commonly attributed to persistant {bodypart} pain.",
+                    "clear": "Well Done! We've haven't seen that {bodypart} pain come back so we'll update your plan to reflect your progress!"
                 }
             },
             17: {
@@ -449,9 +456,9 @@ class InsightsText(object):
                 },
                 "child": {
                     "title": "Sign of Possible Injury",
-                    "first": "We added activities to {goal} because we've noticed that {sport_name} tends to trigger pain in your {bodypart}. This may be a sign of injury caused by a sport-related dysfunction which could lead to future compensations, pain, and injury if not addressed. We'll try to adapt your activities to help with long term prevention, but please try to avoid any acitvities that cause pain & see a doctor if it worsens.",
-                    "subsequent": "We added activities to {goal} because we've noticed that {sport_name} tends to trigger pain in your {bodypart} which may be a sign of injury caused by a sport-related dysfuntion. Please remember to avoid acitvities that cause pain & see a doctor if it worsens.",
-                    "clear": ""
+                    "first": "We've noticed {sport_name} typically causes {bodypart} pain so we've added activities to {goal}. Please avoid any activity that causes pain.",
+                    "subsequent": "We've noticed {sport_name} typically causes {bodypart} pain so we've added activities to {goal}. Please avoid any activity that causes pain.",
+                    "clear": "Well Done! We've haven't seen that {bodypart} pain come back so we'll update your plan to reflect your progress!"
                 }
             },
             18: {
@@ -477,8 +484,8 @@ class InsightsText(object):
                 },
                 "child": {
                     "title": "Possible Strength Imbalance",
-                    "first": "We've added activities to {goal} to your plan. Given your training patterns and persistant {bodypart} soreness response, you may have a strength imbalance or movement dysfuntion which elevates your risk of injury. With these ativities we'll try to address the most likely source given what we've observed.",
-                    "subsequent": "We added activities to {goal} to your plan wecause we've noticed a new strength or movement imbalance given your pattern of persistant {bodypart} soreness.",
+                    "first": "We've added activities to {goal}. Given your training patterns & persistant [body parts] soreness, you may have a strength imbalance or movement dysfuntion which elevates your risk of injury. With these ativities we'll try to address the most likely source.",
+                    "subsequent": "Your pattern of persistant {bodypart} soreness points to a biomechanical imbalance so we've added activities to help {goal}.",
                     "clear": "Congrats! It looks like you've resolved that persistant {bodypart} soreness (a possible sign of strength or movement imbalance)! We'll update your plan to reflect that, but will still keep an eye on it!"
                 }
             },
@@ -492,8 +499,8 @@ class InsightsText(object):
                 "child": {
                     "title": "Mitigate Overuse Injury",
                     "first": "We added activities to {goal} because we've noticed a pattern of {bodypart} soreness after {sport_name} which may indicate a sport-related strength imbalance or movement dysfuntion that could lead to overuse injury. Given this data, we'll adapt your plan to enhance long term prevention efforts until we see signs that it's been resolved.",
-                    "subsequent": "We added activities to {goal} because we've noticed a pattern of {bodypart} soreness after {sport_name} which may indicate a sport-related strength imbalance or movement dysfuntion which could lead to overuse injury.",
-                    "clear": "Congrats! It looks like you've resolved that persistent post-{sport_name} {bodypart} soreness- a possible sign of strength or movement imbalance! We'll update your plan to reflect that, but will still keep an eye on it!"
+                    "subsequent": "We noticed a {sport_name}-related imbalance which could lead to overuse injury so we've updated your plan to {goal}.",
+                    "clear": "Congrats! It looks like you've resolved that persistant post-{sport_name} {bodypart} soreness- a possible sign of strength or movement imbalance! We'll update your plan to reflect that, but will still keep an eye on it!"
                 }
             },
                
