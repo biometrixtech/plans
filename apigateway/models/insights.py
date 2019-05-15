@@ -63,17 +63,25 @@ class AthleteInsight(Serialisable):
     def get_title_and_text(self):
         alert_text = InsightsText(self.trigger_type.value).value()
         if self.parent:
-            title = alert_text['parent']['title']
-            if self.first:
-                text = alert_text['parent']['first']
+            if self.cleared:
+                title = "Symptoms Cleared!"
+                text = alert_text['parent']['clear']
             else:
-                text = alert_text['parent']['subsequent']
+                title = alert_text['parent']['title']
+                if self.first:
+                    text = alert_text['parent']['first']
+                else:
+                    text = alert_text['parent']['subsequent']
         else:
-            title = alert_text['child']['title']
-            if self.first:
-                text = alert_text['child']['first']
+            if self.cleared:
+                title = "Symptoms Cleared!"
+                text = alert_text['child']['clear']
             else:
-                text = alert_text['child']['subsequent']
+                title = alert_text['child']['title']
+                if self.first:
+                    text = alert_text['child']['first']
+                else:
+                    text = alert_text['child']['subsequent']
         self.text = TextGenerator().get_cleaned_text(text, self.goal_targeted, self.body_parts, self.sport_names, severity=self.severity)
         self.title = TextGenerator().get_cleaned_text(title, self.goal_targeted, self.body_parts, self.sport_names, severity=self.severity)
 
@@ -155,7 +163,8 @@ class TextGenerator(object):
                 body_part_text = ", ".join(body_part_list)
         elif len(body_part_list) == 1:
             body_part_text = body_part_list[0]
-        return text.format(bodypart=body_part_text, sport_name=sport_text, goal=goal_text, severity="moderate")
+        text = text.format(bodypart=body_part_text, sport_name=sport_text, goal=goal_text, severity="moderate")
+        return text[0].upper() + text[1:]
 
     @staticmethod
     def merge_bilaterals(body_part_list):

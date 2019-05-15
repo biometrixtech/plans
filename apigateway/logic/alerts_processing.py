@@ -4,7 +4,7 @@ from models.insights import AthleteInsight, InsightType
 class AlertsProcessing(object):
 
     @classmethod
-    def aggregate_alerts(cls, trigger_date_time, alerts, displayed_alerts, longitudinal_alerts):
+    def aggregate_alerts(cls, trigger_date_time, alerts, exposed_triggers, longitudinal_alerts):
         existing_triggers = []
         insights = []
         for alert in alerts:
@@ -50,8 +50,10 @@ class AlertsProcessing(object):
 
         existing_longitudinal_trigger_types = [insight.trigger_type for insight in longitudinal_alerts]
         for insight in insights:
-            if insight.trigger_type not in displayed_alerts:
-                insight.first = True
+            if insight.trigger_type not in exposed_triggers:
+                if not any([insight.trigger_type.belongs_to_same_group(e) for e in exposed_triggers]):
+                    insight.first = True
+                exposed_triggers.append(insight.trigger_type)
             insight.goal_targeted = list(set(insight.goal_targeted))
             insight.sport_names = list(set(insight.sport_names))
             insight.body_parts = list(set(insight.body_parts))
@@ -68,7 +70,7 @@ class AlertsProcessing(object):
             else:
                 insight.start_date_time = trigger_date_time
 
-        return insights, longitudinal_alerts
+        return insights
 
 
 def parent_group_exists(trigger_type, existing_triggers):
