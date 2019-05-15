@@ -43,26 +43,26 @@ class AthleteInsight(Serialisable):
     @classmethod
     def json_deserialise(cls, input_dict):
         insight = cls(TriggerType(input_dict['trigger_type']))
-        insight.title = input_dict['title']
-        insight.goal_targeted = input_dict['goal_targeted']
-        insight.start_date = input_dict['start_date']
-        insight.text = input_dict['text']
-        insight.parent = input_dict['parent']
-        insight.first = input_dict['first']
+        insight.title = input_dict.get('title', "")
+        insight.goal_targeted = input_dict.get('goal_targeted', [])
+        insight.start_date = input_dict.get('start_date', None)
+        insight.text = input_dict.get('text', "")
+        insight.parent = input_dict.get('parent', False)
+        insight.first = input_dict.get('first', False)
         insight.body_parts = [BodyPartSide.json_deserialise(body_part) for body_part in input_dict['body_parts']]
         insight.sport_names = [SportName(sport_name) for sport_name in input_dict['sport_names']]
-        insight.severity =  input_dict['severity']
-        insight.cleared = input_dict['cleared']
-        insight.insight_type = InsightType(input_dict['insight_type'])
-        insight.priority = InsightType(input_dict['priority'])
-        insight.styling = InsightType(input_dict['styling'])
+        insight.severity = input_dict.get('severity', [])
+        insight.cleared = input_dict.get('cleared', False)
+        insight.insight_type = InsightType(input_dict.get('insight_type', 0))
+        insight.priority = input_dict.get('priority', 0)
+        insight.styling = input_dict.get('styling', 0)
 
         return insight
 
     def get_title_and_text(self):
         alert_text = InsightsText(self.trigger_type.value).value()
         if self.parent:
-            title= alert_text['parent']['title']
+            title = alert_text['parent']['title']
             if self.first:
                 text = alert_text['parent']['first']
             else:
@@ -139,7 +139,6 @@ class TextGenerator(object):
             body_part_text = body_part_list[0]
         return text.format(bodypart=body_part_text, sport_name=sport_text, goal=goal_text)
 
-
     @staticmethod
     def merge_bilaterals(body_part_list):
 
@@ -163,7 +162,7 @@ class InsightsText(object):
         self.trigger = trigger
 
     def value(self):
-        insights =  {
+        insights = {
             0: {
                 "parent": {
                     "title": "",

@@ -23,6 +23,7 @@ class HeatSession(Serialisable):
         self.completed = False
         self.active = True
         self.body_parts = []
+        self.alerts = []
 
     def json_serialise(self):
 
@@ -33,7 +34,8 @@ class HeatSession(Serialisable):
             'event_date_time': format_datetime(self.event_date_time) if self.event_date_time is not None else None,
             'completed': self.completed,
             'active': self.active,
-            'body_parts': [heat.json_serialise() for heat in self.body_parts]
+            'body_parts': [heat.json_serialise() for heat in self.body_parts],
+            'alerts': [alert.json_serialise() for alert in self.alerts]
         }
 
         return ret
@@ -47,6 +49,7 @@ class HeatSession(Serialisable):
         heat_session.completed = input_dict.get('completed', False)
         heat_session.active = input_dict.get('active', True)
         heat_session.body_parts = [Heat.json_deserialise(body_part) for body_part in input_dict.get('body_parts', [])]
+        heat_session.alerts = [Alert.json_deserialise(alert) for alert in input_dict.get('alerts', [])]
         if len(heat_session.body_parts) > 0:
             return heat_session
         else:
@@ -1559,6 +1562,7 @@ class IceSession(Serialisable):
         self.completed = False
         self.active = True
         self.body_parts = []
+        self.alerts = []
 
     def json_serialise(self):
 
@@ -1569,7 +1573,8 @@ class IceSession(Serialisable):
             'event_date_time': format_datetime(self.event_date_time) if self.event_date_time is not None else None,
             'completed': self.completed,
             'active': self.active,
-            'body_parts': [ice.json_serialise() for ice in self.body_parts]
+            'body_parts': [ice.json_serialise() for ice in self.body_parts],
+            'alerts': [alert.json_serialise() for alert in self.alerts]
         }
 
         return ret
@@ -1583,6 +1588,7 @@ class IceSession(Serialisable):
         ice_session.completed = input_dict.get('completed', False)
         ice_session.active = input_dict.get('active', True)
         ice_session.body_parts = [Ice.json_deserialise(body_part) for body_part in input_dict.get('body_parts', [])]
+        ice_session.alerts = [Alert.json_deserialise(alert) for alert in input_dict.get('alerts', [])]
         if len(ice_session.body_parts) > 0:
             return ice_session
         else:
@@ -1647,6 +1653,7 @@ class ColdWaterImmersion(Serialisable):
         self.completed = False
         self.active = True
         self.goals = set()
+        self.alerts = []
 
     def json_serialise(self):
         ret = {
@@ -1657,7 +1664,8 @@ class ColdWaterImmersion(Serialisable):
             'completed_date_time': format_datetime(self.completed_date_time) if self.completed_date_time is not None else None,
             'event_date_time': format_datetime(self.event_date_time) if self.event_date_time is not None else None,
             'completed': self.completed,
-            'active': self.active
+            'active': self.active,
+            'alerts': [alert.json_serialise() for alert in self.alerts]
         }
 
         return ret
@@ -1672,6 +1680,7 @@ class ColdWaterImmersion(Serialisable):
         cold_water_immersion.completed = input_dict.get('completed', False)
         cold_water_immersion.active = input_dict.get('active', True)
         cold_water_immersion.goals = set([AthleteGoal.json_deserialise(goal) for goal in input_dict.get('goals', [])])
+        cold_water_immersion.alerts = [Alert.json_deserialise(alert) for alert in input_dict.get('alerts', [])]
 
         return cold_water_immersion
 
