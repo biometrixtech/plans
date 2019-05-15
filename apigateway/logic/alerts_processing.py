@@ -35,6 +35,9 @@ class AlertsProcessing(object):
                 insight.first = True
             # if len(insight.trigger_type) > 0:
             #     insight.parent = True
+            insight.goal_targeted = list(set(insight.goal_targeted))
+            insight.sport_names = list(set(insight.sport_names))
+            insight.body_parts = list(set(insight.body_parts))
             insight.get_title_and_text()
         return insights
 

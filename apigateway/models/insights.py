@@ -84,10 +84,8 @@ class InsightType(Enum):
 
 class TextGenerator(object):
 
-    def get_cleaned_text(self, text, goals, body_parts, sport):
+    def get_cleaned_text(self, text, goals, body_parts, sports):
         body_parts = body_parts
-        # sport = trigger.sport
-        # severity = trigger.severity
         body_part_list = []
         if len(goals) == 0:
             goal_text = ""
@@ -95,7 +93,22 @@ class TextGenerator(object):
             goal_text = goals[0]
         elif len(goals) == 2:
             goal_text = " and ".join(goals)
-        # elif len(goals)
+        else:
+            joined_text = ", ".join(goals)
+            pos = joined_text.rfind(",")
+            goal_text = joined_text[:pos] + " and" + joined_text[pos+1:]
+
+        sport_names = [sport_name.get_display_name() for sport_name in sports]
+        if len(sport_names) == 0:
+            sport_text = ""
+        elif len(sports) == 1:
+            sport_text = sport_names[0]
+        elif len(sports) == 2:
+            sport_text = " and ".join(sport_names)
+        else:
+            joined_text = ", ".join(sport_names)
+            pos = joined_text.rfind(",")
+            sport_text = joined_text[:pos] + " and" + joined_text[pos+1:]
 
         body_parts.sort(key=lambda x: x.body_part_location.value, reverse=False)
         for body_part in body_parts:
@@ -124,7 +137,7 @@ class TextGenerator(object):
                 body_part_text = ", ".join(body_part_list)
         elif len(body_part_list) == 1:
             body_part_text = body_part_list[0]
-        return text.format(bodypart=body_part_text, sport_name=sport, goal=goal_text)
+        return text.format(bodypart=body_part_text, sport_name=sport_text, goal=goal_text)
 
 
     @staticmethod
