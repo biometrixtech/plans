@@ -544,8 +544,8 @@ class ModalityBase(object):
                 dosage.comprehensive_reps_assigned = exercise.max_reps
                 dosage.comprehensive_sets_assigned = 3
 
-        dosage.default_reps_assigned = dosage.comprehensive_reps_assigned
-        dosage.default_sets_assigned = dosage.comprehensive_sets_assigned
+        dosage.default_reps_assigned = exercise.min_reps
+        dosage.default_sets_assigned = exercise.min_sets
 
         return dosage
 
@@ -826,7 +826,7 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
 
                 body_part = body_part_factory.get_body_part(soreness.body_part)
 
-                goal = AthleteGoal("Prevention", 1, AthleteGoalType.corrective)
+                goal = AthleteGoal("Prevention", 2, AthleteGoalType.corrective)
                 #goal.trigger = "Pers, Pers-2 Soreness > 30d"
                 goal.trigger_type = TriggerType.hist_sore_greater_30
 
@@ -872,7 +872,7 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
 
                 body_part = body_part_factory.get_body_part(soreness.body_part)
 
-                goal = AthleteGoal("Prevention", 1, AthleteGoalType.corrective)
+                goal = AthleteGoal("Prevention", 2, AthleteGoalType.corrective)
                 #goal.trigger = "Acute, Pers, Pers-2 Pain"
                 goal.trigger_type = TriggerType.hist_pain
 
@@ -1132,7 +1132,7 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
 
                 body_part = body_part_factory.get_body_part(soreness.body_part)
 
-                goal = AthleteGoal("Prevention", 1, AthleteGoalType.corrective)
+                goal = AthleteGoal("Prevention", 2, AthleteGoalType.corrective)
                 #goal.trigger = "Pers, Pers-2 Soreness > 30d"
                 goal.trigger_type = TriggerType.hist_sore_greater_30
 
@@ -1178,7 +1178,7 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
 
                 body_part = body_part_factory.get_body_part(soreness.body_part)
 
-                goal = AthleteGoal("Prevention", 1, AthleteGoalType.corrective)
+                goal = AthleteGoal("Prevention", 2, AthleteGoalType.corrective)
                 #goal.trigger = "Acute, Pers, Pers-2 Pain"
                 goal.trigger_type = TriggerType.hist_pain
 
