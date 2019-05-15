@@ -25,17 +25,53 @@ exercise_library_datastore = ExerciseLibraryDatastore()
 completed_exercise_datastore = CompletedExerciseDatastore()
 df = DataFrame()
 
+
+class TestParameters(object):
+    def __init__(self, file_name, athlete_stats, train_later):
+        self.file_name = file_name
+        self.athlete_stats = athlete_stats
+        self.train_later = train_later
+
+
+def get_test_parameters_list():
+
+    parm_list = []
+
+    as1 = AthleteStats("tester")
+    as1.delayed_onset_muscle_soreness = []
+    as1.muscular_strain_increasing = False
+    parm1 = TestParameters("PreActiveRest_no_doms_no_muscular_strain.csv", as1, train_later=True)
+    parm2 = TestParameters("PostActiveRest_no_doms_no_muscular_strain.csv", as1, train_later=False)
+
+    as2 = AthleteStats("tester")
+    as2.delayed_onset_muscle_soreness = []
+    as2.muscular_strain_increasing = True
+    parm3 = TestParameters("PreActiveRest_no_doms_muscular_strain.csv", as2, train_later=True)
+    parm4 = TestParameters("PostActiveRest_no_doms_muscular_strain.csv", as2, train_later=False)
+
+    parm_list.append(parm1)
+    parm_list.append(parm2)
+    parm_list.append(parm3)
+    parm_list.append(parm4)
+
+    return parm_list
+
 @pytest.fixture(scope="session", autouse=True)
 def load_exercises():
     exercise_library_datastore.side_load_exericse_list_from_csv()
 
-def create_plan(body_part_list, severity_list, side_list, pain_list, historic_soreness_list=None):
-    user_id = "tester"
+
+def create_plan(athlete_stats, body_part_list, severity_list, side_list, pain_list, train_later, historic_soreness_list=None):
+
+    user_id = athlete_stats.athlete_id
 
     current_date = date.today()
     current_date_time = datetime.combine(current_date, time(12, 0, 0))
 
     daily_plan_datastore = DailyPlanDatastore()
+    athlete_stats_datastore = AthleteStatsDatastore()
+    athlete_stats.historic_soreness = historic_soreness_list
+    athlete_stats_datastore.side_load_athlete_stats(athlete_stats)
 
     soreness_list = []
     for b in range(0, len(body_part_list)):
@@ -47,27 +83,29 @@ def create_plan(body_part_list, severity_list, side_list, pain_list, historic_so
             else:
                 soreness_list.append(TestUtilities().body_part_soreness(body_part_list[b], severity_list[b]))
 
-
     survey = DailyReadiness(current_date_time.strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, soreness_list, 7, 9)
 
     daily_plan = DailyPlan(format_date(current_date))
     daily_plan.user_id = user_id
+    daily_plan.train_later = train_later
     daily_plan.daily_readiness_survey = survey
     daily_plan_datastore.side_load_plans([daily_plan])
     data_store_collection = DatastoreCollection()
     data_store_collection.daily_plan_datastore = daily_plan_datastore
     data_store_collection.exercise_datastore = exercise_library_datastore
+    data_store_collection.athlete_stats_datastore = athlete_stats_datastore
 
+    '''
     if historic_soreness_list is not None and len(historic_soreness_list) > 0:
         athlete_stats_datastore = AthleteStatsDatastore()
         athlete_stats = AthleteStats(user_id)
-        athlete_stats.historic_soreness = historic_soreness_list
+       
         athlete_stats_datastore.side_load_athlete_stats(athlete_stats)
         data_store_collection.athlete_stats_datastore = athlete_stats_datastore
-
+    '''
     mgr = TrainingPlanManager(user_id, data_store_collection)
 
-    daily_plan = mgr.create_daily_plan(format_date(current_date), format_datetime(current_date_time))
+    daily_plan = mgr.create_daily_plan(format_date(current_date), format_datetime(current_date_time), athlete_stats=athlete_stats)
 
     return daily_plan
 
@@ -151,7 +189,10 @@ def get_goals_triggers(assigned_exercises):
 
     for key, assigned_exercise in assigned_exercises.items():
         for d in assigned_exercises[key].dosages:
-            goals = 'Goal=' + d.goal.text.replace(',','-') + '-->' + d.goal.trigger.replace(',',';') + ' Priority=' + d.priority + ' Dosages='
+            if d.goal.trigger_type is not None:
+                goals = 'Goal=' + d.goal.text.replace(',','-') + '-->' + str(d.goal.trigger_type.value).replace(',',';') + ' Priority=' + d.priority + ' Dosages='
+            else:
+                goals = 'Goal=' + d.goal.text.replace(',', '-') +  ' Priority=' + d.priority + ' Dosages='
             goals += "Eff Reps="+ str(d.efficient_reps_assigned) + ' & Eff Sets=' + str(d.efficient_sets_assigned)
             goals += " & Complete Reps=" + str(d.complete_reps_assigned) + ' & Complete Sets=' + str(
                 d.complete_sets_assigned)
@@ -196,144 +237,168 @@ def test_pre_active_rest_limited_body_parts():
     current_date_time = datetime.combine(current_date, time(9, 0, 0))
     current_date_time = current_date_time - timedelta(days=16)
 
-    athlete_id = "tester"
-    made_it_through = False
-    max_severity_1 = [1, 2, 3, 4, 5]
+    parm_list = get_test_parameters_list()
 
-    is_pain_1 = [True, False]
+    for test_parm in parm_list:
 
-    body_parts_1 = [4, 5, 6, 7, 8, 11, 14, 15, 16]
+        athlete_id = "tester"
+        made_it_through = False
+        max_severity_1 = [1, 2, 3, 4, 5]
 
-    historic_soreness_status_1 = [None,
-                                  HistoricSorenessStatus.dormant_cleared,
-                                  HistoricSorenessStatus.almost_acute_pain,
-                                  HistoricSorenessStatus.acute_pain,
-                                  HistoricSorenessStatus.almost_persistent_pain,
-                                  HistoricSorenessStatus.persistent_pain,
-                                  HistoricSorenessStatus.almost_persistent_2_pain,
-                                  HistoricSorenessStatus.almost_persistent_2_pain_acute,
-                                  HistoricSorenessStatus.persistent_2_pain,
-                                  HistoricSorenessStatus.almost_persistent_soreness,
-                                  HistoricSorenessStatus.persistent_soreness,
-                                  HistoricSorenessStatus.almost_persistent_2_soreness,
-                                  HistoricSorenessStatus.persistent_2_soreness]
+        is_pain_1 = [True, False]
 
-    f = open('pre_ar_plans_time.csv', 'w')
-    line = ('BodyPart,is_pain,severity,hs_status,default_plan'+
-            'inhibit_goals_triggers,inhibit_minutes_efficient,inhibit_miniutes_complete, inhibit_minutes_comprehensive,'+
-            'inhibit_exercises,static_stretch_goals_triggers,static_stretch_minutes_efficient,'+
-            'static_stretch_minutes_complete,static_stretch_minutes_comprehensive, static_stretch_exercises,' +
-            'active_stretch_goals_triggers, active_stretch_minutes_efficient, active_stretch_minutes_complete,'+
-            'active_stretch_minutes_comprehensive, active_stretch_exercises,isolated_activate_goals_triggers,'+
-            'isolated_activate_minutes_efficient, isolated_activate_minutes_complete,isolated_activate_minutes_comprehensive,'+
-            'isolated_activate_exercises,static_integrate_goals_triggers,static_integrate_minutes_efficient, '+
-            'static_integrate_minutes_complete,static_integrate_minutes_comprehensive, static_integrate_exercises,'+
-            'total_minutes_efficient, total_minutes_complete, total_minutes_comprehensive')
-    f.write(line + '\n')
+        body_parts_1 = [4, 5, 6, 7, 8, 11, 14, 15, 16]
 
-    for b1 in body_parts_1:
-        for m1 in max_severity_1:
-            for h1 in historic_soreness_status_1:
-                for p in is_pain_1:
-                    soreness_list = []
+        historic_soreness_status_1 = [None,
+                                      HistoricSorenessStatus.dormant_cleared,
+                                      HistoricSorenessStatus.almost_acute_pain,
+                                      HistoricSorenessStatus.acute_pain,
+                                      HistoricSorenessStatus.almost_persistent_pain,
+                                      HistoricSorenessStatus.persistent_pain,
+                                      HistoricSorenessStatus.almost_persistent_2_pain,
+                                      HistoricSorenessStatus.almost_persistent_2_pain_acute,
+                                      HistoricSorenessStatus.persistent_2_pain,
+                                      HistoricSorenessStatus.almost_persistent_soreness,
+                                      HistoricSorenessStatus.persistent_soreness,
+                                      HistoricSorenessStatus.almost_persistent_2_soreness,
+                                      HistoricSorenessStatus.persistent_2_soreness]
 
-                    historic_soreness = HistoricSoreness(BodyPartLocation(14), 1, True)
-                    historic_soreness.first_reported = current_date_time
-                    historic_soreness.historic_soreness_status = h1
+        f = open(test_parm.file_name, 'w')
+        line = ('BodyPart,is_pain,severity,hs_status,default_plan'+
+                'inhibit_goals_triggers,inhibit_minutes_efficient,inhibit_miniutes_complete, inhibit_minutes_comprehensive,'+
+                'inhibit_exercises,static_stretch_goals_triggers,static_stretch_minutes_efficient,'+
+                'static_stretch_minutes_complete,static_stretch_minutes_comprehensive, static_stretch_exercises,' +
+                'active_stretch_goals_triggers, active_stretch_minutes_efficient, active_stretch_minutes_complete,'+
+                'active_stretch_minutes_comprehensive, active_stretch_exercises,isolated_activate_goals_triggers,'+
+                'isolated_activate_minutes_efficient, isolated_activate_minutes_complete,isolated_activate_minutes_comprehensive,'+
+                'isolated_activate_exercises,static_integrate_goals_triggers,static_integrate_minutes_efficient, '+
+                'static_integrate_minutes_complete,static_integrate_minutes_comprehensive, static_integrate_exercises,'+
+                'total_minutes_efficient, total_minutes_complete, total_minutes_comprehensive')
+        f.write(line + '\n')
 
-                    if not p:
-                        soreness_list.extend(soreness_one_body_part(b1, m1, h1))
-                    else:
-                        soreness_list.extend(pain_one_body_part(b1, m1, h1))
+        for b1 in body_parts_1:
+            for m1 in max_severity_1:
+                for h1 in historic_soreness_status_1:
+                    for p in is_pain_1:
+                        soreness_list = []
 
-                    body_part_line = (
-                            str(BodyPartLocation(b1)) + ',' + str(p) + ',' + str(m1) + ',' + str(h1))
+                        historic_soreness = HistoricSoreness(BodyPartLocation(14), 1, True)
+                        historic_soreness.first_reported = current_date_time
+                        historic_soreness.historic_soreness_status = h1
 
-                    daily_plan = create_plan(body_part_list=[b1], severity_list=[m1], side_list=[1],
-                                             pain_list=[p], historic_soreness_list=[historic_soreness])
+                        if not p:
+                            soreness_list.extend(soreness_one_body_part(b1, m1, h1))
+                        else:
+                            soreness_list.extend(pain_one_body_part(b1, m1, h1))
 
-                    body_part_line += ',' + daily_plan.pre_active_rest.default_plan
+                        body_part_line = (
+                                str(BodyPartLocation(b1)) + ',' + str(p) + ',' + str(m1) + ',' + str(h1))
 
-                    inhibit_goals_triggers = get_goals_triggers(daily_plan.pre_active_rest.inhibit_exercises)
-                    static_stretch_goals_triggers = get_goals_triggers(daily_plan.pre_active_rest.static_stretch_exercises)
-                    active_stretch_goals_triggers = get_goals_triggers(daily_plan.pre_active_rest.active_stretch_exercises)
-                    isolated_activate_goals_triggers = get_goals_triggers(daily_plan.pre_active_rest.isolated_activate_exercises)
-                    static_integrate_goals_triggers = get_goals_triggers(daily_plan.pre_active_rest.static_integrate_exercises)
+                        daily_plan = create_plan(athlete_stats=test_parm.athlete_stats, body_part_list=[b1], severity_list=[m1], side_list=[1],
+                                                 pain_list=[p], train_later=test_parm.train_later, historic_soreness_list=[historic_soreness])
 
-                    efficient_inhibit_minutes = calc_active_time_efficient(daily_plan.pre_active_rest.inhibit_exercises)
-                    efficient_static_stretch_minutes = calc_active_time_efficient(
-                        daily_plan.pre_active_rest.static_stretch_exercises)
-                    efficient_active_stretch_minutes = calc_active_time_efficient(
-                        daily_plan.pre_active_rest.active_stretch_exercises)
-                    efficient_isolated_activate_minutes = calc_active_time_efficient(
-                        daily_plan.pre_active_rest.isolated_activate_exercises)
-                    efficient_static_integrate_minutes = calc_active_time_efficient(
-                        daily_plan.pre_active_rest.static_integrate_exercises)
-                    efficient_total_minutes = efficient_inhibit_minutes + efficient_static_stretch_minutes + efficient_active_stretch_minutes + efficient_isolated_activate_minutes + efficient_static_integrate_minutes
+                        if test_parm.train_later:
+                            plan_obj = daily_plan.pre_active_rest[0]
+                        else:
+                            plan_obj = daily_plan.post_active_rest[0]
+                            plan_obj.active_stretch_exercises = {}
 
-                    complete_inhibit_minutes = calc_active_time_complete(daily_plan.pre_active_rest.inhibit_exercises)
-                    complete_static_stretch_minutes = calc_active_time_complete(daily_plan.pre_active_rest.static_stretch_exercises)
-                    complete_active_stretch_minutes = calc_active_time_complete(daily_plan.pre_active_rest.active_stretch_exercises)
-                    complete_isolated_activate_minutes = calc_active_time_complete(daily_plan.pre_active_rest.isolated_activate_exercises)
-                    complete_static_integrate_minutes = calc_active_time_complete(daily_plan.pre_active_rest.static_integrate_exercises)
-                    complete_total_minutes = complete_inhibit_minutes + complete_static_stretch_minutes + complete_active_stretch_minutes + complete_isolated_activate_minutes + complete_static_integrate_minutes
+                        body_part_line += ',' + plan_obj.default_plan
 
-                    comprehensive_inhibit_minutes = calc_active_time_comprehensive(daily_plan.pre_active_rest.inhibit_exercises)
-                    comprehensive_static_stretch_minutes = calc_active_time_comprehensive(
-                        daily_plan.pre_active_rest.static_stretch_exercises)
-                    comprehensive_active_stretch_minutes = calc_active_time_comprehensive(
-                        daily_plan.pre_active_rest.active_stretch_exercises)
-                    comprehensive_isolated_activate_minutes = calc_active_time_comprehensive(
-                        daily_plan.pre_active_rest.isolated_activate_exercises)
-                    comprehensive_static_integrate_minutes = calc_active_time_comprehensive(
-                        daily_plan.pre_active_rest.static_integrate_exercises)
-                    comprehensive_total_minutes = comprehensive_inhibit_minutes + comprehensive_static_stretch_minutes + comprehensive_active_stretch_minutes + comprehensive_isolated_activate_minutes + comprehensive_static_integrate_minutes
+                        inhibit_goals_triggers = get_goals_triggers(plan_obj.inhibit_exercises)
+                        static_stretch_goals_triggers = get_goals_triggers(plan_obj.static_stretch_exercises)
+                        if test_parm.train_later:
+                            active_stretch_goals_triggers = get_goals_triggers(plan_obj.active_stretch_exercises)
+                        else:
+                            active_stretch_goals_triggers = ''
+                        isolated_activate_goals_triggers = get_goals_triggers(plan_obj.isolated_activate_exercises)
+                        static_integrate_goals_triggers = get_goals_triggers(plan_obj.static_integrate_exercises)
 
-                    line = (body_part_line + ',' +
+                        efficient_inhibit_minutes = calc_active_time_efficient(plan_obj.inhibit_exercises)
+                        efficient_static_stretch_minutes = calc_active_time_efficient(
+                            plan_obj.static_stretch_exercises)
+                        if test_parm.train_later:
+                            efficient_active_stretch_minutes = calc_active_time_efficient(
+                                plan_obj.active_stretch_exercises)
+                        else:
+                            efficient_active_stretch_minutes = 0
+                        efficient_isolated_activate_minutes = calc_active_time_efficient(
+                            plan_obj.isolated_activate_exercises)
+                        efficient_static_integrate_minutes = calc_active_time_efficient(
+                            plan_obj.static_integrate_exercises)
+                        efficient_total_minutes = efficient_inhibit_minutes + efficient_static_stretch_minutes + efficient_active_stretch_minutes + efficient_isolated_activate_minutes + efficient_static_integrate_minutes
 
-                            ' ** '.join(inhibit_goals_triggers) + ',' +
+                        complete_inhibit_minutes = calc_active_time_complete(plan_obj.inhibit_exercises)
+                        complete_static_stretch_minutes = calc_active_time_complete(plan_obj.static_stretch_exercises)
+                        if test_parm.train_later:
+                            complete_active_stretch_minutes = calc_active_time_complete(plan_obj.active_stretch_exercises)
+                        else:
+                            complete_active_stretch_minutes = 0
 
-                            str(round(efficient_inhibit_minutes, 2)) + ',' + str(round(complete_inhibit_minutes, 2)) + ',' + str(round(comprehensive_inhibit_minutes, 2)) + ',' +
+                        complete_isolated_activate_minutes = calc_active_time_complete(plan_obj.isolated_activate_exercises)
+                        complete_static_integrate_minutes = calc_active_time_complete(plan_obj.static_integrate_exercises)
+                        complete_total_minutes = complete_inhibit_minutes + complete_static_stretch_minutes + complete_active_stretch_minutes + complete_isolated_activate_minutes + complete_static_integrate_minutes
 
-                            ';'.join(convert_assigned_dict_exercises(
-                                daily_plan.pre_active_rest.inhibit_exercises)) + ',' +
+                        comprehensive_inhibit_minutes = calc_active_time_comprehensive(plan_obj.inhibit_exercises)
+                        comprehensive_static_stretch_minutes = calc_active_time_comprehensive(
+                            plan_obj.static_stretch_exercises)
+                        if test_parm.train_later:
+                            comprehensive_active_stretch_minutes = calc_active_time_comprehensive(
+                                plan_obj.active_stretch_exercises)
+                        else:
+                            comprehensive_active_stretch_minutes = 0
+                        comprehensive_isolated_activate_minutes = calc_active_time_comprehensive(
+                            plan_obj.isolated_activate_exercises)
+                        comprehensive_static_integrate_minutes = calc_active_time_comprehensive(
+                            plan_obj.static_integrate_exercises)
+                        comprehensive_total_minutes = comprehensive_inhibit_minutes + comprehensive_static_stretch_minutes + comprehensive_active_stretch_minutes + comprehensive_isolated_activate_minutes + comprehensive_static_integrate_minutes
 
-                            ' ** '.join(static_stretch_goals_triggers) + ',' +
+                        line = (body_part_line + ',' +
 
-                            str(round(efficient_static_stretch_minutes, 2)) + ',' + str(round(complete_static_stretch_minutes, 2)) + ',' + str(round(comprehensive_static_stretch_minutes, 2)) + ',' +
+                                ' ** '.join(inhibit_goals_triggers) + ',' +
 
-                            ';'.join(convert_assigned_dict_exercises(
-                                daily_plan.pre_active_rest.static_stretch_exercises)) + ',' +
+                                str(round(efficient_inhibit_minutes, 2)) + ',' + str(round(complete_inhibit_minutes, 2)) + ',' + str(round(comprehensive_inhibit_minutes, 2)) + ',' +
 
-                            ' ** '.join(active_stretch_goals_triggers) + ',' +
+                                ';'.join(convert_assigned_dict_exercises(
+                                    plan_obj.inhibit_exercises)) + ',' +
 
-                            str(round(efficient_active_stretch_minutes, 2)) + ',' +str(round(complete_active_stretch_minutes, 2)) + ',' +str(round(comprehensive_active_stretch_minutes, 2)) + ',' +
+                                ' ** '.join(static_stretch_goals_triggers) + ',' +
 
-                            ';'.join(convert_assigned_dict_exercises(
-                                daily_plan.pre_active_rest.active_stretch_exercises)) + ',' +
+                                str(round(efficient_static_stretch_minutes, 2)) + ',' + str(round(complete_static_stretch_minutes, 2)) + ',' + str(round(comprehensive_static_stretch_minutes, 2)) + ',' +
 
-                            ' ** '.join(isolated_activate_goals_triggers) + ',' +
+                                ';'.join(convert_assigned_dict_exercises(
+                                    plan_obj.static_stretch_exercises)) + ',' +
 
-                            str(round(efficient_isolated_activate_minutes, 2)) + ',' +str(round(complete_isolated_activate_minutes, 2)) + ',' +str(round(complete_isolated_activate_minutes, 2)) + ',' +
+                                ' ** '.join(active_stretch_goals_triggers) + ',' +
 
-                            ';'.join(convert_assigned_dict_exercises(
-                                daily_plan.pre_active_rest.isolated_activate_exercises)) + ',' +
 
-                            ' ** '.join(static_integrate_goals_triggers) + ',' +
+                                str(round(efficient_active_stretch_minutes, 2)) + ',' +str(round(complete_active_stretch_minutes, 2)) + ',' +str(round(comprehensive_active_stretch_minutes, 2)) + ',' +
 
-                            str(round(efficient_static_integrate_minutes, 2)) + ',' +str(round(complete_static_integrate_minutes, 2)) + ',' +str(round(comprehensive_static_integrate_minutes, 2)) + ',' +
+                                ';'.join(convert_assigned_dict_exercises(
+                                    plan_obj.active_stretch_exercises)) + ',' +
 
-                            ';'.join(convert_assigned_dict_exercises(
-                                daily_plan.pre_active_rest.static_integrate_exercises)) + ',' +
+                                ' ** '.join(isolated_activate_goals_triggers) + ',' +
 
-                            str(round(efficient_total_minutes, 2))+ ',' +str(round(complete_total_minutes, 2))+ ',' +str(round(comprehensive_total_minutes, 2))
+                                str(round(efficient_isolated_activate_minutes, 2)) + ',' +str(round(complete_isolated_activate_minutes, 2)) + ',' +str(round(complete_isolated_activate_minutes, 2)) + ',' +
 
-                            )
-                    f.write(line + '\n')
+                                ';'.join(convert_assigned_dict_exercises(
+                                    plan_obj.isolated_activate_exercises)) + ',' +
 
-    f.close()
+                                ' ** '.join(static_integrate_goals_triggers) + ',' +
 
-    made_it_through = True
+                                str(round(efficient_static_integrate_minutes, 2)) + ',' +str(round(complete_static_integrate_minutes, 2)) + ',' +str(round(comprehensive_static_integrate_minutes, 2)) + ',' +
+
+                                ';'.join(convert_assigned_dict_exercises(
+                                    plan_obj.static_integrate_exercises)) + ',' +
+
+                                str(round(efficient_total_minutes, 2))+ ',' +str(round(complete_total_minutes, 2))+ ',' +str(round(comprehensive_total_minutes, 2))
+
+                                )
+                        f.write(line + '\n')
+
+        f.close()
+
+        made_it_through = True
 
 
 def test_no_soreness_baseline_active_prep_no_fs_1_body_part():
