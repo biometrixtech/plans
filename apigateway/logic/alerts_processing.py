@@ -53,7 +53,6 @@ class AlertsProcessing(object):
             if insight.trigger_type not in exposed_triggers:
                 if not any([insight.trigger_type.belongs_to_same_group(e) for e in exposed_triggers]):
                     insight.first = True
-                exposed_triggers.append(insight.trigger_type)
             insight.goal_targeted = list(set(insight.goal_targeted))
             insight.sport_names = list(set(insight.sport_names))
             insight.body_parts = list(set(insight.body_parts))
