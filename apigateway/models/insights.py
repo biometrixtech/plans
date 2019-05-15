@@ -189,9 +189,9 @@ class InsightsText(object):
                     "clear": ""
                 },
                 "child": {
-                    "title": "Avoid {severity} Soreness Tomorrow",
-                    "first": "We added activities to {goal} because this workout is likely to trigger {severity} Delayed Onset Muscle Soreness (DOMS) tomorrow.",
-                    "subsequent": "We've added activities to {goal} to mitigate the likelihood of {severity} Delayed Onset Muscle Soreness (DOMS).",
+                    "title": "Avoid Soreness Tomorrow",
+                    "first": "We added activities to {goal} because this workout is likely to trigger Delayed Onset Muscle Soreness (DOMS) tomorrow.",
+                    "subsequent": "We've added activities to {goal} to mitigate the likelihood of Delayed Onset Muscle Soreness (DOMS).",
                     "clear": ""
                 }
             },
