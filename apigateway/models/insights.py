@@ -42,6 +42,7 @@ class AthleteInsight(Serialisable):
 
     @classmethod
     def json_deserialise(cls, input_dict):
+        print(input_dict)
         insight = cls(TriggerType(input_dict['trigger_type']))
         insight.title = input_dict.get('title', "")
         insight.goal_targeted = input_dict.get('goal_targeted', [])

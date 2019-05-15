@@ -159,7 +159,6 @@ class DailyPlan(Serialisable):
         daily_plan.sessions_planned = input_dict.get('sessions_planned', True)
         daily_plan.train_later = input_dict.get('train_later', True)
         daily_plan.insights = [AthleteInsight.json_deserialise(insight) for insight in input_dict.get('insights', [])]
-        daily_plan.insights = []
 
         return daily_plan
 
