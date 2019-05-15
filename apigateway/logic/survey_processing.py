@@ -282,7 +282,7 @@ def match_sessions(user_sessions, health_session):
     return health_session
 
 
-def create_plan(user_id, event_date, target_minutes=15, update_stats=True, athlete_stats=None, stats_processor=None, datastore_collection=None):
+def create_plan(user_id, event_date, target_minutes=15, update_stats=True, athlete_stats=None, stats_processor=None, datastore_collection=None, force_data=False):
     if datastore_collection is None:
         datastore_collection = DatastoreCollection()
     if update_stats:
@@ -305,7 +305,8 @@ def create_plan(user_id, event_date, target_minutes=15, update_stats=True, athle
     plan = plan_manager.create_daily_plan(event_date=format_date(event_date),
                                           target_minutes=target_minutes,
                                           last_updated=format_datetime(event_date),
-                                          athlete_stats=athlete_stats)
+                                          athlete_stats=athlete_stats,
+                                          force_data=force_data)
     plan = cleanup_plan(plan)
 
     return plan

@@ -148,11 +148,11 @@ class ExerciseAssignmentCalculator(object):
 
         return high_relative_intensity_session
 
-    def get_pre_active_rest(self):
+    def get_pre_active_rest(self, force_data=False):
 
         if (len(self.soreness_list) > 0 or self.muscular_strain_increasing
-                or self.high_relative_load_session or self.high_relative_intensity_session):
-            active_rest = ActiveRestBeforeTraining(self.event_date_time)
+                or self.high_relative_load_session or self.high_relative_intensity_session or force_data):
+            active_rest = ActiveRestBeforeTraining(self.event_date_time, force_data)
             active_rest.fill_exercises(self.soreness_list, self.exercise_library, self.high_relative_load_session,
                                        self.high_relative_intensity_session,
                                        self.muscular_strain_increasing,
@@ -164,11 +164,11 @@ class ExerciseAssignmentCalculator(object):
         else:
             return []
 
-    def get_post_active_rest(self):
+    def get_post_active_rest(self, force_data=False):
 
         if (len(self.soreness_list) > 0 or self.muscular_strain_increasing
                 or self.high_relative_load_session or self.high_relative_intensity_session):
-            active_rest = ActiveRestAfterTraining(self.event_date_time)
+            active_rest = ActiveRestAfterTraining(self.event_date_time, force_data)
             active_rest.fill_exercises(self.soreness_list, self.exercise_library,self.high_relative_load_session,
                                        self.high_relative_intensity_session,
                                        self.muscular_strain_increasing,

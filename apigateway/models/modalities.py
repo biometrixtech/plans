@@ -654,8 +654,8 @@ class ActiveRest(ModalityBase):
 
 
 class ActiveRestBeforeTraining(ActiveRest, Serialisable):
-    def __init__(self, event_date_time):
-        super().__init__(event_date_time)
+    def __init__(self, event_date_time, force_data=False):
+        super().__init__(event_date_time, force_data)
         self.active_stretch_exercises = {}
 
     def json_serialise(self):
@@ -971,8 +971,8 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
 
 
 class ActiveRestAfterTraining(ActiveRest, Serialisable):
-    def __init__(self, event_date_time):
-        super().__init__(event_date_time)
+    def __init__(self, event_date_time, force_data=False):
+        super().__init__(event_date_time, force_data)
 
     def json_serialise(self):
         ret = {

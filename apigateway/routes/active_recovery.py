@@ -6,12 +6,14 @@ from fathomapi.utils.exceptions import NoSuchEntityException
 from fathomapi.utils.xray import xray_recorder
 from datastores.datastore_collection import DatastoreCollection
 from models.soreness import CompletedExercise
+from logic.survey_processing import create_plan
 from utils import format_date, parse_datetime, format_datetime
 from config import get_mongo_collection
 
 datastore_collection = DatastoreCollection()
 daily_plan_datastore = datastore_collection.daily_plan_datastore
 completed_exercise_datastore = datastore_collection.completed_exercise_datastore
+athlete_stats_datastore = datastore_collection.athlete_stats_datastore
 
 app = Blueprint('active_recovery', __name__)
 
@@ -136,6 +138,37 @@ def handle_exercise_modalities_start(principal_id=None):
     daily_plan_datastore.put(plan)
 
     return {'message': 'success'}, 200
+
+
+@app.route('/get_mobilize', methods=['POST'])
+@require.authenticated.any
+@require.body({'event_date': str, 'recovery_type': str})
+@xray_recorder.capture('routes.active_recovery.exercise_modalities.start')
+def handle_request_mobilize(principal_id=None):
+    user_id = principal_id
+    event_date = parse_datetime(request.json['event_date'])
+    recovery_start_date = format_datetime(event_date)
+    if not _check_plan_exists(user_id, plan_event_day):
+        raise NoSuchEntityException('Plan not found for the user')
+
+    plan = daily_plan_datastore.get(user_id=user_id,
+                                    start_date=plan_event_day,
+                                    end_date=plan_event_day)[0]
+
+    if (plan.train_later and len(plan.pre_active_rest))  or (not plan.train_later and len(plan.post_active_rest) == 0):
+        force_data = True
+    else:
+        force_data = False
+
+    athlete_stats = athlete_stats_datastore.get(user_id)
+    plan = create_plan(user_id,
+                       event_date,
+                       update_stats=False,
+                       athlete_stats=athlete_stats,
+                       datastore_collection=datastore_collection,
+                       force_data=force_data)
+
+    return {'daily_plans': [plan]}, 200
 
 
 @app.route('/body_part_modalities', methods=['PATCH'])

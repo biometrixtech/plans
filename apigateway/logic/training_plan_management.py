@@ -72,7 +72,7 @@ class TrainingPlanManager(object):
             return modalities
 
     @xray_recorder.capture('logic.TrainingPlanManager.create_daily_plan')
-    def create_daily_plan(self, event_date, last_updated, target_minutes=15, athlete_stats=None):
+    def create_daily_plan(self, event_date, last_updated, target_minutes=15, athlete_stats=None, force_data=False):
         self.athlete_stats = athlete_stats
         self.trigger_date_time = parse_datetime(last_updated)
         self.load_data(event_date)
@@ -121,7 +121,7 @@ class TrainingPlanManager(object):
                 warm_up.active = False
             # create new post-training modalitiesathlete_stats, soreness_list, event_date_time
             self.daily_plan.cool_down = calc.get_cool_down()
-            self.daily_plan.post_active_rest = calc.get_post_active_rest()
+            self.daily_plan.post_active_rest = calc.get_post_active_rest(force_data)
             self.daily_plan.ice = calc.get_ice()
             self.daily_plan.cold_water_immersion = calc.get_cold_water_immersion()
             if self.daily_plan.cold_water_immersion is not None:
@@ -143,7 +143,7 @@ class TrainingPlanManager(object):
                     self.daily_plan.completed_warm_up.append(warm_up)
             # create new pre-training modalities
             self.daily_plan.heat = calc.get_heat()
-            self.daily_plan.pre_active_rest = calc.get_pre_active_rest()
+            self.daily_plan.pre_active_rest = calc.get_pre_active_rest(force_data)
             # self.daily_plan.warm_up = calc.get_warm_up(athlete_stats, soreness_list, parse_date(event_date))
         #
         # if soreness_values is not None and len(soreness_values) > 0:

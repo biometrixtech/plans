@@ -775,7 +775,7 @@ class Alert(object):
         return {
             "goal": self.goal.json_serialise(),
             "body_part": self.body_part.json_serialise() if self.body_part is not None else None,
-            "sport_name": self.sport_name.value if self.sport_name.value is not None else None,
+            "sport_name": self.sport_name.value if self.sport_name is not None else None,
             "severity": self.severity
         }
 
