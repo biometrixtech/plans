@@ -217,6 +217,55 @@ def test_active_rest_after_training_check_pain_severity_4():
     assert len(active_rest.static_integrate_exercises) == 0
 
 
+def test_active_rest_after_training_empty_soreness_blank():
+
+    active_rest = ActiveRestAfterTraining(event_date_time=datetime.today())
+
+    exercise_library = exercise_library_datastore.get()
+    active_rest.fill_exercises([], exercise_library, False, False, False, [])
+
+    assert len(active_rest.inhibit_exercises) == 0
+    assert len(active_rest.static_stretch_exercises) == 0
+    assert len(active_rest.isolated_activate_exercises) == 0
+    assert len(active_rest.static_integrate_exercises) == 0
+
+
+def test_active_rest_after_training_none_soreness_blank():
+
+    active_rest = ActiveRestAfterTraining(event_date_time=datetime.today())
+
+    exercise_library = exercise_library_datastore.get()
+    active_rest.fill_exercises(None, exercise_library, False, False, False, [])
+
+    assert len(active_rest.inhibit_exercises) == 0
+    assert len(active_rest.static_stretch_exercises) == 0
+    assert len(active_rest.isolated_activate_exercises) == 0
+    assert len(active_rest.static_integrate_exercises) == 0
+
+
+def test_active_rest_after_training_empty_soreness_force_data():
+    active_rest = ActiveRestAfterTraining(event_date_time=datetime.today(), force_data=True)
+
+    exercise_library = exercise_library_datastore.get()
+    active_rest.fill_exercises([], exercise_library, False, False, False, [])
+
+    assert len(active_rest.inhibit_exercises) > 0
+    assert len(active_rest.static_stretch_exercises) > 0
+    assert len(active_rest.isolated_activate_exercises) > 0
+    assert len(active_rest.static_integrate_exercises) > 0
+
+
+def test_active_rest_after_training_none_soreness_force_data():
+    active_rest = ActiveRestAfterTraining(event_date_time=datetime.today(), force_data=True)
+
+    exercise_library = exercise_library_datastore.get()
+    active_rest.fill_exercises(None, exercise_library, False, False, False, [])
+
+    assert len(active_rest.inhibit_exercises) > 0
+    assert len(active_rest.static_stretch_exercises) > 0
+    assert len(active_rest.isolated_activate_exercises) > 0
+    assert len(active_rest.static_integrate_exercises) > 0
+
 # pre active rest
 
 
@@ -233,6 +282,7 @@ def test_active_rest_before_training_check_soreness_severity_3():
 
     assert len(active_rest.inhibit_exercises) > 0
     assert len(active_rest.static_stretch_exercises) > 0
+    assert len(active_rest.active_stretch_exercises) > 0
     assert len(active_rest.isolated_activate_exercises) == 0
     assert len(active_rest.static_integrate_exercises) == 0
 
@@ -250,6 +300,7 @@ def test_active_rest_before_training_check_soreness_severity_4():
 
     assert len(active_rest.inhibit_exercises) > 0
     assert len(active_rest.static_stretch_exercises) == 0
+    assert len(active_rest.active_stretch_exercises) == 0
     assert len(active_rest.isolated_activate_exercises) == 0
     assert len(active_rest.static_integrate_exercises) == 0
 
@@ -271,6 +322,7 @@ def test_active_rest_before_training_check_prevention_soreness_severity_2():
 
     assert len(active_rest.inhibit_exercises) > 0
     assert len(active_rest.static_stretch_exercises) > 0
+    assert len(active_rest.active_stretch_exercises) == 0
     assert len(active_rest.isolated_activate_exercises) > 0
     assert len(active_rest.static_integrate_exercises) > 0
 
@@ -292,11 +344,12 @@ def test_active_rest_before_training_check_prevention_soreness_severity_3():
 
     assert len(active_rest.inhibit_exercises) > 0
     assert len(active_rest.static_stretch_exercises) > 0
+    assert len(active_rest.active_stretch_exercises) == 0
     assert len(active_rest.isolated_activate_exercises) > 0
     assert len(active_rest.static_integrate_exercises) == 0
 
 
-def test_active_rest_befpre_training_check_prevention_soreness_severity_4():
+def test_active_rest_before_training_check_prevention_soreness_severity_4():
 
     current_date_time = datetime.today()
     active_rest = ActiveRestBeforeTraining(event_date_time=current_date_time)
@@ -313,6 +366,7 @@ def test_active_rest_befpre_training_check_prevention_soreness_severity_4():
 
     assert len(active_rest.inhibit_exercises) > 0
     assert len(active_rest.static_stretch_exercises) == 0
+    assert len(active_rest.active_stretch_exercises) == 0
     assert len(active_rest.isolated_activate_exercises) == 0
     assert len(active_rest.static_integrate_exercises) == 0
 
@@ -334,6 +388,7 @@ def test_active_rest_before_training_check_prevention_pain_severity_2():
 
     assert len(active_rest.inhibit_exercises) > 0
     assert len(active_rest.static_stretch_exercises) > 0
+    assert len(active_rest.active_stretch_exercises) == 0
     assert len(active_rest.isolated_activate_exercises) > 0
     assert len(active_rest.static_integrate_exercises) > 0
 
@@ -355,6 +410,7 @@ def test_active_rest_before_training_check_prevention_pain_severity_3():
 
     assert len(active_rest.inhibit_exercises) > 0
     assert len(active_rest.static_stretch_exercises) > 0
+    assert len(active_rest.active_stretch_exercises) == 0
     assert len(active_rest.isolated_activate_exercises) > 0
     assert len(active_rest.static_integrate_exercises) == 0
 
@@ -376,6 +432,7 @@ def test_active_rest_before_training_check_prevention_pain_severity_4():
 
     assert len(active_rest.inhibit_exercises) > 0
     assert len(active_rest.static_stretch_exercises) == 0
+    assert len(active_rest.active_stretch_exercises) == 0
     assert len(active_rest.isolated_activate_exercises) == 0
     assert len(active_rest.static_integrate_exercises) == 0
 
@@ -394,6 +451,7 @@ def test_active_rest_before_training_check_pain_severity_3():
 
     assert len(active_rest.inhibit_exercises) > 0
     assert len(active_rest.static_stretch_exercises) > 0
+    assert len(active_rest.active_stretch_exercises) > 0
     assert len(active_rest.isolated_activate_exercises) == 0
     assert len(active_rest.static_integrate_exercises) == 0
 
@@ -412,9 +470,63 @@ def test_active_rest_before_training_check_pain_severity_4():
 
     assert len(active_rest.inhibit_exercises) > 0
     assert len(active_rest.static_stretch_exercises) == 0
+    assert len(active_rest.active_stretch_exercises) == 0
     assert len(active_rest.isolated_activate_exercises) == 0
     assert len(active_rest.static_integrate_exercises) == 0
 
+
+def test_active_rest_before_training_empty_soreness_blank():
+
+    active_rest = ActiveRestBeforeTraining(event_date_time=datetime.today())
+
+    exercise_library = exercise_library_datastore.get()
+    active_rest.fill_exercises([], exercise_library, False, False, False, [])
+
+    assert len(active_rest.inhibit_exercises) == 0
+    assert len(active_rest.static_stretch_exercises) == 0
+    assert len(active_rest.active_stretch_exercises) == 0
+    assert len(active_rest.isolated_activate_exercises) == 0
+    assert len(active_rest.static_integrate_exercises) == 0
+
+
+def test_active_rest_before_training_none_soreness_blank():
+
+    active_rest = ActiveRestBeforeTraining(event_date_time=datetime.today())
+
+    exercise_library = exercise_library_datastore.get()
+    active_rest.fill_exercises(None, exercise_library, False, False, False, [])
+
+    assert len(active_rest.inhibit_exercises) == 0
+    assert len(active_rest.static_stretch_exercises) == 0
+    assert len(active_rest.active_stretch_exercises) == 0
+    assert len(active_rest.isolated_activate_exercises) == 0
+    assert len(active_rest.static_integrate_exercises) == 0
+
+
+def test_active_rest_before_training_empty_soreness_force_data():
+    active_rest = ActiveRestBeforeTraining(event_date_time=datetime.today(), force_data=True)
+
+    exercise_library = exercise_library_datastore.get()
+    active_rest.fill_exercises([], exercise_library, False, False, False, [])
+
+    assert len(active_rest.inhibit_exercises) > 0
+    assert len(active_rest.static_stretch_exercises) > 0
+    assert len(active_rest.active_stretch_exercises) > 0
+    assert len(active_rest.isolated_activate_exercises) > 0
+    assert len(active_rest.static_integrate_exercises) > 0
+
+
+def test_active_rest_before_training_none_soreness_force_data():
+    active_rest = ActiveRestBeforeTraining(event_date_time=datetime.today(), force_data=True)
+
+    exercise_library = exercise_library_datastore.get()
+    active_rest.fill_exercises(None, exercise_library, False, False, False, [])
+
+    assert len(active_rest.inhibit_exercises) > 0
+    assert len(active_rest.static_stretch_exercises) > 0
+    assert len(active_rest.active_stretch_exercises) > 0
+    assert len(active_rest.isolated_activate_exercises) > 0
+    assert len(active_rest.static_integrate_exercises) > 0
 
 '''deprecated
 def test_find_earlier_practice_sessions():

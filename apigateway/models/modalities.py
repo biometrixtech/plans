@@ -924,10 +924,11 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
             if not soreness.is_joint():
                 #goal.trigger = "Painful joint reported today"
                 goal.trigger_type = TriggerType.pain_today
+                synergist_priority = "1"
             else:
                 #goal.trigger = "Painful muscle reported today"
                 goal.trigger_type = TriggerType.pain_today
-
+                synergist_priority = "2"
             if body_part is not None:
                 alert = Alert(goal)
                 alert.body_part = BodyPartSide(soreness.body_part.location, soreness.side)
@@ -952,10 +953,11 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
                 for y in body_part.synergists:
                     synergist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(y), None))
                     if synergist is not None:
-                        self.copy_exercises(synergist.inhibit_exercises, self.inhibit_exercises, goal, "1", soreness, exercise_library)
+                        self.copy_exercises(synergist.inhibit_exercises, self.inhibit_exercises, goal,
+                                            synergist_priority, soreness, exercise_library)
                         if soreness.severity < 3.5:
-                            self.copy_exercises(synergist.active_stretch_exercises, self.active_stretch_exercises, goal, "1", soreness,
-                                                exercise_library)
+                            self.copy_exercises(synergist.active_stretch_exercises, self.active_stretch_exercises, goal,
+                                                synergist_priority, soreness, exercise_library)
 
                 for t in body_part.stabilizers:
                     stabilizer = body_part_factory.get_body_part(BodyPart(BodyPartLocation(t), None))
@@ -1230,11 +1232,11 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
             if soreness.is_joint():
                 #goal.trigger = "Painful joint reported today"
                 goal.trigger_type = TriggerType.pain_today
-                priority = "1"
+                synergist_priority = "1"
             else:
                 #goal.trigger = "Painful muscle reported today"
                 goal.trigger_type = TriggerType.pain_today
-                priority = "2"
+                synergist_priority = "2"
 
             if body_part is not None:
                 alert = Alert(goal)
@@ -1260,9 +1262,9 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
                 for y in body_part.synergists:
                     synergist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(y), None))
                     if synergist is not None:
-                        self.copy_exercises(synergist.inhibit_exercises, self.inhibit_exercises, goal, priority, soreness, exercise_library)
+                        self.copy_exercises(synergist.inhibit_exercises, self.inhibit_exercises, goal, synergist_priority, soreness, exercise_library)
                         if soreness.severity < 3.5:
-                            self.copy_exercises(synergist.static_stretch_exercises, self.static_stretch_exercises, goal, priority, soreness, exercise_library)
+                            self.copy_exercises(synergist.static_stretch_exercises, self.static_stretch_exercises, goal, synergist_priority, soreness, exercise_library)
 
                 for t in body_part.stabilizers:
                     stabilizer = body_part_factory.get_body_part(BodyPart(BodyPartLocation(t), None))

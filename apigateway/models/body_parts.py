@@ -163,13 +163,13 @@ class BodyPartFactory(object):
 
         general = BodyPart(BodyPartLocation.general, 21)
 
-        inhibit = self.get_exercise_dictionary([48, 3, 4, 54, 2, 44, 55])
-        lengthen = self.get_exercise_dictionary([9, 6, 28, 56, 7, 46, 103])
-        activate = self.get_exercise_dictionary([81, 108, 10, 85, 89])
+        #inhibit = self.get_exercise_dictionary([48, 3, 4, 54, 2, 44, 55])
+        #lengthen = self.get_exercise_dictionary([9, 6, 28, 56, 7, 46, 103])
+        #activate = self.get_exercise_dictionary([81, 108, 10, 85, 89])
         static_integrate = self.get_exercise_dictionary([15, 14, 231])
 
-        general.add_extended_exercise_phases(inhibit, {}, {}, {}, {}, static_integrate)
-
+        general.add_extended_exercise_phases({}, {}, {}, {}, {}, static_integrate)
+        general.add_muscle_groups([12, 6, 14], [21, 11, 5, 15], [18, 16, 1], [3, 8])
         return general
 
     def get_upper_body(self):
