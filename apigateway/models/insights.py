@@ -73,8 +73,8 @@ class AthleteInsight(Serialisable):
                 text = alert_text['child']['first']
             else:
                 text = alert_text['child']['subsequent']
-        self.text = TextGenerator().get_cleaned_text(text, self.goal_targeted, self.body_parts, self.sport_names)
-        self.title = TextGenerator().get_cleaned_text(title, self.goal_targeted, self.body_parts, self.sport_names)
+        self.text = TextGenerator().get_cleaned_text(text, self.goal_targeted, self.body_parts, self.sport_names, severity=self.severity)
+        self.title = TextGenerator().get_cleaned_text(title, self.goal_targeted, self.body_parts, self.sport_names, seveiryt=self.severity)
 
 
 class InsightType(Enum):
@@ -84,7 +84,7 @@ class InsightType(Enum):
 
 class TextGenerator(object):
 
-    def get_cleaned_text(self, text, goals, body_parts, sports):
+    def get_cleaned_text(self, text, goals, body_parts, sports, severity):
         body_parts = body_parts
         body_part_list = []
         if len(goals) == 0:
@@ -137,7 +137,7 @@ class TextGenerator(object):
                 body_part_text = ", ".join(body_part_list)
         elif len(body_part_list) == 1:
             body_part_text = body_part_list[0]
-        return text.format(bodypart=body_part_text, sport_name=sport_text, goal=goal_text)
+        return text.format(bodypart=body_part_text, sport_name=sport_text, goal=goal_text, severity="moderate")
 
     @staticmethod
     def merge_bilaterals(body_part_list):
