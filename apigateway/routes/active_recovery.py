@@ -142,12 +142,12 @@ def handle_exercise_modalities_start(principal_id=None):
 
 @app.route('/get_mobilize', methods=['POST'])
 @require.authenticated.any
-@require.body({'event_date': str, 'recovery_type': str})
+@require.body({'event_date': str})
 @xray_recorder.capture('routes.active_recovery.exercise_modalities.start')
 def handle_request_mobilize(principal_id=None):
     user_id = principal_id
     event_date = parse_datetime(request.json['event_date'])
-    recovery_start_date = format_datetime(event_date)
+    plan_event_day = format_date(event_date)
     if not _check_plan_exists(user_id, plan_event_day):
         raise NoSuchEntityException('Plan not found for the user')
 
