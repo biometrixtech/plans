@@ -22,6 +22,7 @@ class TrainingPlanManager(object):
         self.post_session_surveys = []
         self.athlete_stats = None
         self.training_sessions = []
+        self.longitudinal_alerts = []
 
     # def post_session_surveys_today(self):
     #     for ps_survey in self.post_session_surveys:
@@ -188,7 +189,7 @@ class TrainingPlanManager(object):
 
         self.daily_plan.last_updated = last_updated
         alerts = self.daily_plan.get_alerts()
-        self.daily_plan.insights = AlertsProcessing.aggregate_alerts(alerts, [])
+        self.daily_plan.insights, self.longitudinal_alerts = AlertsProcessing.aggregate_alerts(self.trigger_date_time, alerts, [], [])
 
         self.daily_plan_datastore.put(self.daily_plan)
 

@@ -1,14 +1,16 @@
+import datetime
 from enum import Enum
 from serialisable import Serialisable
 from models.soreness import BodyPartLocationText, TriggerType, BodyPartSide
 from models.sport import SportName
+from utils import format_datetime, parse_datetime
 
 
 class AthleteInsight(Serialisable):
     def __init__(self, trigger_type):
         self.trigger_type = trigger_type
         self.goal_targeted = []
-        self.start_date = None
+        self.start_date_time = None
         self.title = ""
         self.text = ""
         self.parent = False
@@ -17,7 +19,7 @@ class AthleteInsight(Serialisable):
         self.sport_names = []
         self.severity = []
         self.cleared = False
-        self.insight_type = InsightType.daily
+        self.insight_type = self.get_insight_type()
         self.priority = 0
         self.styling = 0
 
@@ -26,7 +28,7 @@ class AthleteInsight(Serialisable):
             'trigger_type': self.trigger_type.value,
             'title': self.title,
             'goal_targeted': self.goal_targeted,
-            'start_date': self.start_date,
+            'start_date_time': format_datetime(self.start_date_time) if self.start_date_time is not None else None,
             'text': self.text,
             'parent': self.parent,
             'first': self.first,
@@ -45,7 +47,7 @@ class AthleteInsight(Serialisable):
         insight = cls(TriggerType(input_dict['trigger_type']))
         insight.title = input_dict.get('title', "")
         insight.goal_targeted = input_dict.get('goal_targeted', [])
-        insight.start_date = input_dict.get('start_date', None)
+        insight.start_date_time = input_dict.get('start_date_time', None)
         insight.text = input_dict.get('text', "")
         insight.parent = input_dict.get('parent', False)
         insight.first = input_dict.get('first', False)
@@ -53,7 +55,6 @@ class AthleteInsight(Serialisable):
         insight.sport_names = [SportName(sport_name) for sport_name in input_dict['sport_names']]
         insight.severity = input_dict.get('severity', [])
         insight.cleared = input_dict.get('cleared', False)
-        insight.insight_type = InsightType(input_dict.get('insight_type', 0))
         insight.priority = input_dict.get('priority', 0)
         insight.styling = input_dict.get('styling', 0)
 
@@ -76,6 +77,16 @@ class AthleteInsight(Serialisable):
         self.text = TextGenerator().get_cleaned_text(text, self.goal_targeted, self.body_parts, self.sport_names, severity=self.severity)
         self.title = TextGenerator().get_cleaned_text(title, self.goal_targeted, self.body_parts, self.sport_names, severity=self.severity)
 
+    def get_insight_type(self):
+        if self.trigger_type.value in [6, 7, 8, 12, 16, 17, 18, 19, 20]:
+            return InsightType.longitudinal
+        else:
+            return InsightType.daily
+
+    def __setattr__(self, name, value):
+        if name in ['start_date_time'] and value is not None and not isinstance(value, datetime.datetime):
+            value = parse_datetime(value)
+        super().__setattr__(name, value)
 
 class InsightType(Enum):
     daily = 0
