@@ -1,5 +1,4 @@
 from models.insights import AthleteInsight, InsightType
-from models.soreness import TriggerType
 
 
 class AlertsProcessing(object):
@@ -9,7 +8,28 @@ class AlertsProcessing(object):
         existing_triggers = []
         insights = []
         for alert in alerts:
-            if alert.goal.trigger_type not in existing_triggers:
+            # check if trigger already exists
+            if alert.goal.trigger_type in existing_triggers:
+                insight = [insight for insight in insights if insight.trigger_type == alert.goal.trigger_type][0]
+                insight.goal_targeted.append(alert.goal.text)
+                if alert.body_part is not None:
+                    insight.body_parts.append(alert.body_part)
+                if alert.sport_name is not None:
+                    insight.sport_names.append(alert.sport_name)
+                if alert.severity is not None:
+                    insight.severity.append(alert.severity)
+            # check if any other group member exists
+            elif alert.goal.trigger_type.is_grouped_trigger() and parent_group_exists(alert.goal.trigger_type, existing_triggers):
+                insight = [insight for insight in insights if insight.trigger_type.belongs_to_same_group(alert.goal.trigger_type)][0]
+                insight.goal_targeted.append(alert.goal.text)
+                insight.parent = True
+                if alert.body_part is not None:
+                    insight.body_parts.append(alert.body_part)
+                if alert.sport_name is not None:
+                    insight.sport_names.append(alert.sport_name)
+                if alert.severity is not None:
+                    insight.severity.append(alert.severity)
+            else:
                 insight = AthleteInsight(alert.goal.trigger_type)
                 insight.goal_targeted.append(alert.goal.text)
                 if alert.body_part is not None:
@@ -20,15 +40,6 @@ class AlertsProcessing(object):
                     insight.severity.append(alert.severity)
                 existing_triggers.append(alert.goal.trigger_type)
                 insights.append(insight)
-            else:
-                insight = [insight for insight in insights if insight.trigger_type == alert.goal.trigger_type][0]
-                insight.goal_targeted.append(alert.goal.text)
-                if alert.body_part is not None:
-                    insight.body_parts.append(alert.body_part)
-                if alert.sport_name is not None:
-                    insight.sport_names.append(alert.sport_name)
-                if alert.severity is not None:
-                    insight.severity.append(alert.severity)
 
         current_trigger_types = [insight.trigger_type for insight in insights]
         for l_insight in longitudinal_alerts:
@@ -60,5 +71,8 @@ class AlertsProcessing(object):
         return insights, longitudinal_alerts
 
 
-grouped_triggers = {0: [TriggerType(6), TriggerType(7), TriggerType(8)],
-                    1: [TriggerType(10), TriggerType(11)]}
+def parent_group_exists(trigger_type, existing_triggers):
+    for e in existing_triggers:
+        if trigger_type.belongs_to_same_group(e):
+            return True
+    return False

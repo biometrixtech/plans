@@ -21,7 +21,7 @@ class AthleteInsight(Serialisable):
         self.cleared = False
         self.insight_type = self.get_insight_type()
         self.priority = 0
-        self.styling = 0
+        self.styling = self.get_styling()
 
     def json_serialise(self):
         ret = {
@@ -83,10 +83,17 @@ class AthleteInsight(Serialisable):
         else:
             return InsightType.daily
 
+    def get_styling(self):
+        if self.trigger_type.value in [15]:
+            return 1
+        else:
+            return 0
+
     def __setattr__(self, name, value):
         if name in ['start_date_time'] and value is not None and not isinstance(value, datetime.datetime):
             value = parse_datetime(value)
         super().__setattr__(name, value)
+
 
 class InsightType(Enum):
     daily = 0
