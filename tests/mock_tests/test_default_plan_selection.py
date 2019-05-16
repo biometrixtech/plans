@@ -1,5 +1,5 @@
 from models.modalities import ModalityBase
-from models.soreness import BodyPart, BodyPartLocation, HistoricSorenessStatus, Soreness
+from models.soreness import BodyPart, BodyPartLocation, Soreness, HistoricSorenessStatus
 from datetime import datetime, timedelta
 
 

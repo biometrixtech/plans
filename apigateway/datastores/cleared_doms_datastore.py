@@ -1,6 +1,6 @@
 from aws_xray_sdk.core import xray_recorder
 from config import get_mongo_collection
-from models.delayed_onset_muscle_soreness import DelayedOnsetMuscleSoreness
+from models.historic_soreness import HistoricSoreness
 from utils import format_datetime
 from fathomapi.utils.exceptions import InvalidSchemaException
 
@@ -50,7 +50,7 @@ class ClearedDOMSDatastore(object):
         mongo_cursor = mongo_collection.find(query)
 
         for mongo_result in mongo_cursor:
-            doms = DelayedOnsetMuscleSoreness.json_deserialise(mongo_result)
+            doms = HistoricSoreness.json_deserialise(mongo_result)
             ret.append(doms)
 
         return ret

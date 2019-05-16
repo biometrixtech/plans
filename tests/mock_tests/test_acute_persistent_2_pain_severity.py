@@ -1,4 +1,5 @@
-from models.soreness import BodyPart, BodyPartLocation, HistoricSoreness, HistoricSorenessStatus,Soreness
+from models.soreness import BodyPart, BodyPartLocation, Soreness, HistoricSorenessStatus
+from models.historic_soreness import HistoricSoreness
 from logic.stats_processing import StatsProcessing
 from tests.mocks.mock_datastore_collection import DatastoreCollection
 

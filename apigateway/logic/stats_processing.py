@@ -6,7 +6,8 @@ from datetime import datetime, timedelta
 from fathomapi.utils.xray import xray_recorder
 from logic.training_volume_processing import TrainingVolumeProcessing
 from models.stats import AthleteStats
-from models.soreness import Soreness, BodyPart, HistoricSoreness, HistoricSorenessStatus
+from models.soreness import Soreness, BodyPart, HistoricSorenessStatus
+from models.historic_soreness import HistoricSoreness
 from models.post_session_survey import PostSessionSurvey
 from utils import parse_date, format_date
 
@@ -315,7 +316,11 @@ class StatsProcessing(object):
 
                     avg_severity = self.calc_avg_severity_persistent_2(body_part_history, self.event_date)
 
-                    soreness = HistoricSoreness(g.location, g.side, g.is_pain)
+                    if not g.is_pain and historic_soreness.historic_soreness_status == HistoricSorenessStatus.doms:
+                        soreness = historic_soreness
+                    else:
+                        soreness = HistoricSoreness(g.location, g.side, g.is_pain)
+
                     if g.is_pain:
                         soreness.historic_soreness_status = HistoricSorenessStatus.persistent_pain
                     else:
@@ -333,7 +338,11 @@ class StatsProcessing(object):
 
                     avg_severity = self.calc_avg_severity_persistent_2(body_part_history, self.event_date)
 
-                    soreness = HistoricSoreness(g.location, g.side, g.is_pain)
+                    if not g.is_pain and historic_soreness.historic_soreness_status == HistoricSorenessStatus.doms:
+                        soreness = historic_soreness
+                    else:
+                        soreness = HistoricSoreness(g.location, g.side, g.is_pain)
+
                     if g.is_pain:
                         soreness.historic_soreness_status = HistoricSorenessStatus.persistent_pain
                     else:

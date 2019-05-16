@@ -5,7 +5,8 @@ xray_recorder.begin_segment(name="test")
 import pytest
 from datetime import datetime, timedelta
 from utils import format_datetime, parse_datetime
-from models.soreness import AthleteGoalType, BodyPart, BodyPartLocation, HistoricSoreness, HistoricSorenessStatus, Soreness
+from models.soreness import AthleteGoalType, BodyPart, BodyPartLocation, Soreness, HistoricSorenessStatus
+from models.historic_soreness import HistoricSoreness
 from models.modalities import ColdWaterImmersion, Ice, IceSession
 from models.stats import AthleteStats
 from tests.mocks.mock_exercise_datastore import ExerciseLibraryDatastore

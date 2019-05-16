@@ -2,7 +2,7 @@ from fathomapi.utils.xray import xray_recorder
 from models.session import SessionType, SessionFactory, StrengthConditioningType, SessionSource
 from models.post_session_survey import PostSurvey
 from models.sport import SportName
-from models.soreness import BodyPart, BodyPartLocation, HistoricSorenessStatus, Soreness
+from models.soreness import BodyPart, BodyPartLocation, Soreness, HistoricSorenessStatus
 from models.daily_plan import DailyPlan
 from models.heart_rate import SessionHeartRate, HeartRateData
 from models.sleep_data import DailySleepData, SleepEvent

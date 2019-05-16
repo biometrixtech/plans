@@ -3,7 +3,8 @@ import models.soreness
 # import logic.soreness_processing as soreness_and_injury
 from models.exercise import ExerciseBuckets, Phase
 from models.modalities import ActiveRestBeforeTraining, ActiveRestAfterTraining, ColdWaterImmersion, CoolDown, Heat, WarmUp, Ice, HeatSession, IceSession
-from models.soreness import AthleteGoal, AthleteGoalType, AssignedExercise, BodyPartLocation, HistoricSorenessStatus, Soreness, BodyPart, TriggerType, Alert, BodyPartSide
+from models.soreness import AthleteGoal, AthleteGoalType, AssignedExercise, BodyPartLocation, Soreness, BodyPart, \
+    TriggerType, Alert, BodyPartSide, HistoricSorenessStatus
 from models.sport import SportName
 # from logic.goal_focus_text_generator import RecoveryTextGenerator
 # from datetime import  timedelta
@@ -29,7 +30,7 @@ class ExerciseAssignmentCalculator(object):
         self.high_relative_load_session_sport_names = set()
 
         self.muscular_strain_increasing = athlete_stats.muscular_strain_increasing
-        self.doms = athlete_stats.delayed_onset_muscle_soreness
+        self.doms = list(d for d in athlete_stats.historic_soreness if d.historic_soreness_status == HistoricSorenessStatus.doms)
 
         self.set_high_relative_load_session(athlete_stats, training_sessions)
 
