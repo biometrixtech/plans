@@ -108,3 +108,29 @@ def test_aggregate_alerts_cleared():
     assert insights[0].insight_type == InsightType.longitudinal
     assert insights[0].cleared
     assert insights[0].start_date_time == current_date_time - datetime.timedelta(days=5)
+
+def test_aggregate_alerts_cleared_one_body_part():
+    current_date_time = datetime.datetime.now()
+    goal = AthleteGoal('Care for Pain', 0, AthleteGoalType(0))
+    goal.trigger_type = TriggerType(16)
+    alert1 = Alert(goal)
+    alert1.body_part = BodyPartSide(BodyPartLocation(11), 1)
+    alert2 = Alert(goal)
+    alert2.body_part = BodyPartSide(BodyPartLocation(11), 2)
+
+    alerts = [alert1, alert2]
+    existing_insights, longitudinal_insights = AlertsProcessing.aggregate_alerts(current_date_time - datetime.timedelta(days=5), alerts, [], [])
+    assert len(existing_insights) == 1
+    assert existing_insights[0].first
+    assert not existing_insights[0].parent
+    assert existing_insights[0].insight_type == InsightType.longitudinal
+    assert existing_insights[0].start_date_time == current_date_time - datetime.timedelta(days=5)
+    assert len(existing_insights[0].body_parts) == 2
+
+    insights, longitudinal_insights = AlertsProcessing.aggregate_alerts(current_date_time, [alert2], [TriggerType(16)], existing_insights)
+    assert len(insights) == 2
+    assert insights[0].insight_type == InsightType.longitudinal
+    assert len(longitudinal_insights) == 1
+    assert len(longitudinal_insights[0].body_parts) == 1
+    assert longitudinal_insights[0].body_parts[0].side == 2
+    assert not longitudinal_insights[0].cleared
