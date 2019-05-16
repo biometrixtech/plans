@@ -166,7 +166,8 @@ def handle_request_mobilize(principal_id=None):
                        update_stats=False,
                        athlete_stats=athlete_stats,
                        datastore_collection=datastore_collection,
-                       force_data=force_data)
+                       force_data=force_data,
+                       mobilize_only=True)
 
     return {'daily_plans': [plan]}, 200
 
