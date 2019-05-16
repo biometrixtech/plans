@@ -1,4 +1,5 @@
 from models.insights import AthleteInsight, InsightType
+from models.soreness import TriggerType
 
 
 class AlertsProcessing(object):
@@ -42,6 +43,8 @@ class AlertsProcessing(object):
                 insights.append(insight)
 
         current_trigger_types = [insight.trigger_type for insight in insights]
+        if TriggerType(9) in exposed_triggers:
+            insights = [insight for insight in insights if insight.trigger_type != TriggerType(9)]
         for l_insight in longitudinal_alerts:
             if l_insight.trigger_type not in current_trigger_types:
                 l_insight.cleared = True
