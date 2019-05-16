@@ -149,6 +149,7 @@ class TrainingPlanManager(object):
         alerts = self.daily_plan.get_alerts()
         insights, longitudinal_insights = AlertsProcessing.aggregate_alerts(self.trigger_date_time,
                                                                             alerts=alerts,
+                                                                            previous_insights=self.daily_plan.insights,
                                                                             exposed_triggers=self.athlete_stats.exposed_triggers,
                                                                             longitudinal_insights=self.athlete_stats.longitudinal_insights)
         self.daily_plan.insights = insights
