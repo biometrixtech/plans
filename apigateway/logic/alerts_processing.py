@@ -20,7 +20,7 @@ class AlertsProcessing(object):
             insight.goal_targeted = list(set(insight.goal_targeted))
             insight.sport_names = list(set(insight.sport_names))
             insight.body_parts = list(set(insight.body_parts))
-            insight.get_title_and_text()
+            insight.add_data()
             if insight.insight_type == InsightType.longitudinal:
                 if insight.trigger_type in existing_longitudinal_trigger_types:
                     existing_insight = [i for i in longitudinal_insights if i.trigger_type == insight.trigger_type][0]
@@ -32,6 +32,8 @@ class AlertsProcessing(object):
                     longitudinal_insights.append(insight)
             else:
                 insight.start_date_time = trigger_date_time
+
+        insights = sorted(insights, key=lambda x: (int(x.read), x.priority, int(x.cleared)))
 
         return insights, longitudinal_insights
 
@@ -94,6 +96,7 @@ class AlertsProcessing(object):
                     insight.severity.append(alert.severity)
                 existing_triggers.append(alert.goal.trigger_type)
                 insights.append(insight)
+
         return insights
 
     @classmethod

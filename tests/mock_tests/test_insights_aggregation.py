@@ -12,7 +12,7 @@ def test_insights_text():
     insight.first = False
     insight.body_parts = [BodyPartSide(BodyPartLocation(11), 1)]
     insight.sport_names = [SportName(13)]
-    insight.get_title_and_text()
+    insight.add_data()
     assert insight.text != ""
     assert insight.title == "Mitigate Overuse Injury"
 
@@ -129,6 +129,8 @@ def test_aggregate_alerts_cleared_one_body_part():
 
     insights, longitudinal_insights = AlertsProcessing.aggregate_alerts(current_date_time, [alert2], [TriggerType(16)], existing_insights)
     assert len(insights) == 2
+    assert not insights[0].cleared
+    assert insights[1].cleared
     assert insights[0].insight_type == InsightType.longitudinal
     assert len(longitudinal_insights) == 1
     assert len(longitudinal_insights[0].body_parts) == 1
