@@ -164,7 +164,10 @@ class TextGenerator(object):
         elif len(body_part_list) == 1:
             body_part_text = body_part_list[0]
         text = text.format(bodypart=body_part_text, sport_name=sport_text, goal=goal_text, severity="moderate")
-        return text[0].upper() + text[1:]
+        if len(text) > 1:
+            return text[0].upper() + text[1:]
+        else:
+            return text
 
     @staticmethod
     def merge_bilaterals(body_part_list):
