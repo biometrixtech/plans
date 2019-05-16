@@ -136,7 +136,7 @@ class HistoricSoreness(BaseSoreness, Serialisable):
         self.cause = SorenessCause.unknown
 
     def __setattr__(self, name, value):
-        if name in ['first_reported_date_time', 'last_reported_date_time']:
+        if name in ['first_reported_date_time', 'last_reported_date_time', 'streak_start_date']:
             if value is not None and not isinstance(value, datetime.datetime):
                 try:
                     value = parse_datetime(value)
@@ -157,7 +157,7 @@ class HistoricSoreness(BaseSoreness, Serialisable):
                    'is_pain': self.is_pain,
                    'side': self.side,
                    'streak': self.streak,
-                   'streak_start_date': self.streak_start_date,
+                   'streak_start_date': format_datetime(self.streak_start_date) if self.streak_start_date is not None else None,
                    'average_severity': self.average_severity,
                    'max_severity': self.max_severity,
                    'max_severity_date_time': format_datetime(self.max_severity_date_time) if self.max_severity_date_time is not None else None,
@@ -179,7 +179,7 @@ class HistoricSoreness(BaseSoreness, Serialisable):
         hist_sore_status = input_dict.get('historic_soreness_status', None)
         soreness.historic_soreness_status = HistoricSorenessStatus(hist_sore_status) if hist_sore_status is not None else HistoricSorenessStatus.dormant_cleared
         soreness.streak = input_dict.get('streak', 0)
-        soreness.streak_start_date = input_dict.get("streak_start_date", None)
+        soreness.streak_start_date = input_dict.get("streak_start_date", None) if input_dict.get("streak_start_date", None) != "" else None
         soreness.average_severity = input_dict.get('average_severity', 0.0)
         soreness.max_severity = input_dict.get('max_severity', None)
         soreness.max_severity_date_time = input_dict.get('max_severity_date_time', None)

@@ -290,7 +290,7 @@ def test_flag_acute_pain_10_days_3_day_gaps_last_reported():
 
     historic_soreness = get_historic_soreness([1, 2, 3, None, None, None, 3], "2018-05-18", historic_soreness)
 
-    assert(datetime(2018, 5, 18, 0, 0) == historic_soreness[0].last_reported)
+    assert(datetime(2018, 5, 18, 0, 0) == historic_soreness[0].last_reported_date_time)
 
 
 def test_flag_acute_pain_10_days_3_day_gaps_question():

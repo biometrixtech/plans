@@ -421,7 +421,7 @@ class StatsProcessing(object):
         if (self.event_date - last_reported_date_time).days > 3:
             historic_soreness.ask_acute_pain_question = True
         if len(body_part_history) > 0:
-            historic_soreness.last_reported = body_part_history[0].reported_date_time
+            historic_soreness.last_reported_date_time = body_part_history[0].reported_date_time
             streak = 0
             for b in body_part_history:
                 if b.reported_date_time >= historic_soreness.streak_start_date:
@@ -654,7 +654,7 @@ class StatsProcessing(object):
             if len(body_part_history) >= 2:
                 for b in range(0, len(body_part_history)-1):
                     if (streak_start_date is None or body_part_history[b].reported_date_time
-                            < parse_date(streak_start_date)):
+                            < streak_start_date):
                         streak_start_date = body_part_history[b].reported_date_time
                     days_skipped = (body_part_history[b].reported_date_time -
                                     body_part_history[b + 1].reported_date_time).days
