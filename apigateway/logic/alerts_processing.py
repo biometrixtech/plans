@@ -33,8 +33,6 @@ class AlertsProcessing(object):
             else:
                 insight.start_date_time = trigger_date_time
 
-        insights = sorted(insights, key=lambda x: (int(x.read), x.priority, int(x.cleared)))
-
         return insights, longitudinal_insights
 
     @classmethod

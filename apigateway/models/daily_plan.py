@@ -222,3 +222,6 @@ class DailyPlan(Serialisable):
             if self.cold_water_immersion is not None:
                 alerts.extend(self.cold_water_immersion.alerts)
         return alerts
+
+    def sort_insights(self):
+        self.insights = sorted(self.insights, key=lambda x: (int(x.read), x.priority, int(x.cleared)))

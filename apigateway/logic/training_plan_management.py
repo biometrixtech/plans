@@ -152,6 +152,7 @@ class TrainingPlanManager(object):
                                                                             exposed_triggers=self.athlete_stats.exposed_triggers,
                                                                             longitudinal_insights=self.athlete_stats.longitudinal_insights)
         self.daily_plan.insights = insights
+        self.daily_plan.sort_insights()
         self.athlete_stats.longitudinal_insights = longitudinal_insights
 
         self.daily_plan_datastore.put(self.daily_plan)

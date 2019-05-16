@@ -3,6 +3,8 @@ from models.insights import AthleteInsight, InsightType
 from models.soreness import TriggerType, BodyPartSide, BodyPartLocation, Alert, AthleteGoal, AthleteGoalType
 from models.sport import SportName
 from logic.alerts_processing import AlertsProcessing
+from models.daily_plan import DailyPlan
+from utils import format_date
 
 
 def test_insights_text():
@@ -147,10 +149,15 @@ def test_aggregate_alerts_cleared_one_body_part():
 
     insights, longitudinal_insights = AlertsProcessing.aggregate_alerts(current_date_time, [alert2], [TriggerType(16)], existing_insights)
     assert len(insights) == 2
-    assert not insights[0].cleared
-    assert insights[1].cleared
     assert insights[0].insight_type == InsightType.longitudinal
     assert len(longitudinal_insights) == 1
     assert len(longitudinal_insights[0].body_parts) == 1
     assert longitudinal_insights[0].body_parts[0].side == 2
     assert not longitudinal_insights[0].cleared
+
+
+    plan = DailyPlan(format_date(current_date_time))
+    plan.insights = insights
+    plan.sort_insights()
+    assert not plan.insights[0].cleared
+    assert plan.insights[1].cleared

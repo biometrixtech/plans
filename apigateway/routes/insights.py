@@ -31,6 +31,7 @@ def handle_insights_read(principal_id):
                 existing_insight.read = True
                 exposed_triggers.add(read_trigger_type)
                 continue
+    plan.sort_insights()
     if len(athlete_stats.exposed_triggers) != len(exposed_triggers):
         athlete_stats.exposed_triggers = list(exposed_triggers)
         DatastoreCollection().athlete_stats_datastore.put(athlete_stats)
