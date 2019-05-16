@@ -22,6 +22,7 @@ class AthleteInsight(Serialisable):
         self.insight_type = self.get_insight_type()
         self.priority = 0
         self.styling = self.get_styling()
+        self.read = False
 
     def json_serialise(self):
         ret = {
@@ -38,7 +39,8 @@ class AthleteInsight(Serialisable):
             'cleared': self.cleared,
             'insight_type': self.insight_type.value,
             'priority': self.priority,
-            'styling': self.styling
+            'styling': self.styling,
+            'read': self.read
         }
         return ret
 
@@ -57,6 +59,7 @@ class AthleteInsight(Serialisable):
         insight.cleared = input_dict.get('cleared', False)
         insight.priority = input_dict.get('priority', 0)
         insight.styling = input_dict.get('styling', 0)
+        insight.read = input_dict.get('read', False)
 
         return insight
 

@@ -20,12 +20,12 @@ def handle_insights_read(principal_id):
     user_id = principal_id
     event_date = parse_datetime(request.json['event_date'])
     plan_event_day = format_date(event_date)
-    plan = DatastoreCollection().daily_plan_datastore.get(user_id, start_date=plan_event_day, end_date=plan_event_day)
+    plan = DatastoreCollection().daily_plan_datastore.get(user_id, start_date=plan_event_day, end_date=plan_event_day)[0]
     athlete_stats = DatastoreCollection().athlete_stats_datastore.get(user_id)
-    exposed_triggers = set(athlete_stats.existing_triggers)
+    exposed_triggers = set(athlete_stats.exposed_triggers)
     insights = request.json['insights']
     for read_insight in insights:
-        read_trigger_type = TriggerType(read_insight.trigger_type)
+        read_trigger_type = TriggerType(read_insight['trigger_type'])
         for existing_insight in plan.insights:
             if read_trigger_type == existing_insight.trigger_type:
                 existing_insight.read = True
