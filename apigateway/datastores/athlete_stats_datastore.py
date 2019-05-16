@@ -1,7 +1,7 @@
 from aws_xray_sdk.core import xray_recorder
 from config import get_mongo_collection
 from models.stats import AthleteStats
-from models.soreness import BodyPartLocation, HistoricSoreness, HistoricSorenessStatus, Soreness, BodyPart
+from models.soreness import BodyPartLocation, HistoricSoreness, HistoricSorenessStatus, Soreness, BodyPart, TriggerType
 from models.delayed_onset_muscle_soreness import DelayedOnsetMuscleSoreness
 from models.metrics import AthleteMetric, MetricType, DailyHighLevelInsight, WeeklyHighLevelInsight, MetricColor, SpecificAction
 from models.training_volume import StandardErrorRange
@@ -121,6 +121,8 @@ class AthleteStatsDatastore(object):
         #athlete_stats.high_relative_load_session_sport_name = mongo_result.get('high_relative_load_session_sport_name', None)
         #athlete_stats.high_relative_intensity_session = mongo_result.get('high_relative_intensity_session', False)
         athlete_stats.high_relative_load_benchmarks = {SportName(value): load for (value, load) in mongo_result.get('high_relative_load_benchmarks', {}).items()}
+        athlete_stats.exposed_triggers = [TriggerType(trigger) for trigger in mongo_result.get('exposed_triggers', [])]
+        athlete_stats.longotudinal_insights = [AthleteInsights.json_deserialise(insight) for insight in mongo_result.get('longotudinal_insights', [])]
         return athlete_stats
 
     @xray_recorder.capture('datastore.AthleteStatsDatastore._put_mongodb')
