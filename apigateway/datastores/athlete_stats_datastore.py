@@ -1,12 +1,12 @@
 from aws_xray_sdk.core import xray_recorder
 from config import get_mongo_collection
 from models.stats import AthleteStats
-from models.soreness import BodyPartLocation, HistoricSoreness, HistoricSorenessStatus, Soreness, BodyPart, TriggerType
+from models.soreness import HistoricSoreness, Soreness, TriggerType
 from models.delayed_onset_muscle_soreness import DelayedOnsetMuscleSoreness
-from models.metrics import AthleteMetric, MetricType, DailyHighLevelInsight, WeeklyHighLevelInsight, MetricColor, SpecificAction
+from models.metrics import AthleteMetric
 from models.training_volume import StandardErrorRange
 from models.sport import SportName
-from utils import parse_datetime
+from models.insights import AthleteInsight
 from fathomapi.utils.exceptions import InvalidSchemaException
 import numbers
 
@@ -93,10 +93,10 @@ class AthleteStatsDatastore(object):
         athlete_stats.internal_acwr = self._standard_error_from_monogodb(mongo_result.get('internal_acwr', None))
         athlete_stats.external_acwr = self._standard_error_from_monogodb(mongo_result.get('external_acwr', None))
 
-        #athlete_stats.functional_strength_eligible = mongo_result.get('functional_strength_eligible', False)
-        #athlete_stats.completed_functional_strength_sessions = mongo_result.get(
+        # athlete_stats.functional_strength_eligible = mongo_result.get('functional_strength_eligible', False)
+        # athlete_stats.completed_functional_strength_sessions = mongo_result.get(
         #    'completed_functional_strength_sessions', 0)
-        #athlete_stats.next_functional_strength_eligible_date = mongo_result.get(
+        # athlete_stats.next_functional_strength_eligible_date = mongo_result.get(
         #    'next_functional_strength_eligible_date', None)
         athlete_stats.current_sport_name = mongo_result.get('current_sport_name', None)
         athlete_stats.current_position = mongo_result.get('current_position', None)
@@ -117,12 +117,12 @@ class AthleteStatsDatastore(object):
         athlete_stats.typical_weekly_sessions = mongo_result.get('typical_weekly_sessions', None)
         athlete_stats.wearable_devices = mongo_result.get('wearable_devices', [])
         athlete_stats.muscular_strain_increasing = mongo_result.get('muscular_strain_increasing', False)
-        #athlete_stats.high_relative_load_session = mongo_result.get('high_relative_load_session', False)
-        #athlete_stats.high_relative_load_session_sport_name = mongo_result.get('high_relative_load_session_sport_name', None)
-        #athlete_stats.high_relative_intensity_session = mongo_result.get('high_relative_intensity_session', False)
+        # athlete_stats.high_relative_load_session = mongo_result.get('high_relative_load_session', False)
+        # athlete_stats.high_relative_load_session_sport_name = mongo_result.get('high_relative_load_session_sport_name', None)
+        # athlete_stats.high_relative_intensity_session = mongo_result.get('high_relative_intensity_session', False)
         athlete_stats.high_relative_load_benchmarks = {SportName(value): load for (value, load) in mongo_result.get('high_relative_load_benchmarks', {}).items()}
         athlete_stats.exposed_triggers = [TriggerType(trigger) for trigger in mongo_result.get('exposed_triggers', [])]
-        athlete_stats.longitudinal_insights = [AthleteInsights.json_deserialise(insight) for insight in mongo_result.get('longitudinal_insights', [])]
+        athlete_stats.longitudinal_insights = [AthleteInsight.json_deserialise(insight) for insight in mongo_result.get('longitudinal_insights', [])]
         return athlete_stats
 
     @xray_recorder.capture('datastore.AthleteStatsDatastore._put_mongodb')
