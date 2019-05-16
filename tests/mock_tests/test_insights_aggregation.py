@@ -35,6 +35,24 @@ def test_aggregate_alerts_first_exposure():
     assert insights[0].insight_type == InsightType.daily
 
 
+def test_aggregate_alerts_multiple_same_body_part():
+    goal = AthleteGoal('Care for Pain', 0, AthleteGoalType(0))
+    goal.trigger_type = TriggerType(14)
+    alert1 = Alert(goal)
+    alert1.body_part = BodyPartSide(BodyPartLocation(11), 1)
+
+    alert2 = Alert(goal)
+    alert2.body_part = BodyPartSide(BodyPartLocation(11), 1)
+    exposed_triggers = []
+
+    alerts = [alert1, alert2]
+    insights, longitudinal_insights = AlertsProcessing.aggregate_alerts(datetime.datetime.now(), alerts, exposed_triggers, [])
+    assert len(insights) == 1
+    assert insights[0].first
+    assert not insights[0].parent
+    assert insights[0].insight_type == InsightType.daily
+    assert len(insights[0].body_parts) == 1
+
 def test_aggregate_alerts_exposed():
     goal = AthleteGoal('Care for Pain', 0, AthleteGoalType(0))
     goal.trigger_type = TriggerType(14)
