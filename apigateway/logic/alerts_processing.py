@@ -1,11 +1,11 @@
 from models.insights import AthleteInsight, InsightType
-from models.soreness import TriggerType
+from models.soreness import TriggerType, BodyPartSide
 
 
 class AlertsProcessing(object):
 
     @classmethod
-    def aggregate_alerts(cls, trigger_date_time, alerts, exposed_triggers, longitudinal_insights):
+    def aggregate_alerts(cls, trigger_date_time, alerts, previous_insights, exposed_triggers, longitudinal_insights):
 
         insights = cls.combine_alerts_to_insights(alerts)
         if TriggerType(9) in exposed_triggers:
@@ -19,8 +19,8 @@ class AlertsProcessing(object):
                     insight.first = True
             insight.goal_targeted = list(set(insight.goal_targeted))
             insight.sport_names = list(set(insight.sport_names))
-            insight.body_parts = list(set(insight.body_parts))
-            insight.get_title_and_text()
+            insight.body_parts = [BodyPartSide.json_deserialise(dict(t)) for t in {tuple(d.json_serialise().items()) for d in insight.body_parts}]
+            insight.add_data()
             if insight.insight_type == InsightType.longitudinal:
                 if insight.trigger_type in existing_longitudinal_trigger_types:
                     existing_insight = [i for i in longitudinal_insights if i.trigger_type == insight.trigger_type][0]
@@ -32,6 +32,7 @@ class AlertsProcessing(object):
                     longitudinal_insights.append(insight)
             else:
                 insight.start_date_time = trigger_date_time
+        insights = cls.combine_new_insights_with_previous(insights, previous_insights)
 
         return insights, longitudinal_insights
 
@@ -45,8 +46,9 @@ class AlertsProcessing(object):
             else:  # if it exists make check to see if body parts contributing to existing insight were cleared
                 current_insight = [insight for insight in new_insights if insight.trigger_type == l_insight.trigger_type][0]
                 cleared_parts = []
+                current_body_parts = [d.json_serialise() for d in current_insight.body_parts]
                 for body_part in l_insight.body_parts:
-                    if body_part not in current_insight.body_parts:
+                    if body_part.json_serialise() not in current_body_parts:
                         cleared_parts.append(body_part)
                 if len(cleared_parts) > 0:   # check if any body part was cleared
                     l_insight.cleared = True
@@ -56,6 +58,18 @@ class AlertsProcessing(object):
         existing_longitudinal_insights = [insight for insight in existing_longitudinal_insights if not insight.cleared]
 
         return new_insights, existing_longitudinal_insights
+
+    @classmethod
+    def combine_new_insights_with_previous(cls, new_insights, previous_insights):
+        current_trigger_types = [insight.trigger_type for insight in new_insights]
+        for old in previous_insights:
+            if old.read and old.trigger_type in current_trigger_types:
+                new = [insight for insight in new_insights if insight.trigger_type == old.trigger_type][0]
+                new_json = new.json_serialise()
+                old_json = old.json_serialise()
+                if new_json['body_parts'] == old_json['body_parts'] and new_json['sport_names'] == old_json['sport_names']:
+                    new.read = True
+        return new_insights
 
     @classmethod
     def combine_alerts_to_insights(cls, alerts):
@@ -94,6 +108,7 @@ class AlertsProcessing(object):
                     insight.severity.append(alert.severity)
                 existing_triggers.append(alert.goal.trigger_type)
                 insights.append(insight)
+
         return insights
 
     @classmethod

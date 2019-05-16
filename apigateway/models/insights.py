@@ -20,7 +20,7 @@ class AthleteInsight(Serialisable):
         self.severity = []
         self.cleared = False
         self.insight_type = self.get_insight_type()
-        self.priority = 0
+        self.priority = None
         self.styling = self.get_styling()
         self.read = False
 
@@ -63,30 +63,31 @@ class AthleteInsight(Serialisable):
 
         return insight
 
-    def get_title_and_text(self):
-        alert_text = InsightsText(self.trigger_type.value).value()
+    def add_data(self):
+        insight_data = InsightsData(self.trigger_type.value).data()
         if self.parent:
             if self.cleared:
                 title = "Symptoms Cleared!"
-                text = alert_text['parent']['clear']
+                text = insight_data['parent']['clear']
             else:
-                title = alert_text['parent']['title']
+                title = insight_data['parent']['title']
                 if self.first:
-                    text = alert_text['parent']['first']
+                    text = insight_data['parent']['first']
                 else:
-                    text = alert_text['parent']['subsequent']
+                    text = insight_data['parent']['subsequent']
         else:
             if self.cleared:
                 title = "Symptoms Cleared!"
-                text = alert_text['child']['clear']
+                text = insight_data['child']['clear']
             else:
-                title = alert_text['child']['title']
+                title = insight_data['child']['title']
                 if self.first:
-                    text = alert_text['child']['first']
+                    text = insight_data['child']['first']
                 else:
-                    text = alert_text['child']['subsequent']
+                    text = insight_data['child']['subsequent']
         self.text = TextGenerator().get_cleaned_text(text, self.goal_targeted, self.body_parts, self.sport_names, severity=self.severity)
         self.title = TextGenerator().get_cleaned_text(title, self.goal_targeted, self.body_parts, self.sport_names, severity=self.severity)
+        self.priority = insight_data['priority']
 
     def get_insight_type(self):
         if self.trigger_type.value in [6, 7, 8, 12, 16, 17, 18, 19, 20]:
@@ -99,6 +100,9 @@ class AthleteInsight(Serialisable):
             return 1
         else:
             return 0
+
+    def get_priority(self):
+        pass
 
     def __setattr__(self, name, value):
         if name in ['start_date_time'] and value is not None and not isinstance(value, datetime.datetime):
@@ -190,13 +194,14 @@ class TextGenerator(object):
         return new_body_part_list
 
 
-class InsightsText(object):
+class InsightsData(object):
     def __init__(self, trigger):
         self.trigger = trigger
 
-    def value(self):
+    def data(self):
         insights = {
             0: {
+                "priority": 8,
                 "parent": {
                     "title": "",
                     "first": "",
@@ -211,6 +216,7 @@ class InsightsText(object):
                 }
             },
             1: {
+                "priority": 8,
                 "parent": {
                     "title": "",
                     "first": "",
@@ -225,6 +231,7 @@ class InsightsText(object):
                 }
             },
             2: {
+                "priority": 8,
                 "parent": {
                     "title": "",
                     "first": "",
@@ -239,6 +246,7 @@ class InsightsText(object):
                 }
             },
             3: {
+                "priority": 8,
                 "parent": {
                     "title": "",
                     "first": "",
@@ -253,6 +261,7 @@ class InsightsText(object):
                 }
             },
             4: {
+                "priority": 8,
                 "parent": {
                     "title": "",
                     "first": "",
@@ -267,6 +276,7 @@ class InsightsText(object):
                 }
             },
             5: {
+                "priority": 8,
                 "parent": {
                     "title": "",
                     "first": "",
@@ -281,6 +291,7 @@ class InsightsText(object):
                 }
             },
             6: {
+                "priority": 7,
                 "parent": {
                     "title": "Signs of Poor Adaptation",
                     "first": "We added activities to {goal} because it seems your body is struggling to adequately adapt to your current training cadence.",
@@ -295,6 +306,7 @@ class InsightsText(object):
                 }
             },
             7: {
+                "priority": 7,
                 "parent": {
                     "title": "Signs of Poor Adaptation",
                     "first": "We added activities to {goal} because it seems your body is struggling to adequately adapt to your current training cadence.",
@@ -309,6 +321,7 @@ class InsightsText(object):
                 }
             },
             8: {
+                "priority": 7,
                 "parent": {
                     "title": "Signs of Poor Adaptation",
                     "first": "We added activities to {goal} because it seems your body is struggling to adequately adapt to your current training cadence.",
@@ -323,6 +336,7 @@ class InsightsText(object):
                 }
             },
             9: {
+                "priority": 9,
                 "parent": {
                     "title": "",
                     "first": "",
@@ -337,6 +351,7 @@ class InsightsText(object):
                 }
             },
             10: {
+                "priority": 9,
                 "parent": {
                     "title": "Recover Faster from DOMS",
                     "first": "We've added activities to {goal} to your plan to help tackle Delayed Onset Muscle Sorness (DOMS). We're constantly learning what recovery activities are most effective for your body given your sports & training intensities. So to help us, please do your best to log completed workouts, Fathom activities, and follow-on-soreness so we can optimize our calculations to help you recover faster.",
@@ -351,6 +366,7 @@ class InsightsText(object):
                 }
             },
             11: {
+                "priority": 9,
                 "parent": {
                     "title": "Recover Faster from DOMS",
                     "first": "We've added activities to {goal} to your plan to help tackle Delayed Onset Muscle Sorness (DOMS). We're constantly learning what recovery activities are most effective for your body given your sports & training intensities. So to help us, please do your best to log completed workouts, Fathom activities, and follow-on-soreness so we can optimize our calculations to help you recover faster.",
@@ -365,6 +381,7 @@ class InsightsText(object):
                 }
             },
             12: {
+                "priority": 99,
                 "parent": {
                     "title": "",
                     "first": "",
@@ -379,6 +396,7 @@ class InsightsText(object):
                 }
             },
             13: {
+                "priority": 99,
                 "parent": {
                     "title": "",
                     "first": "",
@@ -393,6 +411,7 @@ class InsightsText(object):
                 }
             },
             14: {
+                "priority": 4,
                 "parent": {
                     "title": "Listen to your body",
                     "first": "Your pain could be a sign that something is wrong. Please avoid and modify any movements that cause discomfort or aggravate your pain.",
@@ -407,6 +426,7 @@ class InsightsText(object):
                 }
             },
             15: {
+                "priority": 1,
                 "parent": {
                     "title": "Listen to your body",
                     "first": "Your pain could be a sign that something is wrong. Please avoid and modify any movements that cause discomfort or aggravate your pain.",
@@ -421,6 +441,7 @@ class InsightsText(object):
                 }
             },
             21: {
+                "priority": 99,
                 "parent": {
                     "title": "",
                     "first": "",
@@ -435,6 +456,7 @@ class InsightsText(object):
                 }
             },
             22: {
+                "priority": 99,
                 "parent": {
                     "title": "",
                     "first": "",
@@ -449,6 +471,7 @@ class InsightsText(object):
                 }
             },
             16: {
+                "priority": 3,
                 "parent": {
                     "title": "",
                     "first": "",
@@ -463,6 +486,7 @@ class InsightsText(object):
                 }
             },
             17: {
+                "priority": 2,
                 "parent": {
                     "title": "",
                     "first": "",
@@ -477,6 +501,7 @@ class InsightsText(object):
                 }
             },
             18: {
+                "priority": 99,
                 "parent": {
                     "title": "",
                     "first": "",
@@ -491,6 +516,7 @@ class InsightsText(object):
                 }
             },
             19: {
+                "priority": 6,
                 "parent": {
                     "title": "",
                     "first": "",
@@ -505,6 +531,7 @@ class InsightsText(object):
                 }
             },
             20: {
+                "priority": 5,
                 "parent": {
                     "title": "",
                     "first": "",
