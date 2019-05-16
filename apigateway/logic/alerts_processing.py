@@ -54,7 +54,6 @@ class AlertsProcessing(object):
                     l_insight.cleared = True
                     l_insight.body_parts = cleared_parts
                     new_insights.append(l_insight)
-                    existing_longitudinal_insights.append(current_insight)
         existing_longitudinal_insights = [insight for insight in existing_longitudinal_insights if not insight.cleared]
 
         return new_insights, existing_longitudinal_insights
@@ -69,6 +68,8 @@ class AlertsProcessing(object):
                 old_json = old.json_serialise()
                 if new_json['body_parts'] == old_json['body_parts'] and new_json['sport_names'] == old_json['sport_names']:
                     new.read = True
+            if old.cleared:
+                new_insights.append(old)
         return new_insights
 
     @classmethod
