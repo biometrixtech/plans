@@ -72,7 +72,7 @@ class AlertsProcessing(object):
             else:
                 insight.start_date_time = trigger_date_time
 
-        return insights
+        return insights, longitudinal_alerts
 
 
 def parent_group_exists(trigger_type, existing_triggers):
