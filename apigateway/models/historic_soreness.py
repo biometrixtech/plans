@@ -136,7 +136,7 @@ class HistoricSoreness(BaseSoreness, Serialisable):
         self.cause = SorenessCause.unknown
 
     def __setattr__(self, name, value):
-        if name in ['first_reported_date_time']:
+        if name in ['first_reported_date_time', 'last_reported_date_time']:
             if value is not None and not isinstance(value, datetime.datetime):
                 try:
                     value = parse_datetime(value)
@@ -203,12 +203,6 @@ class HistoricSoreness(BaseSoreness, Serialisable):
         soreness.ask_persistent_2_question = input_dict.get("ask_persistent_2_question", False)
 
         return soreness
-
-    @classmethod
-    def get_last_reported_date_from_last_reported(cls, input_dict):
-
-
-        return last_reported_date_time
 
     def is_joint(self):
         if (self.body_part_location == BodyPartLocation.hip_flexor or

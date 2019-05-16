@@ -96,7 +96,12 @@ class Soreness(BaseSoreness, Serialisable):
         self.type = None  # soreness_type
         self.count = 1
         self.streak = 0
+        self.max_severity = None  # muscle_soreness_severity
+        self.max_severity_date_time = None
+        self.causal_session = None
         self.first_reported_date_time = None
+        self.last_reported_date_time = None
+        self.cleared_date_time = None
         self.daily = True
 
     @classmethod
@@ -107,7 +112,12 @@ class Soreness(BaseSoreness, Serialisable):
         soreness.severity = input_dict['severity']
         soreness.movement = input_dict.get('movement', None)
         soreness.side = input_dict.get('side', None)
-        soreness.first_reported_date_time = parse_datetime(input_dict.get('first_reported_date_time', None))
+        soreness.max_severity = input_dict.get('max_severity', None)
+        soreness.first_reported_date_time = input_dict.get('first_reported_date_time', None)
+        soreness.last_reported_date_time = input_dict.get('last_reported_date_time', None)
+        soreness.cleared_date_time = input_dict.get('cleared_date_time', None)
+        soreness.max_severity_date_time = input_dict.get('max_severity_date_time', None)
+        soreness.causal_session = input_dict.get('causal_session', None)
         # if input_dict.get('first_reported_date_time', None) is not None:
         #     soreness.first_reported_date_time = parse_date(input_dict['first_reported_date_time'])
         if input_dict.get('reported_date_time', None) is not None:
@@ -122,7 +132,7 @@ class Soreness(BaseSoreness, Serialisable):
                  self.side == other.side))
 
     def __setattr__(self, name, value):
-        if name in ['first_reported_date_time']:
+        if name in ['first_reported_date_time', 'last_reported_date_time', 'reported_date_time', 'cleared_date_time', 'max_severity_date_time']:
             if value is not None and not isinstance(value, datetime.datetime):
                 try:
                     value = parse_datetime(value)

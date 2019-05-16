@@ -112,7 +112,7 @@ class StatsProcessing(object):
             athlete_stats.daily_severe_pain_event_date = self.event_date
             athlete_stats.typical_weekly_sessions = current_athlete_stats.typical_weekly_sessions
             athlete_stats.wearable_devices = current_athlete_stats.wearable_devices
-            if current_athlete_stats.event_date == self.event_date:
+            if current_athlete_stats.event_date.date() == self.event_date.date():
                 # persist all of soreness/pain and session_RPE
                 athlete_stats.session_RPE = current_athlete_stats.session_RPE
                 athlete_stats.session_RPE_event_date = current_athlete_stats.session_RPE_event_date
@@ -146,7 +146,7 @@ class StatsProcessing(object):
 
     def persist_soreness(self, soreness):
         if soreness.reported_date_time is not None:
-            if (parse_date(self.event_date).date() - soreness.reported_date_time.date()).days <= 1:
+            if (self.event_date.date() - soreness.reported_date_time.date()).days <= 1:
                 return True
             else:
                 return False

@@ -2,11 +2,12 @@ from models.training_volume import FitFatigueStatus
 from serialisable import Serialisable
 from models.sport import SportName, BaseballPosition, BasketballPosition, FootballPosition, LacrossePosition, SoccerPosition, SoftballPosition, FieldHockeyPosition, TrackAndFieldPosition, VolleyballPosition
 from models.session import StrengthConditioningType
-from utils import format_date, parse_date
+from utils import format_date, parse_date, parse_datetime
 from models.historic_soreness import HistoricSeverity, HistoricSoreness
 from models.soreness import HistoricSorenessStatus
 from logic.soreness_processing import SorenessCalculator
 from fathomapi.utils.exceptions import InvalidSchemaException
+import datetime
 
 
 class AthleteStats(Serialisable):
@@ -326,6 +327,12 @@ class AthleteStats(Serialisable):
                 value = SportName(value)
             except ValueError:
                 value = SportName(None)
+        elif name in ['daily_severe_soreness_event_date','daily_severe_pain_event_date']:
+            if value is not None and not isinstance(value, datetime.datetime):
+                try:
+                    value = parse_date(value)
+                except InvalidSchemaException:
+                    value = parse_datetime(value)
         elif name == "current_position":
             if self.current_sport_name.value is None and value is not None:
                 value = StrengthConditioningType(value)
@@ -407,8 +414,8 @@ class AthleteStats(Serialisable):
             'post_session_pain': [s.json_serialise(daily=True) for s in self.post_session_pain],
             'daily_severe_pain': [s.json_serialise(daily=True) for s in self.daily_severe_pain],
             'daily_severe_soreness': [s.json_serialise(daily=True) for s in self.daily_severe_soreness],
-            'daily_severe_soreness_event_date': self.daily_severe_soreness_event_date,
-            'daily_severe_pain_event_date': self.daily_severe_pain_event_date,
+            'daily_severe_soreness_event_date': format_date(self.daily_severe_soreness_event_date),
+            'daily_severe_pain_event_date': format_date(self.daily_severe_pain_event_date),
             #'delayed_onset_muscle_soreness': [s.json_serialise() for s in self.delayed_onset_muscle_soreness],
             'metrics': [m.json_serialise() for m in self.metrics],
             'typical_weekly_sessions': self.typical_weekly_sessions,
