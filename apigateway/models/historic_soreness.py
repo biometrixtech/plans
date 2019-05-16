@@ -39,6 +39,7 @@ class HistoricSeverity(object):
         super().__setattr__(name, value)
 
 
+'''
 class DelayedOnsetMuscleSoreness(object):
     def __init__(self):
         self.user_id = None
@@ -89,7 +90,7 @@ class DelayedOnsetMuscleSoreness(object):
             if value is not None and not isinstance(value, datetime.datetime):
                 value = parse_datetime(value)
         super().__setattr__(name, value)
-
+'''
 
 class CoOccurrence(object):
     def __init__(self):
@@ -127,7 +128,7 @@ class HistoricSoreness(BaseSoreness, Serialisable):
         self.first_reported_date_time = None
         self.last_reported_date_time = None
         self.cleared_date_time = None
-        self.last_reported = ""
+        #self.last_reported = ""
         self.ask_acute_pain_question = False
         self.ask_persistent_2_question = False
         self.co_occurrences = []
@@ -158,10 +159,17 @@ class HistoricSoreness(BaseSoreness, Serialisable):
                    'streak': self.streak,
                    'streak_start_date': self.streak_start_date,
                    'average_severity': self.average_severity,
+                   'max_severity': self.max_severity,
+                   'max_severity_date_time': format_datetime(self.max_severity_date_time) if self.max_severity_date_time is not None else None,
+                   'causal_session': self.causal_session.json_serialise() if self.causal_session is not None else None,
                    'first_reported_date_time': format_datetime(self.first_reported_date_time) if self.first_reported_date_time is not None else None,
-                   'last_reported': self.last_reported,
+                   'last_reported_date_time': format_datetime(self.last_reported_date_time) if self.last_reported_date_time is not None else None,
+                   'cleared_date_time': format_datetime(self.cleared_date_time) if self.cleared_date_time is not None else None,
+                   'historic_severity': [hist.json_serialise() for hist in self.historic_severity],
+                   #'last_reported': self.last_reported,
                    'ask_acute_pain_question': self.ask_acute_pain_question,
-                   'ask_persistent_2_question': self.ask_persistent_2_question
+                   'ask_persistent_2_question': self.ask_persistent_2_question,
+                   'cause': self.cause.value
                   }
         return ret
 
@@ -173,12 +181,34 @@ class HistoricSoreness(BaseSoreness, Serialisable):
         soreness.streak = input_dict.get('streak', 0)
         soreness.streak_start_date = input_dict.get("streak_start_date", None)
         soreness.average_severity = input_dict.get('average_severity', 0.0)
+        soreness.max_severity = input_dict.get('max_severity', None)
+        soreness.max_severity_date_time = input_dict.get('max_severity_date_time', None)
         soreness.first_reported_date_time = input_dict.get("first_reported_date_time", None) if input_dict.get("first_reported_date_time", None) != "" else None
-        soreness.last_reported = input_dict.get("last_reported", "")
+        #soreness.last_reported = input_dict.get("last_reported", "")
+        soreness.causal_session = Session.json_deserialise(input_dict['causal_session']) if input_dict.get(
+            'causal_session', None) is not None else None
+        soreness.first_reported_date_time = input_dict.get('first_reported_date_time', None)
+
+        last_reported_date_time = input_dict.get('last_reported_date_time', None)
+        if last_reported_date_time is None:
+            last_reported = input_dict.get("last_reported", "")
+            if last_reported != "":
+                last_reported_date_time = parse_date(last_reported)
+
+        soreness.last_reported_date_time = last_reported_date_time
+        soreness.cleared_date_time = input_dict.get('cleared_date_time', None)
+        soreness.historic_severity = [HistoricSeverity.json_deserialise(hist) for hist in
+                                      input_dict['historic_severity']]
         soreness.ask_acute_pain_question = input_dict.get("ask_acute_pain_question", False)
         soreness.ask_persistent_2_question = input_dict.get("ask_persistent_2_question", False)
 
         return soreness
+
+    @classmethod
+    def get_last_reported_date_from_last_reported(cls, input_dict):
+
+
+        return last_reported_date_time
 
     def is_joint(self):
         if (self.body_part_location == BodyPartLocation.hip_flexor or

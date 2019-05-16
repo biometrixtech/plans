@@ -107,7 +107,7 @@ class Soreness(BaseSoreness, Serialisable):
         soreness.severity = input_dict['severity']
         soreness.movement = input_dict.get('movement', None)
         soreness.side = input_dict.get('side', None)
-        soreness.first_reported_date_time = input_dict.get('first_reported_date_time', None)
+        soreness.first_reported_date_time = parse_datetime(input_dict.get('first_reported_date_time', None))
         # if input_dict.get('first_reported_date_time', None) is not None:
         #     soreness.first_reported_date_time = parse_date(input_dict['first_reported_date_time'])
         if input_dict.get('reported_date_time', None) is not None:

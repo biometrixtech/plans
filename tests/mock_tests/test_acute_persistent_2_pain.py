@@ -27,7 +27,7 @@ def get_soreness_list(body_part_location, side, severity, is_pain, days=None, da
 
     soreness_list = []
 
-    initial_reported_date = parse_date(date) - timedelta(days=(len(severity)-1))
+    initial_reported_date = date - timedelta(days=(len(severity)-1))
 
     for x in range(0, len(severity)):
 
@@ -40,7 +40,8 @@ def get_soreness_list(body_part_location, side, severity, is_pain, days=None, da
 
             current_date = initial_reported_date + timedelta(days=x)
 
-            soreness.reported_date_time = format_date(current_date)
+            #soreness.reported_date_time = format_date(current_date)
+            soreness.reported_date_time = current_date
             soreness_list.append(soreness)
 
     return soreness_list
@@ -59,9 +60,9 @@ def extend_with_nones(existing_list, number_of_nones):
 
 def get_historic_soreness(severity_list, date, historic_soreness=None, is_pain=True):
 
-    soreness_list = get_soreness_list(BodyPartLocation.achilles, 1, severity_list, is_pain, date=date)
+    soreness_list = get_soreness_list(BodyPartLocation.achilles, 1, severity_list, is_pain, date=parse_date(date))
 
-    stats_processing = StatsProcessing("tester", date, DatastoreCollection())
+    stats_processing = StatsProcessing("tester", parse_date(date), DatastoreCollection())
 
     historic_soreness = stats_processing.get_historic_soreness_list(soreness_list,historic_soreness)
 
@@ -70,28 +71,28 @@ def get_historic_soreness(severity_list, date, historic_soreness=None, is_pain=T
 
 def get_historic_soreness_and_answer_acute_question(severity_list, date, historic_soreness=None):
 
-    soreness_list = get_soreness_list(BodyPartLocation.achilles, 1, severity_list, True, date=date)
+    soreness_list = get_soreness_list(BodyPartLocation.achilles, 1, severity_list, True, date=parse_date(date))
 
-    stats_processing = StatsProcessing("tester", date, DatastoreCollection())
+    stats_processing = StatsProcessing("tester", parse_date(date), DatastoreCollection())
 
     historic_soreness = stats_processing.get_historic_soreness_list(soreness_list,historic_soreness)
 
     historic_soreness = stats_processing.answer_acute_pain_question(historic_soreness, soreness_list, BodyPartLocation.achilles, 1,
-                                                                    True, date, 2)
+                                                                    True, parse_date(date), 2)
 
     return historic_soreness
 
 
 def get_historic_soreness_and_answer_pers2_question(severity_list, date, historic_soreness=None, is_pain=True):
 
-    soreness_list = get_soreness_list(BodyPartLocation.achilles, 1, severity_list, is_pain, date=date)
+    soreness_list = get_soreness_list(BodyPartLocation.achilles, 1, severity_list, is_pain, date=parse_date(date))
 
-    stats_processing = StatsProcessing("tester", date, DatastoreCollection())
+    stats_processing = StatsProcessing("tester", parse_date(date), DatastoreCollection())
 
     historic_soreness = stats_processing.get_historic_soreness_list(soreness_list,historic_soreness)
 
     historic_soreness = stats_processing.answer_persistent_2_question(historic_soreness, soreness_list, BodyPartLocation.achilles, 1,
-                                                                      is_pain, date, 1, historic_soreness[0].historic_soreness_status)
+                                                                      is_pain, parse_date(date), 1, historic_soreness[0].historic_soreness_status)
 
     return historic_soreness
 
@@ -289,7 +290,7 @@ def test_flag_acute_pain_10_days_3_day_gaps_last_reported():
 
     historic_soreness = get_historic_soreness([1, 2, 3, None, None, None, 3], "2018-05-18", historic_soreness)
 
-    assert("2018-05-18" == historic_soreness[0].last_reported)
+    assert(datetime(2018, 5, 18, 0, 0) == historic_soreness[0].last_reported)
 
 
 def test_flag_acute_pain_10_days_3_day_gaps_question():

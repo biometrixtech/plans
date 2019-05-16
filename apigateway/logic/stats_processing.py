@@ -58,8 +58,10 @@ class StatsProcessing(object):
         self.historic_data_loaded = False
 
     def set_start_end_times(self):
-        start_date = datetime.strptime(self.event_date, "%Y-%m-%d")
-        end_date = datetime.strptime(self.event_date, "%Y-%m-%d")
+        #start_date = datetime.strptime(self.event_date, "%Y-%m-%d")
+        #end_date = datetime.strptime(self.event_date, "%Y-%m-%d")
+        start_date = self.event_date
+        end_date = self.event_date
         self.start_date_time = start_date - timedelta(days=35)  # used to be 28, this allows for non-overlapping 7/28
         self.end_date_time = end_date + timedelta(days=1)
         self.start_date = self.start_date_time.strftime('%Y-%m-%d')
@@ -179,7 +181,7 @@ class StatsProcessing(object):
         ns = namedtuple("ns", ["location", "side", "is_pain"])
 
         first_reported_date_time = None
-        last_reported_date = None
+        #last_reported_date = None
         last_reported_date_time = None
         days_since_last_report = None
 
@@ -192,10 +194,10 @@ class StatsProcessing(object):
                 grouped_soreness[ns_new] = 1
             # if last_reported_date_time is None:
             #     first_reported_date_time = s.reported_date_time
-            if last_reported_date_time is None or parse_date(s.reported_date_time) > last_reported_date_time:
-                last_reported_date_time = parse_date(s.reported_date_time)
-                last_reported_date = s.reported_date_time
-                days_since_last_report = (parse_date(self.event_date) - last_reported_date_time).days
+            if last_reported_date_time is None or s.reported_date_time > last_reported_date_time:
+                last_reported_date_time = s.reported_date_time
+                #last_reported_date = s.reported_date_time
+                days_since_last_report = (self.event_date - last_reported_date_time).days
 
         for g in grouped_soreness:
 
@@ -222,17 +224,20 @@ class StatsProcessing(object):
 
             if len(body_part_history) > 0:
                 first_reported_date_time = min([s.reported_date_time for s in body_part_history])
-                last_reported_date = max(historic_soreness.last_reported, body_part_history[0].reported_date_time)
+                if historic_soreness.last_reported_date_time is not None:
+                    last_reported_date_time = max(historic_soreness.last_reported_date_time, body_part_history[0].reported_date_time)
+                else:
+                    last_reported_date_time = body_part_history[0].reported_date_time
                 if historic_soreness.first_reported_date_time is None:
                     historic_soreness.first_reported_date_time = first_reported_date_time
-                if historic_soreness.last_reported == last_reported_date and \
-                   historic_soreness.last_reported != body_part_history[0].reported_date_time and \
+                if historic_soreness.last_reported_date_time == last_reported_date_time and \
+                   historic_soreness.last_reported_date_time != body_part_history[0].reported_date_time and \
                    historic_soreness.historic_soreness_status == HistoricSorenessStatus.dormant_cleared:
                     body_part_history = []
 
             for b in range(0, len(body_part_history)):
 
-                days_diff = (parse_date(self.event_date) - parse_date(body_part_history[b].reported_date_time)).days
+                days_diff = (self.event_date - body_part_history[b].reported_date_time).days
 
                 if days_diff < 14:
                     last_fourteen_day_count += 1
@@ -244,7 +249,7 @@ class StatsProcessing(object):
             if historic_soreness.is_acute_pain():
 
                 historic_soreness = self.process_acute_pain_status(body_part_history, historic_soreness,
-                                                                   last_reported_date)
+                                                                   last_reported_date_time)
 
                 acute_pain_list.append(historic_soreness)
 
@@ -255,12 +260,12 @@ class StatsProcessing(object):
                                                                      historic_soreness,
                                                                      last_eight_seventeen_day_count,
                                                                      last_fourteen_day_count,
-                                                                     last_reported_date, last_ten_day_count)
+                                                                     last_reported_date_time, last_ten_day_count)
                 acute_pain_list.append(historic_soreness)
 
             elif historic_soreness.is_persistent_pain() or historic_soreness.is_persistent_soreness():
 
-                historic_soreness = self.process_persistent_status(g.is_pain, historic_soreness, last_reported_date, last_ten_day_count,
+                historic_soreness = self.process_persistent_status(g.is_pain, historic_soreness, last_reported_date_time, last_ten_day_count,
                                                                    body_part_history)
                 acute_pain_list.append(historic_soreness)
 
@@ -271,12 +276,12 @@ class StatsProcessing(object):
 
                     for b in range(0, len(body_part_history)):
                         if days_skipped <= 3:
-                            if (streak_start_date is None or parse_date(body_part_history[b].reported_date_time)
-                                    < parse_date(streak_start_date)):
+                            if (streak_start_date is None or body_part_history[b].reported_date_time
+                                    < streak_start_date):
                                 streak_start_date = body_part_history[b].reported_date_time
                             if b < (len(body_part_history) - 1):
-                                days_skipped = (parse_date(body_part_history[b].reported_date_time) -
-                                                parse_date(body_part_history[b + 1].reported_date_time)).days
+                                days_skipped = (body_part_history[b].reported_date_time -
+                                                body_part_history[b + 1].reported_date_time).days
 
                             streak += 1
 
@@ -292,7 +297,7 @@ class StatsProcessing(object):
                     soreness.ask_persistent_2_question = False
                     soreness.average_severity = avg_severity
                     soreness.first_reported_date_time = first_reported_date_time
-                    soreness.last_reported = last_reported_date
+                    soreness.last_reported_date_time = last_reported_date_time
                     soreness.streak_start_date = streak_start_date
                     soreness.streak = streak
                     acute_pain_list.append(soreness)
@@ -309,7 +314,7 @@ class StatsProcessing(object):
                     soreness.ask_persistent_2_question = False
                     soreness.average_severity = avg_severity
                     soreness.first_reported_date_time = first_reported_date_time
-                    soreness.last_reported = last_reported_date
+                    soreness.last_reported_date_time = last_reported_date_time
                     soreness.streak_start_date = streak_start_date
 
                     acute_pain_list.append(soreness)
@@ -331,7 +336,7 @@ class StatsProcessing(object):
                     soreness.ask_persistent_2_question = False
                     soreness.average_severity = avg_severity
                     soreness.first_reported_date_time = first_reported_date_time
-                    soreness.last_reported = last_reported_date
+                    soreness.last_reported_date_time = last_reported_date_time
                     soreness.streak_start_date = None
 
                     acute_pain_list.append(soreness)
@@ -353,7 +358,7 @@ class StatsProcessing(object):
                     soreness.ask_persistent_2_question = False
                     soreness.average_severity = avg_severity
                     soreness.first_reported_date_time = first_reported_date_time
-                    soreness.last_reported = last_reported_date
+                    soreness.last_reported_date_time = last_reported_date_time
                     soreness.streak_start_date = None
 
                     acute_pain_list.append(soreness)
@@ -367,7 +372,7 @@ class StatsProcessing(object):
                     soreness.ask_persistent_2_question = False
                     soreness.average_severity = avg_severity
                     soreness.first_reported_date_time = first_reported_date_time
-                    soreness.last_reported = last_reported_date
+                    soreness.last_reported_date_time = last_reported_date_time
                     soreness.streak_start_date = None
 
                     acute_pain_list.append(soreness)
@@ -385,7 +390,7 @@ class StatsProcessing(object):
                     soreness.ask_persistent_2_question = False
                     soreness.average_severity = avg_severity
                     soreness.first_reported_date_time = first_reported_date_time
-                    soreness.last_reported = last_reported_date
+                    soreness.last_reported_date_time = last_reported_date_time
                     soreness.streak_start_date = None
 
                     acute_pain_list.append(soreness)
@@ -399,33 +404,36 @@ class StatsProcessing(object):
                     soreness.ask_persistent_2_question = False
                     soreness.average_severity = 0.0
                     soreness.first_reported_date_time = first_reported_date_time
-                    soreness.last_reported = last_reported_date
+                    soreness.last_reported_date_time = last_reported_date_time
                     soreness.streak_start_date = None
 
                     acute_pain_list.append(soreness)
 
         return acute_pain_list
 
-    def process_acute_pain_status(self, body_part_history, historic_soreness, last_reported_date):
+    def process_acute_pain_status(self, body_part_history, historic_soreness, last_reported_date_time):
 
         if len(body_part_history) > 0:
-            last_reported_date = max(historic_soreness.last_reported, body_part_history[0].reported_date_time)
-        if (parse_date(self.event_date) - parse_date(last_reported_date)).days > 3:
+            if historic_soreness.last_reported_date_time is not None:
+                last_reported_date_time = max(historic_soreness.last_reported_date_time, body_part_history[0].reported_date_time)
+            else:
+                last_reported_date_time = body_part_history[0].reported_date_time
+        if (self.event_date - last_reported_date_time).days > 3:
             historic_soreness.ask_acute_pain_question = True
         if len(body_part_history) > 0:
             historic_soreness.last_reported = body_part_history[0].reported_date_time
             streak = 0
             for b in body_part_history:
-                if parse_date(b.reported_date_time) >= parse_date(historic_soreness.streak_start_date):
+                if b.reported_date_time >= historic_soreness.streak_start_date:
                     streak += 1
             historic_soreness.streak = streak
             historic_soreness.average_severity = self.calc_avg_severity_acute_pain(body_part_history, streak)
-        if ((parse_date(last_reported_date) - parse_date(historic_soreness.streak_start_date)).days >= 7
+        if ((last_reported_date_time - historic_soreness.streak_start_date).days >= 7
                 and not historic_soreness.ask_acute_pain_question):
             historic_soreness.historic_soreness_status = HistoricSorenessStatus.persistent_2_pain
             historic_soreness.average_severity = self.calc_avg_severity_persistent_2(body_part_history,
                                                                                      self.event_date)
-        elif ((parse_date(self.event_date) - parse_date(historic_soreness.streak_start_date)).days >= 7
+        elif ((self.event_date - historic_soreness.streak_start_date).days >= 7
               and not historic_soreness.ask_acute_pain_question):
             historic_soreness.historic_soreness_status = HistoricSorenessStatus.acute_pain
             historic_soreness.average_severity = self.calc_avg_severity_persistent_2(body_part_history,
@@ -434,7 +442,7 @@ class StatsProcessing(object):
         return historic_soreness
 
     def process_persistent_2_status(self, body_part_history, days_diff, is_pain, historic_soreness,
-                                    last_eight_seventeen_day_count, last_fourteen_day_count, last_reported_date,
+                                    last_eight_seventeen_day_count, last_fourteen_day_count, last_reported_date_time,
                                     last_ten_day_count):
         if last_fourteen_day_count == 0:
             if is_pain:
@@ -457,15 +465,15 @@ class StatsProcessing(object):
                 historic_soreness.ask_persistent_2_question = False
                 historic_soreness.streak_start_date = None
         historic_soreness.average_severity = self.calc_avg_severity_persistent_2(body_part_history, self.event_date)
-        historic_soreness.last_reported = last_reported_date
+        historic_soreness.last_reported_date_time = last_reported_date_time
         return historic_soreness
 
     def process_persistent_status(self, is_pain, historic_soreness, last_reported_date, last_ten_day_count,
                                   body_part_history):
-        if (parse_date(self.event_date) - parse_date(last_reported_date)).days > 14:
+        if (self.event_date - last_reported_date).days > 14:
             historic_soreness.ask_persistent_2_question = True  # same question even though different status
         if len(body_part_history) > 0:
-            historic_soreness.last_reported = body_part_history[0].reported_date_time
+            historic_soreness.last_reported_date_time = body_part_history[0].reported_date_time
         if last_ten_day_count > 3:
             if is_pain:
                 historic_soreness.historic_soreness_status = HistoricSorenessStatus.persistent_2_pain
@@ -484,8 +492,7 @@ class StatsProcessing(object):
 
         last_day_in_streak = body_part_history[0].reported_date_time
         for b in range(0, streak):
-            days_difference = (
-                        parse_date(last_day_in_streak) - parse_date(body_part_history[b].reported_date_time)).days
+            days_difference = (last_day_in_streak - body_part_history[b].reported_date_time).days
             severity += body_part_history[b].severity * (math.exp(-1.0 * days_difference))
             denom_sum += math.exp(-1.0 * days_difference)
         avg_severity = severity / float(denom_sum)
@@ -499,10 +506,10 @@ class StatsProcessing(object):
         severity = 0.0
 
         for b in range(0, 10):
-            days_ago = parse_date(current_date) - timedelta(days=b)
+            days_ago = current_date - timedelta(days=b)
 
             for h in body_part_history:
-                if parse_date(h.reported_date_time) == days_ago:
+                if h.reported_date_time == days_ago:
                     severity += h.severity * (math.exp(-0.7 * b))
                     denom_sum += math.exp(-0.7 * b)
         if denom_sum > 0:
@@ -524,7 +531,7 @@ class StatsProcessing(object):
 
         for b in range(0, len(body_part_history)):
 
-            days_diff = (parse_date(self.event_date) - parse_date(body_part_history[b].reported_date_time)).days
+            days_diff = (self.event_date - body_part_history[b].reported_date_time).days
 
             if days_diff < 14:
                 last_fourteen_day_count += 1
@@ -550,16 +557,16 @@ class StatsProcessing(object):
                         last_fourteen_day_count += 1
                         e.ask_acute_pain_question = False
                         # should we migrate to persistent-2?
-                        if (parse_date(question_response_date) - parse_date(e.streak_start_date)).days >= 7:
+                        if (question_response_date - e.streak_start_date).days >= 7:
                             e.historic_soreness_status = HistoricSorenessStatus.persistent_2_pain
-                        if (parse_date(question_response_date) - parse_date(e.streak_start_date)).days == 6:
+                        if (question_response_date - e.streak_start_date).days == 6:
                             e.historic_soreness_status = HistoricSorenessStatus.acute_pain
                             e.streak += 1
                             e.average_severity = self.calc_avg_severity_acute_pain(body_part_history, e.streak)
                         else:
                             e.streak += 1
                     else:
-                        e.last_reported = question_response_date
+                        e.last_reported_date_time = question_response_date
                         e.ask_acute_pain_question = False
                         e.historic_soreness_status = HistoricSorenessStatus.dormant_cleared
 
@@ -615,7 +622,7 @@ class StatsProcessing(object):
                         e.ask_persistent_2_question = False
 
                     else:
-                        e.last_reported = question_response_date
+                        e.last_reported_date_time = question_response_date
                         e.ask_persistent_2_question = False
                         e.historic_soreness_status = HistoricSorenessStatus.dormant_cleared
 
@@ -646,11 +653,11 @@ class StatsProcessing(object):
             severity = 0.0
             if len(body_part_history) >= 2:
                 for b in range(0, len(body_part_history)-1):
-                    if (streak_start_date is None or parse_date(body_part_history[b].reported_date_time)
+                    if (streak_start_date is None or body_part_history[b].reported_date_time
                             < parse_date(streak_start_date)):
                         streak_start_date = body_part_history[b].reported_date_time
-                    days_skipped = (parse_date(body_part_history[b].reported_date_time) -
-                                    parse_date(body_part_history[b + 1].reported_date_time)).days
+                    days_skipped = (body_part_history[b].reported_date_time -
+                                    body_part_history[b + 1].reported_date_time).days
 
                     if days_skipped <= 3:
                         streak += 1
@@ -758,7 +765,8 @@ class StatsProcessing(object):
         for c in survey_list:
 
             for s in c.soreness:
-                s.reported_date_time = format_date(c.event_date)
+                #s.reported_date_time = format_date(c.event_date)
+                s.reported_date_time = c.event_date
                 soreness_list.append(s)
 
         return soreness_list
@@ -1060,8 +1068,8 @@ class StatsProcessing(object):
             acute_days_adjustment = 7
 
         adjustment_factor = 0
-        if self.latest_plan_date is not None and parse_date(self.event_date) > self.latest_plan_date:
-            adjustment_factor = (parse_date(self.event_date) - self.latest_plan_date).days
+        if self.latest_plan_date is not None and self.event_date > self.latest_plan_date:
+            adjustment_factor = (self.event_date - self.latest_plan_date).days
 
         if self.acute_days is not None and self.chronic_days is not None:
             self.acute_start_date_time = self.end_date_time - timedelta(days=self.acute_days + adjustment_factor)

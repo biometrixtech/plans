@@ -156,7 +156,7 @@ def test_create_session_hr_data():
 def test_patch_daily_and_historic_soreness_higher_soreness():
     current_time = datetime.datetime.now()
     athlete_stats = AthleteStats('test')
-    athlete_stats.event_date = format_date(current_time)
+    athlete_stats.event_date = current_time
     athlete_stats.readiness_soreness = [get_soreness(7, 1, False, 2)]
     athlete_stats.daily_severe_soreness = [get_soreness(7, 1, False, 2)]
 
@@ -173,7 +173,7 @@ def test_patch_daily_and_historic_soreness_higher_soreness():
 def test_patch_daily_and_historic_soreness_lower_soreness():
     current_time = datetime.datetime.now()
     athlete_stats = AthleteStats('test')
-    athlete_stats.event_date = format_date(current_time)
+    athlete_stats.event_date = current_time
     athlete_stats.readiness_soreness = [get_soreness(7, 1, False, 3, reported_date_time=current_time - datetime.timedelta(days=1))]
     athlete_stats.daily_severe_soreness = [get_soreness(7, 1, False, 3, reported_date_time=current_time - datetime.timedelta(days=1))]
 
@@ -190,7 +190,7 @@ def test_patch_daily_and_historic_soreness_lower_soreness():
 def test_session_from_survey():
     current_time = datetime.datetime.now()
     athlete_stats = AthleteStats('test')
-    athlete_stats.event_date = format_date(current_time)
+    athlete_stats.event_date = current_time
     survey_processor = SurveyProcessing('test', current_time, athlete_stats)
     session_data = get_session_data()
     del session_data['hr_data']
@@ -209,7 +209,7 @@ def test_session_from_survey():
 def test_session_from_survey_hr_data():
     current_time = datetime.datetime.now()
     athlete_stats = AthleteStats('test')
-    athlete_stats.event_date = format_date(current_time)
+    athlete_stats.event_date = current_time
     survey_processor = SurveyProcessing('test', current_time, athlete_stats)
     session_data = get_session_data()
     survey_processor.create_session_from_survey(session_data)
@@ -226,7 +226,7 @@ def test_session_from_survey_hr_data():
 def test_session_from_survey_no_ps_survey():
     current_time = datetime.datetime.now()
     athlete_stats = AthleteStats('test')
-    athlete_stats.event_date = format_date(current_time)
+    athlete_stats.event_date = current_time
     survey_processor = SurveyProcessing('test', current_time, athlete_stats)
     session_data = get_session_data()
     del session_data['post_session_survey']
@@ -244,7 +244,7 @@ def test_session_from_survey_no_ps_survey():
 def test_session_from_survey_historic_health_data():
     current_time = datetime.datetime.now()
     athlete_stats = AthleteStats('test')
-    athlete_stats.event_date = format_date(current_time)
+    athlete_stats.event_date = current_time
     survey_processor = SurveyProcessing('test', current_time, athlete_stats)
     session_data = get_session_data()
     session_obj = survey_processor.create_session_from_survey(session_data, historic_health_data=True)
@@ -262,7 +262,7 @@ def test_session_from_survey_historic_health_data():
 def test_patch_daily_and_historic_soreness_no_existing_doms():
     current_time = datetime.datetime.now()
     athlete_stats = AthleteStats('test')
-    athlete_stats.event_date = format_date(current_time)
+    athlete_stats.event_date = current_time
     athlete_stats.historic_soreness = []
 
     survey_processor = SurveyProcessing('test', current_time, athlete_stats)
@@ -279,7 +279,7 @@ def test_patch_daily_and_historic_soreness_no_existing_doms():
 def test_patch_daily_and_historic_soreness_existing_doms_higher_severity():
     event_date_time = datetime.datetime.now() - datetime.timedelta(days=1)
     athlete_stats = AthleteStats('test')
-    athlete_stats.event_date = format_date(event_date_time)
+    athlete_stats.event_date = event_date_time
     athlete_stats.historic_soreness = []
 
     survey_processor = SurveyProcessing('test', event_date_time, athlete_stats)
@@ -304,7 +304,7 @@ def test_patch_daily_and_historic_soreness_existing_doms_higher_severity():
 def test_patch_daily_and_historic_soreness_existing_doms_same_severity():
     event_date_time = datetime.datetime.now()
     athlete_stats = AthleteStats('test')
-    athlete_stats.event_date = format_date(event_date_time)
+    athlete_stats.event_date = event_date_time
     athlete_stats.historic_soreness = []
 
     survey_processor = SurveyProcessing('test', event_date_time, athlete_stats)
@@ -329,7 +329,7 @@ def test_patch_daily_and_historic_soreness_existing_doms_same_severity():
 def test_patch_daily_and_historic_soreness_existing_doms_pain_reported():
     event_date_time = datetime.datetime.now() - datetime.timedelta(days=1)
     athlete_stats = AthleteStats('test')
-    athlete_stats.event_date = format_date(event_date_time)
+    athlete_stats.event_date = event_date_time
     athlete_stats.historic_soreness = []
 
     survey_processor = SurveyProcessing('test', event_date_time, athlete_stats)
@@ -354,7 +354,7 @@ def test_patch_daily_and_historic_soreness_existing_doms_pain_reported():
 def test_patch_daily_and_historic_soreness_existing_doms_new_body_part():
     event_date_time = datetime.datetime.now() - datetime.timedelta(days=1)
     athlete_stats = AthleteStats('test')
-    athlete_stats.event_date = format_date(event_date_time)
+    athlete_stats.event_date = event_date_time
     athlete_stats.historic_soreness = []
 
     survey_processor = SurveyProcessing('test', event_date_time, athlete_stats)
@@ -383,7 +383,7 @@ def test_patch_daily_and_historic_soreness_existing_doms_new_body_part():
 def test_patch_daily_and_historic_soreness_existing_doms_new_body_part_clear_old():
     event_date_time = datetime.datetime.now() - datetime.timedelta(days=1) + datetime.timedelta(seconds=120)
     athlete_stats = AthleteStats('test')
-    athlete_stats.event_date = format_date(event_date_time)
+    athlete_stats.event_date = event_date_time
     athlete_stats.historic_soreness = []
 
     survey_processor = SurveyProcessing('test', event_date_time, athlete_stats)
@@ -407,7 +407,7 @@ def test_patch_daily_and_historic_soreness_existing_doms_new_body_part_clear_old
 def test_patch_daily_and_historic_soreness_joint():
     current_time = datetime.datetime.now()
     athlete_stats = AthleteStats('test')
-    athlete_stats.event_date = format_date(current_time)
+    athlete_stats.event_date = current_time
     athlete_stats.historic_soreness = []
 
     survey_processor = SurveyProcessing('test', datetime.datetime.now(), athlete_stats)

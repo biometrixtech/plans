@@ -95,7 +95,7 @@ class AthleteStats(Serialisable):
             if (h.body_part_location == soreness.body_part.location and
                     h.side == soreness.side and h.is_pain == soreness.pain):
                 # was historic_soreness already updated today?
-                if format_date(event_date) != h.last_reported:  # not updated
+                if event_date != h.last_reported_date_time:  # not updated
                     if h.is_pain:
                         if h.historic_soreness_status == HistoricSorenessStatus.almost_persistent_pain:
                             h.historic_soreness_status = HistoricSorenessStatus.persistent_pain
@@ -110,7 +110,7 @@ class AthleteStats(Serialisable):
                             h.historic_soreness_status = HistoricSorenessStatus.persistent_2_soreness
                         else:
                             break
-                    h.last_reported = event_date
+                    h.last_reported_date_time = event_date
                     # weighted average
                     h.average_severity = round(h.average_severity * float(h.streak) / (float(h.streak) + 1) +
                                                soreness_calc.get_severity(soreness.severity, soreness.movement) * float(1) / (float(h.streak) + 1), 2)
@@ -139,7 +139,7 @@ class AthleteStats(Serialisable):
 
     def persist_soreness(self, soreness, days=1):
         if soreness.reported_date_time is not None:
-            if (parse_date(self.event_date).date() - soreness.reported_date_time.date()).days <= days:
+            if (self.event_date.date() - soreness.reported_date_time.date()).days <= days:
                 return True
             else:
                 return False
@@ -360,7 +360,7 @@ class AthleteStats(Serialisable):
     def json_serialise(self):
         ret = {
             'athlete_id': self.athlete_id,
-            'event_date': self.event_date,
+            'event_date': format_date(self.event_date),
             'session_RPE': self.session_RPE,
             'session_RPE_event_date': self.session_RPE_event_date,
             'acute_avg_RPE': self.acute_avg_RPE,

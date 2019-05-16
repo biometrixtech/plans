@@ -15,6 +15,7 @@ from tests.mocks.mock_post_session_survey_datastore import PostSessionSurveyData
 from tests.mocks.mock_daily_readiness_datastore import DailyReadinessDatastore
 from tests.mocks.mock_datastore_collection import DatastoreCollection
 from logic.training_volume_processing import TrainingVolumeProcessing
+from utils import parse_date
 
 def get_dates(start_date, end_date):
 
@@ -107,7 +108,7 @@ def test_acute_correct_dates_7_days():
     datastore_collection.daily_plan_datastore = daily_plan_datastore
     datastore_collection.daily_readiness_datastore = daily_readiness_datastore
 
-    stats = StatsProcessing("Tester", "2018-07-03", datastore_collection)
+    stats = StatsProcessing("Tester", parse_date("2018-07-03"), datastore_collection)
     stats.set_start_end_times()
     stats.set_acute_chronic_periods()
     stats.all_plans = plans
@@ -133,7 +134,7 @@ def test_acute_correct_dates_8_days():
     datastore_collection.daily_plan_datastore = daily_plan_datastore
     datastore_collection.daily_readiness_datastore = daily_readiness_datastore
 
-    stats = StatsProcessing("Tester", "2018-07-03", datastore_collection)
+    stats = StatsProcessing("Tester", parse_date("2018-07-03"), datastore_collection)
     stats.set_start_end_times()
     stats.set_acute_chronic_periods()
     stats.all_plans = plans
@@ -160,7 +161,7 @@ def test_acute_correct_dates_9_days():
     datastore_collection.daily_plan_datastore = daily_plan_datastore
     datastore_collection.daily_readiness_datastore = daily_readiness_datastore
 
-    stats = StatsProcessing("Tester", "2018-07-03", datastore_collection)
+    stats = StatsProcessing("Tester", parse_date("2018-07-03"), datastore_collection)
     stats.set_start_end_times()
     stats.set_acute_chronic_periods()
     stats.all_plans = plans
@@ -187,7 +188,7 @@ def test_acute_correct_dates_10_days():
     datastore_collection.daily_plan_datastore = daily_plan_datastore
     datastore_collection.daily_readiness_datastore = daily_readiness_datastore
 
-    stats = StatsProcessing("Tester", "2018-07-03", datastore_collection)
+    stats = StatsProcessing("Tester", parse_date("2018-07-03"), datastore_collection)
     stats.set_start_end_times()
     stats.set_acute_chronic_periods()
     stats.all_plans = plans
@@ -214,7 +215,7 @@ def test_acute_correct_dates_14_days():
     datastore_collection.daily_plan_datastore = daily_plan_datastore
     datastore_collection.daily_readiness_datastore = daily_readiness_datastore
 
-    stats = StatsProcessing("Tester", "2018-07-03", datastore_collection)
+    stats = StatsProcessing("Tester", parse_date("2018-07-03"), datastore_collection)
     stats.set_start_end_times()
     stats.set_acute_chronic_periods()
     stats.all_plans = plans
@@ -241,7 +242,7 @@ def test_acute_correct_dates_28_days():
     datastore_collection.daily_plan_datastore = daily_plan_datastore
     datastore_collection.daily_readiness_datastore = daily_readiness_datastore
 
-    stats = StatsProcessing("Tester", "2018-07-03", datastore_collection)
+    stats = StatsProcessing("Tester", parse_date("2018-07-03"), datastore_collection)
     stats.set_start_end_times()
     stats.set_acute_chronic_periods()
     stats.all_plans = plans
@@ -268,7 +269,7 @@ def test_chronic_correct_dates_7_days():
     datastore_collection.daily_plan_datastore = daily_plan_datastore
     datastore_collection.daily_readiness_datastore = daily_readiness_datastore
 
-    stats = StatsProcessing("Tester", "2018-07-03", datastore_collection)
+    stats = StatsProcessing("Tester", parse_date("2018-07-03"), datastore_collection)
     stats.set_start_end_times()
     stats.set_acute_chronic_periods()
     stats.all_plans = plans
@@ -295,7 +296,7 @@ def test_chronic_correct_dates_28_days():
     datastore_collection.daily_plan_datastore = daily_plan_datastore
     datastore_collection.daily_readiness_datastore = daily_readiness_datastore
 
-    stats = StatsProcessing("Tester", "2018-07-03", datastore_collection)
+    stats = StatsProcessing("Tester", parse_date("2018-07-03"), datastore_collection)
     stats.set_start_end_times()
     stats.set_acute_chronic_periods()
     stats.all_plans = plans
@@ -326,7 +327,7 @@ def test_chronic_correct_dates_33_days():
     datastore_collection.daily_plan_datastore = daily_plan_datastore
     datastore_collection.daily_readiness_datastore = daily_readiness_datastore
 
-    stats = StatsProcessing("Tester", "2018-07-03", datastore_collection)
+    stats = StatsProcessing("Tester", parse_date("2018-07-03"), datastore_collection)
     stats.set_start_end_times()
     stats.set_acute_chronic_periods()
     stats.all_plans = plans
@@ -358,7 +359,7 @@ def test_chronic_correct_dates_40_days():
     datastore_collection.daily_plan_datastore = daily_plan_datastore
     datastore_collection.daily_readiness_datastore = daily_readiness_datastore
 
-    stats = StatsProcessing("Tester", "2018-07-03", datastore_collection)
+    stats = StatsProcessing("Tester", parse_date("2018-07-03"), datastore_collection)
     stats.set_start_end_times()
     stats.set_acute_chronic_periods()
     stats.all_plans = plans
@@ -390,7 +391,7 @@ def test_correct_acute_chronic_load_33_days():
     datastore_collection.daily_plan_datastore = daily_plan_datastore
     datastore_collection.daily_readiness_datastore = daily_readiness_datastore
 
-    stats = StatsProcessing("Tester", "2018-07-03", datastore_collection)
+    stats = StatsProcessing("Tester", parse_date("2018-07-03"), datastore_collection)
     stats.set_start_end_times()
     stats.set_acute_chronic_periods()
     stats.all_plans = plans
@@ -422,7 +423,7 @@ def test_correct_acute_chronic_empty_load_33_days():
     datastore_collection.daily_plan_datastore = daily_plan_datastore
     datastore_collection.daily_readiness_datastore = daily_readiness_datastore
 
-    stats = StatsProcessing("Tester", "2018-07-03", datastore_collection)
+    stats = StatsProcessing("Tester", parse_date("2018-07-03"), datastore_collection)
     stats.set_start_end_times()
     stats.set_acute_chronic_periods()
     stats.all_plans = plans
@@ -455,7 +456,7 @@ def test_correct_acwr_load_33_days():
     datastore_collection.daily_plan_datastore = daily_plan_datastore
     datastore_collection.daily_readiness_datastore = daily_readiness_datastore
 
-    stats = StatsProcessing("Tester", "2018-07-03", datastore_collection)
+    stats = StatsProcessing("Tester", parse_date("2018-07-03"), datastore_collection)
     stats.set_start_end_times()
     stats.set_acute_chronic_periods()
     stats.all_plans = plans
@@ -487,7 +488,7 @@ def test_correct_acwr_empty_load_33_days():
     datastore_collection.daily_plan_datastore = daily_plan_datastore
     datastore_collection.daily_readiness_datastore = daily_readiness_datastore
 
-    stats = StatsProcessing("Tester", "2018-07-03", datastore_collection)
+    stats = StatsProcessing("Tester", parse_date("2018-07-03"), datastore_collection)
     stats.set_start_end_times()
     stats.set_acute_chronic_periods()
     stats.all_plans = plans
@@ -518,7 +519,7 @@ def test_correct_internal_acwr_load_33_days():
     datastore_collection.daily_plan_datastore = daily_plan_datastore
     datastore_collection.daily_readiness_datastore = daily_readiness_datastore
 
-    stats = StatsProcessing("Tester", "2018-07-03", datastore_collection)
+    stats = StatsProcessing("Tester", parse_date("2018-07-03"), datastore_collection)
     stats.set_start_end_times()
     stats.set_acute_chronic_periods()
     stats.all_plans = plans
@@ -550,7 +551,7 @@ def test_correct_internal_acwr_empty_load_33_days():
     datastore_collection.daily_plan_datastore = daily_plan_datastore
     datastore_collection.daily_readiness_datastore = daily_readiness_datastore
 
-    stats = StatsProcessing("Tester", "2018-07-03", datastore_collection)
+    stats = StatsProcessing("Tester", parse_date("2018-07-03"), datastore_collection)
     stats.set_start_end_times()
     stats.all_plans = plans
     stats.update_start_times(surveys, [], stats.all_plans)
