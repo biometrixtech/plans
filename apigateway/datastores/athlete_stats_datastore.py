@@ -122,7 +122,7 @@ class AthleteStatsDatastore(object):
         #athlete_stats.high_relative_intensity_session = mongo_result.get('high_relative_intensity_session', False)
         athlete_stats.high_relative_load_benchmarks = {SportName(value): load for (value, load) in mongo_result.get('high_relative_load_benchmarks', {}).items()}
         athlete_stats.exposed_triggers = [TriggerType(trigger) for trigger in mongo_result.get('exposed_triggers', [])]
-        athlete_stats.longotudinal_insights = [AthleteInsights.json_deserialise(insight) for insight in mongo_result.get('longotudinal_insights', [])]
+        athlete_stats.longitudinal_insights = [AthleteInsights.json_deserialise(insight) for insight in mongo_result.get('longitudinal_insights', [])]
         return athlete_stats
 
     @xray_recorder.capture('datastore.AthleteStatsDatastore._put_mongodb')
