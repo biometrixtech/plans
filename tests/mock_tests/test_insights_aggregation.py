@@ -166,6 +166,44 @@ def test_aggregate_alerts_cleared():
     assert insights[0].start_date_time == current_date_time - datetime.timedelta(days=5)
 
 
+def test_aggregate_alerts_cleared_same_parent_group():
+    current_date_time = datetime.datetime.now()
+    goal1 = AthleteGoal('Care for Pain', 0, AthleteGoalType(0))
+    goal1.trigger_type = TriggerType(6)
+    alert1 = Alert(goal1)
+    alert1.body_part = BodyPartSide(BodyPartLocation(11), 1)
+    goal2 = AthleteGoal('Care for Pain', 0, AthleteGoalType(0))
+    goal2.trigger_type = TriggerType(7)
+    alert2 = Alert(goal2)
+    alert2.body_part = BodyPartSide(BodyPartLocation(11), 2)
+
+    alerts = [alert1, alert2]
+    existing_insights, longitudinal_insights = AlertsProcessing.aggregate_alerts(current_date_time - datetime.timedelta(days=1), alerts, [], [], [])
+    assert len(existing_insights) == 1
+    assert existing_insights[0].first
+    assert existing_insights[0].parent
+    assert existing_insights[0].insight_type == InsightType.longitudinal
+    assert existing_insights[0].start_date_time == current_date_time - datetime.timedelta(days=1)
+
+    insights, longitudinal_insights = AlertsProcessing.aggregate_alerts(current_date_time, [alert2], [], [existing_insights[0].trigger_type], existing_insights)
+    assert len(longitudinal_insights) == 1
+    assert len(insights) == 2
+    for insight in insights:
+        insight.add_data()
+    plan = DailyPlan(format_date(current_date_time))
+    plan.insights = insights
+    plan.sort_insights()
+    assert longitudinal_insights[0] == insights[0]
+
+    assert not insights[0].first
+    assert not insights[0].parent
+
+    assert insights[1].first
+    assert insights[1].insight_type == InsightType.longitudinal
+    assert insights[1].cleared
+    assert insights[1].start_date_time == current_date_time - datetime.timedelta(days=1)
+
+
 def test_aggregate_alerts_cleared_one_body_part():
     current_date_time = datetime.datetime.now()
     goal = AthleteGoal('Care for Pain', 0, AthleteGoalType(0))
