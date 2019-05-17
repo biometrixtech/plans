@@ -827,11 +827,11 @@ class TriggerType(IntEnum):
         else:
             return False
 
-    def belongs_to_same_group(self, other):
-        groups = {0: [6, 7, 8],
-                  1: [10, 11],
-                  2: [14, 15]}
-        for group in groups.values():
-            if self.value in group and other.value in group:
-                return True
-        return False
+    # def belongs_to_same_group(self, other):
+    #     groups = {0: {6, 7, 8},
+    #               1: {10, 11},
+    #               2: {14, 15}}
+    #     for group.value in groups:
+    #         if self.value in group and other.value in group - {self.value}:
+    #             return True
+    #     return False

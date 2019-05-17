@@ -15,7 +15,7 @@ class AlertsProcessing(object):
         existing_longitudinal_trigger_types = [insight.trigger_type for insight in longitudinal_insights]
         for insight in insights:
             if insight.trigger_type not in exposed_triggers:
-                if not any([insight.trigger_type.belongs_to_same_group(e) for e in exposed_triggers]):
+                if not any([AthleteInsight.get_parent_group(insight.trigger_type) == AthleteInsight.get_parent_group(e) for e in exposed_triggers]):
                     insight.first = True
             insight.goal_targeted = list(set(insight.goal_targeted))
             insight.sport_names = list(set(insight.sport_names))
@@ -89,7 +89,7 @@ class AlertsProcessing(object):
                     insight.severity.append(alert.severity)
             # check if any other group member exists
             elif alert.goal.trigger_type.is_grouped_trigger() and cls.parent_group_exists(alert.goal.trigger_type, existing_triggers):
-                insight = [insight for insight in insights if insight.trigger_type.belongs_to_same_group(alert.goal.trigger_type)][0]
+                insight = [insight for insight in insights if AthleteInsight.get_parent_group(insight.trigger_type) == AthleteInsight.get_parent_group(alert.goal.trigger_type)][0]
                 insight.goal_targeted.append(alert.goal.text)
                 insight.parent = True
                 if alert.body_part is not None:
@@ -115,6 +115,6 @@ class AlertsProcessing(object):
     @classmethod
     def parent_group_exists(cls, trigger_type, existing_triggers):
         for e in existing_triggers:
-            if trigger_type.belongs_to_same_group(e):
+            if AthleteInsight.get_parent_group(trigger_type) == AthleteInsight.get_parent_group(e):
                 return True
         return False
