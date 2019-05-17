@@ -295,6 +295,7 @@ class StatsProcessing(object):
                                                                      last_eight_seventeen_day_count,
                                                                      last_fourteen_day_count,
                                                                      last_reported_date_time, last_ten_day_count)
+                '''moving to nightly
                 if not g.is_pain:
                     for b in body_part_history:
                         current_soreness = HistoricSeverity(b.reported_date_time, b.severity, b.movement)
@@ -305,7 +306,7 @@ class StatsProcessing(object):
                         if historic_soreness.max_severity is None or current_severity > historic_soreness.max_severity:
                             historic_soreness.max_severity = current_severity
                             historic_soreness.max_severity_date_time = current_soreness.reported_date_time
-
+                '''
                 acute_pain_list.append(historic_soreness)
 
             elif historic_soreness.is_persistent_pain() or historic_soreness.is_persistent_soreness():
@@ -313,6 +314,7 @@ class StatsProcessing(object):
                 historic_soreness = self.process_persistent_status(g.is_pain, historic_soreness, last_reported_date_time, last_ten_day_count,
                                                                    body_part_history)
 
+                '''moving to nightly
                 if not g.is_pain:
                     for b in body_part_history:
                         current_soreness = HistoricSeverity(b.reported_date_time, b.severity, b.movement)
@@ -323,7 +325,7 @@ class StatsProcessing(object):
                         if historic_soreness.max_severity is None or current_severity > historic_soreness.max_severity:
                             historic_soreness.max_severity = current_severity
                             historic_soreness.max_severity_date_time = current_soreness.reported_date_time
-
+                '''
                 acute_pain_list.append(historic_soreness)
 
             else:
@@ -391,6 +393,7 @@ class StatsProcessing(object):
                     else:
                         #upgrade from doms to persistent soreness
                         soreness.historic_soreness_status = HistoricSorenessStatus.persistent_soreness
+                        '''moving to nightly
                         for b in body_part_history:
                             current_soreness = HistoricSeverity(b.reported_date_time, b.severity, b.movement)
                             current_severity = SorenessCalculator.get_severity(b.severity, b.movement)
@@ -400,6 +403,7 @@ class StatsProcessing(object):
                             if soreness.max_severity is None or current_severity > soreness.max_severity:
                                 soreness.max_severity = current_severity
                                 soreness.max_severity_date_time = current_soreness.reported_date_time
+                        '''
                     soreness.ask_acute_pain_question = False
                     soreness.ask_persistent_2_question = False
                     soreness.average_severity = avg_severity
@@ -423,6 +427,7 @@ class StatsProcessing(object):
                     else:
                         #upgrade to persisten from doms
                         soreness.historic_soreness_status = HistoricSorenessStatus.persistent_soreness
+                        '''moving to nightly
                         for b in body_part_history:
                             current_soreness = HistoricSeverity(b.reported_date_time, b.severity, b.movement)
                             current_severity = SorenessCalculator.get_severity(b.severity, b.movement)
@@ -432,6 +437,7 @@ class StatsProcessing(object):
                             if soreness.max_severity is None or current_severity > soreness.max_severity:
                                 soreness.max_severity = current_severity
                                 soreness.max_severity_date_time = current_soreness.reported_date_time
+                        '''
                     soreness.ask_acute_pain_question = False
                     soreness.ask_persistent_2_question = False
                     soreness.average_severity = avg_severity
@@ -450,6 +456,7 @@ class StatsProcessing(object):
                         soreness.historic_soreness_status = HistoricSorenessStatus.persistent_2_pain
                     else:
                         soreness.historic_soreness_status = HistoricSorenessStatus.persistent_2_soreness
+                        '''moving to nightly
                         for b in body_part_history:
                             current_soreness = HistoricSeverity(b.reported_date_time, b.severity, b.movement)
                             current_severity = SorenessCalculator.get_severity(b.severity, b.movement)
@@ -459,6 +466,7 @@ class StatsProcessing(object):
                             if soreness.max_severity is None or current_severity > soreness.max_severity:
                                 soreness.max_severity = current_severity
                                 soreness.max_severity_date_time = current_soreness.reported_date_time
+                        '''
                     soreness.ask_acute_pain_question = False
                     soreness.ask_persistent_2_question = False
                     soreness.average_severity = avg_severity
@@ -499,6 +507,8 @@ class StatsProcessing(object):
                             historic_soreness.cleared_date_time = self.event_date
                             self.cleared_soreness_datastore.put(historic_soreness)
                             # don't add to list, save to archive
+                        else:
+                            acute_pain_list.append(historic_soreness)
 
                     else:
                         soreness = HistoricSoreness(g.location, g.side, g.is_pain)
