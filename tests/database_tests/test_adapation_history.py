@@ -33,6 +33,38 @@ def add_xray_support(request):
     os.environ["MONGO_COLLECTION_ATHLETESTATS"] = config['collection_athletestats']
     os.environ["MONGO_COLLECTION_COMPLETEDEXERCISES"] = config['collection_completedexercises']
 
+def test_soreness_analysis():
+    users = []
+
+    users.append('fac4be57-35d6-4952-8af9-02aadf979982')  # bay
+    users.append('e9d78b6f-8695-4556-9369-d6a5702c6cc7')  # mwoodard
+
+    for user_id in users:
+        start_date = "2018-11-23"
+        end_date = "2019-01-23"
+
+        drs_dao = DailyReadinessDatastore()
+        daily_readiness_surveys = drs_dao.get(user_id, parse_date(start_date), parse_date(end_date), False)
+        dpo_dao = DailyPlanDatastore()
+        plans = dpo_dao.get(user_id, start_date, end_date)
+        as_dao = AthleteStatsDatastore()
+        ath_stats = as_dao.get(user_id)
+
+        data_store_collection = DatastoreCollection()
+        data_store_collection.daily_readiness_datastore = drs_dao
+        data_store_collection.daily_plan_datastore = dpo_dao
+
+
+        athlete_stats = AthleteStats(user_id)
+        athlete_stats.event_date = parse_date(end_date)
+
+        stats_processing = StatsProcessing(user_id, parse_date(end_date), data_store_collection)
+        stats_processing.set_start_end_times()
+        stats_processing.load_historical_data()
+        historic_soreness = stats_processing.get_historic_soreness()
+        target_soreness = list(h for h in historic_soreness if not h.is_pain and not h.is_dormant_cleared())
+        soreness_dictionary = stats_processing.get_soreness_dictionary(target_soreness)
+        i=0
 
 def test_get_adaptation_history_from_database():
 

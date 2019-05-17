@@ -73,7 +73,6 @@ class BaseSoreness(object):
 
     def is_dormant_cleared(self):
         if (self.historic_soreness_status is None or
-                self.historic_soreness_status == HistoricSorenessStatus.doms or
                 self.historic_soreness_status == HistoricSorenessStatus.dormant_cleared or
                 self.historic_soreness_status == HistoricSorenessStatus.almost_acute_pain or
                 self.historic_soreness_status == HistoricSorenessStatus.almost_persistent_pain or

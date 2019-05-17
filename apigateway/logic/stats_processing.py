@@ -5,11 +5,13 @@ from datetime import datetime, timedelta
 
 from fathomapi.utils.xray import xray_recorder
 from logic.training_volume_processing import TrainingVolumeProcessing
+from logic.soreness_processing import SorenessCalculator
 from models.stats import AthleteStats
 from models.soreness import Soreness, BodyPart, HistoricSorenessStatus
-from models.historic_soreness import HistoricSoreness
+from models.historic_soreness import HistoricSoreness, HistoricSeverity, CoOccurrence
 from models.post_session_survey import PostSessionSurvey
 from utils import parse_date, format_date
+
 
 
 class StatsProcessing(object):
@@ -172,6 +174,38 @@ class StatsProcessing(object):
 
         return historic_soreness
 
+    def get_soreness_dictionary(self, historic_soreness_list):
+
+        soreness_dictionary = {}
+
+        for h in historic_soreness_list:
+            for v in h.historic_severity:
+                if v.reported_date_time not in soreness_dictionary:
+                    soreness_dictionary[v.reported_date_time] = []
+                soreness_dictionary[v.reported_date_time].append(CoOccurrence(h.body_part_location, h.side, h.historic_soreness_status))
+
+        for h in historic_soreness_list:
+            hcount = 0
+            for date, co_occurrence_list in soreness_dictionary.items():
+                current_occurrence = CoOccurrence(h.body_part_location, h.side, h.historic_soreness_status)
+                if current_occurrence in co_occurrence_list:
+                    hcount += 1
+                    co_occurrences = list(c for c in co_occurrence_list if c.body_part_location != h.body_part_location or (c.body_part_location == h.body_part_location and c.side != h.side))
+                    for c in co_occurrences:
+                        try:
+                            index = h.co_occurrences.index(c)
+                            h.co_occurrences[index].increment(1)
+                            h.co_occurrences[index].percentage = h.co_occurrences[index].count / float(hcount)
+                        except ValueError:
+                            new_co_occurrence = CoOccurrence(c.body_part_location, c.side, c.historic_soreness_status)
+                            new_co_occurrence.increment(1)
+                            new_co_occurrence.percentage = new_co_occurrence.count / float(hcount)
+                            h.co_occurrences.append(new_co_occurrence)
+
+
+
+        return soreness_dictionary
+
     def get_historic_soreness_list(self, soreness_list_25, existing_historic_soreness=None):
 
         grouped_soreness = {}
@@ -261,12 +295,35 @@ class StatsProcessing(object):
                                                                      last_eight_seventeen_day_count,
                                                                      last_fourteen_day_count,
                                                                      last_reported_date_time, last_ten_day_count)
+                if not g.is_pain:
+                    for b in body_part_history:
+                        current_soreness = HistoricSeverity(b.reported_date_time, b.severity, b.movement)
+                        current_severity = SorenessCalculator.get_severity(b.severity, b.movement)
+                        historic_soreness.historic_severity.append(current_soreness)
+                        historic_soreness.last_reported_date_time = current_soreness.reported_date_time
+
+                        if historic_soreness.max_severity is None or current_severity > historic_soreness.max_severity:
+                            historic_soreness.max_severity = current_severity
+                            historic_soreness.max_severity_date_time = current_soreness.reported_date_time
+
                 acute_pain_list.append(historic_soreness)
 
             elif historic_soreness.is_persistent_pain() or historic_soreness.is_persistent_soreness():
 
                 historic_soreness = self.process_persistent_status(g.is_pain, historic_soreness, last_reported_date_time, last_ten_day_count,
                                                                    body_part_history)
+
+                if not g.is_pain:
+                    for b in body_part_history:
+                        current_soreness = HistoricSeverity(b.reported_date_time, b.severity, b.movement)
+                        current_severity = SorenessCalculator.get_severity(b.severity, b.movement)
+                        historic_soreness.historic_severity.append(current_soreness)
+                        historic_soreness.last_reported_date_time = current_soreness.reported_date_time
+
+                        if historic_soreness.max_severity is None or current_severity > historic_soreness.max_severity:
+                            historic_soreness.max_severity = current_severity
+                            historic_soreness.max_severity_date_time = current_soreness.reported_date_time
+
                 acute_pain_list.append(historic_soreness)
 
             else:
@@ -332,6 +389,15 @@ class StatsProcessing(object):
                         soreness.historic_soreness_status = HistoricSorenessStatus.persistent_pain
                     else:
                         soreness.historic_soreness_status = HistoricSorenessStatus.persistent_soreness
+                        for b in body_part_history:
+                            current_soreness = HistoricSeverity(b.reported_date_time, b.severity, b.movement)
+                            current_severity = SorenessCalculator.get_severity(b.severity, b.movement)
+                            soreness.historic_severity.append(current_soreness)
+                            soreness.last_reported_date_time = current_soreness.reported_date_time
+
+                            if soreness.max_severity is None or current_severity > soreness.max_severity:
+                                soreness.max_severity = current_severity
+                                soreness.max_severity_date_time = current_soreness.reported_date_time
                     soreness.ask_acute_pain_question = False
                     soreness.ask_persistent_2_question = False
                     soreness.average_severity = avg_severity
@@ -354,6 +420,15 @@ class StatsProcessing(object):
                         soreness.historic_soreness_status = HistoricSorenessStatus.persistent_pain
                     else:
                         soreness.historic_soreness_status = HistoricSorenessStatus.persistent_soreness
+                        for b in body_part_history:
+                            current_soreness = HistoricSeverity(b.reported_date_time, b.severity, b.movement)
+                            current_severity = SorenessCalculator.get_severity(b.severity, b.movement)
+                            soreness.historic_severity.append(current_soreness)
+                            soreness.last_reported_date_time = current_soreness.reported_date_time
+
+                            if soreness.max_severity is None or current_severity > soreness.max_severity:
+                                soreness.max_severity = current_severity
+                                soreness.max_severity_date_time = current_soreness.reported_date_time
                     soreness.ask_acute_pain_question = False
                     soreness.ask_persistent_2_question = False
                     soreness.average_severity = avg_severity
@@ -386,12 +461,40 @@ class StatsProcessing(object):
                         soreness.historic_soreness_status = HistoricSorenessStatus.persistent_2_pain
                     else:
                         soreness.historic_soreness_status = HistoricSorenessStatus.persistent_2_soreness
+                        for b in body_part_history:
+                            current_soreness = HistoricSeverity(b.reported_date_time, b.severity, b.movement)
+                            current_severity = SorenessCalculator.get_severity(b.severity, b.movement)
+                            soreness.historic_severity.append(current_soreness)
+                            soreness.last_reported_date_time = current_soreness.reported_date_time
+
+                            if soreness.max_severity is None or current_severity > soreness.max_severity:
+                                soreness.max_severity = current_severity
+                                soreness.max_severity_date_time = current_soreness.reported_date_time
                     soreness.ask_acute_pain_question = False
                     soreness.ask_persistent_2_question = False
                     soreness.average_severity = avg_severity
                     soreness.first_reported_date_time = first_reported_date_time
                     soreness.last_reported_date_time = last_reported_date_time
                     soreness.streak_start_date = None
+
+                    acute_pain_list.append(soreness)
+
+                elif len(body_part_history) > 0 and not g.is_pain:
+
+                    soreness = HistoricSoreness(g.location, g.side, g.is_pain)
+                    soreness.first_reported_date_time = body_part_history[0].reported_date_time
+
+                    for b in body_part_history:
+                        current_soreness = HistoricSeverity(b.reported_date_time, b.severity, b.movement)
+                        current_severity = SorenessCalculator.get_severity(b.severity, b.movement)
+                        soreness.historic_severity.append(current_soreness)
+                        soreness.last_reported_date_time = current_soreness.reported_date_time
+
+                        if soreness.max_severity is None or current_severity > soreness.max_severity:
+                            soreness.max_severity = current_severity
+                            soreness.max_severity_date_time = current_soreness.reported_date_time
+
+                    soreness.historic_soreness_status = HistoricSorenessStatus.doms
 
                     acute_pain_list.append(soreness)
 

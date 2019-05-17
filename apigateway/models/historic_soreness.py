@@ -93,12 +93,20 @@ class DelayedOnsetMuscleSoreness(object):
 '''
 
 class CoOccurrence(object):
-    def __init__(self):
-        self.body_part_location = None
-        self.side = 0
+    def __init__(self, body_part_location, side, historic_soreness_status):
+        self.body_part_location = body_part_location
+        self.historic_soreness_status = historic_soreness_status
+        self.side = side
+        self.count = 0
         self.percentage = 0.0
         self.correlation = 0.0
         self.confidence = 0.0
+
+    def __eq__(self, other):
+        return self.body_part_location == other.body_part_location and self.side == other.side
+
+    def increment(self, value):
+        self.count += value
 
 
 class HistoricSorenessMatrix(object):
