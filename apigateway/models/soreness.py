@@ -740,14 +740,15 @@ class TriggerType(IntEnum):
     pers_pers2_pain_greater_30_no_pain_today = 22
 
     def is_grouped_trigger(self):
-        if self.value in [6, 7, 8, 10, 11]:
+        if self.value in [6, 7, 8, 10, 11, 14, 15]:
             return True
         else:
             return False
 
     def belongs_to_same_group(self, other):
         groups = {0: [6, 7, 8],
-                  1: [10, 11]}
+                  1: [10, 11],
+                  2: [14, 15]}
         for group in groups.values():
             if self.value in group and other.value in group:
                 return True
