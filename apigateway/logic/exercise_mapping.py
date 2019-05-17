@@ -3,7 +3,8 @@ import models.soreness
 # import logic.soreness_processing as soreness_and_injury
 from models.exercise import ExerciseBuckets, Phase
 from models.modalities import ActiveRestBeforeTraining, ActiveRestAfterTraining, ColdWaterImmersion, CoolDown, Heat, WarmUp, Ice, HeatSession, IceSession
-from models.soreness import AthleteGoal, AthleteGoalType, AssignedExercise, BodyPartLocation, HistoricSorenessStatus, Soreness, BodyPart, TriggerType, Alert, BodyPartSide
+from models.soreness import AthleteGoal, AthleteGoalType, AssignedExercise, BodyPartLocation, HistoricSorenessStatus, Soreness, BodyPart, Alert, BodyPartSide
+from models.trigger import TriggerType
 from models.sport import SportName
 # from logic.goal_focus_text_generator import RecoveryTextGenerator
 # from datetime import  timedelta

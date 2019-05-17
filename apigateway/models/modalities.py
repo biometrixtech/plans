@@ -1,5 +1,6 @@
 from serialisable import Serialisable
-from models.soreness import BodyPart, BodyPartLocation, AssignedExercise, HistoricSorenessStatus, AthleteGoal, AthleteGoalType, ExerciseDosage, Soreness, Alert, BodyPartSide, TriggerType
+from models.soreness import BodyPart, BodyPartLocation, AssignedExercise, HistoricSorenessStatus, AthleteGoal, AthleteGoalType, ExerciseDosage, Soreness, Alert, BodyPartSide
+from models.trigger import TriggerType
 from models.body_parts import BodyPartFactory
 from models.sport import SportName
 from utils import parse_datetime, format_datetime

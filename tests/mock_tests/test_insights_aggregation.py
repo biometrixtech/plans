@@ -1,6 +1,7 @@
 import datetime
 from models.insights import AthleteInsight, InsightType
-from models.soreness import TriggerType, BodyPartSide, BodyPartLocation, Alert, AthleteGoal, AthleteGoalType
+from models.soreness import BodyPartSide, BodyPartLocation, Alert, AthleteGoal, AthleteGoalType
+from models.trigger import TriggerType
 from models.sport import SportName
 from logic.alerts_processing import AlertsProcessing
 from models.daily_plan import DailyPlan
@@ -230,3 +231,13 @@ def test_insights_ordering():
     assert plan.insights[3].trigger_type == TriggerType(3)  # same priority as previous. lost tie breaker (cleared)
     assert plan.insights[4].trigger_type == TriggerType(15)  # read - higher priority
     assert plan.insights[5].trigger_type == TriggerType(1)  # read - lower priority
+
+
+def test_equivalency():
+    trigger1 = TriggerType(6)
+    trigger2 = TriggerType(7)
+    trigger3 = TriggerType(6)
+    trigger4 = TriggerType(9)
+    assert TriggerType.is_equivalent(trigger1, trigger2)
+    assert TriggerType.is_equivalent(trigger1, trigger3)
+    assert not TriggerType.is_equivalent(trigger1, trigger4)

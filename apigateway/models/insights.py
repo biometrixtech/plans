@@ -1,7 +1,8 @@
 import datetime
 from enum import Enum
 from serialisable import Serialisable
-from models.soreness import BodyPartLocationText, TriggerType, BodyPartSide
+from models.soreness import BodyPartLocationText, BodyPartSide
+from models.trigger import TriggerType
 from models.sport import SportName
 from utils import format_datetime, parse_datetime
 
@@ -23,7 +24,7 @@ class AthleteInsight(Serialisable):
         self.priority = None
         self.styling = self.get_styling()
         self.read = False
-        self.parent_group = self.get_parent_group(self.trigger_type)
+        self.parent_group = TriggerType.get_parent_group(self.trigger_type)
 
     def json_serialise(self):
         ret = {
@@ -105,22 +106,25 @@ class AthleteInsight(Serialisable):
         else:
             return 0
 
-    @classmethod
-    def get_parent_group(cls, trigger_type):
-        groups = {
-            6: 0,
-            7: 0,
-            8: 0,
-            10: 1,
-            11: 1,
-            14: 2,
-            15: 2
-        }
-        if trigger_type.is_grouped_trigger():
-            return groups[trigger_type.value]
-        else:
-            return None
+    # @classmethod
+    # def get_parent_group(cls, trigger_type):
+    #     groups = {
+    #         6: 0,
+    #         7: 0,
+    #         8: 0,
+    #         10: 1,
+    #         11: 1,
+    #         14: 2,
+    #         15: 2
+    #     }
+    #     if trigger_type.is_grouped_trigger():
+    #         return groups[trigger_type.value]
+    #     else:
+    #         return None
 
+    # @classmethod
+    # def is_same_parent_group(cls, a, b):
+    #     return cls.get_parent_group(a) == cls.get_parent_group(b)
 
     def __setattr__(self, name, value):
         if name in ['start_date_time'] and value is not None and not isinstance(value, datetime.datetime):

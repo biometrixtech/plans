@@ -1,7 +1,8 @@
 from aws_xray_sdk.core import xray_recorder
 from config import get_mongo_collection
 from models.stats import AthleteStats
-from models.soreness import HistoricSoreness, Soreness, TriggerType
+from models.soreness import HistoricSoreness, Soreness
+from models.trigger import TriggerType
 from models.delayed_onset_muscle_soreness import DelayedOnsetMuscleSoreness
 from models.metrics import AthleteMetric
 from models.training_volume import StandardErrorRange
