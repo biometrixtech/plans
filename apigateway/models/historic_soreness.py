@@ -93,10 +93,12 @@ class DelayedOnsetMuscleSoreness(object):
 '''
 
 class CoOccurrence(object):
-    def __init__(self, body_part_location, side, historic_soreness_status):
+    def __init__(self, body_part_location, side, historic_soreness_status, first_reported_date_time):
         self.body_part_location = body_part_location
         self.historic_soreness_status = historic_soreness_status
         self.side = side
+        self.first_reported_date_time = first_reported_date_time
+        self.symmetric_pair = False
         self.count = 0
         self.percentage = 0.0
         self.correlation = 0.0

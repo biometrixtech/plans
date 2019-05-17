@@ -7,7 +7,9 @@ from datastores.athlete_stats_datastore import AthleteStatsDatastore
 from datastore_collection import DatastoreCollection
 from logic.stats_processing import StatsProcessing
 from logic.training_volume_processing import TrainingVolumeProcessing
+from logic.soreness_processing import SorenessCalculator
 from models.stats import AthleteStats
+from models.historic_soreness import HistoricSorenessStatus, SorenessCause
 from config import get_secret
 from utils import parse_date, format_date
 from statistics import stdev, mean
@@ -36,12 +38,20 @@ def add_xray_support(request):
 def test_soreness_analysis():
     users = []
 
-    users.append('fac4be57-35d6-4952-8af9-02aadf979982')  # bay
-    users.append('e9d78b6f-8695-4556-9369-d6a5702c6cc7')  # mwoodard
+    users.append('93176a69-2d5d-4326-b986-ca6b04a9a29d') #liz
+    users.append('e4fff5dc-6467-4717-8cef-3f2cb13e5c33')  #abbey
+    users.append('82ccf294-7c1e-48e6-8149-c5a001e76f78')  #pene
+    users.append('8bca10bf-8bdd-4971-85ca-cb2712c32478') #rhonda
+    users.append('5e516e2e-ac2d-425e-ba4d-bf2689c28cec')  #td
+    users.append('4f5567c7-a592-4c26-b89d-5c1287884d37')  #megan
+    users.append('fac4be57-35d6-4952-8af9-02aadf979982')  #bay
+    users.append('e9d78b6f-8695-4556-9369-d6a5702c6cc7') #mwoodard
+    users.append('5756fac1-3080-4979-9746-9d4c9a700acf') #lillian
+    users.append('06f2c55d-780c-47cf-9742-a74535bea45f')  #RG (aka User 6 from usability report 4/2/19)
 
     for user_id in users:
         start_date = "2018-11-23"
-        end_date = "2019-01-23"
+        end_date = "2019-02-23"
 
         drs_dao = DailyReadinessDatastore()
         daily_readiness_surveys = drs_dao.get(user_id, parse_date(start_date), parse_date(end_date), False)
@@ -62,8 +72,13 @@ def test_soreness_analysis():
         stats_processing.set_start_end_times()
         stats_processing.load_historical_data()
         historic_soreness = stats_processing.get_historic_soreness()
-        target_soreness = list(h for h in historic_soreness if not h.is_pain and not h.is_dormant_cleared())
-        soreness_dictionary = stats_processing.get_soreness_dictionary(target_soreness)
+        target_soreness = list(h for h in historic_soreness if not h.is_pain and not h.is_dormant_cleared() and h.historic_soreness_status is not HistoricSorenessStatus.doms)
+        target_soreness = stats_processing.get_soreness_dictionary(target_soreness)
+        calc = SorenessCalculator()
+        for t in target_soreness:
+            t.cause = calc.get_soreness_cause(t, parse_date(end_date))
+            if t.cause is not SorenessCause.overloading:
+                j=0
         i=0
 
 def test_get_adaptation_history_from_database():

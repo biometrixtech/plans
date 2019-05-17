@@ -182,12 +182,12 @@ class StatsProcessing(object):
             for v in h.historic_severity:
                 if v.reported_date_time not in soreness_dictionary:
                     soreness_dictionary[v.reported_date_time] = []
-                soreness_dictionary[v.reported_date_time].append(CoOccurrence(h.body_part_location, h.side, h.historic_soreness_status))
+                soreness_dictionary[v.reported_date_time].append(CoOccurrence(h.body_part_location, h.side, h.historic_soreness_status, h.first_reported_date_time))
 
         for h in historic_soreness_list:
             hcount = 0
             for date, co_occurrence_list in soreness_dictionary.items():
-                current_occurrence = CoOccurrence(h.body_part_location, h.side, h.historic_soreness_status)
+                current_occurrence = CoOccurrence(h.body_part_location, h.side, h.historic_soreness_status, h.first_reported_date_time)
                 if current_occurrence in co_occurrence_list:
                     hcount += 1
                     co_occurrences = list(c for c in co_occurrence_list if c.body_part_location != h.body_part_location or (c.body_part_location == h.body_part_location and c.side != h.side))
@@ -197,14 +197,14 @@ class StatsProcessing(object):
                             h.co_occurrences[index].increment(1)
                             h.co_occurrences[index].percentage = h.co_occurrences[index].count / float(hcount)
                         except ValueError:
-                            new_co_occurrence = CoOccurrence(c.body_part_location, c.side, c.historic_soreness_status)
+                            new_co_occurrence = CoOccurrence(c.body_part_location, c.side, c.historic_soreness_status, c.first_reported_date_time)
                             new_co_occurrence.increment(1)
                             new_co_occurrence.percentage = new_co_occurrence.count / float(hcount)
                             h.co_occurrences.append(new_co_occurrence)
 
 
 
-        return soreness_dictionary
+        return historic_soreness_list
 
     def get_historic_soreness_list(self, soreness_list_25, existing_historic_soreness=None):
 
