@@ -161,7 +161,7 @@ class SurveyProcessing(object):
                                                                                                        body_part_location=body_part_location,
                                                                                                        side=side,
                                                                                                        is_pain=pain,
-                                                                                                       question_response_date=plan_event_date,
+                                                                                                       question_response_date=event_date,
                                                                                                        severity_value=SorenessCalculator.get_severity(severity, movement))
             else:
                 self.athlete_stats.historic_soreness = self.stats_processor.answer_persistent_2_question(self.athlete_stats.historic_soreness,
@@ -169,7 +169,7 @@ class SurveyProcessing(object):
                                                                                                          body_part_location=body_part_location,
                                                                                                          side=side,
                                                                                                          is_pain=pain,
-                                                                                                         question_response_date=plan_event_date,
+                                                                                                         question_response_date=event_date,
                                                                                                          severity_value=SorenessCalculator.get_severity(severity, movement),
                                                                                                          current_status=HistoricSorenessStatus[status])
 

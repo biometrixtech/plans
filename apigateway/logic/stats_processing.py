@@ -714,7 +714,7 @@ class StatsProcessing(object):
 
         for b in range(0, len(body_part_history)):
 
-            days_diff = (parse_date(self.event_date) - parse_date(body_part_history[b].reported_date_time)).days
+            days_diff = (self.event_date - body_part_history[b].reported_date_time).days
 
             if days_diff < 14:
                 last_fourteen_day_count += 1

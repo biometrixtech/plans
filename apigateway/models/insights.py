@@ -106,26 +106,6 @@ class AthleteInsight(Serialisable):
         else:
             return 0
 
-    # @classmethod
-    # def get_parent_group(cls, trigger_type):
-    #     groups = {
-    #         6: 0,
-    #         7: 0,
-    #         8: 0,
-    #         10: 1,
-    #         11: 1,
-    #         14: 2,
-    #         15: 2
-    #     }
-    #     if trigger_type.is_grouped_trigger():
-    #         return groups[trigger_type.value]
-    #     else:
-    #         return None
-
-    # @classmethod
-    # def is_same_parent_group(cls, a, b):
-    #     return cls.get_parent_group(a) == cls.get_parent_group(b)
-
     def __setattr__(self, name, value):
         if name in ['start_date_time'] and value is not None and not isinstance(value, datetime.datetime):
             value = parse_datetime(value)
@@ -443,7 +423,7 @@ class InsightsData(object):
                 "child": {
                     "title": "How We Help Address Pain:",
                     "first": "{bodypart} pain is typically a sign of misalignments or movement impairments elsewhere. When you have pain, we provide activities to {goal} by correcting the most likely source of these misalignments. Please remember to avoid any activity which aggravates your pain.",
-                    "subsequent": "We added activities to [goals] that address the most likely source of misalignment. Pease avoid any modify any movements which cause pain.",
+                    "subsequent": "We added activities to {goal} that address the most likely source of misalignment. Pease avoid any modify any movements which cause pain.",
                     "clear": ""
                 }
             },
