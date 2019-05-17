@@ -118,7 +118,22 @@ class StatsProcessing(object):
                 # persist all of soreness/pain and session_RPE
                 athlete_stats.session_RPE = current_athlete_stats.session_RPE
                 athlete_stats.session_RPE_event_date = current_athlete_stats.session_RPE_event_date
-            # else:
+            else:
+                # purge any dormant_cleared hs
+                # clear any doms
+                # update any historic severity (truncating to n days)
+
+                # update soreness cause
+                target_soreness = list(h for h in athlete_stats.historic_soreness if
+                                       not h.is_pain and not h.is_dormant_cleared()
+                                       and h.historic_soreness_status != HistoricSorenessStatus.doms)
+                target_soreness = self.get_soreness_dictionary(target_soreness)
+                soreness_calc = SorenessCalculator()
+                for t in target_soreness:
+                    t.cause = soreness_calc.get_soreness_cause(t, self.event_date)
+
+                # calc muscular strain
+
                 # training_volume_processing.fill_load_monitoring_measures(self.all_daily_readiness_surveys, self.all_plans, parse_date(self.event_date))
                 # athlete_stats.muscular_strain_increasing = training_volume_processing.muscular_strain_increasing()
                 # athlete_stats.high_relative_load_benchmarks = training_volume_processing.calc_high_relative_load_benchmarks()
