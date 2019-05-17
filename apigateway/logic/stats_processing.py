@@ -217,8 +217,6 @@ class StatsProcessing(object):
                             new_co_occurrence.percentage = new_co_occurrence.count / float(hcount)
                             h.co_occurrences.append(new_co_occurrence)
 
-
-
         return historic_soreness_list
 
     def get_historic_soreness_list(self, soreness_list_25, existing_historic_soreness=None):

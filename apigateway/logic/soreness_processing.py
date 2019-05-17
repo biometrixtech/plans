@@ -132,7 +132,9 @@ class SorenessCalculator(object):
             pass
 
         if len(historic_soreness.co_occurrences) == 1:
-            if historic_soreness.co_occurrences[0].percentage > .50:
+            if is_symmetric:
+                return SorenessCause.overloading
+            else:
                 if (14 <= current_days_diff <= 28 and
                       (current_date_time - historic_soreness.co_occurrences[0].first_reported_date_time).days <= 28):
                     return SorenessCause.weakness
@@ -141,9 +143,6 @@ class SorenessCalculator(object):
                     return SorenessCause.dysfunction
                 else:
                     return SorenessCause.overloading
-            else:
-                # asymmetric, multiple muscle groups; since overloading doesn't matter timeframe
-                return SorenessCause.overloading
 
         remaining_parts = list(c for c in historic_soreness.co_occurrences if not c.symmetric_pair)
         symmetric_group_counts, symmetric_group_days_diff = self.get_symmetric_groups(remaining_parts, current_date_time)
@@ -155,14 +154,12 @@ class SorenessCalculator(object):
                     return SorenessCause.overloading
 
         else:
-            for c in historic_soreness.co_occurrences:
-                if c.percentage > .50 and (current_date_time - c.first_reported_date_time).days >= current_days_diff:
-                    if 14 <= current_days_diff <= 28:
-                        return SorenessCause.weakness
-                    elif current_days_diff > 28:
-                        return SorenessCause.dysfunction
-
-        return SorenessCause.overloading
+            if 14 <= current_days_diff <= 28:
+                return SorenessCause.weakness
+            elif current_days_diff > 28:
+                return SorenessCause.dysfunction
+            else:
+                return SorenessCause.overloading
 
     def get_reciprocal_side(self, side):
 
