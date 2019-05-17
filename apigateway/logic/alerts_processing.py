@@ -1,5 +1,6 @@
 from models.insights import AthleteInsight, InsightType
-from models.soreness import TriggerType, BodyPartSide
+from models.soreness import BodyPartSide
+from models.trigger import TriggerType
 
 
 class AlertsProcessing(object):
@@ -14,9 +15,8 @@ class AlertsProcessing(object):
 
         existing_longitudinal_trigger_types = [insight.trigger_type for insight in longitudinal_insights]
         for insight in insights:
-            if insight.trigger_type not in exposed_triggers:
-                if not any([insight.trigger_type.belongs_to_same_group(e) for e in exposed_triggers]):
-                    insight.first = True
+            if not TriggerType.is_in(insight.trigger_type, exposed_triggers):
+                insight.first = True
             insight.goal_targeted = list(set(insight.goal_targeted))
             insight.sport_names = list(set(insight.sport_names))
             insight.body_parts = [BodyPartSide.json_deserialise(dict(t)) for t in {tuple(d.json_serialise().items()) for d in insight.body_parts}]
@@ -40,19 +40,25 @@ class AlertsProcessing(object):
     def clear_insight(cls, new_insights, existing_longitudinal_insights):
         current_trigger_types = [insight.trigger_type for insight in new_insights]
         for l_insight in existing_longitudinal_insights:
-            if l_insight.trigger_type not in current_trigger_types:  # if trigger type does not exist, everything was cleared
+            # if trigger type (including others in same parent group) does not exist, everything was cleared
+            if not TriggerType.is_in(l_insight.trigger_type, current_trigger_types):
                 l_insight.cleared = True
                 new_insights.append(l_insight)
-            else:  # if it exists make check to see if body parts contributing to existing insight were cleared
-                current_insight = [insight for insight in new_insights if insight.trigger_type == l_insight.trigger_type][0]
+            else:  # find current insight is same trigger type or same parent group
+                current_insight = [insight for insight in new_insights if TriggerType.is_equivalent(insight.trigger_type, l_insight.trigger_type)][0]
                 cleared_parts = []
+                cleared_sports = []
                 current_body_parts = [d.json_serialise() for d in current_insight.body_parts]
                 for body_part in l_insight.body_parts:
                     if body_part.json_serialise() not in current_body_parts:
                         cleared_parts.append(body_part)
-                if len(cleared_parts) > 0:   # check if any body part was cleared
+                for sport in l_insight.sport_names:
+                    if sport not in current_insight.sport_names:
+                        cleared_sports.append(sport)
+                if len(cleared_parts) > 0 or len(cleared_sports) > 0:   # check if any body part was cleared
                     l_insight.cleared = True
                     l_insight.body_parts = cleared_parts
+                    l_insight.sport_names = cleared_sports
                     new_insights.append(l_insight)  # add cleared insight to today
         existing_longitudinal_insights = [insight for insight in existing_longitudinal_insights if not insight.cleared]
 
@@ -88,8 +94,8 @@ class AlertsProcessing(object):
                 if alert.severity is not None:
                     insight.severity.append(alert.severity)
             # check if any other group member exists
-            elif alert.goal.trigger_type.is_grouped_trigger() and cls.parent_group_exists(alert.goal.trigger_type, existing_triggers):
-                insight = [insight for insight in insights if insight.trigger_type.belongs_to_same_group(alert.goal.trigger_type)][0]
+            elif TriggerType.parent_group_exists(alert.goal.trigger_type, existing_triggers):
+                insight = [insight for insight in insights if TriggerType.is_same_parent_group(alert.goal.trigger_type, insight.trigger_type)][0]
                 insight.goal_targeted.append(alert.goal.text)
                 insight.parent = True
                 if alert.body_part is not None:
@@ -111,10 +117,3 @@ class AlertsProcessing(object):
                 insights.append(insight)
 
         return insights
-
-    @classmethod
-    def parent_group_exists(cls, trigger_type, existing_triggers):
-        for e in existing_triggers:
-            if trigger_type.belongs_to_same_group(e):
-                return True
-        return False

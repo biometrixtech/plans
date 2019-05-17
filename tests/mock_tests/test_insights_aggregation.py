@@ -1,6 +1,7 @@
 import datetime
 from models.insights import AthleteInsight, InsightType
-from models.soreness import TriggerType, BodyPartSide, BodyPartLocation, Alert, AthleteGoal, AthleteGoalType
+from models.soreness import BodyPartSide, BodyPartLocation, Alert, AthleteGoal, AthleteGoalType
+from models.trigger import TriggerType
 from models.sport import SportName
 from logic.alerts_processing import AlertsProcessing
 from models.daily_plan import DailyPlan
@@ -56,6 +57,22 @@ def test_aggregate_alerts_multiple_same_body_part():
     assert len(insights[0].body_parts) == 1
 
 
+def test_aggregate_alerts_multiple_same_child():
+    goal = AthleteGoal('Care for Pain', 0, AthleteGoalType(0))
+    goal.trigger_type = TriggerType(14)
+    alert1 = Alert(goal)
+    alert1.body_part = BodyPartSide(BodyPartLocation(11), 1)
+    alert2 = Alert(goal)
+    alert2.body_part = BodyPartSide(BodyPartLocation(11), 2)
+
+    alerts = [alert1, alert2]
+    insights, longitudinal_insights = AlertsProcessing.aggregate_alerts(datetime.datetime.now(), alerts, [], [TriggerType(14)], [])
+    assert len(insights) == 1
+    assert not insights[0].first
+    assert not insights[0].parent
+    assert insights[0].insight_type == InsightType.daily
+
+
 def test_aggregate_alerts_exposed():
     goal = AthleteGoal('Care for Pain', 0, AthleteGoalType(0))
     goal.trigger_type = TriggerType(14)
@@ -83,6 +100,24 @@ def test_aggregate_alerts_exposed_group():
     assert not insights[0].parent
     assert insights[0].insight_type == InsightType.longitudinal
 
+
+def test_aggregate_alerts_group_priority():
+    goal1 = AthleteGoal('Care for Pain', 0, AthleteGoalType(0))
+    goal1.trigger_type = TriggerType(14)
+    alert1 = Alert(goal1)
+    alert1.body_part = BodyPartSide(BodyPartLocation(11), 1)
+    goal2 = AthleteGoal('Care for Pain', 0, AthleteGoalType(0))
+    goal2.trigger_type = TriggerType(15)
+    alert2 = Alert(goal2)
+    alert2.body_part = BodyPartSide(BodyPartLocation(11), 1)
+
+    alerts = [alert1, alert2]
+    insights, longitudinal_insights = AlertsProcessing.aggregate_alerts(datetime.datetime.now(), alerts, [], [], [])
+    assert len(insights) == 1
+    assert insights[0].first
+    assert insights[0].parent
+    assert insights[0].insight_type == InsightType.daily
+    assert insights[0].priority == 1
 
 def test_aggregate_alerts_longitutinal():
     current_date_time = datetime.datetime.now()
@@ -196,3 +231,13 @@ def test_insights_ordering():
     assert plan.insights[3].trigger_type == TriggerType(3)  # same priority as previous. lost tie breaker (cleared)
     assert plan.insights[4].trigger_type == TriggerType(15)  # read - higher priority
     assert plan.insights[5].trigger_type == TriggerType(1)  # read - lower priority
+
+
+def test_equivalency():
+    trigger1 = TriggerType(6)
+    trigger2 = TriggerType(7)
+    trigger3 = TriggerType(6)
+    trigger4 = TriggerType(9)
+    assert TriggerType.is_equivalent(trigger1, trigger2)
+    assert TriggerType.is_equivalent(trigger1, trigger3)
+    assert not TriggerType.is_equivalent(trigger1, trigger4)

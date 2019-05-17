@@ -2,7 +2,7 @@ from flask import request, Blueprint
 from fathomapi.utils.decorators import require
 from fathomapi.utils.xray import xray_recorder
 from datastores.datastore_collection import DatastoreCollection
-from models.soreness import TriggerType
+from models.trigger import TriggerType
 from utils import parse_datetime, format_date
 
 datastore_collection = DatastoreCollection()

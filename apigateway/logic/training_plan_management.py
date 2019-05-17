@@ -6,6 +6,7 @@ from logic.soreness_processing import SorenessCalculator
 from logic.alerts_processing import AlertsProcessing
 from models.daily_plan import DailyPlan
 from utils import format_date, parse_datetime, parse_date
+import copy
 
 
 class TrainingPlanManager(object):
@@ -31,7 +32,7 @@ class TrainingPlanManager(object):
             self.daily_plan = DailyPlan(event_date)
             self.daily_plan.user_id = self.athlete_id
         else:
-            self.daily_plan = plan_today[0]
+            self.daily_plan = copy.deepcopy(plan_today[0])
         self.readiness_surveys = [plan.daily_readiness_survey for plan in daily_plans if plan.daily_readiness_survey is not None]
         for plan in daily_plans:
             self.post_session_surveys.extend([ts.post_session_survey for ts in plan.training_sessions if ts is not None and ts.post_session_survey is not None])
@@ -67,7 +68,7 @@ class TrainingPlanManager(object):
         if self.athlete_stats is None:
             historic_soreness = []
         else:
-            historic_soreness = [hs for hs in self.athlete_stats.historic_soreness if not hs.is_dormant_cleared()]
+            historic_soreness = copy.deepcopy([hs for hs in self.athlete_stats.historic_soreness if not hs.is_dormant_cleared()])
             # historic_soreness_present = len(historic_soreness) > 0
 
         soreness_list = SorenessCalculator().get_soreness_summary_from_surveys(self.readiness_surveys,

@@ -5,6 +5,8 @@ from models.soreness import BodyPartLocation, Soreness, BodyPart, HistoricSorene
 from models.historic_soreness import HistoricSoreness
 from models.metrics import AthleteMetric, MetricType, DailyHighLevelInsight, WeeklyHighLevelInsight, MetricColor, SpecificAction
 from models.soreness import Soreness, TriggerType
+from models.soreness import Soreness
+from models.trigger import TriggerType
 from models.metrics import AthleteMetric
 from models.training_volume import StandardErrorRange
 from models.sport import SportName

@@ -1,6 +1,7 @@
 from enum import Enum, IntEnum
 
 from models.exercise import Exercise, UnitOfMeasure
+from models.trigger import TriggerType
 from serialisable import Serialisable
 from random import shuffle
 import datetime
@@ -711,44 +712,3 @@ class Alert(object):
         if name == "sport_name" and not isinstance(value, SportName) and value is not None:
             value = SportName(value)
         super().__setattr__(name, value)
-
-
-class TriggerType(IntEnum):
-    high_volume_intensity = 0  # "High Relative Volume or Intensity of Logged Session"
-    hist_sore_greater_30_high_volume_intensity = 1  # "Pers, Pers-2 Soreness > 30d + High Relative Volume or Intensity of Logged Session" 
-    hist_pain_high_volume_intensity = 2  # "Acute, Pers, Pers_2 Pain  + High Relative Volume or Intensity of Logged Session" 
-    hist_sore_greater_30_no_sore_today_3_high_volume_intensity = 3  # "Pers, Pers-2 Soreness > 30d + No soreness reported today + Logged High Relative Volume or Intensity" 
-    acute_pain_no_pain_today_high_volume_intensity = 4  # "Acute Pain + No pain reported today + High Relative Volume or Intensity of Logged Session" 
-    pers_pers2_pain_no_pain_sore_today_high_volume_intensity = 5  # "Pers, Pers_2 Pain + No pain Reported Today + High Relative Volume or Intensity of Logged Session"
-    hist_sore_less_30_sport = 6  # "Pers, Pers-2 Soreness < 30d + Correlated to Sport"
-    hist_sore_less_30_no_sport = 7  # "Pers, Pers-2 Soreness < 30d + Not Correlated to Sport"  
-    overreaching_increasing_strain = 8  # "Overreaching as increasing Muscular Strain (with context for Training Volume)"
-    sore_today_no_session = 9  # "Sore reported today + not linked to session"    
-    sore_today = 10  # "Sore reported today"
-    sore_today_doms = 11  # "Soreness Reported Today as DOMs"
-    hist_sore_less_30_sore_today = 12  # "Pers, Pers-2 Soreness < 30d + Soreness reported today"
-    hist_sore_greater_30_sore_today = 13  # "Pers, Pers-2 Soreness > 30d + Soreness Reported Today"
-    pain_today = 14  # "Pain reported today"
-    pain_today_high = 15  # "Pain reported today high severity"
-    hist_pain = 16  # "Acute, Pers, Pers-2 Pain"
-    hist_pain_sport = 17  # "Acute, Pers, Pers_2 Pain + Correlated to Sport"
-    pain_injury = 18  # 'Pain - Injury'
-    hist_sore_greater_30 = 19  # "Pers, Pers-2 Soreness > 30d"
-    hist_sore_greater_30_sport = 20  # "Pers, Pers-2 Soreness > 30d + Correlated to Sport"
-    pers_pers2_pain_less_30_no_pain_today = 21
-    pers_pers2_pain_greater_30_no_pain_today = 22
-
-    def is_grouped_trigger(self):
-        if self.value in [6, 7, 8, 10, 11, 14, 15]:
-            return True
-        else:
-            return False
-
-    def belongs_to_same_group(self, other):
-        groups = {0: [6, 7, 8],
-                  1: [10, 11],
-                  2: [14, 15]}
-        for group in groups.values():
-            if self.value in group and other.value in group:
-                return True
-        return False
