@@ -66,9 +66,9 @@ def test_get_adaptation_history_from_database():
 
 
         athlete_stats = AthleteStats(user_id)
-        athlete_stats.event_date = end_date
+        athlete_stats.event_date = parse_date(end_date)
 
-        stats_processing = StatsProcessing(user_id, end_date, data_store_collection)
+        stats_processing = StatsProcessing(user_id, parse_date(end_date), data_store_collection)
         stats_processing.set_start_end_times()
         stats_processing.load_historical_data()
         athlete_stats = stats_processing.calc_survey_stats(athlete_stats)

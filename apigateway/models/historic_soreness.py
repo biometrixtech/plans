@@ -197,8 +197,8 @@ class HistoricSoreness(BaseSoreness, Serialisable):
 
         soreness.last_reported_date_time = last_reported_date_time
         soreness.cleared_date_time = input_dict.get('cleared_date_time', None)
-        soreness.historic_severity = [HistoricSeverity.json_deserialise(hist) for hist in
-                                      input_dict['historic_severity']]
+        #soreness.historic_severity = [HistoricSeverity.json_deserialise(hist) for hist in
+        #                              input_dict['historic_severity'] if input_dict.get('historic_severity', []) is not None]
         soreness.ask_acute_pain_question = input_dict.get("ask_acute_pain_question", False)
         soreness.ask_persistent_2_question = input_dict.get("ask_persistent_2_question", False)
 
