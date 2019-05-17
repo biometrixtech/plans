@@ -27,10 +27,11 @@ class Persona(object):
     def create_history(self, days):
         self.clear_user()
         event_date = datetime.datetime.now() - datetime.timedelta(days=days)
-        self.update_stats(format_date(event_date))
+        self.update_stats(event_date)
         for i in range(days):
-            date_time = format_datetime(event_date)
+            #date_time = format_datetime(event_date)
             today_date = format_date(event_date)
+            date_time = event_date
             soreness = []
             for body_part in self.soreness_history:
                 if body_part['severity'][i] is not None:
@@ -40,17 +41,17 @@ class Persona(object):
                                      'severity': body_part['severity'][i]})
 
             if len(soreness) > 0:
-                readiness_data = {'date_time': date_time,
+                readiness_data = {'date_time': format_datetime(date_time),
                                   'soreness': soreness}
                 self.create_readiness(readiness_data)
                 self.create_plan(event_date)
                 exercise_list = [ex.exercise.id for ex in self.daily_plan.pre_active_rest[0].inhibit_exercises.values()]
                 self.complete_exercises(exercise_list, format_datetime(event_date + datetime.timedelta(hours=1)))
                 print(today_date)
-            self.update_stats(format_date(event_date))
+            self.update_stats(event_date)
             event_date = event_date + datetime.timedelta(days=1)
 
-        self.update_stats(format_date(event_date))
+        self.update_stats(event_date)
 
     def clear_user(self):
         readiness = get_mongo_collection('dailyreadiness')

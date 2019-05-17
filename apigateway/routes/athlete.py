@@ -8,7 +8,7 @@ from logic.training_plan_management import TrainingPlanManager
 from logic.stats_processing import StatsProcessing
 from logic.metrics_processing import MetricsProcessing
 from models.stats import AthleteStats
-from utils import parse_datetime, format_date
+from utils import parse_date, parse_datetime, format_date
 import datetime
 import random
 import os
@@ -46,7 +46,7 @@ def create_daily_plan(athlete_id):
 @xray_recorder.capture('routes.athlete.stats.update')
 def update_athlete_stats(athlete_id):
     event_date = request.json.get('event_date', None)
-    athlete_stats = StatsProcessing(athlete_id, event_date=event_date, datastore_collection=DatastoreCollection()).process_athlete_stats()
+    athlete_stats = StatsProcessing(athlete_id, event_date=parse_date(event_date), datastore_collection=DatastoreCollection()).process_athlete_stats()
 
     if event_date is not None:
         metrics = MetricsProcessing().get_athlete_metrics_from_stats(athlete_stats, event_date)

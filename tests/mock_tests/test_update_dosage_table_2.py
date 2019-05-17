@@ -1,5 +1,5 @@
 from models.modalities import ModalityBase
-from models.soreness import AthleteGoal, AthleteGoalType, Exercise, ExerciseDosage, HistoricSorenessStatus, Soreness
+from models.soreness import AthleteGoal, AthleteGoalType, Exercise, ExerciseDosage, Soreness, HistoricSorenessStatus
 from datetime import datetime
 
 goal_types = [AthleteGoalType.sore, AthleteGoalType.pain, AthleteGoalType.corrective]

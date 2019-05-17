@@ -6,7 +6,7 @@ import pytest
 import logic.exercise_mapping as exercise_mapping
 from logic.training_plan_management import TrainingPlanManager
 import models.session as session
-from models.soreness import HistoricSoreness, HistoricSorenessStatus
+from models.historic_soreness import HistoricSoreness
 from models.stats import AthleteStats
 from pandas import DataFrame
 from datetime import datetime, timedelta, date, time
@@ -15,7 +15,7 @@ from tests.mocks.mock_exercise_datastore import ExerciseLibraryDatastore
 from tests.mocks.mock_completed_exercise_datastore import CompletedExerciseDatastore
 from tests.mocks.mock_datastore_collection import DatastoreCollection
 from tests.mocks.mock_athlete_stats_datastore import AthleteStatsDatastore
-from models.soreness import Soreness, BodyPart, BodyPartLocation
+from models.soreness import Soreness, BodyPart, BodyPartLocation, HistoricSorenessStatus
 from models.daily_plan import DailyPlan
 from tests.testing_utilities import TestUtilities
 from models.daily_readiness import DailyReadiness
@@ -38,13 +38,13 @@ def get_test_parameters_list():
     parm_list = []
 
     as1 = AthleteStats("tester")
-    as1.delayed_onset_muscle_soreness = []
+    as1.historic_soreness = []
     as1.muscular_strain_increasing = False
     parm1 = TestParameters("PreActiveRest_no_doms_no_muscular_strain.csv", as1, train_later=True)
     parm2 = TestParameters("PostActiveRest_no_doms_no_muscular_strain.csv", as1, train_later=False)
 
     as2 = AthleteStats("tester")
-    as2.delayed_onset_muscle_soreness = []
+    as2.historic_soreness = []
     as2.muscular_strain_increasing = True
     parm3 = TestParameters("PreActiveRest_no_doms_muscular_strain.csv", as2, train_later=True)
     parm4 = TestParameters("PostActiveRest_no_doms_muscular_strain.csv", as2, train_later=False)
@@ -263,7 +263,7 @@ def test_pre_active_rest_limited_body_parts():
                                       HistoricSorenessStatus.almost_persistent_2_soreness,
                                       HistoricSorenessStatus.persistent_2_soreness]
 
-        f = open(test_parm.file_name, 'w')
+        f = open('../../output/' + test_parm.file_name, 'w')
         line = ('BodyPart,is_pain,severity,hs_status,default_plan'+
                 'inhibit_goals_triggers,inhibit_minutes_efficient,inhibit_miniutes_complete, inhibit_minutes_comprehensive,'+
                 'inhibit_exercises,static_stretch_goals_triggers,static_stretch_minutes_efficient,'+

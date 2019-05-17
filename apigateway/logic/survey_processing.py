@@ -2,7 +2,7 @@ from fathomapi.utils.xray import xray_recorder
 from models.session import SessionType, SessionFactory, StrengthConditioningType, SessionSource
 from models.post_session_survey import PostSurvey
 from models.sport import SportName
-from models.soreness import BodyPart, BodyPartLocation, HistoricSorenessStatus, Soreness
+from models.soreness import BodyPart, BodyPartLocation, Soreness, HistoricSorenessStatus
 from models.daily_plan import DailyPlan
 from models.heart_rate import SessionHeartRate, HeartRateData
 from models.sleep_data import DailySleepData, SleepEvent
@@ -125,10 +125,11 @@ class SurveyProcessing(object):
 
     def process_clear_status_answers(self, clear_candidates, event_date, soreness):
 
-        plan_event_date = format_date(event_date)
+        #plan_event_date = format_date(event_date)
         if self.stats_processor is None:
             self.stats_processor = StatsProcessing(self.athlete_stats.athlete_id,
-                                                   plan_event_date,
+                                                   #plan_event_date,
+                                                   event_date,
                                                    self.datastore_collection)
             self.stats_processor.set_start_end_times()
             self.stats_processor.load_historical_data()
@@ -289,7 +290,8 @@ def create_plan(user_id, event_date, update_stats=True, athlete_stats=None, stat
         # update stats
         if stats_processor is None:
             stats_processor = StatsProcessing(user_id,
-                                              event_date=format_date(event_date),
+                                              #event_date=format_date(event_date),
+                                              event_date=event_date,
                                               datastore_collection=datastore_collection)
         athlete_stats = stats_processor.process_athlete_stats(current_athlete_stats=athlete_stats)
         # update metrics

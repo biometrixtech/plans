@@ -32,6 +32,21 @@ class JointSorenessSeverity(IntEnum):
     inability_to_move = 5
 
 
+class HistoricSorenessStatus(IntEnum):
+    dormant_cleared = 0
+    persistent_pain = 1
+    persistent_2_pain = 2
+    almost_persistent_pain = 3
+    almost_persistent_2_pain = 4
+    almost_persistent_2_pain_acute = 5
+    persistent_soreness = 6
+    persistent_2_soreness = 7
+    almost_persistent_soreness = 8
+    almost_persistent_2_soreness = 9
+    acute_pain = 10
+    almost_acute_pain = 11
+    doms = 12
+
 class BaseSoreness(object):
     def __init__(self):
         self.historic_soreness_status = HistoricSorenessStatus.dormant_cleared
@@ -81,7 +96,12 @@ class Soreness(BaseSoreness, Serialisable):
         self.type = None  # soreness_type
         self.count = 1
         self.streak = 0
+        self.max_severity = None  # muscle_soreness_severity
+        self.max_severity_date_time = None
+        self.causal_session = None
         self.first_reported_date_time = None
+        self.last_reported_date_time = None
+        self.cleared_date_time = None
         self.daily = True
 
     @classmethod
@@ -92,7 +112,12 @@ class Soreness(BaseSoreness, Serialisable):
         soreness.severity = input_dict['severity']
         soreness.movement = input_dict.get('movement', None)
         soreness.side = input_dict.get('side', None)
+        soreness.max_severity = input_dict.get('max_severity', None)
         soreness.first_reported_date_time = input_dict.get('first_reported_date_time', None)
+        soreness.last_reported_date_time = input_dict.get('last_reported_date_time', None)
+        soreness.cleared_date_time = input_dict.get('cleared_date_time', None)
+        soreness.max_severity_date_time = input_dict.get('max_severity_date_time', None)
+        soreness.causal_session = input_dict.get('causal_session', None)
         # if input_dict.get('first_reported_date_time', None) is not None:
         #     soreness.first_reported_date_time = parse_date(input_dict['first_reported_date_time'])
         if input_dict.get('reported_date_time', None) is not None:
@@ -107,7 +132,7 @@ class Soreness(BaseSoreness, Serialisable):
                  self.side == other.side))
 
     def __setattr__(self, name, value):
-        if name in ['first_reported_date_time']:
+        if name in ['first_reported_date_time', 'last_reported_date_time', 'reported_date_time', 'cleared_date_time', 'max_severity_date_time']:
             if value is not None and not isinstance(value, datetime.datetime):
                 try:
                     value = parse_datetime(value)
@@ -340,114 +365,6 @@ class BodyPart(object):
         self.synergists = synergists
         self.stabilizers = stabilizers
         self.antagonists = antagonists
-
-
-class HistoricSorenessStatus(IntEnum):
-    dormant_cleared = 0
-    persistent_pain = 1
-    persistent_2_pain = 2
-    almost_persistent_pain = 3
-    almost_persistent_2_pain = 4
-    almost_persistent_2_pain_acute = 5
-    persistent_soreness = 6
-    persistent_2_soreness = 7
-    almost_persistent_soreness = 8
-    almost_persistent_2_soreness = 9
-    acute_pain = 10
-    almost_acute_pain = 11
-
-
-class HistoricSoreness(BaseSoreness, Serialisable):
-
-    def __init__(self, body_part_location, side, is_pain):
-        super().__init__()
-        self.body_part_location = body_part_location
-        # self.historic_soreness_status = HistoricSorenessStatus.dormant_cleared
-        self.is_pain = is_pain
-        self.side = side
-        self.streak = 0
-        self.streak_start_date = None
-        self.average_severity = 0.0
-        self.first_reported_date_time = None
-        self.last_reported = ""
-        self.ask_acute_pain_question = False
-        self.ask_persistent_2_question = False
-
-    def __setattr__(self, name, value):
-        if name in ['first_reported_date_time']:
-            if value is not None and not isinstance(value, datetime.datetime):
-                try:
-                    value = parse_datetime(value)
-                except InvalidSchemaException:
-                    value = parse_date(value)
-        super().__setattr__(name, value)
-
-    def json_serialise(self, api=False):
-        if api:
-            ret = {"body_part": self.body_part_location.value,
-                   "side": self.side,
-                   "pain": self.is_pain,
-                   "status": self.historic_soreness_status.name}
-        else:
-            ret = {
-                   'body_part_location': self.body_part_location.value,
-                   'historic_soreness_status': self.historic_soreness_status.value,
-                   'is_pain': self.is_pain,
-                   'side': self.side,
-                   'streak': self.streak,
-                   'streak_start_date': self.streak_start_date,
-                   'average_severity': self.average_severity,
-                   'first_reported_date_time': format_datetime(self.first_reported_date_time) if self.first_reported_date_time is not None else None,
-                   'last_reported': self.last_reported,
-                   'ask_acute_pain_question': self.ask_acute_pain_question,
-                   'ask_persistent_2_question': self.ask_persistent_2_question
-                  }
-        return ret
-
-    @classmethod
-    def json_deserialise(cls, input_dict):
-        soreness = cls(BodyPartLocation(input_dict['body_part_location']), input_dict.get('side', None), input_dict.get('is_pain', False))
-        hist_sore_status = input_dict.get('historic_soreness_status', None)
-        soreness.historic_soreness_status = HistoricSorenessStatus(hist_sore_status) if hist_sore_status is not None else HistoricSorenessStatus.dormant_cleared
-        soreness.streak = input_dict.get('streak', 0)
-        soreness.streak_start_date = input_dict.get("streak_start_date", None)
-        soreness.average_severity = input_dict.get('average_severity', 0.0)
-        soreness.first_reported_date_time = input_dict.get("first_reported_date_time", None) if input_dict.get("first_reported_date_time", None) != "" else None
-        soreness.last_reported = input_dict.get("last_reported", "")
-        soreness.ask_acute_pain_question = input_dict.get("ask_acute_pain_question", False)
-        soreness.ask_persistent_2_question = input_dict.get("ask_persistent_2_question", False)
-
-        return soreness
-
-    def is_joint(self):
-        if (self.body_part_location == BodyPartLocation.hip_flexor or
-                self.body_part_location == BodyPartLocation.knee or
-                self.body_part_location == BodyPartLocation.ankle or
-                self.body_part_location == BodyPartLocation.foot or
-                self.body_part_location == BodyPartLocation.achilles or
-                self.body_part_location == BodyPartLocation.elbow or
-                self.body_part_location == BodyPartLocation.wrist):
-            return True
-        else:
-            return False
-
-    def is_muscle(self):
-        if (self.body_part_location == BodyPartLocation.shoulder or
-                self.body_part_location == BodyPartLocation.chest or
-                self.body_part_location == BodyPartLocation.abdominals or
-                self.body_part_location == BodyPartLocation.groin or
-                self.body_part_location == BodyPartLocation.quads or
-                self.body_part_location == BodyPartLocation.shin or
-                self.body_part_location == BodyPartLocation.outer_thigh or
-                self.body_part_location == BodyPartLocation.lower_back or
-                self.body_part_location == BodyPartLocation.glutes or
-                self.body_part_location == BodyPartLocation.hamstrings or
-                self.body_part_location == BodyPartLocation.calves or
-                self.body_part_location == BodyPartLocation.upper_back_neck or
-                self.body_part_location == BodyPartLocation.lats):
-            return True
-        else:
-            return False
 
 
 class BodyPartLocationText(object):

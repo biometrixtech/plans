@@ -30,7 +30,7 @@ class ExerciseAssignmentCalculator(object):
         self.high_relative_load_session_sport_names = set()
 
         self.muscular_strain_increasing = athlete_stats.muscular_strain_increasing
-        self.doms = athlete_stats.delayed_onset_muscle_soreness
+        self.doms = list(d for d in athlete_stats.historic_soreness if d.historic_soreness_status == HistoricSorenessStatus.doms)
 
         self.set_high_relative_load_session(athlete_stats, training_sessions)
 

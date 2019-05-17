@@ -5,7 +5,8 @@ import os
 os.environ['ENVIRONMENT'] = 'dev'
 import datetime
 from logic.survey_processing import SurveyProcessing, force_datetime_iso, cleanup_sleep_data_from_api, cleanup_hr_data_from_api, create_session
-from models.soreness import  Soreness, BodyPartLocation, BodyPart, HistoricSoreness, HistoricSorenessStatus
+from models.soreness import Soreness, BodyPartLocation, BodyPart, HistoricSorenessStatus
+from models.historic_soreness import HistoricSoreness
 from models.stats import AthleteStats
 from tests.mocks.mock_datastore_collection import DatastoreCollection
 from utils import format_date
@@ -155,7 +156,7 @@ def test_create_session_hr_data():
 def test_patch_daily_and_historic_soreness_higher_soreness():
     current_time = datetime.datetime.now()
     athlete_stats = AthleteStats('test')
-    athlete_stats.event_date = format_date(current_time)
+    athlete_stats.event_date = current_time
     athlete_stats.readiness_soreness = [get_soreness(7, 1, False, 2)]
     athlete_stats.daily_severe_soreness = [get_soreness(7, 1, False, 2)]
 
@@ -172,7 +173,7 @@ def test_patch_daily_and_historic_soreness_higher_soreness():
 def test_patch_daily_and_historic_soreness_lower_soreness():
     current_time = datetime.datetime.now()
     athlete_stats = AthleteStats('test')
-    athlete_stats.event_date = format_date(current_time)
+    athlete_stats.event_date = current_time
     athlete_stats.readiness_soreness = [get_soreness(7, 1, False, 3, reported_date_time=current_time - datetime.timedelta(days=1))]
     athlete_stats.daily_severe_soreness = [get_soreness(7, 1, False, 3, reported_date_time=current_time - datetime.timedelta(days=1))]
 
@@ -189,7 +190,7 @@ def test_patch_daily_and_historic_soreness_lower_soreness():
 def test_session_from_survey():
     current_time = datetime.datetime.now()
     athlete_stats = AthleteStats('test')
-    athlete_stats.event_date = format_date(current_time)
+    athlete_stats.event_date = current_time
     survey_processor = SurveyProcessing('test', current_time, athlete_stats)
     session_data = get_session_data()
     del session_data['hr_data']
@@ -208,7 +209,7 @@ def test_session_from_survey():
 def test_session_from_survey_hr_data():
     current_time = datetime.datetime.now()
     athlete_stats = AthleteStats('test')
-    athlete_stats.event_date = format_date(current_time)
+    athlete_stats.event_date = current_time
     survey_processor = SurveyProcessing('test', current_time, athlete_stats)
     session_data = get_session_data()
     survey_processor.create_session_from_survey(session_data)
@@ -225,7 +226,7 @@ def test_session_from_survey_hr_data():
 def test_session_from_survey_no_ps_survey():
     current_time = datetime.datetime.now()
     athlete_stats = AthleteStats('test')
-    athlete_stats.event_date = format_date(current_time)
+    athlete_stats.event_date = current_time
     survey_processor = SurveyProcessing('test', current_time, athlete_stats)
     session_data = get_session_data()
     del session_data['post_session_survey']
@@ -243,7 +244,7 @@ def test_session_from_survey_no_ps_survey():
 def test_session_from_survey_historic_health_data():
     current_time = datetime.datetime.now()
     athlete_stats = AthleteStats('test')
-    athlete_stats.event_date = format_date(current_time)
+    athlete_stats.event_date = current_time
     survey_processor = SurveyProcessing('test', current_time, athlete_stats)
     session_data = get_session_data()
     session_obj = survey_processor.create_session_from_survey(session_data, historic_health_data=True)
@@ -261,15 +262,15 @@ def test_session_from_survey_historic_health_data():
 def test_patch_daily_and_historic_soreness_no_existing_doms():
     current_time = datetime.datetime.now()
     athlete_stats = AthleteStats('test')
-    athlete_stats.event_date = format_date(current_time)
-    athlete_stats.delayed_onset_muscle_soreness = []
+    athlete_stats.event_date = current_time
+    athlete_stats.historic_soreness = []
 
     survey_processor = SurveyProcessing('test', current_time, athlete_stats)
     survey_processor.soreness = [get_soreness(3, 1, False, 2, reported_date_time=current_time)]
     survey_processor.patch_daily_and_historic_soreness()
 
-    assert len(survey_processor.athlete_stats.delayed_onset_muscle_soreness) == 1
-    doms = survey_processor.athlete_stats.delayed_onset_muscle_soreness[0]
+    assert len(survey_processor.athlete_stats.historic_soreness) == 1
+    doms = survey_processor.athlete_stats.historic_soreness[0]
     assert doms.first_reported_date_time == current_time
     assert doms.max_severity_date_time == current_time
     assert len(doms.historic_severity) == 1
@@ -278,13 +279,13 @@ def test_patch_daily_and_historic_soreness_no_existing_doms():
 def test_patch_daily_and_historic_soreness_existing_doms_higher_severity():
     event_date_time = datetime.datetime.now() - datetime.timedelta(days=1)
     athlete_stats = AthleteStats('test')
-    athlete_stats.event_date = format_date(event_date_time)
-    athlete_stats.delayed_onset_muscle_soreness = []
+    athlete_stats.event_date = event_date_time
+    athlete_stats.historic_soreness = []
 
     survey_processor = SurveyProcessing('test', event_date_time, athlete_stats)
     survey_processor.soreness = [get_soreness(2, 1, False, 2, reported_date_time=event_date_time)]
     survey_processor.patch_daily_and_historic_soreness()
-    assert len(survey_processor.athlete_stats.delayed_onset_muscle_soreness) == 1
+    assert len(survey_processor.athlete_stats.historic_soreness) == 1
 
     current_time = datetime.datetime.now()
     new_soreness = get_soreness(2, 1, False, 3, reported_date_time=current_time)
@@ -292,8 +293,8 @@ def test_patch_daily_and_historic_soreness_existing_doms_higher_severity():
     survey_processor.soreness = [new_soreness]
     survey_processor.patch_daily_and_historic_soreness()
 
-    assert len(survey_processor.athlete_stats.delayed_onset_muscle_soreness) == 1
-    doms = survey_processor.athlete_stats.delayed_onset_muscle_soreness[0]
+    assert len(survey_processor.athlete_stats.historic_soreness) == 1
+    doms = survey_processor.athlete_stats.historic_soreness[0]
     assert doms.max_severity_date_time == current_time
     assert doms.max_severity == new_soreness.severity
     assert doms.first_reported_date_time == event_date_time
@@ -303,13 +304,13 @@ def test_patch_daily_and_historic_soreness_existing_doms_higher_severity():
 def test_patch_daily_and_historic_soreness_existing_doms_same_severity():
     event_date_time = datetime.datetime.now()
     athlete_stats = AthleteStats('test')
-    athlete_stats.event_date = format_date(event_date_time)
-    athlete_stats.delayed_onset_muscle_soreness = []
+    athlete_stats.event_date = event_date_time
+    athlete_stats.historic_soreness = []
 
     survey_processor = SurveyProcessing('test', event_date_time, athlete_stats)
     survey_processor.soreness = [get_soreness(2, 1, False, 2, reported_date_time=event_date_time )]
     survey_processor.patch_daily_and_historic_soreness()
-    assert len(survey_processor.athlete_stats.delayed_onset_muscle_soreness) == 1
+    assert len(survey_processor.athlete_stats.historic_soreness) == 1
 
     current_time = datetime.datetime.now()
     new_soreness = get_soreness(2, 1, False, 2, reported_date_time=current_time)
@@ -317,8 +318,8 @@ def test_patch_daily_and_historic_soreness_existing_doms_same_severity():
     survey_processor.soreness = [new_soreness]
     survey_processor.patch_daily_and_historic_soreness()
 
-    assert len(survey_processor.athlete_stats.delayed_onset_muscle_soreness) == 1
-    doms = survey_processor.athlete_stats.delayed_onset_muscle_soreness[0]
+    assert len(survey_processor.athlete_stats.historic_soreness) == 1
+    doms = survey_processor.athlete_stats.historic_soreness[0]
     assert doms.max_severity_date_time == event_date_time
     assert doms.max_severity == new_soreness.severity
     assert doms.first_reported_date_time == event_date_time
@@ -328,13 +329,13 @@ def test_patch_daily_and_historic_soreness_existing_doms_same_severity():
 def test_patch_daily_and_historic_soreness_existing_doms_pain_reported():
     event_date_time = datetime.datetime.now() - datetime.timedelta(days=1)
     athlete_stats = AthleteStats('test')
-    athlete_stats.event_date = format_date(event_date_time)
-    athlete_stats.delayed_onset_muscle_soreness = []
+    athlete_stats.event_date = event_date_time
+    athlete_stats.historic_soreness = []
 
     survey_processor = SurveyProcessing('test', event_date_time, athlete_stats)
     survey_processor.soreness = [get_soreness(2, 1, False, 3, reported_date_time=event_date_time)]
     survey_processor.patch_daily_and_historic_soreness()
-    assert len(survey_processor.athlete_stats.delayed_onset_muscle_soreness) == 1
+    assert len(survey_processor.athlete_stats.historic_soreness) == 1
 
     current_time = datetime.datetime.now()
     new_soreness = get_soreness(2, 1, True, 3, reported_date_time=current_time)
@@ -342,8 +343,8 @@ def test_patch_daily_and_historic_soreness_existing_doms_pain_reported():
     survey_processor.soreness = [new_soreness]
     survey_processor.patch_daily_and_historic_soreness()
 
-    assert len(survey_processor.athlete_stats.delayed_onset_muscle_soreness) == 1
-    doms = survey_processor.athlete_stats.delayed_onset_muscle_soreness[0]
+    assert len(survey_processor.athlete_stats.historic_soreness) == 1
+    doms = survey_processor.athlete_stats.historic_soreness[0]
     assert doms.max_severity_date_time == event_date_time
     assert doms.max_severity == 3
     assert doms.first_reported_date_time == event_date_time
@@ -353,13 +354,13 @@ def test_patch_daily_and_historic_soreness_existing_doms_pain_reported():
 def test_patch_daily_and_historic_soreness_existing_doms_new_body_part():
     event_date_time = datetime.datetime.now() - datetime.timedelta(days=1)
     athlete_stats = AthleteStats('test')
-    athlete_stats.event_date = format_date(event_date_time)
-    athlete_stats.delayed_onset_muscle_soreness = []
+    athlete_stats.event_date = event_date_time
+    athlete_stats.historic_soreness = []
 
     survey_processor = SurveyProcessing('test', event_date_time, athlete_stats)
     survey_processor.soreness = [get_soreness(2, 1, False, 3, reported_date_time=event_date_time)]
     survey_processor.patch_daily_and_historic_soreness()
-    assert len(survey_processor.athlete_stats.delayed_onset_muscle_soreness) == 1
+    assert len(survey_processor.athlete_stats.historic_soreness) == 1
 
     current_time = datetime.datetime.now()
     new_soreness = get_soreness(16, 1, False, 3, reported_date_time=current_time)
@@ -367,14 +368,14 @@ def test_patch_daily_and_historic_soreness_existing_doms_new_body_part():
     survey_processor.soreness = [new_soreness]
     survey_processor.patch_daily_and_historic_soreness()
 
-    assert len(survey_processor.athlete_stats.delayed_onset_muscle_soreness) == 2
-    doms_0 = survey_processor.athlete_stats.delayed_onset_muscle_soreness[0]
+    assert len(survey_processor.athlete_stats.historic_soreness) == 2
+    doms_0 = survey_processor.athlete_stats.historic_soreness[0]
     assert doms_0.max_severity_date_time == event_date_time
     assert doms_0.first_reported_date_time == event_date_time
     assert len(doms_0.historic_severity) == 1
 
-    doms_1 = survey_processor.athlete_stats.delayed_onset_muscle_soreness[1]
-    assert doms_1.body_part.location.value == new_soreness.body_part.location.value
+    doms_1 = survey_processor.athlete_stats.historic_soreness[1]
+    assert doms_1.body_part_location.value == new_soreness.body_part.location.value
     assert doms_1.max_severity_date_time == current_time
     assert doms_1.first_reported_date_time == current_time
     assert len(doms_1.historic_severity) == 1
@@ -382,14 +383,14 @@ def test_patch_daily_and_historic_soreness_existing_doms_new_body_part():
 def test_patch_daily_and_historic_soreness_existing_doms_new_body_part_clear_old():
     event_date_time = datetime.datetime.now() - datetime.timedelta(days=1) + datetime.timedelta(seconds=120)
     athlete_stats = AthleteStats('test')
-    athlete_stats.event_date = format_date(event_date_time)
-    athlete_stats.delayed_onset_muscle_soreness = []
+    athlete_stats.event_date = event_date_time
+    athlete_stats.historic_soreness = []
 
     survey_processor = SurveyProcessing('test', event_date_time, athlete_stats)
     survey_processor.soreness = [get_soreness(2, 1, False, 2, reported_date_time=event_date_time)]
     survey_processor.patch_daily_and_historic_soreness()
     survey_processor.datastore_collection = DatastoreCollection()
-    assert len(survey_processor.athlete_stats.delayed_onset_muscle_soreness) == 1
+    assert len(survey_processor.athlete_stats.historic_soreness) == 1
 
     current_time = datetime.datetime.now()
     new_soreness = get_soreness(16, 1, False, 2, reported_date_time=current_time)
@@ -399,18 +400,18 @@ def test_patch_daily_and_historic_soreness_existing_doms_new_body_part_clear_old
     survey_processor.soreness = [new_soreness]
     survey_processor.patch_daily_and_historic_soreness()
 
-    assert len(survey_processor.athlete_stats.delayed_onset_muscle_soreness) == 1
+    assert len(survey_processor.athlete_stats.historic_soreness) == 1
 
 
 
 def test_patch_daily_and_historic_soreness_joint():
     current_time = datetime.datetime.now()
     athlete_stats = AthleteStats('test')
-    athlete_stats.event_date = format_date(current_time)
-    athlete_stats.delayed_onset_muscle_soreness = []
+    athlete_stats.event_date = current_time
+    athlete_stats.historic_soreness = []
 
     survey_processor = SurveyProcessing('test', datetime.datetime.now(), athlete_stats)
     survey_processor.soreness = [get_soreness(7, 1, False, 2, reported_date_time=current_time)]
     survey_processor.patch_daily_and_historic_soreness()
 
-    assert len(survey_processor.athlete_stats.delayed_onset_muscle_soreness) == 0
+    assert len(survey_processor.athlete_stats.historic_soreness) == 0
