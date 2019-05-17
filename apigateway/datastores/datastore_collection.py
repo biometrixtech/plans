@@ -2,7 +2,7 @@ from datastores import athlete_stats_datastore, completed_exercise_datastore, da
 from datastores import daily_readiness_datastore, exercise_datastore, heart_rate_datastore
 from datastores import post_session_survey_datastore, session_datastore
 from datastores import sleep_history_datastore
-from datastores import cleared_doms_datastore
+from datastores import cleared_soreness_datastore
 
 
 class DatastoreCollection(object):
@@ -17,4 +17,4 @@ class DatastoreCollection(object):
         self.post_session_survey_datastore = post_session_survey_datastore.PostSessionSurveyDatastore()
         self.session_datastore = session_datastore.SessionDatastore()
         self.sleep_history_datastore = sleep_history_datastore.SleepHistoryDatastore()
-        self.cleared_doms_datastore = cleared_doms_datastore.ClearedDOMSDatastore()
+        self.cleared_soreness_datastore = cleared_soreness_datastore.ClearedSorenessDatastore()

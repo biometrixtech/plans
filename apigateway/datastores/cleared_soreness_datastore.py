@@ -5,11 +5,11 @@ from utils import format_datetime
 from fathomapi.utils.exceptions import InvalidSchemaException
 
 
-class ClearedDOMSDatastore(object):
-    def __init__(self, mongo_collection='cleareddoms'):
+class ClearedSorenessDatastore(object):
+    def __init__(self, mongo_collection='clearedsoreness'):
         self.mongo_collection = mongo_collection
 
-    @xray_recorder.capture('datastore.ClearedDOMSDatastore.get')
+    @xray_recorder.capture('datastore.ClearedSorenessDatastore.get')
     def get(self, user_id, start_date_time, end_date_time):
         return self._query_mongodb(user_id, start_date_time, end_date_time)
 
@@ -33,7 +33,7 @@ class ClearedDOMSDatastore(object):
     #     else:
     #         self._delete_mongodb(item=items, user_id=user_id, start_date_time=start_date_time, end_date_time=end_date_time)
 
-    @xray_recorder.capture('datastore.ClearedDOMSDatastore._query_mongodb')
+    @xray_recorder.capture('datastore.ClearedSorenessDatastore._query_mongodb')
     def _query_mongodb(self, user_id, start_date_time, end_date_time):
         mongo_collection = get_mongo_collection(self.mongo_collection)
         ret = []
@@ -55,14 +55,14 @@ class ClearedDOMSDatastore(object):
 
         return ret
 
-    @xray_recorder.capture('datastore.ClearedDOMSDatastore._put_mongodb')
+    @xray_recorder.capture('datastore.ClearedSorenessDatastore._put_mongodb')
     def _put_mongodb(self, item):
         item = item.json_serialise(cleared=True)
 
         mongo_collection = get_mongo_collection(self.mongo_collection)
         mongo_collection.insert_one(item)
 
-    # @xray_recorder.capture('datastore.ClearedDOMSDatastore._delete_mongodb')
+    # @xray_recorder.capture('datastore.ClearedSorenessDatastore._delete_mongodb')
     # def _delete_mongodb(self, item, user_id, start_date_time, end_date_time):
     #     mongo_collection = get_mongo_collection(self.mongo_collection)
     #     query = {}

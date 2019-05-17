@@ -120,8 +120,8 @@ class SurveyProcessing(object):
         if survey == 'readiness':
             cleared_doms = self.athlete_stats.clear_delayed_onset_muscle_soreness(self.event_date_time)
             if len(cleared_doms) > 0:
-                cleared_doms_datastore = self.datastore_collection.cleared_doms_datastore
-                cleared_doms_datastore.put(cleared_doms)
+                cleared_soreness_datastore = self.datastore_collection.cleared_soreness_datastore
+                cleared_soreness_datastore.put(cleared_doms)
 
     def process_clear_status_answers(self, clear_candidates, event_date, soreness):
 

@@ -1,4 +1,4 @@
-class ClearedDOMSDatastore(object):
+class ClearedSorenessDatastore(object):
 
     def __init__(self):
         self.cleared_doms = None
