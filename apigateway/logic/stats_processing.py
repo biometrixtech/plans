@@ -327,6 +327,7 @@ class StatsProcessing(object):
                 acute_pain_list.append(historic_soreness)
 
             else:
+                # historic soreness status could still be doms at this point
                 # looking for acute OR persistent pain
 
                 if len(body_part_history) >= 2:
@@ -388,6 +389,7 @@ class StatsProcessing(object):
                     if g.is_pain:
                         soreness.historic_soreness_status = HistoricSorenessStatus.persistent_pain
                     else:
+                        #upgrade from doms to persistent soreness
                         soreness.historic_soreness_status = HistoricSorenessStatus.persistent_soreness
                         for b in body_part_history:
                             current_soreness = HistoricSeverity(b.reported_date_time, b.severity, b.movement)
@@ -419,6 +421,7 @@ class StatsProcessing(object):
                     if g.is_pain:
                         soreness.historic_soreness_status = HistoricSorenessStatus.persistent_pain
                     else:
+                        #upgrade to persisten from doms
                         soreness.historic_soreness_status = HistoricSorenessStatus.persistent_soreness
                         for b in body_part_history:
                             current_soreness = HistoricSeverity(b.reported_date_time, b.severity, b.movement)
@@ -438,21 +441,7 @@ class StatsProcessing(object):
 
                     acute_pain_list.append(soreness)
 
-                elif last_ten_day_count == 2 and len(body_part_history) >= 4:  # is it persistent?
-
-                    avg_severity = self.calc_avg_severity_persistent_2(body_part_history, self.event_date)
-
-                    soreness = HistoricSoreness(g.location, g.side, g.is_pain)
-                    soreness.ask_acute_pain_question = False
-                    soreness.ask_persistent_2_question = False
-                    soreness.average_severity = avg_severity
-                    soreness.first_reported_date_time = first_reported_date_time
-                    soreness.last_reported_date_time = last_reported_date_time
-                    soreness.streak_start_date = None
-
-                    acute_pain_list.append(soreness)
-
-                elif last_ten_day_count > 3 and len(body_part_history) >= 5:  # will we ever even get here?
+                elif last_ten_day_count > 3 and len(body_part_history) >= 5:
 
                     avg_severity = self.calc_avg_severity_persistent_2(body_part_history, self.event_date)
 
@@ -479,38 +468,49 @@ class StatsProcessing(object):
 
                     acute_pain_list.append(soreness)
 
-                elif len(body_part_history) > 0 and not g.is_pain:
+                elif last_ten_day_count == 2 and len(body_part_history) >= 4:  # maintain current status but don't clear
+
+                    avg_severity = self.calc_avg_severity_persistent_2(body_part_history, self.event_date)
 
                     soreness = HistoricSoreness(g.location, g.side, g.is_pain)
-                    soreness.first_reported_date_time = body_part_history[0].reported_date_time
-
-                    for b in body_part_history:
-                        current_soreness = HistoricSeverity(b.reported_date_time, b.severity, b.movement)
-                        current_severity = SorenessCalculator.get_severity(b.severity, b.movement)
-                        soreness.historic_severity.append(current_soreness)
-                        soreness.last_reported_date_time = current_soreness.reported_date_time
-
-                        if soreness.max_severity is None or current_severity > soreness.max_severity:
-                            soreness.max_severity = current_severity
-                            soreness.max_severity_date_time = current_soreness.reported_date_time
-
-                    soreness.historic_soreness_status = HistoricSorenessStatus.doms
-
-                    acute_pain_list.append(soreness)
-
-                else:
-
-                    soreness = HistoricSoreness(g.location, g.side, g.is_pain)
-
-                    soreness.historic_soreness_status = HistoricSorenessStatus.dormant_cleared
                     soreness.ask_acute_pain_question = False
                     soreness.ask_persistent_2_question = False
-                    soreness.average_severity = 0.0
+                    soreness.average_severity = avg_severity
                     soreness.first_reported_date_time = first_reported_date_time
                     soreness.last_reported_date_time = last_reported_date_time
                     soreness.streak_start_date = None
 
                     acute_pain_list.append(soreness)
+
+                else:
+                    # first check if we can clear DOMS
+                    if historic_soreness.historic_soreness_status == HistoricSorenessStatus.doms:
+                        last_reported_severity = [hist for hist in historic_soreness.historic_severity if
+                                                  hist.reported_date_time == historic_soreness.last_reported_date_time][0]
+                        last_severity_value = SorenessCalculator.get_severity(last_reported_severity.severity,
+                                                                              last_reported_severity.movement)
+                        if last_severity_value <= 2:
+                            clearance_window = 1
+                        else:
+                            clearance_window = 2
+                        days_since_last_report = (self.event_date.date() - historic_soreness.last_reported_date_time.date()).days
+                        if days_since_last_report >= clearance_window:
+                            historic_soreness.user_id = self.athlete_id
+                            historic_soreness.cleared_date_time = self.event_date
+                            # don't add to list, save to archive
+
+                    else:
+                        soreness = HistoricSoreness(g.location, g.side, g.is_pain)
+
+                        soreness.historic_soreness_status = HistoricSorenessStatus.dormant_cleared
+                        soreness.ask_acute_pain_question = False
+                        soreness.ask_persistent_2_question = False
+                        soreness.average_severity = 0.0
+                        soreness.first_reported_date_time = first_reported_date_time
+                        soreness.last_reported_date_time = last_reported_date_time
+                        soreness.streak_start_date = None
+
+                        acute_pain_list.append(soreness)
 
         return acute_pain_list
 

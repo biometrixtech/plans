@@ -92,6 +92,7 @@ class DelayedOnsetMuscleSoreness(object):
         super().__setattr__(name, value)
 '''
 
+
 class CoOccurrence(object):
     def __init__(self, body_part_location, side, historic_soreness_status, first_reported_date_time):
         self.body_part_location = body_part_location
@@ -146,7 +147,8 @@ class HistoricSoreness(BaseSoreness, Serialisable):
         self.cause = SorenessCause.unknown
 
     def __setattr__(self, name, value):
-        if name in ['first_reported_date_time', 'last_reported_date_time', 'streak_start_date']:
+        if name in ['first_reported_date_time', 'last_reported_date_time', 'streak_start_date', 'cleared_date_time',
+                    'max_severity_date_time']:
             if value is not None and not isinstance(value, datetime.datetime):
                 try:
                     value = parse_datetime(value)
@@ -207,8 +209,7 @@ class HistoricSoreness(BaseSoreness, Serialisable):
 
         soreness.last_reported_date_time = last_reported_date_time
         soreness.cleared_date_time = input_dict.get('cleared_date_time', None)
-        #soreness.historic_severity = [HistoricSeverity.json_deserialise(hist) for hist in
-        #                              input_dict['historic_severity'] if input_dict.get('historic_severity', []) is not None]
+        soreness.historic_severity = [HistoricSeverity.json_deserialise(hist) for hist in input_dict.get('historic_severity', [])]
         soreness.ask_acute_pain_question = input_dict.get("ask_acute_pain_question", False)
         soreness.ask_persistent_2_question = input_dict.get("ask_persistent_2_question", False)
 

@@ -206,17 +206,18 @@ class AthleteStats(Serialisable):
     def clear_delayed_onset_muscle_soreness(self, current_date_time):
         cleared_doms = []
         for doms in self.historic_soreness:
-            last_reported_severity = [hist for hist in doms.historic_severity if hist.reported_date_time == doms.last_reported_date_time][0]
-            last_severity_value = SorenessCalculator.get_severity(last_reported_severity.severity, last_reported_severity.movement)
-            if last_severity_value <= 2:
-                clearance_window = 1
-            else:
-                clearance_window = 2
-            days_since_last_report = (current_date_time.date() - doms.last_reported_date_time.date()).days
-            if days_since_last_report >= clearance_window:
-                doms.user_id = self.athlete_id
-                doms.cleared_date_time = current_date_time
-                cleared_doms.append(doms)
+            if doms.historic_soreness_status == HistoricSorenessStatus.doms:
+                last_reported_severity = [hist for hist in doms.historic_severity if hist.reported_date_time == doms.last_reported_date_time][0]
+                last_severity_value = SorenessCalculator.get_severity(last_reported_severity.severity, last_reported_severity.movement)
+                if last_severity_value <= 2:
+                    clearance_window = 1
+                else:
+                    clearance_window = 2
+                days_since_last_report = (current_date_time.date() - doms.last_reported_date_time.date()).days
+                if days_since_last_report >= clearance_window:
+                    doms.user_id = self.athlete_id
+                    doms.cleared_date_time = current_date_time
+                    cleared_doms.append(doms)
         self.historic_soreness = [doms for doms in self.historic_soreness if doms.cleared_date_time is None]
         return cleared_doms
 
