@@ -13,7 +13,6 @@ from models.post_session_survey import PostSessionSurvey
 from utils import parse_date, format_date
 
 
-
 class StatsProcessing(object):
 
     def __init__(self, athlete_id, event_date, datastore_collection):
@@ -21,6 +20,7 @@ class StatsProcessing(object):
         self.event_date = event_date
         self.athlete_stats_datastore = datastore_collection.athlete_stats_datastore
         self.daily_plan_datastore = datastore_collection.daily_plan_datastore
+        self.cleared_soreness_datastore = datastore_collection.cleared_soreness_datastore
         self.start_date = None
         self.end_date = None
         self.start_date_time = None
@@ -497,6 +497,7 @@ class StatsProcessing(object):
                         if days_since_last_report >= clearance_window:
                             historic_soreness.user_id = self.athlete_id
                             historic_soreness.cleared_date_time = self.event_date
+                            self.cleared_soreness_datastore.put(historic_soreness)
                             # don't add to list, save to archive
 
                     else:
