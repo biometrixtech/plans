@@ -126,20 +126,9 @@ class StatsProcessing(object):
 
                 athlete_stats.historic_soreness = list(h for h in athlete_stats.historic_soreness if h.cleared_date_time is None)
 
-                # update any historic severity (for acute/chronic days)
+                # update soreness cause for acute/chronic days
                 # WARNING: this updates athlete_stats.historic_soreness
-                acute_surveys = self.merge_soreness_from_surveys(self.acute_readiness_surveys, self.acute_post_session_surveys)
-                chronic_surveys = self.merge_soreness_from_surveys(self.chronic_readiness_surveys, self.chronic_post_session_surveys)
-
-                all_surveys = []
-                all_surveys.extend(acute_surveys)
-                all_surveys.extend(chronic_surveys)
-
-                target_soreness_list = self.add_historic_severity(all_surveys, athlete_stats.historic_soreness)
-
-                # update soreness cause
-                # WARNING: this updates athlete_stats.historic_soreness
-                target_soreness_list  = self.add_soreness_cause(target_soreness_list)
+                athlete_stats.historic_soreness = self.add_soreness_cause(athlete_stats.historic_soreness)
 
                 # calc muscular strain
                 cleared_soreness = self.cleared_soreness_datastore.get(self.athlete_id,
@@ -163,32 +152,53 @@ class StatsProcessing(object):
 
         return athlete_stats
 
-    def add_soreness_cause(self, target_soreness_list):
+    def add_soreness_cause(self, historic_soreness):
 
-        target_soreness_list = self.add_soreness_co_occurrences(target_soreness_list)
+        acute_surveys = self.merge_soreness_from_surveys(
+            self.get_readiness_soreness_list(self.acute_readiness_surveys),
+            self.get_ps_survey_soreness_list(self.acute_post_session_surveys))
+        chronic_surveys = self.merge_soreness_from_surveys(
+            self.get_readiness_soreness_list(self.chronic_readiness_surveys),
+            self.get_ps_survey_soreness_list(self.chronic_post_session_surveys))
+        all_surveys = []
+        all_surveys.extend(acute_surveys)
+        all_surveys.extend(chronic_surveys)
+
+        historic_soreness = self.add_historic_severity(all_surveys, historic_soreness)
+
+        historic_soreness = self.add_soreness_co_occurrences(historic_soreness)
+
+        target_soreness_list = self.get_targeted_soreness(historic_soreness)
 
         soreness_calc = SorenessCalculator()
         for t in target_soreness_list:
             t.cause = soreness_calc.get_soreness_cause(t, self.event_date)
 
-        return target_soreness_list
+        return historic_soreness
+
+    def get_targeted_soreness(self, historic_soreness):
+
+        return list(h for h in historic_soreness if
+                    not h.is_pain and not h.is_dormant_cleared()
+                    and h.historic_soreness_status != HistoricSorenessStatus.doms)
 
     def add_historic_severity(self, all_surveys, historic_soreness):
 
-        target_soreness_list = list(h for h in historic_soreness if
-                               not h.is_pain and not h.is_dormant_cleared()
-                               and h.historic_soreness_status != HistoricSorenessStatus.doms)
+        target_soreness_list = self.get_targeted_soreness(historic_soreness)
+
         for t in target_soreness_list:
             body_part_history = list(s for s in all_surveys if s.body_part.location ==
                                      t.body_part_location and s.side == t.side and s.pain == t.is_pain
-                                     and s.reported_date_time >= t.first_reported_date_time)
+                                     and s.event_date_time >= t.first_reported_date_time)
             body_part_history.sort(key=lambda x: x.reported_date_time, reverse=False)
             t.historic_severity = []
+            if len(body_part_history) > 0:
+                t.first_reported_date_time = body_part_history[0].reported_date_time
             for b in body_part_history:
                 current_soreness = HistoricSeverity(b.reported_date_time, b.severity, b.movement)
                 t.historic_severity.append(current_soreness)
 
-        return target_soreness_list
+        return historic_soreness
 
     def get_muscular_strain(self, historic_soreness_list, cleared_soreness, training_sessions):
 
@@ -263,17 +273,19 @@ class StatsProcessing(object):
 
         return historic_soreness
 
-    def add_soreness_co_occurrences(self, historic_soreness_list):
+    def add_soreness_co_occurrences(self, historic_soreness):
+
+        target_soreness_list = self.get_targeted_soreness(historic_soreness)
 
         soreness_dictionary = {}
 
-        for h in historic_soreness_list:
+        for h in target_soreness_list:
             for v in h.historic_severity:
                 if v.reported_date_time not in soreness_dictionary:
                     soreness_dictionary[v.reported_date_time] = []
                 soreness_dictionary[v.reported_date_time].append(CoOccurrence(h.body_part_location, h.side, h.historic_soreness_status, h.first_reported_date_time))
 
-        for h in historic_soreness_list:
+        for h in target_soreness_list:
             hcount = 0
             for date, co_occurrence_list in soreness_dictionary.items():
                 current_occurrence = CoOccurrence(h.body_part_location, h.side, h.historic_soreness_status, h.first_reported_date_time)
@@ -291,7 +303,7 @@ class StatsProcessing(object):
                             new_co_occurrence.percentage = new_co_occurrence.count / float(hcount)
                             h.co_occurrences.append(new_co_occurrence)
 
-        return historic_soreness_list
+        return historic_soreness
 
     def get_historic_soreness_list(self, soreness_list_25, existing_historic_soreness=None):
 
