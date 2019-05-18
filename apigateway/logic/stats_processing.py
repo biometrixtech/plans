@@ -205,8 +205,7 @@ class StatsProcessing(object):
 
         all_soreness = []
         overloading_soreness = list(o for o in historic_soreness_list if not o.is_dormant_cleared()
-                                    and not o.is_pain and o.cause != SorenessCause.dysfunction and
-                                    o.cause != SorenessCause.weakness)
+                                    and not o.is_pain and o.cause == SorenessCause.overloading)
 
         all_soreness.extend(overloading_soreness)
         all_soreness.extend(cleared_soreness)
@@ -215,7 +214,7 @@ class StatsProcessing(object):
         sore_load = 0
 
         for t in training_sessions:
-            if t.session_rpe == 1:  # maintenance load, do not consider
+            if t.session_RPE == 1:  # maintenance load, do not consider
                 total_load += t.duration_load()
             else:
                 sore_body_parts = list(a for a in all_soreness
