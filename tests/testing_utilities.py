@@ -36,7 +36,7 @@ class TestUtilities(object):
             soreness = {
                 "body_part": location_enum,
                 "severity": severity,
-                "side":side,
+                "side": side,
                 "pain": True
             }
         else:

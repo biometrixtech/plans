@@ -189,7 +189,8 @@ class StatsProcessing(object):
         for t in target_soreness_list:
             body_part_history = list(s for s in all_surveys if s.body_part.location ==
                                      t.body_part_location and s.side == t.side and s.pain == t.is_pain
-                                     and s.event_date_time >= t.first_reported_date_time)
+                                     #and s.reported_date_time >= t.first_reported_date_time
+                                    )
             body_part_history.sort(key=lambda x: x.reported_date_time, reverse=False)
             t.historic_severity = []
             if len(body_part_history) > 0:

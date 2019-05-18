@@ -2,7 +2,7 @@ from aws_xray_sdk.core import xray_recorder
 xray_recorder.configure(sampling=False)
 xray_recorder.begin_segment(name="test")
 from math import floor
-from models.historic_soreness import HistoricSoreness, HistoricSorenessStatus, HistoricSeverity
+from models.historic_soreness import HistoricSoreness, HistoricSorenessStatus, HistoricSeverity, SorenessCause
 from models.session import SessionType
 from models.soreness import BodyPartLocation
 from logic.stats_processing import StatsProcessing
@@ -34,17 +34,19 @@ def get_daily_readiness_surveys(start_date, historic_soreness_list, days, co_occ
     factor = floor(co_occurence_ratio * len(dates))
 
     factor_goal = 0
+    i = 0
     for d in dates:
         soreness_list = []
         part_list = 0
         for h in historic_soreness_list:
-            if factor_goal >= factor and part_list > 1:
+            if factor_goal >= factor and part_list > 0 and i % 2 == 0:
                 pass
             else:
                 soreness = TestUtilities().body_part_soreness(h.body_part_location.value, 1, h.side)
                 soreness_list.append(soreness)
             factor_goal += 1
             part_list += 1
+            i += 1
         daily_readiness = DailyReadiness(d.strftime("%Y-%m-%dT%H:%M:%SZ"), "tester", soreness_list, 4, 5)
         surveys.append(daily_readiness)
 
@@ -60,18 +62,19 @@ def get_post_session_surveys(start_date, historic_soreness_list, days, co_occure
     factor = floor(co_occurence_ratio * len(dates))
 
     factor_goal = 0
-
+    i = 0
     for d in dates:
         soreness_list = []
         part_list = 0
         for h in historic_soreness_list:
-            if factor_goal >= factor and part_list > 1:
+            if factor_goal >= factor and part_list > 0 and i % 2 == 0:
                 pass
             else:
                 soreness = TestUtilities().body_part_soreness(h.body_part_location.value, 1, h.side)
                 soreness_list.append(soreness)
             factor_goal += 1
             part_list += 1
+            i += 1
 
         post_survey = TestUtilities().get_post_survey(2, soreness_list)
 
@@ -87,7 +90,7 @@ def get_symmetric_historic_soreness_list(body_part_location):
     historic_soreness_1.historic_soreness_status = HistoricSorenessStatus.persistent_soreness
 
     historic_soreness_2 = HistoricSoreness(body_part_location, 2, False)
-    historic_soreness_1.historic_soreness_status = HistoricSorenessStatus.persistent_2_soreness
+    historic_soreness_2.historic_soreness_status = HistoricSorenessStatus.persistent_2_soreness
 
     historic_soreness_list = [historic_soreness_1, historic_soreness_2]
 
@@ -100,7 +103,7 @@ def get_asymmetric_historic_soreness_list(body_part_location_1, body_part_locati
     historic_soreness_1.historic_soreness_status = HistoricSorenessStatus.persistent_soreness
 
     historic_soreness_2 = HistoricSoreness(body_part_location_2, 2, False)
-    historic_soreness_1.historic_soreness_status = HistoricSorenessStatus.persistent_2_soreness
+    historic_soreness_2.historic_soreness_status = HistoricSorenessStatus.persistent_2_soreness
 
     historic_soreness_list = [historic_soreness_1, historic_soreness_2]
 
@@ -132,17 +135,17 @@ def test_symmetric_muscle_groups():
 
     stats_processing = StatsProcessing("test", base_date_time, datastore_collection)
 
-    co_occurrence_ratio = 0.80
+    co_occurrence_ratio = 0.9
 
     historic_soreness_list = []
     historic_soreness_list.extend(get_symmetric_historic_soreness_list(BodyPartLocation.calves))
 
     acute_readiness_surveys.extend(get_daily_readiness_surveys(base_date_time - timedelta(days=7),
-                                                               historic_soreness_list, 7, co_occurrence_ratio))
+                                                               historic_soreness_list, 7, 1.00))
     chronic_readiness_surveys.extend(get_daily_readiness_surveys(base_date_time - timedelta(days=35),
                                                                  historic_soreness_list, 28, co_occurrence_ratio))
     acute_post_session_surveys.extend(get_post_session_surveys(base_date_time - timedelta(days=7),
-                                                               historic_soreness_list, 7, co_occurrence_ratio))
+                                                               historic_soreness_list, 7, 1.00))
     chronic_post_session_surveys.extend(get_post_session_surveys(base_date_time - timedelta(days=35),
                                                                  historic_soreness_list, 28, co_occurrence_ratio))
 
@@ -153,4 +156,123 @@ def test_symmetric_muscle_groups():
 
     historic_soreness_list = stats_processing.add_soreness_cause(historic_soreness_list)
 
-    assert historic_soreness_list is not None
+    assert historic_soreness_list[0].cause == SorenessCause.dysfunction
+    assert historic_soreness_list[1].cause == SorenessCause.dysfunction
+
+def test_multiple_symmetric_muscle_groups():
+
+    base_date_time = datetime.now()
+
+    acute_readiness_surveys = []
+    acute_post_session_surveys = []
+    chronic_readiness_surveys = []
+    chronic_post_session_surveys = []
+
+    datastore_collection = DatastoreCollection()
+    athlete_stats_datastore = AthleteStatsDatastore()
+    datastore_collection.athlete_stats_datastore = athlete_stats_datastore
+
+    stats_processing = StatsProcessing("test", base_date_time, datastore_collection)
+
+    co_occurrence_ratio = 0.9
+
+    historic_soreness_list = []
+    historic_soreness_list.extend(get_symmetric_historic_soreness_list(BodyPartLocation.calves))
+    historic_soreness_list.extend(get_symmetric_historic_soreness_list(BodyPartLocation.quads))
+
+    acute_readiness_surveys.extend(get_daily_readiness_surveys(base_date_time - timedelta(days=7),
+                                                               historic_soreness_list, 7, 1.00))
+    chronic_readiness_surveys.extend(get_daily_readiness_surveys(base_date_time - timedelta(days=35),
+                                                                 historic_soreness_list, 28, co_occurrence_ratio))
+    acute_post_session_surveys.extend(get_post_session_surveys(base_date_time - timedelta(days=7),
+                                                               historic_soreness_list, 7, 1.00))
+    chronic_post_session_surveys.extend(get_post_session_surveys(base_date_time - timedelta(days=35),
+                                                                 historic_soreness_list, 28, co_occurrence_ratio))
+
+    stats_processing.acute_readiness_surveys = acute_readiness_surveys
+    stats_processing.chronic_readiness_surveys = chronic_readiness_surveys
+    stats_processing.acute_post_session_surveys = acute_post_session_surveys
+    stats_processing.chronic_post_session_surveys = chronic_post_session_surveys
+
+    historic_soreness_list = stats_processing.add_soreness_cause(historic_soreness_list)
+
+    assert historic_soreness_list[0].cause == SorenessCause.overloading
+    assert historic_soreness_list[1].cause == SorenessCause.overloading
+
+
+def test_multiple_asymmetric_muscle_groups():
+
+    base_date_time = datetime.now()
+
+    acute_readiness_surveys = []
+    acute_post_session_surveys = []
+    chronic_readiness_surveys = []
+    chronic_post_session_surveys = []
+
+    datastore_collection = DatastoreCollection()
+    athlete_stats_datastore = AthleteStatsDatastore()
+    datastore_collection.athlete_stats_datastore = athlete_stats_datastore
+
+    stats_processing = StatsProcessing("test", base_date_time, datastore_collection)
+
+    co_occurrence_ratio = 0.9
+
+    historic_soreness_list = []
+    historic_soreness_list.extend(get_asymmetric_historic_soreness_list(BodyPartLocation.calves, BodyPartLocation.quads))
+
+    acute_readiness_surveys.extend(get_daily_readiness_surveys(base_date_time - timedelta(days=7),
+                                                               historic_soreness_list, 7, 1.00))
+    chronic_readiness_surveys.extend(get_daily_readiness_surveys(base_date_time - timedelta(days=35),
+                                                                 historic_soreness_list, 28, co_occurrence_ratio))
+    acute_post_session_surveys.extend(get_post_session_surveys(base_date_time - timedelta(days=7),
+                                                               historic_soreness_list, 7, 1.00))
+    chronic_post_session_surveys.extend(get_post_session_surveys(base_date_time - timedelta(days=35),
+                                                                 historic_soreness_list, 28, co_occurrence_ratio))
+
+    stats_processing.acute_readiness_surveys = acute_readiness_surveys
+    stats_processing.chronic_readiness_surveys = chronic_readiness_surveys
+    stats_processing.acute_post_session_surveys = acute_post_session_surveys
+    stats_processing.chronic_post_session_surveys = chronic_post_session_surveys
+
+    historic_soreness_list = stats_processing.add_soreness_cause(historic_soreness_list)
+
+    assert historic_soreness_list[0].cause == SorenessCause.dysfunction
+    assert historic_soreness_list[1].cause == SorenessCause.dysfunction
+
+def test_single_symmetric_muscle_groups():
+
+    base_date_time = datetime.now()
+
+    acute_readiness_surveys = []
+    acute_post_session_surveys = []
+    chronic_readiness_surveys = []
+    chronic_post_session_surveys = []
+
+    datastore_collection = DatastoreCollection()
+    athlete_stats_datastore = AthleteStatsDatastore()
+    datastore_collection.athlete_stats_datastore = athlete_stats_datastore
+
+    stats_processing = StatsProcessing("test", base_date_time, datastore_collection)
+
+    co_occurrence_ratio = 0.9
+
+    historic_soreness_list = []
+    historic_soreness_list.extend(get_single_historic_soreness(BodyPartLocation.calves))
+
+    acute_readiness_surveys.extend(get_daily_readiness_surveys(base_date_time - timedelta(days=7),
+                                                               historic_soreness_list, 7, 1.00))
+    chronic_readiness_surveys.extend(get_daily_readiness_surveys(base_date_time - timedelta(days=35),
+                                                                 historic_soreness_list, 28, co_occurrence_ratio))
+    acute_post_session_surveys.extend(get_post_session_surveys(base_date_time - timedelta(days=7),
+                                                               historic_soreness_list, 7, 1.00))
+    chronic_post_session_surveys.extend(get_post_session_surveys(base_date_time - timedelta(days=35),
+                                                                 historic_soreness_list, 28, co_occurrence_ratio))
+
+    stats_processing.acute_readiness_surveys = acute_readiness_surveys
+    stats_processing.chronic_readiness_surveys = chronic_readiness_surveys
+    stats_processing.acute_post_session_surveys = acute_post_session_surveys
+    stats_processing.chronic_post_session_surveys = chronic_post_session_surveys
+
+    historic_soreness_list = stats_processing.add_soreness_cause(historic_soreness_list)
+
+    assert historic_soreness_list[0].cause == SorenessCause.dysfunction

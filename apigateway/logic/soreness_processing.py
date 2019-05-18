@@ -133,7 +133,14 @@ class SorenessCalculator(object):
 
         if len(historic_soreness.co_occurrences) == 1:
             if is_symmetric:
-                return SorenessCause.overloading
+                if (14 <= current_days_diff <= 28 and
+                      (current_date_time - historic_soreness.co_occurrences[0].first_reported_date_time).days <= 28):
+                    return SorenessCause.weakness
+                elif (28 < current_days_diff and
+                      (current_date_time - historic_soreness.co_occurrences[0].first_reported_date_time).days > 28):
+                    return SorenessCause.dysfunction
+                else:
+                    return SorenessCause.overloading
             else:
                 if (14 <= current_days_diff <= 28 and
                       (current_date_time - historic_soreness.co_occurrences[0].first_reported_date_time).days <= 28):
