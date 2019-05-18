@@ -124,7 +124,7 @@ class StatsProcessing(object):
                     if h.historic_soreness_status == HistoricSorenessStatus.doms:
                         h = self.clear_doms(h)
 
-                athlete_stats.historic_soreness = list(h for h in athlete_stats.historic_soreness if h.cleared_date_time is not None)
+                athlete_stats.historic_soreness = list(h for h in athlete_stats.historic_soreness if h.cleared_date_time is None)
 
                 # update any historic severity (for acute/chronic days)
                 # WARNING: this updates athlete_stats.historic_soreness
