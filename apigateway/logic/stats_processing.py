@@ -604,7 +604,7 @@ class StatsProcessing(object):
             historic_soreness.cleared_date_time = self.event_date
             self.cleared_soreness_datastore.put(historic_soreness)
 
-        return  historic_soreness
+        return historic_soreness
 
     def process_acute_pain_status(self, body_part_history, historic_soreness, last_reported_date_time):
 
