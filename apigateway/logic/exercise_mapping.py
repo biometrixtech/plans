@@ -40,11 +40,13 @@ class ExerciseAssignmentCalculator(object):
             if t.sport_name in athlete_stats.duration_load_ramp:
                 if (athlete_stats.duration_load_ramp[t.sport_name].observed_value is None or
                         athlete_stats.duration_load_ramp[t.sport_name].observed_value > 1.1):
+                    if t.session_RPE > 4:
+                        self.high_relative_load_session = True
+                        self.high_relative_load_session_sport_names.add(t.sport_name)
+            else:
+                if t.session_RPE > 4:
                     self.high_relative_load_session = True
                     self.high_relative_load_session_sport_names.add(t.sport_name)
-            else:
-                self.high_relative_load_session = True
-                self.high_relative_load_session_sport_names.add(t.sport_name)
 
     def get_progression_list(self, exercise):
 
