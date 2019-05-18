@@ -81,6 +81,7 @@ class AthleteStats(Serialisable):
         self.wearable_devices = []
 
         self.muscular_strain_increasing = False
+        self.muscular_strain = {}
         #self.high_relative_load_session = False
         #self.high_relative_load_session_sport_name = None
         #self.high_relative_intensity_session = False

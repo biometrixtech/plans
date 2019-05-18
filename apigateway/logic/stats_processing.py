@@ -8,7 +8,7 @@ from logic.training_volume_processing import TrainingVolumeProcessing
 from logic.soreness_processing import SorenessCalculator
 from models.stats import AthleteStats
 from models.soreness import Soreness, BodyPart, HistoricSorenessStatus
-from models.historic_soreness import HistoricSoreness, HistoricSeverity, CoOccurrence
+from models.historic_soreness import HistoricSoreness, HistoricSeverity, CoOccurrence, SorenessCause
 from models.post_session_survey import PostSessionSurvey
 from utils import parse_date, format_date
 
@@ -119,20 +119,56 @@ class StatsProcessing(object):
                 athlete_stats.session_RPE = current_athlete_stats.session_RPE
                 athlete_stats.session_RPE_event_date = current_athlete_stats.session_RPE_event_date
             else:
-                # purge any dormant_cleared hs
                 # clear any doms
-                # update any historic severity (truncating to n days)
+                for h in athlete_stats.historic_soreness:
+                    if h.historic_soreness_status == HistoricSorenessStatus.doms:
+                        h = self.clear_doms(h)
 
-                # update soreness cause
+                athlete_stats.historic_soreness = list(h for h in athlete_stats.historic_soreness if h.cleared_date_time is not None)
+
+                # update any historic severity (for acute/chronic days)
+                # WARNING: this updates athlete_stats.historic_soreness
+                acute_surveys = self.merge_soreness_from_surveys(self.acute_readiness_surveys, self.acute_post_session_surveys)
+                chronic_surveys = self.merge_soreness_from_surveys(self.chronic_readiness_surveys, self.chronic_post_session_surveys)
+
+                all_surveys = []
+                all_surveys.extend(acute_surveys)
+                all_surveys.extend(chronic_surveys)
+
                 target_soreness = list(h for h in athlete_stats.historic_soreness if
                                        not h.is_pain and not h.is_dormant_cleared()
                                        and h.historic_soreness_status != HistoricSorenessStatus.doms)
+
+                for t in target_soreness:
+                    body_part_history = list(s for s in all_surveys if s.body_part.location ==
+                                             t.body_part_location and s.side == t.side and s.pain == t.is_pain
+                                             and s.reported_date_time >= t.first_reported_date_time)
+                    body_part_history.sort(key=lambda x: x.reported_date_time, reverse=False)
+                    t.historic_severity = []
+                    for b in body_part_history:
+                        current_soreness = HistoricSeverity(b.reported_date_time, b.severity, b.movement)
+                        t.historic_severity.append(current_soreness)
+
+                # update soreness cause
+                # WARNING: this updates athlete_stats.historic_soreness
+
                 target_soreness = self.get_soreness_dictionary(target_soreness)
                 soreness_calc = SorenessCalculator()
                 for t in target_soreness:
                     t.cause = soreness_calc.get_soreness_cause(t, self.event_date)
 
                 # calc muscular strain
+                cleared_soreness = self.cleared_soreness_datastore.get(self.athlete_id,
+                                                                       self.event_date - timedelta(days=14),
+                                                                       self.event_date)
+
+                training_sessions = []
+                training_sessions.extend(training_volume_processing.get_training_sessions(self.last_7_days_plans))
+                training_sessions.extend(training_volume_processing.get_training_sessions(self.days_8_14_plans))
+
+                athlete_stats.muscular_strain[self.event_date] = self.get_muscular_strain(athlete_stats.historic_soreness,
+                                                                                          cleared_soreness,
+                                                                                          training_sessions)
 
                 # training_volume_processing.fill_load_monitoring_measures(self.all_daily_readiness_surveys, self.all_plans, parse_date(self.event_date))
                 # athlete_stats.muscular_strain_increasing = training_volume_processing.muscular_strain_increasing()
@@ -142,6 +178,33 @@ class StatsProcessing(object):
         #athlete_stats.functional_strength_eligible = self.is_athlete_functional_strength_eligible(athlete_stats)
 
         return athlete_stats
+
+    def get_muscular_strain(self, historic_soreness_list, cleared_soreness, training_sessions):
+
+        all_soreness = []
+        overloading_soreness = list(o for o in historic_soreness_list if not o.is_dormant_cleared()
+                                    and not o.is_pain and o.cause != SorenessCause.dysfunction and
+                                    o.cause != SorenessCause.weakness)
+
+        all_soreness.extend(overloading_soreness)
+        all_soreness.extend(cleared_soreness)
+
+        total_load = 0
+        sore_load = 0
+
+        for t in training_sessions:
+            if t.session_rpe == 1:  # maintenance load, do not consider
+                total_load += t.duration_load()
+            else:
+                sore_body_parts = list(a for a in all_soreness
+                                       if a.first_reported_date_time <= t.event_date <= a.last_reported_date_time)
+                if len(sore_body_parts) > 0:
+                    sore_load += t.duration_load()
+                total_load += t.duration_load()
+
+        muscular_strain = (sore_load / float(total_load)) * 100
+
+        return muscular_strain
 
     @xray_recorder.capture('logic.StatsProcessing.load_historical_data')
     def load_historical_data(self):
@@ -506,21 +569,8 @@ class StatsProcessing(object):
                 else:
                     # first check if we can clear DOMS
                     if historic_soreness.historic_soreness_status == HistoricSorenessStatus.doms:
-                        last_reported_severity = [hist for hist in historic_soreness.historic_severity if
-                                                  hist.reported_date_time == historic_soreness.last_reported_date_time][0]
-                        last_severity_value = SorenessCalculator.get_severity(last_reported_severity.severity,
-                                                                              last_reported_severity.movement)
-                        if last_severity_value <= 2:
-                            clearance_window = 1
-                        else:
-                            clearance_window = 2
-                        days_since_last_report = (self.event_date.date() - historic_soreness.last_reported_date_time.date()).days
-                        if days_since_last_report >= clearance_window:
-                            historic_soreness.user_id = self.athlete_id
-                            historic_soreness.cleared_date_time = self.event_date
-                            self.cleared_soreness_datastore.put(historic_soreness)
-                            # don't add to list, save to archive
-                        else:
+                        historic_soreness = self.clear_doms(historic_soreness)
+                        if historic_soreness.cleared_date_time is None:
                             acute_pain_list.append(historic_soreness)
 
                     else:
@@ -537,6 +587,24 @@ class StatsProcessing(object):
                         acute_pain_list.append(soreness)
 
         return acute_pain_list
+
+    def clear_doms(self, historic_soreness):
+
+        last_reported_severity = [hist for hist in historic_soreness.historic_severity if
+                                  hist.reported_date_time == historic_soreness.last_reported_date_time][0]
+        last_severity_value = SorenessCalculator.get_severity(last_reported_severity.severity,
+                                                              last_reported_severity.movement)
+        if last_severity_value <= 2:
+            clearance_window = 1
+        else:
+            clearance_window = 2
+        days_since_last_report = (self.event_date.date() - historic_soreness.last_reported_date_time.date()).days
+        if days_since_last_report >= clearance_window:
+            historic_soreness.user_id = self.athlete_id
+            historic_soreness.cleared_date_time = self.event_date
+            self.cleared_soreness_datastore.put(historic_soreness)
+
+        return  historic_soreness
 
     def process_acute_pain_status(self, body_part_history, historic_soreness, last_reported_date_time):
 

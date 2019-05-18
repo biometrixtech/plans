@@ -111,7 +111,6 @@ def test_get_adaptation_history_from_database():
         data_store_collection.daily_readiness_datastore = drs_dao
         data_store_collection.daily_plan_datastore = dpo_dao
 
-
         athlete_stats = AthleteStats(user_id)
         athlete_stats.event_date = parse_date(end_date)
 
