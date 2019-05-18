@@ -122,7 +122,7 @@ class StatsProcessing(object):
                 # clear any doms
                 for h in athlete_stats.historic_soreness:
                     if h.historic_soreness_status == HistoricSorenessStatus.doms:
-                        h = self.clear_doms(h)
+                        self.clear_doms(h)
 
                 athlete_stats.historic_soreness = list(h for h in athlete_stats.historic_soreness if h.cleared_date_time is None)
 
@@ -135,27 +135,11 @@ class StatsProcessing(object):
                 all_surveys.extend(acute_surveys)
                 all_surveys.extend(chronic_surveys)
 
-                target_soreness = list(h for h in athlete_stats.historic_soreness if
-                                       not h.is_pain and not h.is_dormant_cleared()
-                                       and h.historic_soreness_status != HistoricSorenessStatus.doms)
-
-                for t in target_soreness:
-                    body_part_history = list(s for s in all_surveys if s.body_part.location ==
-                                             t.body_part_location and s.side == t.side and s.pain == t.is_pain
-                                             and s.reported_date_time >= t.first_reported_date_time)
-                    body_part_history.sort(key=lambda x: x.reported_date_time, reverse=False)
-                    t.historic_severity = []
-                    for b in body_part_history:
-                        current_soreness = HistoricSeverity(b.reported_date_time, b.severity, b.movement)
-                        t.historic_severity.append(current_soreness)
+                target_soreness_list = self.add_historic_severity(all_surveys, athlete_stats.historic_soreness)
 
                 # update soreness cause
                 # WARNING: this updates athlete_stats.historic_soreness
-
-                target_soreness = self.get_soreness_dictionary(target_soreness)
-                soreness_calc = SorenessCalculator()
-                for t in target_soreness:
-                    t.cause = soreness_calc.get_soreness_cause(t, self.event_date)
+                target_soreness_list  = self.add_soreness_cause(target_soreness_list)
 
                 # calc muscular strain
                 cleared_soreness = self.cleared_soreness_datastore.get(self.athlete_id,
@@ -178,6 +162,33 @@ class StatsProcessing(object):
         #athlete_stats.functional_strength_eligible = self.is_athlete_functional_strength_eligible(athlete_stats)
 
         return athlete_stats
+
+    def add_soreness_cause(self, target_soreness_list):
+
+        target_soreness_list = self.add_soreness_co_occurrences(target_soreness_list)
+
+        soreness_calc = SorenessCalculator()
+        for t in target_soreness_list:
+            t.cause = soreness_calc.get_soreness_cause(t, self.event_date)
+
+        return target_soreness_list
+
+    def add_historic_severity(self, all_surveys, historic_soreness):
+
+        target_soreness_list = list(h for h in historic_soreness if
+                               not h.is_pain and not h.is_dormant_cleared()
+                               and h.historic_soreness_status != HistoricSorenessStatus.doms)
+        for t in target_soreness_list:
+            body_part_history = list(s for s in all_surveys if s.body_part.location ==
+                                     t.body_part_location and s.side == t.side and s.pain == t.is_pain
+                                     and s.reported_date_time >= t.first_reported_date_time)
+            body_part_history.sort(key=lambda x: x.reported_date_time, reverse=False)
+            t.historic_severity = []
+            for b in body_part_history:
+                current_soreness = HistoricSeverity(b.reported_date_time, b.severity, b.movement)
+                t.historic_severity.append(current_soreness)
+
+        return target_soreness_list
 
     def get_muscular_strain(self, historic_soreness_list, cleared_soreness, training_sessions):
 
@@ -252,7 +263,7 @@ class StatsProcessing(object):
 
         return historic_soreness
 
-    def get_soreness_dictionary(self, historic_soreness_list):
+    def add_soreness_co_occurrences(self, historic_soreness_list):
 
         soreness_dictionary = {}
 

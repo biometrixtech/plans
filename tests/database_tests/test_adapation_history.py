@@ -73,7 +73,7 @@ def test_soreness_analysis():
         stats_processing.load_historical_data()
         historic_soreness = stats_processing.get_historic_soreness()
         target_soreness = list(h for h in historic_soreness if not h.is_pain and not h.is_dormant_cleared() and h.historic_soreness_status is not HistoricSorenessStatus.doms)
-        target_soreness = stats_processing.get_soreness_dictionary(target_soreness)
+        target_soreness = stats_processing.add_soreness_co_occurrences(target_soreness)
         calc = SorenessCalculator()
         for t in target_soreness:
             t.cause = calc.get_soreness_cause(t, parse_date(end_date))

@@ -120,7 +120,7 @@ class SurveyProcessing(object):
         if survey == 'readiness':
             stats_processing = StatsProcessing(self.user_id, self.event_date_time, self.datastore_collection)
             for h in self.athlete_stats.historic_soreness:
-                h = stats_processing.clear_doms(h)
+                stats_processing.clear_doms(h)
             self.athlete_stats.historic_soreness = list(h for h in self.athlete_stats.historic_soreness
                                                         if h.cleared_date_time is None)
 
