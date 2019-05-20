@@ -105,7 +105,10 @@ class BodyPartChartCollection(object):
         soreness_dictionary = {}
 
         for body_part_side, body_part_chart in self.body_parts.items():
-            soreness_dictionary[body_part_side] = body_part_chart.get_soreness_output_list()
+            if body_part_chart.contains_soreness_data:
+                soreness_dictionary[body_part_side] = body_part_chart.get_soreness_output_list()
+            else:
+                soreness_dictionary.pop(body_part_side, None)
 
         return soreness_dictionary
 
@@ -114,7 +117,10 @@ class BodyPartChartCollection(object):
         pain_dictionary = {}
 
         for body_part_side, body_part_chart in self.body_parts.items():
-            pain_dictionary[body_part_side] = body_part_chart.get_pain_output_list()
+            if body_part_chart.contains_pain_data:
+                pain_dictionary[body_part_side] = body_part_chart.get_pain_output_list()
+            else:
+                pain_dictionary.pop(body_part_side, None)
 
         return pain_dictionary
 
@@ -124,6 +130,8 @@ class BodyPartChart(object):
         self.end_date = end_date
         self.soreness_data = {}
         self.pain_data = {}
+        self.contains_soreness_data = False
+        self.contains_pain_data = False
 
         self.auto_fill_data()
 
@@ -138,13 +146,19 @@ class BodyPartChart(object):
 
     def get_soreness_output_list(self):
 
-        data = sorted(list(self.soreness_data.values()), key=lambda x: x.date, reverse=False)
+        if self.contains_soreness_data:
+            data = sorted(list(self.soreness_data.values()), key=lambda x: x.date, reverse=False)
+        else:
+            data = []
 
         return data
 
     def get_pain_output_list(self):
 
-        data = sorted(list(self.pain_data.values()), key=lambda x: x.date, reverse=False)
+        if self.contains_pain_data:
+            data = sorted(list(self.pain_data.values()), key=lambda x: x.date, reverse=False)
+        else:
+            data = []
 
         return data
 
@@ -169,7 +183,8 @@ class BodyPartChart(object):
         if soreness.pain:
             if soreness is not None and soreness.reported_date_time.date() in self.pain_data:
                 self.pain_data[soreness.reported_date_time.date()].value = max(soreness.severity, self.pain_data[soreness.reported_date_time.date()].value)
+                self.contains_pain_data = True
         else:
             if soreness is not None and soreness.reported_date_time.date() in self.soreness_data:
                 self.soreness_data[soreness.reported_date_time.date()].value = max(soreness.severity, self.soreness_data[soreness.reported_date_time.date()].value)
-
+                self.contains_soreness_data = True

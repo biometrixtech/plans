@@ -179,4 +179,5 @@ def test_body_part_collection():
     soreness_dictionary = body_part_chart_collection.get_soreness_dictionary()
     pain_dictionary = body_part_chart_collection.get_pain_dictionary()
 
-    assert len(soreness_dictionary) is not None
+    assert len(soreness_dictionary) > 0
+    assert len(pain_dictionary) == 0
