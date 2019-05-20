@@ -16,7 +16,7 @@ from tests.mocks.mock_post_session_survey_datastore import PostSessionSurveyData
 from tests.mocks.mock_daily_readiness_datastore import DailyReadinessDatastore
 from tests.mocks.mock_datastore_collection import DatastoreCollection
 from logic.training_volume_processing import TrainingVolumeProcessing
-from utils import parse_date
+from utils import parse_date, format_date
 
 def get_dates(start_date, end_date):
 
@@ -403,7 +403,7 @@ def test_correct_acute_chronic_load_33_days():
     stats.load_historical_plans()
     athlete_stats = AthleteStats("Tester")
     athlete_stats.load_stats = LoadStats()
-    training_volume_processing = TrainingVolumeProcessing(stats.start_date, stats.end_date)
+    training_volume_processing = TrainingVolumeProcessing(stats.start_date, format_date(stats.event_date))
     training_volume_processing.load_plan_values(stats.last_7_days_plans,
                                                 stats.days_8_14_plans,
                                                 stats.acute_daily_plans,
@@ -436,7 +436,7 @@ def test_correct_acute_chronic_empty_load_33_days():
     #stats.load_historical_post_session_surveys([])
     stats.load_historical_plans()
     athlete_stats = AthleteStats("Tester")
-    training_volume_processing = TrainingVolumeProcessing(stats.start_date, stats.end_date)
+    training_volume_processing = TrainingVolumeProcessing(stats.start_date, format_date(stats.event_date))
     training_volume_processing.load_plan_values(stats.last_7_days_plans,
                                                 stats.days_8_14_plans,
                                                 stats.acute_daily_plans,
@@ -471,7 +471,7 @@ def test_correct_acwr_load_33_days():
     stats.load_historical_plans()
     athlete_stats = AthleteStats("Tester")
     athlete_stats.load_stats = LoadStats()
-    training_volume_processing = TrainingVolumeProcessing(stats.start_date, stats.end_date)
+    training_volume_processing = TrainingVolumeProcessing(stats.start_date, format_date(stats.event_date))
     training_volume_processing.load_plan_values(stats.last_7_days_plans,
                                                 stats.days_8_14_plans,
                                                 stats.acute_daily_plans,
@@ -537,7 +537,7 @@ def test_correct_internal_acwr_load_33_days():
     stats.load_historical_plans()
     athlete_stats = AthleteStats("Tester")
     athlete_stats.load_stats = LoadStats()
-    training_volume_processing = TrainingVolumeProcessing(stats.start_date, stats.end_date)
+    training_volume_processing = TrainingVolumeProcessing(stats.start_date, format_date(stats.event_date))
     training_volume_processing.load_plan_values(stats.last_7_days_plans,
                                                 stats.days_8_14_plans,
                                                 stats.acute_daily_plans,

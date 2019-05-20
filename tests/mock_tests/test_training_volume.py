@@ -110,6 +110,7 @@ def test_duration_minutes_load_min_max_high():
     load = load_stats.get_duration_minutes_load(500)
 
     assert load == 100.00
+
 '''
 Liz Data
 1-14-19 - 30, 3
