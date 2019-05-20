@@ -40,14 +40,14 @@ def get_test_parameters_list():
     as1 = AthleteStats("tester")
     as1.historic_soreness = []
     as1.muscular_strain_increasing = False
-    parm1 = TestParameters("PreActiveRest_no_doms_no_muscular_strain.csv", as1, train_later=True)
-    parm2 = TestParameters("PostActiveRest_no_doms_no_muscular_strain.csv", as1, train_later=False)
+    parm1 = TestParameters("PreActiveRest_no_doms_no_muscular_strain", as1, train_later=True)
+    parm2 = TestParameters("PostActiveRest_no_doms_no_muscular_strain", as1, train_later=False)
 
     as2 = AthleteStats("tester")
     as2.historic_soreness = []
     as2.muscular_strain_increasing = True
-    parm3 = TestParameters("PreActiveRest_no_doms_muscular_strain.csv", as2, train_later=True)
-    parm4 = TestParameters("PostActiveRest_no_doms_muscular_strain.csv", as2, train_later=False)
+    parm3 = TestParameters("PreActiveRest_no_doms_muscular_strain", as2, train_later=True)
+    parm4 = TestParameters("PostActiveRest_no_doms_muscular_strain", as2, train_later=False)
 
     parm_list.append(parm1)
     parm_list.append(parm2)
@@ -231,6 +231,38 @@ def calc_active_time_comprehensive(exercise_dictionary):
 
     return active_time
 
+
+def get_summary_string(daily_plan):
+
+    line = ""
+
+    if daily_plan.heat is not None:
+        line = line + "Yes,"
+    else:
+        line = line + "No,"
+    if len(daily_plan.pre_active_rest) > 0:
+        line = line + "Yes,"
+    else:
+        line = line + "No,"
+    if len(daily_plan.post_active_rest) > 0:
+        line = line + "Yes,"
+    else:
+        line = line + "No,"
+    if len(daily_plan.cool_down) > 0:
+        line = line + "Yes,"
+    else:
+        line = line + "No,"
+    if daily_plan.ice is not None:
+        line = line + "Yes,"
+    else:
+        line = line + "No,"
+    if daily_plan.cold_water_immersion is not None:
+        line = line + "Yes"
+    else:
+        line = line + "No"
+
+    return line
+
 def test_pre_active_rest_limited_body_parts():
 
     current_date = date.today()
@@ -241,6 +273,7 @@ def test_pre_active_rest_limited_body_parts():
 
     for test_parm in parm_list:
 
+        j = 0
         athlete_id = "tester"
         made_it_through = False
         max_severity_1 = [1, 2, 3, 4, 5]
@@ -263,7 +296,10 @@ def test_pre_active_rest_limited_body_parts():
                                       HistoricSorenessStatus.almost_persistent_2_soreness,
                                       HistoricSorenessStatus.persistent_2_soreness]
 
-        f = open('../../output/' + test_parm.file_name, 'w')
+        f1 = open('../../output/' + test_parm.file_name + "_a.csv", 'w')
+        s1 = open('../../output/' + 'summary_' + test_parm.file_name + "_a.csv", 'w')
+        f2 = open('../../output/' + test_parm.file_name + "_b.csv", 'w')
+        s2 = open('../../output/' + 'summary_' + test_parm.file_name + "_b.csv", 'w')
         line = ('BodyPart,is_pain,severity,hs_status,default_plan'+
                 'inhibit_goals_triggers,inhibit_minutes_efficient,inhibit_miniutes_complete, inhibit_minutes_comprehensive,'+
                 'inhibit_exercises,static_stretch_goals_triggers,static_stretch_minutes_efficient,'+
@@ -274,7 +310,11 @@ def test_pre_active_rest_limited_body_parts():
                 'isolated_activate_exercises,static_integrate_goals_triggers,static_integrate_minutes_efficient, '+
                 'static_integrate_minutes_complete,static_integrate_minutes_comprehensive, static_integrate_exercises,'+
                 'total_minutes_efficient, total_minutes_complete, total_minutes_comprehensive')
-        f.write(line + '\n')
+        sline = 'BodyPart,is_pain,severity,hs_status,heat, pre_active_rest, post_active_rest, cooldown, ice, cold_water_immersion'
+        f1.write(line + '\n')
+        s1.write(sline + '\n')
+        f2.write(line + '\n')
+        s2.write(sline + '\n')
 
         for b1 in body_parts_1:
             for m1 in max_severity_1:
@@ -353,6 +393,8 @@ def test_pre_active_rest_limited_body_parts():
                             plan_obj.static_integrate_exercises)
                         comprehensive_total_minutes = comprehensive_inhibit_minutes + comprehensive_static_stretch_minutes + comprehensive_active_stretch_minutes + comprehensive_isolated_activate_minutes + comprehensive_static_integrate_minutes
 
+                        sline = body_part_line + ',' + get_summary_string(daily_plan)
+
                         line = (body_part_line + ',' +
 
                                 ' ** '.join(inhibit_goals_triggers) + ',' +
@@ -394,9 +436,19 @@ def test_pre_active_rest_limited_body_parts():
                                 str(round(efficient_total_minutes, 2))+ ',' +str(round(complete_total_minutes, 2))+ ',' +str(round(comprehensive_total_minutes, 2))
 
                                 )
-                        f.write(line + '\n')
+                        if j % 2 == 0:
+                            s1.write(sline + '\n')
+                            f1.write(line + '\n')
+                        else:
+                            s2.write(sline + '\n')
+                            f2.write(line + '\n')
 
-        f.close()
+                        j += 1
+
+        f1.close()
+        s1.close()
+        f2.close()
+        s2.close()
 
         made_it_through = True
 
