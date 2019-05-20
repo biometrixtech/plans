@@ -248,7 +248,7 @@ def handle_session_sensor_data(principal_id=None):
 @require.body({'sessions': list})
 @xray_recorder.capture('routes.session.add_sensor_data')
 def handle_session_three_sensor_data(principal_id=None):
-    user_id = request.json('user_id')
+    user_id = request.json['user_id']
     event_date = parse_datetime(request.json['event_date'])
     plan_event_day = format_date(event_date)
     # update last_sensor_syc date
