@@ -4,6 +4,7 @@ from utils import format_date, parse_datetime, parse_date
 from fathomapi.utils.exceptions import InvalidSchemaException
 from models.soreness import BodyPart, BodyPartSide
 from models.sport import SportName
+from logic.soreness_processing import SorenessCalculator
 
 
 class TrainingVolumeChartData(Serialisable):
@@ -182,9 +183,13 @@ class BodyPartChart(object):
 
         if soreness.pain:
             if soreness is not None and soreness.reported_date_time.date() in self.pain_data:
-                self.pain_data[soreness.reported_date_time.date()].value = max(soreness.severity, self.pain_data[soreness.reported_date_time.date()].value)
+                self.pain_data[soreness.reported_date_time.date()].value = max(
+                    SorenessCalculator().get_severity(soreness.severity, soreness.movement),
+                    self.pain_data[soreness.reported_date_time.date()].value)
                 self.contains_pain_data = True
         else:
             if soreness is not None and soreness.reported_date_time.date() in self.soreness_data:
-                self.soreness_data[soreness.reported_date_time.date()].value = max(soreness.severity, self.soreness_data[soreness.reported_date_time.date()].value)
+                self.soreness_data[soreness.reported_date_time.date()].value = max(
+                    SorenessCalculator().get_severity(soreness.severity, soreness.movement),
+                    self.soreness_data[soreness.reported_date_time.date()].value)
                 self.contains_soreness_data = True

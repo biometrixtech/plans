@@ -297,6 +297,21 @@ class ExerciseAssignmentCalculator(object):
                     #     ice.goals.add(goal)
                     #     ice_list.append(ice)
 
+            elif (s.daily and s.historic_soreness_status is not None and not s.is_dormant_cleared()
+                  and s.severity >= 1.5 and not s.pain and (self.high_relative_load_session or self.high_relative_intensity_session)):
+
+                days_diff = (self.event_date_time - s.first_reported_date_time).days
+                if days_diff > 30 and s.severity >= 1.5:
+                    goal = AthleteGoal("Preemptive, Prepare for Training", 1, AthleteGoalType.preempt_corrective)
+                    #goal.trigger = "No Soreness Reported Today + Historic Soreness > 30d + logged hig vol/intensity"
+                    goal.trigger_type = TriggerType.hist_sore_greater_30_sore_today_high_volume_intensity
+                    ice = Ice(body_part_location=s.body_part.location, side=s.side)
+                    ice.repeat_every_3hrs_for_24hrs = False
+                    if s.body_part.location in low_parts:
+                        minutes.append(10)
+                    else:
+                        minutes.append(15)
+
             elif (not s.daily and s.historic_soreness_status is not None and not s.is_dormant_cleared()
                   and s.severity >= 1.5 and not s.pain and (self.high_relative_load_session or self.high_relative_intensity_session)):
 
@@ -304,7 +319,7 @@ class ExerciseAssignmentCalculator(object):
                 if days_diff > 30 and s.severity >= 1.5:
                     goal = AthleteGoal("Preemptive, Prepare for Training", 1, AthleteGoalType.preempt_corrective)
                     #goal.trigger = "No Soreness Reported Today + Historic Soreness > 30d + logged hig vol/intensity"
-                    goal.trigger_type = TriggerType.hist_sore_greater_30_no_sore_today_3_high_volume_intensity
+                    goal.trigger_type = TriggerType.hist_sore_greater_30_no_sore_today_high_volume_intensity
                     ice = Ice(body_part_location=s.body_part.location, side=s.side)
                     ice.repeat_every_3hrs_for_24hrs = False
                     if s.body_part.location in low_parts:
@@ -320,8 +335,33 @@ class ExerciseAssignmentCalculator(object):
                   and s.severity >= 1.5 and s.pain and (self.high_relative_load_session or self.high_relative_intensity_session)):
 
                 goal = AthleteGoal("Preemptive, Prepare for Training", 1, AthleteGoalType.preempt_corrective)
+                if s.is_persistent_pain() or s.historic_soreness_status == HistoricSorenessStatus.persistent_2_pain:
+                    #goal.trigger = "No Pain Reported Today + Acute, Pers, Pers-2 Pain"
+                    goal.trigger_type = TriggerType.pers_pers2_pain_no_pain_sore_today_high_volume_intensity
+                    ice = Ice(body_part_location=s.body_part.location, side=s.side)
+                    ice.repeat_every_3hrs_for_24hrs = False
+
+                    if s.body_part.location in low_parts:
+                        minutes.append(10)
+                    else:
+                        minutes.append(15)
+
+                elif s.is_acute_pain():
+                    goal.trigger_type = TriggerType.acute_pain_no_pain_today_high_volume_intensity
+                    ice = Ice(body_part_location=s.body_part.location, side=s.side)
+                    ice.repeat_every_3hrs_for_24hrs = False
+
+                    if s.body_part.location in low_parts:
+                        minutes.append(10)
+                    else:
+                        minutes.append(15)
+
+            elif (s.daily and s.historic_soreness_status is not None and not s.is_dormant_cleared()
+                  and s.severity >= 1.5 and s.pain and (self.high_relative_load_session or self.high_relative_intensity_session)):
+
+                goal = AthleteGoal("Preemptive, Prepare for Training", 1, AthleteGoalType.preempt_corrective)
                 #goal.trigger = "No Pain Reported Today + Acute, Pers, Pers-2 Pain"
-                goal.trigger_type = TriggerType.pers_pers2_pain_no_pain_sore_today_high_volume_intensity
+                goal.trigger_type = TriggerType.hist_pain_pain_today_high_volume_intensity
                 ice = Ice(body_part_location=s.body_part.location, side=s.side)
                 ice.repeat_every_3hrs_for_24hrs = False
 
