@@ -2,6 +2,7 @@ from serialisable import Serialisable
 from datetime import datetime, timedelta
 from utils import format_date, parse_datetime, parse_date
 from fathomapi.utils.exceptions import InvalidSchemaException
+from models.sport import SportName
 
 class TrainingVolumeChartData(Serialisable):
     def __init__(self):
@@ -17,7 +18,16 @@ class TrainingVolumeChartData(Serialisable):
             'sport_names': [sport_name.value for sport_name in self.sport_names if sport_name is not None],
             'training_volume': self.training_volume
         }
+        return ret
 
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        chart_data = cls()
+        chart_data.date = input_dict['date']
+        chart_data.day_of_week = input_dict.get('day_of_week', '')
+        chart_data.sport_names = set(SportName(sport_name) for sport_name in input_dict.get('sport_names', []))
+        chart_data.training_volume = input_dict.get('training_volume', 0)
+        return chart_data
 
 class TrainingVolumeChart(object):
     def __init__(self, end_date):

@@ -31,7 +31,7 @@ def test_aggregate_alerts_first_exposure():
     exposed_triggers = []
 
     alerts = [alert1, alert2]
-    insights, longitudinal_insights = AlertsProcessing.aggregate_alerts(datetime.datetime.now(), alerts, [], exposed_triggers, [])
+    insights, longitudinal_insights, trends = AlertsProcessing.aggregate_alerts(datetime.datetime.now(), alerts, [], exposed_triggers, [])
     assert len(insights) == 1
     assert insights[0].first
     assert not insights[0].parent
@@ -49,7 +49,7 @@ def test_aggregate_alerts_multiple_same_body_part():
     exposed_triggers = []
 
     alerts = [alert1, alert2]
-    insights, longitudinal_insights = AlertsProcessing.aggregate_alerts(datetime.datetime.now(), alerts, [], exposed_triggers, [])
+    insights, longitudinal_insights, trends = AlertsProcessing.aggregate_alerts(datetime.datetime.now(), alerts, [], exposed_triggers, [])
     assert len(insights) == 1
     assert insights[0].first
     assert not insights[0].parent
@@ -66,7 +66,7 @@ def test_aggregate_alerts_multiple_same_child():
     alert2.body_part = BodyPartSide(BodyPartLocation(11), 2)
 
     alerts = [alert1, alert2]
-    insights, longitudinal_insights = AlertsProcessing.aggregate_alerts(datetime.datetime.now(), alerts, [], [TriggerType(14)], [])
+    insights, longitudinal_insights, trends = AlertsProcessing.aggregate_alerts(datetime.datetime.now(), alerts, [], [TriggerType(14)], [])
     assert len(insights) == 1
     assert not insights[0].first
     assert not insights[0].parent
@@ -80,7 +80,7 @@ def test_aggregate_alerts_exposed():
     alert1.body_part = BodyPartSide(BodyPartLocation(11), 1)
 
     alerts = [alert1]
-    insights, longitudinal_insights = AlertsProcessing.aggregate_alerts(datetime.datetime.now(), alerts, [], [TriggerType(14)], [])
+    insights, longitudinal_insights, trends = AlertsProcessing.aggregate_alerts(datetime.datetime.now(), alerts, [], [TriggerType(14)], [])
     assert len(insights) == 1
     assert not insights[0].first
     assert not insights[0].parent
@@ -95,7 +95,7 @@ def test_aggregate_alerts_exposed_group():
     alert1.body_part = BodyPartSide(BodyPartLocation(11), 1)
 
     alerts = [alert1]
-    insights, longitudinal_insights = AlertsProcessing.aggregate_alerts(datetime.datetime.now(), alerts, [], [TriggerType(7)], [])
+    insights, longitudinal_insights, trends = AlertsProcessing.aggregate_alerts(datetime.datetime.now(), alerts, [], [TriggerType(7)], [])
     assert len(insights) == 1
     assert not insights[0].first
     assert not insights[0].parent
@@ -113,7 +113,7 @@ def test_aggregate_alerts_group_priority():
     alert2.body_part = BodyPartSide(BodyPartLocation(11), 1)
 
     alerts = [alert1, alert2]
-    insights, longitudinal_insights = AlertsProcessing.aggregate_alerts(datetime.datetime.now(), alerts, [], [], [])
+    insights, longitudinal_insights, trends = AlertsProcessing.aggregate_alerts(datetime.datetime.now(), alerts, [], [], [])
     assert len(insights) == 1
     assert insights[0].first
     assert insights[0].parent
@@ -129,14 +129,14 @@ def test_aggregate_alerts_longitutinal():
     alert1.body_part = BodyPartSide(BodyPartLocation(11), 1)
 
     alerts = [alert1]
-    insights, longitudinal_insights = AlertsProcessing.aggregate_alerts(current_date_time - datetime.timedelta(days=5), alerts, [], [], [])
+    insights, longitudinal_insights, trends = AlertsProcessing.aggregate_alerts(current_date_time - datetime.timedelta(days=5), alerts, [], [], [])
     assert len(insights) == 1
     assert insights[0].first
     assert not insights[0].parent
     assert insights[0].longitudinal
     assert insights[0].start_date_time == current_date_time - datetime.timedelta(days=5)
 
-    insights, longitudinal_insights = AlertsProcessing.aggregate_alerts(current_date_time, alerts, [], [TriggerType(6)], insights)
+    insights, longitudinal_insights, trends = AlertsProcessing.aggregate_alerts(current_date_time, alerts, [], [TriggerType(6)], insights)
     assert len(insights) == 1
     assert not insights[0].first
     assert not insights[0].parent
@@ -152,14 +152,14 @@ def test_aggregate_alerts_cleared():
     alert1.body_part = BodyPartSide(BodyPartLocation(11), 1)
 
     alerts = [alert1]
-    existing_insights, longitudinal_insights = AlertsProcessing.aggregate_alerts(current_date_time - datetime.timedelta(days=5), alerts, [], [], [])
+    existing_insights, longitudinal_insights, trends = AlertsProcessing.aggregate_alerts(current_date_time - datetime.timedelta(days=5), alerts, [], [], [])
     assert len(existing_insights) == 1
     assert existing_insights[0].first
     assert not existing_insights[0].parent
     assert existing_insights[0].longitudinal
     assert existing_insights[0].start_date_time == current_date_time - datetime.timedelta(days=5)
 
-    insights, longitudinal_insights = AlertsProcessing.aggregate_alerts(current_date_time, [], [], [TriggerType(6)], existing_insights)
+    insights, longitudinal_insights, trends = AlertsProcessing.aggregate_alerts(current_date_time, [], [], [TriggerType(6)], existing_insights)
     assert len(insights) == 1
     assert insights[0].first
     assert not insights[0].parent
@@ -180,14 +180,14 @@ def test_aggregate_alerts_cleared_same_parent_group():
     alert2.body_part = BodyPartSide(BodyPartLocation(11), 2)
 
     alerts = [alert1, alert2]
-    existing_insights, longitudinal_insights = AlertsProcessing.aggregate_alerts(current_date_time - datetime.timedelta(days=1), alerts, [], [], [])
+    existing_insights, longitudinal_insights, trends = AlertsProcessing.aggregate_alerts(current_date_time - datetime.timedelta(days=1), alerts, [], [], [])
     assert len(existing_insights) == 1
     assert existing_insights[0].first
     assert existing_insights[0].parent
     assert existing_insights[0].longitudinal
     assert existing_insights[0].start_date_time == current_date_time - datetime.timedelta(days=1)
 
-    insights, longitudinal_insights = AlertsProcessing.aggregate_alerts(current_date_time, [alert2], [], [existing_insights[0].trigger_type], existing_insights)
+    insights, longitudinal_insights, trends = AlertsProcessing.aggregate_alerts(current_date_time, [alert2], [], [existing_insights[0].trigger_type], existing_insights)
     assert len(longitudinal_insights) == 1
     assert len(insights) == 2
     for insight in insights:
@@ -216,7 +216,7 @@ def test_aggregate_alerts_cleared_one_body_part():
     alert2.body_part = BodyPartSide(BodyPartLocation(11), 2)
 
     alerts = [alert1, alert2]
-    existing_insights, longitudinal_insights = AlertsProcessing.aggregate_alerts(current_date_time - datetime.timedelta(days=5), alerts, [], [], [])
+    existing_insights, longitudinal_insights, trends = AlertsProcessing.aggregate_alerts(current_date_time - datetime.timedelta(days=5), alerts, [], [], [])
     assert len(existing_insights) == 1
     assert existing_insights[0].first
     assert not existing_insights[0].parent
@@ -224,7 +224,7 @@ def test_aggregate_alerts_cleared_one_body_part():
     assert existing_insights[0].start_date_time == current_date_time - datetime.timedelta(days=5)
     assert len(existing_insights[0].body_parts) == 2
 
-    insights, longitudinal_insights = AlertsProcessing.aggregate_alerts(current_date_time, [alert2], [], [TriggerType(16)], existing_insights)
+    insights, longitudinal_insights, trends = AlertsProcessing.aggregate_alerts(current_date_time, [alert2], [], [TriggerType(16)], existing_insights)
     assert len(insights) == 2
     assert insights[0].longitudinal
     assert len(longitudinal_insights) == 1

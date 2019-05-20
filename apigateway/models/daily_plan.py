@@ -5,6 +5,7 @@ from models.session import Session
 from models.daily_readiness import DailyReadiness
 from models.modalities import ActiveRestBeforeTraining, ActiveRestAfterTraining, IceSession, HeatSession, ColdWaterImmersion, WarmUp, CoolDown
 from models.insights import AthleteInsight
+from models.athlete_trend import AthleteTrends
 
 
 class DailyPlan(Serialisable):
@@ -46,6 +47,7 @@ class DailyPlan(Serialisable):
         # self.functional_strength_session = None
         self.train_later = True
         self.insights = []
+        self.trends = None
 
     def get_id(self):
         return self.user_id
@@ -93,7 +95,8 @@ class DailyPlan(Serialisable):
                # 'functional_strength_eligible': self.functional_strength_eligible,
                # 'completed_functional_strength_sessions': self.completed_functional_strength_sessions,
                'train_later': self.train_later,
-               'insights': [insight.json_serialise() for insight in self.insights]
+               'insights': [insight.json_serialise() for insight in self.insights],
+               'trends': self.trends.json_serialise() if self.trends is not None else None,
                }
 
         # ret['insights'] = [
@@ -159,6 +162,7 @@ class DailyPlan(Serialisable):
         daily_plan.sessions_planned = input_dict.get('sessions_planned', True)
         daily_plan.train_later = input_dict.get('train_later', True)
         daily_plan.insights = [AthleteInsight.json_deserialise(insight) for insight in input_dict.get('insights', [])]
+        daily_plan.trends = AthleteTrends.json_deserialise(input_dict['trends']) if input_dict.get('trends', None) is not None else None
 
         return daily_plan
 

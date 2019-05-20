@@ -158,25 +158,27 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         return self.get_distance_load(SportName.walking)
 
     def duration_minutes_load(self):
+        return self.duration_minutes
 
-        distance_sports = [SportName.swimming, SportName.cycling, SportName.distance_running, SportName.walking]
+        # distance_sports = [SportName.swimming, SportName.cycling, SportName.distance_running, SportName.walking]
 
-        if (self.sport_type == SportType.sport_endurance and self.duration_minutes is not None and
-              self.session_RPE is not None and self.sport_name not in distance_sports):
-            return self.duration_minutes
-        else:
-            return None
+        # if (self.sport_type == SportType.sport_endurance and self.duration_minutes is not None and
+        #       self.session_RPE is not None and self.sport_name not in distance_sports):
+        #     return self.duration_minutes
+        # else:
+        #     return None
 
     def duration_health_load(self):
+        return self.duration_health
 
-        distance_sports = [SportName.swimming, SportName.cycling, SportName.distance_running, SportName.walking]
-
-        if (self.sport_type == SportType.sport_endurance and self.duration_health is not None and
-                self.duration_minutes is None and self.session_RPE is not None and
-                self.sport_name not in distance_sports):
-            return self.duration_health
-        else:
-            return None
+        # distance_sports = [SportName.swimming, SportName.cycling, SportName.distance_running, SportName.walking]
+        #
+        # if (self.sport_type == SportType.sport_endurance and self.duration_health is not None and
+        #         self.duration_minutes is None and self.session_RPE is not None and
+        #         self.sport_name not in distance_sports):
+        #     return self.duration_health
+        # else:
+        #     return None
 
     def training_volume(self, load_stats):
 

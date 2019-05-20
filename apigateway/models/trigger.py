@@ -76,3 +76,32 @@ class TriggerType(IntEnum):
     @classmethod
     def is_same_parent_group(cls, a, b):
         return cls.get_parent_group(a) == cls.get_parent_group(b)
+
+    @classmethod
+    def get_insight_type(cls, trigger_type):
+        insight_type_dict = {
+            0: 0,
+            1: 0,
+            2: 0,
+            3: 0,
+            4: 0,
+            5: 0,
+            6: 1,
+            7: 1,
+            8: 1,
+            9: 1,
+            10: 1,
+            11: 1,
+            12: 1,
+            13: 1,
+            14: 1,
+            15: 1,
+            16: 2,
+            17: 2,
+            18: 2,
+            19: 2,
+            20: 2,
+            21: 1,
+            22: 1,
+        }
+        return insight_type_dict[trigger_type.value]
