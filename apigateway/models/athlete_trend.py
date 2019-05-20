@@ -21,7 +21,7 @@ class Trend(object):
 
     @classmethod
     def json_deserialise(cls, input_dict):
-        trend = cls(input_dict['insight_type'])
+        trend = cls(InsightType(input_dict['insight_type']))
         trend.goals = input_dict.get('goals', [])
         trend.cta = input_dict.get('cta', [])
         trend.alerts = [Alert.json_deserialise(alert) for alert in input_dict.get('alerts', [])]
