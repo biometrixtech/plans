@@ -131,10 +131,10 @@ class ModalityBase(object):
         super().__setattr__(name, value)
 
     @abc.abstractmethod
-    def conditions_for_increased_sensitivity_met(self, soreness_list, muscular_strain_increasing):
+    def conditions_for_increased_sensitivity_met(self, soreness_list, muscular_strain_high):
         return False
 
-    def set_plan_dosage(self, soreness_list, muscular_strain_increasing):
+    def set_plan_dosage(self, soreness_list, muscular_strain_high):
 
         care_for_pain_present = False
         historic_status_present = False
@@ -148,7 +148,7 @@ class ModalityBase(object):
             if s.severity >= 2:
                 severity_greater_than_2 = True
 
-        increased_sensitivity = self.conditions_for_increased_sensitivity_met(soreness_list, muscular_strain_increasing)
+        increased_sensitivity = self.conditions_for_increased_sensitivity_met(soreness_list, muscular_strain_high)
 
         if care_for_pain_present and not historic_status_present:
             self.default_plan = "Comprehensive"
@@ -356,7 +356,7 @@ class ModalityBase(object):
                 dosage.comprehensive_reps_assigned, dosage.comprehensive_sets_assigned)
 
     @abc.abstractmethod
-    def fill_exercises(self, soreness_list, exercise_library, high_relative_load_session, high_relative_intensity_logged, muscular_strain_increasing, sports):
+    def fill_exercises(self, soreness_list, exercise_library, high_relative_load_session, high_relative_intensity_logged, muscular_strain_high, sports):
         pass
 
     @staticmethod
@@ -565,7 +565,7 @@ class ActiveRest(ModalityBase):
         super().__init__(event_date_time)
         #self.high_relative_load_session = high_relative_load_session
         #self.high_relative_intensity_logged = high_relative_intensity_logged
-        #self.muscular_strain_increasing = muscular_strain_increasing
+        #self.muscular_strain_high = muscular_strain_high
         self.force_data = force_data
         self.event_date_time = event_date_time
         self.inhibit_exercises = {}
@@ -595,9 +595,9 @@ class ActiveRest(ModalityBase):
         pass
     '''
 
-    def conditions_for_increased_sensitivity_met(self, soreness_list, muscular_strain_increasing):
+    def conditions_for_increased_sensitivity_met(self, soreness_list, muscular_strain_high):
 
-        if muscular_strain_increasing:
+        if muscular_strain_high:
             return True
         else:
             for s in soreness_list:
@@ -607,7 +607,7 @@ class ActiveRest(ModalityBase):
                         return True
         return False
 
-    def fill_exercises(self, soreness_list, exercise_library, high_relative_load_session, high_relative_intensity_logged, muscular_strain_increasing, sports):
+    def fill_exercises(self, soreness_list, exercise_library, high_relative_load_session, high_relative_intensity_logged, muscular_strain_high, sports):
 
         if soreness_list is not None and len(soreness_list) > 0:
             for s in soreness_list:
@@ -666,7 +666,7 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
         ret = {
             #'high_relative_load_session': self.high_relative_load_session,
             #'high_relative_intensity_logged': self.high_relative_intensity_logged,
-            #'muscular_strain_increasing': self.muscular_strain_increasing,
+            #'muscular_strain_high': self.muscular_strain_high,
             'inhibit_exercises': [p.json_serialise() for p in self.inhibit_exercises.values()],
             'static_stretch_exercises': [p.json_serialise() for p in self.static_stretch_exercises.values()],
             'active_stretch_exercises': [p.json_serialise() for p in self.active_stretch_exercises.values()],
@@ -686,7 +686,7 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
     def json_deserialise(cls, input_dict):
         pre_active_rest = cls(#high_relative_load_session=input_dict.get('high_relative_load_session', False),
                               #high_relative_intensity_logged=input_dict.get('high_relative_intensity_logged', False),
-                              #muscular_strain_increasing=input_dict.get('muscular_strain_increasing', False),
+                              #muscular_strain_high=input_dict.get('muscular_strain_high', False),
                               event_date_time=input_dict.get('event_date_time', None))
         pre_active_rest.active = input_dict.get("active", True)
         pre_active_rest.start_date_time = input_dict.get("start_date_time", None)
@@ -990,7 +990,7 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
         ret = {
             #'high_relative_load_session': self.high_relative_load_session,
             #'high_relative_intensity_logged': self.high_relative_intensity_logged,
-            #'muscular_strain_increasing': self.muscular_strain_increasing,
+            #'muscular_strain_high': self.muscular_strain_high,
             'inhibit_exercises': [p.json_serialise() for p in self.inhibit_exercises.values()],
             'static_stretch_exercises': [p.json_serialise() for p in self.static_stretch_exercises.values()],
             'isolated_activate_exercises': [p.json_serialise() for p in self.isolated_activate_exercises.values()],
@@ -1009,7 +1009,7 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
     def json_deserialise(cls, input_dict):
         post_active_rest = cls(#high_relative_load_session=input_dict.get('high_relative_load_session', False),
                                #high_relative_intensity_logged=input_dict.get('high_relative_intensity_logged', False),
-                               #muscular_strain_increasing=input_dict.get('muscular_strain_increasing', False),
+                               #muscular_strain_high=input_dict.get('muscular_strain_high', False),
                                event_date_time=input_dict.get('event_date_time', None))
         post_active_rest.active = input_dict.get("active", True)
         post_active_rest.start_date_time = input_dict.get("start_date_time", None)
@@ -1335,7 +1335,7 @@ class WarmUp(ModalityBase, Serialisable):
 
         return warmup
 
-    def fill_exercises(self, soreness_list, exercise_library, high_relative_load_session, high_relative_intensity_logged, muscular_strain_increasing, sports):
+    def fill_exercises(self, soreness_list, exercise_library, high_relative_load_session, high_relative_intensity_logged, muscular_strain_high, sports):
         for s in soreness_list:
             self.check_corrective_soreness(s, self.event_date_time, exercise_library)
             self.check_preempt_soreness(s, self.event_date_time, exercise_library)
@@ -1408,12 +1408,12 @@ class WarmUp(ModalityBase, Serialisable):
 
 
 class CoolDown(ModalityBase, Serialisable):
-    def __init__(self, high_relative_load_session, high_relative_intensity_logged, muscular_strain_increasing, event_date_time):
+    def __init__(self, high_relative_load_session, high_relative_intensity_logged, muscular_strain_high, event_date_time):
         super().__init__(event_date_time)
         #self.sport_name = sport_name
         self.high_relative_volume_logged = high_relative_load_session
         self.high_relative_intensity_logged = high_relative_intensity_logged
-        self.muscular_strain_increasing = muscular_strain_increasing
+        self.muscular_strain_high = muscular_strain_high
         self.dynamic_stretch_exercises = {}
         self.dynamic_integrate_exercises = {}
 
@@ -1422,7 +1422,7 @@ class CoolDown(ModalityBase, Serialisable):
             #'sport_name': self.sport_name.value,
             'high_relative_load_session': self.high_relative_volume_logged,
             'high_relative_intensity_logged': self.high_relative_intensity_logged,
-            'muscular_strain_increasing': self.muscular_strain_increasing,
+            'muscular_strain_high': self.muscular_strain_high,
             'dynamic_stretch_exercises': [p.json_serialise() for p in self.dynamic_stretch_exercises.values()],
             'dynamic_integrate_exercises': [p.json_serialise() for p in self.dynamic_integrate_exercises.values()],
             'start_date_time': format_datetime(self.start_date_time) if self.start_date_time is not None else None,
@@ -1439,7 +1439,7 @@ class CoolDown(ModalityBase, Serialisable):
         cooldown = cls(#sport_name=input_dict.get('sport_name', 0),
                        high_relative_load_session=input_dict.get('high_relative_load_session', False),
                        high_relative_intensity_logged=input_dict.get('high_relative_intensity_logged', False),
-                       muscular_strain_increasing=input_dict.get('muscular_strain_increasing', False),
+                       muscular_strain_high=input_dict.get('muscular_strain_high', False),
                        event_date_time=input_dict.get('event_date_time', None))
         cooldown.dynamic_stretch_exercises = {s['library_id']: AssignedExercise.json_deserialise(s) for s in input_dict['dynamic_stretch_exercises']}
         cooldown.dynamic_integrate_exercises = {s['library_id']: AssignedExercise.json_deserialise(s) for s in
@@ -1457,9 +1457,9 @@ class CoolDown(ModalityBase, Serialisable):
         self.aggregate_dosage_by_severity_exercise_collection(self.dynamic_stretch_exercises)
         self.aggregate_dosage_by_severity_exercise_collection(self.dynamic_integrate_exercises)
 
-    def conditions_for_increased_sensitivity_met(self, soreness_list, muscular_strain_increasing):
+    def conditions_for_increased_sensitivity_met(self, soreness_list, muscular_strain_high):
 
-        if self.muscular_strain_increasing:
+        if self.muscular_strain_high:
             return True
         else:
             for s in soreness_list:
@@ -1517,7 +1517,7 @@ class CoolDown(ModalityBase, Serialisable):
 
                 self.assign_exercises(soreness, goal, exercise_library)
 
-    def fill_exercises(self, soreness_list, exercise_library, high_relative_load_session, high_relative_intensity_logged, muscular_strain_increasing, sports):
+    def fill_exercises(self, soreness_list, exercise_library, high_relative_load_session, high_relative_intensity_logged, muscular_strain_high, sports):
 
         for sport_name in sports:
             self.check_recover_from_sport(soreness_list, sport_name, exercise_library)

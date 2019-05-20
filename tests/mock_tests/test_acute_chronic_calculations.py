@@ -7,6 +7,7 @@ from models.daily_plan import DailyPlan
 from models.session import SportTrainingSession
 from models.daily_readiness import DailyReadiness
 from models.stats import AthleteStats
+from models.load_stats import LoadStats
 from logic.stats_processing import StatsProcessing
 from tests.testing_utilities import TestUtilities
 from tests.mocks.mock_athlete_stats_datastore import AthleteStatsDatastore
@@ -401,12 +402,14 @@ def test_correct_acute_chronic_load_33_days():
     #stats.load_historical_post_session_surveys([])
     stats.load_historical_plans()
     athlete_stats = AthleteStats("Tester")
+    athlete_stats.load_stats = LoadStats()
     training_volume_processing = TrainingVolumeProcessing(stats.start_date, stats.end_date)
     training_volume_processing.load_plan_values(stats.last_7_days_plans,
                                                 stats.days_8_14_plans,
                                                 stats.acute_daily_plans,
                                                 stats.get_chronic_weeks_plans(),
-                                                stats.chronic_daily_plans)
+                                                stats.chronic_daily_plans,
+                                                athlete_stats.load_stats)
     athlete_stats = training_volume_processing.calc_training_volume_metrics(athlete_stats)
     assert 2030 == athlete_stats.acute_external_total_load.observed_value
     assert 3250 == athlete_stats.chronic_external_total_load.observed_value
@@ -438,7 +441,8 @@ def test_correct_acute_chronic_empty_load_33_days():
                                                 stats.days_8_14_plans,
                                                 stats.acute_daily_plans,
                                                 stats.get_chronic_weeks_plans(),
-                                                stats.chronic_daily_plans)
+                                                stats.chronic_daily_plans,
+                                                athlete_stats.load_stats)
     athlete_stats = training_volume_processing.calc_training_volume_metrics(athlete_stats)
     assert None is athlete_stats.acute_external_total_load.observed_value
     assert None is athlete_stats.chronic_external_total_load.observed_value
@@ -466,12 +470,14 @@ def test_correct_acwr_load_33_days():
     #stats.load_historical_post_session_surveys([])
     stats.load_historical_plans()
     athlete_stats = AthleteStats("Tester")
+    athlete_stats.load_stats = LoadStats()
     training_volume_processing = TrainingVolumeProcessing(stats.start_date, stats.end_date)
     training_volume_processing.load_plan_values(stats.last_7_days_plans,
                                                 stats.days_8_14_plans,
                                                 stats.acute_daily_plans,
                                                 stats.get_chronic_weeks_plans(),
-                                                stats.chronic_daily_plans)
+                                                stats.chronic_daily_plans,
+                                                athlete_stats.load_stats)
     athlete_stats = training_volume_processing.calc_training_volume_metrics(athlete_stats)
     assert 0.6246153846153846 == athlete_stats.external_acwr.observed_value
 
@@ -503,7 +509,8 @@ def test_correct_acwr_empty_load_33_days():
                                                 stats.days_8_14_plans,
                                                 stats.acute_daily_plans,
                                                 stats.get_chronic_weeks_plans(),
-                                                stats.chronic_daily_plans)
+                                                stats.chronic_daily_plans,
+                                                athlete_stats.load_stats)
     athlete_stats = training_volume_processing.calc_training_volume_metrics(athlete_stats)
     assert None is athlete_stats.external_acwr.observed_value
 
@@ -529,12 +536,14 @@ def test_correct_internal_acwr_load_33_days():
     #stats.load_historical_post_session_surveys([])
     stats.load_historical_plans()
     athlete_stats = AthleteStats("Tester")
+    athlete_stats.load_stats = LoadStats()
     training_volume_processing = TrainingVolumeProcessing(stats.start_date, stats.end_date)
     training_volume_processing.load_plan_values(stats.last_7_days_plans,
                                                 stats.days_8_14_plans,
                                                 stats.acute_daily_plans,
                                                 stats.get_chronic_weeks_plans(),
-                                                stats.chronic_daily_plans)
+                                                stats.chronic_daily_plans,
+                                                athlete_stats.load_stats)
     athlete_stats = training_volume_processing.calc_training_volume_metrics(athlete_stats)
     assert 0.28 == athlete_stats.internal_acwr.observed_value
 
@@ -565,6 +574,7 @@ def test_correct_internal_acwr_empty_load_33_days():
                                                 stats.days_8_14_plans,
                                                 stats.acute_daily_plans,
                                                 stats.get_chronic_weeks_plans(),
-                                                stats.chronic_daily_plans)
+                                                stats.chronic_daily_plans,
+                                                athlete_stats.load_stats)
     athlete_stats = training_volume_processing.calc_training_volume_metrics(athlete_stats)
     assert None is athlete_stats.internal_acwr.observed_value

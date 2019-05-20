@@ -119,7 +119,7 @@ class TrainingVolumeProcessing(object):
 
         return benchmarks
 
-    def fill_load_monitoring_measures(self, readiness_surveys, daily_plans, load_end_date):
+    def fill_load_monitoring_measures(self, load_stats, readiness_surveys, daily_plans, load_end_date):
 
         swimming_sessions = []
         cycling_sessions = []
@@ -134,8 +134,9 @@ class TrainingVolumeProcessing(object):
             cycling_sessions.append((t.event_date, t.cycling_load(), t.sport_name))
             running_sessions.append((t.event_date, t.running_load(), t.sport_name))
             walking_sessions.append((t.event_date, t.walking_load(), t.sport_name))
-            if t.duration_load() is not None:
-                duration_sessions.append((t.event_date, t.duration_load(), t.sport_name))
+            training_volume = t.training_volume(load_stats)
+            if training_volume is not None:
+                duration_sessions.append((t.event_date, training_volume, t.sport_name))
 
         self.load_monitoring_measures[LoadMonitoringType.RPExSwimmingDistance] = swimming_sessions
         self.load_monitoring_measures[LoadMonitoringType.RPExCyclingDistance] = cycling_sessions
@@ -150,18 +151,22 @@ class TrainingVolumeProcessing(object):
         if len(training_sessions) > 0:
             last_training_session = training_sessions[len(training_sessions) - 1]
             benchmarks = self.calc_high_relative_load_benchmarks()
-            self.high_relative_load_session = self.is_last_session_high_relative_load(load_end_date, last_training_session, benchmarks)
+            self.high_relative_load_session = self.is_last_session_high_relative_load(load_end_date,
+                                                                                      last_training_session,
+                                                                                      benchmarks,
+                                                                                      load_stats)
 
-    def is_last_session_high_relative_load(cls, event_date, last_training_session, benchmarks):
+    def is_last_session_high_relative_load(cls, event_date, last_training_session, benchmarks, load_stats):
         if (event_date - last_training_session.event_date).days <= 2:
             if last_training_session.sport_name in benchmarks:
-                if last_training_session.duration_load() >= benchmarks[last_training_session.sport_name]:
+                if last_training_session.training_volume(load_stats) >= benchmarks[last_training_session.sport_name]:
                     return True
         else:
             return False
 
     @xray_recorder.capture('logic.TrainingVolumeProcessing.load_plan_values')
-    def load_plan_values(self, last_7_days_plans, days_8_14_plans, acute_daily_plans, chronic_weeks_plans, chronic_daily_plans):
+    def load_plan_values(self, last_7_days_plans, days_8_14_plans, acute_daily_plans, chronic_weeks_plans,
+                         chronic_daily_plans, load_stats):
 
         self.last_week_external_values = []
         self.last_week_internal_values = []
@@ -187,7 +192,7 @@ class TrainingVolumeProcessing(object):
             if l.sport_name not in self.last_week_sport_duration_loads:
                 self.last_week_sport_duration_loads[l.sport_name] = []
                 self.previous_week_sport_duration_loads[l.sport_name] = []
-            duration_load = l.duration_load()
+            duration_load = l.training_volume(load_stats)
             if duration_load is not None:
                 self.last_week_sport_duration_loads[l.sport_name].append(duration_load)
 
@@ -195,7 +200,7 @@ class TrainingVolumeProcessing(object):
             if p.sport_name not in self.previous_week_sport_duration_loads:
                 self.last_week_sport_duration_loads[p.sport_name] = []
                 self.previous_week_sport_duration_loads[p.sport_name] = []
-            duration_load = p.duration_load()
+            duration_load = p.training_volume(load_stats)
             if duration_load is not None:
                 self.previous_week_sport_duration_loads[p.sport_name].append(duration_load)
 

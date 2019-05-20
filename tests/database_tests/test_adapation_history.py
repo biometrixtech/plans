@@ -73,7 +73,7 @@ def test_soreness_analysis():
         stats_processing.load_historical_data()
         historic_soreness = stats_processing.get_historic_soreness()
         target_soreness = list(h for h in historic_soreness if not h.is_pain and not h.is_dormant_cleared() and h.historic_soreness_status is not HistoricSorenessStatus.doms)
-        target_soreness = stats_processing.get_soreness_dictionary(target_soreness)
+        target_soreness = stats_processing.add_soreness_co_occurrences(target_soreness)
         calc = SorenessCalculator()
         for t in target_soreness:
             t.cause = calc.get_soreness_cause(t, parse_date(end_date))
@@ -111,7 +111,6 @@ def test_get_adaptation_history_from_database():
         data_store_collection.daily_readiness_datastore = drs_dao
         data_store_collection.daily_plan_datastore = dpo_dao
 
-
         athlete_stats = AthleteStats(user_id)
         athlete_stats.event_date = parse_date(end_date)
 
@@ -124,7 +123,8 @@ def test_get_adaptation_history_from_database():
                                                     stats_processing.days_8_14_plans,
                                                     stats_processing.acute_daily_plans,
                                                     stats_processing.get_chronic_weeks_plans(),
-                                                    stats_processing.chronic_daily_plans)
+                                                    stats_processing.chronic_daily_plans,
+                                                    athlete_stats.load_stats)
         athlete_stats = training_volume_processing.calc_training_volume_metrics(athlete_stats)
         '''
         training_volume_processing.fill_load_monitoring_measures(daily_readiness_surveys, plans, parse_date(end_date))

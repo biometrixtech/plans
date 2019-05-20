@@ -118,10 +118,11 @@ class SurveyProcessing(object):
         for soreness in muscle_soreness:
             self.athlete_stats.update_delayed_onset_muscle_soreness(soreness)
         if survey == 'readiness':
-            cleared_soreness = self.athlete_stats.clear_delayed_onset_muscle_soreness(self.event_date_time)
-            if len(cleared_soreness) > 0:
-                cleared_soreness_datastore = self.datastore_collection.cleared_soreness_datastore
-                cleared_soreness_datastore.put(cleared_soreness)
+            stats_processing = StatsProcessing(self.user_id, self.event_date_time, self.datastore_collection)
+            for h in self.athlete_stats.historic_soreness:
+                stats_processing.clear_doms(h)
+            self.athlete_stats.historic_soreness = list(h for h in self.athlete_stats.historic_soreness
+                                                        if h.cleared_date_time is None)
 
     def process_clear_status_answers(self, clear_candidates, event_date, soreness):
 
@@ -224,7 +225,9 @@ class SurveyProcessing(object):
         load = 0
         for session in sessions:
             if not session.deleted and not session.ignored:
-                if training_volume_processing.is_last_session_high_relative_load(self.event_date_time, session, self.athlete_stats.high_relative_load_benchmarks):
+                if training_volume_processing.is_last_session_high_relative_load(self.event_date_time, session,
+                                                                                 self.athlete_stats.high_relative_load_benchmarks,
+                                                                                 self.load_stats):
                     high_relative_load_session_present = True
                     session_load = session.duration_minutes * session.session_RPE
                     if session_load > load:

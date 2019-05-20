@@ -16,6 +16,7 @@ from tests.mocks.mock_daily_readiness_datastore import DailyReadinessDatastore
 from tests.mocks.mock_post_session_survey_datastore import PostSessionSurveyDatastore
 from tests.mocks.mock_athlete_stats_datastore import AthleteStatsDatastore
 from logic.stats_processing import StatsProcessing
+from models.load_stats import LoadStats
 from logic.training_volume_processing import TrainingVolumeProcessing
 from utils import parse_date, format_date
 
@@ -78,6 +79,37 @@ def get_post_session_surveys(start_date, rpe_list):
     return surveys
 
 
+def test_duration_minutes_load():
+
+    load_stats = LoadStats()
+    load_stats.min_duration_minutes = 0
+    load_stats.max_duration_minutes = 100
+
+    load = load_stats.get_duration_minutes_load(50)
+
+    assert load == 50.0
+
+
+def test_duration_minutes_load_min_max_none():
+
+    load_stats = LoadStats()
+    load_stats.min_duration_minutes = None
+    load_stats.max_duration_minutes = None
+
+    load = load_stats.get_duration_minutes_load(50)
+
+    assert load == 50.0
+
+
+def test_duration_minutes_load_min_max_high():
+
+    load_stats = LoadStats()
+    load_stats.min_duration_minutes = None
+    load_stats.max_duration_minutes = None
+
+    load = load_stats.get_duration_minutes_load(500)
+
+    assert load == 100.00
 '''
 Liz Data
 1-14-19 - 30, 3

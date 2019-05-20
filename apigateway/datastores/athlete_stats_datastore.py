@@ -11,6 +11,7 @@ from models.metrics import AthleteMetric
 from models.training_volume import StandardErrorRange
 from models.sport import SportName
 from models.insights import AthleteInsight
+from models.load_stats import LoadStats
 from fathomapi.utils.exceptions import InvalidSchemaException
 from utils import parse_date
 import numbers
@@ -128,6 +129,7 @@ class AthleteStatsDatastore(object):
         athlete_stats.high_relative_load_benchmarks = {SportName(value): load for (value, load) in mongo_result.get('high_relative_load_benchmarks', {}).items()}
         athlete_stats.exposed_triggers = [TriggerType(trigger) for trigger in mongo_result.get('exposed_triggers', [])]
         athlete_stats.longitudinal_insights = [AthleteInsight.json_deserialise(insight) for insight in mongo_result.get('longitudinal_insights', [])]
+        athlete_stats.load_stats = LoadStats.json_deserialise(mongo_result.get('load_stats', None))
         return athlete_stats
 
     @xray_recorder.capture('datastore.AthleteStatsDatastore._put_mongodb')

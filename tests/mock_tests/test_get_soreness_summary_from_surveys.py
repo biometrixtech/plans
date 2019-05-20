@@ -23,7 +23,7 @@ def soreness_calculator():
 @pytest.fixture(scope="module")
 def readiness_survey_0_hours_ankle(severity_score, movement=None):
 
-    soreness_item = TestUtilities().body_part_soreness(9, severity_score, movement)
+    soreness_item = TestUtilities().body_part_soreness(9, severity_score, movement=movement)
     survey = DailyReadiness(datetime.datetime(2018, 6, 27, 14, 30, 0).strftime("%Y-%m-%dT%H:%M:%SZ"),
                             "tester", [soreness_item], 5, 5)
 
@@ -32,7 +32,7 @@ def readiness_survey_0_hours_ankle(severity_score, movement=None):
 @pytest.fixture(scope="module")
 def readiness_survey_12_hours_ankle(severity_score, movement=None):
 
-    soreness_item = TestUtilities().body_part_soreness(9, severity_score, movement)
+    soreness_item = TestUtilities().body_part_soreness(9, severity_score, movement=movement)
     survey = DailyReadiness(datetime.datetime(2018, 6, 27, 2, 30, 0).strftime("%Y-%m-%dT%H:%M:%SZ"),
                             "tester", [soreness_item], 5, 5)
 
@@ -40,7 +40,7 @@ def readiness_survey_12_hours_ankle(severity_score, movement=None):
 
 def readiness_survey_24_hours_ankle(severity_score, movement=None):
 
-    soreness_item = TestUtilities().body_part_soreness(9, severity_score, movement)
+    soreness_item = TestUtilities().body_part_soreness(9, severity_score, movement=movement)
     survey = DailyReadiness(datetime.datetime(2018, 6, 26, 14, 30, 0).strftime("%Y-%m-%dT%H:%M:%SZ"),
                             "tester", [soreness_item], 5, 5)
 
@@ -50,8 +50,8 @@ def readiness_survey_24_hours_ankle(severity_score, movement=None):
 @pytest.fixture(scope="module")
 def readiness_survey_0_hours_ankle_foot(severity_score_1, severity_score_2, movement_1=None, movement_2=None):
 
-    soreness_item_1 = TestUtilities().body_part_soreness(9, severity_score_1, movement_1)
-    soreness_item_2 = TestUtilities().body_part_soreness(10, severity_score_2, movement_2)
+    soreness_item_1 = TestUtilities().body_part_soreness(9, severity_score_1, movement=movement_1)
+    soreness_item_2 = TestUtilities().body_part_soreness(10, severity_score_2, movement=movement_2)
 
     survey = DailyReadiness(datetime.datetime(2018, 6, 27, 14, 30, 0).strftime("%Y-%m-%dT%H:%M:%SZ"),
                             "tester", [soreness_item_1, soreness_item_2], 5, 5)
@@ -63,7 +63,7 @@ def readiness_survey_0_hours_ankle_foot(severity_score_1, severity_score_2, move
 def post_session_survey_24_hours_ankle(severity_score, movement=None):
     surveys = []
 
-    soreness_list = [TestUtilities().body_part_soreness(9, severity_score, movement)]
+    soreness_list = [TestUtilities().body_part_soreness(9, severity_score, movement=movement)]
 
     post_survey = TestUtilities().get_post_survey(6, soreness_list)
 
@@ -79,7 +79,7 @@ def post_session_survey_24_hours_ankle(severity_score, movement=None):
 def post_session_survey_0_hours_ankle(severity_score, movement=None):
     surveys = []
 
-    soreness_list = [TestUtilities().body_part_soreness(9, severity_score, movement)]
+    soreness_list = [TestUtilities().body_part_soreness(9, severity_score, movement=movement)]
 
     post_survey = TestUtilities().get_post_survey(6, soreness_list)
 
@@ -95,7 +95,7 @@ def post_session_survey_0_hours_ankle(severity_score, movement=None):
 def post_session_survey_24_hours_foot(severity_score, movement=None):
     surveys = []
 
-    soreness_list = [TestUtilities().body_part_soreness(10, severity_score, movement)]
+    soreness_list = [TestUtilities().body_part_soreness(10, severity_score, movement=movement)]
 
     post_survey = TestUtilities().get_post_survey(6, soreness_list)
 
@@ -112,7 +112,7 @@ def post_session_survey_24_hours_foot(severity_score, movement=None):
 def post_session_survey_24_hrs_ankle_foot(severity_score_1, severity_score_2, movement_1=None, movement_2=None):
     surveys = []
 
-    soreness_list = [TestUtilities().body_part_soreness(9, severity_score_1, movement_1), TestUtilities().body_part_soreness(10, severity_score_2, movement_2)]
+    soreness_list = [TestUtilities().body_part_soreness(9, severity_score_1, movement=movement_1), TestUtilities().body_part_soreness(10, severity_score_2, movement=movement_2)]
 
     post_survey = TestUtilities().get_post_survey(6, soreness_list)
 
@@ -128,7 +128,7 @@ def post_session_survey_24_hrs_ankle_foot(severity_score_1, severity_score_2, mo
 def post_session_survey_after_ankle_foot(severity_score_1, severity_score_2, movement_1=None, movement_2=None):
     surveys = []
 
-    soreness_list = [TestUtilities().body_part_soreness(9, severity_score_1, movement_1), TestUtilities().body_part_soreness(10, severity_score_2, movement_2)]
+    soreness_list = [TestUtilities().body_part_soreness(9, severity_score_1, movement=movement_1), TestUtilities().body_part_soreness(10, severity_score_2, movement=movement_2)]
 
     post_survey = TestUtilities().get_post_survey(6, soreness_list)
 
@@ -144,7 +144,7 @@ def post_session_survey_after_ankle_foot(severity_score_1, severity_score_2, mov
 def post_session_survey_48_hours_ankle(severity_score, movement=None):
     surveys = []
 
-    soreness_list = [TestUtilities().body_part_soreness(9, severity_score, movement)]
+    soreness_list = [TestUtilities().body_part_soreness(9, severity_score, movement=movement)]
 
     post_survey = TestUtilities().get_post_survey(6, soreness_list)
 
@@ -161,7 +161,7 @@ def post_session_survey_48_hours_ankle(severity_score, movement=None):
 def post_session_surveys_24_48_hours_foot(severity_score_1, severity_score_2, movement_1=None, movement_2=None):
     surveys = []
 
-    soreness_list_1 = [TestUtilities().body_part_soreness(10, severity_score_1, movement_1)]
+    soreness_list_1 = [TestUtilities().body_part_soreness(10, severity_score_1, movement=movement_1)]
 
     post_survey_1 = TestUtilities().get_post_survey(6, soreness_list_1)
 
@@ -171,7 +171,7 @@ def post_session_surveys_24_48_hours_foot(severity_score_1, severity_score_2, mo
 
     surveys.append(post_session_survey.survey)
 
-    soreness_list_2 = [TestUtilities().body_part_soreness(10, severity_score_2, movement_2)]
+    soreness_list_2 = [TestUtilities().body_part_soreness(10, severity_score_2, movement=movement_2)]
 
     post_survey_2 = TestUtilities().get_post_survey(6, soreness_list_2)
 
@@ -189,7 +189,7 @@ def post_session_surveys_24_48_hours_foot(severity_score_1, severity_score_2, mo
 def post_session_survey_24_0_hours_ankle(severity_score_1, severity_score_2, movement_1=None, movement_2=None):
     surveys = []
 
-    soreness_list_1 = [TestUtilities().body_part_soreness(9, severity_score_1, movement_1)]
+    soreness_list_1 = [TestUtilities().body_part_soreness(9, severity_score_1, movement=movement_1)]
 
     post_survey_1 = TestUtilities().get_post_survey(6, soreness_list_1)
 
@@ -199,7 +199,7 @@ def post_session_survey_24_0_hours_ankle(severity_score_1, severity_score_2, mov
 
     surveys.append(post_session_survey.survey)
 
-    soreness_list_2 = [TestUtilities().body_part_soreness(9, severity_score_2, movement_2)]
+    soreness_list_2 = [TestUtilities().body_part_soreness(9, severity_score_2, movement=movement_2)]
 
     post_survey_2 = TestUtilities().get_post_survey(6, soreness_list_2)
 
@@ -215,7 +215,7 @@ def post_session_survey_24_0_hours_ankle(severity_score_1, severity_score_2, mov
 def post_session_survey_49_hours_ankle(severity_score, movement=None):
     surveys = []
 
-    soreness_list = [TestUtilities().body_part_soreness(9, severity_score, movement)]
+    soreness_list = [TestUtilities().body_part_soreness(9, severity_score, movement=movement)]
 
     post_survey = TestUtilities().get_post_survey(6, soreness_list)
 
