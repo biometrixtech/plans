@@ -6,6 +6,7 @@ from serialisable import Serialisable
 from utils import format_datetime, parse_datetime
 from models.sport import SportName, SportType, BaseballPosition, BasketballPosition, FootballPosition, LacrossePosition, SoccerPosition, SoftballPosition, TrackAndFieldPosition, FieldHockeyPosition, VolleyballPosition
 from models.post_session_survey import PostSurvey
+from models.load_stats import LoadStats
 
 class SessionType(Enum):
     practice = 0
@@ -156,23 +157,87 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
     def walking_load(self):
         return self.get_distance_load(SportName.walking)
 
-    def duration_load(self):
+    def duration_minutes_load(self):
+
+        distance_sports = [SportName.swimming, SportName.cycling, SportName.distance_running, SportName.walking]
+
+        if (self.sport_type == SportType.sport_endurance and self.duration_minutes is not None and
+              self.session_RPE is not None and self.sport_name not in distance_sports):
+            return self.duration_minutes
+        else:
+            return None
+
+    def duration_health_load(self):
 
         distance_sports = [SportName.swimming, SportName.cycling, SportName.distance_running, SportName.walking]
 
         if (self.sport_type == SportType.sport_endurance and self.duration_health is not None and
                 self.duration_minutes is None and self.session_RPE is not None and
                 self.sport_name not in distance_sports):
-            return self.duration_health * self.session_RPE
-        elif (self.sport_type == SportType.sport_endurance and self.duration_minutes is not None and
-              self.session_RPE is not None and self.sport_name not in distance_sports):
-            return self.duration_minutes * self.session_RPE
+            return self.duration_health
         else:
             return None
 
+    def training_volume(self, load_stats):
+
+        normalized_intensity = self.normalized_intensity()
+        normalized_load = self.normalized_load(load_stats)
+
+        if normalized_intensity is not None and normalized_load is not None:
+            return normalized_intensity * normalized_load
+        else:
+            return None
+
+    def normalized_intensity(self):
+
+        if self.session_RPE is not None:
+            return self.session_RPE
+        else:
+            return 0
+
+        #TODO add in TRIMP, SHRZ
+
+    def normalized_load(self, load_stats):
+
+        duration_minutes_load = self.duration_minutes_load()
+        duration_health_load = self.duration_health_load()
+        walking_load = self.walking_load()
+        swimming_load = self.swimming_load()
+        running_load = self.running_load()
+        cycling_load = self.cycling_load()
+
+        load = 0
+
+        duration_minutes_load = load_stats.get_duration_minutes_load(duration_minutes_load)
+        duration_health_load = load_stats.get_duration_health_load(duration_health_load)
+        walking_load = load_stats.get_walking_distance_load(walking_load)
+        swimming_load = load_stats.get_swimming_distance_load(swimming_load)
+        running_load = load_stats.get_running_distance_load(running_load)
+        cycling_load = load_stats.get_cycling_distance_load(cycling_load)
+
+        loads = []
+
+        if duration_minutes_load is not None:
+            loads.append(duration_minutes_load)
+        if duration_health_load is not None:
+            loads.append(duration_health_load)
+        if walking_load is not None:
+            loads.append(walking_load)
+        if swimming_load is not None:
+            loads.append(swimming_load)
+        if running_load is not None:
+            loads.append(running_load)
+        if cycling_load is not None:
+            loads.append(cycling_load)
+
+        if len(loads) > 0:
+            load = max(loads)
+
+        return  load
+
     def get_distance_load(self, sport_name):
-        if self.sport_name == sport_name and self.session_RPE is not None and self.distance is not None:
-            return self.session_RPE * self.distance
+        if self.sport_name == sport_name is not None and self.distance is not None:
+            return self.distance
         else:
             return None
 

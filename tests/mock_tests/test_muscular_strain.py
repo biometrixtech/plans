@@ -5,10 +5,12 @@ from datetime import datetime, timedelta
 from models.session import SportTrainingSession
 from models.historic_soreness import HistoricSoreness, HistoricSorenessStatus, SorenessCause
 from models.soreness import BodyPartLocation
+from models.stats import AthleteStats
 from tests.mocks.mock_datastore_collection import DatastoreCollection
 from tests.mocks.mock_athlete_stats_datastore import AthleteStatsDatastore
 from logic.stats_processing import StatsProcessing
 from models.sport import SportName
+from models.load_stats import LoadStats
 
 
 def get_dates(start_date, days):
@@ -31,7 +33,6 @@ def get_training_sessions(start_date, days):
     for d in dates:
         session = SportTrainingSession()
         session.sport_name = SportName.basketball
-        session.sport_type = session.get_sport_type(SportName.basketball)
         session.session_RPE = 2
         session.event_date = d
         session.duration_minutes = 100
@@ -60,7 +61,11 @@ def test_no_maintenance_load_overloading():
 
     stats_processing = StatsProcessing("test", base_date, datastore_collection)
 
-    muscular_strain = stats_processing.get_muscular_strain(historic_soreness_list, [], training_sessions)
+    athlete_stats = AthleteStats("tester")
+    athlete_stats.historic_soreness = historic_soreness_list
+    athlete_stats.load_stats = LoadStats()
+
+    muscular_strain = stats_processing.get_muscular_strain(athlete_stats, [], training_sessions)
 
     assert muscular_strain == 100.0
 
@@ -85,7 +90,11 @@ def test_no_overloading():
 
     stats_processing = StatsProcessing("test", base_date, datastore_collection)
 
-    muscular_strain = stats_processing.get_muscular_strain(historic_soreness_list, [], training_sessions)
+    athlete_stats = AthleteStats("tester")
+    athlete_stats.historic_soreness = historic_soreness_list
+    athlete_stats.load_stats = LoadStats()
+
+    muscular_strain = stats_processing.get_muscular_strain(athlete_stats, [], training_sessions)
 
     assert muscular_strain == 0.0
 
@@ -98,7 +107,6 @@ def test_maintenance_load_overloading():
 
     maintenance_session = SportTrainingSession()
     maintenance_session.sport_name = SportName.volleyball
-    maintenance_session.sport_type = maintenance_session.get_sport_type(maintenance_session.sport_name)
     maintenance_session.session_RPE = 1
     maintenance_session.duration_minutes = 200
     maintenance_session.event_date = base_date - timedelta(days=1)
@@ -119,6 +127,10 @@ def test_maintenance_load_overloading():
 
     stats_processing = StatsProcessing("test", base_date, datastore_collection)
 
-    muscular_strain = stats_processing.get_muscular_strain(historic_soreness_list, [], training_sessions)
+    athlete_stats = AthleteStats("tester")
+    athlete_stats.historic_soreness = historic_soreness_list
+    athlete_stats.load_stats = LoadStats()
+
+    muscular_strain = stats_processing.get_muscular_strain(athlete_stats, [], training_sessions)
 
     assert round(muscular_strain, 2) == 88.89

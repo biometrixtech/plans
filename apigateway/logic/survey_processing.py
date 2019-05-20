@@ -225,7 +225,9 @@ class SurveyProcessing(object):
         load = 0
         for session in sessions:
             if not session.deleted and not session.ignored:
-                if training_volume_processing.is_last_session_high_relative_load(self.event_date_time, session, self.athlete_stats.high_relative_load_benchmarks):
+                if training_volume_processing.is_last_session_high_relative_load(self.event_date_time, session,
+                                                                                 self.athlete_stats.high_relative_load_benchmarks,
+                                                                                 self.load_stats):
                     high_relative_load_session_present = True
                     session_load = session.duration_minutes * session.session_RPE
                     if session_load > load:

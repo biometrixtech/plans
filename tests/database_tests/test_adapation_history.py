@@ -123,7 +123,8 @@ def test_get_adaptation_history_from_database():
                                                     stats_processing.days_8_14_plans,
                                                     stats_processing.acute_daily_plans,
                                                     stats_processing.get_chronic_weeks_plans(),
-                                                    stats_processing.chronic_daily_plans)
+                                                    stats_processing.chronic_daily_plans,
+                                                    athlete_stats.load_stats)
         athlete_stats = training_volume_processing.calc_training_volume_metrics(athlete_stats)
         '''
         training_volume_processing.fill_load_monitoring_measures(daily_readiness_surveys, plans, parse_date(end_date))

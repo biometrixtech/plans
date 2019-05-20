@@ -87,16 +87,19 @@ class StatsProcessing(object):
         athlete_stats = AthleteStats(self.athlete_id)
         athlete_stats.event_date = self.event_date
         athlete_stats = self.calc_survey_stats(athlete_stats)
+        if current_athlete_stats is None:
+            current_athlete_stats = self.athlete_stats_datastore.get(athlete_id=self.athlete_id)
+        athlete_stats.historic_soreness = self.get_historic_soreness(current_athlete_stats.historic_soreness if
+                                                                     current_athlete_stats is not None else None)
         training_volume_processing = TrainingVolumeProcessing(self.start_date, self.end_date)
         training_volume_processing.load_plan_values(self.last_7_days_plans,
                                                     self.days_8_14_plans,
                                                     self.acute_daily_plans,
                                                     self.get_chronic_weeks_plans(),
-                                                    self.chronic_daily_plans)
-        athlete_stats = training_volume_processing.calc_training_volume_metrics(athlete_stats)
-        if current_athlete_stats is None:
-            current_athlete_stats = self.athlete_stats_datastore.get(athlete_id=self.athlete_id)
-        athlete_stats.historic_soreness = self.get_historic_soreness(current_athlete_stats.historic_soreness if current_athlete_stats is not None else None)
+                                                    self.chronic_daily_plans,
+                                                    current_athlete_stats.load_stats
+                                                    )
+        athlete_stats = training_volume_processing.calc_training_volume_metrics(current_athlete_stats)
         if current_athlete_stats is not None:
             athlete_stats.current_sport_name = current_athlete_stats.current_sport_name
             athlete_stats.current_position = current_athlete_stats.current_position
@@ -139,7 +142,7 @@ class StatsProcessing(object):
                 training_sessions.extend(training_volume_processing.get_training_sessions(self.last_7_days_plans))
                 training_sessions.extend(training_volume_processing.get_training_sessions(self.days_8_14_plans))
 
-                athlete_stats.muscular_strain[self.event_date] = self.get_muscular_strain(athlete_stats.historic_soreness,
+                athlete_stats.muscular_strain[self.event_date] = self.get_muscular_strain(athlete_stats,
                                                                                           cleared_soreness,
                                                                                           training_sessions)
 
@@ -201,10 +204,10 @@ class StatsProcessing(object):
 
         return historic_soreness
 
-    def get_muscular_strain(self, historic_soreness_list, cleared_soreness, training_sessions):
+    def get_muscular_strain(self, athlete_stats, cleared_soreness, training_sessions):
 
         all_soreness = []
-        overloading_soreness = list(o for o in historic_soreness_list if not o.is_dormant_cleared()
+        overloading_soreness = list(o for o in athlete_stats.historic_soreness if not o.is_dormant_cleared()
                                     and not o.is_pain and o.cause == SorenessCause.overloading)
 
         all_soreness.extend(overloading_soreness)
@@ -215,13 +218,13 @@ class StatsProcessing(object):
 
         for t in training_sessions:
             if t.session_RPE == 1:  # maintenance load, do not consider
-                total_load += t.duration_load()
+                total_load += t.training_volume(athlete_stats.load_stats)
             else:
                 sore_body_parts = list(a for a in all_soreness
                                        if a.first_reported_date_time <= t.event_date <= a.last_reported_date_time)
                 if len(sore_body_parts) > 0:
-                    sore_load += t.duration_load()
-                total_load += t.duration_load()
+                    sore_load += t.training_volume(athlete_stats.load_stats)
+                total_load += t.training_volume(athlete_stats.load_stats)
 
         muscular_strain = (sore_load / float(total_load)) * 100
 
