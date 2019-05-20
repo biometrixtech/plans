@@ -1,4 +1,4 @@
-from models.insights import AthleteInsight, InsightType
+from models.insights import AthleteInsight
 from models.soreness import BodyPartSide
 from models.trigger import TriggerType
 
@@ -21,7 +21,7 @@ class AlertsProcessing(object):
             insight.sport_names = list(set(insight.sport_names))
             insight.body_parts = [BodyPartSide.json_deserialise(dict(t)) for t in {tuple(d.json_serialise().items()) for d in insight.body_parts}]
             insight.add_data()
-            if insight.insight_type == InsightType.longitudinal:
+            if insight.longitudinal:
                 if insight.trigger_type in existing_longitudinal_trigger_types:
                     existing_insight = [i for i in longitudinal_insights if i.trigger_type == insight.trigger_type][0]
                     insight.start_date_time = existing_insight.start_date_time

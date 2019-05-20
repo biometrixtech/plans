@@ -20,7 +20,8 @@ class AthleteInsight(Serialisable):
         self.sport_names = []
         self.severity = []
         self.cleared = False
-        self.insight_type = self.get_insight_type()
+        self.insight_type = InsightType.stress
+        self.longitudinal = self.get_insight_duration()
         self.priority = None
         self.styling = self.get_styling()
         self.read = False
@@ -40,6 +41,7 @@ class AthleteInsight(Serialisable):
             'severity': self.severity,
             'cleared': self.cleared,
             'insight_type': self.insight_type.value,
+            'longitudinal': self.longitudinal,
             'priority': self.priority,
             'styling': self.styling,
             'read': self.read
@@ -62,6 +64,7 @@ class AthleteInsight(Serialisable):
         insight.priority = input_dict.get('priority', 0)
         insight.styling = input_dict.get('styling', 0)
         insight.read = input_dict.get('read', False)
+        insight.insight_type = InsightType(input_dict.get('insight_type', 0))
 
         return insight
 
@@ -94,11 +97,13 @@ class AthleteInsight(Serialisable):
         else:
             self.priority = insight_data['priority']
 
-    def get_insight_type(self):
+        self.insight_type = InsightType(insight_data['insight_type'])
+
+    def get_insight_duration(self):
         if self.trigger_type.value in [6, 7, 8, 12, 16, 17, 18, 19, 20]:
-            return InsightType.longitudinal
+            return True
         else:
-            return InsightType.daily
+            return False
 
     def get_styling(self):
         if self.trigger_type.value in [15]:
@@ -115,6 +120,12 @@ class AthleteInsight(Serialisable):
 class InsightType(Enum):
     daily = 0
     longitudinal = 1
+
+
+class InsightType(Enum):
+    stress = 0
+    response = 1
+    biomechanics = 2
 
 
 class TextGenerator(object):
@@ -204,6 +215,7 @@ class InsightsData(object):
         insights = {
             0: {
                 "priority": 8,
+                "insight_type": 0,
                 "parent": {
                     "title": "",
                     "first": "",
@@ -219,6 +231,7 @@ class InsightsData(object):
             },
             1: {
                 "priority": 8,
+                "insight_type": 0,
                 "parent": {
                     "title": "",
                     "first": "",
@@ -234,6 +247,7 @@ class InsightsData(object):
             },
             2: {
                 "priority": 8,
+                "insight_type": 0,
                 "parent": {
                     "title": "",
                     "first": "",
@@ -249,6 +263,7 @@ class InsightsData(object):
             },
             3: {
                 "priority": 8,
+                "insight_type": 0,
                 "parent": {
                     "title": "",
                     "first": "",
@@ -264,6 +279,7 @@ class InsightsData(object):
             },
             4: {
                 "priority": 8,
+                "insight_type": 0,
                 "parent": {
                     "title": "",
                     "first": "",
@@ -279,6 +295,7 @@ class InsightsData(object):
             },
             5: {
                 "priority": 8,
+                "insight_type": 0,
                 "parent": {
                     "title": "",
                     "first": "",
@@ -294,6 +311,7 @@ class InsightsData(object):
             },
             6: {
                 "priority": 7,
+                "insight_type": 1,
                 "parent": {
                     "title": "Signs of Poor Adaptation",
                     "first": "We added activities to {goal} because it seems your body is struggling to adequately adapt to your current training cadence.",
@@ -309,6 +327,7 @@ class InsightsData(object):
             },
             7: {
                 "priority": 7,
+                "insight_type": 1,
                 "parent": {
                     "title": "Signs of Poor Adaptation",
                     "first": "We added activities to {goal} because it seems your body is struggling to adequately adapt to your current training cadence.",
@@ -324,6 +343,7 @@ class InsightsData(object):
             },
             8: {
                 "priority": 7,
+                "insight_type": 1,
                 "parent": {
                     "title": "Signs of Poor Adaptation",
                     "first": "We added activities to {goal} because it seems your body is struggling to adequately adapt to your current training cadence.",
@@ -339,6 +359,7 @@ class InsightsData(object):
             },
             9: {
                 "priority": 9,
+                "insight_type": 1,
                 "parent": {
                     "title": "",
                     "first": "",
@@ -354,6 +375,7 @@ class InsightsData(object):
             },
             10: {
                 "priority": 9,
+                "insight_type": 1,
                 "parent": {
                     "title": "Recover Faster from DOMS",
                     "first": "We've added activities to {goal} to your plan to help tackle Delayed Onset Muscle Sorness (DOMS). We're constantly learning what recovery activities are most effective for your body given your sports & training intensities. So to help us, please do your best to log completed workouts, Fathom activities, and follow-on-soreness so we can optimize our calculations to help you recover faster.",
@@ -369,6 +391,7 @@ class InsightsData(object):
             },
             11: {
                 "priority": 9,
+                "insight_type": 1,
                 "parent": {
                     "title": "Recover Faster from DOMS",
                     "first": "We've added activities to {goal} to your plan to help tackle Delayed Onset Muscle Sorness (DOMS). We're constantly learning what recovery activities are most effective for your body given your sports & training intensities. So to help us, please do your best to log completed workouts, Fathom activities, and follow-on-soreness so we can optimize our calculations to help you recover faster.",
@@ -384,6 +407,7 @@ class InsightsData(object):
             },
             12: {
                 "priority": 99,
+                "insight_type": 1,
                 "parent": {
                     "title": "",
                     "first": "",
@@ -399,6 +423,7 @@ class InsightsData(object):
             },
             13: {
                 "priority": 99,
+                "insight_type": 1,
                 "parent": {
                     "title": "",
                     "first": "",
@@ -414,6 +439,7 @@ class InsightsData(object):
             },
             14: {
                 "priority": 4,
+                "insight_type": 1,
                 "parent": {
                     "title": "Listen to your body",
                     "first": "Your pain could be a sign that something is wrong. Please avoid and modify any movements that cause discomfort or aggravate your pain.",
@@ -429,6 +455,7 @@ class InsightsData(object):
             },
             15: {
                 "priority": 1,
+                "insight_type": 1,
                 "parent": {
                     "title": "Listen to your body",
                     "first": "Your pain could be a sign that something is wrong. Please avoid and modify any movements that cause discomfort or aggravate your pain.",
@@ -444,6 +471,7 @@ class InsightsData(object):
             },
             21: {
                 "priority": 99,
+                "insight_type": 1,
                 "parent": {
                     "title": "",
                     "first": "",
@@ -459,6 +487,7 @@ class InsightsData(object):
             },
             22: {
                 "priority": 99,
+                "insight_type": 1,
                 "parent": {
                     "title": "",
                     "first": "",
@@ -474,6 +503,7 @@ class InsightsData(object):
             },
             16: {
                 "priority": 3,
+                "insight_type": 2,
                 "parent": {
                     "title": "",
                     "first": "",
@@ -489,6 +519,7 @@ class InsightsData(object):
             },
             17: {
                 "priority": 2,
+                "insight_type": 2,
                 "parent": {
                     "title": "",
                     "first": "",
@@ -504,6 +535,7 @@ class InsightsData(object):
             },
             18: {
                 "priority": 99,
+                "insight_type": 2,
                 "parent": {
                     "title": "",
                     "first": "",
@@ -519,6 +551,7 @@ class InsightsData(object):
             },
             19: {
                 "priority": 6,
+                "insight_type": 2,
                 "parent": {
                     "title": "",
                     "first": "",
@@ -534,6 +567,7 @@ class InsightsData(object):
             },
             20: {
                 "priority": 5,
+                "insight_type": 2,
                 "parent": {
                     "title": "",
                     "first": "",
