@@ -30,9 +30,18 @@ class ExerciseAssignmentCalculator(object):
         self.high_relative_load_session_sport_names = set()
 
         self.muscular_strain_increasing = athlete_stats.muscular_strain_increasing
+        self.muscular_strain_high = False
         self.doms = list(d for d in athlete_stats.historic_soreness if d.historic_soreness_status == HistoricSorenessStatus.doms)
 
         self.set_high_relative_load_session(athlete_stats, training_sessions)
+        self.set_muscular_strain_high(athlete_stats)
+
+    def set_muscular_strain_high(self, athlete_stats):
+
+        if len(athlete_stats.muscular_strain) > 0:
+            for x in list(reversed(list(athlete_stats.muscular_strain)))[0]:
+                if athlete_stats.muscular_strain[x] > 50.0:
+                    self.muscular_strain_high = True
 
     def set_high_relative_load_session(self, athlete_stats, training_sessions):
 
@@ -158,14 +167,14 @@ class ExerciseAssignmentCalculator(object):
 
     def get_pre_active_rest(self, force_data=False):
 
-        if (len(self.soreness_list) > 0 or self.muscular_strain_increasing
+        if (len(self.soreness_list) > 0 or self.muscular_strain_high
                 or self.high_relative_load_session or self.high_relative_intensity_session or force_data):
             active_rest = ActiveRestBeforeTraining(self.event_date_time, force_data)
             active_rest.fill_exercises(self.soreness_list, self.exercise_library, self.high_relative_load_session,
                                        self.high_relative_intensity_session,
-                                       self.muscular_strain_increasing,
+                                       self.muscular_strain_high,
                                        self.high_relative_load_session_sport_names)
-            active_rest.set_plan_dosage(self.soreness_list, self.muscular_strain_increasing)
+            active_rest.set_plan_dosage(self.soreness_list, self.muscular_strain_high)
             active_rest.set_exercise_dosage_ranking()
             active_rest.aggregate_dosages()
             return [active_rest]
@@ -174,14 +183,14 @@ class ExerciseAssignmentCalculator(object):
 
     def get_post_active_rest(self, force_data=False):
 
-        if (len(self.soreness_list) > 0 or self.muscular_strain_increasing
+        if (len(self.soreness_list) > 0 or self.muscular_strain_high
                 or self.high_relative_load_session or self.high_relative_intensity_session):
             active_rest = ActiveRestAfterTraining(self.event_date_time, force_data)
             active_rest.fill_exercises(self.soreness_list, self.exercise_library,self.high_relative_load_session,
                                        self.high_relative_intensity_session,
-                                       self.muscular_strain_increasing,
+                                       self.muscular_strain_high,
                                        self.high_relative_load_session_sport_names)
-            active_rest.set_plan_dosage(self.soreness_list, self.muscular_strain_increasing)
+            active_rest.set_plan_dosage(self.soreness_list, self.muscular_strain_high)
             active_rest.set_exercise_dosage_ranking()
             active_rest.aggregate_dosages()
             return [active_rest]
@@ -192,11 +201,11 @@ class ExerciseAssignmentCalculator(object):
 
         # warm_up = None
 
-        if (self.muscular_strain_increasing or self.high_relative_load_session
+        if (self.muscular_strain_high or self.high_relative_load_session
                 or len(self.soreness_list) > 0):
             warm_up = WarmUp(self.event_date_time)
             warm_up.fill_exercises(self.soreness_list, self.exercise_library, self.high_relative_load_session,
-                                   self.high_relative_intensity_session, self.muscular_strain_increasing,
+                                   self.high_relative_intensity_session, self.muscular_strain_high,
                                    self.high_relative_load_session_sport_names)
             warm_up.set_exercise_dosage_ranking()
 
@@ -215,10 +224,10 @@ class ExerciseAssignmentCalculator(object):
             #        if (not s.pain and days_diff > 30) or s.pain:
             for sport_name in self.high_relative_load_session_sport_names:
                 cool_down = CoolDown(self.high_relative_load_session, self.high_relative_intensity_session,
-                                     self.muscular_strain_increasing, self.event_date_time)
-                cool_down.fill_exercises(self.soreness_list, self.exercise_library, self.high_relative_load_session, self.high_relative_intensity_session, self.muscular_strain_increasing,
+                                     self.muscular_strain_high, self.event_date_time)
+                cool_down.fill_exercises(self.soreness_list, self.exercise_library, self.high_relative_load_session, self.high_relative_intensity_session, self.muscular_strain_high,
                                          [sport_name])
-                cool_down.set_plan_dosage(self.soreness_list, self.muscular_strain_increasing)
+                cool_down.set_plan_dosage(self.soreness_list, self.muscular_strain_high)
                 cool_down.set_exercise_dosage_ranking()
                 cool_down.aggregate_dosages()
             #    break
