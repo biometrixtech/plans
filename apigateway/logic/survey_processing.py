@@ -218,7 +218,7 @@ class SurveyProcessing(object):
         session_heart_rate.hr_workout = [HeartRateData(cleanup_hr_data_from_api(hr)) for hr in hr_data]
         self.heart_rate_data.append(session_heart_rate)
 
-    def check_high_relative_load_sessions(self, sessions):
+    def check_high_relative_load_sessions(self, sessions, load_stats):
         training_volume_processing = TrainingVolumeProcessing(self.event_date_time, self.event_date_time)
         high_relative_load_session_present = False
         sport_name = None
@@ -227,9 +227,10 @@ class SurveyProcessing(object):
             if not session.deleted and not session.ignored:
                 if training_volume_processing.is_last_session_high_relative_load(self.event_date_time, session,
                                                                                  self.athlete_stats.high_relative_load_benchmarks,
-                                                                                 self.load_stats):
+                                                                                 load_stats):
                     high_relative_load_session_present = True
-                    session_load = session.duration_minutes * session.session_RPE
+                    #session_load = session.duration_minutes * session.session_RPE
+                    session_load = session.training_volume(load_stats)
                     if session_load > load:
                         sport_name = session.sport_name
         self.athlete_stats.high_relative_load_session = high_relative_load_session_present

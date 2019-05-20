@@ -67,7 +67,7 @@ def handle_daily_readiness_create(principal_id):
             survey_processor.create_session_from_survey(session)
 
         # check if any of the non-ignored and non-deleted sessions are high load
-        survey_processor.check_high_relative_load_sessions(survey_processor.sessions)
+        survey_processor.check_high_relative_load_sessions(survey_processor.sessions, athlete_stats.load_stats)
 
     if "sleep_data" in request.json and len(request.json['sleep_data']) > 0:
         daily_sleep_data = DailySleepData(user_id=user_id,
