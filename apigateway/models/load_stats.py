@@ -78,15 +78,18 @@ class LoadStats(Serialisable):
             setattr(self, max_attribute, value)
             max_value = value
         else:
-            if getattr(self, max_attribute) < value:
+            if getattr(self, max_attribute) > value:
                 max_value = getattr(self, max_attribute)
             else:
                 max_value = value
 
         if max_value == min_value:
             load = value
+            if load > 100:
+                load = 100
         else:
             load = (value - min_value) / (max_value - min_value)
+            load = load * 100
 
         return load
 
