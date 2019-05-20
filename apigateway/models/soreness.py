@@ -237,6 +237,17 @@ class BodyPartSide(object):
         self.body_part_location = body_part_location
         self.side = side
 
+    def __hash__(self):
+        return hash((self.body_part_location.value, self.side))
+
+    def __eq__(self, other):
+        return self.body_part_location == other.body_part_location and self.side == other.side
+
+    def __ne__(self, other):
+        # Not strictly necessary, but to avoid having both x==y and x!=y
+        # True at the same time
+        return not (self == other)
+
     def json_serialise(self):
         return {
             "body_part_location": self.body_part_location.value,

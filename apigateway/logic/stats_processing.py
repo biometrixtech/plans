@@ -2,7 +2,7 @@ import math
 import statistics
 from collections import namedtuple
 from datetime import datetime, timedelta
-
+from models.chart_data import BodyPartChartCollection
 from fathomapi.utils.xray import xray_recorder
 from logic.training_volume_processing import TrainingVolumeProcessing
 from logic.soreness_processing import SorenessCalculator
@@ -94,7 +94,12 @@ class StatsProcessing(object):
                 self.get_readiness_soreness_list(self.last_25_days_readiness_surveys),
                 self.get_ps_survey_soreness_list(self.last_25_days_ps_surveys)
             )
-            athlete_stats.historic_soreness = self.get_historic_soreness_list(soreness_list_25, current_athlete_stats.historic_soreness)
+            body_part_chart_collection = BodyPartChartCollection(self.event_date)
+            body_part_chart_collection.process_soreness_list(soreness_list_25)
+            athlete_stats.soreness_chart_data = body_part_chart_collection.get_soreness_dictionary()
+            athlete_stats.pain_chart_data = body_part_chart_collection.get_pain_dictionary()
+            athlete_stats.historic_soreness = self.get_historic_soreness_list(soreness_list_25,
+                                                                              current_athlete_stats.historic_soreness)
             training_volume_processing = TrainingVolumeProcessing(self.start_date, format_date(
                 self.event_date))  # want event date since end date = event_date + 1
 

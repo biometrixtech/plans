@@ -137,8 +137,12 @@ def test_consecutive_last_updated_2_days_with_break():
 
     stats_processing.load_historical_readiness_surveys(readiness_list)
     # stats.load_historical_post_session_surveys([])
+    soreness_list_25 = stats_processing.merge_soreness_from_surveys(
+        stats_processing.get_readiness_soreness_list(stats_processing.last_25_days_readiness_surveys),
+        stats_processing.get_ps_survey_soreness_list(stats_processing.last_25_days_ps_surveys)
+    )
 
-    consecutive_pain_list = stats_processing.get_historic_soreness()
+    consecutive_pain_list = stats_processing.get_historic_soreness_list(soreness_list_25)
 
     assert (datetime(2018, 7, 19, 11, 0) == consecutive_pain_list[0].last_reported_date_time)
 

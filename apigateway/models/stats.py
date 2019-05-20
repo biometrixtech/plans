@@ -90,6 +90,8 @@ class AthleteStats(Serialisable):
         self.longitudinal_insights = []
         self.load_stats = None
         self.training_volume_chart_data = []
+        self.soreness_chart_data = {}
+        self.pain_chart_data = {}
 
     def update_historic_soreness(self, soreness, event_date):
 
