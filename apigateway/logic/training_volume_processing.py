@@ -7,6 +7,7 @@ from utils import format_date, parse_date
 from itertools import groupby
 from operator import itemgetter, attrgetter
 from statistics import stdev, mean
+from models.chart_data import TrainingVolumeChartData, TrainingVolumeChart
 
 
 class LoadingEvent(object):
@@ -61,6 +62,8 @@ class TrainingVolumeProcessing(object):
         self.previous_week_external_values = []
         self.last_week_internal_values = []
         self.previous_week_internal_values = []
+
+        self.training_volume_chart_data = []
 
         self.internal_load_tuples = []
         self.external_load_tuples = []
@@ -188,7 +191,10 @@ class TrainingVolumeProcessing(object):
         last_7_day_training_sessions = self.get_training_sessions(last_7_days_plans)
         previous_7_day_training_sessions = self.get_training_sessions(days_8_14_plans)
 
+        chart_data = TrainingVolumeChart(self.end_date)
+
         for l in last_7_day_training_sessions:
+            chart_data.add_training_volume(l, load_stats)
             if l.sport_name not in self.last_week_sport_duration_loads:
                 self.last_week_sport_duration_loads[l.sport_name] = []
                 self.previous_week_sport_duration_loads[l.sport_name] = []
@@ -197,12 +203,15 @@ class TrainingVolumeProcessing(object):
                 self.last_week_sport_duration_loads[l.sport_name].append(duration_load)
 
         for p in previous_7_day_training_sessions:
+            chart_data.add_training_volume(p, load_stats)
             if p.sport_name not in self.previous_week_sport_duration_loads:
                 self.last_week_sport_duration_loads[p.sport_name] = []
                 self.previous_week_sport_duration_loads[p.sport_name] = []
             duration_load = p.training_volume(load_stats)
             if duration_load is not None:
                 self.previous_week_sport_duration_loads[p.sport_name].append(duration_load)
+
+        self.training_volume_chart_data = chart_data.get_output_list()
 
         self.last_week_external_values.extend(
             x for x in self.get_plan_session_attribute_sum_list("external_load", last_7_days_plans) if x is not None)
@@ -271,6 +280,7 @@ class TrainingVolumeProcessing(object):
             self.low_internal_load_day_upper_bound = low_internal + range
             self.mod_internal_load_day_upper_bound = high_internal - range
             self.high_internal_load_day_upper_bound = high_internal
+
 
     @xray_recorder.capture('logic.TrainingVolumeProcessing.calc_training_volume_metrics')
     def calc_training_volume_metrics(self, athlete_stats):

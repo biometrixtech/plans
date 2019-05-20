@@ -91,7 +91,7 @@ class StatsProcessing(object):
             current_athlete_stats = self.athlete_stats_datastore.get(athlete_id=self.athlete_id)
         athlete_stats.historic_soreness = self.get_historic_soreness(current_athlete_stats.historic_soreness if
                                                                      current_athlete_stats is not None else None)
-        training_volume_processing = TrainingVolumeProcessing(self.start_date, self.end_date)
+        training_volume_processing = TrainingVolumeProcessing(self.start_date, format_date(self.event_date))  # want event date since end date = event_date + 1
         training_volume_processing.load_plan_values(self.last_7_days_plans,
                                                     self.days_8_14_plans,
                                                     self.acute_daily_plans,
@@ -100,6 +100,8 @@ class StatsProcessing(object):
                                                     current_athlete_stats.load_stats
                                                     )
         athlete_stats = training_volume_processing.calc_training_volume_metrics(current_athlete_stats)
+        athlete_stats.training_volume_chart_data = training_volume_processing.training_volume_chart_data
+
         if current_athlete_stats is not None:
             athlete_stats.current_sport_name = current_athlete_stats.current_sport_name
             athlete_stats.current_position = current_athlete_stats.current_position
@@ -1306,8 +1308,8 @@ class StatsProcessing(object):
             chronic_delta = self.end_date_time - chronic_date_time
             self.chronic_load_start_date_time = self.end_date_time - chronic_delta
 
-        self.last_week = self.end_date_time - timedelta(days=7 + adjustment_factor)
-        self.last_6_days = self.end_date_time - timedelta(days=6 + adjustment_factor)
+        self.last_week = self.end_date_time - timedelta(days=6 + adjustment_factor)
+        self.last_6_days = self.end_date_time - timedelta(days=5 + adjustment_factor)
         self.last_25_days = self.end_date_time - timedelta(days=25 + adjustment_factor)
         self.previous_week = self.last_week - timedelta(days=7)
         self.days_7_13 = self.previous_week + timedelta(days=1)

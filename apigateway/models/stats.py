@@ -89,6 +89,7 @@ class AthleteStats(Serialisable):
         self.exposed_triggers = []
         self.longitudinal_insights = []
         self.load_stats = None
+        self.training_volume_chart_data = []
 
     def update_historic_soreness(self, soreness, event_date):
 
@@ -431,6 +432,7 @@ class AthleteStats(Serialisable):
                                               self.high_relative_load_benchmarks.items()},
             'exposed_triggers': [trigger.value for trigger in self.exposed_triggers],
             'longitudinal_insights': [insight.json_serialise() for insight in self.longitudinal_insights],
-            'load_stats': self.load_stats.json_serialise() if self.load_stats is not None else None
+            'load_stats': self.load_stats.json_serialise() if self.load_stats is not None else None,
+            'training_volume_chart_data': [chart_data.json_serialise() for chart_data in self.training_volume_chart_data]
         }
         return ret
