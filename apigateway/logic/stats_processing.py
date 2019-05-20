@@ -90,7 +90,11 @@ class StatsProcessing(object):
         if current_athlete_stats is None:
             current_athlete_stats = self.athlete_stats_datastore.get(athlete_id=self.athlete_id)
         if current_athlete_stats is not None:
-            athlete_stats.historic_soreness = self.get_historic_soreness(current_athlete_stats.historic_soreness)
+            soreness_list_25 = self.merge_soreness_from_surveys(
+                self.get_readiness_soreness_list(self.last_25_days_readiness_surveys),
+                self.get_ps_survey_soreness_list(self.last_25_days_ps_surveys)
+            )
+            athlete_stats.historic_soreness = self.get_historic_soreness_list(soreness_list_25, current_athlete_stats.historic_soreness)
             training_volume_processing = TrainingVolumeProcessing(self.start_date, format_date(
                 self.event_date))  # want event date since end date = event_date + 1
 
@@ -277,16 +281,14 @@ class StatsProcessing(object):
 
         return training_sessions
 
-    @xray_recorder.capture('logic.StatsProcessing.get_historic_soreness')
+
+    '''deprecated
     def get_historic_soreness(self, existing_historic_soreness=None):
-        soreness_list_25 = self.merge_soreness_from_surveys(
-            self.get_readiness_soreness_list(self.last_25_days_readiness_surveys),
-            self.get_ps_survey_soreness_list(self.last_25_days_ps_surveys)
-        )
+
         historic_soreness = self.get_historic_soreness_list(soreness_list_25, existing_historic_soreness)
 
         return historic_soreness
-
+    '''
     def add_soreness_co_occurrences(self, historic_soreness):
 
         target_soreness_list = self.get_targeted_soreness(historic_soreness)
@@ -319,6 +321,7 @@ class StatsProcessing(object):
 
         return historic_soreness
 
+    @xray_recorder.capture('logic.StatsProcessing.get_historic_soreness')
     def get_historic_soreness_list(self, soreness_list_25, existing_historic_soreness=None):
 
         grouped_soreness = {}
