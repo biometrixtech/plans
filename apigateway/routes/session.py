@@ -243,6 +243,32 @@ def handle_session_sensor_data(principal_id=None):
             'daily_plan': plan}, 200
 
 
+@app.route('/three_sensor_data', methods=['POST'])
+@require.authenticated.any
+@require.body({'sessions': list})
+@xray_recorder.capture('routes.session.add_sensor_data')
+def handle_session_three_sensor_data(principal_id=None):
+    user_id = request.json('user_id')
+    event_date = parse_datetime(request.json['event_date'])
+    plan_event_day = format_date(event_date)
+    # update last_sensor_syc date
+    if not _check_plan_exists(user_id, plan_event_day):
+        plan = DailyPlan(event_date=plan_event_day)
+        plan.user_id = user_id
+    else:
+        plan = daily_plan_datastore.get(user_id, plan_event_day, plan_event_day)[0]
+
+    sessions = request.json['sessions']
+    for session in sessions:
+        event_date = session['event_date']
+        session_obj = create_session(6, {'description': 'test_three_sensor_data',
+                                         'event_date': event_date})
+        plan.training_sessions.append(session_obj)
+    daily_plan_datastore.put(plan)
+
+    return {'message': 'success'}
+
+
 @app.route('/typical', methods=['POST'])
 @require.authenticated.any
 @require.body({'event_date': str})

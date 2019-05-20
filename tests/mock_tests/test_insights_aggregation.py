@@ -35,7 +35,7 @@ def test_aggregate_alerts_first_exposure():
     assert len(insights) == 1
     assert insights[0].first
     assert not insights[0].parent
-    assert insights[0].insight_type == InsightType.daily
+    assert not insights[0].longitudinal
 
 
 def test_aggregate_alerts_multiple_same_body_part():
@@ -53,7 +53,7 @@ def test_aggregate_alerts_multiple_same_body_part():
     assert len(insights) == 1
     assert insights[0].first
     assert not insights[0].parent
-    assert insights[0].insight_type == InsightType.daily
+    assert not insights[0].longitudinal
     assert len(insights[0].body_parts) == 1
 
 
@@ -70,7 +70,7 @@ def test_aggregate_alerts_multiple_same_child():
     assert len(insights) == 1
     assert not insights[0].first
     assert not insights[0].parent
-    assert insights[0].insight_type == InsightType.daily
+    assert not insights[0].longitudinal
 
 
 def test_aggregate_alerts_exposed():
@@ -84,7 +84,8 @@ def test_aggregate_alerts_exposed():
     assert len(insights) == 1
     assert not insights[0].first
     assert not insights[0].parent
-    assert insights[0].insight_type == InsightType.daily
+    assert not insights[0].longitudinal
+    assert insights[0].insight_type == InsightType.response
 
 
 def test_aggregate_alerts_exposed_group():
@@ -98,7 +99,7 @@ def test_aggregate_alerts_exposed_group():
     assert len(insights) == 1
     assert not insights[0].first
     assert not insights[0].parent
-    assert insights[0].insight_type == InsightType.longitudinal
+    assert insights[0].longitudinal
 
 
 def test_aggregate_alerts_group_priority():
@@ -116,8 +117,9 @@ def test_aggregate_alerts_group_priority():
     assert len(insights) == 1
     assert insights[0].first
     assert insights[0].parent
-    assert insights[0].insight_type == InsightType.daily
+    assert not insights[0].longitudinal
     assert insights[0].priority == 1
+
 
 def test_aggregate_alerts_longitutinal():
     current_date_time = datetime.datetime.now()
@@ -131,14 +133,14 @@ def test_aggregate_alerts_longitutinal():
     assert len(insights) == 1
     assert insights[0].first
     assert not insights[0].parent
-    assert insights[0].insight_type == InsightType.longitudinal
+    assert insights[0].longitudinal
     assert insights[0].start_date_time == current_date_time - datetime.timedelta(days=5)
 
     insights, longitudinal_insights = AlertsProcessing.aggregate_alerts(current_date_time, alerts, [], [TriggerType(6)], insights)
     assert len(insights) == 1
     assert not insights[0].first
     assert not insights[0].parent
-    assert insights[0].insight_type == InsightType.longitudinal
+    assert insights[0].longitudinal
     assert insights[0].start_date_time == current_date_time - datetime.timedelta(days=5)
 
 
@@ -154,14 +156,14 @@ def test_aggregate_alerts_cleared():
     assert len(existing_insights) == 1
     assert existing_insights[0].first
     assert not existing_insights[0].parent
-    assert existing_insights[0].insight_type == InsightType.longitudinal
+    assert existing_insights[0].longitudinal
     assert existing_insights[0].start_date_time == current_date_time - datetime.timedelta(days=5)
 
     insights, longitudinal_insights = AlertsProcessing.aggregate_alerts(current_date_time, [], [], [TriggerType(6)], existing_insights)
     assert len(insights) == 1
     assert insights[0].first
     assert not insights[0].parent
-    assert insights[0].insight_type == InsightType.longitudinal
+    assert insights[0].longitudinal
     assert insights[0].cleared
     assert insights[0].start_date_time == current_date_time - datetime.timedelta(days=5)
 
@@ -182,7 +184,7 @@ def test_aggregate_alerts_cleared_same_parent_group():
     assert len(existing_insights) == 1
     assert existing_insights[0].first
     assert existing_insights[0].parent
-    assert existing_insights[0].insight_type == InsightType.longitudinal
+    assert existing_insights[0].longitudinal
     assert existing_insights[0].start_date_time == current_date_time - datetime.timedelta(days=1)
 
     insights, longitudinal_insights = AlertsProcessing.aggregate_alerts(current_date_time, [alert2], [], [existing_insights[0].trigger_type], existing_insights)
@@ -199,7 +201,7 @@ def test_aggregate_alerts_cleared_same_parent_group():
     assert not insights[0].parent
 
     assert insights[1].first
-    assert insights[1].insight_type == InsightType.longitudinal
+    assert insights[1].longitudinal
     assert insights[1].cleared
     assert insights[1].start_date_time == current_date_time - datetime.timedelta(days=1)
 
@@ -218,13 +220,13 @@ def test_aggregate_alerts_cleared_one_body_part():
     assert len(existing_insights) == 1
     assert existing_insights[0].first
     assert not existing_insights[0].parent
-    assert existing_insights[0].insight_type == InsightType.longitudinal
+    assert existing_insights[0].longitudinal
     assert existing_insights[0].start_date_time == current_date_time - datetime.timedelta(days=5)
     assert len(existing_insights[0].body_parts) == 2
 
     insights, longitudinal_insights = AlertsProcessing.aggregate_alerts(current_date_time, [alert2], [], [TriggerType(16)], existing_insights)
     assert len(insights) == 2
-    assert insights[0].insight_type == InsightType.longitudinal
+    assert insights[0].longitudinal
     assert len(longitudinal_insights) == 1
     assert len(longitudinal_insights[0].body_parts) == 1
     assert longitudinal_insights[0].body_parts[0].side == 2
