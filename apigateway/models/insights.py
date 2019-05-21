@@ -621,7 +621,7 @@ class InsightsData(object):
             15: {
                 "priority": 1,
                 "insight_type": 1,
-                "data_source": "",
+                "data_source": "pain",
                 "parent": {
                     "title": "Listen to your body",
                     "first": "Your pain could be a sign that something is wrong. Please avoid and modify any movements that cause discomfort or aggravate your pain.",
@@ -641,7 +641,7 @@ class InsightsData(object):
                     "ongoing_body": "",
                     "cleared_title": "",
                     "cleared_body": "",
-                    "visualization_type": 1,
+                    "visualization_type": 3,
                     "visualization_title": ""
                 }
             },
