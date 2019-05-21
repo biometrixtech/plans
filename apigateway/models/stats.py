@@ -191,7 +191,7 @@ class AthleteStats(Serialisable):
             current_severity = SorenessCalculator.get_severity(soreness.severity, soreness.movement)
             for doms in self.historic_soreness:
                 if (doms.body_part_location == soreness.body_part.location and
-                    doms.side == soreness.side):
+                    doms.side == soreness.side and not doms.is_pain):
                     body_part_exists = True
                     if doms.historic_soreness_status == HistoricSorenessStatus.doms:
                         doms.historic_severity.append(current_soreness)
