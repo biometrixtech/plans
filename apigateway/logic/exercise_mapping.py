@@ -109,7 +109,8 @@ class ExerciseAssignmentCalculator(object):
             goal = AthleteGoal("Preemptive, Prepare for Training", 1, AthleteGoalType.preempt_corrective)
             heat = None
 
-            if 1.5 <= s.severity <= 5 and s.first_reported_date_time is not None and not s.is_dormant_cleared():
+            if (1.5 <= s.severity <= 5 and s.first_reported_date_time is not None and not s.is_dormant_cleared()
+                and s.historic_soreness_status is not HistoricSorenessStatus.doms):
                 days_diff = (self.event_date_time - s.first_reported_date_time).days
 
                 if not s.pain and days_diff >= 30:
@@ -291,6 +292,7 @@ class ExerciseAssignmentCalculator(object):
                     #     ice_list.append(ice)
 
             elif (s.daily and s.historic_soreness_status is not None and not s.is_dormant_cleared()
+                  and s.historic_soreness_status is not HistoricSorenessStatus.doms
                   and s.severity >= 1.5 and not s.pain and (self.high_relative_load_session or self.high_relative_intensity_session)):
 
                 days_diff = (self.event_date_time - s.first_reported_date_time).days
@@ -306,6 +308,7 @@ class ExerciseAssignmentCalculator(object):
                         minutes.append(15)
 
             elif (s.daily and s.historic_soreness_status is not None and not s.is_dormant_cleared()
+                  and s.historic_soreness_status is not HistoricSorenessStatus.doms
                   and s.severity >= 1.5 and s.pain and (self.high_relative_load_session or self.high_relative_intensity_session)):
 
                 goal = AthleteGoal("Preemptive, Prepare for Training", 1, AthleteGoalType.preempt_corrective)
@@ -320,6 +323,7 @@ class ExerciseAssignmentCalculator(object):
                     minutes.append(15)
 
             elif (not s.daily and s.historic_soreness_status is not None and not s.is_dormant_cleared()
+                  and s.historic_soreness_status is not HistoricSorenessStatus.doms
                   and s.severity >= 1.5 and not s.pain and (self.high_relative_load_session or self.high_relative_intensity_session)):
 
                 days_diff = (self.event_date_time - s.first_reported_date_time).days
@@ -339,6 +343,7 @@ class ExerciseAssignmentCalculator(object):
                     #     ice_list.append(ice)
 
             elif (not s.daily and s.historic_soreness_status is not None and not s.is_dormant_cleared()
+                  and s.historic_soreness_status is not HistoricSorenessStatus.doms
                   and s.severity >= 1.5 and s.pain and s.is_acute_pain() and
                   (self.high_relative_load_session or self.high_relative_intensity_session)):
 
@@ -352,6 +357,7 @@ class ExerciseAssignmentCalculator(object):
                 else:
                     minutes.append(15)
             elif (not s.daily and s.historic_soreness_status is not None and not s.is_dormant_cleared()
+                  and s.historic_soreness_status is not HistoricSorenessStatus.doms
                   and s.severity >= 1.5 and s.pain and (self.high_relative_load_session or self.high_relative_intensity_session)):
 
                 goal = AthleteGoal("Preemptive, Prepare for Training", 1, AthleteGoalType.preempt_corrective)
