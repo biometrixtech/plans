@@ -185,20 +185,21 @@ class AthleteStats(Serialisable):
         self.daily_severe_pain = pain_list
 
     def update_delayed_onset_muscle_soreness(self, soreness):
-        existing_doms = False
+        body_part_exists = False
         if not soreness.pain:
             current_soreness = HistoricSeverity(soreness.reported_date_time, soreness.severity, soreness.movement)
             current_severity = SorenessCalculator.get_severity(soreness.severity, soreness.movement)
             for doms in self.historic_soreness:
                 if (doms.body_part_location == soreness.body_part.location and
-                        doms.side == soreness.side):
-                    doms.historic_severity.append(current_soreness)
-                    doms.last_reported_date_time = current_soreness.reported_date_time
-                    existing_doms = True
-                    if current_severity > doms.max_severity:
-                        doms.max_severity = current_severity
-                        doms.max_severity_date_time = current_soreness.reported_date_time
-            if not existing_doms:
+                    doms.side == soreness.side and not doms.is_pain):
+                    body_part_exists = True
+                    if doms.historic_soreness_status == HistoricSorenessStatus.doms:
+                        doms.historic_severity.append(current_soreness)
+                        doms.last_reported_date_time = current_soreness.reported_date_time
+                        if current_severity > doms.max_severity:
+                            doms.max_severity = current_severity
+                            doms.max_severity_date_time = current_soreness.reported_date_time
+            if not body_part_exists:
                 doms = HistoricSoreness(soreness.body_part.location, soreness.side, False)
                 doms.historic_soreness_status = HistoricSorenessStatus.doms
                 doms.first_reported_date_time = soreness.reported_date_time
