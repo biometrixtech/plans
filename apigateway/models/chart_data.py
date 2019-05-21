@@ -7,6 +7,40 @@ from models.sport import SportName
 from logic.soreness_processing import SorenessCalculator
 
 
+class BaseChart(object):
+    def __init__(self, end_date):
+        self.end_date = end_date
+        self.data = {}
+
+        self.auto_fill_data()
+
+    def __setattr__(self, name, value):
+        if name in ['end_date']:
+            if value is not None and not isinstance(value, datetime):
+                try:
+                    value = parse_datetime(value)
+                except InvalidSchemaException:
+                    value = parse_date(value)
+        super().__setattr__(name, value)
+
+    def get_output_list(self):
+
+        data = sorted(list(self.data.values()), key=lambda x: x.date, reverse=False)
+
+        return data
+
+    def auto_fill_data(self):
+
+        start_date = self.end_date - timedelta(days=14)
+
+        for i in range(1, 15):
+            chart_data = TrainingVolumeChartData()
+            chart_data.date = (start_date + timedelta(days=i)).date()
+            day_of_week = (start_date + timedelta(days=i)).strftime('%b')[0]
+            chart_data.day_of_week = day_of_week
+            self.data[chart_data.date] = chart_data
+
+
 class TrainingVolumeChartData(Serialisable):
     def __init__(self):
         self.date = None
@@ -46,38 +80,9 @@ class BodyPartChartData(Serialisable):
         }
 
 
-class TrainingVolumeChart(object):
+class TrainingVolumeChart(BaseChart):
     def __init__(self, end_date):
-        self.end_date = end_date
-        self.data = {}
-
-        self.auto_fill_data()
-
-    def __setattr__(self, name, value):
-        if name in ['end_date']:
-            if value is not None and not isinstance(value, datetime):
-                try:
-                    value = parse_datetime(value)
-                except InvalidSchemaException:
-                    value = parse_date(value)
-        super().__setattr__(name, value)
-
-    def get_output_list(self):
-
-        data = sorted(list(self.data.values()), key=lambda x: x.date, reverse=False)
-
-        return data
-
-    def auto_fill_data(self):
-
-        start_date = self.end_date - timedelta(days=14)
-
-        for i in range(1, 15):
-            chart_data = TrainingVolumeChartData()
-            chart_data.date = (start_date + timedelta(days=i)).date()
-            day_of_week = (start_date + timedelta(days=i)).strftime('%b')[0]
-            chart_data.day_of_week = day_of_week
-            self.data[chart_data.date] = chart_data
+        super().__init__(end_date)
 
     def add_training_volume(self, training_session, load_stats):
 
@@ -86,6 +91,11 @@ class TrainingVolumeChart(object):
             self.data[training_session.event_date.date()].training_volume += training_volume
             self.data[training_session.event_date.date()].sport_names.add(training_session.sport_name)
 
+
+class MuscularStrainChart(BaseChart):
+    def __init__(self, end_date):
+        super().__init__(end_date)
+        
 
 class BodyPartChartCollection(object):
     def __init__(self, end_date):
