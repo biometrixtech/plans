@@ -86,12 +86,14 @@ class SurveyProcessing(object):
             # update session_RPE and add post_session_survey to session
             if not historic_health_data and not session_data['deleted'] and not session_data['ignored']:
                 session_data['post_session_survey'] = survey
-                if self.athlete_stats.session_RPE is not None and survey.RPE is not None:
-                    self.athlete_stats.session_RPE = max(survey.RPE, self.athlete_stats.session_RPE)
-                    self.athlete_stats.session_RPE_event_date = self.event_date
-                elif survey.RPE is not None:
-                    self.athlete_stats.session_RPE = survey.RPE
-                    self.athlete_stats.session_RPE_event_date = self.event_date
+                if survey.RPE is not None:
+                    session_data['session_RPE'] = survey.RPE
+                    if self.athlete_stats.session_RPE is not None:
+                        self.athlete_stats.session_RPE = max(survey.RPE, self.athlete_stats.session_RPE)
+                        self.athlete_stats.session_RPE_event_date = self.event_date
+                    else:
+                        self.athlete_stats.session_RPE = survey.RPE
+                        self.athlete_stats.session_RPE_event_date = self.event_date
         session_obj = create_session(session_type, session_data)
         if 'hr_data' in session and len(session['hr_data']) > 0:
             self.create_session_hr_data(session_obj, session['hr_data'])
