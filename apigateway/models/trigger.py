@@ -10,7 +10,7 @@ class TriggerType(IntEnum):
     pers_pers2_pain_no_pain_sore_today_high_volume_intensity = 5  # "Pers, Pers_2 Pain + No pain Reported Today + High Relative Volume or Intensity of Logged Session"
     hist_sore_less_30_sport = 6  # "Pers, Pers-2 Soreness < 30d + Correlated to Sport"
     hist_sore_less_30_no_sport = 7  # "Pers, Pers-2 Soreness < 30d + Not Correlated to Sport"  
-    overreaching_increasing_strain = 8  # "Overreaching as increasing Muscular Strain (with context for Training Volume)"
+    overreaching_high_muscular_strain = 8  # "Overreaching as increasing Muscular Strain (with context for Training Volume)"
     sore_today_no_session = 9  # "Sore reported today + not linked to session"    
     sore_today = 10  # "Sore reported today"
     sore_today_doms = 11  # "Soreness Reported Today as DOMs"

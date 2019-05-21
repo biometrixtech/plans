@@ -601,7 +601,9 @@ class ActiveRest(ModalityBase):
             return True
         else:
             for s in soreness_list:
-                if s.first_reported_date_time is not None and not s.is_dormant_cleared():
+                if (s.first_reported_date_time is not None and
+                        (s.is_persistent_soreness() or
+                         s.historic_soreness_status == HistoricSorenessStatus.persistent_2_soreness)):
                     days_sore = (self.event_date_time - s.first_reported_date_time).days
                     if not s.pain and days_sore < 30:
                         return True
@@ -629,7 +631,7 @@ class ActiveRest(ModalityBase):
         if high_relative_load_session or high_relative_intensity_logged:
             goal = AthleteGoal("Recover from Sport", 1, AthleteGoalType.sport)
             #goal.trigger = "High Relative Volume or Intensity of Logged Session"
-            goal.trigger_type = TriggerType.high_volume_intensity
+            goal.trigger_type = TriggerType.high_volume_intensity  # 0
 
             body_part_factory = BodyPartFactory()
 
@@ -790,7 +792,7 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
 
             goal = AthleteGoal("Care for Soreness", 1, AthleteGoalType.sore)
             #goal.trigger = "Sore reported today"
-            goal.trigger_type = TriggerType.sore_today
+            goal.trigger_type = TriggerType.sore_today  # 10
 
             if body_part is not None:
                 alert = Alert(goal)
@@ -832,7 +834,7 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
 
                 goal = AthleteGoal("Prevention", 2, AthleteGoalType.corrective)
                 #goal.trigger = "Pers, Pers-2 Soreness > 30d"
-                goal.trigger_type = TriggerType.hist_sore_greater_30
+                goal.trigger_type = TriggerType.hist_sore_greater_30  # 19
 
                 if body_part is not None:
                     alert = Alert(goal)
@@ -878,7 +880,7 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
 
                 goal = AthleteGoal("Prevention", 2, AthleteGoalType.corrective)
                 #goal.trigger = "Acute, Pers, Pers-2 Pain"
-                goal.trigger_type = TriggerType.hist_pain
+                goal.trigger_type = TriggerType.hist_pain  # 16
 
                 if body_part is not None:
                     alert = Alert(goal)
@@ -925,16 +927,16 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
             if not soreness.is_joint():
                 #goal.trigger = "Painful joint reported today"
                 if soreness.severity < 3:
-                    goal.trigger_type = TriggerType.pain_today
+                    goal.trigger_type = TriggerType.pain_today  # 14
                 else:
-                    goal.trigger_type = TriggerType.pain_today_high
+                    goal.trigger_type = TriggerType.pain_today_high  # 15
                 synergist_priority = "1"
             else:
                 #goal.trigger = "Painful muscle reported today"
                 if soreness.severity < 3:
-                    goal.trigger_type = TriggerType.pain_today
+                    goal.trigger_type = TriggerType.pain_today  # 14
                 else:
-                    goal.trigger_type = TriggerType.pain_today_high
+                    goal.trigger_type = TriggerType.pain_today_high  # 15
                 synergist_priority = "2"
             if body_part is not None:
                 alert = Alert(goal)
@@ -1107,7 +1109,7 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
 
             goal = AthleteGoal("Care for Soreness", 1, AthleteGoalType.sore)
             #goal.trigger = "Sore reported today"
-            goal.trigger_type = TriggerType.sore_today
+            goal.trigger_type = TriggerType.sore_today  # 10
 
             if body_part is not None:
                 alert = Alert(goal)
@@ -1146,7 +1148,7 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
 
                 goal = AthleteGoal("Prevention", 2, AthleteGoalType.corrective)
                 #goal.trigger = "Pers, Pers-2 Soreness > 30d"
-                goal.trigger_type = TriggerType.hist_sore_greater_30
+                goal.trigger_type = TriggerType.hist_sore_greater_30  # 19
 
                 if body_part is not None:
                     alert = Alert(goal)
@@ -1192,7 +1194,7 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
 
                 goal = AthleteGoal("Prevention", 2, AthleteGoalType.corrective)
                 #goal.trigger = "Acute, Pers, Pers-2 Pain"
-                goal.trigger_type = TriggerType.hist_pain
+                goal.trigger_type = TriggerType.hist_pain  # 16
 
                 if body_part is not None:
                     alert = Alert(goal)
@@ -1239,16 +1241,16 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
             if soreness.is_joint():
                 #goal.trigger = "Painful joint reported today"
                 if soreness.severity < 3:
-                    goal.trigger_type = TriggerType.pain_today
+                    goal.trigger_type = TriggerType.pain_today  # 14
                 else:
-                    goal.trigger_type = TriggerType.pain_today_high
+                    goal.trigger_type = TriggerType.pain_today_high  # 15
                 synergist_priority = "1"
             else:
                 #goal.trigger = "Painful muscle reported today"
                 if soreness.severity < 3:
-                    goal.trigger_type = TriggerType.pain_today
+                    goal.trigger_type = TriggerType.pain_today  # 14
                 else:
-                    goal.trigger_type = TriggerType.pain_today_high
+                    goal.trigger_type = TriggerType.pain_today_high  # 15
                 synergist_priority = "2"
 
             if body_part is not None:
@@ -1463,7 +1465,9 @@ class CoolDown(ModalityBase, Serialisable):
             return True
         else:
             for s in soreness_list:
-                if s.first_reported_date_time is not None and not s.is_dormant_cleared():
+                if (s.first_reported_date_time is not None and
+                        (s.is_persistent_soreness() or
+                         s.historic_soreness_status == HistoricSorenessStatus.persistent_2_soreness)):
                     days_sore = (self.event_date_time - s.first_reported_date_time).days
                     if (not s.pain and days_sore < 30) or s.pain:
                         return True
@@ -1478,7 +1482,7 @@ class CoolDown(ModalityBase, Serialisable):
         if self.high_relative_volume_logged or self.high_relative_intensity_logged:
             goal = AthleteGoal("Recover from Sport", 1, AthleteGoalType.sport)
             #goal.trigger = "High Relative Volume or Intensity of Logged Session"
-            goal.trigger_type = TriggerType.high_volume_intensity
+            goal.trigger_type = TriggerType.high_volume_intensity  # 0
             alert = Alert(goal)
             alert.sport_name = sport_name
             self.alerts.append(alert)

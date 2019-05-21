@@ -94,10 +94,7 @@ class StatsProcessing(object):
                 self.get_readiness_soreness_list(self.last_25_days_readiness_surveys),
                 self.get_ps_survey_soreness_list(self.last_25_days_ps_surveys)
             )
-            body_part_chart_collection = BodyPartChartCollection(self.event_date)
-            body_part_chart_collection.process_soreness_list(soreness_list_25)
-            athlete_stats.soreness_chart_data = body_part_chart_collection.get_soreness_dictionary()
-            athlete_stats.pain_chart_data = body_part_chart_collection.get_pain_dictionary()
+
             athlete_stats.historic_soreness = self.get_historic_soreness_list(soreness_list_25,
                                                                               current_athlete_stats.historic_soreness)
             training_volume_processing = TrainingVolumeProcessing(self.start_date, format_date(
@@ -112,6 +109,10 @@ class StatsProcessing(object):
                                                         )
             athlete_stats = training_volume_processing.calc_training_volume_metrics(current_athlete_stats)
             athlete_stats.training_volume_chart_data = training_volume_processing.training_volume_chart_data
+            body_part_chart_collection = BodyPartChartCollection(self.event_date)
+            body_part_chart_collection.process_soreness_list(soreness_list_25)
+            athlete_stats.soreness_chart_data = body_part_chart_collection.get_soreness_dictionary()
+            athlete_stats.pain_chart_data = body_part_chart_collection.get_pain_dictionary()
             athlete_stats.current_sport_name = current_athlete_stats.current_sport_name
             athlete_stats.current_position = current_athlete_stats.current_position
             athlete_stats.expected_weekly_workouts = current_athlete_stats.expected_weekly_workouts
