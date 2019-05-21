@@ -2,7 +2,7 @@ import math
 import statistics
 from collections import namedtuple
 from datetime import datetime, timedelta
-from models.chart_data import BodyPartChartCollection, MuscularStrainChart
+from models.chart_data import BodyPartChartCollection, MuscularStrainChart, HighRelativeLoadChart
 from fathomapi.utils.xray import xray_recorder
 from logic.training_volume_processing import TrainingVolumeProcessing
 from logic.soreness_processing import SorenessCalculator
@@ -110,6 +110,14 @@ class StatsProcessing(object):
                                                     current_athlete_stats.load_stats
                                                     )
         current_athlete_stats = training_volume_processing.calc_training_volume_metrics(current_athlete_stats)
+        current_athlete_stats.high_relative_load_sessions = training_volume_processing.high_relative_load_sessions
+
+        high_relative_load_chart = HighRelativeLoadChart(self.event_date)
+
+        for h in current_athlete_stats.high_relative_load_sessions:
+            high_relative_load_chart.add_relative_load(h)
+
+        current_athlete_stats.high_relative_load_chart_data = high_relative_load_chart.get_output_list()
 
         current_athlete_stats.training_volume_chart_data = training_volume_processing.training_volume_chart_data
 

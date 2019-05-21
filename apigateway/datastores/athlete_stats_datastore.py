@@ -94,8 +94,8 @@ class AthleteStatsDatastore(object):
         athlete_stats.external_strain = self._standard_error_from_monogodb(mongo_result.get('external_strain', None))
         athlete_stats.internal_ramp = self._standard_error_from_monogodb(mongo_result.get('internal_ramp', None))
         athlete_stats.external_ramp = self._standard_error_from_monogodb(mongo_result.get('external_ramp', None))
-        athlete_stats.duration_load_ramp = {SportName(int(value)): self._standard_error_from_monogodb(load) for (value, load) in
-                                            mongo_result.get('duration_load_ramp', {}).items()}
+        athlete_stats.training_load_ramp = {SportName(int(value)): self._standard_error_from_monogodb(load) for (value, load) in
+                                            mongo_result.get('training_load_ramp', {}).items()}
         athlete_stats.internal_acwr = self._standard_error_from_monogodb(mongo_result.get('internal_acwr', None))
         athlete_stats.external_acwr = self._standard_error_from_monogodb(mongo_result.get('external_acwr', None))
 

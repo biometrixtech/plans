@@ -527,6 +527,11 @@ class CorrectiveSession(Session):
             return False
 
 
+class HighLoadSession(object):
+    def __init__(self, date, sport_name):
+        self.date = date
+        self.sport_name = sport_name
+
 '''deprecated
 class FunctionalStrengthSession(Serialisable):
 

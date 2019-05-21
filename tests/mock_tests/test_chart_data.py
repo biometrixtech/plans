@@ -1,9 +1,10 @@
-from models.chart_data import TrainingVolumeChartData, TrainingVolumeChart, BodyPartChartCollection
+from models.chart_data import TrainingVolumeChartData, TrainingVolumeChart, BodyPartChartCollection, MuscularStrainChart, HighRelativeLoadChart
 from utils import parse_date
 from math import floor
 from models.historic_soreness import HistoricSoreness, HistoricSorenessStatus, HistoricSeverity, SorenessCause
-from models.session import SessionType
+from models.session import SessionType, HighLoadSession
 from models.soreness import BodyPartLocation
+from models.sport import SportName
 from logic.stats_processing import StatsProcessing
 from datetime import datetime, timedelta
 from tests.mocks.mock_datastore_collection import DatastoreCollection
@@ -11,6 +12,7 @@ from tests.mocks.mock_athlete_stats_datastore import AthleteStatsDatastore
 from tests.testing_utilities import TestUtilities
 from models.post_session_survey import PostSurvey, PostSessionSurvey
 from models.daily_readiness import DailyReadiness
+from models.data_series import DataSeries
 
 
 def get_dates(start_date, days):
@@ -128,6 +130,41 @@ def test_14_days_empty_data():
     assert len(chart_data) == 14
     assert chart_data[13].date == parse_date("2019-01-31").date()
     assert chart_data[0].date == parse_date("2019-01-18").date()
+
+
+def test_muscular_strain_chart():
+
+    muscular_strain = [DataSeries(parse_date("2019-01-01"), 50),
+                       DataSeries(parse_date("2019-01-02"), 60),
+                       DataSeries(parse_date("2019-01-06"), 70)]
+
+    chart = MuscularStrainChart(parse_date("2019-01-10"))
+
+    for m in muscular_strain:
+        chart.add_muscular_strain(m)
+
+    chart_data = chart.get_output_list()
+
+    assert len(chart_data) == 14
+    assert chart_data[9].value == 70
+
+
+def test_high_relative_load_chart():
+    high_load = [HighLoadSession(parse_date("2019-01-01"), SportName.cycling),
+                 HighLoadSession(parse_date("2019-01-02"), SportName.basketball),
+                 HighLoadSession(parse_date("2019-01-06"), SportName.basketball)]
+
+    chart = HighRelativeLoadChart(parse_date("2019-01-10"))
+
+    for m in high_load:
+        chart.add_relative_load(m)
+
+    chart_data = chart.get_output_list()
+
+    assert len(chart_data) == 14
+    assert chart_data[9].value is True
+    assert chart_data[10].value is False
+
 
 def test_body_part_collection():
 
