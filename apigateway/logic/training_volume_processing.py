@@ -91,8 +91,8 @@ class TrainingVolumeProcessing(object):
         self.functional_overreaching_NFO_loads = {}
         self.high_relative_load_session = False
         self.doms = []
-        self.last_week_sport_duration_loads = {}
-        self.previous_week_sport_duration_loads = {}
+        self.last_week_sport_training_loads = {}
+        self.previous_week_sport_training_loads = {}
 
     def muscular_strain_increasing(self):
 
@@ -173,8 +173,8 @@ class TrainingVolumeProcessing(object):
 
         self.last_week_external_values = []
         self.last_week_internal_values = []
-        self.last_week_sport_duration_loads = {}
-        self.previous_week_sport_duration_loads = {}
+        self.last_week_sport_training_loads = {}
+        self.previous_week_sport_training_loads = {}
         self.previous_week_external_values = []
         self.previous_week_internal_values = []
         self.a_internal_load_values = []
@@ -195,21 +195,21 @@ class TrainingVolumeProcessing(object):
 
         for l in last_7_day_training_sessions:
             chart_data.add_training_volume(l, load_stats)
-            if l.sport_name not in self.last_week_sport_duration_loads:
-                self.last_week_sport_duration_loads[l.sport_name] = []
-                self.previous_week_sport_duration_loads[l.sport_name] = []
-            duration_load = l.training_volume(load_stats)
-            if duration_load is not None:
-                self.last_week_sport_duration_loads[l.sport_name].append(duration_load)
+            if l.sport_name not in self.last_week_sport_training_loads:
+                self.last_week_sport_training_loads[l.sport_name] = []
+                self.previous_week_sport_training_loads[l.sport_name] = []
+            training_load = l.training_volume(load_stats)
+            if training_load is not None:
+                self.last_week_sport_training_loads[l.sport_name].append(training_load)
 
         for p in previous_7_day_training_sessions:
             chart_data.add_training_volume(p, load_stats)
-            if p.sport_name not in self.previous_week_sport_duration_loads:
-                self.last_week_sport_duration_loads[p.sport_name] = []
-                self.previous_week_sport_duration_loads[p.sport_name] = []
-            duration_load = p.training_volume(load_stats)
-            if duration_load is not None:
-                self.previous_week_sport_duration_loads[p.sport_name].append(duration_load)
+            if p.sport_name not in self.previous_week_sport_training_loads:
+                self.last_week_sport_training_loads[p.sport_name] = []
+                self.previous_week_sport_training_loads[p.sport_name] = []
+            training_load = p.training_volume(load_stats)
+            if training_load is not None:
+                self.previous_week_sport_training_loads[p.sport_name].append(training_load)
 
         self.training_volume_chart_data = chart_data.get_output_list()
 
@@ -287,10 +287,10 @@ class TrainingVolumeProcessing(object):
 
         athlete_stats.duration_load_ramp = {}
 
-        for sport_name, load in self.previous_week_sport_duration_loads.items():
+        for sport_name, load in self.previous_week_sport_training_loads.items():
             athlete_stats.duration_load_ramp[sport_name] = self.get_ramp(athlete_stats.expected_weekly_workouts,
-                                                                         self.last_week_sport_duration_loads[sport_name],
-                                                                         self.previous_week_sport_duration_loads[sport_name]
+                                                                         self.last_week_sport_training_loads[sport_name],
+                                                                         self.previous_week_sport_training_loads[sport_name]
                                                                          )
 
         athlete_stats.external_ramp = self.get_ramp(athlete_stats.expected_weekly_workouts,
