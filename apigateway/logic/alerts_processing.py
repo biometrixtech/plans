@@ -1,22 +1,23 @@
 from models.insights import AthleteInsight, InsightType
 from models.soreness import BodyPartSide
 from models.trigger import TriggerType
-from models.athlete_trend import AthleteTrends
+from models.athlete_trend import AthleteTrends, Trend
 
 
 class AlertsProcessing(object):
-    # def __init__(self, daily_plan, athlete_stats):
-    #     self.daily_plan = daily_plan
-    #     self.athlete_stats = athlete_stats
+    def __init__(self, daily_plan, athlete_stats):
+        self.daily_plan = daily_plan
+        self.athlete_stats = athlete_stats
 
-    @classmethod
-    def aggregate_alerts(cls, trigger_date_time, alerts, previous_insights, exposed_triggers, longitudinal_insights):
-
+    def aggregate_alerts(self, trigger_date_time, alerts):
+        previous_insights = self.daily_plan.insights
+        exposed_triggers = self.athlete_stats.exposed_triggers
+        longitudinal_insights = self.athlete_stats.longitudinal_insights
         trends = AthleteTrends()
-        insights = cls.combine_alerts_to_insights(alerts, trends)
+        insights = self.combine_alerts_to_insights(alerts, trends)
         if TriggerType(9) in exposed_triggers:
             insights = [insight for insight in insights if insight.trigger_type != TriggerType(9)]
-        insights, longitudinal_insights = cls.clear_insight(insights, longitudinal_insights)
+        insights, longitudinal_insights = self.clear_insight(insights, longitudinal_insights)
 
         existing_longitudinal_trigger_types = [insight.trigger_type for insight in longitudinal_insights]
         for insight in insights:
@@ -37,7 +38,13 @@ class AlertsProcessing(object):
                     longitudinal_insights.append(insight)
             else:
                 insight.start_date_time = trigger_date_time
-        insights = cls.combine_new_insights_with_previous(insights, previous_insights)
+        insights = self.combine_new_insights_with_previous(insights, previous_insights)
+
+        self.daily_plan.insights = insights
+        self.daily_plan.sort_insights()
+        self.daily_plan.trends = trends
+        self.daily_plan.trends.dashboard.training_volume_data = self.athlete_stats.training_volume_chart_data
+        self.athlete_stats.longitudinal_insights = longitudinal_insights
 
         return insights, longitudinal_insights, trends
 
@@ -86,18 +93,27 @@ class AlertsProcessing(object):
     @classmethod
     def combine_alerts_to_insights(cls, alerts, trends):
         existing_triggers = []
+        existing_trends = []
         insights = []
         for alert in alerts:
-            insight_type = InsightType(TriggerType.get_insight_type(alert.goal.trigger_type))
-            if insight_type == InsightType.stress:
-                trends.stress.alerts.append(alert)
-                trends.stress.goals.append(alert.goal.text)
-            elif insight_type == InsightType.response:
-                trends.response.alerts.append(alert)
-                trends.response.goals.append(alert.goal.text)
-            elif insight_type == InsightType.biomechanics:
-                trends.biomechanics.alerts.append(alert)
-                trends.biomechanics.goals.append(alert.goal.text)
+            if not (alert.goal.trigger_type, alert.sport_name, alert.body_part) in existing_trends:
+                existing_trends.append((alert.goal.trigger_type, alert.sport_name, alert.body_part))
+                trend = Trend(alert.goal.trigger_type)
+                trend.goal_targeted = [alert.goal.text]
+                if alert.body_part is not None:
+                    trend.body_parts.append(alert.body_part)
+                if alert.sport_name is not None:
+                    trend.sport_names.append(alert.sport_name)
+                insight_type = InsightType(TriggerType.get_insight_type(alert.goal.trigger_type))
+                if insight_type == InsightType.stress:
+                    trends.stress.alerts.append(trend)
+                    trends.stress.goals.append(alert.goal.text)
+                elif insight_type == InsightType.response:
+                    trends.response.alerts.append(trend)
+                    trends.response.goals.append(alert.goal.text)
+                elif insight_type == InsightType.biomechanics:
+                    trends.biomechanics.alerts.append(trend)
+                    trends.biomechanics.goals.append(alert.goal.text)
             # check if trigger already exists
             if alert.goal.trigger_type in existing_triggers:
                 insight = [insight for insight in insights if insight.trigger_type == alert.goal.trigger_type][0]

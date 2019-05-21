@@ -5,6 +5,7 @@ from models.trigger import TriggerType
 from models.sport import SportName
 from logic.alerts_processing import AlertsProcessing
 from models.daily_plan import DailyPlan
+from models.stats import AthleteStats
 from utils import format_date
 
 
@@ -21,6 +22,7 @@ def test_insights_text():
 
 
 def test_aggregate_alerts_first_exposure():
+    current_date_time = datetime.datetime.now()
     goal = AthleteGoal('Care for Pain', 0, AthleteGoalType(0))
     goal.trigger_type = TriggerType(14)
     alert1 = Alert(goal)
@@ -28,10 +30,12 @@ def test_aggregate_alerts_first_exposure():
 
     alert2 = Alert(goal)
     alert2.body_part = BodyPartSide(BodyPartLocation(11), 2)
-    exposed_triggers = []
 
     alerts = [alert1, alert2]
-    insights, longitudinal_insights, trends = AlertsProcessing.aggregate_alerts(datetime.datetime.now(), alerts, [], exposed_triggers, [])
+    event_date_time = current_date_time
+    daily_plan = DailyPlan(format_date(event_date_time))
+    athlete_stats = AthleteStats('test_user')
+    insights, longitudinal_insights, trends = AlertsProcessing(daily_plan, athlete_stats).aggregate_alerts(event_date_time, alerts)
     assert len(insights) == 1
     assert insights[0].first
     assert not insights[0].parent
@@ -39,6 +43,7 @@ def test_aggregate_alerts_first_exposure():
 
 
 def test_aggregate_alerts_multiple_same_body_part():
+    current_date_time = datetime.datetime.now()
     goal = AthleteGoal('Care for Pain', 0, AthleteGoalType(0))
     goal.trigger_type = TriggerType(14)
     alert1 = Alert(goal)
@@ -49,7 +54,11 @@ def test_aggregate_alerts_multiple_same_body_part():
     exposed_triggers = []
 
     alerts = [alert1, alert2]
-    insights, longitudinal_insights, trends = AlertsProcessing.aggregate_alerts(datetime.datetime.now(), alerts, [], exposed_triggers, [])
+    event_date_time = current_date_time
+    daily_plan = DailyPlan(format_date(event_date_time))
+    athlete_stats = AthleteStats('test_user')
+    athlete_stats.exposed_triggers = exposed_triggers
+    insights, longitudinal_insights, trends = AlertsProcessing(daily_plan, athlete_stats).aggregate_alerts(event_date_time, alerts)
     assert len(insights) == 1
     assert insights[0].first
     assert not insights[0].parent
@@ -58,15 +67,20 @@ def test_aggregate_alerts_multiple_same_body_part():
 
 
 def test_aggregate_alerts_multiple_same_child():
+    current_date_time = datetime.datetime.now()
     goal = AthleteGoal('Care for Pain', 0, AthleteGoalType(0))
     goal.trigger_type = TriggerType(14)
     alert1 = Alert(goal)
     alert1.body_part = BodyPartSide(BodyPartLocation(11), 1)
     alert2 = Alert(goal)
     alert2.body_part = BodyPartSide(BodyPartLocation(11), 2)
-
+    exposed_triggers = [TriggerType(14)]
     alerts = [alert1, alert2]
-    insights, longitudinal_insights, trends = AlertsProcessing.aggregate_alerts(datetime.datetime.now(), alerts, [], [TriggerType(14)], [])
+    event_date_time = current_date_time
+    daily_plan = DailyPlan(format_date(event_date_time))
+    athlete_stats = AthleteStats('test_user')
+    athlete_stats.exposed_triggers = exposed_triggers
+    insights, longitudinal_insights, trends = AlertsProcessing(daily_plan, athlete_stats).aggregate_alerts(event_date_time, alerts)
     assert len(insights) == 1
     assert not insights[0].first
     assert not insights[0].parent
