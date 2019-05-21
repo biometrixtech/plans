@@ -2,7 +2,7 @@ import math
 import statistics
 from collections import namedtuple
 from datetime import datetime, timedelta
-from models.chart_data import BodyPartChartCollection
+from models.chart_data import BodyPartChartCollection, MuscularStrainChart
 from fathomapi.utils.xray import xray_recorder
 from logic.training_volume_processing import TrainingVolumeProcessing
 from logic.soreness_processing import SorenessCalculator
@@ -10,6 +10,7 @@ from models.stats import AthleteStats
 from models.soreness import Soreness, BodyPart, HistoricSorenessStatus
 from models.historic_soreness import HistoricSoreness, HistoricSeverity, CoOccurrence, SorenessCause
 from models.post_session_survey import PostSessionSurvey
+from models.data_series import DataSeries
 from utils import parse_date, format_date
 
 
@@ -86,6 +87,7 @@ class StatsProcessing(object):
         self.load_historical_data()
         if current_athlete_stats is None:  # if no athlete_stats was passed, read from mongo
             current_athlete_stats = self.athlete_stats_datastore.get(athlete_id=self.athlete_id)
+
             if current_athlete_stats is None:  # if not found in mongo (first time use), create a new one
                 current_athlete_stats = AthleteStats(self.athlete_id)
                 current_athlete_stats.event_date = self.event_date
@@ -108,11 +110,20 @@ class StatsProcessing(object):
                                                     current_athlete_stats.load_stats
                                                     )
         current_athlete_stats = training_volume_processing.calc_training_volume_metrics(current_athlete_stats)
+
         current_athlete_stats.training_volume_chart_data = training_volume_processing.training_volume_chart_data
+
         body_part_chart_collection = BodyPartChartCollection(self.event_date)
         body_part_chart_collection.process_soreness_list(soreness_list_25)
         current_athlete_stats.soreness_chart_data = body_part_chart_collection.get_soreness_dictionary()
         current_athlete_stats.pain_chart_data = body_part_chart_collection.get_pain_dictionary()
+
+        muscular_strain_chart = MuscularStrainChart(self.event_date)
+        for m in current_athlete_stats.muscular_strain:
+            muscular_strain_chart.add_muscular_strain(m)
+
+        current_athlete_stats.muscular_strain_chart_data = muscular_strain_chart.get_output_list()
+
         # current_athlete_stats.current_sport_name = current_athlete_stats.current_sport_name
         # current_athlete_stats.current_position = current_athlete_stats.current_position
         # current_athlete_stats.expected_weekly_workouts = current_athlete_stats.expected_weekly_workouts
@@ -158,14 +169,11 @@ class StatsProcessing(object):
             training_sessions.extend(training_volume_processing.get_training_sessions(self.days_8_14_plans))
 
             if len(current_athlete_stats.muscular_strain) == 14:
-
                 current_athlete_stats.muscular_strain = sorted(current_athlete_stats.muscular_strain)
-                for m in list(current_athlete_stats.muscular_strain)[0]:
-                    del(current_athlete_stats[m])
+                del (current_athlete_stats.muscular_strain[0])
 
-            current_athlete_stats.muscular_strain[self.event_date] = self.get_muscular_strain(current_athlete_stats,
-                                                                                              cleared_soreness,
-                                                                                              training_sessions)
+            current_athlete_stats.muscular_strain.append(self.get_muscular_strain(current_athlete_stats, cleared_soreness,
+                                                                      training_sessions))
 
             # training_volume_processing.fill_load_monitoring_measures(self.all_daily_readiness_surveys, self.all_plans, parse_date(self.event_date))
             # current_athlete_stats.muscular_strain_increasing = training_volume_processing.muscular_strain_increasing()
@@ -249,9 +257,9 @@ class StatsProcessing(object):
                 total_load += t.training_volume(athlete_stats.load_stats)
 
         if total_load > 0:
-            muscular_strain = (sore_load / float(total_load)) * 100
+            muscular_strain = DataSeries(self.event_date, (sore_load / float(total_load)) * 100)
         else:
-            muscular_strain = 0
+            muscular_strain = DataSeries(self.event_date, 0)
 
         return muscular_strain
 

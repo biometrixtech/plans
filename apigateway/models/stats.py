@@ -81,7 +81,7 @@ class AthleteStats(Serialisable):
         self.wearable_devices = []
 
         self.muscular_strain_increasing = False
-        self.muscular_strain = {}
+        self.muscular_strain = []
         #self.high_relative_load_session = False
         #self.high_relative_load_session_sport_name = None
         #self.high_relative_intensity_session = False
@@ -92,6 +92,7 @@ class AthleteStats(Serialisable):
         self.training_volume_chart_data = []
         self.soreness_chart_data = {}
         self.pain_chart_data = {}
+        self.muscular_strain_chart_data = []
 
     def update_historic_soreness(self, soreness, event_date):
 
