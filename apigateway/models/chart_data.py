@@ -24,13 +24,44 @@ class BaseChart(object):
         super().__setattr__(name, value)
 
     def auto_fill_data(self):
-        pass
+
+        start_date = self.end_date - timedelta(days=14)
+
+        for i in range(1, 15):
+            chart_data = DataSeriesData()
+            chart_data.date = (start_date + timedelta(days=i)).date()
+            day_of_week = (start_date + timedelta(days=i)).strftime('%a')
+            chart_data.day_of_week = day_of_week
+            self.data[chart_data.date] = chart_data
 
     def get_output_list(self):
 
         data = sorted(list(self.data.values()), key=lambda x: x.date, reverse=False)
 
         return data
+
+
+class DataSeriesData(Serialisable):
+    def __init__(self):
+        self.date = None
+        self.day_of_week = ""
+        self.value = 0
+
+    def json_serialise(self):
+        ret = {
+            'date': format_date(self.date),
+            'day_of_week': self.day_of_week,
+            'value': self.value
+        }
+        return ret
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        chart_data = cls()
+        chart_data.date = input_dict['date']
+        chart_data.day_of_week = input_dict.get('day_of_week', '')
+        chart_data.value = input_dict.get('value', 0)
+        return chart_data
 
 
 class TrainingVolumeChart(BaseChart):
@@ -51,7 +82,7 @@ class TrainingVolumeChart(BaseChart):
         for i in range(1, 15):
             chart_data = TrainingVolumeChartData()
             chart_data.date = (start_date + timedelta(days=i)).date()
-            day_of_week = (start_date + timedelta(days=i)).strftime('%b')[0]
+            day_of_week = (start_date + timedelta(days=i)).strftime('%a')
             chart_data.day_of_week = day_of_week
             self.data[chart_data.date] = chart_data
 
@@ -88,42 +119,8 @@ class MuscularStrainChart(BaseChart):
 
     def add_muscular_strain(self, muscular_strain):
 
-        if muscular_strain is not None and muscular_strain.event_date.date() in self.data:
-            self.data[muscular_strain.event_date.date()].muscular_strain += muscular_strain
-
-    def auto_fill_data(self):
-
-        start_date = self.end_date - timedelta(days=14)
-
-        for i in range(1, 15):
-            chart_data = TrainingVolumeChartData()
-            chart_data.date = (start_date + timedelta(days=i)).date()
-            day_of_week = (start_date + timedelta(days=i)).strftime('%b')[0]
-            chart_data.day_of_week = day_of_week
-            self.data[chart_data.date] = chart_data
-
-
-class MuscularStrainChartData(Serialisable):
-    def __init__(self):
-        self.date = None
-        self.day_of_week = ""
-        self.muscular_strain = 0
-
-    def json_serialise(self):
-        ret = {
-            'date': format_date(self.date),
-            'day_of_week': self.day_of_week,
-            'muscular_strain': self.muscular_strain
-        }
-        return ret
-
-    @classmethod
-    def json_deserialise(cls, input_dict):
-        chart_data = cls()
-        chart_data.date = input_dict['date']
-        chart_data.day_of_week = input_dict.get('day_of_week', '')
-        chart_data.muscular_strain = input_dict.get('muscular_strain', 0)
-        return chart_data
+        if muscular_strain is not None and muscular_strain.date.date() in self.data:
+            self.data[muscular_strain.date.date()].value += muscular_strain.value
 
 
 class BodyPartChartData(Serialisable):
@@ -223,7 +220,7 @@ class BodyPartChart(object):
         for i in range(1, 15):
             soreness_chart_data = BodyPartChartData()
             soreness_chart_data.date = (start_date + timedelta(days=i)).date()
-            day_of_week = (start_date + timedelta(days=i)).strftime('%b')[0]
+            day_of_week = (start_date + timedelta(days=i)).strftime('%a')
             soreness_chart_data.day_of_week = day_of_week
 
             pain_chart_data = BodyPartChartData()

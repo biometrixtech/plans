@@ -10,6 +10,7 @@ from models.stats import AthleteStats
 from models.soreness import Soreness, BodyPart, HistoricSorenessStatus
 from models.historic_soreness import HistoricSoreness, HistoricSeverity, CoOccurrence, SorenessCause
 from models.post_session_survey import PostSessionSurvey
+from models.data_series import DataSeries
 from utils import parse_date, format_date
 
 
@@ -157,12 +158,10 @@ class StatsProcessing(object):
                 if len(athlete_stats.muscular_strain) == 14:
 
                     athlete_stats.muscular_strain = sorted(athlete_stats.muscular_strain)
-                    for m in list(athlete_stats.muscular_strain)[0]:
-                        del(athlete_stats[m])
+                    del(athlete_stats.muscular_strain[0])
 
-                athlete_stats.muscular_strain[self.event_date] = self.get_muscular_strain(athlete_stats,
-                                                                                          cleared_soreness,
-                                                                                          training_sessions)
+                athlete_stats.muscular_strain.append(self.get_muscular_strain(athlete_stats, cleared_soreness,
+                                                                              training_sessions))
 
                 # training_volume_processing.fill_load_monitoring_measures(self.all_daily_readiness_surveys, self.all_plans, parse_date(self.event_date))
                 # athlete_stats.muscular_strain_increasing = training_volume_processing.muscular_strain_increasing()
@@ -245,9 +244,9 @@ class StatsProcessing(object):
                 total_load += t.training_volume(athlete_stats.load_stats)
 
         if total_load > 0:
-            muscular_strain = (sore_load / float(total_load)) * 100
+            muscular_strain = DataSeries(self.event_date, (sore_load / float(total_load)) * 100)
         else:
-            muscular_strain = 0
+            muscular_strain = DataSeries(self.event_date, 0)
 
         return muscular_strain
 
