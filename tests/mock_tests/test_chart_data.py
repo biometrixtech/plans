@@ -1,9 +1,10 @@
-from models.chart_data import TrainingVolumeChartData, TrainingVolumeChart, BodyPartChartCollection, MuscularStrainChart
+from models.chart_data import TrainingVolumeChartData, TrainingVolumeChart, BodyPartChartCollection, MuscularStrainChart, HighRelativeLoadChart
 from utils import parse_date
 from math import floor
 from models.historic_soreness import HistoricSoreness, HistoricSorenessStatus, HistoricSeverity, SorenessCause
-from models.session import SessionType
+from models.session import SessionType, HighLoadSession
 from models.soreness import BodyPartLocation
+from models.sport import SportName
 from logic.stats_processing import StatsProcessing
 from datetime import datetime, timedelta
 from tests.mocks.mock_datastore_collection import DatastoreCollection
@@ -146,6 +147,23 @@ def test_muscular_strain_chart():
 
     assert len(chart_data) == 14
     assert chart_data[9].value == 70
+
+
+def test_high_relative_load_chart():
+    high_load = [HighLoadSession(parse_date("2019-01-01"), SportName.cycling),
+                 HighLoadSession(parse_date("2019-01-02"), SportName.basketball),
+                 HighLoadSession(parse_date("2019-01-06"), SportName.basketball)]
+
+    chart = HighRelativeLoadChart(parse_date("2019-01-10"))
+
+    for m in high_load:
+        chart.add_relative_load(m)
+
+    chart_data = chart.get_output_list()
+
+    assert len(chart_data) == 14
+    assert chart_data[9].value is True
+    assert chart_data[10].value is False
 
 
 def test_body_part_collection():

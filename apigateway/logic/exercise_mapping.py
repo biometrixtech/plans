@@ -33,7 +33,7 @@ class ExerciseAssignmentCalculator(object):
         self.muscular_strain_high = False
         self.doms = list(d for d in athlete_stats.historic_soreness if d.historic_soreness_status == HistoricSorenessStatus.doms)
 
-        self.set_high_relative_load_session(athlete_stats, training_sessions)
+        self.set_high_relative_load_session(athlete_stats)
         self.set_muscular_strain_high(athlete_stats)
 
     def set_muscular_strain_high(self, athlete_stats):
@@ -43,19 +43,13 @@ class ExerciseAssignmentCalculator(object):
             if athlete_stats.muscular_strain[0] > 50.0:
                 self.muscular_strain_high = True
 
-    def set_high_relative_load_session(self, athlete_stats, training_sessions):
+    def set_high_relative_load_session(self, athlete_stats):
 
-        for t in training_sessions:
-            if t.sport_name in athlete_stats.duration_load_ramp:
-                if (athlete_stats.duration_load_ramp[t.sport_name].observed_value is None or
-                        athlete_stats.duration_load_ramp[t.sport_name].observed_value > 1.1):
-                    if t.session_RPE is not None and t.session_RPE > 4:
-                        self.high_relative_load_session = True
-                        self.high_relative_load_session_sport_names.add(t.sport_name)
-            else:
-                if t.session_RPE is not None and t.session_RPE > 4:
-                    self.high_relative_load_session = True
-                    self.high_relative_load_session_sport_names.add(t.sport_name)
+        todays_sessions = list(h for h in athlete_stats.high_relative_load_sessions if h.date.date() == self.event_date_time.date())
+
+        for t in todays_sessions:
+            self.high_relative_load_session = True
+            self.high_relative_load_session_sport_names.add(t.sport_name)
 
     def get_progression_list(self, exercise):
 

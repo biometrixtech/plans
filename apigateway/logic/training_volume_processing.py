@@ -1,6 +1,7 @@
 from fathomapi.utils.xray import xray_recorder
 from models.training_volume import LoadMonitoringType, StandardErrorRange, StandardErrorRangeMetric
 from models.sport import SportName, SportType
+from models.session import HighLoadSession
 from datetime import timedelta
 import statistics, math
 from utils import format_date, parse_date
@@ -90,9 +91,11 @@ class TrainingVolumeProcessing(object):
         self.functional_overreaching_loads = {}
         self.functional_overreaching_NFO_loads = {}
         self.high_relative_load_session = False
+        self.high_relative_load_sessions = []
         self.doms = []
         self.last_week_sport_training_loads = {}
         self.previous_week_sport_training_loads = {}
+        self.last_14_days_training_sessions = []
 
     def muscular_strain_increasing(self):
 
@@ -191,6 +194,12 @@ class TrainingVolumeProcessing(object):
         last_7_day_training_sessions = self.get_training_sessions(last_7_days_plans)
         previous_7_day_training_sessions = self.get_training_sessions(days_8_14_plans)
 
+        all_sessions = []
+        all_sessions.extend(previous_7_day_training_sessions)
+        all_sessions.extend(last_7_day_training_sessions)
+
+        self.last_14_days_training_sessions = all_sessions
+
         chart_data = TrainingVolumeChart(self.end_date)
 
         for l in last_7_day_training_sessions:
@@ -281,6 +290,19 @@ class TrainingVolumeProcessing(object):
             self.mod_internal_load_day_upper_bound = high_internal - range
             self.high_internal_load_day_upper_bound = high_internal
 
+    def set_high_relative_load_sessions(self, athlete_stats, training_sessions):
+
+        for t in training_sessions:
+            if t.sport_name in athlete_stats.training_load_ramp:
+                if (athlete_stats.training_load_ramp[t.sport_name].observed_value is None or
+                        athlete_stats.training_load_ramp[t.sport_name].observed_value > 1.1):
+                    if t.session_RPE is not None and t.session_RPE > 4:
+                        high_load_session = HighLoadSession(t.event_date, t.sport_name)
+                        self.high_relative_load_sessions.append(high_load_session)
+            else:
+                if t.session_RPE is not None and t.session_RPE > 4:
+                    high_load_session = HighLoadSession(t.event_date, t.sport_name)
+                    self.high_relative_load_sessions.append(high_load_session)
 
     @xray_recorder.capture('logic.TrainingVolumeProcessing.calc_training_volume_metrics')
     def calc_training_volume_metrics(self, athlete_stats):
@@ -292,6 +314,8 @@ class TrainingVolumeProcessing(object):
                                                                          self.last_week_sport_training_loads[sport_name],
                                                                          self.previous_week_sport_training_loads[sport_name]
                                                                          )
+
+        self.set_high_relative_load_sessions(athlete_stats, self.last_14_days_training_sessions)
 
         athlete_stats.external_ramp = self.get_ramp(athlete_stats.expected_weekly_workouts,
                                                     self.last_week_external_values, self.previous_week_external_values)
@@ -423,7 +447,8 @@ class TrainingVolumeProcessing(object):
 
         #due to how these are entered, we may have multiple sessions on one day with the same datetime
         for c in daily_plans:
-            training_sessions.extend(c.training_sessions)
+            clean_sessions = list(s for s in c.training_sessions if not s.deleted and not s.ignored)
+            training_sessions.extend(clean_sessions)
             #training_sessions.extend(c.practice_sessions)
             #training_sessions.extend(c.strength_conditioning_sessions)
             #training_sessions.extend(c.games)
