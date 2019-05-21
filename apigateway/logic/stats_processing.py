@@ -2,7 +2,7 @@ import math
 import statistics
 from collections import namedtuple
 from datetime import datetime, timedelta
-from models.chart_data import BodyPartChartCollection
+from models.chart_data import BodyPartChartCollection, MuscularStrainChart
 from fathomapi.utils.xray import xray_recorder
 from logic.training_volume_processing import TrainingVolumeProcessing
 from logic.soreness_processing import SorenessCalculator
@@ -61,8 +61,8 @@ class StatsProcessing(object):
         self.historic_data_loaded = False
 
     def set_start_end_times(self):
-        #start_date = datetime.strptime(self.event_date, "%Y-%m-%d")
-        #end_date = datetime.strptime(self.event_date, "%Y-%m-%d")
+        # start_date = datetime.strptime(self.event_date, "%Y-%m-%d")
+        # end_date = datetime.strptime(self.event_date, "%Y-%m-%d")
         start_date = self.event_date
         end_date = self.event_date
         self.start_date_time = start_date - timedelta(days=35)  # used to be 28, this allows for non-overlapping 7/28
@@ -85,92 +85,105 @@ class StatsProcessing(object):
         if self.start_date is None:
             self.set_start_end_times()
         self.load_historical_data()
-        athlete_stats = AthleteStats(self.athlete_id)
-        athlete_stats.event_date = self.event_date
-        athlete_stats = self.calc_survey_stats(athlete_stats)
-        if current_athlete_stats is None:
+        if current_athlete_stats is None:  # if no athlete_stats was passed, read from mongo
             current_athlete_stats = self.athlete_stats_datastore.get(athlete_id=self.athlete_id)
-        if current_athlete_stats is not None:
-            soreness_list_25 = self.merge_soreness_from_surveys(
-                self.get_readiness_soreness_list(self.last_25_days_readiness_surveys),
-                self.get_ps_survey_soreness_list(self.last_25_days_ps_surveys)
-            )
 
-            athlete_stats.historic_soreness = self.get_historic_soreness_list(soreness_list_25,
-                                                                              current_athlete_stats.historic_soreness)
-            training_volume_processing = TrainingVolumeProcessing(self.start_date, format_date(
-                self.event_date))  # want event date since end date = event_date + 1
+            if current_athlete_stats is None:  # if not found in mongo (first time use), create a new one
+                current_athlete_stats = AthleteStats(self.athlete_id)
+                current_athlete_stats.event_date = self.event_date
+        current_athlete_stats = self.calc_survey_stats(current_athlete_stats)
+        soreness_list_25 = self.merge_soreness_from_surveys(
+            self.get_readiness_soreness_list(self.last_25_days_readiness_surveys),
+            self.get_ps_survey_soreness_list(self.last_25_days_ps_surveys)
+        )
 
-            training_volume_processing.load_plan_values(self.last_7_days_plans,
-                                                        self.days_8_14_plans,
-                                                        self.acute_daily_plans,
-                                                        self.get_chronic_weeks_plans(),
-                                                        self.chronic_daily_plans,
-                                                        current_athlete_stats.load_stats
-                                                        )
-            athlete_stats = training_volume_processing.calc_training_volume_metrics(current_athlete_stats)
-            athlete_stats.training_volume_chart_data = training_volume_processing.training_volume_chart_data
-            body_part_chart_collection = BodyPartChartCollection(self.event_date)
-            body_part_chart_collection.process_soreness_list(soreness_list_25)
-            athlete_stats.soreness_chart_data = body_part_chart_collection.get_soreness_dictionary()
-            athlete_stats.pain_chart_data = body_part_chart_collection.get_pain_dictionary()
-            athlete_stats.current_sport_name = current_athlete_stats.current_sport_name
-            athlete_stats.current_position = current_athlete_stats.current_position
-            athlete_stats.expected_weekly_workouts = current_athlete_stats.expected_weekly_workouts
-            athlete_stats.exposed_triggers = current_athlete_stats.exposed_triggers
-            athlete_stats.longitudinal_insights = current_athlete_stats.longitudinal_insights
-            # Only persist readiness and ps soreness from today and yesterday
-            athlete_stats.readiness_soreness = [s for s in current_athlete_stats.readiness_soreness if self.persist_soreness(s)]
-            athlete_stats.post_session_soreness = [s for s in current_athlete_stats.post_session_soreness if self.persist_soreness(s)]
-            athlete_stats.update_daily_soreness()
-            athlete_stats.readiness_pain = [s for s in current_athlete_stats.readiness_pain if self.persist_soreness(s)]
-            athlete_stats.post_session_pain = [s for s in current_athlete_stats.post_session_pain if self.persist_soreness(s)]
-            athlete_stats.update_daily_pain()
-            athlete_stats.daily_severe_soreness_event_date = self.event_date
-            athlete_stats.daily_severe_pain_event_date = self.event_date
-            athlete_stats.typical_weekly_sessions = current_athlete_stats.typical_weekly_sessions
-            athlete_stats.wearable_devices = current_athlete_stats.wearable_devices
-            if current_athlete_stats.event_date.date() == self.event_date.date():
-                # persist all of soreness/pain and session_RPE
-                athlete_stats.session_RPE = current_athlete_stats.session_RPE
-                athlete_stats.session_RPE_event_date = current_athlete_stats.session_RPE_event_date
-            else:
-                # clear any doms
-                for h in athlete_stats.historic_soreness:
-                    if h.historic_soreness_status == HistoricSorenessStatus.doms:
-                        self.clear_doms(h)
+        current_athlete_stats.historic_soreness = self.get_historic_soreness_list(soreness_list_25,
+                                                                                  current_athlete_stats.historic_soreness)
+        training_volume_processing = TrainingVolumeProcessing(self.start_date,
+                                                              format_date( self.event_date))  # want event date since end date = event_date + 1
 
-                athlete_stats.historic_soreness = list(h for h in athlete_stats.historic_soreness if h.cleared_date_time is None)
+        training_volume_processing.load_plan_values(self.last_7_days_plans,
+                                                    self.days_8_14_plans,
+                                                    self.acute_daily_plans,
+                                                    self.get_chronic_weeks_plans(),
+                                                    self.chronic_daily_plans,
+                                                    current_athlete_stats.load_stats
+                                                    )
+        current_athlete_stats = training_volume_processing.calc_training_volume_metrics(current_athlete_stats)
 
-                # update soreness cause for acute/chronic days
-                # WARNING: this updates athlete_stats.historic_soreness
-                athlete_stats.historic_soreness = self.add_soreness_cause(athlete_stats.historic_soreness)
+        current_athlete_stats.training_volume_chart_data = training_volume_processing.training_volume_chart_data
 
-                # calc muscular strain
-                cleared_soreness = self.cleared_soreness_datastore.get(self.athlete_id,
-                                                                       self.event_date - timedelta(days=14),
-                                                                       self.event_date)
+        body_part_chart_collection = BodyPartChartCollection(self.event_date)
+        body_part_chart_collection.process_soreness_list(soreness_list_25)
+        current_athlete_stats.soreness_chart_data = body_part_chart_collection.get_soreness_dictionary()
+        current_athlete_stats.pain_chart_data = body_part_chart_collection.get_pain_dictionary()
 
-                training_sessions = []
-                training_sessions.extend(training_volume_processing.get_training_sessions(self.last_7_days_plans))
-                training_sessions.extend(training_volume_processing.get_training_sessions(self.days_8_14_plans))
+        muscular_strain_chart = MuscularStrainChart(self.event_date)
+        for m in current_athlete_stats.muscular_strain:
+            muscular_strain_chart.add_muscular_strain(m)
 
-                if len(athlete_stats.muscular_strain) == 14:
+        current_athlete_stats.muscular_strain_chart_data = muscular_strain_chart.get_output_list()
 
-                    athlete_stats.muscular_strain = sorted(athlete_stats.muscular_strain)
-                    del(athlete_stats.muscular_strain[0])
+        # current_athlete_stats.current_sport_name = current_athlete_stats.current_sport_name
+        # current_athlete_stats.current_position = current_athlete_stats.current_position
+        # current_athlete_stats.expected_weekly_workouts = current_athlete_stats.expected_weekly_workouts
+        # current_athlete_stats.exposed_triggers = current_athlete_stats.exposed_triggers
+        # current_athlete_stats.longitudinal_insights = current_athlete_stats.longitudinal_insights
+        # Only persist readiness and ps soreness from today and yesterday
+        current_athlete_stats.readiness_soreness = [s for s in current_athlete_stats.readiness_soreness if self.persist_soreness(s)]
+        current_athlete_stats.post_session_soreness = [s for s in current_athlete_stats.post_session_soreness if self.persist_soreness(s)]
+        current_athlete_stats.update_daily_soreness()
+        current_athlete_stats.readiness_pain = [s for s in current_athlete_stats.readiness_pain if self.persist_soreness(s)]
+        current_athlete_stats.post_session_pain = [s for s in current_athlete_stats.post_session_pain if self.persist_soreness(s)]
+        current_athlete_stats.update_daily_pain()
+        current_athlete_stats.daily_severe_soreness_event_date = self.event_date
+        current_athlete_stats.daily_severe_pain_event_date = self.event_date
+        # current_athlete_stats.typical_weekly_sessions = current_athlete_stats.typical_weekly_sessions
+        # current_athlete_stats.wearable_devices = current_athlete_stats.wearable_devices
+        if current_athlete_stats.event_date.date() == self.event_date.date():
+            # persist all of soreness/pain and session_RPE
+            current_athlete_stats.session_RPE = current_athlete_stats.session_RPE
+            current_athlete_stats.session_RPE_event_date = current_athlete_stats.session_RPE_event_date
+        else:  # nightly process (first update for the day)
+            # clear these if it's a new day
+            current_athlete_stats.session_RPE = None
+            current_athlete_stats.session_RPE_event_date = None
+            # clear any doms
+            for h in current_athlete_stats.historic_soreness:
+                if h.historic_soreness_status == HistoricSorenessStatus.doms:
+                    self.clear_doms(h)
 
-                athlete_stats.muscular_strain.append(self.get_muscular_strain(athlete_stats, cleared_soreness,
-                                                                              training_sessions))
+            current_athlete_stats.historic_soreness = list(h for h in current_athlete_stats.historic_soreness if h.cleared_date_time is None)
 
-                # training_volume_processing.fill_load_monitoring_measures(self.all_daily_readiness_surveys, self.all_plans, parse_date(self.event_date))
-                # athlete_stats.muscular_strain_increasing = training_volume_processing.muscular_strain_increasing()
-                # athlete_stats.high_relative_load_benchmarks = training_volume_processing.calc_high_relative_load_benchmarks()
-                # athlete_stats.high_relative_load_session = training_volume_processing.high_relative_load_session
-        #athlete_stats.completed_functional_strength_sessions = self.get_completed_functional_strength_sessions()
-        #athlete_stats.functional_strength_eligible = self.is_athlete_functional_strength_eligible(athlete_stats)
+            # update soreness cause for acute/chronic days
+            # WARNING: this updates current_athlete_stats.historic_soreness
+            current_athlete_stats.historic_soreness = self.add_soreness_cause(current_athlete_stats.historic_soreness)
 
-        return athlete_stats
+            # calc muscular strain
+            cleared_soreness = self.cleared_soreness_datastore.get(self.athlete_id,
+                                                                   self.event_date - timedelta(days=14),
+                                                                   self.event_date)
+
+            training_sessions = []
+            training_sessions.extend(training_volume_processing.get_training_sessions(self.last_7_days_plans))
+            training_sessions.extend(training_volume_processing.get_training_sessions(self.days_8_14_plans))
+
+            if len(current_athlete_stats.muscular_strain) == 14:
+                current_athlete_stats.muscular_strain = sorted(current_athlete_stats.muscular_strain)
+                del (current_athlete_stats.muscular_strain[0])
+
+            current_athlete_stats.muscular_strain.append(self.get_muscular_strain(current_athlete_stats, cleared_soreness,
+                                                                      training_sessions))
+
+            # training_volume_processing.fill_load_monitoring_measures(self.all_daily_readiness_surveys, self.all_plans, parse_date(self.event_date))
+            # current_athlete_stats.muscular_strain_increasing = training_volume_processing.muscular_strain_increasing()
+            # current_athlete_stats.high_relative_load_benchmarks = training_volume_processing.calc_high_relative_load_benchmarks()
+            # current_athlete_stats.high_relative_load_session = training_volume_processing.high_relative_load_session
+        # current_athlete_stats.completed_functional_strength_sessions = self.get_completed_functional_strength_sessions()
+        # current_athlete_stats.functional_strength_eligible = self.is_athlete_functional_strength_eligible(current_athlete_stats)
+
+        current_athlete_stats.event_date = self.event_date
+        return current_athlete_stats
 
     def add_soreness_cause(self, historic_soreness):
 
