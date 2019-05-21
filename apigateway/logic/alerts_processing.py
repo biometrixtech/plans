@@ -1,7 +1,7 @@
 from models.insights import AthleteInsight, InsightType
 from models.soreness import BodyPartSide
 from models.trigger import TriggerType
-from models.athlete_trend import AthleteTrends
+from models.athlete_trend import AthleteTrends, Trend
 
 
 class AlertsProcessing(object):
@@ -88,15 +88,21 @@ class AlertsProcessing(object):
         existing_triggers = []
         insights = []
         for alert in alerts:
+            trend = Trend(alert.goal.trigger_type)
+            trend.goal_targeted = [alert.goal.text]
+            if alert.body_part is not None:
+                trend.body_parts.append(alert.body_part)
+            if alert.sport_name is not None:
+                trend.sport_names.append(alert.sport_name)
             insight_type = InsightType(TriggerType.get_insight_type(alert.goal.trigger_type))
             if insight_type == InsightType.stress:
-                trends.stress.alerts.append(alert)
+                trends.stress.alerts.append(trend)
                 trends.stress.goals.append(alert.goal.text)
             elif insight_type == InsightType.response:
-                trends.response.alerts.append(alert)
+                trends.response.alerts.append(trend)
                 trends.response.goals.append(alert.goal.text)
             elif insight_type == InsightType.biomechanics:
-                trends.biomechanics.alerts.append(alert)
+                trends.biomechanics.alerts.append(trend)
                 trends.biomechanics.goals.append(alert.goal.text)
             # check if trigger already exists
             if alert.goal.trigger_type in existing_triggers:

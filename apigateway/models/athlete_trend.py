@@ -1,9 +1,154 @@
-from models.soreness import Alert
+from enum import Enum
 from models.insights import InsightType
 from models.chart_data import TrainingVolumeChartData
+from models.sport import SportName
+from models.soreness import BodyPartSide
+
+
+class LegendColor(Enum):
+    green = 0
+    yellow = 1
+    red = 2
+
+
+class LegendType(Enum):
+    circle = 0
+    solid_line = 1
+    dashed_line = 2
+
+
+class VisualizationType(Enum):
+    load = 1
+    session = 2
+    body_part = 3
+    doms = 4
+    muscular_strain = 5
+    sensor = 6
+
+
+class Legend(object):
+    def __init(self):
+        self.color = LegendColor(0)
+        self.type = LegendType(0)
+        self.text = ""
+
+    def json_serialise(self):
+        return {
+            'color': self.color.value,
+            'type': self.type.value,
+            'text': self.text
+        }
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        legend = cls()
+        legend.color = LegendColor(input_dict['color'])
+        legend.type = LegendType(input_dict['type'])
+        legend.text = input_dict['text']
+        return legend
+
+
+class VisualizaitonData(object):
+    def __init__(self):
+        self.y_axis_1 = "training volume"
+        self.y_axis_2 = ""
+        self.plot_legends = []
+
+    def json_serialise(self):
+        return {
+            'y_axis_1': self.y_axis_1,
+            'y_axis_2': self.y_axis_2,
+            'plot_legends': [legend.json_serialise() for legend in self.plot_legends]
+        }
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        viz_data = cls()
+        viz_data.y_axis_1 = input_dict['y_axis_1']
+        viz_data.y_axis_2 = input_dict['y_axis_2']
+        viz_data.plot_legends = [Legend.json_deserialise(legend) for legend in input_dict['plot_legends']]
+        return viz_data
+
+
+class VisualizationTitle(object):
+    def __init__(self):
+        self.text = ""
+        self.body_part_text = []
+        self.color = LegendColor(0)
+
+    def json_serialise(self):
+        return {
+            'text': self.text,
+            'body_part_text': self.body_part_text,
+            'color': self.color.value
+        }
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        viz_title = cls()
+        viz_title.text = input_dict['text']
+        viz_title.body_part_text = input_dict['text']
+        viz_title.color = LegendColor(input_dict['color'])
+        return viz_title
 
 
 class Trend(object):
+    def __init__(self, trigger_type):
+        self.trigger_type = trigger_type
+        self.title = ""
+        self.text = ""
+        self.visualization_title = VisualizationTitle()
+        self.visualization_type = VisualizationType(1)
+        self.visualization_data = VisualizaitonData()
+        self.goal_targeted = []
+        self.body_parts = []
+        self.sport_names = []
+        self.data = []
+
+    def json_serialise(self):
+        ret = {
+            'trigger_type': self.trigger_type.value,
+            'title': self.title,
+            'text': self.text,
+            'visualization_title': self.visualization_title.json_serialise(),
+            'visualization_type': self.visualization_type.value,
+            'visualization_data': self.visualization_data.json_serialise(),
+            'goal_targeted': self.goal_targeted,
+            'body_parts': [body_part.json_serialise() for body_part in self.body_parts],
+            'sport_names': [sport_name.value for sport_name in self.sport_names],
+            'data': [data.json_serialise() for data in self.data]
+        }
+        return ret
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        trend = cls(input_dict['trigger_type'])
+        trend.title = input_dict['title']
+        trend.text = input_dict['text']
+        trend.visualization_title = VisualizationTitle.json_deserialise(input_dict['visualization_title'])
+        trend.visualization_type = VisualizationType(input_dict['visualization_type'])
+        trend.visualization_data = VisualizaitonData.json_deserialise(input_dict['visualization_data'])
+        trend.goal_targeted = input_dict['goal_targeted']
+        trend.body_parts = [BodyPartSide.json_deserialise(body_part) for body_part in input_dict['body_parts']]
+        trend.sport_names = [SportName(sport_name) for sport_name in input_dict['sport_names']]
+        if trend.visualization_type == VisualizationType.load:
+            trend.data = []
+        elif trend.visualization_type == VisualizationType.session:
+            trend.data = []
+        elif trend.visualization_type == VisualizationType.body_part:
+            trend.data = []
+        elif trend.visualization_type == VisualizationType.doms:
+            trend.data = []
+        elif trend.visualization_type == VisualizationType.muscular_strain:
+            trend.data = []
+        elif trend.visualization_type == VisualizationType.sensor:
+            trend.data = []
+        else:
+            trend.data = []
+        return trend
+
+
+class TrendCategory(object):
     def __init__(self, insight_type):
         self.insight_type = insight_type
         self.goals = []
@@ -21,11 +166,11 @@ class Trend(object):
 
     @classmethod
     def json_deserialise(cls, input_dict):
-        trend = cls(InsightType(input_dict['insight_type']))
-        trend.goals = input_dict.get('goals', [])
-        trend.cta = input_dict.get('cta', [])
-        trend.alerts = [Alert.json_deserialise(alert) for alert in input_dict.get('alerts', [])]
-        return trend
+        trend_category = cls(InsightType(input_dict['insight_type']))
+        trend_category.goals = input_dict.get('goals', [])
+        trend_category.cta = input_dict.get('cta', [])
+        trend_category.alerts = [Trend.json_deserialise(alert) for alert in input_dict.get('alerts', [])]
+        return trend_category
 
 
 class TrendsDashboard(object):
@@ -48,9 +193,9 @@ class TrendsDashboard(object):
 class AthleteTrends(object):
     def __init__(self):
         self.dashboard = TrendsDashboard()
-        self.stress = Trend(InsightType.stress)
-        self.response = Trend(InsightType.response)
-        self.biomechanics = Trend(InsightType.biomechanics)
+        self.stress = TrendCategory(InsightType.stress)
+        self.response = TrendCategory(InsightType.response)
+        self.biomechanics = TrendCategory(InsightType.biomechanics)
         # self.stress = None
         # self.response = None
         # self.biomechanics = None
@@ -69,9 +214,9 @@ class AthleteTrends(object):
     def json_deserialise(cls, input_dict):
         trends = cls()
         trends.dashboard = TrendsDashboard.json_deserialise(input_dict['dashboard']) if input_dict.get('dashboard', None) is not None else None
-        trends.stress = Trend.json_deserialise(input_dict['stress']) if input_dict.get('stress', None) is not None else None
-        trends.response = Trend.json_deserialise(input_dict['response']) if input_dict.get('response', None) is not None else None
-        trends.biomechanics = Trend.json_deserialise(input_dict['biomechanics']) if input_dict.get('biomechanics', None) is not None else None
+        trends.stress = TrendCategory.json_deserialise(input_dict['stress']) if input_dict.get('stress', None) is not None else None
+        trends.response = TrendCategory.json_deserialise(input_dict['response']) if input_dict.get('response', None) is not None else None
+        trends.biomechanics = TrendCategory.json_deserialise(input_dict['biomechanics']) if input_dict.get('biomechanics', None) is not None else None
 
         return trends
 

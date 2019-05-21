@@ -40,7 +40,7 @@ class ExerciseAssignmentCalculator(object):
 
         if len(athlete_stats.muscular_strain) > 0:
             athlete_stats.muscular_strain.sort(key=lambda x: x.date, reverse=True)
-            if athlete_stats.muscular_strain[0] > 50.0:
+            if athlete_stats.muscular_strain[0].value > 50.0:
                 self.muscular_strain_high = True
 
     def set_high_relative_load_session(self, athlete_stats, training_sessions):
