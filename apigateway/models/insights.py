@@ -216,7 +216,7 @@ class InsightsData(object):
             0: {
                 "priority": 8,
                 "insight_type": 0,
-                "data_source": "",
+                "data_source": "training_volume",
                 "parent": {
                     "title": "",
                     "first": "",
@@ -692,7 +692,7 @@ class InsightsData(object):
             16: {
                 "priority": 3,
                 "insight_type": 2,
-                "data_source": "",
+                "data_source": "pain",
                 "parent": {
                     "title": "",
                     "first": "",
@@ -712,7 +712,7 @@ class InsightsData(object):
                     "ongoing_body": "",
                     "cleared_title": "",
                     "cleared_body": "",
-                    "visualization_type": 1,
+                    "visualization_type": 3,
                     "visualization_title": ""
                 }
             },

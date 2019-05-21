@@ -112,7 +112,7 @@ def test_aggregate_alerts_exposed():
 def test_aggregate_alerts_exposed_group():
     current_date_time = datetime.datetime.now()
     goal = AthleteGoal('Care for Pain', 0, AthleteGoalType(0))
-    goal.trigger_type = TriggerType(6)
+    goal.trigger_type = TriggerType(7)
     alert1 = Alert(goal)
     alert1.body_part = BodyPartSide(BodyPartLocation(11), 1)
 
@@ -121,7 +121,7 @@ def test_aggregate_alerts_exposed_group():
     event_date_time = current_date_time
     daily_plan = DailyPlan(format_date(event_date_time))
     athlete_stats = AthleteStats('test_user')
-    athlete_stats.exposed_triggers = [TriggerType(7)]
+    athlete_stats.exposed_triggers = [TriggerType(8)]
     insights, longitudinal_insights, trends = AlertsProcessing(daily_plan, athlete_stats).aggregate_alerts(event_date_time, alerts)
     assert len(insights) == 1
     assert not insights[0].first
@@ -213,11 +213,11 @@ def test_aggregate_alerts_cleared():
 def test_aggregate_alerts_cleared_same_parent_group():
     current_date_time = datetime.datetime.now()
     goal1 = AthleteGoal('Care for Pain', 0, AthleteGoalType(0))
-    goal1.trigger_type = TriggerType(6)
+    goal1.trigger_type = TriggerType(7)
     alert1 = Alert(goal1)
     alert1.body_part = BodyPartSide(BodyPartLocation(11), 1)
     goal2 = AthleteGoal('Care for Pain', 0, AthleteGoalType(0))
-    goal2.trigger_type = TriggerType(7)
+    goal2.trigger_type = TriggerType(8)
     alert2 = Alert(goal2)
     alert2.body_part = BodyPartSide(BodyPartLocation(11), 2)
 
@@ -327,9 +327,9 @@ def test_insights_ordering():
 
 
 def test_equivalency():
-    trigger1 = TriggerType(6)
+    trigger1 = TriggerType(8)
     trigger2 = TriggerType(7)
-    trigger3 = TriggerType(6)
+    trigger3 = TriggerType(8)
     trigger4 = TriggerType(9)
     assert TriggerType.is_equivalent(trigger1, trigger2)
     assert TriggerType.is_equivalent(trigger1, trigger3)
@@ -346,7 +346,7 @@ def test_trend_add_data():
 
 
 def test_trend_add_data_another():
-    trend = Trend(TriggerType(15))
+    trend = Trend(TriggerType(5))
     trend.add_data()
     assert trend.visualization_data.plot_legends[0].color.value == 0
     trend_json = trend.json_serialise()

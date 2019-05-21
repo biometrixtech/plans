@@ -5,6 +5,7 @@ from models.sport import SportName
 from models.soreness import BodyPartSide
 from models.trends_data import TrendsData
 from models.trigger import TriggerType
+from models.chart_data import BodyPartChartData, DataSeriesBooleanData
 
 
 class LegendColor(Enum):
@@ -26,6 +27,12 @@ class VisualizationType(Enum):
     doms = 4
     muscular_strain = 5
     sensor = 6
+
+class DataSource(Enum):
+    training_volume = 0
+    pain = 1
+    soreness = 2
+    three_sensor = 4
 
 
 class Legend(object):
@@ -89,7 +96,7 @@ class VisualizationTitle(object):
     def json_deserialise(cls, input_dict):
         viz_title = cls()
         viz_title.text = input_dict['text']
-        viz_title.body_part_text = input_dict['text']
+        viz_title.body_part_text = input_dict['body_part_text']
         viz_title.color = LegendColor(input_dict['color'])
         return viz_title
 
@@ -105,6 +112,7 @@ class Trend(object):
         self.goal_targeted = []
         self.body_parts = []
         self.sport_names = []
+        self.data_source = DataSource(0)
         self.data = []
 
     def json_serialise(self):
@@ -118,7 +126,8 @@ class Trend(object):
             'goal_targeted': self.goal_targeted,
             'body_parts': [body_part.json_serialise() for body_part in self.body_parts],
             'sport_names': [sport_name.value for sport_name in self.sport_names],
-            'data': [data.json_serialise() for data in self.data]
+            'data': [data.json_serialise() for data in self.data],
+            'data_source': self.data_source.value
         }
         return ret
 
@@ -133,12 +142,13 @@ class Trend(object):
         trend.goal_targeted = input_dict['goal_targeted']
         trend.body_parts = [BodyPartSide.json_deserialise(body_part) for body_part in input_dict['body_parts']]
         trend.sport_names = [SportName(sport_name) for sport_name in input_dict['sport_names']]
+        trend.data_source = DataSource(input_dict.get('data_source', 0))
         if trend.visualization_type == VisualizationType.load:
             trend.data = []
         elif trend.visualization_type == VisualizationType.session:
-            trend.data = []
+            trend.data = [DataSeriesBooleanData.json_deserialise(body_part_data) for body_part_data in input_dict.get('data', [])]
         elif trend.visualization_type == VisualizationType.body_part:
-            trend.data = []
+            trend.data = [BodyPartChartData.json_deserialise(body_part_data) for body_part_data in input_dict.get('data', [])]
         elif trend.visualization_type == VisualizationType.doms:
             trend.data = []
         elif trend.visualization_type == VisualizationType.muscular_strain:
@@ -172,6 +182,8 @@ class Trend(object):
 
         self.visualization_title.text = trend_data['new_title']
         self.visualization_title.color = self.visualization_data.plot_legends[0].color
+        if data_source != "":
+            self.data_source = DataSource[data_source]
 
 
 class TrendCategory(object):

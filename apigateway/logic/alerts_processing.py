@@ -1,7 +1,7 @@
 from models.insights import AthleteInsight, InsightType
 from models.soreness import BodyPartSide
 from models.trigger import TriggerType
-from models.athlete_trend import AthleteTrends, Trend
+from models.athlete_trend import AthleteTrends, Trend, VisualizationType, DataSource
 
 
 class AlertsProcessing(object):
@@ -90,8 +90,8 @@ class AlertsProcessing(object):
                 new_insights.append(old)
         return new_insights
 
-    @classmethod
-    def combine_alerts_to_insights(cls, alerts, trends):
+
+    def combine_alerts_to_insights(self, alerts, trends):
         existing_triggers = []
         existing_trends = []
         insights = []
@@ -105,6 +105,8 @@ class AlertsProcessing(object):
                     trend.body_parts.append(alert.body_part)
                 if alert.sport_name is not None:
                     trend.sport_names.append(alert.sport_name)
+
+                self.add_chart_data(trend)
                 insight_type = InsightType(TriggerType.get_insight_type(alert.goal.trigger_type))
                 if insight_type == InsightType.stress:
                     trends.stress.alerts.append(trend)
@@ -149,3 +151,28 @@ class AlertsProcessing(object):
                 insights.append(insight)
 
         return insights
+
+    def add_chart_data(self, trend):
+        if trend.visualization_type == VisualizationType.load:
+            chart_data = []
+        elif trend.visualization_type == VisualizationType.session:
+            chart_data = self.athlete_stats.high_relative_load_chart_data
+        elif trend.visualization_type == VisualizationType.body_part:
+            body_part = trend.body_parts[0]
+            if trend.data_source == DataSource.pain and body_part in self.athlete_stats.pain_chart_data.keys():
+                chart_data = self.athlete_stats.pain_chart_data[body_part]
+            elif trend.data_source == DataSource.soreness and body_part in self.athlete_stats.soreness_chart_data.keys():
+                chart_data = self.athlete_stats.soreness_chart_data[body_part]
+            else:
+                chart_data = []
+        elif trend.visualization_type == VisualizationType.doms:
+            chart_data = []
+        elif trend.visualization_type == VisualizationType.muscular_strain:
+            chart_data = []
+        elif trend.visualization_type == VisualizationType.sensor:
+            chart_data = []
+        else:
+            chart_data = []
+
+        trend.data = chart_data
+        return trend

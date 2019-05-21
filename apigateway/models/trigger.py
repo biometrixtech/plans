@@ -27,7 +27,7 @@ class TriggerType(IntEnum):
     pers_pers2_pain_greater_30_no_pain_today = 22
 
     def is_grouped_trigger(self):
-        if self.value in [6, 7, 8, 10, 11, 14, 15]:
+        if self.value in [1, 2, 7, 8, 14, 15, 16, 19, 23, 24]:
             return True
         else:
             return False
@@ -60,13 +60,16 @@ class TriggerType(IntEnum):
     @classmethod
     def get_parent_group(cls, trigger_type):
         groups = {
-            6: 0,
             7: 0,
             8: 0,
-            10: 1,
-            11: 1,
             14: 2,
-            15: 2
+            15: 2,
+            23: 2,
+            24: 2,
+            1: 3,
+            2: 3,
+            19: 4,
+            16: 4
         }
         if trigger_type.is_grouped_trigger():
             return groups[trigger_type.value]
