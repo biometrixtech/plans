@@ -25,34 +25,34 @@ class AthleteStats(Serialisable):
         self.acute_avg_max_soreness = None
 
         self.acute_internal_total_load = None
-        self.acute_external_total_load = None
-        self.acute_external_high_intensity_load = None
-        self.acute_external_mod_intensity_load = None
-        self.acute_external_low_intensity_load = None
+        #self.acute_external_total_load = None
+        #self.acute_external_high_intensity_load = None
+        #self.acute_external_mod_intensity_load = None
+        #self.acute_external_low_intensity_load = None
 
         self.chronic_avg_RPE = None
         self.chronic_avg_readiness = None
         self.chronic_avg_sleep_quality = None
         self.chronic_avg_max_soreness = None
         self.chronic_internal_total_load = None
-        self.chronic_external_total_load = None
-        self.chronic_external_high_intensity_load = None
-        self.chronic_external_mod_intensity_load = None
-        self.chronic_external_low_intensity_load = None
+        #self.chronic_external_total_load = None
+        #self.chronic_external_high_intensity_load = None
+        #self.chronic_external_mod_intensity_load = None
+        #self.chronic_external_low_intensity_load = None
 
         self.internal_monotony = None
         self.internal_strain = None
-        self.external_monotony = None
-        self.external_strain = None
+        #self.external_monotony = None
+        #self.external_strain = None
         self.internal_ramp = None
-        self.external_ramp = None
+        #self.external_ramp = None
 
         self.training_load_ramp = {}
 
         self.internal_acwr = None
-        self.external_acwr = None
+        #self.external_acwr = None
         self.internal_freshness_index = None
-        self.external_freshness_index = None
+        #self.external_freshness_index = None
         self.historical_internal_strain = []
         self.historical_internal_monotony = []
         self.historical_external_strain = []
@@ -385,32 +385,32 @@ class AthleteStats(Serialisable):
             'acute_avg_sleep_quality': self.acute_avg_sleep_quality,
             'acute_avg_max_soreness': self.acute_avg_max_soreness,
             'acute_internal_total_load': self.acute_internal_total_load.json_serialise() if self.acute_internal_total_load is not None else None,
-            'acute_external_total_load': self.acute_external_total_load.json_serialise() if self.acute_external_total_load is not None else None,
-            'acute_external_high_intensity_load': self.acute_external_high_intensity_load.json_serialise() if self.acute_external_high_intensity_load is not None else None,
-            'acute_external_mod_intensity_load': self.acute_external_mod_intensity_load.json_serialise() if self.acute_external_mod_intensity_load is not None else None,
-            'acute_external_low_intensity_load': self.acute_external_low_intensity_load.json_serialise() if self.acute_external_low_intensity_load is not None else None,
+            #'acute_external_total_load': self.acute_external_total_load.json_serialise() if self.acute_external_total_load is not None else None,
+            #'acute_external_high_intensity_load': self.acute_external_high_intensity_load.json_serialise() if self.acute_external_high_intensity_load is not None else None,
+            #'acute_external_mod_intensity_load': self.acute_external_mod_intensity_load.json_serialise() if self.acute_external_mod_intensity_load is not None else None,
+            #'acute_external_low_intensity_load': self.acute_external_low_intensity_load.json_serialise() if self.acute_external_low_intensity_load is not None else None,
             'chronic_avg_RPE': self.chronic_avg_RPE,
             'chronic_avg_readiness': self.chronic_avg_readiness,
             'chronic_avg_sleep_quality': self.chronic_avg_sleep_quality,
             'chronic_avg_max_soreness': self.chronic_avg_max_soreness,
             'chronic_internal_total_load': self.chronic_internal_total_load.json_serialise() if self.chronic_internal_total_load is not None else None,
-            'chronic_external_total_load': self.chronic_external_total_load.json_serialise() if self.chronic_external_total_load is not None else None,
-            'chronic_external_high_intensity_load': self.chronic_external_high_intensity_load.json_serialise() if self.chronic_external_high_intensity_load is not None else None,
-            'chronic_external_mod_intensity_load': self.chronic_external_mod_intensity_load.json_serialise() if self.chronic_external_mod_intensity_load is not None else None,
-            'chronic_external_low_intensity_load': self.chronic_external_low_intensity_load.json_serialise() if self.chronic_external_low_intensity_load is not None else None,
+            #'chronic_external_total_load': self.chronic_external_total_load.json_serialise() if self.chronic_external_total_load is not None else None,
+            #'chronic_external_high_intensity_load': self.chronic_external_high_intensity_load.json_serialise() if self.chronic_external_high_intensity_load is not None else None,
+            #'chronic_external_mod_intensity_load': self.chronic_external_mod_intensity_load.json_serialise() if self.chronic_external_mod_intensity_load is not None else None,
+            #'chronic_external_low_intensity_load': self.chronic_external_low_intensity_load.json_serialise() if self.chronic_external_low_intensity_load is not None else None,
             'internal_monotony': self.internal_monotony.json_serialise() if self.internal_monotony is not None else None,
             'historical_internal_monotony': [h.json_serialise() for h in self.historical_internal_monotony],
             'internal_strain': self.internal_strain.json_serialise() if self.internal_strain is not None else None,
             'historical_internal_strain': [h.json_serialise() for h in self.historical_internal_strain],
             'internal_strain_events': self.internal_strain_events.json_serialise() if self.internal_strain_events is not None else None,
-            'external_monotony': self.external_monotony.json_serialise() if self.external_monotony is not None else None,
-            'external_strain': self.external_strain.json_serialise() if self.external_strain is not None else None,
+            #'external_monotony': self.external_monotony.json_serialise() if self.external_monotony is not None else None,
+            #'external_strain': self.external_strain.json_serialise() if self.external_strain is not None else None,
             'internal_ramp': self.internal_ramp.json_serialise() if self.internal_ramp is not None else None,
-            'external_ramp': self.external_ramp.json_serialise() if self.external_ramp is not None else None,
+            #'external_ramp': self.external_ramp.json_serialise() if self.external_ramp is not None else None,
             'training_load_ramp' : {str(sport_name.value): standardard_error_range.json_serialise()
                                     for (sport_name, standardard_error_range) in self.training_load_ramp.items()},
             'internal_acwr': self.internal_acwr.json_serialise() if self.internal_acwr is not None else None,
-            'external_acwr': self.external_acwr.json_serialise() if self.external_acwr is not None else None,
+            #'external_acwr': self.external_acwr.json_serialise() if self.external_acwr is not None else None,
             #'functional_strength_eligible': self.functional_strength_eligible,
             #'completed_functional_strength_sessions': self.completed_functional_strength_sessions,
             #'next_functional_strength_eligible_date': self.next_functional_strength_eligible_date,
