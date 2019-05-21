@@ -100,6 +100,7 @@ class AlertsProcessing(object):
                 existing_trends.append((alert.goal.trigger_type, alert.sport_name, alert.body_part))
                 trend = Trend(alert.goal.trigger_type)
                 trend.goal_targeted = [alert.goal.text]
+                trend.add_data()
                 if alert.body_part is not None:
                     trend.body_parts.append(alert.body_part)
                 if alert.sport_name is not None:
