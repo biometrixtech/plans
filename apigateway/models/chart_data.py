@@ -202,6 +202,15 @@ class BodyPartChartData(Serialisable):
             'day_of_week': self.day_of_week,
             'value': self.value
         }
+        return ret
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        chart_data = cls()
+        chart_data.date = input_dict['date']
+        chart_data.day_of_week = input_dict.get('day_of_week', "")
+        chart_data.value = input_dict.get('value', 0)
+        return chart_data
 
 
 class BodyPartChartCollection(object):
