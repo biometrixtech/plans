@@ -1,8 +1,9 @@
 from enum import Enum
-from models.insights import InsightType
+from models.insights import InsightType, InsightsData
 from models.chart_data import TrainingVolumeChartData
 from models.sport import SportName
 from models.soreness import BodyPartSide
+from models.trends_data import TrendsData
 
 
 class LegendColor(Enum):
@@ -146,6 +147,30 @@ class Trend(object):
         else:
             trend.data = []
         return trend
+
+    def add_data(self):
+        # read insight data
+        insight_data = InsightsData(self.trigger_type.value).data()
+        data_source = insight_data['data_source']
+        trend_data = insight_data['trend']
+        self.visualization_type = VisualizationType(trend_data['visualization_type'])
+
+        # read visualization data
+        visualization_data = TrendsData(self.visualization_type.value).data()
+        self.visualization_data.y_axis_1 = visualization_data['y_axis_1']
+        self.visualization_data.y_axis_2 = visualization_data['y_axis_2']
+        if self.visualization_type == VisualizationType.body_part:
+            if data_source == 'pain':
+                legends = [legend for legend in visualization_data['legend'] if legend['color'] == 2]
+            else:
+                legends = [legend for legend in visualization_data['legend'] if legend['color'] == 1]
+        else:
+            legends = visualization_data['legend']
+        for legend in legends:
+            self.visualization_data.plot_legends.append(Legend.json_deserialise(legend))
+
+        self.visualization_title.text = trend_data['new_title']
+        self.visualization_title.color = self.visualization_data.plot_legends[0].color
 
 
 class TrendCategory(object):

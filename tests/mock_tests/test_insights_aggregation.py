@@ -6,6 +6,7 @@ from models.sport import SportName
 from logic.alerts_processing import AlertsProcessing
 from models.daily_plan import DailyPlan
 from models.stats import AthleteStats
+from models.athlete_trend import Trend
 from utils import format_date
 
 
@@ -333,3 +334,21 @@ def test_equivalency():
     assert TriggerType.is_equivalent(trigger1, trigger2)
     assert TriggerType.is_equivalent(trigger1, trigger3)
     assert not TriggerType.is_equivalent(trigger1, trigger4)
+
+
+def test_trend_add_data():
+    trend = Trend(TriggerType(14))
+    trend.add_data()
+    assert trend.visualization_data.plot_legends[0].color.value == 2
+    trend_json = trend.json_serialise()
+    trend2 = Trend.json_deserialise(trend_json)
+    assert trend2.visualization_type == trend.visualization_type
+
+
+def test_trend_add_data_another():
+    trend = Trend(TriggerType(15))
+    trend.add_data()
+    assert trend.visualization_data.plot_legends[0].color.value == 0
+    trend_json = trend.json_serialise()
+    trend2 = Trend.json_deserialise(trend_json)
+    assert trend2.visualization_type == trend.visualization_type
