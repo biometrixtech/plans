@@ -307,10 +307,10 @@ class TrainingVolumeProcessing(object):
     @xray_recorder.capture('logic.TrainingVolumeProcessing.calc_training_volume_metrics')
     def calc_training_volume_metrics(self, athlete_stats):
 
-        athlete_stats.duration_load_ramp = {}
+        athlete_stats.training_load_ramp = {}
 
         for sport_name, load in self.previous_week_sport_training_loads.items():
-            athlete_stats.duration_load_ramp[sport_name] = self.get_ramp(athlete_stats.expected_weekly_workouts,
+            athlete_stats.training_load_ramp[sport_name] = self.get_ramp(athlete_stats.expected_weekly_workouts,
                                                                          self.last_week_sport_training_loads[sport_name],
                                                                          self.previous_week_sport_training_loads[sport_name]
                                                                          )
