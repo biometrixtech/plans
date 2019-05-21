@@ -5,7 +5,7 @@ xray_recorder.begin_segment(name="test")
 import pytest
 import logic.exercise_mapping as exercise_mapping
 from logic.training_plan_management import TrainingPlanManager
-import models.session as session
+from models.session import Session, SportTrainingSession
 from models.historic_soreness import HistoricSoreness
 from models.stats import AthleteStats
 from pandas import DataFrame
@@ -20,6 +20,7 @@ from models.daily_plan import DailyPlan
 from tests.testing_utilities import TestUtilities
 from models.daily_readiness import DailyReadiness
 from utils import format_datetime, format_date
+import random
 
 exercise_library_datastore = ExerciseLibraryDatastore()
 completed_exercise_datastore = CompletedExerciseDatastore()
@@ -27,10 +28,12 @@ df = DataFrame()
 
 
 class TestParameters(object):
-    def __init__(self, file_name, athlete_stats, train_later):
+    def __init__(self, file_name, athlete_stats, train_later, high_volume, doms=False):
         self.file_name = file_name
         self.athlete_stats = athlete_stats
         self.train_later = train_later
+        self.high_volume = high_volume
+        self.doms = doms
 
 
 def get_test_parameters_list():
@@ -40,19 +43,35 @@ def get_test_parameters_list():
     as1 = AthleteStats("tester")
     as1.historic_soreness = []
     as1.muscular_strain_increasing = False
-    parm1 = TestParameters("PreActiveRest_no_doms_no_muscular_strain", as1, train_later=True)
-    parm2 = TestParameters("PostActiveRest_no_doms_no_muscular_strain", as1, train_later=False)
+    parm1 = TestParameters("PreActiveRest_no_doms_no_muscular_strain", as1, train_later=True, high_volume=False)
+    parm2 = TestParameters("PostActiveRest_no_doms_no_muscular_strain", as1, train_later=False, high_volume=False)
+    parm3 = TestParameters("PreActiveRest_no_doms_no_muscular_strain_high_volume", as1, train_later=True, high_volume=True)
+    parm4 = TestParameters("PostActiveRest_no_doms_no_muscular_strain_high_volume", as1, train_later=False, high_volume=True)
 
     as2 = AthleteStats("tester")
     as2.historic_soreness = []
     as2.muscular_strain_increasing = True
-    parm3 = TestParameters("PreActiveRest_no_doms_muscular_strain", as2, train_later=True)
-    parm4 = TestParameters("PostActiveRest_no_doms_muscular_strain", as2, train_later=False)
 
+    parm5 = TestParameters("PreActiveRest_no_doms_muscular_strain_no_high_volume", as2, train_later=True, high_volume=False)
+    parm6 = TestParameters("PostActiveRest_no_doms_muscular_strain_no_high_volume", as2, train_later=False, high_volume=False)
+    parm7 = TestParameters("PreActiveRest_no_doms_muscular_strain_high_volume", as2, train_later=True, high_volume=True)
+    parm8 = TestParameters("PostActiveRest_no_doms_muscular_strain_high_volume", as2, train_later=False, high_volume=True)
+    parm9 = TestParameters("PreActiveRest_doms_muscular_strain_no_high_volume", as2, train_later=True, high_volume=False, doms=True)
+    parm10 = TestParameters("PostActiveRest_doms_muscular_strain_no_high_volume", as2, train_later=False, high_volume=False, doms=True)
+    parm11 = TestParameters("PreActiveRest_doms_muscular_strain_high_volume", as2, train_later=True, high_volume=True, doms=True)
+    parm12 = TestParameters("PostActiveRest_doms_muscular_strain_high_volume", as2, train_later=False, high_volume=True, doms=True)
     parm_list.append(parm1)
     parm_list.append(parm2)
     parm_list.append(parm3)
     parm_list.append(parm4)
+    parm_list.append(parm5)
+    parm_list.append(parm6)
+    parm_list.append(parm7)
+    parm_list.append(parm8)
+    parm_list.append(parm9)
+    parm_list.append(parm10)
+    parm_list.append(parm11)
+    parm_list.append(parm12)
 
     return parm_list
 
@@ -61,7 +80,16 @@ def load_exercises():
     exercise_library_datastore.side_load_exericse_list_from_csv()
 
 
-def create_plan(athlete_stats, body_part_list, severity_list, side_list, pain_list, train_later, historic_soreness_list=None):
+def create_plan(test_parameter, body_part_list, severity_list, side_list, pain_list, train_later, historic_soreness_list=None):
+
+    athlete_stats = test_parameter.athlete_stats
+
+    training_sessions = []
+
+    if test_parameter.high_volume:
+        training_session = SportTrainingSession()
+        training_session.session_RPE = 7
+        training_sessions.append(training_session)
 
     user_id = athlete_stats.athlete_id
 
@@ -104,21 +132,23 @@ def create_plan(athlete_stats, body_part_list, severity_list, side_list, pain_li
         data_store_collection.athlete_stats_datastore = athlete_stats_datastore
     '''
     mgr = TrainingPlanManager(user_id, data_store_collection)
+    mgr.training_sessions = training_sessions
 
     daily_plan = mgr.create_daily_plan(format_date(current_date), format_datetime(current_date_time), athlete_stats=athlete_stats)
 
     return daily_plan
 
+'''deprec
 @pytest.fixture(scope="module")
 def recovery_session(soreness_list, target_minutes, max_severity, historic_soreness_present=False,
                      functional_strength_active=False, is_active_prep=True):
-    target_recovery_session = session.RecoverySession()
+    target_recovery_session = RecoverySession()
     target_recovery_session.set_exercise_target_minutes(soreness_list, target_minutes, max_severity,
                                                         historic_soreness_present=historic_soreness_present,
                                                         functional_strength_active=functional_strength_active,
                                                         is_active_prep=is_active_prep)
     return target_recovery_session
-
+'''
 
 @pytest.fixture(scope="module")
 def soreness_one_body_part(body_enum, severity_score, historic_soreness_status,treatment_priority=1):
@@ -130,6 +160,30 @@ def soreness_one_body_part(body_enum, severity_score, historic_soreness_status,t
                                                   treatment_priority)
     soreness_item.body_part = soreness_body_part
     soreness_list.append(soreness_item)
+    return soreness_list
+
+
+def soreness_two_body_parts_random(body_part_list, body_enum, severity_score, historic_soreness_status,treatment_priority=1):
+
+    soreness_list = []
+
+    soreness_item = Soreness()
+    soreness_item.historic_soreness_status = historic_soreness_status
+    soreness_item.severity = severity_score
+    soreness_body_part = BodyPart(BodyPartLocation(body_enum),
+                                                  treatment_priority)
+    soreness_item.body_part = soreness_body_part
+    soreness_list.append(soreness_item)
+
+    temp_list = list(b for b in body_part_list if b != body_enum)
+    temp_enum = random.choice(temp_list)
+    random_soreness = Soreness()
+    random_soreness.historic_soreness_status = HistoricSorenessStatus.doms
+    random_soreness.severity = severity_score
+    random_soreness_body_part = BodyPart(BodyPartLocation(temp_enum), treatment_priority)
+    random_soreness.body_part = random_soreness_body_part
+    soreness_list.append(random_soreness)
+
     return soreness_list
 
 @pytest.fixture(scope="module")
@@ -327,14 +381,17 @@ def test_pre_active_rest_limited_body_parts():
                         historic_soreness.historic_soreness_status = h1
 
                         if not p:
-                            soreness_list.extend(soreness_one_body_part(b1, m1, h1))
+                            if not test_parm.doms:
+                                soreness_list.extend(soreness_one_body_part(b1, m1, h1))
+                            else:
+                                soreness_list.extend(soreness_two_body_parts_random(body_parts_1, b1, m1, h1))
                         else:
                             soreness_list.extend(pain_one_body_part(b1, m1, h1))
 
                         body_part_line = (
                                 str(BodyPartLocation(b1)) + ',' + str(p) + ',' + str(m1) + ',' + str(h1))
 
-                        daily_plan = create_plan(athlete_stats=test_parm.athlete_stats, body_part_list=[b1], severity_list=[m1], side_list=[1],
+                        daily_plan = create_plan(test_parameter=test_parm, body_part_list=[b1], severity_list=[m1], side_list=[1],
                                                  pain_list=[p], train_later=test_parm.train_later, historic_soreness_list=[historic_soreness])
 
                         if test_parm.train_later:

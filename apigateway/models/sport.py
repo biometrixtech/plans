@@ -207,7 +207,8 @@ class SportName(Enum):
             80: 'Mixed Cardio',
             81: 'Hand Cycling',
             82: 'Climbing',
-            83: 'Other'}
+            83: 'Other',
+            None: ''}
         return display_names[self.value]
 
 
