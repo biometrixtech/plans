@@ -45,9 +45,6 @@ def create_plan(body_part_list, severity_list, side_list, pain_list, historic_so
             else:
                 soreness_list.append(TestUtilities().body_part_soreness(body_part_list[b], severity_list[b]))
 
-
-
-
     survey = DailyReadiness(current_date_time.strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, soreness_list, 7, 9)
 
     daily_plan = DailyPlan(format_date(current_date))

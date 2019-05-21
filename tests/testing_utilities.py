@@ -1,4 +1,4 @@
-from models.soreness import BodyPartLocation, Soreness
+from models.soreness import BodyPart, BodyPartLocation, Soreness
 
 class TestUtilities(object):
 
@@ -21,6 +21,7 @@ class TestUtilities(object):
                 "severity": severity
             }
         else:
+
             soreness = {
                 "body_part": location_enum,
                 "side": side,

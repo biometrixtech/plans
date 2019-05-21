@@ -75,7 +75,7 @@ class TrainingVolumeChart(object):
         for i in range(1, 15):
             chart_data = TrainingVolumeChartData()
             chart_data.date = (start_date + timedelta(days=i)).date()
-            day_of_week = (start_date + timedelta(days=i)).strftime('%a')[0]
+            day_of_week = (start_date + timedelta(days=i)).strftime('%b')[0]
             chart_data.day_of_week = day_of_week
             self.data[chart_data.date] = chart_data
 
@@ -170,7 +170,7 @@ class BodyPartChart(object):
         for i in range(1, 15):
             soreness_chart_data = BodyPartChartData()
             soreness_chart_data.date = (start_date + timedelta(days=i)).date()
-            day_of_week = (start_date + timedelta(days=i)).strftime('%a')[0]
+            day_of_week = (start_date + timedelta(days=i)).strftime('%b')[0]
             soreness_chart_data.day_of_week = day_of_week
 
             pain_chart_data = BodyPartChartData()
