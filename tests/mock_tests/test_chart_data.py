@@ -1,4 +1,4 @@
-from models.chart_data import TrainingVolumeChartData, TrainingVolumeChart, BodyPartChartCollection
+from models.chart_data import TrainingVolumeChartData, TrainingVolumeChart, BodyPartChartCollection, MuscularStrainChart
 from utils import parse_date
 from math import floor
 from models.historic_soreness import HistoricSoreness, HistoricSorenessStatus, HistoricSeverity, SorenessCause
@@ -11,6 +11,7 @@ from tests.mocks.mock_athlete_stats_datastore import AthleteStatsDatastore
 from tests.testing_utilities import TestUtilities
 from models.post_session_survey import PostSurvey, PostSessionSurvey
 from models.daily_readiness import DailyReadiness
+from models.data_series import DataSeries
 
 
 def get_dates(start_date, days):
@@ -128,6 +129,24 @@ def test_14_days_empty_data():
     assert len(chart_data) == 14
     assert chart_data[13].date == parse_date("2019-01-31").date()
     assert chart_data[0].date == parse_date("2019-01-18").date()
+
+
+def test_muscular_strain_chart():
+
+    muscular_strain = [DataSeries(parse_date("2019-01-01"), 50),
+                       DataSeries(parse_date("2019-01-02"), 60),
+                       DataSeries(parse_date("2019-01-06"), 70)]
+
+    chart = MuscularStrainChart(parse_date("2019-01-10"))
+
+    for m in muscular_strain:
+        chart.add_muscular_strain(m)
+
+    chart_data = chart.get_output_list()
+
+    assert len(chart_data) == 14
+    assert chart_data[9].value == 70
+
 
 def test_body_part_collection():
 
