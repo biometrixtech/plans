@@ -4,6 +4,7 @@ from models.chart_data import TrainingVolumeChartData
 from models.sport import SportName
 from models.soreness import BodyPartSide
 from models.trends_data import TrendsData
+from models.trigger import TriggerType
 
 
 class LegendColor(Enum):
@@ -123,7 +124,7 @@ class Trend(object):
 
     @classmethod
     def json_deserialise(cls, input_dict):
-        trend = cls(input_dict['trigger_type'])
+        trend = cls(TriggerType(input_dict['trigger_type']))
         trend.title = input_dict['title']
         trend.text = input_dict['text']
         trend.visualization_title = VisualizationTitle.json_deserialise(input_dict['visualization_title'])
