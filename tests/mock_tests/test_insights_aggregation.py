@@ -11,7 +11,7 @@ from utils import format_date
 
 
 def test_insights_text():
-    insight = AthleteInsight(TriggerType(20))
+    insight = AthleteInsight(TriggerType(0))
     insight.goal_targeted = ['Recover From Sport']
     insight.parent = False
     insight.first = False
@@ -19,7 +19,7 @@ def test_insights_text():
     insight.sport_names = [SportName(13)]
     insight.add_data()
     assert insight.text != ""
-    assert insight.title == "Mitigate Overuse Injury"
+    assert insight.title != ""
 
 
 def test_aggregate_alerts_first_exposure():
@@ -157,7 +157,7 @@ def test_aggregate_alerts_group_priority():
 def test_aggregate_alerts_longitutinal():
     current_date_time = datetime.datetime.now()
     goal = AthleteGoal('Care for Pain', 0, AthleteGoalType(0))
-    goal.trigger_type = TriggerType(6)
+    goal.trigger_type = TriggerType(7)
     alert1 = Alert(goal)
     alert1.body_part = BodyPartSide(BodyPartLocation(11), 1)
 
@@ -174,7 +174,7 @@ def test_aggregate_alerts_longitutinal():
     assert insights[0].start_date_time == current_date_time - datetime.timedelta(days=5)
 
     daily_plan.insights = []
-    athlete_stats.exposed_triggers = [TriggerType(6)]
+    athlete_stats.exposed_triggers = [TriggerType(7)]
     insights, longitudinal_insights, trends = AlertsProcessing(daily_plan, athlete_stats).aggregate_alerts(event_date_time, [])
     assert len(insights) == 1
     assert not insights[0].parent
@@ -185,7 +185,7 @@ def test_aggregate_alerts_longitutinal():
 def test_aggregate_alerts_cleared():
     current_date_time = datetime.datetime.now()
     goal = AthleteGoal('Care for Pain', 0, AthleteGoalType(0))
-    goal.trigger_type = TriggerType(6)
+    goal.trigger_type = TriggerType(7)
     alert1 = Alert(goal)
     alert1.body_part = BodyPartSide(BodyPartLocation(11), 1)
 
@@ -201,7 +201,7 @@ def test_aggregate_alerts_cleared():
     assert existing_insights[0].start_date_time == current_date_time - datetime.timedelta(days=5)
 
     daily_plan.insights = []
-    athlete_stats.exposed_triggers = [TriggerType(6)]
+    athlete_stats.exposed_triggers = [TriggerType(7)]
     insights, longitudinal_insights, trends = AlertsProcessing(daily_plan, athlete_stats).aggregate_alerts(event_date_time, [])
     assert len(insights) == 1
     assert not insights[0].parent
@@ -303,13 +303,13 @@ def test_insights_ordering():
     insights.append(insight2)
     insight3 = AthleteInsight(TriggerType(2))  # priority 8
     insights.append(insight3)
-    insight4 = AthleteInsight(TriggerType(3))  # priority 8
-    insight4.cleared = True
-    insights.append(insight4)
+    # insight4 = AthleteInsight(TriggerType(3))  # priority 8
+    # insight4.cleared = True
+    # insights.append(insight4)
     insight5 = AthleteInsight(TriggerType(8))  # priority 7
     insight5.cleared = True
     insights.append(insight5)
-    insight6 = AthleteInsight(TriggerType(20))  # priority 5
+    insight6 = AthleteInsight(TriggerType(16))  # priority 4
     insights.append(insight6)
 
     for insight in insights:
@@ -318,12 +318,12 @@ def test_insights_ordering():
     plan = DailyPlan(format_date(current_date_time))
     plan.insights = insights
     plan.sort_insights()
-    assert plan.insights[0].trigger_type == TriggerType(20)  # highest priority left of unread ones
+    assert plan.insights[0].trigger_type == TriggerType(16)  # highest priority left of unread ones
     assert plan.insights[1].trigger_type == TriggerType(8)  # second highest priority left of unread ones
     assert plan.insights[2].trigger_type == TriggerType(2)  # same priority as next. won tie breaker (not-cleared)
-    assert plan.insights[3].trigger_type == TriggerType(3)  # same priority as previous. lost tie breaker (cleared)
-    assert plan.insights[4].trigger_type == TriggerType(15)  # read - higher priority
-    assert plan.insights[5].trigger_type == TriggerType(1)  # read - lower priority
+    # assert plan.insights[3].trigger_type == TriggerType(3)  # same priority as previous. lost tie breaker (cleared)
+    assert plan.insights[3].trigger_type == TriggerType(15)  # read - higher priority
+    assert plan.insights[4].trigger_type == TriggerType(1)  # read - lower priority
 
 
 def test_equivalency():
@@ -347,9 +347,10 @@ def test_trend_add_data():
 
 
 def test_trend_add_data_another():
-    trend = Trend(TriggerType(5))
+    trend = Trend(TriggerType(2))
+    trend.body_parts = [BodyPartSide(BodyPartLocation(11), 2)]
     trend.add_data()
-    assert trend.visualization_data.plot_legends[0].color.value == 0
+    assert trend.visualization_data.plot_legends[0].color.value == 2
     trend_json = trend.json_serialise()
     trend2 = Trend.json_deserialise(trend_json)
     assert trend2.visualization_type == trend.visualization_type

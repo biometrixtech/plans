@@ -61,7 +61,7 @@ class AthleteStatsDatastore(object):
 
     def get_athlete_stats_from_mongo(self, mongo_result):
         athlete_stats = AthleteStats(athlete_id=mongo_result['athlete_id'])
-        athlete_stats.event_date = parse_date(mongo_result['event_date'])
+        athlete_stats.event_date = parse_date(mongo_result['event_date']) if mongo_result['event_date'] is not None else None
         athlete_stats.session_RPE = mongo_result.get('session_RPE', None)
         athlete_stats.session_RPE_event_date = mongo_result.get('session_RPE_event_date', None)
         athlete_stats.acute_avg_RPE = mongo_result['acute_avg_RPE']

@@ -1,5 +1,6 @@
 from serialisable import Serialisable
 from models.trigger import TriggerType
+from models.insights import InsightType
 
 
 class TriggerCollection(Serialisable):
@@ -207,13 +208,13 @@ class InsightsChildDataItem(Serialisable):
 
 
 class InsightsDataItem(Serialisable):
-    def __init__(self, trigger_enum, trend_type, triggers, goal_names, length_of_impact, data_source_all_good, insight_priority_plans, insight_priority_trend_type):
+    def __init__(self, trigger_enum, trend_type, triggers, goal_names, length_of_impact, data_source, insight_priority_plans, insight_priority_trend_type):
         self.trigger_enum = trigger_enum
         self.trend_type = trend_type
         self.triggers = triggers
         self.goal_names = goal_names
         self.length_of_impact = length_of_impact
-        self.data_source_all_good = data_source_all_good
+        self.data_source = data_source
         self.insight_priority_plans = insight_priority_plans
         self.insight_priority_trend_type = insight_priority_trend_type
         self.plans_data_item = None
@@ -237,7 +238,7 @@ class InsightsDataItem(Serialisable):
             'triggers': self.triggers,
             'goal_names': self.goal_names,
             'length_of_impact': self.length_of_impact,
-            'data_source_all_good': self.data_source_all_good,
+            'data_source': self.data_source,
             'insight_priority_plans': self.insight_priority_plans,
             'insight_priority_trend_type': self.insight_priority_trend_type,
             'plans': self.plans_data_item.json_serialise(),

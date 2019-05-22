@@ -101,6 +101,7 @@ def process_athlete_survey(athlete_id):
     athlete_stats = DatastoreCollection().athlete_stats_datastore.get(athlete_id=athlete_id)
     if athlete_stats is None:
         athlete_stats = AthleteStats(athlete_id)
+        athlete_stats.event_date = datetime.datetime.now()
 
     if 'typical_weekly_sessions' in request.json:
         athlete_stats.typical_weekly_sessions = request.json['typical_weekly_sessions']

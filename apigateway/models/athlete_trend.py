@@ -1,9 +1,9 @@
 from enum import Enum
-from models.insights import InsightType, InsightsData
+from models.insights import InsightType
 from models.chart_data import TrainingVolumeChartData
 from models.sport import SportName
 from models.soreness import BodyPartLocationText, BodyPartSide
-from models.trends_data import TrendsData
+from models.trigger_data import TriggerData
 from models.trigger import TriggerType
 from models.chart_data import BodyPartChartData, DataSeriesBooleanData, DataSeriesData
 
@@ -162,13 +162,15 @@ class Trend(object):
 
     def add_data(self):
         # read insight data
-        insight_data = InsightsData(self.trigger_type.value).data()
-        data_source = insight_data['data_source']
-        trend_data = insight_data['trend']
-        self.visualization_type = VisualizationType(trend_data['visualization_type'])
+        trigger_data = TriggerData().get_trigger_data(self.trigger_type.value)
+        data_source = trigger_data['data_source']
+        trend_data = trigger_data['trends']
+        plot_data = trigger_data['plots']
+        cta = trigger_data['cta']
+        self.visualization_type = VisualizationType(plot_data['visualization_type'])
 
         # read visualization data
-        visualization_data = TrendsData(self.visualization_type.value).data()
+        visualization_data = TriggerData().get_visualization_data(self.visualization_type.value)
         self.visualization_data.y_axis_1 = visualization_data['y_axis_1']
         self.visualization_data.y_axis_2 = visualization_data['y_axis_2']
         if self.visualization_type == VisualizationType.body_part:
@@ -181,7 +183,7 @@ class Trend(object):
         for legend in legends:
             self.visualization_data.plot_legends.append(Legend.json_deserialise(legend))
 
-        self.visualization_title.text = TextGenerator.get_cleaned_text(trend_data['visualization_title'], body_parts=self.body_parts)
+        self.visualization_title.text = TextGenerator.get_cleaned_text(plot_data['title'], body_parts=self.body_parts)
         self.visualization_title.body_part_text = [TextGenerator.get_body_part_text(self.body_parts)]
         self.visualization_title.color = self.visualization_data.plot_legends[0].color
         if data_source != "":
