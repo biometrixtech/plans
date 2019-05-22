@@ -174,7 +174,7 @@ def test_cooldown_check_corrective_pain_severity_4():
     assert len(cooldown.dynamic_integrate_exercises) == 0
 
 
-def test_cooldown_check_recover_sport_high_volumne_logged():
+def test_cooldown_check_recover_sport_high_volume_logged():
 
     current_date_time = datetime.today()
     cooldown = CoolDown(True, False, False, event_date_time=current_date_time)
@@ -186,7 +186,7 @@ def test_cooldown_check_recover_sport_high_volumne_logged():
     assert len(cooldown.dynamic_integrate_exercises) > 0
 
 
-def test_cooldown_check_recover_sport_no_high_volumne_logged():
+def test_cooldown_check_recover_sport_no_high_volume_logged():
 
     current_date_time = datetime.today()
     cooldown = CoolDown(False, False, False, event_date_time=current_date_time)
