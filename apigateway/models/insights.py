@@ -105,7 +105,7 @@ class AthleteInsight(Serialisable):
         self.insight_type = InsightType[trigger_data['trend_type'].lower()]
 
     def get_insight_duration(self):
-        if self.trigger_type.value in [6, 7, 8, 12, 16, 17, 18, 19, 20]:
+        if self.trigger_type.value in [7, 8, 11, 16, 19, 103, 104]:
             return True
         else:
             return False

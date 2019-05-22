@@ -40,7 +40,7 @@ class TriggerType(IntEnum):
     biomechanics_no_triggers_flagged_based_on_3_sensor = 207
 
     def is_grouped_trigger(self):
-        if self.value in [1, 2, 7, 8, 14, 15, 16, 19, 23, 24]:
+        if self.value in [0, 1, 2, 7, 8, 14, 15, 16, 19, 23, 24]:
             return True
         else:
             return False
@@ -79,10 +79,15 @@ class TriggerType(IntEnum):
             15: 2,
             23: 2,
             24: 2,
+            0: 3,
             1: 3,
             2: 3,
             19: 4,
-            16: 4
+            16: 4,
+            101: 5,
+            102: 5,
+            103: 6,
+            104: 6
         }
         if trigger_type.is_grouped_trigger():
             return groups[trigger_type.value]
