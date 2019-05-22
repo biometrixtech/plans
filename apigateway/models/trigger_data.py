@@ -1,10 +1,14 @@
+import json
+import os
 
-class TrendsData(object):
-    def __init__(self, trigger):
-        self.trigger = trigger
 
-    def data(self):
-        visualizations = {
+class TriggerData(object):
+    def __init__(self):
+        script_dir = os.path.dirname(__file__)
+        file_path = os.path.join(script_dir, 'triggers.json')
+        with open(file_path, 'r') as f:
+            self.triggers = json.load(f)['triggers']
+        self.visualization_data = {
             1: {
                 'title': "",
                 'y_axis_1': "Training Volume",
@@ -23,7 +27,7 @@ class TrendsData(object):
                 'y_axis_2': "",
                 'legend': [
                     {
-                        'color': 2,
+                        'color': 0,
                         'text': "High load days",
                         'type': 0
                     }
@@ -94,4 +98,11 @@ class TrendsData(object):
             },
 
         }
-        return visualizations[self.trigger]
+
+    def get_visualization_data(self, trigger):
+        visualizations = self.visualization_data
+        return visualizations[trigger]
+
+    def get_trigger_data(self, trigger):
+        triggers = self.triggers
+        return triggers[str(trigger)]
