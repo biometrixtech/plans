@@ -169,7 +169,7 @@ class AlertsProcessing(object):
             else:
                 chart_data = []
         elif trend.visualization_type == VisualizationType.doms:
-            chart_data = []
+            chart_data = self.athlete_stats.doms_chart_data
         elif trend.visualization_type == VisualizationType.muscular_strain:
             chart_data = self.athlete_stats.muscular_strain_chart_data
         elif trend.visualization_type == VisualizationType.sensor:

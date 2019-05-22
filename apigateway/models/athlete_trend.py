@@ -153,9 +153,7 @@ class Trend(object):
             trend.data = [DataSeriesBooleanData.json_deserialise(body_part_data) for body_part_data in input_dict.get('data', [])]
         elif trend.visualization_type == VisualizationType.body_part:
             trend.data = [BodyPartChartData.json_deserialise(body_part_data) for body_part_data in input_dict.get('data', [])]
-        elif trend.visualization_type == VisualizationType.doms:
-            trend.data = []
-        elif trend.visualization_type == VisualizationType.muscular_strain:
+        elif trend.visualization_type in [VisualizationType.doms, VisualizationType.muscular_strain]:
             trend.data = [DataSeriesData.json_deserialise(muscular_strain_data) for muscular_strain_data in input_dict.get('data', [])]
         elif trend.visualization_type == VisualizationType.sensor:
             trend.data = []
