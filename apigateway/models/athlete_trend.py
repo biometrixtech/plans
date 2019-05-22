@@ -195,14 +195,14 @@ class Trend(object):
 class TrendCategory(object):
     def __init__(self, insight_type):
         self.insight_type = insight_type
-        self.goals = []
+        self.goals = set()
         self.cta = []
         self.alerts = []
 
     def json_serialise(self):
         ret = {
             'insight_type': self.insight_type.value,
-            'goals': self.goals,
+            'goals': list(self.goals),
             'cta': self.cta,
             'alerts': [alert.json_serialise() for alert in self.alerts]
         }
@@ -211,7 +211,7 @@ class TrendCategory(object):
     @classmethod
     def json_deserialise(cls, input_dict):
         trend_category = cls(InsightType(input_dict['insight_type']))
-        trend_category.goals = input_dict.get('goals', [])
+        trend_category.goals = set(input_dict.get('goals', []))
         trend_category.cta = input_dict.get('cta', [])
         trend_category.alerts = [Trend.json_deserialise(alert) for alert in input_dict.get('alerts', [])]
         return trend_category
