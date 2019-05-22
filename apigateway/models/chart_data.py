@@ -2,7 +2,7 @@ from serialisable import Serialisable
 from datetime import datetime, timedelta
 from utils import format_date, parse_datetime, parse_date
 from fathomapi.utils.exceptions import InvalidSchemaException
-from models.soreness import BodyPart, BodyPartSide
+from models.soreness import BodyPart, BodyPartLocation, BodyPartSide, Soreness
 from models.sport import SportName
 from logic.soreness_processing import SorenessCalculator
 
@@ -178,6 +178,51 @@ class MuscularStrainChart(BaseChart):
 
         if muscular_strain is not None and muscular_strain.date.date() in self.data:
             self.data[muscular_strain.date.date()].value += muscular_strain.value
+
+
+class DOMSChart(BaseChart):
+    def __init__(self, end_date):
+        super().__init__(end_date + timedelta(days=2))
+
+    def process_doms(self, doms_list, soreness_list):
+
+        doms = {}
+
+        start_date = self.end_date - timedelta(days=14)
+
+        for i in range(1, 15):
+            new_date = (start_date + timedelta(days=i)).date()
+            doms[new_date] = []
+
+        for d in doms_list:
+            daily_soreness = list(s for s in soreness_list if s.body_part.location == d.body_part_location and s.side == d.side)
+            for s in daily_soreness:
+                if s.reported_date_time.date() in doms:
+                    doms[s.reported_date_time.date()].append(s)
+
+        for soreness_date, soreness in doms.items():
+            if len(soreness) > 0:
+                severity_list = sorted(doms[soreness_date], key=lambda x: x.severity, reverse=True)
+                self.add_doms(severity_list[0])
+
+        # do we have soreness data for today? (We may need to fake it)
+        todays_soreness = doms[(self.end_date - timedelta(days=2)).date()]
+        if len(todays_soreness) == 0:
+            doms_severity = sorted(doms_list, key=lambda x: x.average_severity, reverse=True)
+            fake_soreness = Soreness()
+            fake_soreness.side = doms_severity[0].side
+            fake_soreness.body_part = BodyPart(doms_severity[0].body_part_location, None)
+            fake_soreness.severity = doms_severity[0].average_severity
+            fake_soreness.reported_date_time = self.end_date - timedelta(days=2)
+            self.add_doms(fake_soreness)
+
+    def add_doms(self, soreness):
+
+        if soreness is not None and soreness.reported_date_time.date() in self.data:
+            self.data[soreness.reported_date_time.date()].value = soreness.severity
+            if soreness.reported_date_time.date() + timedelta(days=2) == self.end_date.date():
+                self.data[(soreness.reported_date_time + timedelta(days=1)).date()].value = max(0, soreness.severity - 1)
+                self.data[(soreness.reported_date_time + timedelta(days=2)).date()].value = max(0, soreness.severity - 2)
 
 
 class HighRelativeLoadChart(BaseChartBoolean):

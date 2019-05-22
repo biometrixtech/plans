@@ -1,4 +1,4 @@
-from models.chart_data import TrainingVolumeChartData, TrainingVolumeChart, BodyPartChartCollection, MuscularStrainChart, HighRelativeLoadChart
+from models.chart_data import TrainingVolumeChartData, TrainingVolumeChart, BodyPartChartCollection, MuscularStrainChart, HighRelativeLoadChart, DOMSChart
 from utils import parse_date
 from math import floor
 from models.historic_soreness import HistoricSoreness, HistoricSorenessStatus, HistoricSeverity, SorenessCause
@@ -13,6 +13,7 @@ from tests.testing_utilities import TestUtilities
 from models.post_session_survey import PostSurvey, PostSessionSurvey
 from models.daily_readiness import DailyReadiness
 from models.data_series import DataSeries
+import random
 
 
 def get_dates(start_date, days):
@@ -54,7 +55,7 @@ def get_daily_readiness_surveys(start_date, historic_soreness_list, days, co_occ
     return surveys
 
 
-def get_post_session_surveys(start_date, historic_soreness_list, days, co_occurence_ratio):
+def get_post_session_surveys(start_date, historic_soreness_list, days, co_occurence_ratio, severity_list=[1]):
 
     surveys = []
 
@@ -71,7 +72,8 @@ def get_post_session_surveys(start_date, historic_soreness_list, days, co_occure
             if factor_goal >= factor and part_list > 0 and i % 2 == 0:
                 pass
             else:
-                soreness = TestUtilities().body_part_soreness(h.body_part_location.value, 1, h.side)
+                severity = random.choice(severity_list)
+                soreness = TestUtilities().body_part_soreness(h.body_part_location.value, severity, h.side)
                 soreness_list.append(soreness)
             factor_goal += 1
             part_list += 1
@@ -89,9 +91,26 @@ def get_symmetric_historic_soreness_list(body_part_location):
 
     historic_soreness_1 = HistoricSoreness(body_part_location, 1, False)
     historic_soreness_1.historic_soreness_status = HistoricSorenessStatus.persistent_soreness
+    historic_soreness_1.average_severity = 4
 
     historic_soreness_2 = HistoricSoreness(body_part_location, 2, False)
     historic_soreness_2.historic_soreness_status = HistoricSorenessStatus.persistent_2_soreness
+    historic_soreness_2.average_severity = 3
+
+    historic_soreness_list = [historic_soreness_1, historic_soreness_2]
+
+    return historic_soreness_list
+
+
+def get_doms_list():
+
+    historic_soreness_1 = HistoricSoreness(BodyPartLocation.calves, 1, False)
+    historic_soreness_1.historic_soreness_status = HistoricSorenessStatus.doms
+    historic_soreness_1.average_severity = 3
+
+    historic_soreness_2 = HistoricSoreness(BodyPartLocation.calves, 2, False)
+    historic_soreness_2.historic_soreness_status = HistoricSorenessStatus.doms
+    historic_soreness_2.average_severity = 2
 
     historic_soreness_list = [historic_soreness_1, historic_soreness_2]
 
@@ -164,6 +183,66 @@ def test_high_relative_load_chart():
     assert len(chart_data) == 14
     assert chart_data[9].value is True
     assert chart_data[10].value is False
+
+
+def test_doms_chart():
+
+    base_date_time = datetime.now()
+
+    acute_readiness_surveys = []
+    acute_post_session_surveys = []
+    chronic_readiness_surveys = []
+    chronic_post_session_surveys = []
+    historic_soreness_list = []
+
+    datastore_collection = DatastoreCollection()
+    athlete_stats_datastore = AthleteStatsDatastore()
+    datastore_collection.athlete_stats_datastore = athlete_stats_datastore
+
+    stats_processing = StatsProcessing("test", base_date_time, datastore_collection)
+
+    co_occurrence_ratio = 0.9
+
+    doms_list = get_doms_list()
+
+    historic_soreness_list.extend(get_symmetric_historic_soreness_list(BodyPartLocation.calves))
+
+    acute_readiness_surveys.extend(get_daily_readiness_surveys(base_date_time - timedelta(days=7),
+                                                               historic_soreness_list, 7, 1.00))
+    chronic_readiness_surveys.extend(get_daily_readiness_surveys(base_date_time - timedelta(days=35),
+                                                                 historic_soreness_list, 28, co_occurrence_ratio))
+    acute_post_session_surveys.extend(get_post_session_surveys(base_date_time - timedelta(days=7),
+                                                               historic_soreness_list, 7, 1.00,
+                                                               severity_list=[4, 3, 2]))
+    chronic_post_session_surveys.extend(get_post_session_surveys(base_date_time - timedelta(days=35),
+                                                                 historic_soreness_list, 28, co_occurrence_ratio,
+                                                                 severity_list=[4, 3, 2]))
+
+    stats_processing.acute_readiness_surveys = acute_readiness_surveys
+    stats_processing.chronic_readiness_surveys = chronic_readiness_surveys
+    stats_processing.acute_post_session_surveys = acute_post_session_surveys
+    stats_processing.chronic_post_session_surveys = chronic_post_session_surveys
+
+    acute_surveys = stats_processing.merge_soreness_from_surveys(
+        stats_processing.get_readiness_soreness_list(stats_processing.acute_readiness_surveys),
+        stats_processing.get_ps_survey_soreness_list(stats_processing.acute_post_session_surveys))
+    chronic_surveys = stats_processing.merge_soreness_from_surveys(
+        stats_processing.get_readiness_soreness_list(stats_processing.chronic_readiness_surveys),
+        stats_processing.get_ps_survey_soreness_list(stats_processing.chronic_post_session_surveys))
+    all_soreness = []
+    all_soreness.extend(acute_surveys)
+    all_soreness.extend(chronic_surveys)
+
+    chart = DOMSChart(base_date_time)
+
+    chart.process_doms(doms_list, all_soreness)
+
+    chart_data = chart.get_output_list()
+
+    assert len(chart_data) == 14
+    assert chart_data[11].value == 3
+    assert chart_data[12].value is max(0, chart_data[11].value - 1)
+    assert chart_data[13].value is max(0, chart_data[11].value - 2)
 
 
 def test_body_part_collection():

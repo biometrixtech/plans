@@ -95,6 +95,7 @@ class AthleteStats(Serialisable):
         self.pain_chart_data = {}
         self.muscular_strain_chart_data = []
         self.high_relative_load_chart_data = []
+        self.doms_chart_data = []
 
     def update_historic_soreness(self, soreness, event_date):
 
