@@ -338,6 +338,7 @@ def test_equivalency():
 
 def test_trend_add_data():
     trend = Trend(TriggerType(14))
+    trend.body_parts = [BodyPartSide(BodyPartLocation(11), 1)]
     trend.add_data()
     assert trend.visualization_data.plot_legends[0].color.value == 2
     trend_json = trend.json_serialise()
