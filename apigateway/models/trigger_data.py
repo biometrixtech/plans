@@ -1,13 +1,15 @@
 import json
 import os
 
+script_dir = os.path.dirname(__file__)
+file_path = os.path.join(script_dir, 'triggers.json')
+with open(file_path, 'r') as f:
+    triggers = json.load(f)['triggers']
+
 
 class TriggerData(object):
     def __init__(self):
-        script_dir = os.path.dirname(__file__)
-        file_path = os.path.join(script_dir, 'triggers.json')
-        with open(file_path, 'r') as f:
-            self.triggers = json.load(f)['triggers']
+        self.triggers = triggers
         self.visualization_data = {
             1: {
                 'title': "",
