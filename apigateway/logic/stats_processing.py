@@ -117,8 +117,9 @@ class StatsProcessing(object):
         doms_chart = DOMSChart(self.event_date)
 
         doms_data = list(h for h in current_athlete_stats.historic_soreness if h.historic_soreness_status is HistoricSorenessStatus.doms)
-        doms_chart.process_doms(doms_data, soreness_list_25)
-        current_athlete_stats.doms_chart_data = doms_chart.get_output_list()
+        if len(doms_data) > 0:
+            doms_chart.process_doms(doms_data, soreness_list_25)
+            current_athlete_stats.doms_chart_data = doms_chart.get_output_list()
 
         high_relative_load_chart = HighRelativeLoadChart(self.event_date)
 
