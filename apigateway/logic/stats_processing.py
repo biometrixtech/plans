@@ -87,6 +87,8 @@ class StatsProcessing(object):
         self.load_historical_data()
         if current_athlete_stats is None:  # if no athlete_stats was passed, read from mongo
             current_athlete_stats = self.athlete_stats_datastore.get(athlete_id=self.athlete_id)
+            if current_athlete_stats.event_date is None:
+                current_athlete_stats.event_date = self.event_date
 
             if current_athlete_stats is None:  # if not found in mongo (first time use), create a new one
                 current_athlete_stats = AthleteStats(self.athlete_id)
