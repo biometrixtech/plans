@@ -263,7 +263,11 @@ class TrendCategory(object):
         cta_names = [alert.cta for alert in self.alerts]
         cta_names = set([item for items in cta_names for item in items])
         for cta_name in cta_names:
+            cta_data = TriggerData().get_cta_data(cta_name)
             cta = CallToAction(cta_name)
+            cta.header = cta_data['header'][self.insight_type.name]
+            cta.benefit = cta_data['benefit'][self.insight_type.name]
+            cta.proximity = cta_data['proximity'][self.insight_type.name]
             self.cta.append(cta)
 
 
