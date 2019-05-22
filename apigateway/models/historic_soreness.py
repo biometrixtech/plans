@@ -2,7 +2,7 @@ import datetime
 from enum import Enum
 
 from fathomapi.utils.exceptions import InvalidSchemaException
-from models.soreness import BodyPartLocation, BodyPart, BaseSoreness, HistoricSorenessStatus
+from models.soreness import BodyPartLocation, BaseSoreness, HistoricSorenessStatus
 from models.session import Session
 from serialisable import Serialisable
 from utils import parse_datetime, format_datetime, parse_date
@@ -140,7 +140,7 @@ class HistoricSoreness(BaseSoreness, Serialisable):
         self.first_reported_date_time = None
         self.last_reported_date_time = None
         self.cleared_date_time = None
-        #self.last_reported = ""
+        # self.last_reported = ""
         self.ask_acute_pain_question = False
         self.ask_persistent_2_question = False
         self.co_occurrences = []
@@ -179,7 +179,7 @@ class HistoricSoreness(BaseSoreness, Serialisable):
                    'last_reported_date_time': format_datetime(self.last_reported_date_time) if self.last_reported_date_time is not None else None,
                    'cleared_date_time': format_datetime(self.cleared_date_time) if self.cleared_date_time is not None else None,
                    'historic_severity': [hist.json_serialise() for hist in self.historic_severity],
-                   #'last_reported': self.last_reported,
+                   # 'last_reported': self.last_reported,
                    'ask_acute_pain_question': self.ask_acute_pain_question,
                    'ask_persistent_2_question': self.ask_persistent_2_question,
                    'cause': self.cause.value
@@ -200,7 +200,7 @@ class HistoricSoreness(BaseSoreness, Serialisable):
         soreness.max_severity = input_dict.get('max_severity', None)
         soreness.max_severity_date_time = input_dict.get('max_severity_date_time', None)
         soreness.first_reported_date_time = input_dict.get("first_reported_date_time", None) if input_dict.get("first_reported_date_time", None) != "" else None
-        #soreness.last_reported = input_dict.get("last_reported", "")
+        # soreness.last_reported = input_dict.get("last_reported", "")
         soreness.causal_session = Session.json_deserialise(input_dict['causal_session']) if input_dict.get(
             'causal_session', None) is not None else None
         soreness.first_reported_date_time = input_dict.get('first_reported_date_time', None)
