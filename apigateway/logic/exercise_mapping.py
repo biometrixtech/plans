@@ -405,21 +405,21 @@ class ExerciseAssignmentCalculator(object):
             if ((days == 2 and d.max_severity == 1) or  # minor DOMS
                     (days <= 2 and 2 <= d.max_severity <= 3) or  # moderate DOMS
                     (days <= 2 and 3 < d.max_severity <= 5)):  # severe DOMS
-                if d.body_part.location not in low_parts:
+                if d.body_part_location not in low_parts:
                     goal = AthleteGoal("Care for Soreness, Reactive", 1, AthleteGoalType.sore)
                     #goal.trigger = "Soreness Reported Today as DOMS"
                     goal.trigger_type = TriggerType.sore_today_doms  # 11
 
-                    if d.body_part.location == BodyPartLocation.elbow:
+                    if d.body_part_location == BodyPartLocation.elbow:
                         minutes.append(10)
                     else:
                         minutes.append(15)
 
-                    ice = Ice(body_part_location=d.body_part.location, side=d.side)
+                    ice = Ice(body_part_location=d.body_part_location, side=d.side)
                     ice.repeat_every_3hrs_for_24hrs = True
                     ice.goals.add(goal)
                     alert = Alert(goal)
-                    alert.body_part = BodyPartSide(d.body_part.location, d.side)
+                    alert.body_part = BodyPartSide(d.body_part_location, d.side)
                     alerts.append(alert)
                     if ice not in ice_list:
                         ice_list.append(ice)
@@ -471,7 +471,7 @@ class ExerciseAssignmentCalculator(object):
             if ((days == 2 and d.max_severity  == 1) or  # minor DOMS
                     (days <= 2 and 2 <= d.max_severity <= 3) or  # moderate DOMS
                     (days <= 2 and 3 < d.max_severity <= 5)):  # severe DOMS
-                if d.body_part.location in low_parts:
+                if d.body_part_location in low_parts:
                     goal = AthleteGoal("Care for Soreness, Reactive", 1, AthleteGoalType.sore)
                     #goal.trigger = "Soreness Reported Today as DOMS"
                     goal.trigger_type = TriggerType.sore_today_doms  # 11

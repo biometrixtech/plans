@@ -150,16 +150,8 @@ class TrainingPlanManager(object):
         alerts = self.daily_plan.get_alerts()
         alerts_processing = AlertsProcessing(self.daily_plan, self.athlete_stats)
         alerts_processing.aggregate_alerts(self.trigger_date_time,
-                                           alerts=alerts,
-                                           # previous_insights=self.daily_plan.insights,
-                                           # exposed_triggers=self.athlete_stats.exposed_triggers,
-                                           # longitudinal_insights=self.athlete_stats.longitudinal_insights
-                                             )
-        # self.daily_plan.insights = insights
-        # self.daily_plan.sort_insights()
-        # # self.daily_plan.trends = trends
-        # self.daily_plan.trends.dashboard.training_volume_data = athlete_stats.training_volume_chart_data
-        # self.athlete_stats.longitudinal_insights = longitudinal_insights
+                                           alerts=alerts
+                                           )
 
         self.daily_plan_datastore.put(self.daily_plan)
         self.athlete_stats_datastore.put(self.athlete_stats)
