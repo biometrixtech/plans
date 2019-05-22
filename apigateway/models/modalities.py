@@ -615,7 +615,10 @@ class ActiveRest(ModalityBase):
 
         if soreness_list is not None and len(soreness_list) > 0:
             for s in soreness_list:
-                self.check_reactive_recover_from_sport(soreness_list, exercise_library, high_relative_load_session, high_relative_intensity_logged, sports)
+                self.check_reactive_recover_from_sport(soreness_list, exercise_library, high_relative_load_session,
+                                                       high_relative_intensity_logged,
+                                                       muscular_strain_high,
+                                                       sports)
                 self.check_reactive_care_soreness(s, exercise_library)
                 self.check_reactive_care_pain(s, exercise_library)
                 self.check_prevention_soreness(s, self.event_date_time, exercise_library)
@@ -629,7 +632,15 @@ class ActiveRest(ModalityBase):
         pass
 
     def check_reactive_recover_from_sport(self, soreness_list, exercise_library, high_relative_load_session,
-                                          high_relative_intensity_logged, sports):
+                                          high_relative_intensity_logged, muscular_strain_high, sports):
+        if muscular_strain_high:
+            goal = AthleteGoal("Recover from Sport", 1, AthleteGoalType.sport)
+            goal.trigger_type = TriggerType.overreaching_high_muscular_strain  # 8
+            for sport_name in sports:
+                alert = Alert(goal)
+                alert.sport_name = sport_name
+                self.alerts.append(alert)
+
         if high_relative_load_session or high_relative_intensity_logged:
             goal = AthleteGoal("Recover from Sport", 1, AthleteGoalType.sport)
             #goal.trigger = "High Relative Volume or Intensity of Logged Session"
@@ -1483,7 +1494,15 @@ class CoolDown(ModalityBase, Serialisable):
         self.rank_dosages([self.dynamic_stretch_exercises])
         self.rank_dosages([self.dynamic_integrate_exercises])
 
-    def check_recover_from_sport(self, soreness_list, sport_name, exercise_library):
+    def check_recover_from_sport(self, soreness_list, sport_name, muscular_strain_high,exercise_library):
+
+        if muscular_strain_high:
+            goal = AthleteGoal("Recover from Sport", 1, AthleteGoalType.sport)
+            goal.trigger_type = TriggerType.overreaching_high_muscular_strain  # 8
+            if sport_name is not None:
+                alert = Alert(goal)
+                alert.sport_name = sport_name
+                self.alerts.append(alert)
 
         if self.high_relative_volume_logged or self.high_relative_intensity_logged:
             goal = AthleteGoal("Recover from Sport", 1, AthleteGoalType.sport)
@@ -1531,7 +1550,7 @@ class CoolDown(ModalityBase, Serialisable):
     def fill_exercises(self, soreness_list, exercise_library, high_relative_load_session, high_relative_intensity_logged, muscular_strain_high, sports):
 
         for sport_name in sports:
-            self.check_recover_from_sport(soreness_list, sport_name, exercise_library)
+            self.check_recover_from_sport(soreness_list, sport_name, muscular_strain_high, exercise_library)
         for s in soreness_list:
             self.check_corrective(s, self.event_date_time, exercise_library)
 
