@@ -821,14 +821,14 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
             #goal.trigger_type = TriggerType.sore_today  # 10
             if soreness.historic_soreness_status == HistoricSorenessStatus.doms:
                 goal.trigger_type = TriggerType.sore_today_doms  # 11
-            elif ((self.event_date_time - soreness.first_reported_date_time).days < 30 and
-                (soreness.is_persistent_soreness() or
-                 soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_soreness)):
-                    goal.trigger_type = TriggerType.hist_sore_less_30_sore_today  # 12
-            elif ((self.event_date_time - soreness.first_reported_date_time).days >= 30 and
-                (soreness.is_persistent_soreness() or
-                 soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_soreness)):
-                    goal.trigger_type = TriggerType.hist_sore_greater_30_sore_today  # 13
+            elif ((soreness.is_persistent_soreness() or
+                   soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_soreness) and
+                  (self.event_date_time - soreness.first_reported_date_time).days < 30):
+                goal.trigger_type = TriggerType.hist_sore_less_30_sore_today  # 12
+            elif ((soreness.is_persistent_soreness() or
+                   soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_soreness) and
+                  (self.event_date_time - soreness.first_reported_date_time).days >= 30):
+                goal.trigger_type = TriggerType.hist_sore_greater_30_sore_today  # 13
             else: # somehow missed doms
                 goal.trigger_type = TriggerType.sore_today_doms  # 11
 
@@ -1151,14 +1151,14 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
             #goal.trigger_type = TriggerType.sore_today  # 10
             if soreness.historic_soreness_status == HistoricSorenessStatus.doms:
                 goal.trigger_type = TriggerType.sore_today_doms  # 11
-            elif ((self.event_date_time - soreness.first_reported_date_time).days < 30 and
-                (soreness.is_persistent_soreness() or
-                 soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_soreness)):
-                    goal.trigger_type = TriggerType.hist_sore_less_30_sore_today  # 12
-            elif ((self.event_date_time - soreness.first_reported_date_time).days >= 30 and
-                (soreness.is_persistent_soreness() or
-                 soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_soreness)):
-                    goal.trigger_type = TriggerType.hist_sore_greater_30_sore_today  # 13
+            elif ((soreness.is_persistent_soreness() or
+                   soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_soreness) and
+                  (self.event_date_time - soreness.first_reported_date_time).days < 30):
+                goal.trigger_type = TriggerType.hist_sore_less_30_sore_today  # 12
+            elif ((soreness.is_persistent_soreness() or
+                   soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_soreness) and
+                  (self.event_date_time - soreness.first_reported_date_time).days >= 30):
+                goal.trigger_type = TriggerType.hist_sore_greater_30_sore_today  # 13
             else: # somehow missed doms
                 goal.trigger_type = TriggerType.sore_today_doms  # 11
 
