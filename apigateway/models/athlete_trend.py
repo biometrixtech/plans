@@ -5,7 +5,7 @@ from models.sport import SportName
 from models.soreness import BodyPartSide
 from models.trends_data import TrendsData
 from models.trigger import TriggerType
-from models.chart_data import BodyPartChartData, DataSeriesBooleanData
+from models.chart_data import BodyPartChartData, DataSeriesBooleanData, DataSeriesData
 
 
 class LegendColor(Enum):
@@ -152,7 +152,7 @@ class Trend(object):
         elif trend.visualization_type == VisualizationType.doms:
             trend.data = []
         elif trend.visualization_type == VisualizationType.muscular_strain:
-            trend.data = []
+            trend.data = [DataSeriesData.json_deserialise(muscular_strain_data) for muscular_strain_data in input_dict.get('data', [])]
         elif trend.visualization_type == VisualizationType.sensor:
             trend.data = []
         else:
