@@ -2,7 +2,7 @@ import datetime
 from enum import Enum
 
 from fathomapi.utils.exceptions import InvalidSchemaException
-from models.soreness import BodyPartLocation, BodyPart, BaseSoreness, HistoricSorenessStatus
+from models.soreness import BodyPartLocation, BaseSoreness, HistoricSorenessStatus
 from models.session import Session
 from serialisable import Serialisable
 from utils import parse_datetime, format_datetime, parse_date
@@ -130,6 +130,7 @@ class HistoricSoreness(BaseSoreness, Serialisable):
         # self.historic_soreness_status = HistoricSorenessStatus.dormant_cleared
         self.is_pain = is_pain
         self.side = side
+        self.user_id = None
         self.streak = 0
         self.streak_start_date = None
         self.average_severity = 0.0
@@ -139,7 +140,7 @@ class HistoricSoreness(BaseSoreness, Serialisable):
         self.first_reported_date_time = None
         self.last_reported_date_time = None
         self.cleared_date_time = None
-        #self.last_reported = ""
+        # self.last_reported = ""
         self.ask_acute_pain_question = False
         self.ask_persistent_2_question = False
         self.co_occurrences = []
@@ -156,7 +157,7 @@ class HistoricSoreness(BaseSoreness, Serialisable):
                     value = parse_date(value)
         super().__setattr__(name, value)
 
-    def json_serialise(self, api=False):
+    def json_serialise(self, api=False, cleared=False):
         if api:
             ret = {"body_part": self.body_part_location.value,
                    "side": self.side,
@@ -178,16 +179,19 @@ class HistoricSoreness(BaseSoreness, Serialisable):
                    'last_reported_date_time': format_datetime(self.last_reported_date_time) if self.last_reported_date_time is not None else None,
                    'cleared_date_time': format_datetime(self.cleared_date_time) if self.cleared_date_time is not None else None,
                    'historic_severity': [hist.json_serialise() for hist in self.historic_severity],
-                   #'last_reported': self.last_reported,
+                   # 'last_reported': self.last_reported,
                    'ask_acute_pain_question': self.ask_acute_pain_question,
                    'ask_persistent_2_question': self.ask_persistent_2_question,
                    'cause': self.cause.value
                   }
+            if cleared:
+                ret['user_id'] = self.user_id
         return ret
 
     @classmethod
     def json_deserialise(cls, input_dict):
         soreness = cls(BodyPartLocation(input_dict['body_part_location']), input_dict.get('side', None), input_dict.get('is_pain', False))
+        soreness.user_id = input_dict.get('user_id', None)
         hist_sore_status = input_dict.get('historic_soreness_status', None)
         soreness.historic_soreness_status = HistoricSorenessStatus(hist_sore_status) if hist_sore_status is not None else HistoricSorenessStatus.dormant_cleared
         soreness.streak = input_dict.get('streak', 0)
@@ -196,7 +200,7 @@ class HistoricSoreness(BaseSoreness, Serialisable):
         soreness.max_severity = input_dict.get('max_severity', None)
         soreness.max_severity_date_time = input_dict.get('max_severity_date_time', None)
         soreness.first_reported_date_time = input_dict.get("first_reported_date_time", None) if input_dict.get("first_reported_date_time", None) != "" else None
-        #soreness.last_reported = input_dict.get("last_reported", "")
+        # soreness.last_reported = input_dict.get("last_reported", "")
         soreness.causal_session = Session.json_deserialise(input_dict['causal_session']) if input_dict.get(
             'causal_session', None) is not None else None
         soreness.first_reported_date_time = input_dict.get('first_reported_date_time', None)

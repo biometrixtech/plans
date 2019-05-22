@@ -100,23 +100,26 @@ class AlertsProcessing(object):
                 existing_trends.append((alert.goal.trigger_type, alert.sport_name, alert.body_part))
                 trend = Trend(alert.goal.trigger_type)
                 trend.goal_targeted = [alert.goal.text]
-                trend.add_data()
                 if alert.body_part is not None:
                     trend.body_parts.append(alert.body_part)
                 if alert.sport_name is not None:
                     trend.sport_names.append(alert.sport_name)
-
+                # populate trend with text/visualization data
+                trend.add_data()
+                # populate relevant data for charts
                 self.add_chart_data(trend)
+
+                # group trend into proper insight type bucket
                 insight_type = InsightType(TriggerType.get_insight_type(alert.goal.trigger_type))
                 if insight_type == InsightType.stress:
                     trends.stress.alerts.append(trend)
-                    trends.stress.goals.append(alert.goal.text)
+                    trends.stress.goals.add(alert.goal.text)
                 elif insight_type == InsightType.response:
                     trends.response.alerts.append(trend)
-                    trends.response.goals.append(alert.goal.text)
+                    trends.response.goals.add(alert.goal.text)
                 elif insight_type == InsightType.biomechanics:
                     trends.biomechanics.alerts.append(trend)
-                    trends.biomechanics.goals.append(alert.goal.text)
+                    trends.biomechanics.goals.add(alert.goal.text)
             # check if trigger already exists
             if alert.goal.trigger_type in existing_triggers:
                 insight = [insight for insight in insights if insight.trigger_type == alert.goal.trigger_type][0]
@@ -168,7 +171,7 @@ class AlertsProcessing(object):
         elif trend.visualization_type == VisualizationType.doms:
             chart_data = []
         elif trend.visualization_type == VisualizationType.muscular_strain:
-            chart_data = []
+            chart_data = self.athlete_stats.muscular_strain_chart_data
         elif trend.visualization_type == VisualizationType.sensor:
             chart_data = []
         else:
