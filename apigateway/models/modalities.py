@@ -653,7 +653,7 @@ class ActiveRest(ModalityBase):
                 for soreness in hist_soreness:
                     alert = Alert(goal)
                     alert.sport_name = sport_name
-                    alert.body_part = BodyPartSide(soreness.body_part.location, soreness.side)
+                    alert.body_part = BodyPartSide(soreness.body_part_location, soreness.side)
                     self.alerts.append(alert)
 
         if high_relative_load_session or high_relative_intensity_logged:
@@ -1588,7 +1588,7 @@ class CoolDown(ModalityBase, Serialisable):
                 for soreness in hist_soreness:
                     alert = Alert(goal)
                     alert.sport_name = sport_name
-                    alert.body_part = BodyPartSide(soreness.body_part.location, soreness.side)
+                    alert.body_part = BodyPartSide(soreness.body_part_location, soreness.side)
                     self.alerts.append(alert)
 
         if self.high_relative_volume_logged or self.high_relative_intensity_logged:
