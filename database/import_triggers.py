@@ -52,6 +52,7 @@ with open('Fathom Content Management System - Insights & Trends.tsv', newline=''
     trigger_collection = TriggerCollection(trigger_list)
     json_output = trigger_collection.json_serialise()
     json_string = json.dumps(json_output, indent=4)
-    f1 = open("triggers.json", 'w')
+    file_name = os.path.join(os.path.realpath('..'), 'apigateway/models/triggers.json')
+    f1 = open(file_name, 'w')
     f1.write(json_string)
     f1.close()
