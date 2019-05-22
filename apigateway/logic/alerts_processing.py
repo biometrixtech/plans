@@ -39,7 +39,7 @@ class AlertsProcessing(object):
             else:
                 insight.start_date_time = trigger_date_time
         insights = self.combine_new_insights_with_previous(insights, previous_insights)
-
+        trends.add_cta()
         self.daily_plan.insights = insights
         self.daily_plan.sort_insights()
         self.daily_plan.trends = trends
