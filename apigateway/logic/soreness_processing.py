@@ -114,6 +114,12 @@ class SorenessCalculator(object):
         if current_days_diff < 14:
             return SorenessCause.overloading
 
+        # don't reset dysfunction, upgrade weakness if the length has increased sufficiently
+        if historic_soreness.cause == SorenessCause.dysfunction:
+            return SorenessCause.dysfunction
+        elif historic_soreness.cause == SorenessCause.weakness and current_days_diff >= 28:
+            return SorenessCause.dysfunction
+
         if len(historic_soreness.co_occurrences) == 0:
             if 14 <= current_days_diff <= 28:
                 return SorenessCause.weakness

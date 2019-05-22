@@ -143,7 +143,8 @@ class ModalityBase(object):
         for s in soreness_list:
             if s.pain:
                 care_for_pain_present = True
-            if s.historic_soreness_status is not None and not s.is_dormant_cleared():
+            if (s.historic_soreness_status is not None and not s.is_dormant_cleared() and
+                    s.historic_soreness_status is not HistoricSorenessStatus.doms):
                 historic_status_present = True
             if s.severity >= 2:
                 severity_greater_than_2 = True
@@ -397,7 +398,8 @@ class ModalityBase(object):
 
         elif (dosage.goal.goal_type == AthleteGoalType.sore and
                 (dosage.soreness_source.historic_soreness_status is None or
-                 dosage.soreness_source.is_dormant_cleared()) or
+                 dosage.soreness_source.is_dormant_cleared() or
+                dosage.soreness_source.historic_soreness_status is HistoricSorenessStatus.doms) or
                 dosage.goal.goal_type == AthleteGoalType.preempt_personalized_sport or
                 dosage.goal.goal_type == AthleteGoalType.preempt_corrective):
             if dosage.soreness_source.severity < 0.5:
@@ -826,7 +828,8 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
 
         body_part_factory = BodyPartFactory()
 
-        if soreness.historic_soreness_status is not None and soreness.first_reported_date_time is not None and not soreness.is_dormant_cleared():
+        if soreness.historic_soreness_status is not None and soreness.first_reported_date_time is not None \
+                and not soreness.is_dormant_cleared() and soreness.historic_soreness_status is not HistoricSorenessStatus.doms:
             days_sore = (event_date_time - soreness.first_reported_date_time).days
             if not soreness.pain and days_sore > 30:
 
@@ -1140,7 +1143,8 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
 
         body_part_factory = BodyPartFactory()
 
-        if soreness.historic_soreness_status is not None and soreness.first_reported_date_time is not None and not soreness.is_dormant_cleared():
+        if soreness.historic_soreness_status is not None and soreness.first_reported_date_time is not None \
+                and not soreness.is_dormant_cleared() and soreness.historic_soreness_status is not HistoricSorenessStatus.doms:
             days_sore = (event_date_time - soreness.first_reported_date_time).days
             if not soreness.pain and days_sore > 30:
 
@@ -1344,7 +1348,8 @@ class WarmUp(ModalityBase, Serialisable):
 
     def check_preempt_soreness(self, soreness, event_date_time, exercise_library):
 
-        if soreness.historic_soreness_status is not None and soreness.first_reported_date_time is not None and not soreness.is_dormant_cleared():
+        if soreness.historic_soreness_status is not None and soreness.first_reported_date_time is not None\
+                and not soreness.is_dormant_cleared() and soreness.historic_soreness_status is not HistoricSorenessStatus.doms:
             days_sore = (event_date_time - soreness.first_reported_date_time).days
             if not soreness.pain and days_sore < 30:
 
@@ -1356,7 +1361,8 @@ class WarmUp(ModalityBase, Serialisable):
 
     def check_corrective_soreness(self, soreness, event_date_time, exercise_library):
 
-        if soreness.historic_soreness_status is not None and soreness.first_reported_date_time is not None and not soreness.is_dormant_cleared():
+        if soreness.historic_soreness_status is not None and soreness.first_reported_date_time is not None \
+                and not soreness.is_dormant_cleared() and soreness.historic_soreness_status is not HistoricSorenessStatus.doms:
             days_sore = (event_date_time - soreness.first_reported_date_time).days
             if soreness.pain or days_sore > 30:
                 goal = AthleteGoal("Personalized Prepare for Training (Identified Dysfunction)", 1, AthleteGoalType.preempt_corrective)
@@ -1507,7 +1513,8 @@ class CoolDown(ModalityBase, Serialisable):
 
     def check_corrective(self, soreness, event_date_time, exercise_library):
 
-        if soreness.historic_soreness_status is not None and soreness.first_reported_date_time is not None and not soreness.is_dormant_cleared():
+        if soreness.historic_soreness_status is not None and soreness.first_reported_date_time is not None\
+                and not soreness.is_dormant_cleared() and soreness.historic_soreness_status is not HistoricSorenessStatus.doms:
             days_sore = (event_date_time - soreness.first_reported_date_time).days
             if soreness.is_acute_pain() or soreness.is_persistent_pain() or soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_pain:
                 goal = AthleteGoal("Personalized Prepare for Training (Identified Dysfunction)", 1, AthleteGoalType.preempt_corrective)

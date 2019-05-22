@@ -41,10 +41,11 @@ def get_daily_plans(start_date, end_date):
         daily_plan = DailyPlan(event_date=d.strftime("%Y-%m-%d"))
         session = SportTrainingSession()
         session.event_date = d
-        session.external_load = 10 * i
-        session.high_intensity_load = 2 * i
-        session.mod_intensity_load = 5 * i
-        session.low_intensity_load = 3 * i
+        session.duration_minutes = i
+        session.session_RPE = 10 * i
+        #session.high_intensity_load = 2 * i
+        #session.mod_intensity_load = 5 * i
+        #session.low_intensity_load = 3 * i
         daily_plan.training_sessions.append(session)
         plans.append(daily_plan)
         i += 1
@@ -411,8 +412,8 @@ def test_correct_acute_chronic_load_33_days():
                                                 stats.chronic_daily_plans,
                                                 athlete_stats.load_stats)
     athlete_stats = training_volume_processing.calc_training_volume_metrics(athlete_stats)
-    assert 2030 == athlete_stats.acute_external_total_load.observed_value
-    assert 3250 == athlete_stats.chronic_external_total_load.observed_value
+    assert 59150 == athlete_stats.acute_internal_total_load.observed_value
+    assert 55250 == athlete_stats.chronic_internal_total_load.observed_value
 
 def test_correct_acute_chronic_empty_load_33_days():
     plans = get_sessionless_daily_plans(datetime(2018, 6, 1, 12, 0, 0), datetime(2018, 7, 2, 12, 0, 0))
@@ -444,8 +445,8 @@ def test_correct_acute_chronic_empty_load_33_days():
                                                 stats.chronic_daily_plans,
                                                 athlete_stats.load_stats)
     athlete_stats = training_volume_processing.calc_training_volume_metrics(athlete_stats)
-    assert None is athlete_stats.acute_external_total_load.observed_value
-    assert None is athlete_stats.chronic_external_total_load.observed_value
+    assert None is athlete_stats.acute_internal_total_load.observed_value
+    assert None is athlete_stats.chronic_internal_total_load.observed_value
 
 
 def test_correct_acwr_load_33_days():
@@ -479,7 +480,7 @@ def test_correct_acwr_load_33_days():
                                                 stats.chronic_daily_plans,
                                                 athlete_stats.load_stats)
     athlete_stats = training_volume_processing.calc_training_volume_metrics(athlete_stats)
-    assert 0.6246153846153846 == athlete_stats.external_acwr.observed_value
+    assert 1.0705882352941176 == athlete_stats.internal_acwr.observed_value
 
 
 def test_correct_acwr_empty_load_33_days():
@@ -512,7 +513,7 @@ def test_correct_acwr_empty_load_33_days():
                                                 stats.chronic_daily_plans,
                                                 athlete_stats.load_stats)
     athlete_stats = training_volume_processing.calc_training_volume_metrics(athlete_stats)
-    assert None is athlete_stats.external_acwr.observed_value
+    assert None is athlete_stats.internal_acwr.observed_value
 
 def test_correct_internal_acwr_load_33_days():
     plans = get_daily_internal_plans(datetime(2018, 6, 1, 12, 0, 0), datetime(2018, 7, 2, 12, 0, 0))

@@ -48,32 +48,32 @@ class TrainingVolumeProcessing(object):
         self.start_date = start_date
         self.end_date = end_date
         self.a_internal_load_values = []
-        self.a_external_load_values = []
-        self.a_high_intensity_values = []
-        self.a_mod_intensity_values = []
-        self.a_low_intensity_values = []
+        #self.a_external_load_values = []
+        #self.a_high_intensity_values = []
+        #self.a_mod_intensity_values = []
+        #self.a_low_intensity_values = []
 
         self.c_internal_load_values = []
-        self.c_external_load_values = []
-        self.c_high_intensity_values = []
-        self.c_mod_intensity_values = []
-        self.c_low_intensity_values = []
+        #self.c_external_load_values = []
+        #self.c_high_intensity_values = []
+        #self.c_mod_intensity_values = []
+        #self.c_low_intensity_values = []
 
-        self.last_week_external_values = []
-        self.previous_week_external_values = []
+        #self.last_week_external_values = []
+        #self.previous_week_external_values = []
         self.last_week_internal_values = []
         self.previous_week_internal_values = []
 
         self.training_volume_chart_data = []
 
         self.internal_load_tuples = []
-        self.external_load_tuples = []
-        self.low_internal_load_day_lower_bound = None
-        self.mod_internal_load_day_lower_bound = None
-        self.high_internal_load_day_lower_bound = None
-        self.low_internal_load_day_upper_bound = None
-        self.mod_internal_load_day_upper_bound = None
-        self.high_internal_load_day_upper_bound = None
+        #self.external_load_tuples = []
+        #self.low_internal_load_day_lower_bound = None
+        #self.mod_internal_load_day_lower_bound = None
+        #self.high_internal_load_day_lower_bound = None
+        #self.low_internal_load_day_upper_bound = None
+        #self.mod_internal_load_day_upper_bound = None
+        #self.high_internal_load_day_upper_bound = None
         self.load_monitoring_measures = {}
 
         self.daily_readiness_tuples = []
@@ -174,21 +174,21 @@ class TrainingVolumeProcessing(object):
     def load_plan_values(self, last_7_days_plans, days_8_14_plans, acute_daily_plans, chronic_weeks_plans,
                          chronic_daily_plans, load_stats):
 
-        self.last_week_external_values = []
+        #self.last_week_external_values = []
         self.last_week_internal_values = []
         self.last_week_sport_training_loads = {}
         self.previous_week_sport_training_loads = {}
-        self.previous_week_external_values = []
+        #self.previous_week_external_values = []
         self.previous_week_internal_values = []
         self.a_internal_load_values = []
-        self.a_external_load_values = []
-        self.a_high_intensity_values = []
-        self.a_mod_intensity_values = []
-        self.a_low_intensity_values = []
-        self.c_external_load_values = []
-        self.c_high_intensity_values = []
-        self.c_mod_intensity_values = []
-        self.c_low_intensity_values = []
+        #self.a_external_load_values = []
+        #self.a_high_intensity_values = []
+        #self.a_mod_intensity_values = []
+        #self.a_low_intensity_values = []
+        #self.c_external_load_values = []
+        #self.c_high_intensity_values = []
+        #self.c_mod_intensity_values = []
+        #self.c_low_intensity_values = []
         self.internal_load_tuples = []
 
         last_7_day_training_sessions = self.get_training_sessions(last_7_days_plans)
@@ -222,54 +222,54 @@ class TrainingVolumeProcessing(object):
 
         self.training_volume_chart_data = chart_data.get_output_list()
 
-        self.last_week_external_values.extend(
-            x for x in self.get_plan_session_attribute_sum_list("external_load", last_7_days_plans) if x is not None)
+        #self.last_week_external_values.extend(
+        #    x for x in self.get_plan_session_attribute_sum_list("external_load", last_7_days_plans) if x is not None)
 
         self.last_week_internal_values.extend(
             x for x in self.get_session_attributes_product_sum_list("session_RPE", "duration_minutes",
                                                                     last_7_days_plans) if x is not None)
-        self.previous_week_external_values.extend(
-            x for x in self.get_plan_session_attribute_sum_list("external_load", days_8_14_plans) if x is not None)
+        #self.previous_week_external_values.extend(
+        #    x for x in self.get_plan_session_attribute_sum_list("external_load", days_8_14_plans) if x is not None)
 
         self.previous_week_internal_values.extend(
             x for x in self.get_session_attributes_product_sum_list("session_RPE", "duration_minutes",
                                                                     days_8_14_plans) if x is not None)
 
-        self.a_external_load_values.extend(
-            x for x in self.get_plan_session_attribute_sum("external_load", acute_daily_plans) if x is not None)
+        #self.a_external_load_values.extend(
+        #    x for x in self.get_plan_session_attribute_sum("external_load", acute_daily_plans) if x is not None)
 
         self.a_internal_load_values.extend(
             x for x in self.get_session_attributes_product_sum("session_RPE", "duration_minutes",
                                                                acute_daily_plans) if x is not None)
 
-        self.a_high_intensity_values.extend(
-            x for x in self.get_plan_session_attribute_sum("high_intensity_load", acute_daily_plans) if
-            x is not None)
+        #self.a_high_intensity_values.extend(
+        #    x for x in self.get_plan_session_attribute_sum("high_intensity_load", acute_daily_plans) if
+        #    x is not None)
 
-        self.a_mod_intensity_values.extend(
-            x for x in self.get_plan_session_attribute_sum("mod_intensity_load", acute_daily_plans) if
-            x is not None)
+        #self.a_mod_intensity_values.extend(
+        #    x for x in self.get_plan_session_attribute_sum("mod_intensity_load", acute_daily_plans) if
+        #    x is not None)
 
-        self.a_low_intensity_values.extend(
-            x for x in self.get_plan_session_attribute_sum("low_intensity_load", acute_daily_plans) if
-            x is not None)
+        #self.a_low_intensity_values.extend(
+        #    x for x in self.get_plan_session_attribute_sum("low_intensity_load", acute_daily_plans) if
+        #    x is not None)
 
         for w in chronic_weeks_plans:
             self.c_internal_load_values.extend(
                 x for x in self.get_session_attributes_product_sum("session_RPE", "duration_minutes", w)
                 if x is not None)
 
-            self.c_external_load_values.extend(
-                x for x in self.get_plan_session_attribute_sum("external_load", w) if x is not None)
+            #self.c_external_load_values.extend(
+            #    x for x in self.get_plan_session_attribute_sum("external_load", w) if x is not None)
 
-            self.c_high_intensity_values.extend(x for x in self.get_plan_session_attribute_sum("high_intensity_load", w)
-                                           if x is not None)
+            #self.c_high_intensity_values.extend(x for x in self.get_plan_session_attribute_sum("high_intensity_load", w)
+            #                               if x is not None)
 
-            self.c_mod_intensity_values.extend(x for x in self.get_plan_session_attribute_sum("mod_intensity_load", w)
-                                          if x is not None)
+            #self.c_mod_intensity_values.extend(x for x in self.get_plan_session_attribute_sum("mod_intensity_load", w)
+            #                              if x is not None)
 
-            self.c_low_intensity_values.extend(x for x in self.get_plan_session_attribute_sum("low_intensity_load", w)
-                                          if x is not None)
+            #self.c_low_intensity_values.extend(x for x in self.get_plan_session_attribute_sum("low_intensity_load", w)
+            #                              if x is not None)
 
         self.internal_load_tuples.extend(list(x for x in self.get_session_attributes_product_sum_tuple_list("session_RPE",
                                                                                                  "duration_minutes",
@@ -307,27 +307,27 @@ class TrainingVolumeProcessing(object):
     @xray_recorder.capture('logic.TrainingVolumeProcessing.calc_training_volume_metrics')
     def calc_training_volume_metrics(self, athlete_stats):
 
-        athlete_stats.duration_load_ramp = {}
+        athlete_stats.training_load_ramp = {}
 
         for sport_name, load in self.previous_week_sport_training_loads.items():
-            athlete_stats.duration_load_ramp[sport_name] = self.get_ramp(athlete_stats.expected_weekly_workouts,
+            athlete_stats.training_load_ramp[sport_name] = self.get_ramp(athlete_stats.expected_weekly_workouts,
                                                                          self.last_week_sport_training_loads[sport_name],
                                                                          self.previous_week_sport_training_loads[sport_name]
                                                                          )
 
         self.set_high_relative_load_sessions(athlete_stats, self.last_14_days_training_sessions)
 
-        athlete_stats.external_ramp = self.get_ramp(athlete_stats.expected_weekly_workouts,
-                                                    self.last_week_external_values, self.previous_week_external_values)
+        #athlete_stats.external_ramp = self.get_ramp(athlete_stats.expected_weekly_workouts,
+        #                                            self.last_week_external_values, self.previous_week_external_values)
 
         athlete_stats.internal_ramp = self.get_ramp(athlete_stats.expected_weekly_workouts,
                                                     self.last_week_internal_values, self.previous_week_internal_values)
 
-        athlete_stats.external_monotony = self.get_monotony(athlete_stats.expected_weekly_workouts,
-                                                            self.last_week_external_values)
+        #athlete_stats.external_monotony = self.get_monotony(athlete_stats.expected_weekly_workouts,
+        #                                                    self.last_week_external_values)
 
-        athlete_stats.external_strain = self.get_strain(athlete_stats.expected_weekly_workouts,
-                                                        athlete_stats.external_monotony, self.last_week_external_values, athlete_stats.historical_external_strain)
+        #athlete_stats.external_strain = self.get_strain(athlete_stats.expected_weekly_workouts,
+        #                                                athlete_stats.external_monotony, self.last_week_external_values, athlete_stats.historical_external_strain)
 
         athlete_stats.internal_monotony = self.get_monotony(athlete_stats.expected_weekly_workouts,
                                                             self.last_week_internal_values)
@@ -346,28 +346,28 @@ class TrainingVolumeProcessing(object):
 
         athlete_stats.acute_internal_total_load = self.get_standard_error_range(athlete_stats.expected_weekly_workouts,
                                                                                 self.a_internal_load_values)
-        athlete_stats.acute_external_total_load = self.get_standard_error_range(athlete_stats.expected_weekly_workouts,
-                                                                                self.a_external_load_values)
-        athlete_stats.acute_external_high_intensity_load = self.get_standard_error_range(
-            athlete_stats.expected_weekly_workouts, self.a_high_intensity_values)
-        athlete_stats.acute_external_mod_intensity_load = self.get_standard_error_range(
-            athlete_stats.expected_weekly_workouts, self.a_mod_intensity_values)
-        athlete_stats.acute_external_low_intensity_load = self.get_standard_error_range(
-            athlete_stats.expected_weekly_workouts, self.a_low_intensity_values)
+        #athlete_stats.acute_external_total_load = self.get_standard_error_range(athlete_stats.expected_weekly_workouts,
+        #                                                                        self.a_external_load_values)
+        #athlete_stats.acute_external_high_intensity_load = self.get_standard_error_range(
+        #    athlete_stats.expected_weekly_workouts, self.a_high_intensity_values)
+        #athlete_stats.acute_external_mod_intensity_load = self.get_standard_error_range(
+        #    athlete_stats.expected_weekly_workouts, self.a_mod_intensity_values)
+        #athlete_stats.acute_external_low_intensity_load = self.get_standard_error_range(
+        #    athlete_stats.expected_weekly_workouts, self.a_low_intensity_values)
 
         athlete_stats.chronic_internal_total_load = self.get_standard_error_range(
             athlete_stats.expected_weekly_workouts, self.c_internal_load_values)
-        athlete_stats.chronic_external_total_load = self.get_standard_error_range(
-            athlete_stats.expected_weekly_workouts, self.c_external_load_values)
-        athlete_stats.chronic_external_high_intensity_load = self.get_standard_error_range(
-            athlete_stats.expected_weekly_workouts, self.c_high_intensity_values)
-        athlete_stats.chronic_external_mod_intensity_load = self.get_standard_error_range(
-            athlete_stats.expected_weekly_workouts, self.c_mod_intensity_values)
-        athlete_stats.chronic_external_low_intensity_load = self.get_standard_error_range(
-            athlete_stats.expected_weekly_workouts, self.c_low_intensity_values)
+        #athlete_stats.chronic_external_total_load = self.get_standard_error_range(
+        #    athlete_stats.expected_weekly_workouts, self.c_external_load_values)
+        #athlete_stats.chronic_external_high_intensity_load = self.get_standard_error_range(
+        #    athlete_stats.expected_weekly_workouts, self.c_high_intensity_values)
+        #athlete_stats.chronic_external_mod_intensity_load = self.get_standard_error_range(
+        #    athlete_stats.expected_weekly_workouts, self.c_mod_intensity_values)
+        #athlete_stats.chronic_external_low_intensity_load = self.get_standard_error_range(
+        #    athlete_stats.expected_weekly_workouts, self.c_low_intensity_values)
 
-        athlete_stats.external_acwr = self.get_acwr(athlete_stats.acute_external_total_load,
-                                                    athlete_stats.chronic_external_total_load)
+        #athlete_stats.external_acwr = self.get_acwr(athlete_stats.acute_external_total_load,
+        #                                            athlete_stats.chronic_external_total_load)
 
         athlete_stats.internal_acwr = self.get_acwr(athlete_stats.acute_internal_total_load,
                                                     athlete_stats.chronic_internal_total_load)
@@ -376,9 +376,9 @@ class TrainingVolumeProcessing(object):
             athlete_stats.acute_internal_total_load,
             athlete_stats.chronic_internal_total_load)
 
-        athlete_stats.external_freshness_index = self.get_freshness_index(
-            athlete_stats.acute_external_total_load,
-            athlete_stats.chronic_external_total_load)
+        #athlete_stats.external_freshness_index = self.get_freshness_index(
+        #    athlete_stats.acute_external_total_load,
+        #    athlete_stats.chronic_external_total_load)
 
         athlete_stats.historical_internal_strain = historical_internal_strain
 
