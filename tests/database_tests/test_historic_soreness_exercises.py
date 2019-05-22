@@ -285,6 +285,21 @@ def calc_active_time_comprehensive(exercise_dictionary):
 
     return active_time
 
+def get_insights_string(insights):
+
+    output = ""
+
+    j = 0
+
+    for i in insights:
+        if j > 0:
+            output += ';'
+        output += "trigger="+str(i.trigger_type.value)+"-"
+        output += "goals=" + '**'.join(i.goal_targeted)
+        j += 1
+
+    return output
+
 def convert_alerts_to_easy_list(alerts):
 
     alert_list = list(str(a.trigger_type.value) for a in alerts)
@@ -303,7 +318,7 @@ def get_alerts_ctas_goals_string(daily_plan):
     output += ";".join(daily_plan.trends.response.goals) + ","
     output += ";".join(convert_alerts_to_easy_list(daily_plan.trends.biomechanics.alerts)) + ","
     output += ";".join(daily_plan.trends.biomechanics.cta) + ","
-    output += ";".join(daily_plan.trends.biomechanics.goals) + ","
+    output += ";".join(daily_plan.trends.biomechanics.goals) 
 
     return output
 
@@ -375,8 +390,8 @@ def test_pre_active_rest_limited_body_parts():
         s1 = open('../../output/' + 'summary_' + test_parm.file_name + "_a.csv", 'w')
         f2 = open('../../output/' + test_parm.file_name + "_b.csv", 'w')
         s2 = open('../../output/' + 'summary_' + test_parm.file_name + "_b.csv", 'w')
-        line = ('BodyPart,is_pain,severity,hs_status,default_plan'+
-                'biomechanics_triggers,biomechanics_ctas, biomechanics_goals,response_triggers,response_cts,response_goals,stress_triggers,stress_ctas,stress_goals,'+
+        line = ('BodyPart,is_pain,severity,hs_status,default_plan,insights,'+
+                't:biomechanics_triggers,t:biomechanics_ctas, t:biomechanics_goals,t:response_triggers,t:response_ctas,t:response_goals,t:stress_triggers,t:stress_ctas,t:stress_goals,'+
                 'inhibit_goals_triggers,inhibit_minutes_efficient,inhibit_miniutes_complete, inhibit_minutes_comprehensive,'+
                 'inhibit_exercises,static_stretch_goals_triggers,static_stretch_minutes_efficient,'+
                 'static_stretch_minutes_complete,static_stretch_minutes_comprehensive, static_stretch_exercises,' +
@@ -386,8 +401,9 @@ def test_pre_active_rest_limited_body_parts():
                 'isolated_activate_exercises,static_integrate_goals_triggers,static_integrate_minutes_efficient, '+
                 'static_integrate_minutes_complete,static_integrate_minutes_comprehensive, static_integrate_exercises,'+
                 'total_minutes_efficient, total_minutes_complete, total_minutes_comprehensive')
-        sline = ('BodyPart,is_pain,severity,hs_status,heat, pre_active_rest, post_active_rest, cooldown, ice, cold_water_immersion,'+
-                'biomechanics_triggers,biomechanics_ctas, biomechanics_goals,response_triggers,response_cts,response_goals,stress_triggers,stress_ctas,stress_goals')
+        sline = ('BodyPart,is_pain,severity,hs_status,default_plan,insights,' +
+                 't:biomechanics_triggers,t:biomechanics_ctas,t:biomechanics_goals,t:response_triggers,t:response_ctas,t:response_goals,t:stress_triggers,t:stress_ctas,t:stress_goals,'+
+                 'heat, pre_active_rest, post_active_rest, cooldown, ice, cold_water_immersion')
         f1.write(line + '\n')
         s1.write(sline + '\n')
         f2.write(line + '\n')
@@ -416,6 +432,8 @@ def test_pre_active_rest_limited_body_parts():
 
                         daily_plan = create_plan(test_parameter=test_parm, body_part_list=[b1], severity_list=[m1], side_list=[1],
                                                  pain_list=[p], train_later=test_parm.train_later, historic_soreness_list=[historic_soreness])
+
+                        insights_string = get_insights_string(daily_plan.insights)
 
                         alert_cta_goal_line = get_alerts_ctas_goals_string(daily_plan)
 
@@ -475,9 +493,9 @@ def test_pre_active_rest_limited_body_parts():
                             plan_obj.static_integrate_exercises)
                         comprehensive_total_minutes = comprehensive_inhibit_minutes + comprehensive_static_stretch_minutes + comprehensive_active_stretch_minutes + comprehensive_isolated_activate_minutes + comprehensive_static_integrate_minutes
 
-                        sline = body_part_line + ',' + alert_cta_goal_line + get_summary_string(daily_plan)
+                        sline = body_part_line + ',' + insights_string + ',' + alert_cta_goal_line + ',' + get_summary_string(daily_plan)
 
-                        line = (body_part_line + ',' + alert_cta_goal_line +
+                        line = (body_part_line + ',' + insights_string + ',' + alert_cta_goal_line + ',' +
 
                                 ' ** '.join(inhibit_goals_triggers) + ',' +
 
