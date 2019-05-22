@@ -130,6 +130,7 @@ class HistoricSoreness(BaseSoreness, Serialisable):
         # self.historic_soreness_status = HistoricSorenessStatus.dormant_cleared
         self.is_pain = is_pain
         self.side = side
+        self.user_id = None
         self.streak = 0
         self.streak_start_date = None
         self.average_severity = 0.0
@@ -156,7 +157,7 @@ class HistoricSoreness(BaseSoreness, Serialisable):
                     value = parse_date(value)
         super().__setattr__(name, value)
 
-    def json_serialise(self, api=False):
+    def json_serialise(self, api=False, cleared=False):
         if api:
             ret = {"body_part": self.body_part_location.value,
                    "side": self.side,
@@ -183,11 +184,14 @@ class HistoricSoreness(BaseSoreness, Serialisable):
                    'ask_persistent_2_question': self.ask_persistent_2_question,
                    'cause': self.cause.value
                   }
+            if cleared:
+                ret['user_id'] = self.user_id
         return ret
 
     @classmethod
     def json_deserialise(cls, input_dict):
         soreness = cls(BodyPartLocation(input_dict['body_part_location']), input_dict.get('side', None), input_dict.get('is_pain', False))
+        soreness.user_id = input_dict.get('user_id', None)
         hist_sore_status = input_dict.get('historic_soreness_status', None)
         soreness.historic_soreness_status = HistoricSorenessStatus(hist_sore_status) if hist_sore_status is not None else HistoricSorenessStatus.dormant_cleared
         soreness.streak = input_dict.get('streak', 0)
