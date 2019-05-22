@@ -227,7 +227,10 @@ class ExerciseAssignmentCalculator(object):
                 cool_down.aggregate_dosages()
             #    break
 
-            return [cool_down]
+            if cool_down is not None:
+                return [cool_down]
+            else:
+                return []
         else:
             return []
 
