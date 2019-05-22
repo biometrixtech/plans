@@ -105,6 +105,7 @@ class VisualizationTitle(object):
 class Trend(object):
     def __init__(self, trigger_type):
         self.trigger_type = trigger_type
+        self.insight_type = InsightType.stress
         self.title = ""
         self.text = ""
         self.visualization_title = VisualizationTitle()
@@ -128,7 +129,8 @@ class Trend(object):
             'body_parts': [body_part.json_serialise() for body_part in self.body_parts],
             'sport_names': [sport_name.value for sport_name in self.sport_names],
             'data': [data.json_serialise() for data in self.data],
-            'data_source': self.data_source.value
+            'data_source': self.data_source.value,
+            'insight_type': self.insight_type.value
         }
         return ret
 
@@ -144,6 +146,7 @@ class Trend(object):
         trend.body_parts = [BodyPartSide.json_deserialise(body_part) for body_part in input_dict['body_parts']]
         trend.sport_names = [SportName(sport_name) for sport_name in input_dict['sport_names']]
         trend.data_source = DataSource(input_dict.get('data_source', 0))
+        trend.insight_type = InsightType(input_dict.get('insight_type', 0))
         if trend.visualization_type == VisualizationType.load:
             trend.data = []
         elif trend.visualization_type == VisualizationType.session:
@@ -192,6 +195,7 @@ class Trend(object):
         text = trend_data['ongoing_body']
         self.text = TextGenerator.get_cleaned_text(text, goals=self.goal_targeted, body_parts=self.body_parts, sport_names=self.sport_names)
         self.title = TextGenerator.get_cleaned_text(title, goals=self.goal_targeted, body_parts=self.body_parts, sport_names=self.sport_names)
+        self.insight_type = InsightType[trigger_data['trend_type'].lower()]
 
 
 class TrendCategory(object):
