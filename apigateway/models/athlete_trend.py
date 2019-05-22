@@ -117,6 +117,7 @@ class Trend(object):
         self.data_source = DataSource(0)
         self.data = []
         self.cta = []
+        self.priority = 0
 
     def json_serialise(self):
         ret = {
@@ -132,7 +133,8 @@ class Trend(object):
             'data': [data.json_serialise() for data in self.data],
             'data_source': self.data_source.value,
             'insight_type': self.insight_type.value,
-            'cta': self.cta
+            'cta': self.cta,
+            'priority': self.priority
         }
         return ret
 
@@ -149,6 +151,7 @@ class Trend(object):
         trend.sport_names = [SportName(sport_name) for sport_name in input_dict['sport_names']]
         trend.data_source = DataSource(input_dict.get('data_source', 0))
         trend.insight_type = InsightType(input_dict.get('insight_type', 0))
+        trend.priority = input_dict.get('priority', 0)
         trend.cta = input_dict.get('cta', [])
         if trend.visualization_type == VisualizationType.load:
             trend.data = []
@@ -197,6 +200,7 @@ class Trend(object):
         self.text = TextGenerator.get_cleaned_text(text, goals=self.goal_targeted, body_parts=self.body_parts, sport_names=self.sport_names)
         self.title = TextGenerator.get_cleaned_text(title, goals=self.goal_targeted, body_parts=self.body_parts, sport_names=self.sport_names)
         self.insight_type = InsightType[trigger_data['trend_type'].lower()]
+        self.priority = int(trigger_data['insight_priority_trend_type'])
         if cta_data['heat']:
             self.cta.append('heat')
         if cta_data['warmup']:
@@ -270,6 +274,35 @@ class TrendCategory(object):
             cta.proximity = cta_data['proximity'][self.insight_type.name]
             self.cta.append(cta)
 
+    def check_no_trend(self):
+        data_sources = [alert.data_source for alert in self.alerts]
+        if self.insight_type == InsightType.stress:
+            if DataSource.training_volume not in data_sources:
+                trend = Trend(TriggerType(201))
+                trend.add_data()
+                self.alerts.append(trend)
+        elif self.insight_type == InsightType.response:
+            if DataSource.soreness not in data_sources:
+                trend = Trend(TriggerType(202))
+                trend.add_data()
+                self.alerts.append(trend)
+            if DataSource.pain not in data_sources:
+                trend = Trend(TriggerType(203))
+                trend.add_data()
+                self.alerts.append(trend)
+        elif self.insight_type == InsightType.biomechanics:
+            if DataSource.soreness not in data_sources:
+                trend = Trend(TriggerType(205))
+                trend.add_data()
+                self.alerts.append(trend)
+            if DataSource.pain not in data_sources:
+                trend = Trend(TriggerType(206))
+                trend.add_data()
+                self.alerts.append(trend)
+
+    def sort_trends(self):
+        self.alerts = sorted(self.alerts, key=lambda x: (x.priority))
+
 
 class TrendsDashboard(object):
     def __init__(self):
@@ -319,35 +352,16 @@ class AthleteTrends(object):
         self.stress.get_cta()
         self.response.get_cta()
         self.biomechanics.get_cta()
-        # stress_cta_names = [alert.cta for alert in self.response.alerts]
-        # stress_cta_names = set([item for items in stress_cta_names for item in items])
-        # for cta_name in stress_cta_names:
-        #     cta = CallToAction(cta_name)
-        #     self.stress.cta.append(cta)
-        #
-        # response_cta_names = [alert.cta for alert in self.response.alerts]
-        # response_cta_names = set([item for items in response_cta_names for item in items])
-        # for cta_name in response_cta_names:
-        #     cta = CallToAction(cta_name)
-        #     self.response.cta.append(cta)
-        #
-        # biomechanics_cta_names = [alert.cta for alert in self.response.alerts]
-        # biomechanics_cta_names = set([item for items in biomechanics_cta_names for item in items])
-        # for cta_name in biomechanics_cta_names:
-        #     cta = CallToAction(cta_name)
-        #     self.biomechanics.cta.append(cta)
-        # for alert in self.stress.alerts:
-        #     for cta_name in alert.cta:
-        #         cta = CallToAction(cta_name)
-        #         self.stress.cta.append(cta)
-        # for alert in self.response.alerts:
-        #     for cta_name in alert.cta:
-        #         cta = CallToAction(cta_name)
-        #         self.response.cta.append(cta)
-        # for alert in self.biomechanics.alerts:
-        #     for cta_name in alert.cta:
-        #         cta = CallToAction(cta_name)
-        #         self.biomechanics.cta.append(cta)
+
+    def add_no_trigger(self):
+        self.stress.check_no_trend()
+        self.response.check_no_trend()
+        self.biomechanics.check_no_trend()
+
+    def sort_by_priority(self):
+        self.stress.sort_trends()
+        self.response.sort_trends()
+        self.biomechanics.sort_trends()
 
 
 class TextGenerator(object):
