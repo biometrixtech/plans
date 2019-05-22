@@ -930,16 +930,16 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
             if not soreness.is_joint():
                 #goal.trigger = "Painful joint reported today"
                 if soreness.severity < 3:
-                    goal.trigger_type = TriggerType.pain_today  # 14
+                    goal.trigger_type = TriggerType.no_hist_pain_pain_today_severity_1_2  # 14
                 else:
-                    goal.trigger_type = TriggerType.pain_today_high  # 15
+                    goal.trigger_type = TriggerType.no_hist_pain_pain_today_high_severity_3_5  # 15
                 synergist_priority = "1"
             else:
                 #goal.trigger = "Painful muscle reported today"
                 if soreness.severity < 3:
-                    goal.trigger_type = TriggerType.pain_today  # 14
+                    goal.trigger_type = TriggerType.no_hist_pain_pain_today_severity_1_2  # 14
                 else:
-                    goal.trigger_type = TriggerType.pain_today_high  # 15
+                    goal.trigger_type = TriggerType.no_hist_pain_pain_today_high_severity_3_5  # 15
                 synergist_priority = "2"
             if body_part is not None:
                 alert = Alert(goal)
@@ -1245,16 +1245,16 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
             if soreness.is_joint():
                 #goal.trigger = "Painful joint reported today"
                 if soreness.severity < 3:
-                    goal.trigger_type = TriggerType.pain_today  # 14
+                    goal.trigger_type = TriggerType.no_hist_pain_pain_today_severity_1_2  # 14
                 else:
-                    goal.trigger_type = TriggerType.pain_today_high  # 15
+                    goal.trigger_type = TriggerType.no_hist_pain_pain_today_high_severity_3_5  # 15
                 synergist_priority = "1"
             else:
                 #goal.trigger = "Painful muscle reported today"
                 if soreness.severity < 3:
-                    goal.trigger_type = TriggerType.pain_today  # 14
+                    goal.trigger_type = TriggerType.no_hist_pain_pain_today_severity_1_2  # 14
                 else:
-                    goal.trigger_type = TriggerType.pain_today_high  # 15
+                    goal.trigger_type = TriggerType.no_hist_pain_pain_today_high_severity_3_5  # 15
                 synergist_priority = "2"
 
             if body_part is not None:

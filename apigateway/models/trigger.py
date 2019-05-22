@@ -16,8 +16,8 @@ class TriggerType(IntEnum):
     sore_today_doms = 11  # "Soreness Reported Today as DOMs"
     hist_sore_less_30_sore_today = 12  # "Pers, Pers-2 Soreness < 30d + Soreness reported today"
     hist_sore_greater_30_sore_today = 13  # "Pers, Pers-2 Soreness > 30d + Soreness Reported Today"
-    pain_today = 14  # "Pain reported today"
-    pain_today_high = 15  # "Pain reported today high severity"
+    no_hist_pain_pain_today_severity_1_2 = 14  # "Pain reported today"
+    no_hist_pain_pain_today_high_severity_3_5 = 15  # "Pain reported today high severity"
     hist_pain = 16  # "Acute, Pers, Pers-2 Pain"
     hist_pain_sport = 17  # "Acute, Pers, Pers_2 Pain + Correlated to Sport"
     pain_injury = 18  # 'Pain - Injury'
@@ -25,6 +25,19 @@ class TriggerType(IntEnum):
     hist_sore_greater_30_sport = 20  # "Pers, Pers-2 Soreness > 30d + Correlated to Sport"
     pers_pers2_pain_less_30_no_pain_today = 21
     pers_pers2_pain_greater_30_no_pain_today = 22
+    hist_pain_pain_today_severity_1_2 = 23
+    hist_pain_pain_today_severity_3_5 = 24
+    response_fatigue_within_a_session_torso_loading_pattern = 101
+    response_poor_response_within_a_session_torso_loading_pattern = 102
+    biomechanics_fatigue_within_a_session_torso_loading_pattern = 103
+    biomechanics_poor_response_within_a_session_torso_loading_pattern = 104
+    stress_no_triggers_flagged_based_on_training_volume = 201
+    response_no_triggers_flagged_based_on_soreness = 202
+    response_no_triggers_flagged_based_on_pain = 203
+    response_no_triggers_flagged_based_on_3_sensor = 204
+    biomechanics_no_triggers_flagged_based_on_soreness = 205
+    biomechanics_no_triggers_flagged_based_on_pain = 206
+    biomechanics_no_triggers_flagged_based_on_3_sensor = 207
 
     def is_grouped_trigger(self):
         if self.value in [1, 2, 7, 8, 14, 15, 16, 19, 23, 24]:

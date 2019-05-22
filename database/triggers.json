@@ -1,7 +1,7 @@
 {
-    "triggers": [
-        {
-            "trigger_enum": "",
+    "triggers": {
+        "201": {
+            "trigger_enum": 201,
             "trend_type": "Stress",
             "triggers": "No triggers flagged based on training volume",
             "goal_names": "",
@@ -10,11 +10,11 @@
             "insight_priority_plans": "",
             "insight_priority_trend_type": "7",
             "plans": {
-                "priority_styling": "",
+                "priority_styling": 0,
                 "content_to_pass": "",
-                "present_in_plans": "",
+                "present_in_plans": true,
                 "parent_data": {
-                    "enum": "",
+                    "enum": null,
                     "new_first_time_title": "",
                     "new_first_time_body": "",
                     "new_subsequent_title": "",
@@ -31,12 +31,12 @@
                 "cleared_title": ""
             },
             "trends": {
-                "priority_styling": "",
+                "priority_styling": 0,
                 "content_to_pass": "",
-                "present_in_trends": "TRUE",
+                "present_in_trends": true,
                 "new_title": "All Good!",
-                "new_body": "",
-                "ongoing_title": "",
+                "new_body": "We haven't noticed any sign of increased recovery need. We'll let you know if we see any meaningful patterns or trends.",
+                "ongoing_title": "All Good!",
                 "ongoing_body": "We haven't noticed any sign of increased recovery need. We'll let you know if we see any meaningful patterns or trends.",
                 "pos_change_title": "",
                 "pos_change_body": "",
@@ -47,24 +47,24 @@
             },
             "plots": {
                 "unit_of_aggregation": "Aggregate the Session(s) to per day",
-                "visualization_type": "1",
-                "visualization_range": "7",
+                "visualization_type": 1,
+                "visualization_range": 7,
                 "overlay_variable": "relative load per day (no overlay)",
                 "title": "Your Training History"
             },
             "cta": {
                 "input": "",
-                "heat": "",
-                "warmup": "",
-                "cooldown": "",
-                "active_rest": "",
-                "ice": "",
-                "cwi": "",
+                "heat": false,
+                "warmup": false,
+                "cooldown": false,
+                "active_rest": false,
+                "ice": false,
+                "cwi": false,
                 "increase_default": ""
             }
         },
-        {
-            "trigger_enum": "0",
+        "0": {
+            "trigger_enum": 0,
             "trend_type": "Stress",
             "triggers": "High Load",
             "goal_names": "Recover from {sport_name}",
@@ -73,11 +73,11 @@
             "insight_priority_plans": "9",
             "insight_priority_trend_type": "1",
             "plans": {
-                "priority_styling": "",
+                "priority_styling": 0,
                 "content_to_pass": "{goal}",
-                "present_in_plans": "TRUE",
+                "present_in_plans": true,
                 "parent_data": {
-                    "enum": "",
+                    "enum": null,
                     "new_first_time_title": "",
                     "new_first_time_body": "",
                     "new_subsequent_title": "",
@@ -88,18 +88,18 @@
                     "new_first_time_title": "Get the greatest gains from your training",
                     "new_first_time_body": "So we added activities to {goal} ",
                     "new_subsequent_title": "Get the greatest gains from your training",
-                    "new_subsequent_body": "SAME AS FIRST TIME",
+                    "new_subsequent_body": "So we added activities to {goal} ",
                     "cleared_body": ""
                 },
                 "cleared_title": ""
             },
             "trends": {
-                "priority_styling": "",
+                "priority_styling": 0,
                 "content_to_pass": "{goal}",
-                "present_in_trends": "TRUE",
-                "new_title": "SAME AS PLANS INSIGHT TITLE",
-                "new_body": "",
-                "ongoing_title": "",
+                "present_in_trends": true,
+                "new_title": "Get the greatest gains from your training",
+                "new_body": "Make more positive- you worked hard, now recover to make the most of your training.",
+                "ongoing_title": "Get the greatest gains from your training",
                 "ongoing_body": "Make more positive- you worked hard, now recover to make the most of your training.",
                 "pos_change_title": "",
                 "pos_change_body": "",
@@ -110,59 +110,59 @@
             },
             "plots": {
                 "unit_of_aggregation": "Aggregate the Session(s) to per day",
-                "visualization_type": "2",
-                "visualization_range": "7",
+                "visualization_type": 2,
+                "visualization_range": 7,
                 "overlay_variable": "Highlight high load days",
                 "title": "Personal High Loads"
             },
             "cta": {
                 "input": "Sport",
-                "heat": "",
-                "warmup": "",
-                "cooldown": "x",
-                "active_rest": "x",
-                "ice": "",
-                "cwi": "",
+                "heat": false,
+                "warmup": false,
+                "cooldown": true,
+                "active_rest": true,
+                "ice": false,
+                "cwi": false,
                 "increase_default": ""
             }
         },
-        {
-            "trigger_enum": "1",
+        "1": {
+            "trigger_enum": 1,
             "trend_type": "Stress",
             "triggers": "Sore (Pers >30d, Pers_2 > 30d)  + Logged High Load",
             "goal_names": "Mitigate Effects of Imbalance",
             "length_of_impact": "Single Day",
-            "data_source_all_good": "",
+            "data_source_all_good": "soreness",
             "insight_priority_plans": "11",
             "insight_priority_trend_type": "4",
             "plans": {
-                "priority_styling": "",
+                "priority_styling": 0,
                 "content_to_pass": "{goal}",
-                "present_in_plans": "TRUE",
+                "present_in_plans": true,
                 "parent_data": {
-                    "enum": "3",
+                    "enum": 3,
                     "new_first_time_title": "Your Workout May Aggrevate Symptoms ",
                     "new_first_time_body": "So we added activities to {goal}",
-                    "new_subsequent_title": "",
-                    "new_subsequent_body": "",
+                    "new_subsequent_title": "Your Workout May Aggrevate Symptoms ",
+                    "new_subsequent_body": "So we added activities to {goal}",
                     "cleared_body": ""
                 },
                 "child_data": {
                     "new_first_time_title": "Your Workout May Aggrevate Symptoms ",
                     "new_first_time_body": "So we added activities to {goal}",
                     "new_subsequent_title": "Your Workout May Aggrevate Symptoms ",
-                    "new_subsequent_body": "SAME AS FIRST TIME",
+                    "new_subsequent_body": "So we added activities to {goal}",
                     "cleared_body": ""
                 },
                 "cleared_title": ""
             },
             "trends": {
-                "priority_styling": "",
+                "priority_styling": 0,
                 "content_to_pass": "",
-                "present_in_trends": "TRUE",
-                "new_title": "SAME AS PLANS INSIGHT TITLE",
-                "new_body": "",
-                "ongoing_title": "",
+                "present_in_trends": true,
+                "new_title": "Your Workout May Aggrevate Symptoms ",
+                "new_body": "Based on your training history, this workout may trigger [moderate/severe] Delayed Onset Muscle Soreness (DOMS) tomorrow.",
+                "ongoing_title": "Your Workout May Aggrevate Symptoms ",
                 "ongoing_body": "Based on your training history, this workout may trigger [moderate/severe] Delayed Onset Muscle Soreness (DOMS) tomorrow.",
                 "pos_change_title": "",
                 "pos_change_body": "",
@@ -173,59 +173,59 @@
             },
             "plots": {
                 "unit_of_aggregation": "Unique per body part",
-                "visualization_type": "3",
-                "visualization_range": "7",
+                "visualization_type": 3,
+                "visualization_range": 7,
                 "overlay_variable": "Max Severity of Soreness reported per day for single body part",
                 "title": "Movement Imbalances Causing Soreness in your {bodypart}"
             },
             "cta": {
                 "input": "Body Part",
-                "heat": "",
-                "warmup": "",
-                "cooldown": "",
-                "active_rest": "",
-                "ice": "x",
-                "cwi": "",
+                "heat": false,
+                "warmup": false,
+                "cooldown": false,
+                "active_rest": false,
+                "ice": true,
+                "cwi": false,
                 "increase_default": ""
             }
         },
-        {
-            "trigger_enum": "2",
+        "2": {
+            "trigger_enum": 2,
             "trend_type": "Stress",
             "triggers": "Pain (Acute, Pers, Pers_2) + Logged High Load",
             "goal_names": "Mitigate Effects of Imbalance",
             "length_of_impact": "Single Day",
-            "data_source_all_good": "",
+            "data_source_all_good": "pain",
             "insight_priority_plans": "11",
             "insight_priority_trend_type": "2",
             "plans": {
-                "priority_styling": "",
+                "priority_styling": 0,
                 "content_to_pass": "{goal}",
-                "present_in_plans": "TRUE",
+                "present_in_plans": true,
                 "parent_data": {
-                    "enum": "3",
+                    "enum": 3,
                     "new_first_time_title": "Your Workout May Aggrevate Symptoms ",
                     "new_first_time_body": "So we added activities to {goal}",
-                    "new_subsequent_title": "",
-                    "new_subsequent_body": "",
+                    "new_subsequent_title": "Your Workout May Aggrevate Symptoms ",
+                    "new_subsequent_body": "So we added activities to {goal}",
                     "cleared_body": ""
                 },
                 "child_data": {
                     "new_first_time_title": "Your Workout May Aggrevate Symptoms ",
                     "new_first_time_body": "So we added activities to {goal}",
-                    "new_subsequent_title": "Your Workout May Aggrevate Pain",
-                    "new_subsequent_body": "SAME AS FIRST TIME",
+                    "new_subsequent_title": "Your Workout May Aggrevate Symptoms ",
+                    "new_subsequent_body": "So we added activities to {goal}",
                     "cleared_body": ""
                 },
                 "cleared_title": ""
             },
             "trends": {
-                "priority_styling": "",
+                "priority_styling": 0,
                 "content_to_pass": "",
-                "present_in_trends": "TRUE",
-                "new_title": "SAME AS PLANS INSIGHT TITLE",
-                "new_body": "",
-                "ongoing_title": "",
+                "present_in_trends": true,
+                "new_title": "Your Workout May Aggrevate Symptoms ",
+                "new_body": "Based on your training history, this workout may trigger [moderate/severe] Delayed Onset Muscle Soreness (DOMS) tomorrow.",
+                "ongoing_title": "Your Workout May Aggrevate Symptoms ",
                 "ongoing_body": "Based on your training history, this workout may trigger [moderate/severe] Delayed Onset Muscle Soreness (DOMS) tomorrow.",
                 "pos_change_title": "",
                 "pos_change_body": "",
@@ -236,24 +236,24 @@
             },
             "plots": {
                 "unit_of_aggregation": "Unique per body part",
-                "visualization_type": "3",
-                "visualization_range": "7",
+                "visualization_type": 3,
+                "visualization_range": 7,
                 "overlay_variable": "Max Severity of Pain reported per day for single body part",
                 "title": "Proactively Care Needed for Pain in your {bodypart}"
             },
             "cta": {
                 "input": "Body Part",
-                "heat": "",
-                "warmup": "",
-                "cooldown": "",
-                "active_rest": "",
-                "ice": "x",
-                "cwi": "",
+                "heat": false,
+                "warmup": false,
+                "cooldown": false,
+                "active_rest": false,
+                "ice": true,
+                "cwi": false,
                 "increase_default": ""
             }
         },
-        {
-            "trigger_enum": "",
+        "202": {
+            "trigger_enum": 202,
             "trend_type": "Response",
             "triggers": "No triggers flagged based on soreness",
             "goal_names": "",
@@ -262,11 +262,11 @@
             "insight_priority_plans": "",
             "insight_priority_trend_type": "18",
             "plans": {
-                "priority_styling": "",
+                "priority_styling": 0,
                 "content_to_pass": "",
-                "present_in_plans": "",
+                "present_in_plans": true,
                 "parent_data": {
-                    "enum": "",
+                    "enum": null,
                     "new_first_time_title": "",
                     "new_first_time_body": "",
                     "new_subsequent_title": "",
@@ -283,12 +283,12 @@
                 "cleared_title": ""
             },
             "trends": {
-                "priority_styling": "",
+                "priority_styling": 0,
                 "content_to_pass": "",
-                "present_in_trends": "TRUE",
+                "present_in_trends": true,
                 "new_title": "All Good!",
-                "new_body": "",
-                "ongoing_title": "",
+                "new_body": "Your soreness reporting seems normal. We'll keep monitoring & will let you know if we see any signs of overreaching or underrecovery.",
+                "ongoing_title": "All Good!",
                 "ongoing_body": "Your soreness reporting seems normal. We'll keep monitoring & will let you know if we see any signs of overreaching or underrecovery.",
                 "pos_change_title": "",
                 "pos_change_body": "",
@@ -299,24 +299,24 @@
             },
             "plots": {
                 "unit_of_aggregation": "per day, considering all body parts",
-                "visualization_type": "3",
-                "visualization_range": "7",
+                "visualization_type": 3,
+                "visualization_range": 7,
                 "overlay_variable": "Max Severity of Soreness reported per day for all body parts",
                 "title": "Your Soreness History"
             },
             "cta": {
                 "input": "",
-                "heat": "",
-                "warmup": "",
-                "cooldown": "",
-                "active_rest": "",
-                "ice": "",
-                "cwi": "",
+                "heat": false,
+                "warmup": false,
+                "cooldown": false,
+                "active_rest": false,
+                "ice": false,
+                "cwi": false,
                 "increase_default": ""
             }
         },
-        {
-            "trigger_enum": "",
+        "203": {
+            "trigger_enum": 203,
             "trend_type": "Response",
             "triggers": "No triggers flagged based on pain",
             "goal_names": "",
@@ -325,11 +325,11 @@
             "insight_priority_plans": "",
             "insight_priority_trend_type": "17",
             "plans": {
-                "priority_styling": "",
+                "priority_styling": 0,
                 "content_to_pass": "",
-                "present_in_plans": "",
+                "present_in_plans": true,
                 "parent_data": {
-                    "enum": "",
+                    "enum": null,
                     "new_first_time_title": "",
                     "new_first_time_body": "",
                     "new_subsequent_title": "",
@@ -346,12 +346,12 @@
                 "cleared_title": ""
             },
             "trends": {
-                "priority_styling": "",
+                "priority_styling": 0,
                 "content_to_pass": "",
-                "present_in_trends": "TRUE",
+                "present_in_trends": true,
                 "new_title": "All Good!",
-                "new_body": "",
-                "ongoing_title": "",
+                "new_body": "No pain-related findings. We'll keep monitoring & will let you know if we find any meaningful patterns or trends.",
+                "ongoing_title": "All Good!",
                 "ongoing_body": "No pain-related findings. We'll keep monitoring & will let you know if we find any meaningful patterns or trends.",
                 "pos_change_title": "",
                 "pos_change_body": "",
@@ -362,24 +362,24 @@
             },
             "plots": {
                 "unit_of_aggregation": "per day, considering all body parts",
-                "visualization_type": "3",
-                "visualization_range": "7",
+                "visualization_type": 3,
+                "visualization_range": 7,
                 "overlay_variable": "Max Severity of Pain reported per day for all body parts",
                 "title": "Your Pain History"
             },
             "cta": {
                 "input": "",
-                "heat": "",
-                "warmup": "",
-                "cooldown": "",
-                "active_rest": "",
-                "ice": "",
-                "cwi": "",
+                "heat": false,
+                "warmup": false,
+                "cooldown": false,
+                "active_rest": false,
+                "ice": false,
+                "cwi": false,
                 "increase_default": ""
             }
         },
-        {
-            "trigger_enum": "",
+        "204": {
+            "trigger_enum": 204,
             "trend_type": "Response",
             "triggers": "No triggers flagged based on 3sensor",
             "goal_names": "",
@@ -388,11 +388,11 @@
             "insight_priority_plans": "",
             "insight_priority_trend_type": "16",
             "plans": {
-                "priority_styling": "",
+                "priority_styling": 0,
                 "content_to_pass": "",
-                "present_in_plans": "",
+                "present_in_plans": true,
                 "parent_data": {
-                    "enum": "",
+                    "enum": null,
                     "new_first_time_title": "",
                     "new_first_time_body": "",
                     "new_subsequent_title": "",
@@ -409,12 +409,12 @@
                 "cleared_title": ""
             },
             "trends": {
-                "priority_styling": "",
+                "priority_styling": 0,
                 "content_to_pass": "",
-                "present_in_trends": "TRUE",
+                "present_in_trends": true,
                 "new_title": "All Good!",
-                "new_body": "",
-                "ongoing_title": "",
+                "new_body": "You're biomechanical variables are in a normal range. We'll keep monitoring for any signs of fatigue or compensations. ",
+                "ongoing_title": "All Good!",
                 "ongoing_body": "You're biomechanical variables are in a normal range. We'll keep monitoring for any signs of fatigue or compensations. ",
                 "pos_change_title": "",
                 "pos_change_body": "",
@@ -425,24 +425,24 @@
             },
             "plots": {
                 "unit_of_aggregation": "per session",
-                "visualization_type": "6",
-                "visualization_range": "7",
+                "visualization_type": 6,
+                "visualization_range": 7,
                 "overlay_variable": "Movement Quality max and min of session Severity category per day to define color per day",
                 "title": "Your Biomechanical Response History"
             },
             "cta": {
                 "input": "",
-                "heat": "",
-                "warmup": "",
-                "cooldown": "",
-                "active_rest": "",
-                "ice": "",
-                "cwi": "",
+                "heat": false,
+                "warmup": false,
+                "cooldown": false,
+                "active_rest": false,
+                "ice": false,
+                "cwi": false,
                 "increase_default": ""
             }
         },
-        {
-            "trigger_enum": "8",
+        "8": {
+            "trigger_enum": 8,
             "trend_type": "Response",
             "triggers": "Overreaching as High Muscular Strain",
             "goal_names": "Recover from {sport_name}",
@@ -451,33 +451,33 @@
             "insight_priority_plans": "7",
             "insight_priority_trend_type": "5",
             "plans": {
-                "priority_styling": "",
+                "priority_styling": 0,
                 "content_to_pass": "{goal}",
-                "present_in_plans": "TRUE",
+                "present_in_plans": true,
                 "parent_data": {
-                    "enum": "0",
+                    "enum": 0,
                     "new_first_time_title": "Signs of Poor Adaptation",
                     "new_first_time_body": "We added activities to {goal} because it seems your body is struggling to adequately adapt to your current training cadence. ",
-                    "new_subsequent_title": "SAME AS FIRST TIME",
-                    "new_subsequent_body": "SAME AS FIRST TIME",
+                    "new_subsequent_title": "Signs of Poor Adaptation",
+                    "new_subsequent_body": "We added activities to {goal} because it seems your body is struggling to adequately adapt to your current training cadence. ",
                     "cleared_body": "Your body's been adapting well to training & no-longer trending toward overreaching! We'll update your plan accordingly."
                 },
                 "child_data": {
                     "new_first_time_title": "Signs of Overreaching",
                     "new_first_time_body": "So we added activities to {goal} ",
-                    "new_subsequent_title": "SAME AS FIRST TIME",
-                    "new_subsequent_body": "SAME AS FIRST TIME",
+                    "new_subsequent_title": "Signs of Overreaching",
+                    "new_subsequent_body": "So we added activities to {goal} ",
                     "cleared_body": "Kudos! You've overcome Overraching and are on track for sustainable training! We'll update your plan accordingly."
                 },
                 "cleared_title": "Symptoms Cleared!"
             },
             "trends": {
-                "priority_styling": "",
+                "priority_styling": 0,
                 "content_to_pass": "",
-                "present_in_trends": "TRUE",
+                "present_in_trends": true,
                 "new_title": "Signs of Overreaching",
-                "new_body": "",
-                "ongoing_title": "",
+                "new_body": "The ideal range for Muscular Strain is [range] and you're currently [number].  This quantifies how we'll you're recovering from training-induced muscle damage.",
+                "ongoing_title": "Signs of Overreaching",
                 "ongoing_body": "The ideal range for Muscular Strain is [range] and you're currently [number].  This quantifies how we'll you're recovering from training-induced muscle damage.",
                 "pos_change_title": "Signs of Overreaching [Improving/Worsening]",
                 "pos_change_body": "",
@@ -488,24 +488,24 @@
             },
             "plots": {
                 "unit_of_aggregation": "Yes/No",
-                "visualization_type": "5",
-                "visualization_range": "7",
+                "visualization_type": 5,
+                "visualization_range": 7,
                 "overlay_variable": "Value of Muscular Strain per day Severity category per day to define color per day",
                 "title": "Your Recovery Efficiency"
             },
             "cta": {
                 "input": "",
-                "heat": "",
-                "warmup": "",
-                "cooldown": "",
-                "active_rest": "",
-                "ice": "",
-                "cwi": "",
+                "heat": false,
+                "warmup": false,
+                "cooldown": false,
+                "active_rest": false,
+                "ice": false,
+                "cwi": false,
                 "increase_default": "x Active Rest Active Recovery"
             }
         },
-        {
-            "trigger_enum": "7",
+        "7": {
+            "trigger_enum": 7,
             "trend_type": "Response",
             "triggers": "Sore (Pers <30d, Pers_2 <30d)",
             "goal_names": "Recover from {sport_name}",
@@ -514,33 +514,33 @@
             "insight_priority_plans": "7",
             "insight_priority_trend_type": "12",
             "plans": {
-                "priority_styling": "",
+                "priority_styling": 0,
                 "content_to_pass": "{goal}, {bodypart}",
-                "present_in_plans": "TRUE",
+                "present_in_plans": true,
                 "parent_data": {
-                    "enum": "0",
+                    "enum": 0,
                     "new_first_time_title": "Signs of Poor Adaptation",
                     "new_first_time_body": "We added activities to {goal} because it seems your body is struggling to adequately adapt to your current training cadence. ",
-                    "new_subsequent_title": "SAME AS FIRST TIME",
-                    "new_subsequent_body": "SAME AS FIRST TIME",
+                    "new_subsequent_title": "Signs of Poor Adaptation",
+                    "new_subsequent_body": "We added activities to {goal} because it seems your body is struggling to adequately adapt to your current training cadence. ",
                     "cleared_body": "Your body's been adapting well to training & no-longer trending toward overreaching! We'll update your plan accordingly."
                 },
                 "child_data": {
                     "new_first_time_title": "Signs of {bodypart} Overstressing ",
                     "new_first_time_body": "So we added activities to {goal} ",
-                    "new_subsequent_title": "SAME AS FIRST TIME",
-                    "new_subsequent_body": "SAME AS FIRST TIME",
+                    "new_subsequent_title": "Signs of {bodypart} Overstressing ",
+                    "new_subsequent_body": "So we added activities to {goal} ",
                     "cleared_body": "Good work! Your no longer trending toward overreaching! We'll scale your recommnedations to reflect that!"
                 },
                 "cleared_title": "Symptoms Cleared!"
             },
             "trends": {
-                "priority_styling": "",
+                "priority_styling": 0,
                 "content_to_pass": "",
-                "present_in_trends": "TRUE",
-                "new_title": "SAME AS PLANS INSIGHT TITLE",
-                "new_body": "",
-                "ongoing_title": "",
+                "present_in_trends": true,
+                "new_title": "Signs of {bodypart} Overstressing ",
+                "new_body": "We've noticed a pattern of persistnat soreness which indicates that you may be trending toward Overreaching.",
+                "ongoing_title": "Signs of {bodypart} Overstressing ",
                 "ongoing_body": "We've noticed a pattern of persistnat soreness which indicates that you may be trending toward Overreaching.",
                 "pos_change_title": "{bodypart} Overstressing  [Improving/Worsening] ",
                 "pos_change_body": "",
@@ -551,24 +551,24 @@
             },
             "plots": {
                 "unit_of_aggregation": "Unique per body part",
-                "visualization_type": "3",
-                "visualization_range": "7",
+                "visualization_type": 3,
+                "visualization_range": 7,
                 "overlay_variable": "Max Severity of Soreness reported per day for single body part",
                 "title": "Soreness Pattern in {bodypart}"
             },
             "cta": {
                 "input": "",
-                "heat": "",
-                "warmup": "",
-                "cooldown": "",
-                "active_rest": "",
-                "ice": "",
-                "cwi": "",
+                "heat": false,
+                "warmup": false,
+                "cooldown": false,
+                "active_rest": false,
+                "ice": false,
+                "cwi": false,
                 "increase_default": "x Active Rest Active Recovery"
             }
         },
-        {
-            "trigger_enum": "11",
+        "11": {
+            "trigger_enum": 11,
             "trend_type": "Response",
             "triggers": "Soreness Reported Today (as DOMs) Moderate DOMs = 1-2day, 2-3 severity Severe DOMs = 1-2day, 4-5 severity Minor DOMs = 2nd day, 1 severity  Mild Soreness = 1st day, 1 severity",
             "goal_names": "Care for Soreness",
@@ -577,11 +577,11 @@
             "insight_priority_plans": "8",
             "insight_priority_trend_type": "6",
             "plans": {
-                "priority_styling": "",
+                "priority_styling": 0,
                 "content_to_pass": "{goal}",
-                "present_in_plans": "TRUE",
+                "present_in_plans": true,
                 "parent_data": {
-                    "enum": "",
+                    "enum": null,
                     "new_first_time_title": "",
                     "new_first_time_body": "",
                     "new_subsequent_title": "",
@@ -590,20 +590,20 @@
                 },
                 "child_data": {
                     "new_first_time_title": "How Soreness Turns to Strength:",
-                    "new_first_time_body": "MILD SORENESS, LINKED TO A SESSION We provide {goal} activities to expedite tissue healing & retain range of motion. These become more personalized as we learn about you!",
-                    "new_subsequent_title": "SAME AS FIRST TIME",
-                    "new_subsequent_body": "SAME AS FIRST TIME",
+                    "new_first_time_body": "We provide {goal} activities to expedite tissue healing & retain range of motion. These become more personalized as we learn about you!",
+                    "new_subsequent_title": "How Soreness Turns to Strength:",
+                    "new_subsequent_body": "We provide {goal} activities to expedite tissue healing & retain range of motion. These become more personalized as we learn about you!",
                     "cleared_body": ""
                 },
                 "cleared_title": ""
             },
             "trends": {
-                "priority_styling": "",
+                "priority_styling": 0,
                 "content_to_pass": "[expected number of days with soreness symptoms]",
-                "present_in_trends": "TRUE",
-                "new_title": "SAME AS PLANS INSIGHT TITLE",
-                "new_body": "",
-                "ongoing_title": "",
+                "present_in_trends": true,
+                "new_title": "How Soreness Turns to Strength:",
+                "new_body": "Without proactive recovery, this type of Delayed Onset Muscle Sorenes (DOMS) usually peaks at [severity] and lasts [number of days]. ",
+                "ongoing_title": "How Soreness Turns to Strength:",
                 "ongoing_body": "Without proactive recovery, this type of Delayed Onset Muscle Sorenes (DOMS) usually peaks at [severity] and lasts [number of days]. ",
                 "pos_change_title": "",
                 "pos_change_body": "",
@@ -614,24 +614,24 @@
             },
             "plots": {
                 "unit_of_aggregation": "Yes/No",
-                "visualization_type": "4",
-                "visualization_range": "7",
+                "visualization_type": 4,
+                "visualization_range": 7,
                 "overlay_variable": "Max Severity of Soreness considering all 'overload' body part reported per day Projected number of days sore from today",
                 "title": "Projected Soreness "
             },
             "cta": {
                 "input": "Body Part",
-                "heat": "",
-                "warmup": "",
-                "cooldown": "",
-                "active_rest": "x",
-                "ice": "",
-                "cwi": "x",
+                "heat": false,
+                "warmup": false,
+                "cooldown": false,
+                "active_rest": true,
+                "ice": false,
+                "cwi": true,
                 "increase_default": ""
             }
         },
-        {
-            "trigger_enum": "12",
+        "12": {
+            "trigger_enum": 12,
             "trend_type": "Response",
             "triggers": "Sore (Pers <30d, Pers_2 <30d) + Soreness Reported Today",
             "goal_names": "Care for Soreness",
@@ -640,11 +640,11 @@
             "insight_priority_plans": "10",
             "insight_priority_trend_type": "10",
             "plans": {
-                "priority_styling": "",
+                "priority_styling": 0,
                 "content_to_pass": "",
-                "present_in_plans": "",
+                "present_in_plans": true,
                 "parent_data": {
-                    "enum": "",
+                    "enum": null,
                     "new_first_time_title": "",
                     "new_first_time_body": "",
                     "new_subsequent_title": "",
@@ -661,12 +661,12 @@
                 "cleared_title": ""
             },
             "trends": {
-                "priority_styling": "",
+                "priority_styling": 0,
                 "content_to_pass": "",
-                "present_in_trends": "TRUE",
+                "present_in_trends": true,
                 "new_title": "Soreness Resulting From Weakeness",
-                "new_body": "",
-                "ongoing_title": "",
+                "new_body": "We've noticed a pattern of soreness likely due to {bodypart} weakness. Proactive recovery will expodite tissue healing for faster gains.",
+                "ongoing_title": "Soreness Resulting From Weakeness",
                 "ongoing_body": "We've noticed a pattern of soreness likely due to {bodypart} weakness. Proactive recovery will expodite tissue healing for faster gains.",
                 "pos_change_title": "",
                 "pos_change_body": "",
@@ -677,24 +677,24 @@
             },
             "plots": {
                 "unit_of_aggregation": "Unique per body part",
-                "visualization_type": "3",
-                "visualization_range": "7",
+                "visualization_type": 3,
+                "visualization_range": 7,
                 "overlay_variable": "Max Severity of Soreness reported per day for single body part",
                 "title": "Soreness Pattern in {bodypart}"
             },
             "cta": {
                 "input": "Body Part",
-                "heat": "",
-                "warmup": "",
-                "cooldown": "",
-                "active_rest": "x",
-                "ice": "",
-                "cwi": "",
+                "heat": false,
+                "warmup": false,
+                "cooldown": false,
+                "active_rest": true,
+                "ice": false,
+                "cwi": false,
                 "increase_default": ""
             }
         },
-        {
-            "trigger_enum": "13",
+        "13": {
+            "trigger_enum": 13,
             "trend_type": "Response",
             "triggers": "Sore (Pers >30d, Pers_2 > 30d) + Soreness Reported Today",
             "goal_names": "Care for Soreness",
@@ -703,11 +703,11 @@
             "insight_priority_plans": "10",
             "insight_priority_trend_type": "9",
             "plans": {
-                "priority_styling": "",
+                "priority_styling": 0,
                 "content_to_pass": "",
-                "present_in_plans": "",
+                "present_in_plans": true,
                 "parent_data": {
-                    "enum": "",
+                    "enum": null,
                     "new_first_time_title": "",
                     "new_first_time_body": "",
                     "new_subsequent_title": "",
@@ -724,12 +724,12 @@
                 "cleared_title": ""
             },
             "trends": {
-                "priority_styling": "",
+                "priority_styling": 0,
                 "content_to_pass": "",
-                "present_in_trends": "TRUE",
+                "present_in_trends": true,
                 "new_title": "Soreness Resulting from Imbalance",
-                "new_body": "",
-                "ongoing_title": "",
+                "new_body": "We've noticed an unexpected pattern of {bodypart} soreness which may be due to a functional or movement imbalance.",
+                "ongoing_title": "Soreness Resulting from Imbalance",
                 "ongoing_body": "We've noticed an unexpected pattern of {bodypart} soreness which may be due to a functional or movement imbalance.",
                 "pos_change_title": "",
                 "pos_change_body": "",
@@ -740,24 +740,24 @@
             },
             "plots": {
                 "unit_of_aggregation": "Unique per body part",
-                "visualization_type": "3",
-                "visualization_range": "7",
+                "visualization_type": 3,
+                "visualization_range": 7,
                 "overlay_variable": "Max Severity of Soreness reported per day for single body part",
                 "title": "Soreness Pattern in {bodypart}"
             },
             "cta": {
                 "input": "Body Part",
-                "heat": "",
-                "warmup": "",
-                "cooldown": "",
-                "active_rest": "x",
-                "ice": "x",
-                "cwi": "",
+                "heat": false,
+                "warmup": false,
+                "cooldown": false,
+                "active_rest": true,
+                "ice": true,
+                "cwi": false,
                 "increase_default": ""
             }
         },
-        {
-            "trigger_enum": "14",
+        "14": {
+            "trigger_enum": 14,
             "trend_type": "Response",
             "triggers": "Pain reported today (severity 1, 2) + NOT historic pain",
             "goal_names": "Address Pain",
@@ -766,33 +766,33 @@
             "insight_priority_plans": "1",
             "insight_priority_trend_type": "7",
             "plans": {
-                "priority_styling": "",
+                "priority_styling": 0,
                 "content_to_pass": "{goal}, {bodypart}",
-                "present_in_plans": "TRUE",
+                "present_in_plans": true,
                 "parent_data": {
-                    "enum": "2",
+                    "enum": 2,
                     "new_first_time_title": "Listen to your body",
                     "new_first_time_body": "This pain could be a sign of something wrong. Please avoid & modify movements that cause discomfort or pain.",
-                    "new_subsequent_title": "SAME AS FIRST TIME",
-                    "new_subsequent_body": "SAME AS FIRST TIME",
+                    "new_subsequent_title": "Listen to your body",
+                    "new_subsequent_body": "This pain could be a sign of something wrong. Please avoid & modify movements that cause discomfort or pain.",
                     "cleared_body": ""
                 },
                 "child_data": {
                     "new_first_time_title": "Listen to your body",
                     "new_first_time_body": "So we've added activities to {goal}, but please avoid anything that causes pain or discomfort.",
-                    "new_subsequent_title": "SAME AS FIRST TIME",
-                    "new_subsequent_body": "SAME AS FIRST TIME",
+                    "new_subsequent_title": "Listen to your body",
+                    "new_subsequent_body": "So we've added activities to {goal}, but please avoid anything that causes pain or discomfort.",
                     "cleared_body": ""
                 },
                 "cleared_title": ""
             },
             "trends": {
-                "priority_styling": "",
+                "priority_styling": 0,
                 "content_to_pass": "",
-                "present_in_trends": "TRUE",
-                "new_title": "SAME AS PLANS INSIGHT TITLE",
-                "new_body": "",
-                "ongoing_title": "",
+                "present_in_trends": true,
+                "new_title": "Listen to your body",
+                "new_body": "{bodypart} pain is not normal and typically a sign of misalignments or movement impairments elsewhere.",
+                "ongoing_title": "Listen to your body",
                 "ongoing_body": "{bodypart} pain is not normal and typically a sign of misalignments or movement impairments elsewhere.",
                 "pos_change_title": "",
                 "pos_change_body": "",
@@ -803,24 +803,24 @@
             },
             "plots": {
                 "unit_of_aggregation": "Unique per body part",
-                "visualization_type": "3",
-                "visualization_range": "7",
+                "visualization_type": 3,
+                "visualization_range": 7,
                 "overlay_variable": "Max Severity of Pain reported per day for single body part",
                 "title": "Pain in {bodypart}"
             },
             "cta": {
                 "input": "Body Part",
-                "heat": "",
-                "warmup": "",
-                "cooldown": "",
-                "active_rest": "x",
-                "ice": "x",
-                "cwi": "",
+                "heat": false,
+                "warmup": false,
+                "cooldown": false,
+                "active_rest": true,
+                "ice": true,
+                "cwi": false,
                 "increase_default": "x Active Rest Active Recovery"
             }
         },
-        {
-            "trigger_enum": "15",
+        "15": {
+            "trigger_enum": 15,
             "trend_type": "Response",
             "triggers": "Pain reported today (severity 3-5) + NOT historic pain",
             "goal_names": "Address Pain",
@@ -829,33 +829,33 @@
             "insight_priority_plans": "1",
             "insight_priority_trend_type": "1",
             "plans": {
-                "priority_styling": "TRUE",
+                "priority_styling": 1,
                 "content_to_pass": "",
-                "present_in_plans": "TRUE",
+                "present_in_plans": true,
                 "parent_data": {
-                    "enum": "2",
+                    "enum": 2,
                     "new_first_time_title": "Listen to your body",
                     "new_first_time_body": "This pain could be a sign of something wrong. Please avoid & modify movements that cause discomfort or pain.",
-                    "new_subsequent_title": "SAME AS FIRST TIME",
-                    "new_subsequent_body": "SAME AS FIRST TIME",
+                    "new_subsequent_title": "Listen to your body",
+                    "new_subsequent_body": "This pain could be a sign of something wrong. Please avoid & modify movements that cause discomfort or pain.",
                     "cleared_body": ""
                 },
                 "child_data": {
                     "new_first_time_title": "Listen to your body",
                     "new_first_time_body": "This pain could be a sign of something wrong. Please avoid & modify movements that cause discomfort or pain.",
-                    "new_subsequent_title": "SAME AS FIRST TIME",
-                    "new_subsequent_body": "SAME AS FIRST TIME",
+                    "new_subsequent_title": "Listen to your body",
+                    "new_subsequent_body": "This pain could be a sign of something wrong. Please avoid & modify movements that cause discomfort or pain.",
                     "cleared_body": ""
                 },
                 "cleared_title": ""
             },
             "trends": {
-                "priority_styling": "TRUE",
+                "priority_styling": 1,
                 "content_to_pass": "",
-                "present_in_trends": "TRUE",
-                "new_title": "SAME AS PLANS INSIGHT TITLE",
-                "new_body": "",
-                "ongoing_title": "",
+                "present_in_trends": true,
+                "new_title": "Listen to your body",
+                "new_body": "Pain is not a normal training response & is typically a sign of misalignments or movement impairments elsewhere.",
+                "ongoing_title": "Listen to your body",
                 "ongoing_body": "Pain is not a normal training response & is typically a sign of misalignments or movement impairments elsewhere.",
                 "pos_change_title": "",
                 "pos_change_body": "",
@@ -866,24 +866,24 @@
             },
             "plots": {
                 "unit_of_aggregation": "Unique per body part",
-                "visualization_type": "3",
-                "visualization_range": "7",
+                "visualization_type": 3,
+                "visualization_range": 7,
                 "overlay_variable": "Max Severity of Pain reported per day for single body part",
                 "title": "Pain in {bodypart}"
             },
             "cta": {
                 "input": "Body Part",
-                "heat": "",
-                "warmup": "",
-                "cooldown": "",
-                "active_rest": "x",
-                "ice": "x",
-                "cwi": "",
+                "heat": false,
+                "warmup": false,
+                "cooldown": false,
+                "active_rest": true,
+                "ice": true,
+                "cwi": false,
                 "increase_default": "x Active Rest Active Recovery"
             }
         },
-        {
-            "trigger_enum": "new-23",
+        "23": {
+            "trigger_enum": 23,
             "trend_type": "Response",
             "triggers": "Pain reported today  (severity 1, 2)  + (acute, pers<30, per>30)",
             "goal_names": "Address Pain",
@@ -892,33 +892,33 @@
             "insight_priority_plans": "1",
             "insight_priority_trend_type": "8",
             "plans": {
-                "priority_styling": "",
+                "priority_styling": 0,
                 "content_to_pass": "",
-                "present_in_plans": "TRUE",
+                "present_in_plans": true,
                 "parent_data": {
-                    "enum": "2",
+                    "enum": 2,
                     "new_first_time_title": "Listen to your body",
                     "new_first_time_body": "This pain could be a sign of something wrong. Please avoid & modify movements that cause discomfort or pain.",
-                    "new_subsequent_title": "SAME AS FIRST TIME",
-                    "new_subsequent_body": "SAME AS FIRST TIME",
+                    "new_subsequent_title": "Listen to your body",
+                    "new_subsequent_body": "This pain could be a sign of something wrong. Please avoid & modify movements that cause discomfort or pain.",
                     "cleared_body": ""
                 },
                 "child_data": {
-                    "new_first_time_title": "Listen to your body - consider that there may be many body parts...",
+                    "new_first_time_title": "Listen to your body(ies)",
                     "new_first_time_body": "So we've added activities to {goal}, but please avoid anything that causes pain or discomfort.",
-                    "new_subsequent_title": "SAME AS FIRST TIME",
-                    "new_subsequent_body": "SAME AS FIRST TIME",
+                    "new_subsequent_title": "Listen to your body(ies)",
+                    "new_subsequent_body": "So we've added activities to {goal}, but please avoid anything that causes pain or discomfort.",
                     "cleared_body": ""
                 },
                 "cleared_title": ""
             },
             "trends": {
-                "priority_styling": "",
+                "priority_styling": 0,
                 "content_to_pass": "",
-                "present_in_trends": "TRUE",
-                "new_title": "SAME AS PLANS INSIGHT TITLE",
-                "new_body": "",
-                "ongoing_title": "",
+                "present_in_trends": true,
+                "new_title": "Listen to your body",
+                "new_body": "Pain is not a normal training response & is typically a sign of misalignments or movement impairments elsewhere.",
+                "ongoing_title": "Listen to your body",
                 "ongoing_body": "Pain is not a normal training response & is typically a sign of misalignments or movement impairments elsewhere.",
                 "pos_change_title": "",
                 "pos_change_body": "",
@@ -929,24 +929,24 @@
             },
             "plots": {
                 "unit_of_aggregation": "Unique per body part",
-                "visualization_type": "3",
-                "visualization_range": "7",
+                "visualization_type": 3,
+                "visualization_range": 7,
                 "overlay_variable": "Max Severity of Pain reported per day for single body part",
                 "title": "Pain Trend in {bodypart}"
             },
             "cta": {
                 "input": "Body Part",
-                "heat": "",
-                "warmup": "",
-                "cooldown": "",
-                "active_rest": "x",
-                "ice": "x",
-                "cwi": "",
+                "heat": false,
+                "warmup": false,
+                "cooldown": false,
+                "active_rest": true,
+                "ice": true,
+                "cwi": false,
                 "increase_default": ""
             }
         },
-        {
-            "trigger_enum": "new-24",
+        "24": {
+            "trigger_enum": 24,
             "trend_type": "Response",
             "triggers": "Pain reported today (severity 3-5)  + (acute, pers<30, per>30)",
             "goal_names": "Address Pain",
@@ -955,33 +955,33 @@
             "insight_priority_plans": "1",
             "insight_priority_trend_type": "2",
             "plans": {
-                "priority_styling": "TRUE",
+                "priority_styling": 1,
                 "content_to_pass": "",
-                "present_in_plans": "TRUE",
+                "present_in_plans": true,
                 "parent_data": {
-                    "enum": "2",
+                    "enum": 2,
                     "new_first_time_title": "Listen to your body",
                     "new_first_time_body": "This pain could be a sign of something wrong. Please avoid & modify movements that cause discomfort or pain.",
-                    "new_subsequent_title": "SAME AS FIRST TIME",
-                    "new_subsequent_body": "SAME AS FIRST TIME",
+                    "new_subsequent_title": "Listen to your body",
+                    "new_subsequent_body": "This pain could be a sign of something wrong. Please avoid & modify movements that cause discomfort or pain.",
                     "cleared_body": ""
                 },
                 "child_data": {
                     "new_first_time_title": "Listen to your body",
                     "new_first_time_body": "This pain could be a sign of something wrong. Please avoid & modify movements that cause discomfort or pain.",
-                    "new_subsequent_title": "SAME AS FIRST TIME",
-                    "new_subsequent_body": "SAME AS FIRST TIME",
+                    "new_subsequent_title": "Listen to your body",
+                    "new_subsequent_body": "This pain could be a sign of something wrong. Please avoid & modify movements that cause discomfort or pain.",
                     "cleared_body": ""
                 },
                 "cleared_title": ""
             },
             "trends": {
-                "priority_styling": "TRUE",
+                "priority_styling": 1,
                 "content_to_pass": "",
-                "present_in_trends": "TRUE",
-                "new_title": "SAME AS PLANS INSIGHT TITLE",
-                "new_body": "",
-                "ongoing_title": "",
+                "present_in_trends": true,
+                "new_title": "Listen to your body",
+                "new_body": "Pain is not a normal training response & is typically a sign of misalignments or movement impairments elsewhere.",
+                "ongoing_title": "Listen to your body",
                 "ongoing_body": "Pain is not a normal training response & is typically a sign of misalignments or movement impairments elsewhere.",
                 "pos_change_title": "",
                 "pos_change_body": "",
@@ -992,24 +992,24 @@
             },
             "plots": {
                 "unit_of_aggregation": "Unique per body part",
-                "visualization_type": "3",
-                "visualization_range": "7",
+                "visualization_type": 3,
+                "visualization_range": 7,
                 "overlay_variable": "Max Severity of Pain reported per day for single body part",
                 "title": "Pain Trend in {bodypart}"
             },
             "cta": {
                 "input": "Body Part",
-                "heat": "",
-                "warmup": "",
-                "cooldown": "",
-                "active_rest": "x",
-                "ice": "x",
-                "cwi": "",
+                "heat": false,
+                "warmup": false,
+                "cooldown": false,
+                "active_rest": true,
+                "ice": true,
+                "cwi": false,
                 "increase_default": ""
             }
         },
-        {
-            "trigger_enum": "21",
+        "21": {
+            "trigger_enum": 21,
             "trend_type": "Response",
             "triggers": "Pain (Pers, Pers_2  < 30d)  + Pain NOT reported today",
             "goal_names": "Mitigate Effects of Imbalance",
@@ -1018,11 +1018,11 @@
             "insight_priority_plans": "12",
             "insight_priority_trend_type": "15",
             "plans": {
-                "priority_styling": "",
+                "priority_styling": 0,
                 "content_to_pass": "",
-                "present_in_plans": "",
+                "present_in_plans": true,
                 "parent_data": {
-                    "enum": "",
+                    "enum": null,
                     "new_first_time_title": "",
                     "new_first_time_body": "",
                     "new_subsequent_title": "",
@@ -1039,9 +1039,9 @@
                 "cleared_title": ""
             },
             "trends": {
-                "priority_styling": "",
+                "priority_styling": 0,
                 "content_to_pass": "",
-                "present_in_trends": "",
+                "present_in_trends": true,
                 "new_title": "",
                 "new_body": "",
                 "ongoing_title": "",
@@ -1055,24 +1055,24 @@
             },
             "plots": {
                 "unit_of_aggregation": "Unique per body part",
-                "visualization_type": "3",
-                "visualization_range": "7",
+                "visualization_type": 3,
+                "visualization_range": 7,
                 "overlay_variable": "Max Severity of Pain reported per day for single body part",
                 "title": "Pain Trend in {bodypart}"
             },
             "cta": {
                 "input": "Body Part",
-                "heat": "x",
-                "warmup": "",
-                "cooldown": "",
-                "active_rest": "",
-                "ice": "",
-                "cwi": "",
+                "heat": true,
+                "warmup": false,
+                "cooldown": false,
+                "active_rest": false,
+                "ice": false,
+                "cwi": false,
                 "increase_default": ""
             }
         },
-        {
-            "trigger_enum": "22",
+        "22": {
+            "trigger_enum": 22,
             "trend_type": "Response",
             "triggers": "Pain (Pers, Pers_2  > 30d)  + Pain NOT reported today",
             "goal_names": "Mitigate Effects of Imbalance",
@@ -1081,11 +1081,11 @@
             "insight_priority_plans": "12",
             "insight_priority_trend_type": "14",
             "plans": {
-                "priority_styling": "",
+                "priority_styling": 0,
                 "content_to_pass": "",
-                "present_in_plans": "",
+                "present_in_plans": true,
                 "parent_data": {
-                    "enum": "",
+                    "enum": null,
                     "new_first_time_title": "",
                     "new_first_time_body": "",
                     "new_subsequent_title": "",
@@ -1102,9 +1102,9 @@
                 "cleared_title": ""
             },
             "trends": {
-                "priority_styling": "",
+                "priority_styling": 0,
                 "content_to_pass": "",
-                "present_in_trends": "",
+                "present_in_trends": true,
                 "new_title": "",
                 "new_body": "",
                 "ongoing_title": "",
@@ -1118,24 +1118,24 @@
             },
             "plots": {
                 "unit_of_aggregation": "Unique per body part",
-                "visualization_type": "3",
-                "visualization_range": "7",
+                "visualization_type": 3,
+                "visualization_range": 7,
                 "overlay_variable": "Max Severity of Pain reported per day for single body part",
                 "title": "Pain Trend in {bodypart}"
             },
             "cta": {
                 "input": "Body Part",
-                "heat": "x",
-                "warmup": "",
-                "cooldown": "",
-                "active_rest": "",
-                "ice": "",
-                "cwi": "",
+                "heat": true,
+                "warmup": false,
+                "cooldown": false,
+                "active_rest": false,
+                "ice": false,
+                "cwi": false,
                 "increase_default": ""
             }
         },
-        {
-            "trigger_enum": "",
+        "101": {
+            "trigger_enum": 101,
             "trend_type": "Response",
             "triggers": "Fatigue within a session - torso / pelvis - loading pattern symmetry",
             "goal_names": "",
@@ -1144,34 +1144,34 @@
             "insight_priority_plans": "3",
             "insight_priority_trend_type": "4",
             "plans": {
-                "priority_styling": "",
+                "priority_styling": 0,
                 "content_to_pass": "",
-                "present_in_plans": "TRUE",
+                "present_in_plans": true,
                 "parent_data": {
-                    "enum": "5",
-                    "new_first_time_title": "",
+                    "enum": 5,
+                    "new_first_time_title": "Poor Response Identified",
                     "new_first_time_body": "So we've added activities to {goal}. ",
-                    "new_subsequent_title": "SAME AS FIRST TIME",
-                    "new_subsequent_body": "SAME AS FIRST TIME",
+                    "new_subsequent_title": "Poor Response Identified",
+                    "new_subsequent_body": "So we've added activities to {goal}. ",
                     "cleared_body": ""
                 },
                 "child_data": {
-                    "new_first_time_title": "",
+                    "new_first_time_title": "Fatigue Identified",
                     "new_first_time_body": "So we've added activities to {goal}. ",
-                    "new_subsequent_title": "SAME AS FIRST TIME",
-                    "new_subsequent_body": "SAME AS FIRST TIME",
+                    "new_subsequent_title": "Fatigue Identified",
+                    "new_subsequent_body": "So we've added activities to {goal}. ",
                     "cleared_body": ""
                 },
                 "cleared_title": ""
             },
             "trends": {
-                "priority_styling": "",
+                "priority_styling": 0,
                 "content_to_pass": "",
-                "present_in_trends": "TRUE",
-                "new_title": "SAME AS PLANS INSIGHT TITLE",
-                "new_body": "",
-                "ongoing_title": "",
-                "ongoing_body": " TEMPLATE 1.2: The ideal range for [Fatigue] is [range] and you're currently at [number]. This [description of risk factor].",
+                "present_in_trends": true,
+                "new_title": "Fatigue Identified",
+                "new_body": "The ideal range for [Fatigue] is [range] and you're currently at [number]. This [description of risk factor].",
+                "ongoing_title": "Fatigue Identified",
+                "ongoing_body": "The ideal range for [Fatigue] is [range] and you're currently at [number]. This [description of risk factor].",
                 "pos_change_title": "",
                 "pos_change_body": "",
                 "neg_change_title": "",
@@ -1181,24 +1181,24 @@
             },
             "plots": {
                 "unit_of_aggregation": "per session",
-                "visualization_type": "6",
-                "visualization_range": "7",
+                "visualization_type": 6,
+                "visualization_range": 7,
                 "overlay_variable": "Movement Quality at start and end of session Severity category per day to define color per day",
                 "title": ""
             },
             "cta": {
                 "input": "CME",
-                "heat": "",
-                "warmup": "",
-                "cooldown": "",
-                "active_rest": "x",
-                "ice": "",
-                "cwi": "",
+                "heat": false,
+                "warmup": false,
+                "cooldown": false,
+                "active_rest": true,
+                "ice": false,
+                "cwi": false,
                 "increase_default": ""
             }
         },
-        {
-            "trigger_enum": "",
+        "102": {
+            "trigger_enum": 102,
             "trend_type": "Response",
             "triggers": "Poor Response in an individual session - torso / pelvis - loading pattern symmetry",
             "goal_names": "",
@@ -1207,34 +1207,34 @@
             "insight_priority_plans": "3",
             "insight_priority_trend_type": "3",
             "plans": {
-                "priority_styling": "",
+                "priority_styling": 0,
                 "content_to_pass": "",
-                "present_in_plans": "TRUE",
+                "present_in_plans": true,
                 "parent_data": {
-                    "enum": "5",
-                    "new_first_time_title": "",
+                    "enum": 5,
+                    "new_first_time_title": "Poor Response Identified",
                     "new_first_time_body": "So we've added activities to {goal}. ",
-                    "new_subsequent_title": "SAME AS FIRST TIME",
-                    "new_subsequent_body": "SAME AS FIRST TIME",
+                    "new_subsequent_title": "Poor Response Identified",
+                    "new_subsequent_body": "So we've added activities to {goal}. ",
                     "cleared_body": ""
                 },
                 "child_data": {
-                    "new_first_time_title": "",
+                    "new_first_time_title": "Poor Response Identified",
                     "new_first_time_body": "So we added activities to {goal}. ",
-                    "new_subsequent_title": "SAME AS FIRST TIME",
-                    "new_subsequent_body": "SAME AS FIRST TIME",
+                    "new_subsequent_title": "Poor Response Identified",
+                    "new_subsequent_body": "So we added activities to {goal}. ",
                     "cleared_body": ""
                 },
                 "cleared_title": ""
             },
             "trends": {
-                "priority_styling": "",
+                "priority_styling": 0,
                 "content_to_pass": "",
-                "present_in_trends": "TRUE",
-                "new_title": "SAME AS PLANS INSIGHT TITLE",
-                "new_body": "",
-                "ongoing_title": "",
-                "ongoing_body": " TEMPLATE 1.2: The ideal range for [Fatigue] is [range] and you're currently at [number]. This [description of risk factor].",
+                "present_in_trends": true,
+                "new_title": "Poor Response Identified",
+                "new_body": "The ideal range for [Fatigue] is [range] and you're currently at [number]. This [description of risk factor].",
+                "ongoing_title": "Poor Response Identified",
+                "ongoing_body": "The ideal range for [Fatigue] is [range] and you're currently at [number]. This [description of risk factor].",
                 "pos_change_title": "",
                 "pos_change_body": "",
                 "neg_change_title": "",
@@ -1244,24 +1244,24 @@
             },
             "plots": {
                 "unit_of_aggregation": "per session",
-                "visualization_type": "6",
-                "visualization_range": "7",
+                "visualization_type": 6,
+                "visualization_range": 7,
                 "overlay_variable": "Movement Quality max and min of session Severity category per day to define color per day",
                 "title": ""
             },
             "cta": {
                 "input": "CME",
-                "heat": "",
-                "warmup": "",
-                "cooldown": "",
-                "active_rest": "x",
-                "ice": "",
-                "cwi": "x",
+                "heat": false,
+                "warmup": false,
+                "cooldown": false,
+                "active_rest": true,
+                "ice": false,
+                "cwi": true,
                 "increase_default": ""
             }
         },
-        {
-            "trigger_enum": "",
+        "205": {
+            "trigger_enum": 205,
             "trend_type": "Biomechanics",
             "triggers": "No triggers flagged based on soreness",
             "goal_names": "",
@@ -1270,11 +1270,11 @@
             "insight_priority_plans": "",
             "insight_priority_trend_type": "9",
             "plans": {
-                "priority_styling": "",
+                "priority_styling": 0,
                 "content_to_pass": "",
-                "present_in_plans": "",
+                "present_in_plans": true,
                 "parent_data": {
-                    "enum": "",
+                    "enum": null,
                     "new_first_time_title": "",
                     "new_first_time_body": "",
                     "new_subsequent_title": "",
@@ -1291,12 +1291,12 @@
                 "cleared_title": ""
             },
             "trends": {
-                "priority_styling": "",
+                "priority_styling": 0,
                 "content_to_pass": "",
-                "present_in_trends": "TRUE",
+                "present_in_trends": true,
                 "new_title": "All Good!",
-                "new_body": "",
-                "ongoing_title": "",
+                "new_body": "You're biomechanical variables are in a normal range. We'll keep monitoring for any signs of weaknesses or imbalances. ",
+                "ongoing_title": "All Good!",
                 "ongoing_body": "You're biomechanical variables are in a normal range. We'll keep monitoring for any signs of weaknesses or imbalances. ",
                 "pos_change_title": "",
                 "pos_change_body": "",
@@ -1307,24 +1307,24 @@
             },
             "plots": {
                 "unit_of_aggregation": "per day, considering all body parts",
-                "visualization_type": "3",
-                "visualization_range": "14",
+                "visualization_type": 3,
+                "visualization_range": 14,
                 "overlay_variable": "Max Severity of Soreness reported per day for all body parts",
                 "title": "Your Soreness History"
             },
             "cta": {
                 "input": "",
-                "heat": "",
-                "warmup": "",
-                "cooldown": "",
-                "active_rest": "",
-                "ice": "",
-                "cwi": "",
+                "heat": false,
+                "warmup": false,
+                "cooldown": false,
+                "active_rest": false,
+                "ice": false,
+                "cwi": false,
                 "increase_default": ""
             }
         },
-        {
-            "trigger_enum": "",
+        "206": {
+            "trigger_enum": 206,
             "trend_type": "Biomechanics",
             "triggers": "No triggers flagged based on pain",
             "goal_names": "",
@@ -1333,11 +1333,11 @@
             "insight_priority_plans": "",
             "insight_priority_trend_type": "8",
             "plans": {
-                "priority_styling": "",
+                "priority_styling": 0,
                 "content_to_pass": "",
-                "present_in_plans": "",
+                "present_in_plans": true,
                 "parent_data": {
-                    "enum": "",
+                    "enum": null,
                     "new_first_time_title": "",
                     "new_first_time_body": "",
                     "new_subsequent_title": "",
@@ -1354,12 +1354,12 @@
                 "cleared_title": ""
             },
             "trends": {
-                "priority_styling": "",
+                "priority_styling": 0,
                 "content_to_pass": "",
-                "present_in_trends": "TRUE",
+                "present_in_trends": true,
                 "new_title": "All Good!",
-                "new_body": "",
-                "ongoing_title": "",
+                "new_body": "No pain-related findings. We'll keep monitoring & will let you know if we find any meaningful patterns or trends.",
+                "ongoing_title": "All Good!",
                 "ongoing_body": "No pain-related findings. We'll keep monitoring & will let you know if we find any meaningful patterns or trends.",
                 "pos_change_title": "",
                 "pos_change_body": "",
@@ -1370,24 +1370,24 @@
             },
             "plots": {
                 "unit_of_aggregation": "per day, considering all body parts",
-                "visualization_type": "3",
-                "visualization_range": "14",
+                "visualization_type": 3,
+                "visualization_range": 14,
                 "overlay_variable": "Max Severity of Pain reported per day for all body parts",
                 "title": "Your Pain History"
             },
             "cta": {
                 "input": "",
-                "heat": "",
-                "warmup": "",
-                "cooldown": "",
-                "active_rest": "",
-                "ice": "",
-                "cwi": "",
+                "heat": false,
+                "warmup": false,
+                "cooldown": false,
+                "active_rest": false,
+                "ice": false,
+                "cwi": false,
                 "increase_default": ""
             }
         },
-        {
-            "trigger_enum": "",
+        "207": {
+            "trigger_enum": 207,
             "trend_type": "Biomechanics",
             "triggers": "No triggers flagged based on 3sensor",
             "goal_names": "",
@@ -1396,11 +1396,11 @@
             "insight_priority_plans": "",
             "insight_priority_trend_type": "7",
             "plans": {
-                "priority_styling": "",
+                "priority_styling": 0,
                 "content_to_pass": "",
-                "present_in_plans": "",
+                "present_in_plans": true,
                 "parent_data": {
-                    "enum": "",
+                    "enum": null,
                     "new_first_time_title": "",
                     "new_first_time_body": "",
                     "new_subsequent_title": "",
@@ -1417,12 +1417,12 @@
                 "cleared_title": ""
             },
             "trends": {
-                "priority_styling": "",
+                "priority_styling": 0,
                 "content_to_pass": "",
-                "present_in_trends": "TRUE",
+                "present_in_trends": true,
                 "new_title": "All Good!",
-                "new_body": "",
-                "ongoing_title": "",
+                "new_body": "You're biomechanical variables are in a normal range. We'll keep monitoring for any signs of chronic movement dysfunction.",
+                "ongoing_title": "All Good!",
                 "ongoing_body": "You're biomechanical variables are in a normal range. We'll keep monitoring for any signs of chronic movement dysfunction.",
                 "pos_change_title": "",
                 "pos_change_body": "",
@@ -1433,24 +1433,24 @@
             },
             "plots": {
                 "unit_of_aggregation": "per session",
-                "visualization_type": "6",
-                "visualization_range": "14",
+                "visualization_type": 6,
+                "visualization_range": 14,
                 "overlay_variable": "Movement Quality max and min of session Severity category per day to define color per day",
                 "title": "Your Biomechanical Response History"
             },
             "cta": {
                 "input": "",
-                "heat": "",
-                "warmup": "",
-                "cooldown": "",
-                "active_rest": "",
-                "ice": "",
-                "cwi": "",
+                "heat": false,
+                "warmup": false,
+                "cooldown": false,
+                "active_rest": false,
+                "ice": false,
+                "cwi": false,
                 "increase_default": ""
             }
         },
-        {
-            "trigger_enum": "19",
+        "19": {
+            "trigger_enum": 19,
             "trend_type": "Biomechanics",
             "triggers": "Sore (Pers >30d, Pers_2 > 30d) ",
             "goal_names": "Mitigate Effects of Imbalance  Correct Imbalance",
@@ -1459,33 +1459,33 @@
             "insight_priority_plans": "6",
             "insight_priority_trend_type": "6",
             "plans": {
-                "priority_styling": "",
+                "priority_styling": 0,
                 "content_to_pass": "{goal}, {bodypart}",
-                "present_in_plans": "TRUE",
+                "present_in_plans": true,
                 "parent_data": {
-                    "enum": "4",
-                    "new_first_time_title": "Strength Imbalance Identified  - consider that there may be many body parts...",
+                    "enum": 4,
+                    "new_first_time_title": "Strength Imbalance(s) Identified ",
                     "new_first_time_body": "So we've added activities to [goals]. ",
-                    "new_subsequent_title": "SAME AS FIRST TIME",
-                    "new_subsequent_body": "SAME AS FIRST TIME",
+                    "new_subsequent_title": "Strength Imbalance(s) Identified ",
+                    "new_subsequent_body": "So we've added activities to [goals]. ",
                     "cleared_body": "Congrats! You've resolved your persistant {bodypart} soreness!"
                 },
                 "child_data": {
                     "new_first_time_title": "Strength Imbalance Identified ",
                     "new_first_time_body": "So we've added activities to {goal}. ",
-                    "new_subsequent_title": "SAME AS FIRST TIME",
-                    "new_subsequent_body": "SAME AS FIRST TIME",
+                    "new_subsequent_title": "Strength Imbalance Identified ",
+                    "new_subsequent_body": "So we've added activities to {goal}. ",
                     "cleared_body": "Congrats! You've resolved your persistant {bodypart} soreness!"
                 },
                 "cleared_title": "Symptoms Cleared!"
             },
             "trends": {
-                "priority_styling": "",
+                "priority_styling": 0,
                 "content_to_pass": "",
-                "present_in_trends": "TRUE",
-                "new_title": "SAME AS PLANS INSIGHT TITLE",
-                "new_body": "",
-                "ongoing_title": "",
+                "present_in_trends": true,
+                "new_title": "Strength Imbalance Identified ",
+                "new_body": "We found a pattern of [body parts] soreness, which points to a strength imbalance that should improve with consistent recovery.",
+                "ongoing_title": "Strength Imbalance Identified ",
                 "ongoing_body": "We found a pattern of [body parts] soreness, which points to a strength imbalance that should improve with consistent recovery.",
                 "pos_change_title": "Strength Imbalance [Improving/Worsening]",
                 "pos_change_body": "",
@@ -1496,24 +1496,24 @@
             },
             "plots": {
                 "unit_of_aggregation": "Unique per body part",
-                "visualization_type": "3",
-                "visualization_range": "14",
+                "visualization_type": 3,
+                "visualization_range": 14,
                 "overlay_variable": "Max Severity of Soreness reported per day for single body part",
                 "title": "Soreness Pattern in {bodypart}"
             },
             "cta": {
                 "input": "Body Part",
-                "heat": "x",
-                "warmup": "",
-                "cooldown": "",
-                "active_rest": "x",
-                "ice": "",
-                "cwi": "",
+                "heat": true,
+                "warmup": false,
+                "cooldown": false,
+                "active_rest": true,
+                "ice": false,
+                "cwi": false,
                 "increase_default": ""
             }
         },
-        {
-            "trigger_enum": "16",
+        "16": {
+            "trigger_enum": 16,
             "trend_type": "Biomechanics",
             "triggers": "Pain (Acute, Pers, Pers_2)",
             "goal_names": "Correct Imbalance",
@@ -1522,33 +1522,33 @@
             "insight_priority_plans": "4",
             "insight_priority_trend_type": "4",
             "plans": {
-                "priority_styling": "",
+                "priority_styling": 0,
                 "content_to_pass": "{goal}, {bodypart}",
-                "present_in_plans": "TRUE",
+                "present_in_plans": true,
                 "parent_data": {
-                    "enum": "4",
-                    "new_first_time_title": "Sign of Possible Injury - consider that there may be many body parts...",
+                    "enum": 4,
+                    "new_first_time_title": "Sign of Possible Injury(ies)",
                     "new_first_time_body": "So we added activities to {goal} commonly attributed to this injury cycle. Please avoid any activity which aggravate your pain.",
-                    "new_subsequent_title": "SAME AS FIRST TIME",
-                    "new_subsequent_body": "SAME AS FIRST TIME",
+                    "new_subsequent_title": "Sign of Possible Injury(ies)",
+                    "new_subsequent_body": "So we added activities to {goal} commonly attributed to this injury cycle. Please avoid any activity which aggravate your pain.",
                     "cleared_body": "Congrats! You've resolved your persistant {bodypart} pain!"
                 },
                 "child_data": {
                     "new_first_time_title": "Sign of Possible Injury",
                     "new_first_time_body": "So we added activities to {goal} commonly attributed to this injury cycle. Please avoid any activity which aggravate your pain.",
-                    "new_subsequent_title": "SAME AS FIRST TIME",
-                    "new_subsequent_body": "SAME AS FIRST TIME",
+                    "new_subsequent_title": "Sign of Possible Injury",
+                    "new_subsequent_body": "So we added activities to {goal} commonly attributed to this injury cycle. Please avoid any activity which aggravate your pain.",
                     "cleared_body": "We've haven't seen your {bodypart} pain come back in a while! We'll update the plan to reflect your progress!"
                 },
                 "cleared_title": "Symptoms Cleared!"
             },
             "trends": {
-                "priority_styling": "",
+                "priority_styling": 0,
                 "content_to_pass": "",
-                "present_in_trends": "TRUE",
-                "new_title": "SAME AS PLANS INSIGHT TITLE",
-                "new_body": "",
-                "ongoing_title": "",
+                "present_in_trends": true,
+                "new_title": "Sign of Possible Injury",
+                "new_body": "Recurring pain can be caused by biomechanical imbalances & frequently results in chronic & overuse injury.",
+                "ongoing_title": "Sign of Possible Injury",
                 "ongoing_body": "Recurring pain can be caused by biomechanical imbalances & frequently results in chronic & overuse injury.",
                 "pos_change_title": " Pain Patterns [Improving/Worsening]",
                 "pos_change_body": "",
@@ -1559,24 +1559,24 @@
             },
             "plots": {
                 "unit_of_aggregation": "Unique per body part",
-                "visualization_type": "3",
-                "visualization_range": "14",
+                "visualization_type": 3,
+                "visualization_range": 14,
                 "overlay_variable": "Max Severity of Pain reported per day for single body part",
                 "title": "Pain Trend in {bodypart}"
             },
             "cta": {
                 "input": "Body Part",
-                "heat": "",
-                "warmup": "",
-                "cooldown": "",
-                "active_rest": "x",
-                "ice": "",
-                "cwi": "",
+                "heat": false,
+                "warmup": false,
+                "cooldown": false,
+                "active_rest": true,
+                "ice": false,
+                "cwi": false,
                 "increase_default": ""
             }
         },
-        {
-            "trigger_enum": "",
+        "103": {
+            "trigger_enum": 103,
             "trend_type": "Biomechanics",
             "triggers": "Fatigue within session, trending over multiple sessions - torso / pelvis - loading pattern symmetry",
             "goal_names": "",
@@ -1585,34 +1585,34 @@
             "insight_priority_plans": "2",
             "insight_priority_trend_type": "2",
             "plans": {
-                "priority_styling": "",
+                "priority_styling": 0,
                 "content_to_pass": "",
-                "present_in_plans": "TRUE",
+                "present_in_plans": true,
                 "parent_data": {
-                    "enum": "6",
-                    "new_first_time_title": "",
-                    "new_first_time_body": "",
-                    "new_subsequent_title": "SAME AS FIRST TIME",
-                    "new_subsequent_body": "SAME AS FIRST TIME",
-                    "cleared_body": ""
+                    "enum": 6,
+                    "new_first_time_title": "Poor Response Identified",
+                    "new_first_time_body": "So we've added activities to {goal}. ",
+                    "new_subsequent_title": "Poor Response Identified",
+                    "new_subsequent_body": "So we've added activities to {goal}. ",
+                    "cleared_body": "Congrats! You've resolved your persistant {bodypart} soreness!"
                 },
                 "child_data": {
-                    "new_first_time_title": "",
+                    "new_first_time_title": "Fatigue Identified",
                     "new_first_time_body": "So we add activities to {goal} ",
-                    "new_subsequent_title": "SAME AS FIRST TIME",
-                    "new_subsequent_body": "SAME AS FIRST TIME",
-                    "cleared_body": ""
+                    "new_subsequent_title": "Fatigue Identified",
+                    "new_subsequent_body": "So we add activities to {goal} ",
+                    "cleared_body": "Congrats! You've resolved your persistant {bodypart} soreness!"
                 },
                 "cleared_title": "Symptoms Cleared!"
             },
             "trends": {
-                "priority_styling": "",
+                "priority_styling": 0,
                 "content_to_pass": "",
-                "present_in_trends": "TRUE",
-                "new_title": "SAME AS PLANS INSIGHT TITLE",
-                "new_body": "",
-                "ongoing_title": "",
-                "ongoing_body": "",
+                "present_in_trends": true,
+                "new_title": "Fatigue Identified",
+                "new_body": "The ideal range for [Fatigue] is [range] and you're currently at [number]. This [description of risk factor].",
+                "ongoing_title": "Fatigue Identified",
+                "ongoing_body": "The ideal range for [Fatigue] is [range] and you're currently at [number]. This [description of risk factor].",
                 "pos_change_title": "",
                 "pos_change_body": "",
                 "neg_change_title": "",
@@ -1622,24 +1622,24 @@
             },
             "plots": {
                 "unit_of_aggregation": "per session",
-                "visualization_type": "6",
-                "visualization_range": "14",
+                "visualization_type": 6,
+                "visualization_range": 14,
                 "overlay_variable": "Movement Quality at start and end of session Severity category per day to define color per day",
                 "title": ""
             },
             "cta": {
                 "input": "CME",
-                "heat": "",
-                "warmup": "x",
-                "cooldown": "",
-                "active_rest": "",
-                "ice": "",
-                "cwi": "x",
+                "heat": false,
+                "warmup": true,
+                "cooldown": false,
+                "active_rest": false,
+                "ice": false,
+                "cwi": true,
                 "increase_default": "x Active Rest"
             }
         },
-        {
-            "trigger_enum": "",
+        "104": {
+            "trigger_enum": 104,
             "trend_type": "Biomechanics",
             "triggers": "Poor Response trending over the course of multiple sessions - torso / pelvis - loading pattern symmetry",
             "goal_names": "",
@@ -1648,34 +1648,34 @@
             "insight_priority_plans": "2",
             "insight_priority_trend_type": "1",
             "plans": {
-                "priority_styling": "",
+                "priority_styling": 0,
                 "content_to_pass": "",
-                "present_in_plans": "TRUE",
+                "present_in_plans": true,
                 "parent_data": {
-                    "enum": "6",
-                    "new_first_time_title": "",
-                    "new_first_time_body": "",
-                    "new_subsequent_title": "",
-                    "new_subsequent_body": "",
-                    "cleared_body": ""
+                    "enum": 6,
+                    "new_first_time_title": "Pattern of Poor Response Identified",
+                    "new_first_time_body": "So we've added activities to {goal}. ",
+                    "new_subsequent_title": "Pattern of Poor Response Identified",
+                    "new_subsequent_body": "So we've added activities to {goal}. ",
+                    "cleared_body": "Congrats! You've resolved your persistant {bodypart} soreness!"
                 },
                 "child_data": {
-                    "new_first_time_title": "",
+                    "new_first_time_title": "Poor Response Identified",
                     "new_first_time_body": "So we add activities to {goal} ",
-                    "new_subsequent_title": "SAME AS FIRST TIME",
-                    "new_subsequent_body": "SAME AS FIRST TIME",
-                    "cleared_body": ""
+                    "new_subsequent_title": "Poor Response Identified",
+                    "new_subsequent_body": "So we add activities to {goal} ",
+                    "cleared_body": "Congrats! You've resolved your persistant {bodypart} soreness!"
                 },
                 "cleared_title": "Symptoms Cleared!"
             },
             "trends": {
-                "priority_styling": "",
+                "priority_styling": 0,
                 "content_to_pass": "",
-                "present_in_trends": "TRUE",
-                "new_title": "SAME AS PLANS INSIGHT TITLE",
-                "new_body": "",
-                "ongoing_title": "",
-                "ongoing_body": "",
+                "present_in_trends": true,
+                "new_title": "Poor Response Identified",
+                "new_body": "The ideal range for [Fatigue] is [range] and you're currently at [number]. This [description of risk factor].",
+                "ongoing_title": "Poor Response Identified",
+                "ongoing_body": "The ideal range for [Fatigue] is [range] and you're currently at [number]. This [description of risk factor].",
                 "pos_change_title": "",
                 "pos_change_body": "",
                 "neg_change_title": "",
@@ -1685,21 +1685,21 @@
             },
             "plots": {
                 "unit_of_aggregation": "per session",
-                "visualization_type": "6",
-                "visualization_range": "14",
+                "visualization_type": 6,
+                "visualization_range": 14,
                 "overlay_variable": "Movement Quality max and min of session Severity category per day to define color per day",
                 "title": ""
             },
             "cta": {
                 "input": "CME",
-                "heat": "",
-                "warmup": "x",
-                "cooldown": "",
-                "active_rest": "",
-                "ice": "",
-                "cwi": "x",
+                "heat": false,
+                "warmup": true,
+                "cooldown": false,
+                "active_rest": false,
+                "ice": false,
+                "cwi": true,
                 "increase_default": "x Active Rest"
             }
         }
-    ]
+    }
 }
