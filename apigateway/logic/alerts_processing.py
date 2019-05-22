@@ -110,14 +110,14 @@ class AlertsProcessing(object):
                 self.add_chart_data(trend)
 
                 # group trend into proper insight type bucket
-                insight_type = InsightType(TriggerType.get_insight_type(alert.goal.trigger_type))
-                if insight_type == InsightType.stress:
+                # insight_type = InsightType(TriggerType.get_insight_type(alert.goal.trigger_type))
+                if trend.insight_type == InsightType.stress:
                     trends.stress.alerts.append(trend)
                     trends.stress.goals.add(alert.goal.text)
-                elif insight_type == InsightType.response:
+                elif trend.insight_type == InsightType.response:
                     trends.response.alerts.append(trend)
                     trends.response.goals.add(alert.goal.text)
-                elif insight_type == InsightType.biomechanics:
+                elif trend.insight_type == InsightType.biomechanics:
                     trends.biomechanics.alerts.append(trend)
                     trends.biomechanics.goals.add(alert.goal.text)
             # check if trigger already exists
@@ -169,7 +169,7 @@ class AlertsProcessing(object):
             else:
                 chart_data = []
         elif trend.visualization_type == VisualizationType.doms:
-            chart_data = []
+            chart_data = self.athlete_stats.doms_chart_data
         elif trend.visualization_type == VisualizationType.muscular_strain:
             chart_data = self.athlete_stats.muscular_strain_chart_data
         elif trend.visualization_type == VisualizationType.sensor:
