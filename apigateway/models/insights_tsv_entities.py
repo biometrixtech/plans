@@ -1,4 +1,5 @@
 from serialisable import Serialisable
+from models.trigger import TriggerType
 
 
 class TriggerCollection(Serialisable):
@@ -7,10 +8,11 @@ class TriggerCollection(Serialisable):
 
     def json_serialise(self):
         ret = {
-            'triggers': [trigger.json_serialise() for trigger in self.trigger_list]
+            'triggers': {trigger.trigger_enum.value: trigger.json_serialise() for trigger in self.trigger_list}
         }
 
         return ret
+
 
 class InsightsPlotsDataItem(Serialisable):
     def __init__(self, unit_of_aggregation, visualization_type, vizualization_range, overlay_variable, title):
@@ -19,6 +21,12 @@ class InsightsPlotsDataItem(Serialisable):
         self.visualization_range = vizualization_range
         self.overlay_variable = overlay_variable
         self.title = title
+
+    def __setattr__(self, name, value):
+            if name in ['visualization_type', 'visualization_range']:
+                if value is not None and not isinstance(value, int):
+                    value = int(value)
+            super().__setattr__(name, value)
 
     def json_serialise(self):
         ret = {
@@ -42,6 +50,15 @@ class InsightsCTA(Serialisable):
         self.ice = ice
         self.cwi = cwi
         self.increase_default = increase_default
+
+    def __setattr__(self, name, value):
+            if name in ['heat', 'warmup', 'cooldown', 'active_rest', 'ice', 'cwi']:
+                if value is not None and not isinstance(value, bool):
+                    if value in ['x', 'X']:
+                        value = True
+                    else:
+                        value = False
+            super().__setattr__(name, value)
 
     def json_serialise(self):
         ret = {
@@ -76,6 +93,15 @@ class InsightsTrendsDataItem(Serialisable):
         self.cleared_title = cleared_title
         self.cleared_body = cleared_body
 
+    def __setattr__(self, name, value):
+        if name in ['present_in_trends']:
+            if value is not None and not isinstance(value, bool):
+                value = bool(value)
+        elif name in ['priority_styling']:
+                if value is not None and not isinstance(value, int):
+                    value = int(value)
+        super().__setattr__(name, value)
+
     def json_serialise(self):
         ret = {
             'priority_styling': self.priority_styling,
@@ -105,6 +131,15 @@ class InsightsPlansDataItem(Serialisable):
         self.child_data_item = None
         self.cleared_title = cleared_title
 
+    def __setattr__(self, name, value):
+        if name in ['present_in_plans']:
+            if value is not None and not isinstance(value, bool):
+                value = bool(value)
+        elif name in ['priority_styling']:
+            if value is not None and not isinstance(value, int):
+                value = int(value)
+        super().__setattr__(name, value)
+
     def json_serialise(self):
         ret = {
             'priority_styling': self.priority_styling,
@@ -128,9 +163,18 @@ class InsightsParentDataItem(Serialisable):
         self.new_subsequent_body = new_subsequent_body
         self.cleared_body = cleared_body
 
+    def __setattr__(self, name, value):
+        if name in ['enum']:
+            if value is not None and not isinstance(value, TriggerType):
+                if value == '':
+                    value = None
+                else:
+                    value = TriggerType(int(value))
+        super().__setattr__(name, value)
+
     def json_serialise(self):
         ret = {
-            'enum': self.enum,
+            'enum': self.enum.value if self.enum is not None else None,
             'new_first_time_title': self.new_first_time_title,
             'new_first_time_body': self.new_first_time_body,
             'new_subsequent_title': self.new_subsequent_title,
@@ -177,9 +221,18 @@ class InsightsDataItem(Serialisable):
         self.plots_data_item = None
         self.cta_data_item = None
 
+    def __setattr__(self, name, value):
+        if name in ['trigger_enum']:
+            if value is not None and not isinstance(value, TriggerType):
+                if value == '':
+                    value = None
+                else:
+                    value = TriggerType(int(value))
+        super().__setattr__(name, value)
+
     def json_serialise(self):
         ret = {
-            'trigger_enum': self.trigger_enum,
+            'trigger_enum': self.trigger_enum.value,
             'trend_type': self.trend_type,
             'triggers': self.triggers,
             'goal_names': self.goal_names,
