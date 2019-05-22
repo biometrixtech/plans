@@ -641,6 +641,19 @@ class ActiveRest(ModalityBase):
                 alert.sport_name = sport_name
                 self.alerts.append(alert)
 
+        hist_soreness = list(s for s in soreness_list if not s.is_dormant_cleared() and not s.pain and
+                             (s.is_persistent_soreness() or
+                              s.historic_soreness_status == HistoricSorenessStatus.persistent_2_soreness) and
+                             (self.event_date_time - s.first_reported_date_time).days < 30)
+
+        if len(hist_soreness) > 0:
+            goal = AthleteGoal("Recover from Sport", 1, AthleteGoalType.sport)
+            goal.trigger_type = TriggerType.hist_sore_less_30_sport  # 7
+            for sport_name in sports:
+                alert = Alert(goal)
+                alert.sport_name = sport_name
+                self.alerts.append(alert)
+
         if high_relative_load_session or high_relative_intensity_logged:
             goal = AthleteGoal("Recover from Sport", 1, AthleteGoalType.sport)
             #goal.trigger = "High Relative Volume or Intensity of Logged Session"
@@ -1499,6 +1512,19 @@ class CoolDown(ModalityBase, Serialisable):
         if muscular_strain_high:
             goal = AthleteGoal("Recover from Sport", 1, AthleteGoalType.sport)
             goal.trigger_type = TriggerType.overreaching_high_muscular_strain  # 8
+            if sport_name is not None:
+                alert = Alert(goal)
+                alert.sport_name = sport_name
+                self.alerts.append(alert)
+
+        hist_soreness = list(s for s in soreness_list if not s.is_dormant_cleared() and not s.pain and
+                             (s.is_persistent_soreness() or
+                              s.historic_soreness_status == HistoricSorenessStatus.persistent_2_soreness) and
+                             (self.event_date_time - s.first_reported_date_time).days < 30)
+
+        if len(hist_soreness) > 0:
+            goal = AthleteGoal("Recover from Sport", 1, AthleteGoalType.sport)
+            goal.trigger_type = TriggerType.hist_sore_less_30_sport  # 7
             if sport_name is not None:
                 alert = Alert(goal)
                 alert.sport_name = sport_name
