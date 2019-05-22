@@ -318,7 +318,7 @@ def get_alerts_ctas_goals_string(daily_plan):
     output += ";".join(daily_plan.trends.response.goals) + ","
     output += ";".join(convert_alerts_to_easy_list(daily_plan.trends.biomechanics.alerts)) + ","
     output += ";".join(daily_plan.trends.biomechanics.cta) + ","
-    output += ";".join(daily_plan.trends.biomechanics.goals) 
+    output += ";".join(daily_plan.trends.biomechanics.goals)
 
     return output
 
