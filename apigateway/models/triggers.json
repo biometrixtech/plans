@@ -299,7 +299,7 @@
             },
             "plots": {
                 "unit_of_aggregation": "per day, considering all body parts",
-                "visualization_type": 3,
+                "visualization_type": 1,
                 "visualization_range": 7,
                 "overlay_variable": "Max Severity of Soreness reported per day for all body parts",
                 "title": "Your Soreness History"
@@ -362,7 +362,7 @@
             },
             "plots": {
                 "unit_of_aggregation": "per day, considering all body parts",
-                "visualization_type": 3,
+                "visualization_type": 1,
                 "visualization_range": 7,
                 "overlay_variable": "Max Severity of Pain reported per day for all body parts",
                 "title": "Your Pain History"
@@ -425,7 +425,7 @@
             },
             "plots": {
                 "unit_of_aggregation": "per session",
-                "visualization_type": 6,
+                "visualization_type": 1,
                 "visualization_range": 7,
                 "overlay_variable": "Movement Quality max and min of session Severity category per day to define color per day",
                 "title": "Your Biomechanical Response History"
@@ -664,10 +664,10 @@
                 "priority_styling": 0,
                 "content_to_pass": "",
                 "present_in_trends": true,
-                "new_title": "Soreness Resulting From Weakeness",
-                "new_body": "We've noticed a pattern of soreness likely due to {bodypart} weakness. Proactive recovery will expodite tissue healing for faster gains.",
-                "ongoing_title": "Soreness Resulting From Weakeness",
-                "ongoing_body": "We've noticed a pattern of soreness likely due to {bodypart} weakness. Proactive recovery will expodite tissue healing for faster gains.",
+                "new_title": "",
+                "new_body": "",
+                "ongoing_title": "",
+                "ongoing_body": "",
                 "pos_change_title": "",
                 "pos_change_body": "",
                 "neg_change_title": "",
@@ -676,11 +676,11 @@
                 "cleared_body": ""
             },
             "plots": {
-                "unit_of_aggregation": "Unique per body part",
+                "unit_of_aggregation": "",
                 "visualization_type": 3,
                 "visualization_range": 7,
-                "overlay_variable": "Max Severity of Soreness reported per day for single body part",
-                "title": "Soreness Pattern in {bodypart}"
+                "overlay_variable": "",
+                "title": ""
             },
             "cta": {
                 "input": "Body Part",
@@ -1307,7 +1307,7 @@
             },
             "plots": {
                 "unit_of_aggregation": "per day, considering all body parts",
-                "visualization_type": 3,
+                "visualization_type": 1,
                 "visualization_range": 14,
                 "overlay_variable": "Max Severity of Soreness reported per day for all body parts",
                 "title": "Your Soreness History"
@@ -1370,7 +1370,7 @@
             },
             "plots": {
                 "unit_of_aggregation": "per day, considering all body parts",
-                "visualization_type": 3,
+                "visualization_type": 1,
                 "visualization_range": 14,
                 "overlay_variable": "Max Severity of Pain reported per day for all body parts",
                 "title": "Your Pain History"
@@ -1433,7 +1433,7 @@
             },
             "plots": {
                 "unit_of_aggregation": "per session",
-                "visualization_type": 6,
+                "visualization_type": 1,
                 "visualization_range": 14,
                 "overlay_variable": "Movement Quality max and min of session Severity category per day to define color per day",
                 "title": "Your Biomechanical Response History"

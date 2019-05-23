@@ -12,6 +12,7 @@ class LegendColor(Enum):
     green = 0
     yellow = 1
     red = 2
+    slate = 3
 
 
 class LegendType(Enum):
