@@ -1,12 +1,11 @@
 from enum import Enum
-from models.insights import InsightType
-from models.chart_data import TrainingVolumeChartData
-from models.sport import SportName
-from models.soreness import BodyPartSide
-from models.trigger_data import TriggerData
-from models.trigger import TriggerType
-from models.chart_data import BodyPartChartData, DataSeriesBooleanData, DataSeriesData
 from logic.text_generator import TextGenerator
+from models.chart_data import BodyPartChartData, DataSeriesBooleanData, DataSeriesData, TrainingVolumeChartData
+from models.insights import InsightType
+from models.soreness import BodyPartSide
+from models.sport import SportName
+from models.trigger import TriggerType
+from models.trigger_data import TriggerData
 
 
 class LegendColor(Enum):
@@ -326,7 +325,7 @@ class TrendCategory(object):
                 self.alerts.append(trend)
 
     def sort_trends(self):
-        self.alerts = sorted(self.alerts, key=lambda x: (x.priority, int(x.cleared)))
+        self.alerts = sorted(self.alerts, key=lambda x: (x.priority, -int(x.cleared)))
 
     def remove_not_present_in_trends_page(self):
         self.alerts = [alert for alert in self.alerts if alert.present_in_trends]

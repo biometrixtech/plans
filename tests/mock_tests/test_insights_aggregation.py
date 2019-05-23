@@ -459,5 +459,7 @@ def test_aggregate_alerts_cleared_trend_different_body_part_today():
     insights, longitudinal_insights, trends = AlertsProcessing(daily_plan, athlete_stats).aggregate_alerts(event_date_time, alerts)
     assert len(trends.response.alerts) == 3
     assert trends.response.alerts[0].trigger_type == TriggerType(7)
+    assert trends.response.alerts[0].cleared
     assert trends.response.alerts[1].trigger_type == TriggerType(7)
+    assert not trends.response.alerts[1].cleared
     assert trends.response.alerts[2].trigger_type == TriggerType(203)
