@@ -1,3 +1,4 @@
+from aws_xray_sdk.core import xray_recorder
 from serialisable import Serialisable
 from utils import parse_date
 # import models.session as session
@@ -132,6 +133,7 @@ class DailyPlan(Serialisable):
         return ret
 
     @classmethod
+    @xray_recorder.capture('datastore.DailyPlanDatastore._query_mongodb')
     def json_deserialise(cls, input_dict, stats_processing):
         daily_plan = cls(event_date=input_dict['date'])
         daily_plan.user_id = input_dict.get('user_id', None)
