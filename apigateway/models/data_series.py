@@ -1,5 +1,5 @@
 from serialisable import Serialisable
-from utils import format_date
+from utils import format_date, parse_date
 
 
 class DataSeries(Serialisable):
@@ -17,6 +17,6 @@ class DataSeries(Serialisable):
     @classmethod
     def json_deserialise(cls, input_dict):
 
-        data_series = DataSeries(input_dict["date"], input_dict["value"])
+        data_series = DataSeries(parse_date(input_dict["date"]), input_dict["value"])
 
         return data_series

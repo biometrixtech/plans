@@ -186,7 +186,7 @@ class StatsProcessing(object):
             training_sessions.extend(training_volume_processing.get_training_sessions(self.days_8_14_plans))
 
             if len(current_athlete_stats.muscular_strain) == 14:
-                current_athlete_stats.muscular_strain = sorted(current_athlete_stats.muscular_strain)
+                current_athlete_stats.muscular_strain.sort(key=lambda x: x.date, reverse=False)
                 del (current_athlete_stats.muscular_strain[0])
 
             current_athlete_stats.muscular_strain.append(self.get_muscular_strain(current_athlete_stats, cleared_soreness,
