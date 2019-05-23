@@ -203,14 +203,16 @@ class AlertsProcessing(object):
         self.add_chart_data(trend)
 
     def clear_trends(self, new_trends):
-        current_stress_trigger_types = [trend.trigger_type for trend in new_trends.stress.alerts]
-        current_response_trigger_types = [trend.trigger_type for trend in new_trends.response.alerts]
-        current_biomechanics_trigger_types = [trend.trigger_type for trend in new_trends.biomechanics.alerts]
+        current_stress_trigger_types = [trend.get_trigger_type_body_part_sport_tuple() for trend in new_trends.stress.alerts]
+        current_response_trigger_types = [trend.get_trigger_type_body_part_sport_tuple() for trend in new_trends.response.alerts]
+        current_biomechanics_trigger_types = [trend.get_trigger_type_body_part_sport_tuple() for trend in new_trends.biomechanics.alerts]
+
 
         for l_trend in self.athlete_stats.longitudinal_trends:
+            l_trend_type = l_trend.get_trigger_type_body_part_sport_tuple()
             # if trigger type does not exist, it was cleared
             if l_trend.insight_type == InsightType.stress and \
-                    l_trend.trigger_type not in current_stress_trigger_types:
+                    l_trend.get_trigger_type_body_part_sport_tuple() not in current_stress_trigger_types:
                 l_trend.cleared = True
                 # populate trend with text/visualization data
                 l_trend.add_data()
@@ -219,7 +221,7 @@ class AlertsProcessing(object):
                 new_trends.stress.alerts.append(l_trend)
             elif l_trend.insight_type == InsightType.response and \
                     l_trend.trigger_type != TriggerType.sore_today_doms and \
-                    l_trend.trigger_type not in current_response_trigger_types:
+                    l_trend.get_trigger_type_body_part_sport_tuple() not in current_response_trigger_types:
                 l_trend.cleared = True
                 # populate trend with text/visualization data
                 l_trend.add_data()
@@ -227,7 +229,7 @@ class AlertsProcessing(object):
                 self.add_chart_data(l_trend)
                 new_trends.response.alerts.append(l_trend)
             elif l_trend.insight_type == InsightType.biomechanics and \
-                    l_trend.trigger_type not in current_biomechanics_trigger_types:
+                    l_trend.get_trigger_type_body_part_sport_tuple() not in current_biomechanics_trigger_types:
                 l_trend.cleared = True
                 # populate trend with text/visualization data
                 l_trend.add_data()

@@ -232,6 +232,13 @@ class Trend(object):
         if cta_data['cwi']:
             self.cta.append('cwi')
 
+    def get_trigger_type_body_part_sport_tuple(self):
+        if len(self.body_parts) != 0:
+            body_part = self.body_parts[0]
+        else:
+            body_part = None
+        return self.trigger_type, body_part
+
 
 class CallToAction(object):
     def __init__(self, name):
@@ -319,7 +326,7 @@ class TrendCategory(object):
                 self.alerts.append(trend)
 
     def sort_trends(self):
-        self.alerts = sorted(self.alerts, key=lambda x: x.priority)
+        self.alerts = sorted(self.alerts, key=lambda x: (x.priority, int(x.cleared)))
 
     def remove_not_present_in_trends_page(self):
         self.alerts = [alert for alert in self.alerts if alert.present_in_trends]

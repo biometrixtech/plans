@@ -397,11 +397,12 @@ def test_aggregate_alerts_doms_yesterday():
     assert trends.response.alerts[1].trigger_type == TriggerType(202)
 
 
-def test_aggregate_alerts_cleared_trend():
+def test_aggregate_alerts_cleared_trend_doms():
     current_date_time = datetime.datetime.now()
     trend = Trend(TriggerType(11))
+    trend.add_data()
     goal = AthleteGoal('Care for Soreness', 0, AthleteGoalType(1))
-    goal.trigger_type = TriggerType(11)
+    goal.trigger_type = TriggerType(8)
     alert = Alert(goal)
     alert.body_part = BodyPartSide(BodyPartLocation(11), 2)
 
@@ -413,5 +414,50 @@ def test_aggregate_alerts_cleared_trend():
     athlete_stats.longitudinal_trends = [trend]
     insights, longitudinal_insights, trends = AlertsProcessing(daily_plan, athlete_stats).aggregate_alerts(event_date_time, alerts)
     assert len(trends.response.alerts) == 2
-    assert trends.response.alerts[0].trigger_type == TriggerType(203)
-    assert trends.response.alerts[1].trigger_type == TriggerType(202)
+    assert trends.response.alerts[0].trigger_type == TriggerType(8)
+    assert trends.response.alerts[1].trigger_type == TriggerType(203)
+
+
+def test_aggregate_alerts_cleared_trend_not_doms():
+    current_date_time = datetime.datetime.now()
+    trend = Trend(TriggerType(8))
+    trend.add_data()
+    goal = AthleteGoal('Care for Soreness', 0, AthleteGoalType(1))
+    goal.trigger_type = TriggerType(7)
+    alert = Alert(goal)
+    alert.body_part = BodyPartSide(BodyPartLocation(11), 2)
+
+    alerts = [alert]
+    event_date_time = current_date_time
+    daily_plan = DailyPlan(format_date(event_date_time))
+    athlete_stats = AthleteStats('test_user')
+    athlete_stats.exposed_triggers = []
+    athlete_stats.longitudinal_trends = [trend]
+    insights, longitudinal_insights, trends = AlertsProcessing(daily_plan, athlete_stats).aggregate_alerts(event_date_time, alerts)
+    assert len(trends.response.alerts) == 3
+    assert trends.response.alerts[0].trigger_type == TriggerType(8)
+    assert trends.response.alerts[1].trigger_type == TriggerType(7)
+    assert trends.response.alerts[2].trigger_type == TriggerType(203)
+
+
+def test_aggregate_alerts_cleared_trend_different_body_part_today():
+    current_date_time = datetime.datetime.now()
+    trend = Trend(TriggerType(7))
+    trend.body_parts = [BodyPartSide(BodyPartLocation(11), 2)]
+    trend.add_data()
+    goal = AthleteGoal('Care for Soreness', 0, AthleteGoalType(1))
+    goal.trigger_type = TriggerType(7)
+    alert = Alert(goal)
+    alert.body_part = BodyPartSide(BodyPartLocation(11), 1)
+
+    alerts = [alert]
+    event_date_time = current_date_time
+    daily_plan = DailyPlan(format_date(event_date_time))
+    athlete_stats = AthleteStats('test_user')
+    athlete_stats.exposed_triggers = []
+    athlete_stats.longitudinal_trends = [trend]
+    insights, longitudinal_insights, trends = AlertsProcessing(daily_plan, athlete_stats).aggregate_alerts(event_date_time, alerts)
+    assert len(trends.response.alerts) == 3
+    assert trends.response.alerts[0].trigger_type == TriggerType(7)
+    assert trends.response.alerts[1].trigger_type == TriggerType(7)
+    assert trends.response.alerts[2].trigger_type == TriggerType(203)
