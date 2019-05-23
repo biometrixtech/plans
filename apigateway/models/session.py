@@ -527,10 +527,25 @@ class CorrectiveSession(Session):
             return False
 
 
-class HighLoadSession(object):
+class HighLoadSession(Serialisable):
     def __init__(self, date, sport_name):
         self.date = date
         self.sport_name = sport_name
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+
+        session = HighLoadSession(input_dict["date"],  SportName(int(input_dict["sport_name"])))
+
+        return session
+
+    def json_serialise(self):
+        ret = {
+            'date': format_datetime(self.date),
+            'sport_name': self.sport_name.value
+        }
+
+        return ret
 
 '''deprecated
 class FunctionalStrengthSession(Serialisable):

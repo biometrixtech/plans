@@ -43,6 +43,7 @@ class LoadMonitoringMeasures(object):
         self.non_functional_overreaching_level = None
 
 
+'''dep
 class MuscularStrain(object):
     def __init__(self):
         self.previous_muscular_strain = None
@@ -54,7 +55,7 @@ class TrainingStrain(object):
         self.value = None
         self.events = 0
         self.historical = []
-
+'''
 
 class Monotony(object):
     def __init__(self):

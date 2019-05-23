@@ -103,7 +103,7 @@ def create_plan(test_parameter, body_part_list, severity_list, side_list, pain_l
 
     soreness_list = []
     for b in range(0, len(body_part_list)):
-        if len(pain_list) > 0 and pain_list[b]:
+        if len(pain_list) > 0 and b in pain_list:
             soreness_list.append(TestUtilities().body_part_pain(body_part_list[b], severity_list[b], side_list[b]))
         else:
             if len(severity_list) == 0:
@@ -311,14 +311,17 @@ def get_alerts_ctas_goals_string(daily_plan):
     output = ""
 
     output += ";".join(convert_alerts_to_easy_list(daily_plan.trends.biomechanics.alerts)) + ","
-    output += ";".join(daily_plan.trends.biomechanics.cta) + ","
+    #output += ";".join(daily_plan.trends.biomechanics.cta.name) + ","
+    output += ";{CTA},"
     output += ";".join(daily_plan.trends.biomechanics.goals) + ","
     output += ";".join(convert_alerts_to_easy_list(daily_plan.trends.response.alerts)) + ","
-    output += ";".join(daily_plan.trends.response.cta) + ","
+    #output += ";".join(daily_plan.trends.response.cta.name) + ","
+    output += ";{CTA},"
     output += ";".join(daily_plan.trends.response.goals) + ","
     output += ";".join(convert_alerts_to_easy_list(daily_plan.trends.biomechanics.alerts)) + ","
-    output += ";".join(daily_plan.trends.biomechanics.cta) + ","
-    output += ";".join(daily_plan.trends.biomechanics.goals) 
+    #output += ";".join(daily_plan.trends.biomechanics.cta.name) + ","
+    output += ";{CTA},"
+    output += ";".join(daily_plan.trends.biomechanics.goals)
 
     return output
 
@@ -352,6 +355,19 @@ def get_summary_string(daily_plan):
         line = line + "No"
 
     return line
+
+def get_body_part_location_string(body_part_list):
+
+    output = ""
+
+    times = 0
+    for b in body_part_list:
+        if times > 0:
+            output += ';'
+        output += str(BodyPartLocation(b))
+        times += 1
+
+    return output
 
 def test_pre_active_rest_limited_body_parts():
 
@@ -413,24 +429,33 @@ def test_pre_active_rest_limited_body_parts():
             for m1 in max_severity_1:
                 for h1 in historic_soreness_status_1:
                     for p in is_pain_1:
-                        soreness_list = []
+                        body_part_list = []
+                        body_part_list.append(b1)
+
+                        severity_list = []
+                        severity_list.append(m1)
+
+                        historic_soreness_list = []
 
                         historic_soreness = HistoricSoreness(BodyPartLocation(14), 1, True)
-                        historic_soreness.first_reported = current_date_time
+                        historic_soreness.first_reported = current_date_time - timedelta(days=16)
                         historic_soreness.historic_soreness_status = h1
+                        historic_soreness_list.append(historic_soreness)
 
-                        if not p:
-                            if not test_parm.doms:
-                                soreness_list.extend(soreness_one_body_part(b1, m1, h1))
-                            else:
-                                soreness_list.extend(soreness_two_body_parts_random(body_parts_1, b1, m1, h1))
-                        else:
-                            soreness_list.extend(pain_one_body_part(b1, m1, h1))
+                        if test_parm.doms and not p:
+                            temp_list = list(b for b in body_parts_1 if b != b1)
+                            temp_enum = random.choice(temp_list)
+                            historic_soreness_2 = HistoricSoreness(BodyPartLocation(temp_enum), 2, True)
+                            historic_soreness_2.first_reported = current_date_time - timedelta(days=8)
+                            historic_soreness_2.historic_soreness_status = HistoricSorenessStatus.doms
+                            historic_soreness_list.append(historic_soreness_2)
+                            body_part_list.append(temp_enum)
+                            severity_list.append(2)
 
                         body_part_line = (
-                                str(BodyPartLocation(b1)) + ',' + str(p) + ',' + str(m1) + ',' + str(h1))
+                                get_body_part_location_string(body_part_list) + ',' + str(p) + ',' + str(m1) + ',' + str(h1))
 
-                        daily_plan = create_plan(test_parameter=test_parm, body_part_list=[b1], severity_list=[m1], side_list=[1],
+                        daily_plan = create_plan(test_parameter=test_parm, body_part_list=body_part_list, severity_list=severity_list, side_list=[1],
                                                  pain_list=[p], train_later=test_parm.train_later, historic_soreness_list=[historic_soreness])
 
                         insights_string = get_insights_string(daily_plan.insights)
