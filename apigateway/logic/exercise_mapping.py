@@ -396,9 +396,10 @@ class ExerciseAssignmentCalculator(object):
             if ice is not None:
                 ice.goals.add(goal)
                 ice_list.append(ice)
-                alert = Alert(goal)
-                alert.body_part = BodyPartSide(s.body_part.location, s.side)
-                alerts.append(alert)
+                if goal.trigger_type not in [TriggerType(4), TriggerType(5)]:  # these triggers are in plans but not insights/trends
+                    alert = Alert(goal)
+                    alert.body_part = BodyPartSide(s.body_part.location, s.side)
+                    alerts.append(alert)
 
         for d in self.doms:
             days = (self.event_date_time - d.first_reported_date_time).days
