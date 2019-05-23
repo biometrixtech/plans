@@ -11,6 +11,7 @@ from models.metrics import AthleteMetric
 from models.training_volume import StandardErrorRange
 from models.sport import SportName
 from models.insights import AthleteInsight
+from models.athlete_trend import Trend
 from models.load_stats import LoadStats
 from models.session import HighLoadSession
 from models.data_series import DataSeries
@@ -131,6 +132,7 @@ class AthleteStatsDatastore(object):
         athlete_stats.high_relative_load_benchmarks = {SportName(value): load for (value, load) in mongo_result.get('high_relative_load_benchmarks', {}).items()}
         athlete_stats.exposed_triggers = [TriggerType(trigger) for trigger in mongo_result.get('exposed_triggers', [])]
         athlete_stats.longitudinal_insights = [AthleteInsight.json_deserialise(insight) for insight in mongo_result.get('longitudinal_insights', [])]
+        athlete_stats.longitudinal_trends = [Trend.json_deserialise(trend) for trend in mongo_result.get('longitudinal_trends', [])]
         athlete_stats.load_stats = LoadStats.json_deserialise(mongo_result.get('load_stats', None))
         athlete_stats.muscular_strain = [DataSeries.json_deserialise(muscular_strain) for muscular_strain in mongo_result.get('muscular_strain', [])]
         athlete_stats.high_relative_load_sessions = [HighLoadSession.json_deserialise(session) for session in mongo_result.get('high_relative_load_sessions', [])]
