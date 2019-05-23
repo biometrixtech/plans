@@ -197,8 +197,7 @@ class Trend(object):
                 legends = [legend for legend in visualization_data['legend'] if legend['color'] == 1]
         else:
             legends = visualization_data['legend']
-        for legend in legends:
-            self.visualization_data.plot_legends.append(Legend.json_deserialise(legend))
+        self.visualization_data.plot_legends = [Legend.json_deserialise(legend) for legend in legends]
 
         self.visualization_title.text = TextGenerator.get_cleaned_text(plot_data['title'], body_parts=self.body_parts)
         self.visualization_title.body_part_text = [TextGenerator.get_body_part_text(self.body_parts)]

@@ -198,6 +198,8 @@ class AlertsProcessing(object):
         if alert.sport_name is not None:
             trend.sport_names.append(alert.sport_name)
         # populate trend with text/visualization data
+        trend.body_parts = [BodyPartSide.json_deserialise(dict(t)) for t in {tuple(d.json_serialise().items()) for d in trend.body_parts}]
+        trend.sport_names = list(set(trend.sport_names))
         trend.add_data()
         # populate relevant data for charts
         self.add_chart_data(trend)
