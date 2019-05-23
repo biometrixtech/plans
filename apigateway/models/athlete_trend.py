@@ -119,6 +119,7 @@ class Trend(object):
         self.data = []
         self.cta = []
         self.priority = 0
+        self.present_in_trends = True
 
     def json_serialise(self):
         ret = {
@@ -135,7 +136,8 @@ class Trend(object):
             'data_source': self.data_source.value,
             'insight_type': self.insight_type.value,
             'cta': self.cta,
-            'priority': self.priority
+            'priority': self.priority,
+            'present_in_trends': self.present_in_trends
         }
         return ret
 
@@ -154,6 +156,7 @@ class Trend(object):
         trend.insight_type = InsightType(input_dict.get('insight_type', 0))
         trend.priority = input_dict.get('priority', 0)
         trend.cta = input_dict.get('cta', [])
+        trend.present_in_trends = input_dict.get('present_in_trends', True)
         if trend.visualization_type == VisualizationType.load:
             trend.data = []
         elif trend.visualization_type == VisualizationType.session:
@@ -202,6 +205,7 @@ class Trend(object):
         self.title = TextGenerator.get_cleaned_text(title, goals=self.goal_targeted, body_parts=self.body_parts, sport_names=self.sport_names)
         self.insight_type = InsightType[trigger_data['trend_type'].lower()]
         self.priority = int(trigger_data['insight_priority_trend_type'])
+        self.present_in_trends = trend_data['present_in_trends']
         if cta_data['heat']:
             self.cta.append('heat')
         if cta_data['warmup']:
@@ -302,7 +306,10 @@ class TrendCategory(object):
                 self.alerts.append(trend)
 
     def sort_trends(self):
-        self.alerts = sorted(self.alerts, key=lambda x: (x.priority))
+        self.alerts = sorted(self.alerts, key=lambda x: x.priority)
+
+    def remove_not_present_in_trends_page(self):
+        self.alerts = [alert for alert in self.alerts if alert.present_in_trends]
 
 
 class TrendsDashboard(object):
@@ -363,6 +370,17 @@ class AthleteTrends(object):
         self.stress.sort_trends()
         self.response.sort_trends()
         self.biomechanics.sort_trends()
+
+    def remove_trend_not_present_in_trends_page(self):
+        self.stress.remove_not_present_in_trends_page()
+        self.response.remove_not_present_in_trends_page()
+        self.biomechanics.remove_not_present_in_trends_page()
+
+    def cleanup(self):
+        self.add_cta()
+        self.add_no_trigger()
+        self.remove_trend_not_present_in_trends_page()
+        self.sort_by_priority()
 
 
 class TextGenerator(object):

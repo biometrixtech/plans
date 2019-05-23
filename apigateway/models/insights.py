@@ -22,7 +22,7 @@ class AthleteInsight(Serialisable):
         self.severity = []
         self.cleared = False
         self.insight_type = InsightType.stress
-        self.longitudinal = self.get_insight_duration()
+        self.longitudinal = self.is_multi_day()
         self.priority = None
         self.styling = self.get_styling()
         self.read = False
@@ -104,7 +104,7 @@ class AthleteInsight(Serialisable):
 
         self.insight_type = InsightType[trigger_data['trend_type'].lower()]
 
-    def get_insight_duration(self):
+    def is_multi_day(self):
         if self.trigger_type.value in [7, 8, 11, 16, 19, 103, 104]:
             return True
         else:
