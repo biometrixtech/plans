@@ -1,4 +1,5 @@
 from serialisable import Serialisable
+from models.sport import SportName
 
 
 class LoadStats(Serialisable):
@@ -57,6 +58,29 @@ class LoadStats(Serialisable):
             load_stats.max_shrz = input_dict["max_shrz"]
 
         return load_stats
+
+    def set_min_max_values(self, training_sessions):
+
+        if training_sessions is not None:
+            for t in training_sessions:
+                if t.duration_minutes is not None and t.duration_minutes > 0:
+                    self.min_duration_minutes = min(self.min_duration_minutes if self.min_duration_minutes is not None else 0, t.duration_minutes)
+                    self.max_duration_minutes = max(self.max_duration_minutes if self.max_duration_minutes is not None else 0, t.duration_minutes)
+                if t.duration_health is not None and t.duration_health > 0:
+                    self.min_duration_health = min(self.min_duration_health if self.min_duration_health is not None else 0, t.duration_health)
+                    self.max_duration_health = max(self.max_duration_health if self.max_duration_health is not None else 0, t.duration_health)
+                if t.get_distance_load(SportName.walking) is not None and t.get_distance_load(SportName.walking) > 0:
+                    self.min_walk_run_distance = min(self.min_walk_run_distance if self.min_walk_run_distance is not None else 0, t.get_distance_load(SportName.walking))
+                    self.max_walk_run_distance = max(self.max_walk_run_distance if self.max_walk_run_distance is not None else 0, t.get_distance_load(SportName.walking))
+                if t.get_distance_load(SportName.distance_running) is not None and t.get_distance_load(SportName.distance_running) > 0:
+                    self.min_walk_run_distance = min(self.min_walk_run_distance if self.min_walk_run_distance is not None else 0, t.get_distance_load(SportName.distance_running))
+                    self.max_walk_run_distance = max(self.max_walk_run_distance if self.max_walk_run_distance is not None else 0, t.get_distance_load(SportName.distance_running))
+                if t.get_distance_load(SportName.swimming) is not None and t.get_distance_load(SportName.swimming) > 0:
+                    self.min_swimming_distance = min(self.min_swimming_distance if self.min_swimming_distance is not None else 0, t.get_distance_load(SportName.swimming))
+                    self.max_swimming_distance = max(self.max_swimming_distance if self.max_swimming_distance is not None else 0, t.get_distance_load(SportName.swimming))
+                if t.get_distance_load(SportName.cycling) is not None and t.get_distance_load(SportName.cycling) > 0:
+                    self.min_cycling_distance = min(self.min_cycling_distance if self.min_cycling_distance is not None else 0, t.get_distance_load(SportName.cycling))
+                    self.max_cycling_distance = max(self.max_cycling_distance if self.max_cycling_distance is not None else 0, t.get_distance_load(SportName.cycling))
 
     def get_attribute_load(self, attribute_name, value):
 

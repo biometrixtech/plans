@@ -102,15 +102,16 @@ class StatsProcessing(object):
         current_athlete_stats.historic_soreness = self.get_historic_soreness_list(soreness_list_25,
                                                                                   current_athlete_stats.historic_soreness)
         training_volume_processing = TrainingVolumeProcessing(self.start_date,
-                                                              format_date( self.event_date))  # want event date since end date = event_date + 1
+                                                              format_date( self.event_date),
+                                                              current_athlete_stats.load_stats)  # want event date since end date = event_date + 1
 
         training_volume_processing.load_plan_values(self.last_7_days_plans,
                                                     self.days_8_14_plans,
                                                     self.acute_daily_plans,
                                                     self.get_chronic_weeks_plans(),
-                                                    self.chronic_daily_plans,
-                                                    current_athlete_stats.load_stats
+                                                    self.chronic_daily_plans
                                                     )
+        current_athlete_stats.load_stats = training_volume_processing.load_stats
         current_athlete_stats = training_volume_processing.calc_training_volume_metrics(current_athlete_stats)
         current_athlete_stats.high_relative_load_sessions = training_volume_processing.high_relative_load_sessions
 
@@ -262,6 +263,8 @@ class StatsProcessing(object):
 
         total_load = 0
         sore_load = 0
+
+        athlete_stats.load_stats.set_min_max_values(training_sessions)
 
         for t in training_sessions:
             if t.session_RPE == 1:  # maintenance load, do not consider

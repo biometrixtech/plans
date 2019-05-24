@@ -221,21 +221,25 @@ class SurveyProcessing(object):
         session_heart_rate.hr_workout = [HeartRateData(cleanup_hr_data_from_api(hr)) for hr in hr_data]
         self.heart_rate_data.append(session_heart_rate)
 
-    def check_high_relative_load_sessions(self, sessions, load_stats):
-        training_volume_processing = TrainingVolumeProcessing(self.event_date_time, self.event_date_time)
+    def check_high_relative_load_sessions(self, sessions):
+        training_volume_processing = TrainingVolumeProcessing(self.event_date_time, self.event_date_time,
+                                                              self.athlete_stats.load_stats)
         high_relative_load_session_present = False
         sport_name = None
         load = 0
-        for session in sessions:
-            if not session.deleted and not session.ignored:
-                if training_volume_processing.is_last_session_high_relative_load(self.event_date_time, session,
-                                                                                 self.athlete_stats.high_relative_load_benchmarks,
-                                                                                 load_stats):
-                    high_relative_load_session_present = True
-                    #session_load = session.duration_minutes * session.session_RPE
-                    session_load = session.training_volume(load_stats)
-                    if session_load > load:
-                        sport_name = session.sport_name
+
+        session_list = list(s for s in sessions if not s.deleted and not s.ignored)
+        self.athlete_stats.load_stats.set_min_max_values(session_list)
+
+        for session in session_list :
+            if training_volume_processing.is_last_session_high_relative_load(self.event_date_time, session,
+                                                                             self.athlete_stats.high_relative_load_benchmarks,
+                                                                             self.athlete_stats.load_stats):
+                high_relative_load_session_present = True
+                #session_load = session.duration_minutes * session.session_RPE
+                session_load = session.training_volume(self.athlete_stats.load_stats)
+                if session_load > load:
+                    sport_name = session.sport_name
         self.athlete_stats.high_relative_load_session = high_relative_load_session_present
         self.athlete_stats.high_relative_load_session_sport_name = sport_name
 
