@@ -616,7 +616,9 @@ class ActiveRest(ModalityBase):
 
     def fill_exercises(self, soreness_list, exercise_library, high_relative_load_session, high_relative_intensity_logged, muscular_strain_high, sports):
 
-        if soreness_list is not None and len(soreness_list) > 0:
+        if self.force_data:
+            self.get_general_exercises(exercise_library)
+        elif soreness_list is not None and len(soreness_list) > 0:
             for s in soreness_list:
                 self.check_reactive_recover_from_sport(soreness_list, exercise_library, high_relative_load_session,
                                                        high_relative_intensity_logged,
@@ -631,9 +633,7 @@ class ActiveRest(ModalityBase):
                                                    high_relative_intensity_logged,
                                                    muscular_strain_high,
                                                    sports)
-        else:
-            if self.force_data:
-                self.get_general_exercises(exercise_library)
+
 
     def get_general_exercises(self, exercise_library):
 
