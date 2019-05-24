@@ -149,7 +149,7 @@ def test_strain_events():
         strain_list.append((seed_date, seed[s]))
         seed_date = seed_date + timedelta(days=1)
 
-    tvp = TrainingVolumeProcessing("2018-01-01", "2018-01-09")
+    tvp = TrainingVolumeProcessing("2018-01-01", "2018-01-09", athlete_stats.load_stats)
     tvp.internal_load_tuples = strain_list
     strain, strain_events = tvp.get_historical_internal_strain("2018-01-01", "2018-01-09", None)
 

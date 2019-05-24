@@ -44,6 +44,7 @@ class Persona(object):
                 readiness_data = {'date_time': format_datetime(date_time),
                                   'soreness': soreness}
                 self.create_readiness(readiness_data)
+
                 self.create_plan(event_date)
                 exercise_list = [ex.exercise.id for ex in self.daily_plan.pre_active_rest[0].inhibit_exercises.values()]
                 self.complete_exercises(exercise_list, format_datetime(event_date + datetime.timedelta(hours=1)))
@@ -72,6 +73,7 @@ class Persona(object):
         self.add_session(event_date)
         store = DailyPlanDatastore()
         store.put(self.daily_plan)
+        self.update_stats(event_date)
         plan_manager = TrainingPlanManager(self.user_id, DatastoreCollection(), )
         self.daily_plan = plan_manager.create_daily_plan(event_date=format_date(event_date), last_updated=format_datetime(event_date), athlete_stats=self.athlete_stats)
 

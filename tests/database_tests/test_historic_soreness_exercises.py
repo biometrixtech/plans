@@ -103,7 +103,7 @@ def create_plan(test_parameter, body_part_list, severity_list, side_list, pain_l
 
     soreness_list = []
     for b in range(0, len(body_part_list)):
-        if len(pain_list) > 0 and b in pain_list:
+        if len(pain_list) > 0 and pain_list[b]:
             soreness_list.append(TestUtilities().body_part_pain(body_part_list[b], severity_list[b], side_list[b]))
         else:
             if len(severity_list) == 0:
@@ -369,6 +369,99 @@ def get_body_part_location_string(body_part_list):
 
     return output
 
+def get_priority_counts_for_collection(collection):
+
+    priority_1_count = 0
+    priority_2_count = 0
+    priority_3_count = 0
+
+    for e, d in collection.items():
+        if d.dosages[0].priority == "1":
+            priority_1_count += 1
+        elif d.dosages[0].priority == "2":
+            priority_2_count += 1
+        elif d.dosages[0].priority == "3":
+            priority_3_count += 1
+
+    return priority_1_count, priority_2_count, priority_3_count
+
+def get_priority_counts_for_dosages(daily_plan):
+
+    priority_1_count = 0
+    priority_2_count = 0
+    priority_3_count = 0
+
+    if daily_plan.pre_active_rest is not None and len(daily_plan.pre_active_rest) > 0:
+        priority_1_count_new, priority_2_count_new, priority_3_count_new = get_priority_counts_for_collection(
+            daily_plan.pre_active_rest[0].inhibit_exercises)
+        priority_1_count += priority_1_count_new
+        priority_2_count += priority_2_count_new
+        priority_3_count += priority_3_count_new
+
+        priority_1_count_new, priority_2_count_new, priority_3_count_new = get_priority_counts_for_collection(
+            daily_plan.pre_active_rest[0].static_stretch_exercises)
+        priority_1_count += priority_1_count_new
+        priority_2_count += priority_2_count_new
+        priority_3_count += priority_3_count_new
+
+        priority_1_count_new, priority_2_count_new, priority_3_count_new = get_priority_counts_for_collection(
+            daily_plan.pre_active_rest[0].active_stretch_exercises)
+        priority_1_count += priority_1_count_new
+        priority_2_count += priority_2_count_new
+        priority_3_count += priority_3_count_new
+
+        priority_1_count_new, priority_2_count_new, priority_3_count_new = get_priority_counts_for_collection(
+            daily_plan.pre_active_rest[0].isolated_activate_exercises)
+        priority_1_count += priority_1_count_new
+        priority_2_count += priority_2_count_new
+        priority_3_count += priority_3_count_new
+
+        priority_1_count_new, priority_2_count_new, priority_3_count_new = get_priority_counts_for_collection(
+            daily_plan.pre_active_rest[0].static_integrate_exercises)
+        priority_1_count += priority_1_count_new
+        priority_2_count += priority_2_count_new
+        priority_3_count += priority_3_count_new
+
+    if daily_plan.post_active_rest is not None and len(daily_plan.post_active_rest) > 0:
+        priority_1_count_new, priority_2_count_new, priority_3_count_new = get_priority_counts_for_collection(
+            daily_plan.post_active_rest[0].inhibit_exercises)
+        priority_1_count += priority_1_count_new
+        priority_2_count += priority_2_count_new
+        priority_3_count += priority_3_count_new
+
+        priority_1_count_new, priority_2_count_new, priority_3_count_new = get_priority_counts_for_collection(
+            daily_plan.post_active_rest[0].static_stretch_exercises)
+        priority_1_count += priority_1_count_new
+        priority_2_count += priority_2_count_new
+        priority_3_count += priority_3_count_new
+
+        priority_1_count_new, priority_2_count_new, priority_3_count_new = get_priority_counts_for_collection(
+            daily_plan.post_active_rest[0].isolated_activate_exercises)
+        priority_1_count += priority_1_count_new
+        priority_2_count += priority_2_count_new
+        priority_3_count += priority_3_count_new
+
+        priority_1_count_new, priority_2_count_new, priority_3_count_new = get_priority_counts_for_collection(
+            daily_plan.post_active_rest[0].static_integrate_exercises)
+        priority_1_count += priority_1_count_new
+        priority_2_count += priority_2_count_new
+        priority_3_count += priority_3_count_new
+
+    priority_string = str(priority_1_count) + "," + str(priority_2_count) + "," + str(priority_3_count)
+
+    return priority_string
+
+def is_historic_soreness_pain(historic_soreness_status):
+
+    if historic_soreness_status in[HistoricSorenessStatus.acute_pain,HistoricSorenessStatus.persistent_pain,
+                                   HistoricSorenessStatus.persistent_2_pain,HistoricSorenessStatus.almost_persistent_pain,
+                                   HistoricSorenessStatus.almost_persistent_2_pain_acute,
+                                   HistoricSorenessStatus.almost_persistent_2_pain,
+                                   HistoricSorenessStatus.almost_acute_pain]:
+        return True
+    else:
+        return False
+
 def test_pre_active_rest_limited_body_parts():
 
     current_date = date.today()
@@ -416,7 +509,7 @@ def test_pre_active_rest_limited_body_parts():
                 'isolated_activate_minutes_efficient, isolated_activate_minutes_complete,isolated_activate_minutes_comprehensive,'+
                 'isolated_activate_exercises,static_integrate_goals_triggers,static_integrate_minutes_efficient, '+
                 'static_integrate_minutes_complete,static_integrate_minutes_comprehensive, static_integrate_exercises,'+
-                'total_minutes_efficient, total_minutes_complete, total_minutes_comprehensive')
+                'total_minutes_efficient, total_minutes_complete, total_minutes_comprehensive,priority_1_count,priority_2_count,priority_3_count')
         sline = ('BodyPart,is_pain,severity,hs_status,default_plan,insights,' +
                  't:biomechanics_triggers,t:biomechanics_ctas,t:biomechanics_goals,t:response_triggers,t:response_ctas,t:response_goals,t:stress_triggers,t:stress_ctas,t:stress_goals,'+
                  'heat, pre_active_rest, post_active_rest, cooldown, ice, cold_water_immersion')
@@ -429,146 +522,153 @@ def test_pre_active_rest_limited_body_parts():
             for m1 in max_severity_1:
                 for h1 in historic_soreness_status_1:
                     for p in is_pain_1:
-                        body_part_list = []
-                        body_part_list.append(b1)
+                        if 0==0 or (b1 == 6 and h1 is None and not test_parm.doms and not test_parm.athlete_stats.muscular_strain_increasing):
+                            body_part_list = []
+                            body_part_list.append(b1)
 
-                        severity_list = []
-                        severity_list.append(m1)
+                            severity_list = []
+                            severity_list.append(m1)
 
-                        historic_soreness_list = []
+                            pain_list = []
+                            pain_list.append(p)
 
-                        historic_soreness = HistoricSoreness(BodyPartLocation(14), 1, True)
-                        historic_soreness.first_reported = current_date_time - timedelta(days=16)
-                        historic_soreness.historic_soreness_status = h1
-                        historic_soreness_list.append(historic_soreness)
+                            historic_soreness_list = []
 
-                        if test_parm.doms and not p:
-                            temp_list = list(b for b in body_parts_1 if b != b1)
-                            temp_enum = random.choice(temp_list)
-                            historic_soreness_2 = HistoricSoreness(BodyPartLocation(temp_enum), 2, True)
-                            historic_soreness_2.first_reported = current_date_time - timedelta(days=8)
-                            historic_soreness_2.historic_soreness_status = HistoricSorenessStatus.doms
-                            historic_soreness_list.append(historic_soreness_2)
-                            body_part_list.append(temp_enum)
-                            severity_list.append(2)
+                            historic_soreness = HistoricSoreness(BodyPartLocation(14), 1, is_historic_soreness_pain(h1))
+                            historic_soreness.first_reported_date_time = current_date_time - timedelta(days=16)
+                            historic_soreness.historic_soreness_status = h1
+                            historic_soreness_list.append(historic_soreness)
 
-                        body_part_line = (
-                                get_body_part_location_string(body_part_list) + ',' + str(p) + ',' + str(m1) + ',' + str(h1))
+                            if test_parm.doms and not p:
+                                temp_list = list(b for b in body_parts_1 if b != b1)
+                                temp_enum = random.choice(temp_list)
+                                historic_soreness_2 = HistoricSoreness(BodyPartLocation(temp_enum), 2, False)
+                                historic_soreness_2.first_reported_date_time = current_date_time - timedelta(days=8)
+                                historic_soreness_2.historic_soreness_status = HistoricSorenessStatus.doms
+                                historic_soreness_list.append(historic_soreness_2)
+                                body_part_list.append(temp_enum)
+                                severity_list.append(2)
+                                pain_list.append(False)
 
-                        daily_plan = create_plan(test_parameter=test_parm, body_part_list=body_part_list, severity_list=severity_list, side_list=[1],
-                                                 pain_list=[p], train_later=test_parm.train_later, historic_soreness_list=[historic_soreness])
+                            body_part_line = (
+                                    get_body_part_location_string(body_part_list) + ',' + str(p) + ',' + str(m1) + ',' + str(h1))
 
-                        insights_string = get_insights_string(daily_plan.insights)
+                            daily_plan = create_plan(test_parameter=test_parm, body_part_list=body_part_list, severity_list=severity_list, side_list=[1],
+                                                     pain_list=pain_list, train_later=test_parm.train_later, historic_soreness_list=[historic_soreness])
 
-                        alert_cta_goal_line = get_alerts_ctas_goals_string(daily_plan)
+                            insights_string = get_insights_string(daily_plan.insights)
 
-                        if test_parm.train_later:
-                            plan_obj = daily_plan.pre_active_rest[0]
-                        else:
-                            plan_obj = daily_plan.post_active_rest[0]
-                            plan_obj.active_stretch_exercises = {}
+                            alert_cta_goal_line = get_alerts_ctas_goals_string(daily_plan)
 
-                        body_part_line += ',' + plan_obj.default_plan
+                            if test_parm.train_later:
+                                plan_obj = daily_plan.pre_active_rest[0]
+                            else:
+                                plan_obj = daily_plan.post_active_rest[0]
+                                plan_obj.active_stretch_exercises = {}
 
-                        inhibit_goals_triggers = get_goals_triggers(plan_obj.inhibit_exercises)
-                        static_stretch_goals_triggers = get_goals_triggers(plan_obj.static_stretch_exercises)
-                        if test_parm.train_later:
-                            active_stretch_goals_triggers = get_goals_triggers(plan_obj.active_stretch_exercises)
-                        else:
-                            active_stretch_goals_triggers = ''
-                        isolated_activate_goals_triggers = get_goals_triggers(plan_obj.isolated_activate_exercises)
-                        static_integrate_goals_triggers = get_goals_triggers(plan_obj.static_integrate_exercises)
+                            body_part_line += ',' + plan_obj.default_plan
 
-                        efficient_inhibit_minutes = calc_active_time_efficient(plan_obj.inhibit_exercises)
-                        efficient_static_stretch_minutes = calc_active_time_efficient(
-                            plan_obj.static_stretch_exercises)
-                        if test_parm.train_later:
-                            efficient_active_stretch_minutes = calc_active_time_efficient(
-                                plan_obj.active_stretch_exercises)
-                        else:
-                            efficient_active_stretch_minutes = 0
-                        efficient_isolated_activate_minutes = calc_active_time_efficient(
-                            plan_obj.isolated_activate_exercises)
-                        efficient_static_integrate_minutes = calc_active_time_efficient(
-                            plan_obj.static_integrate_exercises)
-                        efficient_total_minutes = efficient_inhibit_minutes + efficient_static_stretch_minutes + efficient_active_stretch_minutes + efficient_isolated_activate_minutes + efficient_static_integrate_minutes
+                            inhibit_goals_triggers = get_goals_triggers(plan_obj.inhibit_exercises)
+                            static_stretch_goals_triggers = get_goals_triggers(plan_obj.static_stretch_exercises)
+                            if test_parm.train_later:
+                                active_stretch_goals_triggers = get_goals_triggers(plan_obj.active_stretch_exercises)
+                            else:
+                                active_stretch_goals_triggers = ''
+                            isolated_activate_goals_triggers = get_goals_triggers(plan_obj.isolated_activate_exercises)
+                            static_integrate_goals_triggers = get_goals_triggers(plan_obj.static_integrate_exercises)
 
-                        complete_inhibit_minutes = calc_active_time_complete(plan_obj.inhibit_exercises)
-                        complete_static_stretch_minutes = calc_active_time_complete(plan_obj.static_stretch_exercises)
-                        if test_parm.train_later:
-                            complete_active_stretch_minutes = calc_active_time_complete(plan_obj.active_stretch_exercises)
-                        else:
-                            complete_active_stretch_minutes = 0
+                            efficient_inhibit_minutes = calc_active_time_efficient(plan_obj.inhibit_exercises)
+                            efficient_static_stretch_minutes = calc_active_time_efficient(
+                                plan_obj.static_stretch_exercises)
+                            if test_parm.train_later:
+                                efficient_active_stretch_minutes = calc_active_time_efficient(
+                                    plan_obj.active_stretch_exercises)
+                            else:
+                                efficient_active_stretch_minutes = 0
+                            efficient_isolated_activate_minutes = calc_active_time_efficient(
+                                plan_obj.isolated_activate_exercises)
+                            efficient_static_integrate_minutes = calc_active_time_efficient(
+                                plan_obj.static_integrate_exercises)
+                            efficient_total_minutes = efficient_inhibit_minutes + efficient_static_stretch_minutes + efficient_active_stretch_minutes + efficient_isolated_activate_minutes + efficient_static_integrate_minutes
 
-                        complete_isolated_activate_minutes = calc_active_time_complete(plan_obj.isolated_activate_exercises)
-                        complete_static_integrate_minutes = calc_active_time_complete(plan_obj.static_integrate_exercises)
-                        complete_total_minutes = complete_inhibit_minutes + complete_static_stretch_minutes + complete_active_stretch_minutes + complete_isolated_activate_minutes + complete_static_integrate_minutes
+                            complete_inhibit_minutes = calc_active_time_complete(plan_obj.inhibit_exercises)
+                            complete_static_stretch_minutes = calc_active_time_complete(plan_obj.static_stretch_exercises)
+                            if test_parm.train_later:
+                                complete_active_stretch_minutes = calc_active_time_complete(plan_obj.active_stretch_exercises)
+                            else:
+                                complete_active_stretch_minutes = 0
 
-                        comprehensive_inhibit_minutes = calc_active_time_comprehensive(plan_obj.inhibit_exercises)
-                        comprehensive_static_stretch_minutes = calc_active_time_comprehensive(
-                            plan_obj.static_stretch_exercises)
-                        if test_parm.train_later:
-                            comprehensive_active_stretch_minutes = calc_active_time_comprehensive(
-                                plan_obj.active_stretch_exercises)
-                        else:
-                            comprehensive_active_stretch_minutes = 0
-                        comprehensive_isolated_activate_minutes = calc_active_time_comprehensive(
-                            plan_obj.isolated_activate_exercises)
-                        comprehensive_static_integrate_minutes = calc_active_time_comprehensive(
-                            plan_obj.static_integrate_exercises)
-                        comprehensive_total_minutes = comprehensive_inhibit_minutes + comprehensive_static_stretch_minutes + comprehensive_active_stretch_minutes + comprehensive_isolated_activate_minutes + comprehensive_static_integrate_minutes
+                            complete_isolated_activate_minutes = calc_active_time_complete(plan_obj.isolated_activate_exercises)
+                            complete_static_integrate_minutes = calc_active_time_complete(plan_obj.static_integrate_exercises)
+                            complete_total_minutes = complete_inhibit_minutes + complete_static_stretch_minutes + complete_active_stretch_minutes + complete_isolated_activate_minutes + complete_static_integrate_minutes
 
-                        sline = body_part_line + ',' + insights_string + ',' + alert_cta_goal_line + ',' + get_summary_string(daily_plan)
+                            comprehensive_inhibit_minutes = calc_active_time_comprehensive(plan_obj.inhibit_exercises)
+                            comprehensive_static_stretch_minutes = calc_active_time_comprehensive(
+                                plan_obj.static_stretch_exercises)
+                            if test_parm.train_later:
+                                comprehensive_active_stretch_minutes = calc_active_time_comprehensive(
+                                    plan_obj.active_stretch_exercises)
+                            else:
+                                comprehensive_active_stretch_minutes = 0
+                            comprehensive_isolated_activate_minutes = calc_active_time_comprehensive(
+                                plan_obj.isolated_activate_exercises)
+                            comprehensive_static_integrate_minutes = calc_active_time_comprehensive(
+                                plan_obj.static_integrate_exercises)
+                            comprehensive_total_minutes = comprehensive_inhibit_minutes + comprehensive_static_stretch_minutes + comprehensive_active_stretch_minutes + comprehensive_isolated_activate_minutes + comprehensive_static_integrate_minutes
 
-                        line = (body_part_line + ',' + insights_string + ',' + alert_cta_goal_line + ',' +
+                            sline = body_part_line + ',' + insights_string + ',' + alert_cta_goal_line + ',' + get_summary_string(daily_plan)
 
-                                ' ** '.join(inhibit_goals_triggers) + ',' +
+                            line = (body_part_line + ',' + insights_string + ',' + alert_cta_goal_line + ',' +
 
-                                str(round(efficient_inhibit_minutes, 2)) + ',' + str(round(complete_inhibit_minutes, 2)) + ',' + str(round(comprehensive_inhibit_minutes, 2)) + ',' +
+                                    ' ** '.join(inhibit_goals_triggers) + ',' +
 
-                                ';'.join(convert_assigned_dict_exercises(
-                                    plan_obj.inhibit_exercises)) + ',' +
+                                    str(round(efficient_inhibit_minutes, 2)) + ',' + str(round(complete_inhibit_minutes, 2)) + ',' + str(round(comprehensive_inhibit_minutes, 2)) + ',' +
 
-                                ' ** '.join(static_stretch_goals_triggers) + ',' +
+                                    ';'.join(convert_assigned_dict_exercises(
+                                        plan_obj.inhibit_exercises)) + ',' +
 
-                                str(round(efficient_static_stretch_minutes, 2)) + ',' + str(round(complete_static_stretch_minutes, 2)) + ',' + str(round(comprehensive_static_stretch_minutes, 2)) + ',' +
+                                    ' ** '.join(static_stretch_goals_triggers) + ',' +
 
-                                ';'.join(convert_assigned_dict_exercises(
-                                    plan_obj.static_stretch_exercises)) + ',' +
+                                    str(round(efficient_static_stretch_minutes, 2)) + ',' + str(round(complete_static_stretch_minutes, 2)) + ',' + str(round(comprehensive_static_stretch_minutes, 2)) + ',' +
 
-                                ' ** '.join(active_stretch_goals_triggers) + ',' +
+                                    ';'.join(convert_assigned_dict_exercises(
+                                        plan_obj.static_stretch_exercises)) + ',' +
+
+                                    ' ** '.join(active_stretch_goals_triggers) + ',' +
 
 
-                                str(round(efficient_active_stretch_minutes, 2)) + ',' +str(round(complete_active_stretch_minutes, 2)) + ',' +str(round(comprehensive_active_stretch_minutes, 2)) + ',' +
+                                    str(round(efficient_active_stretch_minutes, 2)) + ',' +str(round(complete_active_stretch_minutes, 2)) + ',' +str(round(comprehensive_active_stretch_minutes, 2)) + ',' +
 
-                                ';'.join(convert_assigned_dict_exercises(
-                                    plan_obj.active_stretch_exercises)) + ',' +
+                                    ';'.join(convert_assigned_dict_exercises(
+                                        plan_obj.active_stretch_exercises)) + ',' +
 
-                                ' ** '.join(isolated_activate_goals_triggers) + ',' +
+                                    ' ** '.join(isolated_activate_goals_triggers) + ',' +
 
-                                str(round(efficient_isolated_activate_minutes, 2)) + ',' +str(round(complete_isolated_activate_minutes, 2)) + ',' +str(round(complete_isolated_activate_minutes, 2)) + ',' +
+                                    str(round(efficient_isolated_activate_minutes, 2)) + ',' +str(round(complete_isolated_activate_minutes, 2)) + ',' +str(round(complete_isolated_activate_minutes, 2)) + ',' +
 
-                                ';'.join(convert_assigned_dict_exercises(
-                                    plan_obj.isolated_activate_exercises)) + ',' +
+                                    ';'.join(convert_assigned_dict_exercises(
+                                        plan_obj.isolated_activate_exercises)) + ',' +
 
-                                ' ** '.join(static_integrate_goals_triggers) + ',' +
+                                    ' ** '.join(static_integrate_goals_triggers) + ',' +
 
-                                str(round(efficient_static_integrate_minutes, 2)) + ',' +str(round(complete_static_integrate_minutes, 2)) + ',' +str(round(comprehensive_static_integrate_minutes, 2)) + ',' +
+                                    str(round(efficient_static_integrate_minutes, 2)) + ',' +str(round(complete_static_integrate_minutes, 2)) + ',' +str(round(comprehensive_static_integrate_minutes, 2)) + ',' +
 
-                                ';'.join(convert_assigned_dict_exercises(
-                                    plan_obj.static_integrate_exercises)) + ',' +
+                                    ';'.join(convert_assigned_dict_exercises(
+                                        plan_obj.static_integrate_exercises)) + ',' +
 
-                                str(round(efficient_total_minutes, 2))+ ',' +str(round(complete_total_minutes, 2))+ ',' +str(round(comprehensive_total_minutes, 2))
+                                    str(round(efficient_total_minutes, 2))+ ',' +str(round(complete_total_minutes, 2))+ ',' +str(round(comprehensive_total_minutes, 2)) +
 
-                                )
-                        if j % 2 == 0:
-                            s1.write(sline + '\n')
-                            f1.write(line + '\n')
-                        else:
-                            s2.write(sline + '\n')
-                            f2.write(line + '\n')
+                                    "," + get_priority_counts_for_dosages(daily_plan)
 
-                        j += 1
+                                    )
+                            if j % 2 == 0:
+                                s1.write(sline + '\n')
+                                f1.write(line + '\n')
+                            else:
+                                s2.write(sline + '\n')
+                                f2.write(line + '\n')
+
+                            j += 1
 
         f1.close()
         s1.close()

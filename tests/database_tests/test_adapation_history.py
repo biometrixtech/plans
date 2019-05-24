@@ -118,13 +118,12 @@ def test_get_adaptation_history_from_database():
         stats_processing.set_start_end_times()
         stats_processing.load_historical_data()
         athlete_stats = stats_processing.calc_survey_stats(athlete_stats)
-        training_volume_processing = TrainingVolumeProcessing(start_date, end_date)
+        training_volume_processing = TrainingVolumeProcessing(start_date, end_date, athlete_stats.load_stats)
         training_volume_processing.load_plan_values(stats_processing.last_7_days_plans,
                                                     stats_processing.days_8_14_plans,
                                                     stats_processing.acute_daily_plans,
                                                     stats_processing.get_chronic_weeks_plans(),
-                                                    stats_processing.chronic_daily_plans,
-                                                    athlete_stats.load_stats)
+                                                    stats_processing.chronic_daily_plans)
         athlete_stats = training_volume_processing.calc_training_volume_metrics(athlete_stats)
         '''
         training_volume_processing.fill_load_monitoring_measures(daily_readiness_surveys, plans, parse_date(end_date))

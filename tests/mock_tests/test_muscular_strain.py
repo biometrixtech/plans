@@ -133,4 +133,4 @@ def test_maintenance_load_overloading():
 
     muscular_strain = stats_processing.get_muscular_strain(athlete_stats, [], training_sessions)
 
-    assert round(muscular_strain.value, 2) == 94.12
+    assert round(muscular_strain.value, 2) == 88.89

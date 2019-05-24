@@ -44,7 +44,7 @@ class AffectedBodyPart(object):
 
 
 class TrainingVolumeProcessing(object):
-    def __init__(self, start_date, end_date):
+    def __init__(self, start_date, end_date, load_stats):
         self.start_date = start_date
         self.end_date = end_date
         self.a_internal_load_values = []
@@ -96,6 +96,7 @@ class TrainingVolumeProcessing(object):
         self.last_week_sport_training_loads = {}
         self.previous_week_sport_training_loads = {}
         self.last_14_days_training_sessions = []
+        self.load_stats = load_stats
 
     def muscular_strain_increasing(self):
 
@@ -125,7 +126,7 @@ class TrainingVolumeProcessing(object):
 
         return benchmarks
 
-    def fill_load_monitoring_measures(self, load_stats, readiness_surveys, daily_plans, load_end_date):
+    def fill_load_monitoring_measures(self, readiness_surveys, daily_plans, load_end_date):
 
         swimming_sessions = []
         cycling_sessions = []
@@ -134,13 +135,14 @@ class TrainingVolumeProcessing(object):
         duration_sessions = []
 
         training_sessions = self.get_training_sessions(daily_plans)
+        self.load_stats.set_min_max_values(training_sessions)
 
         for t in training_sessions:
             swimming_sessions.append((t.event_date, t.swimming_load(), t.sport_name))
             cycling_sessions.append((t.event_date, t.cycling_load(), t.sport_name))
             running_sessions.append((t.event_date, t.running_load(), t.sport_name))
             walking_sessions.append((t.event_date, t.walking_load(), t.sport_name))
-            training_volume = t.training_volume(load_stats)
+            training_volume = t.training_volume(self.load_stats)
             if training_volume is not None:
                 duration_sessions.append((t.event_date, training_volume, t.sport_name))
 
@@ -160,7 +162,7 @@ class TrainingVolumeProcessing(object):
             self.high_relative_load_session = self.is_last_session_high_relative_load(load_end_date,
                                                                                       last_training_session,
                                                                                       benchmarks,
-                                                                                      load_stats)
+                                                                                      self.load_stats)
 
     def is_last_session_high_relative_load(cls, event_date, last_training_session, benchmarks, load_stats):
         if (event_date - last_training_session.event_date).days <= 2:
@@ -172,7 +174,7 @@ class TrainingVolumeProcessing(object):
 
     @xray_recorder.capture('logic.TrainingVolumeProcessing.load_plan_values')
     def load_plan_values(self, last_7_days_plans, days_8_14_plans, acute_daily_plans, chronic_weeks_plans,
-                         chronic_daily_plans, load_stats):
+                         chronic_daily_plans):
 
         #self.last_week_external_values = []
         self.last_week_internal_values = []
@@ -202,21 +204,24 @@ class TrainingVolumeProcessing(object):
 
         chart_data = TrainingVolumeChart(self.end_date)
 
+        self.load_stats.set_min_max_values(last_7_day_training_sessions)
+        self.load_stats.set_min_max_values(previous_7_day_training_sessions)
+
         for l in last_7_day_training_sessions:
-            chart_data.add_training_volume(l, load_stats)
+            chart_data.add_training_volume(l, self.load_stats)
             if l.sport_name not in self.last_week_sport_training_loads:
                 self.last_week_sport_training_loads[l.sport_name] = []
                 self.previous_week_sport_training_loads[l.sport_name] = []
-            training_load = l.training_volume(load_stats)
+            training_load = l.training_volume(self.load_stats)
             if training_load is not None:
                 self.last_week_sport_training_loads[l.sport_name].append(training_load)
 
         for p in previous_7_day_training_sessions:
-            chart_data.add_training_volume(p, load_stats)
+            chart_data.add_training_volume(p, self.load_stats)
             if p.sport_name not in self.previous_week_sport_training_loads:
                 self.last_week_sport_training_loads[p.sport_name] = []
                 self.previous_week_sport_training_loads[p.sport_name] = []
-            training_load = p.training_volume(load_stats)
+            training_load = p.training_volume(self.load_stats)
             if training_load is not None:
                 self.previous_week_sport_training_loads[p.sport_name].append(training_load)
 
