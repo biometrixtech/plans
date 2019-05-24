@@ -91,7 +91,6 @@ class AlertsProcessing(object):
                 new_insights.append(old)
         return new_insights
 
-
     def combine_alerts_to_insights(self, alerts, trends):
         existing_triggers = []
         existing_trends = []
@@ -103,7 +102,7 @@ class AlertsProcessing(object):
                 if doms_yesterday:
                     continue
                 elif doms_today:
-                    trend = [trend for trend in trends.response.alerts if trend.trigger_type==TriggerType.sore_today_doms][0]
+                    trend = [trend for trend in trends.response.alerts if trend.trigger_type == TriggerType.sore_today_doms][0]
                     self.add_data_to_trend(trend, alert)
                 else:
                     # create new doms trend
@@ -114,9 +113,12 @@ class AlertsProcessing(object):
                     # add doms trend to response bucket
                     trends.response.alerts.append(trend)
                     trends.response.goals.add(alert.goal.text)
+            elif (alert.goal.trigger_type, alert.body_part) in existing_trends and alert.goal.trigger_type == TriggerType.high_volume_intensity:
+                trend = [trend for trend in trends.stress.alerts if trend.trigger_type == TriggerType.high_volume_intensity][0]
+                self.add_data_to_trend(trend, alert)
 
-            elif not (alert.goal.trigger_type, alert.sport_name, alert.body_part) in existing_trends:
-                existing_trends.append((alert.goal.trigger_type, alert.sport_name, alert.body_part))
+            elif not (alert.goal.trigger_type, alert.body_part) in existing_trends:
+                existing_trends.append((alert.goal.trigger_type, alert.body_part))
                 trend = Trend(alert.goal.trigger_type)
                 self.add_data_to_trend(trend, alert)
 
@@ -190,7 +192,6 @@ class AlertsProcessing(object):
         trend.data = chart_data
         return trend
 
-
     def add_data_to_trend(self, trend, alert):
         trend.goal_targeted = [alert.goal.text]
         if alert.body_part is not None:
@@ -209,9 +210,7 @@ class AlertsProcessing(object):
         current_response_trigger_types = [trend.get_trigger_type_body_part_sport_tuple() for trend in new_trends.response.alerts]
         current_biomechanics_trigger_types = [trend.get_trigger_type_body_part_sport_tuple() for trend in new_trends.biomechanics.alerts]
 
-
         for l_trend in self.athlete_stats.longitudinal_trends:
-            l_trend_type = l_trend.get_trigger_type_body_part_sport_tuple()
             # if trigger type does not exist, it was cleared
             if l_trend.insight_type == InsightType.stress and \
                     l_trend.get_trigger_type_body_part_sport_tuple() not in current_stress_trigger_types:
