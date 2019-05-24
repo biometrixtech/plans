@@ -57,7 +57,8 @@ class AlertsProcessing(object):
             # if trigger type (including others in same parent group) does not exist, everything was cleared
             if not TriggerType.is_in(l_insight.trigger_type, current_trigger_types):
                 l_insight.cleared = True
-                new_insights.append(l_insight)
+                if l_insight.trigger_type != TriggerType.sore_today_doms:  # don't add cleared doms to today
+                    new_insights.append(l_insight)
             else:  # find current insight is same trigger type or same parent group
                 current_insight = [insight for insight in new_insights if TriggerType.is_equivalent(insight.trigger_type, l_insight.trigger_type)][0]
                 cleared_parts = []
