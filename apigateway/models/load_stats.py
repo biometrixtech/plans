@@ -35,6 +35,7 @@ class LoadStats(Serialisable):
             'min_shrz': self.min_shrz,
             'max_shrz': self.max_shrz
         }
+        return ret
 
     @classmethod
     def json_deserialise(cls, input_dict):
@@ -72,6 +73,7 @@ class LoadStats(Serialisable):
             if getattr(self, min_attribute) < value:
                 min_value = getattr(self, min_attribute)
             else:
+                setattr(self, min_attribute, value)
                 min_value = value
 
         if getattr(self, max_attribute) is None:
@@ -81,6 +83,7 @@ class LoadStats(Serialisable):
             if getattr(self, max_attribute) > value:
                 max_value = getattr(self, max_attribute)
             else:
+                setattr(self, max_attribute, value)
                 max_value = value
 
         if max_value == min_value:
@@ -116,4 +119,3 @@ class LoadStats(Serialisable):
     def get_running_distance_load(self, load_value):
 
         return self.get_attribute_load("walk_run_distance", load_value)
-
