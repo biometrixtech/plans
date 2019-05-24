@@ -110,6 +110,9 @@ class ModalityBase(object):
         self.dosage_durations = {}
         self.initialize_dosage_durations()
 
+    def get_total_exercises(self):
+        pass
+
     def initialize_dosage_durations(self):
 
         self.dosage_durations[0.5] = DosageDuration(0, 0, 0)
@@ -697,6 +700,14 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
         super().__init__(event_date_time, force_data)
         self.active_stretch_exercises = {}
 
+
+    def get_total_exercises(self):
+        return len(self.inhibit_exercises) +\
+               len(self.static_stretch_exercises) +\
+               len(self.active_stretch_exercises) +\
+               len(self.isolated_activate_exercises) +\
+               len(self.static_integrate_exercises)
+
     def json_serialise(self):
         ret = {
             #'high_relative_load_session': self.high_relative_load_session,
@@ -1060,6 +1071,12 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
     def __init__(self, event_date_time, force_data=False):
         super().__init__(event_date_time, force_data)
 
+    def get_total_exercises(self):
+        return len(self.inhibit_exercises) +\
+               len(self.static_stretch_exercises) +\
+               len(self.isolated_activate_exercises) +\
+               len(self.static_integrate_exercises)
+
     def json_serialise(self):
         ret = {
             #'high_relative_load_session': self.high_relative_load_session,
@@ -1413,6 +1430,15 @@ class WarmUp(ModalityBase, Serialisable):
         self.dynamic_integrate_exercises = {}
         self.dynamic_integrate_with_speed_exercises = {}
 
+    def get_total_exercises(self):
+        return len(self.inhibit_exercises) +\
+               len(self.static_stretch_exercises) +\
+               len(self.active_or_dynamic_stretch_exercises) +\
+               len(self.isolated_activate_exercises) +\
+               len(self.dynamic_integrate_exercises) +\
+               len(self.dynamic_integrate_with_speed_exercises)
+
+
     def json_serialise(self):
         ret = {
             'inhibit_exercises': [p.json_serialise() for p in self.inhibit_exercises.values()],
@@ -1528,6 +1554,10 @@ class CoolDown(ModalityBase, Serialisable):
         self.muscular_strain_high = muscular_strain_high
         self.dynamic_stretch_exercises = {}
         self.dynamic_integrate_exercises = {}
+
+    def get_total_exercises(self):
+        return len(self.dynamic_integrate_exercises) +\
+               len(self.dynamic_stretch_exercises)
 
     def json_serialise(self):
         ret = {

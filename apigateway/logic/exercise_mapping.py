@@ -172,9 +172,9 @@ class ExerciseAssignmentCalculator(object):
             active_rest.set_plan_dosage(self.soreness_list, self.muscular_strain_high)
             active_rest.set_exercise_dosage_ranking()
             active_rest.aggregate_dosages()
-            return [active_rest]
-        else:
-            return []
+            if active_rest.get_total_exercises() > 0:
+                return [active_rest]
+        return []
 
     def get_post_active_rest(self, force_data=False):
 
@@ -188,9 +188,9 @@ class ExerciseAssignmentCalculator(object):
             active_rest.set_plan_dosage(self.soreness_list, self.muscular_strain_high)
             active_rest.set_exercise_dosage_ranking()
             active_rest.aggregate_dosages()
-            return [active_rest]
-        else:
-            return []
+            if active_rest.get_total_exercises() > 0:
+                return [active_rest]
+        return []
 
     def get_warm_up(self):
 
@@ -204,9 +204,9 @@ class ExerciseAssignmentCalculator(object):
                                    self.high_relative_load_session_sport_names)
             warm_up.set_exercise_dosage_ranking()
 
-            return [warm_up]
-        else:
-            return []
+            if warm_up.get_total_exercises() > 0:
+                return [warm_up]
+        return []
 
     def get_cool_down(self):
 
@@ -227,12 +227,9 @@ class ExerciseAssignmentCalculator(object):
                 cool_down.aggregate_dosages()
             #    break
 
-            if cool_down is not None:
+            if cool_down is not None and cool_down.get_total_exercises() > 0:
                 return [cool_down]
-            else:
-                return []
-        else:
-            return []
+        return []
 
     def get_ice(self):
 
