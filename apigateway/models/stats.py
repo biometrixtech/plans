@@ -5,6 +5,7 @@ from models.session import StrengthConditioningType
 from utils import format_date, parse_date, parse_datetime
 from models.historic_soreness import HistoricSeverity, HistoricSoreness
 from models.soreness import HistoricSorenessStatus
+from models.load_stats import LoadStats
 from logic.soreness_processing import SorenessCalculator
 from fathomapi.utils.exceptions import InvalidSchemaException
 import datetime
@@ -89,7 +90,7 @@ class AthleteStats(Serialisable):
         self.exposed_triggers = []
         self.longitudinal_insights = []
         self.longitudinal_trends = []
-        self.load_stats = None
+        self.load_stats = LoadStats()
         self.high_relative_load_sessions = []
         self.training_volume_chart_data = []
         self.soreness_chart_data = {}
