@@ -82,7 +82,10 @@ def validate_post_active_rest_exercise_counts(daily_plan, inhibit_present, stati
 
 
 def validate_biomechanics(daily_plan, expected_triggers):
-    pass
+    for t in expected_triggers:
+        response = list(
+            i for i in daily_plan.trends.biomechanics.alerts if i.insight_type == InsightType.biomechanics and i.trigger_type == t)
+        assert len(response) > 0
 
 
 def validate_response(daily_plan, expected_triggers):
@@ -166,6 +169,10 @@ def validate_daily_plan(daily_plan, event_date):
                                              TriggerType.high_volume_intensity],
                           expected_first=[True, True],
                           expected_cleared=[False, False])
+
+        # biomechanics
+        validate_biomechanics(daily_plan, [TriggerType.biomechanics_no_triggers_flagged_based_on_pain,
+                                           TriggerType.biomechanics_no_triggers_flagged_based_on_soreness])
 
         # response
         validate_response(daily_plan, [TriggerType.no_hist_pain_pain_today_severity_1_2])
