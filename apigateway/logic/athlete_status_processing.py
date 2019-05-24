@@ -2,7 +2,6 @@ import datetime
 
 from datastores.datastore_collection import DatastoreCollection
 from logic.soreness_processing import SorenessCalculator
-# from models.post_session_survey import PostSessionSurvey
 from utils import format_datetime, parse_date, format_date
 
 

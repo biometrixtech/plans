@@ -1204,8 +1204,8 @@ class TrainingVolumeProcessing(object):
                                                                      c.training_sessions))
             #sub_values.extend(self.get_product_of_session_attributes(attribute_1_name, attribute_2_name,
             #                                                         c.practice_sessions))
-            sub_values.extend(self.get_product_of_session_attributes(attribute_1_name, attribute_2_name,
-                                                                     c.strength_conditioning_sessions))
+            # sub_values.extend(self.get_product_of_session_attributes(attribute_1_name, attribute_2_name,
+                                                                     # c.strength_conditioning_sessions))
             #sub_values.extend(self.get_product_of_session_attributes(attribute_1_name, attribute_2_name,
             #                                                         c.games))
             #sub_values.extend(self.get_product_of_session_attributes(attribute_1_name, attribute_2_name,
@@ -1230,8 +1230,8 @@ class TrainingVolumeProcessing(object):
                                                                      c.training_sessions))
             #values.extend(self.get_tuple_product_of_session_attributes(c.get_event_datetime(), attribute_1_name, attribute_2_name,
             #                                                         c.practice_sessions))
-            values.extend(self.get_tuple_product_of_session_attributes(c.get_event_datetime(), attribute_1_name, attribute_2_name,
-                                                                     c.strength_conditioning_sessions))
+            # values.extend(self.get_tuple_product_of_session_attributes(c.get_event_datetime(), attribute_1_name, attribute_2_name,
+            #                                                          c.strength_conditioning_sessions))
             #values.extend(self.get_tuple_product_of_session_attributes(c.get_event_datetime(), attribute_1_name, attribute_2_name,
             #                                                         c.games))
             #values.extend(self.get_tuple_product_of_session_attributes(c.get_event_datetime(), attribute_1_name, attribute_2_name,
@@ -1253,8 +1253,8 @@ class TrainingVolumeProcessing(object):
                                                                  c.training_sessions))
             #values.extend(self.get_product_of_session_attributes(attribute_1_name, attribute_2_name,
             #                                                     c.practice_sessions))
-            values.extend(self.get_product_of_session_attributes(attribute_1_name, attribute_2_name,
-                                                                 c.strength_conditioning_sessions))
+            # values.extend(self.get_product_of_session_attributes(attribute_1_name, attribute_2_name,
+            #                                                      c.strength_conditioning_sessions))
             #values.extend(self.get_product_of_session_attributes(attribute_1_name, attribute_2_name,
             #                                                     c.games))
             #values.extend(self.get_product_of_session_attributes(attribute_1_name, attribute_2_name,

@@ -2,7 +2,7 @@ from serialisable import Serialisable
 from datetime import datetime, timedelta
 from utils import format_date, parse_datetime, parse_date
 from fathomapi.utils.exceptions import InvalidSchemaException
-from models.soreness import BodyPart, BodyPartLocation, BodyPartSide, Soreness
+from models.soreness import BodyPart, BodyPartSide, Soreness
 from models.sport import SportName
 from logic.soreness_processing import SorenessCalculator
 
