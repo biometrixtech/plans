@@ -22,7 +22,7 @@ def test_insights_text():
     assert insight.title != ""
 
 
-def test_aggregate_alerts_first_exposure():
+def test_aggregate_insights_first_exposure():
     current_date_time = datetime.datetime.now()
     goal = AthleteGoal('Care for Pain', 0, AthleteGoalType(0))
     goal.trigger_type = TriggerType(14)
@@ -43,13 +43,23 @@ def test_aggregate_alerts_first_exposure():
     assert not insights[0].longitudinal
 
 
-def test_aggregate_alerts_insight_not_displayed():
+def test_aggregate_insights_no_alerts():
+    current_date_time = datetime.datetime.now()
+
+    alerts = []
+    event_date_time = current_date_time
+    daily_plan = DailyPlan(format_date(event_date_time))
+    athlete_stats = AthleteStats('test_user')
+    insights, longitudinal_insights, trends = AlertsProcessing(daily_plan, athlete_stats).aggregate_alerts(event_date_time, alerts)
+    assert len(insights) == 0
+
+
+def test_aggregate_insights_trigger_type_not_present_in_plans():
     current_date_time = datetime.datetime.now()
     goal = AthleteGoal('Care for Pain', 0, AthleteGoalType(0))
     goal.trigger_type = TriggerType(12)
     alert1 = Alert(goal)
     alert1.body_part = BodyPartSide(BodyPartLocation(11), 1)
-
 
     alerts = [alert1]
     event_date_time = current_date_time
@@ -59,7 +69,7 @@ def test_aggregate_alerts_insight_not_displayed():
     assert len(insights) == 0
 
 
-def test_aggregate_alerts_multiple_same_body_part():
+def test_aggregate_insights_multiple_same_body_part():
     current_date_time = datetime.datetime.now()
     goal = AthleteGoal('Care for Pain', 0, AthleteGoalType(0))
     goal.trigger_type = TriggerType(14)
@@ -83,7 +93,7 @@ def test_aggregate_alerts_multiple_same_body_part():
     assert len(insights[0].body_parts) == 1
 
 
-def test_aggregate_alerts_multiple_same_child():
+def test_aggregate_insights_multiple_same_child():
     current_date_time = datetime.datetime.now()
     goal = AthleteGoal('Care for Pain', 0, AthleteGoalType(0))
     goal.trigger_type = TriggerType(14)
@@ -104,7 +114,7 @@ def test_aggregate_alerts_multiple_same_child():
     assert not insights[0].longitudinal
 
 
-def test_aggregate_alerts_exposed():
+def test_aggregate_insights_exposed():
     current_date_time = datetime.datetime.now()
     goal = AthleteGoal('Care for Pain', 0, AthleteGoalType(0))
     goal.trigger_type = TriggerType(14)
@@ -125,7 +135,7 @@ def test_aggregate_alerts_exposed():
     assert insights[0].insight_type == InsightType.response
 
 
-def test_aggregate_alerts_exposed_group():
+def test_aggregate_insights_exposed_group():
     current_date_time = datetime.datetime.now()
     goal = AthleteGoal('Care for Pain', 0, AthleteGoalType(0))
     goal.trigger_type = TriggerType(7)
@@ -145,7 +155,7 @@ def test_aggregate_alerts_exposed_group():
     assert insights[0].longitudinal
 
 
-def test_aggregate_alerts_group_priority():
+def test_aggregate_insights_group_priority():
     current_date_time = datetime.datetime.now()
     goal1 = AthleteGoal('Care for Pain', 0, AthleteGoalType(0))
     goal1.trigger_type = TriggerType(14)
@@ -170,7 +180,7 @@ def test_aggregate_alerts_group_priority():
     assert insights[0].priority == 1
 
 
-def test_aggregate_alerts_longitutinal():
+def test_aggregate_insights_longitutinal():
     current_date_time = datetime.datetime.now()
     goal = AthleteGoal('Care for Pain', 0, AthleteGoalType(0))
     goal.trigger_type = TriggerType(7)
@@ -198,7 +208,7 @@ def test_aggregate_alerts_longitutinal():
     assert insights[0].start_date_time == current_date_time - datetime.timedelta(days=5)
 
 
-def test_aggregate_alerts_cleared():
+def test_aggregate_insights_cleared():
     current_date_time = datetime.datetime.now()
     goal = AthleteGoal('Care for Pain', 0, AthleteGoalType(0))
     goal.trigger_type = TriggerType(7)
@@ -226,7 +236,7 @@ def test_aggregate_alerts_cleared():
     assert insights[0].start_date_time == current_date_time - datetime.timedelta(days=5)
 
 
-def test_aggregate_alerts_cleared_same_parent_group():
+def test_aggregate_insights_cleared_same_parent_group():
     current_date_time = datetime.datetime.now()
     goal1 = AthleteGoal('Care for Pain', 0, AthleteGoalType(0))
     goal1.trigger_type = TriggerType(7)
@@ -270,7 +280,7 @@ def test_aggregate_alerts_cleared_same_parent_group():
     assert insights[1].start_date_time == current_date_time - datetime.timedelta(days=1)
 
 
-def test_aggregate_alerts_cleared_one_body_part():
+def test_aggregate_insights_cleared_one_body_part():
     current_date_time = datetime.datetime.now()
     goal = AthleteGoal('Care for Pain', 0, AthleteGoalType(0))
     goal.trigger_type = TriggerType(16)
@@ -342,7 +352,7 @@ def test_insights_ordering():
     assert plan.insights[4].trigger_type == TriggerType(1)  # read - lower priority
 
 
-def test_equivalency():
+def test_trigger_typeequivalency():
     trigger1 = TriggerType(8)
     trigger2 = TriggerType(7)
     trigger3 = TriggerType(8)
@@ -372,7 +382,7 @@ def test_trend_add_data_another():
     assert trend2.visualization_type == trend.visualization_type
 
 
-def test_aggregate_alerts_multiple_trends_same_body_part():
+def test_aggregate_trends_multiple_trends_same_body_part():
     current_date_time = datetime.datetime.now()
     goal = AthleteGoal('Care for Soreness', 0, AthleteGoalType(1))
     goal.trigger_type = TriggerType(15)
@@ -393,7 +403,7 @@ def test_aggregate_alerts_multiple_trends_same_body_part():
     assert trends.response.alerts[0].trigger_type == TriggerType(15)
 
 
-def test_aggregate_alerts_multiple_trends_same_trigger_type_multiple_sports():
+def test_aggregate_trends_multiple_trends_same_trigger_type_multiple_sports():
     current_date_time = datetime.datetime.now()
     goal = AthleteGoal('Care for Soreness', 0, AthleteGoalType(1))
     goal.trigger_type = TriggerType(0)
@@ -414,7 +424,7 @@ def test_aggregate_alerts_multiple_trends_same_trigger_type_multiple_sports():
     assert trends.stress.alerts[0].trigger_type == TriggerType(0)
 
 
-def test_aggregate_alerts_multiple_doms():
+def test_aggregate_trends_multiple_doms():
     current_date_time = datetime.datetime.now()
     goal = AthleteGoal('Care for Soreness', 0, AthleteGoalType(1))
     goal.trigger_type = TriggerType(11)
@@ -435,7 +445,7 @@ def test_aggregate_alerts_multiple_doms():
     assert trends.response.alerts[0].trigger_type == TriggerType(11)
 
 
-def test_aggregate_alerts_doms_yesterday():
+def test_aggregate_trends_doms_yesterday():
     current_date_time = datetime.datetime.now()
     trend = Trend(TriggerType(11))
     goal = AthleteGoal('Care for Soreness', 0, AthleteGoalType(1))
@@ -455,7 +465,7 @@ def test_aggregate_alerts_doms_yesterday():
     assert trends.response.alerts[1].trigger_type == TriggerType(202)
 
 
-def test_aggregate_alerts_cleared_trend_doms():
+def test_aggregate_trends_cleared_trend_doms():
     current_date_time = datetime.datetime.now()
     trend = Trend(TriggerType(11))
     trend.add_data()
@@ -476,7 +486,7 @@ def test_aggregate_alerts_cleared_trend_doms():
     assert trends.response.alerts[1].trigger_type == TriggerType(203)
 
 
-def test_aggregate_alerts_cleared_trend_not_doms():
+def test_aggregate_trends_cleared_trend_not_doms():
     current_date_time = datetime.datetime.now()
     trend = Trend(TriggerType(8))
     trend.add_data()
@@ -498,7 +508,7 @@ def test_aggregate_alerts_cleared_trend_not_doms():
     assert trends.response.alerts[2].trigger_type == TriggerType(203)
 
 
-def test_aggregate_alerts_cleared_trend_different_body_part_today():
+def test_aggregate_trends_cleared_trend_different_body_part_today():
     current_date_time = datetime.datetime.now()
     trend = Trend(TriggerType(7))
     trend.body_parts = [BodyPartSide(BodyPartLocation(11), 2)]
@@ -523,7 +533,7 @@ def test_aggregate_alerts_cleared_trend_different_body_part_today():
     assert trends.response.alerts[2].trigger_type == TriggerType(203)
 
 
-def test_aggregate_alerts_no_alerts():
+def test_aggregate_trends_no_alerts():
     current_date_time = datetime.datetime.now()
 
     alerts = []
@@ -536,3 +546,21 @@ def test_aggregate_alerts_no_alerts():
     assert len(trends.stress.alerts) == 1
     assert len(trends.response.alerts) == 2
     assert len(trends.biomechanics.alerts) == 2
+
+
+def test_aggregate_trends_trigger_type_not_present_in_trends():
+    current_date_time = datetime.datetime.now()
+    goal = AthleteGoal('Care for Soreness', 0, AthleteGoalType(1))
+    goal.trigger_type = TriggerType(12)
+    alert1 = Alert(goal)
+    alert1.body_part = BodyPartSide(BodyPartLocation(11), 1)
+
+    alerts = [alert1]
+    event_date_time = current_date_time
+    daily_plan = DailyPlan(format_date(event_date_time))
+    athlete_stats = AthleteStats('test_user')
+    athlete_stats.exposed_triggers = []
+    insights, longitudinal_insights, trends = AlertsProcessing(daily_plan, athlete_stats).aggregate_alerts(event_date_time, alerts)
+    assert len(trends.response.alerts) == 2
+    assert trends.response.alerts[0].trigger_type == TriggerType(203)
+    assert trends.response.alerts[1].trigger_type == TriggerType(202)

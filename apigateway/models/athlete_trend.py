@@ -396,6 +396,6 @@ class AthleteTrends(object):
 
     def cleanup(self):
         self.add_cta()
-        self.add_no_trigger()
         self.remove_trend_not_present_in_trends_page()
+        self.add_no_trigger()
         self.sort_by_priority()
