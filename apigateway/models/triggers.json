@@ -12,7 +12,7 @@
             "plans": {
                 "priority_styling": 0,
                 "content_to_pass": "",
-                "present_in_plans": true,
+                "present_in_plans": false,
                 "parent_data": {
                     "enum": null,
                     "new_first_time_title": "",
@@ -264,7 +264,7 @@
             "plans": {
                 "priority_styling": 0,
                 "content_to_pass": "",
-                "present_in_plans": true,
+                "present_in_plans": false,
                 "parent_data": {
                     "enum": null,
                     "new_first_time_title": "",
@@ -327,7 +327,7 @@
             "plans": {
                 "priority_styling": 0,
                 "content_to_pass": "",
-                "present_in_plans": true,
+                "present_in_plans": false,
                 "parent_data": {
                     "enum": null,
                     "new_first_time_title": "",
@@ -390,7 +390,7 @@
             "plans": {
                 "priority_styling": 0,
                 "content_to_pass": "",
-                "present_in_plans": true,
+                "present_in_plans": false,
                 "parent_data": {
                     "enum": null,
                     "new_first_time_title": "",
@@ -642,7 +642,7 @@
             "plans": {
                 "priority_styling": 0,
                 "content_to_pass": "",
-                "present_in_plans": true,
+                "present_in_plans": false,
                 "parent_data": {
                     "enum": null,
                     "new_first_time_title": "",
@@ -663,7 +663,7 @@
             "trends": {
                 "priority_styling": 0,
                 "content_to_pass": "",
-                "present_in_trends": true,
+                "present_in_trends": false,
                 "new_title": "",
                 "new_body": "",
                 "ongoing_title": "",
@@ -705,7 +705,7 @@
             "plans": {
                 "priority_styling": 0,
                 "content_to_pass": "",
-                "present_in_plans": true,
+                "present_in_plans": false,
                 "parent_data": {
                     "enum": null,
                     "new_first_time_title": "",
@@ -726,7 +726,7 @@
             "trends": {
                 "priority_styling": 0,
                 "content_to_pass": "",
-                "present_in_trends": true,
+                "present_in_trends": false,
                 "new_title": "",
                 "new_body": "",
                 "ongoing_title": "",
@@ -1020,7 +1020,7 @@
             "plans": {
                 "priority_styling": 0,
                 "content_to_pass": "",
-                "present_in_plans": true,
+                "present_in_plans": false,
                 "parent_data": {
                     "enum": null,
                     "new_first_time_title": "",
@@ -1041,7 +1041,7 @@
             "trends": {
                 "priority_styling": 0,
                 "content_to_pass": "",
-                "present_in_trends": true,
+                "present_in_trends": false,
                 "new_title": "",
                 "new_body": "",
                 "ongoing_title": "",
@@ -1083,7 +1083,7 @@
             "plans": {
                 "priority_styling": 0,
                 "content_to_pass": "",
-                "present_in_plans": true,
+                "present_in_plans": false,
                 "parent_data": {
                     "enum": null,
                     "new_first_time_title": "",
@@ -1104,7 +1104,7 @@
             "trends": {
                 "priority_styling": 0,
                 "content_to_pass": "",
-                "present_in_trends": true,
+                "present_in_trends": false,
                 "new_title": "",
                 "new_body": "",
                 "ongoing_title": "",
@@ -1272,7 +1272,7 @@
             "plans": {
                 "priority_styling": 0,
                 "content_to_pass": "",
-                "present_in_plans": true,
+                "present_in_plans": false,
                 "parent_data": {
                     "enum": null,
                     "new_first_time_title": "",
@@ -1335,7 +1335,7 @@
             "plans": {
                 "priority_styling": 0,
                 "content_to_pass": "",
-                "present_in_plans": true,
+                "present_in_plans": false,
                 "parent_data": {
                     "enum": null,
                     "new_first_time_title": "",
@@ -1398,7 +1398,7 @@
             "plans": {
                 "priority_styling": 0,
                 "content_to_pass": "",
-                "present_in_plans": true,
+                "present_in_plans": false,
                 "parent_data": {
                     "enum": null,
                     "new_first_time_title": "",

@@ -97,7 +97,10 @@ class InsightsTrendsDataItem(Serialisable):
     def __setattr__(self, name, value):
         if name in ['present_in_trends']:
             if value is not None and not isinstance(value, bool):
-                value = bool(value)
+                if value == '0':
+                    value = False
+                else:
+                    value = True
         elif name in ['priority_styling']:
                 if value is not None and not isinstance(value, int):
                     value = int(value)
@@ -135,7 +138,11 @@ class InsightsPlansDataItem(Serialisable):
     def __setattr__(self, name, value):
         if name in ['present_in_plans']:
             if value is not None and not isinstance(value, bool):
-                value = bool(value)
+                if value == '0':
+                    value = False
+                else:
+                    value = True
+                # value = bool(value)
         elif name in ['priority_styling']:
             if value is not None and not isinstance(value, int):
                 value = int(value)

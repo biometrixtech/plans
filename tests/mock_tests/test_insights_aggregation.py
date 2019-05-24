@@ -43,6 +43,22 @@ def test_aggregate_alerts_first_exposure():
     assert not insights[0].longitudinal
 
 
+def test_aggregate_alerts_insight_not_displayed():
+    current_date_time = datetime.datetime.now()
+    goal = AthleteGoal('Care for Pain', 0, AthleteGoalType(0))
+    goal.trigger_type = TriggerType(12)
+    alert1 = Alert(goal)
+    alert1.body_part = BodyPartSide(BodyPartLocation(11), 1)
+
+
+    alerts = [alert1]
+    event_date_time = current_date_time
+    daily_plan = DailyPlan(format_date(event_date_time))
+    athlete_stats = AthleteStats('test_user')
+    insights, longitudinal_insights, trends = AlertsProcessing(daily_plan, athlete_stats).aggregate_alerts(event_date_time, alerts)
+    assert len(insights) == 0
+
+
 def test_aggregate_alerts_multiple_same_body_part():
     current_date_time = datetime.datetime.now()
     goal = AthleteGoal('Care for Pain', 0, AthleteGoalType(0))
