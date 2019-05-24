@@ -201,6 +201,7 @@ cta_data = {
     },
 }
 
+
 class TriggerData(object):
     def __init__(self):
         self.triggers = triggers
@@ -208,12 +209,10 @@ class TriggerData(object):
         self.cta_data = cta_data
 
     def get_visualization_data(self, trigger):
-        visualizations = self.visualization_data
-        return visualizations[trigger]
+        return self.visualization_data[trigger]
 
     def get_trigger_data(self, trigger):
-        triggers = self.triggers
-        return triggers[str(trigger)]
+        return self.triggers[str(trigger)]
 
     def get_cta_data(self, activity_type):
         return self.cta_data[activity_type]

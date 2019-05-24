@@ -8,7 +8,7 @@ class DataSeries(Serialisable):
         self.value = value
 
     def json_serialise(self):
-        ret ={
+        ret = {
             'date': format_date(self.date),
             'value': self.value
         }
