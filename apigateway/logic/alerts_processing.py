@@ -15,6 +15,7 @@ class AlertsProcessing(object):
         longitudinal_insights = self.athlete_stats.longitudinal_insights
         trends = AthleteTrends()
         insights = self.combine_alerts_to_insights(alerts, trends)
+        self.clear_trends(trends)
         if TriggerType(9) in exposed_triggers:
             insights = [insight for insight in insights if insight.trigger_type != TriggerType(9)]
         insights, longitudinal_insights = self.clear_insight(insights, longitudinal_insights)
@@ -39,9 +40,7 @@ class AlertsProcessing(object):
             else:
                 insight.start_date_time = trigger_date_time
         insights = self.combine_new_insights_with_previous(insights, previous_insights)
-        trends.add_cta()
-        trends.add_no_trigger()
-        trends.sort_by_priority()
+        trends.cleanup()
         self.daily_plan.insights = insights
         self.daily_plan.sort_insights()
         self.daily_plan.trends = trends
@@ -92,27 +91,38 @@ class AlertsProcessing(object):
                 new_insights.append(old)
         return new_insights
 
-
     def combine_alerts_to_insights(self, alerts, trends):
         existing_triggers = []
         existing_trends = []
         insights = []
+        doms_yesterday = any([trend.trigger_type == TriggerType.sore_today_doms for trend in self.athlete_stats.longitudinal_trends])
+        doms_today = False
         for alert in alerts:
-            if not (alert.goal.trigger_type, alert.sport_name, alert.body_part) in existing_trends:
-                existing_trends.append((alert.goal.trigger_type, alert.sport_name, alert.body_part))
+            if alert.goal.trigger_type == TriggerType.sore_today_doms:
+                if doms_yesterday:
+                    continue
+                elif doms_today:
+                    trend = [trend for trend in trends.response.alerts if trend.trigger_type == TriggerType.sore_today_doms][0]
+                    self.add_data_to_trend(trend, alert)
+                else:
+                    # create new doms trend
+                    doms_today = True
+                    existing_trends.append((alert.goal.trigger_type, alert.sport_name, alert.body_part))
+                    trend = Trend(alert.goal.trigger_type)
+                    self.add_data_to_trend(trend, alert)
+                    # add doms trend to response bucket
+                    trends.response.alerts.append(trend)
+                    trends.response.goals.add(alert.goal.text)
+            elif (alert.goal.trigger_type, alert.body_part) in existing_trends and alert.goal.trigger_type == TriggerType.high_volume_intensity:
+                trend = [trend for trend in trends.stress.alerts if trend.trigger_type == TriggerType.high_volume_intensity][0]
+                self.add_data_to_trend(trend, alert)
+
+            elif not (alert.goal.trigger_type, alert.body_part) in existing_trends:
+                existing_trends.append((alert.goal.trigger_type, alert.body_part))
                 trend = Trend(alert.goal.trigger_type)
-                trend.goal_targeted = [alert.goal.text]
-                if alert.body_part is not None:
-                    trend.body_parts.append(alert.body_part)
-                if alert.sport_name is not None:
-                    trend.sport_names.append(alert.sport_name)
-                # populate trend with text/visualization data
-                trend.add_data()
-                # populate relevant data for charts
-                self.add_chart_data(trend)
+                self.add_data_to_trend(trend, alert)
 
                 # group trend into proper insight type bucket
-                # insight_type = InsightType(TriggerType.get_insight_type(alert.goal.trigger_type))
                 if trend.insight_type == InsightType.stress:
                     trends.stress.alerts.append(trend)
                     trends.stress.goals.add(alert.goal.text)
@@ -181,3 +191,54 @@ class AlertsProcessing(object):
 
         trend.data = chart_data
         return trend
+
+    def add_data_to_trend(self, trend, alert):
+        trend.goal_targeted = [alert.goal.text]
+        if alert.body_part is not None:
+            trend.body_parts.append(alert.body_part)
+        if alert.sport_name is not None:
+            trend.sport_names.append(alert.sport_name)
+        # populate trend with text/visualization data
+        trend.body_parts = [BodyPartSide.json_deserialise(dict(t)) for t in {tuple(d.json_serialise().items()) for d in trend.body_parts}]
+        trend.sport_names = list(set(trend.sport_names))
+        trend.add_data()
+        # populate relevant data for charts
+        self.add_chart_data(trend)
+
+    def clear_trends(self, new_trends):
+        current_stress_trigger_types = [trend.get_trigger_type_body_part_sport_tuple() for trend in new_trends.stress.alerts]
+        current_response_trigger_types = [trend.get_trigger_type_body_part_sport_tuple() for trend in new_trends.response.alerts]
+        current_biomechanics_trigger_types = [trend.get_trigger_type_body_part_sport_tuple() for trend in new_trends.biomechanics.alerts]
+
+        for l_trend in self.athlete_stats.longitudinal_trends:
+            # if trigger type does not exist, it was cleared
+            if l_trend.insight_type == InsightType.stress and \
+                    l_trend.get_trigger_type_body_part_sport_tuple() not in current_stress_trigger_types:
+                l_trend.cleared = True
+                # populate trend with text/visualization data
+                l_trend.add_data()
+                # populate relevant data for charts
+                self.add_chart_data(l_trend)
+                new_trends.stress.alerts.append(l_trend)
+            elif l_trend.insight_type == InsightType.response and \
+                    l_trend.trigger_type != TriggerType.sore_today_doms and \
+                    l_trend.get_trigger_type_body_part_sport_tuple() not in current_response_trigger_types:
+                l_trend.cleared = True
+                # populate trend with text/visualization data
+                l_trend.add_data()
+                # populate relevant data for charts
+                self.add_chart_data(l_trend)
+                new_trends.response.alerts.append(l_trend)
+            elif l_trend.insight_type == InsightType.biomechanics and \
+                    l_trend.get_trigger_type_body_part_sport_tuple() not in current_biomechanics_trigger_types:
+                l_trend.cleared = True
+                # populate trend with text/visualization data
+                l_trend.add_data()
+                # populate relevant data for charts
+                self.add_chart_data(l_trend)
+                new_trends.biomechanics.alerts.append(l_trend)
+
+        self.athlete_stats.longitudinal_trends = [trend for trend in new_trends.stress.alerts if trend.longitudinal and not trend.cleared]
+        self.athlete_stats.longitudinal_trends.extend([trend for trend in new_trends.response.alerts if trend.longitudinal and not trend.cleared])
+        self.athlete_stats.longitudinal_trends.extend([trend for trend in new_trends.biomechanics.alerts if trend.longitudinal and not trend.cleared])
+        return new_trends

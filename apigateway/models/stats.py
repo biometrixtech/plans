@@ -88,6 +88,7 @@ class AthleteStats(Serialisable):
         self.high_relative_load_benchmarks = {}
         self.exposed_triggers = []
         self.longitudinal_insights = []
+        self.longitudinal_trends = []
         self.load_stats = None
         self.high_relative_load_sessions = []
         self.training_volume_chart_data = []
@@ -439,9 +440,10 @@ class AthleteStats(Serialisable):
                                               self.high_relative_load_benchmarks.items()},
             'exposed_triggers': [trigger.value for trigger in self.exposed_triggers],
             'longitudinal_insights': [insight.json_serialise() for insight in self.longitudinal_insights],
+            'longitudinal_trends': [trend.json_serialise() for trend in self.longitudinal_trends],
             'load_stats': self.load_stats.json_serialise() if self.load_stats is not None else None,
             'muscular_strain': [muscular_strain.json_serialise() for muscular_strain in self.muscular_strain],
             'high_relative_load_sessions': [high_load.json_serialise() for high_load in self.high_relative_load_sessions],
-            'training_volume_chart_data': [chart_data.json_serialise() for chart_data in self.training_volume_chart_data]
+            # 'training_volume_chart_data': [chart_data.json_serialise() for chart_data in self.training_volume_chart_data]
         }
         return ret

@@ -99,36 +99,6 @@ class DailyPlan(Serialisable):
                'trends': self.trends.json_serialise() if self.trends is not None else None,
                }
 
-        # ret['insights'] = [
-        #                     {
-        #                     "title": "How Soreness Turns to Strength:",
-        #                     "text": "We've added Care for Soreness to your plan today, to help retain mobility and expodite healing of tissue damage indicated by muscle soreness.",
-        #                     "goal_targeted": ["Care for Soreness"],
-        #                     "start_date": "2019-05-13T11:23:00Z",
-        #                     "read": False
-        #                     },
-        #                     {
-        #                     "title": 'Sign of Possible Injury',
-        #                     "text": "We added activities to Prevention to your plan because left knee pain for several days could be sign of injury. We'll remove heat to avoid aggrivating the issue and encourage you to ice, rest and see a doctor if the pain worsens.",
-        #                     "goal_targeted": ["Prevention"],
-        #                     "start_date": "2019-05-10T11:23:00Z",
-        #                     "read": False
-        #                     },
-        #                     {
-        #                     "title": "Possible Strength Imbalance",
-        #                     "text": "We've added activities to Prevention to your plan. Given your training patterns and persistant right glute soreness response, you may have a strength imbalance or movement dysfuntion which elevates your risk of injury. With these ativities we'll try to address the most likely source given what we've observed.",
-        #                     "goal_targeted": ["Prevention"],
-        #                     "start_date": "2019-05-13T11:23:00Z",
-        #                     "read": False
-        #                     },
-        #                     {
-        #                     "title": "How We Help Mitigate Pain: ",
-        #                     "text": "When you report pain we try to provide you with Care for Pain and Personalized Prepare for Sport activities to encourage proper biomechanical alignment & balance mucle tension to help mitigate the pain, but please remember to avoid any activities that hurt. ",
-        #                     "goal_targeted": ["Care for Pain", "Personalized Prepare for Sport"],
-        #                     "start_date": "2019-05-13T11:23:00Z",
-        #                     "read": True
-        #                     }
-        #                 ]
         return ret
 
     @classmethod
@@ -153,6 +123,8 @@ class DailyPlan(Serialisable):
             daily_plan.completed_ice = [IceSession.json_deserialise(ice) for ice in input_dict.get('completed_ice', [])]
             daily_plan.cold_water_immersion = ColdWaterImmersion.json_deserialise(input_dict['cold_water_immersion']) if input_dict.get('cold_water_immersion', None) is not None else None
             daily_plan.completed_cold_water_immersion = [ColdWaterImmersion.json_deserialise(cwi) for cwi in input_dict.get('completed_cold_water_immersion', [])]
+            daily_plan.insights = [AthleteInsight.json_deserialise(insight) for insight in input_dict.get('insights', [])]
+            daily_plan.trends = AthleteTrends.json_deserialise(input_dict['trends']) if input_dict.get('trends', None) is not None else None
         # daily_plan.daily_readiness_survey = _daily_readiness_from_mongo(input_dict.get('daily_readiness_survey', None), daily_plan.user_id)
         # daily_plan.updated = input_dict.get('updated', False)
         daily_plan.last_updated = input_dict.get('last_updated', None)
@@ -161,8 +133,6 @@ class DailyPlan(Serialisable):
         daily_plan.last_sensor_sync = input_dict.get('last_sensor_sync', None)
         daily_plan.sessions_planned = input_dict.get('sessions_planned', True)
         daily_plan.train_later = input_dict.get('train_later', True)
-        daily_plan.insights = [AthleteInsight.json_deserialise(insight) for insight in input_dict.get('insights', [])]
-        daily_plan.trends = AthleteTrends.json_deserialise(input_dict['trends']) if input_dict.get('trends', None) is not None else None
 
         return daily_plan
 

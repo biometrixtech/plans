@@ -1,11 +1,11 @@
 from enum import Enum
+from logic.text_generator import TextGenerator
+from models.chart_data import BodyPartChartData, DataSeriesBooleanData, DataSeriesData, TrainingVolumeChartData
 from models.insights import InsightType
-from models.chart_data import TrainingVolumeChartData
+from models.soreness import BodyPartSide
 from models.sport import SportName
-from models.soreness import BodyPartLocationText, BodyPartSide
-from models.trigger_data import TriggerData
 from models.trigger import TriggerType
-from models.chart_data import BodyPartChartData, DataSeriesBooleanData, DataSeriesData
+from models.trigger_data import TriggerData
 
 
 class LegendColor(Enum):
@@ -119,6 +119,9 @@ class Trend(object):
         self.data = []
         self.cta = []
         self.priority = 0
+        self.present_in_trends = True
+        self.cleared = False
+        self.longitudinal = False
 
     def json_serialise(self):
         ret = {
@@ -135,7 +138,10 @@ class Trend(object):
             'data_source': self.data_source.value,
             'insight_type': self.insight_type.value,
             'cta': self.cta,
-            'priority': self.priority
+            'priority': self.priority,
+            'present_in_trends': self.present_in_trends,
+            'cleared': self.cleared,
+            'longitudinal': self.longitudinal
         }
         return ret
 
@@ -154,6 +160,9 @@ class Trend(object):
         trend.insight_type = InsightType(input_dict.get('insight_type', 0))
         trend.priority = input_dict.get('priority', 0)
         trend.cta = input_dict.get('cta', [])
+        trend.present_in_trends = input_dict.get('present_in_trends', True)
+        trend.cleared = input_dict.get('cleared', False)
+        trend.longitudinal = input_dict.get('longitudinal', False)
         if trend.visualization_type == VisualizationType.load:
             trend.data = []
         elif trend.visualization_type == VisualizationType.session:
@@ -188,20 +197,26 @@ class Trend(object):
                 legends = [legend for legend in visualization_data['legend'] if legend['color'] == 1]
         else:
             legends = visualization_data['legend']
-        for legend in legends:
-            self.visualization_data.plot_legends.append(Legend.json_deserialise(legend))
+        self.visualization_data.plot_legends = [Legend.json_deserialise(legend) for legend in legends]
 
         self.visualization_title.text = TextGenerator.get_cleaned_text(plot_data['title'], body_parts=self.body_parts)
         self.visualization_title.body_part_text = [TextGenerator.get_body_part_text(self.body_parts)]
         self.visualization_title.color = self.visualization_data.plot_legends[0].color
         if data_source != "":
             self.data_source = DataSource[data_source]
-        title = trend_data['new_title']
-        text = trend_data['ongoing_body']
+        if self.cleared:
+            title = trend_data['cleared_title']
+            text = trend_data['cleared_body']
+        else:
+            title = trend_data['new_title']
+            text = trend_data['ongoing_body']
         self.text = TextGenerator.get_cleaned_text(text, goals=self.goal_targeted, body_parts=self.body_parts, sport_names=self.sport_names)
         self.title = TextGenerator.get_cleaned_text(title, goals=self.goal_targeted, body_parts=self.body_parts, sport_names=self.sport_names)
         self.insight_type = InsightType[trigger_data['trend_type'].lower()]
         self.priority = int(trigger_data['insight_priority_trend_type'])
+        self.present_in_trends = trend_data['present_in_trends']
+        if trigger_data['length_of_impact'] == "multiple_days":
+            self.longitudinal = True
         if cta_data['heat']:
             self.cta.append('heat')
         if cta_data['warmup']:
@@ -214,6 +229,13 @@ class Trend(object):
             self.cta.append('ice')
         if cta_data['cwi']:
             self.cta.append('cwi')
+
+    def get_trigger_type_body_part_sport_tuple(self):
+        if len(self.body_parts) != 0:
+            body_part = self.body_parts[0]
+        else:
+            body_part = None
+        return self.trigger_type, body_part
 
 
 class CallToAction(object):
@@ -302,7 +324,10 @@ class TrendCategory(object):
                 self.alerts.append(trend)
 
     def sort_trends(self):
-        self.alerts = sorted(self.alerts, key=lambda x: (x.priority))
+        self.alerts = sorted(self.alerts, key=lambda x: (x.priority, -int(x.cleared)))
+
+    def remove_not_present_in_trends_page(self):
+        self.alerts = [alert for alert in self.alerts if alert.present_in_trends]
 
 
 class TrendsDashboard(object):
@@ -364,99 +389,13 @@ class AthleteTrends(object):
         self.response.sort_trends()
         self.biomechanics.sort_trends()
 
+    def remove_trend_not_present_in_trends_page(self):
+        self.stress.remove_not_present_in_trends_page()
+        self.response.remove_not_present_in_trends_page()
+        self.biomechanics.remove_not_present_in_trends_page()
 
-class TextGenerator(object):
-
-    @classmethod
-    def get_cleaned_text(cls, text, goals=None, body_parts=None, sport_names=None, severity=None):
-        if body_parts is not None:
-            body_part_text = cls.get_body_part_text(body_parts)
-        else:
-            body_part_text = ""
-        if goals is not None:
-            if len(goals) == 0:
-                goal_text = ""
-            elif len(goals) == 1:
-                goal_text = goals[0]
-            elif len(goals) == 2:
-                goal_text = " and ".join(goals)
-            else:
-                joined_text = ", ".join(goals)
-                pos = joined_text.rfind(",")
-                goal_text = joined_text[:pos] + " and" + joined_text[pos+1:]
-        else:
-            goal_text = ""
-
-        if sport_names is not None:
-            sport_names = [sport_name.get_display_name() for sport_name in sport_names]
-            if len(sport_names) == 0:
-                sport_text = ""
-            elif len(sport_names) == 1:
-                sport_text = sport_names[0]
-            elif len(sport_names) == 2:
-                sport_text = " and ".join(sport_names)
-            else:
-                joined_text = ", ".join(sport_names)
-                pos = joined_text.rfind(",")
-                sport_text = joined_text[:pos] + " and" + joined_text[pos+1:]
-        else:
-            sport_text = ""
-
-        if severity is not None:
-            severity = "moderate"
-        else:
-            severity = "moderate"
-
-        text = text.format(bodypart=body_part_text, sport_name=sport_text, goal=goal_text, severity=severity)
-        if len(text) > 1:
-            return text[0].upper() + text[1:]
-        else:
-            return text
-
-    @classmethod
-    def get_body_part_text(cls, body_parts):
-        body_part_list = []
-        body_parts.sort(key=lambda x: x.body_part_location.value, reverse=False)
-        for body_part in body_parts:
-            part = BodyPartLocationText(body_part.body_part_location).value()
-            side = body_part.side
-            if side == 1:
-                body_text = " ".join(["left", part])
-            elif side == 2:
-                body_text = " ".join(["right", part])
-            else:  # side == 0:
-                body_text = part
-            body_part_list.append(body_text)
-
-        body_part_list = cls.merge_bilaterals(body_part_list)
-        body_part_text = ""
-        if len(body_part_list) > 2:
-            joined_text = ", ".join(body_part_list)
-            pos = joined_text.rfind(",")
-            body_part_text = joined_text[:pos] + " and" + joined_text[pos+1:]
-        elif len(body_part_list) == 2:
-            if "left and right" not in body_part_list[0] and "left and right" not in body_part_list[1]:
-                joined_text = ", ".join(body_part_list)
-                pos = joined_text.rfind(",")
-                body_part_text = joined_text[:pos] + " and" + joined_text[pos + 1:]
-            else:
-                body_part_text = ", ".join(body_part_list)
-        elif len(body_part_list) == 1:
-            body_part_text = body_part_list[0]
-        return body_part_text
-
-    @classmethod
-    def merge_bilaterals(cls, body_part_list):
-        last_part = ""
-
-        for b in range(0, len(body_part_list)):
-
-            cleaned_part = body_part_list[b].replace("left ", "").replace("right ", "")
-            if cleaned_part == last_part:
-                body_part_list[b] = "left and right " + cleaned_part
-                body_part_list[b - 1] = ""
-            last_part = cleaned_part
-
-        new_body_part_list = [x for x in body_part_list if x != ""]
-
-        return new_body_part_list
+    def cleanup(self):
+        self.add_cta()
+        self.add_no_trigger()
+        self.remove_trend_not_present_in_trends_page()
+        self.sort_by_priority()
