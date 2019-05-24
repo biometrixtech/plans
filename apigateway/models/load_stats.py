@@ -72,6 +72,7 @@ class LoadStats(Serialisable):
             if getattr(self, min_attribute) < value:
                 min_value = getattr(self, min_attribute)
             else:
+                setattr(self, min_attribute, value)
                 min_value = value
 
         if getattr(self, max_attribute) is None:
@@ -81,6 +82,7 @@ class LoadStats(Serialisable):
             if getattr(self, max_attribute) > value:
                 max_value = getattr(self, max_attribute)
             else:
+                setattr(self, max_attribute, value)
                 max_value = value
 
         if max_value == min_value:
