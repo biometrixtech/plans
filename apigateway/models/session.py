@@ -535,7 +535,7 @@ class HighLoadSession(Serialisable):
     @classmethod
     def json_deserialise(cls, input_dict):
 
-        session = HighLoadSession(input_dict["date"],  SportName(int(input_dict["sport_name"])))
+        session = HighLoadSession(parse_datetime(input_dict["date"]),  SportName(int(input_dict["sport_name"])))
 
         return session
 
