@@ -623,6 +623,11 @@ class ActiveRest(ModalityBase):
                 self.check_reactive_care_pain(s, exercise_library)
                 self.check_prevention_soreness(s, self.event_date_time, exercise_library)
                 self.check_prevention_pain(s, self.event_date_time, exercise_library)
+        elif high_relative_load_session or high_relative_intensity_logged or muscular_strain_high:
+            self.check_reactive_recover_from_sport([], exercise_library, high_relative_load_session,
+                                                   high_relative_intensity_logged,
+                                                   muscular_strain_high,
+                                                   sports)
         else:
             if self.force_data:
                 self.get_general_exercises(exercise_library)
