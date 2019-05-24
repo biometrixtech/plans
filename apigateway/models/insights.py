@@ -28,6 +28,7 @@ class AthleteInsight(Serialisable):
         self.styling = self.get_styling()
         self.read = False
         self.parent_group = TriggerType.get_parent_group(self.trigger_type)
+        self.present_in_plans = True
 
     def json_serialise(self):
         ret = {
@@ -46,7 +47,8 @@ class AthleteInsight(Serialisable):
             'longitudinal': self.longitudinal,
             'priority': self.priority,
             'styling': self.styling,
-            'read': self.read
+            'read': self.read,
+            'present_in_plans': self.present_in_plans
         }
         return ret
 
@@ -67,6 +69,7 @@ class AthleteInsight(Serialisable):
         insight.styling = input_dict.get('styling', 0)
         insight.read = input_dict.get('read', False)
         insight.insight_type = InsightType(input_dict.get('insight_type', 0))
+        insight.present_in_plans = input_dict.get('present_in_plans', True)
 
         return insight
 
@@ -102,6 +105,7 @@ class AthleteInsight(Serialisable):
         else:
             self.priority = int(trigger_data['insight_priority_plans'])
         self.insight_type = InsightType[trigger_data['trend_type'].lower()]
+        self.present_in_plans = plan_data['present_in_plans']
 
     def is_multi_day(self):
         if self.trigger_type.value in [7, 8, 11, 16, 19, 103, 104]:

@@ -40,6 +40,7 @@ class AlertsProcessing(object):
             else:
                 insight.start_date_time = trigger_date_time
         insights = self.combine_new_insights_with_previous(insights, previous_insights)
+        insights = [insight for insight in insights if insight.present_in_plans]
         trends.cleanup()
         self.daily_plan.insights = insights
         self.daily_plan.sort_insights()
