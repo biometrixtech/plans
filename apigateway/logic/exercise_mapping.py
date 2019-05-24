@@ -179,7 +179,7 @@ class ExerciseAssignmentCalculator(object):
     def get_post_active_rest(self, force_data=False):
 
         if (len(self.soreness_list) > 0 or self.muscular_strain_high
-                or self.high_relative_load_session or self.high_relative_intensity_session):
+                or self.high_relative_load_session or self.high_relative_intensity_session or force_data):
             active_rest = ActiveRestAfterTraining(self.event_date_time, force_data)
             active_rest.fill_exercises(self.soreness_list, self.exercise_library,self.high_relative_load_session,
                                        self.high_relative_intensity_session,
