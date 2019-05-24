@@ -12,7 +12,7 @@ visualization_data = {
                 'y_axis_2': "",
                 'legend': [
                     {
-                        'color': 1,
+                        'color': 3,
                         'text': "Load",
                         'type': 0
                     }
