@@ -54,7 +54,7 @@ def test_a_35_day_life_in_a_day():
 
 def validate_pre_active_rest_exercise_counts(daily_plan, inhibit_present, static_stretch_present,
                                              active_stretch_present, isolated_activate_present,
-                                             static_integrate_present):
+                                             static_integrate_present, default_plan):
 
     if (not inhibit_present and not static_stretch_present and not active_stretch_present
             and not isolated_activate_present and not static_integrate_present):
@@ -66,10 +66,11 @@ def validate_pre_active_rest_exercise_counts(daily_plan, inhibit_present, static
         assert (len(daily_plan.pre_active_rest[0].static_stretch_exercises) > 0) is static_stretch_present
         assert (len(daily_plan.pre_active_rest[0].isolated_activate_exercises) > 0) is isolated_activate_present
         assert (len(daily_plan.pre_active_rest[0].static_integrate_exercises) > 0) is static_integrate_present
+        assert daily_plan.pre_active_rest[0].default_plan == default_plan
 
 
 def validate_post_active_rest_exercise_counts(daily_plan, inhibit_present, static_stretch_present,
-                                             isolated_activate_present, static_integrate_present):
+                                             isolated_activate_present, static_integrate_present, default_plan):
     if (not inhibit_present and not static_stretch_present and not isolated_activate_present
             and not static_integrate_present):
         assert len(daily_plan.post_active_rest) == 0
@@ -79,10 +80,36 @@ def validate_post_active_rest_exercise_counts(daily_plan, inhibit_present, stati
         assert (len(daily_plan.post_active_rest[0].static_stretch_exercises) > 0) is static_stretch_present
         assert (len(daily_plan.post_active_rest[0].isolated_activate_exercises) > 0) is isolated_activate_present
         assert (len(daily_plan.post_active_rest[0].static_integrate_exercises) > 0) is static_integrate_present
+        assert daily_plan.post_active_rest[0].default_plan == default_plan
 
 
 def validate_biomechanics(daily_plan, expected_triggers):
-    pass
+    for t in expected_triggers:
+        response = list(
+            i for i in daily_plan.trends.biomechanics.alerts if i.insight_type == InsightType.biomechanics and i.trigger_type == t)
+        assert len(response) > 0
+
+
+def validate_biomechanics_chart_data(daily_plan, trigger_type, last_expected_values):
+
+    if len(last_expected_values) > 0:
+
+        response = list(
+            i for i in daily_plan.trends.biomechanics.alerts if
+            i.insight_type == InsightType.biomechanics and i.trigger_type == trigger_type)[0]
+
+        last_expected_values_counter = 0
+        for v in range(14 - len(last_expected_values), 14):
+            assert response.data[v].value == last_expected_values[last_expected_values_counter]
+            last_expected_values_counter += 1
+
+
+def validate_training_volume_data(daily_plan, last_expected_values):
+
+    last_expected_values_counter = 0
+    for v in range(14-len(last_expected_values), 14):
+        assert daily_plan.trends.dashboard.training_volume_data[v].training_volume == last_expected_values[last_expected_values_counter]
+        last_expected_values_counter += 1
 
 
 def validate_response(daily_plan, expected_triggers):
@@ -93,15 +120,15 @@ def validate_response(daily_plan, expected_triggers):
 
 
 def validate_response_chart_data(daily_plan, trigger_type, last_expected_values):
+    if len(last_expected_values) > 0:
+        response = list(
+            i for i in daily_plan.trends.response.alerts if
+            i.insight_type == InsightType.response and i.trigger_type == trigger_type)[0]
 
-    response = list(
-        i for i in daily_plan.trends.response.alerts if
-        i.insight_type == InsightType.response and i.trigger_type == trigger_type)[0]
-
-    last_expected_values_counter = 0
-    for v in range(14 - len(last_expected_values), 14):
-        assert response.data[v].value == last_expected_values[last_expected_values_counter]
-        last_expected_values_counter += 1
+        last_expected_values_counter = 0
+        for v in range(14 - len(last_expected_values), 14):
+            assert response.data[v].value == last_expected_values[last_expected_values_counter]
+            last_expected_values_counter += 1
 
 
 def validate_stress(daily_plan, expected_triggers):
@@ -112,14 +139,14 @@ def validate_stress(daily_plan, expected_triggers):
 
 
 def validate_stress_chart_data(daily_plan, trigger_type, last_expected_values):
+    if len(last_expected_values) > 0:
+        stress = list(
+            i for i in daily_plan.trends.stress.alerts if i.insight_type == InsightType.stress and i.trigger_type == trigger_type)[0]
 
-    stress = list(
-        i for i in daily_plan.trends.stress.alerts if i.insight_type == InsightType.stress and i.trigger_type == trigger_type)[0]
-
-    last_expected_values_counter = 0
-    for v in range(14-len(last_expected_values), 14):
-        assert stress.data[v].value == last_expected_values[last_expected_values_counter]
-        last_expected_values_counter += 1
+        last_expected_values_counter = 0
+        for v in range(14-len(last_expected_values), 14):
+            assert stress.data[v].value == last_expected_values[last_expected_values_counter]
+            last_expected_values_counter += 1
 
 
 def validate_insights(daily_plan, expected_types, expected_triggers, expected_first, expected_cleared):
@@ -156,8 +183,8 @@ def validate_daily_plan(daily_plan, event_date):
         assert daily_plan.heat is None
         assert daily_plan.ice is None
 
-        validate_pre_active_rest_exercise_counts(daily_plan, True, True, True, False, False)
-        validate_post_active_rest_exercise_counts(daily_plan, False, False, False, False)
+        validate_pre_active_rest_exercise_counts(daily_plan, True, True, True, False, False, 'Comprehensive')
+        validate_post_active_rest_exercise_counts(daily_plan, False, False, False, False, '')
 
         # insights
         validate_insights(daily_plan,
@@ -166,6 +193,17 @@ def validate_daily_plan(daily_plan, event_date):
                                              TriggerType.high_volume_intensity],
                           expected_first=[True, True],
                           expected_cleared=[False, False])
+
+        # training_volume_base_data
+        validate_training_volume_data(daily_plan, [500])
+
+        # biomechanics
+        validate_biomechanics(daily_plan, [TriggerType.biomechanics_no_triggers_flagged_based_on_pain,
+                                           TriggerType.biomechanics_no_triggers_flagged_based_on_soreness])
+
+
+        validate_biomechanics_chart_data(daily_plan, TriggerType.biomechanics_no_triggers_flagged_based_on_pain, [])
+        validate_biomechanics_chart_data(daily_plan, TriggerType.biomechanics_no_triggers_flagged_based_on_soreness, [])
 
         # response
         validate_response(daily_plan, [TriggerType.no_hist_pain_pain_today_severity_1_2])
@@ -180,22 +218,83 @@ def validate_daily_plan(daily_plan, event_date):
         validate_stress_chart_data(daily_plan, TriggerType.high_volume_intensity, [False, False, True])
 
     elif event_date == target_date + timedelta(days=5):
-        recover_alert = list(i for i in daily_plan.trends.stress.alerts if i.insight_type == InsightType.stress)[0]
-        assert recover_alert.trigger_type == TriggerType.high_volume_intensity
+        # modalities
+        assert daily_plan.cold_water_immersion is None
+        assert daily_plan.heat is None
+        assert daily_plan.ice is None
 
-        assert recover_alert.data[11].value is True
-        assert recover_alert.data[12].value is False
-        assert recover_alert.data[13].value is True
+        validate_pre_active_rest_exercise_counts(daily_plan, True, True, True, False, False, 'Comprehensive')
+        validate_post_active_rest_exercise_counts(daily_plan, False, False, False, False, '')
+
+        # insights
+        validate_insights(daily_plan,
+                          expected_types=[InsightType.response, InsightType.stress],
+                          expected_triggers=[TriggerType.no_hist_pain_pain_today_severity_1_2,
+                                             TriggerType.high_volume_intensity],
+                          expected_first=[True, True],
+                          expected_cleared=[False, False])
+
+        # training_volume_base_data
+        validate_training_volume_data(daily_plan, [500, 0, 500])
+
+        # biomechanics
+        validate_biomechanics(daily_plan, [TriggerType.biomechanics_no_triggers_flagged_based_on_pain,
+                                           TriggerType.biomechanics_no_triggers_flagged_based_on_soreness])
+
+        validate_biomechanics_chart_data(daily_plan, TriggerType.biomechanics_no_triggers_flagged_based_on_pain, [])
+        validate_biomechanics_chart_data(daily_plan, TriggerType.biomechanics_no_triggers_flagged_based_on_soreness, [])
+
+        # response
+        validate_response(daily_plan, [TriggerType.no_hist_pain_pain_today_severity_1_2])
+
+        validate_response_chart_data(daily_plan, TriggerType.no_hist_pain_pain_today_severity_1_2, [1, 0, 2])
+
+        validate_response_cta_names(daily_plan, ['mobilize', 'ice'])
+
+        # stress
+        validate_stress(daily_plan, [TriggerType.high_volume_intensity])
+
+        validate_stress_chart_data(daily_plan, TriggerType.high_volume_intensity, [True, False, True])
 
     elif event_date == target_date + timedelta(days=7):
-        recover_alert = list(i for i in daily_plan.trends.stress.alerts if i.insight_type == InsightType.stress)[0]
-        assert recover_alert.trigger_type == TriggerType.high_volume_intensity
+        # modalities
+        assert daily_plan.cold_water_immersion is None
+        assert daily_plan.heat is None
+        assert daily_plan.ice is None
 
-        assert recover_alert.data[9].value is True
-        assert recover_alert.data[10].value is False
-        assert recover_alert.data[11].value is True
-        assert recover_alert.data[12].value is False
-        assert recover_alert.data[13].value is True
+        #isolated activate now present!
+        validate_pre_active_rest_exercise_counts(daily_plan, True, True, True, True, False, 'Complete')
+        validate_post_active_rest_exercise_counts(daily_plan, False, False, False, False, '')
+
+        # insights
+        # MORE INSIGHTS!!! - so we added...
+        validate_insights(daily_plan,
+                          expected_types=[InsightType.biomechanics, InsightType.response, InsightType.stress],
+                          expected_triggers=[TriggerType.hist_pain, TriggerType.hist_pain_pain_today_severity_3_5,
+                                             TriggerType.high_volume_intensity],
+                          expected_first=[True, True, True],
+                          expected_cleared=[False, False, False])
+
+        # training_volume_base_data
+        validate_training_volume_data(daily_plan, [500, 0, 500, 0, 500])
+
+        # biomechanics
+        validate_biomechanics(daily_plan, [TriggerType.hist_pain,
+                                           TriggerType.biomechanics_no_triggers_flagged_based_on_soreness])
+
+        validate_biomechanics_chart_data(daily_plan, TriggerType.hist_pain, [1, 0, 2, 0, 3])
+
+        # response
+        validate_response(daily_plan, [TriggerType.hist_pain_pain_today_severity_3_5])
+
+        validate_response_chart_data(daily_plan, TriggerType.hist_pain_pain_today_severity_3_5, [1, 0, 2, 0, 3])
+
+        validate_response_cta_names(daily_plan, ['mobilize', 'ice'])
+
+        # stress
+        validate_stress(daily_plan, [TriggerType.high_volume_intensity])
+
+        validate_stress_chart_data(daily_plan, TriggerType.high_volume_intensity, [True, False, True, False, True])
 
     elif event_date == target_date + timedelta(days=9):
         recover_alert = list(i for i in daily_plan.trends.stress.alerts if i.insight_type == InsightType.stress)[0]
