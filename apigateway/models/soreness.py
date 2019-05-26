@@ -404,7 +404,9 @@ class BodyPartLocationText(object):
                           'upper_back_neck': 'upper back',
                           'elbow': 'elbow',
                           'wrist': 'wrist',
-                          'lats': 'lat'}
+                          'lats': 'lat',
+                          'biceps': 'biceps',
+                          'triceps': 'triceps'}
 
         return body_part_text[self.body_part_location.name]
 

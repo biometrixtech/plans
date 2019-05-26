@@ -169,12 +169,16 @@ class ModalityBase(object):
 
     def copy_exercises(self, source_collection, target_collection, goal, priority, soreness, exercise_library, sport_name=None):
 
+        position_order = 0
+
         for s in source_collection:
+
             if s.exercise.id not in target_collection:
                 target_collection[s.exercise.id] = AssignedExercise(library_id=str(s.exercise.id))
                 exercise_list = [ex for ex in exercise_library if ex.id == str(s.exercise.id)]
                 target_collection[s.exercise.id].exercise = exercise_list[0]
                 target_collection[s.exercise.id].equipment_required = target_collection[s.exercise.id].exercise.equipment_required
+                target_collection[s.exercise.id].position_order = position_order
 
             dosage = ExerciseDosage()
             dosage.priority = priority
@@ -183,6 +187,7 @@ class ModalityBase(object):
             dosage.goal = goal
             dosage = self.update_dosage(dosage, target_collection[s.exercise.id].exercise)
             target_collection[s.exercise.id].dosages.append(dosage)
+            position_order += 1
 
     def aggregate_dosages(self):
         pass
@@ -191,13 +196,21 @@ class ModalityBase(object):
 
         for ex, a in assigned_exercises.items():
             if len(a.dosages) > 0:
-                a.dosages = sorted(a.dosages, key=lambda x: (x.severity(), 3-int(x.priority),
+                a.dosages = sorted(a.dosages, key=lambda x: (x.severity(), #3-int(x.priority),
                                                              x.comprehensive_sets_assigned,
                                                              x.comprehensive_reps_assigned,
                                                              x.complete_sets_assigned,
                                                              x.complete_reps_assigned,
                                                              x.efficient_sets_assigned,
                                                              x.efficient_reps_assigned), reverse=True)
+
+                # a.dosages = sorted(a.dosages, key=lambda x: (x.severity(), #3 - int(x.priority), has no impact
+                #                                               x.efficient_sets_assigned,
+                #                                               x.efficient_reps_assigned,
+                #                                               x.complete_sets_assigned,
+                #                                               x.complete_reps_assigned,
+                #                                               x.comprehensive_sets_assigned,
+                #                                               x.comprehensive_reps_assigned), reverse=True)
 
                 dosage = a.dosages[0]
 
