@@ -75,10 +75,6 @@ def get_dates_from_severity_list(severity_list, start_date):
 
 def get_historic_soreness(severity_list, start_date, historic_soreness=None, is_pain=True):
 
-    #dates = get_dates_from_severity_list(severity_list, start_date)
-
-    #for date in dates:
-
     soreness_list = get_soreness_list(BodyPartLocation.achilles, 1, severity_list, is_pain, date=parse_date(start_date))
 
     stats_processing = StatsProcessing("tester", parse_date(start_date), DatastoreCollection())
