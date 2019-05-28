@@ -497,7 +497,8 @@ class StatsProcessing(object):
                                 days_skipped = (body_part_history[b].reported_date_time -
                                                 body_part_history[b + 1].reported_date_time).days
 
-                            streak += 1
+                            if b == 0 or (body_part_history[b - 1].reported_date_time.date() - body_part_history[b].reported_date_time.date()).days > 0:
+                                streak += 1
 
                 if streak >= 3 and g.is_pain:  # check for acute pain FIRST
                     if days_since_last_report is not None and days_since_last_report > 3:
