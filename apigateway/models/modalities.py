@@ -1702,8 +1702,9 @@ class CoolDown(ModalityBase, Serialisable):
 
         for sport_name in sports:
             self.check_recover_from_sport(soreness_list, sport_name, muscular_strain_high, exercise_library)
-        for s in soreness_list:
-            self.check_corrective(s, self.event_date_time, exercise_library)
+        # dynamic stretch not ready yet
+        #for s in soreness_list:
+        #    self.check_corrective(s, self.event_date_time, exercise_library)
 
     def assign_exercises(self, soreness, goal, exercise_library):
 
