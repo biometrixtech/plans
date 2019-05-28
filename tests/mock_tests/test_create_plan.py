@@ -239,8 +239,8 @@ def test_active_rest_before_training_spectrum_soreness():
     daily_plan_json = daily_plan.json_serialise()
     assert len(daily_plan.pre_active_rest[0].inhibit_exercises) > 0
     assert len(daily_plan.pre_active_rest[0].static_stretch_exercises) > 0
-    assert len(daily_plan.pre_active_rest[0].isolated_activate_exercises) > 0
-    assert len(daily_plan.pre_active_rest[0].static_integrate_exercises) > 0
+    assert len(daily_plan.pre_active_rest[0].isolated_activate_exercises) == 0
+    assert len(daily_plan.pre_active_rest[0].static_integrate_exercises) == 0
     assert len(daily_plan.cool_down) == 0
     assert daily_plan.heat is None
     assert daily_plan.ice is None
