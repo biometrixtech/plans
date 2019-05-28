@@ -34,7 +34,7 @@ def test_active_rest_after_training_check_soreness_severity_3():
         soreness.severity = 3
         soreness.side = 1
         exercise_library = exercise_library_datastore.get()
-        active_rest.check_reactive_care_soreness(soreness, exercise_library)
+        active_rest.check_reactive_care_soreness(soreness, exercise_library, 3)
 
         assert len(active_rest.inhibit_exercises) > 0
         assert len(active_rest.static_stretch_exercises) > 0
@@ -53,7 +53,7 @@ def test_active_rest_after_training_check_soreness_severity_4():
         soreness.severity = 4
         soreness.side = 1
         exercise_library = exercise_library_datastore.get()
-        active_rest.check_reactive_care_soreness(soreness, exercise_library)
+        active_rest.check_reactive_care_soreness(soreness, exercise_library, 4)
 
         assert len(active_rest.inhibit_exercises) > 0
         assert len(active_rest.static_stretch_exercises) == 0
@@ -163,7 +163,7 @@ def test_active_rest_after_training_check_pain_severity_3():
         soreness.side = 1
         soreness.pain = True
         exercise_library = exercise_library_datastore.get()
-        active_rest.check_reactive_care_pain(soreness, exercise_library)
+        active_rest.check_reactive_care_pain(soreness, exercise_library, 3)
 
         assert len(active_rest.inhibit_exercises) > 0
         assert len(active_rest.static_stretch_exercises) > 0
@@ -182,7 +182,7 @@ def test_active_rest_after_training_check_pain_severity_4():
         soreness.side = 1
         soreness.pain = True
         exercise_library = exercise_library_datastore.get()
-        active_rest.check_reactive_care_pain(soreness, exercise_library)
+        active_rest.check_reactive_care_pain(soreness, exercise_library, 4)
 
         assert len(active_rest.inhibit_exercises) > 0
         assert len(active_rest.static_stretch_exercises) == 0
@@ -252,7 +252,7 @@ def test_active_rest_before_training_check_soreness_severity_3():
         soreness.severity = 3
         soreness.side = 1
         exercise_library = exercise_library_datastore.get()
-        active_rest.check_reactive_care_soreness(soreness, exercise_library)
+        active_rest.check_reactive_care_soreness(soreness, exercise_library, 3)
 
         assert len(active_rest.inhibit_exercises) > 0
         assert len(active_rest.static_stretch_exercises) > 0
@@ -271,7 +271,7 @@ def test_active_rest_before_training_check_soreness_severity_4():
         soreness.severity = 4
         soreness.side = 1
         exercise_library = exercise_library_datastore.get()
-        active_rest.check_reactive_care_soreness(soreness, exercise_library)
+        active_rest.check_reactive_care_soreness(soreness, exercise_library, 4)
 
         assert len(active_rest.inhibit_exercises) > 0
         assert len(active_rest.static_stretch_exercises) == 0
@@ -383,7 +383,7 @@ def test_active_rest_before_training_check_pain_severity_3():
         soreness.side = 1
         soreness.pain = True
         exercise_library = exercise_library_datastore.get()
-        active_rest.check_reactive_care_pain(soreness, exercise_library)
+        active_rest.check_reactive_care_pain(soreness, exercise_library, 3)
 
         assert len(active_rest.inhibit_exercises) > 0
         assert len(active_rest.static_stretch_exercises) > 0
@@ -403,7 +403,7 @@ def test_active_rest_before_training_check_pain_severity_4():
         soreness.side = 1
         soreness.pain = True
         exercise_library = exercise_library_datastore.get()
-        active_rest.check_reactive_care_pain(soreness, exercise_library)
+        active_rest.check_reactive_care_pain(soreness, exercise_library, 4)
 
         assert len(active_rest.inhibit_exercises) > 0
         assert len(active_rest.static_stretch_exercises) == 0
