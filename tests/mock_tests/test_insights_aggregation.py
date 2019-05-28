@@ -152,7 +152,7 @@ def test_aggregate_insights_two_same_child_one_different_same_parent():
     assert not insights[0].longitudinal
     assert len(insights[0].body_parts) == 3
     assert insights[0].styling == 1
-    assert insights[0].trigger_type == TriggerType.no_hist_pain_pain_today_high_severity_3_5
+    assert insights[0].parent_group == 2
 
 
 def test_aggregate_insights_exposed():

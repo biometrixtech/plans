@@ -151,9 +151,9 @@ class AlertsProcessing(object):
             elif TriggerType.parent_group_exists(alert.goal.trigger_type, existing_triggers):
                 insight = [insight for insight in insights if TriggerType.is_same_parent_group(alert.goal.trigger_type, insight.trigger_type)][0]
                 insight.goal_targeted.append(alert.goal.text)
-                if TriggerType.is_equivalent(alert.goal.trigger_type, TriggerType.no_hist_pain_pain_today_high_severity_3_5):
-                    insight.trigger_type = TriggerType.no_hist_pain_pain_today_high_severity_3_5
-                    insight.styling = insight.get_styling()
+                # for parent group 2 (trigger_type 14 and 15, 23, 24), if parent, should always get styling 1
+                if insight.parent_group == 2:
+                    insight.styling = 1
                 insight.parent = True
                 if alert.body_part is not None:
                     insight.body_parts.append(alert.body_part)
