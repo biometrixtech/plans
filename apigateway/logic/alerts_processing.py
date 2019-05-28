@@ -31,9 +31,12 @@ class AlertsProcessing(object):
             if insight.longitudinal:
                 if insight.trigger_type in existing_longitudinal_trigger_types:
                     existing_insight = [i for i in longitudinal_insights if i.trigger_type == insight.trigger_type][0]
+                    existing_insight.body_parts = insight.body_parts
+                    existing_insight.sport_names = insight.sport_names
+                    existing_insight.child_triggers = insight.child_triggers
                     insight.start_date_time = existing_insight.start_date_time
                 elif insight.cleared:
-                    continue
+                    insight.start_date_time = trigger_date_time
                 else:
                     insight.start_date_time = trigger_date_time
                     longitudinal_insights.append(insight)
@@ -59,22 +62,41 @@ class AlertsProcessing(object):
                 l_insight.cleared = True
                 if l_insight.trigger_type != TriggerType.sore_today_doms:  # don't add cleared doms to today
                     new_insights.append(l_insight)
-            else:  # find current insight is same trigger type or same parent group
+            else:  # find current insight of same trigger type or same parent group
                 current_insight = [insight for insight in new_insights if TriggerType.is_equivalent(insight.trigger_type, l_insight.trigger_type)][0]
                 cleared_parts = []
-                cleared_sports = []
-                current_body_parts = [d.json_serialise() for d in current_insight.body_parts]
-                for body_part in l_insight.body_parts:
-                    if body_part.json_serialise() not in current_body_parts:
-                        cleared_parts.append(body_part)
-                for sport in l_insight.sport_names:
-                    if sport not in current_insight.sport_names:
-                        cleared_sports.append(sport)
-                if len(cleared_parts) > 0 or len(cleared_sports) > 0:   # check if any body part was cleared
-                    l_insight.cleared = True
-                    l_insight.body_parts = cleared_parts
-                    l_insight.sport_names = cleared_sports
-                    new_insights.append(l_insight)  # add cleared insight to today
+                # cleared_sports = []
+                for trigger_type, body_parts in l_insight.child_triggers.items():
+                    if trigger_type not in current_insight.child_triggers.keys():
+                        cleared_insight = AthleteInsight(trigger_type)
+                        cleared_insight.cleared = True
+                        cleared_insight.body_parts = body_parts
+                        cleared_insight.parent = False
+                        new_insights.append(cleared_insight)
+                        l_insight.cleared = True
+                    else:
+                        current_body_parts = [d.json_serialise() for d in current_insight.child_triggers[trigger_type]]
+                        for body_part in body_parts:
+                            if body_part.json_serialise() not in current_body_parts:
+                                cleared_parts.append(body_part)
+                        if len(cleared_parts) > 0:
+                            cleared_insight = AthleteInsight(trigger_type)
+                            cleared_insight.cleared = True
+                            cleared_insight.body_parts = cleared_parts
+                            cleared_insight.parent = False
+                            new_insights.append(cleared_insight)
+                            l_insight.cleared = True
+                # for body_part in l_insight.body_parts:
+                #     if body_part.json_serialise() not in current_body_parts:
+                #         cleared_parts.append(body_part)
+                # for sport in l_insight.sport_names:
+                #     if sport not in current_insight.sport_names:
+                #         cleared_sports.append(sport)
+                # if len(cleared_parts) > 0 or len(cleared_sports) > 0:   # check if any body part was cleared
+                #     l_insight.cleared = True
+                #     l_insight.body_parts = cleared_parts
+                #     l_insight.sport_names = cleared_sports
+                #     new_insights.append(l_insight)  # add cleared insight to today
         existing_longitudinal_insights = [insight for insight in existing_longitudinal_insights if not insight.cleared]
 
         return new_insights, existing_longitudinal_insights
@@ -143,6 +165,7 @@ class AlertsProcessing(object):
                 insight.goal_targeted.append(alert.goal.text)
                 if alert.body_part is not None:
                     insight.body_parts.append(alert.body_part)
+                    insight.child_triggers[alert.goal.trigger_type].append(alert.body_part)
                 if alert.sport_name is not None:
                     insight.sport_names.append(alert.sport_name)
                 if alert.severity is not None:
@@ -157,6 +180,13 @@ class AlertsProcessing(object):
                 insight.parent = True
                 if alert.body_part is not None:
                     insight.body_parts.append(alert.body_part)
+                    if alert.goal.trigger_type not in insight.child_triggers.keys():
+                        insight.child_triggers[alert.goal.trigger_type] = [alert.body_part]
+                    else:
+                        insight.child_triggers[alert.goal.trigger_type].append(alert.body_part)
+                elif alert.goal.trigger_type not in insight.child_triggers.keys():
+                        insight.child_triggers[alert.goal.trigger_type] = []
+
                 if alert.sport_name is not None:
                     insight.sport_names.append(alert.sport_name)
                 if alert.severity is not None:
@@ -166,6 +196,9 @@ class AlertsProcessing(object):
                 insight.goal_targeted.append(alert.goal.text)
                 if alert.body_part is not None:
                     insight.body_parts.append(alert.body_part)
+                    insight.child_triggers[alert.goal.trigger_type] = [alert.body_part]
+                else:
+                    insight.child_triggers[alert.goal.trigger_type] = []
                 if alert.sport_name is not None:
                     insight.sport_names.append(alert.sport_name)
                 if alert.severity is not None:
