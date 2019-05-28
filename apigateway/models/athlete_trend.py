@@ -213,7 +213,8 @@ class Trend(object):
         self.text = TextGenerator.get_cleaned_text(text, goals=self.goal_targeted, body_parts=self.body_parts, sport_names=self.sport_names)
         self.title = TextGenerator.get_cleaned_text(title, goals=self.goal_targeted, body_parts=self.body_parts, sport_names=self.sport_names)
         self.insight_type = InsightType[trigger_data['trend_type'].lower()]
-        self.priority = int(trigger_data['insight_priority_trend_type'])
+        if trigger_data['insight_priority_trend_type'] != "":
+            self.priority = int(trigger_data['insight_priority_trend_type'])
         self.present_in_trends = trend_data['present_in_trends']
         if trigger_data['length_of_impact'] == "multiple_days":
             self.longitudinal = True

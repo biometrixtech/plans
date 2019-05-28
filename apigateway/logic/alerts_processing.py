@@ -100,6 +100,7 @@ class AlertsProcessing(object):
         doms_yesterday = any([trend.trigger_type == TriggerType.sore_today_doms for trend in self.athlete_stats.longitudinal_trends])
         doms_today = False
         for alert in alerts:
+            # triggers to trends
             if alert.goal.trigger_type == TriggerType.sore_today_doms:
                 if doms_yesterday:
                     continue
@@ -134,6 +135,8 @@ class AlertsProcessing(object):
                 elif trend.insight_type == InsightType.biomechanics:
                     trends.biomechanics.alerts.append(trend)
                     trends.biomechanics.goals.add(alert.goal.text)
+
+            # triggers to insights
             # check if trigger already exists
             if alert.goal.trigger_type in existing_triggers:
                 insight = [insight for insight in insights if insight.trigger_type == alert.goal.trigger_type][0]
@@ -148,6 +151,9 @@ class AlertsProcessing(object):
             elif TriggerType.parent_group_exists(alert.goal.trigger_type, existing_triggers):
                 insight = [insight for insight in insights if TriggerType.is_same_parent_group(alert.goal.trigger_type, insight.trigger_type)][0]
                 insight.goal_targeted.append(alert.goal.text)
+                # for parent group 2 (trigger_type 14 and 15, 23, 24), if parent, should always get styling 1
+                if insight.parent_group == 2:
+                    insight.styling = 1
                 insight.parent = True
                 if alert.body_part is not None:
                     insight.body_parts.append(alert.body_part)
