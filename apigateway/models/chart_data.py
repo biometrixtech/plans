@@ -182,7 +182,8 @@ class MuscularStrainChart(BaseChart):
 
 class DOMSChart(BaseChart):
     def __init__(self, end_date):
-        super().__init__(end_date + timedelta(days=2))
+        self.day_scale = 3
+        super().__init__(end_date + timedelta(days=self.day_scale))
 
     def process_doms(self, doms_list, soreness_list):
 
@@ -206,23 +207,64 @@ class DOMSChart(BaseChart):
                 self.add_doms(severity_list[0])
 
         # do we have soreness data for today? (We may need to fake it)
-        todays_soreness = doms[(self.end_date - timedelta(days=2)).date()]
+        todays_soreness = doms[(self.end_date - timedelta(days=self.day_scale)).date()]
         if len(todays_soreness) == 0:
             doms_severity = sorted(doms_list, key=lambda x: x.average_severity, reverse=True)
             fake_soreness = Soreness()
             fake_soreness.side = doms_severity[0].side
             fake_soreness.body_part = BodyPart(doms_severity[0].body_part_location, None)
             fake_soreness.severity = doms_severity[0].average_severity
-            fake_soreness.reported_date_time = self.end_date - timedelta(days=2)
+            fake_soreness.reported_date_time = self.end_date - timedelta(days=self.day_scale)
             self.add_doms(fake_soreness)
 
     def add_doms(self, soreness):
 
         if soreness is not None and soreness.reported_date_time.date() in self.data:
             self.data[soreness.reported_date_time.date()].value = soreness.severity
-            if soreness.reported_date_time.date() + timedelta(days=2) == self.end_date.date():
-                self.data[(soreness.reported_date_time + timedelta(days=1)).date()].value = max(0, soreness.severity - 1)
-                self.data[(soreness.reported_date_time + timedelta(days=2)).date()].value = max(0, soreness.severity - 2)
+            if soreness.reported_date_time.date() + timedelta(days=self.day_scale) == self.end_date.date():
+                for s in range(1,self.day_scale + 1):
+                    self.data[(soreness.reported_date_time + timedelta(days=s)).date()].value = \
+                        self.get_projected_severity(soreness.severity, s)
+
+    def get_projected_severity(self, severity, day):
+
+        if severity <= 1:
+            if day == 1:
+                return 0
+            else:
+                return None
+        elif 1 < severity <= 2:
+            if day == 1:
+                return 1.6
+            elif day == 2:
+                return 0
+            else:
+                return None
+        elif 2 < severity <= 3:
+            if day == 1:
+                return 2.65
+            elif day ==2:
+                return 1.75
+            elif day == 3:
+                return 0
+            else:
+                return None
+        elif 3 < severity <= 4:
+            if day == 1:
+                return 3.75
+            elif day == 2:
+                return 3.2
+            elif day == 3:
+                return 2
+        elif 4 < severity <=5:
+            if day == 1:
+                return 4.8
+            elif day == 2:
+                return 4.25
+            elif day == 3:
+                return 3
+        else:
+            return None
 
 
 class HighRelativeLoadChart(BaseChartBoolean):

@@ -240,9 +240,9 @@ def test_doms_chart():
     chart_data = chart.get_output_list()
 
     assert len(chart_data) == 14
-    assert chart_data[11].value == 3
-    assert chart_data[12].value is max(0, chart_data[11].value - 1)
-    assert chart_data[13].value is max(0, chart_data[11].value - 2)
+    assert chart_data[11].value == 2.65
+    assert chart_data[12].value == 1.75
+    assert chart_data[13].value == 0
 
 
 def test_body_part_collection():
