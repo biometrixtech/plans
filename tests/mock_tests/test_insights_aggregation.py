@@ -25,7 +25,7 @@ def test_insights_text():
 def test_aggregate_insights_first_exposure():
     current_date_time = datetime.datetime.now()
     goal = AthleteGoal('Care for Pain', 0, AthleteGoalType(0))
-    goal.trigger_type = TriggerType(14)
+    goal.trigger_type = TriggerType(14)  # no_hist_pain_pain_today_severity_1_2
     alert1 = Alert(goal)
     alert1.body_part = BodyPartSide(BodyPartLocation(11), 1)
 
@@ -41,6 +41,7 @@ def test_aggregate_insights_first_exposure():
     assert insights[0].first
     assert not insights[0].parent
     assert not insights[0].longitudinal
+    assert insights[0].styling == 0
 
 
 def test_aggregate_insights_no_alerts():
@@ -54,10 +55,10 @@ def test_aggregate_insights_no_alerts():
     assert len(insights) == 0
 
 
-def test_aggregate_insights_trigger_type_not_present_in_plans():
+def test_aggregate_insights_trigger_type_not_displayed():
     current_date_time = datetime.datetime.now()
     goal = AthleteGoal('Care for Pain', 0, AthleteGoalType(0))
-    goal.trigger_type = TriggerType(12)
+    goal.trigger_type = TriggerType(12)  # hist_sore_less_30_sore_today
     alert1 = Alert(goal)
     alert1.body_part = BodyPartSide(BodyPartLocation(11), 1)
 
@@ -94,9 +95,14 @@ def test_aggregate_insights_multiple_same_body_part():
 
 
 def test_aggregate_insights_multiple_same_child():
+    """
+    multiple of the same trigger type fired for different body parts
+    Should create a single child trigger
+    :return:
+    """
     current_date_time = datetime.datetime.now()
     goal = AthleteGoal('Care for Pain', 0, AthleteGoalType(0))
-    goal.trigger_type = TriggerType(14)
+    goal.trigger_type = TriggerType(14)  # no_hist_pain_pain_today_severity_1_2
     alert1 = Alert(goal)
     alert1.body_part = BodyPartSide(BodyPartLocation(11), 1)
     alert2 = Alert(goal)
@@ -112,6 +118,41 @@ def test_aggregate_insights_multiple_same_child():
     assert not insights[0].first
     assert not insights[0].parent
     assert not insights[0].longitudinal
+
+
+def test_aggregate_insights_two_same_child_one_different_same_parent():
+    """
+    two trigger of type 14 (different body parts) and one of type 15 fired
+    Should get a single parent insight with all three body parts
+    :return:
+    """
+    current_date_time = datetime.datetime.now()
+    goal1 = AthleteGoal('Care for Pain', 0, AthleteGoalType(0))
+    goal1.trigger_type = TriggerType(14)  # no_hist_pain_pain_today_severity_1_2
+    alert1 = Alert(goal1)
+    alert1.body_part = BodyPartSide(BodyPartLocation(11), 1)
+    alert2 = Alert(goal1)
+    alert2.body_part = BodyPartSide(BodyPartLocation(11), 2)
+
+    goal2 = AthleteGoal('Care for Pain', 0, AthleteGoalType(0))
+    goal2.trigger_type = TriggerType(15)  # no_hist_pain_pain_today_severity_1_2
+    alert3 = Alert(goal2)
+    alert3.body_part = BodyPartSide(BodyPartLocation(7), 2)
+    exposed_triggers = []
+
+    alerts = [alert1, alert2, alert3]
+    event_date_time = current_date_time
+    daily_plan = DailyPlan(format_date(event_date_time))
+    athlete_stats = AthleteStats('test_user')
+    athlete_stats.exposed_triggers = exposed_triggers
+    insights, longitudinal_insights, trends = AlertsProcessing(daily_plan, athlete_stats).aggregate_alerts(event_date_time, alerts)
+    assert len(insights) == 1
+    assert insights[0].first
+    assert insights[0].parent
+    assert not insights[0].longitudinal
+    assert len(insights[0].body_parts) == 3
+    assert insights[0].styling == 1
+    assert insights[0].trigger_type == TriggerType.no_hist_pain_pain_today_high_severity_3_5
 
 
 def test_aggregate_insights_exposed():
@@ -352,7 +393,7 @@ def test_insights_ordering():
     assert plan.insights[4].trigger_type == TriggerType(1)  # read - lower priority
 
 
-def test_trigger_typeequivalency():
+def test_trigger_type_equivalency():
     trigger1 = TriggerType(8)
     trigger2 = TriggerType(7)
     trigger3 = TriggerType(8)
@@ -372,7 +413,7 @@ def test_trend_add_data():
     assert trend2.visualization_type == trend.visualization_type
 
 
-def test_trend_add_data_another():
+def test_trend_add_data_2():
     trend = Trend(TriggerType(2))
     trend.body_parts = [BodyPartSide(BodyPartLocation(11), 2)]
     trend.add_data()
