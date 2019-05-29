@@ -117,7 +117,7 @@ class Trend(object):
         self.sport_names = []
         self.data_source = DataSource(0)
         self.data = []
-        self.cta = []
+        self.cta = set()
         self.priority = 0
         self.present_in_trends = True
         self.cleared = False
@@ -137,7 +137,7 @@ class Trend(object):
             'data': [data.json_serialise() for data in self.data],
             'data_source': self.data_source.value,
             'insight_type': self.insight_type.value,
-            'cta': self.cta,
+            'cta': list(self.cta),
             'priority': self.priority,
             'present_in_trends': self.present_in_trends,
             'cleared': self.cleared,
@@ -159,7 +159,7 @@ class Trend(object):
         trend.data_source = DataSource(input_dict.get('data_source', 0))
         trend.insight_type = InsightType(input_dict.get('insight_type', 0))
         trend.priority = input_dict.get('priority', 0)
-        trend.cta = input_dict.get('cta', [])
+        trend.cta = set(input_dict.get('cta', []))
         trend.present_in_trends = input_dict.get('present_in_trends', True)
         trend.cleared = input_dict.get('cleared', False)
         trend.longitudinal = input_dict.get('longitudinal', False)
@@ -219,17 +219,17 @@ class Trend(object):
         if trigger_data['length_of_impact'] == "multiple_days":
             self.longitudinal = True
         if cta_data['heat']:
-            self.cta.append('heat')
+            self.cta.add('heat')
         if cta_data['warmup']:
-            self.cta.append('warm_up')
+            self.cta.add('warm_up')
         if cta_data['cooldown']:
-            self.cta.append('active_recovery')
+            self.cta.add('active_recovery')
         if cta_data['active_rest']:
-            self.cta.append('mobilize')
+            self.cta.add('mobilize')
         if cta_data['ice']:
-            self.cta.append('ice')
+            self.cta.add('ice')
         if cta_data['cwi']:
-            self.cta.append('cwi')
+            self.cta.add('cwi')
 
     def get_trigger_type_body_part_sport_tuple(self):
         if len(self.body_parts) != 0:
