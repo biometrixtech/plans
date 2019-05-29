@@ -494,6 +494,7 @@ def test_aggregate_trends_multiple_doms():
 def test_aggregate_trends_doms_yesterday():
     current_date_time = datetime.datetime.now()
     trend = Trend(TriggerType(11))
+    trend.last_triggered_date_time = current_date_time - datetime.timedelta(days=1)
 
     alert = get_alert(11, body_part=(11, 2))
 
@@ -512,6 +513,7 @@ def test_aggregate_trends_doms_yesterday():
 def test_aggregate_trends_cleared_trend_doms():
     current_date_time = datetime.datetime.now()
     trend = Trend(TriggerType(11))
+    trend.last_triggered_date_time = current_date_time - datetime.timedelta(days=1)
     trend.add_data()
     alert = get_alert(8, body_part=(11, 2))
 

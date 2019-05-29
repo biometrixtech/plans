@@ -8,8 +8,10 @@ class AlertsProcessing(object):
     def __init__(self, daily_plan, athlete_stats):
         self.daily_plan = daily_plan
         self.athlete_stats = athlete_stats
+        self.trigger_date_time = None
 
     def aggregate_alerts(self, trigger_date_time, alerts):
+        self.trigger_date_time = trigger_date_time
         previous_insights = self.daily_plan.insights
         exposed_triggers = self.athlete_stats.exposed_triggers
         longitudinal_insights = self.athlete_stats.longitudinal_insights
@@ -120,18 +122,23 @@ class AlertsProcessing(object):
         existing_trends = []
         insights = []
         doms_yesterday = any([trend.trigger_type == TriggerType.sore_today_doms for trend in self.athlete_stats.longitudinal_trends])
-        doms_today = False
+        doms_today = any([alert.goal.trigger_type == TriggerType.sore_today_doms for alert in alerts])
+        doms_created_today = False
         for alert in alerts:
             # triggers to trends
             if alert.goal.trigger_type == TriggerType.sore_today_doms:
                 if doms_yesterday:
-                    continue
-                elif doms_today:
+                    if doms_today:
+                        l_trend = [trend for trend in self.athlete_stats.longitudinal_trends if trend.trigger_type == TriggerType.sore_today_doms][0]
+                        l_trend.last_triggered_date_time = self.trigger_date_time
+                    else:
+                        continue
+                elif doms_created_today:
                     trend = [trend for trend in trends.response.alerts if trend.trigger_type == TriggerType.sore_today_doms][0]
                     self.add_data_to_trend(trend, alert)
                 else:
                     # create new doms trend
-                    doms_today = True
+                    doms_created_today = True
                     existing_trends.append((alert.goal.trigger_type, alert.sport_name, alert.body_part))
                     trend = Trend(alert.goal.trigger_type)
                     self.add_data_to_trend(trend, alert)
@@ -279,7 +286,14 @@ class AlertsProcessing(object):
                 self.add_chart_data(l_trend)
                 new_trends.biomechanics.alerts.append(l_trend)
 
-        self.athlete_stats.longitudinal_trends = [trend for trend in new_trends.stress.alerts if trend.longitudinal and not trend.cleared]
+        doms_trends = [trend for trend in self.athlete_stats.longitudinal_trends if trend.trigger_type == TriggerType.sore_today_doms]
+        if len(doms_trends) > 0 and \
+                doms_trends[0].last_triggered_date_time.date() == self.trigger_date_time.date():
+            self.athlete_stats.longitudinal_trends = [doms_trends[0]]
+        else:
+            self.athlete_stats.longitudinal_trends = []
+
+        self.athlete_stats.longitudinal_trends.extend([trend for trend in new_trends.stress.alerts if trend.longitudinal and not trend.cleared])
         self.athlete_stats.longitudinal_trends.extend([trend for trend in new_trends.response.alerts if trend.longitudinal and not trend.cleared])
         self.athlete_stats.longitudinal_trends.extend([trend for trend in new_trends.biomechanics.alerts if trend.longitudinal and not trend.cleared])
         return new_trends

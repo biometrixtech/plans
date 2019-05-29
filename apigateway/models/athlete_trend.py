@@ -6,7 +6,7 @@ from models.soreness import BodyPartSide
 from models.sport import SportName
 from models.trigger import TriggerType
 from models.trigger_data import TriggerData
-
+from utils import format_datetime, parse_datetime
 
 class LegendColor(Enum):
     green = 0
@@ -122,6 +122,7 @@ class Trend(object):
         self.present_in_trends = True
         self.cleared = False
         self.longitudinal = False
+        self.last_triggered_date_time = None
 
     def json_serialise(self):
         ret = {
@@ -141,7 +142,8 @@ class Trend(object):
             'priority': self.priority,
             'present_in_trends': self.present_in_trends,
             'cleared': self.cleared,
-            'longitudinal': self.longitudinal
+            'longitudinal': self.longitudinal,
+            'last_triggered_date_time': format_datetime(self.last_triggered_date_time) if self.last_triggered_date_time is not None else None
         }
         return ret
 
@@ -163,6 +165,8 @@ class Trend(object):
         trend.present_in_trends = input_dict.get('present_in_trends', True)
         trend.cleared = input_dict.get('cleared', False)
         trend.longitudinal = input_dict.get('longitudinal', False)
+        trend.last_triggered_date_time = parse_datetime(input_dict['last_triggered_date_time']) if \
+            input_dict.get('last_triggered_date_time', None) is not None else None
         if trend.visualization_type == VisualizationType.load:
             trend.data = []
         elif trend.visualization_type == VisualizationType.session:
