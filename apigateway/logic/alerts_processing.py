@@ -121,14 +121,15 @@ class AlertsProcessing(object):
         existing_triggers = []
         existing_trends = []
         insights = []
-        doms_yesterday = any([trend.trigger_type == TriggerType.sore_today_doms for trend in self.athlete_stats.longitudinal_trends])
-        doms_today = any([alert.goal.trigger_type == TriggerType.sore_today_doms for alert in alerts])
+        existing_doms = any([trend.trigger_type == TriggerType.sore_today_doms for
+                             trend in self.athlete_stats.longitudinal_trends])
+        doms_now = any([alert.goal.trigger_type == TriggerType.sore_today_doms for alert in alerts])
         doms_created_today = False
         for alert in alerts:
             # triggers to trends
             if alert.goal.trigger_type == TriggerType.sore_today_doms:
-                if doms_yesterday:
-                    if doms_today:
+                if existing_doms:
+                    if doms_now:
                         l_trend = [trend for trend in self.athlete_stats.longitudinal_trends if trend.trigger_type == TriggerType.sore_today_doms][0]
                         l_trend.last_triggered_date_time = self.trigger_date_time
                     else:

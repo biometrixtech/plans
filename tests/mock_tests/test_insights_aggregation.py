@@ -444,6 +444,9 @@ def test_trend_add_data_2():
 
 
 def test_aggregate_trends_multiple_trends_same_body_part():
+    """
+    multiple trends with same trigger_type but multiple body_parts should result in a multiple trends
+    """
     current_date_time = datetime.datetime.now()
     alert1 = get_alert(15, (11, 1))
     alert2 = get_alert(15, (11, 1))
@@ -460,6 +463,9 @@ def test_aggregate_trends_multiple_trends_same_body_part():
 
 
 def test_aggregate_trends_multiple_trends_same_trigger_type_multiple_sports():
+    """
+    multiple trends with same trigger_type but multiple sports should result in a single trend
+    """
     current_date_time = datetime.datetime.now()
     alert1 = get_alert(0, sport_name=SportName(17))
     alert2 = get_alert(0, sport_name=SportName(18))
@@ -476,6 +482,9 @@ def test_aggregate_trends_multiple_trends_same_trigger_type_multiple_sports():
 
 
 def test_aggregate_trends_multiple_doms():
+    """
+    If there are multiple body parts that had doms status, only one doms trend should be displayed to user
+    """
     current_date_time = datetime.datetime.now()
     alert1 = get_alert(11, body_part=(11, 1))
     alert2 = get_alert(11, body_part=(11, 2))
@@ -492,6 +501,12 @@ def test_aggregate_trends_multiple_doms():
 
 
 def test_aggregate_trends_doms_yesterday():
+    """
+    DOMS present yesterday.
+    Soreness reported today in RS
+    DOMS trend should not be shown to user
+    longitudinal should be updated to the latest date.
+    """
     current_date_time = datetime.datetime.now()
     trend = Trend(TriggerType(11))
     trend.last_triggered_date_time = current_date_time - datetime.timedelta(days=1)
@@ -508,6 +523,43 @@ def test_aggregate_trends_doms_yesterday():
     assert len(trends.response.alerts) == 2
     assert trends.response.alerts[0].trigger_type == TriggerType(203)
     assert trends.response.alerts[1].trigger_type == TriggerType(202)
+    assert len(athlete_stats.longitudinal_trends) == 1
+    assert athlete_stats.longitudinal_trends[0].last_triggered_date_time == event_date_time
+
+
+def test_aggregate_trends_doms_yesterday_second_survey():
+    """
+    DOMS present yesterday.
+    Soreness reported today in RS
+    PSS submitted later
+    After each, DOMS trend should not be shown to user
+    longitudinal should be updated to the latest date.
+    """
+    current_date_time = datetime.datetime.now()
+    trend = Trend(TriggerType(11))
+    trend.last_triggered_date_time = current_date_time - datetime.timedelta(days=1)
+
+    alert = get_alert(11, body_part=(11, 2))
+
+    alerts = [alert]
+    event_date_time = current_date_time
+    daily_plan = DailyPlan(format_date(event_date_time))
+    athlete_stats = AthleteStats('test_user')
+    athlete_stats.exposed_triggers = []
+    athlete_stats.longitudinal_trends = [trend]
+    insights, longitudinal_insights, trends = AlertsProcessing(daily_plan, athlete_stats).aggregate_alerts(event_date_time, alerts)
+    assert len(trends.response.alerts) == 2
+    assert trends.response.alerts[0].trigger_type == TriggerType(203)
+    assert trends.response.alerts[1].trigger_type == TriggerType(202)
+    assert len(athlete_stats.longitudinal_trends) == 1
+    assert athlete_stats.longitudinal_trends[0].last_triggered_date_time == event_date_time
+
+    insights, longitudinal_insights, trends = AlertsProcessing(daily_plan, athlete_stats).aggregate_alerts(event_date_time + datetime.timedelta(hours=2), alerts)
+    assert len(trends.response.alerts) == 2
+    assert trends.response.alerts[0].trigger_type == TriggerType(203)
+    assert trends.response.alerts[1].trigger_type == TriggerType(202)
+    assert len(athlete_stats.longitudinal_trends) == 1
+    assert athlete_stats.longitudinal_trends[0].last_triggered_date_time == event_date_time + datetime.timedelta(hours=2)
 
 
 def test_aggregate_trends_cleared_trend_doms():
