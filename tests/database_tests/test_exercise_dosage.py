@@ -381,4 +381,4 @@ def test_ensure_minimum_dosage_assigned():
                             if comprehensive_total_minutes == 0:
                                 stop_here = True
 
-        made_it_through = True
+    made_it_through = True

@@ -494,6 +494,7 @@ class AssignedExercise(Serialisable):
         # self.priorities = set()
         # self.soreness_sources = set()
         self.dosages = []
+        self.phase = ''
 
     def set_dosage_ranking(self):
         if len(self.dosages) > 1:
