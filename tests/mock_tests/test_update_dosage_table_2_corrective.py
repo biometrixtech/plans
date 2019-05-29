@@ -494,8 +494,8 @@ def test_daily_sore_3_4_severity_priority_3_table_2():
     assert dosage.efficient_sets_assigned == 0
     assert dosage.complete_reps_assigned == 0
     assert dosage.complete_sets_assigned == 0
-    assert dosage.default_efficient_reps_assigned == 0
-    assert dosage.default_efficient_sets_assigned == 0
+    assert dosage.default_efficient_reps_assigned == exercise.min_reps
+    assert dosage.default_efficient_sets_assigned == 1
     assert dosage.default_complete_reps_assigned == exercise.max_reps
     assert dosage.default_complete_sets_assigned == 1
     assert dosage.comprehensive_reps_assigned == exercise.max_reps
