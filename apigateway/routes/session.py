@@ -40,6 +40,7 @@ def handle_session_create(principal_id=None):
     survey_processor = SurveyProcessing(user_id, event_date,
                                         athlete_stats=athlete_stats,
                                         datastore_collection=datastore_collection)
+    survey_processor.user_age = request.json.get('user_age', 20)
     for session in request.json['sessions']:
         if session is None:
             continue

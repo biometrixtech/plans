@@ -18,6 +18,7 @@ from utils import parse_datetime, format_datetime, fix_early_survey_event_date, 
 class SurveyProcessing(object):
     def __init__(self, user_id, event_date, athlete_stats=None, datastore_collection=DatastoreCollection()):
         self.user_id = user_id
+        self.user_age = None
         self.event_date = format_date(event_date)
         self.event_date_time = event_date
         self.athlete_stats = athlete_stats
