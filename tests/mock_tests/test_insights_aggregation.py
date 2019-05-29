@@ -285,6 +285,22 @@ def test_aggregate_insights_cleared_same_parent_group():
 
 
 def test_aggregate_insights_cleared_parent_group_4():
+    """
+    day0: trigger_type 16 body_part 11, 1
+        single child insight with single body part
+            start_date_time is day0
+    day1: add trigger_type 19 body_part 7, 1
+        single parent insight with two child triggers
+            start_date_time is day0
+    day3: add trigger_type 16 body_part 11,1
+        single parent insight with two child triggers (one with two body parts another with single body part)
+            start_date_time is day0
+    day5: remove trigger_type 19, body_part 7, 1
+        two insights
+            child insight for trigger_type 16 with multiple body part (ongoing)
+                start_date_time updated to day5
+            child insight for trigger_type 19 with single body part (cleared)
+    """
     current_date_time = datetime.datetime.now()
     alert1 = get_alert(16, (11, 1))
     alert2 = get_alert(16, (11, 2))
@@ -349,6 +365,11 @@ def test_aggregate_insights_cleared_parent_group_4():
 
 
 def test_aggregate_insights_cleared_one_body_part():
+    """
+    longitudinal insight with multiple body parts created 5 days ago
+    one of the body parts cleared today
+    Should result in two insights (cleared and ongoing) for the two body parts
+    """
     current_date_time = datetime.datetime.now()
     alert1 = get_alert(16, (11, 1))
     alert2 = get_alert(16, (11, 2))
