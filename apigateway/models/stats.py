@@ -202,6 +202,7 @@ class AthleteStats(Serialisable):
                     if doms.historic_soreness_status == HistoricSorenessStatus.doms:
                         doms.historic_severity.append(current_soreness)
                         doms.last_reported_date_time = current_soreness.reported_date_time
+                        doms.average_severity = current_severity
                         if current_severity > doms.max_severity:
                             doms.max_severity = current_severity
                             doms.max_severity_date_time = current_soreness.reported_date_time
@@ -210,6 +211,7 @@ class AthleteStats(Serialisable):
                         doms.first_reported_date_time = soreness.reported_date_time
                         doms.last_reported_date_time = soreness.reported_date_time
                         doms.max_severity = current_severity
+                        doms.average_severity = current_severity
                         doms.max_severity_date_time = soreness.reported_date_time
                         doms.historic_severity.append(current_soreness)
             if not body_part_exists:
@@ -217,6 +219,7 @@ class AthleteStats(Serialisable):
                 doms.historic_soreness_status = HistoricSorenessStatus.doms
                 doms.first_reported_date_time = soreness.reported_date_time
                 doms.last_reported_date_time = soreness.reported_date_time
+                doms.average_severity = current_severity
                 doms.max_severity = current_severity
                 doms.max_severity_date_time = soreness.reported_date_time
                 doms.historic_severity.append(current_soreness)
