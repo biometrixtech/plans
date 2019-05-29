@@ -130,10 +130,10 @@ class SurveyProcessing(object):
 
     def process_clear_status_answers(self, clear_candidates, event_date, soreness):
 
-        #plan_event_date = format_date(event_date)
+        # plan_event_date = format_date(event_date)
         if self.stats_processor is None:
             self.stats_processor = StatsProcessing(self.athlete_stats.athlete_id,
-                                                   #plan_event_date,
+                                                   # plan_event_date,
                                                    event_date,
                                                    self.datastore_collection)
             self.stats_processor.set_start_end_times()
@@ -232,12 +232,12 @@ class SurveyProcessing(object):
         session_list = list(s for s in sessions if not s.deleted and not s.ignored)
         self.athlete_stats.load_stats.set_min_max_values(session_list)
 
-        for session in session_list :
+        for session in session_list:
             if training_volume_processing.is_last_session_high_relative_load(self.event_date_time, session,
                                                                              self.athlete_stats.high_relative_load_benchmarks,
                                                                              self.athlete_stats.load_stats):
                 high_relative_load_session_present = True
-                #session_load = session.duration_minutes * session.session_RPE
+                # session_load = session.duration_minutes * session.session_RPE
                 session_load = session.training_volume(self.athlete_stats.load_stats)
                 if session_load > load:
                     sport_name = session.sport_name
@@ -302,7 +302,7 @@ def create_plan(user_id, event_date, update_stats=True, athlete_stats=None, stat
         # update stats
         if stats_processor is None:
             stats_processor = StatsProcessing(user_id,
-                                              #event_date=format_date(event_date),
+                                              # event_date=format_date(event_date),
                                               event_date=event_date,
                                               datastore_collection=datastore_collection)
         athlete_stats = stats_processor.process_athlete_stats(current_athlete_stats=athlete_stats)

@@ -23,11 +23,11 @@ USERS_API_VERSION = os.environ['USERS_API_VERSION']
 @xray_recorder.capture('routes.athlete.daily_plan.create')
 def create_daily_plan(athlete_id):
     event_date = request.json.get('event_date', None)
-    target_minutes = request.json.get('target_minutes', 15)
+    # target_minutes = request.json.get('target_minutes', 15)
     last_updated = request.json.get('last_updated', None)
     plan_manager = TrainingPlanManager(athlete_id, DatastoreCollection())
     daily_plan = plan_manager.create_daily_plan(event_date=event_date,
-                                                target_minutes=target_minutes,
+                                                # target_minutes=target_minutes,
                                                 last_updated=last_updated)
     body = {"message": "Your plan is ready!",
             "call_to_action": "VIEW_PLAN",

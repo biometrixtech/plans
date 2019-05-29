@@ -59,7 +59,7 @@ class TrainingPlanManager(object):
             return modalities
 
     @xray_recorder.capture('logic.TrainingPlanManager.create_daily_plan')
-    def create_daily_plan(self, event_date, last_updated, target_minutes=15, athlete_stats=None, force_data=False, mobilize_only=False):
+    def create_daily_plan(self, event_date, last_updated, athlete_stats=None, force_data=False, mobilize_only=False):
         self.athlete_stats = athlete_stats
         self.trigger_date_time = parse_datetime(last_updated)
         self.load_data(event_date)
@@ -157,42 +157,3 @@ class TrainingPlanManager(object):
         self.athlete_stats_datastore.put(self.athlete_stats)
 
         return self.daily_plan
-
-    '''deprecated
-    def populate_functional_strength(self, wants_functional_strength):
-
-        if self.athlete_stats is not None:
-            self.daily_plan.functional_strength_eligible = self.athlete_stats.functional_strength_eligible
-
-            if self.daily_plan.functional_strength_eligible and wants_functional_strength:
-                if not self.daily_plan.functional_strength_completed:
-                    fs_mapping = FSProgramGenerator(self.exercise_library_datastore)
-                    self.daily_plan.functional_strength_session = fs_mapping.getFunctionalStrengthForSportPosition(
-                        self.athlete_stats.current_sport_name,
-                        self.athlete_stats.current_position)
-    '''
-
-    # def add_recovery_times(self, show_post_recovery):
-    #
-    #     if not show_post_recovery:
-    #         if self.daily_plan.pre_recovery is None:
-    #             self.daily_plan.pre_recovery = session.RecoverySession()
-    #             self.daily_plan.pre_recovery.display_exercises = True
-    #         self.daily_plan.post_recovery.display_exercises = False
-    #     else:
-    #         self.daily_plan.pre_recovery.display_exercises = False
-    #         if self.daily_plan.post_recovery is not None and self.daily_plan.post_recovery.completed:
-    #             self.daily_plan.completed_post_recovery_sessions.append(self.daily_plan.post_recovery)
-    #         self.daily_plan.post_recovery = session.RecoverySession()
-    #         self.daily_plan.post_recovery.display_exercises = True
-
-    '''deprecated
-    def is_functional_strength_eligible(self):
-        if (self.athlete_stats.functional_strength_eligible and
-            not self.athlete_stats.severe_pain_soreness_today() and  # these are updated from surveys but update doesn't make it to stats until after plan is created
-            (self.athlete_stats.next_functional_strength_eligible_date is None or
-             parse_datetime(self.athlete_stats.next_functional_strength_eligible_date) < self.trigger_date_time)):  # need to check if 24 hours have passed since last completed
-            self.athlete_stats.functional_strength_eligible = True
-        else:
-            self.athlete_stats.functional_strength_eligible = False
-    '''
