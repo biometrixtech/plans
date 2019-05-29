@@ -1,3 +1,7 @@
+from aws_xray_sdk.core import xray_recorder
+xray_recorder.configure(sampling=False)
+xray_recorder.begin_segment(name="test")
+
 from models.soreness import BodyPart, BodyPartLocation, Soreness, HistoricSorenessStatus
 from models.historic_soreness import HistoricSoreness
 from logic.stats_processing import StatsProcessing
@@ -58,11 +62,22 @@ def extend_with_nones(existing_list, number_of_nones):
     return existing_list
 
 
-def get_historic_soreness(severity_list, date, historic_soreness=None, is_pain=True):
+def get_dates_from_severity_list(severity_list, start_date):
 
-    soreness_list = get_soreness_list(BodyPartLocation.achilles, 1, severity_list, is_pain, date=parse_date(date))
+    dates = []
 
-    stats_processing = StatsProcessing("tester", parse_date(date), DatastoreCollection())
+    for i in range(0, len(severity_list)):
+        if severity_list[i] is not None:
+            dates.append(start_date + timedelta(i))
+
+    return dates
+
+
+def get_historic_soreness(severity_list, start_date, historic_soreness=None, is_pain=True):
+
+    soreness_list = get_soreness_list(BodyPartLocation.achilles, 1, severity_list, is_pain, date=parse_date(start_date))
+
+    stats_processing = StatsProcessing("tester", parse_date(start_date), DatastoreCollection())
 
     historic_soreness = stats_processing.get_historic_soreness_list(soreness_list,historic_soreness)
 
