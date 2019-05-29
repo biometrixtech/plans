@@ -366,9 +366,10 @@ def test_aggregate_insights_cleared_parent_group_4():
 
 def test_aggregate_insights_cleared_one_body_part():
     """
-    longitudinal insight with multiple body parts created 5 days ago
-    one of the body parts cleared today
-    Should result in two insights (cleared and ongoing) for the two body parts
+    longitudinal insight for doms created yesterday
+    no doms today
+    doms should not be in current insights
+    doms should be in longitudinal insights
     """
     current_date_time = datetime.datetime.now()
     alert1 = get_alert(16, (11, 1))
@@ -398,6 +399,35 @@ def test_aggregate_insights_cleared_one_body_part():
 
     assert not daily_plan.insights[0].cleared
     assert daily_plan.insights[1].cleared
+
+
+def test_aggregate_insights_doms_yesterday_no_doms_today():
+    """
+    longitudinal insight for doms created yesterday
+    no doms today
+    doms should not be in current insights
+    doms should not be in longitudinal insights
+    """
+    current_date_time = datetime.datetime.now()
+    alert1 = get_alert(11, (11, 1))
+
+    alerts = [alert1]
+    event_date_time = current_date_time
+    daily_plan = DailyPlan(format_date(event_date_time))
+    athlete_stats = AthleteStats('test_user')
+    existing_insights, longitudinal_insights, trends = AlertsProcessing(daily_plan, athlete_stats).aggregate_alerts(event_date_time - datetime.timedelta(days=1), alerts)
+    assert len(existing_insights) == 1
+    assert existing_insights[0].first
+    assert not existing_insights[0].parent
+    assert existing_insights[0].longitudinal
+    assert existing_insights[0].start_date_time == current_date_time - datetime.timedelta(days=1)
+    assert len(existing_insights[0].body_parts) == 1
+
+    athlete_stats.exposed_triggers = [TriggerType(11)]
+    daily_plan.insights = []
+    insights, longitudinal_insights, trends = AlertsProcessing(daily_plan, athlete_stats).aggregate_alerts(event_date_time, [])
+    assert len(insights) == 0
+    assert len(longitudinal_insights) == 0
 
 
 def test_insights_ordering():
@@ -525,8 +555,7 @@ def test_aggregate_trends_doms_yesterday():
     """
     DOMS present yesterday.
     Soreness reported today in RS
-    DOMS trend should not be shown to user
-    longitudinal should be updated to the latest date.
+    DOMS trend should be shown to user
     """
     current_date_time = datetime.datetime.now()
     trend = Trend(TriggerType(11))
@@ -542,10 +571,9 @@ def test_aggregate_trends_doms_yesterday():
     athlete_stats.longitudinal_trends = [trend]
     insights, longitudinal_insights, trends = AlertsProcessing(daily_plan, athlete_stats).aggregate_alerts(event_date_time, alerts)
     assert len(trends.response.alerts) == 2
-    assert trends.response.alerts[0].trigger_type == TriggerType(203)
-    assert trends.response.alerts[1].trigger_type == TriggerType(202)
+    assert trends.response.alerts[0].trigger_type == TriggerType(11)
+    assert trends.response.alerts[1].trigger_type == TriggerType(203)
     assert len(athlete_stats.longitudinal_trends) == 1
-    assert athlete_stats.longitudinal_trends[0].last_triggered_date_time == event_date_time
 
 
 def test_aggregate_trends_doms_yesterday_second_survey():
@@ -553,8 +581,7 @@ def test_aggregate_trends_doms_yesterday_second_survey():
     DOMS present yesterday.
     Soreness reported today in RS
     PSS submitted later
-    After each, DOMS trend should not be shown to user
-    longitudinal should be updated to the latest date.
+    After each, DOMS trend should be shown to user
     """
     current_date_time = datetime.datetime.now()
     trend = Trend(TriggerType(11))
@@ -570,20 +597,21 @@ def test_aggregate_trends_doms_yesterday_second_survey():
     athlete_stats.longitudinal_trends = [trend]
     insights, longitudinal_insights, trends = AlertsProcessing(daily_plan, athlete_stats).aggregate_alerts(event_date_time, alerts)
     assert len(trends.response.alerts) == 2
-    assert trends.response.alerts[0].trigger_type == TriggerType(203)
-    assert trends.response.alerts[1].trigger_type == TriggerType(202)
+    assert trends.response.alerts[0].trigger_type == TriggerType(11)
+    assert trends.response.alerts[1].trigger_type == TriggerType(203)
     assert len(athlete_stats.longitudinal_trends) == 1
-    assert athlete_stats.longitudinal_trends[0].last_triggered_date_time == event_date_time
 
     insights, longitudinal_insights, trends = AlertsProcessing(daily_plan, athlete_stats).aggregate_alerts(event_date_time + datetime.timedelta(hours=2), alerts)
     assert len(trends.response.alerts) == 2
-    assert trends.response.alerts[0].trigger_type == TriggerType(203)
-    assert trends.response.alerts[1].trigger_type == TriggerType(202)
+    assert trends.response.alerts[0].trigger_type == TriggerType(11)
+    assert trends.response.alerts[1].trigger_type == TriggerType(203)
     assert len(athlete_stats.longitudinal_trends) == 1
-    assert athlete_stats.longitudinal_trends[0].last_triggered_date_time == event_date_time + datetime.timedelta(hours=2)
 
 
 def test_aggregate_trends_cleared_trend_doms():
+    """
+    cleared doms should not be shown to user
+    """
     current_date_time = datetime.datetime.now()
     trend = Trend(TriggerType(11))
     trend.last_triggered_date_time = current_date_time - datetime.timedelta(days=1)
@@ -603,6 +631,9 @@ def test_aggregate_trends_cleared_trend_doms():
 
 
 def test_aggregate_trends_cleared_trend_not_doms():
+    """
+    if multiple day trends (other than doms) are cleared, there should be a cleared message
+    """
     current_date_time = datetime.datetime.now()
     trend = Trend(TriggerType(8))
     trend.add_data()
@@ -622,6 +653,10 @@ def test_aggregate_trends_cleared_trend_not_doms():
 
 
 def test_aggregate_trends_cleared_trend_different_body_part_today():
+    """
+    if a body part is cleared but another one reported for same trigger type
+    both cleared and not-cleared should be present for respective body parts
+    """
     current_date_time = datetime.datetime.now()
     trend = Trend(TriggerType(7))
     trend.body_parts = [BodyPartSide(BodyPartLocation(11), 2)]
@@ -643,7 +678,33 @@ def test_aggregate_trends_cleared_trend_different_body_part_today():
     assert trends.response.alerts[2].trigger_type == TriggerType(203)
 
 
+def test_aggregate_trends_no_alerts_existing_multi_day_trend():
+    """
+    if no alerts and and existing multi-day trend
+    There should be a clear message and no-trends message for other data types
+    """
+    current_date_time = datetime.datetime.now()
+    trend = Trend(TriggerType(7))
+    trend.body_parts = [BodyPartSide(BodyPartLocation(11), 2)]
+    trend.add_data()
+    alerts = []
+    event_date_time = current_date_time
+    daily_plan = DailyPlan(format_date(event_date_time))
+    athlete_stats = AthleteStats('test_user')
+    athlete_stats.exposed_triggers = []
+    athlete_stats.longitudinal_trends = [trend]
+    insights, longitudinal_insights, trends = AlertsProcessing(daily_plan, athlete_stats).aggregate_alerts(event_date_time, alerts)
+    assert len(trends.stress.alerts) == 1
+    assert len(trends.response.alerts) == 2
+    assert trends.response.alerts[0].trigger_type == TriggerType(7)
+    assert trends.response.alerts[1].trigger_type == TriggerType(203)
+    assert len(trends.biomechanics.alerts) == 2
+
+
 def test_aggregate_trends_no_alerts():
+    """
+    if no alerts and no existing multi-day trends, the respective no-trends messages should be shown
+    """
     current_date_time = datetime.datetime.now()
 
     alerts = []
