@@ -423,8 +423,12 @@ class ExerciseDosage(object):
         self.complete_sets_assigned = 0
         self.comprehensive_reps_assigned = 0
         self.comprehensive_sets_assigned = 0
-        self.default_reps_assigned = 0
-        self.default_sets_assigned = 0
+        self.default_efficient_reps_assigned = 0
+        self.default_efficient_sets_assigned = 0
+        self.default_complete_reps_assigned = 0
+        self.default_complete_sets_assigned = 0
+        self.default_comprehensive_reps_assigned = 0
+        self.default_comprehensive_sets_assigned = 0
         self.ranking = 0
 
     def severity(self):
@@ -448,8 +452,12 @@ class ExerciseDosage(object):
                'complete_sets_assigned': self.complete_sets_assigned,
                'comprehensive_reps_assigned': self.comprehensive_reps_assigned,
                'comprehensive_sets_assigned': self.comprehensive_sets_assigned,
-               'default_reps_assigned': self.default_reps_assigned,
-               'default_sets_assigned': self.default_sets_assigned,
+               'default_efficient_reps_assigned': self.default_efficient_reps_assigned,
+               'default_efficient_sets_assigned': self.default_efficient_sets_assigned,
+               'default_complete_reps_assigned': self.default_complete_reps_assigned,
+               'default_complete_sets_assigned': self.default_complete_sets_assigned,
+               'default_comprehensive_reps_assigned': self.default_comprehensive_reps_assigned,
+               'default_comprehensive_sets_assigned': self.default_comprehensive_sets_assigned,
                'ranking': self.ranking
                }
         return ret
@@ -468,8 +476,12 @@ class ExerciseDosage(object):
         dosage.complete_sets_assigned = input_dict.get('complete_sets_assigned', 0)
         dosage.comprehensive_reps_assigned = input_dict.get('comprehensive_reps_assigned', 0)
         dosage.comprehensive_sets_assigned = input_dict.get('comprehensive_sets_assigned', 0)
-        dosage.default_reps_assigned = input_dict.get('default_reps_assigned', 0)
-        dosage.default_sets_assigned = input_dict.get('default_sets_assigned', 0)
+        dosage.default_efficient_reps_assigned = input_dict.get('default_efficient_reps_assigned', 0)
+        dosage.default_efficient_sets_assigned = input_dict.get('default_efficient_sets_assigned', 0)
+        dosage.complete_reps_assigned = input_dict.get('complete_reps_assigned', 0)
+        dosage.complete_reps_assigned = input_dict.get('complete_reps_assigned', 0)
+        dosage.comprehensive_reps_assigned = input_dict.get('comprehensive_reps_assigned', 0)
+        dosage.comprehensive_sets_assigned = input_dict.get('comprehensive_sets_assigned', 0)
         dosage.ranking = input_dict.get('ranking', 0)
 
         return dosage

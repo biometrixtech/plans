@@ -240,7 +240,7 @@ class ModalityBase(object):
         total_efficient = 0
         total_complete = 0
         total_comprehensive = 0
-        benchmarks = [5, 4, 3, 2, 1]
+        benchmarks = [1, 2, 3, 4, 5]
 
         for b in range(0, len(benchmarks) - 1):
             total_efficient += self.dosage_durations[benchmarks[b]].efficient_duration
@@ -349,6 +349,13 @@ class ModalityBase(object):
                 dosage.comprehensive_reps_assigned = 0
                 dosage.comprehensive_sets_assigned = 0
 
+            dosage.default_efficient_reps_assigned = exercise.min_reps
+            dosage.default_efficient_sets_assigned = 1
+            dosage.default_complete_reps_assigned = exercise.max_reps
+            dosage.default_complete_sets_assigned = 1
+            dosage.default_comprehensive_reps_assigned = exercise.max_reps
+            dosage.default_comprehensive_sets_assigned = 2
+
         elif dosage.goal.goal_type == AthleteGoalType.on_request:
             if dosage.priority == "1":
                 dosage.efficient_reps_assigned = exercise.min_reps
@@ -356,22 +363,103 @@ class ModalityBase(object):
             else:
                 dosage.efficient_reps_assigned = 0
                 dosage.efficient_sets_assigned = 0
+            dosage.default_efficient_reps_assigned = exercise.min_reps
+            dosage.default_efficient_sets_assigned = 1
+
             if dosage.priority == "1" or dosage.priority == "2":
                 dosage.complete_reps_assigned = exercise.min_reps
                 dosage.complete_sets_assigned = 1
             else:
                 dosage.complete_reps_assigned = 0
                 dosage.complete_sets_assigned = 0
+            dosage.default_complete_reps_assigned = exercise.min_reps
+            dosage.default_complete_sets_assigned = 1
 
             dosage.comprehensive_reps_assigned = exercise.min_reps
             dosage.comprehensive_sets_assigned = 1
+            dosage.default_comprehensive_reps_assigned = exercise.min_reps
+            dosage.default_comprehensive_sets_assigned = 1
+
+        elif dosage.goal.goal_type == AthleteGoalType.corrective:
+            if dosage.soreness_source.severity < 0.5:
+                if dosage.priority == "1":
+                    dosage.default_efficient_reps_assigned = exercise.min_reps
+                    dosage.default_efficient_sets_assigned = 1
+
+                if dosage.priority == "1" or dosage.priority == "2":
+                    dosage.default_complete_reps_assigned = exercise.min_reps
+                    dosage.default_complete_sets_assigned = 1
+
+                dosage.comprehensive_reps_assigned = exercise.min_reps
+                dosage.comprehensive_sets_assigned = 1
+                dosage.default_comprehensive_reps_assigned = exercise.min_reps
+                dosage.default_comprehensive_sets_assigned = 1
+
+            elif 0.5 <= dosage.soreness_source.severity < 1.5:
+                if dosage.priority == "1":
+                    dosage.default_efficient_reps_assigned = exercise.min_reps
+                    dosage.default_efficient_sets_assigned = 1
+
+                if dosage.priority == "1" or dosage.priority == "2":
+                    dosage.default_complete_reps_assigned = exercise.min_reps
+                    dosage.default_complete_sets_assigned = 1
+
+                dosage.comprehensive_reps_assigned = exercise.min_reps
+                dosage.comprehensive_sets_assigned = 1
+                dosage.default_comprehensive_reps_assigned = exercise.min_reps
+                dosage.default_comprehensive_sets_assigned = 1
+
+            elif 1.5 <= dosage.soreness_source.severity < 2.5:
+                if dosage.priority == "1":
+                    dosage.default_efficient_reps_assigned = exercise.min_reps
+                    dosage.default_efficient_sets_assigned = 1
+
+                if dosage.priority == "1" or dosage.priority == "2":
+                    dosage.default_complete_reps_assigned = exercise.max_reps
+                    dosage.default_complete_sets_assigned = 1
+
+                dosage.comprehensive_reps_assigned = exercise.max_reps
+                dosage.comprehensive_sets_assigned = 1
+                dosage.default_comprehensive_reps_assigned = exercise.max_reps
+                dosage.default_comprehensive_sets_assigned = 1
+            elif 2.5 <= dosage.soreness_source.severity < 3.5:
+                if dosage.priority == "1" or dosage.priority == "2":
+                    dosage.default_efficient_reps_assigned = exercise.min_reps
+                    dosage.default_efficient_sets_assigned = 1
+
+                dosage.default_complete_reps_assigned = exercise.max_reps
+                dosage.default_complete_sets_assigned = 1
+                dosage.comprehensive_reps_assigned = exercise.max_reps
+                dosage.comprehensive_sets_assigned = 2
+                dosage.default_comprehensive_reps_assigned = exercise.max_reps
+                dosage.default_comprehensive_sets_assigned = 2
+            elif 3.5 <= dosage.soreness_source.severity < 4.5:
+                dosage.default_efficient_reps_assigned = exercise.min_reps
+                dosage.default_efficient_sets_assigned = 1
+                dosage.default_complete_reps_assigned = exercise.max_reps
+                dosage.default_complete_sets_assigned = 1
+                dosage.comprehensive_reps_assigned = exercise.max_reps
+                dosage.comprehensive_sets_assigned = 2
+                dosage.default_comprehensive_reps_assigned = exercise.max_reps
+                dosage.default_comprehensive_sets_assigned = 2
+            elif dosage.soreness_source.severity >= 4.5:
+                dosage.default_efficient_reps_assigned = exercise.max_reps
+                dosage.default_efficient_sets_assigned = 1
+
+                dosage.default_complete_reps_assigned = exercise.max_reps
+                dosage.default_complete_sets_assigned = 2
+                dosage.comprehensive_reps_assigned = exercise.max_reps
+                dosage.comprehensive_sets_assigned = 3
+                dosage.default_comprehensive_reps_assigned = exercise.max_reps
+                dosage.default_comprehensive_sets_assigned = 3
 
         elif (dosage.goal.goal_type == AthleteGoalType.sore and
                 (dosage.soreness_source.historic_soreness_status is None or
                  dosage.soreness_source.is_dormant_cleared() or
                 dosage.soreness_source.historic_soreness_status is HistoricSorenessStatus.doms) or
                 dosage.goal.goal_type == AthleteGoalType.preempt_personalized_sport or
-                dosage.goal.goal_type == AthleteGoalType.preempt_corrective):
+              dosage.goal.goal_type == AthleteGoalType.preempt_corrective
+        ):
             if dosage.soreness_source.severity < 0.5:
                 if dosage.priority == "1":
                     dosage.efficient_reps_assigned = exercise.min_reps
@@ -379,15 +467,20 @@ class ModalityBase(object):
                 else:
                     dosage.efficient_reps_assigned = 0
                     dosage.efficient_sets_assigned = 0
+                dosage.default_efficient_reps_assigned = exercise.min_reps
+                dosage.default_efficient_sets_assigned = 1
                 if dosage.priority == "1" or dosage.priority == "2":
                     dosage.complete_reps_assigned = exercise.min_reps
                     dosage.complete_sets_assigned = 1
                 else:
                     dosage.complete_reps_assigned = 0
                     dosage.complete_sets_assigned = 0
-
+                dosage.default_complete_reps_assigned = exercise.min_reps
+                dosage.default_complete_sets_assigned = 1
                 dosage.comprehensive_reps_assigned = exercise.min_reps
                 dosage.comprehensive_sets_assigned = 1
+                dosage.default_comprehensive_reps_assigned = exercise.min_reps
+                dosage.default_comprehensive_sets_assigned = 1
             elif 0.5 <= dosage.soreness_source.severity < 1.5:
                 if dosage.priority == "1":
                     dosage.efficient_reps_assigned = exercise.min_reps
@@ -395,15 +488,20 @@ class ModalityBase(object):
                 else:
                     dosage.efficient_reps_assigned = 0
                     dosage.efficient_sets_assigned = 0
-
+                dosage.default_efficient_reps_assigned = exercise.min_reps
+                dosage.default_efficient_sets_assigned = 1
                 if dosage.priority == "1" or dosage.priority == "2":
                     dosage.complete_reps_assigned = exercise.min_reps
                     dosage.complete_sets_assigned = 1
                 else:
                     dosage.complete_reps_assigned = 0
                     dosage.complete_sets_assigned = 0
+                dosage.default_complete_reps_assigned = exercise.min_reps
+                dosage.default_complete_sets_assigned = 1
                 dosage.comprehensive_reps_assigned = exercise.min_reps
                 dosage.comprehensive_sets_assigned = 1
+                dosage.default_comprehensive_reps_assigned = exercise.min_reps
+                dosage.default_comprehensive_sets_assigned = 1
             elif 1.5 <= dosage.soreness_source.severity < 2.5:
                 if dosage.priority == "1":
                     dosage.efficient_reps_assigned = exercise.min_reps
@@ -411,14 +509,20 @@ class ModalityBase(object):
                 else:
                     dosage.efficient_reps_assigned = 0
                     dosage.efficient_sets_assigned = 0
+                dosage.default_efficient_reps_assigned = exercise.min_reps
+                dosage.default_efficient_sets_assigned = 1
                 if dosage.priority == "1" or dosage.priority == "2":
                     dosage.complete_reps_assigned = exercise.max_reps
                     dosage.complete_sets_assigned = 1
                 else:
                     dosage.complete_reps_assigned = 0
                     dosage.complete_sets_assigned = 0
+                dosage.default_complete_reps_assigned = exercise.max_reps
+                dosage.default_complete_sets_assigned = 1
                 dosage.comprehensive_reps_assigned = exercise.max_reps
                 dosage.comprehensive_sets_assigned = 1
+                dosage.default_comprehensive_reps_assigned = exercise.max_reps
+                dosage.default_comprehensive_sets_assigned = 1
             elif 2.5 <= dosage.soreness_source.severity < 3.5:
                 if dosage.priority == "1" or dosage.priority == "2":
                     dosage.efficient_reps_assigned = exercise.min_reps
@@ -426,11 +530,16 @@ class ModalityBase(object):
                 else:
                     dosage.efficient_reps_assigned = 0
                     dosage.efficient_sets_assigned = 0
-
+                dosage.default_efficient_reps_assigned = exercise.min_reps
+                dosage.default_efficient_sets_assigned = 1
                 dosage.complete_reps_assigned = exercise.max_reps
                 dosage.complete_sets_assigned = 1
+                dosage.default_complete_reps_assigned = exercise.max_reps
+                dosage.default_complete_sets_assigned = 1
                 dosage.comprehensive_reps_assigned = exercise.max_reps
                 dosage.comprehensive_sets_assigned = 2
+                dosage.default_comprehensive_reps_assigned = exercise.max_reps
+                dosage.default_comprehensive_sets_assigned = 2
             elif 3.5 <= dosage.soreness_source.severity < 4.5:
                 dosage.efficient_reps_assigned = exercise.min_reps
                 dosage.efficient_sets_assigned = 1
@@ -438,6 +547,12 @@ class ModalityBase(object):
                 dosage.complete_sets_assigned = 1
                 dosage.comprehensive_reps_assigned = exercise.max_reps
                 dosage.comprehensive_sets_assigned = 2
+                dosage.default_efficient_reps_assigned = exercise.min_reps
+                dosage.default_efficient_sets_assigned = 1
+                dosage.default_complete_reps_assigned = exercise.max_reps
+                dosage.default_complete_sets_assigned = 1
+                dosage.default_comprehensive_reps_assigned = exercise.max_reps
+                dosage.default_comprehensive_sets_assigned = 2
             elif dosage.soreness_source.severity >= 4.5:
                 dosage.efficient_reps_assigned = exercise.max_reps
                 dosage.efficient_sets_assigned = 1
@@ -446,6 +561,13 @@ class ModalityBase(object):
                 dosage.complete_sets_assigned = 2
                 dosage.comprehensive_reps_assigned = exercise.max_reps
                 dosage.comprehensive_sets_assigned = 3
+                dosage.default_efficient_reps_assigned = exercise.max_reps
+                dosage.default_efficient_sets_assigned = 1
+
+                dosage.default_complete_reps_assigned = exercise.max_reps
+                dosage.default_complete_sets_assigned = 2
+                dosage.default_comprehensive_reps_assigned = exercise.max_reps
+                dosage.default_comprehensive_sets_assigned = 3
 
         else:
             if dosage.soreness_source.severity < 0.5:
@@ -455,15 +577,20 @@ class ModalityBase(object):
                 else:
                     dosage.efficient_reps_assigned = 0
                     dosage.efficient_sets_assigned = 0
+                dosage.default_efficient_reps_assigned = exercise.min_reps
+                dosage.default_efficient_sets_assigned = 1
                 if dosage.priority == "1" or dosage.priority == "2":
                     dosage.complete_reps_assigned = exercise.min_reps
                     dosage.complete_sets_assigned = 1
                 else:
                     dosage.complete_reps_assigned = 0
                     dosage.complete_sets_assigned = 0
-
+                dosage.default_complete_reps_assigned = exercise.min_reps
+                dosage.default_complete_sets_assigned = 1
                 dosage.comprehensive_reps_assigned = exercise.min_reps
                 dosage.comprehensive_sets_assigned = 1
+                dosage.default_comprehensive_reps_assigned = exercise.min_reps
+                dosage.default_comprehensive_sets_assigned = 1
             elif 0.5 <= dosage.soreness_source.severity < 1.5:
                 if dosage.priority == "1":
                     dosage.efficient_reps_assigned = exercise.min_reps
@@ -471,15 +598,20 @@ class ModalityBase(object):
                 else:
                     dosage.efficient_reps_assigned = 0
                     dosage.efficient_sets_assigned = 0
-
+                dosage.default_efficient_reps_assigned = exercise.min_reps
+                dosage.default_efficient_sets_assigned = 1
                 if dosage.priority == "1" or dosage.priority == "2":
                     dosage.complete_reps_assigned = exercise.max_reps
                     dosage.complete_sets_assigned = 1
                 else:
                     dosage.complete_reps_assigned = 0
                     dosage.complete_sets_assigned = 0
+                dosage.default_complete_reps_assigned = exercise.max_reps
+                dosage.default_complete_sets_assigned = 1
                 dosage.comprehensive_reps_assigned = exercise.max_reps
                 dosage.comprehensive_sets_assigned = 1
+                dosage.default_comprehensive_reps_assigned = exercise.max_reps
+                dosage.default_comprehensive_sets_assigned = 1
             elif 1.5 <= dosage.soreness_source.severity < 2.5:
                 if dosage.priority == "1":
                     dosage.efficient_reps_assigned = exercise.min_reps
@@ -487,13 +619,16 @@ class ModalityBase(object):
                 else:
                     dosage.efficient_reps_assigned = 0
                     dosage.efficient_sets_assigned = 0
-
+                dosage.default_efficient_reps_assigned = exercise.min_reps
+                dosage.default_efficient_sets_assigned = 1
                 dosage.complete_reps_assigned = exercise.max_reps
                 dosage.complete_sets_assigned = 1
-
+                dosage.default_complete_reps_assigned = exercise.max_reps
+                dosage.default_complete_sets_assigned = 1
                 dosage.comprehensive_reps_assigned = exercise.max_reps
                 dosage.comprehensive_sets_assigned = 1
-
+                dosage.default_comprehensive_reps_assigned = exercise.max_reps
+                dosage.default_comprehensive_sets_assigned = 1
             elif 2.5 <= dosage.soreness_source.severity < 3.5:
 
                 dosage.efficient_reps_assigned = exercise.min_reps
@@ -502,7 +637,12 @@ class ModalityBase(object):
                 dosage.complete_sets_assigned = 1
                 dosage.comprehensive_reps_assigned = exercise.max_reps
                 dosage.comprehensive_sets_assigned = 2
-
+                dosage.default_efficient_reps_assigned = exercise.min_reps
+                dosage.default_efficient_sets_assigned = 1
+                dosage.default_complete_reps_assigned = exercise.max_reps
+                dosage.default_complete_sets_assigned = 1
+                dosage.default_comprehensive_reps_assigned = exercise.max_reps
+                dosage.default_comprehensive_sets_assigned = 2
             elif 3.5 <= dosage.soreness_source.severity < 4.5:
                 dosage.efficient_reps_assigned = exercise.max_reps
                 dosage.efficient_sets_assigned = 1
@@ -511,6 +651,13 @@ class ModalityBase(object):
                 dosage.complete_sets_assigned = 2
                 dosage.comprehensive_reps_assigned = exercise.max_reps
                 dosage.comprehensive_sets_assigned = 3
+                dosage.default_efficient_reps_assigned = exercise.max_reps
+                dosage.default_efficient_sets_assigned = 1
+
+                dosage.default_complete_reps_assigned = exercise.max_reps
+                dosage.default_complete_sets_assigned = 2
+                dosage.default_comprehensive_reps_assigned = exercise.max_reps
+                dosage.default_comprehensive_sets_assigned = 3
             elif dosage.soreness_source.severity >= 4.5:
                 dosage.efficient_reps_assigned = exercise.max_reps
                 dosage.efficient_sets_assigned = 1
@@ -519,9 +666,13 @@ class ModalityBase(object):
                 dosage.complete_sets_assigned = 2
                 dosage.comprehensive_reps_assigned = exercise.max_reps
                 dosage.comprehensive_sets_assigned = 3
+                dosage.default_efficient_reps_assigned = exercise.max_reps
+                dosage.default_efficient_sets_assigned = 1
 
-        dosage.default_reps_assigned = exercise.min_reps
-        dosage.default_sets_assigned = exercise.min_sets
+                dosage.default_complete_reps_assigned = exercise.max_reps
+                dosage.default_complete_sets_assigned = 2
+                dosage.default_comprehensive_reps_assigned = exercise.max_reps
+                dosage.default_comprehensive_sets_assigned = 3
 
         return dosage
 
