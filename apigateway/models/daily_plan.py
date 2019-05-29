@@ -5,6 +5,7 @@ from models.session import Session
 from models.daily_readiness import DailyReadiness
 from models.modalities import ActiveRestBeforeTraining, ActiveRestAfterTraining, IceSession, HeatSession, ColdWaterImmersion, WarmUp, CoolDown
 from models.insights import AthleteInsight
+from models.trigger import TriggerType
 from models.athlete_trend import AthleteTrends
 
 
@@ -159,7 +160,7 @@ class DailyPlan(Serialisable):
         training_sessions = [x for x in self.training_sessions if x.event_date is not None and
                              x.event_date < trigger_date_time]
         # cross_training_sessions = [x for x in self.strength_conditioning_sessions if x.event_date is not None and
-                                   # x.event_date < trigger_date_time]
+        #                            x.event_date < trigger_date_time]
         # sessions.extend(cross_training_sessions)
         sessions.extend(training_sessions)
 
@@ -196,7 +197,7 @@ class DailyPlan(Serialisable):
                 alerts.extend(self.ice.alerts)
             if self.cold_water_immersion is not None:
                 alerts.extend(self.cold_water_immersion.alerts)
-        return alerts
+        return [alert for alert in alerts if alert.goal.trigger_type != TriggerType.sore_today]
 
     def sort_insights(self):
         self.insights = sorted(self.insights, key=lambda x: (int(x.read), x.priority, int(x.cleared)))
