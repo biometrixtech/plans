@@ -251,7 +251,9 @@ def calc_active_time_comprehensive(exercise_dictionary):
 
 
 def test_ensure_minimum_dosage_assigned():
-
+    f1 = open('../../output/high_efficient.csv', 'w')
+    line = ('body_part,is_pain,severity,hs_status,doms,doms_body_part,musc_strain,high_volume,pr1_time,pr2_time,pr3_time,pr4_time')
+    f1.write(line + '\n')
     current_date = date.today()
     current_date_time = datetime.combine(current_date, time(9, 0, 0))
     current_date_time = current_date_time - timedelta(days=16)
@@ -264,6 +266,7 @@ def test_ensure_minimum_dosage_assigned():
     max_efficient = 0
     max_complete = 0
     max_comprehensive = 0
+    max_efficient_high = []
 
     for test_parm in parm_list:
 
@@ -309,7 +312,11 @@ def test_ensure_minimum_dosage_assigned():
                             historic_soreness = HistoricSoreness(BodyPartLocation(14), 1, is_historic_soreness_pain(h1))
                             historic_soreness.first_reported_date_time = current_date_time - timedelta(days=16)
                             historic_soreness.historic_soreness_status = h1
-                            historic_soreness_list.append(historic_soreness)
+                            historic_soreness.average_severity = 1
+                            if h1 is not None:
+                                historic_soreness_list.append(historic_soreness)
+
+                            historic_soreness_2 = None
 
                             if test_parm.doms and not p:
                                 temp_list = list(b for b in body_parts_1 if b != b1)
@@ -378,7 +385,29 @@ def test_ensure_minimum_dosage_assigned():
                             max_complete = max(max_complete, complete_total_minutes)
                             max_comprehensive = max(max_comprehensive, comprehensive_total_minutes)
 
-                            if comprehensive_total_minutes == 0:
+                            if efficient_total_minutes > 12:
+                                if historic_soreness_2 is None:
+                                    line = (
+                                    str(BodyPartLocation(b1)) + ',' + str(p) + ',' + str(m1) + ',' + str(h1) + ',' + str(test_parm.doms)+ ','
+                                    + 'N/A,' + str(test_parm.athlete_stats.muscular_strain_increasing) + ','
+                                    + str(test_parm.high_volume) + ',' + str(plan_obj.dosage_durations[1].efficient_duration) + ','
+                                    + str(plan_obj.dosage_durations[2].efficient_duration) + ','
+                                    + str(plan_obj.dosage_durations[3].efficient_duration) + ','
+                                    + str(plan_obj.dosage_durations[4].efficient_duration))
+                                    f1.write(line + '\n')
+                                else:
+                                    line = (
+                                            str(BodyPartLocation(b1)) + ',' + str(p) + ',' + str(m1) + ',' + str(
+                                        h1) + ',' + str(test_parm.doms) + ','
+                                            + str(historic_soreness_2.body_part_location) + ',' + str(
+                                        test_parm.athlete_stats.muscular_strain_increasing) + ','
+                                            + str(test_parm.high_volume) + ',' + str(
+                                        plan_obj.dosage_durations[1].efficient_duration) + ','
+                                            + str(plan_obj.dosage_durations[2].efficient_duration) + ','
+                                            + str(plan_obj.dosage_durations[3].efficient_duration) + ','
+                                            + str(plan_obj.dosage_durations[4].efficient_duration))
+                                    f1.write(line + '\n')
                                 stop_here = True
 
-        made_it_through = True
+    made_it_through = True
+    f1.close()

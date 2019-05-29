@@ -109,18 +109,20 @@ class ModalityBase(object):
         self.alerts = []
         self.dosage_durations = {}
         self.initialize_dosage_durations()
+        self.efficient_winner = 1
+        self.complete_winner = 1
+        self.comprehensive_winner = 1
 
     def get_total_exercises(self):
         pass
 
     def initialize_dosage_durations(self):
 
-        self.dosage_durations[0.5] = DosageDuration(0, 0, 0)
-        self.dosage_durations[1.5] = DosageDuration(0, 0, 0)
-        self.dosage_durations[2.5] = DosageDuration(0, 0, 0)
-        self.dosage_durations[3.5] = DosageDuration(0, 0, 0)
-        self.dosage_durations[4.5] = DosageDuration(0, 0, 0)
-        self.dosage_durations[5.0] = DosageDuration(0, 0, 0)
+        self.dosage_durations[1] = DosageDuration(0, 0, 0)
+        self.dosage_durations[2] = DosageDuration(0, 0, 0)
+        self.dosage_durations[3] = DosageDuration(0, 0, 0)
+        self.dosage_durations[4] = DosageDuration(0, 0, 0)
+        self.dosage_durations[5] = DosageDuration(0, 0, 0)
 
     def __setattr__(self, name, value):
         if name in ['event_date_time', 'start_date_time', 'completed_date_time']:
@@ -196,7 +198,7 @@ class ModalityBase(object):
 
         for ex, a in assigned_exercises.items():
             if len(a.dosages) > 0:
-                a.dosages = sorted(a.dosages, key=lambda x: (x.severity(), #3-int(x.priority),
+                a.dosages = sorted(a.dosages, key=lambda x: (3-int(x.priority), x.severity(),
                                                              x.comprehensive_sets_assigned,
                                                              x.comprehensive_reps_assigned,
                                                              x.complete_sets_assigned,
@@ -204,16 +206,20 @@ class ModalityBase(object):
                                                              x.efficient_sets_assigned,
                                                              x.efficient_reps_assigned), reverse=True)
 
-                # a.dosages = sorted(a.dosages, key=lambda x: (x.severity(), #3 - int(x.priority), has no impact
-                #                                               x.efficient_sets_assigned,
-                #                                               x.efficient_reps_assigned,
-                #                                               x.complete_sets_assigned,
-                #                                               x.complete_reps_assigned,
-                #                                               x.comprehensive_sets_assigned,
-                #                                               x.comprehensive_reps_assigned), reverse=True)
-
                 dosage = a.dosages[0]
 
+                if dosage.priority == "1":
+                    self.calc_dosage_durations(1, a, dosage)
+                elif dosage.priority == "2" and dosage.severity() > 2:
+                    self.calc_dosage_durations(2, a, dosage)
+                elif dosage.priority == "2" and dosage.severity() <= 2:
+                    self.calc_dosage_durations(3, a, dosage)
+                elif dosage.priority == "3" and dosage.severity() > 2:
+                    self.calc_dosage_durations(4, a, dosage)
+                elif dosage.priority == "3" and dosage.severity() <= 2:
+                    self.calc_dosage_durations(5, a, dosage)
+
+                '''dep
                 if dosage.severity() < 0.5:
                     self.calc_dosage_durations(0.5, a, dosage)
                 elif 0.5 <= dosage.severity() < 1.5:
@@ -226,16 +232,15 @@ class ModalityBase(object):
                         self.calc_dosage_durations(4.5, a, dosage)
                 elif 4.5 <= dosage.severity() <= 5.0:
                         self.calc_dosage_durations(5.0, a, dosage)
+                '''
+
+    def set_winners(self):
 
         # key off efficient as the guide
         total_efficient = 0
         total_complete = 0
         total_comprehensive = 0
-        benchmarks = [5.0, 4.5, 3.5, 2.5, 1.5, 0.5]
-
-        efficient_winner = None
-        complete_winner = None
-        comprehensive_winner = None
+        benchmarks = [1, 2, 3, 4, 5]
 
         for b in range(0, len(benchmarks) - 1):
             total_efficient += self.dosage_durations[benchmarks[b]].efficient_duration
@@ -243,12 +248,13 @@ class ModalityBase(object):
             if proposed_efficient < 300:
                 continue
             elif abs(total_efficient - 300) < abs(proposed_efficient - 300):
-                efficient_winner = benchmarks[b]
+                self.efficient_winner = benchmarks[b]
                 break
             else:
-                efficient_winner = benchmarks[b + 1]
+                self.efficient_winner = benchmarks[b + 1]
                 break
 
+        '''later
         for b in range(0, len(benchmarks) - 1):
             total_complete += self.dosage_durations[benchmarks[b]].complete_duration
             proposed_complete = total_complete + self.dosage_durations[benchmarks[b + 1]].complete_duration
@@ -272,93 +278,41 @@ class ModalityBase(object):
             else:
                 comprehensive_winner = benchmarks[b + 1]
                 break
+                
+        '''
 
-        if efficient_winner is not None:  # if None, don't reduce
+    def scale_all_active_time(self):
+        pass
+
+    def scale_active_time(self, assigned_exercises):
+
+        if self.efficient_winner is not None:  # if None, don't reduce
             for ex, a in assigned_exercises.items():
                 if len(a.dosages) > 0:
 
-                    if efficient_winner == 5.0:
+                    if self.efficient_winner == 1:
                         for d in a.dosages:
-                            if d.severity() < 4.5:
+                            if d.priority != '1':
                                 d.efficient_reps_assigned = 0
                                 d.efficient_sets_assigned = 0
-                    elif efficient_winner == 4.5:
+                    elif self.efficient_winner == 2:
                         for d in a.dosages:
-                            if d.severity() < 3.5:
+                            if d.priority == '3' or (d.priority == '2' and d.severity() <= 2):
                                 d.efficient_reps_assigned = 0
                                 d.efficient_sets_assigned = 0
-                    elif efficient_winner == 3.5:
+                    elif self.efficient_winner == 3:
                         for d in a.dosages:
-                            if d.severity() < 2.5:
+                            if d.priority == '3':
                                 d.efficient_reps_assigned = 0
                                 d.efficient_sets_assigned = 0
-                    elif efficient_winner == 2.5:
+                    elif self.efficient_winner == 4:
                         for d in a.dosages:
-                            if d.severity() < 1.5:
+                            if d.priority == '3' and d.severity() <= 2:
                                 d.efficient_reps_assigned = 0
                                 d.efficient_sets_assigned = 0
-                    elif efficient_winner == 1.5:
-                        for d in a.dosages:
-                            if d.severity() < 0.5:
-                                d.efficient_reps_assigned = 0
-                                d.efficient_sets_assigned = 0
-                    elif efficient_winner == 0.5:
+                    elif self.efficient_winner == 5:
                         pass
-
-                    if complete_winner == 5.0:
-                        for d in a.dosages:
-                            if d.severity() < 4.5:
-                                d.complete_reps_assigned = 0
-                                d.complete_sets_assigned = 0
-                    elif complete_winner == 4.5:
-                        for d in a.dosages:
-                            if d.severity() < 3.5:
-                                d.complete_reps_assigned = 0
-                                d.complete_sets_assigned = 0
-                    elif complete_winner == 3.5:
-                        for d in a.dosages:
-                            if d.severity() < 2.5:
-                                d.complete_reps_assigned = 0
-                                d.complete_sets_assigned = 0
-                    elif complete_winner == 2.5:
-                        for d in a.dosages:
-                            if d.severity() < 1.5:
-                                d.complete_reps_assigned = 0
-                                d.complete_sets_assigned = 0
-                    elif complete_winner == 1.5:
-                        for d in a.dosages:
-                            if d.severity() < 0.5:
-                                d.complete_reps_assigned = 0
-                                d.complete_sets_assigned = 0
-                    elif complete_winner == 0.5:
-                        pass
-
-                    if comprehensive_winner == 5.0:
-                        for d in a.dosages:
-                            if d.severity() < 4.5:
-                                d.comprehensive_reps_assigned = 0
-                                d.comprehensive_sets_assigned = 0
-                    elif comprehensive_winner == 4.5:
-                        for d in a.dosages:
-                            if d.severity() < 3.5:
-                                d.comprehensive_reps_assigned = 0
-                                d.comprehensive_sets_assigned = 0
-                    elif comprehensive_winner == 3.5:
-                        for d in a.dosages:
-                            if d.severity() < 2.5:
-                                d.comprehensive_reps_assigned = 0
-                                d.comprehensive_sets_assigned = 0
-                    elif comprehensive_winner == 2.5:
-                        for d in a.dosages:
-                            if d.severity() < 1.5:
-                                d.comprehensive_reps_assigned = 0
-                                d.comprehensive_sets_assigned = 0
-                    elif comprehensive_winner == 1.5:
-                        for d in a.dosages:
-                            if d.severity() < 0.5:
-                                d.comprehensive_reps_assigned = 0
-                                d.comprehensive_sets_assigned = 0
-                    elif comprehensive_winner == 0.5:
+                    elif self.efficient_winner == 0:
                         pass
 
     def calc_dosage_durations(self, benchmark_value, assigned_exercise, dosage):
@@ -387,96 +341,175 @@ class ModalityBase(object):
                 dosage.complete_sets_assigned = 1
                 dosage.comprehensive_reps_assigned = exercise.max_reps
                 dosage.comprehensive_sets_assigned = 2
-            else:
-                dosage.efficient_reps_assigned = 0
-                dosage.efficient_sets_assigned = 0
-                dosage.complete_reps_assigned = 0
-                dosage.complete_sets_assigned = 0
-                dosage.comprehensive_reps_assigned = 0
-                dosage.comprehensive_sets_assigned = 0
+                dosage.default_efficient_reps_assigned = exercise.min_reps
+                dosage.default_efficient_sets_assigned = 1
+                dosage.default_complete_reps_assigned = exercise.max_reps
+                dosage.default_complete_sets_assigned = 1
+                dosage.default_comprehensive_reps_assigned = exercise.max_reps
+                dosage.default_comprehensive_sets_assigned = 2
 
         elif dosage.goal.goal_type == AthleteGoalType.on_request:
             if dosage.priority == "1":
                 dosage.efficient_reps_assigned = exercise.min_reps
                 dosage.efficient_sets_assigned = 1
-            else:
-                dosage.efficient_reps_assigned = 0
-                dosage.efficient_sets_assigned = 0
+                dosage.default_efficient_reps_assigned = exercise.min_reps
+                dosage.default_efficient_sets_assigned = 1
+
             if dosage.priority == "1" or dosage.priority == "2":
                 dosage.complete_reps_assigned = exercise.min_reps
                 dosage.complete_sets_assigned = 1
-            else:
-                dosage.complete_reps_assigned = 0
-                dosage.complete_sets_assigned = 0
+                dosage.default_complete_reps_assigned = exercise.min_reps
+                dosage.default_complete_sets_assigned = 1
 
             dosage.comprehensive_reps_assigned = exercise.min_reps
             dosage.comprehensive_sets_assigned = 1
+            dosage.default_comprehensive_reps_assigned = exercise.min_reps
+            dosage.default_comprehensive_sets_assigned = 1
+
+        elif dosage.goal.goal_type == AthleteGoalType.corrective:
+
+            if dosage.soreness_source.severity < 0.5:
+
+                if dosage.priority == "1":
+                    dosage.default_efficient_reps_assigned = exercise.min_reps
+                    dosage.default_efficient_sets_assigned = 1
+
+                if dosage.priority == "1" or dosage.priority == "2":
+                    dosage.default_complete_reps_assigned = exercise.min_reps
+                    dosage.default_complete_sets_assigned = 1
+
+                dosage.comprehensive_reps_assigned = exercise.min_reps
+                dosage.comprehensive_sets_assigned = 1
+                dosage.default_comprehensive_reps_assigned = exercise.min_reps
+                dosage.default_comprehensive_sets_assigned = 1
+
+            elif 0.5 <= dosage.soreness_source.severity < 1.5:
+
+                if dosage.priority == "1":
+                    dosage.default_efficient_reps_assigned = exercise.min_reps
+                    dosage.default_efficient_sets_assigned = 1
+
+                if dosage.priority == "1" or dosage.priority == "2":
+                    dosage.default_complete_reps_assigned = exercise.max_reps
+                    dosage.default_complete_sets_assigned = 1
+
+                dosage.comprehensive_reps_assigned = exercise.max_reps
+                dosage.comprehensive_sets_assigned = 1
+                dosage.default_comprehensive_reps_assigned = exercise.max_reps
+                dosage.default_comprehensive_sets_assigned = 1
+
+            elif 1.5 <= dosage.soreness_source.severity < 2.5:
+
+                if dosage.priority == "1":
+                    dosage.default_efficient_reps_assigned = exercise.min_reps
+                    dosage.default_efficient_sets_assigned = 1
+
+                dosage.default_complete_reps_assigned = exercise.max_reps
+                dosage.default_complete_sets_assigned = 1
+                dosage.comprehensive_reps_assigned = exercise.max_reps
+                dosage.comprehensive_sets_assigned = 2
+                dosage.default_comprehensive_reps_assigned = exercise.max_reps
+                dosage.default_comprehensive_sets_assigned = 2
+
+            elif 2.5 <= dosage.soreness_source.severity < 3.5:
+
+                dosage.default_efficient_reps_assigned = exercise.min_reps
+                dosage.default_efficient_sets_assigned = 1
+                dosage.default_complete_reps_assigned = exercise.max_reps
+                dosage.default_complete_sets_assigned = 1
+                dosage.comprehensive_reps_assigned = exercise.max_reps
+                dosage.comprehensive_sets_assigned = 2
+                dosage.default_comprehensive_reps_assigned = exercise.max_reps
+                dosage.default_comprehensive_sets_assigned = 2
+
+            elif 3.5 <= dosage.soreness_source.severity < 4.5:
+
+                dosage.default_efficient_reps_assigned = exercise.max_reps
+                dosage.default_efficient_sets_assigned = 1
+                dosage.default_complete_reps_assigned = exercise.max_reps
+                dosage.default_complete_sets_assigned = 2
+                dosage.comprehensive_reps_assigned = exercise.max_reps
+                dosage.comprehensive_sets_assigned = 3
+                dosage.default_comprehensive_reps_assigned = exercise.max_reps
+                dosage.default_comprehensive_sets_assigned = 3
+
+            elif dosage.soreness_source.severity >= 4.5:
+
+                dosage.default_efficient_reps_assigned = exercise.max_reps
+                dosage.default_efficient_sets_assigned = 1
+                dosage.default_complete_reps_assigned = exercise.max_reps
+                dosage.default_complete_sets_assigned = 2
+                dosage.comprehensive_reps_assigned = exercise.max_reps
+                dosage.comprehensive_sets_assigned = 3
+                dosage.default_comprehensive_reps_assigned = exercise.max_reps
+                dosage.default_comprehensive_sets_assigned = 3
 
         elif (dosage.goal.goal_type == AthleteGoalType.sore and
                 (dosage.soreness_source.historic_soreness_status is None or
                  dosage.soreness_source.is_dormant_cleared() or
                 dosage.soreness_source.historic_soreness_status is HistoricSorenessStatus.doms) or
-                dosage.goal.goal_type == AthleteGoalType.preempt_personalized_sport or
-                dosage.goal.goal_type == AthleteGoalType.preempt_corrective):
+                #dosage.goal.goal_type == AthleteGoalType.preempt_personalized_sport or
+              dosage.goal.goal_type == AthleteGoalType.preempt_corrective):
             if dosage.soreness_source.severity < 0.5:
                 if dosage.priority == "1":
                     dosage.efficient_reps_assigned = exercise.min_reps
                     dosage.efficient_sets_assigned = 1
-                else:
-                    dosage.efficient_reps_assigned = 0
-                    dosage.efficient_sets_assigned = 0
+                    dosage.default_efficient_reps_assigned = exercise.min_reps
+                    dosage.default_efficient_sets_assigned = 1
+
                 if dosage.priority == "1" or dosage.priority == "2":
                     dosage.complete_reps_assigned = exercise.min_reps
                     dosage.complete_sets_assigned = 1
-                else:
-                    dosage.complete_reps_assigned = 0
-                    dosage.complete_sets_assigned = 0
-
+                    dosage.default_complete_reps_assigned = exercise.min_reps
+                    dosage.default_complete_sets_assigned = 1
                 dosage.comprehensive_reps_assigned = exercise.min_reps
                 dosage.comprehensive_sets_assigned = 1
+                dosage.default_comprehensive_reps_assigned = exercise.min_reps
+                dosage.default_comprehensive_sets_assigned = 1
             elif 0.5 <= dosage.soreness_source.severity < 1.5:
                 if dosage.priority == "1":
                     dosage.efficient_reps_assigned = exercise.min_reps
                     dosage.efficient_sets_assigned = 1
-                else:
-                    dosage.efficient_reps_assigned = 0
-                    dosage.efficient_sets_assigned = 0
-
+                    dosage.default_efficient_reps_assigned = exercise.min_reps
+                    dosage.default_efficient_sets_assigned = 1
                 if dosage.priority == "1" or dosage.priority == "2":
                     dosage.complete_reps_assigned = exercise.min_reps
                     dosage.complete_sets_assigned = 1
-                else:
-                    dosage.complete_reps_assigned = 0
-                    dosage.complete_sets_assigned = 0
+                    dosage.default_complete_reps_assigned = exercise.min_reps
+                    dosage.default_complete_sets_assigned = 1
                 dosage.comprehensive_reps_assigned = exercise.min_reps
                 dosage.comprehensive_sets_assigned = 1
+                dosage.default_comprehensive_reps_assigned = exercise.min_reps
+                dosage.default_comprehensive_sets_assigned = 1
             elif 1.5 <= dosage.soreness_source.severity < 2.5:
                 if dosage.priority == "1":
                     dosage.efficient_reps_assigned = exercise.min_reps
                     dosage.efficient_sets_assigned = 1
-                else:
-                    dosage.efficient_reps_assigned = 0
-                    dosage.efficient_sets_assigned = 0
+                    dosage.default_efficient_reps_assigned = exercise.min_reps
+                    dosage.default_efficient_sets_assigned = 1
                 if dosage.priority == "1" or dosage.priority == "2":
                     dosage.complete_reps_assigned = exercise.max_reps
                     dosage.complete_sets_assigned = 1
-                else:
-                    dosage.complete_reps_assigned = 0
-                    dosage.complete_sets_assigned = 0
+                    dosage.default_complete_reps_assigned = exercise.max_reps
+                    dosage.default_complete_sets_assigned = 1
                 dosage.comprehensive_reps_assigned = exercise.max_reps
                 dosage.comprehensive_sets_assigned = 1
+                dosage.default_comprehensive_reps_assigned = exercise.max_reps
+                dosage.default_comprehensive_sets_assigned = 1
             elif 2.5 <= dosage.soreness_source.severity < 3.5:
                 if dosage.priority == "1" or dosage.priority == "2":
                     dosage.efficient_reps_assigned = exercise.min_reps
                     dosage.efficient_sets_assigned = 1
-                else:
-                    dosage.efficient_reps_assigned = 0
-                    dosage.efficient_sets_assigned = 0
-
+                    dosage.default_efficient_reps_assigned = exercise.min_reps
+                    dosage.default_efficient_sets_assigned = 1
                 dosage.complete_reps_assigned = exercise.max_reps
                 dosage.complete_sets_assigned = 1
+                dosage.default_complete_reps_assigned = exercise.max_reps
+                dosage.default_complete_sets_assigned = 1
                 dosage.comprehensive_reps_assigned = exercise.max_reps
                 dosage.comprehensive_sets_assigned = 2
+                dosage.default_comprehensive_reps_assigned = exercise.max_reps
+                dosage.default_comprehensive_sets_assigned = 2
             elif 3.5 <= dosage.soreness_source.severity < 4.5:
                 dosage.efficient_reps_assigned = exercise.min_reps
                 dosage.efficient_sets_assigned = 1
@@ -484,6 +517,12 @@ class ModalityBase(object):
                 dosage.complete_sets_assigned = 1
                 dosage.comprehensive_reps_assigned = exercise.max_reps
                 dosage.comprehensive_sets_assigned = 2
+                dosage.default_efficient_reps_assigned = exercise.min_reps
+                dosage.default_efficient_sets_assigned = 1
+                dosage.default_complete_reps_assigned = exercise.max_reps
+                dosage.default_complete_sets_assigned = 1
+                dosage.default_comprehensive_reps_assigned = exercise.max_reps
+                dosage.default_comprehensive_sets_assigned = 2
             elif dosage.soreness_source.severity >= 4.5:
                 dosage.efficient_reps_assigned = exercise.max_reps
                 dosage.efficient_sets_assigned = 1
@@ -492,53 +531,59 @@ class ModalityBase(object):
                 dosage.complete_sets_assigned = 2
                 dosage.comprehensive_reps_assigned = exercise.max_reps
                 dosage.comprehensive_sets_assigned = 3
+                dosage.default_efficient_reps_assigned = exercise.max_reps
+                dosage.default_efficient_sets_assigned = 1
 
-        else:
+                dosage.default_complete_reps_assigned = exercise.max_reps
+                dosage.default_complete_sets_assigned = 2
+                dosage.default_comprehensive_reps_assigned = exercise.max_reps
+                dosage.default_comprehensive_sets_assigned = 3
+
+        else:  # table 2
             if dosage.soreness_source.severity < 0.5:
                 if dosage.priority == "1":
                     dosage.efficient_reps_assigned = exercise.min_reps
                     dosage.efficient_sets_assigned = 1
-                else:
-                    dosage.efficient_reps_assigned = 0
-                    dosage.efficient_sets_assigned = 0
+                    dosage.default_efficient_reps_assigned = exercise.min_reps
+                    dosage.default_efficient_sets_assigned = 1
                 if dosage.priority == "1" or dosage.priority == "2":
                     dosage.complete_reps_assigned = exercise.min_reps
                     dosage.complete_sets_assigned = 1
-                else:
-                    dosage.complete_reps_assigned = 0
-                    dosage.complete_sets_assigned = 0
-
+                    dosage.default_complete_reps_assigned = exercise.min_reps
+                    dosage.default_complete_sets_assigned = 1
                 dosage.comprehensive_reps_assigned = exercise.min_reps
                 dosage.comprehensive_sets_assigned = 1
+                dosage.default_comprehensive_reps_assigned = exercise.min_reps
+                dosage.default_comprehensive_sets_assigned = 1
             elif 0.5 <= dosage.soreness_source.severity < 1.5:
                 if dosage.priority == "1":
                     dosage.efficient_reps_assigned = exercise.min_reps
                     dosage.efficient_sets_assigned = 1
-                else:
-                    dosage.efficient_reps_assigned = 0
-                    dosage.efficient_sets_assigned = 0
-
+                    dosage.default_efficient_reps_assigned = exercise.min_reps
+                    dosage.default_efficient_sets_assigned = 1
                 if dosage.priority == "1" or dosage.priority == "2":
                     dosage.complete_reps_assigned = exercise.max_reps
                     dosage.complete_sets_assigned = 1
-                else:
-                    dosage.complete_reps_assigned = 0
-                    dosage.complete_sets_assigned = 0
+                    dosage.default_complete_reps_assigned = exercise.max_reps
+                    dosage.default_complete_sets_assigned = 1
                 dosage.comprehensive_reps_assigned = exercise.max_reps
                 dosage.comprehensive_sets_assigned = 1
+                dosage.default_comprehensive_reps_assigned = exercise.max_reps
+                dosage.default_comprehensive_sets_assigned = 1
             elif 1.5 <= dosage.soreness_source.severity < 2.5:
-                if dosage.priority == "1":
+                if dosage.priority == "1" or dosage.priority == "2":
                     dosage.efficient_reps_assigned = exercise.min_reps
                     dosage.efficient_sets_assigned = 1
-                else:
-                    dosage.efficient_reps_assigned = 0
-                    dosage.efficient_sets_assigned = 0
-
+                    dosage.default_efficient_reps_assigned = exercise.min_reps
+                    dosage.default_efficient_sets_assigned = 1
                 dosage.complete_reps_assigned = exercise.max_reps
                 dosage.complete_sets_assigned = 1
-
+                dosage.default_complete_reps_assigned = exercise.max_reps
+                dosage.default_complete_sets_assigned = 1
                 dosage.comprehensive_reps_assigned = exercise.max_reps
-                dosage.comprehensive_sets_assigned = 1
+                dosage.comprehensive_sets_assigned = 2
+                dosage.default_comprehensive_reps_assigned = exercise.max_reps
+                dosage.default_comprehensive_sets_assigned = 2
 
             elif 2.5 <= dosage.soreness_source.severity < 3.5:
 
@@ -548,7 +593,12 @@ class ModalityBase(object):
                 dosage.complete_sets_assigned = 1
                 dosage.comprehensive_reps_assigned = exercise.max_reps
                 dosage.comprehensive_sets_assigned = 2
-
+                dosage.default_efficient_reps_assigned = exercise.min_reps
+                dosage.default_efficient_sets_assigned = 1
+                dosage.default_complete_reps_assigned = exercise.max_reps
+                dosage.default_complete_sets_assigned = 1
+                dosage.default_comprehensive_reps_assigned = exercise.max_reps
+                dosage.default_comprehensive_sets_assigned = 2
             elif 3.5 <= dosage.soreness_source.severity < 4.5:
                 dosage.efficient_reps_assigned = exercise.max_reps
                 dosage.efficient_sets_assigned = 1
@@ -557,6 +607,13 @@ class ModalityBase(object):
                 dosage.complete_sets_assigned = 2
                 dosage.comprehensive_reps_assigned = exercise.max_reps
                 dosage.comprehensive_sets_assigned = 3
+                dosage.default_efficient_reps_assigned = exercise.max_reps
+                dosage.default_efficient_sets_assigned = 1
+
+                dosage.default_complete_reps_assigned = exercise.max_reps
+                dosage.default_complete_sets_assigned = 2
+                dosage.default_comprehensive_reps_assigned = exercise.max_reps
+                dosage.default_comprehensive_sets_assigned = 3
             elif dosage.soreness_source.severity >= 4.5:
                 dosage.efficient_reps_assigned = exercise.max_reps
                 dosage.efficient_sets_assigned = 1
@@ -565,9 +622,13 @@ class ModalityBase(object):
                 dosage.complete_sets_assigned = 2
                 dosage.comprehensive_reps_assigned = exercise.max_reps
                 dosage.comprehensive_sets_assigned = 3
+                dosage.default_efficient_reps_assigned = exercise.max_reps
+                dosage.default_efficient_sets_assigned = 1
 
-        dosage.default_reps_assigned = exercise.min_reps
-        dosage.default_sets_assigned = exercise.min_sets
+                dosage.default_complete_reps_assigned = exercise.max_reps
+                dosage.default_complete_sets_assigned = 2
+                dosage.default_comprehensive_reps_assigned = exercise.max_reps
+                dosage.default_comprehensive_sets_assigned = 3
 
         return dosage
 
@@ -779,6 +840,14 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
         self.isolated_activate_minutes = self.calc_active_time(self.isolated_activate_exercises)
         self.static_integrate_minutes = self.calc_active_time(self.static_integrate_exercises)
     '''
+
+    def scale_all_active_time(self):
+
+        self.scale_active_time(self.inhibit_exercises)
+        self.scale_active_time(self.static_stretch_exercises)
+        self.scale_active_time(self.active_stretch_exercises)
+        self.scale_active_time(self.static_integrate_exercises)
+        self.scale_active_time(self.isolated_activate_exercises)
 
     def aggregate_dosages(self):
 
@@ -1136,6 +1205,13 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
         self.isolated_activate_minutes = self.calc_active_time(self.isolated_activate_exercises)
         self.static_integrate_minutes = self.calc_active_time(self.static_integrate_exercises)
     '''
+
+    def scale_all_active_time(self):
+
+        self.scale_active_time(self.inhibit_exercises)
+        self.scale_active_time(self.static_stretch_exercises)
+        self.scale_active_time(self.static_integrate_exercises)
+        self.scale_active_time(self.isolated_activate_exercises)
 
     def aggregate_dosages(self):
 
@@ -1594,6 +1670,11 @@ class CoolDown(ModalityBase, Serialisable):
         cooldown.alerts = [Alert.json_deserialise(alert) for alert in input_dict.get('alerts', [])]
 
         return cooldown
+
+    def scale_all_active_time(self):
+
+        self.scale_active_time(self.dynamic_stretch_exercises)
+        self.scale_active_time(self.dynamic_integrate_exercises)
 
     def aggregate_dosages(self):
 

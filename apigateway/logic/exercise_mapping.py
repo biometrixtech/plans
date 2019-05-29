@@ -172,6 +172,8 @@ class ExerciseAssignmentCalculator(object):
             active_rest.set_plan_dosage(self.soreness_list, self.muscular_strain_high)
             active_rest.set_exercise_dosage_ranking()
             active_rest.aggregate_dosages()
+            active_rest.set_winners()
+            active_rest.scale_all_active_time()
             if active_rest.get_total_exercises() > 0:
                 return [active_rest]
         return []
@@ -188,6 +190,8 @@ class ExerciseAssignmentCalculator(object):
             active_rest.set_plan_dosage(self.soreness_list, self.muscular_strain_high)
             active_rest.set_exercise_dosage_ranking()
             active_rest.aggregate_dosages()
+            active_rest.set_winners()
+            active_rest.scale_all_active_time()
             if active_rest.get_total_exercises() > 0:
                 return [active_rest]
         return []
@@ -225,6 +229,8 @@ class ExerciseAssignmentCalculator(object):
                 cool_down.set_plan_dosage(self.soreness_list, self.muscular_strain_high)
                 cool_down.set_exercise_dosage_ranking()
                 cool_down.aggregate_dosages()
+                cool_down.set_winners()
+                cool_down.scale_all_active_time()
             #    break
 
             if cool_down is not None and cool_down.get_total_exercises() > 0:

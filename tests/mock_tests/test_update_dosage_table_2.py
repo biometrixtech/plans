@@ -2,7 +2,7 @@ from models.modalities import ModalityBase
 from models.soreness import AthleteGoal, AthleteGoalType, Exercise, ExerciseDosage, Soreness, HistoricSorenessStatus
 from datetime import datetime
 
-goal_types = [AthleteGoalType.sore, AthleteGoalType.pain, AthleteGoalType.corrective]
+goal_types = [AthleteGoalType.sore, AthleteGoalType.pain]
 
 
 def get_daily_dosage(goal, soreness, priority):
@@ -97,7 +97,7 @@ def test_daily_sore_2_4_severity_priority_1_table_2():
         assert dosage.complete_reps_assigned == exercise.max_reps
         assert dosage.complete_sets_assigned == 1
         assert dosage.comprehensive_reps_assigned == exercise.max_reps
-        assert dosage.comprehensive_sets_assigned == 1
+        assert dosage.comprehensive_sets_assigned == 2
 
 
 def test_daily_sore_3_4_severity_priority_1_table_2():
@@ -243,12 +243,12 @@ def test_daily_sore_2_4_severity_priority_2_table_2():
         dosage = get_daily_dosage(goal, soreness, "2")
 
         dosage = mod_base.update_dosage(dosage, exercise)
-        assert dosage.efficient_reps_assigned == 0
-        assert dosage.efficient_sets_assigned == 0
+        assert dosage.efficient_reps_assigned == exercise.min_reps
+        assert dosage.efficient_sets_assigned == 1
         assert dosage.complete_reps_assigned == exercise.max_reps
         assert dosage.complete_sets_assigned == 1
         assert dosage.comprehensive_reps_assigned == exercise.max_reps
-        assert dosage.comprehensive_sets_assigned == 1
+        assert dosage.comprehensive_sets_assigned == 2
 
 
 def test_daily_sore_3_4_severity_priority_2_table_2():
@@ -399,7 +399,7 @@ def test_daily_sore_2_4_severity_priority_3_table_2():
         assert dosage.complete_reps_assigned == exercise.max_reps
         assert dosage.complete_sets_assigned == 1
         assert dosage.comprehensive_reps_assigned == exercise.max_reps
-        assert dosage.comprehensive_sets_assigned == 1
+        assert dosage.comprehensive_sets_assigned == 2
 
 
 def test_daily_sore_3_4_severity_priority_3_table_2():
