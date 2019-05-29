@@ -41,7 +41,8 @@ def test_aggregate_insights_first_exposure():
     event_date_time = current_date_time
     daily_plan = DailyPlan(format_date(event_date_time))
     athlete_stats = AthleteStats('test_user')
-    insights, longitudinal_insights, trends = AlertsProcessing(daily_plan, athlete_stats).aggregate_alerts(event_date_time, alerts)
+    AlertsProcessing(daily_plan, athlete_stats, event_date_time).aggregate_alerts(alerts)
+    insights = daily_plan.insights
     assert len(insights) == 1
     assert insights[0].first
     assert not insights[0].parent
@@ -59,8 +60,8 @@ def test_aggregate_insights_no_alerts():
     event_date_time = current_date_time
     daily_plan = DailyPlan(format_date(event_date_time))
     athlete_stats = AthleteStats('test_user')
-    insights, longitudinal_insights, trends = AlertsProcessing(daily_plan, athlete_stats).aggregate_alerts(event_date_time, alerts)
-    assert len(insights) == 0
+    AlertsProcessing(daily_plan, athlete_stats, event_date_time).aggregate_alerts(alerts)
+    assert len(daily_plan.insights) == 0
 
 
 def test_aggregate_insights_trigger_type_not_displayed():
@@ -71,8 +72,8 @@ def test_aggregate_insights_trigger_type_not_displayed():
     event_date_time = current_date_time
     daily_plan = DailyPlan(format_date(event_date_time))
     athlete_stats = AthleteStats('test_user')
-    insights, longitudinal_insights, trends = AlertsProcessing(daily_plan, athlete_stats).aggregate_alerts(event_date_time, alerts)
-    assert len(insights) == 0
+    AlertsProcessing(daily_plan, athlete_stats, event_date_time).aggregate_alerts(alerts)
+    assert len(daily_plan.insights) == 0
 
 
 def test_aggregate_insights_multiple_same_body_part():
@@ -87,7 +88,8 @@ def test_aggregate_insights_multiple_same_body_part():
     daily_plan = DailyPlan(format_date(event_date_time))
     athlete_stats = AthleteStats('test_user')
     athlete_stats.exposed_triggers = exposed_triggers
-    insights, longitudinal_insights, trends = AlertsProcessing(daily_plan, athlete_stats).aggregate_alerts(event_date_time, alerts)
+    AlertsProcessing(daily_plan, athlete_stats, event_date_time).aggregate_alerts(alerts)
+    insights = daily_plan.insights
     assert len(insights) == 1
     assert insights[0].first
     assert not insights[0].parent
@@ -111,7 +113,8 @@ def test_aggregate_insights_multiple_same_child():
     daily_plan = DailyPlan(format_date(event_date_time))
     athlete_stats = AthleteStats('test_user')
     athlete_stats.exposed_triggers = exposed_triggers
-    insights, longitudinal_insights, trends = AlertsProcessing(daily_plan, athlete_stats).aggregate_alerts(event_date_time, alerts)
+    AlertsProcessing(daily_plan, athlete_stats, event_date_time).aggregate_alerts(alerts)
+    insights = daily_plan.insights
     assert len(insights) == 1
     assert not insights[0].first
     assert not insights[0].parent
@@ -136,7 +139,8 @@ def test_aggregate_insights_two_same_child_one_different_same_parent():
     daily_plan = DailyPlan(format_date(event_date_time))
     athlete_stats = AthleteStats('test_user')
     athlete_stats.exposed_triggers = exposed_triggers
-    insights, longitudinal_insights, trends = AlertsProcessing(daily_plan, athlete_stats).aggregate_alerts(event_date_time, alerts)
+    AlertsProcessing(daily_plan, athlete_stats, event_date_time).aggregate_alerts(alerts)
+    insights = daily_plan.insights
     assert len(insights) == 1
     assert insights[0].first
     assert insights[0].parent
@@ -156,7 +160,8 @@ def test_aggregate_insights_exposed():
     daily_plan = DailyPlan(format_date(event_date_time))
     athlete_stats = AthleteStats('test_user')
     athlete_stats.exposed_triggers = [TriggerType(14)]
-    insights, longitudinal_insights, trends = AlertsProcessing(daily_plan, athlete_stats).aggregate_alerts(event_date_time, alerts)
+    AlertsProcessing(daily_plan, athlete_stats, event_date_time).aggregate_alerts(alerts)
+    insights = daily_plan.insights
     assert len(insights) == 1
     assert not insights[0].first
     assert not insights[0].parent
@@ -174,7 +179,8 @@ def test_aggregate_insights_exposed_group():
     daily_plan = DailyPlan(format_date(event_date_time))
     athlete_stats = AthleteStats('test_user')
     athlete_stats.exposed_triggers = [TriggerType(8)]
-    insights, longitudinal_insights, trends = AlertsProcessing(daily_plan, athlete_stats).aggregate_alerts(event_date_time, alerts)
+    AlertsProcessing(daily_plan, athlete_stats, event_date_time).aggregate_alerts(alerts)
+    insights = daily_plan.insights
     assert len(insights) == 1
     assert not insights[0].first
     assert not insights[0].parent
@@ -192,7 +198,8 @@ def test_aggregate_insights_group_priority():
     daily_plan = DailyPlan(format_date(event_date_time))
     athlete_stats = AthleteStats('test_user')
     athlete_stats.exposed_triggers = []
-    insights, longitudinal_insights, trends = AlertsProcessing(daily_plan, athlete_stats).aggregate_alerts(event_date_time, alerts)
+    AlertsProcessing(daily_plan, athlete_stats, event_date_time).aggregate_alerts(alerts)
+    insights = daily_plan.insights
     assert len(insights) == 1
     assert insights[0].first
     assert insights[0].parent
@@ -209,7 +216,8 @@ def test_aggregate_insights_longitutinal():
     event_date_time = current_date_time
     daily_plan = DailyPlan(format_date(event_date_time))
     athlete_stats = AthleteStats('test_user')
-    insights, longitudinal_insights, trends = AlertsProcessing(daily_plan, athlete_stats).aggregate_alerts(event_date_time - datetime.timedelta(days=5), alerts)
+    AlertsProcessing(daily_plan, athlete_stats, event_date_time - datetime.timedelta(days=5)).aggregate_alerts(alerts)
+    insights = daily_plan.insights
     assert len(insights) == 1
     assert insights[0].first
     assert not insights[0].parent
@@ -218,7 +226,8 @@ def test_aggregate_insights_longitutinal():
 
     daily_plan.insights = []
     athlete_stats.exposed_triggers = [TriggerType(7)]
-    insights, longitudinal_insights, trends = AlertsProcessing(daily_plan, athlete_stats).aggregate_alerts(event_date_time, [])
+    AlertsProcessing(daily_plan, athlete_stats, event_date_time).aggregate_alerts([])
+    insights = daily_plan.insights
     assert len(insights) == 1
     assert not insights[0].parent
     assert insights[0].longitudinal
@@ -233,7 +242,8 @@ def test_aggregate_insights_cleared():
     event_date_time = current_date_time
     daily_plan = DailyPlan(format_date(event_date_time))
     athlete_stats = AthleteStats('test_user')
-    existing_insights, longitudinal_insights, trends = AlertsProcessing(daily_plan, athlete_stats).aggregate_alerts(event_date_time - datetime.timedelta(days=5), alerts)
+    AlertsProcessing(daily_plan, athlete_stats, event_date_time - datetime.timedelta(days=5)).aggregate_alerts(alerts)
+    existing_insights = daily_plan.insights
     assert len(existing_insights) == 1
     assert existing_insights[0].first
     assert not existing_insights[0].parent
@@ -242,7 +252,8 @@ def test_aggregate_insights_cleared():
 
     daily_plan.insights = []
     athlete_stats.exposed_triggers = [TriggerType(7)]
-    insights, longitudinal_insights, trends = AlertsProcessing(daily_plan, athlete_stats).aggregate_alerts(event_date_time, [])
+    AlertsProcessing(daily_plan, athlete_stats, event_date_time).aggregate_alerts([])
+    insights = daily_plan.insights
     assert len(insights) == 1
     assert not insights[0].parent
     assert insights[0].longitudinal
@@ -259,7 +270,8 @@ def test_aggregate_insights_cleared_same_parent_group():
     event_date_time = current_date_time
     daily_plan = DailyPlan(format_date(event_date_time))
     athlete_stats = AthleteStats('test_user')
-    existing_insights, longitudinal_insights, trends = AlertsProcessing(daily_plan, athlete_stats).aggregate_alerts(event_date_time - datetime.timedelta(days=1), alerts)
+    AlertsProcessing(daily_plan, athlete_stats, event_date_time - datetime.timedelta(days=1)).aggregate_alerts(alerts)
+    existing_insights = daily_plan.insights
 
     assert len(existing_insights) == 1
     assert existing_insights[0].first
@@ -269,7 +281,9 @@ def test_aggregate_insights_cleared_same_parent_group():
 
     athlete_stats.exposed_triggers = [existing_insights[0].trigger_type]
     daily_plan.insights = []
-    insights, longitudinal_insights, trends = AlertsProcessing(daily_plan, athlete_stats).aggregate_alerts(event_date_time, [alert2])
+    AlertsProcessing(daily_plan, athlete_stats, event_date_time).aggregate_alerts([alert2])
+    insights = daily_plan.insights
+    longitudinal_insights = athlete_stats.longitudinal_insights
     assert len(longitudinal_insights) == 1
     assert len(insights) == 2
 
@@ -310,8 +324,8 @@ def test_aggregate_insights_cleared_parent_group_4():
     event_date_time = current_date_time
     daily_plan = DailyPlan(format_date(event_date_time))
     athlete_stats = AthleteStats('test_user')
-    existing_insights, longitudinal_insights, trends = AlertsProcessing(daily_plan, athlete_stats).aggregate_alerts(event_date_time - datetime.timedelta(days=5), alerts)
-
+    AlertsProcessing(daily_plan, athlete_stats, event_date_time - datetime.timedelta(days=5)).aggregate_alerts(alerts)
+    existing_insights = daily_plan.insights
     assert len(existing_insights) == 1
     assert existing_insights[0].first
     assert not existing_insights[0].parent
@@ -322,7 +336,8 @@ def test_aggregate_insights_cleared_parent_group_4():
 
     athlete_stats.exposed_triggers = [existing_insights[0].trigger_type]
     daily_plan.insights = []
-    insights, longitudinal_insights, trends = AlertsProcessing(daily_plan, athlete_stats).aggregate_alerts(event_date_time - datetime.timedelta(days=4), [alert1, alert3])
+    AlertsProcessing(daily_plan, athlete_stats, event_date_time - datetime.timedelta(days=4)).aggregate_alerts([alert1, alert3])
+    insights = daily_plan.insights
 
     assert len(insights) == 1
     assert not insights[0].first
@@ -333,7 +348,8 @@ def test_aggregate_insights_cleared_parent_group_4():
     assert len(insights[0].child_triggers) == 2
 
     daily_plan.insights = []
-    insights, longitudinal_insights, trends = AlertsProcessing(daily_plan, athlete_stats).aggregate_alerts(event_date_time - datetime.timedelta(days=2), [alert1, alert2, alert3])
+    AlertsProcessing(daily_plan, athlete_stats, event_date_time - datetime.timedelta(days=2)).aggregate_alerts([alert1, alert2, alert3])
+    insights = daily_plan.insights
 
     assert len(insights) == 1
     assert not insights[0].first
@@ -344,7 +360,9 @@ def test_aggregate_insights_cleared_parent_group_4():
     assert len(insights[0].child_triggers) == 2
 
     daily_plan.insights = []
-    insights, longitudinal_insights, trends = AlertsProcessing(daily_plan, athlete_stats).aggregate_alerts(event_date_time, [alert1, alert2])
+    AlertsProcessing(daily_plan, athlete_stats, event_date_time).aggregate_alerts([alert1, alert2])
+    insights = daily_plan.insights
+    longitudinal_insights = athlete_stats.longitudinal_insights
 
     assert len(longitudinal_insights) == 1
     assert len(insights) == 2
@@ -379,7 +397,8 @@ def test_aggregate_insights_cleared_one_body_part():
     event_date_time = current_date_time
     daily_plan = DailyPlan(format_date(event_date_time))
     athlete_stats = AthleteStats('test_user')
-    existing_insights, longitudinal_insights, trends = AlertsProcessing(daily_plan, athlete_stats).aggregate_alerts(event_date_time - datetime.timedelta(days=5), alerts)
+    AlertsProcessing(daily_plan, athlete_stats, event_date_time - datetime.timedelta(days=5)).aggregate_alerts(alerts)
+    existing_insights = daily_plan.insights
     assert len(existing_insights) == 1
     assert existing_insights[0].first
     assert not existing_insights[0].parent
@@ -389,7 +408,9 @@ def test_aggregate_insights_cleared_one_body_part():
 
     athlete_stats.exposed_triggers = [TriggerType(16)]
     daily_plan.insights = []
-    insights, longitudinal_insights, trends = AlertsProcessing(daily_plan, athlete_stats).aggregate_alerts(event_date_time, [alert2])
+    AlertsProcessing(daily_plan, athlete_stats, event_date_time).aggregate_alerts([alert2])
+    insights = daily_plan.insights
+    longitudinal_insights = athlete_stats.longitudinal_insights
     assert len(insights) == 2
     assert insights[0].longitudinal
     assert len(longitudinal_insights) == 1
@@ -415,7 +436,8 @@ def test_aggregate_insights_doms_yesterday_no_doms_today():
     event_date_time = current_date_time
     daily_plan = DailyPlan(format_date(event_date_time))
     athlete_stats = AthleteStats('test_user')
-    existing_insights, longitudinal_insights, trends = AlertsProcessing(daily_plan, athlete_stats).aggregate_alerts(event_date_time - datetime.timedelta(days=1), alerts)
+    AlertsProcessing(daily_plan, athlete_stats, event_date_time - datetime.timedelta(days=1)).aggregate_alerts(alerts)
+    existing_insights = daily_plan.insights
     assert len(existing_insights) == 1
     assert existing_insights[0].first
     assert not existing_insights[0].parent
@@ -425,7 +447,9 @@ def test_aggregate_insights_doms_yesterday_no_doms_today():
 
     athlete_stats.exposed_triggers = [TriggerType(11)]
     daily_plan.insights = []
-    insights, longitudinal_insights, trends = AlertsProcessing(daily_plan, athlete_stats).aggregate_alerts(event_date_time, [])
+    AlertsProcessing(daily_plan, athlete_stats, event_date_time).aggregate_alerts([])
+    insights = daily_plan.insights
+    longitudinal_insights = athlete_stats.longitudinal_insights
     assert len(insights) == 0
     assert len(longitudinal_insights) == 0
 
@@ -507,7 +531,8 @@ def test_aggregate_trends_multiple_trends_same_body_part():
     daily_plan = DailyPlan(format_date(event_date_time))
     athlete_stats = AthleteStats('test_user')
     athlete_stats.exposed_triggers = []
-    insights, longitudinal_insights, trends = AlertsProcessing(daily_plan, athlete_stats).aggregate_alerts(event_date_time, alerts)
+    AlertsProcessing(daily_plan, athlete_stats, event_date_time).aggregate_alerts(alerts)
+    trends = daily_plan.trends
     assert len(trends.response.alerts) == 2
     assert len(trends.response.alerts[0].body_parts) == 1
     assert trends.response.alerts[0].trigger_type == TriggerType(15)
@@ -526,7 +551,8 @@ def test_aggregate_trends_multiple_trends_same_trigger_type_multiple_sports():
     daily_plan = DailyPlan(format_date(event_date_time))
     athlete_stats = AthleteStats('test_user')
     athlete_stats.exposed_triggers = []
-    insights, longitudinal_insights, trends = AlertsProcessing(daily_plan, athlete_stats).aggregate_alerts(event_date_time, alerts)
+    AlertsProcessing(daily_plan, athlete_stats, event_date_time).aggregate_alerts(alerts)
+    trends = daily_plan.trends
     assert len(trends.stress.alerts) == 1
     assert len(trends.stress.alerts[0].body_parts) == 0
     assert trends.stress.alerts[0].trigger_type == TriggerType(0)
@@ -545,7 +571,8 @@ def test_aggregate_trends_multiple_doms():
     daily_plan = DailyPlan(format_date(event_date_time))
     athlete_stats = AthleteStats('test_user')
     athlete_stats.exposed_triggers = []
-    insights, longitudinal_insights, trends = AlertsProcessing(daily_plan, athlete_stats).aggregate_alerts(event_date_time, alerts)
+    AlertsProcessing(daily_plan, athlete_stats, event_date_time).aggregate_alerts(alerts)
+    trends = daily_plan.trends
     assert len(trends.response.alerts) == 2
     assert len(trends.response.alerts[0].body_parts) == 2
     assert trends.response.alerts[0].trigger_type == TriggerType(11)
@@ -569,7 +596,8 @@ def test_aggregate_trends_doms_yesterday():
     athlete_stats = AthleteStats('test_user')
     athlete_stats.exposed_triggers = []
     athlete_stats.longitudinal_trends = [trend]
-    insights, longitudinal_insights, trends = AlertsProcessing(daily_plan, athlete_stats).aggregate_alerts(event_date_time, alerts)
+    AlertsProcessing(daily_plan, athlete_stats, event_date_time).aggregate_alerts(alerts)
+    trends = daily_plan.trends
     assert len(trends.response.alerts) == 2
     assert trends.response.alerts[0].trigger_type == TriggerType(11)
     assert trends.response.alerts[1].trigger_type == TriggerType(203)
@@ -595,13 +623,15 @@ def test_aggregate_trends_doms_yesterday_second_survey():
     athlete_stats = AthleteStats('test_user')
     athlete_stats.exposed_triggers = []
     athlete_stats.longitudinal_trends = [trend]
-    insights, longitudinal_insights, trends = AlertsProcessing(daily_plan, athlete_stats).aggregate_alerts(event_date_time, alerts)
+    AlertsProcessing(daily_plan, athlete_stats, event_date_time).aggregate_alerts(alerts)
+    trends = daily_plan.trends
     assert len(trends.response.alerts) == 2
     assert trends.response.alerts[0].trigger_type == TriggerType(11)
     assert trends.response.alerts[1].trigger_type == TriggerType(203)
     assert len(athlete_stats.longitudinal_trends) == 1
 
-    insights, longitudinal_insights, trends = AlertsProcessing(daily_plan, athlete_stats).aggregate_alerts(event_date_time + datetime.timedelta(hours=2), alerts)
+    AlertsProcessing(daily_plan, athlete_stats, event_date_time + datetime.timedelta(hours=2)).aggregate_alerts(alerts)
+    trends = daily_plan.trends
     assert len(trends.response.alerts) == 2
     assert trends.response.alerts[0].trigger_type == TriggerType(11)
     assert trends.response.alerts[1].trigger_type == TriggerType(203)
@@ -624,7 +654,8 @@ def test_aggregate_trends_cleared_trend_doms():
     athlete_stats = AthleteStats('test_user')
     athlete_stats.exposed_triggers = []
     athlete_stats.longitudinal_trends = [trend]
-    insights, longitudinal_insights, trends = AlertsProcessing(daily_plan, athlete_stats).aggregate_alerts(event_date_time, alerts)
+    AlertsProcessing(daily_plan, athlete_stats, event_date_time).aggregate_alerts(alerts)
+    trends = daily_plan.trends
     assert len(trends.response.alerts) == 2
     assert trends.response.alerts[0].trigger_type == TriggerType(8)
     assert trends.response.alerts[1].trigger_type == TriggerType(203)
@@ -645,7 +676,8 @@ def test_aggregate_trends_cleared_trend_not_doms():
     athlete_stats = AthleteStats('test_user')
     athlete_stats.exposed_triggers = []
     athlete_stats.longitudinal_trends = [trend]
-    insights, longitudinal_insights, trends = AlertsProcessing(daily_plan, athlete_stats).aggregate_alerts(event_date_time, alerts)
+    AlertsProcessing(daily_plan, athlete_stats, event_date_time).aggregate_alerts(alerts)
+    trends = daily_plan.trends
     assert len(trends.response.alerts) == 3
     assert trends.response.alerts[0].trigger_type == TriggerType(8)
     assert trends.response.alerts[1].trigger_type == TriggerType(7)
@@ -669,7 +701,8 @@ def test_aggregate_trends_cleared_trend_different_body_part_today():
     athlete_stats = AthleteStats('test_user')
     athlete_stats.exposed_triggers = []
     athlete_stats.longitudinal_trends = [trend]
-    insights, longitudinal_insights, trends = AlertsProcessing(daily_plan, athlete_stats).aggregate_alerts(event_date_time, alerts)
+    AlertsProcessing(daily_plan, athlete_stats, event_date_time).aggregate_alerts(alerts)
+    trends = daily_plan.trends
     assert len(trends.response.alerts) == 3
     assert trends.response.alerts[0].trigger_type == TriggerType(7)
     assert trends.response.alerts[0].cleared
@@ -693,7 +726,8 @@ def test_aggregate_trends_no_alerts_existing_multi_day_trend():
     athlete_stats = AthleteStats('test_user')
     athlete_stats.exposed_triggers = []
     athlete_stats.longitudinal_trends = [trend]
-    insights, longitudinal_insights, trends = AlertsProcessing(daily_plan, athlete_stats).aggregate_alerts(event_date_time, alerts)
+    AlertsProcessing(daily_plan, athlete_stats, event_date_time).aggregate_alerts(alerts)
+    trends = daily_plan.trends
     assert len(trends.stress.alerts) == 1
     assert len(trends.response.alerts) == 2
     assert trends.response.alerts[0].trigger_type == TriggerType(7)
@@ -713,7 +747,8 @@ def test_aggregate_trends_no_alerts():
     athlete_stats = AthleteStats('test_user')
     athlete_stats.exposed_triggers = []
     athlete_stats.longitudinal_trends = []
-    insights, longitudinal_insights, trends = AlertsProcessing(daily_plan, athlete_stats).aggregate_alerts(event_date_time, alerts)
+    AlertsProcessing(daily_plan, athlete_stats, event_date_time).aggregate_alerts(alerts)
+    trends = daily_plan.trends
     assert len(trends.stress.alerts) == 1
     assert len(trends.response.alerts) == 2
     assert len(trends.biomechanics.alerts) == 2
@@ -728,7 +763,8 @@ def test_aggregate_trends_trigger_type_not_present_in_trends():
     daily_plan = DailyPlan(format_date(event_date_time))
     athlete_stats = AthleteStats('test_user')
     athlete_stats.exposed_triggers = []
-    insights, longitudinal_insights, trends = AlertsProcessing(daily_plan, athlete_stats).aggregate_alerts(event_date_time, alerts)
+    AlertsProcessing(daily_plan, athlete_stats, event_date_time).aggregate_alerts(alerts)
+    trends = daily_plan.trends
     assert len(trends.response.alerts) == 2
     assert trends.response.alerts[0].trigger_type == TriggerType(203)
     assert trends.response.alerts[1].trigger_type == TriggerType(202)

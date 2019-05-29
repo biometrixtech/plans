@@ -5,13 +5,12 @@ from models.athlete_trend import AthleteTrends, Trend, VisualizationType, DataSo
 
 
 class AlertsProcessing(object):
-    def __init__(self, daily_plan, athlete_stats):
+    def __init__(self, daily_plan, athlete_stats, trigger_date_time):
         self.daily_plan = daily_plan
         self.athlete_stats = athlete_stats
-        self.trigger_date_time = None
-
-    def aggregate_alerts(self, trigger_date_time, alerts):
         self.trigger_date_time = trigger_date_time
+
+    def aggregate_alerts(self, alerts):
         previous_insights = self.daily_plan.insights
         exposed_triggers = self.athlete_stats.exposed_triggers
         longitudinal_insights = self.athlete_stats.longitudinal_insights
@@ -38,12 +37,12 @@ class AlertsProcessing(object):
                     existing_insight.child_triggers = insight.child_triggers
                     insight.start_date_time = existing_insight.start_date_time
                 elif insight.cleared:
-                    insight.start_date_time = trigger_date_time
+                    insight.start_date_time = self.trigger_date_time
                 else:
-                    insight.start_date_time = trigger_date_time
+                    insight.start_date_time = self.trigger_date_time
                     longitudinal_insights.append(insight)
             else:
-                insight.start_date_time = trigger_date_time
+                insight.start_date_time = self.trigger_date_time
         insights = self.combine_new_insights_with_previous(insights, previous_insights)
         insights = [insight for insight in insights if insight.present_in_plans]
         trends.cleanup()
@@ -53,7 +52,7 @@ class AlertsProcessing(object):
         self.daily_plan.trends.dashboard.training_volume_data = self.athlete_stats.training_volume_chart_data
         self.athlete_stats.longitudinal_insights = longitudinal_insights
 
-        return insights, longitudinal_insights, trends
+        # return insights, longitudinal_insights, trends
 
     def clear_insight(self, new_insights, existing_longitudinal_insights):
         current_trigger_types = [insight.trigger_type for insight in new_insights]

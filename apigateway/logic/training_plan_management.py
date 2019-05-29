@@ -148,10 +148,10 @@ class TrainingPlanManager(object):
 
         self.daily_plan.last_updated = last_updated
         alerts = self.daily_plan.get_alerts()
-        alerts_processing = AlertsProcessing(self.daily_plan, self.athlete_stats)
-        alerts_processing.aggregate_alerts(self.trigger_date_time,
-                                           alerts=alerts
-                                           )
+        alerts_processing = AlertsProcessing(daily_plan=self.daily_plan,
+                                             athlete_stats=self.athlete_stats,
+                                             trigger_date_time=self.trigger_date_time,)
+        alerts_processing.aggregate_alerts(alerts=alerts)
 
         self.daily_plan_datastore.put(self.daily_plan)
         self.athlete_stats_datastore.put(self.athlete_stats)
