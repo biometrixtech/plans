@@ -29,6 +29,7 @@ class AthleteInsight(Serialisable):
         self.read = False
         self.parent_group = TriggerType.get_parent_group(self.trigger_type)
         self.present_in_plans = True
+        self.child_triggers = {}
 
     def json_serialise(self):
         ret = {
@@ -48,7 +49,10 @@ class AthleteInsight(Serialisable):
             'priority': self.priority,
             'styling': self.styling,
             'read': self.read,
-            'present_in_plans': self.present_in_plans
+            'present_in_plans': self.present_in_plans,
+            'child_triggers': {str(trigger_type.value): [body_part.json_serialise() for
+                                                    body_part in body_parts] for
+                               (trigger_type, body_parts) in self.child_triggers.items()}
         }
         return ret
 
@@ -70,6 +74,9 @@ class AthleteInsight(Serialisable):
         insight.read = input_dict.get('read', False)
         insight.insight_type = InsightType(input_dict.get('insight_type', 0))
         insight.present_in_plans = input_dict.get('present_in_plans', True)
+        insight.child_triggers = {TriggerType(int(trigger_type)): [BodyPartSide.json_deserialise(body_part) for
+                                                              body_part in body_parts] for
+                                  (trigger_type, body_parts) in input_dict.get('child_triggers', {}).items()}
 
         return insight
 

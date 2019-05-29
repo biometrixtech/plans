@@ -978,7 +978,7 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
                   (self.event_date_time - soreness.first_reported_date_time).days >= 30):
                 goal.trigger_type = TriggerType.hist_sore_greater_30_sore_today  # 13
             else: # somehow missed doms
-                goal.trigger_type = TriggerType.sore_today_doms  # 11
+                goal.trigger_type = TriggerType.sore_today  # 10
 
             if body_part is not None:
                 alert = Alert(goal)
@@ -1339,7 +1339,7 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
                   (self.event_date_time - soreness.first_reported_date_time).days >= 30):
                 goal.trigger_type = TriggerType.hist_sore_greater_30_sore_today  # 13
             else: # somehow missed doms
-                goal.trigger_type = TriggerType.sore_today_doms  # 11
+                goal.trigger_type = TriggerType.sore_today  # 10
 
             if body_part is not None:
                 alert = Alert(goal)
