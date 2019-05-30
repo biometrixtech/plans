@@ -479,7 +479,7 @@ class ExerciseDosage(object):
         dosage.default_efficient_reps_assigned = input_dict.get('default_efficient_reps_assigned', 0)
         dosage.default_efficient_sets_assigned = input_dict.get('default_efficient_sets_assigned', 0)
         dosage.default_complete_reps_assigned = input_dict.get('default_complete_reps_assigned', 0)
-        dosage.default_complete_reps_assigned = input_dict.get('dfault_complete_reps_assigned', 0)
+        dosage.default_complete_sets_assigned = input_dict.get('default_complete_sets_assigned', 0)
         dosage.default_comprehensive_reps_assigned = input_dict.get('default_comprehensive_reps_assigned', 0)
         dosage.default_comprehensive_sets_assigned = input_dict.get('default_comprehensive_sets_assigned', 0)
         dosage.ranking = input_dict.get('ranking', 0)
