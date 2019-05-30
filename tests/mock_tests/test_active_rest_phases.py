@@ -76,7 +76,7 @@ def test_active_rest_after_training_check_prevention_soreness_severity_2():
         historic_date_time = current_date_time - timedelta(days=31)
         soreness.first_reported_date_time = historic_date_time
         exercise_library = exercise_library_datastore.get()
-        active_rest.check_corrective_soreness(soreness, current_date_time, exercise_library)
+        active_rest.check_corrective_soreness(soreness, current_date_time, exercise_library, 2)
 
         assert len(active_rest.inhibit_exercises) > 0
         assert len(active_rest.static_stretch_exercises) > 0
@@ -99,7 +99,7 @@ def test_active_rest_after_training_check_prevention_soreness_severity_3():
         historic_date_time = current_date_time - timedelta(days=31)
         soreness.first_reported_date_time = historic_date_time
         exercise_library = exercise_library_datastore.get()
-        active_rest.check_corrective_soreness(soreness, current_date_time, exercise_library)
+        active_rest.check_corrective_soreness(soreness, current_date_time, exercise_library, 2)
 
         assert len(active_rest.inhibit_exercises) > 0
         assert len(active_rest.static_stretch_exercises) > 0
@@ -121,7 +121,7 @@ def test_active_rest_after_training_check_prevention_pain_severity_2():
         historic_date_time = current_date_time - timedelta(days=31)
         soreness.first_reported_date_time = historic_date_time
         exercise_library = exercise_library_datastore.get()
-        active_rest.check_corrective_pain(soreness, current_date_time, exercise_library)
+        active_rest.check_corrective_pain(soreness, current_date_time, exercise_library, 2)
 
         assert len(active_rest.inhibit_exercises) > 0
         assert len(active_rest.static_stretch_exercises) > 0
@@ -144,7 +144,7 @@ def test_active_rest_after_training_check_prevention_pain_severity_3():
         historic_date_time = current_date_time - timedelta(days=31)
         soreness.first_reported_date_time = historic_date_time
         exercise_library = exercise_library_datastore.get()
-        active_rest.check_corrective_pain(soreness, current_date_time, exercise_library)
+        active_rest.check_corrective_pain(soreness, current_date_time, exercise_library, 2)
 
         assert len(active_rest.inhibit_exercises) > 0
         assert len(active_rest.static_stretch_exercises) > 0
@@ -294,7 +294,7 @@ def test_active_rest_before_training_check_prevention_soreness_severity_2():
         historic_date_time = current_date_time - timedelta(days=31)
         soreness.first_reported_date_time = historic_date_time
         exercise_library = exercise_library_datastore.get()
-        active_rest.check_corrective_soreness(soreness, current_date_time, exercise_library)
+        active_rest.check_corrective_soreness(soreness, current_date_time, exercise_library, 2)
 
         assert len(active_rest.inhibit_exercises) > 0
         assert len(active_rest.static_stretch_exercises) > 0
@@ -317,7 +317,7 @@ def test_active_rest_before_training_check_prevention_soreness_severity_3():
         historic_date_time = current_date_time - timedelta(days=31)
         soreness.first_reported_date_time = historic_date_time
         exercise_library = exercise_library_datastore.get()
-        active_rest.check_corrective_soreness(soreness, current_date_time, exercise_library)
+        active_rest.check_corrective_soreness(soreness, current_date_time, exercise_library, 2)
 
         assert len(active_rest.inhibit_exercises) > 0, 'Error with ' + str(BodyPartLocation(b))
         assert len(active_rest.static_stretch_exercises) > 0, 'Error with ' + str(BodyPartLocation(b))
@@ -340,7 +340,7 @@ def test_active_rest_before_training_check_prevention_pain_severity_2():
         historic_date_time = current_date_time - timedelta(days=31)
         soreness.first_reported_date_time = historic_date_time
         exercise_library = exercise_library_datastore.get()
-        active_rest.check_corrective_pain(soreness, current_date_time, exercise_library)
+        active_rest.check_corrective_pain(soreness, current_date_time, exercise_library, 2)
 
         assert len(active_rest.inhibit_exercises) > 0
         assert len(active_rest.static_stretch_exercises) > 0
@@ -363,7 +363,7 @@ def test_active_rest_before_training_check_prevention_pain_severity_3():
         historic_date_time = current_date_time - timedelta(days=31)
         soreness.first_reported_date_time = historic_date_time
         exercise_library = exercise_library_datastore.get()
-        active_rest.check_corrective_pain(soreness, current_date_time, exercise_library)
+        active_rest.check_corrective_pain(soreness, current_date_time, exercise_library, 2)
 
         assert len(active_rest.inhibit_exercises) > 0
         assert len(active_rest.static_stretch_exercises) > 0
