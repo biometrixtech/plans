@@ -178,15 +178,21 @@ class ModalityBase(object):
     def set_plan_dosage(self, soreness_list, muscular_strain_high):
 
         care_for_pain_present = False
-        historic_status_present = False
+        pain_reported_today = False
+        soreness_historic_status_present = False
+        soreness_reported_today = False
         severity_greater_than_2 = False
 
         for s in soreness_list:
             if s.pain and (s.historic_soreness_status is None or s.is_dormant_cleared()):
                 care_for_pain_present = True
+            if s.pain:
+                pain_reported_today = True
+            if not s.pain and s.daily:
+                soreness_reported_today = True
             if (not s.pain and s.historic_soreness_status is not None and not s.is_dormant_cleared() and
                     s.historic_soreness_status is not HistoricSorenessStatus.doms):
-                historic_status_present = True
+                soreness_historic_status_present = True
             if s.severity >= 2:
                 severity_greater_than_2 = True
 
@@ -194,7 +200,7 @@ class ModalityBase(object):
 
         if care_for_pain_present:
             self.default_plan = "Comprehensive"
-        elif not severity_greater_than_2 and not care_for_pain_present and not historic_status_present:
+        elif not severity_greater_than_2 and not pain_reported_today and not soreness_historic_status_present and soreness_reported_today:
             if not increased_sensitivity:
                 self.default_plan = "Efficient"
             else:
