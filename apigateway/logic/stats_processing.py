@@ -286,9 +286,9 @@ class StatsProcessing(object):
                 total_load += t.training_volume(athlete_stats.load_stats)
 
         if total_load > 0:
-            muscular_strain = DataSeries(self.event_date, (sore_load / float(total_load)) * 100)
+            muscular_strain = DataSeries(self.event_date, 100 - ((sore_load / float(total_load)) * 100))
         else:
-            muscular_strain = DataSeries(self.event_date, 0)
+            muscular_strain = DataSeries(self.event_date, 100)
 
         return muscular_strain
 
