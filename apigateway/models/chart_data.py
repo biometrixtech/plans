@@ -172,12 +172,12 @@ class TrainingVolumeChartData(Serialisable):
 
 class MuscularStrainChart(BaseChart):
     def __init__(self, end_date):
-        super().__init__(end_date)
+        super().__init__(end_date)  # backdate this since it was calculated overnight
 
     def add_muscular_strain(self, muscular_strain):
 
-        if muscular_strain is not None and muscular_strain.date.date() in self.data:
-            self.data[muscular_strain.date.date()].value += muscular_strain.value
+        if muscular_strain is not None and (muscular_strain.date - timedelta(days=1)).date() in self.data:
+            self.data[(muscular_strain.date - timedelta(days=1)).date()].value += muscular_strain.value
 
 
 class DOMSChart(BaseChart):
