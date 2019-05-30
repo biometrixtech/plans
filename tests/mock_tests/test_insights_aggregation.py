@@ -33,6 +33,13 @@ def test_insights_text():
 
 
 def test_aggregate_insights_first_exposure():
+    """
+    first exposure of alert
+        Should be first
+        Not parent
+        not longitudinal
+        multiple body part present and should be grouped together
+    """
     current_date_time = datetime.datetime.now()
     alert1 = get_alert(14, (11, 1))
     alert2 = get_alert(14, (11, 2))
@@ -48,12 +55,16 @@ def test_aggregate_insights_first_exposure():
     assert not insights[0].parent
     assert not insights[0].longitudinal
     assert insights[0].styling == 0
+    assert len(insights[0].body_parts) == 2
     insights_json = insights[0].json_serialise()
     insights2 = AthleteInsight.json_deserialise(insights_json)
     assert insights2.child_triggers
 
 
 def test_aggregate_insights_no_alerts():
+    """
+    No alerts for the day should result in no insights
+    """
     current_date_time = datetime.datetime.now()
 
     alerts = []
@@ -65,6 +76,9 @@ def test_aggregate_insights_no_alerts():
 
 
 def test_aggregate_insights_trigger_type_not_displayed():
+    """
+    alert present but marked as do not display should result in no insights
+    """
     current_date_time = datetime.datetime.now()
     alert1 = get_alert(12, (11, 1))
 
@@ -77,6 +91,10 @@ def test_aggregate_insights_trigger_type_not_displayed():
 
 
 def test_aggregate_insights_multiple_same_body_part():
+    """
+    Same trigger with same body part twice (happens when same trigger is applied to different modalities)
+    Should result in a single inisght with one body part
+    """
     current_date_time = datetime.datetime.now()
     alert1 = get_alert(14, (11, 1))
     alert2 = get_alert(14, (11, 1))
@@ -151,6 +169,10 @@ def test_aggregate_insights_two_same_child_one_different_same_parent():
 
 
 def test_aggregate_insights_exposed():
+    """
+    User has already been exposed to this trigger_type
+    Should get subsequent text (not first)
+    """
     current_date_time = datetime.datetime.now()
     alert1 = get_alert(14, (11, 1))
 
@@ -170,6 +192,10 @@ def test_aggregate_insights_exposed():
 
 
 def test_aggregate_insights_exposed_group():
+    """
+    User was previously exposed to a different trigger in the same parent group
+    Should see the subsequent text
+    """
     current_date_time = datetime.datetime.now()
     alert1 = get_alert(7, (11, 1))
 
@@ -188,6 +214,10 @@ def test_aggregate_insights_exposed_group():
 
 
 def test_aggregate_insights_group_priority():
+    """
+    if low pain and high pain exist for different body parts, they should be grouped together
+    and priority should be the one for high pain
+    """
     current_date_time = datetime.datetime.now()
     alert1 = get_alert(14, (11, 1))
     alert2 = get_alert(15, (11, 2))
@@ -208,6 +238,10 @@ def test_aggregate_insights_group_priority():
 
 
 def test_aggregate_insights_longitutinal():
+    """
+    longitudinal insight first exposed 5 days ago. Should be marked longitudinal and saved in athlete stats
+    Cleared today when there's no alert with the same trigger type
+    """
     current_date_time = datetime.datetime.now()
     alert1 = get_alert(7, (11, 1))
 
@@ -223,6 +257,7 @@ def test_aggregate_insights_longitutinal():
     assert not insights[0].parent
     assert insights[0].longitudinal
     assert insights[0].start_date_time == current_date_time - datetime.timedelta(days=5)
+    assert athlete_stats.longitudinal_insights[0] == insights[0]
 
     daily_plan.insights = []
     athlete_stats.exposed_triggers = [TriggerType(7)]
@@ -232,9 +267,15 @@ def test_aggregate_insights_longitutinal():
     assert not insights[0].parent
     assert insights[0].longitudinal
     assert insights[0].start_date_time == current_date_time
+    assert insights[0].cleared
 
 
 def test_aggregate_insights_cleared():
+    """
+    longitudinal insight first exposed 5 days ago.
+    Cleared today
+    When cleared date should be today
+    """
     current_date_time = datetime.datetime.now()
     alert1 = get_alert(7, (11, 1))
 
@@ -262,6 +303,11 @@ def test_aggregate_insights_cleared():
 
 
 def test_aggregate_insights_cleared_same_parent_group():
+    """
+    parent group started yesterday
+    one of the child cleared today
+    should result in two insights, first not cleared and second cleared
+    """
     current_date_time = datetime.datetime.now()
     alert1 = get_alert(7, (11, 1))
     alert2 = get_alert(8, (11, 2))
@@ -291,8 +337,11 @@ def test_aggregate_insights_cleared_same_parent_group():
 
     assert not insights[0].first
     assert not insights[0].parent
+    assert insights[0].trigger_type == alert2.goal.trigger_type
 
     assert not insights[1].first
+    assert not insights[1].parent
+    assert insights[1].trigger_type == alert1.goal.trigger_type
     assert insights[1].longitudinal
     assert insights[1].cleared
     assert insights[1].start_date_time == current_date_time

@@ -48,7 +48,7 @@ class DailyPlanDatastore(object):
         if day_of_week is not None:
             query['day_of_week'] = day_of_week
         if stats_processing:
-            mongo_cursor = mongo_collection.find(query, {'date':1, user_id: 1, 'training_sessions': 1, 'daily_readiness_survey': 1})
+            mongo_cursor = mongo_collection.find(query, {'date': 1, user_id: 1, 'training_sessions': 1, 'daily_readiness_survey': 1})
         else:
             mongo_cursor = mongo_collection.find(query)
         ret = []

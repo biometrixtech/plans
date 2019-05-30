@@ -28,7 +28,10 @@ class AthleteStatusProcessing(object):
 
     def get_previous_soreness(self):
         # read plans from yesterday and today
-        daily_plans = self.daily_plan_store.get(self.user_id, format_date(parse_date(self.event_date) - datetime.timedelta(days=1)), self.event_date)
+        daily_plans = self.daily_plan_store.get(self.user_id,
+                                                format_date(parse_date(self.event_date) - datetime.timedelta(days=1)),
+                                                self.event_date,
+                                                stats_processing=True)
         # get soreness from readiness
         readiness_surveys = [plan.daily_readiness_survey for plan in daily_plans if plan.daily_readiness_survey is not None]
         for rs_survey in readiness_surveys:
@@ -38,9 +41,6 @@ class AthleteStatusProcessing(object):
         for plan in daily_plans:
             post_session_surveys.extend([ts.post_session_survey for ts in plan.training_sessions if ts is not None and
                                          ts.post_session_survey is not None])
-            #     [PostSessionSurvey.post_session_survey_from_training_session(ts.post_session_survey, self.user_id, ts.id, ts.session_type().value, plan.event_date)
-            #      for ts in plan.training_sessions if ts is not None]
-            # post_session_surveys.extend([s for s in post_surveys if s is not None])
         post_session_surveys = [s for s in post_session_surveys if s is not None and
                                 self.soreness_start_time <= s.event_date < self.current_time]
         for ps_survey in post_session_surveys:
@@ -116,11 +116,11 @@ class AthleteStatusProcessing(object):
         return [s for s in self.cleaned_sore_body_parts if not s.get('delete', False)]
 
     def get_typical_sessions(self):
-        plans = self.daily_plan_store.get(
-                                          user_id=self.user_id,
+        plans = self.daily_plan_store.get(user_id=self.user_id,
                                           start_date=self.typical_sessions_start_date,
-                                          end_date=self.event_date
-                                         )
+                                          end_date=self.event_date,
+                                          stats_processing=True
+                                          )
         sessions = []
         for plan in plans:
             sessions.extend(plan.training_sessions)
