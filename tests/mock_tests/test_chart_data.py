@@ -165,7 +165,7 @@ def test_muscular_strain_chart():
     chart_data = chart.get_output_list()
 
     assert len(chart_data) == 14
-    assert chart_data[9].value == 70
+    assert chart_data[8].value == 70
 
 
 def test_high_relative_load_chart():

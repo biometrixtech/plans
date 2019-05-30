@@ -190,8 +190,17 @@ class StatsProcessing(object):
                 current_athlete_stats.muscular_strain.sort(key=lambda x: x.date, reverse=False)
                 del (current_athlete_stats.muscular_strain[0])
 
-            current_athlete_stats.muscular_strain.append(self.get_muscular_strain(current_athlete_stats, cleared_soreness,
-                                                                      training_sessions))
+            most_recent_muscular_strain = self.get_muscular_strain(current_athlete_stats, cleared_soreness,
+                                                                      training_sessions)
+
+            found = False
+            for m in range(0, len(current_athlete_stats.muscular_strain)):
+                if current_athlete_stats.muscular_strain[m].date.date() == most_recent_muscular_strain.date.date():
+                    current_athlete_stats.muscular_strain[m] = most_recent_muscular_strain
+                    found = True
+
+            if not found:
+                current_athlete_stats.muscular_strain.append(most_recent_muscular_strain)
 
             # training_volume_processing.fill_load_monitoring_measures(self.all_daily_readiness_surveys, self.all_plans, parse_date(self.event_date))
             # current_athlete_stats.muscular_strain_increasing = training_volume_processing.muscular_strain_increasing()
