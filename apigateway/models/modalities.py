@@ -704,7 +704,7 @@ class ActiveRest(ModalityBase):
                                                        sports)
                 self.check_reactive_care_soreness(s, exercise_library, max_severity)
                 self.check_reactive_care_pain(s, exercise_library, max_severity)
-                if max_severity <= 3:
+                if max_severity < 3:
                     self.check_corrective_soreness(s, self.event_date_time, exercise_library)
                     self.check_corrective_pain(s, self.event_date_time, exercise_library)
         elif high_relative_load_session or high_relative_intensity_logged or muscular_strain_high:
