@@ -817,3 +817,32 @@ def test_aggregate_trends_trigger_type_not_present_in_trends():
     assert len(trends.response.alerts) == 2
     assert trends.response.alerts[0].trigger_type == TriggerType(203)
     assert trends.response.alerts[1].trigger_type == TriggerType(202)
+
+
+def test_aggregate_trends_cleared_trend_persist_though_the_day():
+    current_date_time = datetime.datetime.now()
+    trend = Trend(TriggerType(7))
+    trend.body_parts = [BodyPartSide(BodyPartLocation(11), 2)]
+    trend.add_data()
+
+    alerts = []
+    event_date_time = current_date_time
+    daily_plan = DailyPlan(format_date(event_date_time))
+    athlete_stats = AthleteStats('test_user')
+    athlete_stats.exposed_triggers = []
+    athlete_stats.longitudinal_trends = [trend]
+    # first use
+    AlertsProcessing(daily_plan, athlete_stats, event_date_time).aggregate_alerts(alerts)
+    trends = daily_plan.trends
+    assert len(trends.response.alerts) == 2
+    assert trends.response.alerts[0].trigger_type == TriggerType(7)
+    assert trends.response.alerts[1].trigger_type == TriggerType(203)
+    assert len(athlete_stats.longitudinal_trends) == 0
+
+    # second use, still no alert
+    AlertsProcessing(daily_plan, athlete_stats, event_date_time).aggregate_alerts(alerts)
+    trends = daily_plan.trends
+    assert len(trends.response.alerts) == 2
+    assert trends.response.alerts[0].trigger_type == TriggerType(7)
+    assert trends.response.alerts[1].trigger_type == TriggerType(203)
+    assert len(athlete_stats.longitudinal_trends) == 0
