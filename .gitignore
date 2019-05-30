@@ -30,3 +30,5 @@ apigateway/session.py
 !apigateway/pip_requirements
 !apigateway/routes
 *__pycache__*
+output/*
+tests/database_tests/*.csv

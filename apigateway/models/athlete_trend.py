@@ -290,7 +290,7 @@ class TrendCategory(object):
         return trend_category
 
     def get_cta(self):
-        cta_names = [alert.cta for alert in self.alerts]
+        cta_names = [alert.cta for alert in self.alerts if not alert.cleared]
         cta_names = set([item for items in cta_names for item in items])
         for cta_name in cta_names:
             cta_data = TriggerData().get_cta_data(cta_name)

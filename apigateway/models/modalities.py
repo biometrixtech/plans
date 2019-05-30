@@ -707,6 +707,7 @@ class ActiveRest(ModalityBase):
                 if max_severity < 3:
                     self.check_corrective_soreness(s, self.event_date_time, exercise_library)
                     self.check_corrective_pain(s, self.event_date_time, exercise_library)
+
         elif high_relative_load_session or high_relative_intensity_logged or muscular_strain_high:
             self.check_reactive_recover_from_sport([], exercise_library, high_relative_load_session,
                                                    high_relative_intensity_logged,
@@ -735,12 +736,12 @@ class ActiveRest(ModalityBase):
         if len(hist_soreness) > 0:
             goal = AthleteGoal("Expedite tissue regeneration", 1, AthleteGoalType.sport)
             goal.trigger_type = TriggerType.hist_sore_less_30_sport  # 7
-            for sport_name in sports:
-                for soreness in hist_soreness:
-                    alert = Alert(goal)
-                    alert.sport_name = sport_name
-                    alert.body_part = BodyPartSide(soreness.body_part.location, soreness.side)
-                    self.alerts.append(alert)
+            # for sport_name in sports:
+            for soreness in hist_soreness:
+                alert = Alert(goal)
+                # alert.sport_name = sport_name
+                alert.body_part = BodyPartSide(soreness.body_part.location, soreness.side)
+                self.alerts.append(alert)
 
         if high_relative_load_session or high_relative_intensity_logged:
             goal = AthleteGoal("Expedite tissue regeneration", 1, AthleteGoalType.sport)
@@ -1571,7 +1572,7 @@ class WarmUp(ModalityBase, Serialisable):
         if soreness.historic_soreness_status is not None and soreness.first_reported_date_time is not None \
                 and not soreness.is_dormant_cleared() and soreness.historic_soreness_status is not HistoricSorenessStatus.doms:
             days_sore = (event_date_time - soreness.first_reported_date_time).days
-            if not soreness.pain or days_sore > 30:
+            if not soreness.pain and days_sore > 30:
                 goal = AthleteGoal("Improve neuromuscular control", 1, AthleteGoalType.preempt_corrective)
                 #goal.trigger = "Pers, Pers-2 Soreness > 30d"
                 goal.trigger_type = TriggerType.hist_sore_greater_30
@@ -1717,12 +1718,12 @@ class CoolDown(ModalityBase, Serialisable):
         if len(hist_soreness) > 0:
             goal = AthleteGoal("Expedite tissue regeneration", 1, AthleteGoalType.sport)
             goal.trigger_type = TriggerType.hist_sore_less_30_sport  # 7
-            if sport_name is not None:
-                for soreness in hist_soreness:
-                    alert = Alert(goal)
-                    alert.sport_name = sport_name
-                    alert.body_part = BodyPartSide(soreness.body_part.location, soreness.side)
-                    self.alerts.append(alert)
+            # if sport_name is not None:
+            for soreness in hist_soreness:
+                alert = Alert(goal)
+                alert.sport_name = sport_name
+                alert.body_part = BodyPartSide(soreness.body_part.location, soreness.side)
+                self.alerts.append(alert)
 
         if self.high_relative_volume_logged or self.high_relative_intensity_logged:
             goal = AthleteGoal("Expedite tissue regeneration", 1, AthleteGoalType.sport)

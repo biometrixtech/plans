@@ -134,6 +134,8 @@ def create_plan(test_parameter, body_part_list, severity_list, side_list, pain_l
     mgr = TrainingPlanManager(user_id, data_store_collection)
     mgr.training_sessions = training_sessions
 
+    athlete_stats.longitudinal_insights = []
+    athlete_stats.longitudinal_trends = []
     daily_plan = mgr.create_daily_plan(format_date(current_date), format_datetime(current_date_time), athlete_stats=athlete_stats)
 
     return daily_plan
@@ -466,7 +468,7 @@ def test_pre_active_rest_limited_body_parts():
 
     current_date = date.today()
     current_date_time = datetime.combine(current_date, time(9, 0, 0))
-    current_date_time = current_date_time - timedelta(days=16)
+    # current_date_time = current_date_time - timedelta(days=16)
 
     parm_list = get_test_parameters_list()
 
