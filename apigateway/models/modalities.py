@@ -199,12 +199,12 @@ class ModalityBase(object):
         for ex, a in assigned_exercises.items():
             if len(a.dosages) > 0:
                 a.dosages = sorted(a.dosages, key=lambda x: (3-int(x.priority), x.severity(),
-                                                             x.comprehensive_sets_assigned,
-                                                             x.comprehensive_reps_assigned,
-                                                             x.complete_sets_assigned,
-                                                             x.complete_reps_assigned,
-                                                             x.efficient_sets_assigned,
-                                                             x.efficient_reps_assigned), reverse=True)
+                                                             x.default_comprehensive_sets_assigned,
+                                                             x.default_comprehensive_reps_assigned,
+                                                             x.default_complete_sets_assigned,
+                                                             x.default_complete_reps_assigned,
+                                                             x.default_efficient_sets_assigned,
+                                                             x.default_efficient_reps_assigned), reverse=True)
 
                 dosage = a.dosages[0]
 
