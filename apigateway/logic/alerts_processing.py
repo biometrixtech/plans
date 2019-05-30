@@ -17,6 +17,7 @@ class AlertsProcessing(object):
         trends = AthleteTrends()
         insights = self.combine_alerts_to_insights(alerts, trends)
         self.clear_trends(trends)
+        trends = self.combine_new_trends_with_previous(trends)
         if TriggerType(9) in exposed_triggers:
             insights = [insight for insight in insights if insight.trigger_type != TriggerType(9)]
         insights, longitudinal_insights = self.clear_insight(insights, longitudinal_insights)
@@ -104,6 +105,19 @@ class AlertsProcessing(object):
             if old.cleared:
                 new_insights.append(old)
         return new_insights
+
+    def combine_new_trends_with_previous(self, new_trends):
+        if self.daily_plan.trends is not None:
+            for old in self.daily_plan.trends.stress.alerts:
+                if old.cleared:
+                    new_trends.stress.alerts.append(old)
+            for old in self.daily_plan.trends.response.alerts:
+                if old.cleared:
+                    new_trends.response.alerts.append(old)
+            for old in self.daily_plan.trends.biomechanics.alerts:
+                if old.cleared:
+                    new_trends.biomechanics.alerts.append(old)
+        return new_trends
 
     def combine_alerts_to_insights(self, alerts, trends):
         existing_triggers = []
