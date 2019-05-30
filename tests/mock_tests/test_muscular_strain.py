@@ -67,7 +67,7 @@ def test_no_maintenance_load_overloading():
 
     muscular_strain = stats_processing.get_muscular_strain(athlete_stats, [], training_sessions)
 
-    assert muscular_strain.value == 100.0
+    assert muscular_strain.value == 0.0
 
 
 def test_no_overloading():
@@ -96,7 +96,7 @@ def test_no_overloading():
 
     muscular_strain = stats_processing.get_muscular_strain(athlete_stats, [], training_sessions)
 
-    assert muscular_strain.value == 0.0
+    assert muscular_strain.value == 100.0
 
 
 def test_maintenance_load_overloading():
@@ -133,4 +133,4 @@ def test_maintenance_load_overloading():
 
     muscular_strain = stats_processing.get_muscular_strain(athlete_stats, [], training_sessions)
 
-    assert round(muscular_strain.value, 2) == 88.89
+    assert round(muscular_strain.value, 2) == (100 - 88.89)
