@@ -483,16 +483,16 @@ def test_pre_active_rest_limited_body_parts():
 
         historic_soreness_status_1 = [None,
                                       HistoricSorenessStatus.dormant_cleared,
-                                      HistoricSorenessStatus.almost_acute_pain,
+                                      #HistoricSorenessStatus.almost_acute_pain,
                                       HistoricSorenessStatus.acute_pain,
-                                      HistoricSorenessStatus.almost_persistent_pain,
+                                      #HistoricSorenessStatus.almost_persistent_pain,
                                       HistoricSorenessStatus.persistent_pain,
-                                      HistoricSorenessStatus.almost_persistent_2_pain,
-                                      HistoricSorenessStatus.almost_persistent_2_pain_acute,
+                                      #HistoricSorenessStatus.almost_persistent_2_pain,
+                                      #HistoricSorenessStatus.almost_persistent_2_pain_acute,
                                       HistoricSorenessStatus.persistent_2_pain,
-                                      HistoricSorenessStatus.almost_persistent_soreness,
+                                      #HistoricSorenessStatus.almost_persistent_soreness,
                                       HistoricSorenessStatus.persistent_soreness,
-                                      HistoricSorenessStatus.almost_persistent_2_soreness,
+                                      #HistoricSorenessStatus.almost_persistent_2_soreness,
                                       HistoricSorenessStatus.persistent_2_soreness]
 
         f1 = open('../../output/' + test_parm.file_name + "_a.csv", 'w')
@@ -522,7 +522,7 @@ def test_pre_active_rest_limited_body_parts():
             for m1 in max_severity_1:
                 for h1 in historic_soreness_status_1:
                     for p in is_pain_1:
-                        if 0==0 or (b1 == 6 and h1 is None and not test_parm.doms and not test_parm.athlete_stats.muscular_strain_increasing):
+                        if (0==0) or (b1 == 4 and not test_parm.doms and not test_parm.athlete_stats.muscular_strain_increasing):
                             body_part_list = []
                             body_part_list.append(b1)
 
@@ -538,6 +538,9 @@ def test_pre_active_rest_limited_body_parts():
                             historic_soreness.first_reported_date_time = current_date_time - timedelta(days=16)
                             historic_soreness.historic_soreness_status = h1
                             historic_soreness_list.append(historic_soreness)
+
+                            if h1 == HistoricSorenessStatus.almost_persistent_pain:
+                                i = 0
 
                             if test_parm.doms and not p:
                                 temp_list = list(b for b in body_parts_1 if b != b1)
@@ -644,7 +647,7 @@ def test_pre_active_rest_limited_body_parts():
 
                                     ' ** '.join(isolated_activate_goals_triggers) + ',' +
 
-                                    str(round(efficient_isolated_activate_minutes, 2)) + ',' +str(round(complete_isolated_activate_minutes, 2)) + ',' +str(round(complete_isolated_activate_minutes, 2)) + ',' +
+                                    str(round(efficient_isolated_activate_minutes, 2)) + ',' +str(round(complete_isolated_activate_minutes, 2)) + ',' +str(round(comprehensive_isolated_activate_minutes, 2)) + ',' +
 
                                     ';'.join(convert_assigned_dict_exercises(
                                         plan_obj.isolated_activate_exercises)) + ',' +

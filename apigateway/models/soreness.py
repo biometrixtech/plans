@@ -510,7 +510,13 @@ class AssignedExercise(Serialisable):
 
     def set_dosage_ranking(self):
         if len(self.dosages) > 1:
-            self.dosages = sorted(self.dosages, key=lambda x: x.get_total_dosage(), reverse=True)
+            self.dosages = sorted(self.dosages, key=lambda x: (3-int(x.priority), x.severity(),
+                                                               x.default_comprehensive_sets_assigned,
+                                                               x.default_comprehensive_reps_assigned,
+                                                               x.default_complete_sets_assigned,
+                                                               x.default_complete_reps_assigned,
+                                                               x.default_efficient_sets_assigned,
+                                                               x.default_efficient_reps_assigned), reverse=True)
             rank = 0
             for dosage in self.dosages:
                 dosage.ranking = rank
