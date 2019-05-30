@@ -18,6 +18,12 @@ apigateway/itsdangerous.py
 apigateway/flask_lambda.py
 apigateway/six.py
 apigateway/semver.py
+apigateway/create_plan.py
+apigateway/readiness.py
+apigateway/process_metrics.py
+apigateway/update_stats.py
+apigateway/aggregate_dashboard.py
+apigateway/session.py
 !apigateway/datastores/
 !apigateway/logic/
 !apigateway/models

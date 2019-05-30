@@ -28,6 +28,7 @@ def handle_previous_health_data_write(principal_id=None):
     survey_processor = SurveyProcessing(user_id,
                                         parse_datetime(event_date),
                                         datastore_collection=datastore_collection)
+    survey_processor.user_age = request.json.get('user_age', 20)
     survey_processor.plans = daily_plan_datastore.get(user_id=user_id, start_date=start_date, end_date=end_date)
     if 'sessions' in request.json and len(request.json['sessions']) > 0:
         survey_processor.process_historic_health_data(request.json['sessions'], event_date)

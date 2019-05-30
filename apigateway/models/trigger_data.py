@@ -8,7 +8,7 @@ with open(file_path, 'r') as f:
 visualization_data = {
             1: {
                 'title': "",
-                'y_axis_1': "Training Volume",
+                'y_axis_1': "Load",
                 'y_axis_2': "",
                 'legend': [
                     {
@@ -20,36 +20,36 @@ visualization_data = {
             },
             2: {
                 'title': "",
-                'y_axis_1': "Training Volume",
+                'y_axis_1': "Load",
                 'y_axis_2': "",
                 'legend': [
                     {
                         'color': 0,
-                        'text': "High load days",
+                        'text': "High training loads",
                         'type': 0
                     }
                 ]
             },
             3: {
                 'title': "",
-                'y_axis_1': "Training Volume",
+                'y_axis_1': "Load",
                 'y_axis_2': "Severity",
                 'legend': [
                     {
                         'color': 2,
-                        'text': "Pain severity",
+                        'text': "{bodypart} pain severity",
                         'type': 0
                     },
                     {
                         'color': 1,
-                        'text': "Soreness severity",
+                        'text': "{bodypart} soreness severity",
                         'type': 0
                     }
                 ]
             },
             4: {
                 'title': "",
-                'y_axis_1': "Training Volume",
+                'y_axis_1': "Load",
                 'y_axis_2': "Severity",
                 'legend': [
                     {
@@ -66,7 +66,7 @@ visualization_data = {
             },
             5: {
                 'title': "",
-                'y_axis_1': "Training Volume",
+                'y_axis_1': "Load",
                 'y_axis_2': "Severity",
                 'legend': [
                     {
@@ -88,7 +88,7 @@ visualization_data = {
             },
             6: {
                 'title': "",
-                'y_axis_1': "Training Volume",
+                'y_axis_1': "Load",
                 'y_axis_2': "Movement Quality",
                 'legend': [
                 ]
@@ -151,8 +151,8 @@ cta_data = {
     'mobilize': {
         'header': {
             'stress': "Mobilize",
-            'response': "Mobilize to Recover",
-            'biomechanics': "Mobilize as Prevention"
+            'response': "Mobilize",
+            'biomechanics': "Mobilize"
         },
         'benefit': {
             'stress': "to expedite tissue healing",

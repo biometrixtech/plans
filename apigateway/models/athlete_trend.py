@@ -122,7 +122,6 @@ class Trend(object):
         self.present_in_trends = True
         self.cleared = False
         self.longitudinal = False
-        self.last_triggered_date_time = None
 
     def json_serialise(self):
         ret = {
@@ -142,8 +141,7 @@ class Trend(object):
             'priority': self.priority,
             'present_in_trends': self.present_in_trends,
             'cleared': self.cleared,
-            'longitudinal': self.longitudinal,
-            'last_triggered_date_time': format_datetime(self.last_triggered_date_time) if self.last_triggered_date_time is not None else None
+            'longitudinal': self.longitudinal
         }
         return ret
 
@@ -165,8 +163,6 @@ class Trend(object):
         trend.present_in_trends = input_dict.get('present_in_trends', True)
         trend.cleared = input_dict.get('cleared', False)
         trend.longitudinal = input_dict.get('longitudinal', False)
-        trend.last_triggered_date_time = parse_datetime(input_dict['last_triggered_date_time']) if \
-            input_dict.get('last_triggered_date_time', None) is not None else None
         if trend.visualization_type == VisualizationType.load:
             trend.data = []
         elif trend.visualization_type == VisualizationType.session:
@@ -202,6 +198,8 @@ class Trend(object):
         else:
             legends = visualization_data['legend']
         self.visualization_data.plot_legends = [Legend.json_deserialise(legend) for legend in legends]
+        for legend in self.visualization_data.plot_legends:
+            legend.text = TextGenerator.get_cleaned_text(legend.text, body_parts=self.body_parts)
 
         self.visualization_title.text = TextGenerator.get_cleaned_text(plot_data['title'], body_parts=self.body_parts)
         self.visualization_title.body_part_text = [TextGenerator.get_body_part_text(self.body_parts)]

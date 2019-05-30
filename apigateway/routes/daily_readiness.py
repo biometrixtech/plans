@@ -55,6 +55,7 @@ def handle_daily_readiness_create(principal_id):
         athlete_stats = AthleteStats(user_id)
         athlete_stats.event_date = plan_event_date
     survey_processor = SurveyProcessing(user_id, event_date, athlete_stats, datastore_collection)
+    survey_processor.user_age = request.json.get('user_age', 20)
 
     if 'sessions_planned' in request.json and not request.json['sessions_planned']:
         sessions_planned = False
