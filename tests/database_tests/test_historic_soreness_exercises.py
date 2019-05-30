@@ -539,7 +539,7 @@ def test_pre_active_rest_limited_body_parts():
                             historic_soreness.historic_soreness_status = h1
                             historic_soreness_list.append(historic_soreness)
 
-                            if h1 == HistoricSorenessStatus.almost_persistent_pain:
+                            if b1 == 14 and h1 == HistoricSorenessStatus.acute_pain:
                                 i = 0
 
                             if test_parm.doms and not p:
