@@ -22,6 +22,14 @@ class ModalityGoal(Serialisable):
         }
         return ret
 
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        goal = cls()
+        goal.efficient_active = input_dict.get('efficient_active', False)
+        goal.complete_active = input_dict.get('complete_active', False)
+        goal.comprehensive_active = input_dict.get('comprehensive_active', False)
+        return goal
+
 
 class DosageDuration(object):
     def __init__(self, efficient_duration, complete_duration, comprehensive_duration):
@@ -833,7 +841,7 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
             'active': self.active,
             'default_plan': self.default_plan,
             'alerts': [g.json_serialise() for g in self.alerts],
-            'goals': {goal_type.value: goal.json_serialise() for (goal_type, goal) in self.goals.items()}
+            'goals': {str(goal_type.value): goal.json_serialise() for (goal_type, goal) in self.goals.items()}
         }
         return ret
 
@@ -859,6 +867,7 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
                                                        for s in input_dict['isolated_activate_exercises']}
         pre_active_rest.default_plan = input_dict.get('default_plan', 'complete')
         pre_active_rest.alerts = [Alert.json_deserialise(alert) for alert in input_dict.get('alerts', [])]
+        pre_active_rest.goals = {AthleteGoalType(int(goal_type)): ModalityGoal.json_deserialise(goal) for (goal_type, goal) in input_dict.get('goals', {}).items()}
 
         return pre_active_rest
 
@@ -1204,7 +1213,7 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
             'active': self.active,
             'default_plan': self.default_plan,
             'alerts': [g.json_serialise() for g in self.alerts],
-            'goals': {goal_type.value: goal.json_serialise() for (goal_type, goal) in self.goals.items()}
+            'goals': {str(goal_type.value): goal.json_serialise() for (goal_type, goal) in self.goals.items()}
         }
         return ret
 
@@ -1228,6 +1237,7 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
                                                         for s in input_dict['isolated_activate_exercises']}
         post_active_rest.default_plan = input_dict.get('default_plan', 'complete')
         post_active_rest.alerts = [Alert.json_deserialise(alert) for alert in input_dict.get('alerts', [])]
+        post_active_rest.goals = {AthleteGoalType(int(goal_type)): ModalityGoal.json_deserialise(goal) for (goal_type, goal) in input_dict.get('goals', {}).items()}
 
         return post_active_rest
 
@@ -1686,7 +1696,7 @@ class CoolDown(ModalityBase, Serialisable):
             'completed': self.completed,
             'active': self.active,
             'alerts': [alert.json_serialise() for alert in self.alerts],
-            'goals': {goal_type.value: goal.json_serialise() for (goal_type, goal) in self.goals.items()}
+            'goals': {int(goal_type.value): goal.json_serialise() for (goal_type, goal) in self.goals.items()}
         }
         return ret
 
@@ -1705,6 +1715,7 @@ class CoolDown(ModalityBase, Serialisable):
         cooldown.completed = input_dict.get('completed', False)
         cooldown.active = input_dict.get('active', True)
         cooldown.alerts = [Alert.json_deserialise(alert) for alert in input_dict.get('alerts', [])]
+        cooldown.goals = {AthleteGoalType(int(goal_type)): ModalityGoal.json_deserialise(goal) for (goal_type, goal) in input_dict.get('goals', {}).items()}
 
         return cooldown
 
