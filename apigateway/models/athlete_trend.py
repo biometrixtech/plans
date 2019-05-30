@@ -198,6 +198,8 @@ class Trend(object):
         else:
             legends = visualization_data['legend']
         self.visualization_data.plot_legends = [Legend.json_deserialise(legend) for legend in legends]
+        for legend in self.visualization_data.plot_legends:
+            legend.text = TextGenerator.get_cleaned_text(legend.text, body_parts=self.body_parts)
 
         self.visualization_title.text = TextGenerator.get_cleaned_text(plot_data['title'], body_parts=self.body_parts)
         self.visualization_title.body_part_text = [TextGenerator.get_body_part_text(self.body_parts)]

@@ -50,7 +50,7 @@
                 "visualization_type": 1,
                 "visualization_range": 7,
                 "overlay_variable": "relative load per day (no overlay)",
-                "title": "Your Training History"
+                "title": "Your training history"
             },
             "cta": {
                 "input": "",
@@ -67,7 +67,7 @@
             "trigger_enum": 0,
             "trend_type": "Stress",
             "triggers": "High Load",
-            "goal_names": "Recover from {sport_name}",
+            "goal_names": "Expedite tissue regeneration",
             "length_of_impact": "single_day",
             "data_source": "training_volume",
             "insight_priority_plans": "9",
@@ -130,7 +130,7 @@
             "trigger_enum": 1,
             "trend_type": "Stress",
             "triggers": "Sore (Pers >30d, Pers_2 > 30d)  + Logged High Load",
-            "goal_names": "Mitigate Effects of Imbalance",
+            "goal_names": "Improve neuromuscular control",
             "length_of_impact": "single_day",
             "data_source": "soreness",
             "insight_priority_plans": "11",
@@ -193,7 +193,7 @@
             "trigger_enum": 2,
             "trend_type": "Stress",
             "triggers": "Pain (Acute, Pers, Pers_2) + Logged High Load",
-            "goal_names": "Mitigate Effects of Imbalance",
+            "goal_names": "Improve neuromuscular control",
             "length_of_impact": "single_day",
             "data_source": "pain",
             "insight_priority_plans": "11",
@@ -302,7 +302,7 @@
                 "visualization_type": 1,
                 "visualization_range": 7,
                 "overlay_variable": "Max Severity of Soreness reported per day for all body parts",
-                "title": "Your Soreness History"
+                "title": "Your soreness history"
             },
             "cta": {
                 "input": "",
@@ -365,7 +365,7 @@
                 "visualization_type": 1,
                 "visualization_range": 7,
                 "overlay_variable": "Max Severity of Pain reported per day for all body parts",
-                "title": "Your Pain History"
+                "title": "Your pain history"
             },
             "cta": {
                 "input": "",
@@ -428,7 +428,7 @@
                 "visualization_type": 1,
                 "visualization_range": 7,
                 "overlay_variable": "Movement Quality max and min of session Severity category per day to define color per day",
-                "title": "Your Biomechanical Response History"
+                "title": "Your biomechanical response history"
             },
             "cta": {
                 "input": "",
@@ -445,7 +445,7 @@
             "trigger_enum": 8,
             "trend_type": "Response",
             "triggers": "Overreaching as High Muscular Strain",
-            "goal_names": "Recover from {sport_name}",
+            "goal_names": "Expedite tissue regeneration",
             "length_of_impact": "multiple_days",
             "data_source": "soreness",
             "insight_priority_plans": "7",
@@ -508,7 +508,7 @@
             "trigger_enum": 7,
             "trend_type": "Response",
             "triggers": "Sore (Pers <30d, Pers_2 <30d)",
-            "goal_names": "Recover from {sport_name}",
+            "goal_names": "Expedite tissue regeneration",
             "length_of_impact": "multiple_days",
             "data_source": "soreness",
             "insight_priority_plans": "7",
@@ -571,7 +571,7 @@
             "trigger_enum": 11,
             "trend_type": "Response",
             "triggers": "Soreness Reported Today (as DOMs) Moderate DOMs = 1-2day, 2-3 severity Severe DOMs = 1-2day, 4-5 severity Minor DOMs = 2nd day, 1 severity  Mild Soreness = 1st day, 1 severity",
-            "goal_names": "Care for Soreness",
+            "goal_names": "Care for soreness",
             "length_of_impact": "multiple_days",
             "data_source": "soreness",
             "insight_priority_plans": "8",
@@ -634,7 +634,7 @@
             "trigger_enum": 12,
             "trend_type": "Response",
             "triggers": "Sore (Pers <30d, Pers_2 <30d) + Soreness Reported Today",
-            "goal_names": "Care for Soreness",
+            "goal_names": "Care for soreness",
             "length_of_impact": "single_day",
             "data_source": "soreness",
             "insight_priority_plans": "10",
@@ -697,7 +697,7 @@
             "trigger_enum": 13,
             "trend_type": "Response",
             "triggers": "Sore (Pers >30d, Pers_2 > 30d) + Soreness Reported Today",
-            "goal_names": "Care for Soreness",
+            "goal_names": "Care for soreness",
             "length_of_impact": "single_day",
             "data_source": "soreness",
             "insight_priority_plans": "10",
@@ -760,7 +760,7 @@
             "trigger_enum": 14,
             "trend_type": "Response",
             "triggers": "Pain reported today (severity 1, 2) + NOT historic pain",
-            "goal_names": "Address Pain",
+            "goal_names": "Care for pain",
             "length_of_impact": "single_day",
             "data_source": "pain",
             "insight_priority_plans": "1",
@@ -823,7 +823,7 @@
             "trigger_enum": 15,
             "trend_type": "Response",
             "triggers": "Pain reported today (severity 3-5) + NOT historic pain",
-            "goal_names": "Address Pain",
+            "goal_names": "Care for pain",
             "length_of_impact": "single_day",
             "data_source": "pain",
             "insight_priority_plans": "1",
@@ -886,7 +886,7 @@
             "trigger_enum": 23,
             "trend_type": "Response",
             "triggers": "Pain reported today  (severity 1, 2)  + (acute, pers<30, per>30)",
-            "goal_names": "Address Pain",
+            "goal_names": "Care for pain",
             "length_of_impact": "single_day",
             "data_source": "pain",
             "insight_priority_plans": "1",
@@ -949,7 +949,7 @@
             "trigger_enum": 24,
             "trend_type": "Response",
             "triggers": "Pain reported today (severity 3-5)  + (acute, pers<30, per>30)",
-            "goal_names": "Address Pain",
+            "goal_names": "Care for pain",
             "length_of_impact": "single_day",
             "data_source": "pain",
             "insight_priority_plans": "1",
@@ -1012,7 +1012,7 @@
             "trigger_enum": 21,
             "trend_type": "Response",
             "triggers": "Pain (Pers, Pers_2  < 30d)  + Pain NOT reported today",
-            "goal_names": "Mitigate Effects of Imbalance",
+            "goal_names": "Improve neuromuscular control",
             "length_of_impact": "single_day",
             "data_source": "pain",
             "insight_priority_plans": "12",
@@ -1075,7 +1075,7 @@
             "trigger_enum": 22,
             "trend_type": "Response",
             "triggers": "Pain (Pers, Pers_2  > 30d)  + Pain NOT reported today",
-            "goal_names": "Mitigate Effects of Imbalance",
+            "goal_names": "Improve neuromuscular control",
             "length_of_impact": "single_day",
             "data_source": "pain",
             "insight_priority_plans": "12",
@@ -1310,7 +1310,7 @@
                 "visualization_type": 1,
                 "visualization_range": 14,
                 "overlay_variable": "Max Severity of Soreness reported per day for all body parts",
-                "title": "Your Soreness History"
+                "title": "Your soreness history"
             },
             "cta": {
                 "input": "",
@@ -1373,7 +1373,7 @@
                 "visualization_type": 1,
                 "visualization_range": 14,
                 "overlay_variable": "Max Severity of Pain reported per day for all body parts",
-                "title": "Your Pain History"
+                "title": "Your pain history"
             },
             "cta": {
                 "input": "",
@@ -1436,7 +1436,7 @@
                 "visualization_type": 1,
                 "visualization_range": 14,
                 "overlay_variable": "Movement Quality max and min of session Severity category per day to define color per day",
-                "title": "Your Biomechanical Response History"
+                "title": "Your biomechanical response history"
             },
             "cta": {
                 "input": "",
@@ -1453,7 +1453,7 @@
             "trigger_enum": 19,
             "trend_type": "Biomechanics",
             "triggers": "Sore (Pers >30d, Pers_2 > 30d) ",
-            "goal_names": "Mitigate Effects of Imbalance  Correct Imbalance",
+            "goal_names": "Improve neuromuscular control  Reduce injury risk factors",
             "length_of_impact": "multiple_days",
             "data_source": "soreness",
             "insight_priority_plans": "6",
@@ -1516,7 +1516,7 @@
             "trigger_enum": 16,
             "trend_type": "Biomechanics",
             "triggers": "Pain (Acute, Pers, Pers_2)",
-            "goal_names": "Correct Imbalance",
+            "goal_names": "Reduce injury risk factors",
             "length_of_impact": "multiple_days",
             "data_source": "pain",
             "insight_priority_plans": "4",
