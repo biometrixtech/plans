@@ -8,6 +8,21 @@ import abc
 import datetime
 
 
+class ModalityGoal(Serialisable):
+    def __init__(self):
+        self.efficient_active = False
+        self.complete_active = False
+        self.comprehensive_active = False
+
+    def json_serialise(self):
+        ret = {
+            'efficient_active': self.efficient_active,
+            'complete_active': self.complete_active,
+            'comprehensive_active': self.comprehensive_active
+        }
+        return ret
+
+
 class DosageDuration(object):
     def __init__(self, efficient_duration, complete_duration, comprehensive_duration):
         self.efficient_duration = efficient_duration
@@ -112,6 +127,7 @@ class ModalityBase(object):
         self.efficient_winner = 1
         self.complete_winner = 1
         self.comprehensive_winner = 1
+        self.goals = {}
 
     def get_total_exercises(self):
         pass
@@ -138,6 +154,18 @@ class ModalityBase(object):
     @abc.abstractmethod
     def conditions_for_increased_sensitivity_met(self, soreness_list, muscular_strain_high):
         return False
+
+    def update_goals(self, dosage):
+
+        if dosage.goal.goal_type not in self.goals:
+            self.goals[dosage.goal.goal_type] = ModalityGoal()
+
+        if dosage.efficient_reps_assigned > 0 and dosage.efficient_sets_assigned:
+            self.goals[dosage.goal.goal_type].efficient_active = True
+        if dosage.complete_reps_assigned > 0 and dosage.complete_sets_assigned:
+            self.goals[dosage.goal.goal_type].complete_active = True
+        if dosage.comprehensive_reps_assigned > 0 and dosage.comprehensive_sets_assigned:
+            self.goals[dosage.goal.goal_type].comprehensive_active = True
 
     def set_plan_dosage(self, soreness_list, muscular_strain_high):
 
@@ -207,6 +235,7 @@ class ModalityBase(object):
                                                              x.default_efficient_reps_assigned), reverse=True)
 
                 dosage = a.dosages[0]
+                self.update_goals(dosage)
 
                 if dosage.priority == "1":
                     self.calc_dosage_durations(1, a, dosage)
@@ -802,7 +831,8 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
             'completed': self.completed,
             'active': self.active,
             'default_plan': self.default_plan,
-            'alerts': [g.json_serialise() for g in self.alerts]
+            'alerts': [g.json_serialise() for g in self.alerts],
+            'goals': {goal_type.value: goal.json_serialise() for (goal_type, goal) in self.goals.items()}
         }
         return ret
 
@@ -1170,7 +1200,8 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
             'completed': self.completed,
             'active': self.active,
             'default_plan': self.default_plan,
-            'alerts': [g.json_serialise() for g in self.alerts]
+            'alerts': [g.json_serialise() for g in self.alerts],
+            'goals': {goal_type.value: goal.json_serialise() for (goal_type, goal) in self.goals.items()}
         }
         return ret
 
@@ -1649,7 +1680,8 @@ class CoolDown(ModalityBase, Serialisable):
             'event_date_time': format_datetime(self.event_date_time) if self.event_date_time is not None else None,
             'completed': self.completed,
             'active': self.active,
-            'alerts': [alert.json_serialise() for alert in self.alerts]
+            'alerts': [alert.json_serialise() for alert in self.alerts],
+            'goals': {goal_type.value: goal.json_serialise() for (goal_type, goal) in self.goals.items()}
         }
         return ret
 
