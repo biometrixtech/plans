@@ -96,11 +96,6 @@ def create_plan(test_parameter, body_part_list, severity_list, side_list, pain_l
     current_date = date.today()
     current_date_time = datetime.combine(current_date, time(12, 0, 0))
 
-    daily_plan_datastore = DailyPlanDatastore()
-    athlete_stats_datastore = AthleteStatsDatastore()
-    athlete_stats.historic_soreness = historic_soreness_list
-    athlete_stats_datastore.side_load_athlete_stats(athlete_stats)
-
     soreness_list = []
     for b in range(0, len(body_part_list)):
         if len(pain_list) > 0 and pain_list[b]:
@@ -112,6 +107,14 @@ def create_plan(test_parameter, body_part_list, severity_list, side_list, pain_l
                 soreness_list.append(TestUtilities().body_part_soreness(body_part_list[b], severity_list[b]))
 
     survey = DailyReadiness(current_date_time.strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, soreness_list, 7, 9)
+
+    daily_plan_datastore = DailyPlanDatastore()
+    athlete_stats_datastore = AthleteStatsDatastore()
+    athlete_stats.historic_soreness = historic_soreness_list
+    for s in soreness_list:
+        if not s.pain:
+            athlete_stats.update_delayed_onset_muscle_soreness(s)
+    athlete_stats_datastore.side_load_athlete_stats(athlete_stats)
 
     daily_plan = DailyPlan(format_date(current_date))
     daily_plan.user_id = user_id
