@@ -52,8 +52,6 @@ class AlertsProcessing(object):
         self.daily_plan.trends.dashboard.training_volume_data = self.athlete_stats.training_volume_chart_data
         self.athlete_stats.longitudinal_insights = longitudinal_insights
 
-        # return insights, longitudinal_insights, trends
-
     def clear_insight(self, new_insights, existing_longitudinal_insights):
         current_trigger_types = [insight.trigger_type for insight in new_insights]
         for l_insight in existing_longitudinal_insights:

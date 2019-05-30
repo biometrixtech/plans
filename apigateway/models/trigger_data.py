@@ -92,8 +92,7 @@ visualization_data = {
                 'y_axis_2': "Movement Quality",
                 'legend': [
                 ]
-            },
-
+            }
         }
 
 cta_data = {

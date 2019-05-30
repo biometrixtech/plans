@@ -6,7 +6,7 @@ from models.soreness import BodyPartSide
 from models.sport import SportName
 from models.trigger import TriggerType
 from models.trigger_data import TriggerData
-from utils import format_datetime, parse_datetime
+
 
 class LegendColor(Enum):
     green = 0
