@@ -111,7 +111,7 @@ def create_plan(test_parameter, body_part_list, severity_list, side_list, pain_l
     daily_plan_datastore = DailyPlanDatastore()
     athlete_stats_datastore = AthleteStatsDatastore()
     athlete_stats.historic_soreness = historic_soreness_list
-    for s in soreness_list:
+    for s in survey.soreness:
         if not s.pain:
             athlete_stats.update_delayed_onset_muscle_soreness(s)
     athlete_stats_datastore.side_load_athlete_stats(athlete_stats)
