@@ -199,12 +199,12 @@ class ModalityBase(object):
         for ex, a in assigned_exercises.items():
             if len(a.dosages) > 0:
                 a.dosages = sorted(a.dosages, key=lambda x: (3-int(x.priority), x.severity(),
-                                                             x.comprehensive_sets_assigned,
-                                                             x.comprehensive_reps_assigned,
-                                                             x.complete_sets_assigned,
-                                                             x.complete_reps_assigned,
-                                                             x.efficient_sets_assigned,
-                                                             x.efficient_reps_assigned), reverse=True)
+                                                             x.default_comprehensive_sets_assigned,
+                                                             x.default_comprehensive_reps_assigned,
+                                                             x.default_complete_sets_assigned,
+                                                             x.default_complete_reps_assigned,
+                                                             x.default_efficient_sets_assigned,
+                                                             x.default_efficient_reps_assigned), reverse=True)
 
                 dosage = a.dosages[0]
 
@@ -245,9 +245,9 @@ class ModalityBase(object):
         for b in range(0, len(benchmarks) - 1):
             total_efficient += self.dosage_durations[benchmarks[b]].efficient_duration
             proposed_efficient = total_efficient + self.dosage_durations[benchmarks[b + 1]].efficient_duration
-            if proposed_efficient < 300:
+            if proposed_efficient < 720:
                 continue
-            elif abs(total_efficient - 300) < abs(proposed_efficient - 300):
+            elif abs(total_efficient - 720) < abs(proposed_efficient - 720):
                 self.efficient_winner = benchmarks[b]
                 break
             else:
