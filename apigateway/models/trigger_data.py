@@ -67,7 +67,7 @@ visualization_data = {
             5: {
                 'title': "",
                 'y_axis_1': "Load",
-                'y_axis_2': "Severity",
+                'y_axis_2': "Efficiency",
                 'legend': [
                     {
                         'color': 0,
