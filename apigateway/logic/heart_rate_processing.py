@@ -17,7 +17,7 @@ class HeartRateProcessing(object):
         zone_5_duration = 0
 
         full_heart_data = self.extrapolate_heart_rate_data(heart_rate_data)
-        print('a')
+
         for h in full_heart_data:
             if max_heart_rate * 0.5 <= float(h) < max_heart_rate * 0.6:
                 zone_1_duration += 1
@@ -47,7 +47,7 @@ class HeartRateProcessing(object):
         return shrz
 
     def extrapolate_heart_rate_data(self, heart_rate_data):
-
+        heart_rate_data = sorted(heart_rate_data, key=lambda k: k.start_date)
         new_heart_rate_data = []
 
         for h in range(0, len(heart_rate_data) - 1):
