@@ -387,7 +387,7 @@ class BodyPartFactory(object):
     def get_lower_back(self):
 
         part = BodyPart(BodyPartLocation.lower_back, 1)
-        inhibit = self.get_exercise_dictionary([55])
+        inhibit = self.get_exercise_dictionary([44])
         static_stretch = self.get_exercise_dictionary([56, 103, 104, 121, 218])
         active_stretch = self.get_exercise_dictionary([266])
         dynamic_stretch = {}
