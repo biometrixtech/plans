@@ -510,7 +510,7 @@ def get_cool_down_line(daily_plan):
         time_line = str(round(stretch_time_efficient, 2)) + ',' + str(round(stretch_time_complete, 2)) + ',' + str(round(stretch_time_comprehensive, 2)) + ',' + str(round(integrate_time_efficient, 2)) + ',' + str(round(integrate_time_complete, 2)) + ',' + str(round(integrate_time_comprehensive, 2))
 
         cool_down_line += time_line
-        
+
     return cool_down_line
 
 def test_pre_active_rest_limited_body_parts():
