@@ -211,6 +211,7 @@ def test_session_from_survey_hr_data():
     athlete_stats = AthleteStats('test')
     athlete_stats.event_date = current_time
     survey_processor = SurveyProcessing('test', current_time, athlete_stats)
+    survey_processor.user_age = 25
     session_data = get_session_data()
     survey_processor.create_session_from_survey(session_data)
 
@@ -228,6 +229,7 @@ def test_session_from_survey_no_ps_survey():
     athlete_stats = AthleteStats('test')
     athlete_stats.event_date = current_time
     survey_processor = SurveyProcessing('test', current_time, athlete_stats)
+    survey_processor.user_age = 25
     session_data = get_session_data()
     del session_data['post_session_survey']
     survey_processor.create_session_from_survey(session_data)
@@ -246,6 +248,7 @@ def test_session_from_survey_historic_health_data():
     athlete_stats = AthleteStats('test')
     athlete_stats.event_date = current_time
     survey_processor = SurveyProcessing('test', current_time, athlete_stats)
+    survey_processor.user_age = 25
     session_data = get_session_data()
     session_obj = survey_processor.create_session_from_survey(session_data, historic_health_data=True)
 
