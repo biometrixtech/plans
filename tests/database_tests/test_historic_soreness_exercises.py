@@ -17,6 +17,7 @@ from tests.mocks.mock_datastore_collection import DatastoreCollection
 from tests.mocks.mock_athlete_stats_datastore import AthleteStatsDatastore
 from models.soreness import Soreness, BodyPart, BodyPartLocation, HistoricSorenessStatus
 from models.daily_plan import DailyPlan
+from models.sport import SportName
 from tests.testing_utilities import TestUtilities
 from models.daily_readiness import DailyReadiness
 from utils import format_datetime, format_date
@@ -89,6 +90,7 @@ def create_plan(test_parameter, body_part_list, severity_list, side_list, pain_l
     if test_parameter.high_volume:
         training_session = SportTrainingSession()
         training_session.session_RPE = 7
+        training_session.sport_name = SportName.basketball
         training_sessions.append(training_session)
 
     user_id = athlete_stats.athlete_id

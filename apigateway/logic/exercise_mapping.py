@@ -25,9 +25,11 @@ class ExerciseAssignmentCalculator(object):
         self.training_sessions = training_sessions
         self.soreness_list = soreness_list
         self.event_date_time = event_date_time
-        self.high_relative_intensity_session = self.process_training_sessions_intensity()
+
         self.high_relative_load_session = False
         self.high_relative_load_session_sport_names = set()
+
+        self.high_relative_intensity_session = self.process_training_sessions_intensity()
 
         self.muscular_strain_increasing = athlete_stats.muscular_strain_increasing
         self.muscular_strain_high = False
@@ -157,6 +159,7 @@ class ExerciseAssignmentCalculator(object):
         for t in self.training_sessions:
             if t.high_intensity():
                 high_relative_intensity_session = True
+                self.high_relative_load_session_sport_names.add(t.sport_name)
 
         return high_relative_intensity_session
 
