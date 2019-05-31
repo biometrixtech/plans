@@ -476,6 +476,43 @@ def is_historic_soreness_pain(historic_soreness_status):
     else:
         return False
 
+def get_cool_down_line(daily_plan):
+
+    cool_down_line = ""
+
+    if len(daily_plan.cool_down) > 0:
+        cool_down = daily_plan.cool_down[0]
+        cool_down_line += cool_down.default_plan + ','
+        alert_text = ''
+        for a in cool_down.alerts:
+            alert_text += "trigger=" + str(a.goal.trigger_type.value) + '--'
+            alert_text += str(a.sport_name) + ';'
+        cool_down_line += alert_text + ','
+        stretch_line = ""
+        for s, ex in cool_down.dynamic_stretch_exercises.items():
+            stretch_line += str(s) + ';'
+
+        cool_down_line += stretch_line + ','
+        integrate_line = ""
+        for i, ex in cool_down.dynamic_integrate_exercises.items():
+            integrate_line += str(i) + ';'
+
+        cool_down_line += integrate_line + ','
+
+        stretch_time_efficient = calc_active_time_efficient(cool_down.dynamic_stretch_exercises)
+        stretch_time_complete = calc_active_time_complete(cool_down.dynamic_stretch_exercises)
+        stretch_time_comprehensive = calc_active_time_comprehensive(cool_down.dynamic_stretch_exercises)
+
+        integrate_time_efficient = calc_active_time_efficient(cool_down.dynamic_integrate_exercises)
+        integrate_time_complete = calc_active_time_complete(cool_down.dynamic_integrate_exercises)
+        integrate_time_comprehensive = calc_active_time_comprehensive(cool_down.dynamic_integrate_exercises)
+
+        time_line = str(round(stretch_time_efficient, 2)) + ',' + str(round(stretch_time_complete, 2)) + ',' + str(round(stretch_time_comprehensive, 2)) + ',' + str(round(integrate_time_efficient, 2)) + ',' + str(round(integrate_time_complete, 2)) + ',' + str(round(integrate_time_comprehensive, 2))
+
+        cool_down_line += time_line
+        
+    return cool_down_line
+
 def test_pre_active_rest_limited_body_parts():
 
     current_date = date.today()
@@ -513,6 +550,8 @@ def test_pre_active_rest_limited_body_parts():
         s1 = open('../../output/' + 'summary_' + test_parm.file_name + "_a.csv", 'w')
         f2 = open('../../output/' + test_parm.file_name + "_b.csv", 'w')
         s2 = open('../../output/' + 'summary_' + test_parm.file_name + "_b.csv", 'w')
+        c1 = open('../../output/' + test_parm.file_name + "_cooldown_a.csv", 'w')
+        c2 = open('../../output/' + test_parm.file_name + "_cooldown_b.csv", 'w')
         line = ('BodyPart,is_pain,severity,hs_status,default_plan,insights,'+
                 't:biomechanics_triggers,t:biomechanics_ctas, t:biomechanics_goals,t:response_triggers,t:response_ctas,t:response_goals,t:stress_triggers,t:stress_ctas,t:stress_goals,'+
                 'inhibit_goals_triggers,inhibit_minutes_efficient,inhibit_miniutes_complete, inhibit_minutes_comprehensive,'+
@@ -527,11 +566,14 @@ def test_pre_active_rest_limited_body_parts():
         sline = ('BodyPart,is_pain,severity,hs_status,default_plan,insights,' +
                  't:biomechanics_triggers,t:biomechanics_ctas,t:biomechanics_goals,t:response_triggers,t:response_ctas,t:response_goals,t:stress_triggers,t:stress_ctas,t:stress_goals,'+
                  'heat, pre_active_rest, post_active_rest, cooldown, ice, cold_water_immersion')
+        cline = ('BodyPart,is_pain,severity,hs_status,default_plan,alerts,dynamic_stretch,dynamic_integrate,ds_efficient_time, ds_complete_time,ds_comprehensive_time,'+
+                 'di_efficient_time,di_complete_time,di_comprehensive_time')
         f1.write(line + '\n')
         s1.write(sline + '\n')
         f2.write(line + '\n')
         s2.write(sline + '\n')
-
+        c1.write(cline + '\n')
+        c2.write(cline + '\n')
         for b1 in body_parts_1:
             for m1 in max_severity_1:
                 for h1 in historic_soreness_status_1:
@@ -576,6 +618,11 @@ def test_pre_active_rest_limited_body_parts():
                             insights_string = get_insights_string(daily_plan.insights)
 
                             alert_cta_goal_line = get_alerts_ctas_goals_string(daily_plan)
+
+                            cool_down_line = get_cool_down_line(daily_plan)
+
+                            if len(cool_down_line) > 0:
+                                cool_down_line = body_part_line + ',' + cool_down_line
 
                             if test_parm.train_later:
                                 plan_obj = daily_plan.pre_active_rest[0]
@@ -681,10 +728,13 @@ def test_pre_active_rest_limited_body_parts():
                             if j % 2 == 0:
                                 s1.write(sline + '\n')
                                 f1.write(line + '\n')
+                                if len(cool_down_line) > 0:
+                                    c1.write(cool_down_line + '\n')
                             else:
                                 s2.write(sline + '\n')
                                 f2.write(line + '\n')
-
+                                if len(cool_down_line) > 0:
+                                    c2.write(cool_down_line + '\n')
                             j += 1
 
         f1.close()
