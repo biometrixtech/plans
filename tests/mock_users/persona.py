@@ -29,7 +29,7 @@ class Persona(object):
         event_date = datetime.datetime.now() - datetime.timedelta(days=days)
         self.update_stats(event_date)
         for i in range(days):
-            #date_time = format_datetime(event_date)
+            # date_time = format_datetime(event_date)
             today_date = format_date(event_date)
             date_time = event_date
             soreness = []
