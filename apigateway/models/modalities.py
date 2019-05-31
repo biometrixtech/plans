@@ -764,7 +764,7 @@ class ActiveRest(ModalityBase):
     def check_reactive_recover_from_sport(self, soreness_list, exercise_library, high_relative_load_session,
                                           high_relative_intensity_logged, muscular_strain_high, sports):
         if muscular_strain_high:
-            goal = AthleteGoal("Expedite tissue regeneration", 1, AthleteGoalType.sport)
+            goal = AthleteGoal(None, 1, AthleteGoalType.sport)
             goal.trigger_type = TriggerType.overreaching_high_muscular_strain  # 8
             # for sport_name in sports:
             alert = Alert(goal)
@@ -777,7 +777,7 @@ class ActiveRest(ModalityBase):
                              (self.event_date_time - s.first_reported_date_time).days < 30)
 
         if len(hist_soreness) > 0:
-            goal = AthleteGoal("Expedite tissue regeneration", 1, AthleteGoalType.sport)
+            goal = AthleteGoal(None, 1, AthleteGoalType.sport)
             goal.trigger_type = TriggerType.hist_sore_less_30  # 7
             # for sport_name in sports:
             for soreness in hist_soreness:
@@ -1756,7 +1756,7 @@ class CoolDown(ModalityBase, Serialisable):
     def check_recover_from_sport(self, soreness_list, sport_name, muscular_strain_high,exercise_library):
 
         if muscular_strain_high:
-            goal = AthleteGoal("Expedite tissue regeneration", 1, AthleteGoalType.sport)
+            goal = AthleteGoal(None, 1, AthleteGoalType.sport)
             goal.trigger_type = TriggerType.overreaching_high_muscular_strain  # 8
             if sport_name is not None:
                 alert = Alert(goal)
@@ -1769,7 +1769,7 @@ class CoolDown(ModalityBase, Serialisable):
                              (self.event_date_time - s.first_reported_date_time).days < 30)
 
         if len(hist_soreness) > 0:
-            goal = AthleteGoal("Expedite tissue regeneration", 1, AthleteGoalType.sport)
+            goal = AthleteGoal(None, 1, AthleteGoalType.sport)
             goal.trigger_type = TriggerType.hist_sore_less_30  # 7
             # if sport_name is not None:
             for soreness in hist_soreness:
