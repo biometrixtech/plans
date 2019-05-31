@@ -128,7 +128,7 @@ class TrainingVolumeChart(BaseChart):
     def add_training_volume(self, training_session, load_stats):
 
         training_volume = training_session.training_volume(load_stats)
-        if training_volume is not None and training_session.event_date.date() in self.data:
+        if training_volume is not None and training_volume > 0 and training_session.event_date.date() in self.data:
             self.data[training_session.event_date.date()].training_volume += training_volume
             self.data[training_session.event_date.date()].sport_names.add(training_session.sport_name)
 
