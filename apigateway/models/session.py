@@ -92,6 +92,7 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         self.calories = None
         self.distance = None
         self.source = SessionSource.user
+        self.shrz = None
 
         # post-session
         self.post_session_survey = None
@@ -194,10 +195,10 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
 
         if self.session_RPE is not None:
             return self.session_RPE
+        elif self.shrz is not None:
+            return self.shrz
         else:
             return 0
-
-        #TODO add in TRIMP, SHRZ
 
     def normalized_load(self, load_stats):
 
@@ -292,6 +293,7 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
             'deleted': self.deleted,
             'ignored': self.ignored,
             'duration_health': self.duration_health,
+            'shrz': self.shrz if self.shrz is not None else None,
             'calories': self.calories,
             'distance': self.distance,
             'source': self.source.value if self.source is not None else SessionSource.user.value
@@ -325,6 +327,7 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
                             "deleted",
                             "ignored",
                             "duration_health",
+                            "shrz",
                             "calories",
                             "distance",
                             "source"]
