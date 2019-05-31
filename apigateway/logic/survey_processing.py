@@ -10,6 +10,7 @@ from logic.stats_processing import StatsProcessing
 from logic.soreness_processing import SorenessCalculator
 from logic.training_plan_management import TrainingPlanManager
 from logic.training_volume_processing import TrainingVolumeProcessing
+from logic.heart_rate_processing import HeartRateProcessing
 from logic.metrics_processing import MetricsProcessing
 from datastores.datastore_collection import DatastoreCollection
 from utils import parse_datetime, format_datetime, fix_early_survey_event_date, format_date
@@ -97,8 +98,9 @@ class SurveyProcessing(object):
                         self.athlete_stats.session_RPE_event_date = self.event_date
         session_obj = create_session(session_type, session_data)
         if 'hr_data' in session and len(session['hr_data']) > 0:
+            heart_rate_processing = HeartRateProcessing(session.user_age)
             self.create_session_hr_data(session_obj, session['hr_data'])
-
+            session.shrz = heart_rate_processing.get_shrz(self.heart_rate_data)
         if session_obj.post_session_survey is not None:
             self.soreness.extend(session_obj.post_session_survey.soreness)
         self.sessions.append(session_obj)
@@ -201,7 +203,9 @@ class SurveyProcessing(object):
                 daily_plan.training_sessions.append(session_obj)
                 daily_plan.last_updated = event_date
                 if 'hr_data' in session and len(session['hr_data']) > 0:
+                    heart_rate_processing = HeartRateProcessing(session.user_age)
                     self.create_session_hr_data(session_obj, session['hr_data'])
+                    session.shrz = heart_rate_processing.get_shrz(self.heart_rate_data)
 
         self.plans = [plan for plan in self.plans if plan.last_updated == event_date]
 
