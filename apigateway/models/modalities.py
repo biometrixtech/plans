@@ -1702,7 +1702,7 @@ class CoolDown(ModalityBase, Serialisable):
             'completed': self.completed,
             'active': self.active,
             'alerts': [alert.json_serialise() for alert in self.alerts],
-            'goals': {int(goal_type.value): goal.json_serialise() for (goal_type, goal) in self.goals.items()}
+            'goals': {str(goal_type.value): goal.json_serialise() for (goal_type, goal) in self.goals.items()}
         }
         return ret
 
