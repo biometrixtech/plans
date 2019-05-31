@@ -464,9 +464,9 @@
                 },
                 "child_data": {
                     "new_first_time_title": "Your body isn\u2019t keeping up with training ",
-                    "new_first_time_body": "so we recommend that you increase recovery habits to {goal} ",
+                    "new_first_time_body": "so we recommend increasing recovery habits to {goal} until your body properly adapts. ",
                     "new_subsequent_title": "Your body isn\u2019t keeping up with training ",
-                    "new_subsequent_body": "so we recommend that you increase recovery habits to {goal} ",
+                    "new_subsequent_body": "so we recommend increasing recovery habits to {goal} until your body properly adapts. ",
                     "cleared_body": "Your body\u2019s responding well from training and is now in a sustainable recovery rhythm. Keep it up!"
                 },
                 "cleared_title": "Your Recovery Efficiency has improved!"
@@ -527,9 +527,9 @@
                 },
                 "child_data": {
                     "new_first_time_title": "Your {bodypart} is overstressed",
-                    "new_first_time_body": "so we recommend that you increase recovery habits to {goal} ",
+                    "new_first_time_body": "so we recommend increasing recovery habits to {goal} until your body properly adapts. ",
                     "new_subsequent_title": "Your {bodypart} is overstressed",
-                    "new_subsequent_body": "so we recommend that you increase recovery habits to {goal} ",
+                    "new_subsequent_body": "so we recommend increasing recovery habits to {goal} until your body properly adapts. ",
                     "cleared_body": "Good work! Your {bodypart} is no longer showing signs of overstress in response to training. "
                 },
                 "cleared_title": "Your {bodypart} has adapted!"
@@ -1472,9 +1472,9 @@
                 },
                 "child_data": {
                     "new_first_time_title": "Movement dysfunction identified ",
-                    "new_first_time_body": "so we\u2019ve added activities to {goal}",
+                    "new_first_time_body": "so we'll start incorporating activities to {goal}",
                     "new_subsequent_title": "Movement dysfunction identified ",
-                    "new_subsequent_body": "so we\u2019ve added activities to {goal}",
+                    "new_subsequent_body": "so we'll start incorporating activities to {goal}",
                     "cleared_body": "You haven\u2019t reported {bodypart} soreness in a while. This could mean your movement dysfunction is improving. We\u2019ll keep an eye on it just in case."
                 },
                 "cleared_title": "Signs of dysfunction are gone!"
@@ -1535,9 +1535,9 @@
                 },
                 "child_data": {
                     "new_first_time_title": "Elevated overuse injury risk due to pain",
-                    "new_first_time_body": "so we added activities to {goal}. Please avoid any activity that causes pain",
+                    "new_first_time_body": "so we'll start incorporating activities to {goal}. Please avoid any activity that causes pain",
                     "new_subsequent_title": "Elevated overuse injury risk due to pain",
-                    "new_subsequent_body": "so we added activities to {goal}. Please avoid any activity that causes pain",
+                    "new_subsequent_body": "so we'll start incorporating activities to {goal}. Please avoid any activity that causes pain",
                     "cleared_body": "You haven\u2019t reported {bodypart} pain in a while. This could mean your movement dysfunction is improving. We\u2019ll keep an eye on it just incase."
                 },
                 "cleared_title": "Signs of dysfunction are gone!"
