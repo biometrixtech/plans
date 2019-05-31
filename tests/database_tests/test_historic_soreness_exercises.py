@@ -20,6 +20,7 @@ from models.daily_plan import DailyPlan
 from models.sport import SportName
 from tests.testing_utilities import TestUtilities
 from models.daily_readiness import DailyReadiness
+from models.data_series import DataSeries
 from utils import format_datetime, format_date
 import random
 
@@ -37,7 +38,7 @@ class TestParameters(object):
         self.doms = doms
 
 
-def get_test_parameters_list():
+def get_test_parameters_list(current_date):
 
     parm_list = []
 
@@ -52,6 +53,12 @@ def get_test_parameters_list():
     as2 = AthleteStats("tester")
     as2.historic_soreness = []
     as2.muscular_strain_increasing = True
+
+    high_muscular_strain = DataSeries(current_date, 35)
+    low_muscular_strain = DataSeries(current_date, 65)
+
+    as1.muscular_strain.append(low_muscular_strain)
+    as2.muscular_strain.append(high_muscular_strain)
 
     parm5 = TestParameters("PreActiveRest_no_doms_muscular_strain_no_high_volume", as2, train_later=True, high_volume=False)
     parm6 = TestParameters("PostActiveRest_no_doms_muscular_strain_no_high_volume", as2, train_later=False, high_volume=False)
@@ -475,7 +482,7 @@ def test_pre_active_rest_limited_body_parts():
     current_date_time = datetime.combine(current_date, time(9, 0, 0))
     # current_date_time = current_date_time - timedelta(days=16)
 
-    parm_list = get_test_parameters_list()
+    parm_list = get_test_parameters_list(current_date)
 
     for test_parm in parm_list:
 
