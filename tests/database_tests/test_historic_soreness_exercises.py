@@ -17,6 +17,7 @@ from tests.mocks.mock_datastore_collection import DatastoreCollection
 from tests.mocks.mock_athlete_stats_datastore import AthleteStatsDatastore
 from models.soreness import Soreness, BodyPart, BodyPartLocation, HistoricSorenessStatus
 from models.daily_plan import DailyPlan
+from models.sport import SportName
 from tests.testing_utilities import TestUtilities
 from models.daily_readiness import DailyReadiness
 from utils import format_datetime, format_date
@@ -48,30 +49,30 @@ def get_test_parameters_list():
     parm3 = TestParameters("PreActiveRest_no_doms_no_muscular_strain_high_volume", as1, train_later=True, high_volume=True)
     parm4 = TestParameters("PostActiveRest_no_doms_no_muscular_strain_high_volume", as1, train_later=False, high_volume=True)
 
-    #as2 = AthleteStats("tester")
-    #as2.historic_soreness = []
-    #as2.muscular_strain_increasing = True
+    as2 = AthleteStats("tester")
+    as2.historic_soreness = []
+    as2.muscular_strain_increasing = True
 
-    #parm5 = TestParameters("PreActiveRest_no_doms_muscular_strain_no_high_volume", as2, train_later=True, high_volume=False)
-    #parm6 = TestParameters("PostActiveRest_no_doms_muscular_strain_no_high_volume", as2, train_later=False, high_volume=False)
-    #parm7 = TestParameters("PreActiveRest_no_doms_muscular_strain_high_volume", as2, train_later=True, high_volume=True)
-    #parm8 = TestParameters("PostActiveRest_no_doms_muscular_strain_high_volume", as2, train_later=False, high_volume=True)
-    #parm9 = TestParameters("PreActiveRest_doms_muscular_strain_no_high_volume", as2, train_later=True, high_volume=False, doms=True)
-    #parm10 = TestParameters("PostActiveRest_doms_muscular_strain_no_high_volume", as2, train_later=False, high_volume=False, doms=True)
-    #parm11 = TestParameters("PreActiveRest_doms_muscular_strain_high_volume", as2, train_later=True, high_volume=True, doms=True)
-    #parm12 = TestParameters("PostActiveRest_doms_muscular_strain_high_volume", as2, train_later=False, high_volume=True, doms=True)
+    parm5 = TestParameters("PreActiveRest_no_doms_muscular_strain_no_high_volume", as2, train_later=True, high_volume=False)
+    parm6 = TestParameters("PostActiveRest_no_doms_muscular_strain_no_high_volume", as2, train_later=False, high_volume=False)
+    parm7 = TestParameters("PreActiveRest_no_doms_muscular_strain_high_volume", as2, train_later=True, high_volume=True)
+    parm8 = TestParameters("PostActiveRest_no_doms_muscular_strain_high_volume", as2, train_later=False, high_volume=True)
+    parm9 = TestParameters("PreActiveRest_doms_muscular_strain_no_high_volume", as2, train_later=True, high_volume=False, doms=True)
+    parm10 = TestParameters("PostActiveRest_doms_muscular_strain_no_high_volume", as2, train_later=False, high_volume=False, doms=True)
+    parm11 = TestParameters("PreActiveRest_doms_muscular_strain_high_volume", as2, train_later=True, high_volume=True, doms=True)
+    parm12 = TestParameters("PostActiveRest_doms_muscular_strain_high_volume", as2, train_later=False, high_volume=True, doms=True)
     parm_list.append(parm1)
     parm_list.append(parm2)
     parm_list.append(parm3)
     parm_list.append(parm4)
-    #parm_list.append(parm5)
-    #parm_list.append(parm6)
-    #parm_list.append(parm7)
-    #parm_list.append(parm8)
-    #parm_list.append(parm9)
-    #parm_list.append(parm10)
-    #parm_list.append(parm11)
-    #parm_list.append(parm12)
+    parm_list.append(parm5)
+    parm_list.append(parm6)
+    parm_list.append(parm7)
+    parm_list.append(parm8)
+    parm_list.append(parm9)
+    parm_list.append(parm10)
+    parm_list.append(parm11)
+    parm_list.append(parm12)
 
     return parm_list
 
@@ -89,6 +90,7 @@ def create_plan(test_parameter, body_part_list, severity_list, side_list, pain_l
     if test_parameter.high_volume:
         training_session = SportTrainingSession()
         training_session.session_RPE = 7
+        training_session.sport_name = SportName.basketball
         training_sessions.append(training_session)
 
     user_id = athlete_stats.athlete_id
