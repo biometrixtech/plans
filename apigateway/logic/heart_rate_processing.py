@@ -42,6 +42,8 @@ class HeartRateProcessing(object):
 
         shrz = (total_duration / total_possible_duration) * 10
 
+        shrz = max(1, shrz)
+
         return shrz
 
     def extrapolate_heart_rate_data(self, heart_rate_data):
