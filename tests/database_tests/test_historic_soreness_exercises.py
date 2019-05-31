@@ -310,6 +310,8 @@ def get_insights_string(insights):
             output += ';'
         output += "trigger="+str(i.trigger_type.value)+"-"
         output += "goals=" + '**'.join(i.goal_targeted)
+        if len(i.sport_names) > 0:
+            output += "-sport=" + '**'.join(str(s) for s in i.sport_names)
         j += 1
 
     return output
