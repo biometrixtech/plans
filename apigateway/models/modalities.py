@@ -738,13 +738,13 @@ class ActiveRest(ModalityBase):
         if soreness_list is not None and len(soreness_list) > 0:
             max_severity = max(list(s.severity for s in soreness_list))
         if self.force_data:
-            self.get_general_exercises(exercise_library)
+            self.get_general_exercises(exercise_library, max_severity)
         elif soreness_list is not None and len(soreness_list) > 0:
             for s in soreness_list:
                 self.check_reactive_recover_from_sport(soreness_list, exercise_library, high_relative_load_session,
                                                        high_relative_intensity_logged,
                                                        muscular_strain_high,
-                                                       sports)
+                                                       sports, max_severity)
                 self.check_reactive_care_soreness(s, exercise_library, max_severity)
                 self.check_reactive_care_pain(s, exercise_library, max_severity)
                 # if max_severity < 3:
@@ -755,18 +755,18 @@ class ActiveRest(ModalityBase):
             self.check_reactive_recover_from_sport(soreness_list, exercise_library, high_relative_load_session,
                                                    high_relative_intensity_logged,
                                                    muscular_strain_high,
-                                                   sports)
+                                                   sports, max_severity)
 
-    def get_general_exercises(self, exercise_library):
+    def get_general_exercises(self, exercise_library, max_severity):
 
         pass
 
-    def check_reactive_recover_from_sport_general(self, sport, exercise_library, goal):
+    def check_reactive_recover_from_sport_general(self, sport, exercise_library, goal, max_severity):
 
         pass
 
     def check_reactive_recover_from_sport(self, soreness_list, exercise_library, high_relative_load_session,
-                                          high_relative_intensity_logged, muscular_strain_high, sports):
+                                          high_relative_intensity_logged, muscular_strain_high, sports, max_severity):
         if muscular_strain_high:
             goal = AthleteGoal(None, 1, AthleteGoalType.sport)
             goal.trigger_type = TriggerType.overreaching_high_muscular_strain  # 8
@@ -815,12 +815,14 @@ class ActiveRest(ModalityBase):
                     self.copy_exercises(body_part.inhibit_exercises,
                                         self.inhibit_exercises, goal, "1", None, exercise_library)
                     if not prohibiting_soreness:
-                        self.copy_exercises(body_part.static_stretch_exercises,
-                                            self.static_stretch_exercises, goal, "1", None, exercise_library, sport_name)
-                        self.copy_exercises(body_part.isolated_activate_exercises,
+                        if max_severity < 3.5:
+                            self.copy_exercises(body_part.static_stretch_exercises,
+                                                self.static_stretch_exercises, goal, "1", None, exercise_library, sport_name)
+                        if max_severity < 2.5:
+                            self.copy_exercises(body_part.isolated_activate_exercises,
                                             self.isolated_activate_exercises, goal, "1", None, exercise_library, sport_name)
 
-                self.check_reactive_recover_from_sport_general(sport_name, exercise_library, goal)
+                self.check_reactive_recover_from_sport_general(sport_name, exercise_library, goal, max_severity)
 
 
 class ActiveRestBeforeTraining(ActiveRest, Serialisable):
@@ -909,7 +911,7 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
         self.aggregate_dosage_by_severity_exercise_collection(self.static_integrate_exercises)
         self.aggregate_dosage_by_severity_exercise_collection(self.isolated_activate_exercises)
 
-    def check_reactive_recover_from_sport_general(self, sport, exercise_library, goal):
+    def check_reactive_recover_from_sport_general(self, sport, exercise_library, goal, max_severity):
 
         body_part_factory = BodyPartFactory()
 
@@ -922,21 +924,22 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
                                     exercise_library)
                 #self.copy_exercises(agonist.static_stretch_exercises, self.static_stretch_exercises, goal, "1",
                 #                    None, exercise_library)
-                self.copy_exercises(agonist.active_stretch_exercises, self.active_stretch_exercises, goal, "1",
-                                    None, exercise_library)
-                self.copy_exercises(agonist.isolated_activate_exercises, self.isolated_activate_exercises, goal, "1",
-                                    None, exercise_library)
+                if max_severity < 3.5:
+                    self.copy_exercises(agonist.active_stretch_exercises, self.active_stretch_exercises, goal, "1",
+                                        None, exercise_library)
 
-        for t in body_part.antagonists:
-            antagonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(t), None))
-            if antagonist is not None:
-                self.copy_exercises(antagonist.isolated_activate_exercises, self.isolated_activate_exercises, goal, "1",
-                                    None, exercise_library)
+        if max_severity < 2.5:
+            for t in body_part.antagonists:
+                antagonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(t), None))
+                if antagonist is not None:
+                    self.copy_exercises(antagonist.isolated_activate_exercises, self.isolated_activate_exercises, goal, "1",
+                                        None, exercise_library)
 
-        self.copy_exercises(body_part.static_integrate_exercises, self.static_integrate_exercises, goal, "1", None,
-                            exercise_library)
+        if max_severity < 2.5:
+            self.copy_exercises(body_part.static_integrate_exercises, self.static_integrate_exercises, goal, "1", None,
+                                exercise_library)
 
-    def get_general_exercises(self, exercise_library):
+    def get_general_exercises(self, exercise_library, max_severity):
 
         body_part_factory = BodyPartFactory()
 
@@ -949,12 +952,14 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
             if agonist is not None:
                 self.copy_exercises(agonist.inhibit_exercises, self.inhibit_exercises, goal, "1", None,
                                     exercise_library)
-                self.copy_exercises(agonist.static_stretch_exercises, self.static_stretch_exercises, goal, "1",
-                                    None, exercise_library)
-                self.copy_exercises(agonist.active_stretch_exercises, self.active_stretch_exercises, goal, "1",
-                                    None, exercise_library)
-                self.copy_exercises(agonist.isolated_activate_exercises, self.isolated_activate_exercises, goal, "1",
-                                    None, exercise_library)
+                if max_severity < 3.5:
+                    self.copy_exercises(agonist.static_stretch_exercises, self.static_stretch_exercises, goal, "1",
+                                        None, exercise_library)
+                    self.copy_exercises(agonist.active_stretch_exercises, self.active_stretch_exercises, goal, "1",
+                                        None, exercise_library)
+                if max_severity < 2.5:
+                    self.copy_exercises(agonist.isolated_activate_exercises, self.isolated_activate_exercises, goal, "1",
+                                        None, exercise_library)
 
         '''
         for g in body_part.antagonists:
@@ -973,9 +978,11 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
             if synergist is not None:
                 self.copy_exercises(synergist.inhibit_exercises, self.inhibit_exercises, goal, "2", None,
                                     exercise_library)
-                self.copy_exercises(synergist.active_stretch_exercises, self.active_stretch_exercises, goal, "2",
-                                        None, exercise_library)
-                self.copy_exercises(synergist.isolated_activate_exercises, self.isolated_activate_exercises, goal, "2",
+                if max_severity < 3.5:
+                    self.copy_exercises(synergist.active_stretch_exercises, self.active_stretch_exercises, goal, "2",
+                                            None, exercise_library)
+                if max_severity < 2.5:
+                    self.copy_exercises(synergist.isolated_activate_exercises, self.isolated_activate_exercises, goal, "2",
                                     None, exercise_library)
 
         for t in body_part.stabilizers:
@@ -983,13 +990,16 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
             if stabilizer is not None:
                 self.copy_exercises(stabilizer.inhibit_exercises, self.inhibit_exercises, goal, "3", None,
                                     exercise_library)
-                self.copy_exercises(stabilizer.active_stretch_exercises, self.active_stretch_exercises, goal, "3",
-                                        None, exercise_library)
-                self.copy_exercises(stabilizer.isolated_activate_exercises, self.isolated_activate_exercises, goal, "3",
+                if max_severity < 3.5:
+                    self.copy_exercises(stabilizer.active_stretch_exercises, self.active_stretch_exercises, goal, "3",
+                                            None, exercise_library)
+                if max_severity < 2.5:
+                    self.copy_exercises(stabilizer.isolated_activate_exercises, self.isolated_activate_exercises, goal, "3",
                                     None, exercise_library)
 
-        self.copy_exercises(body_part.static_integrate_exercises, self.static_integrate_exercises, goal, "1", None,
-                            exercise_library)
+        if max_severity < 2.5:
+                self.copy_exercises(body_part.static_integrate_exercises, self.static_integrate_exercises, goal, "1", None,
+                        exercise_library)
 
     def check_reactive_care_soreness(self, soreness, exercise_library, max_severity):
 
@@ -1303,7 +1313,7 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
         self.aggregate_dosage_by_severity_exercise_collection(self.static_integrate_exercises)
         self.aggregate_dosage_by_severity_exercise_collection(self.isolated_activate_exercises)
 
-    def check_reactive_recover_from_sport_general(self, sport, exercise_library, goal):
+    def check_reactive_recover_from_sport_general(self, sport, exercise_library, goal, max_severity):
 
         goal = AthleteGoal("Expedite tissue regeneration", 1, AthleteGoalType.sport)
         # goal.trigger = "High Relative Volume or Intensity of Logged Session"
@@ -1316,23 +1326,24 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
         for a in body_part.agonists:
             agonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None))
             if agonist is not None:
-                self.copy_exercises(agonist.inhibit_exercises, self.inhibit_exercises, goal, "1", None,
-                                    exercise_library)
-                self.copy_exercises(agonist.static_stretch_exercises, self.static_stretch_exercises, goal, "1",
-                                    None, exercise_library)
-                self.copy_exercises(agonist.isolated_activate_exercises, self.isolated_activate_exercises, goal, "1",
-                                    None, exercise_library)
+                if max_severity < 3.5:
+                    self.copy_exercises(agonist.inhibit_exercises, self.inhibit_exercises, goal, "1", None,
+                                        exercise_library)
+                    self.copy_exercises(agonist.static_stretch_exercises, self.static_stretch_exercises, goal, "1",
+                                        None, exercise_library)
 
         for t in body_part.antagonists:
             antagonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(t), None))
             if antagonist is not None:
-                self.copy_exercises(antagonist.isolated_activate_exercises, self.isolated_activate_exercises, goal, "1",
-                                    None, exercise_library)
+                if max_severity < 2.5:
+                    self.copy_exercises(antagonist.isolated_activate_exercises, self.isolated_activate_exercises, goal, "1",
+                                        None, exercise_library)
 
-        self.copy_exercises(body_part.static_integrate_exercises, self.static_integrate_exercises, goal, "1", None,
-                            exercise_library)
+        if max_severity < 2.5:
+            self.copy_exercises(body_part.static_integrate_exercises, self.static_integrate_exercises, goal, "1", None,
+                                exercise_library)
 
-    def get_general_exercises(self, exercise_library):
+    def get_general_exercises(self, exercise_library, max_severity):
 
         body_part_factory = BodyPartFactory()
 
@@ -1345,9 +1356,11 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
             if agonist is not None:
                 self.copy_exercises(agonist.inhibit_exercises, self.inhibit_exercises, goal, "1", None,
                                     exercise_library)
-                self.copy_exercises(agonist.static_stretch_exercises, self.static_stretch_exercises, goal, "1",
-                                    None, exercise_library)
-                self.copy_exercises(agonist.isolated_activate_exercises, self.isolated_activate_exercises, goal, "1",
+                if max_severity < 3.5:
+                    self.copy_exercises(agonist.static_stretch_exercises, self.static_stretch_exercises, goal, "1",
+                                        None, exercise_library)
+                if max_severity < 2.5:
+                    self.copy_exercises(agonist.isolated_activate_exercises, self.isolated_activate_exercises, goal, "1",
                                    None, exercise_library)
 
         '''
@@ -1367,23 +1380,28 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
             if synergist is not None:
                 self.copy_exercises(synergist.inhibit_exercises, self.inhibit_exercises, goal, "2", None,
                                     exercise_library)
-                self.copy_exercises(synergist.static_stretch_exercises, self.static_stretch_exercises, goal, "2",
-                                    None, exercise_library)
-                self.copy_exercises(synergist.isolated_activate_exercises, self.isolated_activate_exercises, goal, "2",
-                                    None, exercise_library)
+                if max_severity < 3.5:
+                    self.copy_exercises(synergist.static_stretch_exercises, self.static_stretch_exercises, goal, "2",
+                                        None, exercise_library)
+                if max_severity < 2.5:
+                    self.copy_exercises(synergist.isolated_activate_exercises, self.isolated_activate_exercises, goal, "2",
+                                        None, exercise_library)
 
         for t in body_part.stabilizers:
             stabilizer = body_part_factory.get_body_part(BodyPart(BodyPartLocation(t), None))
             if stabilizer is not None:
                 self.copy_exercises(stabilizer.inhibit_exercises, self.inhibit_exercises, goal, "3", None,
                                     exercise_library)
-                self.copy_exercises(stabilizer.static_stretch_exercises, self.static_stretch_exercises, goal, "3",
+                if max_severity < 3.5:
+                    self.copy_exercises(stabilizer.static_stretch_exercises, self.static_stretch_exercises, goal, "3",
+                                            None, exercise_library)
+                if max_severity < 2.5:
+                    self.copy_exercises(stabilizer.isolated_activate_exercises, self.isolated_activate_exercises, goal, "3",
                                         None, exercise_library)
-                self.copy_exercises(stabilizer.isolated_activate_exercises, self.isolated_activate_exercises, goal, "3",
-                                    None, exercise_library)
 
-        self.copy_exercises(body_part.static_integrate_exercises, self.static_integrate_exercises, goal, "1", None,
-                            exercise_library)
+        if max_severity < 2.5:
+            self.copy_exercises(body_part.static_integrate_exercises, self.static_integrate_exercises, goal, "1", None,
+                                exercise_library)
 
     def check_reactive_care_soreness(self, soreness, exercise_library, max_severity):
 
@@ -1815,7 +1833,7 @@ class CoolDown(ModalityBase, Serialisable):
         self.rank_dosages([self.dynamic_stretch_exercises])
         self.rank_dosages([self.dynamic_integrate_exercises])
 
-    def check_recover_from_sport(self, soreness_list, sport_name, muscular_strain_high,exercise_library):
+    def check_recover_from_sport(self, soreness_list, sport_name, muscular_strain_high,exercise_library, max_severity):
 
         if muscular_strain_high:
             goal = AthleteGoal(None, 1, AthleteGoalType.sport)
@@ -1840,31 +1858,32 @@ class CoolDown(ModalityBase, Serialisable):
                 alert.body_part = BodyPartSide(soreness.body_part.location, soreness.side)
                 self.alerts.append(alert)
 
-        if self.high_relative_volume_logged or self.high_relative_intensity_logged:
-            goal = AthleteGoal("Expedite tissue regeneration", 1, AthleteGoalType.sport)
-            #goal.trigger = "High Relative Volume or Intensity of Logged Session"
-            goal.trigger_type = TriggerType.high_volume_intensity  # 0
-            alert = Alert(goal)
-            alert.sport_name = sport_name
-            self.alerts.append(alert)
+        if max_severity < 2.5:  # note this is only a pain value for cooldown
+            if self.high_relative_volume_logged or self.high_relative_intensity_logged:
+                goal = AthleteGoal("Expedite tissue regeneration", 1, AthleteGoalType.sport)
+                #goal.trigger = "High Relative Volume or Intensity of Logged Session"
+                goal.trigger_type = TriggerType.high_volume_intensity  # 0
+                alert = Alert(goal)
+                alert.sport_name = sport_name
+                self.alerts.append(alert)
 
-            body_part_factory = BodyPartFactory()
+                body_part_factory = BodyPartFactory()
 
-            body_part = body_part_factory.get_body_part_for_sport(sport_name)
+                body_part = body_part_factory.get_body_part_for_sport(sport_name)
 
-            prohibiting_soreness = False
+                prohibiting_soreness = False
 
-            high_severity_list = list(s for s in soreness_list if s.severity >= 3.5)
+                high_severity_list = list(s for s in soreness_list if s.severity >= 3.5)
 
-            if len(high_severity_list) > 0:
-                prohibiting_soreness = True
+                if len(high_severity_list) > 0:
+                    prohibiting_soreness = True
 
-            # Note: this is just returning the primary mover related exercises for sport
-            if body_part is not None and not prohibiting_soreness:
-                self.copy_exercises(body_part.dynamic_stretch_exercises,
-                                    self.dynamic_stretch_exercises, goal, "1", None, exercise_library, sport_name)
-                self.copy_exercises(body_part.dynamic_integrate_exercises,
-                                    self.dynamic_integrate_exercises, goal, "1", None, exercise_library, sport_name)
+                # Note: this is just returning the primary mover related exercises for sport
+                if body_part is not None and not prohibiting_soreness:
+                    self.copy_exercises(body_part.dynamic_stretch_exercises,
+                                        self.dynamic_stretch_exercises, goal, "1", None, exercise_library, sport_name)
+                    self.copy_exercises(body_part.dynamic_integrate_exercises,
+                                        self.dynamic_integrate_exercises, goal, "1", None, exercise_library, sport_name)
 
     def check_corrective(self, soreness, event_date_time, exercise_library):
 
@@ -1885,8 +1904,15 @@ class CoolDown(ModalityBase, Serialisable):
 
     def fill_exercises(self, soreness_list, exercise_library, high_relative_load_session, high_relative_intensity_logged, muscular_strain_high, sports):
 
+        max_severity = 0
+
+        if soreness_list is not None and len(soreness_list) > 0:
+            pain_list = list(s for s in soreness_list is s.pain)
+            if len(pain_list) > 0:
+                max_severity = max(list(s.severity for s in pain_list))
+
         for sport_name in sports:
-            self.check_recover_from_sport(soreness_list, sport_name, muscular_strain_high, exercise_library)
+            self.check_recover_from_sport(soreness_list, sport_name, muscular_strain_high, exercise_library, max_severity)
         # dynamic stretch not ready yet
         #for s in soreness_list:
         #    self.check_corrective(s, self.event_date_time, exercise_library)

@@ -532,7 +532,7 @@ def test_generate_spreadsheets():
 
         is_pain_1 = [True, False]
 
-        body_parts_1 = [4, 5, 6, 7, 8, 11, 14, 15, 16]
+        body_parts_1 = [1, 4, 5, 6, 7, 8, 11, 14, 15, 16]
 
         historic_soreness_status_1 = [None,
                                       HistoricSorenessStatus.dormant_cleared,
