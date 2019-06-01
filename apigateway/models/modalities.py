@@ -761,6 +761,10 @@ class ActiveRest(ModalityBase):
 
         pass
 
+    def check_reactive_recover_from_sport_general(self, sport, exercise_library, goal):
+
+        pass
+
     def check_reactive_recover_from_sport(self, soreness_list, exercise_library, high_relative_load_session,
                                           high_relative_intensity_logged, muscular_strain_high, sports):
         if muscular_strain_high:
@@ -815,6 +819,8 @@ class ActiveRest(ModalityBase):
                                             self.static_stretch_exercises, goal, "1", None, exercise_library, sport_name)
                         self.copy_exercises(body_part.isolated_activate_exercises,
                                             self.isolated_activate_exercises, goal, "1", None, exercise_library, sport_name)
+
+                self.check_reactive_recover_from_sport_general(sport_name, exercise_library, goal)
 
 
 class ActiveRestBeforeTraining(ActiveRest, Serialisable):
@@ -902,6 +908,33 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
         self.aggregate_dosage_by_severity_exercise_collection(self.active_stretch_exercises)
         self.aggregate_dosage_by_severity_exercise_collection(self.static_integrate_exercises)
         self.aggregate_dosage_by_severity_exercise_collection(self.isolated_activate_exercises)
+
+    def check_reactive_recover_from_sport_general(self, sport, exercise_library, goal):
+
+        body_part_factory = BodyPartFactory()
+
+        body_part = body_part_factory.get_body_part_for_sport(sport)
+
+        for a in body_part.agonists:
+            agonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None))
+            if agonist is not None:
+                self.copy_exercises(agonist.inhibit_exercises, self.inhibit_exercises, goal, "1", None,
+                                    exercise_library)
+                #self.copy_exercises(agonist.static_stretch_exercises, self.static_stretch_exercises, goal, "1",
+                #                    None, exercise_library)
+                self.copy_exercises(agonist.active_stretch_exercises, self.active_stretch_exercises, goal, "1",
+                                    None, exercise_library)
+                self.copy_exercises(agonist.isolated_activate_exercises, self.isolated_activate_exercises, goal, "1",
+                                    None, exercise_library)
+
+        for t in body_part.antagonists:
+            antagonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(t), None))
+            if antagonist is not None:
+                self.copy_exercises(antagonist.isolated_activate_exercises, self.isolated_activate_exercises, goal, "1",
+                                    None, exercise_library)
+
+        self.copy_exercises(body_part.static_integrate_exercises, self.static_integrate_exercises, goal, "1", None,
+                            exercise_library)
 
     def get_general_exercises(self, exercise_library):
 
@@ -1269,6 +1302,35 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
         self.aggregate_dosage_by_severity_exercise_collection(self.static_stretch_exercises)
         self.aggregate_dosage_by_severity_exercise_collection(self.static_integrate_exercises)
         self.aggregate_dosage_by_severity_exercise_collection(self.isolated_activate_exercises)
+
+    def check_reactive_recover_from_sport_general(self, sport, exercise_library, goal):
+
+        goal = AthleteGoal("Expedite tissue regeneration", 1, AthleteGoalType.sport)
+        # goal.trigger = "High Relative Volume or Intensity of Logged Session"
+        goal.trigger_type = TriggerType.high_volume_intensity  # 0
+
+        body_part_factory = BodyPartFactory()
+
+        body_part = body_part_factory.get_body_part_for_sport(sport)
+
+        for a in body_part.agonists:
+            agonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None))
+            if agonist is not None:
+                self.copy_exercises(agonist.inhibit_exercises, self.inhibit_exercises, goal, "1", None,
+                                    exercise_library)
+                self.copy_exercises(agonist.static_stretch_exercises, self.static_stretch_exercises, goal, "1",
+                                    None, exercise_library)
+                self.copy_exercises(agonist.isolated_activate_exercises, self.isolated_activate_exercises, goal, "1",
+                                    None, exercise_library)
+
+        for t in body_part.antagonists:
+            antagonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(t), None))
+            if antagonist is not None:
+                self.copy_exercises(antagonist.isolated_activate_exercises, self.isolated_activate_exercises, goal, "1",
+                                    None, exercise_library)
+
+        self.copy_exercises(body_part.static_integrate_exercises, self.static_integrate_exercises, goal, "1", None,
+                            exercise_library)
 
     def get_general_exercises(self, exercise_library):
 
