@@ -11,7 +11,7 @@ from utils import format_date
 
 
 def get_alert(trigger_type, body_part=None, sport_name=None):
-    goal = AthleteGoal('Care for Soreness', 0, AthleteGoalType(0))
+    goal = AthleteGoal("Goal Name", 0, AthleteGoalType(0))
     goal.trigger_type = TriggerType(trigger_type)
     alert = Alert(goal)
     if body_part is not None:

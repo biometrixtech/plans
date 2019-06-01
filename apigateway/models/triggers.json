@@ -445,7 +445,7 @@
             "trigger_enum": 8,
             "trend_type": "Response",
             "triggers": "Overreaching as High Muscular Strain",
-            "goal_names": "Expedite tissue regeneration",
+            "goal_names": "",
             "length_of_impact": "multiple_days",
             "data_source": "soreness",
             "insight_priority_plans": "7",
@@ -464,9 +464,9 @@
                 },
                 "child_data": {
                     "new_first_time_title": "Your body isn\u2019t keeping up with training ",
-                    "new_first_time_body": "so we recommend increasing recovery habits to {goal} until your body properly adapts. ",
+                    "new_first_time_body": "so we recommend increasing your recovery habits until your body properly adapts. ",
                     "new_subsequent_title": "Your body isn\u2019t keeping up with training ",
-                    "new_subsequent_body": "so we recommend increasing recovery habits to {goal} until your body properly adapts. ",
+                    "new_subsequent_body": "so we recommend increasing your recovery habits until your body properly adapts. ",
                     "cleared_body": "Your body\u2019s responding well from training and is now in a sustainable recovery rhythm. Keep it up!"
                 },
                 "cleared_title": "Your Recovery Efficiency has improved!"
@@ -508,7 +508,7 @@
             "trigger_enum": 7,
             "trend_type": "Response",
             "triggers": "Sore (Pers <30d, Pers_2 <30d)",
-            "goal_names": "Expedite tissue regeneration",
+            "goal_names": "",
             "length_of_impact": "multiple_days",
             "data_source": "soreness",
             "insight_priority_plans": "7",
@@ -527,9 +527,9 @@
                 },
                 "child_data": {
                     "new_first_time_title": "Your {bodypart} is overstressed",
-                    "new_first_time_body": "so we recommend increasing recovery habits to {goal} until your body properly adapts. ",
+                    "new_first_time_body": "so we recommend increasing your recovery habits until your body properly adapts. ",
                     "new_subsequent_title": "Your {bodypart} is overstressed",
-                    "new_subsequent_body": "so we recommend increasing recovery habits to {goal} until your body properly adapts. ",
+                    "new_subsequent_body": "so we recommend increasing your recovery habits until your body properly adapts. ",
                     "cleared_body": "Good work! Your {bodypart} is no longer showing signs of overstress in response to training. "
                 },
                 "cleared_title": "Your {bodypart} has adapted!"

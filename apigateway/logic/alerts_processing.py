@@ -154,13 +154,16 @@ class AlertsProcessing(object):
                 # group trend into proper insight type bucket
                 if trend.insight_type == InsightType.stress:
                     trends.stress.alerts.append(trend)
-                    trends.stress.goals.add(alert.goal.text)
+                    if alert.goal.text is not None:
+                        trends.stress.goals.add(alert.goal.text)
                 elif trend.insight_type == InsightType.response:
                     trends.response.alerts.append(trend)
-                    trends.response.goals.add(alert.goal.text)
+                    if alert.goal.text is not None:
+                        trends.response.goals.add(alert.goal.text)
                 elif trend.insight_type == InsightType.biomechanics:
                     trends.biomechanics.alerts.append(trend)
-                    trends.biomechanics.goals.add(alert.goal.text)
+                    if alert.goal.text is not None:
+                        trends.biomechanics.goals.add(alert.goal.text)
 
             # triggers to insights
             # check if trigger already exists
@@ -169,10 +172,11 @@ class AlertsProcessing(object):
                 l_insight.start_date_time = self.trigger_date_time
             elif alert.goal.trigger_type in existing_triggers:
                 insight = [insight for insight in insights if insight.trigger_type == alert.goal.trigger_type][0]
-                insight.goal_targeted.append(alert.goal.text)
+                if alert.goal.text is not None:
+                    insight.goal_targeted.append(alert.goal.text)
                 if alert.body_part is not None:
                     insight.body_parts.append(alert.body_part)
-                    insight.child_triggers[alert.goal.trigger_type].append(alert.body_part)
+                    insight.child_triggers[alert.goal.trigger_type].add(alert.body_part)
                 if alert.sport_name is not None:
                     insight.sport_names.append(alert.sport_name)
                 if alert.severity is not None:
@@ -180,7 +184,8 @@ class AlertsProcessing(object):
             # check if any other group member exists
             elif TriggerType.parent_group_exists(alert.goal.trigger_type, existing_triggers):
                 insight = [insight for insight in insights if TriggerType.is_same_parent_group(alert.goal.trigger_type, insight.trigger_type)][0]
-                insight.goal_targeted.append(alert.goal.text)
+                if alert.goal.text is not None:
+                    insight.goal_targeted.append(alert.goal.text)
                 # for parent group 2 (trigger_type 14 and 15, 23, 24), if parent, should always get styling 1
                 if insight.parent_group == 2:
                     insight.styling = 1
@@ -188,11 +193,11 @@ class AlertsProcessing(object):
                 if alert.body_part is not None:
                     insight.body_parts.append(alert.body_part)
                     if alert.goal.trigger_type not in insight.child_triggers.keys():
-                        insight.child_triggers[alert.goal.trigger_type] = [alert.body_part]
+                        insight.child_triggers[alert.goal.trigger_type] = set([alert.body_part])
                     else:
-                        insight.child_triggers[alert.goal.trigger_type].append(alert.body_part)
+                        insight.child_triggers[alert.goal.trigger_type].add(alert.body_part)
                 elif alert.goal.trigger_type not in insight.child_triggers.keys():
-                        insight.child_triggers[alert.goal.trigger_type] = []
+                        insight.child_triggers[alert.goal.trigger_type] = set([])
 
                 if alert.sport_name is not None:
                     insight.sport_names.append(alert.sport_name)
@@ -200,12 +205,13 @@ class AlertsProcessing(object):
                     insight.severity.append(alert.severity)
             else:
                 insight = AthleteInsight(alert.goal.trigger_type)
-                insight.goal_targeted.append(alert.goal.text)
+                if alert.goal.text is not None:
+                    insight.goal_targeted.append(alert.goal.text)
                 if alert.body_part is not None:
                     insight.body_parts.append(alert.body_part)
-                    insight.child_triggers[alert.goal.trigger_type] = [alert.body_part]
+                    insight.child_triggers[alert.goal.trigger_type] = set([alert.body_part])
                 else:
-                    insight.child_triggers[alert.goal.trigger_type] = []
+                    insight.child_triggers[alert.goal.trigger_type] = set([])
                 if alert.sport_name is not None:
                     insight.sport_names.append(alert.sport_name)
                 if alert.severity is not None:
@@ -241,7 +247,8 @@ class AlertsProcessing(object):
         return trend
 
     def add_data_to_trend(self, trend, alert):
-        trend.goal_targeted = [alert.goal.text]
+        if alert.goal.text is not None:
+            trend.goal_targeted = [alert.goal.text]
         if alert.body_part is not None:
             trend.body_parts.append(alert.body_part)
         if alert.sport_name is not None:
