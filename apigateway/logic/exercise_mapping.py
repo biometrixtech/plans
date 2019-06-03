@@ -102,11 +102,10 @@ class ExerciseAssignmentCalculator(object):
 
         pain_reported_today = False
 
-        pain_today = list(p for p in self.soreness_list if p.daily and p.pain)
-        if len(pain_today) > 0:
-            pain_reported_today = True
-
         for s in self.soreness_list:
+
+            if s.pain and s.daily:
+                pain_reported_today = True
 
             goal = AthleteGoal("Improve neuromuscular control", 1, AthleteGoalType.preempt_corrective)
             heat = None
