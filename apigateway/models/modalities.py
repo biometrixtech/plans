@@ -771,9 +771,9 @@ class ActiveRest(ModalityBase):
 
         if soreness_list is not None and len(soreness_list) > 0:
             max_severity = max(list(s.severity for s in soreness_list))
-        if self.force_data or soreness_list is None or len(soreness_list) == 0:
+        if self.force_data:
             self.get_general_exercises(exercise_library, max_severity)
-        elif soreness_list is not None and len(soreness_list) > 0:
+        if soreness_list is not None and len(soreness_list) > 0:
             for s in soreness_list:
                 self.check_reactive_recover_from_sport(soreness_list, exercise_library, high_relative_load_session,
                                                        high_relative_intensity_logged,
