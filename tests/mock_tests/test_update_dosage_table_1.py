@@ -56,6 +56,7 @@ def test_daily_sore_1_4_severity_priority_1_table_1():
     soreness.severity = 1.4
     soreness.daily = True
     exercise.min_reps = 30
+    exercise.max_reps = 50
 
     for g in goal_types:
         goal = AthleteGoal("test", "1", g)
@@ -67,7 +68,7 @@ def test_daily_sore_1_4_severity_priority_1_table_1():
         assert dosage.efficient_sets_assigned == 1
         assert dosage.complete_reps_assigned == exercise.min_reps
         assert dosage.complete_sets_assigned == 1
-        assert dosage.comprehensive_reps_assigned == exercise.min_reps
+        assert dosage.comprehensive_reps_assigned == exercise.max_reps
         assert dosage.comprehensive_sets_assigned == 1
 
 
@@ -92,7 +93,7 @@ def test_daily_sore_2_4_severity_priority_1_table_1():
         assert dosage.efficient_sets_assigned == 1
         assert dosage.complete_reps_assigned == exercise.max_reps
         assert dosage.complete_sets_assigned == 1
-        assert dosage.comprehensive_reps_assigned == exercise.max_reps
+        assert dosage.comprehensive_reps_assigned == exercise.min_reps
         assert dosage.comprehensive_sets_assigned == 1
 
 
@@ -115,10 +116,10 @@ def test_daily_sore_3_4_severity_priority_1_table_1():
         dosage = mod_base.update_dosage(dosage, exercise)
         assert dosage.efficient_reps_assigned == exercise.min_reps
         assert dosage.efficient_sets_assigned == 1
-        assert dosage.complete_reps_assigned == exercise.max_reps
+        assert dosage.complete_reps_assigned == exercise.min_reps
         assert dosage.complete_sets_assigned == 1
         assert dosage.comprehensive_reps_assigned == exercise.max_reps
-        assert dosage.comprehensive_sets_assigned == 2
+        assert dosage.comprehensive_sets_assigned == 1
 
 
 def test_daily_sore_4_4_severity_priority_1_table_1():
@@ -206,6 +207,7 @@ def test_daily_sore_1_4_severity_priority_2_table_1():
     soreness.severity = 1.4
     soreness.daily = True
     exercise.min_reps = 30
+    exercise.max_reps = 50
 
     for g in goal_types:
         goal = AthleteGoal("test", "1", g)
@@ -217,7 +219,7 @@ def test_daily_sore_1_4_severity_priority_2_table_1():
         assert dosage.efficient_sets_assigned == 0
         assert dosage.complete_reps_assigned == exercise.min_reps
         assert dosage.complete_sets_assigned == 1
-        assert dosage.comprehensive_reps_assigned == exercise.min_reps
+        assert dosage.comprehensive_reps_assigned == exercise.max_reps
         assert dosage.comprehensive_sets_assigned == 1
 
 
@@ -242,7 +244,7 @@ def test_daily_sore_2_4_severity_priority_2_table_1():
         assert dosage.efficient_sets_assigned == 0
         assert dosage.complete_reps_assigned == exercise.max_reps
         assert dosage.complete_sets_assigned == 1
-        assert dosage.comprehensive_reps_assigned == exercise.max_reps
+        assert dosage.comprehensive_reps_assigned == exercise.min_reps
         assert dosage.comprehensive_sets_assigned == 1
 
 
@@ -265,10 +267,10 @@ def test_daily_sore_3_4_severity_priority_2_table_1():
         dosage = mod_base.update_dosage(dosage, exercise)
         assert dosage.efficient_reps_assigned == exercise.min_reps
         assert dosage.efficient_sets_assigned == 1
-        assert dosage.complete_reps_assigned == exercise.max_reps
+        assert dosage.complete_reps_assigned == exercise.min_reps
         assert dosage.complete_sets_assigned == 1
         assert dosage.comprehensive_reps_assigned == exercise.max_reps
-        assert dosage.comprehensive_sets_assigned == 2
+        assert dosage.comprehensive_sets_assigned == 1
 
 
 def test_daily_sore_4_4_severity_priority_2_table_1():
@@ -343,8 +345,8 @@ def test_daily_sore_0_4_severity_priority_3_table_1():
         assert dosage.efficient_sets_assigned == 0
         assert dosage.complete_reps_assigned == 0
         assert dosage.complete_sets_assigned == 0
-        assert dosage.comprehensive_reps_assigned == exercise.min_reps
-        assert dosage.comprehensive_sets_assigned == 1
+        assert dosage.comprehensive_reps_assigned == 0
+        assert dosage.comprehensive_sets_assigned == 0
 
 
 def test_daily_sore_1_4_severity_priority_3_table_1():
@@ -367,8 +369,8 @@ def test_daily_sore_1_4_severity_priority_3_table_1():
         assert dosage.efficient_sets_assigned == 0
         assert dosage.complete_reps_assigned == 0
         assert dosage.complete_sets_assigned == 0
-        assert dosage.comprehensive_reps_assigned == exercise.min_reps
-        assert dosage.comprehensive_sets_assigned == 1
+        assert dosage.comprehensive_reps_assigned == 0
+        assert dosage.comprehensive_sets_assigned == 0
 
 
 def test_daily_sore_2_4_severity_priority_3_table_1():
@@ -392,7 +394,7 @@ def test_daily_sore_2_4_severity_priority_3_table_1():
         assert dosage.efficient_sets_assigned == 0
         assert dosage.complete_reps_assigned == 0
         assert dosage.complete_sets_assigned == 0
-        assert dosage.comprehensive_reps_assigned == exercise.max_reps
+        assert dosage.comprehensive_reps_assigned == exercise.min_reps
         assert dosage.comprehensive_sets_assigned == 1
 
 
@@ -415,10 +417,10 @@ def test_daily_sore_3_4_severity_priority_3_table_1():
         dosage = mod_base.update_dosage(dosage, exercise)
         assert dosage.efficient_reps_assigned == 0
         assert dosage.efficient_sets_assigned == 0
-        assert dosage.complete_reps_assigned == exercise.max_reps
+        assert dosage.complete_reps_assigned == exercise.min_reps
         assert dosage.complete_sets_assigned == 1
         assert dosage.comprehensive_reps_assigned == exercise.max_reps
-        assert dosage.comprehensive_sets_assigned == 2
+        assert dosage.comprehensive_sets_assigned == 1
 
 
 def test_daily_sore_4_4_severity_priority_3_table_1():
