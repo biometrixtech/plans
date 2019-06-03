@@ -100,12 +100,7 @@ class ExerciseAssignmentCalculator(object):
         minutes = []
         alerts = []
 
-        pain_reported_today = False
-
         for s in self.soreness_list:
-
-            if s.pain and s.daily:
-                pain_reported_today = True
 
             goal = AthleteGoal("Improve neuromuscular control", 1, AthleteGoalType.preempt_corrective)
             heat = None
@@ -124,7 +119,7 @@ class ExerciseAssignmentCalculator(object):
                     goal.trigger_type = TriggerType.hist_sore_greater_30  # 19
 
                 elif ((s.historic_soreness_status == HistoricSorenessStatus.persistent_2_pain or s.is_persistent_pain())
-                      and not pain_reported_today):
+                      and not s.daily):
                     if days_diff <= 30:
                         #goal.trigger = "Acute, Pers, Pers-2 Pain <= 30d"
                         goal.trigger_type = TriggerType.pers_pers2_pain_less_30_no_pain_today  # 21
