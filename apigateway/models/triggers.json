@@ -457,9 +457,9 @@
                 "parent_data": {
                     "enum": 0,
                     "new_first_time_title": "Your body isn\u2019t keeping up with training ",
-                    "new_first_time_body": "So we added activities to {goal}.",
+                    "new_first_time_body": "so we recommend increasing your recovery habits until your body properly adapts. ",
                     "new_subsequent_title": "Your body isn\u2019t keeping up with training ",
-                    "new_subsequent_body": "So we added activities to {goal}.",
+                    "new_subsequent_body": "so we recommend increasing your recovery habits until your body properly adapts. ",
                     "cleared_body": "Your body\u2019s responding well from training and is now in a sustainable recovery rhythm. Keep it up!"
                 },
                 "child_data": {
@@ -520,9 +520,9 @@
                 "parent_data": {
                     "enum": 0,
                     "new_first_time_title": "Your body isn\u2019t keeping up with training ",
-                    "new_first_time_body": "So we added activities to {goal}.",
+                    "new_first_time_body": "so we recommend increasing your recovery habits until your body properly adapts. ",
                     "new_subsequent_title": "Your body isn\u2019t keeping up with training ",
-                    "new_subsequent_body": "So we added activities to {goal}.",
+                    "new_subsequent_body": "so we recommend increasing your recovery habits until your body properly adapts. ",
                     "cleared_body": "Your body\u2019s responding well from training and is now in a sustainable recovery rhythm. Keep it up!"
                 },
                 "child_data": {
