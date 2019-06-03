@@ -6,7 +6,7 @@ class ClearedSorenessDatastore(object):
     def side_load_athlete_stats(self, cleared_doms):
         self.cleared_doms = cleared_doms
 
-    def get(self, athlete_id):
+    def get(self, athlete_id, start_date=None, end_date=None):
         return self._query_mongodb()
 
     def put(self, items):
