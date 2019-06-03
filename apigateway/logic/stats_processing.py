@@ -268,7 +268,8 @@ class StatsProcessing(object):
                                     and not o.is_pain and o.cause == SorenessCause.overloading)
 
         all_soreness.extend(overloading_soreness)
-        all_soreness.extend(cleared_soreness)
+        if cleared_soreness is not None:
+            all_soreness.extend(cleared_soreness)
 
         total_load = 0
         sore_load = 0

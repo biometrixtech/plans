@@ -24,6 +24,7 @@ class TrainingPlanManager(object):
         self.athlete_stats = None
         self.training_sessions = []
         self.longitudinal_alerts = []
+        self.soreness_list = []
 
     def load_data(self, event_date):
         daily_plans = self.daily_plan_datastore.get(self.athlete_id, format_date(parse_date(event_date) - datetime.timedelta(days=1)), event_date)
@@ -71,14 +72,14 @@ class TrainingPlanManager(object):
             historic_soreness = copy.deepcopy([hs for hs in self.athlete_stats.historic_soreness if not hs.is_dormant_cleared()])
             # historic_soreness_present = len(historic_soreness) > 0
 
-        soreness_list = SorenessCalculator().get_soreness_summary_from_surveys(self.readiness_surveys,
+        self.soreness_list = SorenessCalculator().get_soreness_summary_from_surveys(self.readiness_surveys,
                                                                                self.post_session_surveys,
                                                                                self.trigger_date_time,
                                                                                historic_soreness)
 
         calc = exercise_mapping.ExerciseAssignmentCalculator(athlete_stats, self.exercise_library_datastore,
                                                              self.completed_exercise_datastore,
-                                                             self.training_sessions, soreness_list,
+                                                             self.training_sessions, self.soreness_list,
                                                              parse_date(event_date))
 
         # new modalities
