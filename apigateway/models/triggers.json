@@ -841,9 +841,9 @@
                     "cleared_body": ""
                 },
                 "child_data": {
-                    "new_first_time_title": "Your {bodypart} needs attention",
+                    "new_first_time_title": "Keep an eye on your {bodypart}",
                     "new_first_time_body": "we added activities to {goal}, but please avoid any movement that triggers pain",
-                    "new_subsequent_title": "Your {bodypart} needs attention",
+                    "new_subsequent_title": "Keep an eye on your {bodypart}",
                     "new_subsequent_body": "we added activities to {goal}, but please avoid any movement that triggers pain",
                     "cleared_body": ""
                 },
@@ -967,9 +967,9 @@
                     "cleared_body": ""
                 },
                 "child_data": {
-                    "new_first_time_title": "Your {bodypart} needs attention",
+                    "new_first_time_title": "Keep an eye on your {bodypart}",
                     "new_first_time_body": "we added activities to {goal}, but please avoid any movement that triggers pain",
-                    "new_subsequent_title": "Your {bodypart} needs attention",
+                    "new_subsequent_title": "Keep an eye on your {bodypart}",
                     "new_subsequent_body": "we added activities to {goal}, but please avoid any movement that triggers pain",
                     "cleared_body": ""
                 },
@@ -1465,9 +1465,9 @@
                 "parent_data": {
                     "enum": 4,
                     "new_first_time_title": "Elevated overuse injury risk",
-                    "new_first_time_body": "So we added activities to {goal}. Please avoid any activity that causes pain.",
+                    "new_first_time_body": "so we'll start incorporating activities to {goal}. Please avoid any activity that causes pain",
                     "new_subsequent_title": "Elevated overuse injury risk",
-                    "new_subsequent_body": "So we added activities to {goal}. Please avoid any activity that causes pain.",
+                    "new_subsequent_body": "so we'll start incorporating activities to {goal}. Please avoid any activity that causes pain",
                     "cleared_body": "You haven\u2019t reported {bodypart} symptoms in a while. This could mean your movement dysfunction is improving. We\u2019ll keep an eye on it just in case."
                 },
                 "child_data": {
@@ -1528,9 +1528,9 @@
                 "parent_data": {
                     "enum": 4,
                     "new_first_time_title": "Elevated overuse injury risk",
-                    "new_first_time_body": "So we added activities to {goal}. Please avoid any activity that causes pain.",
+                    "new_first_time_body": "so we'll start incorporating activities to {goal}. Please avoid any activity that causes pain",
                     "new_subsequent_title": "Elevated overuse injury risk",
-                    "new_subsequent_body": "So we added activities to {goal}. Please avoid any activity that causes pain.",
+                    "new_subsequent_body": "so we'll start incorporating activities to {goal}. Please avoid any activity that causes pain",
                     "cleared_body": "You haven\u2019t reported {bodypart} symptoms in a while. This could mean your movement dysfunction is improving. We\u2019ll keep an eye on it just in case."
                 },
                 "child_data": {
