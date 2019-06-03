@@ -432,10 +432,10 @@ class ModalityBase(object):
                     dosage.default_complete_reps_assigned = exercise.min_reps
                     dosage.default_complete_sets_assigned = 1
 
-                dosage.comprehensive_reps_assigned = exercise.min_reps
-                dosage.comprehensive_sets_assigned = 1
-                dosage.default_comprehensive_reps_assigned = exercise.min_reps
-                dosage.default_comprehensive_sets_assigned = 1
+                    dosage.comprehensive_reps_assigned = exercise.max_reps
+                    dosage.comprehensive_sets_assigned = 1
+                    dosage.default_comprehensive_reps_assigned = exercise.max_reps
+                    dosage.default_comprehensive_sets_assigned = 1
 
             elif 0.5 <= dosage.soreness_source.severity < 1.5:
 
@@ -444,13 +444,13 @@ class ModalityBase(object):
                     dosage.default_efficient_sets_assigned = 1
 
                 if dosage.priority == "1" or dosage.priority == "2":
-                    dosage.default_complete_reps_assigned = exercise.max_reps
+                    dosage.default_complete_reps_assigned = exercise.min_reps
                     dosage.default_complete_sets_assigned = 1
 
-                dosage.comprehensive_reps_assigned = exercise.max_reps
-                dosage.comprehensive_sets_assigned = 1
-                dosage.default_comprehensive_reps_assigned = exercise.max_reps
-                dosage.default_comprehensive_sets_assigned = 1
+                    dosage.comprehensive_reps_assigned = exercise.max_reps
+                    dosage.comprehensive_sets_assigned = 1
+                    dosage.default_comprehensive_reps_assigned = exercise.max_reps
+                    dosage.default_comprehensive_sets_assigned = 1
 
             elif 1.5 <= dosage.soreness_source.severity < 2.5:
 
@@ -458,13 +458,26 @@ class ModalityBase(object):
                     dosage.default_efficient_reps_assigned = exercise.min_reps
                     dosage.default_efficient_sets_assigned = 1
 
-                dosage.default_complete_reps_assigned = exercise.max_reps
-                dosage.default_complete_sets_assigned = 1
-                dosage.comprehensive_reps_assigned = exercise.max_reps
-                dosage.comprehensive_sets_assigned = 2
-                dosage.default_comprehensive_reps_assigned = exercise.max_reps
-                dosage.default_comprehensive_sets_assigned = 2
+                if dosage.priority == "1" or dosage.priority == "2":
+                    dosage.default_complete_reps_assigned = exercise.min_reps
+                    dosage.default_complete_sets_assigned = 1
+                    dosage.comprehensive_reps_assigned = exercise.max_reps
+                    dosage.comprehensive_sets_assigned = 1
+                    dosage.default_comprehensive_reps_assigned = exercise.max_reps
+                    dosage.default_comprehensive_sets_assigned = 1
 
+            #trial
+            elif 2.5 <= dosage.soreness_source.severity <= 5.0:
+                dosage.default_efficient_reps_assigned = 0
+                dosage.default_efficient_sets_assigned = 0
+                dosage.default_complete_reps_assigned = 0
+                dosage.default_complete_sets_assigned = 0
+                dosage.comprehensive_reps_assigned = 0
+                dosage.comprehensive_sets_assigned = 0
+                dosage.default_comprehensive_reps_assigned = 0
+                dosage.default_comprehensive_sets_assigned = 0
+
+            '''trial
             elif 2.5 <= dosage.soreness_source.severity < 3.5:
 
                 dosage.default_efficient_reps_assigned = exercise.min_reps
@@ -497,6 +510,7 @@ class ModalityBase(object):
                 dosage.comprehensive_sets_assigned = 3
                 dosage.default_comprehensive_reps_assigned = exercise.max_reps
                 dosage.default_comprehensive_sets_assigned = 3
+            '''
 
         elif (dosage.goal.goal_type == AthleteGoalType.sore and
                 (dosage.soreness_source.historic_soreness_status is None or

@@ -33,6 +33,7 @@ def test_daily_sore_0_4_severity_priority_1_table_2():
     soreness.severity = 0.4
     soreness.daily = True
     exercise.min_reps = 30
+    exercise.max_reps = 50
 
     goal = AthleteGoal("test", "1", AthleteGoalType.corrective)
 
@@ -47,9 +48,9 @@ def test_daily_sore_0_4_severity_priority_1_table_2():
     assert dosage.default_efficient_sets_assigned == 1
     assert dosage.default_complete_reps_assigned == exercise.min_reps
     assert dosage.default_complete_sets_assigned == 1
-    assert dosage.comprehensive_reps_assigned == exercise.min_reps
+    assert dosage.comprehensive_reps_assigned == exercise.max_reps
     assert dosage.comprehensive_sets_assigned == 1
-    assert dosage.default_comprehensive_reps_assigned == exercise.min_reps
+    assert dosage.default_comprehensive_reps_assigned == exercise.max_reps
     assert dosage.default_comprehensive_sets_assigned == 1
 
 
@@ -75,7 +76,7 @@ def test_daily_sore_1_4_severity_priority_1_table_2():
     assert dosage.complete_sets_assigned == 0
     assert dosage.default_efficient_reps_assigned == exercise.min_reps
     assert dosage.default_efficient_sets_assigned == 1
-    assert dosage.default_complete_reps_assigned == exercise.max_reps
+    assert dosage.default_complete_reps_assigned == exercise.min_reps
     assert dosage.default_complete_sets_assigned == 1
     assert dosage.comprehensive_reps_assigned == exercise.max_reps
     assert dosage.comprehensive_sets_assigned == 1
@@ -105,12 +106,12 @@ def test_daily_sore_2_4_severity_priority_1_table_2():
     assert dosage.complete_sets_assigned == 0
     assert dosage.default_efficient_reps_assigned == exercise.min_reps
     assert dosage.default_efficient_sets_assigned == 1
-    assert dosage.default_complete_reps_assigned == exercise.max_reps
+    assert dosage.default_complete_reps_assigned == exercise.min_reps
     assert dosage.default_complete_sets_assigned == 1
     assert dosage.comprehensive_reps_assigned == exercise.max_reps
-    assert dosage.comprehensive_sets_assigned == 2
+    assert dosage.comprehensive_sets_assigned == 1
     assert dosage.default_comprehensive_reps_assigned == exercise.max_reps
-    assert dosage.default_comprehensive_sets_assigned == 2
+    assert dosage.default_comprehensive_sets_assigned == 1
 
 
 def test_daily_sore_3_4_severity_priority_1_table_2():
@@ -133,14 +134,14 @@ def test_daily_sore_3_4_severity_priority_1_table_2():
     assert dosage.efficient_sets_assigned == 0
     assert dosage.complete_reps_assigned == 0
     assert dosage.complete_sets_assigned == 0
-    assert dosage.default_efficient_reps_assigned == exercise.min_reps
-    assert dosage.default_efficient_sets_assigned == 1
-    assert dosage.default_complete_reps_assigned == exercise.max_reps
-    assert dosage.default_complete_sets_assigned == 1
-    assert dosage.comprehensive_reps_assigned == exercise.max_reps
-    assert dosage.comprehensive_sets_assigned == 2
-    assert dosage.default_comprehensive_reps_assigned == exercise.max_reps
-    assert dosage.default_comprehensive_sets_assigned == 2
+    assert dosage.default_efficient_reps_assigned == 0
+    assert dosage.default_efficient_sets_assigned == 0
+    assert dosage.default_complete_reps_assigned == 0
+    assert dosage.default_complete_sets_assigned == 0
+    assert dosage.comprehensive_reps_assigned == 0
+    assert dosage.comprehensive_sets_assigned == 0
+    assert dosage.default_comprehensive_reps_assigned == 0
+    assert dosage.default_comprehensive_sets_assigned == 0
 
 
 def test_daily_sore_4_4_severity_priority_1_table_2():
@@ -163,14 +164,14 @@ def test_daily_sore_4_4_severity_priority_1_table_2():
     assert dosage.efficient_sets_assigned == 0
     assert dosage.complete_reps_assigned == 0
     assert dosage.complete_sets_assigned == 0
-    assert dosage.default_efficient_reps_assigned == exercise.max_reps
-    assert dosage.default_efficient_sets_assigned == 1
-    assert dosage.default_complete_reps_assigned == exercise.max_reps
-    assert dosage.default_complete_sets_assigned == 2
-    assert dosage.comprehensive_reps_assigned == exercise.max_reps
-    assert dosage.comprehensive_sets_assigned == 3
-    assert dosage.default_comprehensive_reps_assigned == exercise.max_reps
-    assert dosage.default_comprehensive_sets_assigned == 3
+    assert dosage.default_efficient_reps_assigned == 0
+    assert dosage.default_efficient_sets_assigned == 0
+    assert dosage.default_complete_reps_assigned == 0
+    assert dosage.default_complete_sets_assigned == 0
+    assert dosage.comprehensive_reps_assigned == 0
+    assert dosage.comprehensive_sets_assigned == 0
+    assert dosage.default_comprehensive_reps_assigned == 0
+    assert dosage.default_comprehensive_sets_assigned == 0
 
 
 def test_daily_sore_4_9_severity_priority_1_table_2():
@@ -193,14 +194,14 @@ def test_daily_sore_4_9_severity_priority_1_table_2():
     assert dosage.efficient_sets_assigned == 0
     assert dosage.complete_reps_assigned == 0
     assert dosage.complete_sets_assigned == 0
-    assert dosage.default_efficient_reps_assigned == exercise.max_reps
-    assert dosage.default_efficient_sets_assigned == 1
-    assert dosage.default_complete_reps_assigned == exercise.max_reps
-    assert dosage.default_complete_sets_assigned == 2
-    assert dosage.comprehensive_reps_assigned == exercise.max_reps
-    assert dosage.comprehensive_sets_assigned == 3
-    assert dosage.default_comprehensive_reps_assigned == exercise.max_reps
-    assert dosage.default_comprehensive_sets_assigned == 3
+    assert dosage.default_efficient_reps_assigned == 0
+    assert dosage.default_efficient_sets_assigned == 0
+    assert dosage.default_complete_reps_assigned == 0
+    assert dosage.default_complete_sets_assigned == 0
+    assert dosage.comprehensive_reps_assigned == 0
+    assert dosage.comprehensive_sets_assigned == 0
+    assert dosage.default_comprehensive_reps_assigned == 0
+    assert dosage.default_comprehensive_sets_assigned == 0
 
 # priority 2
 
@@ -214,6 +215,7 @@ def test_daily_sore_0_4_severity_priority_2_table_2():
     soreness.severity = 0.4
     soreness.daily = True
     exercise.min_reps = 30
+    exercise.max_reps = 50
 
     goal = AthleteGoal("test", "1", AthleteGoalType.corrective)
 
@@ -228,9 +230,9 @@ def test_daily_sore_0_4_severity_priority_2_table_2():
     assert dosage.default_efficient_sets_assigned == 0
     assert dosage.default_complete_reps_assigned == exercise.min_reps
     assert dosage.default_complete_sets_assigned == 1
-    assert dosage.comprehensive_reps_assigned == exercise.min_reps
+    assert dosage.comprehensive_reps_assigned == exercise.max_reps
     assert dosage.comprehensive_sets_assigned == 1
-    assert dosage.default_comprehensive_reps_assigned == exercise.min_reps
+    assert dosage.default_comprehensive_reps_assigned == exercise.max_reps
     assert dosage.default_comprehensive_sets_assigned == 1
 
 
@@ -256,7 +258,7 @@ def test_daily_sore_1_4_severity_priority_2_table_2():
     assert dosage.complete_sets_assigned == 0
     assert dosage.default_efficient_reps_assigned == 0
     assert dosage.default_efficient_sets_assigned == 0
-    assert dosage.default_complete_reps_assigned == exercise.max_reps
+    assert dosage.default_complete_reps_assigned == exercise.min_reps
     assert dosage.default_complete_sets_assigned == 1
     assert dosage.comprehensive_reps_assigned == exercise.max_reps
     assert dosage.comprehensive_sets_assigned == 1
@@ -286,12 +288,12 @@ def test_daily_sore_2_4_severity_priority_2_table_2():
     assert dosage.complete_sets_assigned == 0
     assert dosage.default_efficient_reps_assigned == 0
     assert dosage.default_efficient_sets_assigned == 0
-    assert dosage.default_complete_reps_assigned == exercise.max_reps
+    assert dosage.default_complete_reps_assigned == exercise.min_reps
     assert dosage.default_complete_sets_assigned == 1
     assert dosage.comprehensive_reps_assigned == exercise.max_reps
-    assert dosage.comprehensive_sets_assigned == 2
+    assert dosage.comprehensive_sets_assigned == 1
     assert dosage.default_comprehensive_reps_assigned == exercise.max_reps
-    assert dosage.default_comprehensive_sets_assigned == 2
+    assert dosage.default_comprehensive_sets_assigned == 1
 
 
 def test_daily_sore_3_4_severity_priority_2_table_2():
@@ -314,14 +316,14 @@ def test_daily_sore_3_4_severity_priority_2_table_2():
     assert dosage.efficient_sets_assigned == 0
     assert dosage.complete_reps_assigned == 0
     assert dosage.complete_sets_assigned == 0
-    assert dosage.default_efficient_reps_assigned == exercise.min_reps
-    assert dosage.default_efficient_sets_assigned == 1
-    assert dosage.default_complete_reps_assigned == exercise.max_reps
-    assert dosage.default_complete_sets_assigned == 1
-    assert dosage.comprehensive_reps_assigned == exercise.max_reps
-    assert dosage.comprehensive_sets_assigned == 2
-    assert dosage.default_comprehensive_reps_assigned == exercise.max_reps
-    assert dosage.default_comprehensive_sets_assigned == 2
+    assert dosage.default_efficient_reps_assigned == 0
+    assert dosage.default_efficient_sets_assigned == 0
+    assert dosage.default_complete_reps_assigned == 0
+    assert dosage.default_complete_sets_assigned == 0
+    assert dosage.comprehensive_reps_assigned == 0
+    assert dosage.comprehensive_sets_assigned == 0
+    assert dosage.default_comprehensive_reps_assigned == 0
+    assert dosage.default_comprehensive_sets_assigned == 0
 
 def test_daily_sore_4_4_severity_priority_2_table_2():
 
@@ -343,14 +345,14 @@ def test_daily_sore_4_4_severity_priority_2_table_2():
     assert dosage.efficient_sets_assigned == 0
     assert dosage.complete_reps_assigned == 0
     assert dosage.complete_sets_assigned == 0
-    assert dosage.default_efficient_reps_assigned == exercise.max_reps
-    assert dosage.default_efficient_sets_assigned == 1
-    assert dosage.default_complete_reps_assigned == exercise.max_reps
-    assert dosage.default_complete_sets_assigned == 2
-    assert dosage.comprehensive_reps_assigned == exercise.max_reps
-    assert dosage.comprehensive_sets_assigned == 3
-    assert dosage.default_comprehensive_reps_assigned == exercise.max_reps
-    assert dosage.default_comprehensive_sets_assigned == 3
+    assert dosage.default_efficient_reps_assigned == 0
+    assert dosage.default_efficient_sets_assigned == 0
+    assert dosage.default_complete_reps_assigned == 0
+    assert dosage.default_complete_sets_assigned == 0
+    assert dosage.comprehensive_reps_assigned == 0
+    assert dosage.comprehensive_sets_assigned == 0
+    assert dosage.default_comprehensive_reps_assigned == 0
+    assert dosage.default_comprehensive_sets_assigned == 0
 
 
 def test_daily_sore_4_9_severity_priority_2_table_2():
@@ -373,14 +375,14 @@ def test_daily_sore_4_9_severity_priority_2_table_2():
     assert dosage.efficient_sets_assigned == 0
     assert dosage.complete_reps_assigned == 0
     assert dosage.complete_sets_assigned == 0
-    assert dosage.default_efficient_reps_assigned == exercise.max_reps
-    assert dosage.default_efficient_sets_assigned == 1
-    assert dosage.default_complete_reps_assigned == exercise.max_reps
-    assert dosage.default_complete_sets_assigned == 2
-    assert dosage.comprehensive_reps_assigned == exercise.max_reps
-    assert dosage.comprehensive_sets_assigned == 3
-    assert dosage.default_comprehensive_reps_assigned == exercise.max_reps
-    assert dosage.default_comprehensive_sets_assigned == 3
+    assert dosage.default_efficient_reps_assigned == 0
+    assert dosage.default_efficient_sets_assigned == 0
+    assert dosage.default_complete_reps_assigned == 0
+    assert dosage.default_complete_sets_assigned == 0
+    assert dosage.comprehensive_reps_assigned == 0
+    assert dosage.comprehensive_sets_assigned == 0
+    assert dosage.default_comprehensive_reps_assigned == 0
+    assert dosage.default_comprehensive_sets_assigned == 0
 
 # priority 3
 
@@ -408,10 +410,10 @@ def test_daily_sore_0_4_severity_priority_3_table_2():
     assert dosage.default_efficient_sets_assigned == 0
     assert dosage.default_complete_reps_assigned == 0
     assert dosage.default_complete_sets_assigned == 0
-    assert dosage.comprehensive_reps_assigned == exercise.min_reps
-    assert dosage.comprehensive_sets_assigned == 1
-    assert dosage.default_comprehensive_reps_assigned == exercise.min_reps
-    assert dosage.default_comprehensive_sets_assigned == 1
+    assert dosage.comprehensive_reps_assigned == 0
+    assert dosage.comprehensive_sets_assigned == 0
+    assert dosage.default_comprehensive_reps_assigned == 0
+    assert dosage.default_comprehensive_sets_assigned == 0
 
 
 def test_daily_sore_1_4_severity_priority_3_table_2():
@@ -438,10 +440,10 @@ def test_daily_sore_1_4_severity_priority_3_table_2():
     assert dosage.default_efficient_sets_assigned == 0
     assert dosage.default_complete_reps_assigned == 0
     assert dosage.default_complete_sets_assigned == 0
-    assert dosage.comprehensive_reps_assigned == exercise.max_reps
-    assert dosage.comprehensive_sets_assigned == 1
-    assert dosage.default_comprehensive_reps_assigned == exercise.max_reps
-    assert dosage.default_comprehensive_sets_assigned == 1
+    assert dosage.comprehensive_reps_assigned == 0
+    assert dosage.comprehensive_sets_assigned == 0
+    assert dosage.default_comprehensive_reps_assigned == 0
+    assert dosage.default_comprehensive_sets_assigned == 0
 
 
 def test_daily_sore_2_4_severity_priority_3_table_2():
@@ -466,12 +468,12 @@ def test_daily_sore_2_4_severity_priority_3_table_2():
     assert dosage.complete_sets_assigned == 0
     assert dosage.default_efficient_reps_assigned == 0
     assert dosage.default_efficient_sets_assigned == 0
-    assert dosage.default_complete_reps_assigned == exercise.max_reps
-    assert dosage.default_complete_sets_assigned == 1
-    assert dosage.comprehensive_reps_assigned == exercise.max_reps
-    assert dosage.comprehensive_sets_assigned == 2
-    assert dosage.default_comprehensive_reps_assigned == exercise.max_reps
-    assert dosage.default_comprehensive_sets_assigned == 2
+    assert dosage.default_complete_reps_assigned == 0
+    assert dosage.default_complete_sets_assigned == 0
+    assert dosage.comprehensive_reps_assigned == 0
+    assert dosage.comprehensive_sets_assigned == 0
+    assert dosage.default_comprehensive_reps_assigned == 0
+    assert dosage.default_comprehensive_sets_assigned == 0
 
 
 def test_daily_sore_3_4_severity_priority_3_table_2():
@@ -494,14 +496,14 @@ def test_daily_sore_3_4_severity_priority_3_table_2():
     assert dosage.efficient_sets_assigned == 0
     assert dosage.complete_reps_assigned == 0
     assert dosage.complete_sets_assigned == 0
-    assert dosage.default_efficient_reps_assigned == exercise.min_reps
-    assert dosage.default_efficient_sets_assigned == 1
-    assert dosage.default_complete_reps_assigned == exercise.max_reps
-    assert dosage.default_complete_sets_assigned == 1
-    assert dosage.comprehensive_reps_assigned == exercise.max_reps
-    assert dosage.comprehensive_sets_assigned == 2
-    assert dosage.default_comprehensive_reps_assigned == exercise.max_reps
-    assert dosage.default_comprehensive_sets_assigned == 2
+    assert dosage.default_efficient_reps_assigned == 0
+    assert dosage.default_efficient_sets_assigned == 0
+    assert dosage.default_complete_reps_assigned == 0
+    assert dosage.default_complete_sets_assigned == 0
+    assert dosage.comprehensive_reps_assigned == 0
+    assert dosage.comprehensive_sets_assigned == 0
+    assert dosage.default_comprehensive_reps_assigned == 0
+    assert dosage.default_comprehensive_sets_assigned == 0
 
 
 def test_daily_sore_4_4_severity_priority_3_table_2():
@@ -524,14 +526,14 @@ def test_daily_sore_4_4_severity_priority_3_table_2():
     assert dosage.efficient_sets_assigned == 0
     assert dosage.complete_reps_assigned == 0
     assert dosage.complete_sets_assigned == 0
-    assert dosage.default_efficient_reps_assigned == exercise.max_reps
-    assert dosage.default_efficient_sets_assigned == 1
-    assert dosage.default_complete_reps_assigned == exercise.max_reps
-    assert dosage.default_complete_sets_assigned == 2
-    assert dosage.comprehensive_reps_assigned == exercise.max_reps
-    assert dosage.comprehensive_sets_assigned == 3
-    assert dosage.default_comprehensive_reps_assigned == exercise.max_reps
-    assert dosage.default_comprehensive_sets_assigned == 3
+    assert dosage.default_efficient_reps_assigned == 0
+    assert dosage.default_efficient_sets_assigned == 0
+    assert dosage.default_complete_reps_assigned == 0
+    assert dosage.default_complete_sets_assigned == 0
+    assert dosage.comprehensive_reps_assigned == 0
+    assert dosage.comprehensive_sets_assigned == 0
+    assert dosage.default_comprehensive_reps_assigned == 0
+    assert dosage.default_comprehensive_sets_assigned == 0
 
 
 def test_daily_sore_4_9_severity_priority_3_table_2():
@@ -554,11 +556,11 @@ def test_daily_sore_4_9_severity_priority_3_table_2():
     assert dosage.efficient_sets_assigned == 0
     assert dosage.complete_reps_assigned == 0
     assert dosage.complete_sets_assigned == 0
-    assert dosage.default_efficient_reps_assigned == exercise.max_reps
-    assert dosage.default_efficient_sets_assigned == 1
-    assert dosage.default_complete_reps_assigned == exercise.max_reps
-    assert dosage.default_complete_sets_assigned == 2
-    assert dosage.comprehensive_reps_assigned == exercise.max_reps
-    assert dosage.comprehensive_sets_assigned == 3
-    assert dosage.default_comprehensive_reps_assigned == exercise.max_reps
-    assert dosage.default_comprehensive_sets_assigned == 3
+    assert dosage.default_efficient_reps_assigned == 0
+    assert dosage.default_efficient_sets_assigned == 0
+    assert dosage.default_complete_reps_assigned == 0
+    assert dosage.default_complete_sets_assigned == 0
+    assert dosage.comprehensive_reps_assigned == 0
+    assert dosage.comprehensive_sets_assigned == 0
+    assert dosage.default_comprehensive_reps_assigned == 0
+    assert dosage.default_comprehensive_sets_assigned == 0
