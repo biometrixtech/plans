@@ -72,10 +72,11 @@ def validate_uuid4(uuid_string):
 
 def fix_early_survey_event_date(event_date):
     if event_date.hour < 3:
+        event_date = event_date - datetime.timedelta(days=1)
         return datetime.datetime(
                             year=event_date.year, 
                             month=event_date.month,
-                            day=event_date.day - 1,
+                            day=event_date.day,
                             hour=23,
                             minute=59,
                             second=59
