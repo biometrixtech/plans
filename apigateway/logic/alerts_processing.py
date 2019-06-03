@@ -187,8 +187,8 @@ class AlertsProcessing(object):
                 if alert.goal.text is not None:
                     insight.goal_targeted.append(alert.goal.text)
                 # for parent group 2 (trigger_type 14 and 15, 23, 24), if parent, should always get styling 1
-                if insight.parent_group == 2:
-                    insight.styling = 1
+                # if insight.parent_group == 2:
+                #     insight.styling = 1
                 insight.parent = True
                 if alert.body_part is not None:
                     insight.body_parts.append(alert.body_part)

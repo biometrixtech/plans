@@ -25,7 +25,7 @@ class AthleteInsight(Serialisable):
         self.insight_type = InsightType.stress
         self.longitudinal = self.is_multi_day()
         self.priority = None
-        self.styling = self.get_styling()
+        self.styling = 0
         self.read = False
         self.parent_group = TriggerType.get_parent_group(self.trigger_type)
         self.present_in_plans = True
@@ -109,8 +109,10 @@ class AthleteInsight(Serialisable):
         self.title = TextGenerator().get_cleaned_text(title, self.goal_targeted, self.body_parts, self.sport_names, severity=self.severity)
         if self.parent and self.parent_group == 2:
             self.priority = 1
+            self.styling = 1
         else:
             self.priority = int(trigger_data['insight_priority_plans'])
+            self.styling = int(plan_data['priority_styling'])
         self.insight_type = InsightType[trigger_data['trend_type'].lower()]
         self.present_in_plans = plan_data['present_in_plans']
 
@@ -120,11 +122,11 @@ class AthleteInsight(Serialisable):
         else:
             return False
 
-    def get_styling(self):
-        if self.trigger_type.value in [15]:
-            return 1
-        else:
-            return 0
+    # def get_styling(self):
+    #     if self.trigger_type.value in [15]:
+    #         return 1
+    #     else:
+    #         return 0
 
     def __setattr__(self, name, value):
         if name in ['start_date_time'] and value is not None and not isinstance(value, datetime.datetime):
