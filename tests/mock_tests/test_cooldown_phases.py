@@ -31,12 +31,28 @@ def test_cooldown_check_soreness_severity_3():
         soreness.body_part = BodyPart(BodyPartLocation(b), None)
         soreness.severity = 3
         soreness.side = 1
+        soreness.pain = False
         exercise_library = exercise_library_datastore.get()
-        cooldown.check_recover_from_sport([soreness], SportName.cycling, False, exercise_library)
+        cooldown.check_recover_from_sport([soreness], SportName.cycling, False, exercise_library, 0)
 
         assert len(cooldown.dynamic_stretch_exercises) > 0
         assert len(cooldown.dynamic_integrate_exercises) > 0
 
+def test_cooldown_check_soreness_severity_3_pain():
+
+    cooldown = CoolDown(True, False, False, event_date_time=datetime.today())
+
+    for b in body_parts_1:
+        soreness = Soreness()
+        soreness.body_part = BodyPart(BodyPartLocation(b), None)
+        soreness.severity = 3
+        soreness.side = 1
+        soreness.pain = True
+        exercise_library = exercise_library_datastore.get()
+        cooldown.check_recover_from_sport([soreness], SportName.cycling, False, exercise_library, 3)
+
+        assert len(cooldown.dynamic_stretch_exercises) == 0
+        assert len(cooldown.dynamic_integrate_exercises) == 0
 
 def test_cooldown_check_soreness_severity_3_no_high_volume():
 
@@ -48,7 +64,7 @@ def test_cooldown_check_soreness_severity_3_no_high_volume():
         soreness.severity = 3
         soreness.side = 1
         exercise_library = exercise_library_datastore.get()
-        cooldown.check_recover_from_sport([soreness], SportName.cycling, False, exercise_library)
+        cooldown.check_recover_from_sport([soreness], SportName.cycling, False, exercise_library, 3)
 
         assert len(cooldown.dynamic_stretch_exercises) == 0
         assert len(cooldown.dynamic_integrate_exercises) == 0
@@ -63,11 +79,28 @@ def test_cooldown_check_soreness_severity_3_high_intensity():
         soreness.body_part = BodyPart(BodyPartLocation(b), None)
         soreness.severity = 3
         soreness.side = 1
+        soreness.pain = False
         exercise_library = exercise_library_datastore.get()
-        cooldown.check_recover_from_sport([soreness], SportName.cycling, False, exercise_library)
+        cooldown.check_recover_from_sport([soreness], SportName.cycling, False, exercise_library, 0)
 
         assert len(cooldown.dynamic_stretch_exercises) > 0
         assert len(cooldown.dynamic_integrate_exercises) > 0
+
+def test_cooldown_check_soreness_severity_3_high_intensity_pain():
+
+    cooldown = CoolDown(False, True, False, event_date_time=datetime.today())
+
+    for b in body_parts_1:
+        soreness = Soreness()
+        soreness.body_part = BodyPart(BodyPartLocation(b), None)
+        soreness.severity = 3
+        soreness.side = 1
+        soreness.pain = True
+        exercise_library = exercise_library_datastore.get()
+        cooldown.check_recover_from_sport([soreness], SportName.cycling, False, exercise_library, 3)
+
+        assert len(cooldown.dynamic_stretch_exercises) == 0
+        assert len(cooldown.dynamic_integrate_exercises)== 0
 
 
 def test_cooldown_check_soreness_severity_3_muscular_strain():
@@ -80,7 +113,7 @@ def test_cooldown_check_soreness_severity_3_muscular_strain():
         soreness.severity = 3
         soreness.side = 1
         exercise_library = exercise_library_datastore.get()
-        cooldown.check_recover_from_sport([soreness], SportName.cycling, False, exercise_library)
+        cooldown.check_recover_from_sport([soreness], SportName.cycling, False, exercise_library, 3)
 
         assert len(cooldown.dynamic_stretch_exercises) == 0
         assert len(cooldown.dynamic_integrate_exercises) == 0
@@ -96,7 +129,7 @@ def test_cooldown_check_soreness_severity_4():
         soreness.severity = 4
         soreness.side = 1
         exercise_library = exercise_library_datastore.get()
-        cooldown.check_recover_from_sport([soreness], SportName.cycling, False, exercise_library)
+        cooldown.check_recover_from_sport([soreness], SportName.cycling, False, exercise_library, 4)
 
         assert len(cooldown.dynamic_stretch_exercises) == 0
         assert len(cooldown.dynamic_integrate_exercises) == 0
@@ -194,7 +227,7 @@ def test_cooldown_check_recover_sport_high_volume_logged():
     cooldown = CoolDown(True, False, False, event_date_time=current_date_time)
 
     exercise_library = exercise_library_datastore.get()
-    cooldown.check_recover_from_sport([], SportName.cycling, False, exercise_library)
+    cooldown.check_recover_from_sport([], SportName.cycling, False, exercise_library, 0)
 
     assert len(cooldown.dynamic_stretch_exercises) > 0
     assert len(cooldown.dynamic_integrate_exercises) > 0
@@ -206,7 +239,7 @@ def test_cooldown_check_recover_sport_no_high_volume_logged():
     cooldown = CoolDown(False, False, False, event_date_time=current_date_time)
 
     exercise_library = exercise_library_datastore.get()
-    cooldown.check_recover_from_sport([], SportName.cycling, False, exercise_library)
+    cooldown.check_recover_from_sport([], SportName.cycling, False, exercise_library, 0)
 
     assert len(cooldown.dynamic_stretch_exercises) == 0
     assert len(cooldown.dynamic_integrate_exercises) == 0

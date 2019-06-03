@@ -177,6 +177,7 @@ class ExerciseAssignmentCalculator(object):
             active_rest.aggregate_dosages()
             active_rest.set_winners()
             active_rest.scale_all_active_time()
+            active_rest.reconcile_default_plan_with_active_time()
             if active_rest.get_total_exercises() > 0:
                 return [active_rest]
         return []
@@ -195,6 +196,7 @@ class ExerciseAssignmentCalculator(object):
             active_rest.aggregate_dosages()
             active_rest.set_winners()
             active_rest.scale_all_active_time()
+            active_rest.reconcile_default_plan_with_active_time()
             if active_rest.get_total_exercises() > 0:
                 return [active_rest]
         return []
@@ -234,6 +236,8 @@ class ExerciseAssignmentCalculator(object):
                 cool_down.aggregate_dosages()
                 cool_down.set_winners()
                 cool_down.scale_all_active_time()
+                cool_down.default_plan == "Complete"
+                #cool_down.reconcile_default_plan_with_active_time()
             #    break
 
             if cool_down is not None and cool_down.get_total_exercises() > 0:
@@ -245,7 +249,7 @@ class ExerciseAssignmentCalculator(object):
         ice_list = []
         minutes = []
         alerts = []
-        low_parts = [BodyPartLocation.ankle, BodyPartLocation.knee, BodyPartLocation.elbow]
+        ankle_knee_elbow = [BodyPartLocation.ankle, BodyPartLocation.knee, BodyPartLocation.elbow]
 
         for s in self.soreness_list:
             ice = None
@@ -269,11 +273,18 @@ class ExerciseAssignmentCalculator(object):
                     ice = Ice(body_part_location=s.body_part.location, side=s.side)
                     ice.repeat_every_3hrs_for_24hrs = False
 
-                    if s.body_part.location in low_parts:
+                    if s.body_part.location in ankle_knee_elbow:
                         minutes.append(10)
                     else:
                         minutes.append(15)
                 elif 3.5 <= s.severity < 4.5 and not self.is_lower_body_part(s.body_part.location):
+                    ice = Ice(body_part_location=s.body_part.location, side=s.side)
+                    ice.repeat_every_3hrs_for_24hrs = True
+                    if s.body_part.location == BodyPartLocation.elbow:
+                        minutes.append(10)
+                    else:
+                        minutes.append(15)
+                elif 4.5 <= s.severity <= 5.0 and not self.is_lower_body_part(s.body_part.location):
                     ice = Ice(body_part_location=s.body_part.location, side=s.side)
                     ice.repeat_every_3hrs_for_24hrs = True
                     if s.body_part.location == BodyPartLocation.elbow:
@@ -319,7 +330,7 @@ class ExerciseAssignmentCalculator(object):
                     goal.trigger_type = TriggerType.hist_sore_greater_30_sore_today_high_volume_intensity  # 1
                     ice = Ice(body_part_location=s.body_part.location, side=s.side)
                     ice.repeat_every_3hrs_for_24hrs = False
-                    if s.body_part.location in low_parts:
+                    if s.body_part.location in ankle_knee_elbow:
                         minutes.append(10)
                     else:
                         minutes.append(15)
@@ -334,7 +345,7 @@ class ExerciseAssignmentCalculator(object):
                 ice = Ice(body_part_location=s.body_part.location, side=s.side)
                 ice.repeat_every_3hrs_for_24hrs = False
 
-                if s.body_part.location in low_parts:
+                if s.body_part.location in ankle_knee_elbow:
                     minutes.append(10)
                 else:
                     minutes.append(15)
@@ -350,7 +361,7 @@ class ExerciseAssignmentCalculator(object):
                     goal.trigger_type = TriggerType.hist_sore_greater_30_no_sore_today_high_volume_intensity  # 3
                     ice = Ice(body_part_location=s.body_part.location, side=s.side)
                     ice.repeat_every_3hrs_for_24hrs = False
-                    if s.body_part.location in low_parts:
+                    if s.body_part.location in ankle_knee_elbow:
                         minutes.append(10)
                     else:
                         minutes.append(15)
@@ -369,7 +380,7 @@ class ExerciseAssignmentCalculator(object):
                 ice = Ice(body_part_location=s.body_part.location, side=s.side)
                 ice.repeat_every_3hrs_for_24hrs = False
 
-                if s.body_part.location in low_parts:
+                if s.body_part.location in ankle_knee_elbow:
                     minutes.append(10)
                 else:
                     minutes.append(15)
@@ -384,7 +395,7 @@ class ExerciseAssignmentCalculator(object):
                     ice = Ice(body_part_location=s.body_part.location, side=s.side)
                     ice.repeat_every_3hrs_for_24hrs = False
 
-                    if s.body_part.location in low_parts:
+                    if s.body_part.location in ankle_knee_elbow:
                         minutes.append(10)
                     else:
                         minutes.append(15)
@@ -394,7 +405,7 @@ class ExerciseAssignmentCalculator(object):
                     ice = Ice(body_part_location=s.body_part.location, side=s.side)
                     ice.repeat_every_3hrs_for_24hrs = False
 
-                    if s.body_part.location in low_parts:
+                    if s.body_part.location in ankle_knee_elbow:
                         minutes.append(10)
                     else:
                         minutes.append(15)
@@ -412,7 +423,7 @@ class ExerciseAssignmentCalculator(object):
             if ((days == 2 and d.max_severity == 1) or  # minor DOMS
                     (days <= 2 and 2 <= d.max_severity <= 3) or  # moderate DOMS
                     (days <= 2 and 3 < d.max_severity <= 5)):  # severe DOMS
-                if d.body_part_location not in low_parts:
+                if not self.is_lower_body_part(d.body_part_location):
                     goal = AthleteGoal("Care for soreness", 1, AthleteGoalType.sore)
                     #goal.trigger = "Soreness Reported Today as DOMS"
                     goal.trigger_type = TriggerType.sore_today_doms  # 11
@@ -443,8 +454,6 @@ class ExerciseAssignmentCalculator(object):
     def get_cold_water_immersion(self):
 
         cold_water_immersion = None
-
-        low_parts = [BodyPartLocation.ankle, BodyPartLocation.knee, BodyPartLocation.elbow]
 
         for s in self.soreness_list:
             if self.is_lower_body_part(s.body_part.location) and s.daily and s.severity >= 3.5:
@@ -478,7 +487,7 @@ class ExerciseAssignmentCalculator(object):
             if ((days == 2 and d.max_severity  == 1) or  # minor DOMS
                     (days <= 2 and 2 <= d.max_severity <= 3) or  # moderate DOMS
                     (days <= 2 and 3 < d.max_severity <= 5)):  # severe DOMS
-                if d.body_part_location in low_parts:
+                if self.is_lower_body_part(d.body_part_location):
                     goal = AthleteGoal("Care for soreness", 1, AthleteGoalType.sore)
                     #goal.trigger = "Soreness Reported Today as DOMS"
                     goal.trigger_type = TriggerType.sore_today_doms  # 11

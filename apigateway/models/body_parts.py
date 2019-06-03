@@ -54,8 +54,10 @@ class BodyPartFactory(object):
 
         exercise_dict = {}
 
+        sampled_list = random.sample(exercise_list, 4)
+
         # ignoring progressions for now
-        for e in exercise_list:
+        for e in sampled_list:
             exercise_dict[e] = []
 
         return exercise_dict
@@ -175,11 +177,18 @@ class BodyPartFactory(object):
     def get_upper_body(self):
 
         upper_body = BodyPart(BodyPartLocation.upper_body, 22)
+
         dynamic_stretch = self.get_full_exercise_dictionary([162, 180, 181, 179])
         dynamic_integrate = self.get_full_exercise_dictionary([145, 184, 148, 185])
         dynamic_integrate_with_speed = {}
 
+        static_integrate = self.get_exercise_dictionary([240])
+
+        upper_body.add_extended_exercise_phases({}, {}, {}, {}, {}, static_integrate)
+
         upper_body.add_dynamic_exercise_phases(dynamic_stretch, dynamic_integrate, dynamic_integrate_with_speed)
+
+        upper_body.add_muscle_groups([1, 21, 2], [], [], [1])
         return upper_body
 
     def get_lower_body(self):
@@ -189,7 +198,14 @@ class BodyPartFactory(object):
         dynamic_integrate = self.get_full_exercise_dictionary([147, 149, 150, 206, 183, 182])
         dynamic_integrate_with_speed = {}
 
+        static_integrate = self.get_exercise_dictionary([15, 14])
+
+        lower_body.add_extended_exercise_phases({}, {}, {}, {}, {}, static_integrate)
+
         lower_body.add_dynamic_exercise_phases(dynamic_stretch, dynamic_integrate, dynamic_integrate_with_speed)
+
+        lower_body.add_muscle_groups([5, 16, 15, 11], [], [], [3, 14])
+
         return lower_body
 
     def get_full_body(self):
@@ -199,7 +215,16 @@ class BodyPartFactory(object):
         dynamic_integrate = self.get_full_exercise_dictionary([146, 203, 204, 205, 207, 151, 169])
         dynamic_integrate_with_speed = {}
 
+        # just copied over from general
+
+        static_integrate = self.get_exercise_dictionary([15, 14, 231])
+
+        full_body.add_extended_exercise_phases({}, {}, {}, {}, {}, static_integrate)
+
         full_body.add_dynamic_exercise_phases(dynamic_stretch, dynamic_integrate, dynamic_integrate_with_speed)
+
+        full_body.add_muscle_groups([12, 6, 14], [21, 11, 5, 15], [18, 16, 1], [3, 8])
+
         return full_body
 
     def get_achilles(self):
