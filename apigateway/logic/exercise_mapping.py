@@ -502,6 +502,7 @@ class ExerciseAssignmentCalculator(object):
             ice_session.body_parts = list(b for b in ice_session.body_parts if not self.is_lower_body_part(b.body_part_location))
 
             if len(ice_session.body_parts) == 0:
+                cold_water_immersion_session.alerts.extend(ice_session.alerts)
                 ice_session = None
 
         return ice_session
