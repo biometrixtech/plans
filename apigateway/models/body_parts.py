@@ -54,8 +54,10 @@ class BodyPartFactory(object):
 
         exercise_dict = {}
 
+        sampled_list = random.sample(exercise_list, 4)
+
         # ignoring progressions for now
-        for e in exercise_list:
+        for e in sampled_list:
             exercise_dict[e] = []
 
         return exercise_dict

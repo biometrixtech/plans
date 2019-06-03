@@ -128,7 +128,7 @@ class ModalityBase(object):
         self.event_date_time = event_date_time
         self.completed = False
         self.active = True
-        self.default_plan = "Complete"
+        self.default_plan = ""
         self.alerts = []
         self.dosage_durations = {}
         self.initialize_dosage_durations()
@@ -163,6 +163,17 @@ class ModalityBase(object):
     def conditions_for_increased_sensitivity_met(self, soreness_list, muscular_strain_high):
         return False
 
+    def reconcile_default_plan_with_active_time(self):
+
+        efficient_duration = self.dosage_durations[self.efficient_winner].efficient_duration
+
+        complete_duration = self.dosage_durations[self.efficient_winner].complete_duration
+
+        if efficient_duration == 0 and complete_duration == 0:
+            self.default_plan = "Comprehensive"
+        elif efficient_duration == 0 and complete_duration > 0 and self.default_plan == "Efficient":
+            self.default_plan = "Complete"
+
     def update_goals(self, dosage):
 
         if dosage.goal.goal_type not in self.goals:
@@ -184,7 +195,7 @@ class ModalityBase(object):
         severity_greater_than_2 = False
 
         for s in soreness_list:
-            if s.pain and (s.historic_soreness_status is None or s.is_dormant_cleared()):
+            if s.pain and (s.historic_soreness_status is None or s.is_dormant_cleared()) and s.severity > 1:
                 care_for_pain_present = True
             if s.pain:
                 pain_reported_today = True
@@ -505,10 +516,12 @@ class ModalityBase(object):
                     dosage.complete_sets_assigned = 1
                     dosage.default_complete_reps_assigned = exercise.min_reps
                     dosage.default_complete_sets_assigned = 1
-                dosage.comprehensive_reps_assigned = exercise.min_reps
-                dosage.comprehensive_sets_assigned = 1
-                dosage.default_comprehensive_reps_assigned = exercise.min_reps
-                dosage.default_comprehensive_sets_assigned = 1
+
+                    # trial to reduce active time
+                    dosage.comprehensive_reps_assigned = exercise.min_reps
+                    dosage.comprehensive_sets_assigned = 1
+                    dosage.default_comprehensive_reps_assigned = exercise.min_reps
+                    dosage.default_comprehensive_sets_assigned = 1
             elif 0.5 <= dosage.soreness_source.severity < 1.5:
                 if dosage.priority == "1":
                     dosage.efficient_reps_assigned = exercise.min_reps
@@ -520,10 +533,12 @@ class ModalityBase(object):
                     dosage.complete_sets_assigned = 1
                     dosage.default_complete_reps_assigned = exercise.min_reps
                     dosage.default_complete_sets_assigned = 1
-                dosage.comprehensive_reps_assigned = exercise.min_reps
-                dosage.comprehensive_sets_assigned = 1
-                dosage.default_comprehensive_reps_assigned = exercise.min_reps
-                dosage.default_comprehensive_sets_assigned = 1
+
+                    # trial to reduce active time
+                    dosage.comprehensive_reps_assigned = exercise.max_reps
+                    dosage.comprehensive_sets_assigned = 1
+                    dosage.default_comprehensive_reps_assigned = exercise.max_reps
+                    dosage.default_comprehensive_sets_assigned = 1
             elif 1.5 <= dosage.soreness_source.severity < 2.5:
                 if dosage.priority == "1":
                     dosage.efficient_reps_assigned = exercise.min_reps
@@ -535,9 +550,10 @@ class ModalityBase(object):
                     dosage.complete_sets_assigned = 1
                     dosage.default_complete_reps_assigned = exercise.max_reps
                     dosage.default_complete_sets_assigned = 1
-                dosage.comprehensive_reps_assigned = exercise.max_reps
+                #trial
+                dosage.comprehensive_reps_assigned = exercise.min_reps
                 dosage.comprehensive_sets_assigned = 1
-                dosage.default_comprehensive_reps_assigned = exercise.max_reps
+                dosage.default_comprehensive_reps_assigned = exercise.min_reps
                 dosage.default_comprehensive_sets_assigned = 1
             elif 2.5 <= dosage.soreness_source.severity < 3.5:
                 if dosage.priority == "1" or dosage.priority == "2":
@@ -545,14 +561,15 @@ class ModalityBase(object):
                     dosage.efficient_sets_assigned = 1
                     dosage.default_efficient_reps_assigned = exercise.min_reps
                     dosage.default_efficient_sets_assigned = 1
-                dosage.complete_reps_assigned = exercise.max_reps
+                #trial
+                dosage.complete_reps_assigned = exercise.min_reps
                 dosage.complete_sets_assigned = 1
-                dosage.default_complete_reps_assigned = exercise.max_reps
+                dosage.default_complete_reps_assigned = exercise.min_reps
                 dosage.default_complete_sets_assigned = 1
                 dosage.comprehensive_reps_assigned = exercise.max_reps
-                dosage.comprehensive_sets_assigned = 2
+                dosage.comprehensive_sets_assigned = 1
                 dosage.default_comprehensive_reps_assigned = exercise.max_reps
-                dosage.default_comprehensive_sets_assigned = 2
+                dosage.default_comprehensive_sets_assigned = 1
             elif 3.5 <= dosage.soreness_source.severity < 4.5:
                 dosage.efficient_reps_assigned = exercise.min_reps
                 dosage.efficient_sets_assigned = 1
@@ -594,10 +611,12 @@ class ModalityBase(object):
                     dosage.complete_sets_assigned = 1
                     dosage.default_complete_reps_assigned = exercise.min_reps
                     dosage.default_complete_sets_assigned = 1
-                dosage.comprehensive_reps_assigned = exercise.min_reps
-                dosage.comprehensive_sets_assigned = 1
-                dosage.default_comprehensive_reps_assigned = exercise.min_reps
-                dosage.default_comprehensive_sets_assigned = 1
+
+                    # trial
+                    dosage.comprehensive_reps_assigned = exercise.max_reps
+                    dosage.comprehensive_sets_assigned = 1
+                    dosage.default_comprehensive_reps_assigned = exercise.max_reps
+                    dosage.default_comprehensive_sets_assigned = 1
             elif 0.5 <= dosage.soreness_source.severity < 1.5:
                 if dosage.priority == "1":
                     dosage.efficient_reps_assigned = exercise.min_reps
@@ -609,9 +628,9 @@ class ModalityBase(object):
                     dosage.complete_sets_assigned = 1
                     dosage.default_complete_reps_assigned = exercise.max_reps
                     dosage.default_complete_sets_assigned = 1
-                dosage.comprehensive_reps_assigned = exercise.max_reps
+                dosage.comprehensive_reps_assigned = exercise.min_reps
                 dosage.comprehensive_sets_assigned = 1
-                dosage.default_comprehensive_reps_assigned = exercise.max_reps
+                dosage.default_comprehensive_reps_assigned = exercise.min_reps
                 dosage.default_comprehensive_sets_assigned = 1
             elif 1.5 <= dosage.soreness_source.severity < 2.5:
                 if dosage.priority == "1" or dosage.priority == "2":
@@ -619,14 +638,14 @@ class ModalityBase(object):
                     dosage.efficient_sets_assigned = 1
                     dosage.default_efficient_reps_assigned = exercise.min_reps
                     dosage.default_efficient_sets_assigned = 1
-                dosage.complete_reps_assigned = exercise.max_reps
+                dosage.complete_reps_assigned = exercise.min_reps
                 dosage.complete_sets_assigned = 1
-                dosage.default_complete_reps_assigned = exercise.max_reps
+                dosage.default_complete_reps_assigned = exercise.min_reps
                 dosage.default_complete_sets_assigned = 1
                 dosage.comprehensive_reps_assigned = exercise.max_reps
-                dosage.comprehensive_sets_assigned = 2
+                dosage.comprehensive_sets_assigned = 1
                 dosage.default_comprehensive_reps_assigned = exercise.max_reps
-                dosage.default_comprehensive_sets_assigned = 2
+                dosage.default_comprehensive_sets_assigned = 1
 
             elif 2.5 <= dosage.soreness_source.severity < 3.5:
 
@@ -734,10 +753,11 @@ class ActiveRest(ModalityBase):
     def fill_exercises(self, soreness_list, exercise_library, high_relative_load_session, high_relative_intensity_logged, muscular_strain_high, sports):
 
         max_severity = 0
+        checked_recover_from_sport = False
 
         if soreness_list is not None and len(soreness_list) > 0:
             max_severity = max(list(s.severity for s in soreness_list))
-        if self.force_data:
+        if self.force_data or soreness_list is None or len(soreness_list) == 0:
             self.get_general_exercises(exercise_library, max_severity)
         elif soreness_list is not None and len(soreness_list) > 0:
             for s in soreness_list:
@@ -745,13 +765,15 @@ class ActiveRest(ModalityBase):
                                                        high_relative_intensity_logged,
                                                        muscular_strain_high,
                                                        sports, max_severity)
+                checked_recover_from_sport = True
                 self.check_reactive_care_soreness(s, exercise_library, max_severity)
                 self.check_reactive_care_pain(s, exercise_library, max_severity)
                 # if max_severity < 3:
                 self.check_corrective_soreness(s, self.event_date_time, exercise_library, max_severity)
                 self.check_corrective_pain(s, self.event_date_time, exercise_library, max_severity)
 
-        if high_relative_load_session or high_relative_intensity_logged or muscular_strain_high:
+        if ((high_relative_load_session or high_relative_intensity_logged or muscular_strain_high)
+                and not checked_recover_from_sport):
             self.check_reactive_recover_from_sport(soreness_list, exercise_library, high_relative_load_session,
                                                    high_relative_intensity_logged,
                                                    muscular_strain_high,
@@ -803,24 +825,24 @@ class ActiveRest(ModalityBase):
                 self.alerts.append(alert)
                 body_part = body_part_factory.get_body_part_for_sport(sport_name)
 
-                prohibiting_soreness = False
+                #prohibiting_soreness = False
 
-                high_severity_list = list(s for s in soreness_list if s.severity >= 3.5)
+                #high_severity_list = list(s for s in soreness_list if s.severity >= 3.5)
 
-                if len(high_severity_list) > 0:
-                    prohibiting_soreness = True
+                #if len(high_severity_list) > 0:
+                #    prohibiting_soreness = True
 
                 # Note: this is just returning the primary mover related exercises for sport
-                if body_part is not None and not prohibiting_soreness:
+                if body_part is not None: #and not prohibiting_soreness:
                     self.copy_exercises(body_part.inhibit_exercises,
                                         self.inhibit_exercises, goal, "1", None, exercise_library)
-                    if not prohibiting_soreness:
-                        if max_severity < 3.5:
-                            self.copy_exercises(body_part.static_stretch_exercises,
-                                                self.static_stretch_exercises, goal, "1", None, exercise_library, sport_name)
-                        if max_severity < 2.5:
-                            self.copy_exercises(body_part.isolated_activate_exercises,
-                                            self.isolated_activate_exercises, goal, "1", None, exercise_library, sport_name)
+                    #if not prohibiting_soreness:
+                    if max_severity < 3.5:
+                        self.copy_exercises(body_part.static_stretch_exercises,
+                                            self.static_stretch_exercises, goal, "1", None, exercise_library, sport_name)
+                    if max_severity < 2.5:
+                        self.copy_exercises(body_part.isolated_activate_exercises,
+                                        self.isolated_activate_exercises, goal, "1", None, exercise_library, sport_name)
 
                 self.check_reactive_recover_from_sport_general(sport_name, exercise_library, goal, max_severity)
 
@@ -1871,15 +1893,15 @@ class CoolDown(ModalityBase, Serialisable):
 
                 body_part = body_part_factory.get_body_part_for_sport(sport_name)
 
-                prohibiting_soreness = False
+                #prohibiting_soreness = False
 
-                high_severity_list = list(s for s in soreness_list if s.severity >= 3.5)
+                #high_severity_list = list(s for s in soreness_list if s.severity >= 3.5)
 
-                if len(high_severity_list) > 0:
-                    prohibiting_soreness = True
+                #if len(high_severity_list) > 0:
+                #    prohibiting_soreness = True
 
                 # Note: this is just returning the primary mover related exercises for sport
-                if body_part is not None and not prohibiting_soreness:
+                if body_part is not None and max_severity < 3.5:
                     self.copy_exercises(body_part.dynamic_stretch_exercises,
                                         self.dynamic_stretch_exercises, goal, "1", None, exercise_library, sport_name)
                     self.copy_exercises(body_part.dynamic_integrate_exercises,
@@ -1907,7 +1929,7 @@ class CoolDown(ModalityBase, Serialisable):
         max_severity = 0
 
         if soreness_list is not None and len(soreness_list) > 0:
-            pain_list = list(s for s in soreness_list is s.pain)
+            pain_list = list(s for s in soreness_list if s.pain)
             if len(pain_list) > 0:
                 max_severity = max(list(s.severity for s in pain_list))
 
