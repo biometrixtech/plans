@@ -45,8 +45,9 @@ def test_parse_date():
     assert parse_date(event_date) == datetime.datetime(2018, 11, 30, 0, 0, 0)
 
 def test_fix_early_survey_event_date_before_3_am():
-    event_date = datetime.datetime(2018, 11, 30, 1, 0, 0)
-    assert fix_early_survey_event_date(event_date) == datetime.datetime(2018, 11, 29, 23, 59, 59)
+    event_date = datetime.datetime(2018, 6, 1, 1, 0, 0)
+    fixed_date_time = fix_early_survey_event_date(event_date)
+    assert fixed_date_time == datetime.datetime(2018, 5, 31, 23, 59, 59)
 
 def test_fix_early_survey_event_date_after_3_am():
     event_date = datetime.datetime(2018, 11, 30, 3, 0, 0)
