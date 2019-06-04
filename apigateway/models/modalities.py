@@ -167,11 +167,12 @@ class ModalityBase(object):
 
         efficient_duration = self.dosage_durations[self.efficient_winner].efficient_duration
 
-        complete_duration = self.dosage_durations[self.efficient_winner].complete_duration
+        complete_duration = self.dosage_durations[self.complete_winner].complete_duration
 
-        if efficient_duration == 0 and complete_duration == 0:
-            self.default_plan = "Comprehensive"
-        elif efficient_duration == 0 and complete_duration > 0 and self.default_plan == "Efficient":
+        if complete_duration == 0 and self.default_plan == "Complete":
+            self.reactivate_complete_corrective_goals()
+        elif efficient_duration == 0 and complete_duration == 0:
+            self.reactivate_complete_corrective_goals()
             self.default_plan = "Complete"
 
     def update_goals(self, dosage):
@@ -246,6 +247,17 @@ class ModalityBase(object):
 
     def aggregate_dosages(self):
         pass
+
+    def reactivate_complete_corrective_goals(self):
+        pass
+
+    def reactivate_complete_corrective_goals_by_collection(self, assigned_exercises):
+
+        for ex, a in assigned_exercises.items():
+            for d in a.dosages:
+                if d.goal.goal_type == AthleteGoalType.corrective:
+                    d.complete_reps_assigned = d.default_complete_reps_assigned
+                    d.complete_sets_assigned = d.default_complete_sets_assigned
 
     def aggregate_dosage_by_severity_exercise_collection(self, assigned_exercises):
 
@@ -432,10 +444,10 @@ class ModalityBase(object):
                     dosage.default_complete_reps_assigned = exercise.min_reps
                     dosage.default_complete_sets_assigned = 1
 
-                dosage.comprehensive_reps_assigned = exercise.min_reps
-                dosage.comprehensive_sets_assigned = 1
-                dosage.default_comprehensive_reps_assigned = exercise.min_reps
-                dosage.default_comprehensive_sets_assigned = 1
+                    dosage.comprehensive_reps_assigned = exercise.max_reps
+                    dosage.comprehensive_sets_assigned = 1
+                    dosage.default_comprehensive_reps_assigned = exercise.max_reps
+                    dosage.default_comprehensive_sets_assigned = 1
 
             elif 0.5 <= dosage.soreness_source.severity < 1.5:
 
@@ -444,13 +456,13 @@ class ModalityBase(object):
                     dosage.default_efficient_sets_assigned = 1
 
                 if dosage.priority == "1" or dosage.priority == "2":
-                    dosage.default_complete_reps_assigned = exercise.max_reps
+                    dosage.default_complete_reps_assigned = exercise.min_reps
                     dosage.default_complete_sets_assigned = 1
 
-                dosage.comprehensive_reps_assigned = exercise.max_reps
-                dosage.comprehensive_sets_assigned = 1
-                dosage.default_comprehensive_reps_assigned = exercise.max_reps
-                dosage.default_comprehensive_sets_assigned = 1
+                    dosage.comprehensive_reps_assigned = exercise.max_reps
+                    dosage.comprehensive_sets_assigned = 1
+                    dosage.default_comprehensive_reps_assigned = exercise.max_reps
+                    dosage.default_comprehensive_sets_assigned = 1
 
             elif 1.5 <= dosage.soreness_source.severity < 2.5:
 
@@ -458,13 +470,26 @@ class ModalityBase(object):
                     dosage.default_efficient_reps_assigned = exercise.min_reps
                     dosage.default_efficient_sets_assigned = 1
 
-                dosage.default_complete_reps_assigned = exercise.max_reps
-                dosage.default_complete_sets_assigned = 1
-                dosage.comprehensive_reps_assigned = exercise.max_reps
-                dosage.comprehensive_sets_assigned = 2
-                dosage.default_comprehensive_reps_assigned = exercise.max_reps
-                dosage.default_comprehensive_sets_assigned = 2
+                if dosage.priority == "1" or dosage.priority == "2":
+                    dosage.default_complete_reps_assigned = exercise.min_reps
+                    dosage.default_complete_sets_assigned = 1
+                    dosage.comprehensive_reps_assigned = exercise.max_reps
+                    dosage.comprehensive_sets_assigned = 1
+                    dosage.default_comprehensive_reps_assigned = exercise.max_reps
+                    dosage.default_comprehensive_sets_assigned = 1
 
+            #trial
+            elif 2.5 <= dosage.soreness_source.severity <= 5.0:
+                dosage.default_efficient_reps_assigned = 0
+                dosage.default_efficient_sets_assigned = 0
+                dosage.default_complete_reps_assigned = 0
+                dosage.default_complete_sets_assigned = 0
+                dosage.comprehensive_reps_assigned = 0
+                dosage.comprehensive_sets_assigned = 0
+                dosage.default_comprehensive_reps_assigned = 0
+                dosage.default_comprehensive_sets_assigned = 0
+
+            '''trial
             elif 2.5 <= dosage.soreness_source.severity < 3.5:
 
                 dosage.default_efficient_reps_assigned = exercise.min_reps
@@ -497,6 +522,7 @@ class ModalityBase(object):
                 dosage.comprehensive_sets_assigned = 3
                 dosage.default_comprehensive_reps_assigned = exercise.max_reps
                 dosage.default_comprehensive_sets_assigned = 3
+            '''
 
         elif (dosage.goal.goal_type == AthleteGoalType.sore and
                 (dosage.soreness_source.historic_soreness_status is None or
@@ -757,9 +783,9 @@ class ActiveRest(ModalityBase):
 
         if soreness_list is not None and len(soreness_list) > 0:
             max_severity = max(list(s.severity for s in soreness_list))
-        if self.force_data or soreness_list is None or len(soreness_list) == 0:
+        if self.force_data:
             self.get_general_exercises(exercise_library, max_severity)
-        elif soreness_list is not None and len(soreness_list) > 0:
+        if soreness_list is not None and len(soreness_list) > 0:
             for s in soreness_list:
                 self.check_reactive_recover_from_sport(soreness_list, exercise_library, high_relative_load_session,
                                                        high_relative_intensity_logged,
@@ -932,6 +958,14 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
         self.aggregate_dosage_by_severity_exercise_collection(self.active_stretch_exercises)
         self.aggregate_dosage_by_severity_exercise_collection(self.static_integrate_exercises)
         self.aggregate_dosage_by_severity_exercise_collection(self.isolated_activate_exercises)
+
+    def reactivate_complete_corrective_goals(self):
+
+        self.reactivate_complete_corrective_goals_by_collection(self.inhibit_exercises)
+        self.reactivate_complete_corrective_goals_by_collection(self.static_stretch_exercises)
+        self.reactivate_complete_corrective_goals_by_collection(self.active_stretch_exercises)
+        self.reactivate_complete_corrective_goals_by_collection(self.static_integrate_exercises)
+        self.reactivate_complete_corrective_goals_by_collection(self.isolated_activate_exercises)
 
     def check_reactive_recover_from_sport_general(self, sport, exercise_library, goal, max_severity):
 
@@ -1334,6 +1368,13 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
         self.aggregate_dosage_by_severity_exercise_collection(self.static_stretch_exercises)
         self.aggregate_dosage_by_severity_exercise_collection(self.static_integrate_exercises)
         self.aggregate_dosage_by_severity_exercise_collection(self.isolated_activate_exercises)
+
+    def reactivate_complete_corrective_goals(self):
+
+        self.reactivate_complete_corrective_goals_by_collection(self.inhibit_exercises)
+        self.reactivate_complete_corrective_goals_by_collection(self.static_stretch_exercises)
+        self.reactivate_complete_corrective_goals_by_collection(self.static_integrate_exercises)
+        self.reactivate_complete_corrective_goals_by_collection(self.isolated_activate_exercises)
 
     def check_reactive_recover_from_sport_general(self, sport, exercise_library, goal, max_severity):
 

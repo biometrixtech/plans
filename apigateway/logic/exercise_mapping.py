@@ -230,7 +230,7 @@ class ExerciseAssignmentCalculator(object):
                 cool_down.aggregate_dosages()
                 cool_down.set_winners()
                 cool_down.scale_all_active_time()
-                cool_down.default_plan == "Complete"
+                cool_down.default_plan = "Complete"
                 #cool_down.reconcile_default_plan_with_active_time()
             #    break
 
@@ -298,11 +298,13 @@ class ExerciseAssignmentCalculator(object):
                     goal = AthleteGoal("Care for soreness", 1, AthleteGoalType.sore)
                     #goal.trigger = "Soreness Reported Today + Pers, Pers-2 Soreness > 30d"
                     goal.trigger_type = TriggerType.hist_sore_greater_30_sore_today # 13
-                    ice = Ice(body_part_location=s.body_part.location, side=s.side)
+
                     if 1.5 <= s.severity < 3.5:
+                        ice = Ice(body_part_location=s.body_part.location, side=s.side)
                         ice.repeat_every_3hrs_for_24hrs = False
                         minutes.append(15)
                     elif not self.is_lower_body_part(s.body_part.location) and 3.5 <= s.severity <= 5.0:
+                        ice = Ice(body_part_location=s.body_part.location, side=s.side)
                         ice.repeat_every_3hrs_for_24hrs = True
                         if s.body_part.location == BodyPartLocation.elbow:
                             minutes.append(10)

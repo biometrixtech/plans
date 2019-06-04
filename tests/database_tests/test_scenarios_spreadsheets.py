@@ -111,9 +111,9 @@ def create_plan(test_parameter, body_part_list, severity_list, side_list, pain_l
             soreness_list.append(TestUtilities().body_part_pain(body_part_list[b], severity_list[b], side_list[b]))
         else:
             if len(severity_list) == 0:
-                soreness_list.append(TestUtilities().body_part_soreness(body_part_list[b], 2))
+                soreness_list.append(TestUtilities().body_part_soreness(body_part_list[b], 2, side=1))
             else:
-                soreness_list.append(TestUtilities().body_part_soreness(body_part_list[b], severity_list[b]))
+                soreness_list.append(TestUtilities().body_part_soreness(body_part_list[b], severity_list[b], side=1))
 
     survey = DailyReadiness(current_date_time.strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, soreness_list, 7, 9)
 
@@ -305,6 +305,7 @@ def test_generate_spreadsheets():
 
         for h1 in historic_soreness_status_1:
             for day_diff in days_sore:
+
                 historic_soreness_list = []
 
                 historic_soreness = HistoricSoreness(BodyPartLocation(14), 1, is_historic_soreness_pain(h1))
@@ -338,7 +339,9 @@ def test_generate_spreadsheets():
                     for b1 in body_parts_1:
                         for m1 in max_severity_1:
                             for p in is_pain_1:
-                                if (0==0) or (b1 == 4 and not test_parm.doms and not test_parm.athlete_stats.muscular_strain_increasing):
+                                #if h1 == HistoricSorenessStatus.persistent_pain and b1==1:
+                                #    k=0
+                                if (0==0) or h1 == HistoricSorenessStatus.persistent_2_soreness and b1 == 14 and p == False and test_parm.doms and day_diff == 32:
                                     body_part_list = [b1]
                                     severity_list = [m1]
                                     pain_list = [p]
