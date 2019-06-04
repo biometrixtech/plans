@@ -973,9 +973,9 @@ class StatsProcessing(object):
         for s in soreness_list:
             ns_new = ns(s.body_part.location, s.pain, s.side, s.reported_date_time)
             if ns_new in grouped_soreness:
-                grouped_soreness[ns_new] = max(grouped_soreness[ns_new], s.severity)
+                grouped_soreness[ns_new] = max(grouped_soreness[ns_new], SorenessCalculator.get_severity(s.severity, s.movement))
             else:
-                grouped_soreness[ns_new] = s.severity
+                grouped_soreness[ns_new] = SorenessCalculator.get_severity(s.severity, s.movement)
 
         for r in grouped_soreness:
 
