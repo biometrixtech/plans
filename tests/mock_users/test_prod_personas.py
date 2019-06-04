@@ -85,7 +85,7 @@ def get_soreness_string(soreness_list):
 def test_generate_spreadsheets_for_personas():
 
     start_date = parse_date("2019-05-01")
-    end_date = parse_date("2019-06-01")
+    end_date = parse_date("2019-06-03")
 
     users = []
     user_names = []
