@@ -1213,7 +1213,7 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
 
             if not soreness.is_joint():
                 #goal.trigger = "Painful joint reported today"
-                if max_severity < 3:
+                if soreness.severity < 3:
                     if (not soreness.is_acute_pain() and not soreness.is_persistent_pain() and
                             soreness.historic_soreness_status is not HistoricSorenessStatus.persistent_2_pain):
                         goal.trigger_type = TriggerType.no_hist_pain_pain_today_severity_1_2  # 14
@@ -1228,7 +1228,7 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
                 synergist_priority = "1"
             else:
                 #goal.trigger = "Painful muscle reported today"
-                if max_severity < 3:
+                if soreness.severity < 3:
                     if (not soreness.is_acute_pain() and not soreness.is_persistent_pain() and
                             soreness.historic_soreness_status is not HistoricSorenessStatus.persistent_2_pain):
                         goal.trigger_type = TriggerType.no_hist_pain_pain_today_severity_1_2  # 14
@@ -1619,7 +1619,7 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
 
             if not soreness.is_joint():
                 #goal.trigger = "Painful joint reported today"
-                if max_severity < 3:
+                if soreness.severity < 3:
                     if (not soreness.is_acute_pain() and not soreness.is_persistent_pain() and
                             soreness.historic_soreness_status is not HistoricSorenessStatus.persistent_2_pain):
                         goal.trigger_type = TriggerType.no_hist_pain_pain_today_severity_1_2  # 14
@@ -1634,7 +1634,7 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
                 synergist_priority = "1"
             else:
                 #goal.trigger = "Painful muscle reported today"
-                if max_severity < 3:
+                if soreness.severity < 3:
                     if (not soreness.is_acute_pain() and not soreness.is_persistent_pain() and
                             soreness.historic_soreness_status is not HistoricSorenessStatus.persistent_2_pain):
                         goal.trigger_type = TriggerType.no_hist_pain_pain_today_severity_1_2  # 14
