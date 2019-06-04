@@ -149,6 +149,7 @@ class TrainingPlanManager(object):
 
         self.daily_plan.last_updated = last_updated
         alerts = self.daily_plan.get_alerts()
+        alerts.extend(calc.generate_alerts())
         alerts_processing = AlertsProcessing(daily_plan=self.daily_plan,
                                              athlete_stats=self.athlete_stats,
                                              trigger_date_time=self.trigger_date_time,)
