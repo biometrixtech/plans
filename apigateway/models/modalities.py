@@ -180,6 +180,10 @@ class ModalityBase(object):
         if dosage.goal.goal_type not in self.goals:
             self.goals[dosage.goal.goal_type] = ModalityGoal()
 
+        self.goals[dosage.goal.goal_type].efficient_active = False
+        self.goals[dosage.goal.goal_type].complete_active = False
+        self.goals[dosage.goal.goal_type].comprehensive_active = False
+
         if dosage.efficient_reps_assigned > 0 and dosage.efficient_sets_assigned:
             self.goals[dosage.goal.goal_type].efficient_active = True
         if dosage.complete_reps_assigned > 0 and dosage.complete_sets_assigned:
