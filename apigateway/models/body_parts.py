@@ -163,6 +163,10 @@ class BodyPartFactory(object):
 
     def get_general(self):
 
+        #############
+        # WARNING: If you change anything here ALSO change full body
+        ##############
+
         general = BodyPart(BodyPartLocation.general, 21)
 
         #inhibit = self.get_exercise_dictionary([48, 3, 4, 54, 2, 44, 55])
@@ -178,8 +182,8 @@ class BodyPartFactory(object):
 
         upper_body = BodyPart(BodyPartLocation.upper_body, 22)
 
-        dynamic_stretch = self.get_full_exercise_dictionary([162, 180, 181, 179])
-        dynamic_integrate = self.get_full_exercise_dictionary([145, 184, 148, 185])
+        dynamic_stretch = self.get_full_exercise_dictionary([164, 180, 181, 179])
+        dynamic_integrate = self.get_full_exercise_dictionary([145, 162, 148, 185])
         dynamic_integrate_with_speed = {}
 
         static_integrate = self.get_exercise_dictionary([240])
@@ -195,7 +199,7 @@ class BodyPartFactory(object):
 
         lower_body = BodyPart(BodyPartLocation.lower_body, 23)
         dynamic_stretch = self.get_full_exercise_dictionary([139, 142, 143, 163, 161, 176])
-        dynamic_integrate = self.get_full_exercise_dictionary([147, 149, 150, 206, 183, 182])
+        dynamic_integrate = self.get_full_exercise_dictionary([147, 149, 150, 183, 182])
         dynamic_integrate_with_speed = {}
 
         static_integrate = self.get_exercise_dictionary([15, 14])
@@ -212,7 +216,7 @@ class BodyPartFactory(object):
 
         full_body = BodyPart(BodyPartLocation.full_body, 24)
         dynamic_stretch = self.get_full_exercise_dictionary([141, 144, 164, 177, 178, 193, 165, 140])
-        dynamic_integrate = self.get_full_exercise_dictionary([146, 203, 204, 205, 207, 151, 169])
+        dynamic_integrate = self.get_full_exercise_dictionary([146, 203, 204, 151, 169])
         dynamic_integrate_with_speed = {}
 
         # just copied over from general
@@ -223,7 +227,7 @@ class BodyPartFactory(object):
 
         full_body.add_dynamic_exercise_phases(dynamic_stretch, dynamic_integrate, dynamic_integrate_with_speed)
 
-        full_body.add_muscle_groups([12, 6, 14], [21, 11, 5, 15], [18, 16, 1], [3, 8])
+        full_body.add_muscle_groups([12, 6, 4], [21, 11, 5, 15], [18, 16, 1], [3, 14])
 
         return full_body
 
