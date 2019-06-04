@@ -32,3 +32,4 @@ apigateway/session.py
 *__pycache__*
 output/*
 tests/database_tests/*.csv
+output_persona/*
