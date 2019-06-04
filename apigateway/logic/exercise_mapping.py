@@ -230,7 +230,7 @@ class ExerciseAssignmentCalculator(object):
                 cool_down.aggregate_dosages()
                 cool_down.set_winners()
                 cool_down.scale_all_active_time()
-                cool_down.default_plan == "Complete"
+                cool_down.default_plan = "Complete"
                 #cool_down.reconcile_default_plan_with_active_time()
             #    break
 

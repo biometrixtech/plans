@@ -167,11 +167,12 @@ class ModalityBase(object):
 
         efficient_duration = self.dosage_durations[self.efficient_winner].efficient_duration
 
-        complete_duration = self.dosage_durations[self.efficient_winner].complete_duration
+        complete_duration = self.dosage_durations[self.complete_winner].complete_duration
 
-        if efficient_duration == 0 and complete_duration == 0:
-            self.default_plan = "Comprehensive"
-        elif efficient_duration == 0 and complete_duration > 0 and self.default_plan == "Efficient":
+        if complete_duration == 0 and self.default_plan == "Complete":
+            self.reactivate_complete_corrective_goals()
+        elif efficient_duration == 0 and complete_duration == 0:
+            self.reactivate_complete_corrective_goals()
             self.default_plan = "Complete"
 
     def update_goals(self, dosage):
@@ -246,6 +247,17 @@ class ModalityBase(object):
 
     def aggregate_dosages(self):
         pass
+
+    def reactivate_complete_corrective_goals(self):
+        pass
+
+    def reactivate_complete_corrective_goals_by_collection(self, assigned_exercises):
+
+        for ex, a in assigned_exercises.items():
+            for d in a.dosages:
+                if d.goal.goal_type == AthleteGoalType.corrective:
+                    d.complete_reps_assigned = d.default_complete_reps_assigned
+                    d.complete_sets_assigned = d.default_complete_sets_assigned
 
     def aggregate_dosage_by_severity_exercise_collection(self, assigned_exercises):
 
@@ -947,6 +959,14 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
         self.aggregate_dosage_by_severity_exercise_collection(self.static_integrate_exercises)
         self.aggregate_dosage_by_severity_exercise_collection(self.isolated_activate_exercises)
 
+    def reactivate_complete_corrective_goals(self):
+
+        self.reactivate_complete_corrective_goals_by_collection(self.inhibit_exercises)
+        self.reactivate_complete_corrective_goals_by_collection(self.static_stretch_exercises)
+        self.reactivate_complete_corrective_goals_by_collection(self.active_stretch_exercises)
+        self.reactivate_complete_corrective_goals_by_collection(self.static_integrate_exercises)
+        self.reactivate_complete_corrective_goals_by_collection(self.isolated_activate_exercises)
+
     def check_reactive_recover_from_sport_general(self, sport, exercise_library, goal, max_severity):
 
         body_part_factory = BodyPartFactory()
@@ -1348,6 +1368,13 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
         self.aggregate_dosage_by_severity_exercise_collection(self.static_stretch_exercises)
         self.aggregate_dosage_by_severity_exercise_collection(self.static_integrate_exercises)
         self.aggregate_dosage_by_severity_exercise_collection(self.isolated_activate_exercises)
+
+    def reactivate_complete_corrective_goals(self):
+
+        self.reactivate_complete_corrective_goals_by_collection(self.inhibit_exercises)
+        self.reactivate_complete_corrective_goals_by_collection(self.static_stretch_exercises)
+        self.reactivate_complete_corrective_goals_by_collection(self.static_integrate_exercises)
+        self.reactivate_complete_corrective_goals_by_collection(self.isolated_activate_exercises)
 
     def check_reactive_recover_from_sport_general(self, sport, exercise_library, goal, max_severity):
 
