@@ -339,6 +339,8 @@ def test_generate_spreadsheets():
                     for b1 in body_parts_1:
                         for m1 in max_severity_1:
                             for p in is_pain_1:
+                                #if h1 == HistoricSorenessStatus.persistent_pain and b1==1:
+                                #    k=0
                                 if (0==0) or h1 == HistoricSorenessStatus.persistent_2_soreness and b1 == 14 and p == False and test_parm.doms and day_diff == 32:
                                     body_part_list = [b1]
                                     severity_list = [m1]
