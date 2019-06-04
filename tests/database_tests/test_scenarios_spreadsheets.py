@@ -275,7 +275,7 @@ def test_generate_spreadsheets():
         c2_32 = open('../../output/' + test_parm.file_name + "_32_cooldown_b.csv", 'w')
 
         line = ('BodyPart,is_pain,severity,hs_status,hs_days,default_plan,insights,'+
-                't:biomechanics_triggers,t:biomechanics_ctas, t:biomechanics_goals,t:response_triggers,t:response_ctas,t:response_goals,t:stress_triggers,t:stress_ctas,t:stress_goals,'+
+                't:biomechanics_triggers,t:biomechanics_goals,t:response_triggers,t:response_goals,t:stress_triggers,t:stress_goals,'+
                 'inhibit_goals_triggers,inhibit_minutes_efficient,inhibit_miniutes_complete, inhibit_minutes_comprehensive,'+
                 'inhibit_exercises,static_stretch_goals_triggers,static_stretch_minutes_efficient,'+
                 'static_stretch_minutes_complete,static_stretch_minutes_comprehensive, static_stretch_exercises,' +
@@ -286,7 +286,7 @@ def test_generate_spreadsheets():
                 'static_integrate_minutes_complete,static_integrate_minutes_comprehensive, static_integrate_exercises,'+
                 'total_minutes_efficient, total_minutes_complete, total_minutes_comprehensive,priority_1_count,priority_2_count,priority_3_count')
         sline = ('BodyPart,is_pain,severity,hs_status,hs_days,default_plan,insights,' +
-                 't:biomechanics_triggers,t:biomechanics_ctas,t:biomechanics_goals,t:response_triggers,t:response_ctas,t:response_goals,t:stress_triggers,t:stress_ctas,t:stress_goals,'+
+                 't:biomechanics_triggers,t:biomechanics_goals,t:response_triggers,t:response_goals,t:stress_triggers,t:stress_goals,'+
                  'heat, pre_active_rest, post_active_rest, cooldown, ice, cold_water_immersion')
         cline = ('BodyPart,is_pain,severity,hs_status,hs_days,default_plan,alerts,dynamic_stretch,dynamic_integrate,ds_efficient_time, ds_complete_time,ds_comprehensive_time,'+
                  'di_efficient_time,di_complete_time,di_comprehensive_time')
