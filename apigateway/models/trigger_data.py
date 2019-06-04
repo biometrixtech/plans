@@ -8,19 +8,19 @@ with open(file_path, 'r') as f:
 visualization_data = {
             1: {
                 'title': "",
-                'y_axis_1': "Load",
+                'y_axis_1': "Relative Load",
                 'y_axis_2': "",
                 'legend': [
                     {
                         'color': 3,
-                        'text': "Load",
+                        'text': "Relative Load",
                         'type': 0
                     }
                 ]
             },
             2: {
                 'title': "",
-                'y_axis_1': "Load",
+                'y_axis_1': "Relative Load",
                 'y_axis_2': "",
                 'legend': [
                     {
@@ -32,7 +32,7 @@ visualization_data = {
             },
             3: {
                 'title': "",
-                'y_axis_1': "Load",
+                'y_axis_1': "Relative Load",
                 'y_axis_2': "Severity",
                 'legend': [
                     {
@@ -49,7 +49,7 @@ visualization_data = {
             },
             4: {
                 'title': "",
-                'y_axis_1': "Load",
+                'y_axis_1': "Relative Load",
                 'y_axis_2': "Severity",
                 'legend': [
                     {
@@ -66,7 +66,7 @@ visualization_data = {
             },
             5: {
                 'title': "",
-                'y_axis_1': "Load",
+                'y_axis_1': "Relative Load",
                 'y_axis_2': "Efficiency",
                 'legend': [
                     {
@@ -88,7 +88,7 @@ visualization_data = {
             },
             6: {
                 'title': "",
-                'y_axis_1': "Load",
+                'y_axis_1': "Relative Load",
                 'y_axis_2': "Movement Quality",
                 'legend': [
                 ]
