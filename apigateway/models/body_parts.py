@@ -182,8 +182,8 @@ class BodyPartFactory(object):
 
         upper_body = BodyPart(BodyPartLocation.upper_body, 22)
 
-        dynamic_stretch = self.get_full_exercise_dictionary([164, 180, 181, 179])
-        dynamic_integrate = self.get_full_exercise_dictionary([145, 162, 148, 185])
+        dynamic_stretch = self.get_full_exercise_dictionary([164, 165, 179, 180, 181])
+        dynamic_integrate = self.get_full_exercise_dictionary([145, 148, 149, 162, 169])
         dynamic_integrate_with_speed = {}
 
         static_integrate = self.get_exercise_dictionary([240])
@@ -198,8 +198,8 @@ class BodyPartFactory(object):
     def get_lower_body(self):
 
         lower_body = BodyPart(BodyPartLocation.lower_body, 23)
-        dynamic_stretch = self.get_full_exercise_dictionary([139, 142, 143, 163, 161, 176])
-        dynamic_integrate = self.get_full_exercise_dictionary([147, 149, 150, 183, 182])
+        dynamic_stretch = self.get_full_exercise_dictionary([139, 140, 141, 142, 143, 144, 161, 163, 164, 165, 176, 193])
+        dynamic_integrate = self.get_full_exercise_dictionary([145, 146, 147, 148, 149, 150, 151, 182, 183, 203, 204])
         dynamic_integrate_with_speed = {}
 
         static_integrate = self.get_exercise_dictionary([15, 14])
@@ -215,8 +215,8 @@ class BodyPartFactory(object):
     def get_full_body(self):
 
         full_body = BodyPart(BodyPartLocation.full_body, 24)
-        dynamic_stretch = self.get_full_exercise_dictionary([141, 144, 164, 177, 178, 193, 165, 140])
-        dynamic_integrate = self.get_full_exercise_dictionary([146, 203, 204, 151, 169])
+        dynamic_stretch = self.get_full_exercise_dictionary([139, 140, 141, 144, 164, 165, 177, 178, 179, 180, 193])
+        dynamic_integrate = self.get_full_exercise_dictionary([145, 146, 148, 149, 150, 151, 162, 169, 203, 204])
         dynamic_integrate_with_speed = {}
 
         # just copied over from general
