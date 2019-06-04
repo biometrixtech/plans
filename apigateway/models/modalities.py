@@ -170,9 +170,9 @@ class ModalityBase(object):
         complete_duration = self.dosage_durations[self.complete_winner].complete_duration
 
         if complete_duration == 0 and self.default_plan == "Complete":
-            self.reactivate_complete_corrective_goals()
+            self.reactivate_complete_goals()
         elif efficient_duration == 0 and complete_duration == 0:
-            self.reactivate_complete_corrective_goals()
+            self.reactivate_complete_goals()
             self.default_plan = "Complete"
 
     def update_goals(self, dosage):
@@ -252,14 +252,14 @@ class ModalityBase(object):
     def aggregate_dosages(self):
         pass
 
-    def reactivate_complete_corrective_goals(self):
+    def reactivate_complete_goals(self):
         pass
 
     def reactivate_complete_corrective_goals_by_collection(self, assigned_exercises):
 
         for ex, a in assigned_exercises.items():
             for d in a.dosages:
-                if d.goal.goal_type == AthleteGoalType.corrective:
+                if d.goal.goal_type == AthleteGoalType.corrective or d.goal.goal_type == AthleteGoalType.on_request:
                     d.complete_reps_assigned = d.default_complete_reps_assigned
                     d.complete_sets_assigned = d.default_complete_sets_assigned
                     self.update_goals(d)
@@ -964,7 +964,7 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
         self.aggregate_dosage_by_severity_exercise_collection(self.static_integrate_exercises)
         self.aggregate_dosage_by_severity_exercise_collection(self.isolated_activate_exercises)
 
-    def reactivate_complete_corrective_goals(self):
+    def reactivate_complete_goals(self):
 
         self.reactivate_complete_corrective_goals_by_collection(self.inhibit_exercises)
         self.reactivate_complete_corrective_goals_by_collection(self.static_stretch_exercises)
@@ -1374,7 +1374,7 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
         self.aggregate_dosage_by_severity_exercise_collection(self.static_integrate_exercises)
         self.aggregate_dosage_by_severity_exercise_collection(self.isolated_activate_exercises)
 
-    def reactivate_complete_corrective_goals(self):
+    def reactivate_complete_goals(self):
 
         self.reactivate_complete_corrective_goals_by_collection(self.inhibit_exercises)
         self.reactivate_complete_corrective_goals_by_collection(self.static_stretch_exercises)
