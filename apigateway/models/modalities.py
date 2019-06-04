@@ -180,15 +180,15 @@ class ModalityBase(object):
         if dosage.goal.goal_type not in self.goals:
             self.goals[dosage.goal.goal_type] = ModalityGoal()
 
-        self.goals[dosage.goal.goal_type].efficient_active = False
-        self.goals[dosage.goal.goal_type].complete_active = False
-        self.goals[dosage.goal.goal_type].comprehensive_active = False
+        # self.goals[dosage.goal.goal_type].efficient_active = False
+        # self.goals[dosage.goal.goal_type].complete_active = False
+        # self.goals[dosage.goal.goal_type].comprehensive_active = False
 
-        if dosage.efficient_reps_assigned > 0 and dosage.efficient_sets_assigned:
+        if dosage.efficient_reps_assigned > 0 and dosage.efficient_sets_assigned > 0:
             self.goals[dosage.goal.goal_type].efficient_active = True
-        if dosage.complete_reps_assigned > 0 and dosage.complete_sets_assigned:
+        if dosage.complete_reps_assigned > 0 and dosage.complete_sets_assigned > 0:
             self.goals[dosage.goal.goal_type].complete_active = True
-        if dosage.comprehensive_reps_assigned > 0 and dosage.comprehensive_sets_assigned:
+        if dosage.comprehensive_reps_assigned > 0 and dosage.comprehensive_sets_assigned > 0:
             self.goals[dosage.goal.goal_type].comprehensive_active = True
 
     def set_plan_dosage(self, soreness_list, muscular_strain_high):
@@ -259,7 +259,7 @@ class ModalityBase(object):
 
         for ex, a in assigned_exercises.items():
             for d in a.dosages:
-                if d.goal.goal_type == AthleteGoalType.corrective or d.goal.goal_type == AthleteGoalType.on_request:
+                if d.goal.goal_type == AthleteGoalType.corrective:
                     d.complete_reps_assigned = d.default_complete_reps_assigned
                     d.complete_sets_assigned = d.default_complete_sets_assigned
                     self.update_goals(d)
