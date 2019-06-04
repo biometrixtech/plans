@@ -1363,7 +1363,7 @@ class StatsProcessing(object):
             chronic_delta = self.end_date_time - chronic_date_time
             self.chronic_load_start_date_time = self.end_date_time - chronic_delta
 
-        self.last_week = self.end_date_time - timedelta(days=6 + adjustment_factor)
+        self.last_week = self.end_date_time - timedelta(days=7 + adjustment_factor)
         self.last_6_days = self.end_date_time - timedelta(days=5 + adjustment_factor)
         self.last_25_days = self.end_date_time - timedelta(days=25 + adjustment_factor)
         self.previous_week = self.last_week - timedelta(days=7)
