@@ -14,6 +14,7 @@ from tests.mocks.mock_post_session_survey_datastore import PostSessionSurveyData
 from tests.mocks.mock_cleared_soreness_datastore import ClearedSorenessDatastore as MockClearedSorenessDatastore
 from logic.training_plan_management import TrainingPlanManager
 from logic.stats_processing import StatsProcessing
+from logic.survey_processing import SurveyProcessing
 from tests.testing_utilities import TestUtilities, get_body_part_location_string, is_historic_soreness_pain, get_lines
 from tests.database_tests.test_scenarios_spreadsheets import write_lines
 from logic.training_volume_processing import TrainingVolumeProcessing
@@ -85,23 +86,34 @@ def get_soreness_string(soreness_list):
 def test_generate_spreadsheets_for_personas():
 
     start_date = parse_date("2019-05-01")
-    end_date = parse_date("2019-06-03")
+    end_date = parse_date("2019-06-04")
 
     users = []
     user_names = []
 
-    users.append('e1b09f08-fc83-4957-9321-463001650440') # becky
+    users.append('e1b09f08-fc83-4957-9321-463001650440')
     user_names.append('becky')
-    #users.append('93176a69-2d5d-4326-b986-ca6b04a9a29d') #liz
-    #users.append('e4fff5dc-6467-4717-8cef-3f2cb13e5c33')  #abbey
-    #users.append('82ccf294-7c1e-48e6-8149-c5a001e76f78')  #pene
-    #users.append('8bca10bf-8bdd-4971-85ca-cb2712c32478') #rhonda
-    #users.append('5e516e2e-ac2d-425e-ba4d-bf2689c28cec')  #td
-    #users.append('4f5567c7-a592-4c26-b89d-5c1287884d37')  #megan
-    #users.append('fac4be57-35d6-4952-8af9-02aadf979982')  #bay
-    #users.append('e9d78b6f-8695-4556-9369-d6a5702c6cc7') #mwoodard
-    #users.append('5756fac1-3080-4979-9746-9d4c9a700acf') #lillian
-    #users.append('06f2c55d-780c-47cf-9742-a74535bea45f')  #RG (aka User 6 from usability report 4/2/19)
+
+    users.append('06f2c55d-780c-47cf-9742-a74535bea45f')
+    user_names.append('rachael')
+
+    users.append('55b040ff-4eab-4469-be30-39ab4574c3b3')
+    user_names.append('gary')
+
+    users.append('589c625a-cdd6-429f-aa36-3ae66756af3b')
+    user_names.append('cm')
+
+    users.append('d061ca16-b1e1-4d20-b483-8f9c740064c0')
+    user_names.append('ryan')
+
+    users.append('e83814ba-3784-4b24-8a23-95cd8d238045')
+    user_names.append('connor')
+
+    users.append('e9d78b6f-8695-4556-9369-d6a5702c6cc7')
+    user_names.append('matthew')
+
+    users.append('a8172baf-4ca9-4676-84a6-e64f3cd50b13')
+    user_names.append('doug')
 
     for u in range(0, len(users)):
 
@@ -140,7 +152,7 @@ def test_generate_spreadsheets_for_personas():
         athlete_stats = StatsProcessing(user_id, event_date=start_date,
                                         datastore_collection=mock_data_store_collection).process_athlete_stats()
 
-        mock_data_store_collection.daily_readiness_datastore.side_load_surveys(daily_readiness_surveys)
+        #mock_data_store_collection.daily_readiness_datastore.side_load_surveys(daily_readiness_surveys)
 
         pre_active_rest_file = open('../../output_persona/' + user_name + '_pre_active_rest.csv', 'w')
         summary_pre_active_rest_file = open('../../output_persona/' + user_name + '_pre_active_rest_summary.csv', 'w')
@@ -185,7 +197,39 @@ def test_generate_spreadsheets_for_personas():
                                             datastore_collection=mock_data_store_collection).process_athlete_stats(current_athlete_stats=athlete_stats)
 
             if len(surveys) > 0:
+
+                # in athlete stats look for either question being asked
+                candidate_clear_candidates = []
+                for h in athlete_stats.historic_soreness:
+                    if h.ask_acute_pain_question or h.ask_persistent_2_question:
+                        candidate_clear_candidates.append(h)
+
                 survey = surveys[0]
+
+                # check for body part exists in survey to determine
+                clear_candidates = []
+                for c in candidate_clear_candidates:
+                    #is final pain condition correct?
+                    matches = list(s for s in survey.soreness if c.body_part_location == s.body_part.location and
+                                   c.side == s.side and c.is_pain == s.pain)
+                    if len(matches) == 0:
+                        soreness = {
+                            "body_part": c.body_part_location.value,
+                            "severity": 0,
+                            "movement": 0,
+                            "side": c.side,
+                            "pain": c.is_pain,
+                            "status": c.historic_soreness_status.name
+                        }
+                        # pain?
+                        clear_candidates.append(soreness)
+
+                # survey processing, answer appropriate question
+                survey_processing = SurveyProcessing(user_id, date, athlete_stats, mock_data_store_collection)
+                survey_processing.process_clear_status_answers(clear_candidates, date, survey.soreness)
+                survey_processing.soreness = survey.soreness
+                survey_processing.patch_daily_and_historic_soreness('readiness')
+                athlete_stats = survey_processing.athlete_stats
 
                 train_later = False
 
@@ -231,10 +275,14 @@ def test_generate_spreadsheets_for_personas():
                 if len(daily_plans) > 0:
                     for t in range(0, len(daily_plans[0].training_sessions)):
 
-                        #mgr = TrainingPlanManager(user_id, mock_data_store_collection)
-                        #mgr.daily_plan = previous_plan
-
                         training_session = daily_plans[0].training_sessions[t]
+
+                        survey_processing = SurveyProcessing(user_id, date, athlete_stats, mock_data_store_collection)
+                        survey_processing.soreness = training_session.post_session_soreness
+                        survey_processing.sessions.append(training_session)
+                        survey_processing.patch_daily_and_historic_soreness('post_session')
+                        survey_processing.check_high_relative_load_sessions(survey_processing.sessions)
+                        athlete_stats = survey_processing.athlete_stats
 
                         mgr.daily_plan.training_sessions.append(training_session)
 
