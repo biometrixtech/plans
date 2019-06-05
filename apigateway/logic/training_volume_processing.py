@@ -2,6 +2,7 @@ from fathomapi.utils.xray import xray_recorder
 from models.training_volume import LoadMonitoringType, StandardErrorRange, StandardErrorRangeMetric
 from models.sport import SportName, SportType
 from models.session import HighLoadSession
+from logic.soreness_processing import SorenessCalculator
 from datetime import timedelta
 import statistics, math
 from utils import format_date, parse_date
@@ -475,13 +476,13 @@ class TrainingVolumeProcessing(object):
         for r in readiness_surveys:
             for s in r.soreness:
                 if not s.pain:
-                    self.daily_readiness_tuples.append((r.event_date, (s.body_part.location.value, s.side, s.severity)))
+                    self.daily_readiness_tuples.append((r.event_date, (s.body_part.location.value, s.side, SorenessCalculator.get_severity(s.severity, s.movement))))
 
         for t in training_sessions:
             if t.post_session_survey is not None:
                 for s in t.post_session_survey.soreness:
                     if not s.pain:
-                        self.post_session_survey_tuples.append((t.event_date, (s.body_part.location.value, s.side, s.severity)))
+                        self.post_session_survey_tuples.append((t.event_date, (s.body_part.location.value, s.side, SorenessCalculator.get_severity(s.severity, s.movement))))
 
         self.daily_readiness_tuples.sort(key=self.get_tuple_datetime)
         self.post_session_survey_tuples.sort(key=self.get_tuple_datetime)
