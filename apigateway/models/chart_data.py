@@ -196,7 +196,7 @@ class DOMSChart(BaseChart):
             doms[new_date] = []
 
         for d in doms_list:
-            daily_soreness = list(s for s in soreness_list if s.body_part.location == d.body_part_location and s.side == d.side)
+            daily_soreness = list(s for s in soreness_list if s.body_part.location == d.body_part_location and s.side == d.side and not s.pain)
             for s in daily_soreness:
                 if s.reported_date_time.date() in doms:
                     doms[s.reported_date_time.date()].append(s)
