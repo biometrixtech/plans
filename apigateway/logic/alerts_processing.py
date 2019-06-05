@@ -88,26 +88,27 @@ class AlertsProcessing(object):
                             l_insight.cleared = True
         existing_longitudinal_insights = [insight for insight in existing_longitudinal_insights if not insight.cleared]
 
+        # handle the case of hist_sore going from <30 days(trigger 7) to >=30 days (trigger 19) and make sure two conflicting insights don't exist for same body part
         current_trigger_types = [insight.trigger_type for insight in new_insights]
-        if TriggerType(7) in current_trigger_types and TriggerType.is_in(TriggerType(19), current_trigger_types):
+        if TriggerType(7) in current_trigger_types and TriggerType.is_in(TriggerType(19), current_trigger_types):  # only relevant if both 7 and 19 are present
             cleared_trigger_7_insight = [insight for insight in new_insights if insight.trigger_type == TriggerType(7) and insight.cleared]
-            if len(cleared_trigger_7_insight) > 0:
+            if len(cleared_trigger_7_insight) > 0:  # and if the 7 is actually "cleared"
                 cleared_trigger_7_insight = cleared_trigger_7_insight[0]
                 cleared_trigger_7_body_parts = [d.json_serialise() for d in cleared_trigger_7_insight.body_parts]
                 parent_group_4_trigger = [insight for insight in new_insights if TriggerType.is_equivalent(insight.trigger_type, TriggerType(19)) and not insight.cleared]
-                if len(parent_group_4_trigger) > 0:
+                if len(parent_group_4_trigger) > 0:  # make sure parent group 4 is not cleared
                     parent_group_4_trigger = parent_group_4_trigger[0]
                     trigger_19_body_parts = []
-                    if parent_group_4_trigger.parent:
+                    if parent_group_4_trigger.parent:  # if 19 was grouped with 16 to create a parent insight
                         trigger_19_body_parts = [d.json_serialise() for d in parent_group_4_trigger.child_triggers[TriggerType(19)]]
                     elif parent_group_4_trigger.trigger_type == TriggerType(19):
                         trigger_19_body_parts = [d.json_serialise() for d in parent_group_4_trigger.child_triggers[TriggerType(19)]]
-                    if len(trigger_19_body_parts) > 0:
+                    if len(trigger_19_body_parts) > 0:  # if we have any body parts actually present for trigger 19
                         for body_part in trigger_19_body_parts:
                             if body_part in cleared_trigger_7_body_parts:
                                 cleared_trigger_7_body_parts.remove(body_part)
                     cleared_trigger_7_insight.body_parts = [BodyPartSide.json_deserialise(body_part) for body_part in cleared_trigger_7_body_parts]
-                    if len(cleared_trigger_7_insight.body_parts) == 0:
+                    if len(cleared_trigger_7_insight.body_parts) == 0:  # check to see body part exist after moving the ones that were moved to 19 are removed from cleared 7
                         new_insights.remove(cleared_trigger_7_insight)
 
         return new_insights, existing_longitudinal_insights
