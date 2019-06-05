@@ -304,7 +304,11 @@ class AlertsProcessing(object):
                 l_trend.add_data()
                 # populate relevant data for charts
                 self.add_chart_data(l_trend)
-                new_trends.response.alerts.append(l_trend)
+                is_trigger_7 = l_trend.trigger_type == TriggerType(7)
+                trigger19_same_body_part = (TriggerType(19), l_trend.body_parts[0])
+                is_same_body_part_trigger_type_19 = trigger19_same_body_part in current_biomechanics_trigger_types
+                if not (l_trend.trigger_type == TriggerType(7) and (TriggerType(19), l_trend.body_parts[0]) in current_biomechanics_trigger_types):
+                    new_trends.response.alerts.append(l_trend)
             elif l_trend.insight_type == InsightType.biomechanics and \
                     l_trend.get_trigger_type_body_part_sport_tuple() not in current_biomechanics_trigger_types:
                 l_trend.cleared = True

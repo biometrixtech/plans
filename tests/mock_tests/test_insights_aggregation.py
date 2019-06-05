@@ -518,6 +518,7 @@ def test_aggregate_insights_less_30_days_to_greater_30_days():
 
     athlete_stats.exposed_triggers = [existing_insights[0].trigger_type]
     daily_plan.insights = []
+    daily_plan.trends = None
     AlertsProcessing(daily_plan, athlete_stats, event_date_time).aggregate_alerts([alert2, alert3, alert4])
     insights = daily_plan.insights
 
