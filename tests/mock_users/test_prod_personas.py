@@ -181,7 +181,7 @@ def get_soreness_string(soreness_list):
 def test_generate_spreadsheets_for_personas():
 
     start_date = parse_date("2019-05-01")
-    end_date = parse_date("2019-06-04")
+    end_date = parse_date("2019-06-05")
 
     users = []
     user_names = []
@@ -358,6 +358,8 @@ def test_generate_spreadsheets_for_personas():
                 mgr.daily_plan = mgr.create_daily_plan(format_date(date), format_datetime(survey.event_date),
                                                        athlete_stats=athlete_stats)
 
+                athlete_stats = mock_data_store_collection.athlete_stats_datastore.athlete_stats
+
                 body_part_line = str(date) + ',' + get_soreness_string(mgr.soreness_list)
 
                 training_volume_line = get_trends_dashboard_training_volume(mgr.daily_plan)
@@ -424,6 +426,8 @@ def test_generate_spreadsheets_for_personas():
 
                         mgr.daily_plan = mgr.create_daily_plan(format_date(date), format_datetime(training_session.created_date),
                                                                athlete_stats=athlete_stats)
+
+                        athlete_stats = mock_data_store_collection.athlete_stats_datastore.athlete_stats
 
                         body_part_line = str(date) + ',' + get_soreness_string(mgr.soreness_list)
 
