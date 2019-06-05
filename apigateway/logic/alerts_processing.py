@@ -66,7 +66,6 @@ class AlertsProcessing(object):
                 new_insights.append(l_insight)
             else:  # find current insight of same trigger type or same parent group
                 current_insight = [insight for insight in new_insights if TriggerType.is_equivalent(insight.trigger_type, l_insight.trigger_type)][0]
-                cleared_parts = []
                 # cleared_sports = []
                 for trigger_type, body_parts in l_insight.child_triggers.items():
                     if trigger_type not in current_insight.child_triggers.keys():
@@ -77,6 +76,7 @@ class AlertsProcessing(object):
                         new_insights.append(cleared_insight)
                         l_insight.cleared = True
                     else:
+                        cleared_parts = []
                         current_body_parts = [d.json_serialise() for d in current_insight.child_triggers[trigger_type]]
                         for body_part in body_parts:
                             if body_part.json_serialise() not in current_body_parts:
@@ -89,6 +89,28 @@ class AlertsProcessing(object):
                             new_insights.append(cleared_insight)
                             l_insight.cleared = True
         existing_longitudinal_insights = [insight for insight in existing_longitudinal_insights if not insight.cleared]
+
+        current_trigger_types = [insight.trigger_type for insight in new_insights]
+        if TriggerType(7) in current_trigger_types and TriggerType.is_in(TriggerType(19), current_trigger_types):
+            cleared_trigger_7_insight = [insight for insight in new_insights if insight.trigger_type == TriggerType(7) and insight.cleared]
+            if len(cleared_trigger_7_insight) > 0:
+                cleared_trigger_7_insight = cleared_trigger_7_insight[0]
+                cleared_trigger_7_body_parts = [d.json_serialise() for d in cleared_trigger_7_insight.body_parts]
+                parent_group_4_trigger = [insight for insight in new_insights if TriggerType.is_equivalent(insight.trigger_type, TriggerType(19)) and not insight.cleared]
+                if len(parent_group_4_trigger) > 0:
+                    parent_group_4_trigger = parent_group_4_trigger[0]
+                    trigger_19_body_parts = []
+                    if parent_group_4_trigger.parent:
+                        trigger_19_body_parts = [d.json_serialise() for d in parent_group_4_trigger.child_triggers[TriggerType(19)]]
+                    elif parent_group_4_trigger.trigger_type == TriggerType(19):
+                        trigger_19_body_parts = [d.json_serialise() for d in parent_group_4_trigger.child_triggers[TriggerType(19)]]
+                    if len(trigger_19_body_parts) > 0:
+                        for body_part in trigger_19_body_parts:
+                            if body_part in cleared_trigger_7_body_parts:
+                                cleared_trigger_7_body_parts.remove(body_part)
+                    cleared_trigger_7_insight.body_parts = [BodyPartSide.json_deserialise(body_part) for body_part in cleared_trigger_7_body_parts]
+                    if len(cleared_trigger_7_insight.body_parts) == 0:
+                        new_insights.remove(cleared_trigger_7_insight)
 
         return new_insights, existing_longitudinal_insights
 

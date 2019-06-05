@@ -431,6 +431,352 @@ def test_aggregate_insights_cleared_parent_group_4():
     assert insights[1].trigger_type == TriggerType(19)
 
 
+def test_aggregate_insights_cleared_parent_group_0():
+    """
+    day0:
+        trigger_type 8,
+        trigger_type 7 with multiple body parts
+            11,1 and 11,2
+        This should result in a single parent trigger
+
+    day1: remove trigger_type 7 body_part 11, 1
+        one parent insight with two child triggers
+        one cleared inisght for trigger type 7 body_part 11,1
+
+
+    """
+    current_date_time = datetime.datetime.now()
+    alert1 = get_alert(7, (11, 1))
+    alert2 = get_alert(7, (11, 2))
+    alert3 = get_alert(8)
+
+    alerts = [alert1, alert2, alert3]
+    event_date_time = current_date_time
+    daily_plan = DailyPlan(format_date(event_date_time))
+    athlete_stats = AthleteStats('test_user')
+    AlertsProcessing(daily_plan, athlete_stats, event_date_time - datetime.timedelta(days=1)).aggregate_alerts(alerts)
+    existing_insights = daily_plan.insights
+    assert len(existing_insights) == 1
+    assert existing_insights[0].first
+    assert existing_insights[0].parent
+    assert existing_insights[0].longitudinal
+    assert existing_insights[0].start_date_time == current_date_time - datetime.timedelta(days=1)
+    assert len(existing_insights[0].child_triggers) == 2
+
+    athlete_stats.exposed_triggers = [existing_insights[0].trigger_type]
+    daily_plan.insights = []
+    AlertsProcessing(daily_plan, athlete_stats, event_date_time).aggregate_alerts([alert2, alert3])
+    insights = daily_plan.insights
+
+    assert len(insights) == 2
+    assert not insights[0].first
+    assert insights[0].parent
+    assert insights[0].longitudinal
+    assert insights[0].start_date_time == current_date_time
+    assert insights[0].parent_group == 0
+    assert len(insights[0].child_triggers) == 2
+
+    assert not insights[1].parent
+    assert insights[1].longitudinal
+    assert insights[1].cleared
+    assert insights[1].start_date_time == current_date_time
+    assert insights[1].body_parts[0].json_serialise() == BodyPartSide(BodyPartLocation(11), 1).json_serialise()
+
+
+def test_aggregate_insights_less_30_days_to_greater_30_days():
+    """
+    day0:
+        trigger_type 8,
+        trigger_type 7 with multiple body parts
+            11,1 and 11,2
+        This should result in a single parent trigger
+
+    day1: body_part 11, 1 moves to trigger_type 19
+        parent insight (group 0) with two child triggers
+        child insight for trigger type 19 for body part 11, 1
+        No cleared insight for trigger type 7 body part 11, 1
+
+    """
+    current_date_time = datetime.datetime.now()
+    alert1 = get_alert(7, (11, 1))
+    alert2 = get_alert(7, (11, 2))
+    alert3 = get_alert(8)
+    alert4 = get_alert(19, (11, 1))
+
+    alerts = [alert1, alert2, alert3]
+    event_date_time = current_date_time
+    daily_plan = DailyPlan(format_date(event_date_time))
+    athlete_stats = AthleteStats('test_user')
+    AlertsProcessing(daily_plan, athlete_stats, event_date_time - datetime.timedelta(days=1)).aggregate_alerts(alerts)
+    existing_insights = daily_plan.insights
+    assert len(existing_insights) == 1
+    assert existing_insights[0].first
+    assert existing_insights[0].parent
+    assert existing_insights[0].longitudinal
+    assert existing_insights[0].start_date_time == current_date_time - datetime.timedelta(days=1)
+    assert len(existing_insights[0].child_triggers) == 2
+
+    athlete_stats.exposed_triggers = [existing_insights[0].trigger_type]
+    daily_plan.insights = []
+    AlertsProcessing(daily_plan, athlete_stats, event_date_time).aggregate_alerts([alert2, alert3, alert4])
+    insights = daily_plan.insights
+
+    assert len(insights) == 2
+    assert not insights[1].first
+    assert insights[1].parent
+    assert insights[1].longitudinal
+    assert insights[1].start_date_time == current_date_time
+    assert insights[1].parent_group == 0
+    assert len(insights[1].child_triggers) == 2
+
+    assert not insights[0].parent
+    assert insights[0].longitudinal
+    assert not insights[0].cleared
+    assert insights[0].trigger_type == TriggerType(19)
+    assert insights[0].start_date_time == current_date_time
+    assert insights[0].body_parts[0].json_serialise() == BodyPartSide(BodyPartLocation(11), 1).json_serialise()
+
+
+def test_aggregate_insights_less_30_days_to_greater_30_days_multiple_parts():
+    """
+    day0:
+        trigger_type 8,
+        trigger_type 7 with multiple body parts
+            11,1 and 11,2
+        This should result in a single parent trigger
+
+    day1: body_part 11, 1  and body_part 11, 2 moves to trigger_type 19
+        child insight trigger_type 8
+        child insight for trigger type 19 for body part 11, 1 and 11, 2
+        No cleared insight for trigger type 7 body part 11, 1 or 11, 2
+
+    """
+    current_date_time = datetime.datetime.now()
+    alert1 = get_alert(7, (11, 1))
+    alert2 = get_alert(7, (11, 2))
+    alert3 = get_alert(8)
+    alert4 = get_alert(19, (11, 1))
+    alert5 = get_alert(19, (11, 2))
+
+    alerts = [alert1, alert2, alert3]
+    event_date_time = current_date_time
+    daily_plan = DailyPlan(format_date(event_date_time))
+    athlete_stats = AthleteStats('test_user')
+    AlertsProcessing(daily_plan, athlete_stats, event_date_time - datetime.timedelta(days=1)).aggregate_alerts(alerts)
+    existing_insights = daily_plan.insights
+    assert len(existing_insights) == 1
+    assert existing_insights[0].first
+    assert existing_insights[0].parent
+    assert existing_insights[0].longitudinal
+    assert existing_insights[0].start_date_time == current_date_time - datetime.timedelta(days=1)
+    assert len(existing_insights[0].child_triggers) == 2
+
+    athlete_stats.exposed_triggers = [existing_insights[0].trigger_type]
+    daily_plan.insights = []
+    AlertsProcessing(daily_plan, athlete_stats, event_date_time).aggregate_alerts([alert3, alert4, alert5])
+    insights = daily_plan.insights
+
+    assert len(insights) == 2
+    assert not insights[1].first
+    assert not insights[1].parent
+    assert insights[1].longitudinal
+    assert insights[1].start_date_time == current_date_time
+    assert insights[1].trigger_type == TriggerType(8)
+
+    assert not insights[0].parent
+    assert insights[0].longitudinal
+    assert not insights[0].cleared
+    assert insights[0].trigger_type == TriggerType(19)
+    assert insights[0].start_date_time == current_date_time
+    assert len(insights[0].body_parts) == 2
+
+
+def test_aggregate_insights_less_30_days_to_greater_30_days_multiple_parts_move_parent_group_4():
+    """
+    day0:
+        trigger_type 8,
+        trigger_type 7 with multiple body parts
+            11,1 and 11,2
+        This should result in a single parent trigger
+
+    day1: body_part 11, 1  and body_part 11, 2 moves to trigger_type 19, new trigger type 16 body_part 7,1
+        child insight trigger_type 8
+        parent insight (group 4) with two child triggers (19 and 16)
+            child trigger 19 for body part 11, 1 and 11, 2
+            child trigger 16 for body part 7, 1
+        No cleared insight for trigger type 7 body part 11, 1 or 11, 2
+
+    """
+    current_date_time = datetime.datetime.now()
+    alert1 = get_alert(7, (11, 1))
+    alert2 = get_alert(7, (11, 2))
+    alert3 = get_alert(8)
+    alert4 = get_alert(19, (11, 1))
+    alert5 = get_alert(19, (11, 2))
+    alert6 = get_alert(16, (7, 1))
+
+    alerts = [alert1, alert2, alert3]
+    event_date_time = current_date_time
+    daily_plan = DailyPlan(format_date(event_date_time))
+    athlete_stats = AthleteStats('test_user')
+    AlertsProcessing(daily_plan, athlete_stats, event_date_time - datetime.timedelta(days=1)).aggregate_alerts(alerts)
+    existing_insights = daily_plan.insights
+    assert len(existing_insights) == 1
+    assert existing_insights[0].first
+    assert existing_insights[0].parent
+    assert existing_insights[0].longitudinal
+    assert existing_insights[0].start_date_time == current_date_time - datetime.timedelta(days=1)
+    assert len(existing_insights[0].child_triggers) == 2
+
+    athlete_stats.exposed_triggers = [existing_insights[0].trigger_type]
+    daily_plan.insights = []
+    AlertsProcessing(daily_plan, athlete_stats, event_date_time).aggregate_alerts([alert3, alert4, alert5, alert6])
+    insights = daily_plan.insights
+
+    assert len(insights) == 2
+    assert not insights[1].first
+    assert not insights[1].parent
+    assert insights[1].longitudinal
+    assert insights[1].start_date_time == current_date_time
+    assert insights[1].trigger_type == TriggerType(8)
+
+    assert insights[0].parent
+    assert insights[0].parent_group == 4
+    assert insights[0].longitudinal
+    assert len(insights[0].child_triggers) == 2
+    assert not insights[0].cleared
+    assert insights[0].start_date_time == current_date_time
+    assert len(insights[0].body_parts) == 3
+
+
+def test_aggregate_insights_less_30_days_to_greater_30_days_multiple_parts_move_parent_group_4_one_remains_group_0():
+    """
+    day0:
+        trigger_type 8,
+        trigger_type 7 with multiple body parts
+            11,1 and 11,2 and 7, 2
+        This should result in a single parent trigger
+
+    day1: body_part 11, 1  and body_part 11, 2 moves to trigger_type 19, new trigger type 16 body_part 7,1
+        parent insight (group 0) with two child triggers
+            child trigger 7 for body_part 7, 2
+            child trigger 8
+        parent insight (group 4) with two child triggers (19 and 16)
+            child trigger 19 for body part 11, 1 and 11, 2
+            child trigger 16 for body part 7, 1
+        No cleared insight for trigger type 7 body part 11, 1 or 11, 2
+
+    """
+    current_date_time = datetime.datetime.now()
+    alert1 = get_alert(7, (11, 1))
+    alert2 = get_alert(7, (11, 2))
+    alert3 = get_alert(8)
+    alert4 = get_alert(19, (11, 1))
+    alert5 = get_alert(19, (11, 2))
+    alert6 = get_alert(16, (7, 1))
+    alert7 = get_alert(7, (7, 2))
+
+    alerts = [alert1, alert2, alert3, alert7]
+    event_date_time = current_date_time
+    daily_plan = DailyPlan(format_date(event_date_time))
+    athlete_stats = AthleteStats('test_user')
+    AlertsProcessing(daily_plan, athlete_stats, event_date_time - datetime.timedelta(days=1)).aggregate_alerts(alerts)
+    existing_insights = daily_plan.insights
+    assert len(existing_insights) == 1
+    assert existing_insights[0].first
+    assert existing_insights[0].parent
+    assert existing_insights[0].longitudinal
+    assert existing_insights[0].start_date_time == current_date_time - datetime.timedelta(days=1)
+    assert len(existing_insights[0].child_triggers) == 2
+
+    athlete_stats.exposed_triggers = [existing_insights[0].trigger_type]
+    daily_plan.insights = []
+    AlertsProcessing(daily_plan, athlete_stats, event_date_time).aggregate_alerts([alert3, alert4, alert5, alert6, alert7])
+    insights = daily_plan.insights
+
+    assert len(insights) == 2
+    assert not insights[1].first
+    assert insights[1].parent
+    assert insights[1].longitudinal
+    assert insights[1].start_date_time == current_date_time
+    assert len(insights[1].child_triggers) == 2
+
+    assert insights[0].parent
+    assert insights[0].parent_group == 4
+    assert insights[0].longitudinal
+    assert len(insights[0].child_triggers) == 2
+    assert not insights[0].cleared
+    assert insights[0].start_date_time == current_date_time
+    assert len(insights[0].body_parts) == 3
+
+
+def test_aggregate_insights_less_30_days_to_greater_30_days_multiple_parts_move_parent_group_4_one_cleared():
+    """
+    day0:
+        trigger_type 8,
+        trigger_type 7 with multiple body parts
+            11,1 and 11,2 and 7, 2
+        This should result in a single parent trigger
+
+    day1: body_part 11, 1  and body_part 11, 2 moves to trigger_type 19, new trigger type 16 body_part 7,1
+        child insight for trigger type 8
+        cleared insight for trigger 7 for body_part 7, 2
+        parent insight (group 4) with two child triggers (19 and 16)
+            child trigger 19 for body part 11, 1 and 11, 2
+            child trigger 16 for body part 7, 1
+        No cleared insight for trigger type 7 body part 11, 1 or 11, 2
+
+    """
+    current_date_time = datetime.datetime.now()
+    alert1 = get_alert(7, (11, 1))
+    alert2 = get_alert(7, (11, 2))
+    alert3 = get_alert(8)
+    alert4 = get_alert(19, (11, 1))
+    alert5 = get_alert(19, (11, 2))
+    alert6 = get_alert(16, (7, 1))
+    alert7 = get_alert(7, (7, 2))
+
+    alerts = [alert1, alert2, alert3, alert7]
+    event_date_time = current_date_time
+    daily_plan = DailyPlan(format_date(event_date_time))
+    athlete_stats = AthleteStats('test_user')
+    AlertsProcessing(daily_plan, athlete_stats, event_date_time - datetime.timedelta(days=1)).aggregate_alerts(alerts)
+    existing_insights = daily_plan.insights
+    assert len(existing_insights) == 1
+    assert existing_insights[0].first
+    assert existing_insights[0].parent
+    assert existing_insights[0].longitudinal
+    assert existing_insights[0].start_date_time == current_date_time - datetime.timedelta(days=1)
+    assert len(existing_insights[0].child_triggers) == 2
+
+    athlete_stats.exposed_triggers = [existing_insights[0].trigger_type]
+    daily_plan.insights = []
+    AlertsProcessing(daily_plan, athlete_stats, event_date_time).aggregate_alerts([alert3, alert4, alert5, alert6])
+    insights = daily_plan.insights
+
+    assert len(insights) == 3
+    assert not insights[1].first
+    assert not insights[1].parent
+    assert insights[1].longitudinal
+    assert insights[1].start_date_time == current_date_time
+    assert insights[1].trigger_type == TriggerType(8)
+
+    assert insights[0].parent
+    assert insights[0].parent_group == 4
+    assert insights[0].longitudinal
+    assert len(insights[0].child_triggers) == 2
+    assert not insights[0].cleared
+    assert insights[0].start_date_time == current_date_time
+    assert len(insights[0].body_parts) == 3
+
+    assert not insights[2].parent
+    assert insights[2].longitudinal
+    assert insights[2].cleared
+    assert insights[2].start_date_time == current_date_time
+    assert insights[2].body_parts[0].json_serialise() == BodyPartSide(BodyPartLocation(7), 2).json_serialise()
+    assert insights[2].trigger_type == TriggerType(7)
+
+
 def test_aggregate_insights_cleared_one_body_part():
     """
     longitudinal insight for doms created yesterday
