@@ -18,8 +18,6 @@ class AlertsProcessing(object):
         insights = self.combine_alerts_to_insights(alerts, trends)
         self.clear_trends(trends)
         trends = self.combine_new_trends_with_previous(trends)
-        if TriggerType(9) in exposed_triggers:
-            insights = [insight for insight in insights if insight.trigger_type != TriggerType(9)]
         insights, longitudinal_insights = self.clear_insight(insights, longitudinal_insights)
 
         existing_longitudinal_trigger_types = [insight.trigger_type for insight in longitudinal_insights]
