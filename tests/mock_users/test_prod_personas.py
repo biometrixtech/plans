@@ -90,14 +90,21 @@ def get_trends_dashboard_training_volume(daily_plan):
 
     return output
 
-def get_trends_high_training_loads(daily_plan):
+def get_trends_high_training_loads(athlete_stats, daily_plan):
 
     output = ""
     found = False
+    load_list = ""
+    count = 0
+    for d in athlete_stats.high_relative_load_sessions:
+        if count > 0:
+            load_list += ";"
+        load_list += format_datetime(d.date) + "(" + d.sport_name.name + ")"
+        count += 1
     for i in daily_plan.trends.stress.alerts:
         if i.visualization_type == VisualizationType.session:
             found = True
-            output += daily_plan.event_date + ","
+            output += daily_plan.event_date + "," + load_list + ','
             count = 0
             for d in i.data:
                 if count > 0:
@@ -105,19 +112,20 @@ def get_trends_high_training_loads(daily_plan):
                 output += str(round(d.value, 2))
                 count += 1
     if not found:
-        output = daily_plan.event_date + ',0,0,0,0,0,0,0,0,0,0,0,0,0,0'
+        output = daily_plan.event_date + ',' + load_list + ',0,0,0,0,0,0,0,0,0,0,0,0,0,0'
 
     return output
 
 
-def get_trends_muscular_strain(daily_plan):
+def get_trends_muscular_strain(athlete_stats, daily_plan):
 
     output = ""
     found = False
     for i in daily_plan.trends.response.alerts:
         if i.visualization_type == VisualizationType.muscular_strain:
             found = True
-            output += daily_plan.event_date + ","
+            muscular_strain = list(m for m in athlete_stats.muscular_strain if format_date(m.date.date()) == daily_plan.event_date)[0].value
+            output += daily_plan.event_date + "," + str(muscular_strain) + ","
             count = 0
             for d in i.data:
                 if count > 0:
@@ -125,19 +133,32 @@ def get_trends_muscular_strain(daily_plan):
                 output += str(round(d.value, 2))
                 count += 1
     if not found:
-        output = daily_plan.event_date + ',0,0,0,0,0,0,0,0,0,0,0,0,0,0'
+        if len(athlete_stats.muscular_strain) > 0:
+            muscular_strain = list(m for m in athlete_stats.muscular_strain if format_date(m.date.date()) == daily_plan.event_date)[0].value
+            output = daily_plan.event_date + "," + str(muscular_strain) + ",0,0,0,0,0,0,0,0,0,0,0,0,0,0"
+        else:
+            output = daily_plan.event_date + ',N/A,0,0,0,0,0,0,0,0,0,0,0,0,0,0'
 
     return output
 
 
-def get_trends_doms(daily_plan):
+def get_trends_doms(athlete_stats, daily_plan):
 
     output = ""
     found = False
+    doms = list(d for d in athlete_stats.historic_soreness if d.historic_soreness_status == HistoricSorenessStatus.doms)
+    doms_list = ""
+    count = 0
+    for d in doms:
+        if count > 0:
+            doms_list += ";"
+        doms_list += d.body_part_location.name + ';side=' + str(d.side)
+        count += 1
+
     for i in daily_plan.trends.response.alerts:
         if i.visualization_type == VisualizationType.doms:
             found = True
-            output += daily_plan.event_date + ","
+            output += daily_plan.event_date + "," + doms_list + ","
             count = 0
             for d in i.data:
                 if count > 0:
@@ -148,7 +169,7 @@ def get_trends_doms(daily_plan):
                     output += str(round(d.value, 2))
                 count += 1
     if not found:
-        output = daily_plan.event_date + ',0,0,0,0,0,0,0,0,0,0,0,0,0,0'
+        output = daily_plan.event_date + ','+doms_list+',0,0,0,0,0,0,0,0,0,0,0,0,0,0'
 
     return output
 
@@ -276,15 +297,17 @@ def test_generate_spreadsheets_for_personas():
         cline = ('date,soreness,soreness_max_severity,pain, pain_max_severity,default_plan,alerts,dynamic_stretch,dynamic_integrate,ds_efficient_time, ds_complete_time,ds_comprehensive_time,'+
                  'di_efficient_time,di_complete_time,di_comprehensive_time')
         tline = ('date, day_14,day_13, day_12, day_11, day_10, day_9, day_8, day_7, day_6, day_5, day_4, day_3, day_2, day_1')
+        tline_v = (
+            'date, value, day_14,day_13, day_12, day_11, day_10, day_9, day_8, day_7, day_6, day_5, day_4, day_3, day_2, day_1')
         pre_active_rest_file.write(line + '\n')
         summary_pre_active_rest_file.write(sline + '\n')
         post_active_rest_file.write(line + '\n')
         summary_post_active_rest_file.write(sline + '\n')
         cooldown_file.write(cline + '\n')
         training_volume_file.write(tline + '\n')
-        high_training_load_file.write(tline + '\n')
-        muscular_strain_file.write(tline + '\n')
-        doms_file.write(tline + '\n')
+        high_training_load_file.write(tline_v + '\n')
+        muscular_strain_file.write(tline_v + '\n')
+        doms_file.write(tline_v + '\n')
 
         for date in dates:
 
@@ -364,11 +387,11 @@ def test_generate_spreadsheets_for_personas():
 
                 training_volume_line = get_trends_dashboard_training_volume(mgr.daily_plan)
 
-                high_training_load_line = get_trends_high_training_loads(mgr.daily_plan)
+                high_training_load_line = get_trends_high_training_loads(athlete_stats, mgr.daily_plan)
 
-                muscular_strain_line = get_trends_muscular_strain(mgr.daily_plan)
+                muscular_strain_line = get_trends_muscular_strain(athlete_stats, mgr.daily_plan)
 
-                doms_line = get_trends_doms(mgr.daily_plan)
+                doms_line = get_trends_doms(athlete_stats, mgr.daily_plan)
 
                 cool_down_line, line, sline = get_lines(mgr.daily_plan)
 
@@ -396,10 +419,11 @@ def test_generate_spreadsheets_for_personas():
                         training_session = daily_plans[0].training_sessions[t]
 
                         survey_processing = SurveyProcessing(user_id, date, athlete_stats, mock_data_store_collection)
-                        survey_processing.soreness = training_session.post_session_soreness
+                        if training_session.post_session_survey is not None:
+                            survey_processing.soreness = training_session.post_session_survey.soreness
                         survey_processing.sessions.append(training_session)
                         survey_processing.patch_daily_and_historic_soreness('post_session')
-                        survey_processing.check_high_relative_load_sessions(survey_processing.sessions)
+                        #survey_processing.check_high_relative_load_sessions(survey_processing.sessions)
                         athlete_stats = survey_processing.athlete_stats
 
                         mgr.daily_plan.training_sessions.append(training_session)
@@ -431,11 +455,11 @@ def test_generate_spreadsheets_for_personas():
 
                         body_part_line = str(date) + ',' + get_soreness_string(mgr.soreness_list)
 
-                        high_training_load_line = get_trends_high_training_loads(mgr.daily_plan)
+                        high_training_load_line = get_trends_high_training_loads(athlete_stats, mgr.daily_plan)
 
-                        muscular_strain_line = get_trends_muscular_strain(mgr.daily_plan)
+                        muscular_strain_line = get_trends_muscular_strain(athlete_stats, mgr.daily_plan)
 
-                        doms_line = get_trends_doms(mgr.daily_plan)
+                        doms_line = get_trends_doms(athlete_stats, mgr.daily_plan)
 
                         training_volume_line = get_trends_dashboard_training_volume(mgr.daily_plan)
 

@@ -54,7 +54,7 @@ def handle_session_create(principal_id=None):
         if not session.deleted and not session.ignored:
             plan_update_required = True
             break
-    survey_processor.check_high_relative_load_sessions(survey_processor.sessions)
+    #survey_processor.check_high_relative_load_sessions(survey_processor.sessions)
 
     # check if plan exists, if not create a new one and save it to database, also check if existing one needs updating flags
 
@@ -66,8 +66,8 @@ def handle_session_create(principal_id=None):
         plan = daily_plan_datastore.get(user_id, plan_event_date, plan_event_date)[0]
         if plan_update_required and not plan.sessions_planned:
             plan.sessions_planned = True
-        if not survey_processor.athlete_stats.high_relative_load_session and len(plan.training_sessions) > 0:
-            survey_processor.check_high_relative_load_sessions(plan.training_sessions)
+        #if not survey_processor.athlete_stats.high_relative_load_session and len(plan.training_sessions) > 0:
+        #    survey_processor.check_high_relative_load_sessions(plan.training_sessions)
 
     # add sessions to plan and write to mongo
     plan.train_later = train_later
