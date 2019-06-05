@@ -120,7 +120,7 @@ class ExerciseAssignmentCalculator(object):
 
                 elif ((s.historic_soreness_status == HistoricSorenessStatus.persistent_2_pain or s.is_persistent_pain())
                       and not s.daily):
-                    if days_diff <= 30:
+                    if days_diff < 30:
                         #goal.trigger = "Acute, Pers, Pers-2 Pain <= 30d"
                         goal.trigger_type = TriggerType.pers_pers2_pain_less_30_no_pain_today  # 21
                         minutes.append(10)
@@ -294,7 +294,7 @@ class ExerciseAssignmentCalculator(object):
                   (s.is_persistent_soreness() or s.historic_soreness_status ==
                     HistoricSorenessStatus.persistent_2_soreness) and s.first_reported_date_time is not None):
                 days_diff = (self.event_date_time - s.first_reported_date_time).days
-                if days_diff > 30 and s.severity >= 1.5:
+                if days_diff >= 30 and s.severity >= 1.5:
                     goal = AthleteGoal("Care for soreness", 1, AthleteGoalType.sore)
                     #goal.trigger = "Soreness Reported Today + Pers, Pers-2 Soreness > 30d"
                     goal.trigger_type = TriggerType.hist_sore_greater_30_high_volume_intensity # 13
@@ -316,7 +316,7 @@ class ExerciseAssignmentCalculator(object):
                   and s.severity >= 1.5 and not s.pain and (self.high_relative_load_session or self.high_relative_intensity_session)):
 
                 days_diff = (self.event_date_time - s.first_reported_date_time).days
-                if days_diff > 30 and s.severity >= 1.5:
+                if days_diff >= 30 and s.severity >= 1.5:
                     goal = AthleteGoal("Improve neuromuscular control", 1, AthleteGoalType.preempt_corrective)
                     #goal.trigger = "No Soreness Reported Today + Historic Soreness > 30d + logged hig vol/intensity"
                     goal.trigger_type = TriggerType.hist_sore_greater_30_high_volume_intensity  # 1
@@ -347,7 +347,7 @@ class ExerciseAssignmentCalculator(object):
                   and s.severity >= 1.5 and not s.pain and (self.high_relative_load_session or self.high_relative_intensity_session)):
 
                 days_diff = (self.event_date_time - s.first_reported_date_time).days
-                if days_diff > 30 and s.severity >= 1.5:
+                if days_diff >= 30 and s.severity >= 1.5:
                     goal = AthleteGoal("Improve neuromuscular control", 1, AthleteGoalType.preempt_corrective)
                     #goal.trigger = "No Soreness Reported Today + Historic Soreness > 30d + logged hig vol/intensity"
                     goal.trigger_type = TriggerType.hist_sore_greater_30_no_sore_today_high_volume_intensity  # 3
@@ -470,7 +470,7 @@ class ExerciseAssignmentCalculator(object):
                       s.historic_soreness_status == HistoricSorenessStatus.persistent_2_soreness)
                       and s.first_reported_date_time is not None):
                     days_diff = (self.event_date_time - s.first_reported_date_time).days
-                    if days_diff > 30 and s.severity >= 3.5:
+                    if days_diff >= 30 and s.severity >= 3.5:
                         goal = AthleteGoal("Care for soreness", 1, AthleteGoalType.sore)
                         #goal.trigger = "Soreness Reported Today + Pers, Pers-2 Soreness > 30d"
                         goal.trigger_type = TriggerType.hist_sore_greater_30_sore_today  # 13
@@ -548,7 +548,7 @@ class ExerciseAssignmentCalculator(object):
                            or s.historic_soreness_status == HistoricSorenessStatus.persistent_2_soreness)
                       and s.first_reported_date_time is not None):
                         days_diff = (self.event_date_time - s.first_reported_date_time).days
-                        if days_diff > 30:
+                        if days_diff >= 30:
                             goal = AthleteGoal("Improve neuromuscular control", 1, AthleteGoalType.preempt_corrective)
                             goal.trigger_type = TriggerType.hist_sore_greater_30_high_volume_intensity  # 1
                             alert = Alert(goal)
