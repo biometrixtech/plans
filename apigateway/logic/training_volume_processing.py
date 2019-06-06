@@ -1,106 +1,281 @@
 from fathomapi.utils.xray import xray_recorder
-from models.training_volume import StandardErrorRange, StandardErrorRangeMetric
+from models.training_volume import LoadMonitoringType, StandardErrorRange, StandardErrorRangeMetric
+from models.sport import SportName, SportType
+from models.session import HighLoadSession
+from logic.soreness_processing import SorenessCalculator
 from datetime import timedelta
 import statistics, math
 from utils import format_date, parse_date
+from itertools import groupby
+from operator import itemgetter, attrgetter
+from statistics import stdev, mean
+from models.chart_data import TrainingVolumeChartData, TrainingVolumeChart
+
+
+class LoadingEvent(object):
+    def __init__(self, loading_date, load, sport_name):
+        self.loading_date = loading_date
+        self.load = load
+        self.sport_name = sport_name
+        self.affected_body_parts = []
+        self.previous_affected_body_parts = []
+        self.days_rest = None
+        self.highest_load_in_36_hrs = False
+
+    def has_existing_soreness(self, days=1):
+
+        for a in self.affected_body_parts:
+            matched_soreness = list(p for p in self.previous_affected_body_parts if p.body_part == a.body_part
+                                    and p.side == a.side and p.days_sore >= days)
+            if len(matched_soreness) > 0:
+                return True
+
+        return False
+
+
+class AffectedBodyPart(object):
+    def __init__(self, body_part, side, days_sore, max_severity, cleared):
+        self.body_part = body_part
+        self.side = side
+        self.days_sore = days_sore
+        self.max_severity = max_severity
+        self.cleared = cleared
+        self.first_reported_date = None
+        self.last_reported_date = None
 
 
 class TrainingVolumeProcessing(object):
-    def __init__(self, start_date, end_date):
+    def __init__(self, start_date, end_date, load_stats):
         self.start_date = start_date
         self.end_date = end_date
         self.a_internal_load_values = []
-        self.a_external_load_values = []
-        self.a_high_intensity_values = []
-        self.a_mod_intensity_values = []
-        self.a_low_intensity_values = []
+        #self.a_external_load_values = []
+        #self.a_high_intensity_values = []
+        #self.a_mod_intensity_values = []
+        #self.a_low_intensity_values = []
 
         self.c_internal_load_values = []
-        self.c_external_load_values = []
-        self.c_high_intensity_values = []
-        self.c_mod_intensity_values = []
-        self.c_low_intensity_values = []
+        #self.c_external_load_values = []
+        #self.c_high_intensity_values = []
+        #self.c_mod_intensity_values = []
+        #self.c_low_intensity_values = []
 
-        self.last_week_external_values = []
-        self.previous_week_external_values = []
+        #self.last_week_external_values = []
+        #self.previous_week_external_values = []
         self.last_week_internal_values = []
         self.previous_week_internal_values = []
 
+        self.training_volume_chart_data = []
+
         self.internal_load_tuples = []
-        self.external_load_tuples = []
-        self.low_internal_load_day_lower_bound = None
-        self.mod_internal_load_day_lower_bound = None
-        self.high_internal_load_day_lower_bound = None
-        self.low_internal_load_day_upper_bound = None
-        self.mod_internal_load_day_upper_bound = None
-        self.high_internal_load_day_upper_bound = None
+        #self.external_load_tuples = []
+        #self.low_internal_load_day_lower_bound = None
+        #self.mod_internal_load_day_lower_bound = None
+        #self.high_internal_load_day_lower_bound = None
+        #self.low_internal_load_day_upper_bound = None
+        #self.mod_internal_load_day_upper_bound = None
+        #self.high_internal_load_day_upper_bound = None
+        self.load_monitoring_measures = {}
+
+        self.daily_readiness_tuples = []
+        self.post_session_survey_tuples = []
+        self.no_soreness_load_tuples = []
+        self.soreness_load_tuples = []
+        self.load_tuples_last_2_weeks = []
+        self.load_tuples_last_2_4_weeks = []
+        self.no_soreness_load_tuples_last_2_weeks = []
+        self.no_soreness_load_tuples_last_2_4_weeks = []
+        self.muscular_strain_last_2_weeks = None
+        self.muscular_strain_last_2_4_weeks = None
+        self.recovery_loads = {}
+        self.maintenance_loads = {}
+        self.functional_overreaching_loads = {}
+        self.functional_overreaching_NFO_loads = {}
+        self.high_relative_load_session = False
+        self.high_relative_load_sessions = []
+        self.doms = []
+        self.last_week_sport_training_loads = {}
+        self.previous_week_sport_training_loads = {}
+        self.last_14_days_training_sessions = []
+        self.load_stats = load_stats
+
+    def muscular_strain_increasing(self):
+
+        if self.muscular_strain_last_2_weeks is not None and self.muscular_strain_last_2_4_weeks is not None:
+            if self.muscular_strain_last_2_weeks > self.muscular_strain_last_2_4_weeks:
+                return True
+            else:
+                return False
+        else:
+            return False
+
+    def calc_high_relative_load_benchmarks(self):
+
+        benchmarks = {}
+
+        for sport, load_list in self.functional_overreaching_loads.items():
+            if sport not in benchmarks:
+                benchmarks[sport] = mean(load_list)
+            else:
+                benchmarks[sport] = min(benchmarks[sport], mean(load_list))
+
+        for sport, load_list in self.functional_overreaching_NFO_loads.items():
+            if sport not in benchmarks:
+                benchmarks[sport] = mean(load_list)
+            else:
+                benchmarks[sport] = min(benchmarks[sport], mean(load_list))
+
+        return benchmarks
+
+    def fill_load_monitoring_measures(self, readiness_surveys, daily_plans, load_end_date):
+
+        swimming_sessions = []
+        cycling_sessions = []
+        running_sessions = []
+        walking_sessions = []
+        duration_sessions = []
+
+        training_sessions = self.get_training_sessions(daily_plans)
+        self.load_stats.set_min_max_values(training_sessions)
+
+        for t in training_sessions:
+            swimming_sessions.append((t.event_date, t.swimming_load(), t.sport_name))
+            cycling_sessions.append((t.event_date, t.cycling_load(), t.sport_name))
+            running_sessions.append((t.event_date, t.running_load(), t.sport_name))
+            walking_sessions.append((t.event_date, t.walking_load(), t.sport_name))
+            training_volume = t.training_volume(self.load_stats)
+            if training_volume is not None:
+                duration_sessions.append((t.event_date, training_volume, t.sport_name))
+
+        self.load_monitoring_measures[LoadMonitoringType.RPExSwimmingDistance] = swimming_sessions
+        self.load_monitoring_measures[LoadMonitoringType.RPExCyclingDistance] = cycling_sessions
+        self.load_monitoring_measures[LoadMonitoringType.RPExRunningDistance] = running_sessions
+        self.load_monitoring_measures[LoadMonitoringType.RPExWalkingDistance] = walking_sessions
+        self.load_monitoring_measures[LoadMonitoringType.RPExDuration] = duration_sessions
+
+        self.load_surveys(readiness_surveys, training_sessions)
+
+        self.load_adaptation_history(duration_sessions, load_end_date)
+
+        if len(training_sessions) > 0:
+            last_training_session = training_sessions[len(training_sessions) - 1]
+            benchmarks = self.calc_high_relative_load_benchmarks()
+            self.high_relative_load_session = self.is_last_session_high_relative_load(load_end_date,
+                                                                                      last_training_session,
+                                                                                      benchmarks,
+                                                                                      self.load_stats)
+
+    def is_last_session_high_relative_load(self, event_date, last_training_session, benchmarks, load_stats):
+        if (event_date - last_training_session.event_date).days <= 2:
+            if last_training_session.sport_name in benchmarks:
+                if last_training_session.training_volume(load_stats) >= benchmarks[last_training_session.sport_name]:
+                    return True
+        else:
+            return False
 
     @xray_recorder.capture('logic.TrainingVolumeProcessing.load_plan_values')
-    def load_plan_values(self, last_7_days_plans, days_8_14_plans, acute_daily_plans, chronic_weeks_plans, chronic_daily_plans):
+    def load_plan_values(self, last_7_days_plans, days_8_14_plans, acute_daily_plans, chronic_weeks_plans,
+                         chronic_daily_plans):
 
-        self.last_week_external_values = []
+        #self.last_week_external_values = []
         self.last_week_internal_values = []
-        self.previous_week_external_values = []
+        self.last_week_sport_training_loads = {}
+        self.previous_week_sport_training_loads = {}
+        #self.previous_week_external_values = []
         self.previous_week_internal_values = []
         self.a_internal_load_values = []
-        self.a_external_load_values = []
-        self.a_high_intensity_values = []
-        self.a_mod_intensity_values = []
-        self.a_low_intensity_values = []
-        self.c_external_load_values = []
-        self.c_high_intensity_values = []
-        self.c_mod_intensity_values = []
-        self.c_low_intensity_values = []
+        #self.a_external_load_values = []
+        #self.a_high_intensity_values = []
+        #self.a_mod_intensity_values = []
+        #self.a_low_intensity_values = []
+        #self.c_external_load_values = []
+        #self.c_high_intensity_values = []
+        #self.c_mod_intensity_values = []
+        #self.c_low_intensity_values = []
         self.internal_load_tuples = []
 
-        self.last_week_external_values.extend(
-            x for x in self.get_plan_session_attribute_sum_list("external_load", last_7_days_plans) if x is not None)
+        last_7_day_training_sessions = self.get_training_sessions(last_7_days_plans)
+        previous_7_day_training_sessions = self.get_training_sessions(days_8_14_plans)
+
+        all_sessions = []
+        all_sessions.extend(previous_7_day_training_sessions)
+        all_sessions.extend(last_7_day_training_sessions)
+
+        self.last_14_days_training_sessions = all_sessions
+
+        chart_data = TrainingVolumeChart(self.end_date)
+
+        self.load_stats.set_min_max_values(last_7_day_training_sessions)
+        self.load_stats.set_min_max_values(previous_7_day_training_sessions)
+
+        for l in last_7_day_training_sessions:
+            chart_data.add_training_volume(l, self.load_stats)
+            if l.sport_name not in self.last_week_sport_training_loads:
+                self.last_week_sport_training_loads[l.sport_name] = []
+                self.previous_week_sport_training_loads[l.sport_name] = []
+            training_load = l.training_volume(self.load_stats)
+            if training_load is not None:
+                self.last_week_sport_training_loads[l.sport_name].append(training_load)
+
+        for p in previous_7_day_training_sessions:
+            chart_data.add_training_volume(p, self.load_stats)
+            if p.sport_name not in self.previous_week_sport_training_loads:
+                self.last_week_sport_training_loads[p.sport_name] = []
+                self.previous_week_sport_training_loads[p.sport_name] = []
+            training_load = p.training_volume(self.load_stats)
+            if training_load is not None:
+                self.previous_week_sport_training_loads[p.sport_name].append(training_load)
+
+        self.training_volume_chart_data = chart_data.get_output_list()
+
+        #self.last_week_external_values.extend(
+        #    x for x in self.get_plan_session_attribute_sum_list("external_load", last_7_days_plans) if x is not None)
 
         self.last_week_internal_values.extend(
             x for x in self.get_session_attributes_product_sum_list("session_RPE", "duration_minutes",
                                                                     last_7_days_plans) if x is not None)
-        self.previous_week_external_values.extend(
-            x for x in self.get_plan_session_attribute_sum_list("external_load", days_8_14_plans) if x is not None)
+        #self.previous_week_external_values.extend(
+        #    x for x in self.get_plan_session_attribute_sum_list("external_load", days_8_14_plans) if x is not None)
 
         self.previous_week_internal_values.extend(
             x for x in self.get_session_attributes_product_sum_list("session_RPE", "duration_minutes",
                                                                     days_8_14_plans) if x is not None)
 
-        self.a_external_load_values.extend(
-            x for x in self.get_plan_session_attribute_sum("external_load", acute_daily_plans) if x is not None)
+        #self.a_external_load_values.extend(
+        #    x for x in self.get_plan_session_attribute_sum("external_load", acute_daily_plans) if x is not None)
 
         self.a_internal_load_values.extend(
             x for x in self.get_session_attributes_product_sum("session_RPE", "duration_minutes",
                                                                acute_daily_plans) if x is not None)
 
-        self.a_high_intensity_values.extend(
-            x for x in self.get_plan_session_attribute_sum("high_intensity_load", acute_daily_plans) if
-            x is not None)
+        #self.a_high_intensity_values.extend(
+        #    x for x in self.get_plan_session_attribute_sum("high_intensity_load", acute_daily_plans) if
+        #    x is not None)
 
-        self.a_mod_intensity_values.extend(
-            x for x in self.get_plan_session_attribute_sum("mod_intensity_load", acute_daily_plans) if
-            x is not None)
+        #self.a_mod_intensity_values.extend(
+        #    x for x in self.get_plan_session_attribute_sum("mod_intensity_load", acute_daily_plans) if
+        #    x is not None)
 
-        self.a_low_intensity_values.extend(
-            x for x in self.get_plan_session_attribute_sum("low_intensity_load", acute_daily_plans) if
-            x is not None)
+        #self.a_low_intensity_values.extend(
+        #    x for x in self.get_plan_session_attribute_sum("low_intensity_load", acute_daily_plans) if
+        #    x is not None)
 
         for w in chronic_weeks_plans:
             self.c_internal_load_values.extend(
                 x for x in self.get_session_attributes_product_sum("session_RPE", "duration_minutes", w)
                 if x is not None)
 
-            self.c_external_load_values.extend(
-                x for x in self.get_plan_session_attribute_sum("external_load", w) if x is not None)
+            #self.c_external_load_values.extend(
+            #    x for x in self.get_plan_session_attribute_sum("external_load", w) if x is not None)
 
-            self.c_high_intensity_values.extend(x for x in self.get_plan_session_attribute_sum("high_intensity_load", w)
-                                           if x is not None)
+            #self.c_high_intensity_values.extend(x for x in self.get_plan_session_attribute_sum("high_intensity_load", w)
+            #                               if x is not None)
 
-            self.c_mod_intensity_values.extend(x for x in self.get_plan_session_attribute_sum("mod_intensity_load", w)
-                                          if x is not None)
+            #self.c_mod_intensity_values.extend(x for x in self.get_plan_session_attribute_sum("mod_intensity_load", w)
+            #                              if x is not None)
 
-            self.c_low_intensity_values.extend(x for x in self.get_plan_session_attribute_sum("low_intensity_load", w)
-                                          if x is not None)
+            #self.c_low_intensity_values.extend(x for x in self.get_plan_session_attribute_sum("low_intensity_load", w)
+            #                              if x is not None)
 
         self.internal_load_tuples.extend(list(x for x in self.get_session_attributes_product_sum_tuple_list("session_RPE",
                                                                                                  "duration_minutes",
@@ -121,20 +296,44 @@ class TrainingVolumeProcessing(object):
             self.mod_internal_load_day_upper_bound = high_internal - range
             self.high_internal_load_day_upper_bound = high_internal
 
+    def set_high_relative_load_sessions(self, athlete_stats, training_sessions):
+
+        for t in training_sessions:
+            if t.sport_name in athlete_stats.training_load_ramp:
+                if (athlete_stats.training_load_ramp[t.sport_name].observed_value is None or
+                        athlete_stats.training_load_ramp[t.sport_name].observed_value > 1.1):
+                    if t.session_RPE is not None and t.session_RPE > 4:
+                        high_load_session = HighLoadSession(t.event_date, t.sport_name)
+                        self.high_relative_load_sessions.append(high_load_session)
+            else:
+                if t.session_RPE is not None and t.session_RPE > 4:
+                    high_load_session = HighLoadSession(t.event_date, t.sport_name)
+                    self.high_relative_load_sessions.append(high_load_session)
+
     @xray_recorder.capture('logic.TrainingVolumeProcessing.calc_training_volume_metrics')
     def calc_training_volume_metrics(self, athlete_stats):
 
-        athlete_stats.external_ramp = self.get_ramp(athlete_stats.expected_weekly_workouts,
-                                                    self.last_week_external_values, self.previous_week_external_values)
+        athlete_stats.training_load_ramp = {}
+
+        for sport_name, load in self.previous_week_sport_training_loads.items():
+            athlete_stats.training_load_ramp[sport_name] = self.get_ramp(athlete_stats.expected_weekly_workouts,
+                                                                         self.last_week_sport_training_loads[sport_name],
+                                                                         self.previous_week_sport_training_loads[sport_name]
+                                                                         )
+
+        self.set_high_relative_load_sessions(athlete_stats, self.last_14_days_training_sessions)
+
+        #athlete_stats.external_ramp = self.get_ramp(athlete_stats.expected_weekly_workouts,
+        #                                            self.last_week_external_values, self.previous_week_external_values)
 
         athlete_stats.internal_ramp = self.get_ramp(athlete_stats.expected_weekly_workouts,
                                                     self.last_week_internal_values, self.previous_week_internal_values)
 
-        athlete_stats.external_monotony = self.get_monotony(athlete_stats.expected_weekly_workouts,
-                                                            self.last_week_external_values)
+        #athlete_stats.external_monotony = self.get_monotony(athlete_stats.expected_weekly_workouts,
+        #                                                    self.last_week_external_values)
 
-        athlete_stats.external_strain = self.get_strain(athlete_stats.expected_weekly_workouts,
-                                                        athlete_stats.external_monotony, self.last_week_external_values, athlete_stats.historical_external_strain)
+        #athlete_stats.external_strain = self.get_strain(athlete_stats.expected_weekly_workouts,
+        #                                                athlete_stats.external_monotony, self.last_week_external_values, athlete_stats.historical_external_strain)
 
         athlete_stats.internal_monotony = self.get_monotony(athlete_stats.expected_weekly_workouts,
                                                             self.last_week_internal_values)
@@ -153,28 +352,28 @@ class TrainingVolumeProcessing(object):
 
         athlete_stats.acute_internal_total_load = self.get_standard_error_range(athlete_stats.expected_weekly_workouts,
                                                                                 self.a_internal_load_values)
-        athlete_stats.acute_external_total_load = self.get_standard_error_range(athlete_stats.expected_weekly_workouts,
-                                                                                self.a_external_load_values)
-        athlete_stats.acute_external_high_intensity_load = self.get_standard_error_range(
-            athlete_stats.expected_weekly_workouts, self.a_high_intensity_values)
-        athlete_stats.acute_external_mod_intensity_load = self.get_standard_error_range(
-            athlete_stats.expected_weekly_workouts, self.a_mod_intensity_values)
-        athlete_stats.acute_external_low_intensity_load = self.get_standard_error_range(
-            athlete_stats.expected_weekly_workouts, self.a_low_intensity_values)
+        #athlete_stats.acute_external_total_load = self.get_standard_error_range(athlete_stats.expected_weekly_workouts,
+        #                                                                        self.a_external_load_values)
+        #athlete_stats.acute_external_high_intensity_load = self.get_standard_error_range(
+        #    athlete_stats.expected_weekly_workouts, self.a_high_intensity_values)
+        #athlete_stats.acute_external_mod_intensity_load = self.get_standard_error_range(
+        #    athlete_stats.expected_weekly_workouts, self.a_mod_intensity_values)
+        #athlete_stats.acute_external_low_intensity_load = self.get_standard_error_range(
+        #    athlete_stats.expected_weekly_workouts, self.a_low_intensity_values)
 
         athlete_stats.chronic_internal_total_load = self.get_standard_error_range(
             athlete_stats.expected_weekly_workouts, self.c_internal_load_values)
-        athlete_stats.chronic_external_total_load = self.get_standard_error_range(
-            athlete_stats.expected_weekly_workouts, self.c_external_load_values)
-        athlete_stats.chronic_external_high_intensity_load = self.get_standard_error_range(
-            athlete_stats.expected_weekly_workouts, self.c_high_intensity_values)
-        athlete_stats.chronic_external_mod_intensity_load = self.get_standard_error_range(
-            athlete_stats.expected_weekly_workouts, self.c_mod_intensity_values)
-        athlete_stats.chronic_external_low_intensity_load = self.get_standard_error_range(
-            athlete_stats.expected_weekly_workouts, self.c_low_intensity_values)
+        #athlete_stats.chronic_external_total_load = self.get_standard_error_range(
+        #    athlete_stats.expected_weekly_workouts, self.c_external_load_values)
+        #athlete_stats.chronic_external_high_intensity_load = self.get_standard_error_range(
+        #    athlete_stats.expected_weekly_workouts, self.c_high_intensity_values)
+        #athlete_stats.chronic_external_mod_intensity_load = self.get_standard_error_range(
+        #    athlete_stats.expected_weekly_workouts, self.c_mod_intensity_values)
+        #athlete_stats.chronic_external_low_intensity_load = self.get_standard_error_range(
+        #    athlete_stats.expected_weekly_workouts, self.c_low_intensity_values)
 
-        athlete_stats.external_acwr = self.get_acwr(athlete_stats.acute_external_total_load,
-                                                    athlete_stats.chronic_external_total_load)
+        #athlete_stats.external_acwr = self.get_acwr(athlete_stats.acute_external_total_load,
+        #                                            athlete_stats.chronic_external_total_load)
 
         athlete_stats.internal_acwr = self.get_acwr(athlete_stats.acute_internal_total_load,
                                                     athlete_stats.chronic_internal_total_load)
@@ -183,13 +382,310 @@ class TrainingVolumeProcessing(object):
             athlete_stats.acute_internal_total_load,
             athlete_stats.chronic_internal_total_load)
 
-        athlete_stats.external_freshness_index = self.get_freshness_index(
-            athlete_stats.acute_external_total_load,
-            athlete_stats.chronic_external_total_load)
+        #athlete_stats.external_freshness_index = self.get_freshness_index(
+        #    athlete_stats.acute_external_total_load,
+        #    athlete_stats.chronic_external_total_load)
 
         athlete_stats.historical_internal_strain = historical_internal_strain
 
         return athlete_stats
+
+    def find_doms_causal_sessions(self, athlete_stats, training_sessions):
+
+        # training sessions are all the sessions from all_plans
+
+        for d in athlete_stats.delayed_onset_muscle_soreness:
+            if d.causal_session is None:
+                end_date_time = d.first_reported_date_time
+                mid_point_time = d.first_reported_date_time - timedelta(hours=24)
+                start_date_time = d.first_reported_date_time - timedelta(hours=48)
+                target_sessions = list(t for t in training_sessions if start_date_time <= t.event_date <= end_date_time)
+                high_target_sessions = list(
+                    t for t in training_sessions if start_date_time <= t.event_date <= mid_point_time and
+                    t.high_intensity())
+                high_sessions = list(
+                    t for t in target_sessions if t.ultra_high_intensity_session() or t.high_intensity_RPE())
+                midpoint_sessions = list(t for t in training_sessions if start_date_time <= t.event_date <= mid_point_time)
+                # what to do if there are no sessions? leave it None (will only affect historical analysis)
+                if len(high_target_sessions) == 1:
+                    d.causal_session = high_target_sessions[0]
+                elif len(high_sessions) == 1:
+                    d.causal_session = high_sessions[0]
+                elif len(midpoint_sessions) == 1:
+                    d.causal_session = midpoint_sessions[0]
+                elif len(target_sessions) == 1:
+                    d.causal_session = target_sessions[0]
+                elif len(high_target_sessions) > 1:
+                    high_target_sessions.sort(key=self.get_event_date_from_session, reverse=True)
+                    d.causal_session = high_target_sessions[0]
+                elif len(high_sessions) > 1:
+                    high_sessions.sort(key=self.get_event_date_from_session, reverse=True)
+                    d.causal_session = high_sessions[0]
+                elif len(midpoint_sessions) > 1:
+                    midpoint_sessions.sort(key=self.get_event_date_from_session, reverse=True)
+                    d.causal_session = midpoint_sessions[0]
+                elif len(target_sessions) > 1:
+                    # keep searching
+                    target_sessions.sort(key=self.get_event_date_from_session,
+                                         reverse=False)  # DOMS may need 24 hours to manifest; start with earliest
+                    d.causal_session = target_sessions[0]
+                # else:  we will do nothing if we can't find anything yet
+
+    def calc_muscular_strain(self):
+
+        last_2_weeks_load_sum = sum(
+            list(l[1] for l in self.load_tuples_last_2_weeks if l[1] is not None))
+        last_2_4_weeks_load_sum = sum(
+            list(l[1] for l in self.load_tuples_last_2_4_weeks if l[1] is not None))
+        last_2_weeks_no_soreness_load_sum = sum(
+            list(l[1] for l in self.no_soreness_load_tuples_last_2_weeks if l[1] is not None))
+        last_2_4_weeks_no_soreness_load_sum = sum(
+            list(l[1] for l in self.no_soreness_load_tuples_last_2_4_weeks if l[1] is not None))
+
+        if last_2_weeks_load_sum > 0:
+            self.muscular_strain_last_2_weeks = (last_2_weeks_no_soreness_load_sum / last_2_weeks_load_sum) * 100
+        if last_2_4_weeks_load_sum > 0:
+            self.muscular_strain_last_2_4_weeks = (last_2_4_weeks_no_soreness_load_sum / last_2_4_weeks_load_sum) * 100
+
+    def get_training_sessions(self, daily_plans):
+
+        training_sessions = []
+
+        #due to how these are entered, we may have multiple sessions on one day with the same datetime
+        for c in daily_plans:
+            clean_sessions = list(s for s in c.training_sessions if not s.deleted and not s.ignored)
+            training_sessions.extend(clean_sessions)
+            #training_sessions.extend(c.practice_sessions)
+            #training_sessions.extend(c.strength_conditioning_sessions)
+            #training_sessions.extend(c.games)
+            #training_sessions.extend(c.bump_up_sessions)
+
+        training_sessions.sort(key=self.get_event_date_from_session)
+
+        return training_sessions
+
+    def get_event_date_from_session(self, session):
+
+        return session.event_date
+
+    def get_tuple_datetime(self, element):
+            return element[0]
+
+    def load_surveys(self, readiness_surveys, training_sessions):
+
+        for r in readiness_surveys:
+            for s in r.soreness:
+                if not s.pain:
+                    self.daily_readiness_tuples.append((r.event_date, (s.body_part.location.value, s.side, SorenessCalculator.get_severity(s.severity, s.movement))))
+
+        for t in training_sessions:
+            if t.post_session_survey is not None:
+                for s in t.post_session_survey.soreness:
+                    if not s.pain:
+                        self.post_session_survey_tuples.append((t.event_date, (s.body_part.location.value, s.side, SorenessCalculator.get_severity(s.severity, s.movement))))
+
+        self.daily_readiness_tuples.sort(key=self.get_tuple_datetime)
+        self.post_session_survey_tuples.sort(key=self.get_tuple_datetime)
+
+    def load_adaptation_history(self, load_tuples, load_end_date):
+
+        loading_events = []
+        initial_loading_events = []
+        last_2_week_date = load_end_date - timedelta(days=14)
+        last_2_4_week_date = load_end_date - timedelta(days=28)
+        max_load = 0
+        self.doms = []
+
+        # create a list of loading events first
+        for t in range(0, len(load_tuples) - 1):
+
+            if load_tuples[t][0] <= load_end_date:
+                loading_event = LoadingEvent(load_tuples[t][0], load_tuples[t][1], load_tuples[t][2])
+                initial_loading_events.append(loading_event)
+
+        # sum load by day
+        load_grouper = attrgetter('loading_date')
+        for k, g in groupby(sorted(initial_loading_events, key=load_grouper), load_grouper):
+            part_list = list(g)
+            part_list.sort(key=lambda x: (x.loading_date, x.load))
+            load_sum = sum(list(g.load for g in part_list if g.load is not None))
+            loading_event = LoadingEvent(k, load_sum, part_list[len(part_list) - 1].sport_name)
+            max_load = max(loading_event.load, max_load)
+            loading_events.append(loading_event)
+
+        early_soreness_tuples = list(s[0] for s in self.post_session_survey_tuples
+                                     if s is not None and s[0] >= loading_events[0].loading_date and
+                                     s[0] <= loading_events[0].loading_date + timedelta(hours=36))
+        early_soreness_tuples.extend(list(s[0] for s in self.daily_readiness_tuples
+                                          if s is not None and s[0] >= loading_events[0].loading_date and
+                                          s[0] <= loading_events[0].loading_date + timedelta(hours=36)))
+        if len(early_soreness_tuples) > 0:
+            early_soreness_history = list(set(early_soreness_tuples))
+
+            # let's reduce this down to only the loading events that can have soreness
+            # (the highest load within a rolling 36 hour window)
+            for t in range(0, len(loading_events)):
+
+                test_date = loading_events[t].loading_date + timedelta(hours=36)
+                if len(early_soreness_history) > t:
+                    test_date = min(early_soreness_history[t], loading_events[t].loading_date + timedelta(hours=36))
+                window_events = list(d for d in loading_events if
+                                     d.loading_date >= loading_events[t].loading_date and d.loading_date <= test_date)
+                if len(window_events) > 0:
+                    window_events.sort(key=lambda x: x.load, reverse=True)
+                    window_events[0].highest_load_in_36_hrs = True
+
+            for t in range(0, len(loading_events) - 1):
+
+                if loading_events[t].loading_date <= load_end_date and loading_events[t].highest_load_in_36_hrs:
+                    #loading_event = LoadingEvent(self.rpe_load_tuples[t][0], self.rpe_load_tuples[t][1], self.rpe_load_tuples[t][2], self.rpe_load_tuples[t][3])
+                    loading_event = loading_events[t]
+                    first_load_date = loading_events[0].loading_date
+
+                    # get all affected body parts that could be attributed to this training session
+                    next_highest_load_date = loading_events[t].loading_date + timedelta(hours=36)
+                    candidates = list(r for r in loading_events if r.loading_date > loading_events[t].loading_date
+                                      #and r.loading_date <= next_highest_load_date
+                                      #and r.load > loading_events[t].load
+                                      and r.highest_load_in_36_hrs)
+                    candidates.sort(key=lambda x: x.loading_date)
+                    if len(candidates) > 0:
+                        next_highest_load_date = candidates[0].loading_date
+
+
+                    base_soreness_tuples = list((s[0], s[1]) for s in self.post_session_survey_tuples
+                                                if s[0] >= loading_events[t].loading_date and
+                                                s[0] <= next_highest_load_date)
+                    base_soreness_tuples.extend(list((s[0], s[1]) for s in self.daily_readiness_tuples
+                                                     if s[0] >= loading_events[t].loading_date and
+                                                     s[0] <= next_highest_load_date))
+
+                    body_parts = list(AffectedBodyPart(b[1][0], b[1][1], 0, 0, False) for b in base_soreness_tuples) # body part, side, days sore, max_severity, cleared
+                    affected_body_parts = list(set(body_parts))
+                    for d in self.doms:
+                        matched_list = list(a for a in affected_body_parts if a.body_part==d.body_part and a.side==d.side)
+                        if len(matched_list) > 0:
+                            affected_body_parts.remove(matched_list[0])
+                        aff_body_part = AffectedBodyPart(d.body_part, d.side, d.days_sore, d.max_severity, d.cleared)
+                        aff_body_part.last_reported_date = d.last_reported_date
+                        affected_body_parts.append(aff_body_part)
+                        d.cleared = True
+
+                    self.doms = list(d for d in self.doms if not d.cleared)
+
+                    all_soreness_tuples = list((s[0], s[1]) for s in self.post_session_survey_tuples
+                                                if s[0] >= load_tuples[t][0] and
+                                                s[0] < load_tuples[t][0] + timedelta(days=12))
+                    all_soreness_tuples.extend(list((s[0], s[1]) for s in self.daily_readiness_tuples
+                                                     if s[0] >= load_tuples[t][0] and
+                                                     s[0] < load_tuples[t][0] + timedelta(days=12)))
+
+                    if len(all_soreness_tuples) == 0:
+                        self.doms = []
+
+                    soreness_history = list((h[0], h[1][0], h[1][1], h[1][2]) for h in all_soreness_tuples)
+                    unique_soreness_history = list(set(soreness_history))
+
+                    unique_soreness_history.sort(key=self.get_tuple_datetime)
+                    unique_soreness_dates = list(dt[0] for dt in unique_soreness_history)
+                    for dt in unique_soreness_dates:
+                        unique_soreness_events = list(u for u in unique_soreness_history if u[0] == dt)
+                        for a in affected_body_parts:  # looping through only the body parts we care about
+                            if not a.cleared:
+                                body_parts_present = list(u for u in unique_soreness_events if a.body_part == u[1] and a.side == u[2])
+                                if len(body_parts_present) > 0:
+                                    if a.last_reported_date is None:
+                                        a.last_reported_date = body_parts_present[0][0]
+                                        a.days_sore += 1
+                                    else:
+                                        a.days_sore += (body_parts_present[0][0].date() - a.last_reported_date.date()).days
+                                        a.last_reported_date = body_parts_present[0][0]
+                                    a.max_severity = max(a.max_severity, body_parts_present[0][3])
+                                    # let's look at future loading events and update it's previous affected soreness
+                                    future_loading_events = list(f for f in loading_events if f.loading_date > dt)
+                                    if len(future_loading_events) > 0:
+                                        f = future_loading_events[0]
+                                        body_part_in_future = list(g for g in f.previous_affected_body_parts if g.body_part == a.body_part and g.side == a.side)
+                                        if len(body_part_in_future) > 0:
+                                            for p in body_part_in_future:
+                                                if p.first_reported_date is not None:
+                                                    p.first_reported_date = min(p.first_reported_date, body_parts_present[0][0])
+                                                else:
+                                                    p.first_reported_date = body_parts_present[0][0]
+                                        else:
+                                            previous_affected_part = AffectedBodyPart(a.body_part, a.side, a.days_sore, a.max_severity, a.cleared)
+                                            previous_affected_part.first_reported_date = body_parts_present[0][0]
+                                            f.previous_affected_body_parts.append(previous_affected_part)
+                                elif a.days_sore > 0:
+                                    a.cleared = True
+                    # close out any soreness not cleared
+                    for a in affected_body_parts:
+                        if not a.cleared:
+                            found = False
+                            for d in self.doms:
+                                if d.body_part == a.body_part and d.side == a.side:
+                                    if loading_events[t].loading_date > d.last_reported_date:
+                                        d.days_sore += (loading_events[t].loading_date - d.last_reported_date.date()).days
+                                        d.last_reported_date = loading_events[t].loading_date
+                                    found = True
+                            if not found:
+                                self.doms.append(a)
+                            #a.cleared = True
+
+                    # need to pick the oldest date for each body part
+                    grouped_parts = []
+                    grouper = attrgetter('body_part', 'side')
+                    for k, g in groupby(sorted(affected_body_parts, key=grouper), grouper):
+                        part_list = list(g)
+                        part_list.sort(key=lambda x: x.last_reported_date)
+                        grouped_parts.append(part_list[0])
+
+                    loading_event.affected_body_parts = grouped_parts
+
+            for loading_event in loading_events:
+
+                level_one_soreness = list(
+                    a for a in loading_event.affected_body_parts if a.cleared and a.days_sore <= 1)
+
+                if len(loading_event.affected_body_parts) == len(level_one_soreness): # no soreness
+                    self.no_soreness_load_tuples.append((loading_event.loading_date, loading_event.load))
+                    if loading_event.loading_date >= last_2_4_week_date:
+                        if loading_event.load / max_load <= .10:
+                            if loading_event.sport_name not in self.recovery_loads:
+                                self.recovery_loads[loading_event.sport_name] = []
+                            self.recovery_loads[loading_event.sport_name].append(loading_event.load)
+                        else:
+                            if loading_event.sport_name not in self.maintenance_loads:
+                                self.maintenance_loads[loading_event.sport_name] = []
+                            self.maintenance_loads[loading_event.sport_name].append(loading_event.load)
+
+                    if last_2_week_date - timedelta(days=3) > loading_event.loading_date >= last_2_4_week_date - timedelta(days=3):
+                        self.no_soreness_load_tuples_last_2_4_weeks.append((loading_event.loading_date, loading_event.load))
+                    if 0 <= (loading_event.loading_date - last_2_week_date - timedelta(days=3)).days <= 14:
+                        self.no_soreness_load_tuples_last_2_weeks.append((loading_event.loading_date, loading_event.load))
+
+                else:
+                    self.soreness_load_tuples.append((loading_event.loading_date, loading_event.load))
+                    if loading_event.loading_date >= last_2_4_week_date:
+                        fo_soreness_list = list(a for a in loading_event.affected_body_parts if a.cleared and (a.max_severity <= 1 and
+                                                             a.days_sore < 3))
+                        if len(fo_soreness_list) > 0:
+                            if loading_event.sport_name not in self.functional_overreaching_loads:
+                                self.functional_overreaching_loads[loading_event.sport_name] = []
+                            self.functional_overreaching_loads[loading_event.sport_name].append(loading_event.load)
+
+                        fo_nfo_list = list(a for a in loading_event.affected_body_parts if a.cleared and (1 < a.max_severity or
+                                                             a.days_sore > 2))
+
+                        if len(fo_nfo_list) > 0:
+                            if loading_event.sport_name not in self.functional_overreaching_NFO_loads:
+                                self.functional_overreaching_NFO_loads[loading_event.sport_name] = []
+                            self.functional_overreaching_NFO_loads[loading_event.sport_name].append(loading_event.load)
+
+                if last_2_week_date - timedelta(days=3) > loading_event.loading_date >= last_2_4_week_date - timedelta(days=3):
+                    self.load_tuples_last_2_4_weeks.append((loading_event.loading_date, loading_event.load))
+                if 0 <= (loading_event.loading_date - last_2_week_date - timedelta(days=3)).days <= 14:
+                    self.load_tuples_last_2_weeks.append((loading_event.loading_date, loading_event.load))
 
     def get_acwr(self, acute_load_error, chronic_load_error, factor=1.3):
 
@@ -663,10 +1159,10 @@ class TrainingVolumeProcessing(object):
         for c in daily_plan_collection:
 
             values.extend(self.get_values_for_session_attribute(attribute_name, c.training_sessions))
-            values.extend(self.get_values_for_session_attribute(attribute_name, c.practice_sessions))
-            values.extend(self.get_values_for_session_attribute(attribute_name, c.strength_conditioning_sessions))
-            values.extend(self.get_values_for_session_attribute(attribute_name, c.games))
-            values.extend(self.get_values_for_session_attribute(attribute_name, c.bump_up_sessions))
+            #values.extend(self.get_values_for_session_attribute(attribute_name, c.practice_sessions))
+            # values.extend(self.get_values_for_session_attribute(attribute_name, c.strength_conditioning_sessions))
+            #values.extend(self.get_values_for_session_attribute(attribute_name, c.games))
+            #values.extend(self.get_values_for_session_attribute(attribute_name, c.bump_up_sessions))
 
         if len(values) > 0:
             sum_value = sum(values)
@@ -684,10 +1180,10 @@ class TrainingVolumeProcessing(object):
             sub_values = []
 
             sub_values.extend(self.get_values_for_session_attribute(attribute_name, c.training_sessions))
-            sub_values.extend(self.get_values_for_session_attribute(attribute_name, c.practice_sessions))
-            sub_values.extend(self.get_values_for_session_attribute(attribute_name, c.strength_conditioning_sessions))
-            sub_values.extend(self.get_values_for_session_attribute(attribute_name, c.games))
-            sub_values.extend(self.get_values_for_session_attribute(attribute_name, c.bump_up_sessions))
+            #sub_values.extend(self.get_values_for_session_attribute(attribute_name, c.practice_sessions))
+            # sub_values.extend(self.get_values_for_session_attribute(attribute_name, c.strength_conditioning_sessions))
+            #sub_values.extend(self.get_values_for_session_attribute(attribute_name, c.games))
+            #sub_values.extend(self.get_values_for_session_attribute(attribute_name, c.bump_up_sessions))
 
             if len(sub_values) > 0:
                 sum_value = sum(sub_values)
@@ -707,14 +1203,14 @@ class TrainingVolumeProcessing(object):
 
             sub_values.extend(self.get_product_of_session_attributes(attribute_1_name, attribute_2_name,
                                                                      c.training_sessions))
-            sub_values.extend(self.get_product_of_session_attributes(attribute_1_name, attribute_2_name,
-                                                                     c.practice_sessions))
-            sub_values.extend(self.get_product_of_session_attributes(attribute_1_name, attribute_2_name,
-                                                                     c.strength_conditioning_sessions))
-            sub_values.extend(self.get_product_of_session_attributes(attribute_1_name, attribute_2_name,
-                                                                     c.games))
-            sub_values.extend(self.get_product_of_session_attributes(attribute_1_name, attribute_2_name,
-                                                                     c.bump_up_sessions))
+            #sub_values.extend(self.get_product_of_session_attributes(attribute_1_name, attribute_2_name,
+            #                                                         c.practice_sessions))
+            # sub_values.extend(self.get_product_of_session_attributes(attribute_1_name, attribute_2_name,
+                                                                     # c.strength_conditioning_sessions))
+            #sub_values.extend(self.get_product_of_session_attributes(attribute_1_name, attribute_2_name,
+            #                                                         c.games))
+            #sub_values.extend(self.get_product_of_session_attributes(attribute_1_name, attribute_2_name,
+            #                                                         c.bump_up_sessions))
             if len(sub_values) > 0:
                 sum_value = sum(sub_values)
                 values.append(sum_value)
@@ -733,14 +1229,14 @@ class TrainingVolumeProcessing(object):
 
             values.extend(self.get_tuple_product_of_session_attributes(c.get_event_datetime(), attribute_1_name, attribute_2_name,
                                                                      c.training_sessions))
-            values.extend(self.get_tuple_product_of_session_attributes(c.get_event_datetime(), attribute_1_name, attribute_2_name,
-                                                                     c.practice_sessions))
-            values.extend(self.get_tuple_product_of_session_attributes(c.get_event_datetime(), attribute_1_name, attribute_2_name,
-                                                                     c.strength_conditioning_sessions))
-            values.extend(self.get_tuple_product_of_session_attributes(c.get_event_datetime(), attribute_1_name, attribute_2_name,
-                                                                     c.games))
-            values.extend(self.get_tuple_product_of_session_attributes(c.get_event_datetime(), attribute_1_name, attribute_2_name,
-                                                                     c.bump_up_sessions))
+            #values.extend(self.get_tuple_product_of_session_attributes(c.get_event_datetime(), attribute_1_name, attribute_2_name,
+            #                                                         c.practice_sessions))
+            # values.extend(self.get_tuple_product_of_session_attributes(c.get_event_datetime(), attribute_1_name, attribute_2_name,
+            #                                                          c.strength_conditioning_sessions))
+            #values.extend(self.get_tuple_product_of_session_attributes(c.get_event_datetime(), attribute_1_name, attribute_2_name,
+            #                                                         c.games))
+            #values.extend(self.get_tuple_product_of_session_attributes(c.get_event_datetime(), attribute_1_name, attribute_2_name,
+            #                                                         c.bump_up_sessions))
             #if len(sub_values) > 0:
             #    sum_value = sum(sub_values)
             #    values.append(sum_value)
@@ -756,14 +1252,14 @@ class TrainingVolumeProcessing(object):
         for c in daily_plan_collection:
             values.extend(self.get_product_of_session_attributes(attribute_1_name, attribute_2_name,
                                                                  c.training_sessions))
-            values.extend(self.get_product_of_session_attributes(attribute_1_name, attribute_2_name,
-                                                                 c.practice_sessions))
-            values.extend(self.get_product_of_session_attributes(attribute_1_name, attribute_2_name,
-                                                                 c.strength_conditioning_sessions))
-            values.extend(self.get_product_of_session_attributes(attribute_1_name, attribute_2_name,
-                                                                 c.games))
-            values.extend(self.get_product_of_session_attributes(attribute_1_name, attribute_2_name,
-                                                                 c.bump_up_sessions))
+            #values.extend(self.get_product_of_session_attributes(attribute_1_name, attribute_2_name,
+            #                                                     c.practice_sessions))
+            # values.extend(self.get_product_of_session_attributes(attribute_1_name, attribute_2_name,
+            #                                                      c.strength_conditioning_sessions))
+            #values.extend(self.get_product_of_session_attributes(attribute_1_name, attribute_2_name,
+            #                                                     c.games))
+            #values.extend(self.get_product_of_session_attributes(attribute_1_name, attribute_2_name,
+            #                                                     c.bump_up_sessions))
         if len(values) > 0:
             sum_value = sum(values)
 

@@ -8,15 +8,13 @@ from logic.training_plan_management import TrainingPlanManager
 from logic.stats_processing import StatsProcessing
 from logic.metrics_processing import MetricsProcessing
 from models.stats import AthleteStats
-from utils import parse_datetime, format_date
-import boto3
+from utils import parse_date, parse_datetime, format_date
 import datetime
 import random
 import os
 
 
 app = Blueprint('athlete', __name__)
-iotd_client = boto3.client('iot-data')
 USERS_API_VERSION = os.environ['USERS_API_VERSION']
 
 
@@ -25,11 +23,11 @@ USERS_API_VERSION = os.environ['USERS_API_VERSION']
 @xray_recorder.capture('routes.athlete.daily_plan.create')
 def create_daily_plan(athlete_id):
     event_date = request.json.get('event_date', None)
-    target_minutes = request.json.get('target_minutes', 15)
+    # target_minutes = request.json.get('target_minutes', 15)
     last_updated = request.json.get('last_updated', None)
     plan_manager = TrainingPlanManager(athlete_id, DatastoreCollection())
     daily_plan = plan_manager.create_daily_plan(event_date=event_date,
-                                                target_minutes=target_minutes,
+                                                # target_minutes=target_minutes,
                                                 last_updated=last_updated)
     body = {"message": "Your plan is ready!",
             "call_to_action": "VIEW_PLAN",
@@ -48,7 +46,7 @@ def create_daily_plan(athlete_id):
 @xray_recorder.capture('routes.athlete.stats.update')
 def update_athlete_stats(athlete_id):
     event_date = request.json.get('event_date', None)
-    athlete_stats = StatsProcessing(athlete_id, event_date=event_date, datastore_collection=DatastoreCollection()).process_athlete_stats()
+    athlete_stats = StatsProcessing(athlete_id, event_date=parse_date(event_date), datastore_collection=DatastoreCollection()).process_athlete_stats()
 
     if event_date is not None:
         metrics = MetricsProcessing().get_athlete_metrics_from_stats(athlete_stats, event_date)
@@ -103,6 +101,7 @@ def process_athlete_survey(athlete_id):
     athlete_stats = DatastoreCollection().athlete_stats_datastore.get(athlete_id=athlete_id)
     if athlete_stats is None:
         athlete_stats = AthleteStats(athlete_id)
+        athlete_stats.event_date = datetime.datetime.now()
 
     if 'typical_weekly_sessions' in request.json:
         athlete_stats.typical_weekly_sessions = request.json['typical_weekly_sessions']
@@ -172,7 +171,12 @@ def manage_readiness_push_notification(athlete_id):
 def manage_prep_push_notification(athlete_id):
     event_date = request.json['event_date']
     plan = _get_plan(athlete_id, event_date)
-    if plan and not plan.pre_recovery_completed and plan.pre_recovery.start_date is None and _are_exercises_assigned(plan.pre_recovery) and plan.pre_recovery.display_exercises:
+    if (plan and  # plan exists
+            len(plan.pre_active_rest) > 0 and  # pre_active_rest is assigned
+            _are_exercises_assigned(plan.pre_active_rest[0], 'pre') and  # and exercises are present
+            plan.pre_active_rest[0].start_date_time is None and  # and not started
+            plan.pre_active_rest[0].active and  # and still active
+            not plan.pre_active_rest_completed):  # and one hasn't been completed previously
         body = {"message": "Your prep exercises are ready! Tap to to get started!",
                 "call_to_action": "COMPLETE_ACTIVE_PREP"}
         _notify_user(athlete_id, body)
@@ -187,7 +191,12 @@ def manage_prep_push_notification(athlete_id):
 def manage_recovery_push_notification(athlete_id):
     event_date = request.json['event_date']
     plan = _get_plan(athlete_id, event_date)
-    if plan and not plan.post_recovery_completed and plan.post_recovery.start_date is None and _are_exercises_assigned(plan.post_recovery) and plan.post_recovery.display_exercises:
+    if (plan and  # plan is present
+            len(plan.post_active_rest) > 0 and  # post_active_rest is assigned
+            _are_exercises_assigned(plan.post_active_rest[0], 'post') and  # and exercises are present
+            plan.post_active_rest[0].start_date_time is None and  # and not started
+            plan.post_active_rest[0].active and  # is still active
+            not plan.post_active_rest_completed):  # and one hasn't been completed previously
         body = {"message": "Your recovery exercises are ready! Tap to begin taking care!",
                 "call_to_action": "COMPLETE_ACTIVE_RECOVERY"}
         _notify_user(athlete_id, body)
@@ -217,7 +226,6 @@ def schedule_prep_completion_push_notification(athlete_id):
 @xray_recorder.capture('routes.athlete.recovery_pn')
 def schedule_recovery_completion_push_notification(athlete_id):
     execute_at = datetime.datetime.now() + datetime.timedelta(minutes=60)
-    # execute_at = format_datetime(execute_at)
     body = {"recovery_type": "recovery",
             "event_date": format_date(parse_datetime(request.json["event_date"]))}
     plans_service = Service('plans', Config.get('API_VERSION'))
@@ -235,13 +243,21 @@ def manage_recovery_completion_push_notification(athlete_id):
     recovery_type = request.json['recovery_type']
     event_date = request.json['event_date']
     plan = _get_plan(athlete_id, event_date)
-    if recovery_type == 'prep' and plan and plan.pre_recovery.start_date is not None and plan.pre_recovery.display_exercises and not plan.pre_recovery.completed:
+    if (recovery_type == 'prep' and  # is pre_active_rest
+            plan and len(plan.pre_active_rest) > 0 and  # and pre_active_rest is assigned
+            plan.pre_active_rest[0].start_date_time is not None and  # and started
+            plan.pre_active_rest[0].active and  # and is still active
+            not plan.pre_active_rest[0].completed):  # and not completed
         body = {"message": "Take time to invest in yourself. Let's finish your exercises!",
                 "call_to_action": "COMPLETE_ACTIVE_PREP"}
         _notify_user(athlete_id, body)
         return {'message': 'User Notified'}, 200
 
-    elif recovery_type == 'recovery' and plan and plan.post_recovery.start_date is not None and not plan.post_recovery.completed:
+    elif (recovery_type == 'recovery' and  # is post_active_rest
+            plan and len(plan.post_active_rest) > 0 and  # and post_active_rest is assigned
+            plan.post_active_rest[0].start_date_time is not None and  # and started
+            plan.post_active_rest[0].active and  # and is still active
+            not plan.post_active_rest[0].completed):  # and not completed
         body = {"message": "Take time to invest in yourself. Let's finish your exercises!",
                 "call_to_action": "COMPLETE_ACTIVE_RECOVERY"}
         _notify_user(athlete_id, body)
@@ -283,11 +299,13 @@ def _randomize_trigger_time(start_time, window, tz_offset):
     return utc_date
 
 
-def _are_exercises_assigned(rec):
+def _are_exercises_assigned(rec, rec_type):
     exercises = (len(rec.inhibit_exercises) +
-                 len(rec.lengthen_exercises) +
-                 len(rec.activate_exercises) +
-                 len(rec.integrate_exercises))
+                 len(rec.static_stretch_exercises) +
+                 len(rec.static_integrate_exercises) +
+                 len(rec.isolated_activate_exercises))
+    if rec_type == 'pre':
+        exercises += len(rec.active_stretch_exercises)
     return exercises > 0
 
 

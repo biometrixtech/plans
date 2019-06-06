@@ -22,4 +22,4 @@ class AthleteStatsDatastore(object):
         return self.athlete_stats
 
     def _put_mongodb(self, item):
-        pass
+        self.athlete_stats = item

@@ -38,6 +38,7 @@ def get_mongo_database():
         os.environ["MONGO_COLLECTION_APPLOGS"] = config['collection_applogs']
         os.environ["MONGO_COLLECTION_HEARTRATE"] = config['collection_heartrate']
         os.environ["MONGO_COLLECTION_SLEEPHISTORY"] = config['collection_sleephistory']
+        os.environ["MONGO_COLLECTION_CLEAREDSORENESS"] = config['collection_clearedsoreness']
 
         os.environ["MONGO_COLLECTION_DAILYREADINESSTEST"] = config['collection_dailyreadinesstest']
         os.environ["MONGO_COLLECTION_DAILYPLANTEST"] = config['collection_dailyplantest']

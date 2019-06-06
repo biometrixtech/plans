@@ -32,6 +32,24 @@ class AthleteMetric(Serialisable):
         }
         return ret
 
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        metric = cls(input_dict['name'], MetricType(input_dict['metric_type']))
+        metric.color = MetricColor(input_dict.get('color', 0))
+        high_level_insight = input_dict.get('high_level_insight', 0)
+        if metric.metric_type == MetricType.daily:
+            metric.high_level_insight = DailyHighLevelInsight(high_level_insight)
+        else:
+            metric.high_level_insight = WeeklyHighLevelInsight(high_level_insight)
+        metric.high_level_action_description = input_dict.get('high_level_action_description', "")
+        metric.specific_insight_training_volume = input_dict.get('specific_insight_training_volume', "")
+        metric.specific_insight_recovery = input_dict.get('specific_insight_recovery', 0)
+        metric.insufficient_data_for_thresholds = input_dict.get('insufficient_data_for_thresholds', False)
+        metric.range_wider_than_thresholds = input_dict.get('range_wider_than_thresholds', False)
+        metric.specific_actions = [SpecificAction.json_deserialise(sa) for sa in input_dict.get('specific_actions', [])]
+
+        return metric
+
 
 class AthleteTrainingVolumeMetricGenerator(object):
     def __init__(self, name, metric_type, athlete_stats, threshold_attribute):
@@ -229,6 +247,10 @@ class SpecificAction(Serialisable):
                'display': self.display
                 }
         return ret
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        return cls(input_dict['code'], input_dict['text'], input_dict['display'])
 
 
 class DailyHighLevelInsight(Enum):

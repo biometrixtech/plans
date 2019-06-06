@@ -3,9 +3,6 @@ from aws_xray_sdk.core import xray_recorder
 from config import get_mongo_collection
 from fathomapi.utils.exceptions import InvalidSchemaException, NoSuchEntityException
 from models.daily_plan import DailyPlan
-import models.session as session
-import models.soreness
-from models.post_session_survey import PostSurvey
 from models.daily_readiness import DailyReadiness
 from datastores.daily_readiness_datastore import DailyReadinessDatastore
 from utils import parse_date
@@ -50,45 +47,15 @@ class DailyPlanDatastore(object):
             query['date'] = {'$gte': start_date, '$lte': end_date}
         if day_of_week is not None:
             query['day_of_week'] = day_of_week
-        mongo_cursor = mongo_collection.find(query)
+        if stats_processing:
+            mongo_cursor = mongo_collection.find(query, {'date': 1, user_id: 1, 'training_sessions': 1, 'daily_readiness_survey': 1})
+        else:
+            mongo_cursor = mongo_collection.find(query)
         ret = []
 
         for plan in mongo_cursor:
-            # ret.append(self.item_to_response(plan))
-            daily_plan = DailyPlan(event_date=plan['date'])
-            daily_plan.user_id = plan.get('user_id', None)
-            daily_plan.training_sessions = \
-                [_external_session_from_mongodb(s, session.SessionType(s['session_type'])) for s in plan.get('training_sessions', [])]
-            daily_plan.practice_sessions = \
-                [_external_session_from_mongodb(s, session.SessionType.practice) for s in plan.get('practice_sessions', [])]
-            daily_plan.strength_conditioning_sessions = \
-                [_external_session_from_mongodb(s, session.SessionType.strength_and_conditioning)
-                 for s in plan.get('cross_training_sessions', [])]
-            daily_plan.games = \
-                [_external_session_from_mongodb(s, session.SessionType.game)
-                 for s in plan.get('game_sessions', [])]
-            if not stats_processing:
-                daily_plan.pre_recovery = _recovery_session_from_mongodb(plan['pre_recovery']) if plan.get('pre_recovery', None) is not None else None
-                daily_plan.post_recovery = _recovery_session_from_mongodb(plan['post_recovery']) if plan.get('post_recovery', None) is not None else None
-                daily_plan.completed_post_recovery_sessions = \
-                    [_recovery_session_from_mongodb(s) for s in plan.get('completed_post_recovery_sessions', [])]
-                daily_plan.functional_strength_session = \
-                    _functional_strength_session_from_mongodb(plan['functional_strength_session']) if plan.get('functional_strength_session', None) is not None else None
-            daily_plan.bump_up_sessions = \
-                [_external_session_from_mongodb(s, session.SessionType.bump_up)
-                 for s in plan.get('bump_up_sessions', [])]
+            daily_plan = DailyPlan.json_deserialise(plan, stats_processing)
             daily_plan.daily_readiness_survey = _daily_readiness_from_mongo(plan.get('daily_readiness_survey', None), user_id)
-            daily_plan.updated = plan.get('updated', None)
-            daily_plan.last_updated = plan.get('last_updated', None)
-            daily_plan.pre_recovery_completed = plan.get('pre_recovery_completed', False)
-            daily_plan.post_recovery_completed = plan.get('post_recovery_completed', False)
-            daily_plan.last_sensor_sync = plan.get('last_sensor_sync', None)
-            daily_plan.sessions_planned = plan.get('sessions_planned', True)
-            daily_plan.functional_strength_eligible = plan.get('functional_strength_eligible', False)
-            daily_plan.completed_functional_strength_sessions = plan.get('completed_functional_strength_sessions', 0)
-            daily_plan.functional_strength_completed = plan.get('functional_strength_completed', False)
-            daily_plan.session_from_readiness = plan.get('session_from_readiness', False)
-            daily_plan.sessions_planned_readiness = plan.get('sessions_planned_readiness', True)
             ret.append(daily_plan)
 
         if len(ret) == 0 and not isinstance(user_id, list):
@@ -134,48 +101,7 @@ class DailyPlanDatastore(object):
             return None
 
 
-def _external_session_from_mongodb(mongo_result, session_type):
-
-    factory = session.SessionFactory()
-    mongo_session = factory.create(session_type)
-    mongo_session.id = mongo_result["session_id"]
-    attrs_from_mongo = ["description",
-                        "sport_name",
-                        "strength_and_conditioning_type",
-                        "created_date",
-                        "event_date",
-                        "end_date",
-                        "duration_minutes",
-                        "data_transferred",
-                        "duration_sensor",
-                        "external_load",
-                        "high_intensity_minutes",
-                        "mod_intensity_minutes",
-                        "low_intensity_minutes",
-                        "inactive_minutes",
-                        "high_intensity_load",
-                        "mod_intensity_load",
-                        "low_intensity_load",
-                        "inactive_load",
-                        "sensor_start_date_time",
-                        "sensor_end_date_time",
-                        "deleted",
-                        "ignored",
-                        "duration_health",
-                        "calories",
-                        "distance",
-                        "source"]
-    for key in attrs_from_mongo:
-        setattr(mongo_session, key, mongo_result.get(key, None))
-    if "post_session_survey" in mongo_result and mongo_result["post_session_survey"] is not None:
-        mongo_session.post_session_survey = PostSurvey(mongo_result["post_session_survey"], mongo_result["post_session_survey"]["event_date"])
-        mongo_session.session_RPE = mongo_session.post_session_survey.RPE if mongo_session.post_session_survey.RPE is not None else None
-    else:
-        mongo_session.post_session_survey = None
-
-    return mongo_session
-
-
+'''deprecated
 def _recovery_session_from_mongodb(mongo_result):
 
     recovery_session = session.RecoverySession()
@@ -187,13 +113,13 @@ def _recovery_session_from_mongodb(mongo_result):
     recovery_session.duration_minutes = mongo_result.get("minutes_duration", 0)
     recovery_session.completed = mongo_result.get("completed", False)
     recovery_session.display_exercises = mongo_result.get("display_exercises", False)
-    recovery_session.inhibit_exercises = [_assigned_exercises_from_mongodb(s)
+    recovery_session.inhibit_exercises = [AssignedExercise.json_deserialise(s)
                                           for s in mongo_result['inhibit_exercises']]
-    recovery_session.lengthen_exercises = [_assigned_exercises_from_mongodb(s)
+    recovery_session.lengthen_exercises = [AssignedExercise.json_deserialise(s)
                                            for s in mongo_result['lengthen_exercises']]
-    recovery_session.activate_exercises = [_assigned_exercises_from_mongodb(s)
+    recovery_session.activate_exercises = [AssignedExercise.json_deserialise(s)
                                            for s in mongo_result['activate_exercises']]
-    recovery_session.integrate_exercises = [_assigned_exercises_from_mongodb(s)
+    recovery_session.integrate_exercises = [AssignedExercise.json_deserialise(s)
                                             for s in mongo_result['integrate_exercises']]
     recovery_session.inhibit_iterations = mongo_result.get("inhibit_iterations", 0)
     recovery_session.lengthen_iterations = mongo_result.get("lengthen_iterations", 0)
@@ -228,25 +154,7 @@ def _functional_strength_session_from_mongodb(mongo_result):
     functional_strength_session.sport_name = mongo_result.get("sport_name", None)
     functional_strength_session.position = mongo_result.get("position", None)
     return functional_strength_session
-
-
-def _assigned_exercises_from_mongodb(mongo_result):
-
-    assigned_exercise = models.soreness.AssignedExercise(mongo_result.get("library_id", None))
-    assigned_exercise.exercise.name = mongo_result.get("name", "")
-    assigned_exercise.exercise.display_name = mongo_result.get("display_name", "")
-    assigned_exercise.exercise.youtube_id = mongo_result.get("youtube_id", "")
-    assigned_exercise.exercise.description = mongo_result.get("description", "")
-    assigned_exercise.exercise.bilateral = mongo_result.get("bilateral", False)
-    assigned_exercise.exercise.unit_of_measure = mongo_result.get("unit_of_measure", None)
-    assigned_exercise.position_order = mongo_result.get("position_order", 0)
-    assigned_exercise.reps_assigned = mongo_result.get("reps_assigned", 0)
-    assigned_exercise.sets_assigned = mongo_result.get("sets_assigned", 0)
-    assigned_exercise.exercise.seconds_per_set = mongo_result.get("seconds_per_set", 0)
-    assigned_exercise.exercise.seconds_per_rep = mongo_result.get("seconds_per_rep", 0)
-    assigned_exercise.goal_text = mongo_result.get("goal_text", "")
-    assigned_exercise.equipment_required = mongo_result.get("equipment_required", [])
-    return assigned_exercise
+'''
 
 
 def _daily_readiness_from_mongo(mongo_result, user_id):
@@ -259,7 +167,7 @@ def _daily_readiness_from_mongo(mongo_result, user_id):
                                soreness=mongo_result['soreness'],
                                readiness=mongo_result['readiness'],
                                sleep_quality=mongo_result['sleep_quality'],
-                               wants_functional_strength=mongo_result.get('wants_functional_strength', False)
+                               # wants_functional_strength=mongo_result.get('wants_functional_strength', False)
                              )
     elif isinstance(mongo_result, str):
         start_date = parse_date(mongo_result)

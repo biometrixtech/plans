@@ -1,6 +1,8 @@
 import datetime
 from logic.athlete_status_processing import AthleteStatusProcessing
-from models.soreness import  Soreness, BodyPartLocation, BodyPart, HistoricSoreness, HistoricSorenessStatus
+from models.soreness import Soreness, BodyPartLocation, BodyPart, HistoricSorenessStatus
+from models.historic_soreness import HistoricSoreness
+
 
 def get_soreness(body_part, side, pain=False, severity=0, hist_status=None):
     soreness = Soreness()
