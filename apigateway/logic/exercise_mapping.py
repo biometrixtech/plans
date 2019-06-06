@@ -216,23 +216,19 @@ class ExerciseAssignmentCalculator(object):
         cool_down = None
 
         if self.high_relative_load_session or self.high_relative_intensity_session:
-            #for s in soreness_list:
-            #    if s.first_reported_date_time is not None and not s.is_dormant_cleared():
-            #        days_diff = (event_date_time - s.first_reported_date_time).days
-            #        if (not s.pain and days_diff > 30) or s.pain:
-            for sport_name in self.high_relative_load_session_sport_names:
-                cool_down = CoolDown(self.high_relative_load_session, self.high_relative_intensity_session,
-                                     self.muscular_strain_high, self.event_date_time)
-                cool_down.fill_exercises(self.soreness_list, self.exercise_library, self.high_relative_load_session, self.high_relative_intensity_session, self.muscular_strain_high,
-                                         [sport_name])
-                cool_down.set_plan_dosage(self.soreness_list, self.muscular_strain_high)
-                cool_down.set_exercise_dosage_ranking()
-                cool_down.aggregate_dosages()
-                cool_down.set_winners()
-                cool_down.scale_all_active_time()
-                cool_down.default_plan = "Complete"
-                #cool_down.reconcile_default_plan_with_active_time()
-            #    break
+
+            #for sport_name in self.high_relative_load_session_sport_names:
+            cool_down = CoolDown(self.high_relative_load_session, self.high_relative_intensity_session,
+                                 self.muscular_strain_high, self.event_date_time)
+            cool_down.fill_exercises(self.soreness_list, self.exercise_library, self.high_relative_load_session,
+                                     self.high_relative_intensity_session, self.muscular_strain_high,
+                                     self.high_relative_load_session_sport_names)
+            cool_down.set_plan_dosage(self.soreness_list, self.muscular_strain_high)
+            cool_down.set_exercise_dosage_ranking()
+            cool_down.aggregate_dosages()
+            cool_down.set_winners()
+            cool_down.scale_all_active_time()
+            cool_down.default_plan = "Complete"
 
             if cool_down is not None and cool_down.get_total_exercises() > 0:
                 return [cool_down]
