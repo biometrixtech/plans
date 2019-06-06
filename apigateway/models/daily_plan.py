@@ -16,10 +16,6 @@ class DailyPlan(Serialisable):
         self.event_date = event_date
         self.day_of_week = self.get_event_datetime().weekday()
         self.training_sessions = []
-        # self.practice_sessions = []
-        # self.strength_conditioning_sessions = []  # includes cross training
-        # self.games = []
-        # self.tournaments = []
         self.heat = None
         self.completed_heat = []
         self.pre_active_rest = []
@@ -28,8 +24,6 @@ class DailyPlan(Serialisable):
         self.completed_warm_up = []
         self.cool_down = []
         self.completed_cool_down = []
-        # self.active_recovery = None
-        # self.completed_active_recovery = []
         self.post_active_rest = []
         self.completed_post_active_rest = []
         self.ice = None
@@ -39,13 +33,9 @@ class DailyPlan(Serialisable):
         self.pre_active_rest_completed = False
         self.post_active_rest_completed = False
         self.daily_readiness_survey = None
-        # self.updated = False
         self.last_updated = None
         self.last_sensor_sync = None
         self.sessions_planned = True
-        # self.functional_strength_eligible = False
-        # self.completed_functional_strength_sessions = 0
-        # self.functional_strength_session = None
         self.train_later = True
         self.insights = []
         self.trends = None
@@ -67,11 +57,8 @@ class DailyPlan(Serialisable):
                'date': self.event_date,
                'day_of_week': self.day_of_week,
                'training_sessions': [p.json_serialise() for p in self.training_sessions],
-               # 'cross_training_sessions': [c.json_serialise() for c in self.strength_conditioning_sessions],
                'pre_active_rest_completed': self.pre_active_rest_completed,
                'post_active_rest_completed': self.post_active_rest_completed,
-               # 'functional_strength_session': (self.functional_strength_session.json_serialise()
-               #                                 if self.functional_strength_session is not None else None),
                'heat': self.heat.json_serialise() if self.heat is not None else None,
                'completed_heat': [heat.json_serialise() for heat in self.completed_heat],
                'pre_active_rest': [ar.json_serialise() for ar in self.pre_active_rest],
@@ -80,8 +67,6 @@ class DailyPlan(Serialisable):
                'completed_warm_up': [warm_up.json_serialise() for warm_up in self.completed_warm_up],
                'cool_down': [cool_down.json_serialise() for cool_down in self.cool_down],
                'completed_cool_down': [cool_down.json_serialise() for cool_down in self.completed_cool_down],
-               # 'active_recovery': self.active_recovery.json_serialise() if self.active_recovery is not None else None,
-               # 'completed_active_recovery': [active_recovery.json_serialise() for active_recovery in self.completed_active_recovery],
                'post_active_rest': [ar.json_serialise() for ar in self.post_active_rest],
                'completed_post_active_rest': [ar.json_serialise() for ar in self.completed_post_active_rest],
                'ice': self.ice.json_serialise() if self.ice is not None else None,
@@ -92,9 +77,6 @@ class DailyPlan(Serialisable):
                'daily_readiness_survey': readiness,
                'last_sensor_sync': self.last_sensor_sync,
                'sessions_planned': self.sessions_planned,
-               # 'functional_strength_completed': self.functional_strength_completed,
-               # 'functional_strength_eligible': self.functional_strength_eligible,
-               # 'completed_functional_strength_sessions': self.completed_functional_strength_sessions,
                'train_later': self.train_later,
                'insights': [insight.json_serialise() for insight in self.insights],
                'trends': self.trends.json_serialise() if self.trends is not None else None,
@@ -116,8 +98,6 @@ class DailyPlan(Serialisable):
             daily_plan.completed_warm_up = [WarmUp.json_deserialise(w) for w in input_dict.get('completed_warm_up', [])]
             daily_plan.cool_down = [CoolDown.json_deserialise(cool_down) for cool_down in input_dict.get('cool_down', [])]
             daily_plan.completed_cool_down = [CoolDown.json_deserialise(cd) for cd in input_dict.get('completed_cool_down', [])]
-            # daily_plan.active_recovery = ActiveRecovery.json_deserialise(input_dict['active_recovery']) if input_dict.get('active_recovery', None) is not None else None
-            # daily_plan.completed_active_recovery = [ActiveRecovery.json_deserialise(ar) for ar in input_dict.get('completed_active_recovery', [])]
             daily_plan.post_active_rest = [ActiveRestAfterTraining.json_deserialise(ar) for ar in input_dict.get('post_active_rest', [])]
             daily_plan.completed_post_active_rest = [ActiveRestAfterTraining.json_deserialise(ar) for ar in input_dict.get('completed_post_active_rest', [])]
             daily_plan.ice = IceSession.json_deserialise(input_dict['ice']) if input_dict.get('ice', None) is not None else None
@@ -126,8 +106,7 @@ class DailyPlan(Serialisable):
             daily_plan.completed_cold_water_immersion = [ColdWaterImmersion.json_deserialise(cwi) for cwi in input_dict.get('completed_cold_water_immersion', [])]
             daily_plan.insights = [AthleteInsight.json_deserialise(insight) for insight in input_dict.get('insights', [])]
             daily_plan.trends = AthleteTrends.json_deserialise(input_dict['trends']) if input_dict.get('trends', None) is not None else None
-        # daily_plan.daily_readiness_survey = _daily_readiness_from_mongo(input_dict.get('daily_readiness_survey', None), daily_plan.user_id)
-        # daily_plan.updated = input_dict.get('updated', False)
+        # daily_plan.daily_readiness_survey = _daily_readiness_from_mongo(input_dict.get('daily_readiness_survey', None), daily_plan.user_id) # note that this deserialisation is still done in the datastore
         daily_plan.last_updated = input_dict.get('last_updated', None)
         daily_plan.pre_active_rest_completed = input_dict.get('pre_active_rest_completed', False)
         daily_plan.post_active_rest_completed = input_dict.get('post_active_rest_completed', False)
@@ -159,9 +138,6 @@ class DailyPlan(Serialisable):
         sessions = []
         training_sessions = [x for x in self.training_sessions if x.event_date is not None and
                              x.event_date < trigger_date_time]
-        # cross_training_sessions = [x for x in self.strength_conditioning_sessions if x.event_date is not None and
-        #                            x.event_date < trigger_date_time]
-        # sessions.extend(cross_training_sessions)
         sessions.extend(training_sessions)
 
         return sessions
@@ -172,9 +148,6 @@ class DailyPlan(Serialisable):
 
         training_sessions = [x for x in self.training_sessions if x.event_date is not None and
                              x.event_date > trigger_date_time]
-        # cross_training_sessions = [x for x in self.strength_conditioning_sessions if x.event_date is not None and
-        #                            x.event_date > trigger_date_time]
-        # sessions.extend(cross_training_sessions)
         sessions.extend(training_sessions)
 
         return sessions
