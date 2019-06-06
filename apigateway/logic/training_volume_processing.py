@@ -165,7 +165,7 @@ class TrainingVolumeProcessing(object):
                                                                                       benchmarks,
                                                                                       self.load_stats)
 
-    def is_last_session_high_relative_load(cls, event_date, last_training_session, benchmarks, load_stats):
+    def is_last_session_high_relative_load(self, event_date, last_training_session, benchmarks, load_stats):
         if (event_date - last_training_session.event_date).days <= 2:
             if last_training_session.sport_name in benchmarks:
                 if last_training_session.training_volume(load_stats) >= benchmarks[last_training_session.sport_name]:
