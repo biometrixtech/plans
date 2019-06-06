@@ -113,7 +113,7 @@
                 "visualization_type": 2,
                 "visualization_range": 7,
                 "overlay_variable": "Highlight high load days",
-                "title": "These workouts created the greatest oppourtunity for strength gains this week"
+                "title": "These workouts created the greatest opportunity for strength gains this week"
             },
             "cta": {
                 "input": "Sport",
@@ -129,7 +129,7 @@
         "1": {
             "trigger_enum": 1,
             "trend_type": "Stress",
-            "triggers": "Sore (Pers >30d, Pers_2 > 30d)  + Logged High Load",
+            "triggers": "Sore (Pers >=30d, Pers_2 >= 30d)  + Logged High Load",
             "goal_names": "Improve neuromuscular control",
             "length_of_impact": "single_day",
             "data_source": "soreness",
@@ -696,7 +696,7 @@
         "13": {
             "trigger_enum": 13,
             "trend_type": "Response",
-            "triggers": "Sore (Pers >30d, Pers_2 > 30d) + Soreness Reported Today",
+            "triggers": "Sore (Pers >=30d, Pers_2 >= 30d) + Soreness Reported Today",
             "goal_names": "Care for soreness",
             "length_of_impact": "single_day",
             "data_source": "soreness",
@@ -885,7 +885,7 @@
         "23": {
             "trigger_enum": 23,
             "trend_type": "Response",
-            "triggers": "Pain reported today  (severity 1, 2)  + (acute, pers<30, per>30)",
+            "triggers": "Pain reported today  (severity 1, 2)  + Pain(Acute, Pers, Pers_2)",
             "goal_names": "Care for pain",
             "length_of_impact": "single_day",
             "data_source": "pain",
@@ -948,7 +948,7 @@
         "24": {
             "trigger_enum": 24,
             "trend_type": "Response",
-            "triggers": "Pain reported today (severity 3-5)  + (acute, pers<30, per>30)",
+            "triggers": "Pain reported today (severity 3-5)  + Pain(Acute, Pers, Pers_2)",
             "goal_names": "Care for pain",
             "length_of_impact": "single_day",
             "data_source": "pain",
@@ -1074,7 +1074,7 @@
         "22": {
             "trigger_enum": 22,
             "trend_type": "Response",
-            "triggers": "Pain (Pers, Pers_2  > 30d)  + Pain NOT reported today",
+            "triggers": "Pain (Pers, Pers_2  >= 30d)  + Pain NOT reported today",
             "goal_names": "Improve neuromuscular control",
             "length_of_impact": "single_day",
             "data_source": "pain",
@@ -1452,7 +1452,7 @@
         "19": {
             "trigger_enum": 19,
             "trend_type": "Biomechanics",
-            "triggers": "Sore (Pers >30d, Pers_2 > 30d) ",
+            "triggers": "Sore (Pers >=30d, Pers_2 >= 30d) ",
             "goal_names": "Improve neuromuscular control  Reduce injury risk factors",
             "length_of_impact": "multiple_days",
             "data_source": "soreness",
