@@ -4,6 +4,7 @@ import datetime
 from utils import format_date, format_datetime, parse_datetime
 from datastores.datastore_collection import DatastoreCollection
 from logic.athlete_status_processing import AthleteStatusProcessing
+from logic.survey_processing import create_plan, cleanup_plan
 
 from fathomapi.utils.decorators import require
 from fathomapi.utils.exceptions import InvalidSchemaException
@@ -38,12 +39,10 @@ def handle_daily_plan_get(principal_id=None):
         survey_complete = plan.daily_readiness_survey_completed()
         if plan.event_date == format_date(event_date) and not survey_complete:
             need_soreness_sessions = True
-        landing_screen, nav_bar_indicator = plan.define_landing_screen()
-        plan = plan.json_serialise()
-        plan['daily_readiness_survey_completed'] = survey_complete
-        plan['landing_screen'] = landing_screen
-        plan['nav_bar_indicator'] = nav_bar_indicator
-        del plan['daily_readiness_survey'], plan['user_id']
+        if plan.event_date == format_date(event_date) and plan.trends is None:
+            plan = create_plan(user_id, event_date, update_stats=True)
+        else:
+            plan = cleanup_plan(plan)
         daily_plans.append(plan)
     if need_soreness_sessions:
         previous_soreness_processor = AthleteStatusProcessing(user_id, event_date, datastore_collection=datastore_collection)
