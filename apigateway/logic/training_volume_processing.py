@@ -1160,7 +1160,7 @@ class TrainingVolumeProcessing(object):
 
             values.extend(self.get_values_for_session_attribute(attribute_name, c.training_sessions))
             #values.extend(self.get_values_for_session_attribute(attribute_name, c.practice_sessions))
-            values.extend(self.get_values_for_session_attribute(attribute_name, c.strength_conditioning_sessions))
+            # values.extend(self.get_values_for_session_attribute(attribute_name, c.strength_conditioning_sessions))
             #values.extend(self.get_values_for_session_attribute(attribute_name, c.games))
             #values.extend(self.get_values_for_session_attribute(attribute_name, c.bump_up_sessions))
 
@@ -1181,7 +1181,7 @@ class TrainingVolumeProcessing(object):
 
             sub_values.extend(self.get_values_for_session_attribute(attribute_name, c.training_sessions))
             #sub_values.extend(self.get_values_for_session_attribute(attribute_name, c.practice_sessions))
-            sub_values.extend(self.get_values_for_session_attribute(attribute_name, c.strength_conditioning_sessions))
+            # sub_values.extend(self.get_values_for_session_attribute(attribute_name, c.strength_conditioning_sessions))
             #sub_values.extend(self.get_values_for_session_attribute(attribute_name, c.games))
             #sub_values.extend(self.get_values_for_session_attribute(attribute_name, c.bump_up_sessions))
 
