@@ -1006,7 +1006,7 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
 
         body_part = body_part_factory.get_general()
 
-        goal = AthleteGoal("On Request", 1, AthleteGoalType.on_request)
+        goal = AthleteGoal("Improve mobility", 1, AthleteGoalType.on_request)
 
         for a in body_part.agonists:
             agonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None))
@@ -1417,7 +1417,7 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
 
         body_part = body_part_factory.get_general()
 
-        goal = AthleteGoal("On Request", 1, AthleteGoalType.on_request)
+        goal = AthleteGoal("Improve mobility", 1, AthleteGoalType.on_request)
 
         for a in body_part.agonists:
             agonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None))
@@ -1772,7 +1772,7 @@ class WarmUp(ModalityBase, Serialisable):
                 and not soreness.is_dormant_cleared() and soreness.historic_soreness_status is not HistoricSorenessStatus.doms:
             days_sore = (event_date_time - soreness.first_reported_date_time).days
             if not soreness.pain and days_sore >= 30:
-                goal = AthleteGoal("Improve neuromuscular control", 1, AthleteGoalType.preempt_corrective)
+                goal = AthleteGoal("Increase prevention efficacy", 1, AthleteGoalType.preempt_corrective)
                 #goal.trigger = "Pers, Pers-2 Soreness > 30d"
                 goal.trigger_type = TriggerType.hist_sore_greater_30
 
@@ -1961,12 +1961,12 @@ class CoolDown(ModalityBase, Serialisable):
                 and not soreness.is_dormant_cleared() and soreness.historic_soreness_status is not HistoricSorenessStatus.doms:
             days_sore = (event_date_time - soreness.first_reported_date_time).days
             if soreness.is_acute_pain() or soreness.is_persistent_pain() or soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_pain:
-                goal = AthleteGoal("Improve neuromuscular control", 1, AthleteGoalType.preempt_corrective)
+                goal = AthleteGoal("Increase prevention efficacy", 1, AthleteGoalType.preempt_corrective)
                 goal.trigger_type = TriggerType.hist_pain
                 self.assign_exercises(soreness, goal, exercise_library)
 
             elif (soreness.is_persistent_soreness() or soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_soreness and days_sore >= 30):
-                goal = AthleteGoal("Improve neuromuscular control", 1, AthleteGoalType.preempt_corrective)
+                goal = AthleteGoal("Increase prevention efficacy", 1, AthleteGoalType.preempt_corrective)
                 #goal.trigger = "Pers, Pers-2 Soreness > 30d or Historic Pain"
                 goal.trigger_type = TriggerType.hist_sore_greater_30
 

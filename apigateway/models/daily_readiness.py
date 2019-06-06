@@ -15,7 +15,6 @@ class DailyReadiness(Serialisable):
                  wants_functional_strength=False
                  ):
         self.event_date = parse_datetime(event_date)
-        #self.event_date = event_date
         self.user_id = user_id
         self.soreness = [self._soreness_from_dict(s) for s in soreness]
         self.sleep_quality = sleep_quality
