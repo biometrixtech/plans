@@ -227,7 +227,7 @@ class ModalityBase(object):
             else:
                 self.default_plan = "Comprehensive"
 
-    def copy_exercises(self, source_collection, target_collection, goal, priority, soreness, exercise_library, sport_name=None):
+    def copy_exercises(self, source_collection, target_collection, goal, priority, soreness, exercise_library, sports=[]):
 
         position_order = 0
 
@@ -243,7 +243,7 @@ class ModalityBase(object):
             dosage = ExerciseDosage()
             dosage.priority = priority
             dosage.soreness_source = soreness
-            dosage.sport_name = sport_name
+            dosage.sports = sports
             dosage.goal = goal
             dosage = self.update_dosage(dosage, target_collection[s.exercise.id].exercise)
             target_collection[s.exercise.id].dosages.append(dosage)
@@ -814,7 +814,7 @@ class ActiveRest(ModalityBase):
 
         pass
 
-    def check_reactive_recover_from_sport_general(self, sport, exercise_library, goal, max_severity):
+    def check_reactive_recover_from_sport_general(self, sports, exercise_library, goal, max_severity):
 
         pass
 
@@ -823,10 +823,10 @@ class ActiveRest(ModalityBase):
         if muscular_strain_high:
             goal = AthleteGoal(None, 1, AthleteGoalType.sport)
             goal.trigger_type = TriggerType.overreaching_high_muscular_strain  # 8
-            # for sport_name in sports:
-            alert = Alert(goal)
-            # alert.sport_name = sport_name
-            self.alerts.append(alert)
+            for sport_name in sports:
+                alert = Alert(goal)
+                alert.sport_name = sport_name
+                self.alerts.append(alert)
 
         hist_soreness = list(s for s in soreness_list if not s.is_dormant_cleared() and not s.pain and
                              (s.is_persistent_soreness() or
@@ -836,10 +836,8 @@ class ActiveRest(ModalityBase):
         if len(hist_soreness) > 0:
             goal = AthleteGoal(None, 1, AthleteGoalType.sport)
             goal.trigger_type = TriggerType.hist_sore_less_30  # 7
-            # for sport_name in sports:
             for soreness in hist_soreness:
                 alert = Alert(goal)
-                # alert.sport_name = sport_name
                 alert.body_part = BodyPartSide(soreness.body_part.location, soreness.side)
                 self.alerts.append(alert)
 
@@ -854,28 +852,28 @@ class ActiveRest(ModalityBase):
                 alert = Alert(goal)
                 alert.sport_name = sport_name
                 self.alerts.append(alert)
-                body_part = body_part_factory.get_body_part_for_sport(sport_name)
+            body_part = body_part_factory.get_body_part_for_sports(sports)
 
-                #prohibiting_soreness = False
+            #prohibiting_soreness = False
 
-                #high_severity_list = list(s for s in soreness_list if s.severity >= 3.5)
+            #high_severity_list = list(s for s in soreness_list if s.severity >= 3.5)
 
-                #if len(high_severity_list) > 0:
-                #    prohibiting_soreness = True
+            #if len(high_severity_list) > 0:
+            #    prohibiting_soreness = True
 
-                # Note: this is just returning the primary mover related exercises for sport
-                if body_part is not None: #and not prohibiting_soreness:
-                    self.copy_exercises(body_part.inhibit_exercises,
-                                        self.inhibit_exercises, goal, "1", None, exercise_library)
-                    #if not prohibiting_soreness:
-                    if max_severity < 3.5:
-                        self.copy_exercises(body_part.static_stretch_exercises,
-                                            self.static_stretch_exercises, goal, "1", None, exercise_library, sport_name)
-                    if max_severity < 2.5:
-                        self.copy_exercises(body_part.isolated_activate_exercises,
-                                        self.isolated_activate_exercises, goal, "1", None, exercise_library, sport_name)
+            # Note: this is just returning the primary mover related exercises for sport
+            if body_part is not None: #and not prohibiting_soreness:
+                self.copy_exercises(body_part.inhibit_exercises,
+                                    self.inhibit_exercises, goal, "1", None, exercise_library)
+                #if not prohibiting_soreness:
+                if max_severity < 3.5:
+                    self.copy_exercises(body_part.static_stretch_exercises,
+                                        self.static_stretch_exercises, goal, "1", None, exercise_library, sports)
+                if max_severity < 2.5:
+                    self.copy_exercises(body_part.isolated_activate_exercises,
+                                    self.isolated_activate_exercises, goal, "1", None, exercise_library, sports)
 
-                self.check_reactive_recover_from_sport_general(sport_name, exercise_library, goal, max_severity)
+            self.check_reactive_recover_from_sport_general(sports, exercise_library, goal, max_severity)
 
 
 class ActiveRestBeforeTraining(ActiveRest, Serialisable):
@@ -972,11 +970,11 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
         self.reactivate_complete_corrective_goals_by_collection(self.static_integrate_exercises)
         self.reactivate_complete_corrective_goals_by_collection(self.isolated_activate_exercises)
 
-    def check_reactive_recover_from_sport_general(self, sport, exercise_library, goal, max_severity):
+    def check_reactive_recover_from_sport_general(self, sports, exercise_library, goal, max_severity):
 
         body_part_factory = BodyPartFactory()
 
-        body_part = body_part_factory.get_body_part_for_sport(sport)
+        body_part = body_part_factory.get_body_part_for_sports(sports)
 
         for a in body_part.agonists:
             agonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None))
@@ -1381,7 +1379,7 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
         self.reactivate_complete_corrective_goals_by_collection(self.static_integrate_exercises)
         self.reactivate_complete_corrective_goals_by_collection(self.isolated_activate_exercises)
 
-    def check_reactive_recover_from_sport_general(self, sport, exercise_library, goal, max_severity):
+    def check_reactive_recover_from_sport_general(self, sports, exercise_library, goal, max_severity):
 
         goal = AthleteGoal("Expedite tissue regeneration", 1, AthleteGoalType.sport)
         # goal.trigger = "High Relative Volume or Intensity of Logged Session"
@@ -1389,7 +1387,7 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
 
         body_part_factory = BodyPartFactory()
 
-        body_part = body_part_factory.get_body_part_for_sport(sport)
+        body_part = body_part_factory.get_body_part_for_sports(sports)
 
         for a in body_part.agonists:
             agonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None))
@@ -1903,12 +1901,12 @@ class CoolDown(ModalityBase, Serialisable):
         self.rank_dosages([self.dynamic_stretch_exercises])
         self.rank_dosages([self.dynamic_integrate_exercises])
 
-    def check_recover_from_sport(self, soreness_list, sport_name, muscular_strain_high,exercise_library, max_severity):
+    def check_recover_from_sport(self, soreness_list, sports, muscular_strain_high,exercise_library, max_severity):
 
         if muscular_strain_high:
             goal = AthleteGoal(None, 1, AthleteGoalType.sport)
             goal.trigger_type = TriggerType.overreaching_high_muscular_strain  # 8
-            if sport_name is not None:
+            for sport_name in sports:
                 alert = Alert(goal)
                 alert.sport_name = sport_name
                 self.alerts.append(alert)
@@ -1923,8 +1921,9 @@ class CoolDown(ModalityBase, Serialisable):
             goal.trigger_type = TriggerType.hist_sore_less_30  # 7
             # if sport_name is not None:
             for soreness in hist_soreness:
+                #for sport_name in sports:
                 alert = Alert(goal)
-                alert.sport_name = sport_name
+                #alert.sport_name = sport_name
                 alert.body_part = BodyPartSide(soreness.body_part.location, soreness.side)
                 self.alerts.append(alert)
 
@@ -1933,13 +1932,14 @@ class CoolDown(ModalityBase, Serialisable):
                 goal = AthleteGoal("Expedite tissue regeneration", 1, AthleteGoalType.sport)
                 #goal.trigger = "High Relative Volume or Intensity of Logged Session"
                 goal.trigger_type = TriggerType.high_volume_intensity  # 0
-                alert = Alert(goal)
-                alert.sport_name = sport_name
-                self.alerts.append(alert)
+                for sport_name in sports:
+                    alert = Alert(goal)
+                    alert.sport_name = sport_name
+                    self.alerts.append(alert)
 
                 body_part_factory = BodyPartFactory()
 
-                body_part = body_part_factory.get_body_part_for_sport(sport_name)
+                body_part = body_part_factory.get_body_part_for_sports(sports)
 
                 #prohibiting_soreness = False
 
@@ -1951,9 +1951,9 @@ class CoolDown(ModalityBase, Serialisable):
                 # Note: this is just returning the primary mover related exercises for sport
                 if body_part is not None and max_severity < 3.5:
                     self.copy_exercises(body_part.dynamic_stretch_exercises,
-                                        self.dynamic_stretch_exercises, goal, "1", None, exercise_library, sport_name)
+                                        self.dynamic_stretch_exercises, goal, "1", None, exercise_library, sports)
                     self.copy_exercises(body_part.dynamic_integrate_exercises,
-                                        self.dynamic_integrate_exercises, goal, "1", None, exercise_library, sport_name)
+                                        self.dynamic_integrate_exercises, goal, "1", None, exercise_library, sports)
 
     def check_corrective(self, soreness, event_date_time, exercise_library):
 
@@ -1981,8 +1981,8 @@ class CoolDown(ModalityBase, Serialisable):
             if len(pain_list) > 0:
                 max_severity = max(list(s.severity for s in pain_list))
 
-        for sport_name in sports:
-            self.check_recover_from_sport(soreness_list, sport_name, muscular_strain_high, exercise_library, max_severity)
+        #for sport_name in sports:
+        self.check_recover_from_sport(soreness_list, sports, muscular_strain_high, exercise_library, max_severity)
         # dynamic stretch not ready yet
         #for s in soreness_list:
         #    self.check_corrective(s, self.event_date_time, exercise_library)
