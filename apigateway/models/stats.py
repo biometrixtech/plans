@@ -477,6 +477,7 @@ class AthleteStats(Serialisable):
         athlete_stats.acute_avg_max_soreness = input_dict['acute_avg_max_soreness']
         athlete_stats.chronic_avg_RPE = input_dict['chronic_avg_RPE']
         athlete_stats.chronic_avg_readiness = input_dict['chronic_avg_readiness']
+        athlete_stats.chronic_avg_sleep_quality = input_dict['chronic_avg_sleep_quality']
         athlete_stats.chronic_avg_max_soreness = input_dict['chronic_avg_max_soreness']
         athlete_stats.acute_internal_total_load = cls._standard_error_from_monogodb(input_dict.get('acute_internal_total_load', None))
         athlete_stats.chronic_internal_total_load = cls._standard_error_from_monogodb(input_dict.get('chronic_internal_total_load', None))
