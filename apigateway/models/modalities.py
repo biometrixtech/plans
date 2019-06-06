@@ -777,7 +777,7 @@ class ActiveRest(ModalityBase):
                         (s.is_persistent_soreness() or
                          s.historic_soreness_status == HistoricSorenessStatus.persistent_2_soreness)):
                     days_sore = (self.event_date_time - s.first_reported_date_time).days
-                    if not s.pain and days_sore < 30:
+                    if days_sore < 30:
                         return True
         return False
 
@@ -1891,7 +1891,7 @@ class CoolDown(ModalityBase, Serialisable):
                         (s.is_persistent_soreness() or
                          s.historic_soreness_status == HistoricSorenessStatus.persistent_2_soreness)):
                     days_sore = (self.event_date_time - s.first_reported_date_time).days
-                    if (not s.pain and days_sore < 30) or s.pain:
+                    if days_sore < 30:
                         return True
         return False
 
