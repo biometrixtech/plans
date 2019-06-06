@@ -62,7 +62,7 @@ class BodyPartFactory(object):
 
         return exercise_dict
 
-    def get_body_part_for_sport(self, sport_name):
+    def get_body_part_for_sports(self, sport_list):
 
         full_body_list = [SportName.basketball, SportName.football, SportName.general_fitness, SportName.gymnastics,
                           SportName.rugby, SportName.pool_sports, SportName.volleyball, SportName.wrestling,
@@ -85,12 +85,29 @@ class BodyPartFactory(object):
                            SportName.hiking, SportName.stair_climbing, SportName.walking, SportName.jump_rope,
                            SportName.stairs, SportName.step_training]
 
-        if sport_name in full_body_list:
+        use_full = False
+        use_lower = False
+        use_upper = False
+
+        for sport in sport_list:
+            if sport in full_body_list:
+                use_full = True
+                break
+            elif sport in lower_body_list:
+                use_lower = True
+            elif sport not in full_body_list and sport not in lower_body_list:
+                use_upper = True
+
+        if use_full:
             return self.get_body_part(BodyPart(BodyPartLocation.full_body, None))
-        elif sport_name in lower_body_list:
+        elif use_lower and not use_upper:
             return self.get_body_part(BodyPart(BodyPartLocation.lower_body, None))
-        else:
+        elif not use_lower and use_upper:
             return self.get_body_part(BodyPart(BodyPartLocation.upper_body, None))
+        elif use_lower and use_upper:
+            return self.get_body_part(BodyPart(BodyPartLocation.full_body, None))
+        else:
+            return self.get_body_part(BodyPart(BodyPartLocation.full_body, None))
 
     def get_body_part(self, body_part):
 

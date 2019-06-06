@@ -419,7 +419,7 @@ class ExerciseDosage(object):
         self.goal = None
         self.priority = 0
         self.soreness_source = None
-        self.sport_name = None
+        self.sports = []
         self.efficient_reps_assigned = 0
         self.efficient_sets_assigned = 0
         self.complete_reps_assigned = 0
