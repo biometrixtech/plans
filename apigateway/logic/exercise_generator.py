@@ -9,6 +9,17 @@ class ExerciseAssignments(object):
         self.lengthen_exercises = []
         self.activate_exercises = []
         self.integrate_exercises = []
+
+        self.static_stretch_exercises = []
+        self.static_then_active_stretch_exercises = []
+        self.static_then_active_or_dynamic_stretch_exercises = []
+        self.active_stretch_exercises = []
+        self.active_or_dynamic_stretch_exercises = []
+        self.isolated_activation_exercises = []
+        self.dynamic_integrate_exercises = []
+        self.dynamic_integrate_with_speed_exercises = []
+        self.static_integrate_exercises = []
+
         self.inhibit_minutes = 0
         self.lengthen_minutes = 0
         self.activate_minutes = 0
@@ -168,6 +179,7 @@ class ExerciseAssignments(object):
         position = random.randint(0, len(group) - 1)
         return group[position]
 
+    '''deprecated
     def randomize_exercise_selection(self, assigned_exercise_list, exercise_list):
 
         for assigned_exercise in assigned_exercise_list:
@@ -241,46 +253,5 @@ class ExerciseAssignments(object):
             self.activate_percentage = self.activate_minutes / total_minutes
             self.integrate_percentage = self.integrate_minutes / total_minutes
     '''
-    def update(self, soreness_severity, soreness_exercises):
 
-        for soreness_exercise in soreness_exercises:
-            exercise_assignment = AssignedExercise()
-            # exercise_assignment.exercise = soreness_exercise
-            exercise_assignment.soreness_priority = \
-                self.get_exercise_priority_from_soreness_level(soreness_severity, soreness_exercise)
 
-            # TODO expand to accommodate if exercise already exists or if others already exist
-            if isinstance(soreness_exercise, InhibitExercise):
-                self.inhibit_exercises.append(exercise_assignment)
-            elif isinstance(soreness_exercise, LengthenExercise):
-                    self.lengthen_exercises.append(exercise_assignment)
-            elif isinstance(soreness_exercise, ActivateExercise):
-                    self.activate_exercises.append(exercise_assignment)
-            elif isinstance(soreness_exercise, IntegrateExercise):
-                    self.integrate_exercises.append(exercise_assignment)
-
-    def get_exercise_priority_from_soreness_level(self, soreness_level, soreness_exercise):
-
-        exercise_priority = ExercisePriority
-
-        if isinstance(soreness_exercise, InhibitExercise) or isinstance(soreness_exercise, LengthenExercise):
-
-            if soreness_level is None or soreness_level <= 1:
-                return exercise_priority.present
-            elif 2 <= soreness_level < 4:
-                return exercise_priority.high
-            else:
-                return exercise_priority.avoid
-
-        elif isinstance(soreness_exercise, ActivateExercise):
-
-            if soreness_level is None or soreness_level <= 1:
-                return exercise_priority.present
-            elif soreness_level == 2:
-                return exercise_priority.high
-            else:
-                return exercise_priority.avoid
-
-        else:
-            return exercise_priority.avoid
-    '''

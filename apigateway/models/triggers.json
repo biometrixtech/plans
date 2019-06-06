@@ -1,0 +1,1705 @@
+{
+    "triggers": {
+        "201": {
+            "trigger_enum": 201,
+            "trend_type": "Stress",
+            "triggers": "No triggers flagged based on training volume",
+            "goal_names": "",
+            "length_of_impact": "",
+            "data_source": "",
+            "insight_priority_plans": "",
+            "insight_priority_trend_type": "7",
+            "plans": {
+                "priority_styling": 0,
+                "content_to_pass": "",
+                "present_in_plans": false,
+                "parent_data": {
+                    "enum": null,
+                    "new_first_time_title": "",
+                    "new_first_time_body": "",
+                    "new_subsequent_title": "",
+                    "new_subsequent_body": "",
+                    "cleared_body": ""
+                },
+                "child_data": {
+                    "new_first_time_title": "",
+                    "new_first_time_body": "",
+                    "new_subsequent_title": "",
+                    "new_subsequent_body": "",
+                    "cleared_body": ""
+                },
+                "cleared_title": ""
+            },
+            "trends": {
+                "priority_styling": 0,
+                "content_to_pass": "",
+                "present_in_trends": true,
+                "new_title": "No training-related insights found. ",
+                "new_body": "We haven't noticed any sign of increased recovery need. We'll let you know if we see any meaningful patterns or trends.",
+                "ongoing_title": "No training-related insights found. ",
+                "ongoing_body": "We haven't noticed any sign of increased recovery need. We'll let you know if we see any meaningful patterns or trends.",
+                "pos_change_title": "",
+                "pos_change_body": "",
+                "neg_change_title": "",
+                "neg_change_body": "",
+                "cleared_title": "",
+                "cleared_body": ""
+            },
+            "plots": {
+                "unit_of_aggregation": "Aggregate the Session(s) to per day",
+                "visualization_type": 1,
+                "visualization_range": 7,
+                "overlay_variable": "relative load per day (no overlay)",
+                "title": "Your training history"
+            },
+            "cta": {
+                "input": "",
+                "heat": false,
+                "warmup": false,
+                "cooldown": false,
+                "active_rest": false,
+                "ice": false,
+                "cwi": false,
+                "increase_default": ""
+            }
+        },
+        "0": {
+            "trigger_enum": 0,
+            "trend_type": "Stress",
+            "triggers": "High Load",
+            "goal_names": "Expedite tissue regeneration",
+            "length_of_impact": "single_day",
+            "data_source": "training_volume",
+            "insight_priority_plans": "9",
+            "insight_priority_trend_type": "1",
+            "plans": {
+                "priority_styling": 0,
+                "content_to_pass": "{goal}, {sport}",
+                "present_in_plans": true,
+                "parent_data": {
+                    "enum": 3,
+                    "new_first_time_title": "Ideal opportunity to gain strength",
+                    "new_first_time_body": "So we added activities to {goal} after {sport}",
+                    "new_subsequent_title": "Ideal opportunity to gain strength",
+                    "new_subsequent_body": "So we added activities to {goal} after {sport}",
+                    "cleared_body": ""
+                },
+                "child_data": {
+                    "new_first_time_title": "Ideal opportunity to gain strength",
+                    "new_first_time_body": "so we added activities to {goal} from {sport}",
+                    "new_subsequent_title": "Ideal opportunity to gain strength",
+                    "new_subsequent_body": "so we added activities to {goal} from {sport}",
+                    "cleared_body": ""
+                },
+                "cleared_title": ""
+            },
+            "trends": {
+                "priority_styling": 0,
+                "content_to_pass": "",
+                "present_in_trends": true,
+                "new_title": "Ideal opportunity to gain strength",
+                "new_body": "Today\u2019s workout placed elevated stress on your body and is an ideal opportunity for strength & fitness gains if you do a Fathom Recovery within 6hrs.",
+                "ongoing_title": "Ideal opportunity to gain strength",
+                "ongoing_body": "Today\u2019s workout placed elevated stress on your body and is an ideal opportunity for strength & fitness gains if you do a Fathom Recovery within 6hrs.",
+                "pos_change_title": "",
+                "pos_change_body": "",
+                "neg_change_title": "",
+                "neg_change_body": "",
+                "cleared_title": "",
+                "cleared_body": ""
+            },
+            "plots": {
+                "unit_of_aggregation": "Aggregate the Session(s) to per day",
+                "visualization_type": 2,
+                "visualization_range": 7,
+                "overlay_variable": "Highlight high load days",
+                "title": "These workouts created the greatest opportunity for strength gains this week"
+            },
+            "cta": {
+                "input": "Sport",
+                "heat": false,
+                "warmup": false,
+                "cooldown": true,
+                "active_rest": true,
+                "ice": false,
+                "cwi": false,
+                "increase_default": ""
+            }
+        },
+        "1": {
+            "trigger_enum": 1,
+            "trend_type": "Stress",
+            "triggers": "Sore (Pers >=30d, Pers_2 >= 30d)  + Logged High Load",
+            "goal_names": "Improve neuromuscular control",
+            "length_of_impact": "single_day",
+            "data_source": "soreness",
+            "insight_priority_plans": "11",
+            "insight_priority_trend_type": "4",
+            "plans": {
+                "priority_styling": 0,
+                "content_to_pass": "{goal}",
+                "present_in_plans": true,
+                "parent_data": {
+                    "enum": 3,
+                    "new_first_time_title": "Ideal opportunity to gain strength",
+                    "new_first_time_body": "So we added activities to {goal} after {sport}",
+                    "new_subsequent_title": "Ideal opportunity to gain strength",
+                    "new_subsequent_body": "So we added activities to {goal} after {sport}",
+                    "cleared_body": ""
+                },
+                "child_data": {
+                    "new_first_time_title": "Ideal opportunity to gain strength",
+                    "new_first_time_body": "so we added activities to {goal} from {sport}",
+                    "new_subsequent_title": "Ideal opportunity to gain strength",
+                    "new_subsequent_body": "so we added activities to {goal} from {sport}",
+                    "cleared_body": ""
+                },
+                "cleared_title": ""
+            },
+            "trends": {
+                "priority_styling": 0,
+                "content_to_pass": "{bodypart}",
+                "present_in_trends": true,
+                "new_title": "Training may worsen muscle imbalance",
+                "new_body": "Given your history of {bodypart} overactivity, this workout may exacerbate muscle imbalances. Prioritize recovery to improve your injury resilience.",
+                "ongoing_title": "Training may worsen muscle imbalance",
+                "ongoing_body": "Given your history of {bodypart} overactivity, this workout may exacerbate muscle imbalances. Prioritize recovery to improve your injury resilience.",
+                "pos_change_title": "",
+                "pos_change_body": "",
+                "neg_change_title": "",
+                "neg_change_body": "",
+                "cleared_title": "",
+                "cleared_body": ""
+            },
+            "plots": {
+                "unit_of_aggregation": "Unique per body part",
+                "visualization_type": 3,
+                "visualization_range": 7,
+                "overlay_variable": "Max Severity of Soreness reported per day for single body part",
+                "title": "Pattern of soreness & high load today"
+            },
+            "cta": {
+                "input": "Body Part",
+                "heat": false,
+                "warmup": false,
+                "cooldown": false,
+                "active_rest": false,
+                "ice": true,
+                "cwi": false,
+                "increase_default": ""
+            }
+        },
+        "2": {
+            "trigger_enum": 2,
+            "trend_type": "Stress",
+            "triggers": "Pain (Acute, Pers, Pers_2) + Logged High Load",
+            "goal_names": "Improve neuromuscular control",
+            "length_of_impact": "single_day",
+            "data_source": "pain",
+            "insight_priority_plans": "11",
+            "insight_priority_trend_type": "2",
+            "plans": {
+                "priority_styling": 0,
+                "content_to_pass": "{goal}",
+                "present_in_plans": true,
+                "parent_data": {
+                    "enum": 3,
+                    "new_first_time_title": "Ideal opportunity to gain strength",
+                    "new_first_time_body": "So we added activities to {goal} after {sport}",
+                    "new_subsequent_title": "Ideal opportunity to gain strength",
+                    "new_subsequent_body": "So we added activities to {goal} after {sport}",
+                    "cleared_body": ""
+                },
+                "child_data": {
+                    "new_first_time_title": "Ideal opportunity to gain strength",
+                    "new_first_time_body": "so we added activities to {goal} from {sport}",
+                    "new_subsequent_title": "Ideal opportunity to gain strength",
+                    "new_subsequent_body": "so we added activities to {goal} from {sport}",
+                    "cleared_body": ""
+                },
+                "cleared_title": ""
+            },
+            "trends": {
+                "priority_styling": 0,
+                "content_to_pass": "{bodypart}",
+                "present_in_trends": true,
+                "new_title": "Training may worsen compensations",
+                "new_body": "Given your training history, this workout may aggravate your {bodypart} pain. Try to prioritize Recovery over hard workouts.",
+                "ongoing_title": "Training may worsen compensations",
+                "ongoing_body": "Given your training history, this workout may aggravate your {bodypart} pain. Try to prioritize Recovery over hard workouts.",
+                "pos_change_title": "",
+                "pos_change_body": "",
+                "neg_change_title": "",
+                "neg_change_body": "",
+                "cleared_title": "",
+                "cleared_body": ""
+            },
+            "plots": {
+                "unit_of_aggregation": "Unique per body part",
+                "visualization_type": 3,
+                "visualization_range": 7,
+                "overlay_variable": "Max Severity of Pain reported per day for single body part",
+                "title": "Pattern of pain & high load today"
+            },
+            "cta": {
+                "input": "Body Part",
+                "heat": false,
+                "warmup": false,
+                "cooldown": false,
+                "active_rest": false,
+                "ice": true,
+                "cwi": false,
+                "increase_default": ""
+            }
+        },
+        "202": {
+            "trigger_enum": 202,
+            "trend_type": "Response",
+            "triggers": "No triggers flagged based on soreness",
+            "goal_names": "",
+            "length_of_impact": "",
+            "data_source": "",
+            "insight_priority_plans": "",
+            "insight_priority_trend_type": "11",
+            "plans": {
+                "priority_styling": 0,
+                "content_to_pass": "",
+                "present_in_plans": false,
+                "parent_data": {
+                    "enum": null,
+                    "new_first_time_title": "",
+                    "new_first_time_body": "",
+                    "new_subsequent_title": "",
+                    "new_subsequent_body": "",
+                    "cleared_body": ""
+                },
+                "child_data": {
+                    "new_first_time_title": "",
+                    "new_first_time_body": "",
+                    "new_subsequent_title": "",
+                    "new_subsequent_body": "",
+                    "cleared_body": ""
+                },
+                "cleared_title": ""
+            },
+            "trends": {
+                "priority_styling": 0,
+                "content_to_pass": "",
+                "present_in_trends": true,
+                "new_title": "No soreness-related insights found. ",
+                "new_body": "We haven't noticed any meaningful trends. We'll keep monitoring & will let you know if we see any signs of overreaching or underrecovery.",
+                "ongoing_title": "No soreness-related insights found. ",
+                "ongoing_body": "We haven't noticed any meaningful trends. We'll keep monitoring & will let you know if we see any signs of overreaching or underrecovery.",
+                "pos_change_title": "",
+                "pos_change_body": "",
+                "neg_change_title": "",
+                "neg_change_body": "",
+                "cleared_title": "",
+                "cleared_body": ""
+            },
+            "plots": {
+                "unit_of_aggregation": "per day, considering all body parts",
+                "visualization_type": 1,
+                "visualization_range": 7,
+                "overlay_variable": "Max Severity of Soreness reported per day for all body parts",
+                "title": "Your soreness history"
+            },
+            "cta": {
+                "input": "",
+                "heat": false,
+                "warmup": false,
+                "cooldown": false,
+                "active_rest": false,
+                "ice": false,
+                "cwi": false,
+                "increase_default": ""
+            }
+        },
+        "203": {
+            "trigger_enum": 203,
+            "trend_type": "Response",
+            "triggers": "No triggers flagged based on pain",
+            "goal_names": "",
+            "length_of_impact": "",
+            "data_source": "",
+            "insight_priority_plans": "",
+            "insight_priority_trend_type": "10",
+            "plans": {
+                "priority_styling": 0,
+                "content_to_pass": "",
+                "present_in_plans": false,
+                "parent_data": {
+                    "enum": null,
+                    "new_first_time_title": "",
+                    "new_first_time_body": "",
+                    "new_subsequent_title": "",
+                    "new_subsequent_body": "",
+                    "cleared_body": ""
+                },
+                "child_data": {
+                    "new_first_time_title": "",
+                    "new_first_time_body": "",
+                    "new_subsequent_title": "",
+                    "new_subsequent_body": "",
+                    "cleared_body": ""
+                },
+                "cleared_title": ""
+            },
+            "trends": {
+                "priority_styling": 0,
+                "content_to_pass": "",
+                "present_in_trends": true,
+                "new_title": "No pain-related insights found.",
+                "new_body": "No pain-related findings. We'll keep monitoring & will let you know if we find any meaningful patterns or trends.",
+                "ongoing_title": "No pain-related insights found.",
+                "ongoing_body": "No pain-related findings. We'll keep monitoring & will let you know if we find any meaningful patterns or trends.",
+                "pos_change_title": "",
+                "pos_change_body": "",
+                "neg_change_title": "",
+                "neg_change_body": "",
+                "cleared_title": "",
+                "cleared_body": ""
+            },
+            "plots": {
+                "unit_of_aggregation": "per day, considering all body parts",
+                "visualization_type": 1,
+                "visualization_range": 7,
+                "overlay_variable": "Max Severity of Pain reported per day for all body parts",
+                "title": "Your pain history"
+            },
+            "cta": {
+                "input": "",
+                "heat": false,
+                "warmup": false,
+                "cooldown": false,
+                "active_rest": false,
+                "ice": false,
+                "cwi": false,
+                "increase_default": ""
+            }
+        },
+        "204": {
+            "trigger_enum": 204,
+            "trend_type": "Response",
+            "triggers": "No triggers flagged based on 3sensor",
+            "goal_names": "",
+            "length_of_impact": "",
+            "data_source": "",
+            "insight_priority_plans": "",
+            "insight_priority_trend_type": "9",
+            "plans": {
+                "priority_styling": 0,
+                "content_to_pass": "",
+                "present_in_plans": false,
+                "parent_data": {
+                    "enum": null,
+                    "new_first_time_title": "",
+                    "new_first_time_body": "",
+                    "new_subsequent_title": "",
+                    "new_subsequent_body": "",
+                    "cleared_body": ""
+                },
+                "child_data": {
+                    "new_first_time_title": "",
+                    "new_first_time_body": "",
+                    "new_subsequent_title": "",
+                    "new_subsequent_body": "",
+                    "cleared_body": ""
+                },
+                "cleared_title": ""
+            },
+            "trends": {
+                "priority_styling": 0,
+                "content_to_pass": "",
+                "present_in_trends": true,
+                "new_title": "No biomechanics insights found.",
+                "new_body": "We haven't found any biomechanical patterns of note. We'll keep monitoring for any signs of fatigue or compensations. ",
+                "ongoing_title": "No biomechanics insights found.",
+                "ongoing_body": "We haven't found any biomechanical patterns of note. We'll keep monitoring for any signs of fatigue or compensations. ",
+                "pos_change_title": "",
+                "pos_change_body": "",
+                "neg_change_title": "",
+                "neg_change_body": "",
+                "cleared_title": "",
+                "cleared_body": ""
+            },
+            "plots": {
+                "unit_of_aggregation": "per session",
+                "visualization_type": 1,
+                "visualization_range": 7,
+                "overlay_variable": "Movement Quality max and min of session Severity category per day to define color per day",
+                "title": "Your biomechanical response history"
+            },
+            "cta": {
+                "input": "",
+                "heat": false,
+                "warmup": false,
+                "cooldown": false,
+                "active_rest": false,
+                "ice": false,
+                "cwi": false,
+                "increase_default": ""
+            }
+        },
+        "8": {
+            "trigger_enum": 8,
+            "trend_type": "Response",
+            "triggers": "Overreaching as High Muscular Strain",
+            "goal_names": "",
+            "length_of_impact": "multiple_days",
+            "data_source": "soreness",
+            "insight_priority_plans": "7",
+            "insight_priority_trend_type": "5",
+            "plans": {
+                "priority_styling": 0,
+                "content_to_pass": "{goal}",
+                "present_in_plans": true,
+                "parent_data": {
+                    "enum": 0,
+                    "new_first_time_title": "Your body isn\u2019t keeping up with training ",
+                    "new_first_time_body": "so we recommend increasing your recovery habits until your body properly adapts. ",
+                    "new_subsequent_title": "Your body isn\u2019t keeping up with training ",
+                    "new_subsequent_body": "so we recommend increasing your recovery habits until your body properly adapts. ",
+                    "cleared_body": "Your body\u2019s responding well from training and is now in a sustainable recovery rhythm. Keep it up!"
+                },
+                "child_data": {
+                    "new_first_time_title": "Your body isn\u2019t keeping up with training ",
+                    "new_first_time_body": "so we recommend increasing your recovery habits until your body properly adapts. ",
+                    "new_subsequent_title": "Your body isn\u2019t keeping up with training ",
+                    "new_subsequent_body": "so we recommend increasing your recovery habits until your body properly adapts. ",
+                    "cleared_body": "Your body\u2019s responding well from training and is now in a sustainable recovery rhythm. Keep it up!"
+                },
+                "cleared_title": "Your Recovery Efficiency has improved!"
+            },
+            "trends": {
+                "priority_styling": 0,
+                "content_to_pass": "",
+                "present_in_trends": true,
+                "new_title": "Your body isn\u2019t keeping up with training ",
+                "new_body": "Increased levels of soreness could be a sign that your body is struggling to sustain your training demands given your current recovery habits.",
+                "ongoing_title": "Your body isn\u2019t keeping up with training ",
+                "ongoing_body": "Increased levels of soreness could be a sign that your body is struggling to sustain your training demands given your current recovery habits.",
+                "pos_change_title": "Signs of Overreaching [Improving/Worsening]",
+                "pos_change_body": "",
+                "neg_change_title": "",
+                "neg_change_body": "",
+                "cleared_title": "Your Recovery Efficiency has improved!",
+                "cleared_body": "Your body is responding well from training and is now in a sustainable recovery rhythm. Keep it up!"
+            },
+            "plots": {
+                "unit_of_aggregation": "Yes/No",
+                "visualization_type": 5,
+                "visualization_range": 7,
+                "overlay_variable": "Value of Muscular Strain per day Severity category per day to define color per day",
+                "title": "Your Recovery Efficiency Score"
+            },
+            "cta": {
+                "input": "",
+                "heat": false,
+                "warmup": false,
+                "cooldown": false,
+                "active_rest": false,
+                "ice": false,
+                "cwi": false,
+                "increase_default": "x Active Rest Active Recovery"
+            }
+        },
+        "7": {
+            "trigger_enum": 7,
+            "trend_type": "Response",
+            "triggers": "Sore (Pers <30d, Pers_2 <30d)",
+            "goal_names": "",
+            "length_of_impact": "multiple_days",
+            "data_source": "soreness",
+            "insight_priority_plans": "7",
+            "insight_priority_trend_type": "7",
+            "plans": {
+                "priority_styling": 0,
+                "content_to_pass": "{goal}, {bodypart}",
+                "present_in_plans": true,
+                "parent_data": {
+                    "enum": 0,
+                    "new_first_time_title": "Your body isn\u2019t keeping up with training ",
+                    "new_first_time_body": "so we recommend increasing your recovery habits until your body properly adapts. ",
+                    "new_subsequent_title": "Your body isn\u2019t keeping up with training ",
+                    "new_subsequent_body": "so we recommend increasing your recovery habits until your body properly adapts. ",
+                    "cleared_body": "Your body\u2019s responding well from training and is now in a sustainable recovery rhythm. Keep it up!"
+                },
+                "child_data": {
+                    "new_first_time_title": "Your {bodypart} is overstressed",
+                    "new_first_time_body": "so we recommend increasing your recovery habits until your body properly adapts. ",
+                    "new_subsequent_title": "Your {bodypart} is overstressed",
+                    "new_subsequent_body": "so we recommend increasing your recovery habits until your body properly adapts. ",
+                    "cleared_body": "Good work! Your {bodypart} is no longer showing signs of overstress in response to training. "
+                },
+                "cleared_title": "Your {bodypart} has adapted!"
+            },
+            "trends": {
+                "priority_styling": 0,
+                "content_to_pass": "",
+                "present_in_trends": true,
+                "new_title": "Your {bodypart} is overstressed",
+                "new_body": "We\u2019ve noticed a pattern of persistent {bodypart} soreness which indicates you are still building the strength you need to sustain training. ",
+                "ongoing_title": "Your {bodypart} is overstressed",
+                "ongoing_body": "We\u2019ve noticed a pattern of persistent {bodypart} soreness which indicates you are still building the strength you need to sustain training. ",
+                "pos_change_title": "{bodypart} Overstressing  [Improving/Worsening] ",
+                "pos_change_body": "",
+                "neg_change_title": "",
+                "neg_change_body": "",
+                "cleared_title": "Your {bodypart} has adapted!",
+                "cleared_body": "Good work! Your {bodypart} is no longer showing signs of overstress in response to training. "
+            },
+            "plots": {
+                "unit_of_aggregation": "Unique per body part",
+                "visualization_type": 3,
+                "visualization_range": 7,
+                "overlay_variable": "Max Severity of Soreness reported per day for single body part",
+                "title": "Pattern of soreness in {bodypart}"
+            },
+            "cta": {
+                "input": "",
+                "heat": false,
+                "warmup": false,
+                "cooldown": false,
+                "active_rest": false,
+                "ice": false,
+                "cwi": false,
+                "increase_default": "x Active Rest Active Recovery"
+            }
+        },
+        "11": {
+            "trigger_enum": 11,
+            "trend_type": "Response",
+            "triggers": "Soreness Reported Today (as DOMs) Moderate DOMs = 1-2day, 2-3 severity Severe DOMs = 1-2day, 4-5 severity Minor DOMs = 2nd day, 1 severity  Mild Soreness = 1st day, 1 severity",
+            "goal_names": "Care for soreness",
+            "length_of_impact": "multiple_days",
+            "data_source": "soreness",
+            "insight_priority_plans": "8",
+            "insight_priority_trend_type": "8",
+            "plans": {
+                "priority_styling": 0,
+                "content_to_pass": "{goal}",
+                "present_in_plans": true,
+                "parent_data": {
+                    "enum": null,
+                    "new_first_time_title": "",
+                    "new_first_time_body": "",
+                    "new_subsequent_title": "",
+                    "new_subsequent_body": "",
+                    "cleared_body": ""
+                },
+                "child_data": {
+                    "new_first_time_title": "You could recover faster!",
+                    "new_first_time_body": "So we added activities to {goal} ",
+                    "new_subsequent_title": "You could recover faster!",
+                    "new_subsequent_body": "So we added activities to {goal} ",
+                    "cleared_body": ""
+                },
+                "cleared_title": ""
+            },
+            "trends": {
+                "priority_styling": 0,
+                "content_to_pass": "",
+                "present_in_trends": true,
+                "new_title": "You could recover faster!",
+                "new_body": "The activities in your plan will help you beat your soreness projection by expediting tissue healing & retaining range of motion. ",
+                "ongoing_title": "You could recover faster!",
+                "ongoing_body": "The activities in your plan will help you beat your soreness projection by expediting tissue healing & retaining range of motion. ",
+                "pos_change_title": "",
+                "pos_change_body": "",
+                "neg_change_title": "",
+                "neg_change_body": "",
+                "cleared_title": "",
+                "cleared_body": ""
+            },
+            "plots": {
+                "unit_of_aggregation": "Yes/No",
+                "visualization_type": 4,
+                "visualization_range": 7,
+                "overlay_variable": "Max Severity of Soreness considering all 'overload' body part reported per day Projected number of days sore from today",
+                "title": "Projected soreness "
+            },
+            "cta": {
+                "input": "Body Part",
+                "heat": false,
+                "warmup": false,
+                "cooldown": false,
+                "active_rest": true,
+                "ice": false,
+                "cwi": true,
+                "increase_default": ""
+            }
+        },
+        "12": {
+            "trigger_enum": 12,
+            "trend_type": "Response",
+            "triggers": "Sore (Pers <30d, Pers_2 <30d) + Soreness Reported Today",
+            "goal_names": "Care for soreness",
+            "length_of_impact": "single_day",
+            "data_source": "soreness",
+            "insight_priority_plans": "10",
+            "insight_priority_trend_type": "",
+            "plans": {
+                "priority_styling": 0,
+                "content_to_pass": "",
+                "present_in_plans": false,
+                "parent_data": {
+                    "enum": null,
+                    "new_first_time_title": "",
+                    "new_first_time_body": "",
+                    "new_subsequent_title": "",
+                    "new_subsequent_body": "",
+                    "cleared_body": ""
+                },
+                "child_data": {
+                    "new_first_time_title": "",
+                    "new_first_time_body": "",
+                    "new_subsequent_title": "",
+                    "new_subsequent_body": "",
+                    "cleared_body": ""
+                },
+                "cleared_title": ""
+            },
+            "trends": {
+                "priority_styling": 0,
+                "content_to_pass": "",
+                "present_in_trends": false,
+                "new_title": "",
+                "new_body": "",
+                "ongoing_title": "",
+                "ongoing_body": "",
+                "pos_change_title": "",
+                "pos_change_body": "",
+                "neg_change_title": "",
+                "neg_change_body": "",
+                "cleared_title": "",
+                "cleared_body": ""
+            },
+            "plots": {
+                "unit_of_aggregation": "",
+                "visualization_type": 3,
+                "visualization_range": 7,
+                "overlay_variable": "",
+                "title": "Pattern of soreness in {bodypart}"
+            },
+            "cta": {
+                "input": "Body Part",
+                "heat": false,
+                "warmup": false,
+                "cooldown": false,
+                "active_rest": true,
+                "ice": false,
+                "cwi": false,
+                "increase_default": ""
+            }
+        },
+        "13": {
+            "trigger_enum": 13,
+            "trend_type": "Response",
+            "triggers": "Sore (Pers >=30d, Pers_2 >= 30d) + Soreness Reported Today",
+            "goal_names": "Care for soreness",
+            "length_of_impact": "single_day",
+            "data_source": "soreness",
+            "insight_priority_plans": "10",
+            "insight_priority_trend_type": "",
+            "plans": {
+                "priority_styling": 0,
+                "content_to_pass": "",
+                "present_in_plans": false,
+                "parent_data": {
+                    "enum": null,
+                    "new_first_time_title": "",
+                    "new_first_time_body": "",
+                    "new_subsequent_title": "",
+                    "new_subsequent_body": "",
+                    "cleared_body": ""
+                },
+                "child_data": {
+                    "new_first_time_title": "",
+                    "new_first_time_body": "",
+                    "new_subsequent_title": "",
+                    "new_subsequent_body": "",
+                    "cleared_body": ""
+                },
+                "cleared_title": ""
+            },
+            "trends": {
+                "priority_styling": 0,
+                "content_to_pass": "",
+                "present_in_trends": false,
+                "new_title": "",
+                "new_body": "",
+                "ongoing_title": "",
+                "ongoing_body": "",
+                "pos_change_title": "",
+                "pos_change_body": "",
+                "neg_change_title": "",
+                "neg_change_body": "",
+                "cleared_title": "",
+                "cleared_body": ""
+            },
+            "plots": {
+                "unit_of_aggregation": "Unique per body part",
+                "visualization_type": 3,
+                "visualization_range": 7,
+                "overlay_variable": "Max Severity of Soreness reported per day for single body part",
+                "title": "Pattern of soreness in {bodypart}"
+            },
+            "cta": {
+                "input": "Body Part",
+                "heat": false,
+                "warmup": false,
+                "cooldown": false,
+                "active_rest": true,
+                "ice": true,
+                "cwi": false,
+                "increase_default": ""
+            }
+        },
+        "14": {
+            "trigger_enum": 14,
+            "trend_type": "Response",
+            "triggers": "Pain reported today (severity 1, 2) + NOT historic pain",
+            "goal_names": "Care for pain",
+            "length_of_impact": "single_day",
+            "data_source": "pain",
+            "insight_priority_plans": "1",
+            "insight_priority_trend_type": "6",
+            "plans": {
+                "priority_styling": 0,
+                "content_to_pass": "{goal}, {bodypart}",
+                "present_in_plans": true,
+                "parent_data": {
+                    "enum": 2,
+                    "new_first_time_title": "Keep an eye on your {bodypart}",
+                    "new_first_time_body": "We added activities to {goal}, but please avoid any movement that triggers pain.",
+                    "new_subsequent_title": "Keep an eye on your {bodypart}",
+                    "new_subsequent_body": "We added activities to {goal}, but please avoid any movement that triggers pain.",
+                    "cleared_body": ""
+                },
+                "child_data": {
+                    "new_first_time_title": "Keep an eye on your {bodypart}",
+                    "new_first_time_body": "we added activities to {goal}, but please avoid any movement that triggers pain",
+                    "new_subsequent_title": "Keep an eye on your {bodypart}",
+                    "new_subsequent_body": "we added activities to {goal}, but please avoid any movement that triggers pain",
+                    "cleared_body": ""
+                },
+                "cleared_title": ""
+            },
+            "trends": {
+                "priority_styling": 0,
+                "content_to_pass": "{bodypart}",
+                "present_in_trends": true,
+                "new_title": "Keep an eye on your {bodypart}",
+                "new_body": "Consider modifying training to let your {bodypart} recover. Pain is not a normal response and should never be ignored.",
+                "ongoing_title": "Keep an eye on your {bodypart}",
+                "ongoing_body": "Consider modifying training to let your {bodypart} recover. Pain is not a normal response and should never be ignored.",
+                "pos_change_title": "",
+                "pos_change_body": "",
+                "neg_change_title": "",
+                "neg_change_body": "",
+                "cleared_title": "",
+                "cleared_body": ""
+            },
+            "plots": {
+                "unit_of_aggregation": "Unique per body part",
+                "visualization_type": 3,
+                "visualization_range": 7,
+                "overlay_variable": "Max Severity of Pain reported per day for single body part",
+                "title": "Pain in {bodypart}"
+            },
+            "cta": {
+                "input": "Body Part",
+                "heat": false,
+                "warmup": false,
+                "cooldown": false,
+                "active_rest": true,
+                "ice": true,
+                "cwi": false,
+                "increase_default": "x Active Rest Active Recovery"
+            }
+        },
+        "15": {
+            "trigger_enum": 15,
+            "trend_type": "Response",
+            "triggers": "Pain reported today (severity 3-5) + NOT historic pain",
+            "goal_names": "Care for pain",
+            "length_of_impact": "single_day",
+            "data_source": "pain",
+            "insight_priority_plans": "1",
+            "insight_priority_trend_type": "1",
+            "plans": {
+                "priority_styling": 1,
+                "content_to_pass": "{goal}, {bodypart}",
+                "present_in_plans": true,
+                "parent_data": {
+                    "enum": 2,
+                    "new_first_time_title": "Keep an eye on your {bodypart}",
+                    "new_first_time_body": "We added activities to {goal}, but please avoid any movement that triggers pain.",
+                    "new_subsequent_title": "Keep an eye on your {bodypart}",
+                    "new_subsequent_body": "We added activities to {goal}, but please avoid any movement that triggers pain.",
+                    "cleared_body": ""
+                },
+                "child_data": {
+                    "new_first_time_title": "Keep an eye on your {bodypart}",
+                    "new_first_time_body": "we added activities to {goal}, but please avoid any movement that triggers pain",
+                    "new_subsequent_title": "Keep an eye on your {bodypart}",
+                    "new_subsequent_body": "we added activities to {goal}, but please avoid any movement that triggers pain",
+                    "cleared_body": ""
+                },
+                "cleared_title": ""
+            },
+            "trends": {
+                "priority_styling": 1,
+                "content_to_pass": "{bodypart}",
+                "present_in_trends": true,
+                "new_title": "Your {bodypart} needs attention",
+                "new_body": "Consider taking an off day to let your {bodypart} recover. Pain is not a normal response to training. Please avoid triggering it whenever possible.",
+                "ongoing_title": "Your {bodypart} needs attention",
+                "ongoing_body": "Consider taking an off day to let your {bodypart} recover. Pain is not a normal response to training. Please avoid triggering it whenever possible.",
+                "pos_change_title": "",
+                "pos_change_body": "",
+                "neg_change_title": "",
+                "neg_change_body": "",
+                "cleared_title": "",
+                "cleared_body": ""
+            },
+            "plots": {
+                "unit_of_aggregation": "Unique per body part",
+                "visualization_type": 3,
+                "visualization_range": 7,
+                "overlay_variable": "Max Severity of Pain reported per day for single body part",
+                "title": "Pain in {bodypart}"
+            },
+            "cta": {
+                "input": "Body Part",
+                "heat": false,
+                "warmup": false,
+                "cooldown": false,
+                "active_rest": true,
+                "ice": true,
+                "cwi": false,
+                "increase_default": "x Active Rest Active Recovery"
+            }
+        },
+        "23": {
+            "trigger_enum": 23,
+            "trend_type": "Response",
+            "triggers": "Pain reported today  (severity 1, 2)  + Pain(Acute, Pers, Pers_2)",
+            "goal_names": "Care for pain",
+            "length_of_impact": "single_day",
+            "data_source": "pain",
+            "insight_priority_plans": "1",
+            "insight_priority_trend_type": "8",
+            "plans": {
+                "priority_styling": 0,
+                "content_to_pass": "{goal}, {bodypart}",
+                "present_in_plans": true,
+                "parent_data": {
+                    "enum": 2,
+                    "new_first_time_title": "Keep an eye on your {bodypart}",
+                    "new_first_time_body": "We added activities to {goal}, but please avoid any movement that triggers pain.",
+                    "new_subsequent_title": "Keep an eye on your {bodypart}",
+                    "new_subsequent_body": "We added activities to {goal}, but please avoid any movement that triggers pain.",
+                    "cleared_body": ""
+                },
+                "child_data": {
+                    "new_first_time_title": "Keep an eye on your {bodypart}",
+                    "new_first_time_body": "we added activities to {goal}, but please avoid any movement that triggers pain",
+                    "new_subsequent_title": "Keep an eye on your {bodypart}",
+                    "new_subsequent_body": "we added activities to {goal}, but please avoid any movement that triggers pain",
+                    "cleared_body": ""
+                },
+                "cleared_title": ""
+            },
+            "trends": {
+                "priority_styling": 0,
+                "content_to_pass": "{bodypart}",
+                "present_in_trends": true,
+                "new_title": "Keep an eye on your {bodypart}",
+                "new_body": "Consider modifying training to let your {bodypart} recover. Pain is not a normal response and should never be ignored.",
+                "ongoing_title": "Keep an eye on your {bodypart}",
+                "ongoing_body": "Consider modifying training to let your {bodypart} recover. Pain is not a normal response and should never be ignored.",
+                "pos_change_title": "",
+                "pos_change_body": "",
+                "neg_change_title": "",
+                "neg_change_body": "",
+                "cleared_title": "",
+                "cleared_body": ""
+            },
+            "plots": {
+                "unit_of_aggregation": "Unique per body part",
+                "visualization_type": 3,
+                "visualization_range": 7,
+                "overlay_variable": "Max Severity of Pain reported per day for single body part",
+                "title": "Pattern of pain in {bodypart}"
+            },
+            "cta": {
+                "input": "Body Part",
+                "heat": false,
+                "warmup": false,
+                "cooldown": false,
+                "active_rest": true,
+                "ice": true,
+                "cwi": false,
+                "increase_default": ""
+            }
+        },
+        "24": {
+            "trigger_enum": 24,
+            "trend_type": "Response",
+            "triggers": "Pain reported today (severity 3-5)  + Pain(Acute, Pers, Pers_2)",
+            "goal_names": "Care for pain",
+            "length_of_impact": "single_day",
+            "data_source": "pain",
+            "insight_priority_plans": "1",
+            "insight_priority_trend_type": "2",
+            "plans": {
+                "priority_styling": 1,
+                "content_to_pass": "{goal}, {bodypart}",
+                "present_in_plans": true,
+                "parent_data": {
+                    "enum": 2,
+                    "new_first_time_title": "Keep an eye on your {bodypart}",
+                    "new_first_time_body": "We added activities to {goal}, but please avoid any movement that triggers pain.",
+                    "new_subsequent_title": "Keep an eye on your {bodypart}",
+                    "new_subsequent_body": "We added activities to {goal}, but please avoid any movement that triggers pain.",
+                    "cleared_body": ""
+                },
+                "child_data": {
+                    "new_first_time_title": "Keep an eye on your {bodypart}",
+                    "new_first_time_body": "we added activities to {goal}, but please avoid any movement that triggers pain",
+                    "new_subsequent_title": "Keep an eye on your {bodypart}",
+                    "new_subsequent_body": "we added activities to {goal}, but please avoid any movement that triggers pain",
+                    "cleared_body": ""
+                },
+                "cleared_title": ""
+            },
+            "trends": {
+                "priority_styling": 1,
+                "content_to_pass": "{bodypart}",
+                "present_in_trends": true,
+                "new_title": "Your {bodypart} needs attention",
+                "new_body": "Consider taking an off day to let your {bodypart} recover. Pain is not a normal response to training. Please avoid triggering it whenever possible.",
+                "ongoing_title": "Your {bodypart} needs attention",
+                "ongoing_body": "Consider taking an off day to let your {bodypart} recover. Pain is not a normal response to training. Please avoid triggering it whenever possible.",
+                "pos_change_title": "",
+                "pos_change_body": "",
+                "neg_change_title": "",
+                "neg_change_body": "",
+                "cleared_title": "",
+                "cleared_body": ""
+            },
+            "plots": {
+                "unit_of_aggregation": "Unique per body part",
+                "visualization_type": 3,
+                "visualization_range": 7,
+                "overlay_variable": "Max Severity of Pain reported per day for single body part",
+                "title": "Pattern of pain in {bodypart}"
+            },
+            "cta": {
+                "input": "Body Part",
+                "heat": false,
+                "warmup": false,
+                "cooldown": false,
+                "active_rest": true,
+                "ice": true,
+                "cwi": false,
+                "increase_default": ""
+            }
+        },
+        "21": {
+            "trigger_enum": 21,
+            "trend_type": "Response",
+            "triggers": "Pain (Pers, Pers_2  < 30d)  + Pain NOT reported today",
+            "goal_names": "Improve neuromuscular control",
+            "length_of_impact": "single_day",
+            "data_source": "pain",
+            "insight_priority_plans": "12",
+            "insight_priority_trend_type": "",
+            "plans": {
+                "priority_styling": 0,
+                "content_to_pass": "",
+                "present_in_plans": false,
+                "parent_data": {
+                    "enum": null,
+                    "new_first_time_title": "",
+                    "new_first_time_body": "",
+                    "new_subsequent_title": "",
+                    "new_subsequent_body": "",
+                    "cleared_body": ""
+                },
+                "child_data": {
+                    "new_first_time_title": "",
+                    "new_first_time_body": "",
+                    "new_subsequent_title": "",
+                    "new_subsequent_body": "",
+                    "cleared_body": ""
+                },
+                "cleared_title": ""
+            },
+            "trends": {
+                "priority_styling": 0,
+                "content_to_pass": "",
+                "present_in_trends": false,
+                "new_title": "",
+                "new_body": "",
+                "ongoing_title": "",
+                "ongoing_body": "",
+                "pos_change_title": "",
+                "pos_change_body": "",
+                "neg_change_title": "",
+                "neg_change_body": "",
+                "cleared_title": "",
+                "cleared_body": ""
+            },
+            "plots": {
+                "unit_of_aggregation": "Unique per body part",
+                "visualization_type": 3,
+                "visualization_range": 7,
+                "overlay_variable": "Max Severity of Pain reported per day for single body part",
+                "title": "Pattern of pain in {bodypart}"
+            },
+            "cta": {
+                "input": "Body Part",
+                "heat": true,
+                "warmup": false,
+                "cooldown": false,
+                "active_rest": false,
+                "ice": false,
+                "cwi": false,
+                "increase_default": ""
+            }
+        },
+        "22": {
+            "trigger_enum": 22,
+            "trend_type": "Response",
+            "triggers": "Pain (Pers, Pers_2  >= 30d)  + Pain NOT reported today",
+            "goal_names": "Improve neuromuscular control",
+            "length_of_impact": "single_day",
+            "data_source": "pain",
+            "insight_priority_plans": "12",
+            "insight_priority_trend_type": "",
+            "plans": {
+                "priority_styling": 0,
+                "content_to_pass": "",
+                "present_in_plans": false,
+                "parent_data": {
+                    "enum": null,
+                    "new_first_time_title": "",
+                    "new_first_time_body": "",
+                    "new_subsequent_title": "",
+                    "new_subsequent_body": "",
+                    "cleared_body": ""
+                },
+                "child_data": {
+                    "new_first_time_title": "",
+                    "new_first_time_body": "",
+                    "new_subsequent_title": "",
+                    "new_subsequent_body": "",
+                    "cleared_body": ""
+                },
+                "cleared_title": ""
+            },
+            "trends": {
+                "priority_styling": 0,
+                "content_to_pass": "",
+                "present_in_trends": false,
+                "new_title": "",
+                "new_body": "",
+                "ongoing_title": "",
+                "ongoing_body": "",
+                "pos_change_title": "",
+                "pos_change_body": "",
+                "neg_change_title": "",
+                "neg_change_body": "",
+                "cleared_title": "",
+                "cleared_body": ""
+            },
+            "plots": {
+                "unit_of_aggregation": "Unique per body part",
+                "visualization_type": 3,
+                "visualization_range": 7,
+                "overlay_variable": "Max Severity of Pain reported per day for single body part",
+                "title": "Pattern of pain in {bodypart}"
+            },
+            "cta": {
+                "input": "Body Part",
+                "heat": true,
+                "warmup": false,
+                "cooldown": false,
+                "active_rest": false,
+                "ice": false,
+                "cwi": false,
+                "increase_default": ""
+            }
+        },
+        "101": {
+            "trigger_enum": 101,
+            "trend_type": "Response",
+            "triggers": "Fatigue within a session - torso / pelvis - loading pattern symmetry",
+            "goal_names": "",
+            "length_of_impact": "single_day",
+            "data_source": "three_sensor",
+            "insight_priority_plans": "3",
+            "insight_priority_trend_type": "4",
+            "plans": {
+                "priority_styling": 0,
+                "content_to_pass": "",
+                "present_in_plans": true,
+                "parent_data": {
+                    "enum": 5,
+                    "new_first_time_title": "Poor Response Identified",
+                    "new_first_time_body": "So we've added activities to {goal}. ",
+                    "new_subsequent_title": "Poor Response Identified",
+                    "new_subsequent_body": "So we've added activities to {goal}. ",
+                    "cleared_body": ""
+                },
+                "child_data": {
+                    "new_first_time_title": "Fatigue Identified",
+                    "new_first_time_body": "So we've added activities to {goal}. ",
+                    "new_subsequent_title": "Fatigue Identified",
+                    "new_subsequent_body": "So we've added activities to {goal}. ",
+                    "cleared_body": ""
+                },
+                "cleared_title": ""
+            },
+            "trends": {
+                "priority_styling": 0,
+                "content_to_pass": "",
+                "present_in_trends": true,
+                "new_title": "Fatigue Identified",
+                "new_body": "The ideal range for [Fatigue] is [range] and you're currently at [number]. This [description of risk factor].",
+                "ongoing_title": "Fatigue Identified",
+                "ongoing_body": "The ideal range for [Fatigue] is [range] and you're currently at [number]. This [description of risk factor].",
+                "pos_change_title": "",
+                "pos_change_body": "",
+                "neg_change_title": "",
+                "neg_change_body": "",
+                "cleared_title": "",
+                "cleared_body": ""
+            },
+            "plots": {
+                "unit_of_aggregation": "per session",
+                "visualization_type": 6,
+                "visualization_range": 7,
+                "overlay_variable": "Movement Quality at start and end of session Severity category per day to define color per day",
+                "title": ""
+            },
+            "cta": {
+                "input": "CME",
+                "heat": false,
+                "warmup": false,
+                "cooldown": false,
+                "active_rest": true,
+                "ice": false,
+                "cwi": false,
+                "increase_default": ""
+            }
+        },
+        "102": {
+            "trigger_enum": 102,
+            "trend_type": "Response",
+            "triggers": "Poor Response in an individual session - torso / pelvis - loading pattern symmetry",
+            "goal_names": "",
+            "length_of_impact": "single_day",
+            "data_source": "three_sensor",
+            "insight_priority_plans": "3",
+            "insight_priority_trend_type": "3",
+            "plans": {
+                "priority_styling": 0,
+                "content_to_pass": "",
+                "present_in_plans": true,
+                "parent_data": {
+                    "enum": 5,
+                    "new_first_time_title": "Poor Response Identified",
+                    "new_first_time_body": "So we've added activities to {goal}. ",
+                    "new_subsequent_title": "Poor Response Identified",
+                    "new_subsequent_body": "So we've added activities to {goal}. ",
+                    "cleared_body": ""
+                },
+                "child_data": {
+                    "new_first_time_title": "Poor Response Identified",
+                    "new_first_time_body": "So we added activities to {goal}. ",
+                    "new_subsequent_title": "Poor Response Identified",
+                    "new_subsequent_body": "So we added activities to {goal}. ",
+                    "cleared_body": ""
+                },
+                "cleared_title": ""
+            },
+            "trends": {
+                "priority_styling": 0,
+                "content_to_pass": "",
+                "present_in_trends": true,
+                "new_title": "Poor Response Identified",
+                "new_body": "The ideal range for [Fatigue] is [range] and you're currently at [number]. This [description of risk factor].",
+                "ongoing_title": "Poor Response Identified",
+                "ongoing_body": "The ideal range for [Fatigue] is [range] and you're currently at [number]. This [description of risk factor].",
+                "pos_change_title": "",
+                "pos_change_body": "",
+                "neg_change_title": "",
+                "neg_change_body": "",
+                "cleared_title": "",
+                "cleared_body": ""
+            },
+            "plots": {
+                "unit_of_aggregation": "per session",
+                "visualization_type": 6,
+                "visualization_range": 7,
+                "overlay_variable": "Movement Quality max and min of session Severity category per day to define color per day",
+                "title": ""
+            },
+            "cta": {
+                "input": "CME",
+                "heat": false,
+                "warmup": false,
+                "cooldown": false,
+                "active_rest": true,
+                "ice": false,
+                "cwi": true,
+                "increase_default": ""
+            }
+        },
+        "205": {
+            "trigger_enum": 205,
+            "trend_type": "Biomechanics",
+            "triggers": "No triggers flagged based on soreness",
+            "goal_names": "",
+            "length_of_impact": "",
+            "data_source": "",
+            "insight_priority_plans": "",
+            "insight_priority_trend_type": "9",
+            "plans": {
+                "priority_styling": 0,
+                "content_to_pass": "",
+                "present_in_plans": false,
+                "parent_data": {
+                    "enum": null,
+                    "new_first_time_title": "",
+                    "new_first_time_body": "",
+                    "new_subsequent_title": "",
+                    "new_subsequent_body": "",
+                    "cleared_body": ""
+                },
+                "child_data": {
+                    "new_first_time_title": "",
+                    "new_first_time_body": "",
+                    "new_subsequent_title": "",
+                    "new_subsequent_body": "",
+                    "cleared_body": ""
+                },
+                "cleared_title": ""
+            },
+            "trends": {
+                "priority_styling": 0,
+                "content_to_pass": "",
+                "present_in_trends": true,
+                "new_title": "No soreness-related insights found. ",
+                "new_body": "We haven't noticed any meaningful trends. We'll keep monitoring & will let you know if we see any signs of overreaching or underrecovery.",
+                "ongoing_title": "No soreness-related insights found. ",
+                "ongoing_body": "We haven't noticed any meaningful trends. We'll keep monitoring & will let you know if we see any signs of overreaching or underrecovery.",
+                "pos_change_title": "",
+                "pos_change_body": "",
+                "neg_change_title": "",
+                "neg_change_body": "",
+                "cleared_title": "",
+                "cleared_body": ""
+            },
+            "plots": {
+                "unit_of_aggregation": "per day, considering all body parts",
+                "visualization_type": 1,
+                "visualization_range": 14,
+                "overlay_variable": "Max Severity of Soreness reported per day for all body parts",
+                "title": "Your soreness history"
+            },
+            "cta": {
+                "input": "",
+                "heat": false,
+                "warmup": false,
+                "cooldown": false,
+                "active_rest": false,
+                "ice": false,
+                "cwi": false,
+                "increase_default": ""
+            }
+        },
+        "206": {
+            "trigger_enum": 206,
+            "trend_type": "Biomechanics",
+            "triggers": "No triggers flagged based on pain",
+            "goal_names": "",
+            "length_of_impact": "",
+            "data_source": "",
+            "insight_priority_plans": "",
+            "insight_priority_trend_type": "8",
+            "plans": {
+                "priority_styling": 0,
+                "content_to_pass": "",
+                "present_in_plans": false,
+                "parent_data": {
+                    "enum": null,
+                    "new_first_time_title": "",
+                    "new_first_time_body": "",
+                    "new_subsequent_title": "",
+                    "new_subsequent_body": "",
+                    "cleared_body": ""
+                },
+                "child_data": {
+                    "new_first_time_title": "",
+                    "new_first_time_body": "",
+                    "new_subsequent_title": "",
+                    "new_subsequent_body": "",
+                    "cleared_body": ""
+                },
+                "cleared_title": ""
+            },
+            "trends": {
+                "priority_styling": 0,
+                "content_to_pass": "",
+                "present_in_trends": true,
+                "new_title": "No pain-related insights found.",
+                "new_body": "No pain-related findings. We'll keep monitoring & will let you know if we find any meaningful patterns or trends.",
+                "ongoing_title": "No pain-related insights found.",
+                "ongoing_body": "No pain-related findings. We'll keep monitoring & will let you know if we find any meaningful patterns or trends.",
+                "pos_change_title": "",
+                "pos_change_body": "",
+                "neg_change_title": "",
+                "neg_change_body": "",
+                "cleared_title": "",
+                "cleared_body": ""
+            },
+            "plots": {
+                "unit_of_aggregation": "per day, considering all body parts",
+                "visualization_type": 1,
+                "visualization_range": 14,
+                "overlay_variable": "Max Severity of Pain reported per day for all body parts",
+                "title": "Your pain history"
+            },
+            "cta": {
+                "input": "",
+                "heat": false,
+                "warmup": false,
+                "cooldown": false,
+                "active_rest": false,
+                "ice": false,
+                "cwi": false,
+                "increase_default": ""
+            }
+        },
+        "207": {
+            "trigger_enum": 207,
+            "trend_type": "Biomechanics",
+            "triggers": "No triggers flagged based on 3sensor",
+            "goal_names": "",
+            "length_of_impact": "",
+            "data_source": "",
+            "insight_priority_plans": "",
+            "insight_priority_trend_type": "7",
+            "plans": {
+                "priority_styling": 0,
+                "content_to_pass": "",
+                "present_in_plans": false,
+                "parent_data": {
+                    "enum": null,
+                    "new_first_time_title": "",
+                    "new_first_time_body": "",
+                    "new_subsequent_title": "",
+                    "new_subsequent_body": "",
+                    "cleared_body": ""
+                },
+                "child_data": {
+                    "new_first_time_title": "",
+                    "new_first_time_body": "",
+                    "new_subsequent_title": "",
+                    "new_subsequent_body": "",
+                    "cleared_body": ""
+                },
+                "cleared_title": ""
+            },
+            "trends": {
+                "priority_styling": 0,
+                "content_to_pass": "",
+                "present_in_trends": true,
+                "new_title": "No biomechanics insights found.",
+                "new_body": "We haven't found any biomechanical patterns of note. We'll keep monitoring for any signs of fatigue or compensations. ",
+                "ongoing_title": "No biomechanics insights found.",
+                "ongoing_body": "We haven't found any biomechanical patterns of note. We'll keep monitoring for any signs of fatigue or compensations. ",
+                "pos_change_title": "",
+                "pos_change_body": "",
+                "neg_change_title": "",
+                "neg_change_body": "",
+                "cleared_title": "",
+                "cleared_body": ""
+            },
+            "plots": {
+                "unit_of_aggregation": "per session",
+                "visualization_type": 1,
+                "visualization_range": 14,
+                "overlay_variable": "Movement Quality max and min of session Severity category per day to define color per day",
+                "title": "Your biomechanical response history"
+            },
+            "cta": {
+                "input": "",
+                "heat": false,
+                "warmup": false,
+                "cooldown": false,
+                "active_rest": false,
+                "ice": false,
+                "cwi": false,
+                "increase_default": ""
+            }
+        },
+        "19": {
+            "trigger_enum": 19,
+            "trend_type": "Biomechanics",
+            "triggers": "Sore (Pers >=30d, Pers_2 >= 30d) ",
+            "goal_names": "Improve neuromuscular control  Reduce injury risk factors",
+            "length_of_impact": "multiple_days",
+            "data_source": "soreness",
+            "insight_priority_plans": "6",
+            "insight_priority_trend_type": "6",
+            "plans": {
+                "priority_styling": 0,
+                "content_to_pass": "{goal}",
+                "present_in_plans": true,
+                "parent_data": {
+                    "enum": 4,
+                    "new_first_time_title": "Elevated overuse injury risk",
+                    "new_first_time_body": "so we'll start incorporating activities to {goal}. Please avoid any activity that causes pain",
+                    "new_subsequent_title": "Elevated overuse injury risk",
+                    "new_subsequent_body": "so we'll start incorporating activities to {goal}. Please avoid any activity that causes pain",
+                    "cleared_body": "You haven\u2019t reported {bodypart} symptoms in a while. This could mean your movement dysfunction is improving. We\u2019ll keep an eye on it just in case."
+                },
+                "child_data": {
+                    "new_first_time_title": "Movement dysfunction identified ",
+                    "new_first_time_body": "so we'll start incorporating activities to {goal}",
+                    "new_subsequent_title": "Movement dysfunction identified ",
+                    "new_subsequent_body": "so we'll start incorporating activities to {goal}",
+                    "cleared_body": "You haven\u2019t reported {bodypart} soreness in a while. This could mean your movement dysfunction is improving. We\u2019ll keep an eye on it just in case."
+                },
+                "cleared_title": "Signs of dysfunction are gone!"
+            },
+            "trends": {
+                "priority_styling": 0,
+                "content_to_pass": "",
+                "present_in_trends": true,
+                "new_title": "Movement dysfunction identified ",
+                "new_body": "Your persistent {bodypart} soreness may be a sign that other muscles are underactive. This could lead to an overuse injury elsewhere.",
+                "ongoing_title": "Movement dysfunction identified ",
+                "ongoing_body": "Your persistent {bodypart} soreness may be a sign that other muscles are underactive. This could lead to an overuse injury elsewhere.",
+                "pos_change_title": "Strength Imbalance [Improving/Worsening]",
+                "pos_change_body": "",
+                "neg_change_title": "",
+                "neg_change_body": "",
+                "cleared_title": "Signs of dysfunction are gone!",
+                "cleared_body": "You haven\u2019t reported {bodypart} soreness in a while. This could mean your movement dysfunction is improving. We\u2019ll keep an eye on it just in case."
+            },
+            "plots": {
+                "unit_of_aggregation": "Unique per body part",
+                "visualization_type": 3,
+                "visualization_range": 14,
+                "overlay_variable": "Max Severity of Soreness reported per day for single body part",
+                "title": "Prolonged soreness pattern in {bodypart}"
+            },
+            "cta": {
+                "input": "Body Part",
+                "heat": true,
+                "warmup": false,
+                "cooldown": false,
+                "active_rest": true,
+                "ice": false,
+                "cwi": false,
+                "increase_default": ""
+            }
+        },
+        "16": {
+            "trigger_enum": 16,
+            "trend_type": "Biomechanics",
+            "triggers": "Pain (Acute, Pers, Pers_2)",
+            "goal_names": "Reduce injury risk factors",
+            "length_of_impact": "multiple_days",
+            "data_source": "pain",
+            "insight_priority_plans": "4",
+            "insight_priority_trend_type": "4",
+            "plans": {
+                "priority_styling": 0,
+                "content_to_pass": "{goal}",
+                "present_in_plans": true,
+                "parent_data": {
+                    "enum": 4,
+                    "new_first_time_title": "Elevated overuse injury risk",
+                    "new_first_time_body": "so we'll start incorporating activities to {goal}. Please avoid any activity that causes pain",
+                    "new_subsequent_title": "Elevated overuse injury risk",
+                    "new_subsequent_body": "so we'll start incorporating activities to {goal}. Please avoid any activity that causes pain",
+                    "cleared_body": "You haven\u2019t reported {bodypart} symptoms in a while. This could mean your movement dysfunction is improving. We\u2019ll keep an eye on it just in case."
+                },
+                "child_data": {
+                    "new_first_time_title": "Elevated overuse injury risk due to pain",
+                    "new_first_time_body": "so we'll start incorporating activities to {goal}. Please avoid any activity that causes pain",
+                    "new_subsequent_title": "Elevated overuse injury risk due to pain",
+                    "new_subsequent_body": "so we'll start incorporating activities to {goal}. Please avoid any activity that causes pain",
+                    "cleared_body": "You haven\u2019t reported {bodypart} pain in a while. This could mean your movement dysfunction is improving. We\u2019ll keep an eye on it just incase."
+                },
+                "cleared_title": "Signs of dysfunction are gone!"
+            },
+            "trends": {
+                "priority_styling": 0,
+                "content_to_pass": "",
+                "present_in_trends": true,
+                "new_title": "Elevated overuse injury risk due to pain",
+                "new_body": "Reoccurring {bodypart} pain can cause movement compensations. This places excess stress on other tissues, elevating overuse injury risk.",
+                "ongoing_title": "Elevated overuse injury risk due to pain",
+                "ongoing_body": "Reoccurring {bodypart} pain can cause movement compensations. This places excess stress on other tissues, elevating overuse injury risk.",
+                "pos_change_title": " Pain Patterns [Improving/Worsening]",
+                "pos_change_body": "",
+                "neg_change_title": "",
+                "neg_change_body": "",
+                "cleared_title": "Signs of dysfunction are gone!",
+                "cleared_body": "You haven\u2019t reported {bodypart} pain in a while. This could mean your movement dysfunction is improving. We\u2019ll keep an eye on it just in case."
+            },
+            "plots": {
+                "unit_of_aggregation": "Unique per body part",
+                "visualization_type": 3,
+                "visualization_range": 14,
+                "overlay_variable": "Max Severity of Pain reported per day for single body part",
+                "title": "Pattern of pain in {bodypart}"
+            },
+            "cta": {
+                "input": "Body Part",
+                "heat": false,
+                "warmup": false,
+                "cooldown": false,
+                "active_rest": true,
+                "ice": false,
+                "cwi": false,
+                "increase_default": ""
+            }
+        },
+        "103": {
+            "trigger_enum": 103,
+            "trend_type": "Biomechanics",
+            "triggers": "Fatigue within session, trending over multiple sessions - torso / pelvis - loading pattern symmetry",
+            "goal_names": "",
+            "length_of_impact": "multiple_days",
+            "data_source": "three_sensor",
+            "insight_priority_plans": "2",
+            "insight_priority_trend_type": "2",
+            "plans": {
+                "priority_styling": 0,
+                "content_to_pass": "",
+                "present_in_plans": true,
+                "parent_data": {
+                    "enum": 6,
+                    "new_first_time_title": "Poor Response Identified",
+                    "new_first_time_body": "So we've added activities to {goal}. ",
+                    "new_subsequent_title": "Poor Response Identified",
+                    "new_subsequent_body": "So we've added activities to {goal}. ",
+                    "cleared_body": "Congrats! You've resolved your persistant {bodypart} soreness!"
+                },
+                "child_data": {
+                    "new_first_time_title": "Fatigue Identified",
+                    "new_first_time_body": "So we add activities to {goal} ",
+                    "new_subsequent_title": "Fatigue Identified",
+                    "new_subsequent_body": "So we add activities to {goal} ",
+                    "cleared_body": "Congrats! You've resolved your persistant {bodypart} soreness!"
+                },
+                "cleared_title": "Symptoms Cleared!"
+            },
+            "trends": {
+                "priority_styling": 0,
+                "content_to_pass": "",
+                "present_in_trends": true,
+                "new_title": "Fatigue Identified",
+                "new_body": "The ideal range for [Fatigue] is [range] and you're currently at [number]. This [description of risk factor].",
+                "ongoing_title": "Fatigue Identified",
+                "ongoing_body": "The ideal range for [Fatigue] is [range] and you're currently at [number]. This [description of risk factor].",
+                "pos_change_title": "",
+                "pos_change_body": "",
+                "neg_change_title": "",
+                "neg_change_body": "",
+                "cleared_title": "Symptoms Cleared!",
+                "cleared_body": "Congrats! You've resolved your persistant {bodypart} soreness!"
+            },
+            "plots": {
+                "unit_of_aggregation": "per session",
+                "visualization_type": 6,
+                "visualization_range": 14,
+                "overlay_variable": "Movement Quality at start and end of session Severity category per day to define color per day",
+                "title": ""
+            },
+            "cta": {
+                "input": "CME",
+                "heat": false,
+                "warmup": true,
+                "cooldown": false,
+                "active_rest": false,
+                "ice": false,
+                "cwi": true,
+                "increase_default": "x Active Rest"
+            }
+        },
+        "104": {
+            "trigger_enum": 104,
+            "trend_type": "Biomechanics",
+            "triggers": "Poor Response trending over the course of multiple sessions - torso / pelvis - loading pattern symmetry",
+            "goal_names": "",
+            "length_of_impact": "multiple_days",
+            "data_source": "three_sensor",
+            "insight_priority_plans": "2",
+            "insight_priority_trend_type": "1",
+            "plans": {
+                "priority_styling": 0,
+                "content_to_pass": "",
+                "present_in_plans": true,
+                "parent_data": {
+                    "enum": 6,
+                    "new_first_time_title": "Pattern of Poor Response Identified",
+                    "new_first_time_body": "So we've added activities to {goal}. ",
+                    "new_subsequent_title": "Pattern of Poor Response Identified",
+                    "new_subsequent_body": "So we've added activities to {goal}. ",
+                    "cleared_body": "Congrats! You've resolved your persistant {bodypart} soreness!"
+                },
+                "child_data": {
+                    "new_first_time_title": "Poor Response Identified",
+                    "new_first_time_body": "So we add activities to {goal} ",
+                    "new_subsequent_title": "Poor Response Identified",
+                    "new_subsequent_body": "So we add activities to {goal} ",
+                    "cleared_body": "Congrats! You've resolved your persistant {bodypart} soreness!"
+                },
+                "cleared_title": "Symptoms Cleared!"
+            },
+            "trends": {
+                "priority_styling": 0,
+                "content_to_pass": "",
+                "present_in_trends": true,
+                "new_title": "Poor Response Identified",
+                "new_body": "The ideal range for [Fatigue] is [range] and you're currently at [number]. This [description of risk factor].",
+                "ongoing_title": "Poor Response Identified",
+                "ongoing_body": "The ideal range for [Fatigue] is [range] and you're currently at [number]. This [description of risk factor].",
+                "pos_change_title": "",
+                "pos_change_body": "",
+                "neg_change_title": "",
+                "neg_change_body": "",
+                "cleared_title": "Symptoms Cleared!",
+                "cleared_body": "Congrats! You've resolved your persistant {bodypart} soreness!"
+            },
+            "plots": {
+                "unit_of_aggregation": "per session",
+                "visualization_type": 6,
+                "visualization_range": 14,
+                "overlay_variable": "Movement Quality max and min of session Severity category per day to define color per day",
+                "title": ""
+            },
+            "cta": {
+                "input": "CME",
+                "heat": false,
+                "warmup": true,
+                "cooldown": false,
+                "active_rest": false,
+                "ice": false,
+                "cwi": true,
+                "increase_default": "x Active Rest"
+            }
+        }
+    }
+}

@@ -4,8 +4,9 @@ import uuid
 import datetime
 from serialisable import Serialisable
 from utils import format_datetime, parse_datetime
-from models.sport import SportName, BaseballPosition, BasketballPosition, FootballPosition, LacrossePosition, SoccerPosition, SoftballPosition, TrackAndFieldPosition, FieldHockeyPosition, VolleyballPosition
-
+from models.sport import SportName, SportType, BaseballPosition, BasketballPosition, FootballPosition, LacrossePosition, SoccerPosition, SoftballPosition, TrackAndFieldPosition, FieldHockeyPosition, VolleyballPosition
+from models.post_session_survey import PostSurvey
+from models.load_stats import LoadStats
 
 class SessionType(Enum):
     practice = 0
@@ -56,6 +57,7 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
     def __init__(self):
         self.id = None
         self.sport_name = None
+        self.sport_type = None
         self.strength_and_conditioning_type = None
         self.duration_sensor = None
         self.external_load = None
@@ -67,9 +69,9 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         self.mod_intensity_minutes = None
         self.low_intensity_minutes = None
         self.inactive_minutes = None
-        self.high_intensity_RPE = None
-        self.mod_intensity_RPE = None
-        self.low_intensity_RPE = None
+        #self.high_intensity_RPE = None
+        #self.mod_intensity_RPE = None
+        #self.low_intensity_RPE = None
         self.post_session_soreness = []     # post_session_soreness object array
         self.duration_minutes = None
         self.created_date = None
@@ -90,6 +92,7 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         self.calories = None
         self.distance = None
         self.source = SessionSource.user
+        self.shrz = None
 
         # post-session
         self.post_session_survey = None
@@ -109,8 +112,11 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
             else:
                 try:
                     value = SportName(value)
+                    self.sport_type = self.get_sport_type(value)
                 except ValueError:
                     value = SportName(None)
+        elif name == "sport_name" and isinstance(value, SportName):
+            self.sport_type = self.get_sport_type(value)
         elif name == "strength_and_conditioning_type" and not isinstance(value, StrengthConditioningType):
             if value == '':
                 value = StrengthConditioningType(None)
@@ -120,6 +126,7 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
             value = SessionSource(value) if value is not None else SessionSource.user
         elif name == ["deleted", "ignored"]:
             value = value if value is not None else False
+
         super().__setattr__(name, value)
 
     @abc.abstractmethod
@@ -138,6 +145,124 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
             return True
         else:
             return False
+
+    def cycling_load(self):
+        return self.get_distance_load(SportName.cycling)
+
+    def running_load(self):
+        return self.get_distance_load(SportName.distance_running)
+
+    def swimming_load(self):
+        return self.get_distance_load(SportName.swimming)
+
+    def walking_load(self):
+        return self.get_distance_load(SportName.walking)
+
+    def duration_minutes_load(self):
+        return self.duration_minutes
+
+        # distance_sports = [SportName.swimming, SportName.cycling, SportName.distance_running, SportName.walking]
+
+        # if (self.sport_type == SportType.sport_endurance and self.duration_minutes is not None and
+        #       self.session_RPE is not None and self.sport_name not in distance_sports):
+        #     return self.duration_minutes
+        # else:
+        #     return None
+
+    def duration_health_load(self):
+        return self.duration_health
+
+        # distance_sports = [SportName.swimming, SportName.cycling, SportName.distance_running, SportName.walking]
+        #
+        # if (self.sport_type == SportType.sport_endurance and self.duration_health is not None and
+        #         self.duration_minutes is None and self.session_RPE is not None and
+        #         self.sport_name not in distance_sports):
+        #     return self.duration_health
+        # else:
+        #     return None
+
+    def training_volume(self, load_stats):
+
+        normalized_intensity = self.normalized_intensity()
+        normalized_load = self.normalized_load(load_stats)
+
+        if normalized_intensity is not None and normalized_load is not None:
+            return normalized_intensity * normalized_load
+        else:
+            return None
+
+    def normalized_intensity(self):
+
+        if self.session_RPE is not None:
+            return self.session_RPE
+        elif self.shrz is not None:
+            return self.shrz
+        else:
+            return 0
+
+    def normalized_load(self, load_stats):
+
+        duration_minutes_load = self.duration_minutes_load()
+        duration_health_load = self.duration_health_load()
+        walking_load = self.walking_load()
+        swimming_load = self.swimming_load()
+        running_load = self.running_load()
+        cycling_load = self.cycling_load()
+
+        load = 0
+
+        duration_minutes_load = load_stats.get_duration_minutes_load(duration_minutes_load)
+        duration_health_load = load_stats.get_duration_health_load(duration_health_load)
+        walking_load = load_stats.get_walking_distance_load(walking_load)
+        swimming_load = load_stats.get_swimming_distance_load(swimming_load)
+        running_load = load_stats.get_running_distance_load(running_load)
+        cycling_load = load_stats.get_cycling_distance_load(cycling_load)
+
+        loads = []
+
+        if duration_minutes_load is not None:
+            loads.append(duration_minutes_load)
+        if duration_health_load is not None:
+            loads.append(duration_health_load)
+        if walking_load is not None:
+            loads.append(walking_load)
+        if swimming_load is not None:
+            loads.append(swimming_load)
+        if running_load is not None:
+            loads.append(running_load)
+        if cycling_load is not None:
+            loads.append(cycling_load)
+
+        if len(loads) > 0:
+            load = max(loads)
+
+        return  load
+
+    def get_distance_load(self, sport_name):
+        if self.sport_name == sport_name is not None and self.distance is not None:
+            return self.distance
+        else:
+            return None
+
+    def get_sport_type(self, sport_name):
+
+        ultra_high = [SportName.diving, SportName.jumps, SportName.throws, SportName.weightlifting, SportName.strength,
+                      SportName.functional_strength_training, SportName.traditional_strength_training,
+                      SportName.core_training, SportName.high_intensity_interval_training, SportName.pilates]
+
+        unique_activites = [SportName.archery, SportName.bowling]
+
+        load_not_managed = [SportName.fishing, SportName.mind_and_body, SportName.preparation_and_recovery,
+                            SportName.flexibility]
+
+        if sport_name in ultra_high:
+            return SportType.ultra_high_intensity
+        elif sport_name in unique_activites:
+            return SportType.unique_activity
+        elif sport_name in load_not_managed:
+            return SportType.load_not_managed
+        else:
+            return SportType.sport_endurance
 
     def json_serialise(self):
         session_type = self.session_type()
@@ -168,11 +293,53 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
             'deleted': self.deleted,
             'ignored': self.ignored,
             'duration_health': self.duration_health,
+            'shrz': self.shrz if self.shrz is not None else None,
             'calories': self.calories,
             'distance': self.distance,
             'source': self.source.value if self.source is not None else SessionSource.user.value
         }
         return ret
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        session = SessionFactory().create(SessionType(input_dict['session_type']))
+        session.id = input_dict["session_id"]
+        attrs_from_mongo = ["description",
+                            "sport_name",
+                            "strength_and_conditioning_type",
+                            "created_date",
+                            "event_date",
+                            "end_date",
+                            "duration_minutes",
+                            "data_transferred",
+                            "duration_sensor",
+                            "external_load",
+                            "high_intensity_minutes",
+                            "mod_intensity_minutes",
+                            "low_intensity_minutes",
+                            "inactive_minutes",
+                            "high_intensity_load",
+                            "mod_intensity_load",
+                            "low_intensity_load",
+                            "inactive_load",
+                            "sensor_start_date_time",
+                            "sensor_end_date_time",
+                            "deleted",
+                            "ignored",
+                            "duration_health",
+                            "shrz",
+                            "calories",
+                            "distance",
+                            "source"]
+        for key in attrs_from_mongo:
+            setattr(session, key, input_dict.get(key, None))
+        if "post_session_survey" in input_dict and input_dict["post_session_survey"] is not None:
+            session.post_session_survey = PostSurvey(input_dict["post_session_survey"], input_dict["post_session_survey"]["event_date"])
+            session.session_RPE = session.post_session_survey.RPE if session.post_session_survey.RPE is not None else None
+        else:
+            session.post_session_survey = None
+
+        return session
 
     def internal_load(self):
         if self.session_RPE is not None and self.duration_minutes is not None:
@@ -191,9 +358,9 @@ class SessionFactory(object):
 
     def create(self, session_type: SessionType):
 
-        if session_type == SessionType.practice:
-            session_object = PracticeSession()
-        elif session_type == SessionType.game:
+        #if session_type == SessionType.practice:
+        #    session_object = PracticeSession()
+        if session_type == SessionType.game:
             session_object = Game()
         elif session_type == SessionType.bump_up:
             session_object = BumpUpSession()
@@ -227,7 +394,7 @@ class BumpUpSession(Session):
     def missing_post_session_survey(self):
         return Session.missing_post_session_survey()
 
-
+'''Deprecated
 class PracticeSession(Session):
     def __init__(self):
         Session.__init__(self)
@@ -242,11 +409,15 @@ class PracticeSession(Session):
 
     def missing_post_session_survey(self):
         return Session.missing_post_session_survey()
+'''
 
 
 class SportTrainingSession(Session):
     def __init__(self):
         Session.__init__(self)
+        self.leads_to_soreness = False
+        self.atypical_session_type = False
+        self.atypical_high_load = False
 
     def session_type(self):
         return SessionType.sport_training
@@ -258,6 +429,34 @@ class SportTrainingSession(Session):
 
     def missing_post_session_survey(self):
         return Session.missing_post_session_survey()
+
+    def ultra_high_intensity_session(self):
+
+        ultra_high_intensity_sports = [SportName.diving, SportName.jumps, SportName.throws, SportName.weightlifting,
+                                       SportName.strength, SportName.functional_strength_training,
+                                       SportName.traditional_strength_training, SportName.core_training,
+                                       SportName.high_intensity_interval_training, SportName.pilates]
+
+        if self.sport_name in ultra_high_intensity_sports:
+            return True
+        else:
+            return False
+
+    def high_intensity_RPE(self):
+
+        if self.session_RPE is not None and self.session_RPE > 5:
+            return True
+        else:
+            return False
+
+    def high_intensity(self):
+
+        if self.session_RPE is not None and self.session_RPE > 5 and self.ultra_high_intensity_session():
+            return True
+        elif self.session_RPE is not None and self.session_RPE >= 7 and not self.ultra_high_intensity_session():
+            return True
+        else:
+            return False
 
 
 class StrengthConditioningSession(Session):
@@ -331,6 +530,27 @@ class CorrectiveSession(Session):
             return False
 
 
+class HighLoadSession(Serialisable):
+    def __init__(self, date, sport_name):
+        self.date = date
+        self.sport_name = sport_name
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+
+        session = HighLoadSession(parse_datetime(input_dict["date"]),  SportName(int(input_dict["sport_name"])))
+
+        return session
+
+    def json_serialise(self):
+        ret = {
+            'date': format_datetime(self.date),
+            'sport_name': self.sport_name.value
+        }
+
+        return ret
+
+'''deprecated
 class FunctionalStrengthSession(Serialisable):
 
     def __init__(self):
@@ -400,7 +620,7 @@ class FunctionalStrengthSession(Serialisable):
                    'position': self.position.value if self.position is not None else None
                    }
             return ret
-
+'''
 
 # class CompletedFunctionalStrengthSession(Serialisable):
 
@@ -446,10 +666,15 @@ class RecoverySession(Serialisable):
         self.integrate_target_minutes = 0
 
         # new modalities
-        self.dynamic_movement_exercises = []
-        self.dynamic_flexibility_exercises = []
         self.static_stretch_exercises = []
+        self.static_then_active_stretch_exercises = []
+        self.static_then_active_or_dynamic_stretch_exercises = []
         self.active_stretch_exercises = []
+        self.active_or_dynamic_stretch_exercises = []
+        self.isolated_activation_exercises = []
+        self.dynamic_integrate_exercises = []
+        self.dynamic_integrate_with_speed_exercises = []
+        self.static_integrate_exercises = []
         self.heat_minutes = 0
         self.ice_minutes = 0
         self.cold_water_immersion_minutes = 0
@@ -546,7 +771,8 @@ class RecoverySession(Serialisable):
             self.integrate_exercises[s].position_order = num
             num = num + 1
 
-    def set_exercise_target_minutes(self, soreness_list, total_minutes_target, max_severity, historic_soreness_present=False, functional_strength_active=False, is_active_prep=True):
+    #def set_exercise_target_minutes(self, soreness_list, total_minutes_target, max_severity, historic_soreness_present=False, functional_strength_active=False, is_active_prep=True):
+    def set_exercise_target_minutes(self, soreness_list, total_minutes_target, max_severity, historic_soreness_present=False, is_active_prep=True):
         max_severity_and_historic_soreness = False
         high_severity_is_pain = False
 

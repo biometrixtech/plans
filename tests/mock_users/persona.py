@@ -22,13 +22,16 @@ class Persona(object):
         self.session_history = None
         self.daily_plan = None
         self.daily_readiness = None
+        self.athlete_stats = None
 
     def create_history(self, days):
         self.clear_user()
         event_date = datetime.datetime.now() - datetime.timedelta(days=days)
+        self.update_stats(event_date)
         for i in range(days):
-            date_time = format_datetime(event_date)
+            # date_time = format_datetime(event_date)
             today_date = format_date(event_date)
+            date_time = event_date
             soreness = []
             for body_part in self.soreness_history:
                 if body_part['severity'][i] is not None:
@@ -38,17 +41,18 @@ class Persona(object):
                                      'severity': body_part['severity'][i]})
 
             if len(soreness) > 0:
-                readiness_data = {'date_time': date_time,
+                readiness_data = {'date_time': format_datetime(date_time),
                                   'soreness': soreness}
                 self.create_readiness(readiness_data)
+
                 self.create_plan(event_date)
-                exercise_list = [ex.exercise.id for ex in self.daily_plan.pre_recovery.inhibit_exercises]
+                exercise_list = [ex.exercise.id for ex in self.daily_plan.pre_active_rest[0].inhibit_exercises.values()]
                 self.complete_exercises(exercise_list, format_datetime(event_date + datetime.timedelta(hours=1)))
                 print(today_date)
-            self.update_stats(format_date(event_date))
+            self.update_stats(event_date)
             event_date = event_date + datetime.timedelta(days=1)
 
-        self.update_stats(format_date(event_date))
+        self.update_stats(event_date)
 
     def clear_user(self):
         readiness = get_mongo_collection('dailyreadiness')
@@ -65,16 +69,17 @@ class Persona(object):
         self.daily_plan = DailyPlan(format_date(event_date))
         self.daily_plan.user_id = self.user_id
         self.daily_plan.daily_readiness_survey = self.daily_readiness
-        self.daily_plan.session_from_readiness = True
+        # self.daily_plan.session_from_readiness = True
         self.add_session(event_date)
         store = DailyPlanDatastore()
         store.put(self.daily_plan)
+        self.update_stats(event_date)
         plan_manager = TrainingPlanManager(self.user_id, DatastoreCollection(), )
-        self.daily_plan = plan_manager.create_daily_plan(event_date=format_date(event_date), last_updated=format_datetime(event_date))
+        self.daily_plan = plan_manager.create_daily_plan(event_date=format_date(event_date), last_updated=format_datetime(event_date), athlete_stats=self.athlete_stats)
 
     def update_stats(self, event_date):
-        athlete_stats = StatsProcessing(self.user_id, event_date=event_date, datastore_collection=DatastoreCollection()).process_athlete_stats()
-        DatastoreCollection().athlete_stats_datastore.put(athlete_stats)
+        self.athlete_stats = StatsProcessing(self.user_id, event_date=event_date, datastore_collection=DatastoreCollection()).process_athlete_stats()
+        DatastoreCollection().athlete_stats_datastore.put(self.athlete_stats)
 
     def create_readiness(self, data):
         self.daily_readiness = DailyReadiness(

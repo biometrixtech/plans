@@ -28,7 +28,8 @@ class ExerciseLibraryDatastore(object):
             row_count = 0
             for row in exercise_reader:
                 if row_count > 0:
-                    if row[8] != "x" and row[26] == "x":
+                    #if row[8] != "x" and row[26] == "x":  #now allowing integrate exercises
+                    try:
                         exercise_item = models.exercise.Exercise(row[0])
                         exercise_item.display_name = row[1]
                         exercise_item.name = row[2]
@@ -76,14 +77,16 @@ class ExerciseLibraryDatastore(object):
                             exercise_item.seconds_per_rep = int(row[21])
                         exercise_item.progresses_to = row[22]
                         exercise_item.technical_difficulty = row[24]
-                        exercise_item.equipment_required = row[25]
+                        exercise_item.equipment_required = [row[25]]
                         exercise_item.youtube_id = None
-                        try:
-                            exercise_item.description = exercise_descriptions[exercise_item.id]
-                        except KeyError:
-                            print("no description")
-                            exercise_item.description = ""
-                        exercises.append(exercise_item)
+                    except KeyError:
+                        pass # just an empty line
+                    try:
+                        exercise_item.description = exercise_descriptions[exercise_item.id]
+                    except KeyError:
+                        print("no description")
+                        exercise_item.description = ""
+                    exercises.append(exercise_item)
                 row_count = row_count + 1
         self.exercise_list = exercises
 

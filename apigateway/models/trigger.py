@@ -1,0 +1,99 @@
+from enum import IntEnum
+
+
+class TriggerType(IntEnum):
+    high_volume_intensity = 0  # "High Relative Volume or Intensity of Logged Session"
+    hist_sore_greater_30_high_volume_intensity = 1  # "Pers, Pers-2 Soreness > 30d + High Relative Volume or Intensity of Logged Session"
+    hist_pain_high_volume_intensity = 2  # "Acute, Pers, Pers_2 Pain  + High Relative Volume or Intensity of Logged Session"
+    hist_sore_greater_30_no_sore_today_high_volume_intensity = 3  # "Pers, Pers-2 Soreness > 30d + No soreness reported today + Logged High Relative Volume or Intensity"
+    acute_pain_no_pain_today_high_volume_intensity = 4  # "Acute Pain + No pain reported today + High Relative Volume or Intensity of Logged Session" 
+    pers_pers2_pain_no_pain_sore_today_high_volume_intensity = 5  # "Pers, Pers_2 Pain + No pain Reported Today + High Relative Volume or Intensity of Logged Session"
+    hist_sore_less_30_no_sport = 6  # "Pers, Pers-2 Soreness < 30d + Not Correlated to Sport"
+    hist_sore_less_30 = 7  # "Pers, Pers-2 Soreness < 30d + Correlated to Sport"
+    overreaching_high_muscular_strain = 8  # "Overreaching as increasing Muscular Strain (with context for Training Volume)"
+    sore_today_no_session = 9  # "Sore reported today + not linked to session"    
+    sore_today = 10  # "Sore reported today"
+    sore_today_doms = 11  # "Soreness Reported Today as DOMs"
+    hist_sore_less_30_sore_today = 12  # "Pers, Pers-2 Soreness < 30d + Soreness reported today"
+    hist_sore_greater_30_sore_today = 13  # "Pers, Pers-2 Soreness > 30d + Soreness Reported Today"
+    no_hist_pain_pain_today_severity_1_2 = 14  # "Pain reported today"
+    no_hist_pain_pain_today_high_severity_3_5 = 15  # "Pain reported today high severity"
+    hist_pain = 16  # "Acute, Pers, Pers-2 Pain"
+    hist_pain_sport = 17  # "Acute, Pers, Pers_2 Pain + Correlated to Sport"
+    pain_injury = 18  # 'Pain - Injury'
+    hist_sore_greater_30 = 19  # "Pers, Pers-2 Soreness > 30d"
+    hist_sore_greater_30_sport = 20  # "Pers, Pers-2 Soreness > 30d + Correlated to Sport"
+    pers_pers2_pain_less_30_no_pain_today = 21
+    pers_pers2_pain_greater_30_no_pain_today = 22
+    hist_pain_pain_today_severity_1_2 = 23
+    hist_pain_pain_today_severity_3_5 = 24
+    response_fatigue_within_a_session_torso_loading_pattern = 101
+    response_poor_response_within_a_session_torso_loading_pattern = 102
+    biomechanics_fatigue_within_a_session_torso_loading_pattern = 103
+    biomechanics_poor_response_within_a_session_torso_loading_pattern = 104
+    stress_no_triggers_flagged_based_on_training_volume = 201
+    response_no_triggers_flagged_based_on_soreness = 202
+    response_no_triggers_flagged_based_on_pain = 203
+    response_no_triggers_flagged_based_on_3_sensor = 204
+    biomechanics_no_triggers_flagged_based_on_soreness = 205
+    biomechanics_no_triggers_flagged_based_on_pain = 206
+    biomechanics_no_triggers_flagged_based_on_3_sensor = 207
+
+    def is_grouped_trigger(self):
+        if self.value in [0, 1, 2, 7, 8, 14, 15, 16, 19, 23, 24]:
+            return True
+        else:
+            return False
+
+    @classmethod
+    def parent_group_exists(cls, trigger_type, existing_triggers):
+        if trigger_type.is_grouped_trigger():
+            for e in existing_triggers:
+                if cls.is_same_parent_group(trigger_type, e):
+                    return True
+        return False
+
+    @classmethod
+    def is_in(cls, trigger_type, existing_types):
+        """
+        check if exactly match or is in same parent group for any in the list
+        """
+        for e in existing_types:
+            if cls.is_equivalent(trigger_type, e):
+                return True
+        return False
+
+    @classmethod
+    def is_equivalent(cls, trigger1, trigger2):
+        if not trigger1.is_grouped_trigger():
+            return trigger1 == trigger2
+        else:
+            return cls.is_same_parent_group(trigger1, trigger2)
+
+    @classmethod
+    def get_parent_group(cls, trigger_type):
+        groups = {
+            7: 0,
+            8: 0,
+            14: 2,
+            15: 2,
+            23: 2,
+            24: 2,
+            0: 3,
+            1: 3,
+            2: 3,
+            19: 4,
+            16: 4,
+            101: 5,
+            102: 5,
+            103: 6,
+            104: 6
+        }
+        if trigger_type.is_grouped_trigger():
+            return groups[trigger_type.value]
+        else:
+            return None
+
+    @classmethod
+    def is_same_parent_group(cls, a, b):
+        return cls.get_parent_group(a) == cls.get_parent_group(b)

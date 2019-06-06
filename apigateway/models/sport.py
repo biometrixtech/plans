@@ -12,6 +12,14 @@ class SportLevel(IntEnum):
     professional = 7
 
 
+class SportType(Enum):
+    sport_endurance = 0
+    ultra_high_intensity = 1
+    unique_activity = 2
+    load_not_managed = 3
+    no_type = None
+
+
 class Sport(object):
 
     def __init__(self):
@@ -112,6 +120,96 @@ class SportName(Enum):
     @classmethod
     def has_value(cls, value):
         return any(value == item.value for item in cls)
+
+
+    def get_display_name(self):
+        display_names = {
+            0: 'Basketball',
+            1: 'Baseball',
+            2: 'Softball',
+            3: 'Cycling',
+            4: 'Field Hockey',
+            5: 'Football',
+            6: 'General Fitness',
+            7: 'Golf',
+            8: 'Gymnastics',
+            9: 'Skating Sports',
+            10: 'Lacrosse',
+            11: 'Rowing',
+            12: 'Rugby',
+            13: 'Diving',
+            14: 'Soccer',
+            15: 'Water Sports',
+            16: 'Tennis',
+            17: 'Running',
+            18: 'Sprints',
+            19: 'Jumps',
+            20: 'Throws',
+            21: 'Volleyball',
+            22: 'Wrestling',
+            23: 'Weightlifting',
+            24: 'Track & Field',
+            25: 'Archery',
+            26: 'Australian Football',
+            27: 'Badminton',
+            28: 'Bowling',
+            29: 'Boxing',
+            30: 'Cricket',
+            31: 'Curling',
+            32: 'Dance',
+            33: 'Equestrian Sports',
+            34: 'Fencing',
+            35: 'Fishing',
+            36: 'Handball',
+            37: 'Hockey',
+            38: 'Martial Arts',
+            39: 'Paddle Sports',
+            40: 'Racquetball',
+            41: 'Sailing',
+            42: 'Snow Sports',
+            43: 'Squash',
+            44: 'Surfing Sports',
+            45: 'Swimming',
+            46: 'Table Tennis',
+            47: 'Water Polo',
+            48: 'Cross Country Skiing',
+            49: 'Downhill Skiing',
+            50: 'Kick Boxing',
+            51: 'Snowboarding',
+            52: 'Endurance',
+            53: 'Power',
+            54: 'Speed & Agility',
+            55: 'Strength',
+            56: 'Cross Training',
+            57: 'Elliptical',
+            58: 'Functional Strength Training',
+            59: 'Hiking',
+            60: 'Hunting',
+            61: 'Mind & Body',
+            62: 'Play',
+            63: 'Preparation & Recovery',
+            64: 'Stair Climbing',
+            65: 'Traditional Strength Training',
+            66: 'Walking',
+            67: 'Water Fitness',
+            68: 'Yoga',
+            69: 'Barre',
+            70: 'Core Training',
+            71: 'Flexibility',
+            72: 'High Intensity Interval Training',
+            73: 'Jump Rope',
+            74: 'Pilates',
+            75: 'Stairs',
+            76: 'Step Training',
+            77: 'Wheelchair Walk Pace',
+            78: 'Wheelchair Run Pace',
+            79: 'Tai Chi',
+            80: 'Mixed Cardio',
+            81: 'Hand Cycling',
+            82: 'Climbing',
+            83: 'Other',
+            None: ''}
+        return display_names[self.value]
 
 
 class BaseballPosition(Enum):

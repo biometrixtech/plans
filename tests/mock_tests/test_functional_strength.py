@@ -3,14 +3,15 @@ xray_recorder.configure(sampling=False)
 xray_recorder.begin_segment(name="test")
 
 import pytest
-from logic.functional_strength_mapping import FSProgramGenerator
+#from logic.functional_strength_mapping import FSProgramGenerator
 from logic.stats_processing import StatsProcessing
 from logic.training_plan_management import TrainingPlanManager
 from models.stats import AthleteStats
 from models.daily_plan import DailyPlan
 from models.daily_readiness import DailyReadiness
 from models.post_session_survey import PostSessionSurvey, PostSurvey
-from models.session import FunctionalStrengthSession, PracticeSession, SessionType,  StrengthConditioningType
+#from models.session import FunctionalStrengthSession, PracticeSession, SessionType,  StrengthConditioningType
+from models.session import SessionType,  StrengthConditioningType
 from models.sport import BasketballPosition, SportName, SoccerPosition, TrackAndFieldPosition, SoftballPosition, FieldHockeyPosition, VolleyballPosition, BaseballPosition
 from tests.mocks.mock_exercise_datastore import ExerciseLibraryDatastore
 from tests.mocks.mock_datastore_collection import DatastoreCollection
@@ -21,18 +22,18 @@ from tests.mocks.mock_athlete_stats_datastore import AthleteStatsDatastore
 from tests.testing_utilities import TestUtilities
 from datetime import datetime, timedelta
 
-fs_exercise_library_datastore = ExerciseLibraryDatastore()
+#fs_exercise_library_datastore = ExerciseLibraryDatastore()
 exercise_library_datastore = ExerciseLibraryDatastore()
 
 
 @pytest.fixture(scope="session", autouse=True)
 def load_exercises():
-    fs_exercise_library_datastore.side_load_exericse_list_from_csv(library_file='database/FS_Exercise_Library.csv',
-                                                                   desc_file='database/FS_Exercise_Descriptions.tsv')
+    #fs_exercise_library_datastore.side_load_exericse_list_from_csv(library_file='database/FS_Exercise_Library.csv',
+    #                                                               desc_file='database/FS_Exercise_Descriptions.tsv')
 
     exercise_library_datastore.side_load_exericse_list_from_csv(library_file='database/Exercise_Library.csv',
                                                                    desc_file='database/Exercise_Descriptions.tsv')
-
+'''deprecated
 def get_dates(start_date, end_date):
 
     dates = []
@@ -107,7 +108,6 @@ def get_post_session_surveys(start_date, end_date):
         surveys.append(post_session)
 
     return surveys
-
 
 def test_generate_session_for_soccer():
     mapping = FSProgramGenerator(fs_exercise_library_datastore)
@@ -498,3 +498,4 @@ def test_no_fs_with_high_post_session_soreness():
     tpm = TrainingPlanManager("tester", datastore_collection)
     plan = tpm.create_daily_plan("2018-07-24", '2018-07-24T12:00:00Z')
     assert(None is plan.functional_strength_session)
+    '''

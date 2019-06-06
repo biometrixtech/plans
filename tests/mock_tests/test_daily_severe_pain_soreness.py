@@ -1,11 +1,12 @@
 from datetime import datetime
 from models.soreness import BodyPart, BodyPartLocation, Soreness
 from models.stats import AthleteStats
+from utils import parse_date
 
 
 def test_persist_soreness():
     athlete_stats = AthleteStats("tester")
-    athlete_stats.event_date = "2018-12-03"
+    athlete_stats.event_date = parse_date("2018-12-03")
 
     soreness1 = Soreness()
     soreness1.body_part = BodyPart(BodyPartLocation(9), None)
@@ -26,7 +27,7 @@ def test_persist_soreness():
 
 def test_readiness_soreness_update_expired_soreness():
     athlete_stats = AthleteStats("tester")
-    athlete_stats.event_date = "2018-12-03"
+    athlete_stats.event_date = parse_date("2018-12-03")
 
     soreness = Soreness()
     soreness.body_part = BodyPart(BodyPartLocation(9), None)
@@ -50,7 +51,7 @@ def test_readiness_soreness_update_expired_soreness():
 
 def test_readiness_soreness_update_consecutive_days():
     athlete_stats = AthleteStats("tester")
-    athlete_stats.event_date = "2018-12-03"
+    athlete_stats.event_date = parse_date("2018-12-03")
 
     soreness = Soreness()
     soreness.body_part = BodyPart(BodyPartLocation(9), None)
@@ -71,7 +72,7 @@ def test_readiness_soreness_update_consecutive_days():
 
 def test_ps_soreness_update_expired_soreness():
     athlete_stats = AthleteStats("tester")
-    athlete_stats.event_date = "2018-12-03"
+    athlete_stats.event_date = parse_date("2018-12-03")
 
     soreness = Soreness()
     soreness.body_part = BodyPart(BodyPartLocation(9), None)
@@ -95,7 +96,7 @@ def test_ps_soreness_update_expired_soreness():
 
 def test_ps_soreness_update_consecutive_days():
     athlete_stats = AthleteStats("tester")
-    athlete_stats.event_date = "2018-12-03"
+    athlete_stats.event_date = parse_date("2018-12-03")
 
     soreness = Soreness()
     soreness.body_part = BodyPart(BodyPartLocation(9), None)
@@ -117,7 +118,7 @@ def test_ps_soreness_update_consecutive_days():
 
 def test_daily_soreness_update_expired_soreness():
     athlete_stats = AthleteStats("tester")
-    athlete_stats.event_date = "2018-12-03"
+    athlete_stats.event_date = parse_date("2018-12-03")
 
     soreness = Soreness()
     soreness.body_part = BodyPart(BodyPartLocation(9), None)
@@ -142,7 +143,7 @@ def test_daily_soreness_update_expired_soreness():
 
 def test_daily_soreness_update_two_day_consecutive_soreness():
     athlete_stats = AthleteStats("tester")
-    athlete_stats.event_date = "2018-12-03"
+    athlete_stats.event_date = parse_date("2018-12-03")
 
     soreness = Soreness()
     soreness.body_part = BodyPart(BodyPartLocation(9), None)
