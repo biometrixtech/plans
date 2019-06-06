@@ -1,7 +1,7 @@
 from serialisable import Serialisable
 
 from models.soreness import Soreness, BodyPartLocation, BodyPart
-from models.session import SessionType
+# from models.session import SessionType
 import datetime
 from utils import parse_datetime, format_datetime, parse_date
 
@@ -19,7 +19,7 @@ class PostSessionSurvey(Serialisable):
         self.event_date = self.event_date_time.strftime("%Y-%m-%d")
         self.user_id = user_id
         self.session_id = session_id
-        self.session_type = SessionType(session_type)
+        # self.session_type = SessionType(session_type)
         self.survey = PostSurvey(survey, event_date_time)
 
     def get_id(self):
@@ -32,7 +32,7 @@ class PostSessionSurvey(Serialisable):
         ret = {
             'event_date': self.event_date,
             'user_id': self.user_id,
-            'session_type': self.session_type.value,
+            # 'session_type': self.session_type.value,
             'session_id': self.session_id,
             'survey': self.survey.json_serialise()
         }

@@ -1,4 +1,6 @@
 import csv
+import os
+os.environ['ENVIRONMENT'] = 'test'
 #import exercise_generator
 #import database_config  # not committed to source code, contains connection string
 from aws_xray_sdk.core import xray_recorder
@@ -23,7 +25,7 @@ with open('Exercise_Library.csv', newline='') as csvfile:
     row_count = 0
     for row in exercise_reader:
         if row_count > 0:
-            if row[8] != "x" and row[26] == "x":
+            if row[26] == "x":
                 exercise_item = models.exercise.Exercise(row[0])
                 exercise_item.display_name = row[1]
                 exercise_item.name = row[2]

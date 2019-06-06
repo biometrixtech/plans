@@ -11,123 +11,123 @@ def training_plan_manager():
     return mgr
 
 
-def test_no_surveys_available_with_date():
-
-    mgr = training_plan_manager()
-    surveys_today = mgr.post_session_surveys_today()
-
-    assert False is surveys_today
-
-
-def test_one_survey_available_with_date():
-    user_id = "tester"
-
-    mgr = training_plan_manager()
-
-    soreness_list = [TestUtilities().body_part_soreness(12, 1)]
-
-    post_survey = TestUtilities().get_post_survey(4, soreness_list)
-    post_session_survey = \
-        PostSessionSurvey(datetime.datetime(2018, 7, 12, 17, 30, 0).strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, None,
-                          1, post_survey)
-    mgr.trigger_date_time = datetime.datetime(2018, 7, 12, 17, 30, 0)
-    mgr.post_session_surveys = [post_session_survey]
-    surveys_today = mgr.post_session_surveys_today()
-
-    assert True is surveys_today
+# def test_no_surveys_available_with_date():
+#
+#     mgr = training_plan_manager()
+#     surveys_today = mgr.post_session_surveys_today()
+#
+#     assert False is surveys_today
 
 
-def test_no_surveys_available_wrong_date_format():
-
-    mgr = training_plan_manager()
-    mgr.trigger_date_time = datetime.datetime.now()
-    mgr.post_session_surveys = []
-    surveys_today = mgr.post_session_surveys_today()
-
-    assert False is surveys_today
-
-
-def test_one_survey_available_wrong_date_format():
-    user_id = "tester"
-
-    mgr = training_plan_manager()
-
-    soreness_list = [TestUtilities().body_part_soreness(12, 1)]
-
-    post_survey = TestUtilities().get_post_survey(4, soreness_list)
-    post_session_survey = \
-        PostSessionSurvey(datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, None,
-                          1, post_survey)
-    mgr.trigger_date_time = datetime.datetime.now()
-    mgr.post_session_surveys = [post_session_survey]
-    surveys_today = mgr.post_session_surveys_today()
-
-    assert True is surveys_today
+# def test_one_survey_available_with_date():
+#     user_id = "tester"
+#
+#     mgr = training_plan_manager()
+#
+#     soreness_list = [TestUtilities().body_part_soreness(12, 1)]
+#
+#     post_survey = TestUtilities().get_post_survey(4, soreness_list)
+#     post_session_survey = \
+#         PostSessionSurvey(datetime.datetime(2018, 7, 12, 17, 30, 0).strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, None,
+#                           1, post_survey)
+#     mgr.trigger_date_time = datetime.datetime(2018, 7, 12, 17, 30, 0)
+#     mgr.post_session_surveys = [post_session_survey]
+#     surveys_today = mgr.post_session_surveys_today()
+#
+#     assert True is surveys_today
 
 
-def test_no_session_submitted_no_session_planned():
-    mgr = training_plan_manager()
-    daily_plan = DailyPlan(event_date='2018-12-10')
-    daily_plan.session_from_readiness = False
-    daily_plan.sessions_planned_readiness = False
-    surveys_today = False
-    mgr.daily_plan = daily_plan
-
-    assert mgr.show_post_recovery(surveys_today)
-
-
-def test_no_session_submitted_session_planned():
-    mgr = training_plan_manager()
-    daily_plan = DailyPlan(event_date='2018-12-10')
-    daily_plan.session_from_readiness = False
-    daily_plan.sessions_planned_readiness = True
-    surveys_today = False
-    mgr.daily_plan = daily_plan
-
-    assert not mgr.show_post_recovery(surveys_today)
+# def test_no_surveys_available_wrong_date_format():
+#
+#     mgr = training_plan_manager()
+#     mgr.trigger_date_time = datetime.datetime.now()
+#     mgr.post_session_surveys = []
+#     surveys_today = mgr.post_session_surveys_today()
+#
+#     assert False is surveys_today
 
 
-def test_session_submitted_session_planned():
-    mgr = training_plan_manager()
-    daily_plan = DailyPlan(event_date='2018-12-10')
-    daily_plan.session_from_readiness = True
-    daily_plan.sessions_planned_readiness = True
-    surveys_today = True
-    mgr.daily_plan = daily_plan
-    assert not mgr.show_post_recovery(surveys_today)
-
-
-def test_session_submitted_no_session_planned():
-    mgr = training_plan_manager()
-    daily_plan = DailyPlan(event_date='2018-12-10')
-    daily_plan.session_from_readiness = True
-    daily_plan.sessions_planned_readiness = False
-    surveys_today = True
-    mgr.daily_plan = daily_plan
-
-    assert mgr.show_post_recovery(surveys_today)
-
-
-def test_readiness_nosession_session_planned_post_sessionpresent():
-    mgr = training_plan_manager()
-    daily_plan = DailyPlan(event_date='2018-12-10')
-    daily_plan.session_from_readiness = False
-    daily_plan.sessions_planned_readiness = True
-    surveys_today = True
-    mgr.daily_plan = daily_plan
-
-    assert mgr.show_post_recovery(surveys_today)
-
-
-def test_readiness_nosession_nosession_planned_post_sessionpresent():
-    mgr = training_plan_manager()
-    daily_plan = DailyPlan(event_date='2018-12-10')
-    daily_plan.session_from_readiness = False
-    daily_plan.sessions_planned_readiness = False
-    surveys_today = True
-    mgr.daily_plan = daily_plan
-
-    assert mgr.show_post_recovery(surveys_today)
+# def test_one_survey_available_wrong_date_format():
+#     user_id = "tester"
+#
+#     mgr = training_plan_manager()
+#
+#     soreness_list = [TestUtilities().body_part_soreness(12, 1)]
+#
+#     post_survey = TestUtilities().get_post_survey(4, soreness_list)
+#     post_session_survey = \
+#         PostSessionSurvey(datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"), user_id, None,
+#                           1, post_survey)
+#     mgr.trigger_date_time = datetime.datetime.now()
+#     mgr.post_session_surveys = [post_session_survey]
+#     surveys_today = mgr.post_session_surveys_today()
+#
+#     assert True is surveys_today
+#
+#
+# def test_no_session_submitted_no_session_planned():
+#     mgr = training_plan_manager()
+#     daily_plan = DailyPlan(event_date='2018-12-10')
+#     daily_plan.session_from_readiness = False
+#     daily_plan.train_later = False
+#     surveys_today = False
+#     mgr.daily_plan = daily_plan
+#
+#     assert mgr.show_post_recovery(surveys_today)
+#
+#
+# def test_no_session_submitted_session_planned():
+#     mgr = training_plan_manager()
+#     daily_plan = DailyPlan(event_date='2018-12-10')
+#     daily_plan.session_from_readiness = False
+#     daily_plan.train_later = True
+#     surveys_today = False
+#     mgr.daily_plan = daily_plan
+#
+#     assert not mgr.show_post_recovery(surveys_today)
+#
+#
+# def test_session_submitted_session_planned():
+#     mgr = training_plan_manager()
+#     daily_plan = DailyPlan(event_date='2018-12-10')
+#     daily_plan.session_from_readiness = True
+#     daily_plan.train_later = True
+#     surveys_today = True
+#     mgr.daily_plan = daily_plan
+#     assert not mgr.show_post_recovery(surveys_today)
+#
+#
+# def test_session_submitted_no_session_planned():
+#     mgr = training_plan_manager()
+#     daily_plan = DailyPlan(event_date='2018-12-10')
+#     daily_plan.session_from_readiness = True
+#     daily_plan.train_later = False
+#     surveys_today = True
+#     mgr.daily_plan = daily_plan
+#
+#     assert mgr.show_post_recovery(surveys_today)
+#
+#
+# def test_readiness_nosession_session_planned_post_sessionpresent():
+#     mgr = training_plan_manager()
+#     daily_plan = DailyPlan(event_date='2018-12-10')
+#     daily_plan.session_from_readiness = False
+#     daily_plan.train_later = True
+#     surveys_today = True
+#     mgr.daily_plan = daily_plan
+#
+#     assert mgr.show_post_recovery(surveys_today)
+#
+#
+# def test_readiness_nosession_nosession_planned_post_sessionpresent():
+#     mgr = training_plan_manager()
+#     daily_plan = DailyPlan(event_date='2018-12-10')
+#     daily_plan.session_from_readiness = False
+#     daily_plan.train_later = False
+#     surveys_today = True
+#     mgr.daily_plan = daily_plan
+#
+#     assert mgr.show_post_recovery(surveys_today)
 
 
 '''

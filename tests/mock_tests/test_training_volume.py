@@ -1,5 +1,9 @@
+from aws_xray_sdk.core import xray_recorder
+xray_recorder.configure(sampling=False)
+xray_recorder.begin_segment(name="test")
+
 from models.daily_plan import DailyPlan
-from models.session import PracticeSession, SessionType
+from models.session import SportTrainingSession, SessionType
 from models.post_session_survey import PostSurvey, PostSessionSurvey
 from models.daily_readiness import DailyReadiness
 from models.stats import AthleteStats
@@ -12,6 +16,7 @@ from tests.mocks.mock_daily_readiness_datastore import DailyReadinessDatastore
 from tests.mocks.mock_post_session_survey_datastore import PostSessionSurveyDatastore
 from tests.mocks.mock_athlete_stats_datastore import AthleteStatsDatastore
 from logic.stats_processing import StatsProcessing
+from models.load_stats import LoadStats
 from logic.training_volume_processing import TrainingVolumeProcessing
 from utils import parse_date, format_date
 
@@ -33,13 +38,13 @@ def get_daily_plans(start_date, rpe_list, time_list):
 
     for d in range(0, len(dates)):
         daily_plan = DailyPlan(event_date=dates[d].strftime("%Y-%m-%d"))
-        practice_session = PracticeSession()
-        practice_session.event_date = dates[d]
+        session = SportTrainingSession()
+        session.event_date = dates[d]
         post_survey = TestUtilities().get_post_survey(rpe_list[d], [])
         post_session = PostSurvey(survey=post_survey, event_date=dates[d].strftime("%Y-%m-%dT%H:%M:%SZ"))
-        practice_session.post_session_survey = post_session
-        practice_session.duration_minutes = time_list[d]
-        daily_plan.training_sessions.append(practice_session)
+        session.post_session_survey = post_session
+        session.duration_minutes = time_list[d]
+        daily_plan.training_sessions.append(session)
         plans.append(daily_plan)
 
     return plans
@@ -73,6 +78,38 @@ def get_post_session_surveys(start_date, rpe_list):
 
     return surveys
 
+
+def test_duration_minutes_load():
+
+    load_stats = LoadStats()
+    load_stats.min_duration_minutes = 0
+    load_stats.max_duration_minutes = 100
+
+    load = load_stats.get_duration_minutes_load(50)
+
+    assert load == 50.0
+
+
+def test_duration_minutes_load_min_max_none():
+
+    load_stats = LoadStats()
+    load_stats.min_duration_minutes = None
+    load_stats.max_duration_minutes = None
+
+    load = load_stats.get_duration_minutes_load(50)
+
+    assert load == 50.0
+
+
+def test_duration_minutes_load_min_max_high():
+
+    load_stats = LoadStats()
+    load_stats.min_duration_minutes = None
+    load_stats.max_duration_minutes = None
+
+    load = load_stats.get_duration_minutes_load(500)
+
+    assert load == 100.00
 
 '''
 Liz Data
@@ -112,7 +149,7 @@ def test_strain_events():
         strain_list.append((seed_date, seed[s]))
         seed_date = seed_date + timedelta(days=1)
 
-    tvp = TrainingVolumeProcessing("2018-01-01", "2018-01-09")
+    tvp = TrainingVolumeProcessing("2018-01-01", "2018-01-09", athlete_stats.load_stats)
     tvp.internal_load_tuples = strain_list
     strain, strain_events = tvp.get_historical_internal_strain("2018-01-01", "2018-01-09", None)
 

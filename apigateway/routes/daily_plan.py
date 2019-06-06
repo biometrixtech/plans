@@ -54,8 +54,8 @@ def handle_daily_plan_get(principal_id=None):
             dormant_tipping_candidates,
             current_sport_name,
             current_position,
-            functional_strength_eligible,
-            completed_functional_strength_sessions
+            # functional_strength_eligible,
+            # completed_functional_strength_sessions
         ) = previous_soreness_processor.get_previous_soreness()
         readiness = {
                       'body_parts': sore_body_parts,
@@ -64,8 +64,8 @@ def handle_daily_plan_get(principal_id=None):
                       'clear_candidates': clear_candidates,
                       'current_position': current_position,
                       'current_sport_name': current_sport_name,
-                      'functional_strength_eligible': functional_strength_eligible,
-                      'completed_functional_strength_sessions': completed_functional_strength_sessions
+                      # 'functional_strength_eligible': functional_strength_eligible,
+                      # 'completed_functional_strength_sessions': completed_functional_strength_sessions
                      }
 
         typical_sessions = previous_soreness_processor.get_typical_sessions()

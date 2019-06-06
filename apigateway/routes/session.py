@@ -28,14 +28,19 @@ app = Blueprint('session', __name__)
 @require.body({'event_date': str, 'sessions': list})
 @xray_recorder.capture('routes.session.create')
 def handle_session_create(principal_id=None):
+
     user_id = principal_id
     event_date = parse_datetime(request.json['event_date'])
     plan_update_required = False
+    train_later = False
+    if 'sessions_planned' in request.json and request.json['sessions_planned']:
+        train_later = True
     athlete_stats = athlete_stats_datastore.get(athlete_id=user_id)
     plan_event_date = format_date(event_date)
     survey_processor = SurveyProcessing(user_id, event_date,
                                         athlete_stats=athlete_stats,
                                         datastore_collection=datastore_collection)
+    survey_processor.user_age = request.json.get('user_age', 20)
     for session in request.json['sessions']:
         if session is None:
             continue
@@ -44,11 +49,12 @@ def handle_session_create(principal_id=None):
     # update daily pain and soreness in athlete_stats
     survey_processor.patch_daily_and_historic_soreness(survey='post_session')
 
-    # check that not all sessions are deleted or ignored
+    # check if any of the non-ignored and non-deleted sessions are high load
     for session in survey_processor.sessions:
         if not session.deleted and not session.ignored:
             plan_update_required = True
             break
+    #survey_processor.check_high_relative_load_sessions(survey_processor.sessions)
 
     # check if plan exists, if not create a new one and save it to database, also check if existing one needs updating flags
 
@@ -58,11 +64,13 @@ def handle_session_create(principal_id=None):
         plan.last_sensor_sync = daily_plan_datastore.get_last_sensor_sync(user_id, plan_event_date)
     else:
         plan = daily_plan_datastore.get(user_id, plan_event_date, plan_event_date)[0]
-        if plan_update_required and (not plan.sessions_planned or plan.session_from_readiness):
+        if plan_update_required and not plan.sessions_planned:
             plan.sessions_planned = True
-            plan.session_from_readiness = False
+        #if not survey_processor.athlete_stats.high_relative_load_session and len(plan.training_sessions) > 0:
+        #    survey_processor.check_high_relative_load_sessions(plan.training_sessions)
 
     # add sessions to plan and write to mongo
+    plan.train_later = train_later
     plan.training_sessions.extend(survey_processor.sessions)
     daily_plan_datastore.put(plan)
 
@@ -236,6 +244,32 @@ def handle_session_sensor_data(principal_id=None):
             'daily_plan': plan}, 200
 
 
+@app.route('/three_sensor_data', methods=['POST'])
+@require.authenticated.any
+@require.body({'sessions': list})
+@xray_recorder.capture('routes.session.add_sensor_data')
+def handle_session_three_sensor_data(principal_id=None):
+    user_id = request.json['user_id']
+    event_date = parse_datetime(request.json['event_date'])
+    plan_event_day = format_date(event_date)
+    # update last_sensor_syc date
+    if not _check_plan_exists(user_id, plan_event_day):
+        plan = DailyPlan(event_date=plan_event_day)
+        plan.user_id = user_id
+    else:
+        plan = daily_plan_datastore.get(user_id, plan_event_day, plan_event_day)[0]
+
+    sessions = request.json['sessions']
+    for session in sessions:
+        event_date = session['event_date']
+        session_obj = create_session(6, {'description': 'test_three_sensor_data',
+                                         'event_date': event_date})
+        plan.training_sessions.append(session_obj)
+    daily_plan_datastore.put(plan)
+
+    return {'message': 'success'}
+
+
 @app.route('/typical', methods=['POST'])
 @require.authenticated.any
 @require.body({'event_date': str})
@@ -262,27 +296,20 @@ def handle_no_sessions_planned(principal_id=None):
         plan = DailyPlan(event_date=plan_event_date)
         plan.user_id = user_id
         plan.last_sensor_sync = daily_plan_datastore.get_last_sensor_sync(user_id, plan_event_date)
-        plan.sessions_planned = False
-        daily_plan_datastore.put(plan)
     else:
         plan = daily_plan_datastore.get(user_id, plan_event_date, plan_event_date)[0]
-        if plan.sessions_planned:
-            plan.sessions_planned = False
-            daily_plan_datastore.put(plan)
 
-    survey_complete = plan.daily_readiness_survey_completed()
-    plan = plan.json_serialise()
-    plan['daily_readiness_survey_completed'] = survey_complete
-    if plan['pre_recovery_completed']:
-        plan['landing_screen'] = 1.0
-        plan['nav_bar_indicator'] = 1.0
-    else:
-        plan['landing_screen'] = 1.0
-        plan['nav_bar_indicator'] = 0.0
+    plan.sessions_planned = False
+    plan.train_later = False
+    daily_plan_datastore.put(plan)
+    athlete_stats = athlete_stats_datastore.get(athlete_id=user_id)
+    plan = create_plan(user_id,
+                       event_date,
+                       athlete_stats=athlete_stats,
+                       update_stats=False,
+                       datastore_collection=datastore_collection)
 
-    del plan['daily_readiness_survey'], plan['user_id']
-    return {'message': 'success',
-            'daily_plan': plan}, 200
+    return {'daily_plans': [plan]}, 200
 
 
 def get_sensor_data(session):

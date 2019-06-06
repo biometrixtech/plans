@@ -31,7 +31,7 @@ app = Blueprint('daily_readiness', __name__)
 @require.authenticated.any
 @require.body({'date_time': str, "soreness": list})
 @xray_recorder.capture('routes.daily_readiness.create')
-def handle_daily_readiness_create(principal_id=None):
+def handle_daily_readiness_create(principal_id):
     validate_data()
     event_date = parse_datetime(request.json['date_time'])
     event_date = fix_early_survey_event_date(event_date)
@@ -48,25 +48,27 @@ def handle_daily_readiness_create(principal_id=None):
     )
 
     sessions_planned = True
-    sessions_planned_readiness = True
-    session_from_readiness = False
+    train_later = True
     plan_event_date = format_date(event_date)
     athlete_stats = athlete_stats_datastore.get(athlete_id=user_id)
     if athlete_stats is None:
         athlete_stats = AthleteStats(user_id)
         athlete_stats.event_date = plan_event_date
     survey_processor = SurveyProcessing(user_id, event_date, athlete_stats, datastore_collection)
+    survey_processor.user_age = request.json.get('user_age', 20)
 
     if 'sessions_planned' in request.json and not request.json['sessions_planned']:
         sessions_planned = False
-        sessions_planned_readiness = False
+        train_later = False
     if 'sessions' in request.json and len(request.json['sessions']) > 0:
         sessions_planned = True
-        session_from_readiness = True
         for session in request.json['sessions']:
             if session is None:
                 continue
             survey_processor.create_session_from_survey(session)
+
+        # check if any of the non-ignored and non-deleted sessions are high load
+        #survey_processor.check_high_relative_load_sessions(survey_processor.sessions)
 
     if "sleep_data" in request.json and len(request.json['sleep_data']) > 0:
         daily_sleep_data = DailySleepData(user_id=user_id,
@@ -85,8 +87,7 @@ def handle_daily_readiness_create(principal_id=None):
         plan.user_id = user_id
         plan.training_sessions = survey_processor.sessions
     plan.sessions_planned = sessions_planned
-    plan.session_from_readiness = session_from_readiness
-    plan.sessions_planned_readiness = sessions_planned_readiness
+    plan.train_later = train_later
     if len(survey_processor.heart_rate_data) > 0:
         heart_rate_datastore.put(survey_processor.heart_rate_data)
 
@@ -135,8 +136,8 @@ def handle_daily_readiness_get(principal_id=None):
         dormant_tipping_candidates,
         current_sport_name,
         current_position,
-        functional_strength_eligible,
-        completed_functional_strength_sessions
+        # functional_strength_eligible,
+        # completed_functional_strength_sessions
         ) = previous_soreness_processor.get_previous_soreness()
 
     typical_sessions = previous_soreness_processor.get_typical_sessions()
@@ -148,8 +149,8 @@ def handle_daily_readiness_get(principal_id=None):
                           'clear_candidates': clear_candidates,
                           'current_position': current_position,
                           'current_sport_name': current_sport_name,
-                          'functional_strength_eligible': functional_strength_eligible,
-                          'completed_functional_strength_sessions': completed_functional_strength_sessions
+                          # 'functional_strength_eligible': functional_strength_eligible,
+                          # 'completed_functional_strength_sessions': completed_functional_strength_sessions
                          },
             "typical_sessions": typical_sessions}, 200
 

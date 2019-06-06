@@ -1,4 +1,5 @@
 from models.daily_plan import DailyPlan
+from utils import parse_date
 
 
 class DailyPlanDatastore(object):
@@ -28,7 +29,14 @@ class DailyPlanDatastore(object):
             raise e
 
     def _query_mongodb(self, user_id, start_date, end_date):
-        return self.daily_plans
+
+        plans = []
+
+        for p in self.daily_plans:
+            if parse_date(start_date) <= parse_date(p.event_date) <= parse_date(end_date):
+                plans.append(p)
+
+        return plans
 
     def get_last_sensor_sync(self, user_id, event_date):
         return None
@@ -87,8 +95,8 @@ class DailyPlanDatastore(object):
         for recovery_exercise in recovery_session.recommended_exercises():
             exercise_bson += ({'name': recovery_exercise.exercise.name,
                                'position_order': recovery_exercise.position_order,
-                               'reps_assigned': recovery_exercise.reps_assigned,
-                               'sets_assigned': recovery_exercise.sets_assigned,
+                               'complete_reps_assigned': recovery_exercise.reps_assigned,
+                               'complete_sets_assigned': recovery_exercise.sets_assigned,
                                'seconds_duration': recovery_exercise.duration()
                                },)
         recovery_bson = ({'minutes_duration': recovery_session.duration_minutes,

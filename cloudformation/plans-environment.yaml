@@ -173,7 +173,7 @@ Resources:
                     USERS_API_VERSION: { Ref: "UsersApiVersion"}
             Handler: "apigateway.handler"
             Runtime: "python3.6"
-            Timeout: "30"
+            Timeout: "60"
             Role: { "Fn::GetAtt" : [ "ApiGatewayLambdaExecutionRole", "Arn" ] }
             FunctionName: { "Fn::Sub": "plans-${Environment}-apigateway-execute" }
             Tags:
