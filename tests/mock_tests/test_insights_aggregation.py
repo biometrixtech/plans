@@ -1063,6 +1063,7 @@ def test_aggregate_trends_cleared_trend_not_doms():
     """
     current_date_time = datetime.datetime.now()
     trend = Trend(TriggerType(8))
+    trend.body_parts = [BodyPartSide(BodyPartLocation(11), 1)]
     trend.add_data()
     alert = get_alert(7, body_part=(11, 2))
 
