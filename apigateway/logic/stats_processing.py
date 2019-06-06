@@ -167,9 +167,9 @@ class StatsProcessing(object):
             current_athlete_stats.session_RPE = None
             current_athlete_stats.session_RPE_event_date = None
             # clear any doms
-            for h in current_athlete_stats.historic_soreness:
-                if h.historic_soreness_status == HistoricSorenessStatus.doms:
-                    self.clear_doms(h)
+            #for h in current_athlete_stats.historic_soreness:
+            #    if h.historic_soreness_status == HistoricSorenessStatus.doms:
+            #        self.clear_doms(h)
 
             current_athlete_stats.historic_soreness = list(h for h in current_athlete_stats.historic_soreness if h.cleared_date_time is None)
 
@@ -658,9 +658,9 @@ class StatsProcessing(object):
                 else:
                     # first check if we can clear DOMS
                     if historic_soreness.historic_soreness_status == HistoricSorenessStatus.doms:
-                        historic_soreness = self.clear_doms(historic_soreness)
-                        if historic_soreness.cleared_date_time is None:
-                            acute_pain_list.append(historic_soreness)
+                        #historic_soreness = self.clear_doms(historic_soreness)
+                        #if historic_soreness.cleared_date_time is None:
+                        acute_pain_list.append(historic_soreness)
 
                     else:
                         soreness = HistoricSoreness(g.location, g.side, g.is_pain)
