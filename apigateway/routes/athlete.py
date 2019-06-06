@@ -172,10 +172,10 @@ def manage_prep_push_notification(athlete_id):
     event_date = request.json['event_date']
     plan = _get_plan(athlete_id, event_date)
     if (plan and  # plan exists
-            plan.pre_active_rest is not None and  # pre_active_rest is assigned
-            _are_exercises_assigned(plan.pre_active_rest, 'pre') and  # and exercises are present
-            plan.pre_active_rest.start_date is None and  # and not started
-            plan.pre_active_rest.active and  # and still active
+            len(plan.pre_active_rest) > 0 and  # pre_active_rest is assigned
+            _are_exercises_assigned(plan.pre_active_rest[0], 'pre') and  # and exercises are present
+            plan.pre_active_rest[0].start_date_time is None and  # and not started
+            plan.pre_active_rest[0].active and  # and still active
             not plan.pre_active_rest_completed):  # and one hasn't been completed previously
         body = {"message": "Your prep exercises are ready! Tap to to get started!",
                 "call_to_action": "COMPLETE_ACTIVE_PREP"}
@@ -192,10 +192,10 @@ def manage_recovery_push_notification(athlete_id):
     event_date = request.json['event_date']
     plan = _get_plan(athlete_id, event_date)
     if (plan and  # plan is present
-            plan.post_active_rest is not None and  # post_active_rest is assigned
-            _are_exercises_assigned(plan.post_active_rest, 'post') and  # and exercises are present
-            plan.post_active_rest.start_date is None and  # and not started
-            plan.post_active_rest.active and  # is still active
+            len(plan.post_active_rest) > 0 and  # post_active_rest is assigned
+            _are_exercises_assigned(plan.post_active_rest[0], 'post') and  # and exercises are present
+            plan.post_active_rest[0].start_date_time is None and  # and not started
+            plan.post_active_rest[0].active and  # is still active
             not plan.post_active_rest_completed):  # and one hasn't been completed previously
         body = {"message": "Your recovery exercises are ready! Tap to begin taking care!",
                 "call_to_action": "COMPLETE_ACTIVE_RECOVERY"}
@@ -244,20 +244,20 @@ def manage_recovery_completion_push_notification(athlete_id):
     event_date = request.json['event_date']
     plan = _get_plan(athlete_id, event_date)
     if (recovery_type == 'prep' and  # is pre_active_rest
-            plan and plan.pre_active_rest is not None and  # and pre_active_rest is assigned
-            plan.pre_active_rest.start_date is not None and  # and started
-            plan.pre_active_rest.active and  # and is still active
-            not plan.pre_active_rest.completed):  # and not completed
+            plan and len(plan.pre_active_rest) > 0 and  # and pre_active_rest is assigned
+            plan.pre_active_rest[0].start_date_time is not None and  # and started
+            plan.pre_active_rest[0].active and  # and is still active
+            not plan.pre_active_rest[0].completed):  # and not completed
         body = {"message": "Take time to invest in yourself. Let's finish your exercises!",
                 "call_to_action": "COMPLETE_ACTIVE_PREP"}
         _notify_user(athlete_id, body)
         return {'message': 'User Notified'}, 200
 
     elif (recovery_type == 'recovery' and  # is post_active_rest
-            plan and plan.post_active_rest is not None and  # and post_active_rest is assigned
-            plan.post_active_rest.start_date is not None and  # and started
-            plan.post_active_rest.active and  # and is still active
-            not plan.post_active_rest.completed):  # and not completed
+            plan and len(plan.post_active_rest) > 0 and  # and post_active_rest is assigned
+            plan.post_active_rest[0].start_date_time is not None and  # and started
+            plan.post_active_rest[0].active and  # and is still active
+            not plan.post_active_rest[0].completed):  # and not completed
         body = {"message": "Take time to invest in yourself. Let's finish your exercises!",
                 "call_to_action": "COMPLETE_ACTIVE_RECOVERY"}
         _notify_user(athlete_id, body)
