@@ -164,7 +164,7 @@ def handle_request_mobilize(principal_id=None):
     athlete_stats = athlete_stats_datastore.get(user_id)
     plan = create_plan(user_id,
                        event_date,
-                       update_stats=False,
+                       update_stats=True,
                        athlete_stats=athlete_stats,
                        datastore_collection=datastore_collection,
                        force_data=force_data,
