@@ -823,10 +823,8 @@ class ActiveRest(ModalityBase):
         if muscular_strain_high:
             goal = AthleteGoal(None, 1, AthleteGoalType.sport)
             goal.trigger_type = TriggerType.overreaching_high_muscular_strain  # 8
-            for sport_name in sports:
-                alert = Alert(goal)
-                alert.sport_name = sport_name
-                self.alerts.append(alert)
+            alert = Alert(goal)
+            self.alerts.append(alert)
 
         hist_soreness = list(s for s in soreness_list if not s.is_dormant_cleared() and not s.pain and
                              (s.is_persistent_soreness() or
@@ -1906,10 +1904,8 @@ class CoolDown(ModalityBase, Serialisable):
         if muscular_strain_high:
             goal = AthleteGoal(None, 1, AthleteGoalType.sport)
             goal.trigger_type = TriggerType.overreaching_high_muscular_strain  # 8
-            for sport_name in sports:
-                alert = Alert(goal)
-                alert.sport_name = sport_name
-                self.alerts.append(alert)
+            alert = Alert(goal)
+            self.alerts.append(alert)
 
         hist_soreness = list(s for s in soreness_list if not s.is_dormant_cleared() and not s.pain and
                              (s.is_persistent_soreness() or
