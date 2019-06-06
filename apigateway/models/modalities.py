@@ -791,12 +791,12 @@ class ActiveRest(ModalityBase):
         if self.force_data:
             self.get_general_exercises(exercise_library, max_severity)
         if soreness_list is not None and len(soreness_list) > 0:
+            self.check_reactive_recover_from_sport(soreness_list, exercise_library, high_relative_load_session,
+                                                   high_relative_intensity_logged,
+                                                   muscular_strain_high,
+                                                   sports, max_severity)
+            checked_recover_from_sport = True
             for s in soreness_list:
-                self.check_reactive_recover_from_sport(soreness_list, exercise_library, high_relative_load_session,
-                                                       high_relative_intensity_logged,
-                                                       muscular_strain_high,
-                                                       sports, max_severity)
-                checked_recover_from_sport = True
                 self.check_reactive_care_soreness(s, exercise_library, max_severity)
                 self.check_reactive_care_pain(s, exercise_library, max_severity)
                 # if max_severity < 3:
