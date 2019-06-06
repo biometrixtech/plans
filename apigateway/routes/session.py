@@ -306,7 +306,7 @@ def handle_no_sessions_planned(principal_id=None):
     plan = create_plan(user_id,
                        event_date,
                        athlete_stats=athlete_stats,
-                       update_stats=False,
+                       update_stats=True,
                        datastore_collection=datastore_collection)
 
     return {'daily_plans': [plan]}, 200
