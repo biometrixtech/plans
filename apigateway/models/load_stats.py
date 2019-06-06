@@ -40,7 +40,7 @@ class LoadStats(Serialisable):
 
     @classmethod
     def json_deserialise(cls, input_dict):
-        load_stats = LoadStats()
+        load_stats = cls()
         if input_dict is not None:
             load_stats.min_duration_health = input_dict["min_duration_health"]
             load_stats.max_duration_health = input_dict["max_duration_health"]
