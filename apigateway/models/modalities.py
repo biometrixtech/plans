@@ -175,6 +175,12 @@ class ModalityBase(object):
             self.reactivate_complete_goals()
             self.default_plan = "Complete"
 
+    def add_goals(self, dosages):
+
+        for dosage in dosages:
+            if dosage.goal.goal_type not in self.goals:
+                self.goals[dosage.goal.goal_type] = ModalityGoal()
+
     def update_goals(self, dosage):
 
         if dosage.goal.goal_type not in self.goals:
@@ -276,6 +282,7 @@ class ModalityBase(object):
                                                              x.default_efficient_sets_assigned,
                                                              x.default_efficient_reps_assigned), reverse=True)
 
+                self.add_goals(a.dosages)
                 dosage = a.dosages[0]
                 self.update_goals(dosage)
 
@@ -904,7 +911,8 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
             'active': self.active,
             'default_plan': self.default_plan,
             'alerts': [g.json_serialise() for g in self.alerts],
-            'goals': {str(goal_type.value): goal.json_serialise() for (goal_type, goal) in self.goals.items()}
+            'goals': {str(goal_type.value): goal.json_serialise() for (goal_type, goal) in self.goals.items()},
+            'force_data': self.force_data
         }
         return ret
 
@@ -913,7 +921,8 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
         pre_active_rest = cls(#high_relative_load_session=input_dict.get('high_relative_load_session', False),
                               #high_relative_intensity_logged=input_dict.get('high_relative_intensity_logged', False),
                               #muscular_strain_high=input_dict.get('muscular_strain_high', False),
-                              event_date_time=input_dict.get('event_date_time', None))
+                              event_date_time=input_dict.get('event_date_time', None),
+                              force_data=input_dict.get('force_data', False))
         pre_active_rest.active = input_dict.get("active", True)
         pre_active_rest.start_date_time = input_dict.get("start_date_time", None)
         pre_active_rest.completed_date_time = input_dict.get("completed_date_time", None)
@@ -1319,7 +1328,8 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
             'active': self.active,
             'default_plan': self.default_plan,
             'alerts': [g.json_serialise() for g in self.alerts],
-            'goals': {str(goal_type.value): goal.json_serialise() for (goal_type, goal) in self.goals.items()}
+            'goals': {str(goal_type.value): goal.json_serialise() for (goal_type, goal) in self.goals.items()},
+            'force_data': self.force_data
         }
         return ret
 
@@ -1328,7 +1338,8 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
         post_active_rest = cls(#high_relative_load_session=input_dict.get('high_relative_load_session', False),
                                #high_relative_intensity_logged=input_dict.get('high_relative_intensity_logged', False),
                                #muscular_strain_high=input_dict.get('muscular_strain_high', False),
-                               event_date_time=input_dict.get('event_date_time', None))
+                               event_date_time=input_dict.get('event_date_time', None),
+                               force_data=input_dict.get('force_data', False))
         post_active_rest.active = input_dict.get("active", True)
         post_active_rest.start_date_time = input_dict.get("start_date_time", None)
         post_active_rest.completed_date_time = input_dict.get("completed_date_time", None)
