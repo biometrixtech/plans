@@ -190,7 +190,10 @@ class AlertsProcessing(object):
             # check if trigger already exists
             if alert.goal.trigger_type == TriggerType.sore_today_doms and existing_doms_insight:
                 l_insight = [insight for insight in self.athlete_stats.longitudinal_insights if insight.trigger_type == TriggerType.sore_today_doms][0]
-                l_insight.start_date_time = self.trigger_date_time
+                if l_insight.start_date_time.date() == self.trigger_date_time.date():
+                    insights.append(l_insight)
+                else:
+                    l_insight.start_date_time = self.trigger_date_time
             elif alert.goal.trigger_type in existing_triggers:
                 insight = [insight for insight in insights if insight.trigger_type == alert.goal.trigger_type][0]
                 if alert.goal.text is not None:
