@@ -4,7 +4,7 @@ from models.stats import AthleteStats
 from models.soreness import BodyPartLocation, HistoricSoreness, HistoricSorenessStatus, Soreness, BodyPart
 from models.metrics import AthleteMetric, MetricType, DailyHighLevelInsight, WeeklyHighLevelInsight, MetricColor, SpecificAction
 from models.training_volume import StandardErrorRange
-from utils import parse_datetime
+from utils import parse_datetime, parse_date, format_date
 from fathomapi.utils.exceptions import InvalidSchemaException
 import numbers
 
@@ -165,6 +165,24 @@ class AthleteStatsDatastore(object):
         hs.average_severity = historic_soreness.get('average_severity', 0.0)
         hs.last_reported = historic_soreness.get('last_reported', "")
         hs.streak_start_date = historic_soreness.get('streak_start_date', "")
+        # overnight process might alter some of the datetime attributes and make them incompatible make forward compatible
+        if hs.last_reported == "":
+            last_reported_date_time = historic_soreness.get('last_reported_date_time', None)
+            if last_reported_date_time is not None:
+                try:
+                    hs.last_reported = format_date(parse_datetime(last_reported_date_time).date())
+                except InvalidSchemaException:
+                    hs.last_reported = ""
+        if hs.streak_start_date is None:  # default in plans 4_0 is None, not ""
+            hs.streak_start_date = ""
+        else:
+            try:
+                parse_date(hs.streak_start_date)  # it's already a date, continue
+            except InvalidSchemaException:
+                try:
+                    hs.streak_start_date = format_date(parse_datetime(hs.streak_start_date).date())
+                except InvalidSchemaException:
+                    hs.streak_start_date = ""
         hs.ask_acute_pain_question = historic_soreness.get('ask_acute_pain_question', False)
         hs.ask_persistent_2_question = historic_soreness.get('ask_persistent_2_question', False)
 

@@ -172,6 +172,7 @@ class HistoricSorenessStatus(IntEnum):
     almost_persistent_2_soreness = 9
     acute_pain = 10
     almost_acute_pain = 11
+    doms = 12
 
 
 class HistoricSoreness(Serialisable):
