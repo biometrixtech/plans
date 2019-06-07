@@ -175,6 +175,12 @@ class ModalityBase(object):
             self.reactivate_complete_goals()
             self.default_plan = "Complete"
 
+    def add_goals(self, dosages):
+
+        for dosage in dosages:
+            if dosage.goal.goal_type not in self.goals:
+                self.goals[dosage.goal.goal_type] = ModalityGoal()
+
     def update_goals(self, dosage):
 
         if dosage.goal.goal_type not in self.goals:
@@ -276,6 +282,7 @@ class ModalityBase(object):
                                                              x.default_efficient_sets_assigned,
                                                              x.default_efficient_reps_assigned), reverse=True)
 
+                self.add_goals(a.dosages)
                 dosage = a.dosages[0]
                 self.update_goals(dosage)
 
