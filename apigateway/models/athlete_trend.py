@@ -59,7 +59,7 @@ class Legend(object):
         return legend
 
 
-class VisualizaitonData(object):
+class VisualizationData(object):
     def __init__(self):
         self.y_axis_1 = "training volume"
         self.y_axis_2 = ""
@@ -111,7 +111,7 @@ class Trend(object):
         self.text = ""
         self.visualization_title = VisualizationTitle()
         self.visualization_type = VisualizationType(1)
-        self.visualization_data = VisualizaitonData()
+        self.visualization_data = VisualizationData()
         self.goal_targeted = []
         self.body_parts = []
         self.sport_names = []
@@ -152,7 +152,7 @@ class Trend(object):
         trend.text = input_dict['text']
         trend.visualization_title = VisualizationTitle.json_deserialise(input_dict['visualization_title'])
         trend.visualization_type = VisualizationType(input_dict['visualization_type'])
-        trend.visualization_data = VisualizaitonData.json_deserialise(input_dict['visualization_data'])
+        trend.visualization_data = VisualizationData.json_deserialise(input_dict['visualization_data'])
         trend.goal_targeted = input_dict['goal_targeted']
         trend.body_parts = [BodyPartSide.json_deserialise(body_part) for body_part in input_dict['body_parts']]
         trend.sport_names = [SportName(sport_name) for sport_name in input_dict['sport_names']]
