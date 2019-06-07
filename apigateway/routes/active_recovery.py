@@ -155,8 +155,8 @@ def handle_request_mobilize(principal_id=None):
                                     start_date=plan_event_day,
                                     end_date=plan_event_day)[0]
 
-    if (plan.train_later and len(plan.pre_active_rest) == 0) or \
-            (not plan.train_later and len(plan.post_active_rest) == 0):
+    if (plan.train_later and (len(plan.pre_active_rest) == 0) or plan.pre_active_rest[0].force_data) or \
+            (not plan.train_later and (len(plan.post_active_rest) == 0) or plan.post_active_rest[0].force_data):
         force_data = True
     else:
         force_data = False
