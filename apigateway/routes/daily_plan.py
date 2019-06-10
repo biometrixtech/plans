@@ -39,7 +39,8 @@ def handle_daily_plan_get(principal_id=None):
         survey_complete = plan.daily_readiness_survey_completed()
         if plan.event_date == format_date(event_date) and not survey_complete:
             need_soreness_sessions = True
-        if plan.event_date == format_date(event_date) and plan.trends is None:
+        # if RS completed today but no trends, this is the case of RS completed on old app and logging in to new app --> re-generate plan
+        if plan.event_date == format_date(event_date) and survey_complete and plan.trends is None:  
             plan = create_plan(user_id, event_date, update_stats=True)
         else:
             plan = cleanup_plan(plan)
