@@ -330,22 +330,26 @@ class TrainingVolumeProcessing(object):
                                                                          self.previous_week_sport_training_loads[sport_name]
                                                                          )
 
-        eligible_for_high_load_trigger = False
-
-        if athlete_stats.expected_weekly_workouts is None or athlete_stats.expected_weekly_workouts <= 1:
-            if len(self.acute_chronic_training_sessions) > 0:
-                eligible_for_high_load_trigger = True
-        elif 1 > athlete_stats.expected_weekly_workouts and athlete_stats.expected_weekly_workouts <= 4:
-            if len(self.acute_chronic_training_sessions) > 2:
-                eligible_for_high_load_trigger = True
-        elif athlete_stats.expected_weekly_workouts > 4:
-            eligible_for_high_load_trigger = True
-
-        if eligible_for_high_load_trigger:
-            athlete_stats.eligible_for_high_load_trigger = True
+        if athlete_stats.eligible_for_high_load_trigger:
             self.set_high_relative_load_sessions(athlete_stats, self.last_14_days_training_sessions)
         else:
-            athlete_stats.eligible_for_high_load_trigger = False
+            eligible_for_high_load_trigger = False
+
+            if athlete_stats.expected_weekly_workouts is None or athlete_stats.expected_weekly_workouts <= 1:
+                if len(self.acute_chronic_training_sessions) > 0:
+                    eligible_for_high_load_trigger = True
+            elif 1 > athlete_stats.expected_weekly_workouts and athlete_stats.expected_weekly_workouts <= 4:
+                if len(self.acute_chronic_training_sessions) > 2:
+                    eligible_for_high_load_trigger = True
+            elif athlete_stats.expected_weekly_workouts > 4:
+                if len(self.acute_chronic_training_sessions) > 4:
+                    eligible_for_high_load_trigger = True
+
+            if eligible_for_high_load_trigger:
+                athlete_stats.eligible_for_high_load_trigger = True
+                self.set_high_relative_load_sessions(athlete_stats, self.last_14_days_training_sessions)
+            else:
+                athlete_stats.eligible_for_high_load_trigger = False
 
         #athlete_stats.external_ramp = self.get_ramp(athlete_stats.expected_weekly_workouts,
         #                                            self.last_week_external_values, self.previous_week_external_values)
