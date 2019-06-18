@@ -523,15 +523,12 @@ class ExerciseAssignmentCalculator(object):
     def generate_alerts(self):
         alerts = []
         if self.eligible_for_high_load_trigger:
-            for s in self.soreness_list:
-                if self.high_relative_load_session or self.high_relative_intensity_session:
+            if self.high_relative_load_session or self.high_relative_intensity_session:
+                for s in self.soreness_list:
+                    goal = None
                     if s.pain and (s.is_acute_pain() or s.is_persistent_pain() or s.historic_soreness_status == HistoricSorenessStatus.persistent_2_pain):
                         goal = AthleteGoal("Increase prevention efficacy", 1, AthleteGoalType.preempt_corrective)
                         goal.trigger_type = TriggerType.hist_pain_high_volume_intensity  # 2
-                        alert = Alert(goal)
-                        alert.body_part = BodyPartSide(s.body_part.location, s.side)
-                        alert.sport_name = list(self.high_relative_load_session_sport_names)[0]
-                        alerts.append(alert)
                     elif (not s.pain and s.historic_soreness_status is not None
                           and (s.is_persistent_soreness()
                                or s.historic_soreness_status == HistoricSorenessStatus.persistent_2_soreness)
@@ -540,10 +537,12 @@ class ExerciseAssignmentCalculator(object):
                             if days_diff >= 30:
                                 goal = AthleteGoal("Increase prevention efficacy", 1, AthleteGoalType.preempt_corrective)
                                 goal.trigger_type = TriggerType.hist_sore_greater_30_high_volume_intensity  # 1
-                                alert = Alert(goal)
-                                alert.body_part = BodyPartSide(s.body_part.location, s.side)
-                                alert.sport_name = list(self.high_relative_load_session_sport_names)[0]
-                                alerts.append(alert)
+                    if goal is not None:
+                        for sport_name in self.high_relative_load_session_sport_names:
+                            alert = Alert(goal)
+                            alert.body_part = BodyPartSide(s.body_part.location, s.side)
+                            alert.sport_name = sport_name
+                            alerts.append(alert)
         else:
             goal = AthleteGoal(None, 1, AthleteGoalType.sport)
             goal.trigger_type = TriggerType.not_enough_history_for_high_volume_intensity  # 25
