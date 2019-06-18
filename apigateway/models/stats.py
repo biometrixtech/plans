@@ -106,6 +106,8 @@ class AthleteStats(Serialisable):
         self.high_relative_load_chart_data = []
         self.doms_chart_data = []
 
+        self.eligible_for_high_load_trigger = False
+
     def update_historic_soreness(self, soreness, event_date):
 
         soreness_calc = SorenessCalculator
@@ -461,6 +463,7 @@ class AthleteStats(Serialisable):
             'load_stats': self.load_stats.json_serialise() if self.load_stats is not None else None,
             'muscular_strain': [muscular_strain.json_serialise() for muscular_strain in self.muscular_strain],
             'high_relative_load_sessions': [high_load.json_serialise() for high_load in self.high_relative_load_sessions],
+            'eligible_for_high_load_trigger' : self.eligible_for_high_load_trigger
             # 'training_volume_chart_data': [chart_data.json_serialise() for chart_data in self.training_volume_chart_data]
         }
         return ret
@@ -514,7 +517,8 @@ class AthleteStats(Serialisable):
         athlete_stats.longitudinal_trends = [Trend.json_deserialise(trend) for trend in input_dict.get('longitudinal_trends', [])]
         athlete_stats.load_stats = LoadStats.json_deserialise(input_dict.get('load_stats', None))
         athlete_stats.muscular_strain = [DataSeries.json_deserialise(muscular_strain) for muscular_strain in input_dict.get('muscular_strain', [])]
-        athlete_stats.high_relative_load_sessions = [HighLoadSession.json_deserialise(session) for session in input_dict.get('high_relative_load_sessions', [])]
+        athlete_stats.high_relative_load_sessions = [HighLoadSession.json_deserialise(session) for session in input_dict.get('high_relative_load_sessions', [])],
+        athlete_stats.eligible_for_high_load_trigger = input_dict.get('eligible_for_high_load_trigger', False)
         return athlete_stats
 
     @classmethod
