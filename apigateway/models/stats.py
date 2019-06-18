@@ -517,7 +517,7 @@ class AthleteStats(Serialisable):
         athlete_stats.longitudinal_trends = [Trend.json_deserialise(trend) for trend in input_dict.get('longitudinal_trends', [])]
         athlete_stats.load_stats = LoadStats.json_deserialise(input_dict.get('load_stats', None))
         athlete_stats.muscular_strain = [DataSeries.json_deserialise(muscular_strain) for muscular_strain in input_dict.get('muscular_strain', [])]
-        athlete_stats.high_relative_load_sessions = [HighLoadSession.json_deserialise(session) for session in input_dict.get('high_relative_load_sessions', [])],
+        athlete_stats.high_relative_load_sessions = [HighLoadSession.json_deserialise(session) for session in input_dict.get('high_relative_load_sessions', [])]
         athlete_stats.eligible_for_high_load_trigger = input_dict.get('eligible_for_high_load_trigger', False)
         return athlete_stats
 
