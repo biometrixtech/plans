@@ -97,7 +97,6 @@ class TrainingVolumeProcessing(object):
         self.last_week_sport_training_loads = {}
         self.previous_week_sport_training_loads = {}
         self.last_14_days_training_sessions = []
-        self.acute_chronic_training_sessions = []
         self.load_stats = load_stats
         self.plan_exists_days_8_35 = False
 
@@ -209,14 +208,6 @@ class TrainingVolumeProcessing(object):
         last_14_day_sessions.extend(last_7_day_training_sessions)
 
         self.last_14_days_training_sessions = last_14_day_sessions
-
-        acute_chronic_sessions = []
-        acute_sessions = self.get_training_sessions(acute_daily_plans)
-        chronic_sessions = self.get_training_sessions(chronic_daily_plans)
-        acute_chronic_sessions.extend(acute_sessions)
-        acute_chronic_sessions.extend(chronic_sessions)
-
-        self.acute_chronic_training_sessions = acute_chronic_sessions
 
         chart_data = TrainingVolumeChart(self.end_date)
 
@@ -343,13 +334,13 @@ class TrainingVolumeProcessing(object):
                 eligible_for_high_load_trigger = False
 
                 if athlete_stats.expected_weekly_workouts is None or athlete_stats.expected_weekly_workouts <= 1:
-                    if len(self.acute_chronic_training_sessions) > 0:
+                    if len(self.last_14_days_training_sessions) > 1:
                         eligible_for_high_load_trigger = True
-                elif 1 > athlete_stats.expected_weekly_workouts and athlete_stats.expected_weekly_workouts <= 4:
-                    if len(self.acute_chronic_training_sessions) > 2:
+                elif 1 < athlete_stats.expected_weekly_workouts <= 4:
+                    if len(self.last_14_days_training_sessions) > 2:
                         eligible_for_high_load_trigger = True
                 elif athlete_stats.expected_weekly_workouts > 4:
-                    if len(self.acute_chronic_training_sessions) > 4:
+                    if len(self.last_14_days_training_sessions) > 4:
                         eligible_for_high_load_trigger = True
 
                 if eligible_for_high_load_trigger:
