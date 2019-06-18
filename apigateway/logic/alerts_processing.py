@@ -34,11 +34,13 @@ class AlertsProcessing(object):
                     existing_insight.body_parts = insight.body_parts
                     existing_insight.sport_names = insight.sport_names
                     existing_insight.child_triggers = insight.child_triggers
+                    existing_insight.last_triggered_date_time = self.trigger_date_time
                     insight.start_date_time = existing_insight.start_date_time
                 elif insight.cleared:
                     insight.start_date_time = self.trigger_date_time
                 else:
                     insight.start_date_time = self.trigger_date_time
+                    insight.last_triggered_date_time = self.trigger_date_time
                     longitudinal_insights.append(insight)
             else:
                 insight.start_date_time = self.trigger_date_time
@@ -56,7 +58,7 @@ class AlertsProcessing(object):
         for l_insight in existing_longitudinal_insights:
             # clear doms differently
             if l_insight.trigger_type == TriggerType.sore_today_doms:
-                if l_insight.start_date_time.date() != self.trigger_date_time.date():
+                if l_insight.last_triggered_date_time is None or l_insight.last_triggered_date_time.date() != self.trigger_date_time.date():
                     l_insight.cleared = True
             # if trigger type (including others in same parent group) does not exist, everything was cleared
             elif not TriggerType.is_in(l_insight.trigger_type, current_trigger_types):
@@ -147,6 +149,7 @@ class AlertsProcessing(object):
         existing_doms_insight = any([trend.trigger_type == TriggerType.sore_today_doms for
                                      trend in self.athlete_stats.longitudinal_insights])
         doms_today = False
+        doms_insight_added = False
         for alert in alerts:
             # triggers to trends
             if alert.goal.trigger_type == TriggerType.sore_today_doms:
@@ -188,13 +191,7 @@ class AlertsProcessing(object):
 
             # triggers to insights
             # check if trigger already exists
-            if alert.goal.trigger_type == TriggerType.sore_today_doms and existing_doms_insight:
-                l_insight = [insight for insight in self.athlete_stats.longitudinal_insights if insight.trigger_type == TriggerType.sore_today_doms][0]
-                if l_insight.start_date_time.date() == self.trigger_date_time.date():
-                    insights.append(l_insight)
-                else:
-                    l_insight.start_date_time = self.trigger_date_time
-            elif alert.goal.trigger_type in existing_triggers:
+            if alert.goal.trigger_type in existing_triggers:
                 insight = [insight for insight in insights if insight.trigger_type == alert.goal.trigger_type][0]
                 if alert.goal.text is not None:
                     insight.goal_targeted.append(alert.goal.text)
@@ -242,6 +239,15 @@ class AlertsProcessing(object):
                     insight.severity.append(alert.severity)
                 existing_triggers.append(alert.goal.trigger_type)
                 insights.append(insight)
+
+        # remove doms if present yesterday
+        if TriggerType.sore_today_doms in existing_triggers and existing_doms_insight:
+            l_insight = [insight for insight in self.athlete_stats.longitudinal_insights if insight.trigger_type == TriggerType.sore_today_doms][0]
+            # if doms wasn't started earlier today, remove it but note that it was triggered today so it won't be cleared
+            if l_insight.start_date_time.date() != self.trigger_date_time.date():
+                doms_insight = [insight for insight in insights if insight.trigger_type == TriggerType.sore_today_doms][0]
+                insights.remove(doms_insight)
+                l_insight.last_triggered_date_time = self.trigger_date_time
 
         return insights
 

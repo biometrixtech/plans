@@ -818,6 +818,47 @@ def test_aggregate_insights_cleared_one_body_part():
     assert daily_plan.insights[1].cleared
 
 
+def test_doms_yesterday_multiple_doms_today_second_survey():
+    """
+    longitudinal insight for doms created yesterday
+    multiple doms today
+    doms should not be in current insights
+    doms should be in longitudinal insights
+    """
+    current_date_time = datetime.datetime.now()
+    alert1 = get_alert(11, (11, 1))
+    alert2 = get_alert(11, (11, 2))
+    alert3 = get_alert(11, (14, 1))
+    alert4 = get_alert(11, (14, 2))
+
+    alerts = [alert1]
+    event_date_time = current_date_time
+    daily_plan = DailyPlan(format_date(event_date_time))
+    athlete_stats = AthleteStats('test_user')
+    AlertsProcessing(daily_plan, athlete_stats, event_date_time - datetime.timedelta(days=1)).aggregate_alerts(alerts)
+    existing_insights = daily_plan.insights
+    assert len(existing_insights) == 1
+    assert existing_insights[0].first
+    assert not existing_insights[0].parent
+    assert existing_insights[0].longitudinal
+    assert existing_insights[0].start_date_time == current_date_time - datetime.timedelta(days=1)
+    assert len(existing_insights[0].body_parts) == 1
+
+    athlete_stats.exposed_triggers = [TriggerType(11)]
+    daily_plan.insights = []
+    AlertsProcessing(daily_plan, athlete_stats, event_date_time - datetime.timedelta(hours=1)).aggregate_alerts([alert2, alert3, alert4])
+    insights = daily_plan.insights
+    longitudinal_insights = athlete_stats.longitudinal_insights
+    assert len(insights) == 0
+    assert len(longitudinal_insights) == 1
+
+    AlertsProcessing(daily_plan, athlete_stats, event_date_time).aggregate_alerts([alert2, alert3, alert4])
+    insights = daily_plan.insights
+    longitudinal_insights = athlete_stats.longitudinal_insights
+    assert len(insights) == 0
+    assert len(longitudinal_insights) == 1
+
+
 def test_aggregate_insights_doms_yesterday_no_doms_today():
     """
     longitudinal insight for doms created yesterday
