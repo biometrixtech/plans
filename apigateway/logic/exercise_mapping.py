@@ -293,7 +293,7 @@ class ExerciseAssignmentCalculator(object):
                 if days_diff >= 30 and s.severity >= 1.5:
                     goal = AthleteGoal("Care for soreness", 1, AthleteGoalType.sore)
                     #goal.trigger = "Soreness Reported Today + Pers, Pers-2 Soreness > 30d"
-                    goal.trigger_type = TriggerType.hist_sore_greater_30_high_volume_intensity # 13
+                    goal.trigger_type = TriggerType.hist_sore_greater_30_sore_today # 13
 
                     if 1.5 <= s.severity < 3.5:
                         ice = Ice(body_part_location=s.body_part.location, side=s.side)
@@ -401,7 +401,7 @@ class ExerciseAssignmentCalculator(object):
             if ice is not None:
                 ice.goals.add(goal)
                 ice_list.append(ice)
-                if goal.trigger_type not in [TriggerType(4), TriggerType(5)]:  # these triggers are in plans but not insights/trends
+                if goal.trigger_type not in [TriggerType(1), TriggerType(2), TriggerType(4), TriggerType(5)]:  # 4 and 5 in plans but not in insights/trends, 1 and 2 are added to insights/trends elsewhere
                     alert = Alert(goal)
                     alert.body_part = BodyPartSide(s.body_part.location, s.side)
                     alerts.append(alert)
@@ -538,6 +538,7 @@ class ExerciseAssignmentCalculator(object):
                     goal.trigger_type = TriggerType.hist_pain_high_volume_intensity  # 2
                     alert = Alert(goal)
                     alert.body_part = BodyPartSide(s.body_part.location, s.side)
+                    alert.sport_name = list(self.high_relative_load_session_sport_names)[0]
                     alerts.append(alert)
                 elif (not s.pain and s.historic_soreness_status is not None
                       and (s.is_persistent_soreness()
@@ -549,5 +550,6 @@ class ExerciseAssignmentCalculator(object):
                             goal.trigger_type = TriggerType.hist_sore_greater_30_high_volume_intensity  # 1
                             alert = Alert(goal)
                             alert.body_part = BodyPartSide(s.body_part.location, s.side)
+                            alert.sport_name = list(self.high_relative_load_session_sport_names)[0]
                             alerts.append(alert)
         return alerts
