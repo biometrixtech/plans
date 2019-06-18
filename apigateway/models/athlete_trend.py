@@ -327,7 +327,7 @@ class TrendCategory(object):
                 self.alerts.append(trend)
 
     def sort_trends(self):
-        self.alerts = sorted(self.alerts, key=lambda x: (x.priority, -int(x.cleared)))
+        self.alerts = sorted(self.alerts, key=lambda x: (x.priority, int(x.cleared)))
 
     def remove_not_present_in_trends_page(self):
         self.alerts = [alert for alert in self.alerts if alert.present_in_trends]

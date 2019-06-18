@@ -253,7 +253,7 @@ class StatsProcessing(object):
                                     )
             body_part_history.sort(key=lambda x: x.reported_date_time, reverse=False)
             t.historic_severity = []
-            if len(body_part_history) > 0:
+            if len(body_part_history) > 0 and (t.first_reported_date_time is None or body_part_history[0].reported_date_time < t.first_reported_date_time):
                 t.first_reported_date_time = body_part_history[0].reported_date_time
             for b in body_part_history:
                 current_soreness = HistoricSeverity(b.reported_date_time, b.severity, b.movement)
