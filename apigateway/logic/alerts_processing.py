@@ -39,7 +39,8 @@ class AlertsProcessing(object):
                 elif insight.cleared:
                     insight.start_date_time = self.trigger_date_time
                 else:
-                    insight.start_date_time = self.trigger_date_time
+                    if insight.start_date_time is None:
+                        insight.start_date_time = self.trigger_date_time
                     insight.last_triggered_date_time = self.trigger_date_time
                     longitudinal_insights.append(insight)
             else:
@@ -77,10 +78,13 @@ class AlertsProcessing(object):
                         l_insight.cleared = True
                     else:
                         cleared_parts = []
+                        moved_parts = []
                         current_body_parts = [d.json_serialise() for d in current_insight.child_triggers[trigger_type]]
                         for body_part in body_parts:
-                            if body_part.json_serialise() not in current_body_parts:
+                            if body_part.json_serialise() not in current_body_parts:  # if it's not in current parts, it was cleared
                                 cleared_parts.append(body_part)
+                            else:  # if it's in current parts, it was moved from child trigger to parent trigger
+                                moved_parts.append(body_part)
                         if len(cleared_parts) > 0:
                             cleared_insight = AthleteInsight(trigger_type)
                             cleared_insight.cleared = True
@@ -88,6 +92,15 @@ class AlertsProcessing(object):
                             cleared_insight.parent = False
                             new_insights.append(cleared_insight)
                             l_insight.cleared = True
+                        if len(moved_parts) > 0:  # if any parts were moved from child to parent
+                            if current_insight.start_date_time is None:
+                                current_insight.start_date_time = l_insight.start_date_time
+                            else:
+                                current_insight.start_date_time = min(l_insight.start_date_time, current_insight.start_date_time)
+                            for moved_part in moved_parts:
+                                l_insight.body_parts.remove(moved_part)
+                            if len(l_insight.body_parts) == 0:
+                                l_insight.cleared = True
         existing_longitudinal_insights = [insight for insight in existing_longitudinal_insights if not insight.cleared]
 
         # handle the case of hist_sore going from <30 days(trigger 7) to >=30 days (trigger 19) and make sure two conflicting insights don't exist for same body part
