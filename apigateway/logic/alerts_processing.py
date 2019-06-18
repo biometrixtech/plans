@@ -92,11 +92,13 @@ class AlertsProcessing(object):
                             cleared_insight.parent = False
                             new_insights.append(cleared_insight)
                             l_insight.cleared = True
-                        if len(moved_parts) > 0:  # if any parts were moved from child to parent
+                        if len(moved_parts) > 0:  # if any parts were moved from child to parent, child should be removed
+                            # also update the start date for parent to be the same as the child it inherited
                             if current_insight.start_date_time is None:
                                 current_insight.start_date_time = l_insight.start_date_time
                             else:
                                 current_insight.start_date_time = min(l_insight.start_date_time, current_insight.start_date_time)
+                            # make sure all the body parts were moved and remove the insight
                             for moved_part in moved_parts:
                                 l_insight.body_parts.remove(moved_part)
                             if len(l_insight.body_parts) == 0:
@@ -162,7 +164,6 @@ class AlertsProcessing(object):
         existing_doms_insight = any([trend.trigger_type == TriggerType.sore_today_doms for
                                      trend in self.athlete_stats.longitudinal_insights])
         doms_today = False
-        doms_insight_added = False
         for alert in alerts:
             # triggers to trends
             if alert.goal.trigger_type == TriggerType.sore_today_doms:
@@ -227,7 +228,7 @@ class AlertsProcessing(object):
                 if alert.body_part is not None:
                     insight.body_parts.append(alert.body_part)
                     if alert.goal.trigger_type not in insight.child_triggers.keys():
-                        insight.child_triggers[alert.goal.trigger_type] = set([alert.body_part])
+                        insight.child_triggers[alert.goal.trigger_type] = {alert.body_part}
                     else:
                         insight.child_triggers[alert.goal.trigger_type].add(alert.body_part)
                 elif alert.goal.trigger_type not in insight.child_triggers.keys():
@@ -243,7 +244,7 @@ class AlertsProcessing(object):
                     insight.goal_targeted.append(alert.goal.text)
                 if alert.body_part is not None:
                     insight.body_parts.append(alert.body_part)
-                    insight.child_triggers[alert.goal.trigger_type] = set([alert.body_part])
+                    insight.child_triggers[alert.goal.trigger_type] = {alert.body_part}
                 else:
                     insight.child_triggers[alert.goal.trigger_type] = set([])
                 if alert.sport_name is not None:
@@ -254,9 +255,9 @@ class AlertsProcessing(object):
                 insights.append(insight)
 
         # remove doms if present yesterday
-        if TriggerType.sore_today_doms in existing_triggers and existing_doms_insight:
+        if TriggerType.sore_today_doms in existing_triggers and existing_doms_insight:  # doms present today and present in longitudinal insights
             l_insight = [insight for insight in self.athlete_stats.longitudinal_insights if insight.trigger_type == TriggerType.sore_today_doms][0]
-            # if doms wasn't started earlier today, remove it but note that it was triggered today so it won't be cleared
+            # if doms wasn't started earlier today, remove it (Note: that doms is present today so, we're not clearing it from longitudinal insights)
             if l_insight.start_date_time.date() != self.trigger_date_time.date():
                 doms_insight = [insight for insight in insights if insight.trigger_type == TriggerType.sore_today_doms][0]
                 insights.remove(doms_insight)
