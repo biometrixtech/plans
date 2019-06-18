@@ -8,7 +8,7 @@
             "length_of_impact": "",
             "data_source": "",
             "insight_priority_plans": "",
-            "insight_priority_trend_type": "7",
+            "insight_priority_trend_type": "5",
             "plans": {
                 "priority_styling": 0,
                 "content_to_pass": "",
@@ -38,6 +38,69 @@
                 "new_body": "We haven't noticed any sign of increased recovery need. We'll let you know if we see any meaningful patterns or trends.",
                 "ongoing_title": "No training-related insights found. ",
                 "ongoing_body": "We haven't noticed any sign of increased recovery need. We'll let you know if we see any meaningful patterns or trends.",
+                "pos_change_title": "",
+                "pos_change_body": "",
+                "neg_change_title": "",
+                "neg_change_body": "",
+                "cleared_title": "",
+                "cleared_body": ""
+            },
+            "plots": {
+                "unit_of_aggregation": "Aggregate the Session(s) to per day",
+                "visualization_type": 1,
+                "visualization_range": 7,
+                "overlay_variable": "relative load per day (no overlay)",
+                "title": "Your training history"
+            },
+            "cta": {
+                "input": "",
+                "heat": false,
+                "warmup": false,
+                "cooldown": false,
+                "active_rest": false,
+                "ice": false,
+                "cwi": false,
+                "increase_default": ""
+            }
+        },
+        "25": {
+            "trigger_enum": 25,
+            "trend_type": "Stress",
+            "triggers": "Not enough History to quantify High Load",
+            "goal_names": "",
+            "length_of_impact": "single_day",
+            "data_source": "",
+            "insight_priority_plans": "13",
+            "insight_priority_trend_type": "4",
+            "plans": {
+                "priority_styling": 0,
+                "content_to_pass": "",
+                "present_in_plans": false,
+                "parent_data": {
+                    "enum": null,
+                    "new_first_time_title": "",
+                    "new_first_time_body": "",
+                    "new_subsequent_title": "",
+                    "new_subsequent_body": "",
+                    "cleared_body": ""
+                },
+                "child_data": {
+                    "new_first_time_title": "",
+                    "new_first_time_body": "",
+                    "new_subsequent_title": "",
+                    "new_subsequent_body": "",
+                    "cleared_body": ""
+                },
+                "cleared_title": ""
+            },
+            "trends": {
+                "priority_styling": 0,
+                "content_to_pass": "",
+                "present_in_trends": true,
+                "new_title": "",
+                "new_body": "",
+                "ongoing_title": "",
+                "ongoing_body": "",
                 "pos_change_title": "",
                 "pos_change_body": "",
                 "neg_change_title": "",
@@ -134,7 +197,7 @@
             "length_of_impact": "single_day",
             "data_source": "soreness",
             "insight_priority_plans": "11",
-            "insight_priority_trend_type": "4",
+            "insight_priority_trend_type": "3",
             "plans": {
                 "priority_styling": 0,
                 "content_to_pass": "{goal}",
