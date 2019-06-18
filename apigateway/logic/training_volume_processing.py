@@ -197,7 +197,7 @@ class TrainingVolumeProcessing(object):
         self.internal_load_tuples = []
 
         eight_days_ago = parse_date(self.end_date) - timedelta(days=8)
-        eight_day_plus_plans = list(c for c in chronic_daily_plans if c.get_event_datetime() >= eight_days_ago)
+        eight_day_plus_plans = list(c for c in chronic_daily_plans if c.get_event_datetime() <= eight_days_ago)
         if len(eight_day_plus_plans) > 0:
             self.plan_exists_days_8_35 = True
 
