@@ -903,6 +903,8 @@ def test_doms_yesterday_multiple_doms_today_second_survey():
     assert existing_insights[0].longitudinal
     assert existing_insights[0].start_date_time == current_date_time - datetime.timedelta(days=1)
     assert len(existing_insights[0].body_parts) == 1
+    l_insights_json = [insight.json_serialise() for insight in athlete_stats.longitudinal_insights]
+    athlete_stats.longitudinal_insights = [AthleteInsight.json_deserialise(insight) for insight in l_insights_json]
 
     athlete_stats.exposed_triggers = [TriggerType(11)]
     daily_plan.insights = []
