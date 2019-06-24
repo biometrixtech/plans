@@ -132,7 +132,7 @@ class AthleteInsight(Serialisable):
     #         return 0
 
     def __setattr__(self, name, value):
-        if name in ['start_date_time'] and value is not None and not isinstance(value, datetime.datetime):
+        if name in ['start_date_time', 'last_triggered_date_time'] and value is not None and not isinstance(value, datetime.datetime):
             value = parse_datetime(value)
         super().__setattr__(name, value)
 
