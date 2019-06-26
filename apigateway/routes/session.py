@@ -263,7 +263,8 @@ def handle_session_three_sensor_data(principal_id=None):
     for session in sessions:
         event_date = session['event_date']
         session_obj = create_session(6, {'description': 'test_three_sensor_data',
-                                         'event_date': event_date})
+                                         'event_date': event_date,
+                                         'sport_name': 83})
         plan.training_sessions.append(session_obj)
     daily_plan_datastore.put(plan)
 
