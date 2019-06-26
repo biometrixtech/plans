@@ -27,6 +27,7 @@ class TriggerType(IntEnum):
     pers_pers2_pain_greater_30_no_pain_today = 22
     hist_pain_pain_today_severity_1_2 = 23
     hist_pain_pain_today_severity_3_5 = 24
+    not_enough_history_for_high_volume_intensity = 25
     response_fatigue_within_a_session_torso_loading_pattern = 101
     response_poor_response_within_a_session_torso_loading_pattern = 102
     biomechanics_fatigue_within_a_session_torso_loading_pattern = 103

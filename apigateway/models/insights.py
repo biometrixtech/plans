@@ -14,6 +14,7 @@ class AthleteInsight(Serialisable):
         self.trigger_type = trigger_type
         self.goal_targeted = []
         self.start_date_time = None
+        self.last_triggered_date_time = None
         self.title = ""
         self.text = ""
         self.parent = False
@@ -37,6 +38,7 @@ class AthleteInsight(Serialisable):
             'title': self.title,
             'goal_targeted': self.goal_targeted,
             'start_date_time': format_datetime(self.start_date_time) if self.start_date_time is not None else None,
+            'last_triggered_date_time': format_datetime(self.last_triggered_date_time) if self.last_triggered_date_time is not None else None,
             'text': self.text,
             'parent': self.parent,
             'first': self.first,
@@ -62,6 +64,7 @@ class AthleteInsight(Serialisable):
         insight.title = input_dict.get('title', "")
         insight.goal_targeted = input_dict.get('goal_targeted', [])
         insight.start_date_time = input_dict.get('start_date_time', None)
+        insight.last_triggered_date_time = input_dict.get('last_triggered_date_time', None)
         insight.text = input_dict.get('text', "")
         insight.parent = input_dict.get('parent', False)
         insight.first = input_dict.get('first', False)
@@ -129,7 +132,7 @@ class AthleteInsight(Serialisable):
     #         return 0
 
     def __setattr__(self, name, value):
-        if name in ['start_date_time'] and value is not None and not isinstance(value, datetime.datetime):
+        if name in ['start_date_time', 'last_triggered_date_time'] and value is not None and not isinstance(value, datetime.datetime):
             value = parse_datetime(value)
         super().__setattr__(name, value)
 

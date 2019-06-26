@@ -347,6 +347,66 @@ def test_aggregate_insights_cleared_same_parent_group():
     assert insights[1].start_date_time == current_date_time
 
 
+
+def test_aggregate_insights_start_with_child_merge_to_parent_clear_child():
+    """
+    child 2 days ago (7)
+    parent yesterday (7 + 8)
+    7 cleared today
+    """
+    current_date_time = datetime.datetime.now()
+    alert1 = get_alert(7, (11, 1))
+    alert2 = get_alert(8, (11, 2))
+
+    alerts = [alert1]
+    event_date_time = current_date_time
+    daily_plan = DailyPlan(format_date(event_date_time))
+    athlete_stats = AthleteStats('test_user')
+    AlertsProcessing(daily_plan, athlete_stats, event_date_time - datetime.timedelta(days=2)).aggregate_alerts(alerts)
+    existing_insights = daily_plan.insights
+
+    assert len(existing_insights) == 1
+    assert existing_insights[0].first
+    assert not existing_insights[0].parent
+    assert existing_insights[0].longitudinal
+    assert existing_insights[0].start_date_time == current_date_time - datetime.timedelta(days=2)
+
+    athlete_stats.exposed_triggers = [existing_insights[0].trigger_type]
+    daily_plan.insights = []
+    AlertsProcessing(daily_plan, athlete_stats, event_date_time - datetime.timedelta(days=1)).aggregate_alerts([alert2, alert1])
+    insights = daily_plan.insights
+    longitudinal_insights = athlete_stats.longitudinal_insights
+    assert len(longitudinal_insights) == 1
+    assert len(insights) == 1
+
+    assert longitudinal_insights[0] == insights[0]
+
+    assert not insights[0].first
+    assert insights[0].parent
+    assert insights[0].trigger_type == alert2.goal.trigger_type
+    assert insights[0].start_date_time == current_date_time - datetime.timedelta(days=2)
+
+    daily_plan.insights = []
+    AlertsProcessing(daily_plan, athlete_stats, event_date_time).aggregate_alerts([alert2])
+    insights = daily_plan.insights
+    longitudinal_insights = athlete_stats.longitudinal_insights
+    assert len(longitudinal_insights) == 1
+    assert len(insights) == 2
+
+    assert longitudinal_insights[0] == insights[0]
+
+    assert not insights[0].first
+    assert not insights[0].parent
+    assert insights[0].trigger_type == alert2.goal.trigger_type
+
+    assert not insights[1].first
+    assert not insights[1].parent
+    assert insights[1].trigger_type == alert1.goal.trigger_type
+    assert insights[1].longitudinal
+    assert insights[1].cleared
+    assert insights[1].start_date_time == current_date_time
+
+
 def test_aggregate_insights_cleared_parent_group_4():
     """
     day0: trigger_type 16 body_part 11, 1
@@ -420,7 +480,7 @@ def test_aggregate_insights_cleared_parent_group_4():
     assert not insights[0].parent
     assert insights[0].longitudinal
     assert not insights[0].cleared
-    assert insights[0].start_date_time == current_date_time
+    assert insights[0].start_date_time == current_date_time - datetime.timedelta(days=5)
     assert insights[0].trigger_type == TriggerType(16)
 
     assert not insights[1].first
@@ -472,7 +532,7 @@ def test_aggregate_insights_cleared_parent_group_0():
     assert not insights[0].first
     assert insights[0].parent
     assert insights[0].longitudinal
-    assert insights[0].start_date_time == current_date_time
+    assert insights[0].start_date_time == current_date_time - datetime.timedelta(days=1)
     assert insights[0].parent_group == 0
     assert len(insights[0].child_triggers) == 2
 
@@ -526,7 +586,7 @@ def test_aggregate_insights_less_30_days_to_greater_30_days():
     assert not insights[1].first
     assert insights[1].parent
     assert insights[1].longitudinal
-    assert insights[1].start_date_time == current_date_time
+    assert insights[1].start_date_time == current_date_time - datetime.timedelta(days=1)
     assert insights[1].parent_group == 0
     assert len(insights[1].child_triggers) == 2
 
@@ -699,7 +759,7 @@ def test_aggregate_insights_less_30_days_to_greater_30_days_multiple_parts_move_
     assert not insights[1].first
     assert insights[1].parent
     assert insights[1].longitudinal
-    assert insights[1].start_date_time == current_date_time
+    assert insights[1].start_date_time == current_date_time - datetime.timedelta(days=1)
     assert len(insights[1].child_triggers) == 2
 
     assert insights[0].parent
@@ -816,6 +876,49 @@ def test_aggregate_insights_cleared_one_body_part():
 
     assert not daily_plan.insights[0].cleared
     assert daily_plan.insights[1].cleared
+
+
+def test_doms_yesterday_multiple_doms_today_second_survey():
+    """
+    longitudinal insight for doms created yesterday
+    multiple doms today
+    doms should not be in current insights
+    doms should be in longitudinal insights
+    """
+    current_date_time = datetime.datetime.now()
+    alert1 = get_alert(11, (11, 1))
+    alert2 = get_alert(11, (11, 2))
+    alert3 = get_alert(11, (14, 1))
+    alert4 = get_alert(11, (14, 2))
+
+    alerts = [alert1]
+    event_date_time = current_date_time
+    daily_plan = DailyPlan(format_date(event_date_time))
+    athlete_stats = AthleteStats('test_user')
+    AlertsProcessing(daily_plan, athlete_stats, event_date_time - datetime.timedelta(days=1)).aggregate_alerts(alerts)
+    existing_insights = daily_plan.insights
+    assert len(existing_insights) == 1
+    assert existing_insights[0].first
+    assert not existing_insights[0].parent
+    assert existing_insights[0].longitudinal
+    assert existing_insights[0].start_date_time == current_date_time - datetime.timedelta(days=1)
+    assert len(existing_insights[0].body_parts) == 1
+    l_insights_json = [insight.json_serialise() for insight in athlete_stats.longitudinal_insights]
+    athlete_stats.longitudinal_insights = [AthleteInsight.json_deserialise(insight) for insight in l_insights_json]
+
+    athlete_stats.exposed_triggers = [TriggerType(11)]
+    daily_plan.insights = []
+    AlertsProcessing(daily_plan, athlete_stats, event_date_time - datetime.timedelta(hours=1)).aggregate_alerts([alert2, alert3, alert4])
+    insights = daily_plan.insights
+    longitudinal_insights = athlete_stats.longitudinal_insights
+    assert len(insights) == 0
+    assert len(longitudinal_insights) == 1
+
+    AlertsProcessing(daily_plan, athlete_stats, event_date_time).aggregate_alerts([alert2, alert3, alert4])
+    insights = daily_plan.insights
+    longitudinal_insights = athlete_stats.longitudinal_insights
+    assert len(insights) == 0
+    assert len(longitudinal_insights) == 1
 
 
 def test_aggregate_insights_doms_yesterday_no_doms_today():
@@ -1101,10 +1204,10 @@ def test_aggregate_trends_cleared_trend_different_body_part_today():
     AlertsProcessing(daily_plan, athlete_stats, event_date_time).aggregate_alerts(alerts)
     trends = daily_plan.trends
     assert len(trends.response.alerts) == 3
-    assert trends.response.alerts[0].trigger_type == TriggerType(7)
-    assert trends.response.alerts[0].cleared
     assert trends.response.alerts[1].trigger_type == TriggerType(7)
-    assert not trends.response.alerts[1].cleared
+    assert trends.response.alerts[1].cleared
+    assert trends.response.alerts[0].trigger_type == TriggerType(7)
+    assert not trends.response.alerts[0].cleared
     assert trends.response.alerts[2].trigger_type == TriggerType(203)
 
 

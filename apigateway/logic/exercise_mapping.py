@@ -1,14 +1,6 @@
-import models.soreness
-# from logic.exercise_generator import ExerciseAssignments
-# import logic.soreness_processing as soreness_and_injury
-from models.exercise import ExerciseBuckets, Phase
 from models.modalities import ActiveRestBeforeTraining, ActiveRestAfterTraining, ColdWaterImmersion, CoolDown, Heat, WarmUp, Ice, HeatSession, IceSession
-from models.soreness import AthleteGoal, AthleteGoalType, AssignedExercise, BodyPartLocation, HistoricSorenessStatus, Soreness, BodyPart, Alert, BodyPartSide
+from models.soreness import AthleteGoal, AthleteGoalType, BodyPartLocation, HistoricSorenessStatus, Alert, BodyPartSide
 from models.trigger import TriggerType
-from models.sport import SportName
-# from logic.goal_focus_text_generator import RecoveryTextGenerator
-# from datetime import  timedelta
-# from utils import format_datetime, parse_date
 
 
 class ExerciseAssignmentCalculator(object):
@@ -19,23 +11,22 @@ class ExerciseAssignmentCalculator(object):
         self.exercise_library_datastore = exercise_library_datastore
         self.completed_exercise_datastore = completed_exercise_datastore
         self.exercise_library = self.exercise_library_datastore.get()
-        # self.exercises_for_body_parts = self.get_exercises_for_body_parts()
-        #self.is_active_prep = is_active_prep
-        #  self.injury_history_present = injury_history_present
         self.training_sessions = training_sessions
         self.soreness_list = soreness_list
         self.event_date_time = event_date_time
 
         self.high_relative_load_session = False
         self.high_relative_load_session_sport_names = set()
-
-        self.high_relative_intensity_session = self.process_training_sessions_intensity()
+        self.high_relative_intensity_session = False
+        self.eligible_for_high_load_trigger = athlete_stats.eligible_for_high_load_trigger
 
         self.muscular_strain_increasing = athlete_stats.muscular_strain_increasing
         self.muscular_strain_high = False
         self.doms = list(d for d in athlete_stats.historic_soreness if d.historic_soreness_status == HistoricSorenessStatus.doms)
 
-        self.set_high_relative_load_session(athlete_stats)
+        if self.eligible_for_high_load_trigger:
+            self.set_high_relative_load_session(athlete_stats)
+            self.high_relative_intensity_session = self.process_training_sessions_intensity()
         self.set_muscular_strain_high(athlete_stats)
 
     def set_muscular_strain_high(self, athlete_stats):
@@ -56,7 +47,7 @@ class ExerciseAssignmentCalculator(object):
     def get_progression_list(self, exercise):
 
         dict = {}
-        #dict["9"] = ["121"]
+        # dict["9"] = ["121"]
 
         dict["10"] = ["12", "11", "13", "120"]
 
@@ -293,7 +284,7 @@ class ExerciseAssignmentCalculator(object):
                 if days_diff >= 30 and s.severity >= 1.5:
                     goal = AthleteGoal("Care for soreness", 1, AthleteGoalType.sore)
                     #goal.trigger = "Soreness Reported Today + Pers, Pers-2 Soreness > 30d"
-                    goal.trigger_type = TriggerType.hist_sore_greater_30_high_volume_intensity # 13
+                    goal.trigger_type = TriggerType.hist_sore_greater_30_sore_today # 13
 
                     if 1.5 <= s.severity < 3.5:
                         ice = Ice(body_part_location=s.body_part.location, side=s.side)
@@ -401,7 +392,7 @@ class ExerciseAssignmentCalculator(object):
             if ice is not None:
                 ice.goals.add(goal)
                 ice_list.append(ice)
-                if goal.trigger_type not in [TriggerType(4), TriggerType(5)]:  # these triggers are in plans but not insights/trends
+                if goal.trigger_type not in [TriggerType(1), TriggerType(2), TriggerType(4), TriggerType(5)]:  # 4 and 5 in plans but not in insights/trends, 1 and 2 are added to insights/trends elsewhere
                     alert = Alert(goal)
                     alert.body_part = BodyPartSide(s.body_part.location, s.side)
                     alerts.append(alert)
@@ -531,23 +522,31 @@ class ExerciseAssignmentCalculator(object):
 
     def generate_alerts(self):
         alerts = []
-        for s in self.soreness_list:
-            if (self.high_relative_load_session or self.high_relative_intensity_session):
-                if s.pain and (s.is_acute_pain() or s.is_persistent_pain() or s.historic_soreness_status == HistoricSorenessStatus.persistent_2_pain):
-                    goal = AthleteGoal("Increase prevention efficacy", 1, AthleteGoalType.preempt_corrective)
-                    goal.trigger_type = TriggerType.hist_pain_high_volume_intensity  # 2
-                    alert = Alert(goal)
-                    alert.body_part = BodyPartSide(s.body_part.location, s.side)
-                    alerts.append(alert)
-                elif (not s.pain and s.historic_soreness_status is not None
-                      and (s.is_persistent_soreness()
-                           or s.historic_soreness_status == HistoricSorenessStatus.persistent_2_soreness)
-                      and s.first_reported_date_time is not None):
-                        days_diff = (self.event_date_time - s.first_reported_date_time).days
-                        if days_diff >= 30:
-                            goal = AthleteGoal("Increase prevention efficacy", 1, AthleteGoalType.preempt_corrective)
-                            goal.trigger_type = TriggerType.hist_sore_greater_30_high_volume_intensity  # 1
+        if self.eligible_for_high_load_trigger:
+            if self.high_relative_load_session or self.high_relative_intensity_session:
+                for s in self.soreness_list:
+                    goal = None
+                    if s.pain and (s.is_acute_pain() or s.is_persistent_pain() or s.historic_soreness_status == HistoricSorenessStatus.persistent_2_pain):
+                        goal = AthleteGoal("Increase prevention efficacy", 1, AthleteGoalType.preempt_corrective)
+                        goal.trigger_type = TriggerType.hist_pain_high_volume_intensity  # 2
+                    elif (not s.pain and s.historic_soreness_status is not None
+                          and (s.is_persistent_soreness()
+                               or s.historic_soreness_status == HistoricSorenessStatus.persistent_2_soreness)
+                          and s.first_reported_date_time is not None):
+                            days_diff = (self.event_date_time - s.first_reported_date_time).days
+                            if days_diff >= 30:
+                                goal = AthleteGoal("Increase prevention efficacy", 1, AthleteGoalType.preempt_corrective)
+                                goal.trigger_type = TriggerType.hist_sore_greater_30_high_volume_intensity  # 1
+                    if goal is not None:
+                        for sport_name in self.high_relative_load_session_sport_names:
                             alert = Alert(goal)
                             alert.body_part = BodyPartSide(s.body_part.location, s.side)
+                            alert.sport_name = sport_name
                             alerts.append(alert)
+        else:
+            goal = AthleteGoal(None, 1, AthleteGoalType.sport)
+            goal.trigger_type = TriggerType.not_enough_history_for_high_volume_intensity  # 25
+            alert = Alert(goal)
+            alerts.append(alert)
+
         return alerts
