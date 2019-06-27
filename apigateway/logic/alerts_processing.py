@@ -83,7 +83,7 @@ class AlertsProcessing(object):
                         for body_part in body_parts:
                             if body_part.json_serialise() not in current_body_parts:  # if it's not in current parts, it was cleared
                                 cleared_parts.append(body_part)
-                            else:  # if it's in current parts, it was moved from child trigger to parent trigger
+                            elif not l_insight.parent and current_insight.parent:  # if it's in current parts, it was moved from child trigger to parent trigger
                                 moved_parts.append(body_part)
                         if len(cleared_parts) > 0:
                             cleared_insight = AthleteInsight(trigger_type)
