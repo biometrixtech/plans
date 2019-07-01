@@ -40,13 +40,14 @@ class BodyPartFactory(object):
         exercise_dict = {}
 
         # pick on exercise from the list:
-        position = random.randint(0, len(exercise_list) - 1)
+        if len(exercise_list) > 0:
+            position = random.randint(0, len(exercise_list) - 1)
 
-        # ignoring progressions for now
-        #for e in exercise_list:
-        #    exercise_dict[e] = self.get_progression_list(e)
+            # ignoring progressions for now
+            #for e in exercise_list:
+            #    exercise_dict[e] = self.get_progression_list(e)
 
-        exercise_dict[exercise_list[position]] = []
+            exercise_dict[exercise_list[position]] = []
 
         return exercise_dict
 
