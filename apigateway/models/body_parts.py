@@ -192,7 +192,7 @@ class BodyPartFactory(object):
         static_integrate = self.get_exercise_dictionary([15, 14, 231])
 
         general.add_extended_exercise_phases({}, {}, {}, {}, {}, static_integrate)
-        general.add_muscle_groups([12, 6, 4], [21, 11, 5, 15], [18, 16, 1], [3, 14])
+        general.add_muscle_groups([12, 6, 4], [5, 15], [21, 11], [3, 14])
         return general
 
     def get_upper_body(self):
@@ -209,7 +209,7 @@ class BodyPartFactory(object):
 
         upper_body.add_dynamic_exercise_phases(dynamic_stretch, dynamic_integrate, dynamic_integrate_with_speed)
 
-        upper_body.add_muscle_groups([1, 2, 18], [], [], [21, 18])
+        upper_body.add_muscle_groups([1, 18], [2], [], [21, 18])
         return upper_body
 
     def get_lower_body(self):
@@ -225,7 +225,7 @@ class BodyPartFactory(object):
 
         lower_body.add_dynamic_exercise_phases(dynamic_stretch, dynamic_integrate, dynamic_integrate_with_speed)
 
-        lower_body.add_muscle_groups([5, 16, 15, 11], [], [], [14])
+        lower_body.add_muscle_groups([16, 15], [5, 11], [], [14])
 
         return lower_body
 
@@ -244,7 +244,7 @@ class BodyPartFactory(object):
 
         full_body.add_dynamic_exercise_phases(dynamic_stretch, dynamic_integrate, dynamic_integrate_with_speed)
 
-        full_body.add_muscle_groups([12, 6, 4], [21, 11, 5, 15], [18, 16, 1], [3, 14])
+        full_body.add_muscle_groups([12, 6, 4], [5, 15], [21, 11], [3, 14])
 
         return full_body
 
@@ -253,13 +253,13 @@ class BodyPartFactory(object):
         part = BodyPart(BodyPartLocation.achilles, 18)
 
         inhibit = self.get_exercise_dictionary([2])
-        static_stretch = self.get_exercise_dictionary([7, 26, 59, 61, 217])
-        active_stretch = self.get_exercise_dictionary([29, 63, 66])
+        static_stretch = self.get_exercise_dictionary([7, 26])
+        active_stretch = self.get_exercise_dictionary([267, 268])
         dynamic_stretch = {}
-        isolated_activation = self.get_exercise_dictionary([115, 75])
+        isolated_activation = self.get_exercise_dictionary([31, 67, 78, 68])
         part.add_extended_exercise_phases(inhibit, static_stretch, active_stretch, dynamic_stretch, isolated_activation,
                                           {})
-        part.add_muscle_groups([17], [16, 10], [15], [8])
+        part.add_muscle_groups([17], [10], [15], [8])
         return part
 
     def get_abdominals(self):
@@ -270,7 +270,7 @@ class BodyPartFactory(object):
         static_stretch = self.get_exercise_dictionary([98])
         active_stretch = self.get_exercise_dictionary([265])
         dynamic_stretch = {}
-        isolated_activation = self.get_exercise_dictionary([79, 85, 84, 88, 89, 90, 236, 237, 235, 50])
+        isolated_activation = self.get_exercise_dictionary([79, 234, 84, 50])
         part.add_extended_exercise_phases(inhibit, static_stretch, active_stretch, dynamic_stretch, isolated_activation,
                                           {})
         part.add_muscle_groups([3], [4], [12, 5], [18, 4])
@@ -280,14 +280,14 @@ class BodyPartFactory(object):
 
         part = BodyPart(BodyPartLocation.ankle, 12)
 
-        inhibit = self.get_exercise_dictionary([2, 71])
-        static_stretch = self.get_exercise_dictionary([61, 62])
-        active_stretch = self.get_exercise_dictionary([105, 106, 114, 115])
+        inhibit = self.get_exercise_dictionary([])
+        static_stretch = self.get_exercise_dictionary([])
+        active_stretch = self.get_exercise_dictionary([])
         dynamic_stretch = {}
-        isolated_activation = self.get_exercise_dictionary([65, 66])
+        isolated_activation = self.get_exercise_dictionary([])
         part.add_extended_exercise_phases(inhibit, static_stretch, active_stretch, dynamic_stretch, isolated_activation,
                                           {})
-        part.add_muscle_groups([9], [16], [8, 10], [8, 16])
+        part.add_muscle_groups([16], [8], [10], [8, 16])
         return part
 
     def get_biceps(self):
@@ -307,12 +307,12 @@ class BodyPartFactory(object):
     def get_calves(self):
         calves = BodyPart(BodyPartLocation.calves, 10)
         inhibit = self.get_exercise_dictionary([2, 71])
-        static_stretch = self.get_exercise_dictionary([7, 26, 59, 61, 219, 216, 215, 214])
-        active_stretch = self.get_exercise_dictionary([29, 63, 66, 68, 106, 114, 115])
+        static_stretch = self.get_exercise_dictionary([7, 26, 214, 215, 216, 219])
+        active_stretch = self.get_exercise_dictionary([267, 268, 270, 271])
         dynamic_stretch = {}
-        isolated_activation = self.get_exercise_dictionary([31, 78, 67])
+        isolated_activation = self.get_exercise_dictionary([31, 78, 67, 68])
         calves.add_extended_exercise_phases(inhibit, static_stretch, active_stretch, dynamic_stretch, isolated_activation, {})
-        calves.add_muscle_groups([16], [9], [17, 11], [8, 9, 10])
+        calves.add_muscle_groups([16], [11], [], [8, 10])
         return calves
 
     def get_chest(self):
@@ -320,10 +320,10 @@ class BodyPartFactory(object):
         part = BodyPart(BodyPartLocation.chest, 16)
 
         inhibit = self.get_exercise_dictionary([260])
-        static_stretch = self.get_exercise_dictionary([238, 98])
-        active_stretch = self.get_exercise_dictionary([135])
+        static_stretch = self.get_exercise_dictionary([238, 98, 246])
+        active_stretch = self.get_exercise_dictionary([276])
         dynamic_stretch = {}
-        isolated_activation = self.get_exercise_dictionary([240, 201])
+        isolated_activation = self.get_exercise_dictionary([201])
         part.add_extended_exercise_phases(inhibit, static_stretch, active_stretch, dynamic_stretch, isolated_activation, {})
         part.add_muscle_groups([2], [1, 21], [2], [18])
         return part
@@ -336,7 +336,7 @@ class BodyPartFactory(object):
         static_stretch = self.get_exercise_dictionary([247, 246])
         active_stretch = self.get_exercise_dictionary([261, 262])
         dynamic_stretch = {}
-        isolated_activation = self.get_exercise_dictionary([249, 251, 250, 252])
+        isolated_activation = self.get_exercise_dictionary([249, 250, 251, 252])
         part.add_extended_exercise_phases(inhibit, static_stretch, active_stretch, dynamic_stretch, isolated_activation,
                                           {})
         part.add_muscle_groups([19, 22, 23], [1], [19, 20], [22, 23])
@@ -348,22 +348,22 @@ class BodyPartFactory(object):
 
         inhibit = self.get_exercise_dictionary([74])
         static_stretch = self.get_exercise_dictionary([59, 60])
-        active_stretch = self.get_exercise_dictionary([75])
+        active_stretch = self.get_exercise_dictionary([269])
         dynamic_stretch = {}
-        isolated_activation = self.get_exercise_dictionary([53, 63, 64])
+        isolated_activation = self.get_exercise_dictionary([53, 63, 64, 66, 106, 114])
         part.add_extended_exercise_phases(inhibit, static_stretch, active_stretch, dynamic_stretch, isolated_activation,
                                           {})
-        part.add_muscle_groups([10], [9, 8], [16], [9])
+        part.add_muscle_groups([10], [8, 16], [], [16])
         return part
 
     def get_glutes(self):
 
         glutes = BodyPart(BodyPartLocation.glutes, 3)
         inhibit = self.get_exercise_dictionary([44])
-        static_stretch = self.get_exercise_dictionary([46, 56, 225, 223, 215])
-        active_stretch = self.get_exercise_dictionary([116, 117, 144, 175])
+        static_stretch = self.get_exercise_dictionary([46, 56, 221, 222, 223, 225])
+        active_stretch = self.get_exercise_dictionary([272, 273, 274])
         dynamic_stretch = self.get_exercise_dictionary([53, 63, 64])
-        isolated_activation = self.get_exercise_dictionary([10, 230, 233, 119, 232])
+        isolated_activation = self.get_exercise_dictionary([10, 81, 119, 226, 230, 232, 233])
         glutes.add_extended_exercise_phases(inhibit, static_stretch, active_stretch, dynamic_stretch, isolated_activation, {})
         glutes.add_muscle_groups([14], [6, 5, 12], [11], [4, 5])
         return glutes
@@ -373,7 +373,7 @@ class BodyPartFactory(object):
         groin = BodyPart(BodyPartLocation.groin, 7)
         inhibit = self.get_exercise_dictionary([1])
         static_stretch = self.get_exercise_dictionary([8])
-        active_stretch = self.get_exercise_dictionary([122, 119, 116])
+        active_stretch = self.get_exercise_dictionary([122])
         dynamic_stretch = {}
         isolated_activation = self.get_exercise_dictionary([232, 142, 143, 227, 226])
         groin.add_extended_exercise_phases(inhibit, static_stretch, active_stretch, dynamic_stretch, isolated_activation, {})
@@ -384,8 +384,8 @@ class BodyPartFactory(object):
 
         hamstrings = BodyPart(BodyPartLocation.hamstrings, 5)
         inhibit = self.get_exercise_dictionary([3])
-        static_stretch = self.get_exercise_dictionary([9, 46, 121, 225, 221, 219, 218, 217, 216, 215])
-        active_stretch = self.get_exercise_dictionary([116, 117, 175])
+        static_stretch = self.get_exercise_dictionary([215, 9, 121, 216, 218, 219])
+        active_stretch = self.get_exercise_dictionary([271])
         dynamic_stretch = self.get_exercise_dictionary([139, 177])
         isolated_activation = self.get_exercise_dictionary([230])
         hamstrings.add_extended_exercise_phases(inhibit, static_stretch, active_stretch, dynamic_stretch, isolated_activation, {})
@@ -396,10 +396,10 @@ class BodyPartFactory(object):
 
         hip = BodyPart(BodyPartLocation.hip_flexor, 2)
         inhibit = self.get_exercise_dictionary([54])
-        static_stretch = self.get_exercise_dictionary([6, 28, 49, 224, 223, 222, 221])
-        active_stretch = self.get_exercise_dictionary([117, 122, 179])
+        static_stretch = self.get_exercise_dictionary([6, 28, 49, 217, 224])
+        active_stretch = self.get_exercise_dictionary([277])
         dynamic_stretch = {}
-        isolated_activation = self.get_exercise_dictionary([229, 142, 143, 234, 232])
+        isolated_activation = self.get_exercise_dictionary([142, 143, 229, 228, 236, 232])
         hip.add_extended_exercise_phases(inhibit, static_stretch, active_stretch, dynamic_stretch, isolated_activation, {})
         hip.add_muscle_groups([4, 15, 6], [5, 11], [3, 12], [14])
         return hip
@@ -407,13 +407,13 @@ class BodyPartFactory(object):
     def get_knee(self):
 
         knee = BodyPart(BodyPartLocation.knee, 9)
-        inhibit = self.get_exercise_dictionary([3, 2])
-        static_stretch = self.get_exercise_dictionary([28, 118])
+        inhibit = self.get_exercise_dictionary([])
+        static_stretch = self.get_exercise_dictionary([])
         active_stretch = {}
         dynamic_stretch = {}
-        isolated_activation = self.get_exercise_dictionary([115, 81, 77])
+        isolated_activation = self.get_exercise_dictionary([])
         knee.add_extended_exercise_phases(inhibit, static_stretch, active_stretch, dynamic_stretch, isolated_activation, {})
-        knee.add_muscle_groups([15], [16], [11, 8], [6])
+        knee.add_muscle_groups([15, 6], [16, 4], [11, 8], [6])
 
         return knee
 
@@ -421,7 +421,7 @@ class BodyPartFactory(object):
 
         part = BodyPart(BodyPartLocation.lats, 15)
         inhibit = self.get_exercise_dictionary([55])
-        static_stretch = self.get_exercise_dictionary([57, 103, 104, 121])
+        static_stretch = self.get_exercise_dictionary([57, 103, 104])
         active_stretch = self.get_exercise_dictionary([263])
         dynamic_stretch = {}
         isolated_activation = self.get_exercise_dictionary([241, 239])
@@ -434,12 +434,12 @@ class BodyPartFactory(object):
 
         part = BodyPart(BodyPartLocation.lower_back, 1)
         inhibit = self.get_exercise_dictionary([44])
-        static_stretch = self.get_exercise_dictionary([56, 103, 104, 121, 218])
+        static_stretch = self.get_exercise_dictionary([56, 103, 104])
         active_stretch = self.get_exercise_dictionary([266])
         dynamic_stretch = {}
         isolated_activation = self.get_exercise_dictionary([51, 79])
         part.add_extended_exercise_phases(inhibit, static_stretch, active_stretch, dynamic_stretch, isolated_activation, {})
-        part.add_muscle_groups([12], [21, 14], [11, 5, 6, 15], [3, 14])
+        part.add_muscle_groups([12, 14], [21, 15], [11, 5, 6], [3, 14])
 
         return part
 
@@ -448,10 +448,10 @@ class BodyPartFactory(object):
         outer_thigh = BodyPart(BodyPartLocation.outer_thigh, 6)
 
         inhibit = self.get_exercise_dictionary([4])
-        static_stretch = self.get_exercise_dictionary([28, 46, 49, 56, 225, 224])
-        active_stretch = self.get_exercise_dictionary([122, 117, 144])
+        static_stretch = self.get_exercise_dictionary([46, 56, 225, 224])
+        active_stretch = self.get_exercise_dictionary([272, 273, 274])
         dynamic_stretch = {}
-        isolated_activation = self.get_exercise_dictionary([124, 227, 142, 143, 236, 232, 228, 226])
+        isolated_activation = self.get_exercise_dictionary([142, 143, 226, 227, 228, 232, 236])
         outer_thigh.add_extended_exercise_phases(inhibit, static_stretch, active_stretch, dynamic_stretch, isolated_activation, {})
         outer_thigh.add_muscle_groups([11], [6, 4], [15], [5, 14])
         return outer_thigh
@@ -462,9 +462,9 @@ class BodyPartFactory(object):
 
         inhibit = self.get_exercise_dictionary([48])
         static_stretch = self.get_exercise_dictionary([118])
-        active_stretch = self.get_exercise_dictionary([176])
+        active_stretch = self.get_exercise_dictionary([275])
         dynamic_stretch = {}
-        isolated_activation = self.get_exercise_dictionary([10, 77, 119, 234])
+        isolated_activation = self.get_exercise_dictionary([10, 119, 234])
         quads.add_extended_exercise_phases(inhibit, static_stretch, active_stretch, dynamic_stretch, isolated_activation, {})
         quads.add_muscle_groups([6], [11, 5], [4, 14], [15])
         return quads
@@ -474,12 +474,12 @@ class BodyPartFactory(object):
         shin = BodyPart(BodyPartLocation.shin, 11)
 
         inhibit = self.get_exercise_dictionary([72, 73])
-        static_stretch = self.get_exercise_dictionary([60, 62])
-        active_stretch = self.get_exercise_dictionary([64, 65, 106, 114, 115])
+        static_stretch = self.get_exercise_dictionary([60])
+        active_stretch = self.get_exercise_dictionary([269])
         dynamic_stretch = {}
-        isolated_activation = self.get_exercise_dictionary([75, 29])
+        isolated_activation = self.get_exercise_dictionary([75, 29, 64, 65])
         shin.add_extended_exercise_phases(inhibit, static_stretch, active_stretch, dynamic_stretch, isolated_activation, {})
-        shin.add_muscle_groups([8], [6], [5, 11], [16, 9, 10])
+        shin.add_muscle_groups([8], [6], [5, 11], [16, 10])
         return shin
 
     def get_shoulder(self):
@@ -488,9 +488,9 @@ class BodyPartFactory(object):
 
         inhibit = self.get_exercise_dictionary([259])
         static_stretch = self.get_exercise_dictionary([130, 246, 215])
-        active_stretch = self.get_exercise_dictionary([135])
+        active_stretch = self.get_exercise_dictionary([276])
         dynamic_stretch = {}
-        isolated_activation = self.get_exercise_dictionary([239, 136, 137, 51, 241, 242, 240])
+        isolated_activation = self.get_exercise_dictionary([239, 135, 136, 137, 241, 242])
         part.add_extended_exercise_phases(inhibit, static_stretch, active_stretch, dynamic_stretch, isolated_activation, {})
         part.add_muscle_groups([1, 2, 21], [22], [2], [2, 18])
         return part
@@ -503,7 +503,7 @@ class BodyPartFactory(object):
         static_stretch = self.get_exercise_dictionary([57, 103, 104])
         active_stretch = self.get_exercise_dictionary([263])
         dynamic_stretch = {}
-        isolated_activation = self.get_exercise_dictionary([251, 252, 199])
+        isolated_activation = self.get_exercise_dictionary([199])
         part.add_extended_exercise_phases(inhibit, static_stretch, active_stretch, dynamic_stretch, isolated_activation, {})
         part.add_muscle_groups([23], [], [], [22])
         return part
@@ -514,9 +514,9 @@ class BodyPartFactory(object):
 
         inhibit = self.get_exercise_dictionary([102, 125, 126])
         static_stretch = self.get_exercise_dictionary([127, 129, 128, 103, 104, 246, 215])
-        active_stretch = self.get_exercise_dictionary([134, 131, 132, 133, 134, 135])
+        active_stretch = self.get_exercise_dictionary([131, 132, 133])
         dynamic_stretch = {}
-        isolated_activation = self.get_exercise_dictionary([51, 136, 137, 139, 242])
+        isolated_activation = self.get_exercise_dictionary([51, 136, 137, 242, 135, 134])
         part.add_extended_exercise_phases(inhibit, static_stretch, active_stretch, dynamic_stretch, isolated_activation,
                                           {})
         part.add_muscle_groups([18], [2], [12, 21], [1])
