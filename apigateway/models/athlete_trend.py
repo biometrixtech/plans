@@ -363,6 +363,8 @@ class AthleteTrends(object):
             'stress': self.stress.json_serialise() if self.stress is not None else None,
             'response': self.response.json_serialise() if self.response is not None else None,
             'biomechanics': self.biomechanics.json_serialise() if self.biomechanics is not None else None,
+            'body_response': body_response,
+            'workload': workload
 
         }
         return ret
@@ -402,3 +404,1068 @@ class AthleteTrends(object):
         self.remove_trend_not_present_in_trends_page()
         self.add_no_trigger()
         self.sort_by_priority()
+
+
+body_response = {
+                    "visualization_title": {
+                                        "text": "Your soreness history",
+                                        "body_part_text": [
+                                            ""
+                                        ],
+                                        "color": 3
+                                    },
+                    "visualization_type": 7,
+                    "visualization_data": {
+                        "y_axis_1": "Relative Load",
+                        "y_axis_2": "",
+                        "plot_legends": [
+                            {
+                                "color": 3,
+                                "type": 0,
+                                "text": "pain"
+                            },
+                            {
+                                "color": 4,
+                                "type": 0,
+                                "text": "soreness"
+                            }
+                        ]
+                    },
+                    "data": [
+                        {
+                            "date": "2019-06-18",
+                            "day_of_week": "Tue",
+                            "pain_value": 1,
+                            "soreness_value": 2,
+                            "status": {
+                                        "text": "3 days of pain",
+                                        "bolded_text": [
+                                            "3 days"
+                                        ],
+                                        "color": 2,
+                                        "icon": "alert",
+                                        "sport": None
+                                    },
+                            "body_parts":
+                            [
+                                {
+                                    "body_part": 0,
+                                    "side": 1,
+                                    "pain": True,
+                                    "value": 1
+                                },
+                                {
+                                    "body_part": 0,
+                                    "side": 2,
+                                    "pain": False,
+                                    "value": 2
+                                }
+                            ]
+                        },
+                        {
+                            "date": "2019-06-19",
+                            "day_of_week": "Wed",
+                            "pain_value": 1,
+                            "soreness_value": 2,
+                            "status": {
+                                        "text": "3 days of pain",
+                                        "bolded_text": [
+                                            "3 days"
+                                        ],
+                                        "color": 2,
+                                        "icon": "alert",
+                                        "sport": None
+                                    },
+                            "body_parts":
+                            [
+                                {
+                                    "body_part": 0,
+                                    "side": 1,
+                                    "pain": True,
+                                    "value": 1
+                                },
+                                {
+                                    "body_part": 0,
+                                    "side": 2,
+                                    "pain": False,
+                                    "value": 2
+                                }
+                            ]
+                        },
+                        {
+                            "date": "2019-06-20",
+                            "day_of_week": "Thu",
+                            "pain_value": 1,
+                            "soreness_value": 2,
+                            "status": {
+                                        "text": "3 days of pain",
+                                        "bolded_text": [
+                                            "3 days"
+                                        ],
+                                        "color": 2,
+                                        "icon": "alert",
+                                        "sport": None
+                                    },
+                            "body_parts":
+                            [
+                                {
+                                    "body_part": 0,
+                                    "side": 1,
+                                    "pain": True,
+                                    "value": 1
+                                },
+                                {
+                                    "body_part": 0,
+                                    "side": 2,
+                                    "pain": False,
+                                    "value": 2
+                                }
+                            ]
+                        },
+                        {
+                            "date": "2019-06-21",
+                            "day_of_week": "Fri",
+                            "pain_value": 1,
+                            "soreness_value": 2,
+                            "status": {
+                                        "text": "3 days of pain",
+                                        "bolded_text": [
+                                            "3 days"
+                                        ],
+                                        "color": 2,
+                                        "icon": "alert",
+                                        "sport": None
+                                    },
+                            "body_parts":
+                            [
+                                {
+                                    "body_part": 0,
+                                    "side": 1,
+                                    "pain": True,
+                                    "value": 1
+                                },
+                                {
+                                    "body_part": 0,
+                                    "side": 2,
+                                    "pain": False,
+                                    "value": 2
+                                }
+                            ]
+                        },
+                        {
+                            "date": "2019-06-22",
+                            "day_of_week": "Sat",
+                            "pain_value": 1,
+                            "soreness_value": 2,
+                            "status": {
+                                        "text": "3 days of pain",
+                                        "bolded_text": [
+                                            "3 days"
+                                        ],
+                                        "color": 2,
+                                        "icon": "alert",
+                                        "sport": None
+                                    },
+                            "body_parts":
+                            [
+                                {
+                                    "body_part": 0,
+                                    "side": 1,
+                                    "pain": True,
+                                    "value": 1
+                                },
+                                {
+                                    "body_part": 0,
+                                    "side": 2,
+                                    "pain": False,
+                                    "value": 2
+                                }
+                            ]
+                        },
+                        {
+                            "date": "2019-06-23",
+                            "day_of_week": "Sun",
+                            "pain_value": 1,
+                            "soreness_value": 2,
+                            "status": {
+                                        "text": "3 days of pain",
+                                        "bolded_text": [
+                                            "3 days"
+                                        ],
+                                        "color": 2,
+                                        "icon": "alert",
+                                        "sport": None
+                                    },
+                            "body_parts":
+                            [
+                                {
+                                    "body_part": 0,
+                                    "side": 1,
+                                    "pain": True,
+                                    "value": 1
+                                },
+                                {
+                                    "body_part": 0,
+                                    "side": 2,
+                                    "pain": False,
+                                    "value": 2
+                                }
+                            ]
+                        },
+                        {
+                            "date": "2019-06-24",
+                            "day_of_week": "Mon",
+                            "pain_value": 1,
+                            "soreness_value": 2,
+                            "status": {
+                                        "text": "3 days of pain",
+                                        "bolded_text": [
+                                            "3 days"
+                                        ],
+                                        "color": 2,
+                                        "icon": "alert",
+                                        "sport": None
+                                    },
+                            "body_parts":
+                            [
+                                {
+                                    "body_part": 0,
+                                    "side": 1,
+                                    "pain": True,
+                                    "value": 1
+                                },
+                                {
+                                    "body_part": 0,
+                                    "side": 2,
+                                    "pain": False,
+                                    "value": 2
+                                }
+                            ]
+                        },
+                        {
+                            "date": "2019-06-25",
+                            "day_of_week": "Tue",
+                            "pain_value": 1,
+                            "soreness_value": 2,
+                            "status": {
+                                        "text": "3 days of pain",
+                                        "bolded_text": [
+                                            "3 days"
+                                        ],
+                                        "color": 2,
+                                        "icon": "alert",
+                                        "sport": None
+                                    },
+                            "body_parts":
+                            [
+                                {
+                                    "body_part": 0,
+                                    "side": 1,
+                                    "pain": True,
+                                    "value": 1
+                                },
+                                {
+                                    "body_part": 0,
+                                    "side": 2,
+                                    "pain": False,
+                                    "value": 2
+                                }
+                            ]
+                        },
+                        {
+                            "date": "2019-06-26",
+                            "day_of_week": "Wed",
+                            "pain_value": 1,
+                            "soreness_value": 2,
+                            "status": {
+                                        "text": "3 days of pain",
+                                        "bolded_text": [
+                                            "3 days"
+                                        ],
+                                        "color": 2,
+                                        "icon": "alert",
+                                        "sport": None
+                                    },
+                            "body_parts":
+                            [
+                                {
+                                    "body_part": 0,
+                                    "side": 1,
+                                    "pain": True,
+                                    "value": 1
+                                },
+                                {
+                                    "body_part": 0,
+                                    "side": 2,
+                                    "pain": False,
+                                    "value": 2
+                                }
+                            ]
+                        },
+                        {
+                            "date": "2019-06-27",
+                            "day_of_week": "Thu",
+                            "pain_value": 1,
+                            "soreness_value": 2,
+                            "status": {
+                                        "text": "3 days of pain",
+                                        "bolded_text": [
+                                            "3 days"
+                                        ],
+                                        "color": 2,
+                                        "icon": "alert",
+                                        "sport": None
+                                    },
+                            "body_parts":
+                            [
+                                {
+                                    "body_part": 0,
+                                    "side": 1,
+                                    "pain": True,
+                                    "value": 1
+                                },
+                                {
+                                    "body_part": 0,
+                                    "side": 2,
+                                    "pain": False,
+                                    "value": 2
+                                }
+                            ]
+                        },
+                        {
+                            "date": "2019-06-28",
+                            "day_of_week": "Fri",
+                            "pain_value": 1,
+                            "soreness_value": 2,
+                            "status": {
+                                        "text": "3 days of pain",
+                                        "bolded_text": [
+                                            "3 days"
+                                        ],
+                                        "color": 2,
+                                        "icon": "alert",
+                                        "sport": None
+                                    },
+                            "body_parts":
+                            [
+                                {
+                                    "body_part": 0,
+                                    "side": 1,
+                                    "pain": True,
+                                    "value": 1
+                                },
+                                {
+                                    "body_part": 0,
+                                    "side": 2,
+                                    "pain": False,
+                                    "value": 2
+                                }
+                            ]
+                        },
+                        {
+                            "date": "2019-06-29",
+                            "day_of_week": "Sat",
+                            "pain_value": 1,
+                            "soreness_value": 2,
+                            "status": {
+                                        "text": "3 days of pain",
+                                        "bolded_text": [
+                                            "3 days"
+                                        ],
+                                        "color": 2,
+                                        "icon": "alert",
+                                        "sport": None
+                                    },
+                            "body_parts":
+                            [
+                                {
+                                    "body_part": 0,
+                                    "side": 1,
+                                    "pain": True,
+                                    "value": 1
+                                },
+                                {
+                                    "body_part": 0,
+                                    "side": 2,
+                                    "pain": False,
+                                    "value": 2
+                                }
+                            ]
+                        },
+                        {
+                            "date": "2019-06-30",
+                            "day_of_week": "Sun",
+                            "pain_value": 1,
+                            "soreness_value": 2,
+                            "status": {
+                                        "text": "3 days of pain",
+                                        "bolded_text": [
+                                            "3 days"
+                                        ],
+                                        "color": 2,
+                                        "icon": "alert",
+                                        "sport": None
+                                    },
+                            "body_parts":
+                            [
+                                {
+                                    "body_part": 0,
+                                    "side": 1,
+                                    "pain": True,
+                                    "value": 1
+                                },
+                                {
+                                    "body_part": 0,
+                                    "side": 2,
+                                    "pain": False,
+                                    "value": 2
+                                }
+                            ]
+                        },
+                        {
+                            "date": "2019-07-01",
+                            "day_of_week": "Mon",
+                            "pain_value": 1,
+                            "soreness_value": 2,
+                            "status": {
+                                        "text": "3 days of pain",
+                                        "bolded_text": [
+                                            "3 days"
+                                        ],
+                                        "color": 2,
+                                        "icon": "alert",
+                                        "sport": None
+                                    },
+                            "body_parts":
+                            [
+                                {
+                                    "body_part": 0,
+                                    "side": 1,
+                                    "pain": True,
+                                    "value": 1
+                                },
+                                {
+                                    "body_part": 0,
+                                    "side": 2,
+                                    "pain": False,
+                                    "value": 2
+                                }
+                            ]
+                        },
+                        {
+                            "date": "2019-07-02",
+                            "day_of_week": "Tues",
+                            "pain_value": 1,
+                            "soreness_value": 2,
+                            "status": {
+                                        "text": "3 days of pain",
+                                        "bolded_text": [
+                                            "3 days"
+                                        ],
+                                        "color": 2,
+                                        "icon": "alert",
+                                        "sport": None
+                                    },
+                            "body_parts":
+                            [
+                                {
+                                    "body_part": 0,
+                                    "side": 1,
+                                    "pain": True,
+                                    "value": 1
+                                },
+                                {
+                                    "body_part": 0,
+                                    "side": 2,
+                                    "pain": False,
+                                    "value": 2
+                                }
+                            ]
+                        }
+                    ]
+                }
+
+
+workload = {
+                "visualization_title": {
+                                    "text": "Your workload history",
+                                    "body_part_text": [
+                                        ""
+                                    ],
+                                    "color": 3
+                                },
+                "visualization_type": 8,
+                "visualization_data": {
+                    "y_axis_1": "Relative Load",
+                    "y_axis_2": "",
+                    "plot_legends": [
+                        {
+                            "color": 7,
+                            "type": 4,
+                            "text": "Workload"
+                        }
+                    ]
+                },
+                "data": [
+                    {
+                        "date": "2019-06-19",
+                        "day_of_week": "Wed",
+                        "value": 1180,
+                        "status": {
+                                    "text": "today's distance run was in the 93rd percentile",
+                                    "bolded_text": [
+                                        "distance run",
+                                        "93rd percentile"
+                                    ],
+                                    "color": 2,
+                                    "icon": None,
+                                    "sport": 17
+                                },
+                        "sessions":
+                        [
+                            {
+
+                                "sport_name": 17,
+                                "source": 1,
+                                "duration": 73,
+                                "event_date": "2019-07-01T11:11:11Z",
+                                "end_date": "2019-07-01T12:11:11Z",
+                                "distance": 50,
+                                "RPE": 7,
+                                "training_volume": 980
+                            },
+                            {
+
+                                "sport_name": 20,
+                                "source": 0,
+                                "duration": 73,
+                                "event_date": "2019-07-01T15:30:00Z",
+                                "end_date": None,
+                                "distance": None,
+                                "RPE": 5,
+                                "training_volume": 200
+                            },
+                        ]
+                    },
+                    {
+                        "date": "2019-06-20",
+                        "day_of_week": "Thu",
+                        "value": 1180,
+                        "status": {
+                                    "text": "today's distance run was in the 93rd percentile",
+                                    "bolded_text": [
+                                        "distance run",
+                                        "93rd percentile"
+                                    ],
+                                    "color": 2,
+                                    "icon": None,
+                                    "sport": 17
+                                },
+                        "sessions":
+                        [
+                            {
+
+                                "sport_name": 17,
+                                "source": 1,
+                                "duration": 73,
+                                "event_date": "2019-07-01T11:11:11Z",
+                                "end_date": "2019-07-01T12:11:11Z",
+                                "distance": 50,
+                                "RPE": 7,
+                                "training_volume": 980
+                            },
+                            {
+
+                                "sport_name": 20,
+                                "source": 0,
+                                "duration": 73,
+                                "event_date": "2019-07-01T15:30:00Z",
+                                "end_date": None,
+                                "distance": None,
+                                "RPE": 5,
+                                "training_volume": 200
+                            },
+                        ]
+                    },
+                    {
+                        "date": "2019-06-21",
+                        "day_of_week": "Fri",
+                        "value": 1180,
+                        "status": {
+                                    "text": "today's distance run was in the 93rd percentile",
+                                    "bolded_text": [
+                                        "distance run",
+                                        "93rd percentile"
+                                    ],
+                                    "color": 2,
+                                    "icon": None,
+                                    "sport": 17
+                                },
+                        "sessions":
+                        [
+                            {
+
+                                "sport_name": 17,
+                                "source": 1,
+                                "duration": 73,
+                                "event_date": "2019-07-01T11:11:11Z",
+                                "end_date": "2019-07-01T12:11:11Z",
+                                "distance": 50,
+                                "RPE": 7,
+                                "training_volume": 980
+                            },
+                            {
+
+                                "sport_name": 20,
+                                "source": 0,
+                                "duration": 73,
+                                "event_date": "2019-07-01T15:30:00Z",
+                                "end_date": None,
+                                "distance": None,
+                                "RPE": 5,
+                                "training_volume": 200
+                            },
+                        ]
+                    },
+                    {
+                        "date": "2019-06-22",
+                        "day_of_week": "Sat",
+                        "value": 1180,
+                        "status": {
+                                    "text": "today's distance run was in the 93rd percentile",
+                                    "bolded_text": [
+                                        "distance run",
+                                        "93rd percentile"
+                                    ],
+                                    "color": 2,
+                                    "icon": None,
+                                    "sport": 17
+                                },
+                        "sessions":
+                        [
+                            {
+
+                                "sport_name": 17,
+                                "source": 1,
+                                "duration": 73,
+                                "event_date": "2019-07-01T11:11:11Z",
+                                "end_date": "2019-07-01T12:11:11Z",
+                                "distance": 50,
+                                "RPE": 7,
+                                "training_volume": 980
+                            },
+                            {
+
+                                "sport_name": 20,
+                                "source": 0,
+                                "duration": 73,
+                                "event_date": "2019-07-01T15:30:00Z",
+                                "end_date": None,
+                                "distance": None,
+                                "RPE": 5,
+                                "training_volume": 200
+                            },
+                        ]
+                    },
+                    {
+                        "date": "2019-06-23",
+                        "day_of_week": "Sun",
+                        "value": 1180,
+                        "status": {
+                                    "text": "today's distance run was in the 93rd percentile",
+                                    "bolded_text": [
+                                        "distance run",
+                                        "93rd percentile"
+                                    ],
+                                    "color": 2,
+                                    "icon": None,
+                                    "sport": 17
+                                },
+                        "sessions":
+                        [
+                            {
+
+                                "sport_name": 17,
+                                "source": 1,
+                                "duration": 73,
+                                "event_date": "2019-07-01T11:11:11Z",
+                                "end_date": "2019-07-01T12:11:11Z",
+                                "distance": 50,
+                                "RPE": 7,
+                                "training_volume": 980
+                            },
+                            {
+
+                                "sport_name": 20,
+                                "source": 0,
+                                "duration": 73,
+                                "event_date": "2019-07-01T15:30:00Z",
+                                "end_date": None,
+                                "distance": None,
+                                "RPE": 5,
+                                "training_volume": 200
+                            },
+                        ]
+                    },
+                    {
+                        "date": "2019-06-24",
+                        "day_of_week": "Mon",
+                        "value": 1180,
+                        "status": {
+                                    "text": "today's distance run was in the 93rd percentile",
+                                    "bolded_text": [
+                                        "distance run",
+                                        "93rd percentile"
+                                    ],
+                                    "color": 2,
+                                    "icon": None,
+                                    "sport": 17
+                                },
+                        "sessions":
+                        [
+                            {
+
+                                "sport_name": 17,
+                                "source": 1,
+                                "duration": 73,
+                                "event_date": "2019-07-01T11:11:11Z",
+                                "end_date": "2019-07-01T12:11:11Z",
+                                "distance": 50,
+                                "RPE": 7,
+                                "training_volume": 980
+                            },
+                            {
+
+                                "sport_name": 20,
+                                "source": 0,
+                                "duration": 73,
+                                "event_date": "2019-07-01T15:30:00Z",
+                                "end_date": None,
+                                "distance": None,
+                                "RPE": 5,
+                                "training_volume": 200
+                            },
+                        ]
+                    },
+                    {
+                        "date": "2019-06-25",
+                        "day_of_week": "Tue",
+                        "value": 1180,
+                        "status": {
+                                    "text": "today's distance run was in the 93rd percentile",
+                                    "bolded_text": [
+                                        "distance run",
+                                        "93rd percentile"
+                                    ],
+                                    "color": 2,
+                                    "icon": None,
+                                    "sport": 17
+                                },
+                        "sessions":
+                        [
+                            {
+
+                                "sport_name": 17,
+                                "source": 1,
+                                "duration": 73,
+                                "event_date": "2019-07-01T11:11:11Z",
+                                "end_date": "2019-07-01T12:11:11Z",
+                                "distance": 50,
+                                "RPE": 7,
+                                "training_volume": 980
+                            },
+                            {
+
+                                "sport_name": 20,
+                                "source": 0,
+                                "duration": 73,
+                                "event_date": "2019-07-01T15:30:00Z",
+                                "end_date": None,
+                                "distance": None,
+                                "RPE": 5,
+                                "training_volume": 200
+                            },
+                        ]
+                    },
+                    {
+                        "date": "2019-06-26",
+                        "day_of_week": "Wed",
+                        "value": 1180,
+                        "status": {
+                                    "text": "today's distance run was in the 93rd percentile",
+                                    "bolded_text": [
+                                        "distance run",
+                                        "93rd percentile"
+                                    ],
+                                    "color": 2,
+                                    "icon": None,
+                                    "sport": 17
+                                },
+                        "sessions":
+                        [
+                            {
+
+                                "sport_name": 17,
+                                "source": 1,
+                                "duration": 73,
+                                "event_date": "2019-07-01T11:11:11Z",
+                                "end_date": "2019-07-01T12:11:11Z",
+                                "distance": 50,
+                                "RPE": 7,
+                                "training_volume": 980
+                            },
+                            {
+
+                                "sport_name": 20,
+                                "source": 0,
+                                "duration": 73,
+                                "event_date": "2019-07-01T15:30:00Z",
+                                "end_date": None,
+                                "distance": None,
+                                "RPE": 5,
+                                "training_volume": 200
+                            },
+                        ]
+                    },
+                    {
+                        "date": "2019-06-27",
+                        "day_of_week": "Thu",
+                        "value": 1180,
+                        "status": {
+                                    "text": "today's distance run was in the 93rd percentile",
+                                    "bolded_text": [
+                                        "distance run",
+                                        "93rd percentile"
+                                    ],
+                                    "color": 2,
+                                    "icon": None,
+                                    "sport": 17
+                                },
+                        "sessions":
+                        [
+                            {
+
+                                "sport_name": 17,
+                                "source": 1,
+                                "duration": 73,
+                                "event_date": "2019-07-01T11:11:11Z",
+                                "end_date": "2019-07-01T12:11:11Z",
+                                "distance": 50,
+                                "RPE": 7,
+                                "training_volume": 980
+                            },
+                            {
+
+                                "sport_name": 20,
+                                "source": 0,
+                                "duration": 73,
+                                "event_date": "2019-07-01T15:30:00Z",
+                                "end_date": None,
+                                "distance": None,
+                                "RPE": 5,
+                                "training_volume": 200
+                            },
+                        ]
+                    },
+                    {
+                        "date": "2019-06-28",
+                        "day_of_week": "Fri",
+                        "value": 1180,
+                        "status": {
+                                    "text": "today's distance run was in the 93rd percentile",
+                                    "bolded_text": [
+                                        "distance run",
+                                        "93rd percentile"
+                                    ],
+                                    "color": 2,
+                                    "icon": None,
+                                    "sport": 17
+                                },
+                        "sessions":
+                        [
+                            {
+
+                                "sport_name": 17,
+                                "source": 1,
+                                "duration": 73,
+                                "event_date": "2019-07-01T11:11:11Z",
+                                "end_date": "2019-07-01T12:11:11Z",
+                                "distance": 50,
+                                "RPE": 7,
+                                "training_volume": 980
+                            },
+                            {
+
+                                "sport_name": 20,
+                                "source": 0,
+                                "duration": 73,
+                                "event_date": "2019-07-01T15:30:00Z",
+                                "end_date": None,
+                                "distance": None,
+                                "RPE": 5,
+                                "training_volume": 200
+                            },
+                        ]
+                    },
+                    {
+                        "date": "2019-06-29",
+                        "day_of_week": "Sat",
+                        "value": 1180,
+                        "status": {
+                                    "text": "today's distance run was in the 93rd percentile",
+                                    "bolded_text": [
+                                        "distance run",
+                                        "93rd percentile"
+                                    ],
+                                    "color": 2,
+                                    "icon": None,
+                                    "sport": 17
+                                },
+                        "sessions":
+                        [
+                            {
+
+                                "sport_name": 17,
+                                "source": 1,
+                                "duration": 73,
+                                "event_date": "2019-07-01T11:11:11Z",
+                                "end_date": "2019-07-01T12:11:11Z",
+                                "distance": 50,
+                                "RPE": 7,
+                                "training_volume": 980
+                            },
+                            {
+
+                                "sport_name": 20,
+                                "source": 0,
+                                "duration": 73,
+                                "event_date": "2019-07-01T15:30:00Z",
+                                "end_date": None,
+                                "distance": None,
+                                "RPE": 5,
+                                "training_volume": 200
+                            },
+                        ]
+                    },
+                    {
+                        "date": "2019-06-30",
+                        "day_of_week": "Sun",
+                        "value": 1180,
+                        "status": {
+                                    "text": "today's distance run was in the 93rd percentile",
+                                    "bolded_text": [
+                                        "distance run",
+                                        "93rd percentile"
+                                    ],
+                                    "color": 2,
+                                    "icon": None,
+                                    "sport": 17
+                                },
+                        "sessions":
+                        [
+                            {
+
+                                "sport_name": 17,
+                                "source": 1,
+                                "duration": 73,
+                                "event_date": "2019-07-01T11:11:11Z",
+                                "end_date": "2019-07-01T12:11:11Z",
+                                "distance": 50,
+                                "RPE": 7,
+                                "training_volume": 980
+                            },
+                            {
+
+                                "sport_name": 20,
+                                "source": 0,
+                                "duration": 73,
+                                "event_date": "2019-07-01T15:30:00Z",
+                                "end_date": None,
+                                "distance": None,
+                                "RPE": 5,
+                                "training_volume": 200
+                            },
+                        ]
+                    },
+                    {
+                        "date": "2019-07-01",
+                        "day_of_week": "Mon",
+                        "value": 1180,
+                        "status": {
+                                    "text": "today's distance run was in the 93rd percentile",
+                                    "bolded_text": [
+                                        "distance run",
+                                        "93rd percentile"
+                                    ],
+                                    "color": 2,
+                                    "icon": None,
+                                    "sport": 17
+                                },
+                        "sessions":
+                        [
+                            {
+
+                                "sport_name": 17,
+                                "source": 1,
+                                "duration": 73,
+                                "event_date": "2019-07-01T11:11:11Z",
+                                "end_date": "2019-07-01T12:11:11Z",
+                                "distance": 50,
+                                "RPE": 7,
+                                "training_volume": 980
+                            },
+                            {
+
+                                "sport_name": 20,
+                                "source": 0,
+                                "duration": 73,
+                                "event_date": "2019-07-01T15:30:00Z",
+                                "end_date": None,
+                                "distance": None,
+                                "RPE": 5,
+                                "training_volume": 200
+                            },
+                        ]
+                    },
+                    {
+                        "date": "2019-07-02",
+                        "day_of_week": "Tue",
+                        "value": 1180,
+                        "status": {
+                                    "text": "today's distance run was in the 93rd percentile",
+                                    "bolded_text": [
+                                        "distance run",
+                                        "93rd percentile"
+                                    ],
+                                    "color": 2,
+                                    "icon": None,
+                                    "sport": 17
+                                },
+                        "sessions":
+                        [
+                            {
+
+                                "sport_name": 17,
+                                "source": 1,
+                                "duration": 73,
+                                "event_date": "2019-07-01T11:11:11Z",
+                                "end_date": "2019-07-01T12:11:11Z",
+                                "distance": 50,
+                                "RPE": 7,
+                                "training_volume": 980
+                            },
+                            {
+
+                                "sport_name": 20,
+                                "source": 0,
+                                "duration": 73,
+                                "event_date": "2019-07-01T15:30:00Z",
+                                "end_date": None,
+                                "distance": None,
+                                "RPE": 5,
+                                "training_volume": 200
+                            },
+                        ]
+                    },
+                ]
+            }
