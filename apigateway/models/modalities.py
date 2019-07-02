@@ -1230,7 +1230,7 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
                         goal.trigger_type = TriggerType.no_hist_pain_pain_today_high_severity_3_5  # 15
                     else:
                         goal.trigger_type = TriggerType.hist_pain_pain_today_severity_3_5  # 24
-                synergist_priority = "1"
+                synergist_priority = "2"
             else:
                 #goal.trigger = "Painful muscle reported today"
                 if soreness.severity < 3:
@@ -1638,7 +1638,7 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
                         goal.trigger_type = TriggerType.no_hist_pain_pain_today_high_severity_3_5  # 15
                     else:
                         goal.trigger_type = TriggerType.hist_pain_pain_today_severity_3_5  # 24
-                synergist_priority = "1"
+                synergist_priority = "2"
             else:
                 #goal.trigger = "Painful muscle reported today"
                 if soreness.severity < 3:
