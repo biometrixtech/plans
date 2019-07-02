@@ -455,13 +455,13 @@ body_response = {
                             "body_parts":
                             [
                                 {
-                                    "body_part": 0,
+                                    "body_part": 11,
                                     "side": 1,
                                     "pain": True,
                                     "value": 1
                                 },
                                 {
-                                    "body_part": 0,
+                                    "body_part": 11,
                                     "side": 2,
                                     "pain": False,
                                     "value": 2
@@ -486,13 +486,13 @@ body_response = {
                             "body_parts":
                             [
                                 {
-                                    "body_part": 0,
+                                    "body_part": 11,
                                     "side": 1,
                                     "pain": True,
                                     "value": 1
                                 },
                                 {
-                                    "body_part": 0,
+                                    "body_part": 11,
                                     "side": 2,
                                     "pain": False,
                                     "value": 2
@@ -517,13 +517,13 @@ body_response = {
                             "body_parts":
                             [
                                 {
-                                    "body_part": 0,
+                                    "body_part": 11,
                                     "side": 1,
                                     "pain": True,
                                     "value": 1
                                 },
                                 {
-                                    "body_part": 0,
+                                    "body_part": 11,
                                     "side": 2,
                                     "pain": False,
                                     "value": 2
@@ -548,13 +548,13 @@ body_response = {
                             "body_parts":
                             [
                                 {
-                                    "body_part": 0,
+                                    "body_part": 11,
                                     "side": 1,
                                     "pain": True,
                                     "value": 1
                                 },
                                 {
-                                    "body_part": 0,
+                                    "body_part": 11,
                                     "side": 2,
                                     "pain": False,
                                     "value": 2
@@ -579,13 +579,13 @@ body_response = {
                             "body_parts":
                             [
                                 {
-                                    "body_part": 0,
+                                    "body_part": 11,
                                     "side": 1,
                                     "pain": True,
                                     "value": 1
                                 },
                                 {
-                                    "body_part": 0,
+                                    "body_part": 11,
                                     "side": 2,
                                     "pain": False,
                                     "value": 2
@@ -610,13 +610,13 @@ body_response = {
                             "body_parts":
                             [
                                 {
-                                    "body_part": 0,
+                                    "body_part": 11,
                                     "side": 1,
                                     "pain": True,
                                     "value": 1
                                 },
                                 {
-                                    "body_part": 0,
+                                    "body_part": 11,
                                     "side": 2,
                                     "pain": False,
                                     "value": 2
@@ -641,13 +641,13 @@ body_response = {
                             "body_parts":
                             [
                                 {
-                                    "body_part": 0,
+                                    "body_part": 11,
                                     "side": 1,
                                     "pain": True,
                                     "value": 1
                                 },
                                 {
-                                    "body_part": 0,
+                                    "body_part": 11,
                                     "side": 2,
                                     "pain": False,
                                     "value": 2
@@ -672,13 +672,13 @@ body_response = {
                             "body_parts":
                             [
                                 {
-                                    "body_part": 0,
+                                    "body_part": 11,
                                     "side": 1,
                                     "pain": True,
                                     "value": 1
                                 },
                                 {
-                                    "body_part": 0,
+                                    "body_part": 11,
                                     "side": 2,
                                     "pain": False,
                                     "value": 2
@@ -703,13 +703,13 @@ body_response = {
                             "body_parts":
                             [
                                 {
-                                    "body_part": 0,
+                                    "body_part": 11,
                                     "side": 1,
                                     "pain": True,
                                     "value": 1
                                 },
                                 {
-                                    "body_part": 0,
+                                    "body_part": 11,
                                     "side": 2,
                                     "pain": False,
                                     "value": 2
@@ -734,13 +734,13 @@ body_response = {
                             "body_parts":
                             [
                                 {
-                                    "body_part": 0,
+                                    "body_part": 11,
                                     "side": 1,
                                     "pain": True,
                                     "value": 1
                                 },
                                 {
-                                    "body_part": 0,
+                                    "body_part": 11,
                                     "side": 2,
                                     "pain": False,
                                     "value": 2
@@ -765,13 +765,13 @@ body_response = {
                             "body_parts":
                             [
                                 {
-                                    "body_part": 0,
+                                    "body_part": 11,
                                     "side": 1,
                                     "pain": True,
                                     "value": 1
                                 },
                                 {
-                                    "body_part": 0,
+                                    "body_part": 11,
                                     "side": 2,
                                     "pain": False,
                                     "value": 2
@@ -796,13 +796,13 @@ body_response = {
                             "body_parts":
                             [
                                 {
-                                    "body_part": 0,
+                                    "body_part": 11,
                                     "side": 1,
                                     "pain": True,
                                     "value": 1
                                 },
                                 {
-                                    "body_part": 0,
+                                    "body_part": 11,
                                     "side": 2,
                                     "pain": False,
                                     "value": 2
@@ -827,13 +827,13 @@ body_response = {
                             "body_parts":
                             [
                                 {
-                                    "body_part": 0,
+                                    "body_part": 11,
                                     "side": 1,
                                     "pain": True,
                                     "value": 1
                                 },
                                 {
-                                    "body_part": 0,
+                                    "body_part": 11,
                                     "side": 2,
                                     "pain": False,
                                     "value": 2
@@ -858,13 +858,13 @@ body_response = {
                             "body_parts":
                             [
                                 {
-                                    "body_part": 0,
+                                    "body_part": 11,
                                     "side": 1,
                                     "pain": True,
                                     "value": 1
                                 },
                                 {
-                                    "body_part": 0,
+                                    "body_part": 11,
                                     "side": 2,
                                     "pain": False,
                                     "value": 2
@@ -889,13 +889,13 @@ body_response = {
                             "body_parts":
                             [
                                 {
-                                    "body_part": 0,
+                                    "body_part": 11,
                                     "side": 1,
                                     "pain": True,
                                     "value": 1
                                 },
                                 {
-                                    "body_part": 0,
+                                    "body_part": 11,
                                     "side": 2,
                                     "pain": False,
                                     "value": 2
