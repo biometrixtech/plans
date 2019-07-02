@@ -13,12 +13,16 @@ class LegendColor(Enum):
     yellow = 1
     red = 2
     slate = 3
+    splash_light = 4
+    warning_light = 5
+    error_light = 6
 
 
 class LegendType(Enum):
     circle = 0
     solid_line = 1
     dashed_line = 2
+    pill = 3
 
 
 class VisualizationType(Enum):
@@ -416,21 +420,22 @@ body_response = {
                                     },
                     "visualization_type": 7,
                     "visualization_data": {
-                        "y_axis_1": "Relative Load",
+                        "y_axis_1": "Severity",
                         "y_axis_2": "",
                         "plot_legends": [
                             {
-                                "color": 3,
+                                "color": 6,
                                 "type": 0,
                                 "text": "pain"
                             },
                             {
-                                "color": 4,
+                                "color": 5,
                                 "type": 0,
                                 "text": "soreness"
                             }
                         ]
                     },
+                    "lockout": False,
                     "data": [
                         {
                             "date": "2019-06-18",
@@ -442,9 +447,10 @@ body_response = {
                                         "bolded_text": [
                                             "3 days"
                                         ],
-                                        "color": 2,
-                                        "icon": "alert",
-                                        "sport": None
+                                        "color": 5,
+                                        "icon": "md-body",
+                                        "sport": None,
+                                        "icon_type": "ionicon"
                                     },
                             "body_parts":
                             [
@@ -472,9 +478,10 @@ body_response = {
                                         "bolded_text": [
                                             "3 days"
                                         ],
-                                        "color": 2,
-                                        "icon": "alert",
-                                        "sport": None
+                                        "color": 5,
+                                        "icon": "md-body",
+                                        "sport": None,
+                                        "icon_type": "ionicon"
                                     },
                             "body_parts":
                             [
@@ -502,9 +509,10 @@ body_response = {
                                         "bolded_text": [
                                             "3 days"
                                         ],
-                                        "color": 2,
-                                        "icon": "alert",
-                                        "sport": None
+                                        "color": 5,
+                                        "icon": "md-body",
+                                        "sport": None,
+                                        "icon_type": "ionicon"
                                     },
                             "body_parts":
                             [
@@ -532,9 +540,10 @@ body_response = {
                                         "bolded_text": [
                                             "3 days"
                                         ],
-                                        "color": 2,
-                                        "icon": "alert",
-                                        "sport": None
+                                        "color": 5,
+                                        "icon": "md-body",
+                                        "sport": None,
+                                        "icon_type": "ionicon"
                                     },
                             "body_parts":
                             [
@@ -562,9 +571,10 @@ body_response = {
                                         "bolded_text": [
                                             "3 days"
                                         ],
-                                        "color": 2,
-                                        "icon": "alert",
-                                        "sport": None
+                                        "color": 5,
+                                        "icon": "md-body",
+                                        "sport": None,
+                                        "icon_type": "ionicon"
                                     },
                             "body_parts":
                             [
@@ -592,9 +602,10 @@ body_response = {
                                         "bolded_text": [
                                             "3 days"
                                         ],
-                                        "color": 2,
-                                        "icon": "alert",
-                                        "sport": None
+                                        "color": 5,
+                                        "icon": "md-body",
+                                        "sport": None,
+                                        "icon_type": "ionicon"
                                     },
                             "body_parts":
                             [
@@ -622,9 +633,10 @@ body_response = {
                                         "bolded_text": [
                                             "3 days"
                                         ],
-                                        "color": 2,
-                                        "icon": "alert",
-                                        "sport": None
+                                        "color": 5,
+                                        "icon": "md-body",
+                                        "sport": None,
+                                        "icon_type": "ionicon"
                                     },
                             "body_parts":
                             [
@@ -652,9 +664,10 @@ body_response = {
                                         "bolded_text": [
                                             "3 days"
                                         ],
-                                        "color": 2,
-                                        "icon": "alert",
-                                        "sport": None
+                                        "color": 5,
+                                        "icon": "md-body",
+                                        "sport": None,
+                                        "icon_type": "ionicon"
                                     },
                             "body_parts":
                             [
@@ -682,9 +695,10 @@ body_response = {
                                         "bolded_text": [
                                             "3 days"
                                         ],
-                                        "color": 2,
-                                        "icon": "alert",
-                                        "sport": None
+                                        "color": 5,
+                                        "icon": "md-body",
+                                        "sport": None,
+                                        "icon_type": "ionicon"
                                     },
                             "body_parts":
                             [
@@ -712,9 +726,10 @@ body_response = {
                                         "bolded_text": [
                                             "3 days"
                                         ],
-                                        "color": 2,
-                                        "icon": "alert",
-                                        "sport": None
+                                        "color": 5,
+                                        "icon": "md-body",
+                                        "sport": None,
+                                        "icon_type": "ionicon"
                                     },
                             "body_parts":
                             [
@@ -742,9 +757,10 @@ body_response = {
                                         "bolded_text": [
                                             "3 days"
                                         ],
-                                        "color": 2,
-                                        "icon": "alert",
-                                        "sport": None
+                                        "color": 5,
+                                        "icon": "md-body",
+                                        "sport": None,
+                                        "icon_type": "ionicon"
                                     },
                             "body_parts":
                             [
@@ -772,9 +788,10 @@ body_response = {
                                         "bolded_text": [
                                             "3 days"
                                         ],
-                                        "color": 2,
-                                        "icon": "alert",
-                                        "sport": None
+                                        "color": 5,
+                                        "icon": "md-body",
+                                        "sport": None,
+                                        "icon_type": "ionicon"
                                     },
                             "body_parts":
                             [
@@ -802,9 +819,10 @@ body_response = {
                                         "bolded_text": [
                                             "3 days"
                                         ],
-                                        "color": 2,
-                                        "icon": "alert",
-                                        "sport": None
+                                        "color": 5,
+                                        "icon": "md-body",
+                                        "sport": None,
+                                        "icon_type": "ionicon"
                                     },
                             "body_parts":
                             [
@@ -832,9 +850,10 @@ body_response = {
                                         "bolded_text": [
                                             "3 days"
                                         ],
-                                        "color": 2,
-                                        "icon": "alert",
-                                        "sport": None
+                                        "color": 5,
+                                        "icon": "md-body",
+                                        "sport": None,
+                                        "icon_type": "ionicon"
                                     },
                             "body_parts":
                             [
@@ -862,9 +881,10 @@ body_response = {
                                         "bolded_text": [
                                             "3 days"
                                         ],
-                                        "color": 2,
-                                        "icon": "alert",
-                                        "sport": None
+                                        "color": 5,
+                                        "icon": "md-body",
+                                        "sport": None,
+                                        "icon_type": "ionicon"
                                     },
                             "body_parts":
                             [
@@ -896,16 +916,17 @@ workload = {
                                 },
                 "visualization_type": 8,
                 "visualization_data": {
-                    "y_axis_1": "Relative Load",
+                    "y_axis_1": "Intensity",
                     "y_axis_2": "",
                     "plot_legends": [
                         {
-                            "color": 7,
-                            "type": 4,
+                            "color": 6,
+                            "type": 3,
                             "text": "Workload"
                         }
                     ]
                 },
+                "lockout": False,
                 "data": [
                     {
                         "date": "2019-06-19",
@@ -917,9 +938,10 @@ workload = {
                                         "distance run",
                                         "93rd percentile"
                                     ],
-                                    "color": 2,
+                                    "color": 4,
                                     "icon": None,
-                                    "sport": 17
+                                    "sport_name": 17,
+                                    "icon_type": None
                                 },
                         "sessions":
                         [
@@ -957,9 +979,10 @@ workload = {
                                         "distance run",
                                         "93rd percentile"
                                     ],
-                                    "color": 2,
+                                    "color": 4,
                                     "icon": None,
-                                    "sport": 17
+                                    "sport_name": 17,
+                                    "icon_type": None
                                 },
                         "sessions":
                         [
@@ -997,9 +1020,10 @@ workload = {
                                         "distance run",
                                         "93rd percentile"
                                     ],
-                                    "color": 2,
+                                    "color": 4,
                                     "icon": None,
-                                    "sport": 17
+                                    "sport_name": 17,
+                                    "icon_type": None
                                 },
                         "sessions":
                         [
@@ -1037,9 +1061,10 @@ workload = {
                                         "distance run",
                                         "93rd percentile"
                                     ],
-                                    "color": 2,
+                                    "color": 4,
                                     "icon": None,
-                                    "sport": 17
+                                    "sport_name": 17,
+                                    "icon_type": None
                                 },
                         "sessions":
                         [
@@ -1077,9 +1102,10 @@ workload = {
                                         "distance run",
                                         "93rd percentile"
                                     ],
-                                    "color": 2,
+                                    "color": 4,
                                     "icon": None,
-                                    "sport": 17
+                                    "sport_name": 17,
+                                    "icon_type": None
                                 },
                         "sessions":
                         [
@@ -1117,9 +1143,10 @@ workload = {
                                         "distance run",
                                         "93rd percentile"
                                     ],
-                                    "color": 2,
+                                    "color": 4,
                                     "icon": None,
-                                    "sport": 17
+                                    "sport_name": 17,
+                                    "icon_type": None
                                 },
                         "sessions":
                         [
@@ -1157,9 +1184,10 @@ workload = {
                                         "distance run",
                                         "93rd percentile"
                                     ],
-                                    "color": 2,
+                                    "color": 4,
                                     "icon": None,
-                                    "sport": 17
+                                    "sport_name": 17,
+                                    "icon_type": None
                                 },
                         "sessions":
                         [
@@ -1197,9 +1225,10 @@ workload = {
                                         "distance run",
                                         "93rd percentile"
                                     ],
-                                    "color": 2,
+                                    "color": 4,
                                     "icon": None,
-                                    "sport": 17
+                                    "sport_name": 17,
+                                    "icon_type": None
                                 },
                         "sessions":
                         [
@@ -1237,9 +1266,10 @@ workload = {
                                         "distance run",
                                         "93rd percentile"
                                     ],
-                                    "color": 2,
+                                    "color": 4,
                                     "icon": None,
-                                    "sport": 17
+                                    "sport_name": 17,
+                                    "icon_type": None
                                 },
                         "sessions":
                         [
@@ -1277,9 +1307,10 @@ workload = {
                                         "distance run",
                                         "93rd percentile"
                                     ],
-                                    "color": 2,
+                                    "color": 4,
                                     "icon": None,
-                                    "sport": 17
+                                    "sport_name": 17,
+                                    "icon_type": None
                                 },
                         "sessions":
                         [
@@ -1317,9 +1348,10 @@ workload = {
                                         "distance run",
                                         "93rd percentile"
                                     ],
-                                    "color": 2,
+                                    "color": 4,
                                     "icon": None,
-                                    "sport": 17
+                                    "sport_name": 17,
+                                    "icon_type": None
                                 },
                         "sessions":
                         [
@@ -1357,9 +1389,10 @@ workload = {
                                         "distance run",
                                         "93rd percentile"
                                     ],
-                                    "color": 2,
+                                    "color": 4,
                                     "icon": None,
-                                    "sport": 17
+                                    "sport_name": 17,
+                                    "icon_type": None
                                 },
                         "sessions":
                         [
@@ -1397,9 +1430,10 @@ workload = {
                                         "distance run",
                                         "93rd percentile"
                                     ],
-                                    "color": 2,
+                                    "color": 4,
                                     "icon": None,
-                                    "sport": 17
+                                    "sport_name": 17,
+                                    "icon_type": None
                                 },
                         "sessions":
                         [
@@ -1437,9 +1471,10 @@ workload = {
                                         "distance run",
                                         "93rd percentile"
                                     ],
-                                    "color": 2,
+                                    "color": 4,
                                     "icon": None,
-                                    "sport": 17
+                                    "sport_name": 17,
+                                    "icon_type": None
                                 },
                         "sessions":
                         [
