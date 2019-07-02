@@ -313,7 +313,7 @@ class BodyPartFactory(object):
         dynamic_stretch = {}
         isolated_activation = self.get_exercise_dictionary([31, 78, 67, 68])
         calves.add_extended_exercise_phases(inhibit, static_stretch, active_stretch, dynamic_stretch, isolated_activation, {})
-        calves.add_muscle_groups([16], [11], [], [8, 10])
+        calves.add_muscle_groups([16], [11], [8], [8, 10])
         return calves
 
     def get_chest(self):
