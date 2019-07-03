@@ -1,6 +1,6 @@
 from enum import Enum
 from logic.text_generator import TextGenerator
-from models.chart_data import BodyPartChartData, DataSeriesBooleanData, DataSeriesData, TrainingVolumeChartData
+from models.chart_data import BodyPartChartData, DataSeriesBooleanData, DataSeriesData, TrainingVolumeChartData, BodyResponseChartData, WorkoutChartData
 from models.insights import InsightType
 from models.soreness import BodyPartSide
 from models.sport import SportName
@@ -32,6 +32,8 @@ class VisualizationType(Enum):
     doms = 4
     muscular_strain = 5
     sensor = 6
+    body_response = 7
+    workload = 8
 
 
 class DataSource(Enum):
@@ -335,6 +337,77 @@ class TrendCategory(object):
 
     def remove_not_present_in_trends_page(self):
         self.alerts = [alert for alert in self.alerts if alert.present_in_trends]
+
+
+class DataStatus(object):
+    def __init__(self):
+        self.text = ""
+        self.bolded_text = []
+        self.color = LegendColor(0)
+        self.icon = None
+        self.sport_name = None
+        self.icon_type = None
+
+    def json_serialise(self):
+        ret = {'text': self.text,
+               'bolded_text': self.bolded_text,
+               'color': self.color.value,
+               'icon': self.icon,
+               'sport_name': self.sport_name.value if self.sport_name is not None else None,
+               'icon_type': self.icon_type}
+        return ret
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        data_status = cls()
+        data_status.text = input_dict.get('text', '')
+        data_status.bolded_text = input_dict.get('bolded_text', [])
+        data_status.color = LegendColor(input_dict.get('color', 0))
+        data_status.icon = input_dict.get('icon', None)
+        sport_name = input_dict.get('sport_name', None)
+        data_status.sport_name = SportName(sport_name) if sport_name is not None else None
+        data_status.icon_type = input_dict.get('icon_type', None)
+
+        return data_status
+
+
+class TrendData(object):
+    def __init__(self):
+        self.lockout = False
+        self.status = DataStatus()
+        self.data = []
+        self.visualization_type = VisualizationType(1)
+        self.visualization_title = VisualizationTitle()
+        self.visualization_data = VisualizationData()
+
+    def json_serialise(self):
+        ret = {'lockout': self.lockout,
+               'visualization_title': self.visualization_title.json_serialise(),
+               'visualization_type': self.visualization_type.value,
+               'visualization_data': self.visualization_data.json_serialise(),
+               'status': self.status.json_serialise(),
+               'data': [data.json_serialise() for data in self.data]
+               }
+        return ret
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        trend_data = cls()
+        trend_data.lockout = input_dict['lockout']
+        trend_data.status = DataStatus.json_deserialise(input_dict['status'])
+        trend_data.visualization_type = VisualizationType(input_dict['visualization_type'])
+        if trend_data.visualization_type == VisualizationType.body_response:
+            trend_data.data = [BodyResponseChartData.json_deserialise(data) for data in input_dict.get('data', [])]
+        elif trend_data.visualization_type == VisualizationType.workload:
+            trend_data.data = [WorkoutChartData.json_deserialise(data) for data in input_dict.get('data', [])]
+        else:
+            trend_data.data = []
+
+        trend_data.visualization_title = VisualizationTitle()
+        trend_data.visualization_data = VisualizationData.json_deserialise(input_dict['visualization_data'])
+
+        return trend_data
+
 
 
 class TrendsDashboard(object):
