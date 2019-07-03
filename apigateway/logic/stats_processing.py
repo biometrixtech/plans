@@ -130,6 +130,7 @@ class StatsProcessing(object):
         current_athlete_stats.high_relative_load_chart_data = high_relative_load_chart.get_output_list()
 
         current_athlete_stats.training_volume_chart_data = training_volume_processing.training_volume_chart_data
+        current_athlete_stats.workout_chart_data = training_volume_processing.workout_chart_data
 
         body_part_chart_collection = BodyPartChartCollection(self.event_date)
         body_part_chart_collection.process_soreness_list(soreness_list_25)

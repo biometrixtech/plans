@@ -100,6 +100,7 @@ class AthleteStats(Serialisable):
         self.load_stats = LoadStats()
         self.high_relative_load_sessions = []
         self.training_volume_chart_data = []
+        self.workout_chart_data = []
         self.soreness_chart_data = {}
         self.pain_chart_data = {}
         self.muscular_strain_chart_data = []

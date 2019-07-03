@@ -4,6 +4,7 @@ from utils import format_date, parse_datetime, parse_date
 from fathomapi.utils.exceptions import InvalidSchemaException
 from models.soreness import BodyPart, BodyPartSide, Soreness
 from models.sport import SportName
+from models.session import SportTrainingSession
 from logic.soreness_processing import SorenessCalculator
 
 
@@ -144,6 +145,31 @@ class TrainingVolumeChart(BaseChart):
             self.data[chart_data.date] = chart_data
 
 
+class WorkoutChart(BaseChart):
+    def __init__(self, end_date):
+        super().__init__(end_date)
+
+    def add_training_volume(self, training_session, load_stats):
+
+        training_volume = training_session.training_volume(load_stats)
+        if training_volume is not None and training_volume > 0 and training_session.event_date.date() in self.data:
+            self.data[training_session.event_date.date()].training_volume += training_volume
+            self.data[training_session.event_date.date()].sport_names.add(training_session.sport_name)
+            self.data[training_session.event_date.date()].sessions.append(training_session)
+            self.data[training_session.event_date.date()].status = ""  # TODO: include status for workout
+
+    def auto_fill_data(self):
+
+        start_date = self.end_date - timedelta(days=14)
+
+        for i in range(1, 15):
+            chart_data = TrainingVolumeChartData()
+            chart_data.date = (start_date + timedelta(days=i)).date()
+            day_of_week = (start_date + timedelta(days=i)).strftime('%a')
+            chart_data.day_of_week = day_of_week
+            self.data[chart_data.date] = chart_data
+
+
 class TrainingVolumeChartData(Serialisable):
     def __init__(self):
         self.date = None
@@ -167,6 +193,38 @@ class TrainingVolumeChartData(Serialisable):
         chart_data.day_of_week = input_dict.get('day_of_week', '')
         chart_data.sport_names = set(SportName(sport_name) for sport_name in input_dict.get('sport_names', []))
         chart_data.training_volume = input_dict.get('training_volume', 0)
+        return chart_data
+
+
+class WorkoutChartData(Serialisable):
+    def __init__(self):
+        self.date = None
+        self.day_of_week = ""
+        self.sport_names = set()
+        self.training_volume = 0
+        self.sessions = []
+        self.status = ""
+
+    def json_serialise(self):
+        ret = {
+            'date': format_date(self.date),
+            'day_of_week': self.day_of_week,
+            'sport_names': [sport_name.value for sport_name in self.sport_names if sport_name is not None],
+            'training_volume': self.training_volume,
+            'sessions': [session.json_serialise() for session in self.sessions],
+            'status': self.status
+        }
+        return ret
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        chart_data = cls()
+        chart_data.date = input_dict['date']
+        chart_data.day_of_week = input_dict.get('day_of_week', '')
+        chart_data.sport_names = set(SportName(sport_name) for sport_name in input_dict.get('sport_names', []))
+        chart_data.training_volume = input_dict.get('training_volume', 0)
+        chart_data.sessions = list(SportTrainingSession.json_deserialise(s) for s in input_dict['sessions', []])
+        chart_data.status = input_dict['status']
         return chart_data
 
 
