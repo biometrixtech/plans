@@ -1,6 +1,6 @@
 import csv
 import os
-os.environ['ENVIRONMENT'] = 'test'
+os.environ['ENVIRONMENT'] = 'dev'
 #import exercise_generator
 #import database_config  # not committed to source code, contains connection string
 from aws_xray_sdk.core import xray_recorder
@@ -79,6 +79,7 @@ with open('Exercise_Library.csv', newline='') as csvfile:
                     exercise_item.description = exercise_descriptions[exercise_item.id]
                 except KeyError:
                     print("no description")
+                    print(exercise_item.id)
                     exercise_item.description = ""
                 exercises.append(exercise_item)
         row_count = row_count + 1
