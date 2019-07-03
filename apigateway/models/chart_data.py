@@ -163,7 +163,7 @@ class WorkoutChart(BaseChart):
         start_date = self.end_date - timedelta(days=14)
 
         for i in range(1, 15):
-            chart_data = TrainingVolumeChartData()
+            chart_data = WorkoutChartData()
             chart_data.date = (start_date + timedelta(days=i)).date()
             day_of_week = (start_date + timedelta(days=i)).strftime('%a')
             chart_data.day_of_week = day_of_week
@@ -333,6 +333,129 @@ class HighRelativeLoadChart(BaseChartBoolean):
 
         if relative_load is not None and relative_load.date.date() in self.data:
             self.data[relative_load.date.date()].value = True
+
+
+class BodyPartSummary(Serialisable):
+    def __init__(self):
+        self.body_part = None
+        self.side = 0
+        self.pain = False
+        self.value = 0
+
+    def __hash__(self):
+        return hash((self.body_part, self.side, self.pain))
+
+    def __eq__(self, other):
+        return ((self.body_part == other.body_part,
+                 self.side == other.side, self.pain == other.pain))
+
+    def json_serialise(self):
+        ret = {
+            'body_part': self.body_part,
+            'side': self.side,
+            'pain': self.pain,
+            'value': self.value
+        }
+        return ret
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        body_part = cls()
+        body_part.body_part = input_dict['body_part']
+        body_part.side = input_dict.get('side', 0)
+        body_part.pain = input_dict.get('pain', False)
+        body_part.value = input_dict.get('value', 0)
+        return body_part
+
+
+class BodyResponseChartData(Serialisable):
+    def __init__(self):
+        self.date = None
+        self.day_of_week = ""
+        self.pain_value = 0
+        self.soreness_value = 0
+        self.status = ""
+        self.body_parts = []
+
+    def json_serialise(self):
+        ret = {
+            'date': format_date(self.date),
+            'day_of_week': self.day_of_week,
+            'pain_value': self.pain_value,
+            'soreness_value': self.soreness_value,
+            'status': self.status,
+            'body_parts': list(b.json_serialis() for b in self.body_parts)
+        }
+        return ret
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        chart_data = cls()
+        chart_data.date = input_dict['date']
+        chart_data.day_of_week = input_dict.get('day_of_week', "")
+        chart_data.pain_value = input_dict.get('pain_value', 0)
+        chart_data.soreness_value = input_dict.get('soreness_value', 0)
+        chart_data.status = input_dict['status']
+        chart_data.body_parts = list(BodyPartSummary.json_deserialise(b) for b in input_dict['body_parts', []])
+        return chart_data
+
+
+class BodyResponseChart(object):
+    def __init__(self, end_date):
+        self.end_date = end_date
+        self.data = {}
+        self.auto_fill_data()
+
+    def __setattr__(self, name, value):
+        if name in ['end_date']:
+            if value is not None and not isinstance(value, datetime):
+                try:
+                    value = parse_datetime(value)
+                except InvalidSchemaException:
+                    value = parse_date(value)
+        super().__setattr__(name, value)
+
+    def get_output_list(self):
+
+        data = sorted(list(self.data.values()), key=lambda x: x.date, reverse=False)
+
+        return data
+
+    def auto_fill_data(self):
+
+        start_date = self.end_date - timedelta(days=14)
+
+        for i in range(1, 15):
+            chart_data = BodyResponseChartData()
+            chart_data.date = (start_date + timedelta(days=i)).date()
+            day_of_week = (start_date + timedelta(days=i)).strftime('%a')
+            chart_data.day_of_week = day_of_week
+            chart_data.body_parts = {}
+
+            self.data[chart_data.date] = chart_data
+
+    def add_soreness(self, soreness):
+
+        if soreness is not None and soreness.reported_date_time.date() in self.data:
+            if soreness.pain:
+                self.data[soreness.reported_date_time.date()].pain_value = max(soreness.severity,
+                                                                               self.data[soreness.reported_date_time.date()].pain_value)
+            else:
+                self.data[soreness.reported_date_time.date()].soreness_value = max(soreness.severity,
+                                                                                   self.data[soreness.reported_date_time.date()].soreness_value)
+            body_part_summary = BodyPartSummary()
+            body_part_summary.body_part = soreness.body_part.location.value
+            body_part_summary.side = soreness.side
+            body_part_summary.value = soreness.severity
+            body_part_summary.pain = soreness.pain
+
+            if body_part_summary in self.data[soreness.reported_date_time.date()].body_parts:
+                self.data[soreness.reported_date_time.date()].body_parts[body_part_summary].value = max(body_part_summary.value,
+                                                                                                        self.data[
+                                                                                                            soreness.reported_date_time.date()].body_parts[
+                                                                                                            body_part_summary].value)
+
+            self.data[soreness.reported_date_time.date()].body_parts[body_part_summary] = body_part_summary
 
 
 class BodyPartChartData(Serialisable):

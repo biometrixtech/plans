@@ -1,4 +1,4 @@
-from models.chart_data import TrainingVolumeChartData, TrainingVolumeChart, BodyPartChartCollection, MuscularStrainChart, HighRelativeLoadChart, DOMSChart
+from models.chart_data import TrainingVolumeChartData, TrainingVolumeChart, BodyPartChartCollection, MuscularStrainChart, HighRelativeLoadChart, DOMSChart, BodyResponseChart
 from utils import parse_date
 from math import floor
 from models.historic_soreness import HistoricSoreness, HistoricSorenessStatus, HistoricSeverity, SorenessCause
@@ -297,3 +297,56 @@ def test_body_part_collection():
 
     assert len(soreness_dictionary) > 0
     assert len(pain_dictionary) == 0
+
+
+def test_body_response():
+
+    base_date_time = datetime.now()
+
+    acute_readiness_surveys = []
+    acute_post_session_surveys = []
+    chronic_readiness_surveys = []
+    chronic_post_session_surveys = []
+
+    datastore_collection = DatastoreCollection()
+    athlete_stats_datastore = AthleteStatsDatastore()
+    datastore_collection.athlete_stats_datastore = athlete_stats_datastore
+
+    stats_processing = StatsProcessing("test", base_date_time, datastore_collection)
+
+    co_occurrence_ratio = 0.9
+
+    historic_soreness_list = []
+    historic_soreness_list.extend(get_symmetric_historic_soreness_list(BodyPartLocation.calves))
+
+    acute_readiness_surveys.extend(get_daily_readiness_surveys(base_date_time - timedelta(days=7),
+                                                               historic_soreness_list, 7, 1.00))
+    chronic_readiness_surveys.extend(get_daily_readiness_surveys(base_date_time - timedelta(days=35),
+                                                                 historic_soreness_list, 28, co_occurrence_ratio))
+    acute_post_session_surveys.extend(get_post_session_surveys(base_date_time - timedelta(days=7),
+                                                               historic_soreness_list, 7, 1.00))
+    chronic_post_session_surveys.extend(get_post_session_surveys(base_date_time - timedelta(days=35),
+                                                                 historic_soreness_list, 28, co_occurrence_ratio))
+
+    stats_processing.acute_readiness_surveys = acute_readiness_surveys
+    stats_processing.chronic_readiness_surveys = chronic_readiness_surveys
+    stats_processing.acute_post_session_surveys = acute_post_session_surveys
+    stats_processing.chronic_post_session_surveys = chronic_post_session_surveys
+
+    acute_surveys = stats_processing.merge_soreness_from_surveys(
+        stats_processing.get_readiness_soreness_list(stats_processing.acute_readiness_surveys),
+        stats_processing.get_ps_survey_soreness_list(stats_processing.acute_post_session_surveys))
+    chronic_surveys = stats_processing.merge_soreness_from_surveys(
+        stats_processing.get_readiness_soreness_list(stats_processing.chronic_readiness_surveys),
+        stats_processing.get_ps_survey_soreness_list(stats_processing.chronic_post_session_surveys))
+    all_soreness = []
+    all_soreness.extend(acute_surveys)
+    all_soreness.extend(chronic_surveys)
+
+    body_response_chart = BodyResponseChart(base_date_time)
+    for s in all_soreness:
+        body_response_chart.add_soreness(s)
+
+    yesterday = (base_date_time - timedelta(days=1)).date()
+    assert len(body_response_chart.data[base_date_time.date()].body_parts) == 0
+    assert len(body_response_chart.data[yesterday].body_parts) == 2
