@@ -152,6 +152,7 @@ class WorkoutChart(BaseChart, Serialisable):
         self.bolded_text = []
         self.lockout = True
         self.last_workout_today = None
+        self.last_sport_name = None
 
     def json_serialise(self):
         ret = {
@@ -159,7 +160,8 @@ class WorkoutChart(BaseChart, Serialisable):
             'status': self.status,
             'lockout': self.lockout,
             'data': [{"date": d, "value": v.json_serialise()} for d, v in self.data],
-            'last_workout_today': format_datetime(self.last_workout_today) if self.last_workout_today is not None else None
+            'last_workout_today': format_datetime(self.last_workout_today) if self.last_workout_today is not None else None,
+            'last_sport_name': self.last_sport_name
         }
 
         return ret
@@ -187,8 +189,10 @@ class WorkoutChart(BaseChart, Serialisable):
             if summary.event_date.date() == self.end_date.date():
                 if self.last_workout_today is None:
                     self.last_workout_today = summary.event_date
+                    self.last_sport_name = summary.sport_name
                 elif summary.event_date > self.last_workout_today:
                     self.last_workout_today = summary.event_date
+                    self.last_sport_name = summary.sport_name
 
             if (summary.event_date == self.last_workout_today and summary.event_date.date() == self.end_date.date()
                     and summary.sport_name in sport_max_load):
