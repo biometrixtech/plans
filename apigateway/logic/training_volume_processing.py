@@ -10,6 +10,7 @@ from itertools import groupby
 from operator import itemgetter, attrgetter
 from statistics import stdev, mean
 from models.chart_data import TrainingVolumeChartData, TrainingVolumeChart, WorkoutChart
+from models.stats import SportMaxLoad
 
 
 class LoadingEvent(object):
@@ -100,6 +101,7 @@ class TrainingVolumeProcessing(object):
         self.last_14_days_training_sessions = []
         self.load_stats = load_stats
         self.plan_exists_days_8_35 = False
+        self.sport_max_load = {}
 
     def muscular_strain_increasing(self):
 
@@ -213,25 +215,12 @@ class TrainingVolumeProcessing(object):
         training_volume_chart_data = TrainingVolumeChart(self.end_date)
         workout_chart = WorkoutChart(self.end_date)
 
-        self.load_stats.set_min_max_values(last_7_day_training_sessions)
         self.load_stats.set_min_max_values(previous_7_day_training_sessions)
-
-        for l in last_7_day_training_sessions:
-
-            training_volume_chart_data.add_training_volume(l, self.load_stats)
-            workout_chart.add_training_volume(l, self.load_stats)
-
-            if l.sport_name not in self.last_week_sport_training_loads:
-                self.last_week_sport_training_loads[l.sport_name] = []
-                self.previous_week_sport_training_loads[l.sport_name] = []
-            training_load = l.training_volume(self.load_stats)
-            if training_load is not None:
-                self.last_week_sport_training_loads[l.sport_name].append(training_load)
+        self.load_stats.set_min_max_values(last_7_day_training_sessions)
 
         for p in previous_7_day_training_sessions:
 
             training_volume_chart_data.add_training_volume(p, self.load_stats)
-            workout_chart.add_training_volume(p, self.load_stats)
 
             if p.sport_name not in self.previous_week_sport_training_loads:
                 self.last_week_sport_training_loads[p.sport_name] = []
@@ -239,6 +228,37 @@ class TrainingVolumeProcessing(object):
             training_load = p.training_volume(self.load_stats)
             if training_load is not None:
                 self.previous_week_sport_training_loads[p.sport_name].append(training_load)
+                if p.sport_name.value in self.sport_max_load:
+                    if training_load > self.sport_max_load[p.sport_name.value].training_volume:
+                        self.sport_max_load[p.sport_name.value].training_volume = training_load
+                        self.sport_max_load[p.sport_name.value].event_date_time = p.event_date
+                        self.sport_max_load[p.sport_name.value].first_time_logged = False
+                    else:
+                        self.sport_max_load[p.sport_name.value] = SportMaxLoad(p.event_date, training_load)
+                        self.sport_max_load[p.sport_name.value].first_time_logged = True
+
+            workout_chart.add_training_volume(p, self.load_stats, self.sport_max_load)
+
+        for l in last_7_day_training_sessions:
+
+            training_volume_chart_data.add_training_volume(l, self.load_stats)
+
+            if l.sport_name not in self.last_week_sport_training_loads:
+                self.last_week_sport_training_loads[l.sport_name] = []
+                self.previous_week_sport_training_loads[l.sport_name] = []
+            training_load = l.training_volume(self.load_stats)
+            if training_load is not None:
+                self.last_week_sport_training_loads[l.sport_name].append(training_load)
+                if l.sport_name.value in self.sport_max_load:
+                    if training_load > self.sport_max_load[l.sport_name.value].training_volume:
+                        self.sport_max_load[l.sport_name.value].training_volume = training_load
+                        self.sport_max_load[l.sport_name.value].event_date_time = l.event_date
+                        self.sport_max_load[l.sport_name.value].first_time_logged = False
+                    else:
+                        self.sport_max_load[l.sport_name.value] = SportMaxLoad(l.event_date, training_load)
+                        self.sport_max_load[l.sport_name.value].first_time_logged = True
+
+            workout_chart.add_training_volume(l, self.load_stats, self.sport_max_load)
 
         self.training_volume_chart_data = training_volume_chart_data.get_output_list()
         self.workout_chart = workout_chart

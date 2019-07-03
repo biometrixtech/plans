@@ -105,12 +105,17 @@ class StatsProcessing(object):
                                                               format_date( self.event_date),
                                                               current_athlete_stats.load_stats)  # want event date since end date = event_date + 1
 
+        # this gets updated in load plan values
+        training_volume_processing.sport_max_load = current_athlete_stats.sport_max_load
+
         training_volume_processing.load_plan_values(self.last_7_days_plans,
                                                     self.days_8_14_plans,
                                                     self.acute_daily_plans,
                                                     self.get_chronic_weeks_plans(),
                                                     self.chronic_daily_plans
                                                     )
+        current_athlete_stats.sport_max_load = training_volume_processing.sport_max_load
+
         current_athlete_stats.load_stats = training_volume_processing.load_stats
         current_athlete_stats = training_volume_processing.calc_training_volume_metrics(current_athlete_stats)
         current_athlete_stats.high_relative_load_sessions = training_volume_processing.high_relative_load_sessions
