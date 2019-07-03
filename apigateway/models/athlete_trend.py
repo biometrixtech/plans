@@ -436,53 +436,23 @@ body_response = {
                         ]
                     },
                     "lockout": False,
+
+                    "status": {
+                                "text": "3 days of pain",
+                                "bolded_text": [
+                                    "3 days"
+                                ],
+                                "color": 5,
+                                "icon": "md-body",
+                                "sport": None,
+                                "icon_type": "ionicon"
+                            },
                     "data": [
-                        {
-                            "date": "2019-06-18",
-                            "day_of_week": "Tue",
-                            "pain_value": 1,
-                            "soreness_value": 2,
-                            "status": {
-                                        "text": "3 days of pain",
-                                        "bolded_text": [
-                                            "3 days"
-                                        ],
-                                        "color": 5,
-                                        "icon": "md-body",
-                                        "sport": None,
-                                        "icon_type": "ionicon"
-                                    },
-                            "body_parts":
-                            [
-                                {
-                                    "body_part": 11,
-                                    "side": 1,
-                                    "pain": True,
-                                    "value": 1
-                                },
-                                {
-                                    "body_part": 11,
-                                    "side": 2,
-                                    "pain": False,
-                                    "value": 2
-                                }
-                            ]
-                        },
                         {
                             "date": "2019-06-19",
                             "day_of_week": "Wed",
                             "pain_value": 1,
                             "soreness_value": 2,
-                            "status": {
-                                        "text": "3 days of pain",
-                                        "bolded_text": [
-                                            "3 days"
-                                        ],
-                                        "color": 5,
-                                        "icon": "md-body",
-                                        "sport": None,
-                                        "icon_type": "ionicon"
-                                    },
                             "body_parts":
                             [
                                 {
@@ -504,16 +474,6 @@ body_response = {
                             "day_of_week": "Thu",
                             "pain_value": 1,
                             "soreness_value": 2,
-                            "status": {
-                                        "text": "3 days of pain",
-                                        "bolded_text": [
-                                            "3 days"
-                                        ],
-                                        "color": 5,
-                                        "icon": "md-body",
-                                        "sport": None,
-                                        "icon_type": "ionicon"
-                                    },
                             "body_parts":
                             [
                                 {
@@ -535,16 +495,6 @@ body_response = {
                             "day_of_week": "Fri",
                             "pain_value": 1,
                             "soreness_value": 2,
-                            "status": {
-                                        "text": "3 days of pain",
-                                        "bolded_text": [
-                                            "3 days"
-                                        ],
-                                        "color": 5,
-                                        "icon": "md-body",
-                                        "sport": None,
-                                        "icon_type": "ionicon"
-                                    },
                             "body_parts":
                             [
                                 {
@@ -566,16 +516,6 @@ body_response = {
                             "day_of_week": "Sat",
                             "pain_value": 1,
                             "soreness_value": 2,
-                            "status": {
-                                        "text": "3 days of pain",
-                                        "bolded_text": [
-                                            "3 days"
-                                        ],
-                                        "color": 5,
-                                        "icon": "md-body",
-                                        "sport": None,
-                                        "icon_type": "ionicon"
-                                    },
                             "body_parts":
                             [
                                 {
@@ -597,16 +537,6 @@ body_response = {
                             "day_of_week": "Sun",
                             "pain_value": 1,
                             "soreness_value": 2,
-                            "status": {
-                                        "text": "3 days of pain",
-                                        "bolded_text": [
-                                            "3 days"
-                                        ],
-                                        "color": 5,
-                                        "icon": "md-body",
-                                        "sport": None,
-                                        "icon_type": "ionicon"
-                                    },
                             "body_parts":
                             [
                                 {
@@ -628,16 +558,6 @@ body_response = {
                             "day_of_week": "Mon",
                             "pain_value": 1,
                             "soreness_value": 2,
-                            "status": {
-                                        "text": "3 days of pain",
-                                        "bolded_text": [
-                                            "3 days"
-                                        ],
-                                        "color": 5,
-                                        "icon": "md-body",
-                                        "sport": None,
-                                        "icon_type": "ionicon"
-                                    },
                             "body_parts":
                             [
                                 {
@@ -659,16 +579,6 @@ body_response = {
                             "day_of_week": "Tue",
                             "pain_value": 1,
                             "soreness_value": 2,
-                            "status": {
-                                        "text": "3 days of pain",
-                                        "bolded_text": [
-                                            "3 days"
-                                        ],
-                                        "color": 5,
-                                        "icon": "md-body",
-                                        "sport": None,
-                                        "icon_type": "ionicon"
-                                    },
                             "body_parts":
                             [
                                 {
@@ -690,16 +600,6 @@ body_response = {
                             "day_of_week": "Wed",
                             "pain_value": 1,
                             "soreness_value": 2,
-                            "status": {
-                                        "text": "3 days of pain",
-                                        "bolded_text": [
-                                            "3 days"
-                                        ],
-                                        "color": 5,
-                                        "icon": "md-body",
-                                        "sport": None,
-                                        "icon_type": "ionicon"
-                                    },
                             "body_parts":
                             [
                                 {
@@ -721,16 +621,6 @@ body_response = {
                             "day_of_week": "Thu",
                             "pain_value": 1,
                             "soreness_value": 2,
-                            "status": {
-                                        "text": "3 days of pain",
-                                        "bolded_text": [
-                                            "3 days"
-                                        ],
-                                        "color": 5,
-                                        "icon": "md-body",
-                                        "sport": None,
-                                        "icon_type": "ionicon"
-                                    },
                             "body_parts":
                             [
                                 {
@@ -752,29 +642,19 @@ body_response = {
                             "day_of_week": "Fri",
                             "pain_value": 1,
                             "soreness_value": 2,
-                            "status": {
-                                        "text": "3 days of pain",
-                                        "bolded_text": [
-                                            "3 days"
-                                        ],
-                                        "color": 5,
-                                        "icon": "md-body",
-                                        "sport": None,
-                                        "icon_type": "ionicon"
-                                    },
                             "body_parts":
                             [
                                 {
                                     "body_part": 11,
                                     "side": 1,
                                     "pain": True,
-                                    "value": 1
+                                    "value": 2
                                 },
                                 {
                                     "body_part": 11,
                                     "side": 2,
                                     "pain": False,
-                                    "value": 2
+                                    "value": 3
                                 }
                             ]
                         },
@@ -783,16 +663,6 @@ body_response = {
                             "day_of_week": "Sat",
                             "pain_value": 1,
                             "soreness_value": 2,
-                            "status": {
-                                        "text": "3 days of pain",
-                                        "bolded_text": [
-                                            "3 days"
-                                        ],
-                                        "color": 5,
-                                        "icon": "md-body",
-                                        "sport": None,
-                                        "icon_type": "ionicon"
-                                    },
                             "body_parts":
                             [
                                 {
@@ -812,62 +682,42 @@ body_response = {
                         {
                             "date": "2019-06-30",
                             "day_of_week": "Sun",
-                            "pain_value": 1,
-                            "soreness_value": 2,
-                            "status": {
-                                        "text": "3 days of pain",
-                                        "bolded_text": [
-                                            "3 days"
-                                        ],
-                                        "color": 5,
-                                        "icon": "md-body",
-                                        "sport": None,
-                                        "icon_type": "ionicon"
-                                    },
+                            "pain_value": 5,
+                            "soreness_value": 5,
                             "body_parts":
                             [
                                 {
                                     "body_part": 11,
                                     "side": 1,
                                     "pain": True,
-                                    "value": 1
+                                    "value": 5
                                 },
                                 {
                                     "body_part": 11,
                                     "side": 2,
                                     "pain": False,
-                                    "value": 2
+                                    "value": 5
                                 }
                             ]
                         },
                         {
                             "date": "2019-07-01",
                             "day_of_week": "Mon",
-                            "pain_value": 1,
+                            "pain_value": 3,
                             "soreness_value": 2,
-                            "status": {
-                                        "text": "3 days of pain",
-                                        "bolded_text": [
-                                            "3 days"
-                                        ],
-                                        "color": 5,
-                                        "icon": "md-body",
-                                        "sport": None,
-                                        "icon_type": "ionicon"
-                                    },
                             "body_parts":
                             [
                                 {
                                     "body_part": 11,
                                     "side": 1,
                                     "pain": True,
-                                    "value": 1
+                                    "value": 3
                                 },
                                 {
                                     "body_part": 11,
                                     "side": 2,
                                     "pain": False,
-                                    "value": 2
+                                    "value": 4
                                 }
                             ]
                         },
@@ -875,17 +725,7 @@ body_response = {
                             "date": "2019-07-02",
                             "day_of_week": "Tues",
                             "pain_value": 1,
-                            "soreness_value": 2,
-                            "status": {
-                                        "text": "3 days of pain",
-                                        "bolded_text": [
-                                            "3 days"
-                                        ],
-                                        "color": 5,
-                                        "icon": "md-body",
-                                        "sport": None,
-                                        "icon_type": "ionicon"
-                                    },
+                            "soreness_value": 3,
                             "body_parts":
                             [
                                 {
@@ -927,22 +767,22 @@ workload = {
                     ]
                 },
                 "lockout": False,
+                "status": {
+                            "text": "today's distance run was in the 93rd percentile",
+                            "bolded_text": [
+                                "distance run",
+                                "93rd percentile"
+                            ],
+                            "color": 4,
+                            "icon": None,
+                            "sport_name": 17,
+                            "icon_type": None
+                        },
                 "data": [
                     {
                         "date": "2019-06-19",
                         "day_of_week": "Wed",
-                        "value": 1180,
-                        "status": {
-                                    "text": "today's distance run was in the 93rd percentile",
-                                    "bolded_text": [
-                                        "distance run",
-                                        "93rd percentile"
-                                    ],
-                                    "color": 4,
-                                    "icon": None,
-                                    "sport_name": 17,
-                                    "icon_type": None
-                                },
+                        "value": 170,
                         "sessions":
                         [
                             {
@@ -972,18 +812,7 @@ workload = {
                     {
                         "date": "2019-06-20",
                         "day_of_week": "Thu",
-                        "value": 1180,
-                        "status": {
-                                    "text": "today's distance run was in the 93rd percentile",
-                                    "bolded_text": [
-                                        "distance run",
-                                        "93rd percentile"
-                                    ],
-                                    "color": 4,
-                                    "icon": None,
-                                    "sport_name": 17,
-                                    "icon_type": None
-                                },
+                        "value": 1500,
                         "sessions":
                         [
                             {
@@ -1013,18 +842,7 @@ workload = {
                     {
                         "date": "2019-06-21",
                         "day_of_week": "Fri",
-                        "value": 1180,
-                        "status": {
-                                    "text": "today's distance run was in the 93rd percentile",
-                                    "bolded_text": [
-                                        "distance run",
-                                        "93rd percentile"
-                                    ],
-                                    "color": 4,
-                                    "icon": None,
-                                    "sport_name": 17,
-                                    "icon_type": None
-                                },
+                        "value": 900,
                         "sessions":
                         [
                             {
@@ -1054,18 +872,7 @@ workload = {
                     {
                         "date": "2019-06-22",
                         "day_of_week": "Sat",
-                        "value": 1180,
-                        "status": {
-                                    "text": "today's distance run was in the 93rd percentile",
-                                    "bolded_text": [
-                                        "distance run",
-                                        "93rd percentile"
-                                    ],
-                                    "color": 4,
-                                    "icon": None,
-                                    "sport_name": 17,
-                                    "icon_type": None
-                                },
+                        "value": 50,
                         "sessions":
                         [
                             {
@@ -1096,17 +903,6 @@ workload = {
                         "date": "2019-06-23",
                         "day_of_week": "Sun",
                         "value": 1180,
-                        "status": {
-                                    "text": "today's distance run was in the 93rd percentile",
-                                    "bolded_text": [
-                                        "distance run",
-                                        "93rd percentile"
-                                    ],
-                                    "color": 4,
-                                    "icon": None,
-                                    "sport_name": 17,
-                                    "icon_type": None
-                                },
                         "sessions":
                         [
                             {
@@ -1136,18 +932,7 @@ workload = {
                     {
                         "date": "2019-06-24",
                         "day_of_week": "Mon",
-                        "value": 1180,
-                        "status": {
-                                    "text": "today's distance run was in the 93rd percentile",
-                                    "bolded_text": [
-                                        "distance run",
-                                        "93rd percentile"
-                                    ],
-                                    "color": 4,
-                                    "icon": None,
-                                    "sport_name": 17,
-                                    "icon_type": None
-                                },
+                        "value": 1000,
                         "sessions":
                         [
                             {
@@ -1177,18 +962,7 @@ workload = {
                     {
                         "date": "2019-06-25",
                         "day_of_week": "Tue",
-                        "value": 1180,
-                        "status": {
-                                    "text": "today's distance run was in the 93rd percentile",
-                                    "bolded_text": [
-                                        "distance run",
-                                        "93rd percentile"
-                                    ],
-                                    "color": 4,
-                                    "icon": None,
-                                    "sport_name": 17,
-                                    "icon_type": None
-                                },
+                        "value": 700,
                         "sessions":
                         [
                             {
@@ -1218,18 +992,7 @@ workload = {
                     {
                         "date": "2019-06-26",
                         "day_of_week": "Wed",
-                        "value": 1180,
-                        "status": {
-                                    "text": "today's distance run was in the 93rd percentile",
-                                    "bolded_text": [
-                                        "distance run",
-                                        "93rd percentile"
-                                    ],
-                                    "color": 4,
-                                    "icon": None,
-                                    "sport_name": 17,
-                                    "icon_type": None
-                                },
+                        "value": 800,
                         "sessions":
                         [
                             {
@@ -1260,17 +1023,6 @@ workload = {
                         "date": "2019-06-27",
                         "day_of_week": "Thu",
                         "value": 1180,
-                        "status": {
-                                    "text": "today's distance run was in the 93rd percentile",
-                                    "bolded_text": [
-                                        "distance run",
-                                        "93rd percentile"
-                                    ],
-                                    "color": 4,
-                                    "icon": None,
-                                    "sport_name": 17,
-                                    "icon_type": None
-                                },
                         "sessions":
                         [
                             {
@@ -1300,18 +1052,7 @@ workload = {
                     {
                         "date": "2019-06-28",
                         "day_of_week": "Fri",
-                        "value": 1180,
-                        "status": {
-                                    "text": "today's distance run was in the 93rd percentile",
-                                    "bolded_text": [
-                                        "distance run",
-                                        "93rd percentile"
-                                    ],
-                                    "color": 4,
-                                    "icon": None,
-                                    "sport_name": 17,
-                                    "icon_type": None
-                                },
+                        "value": 300,
                         "sessions":
                         [
                             {
@@ -1341,18 +1082,7 @@ workload = {
                     {
                         "date": "2019-06-29",
                         "day_of_week": "Sat",
-                        "value": 1180,
-                        "status": {
-                                    "text": "today's distance run was in the 93rd percentile",
-                                    "bolded_text": [
-                                        "distance run",
-                                        "93rd percentile"
-                                    ],
-                                    "color": 4,
-                                    "icon": None,
-                                    "sport_name": 17,
-                                    "icon_type": None
-                                },
+                        "value": 1500,
                         "sessions":
                         [
                             {
@@ -1383,17 +1113,6 @@ workload = {
                         "date": "2019-06-30",
                         "day_of_week": "Sun",
                         "value": 1180,
-                        "status": {
-                                    "text": "today's distance run was in the 93rd percentile",
-                                    "bolded_text": [
-                                        "distance run",
-                                        "93rd percentile"
-                                    ],
-                                    "color": 4,
-                                    "icon": None,
-                                    "sport_name": 17,
-                                    "icon_type": None
-                                },
                         "sessions":
                         [
                             {
@@ -1423,18 +1142,7 @@ workload = {
                     {
                         "date": "2019-07-01",
                         "day_of_week": "Mon",
-                        "value": 1180,
-                        "status": {
-                                    "text": "today's distance run was in the 93rd percentile",
-                                    "bolded_text": [
-                                        "distance run",
-                                        "93rd percentile"
-                                    ],
-                                    "color": 4,
-                                    "icon": None,
-                                    "sport_name": 17,
-                                    "icon_type": None
-                                },
+                        "value": 100,
                         "sessions":
                         [
                             {
@@ -1464,18 +1172,7 @@ workload = {
                     {
                         "date": "2019-07-02",
                         "day_of_week": "Tue",
-                        "value": 1180,
-                        "status": {
-                                    "text": "today's distance run was in the 93rd percentile",
-                                    "bolded_text": [
-                                        "distance run",
-                                        "93rd percentile"
-                                    ],
-                                    "color": 4,
-                                    "icon": None,
-                                    "sport_name": 17,
-                                    "icon_type": None
-                                },
+                        "value": 800,
                         "sessions":
                         [
                             {
