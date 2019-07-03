@@ -100,11 +100,15 @@ class AthleteStats(Serialisable):
         self.load_stats = LoadStats()
         self.high_relative_load_sessions = []
         self.training_volume_chart_data = []
+
         self.soreness_chart_data = {}
         self.pain_chart_data = {}
         self.muscular_strain_chart_data = []
         self.high_relative_load_chart_data = []
         self.doms_chart_data = []
+
+        self.workout_chart = None
+        self.body_response_chart = None
 
         self.eligible_for_high_load_trigger = False
 
@@ -463,7 +467,9 @@ class AthleteStats(Serialisable):
             'load_stats': self.load_stats.json_serialise() if self.load_stats is not None else None,
             'muscular_strain': [muscular_strain.json_serialise() for muscular_strain in self.muscular_strain],
             'high_relative_load_sessions': [high_load.json_serialise() for high_load in self.high_relative_load_sessions],
-            'eligible_for_high_load_trigger' : self.eligible_for_high_load_trigger
+            'eligible_for_high_load_trigger' : self.eligible_for_high_load_trigger,
+            'workout_chart': self.workout_chart.json_serialise() if self.workout_chart is not None else None,
+            'body_response_chart': self.body_response_chart.json_serialise() if self.body_response_chart is not None else None
             # 'training_volume_chart_data': [chart_data.json_serialise() for chart_data in self.training_volume_chart_data]
         }
         return ret

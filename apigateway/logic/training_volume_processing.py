@@ -9,7 +9,7 @@ from utils import format_date, parse_date
 from itertools import groupby
 from operator import itemgetter, attrgetter
 from statistics import stdev, mean
-from models.chart_data import TrainingVolumeChartData, TrainingVolumeChart
+from models.chart_data import TrainingVolumeChartData, TrainingVolumeChart, WorkoutChart
 
 
 class LoadingEvent(object):
@@ -66,6 +66,7 @@ class TrainingVolumeProcessing(object):
         self.previous_week_internal_values = []
 
         self.training_volume_chart_data = []
+        self.workout_chart = []
 
         self.internal_load_tuples = []
         #self.external_load_tuples = []
@@ -209,13 +210,17 @@ class TrainingVolumeProcessing(object):
 
         self.last_14_days_training_sessions = last_14_day_sessions
 
-        chart_data = TrainingVolumeChart(self.end_date)
+        training_volume_chart_data = TrainingVolumeChart(self.end_date)
+        workout_chart = WorkoutChart(self.end_date)
 
         self.load_stats.set_min_max_values(last_7_day_training_sessions)
         self.load_stats.set_min_max_values(previous_7_day_training_sessions)
 
         for l in last_7_day_training_sessions:
-            chart_data.add_training_volume(l, self.load_stats)
+
+            training_volume_chart_data.add_training_volume(l, self.load_stats)
+            workout_chart.add_training_volume(l, self.load_stats)
+
             if l.sport_name not in self.last_week_sport_training_loads:
                 self.last_week_sport_training_loads[l.sport_name] = []
                 self.previous_week_sport_training_loads[l.sport_name] = []
@@ -224,7 +229,10 @@ class TrainingVolumeProcessing(object):
                 self.last_week_sport_training_loads[l.sport_name].append(training_load)
 
         for p in previous_7_day_training_sessions:
-            chart_data.add_training_volume(p, self.load_stats)
+
+            training_volume_chart_data.add_training_volume(p, self.load_stats)
+            workout_chart.add_training_volume(p, self.load_stats)
+
             if p.sport_name not in self.previous_week_sport_training_loads:
                 self.last_week_sport_training_loads[p.sport_name] = []
                 self.previous_week_sport_training_loads[p.sport_name] = []
@@ -232,7 +240,8 @@ class TrainingVolumeProcessing(object):
             if training_load is not None:
                 self.previous_week_sport_training_loads[p.sport_name].append(training_load)
 
-        self.training_volume_chart_data = chart_data.get_output_list()
+        self.training_volume_chart_data = training_volume_chart_data.get_output_list()
+        self.workout_chart = workout_chart
 
         #self.last_week_external_values.extend(
         #    x for x in self.get_plan_session_attribute_sum_list("external_load", last_7_days_plans) if x is not None)

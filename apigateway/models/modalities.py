@@ -662,13 +662,13 @@ class ModalityBase(object):
                     dosage.default_efficient_reps_assigned = exercise.min_reps
                     dosage.default_efficient_sets_assigned = 1
                 if dosage.priority == "1" or dosage.priority == "2":
-                    dosage.complete_reps_assigned = exercise.max_reps
+                    dosage.complete_reps_assigned = exercise.min_reps
                     dosage.complete_sets_assigned = 1
-                    dosage.default_complete_reps_assigned = exercise.max_reps
+                    dosage.default_complete_reps_assigned = exercise.min_reps
                     dosage.default_complete_sets_assigned = 1
-                dosage.comprehensive_reps_assigned = exercise.min_reps
+                dosage.comprehensive_reps_assigned = exercise.max_reps
                 dosage.comprehensive_sets_assigned = 1
-                dosage.default_comprehensive_reps_assigned = exercise.min_reps
+                dosage.default_comprehensive_reps_assigned = exercise.max_reps
                 dosage.default_comprehensive_sets_assigned = 1
             elif 1.5 <= dosage.soreness_source.severity < 2.5:
                 if dosage.priority == "1" or dosage.priority == "2":
@@ -1230,7 +1230,7 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
                         goal.trigger_type = TriggerType.no_hist_pain_pain_today_high_severity_3_5  # 15
                     else:
                         goal.trigger_type = TriggerType.hist_pain_pain_today_severity_3_5  # 24
-                synergist_priority = "1"
+                synergist_priority = "2"
             else:
                 #goal.trigger = "Painful muscle reported today"
                 if soreness.severity < 3:
@@ -1638,7 +1638,7 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
                         goal.trigger_type = TriggerType.no_hist_pain_pain_today_high_severity_3_5  # 15
                     else:
                         goal.trigger_type = TriggerType.hist_pain_pain_today_severity_3_5  # 24
-                synergist_priority = "1"
+                synergist_priority = "2"
             else:
                 #goal.trigger = "Painful muscle reported today"
                 if soreness.severity < 3:
