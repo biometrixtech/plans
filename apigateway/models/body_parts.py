@@ -402,7 +402,7 @@ class BodyPartFactory(object):
         dynamic_stretch = {}
         isolated_activation = self.get_exercise_dictionary([142, 143, 229, 228, 236, 232])
         hip.add_extended_exercise_phases(inhibit, static_stretch, active_stretch, dynamic_stretch, isolated_activation, {})
-        hip.add_muscle_groups([4], [5, 15, 6], [5, 11], [14])
+        hip.add_muscle_groups([4], [15, 6], [5, 11], [14])
         return hip
 
     def get_knee(self):
