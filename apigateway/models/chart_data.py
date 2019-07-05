@@ -170,7 +170,7 @@ class WorkoutChart(BaseChart, Serialisable):
 
         training_volume = training_session.training_volume(load_stats)
         if training_volume is not None and training_volume > 0 and training_session.event_date.date() in self.data:
-            self.data[training_session.event_date.date()].training_volume += training_volume
+            self.data[training_session.event_date.date()].value += training_volume
             self.data[training_session.event_date.date()].sport_names.add(training_session.sport_name)
 
             summary = WorkoutSummary()
@@ -310,7 +310,7 @@ class WorkoutChartData(Serialisable):
         self.date = None
         self.day_of_week = ""
         self.sport_names = set()
-        self.training_volume = 0
+        self.value = 0
         self.sessions = []
 
     def json_serialise(self):
@@ -318,7 +318,7 @@ class WorkoutChartData(Serialisable):
             'date': format_date(self.date),
             'day_of_week': self.day_of_week,
             'sport_names': [sport_name.value for sport_name in self.sport_names if sport_name is not None],
-            'training_volume': self.training_volume,
+            'value': self.value,
             'sessions': [session.json_serialise() for session in self.sessions]
         }
         return ret
@@ -329,7 +329,7 @@ class WorkoutChartData(Serialisable):
         chart_data.date = input_dict['date']
         chart_data.day_of_week = input_dict.get('day_of_week', '')
         chart_data.sport_names = set(SportName(sport_name) for sport_name in input_dict.get('sport_names', []))
-        chart_data.training_volume = input_dict.get('training_volume', 0)
+        chart_data.value = input_dict.get('value', 0)
         chart_data.sessions = list(WorkoutSummary.json_deserialise(s) for s in input_dict.get('sessions', []))
         return chart_data
 
