@@ -499,21 +499,25 @@ class AthleteTrends(object):
             body_response.lockout = body_response_chart.lockout
             body_response.data = [data for data in body_response_chart.data.values()]
             body_response.add_visualization_data()
-            if not body_response_chart.max_value_pain:
-                color = LegendColor(5)
-                icon_type = "ionicon"
-                icon = "md-body"
-            else:
-                color = LegendColor(6)
-                if body_response_chart.max_value_today == 1:
-                    icon_type = "ionicon"
-                    icon = "md-body"
-                elif body_response_chart.max_value_today <= 3:
-                    icon_type = "material-community"
-                    icon = "alert"
-                else:
-                    icon_type = "material-community"
-                    icon = "alert-octagon"
+
+            color = LegendColor(5)
+            icon_type = "ionicon"
+            icon = "md-body"
+            # if not body_response_chart.max_value_pain:
+            #     color = LegendColor(5)
+            #     icon_type = "ionicon"
+            #     icon = "md-body"
+            # else:
+            #     color = LegendColor(6)
+            #     if body_response_chart.max_value_today == 1:
+            #         icon_type = "ionicon"
+            #         icon = "md-body"
+            #     elif body_response_chart.max_value_today <= 3:
+            #         icon_type = "material-community"
+            #         icon = "alert"
+            #     else:
+            #         icon_type = "material-community"
+            #         icon = "alert-octagon"
             body_response.status = DataStatus(body_response_chart.status,
                                               body_response_chart.bolded_text,
                                               color=color,
@@ -530,7 +534,7 @@ class AthleteTrends(object):
             workload.add_visualization_data()
             workload.status = DataStatus(workout_chart.status,
                                          workout_chart.bolded_text,
-                                         color=LegendColor(0),
+                                         color=LegendColor(4),
                                          sport_name=workout_chart.last_sport_name
                                          )
         self.workload = workload
