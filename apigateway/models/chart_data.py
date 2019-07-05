@@ -149,19 +149,24 @@ class WorkoutChart(BaseChart, Serialisable):
     def __init__(self, end_date):
         super().__init__(end_date)
         self.status = ""
+        self.bolded_text = []
         self.lockout = True
+        self.last_workout_today = None
+        self.last_sport_name = None
 
     def json_serialise(self):
         ret = {
             'end_date': format_date(self.end_date),
             'status': self.status,
             'lockout': self.lockout,
-            'data': [{"date": d, "value": v.json_serialise()} for d, v in self.data]
+            'data': [{"date": d, "value": v.json_serialise()} for d, v in self.data],
+            'last_workout_today': format_datetime(self.last_workout_today) if self.last_workout_today is not None else None,
+            'last_sport_name': self.last_sport_name
         }
 
         return ret
 
-    def add_training_volume(self, training_session, load_stats):
+    def add_training_volume(self, training_session, load_stats, sport_max_load):
 
         training_volume = training_session.training_volume(load_stats)
         if training_volume is not None and training_volume > 0 and training_session.event_date.date() in self.data:
@@ -180,6 +185,26 @@ class WorkoutChart(BaseChart, Serialisable):
             summary.end_date = training_session.end_date
             summary.RPE = training_session.session_RPE
             summary.training_volume = training_volume
+
+            if summary.event_date.date() == self.end_date.date():
+                if self.last_workout_today is None:
+                    self.last_workout_today = summary.event_date
+                    self.last_sport_name = summary.sport_name
+                elif summary.event_date > self.last_workout_today:
+                    self.last_workout_today = summary.event_date
+                    self.last_sport_name = summary.sport_name
+
+            if (summary.event_date == self.last_workout_today and summary.event_date.date() == self.end_date.date()
+                    and summary.sport_name in sport_max_load):
+
+                if summary.event_date == sport_max_load[summary.sport_name].event_date_time:
+                    if sport_max_load[summary.sport_name].first_time_logged:
+                        self.status = "First " + SportName(summary.sport_name).name + " workout recorded!"
+                    else:
+                        self.status = "Today's workout set a new " + SportName(summary.sport_name).name + " max!"
+                else:
+                    percent = round((training_volume / sport_max_load[summary.sport_name].load) * 100, 0)
+                    self.status = "Today's " + SportName(summary.sport_name).name + " was " + str(percent) + "% of your historic max!"
 
             self.data[training_session.event_date.date()].sessions.append(summary)
 
@@ -287,7 +312,7 @@ class WorkoutChartData(Serialisable):
         chart_data.day_of_week = input_dict.get('day_of_week', '')
         chart_data.sport_names = set(SportName(sport_name) for sport_name in input_dict.get('sport_names', []))
         chart_data.training_volume = input_dict.get('training_volume', 0)
-        chart_data.sessions = list(SportTrainingSession.json_deserialise(s) for s in input_dict['sessions', []])
+        chart_data.sessions = list(SportTrainingSession.json_deserialise(s) for s in input_dict.get['sessions', []])
         return chart_data
 
 
@@ -445,7 +470,7 @@ class BodyResponseChartData(Serialisable):
             'day_of_week': self.day_of_week,
             'pain_value': self.pain_value,
             'soreness_value': self.soreness_value,
-            'body_parts': list(b.json_serialis() for b in self.body_parts)
+            'body_parts': list(b.json_serialise() for b in self.body_parts)
         }
         return ret
 
@@ -456,7 +481,7 @@ class BodyResponseChartData(Serialisable):
         chart_data.day_of_week = input_dict.get('day_of_week', "")
         chart_data.pain_value = input_dict.get('pain_value', 0)
         chart_data.soreness_value = input_dict.get('soreness_value', 0)
-        chart_data.body_parts = list(BodyPartSummary.json_deserialise(b) for b in input_dict['body_parts', []])
+        chart_data.body_parts = list(BodyPartSummary.json_deserialise(b) for b in input_dict.get['body_parts', []])
         return chart_data
 
 
@@ -466,6 +491,7 @@ class BodyResponseChart(Serialisable):
         self.data = {}
         self.auto_fill_data()
         self.status = ""
+        self.bolded_text = []
         self.max_value_today = None
         self.max_value_pain = None
         self.lockout = True
@@ -483,6 +509,7 @@ class BodyResponseChart(Serialisable):
         ret = {
             'end_date': format_date(self.end_date),
             'status': self.status,
+            'bolded_text': [t for t in self.bolded_text],
             'max_value_today': self.max_value_today,
             'max_value_pain': self.max_value_pain,
             'lockout': self.lockout,
@@ -533,7 +560,7 @@ class BodyResponseChart(Serialisable):
         elif 3 < severity <= 4:
             return 4
 
-        elif 4 < severity <=5:
+        elif 4 < severity <= 5:
             return 5
         else:
             return None
@@ -542,19 +569,21 @@ class BodyResponseChart(Serialisable):
 
         if self.max_value_pain:
             if self.max_value_today <= 1:
-                return "Avoid worsening pain by modifying training."
+                self.status = "Avoid worsening pain by modifying training."
             elif 1 < self.max_value_today <= 3:
-                return "To help avoid injury, modify training to avoid pain."
+                self.status = "To help avoid injury, modify training to avoid pain."
             else:
-                return "Consider seeing a doctor about your pain symptoms."
+                self.status = "Consider seeing a doctor about your pain symptoms."
         else:
             days = self.get_projected_doms_severity(self.max_value_today)
             if days is None:
-                return ""
+                self.status = ""
             elif days > 1:
-                return str(days) + " days of soreness projected without active recovery"
+                self.status = str(days) + " days of soreness projected without active recovery"
+                self.bolded_text.append(str(days) + " days")
             else:
-                return str(days) + " day of soreness projected without active recovery"
+                self.status = str(days) + " day of soreness projected without active recovery"
+                self.bolded_text.append(str(days) + " days")
 
     def process_soreness(self, soreness_list):
 
@@ -603,7 +632,7 @@ class BodyResponseChart(Serialisable):
                                 self.max_value_pain = False
                                 self.max_value_today = soreness.severity
 
-                self.status = self.set_status_text()
+                self.set_status_text()
 
             if soreness.pain:
                 self.data[soreness.reported_date_time.date()].pain_value = max(self.scale_severity(soreness.severity),

@@ -13,9 +13,25 @@ from models.sport import SportName, BaseballPosition, BasketballPosition, Footba
     SoftballPosition, FieldHockeyPosition, TrackAndFieldPosition, VolleyballPosition
 from models.training_volume import StandardErrorRange
 from models.trigger import TriggerType
-from utils import format_date, parse_date, parse_datetime
+from utils import format_date, format_datetime, parse_date, parse_datetime
 import datetime
 import numbers
+
+
+class SportMaxLoad(Serialisable):
+    def __init__(self, event_date_time, load):
+        self.event_date_time = event_date_time
+        self.load = load
+        self.first_time_logged = False
+
+    def json_serialise(self):
+        ret = {
+            'event_date_tinme': format_datetime(self.event_date_time),
+            'load': self.load,
+            'first_time_logged': self.first_time_logged
+        }
+
+        return ret
 
 
 class AthleteStats(Serialisable):
@@ -111,6 +127,8 @@ class AthleteStats(Serialisable):
         self.body_response_chart = None
 
         self.eligible_for_high_load_trigger = False
+
+        self.sport_max_load = {}
 
     def update_historic_soreness(self, soreness, event_date):
 
