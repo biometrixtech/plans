@@ -4,7 +4,7 @@ from utils import format_date, format_datetime, parse_datetime, parse_date
 from fathomapi.utils.exceptions import InvalidSchemaException
 from models.soreness import BodyPart, BodyPartSide, Soreness
 from models.sport import SportName
-from models.session import SportTrainingSession
+from models.session import SportTrainingSession, SessionSource
 from logic.soreness_processing import SorenessCalculator
 
 
@@ -176,8 +176,8 @@ class WorkoutChart(BaseChart, Serialisable):
             summary = WorkoutSummary()
             summary.sport_name = training_session.sport_name
             summary.source = training_session.source
-            if summary.source == 0:
-                summary.duration = training_session.duration
+            if summary.source == SessionSource.user:
+                summary.duration = training_session.duration_minutes
             else:
                 summary.duration = training_session.duration_health
             summary.distance = training_session.distance
@@ -195,16 +195,20 @@ class WorkoutChart(BaseChart, Serialisable):
                     self.last_sport_name = summary.sport_name
 
             if (summary.event_date == self.last_workout_today and summary.event_date.date() == self.end_date.date()
-                    and summary.sport_name in sport_max_load):
+                    and summary.sport_name.value in sport_max_load):
 
-                if summary.event_date == sport_max_load[summary.sport_name].event_date_time:
-                    if sport_max_load[summary.sport_name].first_time_logged:
-                        self.status = "First " + SportName(summary.sport_name).name + " workout recorded!"
+                if summary.event_date == sport_max_load[summary.sport_name.value].event_date_time:
+                    if sport_max_load[summary.sport_name.value].first_time_logged:
+                        self.status = "First " + SportName(summary.sport_name.value).name + " workout recorded!"
+                        self.bolded_text.append(SportName(summary.sport_name.value).name)
                     else:
-                        self.status = "Today's workout set a new " + SportName(summary.sport_name).name + " max!"
+                        self.status = "Today's workout set a new " + SportName(summary.sport_name.value).name + " max!"
+                        self.bolded_text.append(SportName(summary.sport_name.value).name)
                 else:
-                    percent = round((training_volume / sport_max_load[summary.sport_name].load) * 100, 0)
-                    self.status = "Today's " + SportName(summary.sport_name).name + " was " + str(percent) + "% of your historic max!"
+                    percent = round((training_volume / sport_max_load[summary.sport_name.value].load) * 100, 0)
+                    self.status = "Today's " + SportName(summary.sport_name.value).name + " was " + str(percent) + "% of your historic max!"
+                    self.bolded_text.append(SportName(summary.sport_name.value).name)
+                    self.bolded_text.append(str(percent) + "%")
 
             self.data[training_session.event_date.date()].sessions.append(summary)
 
