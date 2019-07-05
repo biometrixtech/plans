@@ -416,4 +416,86 @@ def test_workload_new_user():
 
     assert workload_chart.status == "You hit 100% of your basketball max!"
 
+def test_workload_new_sport():
+
+    base_date_time = datetime.now()
+
+    start_date = base_date_time - timedelta(days=13)
+
+    sessions = get_training_sessions(start_date, 13)
+
+    workload_chart = WorkoutChart(base_date_time)
+
+    load_stats = LoadStats()
+
+    sport_max_load = {}
+
+    growing_sessions = []
+
+    session_count = 0
+
+    for s in sessions:
+        if session_count == 13:
+            s.sport_name = SportName.cycling
+        growing_sessions.append(s)
+        load_stats.set_min_max_values(growing_sessions)
+        training_load = s.training_volume(load_stats)
+
+        if s.sport_name.value in sport_max_load:
+            if training_load > sport_max_load[s.sport_name.value].load:
+                sport_max_load[s.sport_name.value].load = training_load
+                sport_max_load[s.sport_name.value].event_date_time = s.event_date
+                sport_max_load[s.sport_name.value].first_time_logged = False
+        else:
+            sport_max_load[s.sport_name.value] = SportMaxLoad(s.event_date, training_load)
+            sport_max_load[s.sport_name.value].first_time_logged = True
+        workload_chart.add_training_volume(s, load_stats, sport_max_load)
+        session_count += 1
+
+    assert workload_chart.status == "First cycling workout recorded!"
+
+
+def test_workload_new_max():
+
+    base_date_time = datetime.now()
+
+    start_date = base_date_time - timedelta(days=13)
+
+    sessions = get_training_sessions(start_date, 13)
+
+    workload_chart = WorkoutChart(base_date_time)
+
+    load_stats = LoadStats()
+
+    sport_max_load = {}
+
+    growing_sessions = []
+
+    session_count = 0
+
+    for s in sessions:
+        if session_count == 12:
+            s.sport_name = SportName.cycling
+        if session_count == 13:
+            s.sport_name = SportName.cycling
+            s.duration_minutes = s.duration_minutes * 2
+        growing_sessions.append(s)
+        load_stats.set_min_max_values(growing_sessions)
+        session_count += 1
+
+    for s in sessions:
+        training_load = s.training_volume(load_stats)
+
+        if s.sport_name.value in sport_max_load:
+            if training_load > sport_max_load[s.sport_name.value].load:
+                sport_max_load[s.sport_name.value].load = training_load
+                sport_max_load[s.sport_name.value].event_date_time = s.event_date
+            sport_max_load[s.sport_name.value].first_time_logged = False
+        else:
+            sport_max_load[s.sport_name.value] = SportMaxLoad(s.event_date, training_load)
+            sport_max_load[s.sport_name.value].first_time_logged = True
+        workload_chart.add_training_volume(s, load_stats, sport_max_load)
+
+    assert workload_chart.status == "Today's workout set a new cycling max!"
+
 
