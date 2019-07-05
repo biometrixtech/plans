@@ -159,7 +159,7 @@ class WorkoutChart(BaseChart, Serialisable):
             'end_date': format_date(self.end_date),
             'status': self.status,
             'lockout': self.lockout,
-            'data': [{"date": d, "value": v.json_serialise()} for d, v in self.data],
+            'data': [{"date": format_date(d), "value": v.json_serialise()} for d, v in self.data.items()],
             'last_workout_today': format_datetime(self.last_workout_today) if self.last_workout_today is not None else None,
             'last_sport_name': self.last_sport_name.value if self.last_sport_name is not None else None
         }
@@ -528,7 +528,7 @@ class BodyResponseChart(Serialisable):
             'max_value_today': self.max_value_today,
             'max_value_pain': self.max_value_pain,
             'lockout': self.lockout,
-            'data': [{"date": d, "value": v.json_serialise()} for d, v in self.data]
+            'data': [{"date": format_date(d), "value": v.json_serialise()} for d, v in self.data.items()]
         }
 
         return ret
