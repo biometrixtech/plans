@@ -92,6 +92,35 @@ visualization_data = {
                 'y_axis_2': "Movement Quality",
                 'legend': [
                 ]
+            },
+            7: {
+                'title': "",
+                'y_axis_1': "Severity",
+                'y_axis_2': "",
+                'legend': [
+                    {
+                        'color': 6,
+                        'text': "pain",
+                        'type': 0
+                    },
+                    {
+                        'color': 5,
+                        'text': "soreness",
+                        'type': 0
+                    }
+                ]
+            },
+            8: {
+                'title': "",
+                'y_axis_1': "Load Units",
+                'y_axis_2': "",
+                'legend': [
+                    {
+                        'color': 4,
+                        'text': "Workload",
+                        'type': 3
+                    }
+                ]
             }
         }
 
