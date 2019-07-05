@@ -376,7 +376,7 @@ class TrendData(object):
         self.lockout = False
         self.status = DataStatus()
         self.data = []
-        self.visualization_type = VisualizationType(1)
+        self.visualization_type = VisualizationType(7)
         self.visualization_title = VisualizationTitle()
         self.visualization_data = VisualizationData()
 
@@ -409,6 +409,12 @@ class TrendData(object):
         return trend_data
 
 
+    def add_visualization_data(self):
+        visualization_data = TriggerData().get_visualization_data(self.visualization_type.value)
+        self.visualization_data.y_axis_1 = visualization_data['y_axis_1']
+        self.visualization_data.y_axis_2 = visualization_data['y_axis_2']
+        self.visualization_data.plot_legends = [Legend.json_deserialise(legend) for legend in visualization_data['legend']]
+
 
 class TrendsDashboard(object):
     def __init__(self):
@@ -433,6 +439,8 @@ class AthleteTrends(object):
         self.stress = TrendCategory(InsightType.stress)
         self.response = TrendCategory(InsightType.response)
         self.biomechanics = TrendCategory(InsightType.biomechanics)
+        self.body_response = TrendData()
+        self.workload = TrendData()
 
     def json_serialise(self):
         ret = {
@@ -481,6 +489,29 @@ class AthleteTrends(object):
         self.remove_trend_not_present_in_trends_page()
         self.add_no_trigger()
         self.sort_by_priority()
+
+    def add_trend_data(self, athlete_stats):
+        body_response_chart = athlete_stats.body_response_chart
+        body_response = TrendData()
+        if body_response_chart is not None:
+            body_response.visualization_type = VisualizationType.body_response
+            body_response.lockout = body_response_chart.lockout
+            body_response.status = DataStatus()
+            body_response.data = body_response_chart.data
+            body_response.add_visualization_data()
+        self.body_response = body_response
+
+
+
+        workout_chart = athlete_stats.workout_chart
+        workload = TrendData()
+        if workout_chart is not None:
+            workload.visualization_type = VisualizationType.workload
+            workload.lockout = workout_chart.lockout
+            workload.status = DataStatus()
+            workload.data = workout_chart.data
+            workload.add_visualization_data()
+        self.workload = workload
 
 
 body_response = {
