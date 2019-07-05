@@ -499,6 +499,7 @@ class AthleteTrends(object):
             body_response.lockout = body_response_chart.lockout
             body_response.data = [data for data in body_response_chart.data.values()]
             body_response.add_visualization_data()
+
             if not body_response_chart.max_value_pain:
                 color = LegendColor(5)
                 icon_type = "ionicon"
@@ -530,7 +531,7 @@ class AthleteTrends(object):
             workload.add_visualization_data()
             workload.status = DataStatus(workout_chart.status,
                                          workout_chart.bolded_text,
-                                         color=LegendColor(0),
+                                         color=LegendColor(4),
                                          sport_name=workout_chart.last_sport_name
                                          )
         self.workload = workload
