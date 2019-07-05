@@ -205,8 +205,8 @@ class WorkoutChart(BaseChart, Serialisable):
                         self.status = "Today's workout set a new " + SportName(summary.sport_name.value).name + " max!"
                         self.bolded_text.append(SportName(summary.sport_name.value).name)
                 else:
-                    percent = round((training_volume / sport_max_load[summary.sport_name.value].load) * 100, 0)
-                    self.status = "Today's " + SportName(summary.sport_name.value).name + " was " + str(percent) + "% of your historic max!"
+                    percent = int(round((training_volume / sport_max_load[summary.sport_name.value].load) * 100, 0))
+                    self.status = "You hit " + str(percent) + "% of your " + SportName(summary.sport_name.value).name + " max!"
                     self.bolded_text.append(SportName(summary.sport_name.value).name)
                     self.bolded_text.append(str(percent) + "%")
 
