@@ -340,13 +340,13 @@ class TrendCategory(object):
 
 
 class DataStatus(object):
-    def __init__(self):
-        self.text = ""
-        self.bolded_text = []
-        self.color = LegendColor(0)
-        self.icon = None
-        self.sport_name = None
-        self.icon_type = None
+    def __init__(self, text="", bolded_text=[], color=LegendColor(0), icon=None, sport_name=None, icon_type=None):
+        self.text = text
+        self.bolded_text = bolded_text
+        self.color = color
+        self.icon = icon
+        self.sport_name = sport_name
+        self.icon_type = icon_type
 
     def json_serialise(self):
         ret = {'text': self.text,
@@ -496,21 +496,42 @@ class AthleteTrends(object):
         if body_response_chart is not None:
             body_response.visualization_type = VisualizationType.body_response
             body_response.lockout = body_response_chart.lockout
-            body_response.status = DataStatus()
             body_response.data = body_response_chart.data
             body_response.add_visualization_data()
+            if not body_response_chart.max_value_pain:
+                color = LegendColor(5)
+                icon_type = "ionicon"
+                icon = "md-body"
+            else:
+                color = LegendColor(6)
+                if body_response_chart.max_value_today == 1:
+                    icon_type = "ionicon"
+                    icon = "md-body"
+                elif body_response_chart.max_value_today <= 3:
+                    icon_type = "material-community"
+                    icon = "alert"
+                else:
+                    icon_type = "material-community"
+                    icon = "alert-octagon"
+            body_response.status = DataStatus(body_response_chart.status,
+                                              body_response_chart.bolded_text,
+                                              color=color,
+                                              icon=icon,
+                                              icon_type=icon_type)
         self.body_response = body_response
-
-
 
         workout_chart = athlete_stats.workout_chart
         workload = TrendData()
         if workout_chart is not None:
             workload.visualization_type = VisualizationType.workload
             workload.lockout = workout_chart.lockout
-            workload.status = DataStatus()
             workload.data = workout_chart.data
             workload.add_visualization_data()
+            workload.status = DataStatus(workout_chart.status,
+                                         workout_chart.bolded_text,
+                                         color=LegendColor(0),
+                                         sport_name=workout_chart.last_sport_name
+                                         )
         self.workload = workload
 
 
