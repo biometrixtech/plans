@@ -316,7 +316,7 @@ class WorkoutChartData(Serialisable):
         chart_data.day_of_week = input_dict.get('day_of_week', '')
         chart_data.sport_names = set(SportName(sport_name) for sport_name in input_dict.get('sport_names', []))
         chart_data.training_volume = input_dict.get('training_volume', 0)
-        chart_data.sessions = list(SportTrainingSession.json_deserialise(s) for s in input_dict.get['sessions', []])
+        chart_data.sessions = list(WorkoutSummary.json_deserialise(s) for s in input_dict.get['sessions', []])
         return chart_data
 
 
