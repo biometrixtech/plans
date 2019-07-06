@@ -182,7 +182,7 @@ class HistoricSoreness(BaseSoreness, Serialisable):
                    # 'last_reported': self.last_reported,
                    'ask_acute_pain_question': self.ask_acute_pain_question,
                    'ask_persistent_2_question': self.ask_persistent_2_question,
-                   'cause': self.cause.value
+                   'cause': self.cause.value if self.cause is not None else None
                   }
             if cleared:
                 ret['user_id'] = self.user_id
