@@ -216,7 +216,7 @@ class WorkoutChart(BaseChart, Serialisable):
 
             self.data[training_session.event_date.date()].sessions.append(summary)
 
-            if (self.end_date - training_session.event_date).days < 7:
+            if (self.end_date.date() - training_session.event_date.date()).days < 7:
                 self.lockout = False
 
     def auto_fill_data(self):
@@ -614,7 +614,7 @@ class BodyResponseChart(Serialisable):
     def add_soreness(self, soreness):
 
         if soreness is not None and soreness.reported_date_time.date() in self.data:
-            if (self.end_date - soreness.reported_date_time).days < 7:
+            if (self.end_date.date() - soreness.reported_date_time.date()).days < 7:
                 self.lockout = False
 
             if self.end_date.date() == soreness.reported_date_time.date():
