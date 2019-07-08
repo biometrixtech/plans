@@ -620,7 +620,7 @@ class BodyResponseChart(Serialisable):
                     self.max_value_pain = soreness.pain
                 elif self.max_value_pain:
                     if soreness.pain and soreness.severity > self.max_value_today:
-                        self.max_value_today = soreness.pain
+                        self.max_value_today = soreness.severity
                     else: #highest value so far is pain but soreness is soreness
                         if self.max_value_today <= 1:
                             if soreness.severity > 2:
@@ -636,7 +636,7 @@ class BodyResponseChart(Serialisable):
                                 self.max_value_today = soreness.severity
                 else:
                     if not soreness.pain and soreness.severity > self.max_value_today:
-                        self.max_value_today = soreness.pain
+                        self.max_value_today = soreness.severity
                     else: #highest value so far is soreness but soreness is pain
                         if self.max_value_today < 3:
                             self.max_value_pain = True
