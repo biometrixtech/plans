@@ -179,6 +179,8 @@ class SorenessCalculator(object):
             else:
                 return SorenessCause.overloading
 
+        return SorenessCause.unknown
+
     def get_reciprocal_side(self, side):
 
         if side == 0:
