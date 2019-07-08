@@ -158,6 +158,7 @@ class WorkoutChart(BaseChart, Serialisable):
         ret = {
             'end_date': format_date(self.end_date),
             'status': self.status,
+            'bolded_text': self.bolded_text,
             'lockout': self.lockout,
             'data': [{"date": format_date(d), "value": v.json_serialise()} for d, v in self.data.items()],
             'last_workout_today': format_datetime(self.last_workout_today) if self.last_workout_today is not None else None,
@@ -598,8 +599,10 @@ class BodyResponseChart(Serialisable):
                 self.status = ""
             elif days > 1:
                 self.status = str(days) + " days of soreness projected without active recovery"
+                self.bolded_text = []
                 self.bolded_text.append(str(days) + " days")
             else:
+                self.bolded_text = []
                 self.status = str(days) + " day of soreness projected without active recovery"
                 self.bolded_text.append(str(days) + " days")
 
@@ -619,8 +622,9 @@ class BodyResponseChart(Serialisable):
                     self.max_value_today = soreness.severity
                     self.max_value_pain = soreness.pain
                 elif self.max_value_pain:
-                    if soreness.pain and soreness.severity > self.max_value_today:
-                        self.max_value_today = soreness.severity
+                    if soreness.pain:
+                        if soreness.severity > self.max_value_today:
+                            self.max_value_today = soreness.severity
                     else: #highest value so far is pain but soreness is soreness
                         if self.max_value_today <= 1:
                             if soreness.severity > 2:
@@ -635,8 +639,9 @@ class BodyResponseChart(Serialisable):
                                 self.max_value_pain = False
                                 self.max_value_today = soreness.severity
                 else:
-                    if not soreness.pain and soreness.severity > self.max_value_today:
-                        self.max_value_today = soreness.severity
+                    if not soreness.pain:
+                        if soreness.severity > self.max_value_today:
+                            self.max_value_today = soreness.severity
                     else: #highest value so far is soreness but soreness is pain
                         if self.max_value_today < 3:
                             self.max_value_pain = True
