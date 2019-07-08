@@ -501,9 +501,15 @@ class AthleteTrends(object):
             body_response.add_visualization_data()
 
             if not body_response_chart.max_value_pain:
-                color = LegendColor(5)
-                icon_type = "ionicon"
-                icon = "md-body"
+                if body_response_chart.max_value_today > 1:
+                    color = LegendColor(5)
+                    icon_type = "ionicon"
+                    icon = "md-body"
+                else:
+                    color = LegendColor(0)
+                    icon_type = None
+                    icon = None
+
             else:
                 color = LegendColor(6)
                 if body_response_chart.max_value_today == 1:
