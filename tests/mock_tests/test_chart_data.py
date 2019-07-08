@@ -414,7 +414,7 @@ def test_workload_new_user():
             sport_max_load[s.sport_name.value].first_time_logged = True
         workload_chart.add_training_volume(s, load_stats, sport_max_load)
 
-    assert workload_chart.status == "You hit 100% of your basketball max!"
+    assert workload_chart.status == "You hit 100% of your Basketball max!"
 
 def test_workload_new_sport():
 
@@ -452,7 +452,7 @@ def test_workload_new_sport():
         workload_chart.add_training_volume(s, load_stats, sport_max_load)
         session_count += 1
 
-    assert workload_chart.status == "First cycling workout recorded!"
+    assert workload_chart.status == "First Cycling workout recorded!"
 
 
 def test_workload_new_max():
@@ -496,6 +496,6 @@ def test_workload_new_max():
             sport_max_load[s.sport_name.value].first_time_logged = True
         workload_chart.add_training_volume(s, load_stats, sport_max_load)
 
-    assert workload_chart.status == "Today's workout set a new cycling max!"
+    assert workload_chart.status == "Today's workout set a new Cycling max!"
 
 

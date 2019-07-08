@@ -200,18 +200,18 @@ class WorkoutChart(BaseChart, Serialisable):
 
                 if summary.event_date == sport_max_load[summary.sport_name.value].event_date_time:
                     if sport_max_load[summary.sport_name.value].first_time_logged:
-                        self.status = "First " + SportName(summary.sport_name.value).name + " workout recorded!"
+                        self.status = f"First {summary.sport_name.get_display_name()} workout recorded!"
                         self.bolded_text = []
-                        self.bolded_text.append(SportName(summary.sport_name.value).name)
+                        self.bolded_text.append(summary.sport_name.get_display_name())
                     else:
-                        self.status = "Today's workout set a new " + SportName(summary.sport_name.value).name + " max!"
+                        self.status = f"Today's workout set a new {summary.sport_name.get_display_name()} max!"
                         self.bolded_text = []
                         self.bolded_text.append(SportName(summary.sport_name.value).name)
                 else:
                     percent = int(round((training_volume / sport_max_load[summary.sport_name.value].load) * 100, 0))
-                    self.status = "You hit " + str(percent) + "% of your " + SportName(summary.sport_name.value).name + " max!"
+                    self.status = f"You hit {str(percent)}% of your {summary.sport_name.get_display_name()} max!"
                     self.bolded_text = []
-                    self.bolded_text.append(SportName(summary.sport_name.value).name)
+                    self.bolded_text.append(summary.sport_name.get_display_name())
                     self.bolded_text.append(str(percent) + "%")
 
             self.data[training_session.event_date.date()].sessions.append(summary)
