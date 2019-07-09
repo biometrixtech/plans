@@ -1,9 +1,10 @@
 from serialisable import Serialisable
 from datetime import datetime, timedelta
-from utils import format_date, parse_datetime, parse_date
+from utils import format_date, format_datetime, parse_datetime, parse_date
 from fathomapi.utils.exceptions import InvalidSchemaException
 from models.soreness import BodyPart, BodyPartSide, Soreness
 from models.sport import SportName
+from models.session import SportTrainingSession, SessionSource
 from logic.soreness_processing import SorenessCalculator
 
 
@@ -144,6 +145,92 @@ class TrainingVolumeChart(BaseChart):
             self.data[chart_data.date] = chart_data
 
 
+class WorkoutChart(BaseChart, Serialisable):
+    def __init__(self, end_date):
+        super().__init__(end_date)
+        self.status = ""
+        self.bolded_text = []
+        self.lockout = True
+        self.last_workout_today = None
+        self.last_sport_name = None
+
+    def json_serialise(self):
+        ret = {
+            'end_date': format_date(self.end_date),
+            'status': self.status,
+            'bolded_text': self.bolded_text,
+            'lockout': self.lockout,
+            'data': [{"date": format_date(d), "value": v.json_serialise()} for d, v in self.data.items()],
+            'last_workout_today': format_datetime(self.last_workout_today) if self.last_workout_today is not None else None,
+            'last_sport_name': self.last_sport_name.value if self.last_sport_name is not None else None
+        }
+
+        return ret
+
+    def add_training_volume(self, training_session, load_stats, sport_max_load):
+
+        training_volume = training_session.training_volume(load_stats)
+        if training_volume is not None and training_volume > 0 and training_session.event_date.date() in self.data:
+            self.data[training_session.event_date.date()].value += training_volume
+            self.data[training_session.event_date.date()].sport_names.add(training_session.sport_name)
+
+            summary = WorkoutSummary()
+            summary.sport_name = training_session.sport_name
+            summary.source = training_session.source
+            if summary.source == SessionSource.user:
+                summary.duration = training_session.duration_minutes
+            else:
+                summary.duration = training_session.duration_health
+            summary.distance = training_session.distance
+            summary.event_date = training_session.event_date
+            summary.end_date = training_session.end_date
+            summary.RPE = training_session.session_RPE
+            summary.training_volume = training_volume
+
+            if summary.event_date.date() == self.end_date.date():
+                if self.last_workout_today is None:
+                    self.last_workout_today = summary.event_date
+                    self.last_sport_name = summary.sport_name
+                elif summary.event_date > self.last_workout_today:
+                    self.last_workout_today = summary.event_date
+                    self.last_sport_name = summary.sport_name
+
+            if (summary.event_date == self.last_workout_today and summary.event_date.date() == self.end_date.date()
+                    and summary.sport_name.value in sport_max_load):
+
+                if summary.event_date == sport_max_load[summary.sport_name.value].event_date_time:
+                    if sport_max_load[summary.sport_name.value].first_time_logged:
+                        self.status = f"First {summary.sport_name.get_display_name()} workout recorded!"
+                        self.bolded_text = []
+                        self.bolded_text.append(summary.sport_name.get_display_name())
+                    else:
+                        self.status = f"Today's workout set a new {summary.sport_name.get_display_name()} max!"
+                        self.bolded_text = []
+                        self.bolded_text.append(SportName(summary.sport_name.value).name)
+                else:
+                    percent = int(round((training_volume / sport_max_load[summary.sport_name.value].load) * 100, 0))
+                    self.status = f"You hit {str(percent)}% of your {summary.sport_name.get_display_name()} max!"
+                    self.bolded_text = []
+                    self.bolded_text.append(summary.sport_name.get_display_name())
+                    self.bolded_text.append(str(percent) + "%")
+
+            self.data[training_session.event_date.date()].sessions.append(summary)
+
+            if (self.end_date.date() - training_session.event_date.date()).days < 7:
+                self.lockout = False
+
+    def auto_fill_data(self):
+
+        start_date = self.end_date - timedelta(days=14)
+
+        for i in range(1, 15):
+            chart_data = WorkoutChartData()
+            chart_data.date = (start_date + timedelta(days=i)).date()
+            day_of_week = (start_date + timedelta(days=i)).strftime('%a')
+            chart_data.day_of_week = day_of_week
+            self.data[chart_data.date] = chart_data
+
+
 class TrainingVolumeChartData(Serialisable):
     def __init__(self):
         self.date = None
@@ -167,6 +254,84 @@ class TrainingVolumeChartData(Serialisable):
         chart_data.day_of_week = input_dict.get('day_of_week', '')
         chart_data.sport_names = set(SportName(sport_name) for sport_name in input_dict.get('sport_names', []))
         chart_data.training_volume = input_dict.get('training_volume', 0)
+        return chart_data
+
+
+class WorkoutSummary(Serialisable):
+    def __init__(self):
+        self.sport_name = None
+        self.source = SessionSource.user
+        self.duration = 0
+        self.event_date = None
+        self.end_date = None
+        self.distance = 0
+        self.RPE = 0
+        self.training_volume = 0
+
+    def json_serialise(self):
+        ret = {
+            'sport_name': self.sport_name.value if self.sport_name is not None else None,
+            'source': self.source.value if self.source is not None else None,
+            'duration': self.duration,
+            'event_date': format_datetime(self.event_date),
+            'end_date': format_datetime(self.end_date),
+            'distance': self.distance,
+            'RPE': self.RPE,
+            'training_volume': self.training_volume
+        }
+        return ret
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        summary = cls()
+        summary.sport_name = input_dict['sport_name']
+        summary.source = input_dict.get('source', 0)
+        summary.duration = input_dict.get('duration', 0)
+        summary.event_date = input_dict['event_date']
+        summary.end_date = input_dict['end_date']
+        summary.distance = input_dict.get('distance', 0)
+        summary.RPE = input_dict.get('RPE', 0)
+        summary.training_volume = input_dict.get('training_volume', 0)
+
+        return summary
+
+    def __setattr__(self, key, value):
+        if key in ['event_date', 'end_date',]:
+            if not isinstance(value, datetime) and value is not None:
+                value = parse_datetime(value)
+        elif key == 'sport_name' and value is not None and not isinstance(value, SportName):
+            value = SportName(value)
+        elif key == 'source' and not isinstance(value, SessionSource):
+            value = SessionSource(value)
+        super().__setattr__(key, value)
+
+
+class WorkoutChartData(Serialisable):
+    def __init__(self):
+        self.date = None
+        self.day_of_week = ""
+        self.sport_names = set()
+        self.value = 0
+        self.sessions = []
+
+    def json_serialise(self):
+        ret = {
+            'date': format_date(self.date),
+            'day_of_week': self.day_of_week,
+            'sport_names': [sport_name.value for sport_name in self.sport_names if sport_name is not None],
+            'value': self.value,
+            'sessions': [session.json_serialise() for session in self.sessions]
+        }
+        return ret
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        chart_data = cls()
+        chart_data.date = input_dict['date']
+        chart_data.day_of_week = input_dict.get('day_of_week', '')
+        chart_data.sport_names = set(SportName(sport_name) for sport_name in input_dict.get('sport_names', []))
+        chart_data.value = input_dict.get('value', 0)
+        chart_data.sessions = list(WorkoutSummary.json_deserialise(s) for s in input_dict.get('sessions', []))
         return chart_data
 
 
@@ -275,6 +440,242 @@ class HighRelativeLoadChart(BaseChartBoolean):
 
         if relative_load is not None and relative_load.date.date() in self.data:
             self.data[relative_load.date.date()].value = True
+
+
+class BodyPartSummary(Serialisable):
+    def __init__(self):
+        self.body_part = None
+        self.side = 0
+        self.pain = False
+        self.value = 0
+
+    def __hash__(self):
+        return hash((self.body_part, self.side, self.pain))
+
+    def __eq__(self, other):
+        return ((self.body_part == other.body_part,
+                 self.side == other.side, self.pain == other.pain))
+
+    def json_serialise(self):
+        ret = {
+            'body_part': self.body_part,
+            'side': self.side,
+            'pain': self.pain,
+            'value': self.value
+        }
+        return ret
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        body_part = cls()
+        body_part.body_part = input_dict['body_part']
+        body_part.side = input_dict.get('side', 0)
+        body_part.pain = input_dict.get('pain', False)
+        body_part.value = input_dict.get('value', 0)
+        return body_part
+
+
+class BodyResponseChartData(Serialisable):
+    def __init__(self):
+        self.date = None
+        self.day_of_week = ""
+        self.pain_value = 0
+        self.soreness_value = 0
+        self.body_parts = []
+
+    def json_serialise(self):
+        ret = {
+            'date': format_date(self.date),
+            'day_of_week': self.day_of_week,
+            'pain_value': self.pain_value,
+            'soreness_value': self.soreness_value,
+            'body_parts': list(b.json_serialise() for b in self.body_parts)
+        }
+        return ret
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        chart_data = cls()
+        chart_data.date = input_dict['date']
+        chart_data.day_of_week = input_dict.get('day_of_week', "")
+        chart_data.pain_value = input_dict.get('pain_value', 0)
+        chart_data.soreness_value = input_dict.get('soreness_value', 0)
+        chart_data.body_parts = list(BodyPartSummary.json_deserialise(b) for b in input_dict.get('body_parts', []))
+        return chart_data
+
+
+class BodyResponseChart(Serialisable):
+    def __init__(self, end_date):
+        self.end_date = end_date
+        self.data = {}
+        self.auto_fill_data()
+        self.status = ""
+        self.bolded_text = []
+        self.max_value_today = None
+        self.max_value_pain = None
+        self.lockout = True
+
+    def __setattr__(self, name, value):
+        if name in ['end_date']:
+            if value is not None and not isinstance(value, datetime):
+                try:
+                    value = parse_datetime(value)
+                except InvalidSchemaException:
+                    value = parse_date(value)
+        super().__setattr__(name, value)
+
+    def json_serialise(self):
+        ret = {
+            'end_date': format_date(self.end_date),
+            'status': self.status,
+            'bolded_text': [t for t in self.bolded_text],
+            'max_value_today': self.max_value_today,
+            'max_value_pain': self.max_value_pain,
+            'lockout': self.lockout,
+            'data': [{"date": format_date(d), "value": v.json_serialise()} for d, v in self.data.items()]
+        }
+
+        return ret
+
+    def get_output_list(self):
+
+        data = sorted(list(self.data.values()), key=lambda x: x.date, reverse=False)
+
+        return data
+
+    def auto_fill_data(self):
+
+        start_date = self.end_date - timedelta(days=14)
+
+        for i in range(1, 15):
+            chart_data = BodyResponseChartData()
+            chart_data.date = (start_date + timedelta(days=i)).date()
+            day_of_week = (start_date + timedelta(days=i)).strftime('%a')
+            chart_data.day_of_week = day_of_week
+            chart_data.body_parts = {}
+
+            self.data[chart_data.date] = chart_data
+
+    def scale_severity(self, severity):
+
+        if severity <= 1:
+            return 1
+        elif 1 < severity <= 3:
+            return 2
+        else:
+            return 3
+
+    def get_projected_doms_severity(self, severity):
+
+        if severity is None:
+            return None
+
+        if 1 < severity <= 2:
+            return 2
+
+        elif 2 < severity <= 3:
+            return 3
+
+        elif 3 < severity <= 4:
+            return 4
+
+        elif 4 < severity <= 5:
+            return 5
+        else:
+            return None
+
+    def set_status_text(self):
+
+        if self.max_value_pain:
+            if self.max_value_today <= 1:
+                self.status = "Avoid worsening pain by modifying training."
+            elif 1 < self.max_value_today <= 3:
+                self.status = "To help avoid injury, modify training to avoid pain."
+            else:
+                self.status = "Consider seeing a doctor about your pain symptoms."
+        else:
+            days = self.get_projected_doms_severity(self.max_value_today)
+            if days is None:
+                self.status = ""
+            elif days > 1:
+                self.status = str(days) + " days of soreness projected without active recovery"
+                self.bolded_text = []
+                self.bolded_text.append(str(days) + " days")
+            else:
+                self.bolded_text = []
+                self.status = str(days) + " day of soreness projected without active recovery"
+                self.bolded_text.append(str(days) + " days")
+
+    def process_soreness(self, soreness_list):
+
+        for s in soreness_list:
+            self.add_soreness(s)
+
+    def add_soreness(self, soreness):
+
+        if soreness is not None and soreness.reported_date_time.date() in self.data:
+            if (self.end_date.date() - soreness.reported_date_time.date()).days < 7:
+                self.lockout = False
+
+            if self.end_date.date() == soreness.reported_date_time.date():
+                if self.max_value_today is None:
+                    self.max_value_today = soreness.severity
+                    self.max_value_pain = soreness.pain
+                elif self.max_value_pain:
+                    if soreness.pain:
+                        if soreness.severity > self.max_value_today:
+                            self.max_value_today = soreness.severity
+                    else: #highest value so far is pain but soreness is soreness
+                        if self.max_value_today <= 1:
+                            if soreness.severity > 2:
+                                self.max_value_pain = False
+                                self.max_value_today = soreness.severity
+                        elif 1 < self.max_value_today <= 2:
+                            if soreness.severity > 3:
+                                self.max_value_pain = False
+                                self.max_value_today = soreness.severity
+                        elif 2 < self.max_value_today <= 3:
+                            if soreness.severity > 4:
+                                self.max_value_pain = False
+                                self.max_value_today = soreness.severity
+                else:
+                    if not soreness.pain:
+                        if soreness.severity > self.max_value_today:
+                            self.max_value_today = soreness.severity
+                    else: #highest value so far is soreness but soreness is pain
+                        if self.max_value_today < 3:
+                            self.max_value_pain = True
+                            self.max_value_today = soreness.severity
+                        elif 3 <= self.max_value_today < 4:
+                            if soreness.severity >= 2:
+                                self.max_value_pain = True
+                                self.max_value_today = soreness.severity
+                        elif self.max_value_today >= 4:
+                            if soreness.severity >= 3:
+                                self.max_value_pain = False
+                                self.max_value_today = soreness.severity
+
+                self.set_status_text()
+
+            if soreness.pain:
+                self.data[soreness.reported_date_time.date()].pain_value = max(self.scale_severity(soreness.severity),
+                                                                               self.data[soreness.reported_date_time.date()].pain_value)
+            else:
+                self.data[soreness.reported_date_time.date()].soreness_value = max(self.scale_severity(soreness.severity),
+                                                                                   self.data[soreness.reported_date_time.date()].soreness_value)
+            body_part_summary = BodyPartSummary()
+            body_part_summary.body_part = soreness.body_part.location.value
+            body_part_summary.side = soreness.side
+            body_part_summary.value = self.scale_severity(soreness.severity)
+            body_part_summary.pain = soreness.pain
+
+            if body_part_summary in self.data[soreness.reported_date_time.date()].body_parts:
+                self.data[soreness.reported_date_time.date()].body_parts[body_part_summary].value = max(body_part_summary.value,
+                                                                                                        self.data[
+                                                                                                            soreness.reported_date_time.date()].body_parts[
+                                                                                                            body_part_summary].value)
+
+            self.data[soreness.reported_date_time.date()].body_parts[body_part_summary] = body_part_summary
 
 
 class BodyPartChartData(Serialisable):

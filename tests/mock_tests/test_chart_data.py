@@ -1,10 +1,11 @@
-from models.chart_data import TrainingVolumeChartData, TrainingVolumeChart, BodyPartChartCollection, MuscularStrainChart, HighRelativeLoadChart, DOMSChart
+from models.chart_data import WorkoutChart, TrainingVolumeChart, BodyPartChartCollection, MuscularStrainChart, HighRelativeLoadChart, DOMSChart, BodyResponseChart
 from utils import parse_date
 from math import floor
 from models.historic_soreness import HistoricSoreness, HistoricSorenessStatus, HistoricSeverity, SorenessCause
-from models.session import SessionType, HighLoadSession
+from models.session import SessionType, HighLoadSession, SportTrainingSession, SessionSource
 from models.soreness import BodyPartLocation
 from models.sport import SportName
+from models.stats import SportMaxLoad
 from logic.stats_processing import StatsProcessing
 from datetime import datetime, timedelta
 from tests.mocks.mock_datastore_collection import DatastoreCollection
@@ -13,6 +14,7 @@ from tests.testing_utilities import TestUtilities
 from models.post_session_survey import PostSurvey, PostSessionSurvey
 from models.daily_readiness import DailyReadiness
 from models.data_series import DataSeries
+from models.load_stats import LoadStats
 import random
 
 
@@ -25,6 +27,35 @@ def get_dates(start_date, days):
             dates.append(start_date + timedelta(days=i))
 
     return dates
+
+
+def get_all_dates(start_date, days):
+
+    dates = []
+
+    for i in range(days + 1):
+        dates.append(start_date + timedelta(days=i))
+
+    return dates
+
+
+def get_training_sessions(start_date, days):
+
+    dates = get_all_dates(start_date, days)
+
+    sessions = []
+
+    for d in dates:
+        session = SportTrainingSession()
+        session.sport_name = SportName.basketball
+        session.source = SessionSource.user
+        session.event_date = d
+        session.end_date = d
+        session.session_RPE = 5
+        session.duration_minutes = 90
+        sessions.append(session)
+
+    return sessions
 
 
 def get_daily_readiness_surveys(start_date, historic_soreness_list, days, co_occurence_ratio):
@@ -297,3 +328,174 @@ def test_body_part_collection():
 
     assert len(soreness_dictionary) > 0
     assert len(pain_dictionary) == 0
+
+
+def test_body_response():
+
+    base_date_time = datetime.now()
+
+    acute_readiness_surveys = []
+    acute_post_session_surveys = []
+    chronic_readiness_surveys = []
+    chronic_post_session_surveys = []
+
+    datastore_collection = DatastoreCollection()
+    athlete_stats_datastore = AthleteStatsDatastore()
+    datastore_collection.athlete_stats_datastore = athlete_stats_datastore
+
+    stats_processing = StatsProcessing("test", base_date_time, datastore_collection)
+
+    co_occurrence_ratio = 0.9
+
+    historic_soreness_list = []
+    historic_soreness_list.extend(get_symmetric_historic_soreness_list(BodyPartLocation.calves))
+
+    acute_readiness_surveys.extend(get_daily_readiness_surveys(base_date_time - timedelta(days=7),
+                                                               historic_soreness_list, 7, 1.00))
+    chronic_readiness_surveys.extend(get_daily_readiness_surveys(base_date_time - timedelta(days=35),
+                                                                 historic_soreness_list, 28, co_occurrence_ratio))
+    acute_post_session_surveys.extend(get_post_session_surveys(base_date_time - timedelta(days=7),
+                                                               historic_soreness_list, 7, 1.00))
+    chronic_post_session_surveys.extend(get_post_session_surveys(base_date_time - timedelta(days=35),
+                                                                 historic_soreness_list, 28, co_occurrence_ratio))
+
+    stats_processing.acute_readiness_surveys = acute_readiness_surveys
+    stats_processing.chronic_readiness_surveys = chronic_readiness_surveys
+    stats_processing.acute_post_session_surveys = acute_post_session_surveys
+    stats_processing.chronic_post_session_surveys = chronic_post_session_surveys
+
+    acute_surveys = stats_processing.merge_soreness_from_surveys(
+        stats_processing.get_readiness_soreness_list(stats_processing.acute_readiness_surveys),
+        stats_processing.get_ps_survey_soreness_list(stats_processing.acute_post_session_surveys))
+    chronic_surveys = stats_processing.merge_soreness_from_surveys(
+        stats_processing.get_readiness_soreness_list(stats_processing.chronic_readiness_surveys),
+        stats_processing.get_ps_survey_soreness_list(stats_processing.chronic_post_session_surveys))
+    all_soreness = []
+    all_soreness.extend(acute_surveys)
+    all_soreness.extend(chronic_surveys)
+
+    body_response_chart = BodyResponseChart(base_date_time)
+    for s in all_soreness:
+        body_response_chart.add_soreness(s)
+
+    yesterday = (base_date_time - timedelta(days=1)).date()
+    assert len(body_response_chart.data[base_date_time.date()].body_parts) == 0
+    assert len(body_response_chart.data[yesterday].body_parts) == 2
+
+
+def test_workload_new_user():
+
+    base_date_time = datetime.now()
+
+    start_date = base_date_time - timedelta(days=13)
+
+    sessions = get_training_sessions(start_date, 13)
+
+    workload_chart = WorkoutChart(base_date_time)
+
+    load_stats = LoadStats()
+
+    sport_max_load = {}
+
+    growing_sessions = []
+
+    for s in sessions:
+        growing_sessions.append(s)
+        load_stats.set_min_max_values(growing_sessions)
+        training_load = s.training_volume(load_stats)
+
+        if s.sport_name.value in sport_max_load:
+            if training_load > sport_max_load[s.sport_name.value].load:
+                sport_max_load[s.sport_name.value].load = training_load
+                sport_max_load[s.sport_name.value].event_date_time = s.event_date
+                sport_max_load[s.sport_name.value].first_time_logged = False
+        else:
+            sport_max_load[s.sport_name.value] = SportMaxLoad(s.event_date, training_load)
+            sport_max_load[s.sport_name.value].first_time_logged = True
+        workload_chart.add_training_volume(s, load_stats, sport_max_load)
+
+    assert workload_chart.status == "You hit 100% of your Basketball max!"
+
+def test_workload_new_sport():
+
+    base_date_time = datetime.now()
+
+    start_date = base_date_time - timedelta(days=13)
+
+    sessions = get_training_sessions(start_date, 13)
+
+    workload_chart = WorkoutChart(base_date_time)
+
+    load_stats = LoadStats()
+
+    sport_max_load = {}
+
+    growing_sessions = []
+
+    session_count = 0
+
+    for s in sessions:
+        if session_count == 13:
+            s.sport_name = SportName.cycling
+        growing_sessions.append(s)
+        load_stats.set_min_max_values(growing_sessions)
+        training_load = s.training_volume(load_stats)
+
+        if s.sport_name.value in sport_max_load:
+            if training_load > sport_max_load[s.sport_name.value].load:
+                sport_max_load[s.sport_name.value].load = training_load
+                sport_max_load[s.sport_name.value].event_date_time = s.event_date
+                sport_max_load[s.sport_name.value].first_time_logged = False
+        else:
+            sport_max_load[s.sport_name.value] = SportMaxLoad(s.event_date, training_load)
+            sport_max_load[s.sport_name.value].first_time_logged = True
+        workload_chart.add_training_volume(s, load_stats, sport_max_load)
+        session_count += 1
+
+    assert workload_chart.status == "First Cycling workout recorded!"
+
+
+def test_workload_new_max():
+
+    base_date_time = datetime.now()
+
+    start_date = base_date_time - timedelta(days=13)
+
+    sessions = get_training_sessions(start_date, 13)
+
+    workload_chart = WorkoutChart(base_date_time)
+
+    load_stats = LoadStats()
+
+    sport_max_load = {}
+
+    growing_sessions = []
+
+    session_count = 0
+
+    for s in sessions:
+        if session_count == 12:
+            s.sport_name = SportName.cycling
+        if session_count == 13:
+            s.sport_name = SportName.cycling
+            s.duration_minutes = s.duration_minutes * 2
+        growing_sessions.append(s)
+        load_stats.set_min_max_values(growing_sessions)
+        session_count += 1
+
+    for s in sessions:
+        training_load = s.training_volume(load_stats)
+
+        if s.sport_name.value in sport_max_load:
+            if training_load > sport_max_load[s.sport_name.value].load:
+                sport_max_load[s.sport_name.value].load = training_load
+                sport_max_load[s.sport_name.value].event_date_time = s.event_date
+            sport_max_load[s.sport_name.value].first_time_logged = False
+        else:
+            sport_max_load[s.sport_name.value] = SportMaxLoad(s.event_date, training_load)
+            sport_max_load[s.sport_name.value].first_time_logged = True
+        workload_chart.add_training_volume(s, load_stats, sport_max_load)
+
+    assert workload_chart.status == "Today's workout set a new Cycling max!"
+
+
