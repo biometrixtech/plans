@@ -515,10 +515,10 @@ class AthleteTrends(object):
                     icon = None
             else:
                 color = LegendColor(6)
-                if body_response_chart.max_value_today == 1:
+                if body_response_chart.max_value_today <= 1:
                     icon_type = "ionicon"
                     icon = "md-body"
-                elif body_response_chart.max_value_today <= 3:
+                elif 1 < body_response_chart.max_value_today <= 3:
                     icon_type = "material-community"
                     icon = "alert"
                 else:
