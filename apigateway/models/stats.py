@@ -13,9 +13,31 @@ from models.sport import SportName, BaseballPosition, BasketballPosition, Footba
     SoftballPosition, FieldHockeyPosition, TrackAndFieldPosition, VolleyballPosition
 from models.training_volume import StandardErrorRange
 from models.trigger import TriggerType
-from utils import format_date, parse_date, parse_datetime
+from utils import format_date, format_datetime, parse_date, parse_datetime
 import datetime
 import numbers
+
+
+class SportMaxLoad(Serialisable):
+    def __init__(self, event_date_time, load):
+        self.event_date_time = event_date_time
+        self.load = load
+        self.first_time_logged = False
+
+    def json_serialise(self):
+        ret = {
+            'event_date_time': format_datetime(self.event_date_time),
+            'load': self.load,
+            'first_time_logged': self.first_time_logged
+        }
+
+        return ret
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        sport_max_load = cls(parse_datetime(input_dict['event_date_time']), input_dict['load'])
+        sport_max_load.first_time_logged = input_dict.get('first_time_logged', False)
+        return sport_max_load
 
 
 class AthleteStats(Serialisable):
@@ -100,13 +122,19 @@ class AthleteStats(Serialisable):
         self.load_stats = LoadStats()
         self.high_relative_load_sessions = []
         self.training_volume_chart_data = []
+
         self.soreness_chart_data = {}
         self.pain_chart_data = {}
         self.muscular_strain_chart_data = []
         self.high_relative_load_chart_data = []
         self.doms_chart_data = []
 
+        self.workout_chart = None
+        self.body_response_chart = None
+
         self.eligible_for_high_load_trigger = False
+
+        self.sport_max_load = {}
 
     def update_historic_soreness(self, soreness, event_date):
 
@@ -463,7 +491,10 @@ class AthleteStats(Serialisable):
             'load_stats': self.load_stats.json_serialise() if self.load_stats is not None else None,
             'muscular_strain': [muscular_strain.json_serialise() for muscular_strain in self.muscular_strain],
             'high_relative_load_sessions': [high_load.json_serialise() for high_load in self.high_relative_load_sessions],
-            'eligible_for_high_load_trigger' : self.eligible_for_high_load_trigger
+            'eligible_for_high_load_trigger' : self.eligible_for_high_load_trigger,
+            'sport_max_load': {str(sport_name): sport_max_load.json_serialise() for (sport_name, sport_max_load) in self.sport_max_load.items()}
+            # 'workout_chart': self.workout_chart.json_serialise() if self.workout_chart is not None else None,
+            # 'body_response_chart': self.body_response_chart.json_serialise() if self.body_response_chart is not None else None
             # 'training_volume_chart_data': [chart_data.json_serialise() for chart_data in self.training_volume_chart_data]
         }
         return ret
@@ -519,6 +550,7 @@ class AthleteStats(Serialisable):
         athlete_stats.muscular_strain = [DataSeries.json_deserialise(muscular_strain) for muscular_strain in input_dict.get('muscular_strain', [])]
         athlete_stats.high_relative_load_sessions = [HighLoadSession.json_deserialise(session) for session in input_dict.get('high_relative_load_sessions', [])]
         athlete_stats.eligible_for_high_load_trigger = input_dict.get('eligible_for_high_load_trigger', False)
+        athlete_stats.sport_max_load = {int(sport_name): SportMaxLoad.json_deserialise(sport_max_load) for (sport_name, sport_max_load) in input_dict.get('sport_max_load', {}).items()}
         return athlete_stats
 
     @classmethod

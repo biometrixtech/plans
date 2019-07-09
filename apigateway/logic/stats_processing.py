@@ -2,7 +2,7 @@ import math
 import statistics
 from collections import namedtuple
 from datetime import datetime, timedelta
-from models.chart_data import BodyPartChartCollection, MuscularStrainChart, HighRelativeLoadChart, DOMSChart
+from models.chart_data import BodyPartChartCollection, MuscularStrainChart, HighRelativeLoadChart, DOMSChart, BodyResponseChart
 from fathomapi.utils.xray import xray_recorder
 from logic.training_volume_processing import TrainingVolumeProcessing
 from logic.soreness_processing import SorenessCalculator
@@ -105,12 +105,17 @@ class StatsProcessing(object):
                                                               format_date( self.event_date),
                                                               current_athlete_stats.load_stats)  # want event date since end date = event_date + 1
 
+        # this gets updated in load plan values
+        training_volume_processing.sport_max_load = current_athlete_stats.sport_max_load
+
         training_volume_processing.load_plan_values(self.last_7_days_plans,
                                                     self.days_8_14_plans,
                                                     self.acute_daily_plans,
                                                     self.get_chronic_weeks_plans(),
                                                     self.chronic_daily_plans
                                                     )
+        current_athlete_stats.sport_max_load = training_volume_processing.sport_max_load
+
         current_athlete_stats.load_stats = training_volume_processing.load_stats
         current_athlete_stats = training_volume_processing.calc_training_volume_metrics(current_athlete_stats)
         current_athlete_stats.high_relative_load_sessions = training_volume_processing.high_relative_load_sessions
@@ -130,6 +135,9 @@ class StatsProcessing(object):
         current_athlete_stats.high_relative_load_chart_data = high_relative_load_chart.get_output_list()
 
         current_athlete_stats.training_volume_chart_data = training_volume_processing.training_volume_chart_data
+        current_athlete_stats.workout_chart = training_volume_processing.workout_chart
+        current_athlete_stats.body_response_chart = BodyResponseChart(self.event_date)
+        current_athlete_stats.body_response_chart.process_soreness(soreness_list_25)
 
         body_part_chart_collection = BodyPartChartCollection(self.event_date)
         body_part_chart_collection.process_soreness_list(soreness_list_25)
