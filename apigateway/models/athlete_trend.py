@@ -447,8 +447,8 @@ class AthleteTrends(object):
             'stress': self.stress.json_serialise() if self.stress is not None else None,
             'response': self.response.json_serialise() if self.response is not None else None,
             'biomechanics': self.biomechanics.json_serialise() if self.biomechanics is not None else None,
-            'body_response': self.body_response.json_serialise(),
-            'workload': self.workload.json_serialise()
+            'body_response': self.body_response.json_serialise() if self.body_response is not None else None,
+            'workload': self.workload.json_serialise() if self.body_response is not None else None
 
         }
         return ret
@@ -460,8 +460,8 @@ class AthleteTrends(object):
         trends.stress = TrendCategory.json_deserialise(input_dict['stress']) if input_dict.get('stress', None) is not None else None
         trends.response = TrendCategory.json_deserialise(input_dict['response']) if input_dict.get('response', None) is not None else None
         trends.biomechanics = TrendCategory.json_deserialise(input_dict['biomechanics']) if input_dict.get('biomechanics', None) is not None else None
-        trends.body_response = TrendData.json_deserialise(input_dict['body_response']) if input_dict.get('body_response', None) is not None else TrendData()
-        trends.workload = TrendData.json_deserialise(input_dict['workload']) if input_dict.get('workload', None) is not None else TrendData()
+        trends.body_response = TrendData.json_deserialise(input_dict['body_response']) if input_dict.get('body_response', None) is not None else None
+        trends.workload = TrendData.json_deserialise(input_dict['workload']) if input_dict.get('workload', None) is not None else None
 
         return trends
 
