@@ -171,6 +171,7 @@ class WorkoutChart(BaseChart, Serialisable):
 
         training_volume = training_session.training_volume(load_stats)
         if training_volume is not None and training_volume > 0 and training_session.event_date.date() in self.data:
+            training_volume = round(training_volume, 2)
             self.data[training_session.event_date.date()].value += training_volume
             self.data[training_session.event_date.date()].sport_names.add(training_session.sport_name)
 
@@ -181,7 +182,7 @@ class WorkoutChart(BaseChart, Serialisable):
                 summary.duration = training_session.duration_minutes
             else:
                 summary.duration = training_session.duration_health
-            summary.distance = training_session.distance
+            summary.distance = round(training_session.distance, 2) if training_session.distance is not None else None
             summary.event_date = training_session.event_date
             summary.end_date = training_session.end_date
             summary.RPE = training_session.session_RPE
