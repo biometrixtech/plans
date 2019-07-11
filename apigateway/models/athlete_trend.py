@@ -448,7 +448,7 @@ class AthleteTrends(object):
             'response': self.response.json_serialise() if self.response is not None else None,
             'biomechanics': self.biomechanics.json_serialise() if self.biomechanics is not None else None,
             'body_response': self.body_response.json_serialise() if self.body_response is not None else None,
-            'workload': self.workload.json_serialise() if self.body_response is not None else None
+            'workload': self.workload.json_serialise() if self.workload is not None else None
 
         }
         return ret
