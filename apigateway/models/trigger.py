@@ -1,6 +1,14 @@
 from enum import IntEnum
 
 
+class Trigger(object):
+    def __init__(self, trigger_type):
+        self.trigger_type = trigger_type
+        self.goals = []
+        self.body_part = None
+        self.sport_name = None
+        self.severity = None
+
 class TriggerType(IntEnum):
     high_volume_intensity = 0  # "High Relative Volume or Intensity of Logged Session"
     hist_sore_greater_30_high_volume_intensity = 1  # "Pers, Pers-2 Soreness > 30d + High Relative Volume or Intensity of Logged Session"
