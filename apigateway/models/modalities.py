@@ -1103,9 +1103,9 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
             #     goal.trigger_type = TriggerType.sore_today  # 10
 
             if body_part is not None:
-                alert = Alert(goal)
-                alert.body_part = trigger.body_part
-                self.alerts.append(alert)
+                # alert = Alert(goal)
+                # alert.body_part = trigger.body_part
+                # self.alerts.append(alert)
 
                 self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1", trigger, exercise_library)
                 if max_severity < 3.5:
@@ -1149,9 +1149,9 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
             goal = AthleteGoal("Reduce injury risk factors", 2, AthleteGoalType.corrective)
 
             if body_part is not None:
-                alert = Alert(goal)
-                alert.body_part = trigger.body_part
-                self.alerts.append(alert)
+                # alert = Alert(goal)
+                # alert.body_part = trigger.body_part
+                # self.alerts.append(alert)
                 if max_severity < 3:
                     #for a in body_part.agonists:
                     #    agonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None))
@@ -1195,9 +1195,9 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
             goal = AthleteGoal("Reduce injury risk factors", 2, AthleteGoalType.corrective)
 
             if body_part is not None:
-                alert = Alert(goal)
-                alert.body_part = trigger.body_part
-                self.alerts.append(alert)
+                # alert = Alert(goal)
+                # alert.body_part = trigger.body_part
+                # self.alerts.append(alert)
                 if max_severity < 3:
                     self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1", trigger, exercise_library)
                     self.copy_exercises(body_part.static_stretch_exercises, self.static_stretch_exercises, goal, "1", trigger, exercise_library)
@@ -1271,9 +1271,9 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
             #
             goal = AthleteGoal("Care for pain", 1, AthleteGoalType.pain)
             if body_part is not None:
-                alert = Alert(goal)
-                alert.body_part = trigger.body_part
-                self.alerts.append(alert)
+                # alert = Alert(goal)
+                # alert.body_part = trigger.body_part
+                # self.alerts.append(alert)
                 if body_part_factory.is_joint(body_part):
                     for a in body_part.agonists:
                         agonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None))
@@ -1533,9 +1533,9 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
             goal = AthleteGoal("Care for soreness", 1, AthleteGoalType.sore)
 
             if body_part is not None:
-                alert = Alert(goal)
-                alert.body_part = trigger.body_part
-                self.alerts.append(alert)
+                # alert = Alert(goal)
+                # alert.body_part = trigger.body_part
+                # self.alerts.append(alert)
 
                 self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1", trigger, exercise_library)
                 if max_severity < 3.5:
@@ -1574,31 +1574,31 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
             goal = AthleteGoal("Reduce injury risk factors", 2, AthleteGoalType.corrective)
 
             if body_part is not None:
-                    alert = Alert(goal)
-                    alert.body_part = trigger.body_part
-                    self.alerts.append(alert)
-                    if max_severity < 3:
+                # alert = Alert(goal)
+                # alert.body_part = trigger.body_part
+                # self.alerts.append(alert)
+                if max_severity < 3:
 
-                        self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1", trigger, exercise_library)
-                        self.copy_exercises(body_part.static_stretch_exercises, self.static_stretch_exercises, goal, "1", trigger, exercise_library)
+                    self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1", trigger, exercise_library)
+                    self.copy_exercises(body_part.static_stretch_exercises, self.static_stretch_exercises, goal, "1", trigger, exercise_library)
 
-                        for y in body_part.synergists:
-                            synergist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(y), None))
-                            if synergist is not None:
-                                self.copy_exercises(synergist.inhibit_exercises, self.inhibit_exercises, goal, "2", trigger, exercise_library)
-                                self.copy_exercises(synergist.isolated_activate_exercises, self.isolated_activate_exercises,
-                                                        goal, "2", trigger, exercise_library)
+                    for y in body_part.synergists:
+                        synergist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(y), None))
+                        if synergist is not None:
+                            self.copy_exercises(synergist.inhibit_exercises, self.inhibit_exercises, goal, "2", trigger, exercise_library)
+                            self.copy_exercises(synergist.isolated_activate_exercises, self.isolated_activate_exercises,
+                                                    goal, "2", trigger, exercise_library)
 
-                        for g in body_part.antagonists:
-                            antagonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(g), None))
-                            if antagonist is not None:
-                                self.copy_exercises(antagonist.isolated_activate_exercises,
-                                                        self.isolated_activate_exercises, goal,
-                                                        "1", trigger, exercise_library)
+                    for g in body_part.antagonists:
+                        antagonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(g), None))
+                        if antagonist is not None:
+                            self.copy_exercises(antagonist.isolated_activate_exercises,
+                                                    self.isolated_activate_exercises, goal,
+                                                    "1", trigger, exercise_library)
 
-                        general_body_part = body_part_factory.get_body_part(BodyPart(BodyPartLocation.general, None))
-                        self.copy_exercises(general_body_part.static_integrate_exercises, self.static_integrate_exercises,
-                                                goal, "1", trigger, exercise_library)
+                    general_body_part = body_part_factory.get_body_part(BodyPart(BodyPartLocation.general, None))
+                    self.copy_exercises(general_body_part.static_integrate_exercises, self.static_integrate_exercises,
+                                            goal, "1", trigger, exercise_library)
 
     def check_corrective_pain(self, trigger, event_date_time, exercise_library, max_severity):
 
@@ -1618,31 +1618,31 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
             goal = AthleteGoal("Reduce injury risk factors", 2, AthleteGoalType.corrective)
 
             if body_part is not None:
-                    alert = Alert(goal)
-                    alert.body_part = trigger.body_part
-                    self.alerts.append(alert)
-                    if max_severity < 3:
+                # alert = Alert(goal)
+                # alert.body_part = trigger.body_part
+                # self.alerts.append(alert)
+                if max_severity < 3:
 
-                        self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1", trigger, exercise_library)
-                        self.copy_exercises(body_part.static_stretch_exercises, self.static_stretch_exercises, goal, "1", trigger, exercise_library)
+                    self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1", trigger, exercise_library)
+                    self.copy_exercises(body_part.static_stretch_exercises, self.static_stretch_exercises, goal, "1", trigger, exercise_library)
 
-                        for y in body_part.synergists:
-                            synergist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(y), None))
-                            if synergist is not None:
-                                self.copy_exercises(synergist.inhibit_exercises, self.inhibit_exercises, goal, "2", trigger, exercise_library)
-                                self.copy_exercises(synergist.isolated_activate_exercises, self.isolated_activate_exercises,
-                                                        goal, "2", trigger, exercise_library)
+                    for y in body_part.synergists:
+                        synergist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(y), None))
+                        if synergist is not None:
+                            self.copy_exercises(synergist.inhibit_exercises, self.inhibit_exercises, goal, "2", trigger, exercise_library)
+                            self.copy_exercises(synergist.isolated_activate_exercises, self.isolated_activate_exercises,
+                                                    goal, "2", trigger, exercise_library)
 
-                        for g in body_part.antagonists:
-                            antagonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(g), None))
-                            if antagonist is not None:
-                                self.copy_exercises(antagonist.isolated_activate_exercises,
-                                                        self.isolated_activate_exercises, goal,
-                                                        "1", trigger, exercise_library)
+                    for g in body_part.antagonists:
+                        antagonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(g), None))
+                        if antagonist is not None:
+                            self.copy_exercises(antagonist.isolated_activate_exercises,
+                                                    self.isolated_activate_exercises, goal,
+                                                    "1", trigger, exercise_library)
 
-                        general_body_part = body_part_factory.get_body_part(BodyPart(BodyPartLocation.general, None))
-                        self.copy_exercises(general_body_part.static_integrate_exercises, self.static_integrate_exercises,
-                                                goal, "1", trigger, exercise_library)
+                    general_body_part = body_part_factory.get_body_part(BodyPart(BodyPartLocation.general, None))
+                    self.copy_exercises(general_body_part.static_integrate_exercises, self.static_integrate_exercises,
+                                            goal, "1", trigger, exercise_library)
 
     def check_reactive_care_pain(self, trigger, exercise_library, max_severity):
 
@@ -1692,9 +1692,9 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
             #     synergist_priority = "2"
 
             if body_part is not None:
-                alert = Alert(goal)
-                alert.body_part = trigger.body_part
-                self.alerts.append(alert)
+                # alert = Alert(goal)
+                # alert.body_part = trigger.body_part
+                # self.alerts.append(alert)
 
                 if body_part_factory.is_joint(body_part):
                     for a in body_part.agonists:
@@ -1832,9 +1832,9 @@ class WarmUp(ModalityBase, Serialisable):
         body_part = body_part_factory.get_body_part(trigger.body_part)
 
         if body_part is not None:
-            alert = Alert(goal)
-            alert.body_part = trigger.body_part
-            self.alerts.append(alert)
+            # alert = Alert(goal)
+            # alert.body_part = trigger.body_part
+            # self.alerts.append(alert)
             for a in body_part.agonists:
                 agonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None))
                 if agonist is not None:
@@ -2051,12 +2051,10 @@ class CoolDown(ModalityBase, Serialisable):
         body_part = body_part_factory.get_body_part(trigger.body_part)
 
         if body_part is not None:
-            alert = Alert(goal)
-            alert.body_part = trigger.body_part
-            self.alerts.append(alert)
-            #for a in body_part.agonists:
-            #    agonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None))
-            #    if agonist is not None:
+            # alert = Alert(goal)
+            # alert.body_part = trigger.body_part
+            # self.alerts.append(alert)
+
             if trigger.severity < 3.5:
                 self.copy_exercises(body_part.dynamic_stretch_exercises, self.dynamic_stretch_exercises, goal,
                                     "1", trigger,

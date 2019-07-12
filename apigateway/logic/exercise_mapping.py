@@ -129,9 +129,9 @@ class ExerciseAssignmentCalculator(object):
             if heat is not None:
                 heat.goals.add(goal)
                 bring_the_heat.append(heat)
-                alert = Alert(goal)
-                alert.body_part = t.body_part
-                alerts.append(alert)
+                # alert = Alert(goal)
+                # alert.body_part = t.body_part
+                # alerts.append(alert)
 
         if len(bring_the_heat) > 0:
             heat_session = HeatSession(minutes=max(minutes))
@@ -429,9 +429,9 @@ class ExerciseAssignmentCalculator(object):
                     ice = Ice(body_part_location=d.body_part_location, side=d.side)
                     ice.repeat_every_3hrs_for_24hrs = True
                     ice.goals.add(goal)
-                    alert = Alert(goal)
-                    alert.body_part = BodyPartSide(d.body_part_location, d.side)
-                    alerts.append(alert)
+                    # alert = Alert(goal)
+                    # alert.body_part = BodyPartSide(d.body_part_location, d.side)
+                    # alerts.append(alert)
                     if ice not in ice_list:
                         ice_list.append(ice)
 
@@ -463,9 +463,9 @@ class ExerciseAssignmentCalculator(object):
                     if cold_water_immersion is None:
                         cold_water_immersion = ColdWaterImmersion()
                     cold_water_immersion.goals.add(goal)
-                    alert = Alert(goal)
-                    alert.body_part = t.body_part
-                    alerts.append(alert)
+                    # alert = Alert(goal)
+                    # alert.body_part = t.body_part
+                    # alerts.append(alert)
 
             # elif (not s.pain and s.historic_soreness_status is not None
             #         and (s.is_persistent_soreness() or
@@ -481,9 +481,9 @@ class ExerciseAssignmentCalculator(object):
                     if cold_water_immersion is None:
                         cold_water_immersion = ColdWaterImmersion()
                     cold_water_immersion.goals.add(goal)
-                    alert = Alert(goal)
-                    alert.body_part = t.body_part
-                    alerts.append(alert)
+                    # alert = Alert(goal)
+                    # alert.body_part = t.body_part
+                    # alerts.append(alert)
 
         for d in self.doms:
             days = (self.event_date_time - d.first_reported_date_time).days
@@ -497,9 +497,9 @@ class ExerciseAssignmentCalculator(object):
                     if cold_water_immersion is None:
                         cold_water_immersion = ColdWaterImmersion()
                     cold_water_immersion.goals.add(goal)
-                    alert = Alert(goal)
-                    alert.body_part = BodyPartSide(d.body_part_location, d.side)
-                    alerts.append(alert)
+                    # alert = Alert(goal)
+                    # alert.body_part = BodyPartSide(d.body_part_location, d.side)
+                    # alerts.append(alert)
         if cold_water_immersion is not None:
             cold_water_immersion.alerts = alerts
 
@@ -539,31 +539,31 @@ class ExerciseAssignmentCalculator(object):
 
     def generate_alerts(self):
         alerts = []
-        if self.eligible_for_high_load_trigger:
-            if self.high_relative_load_session or self.high_relative_intensity_session:
-                for s in self.soreness_list:
-                    goal = None
-                    if s.pain and (s.is_acute_pain() or s.is_persistent_pain() or s.historic_soreness_status == HistoricSorenessStatus.persistent_2_pain):
-                        goal = AthleteGoal("Increase prevention efficacy", 1, AthleteGoalType.preempt_corrective)
-                        goal.trigger_type = TriggerType.hist_pain_high_volume_intensity  # 2
-                    elif (not s.pain and s.historic_soreness_status is not None
-                          and (s.is_persistent_soreness()
-                               or s.historic_soreness_status == HistoricSorenessStatus.persistent_2_soreness)
-                          and s.first_reported_date_time is not None):
-                            days_diff = (self.event_date_time - s.first_reported_date_time).days
-                            if days_diff >= 30:
-                                goal = AthleteGoal("Increase prevention efficacy", 1, AthleteGoalType.preempt_corrective)
-                                goal.trigger_type = TriggerType.hist_sore_greater_30_high_volume_intensity  # 1
-                    if goal is not None:
-                        for sport_name in self.high_relative_load_session_sport_names:
-                            alert = Alert(goal)
-                            alert.body_part = BodyPartSide(s.body_part.location, s.side)
-                            alert.sport_name = sport_name
-                            alerts.append(alert)
-        else:
-            goal = AthleteGoal(None, 1, AthleteGoalType.sport)
-            goal.trigger_type = TriggerType.not_enough_history_for_high_volume_intensity  # 25
-            alert = Alert(goal)
-            alerts.append(alert)
+        # if self.eligible_for_high_load_trigger:
+        #     if self.high_relative_load_session or self.high_relative_intensity_session:
+        #         for s in self.soreness_list:
+        #             goal = None
+        #             if s.pain and (s.is_acute_pain() or s.is_persistent_pain() or s.historic_soreness_status == HistoricSorenessStatus.persistent_2_pain):
+        #                 goal = AthleteGoal("Increase prevention efficacy", 1, AthleteGoalType.preempt_corrective)
+        #                 goal.trigger_type = TriggerType.hist_pain_high_volume_intensity  # 2
+        #             elif (not s.pain and s.historic_soreness_status is not None
+        #                   and (s.is_persistent_soreness()
+        #                        or s.historic_soreness_status == HistoricSorenessStatus.persistent_2_soreness)
+        #                   and s.first_reported_date_time is not None):
+        #                     days_diff = (self.event_date_time - s.first_reported_date_time).days
+        #                     if days_diff >= 30:
+        #                         goal = AthleteGoal("Increase prevention efficacy", 1, AthleteGoalType.preempt_corrective)
+        #                         goal.trigger_type = TriggerType.hist_sore_greater_30_high_volume_intensity  # 1
+        #             if goal is not None:
+        #                 for sport_name in self.high_relative_load_session_sport_names:
+        #                     alert = Alert(goal)
+        #                     alert.body_part = BodyPartSide(s.body_part.location, s.side)
+        #                     alert.sport_name = sport_name
+        #                     alerts.append(alert)
+        # else:
+        #     goal = AthleteGoal(None, 1, AthleteGoalType.sport)
+        #     goal.trigger_type = TriggerType.not_enough_history_for_high_volume_intensity  # 25
+        #     alert = Alert(goal)
+        #     alerts.append(alert)
 
         return alerts
