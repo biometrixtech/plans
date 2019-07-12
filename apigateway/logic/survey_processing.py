@@ -1,4 +1,5 @@
 from fathomapi.utils.xray import xray_recorder
+from models.body_parts import BodyPartFactory
 from models.session import SessionType, SessionFactory, StrengthConditioningType, SessionSource
 from models.post_session_survey import PostSurvey
 from models.sport import SportName
@@ -108,6 +109,9 @@ class SurveyProcessing(object):
             return session_obj
 
     def patch_daily_and_historic_soreness(self, survey='readiness'):
+
+        body_part_factory = BodyPartFactory()
+
         severe_soreness = [s for s in self.soreness if not s.pain]
         severe_pain = [s for s in self.soreness if s.pain]
         if (len(severe_soreness) + len(severe_pain)) > 0:
@@ -119,7 +123,7 @@ class SurveyProcessing(object):
             else:
                 self.athlete_stats.update_readiness_soreness(severe_soreness)
                 self.athlete_stats.update_readiness_pain(severe_pain)
-        muscle_soreness = [s for s in severe_soreness if s.is_muscle()]
+        muscle_soreness = [s for s in severe_soreness if body_part_factory.is_muscle(s.body_part)]
         for soreness in muscle_soreness:
             self.athlete_stats.update_delayed_onset_muscle_soreness(soreness)
         if survey == 'readiness':

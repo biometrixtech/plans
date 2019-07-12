@@ -233,7 +233,7 @@ class ModalityBase(object):
             else:
                 self.default_plan = "Comprehensive"
 
-    def copy_exercises(self, source_collection, target_collection, goal, priority, soreness, exercise_library, sports=[]):
+    def copy_exercises(self, source_collection, target_collection, goal, priority, trigger, exercise_library, sports=[]):
 
         position_order = 0
 
@@ -248,7 +248,7 @@ class ModalityBase(object):
 
             dosage = ExerciseDosage()
             dosage.priority = priority
-            dosage.soreness_source = soreness
+            dosage.soreness_source = trigger
             dosage.sports = sports
             dosage.goal = goal
             dosage = self.update_dosage(dosage, target_collection[s.exercise.id].exercise)
@@ -405,7 +405,7 @@ class ModalityBase(object):
                 dosage.comprehensive_reps_assigned, dosage.comprehensive_sets_assigned)
 
     @abc.abstractmethod
-    def fill_exercises(self, soreness_list, exercise_library, high_relative_load_session, high_relative_intensity_logged, muscular_strain_high, sports):
+    def fill_exercises(self, trigger_list, exercise_library, high_relative_load_session, high_relative_intensity_logged, muscular_strain_high, sports):
         pass
 
     @staticmethod
@@ -753,19 +753,19 @@ class ActiveRest(ModalityBase):
         self.isolated_activate_exercises = {}
 
     @abc.abstractmethod
-    def check_reactive_care_soreness(self, soreness, exercise_library, max_severity):
+    def check_reactive_care_soreness(self, trigger, exercise_library, max_severity):
         pass
 
     @abc.abstractmethod
-    def check_reactive_care_pain(self, soreness, exercise_library, max_severity):
+    def check_reactive_care_pain(self, trigger, exercise_library, max_severity):
         pass
 
     @abc.abstractmethod
-    def check_corrective_soreness(self, soreness, event_date_time, exercise_library, max_severity):
+    def check_corrective_soreness(self, trigger, event_date_time, exercise_library, max_severity):
         pass
 
     @abc.abstractmethod
-    def check_corrective_pain(self, soreness, event_date_time, exercise_library, max_severity):
+    def check_corrective_pain(self, trigger, event_date_time, exercise_library, max_severity):
         pass
 
     '''deprecated
@@ -788,31 +788,35 @@ class ActiveRest(ModalityBase):
                         return True
         return False
 
-    def fill_exercises(self, soreness_list, exercise_library, high_relative_load_session, high_relative_intensity_logged, muscular_strain_high, sports):
+    def fill_exercises(self, trigger_list, exercise_library, high_relative_load_session, high_relative_intensity_logged, muscular_strain_high, sports):
 
         max_severity = 0
         checked_recover_from_sport = False
 
-        if soreness_list is not None and len(soreness_list) > 0:
-            max_severity = max(list(s.severity for s in soreness_list))
+        if trigger_list is not None:
+            max_severity_list = list(t.severity for t in trigger_list if t.severity is not None)
+            if len(max_severity_list) > 0:
+                max_severity = max(max_severity_list)
+
         if self.force_data:
             self.get_general_exercises(exercise_library, max_severity)
-        if soreness_list is not None and len(soreness_list) > 0:
-            self.check_reactive_recover_from_sport(soreness_list, exercise_library, high_relative_load_session,
+
+        if trigger_list is not None and len(trigger_list) > 0:
+            self.check_reactive_recover_from_sport(trigger_list, exercise_library, high_relative_load_session,
                                                    high_relative_intensity_logged,
                                                    muscular_strain_high,
                                                    sports, max_severity)
             checked_recover_from_sport = True
-            for s in soreness_list:
-                self.check_reactive_care_soreness(s, exercise_library, max_severity)
-                self.check_reactive_care_pain(s, exercise_library, max_severity)
+            for t in trigger_list:
+                self.check_reactive_care_soreness(t, exercise_library, max_severity)
+                self.check_reactive_care_pain(t, exercise_library, max_severity)
                 # if max_severity < 3:
-                self.check_corrective_soreness(s, self.event_date_time, exercise_library, max_severity)
-                self.check_corrective_pain(s, self.event_date_time, exercise_library, max_severity)
+                self.check_corrective_soreness(t, self.event_date_time, exercise_library, max_severity)
+                self.check_corrective_pain(t, self.event_date_time, exercise_library, max_severity)
 
         if ((high_relative_load_session or high_relative_intensity_logged or muscular_strain_high)
                 and not checked_recover_from_sport):
-            self.check_reactive_recover_from_sport(soreness_list, exercise_library, high_relative_load_session,
+            self.check_reactive_recover_from_sport(trigger_list, exercise_library, high_relative_load_session,
                                                    high_relative_intensity_logged,
                                                    muscular_strain_high,
                                                    sports, max_severity)
@@ -825,60 +829,64 @@ class ActiveRest(ModalityBase):
 
         pass
 
-    def check_reactive_recover_from_sport(self, soreness_list, exercise_library, high_relative_load_session,
+    def check_reactive_recover_from_sport(self, trigger_list, exercise_library, high_relative_load_session,
                                           high_relative_intensity_logged, muscular_strain_high, sports, max_severity):
-        if muscular_strain_high:
-            goal = AthleteGoal(None, 1, AthleteGoalType.sport)
-            goal.trigger_type = TriggerType.overreaching_high_muscular_strain  # 8
-            alert = Alert(goal)
-            self.alerts.append(alert)
+        # if muscular_strain_high:
+        #     goal = AthleteGoal(None, 1, AthleteGoalType.sport)
+        #     goal.trigger_type = TriggerType.overreaching_high_muscular_strain  # 8
+        #     alert = Alert(goal)
+        #     self.alerts.append(alert)
 
-        hist_soreness = list(s for s in soreness_list if not s.is_dormant_cleared() and not s.pain and
-                             (s.is_persistent_soreness() or
-                              s.historic_soreness_status == HistoricSorenessStatus.persistent_2_soreness) and
-                             (self.event_date_time - s.first_reported_date_time).days < 30)
+        # hist_soreness = list(s for s in soreness_list if not s.is_dormant_cleared() and not s.pain and
+        #                      (s.is_persistent_soreness() or
+        #                       s.historic_soreness_status == HistoricSorenessStatus.persistent_2_soreness) and
+        #                      (self.event_date_time - s.first_reported_date_time).days < 30)
 
-        if len(hist_soreness) > 0:
-            goal = AthleteGoal(None, 1, AthleteGoalType.sport)
-            goal.trigger_type = TriggerType.hist_sore_less_30  # 7
-            for soreness in hist_soreness:
-                alert = Alert(goal)
-                alert.body_part = BodyPartSide(soreness.body_part.location, soreness.side)
-                self.alerts.append(alert)
+        # if len(hist_soreness) > 0:
+        #     goal = AthleteGoal(None, 1, AthleteGoalType.sport)
+        #     goal.trigger_type = TriggerType.hist_sore_less_30  # 7
+        #     for soreness in hist_soreness:
+        #         alert = Alert(goal)
+        #         alert.body_part = BodyPartSide(soreness.body_part.location, soreness.side)
+        #         self.alerts.append(alert)
 
-        if high_relative_load_session or high_relative_intensity_logged:
-            goal = AthleteGoal("Expedite tissue regeneration", 1, AthleteGoalType.sport)
-            #goal.trigger = "High Relative Volume or Intensity of Logged Session"
-            goal.trigger_type = TriggerType.high_volume_intensity  # 0
+        for t in range(0, len(trigger_list)):
+            if trigger_list[t].trigger_type == TriggerType.hist_sore_less_30:  # 7
+                goal = AthleteGoal(None, 1, AthleteGoalType.sport)
+                trigger_list[t].goals.append(goal)
+            elif trigger_list[t].trigger_type == TriggerType.overreaching_high_muscular_strain:  # 8
+                goal = AthleteGoal(None, 1, AthleteGoalType.sport)
+                trigger_list[t].goals.append(goal)
+            elif trigger_list[t].trigger_type == TriggerType.high_volume_intensity:  # 0
+                goal = AthleteGoal("Expedite tissue regeneration", 1, AthleteGoalType.sport)
+                trigger_list[t].goals.append(goal)
+                body_part_factory = BodyPartFactory()
 
-            body_part_factory = BodyPartFactory()
+        # if high_relative_load_session or high_relative_intensity_logged:
+        #     goal = AthleteGoal("Expedite tissue regeneration", 1, AthleteGoalType.sport)
+        #     goal.trigger_type = TriggerType.high_volume_intensity  # 0
+        #
+        #     body_part_factory = BodyPartFactory()
+        #
+        #     for sport_name in sports:
+        #         alert = Alert(goal)
+        #         alert.sport_name = sport_name
+        #         self.alerts.append(alert)
+                body_part = body_part_factory.get_body_part_for_sports(sports)
 
-            for sport_name in sports:
-                alert = Alert(goal)
-                alert.sport_name = sport_name
-                self.alerts.append(alert)
-            body_part = body_part_factory.get_body_part_for_sports(sports)
+                # Note: this is just returning the primary mover related exercises for sport
+                if body_part is not None: #and not prohibiting_soreness:
+                    self.copy_exercises(body_part.inhibit_exercises,
+                                        self.inhibit_exercises, goal, "1", None, exercise_library)
+                    #if not prohibiting_soreness:
+                    if max_severity < 3.5:
+                        self.copy_exercises(body_part.static_stretch_exercises,
+                                            self.static_stretch_exercises, goal, "1", None, exercise_library, sports)
+                    if max_severity < 2.5:
+                        self.copy_exercises(body_part.isolated_activate_exercises,
+                                        self.isolated_activate_exercises, goal, "1", None, exercise_library, sports)
 
-            #prohibiting_soreness = False
-
-            #high_severity_list = list(s for s in soreness_list if s.severity >= 3.5)
-
-            #if len(high_severity_list) > 0:
-            #    prohibiting_soreness = True
-
-            # Note: this is just returning the primary mover related exercises for sport
-            if body_part is not None: #and not prohibiting_soreness:
-                self.copy_exercises(body_part.inhibit_exercises,
-                                    self.inhibit_exercises, goal, "1", None, exercise_library)
-                #if not prohibiting_soreness:
-                if max_severity < 3.5:
-                    self.copy_exercises(body_part.static_stretch_exercises,
-                                        self.static_stretch_exercises, goal, "1", None, exercise_library, sports)
-                if max_severity < 2.5:
-                    self.copy_exercises(body_part.isolated_activate_exercises,
-                                    self.isolated_activate_exercises, goal, "1", None, exercise_library, sports)
-
-            self.check_reactive_recover_from_sport_general(sports, exercise_library, goal, max_severity)
+                self.check_reactive_recover_from_sport_general(sports, exercise_library, goal, max_severity)
 
 
 class ActiveRestBeforeTraining(ActiveRest, Serialisable):
@@ -1067,231 +1075,246 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
                 self.copy_exercises(body_part.static_integrate_exercises, self.static_integrate_exercises, goal, "1", None,
                         exercise_library)
 
-    def check_reactive_care_soreness(self, soreness, exercise_library, max_severity):
+    def check_reactive_care_soreness(self, trigger, exercise_library, max_severity):
 
         body_part_factory = BodyPartFactory()
 
-        if soreness.daily and not soreness.pain:
+        #if soreness.daily and not soreness.pain:
+        if trigger.trigger_type in [TriggerType.sore_today,
+                                    TriggerType.sore_today_doms,
+                                    TriggerType.hist_sore_less_30_sore_today,
+                                    TriggerType.hist_sore_greater_30_sore_today]:
 
-            body_part = body_part_factory.get_body_part(soreness.body_part)
+            body_part = body_part_factory.get_body_part(trigger.body_part)
 
             goal = AthleteGoal("Care for soreness", 1, AthleteGoalType.sore)
-            #goal.trigger = "Sore reported today"
-            #goal.trigger_type = TriggerType.sore_today  # 10
-            if soreness.historic_soreness_status == HistoricSorenessStatus.doms:
-                goal.trigger_type = TriggerType.sore_today_doms  # 11
-            elif ((soreness.is_persistent_soreness() or
-                   soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_soreness) and
-                  (self.event_date_time - soreness.first_reported_date_time).days < 30):
-                goal.trigger_type = TriggerType.hist_sore_less_30_sore_today  # 12
-            elif ((soreness.is_persistent_soreness() or
-                   soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_soreness) and
-                  (self.event_date_time - soreness.first_reported_date_time).days >= 30):
-                goal.trigger_type = TriggerType.hist_sore_greater_30_sore_today  # 13
-            else: # somehow missed doms
-                goal.trigger_type = TriggerType.sore_today  # 10
+
+            # if soreness.historic_soreness_status == HistoricSorenessStatus.doms:
+            #     goal.trigger_type = TriggerType.sore_today_doms  # 11
+            # elif ((soreness.is_persistent_soreness() or
+            #        soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_soreness) and
+            #       (self.event_date_time - soreness.first_reported_date_time).days < 30):
+            #     goal.trigger_type = TriggerType.hist_sore_less_30_sore_today  # 12
+            # elif ((soreness.is_persistent_soreness() or
+            #        soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_soreness) and
+            #       (self.event_date_time - soreness.first_reported_date_time).days >= 30):
+            #     goal.trigger_type = TriggerType.hist_sore_greater_30_sore_today  # 13
+            # else: # somehow missed doms
+            #     goal.trigger_type = TriggerType.sore_today  # 10
 
             if body_part is not None:
                 alert = Alert(goal)
-                alert.body_part = BodyPartSide(soreness.body_part.location, soreness.side)
+                alert.body_part = trigger.body_part
                 self.alerts.append(alert)
-                #for a in body_part.agonists:
-                #    agonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None))
-                #    if agonist is not None:
-                self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1", soreness, exercise_library)
+
+                self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1", trigger, exercise_library)
                 if max_severity < 3.5:
-                    self.copy_exercises(body_part.static_stretch_exercises, self.static_stretch_exercises, goal, "1", soreness, exercise_library)
-                    self.copy_exercises(body_part.active_stretch_exercises, self.active_stretch_exercises, goal, "1", soreness, exercise_library)
+                    self.copy_exercises(body_part.static_stretch_exercises, self.static_stretch_exercises, goal, "1", trigger, exercise_library)
+                    self.copy_exercises(body_part.active_stretch_exercises, self.active_stretch_exercises, goal, "1", trigger, exercise_library)
 
                 for y in body_part.synergists:
                     synergist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(y), None))
                     if synergist is not None:
-                        self.copy_exercises(synergist.inhibit_exercises, self.inhibit_exercises, goal, "2", soreness, exercise_library)
+                        self.copy_exercises(synergist.inhibit_exercises, self.inhibit_exercises, goal, "2", trigger, exercise_library)
                         if max_severity < 3.5:
-                            self.copy_exercises(synergist.active_stretch_exercises, self.active_stretch_exercises, goal, "2", soreness,
+                            self.copy_exercises(synergist.active_stretch_exercises, self.active_stretch_exercises, goal, "2", trigger,
                                                 exercise_library)
 
                 for t in body_part.stabilizers:
                     stabilizer = body_part_factory.get_body_part(BodyPart(BodyPartLocation(t), None))
                     if stabilizer is not None:
-                        self.copy_exercises(stabilizer.inhibit_exercises, self.inhibit_exercises, goal, "3", soreness, exercise_library)
+                        self.copy_exercises(stabilizer.inhibit_exercises, self.inhibit_exercises, goal, "3", trigger, exercise_library)
                         if max_severity < 3.5:
-                            self.copy_exercises(stabilizer.active_stretch_exercises, self.active_stretch_exercises, goal, "3", soreness,
+                            self.copy_exercises(stabilizer.active_stretch_exercises, self.active_stretch_exercises, goal, "3", trigger,
                                                 exercise_library)
 
-    def check_corrective_soreness(self, soreness, event_date_time, exercise_library, max_severity):
+    def check_corrective_soreness(self, trigger, event_date_time, exercise_library, max_severity):
 
         body_part_factory = BodyPartFactory()
+        #
+        # if soreness.historic_soreness_status is not None and soreness.first_reported_date_time is not None \
+        #         and not soreness.is_dormant_cleared() and soreness.historic_soreness_status is not HistoricSorenessStatus.doms:
+        #     days_sore = (event_date_time - soreness.first_reported_date_time).days
+        #     if not soreness.pain and days_sore >= 30:
+        #
+        #         body_part = body_part_factory.get_body_part(soreness.body_part)
+        #
+        #         goal = AthleteGoal("Reduce injury risk factors", 2, AthleteGoalType.corrective)
+        #         #goal.trigger = "Pers, Pers-2 Soreness > 30d"
+        #         goal.trigger_type = TriggerType.hist_sore_greater_30  # 19
+        #
+        if trigger.trigger_type == TriggerType.hist_sore_greater_30: # 19
 
-        if soreness.historic_soreness_status is not None and soreness.first_reported_date_time is not None \
-                and not soreness.is_dormant_cleared() and soreness.historic_soreness_status is not HistoricSorenessStatus.doms:
-            days_sore = (event_date_time - soreness.first_reported_date_time).days
-            if not soreness.pain and days_sore >= 30:
-
-                body_part = body_part_factory.get_body_part(soreness.body_part)
-
-                goal = AthleteGoal("Reduce injury risk factors", 2, AthleteGoalType.corrective)
-                #goal.trigger = "Pers, Pers-2 Soreness > 30d"
-                goal.trigger_type = TriggerType.hist_sore_greater_30  # 19
-
-                if body_part is not None:
-                    alert = Alert(goal)
-                    alert.body_part = BodyPartSide(soreness.body_part.location, soreness.side)
-                    self.alerts.append(alert)
-                    if max_severity < 3:
-                        #for a in body_part.agonists:
-                        #    agonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None))
-                        #    if agonist is not None:
-                        self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1", soreness, exercise_library)
-                        self.copy_exercises(body_part.static_stretch_exercises, self.static_stretch_exercises, goal, "1", soreness, exercise_library)
-
-                        for y in body_part.synergists:
-                            synergist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(y), None))
-                            if synergist is not None:
-                                self.copy_exercises(synergist.inhibit_exercises, self.inhibit_exercises, goal, "2", soreness, exercise_library)
-                                self.copy_exercises(synergist.isolated_activate_exercises, self.isolated_activate_exercises,
-                                                        goal, "2", soreness, exercise_library)
-
-                        for g in body_part.antagonists:
-                            antagonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(g), None))
-                            if antagonist is not None:
-                                self.copy_exercises(antagonist.isolated_activate_exercises,
-                                                        self.isolated_activate_exercises, goal,
-                                                        "1", soreness, exercise_library)
-
-                        general_body_part = body_part_factory.get_body_part(BodyPart(BodyPartLocation.general, None))
-                        self.copy_exercises(general_body_part.static_integrate_exercises, self.static_integrate_exercises,
-                                                goal, "1", soreness, exercise_library)
-
-    def check_corrective_pain(self, soreness, event_date_time, exercise_library, max_severity):
-
-        body_part_factory = BodyPartFactory()
-
-        if soreness.historic_soreness_status is not None and soreness.first_reported_date_time is not None:
-            # days_sore = (event_date_time - soreness.first_reported_date_time).days
-            if soreness.is_acute_pain() or soreness.is_persistent_pain() or soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_pain:
-
-                body_part = body_part_factory.get_body_part(soreness.body_part)
-
-                goal = AthleteGoal("Reduce injury risk factors", 2, AthleteGoalType.corrective)
-                #goal.trigger = "Acute, Pers, Pers-2 Pain"
-                goal.trigger_type = TriggerType.hist_pain  # 16
-
-                if body_part is not None:
-                    alert = Alert(goal)
-                    alert.body_part = BodyPartSide(soreness.body_part.location, soreness.side)
-                    self.alerts.append(alert)
-                    if max_severity < 3:
-                        #for a in body_part.agonists:
-                        #    agonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None))
-                        #    if agonist is not None:
-                        self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1", soreness, exercise_library)
-                        self.copy_exercises(body_part.static_stretch_exercises, self.static_stretch_exercises, goal, "1", soreness, exercise_library)
-
-                        for y in body_part.synergists:
-                            synergist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(y), None))
-                            if synergist is not None:
-                                self.copy_exercises(synergist.inhibit_exercises, self.inhibit_exercises, goal, "2", soreness, exercise_library)
-                                self.copy_exercises(synergist.isolated_activate_exercises, self.isolated_activate_exercises,
-                                                        goal, "2", soreness, exercise_library)
-
-                        for g in body_part.antagonists:
-                            antagonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(g), None))
-                            if antagonist is not None:
-                                self.copy_exercises(antagonist.isolated_activate_exercises,
-                                                        self.isolated_activate_exercises, goal,
-                                                        "1", soreness, exercise_library)
-
-                        general_body_part = body_part_factory.get_body_part(BodyPart(BodyPartLocation.general, None))
-                        self.copy_exercises(general_body_part.static_integrate_exercises, self.static_integrate_exercises,
-                                                goal, "1", soreness, exercise_library)
-
-    def check_reactive_care_pain(self, soreness, exercise_library, max_severity):
-
-        body_part_factory = BodyPartFactory()
-
-        if soreness.daily and soreness.pain:
-
-            body_part = body_part_factory.get_body_part(soreness.body_part)
-
-            goal = AthleteGoal("Care for pain", 1, AthleteGoalType.pain)
-
-            if not soreness.is_joint():
-                #goal.trigger = "Painful joint reported today"
-                if soreness.severity < 3:
-                    if (not soreness.is_acute_pain() and not soreness.is_persistent_pain() and
-                            soreness.historic_soreness_status is not HistoricSorenessStatus.persistent_2_pain):
-                        goal.trigger_type = TriggerType.no_hist_pain_pain_today_severity_1_2  # 14
-                    else:
-                        goal.trigger_type = TriggerType.hist_pain_pain_today_severity_1_2  # 23
-                else:
-                    if (not soreness.is_acute_pain() and not soreness.is_persistent_pain() and
-                            soreness.historic_soreness_status is not HistoricSorenessStatus.persistent_2_pain):
-                        goal.trigger_type = TriggerType.no_hist_pain_pain_today_high_severity_3_5  # 15
-                    else:
-                        goal.trigger_type = TriggerType.hist_pain_pain_today_severity_3_5  # 24
-                synergist_priority = "2"
-            else:
-                #goal.trigger = "Painful muscle reported today"
-                if soreness.severity < 3:
-                    if (not soreness.is_acute_pain() and not soreness.is_persistent_pain() and
-                            soreness.historic_soreness_status is not HistoricSorenessStatus.persistent_2_pain):
-                        goal.trigger_type = TriggerType.no_hist_pain_pain_today_severity_1_2  # 14
-                    else:
-                        goal.trigger_type = TriggerType.hist_pain_pain_today_severity_1_2  # 23
-                else:
-                    if (not soreness.is_acute_pain() and not soreness.is_persistent_pain() and
-                            soreness.historic_soreness_status is not HistoricSorenessStatus.persistent_2_pain):
-                        goal.trigger_type = TriggerType.no_hist_pain_pain_today_high_severity_3_5  # 15
-                    else:
-                        goal.trigger_type = TriggerType.hist_pain_pain_today_severity_3_5  # 24
-                synergist_priority = "2"
+            body_part = body_part_factory.get_body_part(trigger.body_part)
+            goal = AthleteGoal("Reduce injury risk factors", 2, AthleteGoalType.corrective)
 
             if body_part is not None:
                 alert = Alert(goal)
-                alert.body_part = BodyPartSide(soreness.body_part.location, soreness.side)
+                alert.body_part = trigger.body_part
                 self.alerts.append(alert)
-                if soreness.is_joint():
-                    for a in body_part.agonists:
-                        agonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None))
-                        if agonist is not None:
-                            self.copy_exercises(agonist.inhibit_exercises, self.inhibit_exercises, goal, "1", soreness, exercise_library)
-                            if max_severity < 3.5:
-                                self.copy_exercises(agonist.static_stretch_exercises, self.static_stretch_exercises, goal, "1", soreness, exercise_library)
-                                self.copy_exercises(agonist.active_stretch_exercises, self.active_stretch_exercises, goal, "1", soreness, exercise_library)
-                else:
-                    self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1", soreness,
-                                        exercise_library)
-                    if max_severity < 3.5:
-                        self.copy_exercises(body_part.static_stretch_exercises, self.static_stretch_exercises, goal, "1",
-                                            soreness, exercise_library)
-                        self.copy_exercises(body_part.active_stretch_exercises, self.active_stretch_exercises, goal, "1",
-                                            soreness, exercise_library)
+                if max_severity < 3:
+                    #for a in body_part.agonists:
+                    #    agonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None))
+                    #    if agonist is not None:
+                    self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1", trigger, exercise_library)
+                    self.copy_exercises(body_part.static_stretch_exercises, self.static_stretch_exercises, goal, "1", trigger, exercise_library)
 
-                if soreness.is_joint():
+                    for y in body_part.synergists:
+                        synergist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(y), None))
+                        if synergist is not None:
+                            self.copy_exercises(synergist.inhibit_exercises, self.inhibit_exercises, goal, "2", trigger, exercise_library)
+                            self.copy_exercises(synergist.isolated_activate_exercises, self.isolated_activate_exercises,
+                                                    goal, "2", trigger, exercise_library)
+
                     for g in body_part.antagonists:
                         antagonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(g), None))
                         if antagonist is not None:
-                            self.copy_exercises(antagonist.inhibit_exercises, self.inhibit_exercises, goal, "1", soreness, exercise_library)
+                            self.copy_exercises(antagonist.isolated_activate_exercises,
+                                                    self.isolated_activate_exercises, goal,
+                                                    "1", trigger, exercise_library)
+
+                    general_body_part = body_part_factory.get_body_part(BodyPart(BodyPartLocation.general, None))
+                    self.copy_exercises(general_body_part.static_integrate_exercises, self.static_integrate_exercises,
+                                            goal, "1", trigger, exercise_library)
+
+    def check_corrective_pain(self, trigger, event_date_time, exercise_library, max_severity):
+
+        body_part_factory = BodyPartFactory()
+
+        # if soreness.historic_soreness_status is not None and soreness.first_reported_date_time is not None:
+        #     # days_sore = (event_date_time - soreness.first_reported_date_time).days
+        #     if soreness.is_acute_pain() or soreness.is_persistent_pain() or soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_pain:
+        #
+        #         body_part = body_part_factory.get_body_part(soreness.body_part)
+        #
+        #         goal = AthleteGoal("Reduce injury risk factors", 2, AthleteGoalType.corrective)
+        #         #goal.trigger = "Acute, Pers, Pers-2 Pain"
+        #         goal.trigger_type = TriggerType.hist_pain  # 16
+        if trigger.trigger_type == TriggerType.hist_pain:  # 16
+            body_part = body_part_factory.get_body_part(trigger.body_part)
+            goal = AthleteGoal("Reduce injury risk factors", 2, AthleteGoalType.corrective)
+
+            if body_part is not None:
+                alert = Alert(goal)
+                alert.body_part = trigger.body_part
+                self.alerts.append(alert)
+                if max_severity < 3:
+                    self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1", trigger, exercise_library)
+                    self.copy_exercises(body_part.static_stretch_exercises, self.static_stretch_exercises, goal, "1", trigger, exercise_library)
+
+                    for y in body_part.synergists:
+                        synergist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(y), None))
+                        if synergist is not None:
+                            self.copy_exercises(synergist.inhibit_exercises, self.inhibit_exercises, goal, "2", trigger, exercise_library)
+                            self.copy_exercises(synergist.isolated_activate_exercises, self.isolated_activate_exercises,
+                                                    goal, "2", trigger, exercise_library)
+
+                    for g in body_part.antagonists:
+                        antagonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(g), None))
+                        if antagonist is not None:
+                            self.copy_exercises(antagonist.isolated_activate_exercises,
+                                                    self.isolated_activate_exercises, goal,
+                                                    "1", trigger, exercise_library)
+
+                    general_body_part = body_part_factory.get_body_part(BodyPart(BodyPartLocation.general, None))
+                    self.copy_exercises(general_body_part.static_integrate_exercises, self.static_integrate_exercises,
+                                            goal, "1", trigger, exercise_library)
+
+    def check_reactive_care_pain(self, trigger, exercise_library, max_severity):
+
+        body_part_factory = BodyPartFactory()
+        synergist_priority = "2"
+
+        # if soreness.daily and soreness.pain:
+        #
+        #     body_part = body_part_factory.get_body_part(soreness.body_part)
+        #
+        #     goal = AthleteGoal("Care for pain", 1, AthleteGoalType.pain)
+        #
+        #     if not soreness.is_joint():
+        #         #goal.trigger = "Painful joint reported today"
+        #         if soreness.severity < 3:
+        #             if (not soreness.is_acute_pain() and not soreness.is_persistent_pain() and
+        #                     soreness.historic_soreness_status is not HistoricSorenessStatus.persistent_2_pain):
+        #                 goal.trigger_type = TriggerType.no_hist_pain_pain_today_severity_1_2  # 14
+        #             else:
+        #                 goal.trigger_type = TriggerType.hist_pain_pain_today_severity_1_2  # 23
+        #         else:
+        #             if (not soreness.is_acute_pain() and not soreness.is_persistent_pain() and
+        #                     soreness.historic_soreness_status is not HistoricSorenessStatus.persistent_2_pain):
+        #                 goal.trigger_type = TriggerType.no_hist_pain_pain_today_high_severity_3_5  # 15
+        #             else:
+        #                 goal.trigger_type = TriggerType.hist_pain_pain_today_severity_3_5  # 24
+        #         synergist_priority = "2"
+        #     else:
+        #         #goal.trigger = "Painful muscle reported today"
+        #         if soreness.severity < 3:
+        #             if (not soreness.is_acute_pain() and not soreness.is_persistent_pain() and
+        #                     soreness.historic_soreness_status is not HistoricSorenessStatus.persistent_2_pain):
+        #                 goal.trigger_type = TriggerType.no_hist_pain_pain_today_severity_1_2  # 14
+        #             else:
+        #                 goal.trigger_type = TriggerType.hist_pain_pain_today_severity_1_2  # 23
+        #         else:
+        #             if (not soreness.is_acute_pain() and not soreness.is_persistent_pain() and
+        #                     soreness.historic_soreness_status is not HistoricSorenessStatus.persistent_2_pain):
+        #                 goal.trigger_type = TriggerType.no_hist_pain_pain_today_high_severity_3_5  # 15
+        #             else:
+        #                 goal.trigger_type = TriggerType.hist_pain_pain_today_severity_3_5  # 24
+        #         synergist_priority = "2"
+
+        if trigger.trigger_type in [TriggerType.no_hist_pain_pain_today_severity_1_2,
+                                    TriggerType.no_hist_pain_pain_today_high_severity_3_5,
+                                    TriggerType.hist_pain_pain_today_severity_1_2,
+                                    TriggerType.hist_pain_pain_today_severity_3_5]:  # 14, 15, 23, 24
+
+            body_part = body_part_factory.get_body_part(trigger.body_part)
+            #
+            goal = AthleteGoal("Care for pain", 1, AthleteGoalType.pain)
+            if body_part is not None:
+                alert = Alert(goal)
+                alert.body_part = trigger.body_part
+                self.alerts.append(alert)
+                if body_part_factory.is_joint(body_part):
+                    for a in body_part.agonists:
+                        agonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None))
+                        if agonist is not None:
+                            self.copy_exercises(agonist.inhibit_exercises, self.inhibit_exercises, goal, "1", trigger, exercise_library)
                             if max_severity < 3.5:
-                                self.copy_exercises(antagonist.static_stretch_exercises, self.static_stretch_exercises, goal, "1", soreness, exercise_library)
-                                self.copy_exercises(antagonist.active_stretch_exercises, self.active_stretch_exercises, goal, "1", soreness, exercise_library)
+                                self.copy_exercises(agonist.static_stretch_exercises, self.static_stretch_exercises, goal, "1", trigger, exercise_library)
+                                self.copy_exercises(agonist.active_stretch_exercises, self.active_stretch_exercises, goal, "1", trigger, exercise_library)
+                else:
+                    self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1", trigger,
+                                        exercise_library)
+                    if max_severity < 3.5:
+                        self.copy_exercises(body_part.static_stretch_exercises, self.static_stretch_exercises, goal, "1",
+                                            trigger, exercise_library)
+                        self.copy_exercises(body_part.active_stretch_exercises, self.active_stretch_exercises, goal, "1",
+                                            trigger, exercise_library)
+
+                if body_part_factory.is_joint(body_part):
+                    for g in body_part.antagonists:
+                        antagonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(g), None))
+                        if antagonist is not None:
+                            self.copy_exercises(antagonist.inhibit_exercises, self.inhibit_exercises, goal, "1", trigger, exercise_library)
+                            if max_severity < 3.5:
+                                self.copy_exercises(antagonist.static_stretch_exercises, self.static_stretch_exercises, goal, "1", trigger, exercise_library)
+                                self.copy_exercises(antagonist.active_stretch_exercises, self.active_stretch_exercises, goal, "1", trigger, exercise_library)
 
                 for y in body_part.synergists:
                     synergist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(y), None))
                     if synergist is not None:
                         self.copy_exercises(synergist.inhibit_exercises, self.inhibit_exercises, goal,
-                                            synergist_priority, soreness, exercise_library)
+                                            synergist_priority, trigger, exercise_library)
                         if max_severity < 3.5:
                             self.copy_exercises(synergist.active_stretch_exercises, self.active_stretch_exercises, goal,
-                                                synergist_priority, soreness, exercise_library)
+                                                synergist_priority, trigger, exercise_library)
 
                 for t in body_part.stabilizers:
                     stabilizer = body_part_factory.get_body_part(BodyPart(BodyPartLocation(t), None))
                     if stabilizer is not None:
-                        self.copy_exercises(stabilizer.inhibit_exercises, self.inhibit_exercises, goal, "3", soreness, exercise_library)
+                        self.copy_exercises(stabilizer.inhibit_exercises, self.inhibit_exercises, goal, "3", trigger, exercise_library)
                         if max_severity < 3.5:
-                            self.copy_exercises(stabilizer.active_stretch_exercises, self.active_stretch_exercises, goal, "3", soreness,
+                            self.copy_exercises(stabilizer.active_stretch_exercises, self.active_stretch_exercises, goal, "3", trigger,
                                                 exercise_library)
 
     def set_exercise_dosage_ranking(self):
@@ -1478,224 +1501,238 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
             self.copy_exercises(body_part.static_integrate_exercises, self.static_integrate_exercises, goal, "1", None,
                                 exercise_library)
 
-    def check_reactive_care_soreness(self, soreness, exercise_library, max_severity):
+    def check_reactive_care_soreness(self, trigger, exercise_library, max_severity):
 
         body_part_factory = BodyPartFactory()
 
-        if soreness.daily and not soreness.pain:
+        # if soreness.daily and not soreness.pain:
+        #
+        #     body_part = body_part_factory.get_body_part(soreness.body_part)
+        #
+        #     goal = AthleteGoal("Care for soreness", 1, AthleteGoalType.sore)
+        #     #goal.trigger = "Sore reported today"
+        #     #goal.trigger_type = TriggerType.sore_today  # 10
+        #     if soreness.historic_soreness_status == HistoricSorenessStatus.doms:
+        #         goal.trigger_type = TriggerType.sore_today_doms  # 11
+        #     elif ((soreness.is_persistent_soreness() or
+        #            soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_soreness) and
+        #           (self.event_date_time - soreness.first_reported_date_time).days < 30):
+        #         goal.trigger_type = TriggerType.hist_sore_less_30_sore_today  # 12
+        #     elif ((soreness.is_persistent_soreness() or
+        #            soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_soreness) and
+        #           (self.event_date_time - soreness.first_reported_date_time).days >= 30):
+        #         goal.trigger_type = TriggerType.hist_sore_greater_30_sore_today  # 13
+        #     else: # somehow missed doms
+        #         goal.trigger_type = TriggerType.sore_today  # 10
+        if trigger.trigger_type in [TriggerType.sore_today,
+                                    TriggerType.sore_today_doms,
+                                    TriggerType.hist_sore_less_30_sore_today,
+                                    TriggerType.hist_sore_greater_30_sore_today]:
 
-            body_part = body_part_factory.get_body_part(soreness.body_part)
-
+            body_part = body_part_factory.get_body_part(trigger.body_part)
             goal = AthleteGoal("Care for soreness", 1, AthleteGoalType.sore)
-            #goal.trigger = "Sore reported today"
-            #goal.trigger_type = TriggerType.sore_today  # 10
-            if soreness.historic_soreness_status == HistoricSorenessStatus.doms:
-                goal.trigger_type = TriggerType.sore_today_doms  # 11
-            elif ((soreness.is_persistent_soreness() or
-                   soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_soreness) and
-                  (self.event_date_time - soreness.first_reported_date_time).days < 30):
-                goal.trigger_type = TriggerType.hist_sore_less_30_sore_today  # 12
-            elif ((soreness.is_persistent_soreness() or
-                   soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_soreness) and
-                  (self.event_date_time - soreness.first_reported_date_time).days >= 30):
-                goal.trigger_type = TriggerType.hist_sore_greater_30_sore_today  # 13
-            else: # somehow missed doms
-                goal.trigger_type = TriggerType.sore_today  # 10
 
             if body_part is not None:
                 alert = Alert(goal)
-                alert.body_part = BodyPartSide(soreness.body_part.location, soreness.side)
+                alert.body_part = trigger.body_part
                 self.alerts.append(alert)
-                #for a in body_part.agonists:
-                #    agonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None))
-                #    if agonist is not None:
-                self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1", soreness, exercise_library)
+
+                self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1", trigger, exercise_library)
                 if max_severity < 3.5:
-                    self.copy_exercises(body_part.static_stretch_exercises, self.static_stretch_exercises, goal, "1", soreness, exercise_library)
+                    self.copy_exercises(body_part.static_stretch_exercises, self.static_stretch_exercises, goal, "1", trigger, exercise_library)
 
                 for y in body_part.synergists:
                     synergist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(y), None))
                     if synergist is not None:
-                        self.copy_exercises(synergist.inhibit_exercises, self.inhibit_exercises, goal, "2", soreness, exercise_library)
+                        self.copy_exercises(synergist.inhibit_exercises, self.inhibit_exercises, goal, "2", trigger, exercise_library)
                         if max_severity < 3.5:
-                            self.copy_exercises(synergist.static_stretch_exercises, self.static_stretch_exercises, goal, "2", soreness, exercise_library)
+                            self.copy_exercises(synergist.static_stretch_exercises, self.static_stretch_exercises, goal, "2", trigger, exercise_library)
 
                 for t in body_part.stabilizers:
                     stabilizer = body_part_factory.get_body_part(BodyPart(BodyPartLocation(t), None))
                     if stabilizer is not None:
-                        self.copy_exercises(stabilizer.inhibit_exercises, self.inhibit_exercises, goal, "3", soreness, exercise_library)
+                        self.copy_exercises(stabilizer.inhibit_exercises, self.inhibit_exercises, goal, "3", trigger, exercise_library)
                         if max_severity < 3.5:
-                            self.copy_exercises(stabilizer.static_stretch_exercises, self.static_stretch_exercises, goal, "3", soreness, exercise_library)
+                            self.copy_exercises(stabilizer.static_stretch_exercises, self.static_stretch_exercises, goal, "3", trigger, exercise_library)
 
-    def check_corrective_soreness(self, soreness, event_date_time, exercise_library, max_severity):
+    def check_corrective_soreness(self, trigger, event_date_time, exercise_library, max_severity):
 
         body_part_factory = BodyPartFactory()
 
-        if soreness.historic_soreness_status is not None and soreness.first_reported_date_time is not None \
-                and not soreness.is_dormant_cleared() and soreness.historic_soreness_status is not HistoricSorenessStatus.doms:
-            days_sore = (event_date_time - soreness.first_reported_date_time).days
-            if not soreness.pain and days_sore >= 30:
+        # if soreness.historic_soreness_status is not None and soreness.first_reported_date_time is not None \
+        #         and not soreness.is_dormant_cleared() and soreness.historic_soreness_status is not HistoricSorenessStatus.doms:
+        #     days_sore = (event_date_time - soreness.first_reported_date_time).days
+        #     if not soreness.pain and days_sore >= 30:
+        #
+        #         body_part = body_part_factory.get_body_part(soreness.body_part)
+        #
+        #         goal = AthleteGoal("Reduce injury risk factors", 2, AthleteGoalType.corrective)
+        #         #goal.trigger = "Pers, Pers-2 Soreness > 30d"
+        #         goal.trigger_type = TriggerType.hist_sore_greater_30  # 19
+        if trigger.trigger_type == TriggerType.hist_sore_greater_30:  # 19
+            body_part = body_part_factory.get_body_part(trigger.body_part)
+            goal = AthleteGoal("Reduce injury risk factors", 2, AthleteGoalType.corrective)
 
-                body_part = body_part_factory.get_body_part(soreness.body_part)
-
-                goal = AthleteGoal("Reduce injury risk factors", 2, AthleteGoalType.corrective)
-                #goal.trigger = "Pers, Pers-2 Soreness > 30d"
-                goal.trigger_type = TriggerType.hist_sore_greater_30  # 19
-
-                if body_part is not None:
+            if body_part is not None:
                     alert = Alert(goal)
-                    alert.body_part = BodyPartSide(soreness.body_part.location, soreness.side)
+                    alert.body_part = trigger.body_part
                     self.alerts.append(alert)
                     if max_severity < 3:
-                        #for a in body_part.agonists:
-                        #    agonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None))
-                        #    if agonist is not None:
-                        self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1", soreness, exercise_library)
-                        self.copy_exercises(body_part.static_stretch_exercises, self.static_stretch_exercises, goal, "1", soreness, exercise_library)
+
+                        self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1", trigger, exercise_library)
+                        self.copy_exercises(body_part.static_stretch_exercises, self.static_stretch_exercises, goal, "1", trigger, exercise_library)
 
                         for y in body_part.synergists:
                             synergist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(y), None))
                             if synergist is not None:
-                                self.copy_exercises(synergist.inhibit_exercises, self.inhibit_exercises, goal, "2", soreness, exercise_library)
+                                self.copy_exercises(synergist.inhibit_exercises, self.inhibit_exercises, goal, "2", trigger, exercise_library)
                                 self.copy_exercises(synergist.isolated_activate_exercises, self.isolated_activate_exercises,
-                                                        goal, "2", soreness, exercise_library)
+                                                        goal, "2", trigger, exercise_library)
 
                         for g in body_part.antagonists:
                             antagonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(g), None))
                             if antagonist is not None:
                                 self.copy_exercises(antagonist.isolated_activate_exercises,
                                                         self.isolated_activate_exercises, goal,
-                                                        "1", soreness, exercise_library)
+                                                        "1", trigger, exercise_library)
 
                         general_body_part = body_part_factory.get_body_part(BodyPart(BodyPartLocation.general, None))
                         self.copy_exercises(general_body_part.static_integrate_exercises, self.static_integrate_exercises,
-                                                goal, "1", soreness, exercise_library)
+                                                goal, "1", trigger, exercise_library)
 
-    def check_corrective_pain(self, soreness, event_date_time, exercise_library, max_severity):
+    def check_corrective_pain(self, trigger, event_date_time, exercise_library, max_severity):
 
         body_part_factory = BodyPartFactory()
 
-        if soreness.historic_soreness_status is not None and soreness.first_reported_date_time is not None:
-            # days_sore = (event_date_time - soreness.first_reported_date_time).days
-            if soreness.is_acute_pain() or soreness.is_persistent_pain() or soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_pain:
+        # if soreness.historic_soreness_status is not None and soreness.first_reported_date_time is not None:
+        #     # days_sore = (event_date_time - soreness.first_reported_date_time).days
+        #     if soreness.is_acute_pain() or soreness.is_persistent_pain() or soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_pain:
+        #
+        #         body_part = body_part_factory.get_body_part(soreness.body_part)
+        #
+        #         goal = AthleteGoal("Reduce injury risk factors", 2, AthleteGoalType.corrective)
+        #         #goal.trigger = "Acute, Pers, Pers-2 Pain"
+        #         goal.trigger_type = TriggerType.hist_pain  # 16
+        if trigger.trigger_type == TriggerType.hist_pain:  # 16
+            body_part = body_part_factory.get_body_part(trigger.body_part)
+            goal = AthleteGoal("Reduce injury risk factors", 2, AthleteGoalType.corrective)
 
-                body_part = body_part_factory.get_body_part(soreness.body_part)
-
-                goal = AthleteGoal("Reduce injury risk factors", 2, AthleteGoalType.corrective)
-                #goal.trigger = "Acute, Pers, Pers-2 Pain"
-                goal.trigger_type = TriggerType.hist_pain  # 16
-
-                if body_part is not None:
+            if body_part is not None:
                     alert = Alert(goal)
-                    alert.body_part = BodyPartSide(soreness.body_part.location, soreness.side)
+                    alert.body_part = trigger.body_part
                     self.alerts.append(alert)
                     if max_severity < 3:
-                        #for a in body_part.agonists:
-                        #    agonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None))
-                        #    if agonist is not None:
-                        self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1", soreness, exercise_library)
-                        self.copy_exercises(body_part.static_stretch_exercises, self.static_stretch_exercises, goal, "1", soreness, exercise_library)
+
+                        self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1", trigger, exercise_library)
+                        self.copy_exercises(body_part.static_stretch_exercises, self.static_stretch_exercises, goal, "1", trigger, exercise_library)
 
                         for y in body_part.synergists:
                             synergist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(y), None))
                             if synergist is not None:
-                                self.copy_exercises(synergist.inhibit_exercises, self.inhibit_exercises, goal, "2", soreness, exercise_library)
+                                self.copy_exercises(synergist.inhibit_exercises, self.inhibit_exercises, goal, "2", trigger, exercise_library)
                                 self.copy_exercises(synergist.isolated_activate_exercises, self.isolated_activate_exercises,
-                                                        goal, "2", soreness, exercise_library)
+                                                        goal, "2", trigger, exercise_library)
 
                         for g in body_part.antagonists:
                             antagonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(g), None))
                             if antagonist is not None:
                                 self.copy_exercises(antagonist.isolated_activate_exercises,
                                                         self.isolated_activate_exercises, goal,
-                                                        "1", soreness, exercise_library)
+                                                        "1", trigger, exercise_library)
 
                         general_body_part = body_part_factory.get_body_part(BodyPart(BodyPartLocation.general, None))
                         self.copy_exercises(general_body_part.static_integrate_exercises, self.static_integrate_exercises,
-                                                goal, "1", soreness, exercise_library)
+                                                goal, "1", trigger, exercise_library)
 
-    def check_reactive_care_pain(self, soreness, exercise_library, max_severity):
+    def check_reactive_care_pain(self, trigger, exercise_library, max_severity):
 
         body_part_factory = BodyPartFactory()
 
-        if soreness.daily and soreness.pain:
+        #if soreness.daily and soreness.pain:
+        if trigger.trigger_type in [TriggerType.no_hist_pain_pain_today_severity_1_2,
+                                    TriggerType.no_hist_pain_pain_today_high_severity_3_5,
+                                    TriggerType.hist_pain_pain_today_severity_1_2,
+                                    TriggerType.hist_pain_pain_today_severity_3_5]:  # 14, 15, 23, 24
 
-            body_part = body_part_factory.get_body_part(soreness.body_part)
+            body_part = body_part_factory.get_body_part(trigger.body_part)
 
             goal = AthleteGoal("Care for pain", 1, AthleteGoalType.pain)
 
-            if not soreness.is_joint():
-                #goal.trigger = "Painful joint reported today"
-                if soreness.severity < 3:
-                    if (not soreness.is_acute_pain() and not soreness.is_persistent_pain() and
-                            soreness.historic_soreness_status is not HistoricSorenessStatus.persistent_2_pain):
-                        goal.trigger_type = TriggerType.no_hist_pain_pain_today_severity_1_2  # 14
-                    else:
-                        goal.trigger_type = TriggerType.hist_pain_pain_today_severity_1_2  # 23
-                else:
-                    if (not soreness.is_acute_pain() and not soreness.is_persistent_pain() and
-                            soreness.historic_soreness_status is not HistoricSorenessStatus.persistent_2_pain):
-                        goal.trigger_type = TriggerType.no_hist_pain_pain_today_high_severity_3_5  # 15
-                    else:
-                        goal.trigger_type = TriggerType.hist_pain_pain_today_severity_3_5  # 24
-                synergist_priority = "2"
-            else:
-                #goal.trigger = "Painful muscle reported today"
-                if soreness.severity < 3:
-                    if (not soreness.is_acute_pain() and not soreness.is_persistent_pain() and
-                            soreness.historic_soreness_status is not HistoricSorenessStatus.persistent_2_pain):
-                        goal.trigger_type = TriggerType.no_hist_pain_pain_today_severity_1_2  # 14
-                    else:
-                        goal.trigger_type = TriggerType.hist_pain_pain_today_severity_1_2  # 23
-                else:
-                    if (not soreness.is_acute_pain() and not soreness.is_persistent_pain() and
-                            soreness.historic_soreness_status is not HistoricSorenessStatus.persistent_2_pain):
-                        goal.trigger_type = TriggerType.no_hist_pain_pain_today_high_severity_3_5  # 15
-                    else:
-                        goal.trigger_type = TriggerType.hist_pain_pain_today_severity_3_5  # 24
-                synergist_priority = "2"
+            synergist_priority = "2"
+
+            # if not soreness.is_joint():
+            #     #goal.trigger = "Painful joint reported today"
+            #     if soreness.severity < 3:
+            #         if (not soreness.is_acute_pain() and not soreness.is_persistent_pain() and
+            #                 soreness.historic_soreness_status is not HistoricSorenessStatus.persistent_2_pain):
+            #             goal.trigger_type = TriggerType.no_hist_pain_pain_today_severity_1_2  # 14
+            #         else:
+            #             goal.trigger_type = TriggerType.hist_pain_pain_today_severity_1_2  # 23
+            #     else:
+            #         if (not soreness.is_acute_pain() and not soreness.is_persistent_pain() and
+            #                 soreness.historic_soreness_status is not HistoricSorenessStatus.persistent_2_pain):
+            #             goal.trigger_type = TriggerType.no_hist_pain_pain_today_high_severity_3_5  # 15
+            #         else:
+            #             goal.trigger_type = TriggerType.hist_pain_pain_today_severity_3_5  # 24
+            #     synergist_priority = "2"
+            # else:
+            #     #goal.trigger = "Painful muscle reported today"
+            #     if soreness.severity < 3:
+            #         if (not soreness.is_acute_pain() and not soreness.is_persistent_pain() and
+            #                 soreness.historic_soreness_status is not HistoricSorenessStatus.persistent_2_pain):
+            #             goal.trigger_type = TriggerType.no_hist_pain_pain_today_severity_1_2  # 14
+            #         else:
+            #             goal.trigger_type = TriggerType.hist_pain_pain_today_severity_1_2  # 23
+            #     else:
+            #         if (not soreness.is_acute_pain() and not soreness.is_persistent_pain() and
+            #                 soreness.historic_soreness_status is not HistoricSorenessStatus.persistent_2_pain):
+            #             goal.trigger_type = TriggerType.no_hist_pain_pain_today_high_severity_3_5  # 15
+            #         else:
+            #             goal.trigger_type = TriggerType.hist_pain_pain_today_severity_3_5  # 24
+            #     synergist_priority = "2"
 
             if body_part is not None:
                 alert = Alert(goal)
-                alert.body_part = BodyPartSide(soreness.body_part.location, soreness.side)
+                alert.body_part = trigger.body_part
                 self.alerts.append(alert)
-                if soreness.is_joint():
+
+                if body_part_factory.is_joint(body_part):
                     for a in body_part.agonists:
                         agonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None))
                         if agonist is not None:
-                            self.copy_exercises(agonist.inhibit_exercises, self.inhibit_exercises, goal, "1", soreness, exercise_library)
+                            self.copy_exercises(agonist.inhibit_exercises, self.inhibit_exercises, goal, "1", trigger, exercise_library)
                             if max_severity < 3.5:
-                                self.copy_exercises(agonist.static_stretch_exercises, self.static_stretch_exercises, goal, "1", soreness, exercise_library)
+                                self.copy_exercises(agonist.static_stretch_exercises, self.static_stretch_exercises, goal, "1", trigger, exercise_library)
                 else:
-                    self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1", soreness,
+                    self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1", trigger,
                                         exercise_library)
                     if max_severity < 3.5:
                         self.copy_exercises(body_part.static_stretch_exercises, self.static_stretch_exercises, goal, "1",
-                                            soreness, exercise_library)
+                                            trigger, exercise_library)
 
-                if soreness.is_joint():
+                if body_part_factory.is_joint(body_part):
                     for g in body_part.antagonists:
                         antagonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(g), None))
                         if antagonist is not None:
-                            self.copy_exercises(antagonist.inhibit_exercises, self.inhibit_exercises, goal, "1", soreness,
+                            self.copy_exercises(antagonist.inhibit_exercises, self.inhibit_exercises, goal, "1", trigger,
                                                 exercise_library)
                             if max_severity < 3.5:
                                 self.copy_exercises(antagonist.static_stretch_exercises, self.static_stretch_exercises,
-                                                    goal, "1", soreness, exercise_library)
+                                                    goal, "1", trigger, exercise_library)
 
                 for y in body_part.synergists:
                     synergist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(y), None))
                     if synergist is not None:
-                        self.copy_exercises(synergist.inhibit_exercises, self.inhibit_exercises, goal, synergist_priority, soreness, exercise_library)
+                        self.copy_exercises(synergist.inhibit_exercises, self.inhibit_exercises, goal, synergist_priority, trigger, exercise_library)
                         if max_severity < 3.5:
-                            self.copy_exercises(synergist.static_stretch_exercises, self.static_stretch_exercises, goal, synergist_priority, soreness, exercise_library)
+                            self.copy_exercises(synergist.static_stretch_exercises, self.static_stretch_exercises, goal, synergist_priority, trigger, exercise_library)
 
                 for t in body_part.stabilizers:
                     stabilizer = body_part_factory.get_body_part(BodyPart(BodyPartLocation(t), None))
                     if stabilizer is not None:
-                        self.copy_exercises(stabilizer.inhibit_exercises, self.inhibit_exercises, goal, "3", soreness, exercise_library)
+                        self.copy_exercises(stabilizer.inhibit_exercises, self.inhibit_exercises, goal, "3", trigger, exercise_library)
                         if max_severity < 3.5:
-                            self.copy_exercises(stabilizer.static_stretch_exercises, self.static_stretch_exercises, goal, "3", soreness, exercise_library)
+                            self.copy_exercises(stabilizer.static_stretch_exercises, self.static_stretch_exercises, goal, "3", trigger, exercise_library)
 
     def set_exercise_dosage_ranking(self):
         self.rank_dosages([self.inhibit_exercises,
@@ -1755,70 +1792,73 @@ class WarmUp(ModalityBase, Serialisable):
 
         return warmup
 
-    def fill_exercises(self, soreness_list, exercise_library, high_relative_load_session, high_relative_intensity_logged, muscular_strain_high, sports):
-        for s in soreness_list:
-            self.check_corrective_soreness(s, self.event_date_time, exercise_library)
-            self.check_preempt_soreness(s, self.event_date_time, exercise_library)
+    def fill_exercises(self, trigger_list, exercise_library, high_relative_load_session, high_relative_intensity_logged, muscular_strain_high, sports):
 
-    def check_preempt_soreness(self, soreness, event_date_time, exercise_library):
+        if trigger_list is not None:
+            for t in trigger_list:
+                self.check_corrective_soreness(t, self.event_date_time, exercise_library)
+                self.check_preempt_soreness(t, self.event_date_time, exercise_library)
 
-        if soreness.historic_soreness_status is not None and soreness.first_reported_date_time is not None\
-                and not soreness.is_dormant_cleared() and soreness.historic_soreness_status is not HistoricSorenessStatus.doms:
-            days_sore = (event_date_time - soreness.first_reported_date_time).days
-            if not soreness.pain and days_sore < 30:
+    def check_preempt_soreness(self, trigger, event_date_time, exercise_library):
 
-                goal = AthleteGoal("Prep for Sport", 1, AthleteGoalType.preempt_personalized_sport)
-                #goal.trigger = "Pers, Pers-2 Soreness > 30d"
-                goal.trigger_type = TriggerType.hist_sore_less_30
+        # if soreness.historic_soreness_status is not None and soreness.first_reported_date_time is not None\
+        #         and not soreness.is_dormant_cleared() and soreness.historic_soreness_status is not HistoricSorenessStatus.doms:
+        #     days_sore = (event_date_time - soreness.first_reported_date_time).days
+        #     if not soreness.pain and days_sore < 30:
+        if trigger.trigger_type == TriggerType.hist_sore_less_30:
+            goal = AthleteGoal("Prep for Sport", 1, AthleteGoalType.preempt_personalized_sport)
+            #goal.trigger = "Pers, Pers-2 Soreness > 30d"
+            #goal.trigger_type = TriggerType.hist_sore_less_30
+            trigger.goals.append(goal)
+            self.assign_exercises(trigger, goal, exercise_library)
 
-                self.assign_exercises(soreness, goal, exercise_library)
+    def check_corrective_soreness(self, trigger, event_date_time, exercise_library):
 
-    def check_corrective_soreness(self, soreness, event_date_time, exercise_library):
+        # if soreness.historic_soreness_status is not None and soreness.first_reported_date_time is not None \
+        #         and not soreness.is_dormant_cleared() and soreness.historic_soreness_status is not HistoricSorenessStatus.doms:
+        #     days_sore = (event_date_time - soreness.first_reported_date_time).days
+        #     if not soreness.pain and days_sore >= 30:
+        if trigger.trigger_type == TriggerType.hist_sore_greater_30:
+            goal = AthleteGoal("Increase prevention efficacy", 1, AthleteGoalType.preempt_corrective)
+            #goal.trigger = "Pers, Pers-2 Soreness > 30d"
+            #goal.trigger_type = TriggerType.hist_sore_greater_30
+            trigger.goals.append(goal)
+            self.assign_exercises(trigger, goal, exercise_library)
 
-        if soreness.historic_soreness_status is not None and soreness.first_reported_date_time is not None \
-                and not soreness.is_dormant_cleared() and soreness.historic_soreness_status is not HistoricSorenessStatus.doms:
-            days_sore = (event_date_time - soreness.first_reported_date_time).days
-            if not soreness.pain and days_sore >= 30:
-                goal = AthleteGoal("Increase prevention efficacy", 1, AthleteGoalType.preempt_corrective)
-                #goal.trigger = "Pers, Pers-2 Soreness > 30d"
-                goal.trigger_type = TriggerType.hist_sore_greater_30
-
-                self.assign_exercises(soreness, goal, exercise_library)
-
-    def assign_exercises(self, soreness, goal, exercise_library):
+    def assign_exercises(self, trigger, goal, exercise_library):
 
         body_part_factory = BodyPartFactory()
 
-        body_part = body_part_factory.get_body_part(soreness.body_part)
+        body_part = body_part_factory.get_body_part(trigger.body_part)
 
         if body_part is not None:
             alert = Alert(goal)
-            alert.body_part = BodyPartSide(soreness.body_part.location, soreness.side)
+            alert.body_part = trigger.body_part
             self.alerts.append(alert)
             for a in body_part.agonists:
                 agonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None))
                 if agonist is not None:
-                    self.copy_exercises(agonist.inhibit_exercises, self.inhibit_exercises, goal, "1", soreness,
+                    self.copy_exercises(agonist.inhibit_exercises, self.inhibit_exercises, goal, "1", trigger,
                                         exercise_library)
-                    if soreness.severity < 3.5:
+                    if trigger.severity < 3.5:
                         self.copy_exercises(agonist.static_stretch_exercises, self.static_stretch_exercises, goal, "1",
-                                            soreness, exercise_library)
+                                            trigger, exercise_library)
                         self.copy_exercises(agonist.isolated_activate_exercises, self.isolated_activate_exercises,
-                                            goal, "1", soreness, exercise_library)
+                                            goal, "1", trigger, exercise_library)
                         self.copy_exercises(agonist.active_or_dynamic_stretch_exercises,
                                             self.active_or_dynamic_stretch_exercises,
-                                            goal, "1", soreness, exercise_library)
+                                            goal, "1", trigger, exercise_library)
             for y in body_part.synergists:
                 synergist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(y), None))
                 if synergist is not None:
-                    self.copy_exercises(synergist.inhibit_exercises, self.inhibit_exercises, goal, "2", soreness,
+                    self.copy_exercises(synergist.inhibit_exercises, self.inhibit_exercises, goal, "2", trigger,
                                         exercise_library)
-                    if soreness.severity < 3.5:
+                    if trigger.severity < 3.5:
                         self.copy_exercises(synergist.isolated_activate_exercises, self.isolated_activate_exercises,
-                                            goal, "2", soreness, exercise_library)
+                                            goal, "2", trigger, exercise_library)
                         self.copy_exercises(synergist.active_or_dynamic_stretch_exercises,
                                             self.active_or_dynamic_stretch_exercises,
-                                            goal, "2", soreness, exercise_library)
+                                            goal, "2", trigger, exercise_library)
 
     def set_exercise_dosage_ranking(self):
         self.rank_dosages([self.inhibit_exercises,
@@ -1910,50 +1950,55 @@ class CoolDown(ModalityBase, Serialisable):
         self.rank_dosages([self.dynamic_stretch_exercises])
         self.rank_dosages([self.dynamic_integrate_exercises])
 
-    def check_recover_from_sport(self, soreness_list, sports, muscular_strain_high,exercise_library, max_severity):
+    def check_recover_from_sport(self, trigger_list, sports, muscular_strain_high,exercise_library, max_severity):
 
-        if muscular_strain_high:
-            goal = AthleteGoal(None, 1, AthleteGoalType.sport)
-            goal.trigger_type = TriggerType.overreaching_high_muscular_strain  # 8
-            alert = Alert(goal)
-            self.alerts.append(alert)
+        # if muscular_strain_high:
+        #     goal = AthleteGoal(None, 1, AthleteGoalType.sport)
+        #     goal.trigger_type = TriggerType.overreaching_high_muscular_strain  # 8
+        #     alert = Alert(goal)
+        #     self.alerts.append(alert)
 
-        hist_soreness = list(s for s in soreness_list if not s.is_dormant_cleared() and not s.pain and
-                             (s.is_persistent_soreness() or
-                              s.historic_soreness_status == HistoricSorenessStatus.persistent_2_soreness) and
-                             (self.event_date_time - s.first_reported_date_time).days < 30)
+        for t in range(0, len(trigger_list)):
+            if trigger_list[t].trigger_type == TriggerType.overreaching_high_muscular_strain:  # 8
+                goal = AthleteGoal(None, 1, AthleteGoalType.sport)
+                trigger_list[t].goals.append(goal)
+            elif trigger_list[t].trigger_type == TriggerType.hist_sore_less_30:  # 7
+                goal = AthleteGoal(None, 1, AthleteGoalType.sport)
+                trigger_list[t].goals.append(goal)
 
-        if len(hist_soreness) > 0:
-            goal = AthleteGoal(None, 1, AthleteGoalType.sport)
-            goal.trigger_type = TriggerType.hist_sore_less_30  # 7
-            # if sport_name is not None:
-            for soreness in hist_soreness:
-                #for sport_name in sports:
-                alert = Alert(goal)
-                #alert.sport_name = sport_name
-                alert.body_part = BodyPartSide(soreness.body_part.location, soreness.side)
-                self.alerts.append(alert)
+        # hist_soreness = list(s for s in soreness_list if not s.is_dormant_cleared() and not s.pain and
+        #                      (s.is_persistent_soreness() or
+        #                       s.historic_soreness_status == HistoricSorenessStatus.persistent_2_soreness) and
+        #                      (self.event_date_time - s.first_reported_date_time).days < 30)
+        #
+        # if len(hist_soreness) > 0:
+        #     goal = AthleteGoal(None, 1, AthleteGoalType.sport)
+        #     goal.trigger_type = TriggerType.hist_sore_less_30  # 7
+        #     # if sport_name is not None:
+        #     for soreness in hist_soreness:
+        #         #for sport_name in sports:
+        #         alert = Alert(goal)
+        #         #alert.sport_name = sport_name
+        #         alert.body_part = BodyPartSide(soreness.body_part.location, soreness.side)
+        #         self.alerts.append(alert)
 
-        if max_severity < 2.5:  # note this is only a pain value for cooldown
-            if self.high_relative_volume_logged or self.high_relative_intensity_logged:
-                goal = AthleteGoal("Expedite tissue regeneration", 1, AthleteGoalType.sport)
-                #goal.trigger = "High Relative Volume or Intensity of Logged Session"
-                goal.trigger_type = TriggerType.high_volume_intensity  # 0
-                for sport_name in sports:
-                    alert = Alert(goal)
-                    alert.sport_name = sport_name
-                    self.alerts.append(alert)
+            elif trigger_list[t].trigger_type == TriggerType.high_volume_intensity and max_severity < 2.5:  # 0
+                goal = AthleteGoal(None, 1, AthleteGoalType.sport)
+                trigger_list[t].goals.append(goal)
+
+        # if max_severity < 2.5:  # note this is only a pain value for cooldown
+        #     if self.high_relative_volume_logged or self.high_relative_intensity_logged:
+        #         goal = AthleteGoal("Expedite tissue regeneration", 1, AthleteGoalType.sport)
+        #         #goal.trigger = "High Relative Volume or Intensity of Logged Session"
+        #         goal.trigger_type = TriggerType.high_volume_intensity  # 0
+        #         for sport_name in sports:
+        #             alert = Alert(goal)
+        #             alert.sport_name = sport_name
+        #             self.alerts.append(alert)
 
                 body_part_factory = BodyPartFactory()
 
                 body_part = body_part_factory.get_body_part_for_sports(sports)
-
-                #prohibiting_soreness = False
-
-                #high_severity_list = list(s for s in soreness_list if s.severity >= 3.5)
-
-                #if len(high_severity_list) > 0:
-                #    prohibiting_soreness = True
 
                 # Note: this is just returning the primary mover related exercises for sport
                 if body_part is not None and max_severity < 3.5:
@@ -1962,67 +2007,72 @@ class CoolDown(ModalityBase, Serialisable):
                     self.copy_exercises(body_part.dynamic_integrate_exercises,
                                         self.dynamic_integrate_exercises, goal, "1", None, exercise_library, sports)
 
-    def check_corrective(self, soreness, event_date_time, exercise_library):
+    def check_corrective(self, trigger, event_date_time, exercise_library):
 
-        if soreness.historic_soreness_status is not None and soreness.first_reported_date_time is not None\
-                and not soreness.is_dormant_cleared() and soreness.historic_soreness_status is not HistoricSorenessStatus.doms:
-            days_sore = (event_date_time - soreness.first_reported_date_time).days
-            if soreness.is_acute_pain() or soreness.is_persistent_pain() or soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_pain:
+        # if soreness.historic_soreness_status is not None and soreness.first_reported_date_time is not None\
+        #         and not soreness.is_dormant_cleared() and soreness.historic_soreness_status is not HistoricSorenessStatus.doms:
+        #     days_sore = (event_date_time - soreness.first_reported_date_time).days
+        #     if soreness.is_acute_pain() or soreness.is_persistent_pain() or soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_pain:
+            if trigger.trigger_type == TriggerType.hist_pain:
                 goal = AthleteGoal("Increase prevention efficacy", 1, AthleteGoalType.preempt_corrective)
-                goal.trigger_type = TriggerType.hist_pain
-                self.assign_exercises(soreness, goal, exercise_library)
+                #goal.trigger_type = TriggerType.hist_pain
+                trigger.goals.append(goal)
+                self.assign_exercises(trigger, goal, exercise_library)
 
-            elif (soreness.is_persistent_soreness() or soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_soreness and days_sore >= 30):
+            #elif (soreness.is_persistent_soreness() or soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_soreness and days_sore >= 30):
+            elif trigger.trigger_type == TriggerType.hist_sore_greater_30:
                 goal = AthleteGoal("Increase prevention efficacy", 1, AthleteGoalType.preempt_corrective)
-                #goal.trigger = "Pers, Pers-2 Soreness > 30d or Historic Pain"
-                goal.trigger_type = TriggerType.hist_sore_greater_30
+                #goal.trigger_type = TriggerType.hist_sore_greater_30
+                trigger.goals.append(goal)
 
-                self.assign_exercises(soreness, goal, exercise_library)
+                self.assign_exercises(trigger, goal, exercise_library)
 
-    def fill_exercises(self, soreness_list, exercise_library, high_relative_load_session, high_relative_intensity_logged, muscular_strain_high, sports):
+    def fill_exercises(self, trigger_list, exercise_library, high_relative_load_session, high_relative_intensity_logged, muscular_strain_high, sports):
 
         max_severity = 0
 
-        if soreness_list is not None and len(soreness_list) > 0:
-            pain_list = list(s for s in soreness_list if s.pain)
-            if len(pain_list) > 0:
-                max_severity = max(list(s.severity for s in pain_list))
+        if trigger_list is not None:
+            max_severity_list = list(t for t in trigger_list if t.severity is not None)
+            if len(max_severity_list) > 0:
+                pain_list = list(t for t in max_severity_list if t.pain)
+                if len(pain_list) > 0:
+                    max_severity = max(list(s.severity for s in pain_list))
 
         #for sport_name in sports:
-        self.check_recover_from_sport(soreness_list, sports, muscular_strain_high, exercise_library, max_severity)
+        self.check_recover_from_sport(trigger_list, sports, muscular_strain_high, exercise_library, max_severity)
         # dynamic stretch not ready yet
         #for s in soreness_list:
         #    self.check_corrective(s, self.event_date_time, exercise_library)
 
-    def assign_exercises(self, soreness, goal, exercise_library):
+    def assign_exercises(self, trigger, goal, exercise_library):
 
         body_part_factory = BodyPartFactory()
 
-        body_part = body_part_factory.get_body_part(soreness.body_part)
+        body_part = body_part_factory.get_body_part(trigger.body_part)
 
         if body_part is not None:
             alert = Alert(goal)
-            alert.body_part = BodyPartSide(soreness.body_part.location, soreness.side)
+            alert.body_part = trigger.body_part
             self.alerts.append(alert)
             #for a in body_part.agonists:
             #    agonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None))
             #    if agonist is not None:
-            if soreness.severity < 3.5:
+            if trigger.severity < 3.5:
                 self.copy_exercises(body_part.dynamic_stretch_exercises, self.dynamic_stretch_exercises, goal,
-                                    "1", soreness,
+                                    "1", trigger,
                                     exercise_library)
                 self.copy_exercises(body_part.dynamic_integrate_exercises, self.dynamic_integrate_exercises, goal,
-                                    "1", soreness,
+                                    "1", trigger,
                                     exercise_library)
 
             for y in body_part.synergists:
                 synergist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(y), None))
                 if synergist is not None:
                     self.copy_exercises(synergist.dynamic_stretch_exercises, self.dynamic_stretch_exercises, goal, "2",
-                                        soreness,
+                                        trigger,
                                         exercise_library)
                     self.copy_exercises(synergist.dynamic_integrate_exercises, self.dynamic_integrate_exercises, goal, "2",
-                                        soreness,
+                                        trigger,
                                         exercise_library)
 
 

@@ -219,6 +219,7 @@ class HistoricSoreness(BaseSoreness, Serialisable):
 
         return soreness
 
+    '''deprecated
     def is_joint(self):
         if (self.body_part_location == BodyPartLocation.hip_flexor or
                 self.body_part_location == BodyPartLocation.knee or
@@ -248,3 +249,4 @@ class HistoricSoreness(BaseSoreness, Serialisable):
             return True
         else:
             return False
+    '''

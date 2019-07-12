@@ -4,6 +4,7 @@ from fathomapi.utils.xray import xray_recorder
 import logic.exercise_mapping as exercise_mapping
 from logic.soreness_processing import SorenessCalculator
 from logic.alerts_processing import AlertsProcessing
+from logic.trigger_processing import TriggerFactory
 from models.daily_plan import DailyPlan
 from utils import format_date, parse_datetime, parse_date
 import copy
@@ -77,10 +78,13 @@ class TrainingPlanManager(object):
                                                                                self.trigger_date_time,
                                                                                historic_soreness)
 
-        calc = exercise_mapping.ExerciseAssignmentCalculator(athlete_stats, self.exercise_library_datastore,
+        trigger_factory = TriggerFactory(parse_date(event_date), athlete_stats, self.soreness_list, self.training_sessions)
+        trigger_factory.load_triggers()
+
+        calc = exercise_mapping.ExerciseAssignmentCalculator(trigger_factory, self.exercise_library_datastore,
                                                              self.completed_exercise_datastore,
                                                              self.training_sessions, self.soreness_list,
-                                                             parse_date(event_date))
+                                                             parse_date(event_date), athlete_stats.historic_soreness)
 
         # new modalities
         if not self.daily_plan.train_later:

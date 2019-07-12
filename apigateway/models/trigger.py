@@ -1,13 +1,18 @@
 from enum import IntEnum
+from models.soreness import BaseSoreness
 
 
-class Trigger(object):
+class Trigger(BaseSoreness):
     def __init__(self, trigger_type):
+        super().__init__()
         self.trigger_type = trigger_type
         self.goals = []
         self.body_part = None
         self.sport_name = None
         self.severity = None
+        self.pain = None
+        self.historic_soreness_status = None
+
 
 class TriggerType(IntEnum):
     high_volume_intensity = 0  # "High Relative Volume or Intensity of Logged Session"

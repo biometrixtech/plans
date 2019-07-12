@@ -14,17 +14,18 @@ class TriggerFactory(object):
 
         self.soreness_list = soreness_list
         self.training_sessions = training_sessions
-        self.eligible_for_high_load_trigger = athlete_stats.eligible_for_high_load_trigger
+        self.eligible_for_high_load_trigger = athlete_stats.eligible_for_high_load_trigger if athlete_stats is not None else False
 
         if self.eligible_for_high_load_trigger:
             self.set_high_relative_load_session(athlete_stats)
             self.high_relative_intensity_session = self.process_training_sessions_intensity()
 
         self.set_muscular_strain_high(athlete_stats)
+        #self.triggers = self.get_triggers()
 
     def set_muscular_strain_high(self, athlete_stats):
 
-        if len(athlete_stats.muscular_strain) > 0:
+        if athlete_stats is not None and len(athlete_stats.muscular_strain) > 0:
             athlete_stats.muscular_strain.sort(key=lambda x: x.date, reverse=True)
             if athlete_stats.muscular_strain[0].value < 50.0:
                 self.muscular_strain_high = True
@@ -49,9 +50,11 @@ class TriggerFactory(object):
 
         return high_relative_intensity_session
 
-    def get_triggers(self):
+    def load_triggers(self):
 
         body_part_factory = BodyPartFactory()
+
+        self.triggers = []
 
         if self.high_relative_load_session or self.high_relative_intensity_session:
             goal = AthleteGoal("Expedite tissue regeneration", 1, AthleteGoalType.sport)
@@ -75,6 +78,7 @@ class TriggerFactory(object):
                 trigger.goals.append(goal)
                 trigger.body_part = BodyPartSide(soreness.body_part.location, soreness.side)
                 trigger.severity = soreness.severity
+                trigger.pain = False
                 self.triggers.append(trigger)
 
         if self.muscular_strain_high:
@@ -85,7 +89,9 @@ class TriggerFactory(object):
 
         for soreness in self.soreness_list:
 
-            days_diff = (self.event_date_time - soreness.first_reported_date_time).days
+            days_diff = None
+            if soreness.first_reported_date_time is not None:
+                days_diff = (self.event_date_time - soreness.first_reported_date_time).days
             body_part = body_part_factory.get_body_part(soreness.body_part)
 
             if self.eligible_for_high_load_trigger:
@@ -93,7 +99,7 @@ class TriggerFactory(object):
                       and soreness.historic_soreness_status is not HistoricSorenessStatus.doms
                       and not soreness.pain and (self.high_relative_load_session or self.high_relative_intensity_session)):
 
-                    if days_diff >= 30:
+                    if days_diff is not None and days_diff >= 30:
                         goal = AthleteGoal("Increase prevention efficacy", 1, AthleteGoalType.preempt_corrective)
                         # goal.trigger = "No Soreness Reported Today + Historic Soreness > 30d + logged hig vol/intensity"
                         for sport_name in self.high_relative_load_session_sport_names:
@@ -102,6 +108,7 @@ class TriggerFactory(object):
                             trigger.body_part = BodyPartSide(soreness.body_part.location, soreness.side)
                             trigger.severity = soreness.severity
                             trigger.sport_name = sport_name
+                            trigger.pain = False
                             self.triggers.append(trigger)
 
                 elif (soreness.daily and soreness.historic_soreness_status is not None and not soreness.is_dormant_cleared()
@@ -116,19 +123,23 @@ class TriggerFactory(object):
                         trigger.body_part = BodyPartSide(soreness.body_part.location, soreness.side)
                         trigger.severity = soreness.severity
                         trigger.sport_name = sport_name
+                        trigger.pain = True
+                        trigger.historic_soreness_status = soreness.historic_soreness_status
                         self.triggers.append(trigger)
 
                 elif (not soreness.daily and soreness.historic_soreness_status is not None and not soreness.is_dormant_cleared()
                       and soreness.historic_soreness_status is not HistoricSorenessStatus.doms
                       and not soreness.pain and (self.high_relative_load_session or self.high_relative_intensity_session)):
 
-                    if days_diff >= 30:
+                    if days_diff is not None and days_diff >= 30:
                         goal = AthleteGoal("Increase prevention efficacy", 1, AthleteGoalType.preempt_corrective)
                         # goal.trigger = "No Soreness Reported Today + Historic Soreness > 30d + logged hig vol/intensity"
                         trigger = Trigger(TriggerType.hist_sore_greater_30_no_sore_today_high_volume_intensity)  # 3
                         trigger.goals.append(goal)
                         trigger.body_part = BodyPartSide(soreness.body_part.location, soreness.side)
                         trigger.severity = soreness.severity
+                        trigger.pain = False
+                        trigger.historic_soreness_status = soreness.historic_soreness_status
                         self.triggers.append(trigger)
 
                 elif (not soreness.daily and soreness.historic_soreness_status is not None and not soreness.is_dormant_cleared()
@@ -140,6 +151,8 @@ class TriggerFactory(object):
                     trigger.goals.append(goal)
                     trigger.body_part = BodyPartSide(soreness.body_part.location, soreness.side)
                     trigger.severity = soreness.severity
+                    trigger.pain = True
+                    trigger.historic_soreness_status = soreness.historic_soreness_status
                     self.triggers.append(trigger)
 
                 elif (not soreness.daily and soreness.historic_soreness_status is not None and not soreness.is_dormant_cleared()
@@ -153,12 +166,16 @@ class TriggerFactory(object):
                         trigger.goals.append(goal)
                         trigger.body_part = BodyPartSide(soreness.body_part.location, soreness.side)
                         trigger.severity = soreness.severity
+                        trigger.pain = True
+                        trigger.historic_soreness_status = soreness.historic_soreness_status
                         self.triggers.append(trigger)
                     elif soreness.is_acute_pain():
                         trigger = Trigger(TriggerType.acute_pain_no_pain_today_high_volume_intensity)
                         trigger.goals.append(goal)
                         trigger.body_part = BodyPartSide(soreness.body_part.location, soreness.side)
                         trigger.severity = soreness.severity
+                        trigger.pain = True
+                        trigger.historic_soreness_status = soreness.historic_soreness_status
                         self.triggers.append(trigger)
             else:
                 goal = AthleteGoal(None, 1, AthleteGoalType.sport)
@@ -172,24 +189,30 @@ class TriggerFactory(object):
 
                 if soreness.historic_soreness_status == HistoricSorenessStatus.doms:
                     trigger = Trigger(TriggerType.sore_today_doms)  # 11
+                    trigger.historic_soreness_status = soreness.historic_soreness_status
 
                 elif ((soreness.is_persistent_soreness() or
                        soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_soreness) and
                       (self.event_date_time - soreness.first_reported_date_time).days < 30):
                     trigger = Trigger(TriggerType.hist_sore_less_30_sore_today)  # 12
+                    trigger.historic_soreness_status = soreness.historic_soreness_status
 
                 elif ((soreness.is_persistent_soreness() or
                        soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_soreness) and
                       (self.event_date_time - soreness.first_reported_date_time).days >= 30):
 
                     trigger = Trigger(TriggerType.hist_sore_greater_30_sore_today)  # 13
+                    trigger.historic_soreness_status = soreness.historic_soreness_status
+
                 else:  # somehow missed doms
                     trigger = Trigger(TriggerType.sore_today)  # 10
+                    trigger.historic_soreness_status = soreness.historic_soreness_status
 
                 if body_part is not None:
                     trigger.goals.append(goal)
                     trigger.body_part = BodyPartSide(soreness.body_part.location, soreness.side)
                     trigger.severity = soreness.severity
+                    trigger.pain = False
                     self.triggers.append(trigger)
 
             if (soreness.historic_soreness_status is not None and soreness.first_reported_date_time is not None and
@@ -205,6 +228,8 @@ class TriggerFactory(object):
                         trigger.body_part = BodyPartSide(soreness.body_part.location, soreness.side)
                         trigger.severity = soreness.severity
                         trigger.goals.append(goal)
+                        trigger.pain = True
+                        trigger.historic_soreness_status = soreness.historic_soreness_status
                         self.triggers.append(trigger)
 
             if soreness.historic_soreness_status is not None and soreness.first_reported_date_time is not None \
@@ -221,12 +246,14 @@ class TriggerFactory(object):
                         trigger.severity = soreness.severity
                         trigger.body_part = BodyPartSide(soreness.body_part.location, soreness.side)
                         trigger.goals.append(goal)
+                        trigger.pain = False
+                        trigger.historic_soreness_status = soreness.historic_soreness_status
                         self.triggers.append(trigger)
 
                 elif ((soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_pain or soreness.is_persistent_pain())
                       and not soreness.daily):
                     goal = AthleteGoal("Increase prevention efficacy", 1, AthleteGoalType.preempt_corrective)
-                    if days_diff < 30:
+                    if days_diff is not None and days_diff < 30:
                         trigger = Trigger(TriggerType.pers_pers2_pain_less_30_no_pain_today)  # 21
 
                     else:
@@ -234,6 +261,8 @@ class TriggerFactory(object):
                     trigger.goals.append(goal)
                     trigger.body_part = BodyPartSide(soreness.body_part.location, soreness.side)
                     trigger.severity = soreness.severity
+                    trigger.pain = True
+                    trigger.historic_soreness_status = soreness.historic_soreness_status
                     self.triggers.append(trigger)
 
             if soreness.daily and soreness.pain:
@@ -246,20 +275,25 @@ class TriggerFactory(object):
                     if (not soreness.is_acute_pain() and not soreness.is_persistent_pain() and
                             soreness.historic_soreness_status is not HistoricSorenessStatus.persistent_2_pain):
                         trigger = Trigger(TriggerType.no_hist_pain_pain_today_severity_1_2)  # 14
+
                     else:
                         trigger = Trigger(TriggerType.hist_pain_pain_today_severity_1_2)  # 23
+
                 else:
                     if (not soreness.is_acute_pain() and not soreness.is_persistent_pain() and
                             soreness.historic_soreness_status is not HistoricSorenessStatus.persistent_2_pain):
                         trigger = Trigger(TriggerType.no_hist_pain_pain_today_high_severity_3_5)  # 15
+
                     else:
                         trigger = Trigger(TriggerType.hist_pain_pain_today_severity_3_5)  # 24
 
                 if body_part is not None:
                     trigger.goals.append(goal)
                     trigger.body_part = BodyPartSide(soreness.body_part.location, soreness.side)
+                    trigger.pain = True
+                    trigger.historic_soreness_status = soreness.historic_soreness_status
+                    trigger.severity = soreness.severity
                     self.triggers.append(trigger)
 
-        return self.triggers
 
 

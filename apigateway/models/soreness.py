@@ -1,7 +1,7 @@
 from enum import Enum, IntEnum
 
 from models.exercise import Exercise, UnitOfMeasure
-from models.trigger import TriggerType
+#from models.trigger import TriggerType
 from serialisable import Serialisable
 from random import shuffle
 import datetime
@@ -153,7 +153,7 @@ class Soreness(BaseSoreness, Serialisable):
                 return False
         except AttributeError:
             return False
-    '''
+    
     def is_joint(self):
         if (self.body_part.location == BodyPartLocation.shoulder or
                 self.body_part.location == BodyPartLocation.hip_flexor or
@@ -186,6 +186,7 @@ class Soreness(BaseSoreness, Serialisable):
             return True
         else:
             return False
+    '''
 
     def json_serialise(self, api=False, daily=False, trigger=False):
         if api:
@@ -676,7 +677,7 @@ class AthleteGoal(object):
         self.text = text
         self.goal_type = athlete_goal_type
         self.priority = priority
-        self.trigger_type = None
+        #self.trigger_type = None
 
     def display_order(self):
 
@@ -705,7 +706,7 @@ class AthleteGoal(object):
         ret = {
             'text': self.text,
             'priority': self.priority,
-            'trigger_type': self.trigger_type.value if self.trigger_type is not None else None,
+            #'trigger_type': self.trigger_type.value if self.trigger_type is not None else None,
             'goal_type': self.goal_type.value if self.goal_type is not None else None
         }
         return ret
@@ -715,8 +716,8 @@ class AthleteGoal(object):
         goal_type = input_dict.get('goal_type', None)
         athlete_goal_type = AthleteGoalType(goal_type) if goal_type is not None else None
         goal = cls(text=input_dict['text'], priority=input_dict['priority'], athlete_goal_type=athlete_goal_type)
-        trigger_type = input_dict.get('trigger_type', None)
-        goal.trigger_type = TriggerType(trigger_type) if trigger_type is not None else None
+        #trigger_type = input_dict.get('trigger_type', None)
+        #goal.trigger_type = TriggerType(trigger_type) if trigger_type is not None else None
         return goal
 
 

@@ -1,8 +1,61 @@
-from models.soreness import BodyPart, BodyPartLocation
+from models.soreness import BodyPart, BodyPartLocation, BodyPartSide
 from models.sport import SportName
 import random
 
+
 class BodyPartFactory(object):
+
+    def is_joint(self, body_part):
+
+        location = self.get_body_part_location(body_part)
+
+        if (location == BodyPartLocation.shoulder or
+                location == BodyPartLocation.hip_flexor or
+                location == BodyPartLocation.knee or
+                location == BodyPartLocation.ankle or
+                location == BodyPartLocation.foot or
+                location == BodyPartLocation.lower_back or
+                location == BodyPartLocation.elbow or
+                location == BodyPartLocation.wrist):
+            return True
+        else:
+            return False
+
+    def is_muscle(self, body_part):
+
+        location = self.get_body_part_location(body_part)
+
+        if (
+                location == BodyPartLocation.chest or
+                location == BodyPartLocation.abdominals or
+                location == BodyPartLocation.groin or
+                location == BodyPartLocation.quads or
+                location == BodyPartLocation.shin or
+                location == BodyPartLocation.outer_thigh or
+                location == BodyPartLocation.glutes or
+                location == BodyPartLocation.hamstrings or
+                location == BodyPartLocation.calves or
+                location == BodyPartLocation.achilles or
+                location == BodyPartLocation.upper_back_neck or
+                location == BodyPartLocation.lats or
+                location == BodyPartLocation.biceps or
+                location == BodyPartLocation.triceps):
+            return True
+        else:
+            return False
+
+    def get_body_part_location(self, body_part):
+
+        location = None
+
+        if isinstance(body_part, BodyPart):
+            location = body_part.location
+        elif isinstance(body_part, BodyPartSide):
+            location = body_part.body_part_location
+        elif isinstance(body_part, BodyPartLocation):
+            location = body_part
+        return location
+
     def get_progression_list(self, exercise):
 
         dict = {}
@@ -112,58 +165,60 @@ class BodyPartFactory(object):
 
     def get_body_part(self, body_part):
 
-        if body_part.location == BodyPartLocation.general:
+        location = self.get_body_part_location(body_part)
+
+        if location == BodyPartLocation.general:
             return self.get_general()
-        elif body_part.location == BodyPartLocation.abdominals:
+        elif location == BodyPartLocation.abdominals:
             return self.get_abdominals()
-        elif body_part.location == BodyPartLocation.achilles:
+        elif location == BodyPartLocation.achilles:
             return self.get_achilles()
-        elif body_part.location == BodyPartLocation.ankle:
+        elif location == BodyPartLocation.ankle:
             return self.get_ankle()
-        elif body_part.location == BodyPartLocation.biceps:
+        elif location == BodyPartLocation.biceps:
             return self.get_biceps()
-        elif body_part.location == BodyPartLocation.calves:
+        elif location == BodyPartLocation.calves:
             return self.get_calves()
-        elif body_part.location == BodyPartLocation.chest:
+        elif location == BodyPartLocation.chest:
             return self.get_chest()
-        elif body_part.location == BodyPartLocation.elbow:
+        elif location == BodyPartLocation.elbow:
             return self.get_elbow()
-        elif body_part.location == BodyPartLocation.foot:
+        elif location == BodyPartLocation.foot:
             return self.get_foot()
-        elif body_part.location == BodyPartLocation.glutes:
+        elif location == BodyPartLocation.glutes:
             return self.get_glutes()
-        elif body_part.location == BodyPartLocation.groin:
+        elif location == BodyPartLocation.groin:
             return self.get_groin()
-        elif body_part.location == BodyPartLocation.hamstrings:
+        elif location == BodyPartLocation.hamstrings:
             return self.get_hamstrings()
-        elif body_part.location == BodyPartLocation.hip_flexor:
+        elif location == BodyPartLocation.hip_flexor:
             return self.get_hip()
-        elif body_part.location == BodyPartLocation.knee:
+        elif location == BodyPartLocation.knee:
             return self.get_knee()
-        elif body_part.location == BodyPartLocation.lats:
+        elif location == BodyPartLocation.lats:
             return self.get_lats()
-        elif body_part.location == BodyPartLocation.lower_back:
+        elif location == BodyPartLocation.lower_back:
             return self.get_lower_back()
-        elif body_part.location == BodyPartLocation.outer_thigh:
+        elif location == BodyPartLocation.outer_thigh:
             return self.get_outer_thigh()
-        elif body_part.location == BodyPartLocation.quads:
+        elif location == BodyPartLocation.quads:
             return self.get_quads()
-        elif body_part.location == BodyPartLocation.shin:
+        elif location == BodyPartLocation.shin:
             return self.get_shin()
-        elif body_part.location == BodyPartLocation.triceps:
+        elif location == BodyPartLocation.triceps:
             return self.get_triceps()
-        elif body_part.location == BodyPartLocation.shoulder:
+        elif location == BodyPartLocation.shoulder:
             return self.get_shoulder()
-        elif body_part.location == BodyPartLocation.upper_back_neck:
+        elif location == BodyPartLocation.upper_back_neck:
             return self.get_upper_back_traps_neck()
-        elif body_part.location == BodyPartLocation.wrist:
+        elif location == BodyPartLocation.wrist:
             return self.get_wrist()
 
-        elif body_part.location == BodyPartLocation.lower_body:
+        elif location == BodyPartLocation.lower_body:
             return self.get_lower_body()
-        elif body_part.location == BodyPartLocation.upper_body:
+        elif location == BodyPartLocation.upper_body:
             return self.get_upper_body()
-        elif body_part.location == BodyPartLocation.full_body:
+        elif location == BodyPartLocation.full_body:
             return self.get_full_body()
 
     def get_constituent_exercises(self, primary_body_part, constituent_body_parts, soreness):

@@ -170,7 +170,8 @@ class DailyPlan(Serialisable):
                 alerts.extend(self.ice.alerts)
             if self.cold_water_immersion is not None:
                 alerts.extend(self.cold_water_immersion.alerts)
-        return [alert for alert in alerts if alert.goal.trigger_type != TriggerType.sore_today]
+        #return [alert for alert in alerts if alert.goal.trigger_type != TriggerType.sore_today]
+        return []
 
     def sort_insights(self):
         self.insights = sorted(self.insights, key=lambda x: (int(x.read), x.priority, int(x.cleared)))

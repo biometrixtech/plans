@@ -5,6 +5,7 @@ xray_recorder.begin_segment(name="test")
 
 import pytest
 from logic.training_plan_management import TrainingPlanManager
+from models.body_parts import BodyPartFactory
 from models.session import SportTrainingSession
 from models.historic_soreness import HistoricSoreness
 from models.stats import AthleteStats
@@ -120,8 +121,9 @@ def create_plan(test_parameter, body_part_list, severity_list, side_list, pain_l
     daily_plan_datastore = DailyPlanDatastore()
     athlete_stats_datastore = AthleteStatsDatastore()
     athlete_stats.historic_soreness = historic_soreness_list
+    body_part_factory = BodyPartFactory()
     for s in survey.soreness:
-        if not s.pain and not s.is_joint():
+        if not s.pain and not body_part_factory.is_joint(s.body_part):
             athlete_stats.update_delayed_onset_muscle_soreness(s)
     athlete_stats_datastore.side_load_athlete_stats(athlete_stats)
 
