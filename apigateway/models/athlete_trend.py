@@ -308,29 +308,29 @@ class TrendCategory(object):
 
     def check_no_trend(self):
         data_sources = [alert.data_source for alert in self.alerts]
-        # if self.insight_type == InsightType.stress:
-        #     if DataSource.training_volume not in data_sources:
-        #         trend = Trend(TriggerType(201))
-        #         trend.add_data()
-        #         self.alerts.append(trend)
-        # elif self.insight_type == InsightType.response:
-        #     if DataSource.soreness not in data_sources:
-        #         trend = Trend(TriggerType(202))
-        #         trend.add_data()
-        #         self.alerts.append(trend)
-        #     if DataSource.pain not in data_sources:
-        #         trend = Trend(TriggerType(203))
-        #         trend.add_data()
-        #         self.alerts.append(trend)
-        # elif self.insight_type == InsightType.biomechanics:
-        #     if DataSource.soreness not in data_sources:
-        #         trend = Trend(TriggerType(205))
-        #         trend.add_data()
-        #         self.alerts.append(trend)
-        #     if DataSource.pain not in data_sources:
-        #         trend = Trend(TriggerType(206))
-        #         trend.add_data()
-        #         self.alerts.append(trend)
+        if self.insight_type == InsightType.stress:
+            if DataSource.training_volume not in data_sources:
+                trend = Trend(TriggerType(201))
+                trend.add_data()
+                self.alerts.append(trend)
+        elif self.insight_type == InsightType.response:
+            if DataSource.soreness not in data_sources:
+                trend = Trend(TriggerType(202))
+                trend.add_data()
+                self.alerts.append(trend)
+            if DataSource.pain not in data_sources:
+                trend = Trend(TriggerType(203))
+                trend.add_data()
+                self.alerts.append(trend)
+        elif self.insight_type == InsightType.biomechanics:
+            if DataSource.soreness not in data_sources:
+                trend = Trend(TriggerType(205))
+                trend.add_data()
+                self.alerts.append(trend)
+            if DataSource.pain not in data_sources:
+                trend = Trend(TriggerType(206))
+                trend.add_data()
+                self.alerts.append(trend)
 
     def sort_trends(self):
         self.alerts = sorted(self.alerts, key=lambda x: (x.priority, int(x.cleared)))
@@ -471,9 +471,10 @@ class AthleteTrends(object):
         self.biomechanics.get_cta()
 
     def add_no_trigger(self):
-        self.stress.check_no_trend()
-        self.response.check_no_trend()
-        self.biomechanics.check_no_trend()
+        #self.stress.check_no_trend()
+        #self.response.check_no_trend()
+        #self.biomechanics.check_no_trend()
+        pass
 
     def sort_by_priority(self):
         self.stress.sort_trends()

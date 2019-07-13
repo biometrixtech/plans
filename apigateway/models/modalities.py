@@ -877,14 +877,14 @@ class ActiveRest(ModalityBase):
                 # Note: this is just returning the primary mover related exercises for sport
                 if body_part is not None: #and not prohibiting_soreness:
                     self.copy_exercises(body_part.inhibit_exercises,
-                                        self.inhibit_exercises, goal, "1", None, exercise_library)
+                                        self.inhibit_exercises, goal, "1", trigger_list[t], exercise_library)
                     #if not prohibiting_soreness:
                     if max_severity < 3.5:
                         self.copy_exercises(body_part.static_stretch_exercises,
-                                            self.static_stretch_exercises, goal, "1", None, exercise_library, sports)
+                                            self.static_stretch_exercises, goal, "1", trigger_list[t], exercise_library, sports)
                     if max_severity < 2.5:
                         self.copy_exercises(body_part.isolated_activate_exercises,
-                                        self.isolated_activate_exercises, goal, "1", None, exercise_library, sports)
+                                        self.isolated_activate_exercises, goal, "1", trigger_list[t], exercise_library, sports)
 
                 self.check_reactive_recover_from_sport_general(sports, exercise_library, goal, max_severity)
 
@@ -1083,7 +1083,7 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
         if trigger.trigger_type in [TriggerType.sore_today,
                                     TriggerType.sore_today_doms,
                                     TriggerType.hist_sore_less_30_sore_today,
-                                    TriggerType.hist_sore_greater_30_sore_today]:
+                                    TriggerType.hist_sore_greater_30_sore_today]:  # 10, 11, 12, 13
 
             body_part = body_part_factory.get_body_part(trigger.body_part)
 
@@ -1153,9 +1153,6 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
                 # alert.body_part = trigger.body_part
                 # self.alerts.append(alert)
                 if max_severity < 3:
-                    #for a in body_part.agonists:
-                    #    agonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None))
-                    #    if agonist is not None:
                     self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1", trigger, exercise_library)
                     self.copy_exercises(body_part.static_stretch_exercises, self.static_stretch_exercises, goal, "1", trigger, exercise_library)
 
@@ -1268,7 +1265,7 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
                                     TriggerType.hist_pain_pain_today_severity_3_5]:  # 14, 15, 23, 24
 
             body_part = body_part_factory.get_body_part(trigger.body_part)
-            #
+
             goal = AthleteGoal("Care for pain", 1, AthleteGoalType.pain)
             if body_part is not None:
                 # alert = Alert(goal)
@@ -1415,7 +1412,6 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
 
         goal = AthleteGoal("Expedite tissue regeneration", 1, AthleteGoalType.sport)
         # goal.trigger = "High Relative Volume or Intensity of Logged Session"
-        goal.trigger_type = TriggerType.high_volume_intensity  # 0
 
         body_part_factory = BodyPartFactory()
 

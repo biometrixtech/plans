@@ -103,13 +103,15 @@ class ExerciseAssignmentCalculator(object):
             #     days_diff = (self.event_date_time - s.first_reported_date_time).days
             #
             #     if not s.pain and days_diff >= 30:
-            if t.trigger_type in [TriggerType.hist_sore_greater_30, TriggerType.pers_pers2_pain_less_30_no_pain_today, TriggerType.pers_pers2_pain_greater_30_no_pain_today] and 1.5 <= t.severity <= 5:
+            if t.trigger_type in [TriggerType.hist_sore_greater_30,
+                                  TriggerType.pers_pers2_pain_less_30_no_pain_today,
+                                  TriggerType.pers_pers2_pain_greater_30_no_pain_today] and 1.5 <= t.severity <= 5:
                 if t.trigger_type == TriggerType.hist_sore_greater_30: # 19
                     if 1.5 <= t.severity < 3.5:
                         minutes.append(10)
                     else:
                         minutes.append(15)
-                    heat = Heat(body_part_location=t.body_part.body_part_location, side=t.body_part.side)
+                    #heat = Heat(body_part_location=t.body_part.body_part_location, side=t.body_part.side)
                     #goal.trigger = "Pers, Pers-2 Soreness > 30d"
                     #goal.trigger_type = TriggerType.hist_sore_greater_30  # 19
 
@@ -155,7 +157,7 @@ class ExerciseAssignmentCalculator(object):
 
     def get_pre_active_rest(self, force_data=False):
 
-        if (len(self.soreness_list) > 0 or self.muscular_strain_high
+        if (len(self.trigger_list) > 0 or len(self.soreness_list) > 0 or self.muscular_strain_high
                 or self.high_relative_load_session or self.high_relative_intensity_session or force_data):
             active_rest = ActiveRestBeforeTraining(self.event_date_time, force_data)
             active_rest.fill_exercises(self.trigger_list, self.exercise_library, self.high_relative_load_session,
@@ -174,7 +176,7 @@ class ExerciseAssignmentCalculator(object):
 
     def get_post_active_rest(self, force_data=False):
 
-        if (len(self.soreness_list) > 0 or self.muscular_strain_high
+        if (len(self.trigger_list) > 0 or len(self.soreness_list) > 0 or self.muscular_strain_high
                 or self.high_relative_load_session or self.high_relative_intensity_session or force_data):
             active_rest = ActiveRestAfterTraining(self.event_date_time, force_data)
             active_rest.fill_exercises(self.trigger_list, self.exercise_library,self.high_relative_load_session,
@@ -196,7 +198,7 @@ class ExerciseAssignmentCalculator(object):
         # warm_up = None
 
         if (self.muscular_strain_high or self.high_relative_load_session
-                or len(self.soreness_list) > 0):
+                or len(self.soreness_list) > 0 or len(self.trigger_list) > 0):
             warm_up = WarmUp(self.event_date_time)
             warm_up.fill_exercises(self.trigger_list, self.exercise_library, self.high_relative_load_session,
                                    self.high_relative_intensity_session, self.muscular_strain_high,
@@ -291,7 +293,7 @@ class ExerciseAssignmentCalculator(object):
             #         HistoricSorenessStatus.persistent_2_soreness) and s.first_reported_date_time is not None):
             #     days_diff = (self.event_date_time - s.first_reported_date_time).days
             #     if days_diff >= 30 and s.severity >= 1.5:
-            elif t.trigger_type == TriggerType.hist_sore_greater_30_sore_today: # 13
+            elif t.trigger_type == TriggerType.hist_sore_greater_30_sore_today and t.severity >= 1.5: # 13
                 goal = AthleteGoal("Care for soreness", 1, AthleteGoalType.sore)
                 #goal.trigger = "Soreness Reported Today + Pers, Pers-2 Soreness > 30d"
                 #goal.trigger_type = TriggerType.hist_sore_greater_30_sore_today # 13
@@ -378,7 +380,8 @@ class ExerciseAssignmentCalculator(object):
             # elif (not s.daily and s.historic_soreness_status is not None and not s.is_dormant_cleared()
             #       and s.historic_soreness_status is not HistoricSorenessStatus.doms
             #       and s.severity >= 1.5 and s.pain and (self.high_relative_load_session or self.high_relative_intensity_session)):
-            elif t.trigger_type in [TriggerType.pers_pers2_pain_no_pain_sore_today_high_volume_intensity,TriggerType.acute_pain_no_pain_today_high_volume_intensity] and t.severity >= 1.5:  # 5
+            elif t.trigger_type in [TriggerType.pers_pers2_pain_no_pain_sore_today_high_volume_intensity,
+                                    TriggerType.acute_pain_no_pain_today_high_volume_intensity] and t.severity >= 1.5:  # 5
                 goal = AthleteGoal("Increase prevention efficacy", 1, AthleteGoalType.preempt_corrective)
                 #if s.is_persistent_pain() or s.historic_soreness_status == HistoricSorenessStatus.persistent_2_pain:
                 if t.trigger_type == TriggerType.pers_pers2_pain_no_pain_sore_today_high_volume_intensity:  # 5
@@ -452,7 +455,8 @@ class ExerciseAssignmentCalculator(object):
         for t in self.trigger_list:
             # if self.is_lower_body_part(s.body_part.location) and s.daily and s.severity >= 3.5:
             #     if s.pain:
-            if t.trigger_type in [TriggerType.no_hist_pain_pain_today_severity_1_2, TriggerType.no_hist_pain_pain_today_high_severity_3_5]: #14, 15
+            if t.trigger_type in [TriggerType.no_hist_pain_pain_today_severity_1_2,
+                                  TriggerType.no_hist_pain_pain_today_high_severity_3_5]: #14, 15
                 if self.is_lower_body_part(t.body_part.body_part_location) and t.severity >= 3.5:
                     goal = AthleteGoal("Care for pain", 1, AthleteGoalType.pain)
                     #goal.trigger = "Pain Reported Today"

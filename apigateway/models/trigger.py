@@ -6,7 +6,6 @@ class Trigger(BaseSoreness):
     def __init__(self, trigger_type):
         super().__init__()
         self.trigger_type = trigger_type
-        self.goals = []
         self.body_part = None
         self.sport_name = None
         self.severity = None
