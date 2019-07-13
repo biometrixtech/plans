@@ -7,6 +7,8 @@ class Trigger(BaseSoreness):
         super().__init__()
         self.trigger_type = trigger_type
         self.body_part = None
+        self.antagonists = []
+        self.synergists = []
         self.sport_name = None
         self.severity = None
         self.pain = None

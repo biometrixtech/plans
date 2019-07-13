@@ -70,8 +70,13 @@ class TriggerFactory(object):
         if len(hist_soreness) > 0:
 
             for soreness in hist_soreness:
+
+                body_part = body_part_factory.get_body_part(soreness.body_part)
+
                 trigger = Trigger(TriggerType.hist_sore_less_30)  # 7
                 trigger.body_part = BodyPartSide(soreness.body_part.location, soreness.side)
+                trigger.antagonists = body_part.antagonists
+                trigger.synergists = body_part.synergists
                 trigger.severity = soreness.severity
                 trigger.pain = False
                 self.triggers.append(trigger)
@@ -214,6 +219,8 @@ class TriggerFactory(object):
                         trigger = Trigger(TriggerType.hist_sore_greater_30)  # 19
                         trigger.severity = soreness.severity
                         trigger.body_part = BodyPartSide(soreness.body_part.location, soreness.side)
+                        trigger.antagonists = body_part.antagonists
+                        trigger.synergists = body_part.synergists
                         trigger.pain = False
                         trigger.historic_soreness_status = soreness.historic_soreness_status
                         self.triggers.append(trigger)

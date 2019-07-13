@@ -129,6 +129,7 @@ class Trend(object):
         self.cleared = False
         self.longitudinal = False
 
+
     def json_serialise(self):
         ret = {
             'trigger_type': self.trigger_type.value,
@@ -277,6 +278,8 @@ class TrendCategory(object):
         self.goals = set()
         self.cta = []
         self.alerts = []
+        self.title = ""
+        self.trends = []
 
     def json_serialise(self):
         ret = {
@@ -375,6 +378,7 @@ class TrendData(object):
     def __init__(self):
         self.lockout = False
         self.status = DataStatus()
+        self.text = ""
         self.data = []
         self.visualization_type = VisualizationType(7)
         self.visualization_title = VisualizationTitle()
@@ -440,6 +444,7 @@ class AthleteTrends(object):
         self.biomechanics = TrendCategory(InsightType.biomechanics)
         self.body_response = TrendData()
         self.workload = TrendData()
+        self.trend_categories = []
 
     def json_serialise(self):
         ret = {
