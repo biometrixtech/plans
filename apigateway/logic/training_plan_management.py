@@ -78,13 +78,14 @@ class TrainingPlanManager(object):
                                                                                self.trigger_date_time,
                                                                                historic_soreness)
 
-        trigger_factory = TriggerFactory(parse_date(event_date), athlete_stats, self.soreness_list, self.training_sessions)
+        trigger_factory = TriggerFactory(parse_date(event_date), self.athlete_stats, self.soreness_list, self.training_sessions)
         trigger_factory.load_triggers()
+        self.athlete_stats.triggers = trigger_factory.triggers
 
         calc = exercise_mapping.ExerciseAssignmentCalculator(trigger_factory, self.exercise_library_datastore,
                                                              self.completed_exercise_datastore,
                                                              self.training_sessions, self.soreness_list,
-                                                             parse_date(event_date), athlete_stats.historic_soreness)
+                                                             parse_date(event_date), historic_soreness)
 
         # new modalities
         if not self.daily_plan.train_later:

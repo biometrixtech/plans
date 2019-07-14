@@ -1,8 +1,11 @@
 from enum import IntEnum
-from models.soreness import BaseSoreness
+from models.soreness import BaseSoreness, BodyPartSide
+from models.sport import SportName
+from serialisable import Serialisable
+from utils import format_datetime, parse_datetime
 
 
-class Trigger(BaseSoreness):
+class Trigger(BaseSoreness, Serialisable):
     def __init__(self, trigger_type):
         super().__init__()
         self.trigger_type = trigger_type
@@ -13,6 +16,49 @@ class Trigger(BaseSoreness):
         self.severity = None
         self.pain = None
         self.historic_soreness_status = None
+        self.created_date_time = None
+        self.modified_date_time = None
+        self.deleted_date_time = None
+
+    def json_serialise(self):
+        return {
+            "trigger_type": self.trigger_type.value,
+            "body_part": self.body_part.json_serialise() if self.body_part is not None else None,
+            "antagonists": self.antagonists if self.antagonists is not None else [],
+            "synergists": self.synergists if self.synergists is not None else [],
+            "sport_name": self.sport_name.value if self.sport_name is not None else None,
+            "severity": self.severity,
+            "pain": self.pain,
+            "historic_soreness_status": self.historic_soreness_status.value if self.historic_soreness_status is not None else None,
+            "created_date_time" : format_datetime(
+                self.created_date_time) if self.created_date_time is not None else None,
+            "modified_date_time": format_datetime(
+                self.modified_date_time) if self.modified_date_time is not None else None,
+            "deleted_date_time": format_datetime(
+                self.deleted_date_time) if self.deleted_date_time is not None else None
+        }
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        trigger = cls(Trigger.json_deserialise(input_dict['trigger_type']))
+        trigger.body_part = BodyPartSide.json_deserialise(input_dict['body_part']) if input_dict['body_part'] is not None else None
+        trigger.antagonists = [a for a in input_dict['antagonists']]
+        trigger.synergists = [s for s in input_dict['synergists']]
+        trigger.sport_name = input_dict['sport_name']
+        trigger.severity = input_dict['severity']
+        trigger.pain = input_dict['pain']
+        trigger.historic_soreness_status = input_dict['historic_soreness_status']
+        trigger.created_date_time = parse_datetime(input_dict["created_date_time"]) if input_dict["created_date_time"] is not None else None
+        trigger.modified_date_time = parse_datetime(input_dict["modified_date_time"]) if input_dict[
+                                                                                         "modified_date_time"] is not None else None
+        trigger.deleted_date_time = parse_datetime(input_dict["deleted_date_time"]) if input_dict[
+                                                                                         "deleted_date_time"] is not None else None
+        return trigger
+
+    def __setattr__(self, name, value):
+        if name == "sport_name" and not isinstance(value, SportName) and value is not None:
+            value = SportName(value)
+        super().__setattr__(name, value)
 
 
 class TriggerType(IntEnum):

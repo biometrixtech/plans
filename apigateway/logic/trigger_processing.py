@@ -6,7 +6,7 @@ from models.trigger import Trigger, TriggerType
 class TriggerFactory(object):
     def __init__(self, event_date_time, athlete_stats, soreness_list, training_sessions):
         self.event_date_time = event_date_time
-        self.triggers = []
+        self.triggers = athlete_stats.triggers if athlete_stats is not None and athlete_stats.triggers is not None else []
         self.high_relative_load_session = False
         self.high_relative_intensity_session = False
         self.high_relative_load_session_sport_names = set()
@@ -49,18 +49,80 @@ class TriggerFactory(object):
 
         return high_relative_intensity_session
 
-    def load_triggers(self):
+    def set_trigger(self, trigger_type, soreness=None, sport_name=None):
 
-        body_part_factory = BodyPartFactory()
+        trigger_index = -1
+
+        if soreness is None and sport_name is None:
+
+            trigger_index = next((i for i, x in enumerate(self.triggers) if trigger_type == x.trigger_type), -1)
+
+        elif soreness is not None and sport_name is None:
+
+            body_part = BodyPartSide(soreness.body_part.location, soreness.side)
+
+            trigger_index = next((i for i, x in enumerate(self.triggers) if trigger_type == x.trigger_type and
+                                  body_part.body_part_location == x.body_part.body_part_location and
+                                  body_part.side == x.body_part.side and
+                                  soreness.pain == x.pain and
+                                  soreness.historic_soreness_status == x.historic_soreness_status), -1)
+
+        elif soreness is not None and sport_name is not None:
+
+            body_part = BodyPartSide(soreness.body_part.location, soreness.side)
+
+            trigger_index = next((i for i, x in enumerate(self.triggers) if trigger_type == x.trigger_type and
+                                  body_part.body_part_location == x.body_part.body_part_location and
+                                  body_part.side == x.body_part.side and
+                                  soreness.pain == x.pain and
+                                  soreness.historic_soreness_status == x.historic_soreness_status and
+                                  sport_name == x.sport_name), -1)
+
+        elif sport_name is not None:
+
+            trigger_index = next((i for i, x in enumerate(self.triggers) if trigger_type == x.trigger_type and
+                                  sport_name == x.sport_name), -1)
+
+        if trigger_index > -1:
+
+            if self.triggers[trigger_index].deleted_date_time is not None:
+                self.triggers[trigger_index].deleted_date_time = None
+                self.triggers[trigger_index].created_date_time = self.event_date_time
+            else:
+                self.triggers[trigger_index].modified_date_time = self.event_date_time
+
+            if soreness is not None:
+                self.triggers[trigger_index].severity = soreness.severity
+
+        else:
+
+            trigger = Trigger(trigger_type)
+            trigger.created_date_time = self.event_date_time
+
+            if soreness is not None:
+                body_part_factory = BodyPartFactory()
+                body_part = body_part_factory.get_body_part(soreness.body_part)
+
+                body_part_side = BodyPartSide(soreness.body_part.location, soreness.side)
+
+                trigger.body_part = body_part_side
+                trigger.pain = soreness.pain
+                trigger.severity = soreness.severity
+                trigger.historic_soreness_status = soreness.historic_soreness_status
+                trigger.antagonists = body_part.antagonists
+                trigger.synergists = body_part.synergists
+
+            trigger.sport_name = sport_name
+            self.triggers.append(trigger)
+
+    def load_triggers(self):
 
         self.triggers = []
 
         if self.high_relative_load_session or self.high_relative_intensity_session:
 
             for sport_name in self.high_relative_load_session_sport_names:
-                trigger = Trigger(TriggerType.high_volume_intensity)  # 0
-                trigger.sport_name = sport_name
-                self.triggers.append(trigger)
+                self.set_trigger(TriggerType.high_volume_intensity, sport_name=sport_name)  # 0
 
         hist_soreness = list(s for s in self.soreness_list if not s.is_dormant_cleared() and not s.pain and
                              (s.is_persistent_soreness() or
@@ -70,27 +132,16 @@ class TriggerFactory(object):
         if len(hist_soreness) > 0:
 
             for soreness in hist_soreness:
-
-                body_part = body_part_factory.get_body_part(soreness.body_part)
-
-                trigger = Trigger(TriggerType.hist_sore_less_30)  # 7
-                trigger.body_part = BodyPartSide(soreness.body_part.location, soreness.side)
-                trigger.antagonists = body_part.antagonists
-                trigger.synergists = body_part.synergists
-                trigger.severity = soreness.severity
-                trigger.pain = False
-                self.triggers.append(trigger)
+                self.set_trigger(TriggerType.hist_sore_less_30, soreness=soreness)  # 7
 
         if self.muscular_strain_high:
-            trigger = Trigger(TriggerType.overreaching_high_muscular_strain)  # 8
-            self.triggers.append(trigger)
+            self.set_trigger(TriggerType.overreaching_high_muscular_strain)  # 8
 
         for soreness in self.soreness_list:
 
             days_diff = None
             if soreness.first_reported_date_time is not None:
                 days_diff = (self.event_date_time - soreness.first_reported_date_time).days
-            body_part = body_part_factory.get_body_part(soreness.body_part)
 
             if self.eligible_for_high_load_trigger:
                 if (soreness.daily and soreness.historic_soreness_status is not None and not soreness.is_dormant_cleared()
@@ -99,172 +150,103 @@ class TriggerFactory(object):
 
                     if days_diff is not None and days_diff >= 30:
                         for sport_name in self.high_relative_load_session_sport_names:
-                            trigger = Trigger(TriggerType.hist_sore_greater_30_high_volume_intensity)  # 1
-                            trigger.body_part = BodyPartSide(soreness.body_part.location, soreness.side)
-                            trigger.severity = soreness.severity
-                            trigger.sport_name = sport_name
-                            trigger.pain = False
-                            self.triggers.append(trigger)
+                            self.set_trigger(TriggerType.hist_sore_greater_30_high_volume_intensity, soreness=soreness, sport_name=sport_name)  # 1
 
                 elif (soreness.daily and soreness.historic_soreness_status is not None and not soreness.is_dormant_cleared()
                       and soreness.historic_soreness_status is not HistoricSorenessStatus.doms
                       and soreness.pain and (self.high_relative_load_session or self.high_relative_intensity_session)):
 
                     for sport_name in self.high_relative_load_session_sport_names:
-                        trigger = Trigger(TriggerType.hist_pain_high_volume_intensity)  # 2
-                        trigger.body_part = BodyPartSide(soreness.body_part.location, soreness.side)
-                        trigger.severity = soreness.severity
-                        trigger.sport_name = sport_name
-                        trigger.pain = True
-                        trigger.historic_soreness_status = soreness.historic_soreness_status
-                        self.triggers.append(trigger)
+                        self.set_trigger(TriggerType.hist_pain_high_volume_intensity, soreness=soreness, sport_name=sport_name)  # 2
 
                 elif (not soreness.daily and soreness.historic_soreness_status is not None and not soreness.is_dormant_cleared()
                       and soreness.historic_soreness_status is not HistoricSorenessStatus.doms
                       and not soreness.pain and (self.high_relative_load_session or self.high_relative_intensity_session)):
 
                     if days_diff is not None and days_diff >= 30:
-                        trigger = Trigger(TriggerType.hist_sore_greater_30_no_sore_today_high_volume_intensity)  # 3
-                        trigger.body_part = BodyPartSide(soreness.body_part.location, soreness.side)
-                        trigger.severity = soreness.severity
-                        trigger.pain = False
-                        trigger.historic_soreness_status = soreness.historic_soreness_status
-                        self.triggers.append(trigger)
+                        self.set_trigger(TriggerType.hist_sore_greater_30_no_sore_today_high_volume_intensity, soreness=soreness)  # 3
 
                 elif (not soreness.daily and soreness.historic_soreness_status is not None and not soreness.is_dormant_cleared()
                       and soreness.historic_soreness_status is not HistoricSorenessStatus.doms
                       and soreness.pain and soreness.is_acute_pain() and (self.high_relative_load_session or self.high_relative_intensity_session)):
 
-                    trigger = Trigger(TriggerType.acute_pain_no_pain_today_high_volume_intensity)  # 4
-                    trigger.body_part = BodyPartSide(soreness.body_part.location, soreness.side)
-                    trigger.severity = soreness.severity
-                    trigger.pain = True
-                    trigger.historic_soreness_status = soreness.historic_soreness_status
-                    self.triggers.append(trigger)
+                    self.set_trigger(TriggerType.acute_pain_no_pain_today_high_volume_intensity, soreness=soreness)  # 4
 
                 elif (not soreness.daily and soreness.historic_soreness_status is not None and not soreness.is_dormant_cleared()
                       and soreness.historic_soreness_status is not HistoricSorenessStatus.doms
                       and soreness.pain and (self.high_relative_load_session or self.high_relative_intensity_session)):
 
                     if soreness.is_persistent_pain() or soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_pain:
-                        # goal.trigger = "No Pain Reported Today + Acute, Pers, Pers-2 Pain"
-                        trigger = Trigger(TriggerType.pers_pers2_pain_no_pain_sore_today_high_volume_intensity)  # 5
-                        trigger.body_part = BodyPartSide(soreness.body_part.location, soreness.side)
-                        trigger.severity = soreness.severity
-                        trigger.pain = True
-                        trigger.historic_soreness_status = soreness.historic_soreness_status
-                        self.triggers.append(trigger)
+                        self.set_trigger(TriggerType.pers_pers2_pain_no_pain_sore_today_high_volume_intensity, soreness=soreness)  # 5
+
                     elif soreness.is_acute_pain():
-                        trigger = Trigger(TriggerType.acute_pain_no_pain_today_high_volume_intensity)
-                        trigger.body_part = BodyPartSide(soreness.body_part.location, soreness.side)
-                        trigger.severity = soreness.severity
-                        trigger.pain = True
-                        trigger.historic_soreness_status = soreness.historic_soreness_status
-                        self.triggers.append(trigger)
+                        self.set_trigger(TriggerType.acute_pain_no_pain_today_high_volume_intensity, soreness=soreness)
+
             else:
-                trigger = Trigger(TriggerType.not_enough_history_for_high_volume_intensity)  # 25
-                self.triggers.append(trigger)
+                self.set_trigger(TriggerType.not_enough_history_for_high_volume_intensity)  # 25
 
             if soreness.daily and not soreness.pain:
 
                 if soreness.historic_soreness_status == HistoricSorenessStatus.doms:
-                    trigger = Trigger(TriggerType.sore_today_doms)  # 11
-                    trigger.historic_soreness_status = soreness.historic_soreness_status
+                    self.set_trigger(TriggerType.sore_today_doms, soreness=soreness)  # 11
 
                 elif ((soreness.is_persistent_soreness() or
                        soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_soreness) and
                       (self.event_date_time - soreness.first_reported_date_time).days < 30):
-                    trigger = Trigger(TriggerType.hist_sore_less_30_sore_today)  # 12
-                    trigger.historic_soreness_status = soreness.historic_soreness_status
+                    self.set_trigger(TriggerType.hist_sore_less_30_sore_today,soreness=soreness)  # 12
 
                 elif ((soreness.is_persistent_soreness() or
                        soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_soreness) and
                       (self.event_date_time - soreness.first_reported_date_time).days >= 30):
 
-                    trigger = Trigger(TriggerType.hist_sore_greater_30_sore_today)  # 13
-                    trigger.historic_soreness_status = soreness.historic_soreness_status
+                    self.set_trigger(TriggerType.hist_sore_greater_30_sore_today, soreness=soreness)  # 13
 
                 else:  # somehow missed doms
-                    trigger = Trigger(TriggerType.sore_today)  # 10
-                    trigger.historic_soreness_status = soreness.historic_soreness_status
-
-                if body_part is not None:
-                    trigger.body_part = BodyPartSide(soreness.body_part.location, soreness.side)
-                    trigger.severity = soreness.severity
-                    trigger.pain = False
-                    self.triggers.append(trigger)
+                    self.set_trigger(TriggerType.sore_today, soreness=soreness)  # 10
 
             if (soreness.historic_soreness_status is not None and soreness.first_reported_date_time is not None and
                     (soreness.is_acute_pain() or soreness.is_persistent_pain() or
                      soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_pain)):
 
-                    body_part = body_part_factory.get_body_part(soreness.body_part)
-
-                    if body_part is not None:
-                        trigger = Trigger(TriggerType.hist_pain)  # 16
-                        trigger.body_part = BodyPartSide(soreness.body_part.location, soreness.side)
-                        trigger.severity = soreness.severity
-                        trigger.pain = True
-                        trigger.historic_soreness_status = soreness.historic_soreness_status
-                        self.triggers.append(trigger)
+                self.set_trigger(TriggerType.hist_pain, soreness=soreness)  # 16
 
             if soreness.historic_soreness_status is not None and soreness.first_reported_date_time is not None \
                     and not soreness.is_dormant_cleared() and soreness.historic_soreness_status is not HistoricSorenessStatus.doms:
 
                 if not soreness.pain and days_diff >= 30:
 
-                    body_part = body_part_factory.get_body_part(soreness.body_part)
-
-                    if body_part is not None:
-                        trigger = Trigger(TriggerType.hist_sore_greater_30)  # 19
-                        trigger.severity = soreness.severity
-                        trigger.body_part = BodyPartSide(soreness.body_part.location, soreness.side)
-                        trigger.antagonists = body_part.antagonists
-                        trigger.synergists = body_part.synergists
-                        trigger.pain = False
-                        trigger.historic_soreness_status = soreness.historic_soreness_status
-                        self.triggers.append(trigger)
+                    self.set_trigger(TriggerType.hist_sore_greater_30, soreness=soreness)  # 19
 
                 elif ((soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_pain or soreness.is_persistent_pain())
                       and not soreness.daily):
-                    goal = AthleteGoal("Increase prevention efficacy", 1, AthleteGoalType.preempt_corrective)
+
                     if days_diff is not None and days_diff < 30:
-                        trigger = Trigger(TriggerType.pers_pers2_pain_less_30_no_pain_today)  # 21
+                        self.set_trigger(TriggerType.pers_pers2_pain_less_30_no_pain_today, soreness=soreness)  # 21
 
                     else:
-                        trigger = Trigger(TriggerType.pers_pers2_pain_greater_30_no_pain_today)  # 22
-                    trigger.body_part = BodyPartSide(soreness.body_part.location, soreness.side)
-                    trigger.severity = soreness.severity
-                    trigger.pain = True
-                    trigger.historic_soreness_status = soreness.historic_soreness_status
-                    self.triggers.append(trigger)
+                        self.set_trigger(TriggerType.pers_pers2_pain_greater_30_no_pain_today,soreness=soreness)  # 22
 
             if soreness.daily and soreness.pain:
-
-                body_part = body_part_factory.get_body_part(soreness.body_part)
 
                 if soreness.severity < 3:
                     if (not soreness.is_acute_pain() and not soreness.is_persistent_pain() and
                             soreness.historic_soreness_status is not HistoricSorenessStatus.persistent_2_pain):
-                        trigger = Trigger(TriggerType.no_hist_pain_pain_today_severity_1_2)  # 14
+                        self.set_trigger(TriggerType.no_hist_pain_pain_today_severity_1_2,soreness=soreness)  # 14
 
                     else:
-                        trigger = Trigger(TriggerType.hist_pain_pain_today_severity_1_2)  # 23
+                        self.set_trigger(TriggerType.hist_pain_pain_today_severity_1_2, soreness=soreness)  # 23
 
                 else:
                     if (not soreness.is_acute_pain() and not soreness.is_persistent_pain() and
                             soreness.historic_soreness_status is not HistoricSorenessStatus.persistent_2_pain):
-                        trigger = Trigger(TriggerType.no_hist_pain_pain_today_high_severity_3_5)  # 15
+                        self.set_trigger(TriggerType.no_hist_pain_pain_today_high_severity_3_5, soreness=soreness)  # 15
 
                     else:
-                        trigger = Trigger(TriggerType.hist_pain_pain_today_severity_3_5)  # 24
+                        self.set_trigger(TriggerType.hist_pain_pain_today_severity_3_5,soreness=soreness)  # 24
 
-                if body_part is not None:
-                    trigger.body_part = BodyPartSide(soreness.body_part.location, soreness.side)
-                    trigger.pain = True
-                    trigger.historic_soreness_status = soreness.historic_soreness_status
-                    trigger.severity = soreness.severity
-                    self.triggers.append(trigger)
+        for t in self.triggers:
+            if t.created_date_time != self.event_date_time and t.modified_date_time != self.event_date_time:
+                t.deleted_date_time = self.event_date_time
 
 
 

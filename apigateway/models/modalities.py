@@ -853,13 +853,13 @@ class ActiveRest(ModalityBase):
         for t in range(0, len(trigger_list)):
             if trigger_list[t].trigger_type == TriggerType.hist_sore_less_30:  # 7
                 goal = AthleteGoal(None, 1, AthleteGoalType.sport)
-                trigger_list[t].goals.append(goal)
+                #trigger_list[t].goals.append(goal)
             elif trigger_list[t].trigger_type == TriggerType.overreaching_high_muscular_strain:  # 8
                 goal = AthleteGoal(None, 1, AthleteGoalType.sport)
-                trigger_list[t].goals.append(goal)
+                #trigger_list[t].goals.append(goal)
             elif trigger_list[t].trigger_type == TriggerType.high_volume_intensity:  # 0
                 goal = AthleteGoal("Expedite tissue regeneration", 1, AthleteGoalType.sport)
-                trigger_list[t].goals.append(goal)
+                #trigger_list[t].goals.append(goal)
                 body_part_factory = BodyPartFactory()
 
         # if high_relative_load_session or high_relative_intensity_logged:
@@ -1980,7 +1980,7 @@ class CoolDown(ModalityBase, Serialisable):
 
             elif trigger_list[t].trigger_type == TriggerType.high_volume_intensity and max_severity < 2.5:  # 0
                 goal = AthleteGoal(None, 1, AthleteGoalType.sport)
-                trigger_list[t].goals.append(goal)
+                #trigger_list[t].goals.append(goal)
 
         # if max_severity < 2.5:  # note this is only a pain value for cooldown
         #     if self.high_relative_volume_logged or self.high_relative_intensity_logged:
@@ -2012,14 +2012,14 @@ class CoolDown(ModalityBase, Serialisable):
             if trigger.trigger_type == TriggerType.hist_pain:
                 goal = AthleteGoal("Increase prevention efficacy", 1, AthleteGoalType.preempt_corrective)
                 #goal.trigger_type = TriggerType.hist_pain
-                trigger.goals.append(goal)
+                #trigger.goals.append(goal)
                 self.assign_exercises(trigger, goal, exercise_library)
 
             #elif (soreness.is_persistent_soreness() or soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_soreness and days_sore >= 30):
             elif trigger.trigger_type == TriggerType.hist_sore_greater_30:
                 goal = AthleteGoal("Increase prevention efficacy", 1, AthleteGoalType.preempt_corrective)
                 #goal.trigger_type = TriggerType.hist_sore_greater_30
-                trigger.goals.append(goal)
+                #trigger.goals.append(goal)
 
                 self.assign_exercises(trigger, goal, exercise_library)
 

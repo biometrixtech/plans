@@ -129,7 +129,6 @@ class Trend(object):
         self.cleared = False
         self.longitudinal = False
 
-
     def json_serialise(self):
         ret = {
             'trigger_type': self.trigger_type.value,
