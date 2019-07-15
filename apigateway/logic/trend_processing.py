@@ -28,8 +28,8 @@ class TrendProcessor(object):
         trend_category.title = "Movement Dysfunction or Compensation"
         tight_muscle_trend = self.get_tight_muscle_view()
         over_under_muscle_trend = self.get_overactive_underactive_muscle_view()
-        plan_alert = PlanAlert()
-        plan_alert.category = "Movement Dysfunction or Compensation"
+        plan_alert = PlanAlert(InsightType.movement_dysfunction_compensation)
+        plan_alert.title = "Movement Dysfunction or Compensation"
         if tight_muscle_trend is not None:
             trend_category.trends.append(tight_muscle_trend)
             plan_alert.views.append("1")
@@ -77,6 +77,7 @@ class TrendProcessor(object):
             tight_under_data.underactive_body_parts = [s for s in synergists]
             trend_data.data = [tight_under_data]
             trend_data.text = "This is a specific description of all your tight muscles..."
+            trend_data.title = "Trigger Specific Title"
             trend.trend_data = trend_data
             trend.last_date_time = self.get_latest_trigger_date_time(triggers)
             return trend
@@ -100,6 +101,7 @@ class TrendProcessor(object):
             over_under_data.underactive_body_parts = [a for a in antagonists]
             trend_data.data = [over_under_data]
             trend_data.text = "This is a specific description of all your o/u body parts..."
+            trend_data.title = "Trigger Specific Title"
             trend.trend_data = trend_data
             trend.last_date_time = self.get_latest_trigger_date_time(triggers)
             return trend

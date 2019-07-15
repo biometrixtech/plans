@@ -52,12 +52,14 @@ class Legend(object):
         self.color = LegendColor(0)
         self.type = LegendType(0)
         self.text = ""
+        self.series = ""
 
     def json_serialise(self):
         return {
             'color': self.color.value,
             'type': self.type.value,
-            'text': self.text
+            'text': self.text,
+            'series': self.series
         }
 
     @classmethod
@@ -66,6 +68,7 @@ class Legend(object):
         legend.color = LegendColor(input_dict['color'])
         legend.type = LegendType(input_dict['type'])
         legend.text = input_dict['text']
+        legend.series = input_dict['series']
         return legend
 
 
@@ -282,16 +285,19 @@ class CallToAction(object):
 
 
 class PlanAlert(Serialisable):
-    def __init__(self):
-        self.category = ""
+    def __init__(self, insight_type):
+        self.category = insight_type
         self.views = []
         self.text = ""
+        self.title = ""
 
     def json_serialise(self):
         return {
             'category': self.category,
             'views': [v for v in self.views],
-            'text': self.text
+            'text': self.text,
+            'title': self.title
+
         }
 
     @classmethod
@@ -300,6 +306,7 @@ class PlanAlert(Serialisable):
         plan_alert.category = input_dict['category']
         plan_alert.views = [v for v in input_dict.get('views', [])]
         plan_alert.text = input_dict['text']
+        plan_alert.title = input_dict['title']
         return plan_alert
 
 
@@ -417,6 +424,7 @@ class TrendData(object):
         self.lockout = False
         self.status = DataStatus()
         self.text = ""
+        self.title = ""
         self.data = []
         self.visualization_type = VisualizationType(7)
         self.visualization_title = VisualizationTitle()
