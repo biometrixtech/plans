@@ -1,5 +1,5 @@
 from models.athlete_trend import AthleteTrends, PlanAlert, Trend, TrendCategory, TrendData, VisualizationType
-from models.trigger import Trigger, TriggerType
+from models.trigger import TriggerType, Trigger
 from models.chart_data import OveractiveUnderactiveChartData, TightUnderactiveChartData
 from models.insights import InsightType
 

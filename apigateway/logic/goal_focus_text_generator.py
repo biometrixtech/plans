@@ -1,5 +1,6 @@
 from models.exercise import Phase
-from models.soreness import SorenessType, BodyPartLocation
+from models.soreness import SorenessType
+from models.soreness_base import BodyPartLocation
 from logic.soreness_processing import BodyPartMapping
 
 

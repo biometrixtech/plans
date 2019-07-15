@@ -8,7 +8,8 @@ from fathomapi.utils.decorators import require
 from fathomapi.utils.exceptions import InvalidSchemaException
 from fathomapi.utils.xray import xray_recorder
 from models.daily_readiness import DailyReadiness
-from models.soreness import MuscleSorenessSeverity, BodyPartLocation
+from models.soreness import MuscleSorenessSeverity
+from models.soreness_base import BodyPartLocation
 from models.stats import AthleteStats
 from models.daily_plan import DailyPlan
 from models.sleep_data import DailySleepData, SleepEvent

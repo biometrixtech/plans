@@ -1,5 +1,7 @@
 from models.modalities import ActiveRestBeforeTraining, ActiveRestAfterTraining, ColdWaterImmersion, CoolDown, Heat, WarmUp, Ice, HeatSession, IceSession
-from models.soreness import AthleteGoal, AthleteGoalType, BodyPartLocation, HistoricSorenessStatus, Alert, BodyPartSide
+from models.soreness import Alert
+from models.soreness_base import HistoricSorenessStatus, BodyPartLocation, BodyPartSide
+from models.goal import AthleteGoalType, AthleteGoal
 from models.trigger import TriggerType
 from logic.trigger_processing import TriggerFactory
 

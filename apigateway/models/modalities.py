@@ -1,7 +1,11 @@
 from serialisable import Serialisable
-from models.soreness import BodyPart, BodyPartLocation, AssignedExercise, HistoricSorenessStatus, AthleteGoal, AthleteGoalType, ExerciseDosage, Soreness, Alert, BodyPartSide
+from models.soreness import Soreness, Alert
+from models.soreness_base import HistoricSorenessStatus, BodyPartLocation, BodyPartSide
+from models.exercise import AssignedExercise
+from models.goal import AthleteGoalType, AthleteGoal
 from models.trigger import TriggerType
-from models.body_parts import BodyPartFactory
+from models.dosage import ExerciseDosage
+from models.body_parts import BodyPartFactory, BodyPart
 from models.sport import SportName
 from utils import parse_datetime, format_datetime
 import abc
@@ -851,13 +855,13 @@ class ActiveRest(ModalityBase):
         #         self.alerts.append(alert)
 
         for t in range(0, len(trigger_list)):
-            if trigger_list[t].trigger_type == TriggerType.hist_sore_less_30:  # 7
-                goal = AthleteGoal(None, 1, AthleteGoalType.sport)
+            #if trigger_list[t].trigger_type == TriggerType.hist_sore_less_30:  # 7
+            #    goal = AthleteGoal(None, 1, AthleteGoalType.sport)
                 #trigger_list[t].goals.append(goal)
-            elif trigger_list[t].trigger_type == TriggerType.overreaching_high_muscular_strain:  # 8
-                goal = AthleteGoal(None, 1, AthleteGoalType.sport)
+            #elif trigger_list[t].trigger_type == TriggerType.overreaching_high_muscular_strain:  # 8
+            #    goal = AthleteGoal(None, 1, AthleteGoalType.sport)
                 #trigger_list[t].goals.append(goal)
-            elif trigger_list[t].trigger_type == TriggerType.high_volume_intensity:  # 0
+            if trigger_list[t].trigger_type == TriggerType.high_volume_intensity:  # 0
                 goal = AthleteGoal("Expedite tissue regeneration", 1, AthleteGoalType.sport)
                 #trigger_list[t].goals.append(goal)
                 body_part_factory = BodyPartFactory()
@@ -1955,12 +1959,12 @@ class CoolDown(ModalityBase, Serialisable):
         #     self.alerts.append(alert)
 
         for t in range(0, len(trigger_list)):
-            if trigger_list[t].trigger_type == TriggerType.overreaching_high_muscular_strain:  # 8
-                goal = AthleteGoal(None, 1, AthleteGoalType.sport)
-                trigger_list[t].goals.append(goal)
-            elif trigger_list[t].trigger_type == TriggerType.hist_sore_less_30:  # 7
-                goal = AthleteGoal(None, 1, AthleteGoalType.sport)
-                trigger_list[t].goals.append(goal)
+            #if trigger_list[t].trigger_type == TriggerType.overreaching_high_muscular_strain:  # 8
+            #    goal = AthleteGoal(None, 1, AthleteGoalType.sport)
+            #    trigger_list[t].goals.append(goal)
+            #elif trigger_list[t].trigger_type == TriggerType.hist_sore_less_30:  # 7
+            #    goal = AthleteGoal(None, 1, AthleteGoalType.sport)
+            #    trigger_list[t].goals.append(goal)
 
         # hist_soreness = list(s for s in soreness_list if not s.is_dormant_cleared() and not s.pain and
         #                      (s.is_persistent_soreness() or
@@ -1978,7 +1982,7 @@ class CoolDown(ModalityBase, Serialisable):
         #         alert.body_part = BodyPartSide(soreness.body_part.location, soreness.side)
         #         self.alerts.append(alert)
 
-            elif trigger_list[t].trigger_type == TriggerType.high_volume_intensity and max_severity < 2.5:  # 0
+            if trigger_list[t].trigger_type == TriggerType.high_volume_intensity and max_severity < 2.5:  # 0
                 goal = AthleteGoal(None, 1, AthleteGoalType.sport)
                 #trigger_list[t].goals.append(goal)
 

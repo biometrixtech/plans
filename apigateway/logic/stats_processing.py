@@ -7,7 +7,9 @@ from fathomapi.utils.xray import xray_recorder
 from logic.training_volume_processing import TrainingVolumeProcessing
 from logic.soreness_processing import SorenessCalculator
 from models.stats import AthleteStats
-from models.soreness import Soreness, BodyPart, HistoricSorenessStatus
+from models.soreness import Soreness
+from models.soreness_base import HistoricSorenessStatus
+from models.body_parts import BodyPart
 from models.historic_soreness import HistoricSoreness, HistoricSeverity, CoOccurrence, SorenessCause
 from models.post_session_survey import PostSessionSurvey
 from models.data_series import DataSeries

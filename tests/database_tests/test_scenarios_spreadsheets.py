@@ -5,7 +5,7 @@ xray_recorder.begin_segment(name="test")
 
 import pytest
 from logic.training_plan_management import TrainingPlanManager
-from models.body_parts import BodyPartFactory
+from models.body_parts import BodyPartFactory, BodyPart
 from models.session import SportTrainingSession
 from models.historic_soreness import HistoricSoreness
 from models.stats import AthleteStats
@@ -16,7 +16,8 @@ from tests.mocks.mock_exercise_datastore import ExerciseLibraryDatastore
 from tests.mocks.mock_completed_exercise_datastore import CompletedExerciseDatastore
 from tests.mocks.mock_datastore_collection import DatastoreCollection
 from tests.mocks.mock_athlete_stats_datastore import AthleteStatsDatastore
-from models.soreness import Soreness, BodyPart, BodyPartLocation, HistoricSorenessStatus
+from models.soreness import Soreness
+from models.soreness_base import HistoricSorenessStatus, BodyPartLocation
 from models.daily_plan import DailyPlan
 from models.sport import SportName
 from tests.testing_utilities import TestUtilities, get_body_part_location_string, is_historic_soreness_pain, \

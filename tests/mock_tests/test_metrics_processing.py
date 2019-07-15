@@ -5,7 +5,7 @@ xray_recorder.begin_segment(name="test")
 from logic.metrics_processing import MetricsProcessing, RecommendationMatrix
 from models.stats import AthleteStats
 from models.metrics import AthleteMetric, MetricColor, MetricType, SpecificAction
-from models.soreness import BodyPartLocation, HistoricSorenessStatus
+from models.soreness_base import HistoricSorenessStatus, BodyPartLocation
 from models.historic_soreness import HistoricSoreness
 from models.training_volume import StandardErrorRange
 

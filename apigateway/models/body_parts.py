@@ -1,4 +1,7 @@
-from models.soreness import BodyPart, BodyPartLocation, BodyPartSide
+from random import shuffle
+
+from models.exercise import AssignedExercise
+from models.soreness_base import BodyPartLocation, BodyPartSide
 from models.sport import SportName
 import random
 
@@ -591,3 +594,94 @@ class BodyPartFactory(object):
                                           {})
         part.add_muscle_groups([20], [22, 23], [19], [20])
         return part
+
+
+class BodyPart(object):
+
+    def __init__(self, body_part_location, treatment_priority):
+        self.location = body_part_location
+        self.treatment_priority = treatment_priority
+        self.inhibit_exercises = []
+        self.lengthen_exercises = []
+        self.activate_exercises = []
+        self.integrate_exercises = []
+
+        self.static_stretch_exercises = []
+        self.active_stretch_exercises = []
+        self.dynamic_stretch_exercises = []
+        self.active_or_dynamic_stretch_exercises = []
+        self.isolated_activate_exercises = []
+        self.static_integrate_exercises = []
+        self.dynamic_integrate_exercises = []
+        self.dynamic_stretch_integrate_exercises = []
+        self.dynamic_integrate_with_speed_exercises = []
+
+        self.agonists = []
+        self.synergists = []
+        self.stabilizers = []
+        self.antagonists = []
+
+    @staticmethod
+    def add_exercises(exercise_list, exercise_dict, treatment_priority, randomize=False):
+
+        priority = 1
+
+        keys = list(exercise_dict.keys())
+
+        if randomize:
+            shuffle(keys)
+
+        for k in keys:
+            if len(exercise_dict[k]) == 0:
+                exercise_list.append(AssignedExercise(k, treatment_priority, priority))
+            else:
+                progression_exercise = AssignedExercise(k, treatment_priority, priority)
+                progression_exercise.exercise.progressions = exercise_dict[k]
+                exercise_list.append(progression_exercise)
+            priority += 1
+
+        return exercise_list
+
+    def add_exercise_phases(self, inhibit, lengthen, activate, randomize=False):
+
+        self.inhibit_exercises = self.add_exercises(self.inhibit_exercises, inhibit,
+                                                    self.treatment_priority, randomize)
+        self.lengthen_exercises = self.add_exercises(self.lengthen_exercises, lengthen,
+                                                     self.treatment_priority, randomize)
+        self.activate_exercises = self.add_exercises(self.activate_exercises, activate,
+                                                     self.treatment_priority, randomize)
+
+    def add_dynamic_exercise_phases(self, dynamic_stretch, dynamic_integrate, dynamic_integrate_with_speed):
+
+        self.dynamic_stretch_exercises = self.add_exercises(self.dynamic_stretch_exercises, dynamic_stretch, self.treatment_priority, False)
+        self.dynamic_integrate_exercises = self.add_exercises(self.dynamic_integrate_exercises, dynamic_integrate, self.treatment_priority, False)
+        self.dynamic_integrate_with_speed_exercises = self.add_exercises(self.dynamic_integrate_with_speed_exercises, dynamic_integrate_with_speed, self.treatment_priority, False)
+
+    def add_extended_exercise_phases(self, inhibit, static_stretch, active_stretch, dynamic_stretch, isolated_activation, static_integrate, randomize=False):
+
+        self.inhibit_exercises = self.add_exercises(self.inhibit_exercises, inhibit,
+                                                    self.treatment_priority, randomize)
+
+        self.static_stretch_exercises = self.add_exercises(self.static_stretch_exercises, static_stretch,
+                                                           self.treatment_priority, randomize)
+
+        self.active_stretch_exercises = self.add_exercises(self.active_stretch_exercises, active_stretch,
+                                                           self.treatment_priority, randomize)
+
+        self.dynamic_stretch_exercises = self.add_exercises(self.dynamic_stretch_exercises, dynamic_stretch,
+                                                            self.treatment_priority, randomize)
+
+        self.isolated_activate_exercises = self.add_exercises(self.isolated_activate_exercises, isolated_activation,
+                                                              self.treatment_priority, randomize)
+
+        self.static_integrate_exercises = self.add_exercises(self.static_integrate_exercises, static_integrate,
+                                                             self.treatment_priority, randomize)
+
+    def add_muscle_groups(self, agonists, synergists, stabilizers, antagonists):
+
+        self.agonists = agonists
+        self.synergists = synergists
+        self.stabilizers = stabilizers
+        self.antagonists = antagonists
+
+

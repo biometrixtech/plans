@@ -1,5 +1,6 @@
 from models.modalities import ActiveRestBeforeTraining, ActiveRestAfterTraining
-from models.soreness import BodyPartLocation, Soreness, HistoricSorenessStatus
+from models.soreness import Soreness
+from models.soreness_base import HistoricSorenessStatus, BodyPartLocation
 from utils import parse_date
 
 

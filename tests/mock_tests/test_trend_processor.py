@@ -1,7 +1,7 @@
 from logic.trend_processing import TrendProcessor
-from models.trigger import Trigger, TriggerType
-from models.soreness import BodyPartLocation, BodyPartSide
+from models.trigger import TriggerType, Trigger
 from models.body_parts import BodyPartFactory
+from models.soreness_base import BodyPartLocation, BodyPartSide
 from datetime import datetime, timedelta
 
 

@@ -15,7 +15,9 @@ from tests.mocks.mock_exercise_datastore import ExerciseLibraryDatastore
 from tests.mocks.mock_completed_exercise_datastore import CompletedExerciseDatastore
 from tests.mocks.mock_datastore_collection import DatastoreCollection
 from tests.mocks.mock_athlete_stats_datastore import AthleteStatsDatastore
-from models.soreness import Soreness, BodyPart, BodyPartLocation, HistoricSorenessStatus
+from models.soreness import Soreness
+from models.soreness_base import HistoricSorenessStatus, BodyPartLocation
+from models.body_parts import BodyPart
 from models.daily_plan import DailyPlan
 from tests.testing_utilities import TestUtilities
 from models.daily_readiness import DailyReadiness

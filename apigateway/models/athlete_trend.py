@@ -2,7 +2,7 @@ from enum import Enum
 from logic.text_generator import TextGenerator
 from models.chart_data import BodyPartChartData, DataSeriesBooleanData, DataSeriesData, TrainingVolumeChartData, BodyResponseChartData, WorkoutChartData, TightUnderactiveChartData, OveractiveUnderactiveChartData
 from models.insights import InsightType
-from models.soreness import BodyPartSide
+from models.soreness_base import BodyPartSide
 from models.sport import SportName
 from models.trigger import TriggerType
 from models.trigger_data import TriggerData

@@ -5,7 +5,9 @@ import os
 os.environ['ENVIRONMENT'] = 'dev'
 import datetime
 from logic.survey_processing import SurveyProcessing, force_datetime_iso, cleanup_sleep_data_from_api, cleanup_hr_data_from_api, create_session
-from models.soreness import Soreness, BodyPartLocation, BodyPart, HistoricSorenessStatus
+from models.soreness import Soreness
+from models.soreness_base import HistoricSorenessStatus, BodyPartLocation
+from models.body_parts import BodyPart
 from models.historic_soreness import HistoricSoreness
 from models.stats import AthleteStats
 from tests.mocks.mock_datastore_collection import DatastoreCollection

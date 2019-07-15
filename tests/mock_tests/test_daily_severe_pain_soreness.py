@@ -1,5 +1,7 @@
 from datetime import datetime
-from models.soreness import BodyPart, BodyPartLocation, Soreness
+from models.soreness import Soreness
+from models.body_parts import BodyPart
+from models.soreness_base import BodyPartLocation
 from models.stats import AthleteStats
 from utils import parse_date
 

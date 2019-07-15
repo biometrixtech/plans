@@ -8,11 +8,12 @@ from models.insights import AthleteInsight
 from models.load_stats import LoadStats
 from models.metrics import AthleteMetric
 from models.session import StrengthConditioningType, HighLoadSession
-from models.soreness import HistoricSorenessStatus, Soreness
+from models.soreness import Soreness
+from models.soreness_base import HistoricSorenessStatus
 from models.sport import SportName, BaseballPosition, BasketballPosition, FootballPosition, LacrossePosition, SoccerPosition,\
     SoftballPosition, FieldHockeyPosition, TrackAndFieldPosition, VolleyballPosition
 from models.training_volume import StandardErrorRange
-from models.trigger import Trigger, TriggerType
+from models.trigger import TriggerType, Trigger
 from utils import format_date, format_datetime, parse_date, parse_datetime
 import datetime
 import numbers

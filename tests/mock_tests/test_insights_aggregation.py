@@ -1,6 +1,8 @@
 import datetime
 from models.insights import AthleteInsight, InsightType
-from models.soreness import BodyPartSide, BodyPartLocation, Alert, AthleteGoal, AthleteGoalType
+from models.soreness import Alert
+from models.soreness_base import BodyPartLocation, BodyPartSide
+from models.goal import AthleteGoalType, AthleteGoal
 from models.trigger import TriggerType
 from models.sport import SportName
 from logic.alerts_processing import AlertsProcessing

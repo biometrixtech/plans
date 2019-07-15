@@ -2,7 +2,9 @@ from aws_xray_sdk.core import xray_recorder
 xray_recorder.configure(sampling=False)
 xray_recorder.begin_segment(name="test")
 
-from models.soreness import BodyPart, BodyPartLocation, Soreness, HistoricSorenessStatus
+from models.soreness import Soreness
+from models.soreness_base import HistoricSorenessStatus, BodyPartLocation
+from models.body_parts import BodyPart
 from models.historic_soreness import HistoricSoreness
 from logic.stats_processing import StatsProcessing
 from tests.mocks.mock_datastore_collection import DatastoreCollection

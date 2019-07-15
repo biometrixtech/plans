@@ -7,7 +7,10 @@ from datetime import datetime, timedelta
 from models.sport import SportName
 from utils import format_datetime, parse_datetime
 from logic.trigger_processing import TriggerFactory
-from models.soreness import AthleteGoalType, BodyPart, BodyPartLocation, Soreness, HistoricSorenessStatus
+from models.soreness import Soreness
+from models.soreness_base import HistoricSorenessStatus, BodyPartLocation
+from models.body_parts import BodyPart
+from models.goal import AthleteGoalType
 from models.historic_soreness import HistoricSoreness
 from models.modalities import ColdWaterImmersion, Ice, IceSession
 from models.stats import AthleteStats

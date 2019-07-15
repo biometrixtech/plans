@@ -1,9 +1,9 @@
 from models.chart_data import WorkoutChart, TrainingVolumeChart, BodyPartChartCollection, MuscularStrainChart, HighRelativeLoadChart, DOMSChart, BodyResponseChart
 from utils import parse_date
 from math import floor
-from models.historic_soreness import HistoricSoreness, HistoricSorenessStatus, HistoricSeverity, SorenessCause
+from models.historic_soreness import HistoricSoreness, HistoricSeverity, SorenessCause
+from models.soreness_base import HistoricSorenessStatus, BodyPartLocation
 from models.session import SessionType, HighLoadSession, SportTrainingSession, SessionSource
-from models.soreness import BodyPartLocation
 from models.sport import SportName
 from models.stats import SportMaxLoad
 from logic.stats_processing import StatsProcessing

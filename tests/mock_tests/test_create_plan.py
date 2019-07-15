@@ -12,7 +12,7 @@ from utils import format_datetime, format_date
 from tests.testing_utilities import TestUtilities
 from models.daily_readiness import DailyReadiness
 from models.daily_plan import DailyPlan
-from models.soreness import BodyPartLocation, HistoricSorenessStatus
+from models.soreness_base import HistoricSorenessStatus, BodyPartLocation
 from models.historic_soreness import HistoricSoreness
 from tests.mocks.mock_exercise_datastore import ExerciseLibraryDatastore
 from tests.mocks.mock_completed_exercise_datastore import CompletedExerciseDatastore

@@ -6,7 +6,9 @@ import datetime
 
 from tests.mocks.mock_exercise_datastore import ExerciseLibraryDatastore
 from tests.mocks.mock_completed_exercise_datastore import CompletedExerciseDatastore
-from models.soreness import Soreness, BodyPart, BodyPartLocation
+from models.soreness import Soreness
+from models.body_parts import BodyPart
+from models.soreness_base import BodyPartLocation
 
 exercise_library_datastore = ExerciseLibraryDatastore()
 completed_exercise_datastore = CompletedExerciseDatastore()

@@ -1,6 +1,7 @@
 from models.body_parts import BodyPartFactory
-from models.soreness import AthleteGoal, AthleteGoalType, BodyPartSide, HistoricSorenessStatus
-from models.trigger import Trigger, TriggerType
+from models.soreness_base import HistoricSorenessStatus, BodyPartSide
+from models.goal import AthleteGoalType, AthleteGoal
+from models.trigger import TriggerType, Trigger
 
 
 class TriggerFactory(object):

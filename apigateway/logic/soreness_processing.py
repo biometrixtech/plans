@@ -1,4 +1,6 @@
-from models.soreness import BodyPart, BodyPartLocation, Soreness, SorenessType
+from models.soreness import Soreness, SorenessType
+from models.body_parts import BodyPart
+from models.soreness_base import BodyPartLocation
 from models.historic_soreness import CoOccurrence, SorenessCause
 from datetime import timedelta
 

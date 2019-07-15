@@ -2,7 +2,7 @@ import datetime
 from enum import Enum
 
 from fathomapi.utils.exceptions import InvalidSchemaException
-from models.soreness import BodyPartLocation, BaseSoreness, HistoricSorenessStatus
+from models.soreness_base import HistoricSorenessStatus, BaseSoreness, BodyPartLocation
 from models.session import Session
 from serialisable import Serialisable
 from utils import parse_datetime, format_datetime, parse_date
