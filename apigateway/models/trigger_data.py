@@ -14,7 +14,8 @@ visualization_data = {
                     {
                         'color': 3,
                         'text': "Relative Load",
-                        'type': 0
+                        'type': 0,
+                        'series': ""
                     }
                 ]
             },
@@ -26,7 +27,8 @@ visualization_data = {
                     {
                         'color': 0,
                         'text': "High training loads",
-                        'type': 0
+                        'type': 0,
+                        'series': ""
                     }
                 ]
             },
@@ -38,12 +40,14 @@ visualization_data = {
                     {
                         'color': 2,
                         'text': "{bodypart} pain severity",
-                        'type': 0
+                        'type': 0,
+                        'series': ""
                     },
                     {
                         'color': 1,
                         'text': "{bodypart} soreness severity",
-                        'type': 0
+                        'type': 0,
+                        'series': ""
                     }
                 ]
             },
@@ -55,12 +59,14 @@ visualization_data = {
                     {
                         'color': 1,
                         'text': "Soreness severity",
-                        'type': 0
+                        'type': 0,
+                        'series': ""
                     },
                     {
                         'color': 1,
                         'text': "Projected duration of soreness without Recovery",
-                        'type': 2
+                        'type': 2,
+                        'series': ""
                     }
                 ]
             },
@@ -72,17 +78,20 @@ visualization_data = {
                     {
                         'color': 0,
                         'text': "Normal",
-                        'type': 0
+                        'type': 0,
+                        'series': ""
                     },
                     {
                         'color': 1,
                         'text': "Moderate",
-                        'type': 0
+                        'type': 0,
+                        'series': ""
                     },
                     {
                         'color': 2,
                         'text': "High risk",
-                        'type': 0
+                        'type': 0,
+                        'series': ""
                     }
                 ]
             },
@@ -101,12 +110,14 @@ visualization_data = {
                     {
                         'color': 6,
                         'text': "pain",
-                        'type': 0
+                        'type': 0,
+                        'series': ""
                     },
                     {
                         'color': 5,
                         'text': "soreness",
-                        'type': 0
+                        'type': 0,
+                        'series': ""
                     }
                 ]
             },
@@ -118,7 +129,8 @@ visualization_data = {
                     {
                         'color': 4,
                         'text': "Workload",
-                        'type': 3
+                        'type': 3,
+                        'series': ""
                     }
                 ]
             },
@@ -130,12 +142,14 @@ visualization_data = {
                     {
                         'color': 6,
                         'text': "Tight Muscle",
-                        'type': 0
+                        'type': 0,
+                        'series': "tight_body_parts"
                     },
                     {
                         'color': 5,
-                        'text': "Underactive",
-                        'type': 0
+                        'text': "Also Needing Care",
+                        'type': 0,
+                        'series': "also_needing_care"
                     }
                 ]
             },
@@ -147,12 +161,14 @@ visualization_data = {
                     {
                         'color': 6,
                         'text': "Overactive",
-                        'type': 0
+                        'type': 0,
+                        'series': "overactive_body_parts"
                     },
                     {
                         'color': 5,
                         'text': "Underactive",
-                        'type': 0
+                        'type': 0,
+                        'series': "underactive_body_parts"
                     }
                 ]
             },

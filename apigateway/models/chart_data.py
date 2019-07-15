@@ -831,19 +831,19 @@ class OveractiveUnderactiveChartData(Serialisable):
     def json_deserialise(cls, input_dict):
         chart_data = cls()
         chart_data.overactive_body_parts = input_dict.get('overactive_body_parts', [])
-        chart_data.underactive_body_parts = input_dict.get('overactive_body_parts', [])
+        chart_data.underactive_body_parts = input_dict.get('underactive_body_parts', [])
         return chart_data
 
 
 class TightUnderactiveChartData(Serialisable):
     def __init__(self):
         self.tight_body_parts = []
-        self.underactive_body_parts = []
+        self.also_needing_care = []
 
     def json_serialise(self):
         ret = {
             'tight_body_parts': self.tight_body_parts,
-            'underactive_body_parts': self.underactive_body_parts,
+            'also_needing_care': self.also_needing_care,
         }
         return ret
 
@@ -851,5 +851,5 @@ class TightUnderactiveChartData(Serialisable):
     def json_deserialise(cls, input_dict):
         chart_data = cls()
         chart_data.tight_body_parts = input_dict.get('tight_body_parts', [])
-        chart_data.underactive_body_parts = input_dict.get('overactive_body_parts', [])
+        chart_data.also_needing_care = input_dict.get('also_needing_care', [])
         return chart_data
