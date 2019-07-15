@@ -143,7 +143,7 @@ visualization_data = {
                         'color': 6,
                         'text': "Tight Muscle",
                         'type': 0,
-                        'series': "tight_muscles"
+                        'series': "tight_body_parts"
                     },
                     {
                         'color': 5,
