@@ -339,7 +339,7 @@ class ExerciseAssignmentCalculator(object):
                 ice = Ice(body_part_location=t.body_part.body_part_location, side=t.body_part.side)
                 ice.repeat_every_3hrs_for_24hrs = False
 
-                if t.body_part.body_part.location in ankle_knee_elbow:
+                if t.body_part.body_part_location in ankle_knee_elbow:
                     minutes.append(10)
                 else:
                     minutes.append(15)

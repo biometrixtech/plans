@@ -6,6 +6,7 @@ from models.soreness_base import BodyPartSide
 from models.sport import SportName
 from models.trigger import TriggerType
 from models.trigger_data import TriggerData
+from utils import format_datetime, parse_datetime
 from serialisable import Serialisable
 
 
@@ -126,6 +127,7 @@ class Trend(object):
         self.sport_names = []
         self.data_source = DataSource(0)
         self.data = []
+        self.trend_data = None
         self.cta = set()
         self.priority = 0
         self.present_in_trends = True
@@ -145,13 +147,15 @@ class Trend(object):
             'body_parts': [body_part.json_serialise() for body_part in self.body_parts],
             'sport_names': [sport_name.value for sport_name in self.sport_names],
             'data': [data.json_serialise() for data in self.data],
+            'trend_data': self.trend_data.json_serialise() if self.trend_data is not None else None,
             'data_source': self.data_source.value,
             'insight_type': self.insight_type.value,
             'cta': list(self.cta),
             'priority': self.priority,
             'present_in_trends': self.present_in_trends,
             'cleared': self.cleared,
-            'longitudinal': self.longitudinal
+            'longitudinal': self.longitudinal,
+            'last_date_time': format_datetime(self.last_date_time) if self.last_date_time is not None else None
         }
         return ret
 
@@ -185,6 +189,8 @@ class Trend(object):
             trend.data = []
         else:
             trend.data = []
+        trend.trend_data = TrendData.json_deserialise(input_dict.get('trend_data')) if input_dict.get('trend_data') is not None else None
+        trend.last_date_time = parse_datetime(input_dict.get('last_date_time')) if input_dict.get('last_date_time') is not None else None
         return trend
 
     def add_data(self):
@@ -313,6 +319,7 @@ class TrendCategory(object):
             'goals': list(self.goals),
             'cta': [cta.json_serialise() for cta in self.cta],
             'alerts': [alert.json_serialise() for alert in self.alerts],
+            'trends': [trend.json_serialise() for trend in self.trends],
             'plan_alerts': [plan_alert.json_serialise() for plan_alert in self.plan_alerts]
         }
         return ret
@@ -323,6 +330,7 @@ class TrendCategory(object):
         trend_category.goals = set(input_dict.get('goals', []))
         trend_category.cta = [CallToAction.json_deserialise(cta) for cta in input_dict.get('cta', [])]
         trend_category.alerts = [Trend.json_deserialise(alert) for alert in input_dict.get('alerts', [])]
+        trend_category.trends = [Trend.json_deserialise(trend) for trend in input_dict.get('trends', [])]
         trend_category.plan_alerts = [PlanAlert.json_deserialise(alert) for alert in input_dict.get('plan_alerts', [])]
         return trend_category
 
@@ -418,6 +426,7 @@ class TrendData(object):
                'visualization_type': self.visualization_type.value,
                'visualization_data': self.visualization_data.json_serialise(),
                'status': self.status.json_serialise(),
+               'text': self.text,
                'data': [data.json_serialise() for data in self.data]
                }
         return ret
@@ -428,6 +437,7 @@ class TrendData(object):
         trend_data.lockout = input_dict['lockout']
         trend_data.status = DataStatus.json_deserialise(input_dict['status'])
         trend_data.visualization_type = VisualizationType(input_dict['visualization_type'])
+        trend_data.text = input_dict.get('text', "")
         if trend_data.visualization_type == VisualizationType.body_response:
             trend_data.data = [BodyResponseChartData.json_deserialise(data) for data in input_dict.get('data', [])]
         elif trend_data.visualization_type == VisualizationType.workload:
@@ -485,7 +495,8 @@ class AthleteTrends(object):
             'response': self.response.json_serialise() if self.response is not None else None,
             'biomechanics': self.biomechanics.json_serialise() if self.biomechanics is not None else None,
             'body_response': self.body_response.json_serialise() if self.body_response is not None else None,
-            'workload': self.workload.json_serialise() if self.workload is not None else None
+            'workload': self.workload.json_serialise() if self.workload is not None else None,
+            'trend_categories': [trend_category.json_serialise() for trend_category in self.trend_categories]
 
         }
         return ret
@@ -499,6 +510,7 @@ class AthleteTrends(object):
         trends.biomechanics = TrendCategory.json_deserialise(input_dict['biomechanics']) if input_dict.get('biomechanics', None) is not None else None
         trends.body_response = TrendData.json_deserialise(input_dict['body_response']) if input_dict.get('body_response', None) is not None else None
         trends.workload = TrendData.json_deserialise(input_dict['workload']) if input_dict.get('workload', None) is not None else None
+        trends.trend_categories = [TrendCategory.json_deserialise(trend_category) for trend_category in input_dict.get('trend_categories', [])]
 
         return trends
 

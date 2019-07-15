@@ -36,7 +36,7 @@ class ExerciseDosage(object):
     def json_serialise(self):
         ret = {'goal': self.goal.json_serialise() if self.goal is not None else None,
                'priority': self.priority,
-               'soreness_source': self.soreness_source.json_serialise(trigger=True) if self.soreness_source is not None else None,
+               # 'soreness_source': self.soreness_source.json_serialise() if self.soreness_source is not None else None,
                'efficient_reps_assigned': self.efficient_reps_assigned,
                'efficient_sets_assigned': self.efficient_sets_assigned,
                'complete_reps_assigned': self.complete_reps_assigned,
@@ -60,7 +60,7 @@ class ExerciseDosage(object):
         dosage = cls()
         dosage.goal = AthleteGoal.json_deserialise(goal) if goal is not None else None
         dosage.priority = input_dict.get('priority', 0)
-        dosage.soreness_source = Trigger.json_deserialise(soreness_source) if soreness_source is not None else None
+        # dosage.soreness_source = Trigger.json_deserialise(soreness_source) if soreness_source is not None else None
         dosage.efficient_reps_assigned = input_dict.get('efficient_reps_assigned', 0)
         dosage.efficient_sets_assigned = input_dict.get('efficient_sets_assigned', 0)
         dosage.complete_reps_assigned = input_dict.get('complete_reps_assigned', 0)

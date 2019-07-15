@@ -75,9 +75,9 @@ class TrendProcessor(object):
             tight_under_data = TightUnderactiveChartData()
             tight_under_data.tight_body_parts = [t.body_part.body_part_location.value for t in triggers]
             tight_under_data.underactive_body_parts = [s for s in synergists]
-            trend_data.data = tight_under_data
+            trend_data.data = [tight_under_data]
             trend_data.text = "This is a specific description of all your tight muscles..."
-            trend.data = trend_data
+            trend.trend_data = trend_data
             trend.last_date_time = self.get_latest_trigger_date_time(triggers)
             return trend
         else:
@@ -98,9 +98,9 @@ class TrendProcessor(object):
             over_under_data = OveractiveUnderactiveChartData()
             over_under_data.overactive_body_parts = [t.body_part.body_part_location.value for t in triggers]
             over_under_data.underactive_body_parts = [a for a in antagonists]
-            trend_data.data = over_under_data
+            trend_data.data = [over_under_data]
             trend_data.text = "This is a specific description of all your o/u body parts..."
-            trend.data = trend_data
+            trend.trend_data = trend_data
             trend.last_date_time = self.get_latest_trigger_date_time(triggers)
             return trend
         else:
