@@ -1809,7 +1809,7 @@ class WarmUp(ModalityBase, Serialisable):
             goal = AthleteGoal("Prep for Sport", 1, AthleteGoalType.preempt_personalized_sport)
             #goal.trigger = "Pers, Pers-2 Soreness > 30d"
             #goal.trigger_type = TriggerType.hist_sore_less_30
-            trigger.goals.append(goal)
+            #trigger.goals.append(goal)
             self.assign_exercises(trigger, goal, exercise_library)
 
     def check_corrective_soreness(self, trigger, event_date_time, exercise_library):
@@ -1822,7 +1822,7 @@ class WarmUp(ModalityBase, Serialisable):
             goal = AthleteGoal("Increase prevention efficacy", 1, AthleteGoalType.preempt_corrective)
             #goal.trigger = "Pers, Pers-2 Soreness > 30d"
             #goal.trigger_type = TriggerType.hist_sore_greater_30
-            trigger.goals.append(goal)
+            #trigger.goals.append(goal)
             self.assign_exercises(trigger, goal, exercise_library)
 
     def assign_exercises(self, trigger, goal, exercise_library):
