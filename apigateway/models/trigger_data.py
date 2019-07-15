@@ -141,15 +141,21 @@ visualization_data = {
                 'legend': [
                     {
                         'color': 6,
-                        'text': "Tight Muscle",
+                        'text': "Overactive",
                         'type': 0,
-                        'series': "tight_body_parts"
+                        'series': "overactive"
                     },
                     {
                         'color': 5,
-                        'text': "Also Needing Care",
+                        'text': "Underactive",
                         'type': 0,
-                        'series': "also_needing_care"
+                        'series': "underactive"
+                    },
+                    {
+                        'color': 4,
+                        'text': "Underactive & Needing Care",
+                        'type': 0,
+                        'series': "underactive_needing_care"
                     }
                 ]
             },

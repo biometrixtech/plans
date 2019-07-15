@@ -1,6 +1,6 @@
 from models.athlete_trend import AthleteTrends, PlanAlert, Trend, TrendCategory, TrendData, VisualizationType
 from models.trigger import TriggerType, Trigger
-from models.chart_data import OveractiveUnderactiveChartData, TightUnderactiveChartData
+from models.chart_data import OveractiveUnderactiveChartData, TightOverUnderactiveChartData
 from models.insights import InsightType
 
 
@@ -26,18 +26,18 @@ class TrendProcessor(object):
 
         trend_category = TrendCategory(InsightType.movement_dysfunction_compensation)
         trend_category.title = "Movement Dysfunction or Compensation"
-        tight_muscle_trend = self.get_tight_muscle_view()
-        over_under_muscle_trend = self.get_overactive_underactive_muscle_view()
+        tight_muscle_trend = self.get_tight_over_under_muscle_view()
+        #over_under_muscle_trend = self.get_overactive_underactive_muscle_view()
         plan_alert = PlanAlert(InsightType.movement_dysfunction_compensation)
         plan_alert.title = "Movement Dysfunction or Compensation"
         if tight_muscle_trend is not None:
             trend_category.trends.append(tight_muscle_trend)
             plan_alert.views.append("1")
-            plan_alert.text += "tight muscle;"
-        if over_under_muscle_trend is not None:
-            trend_category.trends.append(over_under_muscle_trend)
-            plan_alert.views.append("2")
-            plan_alert.text += "overactive underactive muscle;"
+            plan_alert.text += "tight muscle over-under"
+        # if over_under_muscle_trend is not None:
+        #     trend_category.trends.append(over_under_muscle_trend)
+        #     plan_alert.views.append("2")
+        #     plan_alert.text += "overactive underactive muscle;"
         if len(trend_category.trends) > 0:
             trend_category.plan_alerts.append(plan_alert)
             self.athlete_trends.trend_categories.append(trend_category)
@@ -60,53 +60,66 @@ class TrendProcessor(object):
         else:
             return None
 
-    def get_tight_muscle_view(self):
+    def get_tight_over_under_muscle_view(self):
 
-        trigger_type = TriggerType.hist_sore_less_30
-        triggers = list(t for t in self.trigger_list if t.trigger_type == trigger_type)
-        if len(triggers) > 0:
-            antagonists, synergists = self.get_antagonists_syngergists(triggers)
-            trend = Trend(trigger_type)
+        trigger_type_1 = TriggerType.hist_sore_less_30
+        triggers_1 = list(t for t in self.trigger_list if t.trigger_type == trigger_type_1)
+
+        trigger_type_2 = TriggerType.hist_sore_greater_30
+        triggers_2 = list(t for t in self.trigger_list if t.trigger_type == trigger_type_2)
+
+        if len(triggers_1) > 0 or len(triggers_2) > 0:
+            antagonists_1, synergists_1 = self.get_antagonists_syngergists(triggers_1)
+            antagonists_2, synergists_2 = self.get_antagonists_syngergists(triggers_2)
+            trend = Trend(trigger_type_1)
             trend.title = "Tight Muscle"
             trend.text = "Your data suggests tight muscle stuff"
             trend_data = TrendData()
-            trend_data.visualization_type = VisualizationType.tight_muscle
+            trend_data.visualization_type = VisualizationType.tight_overactice_underactive
             trend_data.add_visualization_data()
-            tight_under_data = TightUnderactiveChartData()
-            tight_under_data.tight_body_parts = [t.body_part for t in triggers]
-            tight_under_data.underactive_body_parts = [s for s in synergists]
+            tight_under_data = TightOverUnderactiveChartData()
+            tight_under_data.overactive.extend([t.body_part for t in triggers_1])
+            tight_under_data.overactive.extend([t.body_part for t in triggers_2])
+            tight_under_data.underactive.extend([a for a in antagonists_2])
+            tight_under_data.underactive_needing_care.extend([s for s in synergists_1])
+            tight_under_data.underactive_needing_care.extend([s for s in synergists_2])
             trend_data.data = [tight_under_data]
             trend_data.text = "This is a specific description of all your tight muscles..."
             trend_data.title = "Trigger Specific Title"
             trend.trend_data = trend_data
-            trend.last_date_time = self.get_latest_trigger_date_time(triggers)
+
+            all_triggers = []
+            all_triggers.extend(triggers_1)
+            all_triggers.extend(triggers_2)
+
+            trend.last_date_time = self.get_latest_trigger_date_time(all_triggers)
             return trend
         else:
             return None
 
-    def get_overactive_underactive_muscle_view(self):
-
-        trigger_type = TriggerType.hist_sore_greater_30
-        triggers = list(t for t in self.trigger_list if t.trigger_type == trigger_type)
-        if len(triggers) > 0:
-            antagonists, synergists = self.get_antagonists_syngergists(triggers)
-            trend = Trend(trigger_type)
-            trend.title = "Overactive & Underactive Muscle"
-            trend.text = "Your data suggests several imbalances in muscle activation which can lead to performance inefficiencies...."
-            trend_data = TrendData()
-            trend_data.visualization_type = VisualizationType.overactive_underactive
-            trend_data.add_visualization_data()
-            over_under_data = OveractiveUnderactiveChartData()
-            over_under_data.overactive_body_parts = [t.body_part for t in triggers]
-            over_under_data.underactive_body_parts = [a for a in antagonists]
-            trend_data.data = [over_under_data]
-            trend_data.text = "This is a specific description of all your o/u body parts..."
-            trend_data.title = "Trigger Specific Title"
-            trend.trend_data = trend_data
-            trend.last_date_time = self.get_latest_trigger_date_time(triggers)
-            return trend
-        else:
-            return None
+    # def get_overactive_underactive_muscle_view(self):
+    #
+    #     trigger_type = TriggerType.hist_sore_greater_30
+    #     triggers = list(t for t in self.trigger_list if t.trigger_type == trigger_type)
+    #     if len(triggers) > 0:
+    #         antagonists, synergists = self.get_antagonists_syngergists(triggers)
+    #         trend = Trend(trigger_type)
+    #         trend.title = "Overactive & Underactive Muscle"
+    #         trend.text = "Your data suggests several imbalances in muscle activation which can lead to performance inefficiencies...."
+    #         trend_data = TrendData()
+    #         trend_data.visualization_type = VisualizationType.overactive_underactive
+    #         trend_data.add_visualization_data()
+    #         over_under_data = OveractiveUnderactiveChartData()
+    #         over_under_data.overactive_body_parts = [t.body_part for t in triggers]
+    #         over_under_data.underactive_body_parts = [a for a in antagonists]
+    #         trend_data.data = [over_under_data]
+    #         trend_data.text = "This is a specific description of all your o/u body parts..."
+    #         trend_data.title = "Trigger Specific Title"
+    #         trend.trend_data = trend_data
+    #         trend.last_date_time = self.get_latest_trigger_date_time(triggers)
+    #         return trend
+    #     else:
+    #         return None
 
 
 
