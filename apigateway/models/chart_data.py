@@ -171,6 +171,7 @@ class WorkoutChart(BaseChart, Serialisable):
 
         training_volume = training_session.training_volume(load_stats)
         if training_volume is not None and training_volume > 0 and training_session.event_date.date() in self.data:
+            training_volume = round(training_volume, 2)
             self.data[training_session.event_date.date()].value += training_volume
             self.data[training_session.event_date.date()].sport_names.add(training_session.sport_name)
 
@@ -181,7 +182,7 @@ class WorkoutChart(BaseChart, Serialisable):
                 summary.duration = training_session.duration_minutes
             else:
                 summary.duration = training_session.duration_health
-            summary.distance = training_session.distance
+            summary.distance = round(training_session.distance, 2) if training_session.distance is not None else None
             summary.event_date = training_session.event_date
             summary.end_date = training_session.end_date
             summary.RPE = training_session.session_RPE
@@ -204,12 +205,12 @@ class WorkoutChart(BaseChart, Serialisable):
                         self.bolded_text = []
                         self.bolded_text.append(summary.sport_name.get_display_name())
                     else:
-                        self.status = f"Today's workout set a new {summary.sport_name.get_display_name()} max!"
+                        self.status = f"You set a new personal record for {summary.sport_name.get_display_name()} load!"
                         self.bolded_text = []
                         self.bolded_text.append(SportName(summary.sport_name.value).name)
                 else:
                     percent = int(round((training_volume / sport_max_load[summary.sport_name.value].load) * 100, 0))
-                    self.status = f"You hit {str(percent)}% of your {summary.sport_name.get_display_name()} max!"
+                    self.status = f"Today's workout was {str(percent)}% of your {summary.sport_name.get_display_name()} PR"
                     self.bolded_text = []
                     self.bolded_text.append(summary.sport_name.get_display_name())
                     self.bolded_text.append(str(percent) + "%")
