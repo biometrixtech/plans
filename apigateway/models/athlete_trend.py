@@ -318,6 +318,7 @@ class TrendCategory(object):
             'insight_type': self.insight_type.value,
             'goals': list(self.goals),
             'cta': [cta.json_serialise() for cta in self.cta],
+            'title': self.title,
             'alerts': [alert.json_serialise() for alert in self.alerts],
             'trends': [trend.json_serialise() for trend in self.trends],
             'plan_alerts': [plan_alert.json_serialise() for plan_alert in self.plan_alerts]
@@ -330,6 +331,7 @@ class TrendCategory(object):
         trend_category.goals = set(input_dict.get('goals', []))
         trend_category.cta = [CallToAction.json_deserialise(cta) for cta in input_dict.get('cta', [])]
         trend_category.alerts = [Trend.json_deserialise(alert) for alert in input_dict.get('alerts', [])]
+        trend_category.title = input_dict.get('title', "")
         trend_category.trends = [Trend.json_deserialise(trend) for trend in input_dict.get('trends', [])]
         trend_category.plan_alerts = [PlanAlert.json_deserialise(alert) for alert in input_dict.get('plan_alerts', [])]
         return trend_category
