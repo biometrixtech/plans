@@ -89,6 +89,7 @@ class TriggerFactory(object):
             if self.triggers[trigger_index].deleted_date_time is not None:
                 self.triggers[trigger_index].deleted_date_time = None
                 self.triggers[trigger_index].created_date_time = self.event_date_time
+                self.triggers[trigger_index].modified_date_time = self.event_date_time
             else:
                 self.triggers[trigger_index].modified_date_time = self.event_date_time
 
@@ -99,6 +100,7 @@ class TriggerFactory(object):
 
             trigger = Trigger(trigger_type)
             trigger.created_date_time = self.event_date_time
+            trigger.modified_date_time = self.event_date_time
 
             if soreness is not None:
                 body_part_factory = BodyPartFactory()
