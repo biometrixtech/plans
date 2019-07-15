@@ -112,7 +112,7 @@ visualization_data = {
             },
             8: {
                 'title': "",
-                'y_axis_1': "Load Units",
+                'y_axis_1': "Volume of Load",
                 'y_axis_2': "",
                 'legend': [
                     {
