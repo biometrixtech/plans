@@ -122,6 +122,7 @@ class Trend(object):
         self.insight_type = InsightType.stress
         self.title = ""
         self.text = ""
+        self.bold_text = []
         self.visualization_title = VisualizationTitle()
         self.visualization_type = VisualizationType(1)
         self.visualization_data = VisualizationData()
@@ -143,6 +144,7 @@ class Trend(object):
             'trigger_type': self.trigger_type.value,
             'title': self.title,
             'text': self.text,
+            'bold_text': self.bold_text,
             'visualization_title': self.visualization_title.json_serialise(),
             'visualization_type': self.visualization_type.value,
             'visualization_data': self.visualization_data.json_serialise(),
@@ -167,6 +169,7 @@ class Trend(object):
         trend = cls(TriggerType(input_dict['trigger_type']))
         trend.title = input_dict['title']
         trend.text = input_dict['text']
+        trend.bold_text = input_dict.get('bold_text', [])
         trend.visualization_title = VisualizationTitle.json_deserialise(input_dict['visualization_title'])
         trend.visualization_type = VisualizationType(input_dict['visualization_type'])
         trend.visualization_data = VisualizationData.json_deserialise(input_dict['visualization_data'])
@@ -425,6 +428,7 @@ class TrendData(object):
         self.status = DataStatus()
         self.text = ""
         self.title = ""
+        self.bold_text = []
         self.data = []
         self.visualization_type = VisualizationType(7)
         self.visualization_title = VisualizationTitle()
@@ -437,6 +441,8 @@ class TrendData(object):
                'visualization_data': self.visualization_data.json_serialise(),
                'status': self.status.json_serialise(),
                'text': self.text,
+               'title': self.title,
+               'bold_text': self.bold_text,
                'data': [data.json_serialise() for data in self.data]
                }
         return ret
@@ -448,6 +454,8 @@ class TrendData(object):
         trend_data.status = DataStatus.json_deserialise(input_dict['status'])
         trend_data.visualization_type = VisualizationType(input_dict['visualization_type'])
         trend_data.text = input_dict.get('text', "")
+        trend_data.title = input_dict.get('title', "")
+        trend_data.bold_text = input_dict.get('bold_text', [])
         if trend_data.visualization_type == VisualizationType.body_response:
             trend_data.data = [BodyResponseChartData.json_deserialise(data) for data in input_dict.get('data', [])]
         elif trend_data.visualization_type == VisualizationType.workload:
