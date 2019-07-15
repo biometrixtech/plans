@@ -73,7 +73,7 @@ class TrendProcessor(object):
             trend_data.visualization_type = VisualizationType.tight_muscle
             trend_data.add_visualization_data()
             tight_under_data = TightUnderactiveChartData()
-            tight_under_data.tight_body_parts = [t.body_part.body_part_location.value for t in triggers]
+            tight_under_data.tight_body_parts = [t.body_part for t in triggers]
             tight_under_data.underactive_body_parts = [s for s in synergists]
             trend_data.data = [tight_under_data]
             trend_data.text = "This is a specific description of all your tight muscles..."
@@ -97,7 +97,7 @@ class TrendProcessor(object):
             trend_data.visualization_type = VisualizationType.overactive_underactive
             trend_data.add_visualization_data()
             over_under_data = OveractiveUnderactiveChartData()
-            over_under_data.overactive_body_parts = [t.body_part.body_part_location.value for t in triggers]
+            over_under_data.overactive_body_parts = [t.body_part for t in triggers]
             over_under_data.underactive_body_parts = [a for a in antagonists]
             trend_data.data = [over_under_data]
             trend_data.text = "This is a specific description of all your o/u body parts..."
