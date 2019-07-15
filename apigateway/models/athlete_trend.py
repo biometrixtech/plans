@@ -308,7 +308,7 @@ class PlanAlert(Serialisable):
         plan_alert = PlanAlert(InsightType(input_dict['category']))
         plan_alert.views = [v for v in input_dict.get('views', [])]
         plan_alert.text = input_dict['text']
-        plan_alert.title = input_dict['title']
+        plan_alert.title = input_dict.get('title', "")
         return plan_alert
 
 
