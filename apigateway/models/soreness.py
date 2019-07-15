@@ -1,7 +1,7 @@
 from enum import Enum, IntEnum
 
 from models.exercise import Exercise, UnitOfMeasure
-#from models.trigger import TriggerType
+from models.trigger import Trigger
 from serialisable import Serialisable
 from random import shuffle
 import datetime
@@ -473,7 +473,7 @@ class ExerciseDosage(object):
         dosage = cls()
         dosage.goal = AthleteGoal.json_deserialise(goal) if goal is not None else None
         dosage.priority = input_dict.get('priority', 0)
-        dosage.soreness_source = Soreness.json_deserialise(soreness_source) if soreness_source is not None else None
+        dosage.soreness_source = Trigger.json_deserialise(soreness_source) if soreness_source is not None else None
         dosage.efficient_reps_assigned = input_dict.get('efficient_reps_assigned', 0)
         dosage.efficient_sets_assigned = input_dict.get('efficient_sets_assigned', 0)
         dosage.complete_reps_assigned = input_dict.get('complete_reps_assigned', 0)
