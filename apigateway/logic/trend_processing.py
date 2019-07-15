@@ -1,6 +1,8 @@
-from models.athlete_trend import AthleteTrends, PlanAlert, Trend, TrendCategory, TrendData
+from models.athlete_trend import AthleteTrends, PlanAlert, Trend, TrendCategory, TrendData, VisualizationType
 from models.trigger import Trigger, TriggerType
 from models.chart_data import OveractiveUnderactiveChartData, TightUnderactiveChartData
+from models.insights import InsightType
+
 
 
 class TrendProcessor(object):
@@ -22,7 +24,7 @@ class TrendProcessor(object):
 
         self.athlete_trends = AthleteTrends()
 
-        trend_category = TrendCategory(None)
+        trend_category = TrendCategory(InsightType.movement_dysfunction_compensation)
         trend_category.title = "Movement Dysfunction or Compensation"
         tight_muscle_trend = self.get_tight_muscle_view()
         over_under_muscle_trend = self.get_overactive_underactive_muscle_view()
@@ -68,7 +70,8 @@ class TrendProcessor(object):
             trend.title = "Tight Muscle"
             trend.text = "Your data suggests tight muscle stuff"
             trend_data = TrendData()
-
+            trend_data.visualization_type = VisualizationType.tight_muscle
+            trend_data.add_visualization_data()
             tight_under_data = TightUnderactiveChartData()
             tight_under_data.tight_body_parts = [t.body_part.body_part_location.value for t in triggers]
             tight_under_data.underactive_body_parts = [s for s in synergists]
@@ -90,7 +93,8 @@ class TrendProcessor(object):
             trend.title = "Overactive & Underactive Muscle"
             trend.text = "Your data suggests several imbalances in muscle activation which can lead to performance inefficiencies...."
             trend_data = TrendData()
-
+            trend_data.visualization_type = VisualizationType.overactive_underactive
+            trend_data.add_visualization_data()
             over_under_data = OveractiveUnderactiveChartData()
             over_under_data.overactive_body_parts = [t.body_part.body_part_location.value for t in triggers]
             over_under_data.underactive_body_parts = [a for a in antagonists]

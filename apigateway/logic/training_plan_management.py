@@ -2,6 +2,7 @@ import datetime
 
 from fathomapi.utils.xray import xray_recorder
 import logic.exercise_mapping as exercise_mapping
+from logic.trend_processing import TrendProcessor
 from logic.soreness_processing import SorenessCalculator
 from logic.alerts_processing import AlertsProcessing
 from logic.trigger_processing import TriggerFactory
@@ -82,6 +83,9 @@ class TrainingPlanManager(object):
         trigger_factory.load_triggers()
         self.athlete_stats.triggers = trigger_factory.triggers
 
+        trend_processor = TrendProcessor(trigger_factory.triggers)
+        trend_processor.process_triggers()
+
         calc = exercise_mapping.ExerciseAssignmentCalculator(trigger_factory, self.exercise_library_datastore,
                                                              self.completed_exercise_datastore,
                                                              self.training_sessions, self.soreness_list,
@@ -153,14 +157,14 @@ class TrainingPlanManager(object):
                 # self.daily_plan.warm_up = calc.get_warm_up(athlete_stats, soreness_list, parse_date(event_date))
 
         self.daily_plan.last_updated = last_updated
-        alerts = self.daily_plan.get_alerts()
-        alerts.extend(calc.generate_alerts())
-        alerts_processing = AlertsProcessing(daily_plan=self.daily_plan,
-                                             athlete_stats=self.athlete_stats,
-                                             trigger_date_time=self.trigger_date_time,)
-        alerts_processing.aggregate_alerts(alerts=alerts)
+        # alerts = self.daily_plan.get_alerts()
+        # alerts.extend(calc.generate_alerts())
+        # alerts_processing = AlertsProcessing(daily_plan=self.daily_plan,
+        #                                      athlete_stats=self.athlete_stats,
+        #                                      trigger_date_time=self.trigger_date_time,)
+        # alerts_processing.aggregate_alerts(alerts=alerts)
+        self.daily_plan.trends = trend_processor.athlete_trends
         self.daily_plan.trends.add_trend_data(self.athlete_stats)
-
         self.daily_plan_datastore.put(self.daily_plan)
         self.athlete_stats_datastore.put(self.athlete_stats)
 

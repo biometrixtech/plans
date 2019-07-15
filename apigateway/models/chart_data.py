@@ -817,16 +817,16 @@ class OveractiveUnderactiveChartData(Serialisable):
 
     def json_serialise(self):
         ret = {
-            'overactive_body_parts': list(b.json_serialise() for b in self.overactive_body_parts),
-            'underactive_body_parts': list(b.json_serialise() for b in self.underactive_body_parts),
+            'overactive_body_parts': self.overactive_body_parts,
+            'underactive_body_parts': self.underactive_body_parts,
         }
         return ret
 
     @classmethod
     def json_deserialise(cls, input_dict):
         chart_data = cls()
-        chart_data.overactive_body_parts = list(b for b in input_dict.get('overactive_body_parts', []))
-        chart_data.underactive_body_parts = list(b for b in input_dict.get('overactive_body_parts', []))
+        chart_data.overactive_body_parts = input_dict.get('overactive_body_parts', [])
+        chart_data.underactive_body_parts = input_dict.get('overactive_body_parts', [])
         return chart_data
 
 
@@ -837,14 +837,14 @@ class TightUnderactiveChartData(Serialisable):
 
     def json_serialise(self):
         ret = {
-            'tight_body_parts': list(b.json_serialise() for b in self.tight_body_parts),
-            'underactive_body_parts': list(b.json_serialise() for b in self.underactive_body_parts),
+            'tight_body_parts': self.tight_body_parts,
+            'underactive_body_parts': self.underactive_body_parts,
         }
         return ret
 
     @classmethod
     def json_deserialise(cls, input_dict):
         chart_data = cls()
-        chart_data.tight_body_parts = list(b for b in input_dict.get('tight_body_parts', []))
-        chart_data.underactive_body_parts = list(b for b in input_dict.get('overactive_body_parts', []))
+        chart_data.tight_body_parts = input_dict.get('tight_body_parts', [])
+        chart_data.underactive_body_parts = input_dict.get('overactive_body_parts', [])
         return chart_data

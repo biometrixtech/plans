@@ -121,7 +121,41 @@ visualization_data = {
                         'type': 3
                     }
                 ]
-            }
+            },
+            9: {
+                'title': "",
+                'y_axis_1': "",
+                'y_axis_2': "",
+                'legend': [
+                    {
+                        'color': 6,
+                        'text': "Tight Muscle",
+                        'type': 0
+                    },
+                    {
+                        'color': 5,
+                        'text': "Underactive",
+                        'type': 0
+                    }
+                ]
+            },
+            10: {
+                'title': "",
+                'y_axis_1': "",
+                'y_axis_2': "",
+                'legend': [
+                    {
+                        'color': 6,
+                        'text': "Overactive",
+                        'type': 0
+                    },
+                    {
+                        'color': 5,
+                        'text': "Underactive",
+                        'type': 0
+                    }
+                ]
+            },
         }
 
 cta_data = {
