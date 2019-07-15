@@ -2,6 +2,7 @@ from logic.trend_processing import TrendProcessor
 from models.trigger import Trigger, TriggerType
 from models.soreness import BodyPartLocation, BodyPartSide
 from models.body_parts import BodyPartFactory
+from datetime import datetime, timedelta
 
 
 def test_trigger_19():
@@ -14,6 +15,8 @@ def test_trigger_19():
     body_part = body_part_factory.get_body_part(trigger.body_part)
     trigger.synergists = body_part.synergists
     trigger.antagonists = body_part.antagonists
+    trigger.created_date_time = datetime.now() - timedelta(days=1)
+    trigger.modified_date_time = datetime.now()
 
     trigger_list.append(trigger)
 

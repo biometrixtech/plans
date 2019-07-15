@@ -808,3 +808,43 @@ class BodyPartChart(object):
                     SorenessCalculator().get_severity(soreness.severity, soreness.movement),
                     self.soreness_data[soreness.reported_date_time.date()].value)
                 self.contains_soreness_data = True
+
+
+class OveractiveUnderactiveChartData(Serialisable):
+    def __init__(self):
+        self.overactive_body_parts = []
+        self.underactive_body_parts = []
+
+    def json_serialise(self):
+        ret = {
+            'overactive_body_parts': list(b.json_serialise() for b in self.overactive_body_parts),
+            'underactive_body_parts': list(b.json_serialise() for b in self.underactive_body_parts),
+        }
+        return ret
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        chart_data = cls()
+        chart_data.overactive_body_parts = list(b for b in input_dict.get('overactive_body_parts', []))
+        chart_data.underactive_body_parts = list(b for b in input_dict.get('overactive_body_parts', []))
+        return chart_data
+
+
+class TightUnderactiveChartData(Serialisable):
+    def __init__(self):
+        self.tight_body_parts = []
+        self.underactive_body_parts = []
+
+    def json_serialise(self):
+        ret = {
+            'tight_body_parts': list(b.json_serialise() for b in self.tight_body_parts),
+            'underactive_body_parts': list(b.json_serialise() for b in self.underactive_body_parts),
+        }
+        return ret
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        chart_data = cls()
+        chart_data.tight_body_parts = list(b for b in input_dict.get('tight_body_parts', []))
+        chart_data.underactive_body_parts = list(b for b in input_dict.get('overactive_body_parts', []))
+        return chart_data

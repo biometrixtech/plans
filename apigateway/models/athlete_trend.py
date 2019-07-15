@@ -6,6 +6,7 @@ from models.soreness import BodyPartSide
 from models.sport import SportName
 from models.trigger import TriggerType
 from models.trigger_data import TriggerData
+from serialisable import Serialisable
 
 
 class LegendColor(Enum):
@@ -128,6 +129,7 @@ class Trend(object):
         self.present_in_trends = True
         self.cleared = False
         self.longitudinal = False
+        self.last_date_time = None
 
     def json_serialise(self):
         ret = {
@@ -271,6 +273,28 @@ class CallToAction(object):
         return cta
 
 
+class PlanAlert(Serialisable):
+    def __init__(self):
+        self.category = ""
+        self.views = []
+        self.text = ""
+
+    def json_serialise(self):
+        return {
+            'category': self.category,
+            'views': [v for v in self.views],
+            'text': self.text
+        }
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        plan_alert = PlanAlert()
+        plan_alert.category = input_dict['category']
+        plan_alert.views = [v for v in input_dict.get('views', [])]
+        plan_alert.text = input_dict['text']
+        return plan_alert
+
+
 class TrendCategory(object):
     def __init__(self, insight_type):
         self.insight_type = insight_type
@@ -279,13 +303,15 @@ class TrendCategory(object):
         self.alerts = []
         self.title = ""
         self.trends = []
+        self.plan_alerts = []
 
     def json_serialise(self):
         ret = {
             'insight_type': self.insight_type.value,
             'goals': list(self.goals),
             'cta': [cta.json_serialise() for cta in self.cta],
-            'alerts': [alert.json_serialise() for alert in self.alerts]
+            'alerts': [alert.json_serialise() for alert in self.alerts],
+            'plan_alerts': [plan_alert.json_serialise() for plan_alert in self.plan_alerts]
         }
         return ret
 
@@ -295,6 +321,7 @@ class TrendCategory(object):
         trend_category.goals = set(input_dict.get('goals', []))
         trend_category.cta = [CallToAction.json_deserialise(cta) for cta in input_dict.get('cta', [])]
         trend_category.alerts = [Trend.json_deserialise(alert) for alert in input_dict.get('alerts', [])]
+        trend_category.plan_alerts = [PlanAlert.json_deserialise(alert) for alert in input_dict.get('plan_alerts', [])]
         return trend_category
 
     def get_cta(self):
