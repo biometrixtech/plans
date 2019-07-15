@@ -68,7 +68,7 @@ class Legend(object):
         legend.color = LegendColor(input_dict['color'])
         legend.type = LegendType(input_dict['type'])
         legend.text = input_dict['text']
-        legend.series = input_dict['series']
+        legend.series = input_dict.get('series', "")
         return legend
 
 
@@ -293,7 +293,7 @@ class PlanAlert(Serialisable):
 
     def json_serialise(self):
         return {
-            'category': self.category,
+            'category': self.category.value,
             'views': [v for v in self.views],
             'text': self.text,
             'title': self.title
@@ -302,8 +302,7 @@ class PlanAlert(Serialisable):
 
     @classmethod
     def json_deserialise(cls, input_dict):
-        plan_alert = PlanAlert()
-        plan_alert.category = input_dict['category']
+        plan_alert = PlanAlert(InsightType(input_dict['category']))
         plan_alert.views = [v for v in input_dict.get('views', [])]
         plan_alert.text = input_dict['text']
         plan_alert.title = input_dict['title']
@@ -437,6 +436,7 @@ class TrendData(object):
                'visualization_data': self.visualization_data.json_serialise(),
                'status': self.status.json_serialise(),
                'text': self.text,
+               'title': self.title,
                'data': [data.json_serialise() for data in self.data]
                }
         return ret
@@ -448,6 +448,7 @@ class TrendData(object):
         trend_data.status = DataStatus.json_deserialise(input_dict['status'])
         trend_data.visualization_type = VisualizationType(input_dict['visualization_type'])
         trend_data.text = input_dict.get('text', "")
+        trend_data.title = input_dict.get('title', "")
         if trend_data.visualization_type == VisualizationType.body_response:
             trend_data.data = [BodyResponseChartData.json_deserialise(data) for data in input_dict.get('data', [])]
         elif trend_data.visualization_type == VisualizationType.workload:
