@@ -1,4 +1,4 @@
-from models.body_parts import BodyPartFactory
+from models.body_parts import BodyPartFactory, BodyPartLocation, BodyPart
 from models.soreness_base import HistoricSorenessStatus, BodyPartSide
 from models.goal import AthleteGoalType, AthleteGoal
 from models.trigger import TriggerType, Trigger
@@ -112,11 +112,40 @@ class TriggerFactory(object):
                 trigger.pain = soreness.pain
                 trigger.severity = soreness.severity
                 trigger.historic_soreness_status = soreness.historic_soreness_status
-                trigger.antagonists = body_part.antagonists
-                trigger.synergists = body_part.synergists
+                trigger.antagonists = self.convert_body_part_list(body_part, body_part.antagonists)
+                trigger.synergists = self.convert_body_part_list(body_part, body_part.synergists)
 
             trigger.sport_name = sport_name
             self.triggers.append(trigger)
+
+
+    def convert_body_part_list(self, body_part_side, body_part_list):
+
+        body_part_side_list = []
+        body_part_factory = BodyPartFactory()
+
+        if body_part_side == 1 or body_part_side == 2:
+            for b in body_part_list:
+                body_part = body_part_factory.get_body_part(BodyPart(BodyPartLocation(b), None))
+                if body_part.bilateral:
+                    body_part_side_new = BodyPartSide(BodyPartLocation(b), body_part_side.side)
+                else:
+                    body_part_side_new = BodyPartSide(BodyPartLocation(b), side=0)
+
+                body_part_side_list.append(body_part_side_new)
+        else:
+            for b in body_part_list:
+                body_part = body_part_factory.get_body_part(BodyPart(BodyPartLocation(b), None))
+                if body_part.bilateral:
+                    body_part_side_1 = BodyPartSide(BodyPartLocation(b), side=1)
+                    body_part_side_2 = BodyPartSide(BodyPartLocation(b), side=2)
+                    body_part_side_list.append(body_part_side_1)
+                    body_part_side_list.append(body_part_side_2)
+                else:
+                    body_part_side_new = BodyPartSide(BodyPartLocation(b), side=0)
+                    body_part_side_list.append(body_part_side_new)
+
+        return body_part_side_list
 
     def load_triggers(self):
 
