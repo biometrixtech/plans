@@ -508,10 +508,10 @@ class AthleteTrends(object):
         self.biomechanics.get_cta()
 
     def add_no_trigger(self):
-        #self.stress.check_no_trend()
-        #self.response.check_no_trend()
-        #self.biomechanics.check_no_trend()
-        pass
+        self.stress.check_no_trend()
+        self.response.check_no_trend()
+        self.biomechanics.check_no_trend()
+        # pass
 
     def sort_by_priority(self):
         self.stress.sort_trends()
