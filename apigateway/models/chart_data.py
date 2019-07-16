@@ -856,3 +856,35 @@ class TightOverUnderactiveChartData(Serialisable):
         chart_data.underactive = [BodyPartSide.json_deserialise(a) for a in input_dict.get('underactive',[])]
         chart_data.underactive_needing_care = [BodyPartSide.json_deserialise(a) for a in input_dict.get('underactive_needing_care',[])]
         return chart_data
+
+    def remove_duplicates(self):
+
+        self.overactive = list(set(self.overactive))
+        self.underactive = list(set(self.underactive))
+        self.underactive_needing_care = list(set(self.underactive_needing_care))
+
+        unc_delete = []
+        una_delete = []
+
+        for u in self.underactive_needing_care:
+            index = next((i for i, x in enumerate(self.underactive) if u == x), -1)
+            index_2 = next((i for i, x in enumerate(self.overactive) if u == x), -1)
+            if index > -1 or index_2 > -1:
+                unc_delete.append(index)
+
+        for d in unc_delete:
+            del(self.underactive_needing_care[d])
+
+        for u in self.underactive:
+            index = next((i for i, x in enumerate(self.overactive) if u == x), -1)
+            if index > -1:
+                una_delete.append(index)
+
+        for d in una_delete:
+            del(self.underactive[d])
+
+
+
+
+
+
