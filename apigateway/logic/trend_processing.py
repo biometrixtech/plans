@@ -1,4 +1,4 @@
-from models.athlete_trend import AthleteTrends, PlanAlert, Trend, TrendCategory, TrendData, VisualizationType, LegendColor
+from models.athlete_trend import AthleteTrends, PlanAlert, Trend, TrendCategory, TrendData, VisualizationType, LegendColor, BoldText
 from models.trigger import TriggerType, Trigger
 from models.chart_data import OveractiveUnderactiveChartData, TightOverUnderactiveChartData
 from models.insights import InsightType
@@ -72,10 +72,21 @@ class TrendProcessor(object):
             antagonists_1, synergists_1 = self.get_antagonists_syngergists(triggers_1)
             antagonists_2, synergists_2 = self.get_antagonists_syngergists(triggers_2)
             trend = Trend(trigger_type_1)
-            trend.title = "Tight Muscle"
+            trend.title = "Muscle Over & Under Activity"
             trend.title_color = LegendColor.warning_light
             trend.text.append("Your data suggests tight muscle stuff.")
             trend.text.append("Seriously. We're not kidding.")
+
+            bold_text_1 = BoldText()
+            bold_text_1.text = "Seriously"
+            bold_text_1.color = LegendColor.error_light
+
+            bold_text_2 = BoldText()
+            bold_text_2.text = "tight muscle"
+            bold_text_2.color = LegendColor.warning_light
+            trend.bold_text.append(bold_text_1)
+            trend.bold_text.append(bold_text_2)
+
             trend.icon = "view1icon.png"
             trend_data = TrendData()
             trend_data.visualization_type = VisualizationType.tight_overactice_underactive
@@ -89,7 +100,19 @@ class TrendProcessor(object):
             tight_under_data.remove_duplicates()
             trend_data.data = [tight_under_data]
             trend_data.text = "This is a specific description of all your tight muscles..."
+
+            bold_text_3 = BoldText()
+            bold_text_3.text = "all your tight muscles"
+            bold_text_3.color = LegendColor.error_light
+
+            bold_text_4 = BoldText()
+            bold_text_4.text = "specific"
+            bold_text_4.color = LegendColor.warning_light
+            trend_data.bold_text.append(bold_text_3)
+            trend_data.bold_text.append(bold_text_4)
+
             trend_data.title = "Trigger Specific Title"
+            trend_data.title_color = LegendColor.warning_light
             trend.trend_data = trend_data
 
             all_triggers = []
