@@ -18,6 +18,7 @@ class LegendColor(Enum):
     splash_light = 4
     warning_light = 5
     error_light = 6
+    splash_x_light = 7
 
 
 class LegendType(Enum):
