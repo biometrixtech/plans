@@ -843,7 +843,7 @@ class TightOverUnderactiveChartData(Serialisable):
 
     def json_serialise(self):
         ret = {
-            'tight_body_parts': [a.json_serialise() for a in self.overactive if self.overactive is not None],
+            'overactive': [a.json_serialise() for a in self.overactive if self.overactive is not None],
             'underactive': [a.json_serialise() for a in self.underactive if self.underactive is not None],
             'underactive_needing_care': [a.json_serialise() for a in self.underactive_needing_care if self.underactive_needing_care is not None],
         }
