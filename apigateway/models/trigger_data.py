@@ -140,19 +140,19 @@ visualization_data = {
                 'y_axis_2': "",
                 'legend': [
                     {
-                        'color': 2,
+                        'color': 1,
                         'text': "Overactive",
                         'type': 0,
                         'series': "overactive"
                     },
                     {
-                        'color': 3,
+                        'color': 4,
                         'text': "Underactive",
                         'type': 0,
                         'series': "underactive"
                     },
                     {
-                        'color': 4,
+                        'color': 7,
                         'text': "Underactive & Needing Care",
                         'type': 0,
                         'series': "underactive_needing_care"
