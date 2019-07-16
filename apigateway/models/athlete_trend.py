@@ -459,7 +459,7 @@ class TrendData(object):
             trend_data.data = [BodyResponseChartData.json_deserialise(data) for data in input_dict.get('data', [])]
         elif trend_data.visualization_type == VisualizationType.workload:
             trend_data.data = [WorkoutChartData.json_deserialise(data) for data in input_dict.get('data', [])]
-        elif trend_data.visualization_type == VisualizationType.tight_muscle:
+        elif trend_data.visualization_type == VisualizationType.tight_overactice_underactive:
             trend_data.data = [TightOverUnderactiveChartData.json_deserialise(data) for data in input_dict.get('data', [])]
         elif trend_data.visualization_type == VisualizationType.overactive_underactive:
             trend_data.data = [OveractiveUnderactiveChartData.json_deserialise(data) for data in input_dict.get('data', [])]
