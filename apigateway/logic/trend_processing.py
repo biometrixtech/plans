@@ -1,4 +1,4 @@
-from models.athlete_trend import AthleteTrends, PlanAlert, Trend, TrendCategory, TrendData, VisualizationType
+from models.athlete_trend import AthleteTrends, PlanAlert, Trend, TrendCategory, TrendData, VisualizationType, LegendColor
 from models.trigger import TriggerType, Trigger
 from models.chart_data import OveractiveUnderactiveChartData, TightOverUnderactiveChartData
 from models.insights import InsightType
@@ -73,7 +73,10 @@ class TrendProcessor(object):
             antagonists_2, synergists_2 = self.get_antagonists_syngergists(triggers_2)
             trend = Trend(trigger_type_1)
             trend.title = "Tight Muscle"
-            trend.text = "Your data suggests tight muscle stuff"
+            trend.title_color = LegendColor.warning_light
+            trend.text.append("Your data suggests tight muscle stuff.")
+            trend.text.append("Seriously. We're not kidding.")
+            trend.icon = "view1icon.png"
             trend_data = TrendData()
             trend_data.visualization_type = VisualizationType.tight_overactice_underactive
             trend_data.add_visualization_data()
