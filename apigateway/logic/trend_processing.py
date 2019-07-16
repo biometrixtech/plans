@@ -83,6 +83,7 @@ class TrendProcessor(object):
             tight_under_data.underactive.extend([a for a in antagonists_2])
             tight_under_data.underactive_needing_care.extend([s for s in synergists_1])
             tight_under_data.underactive_needing_care.extend([s for s in synergists_2])
+            tight_under_data.remove_duplicates()
             trend_data.data = [tight_under_data]
             trend_data.text = "This is a specific description of all your tight muscles..."
             trend_data.title = "Trigger Specific Title"
