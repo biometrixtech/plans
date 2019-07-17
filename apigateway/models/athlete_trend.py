@@ -195,7 +195,7 @@ class Trend(object):
         trend = cls(TriggerType(input_dict['trigger_type']))
         trend.title = input_dict.get('title', '')
         trend.first_time = input_dict.get('first_time', False)
-        trend.title_color = LegendColor(input_dict['title_color']) if input_dict['title_color'] is not None else None
+        trend.title_color = LegendColor(input_dict['title_color']) if input_dict.get('title_color') is not None else None
         trend.text = input_dict.get('text', [])
         trend.icon = input_dict.get('icon', '')
         trend.bold_text = [BoldText.json_deserialise(b) for b in input_dict.get('bold_text', [])]
@@ -485,7 +485,7 @@ class TrendData(object):
         trend_data.visualization_type = VisualizationType(input_dict['visualization_type'])
         trend_data.text = input_dict.get('text', "")
         trend_data.title = input_dict.get('title', "")
-        trend_data.title_color = LegendColor(input_dict['title_color']) if input_dict['title_color'] is not None else None
+        trend_data.title_color = LegendColor(input_dict['title_color']) if input_dict.get('title_color') is not None else None
         trend_data.bold_text = [BoldText.json_deserialise(b) for b in input_dict.get('bold_text', [])]
         if trend_data.visualization_type == VisualizationType.body_response:
             trend_data.data = [BodyResponseChartData.json_deserialise(data) for data in input_dict.get('data', [])]
