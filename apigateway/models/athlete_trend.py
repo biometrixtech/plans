@@ -48,6 +48,25 @@ class DataSource(Enum):
     three_sensor = 4
 
 
+class BoldText(Serialisable):
+    def __init__(self):
+        self.text = ""
+        self.color = None
+
+    def json_serialise(self):
+        return {
+            'text': self.text,
+            'color': self.color.value if self.color is not None else None
+        }
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        bold_text = cls()
+        bold_text.color = LegendColor(input_dict['color']) if input_dict['color'] is not None else None
+        bold_text.text = input_dict['text']
+        return bold_text
+
+
 class Legend(object):
     def __init(self):
         self.color = LegendColor(0)
@@ -151,7 +170,7 @@ class Trend(object):
             'title_color': self.title_color.value if self.title_color is not None else None,
             'text': [t for t in self.text],
             'icon': self.icon,
-            'bold_text': self.bold_text,
+            'bold_text': [b.json_serialise() for b in self.bold_text],
             'visualization_title': self.visualization_title.json_serialise(),
             'visualization_type': self.visualization_type.value,
             'visualization_data': self.visualization_data.json_serialise(),
@@ -179,7 +198,7 @@ class Trend(object):
         trend.title_color = LegendColor(input_dict['title_color']) if input_dict['title_color'] is not None else None
         trend.text = input_dict.get('text', [])
         trend.icon = input_dict.get('icon', '')
-        trend.bold_text = input_dict.get('bold_text', [])
+        trend.bold_text = [BoldText.json_deserialise(b) for b in input_dict.get('bold_text', [])]
         trend.visualization_title = VisualizationTitle.json_deserialise(input_dict['visualization_title'])
         trend.visualization_type = VisualizationType(input_dict['visualization_type'])
         trend.visualization_data = VisualizationData.json_deserialise(input_dict['visualization_data'])
@@ -452,8 +471,8 @@ class TrendData(object):
                'status': self.status.json_serialise(),
                'text': self.text,
                'title': self.title,
-               'title_color': self.title_color.json_serialise() if self.title_color is not None else None,
-               'bold_text': self.bold_text,
+               'title_color': self.title_color.value if self.title_color is not None else None,
+               'bold_text': [b.json_serialise() for b in self.bold_text],
                'data': [data.json_serialise() for data in self.data]
                }
         return ret
@@ -467,7 +486,7 @@ class TrendData(object):
         trend_data.text = input_dict.get('text', "")
         trend_data.title = input_dict.get('title', "")
         trend_data.title_color = LegendColor(input_dict['title_color']) if input_dict['title_color'] is not None else None
-        trend_data.bold_text = input_dict.get('bold_text', [])
+        trend_data.bold_text = [BoldText.json_deserialise(b) for b in input_dict.get('bold_text', [])]
         if trend_data.visualization_type == VisualizationType.body_response:
             trend_data.data = [BodyResponseChartData.json_deserialise(data) for data in input_dict.get('data', [])]
         elif trend_data.visualization_type == VisualizationType.workload:
