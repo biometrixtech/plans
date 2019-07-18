@@ -52,6 +52,7 @@ class Soreness(BaseSoreness, Serialisable):
         self.first_reported_date_time = None
         self.last_reported_date_time = None
         self.cleared_date_time = None
+        self.status_changed_date_time = None
         self.daily = True
 
     @classmethod
@@ -68,8 +69,8 @@ class Soreness(BaseSoreness, Serialisable):
         soreness.cleared_date_time = input_dict.get('cleared_date_time', None)
         soreness.max_severity_date_time = input_dict.get('max_severity_date_time', None)
         soreness.causal_session = input_dict.get('causal_session', None)
-        # if input_dict.get('first_reported_date_time', None) is not None:
-        #     soreness.first_reported_date_time = parse_date(input_dict['first_reported_date_time'])
+        if input_dict.get('status_changed_date_time', None) is not None:
+            soreness.status_changed_date_time = parse_datetime(input_dict['status_changed_date_time'])
         if input_dict.get('reported_date_time', None) is not None:
             soreness.reported_date_time = parse_datetime(input_dict['reported_date_time'])
         return soreness
@@ -144,7 +145,8 @@ class Soreness(BaseSoreness, Serialisable):
                    'body_part': self.body_part.location.value,
                    'side': self.side,
                    'pain': self.pain,
-                   'status': self.historic_soreness_status.name if self.historic_soreness_status is not None else HistoricSorenessStatus.dormant_cleared.name
+                   'status': self.historic_soreness_status.name if self.historic_soreness_status is not None else HistoricSorenessStatus.dormant_cleared.name,
+                   'status_changed_date_time': format_datetime(self.status_changed_date_time) if self.status_changed_date_time is not None else None
                    }
         elif daily:
             ret = {

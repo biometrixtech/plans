@@ -92,6 +92,7 @@ class SorenessCalculator(object):
                     soreness_list[s].max_severity = historic_soreness[h].max_severity
                     soreness_list[s].max_severity_date_time = historic_soreness[h].max_severity_date_time
                     soreness_list[s].causal_session = historic_soreness[h].causal_session
+                    soreness_list[s].status_changed_date_time = historic_soreness[h].status_changed_date_time
                     historic_soreness_found = True
             if not historic_soreness_found:
                 new_soreness = Soreness()
@@ -107,6 +108,7 @@ class SorenessCalculator(object):
                 new_soreness.cleared_date_time = historic_soreness[h].cleared_date_time
                 new_soreness.max_severity_date_time = historic_soreness[h].max_severity_date_time
                 new_soreness.causal_session = historic_soreness[h].causal_session
+                new_soreness.status_changed_date_time = historic_soreness[h].status_changed_date_time
                 soreness_list.append(new_soreness)
 
         return soreness_list

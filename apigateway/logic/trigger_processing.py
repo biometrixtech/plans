@@ -95,6 +95,7 @@ class TriggerFactory(object):
 
             if soreness is not None:
                 self.triggers[trigger_index].severity = soreness.severity
+                self.triggers[trigger_index].source_date_time = soreness.status_changed_date_time
 
         else:
 
@@ -114,6 +115,7 @@ class TriggerFactory(object):
                 trigger.historic_soreness_status = soreness.historic_soreness_status
                 trigger.antagonists = self.convert_body_part_list(body_part_side, body_part.antagonists)
                 trigger.synergists = self.convert_body_part_list(body_part_side, body_part.synergists)
+                trigger.source_date_time = soreness.status_changed_date_time
 
             trigger.sport_name = sport_name
             self.triggers.append(trigger)

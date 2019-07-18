@@ -46,13 +46,21 @@ class TrendProcessor(object):
 
         if len(triggers) > 0:
 
+            status_changed_date_time = None
+
             created_triggers = sorted(triggers, key=lambda x: x.created_date_time, reverse=True)
             modified_triggers = sorted(triggers, key=lambda x: x.modified_date_time, reverse=True)
+            status_changed_triggers = [t for t in triggers if t.source_date_time is not None]
+            if len(status_changed_triggers) > 0:
+                status_triggers = sorted(triggers, key=lambda x: x.source_date_time, reverse=True)
+                status_changed_date_time = status_triggers[0].source_date_time
 
             last_created_date_time = created_triggers[0].created_date_time
             last_modified_date_time = modified_triggers[0].modified_date_time
 
-            if last_modified_date_time is not None:
+            if status_changed_date_time is not None:
+                return status_changed_date_time
+            elif last_modified_date_time is not None:
                 return max(last_modified_date_time, last_created_date_time)
             else:
                 return last_created_date_time

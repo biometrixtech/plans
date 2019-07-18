@@ -6,6 +6,7 @@ from models.soreness_base import HistoricSorenessStatus, BaseSoreness, BodyPartL
 from models.session import Session
 from serialisable import Serialisable
 from utils import parse_datetime, format_datetime, parse_date
+from datetime import datetime
 
 
 class SorenessCause(Enum):
@@ -34,7 +35,7 @@ class HistoricSeverity(object):
 
     def __setattr__(self, name, value):
         if name in ['reported_date_time']:
-            if value is not None and not isinstance(value, datetime.datetime):
+            if value is not None and not isinstance(value, datetime):
                 value = parse_datetime(value)
         super().__setattr__(name, value)
 
@@ -146,15 +147,19 @@ class HistoricSoreness(BaseSoreness, Serialisable):
         self.co_occurrences = []
         self.historic_severity = []
         self.cause = SorenessCause.unknown
+        self.status_changed_date_time = None
 
     def __setattr__(self, name, value):
         if name in ['first_reported_date_time', 'last_reported_date_time', 'streak_start_date', 'cleared_date_time',
                     'max_severity_date_time']:
-            if value is not None and not isinstance(value, datetime.datetime):
+            if value is not None and not isinstance(value, datetime):
                 try:
                     value = parse_datetime(value)
                 except InvalidSchemaException:
                     value = parse_date(value)
+        elif name in ['historic_soreness_status']:
+            if hasattr(self, 'historic_soreness_status') and value != self.historic_soreness_status:
+                self.status_changed_date_time = datetime.utcnow()
         super().__setattr__(name, value)
 
     def json_serialise(self, api=False, cleared=False):
@@ -162,7 +167,9 @@ class HistoricSoreness(BaseSoreness, Serialisable):
             ret = {"body_part": self.body_part_location.value,
                    "side": self.side,
                    "pain": self.is_pain,
-                   "status": self.historic_soreness_status.name}
+                   "status": self.historic_soreness_status.name,
+                   'status_changed_date_time': format_datetime(
+                       self.status_changed_date_time) if self.status_changed_date_time is not None else None}
         else:
             ret = {
                    'body_part_location': self.body_part_location.value,
@@ -182,7 +189,8 @@ class HistoricSoreness(BaseSoreness, Serialisable):
                    # 'last_reported': self.last_reported,
                    'ask_acute_pain_question': self.ask_acute_pain_question,
                    'ask_persistent_2_question': self.ask_persistent_2_question,
-                   'cause': self.cause.value if self.cause is not None else None
+                   'cause': self.cause.value if self.cause is not None else None,
+                    'status_changed_date_time': format_datetime(self.status_changed_date_time) if self.status_changed_date_time is not None else None
                   }
             if cleared:
                 ret['user_id'] = self.user_id
@@ -216,7 +224,8 @@ class HistoricSoreness(BaseSoreness, Serialisable):
         soreness.historic_severity = [HistoricSeverity.json_deserialise(hist) for hist in input_dict.get('historic_severity', [])]
         soreness.ask_acute_pain_question = input_dict.get("ask_acute_pain_question", False)
         soreness.ask_persistent_2_question = input_dict.get("ask_persistent_2_question", False)
-
+        if input_dict.get('status_changed_date_time', None) is not None:
+            soreness.status_changed_date_time = parse_datetime(input_dict['status_changed_date_time'])
         return soreness
 
     '''deprecated
