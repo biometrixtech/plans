@@ -113,6 +113,7 @@ class TriggerFactory(object):
                 trigger.pain = soreness.pain
                 trigger.severity = soreness.severity
                 trigger.historic_soreness_status = soreness.historic_soreness_status
+                trigger.agonists = self.convert_body_part_list(body_part_side, body_part.agonists)
                 trigger.antagonists = self.convert_body_part_list(body_part_side, body_part.antagonists)
                 trigger.synergists = self.convert_body_part_list(body_part_side, body_part.synergists)
                 trigger.source_date_time = soreness.status_changed_date_time

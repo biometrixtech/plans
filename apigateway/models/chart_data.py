@@ -815,27 +815,7 @@ class BodyPartChart(object):
                 self.contains_soreness_data = True
 
 
-class OveractiveUnderactiveChartData(Serialisable):
-    def __init__(self):
-        self.overactive_body_parts = []
-        self.underactive_body_parts = []
-
-    def json_serialise(self):
-        ret = {
-            'overactive_body_parts': self.overactive_body_parts,
-            'underactive_body_parts': self.underactive_body_parts,
-        }
-        return ret
-
-    @classmethod
-    def json_deserialise(cls, input_dict):
-        chart_data = cls()
-        chart_data.overactive_body_parts = input_dict.get('overactive_body_parts', [])
-        chart_data.underactive_body_parts = input_dict.get('underactive_body_parts', [])
-        return chart_data
-
-
-class TightOverUnderactiveChartData(Serialisable):
+class BaseOveractiveUnderactiveChartData(Serialisable):
     def __init__(self):
         self.overactive = []
         self.underactive = []
@@ -872,6 +852,8 @@ class TightOverUnderactiveChartData(Serialisable):
             if index > -1 or index_2 > -1:
                 unc_delete.append(index)
 
+        unc_delete.sort(reverse=True)  # need to remove in reverse order so we don't mess up indexes along the way
+
         for d in unc_delete:
             del(self.underactive_needing_care[d])
 
@@ -880,8 +862,21 @@ class TightOverUnderactiveChartData(Serialisable):
             if index > -1:
                 una_delete.append(index)
 
+        una_delete.sort(reverse=True)
+
         for d in una_delete:
             del(self.underactive[d])
+
+
+class PainFunctionalLimitationChartData(BaseOveractiveUnderactiveChartData):
+    def __init__(self):
+        super().__init__()
+
+
+class TightOverUnderactiveChartData(BaseOveractiveUnderactiveChartData):
+    def __init__(self):
+        super().__init__()
+
 
 
 

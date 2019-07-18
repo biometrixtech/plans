@@ -110,6 +110,7 @@ class Trigger(BaseSoreness, Serialisable):
         super().__init__()
         self.trigger_type = trigger_type
         self.body_part = None
+        self.agonists = []
         self.antagonists = []
         self.synergists = []
         self.sport_name = None
@@ -125,6 +126,7 @@ class Trigger(BaseSoreness, Serialisable):
         return {
             "trigger_type": self.trigger_type.value,
             "body_part": self.body_part.json_serialise() if self.body_part is not None else None,
+            "agonists": [a.json_serialise() for a in self.agonists if self.agonists is not None],
             "antagonists": [a.json_serialise() for a in self.antagonists if self.antagonists is not None],
             "synergists": [s.json_serialise() for s in self.synergists if self.synergists is not None],
             "sport_name": self.sport_name.value if self.sport_name is not None else None,
@@ -145,6 +147,7 @@ class Trigger(BaseSoreness, Serialisable):
     def json_deserialise(cls, input_dict):
         trigger = cls(TriggerType(input_dict['trigger_type']))
         trigger.body_part = BodyPartSide.json_deserialise(input_dict['body_part']) if input_dict['body_part'] is not None else None
+        trigger.agonists = [BodyPartSide.json_deserialise(a) for a in input_dict.get('agonists', [])]
         trigger.antagonists = [BodyPartSide.json_deserialise(a) for a in input_dict.get('antagonists',[])]
         trigger.synergists = [BodyPartSide.json_deserialise(s) for s in input_dict.get('synergists',[])]
         trigger.sport_name = input_dict['sport_name']

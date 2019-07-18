@@ -168,13 +168,19 @@ visualization_data = {
                         'color': 6,
                         'text': "Overactive",
                         'type': 0,
-                        'series': "overactive_body_parts"
+                        'series': "overactive"
                     },
                     {
-                        'color': 5,
+                        'color': 4,
                         'text': "Underactive",
                         'type': 0,
-                        'series': "underactive_body_parts"
+                        'series': "underactive"
+                    },
+                    {
+                        'color': 7,
+                        'text': "Underactive & Needing Care",
+                        'type': 0,
+                        'series': "underactive_needing_care"
                     }
                 ]
             },

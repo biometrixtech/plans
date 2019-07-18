@@ -1,6 +1,6 @@
 from enum import Enum
 from logic.text_generator import TextGenerator
-from models.chart_data import BodyPartChartData, DataSeriesBooleanData, DataSeriesData, TrainingVolumeChartData, BodyResponseChartData, WorkoutChartData, TightOverUnderactiveChartData, OveractiveUnderactiveChartData
+from models.chart_data import BodyPartChartData, DataSeriesBooleanData, DataSeriesData, TrainingVolumeChartData, BodyResponseChartData, WorkoutChartData, TightOverUnderactiveChartData, PainFunctionalLimitationChartData
 from models.insights import InsightType
 from models.soreness_base import BodyPartSide
 from models.sport import SportName
@@ -38,7 +38,7 @@ class VisualizationType(Enum):
     body_response = 7
     workload = 8
     tight_overactice_underactive = 9
-    overactive_underactive = 10
+    pain_functional_limitation = 10
 
 
 class DataSource(Enum):
@@ -493,8 +493,8 @@ class TrendData(object):
             trend_data.data = [WorkoutChartData.json_deserialise(data) for data in input_dict.get('data', [])]
         elif trend_data.visualization_type == VisualizationType.tight_overactice_underactive:
             trend_data.data = [TightOverUnderactiveChartData.json_deserialise(data) for data in input_dict.get('data', [])]
-        elif trend_data.visualization_type == VisualizationType.overactive_underactive:
-            trend_data.data = [OveractiveUnderactiveChartData.json_deserialise(data) for data in input_dict.get('data', [])]
+        elif trend_data.visualization_type == VisualizationType.pain_functional_limitation:
+            trend_data.data = [PainFunctionalLimitationChartData.json_deserialise(data) for data in input_dict.get('data', [])]
         else:
             trend_data.data = []
 
