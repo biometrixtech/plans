@@ -110,6 +110,7 @@ class Trigger(BaseSoreness, Serialisable):
         super().__init__()
         self.trigger_type = trigger_type
         self.body_part = None
+        self.agonists = []
         self.antagonists = []
         self.synergists = []
         self.sport_name = None
@@ -119,11 +120,13 @@ class Trigger(BaseSoreness, Serialisable):
         self.created_date_time = None
         self.modified_date_time = None
         self.deleted_date_time = None
+        self.source_date_time = None
 
     def json_serialise(self):
         return {
             "trigger_type": self.trigger_type.value,
             "body_part": self.body_part.json_serialise() if self.body_part is not None else None,
+            "agonists": [a.json_serialise() for a in self.agonists if self.agonists is not None],
             "antagonists": [a.json_serialise() for a in self.antagonists if self.antagonists is not None],
             "synergists": [s.json_serialise() for s in self.synergists if self.synergists is not None],
             "sport_name": self.sport_name.value if self.sport_name is not None else None,
@@ -135,24 +138,26 @@ class Trigger(BaseSoreness, Serialisable):
             "modified_date_time": format_datetime(
                 self.modified_date_time) if self.modified_date_time is not None else None,
             "deleted_date_time": format_datetime(
-                self.deleted_date_time) if self.deleted_date_time is not None else None
+                self.deleted_date_time) if self.deleted_date_time is not None else None,
+            "source_date_time": format_datetime(
+                self.source_date_time) if self.source_date_time is not None else None
         }
 
     @classmethod
     def json_deserialise(cls, input_dict):
         trigger = cls(TriggerType(input_dict['trigger_type']))
         trigger.body_part = BodyPartSide.json_deserialise(input_dict['body_part']) if input_dict['body_part'] is not None else None
+        trigger.agonists = [BodyPartSide.json_deserialise(a) for a in input_dict.get('agonists', [])]
         trigger.antagonists = [BodyPartSide.json_deserialise(a) for a in input_dict.get('antagonists',[])]
         trigger.synergists = [BodyPartSide.json_deserialise(s) for s in input_dict.get('synergists',[])]
         trigger.sport_name = input_dict['sport_name']
         trigger.severity = input_dict['severity']
         trigger.pain = input_dict['pain']
         trigger.historic_soreness_status = HistoricSorenessStatus(input_dict['historic_soreness_status']) if input_dict.get('historic_soreness_status') is not None else None
-        trigger.created_date_time = parse_datetime(input_dict["created_date_time"]) if input_dict["created_date_time"] is not None else None
-        trigger.modified_date_time = parse_datetime(input_dict["modified_date_time"]) if input_dict[
-                                                                                         "modified_date_time"] is not None else None
-        trigger.deleted_date_time = parse_datetime(input_dict["deleted_date_time"]) if input_dict[
-                                                                                         "deleted_date_time"] is not None else None
+        trigger.created_date_time = parse_datetime(input_dict["created_date_time"]) if input_dict.get("created_date_time") is not None else None
+        trigger.modified_date_time = parse_datetime(input_dict["modified_date_time"]) if input_dict.get("modified_date_time") is not None else None
+        trigger.deleted_date_time = parse_datetime(input_dict["deleted_date_time"]) if input_dict.get("deleted_date_time") is not None else None
+        trigger.source_date_time = parse_datetime(input_dict["source_date_time"]) if input_dict.get("source_date_time") is not None else None
         return trigger
 
     def __setattr__(self, name, value):
