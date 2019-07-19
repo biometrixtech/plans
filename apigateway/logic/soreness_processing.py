@@ -70,9 +70,11 @@ class SorenessCalculator(object):
             for r in soreness_list:
                 if r.body_part.location.value == s.body_part.location.value and r.side == s.side and r.pain == s.pain:
                     r.severity = max([self.get_severity(r.severity, r.movement), self.get_severity(s.severity, s.movement)])
+                    r.movement = None
                     updated = True
             if not updated:
                 s.severity = self.get_severity(s.severity, s.movement)
+                s.movement = None
                 soreness_list.append(s)
         return soreness_list
 

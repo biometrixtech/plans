@@ -347,8 +347,8 @@ def test_generate_spreadsheets():
                                 historic_soreness.historic_soreness_status = h1
                                 historic_soreness.average_severity = 2.0
                                 historic_soreness.max_severity = 2.0
-                                if h1 == HistoricSorenessStatus.dormant_cleared and b1==15 and not p and day_diff==32 and not test_parm.doms:
-                                    k=0
+                                #if h1 == HistoricSorenessStatus.dormant_cleared and b1==15 and not p and day_diff==32 and not test_parm.doms:
+                                #    k=0
                                 if (0==0) or h1 == HistoricSorenessStatus.persistent_2_soreness and b1 == 14 and p == False and test_parm.doms and day_diff == 32:
                                     body_part_list = [b1]
                                     severity_list = [m1]
