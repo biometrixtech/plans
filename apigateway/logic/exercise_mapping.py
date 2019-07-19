@@ -417,10 +417,10 @@ class ExerciseAssignmentCalculator(object):
                 #     alerts.append(alert)
 
         for d in self.doms:
-            days = (self.event_date_time - d.first_reported_date_time).days
-            if ((days == 2 and d.max_severity == 1) or  # minor DOMS
-                    (days <= 2 and 2 <= d.max_severity <= 3) or  # moderate DOMS
-                    (days <= 2 and 3 < d.max_severity <= 5)):  # severe DOMS
+            days = (self.event_date_time.date() - d.first_reported_date_time.date()).days
+            if days <= 2 and 2 <= d.max_severity <= 5: #or  # moderate or severe DOMS (not minor doms)
+                    #(days <= 2 and 2 <= d.max_severity <= 3) or  # moderate DOMS
+                    #(days <= 2 and 3 < d.max_severity <= 5)):  # severe DOMS
                 if not self.is_lower_body_part(d.body_part_location):
                     goal = AthleteGoal("Care for soreness", 1, AthleteGoalType.sore)
                     #goal.trigger = "Soreness Reported Today as DOMS"
@@ -492,10 +492,11 @@ class ExerciseAssignmentCalculator(object):
                     # alerts.append(alert)
 
         for d in self.doms:
-            days = (self.event_date_time - d.first_reported_date_time).days
-            if ((days == 2 and d.max_severity  == 1) or  # minor DOMS
-                    (days <= 2 and 2 <= d.max_severity <= 3) or  # moderate DOMS
-                    (days <= 2 and 3 < d.max_severity <= 5)):  # severe DOMS
+            days = (self.event_date_time.date() - d.first_reported_date_time.date()).days
+            if days <= 2 and 2 <= d.max_severity <= 5:  # or  # moderate or severe DOMS (not minor doms)
+            # if ((days == 2 and d.max_severity  == 1) or  # minor DOMS
+            #         (days <= 2 and 2 <= d.max_severity <= 3) or  # moderate DOMS
+            #         (days <= 2 and 3 < d.max_severity <= 5)):  # severe DOMS
                 if self.is_lower_body_part(d.body_part_location):
                     goal = AthleteGoal("Care for soreness", 1, AthleteGoalType.sore)
                     #goal.trigger = "Soreness Reported Today as DOMS"

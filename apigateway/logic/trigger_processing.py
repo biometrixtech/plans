@@ -176,7 +176,7 @@ class TriggerFactory(object):
 
             days_diff = None
             if soreness.first_reported_date_time is not None:
-                days_diff = (self.event_date_time - soreness.first_reported_date_time).days
+                days_diff = (self.event_date_time.date() - soreness.first_reported_date_time.date()).days
 
             if self.eligible_for_high_load_trigger:
                 if (soreness.daily and soreness.historic_soreness_status is not None and not soreness.is_dormant_cleared()

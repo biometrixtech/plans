@@ -314,7 +314,8 @@ def test_generate_spreadsheets():
                 historic_soreness = HistoricSoreness(BodyPartLocation(14), 1, is_historic_soreness_pain(h1))
                 historic_soreness.first_reported_date_time = current_date_time - timedelta(days=day_diff)
                 historic_soreness.historic_soreness_status = h1
-                #historic_soreness.average_severity = 2
+                historic_soreness.average_severity = 2
+                historic_soreness.max_severity = 2
                 historic_soreness_list.append(historic_soreness)
 
                 if test_parm.no_soreness:
@@ -342,8 +343,12 @@ def test_generate_spreadsheets():
                     for b1 in body_parts_1:
                         for m1 in max_severity_1:
                             for p in is_pain_1:
-                                #if h1 == HistoricSorenessStatus.persistent_pain and b1==1:
-                                #    k=0
+                                # this can get reset by reference along the way so reset now
+                                historic_soreness.historic_soreness_status = h1
+                                historic_soreness.average_severity = 2.0
+                                historic_soreness.max_severity = 2.0
+                                if h1 == HistoricSorenessStatus.dormant_cleared and b1==15 and not p and day_diff==32 and not test_parm.doms:
+                                    k=0
                                 if (0==0) or h1 == HistoricSorenessStatus.persistent_2_soreness and b1 == 14 and p == False and test_parm.doms and day_diff == 32:
                                     body_part_list = [b1]
                                     severity_list = [m1]
