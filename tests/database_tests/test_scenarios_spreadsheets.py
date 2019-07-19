@@ -344,11 +344,16 @@ def test_generate_spreadsheets():
                         for m1 in max_severity_1:
                             for p in is_pain_1:
                                 # this can get reset by reference along the way so reset now
-                                historic_soreness.historic_soreness_status = h1
-                                historic_soreness.average_severity = 2.0
-                                historic_soreness.max_severity = 2.0
-                                #if h1 == HistoricSorenessStatus.dormant_cleared and b1==15 and not p and day_diff==32 and not test_parm.doms:
-                                #    k=0
+                                historic_soreness_list = []
+
+                                if h1 is not None:
+                                    historic_soreness.historic_soreness_status = h1
+                                    historic_soreness.average_severity = 2.0
+                                    historic_soreness.max_severity = 2.0
+                                    historic_soreness_list.append(historic_soreness)
+
+                                if h1 is None and b1==14 and not p and day_diff==32 and not test_parm.doms and not test_parm.train_later:
+                                    k=0
                                 if (0==0) or h1 == HistoricSorenessStatus.persistent_2_soreness and b1 == 14 and p == False and test_parm.doms and day_diff == 32:
                                     body_part_list = [b1]
                                     severity_list = [m1]
@@ -365,8 +370,12 @@ def test_generate_spreadsheets():
                                         severity_list.append(2)
                                         pain_list.append(False)
 
-                                    daily_plan = create_plan(test_parameter=test_parm, body_part_list=body_part_list, severity_list=severity_list, side_list=[1],
-                                                             pain_list=pain_list, train_later=test_parm.train_later, historic_soreness_list=[historic_soreness])
+                                    # daily_plan = create_plan(test_parameter=test_parm, body_part_list=body_part_list, severity_list=severity_list, side_list=[1],
+                                    #                          pain_list=pain_list, train_later=test_parm.train_later, historic_soreness_list=[historic_soreness])
+                                    daily_plan = create_plan(test_parameter=test_parm, body_part_list=body_part_list,
+                                                             severity_list=severity_list, side_list=[1],
+                                                             pain_list=pain_list, train_later=test_parm.train_later,
+                                                             historic_soreness_list=historic_soreness_list)
 
                                     body_part_line = (
                                             get_body_part_location_string(body_part_list) + ',' + str(p) + ',' + str(m1) + ',' + str(h1) + ',' + str(day_diff))
