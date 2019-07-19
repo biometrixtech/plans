@@ -429,7 +429,7 @@ class BodyPartFactory(object):
         dynamic_stretch = self.get_exercise_dictionary([53, 63, 64])
         isolated_activation = self.get_exercise_dictionary([10, 81, 119, 226, 230, 232, 233])
         glutes.add_extended_exercise_phases(inhibit, static_stretch, active_stretch, dynamic_stretch, isolated_activation, {})
-        glutes.add_muscle_groups([14], [6, 5, 12], [11], [4, 5])
+        glutes.add_muscle_groups([14], [6, 15, 12], [11], [4, 5])
         return glutes
 
     def get_groin(self):
