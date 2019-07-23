@@ -139,10 +139,10 @@ class TrendProcessor(object):
             self.athlete_trend_categories[trend_category_index].trends = []
 
             if len(first_times) > 0:
-                first_times = sorted(first_times, key=lambda x: x.last_date_time, reverse=True)
+                first_times = sorted(first_times, key=lambda x: (x.last_date_time, x.priority), reverse=True)
 
             if len(full_dates) > 0:
-                full_dates = sorted(full_dates, key=lambda x: x.last_date_time, reverse=True)
+                full_dates = sorted(full_dates, key=lambda x: (x.last_date_time, x.priority), reverse=True)
 
             self.athlete_trend_categories[trend_category_index].trends.extend(first_times)
             self.athlete_trend_categories[trend_category_index].trends.extend(full_dates)
@@ -241,6 +241,7 @@ class TrendProcessor(object):
             trend_data.title_color = LegendColor.warning_light
             trend.trend_data = trend_data
             trend.visible = True
+            trend.priority = 0
 
             all_triggers = []
             all_triggers.extend(triggers_1)
@@ -311,6 +312,7 @@ class TrendProcessor(object):
             trend_data.title_color = LegendColor.warning_light
             trend.trend_data = trend_data
             trend.visible = True
+            trend.priority = 1
 
             all_triggers = []
             all_triggers.extend(triggers)
