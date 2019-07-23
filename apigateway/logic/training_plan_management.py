@@ -7,6 +7,7 @@ from logic.soreness_processing import SorenessCalculator
 from logic.alerts_processing import AlertsProcessing
 from logic.trigger_processing import TriggerFactory
 from models.daily_plan import DailyPlan
+from models.athlete_trend import AthleteTrends
 from utils import format_date, parse_datetime, parse_date
 import copy
 
@@ -83,8 +84,9 @@ class TrainingPlanManager(object):
         trigger_factory.load_triggers()
         self.athlete_stats.triggers = trigger_factory.triggers
 
-        trend_processor = TrendProcessor(trigger_factory.triggers)
+        trend_processor = TrendProcessor(trigger_factory.triggers, athlete_trend_categories=self.athlete_stats.trend_categories)
         trend_processor.process_triggers()
+        self.athlete_stats.trend_categories = trend_processor.athlete_trend_categories
 
         calc = exercise_mapping.ExerciseAssignmentCalculator(trigger_factory, self.exercise_library_datastore,
                                                              self.completed_exercise_datastore,
@@ -163,7 +165,8 @@ class TrainingPlanManager(object):
         #                                      athlete_stats=self.athlete_stats,
         #                                      trigger_date_time=self.trigger_date_time,)
         # alerts_processing.aggregate_alerts(alerts=alerts)
-        self.daily_plan.trends = trend_processor.athlete_trends
+        self.daily_plan.trends = AthleteTrends()
+        self.daily_plan.trends.trend_categories = trend_processor.athlete_trend_categories
         self.daily_plan.trends.add_trend_data(self.athlete_stats)
         self.daily_plan_datastore.put(self.daily_plan)
         self.athlete_stats_datastore.put(self.athlete_stats)

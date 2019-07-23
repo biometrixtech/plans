@@ -1,7 +1,7 @@
 from serialisable import Serialisable
 from fathomapi.utils.exceptions import InvalidSchemaException
 from logic.soreness_processing import SorenessCalculator
-from models.athlete_trend import Trend
+from models.athlete_trend import AthleteTrends, PlanAlert, Trend, TrendCategory, TrendData, VisualizationType, LegendColor, BoldText
 from models.data_series import DataSeries
 from models.historic_soreness import HistoricSeverity, HistoricSoreness
 from models.insights import AthleteInsight
@@ -138,6 +138,8 @@ class AthleteStats(Serialisable):
         self.sport_max_load = {}
 
         self.triggers = []
+
+        self.trend_categories = []
 
     def update_historic_soreness(self, soreness, event_date):
 
@@ -496,7 +498,8 @@ class AthleteStats(Serialisable):
             'high_relative_load_sessions': [high_load.json_serialise() for high_load in self.high_relative_load_sessions],
             'eligible_for_high_load_trigger' : self.eligible_for_high_load_trigger,
             'sport_max_load': {str(sport_name): sport_max_load.json_serialise() for (sport_name, sport_max_load) in self.sport_max_load.items()},
-            'triggers': [s.json_serialise() for s in self.triggers]
+            'triggers': [s.json_serialise() for s in self.triggers],
+            'trend_categories': [s.json_serialise() for s in self.trend_categories]
             # 'workout_chart': self.workout_chart.json_serialise() if self.workout_chart is not None else None,
             # 'body_response_chart': self.body_response_chart.json_serialise() if self.body_response_chart is not None else None
             # 'training_volume_chart_data': [chart_data.json_serialise() for chart_data in self.training_volume_chart_data]
@@ -556,6 +559,7 @@ class AthleteStats(Serialisable):
         athlete_stats.eligible_for_high_load_trigger = input_dict.get('eligible_for_high_load_trigger', False)
         athlete_stats.sport_max_load = {int(sport_name): SportMaxLoad.json_deserialise(sport_max_load) for (sport_name, sport_max_load) in input_dict.get('sport_max_load', {}).items()}
         athlete_stats.triggers = [Trigger.json_deserialise(trigger) for trigger in input_dict.get('triggers', [])]
+        athlete_stats.trend_categories = [TrendCategory.json_deserialise(trend_category) for trend_category in input_dict.get('trend_categories', [])]
         return athlete_stats
 
     @classmethod

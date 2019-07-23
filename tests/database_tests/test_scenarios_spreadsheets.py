@@ -352,7 +352,7 @@ def test_generate_spreadsheets():
                                     historic_soreness.max_severity = 2.0
                                     historic_soreness_list.append(historic_soreness)
 
-                                if h1 is None and b1==14 and not p and day_diff==32 and not test_parm.doms and not test_parm.train_later:
+                                if h1 is None and b1==7 and not p and day_diff==32 and not test_parm.doms and not test_parm.train_later:
                                     k=0
                                 if (0==0) or h1 == HistoricSorenessStatus.persistent_2_soreness and b1 == 14 and p == False and test_parm.doms and day_diff == 32:
                                     body_part_list = [b1]

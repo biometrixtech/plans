@@ -6,9 +6,11 @@ from models.body_parts import BodyPartFactory
 
 
 class TrendProcessor(object):
-    def __init__(self, trigger_list):
-        self.athlete_trends = None
+    def __init__(self, trigger_list, athlete_trend_categories=None):
+        self.athlete_trend_categories = [] if athlete_trend_categories is None else athlete_trend_categories
         self.trigger_list = trigger_list
+
+        self.initialize_trend_categories()
 
     def get_antagonists_syngergists(self, triggers):
 
@@ -25,34 +27,135 @@ class TrendProcessor(object):
 
         return antagonists, synergists
 
-    def process_triggers(self):
+    def initialize_trend_categories(self):
 
-        self.athlete_trends = AthleteTrends()
+        if len(self.athlete_trend_categories) == 0:
 
+            trend_category = self.create_movement_dysfunction_category()
+
+            self.athlete_trend_categories.append(trend_category)
+
+    def get_limitation_trend(self, category_index):
+
+        limitation_index = next((i for i, x in enumerate(self.athlete_trend_categories[category_index].trends) if
+                                 x.title == "Functional Limitation"), -1)
+        if limitation_index == -1:
+            limitation_trend = self.create_limitation_trend()
+            self.athlete_trend_categories[category_index].trends.append(limitation_trend)
+            limitation_index = len(self.athlete_trend_categories[category_index].trends) - 1
+
+        return self.athlete_trend_categories[category_index].trends[limitation_index]
+
+    def set_limitation_trend(self, category_index, limitation_trend):
+
+        index = next((i for i, x in enumerate(self.athlete_trend_categories[category_index].trends) if
+                             x.title == "Functional Limitation"), -1)
+
+        if index == -1:
+            self.athlete_trend_categories[category_index].trends.append(limitation_trend)
+        else:
+            self.athlete_trend_categories[category_index].trends[index] = limitation_trend
+
+    def get_muscle_trend(self, category_index):
+
+        muscle_index = next((i for i, x in enumerate(self.athlete_trend_categories[category_index].trends) if
+                             x.title == "Muscle Over & Under Activity"), -1)
+        if muscle_index == -1:
+            muscle_trend = self.create_muscle_trend()
+            self.athlete_trend_categories[category_index].trends.append(muscle_trend)
+            muscle_index = len(self.athlete_trend_categories[category_index].trends) - 1
+
+        return self.athlete_trend_categories[category_index].trends[muscle_index]
+
+    def set_muscle_trend(self, category_index, muscle_trend):
+
+        muscle_index = next((i for i, x in enumerate(self.athlete_trend_categories[category_index].trends) if
+                             x.title == "Muscle Over & Under Activity"), -1)
+
+        if muscle_index == -1:
+            self.athlete_trend_categories[category_index].trends.append(muscle_trend)
+        else:
+            self.athlete_trend_categories[category_index].trends[muscle_index] = muscle_trend
+
+    def get_category_index(self, insight_type):
+
+        category_index = next((i for i, x in enumerate(self.athlete_trend_categories) if
+                               x.insight_type == insight_type), -1)
+        if category_index == -1:
+            trend_category = self.create_movement_dysfunction_category()
+            self.athlete_trend_categories.append(trend_category)
+            category_index = len(self.athlete_trend_categories) - 1
+        return category_index
+
+    def create_movement_dysfunction_category(self):
         trend_category = TrendCategory(InsightType.movement_dysfunction_compensation)
         trend_category.title = "Movement Dysfunction or Compensation"
-        tight_muscle_trend = self.get_tight_over_under_muscle_view()
-        pain_functional_limitation_trend = self.get_pain_functional_limitation()
+        trend_category.first_time_experience = True
         plan_alert = PlanAlert(InsightType.movement_dysfunction_compensation)
-        plan_alert.title = "Movement Dysfunction or Compensation"
-        if tight_muscle_trend is not None:
-            trend_category.trends.append(tight_muscle_trend)
-            plan_alert.views.append("1")
-            plan_alert.text += "tight muscle over-under"
-        if pain_functional_limitation_trend is not None:
-            trend_category.trends.append(pain_functional_limitation_trend)
-            plan_alert.views.append("2")
-            plan_alert.text += "pain and functional limitation;"
-        if len(trend_category.trends) > 0:
-            trend_category.plan_alerts.append(plan_alert)
+        plan_alert.title = trend_category.title
+        trend_category.plan_alerts.append(plan_alert)
 
-            trend_cats = [t for t in trend_category.trends]
+        muscle_trend = self.create_muscle_trend()
+        trend_category.trends.append(muscle_trend)
 
-            if len(trend_cats) > 0:
-                trend_cats = sorted(trend_cats, key=lambda x: x.last_date_time, reverse=True)
-                trend_category.trends = trend_cats
+        limitation_trend = self.create_limitation_trend()
+        trend_category.trends.append(limitation_trend)
 
-            self.athlete_trends.trend_categories.append(trend_category)
+        return trend_category
+
+    def create_limitation_trend(self):
+        limitation_trend = Trend(TriggerType.hist_sore_greater_30)
+        limitation_trend.title = "Functional Limitation"
+        limitation_trend.title_color = LegendColor.error_light
+        limitation_trend.text.append("Your data suggests pain or functional limitations.")
+        limitation_trend.text.append("Really. We're not kidding.")
+        limitation_trend.icon = "view3icon.png"
+        limitation_trend.visible = False
+        limitation_trend.first_time_experience = True
+        return limitation_trend
+
+    def create_muscle_trend(self):
+        muscle_trend = Trend(TriggerType.hist_pain)
+        muscle_trend.title = "Muscle Over & Under Activity"
+        muscle_trend.title_color = LegendColor.warning_light
+        muscle_trend.text.append("Your data suggests tight muscle stuff.")
+        muscle_trend.text.append("Seriously. We're not kidding.")
+        muscle_trend.icon = "view1icon.png"
+        muscle_trend.visible = False
+        muscle_trend.first_time_experience = True
+        return muscle_trend
+
+    def process_triggers(self):
+
+        trend_category_index = self.get_category_index(InsightType.movement_dysfunction_compensation)
+        self.set_tight_over_under_muscle_view(trend_category_index)
+        self.set_pain_functional_limitation(trend_category_index)
+
+        if len(self.athlete_trend_categories[trend_category_index].trends) > 0:
+            first_times = list(t for t in self.athlete_trend_categories[trend_category_index].trends if t.last_date_time is not None and t.first_time_experience)
+            none_dates = list(t for t in self.athlete_trend_categories[trend_category_index].trends if t.last_date_time is None)
+            full_dates = list(t for t in self.athlete_trend_categories[trend_category_index].trends if t.last_date_time is not None and not t.first_time_experience)
+
+            self.athlete_trend_categories[trend_category_index].trends = []
+
+            if len(first_times) > 0:
+                first_times = sorted(first_times, key=lambda x: x.last_date_time, reverse=True)
+
+            if len(full_dates) > 0:
+                full_dates = sorted(full_dates, key=lambda x: x.last_date_time, reverse=True)
+
+            self.athlete_trend_categories[trend_category_index].trends.extend(first_times)
+            self.athlete_trend_categories[trend_category_index].trends.extend(full_dates)
+            self.athlete_trend_categories[trend_category_index].trends.extend(none_dates)
+
+            visible_trends = list(t for t in self.athlete_trend_categories[trend_category_index].trends if t.visible)
+
+            trends_visible = False
+
+            if len(visible_trends) > 0:
+                trends_visible = True
+
+            self.athlete_trend_categories[trend_category_index].visible = trends_visible
 
     def get_latest_trigger_date_time(self, triggers):
 
@@ -60,27 +163,28 @@ class TrendProcessor(object):
 
             status_changed_date_time = None
 
-            created_triggers = sorted(triggers, key=lambda x: x.created_date_time, reverse=True)
-            modified_triggers = sorted(triggers, key=lambda x: x.modified_date_time, reverse=True)
+            # turns out we are only interested when a new body part is added or when a historic soreness status changes
+            #created_triggers = sorted(triggers, key=lambda x: x.created_date_time, reverse=True)
+            #modified_triggers = sorted(triggers, key=lambda x: x.modified_date_time, reverse=True)
             status_changed_triggers = [t for t in triggers if t.source_date_time is not None]
             if len(status_changed_triggers) > 0:
                 status_triggers = sorted(triggers, key=lambda x: x.source_date_time, reverse=True)
                 status_changed_date_time = status_triggers[0].source_date_time
 
-            last_created_date_time = created_triggers[0].created_date_time
-            last_modified_date_time = modified_triggers[0].modified_date_time
+            #last_created_date_time = created_triggers[0].created_date_time
+            #last_modified_date_time = modified_triggers[0].modified_date_time
 
             if status_changed_date_time is not None:
                 return status_changed_date_time
-            elif last_modified_date_time is not None:
-                return max(last_modified_date_time, last_created_date_time)
-            else:
-                return last_created_date_time
+            #elif last_modified_date_time is not None:
+            #    return max(last_modified_date_time, last_created_date_time)
+            #else:
+            #    return last_created_date_time
 
         else:
             return None
 
-    def get_tight_over_under_muscle_view(self):
+    def set_tight_over_under_muscle_view(self, category_index):
 
         trigger_type_1 = TriggerType.hist_sore_less_30
         triggers_1 = list(t for t in self.trigger_list if t.trigger_type == trigger_type_1)
@@ -91,11 +195,13 @@ class TrendProcessor(object):
         if len(triggers_1) > 0 or len(triggers_2) > 0:
             antagonists_1, synergists_1 = self.get_antagonists_syngergists(triggers_1)
             antagonists_2, synergists_2 = self.get_antagonists_syngergists(triggers_2)
-            trend = Trend(trigger_type_1)
-            trend.title = "Muscle Over & Under Activity"
-            trend.title_color = LegendColor.warning_light
-            trend.text.append("Your data suggests tight muscle stuff.")
-            trend.text.append("Seriously. We're not kidding.")
+            # trend = Trend(trigger_type_1)
+            # trend.title = "Muscle Over & Under Activity"
+            # trend.title_color = LegendColor.warning_light
+            # trend.text.append("Your data suggests tight muscle stuff.")
+            # trend.text.append("Seriously. We're not kidding.")
+
+            trend = self.get_muscle_trend(category_index)
 
             bold_text_1 = BoldText()
             bold_text_1.text = "Seriously"
@@ -107,7 +213,7 @@ class TrendProcessor(object):
             trend.bold_text.append(bold_text_1)
             trend.bold_text.append(bold_text_2)
 
-            trend.icon = "view1icon.png"
+            #trend.icon = "view1icon.png"
             trend_data = TrendData()
             trend_data.visualization_type = VisualizationType.tight_overactice_underactive
             trend_data.add_visualization_data()
@@ -134,17 +240,21 @@ class TrendProcessor(object):
             trend_data.title = "Trigger Specific Title"
             trend_data.title_color = LegendColor.warning_light
             trend.trend_data = trend_data
+            trend.visible = True
 
             all_triggers = []
             all_triggers.extend(triggers_1)
             all_triggers.extend(triggers_2)
 
             trend.last_date_time = self.get_latest_trigger_date_time(all_triggers)
-            return trend
+            self.athlete_trend_categories[category_index].plan_alerts[0].text += "tight muscle over-under;"
+            self.athlete_trend_categories[category_index].plan_alerts[0].views.append("1")
         else:
-            return None
+            trend = self.create_muscle_trend()
+            self.set_muscle_trend(category_index, trend)
 
-    def get_pain_functional_limitation(self):
+
+    def set_pain_functional_limitation(self, category_index):
 
         trigger_type = TriggerType.hist_pain
         triggers = list(t for t in self.trigger_list if t.trigger_type == trigger_type)
@@ -152,11 +262,12 @@ class TrendProcessor(object):
         if len(triggers) > 0:
             antagonists, synergists = self.get_antagonists_syngergists(triggers)
 
-            trend = Trend(trigger_type)
-            trend.title = "Functional Limitation"
-            trend.title_color = LegendColor.error_light
-            trend.text.append("Your data suggests pain or functional limitations.")
-            trend.text.append("Really. We're not kidding.")
+            # trend = Trend(trigger_type)
+            # trend.title = "Functional Limitation"
+            # trend.title_color = LegendColor.error_light
+            # trend.text.append("Your data suggests pain or functional limitations.")
+            # trend.text.append("Really. We're not kidding.")
+            trend = self.get_limitation_trend(category_index)
 
             bold_text_1 = BoldText()
             bold_text_1.text = "Really"
@@ -174,7 +285,7 @@ class TrendProcessor(object):
             trend.bold_text.append(bold_text_2)
             trend.bold_text.append(bold_text_3)
 
-            trend.icon = "view3icon.png"
+            #trend.icon = "view3icon.png"
             trend_data = TrendData()
             trend_data.visualization_type = VisualizationType.pain_functional_limitation
             trend_data.add_visualization_data()
@@ -199,15 +310,17 @@ class TrendProcessor(object):
             trend_data.title = "Trigger Specific Title"
             trend_data.title_color = LegendColor.warning_light
             trend.trend_data = trend_data
+            trend.visible = True
 
             all_triggers = []
             all_triggers.extend(triggers)
 
             trend.last_date_time = self.get_latest_trigger_date_time(all_triggers)
-            return trend
+            self.athlete_trend_categories[category_index].plan_alerts[0].text += "pain and functional limitation"
+            self.athlete_trend_categories[category_index].plan_alerts[0].views.append("2")
         else:
-            return None
-
+            trend = self.create_limitation_trend()
+            self.set_limitation_trend(category_index, trend)
 
 
 
