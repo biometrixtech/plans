@@ -140,7 +140,7 @@ class Trend(object):
     def __init__(self, trigger_type):
         self.trigger_type = trigger_type
         self.insight_type = InsightType.stress
-        self.first_time = False
+        self.first_time_experience = False
         self.title = ""
         self.title_color = None
         self.icon = ""
@@ -161,11 +161,12 @@ class Trend(object):
         self.cleared = False
         self.longitudinal = False
         self.last_date_time = None
+        self.visible = False
 
     def json_serialise(self):
         ret = {
             'trigger_type': self.trigger_type.value,
-            'first_time': self.first_time,
+            'first_time_experience': self.first_time_experience,
             'title': self.title,
             'title_color': self.title_color.value if self.title_color is not None else None,
             'text': [t for t in self.text],
@@ -186,7 +187,8 @@ class Trend(object):
             'present_in_trends': self.present_in_trends,
             'cleared': self.cleared,
             'longitudinal': self.longitudinal,
-            'last_date_time': format_datetime(self.last_date_time) if self.last_date_time is not None else None
+            'last_date_time': format_datetime(self.last_date_time) if self.last_date_time is not None else None,
+            'visible': self.visible
         }
         return ret
 
@@ -194,7 +196,7 @@ class Trend(object):
     def json_deserialise(cls, input_dict):
         trend = cls(TriggerType(input_dict['trigger_type']))
         trend.title = input_dict.get('title', '')
-        trend.first_time = input_dict.get('first_time', False)
+        trend.first_time_experience = input_dict.get('first_time_experience', False)
         trend.title_color = LegendColor(input_dict['title_color']) if input_dict.get('title_color') is not None else None
         trend.text = input_dict.get('text', [])
         trend.icon = input_dict.get('icon', '')
@@ -226,6 +228,7 @@ class Trend(object):
             trend.data = []
         trend.trend_data = TrendData.json_deserialise(input_dict.get('trend_data')) if input_dict.get('trend_data') is not None else None
         trend.last_date_time = parse_datetime(input_dict.get('last_date_time')) if input_dict.get('last_date_time') is not None else None
+        trend.visible = input_dict.get('visible', False)
         return trend
 
     def add_data(self):
@@ -322,13 +325,17 @@ class PlanAlert(Serialisable):
         self.views = []
         self.text = ""
         self.title = ""
+        self.cleared_date_time = None
+        self.last_date_time = None
 
     def json_serialise(self):
         return {
             'category': self.category.value,
             'views': [v for v in self.views],
             'text': self.text,
-            'title': self.title
+            'title': self.title,
+            'cleared_date_time': format_datetime(self.cleared_date_time) if self.cleared_date_time is not None else None,
+            'last_date_time': format_datetime(self.last_date_time) if self.last_date_time is not None else None
 
         }
 
@@ -338,6 +345,9 @@ class PlanAlert(Serialisable):
         plan_alert.views = [v for v in input_dict.get('views', [])]
         plan_alert.text = input_dict['text']
         plan_alert.title = input_dict.get('title', "")
+        plan_alert.cleared_date_time = parse_datetime(input_dict['cleared_date_time']) if input_dict.get('cleared_date_time', None) is not None else None
+        plan_alert.last_date_time = parse_datetime(input_dict['last_date_time']) if input_dict.get(
+            'last_date_time', None) is not None else None
         return plan_alert
 
 
@@ -350,6 +360,8 @@ class TrendCategory(object):
         self.title = ""
         self.trends = []
         self.plan_alerts = []
+        self.visible = False
+        self.first_time_experience = False
 
     def json_serialise(self):
         ret = {
@@ -359,7 +371,9 @@ class TrendCategory(object):
             'title': self.title,
             'alerts': [alert.json_serialise() for alert in self.alerts],
             'trends': [trend.json_serialise() for trend in self.trends],
-            'plan_alerts': [plan_alert.json_serialise() for plan_alert in self.plan_alerts]
+            'plan_alerts': [plan_alert.json_serialise() for plan_alert in self.plan_alerts],
+            'visible': self.visible,
+            'first_time_experience': self.first_time_experience
         }
         return ret
 
@@ -372,6 +386,8 @@ class TrendCategory(object):
         trend_category.title = input_dict.get('title', "")
         trend_category.trends = [Trend.json_deserialise(trend) for trend in input_dict.get('trends', [])]
         trend_category.plan_alerts = [PlanAlert.json_deserialise(alert) for alert in input_dict.get('plan_alerts', [])]
+        trend_category.visible = input_dict.get('visible', False)
+        trend_category.first_time_experience = input_dict.get('first_time_experience', False)
         return trend_category
 
     def get_cta(self):

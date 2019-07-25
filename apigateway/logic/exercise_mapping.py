@@ -369,16 +369,16 @@ class ExerciseAssignmentCalculator(object):
             #       and s.historic_soreness_status is not HistoricSorenessStatus.doms
             #       and s.severity >= 1.5 and s.pain and s.is_acute_pain() and
             #       (self.high_relative_load_session or self.high_relative_intensity_session)):
-            elif t.trigger_type == TriggerType.acute_pain_no_pain_today_high_volume_intensity and t.severity >= 1.5:  # 4
-                goal = AthleteGoal("Increase prevention efficacy", 1, AthleteGoalType.preempt_corrective)
-                #goal.trigger_type = TriggerType.acute_pain_no_pain_today_high_volume_intensity  # 4
-                ice = Ice(body_part_location=t.body_part.body_part_location, side=t.body_part.side)
-                ice.repeat_every_3hrs_for_24hrs = False
-
-                if t.body_part.body_part_location in ankle_knee_elbow:
-                    minutes.append(10)
-                else:
-                    minutes.append(15)
+            # elif t.trigger_type == TriggerType.acute_pain_no_pain_today_high_volume_intensity and t.severity >= 1.5:  # 4
+            #     goal = AthleteGoal("Increase prevention efficacy", 1, AthleteGoalType.preempt_corrective)
+            #     #goal.trigger_type = TriggerType.acute_pain_no_pain_today_high_volume_intensity  # 4
+            #     ice = Ice(body_part_location=t.body_part.body_part_location, side=t.body_part.side)
+            #     ice.repeat_every_3hrs_for_24hrs = False
+            #
+            #     if t.body_part.body_part_location in ankle_knee_elbow:
+            #         minutes.append(10)
+            #     else:
+            #         minutes.append(15)
             # elif (not s.daily and s.historic_soreness_status is not None and not s.is_dormant_cleared()
             #       and s.historic_soreness_status is not HistoricSorenessStatus.doms
             #       and s.severity >= 1.5 and s.pain and (self.high_relative_load_session or self.high_relative_intensity_session)):
@@ -398,7 +398,7 @@ class ExerciseAssignmentCalculator(object):
                         minutes.append(15)
 
                 #elif s.is_acute_pain():
-                elif t.trigger_type == TriggerType.acute_pain_no_pain_today_high_volume_intensity:
+                elif t.trigger_type == TriggerType.acute_pain_no_pain_today_high_volume_intensity:  # 4
                     #goal.trigger_type = TriggerType.acute_pain_no_pain_today_high_volume_intensity
                     ice = Ice(body_part_location=t.body_part.body_part_location, side=t.body_part.side)
                     ice.repeat_every_3hrs_for_24hrs = False
@@ -417,10 +417,10 @@ class ExerciseAssignmentCalculator(object):
                 #     alerts.append(alert)
 
         for d in self.doms:
-            days = (self.event_date_time - d.first_reported_date_time).days
-            if ((days == 2 and d.max_severity == 1) or  # minor DOMS
-                    (days <= 2 and 2 <= d.max_severity <= 3) or  # moderate DOMS
-                    (days <= 2 and 3 < d.max_severity <= 5)):  # severe DOMS
+            days = (self.event_date_time.date() - d.first_reported_date_time.date()).days
+            if days <= 2 and 2 <= d.max_severity <= 5: #or  # moderate or severe DOMS (not minor doms)
+                    #(days <= 2 and 2 <= d.max_severity <= 3) or  # moderate DOMS
+                    #(days <= 2 and 3 < d.max_severity <= 5)):  # severe DOMS
                 if not self.is_lower_body_part(d.body_part_location):
                     goal = AthleteGoal("Care for soreness", 1, AthleteGoalType.sore)
                     #goal.trigger = "Soreness Reported Today as DOMS"
@@ -492,10 +492,11 @@ class ExerciseAssignmentCalculator(object):
                     # alerts.append(alert)
 
         for d in self.doms:
-            days = (self.event_date_time - d.first_reported_date_time).days
-            if ((days == 2 and d.max_severity  == 1) or  # minor DOMS
-                    (days <= 2 and 2 <= d.max_severity <= 3) or  # moderate DOMS
-                    (days <= 2 and 3 < d.max_severity <= 5)):  # severe DOMS
+            days = (self.event_date_time.date() - d.first_reported_date_time.date()).days
+            if days <= 2 and 2 <= d.max_severity <= 5:  # or  # moderate or severe DOMS (not minor doms)
+            # if ((days == 2 and d.max_severity  == 1) or  # minor DOMS
+            #         (days <= 2 and 2 <= d.max_severity <= 3) or  # moderate DOMS
+            #         (days <= 2 and 3 < d.max_severity <= 5)):  # severe DOMS
                 if self.is_lower_body_part(d.body_part_location):
                     goal = AthleteGoal("Care for soreness", 1, AthleteGoalType.sore)
                     #goal.trigger = "Soreness Reported Today as DOMS"
