@@ -3,7 +3,7 @@ from models.trigger import TriggerType, Trigger
 from models.chart_data import PainFunctionalLimitationChartData, TightOverUnderactiveChartData
 from models.insights import InsightType
 from models.body_parts import BodyPartFactory
-
+from logic.goal_focus_text_generator import RecoveryTextGenerator
 
 class TrendProcessor(object):
     def __init__(self, trigger_list, athlete_trend_categories=None):
@@ -223,6 +223,7 @@ class TrendProcessor(object):
         triggers_2 = list(t for t in self.trigger_list if t.trigger_type == trigger_type_2)
 
         if len(triggers_1) > 0 or len(triggers_2) > 0:
+
             antagonists_1, synergists_1 = self.get_antagonists_syngergists(triggers_1)
             antagonists_2, synergists_2 = self.get_antagonists_syngergists(triggers_2)
             # trend = Trend(trigger_type_1)
@@ -255,27 +256,49 @@ class TrendProcessor(object):
             tight_under_data.underactive_needing_care.extend([s for s in synergists_2])
             tight_under_data.remove_duplicates()
             trend_data.data = [tight_under_data]
-            trend_data.text = "This is a specific description of all your tight muscles..."
-
-            bold_text_3 = BoldText()
-            bold_text_3.text = "all your tight muscles"
-            bold_text_3.color = LegendColor.error_light
-
-            bold_text_4 = BoldText()
-            bold_text_4.text = "specific"
-            bold_text_4.color = LegendColor.warning_light
-            trend_data.bold_text.append(bold_text_3)
-            trend_data.bold_text.append(bold_text_4)
-
-            trend_data.title = "Trigger Specific Title"
-            trend_data.title_color = LegendColor.warning_light
-            trend.trend_data = trend_data
-            trend.visible = True
-            trend.priority = 0
 
             all_triggers = []
             all_triggers.extend(triggers_1)
             all_triggers.extend(triggers_2)
+
+            # rank triggers
+            sorted_triggers = sorted(all_triggers, key=lambda x: (x.source_date_time, x.trigger_type), reverse=True)
+
+            text_generator = RecoveryTextGenerator()
+            body_part_factory = BodyPartFactory()
+
+            top_candidates = list(s for s in sorted_triggers if s.source_date_time == sorted_triggers[0].source_date_time)
+
+            trigger_header_text, is_plural = self.get_body_part_title_text(body_part_factory, top_candidates)
+
+            if is_plural:
+                trend_data.title = "Your " + trigger_header_text + " are overactive"
+            else:
+                trend_data.title = "Your " + trigger_header_text + " is overactive"
+
+            trend_data.title = trend_data.title.title()
+            trend_data.title_color = LegendColor.warning_light
+
+            body_part_text = text_generator.get_body_part_text(top_candidates[0].body_part.body_part_location, None)
+            body_part_text.title()
+
+            trend_data.text = body_part_text + " overactivity is often caused by chronic over-compensations for weak or under-active muscles elsewhere.\n"
+
+            bold_text_3 = BoldText()
+            bold_text_3.text = body_part_text
+            bold_text_3.color = LegendColor.error_light
+            trend_data.bold_text.append(bold_text_3)
+
+            # bold_text_4 = BoldText()
+            # bold_text_4.text = "specific"
+            # bold_text_4.color = LegendColor.warning_light
+
+            # trend_data.bold_text.append(bold_text_4)
+
+            trend.trend_data = trend_data
+
+            trend.visible = True
+            trend.priority = 0
 
             trend.triggers = all_triggers
 
@@ -284,6 +307,34 @@ class TrendProcessor(object):
             trend = self.create_muscle_trend()
             self.set_muscle_trend(category_index, trend)
 
+    def get_body_part_title_text(self, body_part_factory, top_candidates):
+
+        text_generator = RecoveryTextGenerator()
+        is_plural = False
+
+        if len(top_candidates) == 1:
+            trigger_header_text = text_generator.get_body_part_text(top_candidates[0].body_part.body_part_location,
+                                                                    top_candidates[0].body_part.side)
+        else:
+            trigger_dictionary = {}
+            for t in top_candidates:
+                body_part = body_part_factory.get_body_part(t.body_part)
+                trigger_dictionary[t] = body_part.treatment_priority
+
+            # still could have a tie (two body parts)
+            sorted_trigger_items = sorted(trigger_dictionary.items(), key=lambda x: x[1])
+            if len(sorted_trigger_items) > 1:
+                if sorted_trigger_items[0][1] == sorted_trigger_items[1][1]:
+                    trigger_header_text = text_generator.get_body_part_text_plural(
+                        top_candidates[0].body_part.body_part_location, None)
+                    is_plural = True
+                else:
+                    trigger_header_text = text_generator.get_body_part_text(
+                        top_candidates[0].body_part.body_part_location, top_candidates[0].body_part.side)
+            else:
+                trigger_header_text = text_generator.get_body_part_text(top_candidates[0].body_part.body_part_location,
+                                                                        top_candidates[0].body_part.side)
+        return trigger_header_text, is_plural
 
     def set_pain_functional_limitation(self, category_index):
 
@@ -326,28 +377,49 @@ class TrendProcessor(object):
             pain_functional_data.underactive_needing_care.extend([s for s in synergists])
             pain_functional_data.remove_duplicates()
             trend_data.data = [pain_functional_data]
-            trend_data.text = "This is a specific description of all your pain and limitations..."
-
-            bold_text_3 = BoldText()
-            bold_text_3.text = "all your pain"
-            bold_text_3.color = LegendColor.error_light
-
-            bold_text_4 = BoldText()
-            bold_text_4.text = "specific"
-            bold_text_4.color = LegendColor.warning_light
-            trend_data.bold_text.append(bold_text_3)
-            trend_data.bold_text.append(bold_text_4)
-
-            trend_data.title = "Trigger Specific Title"
-            trend_data.title_color = LegendColor.warning_light
-            trend.trend_data = trend_data
-            trend.visible = True
-            trend.priority = 1
 
             all_triggers = []
             all_triggers.extend(triggers)
 
             trend.triggers = all_triggers
+
+            # rank triggers
+            sorted_triggers = sorted(all_triggers, key=lambda x: (x.source_date_time, x.trigger_type), reverse=True)
+
+            text_generator = RecoveryTextGenerator()
+            body_part_factory = BodyPartFactory()
+
+            top_candidates = list(
+                s for s in sorted_triggers if s.source_date_time == sorted_triggers[0].source_date_time)
+
+            trigger_header_text, is_plural = self.get_body_part_title_text(body_part_factory, top_candidates)
+
+            if is_plural:
+                trend_data.title = "Your " + trigger_header_text + " are functionally limited"
+            else:
+                trend_data.title = "Your " + trigger_header_text + " is functionally limited"
+
+            trend_data.title = trend_data.title.title()
+            trend_data.title_color = LegendColor.warning_light
+
+            body_part_text = text_generator.get_body_part_text(top_candidates[0].body_part.body_part_location, None)
+            body_part_text.title()
+
+            trend_data.text = body_part_text + " pain is often caused by doing painful things that tend to cause pain when doing painful things.\n"
+
+            bold_text_3 = BoldText()
+            bold_text_3.text = body_part_text
+            bold_text_3.color = LegendColor.error_light
+
+            # bold_text_4 = BoldText()
+            # bold_text_4.text = "specific"
+            # bold_text_4.color = LegendColor.warning_light
+            trend_data.bold_text.append(bold_text_3)
+            #trend_data.bold_text.append(bold_text_4)
+
+            trend.trend_data = trend_data
+            trend.visible = True
+            trend.priority = 1
 
             trend.last_date_time = self.get_latest_trigger_date_time(all_triggers)
 
