@@ -4,7 +4,7 @@ from models.chart_data import BodyPartChartData, DataSeriesBooleanData, DataSeri
 from models.insights import InsightType
 from models.soreness_base import BodyPartSide
 from models.sport import SportName
-from models.trigger import TriggerType
+from models.trigger import Trigger, TriggerType
 from models.trigger_data import TriggerData
 from utils import format_datetime, parse_datetime
 from serialisable import Serialisable
@@ -162,6 +162,8 @@ class Trend(object):
         self.longitudinal = False
         self.last_date_time = None
         self.visible = False
+        self.plan_alert_short_title = ""
+        self.triggers = []
 
     def json_serialise(self):
         ret = {
@@ -188,7 +190,9 @@ class Trend(object):
             'cleared': self.cleared,
             'longitudinal': self.longitudinal,
             'last_date_time': format_datetime(self.last_date_time) if self.last_date_time is not None else None,
-            'visible': self.visible
+            'visible': self.visible,
+            'plan_alert_short_title': self.plan_alert_short_title,
+            'triggers': [t.json_serialise() for t in self.triggers]
         }
         return ret
 
@@ -229,6 +233,8 @@ class Trend(object):
         trend.trend_data = TrendData.json_deserialise(input_dict.get('trend_data')) if input_dict.get('trend_data') is not None else None
         trend.last_date_time = parse_datetime(input_dict.get('last_date_time')) if input_dict.get('last_date_time') is not None else None
         trend.visible = input_dict.get('visible', False)
+        trend.plan_alert_short_title = input_dict.get('plan_alert_short_tile', '')
+        trend.triggers = [Trigger.json_deserialise(t) for t in input_dict.get('triggers', [])]
         return trend
 
     def add_data(self):
@@ -324,6 +330,7 @@ class PlanAlert(Serialisable):
         self.category = insight_type
         self.views = []
         self.text = ""
+        self.bold_text = []
         self.title = ""
         self.cleared_date_time = None
         self.last_date_time = None
@@ -333,6 +340,7 @@ class PlanAlert(Serialisable):
             'category': self.category.value,
             'views': [v for v in self.views],
             'text': self.text,
+            'bold_text': [b.json_serialise() for b in self.bold_text],
             'title': self.title,
             'cleared_date_time': format_datetime(self.cleared_date_time) if self.cleared_date_time is not None else None,
             'last_date_time': format_datetime(self.last_date_time) if self.last_date_time is not None else None
@@ -344,6 +352,7 @@ class PlanAlert(Serialisable):
         plan_alert = PlanAlert(InsightType(input_dict['category']))
         plan_alert.views = [v for v in input_dict.get('views', [])]
         plan_alert.text = input_dict['text']
+        plan_alert.bold_text = [BoldText.json_deserialise(b) for b in input_dict.get('bold_text', [])]
         plan_alert.title = input_dict.get('title', "")
         plan_alert.cleared_date_time = parse_datetime(input_dict['cleared_date_time']) if input_dict.get('cleared_date_time', None) is not None else None
         plan_alert.last_date_time = parse_datetime(input_dict['last_date_time']) if input_dict.get(
@@ -351,7 +360,37 @@ class PlanAlert(Serialisable):
         return plan_alert
 
 
-class TrendCategory(object):
+class TrendDashboardCategory(Serialisable):
+    def __init__(self, insight_type):
+        self.insight_type = insight_type
+        self.title = ""
+        self.body_part = None
+        self.text = ""
+        self.body_part_text = ""
+        self.footer = ""
+
+    def json_serialise(self):
+        ret = {
+            'insight_type': self.insight_type.value,
+            'title': self.title,
+            'body_part': self.body_part.json_serialise() if self.body_part is not None else None,
+            'text': self.text,
+            'body_part_text': self.body_part_text,
+            'footer': self.footer
+        }
+        return ret
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        trend_category = cls(InsightType(input_dict['insight_type']))
+        trend_category.title = input_dict.get('title', "")
+        trend_category.body_part = BodyPartSide.json_deserialise(input_dict['body_part']) if input_dict.get('body_part') is None else None
+        trend_category.text = input_dict.get('text', "")
+        trend_category.body_part_text = input_dict.get('body_part_text', "")
+        trend_category.footer = input_dict.get('footer', "")
+
+
+class TrendCategory(Serialisable):
     def __init__(self, insight_type):
         self.insight_type = insight_type
         self.goals = set()
@@ -529,10 +568,12 @@ class TrendData(object):
 class TrendsDashboard(object):
     def __init__(self):
         self.training_volume_data = []
+        self.trend_categories = []
 
     def json_serialise(self):
         ret = {
             'training_volume_data': [tv_data.json_serialise() for tv_data in self.training_volume_data],
+            'trend_categories': [trend_category.json_serialise() for trend_category in self.trend_categories],
         }
         return ret
 
@@ -540,6 +581,8 @@ class TrendsDashboard(object):
     def json_deserialise(cls, input_dict):
         dashboard = cls()
         dashboard.training_volume_data = [TrainingVolumeChartData.json_deserialise(tv_data) for tv_data in input_dict.get('training_volume_data', [])]
+        dashboard.trend_categories = [TrendDashboardCategory.json_deserialise(trend_category) for trend_category in
+                                          input_dict.get('trend_categories', [])]
         return dashboard
 
 
