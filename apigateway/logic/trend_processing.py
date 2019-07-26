@@ -3,6 +3,7 @@ from models.trigger import TriggerType, Trigger
 from models.chart_data import PainFunctionalLimitationChartData, TightOverUnderactiveChartData
 from models.insights import InsightType
 from models.body_parts import BodyPartFactory
+from models.soreness_base import BodyPartSide
 from logic.goal_focus_text_generator import RecoveryTextGenerator
 
 
@@ -332,7 +333,8 @@ class TrendProcessor(object):
                     trigger_dictionary[t] = body_part.treatment_priority
 
                 sorted_trigger_items = sorted(trigger_dictionary.items(), key=lambda x: x[1])
-                trend_dashboard_category.body_part = sorted_trigger_items[0]
+                trend_dashboard_category.body_part = BodyPartSide(sorted_trigger_items[0][0].body_part_location,
+                                                                                            sorted_trigger_items[0][0].side)
                 trend_dashboard_category.body_part_text = text_generator.get_body_part_text(sorted_trigger_items[0][0].body_part_location,
                                                                                             sorted_trigger_items[0][0].side)
             else:
@@ -342,7 +344,8 @@ class TrendProcessor(object):
                     trigger_dictionary[t] = body_part.treatment_priority
 
                 sorted_trigger_items = sorted(trigger_dictionary.items(), key=lambda x: x[1])
-                trend_dashboard_category.body_part = sorted_trigger_items[0]
+                trend_dashboard_category.body_part = BodyPartSide(sorted_trigger_items[0][0].body_part_location,
+                                                                  sorted_trigger_items[0][0].side)
                 trend_dashboard_category.body_part_text = text_generator.get_body_part_text(sorted_trigger_items[0][0].body_part_location,
                                                                                             sorted_trigger_items[0][0].side)
 
@@ -459,6 +462,8 @@ class TrendProcessor(object):
 
             if len(all_triggers) > 1:
                 trend_dashboard_category.footer = "and " + str(len(all_triggers) - 1) + " more..."
+
+            self.dashboard_categories.append(trend_dashboard_category)
 
         else:
             trend = self.create_limitation_trend()

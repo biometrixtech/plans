@@ -272,6 +272,7 @@ def test_one_side_body_text_overactive():
 
     assert trend_processor.athlete_trend_categories[0].trends[0].trend_data.title == "Your Left Shin Is Overactive"
 
+
 def test_both_sides_body_text_functional_limitation():
     trigger_list = []
     body_part_factory = BodyPartFactory()
@@ -306,6 +307,7 @@ def test_both_sides_body_text_functional_limitation():
 
     assert trend_processor.athlete_trend_categories[0].trends[0].trend_data.title == "Your Shins Are Functionally Limited"
 
+
 def test_one_side_body_text_functional_limitation():
     trigger_list = []
     body_part_factory = BodyPartFactory()
@@ -328,3 +330,59 @@ def test_one_side_body_text_functional_limitation():
     trend_processor.process_triggers()
 
     assert trend_processor.athlete_trend_categories[0].trends[0].trend_data.title == "Your Left Shin Is Functionally Limited"
+
+
+def test_one_side_body_dashboard_functional_limitation():
+    trigger_list = []
+    body_part_factory = BodyPartFactory()
+    trigger_factory = TriggerFactory(datetime.now(), None, [], [])
+
+    now_time = datetime.now()
+
+    trigger = Trigger(TriggerType.hist_pain)
+    trigger.body_part = BodyPartSide(body_part_location=BodyPartLocation(8), side=1)
+    body_part = body_part_factory.get_body_part(trigger.body_part)
+    trigger.synergists = trigger_factory.convert_body_part_list(trigger.body_part, body_part.synergists)
+    trigger.antagonists = trigger_factory.convert_body_part_list(trigger.body_part, body_part.antagonists)
+    trigger.created_date_time = datetime.now() - timedelta(days=1)
+    trigger.source_date_time = now_time
+
+    trigger_list.append(trigger)
+
+    trend_processor = TrendProcessor(trigger_list)
+
+    trend_processor.process_triggers()
+
+    assert trend_processor.dashboard_categories[0].title == "Pain Related Insights"
+    assert trend_processor.dashboard_categories[0].body_part.body_part_location == BodyPartLocation.shin
+    assert trend_processor.dashboard_categories[0].body_part.side == 1
+    assert trend_processor.dashboard_categories[0].body_part_text == "shin"
+    assert trend_processor.dashboard_categories[0].text == "pain identified in"
+
+
+def test_one_side_body_dashboard_muscle_overactivity():
+    trigger_list = []
+    body_part_factory = BodyPartFactory()
+    trigger_factory = TriggerFactory(datetime.now(), None, [], [])
+
+    now_time = datetime.now()
+
+    trigger = Trigger(TriggerType.hist_sore_greater_30)
+    trigger.body_part = BodyPartSide(body_part_location=BodyPartLocation(8), side=1)
+    body_part = body_part_factory.get_body_part(trigger.body_part)
+    trigger.synergists = trigger_factory.convert_body_part_list(trigger.body_part, body_part.synergists)
+    trigger.antagonists = trigger_factory.convert_body_part_list(trigger.body_part, body_part.antagonists)
+    trigger.created_date_time = datetime.now() - timedelta(days=1)
+    trigger.source_date_time = now_time
+
+    trigger_list.append(trigger)
+
+    trend_processor = TrendProcessor(trigger_list)
+
+    trend_processor.process_triggers()
+
+    assert trend_processor.dashboard_categories[0].title == "Tissue Related Insights"
+    assert trend_processor.dashboard_categories[0].body_part.body_part_location == BodyPartLocation.calves
+    assert trend_processor.dashboard_categories[0].body_part.side == 1
+    assert trend_processor.dashboard_categories[0].body_part_text == "left calf"
+    assert trend_processor.dashboard_categories[0].text == "weakness identified in"

@@ -167,6 +167,7 @@ class TrainingPlanManager(object):
         # alerts_processing.aggregate_alerts(alerts=alerts)
         self.daily_plan.trends = AthleteTrends()
         self.daily_plan.trends.trend_categories = trend_processor.athlete_trend_categories
+        self.daily_plan.trends.dashboard.trend_categories = trend_processor.dashboard_categories
         self.daily_plan.trends.add_trend_data(self.athlete_stats)
         self.daily_plan_datastore.put(self.daily_plan)
         self.athlete_stats_datastore.put(self.athlete_stats)
