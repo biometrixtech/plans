@@ -91,9 +91,6 @@ class TrendProcessor(object):
         trend_category = TrendCategory(InsightType.movement_dysfunction_compensation)
         trend_category.title = "Movement Dysfunction or Compensation"
         trend_category.first_time_experience = True
-        plan_alert = PlanAlert(InsightType.movement_dysfunction_compensation)
-        plan_alert.title = trend_category.title
-        trend_category.plan_alerts.append(plan_alert)
 
         muscle_trend = self.create_muscle_trend()
         trend_category.trends.append(muscle_trend)
@@ -112,6 +109,7 @@ class TrendProcessor(object):
         limitation_trend.icon = "view3icon.png"
         limitation_trend.visible = False
         limitation_trend.first_time_experience = True
+        limitation_trend.plan_alert_short_title = "functional limitation"
         return limitation_trend
 
     def create_muscle_trend(self):
@@ -123,6 +121,7 @@ class TrendProcessor(object):
         muscle_trend.icon = "view1icon.png"
         muscle_trend.visible = False
         muscle_trend.first_time_experience = True
+        muscle_trend.plan_alert_short_title = "muscle over-activity"
         return muscle_trend
 
     def process_triggers(self):
@@ -138,11 +137,21 @@ class TrendProcessor(object):
 
             self.athlete_trend_categories[trend_category_index].trends = []
 
+            new_modified_trigger_count = 0
+            plan_alert_short_title = ""
+
             if len(first_times) > 0:
                 first_times = sorted(first_times, key=lambda x: (x.last_date_time, x.priority), reverse=True)
+                plan_alert_short_title = first_times[0].plan_alert_short_title
+                for f in first_times:
+                    new_modified_trigger_count += len(f.triggers)
 
             if len(full_dates) > 0:
                 full_dates = sorted(full_dates, key=lambda x: (x.last_date_time, x.priority), reverse=True)
+                if len(plan_alert_short_title) == 0:
+                    plan_alert_short_title = full_dates[0].plan_alert_short_title
+                for f in full_dates:
+                    new_modified_trigger_count += len(f.triggers)
 
             self.athlete_trend_categories[trend_category_index].trends.extend(first_times)
             self.athlete_trend_categories[trend_category_index].trends.extend(full_dates)
@@ -155,7 +164,28 @@ class TrendProcessor(object):
             if len(visible_trends) > 0:
                 trends_visible = True
 
+                # plans alert text
+                header_text = str(new_modified_trigger_count) + " Tissue Related Insights"
+
+                body_text = "New signs of " + plan_alert_short_title
+
+                if len(visible_trends) > 1:
+                    if len(visible_trends) == 2:
+                        body_text += " and " + str(len(visible_trends)-1) + " other meaningful insight"
+                    else:
+                        body_text += " and " + str(len(visible_trends) - 1) + " other meaningful insights"
+
+                body_text += " in your data. Tap to view more."
+                plan_alert = PlanAlert(self.athlete_trend_categories[trend_category_index].insight_type)
+                plan_alert.title = header_text
+                plan_alert.text = body_text
+                bold_text_1 = BoldText()
+                bold_text_1.text = plan_alert_short_title
+                plan_alert.bold_text.append(bold_text_1)
+                self.athlete_trend_categories[trend_category_index].plan_alerts.append(plan_alert)
+
             self.athlete_trend_categories[trend_category_index].visible = trends_visible
+
 
     def get_latest_trigger_date_time(self, triggers):
 
@@ -247,9 +277,9 @@ class TrendProcessor(object):
             all_triggers.extend(triggers_1)
             all_triggers.extend(triggers_2)
 
+            trend.triggers = all_triggers
+
             trend.last_date_time = self.get_latest_trigger_date_time(all_triggers)
-            self.athlete_trend_categories[category_index].plan_alerts[0].text += "tight muscle over-under;"
-            self.athlete_trend_categories[category_index].plan_alerts[0].views.append("1")
         else:
             trend = self.create_muscle_trend()
             self.set_muscle_trend(category_index, trend)
@@ -317,9 +347,10 @@ class TrendProcessor(object):
             all_triggers = []
             all_triggers.extend(triggers)
 
+            trend.triggers = all_triggers
+
             trend.last_date_time = self.get_latest_trigger_date_time(all_triggers)
-            self.athlete_trend_categories[category_index].plan_alerts[0].text += "pain and functional limitation"
-            self.athlete_trend_categories[category_index].plan_alerts[0].views.append("2")
+
         else:
             trend = self.create_limitation_trend()
             self.set_limitation_trend(category_index, trend)
