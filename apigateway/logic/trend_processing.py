@@ -1,14 +1,16 @@
-from models.athlete_trend import AthleteTrends, PlanAlert, Trend, TrendCategory, TrendData, VisualizationType, LegendColor, BoldText
+from models.athlete_trend import TrendDashboardCategory, PlanAlert, Trend, TrendCategory, TrendData, VisualizationType, LegendColor, BoldText
 from models.trigger import TriggerType, Trigger
 from models.chart_data import PainFunctionalLimitationChartData, TightOverUnderactiveChartData
 from models.insights import InsightType
 from models.body_parts import BodyPartFactory
 from logic.goal_focus_text_generator import RecoveryTextGenerator
 
+
 class TrendProcessor(object):
-    def __init__(self, trigger_list, athlete_trend_categories=None):
+    def __init__(self, trigger_list, athlete_trend_categories=None, dashboard_categories=None):
         self.athlete_trend_categories = [] if athlete_trend_categories is None else athlete_trend_categories
         self.trigger_list = trigger_list
+        self.dashboard_categories = [] if dashboard_categories is None else dashboard_categories
 
         self.initialize_trend_categories()
 
@@ -106,6 +108,23 @@ class TrendProcessor(object):
         limitation_trend.title_color = LegendColor.error_light
         limitation_trend.text.append("Your data suggests pain or functional limitations.")
         limitation_trend.text.append("Really. We're not kidding.")
+
+        bold_text_1 = BoldText()
+        bold_text_1.text = "Really"
+        bold_text_1.color = LegendColor.error_light
+
+        bold_text_2 = BoldText()
+        bold_text_2.text = "pain"
+        bold_text_2.color = LegendColor.warning_light
+
+        bold_text_3 = BoldText()
+        bold_text_3.text = "functional limitations"
+        bold_text_3.color = LegendColor.warning_light
+
+        limitation_trend.bold_text.append(bold_text_1)
+        limitation_trend.bold_text.append(bold_text_2)
+        limitation_trend.bold_text.append(bold_text_3)
+
         limitation_trend.icon = "view3icon.png"
         limitation_trend.visible = False
         limitation_trend.first_time_experience = True
@@ -118,6 +137,17 @@ class TrendProcessor(object):
         muscle_trend.title_color = LegendColor.warning_light
         muscle_trend.text.append("Your data suggests tight muscle stuff.")
         muscle_trend.text.append("Seriously. We're not kidding.")
+
+        bold_text_1 = BoldText()
+        bold_text_1.text = "Seriously"
+        bold_text_1.color = LegendColor.error_light
+
+        bold_text_2 = BoldText()
+        bold_text_2.text = "tight muscle"
+        bold_text_2.color = LegendColor.warning_light
+        muscle_trend.bold_text.append(bold_text_1)
+        muscle_trend.bold_text.append(bold_text_2)
+
         muscle_trend.icon = "view1icon.png"
         muscle_trend.visible = False
         muscle_trend.first_time_experience = True
@@ -165,27 +195,29 @@ class TrendProcessor(object):
                 trends_visible = True
 
                 # plans alert text
-                header_text = str(new_modified_trigger_count) + " Tissue Related Insights"
-
-                body_text = "New signs of " + plan_alert_short_title
-
-                if len(visible_trends) > 1:
-                    if len(visible_trends) == 2:
-                        body_text += " and " + str(len(visible_trends)-1) + " other meaningful insight"
-                    else:
-                        body_text += " and " + str(len(visible_trends) - 1) + " other meaningful insights"
-
-                body_text += " in your data. Tap to view more."
-                plan_alert = PlanAlert(self.athlete_trend_categories[trend_category_index].insight_type)
-                plan_alert.title = header_text
-                plan_alert.text = body_text
-                bold_text_1 = BoldText()
-                bold_text_1.text = plan_alert_short_title
-                plan_alert.bold_text.append(bold_text_1)
+                plan_alert = self.get_plan_alert(new_modified_trigger_count, plan_alert_short_title,
+                                                 trend_category_index, visible_trends)
                 self.athlete_trend_categories[trend_category_index].plan_alerts.append(plan_alert)
 
             self.athlete_trend_categories[trend_category_index].visible = trends_visible
 
+    def get_plan_alert(self, new_modified_trigger_count, plan_alert_short_title, trend_category_index, visible_trends):
+
+        header_text = str(new_modified_trigger_count) + " Tissue Related Insights"
+        body_text = "New signs of " + plan_alert_short_title
+        if len(visible_trends) > 1:
+            if len(visible_trends) == 2:
+                body_text += " and " + str(len(visible_trends) - 1) + " other meaningful insight"
+            else:
+                body_text += " and " + str(len(visible_trends) - 1) + " other meaningful insights"
+        body_text += " in your data. Tap to view more."
+        plan_alert = PlanAlert(self.athlete_trend_categories[trend_category_index].insight_type)
+        plan_alert.title = header_text
+        plan_alert.text = body_text
+        bold_text_1 = BoldText()
+        bold_text_1.text = plan_alert_short_title
+        plan_alert.bold_text.append(bold_text_1)
+        return plan_alert
 
     def get_latest_trigger_date_time(self, triggers):
 
@@ -226,25 +258,9 @@ class TrendProcessor(object):
 
             antagonists_1, synergists_1 = self.get_antagonists_syngergists(triggers_1)
             antagonists_2, synergists_2 = self.get_antagonists_syngergists(triggers_2)
-            # trend = Trend(trigger_type_1)
-            # trend.title = "Muscle Over & Under Activity"
-            # trend.title_color = LegendColor.warning_light
-            # trend.text.append("Your data suggests tight muscle stuff.")
-            # trend.text.append("Seriously. We're not kidding.")
 
             trend = self.get_muscle_trend(category_index)
 
-            bold_text_1 = BoldText()
-            bold_text_1.text = "Seriously"
-            bold_text_1.color = LegendColor.error_light
-
-            bold_text_2 = BoldText()
-            bold_text_2.text = "tight muscle"
-            bold_text_2.color = LegendColor.warning_light
-            trend.bold_text.append(bold_text_1)
-            trend.bold_text.append(bold_text_2)
-
-            #trend.icon = "view1icon.png"
             trend_data = TrendData()
             trend_data.visualization_type = VisualizationType.tight_overactice_underactive
             trend_data.add_visualization_data()
@@ -303,6 +319,38 @@ class TrendProcessor(object):
             trend.triggers = all_triggers
 
             trend.last_date_time = self.get_latest_trigger_date_time(all_triggers)
+
+            # Now create dashboard category card
+            trend_dashboard_category = TrendDashboardCategory(self.athlete_trend_categories[category_index].insight_type)
+            trend_dashboard_category.title = "Tissue Related Insights"
+            trend_dashboard_category.text = "weakness identified in"
+
+            if top_candidates[0].trigger_type == TriggerType.hist_sore_greater_30:
+                trigger_dictionary = {}
+                for t in top_candidates[0].antagonists:
+                    body_part = body_part_factory.get_body_part(t)
+                    trigger_dictionary[t] = body_part.treatment_priority
+
+                sorted_trigger_items = sorted(trigger_dictionary.items(), key=lambda x: x[1])
+                trend_dashboard_category.body_part = sorted_trigger_items[0]
+                trend_dashboard_category.body_part_text = text_generator.get_body_part_text(sorted_trigger_items[0][0].body_part_location,
+                                                                                            sorted_trigger_items[0][0].side)
+            else:
+                trigger_dictionary = {}
+                for t in top_candidates[0].synergists:
+                    body_part = body_part_factory.get_body_part(t)
+                    trigger_dictionary[t] = body_part.treatment_priority
+
+                sorted_trigger_items = sorted(trigger_dictionary.items(), key=lambda x: x[1])
+                trend_dashboard_category.body_part = sorted_trigger_items[0]
+                trend_dashboard_category.body_part_text = text_generator.get_body_part_text(sorted_trigger_items[0][0].body_part_location,
+                                                                                            sorted_trigger_items[0][0].side)
+
+            if len(all_triggers) > 1:
+                trend_dashboard_category.footer = "and " + str(len(all_triggers) - 1) + " more..."
+
+            self.dashboard_categories.append(trend_dashboard_category)
+
         else:
             trend = self.create_muscle_trend()
             self.set_muscle_trend(category_index, trend)
@@ -344,30 +392,8 @@ class TrendProcessor(object):
         if len(triggers) > 0:
             antagonists, synergists = self.get_antagonists_syngergists(triggers)
 
-            # trend = Trend(trigger_type)
-            # trend.title = "Functional Limitation"
-            # trend.title_color = LegendColor.error_light
-            # trend.text.append("Your data suggests pain or functional limitations.")
-            # trend.text.append("Really. We're not kidding.")
             trend = self.get_limitation_trend(category_index)
 
-            bold_text_1 = BoldText()
-            bold_text_1.text = "Really"
-            bold_text_1.color = LegendColor.error_light
-
-            bold_text_2 = BoldText()
-            bold_text_2.text = "pain"
-            bold_text_2.color = LegendColor.warning_light
-
-            bold_text_3 = BoldText()
-            bold_text_3.text = "functional limitations"
-            bold_text_3.color = LegendColor.warning_light
-
-            trend.bold_text.append(bold_text_1)
-            trend.bold_text.append(bold_text_2)
-            trend.bold_text.append(bold_text_3)
-
-            #trend.icon = "view3icon.png"
             trend_data = TrendData()
             trend_data.visualization_type = VisualizationType.pain_functional_limitation
             trend_data.add_visualization_data()
@@ -422,6 +448,17 @@ class TrendProcessor(object):
             trend.priority = 1
 
             trend.last_date_time = self.get_latest_trigger_date_time(all_triggers)
+
+            # Now create dashboard category card
+            trend_dashboard_category = TrendDashboardCategory(self.athlete_trend_categories[category_index].insight_type)
+            trend_dashboard_category.title = "Pain Related Insights"
+            trend_dashboard_category.text = "pain identified in"
+
+            trend_dashboard_category.body_part = top_candidates[0].body_part
+            trend_dashboard_category.body_part_text = body_part_text
+
+            if len(all_triggers) > 1:
+                trend_dashboard_category.footer = "and " + str(len(all_triggers) - 1) + " more..."
 
         else:
             trend = self.create_limitation_trend()

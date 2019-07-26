@@ -360,7 +360,37 @@ class PlanAlert(Serialisable):
         return plan_alert
 
 
-class TrendCategory(object):
+class TrendDashboardCategory(Serialisable):
+    def __init__(self, insight_type):
+        self.insight_type = insight_type
+        self.title = ""
+        self.body_part = None
+        self.text = ""
+        self.body_part_text = ""
+        self.footer = ""
+
+    def json_serialise(self):
+        ret = {
+            'insight_type': self.insight_type.value,
+            'title': self.title,
+            'body_part': self.body_part.json_serialise() if self.body_part is not None else None,
+            'text': self.text,
+            'body_part_text': self.body_part_text,
+            'footer': self.footer
+        }
+        return ret
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        trend_category = cls(InsightType(input_dict['insight_type']))
+        trend_category.title = input_dict.get('title', "")
+        trend_category.body_part = BodyPartSide.json_deserialise(input_dict['body_part']) if input_dict.get('body_part') is None else None
+        trend_category.text = input_dict.get('text', "")
+        trend_category.body_part_text = input_dict.get('body_part_text', "")
+        trend_category.footer = input_dict.get('footer', "")
+
+
+class TrendCategory(Serialisable):
     def __init__(self, insight_type):
         self.insight_type = insight_type
         self.goals = set()
@@ -538,10 +568,12 @@ class TrendData(object):
 class TrendsDashboard(object):
     def __init__(self):
         self.training_volume_data = []
+        self.trend_categories = []
 
     def json_serialise(self):
         ret = {
             'training_volume_data': [tv_data.json_serialise() for tv_data in self.training_volume_data],
+            'trend_categories': [trend_category.json_serialise() for trend_category in self.trend_categories],
         }
         return ret
 
@@ -549,6 +581,8 @@ class TrendsDashboard(object):
     def json_deserialise(cls, input_dict):
         dashboard = cls()
         dashboard.training_volume_data = [TrainingVolumeChartData.json_deserialise(tv_data) for tv_data in input_dict.get('training_volume_data', [])]
+        dashboard.trend_categories = [TrendDashboardCategory.json_deserialise(trend_category) for trend_category in
+                                          input_dict.get('trend_categories', [])]
         return dashboard
 
 
