@@ -121,6 +121,7 @@ class Trigger(BaseSoreness, Serialisable):
         self.modified_date_time = None
         self.deleted_date_time = None
         self.source_date_time = None
+        self.priority = 0  # This doesn't need to be persisted, just used in logic
 
     def json_serialise(self):
         return {

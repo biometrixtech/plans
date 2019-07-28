@@ -250,10 +250,24 @@ class TrendProcessor(object):
     def set_tight_over_under_muscle_view(self, category_index):
 
         trigger_type_1 = TriggerType.hist_sore_less_30
-        triggers_1 = list(t for t in self.trigger_list if t.trigger_type == trigger_type_1)
+        less_30_triggers = [TriggerType.hist_sore_less_30_no_sport,
+                            TriggerType.hist_sore_less_30,
+                            TriggerType.hist_sore_less_30_sore_today]
+        triggers_1 = list(t for t in self.trigger_list if t.trigger_type in less_30_triggers)
+        for t in triggers_1:
+            t.priority = 1
 
         trigger_type_2 = TriggerType.hist_sore_greater_30
-        triggers_2 = list(t for t in self.trigger_list if t.trigger_type == trigger_type_2)
+        greater_30_triggers = [TriggerType.hist_sore_greater_30_high_volume_intensity,
+                               TriggerType.hist_sore_greater_30_no_sore_today_high_volume_intensity,
+                               TriggerType.hist_sore_greater_30_sore_today,
+                               TriggerType.hist_sore_greater_30,
+                               TriggerType.hist_sore_greater_30_sport]
+        triggers_2 = list(t for t in self.trigger_list if t.trigger_type in greater_30_triggers)
+        for t in triggers_2:
+            t.priority = 2
+
+        # since we're reverse sorting, 2 is a higher priority than 1
 
         if len(triggers_1) > 0 or len(triggers_2) > 0:
 
@@ -279,7 +293,7 @@ class TrendProcessor(object):
             all_triggers.extend(triggers_2)
 
             # rank triggers
-            sorted_triggers = sorted(all_triggers, key=lambda x: (x.source_date_time, x.trigger_type), reverse=True)
+            sorted_triggers = sorted(all_triggers, key=lambda x: (x.source_date_time, x.priority), reverse=True)
 
             text_generator = RecoveryTextGenerator()
             body_part_factory = BodyPartFactory()
@@ -326,7 +340,7 @@ class TrendProcessor(object):
             trend_dashboard_category.title = "Tissue Related Insights"
             trend_dashboard_category.text = "weakness identified in"
 
-            if top_candidates[0].trigger_type == TriggerType.hist_sore_greater_30:
+            if top_candidates[0].priority == 2:
                 trigger_dictionary = {}
                 for t in top_candidates[0].antagonists:
                     body_part = body_part_factory.get_body_part(t)
@@ -370,7 +384,7 @@ class TrendProcessor(object):
             trigger_dictionary = {}
             for t in top_candidates:
                 body_part = body_part_factory.get_body_part(t.body_part)
-                trigger_dictionary[t] = body_part.treatment_priority
+                trigger_dictionary[t.body_part] = body_part.treatment_priority
 
             # still could have a tie (two body parts)
             sorted_trigger_items = sorted(trigger_dictionary.items(), key=lambda x: x[1])
@@ -389,8 +403,17 @@ class TrendProcessor(object):
 
     def set_pain_functional_limitation(self, category_index):
 
-        trigger_type = TriggerType.hist_pain
-        triggers = list(t for t in self.trigger_list if t.trigger_type == trigger_type)
+        #trigger_type = TriggerType.hist_pain
+        hist_pain_triggers = [TriggerType.hist_pain_high_volume_intensity,
+                              TriggerType.acute_pain_no_pain_today_high_volume_intensity,
+                              TriggerType.pers_pers2_pain_no_pain_sore_today_high_volume_intensity,
+                              TriggerType.hist_pain,
+                              TriggerType.hist_pain_sport,
+                              TriggerType.pers_pers2_pain_less_30_no_pain_today,
+                              TriggerType.pers_pers2_pain_greater_30_no_pain_today,
+                              TriggerType.hist_pain_pain_today_severity_1_2,
+                              TriggerType.hist_pain_pain_today_severity_3_5]
+        triggers = list(t for t in self.trigger_list if t.trigger_type in hist_pain_triggers)
 
         if len(triggers) > 0:
             antagonists, synergists = self.get_antagonists_syngergists(triggers)
@@ -413,7 +436,7 @@ class TrendProcessor(object):
             trend.triggers = all_triggers
 
             # rank triggers
-            sorted_triggers = sorted(all_triggers, key=lambda x: (x.source_date_time, x.trigger_type), reverse=True)
+            sorted_triggers = sorted(all_triggers, key=lambda x: x.source_date_time, reverse=True)
 
             text_generator = RecoveryTextGenerator()
             body_part_factory = BodyPartFactory()

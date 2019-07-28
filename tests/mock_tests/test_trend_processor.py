@@ -241,6 +241,17 @@ def test_both_sides_body_text_overactive():
 
     trigger_list.append(trigger_2)
 
+    trigger_3 = Trigger(TriggerType.hist_sore_greater_30_sport)
+    trigger_3.body_part = BodyPartSide(body_part_location=BodyPartLocation(8), side=2)
+    body_part_3 = body_part_factory.get_body_part(trigger_3.body_part)
+    trigger_3.synergists = trigger_factory.convert_body_part_list(trigger_3.body_part, body_part_3.synergists)
+    trigger_3.antagonists = trigger_factory.convert_body_part_list(trigger_3.body_part, body_part_3.antagonists)
+    trigger_3.agonists = trigger_factory.convert_body_part_list(trigger_3.body_part, body_part_3.agonists)
+    trigger_3.created_date_time = datetime.now() - timedelta(days=1)
+    trigger_3.source_date_time = now_time
+
+    trigger_list.append(trigger_3)
+
     trend_processor = TrendProcessor(trigger_list)
 
     trend_processor.process_triggers()
@@ -300,6 +311,17 @@ def test_both_sides_body_text_functional_limitation():
     trigger_2.source_date_time = now_time
 
     trigger_list.append(trigger_2)
+
+    trigger_3 = Trigger(TriggerType.hist_pain_sport)
+    trigger_3.body_part = BodyPartSide(body_part_location=BodyPartLocation(8), side=2)
+    body_part_3 = body_part_factory.get_body_part(trigger_3.body_part)
+    trigger_3.synergists = trigger_factory.convert_body_part_list(trigger_3.body_part, body_part_3.synergists)
+    trigger_3.antagonists = trigger_factory.convert_body_part_list(trigger_3.body_part, body_part_3.antagonists)
+    trigger_3.agonists = trigger_factory.convert_body_part_list(trigger_3.body_part, body_part_3.agonists)
+    trigger_3.created_date_time = datetime.now() - timedelta(days=1)
+    trigger_3.source_date_time = now_time
+
+    trigger_list.append(trigger_3)
 
     trend_processor = TrendProcessor(trigger_list)
 
