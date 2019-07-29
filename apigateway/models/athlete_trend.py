@@ -384,7 +384,7 @@ class TrendDashboardCategory(Serialisable):
     def json_deserialise(cls, input_dict):
         trend_category = cls(InsightType(input_dict['insight_type']))
         trend_category.title = input_dict.get('title', "")
-        trend_category.body_part = BodyPartSide.json_deserialise(input_dict['body_part']) if input_dict.get('body_part') is None else None
+        trend_category.body_part = BodyPartSide.json_deserialise(input_dict['body_part']) if input_dict.get('body_part') is not None else None
         trend_category.text = input_dict.get('text', "")
         trend_category.body_part_text = input_dict.get('body_part_text', "")
         trend_category.footer = input_dict.get('footer', "")
