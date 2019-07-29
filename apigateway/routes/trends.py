@@ -51,11 +51,15 @@ def handle_fte_category(principal_id):
     plan = DatastoreCollection().daily_plan_datastore.get(user_id, start_date=plan_event_day, end_date=plan_event_day)[0]
     athlete_stats = DatastoreCollection().athlete_stats_datastore.get(user_id)
     fte_insight_type = InsightType(request.json['insight_type'])
-    trend_category = [category for category in plan.trends.trend_categories if category.insight_type == fte_insight_type][0]
-    trend_category.first_time_experience = False
-    athlete_stats.trend_categories = plan.trends.trend_categories
-    DatastoreCollection().athlete_stats_datastore.put(athlete_stats)
-    DatastoreCollection().daily_plan_datastore.put(plan)
+    fte_trend_categories = [category for category in plan.trends.trend_categories if category.insight_type == fte_insight_type]
+    if len(fte_trend_categories) > 0:
+        fte_trend_category = fte_trend_categories[0]
+        fte_trend_category.first_time_experience = False
+        athlete_stats.trend_categories = plan.trends.trend_categories
+        DatastoreCollection().athlete_stats_datastore.put(athlete_stats)
+        DatastoreCollection().daily_plan_datastore.put(plan)
+    else:
+        print(f"Trend Category {fte_insight_type.name} not found")
 
     plan = cleanup_plan(plan)
     return {'daily_plans': [plan]}, 200
@@ -73,12 +77,20 @@ def handle_fte_view(principal_id):
     athlete_stats = DatastoreCollection().athlete_stats_datastore.get(user_id)
     fte_insight_type = InsightType(request.json['insight_type'])
     fte_viz_type = VisualizationType(request.json['visualization_type'])
-    fte_trend_category = [category for category in plan.trends.trend_categories if category.insight_type == fte_insight_type][0]
-    fte_view = [trend for trend in fte_trend_category.trends if trend.visualization_type == fte_viz_type]
-    fte_view.first_time_experience = False
-    athlete_stats.trend_categories = plan.trends.trend_categories
-    DatastoreCollection().athlete_stats_datastore.put(athlete_stats)
-    DatastoreCollection().daily_plan_datastore.put(plan)
+    fte_trend_categories = [category for category in plan.trends.trend_categories if category.insight_type == fte_insight_type]
+    if len(fte_trend_categories) > 0:
+        fte_trend_category = fte_trend_categories[0]
+        fte_views = [trend for trend in fte_trend_category.trends if trend.visualization_type == fte_viz_type]
+        if len(fte_views) > 0:
+            fte_view = fte_views[0]
+            fte_view.first_time_experience = False
+            athlete_stats.trend_categories = plan.trends.trend_categories
+            DatastoreCollection().athlete_stats_datastore.put(athlete_stats)
+            DatastoreCollection().daily_plan_datastore.put(plan)
+        else:
+            print(f"No View found for Visualization Type {fte_viz_type.name}")
+    else:
+        print(f"Trend Category {fte_insight_type.name} not found")
 
     plan = cleanup_plan(plan)
     return {'daily_plans': [plan]}, 200
