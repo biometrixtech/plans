@@ -164,6 +164,7 @@ class Trend(object):
         self.visible = False
         self.plan_alert_short_title = ""
         self.triggers = []
+        self.video_url = ""
 
     def json_serialise(self):
         ret = {
@@ -192,7 +193,8 @@ class Trend(object):
             'last_date_time': format_datetime(self.last_date_time) if self.last_date_time is not None else None,
             'visible': self.visible,
             'plan_alert_short_title': self.plan_alert_short_title,
-            'triggers': [t.json_serialise() for t in self.triggers]
+            'triggers': [t.json_serialise() for t in self.triggers],
+            'video_url': self.video_url
         }
         return ret
 
@@ -235,6 +237,7 @@ class Trend(object):
         trend.visible = input_dict.get('visible', False)
         trend.plan_alert_short_title = input_dict.get('plan_alert_short_tile', '')
         trend.triggers = [Trigger.json_deserialise(t) for t in input_dict.get('triggers', [])]
+        trend.video_url = input_dict.get('video_url', '')
         return trend
 
     def add_data(self):
