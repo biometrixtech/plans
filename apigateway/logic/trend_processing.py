@@ -128,6 +128,7 @@ class TrendProcessor(object):
 
         limitation_trend.icon = "view3icon.png"
         limitation_trend.video_url = "https://d2xll36aqjtmhz.cloudfront.net/calibration.mp4"
+        limitation_trend.visualization_type = VisualizationType.pain_functional_limitation
         limitation_trend.visible = False
         limitation_trend.first_time_experience = True
         limitation_trend.plan_alert_short_title = "functional limitation"
@@ -152,6 +153,7 @@ class TrendProcessor(object):
 
         muscle_trend.icon = "view1icon.png"
         muscle_trend.video_url = "https://d2xll36aqjtmhz.cloudfront.net/calibration.mp4"
+        muscle_trend.visualization_type = VisualizationType.tight_overactice_underactive
         muscle_trend.visible = False
         muscle_trend.first_time_experience = True
         muscle_trend.plan_alert_short_title = "muscle over-activity"
