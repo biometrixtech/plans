@@ -193,12 +193,25 @@ class TrendProcessor(object):
             trends_visible = False
 
             if len(visible_trends) > 0:
+
                 trends_visible = True
 
-                # plans alert text
-                plan_alert = self.get_plan_alert(new_modified_trigger_count, plan_alert_short_title,
-                                                 trend_category_index, visible_trends)
-                self.athlete_trend_categories[trend_category_index].plan_alerts.append(plan_alert)
+                sorted_trends = sorted(visible_trends, key=lambda v: v.last_date_time, reverse=True)
+
+                if (len(self.athlete_trend_categories[trend_category_index].plan_alerts) > 0 and
+                        (self.athlete_trend_categories[trend_category_index].plan_alerts[0].cleared_date_time is None)):
+
+                    # clear this out so we can update the plan alert
+                    self.athlete_trend_categories[trend_category_index].plan_alerts = []
+
+                if (len(self.athlete_trend_categories[trend_category_index].plan_alerts) == 0 or
+                    (self.athlete_trend_categories[trend_category_index].plan_alerts[0].cleared_date_time is not None
+                     and sorted_trends[0].last_date_time > self.athlete_trend_categories[trend_category_index].plan_alerts[0].cleared_date_time)):
+
+                    # plans alert text
+                    plan_alert = self.get_plan_alert(new_modified_trigger_count, plan_alert_short_title,
+                                                     trend_category_index, visible_trends)
+                    self.athlete_trend_categories[trend_category_index].plan_alerts.append(plan_alert)
 
             self.athlete_trend_categories[trend_category_index].visible = trends_visible
 
