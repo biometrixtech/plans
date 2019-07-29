@@ -2,6 +2,7 @@ from flask import request, Blueprint
 from fathomapi.utils.decorators import require
 from fathomapi.utils.xray import xray_recorder
 from datastores.datastore_collection import DatastoreCollection
+from logic.survey_processing import cleanup_plan
 from models.insights import InsightType
 from models.athlete_trend import VisualizationType
 from utils import parse_datetime, format_date
@@ -35,7 +36,8 @@ def handle_alerts_cleared(principal_id):
     else:
         print(f"Trend Category {cleared_insight_type.name} not found")
 
-    return {'message': 'success'}, 200
+    plan = cleanup_plan(plan)
+    return {'daily_plans': [plan]}, 200
 
 
 @app.route('first_time_experience/category', methods=['POST'])
@@ -55,7 +57,8 @@ def handle_fte_category(principal_id):
     DatastoreCollection().athlete_stats_datastore.put(athlete_stats)
     DatastoreCollection().daily_plan_datastore.put(plan)
 
-    return {'message': 'success'}, 200
+    plan = cleanup_plan(plan)
+    return {'daily_plans': [plan]}, 200
 
 
 @app.route('first_time_experience/view', methods=['POST'])
@@ -77,4 +80,5 @@ def handle_fte_view(principal_id):
     DatastoreCollection().athlete_stats_datastore.put(athlete_stats)
     DatastoreCollection().daily_plan_datastore.put(plan)
 
-    return {'message': 'success'}, 200
+    plan = cleanup_plan(plan)
+    return {'daily_plans': [plan]}, 200
