@@ -139,27 +139,27 @@ class VisualizationTitle(object):
 class Trend(object):
     def __init__(self, trigger_type):
         self.trigger_type = trigger_type
-        self.insight_type = InsightType.stress
+        # self.insight_type = InsightType.stress
         self.first_time_experience = False
         self.title = ""
         self.title_color = None
         self.icon = ""
         self.text = []
         self.bold_text = []
-        self.visualization_title = VisualizationTitle()
+        # self.visualization_title = VisualizationTitle()
         self.visualization_type = VisualizationType(1)
-        self.visualization_data = VisualizationData()
-        self.goal_targeted = []
-        self.body_parts = []
-        self.sport_names = []
-        self.data_source = DataSource(0)
-        self.data = []
+        # self.visualization_data = VisualizationData()
+        # self.goal_targeted = []
+        # self.body_parts = []
+        # self.sport_names = []
+        # self.data_source = DataSource(0)
+        # self.data = []
         self.trend_data = None
-        self.cta = set()
+        # self.cta = set()
         self.priority = 0
-        self.present_in_trends = True
-        self.cleared = False
-        self.longitudinal = False
+        # self.present_in_trends = True
+        # self.cleared = False
+        # self.longitudinal = False
         self.last_date_time = None
         self.visible = False
         self.plan_alert_short_title = ""
@@ -175,21 +175,21 @@ class Trend(object):
             'text': [t for t in self.text],
             'icon': self.icon,
             'bold_text': [b.json_serialise() for b in self.bold_text],
-            'visualization_title': self.visualization_title.json_serialise(),
+            # 'visualization_title': self.visualization_title.json_serialise(),
             'visualization_type': self.visualization_type.value,
-            'visualization_data': self.visualization_data.json_serialise(),
-            'goal_targeted': self.goal_targeted,
-            'body_parts': [body_part.json_serialise() for body_part in self.body_parts],
-            'sport_names': [sport_name.value for sport_name in self.sport_names],
-            'data': [data.json_serialise() for data in self.data],
+            # 'visualization_data': self.visualization_data.json_serialise(),
+            # 'goal_targeted': self.goal_targeted,
+            # 'body_parts': [body_part.json_serialise() for body_part in self.body_parts],
+            # 'sport_names': [sport_name.value for sport_name in self.sport_names],
+            # 'data': [data.json_serialise() for data in self.data],
             'trend_data': self.trend_data.json_serialise() if self.trend_data is not None else None,
-            'data_source': self.data_source.value,
-            'insight_type': self.insight_type.value,
-            'cta': list(self.cta),
+            # 'data_source': self.data_source.value,
+            # 'insight_type': self.insight_type.value,
+            # 'cta': list(self.cta),
             'priority': self.priority,
-            'present_in_trends': self.present_in_trends,
-            'cleared': self.cleared,
-            'longitudinal': self.longitudinal,
+            # 'present_in_trends': self.present_in_trends,
+            # 'cleared': self.cleared,
+            # 'longitudinal': self.longitudinal,
             'last_date_time': format_datetime(self.last_date_time) if self.last_date_time is not None else None,
             'visible': self.visible,
             'plan_alert_short_title': self.plan_alert_short_title,
@@ -207,31 +207,31 @@ class Trend(object):
         trend.text = input_dict.get('text', [])
         trend.icon = input_dict.get('icon', '')
         trend.bold_text = [BoldText.json_deserialise(b) for b in input_dict.get('bold_text', [])]
-        trend.visualization_title = VisualizationTitle.json_deserialise(input_dict['visualization_title'])
+        # trend.visualization_title = VisualizationTitle.json_deserialise(input_dict['visualization_title'])
         trend.visualization_type = VisualizationType(input_dict['visualization_type'])
-        trend.visualization_data = VisualizationData.json_deserialise(input_dict['visualization_data'])
-        trend.goal_targeted = input_dict['goal_targeted']
-        trend.body_parts = [BodyPartSide.json_deserialise(body_part) for body_part in input_dict['body_parts']]
-        trend.sport_names = [SportName(sport_name) for sport_name in input_dict['sport_names']]
-        trend.data_source = DataSource(input_dict.get('data_source', 0))
-        trend.insight_type = InsightType(input_dict.get('insight_type', 0))
+        # trend.visualization_data = VisualizationData.json_deserialise(input_dict['visualization_data'])
+        # trend.goal_targeted = input_dict['goal_targeted']
+        # trend.body_parts = [BodyPartSide.json_deserialise(body_part) for body_part in input_dict['body_parts']]
+        # trend.sport_names = [SportName(sport_name) for sport_name in input_dict['sport_names']]
+        # trend.data_source = DataSource(input_dict.get('data_source', 0))
+        # trend.insight_type = InsightType(input_dict.get('insight_type', 0))
         trend.priority = input_dict.get('priority', 0)
-        trend.cta = set(input_dict.get('cta', []))
-        trend.present_in_trends = input_dict.get('present_in_trends', True)
-        trend.cleared = input_dict.get('cleared', False)
-        trend.longitudinal = input_dict.get('longitudinal', False)
-        if trend.visualization_type == VisualizationType.load:
-            trend.data = []
-        elif trend.visualization_type == VisualizationType.session:
-            trend.data = [DataSeriesBooleanData.json_deserialise(body_part_data) for body_part_data in input_dict.get('data', [])]
-        elif trend.visualization_type == VisualizationType.body_part:
-            trend.data = [BodyPartChartData.json_deserialise(body_part_data) for body_part_data in input_dict.get('data', [])]
-        elif trend.visualization_type in [VisualizationType.doms, VisualizationType.muscular_strain]:
-            trend.data = [DataSeriesData.json_deserialise(data) for data in input_dict.get('data', [])]
-        elif trend.visualization_type == VisualizationType.sensor:
-            trend.data = []
-        else:
-            trend.data = []
+        # trend.cta = set(input_dict.get('cta', []))
+        # trend.present_in_trends = input_dict.get('present_in_trends', True)
+        # trend.cleared = input_dict.get('cleared', False)
+        # trend.longitudinal = input_dict.get('longitudinal', False)
+        # if trend.visualization_type == VisualizationType.load:
+        #     trend.data = []
+        # elif trend.visualization_type == VisualizationType.session:
+        #     trend.data = [DataSeriesBooleanData.json_deserialise(body_part_data) for body_part_data in input_dict.get('data', [])]
+        # elif trend.visualization_type == VisualizationType.body_part:
+        #     trend.data = [BodyPartChartData.json_deserialise(body_part_data) for body_part_data in input_dict.get('data', [])]
+        # elif trend.visualization_type in [VisualizationType.doms, VisualizationType.muscular_strain]:
+        #     trend.data = [DataSeriesData.json_deserialise(data) for data in input_dict.get('data', [])]
+        # elif trend.visualization_type == VisualizationType.sensor:
+        #     trend.data = []
+        # else:
+        #     trend.data = []
         trend.trend_data = TrendData.json_deserialise(input_dict.get('trend_data')) if input_dict.get('trend_data') is not None else None
         trend.last_date_time = parse_datetime(input_dict.get('last_date_time')) if input_dict.get('last_date_time') is not None else None
         trend.visible = input_dict.get('visible', False)
@@ -240,68 +240,68 @@ class Trend(object):
         trend.video_url = input_dict.get('video_url', '')
         return trend
 
-    def add_data(self):
-        # read insight data
-        trigger_data = TriggerData().get_trigger_data(self.trigger_type.value)
-        data_source = trigger_data['data_source']
-        trend_data = trigger_data['trends']
-        plot_data = trigger_data['plots']
-        cta_data = trigger_data['cta']
-        self.visualization_type = VisualizationType(plot_data['visualization_type'])
+    # def add_data(self):
+    #     # read insight data
+    #     trigger_data = TriggerData().get_trigger_data(self.trigger_type.value)
+    #     data_source = trigger_data['data_source']
+    #     trend_data = trigger_data['trends']
+    #     plot_data = trigger_data['plots']
+    #     cta_data = trigger_data['cta']
+    #     self.visualization_type = VisualizationType(plot_data['visualization_type'])
 
-        # read visualization data
-        visualization_data = TriggerData().get_visualization_data(self.visualization_type.value)
-        self.visualization_data.y_axis_1 = visualization_data['y_axis_1']
-        self.visualization_data.y_axis_2 = visualization_data['y_axis_2']
-        if self.visualization_type == VisualizationType.body_part:
-            if data_source == 'pain':
-                legends = [legend for legend in visualization_data['legend'] if legend['color'] == 2]
-            else:
-                legends = [legend for legend in visualization_data['legend'] if legend['color'] == 1]
-        else:
-            legends = visualization_data['legend']
-        self.visualization_data.plot_legends = [Legend.json_deserialise(legend) for legend in legends]
-        for legend in self.visualization_data.plot_legends:
-            legend.text = TextGenerator.get_cleaned_text(legend.text, body_parts=self.body_parts)
+    #     # read visualization data
+    #     visualization_data = TriggerData().get_visualization_data(self.visualization_type.value)
+    #     self.visualization_data.y_axis_1 = visualization_data['y_axis_1']
+    #     self.visualization_data.y_axis_2 = visualization_data['y_axis_2']
+    #     if self.visualization_type == VisualizationType.body_part:
+    #         if data_source == 'pain':
+    #             legends = [legend for legend in visualization_data['legend'] if legend['color'] == 2]
+    #         else:
+    #             legends = [legend for legend in visualization_data['legend'] if legend['color'] == 1]
+    #     else:
+    #         legends = visualization_data['legend']
+    #     self.visualization_data.plot_legends = [Legend.json_deserialise(legend) for legend in legends]
+    #     for legend in self.visualization_data.plot_legends:
+    #         legend.text = TextGenerator.get_cleaned_text(legend.text, body_parts=self.body_parts)
 
-        self.visualization_title.text = TextGenerator.get_cleaned_text(plot_data['title'], body_parts=self.body_parts)
-        self.visualization_title.body_part_text = [TextGenerator.get_body_part_text(self.body_parts)]
-        self.visualization_title.color = self.visualization_data.plot_legends[0].color
-        if data_source != "":
-            self.data_source = DataSource[data_source]
-        if self.cleared:
-            title = trend_data['cleared_title']
-            text = trend_data['cleared_body']
-        else:
-            title = trend_data['new_title']
-            text = trend_data['ongoing_body']
-        self.text = TextGenerator.get_cleaned_text(text, goals=self.goal_targeted, body_parts=self.body_parts, sport_names=self.sport_names)
-        self.title = TextGenerator.get_cleaned_text(title, goals=self.goal_targeted, body_parts=self.body_parts, sport_names=self.sport_names)
-        self.insight_type = InsightType[trigger_data['trend_type'].lower()]
-        if trigger_data['insight_priority_trend_type'] != "":
-            self.priority = int(trigger_data['insight_priority_trend_type'])
-        self.present_in_trends = trend_data['present_in_trends']
-        if trigger_data['length_of_impact'] == "multiple_days":
-            self.longitudinal = True
-        if cta_data['heat']:
-            self.cta.add('heat')
-        if cta_data['warmup']:
-            self.cta.add('warm_up')
-        if cta_data['cooldown']:
-            self.cta.add('active_recovery')
-        if cta_data['active_rest']:
-            self.cta.add('mobilize')
-        if cta_data['ice']:
-            self.cta.add('ice')
-        if cta_data['cwi']:
-            self.cta.add('cwi')
+    #     self.visualization_title.text = TextGenerator.get_cleaned_text(plot_data['title'], body_parts=self.body_parts)
+    #     self.visualization_title.body_part_text = [TextGenerator.get_body_part_text(self.body_parts)]
+    #     self.visualization_title.color = self.visualization_data.plot_legends[0].color
+    #     if data_source != "":
+    #         self.data_source = DataSource[data_source]
+    #     if self.cleared:
+    #         title = trend_data['cleared_title']
+    #         text = trend_data['cleared_body']
+    #     else:
+    #         title = trend_data['new_title']
+    #         text = trend_data['ongoing_body']
+    #     self.text = TextGenerator.get_cleaned_text(text, goals=self.goal_targeted, body_parts=self.body_parts, sport_names=self.sport_names)
+    #     self.title = TextGenerator.get_cleaned_text(title, goals=self.goal_targeted, body_parts=self.body_parts, sport_names=self.sport_names)
+    #     self.insight_type = InsightType[trigger_data['trend_type'].lower()]
+    #     if trigger_data['insight_priority_trend_type'] != "":
+    #         self.priority = int(trigger_data['insight_priority_trend_type'])
+    #     self.present_in_trends = trend_data['present_in_trends']
+    #     if trigger_data['length_of_impact'] == "multiple_days":
+    #         self.longitudinal = True
+    #     if cta_data['heat']:
+    #         self.cta.add('heat')
+    #     if cta_data['warmup']:
+    #         self.cta.add('warm_up')
+    #     if cta_data['cooldown']:
+    #         self.cta.add('active_recovery')
+    #     if cta_data['active_rest']:
+    #         self.cta.add('mobilize')
+    #     if cta_data['ice']:
+    #         self.cta.add('ice')
+    #     if cta_data['cwi']:
+    #         self.cta.add('cwi')
 
-    def get_trigger_type_body_part_sport_tuple(self):
-        if len(self.body_parts) != 0:
-            body_part = self.body_parts[0]
-        else:
-            body_part = None
-        return self.trigger_type, body_part
+    # def get_trigger_type_body_part_sport_tuple(self):
+    #     if len(self.body_parts) != 0:
+    #         body_part = self.body_parts[0]
+    #     else:
+    #         body_part = None
+    #     return self.trigger_type, body_part
 
 
 class CallToAction(object):
@@ -397,9 +397,9 @@ class TrendDashboardCategory(Serialisable):
 class TrendCategory(Serialisable):
     def __init__(self, insight_type):
         self.insight_type = insight_type
-        self.goals = set()
-        self.cta = []
-        self.alerts = []
+        # self.goals = set()
+        # self.cta = []
+        # self.alerts = []
         self.title = ""
         self.trends = []
         self.plan_alerts = []
@@ -409,10 +409,10 @@ class TrendCategory(Serialisable):
     def json_serialise(self):
         ret = {
             'insight_type': self.insight_type.value,
-            'goals': list(self.goals),
-            'cta': [cta.json_serialise() for cta in self.cta],
+            # 'goals': list(self.goals),
+            # 'cta': [cta.json_serialise() for cta in self.cta],
             'title': self.title,
-            'alerts': [alert.json_serialise() for alert in self.alerts],
+            # 'alerts': [alert.json_serialise() for alert in self.alerts],
             'trends': [trend.json_serialise() for trend in self.trends],
             'plan_alerts': [plan_alert.json_serialise() for plan_alert in self.plan_alerts],
             'visible': self.visible,
@@ -423,9 +423,9 @@ class TrendCategory(Serialisable):
     @classmethod
     def json_deserialise(cls, input_dict):
         trend_category = cls(InsightType(input_dict['insight_type']))
-        trend_category.goals = set(input_dict.get('goals', []))
-        trend_category.cta = [CallToAction.json_deserialise(cta) for cta in input_dict.get('cta', [])]
-        trend_category.alerts = [Trend.json_deserialise(alert) for alert in input_dict.get('alerts', [])]
+        # trend_category.goals = set(input_dict.get('goals', []))
+        # trend_category.cta = [CallToAction.json_deserialise(cta) for cta in input_dict.get('cta', [])]
+        # trend_category.alerts = [Trend.json_deserialise(alert) for alert in input_dict.get('alerts', [])]
         trend_category.title = input_dict.get('title', "")
         trend_category.trends = [Trend.json_deserialise(trend) for trend in input_dict.get('trends', [])]
         trend_category.plan_alerts = [PlanAlert.json_deserialise(alert) for alert in input_dict.get('plan_alerts', [])]
@@ -433,48 +433,48 @@ class TrendCategory(Serialisable):
         trend_category.first_time_experience = input_dict.get('first_time_experience', False)
         return trend_category
 
-    def get_cta(self):
-        cta_names = [alert.cta for alert in self.alerts if not alert.cleared]
-        cta_names = set([item for items in cta_names for item in items])
-        for cta_name in cta_names:
-            cta_data = TriggerData().get_cta_data(cta_name)
-            cta = CallToAction(cta_name)
-            cta.header = cta_data['header'][self.insight_type.name]
-            cta.benefit = cta_data['benefit'][self.insight_type.name]
-            cta.proximity = cta_data['proximity'][self.insight_type.name]
-            self.cta.append(cta)
+    # def get_cta(self):
+    #     cta_names = [alert.cta for alert in self.alerts if not alert.cleared]
+    #     cta_names = set([item for items in cta_names for item in items])
+    #     for cta_name in cta_names:
+    #         cta_data = TriggerData().get_cta_data(cta_name)
+    #         cta = CallToAction(cta_name)
+    #         cta.header = cta_data['header'][self.insight_type.name]
+    #         cta.benefit = cta_data['benefit'][self.insight_type.name]
+    #         cta.proximity = cta_data['proximity'][self.insight_type.name]
+    #         self.cta.append(cta)
 
-    def check_no_trend(self):
-        data_sources = [alert.data_source for alert in self.alerts]
-        if self.insight_type == InsightType.stress:
-            if DataSource.training_volume not in data_sources:
-                trend = Trend(TriggerType(201))
-                trend.add_data()
-                self.alerts.append(trend)
-        elif self.insight_type == InsightType.response:
-            if DataSource.soreness not in data_sources:
-                trend = Trend(TriggerType(202))
-                trend.add_data()
-                self.alerts.append(trend)
-            if DataSource.pain not in data_sources:
-                trend = Trend(TriggerType(203))
-                trend.add_data()
-                self.alerts.append(trend)
-        elif self.insight_type == InsightType.biomechanics:
-            if DataSource.soreness not in data_sources:
-                trend = Trend(TriggerType(205))
-                trend.add_data()
-                self.alerts.append(trend)
-            if DataSource.pain not in data_sources:
-                trend = Trend(TriggerType(206))
-                trend.add_data()
-                self.alerts.append(trend)
+    # def check_no_trend(self):
+    #     data_sources = [alert.data_source for alert in self.alerts]
+    #     if self.insight_type == InsightType.stress:
+    #         if DataSource.training_volume not in data_sources:
+    #             trend = Trend(TriggerType(201))
+    #             trend.add_data()
+    #             self.alerts.append(trend)
+    #     elif self.insight_type == InsightType.response:
+    #         if DataSource.soreness not in data_sources:
+    #             trend = Trend(TriggerType(202))
+    #             trend.add_data()
+    #             self.alerts.append(trend)
+    #         if DataSource.pain not in data_sources:
+    #             trend = Trend(TriggerType(203))
+    #             trend.add_data()
+    #             self.alerts.append(trend)
+    #     elif self.insight_type == InsightType.biomechanics:
+    #         if DataSource.soreness not in data_sources:
+    #             trend = Trend(TriggerType(205))
+    #             trend.add_data()
+    #             self.alerts.append(trend)
+    #         if DataSource.pain not in data_sources:
+    #             trend = Trend(TriggerType(206))
+    #             trend.add_data()
+    #             self.alerts.append(trend)
 
-    def sort_trends(self):
-        self.alerts = sorted(self.alerts, key=lambda x: (x.priority, int(x.cleared)))
+    # def sort_trends(self):
+    #     self.alerts = sorted(self.alerts, key=lambda x: (x.priority, int(x.cleared)))
 
-    def remove_not_present_in_trends_page(self):
-        self.alerts = [alert for alert in self.alerts if alert.present_in_trends]
+    # def remove_not_present_in_trends_page(self):
+    #     self.alerts = [alert for alert in self.alerts if alert.present_in_trends]
 
 
 class DataStatus(object):
@@ -626,32 +626,32 @@ class AthleteTrends(object):
 
         return trends
 
-    def add_cta(self):
-        self.stress.get_cta()
-        self.response.get_cta()
-        self.biomechanics.get_cta()
+    # def add_cta(self):
+    #     self.stress.get_cta()
+    #     self.response.get_cta()
+    #     self.biomechanics.get_cta()
 
-    def add_no_trigger(self):
-        self.stress.check_no_trend()
-        self.response.check_no_trend()
-        self.biomechanics.check_no_trend()
-        # pass
+    # def add_no_trigger(self):
+    #     self.stress.check_no_trend()
+    #     self.response.check_no_trend()
+    #     self.biomechanics.check_no_trend()
+    #     # pass
 
-    def sort_by_priority(self):
-        self.stress.sort_trends()
-        self.response.sort_trends()
-        self.biomechanics.sort_trends()
+    # def sort_by_priority(self):
+    #     self.stress.sort_trends()
+    #     self.response.sort_trends()
+    #     self.biomechanics.sort_trends()
 
-    def remove_trend_not_present_in_trends_page(self):
-        self.stress.remove_not_present_in_trends_page()
-        self.response.remove_not_present_in_trends_page()
-        self.biomechanics.remove_not_present_in_trends_page()
+    # def remove_trend_not_present_in_trends_page(self):
+    #     self.stress.remove_not_present_in_trends_page()
+    #     self.response.remove_not_present_in_trends_page()
+    #     self.biomechanics.remove_not_present_in_trends_page()
 
-    def cleanup(self):
-        self.add_cta()
-        self.remove_trend_not_present_in_trends_page()
-        self.add_no_trigger()
-        self.sort_by_priority()
+    # def cleanup(self):
+    #     self.add_cta()
+    #     self.remove_trend_not_present_in_trends_page()
+    #     self.add_no_trigger()
+    #     self.sort_by_priority()
 
     def add_trend_data(self, athlete_stats):
         body_response_chart = athlete_stats.body_response_chart

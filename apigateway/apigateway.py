@@ -12,6 +12,7 @@ from routes.misc import app as misc_routes
 from routes.session import app as session_routes
 from routes.health_data import app as health_data_routes
 from routes.insights import app as insights_routes
+from routes.trends import app as trend_routes
 app.register_blueprint(active_recovery_routes, url_prefix='/active_recovery')
 app.register_blueprint(session_routes, url_prefix='/session')
 app.register_blueprint(athlete_routes, url_prefix='/athlete')
@@ -22,6 +23,7 @@ app.register_blueprint(functional_strength_routes, url_prefix='/functional_stren
 app.register_blueprint(misc_routes, url_prefix='/misc')
 app.register_blueprint(health_data_routes, url_prefix='/health_data')
 app.register_blueprint(insights_routes, url_prefix='/insights')
+app.register_blueprint(trend_routes, url_prefix='/trends')
 
 
 def handler(event, context):
