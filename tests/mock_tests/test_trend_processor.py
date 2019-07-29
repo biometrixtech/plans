@@ -13,13 +13,14 @@ def test_trigger_19():
     trigger_factory = TriggerFactory(datetime.now(), None, [], [])
 
     now_time = datetime.now()
+    now_time_2 = now_time = timedelta(days=1)
 
     trigger = Trigger(TriggerType.hist_sore_greater_30)
     trigger.body_part = BodyPartSide(body_part_location=BodyPartLocation(8), side=1)
     body_part = body_part_factory.get_body_part(trigger.body_part)
     trigger.synergists = trigger_factory.convert_body_part_list(trigger.body_part, body_part.synergists)
     trigger.antagonists = trigger_factory.convert_body_part_list(trigger.body_part, body_part.antagonists)
-    trigger.created_date_time = datetime.now() - timedelta(days=1)
+    trigger.created_date_time = now_time_2
     trigger.source_date_time = now_time
 
     trigger_list.append(trigger)
@@ -33,7 +34,7 @@ def test_trigger_19():
     assert trend_processor.athlete_trend_categories[0].visible is True
     assert trend_processor.athlete_trend_categories[0].trends[0].visible is True
     assert trend_processor.athlete_trend_categories[0].trends[0].title == "Muscle Over & Under Activity"
-    assert trend_processor.athlete_trend_categories[0].trends[0].last_date_time == now_time
+    assert trend_processor.athlete_trend_categories[0].trends[0].last_date_time == now_time_2
     assert trend_processor.athlete_trend_categories[0].trends[1].visible is False
 
 
@@ -44,6 +45,7 @@ def test_trigger_16():
     trigger_factory = TriggerFactory(datetime.now(), None, [], [])
 
     now_time = datetime.now()
+    now_time_2 = now_time = timedelta(days=1)
 
     trigger = Trigger(TriggerType.hist_pain)
     trigger.body_part = BodyPartSide(body_part_location=BodyPartLocation(8), side=1)
@@ -51,7 +53,7 @@ def test_trigger_16():
     trigger.synergists = trigger_factory.convert_body_part_list(trigger.body_part, body_part.synergists)
     trigger.antagonists = trigger_factory.convert_body_part_list(trigger.body_part, body_part.antagonists)
     trigger.agonists = trigger_factory.convert_body_part_list(trigger.body_part, body_part.agonists)
-    trigger.created_date_time = datetime.now() - timedelta(days=1)
+    trigger.created_date_time = now_time_2
     trigger.source_date_time = now_time
 
     trigger_list.append(trigger)
@@ -65,7 +67,7 @@ def test_trigger_16():
     assert trend_processor.athlete_trend_categories[0].visible is True
     assert trend_processor.athlete_trend_categories[0].trends[0].visible is True
     assert trend_processor.athlete_trend_categories[0].trends[0].title == "Functional Limitation"
-    assert trend_processor.athlete_trend_categories[0].trends[0].last_date_time == now_time
+    assert trend_processor.athlete_trend_categories[0].trends[0].last_date_time == now_time_2
     assert trend_processor.athlete_trend_categories[0].trends[1].visible is False
 
 
@@ -76,13 +78,14 @@ def test_pain_view_breaks_tie():
     trigger_factory = TriggerFactory(datetime.now(), None, [], [])
 
     now_time = datetime.now()
+    now_time_2 = now_time = timedelta(days=1)
 
     trigger = Trigger(TriggerType.hist_sore_greater_30)
     trigger.body_part = BodyPartSide(body_part_location=BodyPartLocation(8), side=1)
     body_part = body_part_factory.get_body_part(trigger.body_part)
     trigger.synergists = trigger_factory.convert_body_part_list(trigger.body_part, body_part.synergists)
     trigger.antagonists = trigger_factory.convert_body_part_list(trigger.body_part, body_part.antagonists)
-    trigger.created_date_time = datetime.now() - timedelta(days=1)
+    trigger.created_date_time = now_time_2
     trigger.source_date_time = now_time
 
     trigger_list.append(trigger)
@@ -93,7 +96,7 @@ def test_pain_view_breaks_tie():
     trigger_2.synergists = trigger_factory.convert_body_part_list(trigger_2.body_part, body_part_2.synergists)
     trigger_2.antagonists = trigger_factory.convert_body_part_list(trigger_2.body_part, body_part_2.antagonists)
     trigger_2.agonists = trigger_factory.convert_body_part_list(trigger_2.body_part, body_part_2.agonists)
-    trigger_2.created_date_time = datetime.now() - timedelta(days=1)
+    trigger_2.created_date_time = now_time_2
     trigger_2.source_date_time = now_time
 
     trigger_list.append(trigger_2)
@@ -105,7 +108,7 @@ def test_pain_view_breaks_tie():
     assert trend_processor.athlete_trend_categories[0].visible is True
     assert trend_processor.athlete_trend_categories[0].trends[0].visible is True
     assert trend_processor.athlete_trend_categories[0].trends[0].title == "Functional Limitation"
-    assert trend_processor.athlete_trend_categories[0].trends[0].last_date_time == now_time
+    assert trend_processor.athlete_trend_categories[0].trends[0].last_date_time == now_time_2
     assert trend_processor.athlete_trend_categories[0].trends[1].visible is True
 
 
@@ -116,13 +119,15 @@ def test_no_triggers_clear_all():
     trigger_factory = TriggerFactory(datetime.now(), None, [], [])
 
     now_time = datetime.now()
+    now_time_2 = now_time - timedelta(days=1)
+    now_time_3 = now_time_2 - timedelta(seconds=1)
 
     trigger = Trigger(TriggerType.hist_sore_greater_30)
     trigger.body_part = BodyPartSide(body_part_location=BodyPartLocation(8), side=1)
     body_part = body_part_factory.get_body_part(trigger.body_part)
     trigger.synergists = trigger_factory.convert_body_part_list(trigger.body_part, body_part.synergists)
     trigger.antagonists = trigger_factory.convert_body_part_list(trigger.body_part, body_part.antagonists)
-    trigger.created_date_time = datetime.now() - timedelta(days=1)
+    trigger.created_date_time = now_time_2
     trigger.source_date_time = now_time
 
     trigger_list.append(trigger)
@@ -133,8 +138,8 @@ def test_no_triggers_clear_all():
     trigger_2.synergists = trigger_factory.convert_body_part_list(trigger_2.body_part, body_part_2.synergists)
     trigger_2.antagonists = trigger_factory.convert_body_part_list(trigger_2.body_part, body_part_2.antagonists)
     trigger_2.agonists = trigger_factory.convert_body_part_list(trigger_2.body_part, body_part_2.agonists)
-    trigger_2.created_date_time = datetime.now() - timedelta(days=1)
-    trigger_2.source_date_time = now_time - timedelta(seconds=1)
+    trigger_2.created_date_time = now_time_3
+    trigger_2.source_date_time = now_time_3
 
     trigger_list.append(trigger_2)
 
@@ -145,7 +150,7 @@ def test_no_triggers_clear_all():
     assert trend_processor.athlete_trend_categories[0].visible is True
     assert trend_processor.athlete_trend_categories[0].trends[0].visible is True
     assert trend_processor.athlete_trend_categories[0].trends[0].title == "Muscle Over & Under Activity"
-    assert trend_processor.athlete_trend_categories[0].trends[0].last_date_time == now_time
+    assert trend_processor.athlete_trend_categories[0].trends[0].last_date_time == now_time_2
     assert trend_processor.athlete_trend_categories[0].trends[1].visible is True
 
     # now all the triggers be gone!
@@ -165,13 +170,15 @@ def test_first_time_experience_sorts_first():
     trigger_factory = TriggerFactory(datetime.now(), None, [], [])
 
     now_time = datetime.now()
+    now_time_2 = now_time - timedelta(days=1)
+    now_time_3 = now_time_2 - timedelta(seconds=1)
 
     trigger = Trigger(TriggerType.hist_sore_greater_30)
     trigger.body_part = BodyPartSide(body_part_location=BodyPartLocation(8), side=1)
     body_part = body_part_factory.get_body_part(trigger.body_part)
     trigger.synergists = trigger_factory.convert_body_part_list(trigger.body_part, body_part.synergists)
     trigger.antagonists = trigger_factory.convert_body_part_list(trigger.body_part, body_part.antagonists)
-    trigger.created_date_time = datetime.now() - timedelta(days=1)
+    trigger.created_date_time = now_time_2
     trigger.source_date_time = now_time
 
     trigger_list.append(trigger)
@@ -182,8 +189,8 @@ def test_first_time_experience_sorts_first():
     trigger_2.synergists = trigger_factory.convert_body_part_list(trigger_2.body_part, body_part_2.synergists)
     trigger_2.antagonists = trigger_factory.convert_body_part_list(trigger_2.body_part, body_part_2.antagonists)
     trigger_2.agonists = trigger_factory.convert_body_part_list(trigger_2.body_part, body_part_2.agonists)
-    trigger_2.created_date_time = datetime.now() - timedelta(days=1)
-    trigger_2.source_date_time = now_time - timedelta(seconds=1)
+    trigger_2.created_date_time = now_time_3
+    trigger_2.source_date_time = now_time_3
 
     trigger_list.append(trigger_2)
 
@@ -195,7 +202,7 @@ def test_first_time_experience_sorts_first():
     assert trend_processor.athlete_trend_categories[0].first_time_experience is True
     assert trend_processor.athlete_trend_categories[0].trends[0].visible is True
     assert trend_processor.athlete_trend_categories[0].trends[0].title == "Muscle Over & Under Activity"
-    assert trend_processor.athlete_trend_categories[0].trends[0].last_date_time == now_time
+    assert trend_processor.athlete_trend_categories[0].trends[0].last_date_time == now_time_2
     assert trend_processor.athlete_trend_categories[0].trends[1].visible is True
 
     # now clear first time experience for first view
@@ -208,7 +215,7 @@ def test_first_time_experience_sorts_first():
     assert trend_processor.athlete_trend_categories[0].first_time_experience is False
     assert trend_processor.athlete_trend_categories[0].trends[0].visible is True
     assert trend_processor.athlete_trend_categories[0].trends[0].title == "Functional Limitation"
-    assert trend_processor.athlete_trend_categories[0].trends[0].last_date_time == now_time - timedelta(seconds=1)
+    assert trend_processor.athlete_trend_categories[0].trends[0].last_date_time == now_time_3
     assert trend_processor.athlete_trend_categories[0].trends[1].visible is True
 
 

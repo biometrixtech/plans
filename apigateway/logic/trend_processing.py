@@ -127,6 +127,7 @@ class TrendProcessor(object):
         limitation_trend.bold_text.append(bold_text_3)
 
         limitation_trend.icon = "view3icon.png"
+        limitation_trend.video_url = "https://d2xll36aqjtmhz.cloudfront.net/calibration.mp4"
         limitation_trend.visible = False
         limitation_trend.first_time_experience = True
         limitation_trend.plan_alert_short_title = "functional limitation"
@@ -150,6 +151,7 @@ class TrendProcessor(object):
         muscle_trend.bold_text.append(bold_text_2)
 
         muscle_trend.icon = "view1icon.png"
+        muscle_trend.video_url = "https://d2xll36aqjtmhz.cloudfront.net/calibration.mp4"
         muscle_trend.visible = False
         muscle_trend.first_time_experience = True
         muscle_trend.plan_alert_short_title = "muscle over-activity"
@@ -237,25 +239,25 @@ class TrendProcessor(object):
 
         if len(triggers) > 0:
 
-            status_changed_date_time = None
+            last_created_date_time = None
 
             # turns out we are only interested when a new body part is added or when a historic soreness status changes
-            #created_triggers = sorted(triggers, key=lambda x: x.created_date_time, reverse=True)
+            created_triggers = sorted(triggers, key=lambda x: x.created_date_time, reverse=True)
             #modified_triggers = sorted(triggers, key=lambda x: x.modified_date_time, reverse=True)
-            status_changed_triggers = [t for t in triggers if t.source_date_time is not None]
-            if len(status_changed_triggers) > 0:
-                status_triggers = sorted(triggers, key=lambda x: x.source_date_time, reverse=True)
-                status_changed_date_time = status_triggers[0].source_date_time
+            #status_changed_triggers = [t for t in triggers if t.source_date_time is not None]
+            if len(created_triggers) > 0:
+                status_triggers = sorted(triggers, key=lambda x: x.created_date_time, reverse=True)
+                created_date_time = status_triggers[0].created_date_time
 
-            #last_created_date_time = created_triggers[0].created_date_time
+                last_created_date_time = created_triggers[0].created_date_time
             #last_modified_date_time = modified_triggers[0].modified_date_time
 
-            if status_changed_date_time is not None:
-                return status_changed_date_time
+            #if status_changed_date_time is not None:
+            #    return status_changed_date_time
             #elif last_modified_date_time is not None:
             #    return max(last_modified_date_time, last_created_date_time)
             #else:
-            #    return last_created_date_time
+            return last_created_date_time
 
         else:
             return None
