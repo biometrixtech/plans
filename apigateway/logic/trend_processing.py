@@ -212,6 +212,9 @@ class TrendProcessor(object):
                     (self.athlete_trend_categories[trend_category_index].plan_alerts[0].cleared_date_time is not None
                      and sorted_trends[0].last_date_time > self.athlete_trend_categories[trend_category_index].plan_alerts[0].cleared_date_time)):
 
+                    # clear this out so we can update the plan alert
+                    self.athlete_trend_categories[trend_category_index].plan_alerts = []
+
                     # plans alert text
                     plan_alert = self.get_plan_alert(new_modified_trigger_count, plan_alert_short_title,
                                                      trend_category_index, visible_trends)
