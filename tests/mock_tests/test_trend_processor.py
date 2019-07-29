@@ -478,3 +478,50 @@ def test_retriggered_plan_alert():
     trend_processor_2.process_triggers()
 
     assert trend_processor_2.athlete_trend_categories[0].plan_alerts[0].cleared_date_time is None
+
+
+def test_new_alert_with_progressed_trigger_after_clearing():
+
+    trigger_list = []
+    body_part_factory = BodyPartFactory()
+    trigger_factory = TriggerFactory(datetime.now(), None, [], [])
+
+    now_time = datetime.now()
+    now_time_2 = now_time - timedelta(days=1)
+    now_time_5 = now_time - timedelta(days=5)
+
+    trigger = Trigger(TriggerType.hist_sore_less_30)
+    trigger.body_part = BodyPartSide(body_part_location=BodyPartLocation(8), side=1)
+    body_part = body_part_factory.get_body_part(trigger.body_part)
+    trigger.synergists = trigger_factory.convert_body_part_list(trigger.body_part, body_part.synergists)
+    trigger.antagonists = trigger_factory.convert_body_part_list(trigger.body_part, body_part.antagonists)
+    trigger.created_date_time = now_time_5
+
+    trigger_list.append(trigger)
+
+    trend_processor = TrendProcessor(trigger_list)
+
+    trend_processor.process_triggers()
+
+    trend_processor.athlete_trend_categories[0].plan_alerts[0].cleared_date_time = now_time_2
+
+    trend_processor_2 = TrendProcessor(trigger_list, athlete_trend_categories=trend_processor.athlete_trend_categories)
+
+    trend_processor_2.process_triggers()
+
+    assert trend_processor_2.athlete_trend_categories[0].plan_alerts[0].cleared_date_time is not None
+
+    trigger_2 = Trigger(TriggerType.hist_sore_greater_30)
+    trigger_2.body_part = BodyPartSide(body_part_location=BodyPartLocation(8), side=1)
+    body_part_2 = body_part_factory.get_body_part(trigger_2.body_part)
+    trigger_2.synergists = trigger_factory.convert_body_part_list(trigger_2.body_part, body_part_2.synergists)
+    trigger_2.antagonists = trigger_factory.convert_body_part_list(trigger_2.body_part, body_part_2.antagonists)
+    trigger_2.created_date_time = now_time
+
+    trigger_list.append(trigger_2)
+
+    trend_processor_3 = TrendProcessor(trigger_list, athlete_trend_categories=trend_processor.athlete_trend_categories)
+
+    trend_processor_3.process_triggers()
+
+    assert trend_processor_3.athlete_trend_categories[0].plan_alerts[0].cleared_date_time is None
