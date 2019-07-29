@@ -388,6 +388,7 @@ class TrendDashboardCategory(Serialisable):
         trend_category.text = input_dict.get('text', "")
         trend_category.body_part_text = input_dict.get('body_part_text', "")
         trend_category.footer = input_dict.get('footer', "")
+        return trend_category
 
 
 class TrendCategory(Serialisable):
