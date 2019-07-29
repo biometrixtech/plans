@@ -13,7 +13,7 @@ def test_trigger_19():
     trigger_factory = TriggerFactory(datetime.now(), None, [], [])
 
     now_time = datetime.now()
-    now_time_2 = now_time = timedelta(days=1)
+    now_time_2 = now_time - timedelta(days=1)
 
     trigger = Trigger(TriggerType.hist_sore_greater_30)
     trigger.body_part = BodyPartSide(body_part_location=BodyPartLocation(8), side=1)
@@ -45,7 +45,7 @@ def test_trigger_16():
     trigger_factory = TriggerFactory(datetime.now(), None, [], [])
 
     now_time = datetime.now()
-    now_time_2 = now_time = timedelta(days=1)
+    now_time_2 = now_time - timedelta(days=1)
 
     trigger = Trigger(TriggerType.hist_pain)
     trigger.body_part = BodyPartSide(body_part_location=BodyPartLocation(8), side=1)
@@ -78,7 +78,7 @@ def test_pain_view_breaks_tie():
     trigger_factory = TriggerFactory(datetime.now(), None, [], [])
 
     now_time = datetime.now()
-    now_time_2 = now_time = timedelta(days=1)
+    now_time_2 = now_time - timedelta(days=1)
 
     trigger = Trigger(TriggerType.hist_sore_greater_30)
     trigger.body_part = BodyPartSide(body_part_location=BodyPartLocation(8), side=1)
