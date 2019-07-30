@@ -23,14 +23,17 @@ def handle_alerts_cleared(principal_id):
     plan = DatastoreCollection().daily_plan_datastore.get(user_id, start_date=plan_event_day, end_date=plan_event_day)[0]
     athlete_stats = DatastoreCollection().athlete_stats_datastore.get(user_id)
     cleared_insight_type = InsightType(request.json['insight_type'])
-    cleared_trend_categories = [category for category in plan.trends.trend_categories if category.insight_type == cleared_insight_type]
-    if len(cleared_trend_categories) > 0:
-        cleared_trend_category = cleared_trend_categories[0]
-        if len(cleared_trend_category.plan_alerts) > 0:
-            cleared_trend_category.plan_alerts[0].cleared_date_time = event_date
-            athlete_stats.trend_categories = plan.trends.trend_categories
+    cleared_trend_categories_plan = [category for category in plan.trends.trend_categories if category.insight_type == cleared_insight_type]
+    if len(cleared_trend_categories_plan) > 0:
+        cleared_trend_category_plan = cleared_trend_categories_plan[0]
+        cleared_trend_category_plan.plan_alerts = []
+        DatastoreCollection().daily_plan_datastore.put(plan)
+    cleared_trend_categories_stats = [category for category in athlete_stats.trend_categories if category.insight_type == cleared_insight_type]
+    if len(cleared_trend_categories_stats) > 0:
+        cleared_trend_category_stats = cleared_trend_categories_stats[0]
+        if len(cleared_trend_category_stats.plan_alerts) > 0:
+            cleared_trend_category_stats.plan_alerts[0].cleared_date_time = event_date
             DatastoreCollection().athlete_stats_datastore.put(athlete_stats)
-            DatastoreCollection().daily_plan_datastore.put(plan)
         else:
             print(f"No Plan Alerts found for Trend Category {cleared_insight_type.name}")
     else:
