@@ -33,7 +33,7 @@ def test_trigger_19():
 
     assert trend_processor.athlete_trend_categories[0].visible is True
     assert trend_processor.athlete_trend_categories[0].trends[0].visible is True
-    assert trend_processor.athlete_trend_categories[0].trends[0].title == "Muscle Over & Under Activity"
+    assert trend_processor.athlete_trend_categories[0].trends[0].title == "Muscle Over & Under-activity"
     assert trend_processor.athlete_trend_categories[0].trends[0].last_date_time == now_time_2
     assert trend_processor.athlete_trend_categories[0].trends[1].visible is False
 
@@ -149,7 +149,7 @@ def test_no_triggers_clear_all():
 
     assert trend_processor.athlete_trend_categories[0].visible is True
     assert trend_processor.athlete_trend_categories[0].trends[0].visible is True
-    assert trend_processor.athlete_trend_categories[0].trends[0].title == "Muscle Over & Under Activity"
+    assert trend_processor.athlete_trend_categories[0].trends[0].title == "Muscle Over & Under-activity"
     assert trend_processor.athlete_trend_categories[0].trends[0].last_date_time == now_time_2
     assert trend_processor.athlete_trend_categories[0].trends[1].visible is True
 
@@ -158,9 +158,9 @@ def test_no_triggers_clear_all():
     trend_processor_next_day = TrendProcessor(no_triggers, athlete_trend_categories=trend_processor.athlete_trend_categories)
     trend_processor_next_day.process_triggers()
 
-    assert trend_processor.athlete_trend_categories[0].visible is False
-    assert trend_processor.athlete_trend_categories[0].trends[0].visible is False
-    assert trend_processor.athlete_trend_categories[0].trends[1].visible is False
+    assert trend_processor_next_day.athlete_trend_categories[0].visible is False
+    assert trend_processor_next_day.athlete_trend_categories[0].trends[0].visible is False
+    assert trend_processor_next_day.athlete_trend_categories[0].trends[1].visible is False
 
 
 def test_first_time_experience_sorts_first():
@@ -201,7 +201,7 @@ def test_first_time_experience_sorts_first():
     assert trend_processor.athlete_trend_categories[0].visible is True
     assert trend_processor.athlete_trend_categories[0].first_time_experience is True
     assert trend_processor.athlete_trend_categories[0].trends[0].visible is True
-    assert trend_processor.athlete_trend_categories[0].trends[0].title == "Muscle Over & Under Activity"
+    assert trend_processor.athlete_trend_categories[0].trends[0].title == "Muscle Over & Under-activity"
     assert trend_processor.athlete_trend_categories[0].trends[0].last_date_time == now_time_2
     assert trend_processor.athlete_trend_categories[0].trends[1].visible is True
 
@@ -263,7 +263,7 @@ def test_both_sides_body_text_overactive():
 
     trend_processor.process_triggers()
 
-    assert trend_processor.athlete_trend_categories[0].trends[0].trend_data.title == "Your Shins Are Overactive"
+    assert trend_processor.athlete_trend_categories[0].trends[0].trend_data.title == "Elevated strain on Right Calf and Right Foot"
 
 
 def test_one_side_body_text_overactive():
@@ -288,7 +288,7 @@ def test_one_side_body_text_overactive():
 
     trend_processor.process_triggers()
 
-    assert trend_processor.athlete_trend_categories[0].trends[0].trend_data.title == "Your Left Shin Is Overactive"
+    assert trend_processor.athlete_trend_categories[0].trends[0].trend_data.title == "Elevated strain on Left Calf and Left Foot"
 
 
 def test_both_sides_body_text_functional_limitation():
@@ -334,7 +334,7 @@ def test_both_sides_body_text_functional_limitation():
 
     trend_processor.process_triggers()
 
-    assert trend_processor.athlete_trend_categories[0].trends[0].trend_data.title == "Your Shins Are Functionally Limited"
+    assert trend_processor.athlete_trend_categories[0].trends[0].trend_data.title == "Elevated strain on Right Quad"
 
 
 def test_one_side_body_text_functional_limitation():
@@ -358,7 +358,7 @@ def test_one_side_body_text_functional_limitation():
 
     trend_processor.process_triggers()
 
-    assert trend_processor.athlete_trend_categories[0].trends[0].trend_data.title == "Your Left Shin Is Functionally Limited"
+    assert trend_processor.athlete_trend_categories[0].trends[0].trend_data.title == "Elevated strain on Left Quad"
 
 
 def test_one_side_body_dashboard_functional_limitation():
@@ -382,11 +382,11 @@ def test_one_side_body_dashboard_functional_limitation():
 
     trend_processor.process_triggers()
 
-    assert trend_processor.dashboard_categories[0].title == "Pain Related Insights"
-    assert trend_processor.dashboard_categories[0].body_part.body_part_location == BodyPartLocation.shin
+    assert trend_processor.dashboard_categories[0].title == "Tissue Related Insights"
+    assert trend_processor.dashboard_categories[0].body_part.body_part_location == BodyPartLocation.quads
     assert trend_processor.dashboard_categories[0].body_part.side == 1
-    assert trend_processor.dashboard_categories[0].body_part_text == "shin"
-    assert trend_processor.dashboard_categories[0].text == "pain identified in"
+    assert trend_processor.dashboard_categories[0].body_part_text == "Left Quad"
+    assert trend_processor.dashboard_categories[0].text == "Signs of elevated strain on"
 
 
 def test_one_side_body_dashboard_muscle_overactivity():
@@ -413,8 +413,8 @@ def test_one_side_body_dashboard_muscle_overactivity():
     assert trend_processor.dashboard_categories[0].title == "Tissue Related Insights"
     assert trend_processor.dashboard_categories[0].body_part.body_part_location == BodyPartLocation.calves
     assert trend_processor.dashboard_categories[0].body_part.side == 1
-    assert trend_processor.dashboard_categories[0].body_part_text == "left calf"
-    assert trend_processor.dashboard_categories[0].text == "weakness identified in"
+    assert trend_processor.dashboard_categories[0].body_part_text == "Left Calf"
+    assert trend_processor.dashboard_categories[0].text == "Signs of elevated strain on"
 
 
 def test_cleared_plan_alert():
@@ -438,6 +438,10 @@ def test_cleared_plan_alert():
     trend_processor = TrendProcessor(trigger_list)
 
     trend_processor.process_triggers()
+
+    assert trend_processor.athlete_trend_categories[0].plan_alerts[0].text == 'Signs of elevated strain on Left Calf & Left Foot in your data. Tap to view more.'
+    assert trend_processor.athlete_trend_categories[0].plan_alerts[0].title == 'New Tissue Related Insights'
+    assert trend_processor.athlete_trend_categories[0].plan_alerts[0].bold_text[0].text == 'elevated strain on Left Calf & Left Foot'
 
     trend_processor.athlete_trend_categories[0].plan_alerts[0].cleared_date_time = datetime.now()
 
@@ -478,3 +482,50 @@ def test_retriggered_plan_alert():
     trend_processor_2.process_triggers()
 
     assert trend_processor_2.athlete_trend_categories[0].plan_alerts[0].cleared_date_time is None
+
+
+def test_new_alert_with_progressed_trigger_after_clearing():
+
+    trigger_list = []
+    body_part_factory = BodyPartFactory()
+    trigger_factory = TriggerFactory(datetime.now(), None, [], [])
+
+    now_time = datetime.now()
+    now_time_2 = now_time - timedelta(days=1)
+    now_time_5 = now_time - timedelta(days=5)
+
+    trigger = Trigger(TriggerType.hist_sore_less_30)
+    trigger.body_part = BodyPartSide(body_part_location=BodyPartLocation(8), side=1)
+    body_part = body_part_factory.get_body_part(trigger.body_part)
+    trigger.synergists = trigger_factory.convert_body_part_list(trigger.body_part, body_part.synergists)
+    trigger.antagonists = trigger_factory.convert_body_part_list(trigger.body_part, body_part.antagonists)
+    trigger.created_date_time = now_time_5
+
+    trigger_list.append(trigger)
+
+    trend_processor = TrendProcessor(trigger_list)
+
+    trend_processor.process_triggers()
+
+    trend_processor.athlete_trend_categories[0].plan_alerts[0].cleared_date_time = now_time_2
+
+    trend_processor_2 = TrendProcessor(trigger_list, athlete_trend_categories=trend_processor.athlete_trend_categories)
+
+    trend_processor_2.process_triggers()
+
+    assert trend_processor_2.athlete_trend_categories[0].plan_alerts[0].cleared_date_time is not None
+
+    trigger_2 = Trigger(TriggerType.hist_sore_greater_30)
+    trigger_2.body_part = BodyPartSide(body_part_location=BodyPartLocation(8), side=1)
+    body_part_2 = body_part_factory.get_body_part(trigger_2.body_part)
+    trigger_2.synergists = trigger_factory.convert_body_part_list(trigger_2.body_part, body_part_2.synergists)
+    trigger_2.antagonists = trigger_factory.convert_body_part_list(trigger_2.body_part, body_part_2.antagonists)
+    trigger_2.created_date_time = now_time
+
+    trigger_list.append(trigger_2)
+
+    trend_processor_3 = TrendProcessor(trigger_list, athlete_trend_categories=trend_processor.athlete_trend_categories)
+
+    trend_processor_3.process_triggers()
+
+    assert trend_processor_3.athlete_trend_categories[0].plan_alerts[0].cleared_date_time is None
