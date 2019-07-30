@@ -165,6 +165,10 @@ class Trend(object):
         self.plan_alert_short_title = ""
         self.triggers = []
         self.video_url = ""
+        # these do not need to be persisted, used in logic only
+        self.dashboard_body_part = None
+        self.dashboard_body_part_text = ""
+        self.top_priority_trigger = None
 
     def json_serialise(self):
         ret = {
@@ -371,6 +375,7 @@ class TrendDashboardCategory(Serialisable):
         self.text = ""
         self.body_part_text = ""
         self.footer = ""
+        self.color = None
 
     def json_serialise(self):
         ret = {

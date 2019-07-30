@@ -140,20 +140,20 @@ visualization_data = {
                 'y_axis_2': "",
                 'legend': [
                     {
-                        'color': 1,
-                        'text': "Overactive",
+                        'color': 4,
+                        'text': "Overactivity",
                         'type': 0,
                         'series': "overactive"
                     },
                     {
-                        'color': 4,
-                        'text': "Underactive",
+                        'color': 5,
+                        'text': "Weakness",
                         'type': 0,
                         'series': "underactive"
                     },
                     {
                         'color': 7,
-                        'text': "Underactive & Needing Care",
+                        'text': "Elevated Strain",
                         'type': 0,
                         'series': "underactive_needing_care"
                     }
@@ -166,22 +166,22 @@ visualization_data = {
                 'legend': [
                     {
                         'color': 6,
-                        'text': "Overactive",
+                        'text': "Recurring Pain",
                         'type': 0,
                         'series': "overactive"
                     },
                     {
-                        'color': 4,
-                        'text': "Underactive",
+                        'color': 7,
+                        'text': "Elevated Strain",
                         'type': 0,
                         'series': "underactive"
-                    },
-                    {
-                        'color': 7,
-                        'text': "Underactive & Needing Care",
-                        'type': 0,
-                        'series': "underactive_needing_care"
                     }
+                    # ,{
+                    #     'color': 7,
+                    #     'text': "Underactive & Needing Care",
+                    #     'type': 0,
+                    #     'series': "underactive_needing_care"
+                    # }
                 ]
             },
         }
