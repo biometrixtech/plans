@@ -112,21 +112,21 @@ class TrendProcessor(object):
                                      "This over-stresses supporting tissues and other limbs which adopt more force than they’re used to. "+
                                      "This often leads to the development of new injuries. See your factors below.")
 
-        bold_text_1 = BoldText()
-        bold_text_1.text = "Really"
-        bold_text_1.color = LegendColor.error_light
-
-        bold_text_2 = BoldText()
-        bold_text_2.text = "pain"
-        bold_text_2.color = LegendColor.warning_light
-
-        bold_text_3 = BoldText()
-        bold_text_3.text = "functional limitations"
-        bold_text_3.color = LegendColor.warning_light
-
-        limitation_trend.bold_text.append(bold_text_1)
-        limitation_trend.bold_text.append(bold_text_2)
-        limitation_trend.bold_text.append(bold_text_3)
+        # bold_text_1 = BoldText()
+        # bold_text_1.text = "Really"
+        # bold_text_1.color = LegendColor.error_light
+        #
+        # bold_text_2 = BoldText()
+        # bold_text_2.text = "pain"
+        # bold_text_2.color = LegendColor.warning_light
+        #
+        # bold_text_3 = BoldText()
+        # bold_text_3.text = "functional limitations"
+        # bold_text_3.color = LegendColor.warning_light
+        #
+        # limitation_trend.bold_text.append(bold_text_1)
+        # limitation_trend.bold_text.append(bold_text_2)
+        # limitation_trend.bold_text.append(bold_text_3)
 
         limitation_trend.icon = "view3icon.png"
         limitation_trend.video_url = "https://d2xll36aqjtmhz.cloudfront.net/calibration.mp4"
