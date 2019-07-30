@@ -376,6 +376,7 @@ class TrendDashboardCategory(Serialisable):
         self.body_part_text = ""
         self.footer = ""
         self.color = None
+        self.unread_alerts = False
 
     def json_serialise(self):
         ret = {
@@ -384,7 +385,8 @@ class TrendDashboardCategory(Serialisable):
             'body_part': self.body_part.json_serialise() if self.body_part is not None else None,
             'text': self.text,
             'body_part_text': self.body_part_text,
-            'footer': self.footer
+            'footer': self.footer,
+            'unread_alerts': self.unread_alerts
         }
         return ret
 
@@ -396,7 +398,54 @@ class TrendDashboardCategory(Serialisable):
         trend_category.text = input_dict.get('text', "")
         trend_category.body_part_text = input_dict.get('body_part_text', "")
         trend_category.footer = input_dict.get('footer', "")
+        trend_category.unread_alerts = input_dict.get('unread_alerts', False)
         return trend_category
+
+
+class CategoryFirstTimeExperienceModal(Serialisable):
+    def __init__(self):
+        self.title = ""
+        self.body = ""
+        self.categories = []
+        self.subtext = ""
+
+    def json_serialise(self):
+        ret = {
+            'title': self.title,
+            'body': self.body,
+            'categories': [cat.json_serialise() for cat in self.categories],
+            'subtext': self.subtext
+        }
+        return ret
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        trend_category = cls()
+        trend_category.title = input_dict.get('title', "")
+        trend_category.body = input_dict.get('body', "")
+        trend_category.categories = [FirstTimeExperienceElement.json_deserialise(cat) for cat in input_dict.get('categories', [])]
+        trend_category.subtext = input_dict.get('subtext', "")
+        return trend_category
+
+
+class FirstTimeExperienceElement(Serialisable):
+    def __init__(self):
+        self.title = ""
+        self.image = ""
+
+    def json_serialise(self):
+        ret = {
+            'title': self.title,
+            'image': self.image
+        }
+        return ret
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        element = cls()
+        element.title = input_dict.get('title', "")
+        element.image = input_dict.get('body', "")
+        return element
 
 
 class TrendCategory(Serialisable):
@@ -410,6 +459,7 @@ class TrendCategory(Serialisable):
         self.plan_alerts = []
         self.visible = False
         self.first_time_experience = False
+        self.first_time_experience_modal = None
 
     def json_serialise(self, plan=False):
         if plan:
@@ -425,7 +475,8 @@ class TrendCategory(Serialisable):
             'trends': [trend.json_serialise() for trend in self.trends],
             'plan_alerts': plan_alerts,
             'visible': self.visible,
-            'first_time_experience': self.first_time_experience
+            'first_time_experience': self.first_time_experience,
+            'first_time_experience_modal': self.first_time_experience_modal.json_serialise() if self.first_time_experience_modal is not None else None
         }
         return ret
 
@@ -440,6 +491,7 @@ class TrendCategory(Serialisable):
         trend_category.plan_alerts = [PlanAlert.json_deserialise(alert) for alert in input_dict.get('plan_alerts', [])]
         trend_category.visible = input_dict.get('visible', False)
         trend_category.first_time_experience = input_dict.get('first_time_experience', False)
+        trend_category.first_time_experience_modal = CategoryFirstTimeExperienceModal.json_deserialise(input_dict['first_time_experience_modal']) if input_dict.get('first_time_experience_modal') is not None else None
         return trend_category
 
     # def get_cta(self):
