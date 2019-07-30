@@ -79,7 +79,7 @@ class DailyPlan(Serialisable):
                'sessions_planned': self.sessions_planned,
                'train_later': self.train_later,
                'insights': [insight.json_serialise() for insight in self.insights],
-               'trends': self.trends.json_serialise() if self.trends is not None else None,
+               'trends': self.trends.json_serialise(plan=True) if self.trends is not None else None,
                }
 
         return ret

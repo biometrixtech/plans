@@ -406,7 +406,11 @@ class TrendCategory(Serialisable):
         self.visible = False
         self.first_time_experience = False
 
-    def json_serialise(self):
+    def json_serialise(self, plan=False):
+        if plan:
+            plan_alerts = [plan_alert.json_serialise() for plan_alert in self.plan_alerts if plan_alert.cleared_date_time is None]
+        else:
+            plan_alerts = [plan_alert.json_serialise() for plan_alert in self.plan_alerts]
         ret = {
             'insight_type': self.insight_type.value,
             # 'goals': list(self.goals),
@@ -414,7 +418,7 @@ class TrendCategory(Serialisable):
             'title': self.title,
             # 'alerts': [alert.json_serialise() for alert in self.alerts],
             'trends': [trend.json_serialise() for trend in self.trends],
-            'plan_alerts': [plan_alert.json_serialise() for plan_alert in self.plan_alerts],
+            'plan_alerts': plan_alerts,
             'visible': self.visible,
             'first_time_experience': self.first_time_experience
         }
@@ -600,7 +604,7 @@ class AthleteTrends(object):
         self.workload = TrendData()
         self.trend_categories = []
 
-    def json_serialise(self):
+    def json_serialise(self, plan=False):
         ret = {
             'dashboard': self.dashboard.json_serialise() if self.dashboard is not None else None,
             'stress': self.stress.json_serialise() if self.stress is not None else None,
@@ -608,7 +612,7 @@ class AthleteTrends(object):
             'biomechanics': self.biomechanics.json_serialise() if self.biomechanics is not None else None,
             'body_response': self.body_response.json_serialise() if self.body_response is not None else None,
             'workload': self.workload.json_serialise() if self.workload is not None else None,
-            'trend_categories': [trend_category.json_serialise() for trend_category in self.trend_categories]
+            'trend_categories': [trend_category.json_serialise(plan) for trend_category in self.trend_categories]
 
         }
         return ret
