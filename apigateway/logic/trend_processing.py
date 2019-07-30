@@ -1,4 +1,4 @@
-from models.athlete_trend import TrendDashboardCategory, PlanAlert, Trend, TrendCategory, TrendData, VisualizationType, LegendColor, BoldText
+from models.athlete_trend import TrendDashboardCategory, PlanAlert, Trend, TrendCategory, TrendData, VisualizationType, LegendColor, BoldText, FirstTimeExperienceElement, CategoryFirstTimeExperienceModal
 from models.trigger import TriggerType, Trigger
 from models.chart_data import PainFunctionalLimitationChartData, TightOverUnderactiveChartData
 from models.insights import InsightType
@@ -100,6 +100,26 @@ class TrendProcessor(object):
 
         limitation_trend = self.create_limitation_trend()
         trend_category.trends.append(limitation_trend)
+
+        modal = CategoryFirstTimeExperienceModal()
+        modal.title = "Tissue Related Insights"
+        modal.body = ("We monitor your data for signs imbalances in  muscle activation, range of motion and more.\n\n" +
+                        "These imbalances can create inefficiency in speed & power production and even increase soft tissue injury risk.\n\n" +
+                        "We’re looking to find and fix two types of body-part specific imbalances:\n\n")
+        element_1 = FirstTimeExperienceElement()
+        element_1.title = "Tissue Under\n& Over Activity"
+        element_1.image = "view1icon.png"
+
+        element_2 = FirstTimeExperienceElement()
+        element_2.title = "Functional\nLimitations"
+        element_2.image = "view3icon.png"
+
+        modal.categories.append(element_1)
+        modal.categories.append(element_2)
+
+        modal.subtext = 'Tap “continue” to see your unique findings.'
+
+        trend_category.first_time_experience_modal = modal
 
         return trend_category
 
@@ -226,16 +246,19 @@ class TrendProcessor(object):
                 # Now create dashboard category card
                 self.dashboard_categories = []
 
+                trend_dashboard_category = None
+
                 if sorted_trends[0].visualization_type == VisualizationType.tight_overactice_underactive:
                     trend_dashboard_category = self.get_over_under_active_dashboard_card(trend_category_index,
                                                                                          sorted_trends[0])
-
-                    self.dashboard_categories.append(trend_dashboard_category)
 
                 elif sorted_trends[0].visualization_type == VisualizationType.pain_functional_limitation:
                     trend_dashboard_category = self.get_functional_limitation_dashboard_card(trend_category_index,
                                                                                              sorted_trends[0])
 
+                if trend_dashboard_category is not None:
+                    trend_dashboard_category.unread_alerts = (
+                                len(self.athlete_trend_categories[trend_category_index].plan_alerts) > 0)
                     self.dashboard_categories.append(trend_dashboard_category)
 
             self.athlete_trend_categories[trend_category_index].visible = trends_visible

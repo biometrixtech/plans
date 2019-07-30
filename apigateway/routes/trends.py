@@ -84,6 +84,7 @@ def handle_fte_view(principal_id):
     if len(fte_trend_categories) > 0:
         fte_trend_category = fte_trend_categories[0]
         fte_trend_category.first_time_experience = False
+        fte_trend_category.first_time_experience_modal = None
         fte_views = [trend for trend in fte_trend_category.trends if trend.visualization_type == fte_viz_type]
         if len(fte_views) > 0:
             fte_view = fte_views[0]

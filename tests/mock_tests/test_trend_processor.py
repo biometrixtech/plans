@@ -263,7 +263,7 @@ def test_both_sides_body_text_overactive():
 
     trend_processor.process_triggers()
 
-    assert trend_processor.athlete_trend_categories[0].trends[0].trend_data.title == "Elevated strain on Right Calf and Right Foot"
+    assert trend_processor.athlete_trend_categories[0].trends[0].trend_data.title == "Elevated strain on Right Calf & Right Foot"
 
 
 def test_one_side_body_text_overactive():
@@ -288,7 +288,7 @@ def test_one_side_body_text_overactive():
 
     trend_processor.process_triggers()
 
-    assert trend_processor.athlete_trend_categories[0].trends[0].trend_data.title == "Elevated strain on Left Calf and Left Foot"
+    assert trend_processor.athlete_trend_categories[0].trends[0].trend_data.title == "Elevated strain on Left Calf & Left Foot"
 
 
 def test_both_sides_body_text_functional_limitation():
