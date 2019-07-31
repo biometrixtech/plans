@@ -488,9 +488,10 @@ class TrendProcessor(object):
         trend_dashboard_category.color = LegendColor.splash_x_light
         body_part_set = set()
         body_part_location_set = set()
-        for t in trend.triggers:
-            body_part_set.add(t.body_part)  # not sure we need this
-            body_part_location_set.add(t.body_part.body_part_location)
+        for t in self.trigger_list:
+            if t.body_part is not None:
+                body_part_set.add(t.body_part)  # not sure we need this
+                body_part_location_set.add(t.body_part.body_part_location)
         if len(body_part_location_set) > 1:
             trend_dashboard_category.body_part_text += " and more..."
         return trend_dashboard_category
@@ -677,9 +678,10 @@ class TrendProcessor(object):
         trend_dashboard_category.body_part_text = trend.dashboard_body_part_text
         body_part_set = set()
         body_part_location_set = set()
-        for t in trend.triggers:
-            body_part_set.add(t.body_part)  # not sure we need this
-            body_part_location_set.add(t.body_part.body_part_location)
+        for t in self.trigger_list:
+            if t.body_part is not None:
+                body_part_set.add(t.body_part)  # not sure we need this
+                body_part_location_set.add(t.body_part.body_part_location)
         if len(body_part_location_set) > 1:
             trend_dashboard_category.body_part_text += " and more..."
         return trend_dashboard_category

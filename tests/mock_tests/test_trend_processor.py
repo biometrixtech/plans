@@ -455,6 +455,55 @@ def test_two_side_body_dashboard_muscle_overactivity():
     assert trend_processor.dashboard_categories[0].text == "Signs of elevated strain on"
 
 
+def test_two_side_body_dashboard_muscle_overactivity_and_more():
+    trigger_list = []
+    body_part_factory = BodyPartFactory()
+    trigger_factory = TriggerFactory(datetime.now(), None, [], [])
+
+    now_time = datetime.now()
+
+    trigger = Trigger(TriggerType.hist_sore_greater_30)
+    trigger.body_part = BodyPartSide(body_part_location=BodyPartLocation(8), side=1)
+    body_part = body_part_factory.get_body_part(trigger.body_part)
+    trigger.synergists = trigger_factory.convert_body_part_list(trigger.body_part, body_part.synergists)
+    trigger.antagonists = trigger_factory.convert_body_part_list(trigger.body_part, body_part.antagonists)
+    trigger.created_date_time = now_time
+    trigger.source_date_time = now_time
+
+    trigger_list.append(trigger)
+
+    trigger_2 = Trigger(TriggerType.hist_sore_greater_30)
+    trigger_2.body_part = BodyPartSide(body_part_location=BodyPartLocation(8), side=2)
+    body_part_2 = body_part_factory.get_body_part(trigger_2.body_part)
+    trigger_2.synergists = trigger_factory.convert_body_part_list(trigger_2.body_part, body_part_2.synergists)
+    trigger_2.antagonists = trigger_factory.convert_body_part_list(trigger_2.body_part, body_part_2.antagonists)
+    trigger_2.created_date_time = now_time
+    trigger_2.source_date_time = now_time
+
+    trigger_list.append(trigger_2)
+
+    trigger_3 = Trigger(TriggerType.hist_pain)
+    trigger_3.body_part = BodyPartSide(body_part_location=BodyPartLocation(12), side=2)
+    body_part_3 = body_part_factory.get_body_part(trigger_3.body_part)
+    trigger_3.synergists = trigger_factory.convert_body_part_list(trigger_3.body_part, body_part_3.synergists)
+    trigger_3.antagonists = trigger_factory.convert_body_part_list(trigger_3.body_part, body_part_3.antagonists)
+    trigger_3.created_date_time = now_time - timedelta(days=2)
+    trigger_3.source_date_time = now_time
+
+    trigger_list.append(trigger_3)
+
+    trend_processor = TrendProcessor(trigger_list)
+
+    trend_processor.process_triggers()
+
+    assert trend_processor.dashboard_categories[0].title == "Tissue Related Insights"
+    assert trend_processor.dashboard_categories[0].body_part.body_part_location == BodyPartLocation.calves
+    assert trend_processor.dashboard_categories[0].body_part.side is None
+    assert trend_processor.dashboard_categories[0].body_part_text == "Calves and more..."
+    assert trend_processor.dashboard_categories[0].text == "Signs of elevated strain on"
+    assert trend_processor.athlete_trend_categories[0].plan_alerts[0].text == "Signs of elevated strain on Calves & Feet and other meaningful insights in your data. Tap to view more."
+
+
 def test_cleared_plan_alert():
 
     trigger_list = []
