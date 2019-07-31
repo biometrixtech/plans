@@ -243,7 +243,7 @@ class BodyPartFactory(object):
         # WARNING: If you change anything here ALSO change full body
         ##############
 
-        general = BodyPart(BodyPartLocation.general, 21)
+        general = BodyPart(BodyPartLocation.general, 23)
         general.bilateral = False
 
         #inhibit = self.get_exercise_dictionary([48, 3, 4, 54, 2, 44, 55])
@@ -257,7 +257,7 @@ class BodyPartFactory(object):
 
     def get_upper_body(self):
 
-        upper_body = BodyPart(BodyPartLocation.upper_body, 22)
+        upper_body = BodyPart(BodyPartLocation.upper_body, 25)
         upper_body.bilateral = False
 
         dynamic_stretch = self.get_full_exercise_dictionary([164, 165, 179, 180, 181])
@@ -275,7 +275,7 @@ class BodyPartFactory(object):
 
     def get_lower_body(self):
 
-        lower_body = BodyPart(BodyPartLocation.lower_body, 23)
+        lower_body = BodyPart(BodyPartLocation.lower_body, 24)
         lower_body.bilateral = False
         dynamic_stretch = self.get_full_exercise_dictionary([139, 140, 141, 142, 143, 144, 161, 163, 164, 165, 176, 193])
         dynamic_integrate = self.get_full_exercise_dictionary([145, 146, 147, 148, 149, 150, 151, 182, 183, 203, 204])
@@ -293,7 +293,7 @@ class BodyPartFactory(object):
 
     def get_full_body(self):
 
-        full_body = BodyPart(BodyPartLocation.full_body, 24)
+        full_body = BodyPart(BodyPartLocation.full_body, 23)
         full_body.bilateral = False
         dynamic_stretch = self.get_full_exercise_dictionary([139, 140, 141, 144, 164, 165, 177, 178, 179, 180, 193])
         dynamic_integrate = self.get_full_exercise_dictionary([145, 146, 148, 149, 150, 151, 162, 169, 203, 204])
@@ -356,7 +356,7 @@ class BodyPartFactory(object):
 
     def get_biceps(self):
 
-        part = BodyPart(BodyPartLocation.biceps, None)
+        part = BodyPart(BodyPartLocation.biceps, 19)
 
         inhibit = self.get_exercise_dictionary([243, 244])
         static_stretch = self.get_exercise_dictionary([246])
@@ -365,7 +365,7 @@ class BodyPartFactory(object):
         isolated_activation = self.get_exercise_dictionary([249, 250])
         part.add_extended_exercise_phases(inhibit, static_stretch, active_stretch, dynamic_stretch, isolated_activation,
                                           {})
-        part.add_muscle_groups([22], [], [], [23])
+        part.add_muscle_groups([22], [1], [], [23])
         return part
 
     def get_calves(self):
@@ -394,7 +394,7 @@ class BodyPartFactory(object):
 
     def get_elbow(self):
 
-        part = BodyPart(BodyPartLocation.elbow, 19)
+        part = BodyPart(BodyPartLocation.elbow, 21)
 
         inhibit = self.get_exercise_dictionary([245])
         static_stretch = self.get_exercise_dictionary([247, 246])
@@ -562,7 +562,7 @@ class BodyPartFactory(object):
 
     def get_triceps(self):
 
-        part = BodyPart(BodyPartLocation.triceps, None)
+        part = BodyPart(BodyPartLocation.triceps, 20)
 
         inhibit = self.get_exercise_dictionary([258])
         static_stretch = self.get_exercise_dictionary([57, 103, 104])
@@ -570,7 +570,7 @@ class BodyPartFactory(object):
         dynamic_stretch = {}
         isolated_activation = self.get_exercise_dictionary([199])
         part.add_extended_exercise_phases(inhibit, static_stretch, active_stretch, dynamic_stretch, isolated_activation, {})
-        part.add_muscle_groups([23], [], [], [22])
+        part.add_muscle_groups([23], [1], [], [22])
         return part
 
     def get_upper_back_traps_neck(self):
@@ -590,7 +590,7 @@ class BodyPartFactory(object):
 
     def get_wrist(self):
 
-        part = BodyPart(BodyPartLocation.wrist, 20)
+        part = BodyPart(BodyPartLocation.wrist, 22)
 
         inhibit = self.get_exercise_dictionary([245])
         static_stretch = self.get_exercise_dictionary([247, 248])

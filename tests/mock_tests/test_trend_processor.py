@@ -163,7 +163,7 @@ def test_no_triggers_clear_all():
     assert trend_processor_next_day.athlete_trend_categories[0].trends[1].visible is False
 
 
-def test_first_time_experience_sorts_first():
+def test_first_time_experience_doesnt_first():
 
     trigger_list = []
     body_part_factory = BodyPartFactory()
@@ -214,8 +214,8 @@ def test_first_time_experience_sorts_first():
     assert trend_processor.athlete_trend_categories[0].visible is True
     assert trend_processor.athlete_trend_categories[0].first_time_experience is False
     assert trend_processor.athlete_trend_categories[0].trends[0].visible is True
-    assert trend_processor.athlete_trend_categories[0].trends[0].title == "Functional Limitation"
-    assert trend_processor.athlete_trend_categories[0].trends[0].last_date_time == now_time_3
+    assert trend_processor.athlete_trend_categories[0].trends[0].title == "Muscle Over & Under-activity"
+    assert trend_processor.athlete_trend_categories[0].trends[0].last_date_time == now_time_2
     assert trend_processor.athlete_trend_categories[0].trends[1].visible is True
 
 

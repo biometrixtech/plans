@@ -24,8 +24,8 @@ class Persona(object):
         self.daily_readiness = None
         self.athlete_stats = None
 
-    def create_history(self, days):
-        self.clear_user()
+    def create_history(self, days, suffix='Test'):
+        self.clear_user(suffix)
         event_date = datetime.datetime.now() - datetime.timedelta(days=days)
         self.update_stats(event_date)
         for i in range(days):
@@ -54,11 +54,11 @@ class Persona(object):
 
         self.update_stats(event_date)
 
-    def clear_user(self):
-        readiness = get_mongo_collection('dailyreadiness')
-        daily_plan = get_mongo_collection('dailyplan')
-        stats = get_mongo_collection('athletestats')
-        exercises = get_mongo_collection('completedexercises')
+    def clear_user(self, suffix='Test'):
+        readiness = get_mongo_collection('dailyreadiness', suffix)
+        daily_plan = get_mongo_collection('dailyplan', suffix)
+        stats = get_mongo_collection('athletestats', suffix)
+        exercises = get_mongo_collection('completedexercises', suffix)
 
         readiness.delete_many({"user_id": self.user_id})
         daily_plan.delete_many({"user_id": self.user_id})
