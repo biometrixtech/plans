@@ -305,12 +305,16 @@ class TrendProcessor(object):
         title_text = ""
 
         for b in range(0, len(sorted_body_parts)):
-            if sorted_body_parts[b].bilateral:
-                body_part_text = text_generator.get_body_part_text(sorted_body_parts[b].location,
-                                                                   side).title()
+            if side == 0:
+                body_part_text = text_generator.get_body_part_text_plural(sorted_body_parts[b].location,
+                                                                       side).title()
             else:
-                body_part_text = text_generator.get_body_part_text(sorted_body_parts[b].location,
-                                                                   None).title()
+                if sorted_body_parts[b].bilateral:
+                    body_part_text = text_generator.get_body_part_text(sorted_body_parts[b].location,
+                                                                       side).title()
+                else:
+                    body_part_text = text_generator.get_body_part_text(sorted_body_parts[b].location,
+                                                                       None).title()
             if b == len(sorted_body_parts) - 2:
                 body_part_text += " & "
             elif b <= len(sorted_body_parts) - 3:
@@ -441,11 +445,21 @@ class TrendProcessor(object):
             bold_text_3.color = LegendColor.warning_light
             trend_data.bold_text.append(bold_text_3)
 
-            bold_text_4 = BoldText()
-            bold_text_4.text = clean_title_body_part_text
-            bold_text_4.color = LegendColor.splash_light
+            if trend.top_priority_trigger.priority == 2:
 
-            trend_data.bold_text.append(bold_text_4)
+                bold_text_4 = BoldText()
+                bold_text_4.text = clean_title_body_part_text
+                bold_text_4.color = LegendColor.splash_light
+
+                trend_data.bold_text.append(bold_text_4)
+
+            else:
+
+                bold_text_4 = BoldText()
+                bold_text_4.text = clean_title_body_part_text
+                bold_text_4.color = LegendColor.splash_x_light
+
+                trend_data.bold_text.append(bold_text_4)
 
             trend.trend_data = trend_data
 
@@ -474,9 +488,10 @@ class TrendProcessor(object):
         trend_dashboard_category.color = LegendColor.splash_x_light
         body_part_set = set()
         body_part_location_set = set()
-        for t in trend.triggers:
-            body_part_set.add(t.body_part)  # not sure we need this
-            body_part_location_set.add(t.body_part.body_part_location)
+        for t in self.trigger_list:
+            if t.body_part is not None:
+                body_part_set.add(t.body_part)  # not sure we need this
+                body_part_location_set.add(t.body_part.body_part_location)
         if len(body_part_location_set) > 1:
             trend_dashboard_category.body_part_text += " and more..."
         return trend_dashboard_category
@@ -543,15 +558,16 @@ class TrendProcessor(object):
 
         sorted_body_parts = sorted(converted_body_parts, key=lambda x: x.treatment_priority)
 
-        if len(sorted_body_parts) == 0:
-            help_me = True
-
-        if sorted_body_parts[0].bilateral:
-            body_part_side = BodyPartSide(sorted_body_parts[0].location, side)
-            body_part_text = text_generator.get_body_part_text(sorted_body_parts[0].location, side).title()
-        else:
+        if side == 0:
             body_part_side = BodyPartSide(sorted_body_parts[0].location, None)
-            body_part_text = text_generator.get_body_part_text(sorted_body_parts[0].location, None).title()
+            body_part_text = text_generator.get_body_part_text_plural(sorted_body_parts[0].location, None).title()
+        else:
+            if sorted_body_parts[0].bilateral:
+                body_part_side = BodyPartSide(sorted_body_parts[0].location, side)
+                body_part_text = text_generator.get_body_part_text(sorted_body_parts[0].location, side).title()
+            else:
+                body_part_side = BodyPartSide(sorted_body_parts[0].location, None)
+                body_part_text = text_generator.get_body_part_text(sorted_body_parts[0].location, None).title()
 
         return body_part_side, body_part_text
 
@@ -662,9 +678,10 @@ class TrendProcessor(object):
         trend_dashboard_category.body_part_text = trend.dashboard_body_part_text
         body_part_set = set()
         body_part_location_set = set()
-        for t in trend.triggers:
-            body_part_set.add(t.body_part)  # not sure we need this
-            body_part_location_set.add(t.body_part.body_part_location)
+        for t in self.trigger_list:
+            if t.body_part is not None:
+                body_part_set.add(t.body_part)  # not sure we need this
+                body_part_location_set.add(t.body_part.body_part_location)
         if len(body_part_location_set) > 1:
             trend_dashboard_category.body_part_text += " and more..."
         return trend_dashboard_category

@@ -151,7 +151,7 @@ class RecoveryTextGenerator(object):
         elif body_part_location == BodyPartLocation.quads:
             return side_text + "quads"
         elif body_part_location == BodyPartLocation.groin:
-            return side_text + "groin muscles"
+            return side_text + "groin"
         elif body_part_location == BodyPartLocation.outer_thigh:
             return side_text + "outer thighs"
         elif body_part_location == BodyPartLocation.hamstrings:
