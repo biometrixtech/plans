@@ -444,7 +444,7 @@ class FirstTimeExperienceElement(Serialisable):
     def json_deserialise(cls, input_dict):
         element = cls()
         element.title = input_dict.get('title', "")
-        element.image = input_dict.get('body', "")
+        element.image = input_dict.get('image', "")
         return element
 
 

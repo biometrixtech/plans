@@ -149,7 +149,7 @@ class TrendProcessor(object):
         # limitation_trend.bold_text.append(bold_text_3)
 
         limitation_trend.icon = "view3icon.png"
-        limitation_trend.video_url = "https://d2xll36aqjtmhz.cloudfront.net/calibration.mp4"
+        limitation_trend.video_url = "https://d2xll36aqjtmhz.cloudfront.net/view1context.mp4"
         limitation_trend.visualization_type = VisualizationType.pain_functional_limitation
         limitation_trend.visible = False
         limitation_trend.first_time_experience = True
@@ -175,7 +175,7 @@ class TrendProcessor(object):
         # muscle_trend.bold_text.append(bold_text_2)
 
         muscle_trend.icon = "view1icon.png"
-        muscle_trend.video_url = "https://d2xll36aqjtmhz.cloudfront.net/calibration.mp4"
+        muscle_trend.video_url = "https://d2xll36aqjtmhz.cloudfront.net/view1context.mp4"
         muscle_trend.visualization_type = VisualizationType.tight_overactice_underactive
         muscle_trend.visible = False
         muscle_trend.first_time_experience = True
@@ -189,20 +189,20 @@ class TrendProcessor(object):
         self.set_pain_functional_limitation(trend_category_index)
 
         if len(self.athlete_trend_categories[trend_category_index].trends) > 0:
-            first_times = list(t for t in self.athlete_trend_categories[trend_category_index].trends if t.last_date_time is not None and t.first_time_experience)
+            #first_times = list(t for t in self.athlete_trend_categories[trend_category_index].trends if t.last_date_time is not None and t.first_time_experience)
             none_dates = list(t for t in self.athlete_trend_categories[trend_category_index].trends if t.last_date_time is None)
-            full_dates = list(t for t in self.athlete_trend_categories[trend_category_index].trends if t.last_date_time is not None and not t.first_time_experience)
+            full_dates = list(t for t in self.athlete_trend_categories[trend_category_index].trends if t.last_date_time is not None)
 
             self.athlete_trend_categories[trend_category_index].trends = []
 
             new_modified_trigger_count = 0
             plan_alert_short_title = ""
 
-            if len(first_times) > 0:
-                first_times = sorted(first_times, key=lambda x: (x.last_date_time, x.priority), reverse=True)
-                plan_alert_short_title = first_times[0].plan_alert_short_title
-                for f in first_times:
-                    new_modified_trigger_count += len(f.triggers)
+            # if len(first_times) > 0:
+            #     first_times = sorted(first_times, key=lambda x: (x.last_date_time, x.priority), reverse=True)
+            #     plan_alert_short_title = first_times[0].plan_alert_short_title
+            #     for f in first_times:
+            #         new_modified_trigger_count += len(f.triggers)
 
             if len(full_dates) > 0:
                 full_dates = sorted(full_dates, key=lambda x: (x.last_date_time, x.priority), reverse=True)
@@ -211,7 +211,7 @@ class TrendProcessor(object):
                 for f in full_dates:
                     new_modified_trigger_count += len(f.triggers)
 
-            self.athlete_trend_categories[trend_category_index].trends.extend(first_times)
+            #self.athlete_trend_categories[trend_category_index].trends.extend(first_times)
             self.athlete_trend_categories[trend_category_index].trends.extend(full_dates)
             self.athlete_trend_categories[trend_category_index].trends.extend(none_dates)
 
@@ -542,6 +542,9 @@ class TrendProcessor(object):
             converted_body_parts.append(body_part)
 
         sorted_body_parts = sorted(converted_body_parts, key=lambda x: x.treatment_priority)
+
+        if len(sorted_body_parts) == 0:
+            help_me = True
 
         if sorted_body_parts[0].bilateral:
             body_part_side = BodyPartSide(sorted_body_parts[0].location, side)
