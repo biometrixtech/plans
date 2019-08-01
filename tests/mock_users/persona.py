@@ -28,6 +28,7 @@ class Persona(object):
         self.clear_user(suffix)
         event_date = datetime.datetime.now() - datetime.timedelta(days=days)
         self.update_stats(event_date)
+        last_plan_date = None
         for i in range(days):
             # date_time = format_datetime(event_date)
             today_date = format_date(event_date)
@@ -46,6 +47,7 @@ class Persona(object):
                 self.create_readiness(readiness_data)
 
                 self.create_plan(event_date)
+                last_plan_date = event_date
                 exercise_list = [ex.exercise.id for ex in self.daily_plan.pre_active_rest[0].inhibit_exercises.values()]
                 self.complete_exercises(exercise_list, format_datetime(event_date + datetime.timedelta(hours=1)))
                 print(today_date)
@@ -53,6 +55,8 @@ class Persona(object):
             event_date = event_date + datetime.timedelta(days=1)
 
         self.update_stats(event_date)
+
+        return last_plan_date
 
     def clear_user(self, suffix='Test'):
         readiness = get_mongo_collection('dailyreadiness', suffix)
