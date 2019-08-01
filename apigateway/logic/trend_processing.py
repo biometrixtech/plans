@@ -149,7 +149,7 @@ class TrendProcessor(object):
         # limitation_trend.bold_text.append(bold_text_3)
 
         limitation_trend.icon = "view3icon.png"
-        limitation_trend.video_url = "https://d2xll36aqjtmhz.cloudfront.net/view1context.mp4"
+        limitation_trend.video_url = "https://d2xll36aqjtmhz.cloudfront.net/view3context.mp4"
         limitation_trend.visualization_type = VisualizationType.pain_functional_limitation
         limitation_trend.visible = False
         limitation_trend.first_time_experience = True
