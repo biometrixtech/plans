@@ -27,6 +27,10 @@ def handle_alerts_cleared(principal_id):
     if len(cleared_trend_categories_plan) > 0:
         cleared_trend_category_plan = cleared_trend_categories_plan[0]
         cleared_trend_category_plan.plan_alerts = []
+        for cat in plan.trends.dashboard.trend_categories:
+            if cat.insight_type == cleared_insight_type:
+                cat.unread_alerts = False
+                break
         DatastoreCollection().daily_plan_datastore.put(plan)
     cleared_trend_categories_stats = [category for category in athlete_stats.trend_categories if category.insight_type == cleared_insight_type]
     if len(cleared_trend_categories_stats) > 0:
