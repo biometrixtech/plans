@@ -295,8 +295,13 @@ class TrendProcessor(object):
             body_part = body_part_factory.get_body_part(b)
             converted_body_parts.append(body_part)
 
+        if side == 0:
+            converted_body_parts = set(converted_body_parts)
+
         bilateral_body_parts = list(b for b in converted_body_parts if b.bilateral)
+        bilateral_body_parts = sorted(bilateral_body_parts, key=lambda x: x.treatment_priority)
         non_bilateral_body_parts = list(b for b in converted_body_parts if not b.bilateral)
+        non_bilateral_body_parts = sorted(non_bilateral_body_parts, key=lambda x: x.treatment_priority)
 
         sorted_body_parts = []
         sorted_body_parts.extend(bilateral_body_parts)

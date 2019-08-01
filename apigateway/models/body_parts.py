@@ -650,6 +650,12 @@ class BodyPart(object):
 
         return exercise_list
 
+    def __hash__(self):
+        return hash((self.location.value, self.treatment_priority))
+
+    def __eq__(self, other):
+        return self.location.value == other.location.value and self.treatment_priority == other.treatment_priority
+
     def add_exercise_phases(self, inhibit, lengthen, activate, randomize=False):
 
         self.inhibit_exercises = self.add_exercises(self.inhibit_exercises, inhibit,
