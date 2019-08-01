@@ -413,7 +413,7 @@ class TrendProcessor(object):
                 side = trend.top_priority_trigger.body_part.side
 
             body_part_text = text_generator.get_body_part_text(trend.top_priority_trigger.body_part.body_part_location, None)
-            body_part_text.title()
+            body_part_text = body_part_text.title()
 
             if trend.top_priority_trigger.priority == 2:
                 title_body_part_text = self.get_title_text_for_body_parts(trend.top_priority_trigger.antagonists, side)
@@ -631,7 +631,7 @@ class TrendProcessor(object):
                 side = trend.top_priority_trigger.body_part.side
 
             body_part_text = text_generator.get_body_part_text(trend.top_priority_trigger.body_part.body_part_location, None)
-            body_part_text.title()
+            body_part_text = body_part_text.title()
 
             title_body_part_text = self.get_title_text_for_body_parts(trend.top_priority_trigger.synergists, side)
             trend_data.title = "Elevated strain on " + title_body_part_text

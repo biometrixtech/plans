@@ -613,6 +613,44 @@ def test_bilateral_body_parts_3_elements():
     assert trend_processor.athlete_trend_categories[0].plan_alerts[0].bold_text[0].text == 'elevated strain on Quads, Hamstrings & Lower Back'
 
 
+def test_agonist_capitalized():
+
+    trigger_list = []
+    body_part_factory = BodyPartFactory()
+    trigger_factory = TriggerFactory(datetime.now(), None, [], [])
+
+    now_time = datetime.now()
+
+    trigger = Trigger(TriggerType.hist_pain)
+    trigger.body_part = BodyPartSide(body_part_location=BodyPartLocation(14), side=1)
+    body_part = body_part_factory.get_body_part(trigger.body_part)
+    trigger.synergists = trigger_factory.convert_body_part_list(trigger.body_part, body_part.synergists)
+    trigger.antagonists = trigger_factory.convert_body_part_list(trigger.body_part, body_part.antagonists)
+    trigger.created_date_time = now_time
+    trigger.source_date_time = now_time
+
+    trigger_list.append(trigger)
+
+    trigger_2 = Trigger(TriggerType.hist_pain)
+    trigger_2.body_part = BodyPartSide(body_part_location=BodyPartLocation(14), side=2)
+    body_part_2 = body_part_factory.get_body_part(trigger_2.body_part)
+    trigger_2.synergists = trigger_factory.convert_body_part_list(trigger_2.body_part, body_part_2.synergists)
+    trigger_2.antagonists = trigger_factory.convert_body_part_list(trigger_2.body_part, body_part_2.antagonists)
+    trigger_2.created_date_time = now_time
+    trigger_2.source_date_time = now_time
+
+    trigger_list.append(trigger_2)
+
+    trend_processor = TrendProcessor(trigger_list)
+
+    trend_processor.process_triggers()
+
+    assert trend_processor.athlete_trend_categories[0].trends[0].trend_data.text == ("Athletes struggling with recurring Glute pain often develop "
+                                                                                     + "misalignments that over-stress the Quads, Hamstrings and Lower Back. "+
+                                                                                     "Without proactive measures, this can leading to accumulated micro trauma in "+
+                                                                                     "the tissues and new areas of pain or injury over time.")
+
+
 def test_partial_bilateral_body_parts_3_elements():
 
     trigger_list = []
