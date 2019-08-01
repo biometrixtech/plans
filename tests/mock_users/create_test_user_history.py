@@ -53,7 +53,7 @@ if __name__ == '__main__':
     users = test_users.get_test_users()
 
     for u in users:
-        if u == "full_fte@200.com":
+        if u == "full_fte@200.com" or "full_fte_2@200.com":
             soreness_history = []
             lower_back_no_question = sh.create_body_part_history(sh.persistent2_no_question(), 12, 0, True)
             soreness_history.append(lower_back_no_question)
@@ -65,7 +65,7 @@ if __name__ == '__main__':
             persona1.soreness_history = soreness_history
             persona1.create_history(days=history_length, suffix='')
             print(time.time() - start)
-        elif u == "sore_fte@200.com":
+        elif u == "sore_fte@200.com" or "sore_fte_2@200.com":
             soreness_history = []
             lower_back_no_question = sh.create_body_part_history(sh.persistent2_no_question(), 12, 0, True)
             soreness_history.append(lower_back_no_question)
@@ -79,7 +79,7 @@ if __name__ == '__main__':
             clear_fte_category(InsightType.movement_dysfunction_compensation, jwt)
             clear_fte_category_view(InsightType.movement_dysfunction_compensation, VisualizationType.pain_functional_limitation, jwt)
             print(time.time() - start)
-        elif u == "near_clear@200.com":
+        elif u == "near_clear@200.com" or "near_clear_2@200.com":
             soreness_history = []
             left_hip_no_question = sh.create_body_part_history(sh.persistent2_no_question(), 4, 1, False)
             soreness_history.append(left_hip_no_question)
@@ -96,7 +96,7 @@ if __name__ == '__main__':
             clear_fte_category_view(InsightType.movement_dysfunction_compensation,
                                     VisualizationType.tight_overactice_underactive, jwt)
             print(time.time() - start)
-        elif u == "two_pain@200.com":
+        elif u == "two_pain@200.com" or "two_pain_2@200.com":
             soreness_history = []
             left_ankle_no_question = sh.create_body_part_history(sh.persistent2_no_question(), 9, 1, True)
             soreness_history.append(left_ankle_no_question)
