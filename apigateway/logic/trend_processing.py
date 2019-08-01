@@ -105,7 +105,7 @@ class TrendProcessor(object):
         modal.title = "Tissue Related Insights"
         modal.body = ("We monitor your data for signs imbalances in  muscle activation, range of motion and more.\n\n" +
                         "These imbalances can create inefficiency in speed & power production and even increase soft tissue injury risk.\n\n" +
-                        "We’re looking to find and fix two types of body-part specific imbalances:\n\n")
+                        "We’re looking to find and fix two types of body-part specific imbalances:")
         element_1 = FirstTimeExperienceElement()
         element_1.title = "Tissue Under\n& Over Activity"
         element_1.image = "view1icon.png"
@@ -149,7 +149,7 @@ class TrendProcessor(object):
         # limitation_trend.bold_text.append(bold_text_3)
 
         limitation_trend.icon = "view3icon.png"
-        limitation_trend.video_url = "https://d2xll36aqjtmhz.cloudfront.net/view1context.mp4"
+        limitation_trend.video_url = "https://d2xll36aqjtmhz.cloudfront.net/view3context.mp4"
         limitation_trend.visualization_type = VisualizationType.pain_functional_limitation
         limitation_trend.visible = False
         limitation_trend.first_time_experience = True
