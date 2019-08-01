@@ -1,11 +1,11 @@
 domain = "@200.com"
 
 users = [
-    # "full_fte",
+    "full_fte",
     # "sore_fte",
     # "near_clear",
     #"two_sore",
-    "two_pain"
+    #"two_pain"
 ]
 
 def get_test_users():
