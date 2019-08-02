@@ -1,5 +1,5 @@
 # import datetime
-from config import get_mongo_collection
+from .config import get_mongo_collection
 import datetime
 from models.daily_plan import DailyPlan
 from models.daily_readiness import DailyReadiness
@@ -59,10 +59,10 @@ class Persona(object):
         return last_plan_date
 
     def clear_user(self, suffix='Test'):
-        readiness = get_mongo_collection('dailyreadiness'+ suffix)
-        daily_plan = get_mongo_collection('dailyplan'+ suffix)
-        stats = get_mongo_collection('athletestats'+ suffix)
-        exercises = get_mongo_collection('completedexercises'+ suffix)
+        readiness = get_mongo_collection('dailyreadiness', suffix)
+        daily_plan = get_mongo_collection('dailyplan', suffix)
+        stats = get_mongo_collection('athletestats', suffix)
+        exercises = get_mongo_collection('completedexercises', suffix)
 
         readiness.delete_many({"user_id": self.user_id})
         daily_plan.delete_many({"user_id": self.user_id})
