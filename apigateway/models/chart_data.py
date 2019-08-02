@@ -847,21 +847,25 @@ class BaseOveractiveUnderactiveChartData(Serialisable):
         unc_delete = []
         una_delete = []
 
+        id = 0
         for u in self.underactive_needing_care:
             index = next((i for i, x in enumerate(self.underactive) if u == x), -1)
             index_2 = next((i for i, x in enumerate(self.overactive) if u == x), -1)
             if index > -1 or index_2 > -1:
-                unc_delete.append(index)
+                unc_delete.append(id)
+            id += 1
 
         unc_delete.sort(reverse=True)  # need to remove in reverse order so we don't mess up indexes along the way
 
         for d in unc_delete:
             del(self.underactive_needing_care[d])
 
+        id = 0
         for u in self.underactive:
             index = next((i for i, x in enumerate(self.overactive) if u == x), -1)
             if index > -1:
-                una_delete.append(index)
+                una_delete.append(id)
+            id += 1
 
         una_delete.sort(reverse=True)
 

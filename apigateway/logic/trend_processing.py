@@ -103,9 +103,9 @@ class TrendProcessor(object):
 
         modal = CategoryFirstTimeExperienceModal()
         modal.title = "Tissue Related Insights"
-        modal.body = ("We monitor your data for signs imbalances in  muscle activation, range of motion and more.\n\n" +
-                        "These imbalances can create inefficiency in speed & power production and even increase soft tissue injury risk.\n\n" +
-                        "We’re looking to find and fix two types of body-part specific imbalances:")
+        modal.body = ("We monitor your data for signs of imbalances in  muscle activation, range of motion and more.\n\n" +
+                        "These imbalances can create inefficiency in speed & power productionover-strain tissues making them short and tight, and even increase soft tissue injury risk.\n\n" +
+                        "We try to find and help address two types of body-part specific imbalances:")
         element_1 = FirstTimeExperienceElement()
         element_1.title = "Tissue Under\n& Over Activity"
         element_1.image = "view1icon.png"
@@ -127,9 +127,9 @@ class TrendProcessor(object):
         limitation_trend = Trend(TriggerType.hist_sore_greater_30)
         limitation_trend.title = "Functional Limitation"
         limitation_trend.title_color = LegendColor.error_light
-        limitation_trend.text.append("Your pain is likely to effect supporting tissues, contributing to a cycle of soft tissue injury…")
-        limitation_trend.text.append("Most people, knowingly or not, change the way they move to distribute force away from areas of pain."+
-                                     "This over-stresses supporting tissues and other limbs which adopt more force than they’re used to. "+
+        limitation_trend.text.append("Your pain is likely to affect supporting tissues, contributing to a cycle of soft tissue injury.")
+        limitation_trend.text.append("Most people, knowingly or not, change the way they move to distribute force away from areas of pain. "+
+                                     "This over-stresses supporting tissues and limbs which adopt more force and stress than they’re used to. "+
                                      "This often leads to the development of new injuries. See your factors below.")
 
         # bold_text_1 = BoldText()
@@ -160,9 +160,9 @@ class TrendProcessor(object):
         muscle_trend = Trend(TriggerType.hist_pain)
         muscle_trend.title = "Muscle Over & Under-activity"
         muscle_trend.title_color = LegendColor.warning_light
-        muscle_trend.text.append("Your data suggests you may have some imbalances in muscle activation.")
-        muscle_trend.text.append("This can lead to performance inefficiencies like decreased speed and power output. If these imbalances persist, they can turn into strength dysfunctions which alter your " +
-                                    "biomechanics & elevate sort tissue injury risk. Addressing these imbalances early is important for athletic resilience.")
+        muscle_trend.text.append("Your data suggests you may have some imbalances in muscle activation which can lead to performance inefficiencies like decreased speed and power output.")
+        muscle_trend.text.append("If these imbalances persist, they can turn into strength dysfunctions which alter your biomechanics and elevate sort tissue injury risk."+
+                                 " Addressing these imbalances early is important for athletic resilience.")
 
         # bold_text_1 = BoldText()
         # bold_text_1.text = "Seriously"
@@ -295,8 +295,13 @@ class TrendProcessor(object):
             body_part = body_part_factory.get_body_part(b)
             converted_body_parts.append(body_part)
 
+        if side == 0:
+            converted_body_parts = set(converted_body_parts)
+
         bilateral_body_parts = list(b for b in converted_body_parts if b.bilateral)
+        bilateral_body_parts = sorted(bilateral_body_parts, key=lambda x: x.treatment_priority)
         non_bilateral_body_parts = list(b for b in converted_body_parts if not b.bilateral)
+        non_bilateral_body_parts = sorted(non_bilateral_body_parts, key=lambda x: x.treatment_priority)
 
         sorted_body_parts = []
         sorted_body_parts.extend(bilateral_body_parts)
@@ -420,12 +425,12 @@ class TrendProcessor(object):
                 trend_data.title = "Elevated strain on " + title_body_part_text
                 trend.plan_alert_short_title = "elevated strain on " + title_body_part_text
                 clean_title_body_part_text = title_body_part_text.replace('&', 'and')
-                body_text = ("Signs of " + body_part_text + " overactivity in your soreness data suggest that supporting muscles like " + clean_title_body_part_text +
-                            " are experiencing elevated levels of strain which can lead to tissue fatigue and strength imbalances that can affect performance and increase injury risk.")
+                body_text = ("Signs of " + body_part_text + " overactivity in your soreness data suggest that supporting tissues like the " + clean_title_body_part_text +
+                            " are experiencing elevated levels of strain which can lead to tissue fatigue and strength imbalances that affect performance and increase injury risk.")
                 trend.dashboard_body_part, trend.dashboard_body_part_text = self.get_title_body_part_and_text(trend.top_priority_trigger.antagonists, side)
             else:
                 title_body_part_text = self.get_title_text_for_body_parts(trend.top_priority_trigger.synergists, side)
-                trend_data.title = "Your " + title_body_part_text + " may lack strength"
+                trend_data.title = title_body_part_text + " may lack strength"
                 trend.plan_alert_short_title = title_body_part_text + " weakness"
                 clean_title_body_part_text = title_body_part_text.replace('&','and')
                 body_text = ("Patterns in your soreness data suggest that your " + body_part_text + " may actually be overactive due to a chronic over-compensation for a weak "
@@ -637,8 +642,8 @@ class TrendProcessor(object):
             trend_data.title = "Elevated strain on " + title_body_part_text
             trend.plan_alert_short_title = "elevated strain on " + title_body_part_text
             clean_title_body_part_text = title_body_part_text.replace('&','and')
-            body_text = ("Athletes struggling with recurring " + body_part_text + " pain often develop misalignments that over-stress the "+ clean_title_body_part_text +
-                         ". Without proactive measures, this can leading to accumulated micro trauma in the tissues and new areas of pain or injury over time.")
+            body_text = ("Athletes struggling with recurring " + body_part_text + " pain often develop misalignments that over-stress their "+ clean_title_body_part_text +
+                         ". Without proactive measures, this can lead to accumulated micro trauma in the tissues and new areas of pain or injury over time.")
             trend.dashboard_body_part, trend.dashboard_body_part_text = self.get_title_body_part_and_text(
                 trend.top_priority_trigger.synergists, side)
 
