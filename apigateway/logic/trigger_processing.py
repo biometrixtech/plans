@@ -7,7 +7,10 @@ from models.trigger import TriggerType, Trigger
 class TriggerFactory(object):
     def __init__(self, event_date_time, athlete_stats, soreness_list, training_sessions):
         self.event_date_time = event_date_time
-        self.triggers = athlete_stats.triggers if athlete_stats is not None and athlete_stats.triggers is not None else []
+        self.triggers = []
+
+        if athlete_stats is not None and athlete_stats.triggers is not None:
+            self.triggers = athlete_stats.triggers
         self.high_relative_load_session = False
         self.high_relative_intensity_session = False
         self.high_relative_load_session_sport_names = set()
@@ -152,7 +155,7 @@ class TriggerFactory(object):
 
     def load_triggers(self):
 
-        self.triggers = []
+        #self.triggers = []
 
         if self.high_relative_load_session or self.high_relative_intensity_session:
 
@@ -162,7 +165,7 @@ class TriggerFactory(object):
         hist_soreness = list(s for s in self.soreness_list if not s.is_dormant_cleared() and not s.pain and
                              (s.is_persistent_soreness() or
                               s.historic_soreness_status == HistoricSorenessStatus.persistent_2_soreness) and
-                             (self.event_date_time - s.first_reported_date_time).days < 30)
+                             (self.event_date_time.date() - s.first_reported_date_time.date()).days < 30)
 
         if len(hist_soreness) > 0:
 
@@ -227,12 +230,12 @@ class TriggerFactory(object):
 
                 elif ((soreness.is_persistent_soreness() or
                        soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_soreness) and
-                      (self.event_date_time - soreness.first_reported_date_time).days < 30):
+                      days_diff is not None and days_diff < 30):
                     self.set_trigger(TriggerType.hist_sore_less_30_sore_today,soreness=soreness)  # 12
 
                 elif ((soreness.is_persistent_soreness() or
                        soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_soreness) and
-                      (self.event_date_time - soreness.first_reported_date_time).days >= 30):
+                      days_diff is not None and days_diff >= 30):
 
                     self.set_trigger(TriggerType.hist_sore_greater_30_sore_today, soreness=soreness)  # 13
 
@@ -248,7 +251,7 @@ class TriggerFactory(object):
             if soreness.historic_soreness_status is not None and soreness.first_reported_date_time is not None \
                     and not soreness.is_dormant_cleared() and soreness.historic_soreness_status is not HistoricSorenessStatus.doms:
 
-                if not soreness.pain and days_diff >= 30:
+                if not soreness.pain and days_diff is not None and days_diff >= 30:
 
                     self.set_trigger(TriggerType.hist_sore_greater_30, soreness=soreness)  # 19
 
@@ -283,5 +286,6 @@ class TriggerFactory(object):
             if t.created_date_time != self.event_date_time and t.modified_date_time != self.event_date_time:
                 t.deleted_date_time = self.event_date_time
 
+        self.triggers = [t for t in self.triggers if t.deleted_date_time is None]
 
 
