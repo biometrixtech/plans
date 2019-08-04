@@ -1,5 +1,5 @@
 # import datetime
-from config import get_mongo_collection
+from mock_config import get_mongo_collection
 import datetime
 from models.daily_plan import DailyPlan
 from models.daily_readiness import DailyReadiness
@@ -24,9 +24,10 @@ class Persona(object):
         self.daily_readiness = None
         self.athlete_stats = None
 
-    def create_history(self, days, suffix='Test'):
-        self.clear_user(suffix)
-        event_date = datetime.datetime.now() - datetime.timedelta(days=days)
+    def create_history(self, days, suffix='Test', clear_history=True, start_date_time=datetime.datetime.now()):
+        if clear_history:
+            self.clear_user(suffix)
+        event_date = start_date_time - datetime.timedelta(days=days)
         self.update_stats(event_date)
         last_plan_date = None
         for i in range(days):
@@ -59,10 +60,10 @@ class Persona(object):
         return last_plan_date
 
     def clear_user(self, suffix='Test'):
-        readiness = get_mongo_collection('dailyreadiness'+ suffix)
-        daily_plan = get_mongo_collection('dailyplan'+ suffix)
-        stats = get_mongo_collection('athletestats'+ suffix)
-        exercises = get_mongo_collection('completedexercises'+ suffix)
+        readiness = get_mongo_collection('dailyreadiness', suffix)
+        daily_plan = get_mongo_collection('dailyplan', suffix)
+        stats = get_mongo_collection('athletestats', suffix)
+        exercises = get_mongo_collection('completedexercises', suffix)
 
         readiness.delete_many({"user_id": self.user_id})
         daily_plan.delete_many({"user_id": self.user_id})
