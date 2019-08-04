@@ -358,19 +358,21 @@ class TrendProcessor(object):
     def set_tight_over_under_muscle_view(self, category_index):
 
         trigger_type_1 = TriggerType.hist_sore_less_30
-        less_30_triggers = [TriggerType.hist_sore_less_30_no_sport,
+        less_30_triggers = [#TriggerType.hist_sore_less_30_no_sport,
                             TriggerType.hist_sore_less_30,
-                            TriggerType.hist_sore_less_30_sore_today]
+                            #TriggerType.hist_sore_less_30_sore_today
+                            ]
         triggers_1 = list(t for t in self.trigger_list if t.trigger_type in less_30_triggers)
         for t in triggers_1:
             t.priority = 1
 
         trigger_type_2 = TriggerType.hist_sore_greater_30
-        greater_30_triggers = [TriggerType.hist_sore_greater_30_high_volume_intensity,
-                               TriggerType.hist_sore_greater_30_no_sore_today_high_volume_intensity,
-                               TriggerType.hist_sore_greater_30_sore_today,
+        greater_30_triggers = [#TriggerType.hist_sore_greater_30_high_volume_intensity,
+                               #TriggerType.hist_sore_greater_30_no_sore_today_high_volume_intensity,
+                               #TriggerType.hist_sore_greater_30_sore_today,
                                TriggerType.hist_sore_greater_30,
-                               TriggerType.hist_sore_greater_30_sport]
+                               #TriggerType.hist_sore_greater_30_sport
+            ]
         triggers_2 = list(t for t in self.trigger_list if t.trigger_type in greater_30_triggers)
         for t in triggers_2:
             t.priority = 2
@@ -579,15 +581,16 @@ class TrendProcessor(object):
     def set_pain_functional_limitation(self, category_index):
 
         #trigger_type = TriggerType.hist_pain
-        hist_pain_triggers = [TriggerType.hist_pain_high_volume_intensity,
-                              TriggerType.acute_pain_no_pain_today_high_volume_intensity,
-                              TriggerType.pers_pers2_pain_no_pain_sore_today_high_volume_intensity,
+        hist_pain_triggers = [#TriggerType.hist_pain_high_volume_intensity,
+                              #TriggerType.acute_pain_no_pain_today_high_volume_intensity,
+                              #TriggerType.pers_pers2_pain_no_pain_sore_today_high_volume_intensity,
                               TriggerType.hist_pain,
-                              TriggerType.hist_pain_sport,
-                              TriggerType.pers_pers2_pain_less_30_no_pain_today,
-                              TriggerType.pers_pers2_pain_greater_30_no_pain_today,
-                              TriggerType.hist_pain_pain_today_severity_1_2,
-                              TriggerType.hist_pain_pain_today_severity_3_5]
+                              #TriggerType.hist_pain_sport,
+                              #TriggerType.pers_pers2_pain_less_30_no_pain_today,
+                              #TriggerType.pers_pers2_pain_greater_30_no_pain_today,
+                              #TriggerType.hist_pain_pain_today_severity_1_2,
+                              #TriggerType.hist_pain_pain_today_severity_3_5
+                            ]
         triggers = list(t for t in self.trigger_list if t.trigger_type in hist_pain_triggers)
 
         if len(triggers) > 0:

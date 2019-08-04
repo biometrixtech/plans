@@ -147,4 +147,37 @@ if __name__ == '__main__':
             last_plan_date_time = persona1.create_history(days=2, suffix='', clear_history=False, start_date_time=datetime.now()+timedelta(days=2))
 
             print(time.time() - start)
+        elif u == "three_pain@200.com":
+            soreness_history = []
+            right_calf_no_question = sh.create_body_part_history(sh.persistent2_no_question(), 16, 2, True)
+            soreness_history.append(right_calf_no_question)
+            right_it_band_no_question = sh.create_body_part_history(sh.persistent2_no_question(), 11, 2, True)
+            soreness_history.append(right_it_band_no_question)
+            # left_bicep_31_days_no_question = sh.create_body_part_history(sh.persistent_soreness_no_question_31_days(), 22, 1, False)
+            # soreness_history.append(left_bicep_31_days_no_question)
+            user_id, jwt = login_user(u)
+            print(user_id)
+            persona1 = Persona(user_id)
+            persona1.soreness_history = soreness_history
+            last_plan_date_time = persona1.create_history(days=history_length, suffix='')
+            clear_fte_category(InsightType.movement_dysfunction_compensation, jwt, last_plan_date_time)
+            clear_fte_category_view(InsightType.movement_dysfunction_compensation,
+                                    VisualizationType.pain_functional_limitation, jwt, last_plan_date_time)
+            clear_fte_category_view(InsightType.movement_dysfunction_compensation,
+                                    VisualizationType.tight_overactice_underactive, jwt, last_plan_date_time)
+
+            additional_soreness_history = []
+            right_calf_no_question = sh.create_body_part_history(sh.new_persistent_pain_no_question(), 16, 2, True)
+            additional_soreness_history.append(right_calf_no_question)
+            right_it_band_no_question = sh.create_body_part_history(sh.new_persistent_pain_no_question(), 11, 2, True)
+            additional_soreness_history.append(right_it_band_no_question)
+            additional_soreness_new = sh.create_body_part_history(sh.new_persistent_pain_no_question(), 9, 2, True)
+            additional_soreness_history.append(additional_soreness_new)
+
+            persona1 = Persona(user_id)
+            persona1.soreness_history = additional_soreness_history
+            last_plan_date_time = persona1.create_history(days=20, suffix='', clear_history=False,
+                                                          start_date_time=datetime.now() + timedelta(days=20))
+
+            print(time.time() - start)
 

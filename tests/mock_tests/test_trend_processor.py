@@ -763,8 +763,8 @@ def test_agonist_capitalized():
     trend_processor.process_triggers()
 
     assert trend_processor.athlete_trend_categories[0].trends[0].trend_data.text == ("Athletes struggling with recurring Glute pain often develop "
-                                                                                     + "misalignments that over-stress the Hamstrings, Quads and Lower Back. "+
-                                                                                     "Without proactive measures, this can leading to accumulated micro trauma in "+
+                                                                                     + "misalignments that over-stress their Hamstrings, Quads and Lower Back. "+
+                                                                                     "Without proactive measures, this can lead to accumulated micro trauma in "+
                                                                                      "the tissues and new areas of pain or injury over time.")
 
 

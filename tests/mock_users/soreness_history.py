@@ -53,6 +53,9 @@ def persistent_pain_question():
 def persistent_pain_no_question():
     return pre_pad_with_nones([3, None, 3, None, None, 3, 3, None, 3, None, None, 2, None, None, None, None, None, None, None, 2])
 
+def new_persistent_pain_no_question():
+    return [3, None, 3, None, None, 3, 3, None, 3, None, None, 2, None, None, None, None, None, None, None, 2]
+
 def persistent_soreness_no_question_25_days():
     return pre_pad_with_nones([1, None, None, 2, None, None, 3, None, None, 2, None, None, 3, None, None, 3, 2, None, None, 2, None, None, 3, None, 3])
 
