@@ -102,9 +102,9 @@ class TrendProcessor(object):
         trend_category.trends.append(limitation_trend)
 
         modal = CategoryFirstTimeExperienceModal()
-        modal.title = "Tissue Related Insights"
+        modal.title = "Signs of Imbalance"
         modal.body = ("We monitor your data for signs of imbalances in  muscle activation, range of motion and more.\n\n" +
-                        "These imbalances can create inefficiency in speed & power productionover-strain tissues making them short and tight, and even increase soft tissue injury risk.\n\n" +
+                        "These imbalances can create inefficiency in speed & power production, over-strain tissues making them short and tight, and even increase soft tissue injury risk.\n\n" +
                         "We try to find and help address two types of body-part specific imbalances:")
         element_1 = FirstTimeExperienceElement()
         element_1.title = "Tissue Under\n& Over Activity"
@@ -117,7 +117,7 @@ class TrendProcessor(object):
         modal.categories.append(element_1)
         modal.categories.append(element_2)
 
-        modal.subtext = 'Tap “continue” to see your unique findings.'
+        modal.subtext = 'Tap “Continue” to see your unique findings.'
 
         trend_category.first_time_experience_modal = modal
 
@@ -125,12 +125,12 @@ class TrendProcessor(object):
 
     def create_limitation_trend(self):
         limitation_trend = Trend(TriggerType.hist_sore_greater_30)
-        limitation_trend.title = "Functional Limitation"
+        limitation_trend.title = "Injury Cycle Risks"
         limitation_trend.title_color = LegendColor.error_light
-        limitation_trend.text.append("Your pain is likely to affect supporting tissues, contributing to a cycle of soft tissue injury.")
+        limitation_trend.text.append("Your pain may lead to elevated strain on other muscles and soft tissue injury.")
         limitation_trend.text.append("Most people, knowingly or not, change the way they move to distribute force away from areas of pain. "+
                                      "This over-stresses supporting tissues and limbs which adopt more force and stress than they’re used to. "+
-                                     "This often leads to the development of new injuries. See your factors below.")
+                                     "This often leads accumulated muscle damage and the eventual development of new injuries. See your factors below.")
 
         # bold_text_1 = BoldText()
         # bold_text_1.text = "Really"
@@ -158,10 +158,10 @@ class TrendProcessor(object):
 
     def create_muscle_trend(self):
         muscle_trend = Trend(TriggerType.hist_pain)
-        muscle_trend.title = "Muscle Over & Under-activity"
+        muscle_trend.title = "Muscle Over & Under-Activity"
         muscle_trend.title_color = LegendColor.warning_light
         muscle_trend.text.append("Your data suggests you may have some imbalances in muscle activation which can lead to performance inefficiencies like decreased speed and power output.")
-        muscle_trend.text.append("If these imbalances persist, they can turn into strength dysfunctions which alter your biomechanics and elevate sort tissue injury risk."+
+        muscle_trend.text.append("If these imbalances persist, they can turn into strength dysfunctions which alter your biomechanics and elevate soft tissue injury risk."+
                                  " Addressing these imbalances early is important for athletic resilience.")
 
         # bold_text_1 = BoldText()
@@ -266,7 +266,8 @@ class TrendProcessor(object):
     def get_plan_alert(self, new_modified_trigger_count, plan_alert_short_title, trend_category_index, visible_trends):
 
         #header_text = str(new_modified_trigger_count) + " Tissue Related Insights"
-        header_text = "New Tissue Related Insights"
+        #header_text = "New Tissue Related Insights"
+        header_text = "Signs of Imbalance"
         body_text = "Signs of " + plan_alert_short_title
         if len(visible_trends) > 1:
             # we're bringing this back later
@@ -274,7 +275,7 @@ class TrendProcessor(object):
             #     body_text += " and " + str(len(visible_trends) - 1) + " other meaningful insight"
             # else:
             #     body_text += " and " + str(len(visible_trends) - 1) + " other meaningful insights"
-            body_text += " and other meaningful insights"
+            body_text += " and other insights"
         body_text += " in your data. Tap to view more."
         plan_alert = PlanAlert(self.athlete_trend_categories[trend_category_index].insight_type)
         plan_alert.title = header_text
@@ -284,7 +285,7 @@ class TrendProcessor(object):
         plan_alert.bold_text.append(bold_text_1)
         return plan_alert
 
-    def get_title_text_for_body_parts(self, body_parts, side):
+    def get_title_text_for_body_parts(self, body_parts, side, use_plural=True):
 
         text_generator = RecoveryTextGenerator()
         body_part_factory = BodyPartFactory()
@@ -311,8 +312,13 @@ class TrendProcessor(object):
 
         for b in range(0, len(sorted_body_parts)):
             if side == 0:
-                body_part_text = text_generator.get_body_part_text_plural(sorted_body_parts[b].location,
-                                                                       side).title()
+                if use_plural:
+                    body_part_text = text_generator.get_body_part_text_plural(sorted_body_parts[b].location,
+                                                                           side).title()
+                else:
+                    body_part_text = text_generator.get_body_part_text(sorted_body_parts[b].location,
+                                                                              side).title()
+
             else:
                 if sorted_body_parts[b].bilateral:
                     body_part_text = text_generator.get_body_part_text(sorted_body_parts[b].location,
@@ -422,7 +428,7 @@ class TrendProcessor(object):
             body_part_text = text_generator.get_body_part_text(trend.top_priority_trigger.body_part.body_part_location, None)
             body_part_text = body_part_text.title()
 
-            if trend.top_priority_trigger.priority == 2:
+            if trend.top_priority_trigger.priority == 1:
                 title_body_part_text = self.get_title_text_for_body_parts(trend.top_priority_trigger.antagonists, side)
                 trend_data.title = "Elevated strain on " + title_body_part_text
                 trend.plan_alert_short_title = "elevated strain on " + title_body_part_text
@@ -432,8 +438,10 @@ class TrendProcessor(object):
                 trend.dashboard_body_part, trend.dashboard_body_part_text = self.get_title_body_part_and_text(trend.top_priority_trigger.antagonists, side)
             else:
                 title_body_part_text = self.get_title_text_for_body_parts(trend.top_priority_trigger.synergists, side)
+                title_body_part_text_not_plural = self.get_title_text_for_body_parts(trend.top_priority_trigger.synergists, side, use_plural=False)
                 trend_data.title = title_body_part_text + " may lack strength"
-                trend.plan_alert_short_title = title_body_part_text + " weakness"
+                #trend.plan_alert_short_title = title_body_part_text + " weakness"
+                trend.plan_alert_short_title = title_body_part_text_not_plural + " weakness"
                 clean_title_body_part_text = title_body_part_text.replace('&','and')
                 body_text = ("Patterns in your soreness data suggest that your " + body_part_text + " may actually be overactive due to a chronic over-compensation for a weak "
                              + clean_title_body_part_text + ".  This dysfunction could exacerbate movement imbalances and elevate your risk of chronic injury.")
@@ -485,11 +493,11 @@ class TrendProcessor(object):
 
     def get_over_under_active_dashboard_card(self, category_index, trend):
         trend_dashboard_category = TrendDashboardCategory(self.athlete_trend_categories[category_index].insight_type)
-        trend_dashboard_category.title = "Tissue Related Insights"
-        if trend.top_priority_trigger.priority == 2:
-            trend_dashboard_category.text = "Signs of elevated strain on"
+        trend_dashboard_category.title = "Signs of Imbalance"
+        if trend.top_priority_trigger.priority == 1:
+            trend_dashboard_category.text = "Elevated strain on"
         else:
-            trend_dashboard_category.text = "Signs of weakness in"
+            trend_dashboard_category.text = "Potential weakness in"
         trend_dashboard_category.body_part = trend.dashboard_body_part
         trend_dashboard_category.body_part_text = trend.dashboard_body_part_text
         trend_dashboard_category.color = LegendColor.splash_x_light
@@ -646,7 +654,7 @@ class TrendProcessor(object):
             trend.plan_alert_short_title = "elevated strain on " + title_body_part_text
             clean_title_body_part_text = title_body_part_text.replace('&','and')
             body_text = ("Athletes struggling with recurring " + body_part_text + " pain often develop misalignments that over-stress their "+ clean_title_body_part_text +
-                         ". Without proactive measures, this can lead to accumulated micro trauma in the tissues and new areas of pain or injury over time.")
+                         ". Without proactive measures, this can lead to accumulated micro-trauma in the tissues and new areas of pain or injury over time.")
             trend.dashboard_body_part, trend.dashboard_body_part_text = self.get_title_body_part_and_text(
                 trend.top_priority_trigger.synergists, side)
 
@@ -679,8 +687,8 @@ class TrendProcessor(object):
 
     def get_functional_limitation_dashboard_card(self, category_index, trend):
         trend_dashboard_category = TrendDashboardCategory(self.athlete_trend_categories[category_index].insight_type)
-        trend_dashboard_category.title = "Tissue Related Insights"
-        trend_dashboard_category.text = "Signs of elevated strain on"
+        trend_dashboard_category.title = "Signs of Imbalance"
+        trend_dashboard_category.text = "Elevated strain on"
         trend_dashboard_category.color = LegendColor.warning_light
         trend_dashboard_category.body_part = trend.dashboard_body_part
         trend_dashboard_category.body_part_text = trend.dashboard_body_part_text
