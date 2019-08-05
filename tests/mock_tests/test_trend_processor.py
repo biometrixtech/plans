@@ -302,7 +302,7 @@ def test_both_sides_body_text_overactive():
 
     trend_processor.process_triggers()
 
-    assert trend_processor.athlete_trend_categories[0].trends[0].trend_data.title == "Right Quad may lack strength"
+    assert trend_processor.athlete_trend_categories[0].trends[0].trend_data.title == "Right Calf & Right Foot may lack strength"
 
 
 def test_one_side_body_text_overactive():
@@ -327,7 +327,7 @@ def test_one_side_body_text_overactive():
 
     trend_processor.process_triggers()
 
-    assert trend_processor.athlete_trend_categories[0].trends[0].trend_data.title == "Left Quad may lack strength"
+    assert trend_processor.athlete_trend_categories[0].trends[0].trend_data.title == "Left Calf & Left Foot may lack strength"
 
 
 def test_both_sides_body_text_functional_limitation():
@@ -450,9 +450,9 @@ def test_one_side_body_dashboard_muscle_overactivity():
     trend_processor.process_triggers()
 
     assert trend_processor.dashboard_categories[0].title == "Signs of Imbalance"
-    assert trend_processor.dashboard_categories[0].body_part.body_part_location == BodyPartLocation.quads
+    assert trend_processor.dashboard_categories[0].body_part.body_part_location == BodyPartLocation.calves
     assert trend_processor.dashboard_categories[0].body_part.side == 1
-    assert trend_processor.dashboard_categories[0].body_part_text == "Left Quad"
+    assert trend_processor.dashboard_categories[0].body_part_text == "Left Calf"
     assert trend_processor.dashboard_categories[0].text == "Potential weakness in"
 
 
@@ -488,9 +488,9 @@ def test_two_side_body_dashboard_muscle_overactivity():
     trend_processor.process_triggers()
 
     assert trend_processor.dashboard_categories[0].title == "Signs of Imbalance"
-    assert trend_processor.dashboard_categories[0].body_part.body_part_location == BodyPartLocation.quads
+    assert trend_processor.dashboard_categories[0].body_part.body_part_location == BodyPartLocation.calves
     assert trend_processor.dashboard_categories[0].body_part.side is None
-    assert trend_processor.dashboard_categories[0].body_part_text == "Quads"
+    assert trend_processor.dashboard_categories[0].body_part_text == "Calves"
     assert trend_processor.dashboard_categories[0].text == "Potential weakness in"
 
 
@@ -536,11 +536,11 @@ def test_two_side_body_dashboard_muscle_overactivity_and_more():
     trend_processor.process_triggers()
 
     assert trend_processor.dashboard_categories[0].title == "Signs of Imbalance"
-    assert trend_processor.dashboard_categories[0].body_part.body_part_location == BodyPartLocation.quads
+    assert trend_processor.dashboard_categories[0].body_part.body_part_location == BodyPartLocation.calves
     assert trend_processor.dashboard_categories[0].body_part.side is None
-    assert trend_processor.dashboard_categories[0].body_part_text == "Quads and more..."
+    assert trend_processor.dashboard_categories[0].body_part_text == "Calves and more..."
     assert trend_processor.dashboard_categories[0].text == "Potential weakness in"
-    assert trend_processor.athlete_trend_categories[0].plan_alerts[0].text == "Signs of Quad weakness and other insights in your data. Tap to view more."
+    assert trend_processor.athlete_trend_categories[0].plan_alerts[0].text == "Signs of Calf & Foot weakness and other insights in your data. Tap to view more."
 
 
 def test_cleared_plan_alert():
@@ -565,9 +565,9 @@ def test_cleared_plan_alert():
 
     trend_processor.process_triggers()
 
-    assert trend_processor.athlete_trend_categories[0].plan_alerts[0].text == 'Signs of Left Quad weakness in your data. Tap to view more.'
+    assert trend_processor.athlete_trend_categories[0].plan_alerts[0].text == 'Signs of Left Calf & Left Foot weakness in your data. Tap to view more.'
     assert trend_processor.athlete_trend_categories[0].plan_alerts[0].title == 'Signs of Imbalance'
-    assert trend_processor.athlete_trend_categories[0].plan_alerts[0].bold_text[0].text == 'Left Quad weakness'
+    assert trend_processor.athlete_trend_categories[0].plan_alerts[0].bold_text[0].text == 'Left Calf & Left Foot weakness'
 
     trend_processor.athlete_trend_categories[0].plan_alerts[0].cleared_date_time = datetime.now()
 
@@ -610,9 +610,9 @@ def test_bilateral_body_parts():
 
     trend_processor.process_triggers()
 
-    assert trend_processor.athlete_trend_categories[0].plan_alerts[0].text == 'Signs of Quad weakness in your data. Tap to view more.'
+    assert trend_processor.athlete_trend_categories[0].plan_alerts[0].text == 'Signs of Calf & Foot weakness in your data. Tap to view more.'
     assert trend_processor.athlete_trend_categories[0].plan_alerts[0].title == 'Signs of Imbalance'
-    assert trend_processor.athlete_trend_categories[0].plan_alerts[0].bold_text[0].text == 'Quad weakness'
+    assert trend_processor.athlete_trend_categories[0].plan_alerts[0].bold_text[0].text == 'Calf & Foot weakness'
 
 
 def test_non_duplicating_pain_body_parts():
