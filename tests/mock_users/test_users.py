@@ -1,7 +1,7 @@
 domain = "@200.com"
 
 users = [
-    #"full_fte", #6a91a0cb-2c90-4b93-94d2-a943c6284af7
+    "full_fte", #6a91a0cb-2c90-4b93-94d2-a943c6284af7
     #"sore_fte",
     # "near_clear",
     # "two_sore",
@@ -12,7 +12,7 @@ users = [
     # "two_sore_2",
     #"two_pain_2",
     #"pain_sore" #d295beff-701c-448b-9e17-a5aba60b1e36,
-    "three_pain" #8cc57568-073f-4aeb-9ae2-4bb7c39297a1
+    #"three_pain" #8cc57568-073f-4aeb-9ae2-4bb7c39297a1
 ]
 
 def get_test_users():
