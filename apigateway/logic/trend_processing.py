@@ -429,23 +429,23 @@ class TrendProcessor(object):
             body_part_text = body_part_text.title()
 
             if trend.top_priority_trigger.priority == 1:
-                title_body_part_text = self.get_title_text_for_body_parts(trend.top_priority_trigger.antagonists, side)
+                title_body_part_text = self.get_title_text_for_body_parts(trend.top_priority_trigger.synergists, side)
                 trend_data.title = "Elevated strain on " + title_body_part_text
                 trend.plan_alert_short_title = "elevated strain on " + title_body_part_text
                 clean_title_body_part_text = title_body_part_text.replace('&', 'and')
                 body_text = ("Signs of " + body_part_text + " overactivity in your soreness data suggest that supporting tissues like the " + clean_title_body_part_text +
                             " are experiencing elevated levels of strain which can lead to tissue fatigue and strength imbalances that affect performance and increase injury risk.")
-                trend.dashboard_body_part, trend.dashboard_body_part_text = self.get_title_body_part_and_text(trend.top_priority_trigger.antagonists, side)
+                trend.dashboard_body_part, trend.dashboard_body_part_text = self.get_title_body_part_and_text(trend.top_priority_trigger.synergists, side)
             else:
-                title_body_part_text = self.get_title_text_for_body_parts(trend.top_priority_trigger.synergists, side)
-                title_body_part_text_not_plural = self.get_title_text_for_body_parts(trend.top_priority_trigger.synergists, side, use_plural=False)
+                title_body_part_text = self.get_title_text_for_body_parts(trend.top_priority_trigger.antagonists, side)
+                title_body_part_text_not_plural = self.get_title_text_for_body_parts(trend.top_priority_trigger.antagonists, side, use_plural=False)
                 trend_data.title = title_body_part_text + " may lack strength"
                 #trend.plan_alert_short_title = title_body_part_text + " weakness"
                 trend.plan_alert_short_title = title_body_part_text_not_plural + " weakness"
                 clean_title_body_part_text = title_body_part_text.replace('&','and')
                 body_text = ("Patterns in your soreness data suggest that your " + body_part_text + " may actually be overactive due to a chronic over-compensation for a weak "
                              + clean_title_body_part_text + ".  This dysfunction could exacerbate movement imbalances and elevate your risk of chronic injury.")
-                trend.dashboard_body_part, trend.dashboard_body_part_text = self.get_title_body_part_and_text(trend.top_priority_trigger.synergists, side)
+                trend.dashboard_body_part, trend.dashboard_body_part_text = self.get_title_body_part_and_text(trend.top_priority_trigger.antagonists, side)
             # if is_plural:
             #     trend_data.title = "Your " + trigger_header_text + " are overactive"
             # else:
@@ -460,7 +460,7 @@ class TrendProcessor(object):
             bold_text_3.color = LegendColor.warning_light
             trend_data.bold_text.append(bold_text_3)
 
-            if trend.top_priority_trigger.priority == 2:
+            if trend.top_priority_trigger.priority == 1:
 
                 bold_text_4 = BoldText()
                 bold_text_4.text = clean_title_body_part_text
