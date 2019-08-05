@@ -1,5 +1,5 @@
 # import datetime
-from mock_config import get_mongo_collection
+from config_mock import get_mongo_collection
 import datetime
 from models.daily_plan import DailyPlan
 from models.daily_readiness import DailyReadiness

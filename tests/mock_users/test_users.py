@@ -5,14 +5,16 @@ users = [
     #"sore_fte",
     # "near_clear",
     # "two_sore",
-    #"two_pain",
+    "two_pain",
     #"full_fte_2",
     # "sore_fte_2",
     # "near_clear_2",
     # "two_sore_2",
-    #"two_pain_2",
-    #"pain_sore" #d295beff-701c-448b-9e17-a5aba60b1e36,
-    "three_pain" #8cc57568-073f-4aeb-9ae2-4bb7c39297a1
+    #"two_pain_2", #c82d4f18-efba-421e-b28f-bab349ebd3c1
+    #"pain_sore", #d295beff-701c-448b-9e17-a5aba60b1e36,
+    #"three_pain", #8cc57568-073f-4aeb-9ae2-4bb7c39297a1
+    #"pain_sore_2",
+    #"three_pain_2",
 ]
 
 def get_test_users():

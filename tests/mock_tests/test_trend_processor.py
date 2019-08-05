@@ -33,7 +33,7 @@ def test_trigger_19():
 
     assert trend_processor.athlete_trend_categories[0].visible is True
     assert trend_processor.athlete_trend_categories[0].trends[0].visible is True
-    assert trend_processor.athlete_trend_categories[0].trends[0].title == "Muscle Over & Under-activity"
+    assert trend_processor.athlete_trend_categories[0].trends[0].title == "Muscle Over & Under-Activity"
     assert trend_processor.athlete_trend_categories[0].trends[0].last_date_time == now_time_2
     assert trend_processor.athlete_trend_categories[0].trends[1].visible is False
 
@@ -66,7 +66,7 @@ def test_trigger_16():
 
     assert trend_processor.athlete_trend_categories[0].visible is True
     assert trend_processor.athlete_trend_categories[0].trends[0].visible is True
-    assert trend_processor.athlete_trend_categories[0].trends[0].title == "Functional Limitation"
+    assert trend_processor.athlete_trend_categories[0].trends[0].title == "Injury Cycle Risks"
     assert trend_processor.athlete_trend_categories[0].trends[0].last_date_time == now_time_2
     assert trend_processor.athlete_trend_categories[0].trends[1].visible is False
 
@@ -107,7 +107,7 @@ def test_pain_view_breaks_tie():
 
     assert trend_processor.athlete_trend_categories[0].visible is True
     assert trend_processor.athlete_trend_categories[0].trends[0].visible is True
-    assert trend_processor.athlete_trend_categories[0].trends[0].title == "Functional Limitation"
+    assert trend_processor.athlete_trend_categories[0].trends[0].title == "Injury Cycle Risks"
     assert trend_processor.athlete_trend_categories[0].trends[0].last_date_time == now_time_2
     assert trend_processor.athlete_trend_categories[0].trends[1].visible is True
 
@@ -146,7 +146,7 @@ def test_soreness_beats_pain_if_newer():
 
     assert trend_processor.athlete_trend_categories[0].visible is True
     assert trend_processor.athlete_trend_categories[0].trends[0].visible is True
-    assert trend_processor.athlete_trend_categories[0].trends[0].title == "Muscle Over & Under-activity"
+    assert trend_processor.athlete_trend_categories[0].trends[0].title == "Muscle Over & Under-Activity"
     assert trend_processor.athlete_trend_categories[0].trends[0].last_date_time == now_time
     assert trend_processor.athlete_trend_categories[0].trends[1].visible is True
 
@@ -188,7 +188,7 @@ def test_no_triggers_clear_all():
 
     assert trend_processor.athlete_trend_categories[0].visible is True
     assert trend_processor.athlete_trend_categories[0].trends[0].visible is True
-    assert trend_processor.athlete_trend_categories[0].trends[0].title == "Muscle Over & Under-activity"
+    assert trend_processor.athlete_trend_categories[0].trends[0].title == "Muscle Over & Under-Activity"
     assert trend_processor.athlete_trend_categories[0].trends[0].last_date_time == now_time_2
     assert trend_processor.athlete_trend_categories[0].trends[1].visible is True
 
@@ -240,7 +240,7 @@ def test_first_time_experience_doesnt_first():
     assert trend_processor.athlete_trend_categories[0].visible is True
     assert trend_processor.athlete_trend_categories[0].first_time_experience is True
     assert trend_processor.athlete_trend_categories[0].trends[0].visible is True
-    assert trend_processor.athlete_trend_categories[0].trends[0].title == "Muscle Over & Under-activity"
+    assert trend_processor.athlete_trend_categories[0].trends[0].title == "Muscle Over & Under-Activity"
     assert trend_processor.athlete_trend_categories[0].trends[0].last_date_time == now_time_2
     assert trend_processor.athlete_trend_categories[0].trends[1].visible is True
 
@@ -253,7 +253,7 @@ def test_first_time_experience_doesnt_first():
     assert trend_processor.athlete_trend_categories[0].visible is True
     assert trend_processor.athlete_trend_categories[0].first_time_experience is False
     assert trend_processor.athlete_trend_categories[0].trends[0].visible is True
-    assert trend_processor.athlete_trend_categories[0].trends[0].title == "Muscle Over & Under-activity"
+    assert trend_processor.athlete_trend_categories[0].trends[0].title == "Muscle Over & Under-Activity"
     assert trend_processor.athlete_trend_categories[0].trends[0].last_date_time == now_time_2
     assert trend_processor.athlete_trend_categories[0].trends[1].visible is True
 
@@ -302,7 +302,7 @@ def test_both_sides_body_text_overactive():
 
     trend_processor.process_triggers()
 
-    assert trend_processor.athlete_trend_categories[0].trends[0].trend_data.title == "Elevated strain on Right Calf & Right Foot"
+    assert trend_processor.athlete_trend_categories[0].trends[0].trend_data.title == "Right Quad may lack strength"
 
 
 def test_one_side_body_text_overactive():
@@ -327,7 +327,7 @@ def test_one_side_body_text_overactive():
 
     trend_processor.process_triggers()
 
-    assert trend_processor.athlete_trend_categories[0].trends[0].trend_data.title == "Elevated strain on Left Calf & Left Foot"
+    assert trend_processor.athlete_trend_categories[0].trends[0].trend_data.title == "Left Quad may lack strength"
 
 
 def test_both_sides_body_text_functional_limitation():
@@ -421,11 +421,11 @@ def test_one_side_body_dashboard_functional_limitation():
 
     trend_processor.process_triggers()
 
-    assert trend_processor.dashboard_categories[0].title == "Tissue Related Insights"
+    assert trend_processor.dashboard_categories[0].title == "Signs of Imbalance"
     assert trend_processor.dashboard_categories[0].body_part.body_part_location == BodyPartLocation.quads
     assert trend_processor.dashboard_categories[0].body_part.side == 1
     assert trend_processor.dashboard_categories[0].body_part_text == "Left Quad"
-    assert trend_processor.dashboard_categories[0].text == "Signs of elevated strain on"
+    assert trend_processor.dashboard_categories[0].text == "Elevated strain on"
 
 
 def test_one_side_body_dashboard_muscle_overactivity():
@@ -449,11 +449,11 @@ def test_one_side_body_dashboard_muscle_overactivity():
 
     trend_processor.process_triggers()
 
-    assert trend_processor.dashboard_categories[0].title == "Tissue Related Insights"
-    assert trend_processor.dashboard_categories[0].body_part.body_part_location == BodyPartLocation.calves
+    assert trend_processor.dashboard_categories[0].title == "Signs of Imbalance"
+    assert trend_processor.dashboard_categories[0].body_part.body_part_location == BodyPartLocation.quads
     assert trend_processor.dashboard_categories[0].body_part.side == 1
-    assert trend_processor.dashboard_categories[0].body_part_text == "Left Calf"
-    assert trend_processor.dashboard_categories[0].text == "Signs of elevated strain on"
+    assert trend_processor.dashboard_categories[0].body_part_text == "Left Quad"
+    assert trend_processor.dashboard_categories[0].text == "Potential weakness in"
 
 
 def test_two_side_body_dashboard_muscle_overactivity():
@@ -487,11 +487,11 @@ def test_two_side_body_dashboard_muscle_overactivity():
 
     trend_processor.process_triggers()
 
-    assert trend_processor.dashboard_categories[0].title == "Tissue Related Insights"
-    assert trend_processor.dashboard_categories[0].body_part.body_part_location == BodyPartLocation.calves
+    assert trend_processor.dashboard_categories[0].title == "Signs of Imbalance"
+    assert trend_processor.dashboard_categories[0].body_part.body_part_location == BodyPartLocation.quads
     assert trend_processor.dashboard_categories[0].body_part.side is None
-    assert trend_processor.dashboard_categories[0].body_part_text == "Calves"
-    assert trend_processor.dashboard_categories[0].text == "Signs of elevated strain on"
+    assert trend_processor.dashboard_categories[0].body_part_text == "Quads"
+    assert trend_processor.dashboard_categories[0].text == "Potential weakness in"
 
 
 def test_two_side_body_dashboard_muscle_overactivity_and_more():
@@ -535,12 +535,12 @@ def test_two_side_body_dashboard_muscle_overactivity_and_more():
 
     trend_processor.process_triggers()
 
-    assert trend_processor.dashboard_categories[0].title == "Tissue Related Insights"
-    assert trend_processor.dashboard_categories[0].body_part.body_part_location == BodyPartLocation.calves
+    assert trend_processor.dashboard_categories[0].title == "Signs of Imbalance"
+    assert trend_processor.dashboard_categories[0].body_part.body_part_location == BodyPartLocation.quads
     assert trend_processor.dashboard_categories[0].body_part.side is None
-    assert trend_processor.dashboard_categories[0].body_part_text == "Calves and more..."
-    assert trend_processor.dashboard_categories[0].text == "Signs of elevated strain on"
-    assert trend_processor.athlete_trend_categories[0].plan_alerts[0].text == "Signs of elevated strain on Calves & Feet and other meaningful insights in your data. Tap to view more."
+    assert trend_processor.dashboard_categories[0].body_part_text == "Quads and more..."
+    assert trend_processor.dashboard_categories[0].text == "Potential weakness in"
+    assert trend_processor.athlete_trend_categories[0].plan_alerts[0].text == "Signs of Quad weakness and other insights in your data. Tap to view more."
 
 
 def test_cleared_plan_alert():
@@ -565,9 +565,9 @@ def test_cleared_plan_alert():
 
     trend_processor.process_triggers()
 
-    assert trend_processor.athlete_trend_categories[0].plan_alerts[0].text == 'Signs of elevated strain on Left Calf & Left Foot in your data. Tap to view more.'
-    assert trend_processor.athlete_trend_categories[0].plan_alerts[0].title == 'New Tissue Related Insights'
-    assert trend_processor.athlete_trend_categories[0].plan_alerts[0].bold_text[0].text == 'elevated strain on Left Calf & Left Foot'
+    assert trend_processor.athlete_trend_categories[0].plan_alerts[0].text == 'Signs of Left Quad weakness in your data. Tap to view more.'
+    assert trend_processor.athlete_trend_categories[0].plan_alerts[0].title == 'Signs of Imbalance'
+    assert trend_processor.athlete_trend_categories[0].plan_alerts[0].bold_text[0].text == 'Left Quad weakness'
 
     trend_processor.athlete_trend_categories[0].plan_alerts[0].cleared_date_time = datetime.now()
 
@@ -610,9 +610,9 @@ def test_bilateral_body_parts():
 
     trend_processor.process_triggers()
 
-    assert trend_processor.athlete_trend_categories[0].plan_alerts[0].text == 'Signs of elevated strain on Calves & Feet in your data. Tap to view more.'
-    assert trend_processor.athlete_trend_categories[0].plan_alerts[0].title == 'New Tissue Related Insights'
-    assert trend_processor.athlete_trend_categories[0].plan_alerts[0].bold_text[0].text == 'elevated strain on Calves & Feet'
+    assert trend_processor.athlete_trend_categories[0].plan_alerts[0].text == 'Signs of Quad weakness in your data. Tap to view more.'
+    assert trend_processor.athlete_trend_categories[0].plan_alerts[0].title == 'Signs of Imbalance'
+    assert trend_processor.athlete_trend_categories[0].plan_alerts[0].bold_text[0].text == 'Quad weakness'
 
 
 def test_non_duplicating_pain_body_parts():
@@ -648,7 +648,7 @@ def test_non_duplicating_pain_body_parts():
     trend_processor.process_triggers()
 
     assert trend_processor.athlete_trend_categories[0].plan_alerts[0].text == 'Signs of elevated strain on Hamstrings & Lats in your data. Tap to view more.'
-    assert trend_processor.athlete_trend_categories[0].plan_alerts[0].title == 'New Tissue Related Insights'
+    assert trend_processor.athlete_trend_categories[0].plan_alerts[0].title == 'Signs of Imbalance'
     assert trend_processor.athlete_trend_categories[0].plan_alerts[0].bold_text[0].text == 'elevated strain on Hamstrings & Lats'
 
 
@@ -685,7 +685,7 @@ def test_bilateral_body_parts_3_elements():
     trend_processor.process_triggers()
 
     assert trend_processor.athlete_trend_categories[0].plan_alerts[0].text == 'Signs of elevated strain on Hamstrings, Quads & Lower Back in your data. Tap to view more.'
-    assert trend_processor.athlete_trend_categories[0].plan_alerts[0].title == 'New Tissue Related Insights'
+    assert trend_processor.athlete_trend_categories[0].plan_alerts[0].title == 'Signs of Imbalance'
     assert trend_processor.athlete_trend_categories[0].plan_alerts[0].bold_text[0].text == 'elevated strain on Hamstrings, Quads & Lower Back'
 
 
@@ -764,7 +764,7 @@ def test_agonist_capitalized():
 
     assert trend_processor.athlete_trend_categories[0].trends[0].trend_data.text == ("Athletes struggling with recurring Glute pain often develop "
                                                                                      + "misalignments that over-stress their Hamstrings, Quads and Lower Back. "+
-                                                                                     "Without proactive measures, this can lead to accumulated micro trauma in "+
+                                                                                     "Without proactive measures, this can lead to accumulated micro-trauma in "+
                                                                                      "the tissues and new areas of pain or injury over time.")
 
 
@@ -801,7 +801,7 @@ def test_partial_bilateral_body_parts_3_elements():
     trend_processor.process_triggers()
 
     assert trend_processor.athlete_trend_categories[0].plan_alerts[0].text == 'Signs of elevated strain on Right Hamstring, Right Quad & Lower Back in your data. Tap to view more.'
-    assert trend_processor.athlete_trend_categories[0].plan_alerts[0].title == 'New Tissue Related Insights'
+    assert trend_processor.athlete_trend_categories[0].plan_alerts[0].title == 'Signs of Imbalance'
     assert trend_processor.athlete_trend_categories[0].plan_alerts[0].bold_text[0].text == 'elevated strain on Right Hamstring, Right Quad & Lower Back'
 
 

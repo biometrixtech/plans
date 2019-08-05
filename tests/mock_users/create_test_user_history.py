@@ -126,7 +126,7 @@ if __name__ == '__main__':
             clear_fte_category_view(InsightType.movement_dysfunction_compensation,
                                     VisualizationType.tight_overactice_underactive, jwt, last_plan_date_time)
             print(time.time() - start)
-        elif u == "pain_sore@200.com":
+        elif u == "pain_sore@200.com" or u == "pain_sore_2@200.com":
             soreness_history = []
             lower_back_no_question = sh.create_body_part_history(sh.persistent2_no_question(), 12, 0, True)
             soreness_history.append(lower_back_no_question)
@@ -147,7 +147,7 @@ if __name__ == '__main__':
             last_plan_date_time = persona1.create_history(days=2, suffix='', clear_history=False, start_date_time=datetime.now()+timedelta(days=2))
 
             print(time.time() - start)
-        elif u == "three_pain@200.com":
+        elif u == "three_pain@200.com" or u == "three_pain_2@200.com":
             soreness_history = []
             right_calf_no_question = sh.create_body_part_history(sh.persistent2_no_question(), 16, 2, True)
             soreness_history.append(right_calf_no_question)
