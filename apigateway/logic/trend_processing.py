@@ -425,7 +425,11 @@ class TrendProcessor(object):
             else:
                 side = trend.top_priority_trigger.body_part.side
 
-            body_part_text = text_generator.get_body_part_text(trend.top_priority_trigger.body_part.body_part_location, None)
+            if is_body_part_plural:
+                body_part_text = text_generator.get_body_part_text_plural(
+                    trend.top_priority_trigger.body_part.body_part_location, None)
+            else:
+                body_part_text = text_generator.get_body_part_text(trend.top_priority_trigger.body_part.body_part_location, None)
             body_part_text = body_part_text.title()
 
             if trend.top_priority_trigger.priority == 1:
