@@ -689,6 +689,153 @@ def test_bilateral_body_parts_3_elements():
     assert trend_processor.athlete_trend_categories[0].plan_alerts[0].bold_text[0].text == 'elevated strain on Hamstrings, Quads & Lower Back'
 
 
+
+def test_body_part_surrounding_text_singular():
+
+    trigger_list = []
+    body_part_factory = BodyPartFactory()
+    trigger_factory = TriggerFactory(datetime.now(), None, [], [])
+
+    now_time = datetime.now()
+
+    trigger = Trigger(TriggerType.hist_sore_greater_30)
+    trigger.body_part = BodyPartSide(body_part_location=BodyPartLocation(21), side=1)
+    body_part = body_part_factory.get_body_part(trigger.body_part)
+    trigger.synergists = trigger_factory.convert_body_part_list(trigger.body_part, body_part.synergists)
+    trigger.antagonists = trigger_factory.convert_body_part_list(trigger.body_part, body_part.antagonists)
+    trigger.created_date_time = now_time
+    trigger.source_date_time = now_time
+
+    trigger_list.append(trigger)
+
+    trigger_2 = Trigger(TriggerType.hist_sore_greater_30)
+    trigger_2.body_part = BodyPartSide(body_part_location=BodyPartLocation(21), side=2)
+    body_part_2 = body_part_factory.get_body_part(trigger_2.body_part)
+    trigger_2.synergists = trigger_factory.convert_body_part_list(trigger_2.body_part, body_part_2.synergists)
+    trigger_2.antagonists = trigger_factory.convert_body_part_list(trigger_2.body_part, body_part_2.antagonists)
+    trigger_2.created_date_time = now_time
+    trigger_2.source_date_time = now_time
+
+    trigger_list.append(trigger_2)
+
+    trend_processor = TrendProcessor(trigger_list)
+
+    trend_processor.process_triggers()
+
+    assert trend_processor.athlete_trend_categories[0].trends[0].trend_data.text == ("Patterns in your soreness data suggest that your Lats "+
+                                                                                     "may actually be overactive due to a chronic over-compensation for weak Shoulders and Biceps.  "+
+                                                                                     "This dysfunction could exacerbate movement imbalances and elevate your risk of chronic injury.")
+
+def test_body_part_surrounding_text_plural():
+
+    trigger_list = []
+    body_part_factory = BodyPartFactory()
+    trigger_factory = TriggerFactory(datetime.now(), None, [], [])
+
+    now_time = datetime.now()
+
+    trigger = Trigger(TriggerType.hist_sore_greater_30)
+    trigger.body_part = BodyPartSide(body_part_location=BodyPartLocation(22), side=1)
+    body_part = body_part_factory.get_body_part(trigger.body_part)
+    trigger.synergists = trigger_factory.convert_body_part_list(trigger.body_part, body_part.synergists)
+    trigger.antagonists = trigger_factory.convert_body_part_list(trigger.body_part, body_part.antagonists)
+    trigger.created_date_time = now_time
+    trigger.source_date_time = now_time
+
+    trigger_list.append(trigger)
+
+    trigger_2 = Trigger(TriggerType.hist_sore_greater_30)
+    trigger_2.body_part = BodyPartSide(body_part_location=BodyPartLocation(23), side=1)
+    body_part_2 = body_part_factory.get_body_part(trigger_2.body_part)
+    trigger_2.synergists = trigger_factory.convert_body_part_list(trigger_2.body_part, body_part_2.synergists)
+    trigger_2.antagonists = trigger_factory.convert_body_part_list(trigger_2.body_part, body_part_2.antagonists)
+    trigger_2.created_date_time = now_time
+    trigger_2.source_date_time = now_time
+
+    trigger_list.append(trigger_2)
+
+    trend_processor = TrendProcessor(trigger_list)
+
+    trend_processor.process_triggers()
+
+    assert trend_processor.athlete_trend_categories[0].trends[0].trend_data.text == ("Patterns in your soreness data suggest that your Bicep "+
+                                                                                     "may actually be overactive due to a chronic over-compensation for a weak Left Tricep.  "+
+                                                                                     "This dysfunction could exacerbate movement imbalances and elevate your risk of chronic injury.")
+
+def test_body_part_surrounding_text_plural_both_sides():
+
+    trigger_list = []
+    body_part_factory = BodyPartFactory()
+    trigger_factory = TriggerFactory(datetime.now(), None, [], [])
+
+    now_time = datetime.now()
+
+    trigger = Trigger(TriggerType.hist_sore_greater_30)
+    trigger.body_part = BodyPartSide(body_part_location=BodyPartLocation(22), side=1)
+    body_part = body_part_factory.get_body_part(trigger.body_part)
+    trigger.synergists = trigger_factory.convert_body_part_list(trigger.body_part, body_part.synergists)
+    trigger.antagonists = trigger_factory.convert_body_part_list(trigger.body_part, body_part.antagonists)
+    trigger.created_date_time = now_time
+    trigger.source_date_time = now_time
+
+    trigger_list.append(trigger)
+
+    trigger_2 = Trigger(TriggerType.hist_sore_greater_30)
+    trigger_2.body_part = BodyPartSide(body_part_location=BodyPartLocation(22), side=2)
+    body_part_2 = body_part_factory.get_body_part(trigger_2.body_part)
+    trigger_2.synergists = trigger_factory.convert_body_part_list(trigger_2.body_part, body_part_2.synergists)
+    trigger_2.antagonists = trigger_factory.convert_body_part_list(trigger_2.body_part, body_part_2.antagonists)
+    trigger_2.created_date_time = now_time
+    trigger_2.source_date_time = now_time
+
+    trigger_list.append(trigger_2)
+
+    trend_processor = TrendProcessor(trigger_list)
+
+    trend_processor.process_triggers()
+
+    assert trend_processor.athlete_trend_categories[0].trends[0].trend_data.text == ("Patterns in your soreness data suggest that your Biceps "+
+                                                                                     "may actually be overactive due to a chronic over-compensation for weak Triceps.  "+
+                                                                                     "This dysfunction could exacerbate movement imbalances and elevate your risk of chronic injury.")
+
+
+def test_body_part_surrounding_text_plural_part_2():
+
+    trigger_list = []
+    body_part_factory = BodyPartFactory()
+    trigger_factory = TriggerFactory(datetime.now(), None, [], [])
+
+    now_time = datetime.now()
+
+    trigger = Trigger(TriggerType.hist_sore_greater_30)
+    trigger.body_part = BodyPartSide(body_part_location=BodyPartLocation(4), side=1)
+    body_part = body_part_factory.get_body_part(trigger.body_part)
+    trigger.synergists = trigger_factory.convert_body_part_list(trigger.body_part, body_part.synergists)
+    trigger.antagonists = trigger_factory.convert_body_part_list(trigger.body_part, body_part.antagonists)
+    trigger.created_date_time = now_time
+    trigger.source_date_time = now_time
+
+    trigger_list.append(trigger)
+
+    trigger_2 = Trigger(TriggerType.hist_sore_greater_30)
+    trigger_2.body_part = BodyPartSide(body_part_location=BodyPartLocation(5), side=1)
+    body_part_2 = body_part_factory.get_body_part(trigger_2.body_part)
+    trigger_2.synergists = trigger_factory.convert_body_part_list(trigger_2.body_part, body_part_2.synergists)
+    trigger_2.antagonists = trigger_factory.convert_body_part_list(trigger_2.body_part, body_part_2.antagonists)
+    trigger_2.created_date_time = now_time
+    trigger_2.source_date_time = now_time
+
+    trigger_list.append(trigger_2)
+
+    trend_processor = TrendProcessor(trigger_list)
+
+    trend_processor.process_triggers()
+
+    assert trend_processor.athlete_trend_categories[0].trends[0].trend_data.text == ("Patterns in your soreness data suggest that your Hip "+
+                                                                                     "may actually be overactive due to a chronic over-compensation for a weak Glute.  "+
+                                                                                     "This dysfunction could exacerbate movement imbalances and elevate your risk of chronic injury.")
+
+
 def test_overlapping_muscle_correct():
 
     trigger_list = []
