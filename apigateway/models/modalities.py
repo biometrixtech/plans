@@ -1983,7 +1983,7 @@ class CoolDown(ModalityBase, Serialisable):
         #         self.alerts.append(alert)
 
             if trigger_list[t].trigger_type == TriggerType.high_volume_intensity and max_severity < 2.5:  # 0
-                goal = AthleteGoal("", 1, AthleteGoalType.sport)
+                goal = AthleteGoal("Expedite tissue regeneration", 1, AthleteGoalType.sport)
                 #trigger_list[t].goals.append(goal)
 
         # if max_severity < 2.5:  # note this is only a pain value for cooldown
