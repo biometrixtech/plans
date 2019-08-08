@@ -366,7 +366,7 @@ class TrendProcessor(object):
 
     def set_tight_over_under_muscle_view(self, category_index):
 
-        trigger_type_1 = TriggerType.hist_sore_less_30
+        #trigger_type_1 = TriggerType.hist_sore_less_30
         less_30_triggers = [#TriggerType.hist_sore_less_30_no_sport,
                             TriggerType.hist_sore_less_30,
                             #TriggerType.hist_sore_less_30_sore_today
@@ -375,7 +375,7 @@ class TrendProcessor(object):
         for t in triggers_1:
             t.priority = 1
 
-        trigger_type_2 = TriggerType.hist_sore_greater_30
+        #trigger_type_2 = TriggerType.hist_sore_greater_30
         greater_30_triggers = [#TriggerType.hist_sore_greater_30_high_volume_intensity,
                                #TriggerType.hist_sore_greater_30_no_sore_today_high_volume_intensity,
                                #TriggerType.hist_sore_greater_30_sore_today,
