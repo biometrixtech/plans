@@ -53,9 +53,9 @@ class SessionDatastore(object):
         plan = plan[0]
         if session_type is None:
             external_sessions = []
-            external_sessions.extend(getattr(plan, 'practice_sessions'))
-            external_sessions.extend(getattr(plan, 'strength_conditioning_sessions'))
-            external_sessions.extend(getattr(plan, 'games'))
+            # external_sessions.extend(getattr(plan, 'practice_sessions'))
+            # external_sessions.extend(getattr(plan, 'strength_conditioning_sessions'))
+            # external_sessions.extend(getattr(plan, 'games'))
             external_sessions.extend(getattr(plan, 'training_sessions'))
         else:
             external_sessions = getattr(plan, 'training_sessions')
