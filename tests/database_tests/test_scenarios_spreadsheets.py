@@ -256,7 +256,7 @@ def test_generate_spreadsheets():
 
             is_pain_1 = [True, False]
 
-            body_parts_1 = [1, 4, 5, 6, 7, 8, 11, 14, 15, 16]
+            body_parts_1 = [2, 4, 5, 6, 7, 8, 11, 14, 15, 16]
 
         else:
             max_severity_1 = []
@@ -308,7 +308,7 @@ def test_generate_spreadsheets():
 
         for h1 in historic_soreness_status_1:
             for day_diff in days_sore:
-
+                test_parm.athlete_stats.triggers = []
                 historic_soreness_list = []
 
                 historic_soreness = HistoricSoreness(BodyPartLocation(14), 1, is_historic_soreness_pain(h1))
@@ -344,6 +344,7 @@ def test_generate_spreadsheets():
                         for m1 in max_severity_1:
                             for p in is_pain_1:
                                 # this can get reset by reference along the way so reset now
+                                test_parm.athlete_stats.triggers = []
                                 historic_soreness_list = []
 
                                 if h1 is not None:
@@ -352,7 +353,7 @@ def test_generate_spreadsheets():
                                     historic_soreness.max_severity = 2.0
                                     historic_soreness_list.append(historic_soreness)
 
-                                if h1 is None and b1==7 and not p and day_diff==32 and not test_parm.doms and not test_parm.train_later:
+                                if h1 is HistoricSorenessStatus.dormant_cleared and b1==15 and not p and day_diff==16 and not test_parm.doms and not test_parm.train_later:
                                     k=0
                                 if (0==0) or h1 == HistoricSorenessStatus.persistent_2_soreness and b1 == 14 and p == False and test_parm.doms and day_diff == 32:
                                     body_part_list = [b1]
