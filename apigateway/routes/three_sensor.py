@@ -8,7 +8,7 @@ app = Blueprint('three_sensor', __name__)
 
 @app.route('/biomechanics_detail', methods=['POST'])
 @require.authenticated.any
-@require.body({'event_date': str})
+# @require.body({'event_date': str})
 @xray_recorder.capture('routes.three_sensor.get')
 def handle_biomechanics_detail_get(principal_id=None):
     # user_id = principal_id
