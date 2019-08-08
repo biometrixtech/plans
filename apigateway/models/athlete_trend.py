@@ -774,13 +774,13 @@ def fake_biomechanics_data():
     import random
     import datetime
     current = datetime.datetime.now()
-    durations = [915, 2000, 4115]
+    durations = [54, 95, 170, 53, 30]
     body_sides = [0, 1, 2]
     sessions = []
-    for i in range(random.randint(1, 7)):
+    for i in range(5):
         session = {
                     'session_id': f"session{i}",
-                    'duration':  random.choice(durations),
+                    'duration':  durations[i] * 30,
                     'sport_name': 17,
                     'start_date_time': format_datetime(current - datetime.timedelta(days=i)),
                     'asymmetry': {
