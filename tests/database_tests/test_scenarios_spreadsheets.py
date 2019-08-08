@@ -5,6 +5,7 @@ xray_recorder.begin_segment(name="test")
 
 import pytest
 from logic.training_plan_management import TrainingPlanManager
+from models.body_parts import BodyPartFactory, BodyPart
 from models.session import SportTrainingSession
 from models.historic_soreness import HistoricSoreness
 from models.stats import AthleteStats
@@ -15,7 +16,8 @@ from tests.mocks.mock_exercise_datastore import ExerciseLibraryDatastore
 from tests.mocks.mock_completed_exercise_datastore import CompletedExerciseDatastore
 from tests.mocks.mock_datastore_collection import DatastoreCollection
 from tests.mocks.mock_athlete_stats_datastore import AthleteStatsDatastore
-from models.soreness import Soreness, BodyPart, BodyPartLocation, HistoricSorenessStatus
+from models.soreness import Soreness
+from models.soreness_base import HistoricSorenessStatus, BodyPartLocation
 from models.daily_plan import DailyPlan
 from models.sport import SportName
 from tests.testing_utilities import TestUtilities, get_body_part_location_string, is_historic_soreness_pain, \
@@ -120,8 +122,9 @@ def create_plan(test_parameter, body_part_list, severity_list, side_list, pain_l
     daily_plan_datastore = DailyPlanDatastore()
     athlete_stats_datastore = AthleteStatsDatastore()
     athlete_stats.historic_soreness = historic_soreness_list
+    body_part_factory = BodyPartFactory()
     for s in survey.soreness:
-        if not s.pain and not s.is_joint():
+        if not s.pain and not body_part_factory.is_joint(s.body_part):
             athlete_stats.update_delayed_onset_muscle_soreness(s)
     athlete_stats_datastore.side_load_athlete_stats(athlete_stats)
 
@@ -253,7 +256,7 @@ def test_generate_spreadsheets():
 
             is_pain_1 = [True, False]
 
-            body_parts_1 = [1, 4, 5, 6, 7, 8, 11, 14, 15, 16]
+            body_parts_1 = [2, 4, 5, 6, 7, 8, 11, 14, 15, 16]
 
         else:
             max_severity_1 = []
@@ -305,13 +308,14 @@ def test_generate_spreadsheets():
 
         for h1 in historic_soreness_status_1:
             for day_diff in days_sore:
-
+                test_parm.athlete_stats.triggers = []
                 historic_soreness_list = []
 
                 historic_soreness = HistoricSoreness(BodyPartLocation(14), 1, is_historic_soreness_pain(h1))
                 historic_soreness.first_reported_date_time = current_date_time - timedelta(days=day_diff)
                 historic_soreness.historic_soreness_status = h1
-                #historic_soreness.average_severity = 2
+                historic_soreness.average_severity = 2
+                historic_soreness.max_severity = 2
                 historic_soreness_list.append(historic_soreness)
 
                 if test_parm.no_soreness:
@@ -339,8 +343,18 @@ def test_generate_spreadsheets():
                     for b1 in body_parts_1:
                         for m1 in max_severity_1:
                             for p in is_pain_1:
-                                #if h1 == HistoricSorenessStatus.persistent_pain and b1==1:
-                                #    k=0
+                                # this can get reset by reference along the way so reset now
+                                test_parm.athlete_stats.triggers = []
+                                historic_soreness_list = []
+
+                                if h1 is not None:
+                                    historic_soreness.historic_soreness_status = h1
+                                    historic_soreness.average_severity = 2.0
+                                    historic_soreness.max_severity = 2.0
+                                    historic_soreness_list.append(historic_soreness)
+
+                                if h1 is HistoricSorenessStatus.dormant_cleared and b1==15 and not p and day_diff==16 and not test_parm.doms and not test_parm.train_later:
+                                    k=0
                                 if (0==0) or h1 == HistoricSorenessStatus.persistent_2_soreness and b1 == 14 and p == False and test_parm.doms and day_diff == 32:
                                     body_part_list = [b1]
                                     severity_list = [m1]
@@ -357,8 +371,12 @@ def test_generate_spreadsheets():
                                         severity_list.append(2)
                                         pain_list.append(False)
 
-                                    daily_plan = create_plan(test_parameter=test_parm, body_part_list=body_part_list, severity_list=severity_list, side_list=[1],
-                                                             pain_list=pain_list, train_later=test_parm.train_later, historic_soreness_list=[historic_soreness])
+                                    # daily_plan = create_plan(test_parameter=test_parm, body_part_list=body_part_list, severity_list=severity_list, side_list=[1],
+                                    #                          pain_list=pain_list, train_later=test_parm.train_later, historic_soreness_list=[historic_soreness])
+                                    daily_plan = create_plan(test_parameter=test_parm, body_part_list=body_part_list,
+                                                             severity_list=severity_list, side_list=[1],
+                                                             pain_list=pain_list, train_later=test_parm.train_later,
+                                                             historic_soreness_list=historic_soreness_list)
 
                                     body_part_line = (
                                             get_body_part_location_string(body_part_list) + ',' + str(p) + ',' + str(m1) + ',' + str(h1) + ',' + str(day_diff))

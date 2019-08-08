@@ -1,4 +1,6 @@
-from models.soreness import BodyPart, BodyPartLocation, Soreness, SorenessType
+from models.soreness import Soreness, SorenessType
+from models.body_parts import BodyPart
+from models.soreness_base import BodyPartLocation
 from models.historic_soreness import CoOccurrence, SorenessCause
 from datetime import timedelta
 
@@ -68,9 +70,11 @@ class SorenessCalculator(object):
             for r in soreness_list:
                 if r.body_part.location.value == s.body_part.location.value and r.side == s.side and r.pain == s.pain:
                     r.severity = max([self.get_severity(r.severity, r.movement), self.get_severity(s.severity, s.movement)])
+                    r.movement = None
                     updated = True
             if not updated:
                 s.severity = self.get_severity(s.severity, s.movement)
+                s.movement = None
                 soreness_list.append(s)
         return soreness_list
 
@@ -90,6 +94,7 @@ class SorenessCalculator(object):
                     soreness_list[s].max_severity = historic_soreness[h].max_severity
                     soreness_list[s].max_severity_date_time = historic_soreness[h].max_severity_date_time
                     soreness_list[s].causal_session = historic_soreness[h].causal_session
+                    soreness_list[s].status_changed_date_time = historic_soreness[h].status_changed_date_time
                     historic_soreness_found = True
             if not historic_soreness_found:
                 new_soreness = Soreness()
@@ -105,6 +110,7 @@ class SorenessCalculator(object):
                 new_soreness.cleared_date_time = historic_soreness[h].cleared_date_time
                 new_soreness.max_severity_date_time = historic_soreness[h].max_severity_date_time
                 new_soreness.causal_session = historic_soreness[h].causal_session
+                new_soreness.status_changed_date_time = historic_soreness[h].status_changed_date_time
                 soreness_list.append(new_soreness)
 
         return soreness_list

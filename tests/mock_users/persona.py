@@ -1,5 +1,5 @@
 # import datetime
-from config import get_mongo_collection
+from config_mock import get_mongo_collection
 import datetime
 from models.daily_plan import DailyPlan
 from models.daily_readiness import DailyReadiness
@@ -24,10 +24,12 @@ class Persona(object):
         self.daily_readiness = None
         self.athlete_stats = None
 
-    def create_history(self, days):
-        self.clear_user()
-        event_date = datetime.datetime.now() - datetime.timedelta(days=days)
+    def create_history(self, days, suffix='Test', clear_history=True, start_date_time=datetime.datetime.now()):
+        if clear_history:
+            self.clear_user(suffix)
+        event_date = start_date_time - datetime.timedelta(days=days)
         self.update_stats(event_date)
+        last_plan_date = None
         for i in range(days):
             # date_time = format_datetime(event_date)
             today_date = format_date(event_date)
@@ -46,6 +48,7 @@ class Persona(object):
                 self.create_readiness(readiness_data)
 
                 self.create_plan(event_date)
+                last_plan_date = event_date
                 exercise_list = [ex.exercise.id for ex in self.daily_plan.pre_active_rest[0].inhibit_exercises.values()]
                 self.complete_exercises(exercise_list, format_datetime(event_date + datetime.timedelta(hours=1)))
                 print(today_date)
@@ -54,11 +57,13 @@ class Persona(object):
 
         self.update_stats(event_date)
 
-    def clear_user(self):
-        readiness = get_mongo_collection('dailyreadiness')
-        daily_plan = get_mongo_collection('dailyplan')
-        stats = get_mongo_collection('athletestats')
-        exercises = get_mongo_collection('completedexercises')
+        return last_plan_date
+
+    def clear_user(self, suffix='Test'):
+        readiness = get_mongo_collection('dailyreadiness', suffix)
+        daily_plan = get_mongo_collection('dailyplan', suffix)
+        stats = get_mongo_collection('athletestats', suffix)
+        exercises = get_mongo_collection('completedexercises', suffix)
 
         readiness.delete_many({"user_id": self.user_id})
         daily_plan.delete_many({"user_id": self.user_id})

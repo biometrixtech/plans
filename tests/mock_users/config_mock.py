@@ -8,8 +8,8 @@ from fathomapi.api.config import Config
 from fathomapi.utils.exceptions import ApplicationException
 
 
-def get_mongo_collection(collection):
-    database = get_mongo_database()
+def get_mongo_collection(collection, suffix='Test'):
+    database = get_mongo_database(suffix)
     mongo_collection = os.environ['MONGO_COLLECTION_' + collection.upper()]
 
     return database[mongo_collection]
@@ -18,9 +18,9 @@ def get_mongo_collection(collection):
 _database = None
 
 
-def get_mongo_database():
+def get_mongo_database(suffix='Test'):
     global _database
-    
+
     if _database is None:
         config = get_secret('mongo')
         os.environ["MONGO_HOST"] = config['host']
@@ -28,16 +28,16 @@ def get_mongo_database():
         os.environ["MONGO_DATABASE"] = config['database']
         os.environ["MONGO_USER"] = config['user']
         os.environ["MONGO_PASSWORD"] = config['password']
-        os.environ["MONGO_COLLECTION_DAILYREADINESS"] = config['collection_dailyreadiness'] + 'Test'
-        os.environ["MONGO_COLLECTION_DAILYPLAN"] = config['collection_dailyplan'] + 'Test'
+        os.environ["MONGO_COLLECTION_DAILYREADINESS"] = config['collection_dailyreadiness'] + suffix
+        os.environ["MONGO_COLLECTION_DAILYPLAN"] = config['collection_dailyplan'] + suffix
         os.environ["MONGO_COLLECTION_EXERCISELIBRARY"] = config['collection_exerciselibrary']
-        os.environ["MONGO_COLLECTION_ATHLETESTATS"] = config['collection_athletestats'] + 'Test'
-        os.environ["MONGO_COLLECTION_COMPLETEDEXERCISES"] = config['collection_completedexercises'] + 'Test'
-        os.environ["MONGO_COLLECTION_APPLOGS"] = config['collection_applogs'] + 'Test'
-        os.environ["MONGO_COLLECTION_HEARTRATE"] = config['collection_heartrate'] + 'Test'
-        os.environ["MONGO_COLLECTION_SLEEPHISTORY"] = config['collection_sleephistory'] + 'Test'
-        os.environ["MONGO_COLLECTION_CLEAREDSORENESS"] = config['collection_clearedsoreness'] + 'Test'
-    
+        os.environ["MONGO_COLLECTION_ATHLETESTATS"] = config['collection_athletestats'] + suffix
+        os.environ["MONGO_COLLECTION_COMPLETEDEXERCISES"] = config['collection_completedexercises'] + suffix
+        os.environ["MONGO_COLLECTION_APPLOGS"] = config['collection_applogs'] + suffix
+        os.environ["MONGO_COLLECTION_HEARTRATE"] = config['collection_heartrate'] + suffix
+        os.environ["MONGO_COLLECTION_SLEEPHISTORY"] = config['collection_sleephistory'] + suffix
+        os.environ["MONGO_COLLECTION_CLEAREDSORENESS"] = config['collection_clearedsoreness'] + suffix
+
         host = Config.get('MONGO_HOST')
         replicaset = Config.get('MONGO_REPLICASET')
         user = Config.get('MONGO_USER')
@@ -51,7 +51,7 @@ def get_mongo_database():
         )
         _database = mongo_client[mongo_database]
         _database.authenticate(user, password, mechanism='SCRAM-SHA-1', source='admin')
-    
+
     return _database
 
 

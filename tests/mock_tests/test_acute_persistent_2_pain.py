@@ -2,7 +2,9 @@ from aws_xray_sdk.core import xray_recorder
 xray_recorder.configure(sampling=False)
 xray_recorder.begin_segment(name="test")
 
-from models.soreness import BodyPart, BodyPartLocation, Soreness, HistoricSorenessStatus
+from models.soreness import Soreness
+from models.soreness_base import HistoricSorenessStatus, BodyPartLocation
+from models.body_parts import BodyPart
 from models.historic_soreness import HistoricSoreness
 from logic.stats_processing import StatsProcessing
 from tests.mocks.mock_datastore_collection import DatastoreCollection
@@ -374,6 +376,8 @@ def test_migrate_acute_pain_to_persistent2_9_days_3_day_gap():
 def test_auto_migrate_acute_pain_to_persistent2_9_days_3_day_gap():
 
     historic_soreness = get_historic_soreness([1, 2, 3], "2018-05-14")
+
+    initial_changed_date_time = historic_soreness[0].status_changed_date_time
     assert (HistoricSorenessStatus.acute_pain is historic_soreness[0].historic_soreness_status)
 
     streak = historic_soreness[0].streak
@@ -398,6 +402,7 @@ def test_auto_migrate_acute_pain_to_persistent2_9_days_3_day_gap():
     historic_soreness = get_historic_soreness([1, 2, 3, None, None, None, 3, None, 3], "2018-05-20", historic_soreness)
 
     assert (HistoricSorenessStatus.persistent_2_pain is historic_soreness[0].historic_soreness_status)
+    assert (initial_changed_date_time != historic_soreness[0].status_changed_date_time)
 
     historic_soreness = get_historic_soreness([1, 2, 3, None, None, None, 3, None, None, 3, None], "2018-05-21", historic_soreness)
 

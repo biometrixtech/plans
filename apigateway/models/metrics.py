@@ -1,6 +1,6 @@
 from enum import Enum, IntEnum
 from serialisable import Serialisable
-from models.soreness import BodyPartLocationText
+from models.soreness_base import BodyPartLocationText
 from models.training_volume import StandardErrorRange
 
 
