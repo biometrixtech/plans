@@ -775,29 +775,22 @@ def fake_biomechanics_data():
     import datetime
     current = datetime.datetime.now()
     durations = [915, 2000, 4115]
-    body_sides = ['right', 'left', '']
+    body_sides = [0, 1, 2]
     sessions = []
     for i in range(random.randint(1, 7)):
         session = {
                     'session_id': f"session{i}",
-                    'body_side': random.choice(body_sides),
                     'duration':  random.choice(durations),
                     'sport_name': 17,
                     'start_date_time': format_datetime(current - datetime.timedelta(days=i)),
-                    # 'detail_data': None,
-                    # 'detail_legend': [
-                    #     {
-                    #         'color': [8, 9],
-                    #         'text':  'No Asymmetry detected',
-                    #     },
-                    #     {
-                    #         'color': [1, 4],
-                    #         'text':  'Significant Asymmetry detected',
-                    #     },
-                    # ],
-                    'summary_data': [],
-                    'summary_text': {},
-                    'summary_legend': []
+                    'asymmetry': {
+                        'body_side': random.choice(body_sides),
+                        'apt': {
+                            'summary_data': [],
+                            'summary_text': {},
+                            'summary_legend': []
+                            }
+                        }
                 }
         sessions.insert(0, session)
     biomechanics_summary = {'sessions': sessions}
