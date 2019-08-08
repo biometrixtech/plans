@@ -9,7 +9,8 @@ from logic.stats_processing import StatsProcessing
 from logic.training_volume_processing import TrainingVolumeProcessing
 from logic.soreness_processing import SorenessCalculator
 from models.stats import AthleteStats
-from models.historic_soreness import HistoricSorenessStatus, SorenessCause
+from models.historic_soreness import SorenessCause
+from models.soreness_base import HistoricSorenessStatus
 from config import get_secret
 from utils import parse_date, format_date
 from statistics import stdev, mean

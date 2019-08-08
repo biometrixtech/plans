@@ -2,7 +2,9 @@ from aws_xray_sdk.core import xray_recorder
 xray_recorder.configure(sampling=False)
 xray_recorder.begin_segment(name="test")
 
-from models.soreness import AssignedExercise, ExerciseDosage, AthleteGoal, AthleteGoalType
+from models.exercise import AssignedExercise
+from models.goal import AthleteGoalType, AthleteGoal
+from models.dosage import ExerciseDosage
 from models.modalities import ModalityBase
 from datetime import datetime
 

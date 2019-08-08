@@ -1,6 +1,8 @@
 import datetime
 from logic.athlete_status_processing import AthleteStatusProcessing
-from models.soreness import Soreness, BodyPartLocation, BodyPart, HistoricSorenessStatus
+from models.soreness import Soreness
+from models.soreness_base import HistoricSorenessStatus, BodyPartLocation
+from models.body_parts import BodyPart
 from models.historic_soreness import HistoricSoreness
 
 

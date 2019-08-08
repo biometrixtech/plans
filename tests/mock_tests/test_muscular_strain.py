@@ -3,8 +3,8 @@ xray_recorder.configure(sampling=False)
 xray_recorder.begin_segment(name="test")
 from datetime import datetime, timedelta
 from models.session import SportTrainingSession
-from models.historic_soreness import HistoricSoreness, HistoricSorenessStatus, SorenessCause
-from models.soreness import BodyPartLocation
+from models.historic_soreness import HistoricSoreness, SorenessCause
+from models.soreness_base import HistoricSorenessStatus, BodyPartLocation
 from models.stats import AthleteStats
 from tests.mocks.mock_datastore_collection import DatastoreCollection
 from tests.mocks.mock_athlete_stats_datastore import AthleteStatsDatastore

@@ -1,5 +1,9 @@
 from models.modalities import ModalityBase
-from models.soreness import AthleteGoal, AthleteGoalType, Exercise, ExerciseDosage, Soreness, HistoricSorenessStatus
+from models.soreness import Soreness
+from models.exercise import Exercise
+from models.soreness_base import HistoricSorenessStatus
+from models.goal import AthleteGoalType, AthleteGoal
+from models.dosage import ExerciseDosage
 from datetime import datetime
 
 

@@ -1,7 +1,9 @@
 from serialisable import Serialisable
 
 from utils import parse_datetime, format_datetime
-from models.soreness import Soreness, BodyPartLocation, BodyPart
+from models.soreness import Soreness
+from models.body_parts import BodyPart
+from models.soreness_base import BodyPartLocation
 
 
 class DailyReadiness(Serialisable):

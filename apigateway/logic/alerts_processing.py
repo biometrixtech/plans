@@ -1,5 +1,5 @@
 from models.insights import AthleteInsight, InsightType
-from models.soreness import BodyPartSide
+from models.soreness_base import BodyPartSide
 from models.trigger import TriggerType
 from models.athlete_trend import AthleteTrends, Trend, VisualizationType, DataSource
 

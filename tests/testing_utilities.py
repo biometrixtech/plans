@@ -1,5 +1,6 @@
 from models.modalities import ActiveRestBeforeTraining, ActiveRestAfterTraining
-from models.soreness import BodyPartLocation, Soreness, HistoricSorenessStatus
+from models.soreness import Soreness
+from models.soreness_base import HistoricSorenessStatus, BodyPartLocation
 from utils import parse_date
 
 
@@ -108,8 +109,9 @@ def get_goals_triggers(assigned_exercises):
 
     for key, assigned_exercise in assigned_exercises.items():
         for d in assigned_exercises[key].dosages:
-            if d.goal.trigger_type is not None:
-                goals = 'Goal=' + d.goal.text.replace(',','-') + '-->' + str(d.goal.trigger_type.value).replace(',',';') + ' Priority=' + d.priority + ' Dosages='
+            #if d.goal.trigger_type is not None:
+            if d.soreness_source is not None:
+                goals = 'Goal=' + d.goal.text.replace(',','-') + '-->' + str(d.soreness_source.trigger_type.value).replace(',',';') + ' Priority=' + d.priority + ' Dosages='
             else:
                 goals = 'Goal=' + d.goal.text.replace(',', '-') +  ' Priority=' + d.priority + ' Dosages='
             goals += "Eff Reps="+ str(d.efficient_reps_assigned) + ' & Eff Sets=' + str(d.efficient_sets_assigned)
@@ -183,12 +185,13 @@ def get_alerts_ctas_goals_string(daily_plan):
 
     output = ""
 
-    output += ";".join(convert_alerts_to_easy_list(daily_plan.trends.biomechanics.alerts)) + ","
-    output += ";".join(daily_plan.trends.biomechanics.goals) + ","
-    output += ";".join(convert_alerts_to_easy_list(daily_plan.trends.response.alerts)) + ","
-    output += ";".join(daily_plan.trends.response.goals) + ","
-    output += ";".join(convert_alerts_to_easy_list(daily_plan.trends.stress.alerts)) + ","
-    output += ";".join(daily_plan.trends.stress.goals)
+    # output += ";".join(convert_alerts_to_easy_list(daily_plan.trends.biomechanics.alerts)) + ","
+    # output += ";".join(daily_plan.trends.biomechanics.goals) + ","
+    # output += ";".join(convert_alerts_to_easy_list(daily_plan.trends.response.alerts)) + ","
+    # output += ";".join(daily_plan.trends.response.goals) + ","
+    # output += ";".join(convert_alerts_to_easy_list(daily_plan.trends.stress.alerts)) + ","
+    # output += ";".join(daily_plan.trends.stress.goals)
+    output += ",,,,,"
 
     return output
 

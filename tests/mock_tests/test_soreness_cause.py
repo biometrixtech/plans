@@ -2,9 +2,9 @@ from aws_xray_sdk.core import xray_recorder
 xray_recorder.configure(sampling=False)
 xray_recorder.begin_segment(name="test")
 from math import floor
-from models.historic_soreness import HistoricSoreness, HistoricSorenessStatus, HistoricSeverity, SorenessCause
+from models.historic_soreness import HistoricSoreness, HistoricSeverity, SorenessCause
+from models.soreness_base import HistoricSorenessStatus, BodyPartLocation
 from models.session import SessionType
-from models.soreness import BodyPartLocation
 from logic.stats_processing import StatsProcessing
 from datetime import datetime, timedelta
 from tests.mocks.mock_datastore_collection import DatastoreCollection

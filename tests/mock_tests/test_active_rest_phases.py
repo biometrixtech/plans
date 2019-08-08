@@ -5,9 +5,12 @@ xray_recorder.begin_segment(name="test")
 import pytest
 from datetime import datetime, timedelta
 from utils import format_datetime, parse_datetime
-from models.soreness import BodyPart, BodyPartLocation, Soreness, HistoricSorenessStatus
-from models.historic_soreness import HistoricSoreness
+from models.soreness import Soreness
+from models.soreness_base import HistoricSorenessStatus
+from models.body_parts import BodyPart, BodyPartLocation
+#from models.historic_soreness import HistoricSoreness
 from models.modalities import ActiveRestAfterTraining, ActiveRestBeforeTraining
+from logic.trigger_processing import TriggerFactory
 from tests.mocks.mock_exercise_datastore import ExerciseLibraryDatastore
 from tests.mocks.mock_completed_exercise_datastore import CompletedExerciseDatastore
 
@@ -34,7 +37,12 @@ def test_active_rest_after_training_check_soreness_severity_3():
         soreness.severity = 3
         soreness.side = 1
         exercise_library = exercise_library_datastore.get()
-        active_rest.check_reactive_care_soreness(soreness, exercise_library, 3)
+
+        factory = TriggerFactory(datetime.now(), None, [soreness], [])
+        factory.load_triggers()
+
+        for t in factory.triggers:
+            active_rest.check_reactive_care_soreness(t, exercise_library, 3)
 
         assert len(active_rest.inhibit_exercises) > 0
         assert len(active_rest.static_stretch_exercises) > 0
@@ -53,7 +61,12 @@ def test_active_rest_after_training_check_soreness_severity_4():
         soreness.severity = 4
         soreness.side = 1
         exercise_library = exercise_library_datastore.get()
-        active_rest.check_reactive_care_soreness(soreness, exercise_library, 4)
+
+        factory = TriggerFactory(datetime.now(), None, [soreness], [])
+        factory.load_triggers()
+
+        for t in factory.triggers:
+            active_rest.check_reactive_care_soreness(t, exercise_library, 4)
 
         assert len(active_rest.inhibit_exercises) > 0
         assert len(active_rest.static_stretch_exercises) == 0
@@ -76,7 +89,12 @@ def test_active_rest_after_training_check_prevention_soreness_severity_2():
         historic_date_time = current_date_time - timedelta(days=31)
         soreness.first_reported_date_time = historic_date_time
         exercise_library = exercise_library_datastore.get()
-        active_rest.check_corrective_soreness(soreness, current_date_time, exercise_library, 2)
+
+        factory = TriggerFactory(datetime.now(), None, [soreness], [])
+        factory.load_triggers()
+
+        for t in factory.triggers:
+            active_rest.check_corrective_soreness(t, current_date_time, exercise_library, 2)
 
         assert len(active_rest.inhibit_exercises) > 0
         assert len(active_rest.static_stretch_exercises) > 0
@@ -99,7 +117,12 @@ def test_active_rest_after_training_check_prevention_soreness_severity_3():
         historic_date_time = current_date_time - timedelta(days=31)
         soreness.first_reported_date_time = historic_date_time
         exercise_library = exercise_library_datastore.get()
-        active_rest.check_corrective_soreness(soreness, current_date_time, exercise_library, 2)
+
+        factory = TriggerFactory(datetime.now(), None, [soreness], [])
+        factory.load_triggers()
+
+        for t in factory.triggers:
+            active_rest.check_corrective_soreness(t, current_date_time, exercise_library, 2)
 
         assert len(active_rest.inhibit_exercises) > 0
         assert len(active_rest.static_stretch_exercises) > 0
@@ -121,7 +144,12 @@ def test_active_rest_after_training_check_prevention_pain_severity_2():
         historic_date_time = current_date_time - timedelta(days=31)
         soreness.first_reported_date_time = historic_date_time
         exercise_library = exercise_library_datastore.get()
-        active_rest.check_corrective_pain(soreness, current_date_time, exercise_library, 2)
+
+        factory = TriggerFactory(datetime.now(), None, [soreness], [])
+        factory.load_triggers()
+
+        for t in factory.triggers:
+            active_rest.check_corrective_pain(t, current_date_time, exercise_library, 2)
 
         assert len(active_rest.inhibit_exercises) > 0
         assert len(active_rest.static_stretch_exercises) > 0
@@ -144,7 +172,12 @@ def test_active_rest_after_training_check_prevention_pain_severity_3():
         historic_date_time = current_date_time - timedelta(days=31)
         soreness.first_reported_date_time = historic_date_time
         exercise_library = exercise_library_datastore.get()
-        active_rest.check_corrective_pain(soreness, current_date_time, exercise_library, 2)
+
+        factory = TriggerFactory(datetime.now(), None, [soreness], [])
+        factory.load_triggers()
+
+        for t in factory.triggers:
+            active_rest.check_corrective_pain(t, current_date_time, exercise_library, 2)
 
         assert len(active_rest.inhibit_exercises) > 0
         assert len(active_rest.static_stretch_exercises) > 0
@@ -163,7 +196,12 @@ def test_active_rest_after_training_check_pain_severity_3():
         soreness.side = 1
         soreness.pain = True
         exercise_library = exercise_library_datastore.get()
-        active_rest.check_reactive_care_pain(soreness, exercise_library, 3)
+
+        factory = TriggerFactory(datetime.now(), None, [soreness], [])
+        factory.load_triggers()
+
+        for t in factory.triggers:
+            active_rest.check_reactive_care_pain(t, exercise_library, 3)
 
         assert len(active_rest.inhibit_exercises) > 0
         assert len(active_rest.static_stretch_exercises) > 0
@@ -182,7 +220,12 @@ def test_active_rest_after_training_check_pain_severity_4():
         soreness.side = 1
         soreness.pain = True
         exercise_library = exercise_library_datastore.get()
-        active_rest.check_reactive_care_pain(soreness, exercise_library, 4)
+
+        factory = TriggerFactory(datetime.now(), None, [soreness], [])
+        factory.load_triggers()
+
+        for t in factory.triggers:
+            active_rest.check_reactive_care_pain(t, exercise_library, 4)
 
         assert len(active_rest.inhibit_exercises) > 0
         assert len(active_rest.static_stretch_exercises) == 0
@@ -252,7 +295,12 @@ def test_active_rest_before_training_check_soreness_severity_3():
         soreness.severity = 3
         soreness.side = 1
         exercise_library = exercise_library_datastore.get()
-        active_rest.check_reactive_care_soreness(soreness, exercise_library, 3)
+
+        factory = TriggerFactory(datetime.now(), None, [soreness], [])
+        factory.load_triggers()
+
+        for t in factory.triggers:
+            active_rest.check_reactive_care_soreness(t, exercise_library, 3)
 
         assert len(active_rest.inhibit_exercises) > 0
         assert len(active_rest.static_stretch_exercises) > 0
@@ -271,7 +319,12 @@ def test_active_rest_before_training_check_soreness_severity_4():
         soreness.severity = 4
         soreness.side = 1
         exercise_library = exercise_library_datastore.get()
-        active_rest.check_reactive_care_soreness(soreness, exercise_library, 4)
+
+        factory = TriggerFactory(datetime.now(), None, [soreness], [])
+        factory.load_triggers()
+
+        for t in factory.triggers:
+            active_rest.check_reactive_care_soreness(t, exercise_library, 4)
 
         assert len(active_rest.inhibit_exercises) > 0
         assert len(active_rest.static_stretch_exercises) == 0
@@ -294,7 +347,12 @@ def test_active_rest_before_training_check_prevention_soreness_severity_2():
         historic_date_time = current_date_time - timedelta(days=31)
         soreness.first_reported_date_time = historic_date_time
         exercise_library = exercise_library_datastore.get()
-        active_rest.check_corrective_soreness(soreness, current_date_time, exercise_library, 2)
+
+        factory = TriggerFactory(datetime.now(), None, [soreness], [])
+        factory.load_triggers()
+
+        for t in factory.triggers:
+            active_rest.check_corrective_soreness(t, current_date_time, exercise_library, 2)
 
         assert len(active_rest.inhibit_exercises) > 0
         assert len(active_rest.static_stretch_exercises) > 0
@@ -317,7 +375,12 @@ def test_active_rest_before_training_check_prevention_soreness_severity_3():
         historic_date_time = current_date_time - timedelta(days=31)
         soreness.first_reported_date_time = historic_date_time
         exercise_library = exercise_library_datastore.get()
-        active_rest.check_corrective_soreness(soreness, current_date_time, exercise_library, 2)
+
+        factory = TriggerFactory(datetime.now(), None, [soreness], [])
+        factory.load_triggers()
+
+        for t in factory.triggers:
+            active_rest.check_corrective_soreness(t, current_date_time, exercise_library, 2)
 
         assert len(active_rest.inhibit_exercises) > 0, 'Error with ' + str(BodyPartLocation(b))
         assert len(active_rest.static_stretch_exercises) > 0, 'Error with ' + str(BodyPartLocation(b))
@@ -340,7 +403,12 @@ def test_active_rest_before_training_check_prevention_pain_severity_2():
         historic_date_time = current_date_time - timedelta(days=31)
         soreness.first_reported_date_time = historic_date_time
         exercise_library = exercise_library_datastore.get()
-        active_rest.check_corrective_pain(soreness, current_date_time, exercise_library, 2)
+
+        factory = TriggerFactory(datetime.now(), None, [soreness], [])
+        factory.load_triggers()
+
+        for t in factory.triggers:
+            active_rest.check_corrective_pain(t, current_date_time, exercise_library, 2)
 
         assert len(active_rest.inhibit_exercises) > 0
         assert len(active_rest.static_stretch_exercises) > 0
@@ -363,7 +431,12 @@ def test_active_rest_before_training_check_prevention_pain_severity_3():
         historic_date_time = current_date_time - timedelta(days=31)
         soreness.first_reported_date_time = historic_date_time
         exercise_library = exercise_library_datastore.get()
-        active_rest.check_corrective_pain(soreness, current_date_time, exercise_library, 2)
+
+        factory = TriggerFactory(datetime.now(), None, [soreness], [])
+        factory.load_triggers()
+
+        for t in factory.triggers:
+            active_rest.check_corrective_pain(t, current_date_time, exercise_library, 2)
 
         assert len(active_rest.inhibit_exercises) > 0
         assert len(active_rest.static_stretch_exercises) > 0
@@ -383,7 +456,12 @@ def test_active_rest_before_training_check_pain_severity_3():
         soreness.side = 1
         soreness.pain = True
         exercise_library = exercise_library_datastore.get()
-        active_rest.check_reactive_care_pain(soreness, exercise_library, 3)
+
+        factory = TriggerFactory(datetime.now(), None, [soreness], [])
+        factory.load_triggers()
+
+        for t in factory.triggers:
+            active_rest.check_reactive_care_pain(t, exercise_library, 3)
 
         assert len(active_rest.inhibit_exercises) > 0
         assert len(active_rest.static_stretch_exercises) > 0
@@ -403,7 +481,12 @@ def test_active_rest_before_training_check_pain_severity_4():
         soreness.side = 1
         soreness.pain = True
         exercise_library = exercise_library_datastore.get()
-        active_rest.check_reactive_care_pain(soreness, exercise_library, 4)
+
+        factory = TriggerFactory(datetime.now(), None, [soreness], [])
+        factory.load_triggers()
+
+        for t in factory.triggers:
+            active_rest.check_reactive_care_pain(t, exercise_library, 4)
 
         assert len(active_rest.inhibit_exercises) > 0
         assert len(active_rest.static_stretch_exercises) == 0

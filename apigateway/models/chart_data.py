@@ -2,7 +2,9 @@ from serialisable import Serialisable
 from datetime import datetime, timedelta
 from utils import format_date, format_datetime, parse_datetime, parse_date
 from fathomapi.utils.exceptions import InvalidSchemaException
-from models.soreness import BodyPart, BodyPartSide, Soreness
+from models.soreness import Soreness
+from models.body_parts import BodyPart
+from models.soreness_base import BodyPartSide
 from models.sport import SportName
 from models.session import SportTrainingSession, SessionSource
 from logic.soreness_processing import SorenessCalculator
@@ -213,10 +215,11 @@ class WorkoutChart(BaseChart, Serialisable):
                         self.bolded_text.append(SportName(summary.sport_name.value).name)
                 else:
                     percent = int(round((training_volume / sport_max_load[summary.sport_name.value].load) * 100, 0))
-                    self.status = f"Today's workout was {str(percent)}% of your {summary.sport_name.get_display_name()} PR"
-                    self.bolded_text = []
-                    self.bolded_text.append(summary.sport_name.get_display_name())
-                    self.bolded_text.append(str(percent) + "%")
+                    if percent >= 30:
+                        self.status = f"Today's workout was {str(percent)}% of your {summary.sport_name.get_display_name()} PR"
+                        self.bolded_text = []
+                        self.bolded_text.append(summary.sport_name.get_display_name())
+                        self.bolded_text.append(str(percent) + "%")
 
             self.data[training_session.event_date.date()].sessions.append(summary)
 
@@ -811,3 +814,77 @@ class BodyPartChart(object):
                     SorenessCalculator().get_severity(soreness.severity, soreness.movement),
                     self.soreness_data[soreness.reported_date_time.date()].value)
                 self.contains_soreness_data = True
+
+
+class BaseOveractiveUnderactiveChartData(Serialisable):
+    def __init__(self):
+        self.overactive = []
+        self.underactive = []
+        self.underactive_needing_care = []
+
+    def json_serialise(self):
+        ret = {
+            'overactive': [a.json_serialise() for a in self.overactive if self.overactive is not None],
+            'underactive': [a.json_serialise() for a in self.underactive if self.underactive is not None],
+            'underactive_needing_care': [a.json_serialise() for a in self.underactive_needing_care if self.underactive_needing_care is not None],
+        }
+        return ret
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        chart_data = cls()
+        chart_data.overactive = [BodyPartSide.json_deserialise(a) for a in input_dict.get('overactive',[])]
+        chart_data.underactive = [BodyPartSide.json_deserialise(a) for a in input_dict.get('underactive',[])]
+        chart_data.underactive_needing_care = [BodyPartSide.json_deserialise(a) for a in input_dict.get('underactive_needing_care',[])]
+        return chart_data
+
+    def remove_duplicates(self):
+
+        self.overactive = list(set(self.overactive))
+        self.underactive = list(set(self.underactive))
+        self.underactive_needing_care = list(set(self.underactive_needing_care))
+
+        unc_delete = []
+        una_delete = []
+
+        id = 0
+        for u in self.underactive_needing_care:
+            index = next((i for i, x in enumerate(self.underactive) if u == x), -1)
+            index_2 = next((i for i, x in enumerate(self.overactive) if u == x), -1)
+            if index > -1 or index_2 > -1:
+                unc_delete.append(id)
+            id += 1
+
+        unc_delete.sort(reverse=True)  # need to remove in reverse order so we don't mess up indexes along the way
+
+        for d in unc_delete:
+            del(self.underactive_needing_care[d])
+
+        id = 0
+        for u in self.underactive:
+            index = next((i for i, x in enumerate(self.overactive) if u == x), -1)
+            if index > -1:
+                una_delete.append(id)
+            id += 1
+
+        una_delete.sort(reverse=True)
+
+        for d in una_delete:
+            del(self.underactive[d])
+
+
+class PainFunctionalLimitationChartData(BaseOveractiveUnderactiveChartData):
+    def __init__(self):
+        super().__init__()
+
+
+class TightOverUnderactiveChartData(BaseOveractiveUnderactiveChartData):
+    def __init__(self):
+        super().__init__()
+
+
+
+
+
+
+

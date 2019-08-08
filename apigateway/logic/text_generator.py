@@ -1,4 +1,4 @@
-from models.soreness import BodyPartLocationText
+from models.soreness_base import BodyPartLocationText
 
 
 class TextGenerator(object):

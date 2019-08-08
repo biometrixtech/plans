@@ -1,4 +1,6 @@
-from models.soreness import Soreness, BodyPartLocation, BodyPart
+from models.soreness import Soreness
+from models.body_parts import BodyPart
+from models.soreness_base import BodyPartLocation
 from models.daily_readiness import DailyReadiness
 from utils import format_datetime
 import datetime
