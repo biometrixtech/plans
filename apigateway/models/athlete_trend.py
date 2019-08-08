@@ -782,7 +782,7 @@ def fake_biomechanics_data():
                     'session_id': f"session{i}",
                     'duration':  durations[i] * 30,
                     'sport_name': 17,
-                    'start_date_time': format_datetime(current - datetime.timedelta(days=i)),
+                    'event_date_time': format_datetime(current - datetime.timedelta(days=i)),
                     'asymmetry': {
                         'body_side': random.choice(body_sides),
                         'apt': {
