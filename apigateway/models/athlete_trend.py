@@ -669,7 +669,8 @@ class AthleteTrends(object):
             'biomechanics': self.biomechanics.json_serialise() if self.biomechanics is not None else None,
             'body_response': self.body_response.json_serialise() if self.body_response is not None else None,
             'workload': self.workload.json_serialise() if self.workload is not None else None,
-            'trend_categories': [trend_category.json_serialise(plan) for trend_category in self.trend_categories]
+            'trend_categories': [trend_category.json_serialise(plan) for trend_category in self.trend_categories],
+            'biomechanics_summary': fake_biomechanics_data()
 
         }
         return ret
@@ -767,3 +768,38 @@ class AthleteTrends(object):
                                          sport_name=workout_chart.last_sport_name
                                          )
         self.workload = workload
+
+
+def fake_biomechanics_data():
+    import random
+    import datetime
+    current = datetime.datetime.now()
+    durations = [915, 2000, 4115]
+    body_sides = ['right', 'left', '']
+    sessions = []
+    for i in range(random.randint(1, 7)):
+        session = {
+                    'session_id': f"session{i}",
+                    'body_side': random.choice(body_sides),
+                    'duration':  random.choice(durations),
+                    'sport_name': 17,
+                    'start_date_time': format_datetime(current - datetime.timedelta(days=i)),
+                    # 'detail_data': None,
+                    # 'detail_legend': [
+                    #     {
+                    #         'color': [8, 9],
+                    #         'text':  'No Asymmetry detected',
+                    #     },
+                    #     {
+                    #         'color': [1, 4],
+                    #         'text':  'Significant Asymmetry detected',
+                    #     },
+                    # ],
+                    'summary_data': [],
+                    'summary_text': {},
+                    'summary_legend': []
+                }
+        sessions.insert(0, session)
+    biomechanics_summary = {'sessions': sessions}
+
+    return biomechanics_summary
