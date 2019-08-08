@@ -1,8 +1,64 @@
-from models.soreness import BodyPart, BodyPartLocation
+from random import shuffle
+
+from models.exercise import AssignedExercise
+from models.soreness_base import BodyPartLocation, BodyPartSide
 from models.sport import SportName
 import random
 
+
 class BodyPartFactory(object):
+
+    def is_joint(self, body_part):
+
+        location = self.get_body_part_location(body_part)
+
+        if (location == BodyPartLocation.shoulder or
+                location == BodyPartLocation.hip_flexor or
+                location == BodyPartLocation.knee or
+                location == BodyPartLocation.ankle or
+                location == BodyPartLocation.foot or
+                location == BodyPartLocation.lower_back or
+                location == BodyPartLocation.elbow or
+                location == BodyPartLocation.wrist):
+            return True
+        else:
+            return False
+
+    def is_muscle(self, body_part):
+
+        location = self.get_body_part_location(body_part)
+
+        if (
+                location == BodyPartLocation.chest or
+                location == BodyPartLocation.abdominals or
+                location == BodyPartLocation.groin or
+                location == BodyPartLocation.quads or
+                location == BodyPartLocation.shin or
+                location == BodyPartLocation.outer_thigh or
+                location == BodyPartLocation.glutes or
+                location == BodyPartLocation.hamstrings or
+                location == BodyPartLocation.calves or
+                location == BodyPartLocation.achilles or
+                location == BodyPartLocation.upper_back_neck or
+                location == BodyPartLocation.lats or
+                location == BodyPartLocation.biceps or
+                location == BodyPartLocation.triceps):
+            return True
+        else:
+            return False
+
+    def get_body_part_location(self, body_part):
+
+        location = None
+
+        if isinstance(body_part, BodyPart):
+            location = body_part.location
+        elif isinstance(body_part, BodyPartSide):
+            location = body_part.body_part_location
+        elif isinstance(body_part, BodyPartLocation):
+            location = body_part
+        return location
+
     def get_progression_list(self, exercise):
 
         dict = {}
@@ -112,58 +168,60 @@ class BodyPartFactory(object):
 
     def get_body_part(self, body_part):
 
-        if body_part.location == BodyPartLocation.general:
+        location = self.get_body_part_location(body_part)
+
+        if location == BodyPartLocation.general:
             return self.get_general()
-        elif body_part.location == BodyPartLocation.abdominals:
+        elif location == BodyPartLocation.abdominals:
             return self.get_abdominals()
-        elif body_part.location == BodyPartLocation.achilles:
+        elif location == BodyPartLocation.achilles:
             return self.get_achilles()
-        elif body_part.location == BodyPartLocation.ankle:
+        elif location == BodyPartLocation.ankle:
             return self.get_ankle()
-        elif body_part.location == BodyPartLocation.biceps:
+        elif location == BodyPartLocation.biceps:
             return self.get_biceps()
-        elif body_part.location == BodyPartLocation.calves:
+        elif location == BodyPartLocation.calves:
             return self.get_calves()
-        elif body_part.location == BodyPartLocation.chest:
+        elif location == BodyPartLocation.chest:
             return self.get_chest()
-        elif body_part.location == BodyPartLocation.elbow:
+        elif location == BodyPartLocation.elbow:
             return self.get_elbow()
-        elif body_part.location == BodyPartLocation.foot:
+        elif location == BodyPartLocation.foot:
             return self.get_foot()
-        elif body_part.location == BodyPartLocation.glutes:
+        elif location == BodyPartLocation.glutes:
             return self.get_glutes()
-        elif body_part.location == BodyPartLocation.groin:
+        elif location == BodyPartLocation.groin:
             return self.get_groin()
-        elif body_part.location == BodyPartLocation.hamstrings:
+        elif location == BodyPartLocation.hamstrings:
             return self.get_hamstrings()
-        elif body_part.location == BodyPartLocation.hip_flexor:
+        elif location == BodyPartLocation.hip_flexor:
             return self.get_hip()
-        elif body_part.location == BodyPartLocation.knee:
+        elif location == BodyPartLocation.knee:
             return self.get_knee()
-        elif body_part.location == BodyPartLocation.lats:
+        elif location == BodyPartLocation.lats:
             return self.get_lats()
-        elif body_part.location == BodyPartLocation.lower_back:
+        elif location == BodyPartLocation.lower_back:
             return self.get_lower_back()
-        elif body_part.location == BodyPartLocation.outer_thigh:
+        elif location == BodyPartLocation.outer_thigh:
             return self.get_outer_thigh()
-        elif body_part.location == BodyPartLocation.quads:
+        elif location == BodyPartLocation.quads:
             return self.get_quads()
-        elif body_part.location == BodyPartLocation.shin:
+        elif location == BodyPartLocation.shin:
             return self.get_shin()
-        elif body_part.location == BodyPartLocation.triceps:
+        elif location == BodyPartLocation.triceps:
             return self.get_triceps()
-        elif body_part.location == BodyPartLocation.shoulder:
+        elif location == BodyPartLocation.shoulder:
             return self.get_shoulder()
-        elif body_part.location == BodyPartLocation.upper_back_neck:
+        elif location == BodyPartLocation.upper_back_neck:
             return self.get_upper_back_traps_neck()
-        elif body_part.location == BodyPartLocation.wrist:
+        elif location == BodyPartLocation.wrist:
             return self.get_wrist()
 
-        elif body_part.location == BodyPartLocation.lower_body:
+        elif location == BodyPartLocation.lower_body:
             return self.get_lower_body()
-        elif body_part.location == BodyPartLocation.upper_body:
+        elif location == BodyPartLocation.upper_body:
             return self.get_upper_body()
-        elif body_part.location == BodyPartLocation.full_body:
+        elif location == BodyPartLocation.full_body:
             return self.get_full_body()
 
     def get_constituent_exercises(self, primary_body_part, constituent_body_parts, soreness):
@@ -185,7 +243,8 @@ class BodyPartFactory(object):
         # WARNING: If you change anything here ALSO change full body
         ##############
 
-        general = BodyPart(BodyPartLocation.general, 21)
+        general = BodyPart(BodyPartLocation.general, 23)
+        general.bilateral = False
 
         #inhibit = self.get_exercise_dictionary([48, 3, 4, 54, 2, 44, 55])
         #lengthen = self.get_exercise_dictionary([9, 6, 28, 56, 7, 46, 103])
@@ -198,7 +257,8 @@ class BodyPartFactory(object):
 
     def get_upper_body(self):
 
-        upper_body = BodyPart(BodyPartLocation.upper_body, 22)
+        upper_body = BodyPart(BodyPartLocation.upper_body, 25)
+        upper_body.bilateral = False
 
         dynamic_stretch = self.get_full_exercise_dictionary([164, 165, 179, 180, 181])
         dynamic_integrate = self.get_full_exercise_dictionary([145, 148, 149, 162, 169])
@@ -215,7 +275,8 @@ class BodyPartFactory(object):
 
     def get_lower_body(self):
 
-        lower_body = BodyPart(BodyPartLocation.lower_body, 23)
+        lower_body = BodyPart(BodyPartLocation.lower_body, 24)
+        lower_body.bilateral = False
         dynamic_stretch = self.get_full_exercise_dictionary([139, 140, 141, 142, 143, 144, 161, 163, 164, 165, 176, 193])
         dynamic_integrate = self.get_full_exercise_dictionary([145, 146, 147, 148, 149, 150, 151, 182, 183, 203, 204])
         dynamic_integrate_with_speed = {}
@@ -232,7 +293,8 @@ class BodyPartFactory(object):
 
     def get_full_body(self):
 
-        full_body = BodyPart(BodyPartLocation.full_body, 24)
+        full_body = BodyPart(BodyPartLocation.full_body, 23)
+        full_body.bilateral = False
         dynamic_stretch = self.get_full_exercise_dictionary([139, 140, 141, 144, 164, 165, 177, 178, 179, 180, 193])
         dynamic_integrate = self.get_full_exercise_dictionary([145, 146, 148, 149, 150, 151, 162, 169, 203, 204])
         dynamic_integrate_with_speed = {}
@@ -266,6 +328,7 @@ class BodyPartFactory(object):
     def get_abdominals(self):
 
         part = BodyPart(BodyPartLocation.abdominals, 4)
+        part.bilateral = False
 
         inhibit = self.get_exercise_dictionary([54])
         static_stretch = self.get_exercise_dictionary([98])
@@ -293,7 +356,7 @@ class BodyPartFactory(object):
 
     def get_biceps(self):
 
-        part = BodyPart(BodyPartLocation.biceps, None)
+        part = BodyPart(BodyPartLocation.biceps, 19)
 
         inhibit = self.get_exercise_dictionary([243, 244])
         static_stretch = self.get_exercise_dictionary([246])
@@ -302,7 +365,7 @@ class BodyPartFactory(object):
         isolated_activation = self.get_exercise_dictionary([249, 250])
         part.add_extended_exercise_phases(inhibit, static_stretch, active_stretch, dynamic_stretch, isolated_activation,
                                           {})
-        part.add_muscle_groups([22], [], [], [23])
+        part.add_muscle_groups([22], [1], [], [23])
         return part
 
     def get_calves(self):
@@ -331,7 +394,7 @@ class BodyPartFactory(object):
 
     def get_elbow(self):
 
-        part = BodyPart(BodyPartLocation.elbow, 19)
+        part = BodyPart(BodyPartLocation.elbow, 21)
 
         inhibit = self.get_exercise_dictionary([245])
         static_stretch = self.get_exercise_dictionary([247, 246])
@@ -434,6 +497,7 @@ class BodyPartFactory(object):
     def get_lower_back(self):
 
         part = BodyPart(BodyPartLocation.lower_back, 1)
+        part.bilateral = False
         inhibit = self.get_exercise_dictionary([44])
         static_stretch = self.get_exercise_dictionary([56, 103, 104])
         active_stretch = self.get_exercise_dictionary([266])
@@ -498,7 +562,7 @@ class BodyPartFactory(object):
 
     def get_triceps(self):
 
-        part = BodyPart(BodyPartLocation.triceps, None)
+        part = BodyPart(BodyPartLocation.triceps, 20)
 
         inhibit = self.get_exercise_dictionary([258])
         static_stretch = self.get_exercise_dictionary([57, 103, 104])
@@ -506,12 +570,13 @@ class BodyPartFactory(object):
         dynamic_stretch = {}
         isolated_activation = self.get_exercise_dictionary([199])
         part.add_extended_exercise_phases(inhibit, static_stretch, active_stretch, dynamic_stretch, isolated_activation, {})
-        part.add_muscle_groups([23], [], [], [22])
+        part.add_muscle_groups([23], [1], [], [22])
         return part
 
     def get_upper_back_traps_neck(self):
 
         part = BodyPart(BodyPartLocation.upper_back_neck, 13)
+        part.bilateral = False
 
         inhibit = self.get_exercise_dictionary([102, 125, 126])
         static_stretch = self.get_exercise_dictionary([127, 129, 128, 103, 104, 246, 215])
@@ -525,7 +590,7 @@ class BodyPartFactory(object):
 
     def get_wrist(self):
 
-        part = BodyPart(BodyPartLocation.wrist, 20)
+        part = BodyPart(BodyPartLocation.wrist, 22)
 
         inhibit = self.get_exercise_dictionary([245])
         static_stretch = self.get_exercise_dictionary([247, 248])
@@ -536,3 +601,101 @@ class BodyPartFactory(object):
                                           {})
         part.add_muscle_groups([20], [22, 23], [19], [20])
         return part
+
+
+class BodyPart(object):
+
+    def __init__(self, body_part_location, treatment_priority):
+        self.bilateral = True
+        self.location = body_part_location
+        self.treatment_priority = treatment_priority
+        self.inhibit_exercises = []
+        self.lengthen_exercises = []
+        self.activate_exercises = []
+        self.integrate_exercises = []
+
+        self.static_stretch_exercises = []
+        self.active_stretch_exercises = []
+        self.dynamic_stretch_exercises = []
+        self.active_or_dynamic_stretch_exercises = []
+        self.isolated_activate_exercises = []
+        self.static_integrate_exercises = []
+        self.dynamic_integrate_exercises = []
+        self.dynamic_stretch_integrate_exercises = []
+        self.dynamic_integrate_with_speed_exercises = []
+
+        self.agonists = []
+        self.synergists = []
+        self.stabilizers = []
+        self.antagonists = []
+
+    @staticmethod
+    def add_exercises(exercise_list, exercise_dict, treatment_priority, randomize=False):
+
+        priority = 1
+
+        keys = list(exercise_dict.keys())
+
+        if randomize:
+            shuffle(keys)
+
+        for k in keys:
+            if len(exercise_dict[k]) == 0:
+                exercise_list.append(AssignedExercise(k, treatment_priority, priority))
+            else:
+                progression_exercise = AssignedExercise(k, treatment_priority, priority)
+                progression_exercise.exercise.progressions = exercise_dict[k]
+                exercise_list.append(progression_exercise)
+            priority += 1
+
+        return exercise_list
+
+    def __hash__(self):
+        return hash((self.location.value, self.treatment_priority))
+
+    def __eq__(self, other):
+        return self.location.value == other.location.value and self.treatment_priority == other.treatment_priority
+
+    def add_exercise_phases(self, inhibit, lengthen, activate, randomize=False):
+
+        self.inhibit_exercises = self.add_exercises(self.inhibit_exercises, inhibit,
+                                                    self.treatment_priority, randomize)
+        self.lengthen_exercises = self.add_exercises(self.lengthen_exercises, lengthen,
+                                                     self.treatment_priority, randomize)
+        self.activate_exercises = self.add_exercises(self.activate_exercises, activate,
+                                                     self.treatment_priority, randomize)
+
+    def add_dynamic_exercise_phases(self, dynamic_stretch, dynamic_integrate, dynamic_integrate_with_speed):
+
+        self.dynamic_stretch_exercises = self.add_exercises(self.dynamic_stretch_exercises, dynamic_stretch, self.treatment_priority, False)
+        self.dynamic_integrate_exercises = self.add_exercises(self.dynamic_integrate_exercises, dynamic_integrate, self.treatment_priority, False)
+        self.dynamic_integrate_with_speed_exercises = self.add_exercises(self.dynamic_integrate_with_speed_exercises, dynamic_integrate_with_speed, self.treatment_priority, False)
+
+    def add_extended_exercise_phases(self, inhibit, static_stretch, active_stretch, dynamic_stretch, isolated_activation, static_integrate, randomize=False):
+
+        self.inhibit_exercises = self.add_exercises(self.inhibit_exercises, inhibit,
+                                                    self.treatment_priority, randomize)
+
+        self.static_stretch_exercises = self.add_exercises(self.static_stretch_exercises, static_stretch,
+                                                           self.treatment_priority, randomize)
+
+        self.active_stretch_exercises = self.add_exercises(self.active_stretch_exercises, active_stretch,
+                                                           self.treatment_priority, randomize)
+
+        self.dynamic_stretch_exercises = self.add_exercises(self.dynamic_stretch_exercises, dynamic_stretch,
+                                                            self.treatment_priority, randomize)
+
+        self.isolated_activate_exercises = self.add_exercises(self.isolated_activate_exercises, isolated_activation,
+                                                              self.treatment_priority, randomize)
+
+        self.static_integrate_exercises = self.add_exercises(self.static_integrate_exercises, static_integrate,
+                                                             self.treatment_priority, randomize)
+
+    def add_muscle_groups(self, agonists, synergists, stabilizers, antagonists):
+
+        self.agonists = agonists
+        self.synergists = synergists
+        self.stabilizers = stabilizers
+        self.antagonists = antagonists
+
+

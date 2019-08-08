@@ -1,6 +1,7 @@
 import pytest
 import logic.soreness_processing as soreness_and_injury
-from models.soreness import Soreness, BodyPartLocation
+from models.soreness import Soreness
+from models.soreness_base import BodyPartLocation
 from models.daily_readiness import DailyReadiness
 from models.post_session_survey import PostSessionSurvey, PostSurvey
 from tests.testing_utilities import TestUtilities

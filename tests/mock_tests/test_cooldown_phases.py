@@ -5,7 +5,10 @@ xray_recorder.begin_segment(name="test")
 import pytest
 from datetime import datetime, timedelta
 from utils import format_datetime, parse_datetime
-from models.soreness import BodyPart, BodyPartLocation, Soreness, HistoricSorenessStatus
+from logic.trigger_processing import TriggerFactory
+from models.soreness import Soreness
+from models.soreness_base import HistoricSorenessStatus, BodyPartLocation
+from models.body_parts import BodyPart
 from models.historic_soreness import HistoricSoreness
 from models.modalities import CoolDown
 from models.sport import SportName
@@ -33,7 +36,13 @@ def test_cooldown_check_soreness_severity_3():
         soreness.side = 1
         soreness.pain = False
         exercise_library = exercise_library_datastore.get()
-        cooldown.check_recover_from_sport([soreness], [SportName.cycling], False, exercise_library, 0)
+
+        factory = TriggerFactory(datetime.now(), None, [soreness], [])
+        factory.high_relative_load_session_sport_names = [SportName.cycling]
+        factory.high_relative_load_session = True
+        factory.load_triggers()
+
+        cooldown.check_recover_from_sport(factory.triggers, factory.high_relative_load_session_sport_names, False, exercise_library, 0)
 
         assert len(cooldown.dynamic_stretch_exercises) > 0
         assert len(cooldown.dynamic_integrate_exercises) > 0
@@ -49,7 +58,13 @@ def test_cooldown_check_soreness_severity_3_pain():
         soreness.side = 1
         soreness.pain = True
         exercise_library = exercise_library_datastore.get()
-        cooldown.check_recover_from_sport([soreness], [SportName.cycling], False, exercise_library, 3)
+
+        factory = TriggerFactory(datetime.now(), None, [soreness], [])
+        factory.high_relative_load_session_sport_names = [SportName.cycling]
+        factory.high_relative_load_session = True
+        factory.load_triggers()
+
+        cooldown.check_recover_from_sport(factory.triggers, factory.high_relative_load_session_sport_names, False, exercise_library, 3)
 
         assert len(cooldown.dynamic_stretch_exercises) == 0
         assert len(cooldown.dynamic_integrate_exercises) == 0
@@ -64,7 +79,12 @@ def test_cooldown_check_soreness_severity_3_no_high_volume():
         soreness.severity = 3
         soreness.side = 1
         exercise_library = exercise_library_datastore.get()
-        cooldown.check_recover_from_sport([soreness], [SportName.cycling], False, exercise_library, 3)
+        factory = TriggerFactory(datetime.now(), None, [soreness], [])
+        factory.high_relative_load_session_sport_names = [SportName.cycling]
+        factory.high_relative_load_session = True
+        factory.load_triggers()
+
+        cooldown.check_recover_from_sport(factory.triggers, factory.high_relative_load_session_sport_names, False, exercise_library, 3)
 
         assert len(cooldown.dynamic_stretch_exercises) == 0
         assert len(cooldown.dynamic_integrate_exercises) == 0
@@ -81,7 +101,12 @@ def test_cooldown_check_soreness_severity_3_high_intensity():
         soreness.side = 1
         soreness.pain = False
         exercise_library = exercise_library_datastore.get()
-        cooldown.check_recover_from_sport([soreness], [SportName.cycling], False, exercise_library, 0)
+        factory = TriggerFactory(datetime.now(), None, [soreness], [])
+        factory.high_relative_load_session_sport_names = [SportName.cycling]
+        factory.high_relative_load_session = True
+        factory.load_triggers()
+
+        cooldown.check_recover_from_sport(factory.triggers, factory.high_relative_load_session_sport_names, False, exercise_library, 0)
 
         assert len(cooldown.dynamic_stretch_exercises) > 0
         assert len(cooldown.dynamic_integrate_exercises) > 0
@@ -97,7 +122,12 @@ def test_cooldown_check_soreness_severity_3_high_intensity_pain():
         soreness.side = 1
         soreness.pain = True
         exercise_library = exercise_library_datastore.get()
-        cooldown.check_recover_from_sport([soreness], [SportName.cycling], False, exercise_library, 3)
+        factory = TriggerFactory(datetime.now(), None, [soreness], [])
+        factory.high_relative_load_session_sport_names = [SportName.cycling]
+        factory.high_relative_load_session = True
+        factory.load_triggers()
+
+        cooldown.check_recover_from_sport(factory.triggers, factory.high_relative_load_session_sport_names, False, exercise_library, 3)
 
         assert len(cooldown.dynamic_stretch_exercises) == 0
         assert len(cooldown.dynamic_integrate_exercises)== 0
@@ -113,7 +143,12 @@ def test_cooldown_check_soreness_severity_3_muscular_strain():
         soreness.severity = 3
         soreness.side = 1
         exercise_library = exercise_library_datastore.get()
-        cooldown.check_recover_from_sport([soreness], [SportName.cycling], False, exercise_library, 3)
+        factory = TriggerFactory(datetime.now(), None, [soreness], [])
+        factory.high_relative_load_session_sport_names = [SportName.cycling]
+        factory.high_relative_load_session = True
+        factory.load_triggers()
+
+        cooldown.check_recover_from_sport(factory.triggers, factory.high_relative_load_session_sport_names, False, exercise_library, 3)
 
         assert len(cooldown.dynamic_stretch_exercises) == 0
         assert len(cooldown.dynamic_integrate_exercises) == 0
@@ -129,7 +164,12 @@ def test_cooldown_check_soreness_severity_4():
         soreness.severity = 4
         soreness.side = 1
         exercise_library = exercise_library_datastore.get()
-        cooldown.check_recover_from_sport([soreness], [SportName.cycling], False, exercise_library, 4)
+        factory = TriggerFactory(datetime.now(), None, [soreness], [])
+        factory.high_relative_load_session_sport_names = [SportName.cycling]
+        factory.high_relative_load_session = True
+        factory.load_triggers()
+
+        cooldown.check_recover_from_sport(factory.triggers, factory.high_relative_load_session_sport_names, False, exercise_library, 4)
 
         assert len(cooldown.dynamic_stretch_exercises) == 0
         assert len(cooldown.dynamic_integrate_exercises) == 0
@@ -149,7 +189,12 @@ def test_cooldown_check_corrective_soreness_severity_3():
         historic_date_time = current_date_time - timedelta(days=31)
         soreness.first_reported_date_time = historic_date_time
         exercise_library = exercise_library_datastore.get()
-        cooldown.check_corrective(soreness, current_date_time, exercise_library)
+
+        factory = TriggerFactory(datetime.now(), None, [soreness], [])
+        factory.load_triggers()
+
+        for t in factory.triggers:
+            cooldown.check_corrective(t, current_date_time, exercise_library)
 
         # dynamic stretch not ready yet
         #assert len(cooldown.dynamic_stretch_exercises) > 0, 'Error with ' + str(BodyPartLocation(b))
@@ -171,7 +216,11 @@ def test_cooldown_check_corrective_soreness_severity_4():
         historic_date_time = current_date_time - timedelta(days=31)
         soreness.first_reported_date_time = historic_date_time
         exercise_library = exercise_library_datastore.get()
-        cooldown.check_corrective(soreness, current_date_time, exercise_library)
+        factory = TriggerFactory(datetime.now(), None, [soreness], [])
+        factory.load_triggers()
+
+        for t in factory.triggers:
+            cooldown.check_corrective(t, current_date_time, exercise_library)
 
         # dynamic stretch not ready yet
         #assert len(cooldown.dynamic_stretch_exercises) == 0, 'Error with ' + str(BodyPartLocation(b))
@@ -192,7 +241,11 @@ def test_cooldown_check_corrective_pain_severity_3():
         historic_date_time = current_date_time - timedelta(days=31)
         soreness.first_reported_date_time = historic_date_time
         exercise_library = exercise_library_datastore.get()
-        cooldown.check_corrective(soreness, current_date_time, exercise_library)
+        factory = TriggerFactory(datetime.now(), None, [soreness], [])
+        factory.load_triggers()
+
+        for t in factory.triggers:
+            cooldown.check_corrective(t, current_date_time, exercise_library)
 
         # dynamic stretch not ready yet
         #assert len(cooldown.dynamic_stretch_exercises) > 0, 'Error with ' + str(BodyPartLocation(b))
@@ -214,7 +267,11 @@ def test_cooldown_check_corrective_pain_severity_4():
         historic_date_time = current_date_time - timedelta(days=31)
         soreness.first_reported_date_time = historic_date_time
         exercise_library = exercise_library_datastore.get()
-        cooldown.check_corrective(soreness, current_date_time, exercise_library)
+        factory = TriggerFactory(datetime.now(), None, [soreness], [])
+        factory.load_triggers()
+
+        for t in factory.triggers:
+            cooldown.check_corrective(t, current_date_time, exercise_library)
 
         # dynamic stretch not ready yet
         #assert len(cooldown.dynamic_stretch_exercises) == 0, 'Error with ' + str(BodyPartLocation(b))
@@ -227,7 +284,13 @@ def test_cooldown_check_recover_sport_high_volume_logged():
     cooldown = CoolDown(True, False, False, event_date_time=current_date_time)
 
     exercise_library = exercise_library_datastore.get()
-    cooldown.check_recover_from_sport([], [SportName.cycling], False, exercise_library, 0)
+
+    factory = TriggerFactory(datetime.now(), None, [], [])
+    factory.high_relative_load_session_sport_names = [SportName.cycling]
+    factory.high_relative_load_session = True
+    factory.load_triggers()
+
+    cooldown.check_recover_from_sport(factory.triggers, factory.high_relative_load_session_sport_names, False, exercise_library, 0)
 
     assert len(cooldown.dynamic_stretch_exercises) > 0
     assert len(cooldown.dynamic_integrate_exercises) > 0
@@ -239,7 +302,13 @@ def test_cooldown_check_recover_sport_no_high_volume_logged():
     cooldown = CoolDown(False, False, False, event_date_time=current_date_time)
 
     exercise_library = exercise_library_datastore.get()
-    cooldown.check_recover_from_sport([], SportName.cycling, False, exercise_library, 0)
+
+    factory = TriggerFactory(datetime.now(), None, [], [])
+    factory.high_relative_load_session_sport_names = []
+    factory.high_relative_load_session = False
+    factory.load_triggers()
+
+    cooldown.check_recover_from_sport(factory.triggers, factory.high_relative_load_session_sport_names, False, exercise_library, 0)
 
     assert len(cooldown.dynamic_stretch_exercises) == 0
     assert len(cooldown.dynamic_integrate_exercises) == 0

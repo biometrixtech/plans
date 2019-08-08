@@ -1,4 +1,8 @@
 from enum import IntEnum, Enum
+
+from models.dosage import ExerciseDosage
+from models.soreness_base import BodyPartLocation
+
 from serialisable import Serialisable
 
 
@@ -125,5 +129,142 @@ class Exercise(Serialisable):
                'progresses_to': self.progresses_to,
                'technical_difficulty': self.technical_difficulty,
                'equipment_required': self.equipment_required
+               }
+        return ret
+
+
+class AssignedExercise(Serialisable):
+    def __init__(self, library_id, body_part_priority=0, body_part_exercise_priority=0, body_part_soreness_level=0,
+                 body_part_location=BodyPartLocation.general, progressions=[]):
+        self.exercise = Exercise(library_id)
+        self.exercise.progressions = progressions
+        # self.body_part_priority = body_part_priority
+        # self.body_part_exercise_priority = body_part_exercise_priority
+        # self.body_part_soreness_level = body_part_soreness_level
+        # self.body_part_location = body_part_location
+        self.athlete_id = ""
+
+        self.expire_date_time = None
+        self.position_order = 0
+        self.goal_text = ""
+        self.equipment_required = []
+        # self.goals = set()
+        # self.priorities = set()
+        # self.soreness_sources = set()
+        self.dosages = []
+        self.phase = ''
+
+    def set_dosage_ranking(self):
+        if len(self.dosages) > 1:
+            self.dosages = sorted(self.dosages, key=lambda x: (3-int(x.priority), x.severity(),
+                                                               x.default_comprehensive_sets_assigned,
+                                                               x.default_comprehensive_reps_assigned,
+                                                               x.default_complete_sets_assigned,
+                                                               x.default_complete_reps_assigned,
+                                                               x.default_efficient_sets_assigned,
+                                                               x.default_efficient_reps_assigned), reverse=True)
+            rank = 0
+            for dosage in self.dosages:
+                dosage.ranking = rank
+                rank += 1
+
+    def duration_efficient(self):
+
+        if len(self.dosages) > 0:
+            dosages = sorted(self.dosages, key=lambda x: (x.efficient_sets_assigned, x.efficient_reps_assigned), reverse=True)
+
+            return self.duration(dosages[0].efficient_reps_assigned, dosages[0].efficient_sets_assigned)
+        else:
+            return 0
+
+    def duration_complete(self):
+
+        if len(self.dosages) > 0:
+            dosages = sorted(self.dosages, key=lambda x: (x.complete_sets_assigned, x.complete_reps_assigned), reverse=True)
+
+            return self.duration(dosages[0].complete_reps_assigned, dosages[0].complete_sets_assigned)
+        else:
+            return 0
+
+    def duration_comprehensive(self):
+
+        if len(self.dosages) > 0:
+            dosages = sorted(self.dosages, key=lambda x: (x.comprehensive_sets_assigned, x.comprehensive_reps_assigned), reverse=True)
+
+            return self.duration(dosages[0].comprehensive_reps_assigned, dosages[0].comprehensive_sets_assigned)
+        else:
+            return 0
+
+    def duration(self, reps_assigned, sets_assigned):
+        if self.exercise.unit_of_measure.name == "count":
+            if not self.exercise.bilateral:
+                return self.exercise.seconds_per_rep * reps_assigned * sets_assigned
+            else:
+                return (self.exercise.seconds_per_rep * reps_assigned * sets_assigned) * 2
+        elif self.exercise.unit_of_measure.name == "seconds" or self.exercise.unit_of_measure.name == 'yards':
+            if not self.exercise.bilateral:
+                return self.exercise.seconds_per_set * sets_assigned
+            else:
+                return (self.exercise.seconds_per_set * sets_assigned) * 2
+        else:
+            return None
+
+    '''
+    def soreness_priority(self):
+        return ExercisePriority.neutral
+    '''
+
+    def __setattr__(self, name, value):
+        if name == "unit_of_measure" and not isinstance(value, UnitOfMeasure):
+            value = UnitOfMeasure[value]
+        super().__setattr__(name, value)
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        assigned_exercise = cls(input_dict.get("library_id", None))
+        assigned_exercise.exercise.name = input_dict.get("name", "")
+        assigned_exercise.exercise.display_name = input_dict.get("display_name", "")
+        assigned_exercise.exercise.youtube_id = input_dict.get("youtube_id", "")
+        assigned_exercise.exercise.description = input_dict.get("description", "")
+        assigned_exercise.exercise.bilateral = input_dict.get("bilateral", False)
+        assigned_exercise.exercise.unit_of_measure = input_dict.get("unit_of_measure", None)
+        assigned_exercise.position_order = input_dict.get("position_order", 0)
+        # assigned_exercise.efficient_reps_assigned = input_dict.get("efficient_reps_assigned", 0)
+        # assigned_exercise.efficient_sets_assigned = input_dict.get("efficient_sets_assigned", 0)
+        # assigned_exercise.complete_reps_assigned = input_dict.get("complete_reps_assigned", 0)
+        # assigned_exercise.complete_sets_assigned = input_dict.get("complete_sets_assigned", 0)
+        # assigned_exercise.comprehensive_reps_assigned = input_dict.get("comprehensive_reps_assigned", 0)
+        # assigned_exercise.comprehensive_sets_assigned = input_dict.get("comprehensive_sets_assigned", 0)
+        assigned_exercise.exercise.seconds_per_set = input_dict.get("seconds_per_set", 0)
+        assigned_exercise.exercise.seconds_per_rep = input_dict.get("seconds_per_rep", 0)
+        assigned_exercise.goal_text = input_dict.get("goal_text", "")
+        assigned_exercise.equipment_required = input_dict.get("equipment_required", [])
+        # assigned_exercise.goals = set([AthleteGoal.json_deserialise(goal) for goal in input_dict.get('goals', [])])
+        # assigned_exercise.priorities = set(input_dict.get('priorities', []))
+        # assigned_exercise.soreness_sources = set([Soreness.json_deserialise(soreness) for soreness in input_dict.get('soreness_sources', [])])
+        assigned_exercise.dosages = [ExerciseDosage.json_deserialise(dosage) for dosage in input_dict.get('dosages', [])]
+
+        return assigned_exercise
+
+    def json_serialise(self):
+        ret = {'name': self.exercise.name,
+               'display_name': self.exercise.display_name,
+               'library_id': self.exercise.id,
+               'description': self.exercise.description,
+               'youtube_id': self.exercise.youtube_id,
+               'bilateral': self.exercise.bilateral,
+               'seconds_per_rep': self.exercise.seconds_per_rep,
+               'seconds_per_set': self.exercise.seconds_per_set,
+               'unit_of_measure': self.exercise.unit_of_measure.name,
+               'position_order': self.position_order,
+               'duration_efficient': self.duration_efficient(),
+               'duration_complete': self.duration_complete(),
+               'duration_comprehensive': self.duration_comprehensive(),
+               'goal_text': self.goal_text,
+               'equipment_required': self.equipment_required,
+               # 'goals': [goal.json_serialise() for goal in self.goals],
+               # 'priorities': list(self.priorities),
+               # 'soreness_sources': [soreness.json_serialise(trigger=True) for soreness in self.soreness_sources],
+               'dosages': [dosage.json_serialise() for dosage in self.dosages]
                }
         return ret

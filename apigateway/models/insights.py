@@ -1,7 +1,7 @@
 import datetime
 from enum import Enum
 from serialisable import Serialisable
-from models.soreness import BodyPartSide
+from models.soreness_base import BodyPartSide
 from models.trigger import TriggerType
 from models.trigger_data import TriggerData
 from models.sport import SportName
@@ -141,3 +141,4 @@ class InsightType(Enum):
     stress = 0
     response = 1
     biomechanics = 2
+    movement_dysfunction_compensation = 3

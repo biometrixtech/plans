@@ -1,6 +1,8 @@
 from serialisable import Serialisable
 
-from models.soreness import Soreness, BodyPartLocation, BodyPart
+from models.soreness import Soreness
+from models.body_parts import BodyPart
+from models.soreness_base import BodyPartLocation
 # from models.session import SessionType
 import datetime
 from utils import parse_datetime, format_datetime, parse_date

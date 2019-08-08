@@ -1,6 +1,6 @@
 from fathomapi.utils.xray import xray_recorder
 from models.metrics import AthleteSorenessMetricGenerator, AthleteTrainingVolumeMetricGenerator, DailyHighLevelInsight, MetricColor, MetricType, ThresholdRecommendation, WeeklyHighLevelInsight
-from models.soreness import HistoricSorenessStatus
+from models.soreness_base import HistoricSorenessStatus
 
 
 class MetricsProcessing(object):

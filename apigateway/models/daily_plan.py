@@ -79,7 +79,7 @@ class DailyPlan(Serialisable):
                'sessions_planned': self.sessions_planned,
                'train_later': self.train_later,
                'insights': [insight.json_serialise() for insight in self.insights],
-               'trends': self.trends.json_serialise() if self.trends is not None else None,
+               'trends': self.trends.json_serialise(plan=True) if self.trends is not None else None,
                }
 
         return ret
@@ -170,7 +170,8 @@ class DailyPlan(Serialisable):
                 alerts.extend(self.ice.alerts)
             if self.cold_water_immersion is not None:
                 alerts.extend(self.cold_water_immersion.alerts)
-        return [alert for alert in alerts if alert.goal.trigger_type != TriggerType.sore_today]
+        #return [alert for alert in alerts if alert.goal.trigger_type != TriggerType.sore_today]
+        return []
 
     def sort_insights(self):
         self.insights = sorted(self.insights, key=lambda x: (int(x.read), x.priority, int(x.cleared)))
