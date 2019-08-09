@@ -1,6 +1,6 @@
 from enum import Enum
 from logic.text_generator import TextGenerator
-from models.chart_data import BodyPartChartData, DataSeriesBooleanData, DataSeriesData, TrainingVolumeChartData, BodyResponseChartData, WorkoutChartData, TightOverUnderactiveChartData, PainFunctionalLimitationChartData
+from models.chart_data import BodyPartChartData, DataSeriesBooleanData, DataSeriesData, TrainingVolumeChartData, BodyResponseChartData, WorkoutChartData, TightOverUnderactiveChartData, PainFunctionalLimitationChartData, BiomechanicsChart
 from models.insights import InsightType
 from models.soreness_base import BodyPartSide
 from models.sport import SportName
@@ -39,6 +39,7 @@ class VisualizationType(Enum):
     workload = 8
     tight_overactice_underactive = 9
     pain_functional_limitation = 10
+    biomechanics = 20
 
 
 class DataSource(Enum):
@@ -657,6 +658,7 @@ class AthleteTrends(object):
         self.stress = TrendCategory(InsightType.stress)
         self.response = TrendCategory(InsightType.response)
         self.biomechanics = TrendCategory(InsightType.biomechanics)
+        self.biomechanics_summary = None
         self.body_response = TrendData()
         self.workload = TrendData()
         self.trend_categories = []
@@ -670,7 +672,7 @@ class AthleteTrends(object):
             'body_response': self.body_response.json_serialise() if self.body_response is not None else None,
             'workload': self.workload.json_serialise() if self.workload is not None else None,
             'trend_categories': [trend_category.json_serialise(plan) for trend_category in self.trend_categories],
-            'biomechanics_summary': fake_biomechanics_data()
+            'biomechanics_summary': self.biomechanics_summary.json_serialise() if self.biomechanics_summary is not None else None
 
         }
         return ret
@@ -685,7 +687,8 @@ class AthleteTrends(object):
         trends.body_response = TrendData.json_deserialise(input_dict['body_response']) if input_dict.get('body_response', None) is not None else None
         trends.workload = TrendData.json_deserialise(input_dict['workload']) if input_dict.get('workload', None) is not None else None
         trends.trend_categories = [TrendCategory.json_deserialise(trend_category) for trend_category in input_dict.get('trend_categories', [])]
-
+        trends.biomechanics_summary = BiomechanicsChart.json_deserialise(input_dict['biomechanics_summary']) if input_dict.get(
+            'biomechanics_summary', None) is not None else None
         return trends
 
     # def add_cta(self):
@@ -768,6 +771,8 @@ class AthleteTrends(object):
                                          sport_name=workout_chart.last_sport_name
                                          )
         self.workload = workload
+
+        self.biomechanics_summary = athlete_stats.biomechanics_chart
 
 
 def fake_biomechanics_data():
