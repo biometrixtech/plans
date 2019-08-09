@@ -265,7 +265,7 @@ class TrainingVolumeProcessing(object):
         self.workout_chart = workout_chart
 
         biomechanics_chart = BiomechanicsChart()
-        biomechanics_chart.add_sessions(last_14_day_training_sessions)
+        biomechanics_chart.add_sessions(last_14_day_sessions)
         self.biomechanics_chart = biomechanics_chart
 
         #self.last_week_external_values.extend(
