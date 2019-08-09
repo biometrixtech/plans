@@ -56,3 +56,12 @@ class VisualizedLeftRightAsymmetry(object):
         self.right_start_angle = round(right_start_angle, 2)
         self.left_y = round(left_y, 2)
         self.right_y = round(right_y, 2)
+
+    def json_serialise(self):
+        ret = {
+            "left_start_angle": self.left_start_angle,
+            "left_y": self.left_y,
+            "right_start_angle": self.right_start_angle,
+            "right_y": self.right_y
+        }
+        return ret

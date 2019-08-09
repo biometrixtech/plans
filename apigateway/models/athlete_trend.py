@@ -773,10 +773,19 @@ class AthleteTrends(object):
 def fake_biomechanics_data():
     import random
     import datetime
+    from logic.asymmetry_logic import AsymmetryProcessor
     current = datetime.datetime.now()
     durations = [54, 95, 170, 53, 30]
     body_sides = [0, 1, 2]
     sessions = []
+    proc = AsymmetryProcessor()
+    data = {
+        "viz0": proc.get_visualized_left_right_asymmetry(5, 5).json_serialise(),
+        "viz1": proc.get_visualized_left_right_asymmetry(10, 5).json_serialise(),
+        "viz2": proc.get_visualized_left_right_asymmetry(8, 4).json_serialise(),
+        "viz3": proc.get_visualized_left_right_asymmetry(5, 10).json_serialise(),
+        "viz4": proc.get_visualized_left_right_asymmetry(4, 8).json_serialise()
+    }
     for i in range(5):
         session = {
                     'session_id': f"session{i}",
@@ -786,7 +795,7 @@ def fake_biomechanics_data():
                     'asymmetry': {
                         'body_side': random.choice(body_sides),
                         'apt': {
-                            'summary_data': [],
+                            'summary_data': data[f"viz{i}"],
                             'summary_text': {},
                             'summary_legend': []
                             }
