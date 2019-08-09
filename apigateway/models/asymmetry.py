@@ -48,3 +48,11 @@ class SessionAsymmetry(Serialisable):
         session.time_blocks = [TimeBlockAsymmetry.json_deserialise(tb) for tb in input_dict.get('time_blocks', [])]
 
         return session
+
+
+class VisualizedLeftRightAsymmetry(object):
+    def __init__(self, left_start_angle, right_start_angle, left_y, right_y):
+        self.left_start_angle = round(left_start_angle, 2)
+        self.right_start_angle = round(right_start_angle, 2)
+        self.left_y = round(left_y, 2)
+        self.right_y = round(right_y, 2)
