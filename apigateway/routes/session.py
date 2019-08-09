@@ -8,6 +8,7 @@ from fathomapi.utils.decorators import require
 from fathomapi.utils.exceptions import InvalidSchemaException, NoSuchEntityException
 from fathomapi.utils.xray import xray_recorder
 from models.session import SessionType, SessionSource
+from models.asymmetry import Asymmetry
 from models.daily_plan import DailyPlan
 from utils import parse_datetime, format_date, format_datetime
 from config import get_mongo_collection
@@ -261,10 +262,19 @@ def handle_session_three_sensor_data(principal_id=None):
 
     sessions = request.json['sessions']
     for session in sessions:
+        session_id = session['session_id']
         event_date = session['event_date']
+        left_apt = session.get('left_apt', 0)
+        right_apt = session.get('right_apt', 0)
+        duration = session.get('seconds_duration', 0)
+
         session_obj = create_session(6, {'description': 'test_three_sensor_data',
                                          'event_date': event_date,
-                                         'sport_name': 83})
+                                         'sport_name': 17,
+                                         'source': 3,
+                                         'duration_sensor': duration})
+        session_obj.id = session_id
+        session_obj.asymmetry = Asymmetry(left_apt, right_apt)
         plan.training_sessions.append(session_obj)
     daily_plan_datastore.put(plan)
 

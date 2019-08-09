@@ -106,3 +106,20 @@ class VisualizedLeftRightAsymmetry(object):
             "right_y": self.right_y
         }
         return ret
+
+
+class Asymmetry(object):
+    def __init__(self, left_apt, right_apt):
+        self.left_apt = left_apt
+        self.right_apt = right_apt
+
+    def json_serialise(self):
+        ret = {
+            "left_apt": self.left_apt,
+            "right_apt": self.right_apt
+        }
+        return ret
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        return cls(input_dict.get('left_apt', 0), input_dict.get('right_apt', 0))
