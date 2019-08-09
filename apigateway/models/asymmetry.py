@@ -11,7 +11,7 @@ class TimeBlockAsymmetry(Serialisable):
 
     def json_serialise(self, api=False):
         if api:
-            ret= {
+            ret = {
                 'flag': int(self.significant),
                 'x': self.time_block,
                 'y1': self.left,
@@ -52,18 +52,20 @@ class SessionAsymmetry(Serialisable):
             ret = {
                 'session_id': self.session_id,
                 'asymmetry': {
-                'detail_legend': [
-                        {
-                            'color': [8, 9],
-                            'text': 'No Asymmetry Identified',
-                        },
-                        {
-                            'color': [1, 4],
-                            'text': 'Significant Asymmetry Identified',
-                        },
-                    ],
-                'detail_data': [t.json_serialise(api) for t in self.time_blocks],
-                'detail_text': {}
+                    'apt': {
+                        'detail_legend': [
+                                {
+                                    'color': [8, 9],
+                                    'text': 'No Asymmetry Identified',
+                                },
+                                {
+                                    'color': [1, 4],
+                                    'text': 'Significant Asymmetry Identified',
+                                },
+                            ],
+                        'detail_data': [t.json_serialise(api) for t in self.time_blocks],
+                        'detail_text': {}
+                    }
                 }
             }
         else:
