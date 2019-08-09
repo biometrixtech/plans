@@ -7,6 +7,8 @@ from utils import format_datetime, parse_datetime
 from models.sport import SportName, SportType, BaseballPosition, BasketballPosition, FootballPosition, LacrossePosition, SoccerPosition, SoftballPosition, TrackAndFieldPosition, FieldHockeyPosition, VolleyballPosition
 from models.post_session_survey import PostSurvey
 from models.load_stats import LoadStats
+from models.asymmetry import Asymmetry
+
 
 class SessionType(Enum):
     practice = 0
@@ -49,7 +51,8 @@ class DayOfWeek(Enum):
 class SessionSource(Enum):
     user = 0
     health = 1
-    combined = 2
+    user_health = 2
+    three_sensor = 3
 
 
 class Session(Serialisable, metaclass=abc.ABCMeta):
@@ -101,6 +104,9 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         self.completion_percentage = 100    # only answered if there is discomfort
         self.sustained_injury_or_pain = False
         self.description = ""
+
+        # three sensor
+        self.asymmetry = None
 
     def __setattr__(self, name, value):
         if name in ['event_date', 'end_date', 'created_date', 'sensor_start_date_time', 'sensor_end_date_time']:
@@ -296,7 +302,8 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
             'shrz': self.shrz if self.shrz is not None else None,
             'calories': self.calories,
             'distance': self.distance,
-            'source': self.source.value if self.source is not None else SessionSource.user.value
+            'source': self.source.value if self.source is not None else SessionSource.user.value,
+            'asymmetry': self.asymmetry.json_serialise() if self.asymmetry is not None else None
         }
         return ret
 
@@ -338,6 +345,7 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
             session.session_RPE = session.post_session_survey.RPE if session.post_session_survey.RPE is not None else None
         else:
             session.post_session_survey = None
+        session.asymmetry = Asymmetry.json_deserialise(input_dict['asymmetry']) if input_dict.get('asymmetry') is not None else None
 
         return session
 
@@ -652,336 +660,336 @@ class FunctionalStrengthSession(Serialisable):
 #         return ret
 
 
-class RecoverySession(Serialisable):
+# class RecoverySession(Serialisable):
 
-    def __init__(self):
-        self.inhibit_exercises = []
-        self.lengthen_exercises = []
-        self.activate_exercises = []
-        self.integrate_exercises = []
-        self.duration_minutes = 0
-        self.inhibit_target_minutes = 0
-        self.lengthen_target_minutes = 0
-        self.activate_target_minutes = 0
-        self.integrate_target_minutes = 0
+#     def __init__(self):
+#         self.inhibit_exercises = []
+#         self.lengthen_exercises = []
+#         self.activate_exercises = []
+#         self.integrate_exercises = []
+#         self.duration_minutes = 0
+#         self.inhibit_target_minutes = 0
+#         self.lengthen_target_minutes = 0
+#         self.activate_target_minutes = 0
+#         self.integrate_target_minutes = 0
 
-        # new modalities
-        self.static_stretch_exercises = []
-        self.static_then_active_stretch_exercises = []
-        self.static_then_active_or_dynamic_stretch_exercises = []
-        self.active_stretch_exercises = []
-        self.active_or_dynamic_stretch_exercises = []
-        self.isolated_activation_exercises = []
-        self.dynamic_integrate_exercises = []
-        self.dynamic_integrate_with_speed_exercises = []
-        self.static_integrate_exercises = []
-        self.heat_minutes = 0
-        self.ice_minutes = 0
-        self.cold_water_immersion_minutes = 0
-        self.dynamic_movement_minutes = 0
-        self.dynamic_flexibility_minutes = 0
-        self.static_stretch_minutes = 0
-        self.active_stretch_minutes = 0
+#         # new modalities
+#         self.static_stretch_exercises = []
+#         self.static_then_active_stretch_exercises = []
+#         self.static_then_active_or_dynamic_stretch_exercises = []
+#         self.active_stretch_exercises = []
+#         self.active_or_dynamic_stretch_exercises = []
+#         self.isolated_activation_exercises = []
+#         self.dynamic_integrate_exercises = []
+#         self.dynamic_integrate_with_speed_exercises = []
+#         self.static_integrate_exercises = []
+#         self.heat_minutes = 0
+#         self.ice_minutes = 0
+#         self.cold_water_immersion_minutes = 0
+#         self.dynamic_movement_minutes = 0
+#         self.dynamic_flexibility_minutes = 0
+#         self.static_stretch_minutes = 0
+#         self.active_stretch_minutes = 0
 
-        self.inhibit_iterations = 0
-        self.lengthen_iterations = 0
-        self.activate_iterations = 0
-        self.integrate_iterations = 0
-        self.inhibit_max_percentage = 0
-        self.lengthen_max_percentage = 0
-        self.activate_max_percentage = 0
-        self.integrate_max_percentage = 0
-        self.start_date = None
-        self.event_date = None
-        self.impact_score = 0
-        self.why_text = ""
-        self.goal_text = ""
-        self.completed = False
-        self.display_exercises = False
+#         self.inhibit_iterations = 0
+#         self.lengthen_iterations = 0
+#         self.activate_iterations = 0
+#         self.integrate_iterations = 0
+#         self.inhibit_max_percentage = 0
+#         self.lengthen_max_percentage = 0
+#         self.activate_max_percentage = 0
+#         self.integrate_max_percentage = 0
+#         self.start_date = None
+#         self.event_date = None
+#         self.impact_score = 0
+#         self.why_text = ""
+#         self.goal_text = ""
+#         self.completed = False
+#         self.display_exercises = False
 
-    def __setattr__(self, name, value):
-        if name in ['start_date', 'event_date']:
-            if not isinstance(value, datetime.datetime) and value is not None:
-                value = parse_datetime(value)
-        super().__setattr__(name, value)
+#     def __setattr__(self, name, value):
+#         if name in ['start_date', 'event_date']:
+#             if not isinstance(value, datetime.datetime) and value is not None:
+#                 value = parse_datetime(value)
+#         super().__setattr__(name, value)
 
-    def json_serialise(self):
-        ret = {'minutes_duration': self.duration_minutes,
-               'why_text': self.why_text,
-               'goal_text': self.goal_text,
-               'start_date': format_datetime(self.start_date),
-               'event_date': format_datetime(self.event_date),
-               'impact_score': self.impact_score,
-               'completed': self.completed,
-               'display_exercises': self.display_exercises,
-               'inhibit_exercises': [ex.json_serialise() for ex in self.inhibit_exercises],
-               'lengthen_exercises': [ex.json_serialise() for ex in self.lengthen_exercises],
-               'activate_exercises': [ex.json_serialise() for ex in self.activate_exercises],
-               'integrate_exercises': [ex.json_serialise() for ex in self.integrate_exercises],
-               'inhibit_iterations': self.inhibit_iterations,
-               'lengthen_iterations': self.lengthen_iterations,
-               'activate_iterations': self.activate_iterations,
-               'integrate_iterations': self.integrate_iterations,
-               }
-        return ret
+#     def json_serialise(self):
+#         ret = {'minutes_duration': self.duration_minutes,
+#                'why_text': self.why_text,
+#                'goal_text': self.goal_text,
+#                'start_date': format_datetime(self.start_date),
+#                'event_date': format_datetime(self.event_date),
+#                'impact_score': self.impact_score,
+#                'completed': self.completed,
+#                'display_exercises': self.display_exercises,
+#                'inhibit_exercises': [ex.json_serialise() for ex in self.inhibit_exercises],
+#                'lengthen_exercises': [ex.json_serialise() for ex in self.lengthen_exercises],
+#                'activate_exercises': [ex.json_serialise() for ex in self.activate_exercises],
+#                'integrate_exercises': [ex.json_serialise() for ex in self.integrate_exercises],
+#                'inhibit_iterations': self.inhibit_iterations,
+#                'lengthen_iterations': self.lengthen_iterations,
+#                'activate_iterations': self.activate_iterations,
+#                'integrate_iterations': self.integrate_iterations,
+#                }
+#         return ret
 
-    def recommended_exercises(self):
-        exercise_list = []
-        exercise_list.extend(self.inhibit_exercises)
-        exercise_list.extend(self.lengthen_exercises)
-        exercise_list.extend(self.activate_exercises)
-        exercise_list.extend(self.integrate_exercises)
+#     def recommended_exercises(self):
+#         exercise_list = []
+#         exercise_list.extend(self.inhibit_exercises)
+#         exercise_list.extend(self.lengthen_exercises)
+#         exercise_list.extend(self.activate_exercises)
+#         exercise_list.extend(self.integrate_exercises)
 
-        #for s in range(0, len(exercise_list)):
-        #    exercise_list[s].position_order = s
+#         #for s in range(0, len(exercise_list)):
+#         #    exercise_list[s].position_order = s
 
-        return exercise_list
+#         return exercise_list
 
-    def update_from_exercise_assignments(self, exercise_assignments):
-        self.inhibit_exercises = exercise_assignments.inhibit_exercises
-        self.lengthen_exercises = exercise_assignments.lengthen_exercises
-        self.activate_exercises = exercise_assignments.activate_exercises
-        self.integrate_exercises = exercise_assignments.integrate_exercises
-        self.duration_minutes = exercise_assignments.duration_minutes_target
-        # self.duration_minutes = (exercise_assignments.inhibit_minutes +
-        #                          exercise_assignments.lengthen_minutes +
-        #                          exercise_assignments.activate_minutes +
-        #                          exercise_assignments.integrate_minutes)
+#     def update_from_exercise_assignments(self, exercise_assignments):
+#         self.inhibit_exercises = exercise_assignments.inhibit_exercises
+#         self.lengthen_exercises = exercise_assignments.lengthen_exercises
+#         self.activate_exercises = exercise_assignments.activate_exercises
+#         self.integrate_exercises = exercise_assignments.integrate_exercises
+#         self.duration_minutes = exercise_assignments.duration_minutes_target
+#         # self.duration_minutes = (exercise_assignments.inhibit_minutes +
+#         #                          exercise_assignments.lengthen_minutes +
+#         #                          exercise_assignments.activate_minutes +
+#         #                          exercise_assignments.integrate_minutes)
 
-        self.inhibit_iterations = exercise_assignments.inhibit_iterations
-        self.lengthen_iterations = exercise_assignments.lengthen_iterations
-        self.activate_iterations = exercise_assignments.activate_iterations
-        self.integrate_iterations = exercise_assignments.integrate_iterations
+#         self.inhibit_iterations = exercise_assignments.inhibit_iterations
+#         self.lengthen_iterations = exercise_assignments.lengthen_iterations
+#         self.activate_iterations = exercise_assignments.activate_iterations
+#         self.integrate_iterations = exercise_assignments.integrate_iterations
 
-        num = 0
+#         num = 0
 
-        for s in range(0, len(self.inhibit_exercises)):
-            self.inhibit_exercises[s].position_order = num
-            num = num + 1
+#         for s in range(0, len(self.inhibit_exercises)):
+#             self.inhibit_exercises[s].position_order = num
+#             num = num + 1
 
-        for s in range(0, len(self.lengthen_exercises)):
-            self.lengthen_exercises[s].position_order = num
-            num = num + 1
+#         for s in range(0, len(self.lengthen_exercises)):
+#             self.lengthen_exercises[s].position_order = num
+#             num = num + 1
 
-        for s in range(0, len(self.activate_exercises)):
-            self.activate_exercises[s].position_order = num
-            num = num + 1
+#         for s in range(0, len(self.activate_exercises)):
+#             self.activate_exercises[s].position_order = num
+#             num = num + 1
 
-        for s in range(0, len(self.integrate_exercises)):
-            self.integrate_exercises[s].position_order = num
-            num = num + 1
+#         for s in range(0, len(self.integrate_exercises)):
+#             self.integrate_exercises[s].position_order = num
+#             num = num + 1
 
-    #def set_exercise_target_minutes(self, soreness_list, total_minutes_target, max_severity, historic_soreness_present=False, functional_strength_active=False, is_active_prep=True):
-    def set_exercise_target_minutes(self, soreness_list, total_minutes_target, max_severity, historic_soreness_present=False, is_active_prep=True):
-        max_severity_and_historic_soreness = False
-        high_severity_is_pain = False
+#     #def set_exercise_target_minutes(self, soreness_list, total_minutes_target, max_severity, historic_soreness_present=False, functional_strength_active=False, is_active_prep=True):
+#     def set_exercise_target_minutes(self, soreness_list, total_minutes_target, max_severity, historic_soreness_present=False, is_active_prep=True):
+#         max_severity_and_historic_soreness = False
+#         high_severity_is_pain = False
 
-        if soreness_list is not None:
-            for soreness in [s for s in soreness_list if s.daily]:
-                if (not soreness.is_dormant_cleared() and
-                    soreness.severity == max_severity and
-                    soreness.severity > 0):
-                    max_severity_and_historic_soreness = True
-                if soreness.severity > 3 and soreness.pain:
-                    high_severity_is_pain = True
+#         if soreness_list is not None:
+#             for soreness in [s for s in soreness_list if s.daily]:
+#                 if (not soreness.is_dormant_cleared() and
+#                     soreness.severity == max_severity and
+#                     soreness.severity > 0):
+#                     max_severity_and_historic_soreness = True
+#                 if soreness.severity > 3 and soreness.pain:
+#                     high_severity_is_pain = True
 
-        if (max_severity > 3 and high_severity_is_pain) or (max_severity > 4 and not high_severity_is_pain):
-            self.integrate_target_minutes = 0
-            self.activate_target_minutes = 0
-            self.lengthen_target_minutes = 0
-            self.inhibit_target_minutes = 0
-            self.integrate_max_percentage = 0
-            self.activate_max_percentage = 0
-            self.lengthen_max_percentage = 0
-            self.inhibit_max_percentage = 0
-        elif total_minutes_target == 5:
-            self.integrate_target_minutes = 0
-            self.activate_target_minutes = 0
-            self.lengthen_target_minutes = 0
-            self.inhibit_target_minutes = total_minutes_target
-            self.integrate_max_percentage = 0
-            self.activate_max_percentage = 0
-            self.lengthen_max_percentage = 0
-            self.inhibit_max_percentage = 1.0
-        elif 3 < max_severity <= 4 and not high_severity_is_pain:
-            self.integrate_target_minutes = 0
-            self.activate_target_minutes = 0
-            self.lengthen_target_minutes = 0
-            self.inhibit_target_minutes = total_minutes_target
-            self.integrate_max_percentage = 0
-            self.activate_max_percentage = 0
-            self.lengthen_max_percentage = 0
-            self.inhibit_max_percentage = 1.0
-        elif max_severity == 3:
-            if max_severity_and_historic_soreness:
-                #if not functional_strength_active:
-                self.set_70_30_time_split(total_minutes_target)
-                #else:
-                #    self.set_50_50_time_split(total_minutes_target)
-            elif historic_soreness_present:
-                #if not functional_strength_active:
-                self.set_60_40_time_split(total_minutes_target)
-                #else:
-                #    self.set_50_50_time_split(total_minutes_target)
-            else:
-                self.set_50_50_time_split(total_minutes_target)
-        elif max_severity == 2:
-            if max_severity_and_historic_soreness:
-                #if not functional_strength_active:
-                if is_active_prep:
-                    self.set_35_35_30_time_split(total_minutes_target)
-                else:
-                    self.set_40_40_20_time_split(total_minutes_target)
-                #else:
-                #    self.set_40_60_time_split(total_minutes_target)
-            elif historic_soreness_present:
-                #if not functional_strength_active:
-                if is_active_prep:
-                    self.set_30_30_40_time_split(total_minutes_target)
-                else:
-                    self.set_40_40_20_time_split(total_minutes_target)
-                #else:
-                #    self.set_50_50_time_split(total_minutes_target)
-            else:
-                self.set_33_33_33_time_split(total_minutes_target)
-        elif 0 < max_severity <= 1:
-            if max_severity_and_historic_soreness:
-                #if not functional_strength_active:
-                if is_active_prep:
-                    self.set_30_30_40_time_split(total_minutes_target)
-                else:
-                    self.set_40_40_20_time_split(total_minutes_target)
-                #else:
-                #    # no difference between AP/AR
-                #    self.set_40_60_time_split(total_minutes_target)
-            elif historic_soreness_present:
-                #if not functional_strength_active:
-                if is_active_prep:
-                    self.set_35_35_30_time_split(total_minutes_target)
-                else:
-                    self.set_40_40_20_time_split(total_minutes_target)
-                #else:
-                # no difference between AP/AR
-                #self.set_50_50_time_split(total_minutes_target)
-            else:
-                self.set_25_25_50_time_split(total_minutes_target)
+#         if (max_severity > 3 and high_severity_is_pain) or (max_severity > 4 and not high_severity_is_pain):
+#             self.integrate_target_minutes = 0
+#             self.activate_target_minutes = 0
+#             self.lengthen_target_minutes = 0
+#             self.inhibit_target_minutes = 0
+#             self.integrate_max_percentage = 0
+#             self.activate_max_percentage = 0
+#             self.lengthen_max_percentage = 0
+#             self.inhibit_max_percentage = 0
+#         elif total_minutes_target == 5:
+#             self.integrate_target_minutes = 0
+#             self.activate_target_minutes = 0
+#             self.lengthen_target_minutes = 0
+#             self.inhibit_target_minutes = total_minutes_target
+#             self.integrate_max_percentage = 0
+#             self.activate_max_percentage = 0
+#             self.lengthen_max_percentage = 0
+#             self.inhibit_max_percentage = 1.0
+#         elif 3 < max_severity <= 4 and not high_severity_is_pain:
+#             self.integrate_target_minutes = 0
+#             self.activate_target_minutes = 0
+#             self.lengthen_target_minutes = 0
+#             self.inhibit_target_minutes = total_minutes_target
+#             self.integrate_max_percentage = 0
+#             self.activate_max_percentage = 0
+#             self.lengthen_max_percentage = 0
+#             self.inhibit_max_percentage = 1.0
+#         elif max_severity == 3:
+#             if max_severity_and_historic_soreness:
+#                 #if not functional_strength_active:
+#                 self.set_70_30_time_split(total_minutes_target)
+#                 #else:
+#                 #    self.set_50_50_time_split(total_minutes_target)
+#             elif historic_soreness_present:
+#                 #if not functional_strength_active:
+#                 self.set_60_40_time_split(total_minutes_target)
+#                 #else:
+#                 #    self.set_50_50_time_split(total_minutes_target)
+#             else:
+#                 self.set_50_50_time_split(total_minutes_target)
+#         elif max_severity == 2:
+#             if max_severity_and_historic_soreness:
+#                 #if not functional_strength_active:
+#                 if is_active_prep:
+#                     self.set_35_35_30_time_split(total_minutes_target)
+#                 else:
+#                     self.set_40_40_20_time_split(total_minutes_target)
+#                 #else:
+#                 #    self.set_40_60_time_split(total_minutes_target)
+#             elif historic_soreness_present:
+#                 #if not functional_strength_active:
+#                 if is_active_prep:
+#                     self.set_30_30_40_time_split(total_minutes_target)
+#                 else:
+#                     self.set_40_40_20_time_split(total_minutes_target)
+#                 #else:
+#                 #    self.set_50_50_time_split(total_minutes_target)
+#             else:
+#                 self.set_33_33_33_time_split(total_minutes_target)
+#         elif 0 < max_severity <= 1:
+#             if max_severity_and_historic_soreness:
+#                 #if not functional_strength_active:
+#                 if is_active_prep:
+#                     self.set_30_30_40_time_split(total_minutes_target)
+#                 else:
+#                     self.set_40_40_20_time_split(total_minutes_target)
+#                 #else:
+#                 #    # no difference between AP/AR
+#                 #    self.set_40_60_time_split(total_minutes_target)
+#             elif historic_soreness_present:
+#                 #if not functional_strength_active:
+#                 if is_active_prep:
+#                     self.set_35_35_30_time_split(total_minutes_target)
+#                 else:
+#                     self.set_40_40_20_time_split(total_minutes_target)
+#                 #else:
+#                 # no difference between AP/AR
+#                 #self.set_50_50_time_split(total_minutes_target)
+#             else:
+#                 self.set_25_25_50_time_split(total_minutes_target)
 
-        elif max_severity == 0:
-            if historic_soreness_present:
-                #if not functional_strength_active:
-                if is_active_prep:
-                    self.set_25_25_50_time_split(total_minutes_target)
-                else:
-                    self.set_35_35_30_time_split(total_minutes_target)
-                #else:
-                    # no difference between AP/AR
-                #    self.set_50_50_time_split(total_minutes_target)
-            else:
-                self.set_25_25_50_time_split(total_minutes_target)
+#         elif max_severity == 0:
+#             if historic_soreness_present:
+#                 #if not functional_strength_active:
+#                 if is_active_prep:
+#                     self.set_25_25_50_time_split(total_minutes_target)
+#                 else:
+#                     self.set_35_35_30_time_split(total_minutes_target)
+#                 #else:
+#                     # no difference between AP/AR
+#                 #    self.set_50_50_time_split(total_minutes_target)
+#             else:
+#                 self.set_25_25_50_time_split(total_minutes_target)
 
-        if total_minutes_target == 10:
-            lengthen_percentage = self.lengthen_target_minutes / (self.lengthen_target_minutes + self.inhibit_target_minutes)
-            inhibit_percentage = self.inhibit_target_minutes / (self.lengthen_target_minutes + self.inhibit_target_minutes)
-            self.integrate_target_minutes = None
-            self.activate_target_minutes = None
-            self.lengthen_target_minutes = total_minutes_target * lengthen_percentage
-            self.inhibit_target_minutes = total_minutes_target * inhibit_percentage
-            self.integrate_max_percentage = None
-            self.activate_max_percentage = None
-            self.lengthen_max_percentage = lengthen_percentage + .1
-            self.inhibit_max_percentage = inhibit_percentage + .1
+#         if total_minutes_target == 10:
+#             lengthen_percentage = self.lengthen_target_minutes / (self.lengthen_target_minutes + self.inhibit_target_minutes)
+#             inhibit_percentage = self.inhibit_target_minutes / (self.lengthen_target_minutes + self.inhibit_target_minutes)
+#             self.integrate_target_minutes = None
+#             self.activate_target_minutes = None
+#             self.lengthen_target_minutes = total_minutes_target * lengthen_percentage
+#             self.inhibit_target_minutes = total_minutes_target * inhibit_percentage
+#             self.integrate_max_percentage = None
+#             self.activate_max_percentage = None
+#             self.lengthen_max_percentage = lengthen_percentage + .1
+#             self.inhibit_max_percentage = inhibit_percentage + .1
 
-    def set_70_30_time_split(self, total_minutes_target):
-        self.integrate_target_minutes = None
-        self.activate_target_minutes = None
-        self.lengthen_target_minutes = total_minutes_target / 3.3
-        self.inhibit_target_minutes = total_minutes_target / 1.43
-        self.integrate_max_percentage = None
-        self.activate_max_percentage = None
-        self.lengthen_max_percentage = .4
-        self.inhibit_max_percentage = .8
-
-
-    def set_60_40_time_split(self, total_minutes_target):
-        self.integrate_target_minutes = None
-        self.activate_target_minutes = None
-        self.lengthen_target_minutes = total_minutes_target / 2.5
-        self.inhibit_target_minutes = total_minutes_target / 1.67
-        self.integrate_max_percentage = None
-        self.activate_max_percentage = None
-        self.lengthen_max_percentage = .5
-        self.inhibit_max_percentage = .7
+#     def set_70_30_time_split(self, total_minutes_target):
+#         self.integrate_target_minutes = None
+#         self.activate_target_minutes = None
+#         self.lengthen_target_minutes = total_minutes_target / 3.3
+#         self.inhibit_target_minutes = total_minutes_target / 1.43
+#         self.integrate_max_percentage = None
+#         self.activate_max_percentage = None
+#         self.lengthen_max_percentage = .4
+#         self.inhibit_max_percentage = .8
 
 
-    def set_40_60_time_split(self, total_minutes_target):
-        self.integrate_target_minutes = None
-        self.activate_target_minutes = None
-        self.lengthen_target_minutes = total_minutes_target / 1.67
-        self.inhibit_target_minutes = total_minutes_target / 2.5
-        self.integrate_max_percentage = None
-        self.activate_max_percentage = None
-        self.lengthen_max_percentage = .7
-        self.inhibit_max_percentage = .5
+#     def set_60_40_time_split(self, total_minutes_target):
+#         self.integrate_target_minutes = None
+#         self.activate_target_minutes = None
+#         self.lengthen_target_minutes = total_minutes_target / 2.5
+#         self.inhibit_target_minutes = total_minutes_target / 1.67
+#         self.integrate_max_percentage = None
+#         self.activate_max_percentage = None
+#         self.lengthen_max_percentage = .5
+#         self.inhibit_max_percentage = .7
 
-    def set_30_30_40_time_split(self, total_minutes_target):
-        self.integrate_target_minutes = None
-        self.activate_target_minutes = total_minutes_target / 2.5
-        self.lengthen_target_minutes = total_minutes_target / 3.3
-        self.inhibit_target_minutes = total_minutes_target / 3.3
-        self.integrate_max_percentage = None
-        self.activate_max_percentage = .45
-        self.lengthen_max_percentage = .35
-        self.inhibit_max_percentage = .35
 
-    def set_33_33_33_time_split(self, total_minutes_target):
-        self.integrate_target_minutes = None
-        self.activate_target_minutes = total_minutes_target / 3
-        self.lengthen_target_minutes = total_minutes_target / 3
-        self.inhibit_target_minutes = total_minutes_target / 3
-        self.integrate_max_percentage = None
-        self.activate_max_percentage = .4
-        self.lengthen_max_percentage = .4
-        self.inhibit_max_percentage = .4
+#     def set_40_60_time_split(self, total_minutes_target):
+#         self.integrate_target_minutes = None
+#         self.activate_target_minutes = None
+#         self.lengthen_target_minutes = total_minutes_target / 1.67
+#         self.inhibit_target_minutes = total_minutes_target / 2.5
+#         self.integrate_max_percentage = None
+#         self.activate_max_percentage = None
+#         self.lengthen_max_percentage = .7
+#         self.inhibit_max_percentage = .5
 
-    def set_25_25_50_time_split(self, total_minutes_target):
-        self.integrate_target_minutes = None
-        self.activate_target_minutes = total_minutes_target / 2
-        self.lengthen_target_minutes = total_minutes_target / 4
-        self.inhibit_target_minutes = total_minutes_target / 4
-        self.integrate_max_percentage = None
-        self.activate_max_percentage = .6
-        self.lengthen_max_percentage = .3
-        self.inhibit_max_percentage = .3
+#     def set_30_30_40_time_split(self, total_minutes_target):
+#         self.integrate_target_minutes = None
+#         self.activate_target_minutes = total_minutes_target / 2.5
+#         self.lengthen_target_minutes = total_minutes_target / 3.3
+#         self.inhibit_target_minutes = total_minutes_target / 3.3
+#         self.integrate_max_percentage = None
+#         self.activate_max_percentage = .45
+#         self.lengthen_max_percentage = .35
+#         self.inhibit_max_percentage = .35
 
-    def set_50_50_time_split(self, total_minutes_target):
-        self.integrate_target_minutes = None
-        self.activate_target_minutes = None
-        self.lengthen_target_minutes = total_minutes_target / 2
-        self.inhibit_target_minutes = total_minutes_target / 2
-        self.integrate_max_percentage = None
-        self.activate_max_percentage = None
-        self.lengthen_max_percentage = .6
-        self.inhibit_max_percentage = .6
+#     def set_33_33_33_time_split(self, total_minutes_target):
+#         self.integrate_target_minutes = None
+#         self.activate_target_minutes = total_minutes_target / 3
+#         self.lengthen_target_minutes = total_minutes_target / 3
+#         self.inhibit_target_minutes = total_minutes_target / 3
+#         self.integrate_max_percentage = None
+#         self.activate_max_percentage = .4
+#         self.lengthen_max_percentage = .4
+#         self.inhibit_max_percentage = .4
 
-    def set_40_40_20_time_split(self, total_minutes_target):
-        self.integrate_target_minutes = None
-        self.activate_target_minutes = total_minutes_target / 5
-        self.lengthen_target_minutes = total_minutes_target / 2.5
-        self.inhibit_target_minutes = total_minutes_target / 2.5
-        self.integrate_max_percentage = None
-        self.activate_max_percentage = .3
-        self.lengthen_max_percentage = .5
-        self.inhibit_max_percentage = .5
+#     def set_25_25_50_time_split(self, total_minutes_target):
+#         self.integrate_target_minutes = None
+#         self.activate_target_minutes = total_minutes_target / 2
+#         self.lengthen_target_minutes = total_minutes_target / 4
+#         self.inhibit_target_minutes = total_minutes_target / 4
+#         self.integrate_max_percentage = None
+#         self.activate_max_percentage = .6
+#         self.lengthen_max_percentage = .3
+#         self.inhibit_max_percentage = .3
 
-    def set_35_35_30_time_split(self, total_minutes_target):
-        self.integrate_target_minutes = None
-        self.activate_target_minutes = total_minutes_target / 3.3
-        self.lengthen_target_minutes = total_minutes_target / 2.85
-        self.inhibit_target_minutes = total_minutes_target / 2.85
-        self.integrate_max_percentage = None
-        self.activate_max_percentage = .4
-        self.lengthen_max_percentage = .4
-        self.inhibit_max_percentage = .4
+#     def set_50_50_time_split(self, total_minutes_target):
+#         self.integrate_target_minutes = None
+#         self.activate_target_minutes = None
+#         self.lengthen_target_minutes = total_minutes_target / 2
+#         self.inhibit_target_minutes = total_minutes_target / 2
+#         self.integrate_max_percentage = None
+#         self.activate_max_percentage = None
+#         self.lengthen_max_percentage = .6
+#         self.inhibit_max_percentage = .6
+
+#     def set_40_40_20_time_split(self, total_minutes_target):
+#         self.integrate_target_minutes = None
+#         self.activate_target_minutes = total_minutes_target / 5
+#         self.lengthen_target_minutes = total_minutes_target / 2.5
+#         self.inhibit_target_minutes = total_minutes_target / 2.5
+#         self.integrate_max_percentage = None
+#         self.activate_max_percentage = .3
+#         self.lengthen_max_percentage = .5
+#         self.inhibit_max_percentage = .5
+
+#     def set_35_35_30_time_split(self, total_minutes_target):
+#         self.integrate_target_minutes = None
+#         self.activate_target_minutes = total_minutes_target / 3.3
+#         self.lengthen_target_minutes = total_minutes_target / 2.85
+#         self.inhibit_target_minutes = total_minutes_target / 2.85
+#         self.integrate_max_percentage = None
+#         self.activate_max_percentage = .4
+#         self.lengthen_max_percentage = .4
+#         self.inhibit_max_percentage = .4
 
 
 class GlobalLoadEstimationParameters(object):

@@ -9,7 +9,7 @@ from utils import format_date, parse_date
 from itertools import groupby
 from operator import itemgetter, attrgetter
 from statistics import stdev, mean
-from models.chart_data import TrainingVolumeChartData, TrainingVolumeChart, WorkoutChart
+from models.chart_data import TrainingVolumeChartData, TrainingVolumeChart, WorkoutChart, BiomechanicsChart
 from models.stats import SportMaxLoad
 
 
@@ -68,6 +68,7 @@ class TrainingVolumeProcessing(object):
 
         self.training_volume_chart_data = []
         self.workout_chart = []
+        self.biomechanics_chart = None
 
         self.internal_load_tuples = []
         #self.external_load_tuples = []
@@ -262,6 +263,10 @@ class TrainingVolumeProcessing(object):
 
         self.training_volume_chart_data = training_volume_chart_data.get_output_list()
         self.workout_chart = workout_chart
+
+        biomechanics_chart = BiomechanicsChart()
+        biomechanics_chart.add_sessions(last_7_day_training_sessions)
+        self.biomechanics_chart = biomechanics_chart
 
         #self.last_week_external_values.extend(
         #    x for x in self.get_plan_session_attribute_sum_list("external_load", last_7_days_plans) if x is not None)

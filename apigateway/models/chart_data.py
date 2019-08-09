@@ -9,6 +9,7 @@ from models.sport import SportName
 from models.session import SportTrainingSession, SessionSource
 from models.asymmetry import VisualizedLeftRightAsymmetry
 from logic.soreness_processing import SorenessCalculator
+from logic.asymmetry_logic import AsymmetryProcessor
 
 
 class BaseChart(object):
@@ -154,11 +155,25 @@ class BiomechanicsChart(Serialisable):
 
     def add_sessions(self, session_list):
 
-        for s in session_list:
+        filtered_list = [s for s in session_list if s.source == SessionSource.three_sensor]
+
+        for f in filtered_list:
             chart_data = BiomechanicsChartData()
-            chart_data.add_session_data(s)
+            chart_data.add_session_data(f)
             self.sessions.append(chart_data)
-            
+
+    def json_serialise(self):
+        ret = {
+            'sessions': [s.json_serialise() for s in self.sessions]
+        }
+        return ret
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        chart = cls()
+        chart.sessions = [BiomechanicsChartData.json_deserialise(s) for s in input_dict.get('sessions', [])]
+        return chart
+    
 
 class BiomechanicsChartData(Serialisable):
     def __init__(self):
@@ -189,7 +204,30 @@ class BiomechanicsChartData(Serialisable):
         return data
 
     def add_session_data(self, session):
-        pass
+
+        proc = AsymmetryProcessor()
+
+        if session.asymmetry is not None:
+            viz = proc.get_visualized_left_right_asymmetry(session.asymmetry.left_apt, session.asymmetry.right_apt)
+            summary_data = AsymmetrySummaryData()
+            summary_data.summary_data = viz
+
+            asymmetry_data = AsymmetryData()
+
+            body_side = 0
+            if session.asymmetry.left_apt > session.asymmetry.right_apt:
+                body_side = 1
+            elif session.asymmetry.right_apt > session.asymmetry.left_apt:
+                body_side = 2
+
+            asymmetry_data.body_side = body_side
+            asymmetry_data.apt = summary_data
+
+            self.session_id = session.id
+            self.session_duration = session.duration_sensor
+            self.sport_name = session.sport_name
+            self.event_date_time = session.event_date
+            self.asymmetry = asymmetry_data
 
 
 class AsymmetryData(Serialisable):
