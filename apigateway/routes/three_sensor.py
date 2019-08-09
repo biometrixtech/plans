@@ -18,7 +18,7 @@ def handle_biomechanics_detail_get(principal_id=None):
     user_id = 'tester'
     datastore = DatastoreCollection().asymmetry_datastore
 
-    user_sessions = datastore.get(user_id=user_id, sessions=7)
+    user_sessions = sorted(datastore.get(user_id='tester', sessions=7), key=lambda i:i.event_date)
     sessions = [s.json_serialise(api=True) for s in user_sessions]
 
     return {'sessions': sessions}, 200
