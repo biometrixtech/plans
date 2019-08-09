@@ -1,5 +1,5 @@
 from serialisable import Serialisable
-from utils import format_date, parse_date
+from utils import format_datetime, parse_datetime
 
 
 class TimeBlockAsymmetry(Serialisable):
@@ -69,7 +69,7 @@ class SessionAsymmetry(Serialisable):
         else:
             ret = {
                 'session_id': self.session_id,
-                'event_date': format_date(self.event_date),
+                'event_date': format_datetime(self.event_date),
                 'left_apt': self.left_apt,
                 'right_apt': self.right_apt,
                 'time_blocks': [t.json_serialise() for t in self.time_blocks],
@@ -79,7 +79,7 @@ class SessionAsymmetry(Serialisable):
     @classmethod
     def json_deserialise(cls, input_dict):
         session = cls(session_id=input_dict['session_id'])
-        session.event_date = parse_date(input_dict['event_date']) if input_dict.get('event_date') is not None else None
+        session.event_date = parse_datetime(input_dict['event_date']) if input_dict.get('event_date') is not None else None
         session.left_apt = input_dict.get('left_apt', 0)
         session.right_apt = input_dict.get('right_apt', 0)
         session.time_blocks = [TimeBlockAsymmetry.json_deserialise(tb) for tb in input_dict.get('time_blocks', [])]
