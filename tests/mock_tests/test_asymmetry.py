@@ -12,6 +12,17 @@ def test_equal_apt():
     assert viz.right_y == 8.5
 
 
+def test_equal_zero():
+
+    proc = AsymmetryProcessor()
+    viz = proc.get_visualized_left_right_asymmetry(0, 0)
+
+    assert viz.left_start_angle == 79.97
+    assert viz.left_y == 5.0
+    assert viz.right_start_angle == 82.48
+    assert viz.right_y == 8.5
+
+
 def test_left_2x_right():
 
     proc = AsymmetryProcessor()
