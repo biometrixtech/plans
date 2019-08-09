@@ -7,6 +7,7 @@ from models.body_parts import BodyPart
 from models.soreness_base import BodyPartSide
 from models.sport import SportName
 from models.session import SportTrainingSession, SessionSource
+from models.asymmetry import VisualizedLeftRightAsymmetry
 from logic.soreness_processing import SorenessCalculator
 
 
@@ -145,6 +146,93 @@ class TrainingVolumeChart(BaseChart):
             day_of_week = (start_date + timedelta(days=i)).strftime('%a')
             chart_data.day_of_week = day_of_week
             self.data[chart_data.date] = chart_data
+
+
+class BiomechanicsChart(Serialisable):
+    def __init__(self):
+        self.sessions = []
+
+    def add_sessions(self, session_list):
+
+        for s in session_list:
+            chart_data = BiomechanicsChartData()
+            chart_data.add_session_data(s)
+            self.sessions.append(chart_data)
+            
+
+class BiomechanicsChartData(Serialisable):
+    def __init__(self):
+        self.session_id = ''
+        self.session_duration = 0
+        self.sport_name = None
+        self.event_date_time = None
+        self.asymmetry = None
+
+    def json_serialise(self):
+        ret = {
+            'session_id' : self.session_id,
+            'session_duration': self.session_duration,
+            'sport_name': self.sport_name.value if self.sport_name is not None else None,
+            'event_date_time ': format_datetime(self.event_date_time) if self.event_date_time is not None else None,
+            'asymmetry': self.asymmetry.json_serialise() if self.asymmetry is not None else None
+        }
+        return ret
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        data = cls()
+        data.session_id = input_dict.get('session_id', '')
+        data.session_duration = input_dict.get('session_duration', 0)
+        data.sport_name = SportName(input_dict['sport_name']) if input_dict.get('sport_name') is not None else None
+        data.event_date_time = parse_datetime(input_dict['event_date_time']) if input_dict.get('event_date_time') is not None else None
+        data.apt = AsymmetryData.json_deserialise(input_dict['asymmetry']) if input_dict.get('asymmetry') is not None else None
+        return data
+
+    def add_session_data(self, session):
+        pass
+
+
+class AsymmetryData(Serialisable):
+    def __init__(self):
+        self.body_side = 0
+        self.apt = None
+
+    def json_serialise(self):
+        ret = {
+            'body_side': self.body_side,
+            'apt': self.apt.json_serialise() if self.apt is not None else None
+        }
+        return ret
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        data = cls()
+        data.body_side = input_dict.get('body_side', 0)
+        data.apt = AsymmetrySummaryData.json_deserialise(input_dict['apt']) if input_dict.get('apt') is not None else None
+        return data
+
+
+class AsymmetrySummaryData(Serialisable):
+    def __init__(self):
+        self.summary_data = None
+        self.summary_text = {},
+        self.summary_legend = []
+
+    def json_serialise(self):
+        ret = {
+            'summary_data': self.summary_data.json_serialise() if self.summary_data is not None else None,
+            'summary_text': None,
+            'summary_legend': None
+        }
+        return ret
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        data = cls()
+        data.summary_data = VisualizedLeftRightAsymmetry.json_deserialise(input_dict['summary_data']) if input_dict.get('summary_data') is not None else None
+        data.summary_text = input_dict.get('summary_text', '')
+        data.summary_legend = []
+        return data
 
 
 class WorkoutChart(BaseChart, Serialisable):
