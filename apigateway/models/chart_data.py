@@ -173,7 +173,7 @@ class BiomechanicsChart(Serialisable):
         chart = cls()
         chart.sessions = [BiomechanicsChartData.json_deserialise(s) for s in input_dict.get('sessions', [])]
         return chart
-    
+
 
 class BiomechanicsChartData(Serialisable):
     def __init__(self):
