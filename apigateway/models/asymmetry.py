@@ -12,7 +12,7 @@ class TimeBlockAsymmetry(Serialisable):
     def json_serialise(self, api=False):
         if api:
             ret= {
-                'flag': self.significant,
+                'flag': int(self.significant),
                 'x': self.time_block,
                 'y1': self.left,
                 'y2': -self.right
