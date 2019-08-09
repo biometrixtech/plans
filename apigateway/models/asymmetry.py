@@ -33,18 +33,24 @@ class TimeBlockAsymmetry(Serialisable):
 class SessionAsymmetry(Serialisable):
     def __init__(self, session_id):
         self.session_id = session_id
+        self.left_apt = 0
+        self.right_apt = 0
         self.time_blocks = []
 
     def json_serialise(self):
         ret = {
             'session_id': self.session_id,
-            'time_blocks': [t.json_serialise() for t in self.time_blocks]
+            'left_apt': self.left_apt,
+            'right_apt': self.right_apt,
+            'time_blocks': [t.json_serialise() for t in self.time_blocks],
         }
         return ret
 
     @classmethod
     def json_deserialise(cls, input_dict):
         session = cls(session_id=input_dict['session_id'])
+        session.left_apt = input_dict.get('left_apt', 0)
+        session.right_apt = input_dict.get('right_apt', 0)
         session.time_blocks = [TimeBlockAsymmetry.json_deserialise(tb) for tb in input_dict.get('time_blocks', [])]
 
         return session
