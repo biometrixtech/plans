@@ -46,11 +46,13 @@ class SessionAsymmetry(Serialisable):
         self.left_apt = 0
         self.right_apt = 0
         self.time_blocks = []
+        self.seconds_duration = 0
 
     def json_serialise(self, api=False):
         if api:
             ret = {
                 'session_id': self.session_id,
+                'seconds_duration': self.seconds_duration,
                 'asymmetry': {
                     'apt': {
                         'detail_legend': [
@@ -85,7 +87,7 @@ class SessionAsymmetry(Serialisable):
         session.left_apt = input_dict.get('left_apt', 0)
         session.right_apt = input_dict.get('right_apt', 0)
         session.time_blocks = [TimeBlockAsymmetry.json_deserialise(tb) for tb in input_dict.get('time_blocks', [])]
-
+        session.seconds_duration = input_dict.get('seconds_duration', 0)
         return session
 
 
