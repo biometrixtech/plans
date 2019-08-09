@@ -178,7 +178,7 @@ class BiomechanicsChart(Serialisable):
 class BiomechanicsChartData(Serialisable):
     def __init__(self):
         self.session_id = ''
-        self.session_duration = 0
+        self.duration = 0
         self.sport_name = None
         self.event_date_time = None
         self.asymmetry = None
@@ -186,7 +186,7 @@ class BiomechanicsChartData(Serialisable):
     def json_serialise(self):
         ret = {
             'session_id' : self.session_id,
-            'session_duration': self.session_duration,
+            'duration': self.duration,
             'sport_name': self.sport_name.value if self.sport_name is not None else None,
             'event_date_time ': format_datetime(self.event_date_time) if self.event_date_time is not None else None,
             'asymmetry': self.asymmetry.json_serialise() if self.asymmetry is not None else None
@@ -197,7 +197,7 @@ class BiomechanicsChartData(Serialisable):
     def json_deserialise(cls, input_dict):
         data = cls()
         data.session_id = input_dict.get('session_id', '')
-        data.session_duration = input_dict.get('session_duration', 0)
+        data.duration = input_dict.get('duration', 0)
         data.sport_name = SportName(input_dict['sport_name']) if input_dict.get('sport_name') is not None else None
         data.event_date_time = parse_datetime(input_dict['event_date_time']) if input_dict.get('event_date_time') is not None else None
         data.apt = AsymmetryData.json_deserialise(input_dict['asymmetry']) if input_dict.get('asymmetry') is not None else None
@@ -224,7 +224,7 @@ class BiomechanicsChartData(Serialisable):
             asymmetry_data.apt = summary_data
 
             self.session_id = session.id
-            self.session_duration = session.duration_sensor
+            self.duration = session.duration_sensor
             self.sport_name = session.sport_name
             self.event_date_time = session.event_date
             self.asymmetry = asymmetry_data
@@ -253,14 +253,14 @@ class AsymmetryData(Serialisable):
 class AsymmetrySummaryData(Serialisable):
     def __init__(self):
         self.summary_data = None
-        self.summary_text = {},
+        self.summary_text = {}
         self.summary_legend = []
 
     def json_serialise(self):
         ret = {
             'summary_data': self.summary_data.json_serialise() if self.summary_data is not None else None,
-            'summary_text': None,
-            'summary_legend': None
+            'summary_text': {},
+            'summary_legend': []
         }
         return ret
 
