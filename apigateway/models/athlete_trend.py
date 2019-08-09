@@ -775,8 +775,8 @@ def fake_biomechanics_data():
     import datetime
     from logic.asymmetry_logic import AsymmetryProcessor
     current = datetime.datetime.now()
-    session_ids = ['f78a9e26-6003-5ac7-8590-3ae4a421dac7', '7bbff8e0-189a-5643-93bc-9730e0fdcd20', 'e3223bf2-bc6b-52e7-8612-1ed7c6e7ae55']
-    durations = [55, 32, 14]
+    session_ids = ['e3223bf2-bc6b-52e7-8612-1ed7c6e7ae55', '7bbff8e0-189a-5643-93bc-9730e0fdcd20', 'f78a9e26-6003-5ac7-8590-3ae4a421dac7']
+    durations = [14, 32, 55]
     body_sides = [0, 1, 2]
     sessions = []
     proc = AsymmetryProcessor()
