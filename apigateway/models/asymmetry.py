@@ -1,4 +1,5 @@
 from serialisable import Serialisable
+from utils import format_date, parse_date
 
 
 class TimeBlockAsymmetry(Serialisable):
@@ -8,13 +9,21 @@ class TimeBlockAsymmetry(Serialisable):
         self.time_block = time_block
         self.significant = significant
 
-    def json_serialise(self):
-        ret = {
-            'left': self.left,
-            'right': self.right,
-            'time_block': self.time_block,
-            'significant': self.significant
-        }
+    def json_serialise(self, api=False):
+        if api:
+            ret= {
+                'flag': self.significant,
+                'x': self.time_block,
+                'y1': self.left,
+                'y2': -self.right
+            }
+        else:
+            ret = {
+                'left': self.left,
+                'right': self.right,
+                'time_block': self.time_block,
+                'significant': self.significant
+            }
 
         return ret
 
@@ -33,22 +42,44 @@ class TimeBlockAsymmetry(Serialisable):
 class SessionAsymmetry(Serialisable):
     def __init__(self, session_id):
         self.session_id = session_id
+        self.event_date = None
         self.left_apt = 0
         self.right_apt = 0
         self.time_blocks = []
 
-    def json_serialise(self):
-        ret = {
-            'session_id': self.session_id,
-            'left_apt': self.left_apt,
-            'right_apt': self.right_apt,
-            'time_blocks': [t.json_serialise() for t in self.time_blocks],
-        }
+    def json_serialise(self, api=False):
+        if api:
+            ret = {
+                'session_id': self.session_id,
+                'asymmetry': {
+                'detail_legend': [
+                        {
+                            'color': [8, 9],
+                            'text': 'No Asymmetry Identified',
+                        },
+                        {
+                            'color': [1, 4],
+                            'text': 'Significant Asymmetry Identified',
+                        },
+                    ],
+                'detail_data': [t.json_serialise(api) for t in self.time_blocks],
+                'detail_text': {}
+                }
+            }
+        else:
+            ret = {
+                'session_id': self.session_id,
+                'event_date': format_date(self.event_date),
+                'left_apt': self.left_apt,
+                'right_apt': self.right_apt,
+                'time_blocks': [t.json_serialise() for t in self.time_blocks],
+            }
         return ret
 
     @classmethod
     def json_deserialise(cls, input_dict):
         session = cls(session_id=input_dict['session_id'])
+        session.event_date = parse_date(input_dict['event_date']) if input_dict.get('event_date') is not None else None
         session.left_apt = input_dict.get('left_apt', 0)
         session.right_apt = input_dict.get('right_apt', 0)
         session.time_blocks = [TimeBlockAsymmetry.json_deserialise(tb) for tb in input_dict.get('time_blocks', [])]

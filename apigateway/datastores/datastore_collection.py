@@ -3,6 +3,7 @@ from datastores import daily_readiness_datastore, exercise_datastore, heart_rate
 from datastores import post_session_survey_datastore, session_datastore
 from datastores import sleep_history_datastore
 from datastores import cleared_soreness_datastore
+from datastores import asymmetry_datastore
 
 
 class DatastoreCollection(object):
@@ -18,3 +19,4 @@ class DatastoreCollection(object):
         self.session_datastore = session_datastore.SessionDatastore()
         self.sleep_history_datastore = sleep_history_datastore.SleepHistoryDatastore()
         self.cleared_soreness_datastore = cleared_soreness_datastore.ClearedSorenessDatastore()
+        self.asymmetry_datastore = asymmetry_datastore.AsymmetryDatastore()
