@@ -775,7 +775,8 @@ def fake_biomechanics_data():
     import datetime
     from logic.asymmetry_logic import AsymmetryProcessor
     current = datetime.datetime.now()
-    durations = [54, 95, 170, 53, 30]
+    session_ids = ['f78a9e26-6003-5ac7-8590-3ae4a421dac7', '7bbff8e0-189a-5643-93bc-9730e0fdcd20', 'e3223bf2-bc6b-52e7-8612-1ed7c6e7ae55']
+    durations = [55, 32, 14]
     body_sides = [0, 1, 2]
     sessions = []
     proc = AsymmetryProcessor()
@@ -786,9 +787,9 @@ def fake_biomechanics_data():
         "viz3": proc.get_visualized_left_right_asymmetry(5, 10).json_serialise(),
         "viz4": proc.get_visualized_left_right_asymmetry(4, 8).json_serialise()
     }
-    for i in range(5):
+    for i in range(3):
         session = {
-                    'session_id': f"session{i}",
+                    'session_id': session_ids[i],
                     'duration':  durations[i] * 30,
                     'sport_name': 17,
                     'event_date_time': format_datetime(current - datetime.timedelta(days=i)),
