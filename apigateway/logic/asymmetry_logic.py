@@ -1,6 +1,7 @@
 from models.asymmetry import VisualizedLeftRightAsymmetry
 
 
+# Questions on this code, please see Evan LaForge
 class AsymmetryProcessor(object):
     def __init__(self):
         self.min_left_degrees = 46.67
