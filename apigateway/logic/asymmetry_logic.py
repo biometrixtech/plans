@@ -20,10 +20,10 @@ class AsymmetryProcessor(object):
                 right_apt = 3.0 * left_apt
 
         if 0 < right_apt <= left_apt:
-            degrees_left = (((left_apt/right_apt) - 1) * 41.21) + self.min_left_degrees
+            degrees_left = ((((left_apt/right_apt) - 1)**.75) * 41.21) + self.min_left_degrees
         else:
             if left_apt > 0:
-                degrees_right = (((right_apt/left_apt) - 1) * 32.08) + self.min_right_degrees
+                degrees_right = ((((right_apt/left_apt) - 1)**.75) * 37.00) + self.min_right_degrees
 
         return degrees_left, degrees_right
 
