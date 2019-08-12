@@ -103,7 +103,7 @@ class SessionAsymmetry(Serialisable):
                             ],
                         'detail_data': [t.json_serialise(api) for t in self.time_blocks],
                         'detail_text': self.get_detail_text(),
-                        'detail_bold_text': [b for b in self.get_detail_bold_text()]
+                        'detail_bold_text': [b.json_serialise() for b in self.get_detail_bold_text()]
                     }
                 }
             }
