@@ -116,6 +116,9 @@ class StatsProcessing(object):
                                                     self.get_chronic_weeks_plans(),
                                                     self.chronic_daily_plans
                                                     )
+
+        training_volume_processing.load_biomechanics_chart(self.all_plans)
+
         current_athlete_stats.sport_max_load = training_volume_processing.sport_max_load
 
         current_athlete_stats.load_stats = training_volume_processing.load_stats

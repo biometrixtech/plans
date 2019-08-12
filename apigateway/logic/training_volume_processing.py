@@ -178,6 +178,15 @@ class TrainingVolumeProcessing(object):
         else:
             return False
 
+    @xray_recorder.capture('logic.TrainingVolumeProcessing.load_biomechanics_chart')
+    def load_biomechanics_chart(self, all_plans):
+
+        sessions = self.get_training_sessions(all_plans)
+
+        biomechanics_chart = BiomechanicsChart()
+        biomechanics_chart.add_sessions(sessions)
+        self.biomechanics_chart = biomechanics_chart
+
     @xray_recorder.capture('logic.TrainingVolumeProcessing.load_plan_values')
     def load_plan_values(self, last_7_days_plans, days_8_14_plans, acute_daily_plans, chronic_weeks_plans,
                          chronic_daily_plans):
@@ -206,13 +215,6 @@ class TrainingVolumeProcessing(object):
 
         last_7_day_training_sessions = self.get_training_sessions(last_7_days_plans)
         previous_7_day_training_sessions = self.get_training_sessions(days_8_14_plans)
-
-        acute_training_sessions = self.get_training_sessions(acute_daily_plans)
-        chronic_training_sessions = self.get_training_sessions(chronic_daily_plans)
-
-        last_35_day_sessions = []
-        last_35_day_sessions.extend(chronic_training_sessions)
-        last_35_day_sessions.extend(acute_training_sessions)
 
         last_14_day_sessions = []
         last_14_day_sessions.extend(previous_7_day_training_sessions)
@@ -270,10 +272,6 @@ class TrainingVolumeProcessing(object):
 
         self.training_volume_chart_data = training_volume_chart_data.get_output_list()
         self.workout_chart = workout_chart
-
-        biomechanics_chart = BiomechanicsChart()
-        biomechanics_chart.add_sessions(last_14_day_sessions)
-        self.biomechanics_chart = biomechanics_chart
 
         #self.last_week_external_values.extend(
         #    x for x in self.get_plan_session_attribute_sum_list("external_load", last_7_days_plans) if x is not None)
