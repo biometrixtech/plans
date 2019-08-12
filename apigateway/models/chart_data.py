@@ -260,7 +260,6 @@ class BiomechanicsChartData(Serialisable):
                 summary_data.summary_side = "0"
                 bold_text_1 = BoldText()
                 bold_text_1.text = "balanced"
-                bold_text_1.color = "successLight"
                 summary_data.summary_take_away_bold_text.append(bold_text_1)
 
             asymmetry_data.body_side = body_side
