@@ -69,20 +69,33 @@ class SessionAsymmetry(Serialisable):
 
         if self.left_apt > self.right_apt > 0:
 
-            percentage = round(((self.left_apt / self.right_apt) - 1.00) * 100, 2)
+            percentage = round(((self.left_apt / self.right_apt) - 1.00) * 100, 0)
             bold_text = BoldText()
-            bold_text.text = percentage
+            bold_text.text = str(percentage) + "%"
             return [bold_text]
 
         elif self.right_apt > self.left_apt > 0:
 
-            percentage = round(((self.right_apt / self.left_apt) - 1.00) * 100, 2)
+            percentage = round(((self.right_apt / self.left_apt) - 1.00) * 100, 0)
             bold_text = BoldText()
-            bold_text.text = percentage
+            bold_text.text = str(percentage) + "%"
             return [bold_text]
 
         else:
             return []
+
+    def get_detail_bold_side(self):
+
+        if self.left_apt > self.right_apt > 0:
+
+            return "1"
+
+        elif self.right_apt > self.left_apt > 0:
+
+            return "2"
+
+        else:
+            return "0"
 
     def json_serialise(self, api=False):
         if api:
@@ -103,7 +116,8 @@ class SessionAsymmetry(Serialisable):
                             ],
                         'detail_data': [t.json_serialise(api) for t in self.time_blocks],
                         'detail_text': self.get_detail_text(),
-                        'detail_bold_text': [b.json_serialise() for b in self.get_detail_bold_text()]
+                        'detail_bold_text': [b.json_serialise() for b in self.get_detail_bold_text()],
+                        'detail_bold_side': self.get_detail_bold_side()
                     }
                 }
             }

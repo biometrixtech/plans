@@ -9,6 +9,7 @@ from models.soreness_base import BodyPartSide
 from models.sport import SportName
 from models.session import SportTrainingSession, SessionSource
 from models.asymmetry import VisualizedLeftRightAsymmetry
+from models.styles import LegendColor
 from logic.soreness_processing import SorenessCalculator
 from logic.asymmetry_logic import AsymmetryProcessor
 
@@ -218,8 +219,9 @@ class BiomechanicsChartData(Serialisable):
             body_side = 0
             if session.asymmetry.left_apt > session.asymmetry.right_apt:
                 body_side = 1
-                percentage = round(((session.asymmetry.left_apt / session.asymmetry.right_apt) - 1.00) * 100, 2)
+                percentage = round(((session.asymmetry.left_apt / session.asymmetry.right_apt) - 1.00) * 100, 0)
                 summary_data.summary_percentage = str(percentage)
+                summary_data.summary_side = "1"
                 summary_data.summary_text = "more range of motion during left foot steps"
                 summary_data.summary_take_away_text = "You had " + str(percentage) + "% more range of motion during left foot steps compared to right foot steps."
                 # bold_text_1 = BoldText()
@@ -235,8 +237,9 @@ class BiomechanicsChartData(Serialisable):
 
             elif session.asymmetry.right_apt > session.asymmetry.left_apt:
                 body_side = 2
-                percentage = round(((session.asymmetry.right_apt / session.asymmetry.left_apt) - 1.00) * 100, 2)
+                percentage = round(((session.asymmetry.right_apt / session.asymmetry.left_apt) - 1.00) * 100, 0)
                 summary_data.summary_percentage = str(percentage)
+                summary_data.summary_side = "2"
                 summary_data.summary_text = "more range of motion during right foot steps"
                 summary_data.summary_take_away_text = "You had " + str(
                     percentage) + "% more range of motion during right foot steps compared to left foot steps."
@@ -244,6 +247,7 @@ class BiomechanicsChartData(Serialisable):
                 # bold_text_1.text = str(percentage) + "%"
                 bold_text_2 = BoldText()
                 bold_text_2.text = "right"
+
                 # summary_data.summary_bold_text.append(bold_text_1)
                 summary_data.summary_bold_text.append(bold_text_2)
                 bold_text_3 = BoldText()
@@ -253,6 +257,7 @@ class BiomechanicsChartData(Serialisable):
             else:
                 summary_data.summary_text = "symmetric range of motion today!"
                 summary_data.summary_take_away_text = "Your average range of motion was balanced between left and right steps across this workout."
+                summary_data.summary_side = "0"
                 bold_text_1 = BoldText()
                 bold_text_1.text = "balanced"
                 bold_text_1.color = "successLight"
@@ -297,6 +302,7 @@ class AsymmetrySummaryData(Serialisable):
         self.summary_take_away_text = ""
         self.summary_take_away_bold_text = []
         self.summary_legend = []
+        self.summary_side = "0"
 
     def json_serialise(self):
         ret = {
