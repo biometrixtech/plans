@@ -61,7 +61,7 @@ class SessionAsymmetry(Serialisable):
                                     'text': 'No Asymmetry Identified',
                                 },
                                 {
-                                    'color': [1, 4],
+                                    'color': [10, 4],
                                     'text': 'Significant Asymmetry Identified',
                                 },
                             ],
