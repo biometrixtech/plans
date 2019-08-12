@@ -1,5 +1,6 @@
 from serialisable import Serialisable
 from utils import format_datetime, parse_datetime
+from models.styles import BoldText
 
 
 class TimeBlockAsymmetry(Serialisable):
@@ -48,6 +49,41 @@ class SessionAsymmetry(Serialisable):
         self.time_blocks = []
         self.seconds_duration = 0
 
+    def get_detail_text(self):
+
+        if self.left_apt > self.right_apt > 0:
+
+            percentage = round(((self.left_apt / self.right_apt) - 1.00) * 100, 2)
+            return "Your range of motion was asymmetric in " + str(percentage) + "% of this workout."
+
+        elif self.right_apt > self.left_apt > 0:
+
+            percentage = round(((self.right_apt / self.left_apt) - 1.00) * 100, 2)
+            return "Your range of motion was asymmetric in " + str(percentage) + "% of this workout."
+
+        else:
+
+            return "We didn’t find any statistically significant pelvic range of motion asymmetry in this workout."
+
+    def get_detail_bold_text(self):
+
+        if self.left_apt > self.right_apt > 0:
+
+            percentage = round(((self.left_apt / self.right_apt) - 1.00) * 100, 2)
+            bold_text = BoldText()
+            bold_text.text = percentage
+            return [bold_text]
+
+        elif self.right_apt > self.left_apt > 0:
+
+            percentage = round(((self.right_apt / self.left_apt) - 1.00) * 100, 2)
+            bold_text = BoldText()
+            bold_text.text = percentage
+            return [bold_text]
+
+        else:
+            return []
+
     def json_serialise(self, api=False):
         if api:
             ret = {
@@ -66,7 +102,8 @@ class SessionAsymmetry(Serialisable):
                                 },
                             ],
                         'detail_data': [t.json_serialise(api) for t in self.time_blocks],
-                        'detail_text': {}
+                        'detail_text': self.get_detail_text(),
+                        'detail_bold_text': [b for b in self.get_detail_bold_text()]
                     }
                 }
             }
