@@ -22,7 +22,7 @@ from logic.soreness_processing import SorenessCalculator
 from models.stats import AthleteStats
 from models.daily_readiness import DailyReadiness
 from models.daily_plan import DailyPlan
-from models.athlete_trend import VisualizationType
+from models.styles import VisualizationType
 from models.historic_soreness import SorenessCause
 from models.soreness_base import HistoricSorenessStatus
 from config import get_secret

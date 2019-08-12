@@ -3,7 +3,8 @@ import time
 import json
 import requests
 import test_users
-from models.athlete_trend import InsightType, VisualizationType
+from models.athlete_trend import InsightType
+from models.styles import VisualizationType
 from aws_xray_sdk.core import xray_recorder
 os.environ['ENVIRONMENT'] = 'test'
 xray_recorder.configure(sampling=False)

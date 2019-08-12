@@ -1,4 +1,6 @@
-from models.athlete_trend import TrendDashboardCategory, PlanAlert, Trend, TrendCategory, TrendData, VisualizationType, LegendColor, BoldText, FirstTimeExperienceElement, CategoryFirstTimeExperienceModal
+from models.athlete_trend import TrendDashboardCategory, PlanAlert, Trend, TrendCategory, TrendData, \
+    FirstTimeExperienceElement, CategoryFirstTimeExperienceModal
+from models.styles import BoldText, LegendColor, VisualizationType
 from models.trigger import TriggerType, Trigger
 from models.chart_data import PainFunctionalLimitationChartData, TightOverUnderactiveChartData
 from models.insights import InsightType
