@@ -31,6 +31,9 @@ class LegendColor(Enum):
     warning_light = 5
     error_light = 6
     splash_x_light = 7
+    purple_light_opacity = 8
+    splash_light_opacity = 9
+    purple_light = 10
 
 
 class Legend(object):
