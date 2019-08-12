@@ -207,6 +207,13 @@ class TrainingVolumeProcessing(object):
         last_7_day_training_sessions = self.get_training_sessions(last_7_days_plans)
         previous_7_day_training_sessions = self.get_training_sessions(days_8_14_plans)
 
+        acute_training_sessions = self.get_training_sessions(acute_daily_plans)
+        chronic_training_sessions = self.get_training_sessions(chronic_daily_plans)
+
+        last_35_day_sessions = []
+        last_35_day_sessions.extend(chronic_training_sessions)
+        last_35_day_sessions.extend(acute_training_sessions)
+
         last_14_day_sessions = []
         last_14_day_sessions.extend(previous_7_day_training_sessions)
         last_14_day_sessions.extend(last_7_day_training_sessions)
@@ -265,7 +272,7 @@ class TrainingVolumeProcessing(object):
         self.workout_chart = workout_chart
 
         biomechanics_chart = BiomechanicsChart()
-        biomechanics_chart.add_sessions(last_14_day_sessions)
+        biomechanics_chart.add_sessions(last_35_day_sessions)
         self.biomechanics_chart = biomechanics_chart
 
         #self.last_week_external_values.extend(

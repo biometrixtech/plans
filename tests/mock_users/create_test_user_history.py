@@ -3,7 +3,8 @@ import time
 import json
 import requests
 import test_users
-from models.athlete_trend import InsightType, VisualizationType
+from models.athlete_trend import InsightType
+from models.styles import VisualizationType
 from aws_xray_sdk.core import xray_recorder
 os.environ['ENVIRONMENT'] = 'test'
 xray_recorder.configure(sampling=False)
@@ -62,6 +63,18 @@ if __name__ == '__main__':
     history_length = 35
 
     users = test_users.get_test_users()
+
+    three_sensor_users = test_users.get_three_sensor_test_users()
+
+    for u in three_sensor_users:
+        if u in ["tread_a@200.com", "tread_b@200.com", "tread_run@200.com", "run_a@200.com"]:
+            soreness_history = []
+            user_id, jwt = login_user(u)
+            print(u + "=" + user_id)
+            persona1 = Persona(user_id)
+            persona1.soreness_history = soreness_history
+            persona1.create_history(days=history_length, suffix='')
+            print(time.time() - start)
 
     for u in users:
         if u == "full_fte@200.com" or u == "full_fte_2@200.com":
