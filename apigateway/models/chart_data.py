@@ -219,7 +219,7 @@ class BiomechanicsChartData(Serialisable):
             body_side = 0
             if session.asymmetry.left_apt > session.asymmetry.right_apt:
                 body_side = 1
-                percentage = round(((session.asymmetry.left_apt / session.asymmetry.right_apt) - 1.00) * 100, 0)
+                percentage = round(((session.asymmetry.left_apt / session.asymmetry.right_apt) - 1.00) * 100)
                 summary_data.summary_percentage = str(percentage)
                 summary_data.summary_side = "1"
                 summary_data.summary_text = "more range of motion during left foot steps"
@@ -237,7 +237,7 @@ class BiomechanicsChartData(Serialisable):
 
             elif session.asymmetry.right_apt > session.asymmetry.left_apt:
                 body_side = 2
-                percentage = round(((session.asymmetry.right_apt / session.asymmetry.left_apt) - 1.00) * 100, 0)
+                percentage = round(((session.asymmetry.right_apt / session.asymmetry.left_apt) - 1.00) * 100)
                 summary_data.summary_percentage = str(percentage)
                 summary_data.summary_side = "2"
                 summary_data.summary_text = "more range of motion during right foot steps"
@@ -309,6 +309,7 @@ class AsymmetrySummaryData(Serialisable):
             'summary_data': self.summary_data.json_serialise() if self.summary_data is not None else None,
             'summary_percentage': self.summary_percentage,
             'summary_text': self.summary_text,
+            'summary_side': self.summary_side,
             'summary_bold_text': [b.json_serialise() for b in self.summary_bold_text],
             'summary_take_away_bold_text': [b.json_serialise() for b in self.summary_take_away_bold_text],
             'summary_legend': [],
@@ -322,6 +323,7 @@ class AsymmetrySummaryData(Serialisable):
         data.summary_data = VisualizedLeftRightAsymmetry.json_deserialise(input_dict['summary_data']) if input_dict.get('summary_data') is not None else None
         data.summary_percentage = input_dict.get('summary_percentage', '')
         data.summary_text = input_dict.get('summary_text', '')
+        data.summary_side = input_dict.get('summary_side', '')
         data.summary_bold_text = [BoldText.json_deserialise(b) for b in input_dict.get('summary_bold_text', [])]
         data.summary_take_away_text = input_dict.get('summary_take_away_text', '')
         data.summary_take_away_bold_text = [BoldText.json_deserialise(b) for b in input_dict.get('summary_take_away_bold_text', [])]

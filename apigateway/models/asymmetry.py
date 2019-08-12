@@ -69,14 +69,14 @@ class SessionAsymmetry(Serialisable):
 
         if self.left_apt > self.right_apt > 0:
 
-            percentage = round(((self.left_apt / self.right_apt) - 1.00) * 100, 0)
+            percentage = round(((self.left_apt / self.right_apt) - 1.00) * 100)
             bold_text = BoldText()
             bold_text.text = str(percentage) + "%"
             return [bold_text]
 
         elif self.right_apt > self.left_apt > 0:
 
-            percentage = round(((self.right_apt / self.left_apt) - 1.00) * 100, 0)
+            percentage = round(((self.right_apt / self.left_apt) - 1.00) * 100)
             bold_text = BoldText()
             bold_text.text = str(percentage) + "%"
             return [bold_text]
