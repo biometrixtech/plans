@@ -189,7 +189,7 @@ class BiomechanicsChartData(Serialisable):
             'session_id' : self.session_id,
             'duration': self.duration,
             'sport_name': self.sport_name.value if self.sport_name is not None else None,
-            'event_date_time ': format_datetime(self.event_date_time) if self.event_date_time is not None else None,
+            'event_date_time': format_datetime(self.event_date_time) if self.event_date_time is not None else None,
             'asymmetry': self.asymmetry.json_serialise() if self.asymmetry is not None else None
         }
         return ret
@@ -201,7 +201,7 @@ class BiomechanicsChartData(Serialisable):
         data.duration = input_dict.get('duration', 0)
         data.sport_name = SportName(input_dict['sport_name']) if input_dict.get('sport_name') is not None else None
         data.event_date_time = parse_datetime(input_dict['event_date_time']) if input_dict.get('event_date_time') is not None else None
-        data.apt = AsymmetryData.json_deserialise(input_dict['asymmetry']) if input_dict.get('asymmetry') is not None else None
+        data.asymmetry = AsymmetryData.json_deserialise(input_dict['asymmetry']) if input_dict.get('asymmetry') is not None else None
         return data
 
     def add_session_data(self, session):
