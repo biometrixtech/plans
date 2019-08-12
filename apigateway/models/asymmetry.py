@@ -53,12 +53,12 @@ class SessionAsymmetry(Serialisable):
 
         if self.left_apt > self.right_apt > 0:
 
-            percentage = round(((self.left_apt / self.right_apt) - 1.00) * 100, 2)
+            percentage = round(((self.left_apt / self.right_apt) - 1.00) * 100)
             return "Your range of motion was asymmetric in " + str(percentage) + "% of this workout."
 
         elif self.right_apt > self.left_apt > 0:
 
-            percentage = round(((self.right_apt / self.left_apt) - 1.00) * 100, 2)
+            percentage = round(((self.right_apt / self.left_apt) - 1.00) * 100)
             return "Your range of motion was asymmetric in " + str(percentage) + "% of this workout."
 
         else:
