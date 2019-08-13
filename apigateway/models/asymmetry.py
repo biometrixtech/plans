@@ -107,11 +107,11 @@ class SessionAsymmetry(Serialisable):
                         'detail_legend': [
                                 {
                                     'color': [8, 9],
-                                    'text': 'No Asymmetry Identified',
+                                    'text': 'Symmetric',
                                 },
                                 {
                                     'color': [10, 4],
-                                    'text': 'Significant Asymmetry Identified',
+                                    'text': 'Asymmetric',
                                 },
                             ],
                         'detail_data': [t.json_serialise(api) for t in self.time_blocks],

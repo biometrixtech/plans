@@ -255,7 +255,7 @@ class BiomechanicsChartData(Serialisable):
                 #bold_text_3.color = "successLight"
                 summary_data.summary_take_away_bold_text.append(bold_text_3)
             else:
-                summary_data.summary_text = "symmetric range of motion today!"
+                summary_data.summary_text = "Symmetric range of motion in this workout!"
                 summary_data.summary_take_away_text = "Your average range of motion was balanced between left and right steps across this workout."
                 summary_data.summary_side = "0"
                 bold_text_1 = BoldText()
