@@ -37,6 +37,7 @@ class TriggerType(IntEnum):
     response_poor_response_within_a_session_torso_loading_pattern = 102
     biomechanics_fatigue_within_a_session_torso_loading_pattern = 103
     biomechanics_poor_response_within_a_session_torso_loading_pattern = 104
+    movement_error_apt_asymmetry = 110
     stress_no_triggers_flagged_based_on_training_volume = 201
     response_no_triggers_flagged_based_on_soreness = 202
     response_no_triggers_flagged_based_on_pain = 203

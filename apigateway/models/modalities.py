@@ -430,6 +430,21 @@ class ModalityBase(object):
                 dosage.default_comprehensive_reps_assigned = exercise.max_reps
                 dosage.default_comprehensive_sets_assigned = 2
 
+        elif dosage.goal.goal_type == AthleteGoalType.three_sensor_reactive:
+            if dosage.priority == "1" or dosage.priority == "2" or dosage.priority == "3":
+                dosage.efficient_reps_assigned = exercise.min_reps
+                dosage.efficient_sets_assigned = 1
+                dosage.complete_reps_assigned = exercise.max_reps
+                dosage.complete_sets_assigned = 1
+                dosage.comprehensive_reps_assigned = exercise.max_reps
+                dosage.comprehensive_sets_assigned = 2
+                dosage.default_efficient_reps_assigned = exercise.min_reps
+                dosage.default_efficient_sets_assigned = 1
+                dosage.default_complete_reps_assigned = exercise.max_reps
+                dosage.default_complete_sets_assigned = 1
+                dosage.default_comprehensive_reps_assigned = exercise.max_reps
+                dosage.default_comprehensive_sets_assigned = 2
+
         elif dosage.goal.goal_type == AthleteGoalType.on_request:
             if dosage.priority == "1":
                 dosage.efficient_reps_assigned = exercise.min_reps
@@ -818,6 +833,8 @@ class ActiveRest(ModalityBase):
                 self.check_corrective_soreness(t, self.event_date_time, exercise_library, max_severity)
                 self.check_corrective_pain(t, self.event_date_time, exercise_library, max_severity)
 
+        self.check_reactive_three_sensor(trigger_list, exercise_library)
+
         if ((high_relative_load_session or high_relative_intensity_logged or muscular_strain_high)
                 and not checked_recover_from_sport):
             self.check_reactive_recover_from_sport(trigger_list, exercise_library, high_relative_load_session,
@@ -830,6 +847,10 @@ class ActiveRest(ModalityBase):
         pass
 
     def check_reactive_recover_from_sport_general(self, sports, exercise_library, goal, max_severity):
+
+        pass
+
+    def check_reactive_three_sensor(self, trigger_list, exercise_library):
 
         pass
 
@@ -988,6 +1009,55 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
         self.reactivate_complete_corrective_goals_by_collection(self.active_stretch_exercises)
         self.reactivate_complete_corrective_goals_by_collection(self.static_integrate_exercises)
         self.reactivate_complete_corrective_goals_by_collection(self.isolated_activate_exercises)
+
+    def check_reactive_three_sensor(self, trigger_list, exercise_library):
+
+        for t in trigger_list:
+            if TriggerType.movement_error_apt_asymmetry == t.trigger_type:
+                goal = AthleteGoal("3 Sensor Reactive", 1, AthleteGoalType.three_sensor_reactive)
+                body_part_factory = BodyPartFactory()
+                quads = body_part_factory.get_body_part(BodyPart(BodyPartLocation.quads, None))
+                lats = body_part_factory.get_body_part(BodyPart(BodyPartLocation.lats, None))
+                hip = body_part_factory.get_body_part(BodyPart(BodyPartLocation.hip_flexor, None))
+                upper_back = body_part_factory.get_body_part(BodyPart(BodyPartLocation.upper_back_neck, None))
+                calves = body_part_factory.get_body_part(BodyPart(BodyPartLocation.calves, None))
+                adducter = body_part_factory.get_body_part(BodyPart(BodyPartLocation.groin, None))
+                hamstring = body_part_factory.get_body_part(BodyPart(BodyPartLocation.hamstrings, None))
+                glutes = body_part_factory.get_body_part(BodyPart(BodyPartLocation.glutes, None))
+
+                # inhibit exercises
+                self.copy_exercises(quads.inhibit_exercises, self.inhibit_exercises, goal, "1",
+                                    None, exercise_library)
+                self.copy_exercises(lats.inhibit_exercises, self.inhibit_exercises, goal, "1",
+                                    None, exercise_library)
+                self.copy_exercises(hip.inhibit_exercises, self.inhibit_exercises, goal, "2",
+                                    None, exercise_library)
+                self.copy_exercises(upper_back.inhibit_exercises, self.inhibit_exercises, goal, "2",
+                                    None, exercise_library)
+                self.copy_exercises(calves.inhibit_exercises, self.inhibit_exercises, goal, "3",
+                                    None, exercise_library)
+                self.copy_exercises(hamstring.inhibit_exercises, self.inhibit_exercises, goal, "3",
+                                    None, exercise_library)
+                self.copy_exercises(adducter.inhibit_exercises, self.inhibit_exercises, goal, "3",
+                                    None, exercise_library)
+
+                # static stretch
+                self.copy_exercises(quads.static_stretch_exercises, self.static_stretch_exercises, goal, "1",
+                                    None, exercise_library)
+                self.copy_exercises(lats.static_stretch_exercises, self.static_stretch_exercises, goal, "1",
+                                    None, exercise_library)
+                self.copy_exercises(hip.static_stretch_exercises, self.static_stretch_exercises, goal, "2",
+                                    None, exercise_library)
+                self.copy_exercises(upper_back.static_stretch_exercises, self.static_stretch_exercises, goal, "2",
+                                    None, exercise_library)
+
+                # active stretch
+                self.copy_exercises(calves.active_stretch_exercises, self.active_stretch_exercises, goal, "3",
+                                    None, exercise_library)
+                self.copy_exercises(hamstring.active_stretch_exercises, self.active_stretch_exercises, goal, "3",
+                                    None, exercise_library)
+                self.copy_exercises(adducter.active_stretch_exercises, self.active_stretch_exercises, goal, "3",
+                                    None, exercise_library)
 
     def check_reactive_recover_from_sport_general(self, sports, exercise_library, goal, max_severity):
 
@@ -1411,6 +1481,52 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
         self.reactivate_complete_corrective_goals_by_collection(self.static_stretch_exercises)
         self.reactivate_complete_corrective_goals_by_collection(self.static_integrate_exercises)
         self.reactivate_complete_corrective_goals_by_collection(self.isolated_activate_exercises)
+
+    def check_reactive_three_sensor(self, trigger_list, exercise_library):
+
+        for t in trigger_list:
+            if TriggerType.movement_error_apt_asymmetry == t.trigger_type:
+                goal = AthleteGoal("3 Sensor Reactive", 1, AthleteGoalType.three_sensor_reactive)
+                body_part_factory = BodyPartFactory()
+                quads = body_part_factory.get_body_part(BodyPart(BodyPartLocation.quads, None))
+                lats = body_part_factory.get_body_part(BodyPart(BodyPartLocation.lats, None))
+                hip = body_part_factory.get_body_part(BodyPart(BodyPartLocation.hip_flexor, None))
+                upper_back = body_part_factory.get_body_part(BodyPart(BodyPartLocation.upper_back_neck, None))
+                calves = body_part_factory.get_body_part(BodyPart(BodyPartLocation.calves, None))
+                adducter = body_part_factory.get_body_part(BodyPart(BodyPartLocation.groin, None))
+                hamstring = body_part_factory.get_body_part(BodyPart(BodyPartLocation.hamstrings, None))
+
+                # inhibit exercises
+                self.copy_exercises(quads.inhibit_exercises, self.inhibit_exercises, goal, "1",
+                                    None, exercise_library)
+                self.copy_exercises(lats.inhibit_exercises, self.inhibit_exercises, goal, "1",
+                                    None, exercise_library)
+                self.copy_exercises(hip.inhibit_exercises, self.inhibit_exercises, goal, "2",
+                                    None, exercise_library)
+                self.copy_exercises(upper_back.inhibit_exercises, self.inhibit_exercises, goal, "2",
+                                    None, exercise_library)
+                self.copy_exercises(calves.inhibit_exercises, self.inhibit_exercises, goal, "3",
+                                    None, exercise_library)
+                self.copy_exercises(hamstring.inhibit_exercises, self.inhibit_exercises, goal, "3",
+                                    None, exercise_library)
+                self.copy_exercises(adducter.inhibit_exercises, self.inhibit_exercises, goal, "3",
+                                    None, exercise_library)
+
+                # static stretch
+                self.copy_exercises(quads.static_stretch_exercises, self.static_stretch_exercises, goal, "1",
+                                    None, exercise_library)
+                self.copy_exercises(lats.static_stretch_exercises, self.static_stretch_exercises, goal, "1",
+                                    None, exercise_library)
+                self.copy_exercises(hip.static_stretch_exercises, self.static_stretch_exercises, goal, "2",
+                                    None, exercise_library)
+                self.copy_exercises(upper_back.static_stretch_exercises, self.static_stretch_exercises, goal, "2",
+                                    None, exercise_library)
+                self.copy_exercises(calves.static_stretch_exercises, self.static_stretch_exercises, goal, "3",
+                                    None, exercise_library)
+                self.copy_exercises(hamstring.static_stretch_exercises, self.static_stretch_exercises, goal, "3",
+                                    None, exercise_library)
+                self.copy_exercises(adducter.static_stretch_exercises, self.static_stretch_exercises, goal, "3",
+                                    None, exercise_library)
 
     def check_reactive_recover_from_sport_general(self, sports, exercise_library, goal, max_severity):
 

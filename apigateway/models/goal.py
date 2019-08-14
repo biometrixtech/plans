@@ -13,6 +13,7 @@ class AthleteGoalType(Enum):
     counter_overreaching = 8
     respond_risk = 9
     on_request = 10
+    three_sensor_reactive = 20
 
 
 class AthleteGoal(object):

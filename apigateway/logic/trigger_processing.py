@@ -1,4 +1,5 @@
 from models.body_parts import BodyPartFactory, BodyPartLocation, BodyPart
+from models.session import SessionSource
 from models.soreness_base import HistoricSorenessStatus, BodyPartSide
 from models.goal import AthleteGoalType, AthleteGoal
 from models.trigger import TriggerType, Trigger
@@ -155,8 +156,6 @@ class TriggerFactory(object):
 
     def load_triggers(self):
 
-        #self.triggers = []
-
         if self.high_relative_load_session or self.high_relative_intensity_session:
 
             for sport_name in self.high_relative_load_session_sport_names:
@@ -174,6 +173,12 @@ class TriggerFactory(object):
 
         if self.muscular_strain_high:
             self.set_trigger(TriggerType.overreaching_high_muscular_strain)  # 8
+
+        for session in self.training_sessions:
+            if session.source == SessionSource.three_sensor:
+                if session.asymmetry is not None:
+                    if session.left_apt != session.right_apt:
+                        self.set_trigger(TriggerType.movement_error_apt_asymmetry, soreness=None, sport_name=None) # 110
 
         for soreness in self.soreness_list:
 
