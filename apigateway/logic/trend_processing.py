@@ -17,16 +17,16 @@ class TrendProcessor(object):
 
         self.initialize_trend_categories()
 
-    def get_antagonists_syngergists(self, triggers):
+    def get_antagonists_syngergists(self, triggers, use_agonists=False):
 
         antagonists = []
         synergists = []
 
-        #body_part_factory = BodyPartFactory()
+        body_part_factory = BodyPartFactory()
 
         for t in triggers:
-            # if body_part_factory.is_joint(t.body_part):
-            #     antagonists.extend(t.agonists)
+            if body_part_factory.is_joint(t.body_part) and use_agonists:
+                antagonists.extend(t.agonists)
             antagonists.extend(t.antagonists)
             synergists.extend(t.synergists)
 
@@ -617,7 +617,7 @@ class TrendProcessor(object):
         triggers = list(t for t in self.trigger_list if t.trigger_type in hist_pain_triggers)
 
         if len(triggers) > 0:
-            antagonists, synergists = self.get_antagonists_syngergists(triggers)
+            antagonists, synergists = self.get_antagonists_syngergists(triggers, use_agonists=True)
 
             trend = self.get_limitation_trend(category_index)
 
@@ -626,7 +626,7 @@ class TrendProcessor(object):
             trend_data.add_visualization_data()
             pain_functional_data = PainFunctionalLimitationChartData()
             pain_functional_data.overactive.extend([t.body_part for t in triggers])
-            #pain_functional_data.underactive.extend([a for a in antagonists])
+            pain_functional_data.underactive.extend([a for a in antagonists])
             #pain_functional_data.underactive_needing_care.extend([s for s in synergists])
             pain_functional_data.underactive.extend([s for s in synergists])
             pain_functional_data.remove_duplicates()

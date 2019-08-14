@@ -872,10 +872,13 @@ def test_overlapping_muscle_correct():
     assert trend_processor.athlete_trend_categories[0].trends[0].trend_data.data[0].overactive[0].side == 2
     assert trend_processor.athlete_trend_categories[0].trends[0].trend_data.data[0].overactive[1].body_part_location == BodyPartLocation.calves
     assert trend_processor.athlete_trend_categories[0].trends[0].trend_data.data[0].overactive[1].side == 2
-    assert trend_processor.athlete_trend_categories[0].trends[0].trend_data.data[0].underactive[0].body_part_location == BodyPartLocation.hip_flexor
+    assert trend_processor.athlete_trend_categories[0].trends[0].trend_data.data[0].underactive[0].body_part_location == BodyPartLocation.shin
     assert trend_processor.athlete_trend_categories[0].trends[0].trend_data.data[0].underactive[0].side == 2
     assert trend_processor.athlete_trend_categories[0].trends[0].trend_data.data[0].underactive[1].body_part_location == BodyPartLocation.quads
     assert trend_processor.athlete_trend_categories[0].trends[0].trend_data.data[0].underactive[1].side == 2
+    assert trend_processor.athlete_trend_categories[0].trends[0].trend_data.data[0].underactive[2].body_part_location == BodyPartLocation.hip_flexor
+    assert trend_processor.athlete_trend_categories[0].trends[0].trend_data.data[0].underactive[2].side == 2
+
 
 def test_agonist_capitalized():
 
