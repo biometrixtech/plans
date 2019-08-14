@@ -4,7 +4,7 @@ from fathomapi.utils.xray import xray_recorder
 from datastores.datastore_collection import DatastoreCollection
 from logic.survey_processing import cleanup_plan
 from models.insights import InsightType
-from models.athlete_trend import VisualizationType
+from models.styles import VisualizationType
 from utils import parse_datetime, format_date
 
 datastore_collection = DatastoreCollection()

@@ -116,6 +116,9 @@ class StatsProcessing(object):
                                                     self.get_chronic_weeks_plans(),
                                                     self.chronic_daily_plans
                                                     )
+
+        training_volume_processing.load_biomechanics_chart(self.all_plans)
+
         current_athlete_stats.sport_max_load = training_volume_processing.sport_max_load
 
         current_athlete_stats.load_stats = training_volume_processing.load_stats
@@ -138,6 +141,7 @@ class StatsProcessing(object):
 
         current_athlete_stats.training_volume_chart_data = training_volume_processing.training_volume_chart_data
         current_athlete_stats.workout_chart = training_volume_processing.workout_chart
+        current_athlete_stats.biomechanics_chart = training_volume_processing.biomechanics_chart
         current_athlete_stats.body_response_chart = BodyResponseChart(self.event_date)
         current_athlete_stats.body_response_chart.process_soreness(soreness_list_25)
 

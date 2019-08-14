@@ -1,7 +1,8 @@
 from serialisable import Serialisable
 from fathomapi.utils.exceptions import InvalidSchemaException
 from logic.soreness_processing import SorenessCalculator
-from models.athlete_trend import AthleteTrends, PlanAlert, Trend, TrendCategory, TrendData, VisualizationType, LegendColor, BoldText
+from models.athlete_trend import AthleteTrends, PlanAlert, Trend, TrendCategory, TrendData
+from models.styles import BoldText, LegendColor, VisualizationType
 from models.data_series import DataSeries
 from models.historic_soreness import HistoricSeverity, HistoricSoreness
 from models.insights import AthleteInsight
@@ -132,6 +133,7 @@ class AthleteStats(Serialisable):
 
         self.workout_chart = None
         self.body_response_chart = None
+        self.biomechanics_chart = None
 
         self.eligible_for_high_load_trigger = False
 
