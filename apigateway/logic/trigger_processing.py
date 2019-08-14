@@ -177,7 +177,7 @@ class TriggerFactory(object):
         for session in self.training_sessions:
             if session.source == SessionSource.three_sensor:
                 if session.asymmetry is not None:
-                    if session.left_apt != session.right_apt:
+                    if session.asymmetry.left_apt != session.asymmetry.right_apt:
                         self.set_trigger(TriggerType.movement_error_apt_asymmetry, soreness=None, sport_name=None) # 110
 
         for soreness in self.soreness_list:
