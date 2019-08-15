@@ -67,7 +67,9 @@ if __name__ == '__main__':
     three_sensor_users = test_users.get_three_sensor_test_users()
 
     for u in three_sensor_users:
-        if u in ["tread_a@200.com", "tread_b@200.com", "tread_run@200.com", "run_a@200.com", "sym@200.com", "half_sym@200.com", "run_a_2@200.com", "sym_2@200.com", "long_3s@200.com"]:
+        if u in ["tread_a@200.com", "tread_b@200.com", "tread_run@200.com", "run_a@200.com", "sym@200.com",
+                 "half_sym@200.com", "run_a_2@200.com", "sym_2@200.com", "long_3s@200.com",
+                 "run_a_3@200.com", "sym_3@200.com",]:
             soreness_history = []
             user_id, jwt = login_user(u)
             print(u + "=" + user_id)

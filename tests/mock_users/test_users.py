@@ -1,18 +1,18 @@
 domain = "@200.com"
 
 users = [
-    #"full_fte", #6a91a0cb-2c90-4b93-94d2-a943c6284af7
-    #"sore_fte",
-    # "near_clear",
-    #"two_sore",
-    #"two_pain",
+    "full_fte", #6a91a0cb-2c90-4b93-94d2-a943c6284af7
+    "sore_fte",
+    "near_clear",
+    "two_sore",
+    "two_pain",
     #"full_fte_2",
     # "sore_fte_2",
     #"near_clear_2",
     # "two_sore_2",
     #"two_pain_2", #c82d4f18-efba-421e-b28f-bab349ebd3c1
-    #"pain_sore", #d295beff-701c-448b-9e17-a5aba60b1e36,
-    #"three_pain", #8cc57568-073f-4aeb-9ae2-4bb7c39297a1
+    "pain_sore", #d295beff-701c-448b-9e17-a5aba60b1e36,
+    "three_pain", #8cc57568-073f-4aeb-9ae2-4bb7c39297a1
     #"pain_sore_2",
     #"three_pain_2",
 ]
@@ -26,7 +26,9 @@ three_sensor_users = [
     #"half_sym", #7cf2f832-a043-468c-8f61-13d07765d2a2
     #"run_a_2", #5c695e58-0aba-4eec-9af1-fa93970d3132
     #"sym_2" #aa1534d0-4abd-41c0-9b84-4e414b3d86d4
-    "long_3s", #928f64b5-a761-4278-8724-95a908499fae
+    #"long_3s", #928f64b5-a761-4278-8724-95a908499fae
+    #"run_a_3",  #9e90e3ef-c6e0-4e2d-a430-a52f1e61a962
+    #"sym_3"  #34b47309-7ad5-4222-b865-0f825680541e
 ]
 
 def get_test_users():
