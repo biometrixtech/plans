@@ -159,7 +159,7 @@ def handle_session_update(session_id, principal_id=None):
         session_obj.duration_health = new_session.duration_health
         session_obj.calories = new_session.calories
         session_obj.distance = new_session.distance
-        session_obj.source = SessionSource.combined
+        session_obj.source = SessionSource.user_health
         session_datastore.update(session_obj,
                                  user_id=user_id,
                                  event_date=plan_event_date

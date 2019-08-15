@@ -199,7 +199,7 @@ class SurveyProcessing(object):
                 self.plans.append(daily_plan)
                 days_with_plan.append(plan_date)
 
-            stored_health_sessions = [session.event_date for session in daily_plan.training_sessions if session.source in [SessionSource.health, SessionSource.combined]]
+            stored_health_sessions = [session.event_date for session in daily_plan.training_sessions if session.source in [SessionSource.health, SessionSource.user_health]]
             user_sessions = [session for session in daily_plan.training_sessions if session.source == SessionSource.user]
             if session_event_date not in stored_health_sessions:
                 session_obj = self.create_session_from_survey(session, historic_health_data=True)
@@ -299,7 +299,7 @@ def match_sessions(user_sessions, health_session):
                 user_session.duration_health = health_session.duration_health
                 user_session.calories = health_session.calories
                 user_session.distance = health_session.distance
-                user_session.source = SessionSource.combined
+                user_session.source = SessionSource.user_health
                 return user_session
     return health_session
 
