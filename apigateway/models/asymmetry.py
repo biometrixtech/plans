@@ -63,16 +63,9 @@ class SessionAsymmetry(Serialisable):
 
     def get_detail_bold_text(self):
 
-        if self.left_apt > self.right_apt > 0:
+        if self.percent_events_asymmetric > 0:
 
-            percentage = round(((self.left_apt / self.right_apt) - 1.00) * 100)
-            bold_text = BoldText()
-            bold_text.text = str(percentage) + "%"
-            return [bold_text]
-
-        elif self.right_apt > self.left_apt > 0:
-
-            percentage = round(((self.right_apt / self.left_apt) - 1.00) * 100)
+            percentage = self.percent_events_asymmetric
             bold_text = BoldText()
             bold_text.text = str(percentage) + "%"
             return [bold_text]
