@@ -159,6 +159,12 @@ class BiomechanicsChart(Serialisable):
 
         filtered_list = [s for s in session_list if s.source == SessionSource.three_sensor]
 
+        filtered_list = sorted(filtered_list, key=lambda x:x.event_date, reverse=True)
+
+        filtered_list = filtered_list[:7]
+
+        filtered_list = sorted(filtered_list, key=lambda x:x.event_date, reverse=False)
+
         for f in filtered_list:
             chart_data = BiomechanicsChartData()
             chart_data.add_session_data(f)
