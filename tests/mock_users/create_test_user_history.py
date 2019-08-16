@@ -25,7 +25,7 @@ def login_user(email):
 
 
 def clear_fte_category_view(insight_type, visualization_type, jwt, plan_date_time):
-    url = "http://apis.{env}.fathomai.com/plans/4_2/trends/first_time_experience/view".format(env=os.environ['ENVIRONMENT'])
+    url = "http://apis.{env}.fathomai.com/plans/4_3/trends/first_time_experience/view".format(env=os.environ['ENVIRONMENT'])
     body = {
             "event_date": format_datetime(plan_date_time),
             "insight_type": insight_type.value,
@@ -37,7 +37,7 @@ def clear_fte_category_view(insight_type, visualization_type, jwt, plan_date_tim
 
 
 def clear_fte_category(insight_type, jwt, plan_date_time):
-    url = "http://apis.{env}.fathomai.com/plans/4_2/trends/first_time_experience/category".format(env=os.environ['ENVIRONMENT'])
+    url = "http://apis.{env}.fathomai.com/plans/4_3/trends/first_time_experience/category".format(env=os.environ['ENVIRONMENT'])
     body = {
             "event_date": format_datetime(plan_date_time),
             "insight_type": insight_type.value}
@@ -48,7 +48,7 @@ def clear_fte_category(insight_type, jwt, plan_date_time):
 
 
 def clear_plan_alerts(insight_type, jwt, plan_date_time):
-    url = "http://apis.{env}.fathomai.com/plans/4_2/trends/plan_alerts/clear".format(env=os.environ['ENVIRONMENT'])
+    url = "http://apis.{env}.fathomai.com/plans/4_3/trends/plan_alerts/clear".format(env=os.environ['ENVIRONMENT'])
     body = {
             "event_date": format_datetime(plan_date_time),
             "insight_type": insight_type.value}
