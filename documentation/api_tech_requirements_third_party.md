@@ -4,7 +4,7 @@
 
 ### Overview
 
-This technical summary provides prospective third party clients of __Fathom's Plans API__ with a brief summary of the data returned from the service along with the technical and data requirements.  This document is not a substitute for the full API specification.
+This technical summary provides prospective third party clients of  __Fathom's Plans API__ with a brief summary of the data returned from the service along with the technical and data requirements.  This document is not a substitute for the full API specification.
 
 ### Daily Plan
 
