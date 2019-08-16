@@ -3,7 +3,7 @@ domain = "@200.com"
 users = [
     #"full_fte", #6a91a0cb-2c90-4b93-94d2-a943c6284af7
     #"sore_fte",
-    #"near_clear",
+    "near_clear",
     #"two_sore",
     #"two_pain", #c82d4f18-efba-421e-b28f-bab349ebd3c1
     #"full_fte_2",
@@ -35,7 +35,7 @@ three_sensor_users = [
     # "long_3s_2", #06a112b3-b07f-4da7-a6bb-16558c5345ea
     # "half_sym_2", #d81af04a-385e-4a43-ad95-63222549ecc4
     #"run_a_mazen", #110e14e6-8630-48e8-b75d-0caad447d661
-    "tread_run_2_mazen", #23e93c04-c7cc-40b3-8e34-e43a9cab286a
+    #"tread_run_2_mazen", #23e93c04-c7cc-40b3-8e34-e43a9cab286a
 ]
 
 def get_test_users():
