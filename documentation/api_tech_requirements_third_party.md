@@ -10,20 +10,20 @@ This technical summary provides prospective third party clients of  __Fathom's P
 
 The plans service generates a __Daily Plan__ for an athlete based on one or both of the following data elements:
 
-* __Daily Readiness__ - information about the user's "readiness" and pain/soreness for a given day
-* __Post-Workout__ - information about a user's workout session along with their RPE and pain/soreness following the workout
+* __Daily Readiness__ - information about the athlete's "readiness" and pain/soreness for a given day
+* __Post-Workout__ - information about a athlete's workout session along with their RPE and pain/soreness following the workout
 
-A Daily Plan can be created with as little as one of the above data elements; however, as this information is gathered over time, Fathom's analytics will also use historical patterns in pain/soreness and workouts to influence Daily Plan creation.
+A __Daily Plan__ can be created with as little as one of the above data elements; however, as this information is gathered over time, Fathom's analytics will also use historical patterns in pain/soreness and workouts to influence __Daily Plan__ creation.
 
 
 
 A __Daily Plan__ provides a personalized, research-driven recovery plan for an athlete.  A plan may consist of one or more modalities, targeting one or more recovery goals Fathom analytics identifies for the athlete.
 
-Modalities such as __Active Rest (Before Training)__, __Active Rest (After Training)__, and __Cooldown__ include a series of recommended exercises, personalized for the athlete that day.  These exercises are provided in a sequence consistent with sports science research.
+Modalities such as __Active Rest (Before Training)__, __Active Rest (After Training)__, and __Cooldown__ include a series of recommended exercises personalized for the athlete that day.  These exercises are provided in a sequence consistent with sports science research.
  
 Other modalities do not include exercises but are assigned to a plan based on athlete needs.  These modalities include __heat__, __ice__ and __cold water immersion__.
 
-Recommended dosages are also provided for each exercise/modality.  These dosages are associated with three different active times for the entire exercise sequence (__Efficient__, __Complete__, __Comprehensive__), depending upon the time the athlete has available.  Dosages are also provided by goal, allowing the athlete to further customize their recovery.
+Recommended dosages are also provided for each exercise and modality.  These dosages are associated with three different active times for the entire exercise sequence (__Efficient__, __Complete__, __Comprehensive__), depending upon the time the athlete has available.  Dosages are also provided by goal, allowing the athlete to further customize their recovery.
 
 
 ### Technical and Data Requirements
@@ -51,7 +51,7 @@ The client __must__ submit the header `Authorization: <JWT>` with all requests. 
 
 #### General responses
 
-In addition to the AWS API Gateway responses and the specific responses for each endpoint, the server __may__ respond with one of the following HTTP responses:
+In addition to the API responses and the specific responses for each endpoint, the server __may__ respond with one of the following HTTP responses:
 
 * `400 Bad Request` with `Status` header equal to `InvalidSchema`, if the JSON body of the request does not match the requirements of the endpoint.
 * `403 Forbidden` with `Status` header equal to `Forbidden`, if the user is not allowed to perform the requested action.
@@ -92,7 +92,7 @@ The following data elements are not required to generate a plan using the __Dail
 
 * `sleep_quality` __should__ be an integer between 1 and 10 or null
 * `readiness` __should__ be an integer between 1 and 10 or null
-* `sessions` __should__ be a list of workout sessions.
+* `sessions` __should__ be a list of workout sessions completed but not yet submitted to Fathom.
 * `sleep_data` __should__ be a list of sleep_events.
 * `sessions_planned` __should__ be a boolean representing whether the user plans to train again that day.
 * `health_sync_date` is __optional__ and only provided if one of the sessions is obtained from Apple's HealthKit app
@@ -111,8 +111,8 @@ The following data elements are not required to generate a plan using the __Dail
 
 The following data elements are required when following the __Post-Workout__ pathway to __Daily Plan__ generation.
 
-* `health_sync_date` is __optional__ and only provided if one of the sessions is obtained from health app
-* `session` __should__ be of the following schema
+* `health_sync_date` is __optional__ and only provided if one of the sessions is obtained from Apple's HealthKit  app
+* `session` __should__ include the data elements as specified below
 * `sessions_planned` __should__ be a boolean representing whether the user plans to train again that day.
 
 `session` data elements
@@ -125,13 +125,13 @@ The following data elements are required when following the __Post-Workout__ pat
 * `calories` __if present__, __should__ be calorie information obtained from health workout _(only needed for health workout)_
 * `distance` __if present__, __should__ be distance information obtained from health workout _(only needed for health workout)_
 * `source` __if present__, __should__ be 0 for manually logged session and 1 for health data
-* `deleted` __if present__, __should__ be true if the user deletes the workout detected from health app
+* `deleted` __if present__, __should__ be true if the user deletes the workout detected from Apple's HealthKit app
 * `ignored` __if present__, __should__ be true for short walking workouts.
 * `hr_data` __if present__, __should__ be the heart rate data associated with the health workout. each hr will have `startDate`, `endDate` and `value` _(only needed for health workout)_
 * `description` is __optional__ parameter to provide short description of the session they're adding
 * `post-session-survey` __should__ follow requirements below
 
-`post-session survey` data elements
+`post-session-survey` data elements
 
 * `event_date` __should__ reflect the local date and time when the survey (associated with the workout) was completed
 * `RPE` __should__ be an integer between 1 and 10 indicating the _Rate of Perceived Exertion_ of the athlete during the session
