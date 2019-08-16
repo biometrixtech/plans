@@ -116,6 +116,7 @@ The following data elements are required when following the __Post-Workout__ pat
 * `sessions_planned` __should__ be a boolean representing whether the user plans to train again that day.
 
 `session` data elements
+
 * `event_date` __should__ reflect the start time of the session (Apple HealthKit data) or default date (manually logged session)
 * `end_date` is __optional__ parameter that reflects the end time of the session for health data
 * `session_type` __should__ be an integer reflecting SessionType enumeration.
@@ -131,6 +132,7 @@ The following data elements are required when following the __Post-Workout__ pat
 * `post-session-survey` __should__ follow requirements below
 
 `post-session survey` data elements
+
 * `event_date` __should__ reflect the local date and time when the survey (associated with the workout) was completed
 * `RPE` __should__ be an integer between 1 and 10 indicating the _Rate of Perceived Exertion_ of the athlete during the session
 * `soreness` __should__ follow the same definition as in _Daily Readiness_
