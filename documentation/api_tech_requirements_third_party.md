@@ -88,13 +88,13 @@ Note: Fathom can customize the processing of `severity` and `movement` data upon
 
 ##### Optional Data Elements
 
-The following data elements are not required to generate a plan using the __Daily Readiness__ pathway, but enhance the customization of the plan for the user.
+The following data elements are not required to generate a plan using the __Daily Readiness__ pathway, but enhance the customization of the plan for the athlete.
 
 * `sleep_quality` __should__ be an integer between 1 and 10 or null
 * `readiness` __should__ be an integer between 1 and 10 or null
 * `sessions` __should__ be a list of workout sessions completed but not yet submitted to Fathom.
 * `sleep_data` __should__ be a list of sleep_events.
-* `sessions_planned` __should__ be a boolean representing whether the user plans to train again that day.
+* `sessions_planned` __should__ be a boolean representing whether the athlete plans to train again that day.
 * `health_sync_date` is __optional__ and only provided if one of the sessions is obtained from Apple's HealthKit app
 
 `session` __if present__, __should__ follow the requirements outlined in the __Post-Workout__ pathway
@@ -113,7 +113,7 @@ The following data elements are required when following the __Post-Workout__ pat
 
 * `health_sync_date` is __optional__ and only provided if one of the sessions is obtained from Apple's HealthKit  app
 * `session` __should__ include the data elements as specified below
-* `sessions_planned` __should__ be a boolean representing whether the user plans to train again that day.
+* `sessions_planned` __should__ be a boolean representing whether the athlete plans to train again that day.
 
 `session` data elements
 
@@ -121,11 +121,11 @@ The following data elements are required when following the __Post-Workout__ pat
 * `end_date` is __optional__ parameter that reflects the end time of the session for health data
 * `session_type` __should__ be an integer reflecting SessionType enumeration.
 * `sport_name` __should__ be an integer reflecting SportName enumeration.
-* `duration` __should__ be in minutes and reflect the duration which the user confirmed (health data) or entered (manually logged session).
+* `duration` __should__ be in minutes and reflect the duration which the athlete confirmed (health data) or entered (manually logged session).
 * `calories` __if present__, __should__ be calorie information obtained from health workout _(only needed for health workout)_
 * `distance` __if present__, __should__ be distance information obtained from health workout _(only needed for health workout)_
 * `source` __if present__, __should__ be 0 for manually logged session and 1 for health data
-* `deleted` __if present__, __should__ be true if the user deletes the workout detected from Apple's HealthKit app
+* `deleted` __if present__, __should__ be true if the athlete deletes the workout detected from Apple's HealthKit app
 * `ignored` __if present__, __should__ be true for short walking workouts.
 * `hr_data` __if present__, __should__ be the heart rate data associated with the health workout. each hr will have `startDate`, `endDate` and `value` _(only needed for health workout)_
 * `description` is __optional__ parameter to provide short description of the session they're adding
