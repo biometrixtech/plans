@@ -262,6 +262,8 @@ class TrendProcessor(object):
                     trend_dashboard_category.unread_alerts = (
                                 len(self.athlete_trend_categories[trend_category_index].plan_alerts) > 0)
                     self.dashboard_categories.append(trend_dashboard_category)
+            else:
+                self.athlete_trend_categories[trend_category_index].plan_alerts = []
 
             self.athlete_trend_categories[trend_category_index].visible = trends_visible
 
