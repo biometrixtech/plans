@@ -16,13 +16,13 @@ daily_plan_datastore = datastore_collection.daily_plan_datastore
 app = Blueprint('daily_plan', __name__)
 
 
-@app.route('/', methods=['POST'])
-@require.authenticated.any
+@app.route('/<uuid:user_id>/', methods=['POST'])
+#@require.authenticated.any
 @require.body({'start_date': str})
 @xray_recorder.capture('routes.daily_plan.get')
-def handle_daily_plan_get(principal_id=None):
+def handle_daily_plan_get(user_id=None):
     validate_input()
-    user_id = principal_id
+    #user_id = principal_id
     event_date = request.json.get('event_date', format_datetime(datetime.datetime.utcnow()))
     event_date = parse_datetime(event_date)
 

@@ -10,6 +10,7 @@ from fathomapi.utils.xray import xray_recorder
 from models.session import SessionType, SessionSource
 from models.asymmetry import Asymmetry
 from models.daily_plan import DailyPlan
+from models.stats import AthleteStats
 from utils import parse_datetime, format_date, format_datetime
 from config import get_mongo_collection
 from logic.survey_processing import SurveyProcessing, create_session, update_session, create_plan, cleanup_plan
@@ -37,6 +38,8 @@ def handle_session_create(principal_id=None):
     if 'sessions_planned' in request.json and request.json['sessions_planned']:
         train_later = True
     athlete_stats = athlete_stats_datastore.get(athlete_id=user_id)
+    if athlete_stats is None:
+        athlete_stats = AthleteStats(user_id)
     plan_event_date = format_date(event_date)
     survey_processor = SurveyProcessing(user_id, event_date,
                                         athlete_stats=athlete_stats,
