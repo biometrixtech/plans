@@ -118,9 +118,9 @@ In addition to the API responses and the specific responses for each endpoint, t
 * `403 Forbidden` with `Status` header equal to `Forbidden`, if the user is not allowed to perform the requested action.
 * `404 Unknown` with `Status` header equal to `UnknownEndpoint`, if an invalid endpoint was requested.
 
-## Schema
+## Data Requirements
 
-### Simple
+### Types
 
 Required data elements are based on the following simple types :
 
