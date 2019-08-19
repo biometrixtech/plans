@@ -25,7 +25,7 @@ def login_user(email):
 
 
 def clear_fte_category_view(insight_type, visualization_type, jwt, plan_date_time):
-    url = "http://apis.{env}.fathomai.com/plans/4_2/trends/first_time_experience/view".format(env=os.environ['ENVIRONMENT'])
+    url = "http://apis.{env}.fathomai.com/plans/4_3/trends/first_time_experience/view".format(env=os.environ['ENVIRONMENT'])
     body = {
             "event_date": format_datetime(plan_date_time),
             "insight_type": insight_type.value,
@@ -37,7 +37,7 @@ def clear_fte_category_view(insight_type, visualization_type, jwt, plan_date_tim
 
 
 def clear_fte_category(insight_type, jwt, plan_date_time):
-    url = "http://apis.{env}.fathomai.com/plans/4_2/trends/first_time_experience/category".format(env=os.environ['ENVIRONMENT'])
+    url = "http://apis.{env}.fathomai.com/plans/4_3/trends/first_time_experience/category".format(env=os.environ['ENVIRONMENT'])
     body = {
             "event_date": format_datetime(plan_date_time),
             "insight_type": insight_type.value}
@@ -48,7 +48,7 @@ def clear_fte_category(insight_type, jwt, plan_date_time):
 
 
 def clear_plan_alerts(insight_type, jwt, plan_date_time):
-    url = "http://apis.{env}.fathomai.com/plans/4_2/trends/plan_alerts/clear".format(env=os.environ['ENVIRONMENT'])
+    url = "http://apis.{env}.fathomai.com/plans/4_3/trends/plan_alerts/clear".format(env=os.environ['ENVIRONMENT'])
     body = {
             "event_date": format_datetime(plan_date_time),
             "insight_type": insight_type.value}
@@ -68,7 +68,7 @@ if __name__ == '__main__':
 
     for u in three_sensor_users:
         if u in ["tread_a@200.com", "tread_b@200.com", "tread_run@200.com", "run_a@200.com", "sym@200.com",
-                 "half_sym@200.com", "run_a_2@200.com", "sym_2@200.com", "long_3s@200.com", "run_a_mazen@200.com","tread_run_2_mazen@200.com",
+                 "half_sym@200.com", "run_a_2@200.com", "sym_2@200.com", "long_3s@200.com", "run_a_mazen@200.com","tread_run_2_mazen@200.com","tread_b_mazen@200.com",
                  "run_a_3@200.com", "sym_3@200.com","tread_a_2@200.com", "tread_b_2@200.com", "tread_run_2@200.com", "half_sym_2@200.com", "long_3s_2@200.com"]:
             soreness_history = []
             user_id, jwt = login_user(u)
