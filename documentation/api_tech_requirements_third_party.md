@@ -32,7 +32,7 @@ Recommended dosages are also provided for each exercise and modality.  These dos
 
 The terminology of [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt) (specifically __must__, __should__, __may__ and their negatives) applies.  The word __will__, when applied to the Plans API ("the API"), has the same meaning as __must__.
 
-Each third-party partner will be recognised as a "provider" and will be assigned a unique 'Provider Code'.  This __will__ be a string matching the regular expression `^[a-z][a-z0-9\-]{3,31}$`.
+Each third-party partner will be recognised as a "provider" and will be assigned a unique 'Provider Code'.  This __will__ be a string matching the regular expression `^[a-z][a-z0-9\-]{3,31}$`.  
 
 ### Protocol
 
@@ -41,6 +41,10 @@ The API supports communication over HTTPS only.  The client __must__ recognise t
 ### Encoding
 
 The API supports communication using JSON encoding only.  The client __must__ submit the headers `Content-Type: application/json` and `Accept: application/json` (or a subtype `application/{subtype}+json`, if appropriate) for all requests.  Failure to do so __will__ result in a `415 Unsupported Media Type` response.  The API __will__ include the header `Content-Type: application/json` (or a subtype if appropriate) with its response.
+
+### Endpoints
+
+Each provider will also be assigned a unique set of test and production endpoints to access the plans service.  These endpoints will require a custom JWT bearer token unique to the Provider. 
 
 ### Authentication
 
