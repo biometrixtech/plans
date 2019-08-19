@@ -4,11 +4,11 @@
 
 ### Overview
 
-This technical summary provides prospective third party partners ('providers') of  __Fathom's Plans API__ with a brief summary of the data returned from the service along with the technical and data requirements.  This document is not a substitute for the full API specification.
+This technical summary provides prospective third party partners ('providers') of  __Fathom's Plans API__ with a brief summary of the type of information returned from the service along with a summary of the minimum technical and data requirements.  This document is not a substitute for the full API specification.
 
 ### Daily Plan
 
-The plans service generates a __Daily Plan__ for an athlete based on one or both of the following data elements:
+The plans service generates a  __Daily Plan__ for an athlete based on one or both of the following data elements:
 
 * __Daily Readiness__ - information about the athlete's training plan and pain/soreness for a given day
 * __Post-Workout__ - information about an athlete's workout session along with their Rating of Perceived Exertion (RPE) and pain/soreness following the workout
@@ -30,7 +30,9 @@ Recommended dosages are also provided for each exercise and modality.  These dos
 
 The terminology of [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt) (specifically __must__, __should__, __may__ and their negatives) applies.  The word __will__, when applied to the Plans API ("the API"), has the same meaning as __must__.
 
-Each third-party partner will be recognised as a "provider" and will be assigned a unique 'Provider Code'.  This __will__ be a string matching the regular expression `^[a-z][a-z0-9\-]{3,31}$`.  
+Each third-party partner will be recognised as a "provider" and will be assigned a unique 'Provider Code'.  This __will__ be a string matching the regular expression `^[a-z][a-z0-9\-]{3,31}$`.
+  
+</br>
 
 ### Protocol
 
@@ -117,6 +119,8 @@ In addition to the API responses and the specific responses for each endpoint, t
 * `400 Bad Request` with `Status` header equal to `InvalidSchema`, if the JSON body of the request does not match the requirements of the endpoint.
 * `403 Forbidden` with `Status` header equal to `Forbidden`, if the user is not allowed to perform the requested action.
 * `404 Unknown` with `Status` header equal to `UnknownEndpoint`, if an invalid endpoint was requested.
+
+</br>
 
 ## Data Requirements
 
