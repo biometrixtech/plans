@@ -18,6 +18,11 @@ Parameters:
         Default: "2_2"
         Description: "Corresponding Users API version"
 
+    ServiceAuthPolicyArn:
+        Type: "String"
+        Default: ""
+        Description: "IAM Policy ARN granting access to the serviceauth lambda function"
+
     # The second part of the CIDR block for the VPN (10.xx.0.0/24).
     VpnCidr:
         Type: "Number"
@@ -62,6 +67,7 @@ Metadata:
 
 Conditions:
     CreateVpc: { "Fn::Not": [ { "Fn::Equals": [ { Ref: "MongoDbPeeringCidr" }, "" ] } ] }
+    ServiceAuthPolicyProvided: { "Fn::Not": [ { "Fn::Equals": [ { Ref: "ServiceAuthPolicyArn" }, "" ] } ] }
 
 Resources:
 
@@ -110,8 +116,7 @@ Resources:
               - "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
               - "arn:aws:iam::aws:policy/AWSXrayWriteOnlyAccess"
               - "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
-              - { "Fn::ImportValue": { "Fn::Sub": "UsersValidateAuthPolicyArn-${Environment}" } }
-              - { "Fn::ImportValue": { "Fn::Sub": "UsersServiceAuthPolicyArn-${Environment}" } }
+              - { "Fn::If": [ "ServiceAuthPolicyProvided", { Ref: "ServiceAuthPolicyArn" }, { Ref: "AWS::NoValue" } ] }
             Policies:
               - PolicyName: "default"
                 PolicyDocument:
