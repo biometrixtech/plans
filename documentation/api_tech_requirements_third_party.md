@@ -13,15 +13,15 @@ The plans service generates a  __Daily Plan__ for an athlete based on one or bot
 * __Daily Readiness__ - information about the athlete's training plan and pain/soreness for a given day
 * __Post-Workout__ - information about an athlete's workout session along with their Rating of Perceived Exertion (RPE) and pain/soreness following the workout
 
-A __Daily Plan__ can be created with as little as one of the above data elements; however, as this information is gathered over time, Fathom's analytics also use historical patterns in pain/soreness and workouts to influence __Daily Plan__ creation.
+A __Daily Plan__ can be created with as little as one of the above data elements. As this information is gathered over time, Fathom's analytics also use historical patterns in pain/soreness and workouts to identify underlying imbalances unique to the athlete which influence the creation of their __Daily Plan__.
 
-A __Daily Plan__ provides a personalized, research-driven plan for an athlete.  A plan may consist of one or more modalities, targeting one or more recovery goals Fathom analytics identifies for the athlete.
+A __Daily Plan__ provides a personalized, research-driven prep, recovery, and corrective exercise plan for an athlete.  A plan may consist of one or more modalities, targeting one or more recovery goals Fathom analytics identifies for the athlete.
 
-Some modalities include a series of exercises personalized for the athlete for that day.  These exercises are provided in a sequence consistent with sports science research to expedite tissue recovery, reduce pain, and prevent injury.
+The __Daily Plan__ includes modalities such as  __foam rolling__, __static stretching__, __active stretching__, __dynamic stretching__, __targeted muscle activation__, and __integrated movement__ exercises personalized for the athlete for that day.  These exercises are provided in a sequence consistent with sports science research to expedite tissue recovery, reduce pain, and prevent injury.
  
 Other modalities do not include exercises but are assigned to a plan based on athlete needs.  These modalities include __heat__, __ice__ and __cold water immersion__.
 
-Recommended dosages are also provided for each exercise and modality.  These dosages are associated with three different active times.  Dosages are also provided by goal, allowing the athlete to further customize their recovery.
+Recommended dosages are also provided for each exercise and modality.  These dosages are associated with three different active times which correspond with minimal, optimal, and comprehensive sequences of activities.  These sequences are designed to achieve each of the athlete's unique combination of goals.  Additionally, dosages are also provided by goal, allowing the athlete to further customize their recovery.
 
 
 ## Technical and Data Requirements
@@ -32,7 +32,6 @@ The terminology of [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt) (specificall
 
 Each third-party partner will be recognised as a "provider" and will be assigned a unique 'Provider Code'.  This __will__ be a string matching the regular expression `^[a-z][a-z0-9\-]{3,31}$`.
   
-</br>
 
 ### Protocol
 
@@ -54,7 +53,7 @@ It is expected that partners will normally generate and sign their own JWTs for 
 
 #### Signing keys
 
-Prior to integrating with the API, each partner __must__ supply a set of one or more public keys with which they will sign clients' JWT credentials.  This __must__ take the form of an [RFC 7517](https://tools.ietf.org/html/rfc7517) JSON Web Key Set document, for example:
+Prior to integrating with the API, each partner  __must__ supply a set of one or more public keys with which they will sign clients' JWT credentials.  This __must__ take the form of an [RFC 7517](https://tools.ietf.org/html/rfc7517) JSON Web Key Set document, for example:
 
 ```json
 {
@@ -81,19 +80,19 @@ Prior to integrating with the API, each partner __must__ supply a set of one or 
 }
 ```
 
-Each key within the key set __must__ have a `kid` field matching the regular expression `^([a-z][a-z0-9\-]{3,31})_([a-z0-9\-]+)$`, where the first group of the expression is the partner's Provider Code.  
+Each key within the key set  __must__ have a `kid` field matching the regular expression `^([a-z][a-z0-9\-]{3,31})_([a-z0-9\-]+)$`, where the first group of the expression is the partner's Provider Code.  
 
-Each key within the key set __must__ have a `use` field set to `sig` if the key is to be used for signing JWTs.  Partners __should not__ include keys with other values in the key set.
+Each key within the key set  __must__ have a `use` field set to `sig` if the key is to be used for signing JWTs.  Partners __should not__ include keys with other values in the key set.
 
-At the present time the only algorithm from the [RFC 7518](https://tools.ietf.org/html/rfc7518#section-3) list supported is RSA-256, so the value of the `alg` field for each key in the key set __must__ be `RS256`.  We hope to support at least `ES256` in the near future.
+At the present time the only algorithm from the  [RFC 7518](https://tools.ietf.org/html/rfc7518#section-3) list supported is RSA-256, so the value of the `alg` field for each key in the key set __must__ be `RS256`.  We hope to support at least `ES256` in the near future.
 
-Partners __may__ include the non-standardized fields `_nbf` and `_exp` in key definitions; if these fields are provided, they __must__ follow the semantics of the corresponding JWT claim fields in [RFC7519](https://tools.ietf.org/html/rfc7519#section-4.1.3), and the API __will__ interpret them similarly (that is to say, a JWT with an `iat` value falling before the corresponding key's `nbf` value or after its `exp` value, will not be considered valid).  This allows partners to perform key rotation in an orderly fashion.
+Partners __may__ include the non-standardized fields `_nbf` and `_exp` in key definitions; if these fields are provided, they __must__ follow the semantics of the corresponding JWT claim fields in  [RFC7519](https://tools.ietf.org/html/rfc7519#section-4.1.3), and the API __will__ interpret them similarly (that is to say, a JWT with an `iat` value falling before the corresponding key's `nbf` value or after its `exp` value, will not be considered valid).  This allows partners to perform key rotation in an orderly fashion.
 
-Partners __may__ include the non-standardized field `_env` in key definitions; if this field is provided the value __must__ be a String matching the regular expression `^[a-z0-9]+$` or an array of such Strings, and the API __will__ interpret this as a list of the environments where the key should be accepted.  This allows partners to use different signing keys for production and non-production environments.
+Partners __may__ include the non-standardized field `_env` in key definitions; if this field is provided the value  __must__ be a String matching the regular expression `^[a-z0-9]+$` or an array of such Strings, and the API  __will__ interpret this as a list of the environments where the key should be accepted.  This allows partners to use different signing keys for production and non-production environments.
 
 #### JWT claims
 
-The JWTs provided by clients __must__ contain the following claims:
+The JWTs provided by clients  __must__ contain the following claims:
 
 * `iss`, which __must__ be a String matching the regular expression `^([a-z][a-z0-9\-]{3,31})_([a-z0-9\-]+)$`, where the first group of the expression is the partner's Provider Code.  
 * `aud`, which __must__ be a String matching the regular expression `^fathom(_[a-z0-9]+)?$` (or an array containing such a String).  If the group is provided (eg `fathom_production`), the API __will__ treat the second part as an environment specifier, and __will__ only accept as valid JWTs targeted at its own environment (for instance, the production API will only accept tokens with an `aud` value of `fathom` and/or `fathom_production`).
@@ -109,12 +108,12 @@ The JWTs provided by clients __must__ contain the following claims:
 
 Partners __may__ interact with the API on a business-to-business basis instead of, or in addition to, building clients which allow users to interact with the API directly.  Partners' private servers __may__ authenticate such requests using a JWT carrying the `fathom.plans:service` scope.  Such tokens must meet the following additional validation conditions:
 
-* The value of the `sub` field __must__ be the String `00000000-0000-4000-8000-000000000000`.
-* The total period of validity of the JWT __must not__ be greater than 600 seconds.
+* The value of the `sub` field  __must__ be the String `00000000-0000-4000-8000-000000000000`.
+* The total period of validity of the JWT  __must not__ be greater than 600 seconds.
 
 ### General responses
 
-In addition to the API responses and the specific responses for each endpoint, the server __may__ respond with one of the following HTTP responses:
+In addition to the API responses and the specific responses for each endpoint, the server  __may__ respond with one of the following HTTP responses:
 
 * `400 Bad Request` with `Status` header equal to `InvalidSchema`, if the JSON body of the request does not match the requirements of the endpoint.
 * `403 Forbidden` with `Status` header equal to `Forbidden`, if the user is not allowed to perform the requested action.
@@ -129,14 +128,14 @@ In addition to the API responses and the specific responses for each endpoint, t
 Required data elements are based on the following simple types :
 
 * `string`, `number`, `integer`, `boolean`: as defined in the [JSON Schema](http://json-schema.org) standard.
-* `Uuid`: a `string` matching the regular expression `^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$`, that is, the string representation of an [RFC 4122](https://tools.ietf.org/html/rfc4122) UUID.
-* `Datetime`: a `string` matching the regular expression `/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(Z|+\d{2}:\d{2})/` and representing a date and time in full [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) format.
+* `Uuid`: a `string` matching the regular expression `^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$`, that is, the string representation of an  [RFC 4122](https://tools.ietf.org/html/rfc4122) UUID.
+* `Datetime`: a `string` matching the regular expression `/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(Z|+\d{2}:\d{2})/` and representing a date and time in full  [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) format.
 
 ### Daily Readiness
 
 #### Required Data Elements
 
-The following data elements are required when following the __Daily Readiness__ pathway to __Daily Plan__ generation.
+The following data elements are required when following the  __Daily Readiness__ pathway to __Daily Plan__ generation.
 
 * `date_time` __should__ be a Datetime and reflect the local time that survey was taken
 * `soreness` __should__ reflect a list of body parts(`sore_part`) with pain or soreness. Length __could__ be 0.
@@ -153,18 +152,18 @@ Note: Fathom can customize the processing of `severity` and `movement` data upon
 
 #### Optional Data Elements
 
-The following data elements are not required to generate a plan using the __Daily Readiness__ pathway, but enhance the customization of the plan for the athlete.
+The following data elements are not required to generate a plan using the  __Daily Readiness__ pathway, but enhance the customization of the plan for the athlete.
 
 * `sessions` __should__ be a list of workout sessions completed but not yet submitted to Fathom.
 * `sessions_planned` __should__ be a boolean representing whether the athlete plans to train again that day.
 
-`session` __if present__, __should__ follow the requirements outlined in the __Post-Workout__ pathway
+`session` __if present__, __should__ follow the requirements outlined in the  __Post-Workout__ pathway
 
 
 ### Post-Workout
 #### Required Data Elements
 
-The following data elements are required when following the __Post-Workout__ pathway to __Daily Plan__ generation.  Sessions can either be logged manually be an athlete or transferred from Apple's HealthKit app.
+The following data elements are required when following the  __Post-Workout__ pathway to __Daily Plan__ generation.  Sessions can either be logged manually be an athlete or transferred from a third party source such as Apple's HealthKit app.
 
 * `session` __should__ include the data elements as specified below
 * `sessions_planned` __should__ be a boolean representing whether the athlete plans to train again that day.
@@ -172,23 +171,23 @@ The following data elements are required when following the __Post-Workout__ pat
 `session` data elements
 
 * `event_date` __should__ be a Datetime and reflect the start time of the session
-* `end_date` is __optional__ Datetime parameter that reflects the end time of the session from Apple's HealthKit app
+* `end_date` is __optional__ Datetime parameter that reflects the end time of the session from third party source
 * `sport_name` __should__ be an integer reflecting SportName enumeration.
-* `duration` __should__ be an integer and reflect the minutes duration which the athlete confirmed (Apple's HealthKit app) or entered (manually logged session).
-* `calories` __if present__, __should__ be an integer and represent the calorie information obtained from Apple's HealthKit app workout _(only needed for Apple's HealthKit app workout)_
-* `distance` __if present__, __should__ be an integer and represent the distance information obtained from Apple's HealthKit app workout _(only needed for Apple's HealthKit app workout)_
-* `source` __if present__, __should__ be 0 for manually logged session and 1 for Apple's HealthKit app data
-* `deleted` __if present__, __should__ be a boolean and true if the athlete deletes the workout detected from Apple's HealthKit app
-* `ignored` __if present__, __should__ be a boolean and true for short walking workouts.  This is typically only used for sessions created by third-party apps that interact with Apple's HealthKit app but should be excluded from Fathom processing.
-* `hr_data` __if present__, __should__ be the heart rate data associated with the Apple's HealthKit app workout. each hr will have `startDate` (Datetime), `endDate` (Datetime) and `value` (integer) _(only needed for Apple's HealthKit app workout)_
+* `duration` __should__ be an integer and reflect the minutes duration which the athlete confirmed (third party source) or entered (manually logged session).
+* `calories` __if present__, __should__ be an integer and represent the calorie information obtained from a third party source workout _(only needed for third party source workouts)_
+* `distance` __if present__, __should__ be an integer and represent the distance information obtained from a third party source workout _(only needed for third party source workouts)_
+* `source` __if present__, __should__ be 0 for manually logged session and 1 for a third party source workout
+* `deleted` __if present__, __should__ be a boolean and true to delete the workout transferred from a third party source
+* `ignored` __if present__, __should__ be a boolean and true for short walking workouts.  This is typically only used for sessions created by third-party apps that should be excluded from Fathom processing.
+* `hr_data` __if present__, __should__ be the heart rate data associated with a third party source workout. Each hr will have `startDate` (Datetime), `endDate` (Datetime) and `value` (integer) _(only needed for third party source workouts)_
 * `description` is __optional__ string parameter to provide a short description of the session they're adding
 * `post-session-survey` __should__ follow requirements below
 
 `post-session-survey` data elements
 
 * `event_date` __should__ be a Datetime and reflect the local date and time when the survey (associated with the workout) was completed
-* `RPE` __should__ be an integer between 1 and 10 indicating the _Rating of Perceived Exertion_ of the athlete during the session
-* `soreness` __should__ follow the same definition as in _Daily Readiness_
+* `RPE` __should__ be an integer between 1 and 10 indicating the  _Rating of Perceived Exertion_ of the athlete during the session
+* `soreness` __should__ follow the same definition as in  _Daily Readiness_
 
 
 
