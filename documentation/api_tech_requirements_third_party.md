@@ -164,7 +164,7 @@ The following data elements are not required to generate a plan using the __Dail
 ### Post-Workout
 #### Required Data Elements
 
-The following data elements are required when following the __Post-Workout__ pathway to __Daily Plan__ generation.  Sessions can either be logged manually be a user or transferred from Apple's HealthKit app.
+The following data elements are required when following the __Post-Workout__ pathway to __Daily Plan__ generation.  Sessions can either be logged manually be an athlete or transferred from Apple's HealthKit app.
 
 * `session` __should__ include the data elements as specified below
 * `sessions_planned` __should__ be a boolean representing whether the athlete plans to train again that day.
@@ -179,9 +179,9 @@ The following data elements are required when following the __Post-Workout__ pat
 * `distance` __if present__, __should__ be an integer and represent the distance information obtained from Apple's HealthKit app workout _(only needed for Apple's HealthKit app workout)_
 * `source` __if present__, __should__ be 0 for manually logged session and 1 for Apple's HealthKit app data
 * `deleted` __if present__, __should__ be a boolean and true if the athlete deletes the workout detected from Apple's HealthKit app
-* `ignored` __if present__, __should__ be a boolean and true for short walking workouts.
+* `ignored` __if present__, __should__ be a boolean and true for short walking workouts.  This is typically only used for sessions created by third-party apps that interact with Apple's HealthKit app but should be excluded from Fathom processing.
 * `hr_data` __if present__, __should__ be the heart rate data associated with the Apple's HealthKit app workout. each hr will have `startDate` (Datetime), `endDate` (Datetime) and `value` (integer) _(only needed for Apple's HealthKit app workout)_
-* `description` is __optional__ string parameter to provide short description of the session they're adding
+* `description` is __optional__ string parameter to provide a short description of the session they're adding
 * `post-session-survey` __should__ follow requirements below
 
 `post-session-survey` data elements
