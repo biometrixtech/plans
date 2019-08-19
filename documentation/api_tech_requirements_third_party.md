@@ -171,9 +171,8 @@ The following data elements are required when following the __Post-Workout__ pat
 
 `session` data elements
 
-* `event_date` __should__ be a Datetime and reflect the start time of the session (Apple HealthKit data) or default date (manually logged session)
-* `end_date` is __optional__ Datetime parameter that reflects the end time of the session for health data
-* `session_type` __should__ be an integer reflecting SessionType enumeration.
+* `event_date` __should__ be a Datetime and reflect the start time of the session
+* `end_date` is __optional__ Datetime parameter that reflects the end time of the session from Apple's HealthKit app
 * `sport_name` __should__ be an integer reflecting SportName enumeration.
 * `duration` __should__ be an integer and reflect the minutes duration which the athlete confirmed (health data) or entered (manually logged session).
 * `calories` __if present__, __should__ be an integer and represent the calorie information obtained from health workout _(only needed for health workout)_
