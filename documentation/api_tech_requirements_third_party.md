@@ -164,7 +164,7 @@ The following data elements are not required to generate a plan using the __Dail
 ### Post-Workout
 #### Required Data Elements
 
-The following data elements are required when following the __Post-Workout__ pathway to __Daily Plan__ generation.
+The following data elements are required when following the __Post-Workout__ pathway to __Daily Plan__ generation.  Sessions can either be logged manually be a user or transferred from Apple's HealthKit app.
 
 * `session` __should__ include the data elements as specified below
 * `sessions_planned` __should__ be a boolean representing whether the athlete plans to train again that day.
@@ -174,13 +174,13 @@ The following data elements are required when following the __Post-Workout__ pat
 * `event_date` __should__ be a Datetime and reflect the start time of the session
 * `end_date` is __optional__ Datetime parameter that reflects the end time of the session from Apple's HealthKit app
 * `sport_name` __should__ be an integer reflecting SportName enumeration.
-* `duration` __should__ be an integer and reflect the minutes duration which the athlete confirmed (health data) or entered (manually logged session).
-* `calories` __if present__, __should__ be an integer and represent the calorie information obtained from health workout _(only needed for health workout)_
-* `distance` __if present__, __should__ be an integer and represent the distance information obtained from health workout _(only needed for health workout)_
-* `source` __if present__, __should__ be 0 for manually logged session and 1 for health data
+* `duration` __should__ be an integer and reflect the minutes duration which the athlete confirmed (Apple's HealthKit app) or entered (manually logged session).
+* `calories` __if present__, __should__ be an integer and represent the calorie information obtained from Apple's HealthKit app workout _(only needed for Apple's HealthKit app workout)_
+* `distance` __if present__, __should__ be an integer and represent the distance information obtained from Apple's HealthKit app workout _(only needed for Apple's HealthKit app workout)_
+* `source` __if present__, __should__ be 0 for manually logged session and 1 for Apple's HealthKit app data
 * `deleted` __if present__, __should__ be a boolean and true if the athlete deletes the workout detected from Apple's HealthKit app
 * `ignored` __if present__, __should__ be a boolean and true for short walking workouts.
-* `hr_data` __if present__, __should__ be the heart rate data associated with the health workout. each hr will have `startDate` (Datetime), `endDate` (Datetime) and `value` (integer) _(only needed for health workout)_
+* `hr_data` __if present__, __should__ be the heart rate data associated with the Apple's HealthKit app workout. each hr will have `startDate` (Datetime), `endDate` (Datetime) and `value` (integer) _(only needed for Apple's HealthKit app workout)_
 * `description` is __optional__ string parameter to provide short description of the session they're adding
 * `post-session-survey` __should__ follow requirements below
 
