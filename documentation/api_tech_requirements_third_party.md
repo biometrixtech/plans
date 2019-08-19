@@ -162,7 +162,6 @@ The following data elements are not required to generate a plan using the __Dail
 
 The following data elements are required when following the __Post-Workout__ pathway to __Daily Plan__ generation.
 
-* `event_date` __should__ be a Datetime and reflect the local date and time of the submission
 * `session` __should__ include the data elements as specified below
 * `sessions_planned` __should__ be a boolean representing whether the athlete plans to train again that day.
 
