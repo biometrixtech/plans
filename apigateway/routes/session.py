@@ -273,8 +273,17 @@ def handle_session_three_sensor_data():
     session_obj.id = session_id
     session_obj.asymmetry = Asymmetry.json_deserialise(asymmetry)
 
-    # add to plans and store plan
-    plan.training_sessions.append(session_obj)
+    # does session already exist
+    found = False
+    for s in plan.training_sessions:
+        if plan.training_sessions[s].id == session_id:
+            plan.training_sessions[s] = session_obj
+            found = True
+
+    if not found:
+        # add to plans and store plan
+        plan.training_sessions.append(session_obj)
+
     daily_plan_datastore.put(plan)
 
     return {'message': 'success'}
