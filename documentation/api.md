@@ -119,8 +119,8 @@ The client __must__ submit a request body containing a JSON object with the foll
     "health_sync_date": Datetime
 }
 ```
-* `date_time` __should__ reflect the local time that survey was taken
-* `soreness` __should__ reflect the number of body part that the user indicated soreness that were not candidates for clearance. Length __could__ be 0.
+* `date_time` __should__  be a Datetime and reflect the local time that survey was taken
+* `soreness` __should__ reflect a list of body parts(`sore_part`) with pain or soreness. Length __could__ be 0.
 * `clear_candidates` __should__ include body parts that were candidates to be cleared of historical status. Note this should include the body part even if marked "all_clear".
 * `sleep_quality` __should__ be an integer between 1 and 10 or null
 * `readiness` __should__ be an integer between 1 and 10 or null
@@ -139,11 +139,15 @@ The client __must__ submit a request body containing a JSON object with the foll
 }
 ```
 * `body_part` __should__ be an integer reflecting BodyPart enum
+
+[//]: # (TODO: Should this include severity and movement?)
+
 * `severity` __should__ be an integer between 0 and 5. (0 is only allowed for clear_candidates)
 * `side` __should__ be an integer, either 0 (both sides/non-bilateral), 1 (left) or 2 (right)
 * `pain` __should__ be a boolean to indicate whether it's pain or soreness.
 * `status` __should__ be a string representating the historical soreness status if one was received. Optional for soreness but required for clear candidates.
 
+[//]: # (TODO: UPDATE URL)
 
 ```
 POST /plans/version/daily_readiness HTTPS/1.1
