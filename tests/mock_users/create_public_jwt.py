@@ -70,7 +70,8 @@ def get_jwt():
 
     print(rs256_key)
     print(f'About to compile token')
-    ret = {'token': jwt.encode(payload, rs256_key, headers={'kid': rs256_key['kid']}, algorithm='RS256')}
+    #ret = {'token': jwt.encode(payload, rs256_key, headers={'kid': rs256_key['kid']}, algorithm='RS256')}
+    ret = {'token': jwt.encode(payload, rs256_key, headers={'kid': 'example_001'}, algorithm='RS256')}
     print('Encoded token')
     return ret
 
