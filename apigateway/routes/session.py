@@ -267,7 +267,7 @@ def handle_session_three_sensor_data(user_id):
     asymmetry = request.json.get('asymmetry', {})
     duration = request.json.get('seconds_duration', 0)
 
-    session_obj = create_session(6, {'description': 'test_three_sensor_data',
+    session_obj = create_session(6, {'description': 'three_sensor_data',
                                      'event_date': event_date,
                                      'sport_name': 17,
                                      'source': 3,
@@ -276,8 +276,23 @@ def handle_session_three_sensor_data(user_id):
     session_obj.id = session_id
     session_obj.asymmetry = Asymmetry.json_deserialise(asymmetry)
 
-    # add to plans and store plan
-    plan.training_sessions.append(session_obj)
+    # does session already exist
+    found = False
+    for s in range(0, len(plan.training_sessions)):
+        if plan.training_sessions[s].id == session_id:
+            plan.training_sessions[s].description = 'three_sensor_data'
+            plan.training_sessions[s].event_date = event_date
+            plan.training_sessions[s].sport_name = 17
+            plan.training_sessions[s].source = 3
+            plan.training_sessions[s].duration_sensor = duration
+            plan.training_sessions[s].asymmetry = session_obj.asymmetry
+            found = True
+            break
+
+    if not found:
+        # add to plans and store plan
+        plan.training_sessions.append(session_obj)
+
     daily_plan_datastore.put(plan)
 
     return {'message': 'success'}
