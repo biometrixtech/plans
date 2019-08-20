@@ -18,12 +18,12 @@ athlete_stats_datastore = datastore_collection.athlete_stats_datastore
 app = Blueprint('active_recovery', __name__)
 
 
-@app.route('/exercise_modalities', methods=['PATCH'])
+@app.route('/<uuid:user_id>/exercise_modalities', methods=['PATCH'])
 @require.authenticated.any
 @require.body({'event_date': str, 'recovery_type': str})
 @xray_recorder.capture('routes.active_recovery.exercise_modalities.complete')
-def handle_exercise_modalities_complete(principal_id=None):
-    user_id = principal_id
+def handle_exercise_modalities_complete(user_id=None):
+    #user_id = principal_id
     event_date = parse_datetime(request.json['event_date'])
     recovery_type = request.json['recovery_type']
     completed_exercises = request.json.get('completed_exercises', [])
@@ -89,12 +89,12 @@ def handle_exercise_modalities_complete(principal_id=None):
     return {'daily_plans': [plan]}, 202
 
 
-@app.route('/exercise_modalities', methods=['POST'])
+@app.route('/<uuid:user_id>/exercise_modalities', methods=['POST'])
 @require.authenticated.any
 @require.body({'event_date': str, 'recovery_type': str})
 @xray_recorder.capture('routes.active_recovery.exercise_modalities.start')
-def handle_exercise_modalities_start(principal_id=None):
-    user_id = principal_id
+def handle_exercise_modalities_start(user_id=None):
+    #user_id = principal_id
     event_date = parse_datetime(request.json['event_date'])
     recovery_type = request.json['recovery_type']
     recovery_index = request.json.get('recovery_index', 0)
@@ -140,12 +140,12 @@ def handle_exercise_modalities_start(principal_id=None):
     return {'message': 'success'}, 200
 
 
-@app.route('/get_mobilize', methods=['POST'])
+@app.route('/<uuid:user_id>/get_mobilize', methods=['POST'])
 @require.authenticated.any
 @require.body({'event_date': str})
 @xray_recorder.capture('routes.active_recovery.exercise_modalities.start')
-def handle_request_mobilize(principal_id=None):
-    user_id = principal_id
+def handle_request_mobilize(user_id=None):
+    #user_id = principal_id
     event_date = parse_datetime(request.json['event_date'])
     plan_event_day = format_date(event_date)
     if not _check_plan_exists(user_id, plan_event_day):
@@ -182,12 +182,12 @@ def handle_request_mobilize(principal_id=None):
     return {'daily_plans': [plan]}, 200
 
 
-@app.route('/body_part_modalities', methods=['PATCH'])
+@app.route('/<uuid:user_id>/body_part_modalities', methods=['PATCH'])
 @require.authenticated.any
 @require.body({'event_date': str, 'recovery_type': str})
 @xray_recorder.capture('routes.active_recovery.body_part_modalities.complete')
-def handle_body_part_modalities_complete(principal_id=None):
-    user_id = principal_id
+def handle_body_part_modalities_complete(user_id=None):
+    #user_id = principal_id
     event_date = parse_datetime(request.json['event_date'])
     recovery_type = request.json['recovery_type']
     completed_body_parts = request.json.get('completed_body_parts', [])
@@ -234,12 +234,12 @@ def handle_body_part_modalities_complete(principal_id=None):
     return {'daily_plans': [plan]}, 202
 
 
-@app.route('/body_part_modalities', methods=['POST'])
+@app.route('/<uuid:user_id>/body_part_modalities', methods=['POST'])
 @require.authenticated.any
 @require.body({'event_date': str, 'recovery_type': str})
 @xray_recorder.capture('routes.active_recovery.body_part_modalities.start')
-def handle_body_part_modalities_start(principal_id=None):
-    user_id = principal_id
+def handle_body_part_modalities_start(user_id=None):
+    #user_id = principal_id
     start_date_time = parse_datetime(request.json['event_date'])
     recovery_type = request.json['recovery_type']
 

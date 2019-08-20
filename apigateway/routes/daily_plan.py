@@ -17,7 +17,7 @@ app = Blueprint('daily_plan', __name__)
 
 
 @app.route('/<uuid:user_id>/', methods=['POST'])
-#@require.authenticated.any
+@require.authenticated.any
 @require.body({'start_date': str})
 @xray_recorder.capture('routes.daily_plan.get')
 def handle_daily_plan_get(user_id=None):

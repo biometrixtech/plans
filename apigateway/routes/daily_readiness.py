@@ -28,16 +28,16 @@ sleep_history_datastore = datastore_collection.sleep_history_datastore
 app = Blueprint('daily_readiness', __name__)
 
 
-@app.route('/', methods=['POST'])
+@app.route('/<uuid:user_id>/', methods=['POST'])
 @require.authenticated.any
 @require.body({'date_time': str, "soreness": list})
 @xray_recorder.capture('routes.daily_readiness.create')
-def handle_daily_readiness_create(principal_id):
+def handle_daily_readiness_create(user_id):
     validate_data()
     event_date = parse_datetime(request.json['date_time'])
     event_date = fix_early_survey_event_date(event_date)
 
-    user_id = principal_id
+    #user_id = principal_id
     daily_readiness = DailyReadiness(
         user_id=user_id,
         event_date=format_datetime(event_date),
@@ -122,12 +122,12 @@ def handle_daily_readiness_create(principal_id):
     return {'daily_plans': [plan]}, 201
 
 
-@app.route('/previous', methods=['POST'])
+@app.route('/<uuid:user_id>/previous', methods=['POST'])
 @require.authenticated.any
 @require.body({'event_date': str})
 @xray_recorder.capture('routes.daily_readiness.previous')
-def handle_daily_readiness_get(principal_id=None):
-    user_id = principal_id
+def handle_daily_readiness_get(user_id=None):
+    #user_id = principal_id
     current_time = parse_datetime(request.json['event_date'])
     previous_soreness_processor = AthleteStatusProcessing(user_id, current_time, datastore_collection)
     (

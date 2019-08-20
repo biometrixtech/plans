@@ -12,12 +12,12 @@ datastore_collection = DatastoreCollection()
 app = Blueprint('trends', __name__)
 
 
-@app.route('plan_alerts/clear', methods=['POST'])
+@app.route('/<uuid:user_id>/plan_alerts/clear', methods=['POST'])
 @require.authenticated.any
 @require.body({'event_date': str})
 @xray_recorder.capture('routes.trends.plan_alerts.clear')
-def handle_alerts_cleared(principal_id):
-    user_id = principal_id
+def handle_alerts_cleared(user_id):
+    #user_id = principal_id
     event_date = parse_datetime(request.json['event_date'])
     plan_event_day = format_date(event_date)
     plan = DatastoreCollection().daily_plan_datastore.get(user_id, start_date=plan_event_day, end_date=plan_event_day)[0]
@@ -47,12 +47,12 @@ def handle_alerts_cleared(principal_id):
     return {'daily_plans': [plan]}, 200
 
 
-@app.route('first_time_experience/category', methods=['POST'])
+@app.route('/<uuid:user_id>/first_time_experience/category', methods=['POST'])
 @require.authenticated.any
 @require.body({'event_date': str})
 @xray_recorder.capture('routes.trends.first_time_experience.category')
-def handle_fte_category(principal_id):
-    user_id = principal_id
+def handle_fte_category(user_id):
+    #user_id = principal_id
     event_date = parse_datetime(request.json['event_date'])
     plan_event_day = format_date(event_date)
     plan = DatastoreCollection().daily_plan_datastore.get(user_id, start_date=plan_event_day, end_date=plan_event_day)[0]
@@ -72,12 +72,12 @@ def handle_fte_category(principal_id):
     return {'daily_plans': [plan]}, 200
 
 
-@app.route('first_time_experience/view', methods=['POST'])
+@app.route('/<uuid:user_id>/first_time_experience/view', methods=['POST'])
 @require.authenticated.any
 @require.body({'event_date': str})
 @xray_recorder.capture('routes.trends.first_time_experience.view')
-def handle_fte_view(principal_id):
-    user_id = principal_id
+def handle_fte_view(user_id):
+    #user_id = principal_id
     event_date = parse_datetime(request.json['event_date'])
     plan_event_day = format_date(event_date)
     plan = DatastoreCollection().daily_plan_datastore.get(user_id, start_date=plan_event_day, end_date=plan_event_day)[0]

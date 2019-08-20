@@ -25,13 +25,13 @@ session_datastore = datastore_collection.session_datastore
 app = Blueprint('session', __name__)
 
 
-@app.route('/', methods=['POST'])
+@app.route('/<uuid:user_id>/', methods=['POST'])
 @require.authenticated.any
 @require.body({'event_date': str, 'sessions': list})
 @xray_recorder.capture('routes.session.create')
-def handle_session_create(principal_id=None):
+def handle_session_create(user_id=None):
 
-    user_id = principal_id
+    #user_id = principal_id
     event_date = parse_datetime(request.json['event_date'])
     plan_update_required = False
     train_later = False
@@ -105,13 +105,13 @@ def handle_session_create(principal_id=None):
     return {'daily_plans': [plan]}, 201
 
 
-@app.route('/<uuid:session_id>', methods=['DELETE'])
+@app.route('/<uuid:user_id>/<uuid:session_id>', methods=['DELETE'])
 @require.authenticated.any
 @require.body({'event_date': str, 'session_type': int})
 @xray_recorder.capture('routes.session.delete')
-def handle_session_delete(session_id, principal_id=None):
+def handle_session_delete(session_id, user_id=None):
     _validate_schema()
-    user_id = principal_id
+    #user_id = principal_id
 
     event_date = parse_datetime(request.json['event_date'])
     session_type = request.json['session_type']
@@ -130,12 +130,12 @@ def handle_session_delete(session_id, principal_id=None):
     return {'message': 'success'}, 200
 
 
-@app.route('/<uuid:session_id>', methods=['PATCH'])
+@app.route('/<uuid:user_id>/<uuid:session_id>', methods=['PATCH'])
 @require.authenticated.any
 @require.body({'event_date': str})
 @xray_recorder.capture('routes.session.update')
-def handle_session_update(session_id, principal_id=None):
-    user_id = principal_id
+def handle_session_update(session_id, user_id=None):
+    #user_id = principal_id
     event_date = parse_datetime(request.json['event_date'])
     plan_event_date = format_date(event_date)
 
@@ -178,12 +178,12 @@ def handle_session_update(session_id, principal_id=None):
     return {'message': 'success'}, 200
 
 
-@app.route('/sensor_data', methods=['POST'])
+@app.route('/<uuid:user_id>/sensor_data', methods=['POST'])
 @require.authenticated.any
 @require.body({'last_sensor_sync': str, 'sessions': list})
 @xray_recorder.capture('routes.session.add_sensor_data')
-def handle_session_sensor_data(principal_id=None):
-    user_id = principal_id
+def handle_session_sensor_data(user_id=None):
+    #user_id = principal_id
 
     # update last_sensor_syc date
     last_sensor_sync = request.json['last_sensor_sync']
@@ -248,12 +248,12 @@ def handle_session_sensor_data(principal_id=None):
             'daily_plan': plan}, 200
 
 
-@app.route('/three_sensor_data', methods=['POST'])
+@app.route('/<uuid:user_id>/three_sensor_data', methods=['POST'])
 @require.authenticated.any
 @require.body({'event_date': str})
 @xray_recorder.capture('routes.session.add_sensor_data')
-def handle_session_three_sensor_data():
-    user_id = request.json['user_id']
+def handle_session_three_sensor_data(user_id):
+    #user_id = request.json['user_id']
     event_date = parse_datetime(request.json['event_date'])
     plan_event_day = format_date(event_date)
     # update last_sensor_syc date
@@ -283,12 +283,12 @@ def handle_session_three_sensor_data():
     return {'message': 'success'}
 
 
-@app.route('/typical', methods=['POST'])
+@app.route('/<uuid:user_id>/typical', methods=['POST'])
 @require.authenticated.any
 @require.body({'event_date': str})
 @xray_recorder.capture('routes.typical_sessions')
-def handle_get_typical_sessions(principal_id=None):
-    user_id = principal_id
+def handle_get_typical_sessions(user_id=None):
+    #user_id = principal_id
     event_date = parse_datetime(request.json['event_date'])
 
     filtered_sessions = AthleteStatusProcessing(user_id, event_date, datastore_collection).get_typical_sessions()
@@ -296,12 +296,12 @@ def handle_get_typical_sessions(principal_id=None):
     return {'typical_sessions': filtered_sessions}, 200
 
 
-@app.route('/no_sessions', methods=['POST'])
+@app.route('/<uuid:user_id>/no_sessions', methods=['POST'])
 @require.authenticated.any
 @require.body({'event_date': str})
 @xray_recorder.capture('routes.no_sessions_planned')
-def handle_no_sessions_planned(principal_id=None):
-    user_id = principal_id
+def handle_no_sessions_planned(user_id=None):
+    #user_id = principal_id
     event_date = parse_datetime(request.json['event_date'])
 
     plan_event_date = format_date(event_date)
