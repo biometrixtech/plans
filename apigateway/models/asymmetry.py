@@ -47,18 +47,14 @@ class SessionAsymmetry(Serialisable):
         self.left_apt = 0
         self.right_apt = 0
         self.time_blocks = []
+        self.percent_events_asymmetric = 0
         self.seconds_duration = 0
 
     def get_detail_text(self):
 
-        if self.left_apt > self.right_apt > 0:
+        if self.percent_events_asymmetric > 0:
 
-            percentage = round(((self.left_apt / self.right_apt) - 1.00) * 100)
-            return "Your range of motion was asymmetric in " + str(percentage) + "% of this workout."
-
-        elif self.right_apt > self.left_apt > 0:
-
-            percentage = round(((self.right_apt / self.left_apt) - 1.00) * 100)
+            percentage = self.percent_events_asymmetric
             return "Your range of motion was asymmetric in " + str(percentage) + "% of this workout."
 
         else:
@@ -67,16 +63,9 @@ class SessionAsymmetry(Serialisable):
 
     def get_detail_bold_text(self):
 
-        if self.left_apt > self.right_apt > 0:
+        if self.percent_events_asymmetric > 0:
 
-            percentage = round(((self.left_apt / self.right_apt) - 1.00) * 100)
-            bold_text = BoldText()
-            bold_text.text = str(percentage) + "%"
-            return [bold_text]
-
-        elif self.right_apt > self.left_apt > 0:
-
-            percentage = round(((self.right_apt / self.left_apt) - 1.00) * 100)
+            percentage = self.percent_events_asymmetric
             bold_text = BoldText()
             bold_text.text = str(percentage) + "%"
             return [bold_text]
@@ -127,6 +116,7 @@ class SessionAsymmetry(Serialisable):
                 'event_date': format_datetime(self.event_date),
                 'left_apt': self.left_apt,
                 'right_apt': self.right_apt,
+                'percent_events_asymmetric': self.percent_events_asymmetric,
                 'time_blocks': [t.json_serialise() for t in self.time_blocks],
             }
         return ret
@@ -139,6 +129,7 @@ class SessionAsymmetry(Serialisable):
         session.right_apt = input_dict.get('right_apt', 0)
         session.time_blocks = [TimeBlockAsymmetry.json_deserialise(tb) for tb in input_dict.get('time_blocks', [])]
         session.seconds_duration = input_dict.get('seconds_duration', 0)
+        session.percent_events_asymmetric = input_dict.get('percent_events_asymmetric', 0)
         return session
 
 
