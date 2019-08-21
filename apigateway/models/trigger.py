@@ -114,6 +114,11 @@ class Trigger(BaseSoreness, Serialisable):
         self.agonists = []
         self.antagonists = []
         self.synergists = []
+        self.stabilizers = []
+        self.overactive_tight_first = []
+        self.overactive_tight_second = []
+        self.elevated_stress = []
+        self.underactive_weak = []
         self.sport_name = None
         self.severity = None
         self.pain = None
@@ -132,6 +137,11 @@ class Trigger(BaseSoreness, Serialisable):
             "agonists": [a.json_serialise() for a in self.agonists if self.agonists is not None],
             "antagonists": [a.json_serialise() for a in self.antagonists if self.antagonists is not None],
             "synergists": [s.json_serialise() for s in self.synergists if self.synergists is not None],
+            "stabilizers": [s.json_serialise() for s in self.stabilizers if self.stabilizers is not None],
+            "overactive_tight_first": [s.json_serialise() for s in self.overactive_tight_first if self.overactive_tight_first is not None],
+            "overactive_tight_second": [s.json_serialise() for s in self.overactive_tight_second if self.overactive_tight_second is not None],
+            "elevated_stress": [s.json_serialise() for s in self.elevated_stress if self.elevated_stress is not None],
+            "underactive_weak": [s.json_serialise() for s in self.underactive_weak if self.underactive_weak is not None],
             "sport_name": self.sport_name.value if self.sport_name is not None else None,
             "severity": self.severity,
             "pain": self.pain,
@@ -153,6 +163,13 @@ class Trigger(BaseSoreness, Serialisable):
         trigger.agonists = [BodyPartSide.json_deserialise(a) for a in input_dict.get('agonists', [])]
         trigger.antagonists = [BodyPartSide.json_deserialise(a) for a in input_dict.get('antagonists',[])]
         trigger.synergists = [BodyPartSide.json_deserialise(s) for s in input_dict.get('synergists',[])]
+        trigger.stabilizers = [BodyPartSide.json_deserialise(s) for s in input_dict.get('stabilizers', [])]
+
+        trigger.overactive_tight_first = [BodyPartSide.json_deserialise(s) for s in input_dict.get('overactive_tight_first', [])]
+        trigger.overactive_tight_second = [BodyPartSide.json_deserialise(s) for s in input_dict.get('overactive_tight_second', [])]
+        trigger.elevated_stress = [BodyPartSide.json_deserialise(s) for s in input_dict.get('elevated_stress', [])]
+        trigger.underactive_weak = [BodyPartSide.json_deserialise(s) for s in input_dict.get('underactive_weak', [])]
+
         trigger.sport_name = input_dict['sport_name']
         trigger.severity = input_dict['severity']
         trigger.pain = input_dict['pain']

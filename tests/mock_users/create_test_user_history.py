@@ -102,8 +102,8 @@ if __name__ == '__main__':
             persona1 = Persona(user_id)
             persona1.soreness_history = soreness_history
             last_plan_date_time = persona1.create_history(days=history_length, suffix='')
-            response = clear_fte_category(InsightType.movement_dysfunction_compensation, jwt, last_plan_date_time)
-            response_2 = clear_fte_category_view(InsightType.movement_dysfunction_compensation, VisualizationType.pain_functional_limitation, jwt, last_plan_date_time)
+            response = clear_fte_category(InsightType.personalized_recovery, jwt, last_plan_date_time)
+            response_2 = clear_fte_category_view(InsightType.personalized_recovery, VisualizationType.pain_functional_limitation, jwt, last_plan_date_time)
             print(time.time() - start)
         elif u == "near_clear@200.com" or u == "near_clear_2@200.com":
             soreness_history = []
@@ -116,10 +116,10 @@ if __name__ == '__main__':
             persona1 = Persona(user_id)
             persona1.soreness_history = soreness_history
             last_plan_date_time = persona1.create_history(days=history_length, suffix='')
-            clear_fte_category(InsightType.movement_dysfunction_compensation, jwt, last_plan_date_time)
-            clear_fte_category_view(InsightType.movement_dysfunction_compensation,
+            clear_fte_category(InsightType.personalized_recovery, jwt, last_plan_date_time)
+            clear_fte_category_view(InsightType.personalized_recovery,
                                     VisualizationType.pain_functional_limitation, jwt, last_plan_date_time)
-            clear_fte_category_view(InsightType.movement_dysfunction_compensation,
+            clear_fte_category_view(InsightType.personalized_recovery,
                                     VisualizationType.tight_overactice_underactive, jwt, last_plan_date_time)
             print(time.time() - start)
         elif u == "two_pain@200.com" or u == "two_pain_2@200.com":
@@ -135,10 +135,10 @@ if __name__ == '__main__':
             persona1 = Persona(user_id)
             persona1.soreness_history = soreness_history
             last_plan_date_time = persona1.create_history(days=history_length, suffix='')
-            clear_fte_category(InsightType.movement_dysfunction_compensation, jwt, last_plan_date_time)
-            clear_fte_category_view(InsightType.movement_dysfunction_compensation,
+            clear_fte_category(InsightType.personalized_recovery, jwt, last_plan_date_time)
+            clear_fte_category_view(InsightType.personalized_recovery,
                                     VisualizationType.pain_functional_limitation, jwt, last_plan_date_time)
-            clear_fte_category_view(InsightType.movement_dysfunction_compensation,
+            clear_fte_category_view(InsightType.personalized_recovery,
                                     VisualizationType.tight_overactice_underactive, jwt, last_plan_date_time)
             print(time.time() - start)
         elif u == "pain_sore@200.com" or u == "pain_sore_2@200.com":
@@ -153,7 +153,7 @@ if __name__ == '__main__':
             persona1.soreness_history = soreness_history
             last_plan_date_time = persona1.create_history(days=history_length, suffix='')
 
-            response = clear_plan_alerts(InsightType.movement_dysfunction_compensation,jwt, last_plan_date_time)
+            response = clear_plan_alerts(InsightType.personalized_recovery, jwt, last_plan_date_time)
             additional_soreness_history = []
             additional_rec_pec_soreness = sh.create_body_part_history(sh.two_days_soreness(), 2, 2, False)
             additional_soreness_history.append(additional_rec_pec_soreness)
@@ -175,10 +175,10 @@ if __name__ == '__main__':
             persona1 = Persona(user_id)
             persona1.soreness_history = soreness_history
             last_plan_date_time = persona1.create_history(days=history_length, suffix='')
-            clear_fte_category(InsightType.movement_dysfunction_compensation, jwt, last_plan_date_time)
-            clear_fte_category_view(InsightType.movement_dysfunction_compensation,
+            clear_fte_category(InsightType.personalized_recovery, jwt, last_plan_date_time)
+            clear_fte_category_view(InsightType.personalized_recovery,
                                     VisualizationType.pain_functional_limitation, jwt, last_plan_date_time)
-            clear_fte_category_view(InsightType.movement_dysfunction_compensation,
+            clear_fte_category_view(InsightType.personalized_recovery,
                                     VisualizationType.tight_overactice_underactive, jwt, last_plan_date_time)
 
             additional_soreness_history = []

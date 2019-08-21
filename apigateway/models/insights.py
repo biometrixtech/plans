@@ -141,4 +141,5 @@ class InsightType(Enum):
     stress = 0
     response = 1
     biomechanics = 2
-    movement_dysfunction_compensation = 3
+    personalized_recovery = 3
+    prevention = 4

@@ -7,6 +7,7 @@ from models.trigger import TriggerType
 from models.dosage import ExerciseDosage
 from models.body_parts import BodyPartFactory, BodyPart
 from models.sport import SportName
+from models.movement_errors import MovementErrorType, MovementError, MovementErrorFactory
 from utils import parse_datetime, format_datetime
 import abc
 import datetime
@@ -1012,52 +1013,45 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
 
     def check_reactive_three_sensor(self, trigger_list, exercise_library):
 
-        for t in trigger_list:
-            if TriggerType.movement_error_apt_asymmetry == t.trigger_type:
-                goal = AthleteGoal("3 Sensor Reactive", 1, AthleteGoalType.three_sensor_reactive)
-                body_part_factory = BodyPartFactory()
-                quads = body_part_factory.get_body_part(BodyPart(BodyPartLocation.quads, None))
-                lats = body_part_factory.get_body_part(BodyPart(BodyPartLocation.lats, None))
-                hip = body_part_factory.get_body_part(BodyPart(BodyPartLocation.hip_flexor, None))
-                upper_back = body_part_factory.get_body_part(BodyPart(BodyPartLocation.upper_back_neck, None))
-                calves = body_part_factory.get_body_part(BodyPart(BodyPartLocation.calves, None))
-                adducter = body_part_factory.get_body_part(BodyPart(BodyPartLocation.groin, None))
-                hamstring = body_part_factory.get_body_part(BodyPart(BodyPartLocation.hamstrings, None))
-                glutes = body_part_factory.get_body_part(BodyPart(BodyPartLocation.glutes, None))
 
-                # inhibit exercises
-                self.copy_exercises(quads.inhibit_exercises, self.inhibit_exercises, goal, "1",
-                                    None, exercise_library)
-                self.copy_exercises(lats.inhibit_exercises, self.inhibit_exercises, goal, "1",
-                                    None, exercise_library)
-                self.copy_exercises(hip.inhibit_exercises, self.inhibit_exercises, goal, "2",
-                                    None, exercise_library)
-                self.copy_exercises(upper_back.inhibit_exercises, self.inhibit_exercises, goal, "2",
-                                    None, exercise_library)
-                self.copy_exercises(calves.inhibit_exercises, self.inhibit_exercises, goal, "3",
-                                    None, exercise_library)
-                self.copy_exercises(hamstring.inhibit_exercises, self.inhibit_exercises, goal, "3",
-                                    None, exercise_library)
-                self.copy_exercises(adducter.inhibit_exercises, self.inhibit_exercises, goal, "3",
-                                    None, exercise_library)
+        if trigger_list is not None:
+            for t in trigger_list:
+                if TriggerType.movement_error_apt_asymmetry == t.trigger_type:
+                    goal = AthleteGoal("3 Sensor Reactive", 1, AthleteGoalType.three_sensor_reactive)
+                    factory = MovementErrorFactory()
+                    movement_error = factory.get_movement_error(MovementErrorType.apt_asymmetry)
 
-                # static stretch
-                self.copy_exercises(quads.static_stretch_exercises, self.static_stretch_exercises, goal, "1",
-                                    None, exercise_library)
-                self.copy_exercises(lats.static_stretch_exercises, self.static_stretch_exercises, goal, "1",
-                                    None, exercise_library)
-                self.copy_exercises(hip.static_stretch_exercises, self.static_stretch_exercises, goal, "2",
-                                    None, exercise_library)
-                self.copy_exercises(upper_back.static_stretch_exercises, self.static_stretch_exercises, goal, "2",
-                                    None, exercise_library)
+                    body_part_factory = BodyPartFactory()
 
-                # active stretch
-                self.copy_exercises(calves.active_stretch_exercises, self.active_stretch_exercises, goal, "3",
-                                    None, exercise_library)
-                self.copy_exercises(hamstring.active_stretch_exercises, self.active_stretch_exercises, goal, "3",
-                                    None, exercise_library)
-                self.copy_exercises(adducter.active_stretch_exercises, self.active_stretch_exercises, goal, "3",
-                                    None, exercise_library)
+                    for o1 in movement_error.overactive_tight_first:
+                        body_part = body_part_factory.get_body_part(BodyPart(BodyPartLocation(o1), None))
+
+                        self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1",
+                                            None, exercise_library)
+
+                        self.copy_exercises(body_part.static_stretch_exercises, self.static_stretch_exercises, goal,
+                                            "1",
+                                            None, exercise_library)
+
+                    for o2 in movement_error.overactive_tight_second:
+                        body_part = body_part_factory.get_body_part(BodyPart(BodyPartLocation(o2), None))
+
+                        self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "2",
+                                            None, exercise_library)
+
+                        self.copy_exercises(body_part.static_stretch_exercises, self.static_stretch_exercises, goal,
+                                            "2",
+                                            None, exercise_library)
+
+                    for e in movement_error.elevated_stress:
+                        body_part = body_part_factory.get_body_part(BodyPart(BodyPartLocation(e), None))
+
+                        self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "3",
+                                            None, exercise_library)
+
+                        self.copy_exercises(body_part.active_stretch_exercises, self.active_stretch_exercises, goal,
+                                            "3",
+                                            None, exercise_library)
 
     def check_reactive_recover_from_sport_general(self, sports, exercise_library, goal, max_severity):
 
@@ -1484,49 +1478,43 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
 
     def check_reactive_three_sensor(self, trigger_list, exercise_library):
 
-        for t in trigger_list:
-            if TriggerType.movement_error_apt_asymmetry == t.trigger_type:
-                goal = AthleteGoal("3 Sensor Reactive", 1, AthleteGoalType.three_sensor_reactive)
-                body_part_factory = BodyPartFactory()
-                quads = body_part_factory.get_body_part(BodyPart(BodyPartLocation.quads, None))
-                lats = body_part_factory.get_body_part(BodyPart(BodyPartLocation.lats, None))
-                hip = body_part_factory.get_body_part(BodyPart(BodyPartLocation.hip_flexor, None))
-                upper_back = body_part_factory.get_body_part(BodyPart(BodyPartLocation.upper_back_neck, None))
-                calves = body_part_factory.get_body_part(BodyPart(BodyPartLocation.calves, None))
-                adducter = body_part_factory.get_body_part(BodyPart(BodyPartLocation.groin, None))
-                hamstring = body_part_factory.get_body_part(BodyPart(BodyPartLocation.hamstrings, None))
+        if trigger_list is not None:
 
-                # inhibit exercises
-                self.copy_exercises(quads.inhibit_exercises, self.inhibit_exercises, goal, "1",
-                                    None, exercise_library)
-                self.copy_exercises(lats.inhibit_exercises, self.inhibit_exercises, goal, "1",
-                                    None, exercise_library)
-                self.copy_exercises(hip.inhibit_exercises, self.inhibit_exercises, goal, "2",
-                                    None, exercise_library)
-                self.copy_exercises(upper_back.inhibit_exercises, self.inhibit_exercises, goal, "2",
-                                    None, exercise_library)
-                self.copy_exercises(calves.inhibit_exercises, self.inhibit_exercises, goal, "3",
-                                    None, exercise_library)
-                self.copy_exercises(hamstring.inhibit_exercises, self.inhibit_exercises, goal, "3",
-                                    None, exercise_library)
-                self.copy_exercises(adducter.inhibit_exercises, self.inhibit_exercises, goal, "3",
-                                    None, exercise_library)
+            for t in trigger_list:
+                if TriggerType.movement_error_apt_asymmetry == t.trigger_type:
+                    goal = AthleteGoal("3 Sensor Reactive", 1, AthleteGoalType.three_sensor_reactive)
+                    factory = MovementErrorFactory()
+                    movement_error = factory.get_movement_error(MovementErrorType.apt_asymmetry)
 
-                # static stretch
-                self.copy_exercises(quads.static_stretch_exercises, self.static_stretch_exercises, goal, "1",
-                                    None, exercise_library)
-                self.copy_exercises(lats.static_stretch_exercises, self.static_stretch_exercises, goal, "1",
-                                    None, exercise_library)
-                self.copy_exercises(hip.static_stretch_exercises, self.static_stretch_exercises, goal, "2",
-                                    None, exercise_library)
-                self.copy_exercises(upper_back.static_stretch_exercises, self.static_stretch_exercises, goal, "2",
-                                    None, exercise_library)
-                self.copy_exercises(calves.static_stretch_exercises, self.static_stretch_exercises, goal, "3",
-                                    None, exercise_library)
-                self.copy_exercises(hamstring.static_stretch_exercises, self.static_stretch_exercises, goal, "3",
-                                    None, exercise_library)
-                self.copy_exercises(adducter.static_stretch_exercises, self.static_stretch_exercises, goal, "3",
-                                    None, exercise_library)
+                    body_part_factory = BodyPartFactory()
+
+                    for o1 in movement_error.overactive_tight_first:
+                        body_part = body_part_factory.get_body_part(BodyPart(BodyPartLocation(o1), None))
+
+                        self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1",
+                                            None, exercise_library)
+
+                        self.copy_exercises(body_part.static_stretch_exercises, self.static_stretch_exercises, goal, "1",
+                                            None, exercise_library)
+
+                    for o2 in movement_error.overactive_tight_second:
+                        body_part = body_part_factory.get_body_part(BodyPart(BodyPartLocation(o2), None))
+
+                        self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "2",
+                                            None, exercise_library)
+
+                        self.copy_exercises(body_part.static_stretch_exercises, self.static_stretch_exercises, goal, "2",
+                                            None, exercise_library)
+
+                    for e in movement_error.elevated_stress:
+                        body_part = body_part_factory.get_body_part(BodyPart(BodyPartLocation(e), None))
+
+                        self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "3",
+                                            None, exercise_library)
+
+                        self.copy_exercises(body_part.static_stretch_exercises, self.static_stretch_exercises, goal, "3",
+                                            None, exercise_library)
+
 
     def check_reactive_recover_from_sport_general(self, sports, exercise_library, goal, max_severity):
 

@@ -1,6 +1,7 @@
 from models.body_parts import BodyPartFactory, BodyPartLocation, BodyPart
 from models.session import SessionSource
 from models.soreness_base import HistoricSorenessStatus, BodyPartSide
+from models.movement_errors import MovementErrorType, MovementError, MovementErrorFactory
 from models.goal import AthleteGoalType, AthleteGoal
 from models.trigger import TriggerType, Trigger
 
@@ -54,7 +55,7 @@ class TriggerFactory(object):
 
         return high_relative_intensity_session
 
-    def set_trigger(self, trigger_type, soreness=None, sport_name=None):
+    def set_trigger(self, trigger_type, soreness=None, sport_name=None, movement_error=None):
 
         trigger_index = -1
 
@@ -121,7 +122,16 @@ class TriggerFactory(object):
                 trigger.agonists = self.convert_body_part_list(body_part_side, body_part.agonists)
                 trigger.antagonists = self.convert_body_part_list(body_part_side, body_part.antagonists)
                 trigger.synergists = self.convert_body_part_list(body_part_side, body_part.synergists)
+                trigger.stabilizers = self.convert_body_part_list(body_part_side, body_part.stabilizers)
                 trigger.source_date_time = soreness.status_changed_date_time
+
+            if movement_error is not None:
+
+                trigger.overactive_tight_first = movement_error.overactive_tight_first
+                trigger.overactive_tight_second = movement_error.overactive_tight_second
+                trigger.elevated_stress = movement_error.elevated_stress
+                trigger.underactive_weak = movement_error.underactive_weak
+                trigger.body_part = movement_error.body_part_side
 
             trigger.sport_name = sport_name
             self.triggers.append(trigger)
@@ -179,7 +189,9 @@ class TriggerFactory(object):
             if session.source == SessionSource.three_sensor:
                 if session.asymmetry is not None:
                     if session.asymmetry.left_apt != session.asymmetry.right_apt:
-                        self.set_trigger(TriggerType.movement_error_apt_asymmetry, soreness=None, sport_name=None) # 110
+                        factory = MovementErrorFactory()
+                        movement_error = factory.get_movement_error(MovementErrorType.apt_asymmetry)
+                        self.set_trigger(TriggerType.movement_error_apt_asymmetry, soreness=None, sport_name=None, movement_error=movement_error) # 110
 
         for soreness in self.soreness_list:
 
