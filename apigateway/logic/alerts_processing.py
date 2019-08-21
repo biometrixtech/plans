@@ -1,7 +1,8 @@
 from models.insights import AthleteInsight, InsightType
 from models.soreness_base import BodyPartSide
 from models.trigger import TriggerType
-from models.athlete_trend import AthleteTrends, Trend, VisualizationType, DataSource
+from models.athlete_trend import AthleteTrends, Trend, DataSource
+from models.styles import VisualizationType
 
 
 class AlertsProcessing(object):

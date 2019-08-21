@@ -68,8 +68,9 @@ class TriggerFactory(object):
             trigger_index = next((i for i, x in enumerate(self.triggers) if trigger_type == x.trigger_type and
                                   body_part.body_part_location == x.body_part.body_part_location and
                                   body_part.side == x.body_part.side and
-                                  soreness.pain == x.pain and
-                                  soreness.historic_soreness_status == x.historic_soreness_status), -1)
+                                  soreness.pain == x.pain #and
+                                  #soreness.historic_soreness_status == x.historic_soreness_status
+                                  ), -1)
 
         elif soreness is not None and sport_name is not None:
 
@@ -79,7 +80,7 @@ class TriggerFactory(object):
                                   body_part.body_part_location == x.body_part.body_part_location and
                                   body_part.side == x.body_part.side and
                                   soreness.pain == x.pain and
-                                  soreness.historic_soreness_status == x.historic_soreness_status and
+                                  #soreness.historic_soreness_status == x.historic_soreness_status and
                                   sport_name == x.sport_name), -1)
 
         elif sport_name is not None:
