@@ -8,6 +8,7 @@ from fathomapi.utils.decorators import require
 from fathomapi.utils.exceptions import InvalidSchemaException, NoSuchEntityException
 from fathomapi.utils.xray import xray_recorder
 from models.session import SessionType, SessionSource
+from models.asymmetry import Asymmetry
 from models.daily_plan import DailyPlan
 from utils import parse_datetime, format_date, format_datetime
 from config import get_mongo_collection
@@ -158,7 +159,7 @@ def handle_session_update(session_id, principal_id=None):
         session_obj.duration_health = new_session.duration_health
         session_obj.calories = new_session.calories
         session_obj.distance = new_session.distance
-        session_obj.source = SessionSource.combined
+        session_obj.source = SessionSource.user_health
         session_datastore.update(session_obj,
                                  user_id=user_id,
                                  event_date=plan_event_date
@@ -246,9 +247,9 @@ def handle_session_sensor_data(principal_id=None):
 
 @app.route('/three_sensor_data', methods=['POST'])
 @require.authenticated.any
-@require.body({'sessions': list})
+@require.body({'event_date': str})
 @xray_recorder.capture('routes.session.add_sensor_data')
-def handle_session_three_sensor_data(principal_id=None):
+def handle_session_three_sensor_data():
     user_id = request.json['user_id']
     event_date = parse_datetime(request.json['event_date'])
     plan_event_day = format_date(event_date)
@@ -259,13 +260,36 @@ def handle_session_three_sensor_data(principal_id=None):
     else:
         plan = daily_plan_datastore.get(user_id, plan_event_day, plan_event_day)[0]
 
-    sessions = request.json['sessions']
-    for session in sessions:
-        event_date = session['event_date']
-        session_obj = create_session(6, {'description': 'test_three_sensor_data',
-                                         'event_date': event_date,
-                                         'sport_name': 83})
+    session_id = request.json['session_id']
+    asymmetry = request.json.get('asymmetry', {})
+    duration = request.json.get('seconds_duration', 0)
+
+    session_obj = create_session(6, {'description': 'three_sensor_data',
+                                     'event_date': event_date,
+                                     'sport_name': 17,
+                                     'source': 3,
+                                     'duration_sensor': duration})
+    # update other fields
+    session_obj.id = session_id
+    session_obj.asymmetry = Asymmetry.json_deserialise(asymmetry)
+
+    # does session already exist
+    found = False
+    for s in range(0, len(plan.training_sessions)):
+        if plan.training_sessions[s].id == session_id:
+            plan.training_sessions[s].description = 'three_sensor_data'
+            plan.training_sessions[s].event_date = event_date
+            plan.training_sessions[s].sport_name = 17
+            plan.training_sessions[s].source = 3
+            plan.training_sessions[s].duration_sensor = duration
+            plan.training_sessions[s].asymmetry = session_obj.asymmetry
+            found = True
+            break
+
+    if not found:
+        # add to plans and store plan
         plan.training_sessions.append(session_obj)
+
     daily_plan_datastore.put(plan)
 
     return {'message': 'success'}
