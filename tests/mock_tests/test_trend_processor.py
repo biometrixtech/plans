@@ -3,6 +3,7 @@ from logic.trigger_processing import TriggerFactory
 from models.trigger import TriggerType, Trigger
 from models.body_parts import BodyPartFactory
 from models.soreness_base import BodyPartLocation, BodyPartSide
+from models.sport import SportName
 from models.movement_errors import MovementErrorType, MovementErrorFactory, MovementError
 from datetime import datetime, timedelta
 
@@ -113,29 +114,14 @@ def test_trigger_7():
 
 def test_trigger_110():
 
-    trigger_list = []
-    body_part_factory = BodyPartFactory()
     trigger_factory = TriggerFactory(datetime.now(), None, [], [])
 
-    now_time = datetime.now()
-    now_time_2 = now_time - timedelta(days=1)
-
-    trigger = Trigger(TriggerType.movement_error_apt_asymmetry)
     factory = MovementErrorFactory()
     movement_error = factory.get_movement_error(MovementErrorType.apt_asymmetry)
-    trigger.overactive_tight_first = movement_error.overactive_tight_first
-    trigger.overactive_tight_second = movement_error.overactive_tight_second
-    trigger.underactive_weak = movement_error.underactive_weak
-    trigger.elevated_stress = movement_error.elevated_stress
-    trigger.body_part = movement_error.body_part_side
-    trigger.created_date_time = now_time_2
-    trigger.source_date_time = now_time
 
-    trigger_list.append(trigger)
+    trigger_factory.set_trigger(TriggerType.movement_error_apt_asymmetry, movement_error=movement_error)
 
-    trend_processor = TrendProcessor(trigger_list)
-
-    assert trend_processor.athlete_trend_categories[0].visible is False
+    trend_processor = TrendProcessor(trigger_factory.triggers)
 
     trend_processor.process_triggers()
 
@@ -143,9 +129,24 @@ def test_trigger_110():
     assert trend_processor.athlete_trend_categories[1].visible is False
     assert trend_processor.athlete_trend_categories[0].trends[0].visible is True
     assert trend_processor.athlete_trend_categories[0].trends[0].title == "Muscle Over & Under-Activity"
-    assert trend_processor.athlete_trend_categories[0].trends[0].last_date_time == now_time_2
-    assert 1 == len(trend_processor.athlete_trend_categories[0].trends)
-    assert 1 == len(trend_processor.athlete_trend_categories[1].trends)
+
+
+def test_trigger_0():
+
+    trigger_factory = TriggerFactory(datetime.now(), None, [], [])
+
+    trigger_factory.set_trigger(TriggerType.high_volume_intensity, sport_name=SportName.cycling)
+
+    trend_processor = TrendProcessor(trigger_factory.triggers)
+
+    trend_processor.process_triggers()
+
+    assert trend_processor.athlete_trend_categories[0].visible is False
+    assert trend_processor.athlete_trend_categories[1].visible is False
+    assert trend_processor.athlete_trend_categories[2].visible is True
+    assert trend_processor.athlete_trend_categories[2].trends[0].visible is True
+    assert trend_processor.athlete_trend_categories[2].trends[0].title == "Daily Care"
+    assert trend_processor.athlete_trend_categories[2].trends[0].last_date_time is not None
 
 # We don't have more than one view per category thus no ties
 # def test_pain_view_breaks_tie():
