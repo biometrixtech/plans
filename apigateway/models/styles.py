@@ -79,6 +79,7 @@ class VisualizationType(Enum):
     workload = 8
     tight_overactice_underactive = 9
     pain_functional_limitation = 10
+    care_today = 11
     biomechanics = 20
 
 

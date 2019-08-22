@@ -2,7 +2,7 @@ from models.athlete_trend import TrendDashboardCategory, PlanAlert, Trend, Trend
     FirstTimeExperienceElement, CategoryFirstTimeExperienceModal
 from models.styles import BoldText, LegendColor, VisualizationType
 from models.trigger import TriggerType, Trigger
-from models.chart_data import PainFunctionalLimitationChartData, TightOverUnderactiveChartData
+from models.chart_data import PainFunctionalLimitationChartData, TightOverUnderactiveChartData, CareTodayChartData
 from models.insights import InsightType
 from models.body_parts import BodyPartFactory
 from models.soreness_base import BodyPartSide, BodyPartLocation
@@ -38,9 +38,32 @@ class TrendProcessor(object):
 
             personalized_recovery_category = self.create_personalized_recovery_category()
             prevention_category = self.create_prevention_category()
+            care_category = self.create_care_category()
 
             self.athlete_trend_categories.append(personalized_recovery_category)
             self.athlete_trend_categories.append(prevention_category)
+            self.athlete_trend_categories.append(care_category)
+
+    def get_care_trend(self, category_index):
+
+        care_index = next((i for i, x in enumerate(self.athlete_trend_categories[category_index].trends) if
+                                 x.visualization_type == VisualizationType.care_today), -1)
+        if care_index == -1:
+            care_trend = self.create_daily_trend()
+            self.athlete_trend_categories[category_index].trends.append(care_trend)
+            care_index = len(self.athlete_trend_categories[category_index].trends) - 1
+
+        return self.athlete_trend_categories[category_index].trends[care_index]
+
+    def set_care_trend(self, category_index, care_trend):
+
+        index = next((i for i, x in enumerate(self.athlete_trend_categories[category_index].trends) if
+                             x.visualization_type == VisualizationType.care_today), -1)
+
+        if index == -1:
+            self.athlete_trend_categories[category_index].trends.append(care_trend)
+        else:
+            self.athlete_trend_categories[category_index].trends[index] = care_trend
 
     def get_limitation_trend(self, category_index):
 
@@ -145,6 +168,50 @@ class TrendProcessor(object):
 
         return trend_category
 
+    def create_care_category(self):
+        trend_category = TrendCategory(InsightType.care)
+        trend_category.title = "Care"
+        trend_category.first_time_experience = True
+
+        daily_trend = self.create_daily_trend()
+        trend_category.trends.append(daily_trend)
+
+        modal = CategoryFirstTimeExperienceModal()
+        modal.title = "Care - FTE"
+        modal.body = ("We monitor your data for signs of imbalances in  muscle activation, range of motion and more.\n\n" +
+                        "These imbalances can create inefficiency in speed & power production, over-strain tissues making them short and tight, and even increase soft tissue injury risk.\n\n" +
+                        "We try to find and help address two types of body-part specific imbalances:")
+
+        element_2 = FirstTimeExperienceElement()
+        element_2.title = "Functional\nLimitations"
+        element_2.image = "view3icon.png"
+
+        modal.categories.append(element_2)
+
+        modal.subtext = 'Tap “Continue” to see your unique findings.'
+
+        trend_category.first_time_experience_modal = modal
+
+        return trend_category
+
+    def create_daily_trend(self):
+        daily_trend = Trend(TriggerType.sore_today)
+        daily_trend.title = "Daily Care"
+        daily_trend.title_color = LegendColor.error_light
+        daily_trend.text.append("Your pain may lead to elevated strain on other muscles and soft tissue injury.")
+        daily_trend.text.append(
+            "Most people, knowingly or not, change the way they move to distribute force away from areas of pain. " +
+            "This over-stresses supporting tissues and limbs which adopt more force and stress than they’re used to. " +
+            "This often leads accumulated muscle damage and the eventual development of new injuries. See your factors below.")
+
+        daily_trend.icon = "view3icon.png"
+        daily_trend.video_url = "https://d2xll36aqjtmhz.cloudfront.net/view3context.mp4"
+        daily_trend.visualization_type = VisualizationType.care_today
+        daily_trend.visible = False
+        daily_trend.first_time_experience = True
+
+        return daily_trend
+
     def create_limitation_trend(self):
         limitation_trend = Trend(TriggerType.hist_sore_greater_30)
         limitation_trend.title = "Injury Cycle Risks"
@@ -181,8 +248,10 @@ class TrendProcessor(object):
 
         personalized_recovery_category_index = self.get_category_index(InsightType.personalized_recovery)
         prevention_category_index = self.get_category_index(InsightType.prevention)
+        care_category_index = self.get_category_index(InsightType.care)
         self.set_tight_over_under_muscle_view(personalized_recovery_category_index)
         self.set_pain_functional_limitation(prevention_category_index)
+        self.set_daily_care(care_category_index)
 
         for c in range(0, len(self.athlete_trend_categories)):
             if len(self.athlete_trend_categories[c].trends) > 0:
@@ -533,7 +602,10 @@ class TrendProcessor(object):
     def get_highest_priority_body_part_from_triggers(self, body_part_factory, top_candidates):
 
         if len(top_candidates) == 1:
-            return top_candidates[0], top_candidates[0].body_part.side == 0
+            if top_candidates[0].body_part is not None:
+                return top_candidates[0], top_candidates[0].body_part.side == 0
+            else:
+                return top_candidates[0], True
         else:
             for t in top_candidates:
                 body_part = body_part_factory.get_body_part(t.body_part)
@@ -575,6 +647,126 @@ class TrendProcessor(object):
                 body_part_text = text_generator.get_body_part_text(sorted_body_parts[0].location, None).title()
 
         return body_part_side, body_part_text
+
+    def set_daily_care(self, category_index):
+
+        pain_triggers = [TriggerType.no_hist_pain_pain_today_severity_1_2,
+                         TriggerType.no_hist_pain_pain_today_high_severity_3_5,
+                         TriggerType.hist_pain_pain_today_severity_1_2,
+                         TriggerType.hist_pain_pain_today_severity_3_5]
+        triggers_pain = list(t for t in self.trigger_list if t.trigger_type in pain_triggers)
+        for t in triggers_pain:
+            t.priority = 1
+
+        sore_triggers = [TriggerType.sore_today_doms,
+                         TriggerType.hist_sore_less_30_sore_today,
+                         TriggerType.hist_sore_greater_30_sore_today]
+
+        triggers_sore = list(t for t in self.trigger_list if t.trigger_type in sore_triggers)
+        for t in triggers_sore:
+            t.priority = 2
+
+        triggers_load = list(t for t in self.trigger_list if t.trigger_type == TriggerType.high_volume_intensity)
+        for t in triggers_load:
+            t.priority = 3
+
+        if len(triggers_pain) > 0 or len(triggers_sore) > 0 or len(triggers_load) > 0:
+
+            trend = self.get_care_trend(category_index)
+
+            trend_data = TrendData()
+            trend_data.visualization_type = VisualizationType.care_today
+            trend_data.add_visualization_data()
+            care_data = CareTodayChartData()
+
+            body_part_factory = BodyPartFactory()
+
+            for t in triggers_pain:
+                care_data.overactive.extend([t.body_part])  # pain
+                if body_part_factory.is_joint(t.body_part):
+                    care_data.underactive_needing_care.extend([a for a in t.agonists])  # elevated strain
+                    care_data.underactive_needing_care.extend([a for a in t.antagonists])  # elevated strain
+                    care_data.underactive_needing_care.extend([a for a in t.synergists])  # elevated strain
+                else:
+                    care_data.underactive_needing_care.extend([s for s in t.synergists])  # elevated strain
+
+            for t in triggers_sore:
+                care_data.underactive.extend([t.body_part])  # soreness
+                care_data.underactive_needing_care.extend([s for s in t.synergists])  # elevated strain
+
+            for t in triggers_load:
+                body_part_sport = body_part_factory.get_body_part_for_sports([t.sport_name])
+                care_data.underactive_needing_care.extend([a for a in body_part_sport.agonists])  # elevated strain
+                care_data.underactive_needing_care.extend([s for s in body_part_sport.synergists])  # elevated strain
+
+            care_data.remove_duplicates()
+            trend_data.data = [care_data]
+
+            all_triggers = []
+            all_triggers.extend(triggers_pain)
+            all_triggers.extend(triggers_sore)
+            all_triggers.extend(triggers_load)
+
+            # rank triggers
+            sorted_triggers = sorted(all_triggers, key=lambda x: (x.created_date_time, x.priority), reverse=True)
+
+            trend.triggers = all_triggers
+
+            text_generator = RecoveryTextGenerator()
+            body_part_factory = BodyPartFactory()
+
+            top_candidates = list(
+                s for s in sorted_triggers if s.created_date_time == sorted_triggers[0].created_date_time)
+
+            trend.top_priority_trigger, is_body_part_plural = self.get_highest_priority_body_part_from_triggers(
+                body_part_factory, top_candidates)
+
+            if is_body_part_plural:
+                side = 0
+            else:
+                side = trend.top_priority_trigger.body_part.side
+
+            if trend.top_priority_trigger.body_part is not None:
+                body_part_text = text_generator.get_body_part_text(trend.top_priority_trigger.body_part.body_part_location,
+                                                                   None)
+            else:
+                body_part_text = ""
+
+            body_part_text = body_part_text.title()
+
+            title_body_part_text, is_title_plural = self.get_title_text_for_body_parts(
+                trend.top_priority_trigger.synergists, side)
+            trend_data.title = "Elevated strain on " + title_body_part_text
+            trend.plan_alert_short_title = "elevated strain on " + title_body_part_text
+            clean_title_body_part_text = title_body_part_text.replace('&', 'and')
+            body_text = (
+                        "Athletes struggling with recurring " + body_part_text + " pain often develop misalignments that over-stress their " + clean_title_body_part_text +
+                        ". Without proactive measures, this can lead to accumulated micro-trauma in the tissues and new areas of pain or injury over time.")
+            trend.dashboard_body_part, trend.dashboard_body_part_text = self.get_title_body_part_and_text(
+                trend.top_priority_trigger.synergists, side)
+
+            bold_text_3 = BoldText()
+            bold_text_3.text = body_part_text
+            bold_text_3.color = LegendColor.error_light
+            trend_data.bold_text.append(bold_text_3)
+            trend_data.text = body_text
+
+            bold_text_4 = BoldText()
+            bold_text_4.text = clean_title_body_part_text
+            bold_text_4.color = LegendColor.splash_x_light
+            trend_data.bold_text.append(bold_text_4)
+
+            trend.trend_data = trend_data
+            trend.visible = True
+            trend.priority = 1
+
+            trend.last_date_time = self.get_latest_trigger_date_time(all_triggers)
+
+            self.set_care_trend(category_index, trend)
+
+        else:
+            trend = self.create_daily_trend()
+            self.set_care_trend(category_index, trend)
 
     def set_pain_functional_limitation(self, category_index):
 
@@ -638,15 +830,8 @@ class TrendProcessor(object):
             top_candidates = list(
                 s for s in sorted_triggers if s.created_date_time == sorted_triggers[0].created_date_time)
 
-            #trigger_header_text, is_plural = self.get_body_part_title_text(body_part_factory, top_candidates)
-
             trend.top_priority_trigger, is_body_part_plural = self.get_highest_priority_body_part_from_triggers(
                 body_part_factory, top_candidates)
-
-            # if is_plural:
-            #     trend_data.title = "Your " + trigger_header_text + " are functionally limited"
-            # else:
-            #     trend_data.title = "Your " + trigger_header_text + " is functionally limited"
 
             if is_body_part_plural:
                 side = 0
@@ -665,14 +850,10 @@ class TrendProcessor(object):
             trend.dashboard_body_part, trend.dashboard_body_part_text = self.get_title_body_part_and_text(
                 trend.top_priority_trigger.synergists, side)
 
-            #trend_data.text = body_part_text + " pain is often caused by doing painful things that tend to cause pain when doing painful things.\n"
-
             bold_text_3 = BoldText()
             bold_text_3.text = body_part_text
             bold_text_3.color = LegendColor.error_light
             trend_data.bold_text.append(bold_text_3)
-            #trend_data.title = trend_data.title.title()
-            #trend_data.title_color = LegendColor.warning_light
             trend_data.text = body_text
 
             bold_text_4 = BoldText()

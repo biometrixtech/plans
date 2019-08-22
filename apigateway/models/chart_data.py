@@ -1062,6 +1062,11 @@ class BaseOveractiveUnderactiveChartData(Serialisable):
             del(self.underactive[d])
 
 
+class CareTodayChartData(BaseOveractiveUnderactiveChartData):
+    def __init__(self):
+        super().__init__()
+
+
 class PainFunctionalLimitationChartData(BaseOveractiveUnderactiveChartData):
     def __init__(self):
         super().__init__()

@@ -109,6 +109,8 @@ class TriggerFactory(object):
             trigger.created_date_time = self.event_date_time
             trigger.modified_date_time = self.event_date_time
 
+            body_part_factory = BodyPartFactory()
+
             if soreness is not None:
                 body_part_factory = BodyPartFactory()
                 body_part = body_part_factory.get_body_part(soreness.body_part)
@@ -134,8 +136,15 @@ class TriggerFactory(object):
                 trigger.body_part = movement_error.body_part_side
 
             trigger.sport_name = sport_name
-            self.triggers.append(trigger)
 
+            if sport_name is not None:
+                body_part = body_part_factory.get_body_part_for_sports([sport_name])
+                trigger.agonists = self.get_body_part_list(body_part.agonists)
+                trigger.antagonists = self.get_body_part_list(body_part.antagonists)
+                trigger.synergists = self.get_body_part_list(body_part.synergists)
+                trigger.stabilizers = self.get_body_part_list(body_part.stabilizers)
+
+            self.triggers.append(trigger)
 
     def convert_body_part_list(self, body_part_side, body_part_list):
 
@@ -162,6 +171,24 @@ class TriggerFactory(object):
                 else:
                     body_part_side_new = BodyPartSide(BodyPartLocation(b), side=0)
                     body_part_side_list.append(body_part_side_new)
+
+        return body_part_side_list
+
+    def get_body_part_list(self, body_part_list):
+
+        body_part_side_list = []
+        body_part_factory = BodyPartFactory()
+
+        for b in body_part_list:
+            body_part = body_part_factory.get_body_part(BodyPart(BodyPartLocation(b), None))
+            if body_part.bilateral:
+                body_part_side_1 = BodyPartSide(BodyPartLocation(b), side=1)
+                body_part_side_2 = BodyPartSide(BodyPartLocation(b), side=2)
+                body_part_side_list.append(body_part_side_1)
+                body_part_side_list.append(body_part_side_2)
+            else:
+                body_part_side_new = BodyPartSide(BodyPartLocation(b), side=0)
+                body_part_side_list.append(body_part_side_new)
 
         return body_part_side_list
 

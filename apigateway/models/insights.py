@@ -143,3 +143,4 @@ class InsightType(Enum):
     biomechanics = 2
     personalized_recovery = 3
     prevention = 4
+    care = 5

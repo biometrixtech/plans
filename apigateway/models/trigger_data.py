@@ -184,6 +184,31 @@ visualization_data = {
                     # }
                 ]
             },
+            11: {
+                'title': "",
+                'y_axis_1': "",
+                'y_axis_2': "",
+                'legend': [
+                    {
+                        'color': 5,
+                        'text': "Pain",
+                        'type': 0,
+                        'series': "overactive"
+                    },
+                    {
+                        'color': 4,
+                        'text': "Soreness",
+                        'type': 0,
+                        'series': "underactive"
+                    },
+                    {
+                        'color': 7,
+                        'text': "Elevated Strain / Projected Soreness",
+                        'type': 0,
+                        'series': "underactive_needing_care"
+                    }
+                ]
+            },
         }
 
 cta_data = {
