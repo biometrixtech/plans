@@ -45,6 +45,7 @@ class Trend(object):
         self.visible = False
         self.plan_alert_short_title = ""
         self.triggers = []
+        self.trigger_tiles = []
         self.video_url = ""
         # these do not need to be persisted, used in logic only
         self.dashboard_body_part = None
@@ -79,6 +80,7 @@ class Trend(object):
             'visible': self.visible,
             'plan_alert_short_title': self.plan_alert_short_title,
             'triggers': [t.json_serialise() for t in self.triggers],
+            'trigger_tiles': [t.json_serialise() for t in self.trigger_tiles],
             'video_url': self.video_url
         }
         return ret
@@ -122,6 +124,7 @@ class Trend(object):
         trend.visible = input_dict.get('visible', False)
         trend.plan_alert_short_title = input_dict.get('plan_alert_short_tile', '')
         trend.triggers = [Trigger.json_deserialise(t) for t in input_dict.get('triggers', [])]
+        trend.trigger_tiles = [TriggerTile.json_deserialise(t) for t in input_dict.get('trigger_tiles', [])]
         trend.video_url = input_dict.get('video_url', '')
         return trend
 
@@ -449,6 +452,34 @@ class DataStatus(object):
         data_status.icon_type = input_dict.get('icon_type', None)
 
         return data_status
+
+
+class TriggerTile(Serialisable):
+    def __init__(self):
+        self.text = ""
+        self.title = ""
+        self.title_color = None
+        self.bold_text = []
+        self.order = 0
+
+    def json_serialise(self):
+        ret = {'text': self.text,
+               'title': self.title,
+               'title_color': self.title_color.value if self.title_color is not None else None,
+               'bold_text': [b.json_serialise() for b in self.bold_text],
+               'order': self.order
+               }
+        return ret
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        trigger_tile = cls()
+        trigger_tile.text = input_dict.get('text', "")
+        trigger_tile.title = input_dict.get('title', "")
+        trigger_tile.title_color = LegendColor(input_dict['title_color']) if input_dict.get('title_color') is not None else None
+        trigger_tile.bold_text = [BoldText.json_deserialise(b) for b in input_dict.get('bold_text', [])]
+        trigger_tile.order = input_dict.get('order', 0)
+        return trigger_tile
 
 
 class TrendData(object):

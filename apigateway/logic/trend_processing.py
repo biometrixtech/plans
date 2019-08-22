@@ -6,6 +6,7 @@ from models.chart_data import PainFunctionalLimitationChartData, TightOverUndera
 from models.insights import InsightType
 from models.body_parts import BodyPartFactory
 from models.soreness_base import BodyPartSide, BodyPartLocation
+from models.athlete_trend import TriggerTile
 from logic.goal_focus_text_generator import RecoveryTextGenerator
 
 
@@ -486,6 +487,17 @@ class TrendProcessor(object):
             all_triggers.extend(triggers_7)
             all_triggers.extend(triggers_110)
 
+            order = 0
+            for a in all_triggers:
+                tile = TriggerTile()
+                tile.text = a.text = "Trigger="+str(a.trigger_type.value)
+                tile.order = order
+                bold_text = BoldText()
+                bold_text.text = str(a.trigger_type.value)
+                tile.bold_text.append(bold_text)
+                trend.trigger_tiles.append(tile)
+                order += 1
+
             # rank triggers
             sorted_triggers = sorted(all_triggers, key=lambda x: (x.created_date_time, x.priority), reverse=True)
 
@@ -738,6 +750,17 @@ class TrendProcessor(object):
             all_triggers.extend(triggers_sore)
             all_triggers.extend(triggers_load)
 
+            order = 0
+            for a in all_triggers:
+                tile = TriggerTile()
+                tile.text = a.text = "Trigger="+str(a.trigger_type.value)
+                tile.order = order
+                bold_text = BoldText()
+                bold_text.text = str(a.trigger_type.value)
+                tile.bold_text.append(bold_text)
+                trend.trigger_tiles.append(tile)
+                order += 1
+
             # rank triggers
             sorted_triggers = sorted(all_triggers, key=lambda x: (x.created_date_time, x.priority), reverse=True)
 
@@ -846,6 +869,17 @@ class TrendProcessor(object):
             all_triggers = []
             all_triggers.extend(triggers_19)
             all_triggers.extend(triggers_16)
+
+            order = 0
+            for a in all_triggers:
+                tile = TriggerTile()
+                tile.text = a.text = "Trigger="+str(a.trigger_type.value)
+                tile.order = order
+                bold_text = BoldText()
+                bold_text.text = str(a.trigger_type.value)
+                tile.bold_text.append(bold_text)
+                trend.trigger_tiles.append(tile)
+                order += 1
 
             # rank triggers
             sorted_triggers = sorted(all_triggers, key=lambda x: (x.created_date_time, x.priority), reverse=True)
