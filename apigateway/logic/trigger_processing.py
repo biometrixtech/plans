@@ -129,11 +129,11 @@ class TriggerFactory(object):
 
             if movement_error is not None:
 
-                trigger.overactive_tight_first = movement_error.overactive_tight_first
-                trigger.overactive_tight_second = movement_error.overactive_tight_second
-                trigger.elevated_stress = movement_error.elevated_stress
-                trigger.underactive_weak = movement_error.underactive_weak
-                trigger.body_part = movement_error.body_part_side
+                trigger.overactive_tight_first = self.get_body_part_list(movement_error.overactive_tight_first)
+                trigger.overactive_tight_second = self.get_body_part_list(movement_error.overactive_tight_second)
+                trigger.elevated_stress = self.get_body_part_list(movement_error.elevated_stress)
+                trigger.underactive_weak = self.get_body_part_list(movement_error.underactive_weak)
+                #trigger.body_part = movement_error.body_part_side
 
             trigger.sport_name = sport_name
 

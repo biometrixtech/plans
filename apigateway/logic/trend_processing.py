@@ -476,8 +476,11 @@ class TrendProcessor(object):
                 side = trend.top_priority_trigger.body_part.side
 
             if is_body_part_plural and trend.top_priority_trigger.priority == 2:
-                body_part_text = text_generator.get_body_part_text_plural(
-                    trend.top_priority_trigger.body_part.body_part_location, None)
+                if trend.top_priority_trigger.body_part is not None:
+                    body_part_text = text_generator.get_body_part_text_plural(
+                        trend.top_priority_trigger.body_part.body_part_location, None)
+                else:
+                    body_part_text = ""
             else:
                 body_part_text = text_generator.get_body_part_text(trend.top_priority_trigger.body_part.body_part_location, None)
             body_part_text = body_part_text.title()
@@ -506,11 +509,7 @@ class TrendProcessor(object):
                 body_text = ("Patterns in your soreness data suggest that your " + body_part_text + " may actually be overactive due to a chronic over-compensation " + for_a_weak_phrase + " "
                              + clean_title_body_part_text + ".  This dysfunction could exacerbate movement imbalances and elevate your risk of chronic injury.")
 
-                temp_body_parts = []
-                for o in tight_under_data.overactive:
-                    bp = body_part_factory.get_body_part(BodyPartSide(BodyPartLocation(o), side))
-                    temp_body_parts.append(bp)
-                trend.dashboard_body_part, trend.dashboard_body_part_text = self.get_title_body_part_and_text(temp_body_parts, side)
+                trend.dashboard_body_part, trend.dashboard_body_part_text = self.get_title_body_part_and_text(tight_under_data.overactive, side)
 
             trend_data.text = body_text
 
@@ -695,9 +694,8 @@ class TrendProcessor(object):
                 care_data.underactive_needing_care.extend([s for s in t.synergists])  # elevated strain
 
             for t in triggers_load:
-                body_part_sport = body_part_factory.get_body_part_for_sports([t.sport_name])
-                care_data.underactive_needing_care.extend([a for a in body_part_sport.agonists])  # elevated strain
-                care_data.underactive_needing_care.extend([s for s in body_part_sport.synergists])  # elevated strain
+                care_data.underactive_needing_care.extend([a for a in t.agonists])  # elevated strain
+                care_data.underactive_needing_care.extend([s for s in t.synergists])  # elevated strain
 
             care_data.remove_duplicates()
             trend_data.data = [care_data]

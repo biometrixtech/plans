@@ -76,6 +76,10 @@ def test_trigger_16():
     assert 1 == len(trend_processor.athlete_trend_categories[0].trends)
     assert 1 == len(trend_processor.athlete_trend_categories[1].trends)
 
+    json_data = trend_processor.athlete_trend_categories[1].trends[0].json_serialise()
+
+    assert json_data is not None
+
 
 def test_trigger_7():
 
@@ -108,8 +112,10 @@ def test_trigger_7():
     assert trend_processor.athlete_trend_categories[0].trends[0].visible is True
     assert trend_processor.athlete_trend_categories[0].trends[0].title == "Muscle Over & Under-Activity"
     assert trend_processor.athlete_trend_categories[0].trends[0].last_date_time == now_time_2
-    assert 1 == len(trend_processor.athlete_trend_categories[0].trends)
-    assert 1 == len(trend_processor.athlete_trend_categories[1].trends)
+
+    json_data = trend_processor.athlete_trend_categories[0].trends[0].json_serialise()
+
+    assert json_data is not None
 
 
 def test_trigger_110():
@@ -130,6 +136,10 @@ def test_trigger_110():
     assert trend_processor.athlete_trend_categories[0].trends[0].visible is True
     assert trend_processor.athlete_trend_categories[0].trends[0].title == "Muscle Over & Under-Activity"
 
+    json_data = trend_processor.athlete_trend_categories[0].trends[0].json_serialise()
+
+    assert json_data is not None
+
 
 def test_trigger_0():
 
@@ -147,6 +157,11 @@ def test_trigger_0():
     assert trend_processor.athlete_trend_categories[2].trends[0].visible is True
     assert trend_processor.athlete_trend_categories[2].trends[0].title == "Daily Care"
     assert trend_processor.athlete_trend_categories[2].trends[0].last_date_time is not None
+
+    json_data = trend_processor.athlete_trend_categories[2].trends[0].json_serialise()
+
+    assert json_data is not None
+
 
 # We don't have more than one view per category thus no ties
 # def test_pain_view_breaks_tie():
