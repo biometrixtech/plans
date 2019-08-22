@@ -34,15 +34,41 @@ class TrendProcessor(object):
 
     def initialize_trend_categories(self):
 
-        if len(self.athlete_trend_categories) == 0:
+        del_list = []
 
-            personalized_recovery_category = self.create_personalized_recovery_category()
-            prevention_category = self.create_prevention_category()
+        for c in range(0, len(self.athlete_trend_categories)):
+            if (self.athlete_trend_categories[c].insight_type in [InsightType.stress,
+                                                                  InsightType.response,
+                                                                  InsightType.biomechanics,
+                                                                  InsightType.movement_dysfunction_compensation]):
+                del_list.append(c)
+
+        del_list.sort(reverse=True)
+
+        for d in del_list:
+            del(self.athlete_trend_categories[d])
+
+        care_index = next((i for i, x in enumerate(self.athlete_trend_categories) if InsightType.care == x.insight_type), -1)
+
+        if care_index == -1:
             care_category = self.create_care_category()
-
-            self.athlete_trend_categories.append(personalized_recovery_category)
-            self.athlete_trend_categories.append(prevention_category)
             self.athlete_trend_categories.append(care_category)
+
+        prevention_index = next(
+            (i for i, x in enumerate(self.athlete_trend_categories) if InsightType.prevention == x.insight_type), -1)
+
+        if prevention_index == -1:
+            prevention_category = self.create_prevention_category()
+            self.athlete_trend_categories.append(prevention_category)
+
+        recovery_index = next(
+            (i for i, x in enumerate(self.athlete_trend_categories) if InsightType.personalized_recovery == x.insight_type), -1)
+
+        if recovery_index == -1:
+            personalized_recovery_category = self.create_personalized_recovery_category()
+            self.athlete_trend_categories.append(personalized_recovery_category)
+
+
 
     def get_care_trend(self, category_index):
 
@@ -607,8 +633,9 @@ class TrendProcessor(object):
                 return top_candidates[0], True
         else:
             for t in top_candidates:
-                body_part = body_part_factory.get_body_part(t.body_part)
-                t.body_part_priority = body_part.treatment_priority
+                if t.body_part is not None:
+                    body_part = body_part_factory.get_body_part(t.body_part)
+                    t.body_part_priority = body_part.treatment_priority
 
             # still could have a tie (two body parts)
             sorted_triggers = sorted(top_candidates, key=lambda x: x.body_part_priority)
@@ -617,9 +644,15 @@ class TrendProcessor(object):
                 if sorted_triggers[0].body_part_priority == sorted_triggers[1].body_part_priority:
                     return sorted_triggers[0], True
                 else:
-                    return sorted_triggers[0], sorted_triggers[0].body_part.side == 0
+                    if sorted_triggers[0].body_part is not None:
+                        return sorted_triggers[0], sorted_triggers[0].body_part.side == 0
+                    else:
+                        return sorted_triggers[0], True
             else:
-                return sorted_triggers[0], sorted_triggers[0].body_part.side == 0
+                if sorted_triggers[0].body_part is not None:
+                    return sorted_triggers[0], sorted_triggers[0].body_part.side == 0
+                else:
+                    return sorted_triggers[0], True
 
     def get_title_body_part_and_text(self, body_parts, side):
 

@@ -2,6 +2,7 @@ from logic.trend_processing import TrendProcessor
 from logic.trigger_processing import TriggerFactory
 from models.trigger import TriggerType, Trigger
 from models.body_parts import BodyPartFactory
+from models.insights import InsightType
 from models.soreness_base import BodyPartLocation, BodyPartSide
 from models.sport import SportName
 from models.movement_errors import MovementErrorType, MovementErrorFactory, MovementError
@@ -107,13 +108,18 @@ def test_trigger_7():
 
     trend_processor.process_triggers()
 
-    assert trend_processor.athlete_trend_categories[0].visible is True
-    assert trend_processor.athlete_trend_categories[1].visible is False
-    assert trend_processor.athlete_trend_categories[0].trends[0].visible is True
-    assert trend_processor.athlete_trend_categories[0].trends[0].title == "Muscle Over & Under-Activity"
-    assert trend_processor.athlete_trend_categories[0].trends[0].last_date_time == now_time_2
+    care_category = trend_processor.get_category_index(InsightType.care)
+    prevention_category = trend_processor.get_category_index(InsightType.prevention)
+    recovery_category = trend_processor.get_category_index(InsightType.personalized_recovery)
 
-    json_data = trend_processor.athlete_trend_categories[0].trends[0].json_serialise()
+    assert trend_processor.athlete_trend_categories[recovery_category].visible is True
+    assert trend_processor.athlete_trend_categories[care_category].visible is False
+    assert trend_processor.athlete_trend_categories[prevention_category].visible is False
+    assert trend_processor.athlete_trend_categories[recovery_category].trends[0].visible is True
+    assert trend_processor.athlete_trend_categories[recovery_category].trends[0].title == "Muscle Over & Under-Activity"
+    assert trend_processor.athlete_trend_categories[recovery_category].trends[0].last_date_time == now_time_2
+
+    json_data = trend_processor.athlete_trend_categories[recovery_category].trends[0].json_serialise()
 
     assert json_data is not None
 
@@ -131,12 +137,17 @@ def test_trigger_110():
 
     trend_processor.process_triggers()
 
-    assert trend_processor.athlete_trend_categories[0].visible is True
-    assert trend_processor.athlete_trend_categories[1].visible is False
-    assert trend_processor.athlete_trend_categories[0].trends[0].visible is True
-    assert trend_processor.athlete_trend_categories[0].trends[0].title == "Muscle Over & Under-Activity"
+    care_category = trend_processor.get_category_index(InsightType.care)
+    prevention_category = trend_processor.get_category_index(InsightType.prevention)
+    recovery_category = trend_processor.get_category_index(InsightType.personalized_recovery)
 
-    json_data = trend_processor.athlete_trend_categories[0].trends[0].json_serialise()
+    assert trend_processor.athlete_trend_categories[recovery_category].visible is True
+    assert trend_processor.athlete_trend_categories[care_category].visible is False
+    assert trend_processor.athlete_trend_categories[prevention_category].visible is False
+    assert trend_processor.athlete_trend_categories[recovery_category].trends[0].visible is True
+    assert trend_processor.athlete_trend_categories[recovery_category].trends[0].title == "Muscle Over & Under-Activity"
+
+    json_data = trend_processor.athlete_trend_categories[recovery_category].trends[0].json_serialise()
 
     assert json_data is not None
 
@@ -151,14 +162,18 @@ def test_trigger_0():
 
     trend_processor.process_triggers()
 
-    assert trend_processor.athlete_trend_categories[0].visible is False
-    assert trend_processor.athlete_trend_categories[1].visible is False
-    assert trend_processor.athlete_trend_categories[2].visible is True
-    assert trend_processor.athlete_trend_categories[2].trends[0].visible is True
-    assert trend_processor.athlete_trend_categories[2].trends[0].title == "Daily Care"
-    assert trend_processor.athlete_trend_categories[2].trends[0].last_date_time is not None
+    care_category = trend_processor.get_category_index(InsightType.care)
+    prevention_category = trend_processor.get_category_index(InsightType.prevention)
+    recovery_category = trend_processor.get_category_index(InsightType.personalized_recovery)
 
-    json_data = trend_processor.athlete_trend_categories[2].trends[0].json_serialise()
+    assert trend_processor.athlete_trend_categories[prevention_category].visible is False
+    assert trend_processor.athlete_trend_categories[recovery_category].visible is False
+    assert trend_processor.athlete_trend_categories[care_category].visible is True
+    assert trend_processor.athlete_trend_categories[care_category].trends[0].visible is True
+    assert trend_processor.athlete_trend_categories[care_category].trends[0].title == "Daily Care"
+    assert trend_processor.athlete_trend_categories[care_category].trends[0].last_date_time is not None
+
+    json_data = trend_processor.athlete_trend_categories[care_category].trends[0].json_serialise()
 
     assert json_data is not None
 
