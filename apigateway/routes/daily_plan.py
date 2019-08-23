@@ -1,6 +1,7 @@
 from flask import request, Blueprint
 import datetime
 
+from routes.visualizations import get_visualization_parameter
 from utils import format_date, format_datetime, parse_datetime
 from datastores.datastore_collection import DatastoreCollection
 from logic.athlete_status_processing import AthleteStatusProcessing
@@ -32,13 +33,7 @@ def handle_daily_plan_get(user_id=None):
     else:
         start_date = format_date(event_date)
         end_date = start_date
-    visualizations = True
-    if 'visualizations' in request.json:
-        visualization_request = request.json['visualizations']
-        try:
-            visualizations = bool(visualization_request)
-        except:
-            pass
+    visualizations = get_visualization_parameter(request)
     items = daily_plan_datastore.get(user_id, start_date, end_date)
     daily_plans = []
     need_soreness_sessions = False

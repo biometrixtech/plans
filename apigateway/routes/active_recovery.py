@@ -6,7 +6,8 @@ from fathomapi.utils.exceptions import NoSuchEntityException
 from fathomapi.utils.xray import xray_recorder
 from datastores.datastore_collection import DatastoreCollection
 from models.soreness import CompletedExercise
-from logic.survey_processing import create_plan
+from routes.visualizations import get_visualization_parameter
+from logic.survey_processing import create_plan, cleanup_plan
 from utils import format_date, parse_datetime, format_datetime
 from config import get_mongo_collection
 
@@ -28,6 +29,8 @@ def handle_exercise_modalities_complete(user_id=None):
     recovery_type = request.json['recovery_type']
     completed_exercises = request.json.get('completed_exercises', [])
     recovery_index = request.json.get('recovery_index', 0)
+
+    visualizations = get_visualization_parameter(request)
 
     plan_event_day = format_date(event_date)
     recovery_event_date = format_datetime(event_date)
@@ -78,13 +81,15 @@ def handle_exercise_modalities_complete(user_id=None):
     if save_exercises:
         save_completed_exercises(completed_exercises, user_id, recovery_event_date)
 
-    survey_complete = plan.daily_readiness_survey_completed()
-    landing_screen, nav_bar_indicator = plan.define_landing_screen()
-    plan = plan.json_serialise()
-    plan['daily_readiness_survey_completed'] = survey_complete
-    plan['landing_screen'] = landing_screen
-    plan['nav_bar_indicator'] = nav_bar_indicator
-    del plan['daily_readiness_survey'], plan['user_id']
+    # survey_complete = plan.daily_readiness_survey_completed()
+    # landing_screen, nav_bar_indicator = plan.define_landing_screen()
+    # plan = plan.json_serialise()
+    # plan['daily_readiness_survey_completed'] = survey_complete
+    # plan['landing_screen'] = landing_screen
+    # plan['nav_bar_indicator'] = nav_bar_indicator
+    # del plan['daily_readiness_survey'], plan['user_id']
+
+    plan = cleanup_plan(plan, visualizations=visualizations)
 
     return {'daily_plans': [plan]}, 202
 
@@ -155,6 +160,8 @@ def handle_request_mobilize(user_id=None):
                                     start_date=plan_event_day,
                                     end_date=plan_event_day)[0]
 
+    visualizations = get_visualization_parameter(request)
+
     if plan.train_later:
         if len(plan.pre_active_rest) == 0:
             force_data = True
@@ -177,7 +184,10 @@ def handle_request_mobilize(user_id=None):
                        athlete_stats=athlete_stats,
                        datastore_collection=datastore_collection,
                        force_data=force_data,
-                       mobilize_only=True)
+                       mobilize_only=True,
+                       visualizations=visualizations)
+
+    plan = cleanup_plan(plan, visualizations=visualizations)
 
     return {'daily_plans': [plan]}, 200
 
@@ -191,6 +201,8 @@ def handle_body_part_modalities_complete(user_id=None):
     event_date = parse_datetime(request.json['event_date'])
     recovery_type = request.json['recovery_type']
     completed_body_parts = request.json.get('completed_body_parts', [])
+
+    visualizations = get_visualization_parameter(request)
 
     plan_event_day = format_date(event_date)
 
@@ -223,13 +235,15 @@ def handle_body_part_modalities_complete(user_id=None):
 
     daily_plan_datastore.put(plan)
 
-    survey_complete = plan.daily_readiness_survey_completed()
-    landing_screen, nav_bar_indicator = plan.define_landing_screen()
-    plan = plan.json_serialise()
-    plan['daily_readiness_survey_completed'] = survey_complete
-    plan['landing_screen'] = landing_screen
-    plan['nav_bar_indicator'] = nav_bar_indicator
-    del plan['daily_readiness_survey'], plan['user_id']
+    # survey_complete = plan.daily_readiness_survey_completed()
+    # landing_screen, nav_bar_indicator = plan.define_landing_screen()
+    # plan = plan.json_serialise()
+    # plan['daily_readiness_survey_completed'] = survey_complete
+    # plan['landing_screen'] = landing_screen
+    # plan['nav_bar_indicator'] = nav_bar_indicator
+    # del plan['daily_readiness_survey'], plan['user_id']
+
+    plan = cleanup_plan(plan, visualizations=visualizations)
 
     return {'daily_plans': [plan]}, 202
 

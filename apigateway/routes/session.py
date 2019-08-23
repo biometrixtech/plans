@@ -11,6 +11,7 @@ from models.session import SessionType, SessionSource
 from models.asymmetry import Asymmetry
 from models.daily_plan import DailyPlan
 from models.stats import AthleteStats
+from routes.visualizations import get_visualization_parameter
 from utils import parse_datetime, format_date, format_datetime
 from config import get_mongo_collection
 from logic.survey_processing import SurveyProcessing, create_session, update_session, create_plan, cleanup_plan
@@ -51,13 +52,7 @@ def handle_session_create(user_id=None):
             continue
         survey_processor.create_session_from_survey(session)
 
-    visualizations = True
-    if 'visualizations' in request.json:
-        visualization_request = request.json['visualizations']
-        try:
-            visualizations = bool(visualization_request)
-        except:
-            pass
+    visualizations = get_visualization_parameter(request)
 
     # update daily pain and soreness in athlete_stats
     survey_processor.patch_daily_and_historic_soreness(survey='post_session')
