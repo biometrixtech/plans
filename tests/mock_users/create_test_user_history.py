@@ -63,6 +63,7 @@ if __name__ == '__main__':
     history_length = 35
 
     users = test_users.get_test_users()
+    users.extend(test_users.get_merged_users())
 
     three_sensor_users = test_users.get_three_sensor_test_users()
 
@@ -105,7 +106,7 @@ if __name__ == '__main__':
             response = clear_fte_category(InsightType.personalized_recovery, jwt, last_plan_date_time)
             response_2 = clear_fte_category_view(InsightType.personalized_recovery, VisualizationType.pain_functional_limitation, jwt, last_plan_date_time)
             print(time.time() - start)
-        elif u == "near_clear@200.com" or u == "near_clear_2@200.com":
+        elif u == "near_clear@200.com" or u == "near_clear_2@200.com" or u == "nc_long@200.com":
             soreness_history = []
             abs_no_question = sh.create_body_part_history(sh.persistent_soreness_no_question_25_days(), 3, 0, False)
             soreness_history.append(abs_no_question)
@@ -115,13 +116,36 @@ if __name__ == '__main__':
             print(user_id)
             persona1 = Persona(user_id)
             persona1.soreness_history = soreness_history
-            last_plan_date_time = persona1.create_history(days=history_length, suffix='')
+            if u == "nc_long@200.com":
+                last_plan_date_time = persona1.create_history(days=history_length, suffix='', end_today=True)
+            else:
+                last_plan_date_time = persona1.create_history(days=history_length, suffix='')
             clear_fte_category(InsightType.personalized_recovery, jwt, last_plan_date_time)
             clear_fte_category_view(InsightType.personalized_recovery,
                                     VisualizationType.pain_functional_limitation, jwt, last_plan_date_time)
             clear_fte_category_view(InsightType.personalized_recovery,
                                     VisualizationType.tight_overactice_underactive, jwt, last_plan_date_time)
             print(time.time() - start)
+        elif u=="nc_sore_tread@200.com":
+            soreness_history = []
+            abs_no_question = sh.create_body_part_history(sh.persistent_soreness_no_question_25_days(), 3, 0, False)
+            soreness_history.append(abs_no_question)
+            right_quad_31_days_sore_no_question = sh.create_body_part_history(sh.persistent_soreness_no_question_29_days(), 6, 2, False)
+            left_quad_1_day_sore = sh.create_body_part_history(sh.pre_pad_with_nones([2]), 6, 1, False)
+            soreness_history.append(right_quad_31_days_sore_no_question)
+            soreness_history.append(left_quad_1_day_sore)
+            user_id, jwt = login_user(u)
+            print(user_id)
+            persona1 = Persona(user_id)
+            persona1.soreness_history = soreness_history
+            last_plan_date_time = persona1.create_history(days=history_length, suffix='', end_today=True)
+            clear_fte_category(InsightType.personalized_recovery, jwt, last_plan_date_time)
+            clear_fte_category_view(InsightType.personalized_recovery,
+                                    VisualizationType.pain_functional_limitation, jwt, last_plan_date_time)
+            clear_fte_category_view(InsightType.personalized_recovery,
+                                    VisualizationType.tight_overactice_underactive, jwt, last_plan_date_time)
+            print(time.time() - start)
+
         elif u == "two_pain@200.com" or u == "two_pain_2@200.com":
             soreness_history = []
             right_calf_no_question = sh.create_body_part_history(sh.persistent2_no_question(), 16, 2, True)

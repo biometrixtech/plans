@@ -488,6 +488,7 @@ class TrendProcessor(object):
             all_triggers.extend(triggers_110)
 
             order = 0
+            trend.trigger_tiles = []
             for a in all_triggers:
                 tile = TriggerTile()
                 tile.text = a.text = "Trigger="+str(a.trigger_type.value)
@@ -751,6 +752,7 @@ class TrendProcessor(object):
             all_triggers.extend(triggers_load)
 
             order = 0
+            trend.trigger_tiles = []
             for a in all_triggers:
                 tile = TriggerTile()
                 tile.text = a.text = "Trigger="+str(a.trigger_type.value)
@@ -871,6 +873,7 @@ class TrendProcessor(object):
             all_triggers.extend(triggers_16)
 
             order = 0
+            trend.trigger_tiles = []
             for a in all_triggers:
                 tile = TriggerTile()
                 tile.text = a.text = "Trigger="+str(a.trigger_type.value)

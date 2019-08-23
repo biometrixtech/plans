@@ -24,9 +24,11 @@ class Persona(object):
         self.daily_readiness = None
         self.athlete_stats = None
 
-    def create_history(self, days, suffix='Test', clear_history=True, start_date_time=datetime.datetime.now()):
+    def create_history(self, days, suffix='Test', clear_history=True, start_date_time=datetime.datetime.now(), end_today=False):
         if clear_history:
             self.clear_user(suffix)
+        if end_today:
+            start_date_time = start_date_time + datetime.timedelta(days=1)
         event_date = start_date_time - datetime.timedelta(days=days)
         self.update_stats(event_date)
         last_plan_date = None
@@ -52,10 +54,16 @@ class Persona(object):
                 exercise_list = [ex.exercise.id for ex in self.daily_plan.pre_active_rest[0].inhibit_exercises.values()]
                 self.complete_exercises(exercise_list, format_datetime(event_date + datetime.timedelta(hours=1)))
                 print(today_date)
-            self.update_stats(event_date)
-            event_date = event_date + datetime.timedelta(days=1)
 
-        self.update_stats(event_date)
+            event_date = event_date + datetime.timedelta(days=1)
+            if not end_today:
+                self.update_stats(event_date)
+            else:
+                if i < days - 1:
+                    self.update_stats(event_date)
+
+        # if not end_today:
+        #     self.update_stats(event_date)
 
         return last_plan_date
 
@@ -82,7 +90,7 @@ class Persona(object):
         store.put(self.daily_plan)
         self.update_stats(event_date)
         plan_manager = TrainingPlanManager(self.user_id, DatastoreCollection(), )
-        self.daily_plan = plan_manager.create_daily_plan(event_date=format_date(event_date), last_updated=format_datetime(event_date), athlete_stats=self.athlete_stats)
+        self.daily_plan = plan_manager.create_daily_plan(event_date=format_date(event_date), last_updated=format_datetime(event_date), athlete_stats=self.athlete_stats, visualizations=True)
 
     def update_stats(self, event_date):
         self.athlete_stats = StatsProcessing(self.user_id, event_date=event_date, datastore_collection=DatastoreCollection()).process_athlete_stats()
