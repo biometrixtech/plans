@@ -43,7 +43,7 @@ def handle_alerts_cleared(user_id):
     else:
         print(f"Trend Category {cleared_insight_type.name} not found")
 
-    plan = cleanup_plan(plan)
+    plan = cleanup_plan(plan, visualizations=True)
     return {'daily_plans': [plan]}, 200
 
 
@@ -68,7 +68,7 @@ def handle_fte_category(user_id):
     else:
         print(f"Trend Category {fte_insight_type.name} not found")
 
-    plan = cleanup_plan(plan)
+    plan = cleanup_plan(plan, visualizations=True)
     return {'daily_plans': [plan]}, 200
 
 
@@ -101,5 +101,5 @@ def handle_fte_view(user_id):
     else:
         print(f"Trend Category {fte_insight_type.name} not found")
 
-    plan = cleanup_plan(plan)
+    plan = cleanup_plan(plan, visualizations=True)
     return {'daily_plans': [plan]}, 200

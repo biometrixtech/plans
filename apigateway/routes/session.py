@@ -51,6 +51,14 @@ def handle_session_create(user_id=None):
             continue
         survey_processor.create_session_from_survey(session)
 
+    visualizations = True
+    if 'visualizations' in request.json:
+        visualization_request = request.json['visualizations']
+        try:
+            visualizations = bool(visualization_request)
+        except:
+            pass
+
     # update daily pain and soreness in athlete_stats
     survey_processor.patch_daily_and_historic_soreness(survey='post_session')
 
@@ -94,9 +102,10 @@ def handle_session_create(user_id=None):
                            event_date,
                            athlete_stats=survey_processor.athlete_stats,
                            stats_processor=survey_processor.stats_processor,
-                           datastore_collection=datastore_collection)
+                           datastore_collection=datastore_collection,
+                           visualizations=visualizations)
     else:
-        plan = cleanup_plan(plan)
+        plan = cleanup_plan(plan, visualizations)
 
     # update users database if health data received
     if "health_sync_date" in request.json and request.json['health_sync_date'] is not None:

@@ -32,6 +32,13 @@ def handle_daily_plan_get(user_id=None):
     else:
         start_date = format_date(event_date)
         end_date = start_date
+    visualizations = True
+    if 'visualizations' in request.json:
+        visualization_request = request.json['visualizations']
+        try:
+            visualizations = bool(visualization_request)
+        except:
+            pass
     items = daily_plan_datastore.get(user_id, start_date, end_date)
     daily_plans = []
     need_soreness_sessions = False
@@ -41,9 +48,9 @@ def handle_daily_plan_get(user_id=None):
             need_soreness_sessions = True
         # if RS completed today but no trends, this is the case of RS completed on old app and logging in to new app --> re-generate plan
         if plan.event_date == format_date(event_date) and survey_complete and (plan.trends is None or plan.trends.body_response is None):  
-            plan = create_plan(user_id, event_date, update_stats=True)
+            plan = create_plan(user_id, event_date, update_stats=True, visualizations=visualizations)
         else:
-            plan = cleanup_plan(plan)
+            plan = cleanup_plan(plan, visualizations=visualizations)
         daily_plans.append(plan)
     if need_soreness_sessions:
         previous_soreness_processor = AthleteStatusProcessing(user_id, event_date, datastore_collection=datastore_collection)

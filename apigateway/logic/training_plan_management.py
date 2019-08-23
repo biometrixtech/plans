@@ -63,7 +63,7 @@ class TrainingPlanManager(object):
             return modalities
 
     @xray_recorder.capture('logic.TrainingPlanManager.create_daily_plan')
-    def create_daily_plan(self, event_date, last_updated, athlete_stats=None, force_data=False, mobilize_only=False):
+    def create_daily_plan(self, event_date, last_updated, athlete_stats=None, force_data=False, mobilize_only=False, visualizations=False):
         self.athlete_stats = athlete_stats
         self.trigger_date_time = parse_datetime(last_updated)
         self.load_data(event_date)
@@ -84,9 +84,10 @@ class TrainingPlanManager(object):
         trigger_factory.load_triggers()
         self.athlete_stats.triggers = trigger_factory.triggers
 
-        trend_processor = TrendProcessor(trigger_factory.triggers, athlete_trend_categories=self.athlete_stats.trend_categories)
-        trend_processor.process_triggers()
-        self.athlete_stats.trend_categories = trend_processor.athlete_trend_categories
+        if visualizations:
+            trend_processor = TrendProcessor(trigger_factory.triggers, athlete_trend_categories=self.athlete_stats.trend_categories)
+            trend_processor.process_triggers()
+            self.athlete_stats.trend_categories = trend_processor.athlete_trend_categories
 
         calc = exercise_mapping.ExerciseAssignmentCalculator(trigger_factory, self.exercise_library_datastore,
                                                              self.completed_exercise_datastore,
@@ -165,10 +166,11 @@ class TrainingPlanManager(object):
         #                                      athlete_stats=self.athlete_stats,
         #                                      trigger_date_time=self.trigger_date_time,)
         # alerts_processing.aggregate_alerts(alerts=alerts)
-        self.daily_plan.trends = AthleteTrends()
-        self.daily_plan.trends.trend_categories = trend_processor.athlete_trend_categories
-        self.daily_plan.trends.dashboard.trend_categories = trend_processor.dashboard_categories
-        self.daily_plan.trends.add_trend_data(self.athlete_stats)
+        if visualizations:
+            self.daily_plan.trends = AthleteTrends()
+            self.daily_plan.trends.trend_categories = trend_processor.athlete_trend_categories
+            self.daily_plan.trends.dashboard.trend_categories = trend_processor.dashboard_categories
+            self.daily_plan.trends.add_trend_data(self.athlete_stats)
         self.daily_plan_datastore.put(self.daily_plan)
         self.athlete_stats_datastore.put(self.athlete_stats)
 
