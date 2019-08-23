@@ -338,12 +338,12 @@ def create_plan(user_id, event_date, update_stats=True, athlete_stats=None, stat
 
 def cleanup_plan(plan, visualizations=True):
     survey_complete = plan.daily_readiness_survey_completed()
+    landing_screen, nav_bar_indicator = plan.define_landing_screen()
 
     plan = plan.json_serialise()
     plan['daily_readiness_survey_completed'] = survey_complete
 
     if visualizations:
-        landing_screen, nav_bar_indicator = plan.define_landing_screen()
         plan['landing_screen'] = landing_screen
         plan['nav_bar_indicator'] = nav_bar_indicator
     else:
