@@ -37,7 +37,7 @@ def handle_daily_readiness_create(user_id):
     event_date = parse_datetime(request.json['date_time'])
     event_date = fix_early_survey_event_date(event_date)
 
-    #user_id = principal_id
+    # user_id = principal_id
     daily_readiness = DailyReadiness(
         user_id=user_id,
         event_date=format_datetime(event_date),
@@ -54,7 +54,7 @@ def handle_daily_readiness_create(user_id):
     athlete_stats = athlete_stats_datastore.get(athlete_id=user_id)
     if athlete_stats is None:
         athlete_stats = AthleteStats(user_id)
-        athlete_stats.event_date = plan_event_date
+        athlete_stats.event_date = event_date
     survey_processor = SurveyProcessing(user_id, event_date, athlete_stats, datastore_collection)
     survey_processor.user_age = request.json.get('user_age', 20)
 
@@ -69,7 +69,7 @@ def handle_daily_readiness_create(user_id):
             survey_processor.create_session_from_survey(session)
 
         # check if any of the non-ignored and non-deleted sessions are high load
-        #survey_processor.check_high_relative_load_sessions(survey_processor.sessions)
+        # survey_processor.check_high_relative_load_sessions(survey_processor.sessions)
 
     if "sleep_data" in request.json and len(request.json['sleep_data']) > 0:
         daily_sleep_data = DailySleepData(user_id=user_id,
@@ -127,7 +127,7 @@ def handle_daily_readiness_create(user_id):
 @require.body({'event_date': str})
 @xray_recorder.capture('routes.daily_readiness.previous')
 def handle_daily_readiness_get(user_id=None):
-    #user_id = principal_id
+    # user_id = principal_id
     current_time = parse_datetime(request.json['event_date'])
     previous_soreness_processor = AthleteStatusProcessing(user_id, current_time, datastore_collection)
     (
