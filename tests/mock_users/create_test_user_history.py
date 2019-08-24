@@ -131,7 +131,7 @@ if __name__ == '__main__':
             abs_no_question = sh.create_body_part_history(sh.persistent_soreness_no_question_25_days(), 3, 0, False)
             soreness_history.append(abs_no_question)
             right_quad_31_days_sore_no_question = sh.create_body_part_history(sh.persistent_soreness_no_question_29_days(), 6, 2, False)
-            left_quad_1_day_sore = sh.create_body_part_history(sh.pre_pad_with_nones([2]), 6, 1, False)
+            left_quad_1_day_sore = sh.create_body_part_history(sh.pre_pad_with_nones([2, 2]), 6, 1, False)
             soreness_history.append(right_quad_31_days_sore_no_question)
             soreness_history.append(left_quad_1_day_sore)
             user_id, jwt = login_user(u)

@@ -8,11 +8,12 @@ from models.session import SessionFactory, SessionType
 from models.post_session_survey import PostSurvey
 from logic.stats_processing import StatsProcessing
 from logic.training_plan_management import TrainingPlanManager
+from logic.survey_processing import SurveyProcessing
 from datastores.daily_plan_datastore import DailyPlanDatastore
 from datastores.completed_exercise_datastore import CompletedExerciseDatastore
 from datastores.session_datastore import SessionDatastore
 from datastores.datastore_collection import DatastoreCollection
-from utils import format_datetime, format_date
+from utils import format_datetime, format_date, parse_datetime
 
 
 class Persona(object):
@@ -89,6 +90,11 @@ class Persona(object):
         store = DailyPlanDatastore()
         store.put(self.daily_plan)
         self.update_stats(event_date)
+        survey_processor = SurveyProcessing(self.user_id, event_date, self.athlete_stats, DatastoreCollection())
+        survey_processor.soreness = self.daily_readiness.soreness
+        survey_processor.patch_daily_and_historic_soreness(survey='readiness')
+
+        self.athlete_stats = survey_processor.athlete_stats
         plan_manager = TrainingPlanManager(self.user_id, DatastoreCollection(), )
         self.daily_plan = plan_manager.create_daily_plan(event_date=format_date(event_date), last_updated=format_datetime(event_date), athlete_stats=self.athlete_stats, visualizations=True)
 
