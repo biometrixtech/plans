@@ -462,24 +462,22 @@ class TrendProcessor(object):
         if len(triggers_7) > 0 or len(triggers_110) > 0:
 
             antagonists_7, synergists_7 = self.get_antagonists_syngergists(triggers_7)
-            #antagonists_110, synergists_110 = self.get_antagonists_syngergists(triggers_110)
 
             trend = self.get_personalized_recovery_trend(category_index)
 
             trend_data = TrendData()
             trend_data.visualization_type = VisualizationType.personalized_recovery
             trend_data.add_visualization_data()
-            tight_under_data = PersonalizedRecoveryChartData()
-            tight_under_data.overactive.extend([t.body_part for t in triggers_7])
-            tight_under_data.underactive_needing_care.extend([s for s in synergists_7])
+            recovery_data = PersonalizedRecoveryChartData()
+            recovery_data.tight.extend([t.body_part for t in triggers_7])
+            recovery_data.elevated_stress.extend([s for s in synergists_7])
 
             for t in triggers_110:
-                tight_under_data.overactive.extend([a for a in t.overactive_tight_first])
-                tight_under_data.overactive.extend([s for s in t.overactive_tight_second])
-                tight_under_data.underactive_needing_care.extend([s for s in t.elevated_stress])
+                recovery_data.tight.extend([a for a in t.overactive_tight_first])
+                recovery_data.elevated_stress.extend([s for s in t.elevated_stress])
 
-            tight_under_data.remove_duplicates()
-            trend_data.data = [tight_under_data]
+            recovery_data.remove_duplicates()
+            trend_data.data = [recovery_data]
 
             all_triggers = []
             all_triggers.extend(triggers_7)
@@ -546,7 +544,7 @@ class TrendProcessor(object):
                 body_text = ("Patterns in your soreness data suggest that your " + body_part_text + " may actually be overactive due to a chronic over-compensation " + for_a_weak_phrase + " "
                              + clean_title_body_part_text + ".  This dysfunction could exacerbate movement imbalances and elevate your risk of chronic injury.")
 
-                trend.dashboard_body_part, trend.dashboard_body_part_text = self.get_title_body_part_and_text(tight_under_data.overactive, side)
+                trend.dashboard_body_part, trend.dashboard_body_part_text = self.get_title_body_part_and_text(recovery_data.tight, side)
 
             trend_data.text = body_text
 
@@ -725,21 +723,22 @@ class TrendProcessor(object):
             body_part_factory = BodyPartFactory()
 
             for t in triggers_pain:
-                care_data.overactive.extend([t.body_part])  # pain
+                care_data.pain.extend([t.body_part])
                 if body_part_factory.is_joint(t.body_part):
-                    care_data.underactive_needing_care.extend([a for a in t.agonists])  # elevated strain
-                    care_data.underactive_needing_care.extend([a for a in t.antagonists])  # elevated strain
-                    care_data.underactive_needing_care.extend([a for a in t.synergists])  # elevated strain
+                    care_data.elevated_stress.extend([a for a in t.agonists])
+                    care_data.elevated_stress.extend([a for a in t.antagonists])
+                    care_data.elevated_stress.extend([a for a in t.synergists])
                 else:
-                    care_data.underactive_needing_care.extend([s for s in t.synergists])  # elevated strain
+                    care_data.elevated_stress.extend([s for s in t.agonists])  # should be prime movers
+                    care_data.elevated_stress.extend([s for s in t.synergists])
 
             for t in triggers_sore:
-                care_data.underactive.extend([t.body_part])  # soreness
-                care_data.underactive_needing_care.extend([s for s in t.synergists])  # elevated strain
+                care_data.soreness.extend([t.body_part])
+                care_data.elevated_stress.extend([s for s in t.synergists])
 
             for t in triggers_load:
-                care_data.underactive_needing_care.extend([a for a in t.agonists])  # elevated strain
-                care_data.underactive_needing_care.extend([s for s in t.synergists])  # elevated strain
+                care_data.elevated_stress.extend([a for a in t.agonists])
+                care_data.elevated_stress.extend([s for s in t.antagonists])
 
             care_data.remove_duplicates()
             trend_data.data = [care_data]
@@ -843,28 +842,24 @@ class TrendProcessor(object):
             trend_data = TrendData()
             trend_data.visualization_type = VisualizationType.prevention
             trend_data.add_visualization_data()
-            pain_functional_data = PreventionChartData()
+            prevention_data = PreventionChartData()
 
-            pain_functional_data.overactive.extend([t.body_part for t in triggers_19])
-            pain_functional_data.underactive.extend([a for a in antagonists_19]) # weakness
-            pain_functional_data.underactive_needing_care.extend([s for s in synergists_19]) # elevated strain
+            prevention_data.overactive.extend([t.body_part for t in triggers_19])
+            prevention_data.weak.extend([a for a in antagonists_19])
 
             body_part_factory = BodyPartFactory()
 
             for t in triggers_16:
                 if body_part_factory.is_joint(t.body_part):
-                    pain_functional_data.overactive.extend([a for a in t.agonists])  # overactive
-                    pain_functional_data.overactive.extend([a for a in t.antagonists])  # overactive
-                    pain_functional_data.underactive_needing_care.extend([t.body_part])  # elevated strain
+                    prevention_data.weak.extend([a for a in t.agonists])
+                    prevention_data.weak.extend([a for a in t.antagonists])
+                    prevention_data.pain.extend([t.body_part])
                 else:
-                    pain_functional_data.underactive_needing_care.extend(
-                        [t.body_part])  # elevated strain
-                    pain_functional_data.underactive_needing_care.extend(
-                        [s for s in t.synergists])  # elevated strain
-                    pain_functional_data.underactive.extend([a for a in t.antagonists])  # weakness
+                    prevention_data.pain.extend([t.body_part])
+                    prevention_data.weak.extend([a for a in t.antagonists])
 
-            pain_functional_data.remove_duplicates()
-            trend_data.data = [pain_functional_data]
+            prevention_data.remove_duplicates()
+            trend_data.data = [prevention_data]
 
             all_triggers = []
             all_triggers.extend(triggers_19)

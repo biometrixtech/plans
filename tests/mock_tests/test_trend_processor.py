@@ -974,21 +974,18 @@ def test_overlapping_muscle_correct():
 
     trend_processor.process_triggers()
 
-    assert BodyPartSide(BodyPartLocation(5), 2) in trend_processor.athlete_trend_categories[1].trends[0].trend_data.data[0].underactive
+    assert BodyPartSide(BodyPartLocation(5), 2) in trend_processor.athlete_trend_categories[1].trends[0].trend_data.data[0].weak
     assert BodyPartSide(BodyPartLocation(14), 2) in \
-           trend_processor.athlete_trend_categories[1].trends[0].trend_data.data[0].underactive
+           trend_processor.athlete_trend_categories[1].trends[0].trend_data.data[0].weak
     assert BodyPartSide(BodyPartLocation(8), 2) in \
-           trend_processor.athlete_trend_categories[1].trends[0].trend_data.data[0].underactive
+           trend_processor.athlete_trend_categories[1].trends[0].trend_data.data[0].weak
     assert BodyPartSide(BodyPartLocation(10), 2) in \
-           trend_processor.athlete_trend_categories[1].trends[0].trend_data.data[0].underactive
+           trend_processor.athlete_trend_categories[1].trends[0].trend_data.data[0].weak
 
-    assert BodyPartSide(BodyPartLocation(4), 2) in trend_processor.athlete_trend_categories[1].trends[0].trend_data.data[0].underactive_needing_care
-    assert BodyPartSide(BodyPartLocation(11), 2) in \
-           trend_processor.athlete_trend_categories[1].trends[0].trend_data.data[0].underactive_needing_care
-    assert BodyPartSide(BodyPartLocation(6), 2) in \
-           trend_processor.athlete_trend_categories[1].trends[0].trend_data.data[0].underactive_needing_care
+    assert BodyPartSide(BodyPartLocation(11), 2) in trend_processor.athlete_trend_categories[1].trends[0].trend_data.data[0].pain
     assert BodyPartSide(BodyPartLocation(16), 2) in \
-           trend_processor.athlete_trend_categories[1].trends[0].trend_data.data[0].underactive_needing_care
+           trend_processor.athlete_trend_categories[1].trends[0].trend_data.data[0].pain
+
 
 
 # def test_agonist_capitalized():

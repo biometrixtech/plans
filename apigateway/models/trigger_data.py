@@ -143,19 +143,13 @@ visualization_data = {
                         'color': 6,
                         'text': "Tight",
                         'type': 0,
-                        'series': "overactive"
+                        'series': "tight"
                     },
-                    # {
-                    #     'color': 7,
-                    #     'text': "Elevated Strain",
-                    #     'type': 0,
-                    #     'series': "underactive"
-                    # }
                     {
                         'color': 7,
                         'text': "Elevated Stress",
                         'type': 0,
-                        'series': "underactive_needing_care"
+                        'series': "elevated_stress"
                     }
                 ]
             },
@@ -166,21 +160,21 @@ visualization_data = {
                 'legend': [
                     {
                         'color': 5,
-                        'text': "Overactivity",
+                        'text': "Overactive",
                         'type': 0,
                         'series': "overactive"
                     },
                     {
                         'color': 4,
-                        'text': "Weakness",
+                        'text': "Weak",
                         'type': 0,
-                        'series': "underactive"
+                        'series': "weak"
                     },
                     {
                         'color': 7,
-                        'text': "Elevated Stress",
+                        'text': "Pain",
                         'type': 0,
-                        'series': "underactive_needing_care"
+                        'series': "pain"
                     }
                 ]
             },
@@ -193,19 +187,19 @@ visualization_data = {
                         'color': 5,
                         'text': "Pain",
                         'type': 0,
-                        'series': "overactive"
+                        'series': "pain"
                     },
                     {
                         'color': 4,
                         'text': "Soreness",
                         'type': 0,
-                        'series': "underactive"
+                        'series': "soreness"
                     },
                     {
                         'color': 7,
-                        'text': "Elevated Strain / Projected Soreness",
+                        'text': "Elevated Stress",
                         'type': 0,
-                        'series': "underactive_needing_care"
+                        'series': "elevated_stress"
                     }
                 ]
             },
