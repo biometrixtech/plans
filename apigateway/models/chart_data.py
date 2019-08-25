@@ -1067,12 +1067,12 @@ class CareTodayChartData(BaseOveractiveUnderactiveChartData):
         super().__init__()
 
 
-class PainFunctionalLimitationChartData(BaseOveractiveUnderactiveChartData):
+class PreventionChartData(BaseOveractiveUnderactiveChartData):
     def __init__(self):
         super().__init__()
 
 
-class TightOverUnderactiveChartData(BaseOveractiveUnderactiveChartData):
+class PersonalizedRecoveryChartData(BaseOveractiveUnderactiveChartData):
     def __init__(self):
         super().__init__()
 

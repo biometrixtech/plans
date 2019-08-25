@@ -106,7 +106,7 @@ if __name__ == '__main__':
             persona1.soreness_history = soreness_history
             last_plan_date_time = persona1.create_history(days=history_length, suffix='')
             response = clear_fte_category(InsightType.personalized_recovery, jwt, last_plan_date_time)
-            response_2 = clear_fte_category_view(InsightType.personalized_recovery, VisualizationType.pain_functional_limitation, jwt, last_plan_date_time)
+            response_2 = clear_fte_category_view(InsightType.personalized_recovery, VisualizationType.prevention, jwt, last_plan_date_time)
             print(time.time() - start)
         elif u == "near_clear@200.com" or u == "near_clear_2@200.com" or u == "nc_long@200.com":
             soreness_history = []
@@ -129,9 +129,9 @@ if __name__ == '__main__':
                 last_plan_date_time = persona1.create_history(days=history_length, suffix='')
             clear_fte_category(InsightType.personalized_recovery, jwt, last_plan_date_time)
             clear_fte_category_view(InsightType.personalized_recovery,
-                                    VisualizationType.pain_functional_limitation, jwt, last_plan_date_time)
+                                    VisualizationType.prevention, jwt, last_plan_date_time)
             clear_fte_category_view(InsightType.personalized_recovery,
-                                    VisualizationType.tight_overactice_underactive, jwt, last_plan_date_time)
+                                    VisualizationType.personalized_recovery, jwt, last_plan_date_time)
             print(time.time() - start)
         elif u == "ts_tread@200.com":
             soreness_history = []
@@ -152,6 +152,30 @@ if __name__ == '__main__':
             last_plan_date_time = persona1.create_history(days=history_length, suffix='', end_today=True, rpes=rpes)
 
             print(time.time() - start)
+        elif u == "ts_pain_long@200.com":
+            soreness_history = []
+            groin_no_question = sh.create_body_part_history(sh.persistent_soreness_no_question_31_days(), 5, 2, False)
+            quad_no_question = sh.create_body_part_history(sh.persistent_soreness_no_question_31_days(), 6, 2, False)
+            r_achilles_1_day_pain = sh.create_body_part_history(sh.pre_pad_with_nones([2]), 17, 2, True)
+            r_hamstring_1_day_pain = sh.create_body_part_history(sh.pre_pad_with_nones([2]), 15, 2, True)
+            soreness_history.append(groin_no_question)
+            soreness_history.append(quad_no_question)
+            soreness_history.append(r_achilles_1_day_pain)
+            soreness_history.append(r_hamstring_1_day_pain)
+
+            user_id, jwt = login_user(u)
+            print(user_id)
+            persona1 = Persona(user_id)
+            persona1.soreness_history = soreness_history
+            rpes = [5, None, None, 5, None, 3, None,
+                    4, None, 6, None, 5, 5, None,
+                    None, 4, None, 3, 5, None, None,
+                    6, None, 5, None, 4, None, 3,
+                    5, 5, 6, None, 5, 4, 6]
+            last_plan_date_time = persona1.create_history(days=history_length, suffix='', end_today=True, rpes=rpes)
+
+            print(time.time() - start)
+
         elif u=="nc_sore_tread@200.com":
             soreness_history = []
             abs_no_question = sh.create_body_part_history(sh.persistent_soreness_no_question_25_days(), 3, 0, False)
@@ -172,9 +196,9 @@ if __name__ == '__main__':
             last_plan_date_time = persona1.create_history(days=history_length, suffix='', end_today=True, rpes=rpes)
             clear_fte_category(InsightType.personalized_recovery, jwt, last_plan_date_time)
             clear_fte_category_view(InsightType.personalized_recovery,
-                                    VisualizationType.pain_functional_limitation, jwt, last_plan_date_time)
+                                    VisualizationType.prevention, jwt, last_plan_date_time)
             clear_fte_category_view(InsightType.personalized_recovery,
-                                    VisualizationType.tight_overactice_underactive, jwt, last_plan_date_time)
+                                    VisualizationType.personalized_recovery, jwt, last_plan_date_time)
             print(time.time() - start)
 
         elif u == "two_pain@200.com" or u == "two_pain_2@200.com":
@@ -192,9 +216,9 @@ if __name__ == '__main__':
             last_plan_date_time = persona1.create_history(days=history_length, suffix='')
             clear_fte_category(InsightType.personalized_recovery, jwt, last_plan_date_time)
             clear_fte_category_view(InsightType.personalized_recovery,
-                                    VisualizationType.pain_functional_limitation, jwt, last_plan_date_time)
+                                    VisualizationType.prevention, jwt, last_plan_date_time)
             clear_fte_category_view(InsightType.personalized_recovery,
-                                    VisualizationType.tight_overactice_underactive, jwt, last_plan_date_time)
+                                    VisualizationType.personalized_recovery, jwt, last_plan_date_time)
             print(time.time() - start)
         elif u == "pain_sore@200.com" or u == "pain_sore_2@200.com":
             soreness_history = []
@@ -232,9 +256,9 @@ if __name__ == '__main__':
             last_plan_date_time = persona1.create_history(days=history_length, suffix='')
             clear_fte_category(InsightType.personalized_recovery, jwt, last_plan_date_time)
             clear_fte_category_view(InsightType.personalized_recovery,
-                                    VisualizationType.pain_functional_limitation, jwt, last_plan_date_time)
+                                    VisualizationType.prevention, jwt, last_plan_date_time)
             clear_fte_category_view(InsightType.personalized_recovery,
-                                    VisualizationType.tight_overactice_underactive, jwt, last_plan_date_time)
+                                    VisualizationType.personalized_recovery, jwt, last_plan_date_time)
 
             additional_soreness_history = []
             right_calf_no_question = sh.create_body_part_history(sh.new_persistent_pain_no_question(), 16, 2, True)

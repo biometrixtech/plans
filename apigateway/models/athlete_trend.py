@@ -1,5 +1,5 @@
 from enum import Enum
-from models.chart_data import TrainingVolumeChartData, BodyResponseChartData, WorkoutChartData, TightOverUnderactiveChartData, PainFunctionalLimitationChartData, BiomechanicsChart, CareTodayChartData
+from models.chart_data import TrainingVolumeChartData, BodyResponseChartData, WorkoutChartData, PersonalizedRecoveryChartData, PreventionChartData, BiomechanicsChart, CareTodayChartData
 from models.insights import InsightType
 from models.soreness_base import BodyPartSide
 from models.sport import SportName
@@ -523,10 +523,10 @@ class TrendData(object):
             trend_data.data = [BodyResponseChartData.json_deserialise(data) for data in input_dict.get('data', [])]
         elif trend_data.visualization_type == VisualizationType.workload:
             trend_data.data = [WorkoutChartData.json_deserialise(data) for data in input_dict.get('data', [])]
-        elif trend_data.visualization_type == VisualizationType.tight_overactice_underactive:
-            trend_data.data = [TightOverUnderactiveChartData.json_deserialise(data) for data in input_dict.get('data', [])]
-        elif trend_data.visualization_type == VisualizationType.pain_functional_limitation:
-            trend_data.data = [PainFunctionalLimitationChartData.json_deserialise(data) for data in input_dict.get('data', [])]
+        elif trend_data.visualization_type == VisualizationType.personalized_recovery:
+            trend_data.data = [PersonalizedRecoveryChartData.json_deserialise(data) for data in input_dict.get('data', [])]
+        elif trend_data.visualization_type == VisualizationType.prevention:
+            trend_data.data = [PreventionChartData.json_deserialise(data) for data in input_dict.get('data', [])]
         elif trend_data.visualization_type == VisualizationType.care_today:
             trend_data.data = [CareTodayChartData.json_deserialise(data) for data in
                                input_dict.get('data', [])]

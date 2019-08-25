@@ -140,6 +140,31 @@ visualization_data = {
                 'y_axis_2': "",
                 'legend': [
                     {
+                        'color': 6,
+                        'text': "Tight",
+                        'type': 0,
+                        'series': "overactive"
+                    },
+                    # {
+                    #     'color': 7,
+                    #     'text': "Elevated Strain",
+                    #     'type': 0,
+                    #     'series': "underactive"
+                    # }
+                    {
+                        'color': 7,
+                        'text': "Elevated Stress",
+                        'type': 0,
+                        'series': "underactive_needing_care"
+                    }
+                ]
+            },
+            10: {
+                'title': "",
+                'y_axis_1': "",
+                'y_axis_2': "",
+                'legend': [
+                    {
                         'color': 5,
                         'text': "Overactivity",
                         'type': 0,
@@ -153,35 +178,10 @@ visualization_data = {
                     },
                     {
                         'color': 7,
-                        'text': "Elevated Strain",
+                        'text': "Elevated Stress",
                         'type': 0,
                         'series': "underactive_needing_care"
                     }
-                ]
-            },
-            10: {
-                'title': "",
-                'y_axis_1': "",
-                'y_axis_2': "",
-                'legend': [
-                    {
-                        'color': 6,
-                        'text': "Recurring Pain",
-                        'type': 0,
-                        'series': "overactive"
-                    },
-                    {
-                        'color': 7,
-                        'text': "Elevated Strain",
-                        'type': 0,
-                        'series': "underactive"
-                    }
-                    # ,{
-                    #     'color': 7,
-                    #     'text': "Underactive & Needing Care",
-                    #     'type': 0,
-                    #     'series': "underactive_needing_care"
-                    # }
                 ]
             },
             11: {

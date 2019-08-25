@@ -2,7 +2,7 @@ from models.athlete_trend import TrendDashboardCategory, PlanAlert, Trend, Trend
     FirstTimeExperienceElement, CategoryFirstTimeExperienceModal
 from models.styles import BoldText, LegendColor, VisualizationType
 from models.trigger import TriggerType, Trigger
-from models.chart_data import PainFunctionalLimitationChartData, TightOverUnderactiveChartData, CareTodayChartData
+from models.chart_data import PreventionChartData, PersonalizedRecoveryChartData, CareTodayChartData
 from models.insights import InsightType
 from models.body_parts import BodyPartFactory
 from models.soreness_base import BodyPartSide, BodyPartLocation
@@ -69,14 +69,12 @@ class TrendProcessor(object):
             personalized_recovery_category = self.create_personalized_recovery_category()
             self.athlete_trend_categories.append(personalized_recovery_category)
 
-
-
     def get_care_trend(self, category_index):
 
         care_index = next((i for i, x in enumerate(self.athlete_trend_categories[category_index].trends) if
                                  x.visualization_type == VisualizationType.care_today), -1)
         if care_index == -1:
-            care_trend = self.create_daily_trend()
+            care_trend = self.create_care_trend()
             self.athlete_trend_categories[category_index].trends.append(care_trend)
             care_index = len(self.athlete_trend_categories[category_index].trends) - 1
 
@@ -92,47 +90,47 @@ class TrendProcessor(object):
         else:
             self.athlete_trend_categories[category_index].trends[index] = care_trend
 
-    def get_limitation_trend(self, category_index):
+    def get_prevention_trend(self, category_index):
 
         limitation_index = next((i for i, x in enumerate(self.athlete_trend_categories[category_index].trends) if
-                                 x.visualization_type == VisualizationType.pain_functional_limitation), -1)
+                                 x.visualization_type == VisualizationType.prevention), -1)
         if limitation_index == -1:
-            limitation_trend = self.create_limitation_trend()
+            limitation_trend = self.create_prevention_trend()
             self.athlete_trend_categories[category_index].trends.append(limitation_trend)
             limitation_index = len(self.athlete_trend_categories[category_index].trends) - 1
 
         return self.athlete_trend_categories[category_index].trends[limitation_index]
 
-    def set_limitation_trend(self, category_index, limitation_trend):
+    def set_prevention_trend(self, category_index, prevention_trend):
 
         index = next((i for i, x in enumerate(self.athlete_trend_categories[category_index].trends) if
-                             x.visualization_type == VisualizationType.pain_functional_limitation), -1)
+                      x.visualization_type == VisualizationType.prevention), -1)
 
         if index == -1:
-            self.athlete_trend_categories[category_index].trends.append(limitation_trend)
+            self.athlete_trend_categories[category_index].trends.append(prevention_trend)
         else:
-            self.athlete_trend_categories[category_index].trends[index] = limitation_trend
+            self.athlete_trend_categories[category_index].trends[index] = prevention_trend
 
-    def get_muscle_trend(self, category_index):
+    def get_personalized_recovery_trend(self, category_index):
 
         muscle_index = next((i for i, x in enumerate(self.athlete_trend_categories[category_index].trends) if
-                             x.visualization_type == VisualizationType.tight_overactice_underactive), -1)
+                             x.visualization_type == VisualizationType.personalized_recovery), -1)
         if muscle_index == -1:
-            muscle_trend = self.create_muscle_trend()
+            muscle_trend = self.create_personalized_recovery_trend()
             self.athlete_trend_categories[category_index].trends.append(muscle_trend)
             muscle_index = len(self.athlete_trend_categories[category_index].trends) - 1
 
         return self.athlete_trend_categories[category_index].trends[muscle_index]
 
-    def set_muscle_trend(self, category_index, muscle_trend):
+    def set_personalized_recovery_trend(self, category_index, recovery_trend):
 
         muscle_index = next((i for i, x in enumerate(self.athlete_trend_categories[category_index].trends) if
-                             x.visualization_type == VisualizationType.tight_overactice_underactive), -1)
+                             x.visualization_type == VisualizationType.personalized_recovery), -1)
 
         if muscle_index == -1:
-            self.athlete_trend_categories[category_index].trends.append(muscle_trend)
+            self.athlete_trend_categories[category_index].trends.append(recovery_trend)
         else:
-            self.athlete_trend_categories[category_index].trends[muscle_index] = muscle_trend
+            self.athlete_trend_categories[category_index].trends[muscle_index] = recovery_trend
 
     def get_category_index(self, insight_type):
 
@@ -149,7 +147,7 @@ class TrendProcessor(object):
         trend_category.title = "Personalized Recovery"
         trend_category.first_time_experience = True
 
-        muscle_trend = self.create_muscle_trend()
+        muscle_trend = self.create_personalized_recovery_trend()
         trend_category.trends.append(muscle_trend)
 
         modal = CategoryFirstTimeExperienceModal()
@@ -174,7 +172,7 @@ class TrendProcessor(object):
         trend_category.title = "Prevention"
         trend_category.first_time_experience = True
 
-        limitation_trend = self.create_limitation_trend()
+        limitation_trend = self.create_prevention_trend()
         trend_category.trends.append(limitation_trend)
 
         modal = CategoryFirstTimeExperienceModal()
@@ -200,7 +198,7 @@ class TrendProcessor(object):
         trend_category.title = "Care"
         trend_category.first_time_experience = True
 
-        daily_trend = self.create_daily_trend()
+        daily_trend = self.create_care_trend()
         trend_category.trends.append(daily_trend)
 
         modal = CategoryFirstTimeExperienceModal()
@@ -221,7 +219,7 @@ class TrendProcessor(object):
 
         return trend_category
 
-    def create_daily_trend(self):
+    def create_care_trend(self):
         daily_trend = Trend(TriggerType.sore_today)
         daily_trend.title = "Daily Care"
         daily_trend.title_color = LegendColor.error_light
@@ -239,7 +237,7 @@ class TrendProcessor(object):
 
         return daily_trend
 
-    def create_limitation_trend(self):
+    def create_prevention_trend(self):
         limitation_trend = Trend(TriggerType.hist_sore_greater_30)
         limitation_trend.title = "Injury Cycle Risks"
         limitation_trend.title_color = LegendColor.error_light
@@ -251,12 +249,12 @@ class TrendProcessor(object):
 
         limitation_trend.icon = "view3icon.png"
         limitation_trend.video_url = "https://d2xll36aqjtmhz.cloudfront.net/view3context.mp4"
-        limitation_trend.visualization_type = VisualizationType.pain_functional_limitation
+        limitation_trend.visualization_type = VisualizationType.prevention
         limitation_trend.visible = False
         limitation_trend.first_time_experience = True
         return limitation_trend
 
-    def create_muscle_trend(self):
+    def create_personalized_recovery_trend(self):
         muscle_trend = Trend(TriggerType.hist_pain)
         muscle_trend.title = "Muscle Over & Under-Activity"
         muscle_trend.title_color = LegendColor.warning_light
@@ -266,7 +264,7 @@ class TrendProcessor(object):
 
         muscle_trend.icon = "view1icon.png"
         muscle_trend.video_url = "https://d2xll36aqjtmhz.cloudfront.net/view1context.mp4"
-        muscle_trend.visualization_type = VisualizationType.tight_overactice_underactive
+        muscle_trend.visualization_type = VisualizationType.personalized_recovery
         muscle_trend.visible = False
         muscle_trend.first_time_experience = True
         return muscle_trend
@@ -276,8 +274,8 @@ class TrendProcessor(object):
         personalized_recovery_category_index = self.get_category_index(InsightType.personalized_recovery)
         prevention_category_index = self.get_category_index(InsightType.prevention)
         care_category_index = self.get_category_index(InsightType.care)
-        self.set_tight_over_under_muscle_view(personalized_recovery_category_index)
-        self.set_pain_functional_limitation(prevention_category_index)
+        self.set_personalized_recovery(personalized_recovery_category_index)
+        self.set_prevention(prevention_category_index)
         self.set_daily_care(care_category_index)
 
         for c in range(0, len(self.athlete_trend_categories)):
@@ -333,10 +331,10 @@ class TrendProcessor(object):
 
                     trend_dashboard_category = None
 
-                    if sorted_trends[0].visualization_type == VisualizationType.tight_overactice_underactive:
+                    if sorted_trends[0].visualization_type == VisualizationType.personalized_recovery:
                         trend_dashboard_category = self.get_over_under_active_dashboard_card(c, sorted_trends[0])
 
-                    elif sorted_trends[0].visualization_type == VisualizationType.pain_functional_limitation:
+                    elif sorted_trends[0].visualization_type == VisualizationType.prevention:
                         trend_dashboard_category = self.get_functional_limitation_dashboard_card(c, sorted_trends[0])
 
                     if trend_dashboard_category is not None:
@@ -449,7 +447,7 @@ class TrendProcessor(object):
         else:
             return None
 
-    def set_tight_over_under_muscle_view(self, category_index):
+    def set_personalized_recovery(self, category_index):
 
         triggers_7 = list(t for t in self.trigger_list if t.trigger_type == TriggerType.hist_sore_less_30)
         for t in triggers_7:
@@ -466,12 +464,12 @@ class TrendProcessor(object):
             antagonists_7, synergists_7 = self.get_antagonists_syngergists(triggers_7)
             #antagonists_110, synergists_110 = self.get_antagonists_syngergists(triggers_110)
 
-            trend = self.get_muscle_trend(category_index)
+            trend = self.get_personalized_recovery_trend(category_index)
 
             trend_data = TrendData()
-            trend_data.visualization_type = VisualizationType.tight_overactice_underactive
+            trend_data.visualization_type = VisualizationType.personalized_recovery
             trend_data.add_visualization_data()
-            tight_under_data = TightOverUnderactiveChartData()
+            tight_under_data = PersonalizedRecoveryChartData()
             tight_under_data.overactive.extend([t.body_part for t in triggers_7])
             tight_under_data.underactive_needing_care.extend([s for s in synergists_7])
 
@@ -582,11 +580,11 @@ class TrendProcessor(object):
 
             trend.last_date_time = self.get_latest_trigger_date_time(all_triggers)
 
-            self.set_muscle_trend(category_index, trend)
+            self.set_personalized_recovery_trend(category_index, trend)
 
         else:
-            trend = self.create_muscle_trend()
-            self.set_muscle_trend(category_index, trend)
+            trend = self.create_personalized_recovery_trend()
+            self.set_personalized_recovery_trend(category_index, trend)
 
     def get_over_under_active_dashboard_card(self, category_index, trend):
         trend_dashboard_category = TrendDashboardCategory(self.athlete_trend_categories[category_index].insight_type)
@@ -821,10 +819,10 @@ class TrendProcessor(object):
             self.set_care_trend(category_index, trend)
 
         else:
-            trend = self.create_daily_trend()
+            trend = self.create_care_trend()
             self.set_care_trend(category_index, trend)
 
-    def set_pain_functional_limitation(self, category_index):
+    def set_prevention(self, category_index):
 
         triggers_19 = list(t for t in self.trigger_list if t.trigger_type == TriggerType.hist_sore_greater_30)
         for t in triggers_19:
@@ -840,12 +838,12 @@ class TrendProcessor(object):
 
             antagonists_19, synergists_19 = self.get_antagonists_syngergists(triggers_19)
 
-            trend = self.get_limitation_trend(category_index)
+            trend = self.get_prevention_trend(category_index)
 
             trend_data = TrendData()
-            trend_data.visualization_type = VisualizationType.pain_functional_limitation
+            trend_data.visualization_type = VisualizationType.prevention
             trend_data.add_visualization_data()
-            pain_functional_data = PainFunctionalLimitationChartData()
+            pain_functional_data = PreventionChartData()
 
             pain_functional_data.overactive.extend([t.body_part for t in triggers_19])
             pain_functional_data.underactive.extend([a for a in antagonists_19]) # weakness
@@ -935,11 +933,11 @@ class TrendProcessor(object):
 
             trend.last_date_time = self.get_latest_trigger_date_time(all_triggers)
 
-            self.set_limitation_trend(category_index, trend)
+            self.set_prevention_trend(category_index, trend)
 
         else:
-            trend = self.create_limitation_trend()
-            self.set_limitation_trend(category_index, trend)
+            trend = self.create_prevention_trend()
+            self.set_prevention_trend(category_index, trend)
 
     def get_functional_limitation_dashboard_card(self, category_index, trend):
         trend_dashboard_category = TrendDashboardCategory(self.athlete_trend_categories[category_index].insight_type)

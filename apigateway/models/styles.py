@@ -77,8 +77,8 @@ class VisualizationType(Enum):
     sensor = 6
     body_response = 7
     workload = 8
-    tight_overactice_underactive = 9
-    pain_functional_limitation = 10
+    personalized_recovery = 9
+    prevention = 10
     care_today = 11
     biomechanics = 20
 
