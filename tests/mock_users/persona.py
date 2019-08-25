@@ -24,8 +24,10 @@ class Persona(object):
         self.daily_plan = None
         self.daily_readiness = None
         self.athlete_stats = None
+        self.rpes = []
 
-    def create_history(self, days, suffix='Test', clear_history=True, start_date_time=datetime.datetime.now(), end_today=False):
+    def create_history(self, days, suffix='Test', clear_history=True, start_date_time=datetime.datetime.now(), end_today=False, rpes=[]):
+        self.rpes = rpes
         if clear_history:
             self.clear_user(suffix)
         if end_today:
@@ -45,15 +47,22 @@ class Persona(object):
                                      'pain': body_part['pain'],
                                      'severity': body_part['severity'][i]})
 
-            if len(soreness) > 0:
-                readiness_data = {'date_time': format_datetime(date_time),
-                                  'soreness': soreness}
-                self.create_readiness(readiness_data)
+            if len(soreness) > 0 or (len(self.rpes) > 0 and self.rpes[i] is not None):
 
-                self.create_plan(event_date)
+                if len(soreness) > 0:
+                    readiness_data = {'date_time': format_datetime(date_time),
+                                      'soreness': soreness}
+                    self.create_readiness(readiness_data)
+
+                    self.create_plan(event_date, i)
+                else:
+                    self.daily_readiness = None
+                    self.create_plan(event_date, i)
+
                 last_plan_date = event_date
-                exercise_list = [ex.exercise.id for ex in self.daily_plan.pre_active_rest[0].inhibit_exercises.values()]
-                self.complete_exercises(exercise_list, format_datetime(event_date + datetime.timedelta(hours=1)))
+                if self.daily_plan.pre_active_rest is not None and len(self.daily_plan.pre_active_rest) > 0:
+                    exercise_list = [ex.exercise.id for ex in self.daily_plan.pre_active_rest[0].inhibit_exercises.values()]
+                    self.complete_exercises(exercise_list, format_datetime(event_date + datetime.timedelta(hours=1)))
                 print(today_date)
 
             event_date = event_date + datetime.timedelta(days=1)
@@ -81,20 +90,25 @@ class Persona(object):
         stats.delete_one({"athlete_id": self.user_id})
         asymmetry.delete_many({"user_id": self.user_id})
 
-    def create_plan(self, event_date):
+    def create_plan(self, event_date, day_number):
         self.daily_plan = DailyPlan(format_date(event_date))
         self.daily_plan.user_id = self.user_id
         self.daily_plan.daily_readiness_survey = self.daily_readiness
         # self.daily_plan.session_from_readiness = True
-        self.add_session(event_date)
+        if len(self.rpes) > 0:
+            self.add_session(event_date, self.rpes[day_number])
+        else:
+            self.add_session(event_date)
         store = DailyPlanDatastore()
         store.put(self.daily_plan)
         self.update_stats(event_date)
-        survey_processor = SurveyProcessing(self.user_id, event_date, self.athlete_stats, DatastoreCollection())
-        survey_processor.soreness = self.daily_readiness.soreness
-        survey_processor.patch_daily_and_historic_soreness(survey='readiness')
 
-        self.athlete_stats = survey_processor.athlete_stats
+        if self.daily_readiness is not None:
+            survey_processor = SurveyProcessing(self.user_id, event_date, self.athlete_stats, DatastoreCollection())
+            survey_processor.soreness = self.daily_readiness.soreness
+            survey_processor.patch_daily_and_historic_soreness(survey='readiness')
+            self.athlete_stats = survey_processor.athlete_stats
+
         plan_manager = TrainingPlanManager(self.user_id, DatastoreCollection(), )
         self.daily_plan = plan_manager.create_daily_plan(event_date=format_date(event_date), last_updated=format_datetime(event_date), athlete_stats=self.athlete_stats, visualizations=True)
 
@@ -121,13 +135,14 @@ class Persona(object):
                                                  exercise_id=exercise,
                                                  event_date=event_date))
 
-    def add_session(self, event_date):
-        ps_event_date = event_date + datetime.timedelta(minutes=40)
-        session = SessionFactory().create(SessionType(6))
-        session.event_date = ps_event_date
-        session.sport_name = 72
-        session.duration_minutes = 30
-        session.post_session_survey = PostSurvey(survey={'RPE': 5, 'soreness': []}, event_date=format_datetime(ps_event_date))
-        store = SessionDatastore()
-        store.insert(session, self.user_id, format_date(event_date))
-        self.daily_plan.training_sessions.append(session)
+    def add_session(self, event_date, rpe=5):
+        if rpe is not None:
+            ps_event_date = event_date + datetime.timedelta(minutes=40)
+            session = SessionFactory().create(SessionType(6))
+            session.event_date = ps_event_date
+            session.sport_name = 72
+            session.duration_minutes = 30
+            session.post_session_survey = PostSurvey(survey={'RPE': rpe, 'soreness': []}, event_date=format_datetime(ps_event_date))
+            store = SessionDatastore()
+            store.insert(session, self.user_id, format_date(event_date))
+            self.daily_plan.training_sessions.append(session)

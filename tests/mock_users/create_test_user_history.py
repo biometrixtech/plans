@@ -15,6 +15,8 @@ import soreness_history as sh
 from utils import format_datetime
 from datetime import datetime, timedelta
 
+plans_version = "4_4"
+
 
 def login_user(email):
     body = {"password": "Fathom123!", "personal_data": {"email": email}}
@@ -25,7 +27,7 @@ def login_user(email):
 
 
 def clear_fte_category_view(insight_type, visualization_type, jwt, plan_date_time):
-    url = "http://apis.{env}.fathomai.com/plans/4_3/trends/first_time_experience/view".format(env=os.environ['ENVIRONMENT'])
+    url = "http://apis.{env}.fathomai.com/plans/{version}/trends/first_time_experience/view".format(env=os.environ['ENVIRONMENT'], version=plans_version)
     body = {
             "event_date": format_datetime(plan_date_time),
             "insight_type": insight_type.value,
@@ -37,7 +39,7 @@ def clear_fte_category_view(insight_type, visualization_type, jwt, plan_date_tim
 
 
 def clear_fte_category(insight_type, jwt, plan_date_time):
-    url = "http://apis.{env}.fathomai.com/plans/4_3/trends/first_time_experience/category".format(env=os.environ['ENVIRONMENT'])
+    url = "http://apis.{env}.fathomai.com/plans/{version}/trends/first_time_experience/category".format(env=os.environ['ENVIRONMENT'], version=plans_version)
     body = {
             "event_date": format_datetime(plan_date_time),
             "insight_type": insight_type.value}
@@ -48,7 +50,7 @@ def clear_fte_category(insight_type, jwt, plan_date_time):
 
 
 def clear_plan_alerts(insight_type, jwt, plan_date_time):
-    url = "http://apis.{env}.fathomai.com/plans/4_3/trends/plan_alerts/clear".format(env=os.environ['ENVIRONMENT'])
+    url = "http://apis.{env}.fathomai.com/plans/{version}/trends/plan_alerts/clear".format(env=os.environ['ENVIRONMENT'], version=plans_version)
     body = {
             "event_date": format_datetime(plan_date_time),
             "insight_type": insight_type.value}
@@ -117,7 +119,12 @@ if __name__ == '__main__':
             persona1 = Persona(user_id)
             persona1.soreness_history = soreness_history
             if u == "nc_long@200.com":
-                last_plan_date_time = persona1.create_history(days=history_length, suffix='', end_today=True)
+                rpes = [5, None, None, 5, None, 3, None,
+                        4, None, 6, None, 5, 5, None,
+                        None, 4, None, 3, 5, None, None,
+                        6, None, 5, None, 4, None, 3,
+                        5, None, 6, None, 5, 4, 6]
+                last_plan_date_time = persona1.create_history(days=history_length, suffix='', end_today=True, rpes=rpes)
             else:
                 last_plan_date_time = persona1.create_history(days=history_length, suffix='')
             clear_fte_category(InsightType.personalized_recovery, jwt, last_plan_date_time)
@@ -125,6 +132,25 @@ if __name__ == '__main__':
                                     VisualizationType.pain_functional_limitation, jwt, last_plan_date_time)
             clear_fte_category_view(InsightType.personalized_recovery,
                                     VisualizationType.tight_overactice_underactive, jwt, last_plan_date_time)
+            print(time.time() - start)
+        elif u == "ts_tread@200.com":
+            soreness_history = []
+            pecs_no_question = sh.create_body_part_history(sh.persistent_soreness_no_question_31_days(), 2, 1, False)
+            calves_no_question = sh.create_body_part_history(sh.persistent_soreness_no_question_31_days(), 16, 2, False)
+            soreness_history.append(pecs_no_question)
+            soreness_history.append(calves_no_question)
+
+            user_id, jwt = login_user(u)
+            print(user_id)
+            persona1 = Persona(user_id)
+            persona1.soreness_history = soreness_history
+            rpes = [5, None, None, 5, None, 3, None,
+                    4, None, 6, None, 5, 5, None,
+                    None, 4, None, 3, 5, None, None,
+                    6, None, 5, None, 4, None, 3,
+                    5, 5, 6, None, 5, 4, 6]
+            last_plan_date_time = persona1.create_history(days=history_length, suffix='', end_today=True, rpes=rpes)
+
             print(time.time() - start)
         elif u=="nc_sore_tread@200.com":
             soreness_history = []
@@ -135,10 +161,15 @@ if __name__ == '__main__':
             soreness_history.append(right_quad_31_days_sore_no_question)
             soreness_history.append(left_quad_1_day_sore)
             user_id, jwt = login_user(u)
+            rpes = [None, None, 6, None, 5, None, 4,
+                    None, None, 6, None, 5, None, 4,
+                    None, None, 6, None, 5, None, 4,
+                    None, None, 6, None, 5, None, 4,
+                    None, None, 6, None, 5, None, 4]
             print(user_id)
             persona1 = Persona(user_id)
             persona1.soreness_history = soreness_history
-            last_plan_date_time = persona1.create_history(days=history_length, suffix='', end_today=True)
+            last_plan_date_time = persona1.create_history(days=history_length, suffix='', end_today=True, rpes=rpes)
             clear_fte_category(InsightType.personalized_recovery, jwt, last_plan_date_time)
             clear_fte_category_view(InsightType.personalized_recovery,
                                     VisualizationType.pain_functional_limitation, jwt, last_plan_date_time)
