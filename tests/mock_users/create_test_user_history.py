@@ -175,6 +175,52 @@ if __name__ == '__main__':
             last_plan_date_time = persona1.create_history(days=history_length, suffix='', end_today=True, rpes=rpes)
 
             print(time.time() - start)
+        elif u == "full_fte_long@200.com":
+            soreness_history = []
+            lower_back_no_question = sh.create_body_part_history(sh.persistent_soreness_no_question_29_days(), 12, 0, True)
+            r_pec_no_question = sh.create_body_part_history(sh.persistent_soreness_no_question_29_days(), 2, 2, False)
+            lower_back_1_day_pain = sh.create_body_part_history(sh.pre_pad_with_nones([2]), 12, 0, True)
+            l_hamstring_1_day_sore = sh.create_body_part_history(sh.pre_pad_with_nones([2]), 15, 1, False)
+            l_calves_1_day_sore = sh.create_body_part_history(sh.pre_pad_with_nones([2]), 16, 1, False)
+            soreness_history.append(lower_back_no_question)
+            soreness_history.append(r_pec_no_question)
+            soreness_history.append(lower_back_1_day_pain)
+            soreness_history.append(l_hamstring_1_day_sore)
+            soreness_history.append(l_calves_1_day_sore)
+
+            user_id, jwt = login_user(u)
+            print(user_id)
+            persona1 = Persona(user_id)
+            persona1.soreness_history = soreness_history
+            rpes = [None, None, 6, None, 5, None, 4,
+                    None, None, 6, None, 5, None, 4,
+                    None, None, 6, None, 5, None, 4,
+                    None, None, 6, None, 5, None, 4,
+                    None, None, 6, None, 5, None, 4]
+            last_plan_date_time = persona1.create_history(days=history_length, suffix='', end_today=True, rpes=rpes)
+
+            print(time.time() - start)
+        elif u == "full_fte_tread@200.com":
+            soreness_history = []
+            lower_back_no_question = sh.create_body_part_history(sh.persistent_soreness_no_question_29_days(), 12, 0, True)
+            r_pec_no_question = sh.create_body_part_history(sh.persistent_soreness_no_question_29_days(), 2, 2, False)
+            l_quads_1_day_sore = sh.create_body_part_history(sh.pre_pad_with_nones([2]), 6, 1, False)
+            soreness_history.append(lower_back_no_question)
+            soreness_history.append(r_pec_no_question)
+            soreness_history.append(l_quads_1_day_sore)
+
+            user_id, jwt = login_user(u)
+            print(user_id)
+            persona1 = Persona(user_id)
+            persona1.soreness_history = soreness_history
+            rpes = [5, None, None, 5, None, 3, None,
+                    4, None, 6, None, 5, 5, None,
+                    None, 4, None, 3, 5, None, None,
+                    6, None, 5, None, 4, None, 3,
+                    5, 5, 6, None, 5, 4, 6]
+            last_plan_date_time = persona1.create_history(days=history_length, suffix='', end_today=True, rpes=rpes)
+
+            print(time.time() - start)
 
         elif u=="nc_sore_tread@200.com":
             soreness_history = []
@@ -220,6 +266,31 @@ if __name__ == '__main__':
             clear_fte_category_view(InsightType.personalized_recovery,
                                     VisualizationType.personalized_recovery, jwt, last_plan_date_time)
             print(time.time() - start)
+
+        elif u == "two_pain_tread@200.com":
+            soreness_history = []
+            right_calf_no_question = sh.create_body_part_history(sh.persistent2_no_question(), 16, 2, True)
+            soreness_history.append(right_calf_no_question)
+            right_it_band_no_question = sh.create_body_part_history(sh.persistent2_no_question(), 11, 2, True)
+            soreness_history.append(right_it_band_no_question)
+            right_calf_sore_question = sh.create_body_part_history(sh.persistent_soreness_no_question_31_days(), 16, 2, False)
+            soreness_history.append(right_calf_sore_question)
+            user_id, jwt = login_user(u)
+            print(user_id)
+            rpes = [None, None, 6, None, 5, None, 4,
+                    None, None, 6, None, 5, None, 4,
+                    None, None, 6, None, 5, None, 4,
+                    None, None, 6, None, 5, None, 4,
+                    None, None, 6, None, 5, None, 4]
+            persona1 = Persona(user_id)
+            persona1.soreness_history = soreness_history
+            last_plan_date_time = persona1.create_history(days=history_length, suffix='', end_today=True, rpes=rpes)
+            # clear_fte_category(InsightType.personalized_recovery, jwt, last_plan_date_time)
+            # clear_fte_category_view(InsightType.personalized_recovery,
+            #                         VisualizationType.prevention, jwt, last_plan_date_time)
+            # clear_fte_category_view(InsightType.personalized_recovery,
+            #                         VisualizationType.personalized_recovery, jwt, last_plan_date_time)
+            #
         elif u == "pain_sore@200.com" or u == "pain_sore_2@200.com":
             soreness_history = []
             lower_back_no_question = sh.create_body_part_history(sh.persistent2_no_question(), 12, 0, True)
