@@ -929,18 +929,28 @@ class TrendProcessor(object):
 
         tiles = []
 
-        trigger_list = sorted(trigger_list, key=lambda x: x.priority)
+        trigger_7_flagged = False
 
-        used_body_parts = set()
+        # trigger_7_list = [t for t in trigger_list if t.trigger_type == TriggerType.hist_sore_less_30]
+        #
+        # filtered_trigger_list = [t for t in trigger_list if t.trigger_type != TriggerType.hist_sore_less_30]
 
-        for t in trigger_list:
+        filtered_trigger_list = sorted(trigger_list, key=lambda x: x.priority)
+
+        recovery_body_parts = set()
+        prevention_body_parts = set()
+        care_body_parts = set()
+
+        for t in filtered_trigger_list:
             if t.trigger_type == TriggerType.hist_sore_less_30:
-                tile_1 = TriggerTile()
-                tile_1.text = "Increase care for chronically sore tissues to promote positive training adaptation"
-                bold_1 = BoldText()
-                bold_1.text = "Increase care"
-                tile_1.bold_text.append(bold_1)
-                tiles.append(tile_1)
+                if not trigger_7_flagged:
+                    tile_1 = TriggerTile()
+                    tile_1.text = "Increase care for chronically sore tissues to promote positive training adaptation"
+                    bold_1 = BoldText()
+                    bold_1.text = "Increase care"
+                    tile_1.bold_text.append(bold_1)
+                    tiles.append(tile_1)
+                    trigger_7_flagged = True
 
             elif t.trigger_type == TriggerType.movement_error_apt_asymmetry:
                 mobilize_suffix = " to address asymmetric stress accumulated in training"
@@ -948,11 +958,13 @@ class TrendProcessor(object):
                 body_part_text_1, is_plural_1 = self.get_title_text_for_body_parts(t.overactive_tight_first, 0)
                 if len(body_part_text_1) == 0:
                     body_part_text_1 = "PRIME MOVER"
-                tile_1.text = "Foam Roll & Static Stretch your " + body_part_text_1 + mobilize_suffix
-                bold_1 = BoldText()
-                bold_1.text = "Foam Roll & Static Stretch"
-                tile_1.bold_text.append(bold_1)
-                tiles.append(tile_1)
+                if body_part_text_1 not in recovery_body_parts:
+                    recovery_body_parts.add(body_part_text_1)
+                    tile_1.text = "Foam Roll & Static Stretch your " + body_part_text_1 + mobilize_suffix
+                    bold_1 = BoldText()
+                    bold_1.text = "Foam Roll & Static Stretch"
+                    tile_1.bold_text.append(bold_1)
+                    tiles.append(tile_1)
 
             elif t.trigger_type == TriggerType.hist_sore_greater_30:
                 mobilize_suffix = " to correct observed imbalances"
@@ -960,28 +972,34 @@ class TrendProcessor(object):
                 body_part_text_1, is_plural_1 = self.get_title_text_for_body_parts(t.agonists, 0)
                 if len(body_part_text_1) == 0:
                     body_part_text_1 = "PRIME MOVER"
-                tile_1.text = "Foam Roll & Static Stretch your " + body_part_text_1 + mobilize_suffix
-                bold_1 = BoldText()
-                bold_1.text = "Foam Roll & Static Stretch"
-                tile_1.bold_text.append(bold_1)
+                if body_part_text_1 not in prevention_body_parts:
+                    prevention_body_parts.add(body_part_text_1)
+                    tile_1.text = "Foam Roll & Static Stretch your " + body_part_text_1 + mobilize_suffix
+                    bold_1 = BoldText()
+                    bold_1.text = "Foam Roll & Static Stretch"
+                    tile_1.bold_text.append(bold_1)
+                    tiles.append(tile_1)
                 tile_2 = TriggerTile()
                 a_s_2 = []
                 a_s_2.extend(t.antagonists)
                 a_s_2.extend(t.synergists)
                 body_part_text_2, is_plural_2 = self.get_title_text_for_body_parts(a_s_2, 0)
-                tile_2.text = "Strengthen your " + body_part_text_2 + mobilize_suffix
-                bold_2 = BoldText()
-                bold_2.text = "Strengthen"
-                tile_2.bold_text.append(bold_2)
+                if body_part_text_2 not in prevention_body_parts:
+                    prevention_body_parts.add(body_part_text_2)
+                    tile_2.text = "Strengthen your " + body_part_text_2 + mobilize_suffix
+                    bold_2 = BoldText()
+                    bold_2.text = "Strengthen"
+                    tile_2.bold_text.append(bold_2)
+                    tiles.append(tile_2)
                 tile_3 = TriggerTile()
                 body_part_text_3, is_plural_3 = self.get_title_text_for_body_parts([t.body_part], 0)
-                tile_3.text = "Heat your " + body_part_text_3 + " before training to temporarily improve mobility and increase the efficacy of stretching"
-                bold_3 = BoldText()
-                bold_3.text = "Heat"
-                tile_3.bold_text.append(bold_3)
-                tiles.append(tile_1)
-                tiles.append(tile_2)
-                tiles.append(tile_3)
+                if body_part_text_3 not in prevention_body_parts:
+                    prevention_body_parts.add(body_part_text_3)
+                    tile_3.text = "Heat your " + body_part_text_3 + " before training to temporarily improve mobility and increase the efficacy of stretching"
+                    bold_3 = BoldText()
+                    bold_3.text = "Heat"
+                    tile_3.bold_text.append(bold_3)
+                    tiles.append(tile_3)
 
             elif t.trigger_type == TriggerType.hist_pain:
                 if not body_part_factory.is_joint(t.body_part):
@@ -990,28 +1008,37 @@ class TrendProcessor(object):
                     body_part_text_1, is_plural_1 = self.get_title_text_for_body_parts(t.agonists, 0)
                     if len(body_part_text_1) == 0:
                         body_part_text_1 = "PRIME MOVER"
-                    tile_1.text = "Foam Roll & Static Stretch your " + body_part_text_1 + mobilize_suffix
-                    bold_1 = BoldText()
-                    bold_1.text = "Foam Roll & Static Stretch"
-                    tile_1.bold_text.append(bold_1)
+                    if body_part_text_1 not in prevention_body_parts:
+                        prevention_body_parts.add(body_part_text_1)
+                        tile_1.text = "Foam Roll & Static Stretch your " + body_part_text_1 + mobilize_suffix
+                        bold_1 = BoldText()
+                        bold_1.text = "Foam Roll & Static Stretch"
+                        tile_1.bold_text.append(bold_1)
+                        tiles.append(tile_1)
+
                     tile_2 = TriggerTile()
                     a_s_2 = []
                     a_s_2.extend(t.antagonists)
                     a_s_2.extend(t.synergists)
                     body_part_text_2, is_plural_2 = self.get_title_text_for_body_parts(a_s_2, 0)
-                    bold_2 = BoldText()
-                    bold_2.text = "Strengthen"
-                    tile_2.bold_text.append(bold_2)
-                    tile_2.text = "Strengthen your " + body_part_text_2 + mobilize_suffix
+                    if body_part_text_2 not in prevention_body_parts:
+                        prevention_body_parts.add(body_part_text_2)
+                        bold_2 = BoldText()
+                        bold_2.text = "Strengthen"
+                        tile_2.bold_text.append(bold_2)
+                        tile_2.text = "Strengthen your " + body_part_text_2 + mobilize_suffix
+                        tiles.append(tile_2)
+
                     tile_3 = TriggerTile()
                     body_part_text_3, is_plural_3 = self.get_title_text_for_body_parts([t.body_part], 0)
-                    tile_3.text = "Heat your " + body_part_text_3 + " before training to temporarily improve mobility and increase the efficacy of stretching"
-                    bold_3 = BoldText()
-                    bold_3.text = "Heat"
-                    tile_3.bold_text.append(bold_3)
-                    tiles.append(tile_1)
-                    tiles.append(tile_2)
-                    tiles.append(tile_3)
+                    if body_part_text_3 not in prevention_body_parts:
+                        prevention_body_parts.add(body_part_text_3)
+                        tile_3.text = "Heat your " + body_part_text_3 + " before training to temporarily improve mobility and increase the efficacy of stretching"
+                        bold_3 = BoldText()
+                        bold_3.text = "Heat"
+                        tile_3.bold_text.append(bold_3)
+                        tiles.append(tile_3)
+
                 else:
                     mobilize_suffix = " to correct imbalances exacerbating your pain"
                     a_a = []
@@ -1021,25 +1048,32 @@ class TrendProcessor(object):
                     body_part_text_1, is_plural_1 = self.get_title_text_for_body_parts(a_a, 0)
                     if len(body_part_text_1) == 0:
                         body_part_text_1 = "PRIME MOVER"
-                    tile_1.text = "Foam Roll & Static Stretch your " + body_part_text_1 + mobilize_suffix
-                    bold_1 = BoldText()
-                    bold_1.text = "Foam Roll & Static Stretch"
-                    tile_1.bold_text.append(bold_1)
+                    if body_part_text_1 not in prevention_body_parts:
+                        prevention_body_parts.add(body_part_text_1)
+                        tile_1.text = "Foam Roll & Static Stretch your " + body_part_text_1 + mobilize_suffix
+                        bold_1 = BoldText()
+                        bold_1.text = "Foam Roll & Static Stretch"
+                        tile_1.bold_text.append(bold_1)
+                        tiles.append(tile_1)
+
                     tile_2 = TriggerTile()
                     body_part_text_2, is_plural_2 = self.get_title_text_for_body_parts(a_a, 0)
-                    tile_2.text = "Strengthen your " + body_part_text_2 + mobilize_suffix
-                    bold_2 = BoldText()
-                    bold_2.text = "Strengthen"
-                    tile_2.bold_text.append(bold_2)
+                    if body_part_text_2 not in prevention_body_parts:
+                        prevention_body_parts.add(body_part_text_2)
+                        tile_2.text = "Strengthen your " + body_part_text_2 + mobilize_suffix
+                        bold_2 = BoldText()
+                        bold_2.text = "Strengthen"
+                        tile_2.bold_text.append(bold_2)
+                        tiles.append(tile_2)
                     tile_3 = TriggerTile()
                     body_part_text_3, is_plural_3 = self.get_title_text_for_body_parts([t.body_part], 0)
-                    tile_3.text = "Heat your " + body_part_text_3 + " before training to temporarily improve mobility and increase the efficacy of stretching"
-                    bold_3 = BoldText()
-                    bold_3.text = "Heat"
-                    tile_3.bold_text.append(bold_3)
-                    tiles.append(tile_1)
-                    tiles.append(tile_2)
-                    tiles.append(tile_3)
+                    if body_part_text_3 not in prevention_body_parts:
+                        prevention_body_parts.add(body_part_text_3)
+                        tile_3.text = "Heat your " + body_part_text_3 + " before training to temporarily improve mobility and increase the efficacy of stretching"
+                        bold_3 = BoldText()
+                        bold_3.text = "Heat"
+                        tile_3.bold_text.append(bold_3)
+                        tiles.append(tile_3)
 
             elif t.trigger_type in [TriggerType.no_hist_pain_pain_today_severity_1_2,
                                     TriggerType.no_hist_pain_pain_today_high_severity_3_5,
@@ -1051,46 +1085,58 @@ class TrendProcessor(object):
                     body_part_text_1, is_plural_1 = self.get_title_text_for_body_parts(t.agonists, 0)
                     if len(body_part_text_1) == 0:
                         body_part_text_1 = "PRIME MOVER"
-                    tile_1.text = "Foam Roll & Stretch your " + body_part_text_1 + mobilize_suffix
-                    bold_1 = BoldText()
-                    bold_1.text = "Foam Roll & Stretch"
-                    tile_1.bold_text.append(bold_1)
+                    if body_part_text_1 not in care_body_parts:
+                        care_body_parts.add(body_part_text_1)
+                        tile_1.text = "Foam Roll & Stretch your " + body_part_text_1 + mobilize_suffix
+                        bold_1 = BoldText()
+                        bold_1.text = "Foam Roll & Stretch"
+                        tile_1.bold_text.append(bold_1)
+                        tiles.append(tile_1)
+
                     tile_2 = TriggerTile()
                     body_part_text_2, is_plural_2 = self.get_title_text_for_body_parts([t.body_part], 0)
-                    bold_2 = BoldText()
-                    bold_2.text = "Strengthen"
-                    tile_2.bold_text.append(bold_2)
-                    tile_2.text = "Foam Roll & Stretch the supporting musculature of your " + body_part_text_2 + mobilize_suffix
+                    if body_part_text_2 not in care_body_parts:
+                        care_body_parts.add(body_part_text_2)
+                        bold_2 = BoldText()
+                        bold_2.text = "Foam Roll & Stretch"
+                        tile_2.bold_text.append(bold_2)
+                        tile_2.text = "Foam Roll & Stretch the supporting musculature of your " + body_part_text_2 + mobilize_suffix
+                        tiles.append(tile_2)
+
                     tile_3 = TriggerTile()
                     body_part_text_3, is_plural_3 = self.get_title_text_for_body_parts([t.body_part], 0)
-                    tile_3.text = "Ice your " + body_part_text_3 + " after training to reduce inflammation and muscle damage"
-                    bold_3 = BoldText()
-                    bold_3.text = "Ice"
-                    tile_3.bold_text.append(bold_3)
-                    tiles.append(tile_1)
-                    tiles.append(tile_2)
-                    tiles.append(tile_3)
+                    if body_part_text_3 not in care_body_parts:
+                        care_body_parts.add(body_part_text_3)
+                        tile_3.text = "Ice your " + body_part_text_3 + " after training to reduce inflammation and muscle damage"
+                        bold_3 = BoldText()
+                        bold_3.text = "Ice"
+                        tile_3.bold_text.append(bold_3)
+                        tiles.append(tile_3)
                 else:
                     mobilize_suffix = " to minimize effects of compensations resulting from pain"
                     tile_1 = TriggerTile()
                     body_part_text_1, is_plural_1 = self.get_title_text_for_body_parts([t.body_part], 0)
                     if len(body_part_text_1) == 0:
                         body_part_text_1 = "PRIME MOVER"
-                    tile_1.text = "Foam Roll & Stretch the supporting musculature of your " + body_part_text_1 + mobilize_suffix
-                    bold_1 = BoldText()
-                    bold_1.text = "Foam Roll & Stretch"
-                    tile_1.bold_text.append(bold_1)
+                    if body_part_text_1 not in care_body_parts:
+                        care_body_parts.add(body_part_text_1)
+                        tile_1.text = "Foam Roll & Stretch the supporting musculature of your " + body_part_text_1 + mobilize_suffix
+                        bold_1 = BoldText()
+                        bold_1.text = "Foam Roll & Stretch"
+                        tile_1.bold_text.append(bold_1)
+                        tiles.append(tile_1)
 
-                    tile_1 = TriggerTile()
-                    body_part_text_1, is_plural_1 = self.get_title_text_for_body_parts([t.body_part], 0)
-                    if len(body_part_text_1) == 0:
-                        body_part_text_1 = "PRIME MOVER"
-                    tile_1.text = "Ice your " + body_part_text_1 + " after training to reduce inflammation and tissue damage"
-                    bold_1 = BoldText()
-                    bold_1.text = "Ice"
-                    tile_1.bold_text.append(bold_1)
-
-                    tiles.append(tile_1)
+                    tile_2 = TriggerTile()
+                    body_part_text_2, is_plural_1 = self.get_title_text_for_body_parts([t.body_part], 0)
+                    if len(body_part_text_2) == 0:
+                        body_part_text_2 = "PRIME MOVER"
+                    if body_part_text_2 not in care_body_parts:
+                        care_body_parts.add(body_part_text_2)
+                        tile_2.text = "Ice your " + body_part_text_2 + " after training to reduce inflammation and tissue damage"
+                        bold_2 = BoldText()
+                        bold_2.text = "Ice"
+                        tile_2.bold_text.append(bold_2)
+                        tiles.append(tile_2)
 
             elif t.trigger_type in [TriggerType.sore_today_doms,
                                     TriggerType.hist_sore_less_30_sore_today,
@@ -1098,21 +1144,26 @@ class TrendProcessor(object):
 
                 mobilize_suffix = " to reduce soreness & regain range of motion"
                 tile_1 = TriggerTile()
-                body_part_text_1, is_plural_1 = self.get_title_text_for_body_parts([t.agonists], 0)
+                body_part_text_1, is_plural_1 = self.get_title_text_for_body_parts(t.agonists, 0)
                 if len(body_part_text_1) == 0:
                     body_part_text_1 = "PRIME MOVER"
-                tile_1.text = "Foam Roll & Stretch your " + body_part_text_1 + mobilize_suffix
-                bold_1 = BoldText()
-                bold_1.text = "Foam Roll & Stretch"
-                tile_1.bold_text.append(bold_1)
+                if body_part_text_1 not in care_body_parts:
+                    care_body_parts.add(body_part_text_1)
+                    tile_1.text = "Foam Roll & Stretch your " + body_part_text_1 + mobilize_suffix
+                    bold_1 = BoldText()
+                    bold_1.text = "Foam Roll & Stretch"
+                    tile_1.bold_text.append(bold_1)
+                    tiles.append(tile_1)
+
                 tile_3 = TriggerTile()
                 body_part_text_3, is_plural_3 = self.get_title_text_for_body_parts([t.body_part], 0)
-                tile_3.text = "Ice your " + body_part_text_3 + " after training to reduce inflammation and muscle damage"
-                bold_3 = BoldText()
-                bold_3.text = "Ice"
-                tile_3.bold_text.append(bold_3)
-                tiles.append(tile_1)
-                tiles.append(tile_3)
+                if body_part_text_3 not in care_body_parts:
+                    care_body_parts.add(body_part_text_3)
+                    tile_3.text = "Ice your " + body_part_text_3 + " after training to reduce inflammation and muscle damage"
+                    bold_3 = BoldText()
+                    bold_3.text = "Ice"
+                    tile_3.bold_text.append(bold_3)
+                    tiles.append(tile_3)
 
             elif t.trigger_type == TriggerType.high_volume_intensity:
 

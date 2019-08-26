@@ -4,7 +4,7 @@ from enum import Enum
 class AthleteGoalType(Enum):
     pain = 0
     sore = 1
-    sport = 2
+    high_load = 2
     preempt_sport = 3
     preempt_personalized_sport = 4
     preempt_corrective = 5
@@ -13,7 +13,8 @@ class AthleteGoalType(Enum):
     counter_overreaching = 8
     respond_risk = 9
     on_request = 10
-    three_sensor_reactive = 20
+    asymmetric_session = 20
+    asymmetric_pattern = 21
 
 
 class AthleteGoal(object):
@@ -33,7 +34,7 @@ class AthleteGoal(object):
             return 3
         elif self.goal_type == AthleteGoalType.respond_risk:
             return 4
-        elif self.goal_type == AthleteGoalType.sport:
+        elif self.goal_type == AthleteGoalType.high_load:
             return 5
         elif self.goal_type == AthleteGoalType.preempt_corrective:
             return 6
