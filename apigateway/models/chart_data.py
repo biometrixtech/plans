@@ -1106,9 +1106,9 @@ class PreventionChartData(BaseOveractiveUnderactiveChartData, Serialisable):
         una_delete = []
 
         id = 0
-        for u in self.pain:
-            index = next((i for i, x in enumerate(self.weak) if u == x), -1)
-            index_2 = next((i for i, x in enumerate(self.overactive) if u == x), -1)
+        for u in self.weak:
+            index = next((i for i, x in enumerate(self.overactive) if u == x), -1)
+            index_2 = next((i for i, x in enumerate(self.pain) if u == x), -1)
             if index > -1 or index_2 > -1:
                 unc_delete.append(id)
             id += 1
@@ -1116,11 +1116,11 @@ class PreventionChartData(BaseOveractiveUnderactiveChartData, Serialisable):
         unc_delete.sort(reverse=True)  # need to remove in reverse order so we don't mess up indexes along the way
 
         for d in unc_delete:
-            del(self.pain[d])
+            del(self.weak[d])
 
         id = 0
-        for u in self.weak:
-            index = next((i for i, x in enumerate(self.overactive) if u == x), -1)
+        for u in self.overactive:
+            index = next((i for i, x in enumerate(self.pain) if u == x), -1)
             if index > -1:
                 una_delete.append(id)
             id += 1
@@ -1128,7 +1128,7 @@ class PreventionChartData(BaseOveractiveUnderactiveChartData, Serialisable):
         una_delete.sort(reverse=True)
 
         for d in una_delete:
-            del(self.weak[d])
+            del(self.overactive[d])
 
 
 class PersonalizedRecoveryChartData(BaseOveractiveUnderactiveChartData, Serialisable):

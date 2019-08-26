@@ -1106,7 +1106,7 @@ class TrendProcessor(object):
                 bold_2.text = "Cold Water Bath"
                 tile_2.bold_text.append(bold_2)
                 tile_3 = TriggerTile()
-                tile_3.text = "Dynamic Stretch muscles heavily stressed in " + sport + " to increase bloodflow & retain mobility"
+                tile_3.text = "Dynamic Stretch muscles stressed in " + sport + " to increase bloodflow & retain mobility"
                 bold_3 = BoldText()
                 bold_3.text = "Dynamic Stretch"
                 tile_3.bold_text.append(bold_3)
