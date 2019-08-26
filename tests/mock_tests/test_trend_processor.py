@@ -987,6 +987,39 @@ def test_overlapping_muscle_correct():
            trend_processor.athlete_trend_categories[1].trends[0].trend_data.data[0].pain
 
 
+def test_get_tiles_trigger_19():
+
+    trigger_list = []
+    body_part_factory = BodyPartFactory()
+    trigger_factory = TriggerFactory(datetime.now(), None, [], [])
+
+    now_time = datetime.now()
+
+    trigger = Trigger(TriggerType.hist_pain)
+    trigger.body_part = BodyPartSide(body_part_location=BodyPartLocation(16), side=2)
+    body_part = body_part_factory.get_body_part(trigger.body_part)
+    trigger.synergists = trigger_factory.convert_body_part_list(trigger.body_part, body_part.synergists)
+    trigger.antagonists = trigger_factory.convert_body_part_list(trigger.body_part, body_part.antagonists)
+    trigger.created_date_time = now_time
+    trigger.source_date_time = now_time
+
+    trigger_list.append(trigger)
+
+    trigger_2 = Trigger(TriggerType.hist_pain)
+    trigger_2.body_part = BodyPartSide(body_part_location=BodyPartLocation(11), side=2)
+    body_part_2 = body_part_factory.get_body_part(trigger_2.body_part)
+    trigger_2.synergists = trigger_factory.convert_body_part_list(trigger_2.body_part, body_part_2.synergists)
+    trigger_2.antagonists = trigger_factory.convert_body_part_list(trigger_2.body_part, body_part_2.antagonists)
+    trigger_2.created_date_time = now_time
+    trigger_2.source_date_time = now_time
+
+    trigger_list.append(trigger_2)
+
+    trend_processor = TrendProcessor(trigger_list)
+
+    tiles = trend_processor.get_trigger_tiles(trigger_list)
+
+    f=0
 
 # def test_agonist_capitalized():
 #
