@@ -307,41 +307,41 @@ class TrendProcessor(object):
 
                     trends_visible = True
 
-                    sorted_trends = sorted(visible_trends, key=lambda v: v.last_date_time, reverse=True)
-
-                    if (len(self.athlete_trend_categories[c].plan_alerts) > 0 and
-                            (self.athlete_trend_categories[c].plan_alerts[0].cleared_date_time is None)):
-
-                        # clear this out so we can update the plan alert
-                        self.athlete_trend_categories[c].plan_alerts = []
-
-                    if (len(self.athlete_trend_categories[c].plan_alerts) == 0 or
-                        (self.athlete_trend_categories[c].plan_alerts[0].cleared_date_time is not None
-                         and sorted_trends[0].last_date_time > self.athlete_trend_categories[c].plan_alerts[0].cleared_date_time)):
-
-                        # clear this out so we can update the plan alert
-                        self.athlete_trend_categories[c].plan_alerts = []
-
-                        # plans alert text
-                        plan_alert = self.get_plan_alert(new_modified_trigger_count, plan_alert_short_title,
-                                                         personalized_recovery_category_index, visible_trends)
-                        self.athlete_trend_categories[c].plan_alerts.append(plan_alert)
+                    # sorted_trends = sorted(visible_trends, key=lambda v: v.last_date_time, reverse=True)
+                    #
+                    # if (len(self.athlete_trend_categories[c].plan_alerts) > 0 and
+                    #         (self.athlete_trend_categories[c].plan_alerts[0].cleared_date_time is None)):
+                    #
+                    #     # clear this out so we can update the plan alert
+                    #     self.athlete_trend_categories[c].plan_alerts = []
+                    #
+                    # if (len(self.athlete_trend_categories[c].plan_alerts) == 0 or
+                    #     (self.athlete_trend_categories[c].plan_alerts[0].cleared_date_time is not None
+                    #      and sorted_trends[0].last_date_time > self.athlete_trend_categories[c].plan_alerts[0].cleared_date_time)):
+                    #
+                    #     # clear this out so we can update the plan alert
+                    #     self.athlete_trend_categories[c].plan_alerts = []
+                    #
+                    #     # plans alert text
+                    #     plan_alert = self.get_plan_alert(new_modified_trigger_count, plan_alert_short_title,
+                    #                                      personalized_recovery_category_index, visible_trends)
+                    #     self.athlete_trend_categories[c].plan_alerts.append(plan_alert)
 
                     # Now create dashboard category card
                     self.dashboard_categories = []
 
-                    trend_dashboard_category = None
-
-                    if sorted_trends[0].visualization_type == VisualizationType.personalized_recovery:
-                        trend_dashboard_category = self.get_over_under_active_dashboard_card(c, sorted_trends[0])
-
-                    elif sorted_trends[0].visualization_type == VisualizationType.prevention:
-                        trend_dashboard_category = self.get_functional_limitation_dashboard_card(c, sorted_trends[0])
-
-                    if trend_dashboard_category is not None:
-                        trend_dashboard_category.unread_alerts = (
-                                    len(self.athlete_trend_categories[c].plan_alerts) > 0)
-                        self.dashboard_categories.append(trend_dashboard_category)
+                    # trend_dashboard_category = None
+                    #
+                    # if sorted_trends[0].visualization_type == VisualizationType.personalized_recovery:
+                    #     trend_dashboard_category = self.get_over_under_active_dashboard_card(c, sorted_trends[0])
+                    #
+                    # elif sorted_trends[0].visualization_type == VisualizationType.prevention:
+                    #     trend_dashboard_category = self.get_functional_limitation_dashboard_card(c, sorted_trends[0])
+                    #
+                    # if trend_dashboard_category is not None:
+                    #     trend_dashboard_category.unread_alerts = (
+                    #                 len(self.athlete_trend_categories[c].plan_alerts) > 0)
+                    #     self.dashboard_categories.append(trend_dashboard_category)
                 else:
                     self.athlete_trend_categories[c].plan_alerts = []
 
@@ -452,11 +452,11 @@ class TrendProcessor(object):
 
         triggers_7 = list(t for t in self.trigger_list if t.trigger_type == TriggerType.hist_sore_less_30)
         for t in triggers_7:
-            t.priority = 1
+            t.priority = 3
 
         triggers_110 = list(t for t in self.trigger_list if t.trigger_type == TriggerType.movement_error_apt_asymmetry)
         for t in triggers_110:
-            t.priority = 2
+            t.priority = 1
 
         # since we're reverse sorting, 2 is a higher priority than 1
 
@@ -508,7 +508,8 @@ class TrendProcessor(object):
                 else:
                     body_part_text = ""
             else:
-                body_part_text = text_generator.get_body_part_text(trend.top_priority_trigger.body_part.body_part_location, None)
+                #body_part_text = text_generator.get_body_part_text(trend.top_priority_trigger.body_part.body_part_location, None)
+                body_part_text = ""
             body_part_text = body_part_text.title()
 
             if trend.top_priority_trigger.priority == 1:
@@ -518,7 +519,7 @@ class TrendProcessor(object):
                 clean_title_body_part_text = title_body_part_text.replace('&', 'and')
                 body_text = ("Signs of " + body_part_text + " overactivity in your soreness data suggest that supporting tissues like the " + clean_title_body_part_text +
                             " are experiencing elevated levels of strain which can lead to tissue fatigue and strength imbalances that affect performance and increase injury risk.")
-                trend.dashboard_body_part, trend.dashboard_body_part_text = self.get_title_body_part_and_text(trend.top_priority_trigger.synergists, side)
+                #trend.dashboard_body_part, trend.dashboard_body_part_text = self.get_title_body_part_and_text(trend.top_priority_trigger.synergists, side)
             else:
                 title_body_part_text, is_title_plural = self.get_title_text_for_body_parts(trend.top_priority_trigger.antagonists, side)
                 title_body_part_text_not_plural, is_title_plural_false = self.get_title_text_for_body_parts(trend.top_priority_trigger.antagonists, side, use_plural=False)
@@ -535,7 +536,7 @@ class TrendProcessor(object):
                 body_text = ("Patterns in your soreness data suggest that your " + body_part_text + " may actually be overactive due to a chronic over-compensation " + for_a_weak_phrase + " "
                              + clean_title_body_part_text + ".  This dysfunction could exacerbate movement imbalances and elevate your risk of chronic injury.")
 
-                trend.dashboard_body_part, trend.dashboard_body_part_text = self.get_title_body_part_and_text(recovery_data.tight, side)
+                #trend.dashboard_body_part, trend.dashboard_body_part_text = self.get_title_body_part_and_text(recovery_data.tight, side)
 
             trend_data.text = body_text
 
@@ -688,7 +689,7 @@ class TrendProcessor(object):
                          TriggerType.hist_pain_pain_today_severity_3_5]
         triggers_pain = list(t for t in self.trigger_list if t.trigger_type in pain_triggers)
         for t in triggers_pain:
-            t.priority = 1
+            t.priority = 2
 
         sore_triggers = [TriggerType.sore_today_doms,
                          TriggerType.hist_sore_less_30_sore_today,
@@ -696,11 +697,11 @@ class TrendProcessor(object):
 
         triggers_sore = list(t for t in self.trigger_list if t.trigger_type in sore_triggers)
         for t in triggers_sore:
-            t.priority = 2
+            t.priority = 3
 
         triggers_load = list(t for t in self.trigger_list if t.trigger_type == TriggerType.high_volume_intensity)
         for t in triggers_load:
-            t.priority = 3
+            t.priority = 4
 
         if len(triggers_pain) > 0 or len(triggers_sore) > 0 or len(triggers_load) > 0:
 
@@ -776,8 +777,8 @@ class TrendProcessor(object):
             body_text = (
                         "Athletes struggling with recurring " + body_part_text + " pain often develop misalignments that over-stress their " + clean_title_body_part_text +
                         ". Without proactive measures, this can lead to accumulated micro-trauma in the tissues and new areas of pain or injury over time.")
-            trend.dashboard_body_part, trend.dashboard_body_part_text = self.get_title_body_part_and_text(
-                trend.top_priority_trigger.synergists, side)
+            # trend.dashboard_body_part, trend.dashboard_body_part_text = self.get_title_body_part_and_text(
+            #     trend.top_priority_trigger.synergists, side)
 
             bold_text_3 = BoldText()
             bold_text_3.text = body_part_text
@@ -806,7 +807,7 @@ class TrendProcessor(object):
 
         triggers_19 = list(t for t in self.trigger_list if t.trigger_type == TriggerType.hist_sore_greater_30)
         for t in triggers_19:
-            t.priority = 1
+            t.priority = 3
 
         triggers_16 = list(t for t in self.trigger_list if t.trigger_type == TriggerType.hist_pain)
         for t in triggers_16:
@@ -879,8 +880,8 @@ class TrendProcessor(object):
             clean_title_body_part_text = title_body_part_text.replace('&','and')
             body_text = ("Athletes struggling with recurring " + body_part_text + " pain often develop misalignments that over-stress their "+ clean_title_body_part_text +
                          ". Without proactive measures, this can lead to accumulated micro-trauma in the tissues and new areas of pain or injury over time.")
-            trend.dashboard_body_part, trend.dashboard_body_part_text = self.get_title_body_part_and_text(
-                trend.top_priority_trigger.synergists, side)
+            # trend.dashboard_body_part, trend.dashboard_body_part_text = self.get_title_body_part_and_text(
+            #     trend.top_priority_trigger.synergists, side)
 
             bold_text_3 = BoldText()
             bold_text_3.text = body_part_text
@@ -927,6 +928,10 @@ class TrendProcessor(object):
         body_part_factory = BodyPartFactory()
 
         tiles = []
+
+        trigger_list = sorted(trigger_list, key=lambda x: x.priority)
+
+        used_body_parts = set()
 
         for t in trigger_list:
             if t.trigger_type == TriggerType.hist_sore_less_30:
@@ -1088,7 +1093,7 @@ class TrendProcessor(object):
             elif t.trigger_type == TriggerType.high_volume_intensity:
 
                 mobilize_suffix = " to expedite tissue regeneration"
-                sport = SportName(t.sport_name).name
+                sport = SportName(t.sport_name).get_display_name()
                 tile_1 = TriggerTile()
 
                 tile_1.text = "Mobilize muscles used in " + sport + mobilize_suffix

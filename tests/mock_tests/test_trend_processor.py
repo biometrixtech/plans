@@ -21,6 +21,7 @@ def test_trigger_19():
     trigger = Trigger(TriggerType.hist_sore_greater_30)
     trigger.body_part = BodyPartSide(body_part_location=BodyPartLocation(8), side=1)
     body_part = body_part_factory.get_body_part(trigger.body_part)
+    trigger.agonists = trigger_factory.convert_body_part_list(trigger.body_part, body_part.agonists)
     trigger.synergists = trigger_factory.convert_body_part_list(trigger.body_part, body_part.synergists)
     trigger.antagonists = trigger_factory.convert_body_part_list(trigger.body_part, body_part.antagonists)
     trigger.created_date_time = now_time_2
@@ -1096,36 +1097,36 @@ def test_get_tiles_trigger_19():
 #     assert trend_processor.athlete_trend_categories[0].plan_alerts[0].bold_text[0].text == 'elevated strain on Right Hamstring, Right Quad & Lower Back'
 
 
-def test_retriggered_plan_alert():
-
-    trigger_list = []
-    body_part_factory = BodyPartFactory()
-    trigger_factory = TriggerFactory(datetime.now(), None, [], [])
-
-    now_time = datetime.now()
-    now_time_2 = datetime.now() - timedelta(days=1)
-
-    trigger = Trigger(TriggerType.hist_sore_greater_30)
-    trigger.body_part = BodyPartSide(body_part_location=BodyPartLocation(8), side=1)
-    body_part = body_part_factory.get_body_part(trigger.body_part)
-    trigger.synergists = trigger_factory.convert_body_part_list(trigger.body_part, body_part.synergists)
-    trigger.antagonists = trigger_factory.convert_body_part_list(trigger.body_part, body_part.antagonists)
-    trigger.created_date_time = datetime.now() - timedelta(days=1)
-    trigger.source_date_time = now_time
-
-    trigger_list.append(trigger)
-
-    trend_processor = TrendProcessor(trigger_list)
-
-    trend_processor.process_triggers()
-
-    trend_processor.athlete_trend_categories[1].plan_alerts[0].cleared_date_time = now_time_2
-
-    trend_processor_2 = TrendProcessor(trigger_list, athlete_trend_categories=trend_processor.athlete_trend_categories)
-
-    trend_processor_2.process_triggers()
-
-    assert trend_processor_2.athlete_trend_categories[1].plan_alerts[0].cleared_date_time is None
+# def test_retriggered_plan_alert():
+#
+#     trigger_list = []
+#     body_part_factory = BodyPartFactory()
+#     trigger_factory = TriggerFactory(datetime.now(), None, [], [])
+#
+#     now_time = datetime.now()
+#     now_time_2 = datetime.now() - timedelta(days=1)
+#
+#     trigger = Trigger(TriggerType.hist_sore_greater_30)
+#     trigger.body_part = BodyPartSide(body_part_location=BodyPartLocation(8), side=1)
+#     body_part = body_part_factory.get_body_part(trigger.body_part)
+#     trigger.synergists = trigger_factory.convert_body_part_list(trigger.body_part, body_part.synergists)
+#     trigger.antagonists = trigger_factory.convert_body_part_list(trigger.body_part, body_part.antagonists)
+#     trigger.created_date_time = datetime.now() - timedelta(days=1)
+#     trigger.source_date_time = now_time
+#
+#     trigger_list.append(trigger)
+#
+#     trend_processor = TrendProcessor(trigger_list)
+#
+#     trend_processor.process_triggers()
+#
+#     trend_processor.athlete_trend_categories[1].plan_alerts[0].cleared_date_time = now_time_2
+#
+#     trend_processor_2 = TrendProcessor(trigger_list, athlete_trend_categories=trend_processor.athlete_trend_categories)
+#
+#     trend_processor_2.process_triggers()
+#
+#     assert trend_processor_2.athlete_trend_categories[1].plan_alerts[0].cleared_date_time is None
 
 
 # def test_new_alert_with_progressed_trigger_after_clearing():

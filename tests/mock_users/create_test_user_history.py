@@ -127,11 +127,11 @@ if __name__ == '__main__':
                 last_plan_date_time = persona1.create_history(days=history_length, suffix='', end_today=True, rpes=rpes)
             else:
                 last_plan_date_time = persona1.create_history(days=history_length, suffix='')
-            clear_fte_category(InsightType.personalized_recovery, jwt, last_plan_date_time)
-            clear_fte_category_view(InsightType.personalized_recovery,
-                                    VisualizationType.prevention, jwt, last_plan_date_time)
-            clear_fte_category_view(InsightType.personalized_recovery,
-                                    VisualizationType.personalized_recovery, jwt, last_plan_date_time)
+                clear_fte_category(InsightType.personalized_recovery, jwt, last_plan_date_time)
+                clear_fte_category_view(InsightType.personalized_recovery,
+                                        VisualizationType.prevention, jwt, last_plan_date_time)
+                clear_fte_category_view(InsightType.personalized_recovery,
+                                        VisualizationType.personalized_recovery, jwt, last_plan_date_time)
             print(time.time() - start)
         elif u == "ts_tread@200.com":
             soreness_history = []
@@ -240,11 +240,11 @@ if __name__ == '__main__':
             persona1 = Persona(user_id)
             persona1.soreness_history = soreness_history
             last_plan_date_time = persona1.create_history(days=history_length, suffix='', end_today=True, rpes=rpes)
-            clear_fte_category(InsightType.personalized_recovery, jwt, last_plan_date_time)
-            clear_fte_category_view(InsightType.personalized_recovery,
-                                    VisualizationType.prevention, jwt, last_plan_date_time)
-            clear_fte_category_view(InsightType.personalized_recovery,
-                                    VisualizationType.personalized_recovery, jwt, last_plan_date_time)
+            # clear_fte_category(InsightType.personalized_recovery, jwt, last_plan_date_time)
+            # clear_fte_category_view(InsightType.personalized_recovery,
+            #                         VisualizationType.prevention, jwt, last_plan_date_time)
+            # clear_fte_category_view(InsightType.personalized_recovery,
+            #                         VisualizationType.personalized_recovery, jwt, last_plan_date_time)
             print(time.time() - start)
 
         elif u == "two_pain@200.com" or u == "two_pain_2@200.com":
