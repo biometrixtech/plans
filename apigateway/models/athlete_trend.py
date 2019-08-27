@@ -460,15 +460,18 @@ class TriggerTile(Serialisable):
         self.description = ""
         self.bold_text = []
         self.statistic_text = ""
+        self.bold_statistic_text = []
         self.trigger_type = None
+        self.sport_name = None
 
     def json_serialise(self):
         ret = {'text': self.text,
                'description': self.description,
                'bold_text': [b.json_serialise() for b in self.bold_text],
                'statistic_text': self.statistic_text,
-               'trigger_type': self.trigger_type.value if self.trigger_type is not None else None
-
+               'bold_statistic_text': [b.json_serialise() for b in self.bold_statistic_text],
+               'trigger_type': self.trigger_type.value if self.trigger_type is not None else None,
+               'sport_name': self.sport_name.value if self.sport_name is not None else None,
                }
         return ret
 
@@ -479,7 +482,10 @@ class TriggerTile(Serialisable):
         trigger_tile.description = input_dict.get('description', '')
         trigger_tile.bold_text = [BoldText.json_deserialise(b) for b in input_dict.get('bold_text', [])]
         trigger_tile.statistic_text = input_dict.get('statistic_text', "")
+        trigger_tile.bold_statistic_text = [BoldText.json_deserialise(b) for b in input_dict.get('bold_statistic_text', [])]
         trigger_tile.trigger_type = TriggerType(input_dict['trigger_type']) if input_dict.get('trigger_type') is not None else None
+        sport_name = input_dict.get('sport_name', None)
+        trigger_tile.sport_name = SportName(sport_name) if sport_name is not None else None
         return trigger_tile
 
 

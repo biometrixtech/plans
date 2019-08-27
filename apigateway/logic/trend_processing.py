@@ -964,8 +964,12 @@ class TrendProcessor(object):
             if t.trigger_type == TriggerType.movement_error_apt_asymmetry:
                 mobilize_suffix = "to address asymmetric stress accumulated in training"
                 statistic_text = ""
+                bold_statistic_text = []
                 if t.metric is not None:
                     statistic_text = str(t.metric) + "% Asymmetric"
+                    bold_stat_text = BoldText()
+                    bold_stat_text.text = str(t.metric) + "%"
+                    bold_statistic_text.append(bold_stat_text)
                 tile_1 = TriggerTile()
                 body_part_text_1, is_plural_1 = self.get_title_text_for_body_parts(t.overactive_tight_first, 0)
                 if len(body_part_text_1) == 0:
@@ -979,6 +983,7 @@ class TrendProcessor(object):
                     bold_1.color = LegendColor.warning_light
                     tile_1.bold_text.append(bold_1)
                     tile_1.statistic_text = statistic_text
+                    tile_1.bold_statistic_text = bold_statistic_text
                     tile_1.trigger_type = t.trigger_type
                     tiles.append(tile_1)
 
@@ -995,18 +1000,23 @@ class TrendProcessor(object):
                     bold_2.color = LegendColor.splash_x_light
                     tile_2.bold_text.append(bold_2)
                     tile_2.statistic_text = statistic_text
+                    tile_2.bold_statistic_text = bold_statistic_text
                     tile_2.trigger_type = t.trigger_type
                     tiles.append(tile_2)
 
             elif t.trigger_type == TriggerType.hist_sore_greater_30:
                 mobilize_suffix = "to correct observed imbalances"
                 statistic_text = ""
+                bold_statistic_text = []
                 if t.source_first_reported_date_time is not None:
                     weeks = ceil((self.event_date_time.date() - t.source_first_reported_date_time.date()).days / 7)
                     if weeks > 1:
                         statistic_text = str(weeks) + " Weeks of Soreness"
                     else:
                         statistic_text = str(weeks) + " Week of Soreness"
+                    bold_stat_text = BoldText()
+                    bold_stat_text.text = str(weeks)
+                    bold_statistic_text.append(bold_stat_text)
                 tile_1 = TriggerTile()
                 body_part_text_1, is_plural_1 = self.get_title_text_for_body_parts(t.agonists, 0)
                 if len(body_part_text_1) == 0:
@@ -1020,6 +1030,7 @@ class TrendProcessor(object):
                     bold_1.color = LegendColor.warning_light
                     tile_1.bold_text.append(bold_1)
                     tile_1.statistic_text = statistic_text
+                    tile_1.bold_statistic_text = bold_statistic_text
                     tile_1.trigger_type = t.trigger_type
                     tiles.append(tile_1)
                 tile_2 = TriggerTile()
@@ -1036,6 +1047,7 @@ class TrendProcessor(object):
                     bold_2.color = LegendColor.splash_light
                     tile_2.bold_text.append(bold_2)
                     tile_2.statistic_text = statistic_text
+                    tile_2.bold_statistic_text = bold_statistic_text
                     tile_2.trigger_type = t.trigger_type
                     tiles.append(tile_2)
                 tile_3 = TriggerTile()
@@ -1049,17 +1061,22 @@ class TrendProcessor(object):
                     bold_3.color = LegendColor.warning_light
                     tile_3.bold_text.append(bold_3)
                     tile_3.statistic_text = statistic_text
+                    tile_3.bold_statistic_text = bold_statistic_text
                     tile_3.trigger_type = t.trigger_type
                     tiles.append(tile_3)
 
             elif t.trigger_type == TriggerType.hist_pain:
                 statistic_text = ""
+                bold_statistic_text = []
                 if t.source_first_reported_date_time is not None:
                     weeks = ceil((self.event_date_time.date() - t.source_first_reported_date_time.date()).days / 7)
                     if weeks > 1:
                         statistic_text = str(weeks) + " Weeks of Pain"
                     else:
                         statistic_text = str(weeks) + " Week of Pain"
+                    bold_stat_text = BoldText()
+                    bold_stat_text.text = str(weeks)
+                    bold_statistic_text.append(bold_stat_text)
                 if not body_part_factory.is_joint(t.body_part):
                     mobilize_suffix = "to correct imbalances exacerbating your pain"
                     tile_1 = TriggerTile()
@@ -1075,6 +1092,7 @@ class TrendProcessor(object):
                         bold_1.color = LegendColor.warning_light
                         tile_1.bold_text.append(bold_1)
                         tile_1.statistic_text = statistic_text
+                        tile_1.bold_statistic_text = bold_statistic_text
                         tile_1.trigger_type = t.trigger_type
                         tiles.append(tile_1)
 
@@ -1092,6 +1110,7 @@ class TrendProcessor(object):
                         tile_2.text = "Strengthen your " + body_part_text_2
                         tile_2.description = mobilize_suffix
                         tile_2.statistic_text = statistic_text
+                        tile_2.bold_statistic_text = bold_statistic_text
                         tile_2.trigger_type = t.trigger_type
                         tiles.append(tile_2)
 
@@ -1106,6 +1125,7 @@ class TrendProcessor(object):
                         bold_3.color = LegendColor.error_light
                         tile_3.bold_text.append(bold_3)
                         tile_3.statistic_text = statistic_text
+                        tile_3.bold_statistic_text = bold_statistic_text
                         tile_3.trigger_type = t.trigger_type
                         tiles.append(tile_3)
 
@@ -1127,6 +1147,7 @@ class TrendProcessor(object):
                         bold_1.color = LegendColor.warning_light
                         tile_1.bold_text.append(bold_1)
                         tile_1.statistic_text = statistic_text
+                        tile_1.bold_statistic_text = bold_statistic_text
                         tile_1.trigger_type = t.trigger_type
                         tiles.append(tile_1)
 
@@ -1141,6 +1162,7 @@ class TrendProcessor(object):
                         bold_2.color = LegendColor.splash_light
                         tile_2.bold_text.append(bold_2)
                         tile_2.statistic_text = statistic_text
+                        tile_2.bold_statistic_text = bold_statistic_text
                         tile_2.trigger_type = t.trigger_type
                         tiles.append(tile_2)
                     tile_3 = TriggerTile()
@@ -1154,6 +1176,7 @@ class TrendProcessor(object):
                         bold_3.color = LegendColor.error_light
                         tile_3.bold_text.append(bold_3)
                         tile_3.statistic_text = statistic_text
+                        tile_3.bold_statistic_text = bold_statistic_text
                         tile_3.trigger_type = t.trigger_type
                         tiles.append(tile_3)
 
@@ -1162,8 +1185,12 @@ class TrendProcessor(object):
                                     TriggerType.hist_pain_pain_today_severity_1_2,
                                     TriggerType.hist_pain_pain_today_severity_3_5]:
                 statistic_text = ""
+                bold_statistic_text = []
                 if t.severity is not None:
                     statistic_text = self.get_severity_descriptor(t.severity) + " Pain Reported"
+                    bold_stat_text = BoldText()
+                    bold_stat_text.text = self.get_severity_descriptor(t.severity)
+                    bold_statistic_text.append(bold_stat_text)
                 if not body_part_factory.is_joint(t.body_part):
                     mobilize_suffix = "to minimize effects of compensations resulting from pain"
                     tile_1 = TriggerTile()
@@ -1178,6 +1205,7 @@ class TrendProcessor(object):
                         bold_1.text = "Foam Roll & Stretch"
                         tile_1.bold_text.append(bold_1)
                         tile_1.statistic_text = statistic_text
+                        tile_1.bold_statistic_text = bold_statistic_text
                         tile_1.trigger_type = t.trigger_type
                         tiles.append(tile_1)
 
@@ -1191,6 +1219,7 @@ class TrendProcessor(object):
                         tile_2.text = "Foam Roll & Static Stretch the muscles supporting your " + body_part_text_2
                         tile_2.description = mobilize_suffix
                         tile_2.statistic_text = statistic_text
+                        tile_2.bold_statistic_text = bold_statistic_text
                         tile_2.trigger_type = t.trigger_type
                         tiles.append(tile_2)
 
@@ -1204,6 +1233,7 @@ class TrendProcessor(object):
                         bold_3.text = "Ice"
                         tile_3.bold_text.append(bold_3)
                         tile_3.statistic_text = statistic_text
+                        tile_3.bold_statistic_text = bold_statistic_text
                         tile_3.trigger_type = t.trigger_type
                         tiles.append(tile_3)
                 else:
@@ -1220,6 +1250,7 @@ class TrendProcessor(object):
                         bold_1.text = "Foam Roll & Static Stretch"
                         tile_1.bold_text.append(bold_1)
                         tile_1.statistic_text = statistic_text
+                        tile_1.bold_statistic_text = bold_statistic_text
                         tile_1.trigger_type = t.trigger_type
                         tiles.append(tile_1)
 
@@ -1235,6 +1266,7 @@ class TrendProcessor(object):
                         bold_2.text = "Ice"
                         tile_2.bold_text.append(bold_2)
                         tile_2.statistic_text = statistic_text
+                        tile_2.bold_statistic_text = bold_statistic_text
                         tile_2.trigger_type = t.trigger_type
                         tiles.append(tile_2)
 
@@ -1243,8 +1275,12 @@ class TrendProcessor(object):
                                     TriggerType.hist_sore_greater_30_sore_today]:
 
                 statistic_text = ""
+                bold_statistic_text = []
                 if t.severity is not None:
                     statistic_text = self.get_severity_descriptor(t.severity) + " Soreness Reported"
+                    bold_stat_text = BoldText()
+                    bold_stat_text.text = self.get_severity_descriptor(t.severity)
+                    bold_statistic_text.append(bold_stat_text)
                 mobilize_suffix = "to reduce soreness & restore range of motion"
                 tile_1 = TriggerTile()
                 body_part_text_1, is_plural_1 = self.get_title_text_for_body_parts(t.agonists, 0)
@@ -1258,6 +1294,7 @@ class TrendProcessor(object):
                     bold_1.text = "Foam Roll & Static Stretch"
                     tile_1.bold_text.append(bold_1)
                     tile_1.statistic_text = statistic_text
+                    tile_1.bold_statistic_text = bold_statistic_text
                     tile_1.trigger_type = t.trigger_type
                     tiles.append(tile_1)
 
@@ -1271,6 +1308,7 @@ class TrendProcessor(object):
                     bold_3.text = "Ice"
                     tile_3.bold_text.append(bold_3)
                     tile_3.statistic_text = statistic_text
+                    tile_3.bold_statistic_text = bold_statistic_text
                     tile_3.trigger_type = t.trigger_type
                     tiles.append(tile_3)
 
@@ -1278,25 +1316,32 @@ class TrendProcessor(object):
 
                 mobilize_suffix = "to increase blood flow & expedite tissue regeneration"
                 statistic_text = ""
+                bold_statistic_text = []
                 if t.metric is not None:
                     statistic_text = str(t.metric) + "% of Max"
+                    bold_stat_text = BoldText()
+                    bold_stat_text.text = str(t.metric)
+                    bold_statistic_text.append(bold_stat_text)
                 sport = SportName(t.sport_name).get_display_name()
                 tile_1 = TriggerTile()
-
+                tile_1.sport_name = t.sport_name
                 tile_1.text = "Mobilize muscles used in " + sport
                 tile_1.description = mobilize_suffix
                 bold_1 = BoldText()
                 bold_1.text = "Mobilize"
                 tile_1.bold_text.append(bold_1)
                 tile_1.statistic_text = statistic_text
+                tile_1.bold_statistic_text = bold_statistic_text
                 tile_1.trigger_type = t.trigger_type
                 tile_2 = TriggerTile()
+                tile_2.sport_name = t.sport_name
                 tile_2.text = "Cold Water Bath your lower body"
                 tile_2.description = "to reduce inflammation and muscle damage"
                 bold_2 = BoldText()
                 bold_2.text = "Cold Water Bath"
                 tile_2.bold_text.append(bold_2)
                 tile_2.statistic_text = statistic_text
+                tile_2.bold_statistic_text = bold_statistic_text
                 tile_2.trigger_type = t.trigger_type
                 # tile_3 = TriggerTile()
                 # tile_3.text = "Dynamic Stretch muscles stressed in " + sport

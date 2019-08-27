@@ -61,7 +61,8 @@ def test_trigger_16():
     trigger.agonists = trigger_factory.convert_body_part_list(trigger.body_part, body_part.agonists)
     trigger.created_date_time = now_time_2
     trigger.source_date_time = now_time
-
+    trigger.severity = 3
+    trigger.source_first_reported_date_time = now_time_2 - timedelta(days=15)
     trigger_list.append(trigger)
 
     trend_processor = TrendProcessor(trigger_list, datetime.now())
