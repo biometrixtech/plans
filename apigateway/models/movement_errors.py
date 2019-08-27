@@ -15,6 +15,8 @@ class MovementError(object):
         self.overactive_tight_second = []
         self.elevated_stress = []
         self.underactive_weak = []
+        self.left_apt = 0
+        self.right_apt = 0
 
     def add_muscle_groups(self, overactive_tight_first, overactive_tight_second, elevated_stress, underactive_weak):
 
@@ -53,12 +55,14 @@ class MovementErrorFactory(object):
 
         return exercise_dict
 
-    def get_movement_error(self, movement_error_type):
+    def get_movement_error(self, movement_error_type, left_apt, right_apt):
 
         if movement_error_type == MovementErrorType.apt_asymmetry:
-            return self.get_apt_asymmetry()
+            return self.get_apt_asymmetry(left_apt, right_apt)
 
-    def get_apt_asymmetry(self):
+    def get_apt_asymmetry(self, left_apt, right_apt):
         movement_error = MovementError(MovementErrorType.apt_asymmetry, BodyPartSide(BodyPartLocation(4), 0))
+        movement_error.left_apt = left_apt
+        movement_error.right_apt = right_apt
         movement_error.add_muscle_groups([6, 21], [4, 26], [16, 15, 5], [14, 25])
         return movement_error

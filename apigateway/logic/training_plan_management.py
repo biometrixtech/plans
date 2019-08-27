@@ -85,7 +85,7 @@ class TrainingPlanManager(object):
         self.athlete_stats.triggers = trigger_factory.triggers
 
         if visualizations:
-            trend_processor = TrendProcessor(trigger_factory.triggers, athlete_trend_categories=self.athlete_stats.trend_categories)
+            trend_processor = TrendProcessor(trigger_factory.triggers, parse_date(event_date), athlete_trend_categories=self.athlete_stats.trend_categories)
             trend_processor.process_triggers()
             self.athlete_stats.trend_categories = trend_processor.athlete_trend_categories
 

@@ -127,6 +127,8 @@ class Trigger(BaseSoreness, Serialisable):
         self.modified_date_time = None
         self.deleted_date_time = None
         self.source_date_time = None
+        self.source_first_reported_date_time = None
+        self.metric = None
         self.priority = 0  # This doesn't need to be persisted, just used in logic
         self.body_part_priority = 0  # This doesn't need to be persisted, just used in logic
 
@@ -153,7 +155,10 @@ class Trigger(BaseSoreness, Serialisable):
             "deleted_date_time": format_datetime(
                 self.deleted_date_time) if self.deleted_date_time is not None else None,
             "source_date_time": format_datetime(
-                self.source_date_time) if self.source_date_time is not None else None
+                self.source_date_time) if self.source_date_time is not None else None,
+            "source_first_reported_date_time": format_datetime(
+                self.source_date_time) if self.source_date_time is not None else None,
+            'metric': self.metric if self.metric is not None else None
         }
 
     @classmethod
@@ -178,6 +183,9 @@ class Trigger(BaseSoreness, Serialisable):
         trigger.modified_date_time = parse_datetime(input_dict["modified_date_time"]) if input_dict.get("modified_date_time") is not None else None
         trigger.deleted_date_time = parse_datetime(input_dict["deleted_date_time"]) if input_dict.get("deleted_date_time") is not None else None
         trigger.source_date_time = parse_datetime(input_dict["source_date_time"]) if input_dict.get("source_date_time") is not None else None
+        trigger.source_first_reported_date_time = parse_datetime(input_dict["source_first_reported_date_time"]) if input_dict.get(
+            "source_first_reported_date_time") is not None else None
+        trigger.metric = input_dict['metric'] if input_dict.get('metric') is not None else None
         return trigger
 
     def __setattr__(self, name, value):

@@ -887,7 +887,7 @@ class ActiveRest(ModalityBase):
             #    goal = AthleteGoal(None, 1, AthleteGoalType.sport)
                 #trigger_list[t].goals.append(goal)
             if trigger_list[t].trigger_type == TriggerType.high_volume_intensity:  # 0
-                goal = AthleteGoal("Care: High Load", 1, AthleteGoalType.high_load)
+                goal = AthleteGoal("High Load", 1, AthleteGoalType.high_load)
                 #trigger_list[t].goals.append(goal)
                 body_part_factory = BodyPartFactory()
 
@@ -1019,7 +1019,7 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
         if trigger_list is not None:
             for t in trigger_list:
                 if TriggerType.movement_error_apt_asymmetry == t.trigger_type:
-                    goal = AthleteGoal("Recovery: Asymmetric Stress", 1, AthleteGoalType.asymmetric_session)
+                    goal = AthleteGoal("Asymmetric Stress", 1, AthleteGoalType.asymmetric_session)
                     factory = MovementErrorFactory()
                     movement_error = factory.get_movement_error(MovementErrorType.apt_asymmetry)
 
@@ -1157,7 +1157,7 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
 
             body_part = body_part_factory.get_body_part(trigger.body_part)
 
-            goal = AthleteGoal("Care: Soreness", 1, AthleteGoalType.sore)
+            goal = AthleteGoal("Soreness", 1, AthleteGoalType.sore)
 
             # if soreness.historic_soreness_status == HistoricSorenessStatus.doms:
             #     goal.trigger_type = TriggerType.sore_today_doms  # 11
@@ -1216,7 +1216,7 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
         if trigger.trigger_type == TriggerType.hist_sore_greater_30: # 19
 
             body_part = body_part_factory.get_body_part(trigger.body_part)
-            goal = AthleteGoal("Prevention: Chronic Imbalances", 2, AthleteGoalType.corrective)
+            goal = AthleteGoal("Chronic Imbalances", 2, AthleteGoalType.corrective)
 
             if body_part is not None:
                 # alert = Alert(goal)
@@ -1259,7 +1259,7 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
         #         goal.trigger_type = TriggerType.hist_pain  # 16
         if trigger.trigger_type == TriggerType.hist_pain:  # 16
             body_part = body_part_factory.get_body_part(trigger.body_part)
-            goal = AthleteGoal("Prevention: Chronic Imbalances", 2, AthleteGoalType.corrective)
+            goal = AthleteGoal("Chronic Imbalances", 2, AthleteGoalType.corrective)
 
             if body_part is not None:
                 # alert = Alert(goal)
@@ -1336,7 +1336,7 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
 
             body_part = body_part_factory.get_body_part(trigger.body_part)
 
-            goal = AthleteGoal("Care: Pain", 1, AthleteGoalType.pain)
+            goal = AthleteGoal("Pain", 1, AthleteGoalType.pain)
             if body_part is not None:
                 # alert = Alert(goal)
                 # alert.body_part = trigger.body_part
@@ -1484,9 +1484,9 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
 
             for t in trigger_list:
                 if TriggerType.movement_error_apt_asymmetry == t.trigger_type:
-                    goal = AthleteGoal("Recovery: Asymmetric Stress", 1, AthleteGoalType.asymmetric_session)
+                    goal = AthleteGoal("Asymmetric Stress", 1, AthleteGoalType.asymmetric_session)
                     factory = MovementErrorFactory()
-                    movement_error = factory.get_movement_error(MovementErrorType.apt_asymmetry)
+                    movement_error = factory.get_movement_error(MovementErrorType.apt_asymmetry, 325, 275)
 
                     body_part_factory = BodyPartFactory()
 
@@ -1520,7 +1520,7 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
 
     def check_reactive_recover_from_sport_general(self, sports, exercise_library, goal, max_severity):
 
-        goal = AthleteGoal("Care: High Load", 1, AthleteGoalType.high_load)
+        goal = AthleteGoal("High Load", 1, AthleteGoalType.high_load)
         # goal.trigger = "High Relative Volume or Intensity of Logged Session"
 
         body_part_factory = BodyPartFactory()
@@ -1636,7 +1636,7 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
                                     TriggerType.hist_sore_greater_30_sore_today]:
 
             body_part = body_part_factory.get_body_part(trigger.body_part)
-            goal = AthleteGoal("Care: Soreness", 1, AthleteGoalType.sore)
+            goal = AthleteGoal("Soreness", 1, AthleteGoalType.sore)
 
             if body_part is not None:
                 # alert = Alert(goal)
@@ -1677,7 +1677,7 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
         #         goal.trigger_type = TriggerType.hist_sore_greater_30  # 19
         if trigger.trigger_type == TriggerType.hist_sore_greater_30:  # 19
             body_part = body_part_factory.get_body_part(trigger.body_part)
-            goal = AthleteGoal("Prevention: Chronic Imbalances", 2, AthleteGoalType.corrective)
+            goal = AthleteGoal("Chronic Imbalances", 2, AthleteGoalType.corrective)
 
             if body_part is not None:
                 # alert = Alert(goal)
@@ -1721,7 +1721,7 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
         #         goal.trigger_type = TriggerType.hist_pain  # 16
         if trigger.trigger_type == TriggerType.hist_pain:  # 16
             body_part = body_part_factory.get_body_part(trigger.body_part)
-            goal = AthleteGoal("Prevention: Chronic Imbalances", 2, AthleteGoalType.corrective)
+            goal = AthleteGoal("Chronic Imbalances", 2, AthleteGoalType.corrective)
 
             if body_part is not None:
                 # alert = Alert(goal)
@@ -1762,7 +1762,7 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
 
             body_part = body_part_factory.get_body_part(trigger.body_part)
 
-            goal = AthleteGoal("Care: Pain", 1, AthleteGoalType.pain)
+            goal = AthleteGoal("Pain", 1, AthleteGoalType.pain)
 
             synergist_priority = "2"
 
@@ -2089,7 +2089,7 @@ class CoolDown(ModalityBase, Serialisable):
         #         self.alerts.append(alert)
 
             if trigger_list[t].trigger_type == TriggerType.high_volume_intensity and max_severity < 2.5:  # 0
-                goal = AthleteGoal("Care: High Load", 1, AthleteGoalType.high_load)
+                goal = AthleteGoal("High Load", 1, AthleteGoalType.high_load)
                 #trigger_list[t].goals.append(goal)
 
         # if max_severity < 2.5:  # note this is only a pain value for cooldown

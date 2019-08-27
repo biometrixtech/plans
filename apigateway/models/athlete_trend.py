@@ -461,13 +461,15 @@ class TriggerTile(Serialisable):
         self.title_color = None
         self.bold_text = []
         self.order = 0
+        self.statistic_text = ""
 
     def json_serialise(self):
         ret = {'text': self.text,
                'title': self.title,
                'title_color': self.title_color.value if self.title_color is not None else None,
                'bold_text': [b.json_serialise() for b in self.bold_text],
-               'order': self.order
+               'order': self.order,
+               'statistic_text': self.statistic_text
                }
         return ret
 
@@ -479,6 +481,7 @@ class TriggerTile(Serialisable):
         trigger_tile.title_color = LegendColor(input_dict['title_color']) if input_dict.get('title_color') is not None else None
         trigger_tile.bold_text = [BoldText.json_deserialise(b) for b in input_dict.get('bold_text', [])]
         trigger_tile.order = input_dict.get('order', 0)
+        trigger_tile.statistic_text = input_dict.get('statistic_text', "")
         return trigger_tile
 
 
