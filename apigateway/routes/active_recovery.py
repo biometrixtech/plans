@@ -187,7 +187,7 @@ def handle_request_mobilize(user_id=None):
                        mobilize_only=True,
                        visualizations=visualizations)
 
-    plan = cleanup_plan(plan, visualizations=visualizations)
+    # plan = cleanup_plan(plan, visualizations=visualizations)
 
     return {'daily_plans': [plan]}, 200
 
