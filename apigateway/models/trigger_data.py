@@ -146,7 +146,7 @@ visualization_data = {
                         'series': "tight"
                     },
                     {
-                        'color': 14,
+                        'color': 7,
                         'text': "Elevated Stress",
                         'type': 0,
                         'series': "elevated_stress"
@@ -197,7 +197,7 @@ visualization_data = {
                         'series': "soreness"
                     },
                     {
-                        'color': 4,
+                        'color': 7,
                         'text': "Elevated Stress",
                         'type': 0,
                         'series': "elevated_stress"
