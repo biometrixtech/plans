@@ -13,6 +13,10 @@ class TriggerFactory(object):
 
         if athlete_stats is not None and athlete_stats.triggers is not None:
             self.triggers = athlete_stats.triggers
+        if athlete_stats is not None and athlete_stats.load_stats is not None:
+            self.load_stats = athlete_stats.load_stats
+        if athlete_stats is not None and athlete_stats.sport_max_load is not None:
+            self.sport_max_load = athlete_stats.sport_max_load
         self.high_relative_load_session = False
         self.high_relative_intensity_session = False
         self.high_relative_load_session_sport_names = set()
@@ -21,7 +25,7 @@ class TriggerFactory(object):
         self.soreness_list = soreness_list
         self.training_sessions = training_sessions
         self.eligible_for_high_load_trigger = athlete_stats.eligible_for_high_load_trigger if athlete_stats is not None else False
-        self.high_load_session_count = 0
+        self.high_load_sessions = []
 
         if self.eligible_for_high_load_trigger:
             self.set_high_relative_load_session(athlete_stats)
@@ -45,21 +49,19 @@ class TriggerFactory(object):
             self.high_relative_load_session = True
             self.high_relative_load_session_sport_names.add(t.sport_name)
 
+        self.high_load_sessions = todays_sessions
+
     def process_training_sessions_intensity(self):
 
         high_relative_intensity_session = False
-        high_load_session_count = 0
         for t in self.training_sessions:
             if t.high_intensity():
                 high_relative_intensity_session = True
-                high_load_session_count += 1
                 self.high_relative_load_session_sport_names.add(t.sport_name)
-
-        self.high_load_session_count = high_load_session_count
 
         return high_relative_intensity_session
 
-    def set_trigger(self, trigger_type, soreness=None, sport_name=None, movement_error=None, metric=None):
+    def set_trigger(self, trigger_type, soreness=None, sport_name=None, movement_error=None):
 
         trigger_index = -1
 
@@ -153,8 +155,19 @@ class TriggerFactory(object):
                 trigger.antagonists = self.get_body_part_list(body_part.antagonists)
                 trigger.synergists = self.get_body_part_list(body_part.synergists)
                 trigger.stabilizers = self.get_body_part_list(body_part.stabilizers)
-                if metric is not None:
-                    trigger.metric = metric
+                sport_sessions = [t for t in self.high_load_sessions if t.sport_name == sport_name]
+
+                max_percent = None
+
+                for s in sport_sessions:  #these are HighLoadSessions
+                    session_max = s.percent_of_max
+                    if session_max is not None:
+                        if max_percent is None:
+                            max_percent = session_max
+                        else:
+                            max_percent = max(max_percent, session_max)
+
+                trigger.metric = max_percent
 
             self.triggers.append(trigger)
 
@@ -209,7 +222,8 @@ class TriggerFactory(object):
         if self.high_relative_load_session or self.high_relative_intensity_session:
 
             for sport_name in self.high_relative_load_session_sport_names:
-                self.set_trigger(TriggerType.high_volume_intensity, sport_name=sport_name, metric=self.high_load_session_count)  # 0
+
+                self.set_trigger(TriggerType.high_volume_intensity, sport_name=sport_name)  # 0
 
         hist_soreness = list(s for s in self.soreness_list if not s.is_dormant_cleared() and not s.pain and
                              (s.is_persistent_soreness() or

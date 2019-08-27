@@ -1163,7 +1163,7 @@ class TrendProcessor(object):
                                     TriggerType.hist_pain_pain_today_severity_3_5]:
                 statistic_text = ""
                 if t.severity is not None:
-                    statistic_text = str(t.severity) + " Pain Reported"
+                    statistic_text = self.get_severity_descriptor(t.severity) + " Pain Reported"
                 if not body_part_factory.is_joint(t.body_part):
                     mobilize_suffix = "to minimize effects of compensations resulting from pain"
                     tile_1 = TriggerTile()
@@ -1244,7 +1244,7 @@ class TrendProcessor(object):
 
                 statistic_text = ""
                 if t.severity is not None:
-                    statistic_text = str(t.severity) + " Soreness Reported"
+                    statistic_text = self.get_severity_descriptor(t.severity) + " Soreness Reported"
                 mobilize_suffix = "to reduce soreness & restore range of motion"
                 tile_1 = TriggerTile()
                 body_part_text_1, is_plural_1 = self.get_title_text_for_body_parts(t.agonists, 0)
@@ -1279,7 +1279,7 @@ class TrendProcessor(object):
                 mobilize_suffix = "to increase blood flow & expedite tissue regeneration"
                 statistic_text = ""
                 if t.metric is not None:
-                    statistic_text = str(t.metric) + " High Load Workouts"
+                    statistic_text = str(t.metric) + "% of Max"
                 sport = SportName(t.sport_name).get_display_name()
                 tile_1 = TriggerTile()
 
@@ -1311,6 +1311,16 @@ class TrendProcessor(object):
                 #tiles.append(tile_3)
 
         return tiles
+
+    def get_severity_descriptor(self, severity):
+
+        if severity <= 2:
+            return "Mild"
+        elif 2 < severity <= 3:
+            return "Moderate"
+        else:
+            return "Severe"
+
 
 
 

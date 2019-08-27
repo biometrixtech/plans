@@ -349,11 +349,28 @@ class TrainingVolumeProcessing(object):
                         athlete_stats.training_load_ramp[t.sport_name].observed_value > 1.1):
                     if t.session_RPE is not None and t.session_RPE > 4:
                         high_load_session = HighLoadSession(t.event_date, t.sport_name)
+                        high_load_session.percent_of_max = self.get_max_training_percent(t)
                         self.high_relative_load_sessions.append(high_load_session)
             else:
                 if t.session_RPE is not None and t.session_RPE > 4:
                     high_load_session = HighLoadSession(t.event_date, t.sport_name)
+                    high_load_session.percent_of_max = self.get_max_training_percent(t)
                     self.high_relative_load_sessions.append(high_load_session)
+
+    def get_max_training_percent(self, training_session):
+
+        percent = None
+
+        if self.load_stats is not None and self.sport_max_load is not None:
+            training_volume = training_session.training_volume(self.load_stats)
+            if training_volume is not None and training_volume > 0:
+                training_volume = round(training_volume, 2)
+
+                if training_session.sport_name.value in self.sport_max_load:
+
+                    percent = int(round((training_volume / self.sport_max_load[training_session.sport_name.value].load) * 100, 0))
+
+        return percent
 
     @xray_recorder.capture('logic.TrainingVolumeProcessing.calc_training_volume_metrics')
     def calc_training_volume_metrics(self, athlete_stats):
