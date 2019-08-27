@@ -432,19 +432,22 @@ class ModalityBase(object):
                 dosage.default_comprehensive_sets_assigned = 2
 
         elif dosage.goal.goal_type == AthleteGoalType.asymmetric_session:
-            if dosage.priority == "1" or dosage.priority == "2" or dosage.priority == "3":
+            if dosage.priority == "1":
                 dosage.efficient_reps_assigned = exercise.min_reps
                 dosage.efficient_sets_assigned = 1
-                dosage.complete_reps_assigned = exercise.max_reps
-                dosage.complete_sets_assigned = 1
-                dosage.comprehensive_reps_assigned = exercise.max_reps
-                dosage.comprehensive_sets_assigned = 2
                 dosage.default_efficient_reps_assigned = exercise.min_reps
                 dosage.default_efficient_sets_assigned = 1
-                dosage.default_complete_reps_assigned = exercise.max_reps
+
+            if dosage.priority == "1" or dosage.priority == "2":
+                dosage.complete_reps_assigned = exercise.min_reps
+                dosage.complete_sets_assigned = 1
+                dosage.default_complete_reps_assigned = exercise.min_reps
                 dosage.default_complete_sets_assigned = 1
-                dosage.default_comprehensive_reps_assigned = exercise.max_reps
-                dosage.default_comprehensive_sets_assigned = 2
+
+            dosage.comprehensive_reps_assigned = exercise.min_reps
+            dosage.comprehensive_sets_assigned = 1
+            dosage.default_comprehensive_reps_assigned = exercise.min_reps
+            dosage.default_comprehensive_sets_assigned = 1
 
         elif dosage.goal.goal_type == AthleteGoalType.on_request:
             if dosage.priority == "1":

@@ -60,5 +60,5 @@ class MovementErrorFactory(object):
 
     def get_apt_asymmetry(self):
         movement_error = MovementError(MovementErrorType.apt_asymmetry, BodyPartSide(BodyPartLocation(4), 0))
-        movement_error.add_muscle_groups([6, 21], [4, 18], [16, 15, 5], [14, 3])
+        movement_error.add_muscle_groups([6, 21], [4, 26], [16, 15, 5], [14, 25])
         return movement_error

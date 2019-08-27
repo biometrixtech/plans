@@ -140,13 +140,13 @@ visualization_data = {
                 'y_axis_2': "",
                 'legend': [
                     {
-                        'color': 6,
+                        'color': 5,
                         'text': "Tight",
                         'type': 0,
                         'series': "tight"
                     },
                     {
-                        'color': 7,
+                        'color': 14,
                         'text': "Elevated Stress",
                         'type': 0,
                         'series': "elevated_stress"
@@ -159,6 +159,12 @@ visualization_data = {
                 'y_axis_2': "",
                 'legend': [
                     {
+                        'color': 6,
+                        'text': "Pain",
+                        'type': 0,
+                        'series': "pain"
+                    },
+                    {
                         'color': 5,
                         'text': "Overactive",
                         'type': 0,
@@ -169,13 +175,8 @@ visualization_data = {
                         'text': "Weak",
                         'type': 0,
                         'series': "weak"
-                    },
-                    {
-                        'color': 7,
-                        'text': "Pain",
-                        'type': 0,
-                        'series': "pain"
                     }
+
                 ]
             },
             11: {
@@ -184,19 +185,19 @@ visualization_data = {
                 'y_axis_2': "",
                 'legend': [
                     {
-                        'color': 5,
+                        'color': 6,
                         'text': "Pain",
                         'type': 0,
                         'series': "pain"
                     },
                     {
-                        'color': 4,
+                        'color': 5,
                         'text': "Soreness",
                         'type': 0,
                         'series': "soreness"
                     },
                     {
-                        'color': 7,
+                        'color': 4,
                         'text': "Elevated Stress",
                         'type': 0,
                         'series': "elevated_stress"
