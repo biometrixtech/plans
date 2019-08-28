@@ -229,3 +229,48 @@ def update_dates(daily_plans, athlete_stats, event_date):
                 hs.streak_start_date = hs.streak_start_date + delta
             if hs.last_reported_date_time is not None:
                 hs.last_reported_date_time = hs.last_reported_date_time + delta
+
+
+
+@misc_app.route('/dailycron', methods=['POST'])
+@xray_recorder.capture('routes.misc.dailycron')
+def handle_dailycron():
+    # This route will be called daily via a CloudWatch Scheduled Event.
+    Service('plans', Config.get('API_VERSION')).call_apigateway_sync('POST', '/misc/activeusers', body={})
+
+    return {'status': 'Success'}, 200
+
+
+@misc_app.route('/activeusers', methods=['POST'])
+@require.authenticated.any
+@require.body({})
+@xray_recorder.capture('routes.misc.activeusers')
+def handle_activeusers():
+    # This route will be invoked daily.  It should scan to find users which meet
+    # some definition of 'active', and for each one should push to the plans service with them
+    print('here')
+
+    # user_data = list(UserData.get_many(id=[user.id for user in active_users]))
+
+    # plans_service = Service('plans', Config.get('API_VERSION'))
+    # now = datetime.datetime.now()
+    # calls = []
+    # for user in active_users:
+    #     try:
+    #         user_datum = next(ud for ud in user_data if ud.id == user.id)
+    #     except StopIteration:
+    #         print(f"user not found {user.id}")
+    #         continue
+    #     body = {"timezone": user_datum.get().get('timezone', None) or "-05:00"}
+
+    #     calls.append({'method': 'POST', 'endpoint': f'/athlete/{user.id}/active', 'body': body})
+
+    # plans_service.call_apigateway_async_multi(calls=calls, jitter=10 * 60)
+
+    # return {'status': 'Success'}
+
+
+def _get_all_users():
+    pass
+
+
