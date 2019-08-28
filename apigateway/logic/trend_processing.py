@@ -1320,7 +1320,7 @@ class TrendProcessor(object):
                 if t.metric is not None:
                     statistic_text = str(t.metric) + "% of Max"
                     bold_stat_text = BoldText()
-                    bold_stat_text.text = str(t.metric)
+                    bold_stat_text.text = str(t.metric) + "%"
                     bold_statistic_text.append(bold_stat_text)
                 sport = SportName(t.sport_name).get_display_name()
                 tile_1 = TriggerTile()
