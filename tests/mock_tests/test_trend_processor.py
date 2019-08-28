@@ -170,11 +170,11 @@ def test_trigger_0():
     recovery_category = trend_processor.get_category_index(InsightType.personalized_recovery)
 
     assert trend_processor.athlete_trend_categories[prevention_category].visible is False
-    assert trend_processor.athlete_trend_categories[recovery_category].visible is False
-    assert trend_processor.athlete_trend_categories[care_category].visible is True
-    assert trend_processor.athlete_trend_categories[care_category].trends[0].visible is True
-    assert trend_processor.athlete_trend_categories[care_category].trends[0].title == "Daily Care"
-    assert trend_processor.athlete_trend_categories[care_category].trends[0].last_date_time is not None
+    assert trend_processor.athlete_trend_categories[recovery_category].visible is True
+    assert trend_processor.athlete_trend_categories[care_category].visible is False
+    assert trend_processor.athlete_trend_categories[recovery_category].trends[0].visible is True
+    #assert trend_processor.athlete_trend_categories[recovery_category].trends[0].title == "Personalized Recovery"
+    assert trend_processor.athlete_trend_categories[recovery_category].trends[0].last_date_time is not None
 
     json_data = trend_processor.athlete_trend_categories[care_category].trends[0].json_serialise()
 

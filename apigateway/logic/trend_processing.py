@@ -455,13 +455,17 @@ class TrendProcessor(object):
         # for t in triggers_7:
         #     t.priority = 3
 
+        triggers_load = list(t for t in self.trigger_list if t.trigger_type == TriggerType.high_volume_intensity)
+        for t in triggers_load:
+            t.priority = 4
+
         triggers_110 = list(t for t in self.trigger_list if t.trigger_type == TriggerType.movement_error_apt_asymmetry)
         for t in triggers_110:
             t.priority = 1
 
         # since we're reverse sorting, 2 is a higher priority than 1
 
-        if len(triggers_110) > 0:
+        if len(triggers_110) > 0 or len(triggers_load) > 0:
 
             #antagonists_7, synergists_7 = self.get_antagonists_syngergists(triggers_7)
 
@@ -478,89 +482,94 @@ class TrendProcessor(object):
                 recovery_data.tight.extend([a for a in t.overactive_tight_first])
                 recovery_data.elevated_stress.extend([s for s in t.elevated_stress])
 
+            for t in triggers_load:
+                recovery_data.elevated_stress.extend([a for a in t.agonists])
+                recovery_data.elevated_stress.extend([s for s in t.antagonists])
+
             recovery_data.remove_duplicates()
             trend_data.data = [recovery_data]
 
             all_triggers = []
             #all_triggers.extend(triggers_7)
             all_triggers.extend(triggers_110)
+            all_triggers.extend(triggers_load)
 
             trend.trigger_tiles = self.get_trigger_tiles(all_triggers)
 
             # rank triggers
-            sorted_triggers = sorted(all_triggers, key=lambda x: (x.created_date_time, x.priority), reverse=True)
-
-            text_generator = RecoveryTextGenerator()
-            body_part_factory = BodyPartFactory()
-
-            top_candidates = list(s for s in sorted_triggers if s.created_date_time == sorted_triggers[0].created_date_time and s.priority == sorted_triggers[0].priority)
-
-            trend.top_priority_trigger, is_body_part_plural = self.get_highest_priority_body_part_from_triggers(body_part_factory, top_candidates)
-
-            if is_body_part_plural:
-                side = 0
-            else:
-                side = trend.top_priority_trigger.body_part.side
-
-            if is_body_part_plural and trend.top_priority_trigger.priority == 2:
-                if trend.top_priority_trigger.body_part is not None:
-                    body_part_text = text_generator.get_body_part_text_plural(
-                        trend.top_priority_trigger.body_part.body_part_location, None)
-                else:
-                    body_part_text = ""
-            else:
-                #body_part_text = text_generator.get_body_part_text(trend.top_priority_trigger.body_part.body_part_location, None)
-                body_part_text = ""
-            body_part_text = body_part_text.title()
-
-            if trend.top_priority_trigger.priority == 1:
-                title_body_part_text, is_title_plural = self.get_title_text_for_body_parts(trend.top_priority_trigger.synergists, side)
-                trend_data.title = "Elevated strain on " + title_body_part_text
-                trend.plan_alert_short_title = "elevated strain on " + title_body_part_text
-                clean_title_body_part_text = title_body_part_text.replace('&', 'and')
-                body_text = ("Signs of " + body_part_text + " overactivity in your soreness data suggest that supporting tissues like the " + clean_title_body_part_text +
-                            " are experiencing elevated levels of strain which can lead to tissue fatigue and strength imbalances that affect performance and increase injury risk.")
-                #trend.dashboard_body_part, trend.dashboard_body_part_text = self.get_title_body_part_and_text(trend.top_priority_trigger.synergists, side)
-            else:
-                title_body_part_text, is_title_plural = self.get_title_text_for_body_parts(trend.top_priority_trigger.antagonists, side)
-                title_body_part_text_not_plural, is_title_plural_false = self.get_title_text_for_body_parts(trend.top_priority_trigger.antagonists, side, use_plural=False)
-                trend_data.title = title_body_part_text + " may lack strength"
-                #trend.plan_alert_short_title = title_body_part_text + " weakness"
-                trend.plan_alert_short_title = title_body_part_text_not_plural + " weakness"
-                clean_title_body_part_text = title_body_part_text.replace('&','and')
-
-                if is_title_plural:
-                    for_a_weak_phrase = "for weak"
-                else:
-                    for_a_weak_phrase = "for a weak"
-
-                body_text = ("Patterns in your soreness data suggest that your " + body_part_text + " may actually be overactive due to a chronic over-compensation " + for_a_weak_phrase + " "
-                             + clean_title_body_part_text + ".  This dysfunction could exacerbate movement imbalances and elevate your risk of chronic injury.")
-
-                #trend.dashboard_body_part, trend.dashboard_body_part_text = self.get_title_body_part_and_text(recovery_data.tight, side)
-
-            trend_data.text = body_text
-
-            bold_text_3 = BoldText()
-            bold_text_3.text = body_part_text
-            bold_text_3.color = LegendColor.warning_light
-            trend_data.bold_text.append(bold_text_3)
-
-            if trend.top_priority_trigger.priority == 1:
-
-                bold_text_4 = BoldText()
-                bold_text_4.text = clean_title_body_part_text
-                bold_text_4.color = LegendColor.splash_light
-
-                trend_data.bold_text.append(bold_text_4)
-
-            else:
-
-                bold_text_4 = BoldText()
-                bold_text_4.text = clean_title_body_part_text
-                bold_text_4.color = LegendColor.splash_x_light
-
-                trend_data.bold_text.append(bold_text_4)
+            # sorted_triggers = sorted(all_triggers, key=lambda x: (x.created_date_time, x.priority), reverse=True)
+            #
+            # text_generator = RecoveryTextGenerator()
+            # body_part_factory = BodyPartFactory()
+            #
+            # top_candidates = list(s for s in sorted_triggers if s.created_date_time == sorted_triggers[0].created_date_time and s.priority == sorted_triggers[0].priority)
+            #
+            # trend.top_priority_trigger, is_body_part_plural = self.get_highest_priority_body_part_from_triggers(body_part_factory, top_candidates)
+            #
+            # if is_body_part_plural:
+            #     side = 0
+            # else:
+            #     side = trend.top_priority_trigger.body_part.side
+            #
+            # if is_body_part_plural and trend.top_priority_trigger.priority == 2:
+            #     if trend.top_priority_trigger.body_part is not None:
+            #         body_part_text = text_generator.get_body_part_text_plural(
+            #             trend.top_priority_trigger.body_part.body_part_location, None)
+            #     else:
+            #         body_part_text = ""
+            # else:
+            #     #body_part_text = text_generator.get_body_part_text(trend.top_priority_trigger.body_part.body_part_location, None)
+            #     body_part_text = ""
+            # body_part_text = body_part_text.title()
+            #
+            # if trend.top_priority_trigger.priority == 1:
+            #     title_body_part_text, is_title_plural = self.get_title_text_for_body_parts(trend.top_priority_trigger.synergists, side)
+            #     trend_data.title = "Elevated strain on " + title_body_part_text
+            #     trend.plan_alert_short_title = "elevated strain on " + title_body_part_text
+            #     clean_title_body_part_text = title_body_part_text.replace('&', 'and')
+            #     body_text = ("Signs of " + body_part_text + " overactivity in your soreness data suggest that supporting tissues like the " + clean_title_body_part_text +
+            #                 " are experiencing elevated levels of strain which can lead to tissue fatigue and strength imbalances that affect performance and increase injury risk.")
+            #     #trend.dashboard_body_part, trend.dashboard_body_part_text = self.get_title_body_part_and_text(trend.top_priority_trigger.synergists, side)
+            # else:
+            #     title_body_part_text, is_title_plural = self.get_title_text_for_body_parts(trend.top_priority_trigger.antagonists, side)
+            #     title_body_part_text_not_plural, is_title_plural_false = self.get_title_text_for_body_parts(trend.top_priority_trigger.antagonists, side, use_plural=False)
+            #     trend_data.title = title_body_part_text + " may lack strength"
+            #     #trend.plan_alert_short_title = title_body_part_text + " weakness"
+            #     trend.plan_alert_short_title = title_body_part_text_not_plural + " weakness"
+            #     clean_title_body_part_text = title_body_part_text.replace('&','and')
+            #
+            #     if is_title_plural:
+            #         for_a_weak_phrase = "for weak"
+            #     else:
+            #         for_a_weak_phrase = "for a weak"
+            #
+            #     body_text = ("Patterns in your soreness data suggest that your " + body_part_text + " may actually be overactive due to a chronic over-compensation " + for_a_weak_phrase + " "
+            #                  + clean_title_body_part_text + ".  This dysfunction could exacerbate movement imbalances and elevate your risk of chronic injury.")
+            #
+            #     #trend.dashboard_body_part, trend.dashboard_body_part_text = self.get_title_body_part_and_text(recovery_data.tight, side)
+            #
+            # trend_data.text = body_text
+            #
+            # bold_text_3 = BoldText()
+            # bold_text_3.text = body_part_text
+            # bold_text_3.color = LegendColor.warning_light
+            # trend_data.bold_text.append(bold_text_3)
+            #
+            # if trend.top_priority_trigger.priority == 1:
+            #
+            #     bold_text_4 = BoldText()
+            #     bold_text_4.text = clean_title_body_part_text
+            #     bold_text_4.color = LegendColor.splash_light
+            #
+            #     trend_data.bold_text.append(bold_text_4)
+            #
+            # else:
+            #
+            #     bold_text_4 = BoldText()
+            #     bold_text_4.text = clean_title_body_part_text
+            #     bold_text_4.color = LegendColor.splash_x_light
+            #
+            #     trend_data.bold_text.append(bold_text_4)
 
             trend.trend_data = trend_data
 
@@ -700,11 +709,7 @@ class TrendProcessor(object):
         for t in triggers_sore:
             t.priority = 3
 
-        triggers_load = list(t for t in self.trigger_list if t.trigger_type == TriggerType.high_volume_intensity)
-        for t in triggers_load:
-            t.priority = 4
-
-        if len(triggers_pain) > 0 or len(triggers_sore) > 0 or len(triggers_load) > 0:
+        if len(triggers_pain) > 0 or len(triggers_sore) > 0:
 
             trend = self.get_care_trend(category_index)
 
@@ -729,68 +734,63 @@ class TrendProcessor(object):
                 care_data.soreness.extend([t.body_part])
                 care_data.elevated_stress.extend([s for s in t.synergists])
 
-            for t in triggers_load:
-                care_data.elevated_stress.extend([a for a in t.agonists])
-                care_data.elevated_stress.extend([s for s in t.antagonists])
-
             care_data.remove_duplicates()
             trend_data.data = [care_data]
 
             all_triggers = []
             all_triggers.extend(triggers_pain)
             all_triggers.extend(triggers_sore)
-            all_triggers.extend(triggers_load)
 
             trend.trigger_tiles = self.get_trigger_tiles(all_triggers)
 
             # rank triggers
-            sorted_triggers = sorted(all_triggers, key=lambda x: (x.created_date_time, x.priority), reverse=True)
+            #sorted_triggers = sorted(all_triggers, key=lambda x: (x.created_date_time, x.priority), reverse=True)
 
             trend.triggers = all_triggers
 
-            text_generator = RecoveryTextGenerator()
-            body_part_factory = BodyPartFactory()
-
-            top_candidates = list(
-                s for s in sorted_triggers if s.created_date_time == sorted_triggers[0].created_date_time)
-
-            trend.top_priority_trigger, is_body_part_plural = self.get_highest_priority_body_part_from_triggers(
-                body_part_factory, top_candidates)
-
-            if is_body_part_plural:
-                side = 0
-            else:
-                side = trend.top_priority_trigger.body_part.side
-
-            if trend.top_priority_trigger.body_part is not None:
-                body_part_text = text_generator.get_body_part_text(trend.top_priority_trigger.body_part.body_part_location,
-                                                                   None)
-            else:
-                body_part_text = ""
-
-            body_part_text = body_part_text.title()
-
-            title_body_part_text, is_title_plural = self.get_title_text_for_body_parts(
-                trend.top_priority_trigger.synergists, side)
-            trend_data.title = "Elevated strain on " + title_body_part_text
-            trend.plan_alert_short_title = "elevated strain on " + title_body_part_text
-            clean_title_body_part_text = title_body_part_text.replace('&', 'and')
-            body_text = (
-                        "Athletes struggling with recurring " + body_part_text + " pain often develop misalignments that over-stress their " + clean_title_body_part_text +
-                        ". Without proactive measures, this can lead to accumulated micro-trauma in the tissues and new areas of pain or injury over time.")
-            # trend.dashboard_body_part, trend.dashboard_body_part_text = self.get_title_body_part_and_text(
+            # text_generator = RecoveryTextGenerator()
+            # body_part_factory = BodyPartFactory()
+            #
+            # top_candidates = list(
+            #     s for s in sorted_triggers if s.created_date_time == sorted_triggers[0].created_date_time)
+            #
+            # trend.top_priority_trigger, is_body_part_plural = self.get_highest_priority_body_part_from_triggers(
+            #     body_part_factory, top_candidates)
+            #
+            # if is_body_part_plural:
+            #     side = 0
+            # else:
+            #     side = trend.top_priority_trigger.body_part.side
+            #
+            # if trend.top_priority_trigger.body_part is not None:
+            #     body_part_text = text_generator.get_body_part_text(trend.top_priority_trigger.body_part.body_part_location,
+            #                                                        None)
+            # else:
+            #     body_part_text = ""
+            #
+            # body_part_text = body_part_text.title()
+            #
+            # title_body_part_text, is_title_plural = self.get_title_text_for_body_parts(
             #     trend.top_priority_trigger.synergists, side)
-
-            bold_text_3 = BoldText()
-            bold_text_3.text = body_part_text
-            bold_text_3.color = LegendColor.error_light
-            trend_data.bold_text.append(bold_text_3)
-            trend_data.text = body_text
-
-            bold_text_4 = BoldText()
-            bold_text_4.text = clean_title_body_part_text
-            bold_text_4.color = LegendColor.splash_x_light
-            trend_data.bold_text.append(bold_text_4)
+            # trend_data.title = "Elevated strain on " + title_body_part_text
+            # trend.plan_alert_short_title = "elevated strain on " + title_body_part_text
+            # clean_title_body_part_text = title_body_part_text.replace('&', 'and')
+            # body_text = (
+            #             "Athletes struggling with recurring " + body_part_text + " pain often develop misalignments that over-stress their " + clean_title_body_part_text +
+            #             ". Without proactive measures, this can lead to accumulated micro-trauma in the tissues and new areas of pain or injury over time.")
+            # # trend.dashboard_body_part, trend.dashboard_body_part_text = self.get_title_body_part_and_text(
+            # #     trend.top_priority_trigger.synergists, side)
+            #
+            # bold_text_3 = BoldText()
+            # bold_text_3.text = body_part_text
+            # bold_text_3.color = LegendColor.error_light
+            # trend_data.bold_text.append(bold_text_3)
+            # trend_data.text = body_text
+            #
+            # bold_text_4 = BoldText()
+            # bold_text_4.text = clean_title_body_part_text
+            # bold_text_4.color = LegendColor.splash_x_light
+            # trend_data.bold_text.append(bold_text_4)
 
             trend.trend_data = trend_data
             trend.visible = True
@@ -851,49 +851,49 @@ class TrendProcessor(object):
             trend.trigger_tiles = self.get_trigger_tiles(all_triggers)
 
             # rank triggers
-            sorted_triggers = sorted(all_triggers, key=lambda x: (x.created_date_time, x.priority), reverse=True)
+            #sorted_triggers = sorted(all_triggers, key=lambda x: (x.created_date_time, x.priority), reverse=True)
 
             trend.triggers = all_triggers
 
-            # rank triggers
-            sorted_triggers = sorted(all_triggers, key=lambda x: x.created_date_time, reverse=True)
-
-            text_generator = RecoveryTextGenerator()
-            body_part_factory = BodyPartFactory()
-
-            top_candidates = list(
-                s for s in sorted_triggers if s.created_date_time == sorted_triggers[0].created_date_time)
-
-            trend.top_priority_trigger, is_body_part_plural = self.get_highest_priority_body_part_from_triggers(
-                body_part_factory, top_candidates)
-
-            if is_body_part_plural:
-                side = 0
-            else:
-                side = trend.top_priority_trigger.body_part.side
-
-            body_part_text = text_generator.get_body_part_text(trend.top_priority_trigger.body_part.body_part_location, None)
-            body_part_text = body_part_text.title()
-
-            title_body_part_text, is_title_plural = self.get_title_text_for_body_parts(trend.top_priority_trigger.synergists, side)
-            trend_data.title = "Elevated strain on " + title_body_part_text
-            trend.plan_alert_short_title = "elevated strain on " + title_body_part_text
-            clean_title_body_part_text = title_body_part_text.replace('&','and')
-            body_text = ("Athletes struggling with recurring " + body_part_text + " pain often develop misalignments that over-stress their "+ clean_title_body_part_text +
-                         ". Without proactive measures, this can lead to accumulated micro-trauma in the tissues and new areas of pain or injury over time.")
-            # trend.dashboard_body_part, trend.dashboard_body_part_text = self.get_title_body_part_and_text(
-            #     trend.top_priority_trigger.synergists, side)
-
-            bold_text_3 = BoldText()
-            bold_text_3.text = body_part_text
-            bold_text_3.color = LegendColor.error_light
-            trend_data.bold_text.append(bold_text_3)
-            trend_data.text = body_text
-
-            bold_text_4 = BoldText()
-            bold_text_4.text = clean_title_body_part_text
-            bold_text_4.color = LegendColor.splash_x_light
-            trend_data.bold_text.append(bold_text_4)
+            # # rank triggers
+            # sorted_triggers = sorted(all_triggers, key=lambda x: x.created_date_time, reverse=True)
+            #
+            # text_generator = RecoveryTextGenerator()
+            # body_part_factory = BodyPartFactory()
+            #
+            # top_candidates = list(
+            #     s for s in sorted_triggers if s.created_date_time == sorted_triggers[0].created_date_time)
+            #
+            # trend.top_priority_trigger, is_body_part_plural = self.get_highest_priority_body_part_from_triggers(
+            #     body_part_factory, top_candidates)
+            #
+            # if is_body_part_plural:
+            #     side = 0
+            # else:
+            #     side = trend.top_priority_trigger.body_part.side
+            #
+            # body_part_text = text_generator.get_body_part_text(trend.top_priority_trigger.body_part.body_part_location, None)
+            # body_part_text = body_part_text.title()
+            #
+            # title_body_part_text, is_title_plural = self.get_title_text_for_body_parts(trend.top_priority_trigger.synergists, side)
+            # trend_data.title = "Elevated strain on " + title_body_part_text
+            # trend.plan_alert_short_title = "elevated strain on " + title_body_part_text
+            # clean_title_body_part_text = title_body_part_text.replace('&','and')
+            # body_text = ("Athletes struggling with recurring " + body_part_text + " pain often develop misalignments that over-stress their "+ clean_title_body_part_text +
+            #              ". Without proactive measures, this can lead to accumulated micro-trauma in the tissues and new areas of pain or injury over time.")
+            # # trend.dashboard_body_part, trend.dashboard_body_part_text = self.get_title_body_part_and_text(
+            # #     trend.top_priority_trigger.synergists, side)
+            #
+            # bold_text_3 = BoldText()
+            # bold_text_3.text = body_part_text
+            # bold_text_3.color = LegendColor.error_light
+            # trend_data.bold_text.append(bold_text_3)
+            # trend_data.text = body_text
+            #
+            # bold_text_4 = BoldText()
+            # bold_text_4.text = clean_title_body_part_text
+            # bold_text_4.color = LegendColor.splash_x_light
+            # trend_data.bold_text.append(bold_text_4)
 
             trend.trend_data = trend_data
             trend.visible = True
@@ -1013,6 +1013,7 @@ class TrendProcessor(object):
                     if weeks > 1:
                         statistic_text = str(weeks) + " Weeks of Soreness"
                     else:
+                        weeks = 1
                         statistic_text = str(weeks) + " Week of Soreness"
                     bold_stat_text = BoldText()
                     bold_stat_text.text = str(weeks)
@@ -1054,8 +1055,8 @@ class TrendProcessor(object):
                 body_part_text_3, is_plural_3 = self.get_title_text_for_body_parts([t.body_part], 0)
                 if body_part_text_3 not in prevention_body_parts:
                     prevention_body_parts.add(body_part_text_3)
-                    tile_3.text = "Heat your " + body_part_text_3
-                    tile_3.description = "before training to temporarily improve mobility & increase the efficacy of stretching"
+                    tile_3.text = "Heat your " + body_part_text_3 + " before training"
+                    tile_3.description = "to temporarily improve mobility & increase the efficacy of stretching"
                     bold_3 = BoldText()
                     bold_3.text = "Heat"
                     bold_3.color = LegendColor.warning_light
@@ -1073,6 +1074,7 @@ class TrendProcessor(object):
                     if weeks > 1:
                         statistic_text = str(weeks) + " Weeks of Pain"
                     else:
+                        weeks = 1
                         statistic_text = str(weeks) + " Week of Pain"
                     bold_stat_text = BoldText()
                     bold_stat_text.text = str(weeks)
@@ -1118,8 +1120,8 @@ class TrendProcessor(object):
                     body_part_text_3, is_plural_3 = self.get_title_text_for_body_parts([t.body_part], 0)
                     if body_part_text_3 not in prevention_body_parts:
                         prevention_body_parts.add(body_part_text_3)
-                        tile_3.text = "Heat your " + body_part_text_3
-                        tile_3.description = "before training to temporarily improve mobility & increase the efficacy of stretching"
+                        tile_3.text = "Heat your " + body_part_text_3 + " before training"
+                        tile_3.description = "to temporarily improve mobility & increase the efficacy of stretching"
                         bold_3 = BoldText()
                         bold_3.text = "Heat"
                         bold_3.color = LegendColor.error_light
@@ -1169,8 +1171,8 @@ class TrendProcessor(object):
                     body_part_text_3, is_plural_3 = self.get_title_text_for_body_parts([t.body_part], 0)
                     if body_part_text_3 not in prevention_body_parts:
                         prevention_body_parts.add(body_part_text_3)
-                        tile_3.text = "Heat your " + body_part_text_3
-                        tile_3.description = "before training to temporarily improve mobility & increase the efficacy of stretching"
+                        tile_3.text = "Heat your " + body_part_text_3 + " before training"
+                        tile_3.description = "to temporarily improve mobility & increase the efficacy of stretching"
                         bold_3 = BoldText()
                         bold_3.text = "Heat"
                         bold_3.color = LegendColor.error_light
@@ -1203,6 +1205,7 @@ class TrendProcessor(object):
                         tile_1.description = mobilize_suffix
                         bold_1 = BoldText()
                         bold_1.text = "Foam Roll & Stretch"
+                        bold_1.color = LegendColor.error_light
                         tile_1.bold_text.append(bold_1)
                         tile_1.statistic_text = statistic_text
                         tile_1.bold_statistic_text = bold_statistic_text
@@ -1215,6 +1218,7 @@ class TrendProcessor(object):
                         care_body_parts.add(body_part_text_2)
                         bold_2 = BoldText()
                         bold_2.text = "Foam Roll & Static Stretch"
+                        bold_2.color = LegendColor.splash_x_light
                         tile_2.bold_text.append(bold_2)
                         tile_2.text = "Foam Roll & Static Stretch the muscles supporting your " + body_part_text_2
                         tile_2.description = mobilize_suffix
@@ -1227,10 +1231,11 @@ class TrendProcessor(object):
                     body_part_text_3, is_plural_3 = self.get_title_text_for_body_parts([t.body_part], 0)
                     if body_part_text_3 not in care_body_parts:
                         care_body_parts.add(body_part_text_3)
-                        tile_3.text = "Ice your " + body_part_text_3
-                        tile_3.description = "after training to reduce inflammation and muscle damage"
+                        tile_3.text = "Ice your " + body_part_text_3 + " after training"
+                        tile_3.description = "to reduce inflammation and muscle damage"
                         bold_3 = BoldText()
                         bold_3.text = "Ice"
+                        bold_3.color = LegendColor.error_light
                         tile_3.bold_text.append(bold_3)
                         tile_3.statistic_text = statistic_text
                         tile_3.bold_statistic_text = bold_statistic_text
@@ -1248,6 +1253,7 @@ class TrendProcessor(object):
                         tile_1.description = mobilize_suffix
                         bold_1 = BoldText()
                         bold_1.text = "Foam Roll & Static Stretch"
+                        bold_1.color = LegendColor.splash_x_light
                         tile_1.bold_text.append(bold_1)
                         tile_1.statistic_text = statistic_text
                         tile_1.bold_statistic_text = bold_statistic_text
@@ -1260,10 +1266,11 @@ class TrendProcessor(object):
                         body_part_text_2 = "PRIME MOVER"
                     if body_part_text_2 not in care_body_parts:
                         care_body_parts.add(body_part_text_2)
-                        tile_2.text = "Ice your " + body_part_text_2
-                        tile_2.description = "after training to reduce inflammation and tissue damage"
+                        tile_2.text = "Ice your " + body_part_text_2 + " after training"
+                        tile_2.description = "to reduce inflammation and tissue damage"
                         bold_2 = BoldText()
                         bold_2.text = "Ice"
+                        bold_2.color = LegendColor.error_light
                         tile_2.bold_text.append(bold_2)
                         tile_2.statistic_text = statistic_text
                         tile_2.bold_statistic_text = bold_statistic_text
@@ -1292,6 +1299,7 @@ class TrendProcessor(object):
                     tile_1.description = mobilize_suffix
                     bold_1 = BoldText()
                     bold_1.text = "Foam Roll & Static Stretch"
+                    bold_1.color = LegendColor.warning_light
                     tile_1.bold_text.append(bold_1)
                     tile_1.statistic_text = statistic_text
                     tile_1.bold_statistic_text = bold_statistic_text
@@ -1302,10 +1310,11 @@ class TrendProcessor(object):
                 body_part_text_3, is_plural_3 = self.get_title_text_for_body_parts([t.body_part], 0)
                 if body_part_text_3 not in care_body_parts:
                     care_body_parts.add(body_part_text_3)
-                    tile_3.text = "Ice your " + body_part_text_3
-                    tile_3.description = "after training to reduce inflammation and muscle damage"
+                    tile_3.text = "Ice your " + body_part_text_3 + " after training"
+                    tile_3.description = "to reduce inflammation and muscle damage"
                     bold_3 = BoldText()
                     bold_3.text = "Ice"
+                    bold_3.color = LegendColor.warning_light
                     tile_3.bold_text.append(bold_3)
                     tile_3.statistic_text = statistic_text
                     tile_3.bold_statistic_text = bold_statistic_text
@@ -1329,6 +1338,7 @@ class TrendProcessor(object):
                 tile_1.description = mobilize_suffix
                 bold_1 = BoldText()
                 bold_1.text = "Mobilize"
+                bold_1.color = LegendColor.splash_x_light
                 tile_1.bold_text.append(bold_1)
                 tile_1.statistic_text = statistic_text
                 tile_1.bold_statistic_text = bold_statistic_text
@@ -1339,6 +1349,7 @@ class TrendProcessor(object):
                 tile_2.description = "to reduce inflammation and muscle damage"
                 bold_2 = BoldText()
                 bold_2.text = "Cold Water Bath"
+                bold_2.color = LegendColor.splash_x_light
                 tile_2.bold_text.append(bold_2)
                 tile_2.statistic_text = statistic_text
                 tile_2.bold_statistic_text = bold_statistic_text
