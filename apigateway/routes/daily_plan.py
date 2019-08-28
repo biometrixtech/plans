@@ -41,8 +41,13 @@ def handle_daily_plan_get(user_id=None):
         survey_complete = plan.daily_readiness_survey_completed()
         if plan.event_date == format_date(event_date) and not survey_complete:
             need_soreness_sessions = True
-        # if RS completed today but no trends, this is the case of RS completed on old app and logging in to new app --> re-generate plan
-        if plan.event_date == format_date(event_date) and survey_complete and (plan.trends is None or plan.trends.body_response is None):  
+        # handle case of RS completed on old app and logging in to new app --> re-generate plan
+        # 4_3 to 4_4 changes
+        if plan.trends is not None and plan.trends.trend_categories is not None:
+            insight_types = [tc.insight_type.value for tc in plan.trends.trend_categories]
+        else:
+            insight_types = []
+        if plan.event_date == format_date(event_date) and survey_complete and (plan.trends is None or plan.trends.body_response is None or 6 not in insight_types):
             plan = create_plan(user_id, event_date, update_stats=True, visualizations=visualizations)
         else:
             plan = cleanup_plan(plan, visualizations=visualizations)
