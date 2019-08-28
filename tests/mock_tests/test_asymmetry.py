@@ -85,3 +85,4 @@ def test_right_1_5x_left():
     assert viz.right_y == 7.5
 
 
+

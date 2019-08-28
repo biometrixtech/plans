@@ -37,6 +37,7 @@ class TriggerType(IntEnum):
     response_poor_response_within_a_session_torso_loading_pattern = 102
     biomechanics_fatigue_within_a_session_torso_loading_pattern = 103
     biomechanics_poor_response_within_a_session_torso_loading_pattern = 104
+    movement_error_apt_asymmetry = 110
     stress_no_triggers_flagged_based_on_training_volume = 201
     response_no_triggers_flagged_based_on_soreness = 202
     response_no_triggers_flagged_based_on_pain = 203
@@ -113,6 +114,11 @@ class Trigger(BaseSoreness, Serialisable):
         self.agonists = []
         self.antagonists = []
         self.synergists = []
+        self.stabilizers = []
+        self.overactive_tight_first = []
+        self.overactive_tight_second = []
+        self.elevated_stress = []
+        self.underactive_weak = []
         self.sport_name = None
         self.severity = None
         self.pain = None
@@ -121,6 +127,8 @@ class Trigger(BaseSoreness, Serialisable):
         self.modified_date_time = None
         self.deleted_date_time = None
         self.source_date_time = None
+        self.source_first_reported_date_time = None
+        self.metric = None
         self.priority = 0  # This doesn't need to be persisted, just used in logic
         self.body_part_priority = 0  # This doesn't need to be persisted, just used in logic
 
@@ -131,6 +139,11 @@ class Trigger(BaseSoreness, Serialisable):
             "agonists": [a.json_serialise() for a in self.agonists if self.agonists is not None],
             "antagonists": [a.json_serialise() for a in self.antagonists if self.antagonists is not None],
             "synergists": [s.json_serialise() for s in self.synergists if self.synergists is not None],
+            "stabilizers": [s.json_serialise() for s in self.stabilizers if self.stabilizers is not None],
+            "overactive_tight_first": [s.json_serialise() for s in self.overactive_tight_first if self.overactive_tight_first is not None],
+            "overactive_tight_second": [s.json_serialise() for s in self.overactive_tight_second if self.overactive_tight_second is not None],
+            "elevated_stress": [s.json_serialise() for s in self.elevated_stress if self.elevated_stress is not None],
+            "underactive_weak": [s.json_serialise() for s in self.underactive_weak if self.underactive_weak is not None],
             "sport_name": self.sport_name.value if self.sport_name is not None else None,
             "severity": self.severity,
             "pain": self.pain,
@@ -142,7 +155,10 @@ class Trigger(BaseSoreness, Serialisable):
             "deleted_date_time": format_datetime(
                 self.deleted_date_time) if self.deleted_date_time is not None else None,
             "source_date_time": format_datetime(
-                self.source_date_time) if self.source_date_time is not None else None
+                self.source_date_time) if self.source_date_time is not None else None,
+            "source_first_reported_date_time": format_datetime(
+                self.source_date_time) if self.source_date_time is not None else None,
+            'metric': self.metric if self.metric is not None else None
         }
 
     @classmethod
@@ -152,6 +168,13 @@ class Trigger(BaseSoreness, Serialisable):
         trigger.agonists = [BodyPartSide.json_deserialise(a) for a in input_dict.get('agonists', [])]
         trigger.antagonists = [BodyPartSide.json_deserialise(a) for a in input_dict.get('antagonists',[])]
         trigger.synergists = [BodyPartSide.json_deserialise(s) for s in input_dict.get('synergists',[])]
+        trigger.stabilizers = [BodyPartSide.json_deserialise(s) for s in input_dict.get('stabilizers', [])]
+
+        trigger.overactive_tight_first = [BodyPartSide.json_deserialise(s) for s in input_dict.get('overactive_tight_first', [])]
+        trigger.overactive_tight_second = [BodyPartSide.json_deserialise(s) for s in input_dict.get('overactive_tight_second', [])]
+        trigger.elevated_stress = [BodyPartSide.json_deserialise(s) for s in input_dict.get('elevated_stress', [])]
+        trigger.underactive_weak = [BodyPartSide.json_deserialise(s) for s in input_dict.get('underactive_weak', [])]
+
         trigger.sport_name = input_dict['sport_name']
         trigger.severity = input_dict['severity']
         trigger.pain = input_dict['pain']
@@ -160,6 +183,9 @@ class Trigger(BaseSoreness, Serialisable):
         trigger.modified_date_time = parse_datetime(input_dict["modified_date_time"]) if input_dict.get("modified_date_time") is not None else None
         trigger.deleted_date_time = parse_datetime(input_dict["deleted_date_time"]) if input_dict.get("deleted_date_time") is not None else None
         trigger.source_date_time = parse_datetime(input_dict["source_date_time"]) if input_dict.get("source_date_time") is not None else None
+        trigger.source_first_reported_date_time = parse_datetime(input_dict["source_first_reported_date_time"]) if input_dict.get(
+            "source_first_reported_date_time") is not None else None
+        trigger.metric = input_dict['metric'] if input_dict.get('metric') is not None else None
         return trigger
 
     def __setattr__(self, name, value):

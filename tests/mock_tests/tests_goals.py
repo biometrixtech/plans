@@ -15,7 +15,7 @@ def test_low_priority_goal_count():
     dosage_1 = ExerciseDosage()
     dosage_1.goal = AthleteGoal("1", 1, AthleteGoalType.pain)
     dosage_2 = ExerciseDosage()
-    dosage_2.goal = AthleteGoal("2", 2, AthleteGoalType.sport)
+    dosage_2.goal = AthleteGoal("2", 2, AthleteGoalType.high_load)
     dosage_3 = ExerciseDosage()
     dosage_3.goal = AthleteGoal("3", 3, AthleteGoalType.sore)
     exercise_1.dosages.append(dosage_1)

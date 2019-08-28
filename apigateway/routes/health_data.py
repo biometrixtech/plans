@@ -16,12 +16,12 @@ sleep_history_datastore = datastore_collection.sleep_history_datastore
 app = Blueprint('health_data', __name__)
 
 
-@app.route('/', methods=['POST'])
+@app.route('/<uuid:user_id>/', methods=['POST'])
 @require.authenticated.any
 @require.body({'event_date': str, 'start_date': str, 'end_date': str})
 @xray_recorder.capture('routes.health_data.write')
-def handle_previous_health_data_write(principal_id=None):
-    user_id = principal_id
+def handle_previous_health_data_write(user_id=None):
+    #user_id = principal_id
     event_date = request.json['event_date']
     start_date = format_date(request.json['start_date'])
     end_date = format_date(request.json['end_date'])

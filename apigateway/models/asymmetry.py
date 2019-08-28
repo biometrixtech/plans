@@ -55,7 +55,7 @@ class SessionAsymmetry(Serialisable):
         if self.percent_events_asymmetric > 0:
 
             percentage = self.percent_events_asymmetric
-            return "Your range of motion was asymmetric in " + str(percentage) + "% of this workout."
+            return str(percentage) + "% of this workout has asymmetric range of motion."
 
         else:
 

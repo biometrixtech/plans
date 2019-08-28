@@ -1,5 +1,7 @@
 from models.body_parts import BodyPartFactory, BodyPartLocation, BodyPart
+from models.session import SessionSource
 from models.soreness_base import HistoricSorenessStatus, BodyPartSide
+from models.movement_errors import MovementErrorType, MovementError, MovementErrorFactory
 from models.goal import AthleteGoalType, AthleteGoal
 from models.trigger import TriggerType, Trigger
 
@@ -11,6 +13,10 @@ class TriggerFactory(object):
 
         if athlete_stats is not None and athlete_stats.triggers is not None:
             self.triggers = athlete_stats.triggers
+        if athlete_stats is not None and athlete_stats.load_stats is not None:
+            self.load_stats = athlete_stats.load_stats
+        if athlete_stats is not None and athlete_stats.sport_max_load is not None:
+            self.sport_max_load = athlete_stats.sport_max_load
         self.high_relative_load_session = False
         self.high_relative_intensity_session = False
         self.high_relative_load_session_sport_names = set()
@@ -19,6 +25,7 @@ class TriggerFactory(object):
         self.soreness_list = soreness_list
         self.training_sessions = training_sessions
         self.eligible_for_high_load_trigger = athlete_stats.eligible_for_high_load_trigger if athlete_stats is not None else False
+        self.high_load_sessions = []
 
         if self.eligible_for_high_load_trigger:
             self.set_high_relative_load_session(athlete_stats)
@@ -42,10 +49,11 @@ class TriggerFactory(object):
             self.high_relative_load_session = True
             self.high_relative_load_session_sport_names.add(t.sport_name)
 
+        self.high_load_sessions = todays_sessions
+
     def process_training_sessions_intensity(self):
 
         high_relative_intensity_session = False
-
         for t in self.training_sessions:
             if t.high_intensity():
                 high_relative_intensity_session = True
@@ -53,7 +61,7 @@ class TriggerFactory(object):
 
         return high_relative_intensity_session
 
-    def set_trigger(self, trigger_type, soreness=None, sport_name=None):
+    def set_trigger(self, trigger_type, soreness=None, sport_name=None, movement_error=None):
 
         trigger_index = -1
 
@@ -107,6 +115,8 @@ class TriggerFactory(object):
             trigger.created_date_time = self.event_date_time
             trigger.modified_date_time = self.event_date_time
 
+            body_part_factory = BodyPartFactory()
+
             if soreness is not None:
                 body_part_factory = BodyPartFactory()
                 body_part = body_part_factory.get_body_part(soreness.body_part)
@@ -120,11 +130,46 @@ class TriggerFactory(object):
                 trigger.agonists = self.convert_body_part_list(body_part_side, body_part.agonists)
                 trigger.antagonists = self.convert_body_part_list(body_part_side, body_part.antagonists)
                 trigger.synergists = self.convert_body_part_list(body_part_side, body_part.synergists)
+                trigger.stabilizers = self.convert_body_part_list(body_part_side, body_part.stabilizers)
                 trigger.source_date_time = soreness.status_changed_date_time
+                trigger.source_first_reported_date_time = soreness.first_reported_date_time
+
+            if movement_error is not None:
+
+                trigger.overactive_tight_first = self.get_body_part_list(movement_error.overactive_tight_first)
+                trigger.overactive_tight_second = self.get_body_part_list(movement_error.overactive_tight_second)
+                trigger.elevated_stress = self.get_body_part_list(movement_error.elevated_stress)
+                trigger.underactive_weak = self.get_body_part_list(movement_error.underactive_weak)
+
+                if movement_error.left_apt > movement_error.right_apt:
+                    trigger.metric = round(((movement_error.left_apt - movement_error.right_apt)/movement_error.left_apt) * 100)
+                else:
+                    trigger.metric = round(((movement_error.right_apt - movement_error.left_apt) / movement_error.right_apt) * 100)
+                #trigger.body_part = movement_error.body_part_side
 
             trigger.sport_name = sport_name
-            self.triggers.append(trigger)
 
+            if sport_name is not None:
+                body_part = body_part_factory.get_body_part_for_sports([sport_name])
+                trigger.agonists = self.get_body_part_list(body_part.agonists)
+                trigger.antagonists = self.get_body_part_list(body_part.antagonists)
+                trigger.synergists = self.get_body_part_list(body_part.synergists)
+                trigger.stabilizers = self.get_body_part_list(body_part.stabilizers)
+                sport_sessions = [t for t in self.high_load_sessions if t.sport_name == sport_name]
+
+                max_percent = None
+
+                for s in sport_sessions:  #these are HighLoadSessions
+                    session_max = s.percent_of_max
+                    if session_max is not None:
+                        if max_percent is None:
+                            max_percent = session_max
+                        else:
+                            max_percent = max(max_percent, session_max)
+
+                trigger.metric = max_percent
+
+            self.triggers.append(trigger)
 
     def convert_body_part_list(self, body_part_side, body_part_list):
 
@@ -154,13 +199,30 @@ class TriggerFactory(object):
 
         return body_part_side_list
 
-    def load_triggers(self):
+    def get_body_part_list(self, body_part_list):
 
-        #self.triggers = []
+        body_part_side_list = []
+        body_part_factory = BodyPartFactory()
+
+        for b in body_part_list:
+            body_part = body_part_factory.get_body_part(BodyPart(BodyPartLocation(b), None))
+            if body_part.bilateral:
+                body_part_side_1 = BodyPartSide(BodyPartLocation(b), side=1)
+                body_part_side_2 = BodyPartSide(BodyPartLocation(b), side=2)
+                body_part_side_list.append(body_part_side_1)
+                body_part_side_list.append(body_part_side_2)
+            else:
+                body_part_side_new = BodyPartSide(BodyPartLocation(b), side=0)
+                body_part_side_list.append(body_part_side_new)
+
+        return body_part_side_list
+
+    def load_triggers(self):
 
         if self.high_relative_load_session or self.high_relative_intensity_session:
 
             for sport_name in self.high_relative_load_session_sport_names:
+
                 self.set_trigger(TriggerType.high_volume_intensity, sport_name=sport_name)  # 0
 
         hist_soreness = list(s for s in self.soreness_list if not s.is_dormant_cleared() and not s.pain and
@@ -175,6 +237,14 @@ class TriggerFactory(object):
 
         if self.muscular_strain_high:
             self.set_trigger(TriggerType.overreaching_high_muscular_strain)  # 8
+
+        for session in self.training_sessions:
+            if session.source == SessionSource.three_sensor:
+                if session.asymmetry is not None:
+                    if session.asymmetry.left_apt != session.asymmetry.right_apt:
+                        factory = MovementErrorFactory()
+                        movement_error = factory.get_movement_error(MovementErrorType.apt_asymmetry, session.asymmetry.left_apt, session.asymmetry.right_apt)
+                        self.set_trigger(TriggerType.movement_error_apt_asymmetry, soreness=None, sport_name=None, movement_error=movement_error) # 110
 
         for soreness in self.soreness_list:
 

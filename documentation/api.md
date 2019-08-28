@@ -59,7 +59,7 @@ The terminology of [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt) (specificall
 
 #### Protocol
 
-The API supports communication over HTTPS only.
+The API supports communication over HTTPS only.  Requests sent via HTTP will be redirected to HTTPS connections.
 
 #### Encoding
 
@@ -87,7 +87,7 @@ In addition to the AWS API Gateway responses and the specific responses for each
 
 The following simple types __may__ be used in responses:
 
-* `string`, `number`: as defined in the [JSON Schema](http://json-schema.org) standard.
+* `string`, `number`, `integer`, `boolean`: as defined in the [JSON Schema](http://json-schema.org) standard.
 * `Uuid`: a `string` matching the regular expression `^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$`, that is, the string representation of an [RFC 4122](https://tools.ietf.org/html/rfc4122) UUID.
 * `Datetime`: a `string` matching the regular expression `/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(Z|+\d{2}:\d{2})/` and representing a date and time in full [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) format.
 
@@ -101,7 +101,7 @@ This endpoint can be called to register a new daily readiness survey.
 
 ##### Query String
  
-The client __must__ submit a request to the endpoint `/plans/version/daily_readiness`. The request method __must__ be `POST`.
+The client __must__ submit a request to the endpoint `/plans/version/daily_readiness/{User UUID}`. The request method __must__ be `POST`.
 
 ##### Request
 
@@ -111,58 +111,47 @@ The client __must__ submit a request body containing a JSON object with the foll
     "date_time": Datetime,
     "soreness": [sore_part, sore_part],
     "clear_candidates": [sore_part, sore_part]
-    "sleep_quality": number,
-    "readines": number,
     "sessions": [session, session],
     "sessions_planned": boolean,
-    "sleep_data": [sleep_event, sleep_event],
     "health_sync_date": Datetime
 }
 ```
-* `date_time` __should__ reflect the local time that survey was taken
-* `soreness` __should__ reflect the number of body part that the user indicated soreness that were not candidates for clearance. Length __could__ be 0.
-* `clear_candidates` __should__ include body parts that were candidates to be cleared of historical status. Note this should include the body part even if marked "all_clear".
-* `sleep_quality` __should__ be an integer between 1 and 10 or null
-* `readiness` __should__ be an integer between 1 and 10 or null
-* `sessions` __should__ be a list of session objects, where each session matches the body of [Create](#create-2) Session.
-* `sleep_data` __should__ be a list of sleep_events.
-* `sessions_planned` __should__ be a boolean representing whether the user plans to train again that day.
+* `date_time` __should__  be a Datetime and reflect the local time that survey was taken
+* `soreness` __should__ reflect a list of body parts(`sore_part`) with pain or soreness. Length __could__ be 0.
+* `clear_candidates` is __optional__ and __should__ include body parts that were candidates to be cleared of historical status. Note this should include the body part even if marked "all_clear".
+* `sessions` is __optional__ and __should__ be a list of session objects, where each session matches the body of [Create](#create-2) Session.
+* `sessions_planned` is __optional__ and __should__ be a boolean representing whether the user plans to train again that day.
 * `health_sync_date` is __optional__ and only provided if one of the sessions is obtained from health app
 * `sore_part` __should__ have the following schema:
 ```
 {
     "body_part": number,
     "severity": number,
+    "movement": number,
     "side": number,
     "pain": boolean,
     "status": string
 }
 ```
 * `body_part` __should__ be an integer reflecting BodyPart enum
-* `severity` __should__ be an integer between 0 and 5. (0 is only allowed for clear_candidates)
+* `severity` __should__ be an integer 0, 1, 3 or 5 indicating the severity of the pain/soreness
+* `movement` __should__ be an integer 0, 1, 3 or 5 indicating how much movement is restricted 
 * `side` __should__ be an integer, either 0 (both sides/non-bilateral), 1 (left) or 2 (right)
 * `pain` __should__ be a boolean to indicate whether it's pain or soreness.
-* `status` __should__ be a string representating the historical soreness status if one was received. Optional for soreness but required for clear candidates.
-
+* `status` __should__ be a string representing the historical soreness status if one was received. Optional for soreness but required for clear candidates.
 
 ```
-POST /plans/version/daily_readiness HTTPS/1.1
-Host: apis.env.fathomai.com
+POST /plans/version/daily_readiness/{User UUID} HTTPS/1.1
+Host: apis.{env}.fathomai.com
 Content-Type: application/json
 Authorization: eyJraWQ...ajBc4VQ
 
 {
     "date_time": "2018-12-10T17:45:24Z",
-    "soreness":[{"body_part": 18, "severity": 2, "side": 0}],
+    "soreness":[{"body_part": 18, "severity": 3, "movement": 3, "side": 0}],
     "clear_candidates": [{"body_part": 5, "severity": 0, "side": 1, "pain":true, "status": "persistant_2_pain"}]
-    "sleep_quality":4,
-    "readiness":4,
-    "wants_functional_strength": true,
-    "current_sport_name": 14,
-    "current_position": 1,
     "sessions": [{"event_date": "2018-12-10T12:30:00Z",
-                  "session_type": 0,
-                  "sport_name": 0,
+                  "sport_name": 3,
                   "duration": 90,
                   "description": "Evening Practice",
                   "post_session_survey": {
@@ -194,7 +183,7 @@ This endpoint can be called to get the body parts where soreness was reported in
 
 ##### Query String
  
-The client __must__ submit a request to the endpoint `/plans/version/daily_readiness/previous`. The request method __must__ be `POST`.
+The client __must__ submit a request to the endpoint `/plans/version/daily_readiness/{User UUID}/previous`. The request method __must__ be `POST`.
 
 ##### Request
 For `POST` method, the client __must__ submit a request body containing a JSON object with the following schema:
@@ -204,8 +193,8 @@ For `POST` method, the client __must__ submit a request body containing a JSON o
 }
 ```
 ```
-POST /plans/version/daily_readiness/previous HTTPS/1.1
-Host: apis.env.fathomai.com
+POST /plans/version/daily_readiness/{User UUID}/previous HTTPS/1.1
+Host: apis.{env}.fathomai.com
 Content-Type: application/json
 Authorization: eyJraWQ...ajBc4VQ
 
@@ -230,7 +219,6 @@ Authentication is required for this endpoint
     "hist_sore_status": [{"body_part": number, "side": number, "status": string, pain: boolean}],
     "clear_candidates": [{"body_part": number, "side": number, "status": string, pain: boolean}],
     "dormant_tipping_candidates": [{"body_part": number, "side": number, "status": string, pain: boolean}],
-    "completed_functional_strength_sessions": number,
     "current_position": number,
     "current_sport_name": number,
     "functional_strength_eligible": boolean,
@@ -240,7 +228,6 @@ Authentication is required for this endpoint
 * `clear_candidates` will be a list of sore body parts with historical status that are candidates for clearance
 * `hist_sore_status` will be a list of sore body parts with historical status that are not candidates for clearing
 * `dormant_tipping_candidates` will be a list of sore body parts that should not prompt a response for the user but if they indicate a status for that, they will tip into specific status as defined in the response
-* `completed_functional_strength_sessions` will be a count of completed functional strength sessions for the last week
 * `current_position` and `current_sport_name` will be enumeration
 * `current_position` exists but `current_sport_name` does not, then it's implied that the user wants functional strength for sport-less activity
 
@@ -259,70 +246,6 @@ Authentication is required for this endpoint
 
 ```
 
-### Post-Session Survey (Deprecated)
-
-#### Create
-
-This endpoint can be called to register a a post-session survey.
-
-##### Query String
- 
-The client __must__ submit a request to the endpoint `/plans/version/post_session_survey`. The request method __must__ be `POST`.
-
-##### Request
-
-The client __must__ submit a request body containing a JSON object with the following schema:
-```
-{
-    "user_id": Uuid,
-    "event_date": Datetime,
-    "session_id": Uuid,
-    "session_type": number,
-    "survey": {
-      "RPE": number,
-      "soreness": [{"body_part": number, "severity": number, "side": number, "pain", boolean}]
-    }
-}
-```
-* `event_date` __should__ reflect the date and time when the survey happened
-* `session_id` __should__ be id of the session associated. It's __optional__ if the survey is associated with new session that doesn't exist in daily_plan
-* `session_type` __should__ be an integer reflecting enumeration of different session type (0-5)
-* `RPE` __should__ be an integer between 1 and 10
-* `soreness` __should__ follow the same definition as in readiness_survey
-
-```
-POST /plans/version/post_session_survey HTTPS/1.1
-Host: apis.env.fathomai.com
-Content-Type: application/json
-Authorization: eyJraWQ...ajBc4VQ
-
-{
-    "user_id": "02cb7965-7921-493a-80d4-6b278c928fad",
-    "event_date": "2018-07-03",
-    "session_id": "69223f69-08b2-4e61-be2a-0e9b38787cec",
-    "session_type": 1,
-    "survey": 
-            {
-               "RPE": 4,
-               "soreness": [
-                  {"body_part": 17.0, "severity": 5, "side": 0, pain: false},
-                  {"body_part": 14, "severity": 3, "side": 0, pain: false}
-                  ]
-            }
-            
-}
-```
-##### Responses
- 
- If the write was successful, the Service __will__ respond with HTTP Status `201 Created`, with a body with the following syntax:
- 
-```
-{
-    "message": "success"
-}
-```
-
-
 ### Session
 
 #### Create
@@ -331,7 +254,7 @@ This endpoint can be called to log a new session to today's plan and should incl
 
 ##### Query String
  
-The client __must__ submit a request to the endpoint `/plans/version/session`. The request method __must__ be `POST`.
+The client __must__ submit a request to the endpoint `/plans/version/session/{User UUID}`. The request method __must__ be `POST`.
 
 ##### Request
 
@@ -384,8 +307,8 @@ The client __must__ submit a request body containing a JSON object with the foll
 * `description` is __optional__ parameter to provide short description of the session they're adding
 
 ```
-POST /plans/version/session HTTP/1.1
-Host: apis.dev.fathomai.com
+POST /plans/version/session/{User UUID} HTTP/1.1
+Host: apis.{env}.fathomai.com
 Content-Type: application/json
 Authorization: eyJ0eX...xA8
 Cache-Control: no-cache
@@ -439,65 +362,14 @@ Postman-Token: 4b6c3946-89fd-4cde-ae29-3a4984d5f373
 ```
 * `daily_plan` will have the same structure as defined in output of [Get daily plan](#get-daily-plan) route.
 
-#### Get Typical Sessions (Deprecated)
-
-This endpoint can be called to get the typical sessions the user has logged in the past two weeks ordered by their occurence. Only the top five most occuring session types will be returned.
-
-##### Query String
- 
-The client __must__ submit a request to the endpoint `/plans/version/session/typical`. The request method __must__ be `POST`.
-
-##### Request
-
-The client __must__ submit a request body containing a JSON object with the following schema:
-```
-{
-    "event_date": Datetime
-}
-```
-* `event_date` __should__ reflect the date and time when the call is made
-
-```
-POST /plans/version/session/typical HTTP/1.1
-Host: apis.dev.fathomai.com
-Content-Type: application/json
-Authorization: eyJ0eX...xA8
-Cache-Control: no-cache
-Postman-Token: 4b6c3946-89fd-4cde-ae29-3a4984d5f373
-
-{
-    "event_date": "2018-09-14T19:54:48Z"
-}
-```
-##### Responses
- 
- If the request was successful, the Service __will__ respond with HTTP Status `200 OK`, with a body with the following syntax:
- 
-```
-{
-    "typical_sessions": [session, session]
-}
-```
-each session object will be of the following schema
-
-``` 
-{
-    "count": 4,
-    "duration": 25,
-    "event_date": "2018-09-19T15:30:00Z",
-    "session_type": 0,
-    "sport_name": 5,
-    "strength_and_conditioning_type": null
-}
-```
 
 #### Mark no sessions planned
 
-This endpoint can be called to notify that no sessios are planned for the day.
+This endpoint can be called to notify that no sessions are planned for the day.
 
 ##### Query String
  
-The client __must__ submit a request to the endpoint `/plans/version/session/no_session`. The request method __must__ be `POST`.
+The client __must__ submit a request to the endpoint `/plans/version/session/{{User UUID}/no_session`. The request method __must__ be `POST`.
 
 ##### Request
 
@@ -510,8 +382,8 @@ The client __must__ submit a request body containing a JSON object with the foll
 * `event_date` __should__ reflect the date and time when the call is made
 
 ```
-POST /plans/version/session/no_session HTTP/1.1
-Host: apis.dev.fathomai.com
+POST /plans/version/session/{User UUID}/no_session HTTP/1.1
+Host: apis.{env}.fathomai.com
 Content-Type: application/json
 Authorization: eyJ0eX...xA8
 Cache-Control: no-cache
@@ -554,8 +426,8 @@ The client __must__ submit a request body containing a JSON object with the foll
 * `session_type` __should__ be an integer reflecting SessionType enumeration.
 
 ```
-DELETE /plans/version/session/73e8f603-d2d5-423a-b2b6-fe0996a373c8 HTTPS/1.1
-Host: apis.env.fathomai.com
+DELETE /plans/version/session/{User UUID}/{Session ID} HTTPS/1.1
+Host: apis.{env}.fathomai.com
 Content-Type: application/json
 Authorization: eyJraWQ...ajBc4VQ
 
@@ -580,7 +452,7 @@ This endpoint can be called to update and combine manually logged session with a
 
 ##### Query String
  
-The client __must__ submit a request to the endpoint `/plans/version/session/{session_id}`. The request method __must__ be `PATCH`.
+The client __must__ submit a request to the endpoint `/plans/version/session/{User UUID}/{session_id}`. The request method __must__ be `PATCH`.
 
 ##### Request
 
@@ -597,8 +469,8 @@ The client __must__ submit a request body containing a JSON object with the foll
 * `health_sync_date` __should__ reflect the time when the data was obtained from health app
 
 ```
-PATCH /plans/version/session/73e8f603-d2d5-423a-b2b6-fe0996a373c8 HTTPS/1.1
-Host: apis.env.fathomai.com
+PATCH /plans/version/session/{User UUID}/{Session ID} HTTPS/1.1
+Host: apis.{env}.fathomai.com
 Content-Type: application/json
 Authorization: eyJraWQ...ajBc4VQ
 
@@ -637,82 +509,6 @@ Authorization: eyJraWQ...ajBc4VQ
 }
 ```
 
-#### Send sensor data
-
-This endpoint can be called to write sensor data for sessions(s)
-
-##### Query String
- 
-The client __must__ submit a request to the endpoint `/plans/version/session/sensor_data`. The request method __must__ be `POST`.
-
-##### Request
-
-The client __must__ submit a request body containing a JSON object with the following schema:
-```
-{
-    "last_sensor_sync": Datetime
-    "sessions": [Session]
-}
-```
-A `Session` object __will__ have the following schema:
-
-```
-{
-    "session_id": Uuid,
-    "session_type": number,
-    "event_date": Datetime
-    "start_time": Datetime,
-    "end_time": Datetime,
-    "inactive_duration": number,
-    "low_duration": number, 
-    "mod_duration": number,
-    "high_duration": number,
-    "inactive_accel": number,
-    "low_accel": number, 
-    "mod_accel": number,
-    "high_accel": number
-
-}
-```
-* `session_id` , `session_type` and `event_date` are optional arguments
-
-
-```
-POST /plans/version/session/sensor_data HTTPS/1.1
-Host: apis.env.fathomai.com
-Content-Type: application/json
-Authorization: eyJraWQ...ajBc4VQ
-
-{
-    "last_sensor_sync": "2018-09-05T14:06:44Z",
-    "sessions":
-    [
-        {
-            "start_time": "2018-07-18T13:40:20Z",
-            "end_time": "2018-07-18T14:40:20Z",
-            "inactive_duration": 1500,
-            "low_duration": 500, 
-            "mod_duration": 200,
-            "high_duration": 60,
-            "inactive_accel": 1500,
-            "low_accel": 500, 
-            "mod_accel": 200,
-            "high_accel": 60
-        }
-    ]
-}
-```
-##### Responses
- 
- If all sessions were updated successfully, the Service __will__ respond with HTTP Status `200 OK`, with a body with the following syntax:
- 
-```
-{
-    "message": "success"
-}
-```
-
-
 ### Active Recovery
 
 #### Mark Started (Exercise Modalities)
@@ -721,7 +517,7 @@ This endpoint can be called to mark the start of exercise-based modalities.
 
 ##### Query String
  
-The client __must__ submit a request to the endpoint `/plans/version/active_recovery/exercise_modalities`. The request method __must__ be `POST`.
+The client __must__ submit a request to the endpoint `/plans/version/active_recovery/{User UUID}/exercise_modalities`. The request method __must__ be `POST`.
 
 ##### Request
 
@@ -736,8 +532,8 @@ The client __must__ submit a request body containing a JSON object with the foll
 * `recovery_type` __should__ be one of `pre_active_rest`, `post_active_rest` or `cool_down`
 
 ```
-POST /plans/version/active_recovery/exercise_modalities HTTPS/1.1
-Host: apis.env.fathomai.com
+POST /plans/version/active_recovery/{User UUID}/exercise_modalities HTTPS/1.1
+Host: apis.{env}.fathomai.com
 Content-Type: application/json
 Authorization: eyJraWQ...ajBc4VQ
 {
@@ -761,7 +557,7 @@ This endpoint can be called to mark the completion of exercise-based modalities.
 
 ##### Query String
  
-The client __must__ submit a request to the endpoint `/plans/version/active_recovery/exercise_modalities`. The request method __must__ be `PATCH`.
+The client __must__ submit a request to the endpoint `/plans/version/active_recovery/{User UUID}/exercise_modalities`. The request method __must__ be `PATCH`.
 
 ##### Request
 
@@ -778,8 +574,8 @@ The client __must__ submit a request body containing a JSON object with the foll
 * `completed_exercises` __should__ be a list representing the exercises that the user checked off
 
 ```
-PATCH /plans/version/active_recovery/exercise_modalities HTTPS/1.1
-Host: apis.env.fathomai.com
+PATCH /plans/version/active_recovery/{User UUID}/exercise_modalities HTTPS/1.1
+Host: apis.{env}.fathomai.com
 Content-Type: application/json
 Authorization: eyJraWQ...ajBc4VQ
 {
@@ -807,7 +603,7 @@ This endpoint can be called to mark the start of body part based modalities.
 
 ##### Query String
  
-The client __must__ submit a request to the endpoint `/plans/version/active_recovery/body_part_modalities`. The request method __must__ be `POST`.
+The client __must__ submit a request to the endpoint `/plans/version/active_recovery/{User UUID}/body_part_modalities`. The request method __must__ be `POST`.
 
 ##### Request
 
@@ -822,8 +618,8 @@ The client __must__ submit a request body containing a JSON object with the foll
 * `recovery_type` __should__ be one of `heat`, `ice` or `cold_water_immersion`
 
 ```
-POST /plans/version/active_recovery/body_part_modalities HTTPS/1.1
-Host: apis.env.fathomai.com
+POST /plans/version/active_recovery/{User UUID}/body_part_modalities HTTPS/1.1
+Host: apis.{env}.fathomai.com
 Content-Type: application/json
 Authorization: eyJraWQ...ajBc4VQ
 {
@@ -847,7 +643,7 @@ This endpoint can be called to mark the completion of body part based modalities
 
 ##### Query String
  
-The client __must__ submit a request to the endpoint `/plans/version/active_recovery/body_part_modalities`. The request method __must__ be `PATCH`.
+The client __must__ submit a request to the endpoint `/plans/version/active_recovery/{User UUID}/body_part_modalities`. The request method __must__ be `PATCH`.
 
 ##### Request
 
@@ -881,8 +677,8 @@ The client __must__ submit a request body containing a JSON object with the foll
 ```
 
 ```
-PATCH /plans/version/active_recovery/body_part_modalities HTTPS/1.1
-Host: apis.env.fathomai.com
+PATCH /plans/version/active_recovery/{User UUID}/body_part_modalities HTTPS/1.1
+Host: apis.{env}.fathomai.com
 Content-Type: application/json
 Authorization: eyJraWQ...ajBc4VQ
 {
@@ -903,180 +699,12 @@ Authorization: eyJraWQ...ajBc4VQ
 * `daily_plan` will have the same structure as defined in output of [Get daily plan](#get-daily-plan) route.
 
 
-#### Adjust active time (Deprecated)
-
-This endpoint can be called to adjust the active time for either pre- or post-recovery.
-
-##### Query String
- 
-The client __must__ submit a request to the endpoint `/plans/version/active_recovery/active_time`. The request method __must__ be `PATCH`.
-
-##### Request
-
-The client __must__ submit a request body containing a JSON object with the following schema:
-```
-{
-    "event_date": Datetime,
-    "active_time": number
-}
-```
-* `event_date` __should__ be the time when user makes the request
-* `active_time` __should__ be in minutes
-
-```
-PATCH /plans/version/active_recovery/active_time HTTPS/1.1
-Host: apis.env.fathomai.com
-Content-Type: application/json
-Authorization: eyJraWQ...ajBc4VQ
-{
-    "event_date": "2018-09-21T17:53:39Z",
-    "active_time": 20
-}
-```
-##### Responses
- 
- If the write was successful, the Service __will__ respond with HTTP Status `200 OK` with a body with the following syntax:
-```
-{
-    "daily_plans": [daily_plan]
-}
-```
-* `daily_plan` will have the same structure as defined in output of [Get daily plan](#get-daily-plan) route.
-
-### Functional Strength (Deprecated)
-
-#### Activate
-
-This endpoint can be called to activate functional strength and define sport and position.
-
-##### Query String
- 
-The client __must__ submit a request to the endpoint `/plans/version/functional_strength/activate`. The request method __must__ be `POST`.
-
-##### Request
-
-The client __must__ submit a request body containing a JSON object with the following schema:
-```
-{
-    "event_date": Datetime,
-    "current_sport_name": number
-    "current_position": number
-}
-```
-* `event_date` __should__ be the time when user submits the request
-* `current_sport_name` __should__ be integer representing SportName enumeration
-* `current_position` __should__ be integer representating position enumeration. It should be `null` if no positions exist for the sport.
-
-```
-POST /plans/version/functional_strength/activate HTTPS/1.1
-Host: apis.env.fathomai.com
-Content-Type: application/json
-Authorization: eyJraWQ...ajBc4VQ
-
-{
-    "event_date": "2018-09-21T17:53:39Z",
-    "current_sport_name": 14,
-    "current_position": 0
-}
-```
-##### Responses
- 
- If the write was successful, the Service __will__ respond with HTTP Status `200 OK`, with a body with the following syntax:
- 
-```
-{
-    "daily_plan": daily_plan
-}
-```
-where `daily_plan` will have the standard schema as defined in [Get daily plan](#get-daily-plan)
-
-#### Mark Started (Deprecated)
-
-This endpoint can be called to mark functional strength start.
-
-##### Query String
- 
-The client __must__ submit a request to the endpoint `/plans/version/functional_strength`. The request method __must__ be `POST`.
-
-##### Request
-
-The client __must__ submit a request body containing a JSON object with the following schema:
-```
-{
-    "event_date": Datetime,
-}
-```
-* `event_date` __should__ be the time when user starts (checks the first exercise off) the session.
-
-```
-POST /plans/version/functional_strength HTTPS/1.1
-Host: apis.env.fathomai.com
-Content-Type: application/json
-Authorization: eyJraWQ...ajBc4VQ
-
-{
-    "event_date": "2018-09-21T17:53:39Z"
-}
-```
-##### Responses
- 
- If the write was successful, the Service __will__ respond with HTTP Status `200 OK`, with a body with the following syntax:
- 
-```
-{
-    "message": "success"
-}
-```
-
-#### Mark Completed (Deprecated)
-
-This endpoint can be called to mark functional strength completion.
-
-##### Query String
- 
-The client __must__ submit a request to the endpoint `/plans/version/functional_strength`. The request method __must__ be `PATCH`.
-
-##### Request
-
-The client __must__ submit a request body containing a JSON object with the following schema:
-```
-{
-    "event_date": Datetime,
-    "completed_exercises": [string]
-}
-```
-* `event_date` __should__ be the time when user completes the session.
-
-```
-PATCH /plans/version/functional_strength HTTPS/1.1
-Host: apis.env.fathomai.com
-Content-Type: application/json
-Authorization: eyJraWQ...ajBc4VQ
-
-{
-    "event_date": "2018-09-21T17:53:39Z",
-    "completed_exercises": ["3", "5", "20", "142"]
-}
-```
-##### Responses
- 
- If the write was successful, the Service __will__ respond with HTTP Status `202 Accepted`, and return the daily_plan in the body with following syntax.
- 
-```
-{
-    "daily_plans": [daily_plan]
-}
-```
-* `daily_plan` will have the same structure as defined in output of [Get daily plan](#get-daily-plan) route.
-
-
-
 ### Daily Plans
 
 #### Get daily plan
 
 ##### Query String
-The client __must__ submit a request to the endpoint `/plans/version/daily_plan`. The request method __must__ be `POST`.
+The client __must__ submit a request to the endpoint `/plans/version/daily_plan/{User UUID}`. The request method __must__ be `POST`.
 
 ##### Request
 The client __must__ submit a request body containing a JSON object with the following schema:
@@ -1092,8 +720,8 @@ The client __must__ submit a request body containing a JSON object with the foll
 * `end_date` __should__ should be of format `yyyy-mm-dd` but is __optional__
 
 ```
-POST /plans/version/daily_plan HTTPS/1.1
-Host: apis.env.fathomai.com
+POST /plans/version/daily_plan/{User UUID} HTTPS/1.1
+Host: apis.{env}.fathomai.com
 Content-Type: application/json
 Authorization: eyJraWQ...ajBc4VQ
 
@@ -1480,7 +1108,7 @@ Authorization: eyJraWQ...ajBc4VQ
 This endpoint can used to submit health app workouts from missed days
 
 ##### Query String
-The client __must__ submit a request to the endpoint `/plans/version/health_data`. The request method __must__ be `POST`.
+The client __must__ submit a request to the endpoint `/plans/version/health_data/{User UUID}`. The request method __must__ be `POST`.
 
 ##### Request
 The client __must__ submit a request body containing a JSON object with the following schema:
@@ -1500,8 +1128,8 @@ The client __must__ submit a request body containing a JSON object with the foll
 * `sleep_event` __should__ follow the same schema as defined in [Readiness Create](#create)
 
 ```
-POST /plans/version/health_data HTTPS/1.1
-Host: apis.env.fathomai.com
+POST /plans/version/health_data/{User UUID} HTTPS/1.1
+Host: apis.{env}.fathomai.com
 Content-Type: application/json
 Authorization: eyJraWQ...ajBc4VQ
 
@@ -1528,7 +1156,7 @@ Authorization: eyJraWQ...ajBc4VQ
 This endpoint can used to clear the user's data for the given day. Note that his endpoint is restricted to select demo accounts and user must be authorized to perform the action. It will clear out users daily readiness survey and their plan for the day. If the request is made before 3 am, plan and surveys for the previous day will be cleared which is consistent with 3am being the cutoff time for the new daily plan.
 
 ##### Query String
-The client __must__ submit a request to the endpoint `/plans/version/misc/clear_user_data`. The request method __must__ be `POST`.
+The client __must__ submit a request to the endpoint `/plans/version/misc/{User UUID}/clear_user_data`. The request method __must__ be `POST`.
 
 ##### Request
 The client __must__ submit a request body containing a JSON object with the following schema:
@@ -1540,8 +1168,8 @@ The client __must__ submit a request body containing a JSON object with the foll
 * `event_date` __should__ reflect the local date and time when the request was made
 
 ```
-POST /plans/version/misc/clear_user_data HTTPS/1.1
-Host: apis.env.fathomai.com
+POST /plans/version/misc/{User UUID}/clear_user_data HTTPS/1.1
+Host: apis.{env}.fathomai.com
 Content-Type: application/json
 Authorization: eyJraWQ...ajBc4VQ
 
@@ -1562,7 +1190,7 @@ Authorization: eyJraWQ...ajBc4VQ
 This endpoingt can be used to log relevant device/app information and usage
 
 ##### Query String
-The client __must__ submit a request to the endpoint `/plans/version/misc/app_logs`. The request method __must__ be `POST`.
+The client __must__ submit a request to the endpoint `/plans/version/misc/{User UUID}/app_logs`. The request method __must__ be `POST`.
 
 ##### Request
 The client __must__ submit a request body containing a JSON object with the following schema:
@@ -1582,8 +1210,8 @@ The client __must__ submit a request body containing a JSON object with the foll
 
 
 ```
-POST /plans/version/misc/app_logs HTTPS/1.1
-Host: apis.env.fathomai.com
+POST /plans/version/misc/{User UUID}/app_logs HTTPS/1.1
+Host: apis.{env}.fathomai.com
 Content-Type: application/json
 Authorization: eyJraWQ...ajBc4VQ
 
@@ -1607,7 +1235,7 @@ Authorization: eyJraWQ...ajBc4VQ
 This endpoint can used to copy test user's data to create personas to test different scenarios. Note that his endpoint is restricted to dev and test environment to specific test accounts.
 
 ##### Query String
-The client __must__ submit a request to the endpoint `/plans/version/misc/copy_test_data`. The request method __must__ be `POST`.
+The client __must__ submit a request to the endpoint `/plans/version/misc/{User UUID}/copy_test_data`. The request method __must__ be `POST`.
 
 ##### Request
 The client __must__ submit a request body containing a JSON object with the following schema:
@@ -1621,8 +1249,8 @@ The client __must__ submit a request body containing a JSON object with the foll
 * `cop_all` __should__ be true if trying to copy/reset data for all personas. Setting it false would only copy/reset data for the persona logged in.
 
 ```
-POST /plans/version/misc/copy_test_data HTTPS/1.1
-Host: apis.env.fathomai.com
+POST /plans/version/misc/{User UUID}/copy_test_data HTTPS/1.1
+Host: apis.{env}.fathomai.com
 Content-Type: application/json
 Authorization: eyJraWQ...ajBc4VQ
 

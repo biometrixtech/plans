@@ -20,11 +20,11 @@ app = Blueprint('misc', __name__)
 USERS_API_VERSION = os.environ['USERS_API_VERSION']
 
 
-@app.route('/clear_user_data', methods=['POST'])
+@app.route('/<uuid:user_id>/clear_user_data', methods=['POST'])
 @require.body({'event_date': str})
 @require.authenticated.any
 @xray_recorder.capture('routes.misc.clearuser')
-def handle_clear_user_data(principal_id=None):
+def handle_clear_user_data(user_id=None):
     # users_service = Service('users', '2_0')
     # user_data = users_service.call_apigateway_sync(method='GET',
     #                                                endpoint=f'user/{principal_id}')
@@ -48,7 +48,7 @@ def handle_clear_user_data(principal_id=None):
     #     "hello+demo5@fathomai.com"
     # ]:
     #     raise ForbiddenException("The user is not allowed to perform this action.")
-    user_id = principal_id
+    #user_id = principal_id
 
     current_time = parse_datetime(request.json['event_date'])
 
@@ -132,13 +132,13 @@ def handle_data_migration():
     return {'message': 'success'}, 200
 
 
-@app.route('/app_logs', methods=['POST'])
+@app.route('/<uuid:user_id>/app_logs', methods=['POST'])
 @require.authenticated.any
 @xray_recorder.capture('routes.misc.app_logs')
-def handle_app_open_tracking(principal_id=None):
+def handle_app_open_tracking(user_id=None):
     event_date = request.json['event_date']
     mongo_collection = get_mongo_collection('applogs')
-    log = AppLogs(principal_id, event_date)
+    log = AppLogs(user_id, event_date)
     log.os_name = request.json.get('os_name', None)
     log.os_version = request.json.get('os_version', None)
     log.app_version = request.json.get('app_version', None)
@@ -149,15 +149,15 @@ def handle_app_open_tracking(principal_id=None):
     return {'message': 'success'}, 200
 
 
-@app.route('/copy_test_data', methods=['POST'])
+@app.route('/<uuid:user_id>/copy_test_data', methods=['POST'])
 @require.authenticated.any
 @xray_recorder.capture('routes.misc.copy_test_data')
-def handle_test_data_copy(principal_id=None):
+def handle_test_data_copy(user_id=None):
     """Copy data for test user from test collection
     """
     if Config.get('ENVIRONMENT') == 'production':
         raise ForbiddenException("This API is only allowed in develop/test environment")
-    user_id = principal_id
+    #user_id = principal_id
     event_date = parse_datetime(request.json['event_date'])
 
     mongo_database = get_mongo_database()

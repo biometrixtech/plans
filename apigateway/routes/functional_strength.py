@@ -16,12 +16,12 @@ from datetime import timedelta
 app = Blueprint('functional_strength', __name__)
 
 
-@app.route('/', methods=['PATCH'])
+@app.route('/<uuid:user_id>/', methods=['PATCH'])
 @require.authenticated.any
 @require.body({'event_date': str})
 @xray_recorder.capture('routes.functional_strength')
-def handle_functional_strength_update(principal_id=None):
-    user_id = principal_id
+def handle_functional_strength_update(user_id=None):
+    #user_id = principal_id
 
     event_date = parse_datetime(request.json['event_date'])
     completed_exercises = request.json.get('completed_exercises', [])
@@ -65,12 +65,12 @@ def handle_functional_strength_update(principal_id=None):
     return {'daily_plans': [plan]}, 202
 
 
-@app.route('/', methods=['POST'])
+@app.route('/<uuid:user_id>/', methods=['POST'])
 @require.authenticated.any
 @require.body({'event_date': str})
 @xray_recorder.capture('routes.functional_strength')
-def handle_functional_strength_start(principal_id=None):
-    user_id = principal_id
+def handle_functional_strength_start(user_id=None):
+    #user_id = principal_id
     event_date = parse_datetime(request.json['event_date'])
 
     plan_event_date = format_date(event_date)
@@ -97,13 +97,13 @@ def handle_functional_strength_start(principal_id=None):
     return {'message': 'success'}, 200
 
 
-@app.route('/activate', methods=['POST'])
+@app.route('/<uuid:user_id>/activate', methods=['POST'])
 @require.authenticated.any
 @require.body({'event_date': str, "current_sport_name": (int, None), "current_position": (int, None)})
 @xray_recorder.capture('routes.functional_strength.activate')
-def handle_functional_strength_activate(principal_id=None):
+def handle_functional_strength_activate(user_id=None):
 
-    user_id = principal_id
+    #user_id = principal_id
     event_date = parse_datetime(request.json['event_date'])
     plan_event_date = format_date(event_date)
 
