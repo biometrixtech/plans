@@ -10,6 +10,7 @@ from models.soreness_base import HistoricSorenessStatus
 from models.body_parts import BodyPart, BodyPartLocation
 #from models.historic_soreness import HistoricSoreness
 from models.modalities import ActiveRestAfterTraining, ActiveRestBeforeTraining
+from models.trigger import Trigger, TriggerType
 from logic.trigger_processing import TriggerFactory
 from tests.mocks.mock_exercise_datastore import ExerciseLibraryDatastore
 from tests.mocks.mock_completed_exercise_datastore import CompletedExerciseDatastore
@@ -231,6 +232,22 @@ def test_active_rest_after_training_check_pain_severity_4():
         assert len(active_rest.static_stretch_exercises) == 0
         assert len(active_rest.isolated_activate_exercises) == 0
         assert len(active_rest.static_integrate_exercises) == 0
+
+
+def test_active_rest_after_training_three_sensor_asymmetry():
+
+    active_rest = ActiveRestAfterTraining(event_date_time=datetime.today())
+
+    exercise_library = exercise_library_datastore.get()
+
+    trigger = Trigger(TriggerType.movement_error_apt_asymmetry)
+
+    active_rest.check_reactive_three_sensor([trigger], exercise_library)
+
+    assert len(active_rest.inhibit_exercises) > 0
+    assert len(active_rest.static_stretch_exercises) > 0
+    assert len(active_rest.isolated_activate_exercises) == 0
+    assert len(active_rest.static_integrate_exercises) == 0
 
 
 def test_active_rest_after_training_empty_soreness_blank():

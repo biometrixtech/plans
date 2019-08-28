@@ -1,6 +1,7 @@
 from flask import request, Blueprint
 import datetime
 
+from routes.visualizations import get_visualization_parameter
 from utils import format_date, format_datetime, parse_datetime
 from datastores.datastore_collection import DatastoreCollection
 from logic.athlete_status_processing import AthleteStatusProcessing
@@ -16,13 +17,13 @@ daily_plan_datastore = datastore_collection.daily_plan_datastore
 app = Blueprint('daily_plan', __name__)
 
 
-@app.route('/', methods=['POST'])
+@app.route('/<uuid:user_id>/', methods=['POST'])
 @require.authenticated.any
 @require.body({'start_date': str})
 @xray_recorder.capture('routes.daily_plan.get')
-def handle_daily_plan_get(principal_id=None):
+def handle_daily_plan_get(user_id=None):
     validate_input()
-    user_id = principal_id
+    #user_id = principal_id
     event_date = request.json.get('event_date', format_datetime(datetime.datetime.utcnow()))
     event_date = parse_datetime(event_date)
 
@@ -32,6 +33,7 @@ def handle_daily_plan_get(principal_id=None):
     else:
         start_date = format_date(event_date)
         end_date = start_date
+    visualizations = get_visualization_parameter(request)
     items = daily_plan_datastore.get(user_id, start_date, end_date)
     daily_plans = []
     need_soreness_sessions = False
@@ -39,11 +41,16 @@ def handle_daily_plan_get(principal_id=None):
         survey_complete = plan.daily_readiness_survey_completed()
         if plan.event_date == format_date(event_date) and not survey_complete:
             need_soreness_sessions = True
-        # if RS completed today but no trends, this is the case of RS completed on old app and logging in to new app --> re-generate plan
-        if plan.event_date == format_date(event_date) and survey_complete and (plan.trends is None or plan.trends.body_response is None):  
-            plan = create_plan(user_id, event_date, update_stats=True)
+        # handle case of RS completed on old app and logging in to new app --> re-generate plan
+        # 4_3 to 4_4 changes
+        if plan.trends is not None and plan.trends.trend_categories is not None:
+            insight_types = [tc.insight_type.value for tc in plan.trends.trend_categories]
         else:
-            plan = cleanup_plan(plan)
+            insight_types = []
+        if plan.event_date == format_date(event_date) and survey_complete and (plan.trends is None or plan.trends.body_response is None or 6 not in insight_types):
+            plan = create_plan(user_id, event_date, update_stats=True, visualizations=visualizations)
+        else:
+            plan = cleanup_plan(plan, visualizations=visualizations)
         daily_plans.append(plan)
     if need_soreness_sessions:
         previous_soreness_processor = AthleteStatusProcessing(user_id, event_date, datastore_collection=datastore_collection)

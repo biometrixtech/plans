@@ -26,7 +26,7 @@ class LegendColor(Enum):
     green = 0
     yellow = 1
     red = 2
-    slate = 3
+    slate_x_light = 3
     splash_light = 4
     warning_light = 5
     error_light = 6
@@ -34,6 +34,10 @@ class LegendColor(Enum):
     purple_light_opacity = 8
     splash_light_opacity = 9
     purple_light = 10
+    slate_ight = 11
+    slate = 12
+    success_light = 13
+    splash_half = 14
 
 
 class Legend(object):
@@ -77,8 +81,9 @@ class VisualizationType(Enum):
     sensor = 6
     body_response = 7
     workload = 8
-    tight_overactice_underactive = 9
-    pain_functional_limitation = 10
+    personalized_recovery = 9
+    prevention = 10
+    care_today = 11
     biomechanics = 20
 
 
