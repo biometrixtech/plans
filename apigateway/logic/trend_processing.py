@@ -1327,7 +1327,7 @@ class TrendProcessor(object):
                 statistic_text = ""
                 bold_statistic_text = []
                 if t.metric is not None:
-                    statistic_text = str(t.metric) + "% of Max"
+                    statistic_text = str(t.metric) + "% of Max Workload"
                     bold_stat_text = BoldText()
                     bold_stat_text.text = str(t.metric) + "%"
                     bold_statistic_text.append(bold_stat_text)
