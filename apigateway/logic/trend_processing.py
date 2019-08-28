@@ -1091,7 +1091,7 @@ class TrendProcessor(object):
                         tile_1.description = mobilize_suffix
                         bold_1 = BoldText()
                         bold_1.text = "Foam Roll & Static Stretch"
-                        bold_1.color = LegendColor.warning_light
+                        bold_1.color = LegendColor.error_light
                         tile_1.bold_text.append(bold_1)
                         tile_1.statistic_text = statistic_text
                         tile_1.bold_statistic_text = bold_statistic_text
@@ -1146,7 +1146,7 @@ class TrendProcessor(object):
                         tile_1.description = mobilize_suffix
                         bold_1 = BoldText()
                         bold_1.text = "Foam Roll & Static Stretch"
-                        bold_1.color = LegendColor.warning_light
+                        bold_1.color = LegendColor.splash_light
                         tile_1.bold_text.append(bold_1)
                         tile_1.statistic_text = statistic_text
                         tile_1.bold_statistic_text = bold_statistic_text
