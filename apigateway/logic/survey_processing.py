@@ -304,7 +304,7 @@ def match_sessions(user_sessions, health_session):
     return health_session
 
 
-def create_plan(user_id, event_date, update_stats=True, athlete_stats=None, stats_processor=None, datastore_collection=None, force_data=False, mobilize_only=False):
+def create_plan(user_id, event_date, update_stats=True, athlete_stats=None, stats_processor=None, datastore_collection=None, force_data=False, mobilize_only=False, visualizations=True):
     if datastore_collection is None:
         datastore_collection = DatastoreCollection()
     if update_stats:
@@ -329,19 +329,26 @@ def create_plan(user_id, event_date, update_stats=True, athlete_stats=None, stat
                                           last_updated=format_datetime(event_date),
                                           athlete_stats=athlete_stats,
                                           force_data=force_data,
-                                          mobilize_only=mobilize_only)
-    plan = cleanup_plan(plan)
+                                          mobilize_only=mobilize_only,
+                                          visualizations=visualizations)
+    plan = cleanup_plan(plan, visualizations)
 
     return plan
 
 
-def cleanup_plan(plan):
+def cleanup_plan(plan, visualizations=True):
     survey_complete = plan.daily_readiness_survey_completed()
     landing_screen, nav_bar_indicator = plan.define_landing_screen()
+
     plan = plan.json_serialise()
     plan['daily_readiness_survey_completed'] = survey_complete
-    plan['landing_screen'] = landing_screen
-    plan['nav_bar_indicator'] = nav_bar_indicator
+
+    if visualizations:
+        plan['landing_screen'] = landing_screen
+        plan['nav_bar_indicator'] = nav_bar_indicator
+    else:
+        del plan['trends']
+
     del plan['daily_readiness_survey'], plan['user_id']
 
     return plan

@@ -120,6 +120,8 @@ class RecoveryTextGenerator(object):
             return side_text + "tricep"
         elif body_part_location == BodyPartLocation.biceps:
             return side_text + "bicep"
+        else:
+            return ""
 
     def get_body_part_text_plural(self, body_part_location, side=None):
 

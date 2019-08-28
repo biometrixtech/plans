@@ -1,5 +1,5 @@
 from enum import Enum
-from models.chart_data import TrainingVolumeChartData, BodyResponseChartData, WorkoutChartData, TightOverUnderactiveChartData, PainFunctionalLimitationChartData, BiomechanicsChart
+from models.chart_data import TrainingVolumeChartData, BodyResponseChartData, WorkoutChartData, PersonalizedRecoveryChartData, PreventionChartData, BiomechanicsChart, CareTodayChartData
 from models.insights import InsightType
 from models.soreness_base import BodyPartSide
 from models.sport import SportName
@@ -45,6 +45,7 @@ class Trend(object):
         self.visible = False
         self.plan_alert_short_title = ""
         self.triggers = []
+        self.trigger_tiles = []
         self.video_url = ""
         # these do not need to be persisted, used in logic only
         self.dashboard_body_part = None
@@ -79,6 +80,7 @@ class Trend(object):
             'visible': self.visible,
             'plan_alert_short_title': self.plan_alert_short_title,
             'triggers': [t.json_serialise() for t in self.triggers],
+            'trigger_tiles': [t.json_serialise() for t in self.trigger_tiles],
             'video_url': self.video_url
         }
         return ret
@@ -122,6 +124,7 @@ class Trend(object):
         trend.visible = input_dict.get('visible', False)
         trend.plan_alert_short_title = input_dict.get('plan_alert_short_tile', '')
         trend.triggers = [Trigger.json_deserialise(t) for t in input_dict.get('triggers', [])]
+        trend.trigger_tiles = [TriggerTile.json_deserialise(t) for t in input_dict.get('trigger_tiles', [])]
         trend.video_url = input_dict.get('video_url', '')
         return trend
 
@@ -451,6 +454,41 @@ class DataStatus(object):
         return data_status
 
 
+class TriggerTile(Serialisable):
+    def __init__(self):
+        self.text = ""
+        self.description = ""
+        self.bold_text = []
+        self.statistic_text = ""
+        self.bold_statistic_text = []
+        self.trigger_type = None
+        self.sport_name = None
+
+    def json_serialise(self):
+        ret = {'text': self.text,
+               'description': self.description,
+               'bold_text': [b.json_serialise() for b in self.bold_text],
+               'statistic_text': self.statistic_text,
+               'bold_statistic_text': [b.json_serialise() for b in self.bold_statistic_text],
+               'trigger_type': self.trigger_type.value if self.trigger_type is not None else None,
+               'sport_name': self.sport_name.value if self.sport_name is not None else None,
+               }
+        return ret
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        trigger_tile = cls()
+        trigger_tile.text = input_dict.get('text', "")
+        trigger_tile.description = input_dict.get('description', '')
+        trigger_tile.bold_text = [BoldText.json_deserialise(b) for b in input_dict.get('bold_text', [])]
+        trigger_tile.statistic_text = input_dict.get('statistic_text', "")
+        trigger_tile.bold_statistic_text = [BoldText.json_deserialise(b) for b in input_dict.get('bold_statistic_text', [])]
+        trigger_tile.trigger_type = TriggerType(input_dict['trigger_type']) if input_dict.get('trigger_type') is not None else None
+        sport_name = input_dict.get('sport_name', None)
+        trigger_tile.sport_name = SportName(sport_name) if sport_name is not None else None
+        return trigger_tile
+
+
 class TrendData(object):
     def __init__(self):
         self.lockout = False
@@ -492,10 +530,14 @@ class TrendData(object):
             trend_data.data = [BodyResponseChartData.json_deserialise(data) for data in input_dict.get('data', [])]
         elif trend_data.visualization_type == VisualizationType.workload:
             trend_data.data = [WorkoutChartData.json_deserialise(data) for data in input_dict.get('data', [])]
-        elif trend_data.visualization_type == VisualizationType.tight_overactice_underactive:
-            trend_data.data = [TightOverUnderactiveChartData.json_deserialise(data) for data in input_dict.get('data', [])]
-        elif trend_data.visualization_type == VisualizationType.pain_functional_limitation:
-            trend_data.data = [PainFunctionalLimitationChartData.json_deserialise(data) for data in input_dict.get('data', [])]
+        elif trend_data.visualization_type == VisualizationType.personalized_recovery:
+            trend_data.data = [PersonalizedRecoveryChartData.json_deserialise(data) for data in input_dict.get('data', [])]
+        elif trend_data.visualization_type == VisualizationType.prevention:
+            trend_data.data = [PreventionChartData.json_deserialise(data) for data in input_dict.get('data', [])]
+        elif trend_data.visualization_type == VisualizationType.care_today:
+            trend_data.data = [CareTodayChartData.json_deserialise(data) for data in
+                               input_dict.get('data', [])]
+
         else:
             trend_data.data = []
 

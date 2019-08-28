@@ -175,103 +175,103 @@ def test_cooldown_check_soreness_severity_4():
         assert len(cooldown.dynamic_integrate_exercises) == 0
 
 
-def test_cooldown_check_corrective_soreness_severity_3():
-
-    current_date_time = datetime.today()
-    cooldown = CoolDown(True, False, False, event_date_time=current_date_time)
-
-    for b in body_parts_1:
-        soreness = Soreness()
-        soreness.body_part = BodyPart(BodyPartLocation(b), None)
-        soreness.severity = 3
-        soreness.side = 1
-        soreness.historic_soreness_status = HistoricSorenessStatus.persistent_soreness
-        historic_date_time = current_date_time - timedelta(days=31)
-        soreness.first_reported_date_time = historic_date_time
-        exercise_library = exercise_library_datastore.get()
-
-        factory = TriggerFactory(datetime.now(), None, [soreness], [])
-        factory.load_triggers()
-
-        for t in factory.triggers:
-            cooldown.check_corrective(t, current_date_time, exercise_library)
-
-        # dynamic stretch not ready yet
-        #assert len(cooldown.dynamic_stretch_exercises) > 0, 'Error with ' + str(BodyPartLocation(b))
-        # dynamic integrate not defined yet
-        #assert len(cooldown.dynamic_integrate_exercises) > 0
-
-
-def test_cooldown_check_corrective_soreness_severity_4():
-
-    current_date_time = datetime.today()
-    cooldown = CoolDown(True, False, False, event_date_time=current_date_time)
-
-    for b in body_parts_1:
-        soreness = Soreness()
-        soreness.body_part = BodyPart(BodyPartLocation(b), None)
-        soreness.severity = 4
-        soreness.side = 1
-        soreness.historic_soreness_status = HistoricSorenessStatus.persistent_soreness
-        historic_date_time = current_date_time - timedelta(days=31)
-        soreness.first_reported_date_time = historic_date_time
-        exercise_library = exercise_library_datastore.get()
-        factory = TriggerFactory(datetime.now(), None, [soreness], [])
-        factory.load_triggers()
-
-        for t in factory.triggers:
-            cooldown.check_corrective(t, current_date_time, exercise_library)
-
-        # dynamic stretch not ready yet
-        #assert len(cooldown.dynamic_stretch_exercises) == 0, 'Error with ' + str(BodyPartLocation(b))
-        #assert len(cooldown.dynamic_integrate_exercises) == 0, 'Error with ' + str(BodyPartLocation(b))
-
-
-def test_cooldown_check_corrective_pain_severity_3():
-
-    current_date_time = datetime.today()
-    cooldown = CoolDown(True, False, False, event_date_time=current_date_time)
-
-    for b in body_parts_1:
-        soreness = Soreness()
-        soreness.body_part = BodyPart(BodyPartLocation(b), None)
-        soreness.severity = 3
-        soreness.side = 1
-        soreness.historic_soreness_status = HistoricSorenessStatus.persistent_pain
-        historic_date_time = current_date_time - timedelta(days=31)
-        soreness.first_reported_date_time = historic_date_time
-        exercise_library = exercise_library_datastore.get()
-        factory = TriggerFactory(datetime.now(), None, [soreness], [])
-        factory.load_triggers()
-
-        for t in factory.triggers:
-            cooldown.check_corrective(t, current_date_time, exercise_library)
-
-        # dynamic stretch not ready yet
-        #assert len(cooldown.dynamic_stretch_exercises) > 0, 'Error with ' + str(BodyPartLocation(b))
-        # dynamic integrate not defined yet
-        # assert len(cooldown.dynamic_integrate_exercises) > 0
-
-
-def test_cooldown_check_corrective_pain_severity_4():
-
-    current_date_time = datetime.today()
-    cooldown = CoolDown(True, False, False, event_date_time=current_date_time)
-
-    for b in body_parts_1:
-        soreness = Soreness()
-        soreness.body_part = BodyPart(BodyPartLocation(b), None)
-        soreness.severity = 4
-        soreness.side = 1
-        soreness.historic_soreness_status = HistoricSorenessStatus.persistent_pain
-        historic_date_time = current_date_time - timedelta(days=31)
-        soreness.first_reported_date_time = historic_date_time
-        exercise_library = exercise_library_datastore.get()
-        factory = TriggerFactory(datetime.now(), None, [soreness], [])
-        factory.load_triggers()
-
-        for t in factory.triggers:
-            cooldown.check_corrective(t, current_date_time, exercise_library)
+# def test_cooldown_check_corrective_soreness_severity_3():
+#
+#     current_date_time = datetime.today()
+#     cooldown = CoolDown(True, False, False, event_date_time=current_date_time)
+#
+#     for b in body_parts_1:
+#         soreness = Soreness()
+#         soreness.body_part = BodyPart(BodyPartLocation(b), None)
+#         soreness.severity = 3
+#         soreness.side = 1
+#         soreness.historic_soreness_status = HistoricSorenessStatus.persistent_soreness
+#         historic_date_time = current_date_time - timedelta(days=31)
+#         soreness.first_reported_date_time = historic_date_time
+#         exercise_library = exercise_library_datastore.get()
+#
+#         factory = TriggerFactory(datetime.now(), None, [soreness], [])
+#         factory.load_triggers()
+#
+#         for t in factory.triggers:
+#             cooldown.check_corrective(t, current_date_time, exercise_library)
+#
+#         # dynamic stretch not ready yet
+#         #assert len(cooldown.dynamic_stretch_exercises) > 0, 'Error with ' + str(BodyPartLocation(b))
+#         # dynamic integrate not defined yet
+#         #assert len(cooldown.dynamic_integrate_exercises) > 0
+#
+#
+# def test_cooldown_check_corrective_soreness_severity_4():
+#
+#     current_date_time = datetime.today()
+#     cooldown = CoolDown(True, False, False, event_date_time=current_date_time)
+#
+#     for b in body_parts_1:
+#         soreness = Soreness()
+#         soreness.body_part = BodyPart(BodyPartLocation(b), None)
+#         soreness.severity = 4
+#         soreness.side = 1
+#         soreness.historic_soreness_status = HistoricSorenessStatus.persistent_soreness
+#         historic_date_time = current_date_time - timedelta(days=31)
+#         soreness.first_reported_date_time = historic_date_time
+#         exercise_library = exercise_library_datastore.get()
+#         factory = TriggerFactory(datetime.now(), None, [soreness], [])
+#         factory.load_triggers()
+#
+#         for t in factory.triggers:
+#             cooldown.check_corrective(t, current_date_time, exercise_library)
+#
+#         # dynamic stretch not ready yet
+#         #assert len(cooldown.dynamic_stretch_exercises) == 0, 'Error with ' + str(BodyPartLocation(b))
+#         #assert len(cooldown.dynamic_integrate_exercises) == 0, 'Error with ' + str(BodyPartLocation(b))
+#
+#
+# def test_cooldown_check_corrective_pain_severity_3():
+#
+#     current_date_time = datetime.today()
+#     cooldown = CoolDown(True, False, False, event_date_time=current_date_time)
+#
+#     for b in body_parts_1:
+#         soreness = Soreness()
+#         soreness.body_part = BodyPart(BodyPartLocation(b), None)
+#         soreness.severity = 3
+#         soreness.side = 1
+#         soreness.historic_soreness_status = HistoricSorenessStatus.persistent_pain
+#         historic_date_time = current_date_time - timedelta(days=31)
+#         soreness.first_reported_date_time = historic_date_time
+#         exercise_library = exercise_library_datastore.get()
+#         factory = TriggerFactory(datetime.now(), None, [soreness], [])
+#         factory.load_triggers()
+#
+#         for t in factory.triggers:
+#             cooldown.check_corrective(t, current_date_time, exercise_library)
+#
+#         # dynamic stretch not ready yet
+#         #assert len(cooldown.dynamic_stretch_exercises) > 0, 'Error with ' + str(BodyPartLocation(b))
+#         # dynamic integrate not defined yet
+#         # assert len(cooldown.dynamic_integrate_exercises) > 0
+#
+#
+# def test_cooldown_check_corrective_pain_severity_4():
+#
+#     current_date_time = datetime.today()
+#     cooldown = CoolDown(True, False, False, event_date_time=current_date_time)
+#
+#     for b in body_parts_1:
+#         soreness = Soreness()
+#         soreness.body_part = BodyPart(BodyPartLocation(b), None)
+#         soreness.severity = 4
+#         soreness.side = 1
+#         soreness.historic_soreness_status = HistoricSorenessStatus.persistent_pain
+#         historic_date_time = current_date_time - timedelta(days=31)
+#         soreness.first_reported_date_time = historic_date_time
+#         exercise_library = exercise_library_datastore.get()
+#         factory = TriggerFactory(datetime.now(), None, [soreness], [])
+#         factory.load_triggers()
+#
+#         for t in factory.triggers:
+#             cooldown.check_corrective(t, current_date_time, exercise_library)
 
         # dynamic stretch not ready yet
         #assert len(cooldown.dynamic_stretch_exercises) == 0, 'Error with ' + str(BodyPartLocation(b))

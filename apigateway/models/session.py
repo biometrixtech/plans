@@ -542,18 +542,20 @@ class HighLoadSession(Serialisable):
     def __init__(self, date, sport_name):
         self.date = date
         self.sport_name = sport_name
+        self.percent_of_max = None
 
     @classmethod
     def json_deserialise(cls, input_dict):
 
         session = HighLoadSession(parse_datetime(input_dict["date"]),  SportName(int(input_dict["sport_name"])))
-
+        session.percent_of_max = input_dict['percent_of_max'] if input_dict.get('percent_of_max') is not None else None
         return session
 
     def json_serialise(self):
         ret = {
             'date': format_datetime(self.date),
-            'sport_name': self.sport_name.value
+            'sport_name': self.sport_name.value,
+            'percent_of_max': self.percent_of_max if self.percent_of_max is not None else None
         }
 
         return ret

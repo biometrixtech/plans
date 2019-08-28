@@ -141,21 +141,15 @@ visualization_data = {
                 'legend': [
                     {
                         'color': 5,
-                        'text': "Overactivity",
+                        'text': "Tight",
                         'type': 0,
-                        'series': "overactive"
-                    },
-                    {
-                        'color': 4,
-                        'text': "Weakness",
-                        'type': 0,
-                        'series': "underactive"
+                        'series': "tight"
                     },
                     {
                         'color': 7,
-                        'text': "Elevated Strain",
+                        'text': "Elevated Stress",
                         'type': 0,
-                        'series': "underactive_needing_care"
+                        'series': "elevated_stress"
                     }
                 ]
             },
@@ -166,22 +160,48 @@ visualization_data = {
                 'legend': [
                     {
                         'color': 6,
-                        'text': "Recurring Pain",
+                        'text': "Pain",
+                        'type': 0,
+                        'series': "pain"
+                    },
+                    {
+                        'color': 5,
+                        'text': "Overactive",
                         'type': 0,
                         'series': "overactive"
                     },
                     {
-                        'color': 7,
-                        'text': "Elevated Strain",
+                        'color': 4,
+                        'text': "Weak",
                         'type': 0,
-                        'series': "underactive"
+                        'series': "weak"
                     }
-                    # ,{
-                    #     'color': 7,
-                    #     'text': "Underactive & Needing Care",
-                    #     'type': 0,
-                    #     'series': "underactive_needing_care"
-                    # }
+
+                ]
+            },
+            11: {
+                'title': "",
+                'y_axis_1': "",
+                'y_axis_2': "",
+                'legend': [
+                    {
+                        'color': 6,
+                        'text': "Pain",
+                        'type': 0,
+                        'series': "pain"
+                    },
+                    {
+                        'color': 5,
+                        'text': "Soreness",
+                        'type': 0,
+                        'series': "soreness"
+                    },
+                    {
+                        'color': 7,
+                        'text': "Elevated Stress",
+                        'type': 0,
+                        'series': "elevated_stress"
+                    }
                 ]
             },
         }
