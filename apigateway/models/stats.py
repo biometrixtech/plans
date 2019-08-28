@@ -143,6 +143,9 @@ class AthleteStats(Serialisable):
 
         self.trend_categories = []
 
+        self.api_version = '4_3'
+        self.time_zone = '-04:00'
+
     def update_historic_soreness(self, soreness, event_date):
 
         soreness_calc = SorenessCalculator
@@ -501,10 +504,12 @@ class AthleteStats(Serialisable):
             'eligible_for_high_load_trigger' : self.eligible_for_high_load_trigger,
             'sport_max_load': {str(sport_name): sport_max_load.json_serialise() for (sport_name, sport_max_load) in self.sport_max_load.items()},
             'triggers': [s.json_serialise() for s in self.triggers],
-            'trend_categories': [s.json_serialise() for s in self.trend_categories]
+            'trend_categories': [s.json_serialise() for s in self.trend_categories],
             # 'workout_chart': self.workout_chart.json_serialise() if self.workout_chart is not None else None,
             # 'body_response_chart': self.body_response_chart.json_serialise() if self.body_response_chart is not None else None
             # 'training_volume_chart_data': [chart_data.json_serialise() for chart_data in self.training_volume_chart_data]
+            'api_version': self.api_version,
+            'time_zone': self.time_zone
         }
         return ret
 
@@ -562,6 +567,8 @@ class AthleteStats(Serialisable):
         athlete_stats.sport_max_load = {int(sport_name): SportMaxLoad.json_deserialise(sport_max_load) for (sport_name, sport_max_load) in input_dict.get('sport_max_load', {}).items()}
         athlete_stats.triggers = [Trigger.json_deserialise(trigger) for trigger in input_dict.get('triggers', [])]
         athlete_stats.trend_categories = [TrendCategory.json_deserialise(trend_category) for trend_category in input_dict.get('trend_categories', [])]
+        athlete_stats.api_version = input_dict.get('api_version', '4_3')
+        athlete_stats.time_zone = input_dict.get('api_version', '-04:00')
         return athlete_stats
 
     @classmethod

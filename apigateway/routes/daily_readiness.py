@@ -3,6 +3,7 @@ import os
 import copy
 
 from datastores.datastore_collection import DatastoreCollection
+from fathomapi.api.config import Config
 from fathomapi.comms.service import Service
 from fathomapi.utils.decorators import require
 from fathomapi.utils.exceptions import InvalidSchemaException
@@ -55,6 +56,7 @@ def handle_daily_readiness_create(user_id):
     if athlete_stats is None:
         athlete_stats = AthleteStats(user_id)
         athlete_stats.event_date = event_date
+    athlete_stats.api_version = Config.get('API_VERSION')
     survey_processor = SurveyProcessing(user_id, event_date, athlete_stats, datastore_collection)
     survey_processor.user_age = request.json.get('user_age', 20)
 

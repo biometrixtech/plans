@@ -3,6 +3,7 @@ import os
 import copy
 
 from datastores.datastore_collection import DatastoreCollection
+from fathomapi.api.config import Config
 from fathomapi.comms.service import Service
 from fathomapi.utils.decorators import require
 from fathomapi.utils.exceptions import InvalidSchemaException, NoSuchEntityException
@@ -42,6 +43,7 @@ def handle_session_create(user_id=None):
     if athlete_stats is None:
         athlete_stats = AthleteStats(user_id)
         athlete_stats.event_date = event_date
+    athlete_stats.api_version = Config.get('API_VERSION')
     plan_event_date = format_date(event_date)
     survey_processor = SurveyProcessing(user_id, event_date,
                                         athlete_stats=athlete_stats,
