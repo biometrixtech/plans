@@ -249,7 +249,7 @@ Resources:
             ManagedPolicyArns:
               - "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
               - "arn:aws:iam::aws:policy/AWSXrayWriteOnlyAccess"
-              - { Ref: "ServiceAuthExecutionPolicy" }
+              - { "Fn::If": [ "ServiceAuthPolicyProvided", { Ref: "ServiceAuthPolicyArn" }, { Ref: "AWS::NoValue" } ] }
             Policies:
               - PolicyName: "default"
                 PolicyDocument:

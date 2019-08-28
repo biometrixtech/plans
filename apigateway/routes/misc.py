@@ -232,7 +232,7 @@ def update_dates(daily_plans, athlete_stats, event_date):
 
 
 
-@misc_app.route('/dailycron', methods=['POST'])
+@app.route('/dailycron', methods=['POST'])
 @xray_recorder.capture('routes.misc.dailycron')
 def handle_dailycron():
     # This route will be called daily via a CloudWatch Scheduled Event.
@@ -241,7 +241,7 @@ def handle_dailycron():
     return {'status': 'Success'}, 200
 
 
-@misc_app.route('/activeusers', methods=['POST'])
+@app.route('/activeusers', methods=['POST'])
 @require.authenticated.any
 @require.body({})
 @xray_recorder.capture('routes.misc.activeusers')
@@ -267,7 +267,7 @@ def handle_activeusers():
 
     # plans_service.call_apigateway_async_multi(calls=calls, jitter=10 * 60)
 
-    # return {'status': 'Success'}
+    return {'status': 'Success'}
 
 
 def _get_all_users():
