@@ -46,32 +46,33 @@ class AsymmetryProcessor(object):
 
         if left_apt > right_apt > 0:
 
-            ratio = left_apt / float(right_apt)
+            ratio = ((left_apt - right_apt) / float(left_apt)) + 1
 
-            if ratio < 2:
-                ratio_factor = (2 - (0.5 * ratio))
-                ratio = ratio * ratio_factor
+            # if ratio < 2:
+            #     ratio_factor = (2 - (0.5 * ratio))
+            #     ratio = ratio * ratio_factor
 
-            right_y = 5
+            right_y = 10
 
-            left_y = 5 * ratio
+            left_y = 10 * ratio
 
         elif right_apt > left_apt > 0:
 
-            ratio = right_apt / float(left_apt) * 1.5 # increasing to aid visualization
+            #ratio = right_apt / float(left_apt) * 1.5 # increasing to aid visualization
+            ratio = ((right_apt - left_apt) / float(right_apt)) + 1
 
-            if ratio < 2:
-                ratio_factor = (2 - (0.5 * ratio))
-                ratio = ratio * ratio_factor
+            # if ratio < 2:
+            #     ratio_factor = (2 - (0.5 * ratio))
+            #     ratio = ratio * ratio_factor
 
-            left_y = 5
+            left_y = 10
 
-            right_y = 5 * ratio
+            right_y = 10 * ratio
 
         else:
 
-            left_y = 5
-            right_y = 5
+            left_y = 10
+            right_y = 10
 
         #left_degrees, right_degrees = self.get_left_right_degrees(left_apt, right_apt)
 
