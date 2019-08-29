@@ -278,7 +278,7 @@ def _get_plan(user_id, event_date):
 def _is_athlete_active(athlete_id):
     today = datetime.datetime.now()
     fourteen_days = today - datetime.timedelta(days=14)
-    daily_plans = DatastoreCollection().daily_plan_datastore.get(user_id=athlete_id, start_date=format_date(fourteen_days), end_date=format_date(today))
+    daily_plans = DatastoreCollection().daily_plan_datastore.get(user_id=athlete_id, start_date=format_date(fourteen_days), end_date=format_date(today), stats_processing=True)
     if any([plan.daily_readiness_survey_completed() for plan in daily_plans]):
         return True
     else:

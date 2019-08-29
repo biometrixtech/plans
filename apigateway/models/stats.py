@@ -144,7 +144,7 @@ class AthleteStats(Serialisable):
         self.trend_categories = []
 
         self.api_version = '4_3'
-        self.time_zone = '-04:00'
+        self.timezone = '-04:00'
 
     def update_historic_soreness(self, soreness, event_date):
 
@@ -509,7 +509,7 @@ class AthleteStats(Serialisable):
             # 'body_response_chart': self.body_response_chart.json_serialise() if self.body_response_chart is not None else None
             # 'training_volume_chart_data': [chart_data.json_serialise() for chart_data in self.training_volume_chart_data]
             'api_version': self.api_version,
-            'time_zone': self.time_zone
+            'timezone': self.timezone
         }
         return ret
 
@@ -568,7 +568,7 @@ class AthleteStats(Serialisable):
         athlete_stats.triggers = [Trigger.json_deserialise(trigger) for trigger in input_dict.get('triggers', [])]
         athlete_stats.trend_categories = [TrendCategory.json_deserialise(trend_category) for trend_category in input_dict.get('trend_categories', [])]
         athlete_stats.api_version = input_dict.get('api_version', '4_3')
-        athlete_stats.time_zone = input_dict.get('api_version', '-04:00')
+        athlete_stats.timezone = input_dict.get('timezone', '-04:00')
         return athlete_stats
 
     @classmethod

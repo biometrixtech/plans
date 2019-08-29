@@ -12,7 +12,7 @@ from datastores.daily_readiness_datastore import DailyReadinessDatastore
 from datastores.daily_plan_datastore import DailyPlanDatastore
 from datastores.athlete_stats_datastore import AthleteStatsDatastore
 from datastores.completed_exercise_datastore import CompletedExerciseDatastore
-from utils import format_date, parse_datetime, parse_date
+from utils import format_date, parse_datetime, parse_date, validate_uuid4
 
 from models.app_logs import AppLogs
 
@@ -246,31 +246,73 @@ def handle_dailycron():
 @require.body({})
 @xray_recorder.capture('routes.misc.activeusers')
 def handle_activeusers():
+    last_user = request.json.get('last_user', None)
     # This route will be invoked daily.  It should scan to find users which meet
     # some definition of 'active', and for each one should push to the plans service with them
-    print('here')
+    batch_users, last_user = _get_all_users(last_user)
 
-    # user_data = list(UserData.get_many(id=[user.id for user in active_users]))
+    now = datetime.datetime.now()
+    three_am_today = datetime.datetime(now.year, now.month, now.day, 2, 50, 0)
 
-    # plans_service = Service('plans', Config.get('API_VERSION'))
-    # now = datetime.datetime.now()
-    # calls = []
-    # for user in active_users:
-    #     try:
-    #         user_datum = next(ud for ud in user_data if ud.id == user.id)
-    #     except StopIteration:
-    #         print(f"user not found {user.id}")
-    #         continue
-    #     body = {"timezone": user_datum.get().get('timezone', None) or "-05:00"}
+    # group users by timezone to dictate when to execute
+    timezones = set(user['timezone'] for user in batch_users)
+    for timezone in timezones:
+        execute_at = three_am_today - datetime.timedelta(minutes=_get_offset(timezone))  # this will be specific for timezone
+        tz_users = [user for user in batch_users if user['timezone'] == timezone]
+        body = {"timezone": timezone}
 
-    #     calls.append({'method': 'POST', 'endpoint': f'/athlete/{user.id}/active', 'body': body})
+        # now group users by their last used api version
+        api_versions = set(user['api_version'] for user in tz_users)
+        for api_version in api_versions:
+            tz_api_users = [user for user in tz_users if user['api_version'] == api_version]
+            tz_api_calls = []
+            for user in tz_api_users:
+                tz_api_calls.append({'method': 'POST', 'endpoint': f"athlete/{user['id']}/active", 'body': body})
+            # schedule async calls to happen at 3am local time for the user
+            plans_service = Service('plans', api_version)
+            plans_service.call_apigateway_async_multi(calls=tz_api_calls, jitter=10 * 60, execute_at=execute_at)
 
-    # plans_service.call_apigateway_async_multi(calls=calls, jitter=10 * 60)
+    # check if we've reached end of list, if not trigger next batch
+    if last_user is not None:
+        print('Triggering next batch')
+        self_service = Service('plans', Config.get('API_VERSION'))
+        self_service.call_apigateway_async('POST', '/misc/activeusers', body={'last_user': last_user}, execute_at=now + datetime.timedelta(seconds=60))
 
     return {'status': 'Success'}
 
 
-def _get_all_users():
-    pass
+def _get_all_users(last_user):
+    end_reached = False
+    stats_collection = get_mongo_collection('athletestats')
+    if last_user is None:
+        query = {}
+    else:
+        query = {"_id": { "$gt": last_user}}
+    users = stats_collection.find(query , projection=["athlete_id", "timezone", "api_version"])
+    if users.count() < 100:
+        end_reached = True
+    batch_users = []
+    for user in users:
+        last_user = user['_id']
+        if isinstance(user['athlete_id'], str) and validate_uuid4(user['athlete_id']):
+            batch_users.append(
+                    {
+                        'id': user['athlete_id'],
+                        'timezone': user.get('timezone', '-04:00'),
+                        'api_version': user.get('api_version', '4_3')
+                    }
+            )
+    if end_reached:
+        last_user = None
+    return batch_users, last_user
 
 
+def _get_offset(tz):
+    offset = tz.split(":")
+    hour_offset = int(offset[0])
+    minute_offset = int(offset[1])
+    if hour_offset < 0:
+        minute_offset = hour_offset * 60 - minute_offset
+    else:
+        minute_offset += hour_offset * 60
+    return minute_offset
