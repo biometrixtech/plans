@@ -15,7 +15,7 @@ Parameters:
     # Users API version
     UsersApiVersion: 
         Type: "String"
-        Default: "2_2"
+        Default: "2_4"
         Description: "Corresponding Users API version"
 
     ServiceAuthPolicyArn:
@@ -231,6 +231,111 @@ Resources:
                       - "sqs:SendMessage"
                     Effect: "Allow"
                     Resource: { 'Fn::GetAtt': [ 'ApigatewayStack', 'Outputs.AsyncSqsQueueArn' ] }
+
+
+    ##########################################################################################################
+    ##  DAILY SCHEDULER
+    ##########################################################################################################
+
+    DailySchedulerExecutionRole:
+        Type: "AWS::IAM::Role"
+        Properties:
+            AssumeRolePolicyDocument:
+                Version: "2012-10-17"
+                Statement:
+                  - Effect: "Allow"
+                    Principal: { Service: [ "lambda.amazonaws.com" ] }
+                    Action: "sts:AssumeRole"
+            ManagedPolicyArns:
+              - "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+              - "arn:aws:iam::aws:policy/AWSXrayWriteOnlyAccess"
+              - { "Fn::If": [ "ServiceAuthPolicyProvided", { Ref: "ServiceAuthPolicyArn" }, { Ref: "AWS::NoValue" } ] }
+            Policies:
+              - PolicyName: "default"
+                PolicyDocument:
+                    Version: "2012-10-17"
+                    Statement:
+                      - Action:
+                          - "sqs:SendMessage"
+                        Effect: "Allow"
+                        Resource:
+                          - { "Fn::Sub": "arn:aws:sqs:${AWS::Region}:${AWS::AccountId}:plans-${Environment}-apigateway-async" }
+                      - Action:
+                          - "sqs:ListQueues"
+                        Effect: "Allow"
+                        Resource: "*"
+            RoleName: { "Fn::Sub": "plans-${Environment}-apigateway-dailyscheduler-${AWS::Region}" }
+
+    DailySchedulerLambda:
+        Type: "AWS::Lambda::Function"
+        Properties:
+            Code:
+                ZipFile: |
+                    import boto3, json, os
+                    _lambda_client = boto3.client('lambda')
+                    _sqs_client = boto3.client('sqs')
+                    def handler(_, __):
+                        payload = {
+                            "path": '/plans/4_4/misc/dailycron',
+                            "httpMethod": 'POST',
+                            "headers": {
+                                "Accept": "*/*",
+                                "Authorization": get_service_token(),
+                                "Content-Type": "application/json",
+                                "User-Agent": "Biometrix/DailyScheduler",
+                            },
+                            "pathParameters": {"endpoint": 'misc/dailycron'},
+                            "stageVariables": {"LambdaAlias": '4_4'},
+                            "body": None,
+                            "isBase64Encoded": False
+                        }
+
+                        _sqs_client.send_message(
+                            QueueUrl='https://sqs.{AWS_REGION}.amazonaws.com/{AWS_ACCOUNT_ID}/plans-{ENVIRONMENT}-apigateway-async'.format(**os.environ),
+                            MessageBody=json.dumps(payload),
+                        )
+
+                    def get_service_token():
+                        res = _lambda_client.invoke(FunctionName='users-{ENVIRONMENT}-apigateway-serviceauth:2_0'.format(**os.environ))
+                        return json.loads(res['Payload'].read().decode('utf-8'))['token']
+
+            Environment:
+                Variables:
+                    AWS_ACCOUNT_ID: { Ref: 'AWS::AccountId' }
+                    ENVIRONMENT: { Ref: 'Environment' }
+            Handler: "index.handler"
+            MemorySize: "256"
+            Runtime: "python3.6"
+            Timeout: "30"
+            Role: { "Fn::GetAtt" : [ "DailySchedulerExecutionRole", "Arn" ] }
+            FunctionName: { "Fn::Sub": "plans-${Environment}-apigateway-dailyscheduler" }
+            Tags:
+              - { Key: "Name", Value: { "Fn::Sub": "plans-${Environment}-apigateway-dailyscheduler" } }
+              - { Key: "Management", Value: "managed" }
+              - { Key: "Project", Value: 'plans' }
+              - { Key: "Environment", Value: { Ref: "Environment" } }
+              - { Key: "Service", Value: 'apigateway' }
+
+    DailySchedulerScheduledRule:
+        Type: "AWS::Events::Rule"
+        Properties:
+            Description: "ScheduledRule"
+            ScheduleExpression: "cron(0 1 * * ? *)"  # 1am UTC every day
+            State: "ENABLED"
+            Targets:
+              - Arn: { "Fn::GetAtt": [ "DailySchedulerLambda", "Arn" ] }
+                Id: "target"
+
+    DailySchedulerInvokePermission:
+        Type: "AWS::Lambda::Permission"
+        Properties:
+            FunctionName: { "Fn::GetAtt": [ "DailySchedulerLambda", "Arn" ] }
+            Action: "lambda:InvokeFunction"
+            Principal: "events.amazonaws.com"
+            SourceArn: { "Fn::GetAtt": [ "DailySchedulerScheduledRule", "Arn" ] }
+
+
+
 
     ##########################################################################################################
     ## MONITORING

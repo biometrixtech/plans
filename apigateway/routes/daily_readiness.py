@@ -3,6 +3,7 @@ import os
 import copy
 
 from datastores.datastore_collection import DatastoreCollection
+from fathomapi.api.config import Config
 from fathomapi.comms.service import Service
 from fathomapi.utils.decorators import require
 from fathomapi.utils.exceptions import InvalidSchemaException
@@ -16,7 +17,7 @@ from models.sleep_data import DailySleepData, SleepEvent
 from logic.survey_processing import SurveyProcessing, cleanup_sleep_data_from_api, create_plan
 from logic.athlete_status_processing import AthleteStatusProcessing
 from config import get_mongo_collection
-from utils import parse_datetime, format_date, format_datetime, fix_early_survey_event_date
+from utils import parse_datetime, format_date, format_datetime, fix_early_survey_event_date, get_timezone
 
 datastore_collection = DatastoreCollection()
 athlete_stats_datastore = datastore_collection.athlete_stats_datastore
@@ -37,6 +38,7 @@ def handle_daily_readiness_create(user_id):
     event_date = parse_datetime(request.json['date_time'])
     event_date = fix_early_survey_event_date(event_date)
 
+    timezone = get_timezone(event_date)
     # user_id = principal_id
     daily_readiness = DailyReadiness(
         user_id=user_id,
@@ -55,6 +57,8 @@ def handle_daily_readiness_create(user_id):
     if athlete_stats is None:
         athlete_stats = AthleteStats(user_id)
         athlete_stats.event_date = event_date
+    athlete_stats.api_version = Config.get('API_VERSION')
+    athlete_stats.timezone = timezone
     survey_processor = SurveyProcessing(user_id, event_date, athlete_stats, datastore_collection)
     survey_processor.user_age = request.json.get('user_age', 20)
 
@@ -118,6 +122,11 @@ def handle_daily_readiness_create(user_id):
         Service('users', os.environ['USERS_API_VERSION']).call_apigateway_async(method='PATCH',
                                                                                 endpoint=f"user/{user_id}",
                                                                                 body={"health_sync_date": request.json['health_sync_date']})
+
+    Service('users', os.environ['USERS_API_VERSION']).call_apigateway_async(method='PATCH',
+                                                                            endpoint=f"user/{user_id}",
+                                                                            body={"timezone": timezone,
+                                                                                  "plans_api_version": Config.get('API_VERSION')})
 
     return {'daily_plans': [plan]}, 201
 

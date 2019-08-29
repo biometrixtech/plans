@@ -225,7 +225,8 @@ class BiomechanicsChartData(Serialisable):
             body_side = 0
             if session.asymmetry.left_apt > session.asymmetry.right_apt:
                 body_side = 1
-                percentage = round(((session.asymmetry.left_apt / session.asymmetry.right_apt) - 1.00) * 100)
+
+                percentage = round(((session.asymmetry.left_apt - session.asymmetry.right_apt) / session.asymmetry.left_apt) * 100)
                 summary_data.summary_percentage = str(percentage)
                 summary_data.summary_side = "1"
                 summary_data.summary_text = "more range of motion during left foot steps"
@@ -243,7 +244,8 @@ class BiomechanicsChartData(Serialisable):
 
             elif session.asymmetry.right_apt > session.asymmetry.left_apt:
                 body_side = 2
-                percentage = round(((session.asymmetry.right_apt / session.asymmetry.left_apt) - 1.00) * 100)
+                percentage = round(
+                    ((session.asymmetry.right_apt - session.asymmetry.left_apt) / session.asymmetry.right_apt) * 100)
                 summary_data.summary_percentage = str(percentage)
                 summary_data.summary_side = "2"
                 summary_data.summary_text = "more range of motion during right foot steps"

@@ -3,6 +3,7 @@ import os
 import copy
 
 from datastores.datastore_collection import DatastoreCollection
+from fathomapi.api.config import Config
 from fathomapi.comms.service import Service
 from fathomapi.utils.decorators import require
 from fathomapi.utils.exceptions import InvalidSchemaException, NoSuchEntityException
@@ -12,7 +13,7 @@ from models.asymmetry import Asymmetry
 from models.daily_plan import DailyPlan
 from models.stats import AthleteStats
 from routes.visualizations import get_visualization_parameter
-from utils import parse_datetime, format_date, format_datetime
+from utils import parse_datetime, format_date, format_datetime, get_timezone
 from config import get_mongo_collection
 from logic.survey_processing import SurveyProcessing, create_session, update_session, create_plan, cleanup_plan
 from logic.athlete_status_processing import AthleteStatusProcessing
@@ -34,6 +35,7 @@ def handle_session_create(user_id=None):
 
     #user_id = principal_id
     event_date = parse_datetime(request.json['event_date'])
+    timezone = get_timezone(event_date)
     plan_update_required = False
     train_later = False
     if 'sessions_planned' in request.json and request.json['sessions_planned']:
@@ -42,6 +44,9 @@ def handle_session_create(user_id=None):
     if athlete_stats is None:
         athlete_stats = AthleteStats(user_id)
         athlete_stats.event_date = event_date
+    athlete_stats.api_version = Config.get('API_VERSION')
+    athlete_stats.timezone = timezone
+
     plan_event_date = format_date(event_date)
     survey_processor = SurveyProcessing(user_id, event_date,
                                         athlete_stats=athlete_stats,
@@ -107,6 +112,10 @@ def handle_session_create(user_id=None):
         Service('users', os.environ['USERS_API_VERSION']).call_apigateway_async(method='PATCH',
                                                                                 endpoint=f"user/{user_id}",
                                                                                 body={"health_sync_date": request.json['health_sync_date']})
+    Service('users', os.environ['USERS_API_VERSION']).call_apigateway_async(method='PATCH',
+                                                                            endpoint=f"user/{user_id}",
+                                                                            body={"timezone": timezone,
+                                                                                  "plans_api_version": Config.get('API_VERSION')})
     return {'daily_plans': [plan]}, 201
 
 
