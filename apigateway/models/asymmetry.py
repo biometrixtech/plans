@@ -48,6 +48,9 @@ class SessionAsymmetry(Serialisable):
         self.right_apt = 0
         self.time_blocks = []
         self.percent_events_asymmetric = 0
+        self.symmetric_events = 0
+        self.asymmetric_events = 0
+
         self.seconds_duration = 0
 
     def get_detail_text(self):
@@ -116,6 +119,8 @@ class SessionAsymmetry(Serialisable):
                 'event_date': format_datetime(self.event_date),
                 'left_apt': self.left_apt,
                 'right_apt': self.right_apt,
+                'symmetric_events': self.symmetric_events,
+                'asymmetric_events': self.asymmetric_events,
                 'percent_events_asymmetric': self.percent_events_asymmetric,
                 'time_blocks': [t.json_serialise() for t in self.time_blocks],
             }
@@ -129,6 +134,8 @@ class SessionAsymmetry(Serialisable):
         session.right_apt = input_dict.get('right_apt', 0)
         session.time_blocks = [TimeBlockAsymmetry.json_deserialise(tb) for tb in input_dict.get('time_blocks', [])]
         session.seconds_duration = input_dict.get('seconds_duration', 0)
+        session.asymmetric_events = input_dict.get('asymmetric_events', 0)
+        session.symmetric_events = input_dict.get('symmetric_events', 0)
         session.percent_events_asymmetric = input_dict.get('percent_events_asymmetric', 0)
         return session
 
@@ -162,14 +169,20 @@ class Asymmetry(object):
     def __init__(self, left_apt, right_apt):
         self.left_apt = left_apt
         self.right_apt = right_apt
+        self.symmetric_events = 0
+        self.asymmetric_events = 0
 
     def json_serialise(self):
         ret = {
             "left_apt": self.left_apt,
-            "right_apt": self.right_apt
+            "right_apt": self.right_apt,
+            "asymmetric_events": self.asymmetric_events,
+            "symmetric_events": self.symmetric_events
         }
         return ret
 
     @classmethod
     def json_deserialise(cls, input_dict):
-        return cls(input_dict.get('left_apt', 0), input_dict.get('right_apt', 0))
+        asymmetry = cls(input_dict.get('left_apt', 0), input_dict.get('right_apt', 0))
+        asymmetry.asymmetric_events = input_dict.get("asymmetric_events", 0)
+        asymmetry.symmetric_events = input_dict.get("symmetric_events", 0)
