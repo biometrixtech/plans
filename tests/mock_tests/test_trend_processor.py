@@ -120,17 +120,14 @@ def test_trigger_11_get_max():
 
     trend_processor.process_triggers()
 
-    assert trend_processor.athlete_trend_categories[0].visible is False
-    assert trend_processor.athlete_trend_categories[1].visible is True
-    assert trend_processor.athlete_trend_categories[1].trends[0].visible is True
-    assert trend_processor.athlete_trend_categories[1].trends[0].title == "Injury Cycle Risks"
-    assert trend_processor.athlete_trend_categories[1].trends[0].last_date_time == now_time_2
-    assert 1 == len(trend_processor.athlete_trend_categories[0].trends)
-    assert 1 == len(trend_processor.athlete_trend_categories[1].trends)
+    assert trend_processor.athlete_trend_categories[0].visible is True
+    assert len(trend_processor.athlete_trend_categories[0].trends[0].trigger_tiles) == 3
+    assert trend_processor.athlete_trend_categories[0].trends[0].trigger_tiles[0].statistic_text == "Severe Soreness Reported"
+    assert trend_processor.athlete_trend_categories[0].trends[0].trigger_tiles[
+               1].statistic_text == "Severe Soreness Reported"
+    assert trend_processor.athlete_trend_categories[0].trends[0].trigger_tiles[
+               2].statistic_text == "Severe Soreness Reported"
 
-    json_data = trend_processor.athlete_trend_categories[1].trends[0].json_serialise()
-
-    assert json_data is not None
 
 
 # def test_trigger_7():
