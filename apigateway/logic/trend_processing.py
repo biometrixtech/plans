@@ -1213,7 +1213,7 @@ class TrendProcessor(object):
                         tiles.append(tile_1)
 
                     tile_2 = TriggerTile()
-                    body_part_text_2, is_plural_2 = self.get_title_text_for_body_parts([t.body_part], 0)
+                    body_part_text_2, is_plural_2 = self.get_title_text_for_body_parts(t.synergists, 0)
                     if body_part_text_2 not in care_body_parts:
                         care_body_parts.add(body_part_text_2)
                         bold_2 = BoldText()
@@ -1244,7 +1244,7 @@ class TrendProcessor(object):
                 else:
                     mobilize_suffix = "to minimize effects of compensations resulting from pain"
                     tile_1 = TriggerTile()
-                    body_part_text_1, is_plural_1 = self.get_title_text_for_body_parts([t.body_part], 0)
+                    body_part_text_1, is_plural_1 = self.get_title_text_for_body_parts(t.synergists, 0)
                     if len(body_part_text_1) == 0:
                         body_part_text_1 = "PRIME MOVER"
                     if body_part_text_1 not in care_body_parts:
@@ -1305,6 +1305,23 @@ class TrendProcessor(object):
                     tile_1.bold_statistic_text = bold_statistic_text
                     tile_1.trigger_type = t.trigger_type
                     tiles.append(tile_1)
+
+                tile_2 = TriggerTile()
+                body_part_text_2, is_plural_2 = self.get_title_text_for_body_parts(t.synergists, 0)
+                if len(body_part_text_2) == 0:
+                    body_part_text_2 = "PRIME MOVER"
+                if body_part_text_2 not in care_body_parts:
+                    care_body_parts.add(body_part_text_1)
+                    tile_2.text = "Foam Roll & Static Stretch your " + body_part_text_2
+                    tile_2.description = "to minimize effects of compensations resulting from soreness"
+                    bold_2 = BoldText()
+                    bold_2.text = "Foam Roll & Static Stretch"
+                    bold_2.color = LegendColor.warning_light
+                    tile_2.bold_text.append(bold_2)
+                    tile_2.statistic_text = statistic_text
+                    tile_2.bold_statistic_text = bold_statistic_text
+                    tile_2.trigger_type = t.trigger_type
+                    tiles.append(tile_2)
 
                 tile_3 = TriggerTile()
                 body_part_text_3, is_plural_3 = self.get_title_text_for_body_parts([t.body_part], 0)
