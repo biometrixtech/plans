@@ -1334,7 +1334,7 @@ class TrendProcessor(object):
                     tile_2.description = "to minimize effects of compensations resulting from soreness"
                     bold_2 = BoldText()
                     bold_2.text = "Foam Roll & Stretch"
-                    bold_2.color = LegendColor.warning_light
+                    bold_2.color = LegendColor.splash_x_light
                     tile_2.bold_text.append(bold_2)
                     tile_2.statistic_text = statistic_text
                     tile_2.bold_statistic_text = bold_statistic_text

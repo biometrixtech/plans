@@ -52,7 +52,7 @@ def test_right_2x_left():
     assert viz.left_start_angle == 0
     assert viz.left_y == 5
     assert viz.right_start_angle == 0
-    assert viz.right_y == 10
+    assert viz.right_y == 15
 
 
 def test_right_2x_left_2():
@@ -62,7 +62,7 @@ def test_right_2x_left_2():
     assert viz.left_start_angle == 0
     assert viz.left_y == 5
     assert viz.right_start_angle == 0
-    assert viz.right_y == 10
+    assert viz.right_y == 15
 
 def test_left_1_5x_right():
 
@@ -70,7 +70,7 @@ def test_left_1_5x_right():
     viz = proc.get_visualized_left_right_asymmetry(6, 4)
 
     assert viz.left_start_angle == 0
-    assert viz.left_y == 7.5
+    assert viz.left_y == 9.38
     assert viz.right_start_angle == 0
     assert viz.right_y == 5
 
@@ -82,7 +82,7 @@ def test_right_1_5x_left():
     assert viz.left_start_angle == 0
     assert viz.left_y == 5
     assert viz.right_start_angle == 0
-    assert viz.right_y == 7.5
+    assert viz.right_y == 11.25
 
 
 

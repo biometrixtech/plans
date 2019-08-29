@@ -48,13 +48,21 @@ class AsymmetryProcessor(object):
 
             ratio = left_apt / float(right_apt)
 
+            if ratio < 2:
+                ratio_factor = (2 - (0.5 * ratio))
+                ratio = ratio * ratio_factor
+
             right_y = 5
 
             left_y = 5 * ratio
 
         elif right_apt > left_apt > 0:
 
-            ratio = right_apt / float(left_apt)
+            ratio = right_apt / float(left_apt) * 1.5 # increasing to aid visualization
+
+            if ratio < 2:
+                ratio_factor = (2 - (0.5 * ratio))
+                ratio = ratio * ratio_factor
 
             left_y = 5
 
