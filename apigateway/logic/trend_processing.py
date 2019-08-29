@@ -1201,10 +1201,10 @@ class TrendProcessor(object):
                         body_part_text_1 = "PRIME MOVER"
                     if body_part_text_1 not in care_body_parts:
                         care_body_parts.add(body_part_text_1)
-                        tile_1.text = "Foam Roll & Stretch your " + body_part_text_1
+                        tile_1.text = "Foam Roll & Static Stretch your " + body_part_text_1
                         tile_1.description = mobilize_suffix
                         bold_1 = BoldText()
-                        bold_1.text = "Foam Roll & Stretch"
+                        bold_1.text = "Foam Roll & Static Stretch"
                         bold_1.color = LegendColor.error_light
                         tile_1.bold_text.append(bold_1)
                         tile_1.statistic_text = statistic_text
@@ -1217,10 +1217,10 @@ class TrendProcessor(object):
                     if body_part_text_2 not in care_body_parts:
                         care_body_parts.add(body_part_text_2)
                         bold_2 = BoldText()
-                        bold_2.text = "Foam Roll & Static Stretch"
+                        bold_2.text = "Foam Roll & Stretch"
                         bold_2.color = LegendColor.splash_x_light
                         tile_2.bold_text.append(bold_2)
-                        tile_2.text = "Foam Roll & Static Stretch the muscles supporting your " + body_part_text_2
+                        tile_2.text = "Foam Roll & Stretch your " + body_part_text_2
                         tile_2.description = mobilize_suffix
                         tile_2.statistic_text = statistic_text
                         tile_2.bold_statistic_text = bold_statistic_text
@@ -1249,7 +1249,7 @@ class TrendProcessor(object):
                         body_part_text_1 = "PRIME MOVER"
                     if body_part_text_1 not in care_body_parts:
                         care_body_parts.add(body_part_text_1)
-                        tile_1.text = "Foam Roll & Static Stretch the muscles supporting your " + body_part_text_1
+                        tile_1.text = "Foam Roll & Static Stretch your " + body_part_text_1
                         tile_1.description = mobilize_suffix
                         bold_1 = BoldText()
                         bold_1.text = "Foam Roll & Static Stretch"
@@ -1312,10 +1312,10 @@ class TrendProcessor(object):
                     body_part_text_2 = "PRIME MOVER"
                 if body_part_text_2 not in care_body_parts:
                     care_body_parts.add(body_part_text_1)
-                    tile_2.text = "Foam Roll & Static Stretch your " + body_part_text_2
+                    tile_2.text = "Foam Roll & Stretch your " + body_part_text_2
                     tile_2.description = "to minimize effects of compensations resulting from soreness"
                     bold_2 = BoldText()
-                    bold_2.text = "Foam Roll & Static Stretch"
+                    bold_2.text = "Foam Roll & Stretch"
                     bold_2.color = LegendColor.warning_light
                     tile_2.bold_text.append(bold_2)
                     tile_2.statistic_text = statistic_text
