@@ -232,7 +232,6 @@ def update_dates(daily_plans, athlete_stats, event_date):
                 hs.last_reported_date_time = hs.last_reported_date_time + delta
 
 
-
 @app.route('/dailycron', methods=['POST'])
 @xray_recorder.capture('routes.misc.dailycron')
 def handle_dailycron():
@@ -263,12 +262,12 @@ def handle_activeusers():
     print(timezones)
     for timezone in timezones:
         execute_at = three_am_today - datetime.timedelta(minutes=_get_offset(timezone))  # this will be specific for timezone
+        print(execute_at)
         tz_users = [user for user in batch_users if user['timezone'] == timezone]
         body = {"timezone": timezone}
 
         # now group users by their last used api version
         api_versions = set(user['api_version'] for user in tz_users)
-        print(api_versions)
         for api_version in api_versions:
             tz_api_users = [user for user in tz_users if user['api_version'] == api_version]
             tz_api_calls = []
@@ -284,7 +283,7 @@ def handle_activeusers():
     if last_user is not None:
         print('Triggering next batch')
         self_service = Service('plans', Config.get('API_VERSION'))
-        self_service.call_apigateway_async('POST', '/misc/activeusers', body={'last_user': str(last_user)}, execute_at=now + datetime.timedelta(seconds=60))
+        self_service.call_apigateway_async('POST', 'misc/activeusers', body={'last_user': str(last_user)}, execute_at=now + datetime.timedelta(seconds=60))
 
     return {'status': 'Success'}
 
@@ -295,8 +294,8 @@ def _get_user_batch(last_user):
     if last_user is None:
         query = {}
     else:
-        query = {"_id": { "$gt": ObjectId(last_user)}}
-    users = stats_collection.find(query , projection=["athlete_id", "timezone", "api_version"], limit=100)
+        query = {"_id": {"$gt": ObjectId(last_user)}}
+    users = stats_collection.find(query, projection=["athlete_id", "timezone", "api_version"], limit=100)
     if users.count() < 100:
         end_reached = True
     batch_users = []
