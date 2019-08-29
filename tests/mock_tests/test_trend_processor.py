@@ -83,6 +83,52 @@ def test_trigger_16():
 
     assert json_data is not None
 
+def test_trigger_11_get_max():
+
+    trigger_list = []
+    body_part_factory = BodyPartFactory()
+    trigger_factory = TriggerFactory(datetime.now(), None, [], [])
+
+    now_time = datetime.now()
+    now_time_2 = now_time - timedelta(days=1)
+
+    trigger = Trigger(TriggerType.sore_today_doms)
+    trigger.body_part = BodyPartSide(body_part_location=BodyPartLocation(8), side=1)
+    body_part = body_part_factory.get_body_part(trigger.body_part)
+    trigger.synergists = trigger_factory.convert_body_part_list(trigger.body_part, body_part.synergists)
+    trigger.antagonists = trigger_factory.convert_body_part_list(trigger.body_part, body_part.antagonists)
+    trigger.agonists = trigger_factory.convert_body_part_list(trigger.body_part, body_part.agonists)
+    trigger.created_date_time = now_time_2
+    trigger.source_date_time = now_time
+    trigger.severity = 2
+    trigger.source_first_reported_date_time = now_time_2 - timedelta(days=1)
+    trigger_list.append(trigger)
+
+    trigger2 = Trigger(TriggerType.sore_today_doms)
+    trigger2.body_part = BodyPartSide(body_part_location=BodyPartLocation(8), side=2)
+    body_part2 = body_part_factory.get_body_part(trigger2.body_part)
+    trigger2.synergists = trigger_factory.convert_body_part_list(trigger2.body_part, body_part2.synergists)
+    trigger2.antagonists = trigger_factory.convert_body_part_list(trigger2.body_part, body_part2.antagonists)
+    trigger2.agonists = trigger_factory.convert_body_part_list(trigger2.body_part, body_part2.agonists)
+    trigger2.created_date_time = now_time_2
+    trigger2.source_date_time = now_time
+    trigger2.severity = 5
+    trigger2.source_first_reported_date_time = now_time_2 - timedelta(days=1)
+    trigger_list.append(trigger2)
+
+    trend_processor = TrendProcessor(trigger_list, datetime.now())
+
+    trend_processor.process_triggers()
+
+    assert trend_processor.athlete_trend_categories[0].visible is True
+    assert len(trend_processor.athlete_trend_categories[0].trends[0].trigger_tiles) == 3
+    assert trend_processor.athlete_trend_categories[0].trends[0].trigger_tiles[0].statistic_text == "Severe Soreness Reported"
+    assert trend_processor.athlete_trend_categories[0].trends[0].trigger_tiles[
+               1].statistic_text == "Severe Soreness Reported"
+    assert trend_processor.athlete_trend_categories[0].trends[0].trigger_tiles[
+               2].statistic_text == "Severe Soreness Reported"
+
+
 
 # def test_trigger_7():
 #

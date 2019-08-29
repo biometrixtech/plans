@@ -3,20 +3,22 @@ import os
 import json
 from aws_xray_sdk.core import xray_recorder
 from datastores.daily_readiness_datastore import DailyReadinessDatastore
+from datastores.asymmetry_datastore import AsymmetryDatastore
 from datastores.daily_plan_datastore import DailyPlanDatastore
 from datastores.post_session_survey_datastore import PostSessionSurveyDatastore
 from datastores.completed_exercise_datastore import CompletedExerciseDatastore
 from datastores.heart_rate_datastore import HeartRateDatastore
 from datastores.sleep_history_datastore import SleepHistoryDatastore
 from models.soreness import CompletedExercise
-from datetime import datetime
+from datetime import datetime, timedelta
 from config import get_secret
+from utils import format_datetime
 from fathomapi.utils.exceptions import NoSuchEntityException
 from utils import format_date
 
 @pytest.fixture(scope="session", autouse=True)
 def add_xray_support(request):
-    os.environ["ENVIRONMENT"] = "dev"
+    os.environ["ENVIRONMENT"] = "test"
 
     xray_recorder.configure(sampling=False)
     xray_recorder.begin_segment(name="test")
@@ -35,12 +37,20 @@ def add_xray_support(request):
     os.environ["MONGO_COLLECTION_ATHLETESTATS"] = config['collection_athletestats']
     os.environ["MONGO_COLLECTION_COMPLETEDEXERCISES"] = config['collection_completedexercises']
     os.environ["MONGO_COLLECTION_HEARTRATE"] = config['collection_heartrate']
-
+    os.environ["MONGO_COLLECTION_ASYMMETRY"] = config['collection_asymmetry']
 
     os.environ["MONGO_COLLECTION_DAILYREADINESSTEST"] = config['collection_dailyreadinesstest']
     os.environ["MONGO_COLLECTION_DAILYPLANTEST"] = config['collection_dailyplantest']
     os.environ["MONGO_COLLECTION_ATHLETESTATSTEST"] = config['collection_athletestatstest']
     os.environ["MONGO_COLLECTION_COMPLETEDEXERCISESTEST"] = config['collection_completedexercisestest']
+
+def test_get_15_days_of_asymmetry():
+    dao = AsymmetryDatastore()
+    end_date =  datetime.now()
+    start_date = end_date - timedelta(days=15)
+    events = dao.get(user_id='703b5309-78cd-46b1-82ec-45e86b6d71de', start_date=format_datetime(start_date), end_date=format_datetime(end_date))
+    assert len(events) == 4
+
 
 def test_get_readiness_survey_test_data():
     athlete_dao = DailyReadinessDatastore()
