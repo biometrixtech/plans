@@ -15,7 +15,7 @@ Parameters:
     # Users API version
     UsersApiVersion: 
         Type: "String"
-        Default: "2_2"
+        Default: "2_3"
         Description: "Corresponding Users API version"
 
     ServiceAuthPolicyArn:

@@ -1,4 +1,5 @@
 import datetime
+import math
 import uuid
 from fathomapi.utils.exceptions import InvalidSchemaException
 
@@ -83,3 +84,24 @@ def fix_early_survey_event_date(event_date):
                             )
     else:
         return event_date
+
+
+def get_timezone(local_time):
+    try:
+        utc_time = datetime.datetime.now()
+        diff = (local_time - utc_time).total_seconds()
+        thirty_mins = round(diff / (30 * 60), 0)
+        hour_diff = int(abs(thirty_mins) // 2)
+        min_diff = int(math.ceil(thirty_mins % 2) * 30)
+        if min_diff == 0:
+            min_diff = f"0{min_diff}"
+        else:
+            min_diff = f"{min_diff}"
+        sign = "-" if diff < 0 else "+"
+        if hour_diff >= 10:
+            tz = f"{sign}{hour_diff}:{min_diff}"
+        else:
+            tz = f"{sign}0{hour_diff}:{min_diff}"
+        return tz
+    except:
+        return '-04:00'

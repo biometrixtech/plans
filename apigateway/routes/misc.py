@@ -250,7 +250,10 @@ def handle_activeusers():
     last_user = request.json.get('last_user', None)
     # This route will be invoked daily.  It should scan to find users which meet
     # some definition of 'active', and for each one should push to the plans service with them
-    batch_users, last_user = _get_all_users(last_user)
+    batch_users, last_user = _get_user_batch(last_user)
+
+    # remove users that are api_version < 4_4 (they'll go throuh the old route)
+    batch_users = [user for user in batch_users if user['api_version'] != '4_3']
 
     now = datetime.datetime.now()
     three_am_today = datetime.datetime(now.year, now.month, now.day, 2, 50, 0)
@@ -286,7 +289,7 @@ def handle_activeusers():
     return {'status': 'Success'}
 
 
-def _get_all_users(last_user):
+def _get_user_batch(last_user):
     end_reached = False
     stats_collection = get_mongo_collection('athletestats')
     if last_user is None:
