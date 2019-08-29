@@ -186,3 +186,4 @@ class Asymmetry(object):
         asymmetry = cls(input_dict.get('left_apt', 0), input_dict.get('right_apt', 0))
         asymmetry.asymmetric_events = input_dict.get("asymmetric_events", 0)
         asymmetry.symmetric_events = input_dict.get("symmetric_events", 0)
+        return asymmetry
