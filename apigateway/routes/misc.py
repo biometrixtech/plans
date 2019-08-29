@@ -255,7 +255,7 @@ def handle_activeusers():
     batch_users = [user for user in batch_users if user['api_version'] != '4_3']
 
     now = datetime.datetime.now()
-    three_am_today = datetime.datetime(now.year, now.month, now.day, 2, 50, 0)
+    three_am_today = datetime.datetime(now.year, now.month, now.day, 3, 0, 0)
 
     # group users by timezone to dictate when to execute
     timezones = set(user['timezone'] for user in batch_users)
