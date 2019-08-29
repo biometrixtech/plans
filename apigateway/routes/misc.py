@@ -1,6 +1,7 @@
 from flask import request, Blueprint
 import datetime
 import os
+from bson import ObjectId
 
 from fathomapi.api.config import Config
 from fathomapi.comms.service import Service
@@ -268,6 +269,8 @@ def handle_activeusers():
             tz_api_calls = []
             for user in tz_api_users:
                 tz_api_calls.append({'method': 'POST', 'endpoint': f"athlete/{user['id']}/active", 'body': body})
+
+            print(f'{len(tz_api_calls)} users (in this batch) for timezone: {timezone} and api_version: {api_version}')
             # schedule async calls to happen at 3am local time for the user
             plans_service = Service('plans', api_version)
             plans_service.call_apigateway_async_multi(calls=tz_api_calls, jitter=10 * 60, execute_at=execute_at)
@@ -276,7 +279,7 @@ def handle_activeusers():
     if last_user is not None:
         print('Triggering next batch')
         self_service = Service('plans', Config.get('API_VERSION'))
-        self_service.call_apigateway_async('POST', '/misc/activeusers', body={'last_user': last_user}, execute_at=now + datetime.timedelta(seconds=60))
+        self_service.call_apigateway_async('POST', '/misc/activeusers', body={'last_user': str(last_user)}, execute_at=now + datetime.timedelta(seconds=60))
 
     return {'status': 'Success'}
 
@@ -287,7 +290,7 @@ def _get_all_users(last_user):
     if last_user is None:
         query = {}
     else:
-        query = {"_id": { "$gt": last_user}}
+        query = {"_id": { "$gt": ObjectId(last_user)}}
     users = stats_collection.find(query , projection=["athlete_id", "timezone", "api_version"])
     if users.count() < 100:
         end_reached = True
