@@ -457,11 +457,11 @@ class TrendProcessor(object):
 
         triggers_load = list(t for t in self.trigger_list if t.trigger_type == TriggerType.high_volume_intensity)
         for t in triggers_load:
-            t.priority = 4
+            t.priority = 1
 
         triggers_110 = list(t for t in self.trigger_list if t.trigger_type == TriggerType.movement_error_apt_asymmetry)
         for t in triggers_110:
-            t.priority = 1
+            t.priority = 4
 
         # since we're reverse sorting, 2 is a higher priority than 1
 
@@ -699,7 +699,7 @@ class TrendProcessor(object):
                          TriggerType.hist_pain_pain_today_severity_3_5]
         triggers_pain = list(t for t in self.trigger_list if t.trigger_type in pain_triggers)
         for t in triggers_pain:
-            t.priority = 2
+            t.priority = 3
 
         sore_triggers = [TriggerType.sore_today_doms,
                          TriggerType.hist_sore_less_30_sore_today,
@@ -707,7 +707,7 @@ class TrendProcessor(object):
 
         triggers_sore = list(t for t in self.trigger_list if t.trigger_type in sore_triggers)
         for t in triggers_sore:
-            t.priority = 3
+            t.priority = 2
 
         if len(triggers_pain) > 0 or len(triggers_sore) > 0:
 
@@ -808,11 +808,11 @@ class TrendProcessor(object):
 
         triggers_19 = list(t for t in self.trigger_list if t.trigger_type == TriggerType.hist_sore_greater_30)
         for t in triggers_19:
-            t.priority = 3
+            t.priority = 2
 
         triggers_16 = list(t for t in self.trigger_list if t.trigger_type == TriggerType.hist_pain)
         for t in triggers_16:
-            t.priority = 2
+            t.priority = 3
 
         # since we're reverse sorting, 2 is a higher priority than 1
 
@@ -936,11 +936,21 @@ class TrendProcessor(object):
         #
         # filtered_trigger_list = [t for t in trigger_list if t.trigger_type != TriggerType.hist_sore_less_30]
 
-        filtered_trigger_list = sorted(trigger_list, key=lambda x: x.priority)
+        for f in trigger_list:
+            if f.severity is None:
+                f.severity = 0
+
+        filtered_trigger_list = sorted(trigger_list, key=lambda x: (x.priority, x.severity), reverse=True)
 
         recovery_body_parts = set()
-        prevention_body_parts = set()
-        care_body_parts = set()
+        prevention_fr_body_parts = set()
+        prevention_strenghten_body_parts = set()
+        prevention_heat_body_parts = set()
+        care_fss_body_parts = set()
+        care_fs_body_parts = set()
+        care_ice_body_parts = set()
+        pain_body_part_severity = {}
+        soreness_body_part_severity = {}
 
         for t in filtered_trigger_list:
             # if t.trigger_type == TriggerType.hist_sore_less_30:
@@ -1022,8 +1032,8 @@ class TrendProcessor(object):
                 body_part_text_1, is_plural_1 = self.get_title_text_for_body_parts(t.agonists, 0)
                 if len(body_part_text_1) == 0:
                     body_part_text_1 = "PRIME MOVER"
-                if body_part_text_1 not in prevention_body_parts:
-                    prevention_body_parts.add(body_part_text_1)
+                if body_part_text_1 not in prevention_fr_body_parts:
+                    prevention_fr_body_parts.add(body_part_text_1)
                     tile_1.text = "Foam Roll & Static Stretch your " + body_part_text_1
                     tile_1.description = mobilize_suffix
                     bold_1 = BoldText()
@@ -1039,8 +1049,8 @@ class TrendProcessor(object):
                 a_s_2.extend(t.antagonists)
                 #a_s_2.extend(t.synergists)
                 body_part_text_2, is_plural_2 = self.get_title_text_for_body_parts(a_s_2, 0)
-                if body_part_text_2 not in prevention_body_parts:
-                    prevention_body_parts.add(body_part_text_2)
+                if body_part_text_2 not in prevention_strenghten_body_parts:
+                    prevention_strenghten_body_parts.add(body_part_text_2)
                     tile_2.text = "Strengthen your " + body_part_text_2
                     tile_2.description = mobilize_suffix
                     bold_2 = BoldText()
@@ -1053,8 +1063,8 @@ class TrendProcessor(object):
                     tiles.append(tile_2)
                 tile_3 = TriggerTile()
                 body_part_text_3, is_plural_3 = self.get_title_text_for_body_parts([t.body_part], 0)
-                if body_part_text_3 not in prevention_body_parts:
-                    prevention_body_parts.add(body_part_text_3)
+                if body_part_text_3 not in prevention_heat_body_parts:
+                    prevention_heat_body_parts.add(body_part_text_3)
                     tile_3.text = "Heat your " + body_part_text_3 + " before training"
                     tile_3.description = "to temporarily improve mobility & increase the efficacy of stretching"
                     bold_3 = BoldText()
@@ -1085,13 +1095,13 @@ class TrendProcessor(object):
                     body_part_text_1, is_plural_1 = self.get_title_text_for_body_parts(t.agonists, 0)
                     if len(body_part_text_1) == 0:
                         body_part_text_1 = "PRIME MOVER"
-                    if body_part_text_1 not in prevention_body_parts:
-                        prevention_body_parts.add(body_part_text_1)
+                    if body_part_text_1 not in prevention_fr_body_parts:
+                        prevention_fr_body_parts.add(body_part_text_1)
                         tile_1.text = "Foam Roll & Static Stretch your " + body_part_text_1
                         tile_1.description = mobilize_suffix
                         bold_1 = BoldText()
                         bold_1.text = "Foam Roll & Static Stretch"
-                        bold_1.color = LegendColor.warning_light
+                        bold_1.color = LegendColor.error_light
                         tile_1.bold_text.append(bold_1)
                         tile_1.statistic_text = statistic_text
                         tile_1.bold_statistic_text = bold_statistic_text
@@ -1103,8 +1113,8 @@ class TrendProcessor(object):
                     a_s_2.extend(t.antagonists)
                     #a_s_2.extend(t.synergists)
                     body_part_text_2, is_plural_2 = self.get_title_text_for_body_parts(a_s_2, 0)
-                    if body_part_text_2 not in prevention_body_parts:
-                        prevention_body_parts.add(body_part_text_2)
+                    if body_part_text_2 not in prevention_strenghten_body_parts:
+                        prevention_strenghten_body_parts.add(body_part_text_2)
                         bold_2 = BoldText()
                         bold_2.text = "Strengthen"
                         bold_2.color = LegendColor.splash_light
@@ -1118,8 +1128,8 @@ class TrendProcessor(object):
 
                     tile_3 = TriggerTile()
                     body_part_text_3, is_plural_3 = self.get_title_text_for_body_parts([t.body_part], 0)
-                    if body_part_text_3 not in prevention_body_parts:
-                        prevention_body_parts.add(body_part_text_3)
+                    if body_part_text_3 not in prevention_heat_body_parts:
+                        prevention_heat_body_parts.add(body_part_text_3)
                         tile_3.text = "Heat your " + body_part_text_3 + " before training"
                         tile_3.description = "to temporarily improve mobility & increase the efficacy of stretching"
                         bold_3 = BoldText()
@@ -1140,13 +1150,13 @@ class TrendProcessor(object):
                     body_part_text_1, is_plural_1 = self.get_title_text_for_body_parts(a_a, 0)
                     if len(body_part_text_1) == 0:
                         body_part_text_1 = "PRIME MOVER"
-                    if body_part_text_1 not in prevention_body_parts:
-                        prevention_body_parts.add(body_part_text_1)
+                    if body_part_text_1 not in prevention_fr_body_parts:
+                        prevention_fr_body_parts.add(body_part_text_1)
                         tile_1.text = "Foam Roll & Static Stretch your " + body_part_text_1
                         tile_1.description = mobilize_suffix
                         bold_1 = BoldText()
                         bold_1.text = "Foam Roll & Static Stretch"
-                        bold_1.color = LegendColor.warning_light
+                        bold_1.color = LegendColor.splash_light
                         tile_1.bold_text.append(bold_1)
                         tile_1.statistic_text = statistic_text
                         tile_1.bold_statistic_text = bold_statistic_text
@@ -1155,8 +1165,8 @@ class TrendProcessor(object):
 
                     tile_2 = TriggerTile()
                     body_part_text_2, is_plural_2 = self.get_title_text_for_body_parts(a_a, 0)
-                    if body_part_text_2 not in prevention_body_parts:
-                        prevention_body_parts.add(body_part_text_2)
+                    if body_part_text_2 not in prevention_strenghten_body_parts:
+                        prevention_strenghten_body_parts.add(body_part_text_2)
                         tile_2.text = "Strengthen your " + body_part_text_2
                         tile_2.description = mobilize_suffix
                         bold_2 = BoldText()
@@ -1169,8 +1179,8 @@ class TrendProcessor(object):
                         tiles.append(tile_2)
                     tile_3 = TriggerTile()
                     body_part_text_3, is_plural_3 = self.get_title_text_for_body_parts([t.body_part], 0)
-                    if body_part_text_3 not in prevention_body_parts:
-                        prevention_body_parts.add(body_part_text_3)
+                    if body_part_text_3 not in prevention_heat_body_parts:
+                        prevention_heat_body_parts.add(body_part_text_3)
                         tile_3.text = "Heat your " + body_part_text_3 + " before training"
                         tile_3.description = "to temporarily improve mobility & increase the efficacy of stretching"
                         bold_3 = BoldText()
@@ -1189,9 +1199,13 @@ class TrendProcessor(object):
                 statistic_text = ""
                 bold_statistic_text = []
                 if t.severity is not None:
-                    statistic_text = self.get_severity_descriptor(t.severity) + " Pain Reported"
+                    if t.body_part.body_part_location not in pain_body_part_severity:
+                        pain_body_part_severity[t.body_part.body_part_location] = t.severity
+                    else:
+                        pain_body_part_severity[t.body_part.body_part_location] = max(t.severity, pain_body_part_severity[t.body_part.body_part_location])
+                    statistic_text = self.get_severity_descriptor(pain_body_part_severity[t.body_part.body_part_location]) + " Pain Reported"
                     bold_stat_text = BoldText()
-                    bold_stat_text.text = self.get_severity_descriptor(t.severity)
+                    bold_stat_text.text = self.get_severity_descriptor(pain_body_part_severity[t.body_part.body_part_location])
                     bold_statistic_text.append(bold_stat_text)
                 if not body_part_factory.is_joint(t.body_part):
                     mobilize_suffix = "to minimize effects of compensations resulting from pain"
@@ -1199,12 +1213,12 @@ class TrendProcessor(object):
                     body_part_text_1, is_plural_1 = self.get_title_text_for_body_parts(t.agonists, 0)
                     if len(body_part_text_1) == 0:
                         body_part_text_1 = "PRIME MOVER"
-                    if body_part_text_1 not in care_body_parts:
-                        care_body_parts.add(body_part_text_1)
-                        tile_1.text = "Foam Roll & Stretch your " + body_part_text_1
+                    if body_part_text_1 not in care_fss_body_parts:
+                        care_fss_body_parts.add(body_part_text_1)
+                        tile_1.text = "Foam Roll & Static Stretch your " + body_part_text_1
                         tile_1.description = mobilize_suffix
                         bold_1 = BoldText()
-                        bold_1.text = "Foam Roll & Stretch"
+                        bold_1.text = "Foam Roll & Static Stretch"
                         bold_1.color = LegendColor.error_light
                         tile_1.bold_text.append(bold_1)
                         tile_1.statistic_text = statistic_text
@@ -1213,14 +1227,14 @@ class TrendProcessor(object):
                         tiles.append(tile_1)
 
                     tile_2 = TriggerTile()
-                    body_part_text_2, is_plural_2 = self.get_title_text_for_body_parts([t.body_part], 0)
-                    if body_part_text_2 not in care_body_parts:
-                        care_body_parts.add(body_part_text_2)
+                    body_part_text_2, is_plural_2 = self.get_title_text_for_body_parts(t.synergists, 0)
+                    if body_part_text_2 not in care_fs_body_parts:
+                        care_fs_body_parts.add(body_part_text_2)
                         bold_2 = BoldText()
-                        bold_2.text = "Foam Roll & Static Stretch"
+                        bold_2.text = "Foam Roll & Stretch"
                         bold_2.color = LegendColor.splash_x_light
                         tile_2.bold_text.append(bold_2)
-                        tile_2.text = "Foam Roll & Static Stretch the muscles supporting your " + body_part_text_2
+                        tile_2.text = "Foam Roll & Stretch your " + body_part_text_2
                         tile_2.description = mobilize_suffix
                         tile_2.statistic_text = statistic_text
                         tile_2.bold_statistic_text = bold_statistic_text
@@ -1229,8 +1243,8 @@ class TrendProcessor(object):
 
                     tile_3 = TriggerTile()
                     body_part_text_3, is_plural_3 = self.get_title_text_for_body_parts([t.body_part], 0)
-                    if body_part_text_3 not in care_body_parts:
-                        care_body_parts.add(body_part_text_3)
+                    if body_part_text_3 not in care_ice_body_parts:
+                        care_ice_body_parts.add(body_part_text_3)
                         tile_3.text = "Ice your " + body_part_text_3 + " after training"
                         tile_3.description = "to reduce inflammation and muscle damage"
                         bold_3 = BoldText()
@@ -1244,12 +1258,12 @@ class TrendProcessor(object):
                 else:
                     mobilize_suffix = "to minimize effects of compensations resulting from pain"
                     tile_1 = TriggerTile()
-                    body_part_text_1, is_plural_1 = self.get_title_text_for_body_parts([t.body_part], 0)
+                    body_part_text_1, is_plural_1 = self.get_title_text_for_body_parts(t.synergists, 0)
                     if len(body_part_text_1) == 0:
                         body_part_text_1 = "PRIME MOVER"
-                    if body_part_text_1 not in care_body_parts:
-                        care_body_parts.add(body_part_text_1)
-                        tile_1.text = "Foam Roll & Static Stretch the muscles supporting your " + body_part_text_1
+                    if body_part_text_1 not in care_fss_body_parts:
+                        care_fss_body_parts.add(body_part_text_1)
+                        tile_1.text = "Foam Roll & Static Stretch your " + body_part_text_1
                         tile_1.description = mobilize_suffix
                         bold_1 = BoldText()
                         bold_1.text = "Foam Roll & Static Stretch"
@@ -1264,8 +1278,8 @@ class TrendProcessor(object):
                     body_part_text_2, is_plural_1 = self.get_title_text_for_body_parts([t.body_part], 0)
                     if len(body_part_text_2) == 0:
                         body_part_text_2 = "PRIME MOVER"
-                    if body_part_text_2 not in care_body_parts:
-                        care_body_parts.add(body_part_text_2)
+                    if body_part_text_2 not in care_ice_body_parts:
+                        care_ice_body_parts.add(body_part_text_2)
                         tile_2.text = "Ice your " + body_part_text_2 + " after training"
                         tile_2.description = "to reduce inflammation and tissue damage"
                         bold_2 = BoldText()
@@ -1284,17 +1298,21 @@ class TrendProcessor(object):
                 statistic_text = ""
                 bold_statistic_text = []
                 if t.severity is not None:
-                    statistic_text = self.get_severity_descriptor(t.severity) + " Soreness Reported"
+                    if t.body_part.body_part_location not in soreness_body_part_severity:
+                        soreness_body_part_severity[t.body_part.body_part_location] = t.severity
+                    else:
+                        soreness_body_part_severity[t.body_part.body_part_location] = max(t.severity, soreness_body_part_severity[t.body_part.body_part_location])
+                    statistic_text = self.get_severity_descriptor( soreness_body_part_severity[t.body_part.body_part_location]) + " Soreness Reported"
                     bold_stat_text = BoldText()
-                    bold_stat_text.text = self.get_severity_descriptor(t.severity)
+                    bold_stat_text.text = self.get_severity_descriptor(soreness_body_part_severity[t.body_part.body_part_location])
                     bold_statistic_text.append(bold_stat_text)
                 mobilize_suffix = "to reduce soreness & restore range of motion"
                 tile_1 = TriggerTile()
                 body_part_text_1, is_plural_1 = self.get_title_text_for_body_parts(t.agonists, 0)
                 if len(body_part_text_1) == 0:
                     body_part_text_1 = "PRIME MOVER"
-                if body_part_text_1 not in care_body_parts:
-                    care_body_parts.add(body_part_text_1)
+                if body_part_text_1 not in care_fss_body_parts:
+                    care_fss_body_parts.add(body_part_text_1)
                     tile_1.text = "Foam Roll & Static Stretch your " + body_part_text_1
                     tile_1.description = mobilize_suffix
                     bold_1 = BoldText()
@@ -1306,10 +1324,27 @@ class TrendProcessor(object):
                     tile_1.trigger_type = t.trigger_type
                     tiles.append(tile_1)
 
+                tile_2 = TriggerTile()
+                body_part_text_2, is_plural_2 = self.get_title_text_for_body_parts(t.synergists, 0)
+                if len(body_part_text_2) == 0:
+                    body_part_text_2 = "PRIME MOVER"
+                if body_part_text_2 not in care_fs_body_parts:
+                    care_fs_body_parts.add(body_part_text_2)
+                    tile_2.text = "Foam Roll & Stretch your " + body_part_text_2
+                    tile_2.description = "to minimize effects of compensations resulting from soreness"
+                    bold_2 = BoldText()
+                    bold_2.text = "Foam Roll & Stretch"
+                    bold_2.color = LegendColor.splash_x_light
+                    tile_2.bold_text.append(bold_2)
+                    tile_2.statistic_text = statistic_text
+                    tile_2.bold_statistic_text = bold_statistic_text
+                    tile_2.trigger_type = t.trigger_type
+                    tiles.append(tile_2)
+
                 tile_3 = TriggerTile()
                 body_part_text_3, is_plural_3 = self.get_title_text_for_body_parts([t.body_part], 0)
-                if body_part_text_3 not in care_body_parts:
-                    care_body_parts.add(body_part_text_3)
+                if body_part_text_3 not in care_ice_body_parts:
+                    care_ice_body_parts.add(body_part_text_3)
                     tile_3.text = "Ice your " + body_part_text_3 + " after training"
                     tile_3.description = "to reduce inflammation and muscle damage"
                     bold_3 = BoldText()
@@ -1327,7 +1362,7 @@ class TrendProcessor(object):
                 statistic_text = ""
                 bold_statistic_text = []
                 if t.metric is not None:
-                    statistic_text = str(t.metric) + "% of Max"
+                    statistic_text = str(t.metric) + "% of Max Workload"
                     bold_stat_text = BoldText()
                     bold_stat_text.text = str(t.metric) + "%"
                     bold_statistic_text.append(bold_stat_text)
@@ -1346,7 +1381,7 @@ class TrendProcessor(object):
                 tile_2 = TriggerTile()
                 tile_2.sport_name = t.sport_name
                 tile_2.text = "Cold Water Bath your lower body"
-                tile_2.description = "to reduce inflammation and muscle damage"
+                tile_2.description = "to reduce inflammation & muscle damage"
                 bold_2 = BoldText()
                 bold_2.text = "Cold Water Bath"
                 bold_2.color = LegendColor.splash_x_light
