@@ -236,7 +236,7 @@ def update_dates(daily_plans, athlete_stats, event_date):
 @xray_recorder.capture('routes.misc.dailycron')
 def handle_dailycron():
     # This route will be called daily via a CloudWatch Scheduled Event.
-    Service('plans', Config.get('API_VERSION')).call_apigateway_sync('POST', '/misc/activeusers', body={})
+    Service('plans', Config.get('API_VERSION')).call_apigateway_sync('POST', 'misc/activeusers', body={})
 
     return {'status': 'Success'}, 200
 
@@ -262,7 +262,6 @@ def handle_activeusers():
     print(timezones)
     for timezone in timezones:
         execute_at = three_am_today - datetime.timedelta(minutes=_get_offset(timezone))  # this will be specific for timezone
-        print(execute_at)
         tz_users = [user for user in batch_users if user['timezone'] == timezone]
         body = {"timezone": timezone}
 
