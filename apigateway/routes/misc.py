@@ -257,6 +257,7 @@ def handle_activeusers():
 
     # group users by timezone to dictate when to execute
     timezones = set(user['timezone'] for user in batch_users)
+    print(timezones)
     for timezone in timezones:
         execute_at = three_am_today - datetime.timedelta(minutes=_get_offset(timezone))  # this will be specific for timezone
         tz_users = [user for user in batch_users if user['timezone'] == timezone]
@@ -264,6 +265,7 @@ def handle_activeusers():
 
         # now group users by their last used api version
         api_versions = set(user['api_version'] for user in tz_users)
+        print(api_versions)
         for api_version in api_versions:
             tz_api_users = [user for user in tz_users if user['api_version'] == api_version]
             tz_api_calls = []
@@ -291,7 +293,7 @@ def _get_all_users(last_user):
         query = {}
     else:
         query = {"_id": { "$gt": ObjectId(last_user)}}
-    users = stats_collection.find(query , projection=["athlete_id", "timezone", "api_version"])
+    users = stats_collection.find(query , projection=["athlete_id", "timezone", "api_version"], limit=100)
     if users.count() < 100:
         end_reached = True
     batch_users = []
