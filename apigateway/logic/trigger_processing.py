@@ -10,6 +10,9 @@ class TriggerFactory(object):
     def __init__(self, event_date_time, athlete_stats, soreness_list, training_sessions):
         self.event_date_time = event_date_time
         self.triggers = []
+        self.load_stats = None
+        self.sport_max_load = {}
+        self.historic_asymmetry = None
 
         if athlete_stats is not None and athlete_stats.triggers is not None:
             self.triggers = athlete_stats.triggers
@@ -17,6 +20,8 @@ class TriggerFactory(object):
             self.load_stats = athlete_stats.load_stats
         if athlete_stats is not None and athlete_stats.sport_max_load is not None:
             self.sport_max_load = athlete_stats.sport_max_load
+        if athlete_stats is not None and athlete_stats.historic_asymmetry is not None:
+            self.historic_asymmetry = athlete_stats.historic_asymmetry
         self.high_relative_load_session = False
         self.high_relative_intensity_session = False
         self.high_relative_load_session_sport_names = set()
@@ -145,7 +150,6 @@ class TriggerFactory(object):
                     trigger.metric = round(((movement_error.left_apt - movement_error.right_apt)/movement_error.left_apt) * 100)
                 else:
                     trigger.metric = round(((movement_error.right_apt - movement_error.left_apt) / movement_error.right_apt) * 100)
-                #trigger.body_part = movement_error.body_part_side
 
             trigger.sport_name = sport_name
 
@@ -245,6 +249,15 @@ class TriggerFactory(object):
                         factory = MovementErrorFactory()
                         movement_error = factory.get_movement_error(MovementErrorType.apt_asymmetry, session.asymmetry.left_apt, session.asymmetry.right_apt)
                         self.set_trigger(TriggerType.movement_error_apt_asymmetry, soreness=None, sport_name=None, movement_error=movement_error) # 110
+
+        # if self.historic_asymmetry is not None:
+        #     if self.historic_asymmetry.asymmetric_events is not None and self.historic_asymmetry.symmetric_events is not None:
+        #         if self.historic_asymmetry.asymmetric_events + self.historic_asymmetry.symmetric_events > 0:
+        #             asymmetric_percentage = (self.historic_asymmetry.asymmetric_events / (self.historic_asymmetry.asymmetric_events + self.historic_asymmetry.symmetric_events)) * 100
+        #             if asymmetric_percentage > 50:
+        #                 factory = MovementErrorFactory()
+        #
+        #                 self.set_trigger(TriggerType.movement_error_historic_apt_asymmetry, soreness=None, sport_name=None)
 
         for soreness in self.soreness_list:
 

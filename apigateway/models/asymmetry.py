@@ -187,3 +187,30 @@ class Asymmetry(object):
         asymmetry.asymmetric_events = input_dict.get("asymmetric_events", 0)
         asymmetry.symmetric_events = input_dict.get("symmetric_events", 0)
         return asymmetry
+
+
+class HistoricAsymmetry(Serialisable):
+    def __init__(self):
+        self.asymmetric_events_15_days = None
+        self.symmetric_events_15_days = None
+        self.asymmetric_events_30_days = None
+        self.symmetric_events_30_days = None
+
+    def json_serialise(self):
+        ret = {
+            "asymmetric_events_15_days": self.asymmetric_events_15_days,
+            "symmetric_events_15_days": self.symmetric_events_15_days,
+            "asymmetric_events_30_days": self.asymmetric_events_30_days,
+            "symmetric_events_30_days": self.symmetric_events_30_days
+        }
+        return ret
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        asymmetry = cls()
+        asymmetry.asymmetric_events_15_days = input_dict.get("asymmetric_events_15_days")
+        asymmetry.symmetric_events_15_days = input_dict.get("symmetric_events_15_days")
+        asymmetry.asymmetric_events_30_days = input_dict.get("asymmetric_events_30_days")
+        asymmetry.symmetric_events_30_days = input_dict.get("symmetric_events_30_days")
+        return asymmetry
+

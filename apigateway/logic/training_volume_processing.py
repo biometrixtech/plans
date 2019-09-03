@@ -179,9 +179,7 @@ class TrainingVolumeProcessing(object):
             return False
 
     @xray_recorder.capture('logic.TrainingVolumeProcessing.load_biomechanics_chart')
-    def load_biomechanics_chart(self, all_plans):
-
-        sessions = self.get_training_sessions(all_plans)
+    def load_biomechanics_chart(self, sessions):
 
         biomechanics_chart = BiomechanicsChart()
         biomechanics_chart.add_sessions(sessions)
