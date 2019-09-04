@@ -256,7 +256,7 @@ class TriggerFactory(object):
             if self.historic_asymmetry.asymmetric_events_15_days is not None and self.historic_asymmetry.symmetric_events_15_days is not None:
                 if self.historic_asymmetry.asymmetric_events_15_days + self.historic_asymmetry.symmetric_events_15_days > 0:
                     asymmetric_percentage = round((self.historic_asymmetry.asymmetric_events_15_days / (self.historic_asymmetry.asymmetric_events_15_days + self.historic_asymmetry.symmetric_events_15_days)) * 100)
-                    if asymmetric_percentage > 35:  # reduced it to 35 from 50 to get this to fire for nc_sore_tread
+                    if asymmetric_percentage > 50: 
                         factory = MovementErrorFactory()
                         movement_error = factory.get_movement_error(MovementErrorType.apt_asymmetry, asymmetric_percentage)
                         self.set_trigger(TriggerType.movement_error_historic_apt_asymmetry, soreness=None,
