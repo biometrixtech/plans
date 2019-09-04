@@ -1,13 +1,10 @@
+from fathomapi.api.config import Config
 
+def get_visualization_parameter():
 
-def get_visualization_parameter(request):
+    environment = Config.get('ENVIRONMENT')
 
-    visualizations = True
-
-    if 'visualizations' in request.json:
-        visualization_request = request.json['visualizations']
-        try:
-            visualizations = bool(visualization_request)
-        except:
-            pass
-    return visualizations
+    if environment in ['dev', 'test', 'production']:
+        return True
+    else:
+        return False

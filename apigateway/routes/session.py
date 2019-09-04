@@ -57,7 +57,7 @@ def handle_session_create(user_id=None):
             continue
         survey_processor.create_session_from_survey(session)
 
-    visualizations = get_visualization_parameter(request)
+    visualizations = get_visualization_parameter()
 
     # update daily pain and soreness in athlete_stats
     survey_processor.patch_daily_and_historic_soreness(survey='post_session')
@@ -341,6 +341,7 @@ def handle_no_sessions_planned(user_id=None):
     else:
         plan = daily_plan_datastore.get(user_id, plan_event_date, plan_event_date)[0]
 
+    visualizations = get_visualization_parameter()
     plan.sessions_planned = False
     plan.train_later = False
     daily_plan_datastore.put(plan)
@@ -349,7 +350,8 @@ def handle_no_sessions_planned(user_id=None):
                        event_date,
                        athlete_stats=athlete_stats,
                        update_stats=True,
-                       datastore_collection=datastore_collection)
+                       datastore_collection=datastore_collection,
+                       visualizations=visualizations)
 
     return {'daily_plans': [plan]}, 200
 

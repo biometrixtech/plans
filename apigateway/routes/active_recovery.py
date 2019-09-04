@@ -30,7 +30,7 @@ def handle_exercise_modalities_complete(user_id=None):
     completed_exercises = request.json.get('completed_exercises', [])
     recovery_index = request.json.get('recovery_index', 0)
 
-    visualizations = get_visualization_parameter(request)
+    visualizations = get_visualization_parameter()
 
     plan_event_day = format_date(event_date)
     recovery_event_date = format_datetime(event_date)
@@ -160,7 +160,7 @@ def handle_request_mobilize(user_id=None):
                                     start_date=plan_event_day,
                                     end_date=plan_event_day)[0]
 
-    visualizations = get_visualization_parameter(request)
+    visualizations = get_visualization_parameter()
 
     if plan.train_later:
         if len(plan.pre_active_rest) == 0:
@@ -202,7 +202,7 @@ def handle_body_part_modalities_complete(user_id=None):
     recovery_type = request.json['recovery_type']
     completed_body_parts = request.json.get('completed_body_parts', [])
 
-    visualizations = get_visualization_parameter(request)
+    visualizations = get_visualization_parameter()
 
     plan_event_day = format_date(event_date)
 

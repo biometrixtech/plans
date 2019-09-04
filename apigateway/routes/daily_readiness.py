@@ -14,6 +14,7 @@ from models.soreness_base import BodyPartLocation
 from models.stats import AthleteStats
 from models.daily_plan import DailyPlan
 from models.sleep_data import DailySleepData, SleepEvent
+from routes.visualizations import get_visualization_parameter
 from logic.survey_processing import SurveyProcessing, cleanup_sleep_data_from_api, create_plan
 from logic.athlete_status_processing import AthleteStatusProcessing
 from config import get_mongo_collection
@@ -113,11 +114,14 @@ def handle_daily_readiness_create(user_id):
         if 'current_position' in request.json:
             survey_processor.athlete_stats.current_position = request.json['current_position']
 
+    visualizations = get_visualization_parameter()
+
     plan = create_plan(user_id,
                        event_date,
                        athlete_stats=survey_processor.athlete_stats,
                        stats_processor=survey_processor.stats_processor,
-                       datastore_collection=datastore_collection)
+                       datastore_collection=datastore_collection,
+                       visualizations=visualizations)
     if "health_sync_date" in request.json and request.json['health_sync_date'] is not None:
         Service('users', os.environ['USERS_API_VERSION']).call_apigateway_async(method='PATCH',
                                                                                 endpoint=f"user/{user_id}",

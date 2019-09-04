@@ -9,6 +9,7 @@ from logic.stats_processing import StatsProcessing
 from logic.metrics_processing import MetricsProcessing
 from models.stats import AthleteStats
 from utils import parse_date, parse_datetime, format_date
+from routes.visualizations import get_visualization_parameter
 import datetime
 import random
 import os
@@ -26,9 +27,11 @@ def create_daily_plan(athlete_id):
     # target_minutes = request.json.get('target_minutes', 15)
     last_updated = request.json.get('last_updated', None)
     plan_manager = TrainingPlanManager(athlete_id, DatastoreCollection())
+    visualizations = get_visualization_parameter()
     daily_plan = plan_manager.create_daily_plan(event_date=event_date,
                                                 # target_minutes=target_minutes,
-                                                last_updated=last_updated)
+                                                last_updated=last_updated,
+                                                visualizations=visualizations)
     body = {"message": "Your plan is ready!",
             "call_to_action": "VIEW_PLAN",
             "last_updated": last_updated}

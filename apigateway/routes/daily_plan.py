@@ -33,7 +33,7 @@ def handle_daily_plan_get(user_id=None):
     else:
         start_date = format_date(event_date)
         end_date = start_date
-    visualizations = get_visualization_parameter(request)
+    visualizations = get_visualization_parameter()
     items = daily_plan_datastore.get(user_id, start_date, end_date)
     daily_plans = []
     need_soreness_sessions = False
