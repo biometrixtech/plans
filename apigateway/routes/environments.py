@@ -1,6 +1,6 @@
 from fathomapi.api.config import Config
 
-def get_visualization_parameter():
+def is_fathom_environment():
 
     environment = Config.get('ENVIRONMENT')
 

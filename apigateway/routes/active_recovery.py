@@ -6,7 +6,7 @@ from fathomapi.utils.exceptions import NoSuchEntityException
 from fathomapi.utils.xray import xray_recorder
 from datastores.datastore_collection import DatastoreCollection
 from models.soreness import CompletedExercise
-from routes.visualizations import get_visualization_parameter
+from routes.environments import is_fathom_environment
 from logic.survey_processing import create_plan, cleanup_plan
 from utils import format_date, parse_datetime, format_datetime
 from config import get_mongo_collection
@@ -30,7 +30,7 @@ def handle_exercise_modalities_complete(user_id=None):
     completed_exercises = request.json.get('completed_exercises', [])
     recovery_index = request.json.get('recovery_index', 0)
 
-    visualizations = get_visualization_parameter()
+    visualizations = is_fathom_environment()
 
     plan_event_day = format_date(event_date)
     recovery_event_date = format_datetime(event_date)
@@ -160,7 +160,7 @@ def handle_request_mobilize(user_id=None):
                                     start_date=plan_event_day,
                                     end_date=plan_event_day)[0]
 
-    visualizations = get_visualization_parameter()
+    visualizations = is_fathom_environment()
 
     if plan.train_later:
         if len(plan.pre_active_rest) == 0:
@@ -202,7 +202,7 @@ def handle_body_part_modalities_complete(user_id=None):
     recovery_type = request.json['recovery_type']
     completed_body_parts = request.json.get('completed_body_parts', [])
 
-    visualizations = get_visualization_parameter()
+    visualizations = is_fathom_environment()
 
     plan_event_day = format_date(event_date)
 

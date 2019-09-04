@@ -893,6 +893,9 @@ class BodyPart(object):
         self.stabilizers = []
         self.antagonists = []
 
+        self.parent = None
+        self.children = []
+
     @staticmethod
     def add_exercises(exercise_list, exercise_dict, treatment_priority, randomize=False):
 
