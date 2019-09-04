@@ -896,6 +896,14 @@ class BodyPart(object):
         self.parent = None
         self.children = []
 
+        self.overactive_count = 0
+        self.overactive_risk_count = 0
+        self.tight_count = 0
+        self.tight_risk_count = 0
+        self.underactive_count = 0
+        self.underactive_risk_count = 0
+        self.weakness_count = 0
+
     @staticmethod
     def add_exercises(exercise_list, exercise_dict, treatment_priority, randomize=False):
 
