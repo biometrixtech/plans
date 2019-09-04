@@ -194,7 +194,7 @@ class BodyPartFactory(object):
             return self.get_core_stabilizers(sample)
         elif location == BodyPartLocation.elbow:
             return self.get_elbow(sample)
-        elif location == BodyPartLocation.erector_spinea:
+        elif location == BodyPartLocation.erector_spinae:
             return self.get_erector_spinea(sample)
         elif location == BodyPartLocation.foot:
             return self.get_foot(sample)
@@ -501,7 +501,7 @@ class BodyPartFactory(object):
 
     def get_erector_spinea(self, sample=True):
 
-        part = BodyPart(BodyPartLocation.erector_spinea, None)
+        part = BodyPart(BodyPartLocation.erector_spinae, None)
 
         if sample:
             inhibit = self.get_exercise_dictionary([102, 125, 126])

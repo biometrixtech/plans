@@ -145,11 +145,7 @@ class TriggerFactory(object):
                 trigger.overactive_tight_second = self.get_body_part_list(movement_error.overactive_tight_second)
                 trigger.elevated_stress = self.get_body_part_list(movement_error.elevated_stress)
                 trigger.underactive_weak = self.get_body_part_list(movement_error.underactive_weak)
-
-                if movement_error.left_apt > movement_error.right_apt:
-                    trigger.metric = round(((movement_error.left_apt - movement_error.right_apt)/movement_error.left_apt) * 100)
-                else:
-                    trigger.metric = round(((movement_error.right_apt - movement_error.left_apt) / movement_error.right_apt) * 100)
+                trigger.metric = movement_error.metric
 
             trigger.sport_name = sport_name
 
@@ -247,17 +243,24 @@ class TriggerFactory(object):
                 if session.asymmetry is not None:
                     if session.asymmetry.left_apt != session.asymmetry.right_apt:
                         factory = MovementErrorFactory()
-                        movement_error = factory.get_movement_error(MovementErrorType.apt_asymmetry, session.asymmetry.left_apt, session.asymmetry.right_apt)
-                        self.set_trigger(TriggerType.movement_error_apt_asymmetry, soreness=None, sport_name=None, movement_error=movement_error) # 110
+                        if session.asymmetry.left_apt > session.asymmetry.right_apt:
+                            metric = round(((session.asymmetry.left_apt - session.asymmetry.right_apt) / session.asymmetry.left_apt) * 100)
+                        else:
+                            metric = round(((session.asymmetry.right_apt - session.asymmetry.left_apt) / session.asymmetry.right_apt) * 100)
+                        movement_error = factory.get_movement_error(MovementErrorType.apt_asymmetry, metric)
 
-        # if self.historic_asymmetry is not None:
-        #     if self.historic_asymmetry.asymmetric_events is not None and self.historic_asymmetry.symmetric_events is not None:
-        #         if self.historic_asymmetry.asymmetric_events + self.historic_asymmetry.symmetric_events > 0:
-        #             asymmetric_percentage = (self.historic_asymmetry.asymmetric_events / (self.historic_asymmetry.asymmetric_events + self.historic_asymmetry.symmetric_events)) * 100
-        #             if asymmetric_percentage > 50:
-        #                 factory = MovementErrorFactory()
-        #
-        #                 self.set_trigger(TriggerType.movement_error_historic_apt_asymmetry, soreness=None, sport_name=None)
+                        self.set_trigger(TriggerType.movement_error_apt_asymmetry, soreness=None, sport_name=None,
+                                         movement_error=movement_error)  # 110
+
+        if self.historic_asymmetry is not None:
+            if self.historic_asymmetry.asymmetric_events_15_days is not None and self.historic_asymmetry.symmetric_events_15_days is not None:
+                if self.historic_asymmetry.asymmetric_events_15_days + self.historic_asymmetry.symmetric_events_15_days > 0:
+                    asymmetric_percentage = round((self.historic_asymmetry.asymmetric_events_15_days / (self.historic_asymmetry.asymmetric_events_15_days + self.historic_asymmetry.symmetric_events_15_days)) * 100)
+                    if asymmetric_percentage > 35:  # reduced it to 35 from 50 to get this to fire for nc_sore_tread
+                        factory = MovementErrorFactory()
+                        movement_error = factory.get_movement_error(MovementErrorType.apt_asymmetry, asymmetric_percentage)
+                        self.set_trigger(TriggerType.movement_error_historic_apt_asymmetry, soreness=None,
+                                         sport_name=None, movement_error=movement_error)  # 111
 
         for soreness in self.soreness_list:
 

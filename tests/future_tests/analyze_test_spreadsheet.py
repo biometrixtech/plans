@@ -5,7 +5,7 @@ from models.historic_soreness import HistoricSorenessStatus
 unreportable_parts = [BodyPartLocation.upper_body, BodyPartLocation.lower_body,
                       BodyPartLocation.full_body, BodyPartLocation.general, BodyPartLocation.head,
                       BodyPartLocation.biceps, BodyPartLocation.triceps, BodyPartLocation.core_stabilizers,
-                      BodyPartLocation.erector_spinea, BodyPartLocation.forearm]
+                      BodyPartLocation.erector_spinae, BodyPartLocation.forearm]
 joints = [BodyPartLocation.wrist, BodyPartLocation.elbow, BodyPartLocation.hip_flexor, BodyPartLocation.knee,
           BodyPartLocation.ankle, BodyPartLocation.foot, BodyPartLocation.lower_back, BodyPartLocation.shoulder]
 no_side_parts = [BodyPartLocation.abdominals, BodyPartLocation.upper_back_neck, BodyPartLocation.lower_back]

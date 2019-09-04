@@ -80,7 +80,7 @@ class BodyPartLocation(Enum):
     triceps = 23
     forearm = 24
     core_stabilizers = 25
-    erector_spinea = 26
+    erector_spinae = 26
     upper_body = 91
     lower_body = 92
     full_body = 93

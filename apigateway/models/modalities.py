@@ -1021,7 +1021,7 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
                 if TriggerType.movement_error_apt_asymmetry == t.trigger_type:
                     goal = AthleteGoal("Asymmetric Stress", 1, AthleteGoalType.asymmetric_session)
                     factory = MovementErrorFactory()
-                    movement_error = factory.get_movement_error(MovementErrorType.apt_asymmetry, None, None)
+                    movement_error = factory.get_movement_error(MovementErrorType.apt_asymmetry, None)
 
                     body_part_factory = BodyPartFactory()
 
@@ -1486,7 +1486,7 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
                 if TriggerType.movement_error_apt_asymmetry == t.trigger_type:
                     goal = AthleteGoal("Asymmetric Stress", 1, AthleteGoalType.asymmetric_session)
                     factory = MovementErrorFactory()
-                    movement_error = factory.get_movement_error(MovementErrorType.apt_asymmetry, None, None)
+                    movement_error = factory.get_movement_error(MovementErrorType.apt_asymmetry, None)
 
                     body_part_factory = BodyPartFactory()
 

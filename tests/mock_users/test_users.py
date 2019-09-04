@@ -41,8 +41,8 @@ three_sensor_users = [
 ]
 
 merged_users = [
-    "nc_long",  #7bb3e792-41ff-43cb-861e-87cf2bdeeadf
-    # "nc_sore_tread",  #917e94bc-3f56-4519-8d25-ae54878748f2
+    #"nc_long",  #7bb3e792-41ff-43cb-861e-87cf2bdeeadf
+    "nc_sore_tread",  #917e94bc-3f56-4519-8d25-ae54878748f2
     # "ts_pain_long", #e602620d-2040-4ecc-87cc-f392d9db5eab
     # "ts_tread",  #18ad5cde-92a8-4cd4-8295-71a91c7d3aac
     # "two_pain_tread", #25c38e39-357a-456d-84b7-61547364a2ba
