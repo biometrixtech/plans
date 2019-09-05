@@ -903,6 +903,7 @@ class BodyPart(object):
         self.underactive_count = 0
         self.underactive_risk_count = 0
         self.weakness_count = 0
+        self.possible_soreness_source_count = 0
 
     @staticmethod
     def add_exercises(exercise_list, exercise_dict, treatment_priority, randomize=False):
