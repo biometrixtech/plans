@@ -19,7 +19,7 @@ app = Blueprint('three_sensor', __name__)
 def handle_biomechanics_detail_get(user_id=None):
     asymmetry_type = 0
 
-    if request.json['data_type']:
+    if 'data_type' in request.json:
         asymmetry_type = request.json["data_type"]
 
     event_date = parse_datetime(request.json['event_date'])
