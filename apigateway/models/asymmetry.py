@@ -224,7 +224,8 @@ class AnteriorPelvicTilt(object):
             "left": self.left,
             "right": self.right,
             "asymmetric_events": self.asymmetric_events,
-            "symmetric_events": self.symmetric_events
+            "symmetric_events": self.symmetric_events,
+            "percent_events_asymmetric": self.percent_events_asymmetric
         }
         return ret
 
@@ -274,6 +275,7 @@ class AnteriorPelvicTilt(object):
             asymmetry = cls(input_dict.get('left', 0), input_dict.get('right', 0))
         asymmetry.asymmetric_events = input_dict.get("asymmetric_events", 0)
         asymmetry.symmetric_events = input_dict.get("symmetric_events", 0)
+        asymmetry.percent_events_asymmetric = input_dict.get("percent_events_asymmetric", 0)
         return asymmetry
 
 
