@@ -146,7 +146,7 @@ class AthleteStats(Serialisable):
 
         self.api_version = '4_3'
         self.timezone = '-04:00'
-        self.historic_asymmetry = None
+        self.historic_asymmetry = {}
 
     def update_historic_soreness(self, soreness, event_date):
 
@@ -512,7 +512,7 @@ class AthleteStats(Serialisable):
             # 'training_volume_chart_data': [chart_data.json_serialise() for chart_data in self.training_volume_chart_data]
             'api_version': self.api_version,
             'timezone': self.timezone,
-            'historic_asymmetry': self.historic_asymmetry.json_serialise() if self.historic_asymmetry is not None else None
+            'historic_asymmetry': {str(asymmetry_type): historic_asymmetry.json_serialise() for (asymmetry_type, historic_asymmetry) in self.historic_asymmetry.items()}
         }
         return ret
 
@@ -572,7 +572,8 @@ class AthleteStats(Serialisable):
         athlete_stats.trend_categories = [TrendCategory.json_deserialise(trend_category) for trend_category in input_dict.get('trend_categories', [])]
         athlete_stats.api_version = input_dict.get('api_version', '4_3')
         athlete_stats.timezone = input_dict.get('timezone', '-04:00')
-        athlete_stats.historic_asymmetry = HistoricAsymmetry.json_deserialise(input_dict['historic_asymmetry']) if input_dict.get('historic_asymmetry') is not None else None
+        athlete_stats.historic_asymmetry = {int(asymmetry_type): HistoricAsymmetry.json_deserialise(historic_asymmetry)
+                                            for (asymmetry_type, historic_asymmetry) in input_dict.get('historic_asymmetry', {}).items()}
         return athlete_stats
 
     @classmethod

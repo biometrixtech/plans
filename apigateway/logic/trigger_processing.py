@@ -4,6 +4,7 @@ from models.soreness_base import HistoricSorenessStatus, BodyPartSide
 from models.movement_errors import MovementErrorType, MovementError, MovementErrorFactory
 from models.goal import AthleteGoalType, AthleteGoal
 from models.trigger import TriggerType, Trigger
+from models.asymmetry import AsymmetryType
 
 
 class TriggerFactory(object):
@@ -240,23 +241,23 @@ class TriggerFactory(object):
 
         for session in self.training_sessions:
             if session.source == SessionSource.three_sensor:
-                if session.asymmetry is not None:
-                    if session.asymmetry.left_apt != session.asymmetry.right_apt:
+                if session.asymmetry is not None and session.asymmetry.anterior_pelvic_tilt is not None:
+                    if session.asymmetry.anterior_pelvic_tilt.left != session.asymmetry.anterior_pelvic_tilt.right:
                         factory = MovementErrorFactory()
-                        if session.asymmetry.left_apt > session.asymmetry.right_apt:
-                            metric = round(((session.asymmetry.left_apt - session.asymmetry.right_apt) / session.asymmetry.left_apt) * 100)
+                        if session.asymmetry.anterior_pelvic_tilt.left > session.asymmetry.anterior_pelvic_tilt.right:
+                            metric = round(((session.asymmetry.anterior_pelvic_tilt.left - session.asymmetry.anterior_pelvic_tilt.right) / session.asymmetry.anterior_pelvic_tilt.left) * 100)
                         else:
-                            metric = round(((session.asymmetry.right_apt - session.asymmetry.left_apt) / session.asymmetry.right_apt) * 100)
+                            metric = round(((session.asymmetry.anterior_pelvic_tilt.right - session.asymmetry.anterior_pelvic_tilt.left) / session.asymmetry.anterior_pelvic_tilt.right) * 100)
                         movement_error = factory.get_movement_error(MovementErrorType.apt_asymmetry, metric)
 
                         self.set_trigger(TriggerType.movement_error_apt_asymmetry, soreness=None, sport_name=None,
                                          movement_error=movement_error)  # 110
 
-        if self.historic_asymmetry is not None:
-            if self.historic_asymmetry.asymmetric_events_15_days is not None and self.historic_asymmetry.symmetric_events_15_days is not None:
-                if self.historic_asymmetry.asymmetric_events_15_days + self.historic_asymmetry.symmetric_events_15_days > 0:
-                    asymmetric_percentage = round((self.historic_asymmetry.asymmetric_events_15_days / (self.historic_asymmetry.asymmetric_events_15_days + self.historic_asymmetry.symmetric_events_15_days)) * 100)
-                    if asymmetric_percentage > 50:
+        if self.historic_asymmetry is not None and AsymmetryType.anterior_pelvic_tilt.value in self.historic_asymmetry:
+            if self.historic_asymmetry[AsymmetryType.anterior_pelvic_tilt.value].asymmetric_events_15_days is not None and self.historic_asymmetry[AsymmetryType.anterior_pelvic_tilt.value].symmetric_events_15_days is not None:
+                if self.historic_asymmetry[AsymmetryType.anterior_pelvic_tilt.value].asymmetric_events_15_days + self.historic_asymmetry[AsymmetryType.anterior_pelvic_tilt.value].symmetric_events_15_days > 0:
+                    asymmetric_percentage = round((self.historic_asymmetry[AsymmetryType.anterior_pelvic_tilt.value].asymmetric_events_15_days / (self.historic_asymmetry[AsymmetryType.anterior_pelvic_tilt.value].asymmetric_events_15_days + self.historic_asymmetry[AsymmetryType.anterior_pelvic_tilt.value].symmetric_events_15_days)) * 100)
+                    if asymmetric_percentage > 35:
                         factory = MovementErrorFactory()
                         movement_error = factory.get_movement_error(MovementErrorType.apt_asymmetry, asymmetric_percentage)
                         self.set_trigger(TriggerType.movement_error_historic_apt_asymmetry, soreness=None,

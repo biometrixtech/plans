@@ -215,18 +215,18 @@ class BiomechanicsChartData(Serialisable):
 
         proc = AsymmetryProcessor()
 
-        if session.asymmetry is not None:
-            viz = proc.get_visualized_left_right_asymmetry(session.asymmetry.left_apt, session.asymmetry.right_apt)
+        if session.asymmetry is not None and session.asymmetry.anterior_pelvic_tilt is not None:
+            viz = proc.get_visualized_left_right_asymmetry(session.asymmetry.anterior_pelvic_tilt.left, session.asymmetry.anterior_pelvic_tilt.right)
             summary_data = AsymmetrySummaryData()
             summary_data.summary_data = viz
 
             asymmetry_data = AsymmetryData()
 
             body_side = 0
-            if session.asymmetry.left_apt > session.asymmetry.right_apt:
+            if session.asymmetry.anterior_pelvic_tilt.left > session.asymmetry.anterior_pelvic_tilt.right:
                 body_side = 1
 
-                percentage = round(((session.asymmetry.left_apt - session.asymmetry.right_apt) / session.asymmetry.left_apt) * 100)
+                percentage = round(((session.asymmetry.anterior_pelvic_tilt.left - session.asymmetry.anterior_pelvic_tilt.right) / session.asymmetry.anterior_pelvic_tilt.left) * 100)
                 summary_data.summary_percentage = str(percentage)
                 summary_data.summary_side = "1"
                 summary_data.summary_text = "more range of motion during left foot steps"
@@ -242,10 +242,10 @@ class BiomechanicsChartData(Serialisable):
                 #bold_text_3.color = "successLight"
                 summary_data.summary_take_away_bold_text.append(bold_text_3)
 
-            elif session.asymmetry.right_apt > session.asymmetry.left_apt:
+            elif session.asymmetry.anterior_pelvic_tilt.right > session.asymmetry.anterior_pelvic_tilt.left:
                 body_side = 2
                 percentage = round(
-                    ((session.asymmetry.right_apt - session.asymmetry.left_apt) / session.asymmetry.right_apt) * 100)
+                    ((session.asymmetry.anterior_pelvic_tilt.right - session.asymmetry.anterior_pelvic_tilt.left) / session.asymmetry.anterior_pelvic_tilt.right) * 100)
                 summary_data.summary_percentage = str(percentage)
                 summary_data.summary_side = "2"
                 summary_data.summary_text = "more range of motion during right foot steps"

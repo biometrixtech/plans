@@ -7,8 +7,8 @@ class AsymmetryDatastore(object):
     mongo_collection = 'asymmetry'
 
     @xray_recorder.capture('datastore.AsymmetryDatastore.get')
-    def get(self, session_id=None, user_id=None, sessions=None, start_date=None, end_date=None):
-        return self._query_mongodb(session_id=session_id, user_id=user_id, sessions=sessions, start_date=start_date, end_date=end_date)
+    def get(self, session_id=None, user_id=None, sessions=None, data_type=0):
+        return self._query_mongodb(session_id=session_id, user_id=user_id, sessions=sessions, data_type=data_type)
 
     def put(self, items):
         if not isinstance(items, list):
@@ -20,7 +20,7 @@ class AsymmetryDatastore(object):
             raise e
 
     @xray_recorder.capture('datastore.AsymmetryDatastore._query_mongodb')
-    def _query_mongodb(self, session_id, user_id, sessions=7, start_date=None, end_date=None):
+    def _query_mongodb(self, session_id, user_id, sessions=7, data_type=0):
         mongo_collection = get_mongo_collection(self.mongo_collection)
 
         if session_id is not None:
@@ -34,22 +34,16 @@ class AsymmetryDatastore(object):
                 return None
         elif user_id is not None:
             query = {'user_id': user_id}
-            if start_date is not None and end_date is not None:
-
-                query['event_date'] = {'$gte': start_date, '$lte': end_date}
-                projection = ['user_id', 'session_id','event_date', 'left_apt', 'right_apt', 'symmetric_events', 'asymmetric_events']
-                mongo_cursor = mongo_collection.find(query, sort=[('event_date', -1)], projection=projection)
-                #mongo_cursor = mongo_collection.find(query, sort=[('event_date', -1)])
-
-            else:
-
-                mongo_cursor = mongo_collection.find(query, sort=[('event_date', -1)], limit=sessions)
             ret = []
-            for mongo_result in mongo_cursor:
-                session = SessionAsymmetry.json_deserialise(mongo_result)
-                ret.append(session)
-            return ret
 
+            if data_type == 0:
+                projection = ['user_id', 'session_id','event_date','left_apt','right_apt','time_blocks.left','time_blocks.right', 'time_blocks.significant', 'time_blocks.time_block', 'time_blocks.apt']
+                mongo_cursor = mongo_collection.find(query, sort=[('event_date', -1)], limit=sessions, projection=projection)
+
+                for mongo_result in mongo_cursor:
+                    session = SessionAsymmetry.json_deserialise(mongo_result)
+                    ret.append(session)
+            return ret
 
 
     @xray_recorder.capture('datastore.AsymmetryDatastore._put_mongodb')

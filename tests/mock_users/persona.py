@@ -26,7 +26,7 @@ class Persona(object):
         self.athlete_stats = None
         self.rpes = []
 
-    def create_history(self, days, suffix='Test', clear_history=True, start_date_time=datetime.datetime.now(), end_today=False, rpes=[], visualizations=True):
+    def create_history(self, days, suffix='', clear_history=True, start_date_time=datetime.datetime.now(), end_today=False, rpes=[], visualizations=True):
         self.rpes = rpes
         if clear_history:
             self.clear_user(suffix)
@@ -77,7 +77,7 @@ class Persona(object):
 
         return last_plan_date
 
-    def clear_user(self, suffix='Test'):
+    def clear_user(self, suffix=''):
         readiness = get_mongo_collection('dailyreadiness', suffix)
         daily_plan = get_mongo_collection('dailyplan', suffix)
         stats = get_mongo_collection('athletestats', suffix)
