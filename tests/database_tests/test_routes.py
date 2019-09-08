@@ -20,10 +20,10 @@ from utils import format_date
 
 @pytest.fixture(scope="session", autouse=True)
 def add_xray_support(request):
-    os.environ["ENVIRONMENT"] = "test"
+    os.environ["ENVIRONMENT"] = "dev"
 
     xray_recorder.configure(sampling=False)
-    xray_recorder.begin_segment(name="test")
+    xray_recorder.begin_segment(name="dev")
 
     config = get_secret('mongo')
     os.environ["MONGO_HOST"] = config['host']
@@ -48,14 +48,21 @@ def add_xray_support(request):
 
 
 def test_biomechanics_detail_0_asymmetry_type():
-    user_id = "917e94bc-3f56-4519-8d25-ae54878748f2"
+    user_id = "2b4a1792-42c7-460e-9e4c-98627e72cc6f"
     event_date = datetime.now()
     sessions = get_sessions_detail(user_id, event_date, 0)
     assert len(sessions) > 0
 
 
+def test_biomechanics_detail_1_asymmetry_type():
+    user_id = "2b4a1792-42c7-460e-9e4c-98627e72cc6f"
+    event_date = datetime.now()
+    sessions = get_sessions_detail(user_id, event_date, 1)
+    assert len(sessions) > 1
+
+
 def test_biomechanics_detail_no_asymmetry_type():
     user_id = "917e94bc-3f56-4519-8d25-ae54878748f2"
     event_date = datetime.now()
-    sessions = get_sessions_detail(user_id, event_date, 1)
+    sessions = get_sessions_detail(user_id, event_date, 2)
     assert len(sessions) == 0
