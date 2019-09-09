@@ -400,7 +400,7 @@ class BiomechanicsAnklePitchChartData(Serialisable):
                 summary_data.summary_take_away_bold_text.append(bold_text_1)
 
             asymmetry_data.body_side = body_side
-            asymmetry_data.apt = summary_data
+            asymmetry_data.ankle_pitch = summary_data
 
             self.session_id = session.id
             self.duration = session.duration_sensor
@@ -445,7 +445,7 @@ class AsymmetryAnklePitchData(Serialisable):
     def json_deserialise(cls, input_dict):
         data = cls()
         data.body_side = input_dict.get('body_side', 0)
-        data.apt = AsymmetrySummaryData.json_deserialise(input_dict['ankle_pitch']) if input_dict.get('ankle_pitch') is not None else None
+        data.ankle_pitch = AsymmetrySummaryData.json_deserialise(input_dict['ankle_pitch']) if input_dict.get('ankle_pitch') is not None else None
         return data
 
 
