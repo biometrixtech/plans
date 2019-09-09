@@ -120,7 +120,7 @@ class StatsProcessing(object):
 
         sessions = training_volume_processing.get_training_sessions(self.all_plans)
 
-        training_volume_processing.load_biomechanics_chart(sessions)
+        training_volume_processing.load_biomechanics_charts(sessions)
 
         current_athlete_stats.historic_asymmetry = self.get_historic_asymmetry(sessions)
 
@@ -146,7 +146,7 @@ class StatsProcessing(object):
 
         current_athlete_stats.training_volume_chart_data = training_volume_processing.training_volume_chart_data
         current_athlete_stats.workout_chart = training_volume_processing.workout_chart
-        current_athlete_stats.biomechanics_chart = training_volume_processing.biomechanics_chart
+        current_athlete_stats.biomechanics_chart = training_volume_processing.biomechanics_apt_chart
         current_athlete_stats.body_response_chart = BodyResponseChart(self.event_date)
         current_athlete_stats.body_response_chart.process_soreness(soreness_list_25)
 

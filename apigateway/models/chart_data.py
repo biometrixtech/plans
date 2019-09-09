@@ -151,7 +151,7 @@ class TrainingVolumeChart(BaseChart):
             self.data[chart_data.date] = chart_data
 
 
-class BiomechanicsChart(Serialisable):
+class BiomechanicsAPTChart(Serialisable):
     def __init__(self):
         self.sessions = []
 
@@ -166,7 +166,7 @@ class BiomechanicsChart(Serialisable):
         filtered_list = sorted(filtered_list, key=lambda x:x.event_date, reverse=False)
 
         for f in filtered_list:
-            chart_data = BiomechanicsChartData()
+            chart_data = BiomechanicsAPTChartData()
             chart_data.add_session_data(f)
             self.sessions.append(chart_data)
 
@@ -179,11 +179,43 @@ class BiomechanicsChart(Serialisable):
     @classmethod
     def json_deserialise(cls, input_dict):
         chart = cls()
-        chart.sessions = [BiomechanicsChartData.json_deserialise(s) for s in input_dict.get('sessions', [])]
+        chart.sessions = [BiomechanicsAPTChartData.json_deserialise(s) for s in input_dict.get('sessions', [])]
         return chart
 
 
-class BiomechanicsChartData(Serialisable):
+class BiomechanicsAnklePitchChart(Serialisable):
+    def __init__(self):
+        self.sessions = []
+
+    def add_sessions(self, session_list):
+
+        filtered_list = [s for s in session_list if s.source == SessionSource.three_sensor]
+
+        filtered_list = sorted(filtered_list, key=lambda x:x.event_date, reverse=True)
+
+        filtered_list = filtered_list[:7]
+
+        filtered_list = sorted(filtered_list, key=lambda x:x.event_date, reverse=False)
+
+        for f in filtered_list:
+            chart_data = BiomechanicsAnklePitchChartData()
+            chart_data.add_session_data(f)
+            self.sessions.append(chart_data)
+
+    def json_serialise(self):
+        ret = {
+            'sessions': [s.json_serialise() for s in self.sessions]
+        }
+        return ret
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        chart = cls()
+        chart.sessions = [BiomechanicsAnklePitchChartData.json_deserialise(s) for s in input_dict.get('sessions', [])]
+        return chart
+
+
+class BiomechanicsAPTChartData(Serialisable):
     def __init__(self):
         self.session_id = ''
         self.duration = 0
@@ -208,7 +240,7 @@ class BiomechanicsChartData(Serialisable):
         data.duration = input_dict.get('duration', 0)
         data.sport_name = SportName(input_dict['sport_name']) if input_dict.get('sport_name') is not None else None
         data.event_date_time = parse_datetime(input_dict['event_date_time']) if input_dict.get('event_date_time') is not None else None
-        data.asymmetry = AsymmetryData.json_deserialise(input_dict['asymmetry']) if input_dict.get('asymmetry') is not None else None
+        data.asymmetry = AsymmetryAPTData.json_deserialise(input_dict['asymmetry']) if input_dict.get('asymmetry') is not None else None
         return data
 
     def add_session_data(self, session):
@@ -220,7 +252,7 @@ class BiomechanicsChartData(Serialisable):
             summary_data = AsymmetrySummaryData()
             summary_data.summary_data = viz
 
-            asymmetry_data = AsymmetryData()
+            asymmetry_data = AsymmetryAPTData()
 
             body_side = 0
             if session.asymmetry.anterior_pelvic_tilt.left > session.asymmetry.anterior_pelvic_tilt.right:
@@ -280,7 +312,104 @@ class BiomechanicsChartData(Serialisable):
             self.asymmetry = asymmetry_data
 
 
-class AsymmetryData(Serialisable):
+class BiomechanicsAnklePitchChartData(Serialisable):
+    def __init__(self):
+        self.session_id = ''
+        self.duration = 0
+        self.sport_name = None
+        self.event_date_time = None
+        self.asymmetry = None
+
+    def json_serialise(self):
+        ret = {
+            'session_id' : self.session_id,
+            'duration': self.duration,
+            'sport_name': self.sport_name.value if self.sport_name is not None else None,
+            'event_date_time': format_datetime(self.event_date_time) if self.event_date_time is not None else None,
+            'asymmetry': self.asymmetry.json_serialise() if self.asymmetry is not None else None
+        }
+        return ret
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        data = cls()
+        data.session_id = input_dict.get('session_id', '')
+        data.duration = input_dict.get('duration', 0)
+        data.sport_name = SportName(input_dict['sport_name']) if input_dict.get('sport_name') is not None else None
+        data.event_date_time = parse_datetime(input_dict['event_date_time']) if input_dict.get('event_date_time') is not None else None
+        data.asymmetry = AsymmetryAnklePitchData.json_deserialise(input_dict['asymmetry']) if input_dict.get('asymmetry') is not None else None
+        return data
+
+    def add_session_data(self, session):
+
+        proc = AsymmetryProcessor()
+
+        if session.asymmetry is not None and session.asymmetry.ankle_pitch is not None:
+            viz = proc.get_visualized_left_right_asymmetry(session.asymmetry.ankle_pitch.left, session.asymmetry.ankle_pitch.right)
+            summary_data = AsymmetrySummaryData()
+            summary_data.summary_data = viz
+
+            asymmetry_data = AsymmetryAnklePitchData()
+
+            body_side = 0
+            if session.asymmetry.ankle_pitch.left > session.asymmetry.ankle_pitch.right:
+                body_side = 1
+
+                percentage = round(((session.asymmetry.ankle_pitch.left - session.asymmetry.ankle_pitch.right) / session.asymmetry.ankle_pitch.left) * 100)
+                summary_data.summary_percentage = str(percentage)
+                summary_data.summary_side = "1"
+                summary_data.summary_text = "more range of motion during left foot steps"
+                summary_data.summary_take_away_text = "You had " + str(percentage) + "% more range of motion during left foot steps compared to right foot steps."
+                # bold_text_1 = BoldText()
+                # bold_text_1.text = str(percentage) + "%"
+                bold_text_2 = BoldText()
+                bold_text_2.text = "left"
+                # summary_data.summary_bold_text.append(bold_text_1)
+                summary_data.summary_bold_text.append(bold_text_2)
+                bold_text_3 = BoldText()
+                bold_text_3.text = str(percentage) + "% more"
+                #bold_text_3.color = "successLight"
+                summary_data.summary_take_away_bold_text.append(bold_text_3)
+
+            elif session.asymmetry.ankle_pitch.right > session.asymmetry.ankle_pitch.left:
+                body_side = 2
+                percentage = round(
+                    ((session.asymmetry.ankle_pitch.right - session.asymmetry.ankle_pitch.left) / session.asymmetry.ankle_pitch.right) * 100)
+                summary_data.summary_percentage = str(percentage)
+                summary_data.summary_side = "2"
+                summary_data.summary_text = "more range of motion during right foot steps"
+                summary_data.summary_take_away_text = "You had " + str(
+                    percentage) + "% more range of motion during right foot steps compared to left foot steps."
+                # bold_text_1 = BoldText()
+                # bold_text_1.text = str(percentage) + "%"
+                bold_text_2 = BoldText()
+                bold_text_2.text = "right"
+
+                # summary_data.summary_bold_text.append(bold_text_1)
+                summary_data.summary_bold_text.append(bold_text_2)
+                bold_text_3 = BoldText()
+                bold_text_3.text = str(percentage) + "% more"
+                #bold_text_3.color = "successLight"
+                summary_data.summary_take_away_bold_text.append(bold_text_3)
+            else:
+                summary_data.summary_text = "Symmetric range of motion in this workout!"
+                summary_data.summary_take_away_text = "Your average range of motion was balanced between left and right steps across this workout."
+                summary_data.summary_side = "0"
+                bold_text_1 = BoldText()
+                bold_text_1.text = "balanced"
+                summary_data.summary_take_away_bold_text.append(bold_text_1)
+
+            asymmetry_data.body_side = body_side
+            asymmetry_data.apt = summary_data
+
+            self.session_id = session.id
+            self.duration = session.duration_sensor
+            self.sport_name = session.sport_name
+            self.event_date_time = session.event_date
+            self.asymmetry = asymmetry_data
+
+
+class AsymmetryAPTData(Serialisable):
     def __init__(self):
         self.body_side = 0
         self.apt = None
@@ -297,6 +426,26 @@ class AsymmetryData(Serialisable):
         data = cls()
         data.body_side = input_dict.get('body_side', 0)
         data.apt = AsymmetrySummaryData.json_deserialise(input_dict['apt']) if input_dict.get('apt') is not None else None
+        return data
+
+
+class AsymmetryAnklePitchData(Serialisable):
+    def __init__(self):
+        self.body_side = 0
+        self.ankle_pitch = None
+
+    def json_serialise(self):
+        ret = {
+            'body_side': self.body_side,
+            'ankle_pitch': self.ankle_pitch.json_serialise() if self.ankle_pitch is not None else None
+        }
+        return ret
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        data = cls()
+        data.body_side = input_dict.get('body_side', 0)
+        data.apt = AsymmetrySummaryData.json_deserialise(input_dict['ankle_pitch']) if input_dict.get('ankle_pitch') is not None else None
         return data
 
 

@@ -9,7 +9,7 @@ from utils import format_date, parse_date
 from itertools import groupby
 from operator import itemgetter, attrgetter
 from statistics import stdev, mean
-from models.chart_data import TrainingVolumeChartData, TrainingVolumeChart, WorkoutChart, BiomechanicsChart
+from models.chart_data import TrainingVolumeChartData, TrainingVolumeChart, WorkoutChart, BiomechanicsAPTChart, BiomechanicsAnklePitchChart
 from models.stats import SportMaxLoad
 
 
@@ -68,7 +68,8 @@ class TrainingVolumeProcessing(object):
 
         self.training_volume_chart_data = []
         self.workout_chart = []
-        self.biomechanics_chart = None
+        self.biomechanics_apt_chart = None
+        self.biomechanics_ankle_pitch_chart = None
 
         self.internal_load_tuples = []
         #self.external_load_tuples = []
@@ -178,12 +179,18 @@ class TrainingVolumeProcessing(object):
         else:
             return False
 
-    @xray_recorder.capture('logic.TrainingVolumeProcessing.load_biomechanics_chart')
-    def load_biomechanics_chart(self, sessions):
+    @xray_recorder.capture('logic.TrainingVolumeProcessing.load_biomechanics_charts')
+    def load_biomechanics_charts(self, sessions):
 
-        biomechanics_chart = BiomechanicsChart()
-        biomechanics_chart.add_sessions(sessions)
-        self.biomechanics_chart = biomechanics_chart
+        biomechanics_apt_chart = BiomechanicsAPTChart()
+        biomechanics_apt_chart.add_sessions(sessions)
+
+        self.biomechanics_apt_chart = biomechanics_apt_chart
+
+        biomechanics_ankle_pitch_chart = BiomechanicsAnklePitchChart()
+        biomechanics_ankle_pitch_chart.add_sessions(sessions)
+
+        self.biomechanics_ankle_pitch_chart = biomechanics_ankle_pitch_chart
 
     @xray_recorder.capture('logic.TrainingVolumeProcessing.load_plan_values')
     def load_plan_values(self, last_7_days_plans, days_8_14_plans, acute_daily_plans, chronic_weeks_plans,

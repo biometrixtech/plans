@@ -253,7 +253,7 @@ class Asymmetry(object):
             asymmetry.anterior_pelvic_tilt = anterior_pelvic_tilt
         else:
             asymmetry.anterior_pelvic_tilt = AnteriorPelvicTilt.json_deserialise(input_dict['apt']) if input_dict.get('apt') is not None else None
-        asymmetry.ankle_pitch = AnklePitch.json_serialise(input_dict['ankle_pitch']) if input_dict.get('ankle_pitch') is not None else None
+        asymmetry.ankle_pitch = AnklePitch.json_deserialise(input_dict['ankle_pitch']) if input_dict.get('ankle_pitch') is not None else None
         return asymmetry
 
 
