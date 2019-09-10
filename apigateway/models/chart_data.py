@@ -345,7 +345,8 @@ class BiomechanicsAnklePitchChartData(Serialisable):
         proc = AsymmetryProcessor()
 
         if session.asymmetry is not None and session.asymmetry.ankle_pitch is not None:
-            viz = proc.get_visualized_left_right_asymmetry(session.asymmetry.ankle_pitch.left, session.asymmetry.ankle_pitch.right)
+            #viz = proc.get_visualized_left_right_asymmetry(session.asymmetry.ankle_pitch.left, session.asymmetry.ankle_pitch.right)
+            viz = VisualizedLeftRightAsymmetry(0, 0, session.asymmetry.ankle_pitch.left, session.asymmetry.ankle_pitch.right)
             summary_data = AsymmetrySummaryData()
             summary_data.summary_data = viz
 
@@ -358,8 +359,8 @@ class BiomechanicsAnklePitchChartData(Serialisable):
                 percentage = round(((session.asymmetry.ankle_pitch.left - session.asymmetry.ankle_pitch.right) / session.asymmetry.ankle_pitch.left) * 100)
                 summary_data.summary_percentage = str(percentage)
                 summary_data.summary_side = "1"
-                summary_data.summary_text = "more range of motion during left foot steps"
-                summary_data.summary_take_away_text = "You had " + str(percentage) + "% more range of motion during left foot steps compared to right foot steps."
+                summary_data.summary_text = "more extension with your left leg compared to your right"
+                summary_data.summary_take_away_text = "You had " + str(percentage) + "% more extension with your left leg compared to your right."
                 # bold_text_1 = BoldText()
                 # bold_text_1.text = str(percentage) + "%"
                 bold_text_2 = BoldText()
@@ -377,9 +378,9 @@ class BiomechanicsAnklePitchChartData(Serialisable):
                     ((session.asymmetry.ankle_pitch.right - session.asymmetry.ankle_pitch.left) / session.asymmetry.ankle_pitch.right) * 100)
                 summary_data.summary_percentage = str(percentage)
                 summary_data.summary_side = "2"
-                summary_data.summary_text = "more range of motion during right foot steps"
+                summary_data.summary_text = "more extension with your right leg compared to your left"
                 summary_data.summary_take_away_text = "You had " + str(
-                    percentage) + "% more range of motion during right foot steps compared to left foot steps."
+                    percentage) + "% more extension with your right leg compared to your left."
                 # bold_text_1 = BoldText()
                 # bold_text_1.text = str(percentage) + "%"
                 bold_text_2 = BoldText()
@@ -393,7 +394,7 @@ class BiomechanicsAnklePitchChartData(Serialisable):
                 summary_data.summary_take_away_bold_text.append(bold_text_3)
             else:
                 summary_data.summary_text = "Symmetric range of motion in this workout!"
-                summary_data.summary_take_away_text = "Your average range of motion was balanced between left and right steps across this workout."
+                summary_data.summary_take_away_text = "Your average leg extension was balanced between left and right steps across this workout."
                 summary_data.summary_side = "0"
                 bold_text_1 = BoldText()
                 bold_text_1.text = "balanced"
