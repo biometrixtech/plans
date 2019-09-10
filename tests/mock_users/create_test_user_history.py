@@ -6,7 +6,7 @@ import test_users
 from models.athlete_trend import InsightType
 from models.styles import VisualizationType
 from aws_xray_sdk.core import xray_recorder
-os.environ['ENVIRONMENT'] = 'dev'
+os.environ['ENVIRONMENT'] = 'test'
 xray_recorder.configure(sampling=False)
 xray_recorder.begin_segment(name="test")
 

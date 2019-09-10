@@ -39,7 +39,7 @@ class AsymmetryDatastore(object):
             if data_type == 0:
                 projection = ['user_id', 'session_id','event_date','left_apt','right_apt','asymmetric_events','symmetric_events','percent_events_asymmetric','apt','time_blocks.left','time_blocks.right', 'time_blocks.significant', 'time_blocks.time_block', 'time_blocks.apt']
             elif data_type == 1:
-                projection = ['user_id', 'session_id', 'event_date', 'ankle_pitch', 'time_blocks.ankle_pitch']
+                projection = ['user_id', 'session_id', 'event_date', 'ankle_pitch', 'time_blocks.time_block', 'time_blocks.ankle_pitch']
             mongo_cursor = mongo_collection.find(query, sort=[('event_date', -1)], limit=sessions, projection=projection)
 
             for mongo_result in mongo_cursor:
