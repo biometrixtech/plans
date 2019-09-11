@@ -258,7 +258,7 @@ class BiomechanicsAPTChartData(Serialisable):
             if session.asymmetry.anterior_pelvic_tilt.left > session.asymmetry.anterior_pelvic_tilt.right:
                 body_side = 1
 
-                percentage = round(((session.asymmetry.anterior_pelvic_tilt.left - session.asymmetry.anterior_pelvic_tilt.right) / session.asymmetry.anterior_pelvic_tilt.left) * 100)
+                percentage = round((1 - ((session.asymmetry.anterior_pelvic_tilt.left - session.asymmetry.anterior_pelvic_tilt.right) / session.asymmetry.anterior_pelvic_tilt.left)) * 100)
                 summary_data.summary_percentage = str(percentage)
                 summary_data.summary_side = "1"
                 summary_data.summary_text = "more range of motion during left foot steps"
@@ -276,8 +276,7 @@ class BiomechanicsAPTChartData(Serialisable):
 
             elif session.asymmetry.anterior_pelvic_tilt.right > session.asymmetry.anterior_pelvic_tilt.left:
                 body_side = 2
-                percentage = round(
-                    ((session.asymmetry.anterior_pelvic_tilt.right - session.asymmetry.anterior_pelvic_tilt.left) / session.asymmetry.anterior_pelvic_tilt.right) * 100)
+                percentage = round((1 - ((session.asymmetry.anterior_pelvic_tilt.right - session.asymmetry.anterior_pelvic_tilt.left) / session.asymmetry.anterior_pelvic_tilt.right)) * 100)
                 summary_data.summary_percentage = str(percentage)
                 summary_data.summary_side = "2"
                 summary_data.summary_text = "more range of motion during right foot steps"
@@ -356,7 +355,7 @@ class BiomechanicsAnklePitchChartData(Serialisable):
             if session.asymmetry.ankle_pitch.left > session.asymmetry.ankle_pitch.right:
                 body_side = 1
 
-                percentage = round(((session.asymmetry.ankle_pitch.left - session.asymmetry.ankle_pitch.right) / session.asymmetry.ankle_pitch.left) * 100)
+                percentage = round((1 - ((session.asymmetry.ankle_pitch.left - session.asymmetry.ankle_pitch.right) / session.asymmetry.ankle_pitch.left)) * 100)
                 summary_data.summary_percentage = str(percentage)
                 summary_data.summary_side = "1"
                 summary_data.summary_text = "more extension with your left leg compared to your right"
@@ -374,8 +373,7 @@ class BiomechanicsAnklePitchChartData(Serialisable):
 
             elif session.asymmetry.ankle_pitch.right > session.asymmetry.ankle_pitch.left:
                 body_side = 2
-                percentage = round(
-                    ((session.asymmetry.ankle_pitch.right - session.asymmetry.ankle_pitch.left) / session.asymmetry.ankle_pitch.right) * 100)
+                percentage = round((1 - ((session.asymmetry.ankle_pitch.right - session.asymmetry.ankle_pitch.left) / session.asymmetry.ankle_pitch.right)) * 100)
                 summary_data.summary_percentage = str(percentage)
                 summary_data.summary_side = "2"
                 summary_data.summary_text = "more extension with your right leg compared to your left"
