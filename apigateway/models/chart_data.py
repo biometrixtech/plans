@@ -345,7 +345,12 @@ class BiomechanicsAnklePitchChartData(Serialisable):
 
         if session.asymmetry is not None and session.asymmetry.ankle_pitch is not None:
             #viz = proc.get_visualized_left_right_asymmetry(session.asymmetry.ankle_pitch.left, session.asymmetry.ankle_pitch.right)
-            viz = VisualizedLeftRightAsymmetry(0, 0, session.asymmetry.ankle_pitch.left, session.asymmetry.ankle_pitch.right)
+            if session.asymmetry.ankle_pitch.left > 0 or session.asymmetry.ankle_pitch.right > 0:
+                viz = VisualizedLeftRightAsymmetry(0, 0, session.asymmetry.ankle_pitch.left,
+                                                   session.asymmetry.ankle_pitch.right)
+            else:
+                viz = VisualizedLeftRightAsymmetry(0, 0, 100, 100)
+
             summary_data = AsymmetrySummaryData()
             summary_data.summary_data = viz
 
