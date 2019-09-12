@@ -284,7 +284,7 @@ class AnklePitch(object):
 
         else:
 
-            return "No Leg Extension asymmetry detected in this workout."
+            return "No meaningful Leg Extension asymmetry found in this workout."
 
     def get_detail_bold_text(self):
 
@@ -343,11 +343,11 @@ class AnteriorPelvicTilt(object):
         if self.percent_events_asymmetric > 0:
 
             percentage = self.percent_events_asymmetric
-            return str(percentage) + "% of this workout has asymmetric range of motion."
+            return str(percentage) + "% of this workout had asymmetric Pelvic Tilt."
 
         else:
 
-            return "We didn’t find any statistically significant pelvic range of motion asymmetry in this workout."
+            return "No meaningful Pelvic Tilt asymmetry found in this workout."
 
     def get_detail_bold_text(self):
 

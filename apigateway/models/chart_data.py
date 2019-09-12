@@ -263,8 +263,8 @@ class BiomechanicsAPTChartData(Serialisable):
                 percentage = round((1 - ((session.asymmetry.anterior_pelvic_tilt.left - session.asymmetry.anterior_pelvic_tilt.right) / session.asymmetry.anterior_pelvic_tilt.left)) * 100)
                 summary_data.summary_percentage = str(percentage)
                 summary_data.summary_side = "1"
-                summary_data.summary_text = "more range of motion during left foot steps"
-                summary_data.summary_take_away_text = "You had " + str(percentage) + "% more range of motion during left foot steps compared to right foot steps."
+                summary_data.summary_text = "Pelvic Tilt Symmetry in this workout"
+                summary_data.summary_take_away_text = str(percentage) + "% Pelvic Tilt Symmetry in this workout."
                 # bold_text_1 = BoldText()
                 # bold_text_1.text = str(percentage) + "%"
                 bold_text_2 = BoldText()
@@ -281,9 +281,9 @@ class BiomechanicsAPTChartData(Serialisable):
                 percentage = round((1 - ((session.asymmetry.anterior_pelvic_tilt.right - session.asymmetry.anterior_pelvic_tilt.left) / session.asymmetry.anterior_pelvic_tilt.right)) * 100)
                 summary_data.summary_percentage = str(percentage)
                 summary_data.summary_side = "2"
-                summary_data.summary_text = "more range of motion during right foot steps"
-                summary_data.summary_take_away_text = "You had " + str(
-                    percentage) + "% more range of motion during right foot steps compared to left foot steps."
+                summary_data.summary_text = "Pelvic Tilt Symmetry in this workout"
+                summary_data.summary_take_away_text = str(
+                    percentage) + "% Pelvic Tilt Symmetry in this workout."
                 # bold_text_1 = BoldText()
                 # bold_text_1.text = str(percentage) + "%"
                 bold_text_2 = BoldText()
@@ -365,8 +365,8 @@ class BiomechanicsAnklePitchChartData(Serialisable):
                 percentage = round((1 - ((session.asymmetry.ankle_pitch.left - session.asymmetry.ankle_pitch.right) / session.asymmetry.ankle_pitch.left)) * 100)
                 summary_data.summary_percentage = str(percentage)
                 summary_data.summary_side = "1"
-                summary_data.summary_text = "more extension with your left leg compared to your right"
-                summary_data.summary_take_away_text = "You had " + str(percentage) + "% more extension with your left leg compared to your right."
+                summary_data.summary_text = "Leg Extension Symmetry in this workout"
+                summary_data.summary_take_away_text = str(percentage) + "% Leg Extension Symmetry in this workout."
                 # bold_text_1 = BoldText()
                 # bold_text_1.text = str(percentage) + "%"
                 bold_text_2 = BoldText()
@@ -383,9 +383,9 @@ class BiomechanicsAnklePitchChartData(Serialisable):
                 percentage = round((1 - ((session.asymmetry.ankle_pitch.right - session.asymmetry.ankle_pitch.left) / session.asymmetry.ankle_pitch.right)) * 100)
                 summary_data.summary_percentage = str(percentage)
                 summary_data.summary_side = "2"
-                summary_data.summary_text = "more extension with your right leg compared to your left"
-                summary_data.summary_take_away_text = "You had " + str(
-                    percentage) + "% more extension with your right leg compared to your left."
+                summary_data.summary_text = "Leg Extension Symmetry in this workout"
+                summary_data.summary_take_away_text = str(
+                    percentage) + "% Leg Extension Symmetry in this workout."
                 # bold_text_1 = BoldText()
                 # bold_text_1.text = str(percentage) + "%"
                 bold_text_2 = BoldText()
