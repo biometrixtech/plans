@@ -27,7 +27,7 @@ three_sensor_users = [
     # "half_sym", #7cf2f832-a043-468c-8f61-13d07765d2a2
     # "run_a_2", #5c695e58-0aba-4eec-9af1-fa93970d3132
     # "sym_2" #aa1534d0-4abd-41c0-9b84-4e414b3d86d4
-    # "long_3s", #928f64b5-a761-4278-8724-95a908499fae
+    "long_3s", #928f64b5-a761-4278-8724-95a908499fae
     # "run_a_3",  #9e90e3ef-c6e0-4e2d-a430-a52f1e61a962
     # "sym_3",  #34b47309-7ad5-4222-b865-0f825680541e
     #"tread_a_2", #441a296a-6d37-4de3-ba04-bd725da05613
@@ -41,7 +41,7 @@ three_sensor_users = [
 ]
 
 merged_users = [
-    "nc_long",  #7bb3e792-41ff-43cb-861e-87cf2bdeeadf
+    #"nc_long",  #7bb3e792-41ff-43cb-861e-87cf2bdeeadf
     # "nc_sore_tread",  #917e94bc-3f56-4519-8d25-ae54878748f2
     # "ts_pain_long", #e602620d-2040-4ecc-87cc-f392d9db5eab
     # "ts_tread",  #18ad5cde-92a8-4cd4-8295-71a91c7d3aac
