@@ -987,7 +987,7 @@ class TrendProcessor(object):
                 statistic_text = ""
                 bold_statistic_text = []
                 if t.metric is not None:
-                    statistic_text = str(t.metric) + "% Asymmetric"
+                    statistic_text = str(t.metric) + "% Hip Asymmetry"
                     bold_stat_text = BoldText()
                     bold_stat_text.text = str(t.metric) + "%"
                     bold_statistic_text.append(bold_stat_text)
@@ -1030,7 +1030,7 @@ class TrendProcessor(object):
                 statistic_text = ""
                 bold_statistic_text = []
                 if t.metric is not None:
-                    statistic_text = str(t.metric) + "% Asymmetric"
+                    statistic_text = str(t.metric) + "% Hip Asymmetry Trend"
                     bold_stat_text = BoldText()
                     bold_stat_text.text = str(t.metric) + "%"
                     bold_statistic_text.append(bold_stat_text)

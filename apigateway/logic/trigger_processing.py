@@ -245,9 +245,9 @@ class TriggerFactory(object):
                     if session.asymmetry.anterior_pelvic_tilt.left != session.asymmetry.anterior_pelvic_tilt.right:
                         factory = MovementErrorFactory()
                         if session.asymmetry.anterior_pelvic_tilt.left > session.asymmetry.anterior_pelvic_tilt.right:
-                            metric = round(((session.asymmetry.anterior_pelvic_tilt.left - session.asymmetry.anterior_pelvic_tilt.right) / session.asymmetry.anterior_pelvic_tilt.left) * 100)
+                            metric = 100 - round((1 - ((session.asymmetry.anterior_pelvic_tilt.left - session.asymmetry.anterior_pelvic_tilt.right) / session.asymmetry.anterior_pelvic_tilt.left)) * 100)
                         else:
-                            metric = round(((session.asymmetry.anterior_pelvic_tilt.right - session.asymmetry.anterior_pelvic_tilt.left) / session.asymmetry.anterior_pelvic_tilt.right) * 100)
+                            metric = 100 - round((1 - ((session.asymmetry.anterior_pelvic_tilt.right - session.asymmetry.anterior_pelvic_tilt.left) / session.asymmetry.anterior_pelvic_tilt.right)) * 100)
                         movement_error = factory.get_movement_error(MovementErrorType.apt_asymmetry, metric)
 
                         self.set_trigger(TriggerType.movement_error_apt_asymmetry, soreness=None, sport_name=None,
