@@ -105,3 +105,19 @@ def get_timezone(local_time):
         return tz
     except:
         return '-04:00'
+
+
+def get_local_time(utc_time, timezone):
+    offset = _get_time_offset(timezone)
+    return utc_time + datetime.timedelta(minutes=offset)
+
+
+def _get_time_offset(timezone):
+    offset = timezone.split(":")
+    hour_offset = int(offset[0])
+    minute_offset = int(offset[1])
+    if hour_offset < 0:
+        minute_offset = hour_offset * 60 - minute_offset
+    else:
+        minute_offset += hour_offset * 60
+    return minute_offset

@@ -13,7 +13,7 @@ from models.asymmetry import Asymmetry
 from models.daily_plan import DailyPlan
 from models.stats import AthleteStats
 from routes.environments import is_fathom_environment
-from utils import parse_datetime, format_date, format_datetime, get_timezone
+from utils import parse_datetime, format_date, format_datetime, get_timezone, get_local_time
 from config import get_mongo_collection
 from logic.survey_processing import SurveyProcessing, create_session, update_session, create_plan, cleanup_plan
 from logic.athlete_status_processing import AthleteStatusProcessing
@@ -270,10 +270,17 @@ def handle_session_sensor_data(user_id=None):
 @xray_recorder.capture('routes.session.add_sensor_data')
 def handle_session_three_sensor_data(user_id):
     #user_id = request.json['user_id']
+    athlete_stats = athlete_stats_datastore.get(athlete_id=user_id)
+    if athlete_stats is not None:
+        timezone = athlete_stats.timezone
+    else:
+        timezone = '-04:00'
     event_date = parse_datetime(request.json['event_date'])
+    event_date = get_local_time(event_date, timezone)
     end_date = request.json.get('end_date')
     if end_date is not None:
         end_date = parse_datetime(end_date)
+        end_date = get_local_time(end_date, timezone)
     plan_event_day = format_date(event_date)
     # update last_sensor_syc date
     if not _check_plan_exists(user_id, plan_event_day):
