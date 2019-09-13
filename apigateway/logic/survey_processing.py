@@ -56,7 +56,7 @@ class SurveyProcessing(object):
         if session_end_date is not None:
             session_completed_date = session_end_date
         else:
-            session_completed_date = event_date
+            session_completed_date = self.event_date_time
         calories = session.get("calories", None)
         distance = session.get("distance", None)
         source = session.get("source", None)
