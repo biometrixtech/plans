@@ -257,7 +257,7 @@ class TriggerFactory(object):
             if self.historic_asymmetry[AsymmetryType.anterior_pelvic_tilt.value].asymmetric_events_15_days is not None and self.historic_asymmetry[AsymmetryType.anterior_pelvic_tilt.value].symmetric_events_15_days is not None:
                 if self.historic_asymmetry[AsymmetryType.anterior_pelvic_tilt.value].asymmetric_events_15_days + self.historic_asymmetry[AsymmetryType.anterior_pelvic_tilt.value].symmetric_events_15_days > 0:
                     asymmetric_percentage = round((self.historic_asymmetry[AsymmetryType.anterior_pelvic_tilt.value].asymmetric_events_15_days / (self.historic_asymmetry[AsymmetryType.anterior_pelvic_tilt.value].asymmetric_events_15_days + self.historic_asymmetry[AsymmetryType.anterior_pelvic_tilt.value].symmetric_events_15_days)) * 100)
-                    if asymmetric_percentage > 35:
+                    if asymmetric_percentage > 50:
                         factory = MovementErrorFactory()
                         movement_error = factory.get_movement_error(MovementErrorType.apt_asymmetry, asymmetric_percentage)
                         self.set_trigger(TriggerType.movement_error_historic_apt_asymmetry, soreness=None,

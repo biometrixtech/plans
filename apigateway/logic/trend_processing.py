@@ -1030,9 +1030,9 @@ class TrendProcessor(object):
                 statistic_text = ""
                 bold_statistic_text = []
                 if t.metric is not None:
-                    statistic_text = str(t.metric) + "% Hip Asymmetry Trend"
+                    statistic_text = "Hip Asymmetry Trend"
                     bold_stat_text = BoldText()
-                    bold_stat_text.text = str(t.metric) + "%"
+                    bold_stat_text.text = "Hip"
                     bold_statistic_text.append(bold_stat_text)
                 tile_1 = TriggerTile()
                 body_part_text_1, is_plural_1 = self.get_title_text_for_body_parts(t.overactive_tight_first, 0)

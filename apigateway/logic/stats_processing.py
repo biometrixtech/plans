@@ -266,9 +266,9 @@ class StatsProcessing(object):
 
         historic_asymmetry = {}
 
-        last_15_day_sessions = [s for s in sessions if self.event_date >= s.event_date >= self.event_date - timedelta(days=15)]
+        last_15_day_sessions = [s for s in sessions if self.event_date >= s.event_date >= self.event_date - timedelta(days=15) and s.asymmetry is not None]
         last_30_day_sessions = [s for s in sessions if
-                                self.event_date - timedelta(days=15) > s.event_date >= self.event_date - timedelta(days=30)]
+                                self.event_date - timedelta(days=15) > s.event_date >= self.event_date - timedelta(days=30) and s.asymmetry is not None]
 
         apt_historic_asymmetry = HistoricAsymmetry(AsymmetryType.anterior_pelvic_tilt)
 

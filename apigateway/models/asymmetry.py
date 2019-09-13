@@ -145,7 +145,8 @@ class SessionAsymmetry(Serialisable):
                     }
                 }
             elif self.ankle_pitch is not None:
-                symmetric_minutes = round(minutes - (self.ankle_pitch.percent_events_asymmetric * minutes))
+                symmetric_minutes = round(
+                    minutes - ((self.ankle_pitch.percent_events_asymmetric / float(100)) * minutes))
                 ret = {
                     'session_id': self.session_id,
                     'seconds_duration': self.seconds_duration,
@@ -285,10 +286,11 @@ class AnklePitch(object):
 
         if self.percent_events_asymmetric > 0:
 
-            #percentage = self.percent_events_asymmetric
-            #return str(percentage) + "% of this workout had asymmetric Leg Extension."
-            return "Your Leg Extension was symmetric for " + str(
-                symmetric_minutes) + " min of your " + str(total_minutes) + " min workout."
+            if symmetric_minutes == 0:
+                return "Your Leg Extension was asymmetric throughout your whole session."
+            else:
+                return "Your Leg Extension was symmetric for " + str(
+                    symmetric_minutes) + " min of your " + str(total_minutes) + " min workout."
 
         else:
 
@@ -351,10 +353,11 @@ class AnteriorPelvicTilt(object):
 
         if self.percent_events_asymmetric > 0:
 
-            #percentage = self.percent_events_asymmetric
-            #return str(percentage) + "% of this workout had asymmetric Pelvic Tilt."
-            return "Your Leg Extension was symmetric for " + str(
-                symmetric_minutes) + " min of your " + str(total_minutes) + " min workout."
+            if symmetric_minutes == 0:
+                return "Your Pelvic Tilt was asymmetric throughout your whole session."
+            else:
+                return "Your Pelvic Tilt was symmetric for " + str(
+                    symmetric_minutes) + " min of your " + str(total_minutes) + " min workout."
 
         else:
 
