@@ -120,7 +120,7 @@ class SessionAsymmetry(Serialisable):
         if api:
             minutes = round(self.seconds_duration / 60)
             if self.anterior_pelvic_tilt is not None:
-                symmetric_minutes = round(minutes - (self.anterior_pelvic_tilt.percent_events_asymmetric * minutes))
+                symmetric_minutes = round(minutes - ((self.anterior_pelvic_tilt.percent_events_asymmetric / float(100)) * minutes))
                 ret = {
                     'session_id': self.session_id,
                     'seconds_duration': self.seconds_duration,
@@ -137,8 +137,8 @@ class SessionAsymmetry(Serialisable):
                                     },
                                 ],
                             'detail_data': [t.json_serialise(api) for t in self.time_blocks],
-                            #'detail_text': self.anterior_pelvic_tilt.get_detail_text() if self.anterior_pelvic_tilt is not None else '',
-                            'detail_text': "Your Pelvic Tilt was symmetric for " + str(symmetric_minutes) + " of your " + str(minutes) + " workout.",
+                            'detail_text': self.anterior_pelvic_tilt.get_detail_text(symmetric_minutes, minutes) if self.anterior_pelvic_tilt is not None else '',
+                            #'detail_text': "Your Pelvic Tilt was symmetric for " + str(symmetric_minutes) + " min of your " + str(minutes) + " min workout.",
                             'detail_bold_text': [b.json_serialise() for b in self.anterior_pelvic_tilt.get_detail_bold_text(symmetric_minutes) if self.anterior_pelvic_tilt is not None],
                             'detail_bold_side': self.anterior_pelvic_tilt.get_detail_bold_side() if self.anterior_pelvic_tilt is not None else ''
                         }
@@ -162,9 +162,9 @@ class SessionAsymmetry(Serialisable):
                                 },
                             ],
                             'detail_data': [t.json_serialise(api) for t in self.time_blocks],
-                            #'detail_text': self.ankle_pitch.get_detail_text() if self.ankle_pitch is not None else '',
-                            'detail_text': "Your Leg Extension was symmetric for " + str(
-                                symmetric_minutes) + " of your " + str(minutes) + " workout.",
+                            'detail_text': self.ankle_pitch.get_detail_text(symmetric_minutes, minutes) if self.ankle_pitch is not None else '',
+                            #'detail_text': "Your Leg Extension was symmetric for " + str(
+                            #    symmetric_minutes) + " min of your " + str(minutes) + " min workout.",
                             'detail_bold_text': [b.json_serialise() for b in
                                                  self.ankle_pitch.get_detail_bold_text(symmetric_minutes) if
                                                  self.ankle_pitch is not None],
@@ -281,12 +281,14 @@ class AnklePitch(object):
         }
         return ret
 
-    def get_detail_text(self):
+    def get_detail_text(self, symmetric_minutes, total_minutes):
 
         if self.percent_events_asymmetric > 0:
 
-            percentage = self.percent_events_asymmetric
-            return str(percentage) + "% of this workout had asymmetric Leg Extension."
+            #percentage = self.percent_events_asymmetric
+            #return str(percentage) + "% of this workout had asymmetric Leg Extension."
+            return "Your Leg Extension was symmetric for " + str(
+                symmetric_minutes) + " min of your " + str(total_minutes) + " min workout."
 
         else:
 
@@ -345,12 +347,14 @@ class AnteriorPelvicTilt(object):
         }
         return ret
 
-    def get_detail_text(self):
+    def get_detail_text(self, symmetric_minutes, total_minutes):
 
         if self.percent_events_asymmetric > 0:
 
-            percentage = self.percent_events_asymmetric
-            return str(percentage) + "% of this workout had asymmetric Pelvic Tilt."
+            #percentage = self.percent_events_asymmetric
+            #return str(percentage) + "% of this workout had asymmetric Pelvic Tilt."
+            return "Your Leg Extension was symmetric for " + str(
+                symmetric_minutes) + " min of your " + str(total_minutes) + " min workout."
 
         else:
 
