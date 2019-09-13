@@ -54,9 +54,9 @@ class SurveyProcessing(object):
         session_event_date = format_datetime(event_date)
         session_end_date = format_datetime(end_date)
         if session_end_date is not None:
-            session_completed_date = session_end_date
+            session_completed_date_time = session_end_date
         else:
-            session_completed_date = self.event_date_time
+            session_completed_date_time = self.event_date_time
         calories = session.get("calories", None)
         distance = session.get("distance", None)
         source = session.get("source", None)
@@ -71,7 +71,7 @@ class SurveyProcessing(object):
                         "description": description,
                         "duration_minutes": duration,
                         "duration_health": duration_health,
-                        "completed_date": session_completed_date,
+                        "completed_date_time": session_completed_date_time,
                         "event_date": session_event_date,
                         "end_date": session_end_date,
                         "calories": calories,
