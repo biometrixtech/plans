@@ -118,7 +118,9 @@ class SessionAsymmetry(Serialisable):
 
     def json_serialise(self, api=False):
         if api:
+            minutes = round(self.seconds_duration / 60)
             if self.anterior_pelvic_tilt is not None:
+                symmetric_minutes = round(minutes - (self.anterior_pelvic_tilt.percent_events_asymmetric * minutes))
                 ret = {
                     'session_id': self.session_id,
                     'seconds_duration': self.seconds_duration,
@@ -135,13 +137,15 @@ class SessionAsymmetry(Serialisable):
                                     },
                                 ],
                             'detail_data': [t.json_serialise(api) for t in self.time_blocks],
-                            'detail_text': self.anterior_pelvic_tilt.get_detail_text() if self.anterior_pelvic_tilt is not None else '',
-                            'detail_bold_text': [b.json_serialise() for b in self.anterior_pelvic_tilt.get_detail_bold_text() if self.anterior_pelvic_tilt is not None],
+                            #'detail_text': self.anterior_pelvic_tilt.get_detail_text() if self.anterior_pelvic_tilt is not None else '',
+                            'detail_text': "Your Pelvic Tilt was symmetric for " + str(symmetric_minutes) + " of your " + str(minutes) + " workout.",
+                            'detail_bold_text': [b.json_serialise() for b in self.anterior_pelvic_tilt.get_detail_bold_text(symmetric_minutes) if self.anterior_pelvic_tilt is not None],
                             'detail_bold_side': self.anterior_pelvic_tilt.get_detail_bold_side() if self.anterior_pelvic_tilt is not None else ''
                         }
                     }
                 }
             elif self.ankle_pitch is not None:
+                symmetric_minutes = round(minutes - (self.ankle_pitch.percent_events_asymmetric * minutes))
                 ret = {
                     'session_id': self.session_id,
                     'seconds_duration': self.seconds_duration,
@@ -158,9 +162,11 @@ class SessionAsymmetry(Serialisable):
                                 },
                             ],
                             'detail_data': [t.json_serialise(api) for t in self.time_blocks],
-                            'detail_text': self.ankle_pitch.get_detail_text() if self.ankle_pitch is not None else '',
+                            #'detail_text': self.ankle_pitch.get_detail_text() if self.ankle_pitch is not None else '',
+                            'detail_text': "Your Leg Extension was symmetric for " + str(
+                                symmetric_minutes) + " of your " + str(minutes) + " workout.",
                             'detail_bold_text': [b.json_serialise() for b in
-                                                 self.ankle_pitch.get_detail_bold_text() if
+                                                 self.ankle_pitch.get_detail_bold_text(symmetric_minutes) if
                                                  self.ankle_pitch is not None],
                             'detail_bold_side': self.ankle_pitch.get_detail_bold_side() if self.ankle_pitch is not None else ''
                         }
@@ -286,13 +292,14 @@ class AnklePitch(object):
 
             return "No meaningful Leg Extension asymmetry found in this workout."
 
-    def get_detail_bold_text(self):
+    def get_detail_bold_text(self, minutes):
 
-        if self.percent_events_asymmetric > 0:
+        #if self.percent_events_asymmetric > 0:
+        if minutes > 0:
 
-            percentage = self.percent_events_asymmetric
+            #percentage = self.percent_events_asymmetric
             bold_text = BoldText()
-            bold_text.text = str(percentage) + "%"
+            bold_text.text = str(minutes) + " min"
             return [bold_text]
 
         else:
@@ -349,15 +356,15 @@ class AnteriorPelvicTilt(object):
 
             return "No meaningful Pelvic Tilt asymmetry found in this workout."
 
-    def get_detail_bold_text(self):
+    def get_detail_bold_text(self, minutes):
 
-        if self.percent_events_asymmetric > 0:
+        #if self.percent_events_asymmetric > 0:
+        if minutes > 0:
 
-            percentage = self.percent_events_asymmetric
+            #percentage = self.percent_events_asymmetric
             bold_text = BoldText()
-            bold_text.text = str(percentage) + "%"
+            bold_text.text = str(minutes) + " min"
             return [bold_text]
-
         else:
             return []
 
