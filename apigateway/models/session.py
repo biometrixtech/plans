@@ -78,6 +78,7 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         self.post_session_soreness = []     # post_session_soreness object array
         self.duration_minutes = None
         self.created_date = None
+        self.completed_date = None
         self.event_date = None
         self.end_date = None
         self.sensor_start_date_time = None
@@ -109,7 +110,7 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         self.asymmetry = None
 
     def __setattr__(self, name, value):
-        if name in ['event_date', 'end_date', 'created_date', 'sensor_start_date_time', 'sensor_end_date_time']:
+        if name in ['event_date', 'end_date', 'created_date', 'completed_date', 'sensor_start_date_time', 'sensor_end_date_time']:
             if not isinstance(value, datetime.datetime) and value is not None:
                 value = parse_datetime(value)
         elif name == "sport_name" and not isinstance(value, SportName):
@@ -279,6 +280,7 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
             'sport_name': self.sport_name.value,
             'strength_and_conditioning_type': self.strength_and_conditioning_type.value,
             'created_date': format_datetime(self.created_date),
+            'completed_date': format_datetime(self.completed_date),
             'event_date': format_datetime(self.event_date),
             'end_date': format_datetime(self.end_date),
             'duration_minutes': self.duration_minutes,
@@ -315,6 +317,7 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
                             "sport_name",
                             "strength_and_conditioning_type",
                             "created_date",
+                            "completed_date",
                             "event_date",
                             "end_date",
                             "duration_minutes",
