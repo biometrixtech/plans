@@ -128,11 +128,11 @@ class SessionAsymmetry(Serialisable):
                         'apt': {
                             'detail_legend': [
                                     {
-                                        'color': [8, 9],
+                                        'color': [10, 4],
                                         'text': 'Symmetric',
                                     },
                                     {
-                                        'color': [10, 4],
+                                        'color': [8, 9],
                                         'text': 'Asymmetric',
                                     },
                                 ],
@@ -154,11 +154,11 @@ class SessionAsymmetry(Serialisable):
                         'ankle_pitch': {
                             'detail_legend': [
                                 {
-                                    'color': [8, 9],
+                                    'color': [10, 4],
                                     'text': 'Symmetric',
                                 },
                                 {
-                                    'color': [10, 4],
+                                    'color': [8, 9],
                                     'text': 'Asymmetric',
                                 },
                             ],
