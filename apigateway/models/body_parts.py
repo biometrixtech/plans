@@ -194,8 +194,8 @@ class BodyPartFactory(object):
             return self.get_core_stabilizers(sample)
         elif location == BodyPartLocation.elbow:
             return self.get_elbow(sample)
-        elif location == BodyPartLocation.erector_spinea:
-            return self.get_erector_spinea(sample)
+        elif location == BodyPartLocation.erector_spinae:
+            return self.get_erector_spinae(sample)
         elif location == BodyPartLocation.foot:
             return self.get_foot(sample)
         elif location == BodyPartLocation.forearm:
@@ -499,9 +499,9 @@ class BodyPartFactory(object):
         part.add_muscle_groups([22, 23], [1], [24], [22, 23])
         return part
 
-    def get_erector_spinea(self, sample=True):
+    def get_erector_spinae(self, sample=True):
 
-        part = BodyPart(BodyPartLocation.erector_spinea, None)
+        part = BodyPart(BodyPartLocation.erector_spinae, None)
 
         if sample:
             inhibit = self.get_exercise_dictionary([102, 125, 126])
@@ -892,6 +892,18 @@ class BodyPart(object):
         self.synergists = []
         self.stabilizers = []
         self.antagonists = []
+
+        self.parent = None
+        self.children = []
+
+        self.overactive_count = 0
+        self.overactive_risk_count = 0
+        self.tight_count = 0
+        self.tight_risk_count = 0
+        self.underactive_count = 0
+        self.underactive_risk_count = 0
+        self.weakness_count = 0
+        self.possible_soreness_source_count = 0
 
     @staticmethod
     def add_exercises(exercise_list, exercise_dict, treatment_priority, randomize=False):

@@ -9,6 +9,7 @@ from logic.stats_processing import StatsProcessing
 from logic.metrics_processing import MetricsProcessing
 from models.stats import AthleteStats
 from utils import parse_date, parse_datetime, format_date
+from routes.environments import is_fathom_environment
 import datetime
 import random
 import os
@@ -26,9 +27,11 @@ def create_daily_plan(athlete_id):
     # target_minutes = request.json.get('target_minutes', 15)
     last_updated = request.json.get('last_updated', None)
     plan_manager = TrainingPlanManager(athlete_id, DatastoreCollection())
+    visualizations = is_fathom_environment()
     daily_plan = plan_manager.create_daily_plan(event_date=event_date,
                                                 # target_minutes=target_minutes,
-                                                last_updated=last_updated)
+                                                last_updated=last_updated,
+                                                visualizations=visualizations)
     body = {"message": "Your plan is ready!",
             "call_to_action": "VIEW_PLAN",
             "last_updated": last_updated}
@@ -286,10 +289,11 @@ def _is_athlete_active(athlete_id):
 
 
 def _notify_user(athlete_id, body):
-    users_service = Service('users', USERS_API_VERSION)
-    users_service.call_apigateway_async(method='POST',
-                                        endpoint=f'/user/{athlete_id}/notify',
-                                        body=body)
+    if is_fathom_environment():
+        users_service = Service('users', USERS_API_VERSION)
+        users_service.call_apigateway_async(method='POST',
+                                            endpoint=f'/user/{athlete_id}/notify',
+                                            body=body)
 
 
 def _randomize_trigger_time(start_time, window, tz_offset):

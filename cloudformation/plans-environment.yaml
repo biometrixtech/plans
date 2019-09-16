@@ -320,7 +320,7 @@ Resources:
         Type: "AWS::Events::Rule"
         Properties:
             Description: "ScheduledRule"
-            ScheduleExpression: "cron(0 1 * * ? *)"  # 1am UTC every day
+            ScheduleExpression: "cron(30 5 * * ? *)"  # 5:30am UTC every day
             State: "ENABLED"
             Targets:
               - Arn: { "Fn::GetAtt": [ "DailySchedulerLambda", "Arn" ] }

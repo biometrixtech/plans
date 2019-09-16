@@ -431,7 +431,7 @@ class ModalityBase(object):
                 dosage.default_comprehensive_reps_assigned = exercise.max_reps
                 dosage.default_comprehensive_sets_assigned = 2
 
-        elif dosage.goal.goal_type == AthleteGoalType.asymmetric_session:
+        elif dosage.goal.goal_type == AthleteGoalType.asymmetric_session or dosage.goal.goal_type == AthleteGoalType.asymmetric_pattern:
             if dosage.priority == "1":
                 dosage.efficient_reps_assigned = exercise.min_reps
                 dosage.efficient_sets_assigned = 1
@@ -1018,10 +1018,13 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
 
         if trigger_list is not None:
             for t in trigger_list:
-                if TriggerType.movement_error_apt_asymmetry == t.trigger_type:
-                    goal = AthleteGoal("Asymmetric Stress", 1, AthleteGoalType.asymmetric_session)
+                if TriggerType.movement_error_apt_asymmetry == t.trigger_type or TriggerType.movement_error_historic_apt_asymmetry == t.trigger_type:
+                    if TriggerType.movement_error_historic_apt_asymmetry == t.trigger_type:
+                        goal = AthleteGoal("Core Instability", 1, AthleteGoalType.asymmetric_pattern)
+                    else:
+                        goal = AthleteGoal("Asymmetric Stress", 1, AthleteGoalType.asymmetric_session)
                     factory = MovementErrorFactory()
-                    movement_error = factory.get_movement_error(MovementErrorType.apt_asymmetry, None, None)
+                    movement_error = factory.get_movement_error(MovementErrorType.apt_asymmetry, None)
 
                     body_part_factory = BodyPartFactory()
 
@@ -1054,6 +1057,17 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
                         self.copy_exercises(body_part.active_stretch_exercises, self.active_stretch_exercises, goal,
                                             "3",
                                             None, exercise_library)
+
+                    if TriggerType.movement_error_historic_apt_asymmetry == t.trigger_type:
+                        for e in movement_error.underactive_weak:
+                            body_part = body_part_factory.get_body_part(BodyPart(BodyPartLocation(e), None))
+
+                            self.copy_exercises(body_part.isolated_activate_exercises, self.isolated_activate_exercises,
+                                                goal, "1",
+                                                None, exercise_library)
+
+                        self.copy_exercises(movement_error.static_integrate_exercises, self.static_integrate_exercises,
+                                            goal, "1", None, exercise_library)
 
     def check_reactive_recover_from_sport_general(self, sports, exercise_library, goal, max_severity):
 
@@ -1483,10 +1497,13 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
         if trigger_list is not None:
 
             for t in trigger_list:
-                if TriggerType.movement_error_apt_asymmetry == t.trigger_type:
-                    goal = AthleteGoal("Asymmetric Stress", 1, AthleteGoalType.asymmetric_session)
+                if TriggerType.movement_error_apt_asymmetry == t.trigger_type or TriggerType.movement_error_historic_apt_asymmetry == t.trigger_type:
+                    if TriggerType.movement_error_historic_apt_asymmetry == t.trigger_type:
+                        goal = AthleteGoal("Core Instability", 1, AthleteGoalType.asymmetric_pattern)
+                    else:
+                        goal = AthleteGoal("Asymmetric Stress", 1, AthleteGoalType.asymmetric_session)
                     factory = MovementErrorFactory()
-                    movement_error = factory.get_movement_error(MovementErrorType.apt_asymmetry, None, None)
+                    movement_error = factory.get_movement_error(MovementErrorType.apt_asymmetry, None)
 
                     body_part_factory = BodyPartFactory()
 
@@ -1516,6 +1533,16 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
 
                         self.copy_exercises(body_part.static_stretch_exercises, self.static_stretch_exercises, goal, "3",
                                             None, exercise_library)
+
+                    if TriggerType.movement_error_historic_apt_asymmetry == t.trigger_type:
+                        for e in movement_error.underactive_weak:
+                            body_part = body_part_factory.get_body_part(BodyPart(BodyPartLocation(e), None))
+
+                            self.copy_exercises(body_part.isolated_activate_exercises, self.isolated_activate_exercises, goal, "1",
+                                                None, exercise_library)
+
+                        self.copy_exercises(movement_error.static_integrate_exercises, self.static_integrate_exercises,
+                                            goal, "1", None, exercise_library)
 
 
     def check_reactive_recover_from_sport_general(self, sports, exercise_library, goal, max_severity):

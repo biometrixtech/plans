@@ -381,6 +381,8 @@ class TrendProcessor(object):
 
         for b in body_parts:
             body_part = body_part_factory.get_body_part(b)
+            if body_part.treatment_priority is None:
+                body_part.treatment_priority = 99
             converted_body_parts.append(body_part)
 
         if side == 0:
@@ -814,9 +816,13 @@ class TrendProcessor(object):
         for t in triggers_16:
             t.priority = 3
 
+        trigger_111 = list(t for t in self.trigger_list if t.trigger_type == TriggerType.movement_error_historic_apt_asymmetry)
+        for t in trigger_111:
+            t.priority = 4
+
         # since we're reverse sorting, 2 is a higher priority than 1
 
-        if len(triggers_19) > 0 or len(triggers_16) > 0:
+        if len(triggers_19) > 0 or len(triggers_16) > 0 or len(trigger_111) > 0:
 
             antagonists_19, synergists_19 = self.get_antagonists_syngergists(triggers_19)
 
@@ -841,12 +847,17 @@ class TrendProcessor(object):
                     prevention_data.pain.extend([t.body_part])
                     prevention_data.weak.extend([a for a in t.antagonists])
 
+            for t in trigger_111:
+                prevention_data.overactive.extend([o for o in t.overactive_tight_first])
+                prevention_data.weak.extend([u for u in t.underactive_weak])
+
             prevention_data.remove_duplicates()
             trend_data.data = [prevention_data]
 
             all_triggers = []
             all_triggers.extend(triggers_19)
             all_triggers.extend(triggers_16)
+            all_triggers.extend(trigger_111)
 
             trend.trigger_tiles = self.get_trigger_tiles(all_triggers)
 
@@ -976,7 +987,7 @@ class TrendProcessor(object):
                 statistic_text = ""
                 bold_statistic_text = []
                 if t.metric is not None:
-                    statistic_text = str(t.metric) + "% Asymmetric"
+                    statistic_text = str(t.metric) + "% Hip Asymmetry"
                     bold_stat_text = BoldText()
                     bold_stat_text.text = str(t.metric) + "%"
                     bold_statistic_text.append(bold_stat_text)
@@ -1008,6 +1019,49 @@ class TrendProcessor(object):
                     bold_2 = BoldText()
                     bold_2.text = "Foam Roll & Stretch"
                     bold_2.color = LegendColor.splash_x_light
+                    tile_2.bold_text.append(bold_2)
+                    tile_2.statistic_text = statistic_text
+                    tile_2.bold_statistic_text = bold_statistic_text
+                    tile_2.trigger_type = t.trigger_type
+                    tiles.append(tile_2)
+
+            elif t.trigger_type == TriggerType.movement_error_historic_apt_asymmetry:
+                mobilize_suffix = "to correct imbalances causing Pelvic Tilt Asymmetry"
+                statistic_text = ""
+                bold_statistic_text = []
+                if t.metric is not None:
+                    statistic_text = "Hip Asymmetry Trend"
+                    bold_stat_text = BoldText()
+                    bold_stat_text.text = "Hip"
+                    bold_statistic_text.append(bold_stat_text)
+                tile_1 = TriggerTile()
+                body_part_text_1, is_plural_1 = self.get_title_text_for_body_parts(t.overactive_tight_first, 0)
+                if len(body_part_text_1) == 0:
+                    body_part_text_1 = "PRIME MOVER"
+                if body_part_text_1 not in recovery_body_parts:
+                    recovery_body_parts.add(body_part_text_1)
+                    tile_1.text = "Foam Roll & Static Stretch your " + body_part_text_1
+                    tile_1.description = mobilize_suffix
+                    bold_1 = BoldText()
+                    bold_1.text = "Foam Roll & Static Stretch"
+                    bold_1.color = LegendColor.warning_light
+                    tile_1.bold_text.append(bold_1)
+                    tile_1.statistic_text = statistic_text
+                    tile_1.bold_statistic_text = bold_statistic_text
+                    tile_1.trigger_type = t.trigger_type
+                    tiles.append(tile_1)
+
+                tile_2 = TriggerTile()
+                body_part_text_2, is_plural_2 = self.get_title_text_for_body_parts(t.underactive_weak, 0)
+                if len(body_part_text_2) == 0:
+                    body_part_text_2 = "PRIME MOVER"
+                if body_part_text_2 not in recovery_body_parts:
+                    recovery_body_parts.add(body_part_text_1)
+                    tile_2.text = "Strengthen your " + body_part_text_2
+                    tile_2.description = mobilize_suffix
+                    bold_2 = BoldText()
+                    bold_2.text = "Strengthen"
+                    bold_2.color = LegendColor.splash_light
                     tile_2.bold_text.append(bold_2)
                     tile_2.statistic_text = statistic_text
                     tile_2.bold_statistic_text = bold_statistic_text

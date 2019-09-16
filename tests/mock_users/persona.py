@@ -26,7 +26,7 @@ class Persona(object):
         self.athlete_stats = None
         self.rpes = []
 
-    def create_history(self, days, suffix='Test', clear_history=True, start_date_time=datetime.datetime.now(), end_today=False, rpes=[]):
+    def create_history(self, days, suffix='', clear_history=True, start_date_time=datetime.datetime.now(), end_today=False, rpes=[], visualizations=True):
         self.rpes = rpes
         if clear_history:
             self.clear_user(suffix)
@@ -54,10 +54,10 @@ class Persona(object):
                                       'soreness': soreness}
                     self.create_readiness(readiness_data)
 
-                    self.create_plan(event_date, i)
+                    self.create_plan(event_date, i, visualizations)
                 else:
                     self.daily_readiness = None
-                    self.create_plan(event_date, i)
+                    self.create_plan(event_date, i, visualizations)
 
                 last_plan_date = event_date
                 if self.daily_plan.pre_active_rest is not None and len(self.daily_plan.pre_active_rest) > 0:
@@ -77,7 +77,7 @@ class Persona(object):
 
         return last_plan_date
 
-    def clear_user(self, suffix='Test'):
+    def clear_user(self, suffix=''):
         readiness = get_mongo_collection('dailyreadiness', suffix)
         daily_plan = get_mongo_collection('dailyplan', suffix)
         stats = get_mongo_collection('athletestats', suffix)
@@ -90,7 +90,7 @@ class Persona(object):
         stats.delete_one({"athlete_id": self.user_id})
         asymmetry.delete_many({"user_id": self.user_id})
 
-    def create_plan(self, event_date, day_number):
+    def create_plan(self, event_date, day_number, visualizations):
         self.daily_plan = DailyPlan(format_date(event_date))
         self.daily_plan.user_id = self.user_id
         self.daily_plan.daily_readiness_survey = self.daily_readiness
@@ -110,7 +110,7 @@ class Persona(object):
             self.athlete_stats = survey_processor.athlete_stats
 
         plan_manager = TrainingPlanManager(self.user_id, DatastoreCollection(), )
-        self.daily_plan = plan_manager.create_daily_plan(event_date=format_date(event_date), last_updated=format_datetime(event_date), athlete_stats=self.athlete_stats, visualizations=True)
+        self.daily_plan = plan_manager.create_daily_plan(event_date=format_date(event_date), last_updated=format_datetime(event_date), athlete_stats=self.athlete_stats, visualizations=visualizations)
 
     def update_stats(self, event_date):
         self.athlete_stats = StatsProcessing(self.user_id, event_date=event_date, datastore_collection=DatastoreCollection()).process_athlete_stats()
