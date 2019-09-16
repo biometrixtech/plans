@@ -120,6 +120,12 @@ class RecoveryTextGenerator(object):
             return side_text + "tricep"
         elif body_part_location == BodyPartLocation.biceps:
             return side_text + "bicep"
+        elif body_part_location == BodyPartLocation.forearm:
+            return side_text + "forearm"
+        elif body_part_location == BodyPartLocation.core_stabilizers:
+            return side_text + "core stabilizers"
+        elif body_part_location == BodyPartLocation.erector_spinae:
+            return side_text + "erector spinae"
         else:
             return ""
 
@@ -180,6 +186,12 @@ class RecoveryTextGenerator(object):
             return side_text + "triceps"
         elif body_part_location == BodyPartLocation.biceps:
             return side_text + "biceps"
+        elif body_part_location == BodyPartLocation.forearm:
+            return side_text + "forearms"
+        elif body_part_location == BodyPartLocation.core_stabilizers:
+            return side_text + "core stabilizers"
+        elif body_part_location == BodyPartLocation.erector_spinae:
+            return  side_text + "erector spinae"
 
     def get_soreness_4_text(self, body_part_text):
         return "Based on the discomfort reporting at your " + body_part_text + " we recommend you rest and " \

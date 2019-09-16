@@ -41,7 +41,7 @@ users = test_users.get_test_users()
 users.extend(test_users.get_three_sensor_test_users())
 users.extend(test_users.get_merged_users())
 
-environment = "test"
+environment = "dev"
 
 for user in users:
 

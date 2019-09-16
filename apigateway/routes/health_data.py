@@ -7,6 +7,7 @@ from logic.survey_processing import SurveyProcessing
 from fathomapi.utils.decorators import require
 from fathomapi.utils.xray import xray_recorder
 from fathomapi.comms.service import Service
+from routes.environments import is_fathom_environment
 
 datastore_collection = DatastoreCollection()
 daily_plan_datastore = datastore_collection.daily_plan_datastore
@@ -48,7 +49,8 @@ def handle_previous_health_data_write(user_id=None):
     if len(survey_processor.sleep_history) > 0:
         sleep_history_datastore.put(survey_processor.sleep_history)
 
-    Service('users', os.environ['USERS_API_VERSION']).call_apigateway_async(method='PATCH',
-                                                                            endpoint=f"user/{user_id}",
-                                                                            body={"historic_health_sync_date": event_date})
+    if is_fathom_environment():
+        Service('users', os.environ['USERS_API_VERSION']).call_apigateway_async(method='PATCH',
+                                                                                endpoint=f"user/{user_id}",
+                                                                                body={"historic_health_sync_date": event_date})
     return {'message': "success"}, 200

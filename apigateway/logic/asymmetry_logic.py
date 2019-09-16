@@ -42,7 +42,7 @@ class AsymmetryProcessor(object):
 
         return left_y, right_y
 
-    def get_visualized_left_right_asymmetry(self, left_apt, right_apt):
+    def get_visualized_left_right_asymmetry(self, left_apt, right_apt, base_number=10):
 
         if left_apt > right_apt > 0:
 
@@ -52,9 +52,9 @@ class AsymmetryProcessor(object):
             #     ratio_factor = (2 - (0.5 * ratio))
             #     ratio = ratio * ratio_factor
 
-            right_y = 10
+            right_y = base_number
 
-            left_y = 10 * ratio
+            left_y = base_number * ratio
 
         elif right_apt > left_apt > 0:
 
@@ -65,14 +65,14 @@ class AsymmetryProcessor(object):
             #     ratio_factor = (2 - (0.5 * ratio))
             #     ratio = ratio * ratio_factor
 
-            left_y = 10
+            left_y = base_number
 
-            right_y = 10 * ratio
+            right_y = base_number * ratio
 
         else:
 
-            left_y = 10
-            right_y = 10
+            left_y = base_number
+            right_y = base_number
 
         #left_degrees, right_degrees = self.get_left_right_degrees(left_apt, right_apt)
 

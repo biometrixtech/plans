@@ -1,5 +1,5 @@
 from enum import Enum
-from models.chart_data import TrainingVolumeChartData, BodyResponseChartData, WorkoutChartData, PersonalizedRecoveryChartData, PreventionChartData, BiomechanicsChart, CareTodayChartData
+from models.chart_data import TrainingVolumeChartData, BodyResponseChartData, WorkoutChartData, PersonalizedRecoveryChartData, PreventionChartData, BiomechanicsAPTChart, CareTodayChartData, BiomechanicsAnklePitchChart
 from models.insights import InsightType
 from models.soreness_base import BodyPartSide
 from models.sport import SportName
@@ -580,7 +580,9 @@ class AthleteTrends(object):
         self.stress = TrendCategory(InsightType.stress)
         self.response = TrendCategory(InsightType.response)
         self.biomechanics = TrendCategory(InsightType.biomechanics)
-        self.biomechanics_summary = None
+        #self.biomechanics_summary = None
+        self.biomechanics_apt = None
+        self.biomechanics_ankle_pitch = None
         self.body_response = TrendData()
         self.workload = TrendData()
         self.trend_categories = []
@@ -594,8 +596,8 @@ class AthleteTrends(object):
             'body_response': self.body_response.json_serialise() if self.body_response is not None else None,
             'workload': self.workload.json_serialise() if self.workload is not None else None,
             'trend_categories': [trend_category.json_serialise(plan) for trend_category in self.trend_categories],
-            'biomechanics_summary': self.biomechanics_summary.json_serialise() if self.biomechanics_summary is not None else None
-
+            'biomechanics_apt': self.biomechanics_apt.json_serialise() if self.biomechanics_apt is not None else None,
+            'biomechanics_ankle_pitch': self.biomechanics_ankle_pitch.json_serialise() if self.biomechanics_ankle_pitch is not None else None,
         }
         return ret
 
@@ -609,8 +611,17 @@ class AthleteTrends(object):
         trends.body_response = TrendData.json_deserialise(input_dict['body_response']) if input_dict.get('body_response', None) is not None else None
         trends.workload = TrendData.json_deserialise(input_dict['workload']) if input_dict.get('workload', None) is not None else None
         trends.trend_categories = [TrendCategory.json_deserialise(trend_category) for trend_category in input_dict.get('trend_categories', [])]
-        trends.biomechanics_summary = BiomechanicsChart.json_deserialise(input_dict['biomechanics_summary']) if input_dict.get(
-            'biomechanics_summary', None) is not None else None
+        trends.biomechanics_apt = BiomechanicsAPTChart.json_deserialise(
+            input_dict['biomechanics_apt']) if input_dict.get('biomechanics_apt', None) is not None else None
+
+        biomechanics_summary = input_dict.get('biomechanics_summary')
+
+        if biomechanics_summary is not None:
+            trends.biomechanics_apt = BiomechanicsAPTChart.json_deserialise(input_dict['biomechanics_summary']) if input_dict.get(
+                'biomechanics_summary', None) is not None else None
+
+        trends.biomechanics_ankle_pitch = BiomechanicsAnklePitchChart.json_deserialise(input_dict['biomechanics_ankle_pitch']) if input_dict.get(
+            'biomechanics_ankle_pitch', None) is not None else None
         return trends
 
     # def add_cta(self):
@@ -694,4 +705,5 @@ class AthleteTrends(object):
                                          )
         self.workload = workload
 
-        self.biomechanics_summary = athlete_stats.biomechanics_chart
+        self.biomechanics_apt = athlete_stats.biomechanics_apt_chart
+        self.biomechanics_ankle_pitch = athlete_stats.biomechanics_ankle_pitch_chart

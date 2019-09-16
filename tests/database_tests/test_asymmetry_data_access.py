@@ -11,7 +11,7 @@ from utils import parse_date
 
 @pytest.fixture(scope="session", autouse=True)
 def add_xray_support(request):
-    os.environ["ENVIRONMENT"] = "dev"
+    os.environ["ENVIRONMENT"] = "test"
 
     xray_recorder.configure(sampling=False)
     xray_recorder.begin_segment(name="test")

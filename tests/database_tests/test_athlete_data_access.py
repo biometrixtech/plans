@@ -48,9 +48,8 @@ def test_get_15_days_of_asymmetry():
     dao = AsymmetryDatastore()
     end_date =  datetime.now()
     start_date = end_date - timedelta(days=15)
-    events = dao.get(user_id='703b5309-78cd-46b1-82ec-45e86b6d71de', start_date=format_datetime(start_date), end_date=format_datetime(end_date))
+    events = dao.get(user_id='703b5309-78cd-46b1-82ec-45e86b6d71de', sessions=7)
     assert len(events) == 4
-
 
 def test_get_readiness_survey_test_data():
     athlete_dao = DailyReadinessDatastore()

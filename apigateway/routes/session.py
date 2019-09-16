@@ -12,8 +12,8 @@ from models.session import SessionType, SessionSource
 from models.asymmetry import Asymmetry
 from models.daily_plan import DailyPlan
 from models.stats import AthleteStats
-from routes.visualizations import get_visualization_parameter
-from utils import parse_datetime, format_date, format_datetime, get_timezone
+from routes.environments import is_fathom_environment
+from utils import parse_datetime, format_date, format_datetime, get_timezone, get_local_time
 from config import get_mongo_collection
 from logic.survey_processing import SurveyProcessing, create_session, update_session, create_plan, cleanup_plan
 from logic.athlete_status_processing import AthleteStatusProcessing
@@ -57,7 +57,7 @@ def handle_session_create(user_id=None):
             continue
         survey_processor.create_session_from_survey(session)
 
-    visualizations = get_visualization_parameter(request)
+    visualizations = is_fathom_environment()
 
     # update daily pain and soreness in athlete_stats
     survey_processor.patch_daily_and_historic_soreness(survey='post_session')
@@ -108,14 +108,15 @@ def handle_session_create(user_id=None):
         plan = cleanup_plan(plan, visualizations)
 
     # update users database if health data received
-    if "health_sync_date" in request.json and request.json['health_sync_date'] is not None:
+    if is_fathom_environment():
+        if "health_sync_date" in request.json and request.json['health_sync_date'] is not None:
+            Service('users', os.environ['USERS_API_VERSION']).call_apigateway_async(method='PATCH',
+                                                                                    endpoint=f"user/{user_id}",
+                                                                                    body={"health_sync_date": request.json['health_sync_date']})
         Service('users', os.environ['USERS_API_VERSION']).call_apigateway_async(method='PATCH',
                                                                                 endpoint=f"user/{user_id}",
-                                                                                body={"health_sync_date": request.json['health_sync_date']})
-    Service('users', os.environ['USERS_API_VERSION']).call_apigateway_async(method='PATCH',
-                                                                            endpoint=f"user/{user_id}",
-                                                                            body={"timezone": timezone,
-                                                                                  "plans_api_version": Config.get('API_VERSION')})
+                                                                                body={"timezone": timezone,
+                                                                                      "plans_api_version": Config.get('API_VERSION')})
     return {'daily_plans': [plan]}, 201
 
 
@@ -184,10 +185,11 @@ def handle_session_update(session_id, user_id=None):
     # write hr data if it exists
     if len(survey_processor.heart_rate_data) > 0:
         heart_rate_datastore.put(survey_processor.heart_rate_data)
-    if "health_sync_date" in request.json and request.json['health_sync_date'] is not None:
-        Service('users', os.environ['USERS_API_VERSION']).call_apigateway_async(method='PATCH',
-                                                                                endpoint=f"user/{user_id}",
-                                                                                body={"health_sync_date": request.json['health_sync_date']})
+    if is_fathom_environment():
+        if "health_sync_date" in request.json and request.json['health_sync_date'] is not None:
+            Service('users', os.environ['USERS_API_VERSION']).call_apigateway_async(method='PATCH',
+                                                                                    endpoint=f"user/{user_id}",
+                                                                                    body={"health_sync_date": request.json['health_sync_date']})
 
     return {'message': 'success'}, 200
 
@@ -268,7 +270,17 @@ def handle_session_sensor_data(user_id=None):
 @xray_recorder.capture('routes.session.add_sensor_data')
 def handle_session_three_sensor_data(user_id):
     #user_id = request.json['user_id']
+    athlete_stats = athlete_stats_datastore.get(athlete_id=user_id)
+    if athlete_stats is not None:
+        timezone = athlete_stats.timezone
+    else:
+        timezone = '-04:00'
     event_date = parse_datetime(request.json['event_date'])
+    event_date = get_local_time(event_date, timezone)
+    end_date = request.json.get('end_date')
+    if end_date is not None:
+        end_date = parse_datetime(end_date)
+        end_date = get_local_time(end_date, timezone)
     plan_event_day = format_date(event_date)
     # update last_sensor_syc date
     if not _check_plan_exists(user_id, plan_event_day):
@@ -283,6 +295,8 @@ def handle_session_three_sensor_data(user_id):
 
     session_obj = create_session(6, {'description': 'three_sensor_data',
                                      'event_date': event_date,
+                                     'end_date': end_date,
+                                     'completed_date_time': end_date,
                                      'sport_name': 17,
                                      'source': 3,
                                      'duration_sensor': duration})
@@ -296,6 +310,8 @@ def handle_session_three_sensor_data(user_id):
         if plan.training_sessions[s].id == session_id:
             plan.training_sessions[s].description = 'three_sensor_data'
             plan.training_sessions[s].event_date = event_date
+            plan.training_sessions[s].end_date = end_date
+            plan.training_sessions[s].completed_date_time = end_date
             plan.training_sessions[s].sport_name = 17
             plan.training_sessions[s].source = 3
             plan.training_sessions[s].duration_sensor = duration
@@ -341,6 +357,7 @@ def handle_no_sessions_planned(user_id=None):
     else:
         plan = daily_plan_datastore.get(user_id, plan_event_date, plan_event_date)[0]
 
+    visualizations = is_fathom_environment()
     plan.sessions_planned = False
     plan.train_later = False
     daily_plan_datastore.put(plan)
@@ -349,7 +366,8 @@ def handle_no_sessions_planned(user_id=None):
                        event_date,
                        athlete_stats=athlete_stats,
                        update_stats=True,
-                       datastore_collection=datastore_collection)
+                       datastore_collection=datastore_collection,
+                       visualizations=visualizations)
 
     return {'daily_plans': [plan]}, 200
 

@@ -13,6 +13,7 @@ from models.body_parts import BodyPart
 from models.historic_soreness import HistoricSoreness, HistoricSeverity, CoOccurrence, SorenessCause
 from models.post_session_survey import PostSessionSurvey
 from models.data_series import DataSeries
+from models.asymmetry import HistoricAsymmetry, AsymmetryType
 from utils import parse_date, format_date
 
 
@@ -117,7 +118,11 @@ class StatsProcessing(object):
                                                     self.chronic_daily_plans
                                                     )
 
-        training_volume_processing.load_biomechanics_chart(self.all_plans)
+        sessions = training_volume_processing.get_training_sessions(self.all_plans)
+
+        training_volume_processing.load_biomechanics_charts(sessions)
+
+        current_athlete_stats.historic_asymmetry = self.get_historic_asymmetry(sessions)
 
         current_athlete_stats.sport_max_load = training_volume_processing.sport_max_load
 
@@ -141,7 +146,8 @@ class StatsProcessing(object):
 
         current_athlete_stats.training_volume_chart_data = training_volume_processing.training_volume_chart_data
         current_athlete_stats.workout_chart = training_volume_processing.workout_chart
-        current_athlete_stats.biomechanics_chart = training_volume_processing.biomechanics_chart
+        current_athlete_stats.biomechanics_apt_chart = training_volume_processing.biomechanics_apt_chart
+        current_athlete_stats.biomechanics_ankle_pitch_chart = training_volume_processing.biomechanics_ankle_pitch_chart
         current_athlete_stats.body_response_chart = BodyResponseChart(self.event_date)
         current_athlete_stats.body_response_chart.process_soreness(soreness_list_25)
 
@@ -255,6 +261,44 @@ class StatsProcessing(object):
         return list(h for h in historic_soreness if
                     not h.is_pain and not h.is_dormant_cleared()
                     and h.historic_soreness_status != HistoricSorenessStatus.doms)
+
+    def get_historic_asymmetry(self, sessions):
+
+        historic_asymmetry = {}
+
+        last_15_day_sessions = [s for s in sessions if self.event_date >= s.event_date >= self.event_date - timedelta(days=15) and s.asymmetry is not None]
+        last_30_day_sessions = [s for s in sessions if
+                                self.event_date - timedelta(days=15) > s.event_date >= self.event_date - timedelta(days=30) and s.asymmetry is not None]
+
+        apt_historic_asymmetry = HistoricAsymmetry(AsymmetryType.anterior_pelvic_tilt)
+
+        if len(last_15_day_sessions) >= 4:
+            apt_asymmetric_events = 0
+            apt_symmetric_events = 0
+            for s in last_15_day_sessions:
+                if s.asymmetry is not None and s.asymmetry.anterior_pelvic_tilt is not None:
+                    apt_asymmetric_events += s.asymmetry.anterior_pelvic_tilt.asymmetric_events
+                if s.asymmetry is not None and s.asymmetry.anterior_pelvic_tilt is not None:
+                    apt_symmetric_events += s.asymmetry.anterior_pelvic_tilt.symmetric_events
+
+            apt_historic_asymmetry.asymmetric_events_15_days = apt_asymmetric_events
+            apt_historic_asymmetry.symmetric_events_15_days = apt_symmetric_events
+
+        if len(last_30_day_sessions) >= 4:
+            apt_asymmetric_events = 0
+            apt_symmetric_events = 0
+            for s in last_30_day_sessions:
+                if s.asymmetry is not None and s.asymmetry.anterior_pelvic_tilt is not None:
+                    apt_asymmetric_events += s.asymmetry.anterior_pelvic_tilt.asymmetric_events
+                if s.asymmetry is not None and s.asymmetry.anterior_pelvic_tilt is not None:
+                    apt_symmetric_events += s.asymmetry.anterior_pelvic_tilt.symmetric_events
+
+            apt_historic_asymmetry.asymmetric_events_30_days = apt_asymmetric_events
+            apt_historic_asymmetry.symmetric_events_30_days = apt_symmetric_events
+
+        historic_asymmetry[AsymmetryType.anterior_pelvic_tilt.value] = apt_historic_asymmetry
+
+        return historic_asymmetry
 
     def add_historic_severity(self, all_surveys, historic_soreness):
 

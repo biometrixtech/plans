@@ -5,6 +5,7 @@ from datastores.datastore_collection import DatastoreCollection
 from logic.survey_processing import cleanup_plan
 from models.insights import InsightType
 from models.styles import VisualizationType
+from routes.environments import is_fathom_environment
 from utils import parse_datetime, format_date
 
 datastore_collection = DatastoreCollection()
@@ -43,7 +44,8 @@ def handle_alerts_cleared(user_id):
     else:
         print(f"Trend Category {cleared_insight_type.name} not found")
 
-    plan = cleanup_plan(plan, visualizations=True)
+    visualizations = is_fathom_environment()
+    plan = cleanup_plan(plan, visualizations=visualizations)
     return {'daily_plans': [plan]}, 200
 
 
@@ -68,7 +70,8 @@ def handle_fte_category(user_id):
     else:
         print(f"Trend Category {fte_insight_type.name} not found")
 
-    plan = cleanup_plan(plan, visualizations=True)
+    visualizations = is_fathom_environment()
+    plan = cleanup_plan(plan, visualizations=visualizations)
     return {'daily_plans': [plan]}, 200
 
 
@@ -101,5 +104,6 @@ def handle_fte_view(user_id):
     else:
         print(f"Trend Category {fte_insight_type.name} not found")
 
-    plan = cleanup_plan(plan, visualizations=True)
+    visualizations = is_fathom_environment()
+    plan = cleanup_plan(plan, visualizations=visualizations)
     return {'daily_plans': [plan]}, 200

@@ -178,7 +178,7 @@ def test_trigger_110():
     trigger_factory = TriggerFactory(datetime.now(), None, [], [])
 
     factory = MovementErrorFactory()
-    movement_error = factory.get_movement_error(MovementErrorType.apt_asymmetry, 310, 290)
+    movement_error = factory.get_movement_error(MovementErrorType.apt_asymmetry, (310/290) * 100)
 
     trigger_factory.set_trigger(TriggerType.movement_error_apt_asymmetry, movement_error=movement_error)
 
