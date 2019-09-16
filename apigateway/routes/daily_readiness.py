@@ -14,6 +14,7 @@ from models.soreness_base import BodyPartLocation
 from models.stats import AthleteStats
 from models.daily_plan import DailyPlan
 from models.sleep_data import DailySleepData, SleepEvent
+from routes.environments import is_fathom_environment
 from logic.survey_processing import SurveyProcessing, cleanup_sleep_data_from_api, create_plan
 from logic.athlete_status_processing import AthleteStatusProcessing
 from config import get_mongo_collection
@@ -113,20 +114,24 @@ def handle_daily_readiness_create(user_id):
         if 'current_position' in request.json:
             survey_processor.athlete_stats.current_position = request.json['current_position']
 
+    visualizations = is_fathom_environment()
+
     plan = create_plan(user_id,
                        event_date,
                        athlete_stats=survey_processor.athlete_stats,
                        stats_processor=survey_processor.stats_processor,
-                       datastore_collection=datastore_collection)
-    if "health_sync_date" in request.json and request.json['health_sync_date'] is not None:
+                       datastore_collection=datastore_collection,
+                       visualizations=visualizations)
+    if is_fathom_environment():
+        if "health_sync_date" in request.json and request.json['health_sync_date'] is not None:
+            Service('users', os.environ['USERS_API_VERSION']).call_apigateway_async(method='PATCH',
+                                                                                    endpoint=f"user/{user_id}",
+                                                                                    body={"health_sync_date": request.json['health_sync_date']})
+
         Service('users', os.environ['USERS_API_VERSION']).call_apigateway_async(method='PATCH',
                                                                                 endpoint=f"user/{user_id}",
-                                                                                body={"health_sync_date": request.json['health_sync_date']})
-
-    Service('users', os.environ['USERS_API_VERSION']).call_apigateway_async(method='PATCH',
-                                                                            endpoint=f"user/{user_id}",
-                                                                            body={"timezone": timezone,
-                                                                                  "plans_api_version": Config.get('API_VERSION')})
+                                                                                body={"timezone": timezone,
+                                                                                      "plans_api_version": Config.get('API_VERSION')})
 
     return {'daily_plans': [plan]}, 201
 

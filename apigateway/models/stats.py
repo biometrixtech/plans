@@ -15,6 +15,7 @@ from models.sport import SportName, BaseballPosition, BasketballPosition, Footba
     SoftballPosition, FieldHockeyPosition, TrackAndFieldPosition, VolleyballPosition
 from models.training_volume import StandardErrorRange
 from models.trigger import TriggerType, Trigger
+from models.asymmetry import HistoricAsymmetry
 from utils import format_date, format_datetime, parse_date, parse_datetime
 import datetime
 import numbers
@@ -133,7 +134,9 @@ class AthleteStats(Serialisable):
 
         self.workout_chart = None
         self.body_response_chart = None
-        self.biomechanics_chart = None
+        #self.biomechanics_chart = None
+        self.biomechanics_apt_chart = None
+        self.biomechanics_ankle_pitch_chart = None
 
         self.eligible_for_high_load_trigger = False
 
@@ -145,6 +148,7 @@ class AthleteStats(Serialisable):
 
         self.api_version = '4_3'
         self.timezone = '-04:00'
+        self.historic_asymmetry = {}
 
     def update_historic_soreness(self, soreness, event_date):
 
@@ -509,7 +513,8 @@ class AthleteStats(Serialisable):
             # 'body_response_chart': self.body_response_chart.json_serialise() if self.body_response_chart is not None else None
             # 'training_volume_chart_data': [chart_data.json_serialise() for chart_data in self.training_volume_chart_data]
             'api_version': self.api_version,
-            'timezone': self.timezone
+            'timezone': self.timezone,
+            'historic_asymmetry': {str(asymmetry_type): historic_asymmetry.json_serialise() for (asymmetry_type, historic_asymmetry) in self.historic_asymmetry.items()}
         }
         return ret
 
@@ -569,6 +574,8 @@ class AthleteStats(Serialisable):
         athlete_stats.trend_categories = [TrendCategory.json_deserialise(trend_category) for trend_category in input_dict.get('trend_categories', [])]
         athlete_stats.api_version = input_dict.get('api_version', '4_3')
         athlete_stats.timezone = input_dict.get('timezone', '-04:00')
+        athlete_stats.historic_asymmetry = {int(asymmetry_type): HistoricAsymmetry.json_deserialise(historic_asymmetry)
+                                            for (asymmetry_type, historic_asymmetry) in input_dict.get('historic_asymmetry', {}).items()}
         return athlete_stats
 
     @classmethod
