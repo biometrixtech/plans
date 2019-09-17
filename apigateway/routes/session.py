@@ -13,10 +13,9 @@ from models.asymmetry import Asymmetry
 from models.daily_plan import DailyPlan
 from models.stats import AthleteStats
 from routes.environments import is_fathom_environment
-from survey_processing import add_hk_data_to_sessions
 from utils import parse_datetime, format_date, format_datetime, get_timezone, get_local_time
 from config import get_mongo_collection
-from logic.survey_processing import SurveyProcessing, create_session, update_session, create_plan, cleanup_plan
+from logic.survey_processing import SurveyProcessing, create_session, update_session, create_plan, cleanup_plan, add_hk_data_to_sessions
 from logic.athlete_status_processing import AthleteStatusProcessing
 
 datastore_collection = DatastoreCollection()

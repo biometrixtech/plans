@@ -15,8 +15,7 @@ from models.stats import AthleteStats
 from models.daily_plan import DailyPlan
 from models.sleep_data import DailySleepData, SleepEvent
 from routes.environments import is_fathom_environment
-from survey_processing import add_hk_data_to_sessions
-from logic.survey_processing import SurveyProcessing, cleanup_sleep_data_from_api, create_plan
+from logic.survey_processing import SurveyProcessing, cleanup_sleep_data_from_api, create_plan, add_hk_data_to_sessions
 from logic.athlete_status_processing import AthleteStatusProcessing
 from config import get_mongo_collection
 from utils import parse_datetime, format_date, format_datetime, fix_early_survey_event_date, get_timezone
