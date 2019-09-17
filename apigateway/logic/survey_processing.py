@@ -34,6 +34,7 @@ class SurveyProcessing(object):
         self.datastore_collection = datastore_collection
 
     def create_session_from_survey(self, session, historic_health_data=False):
+        existing_session_id = session.get('id', None)
         event_date = parse_datetime(session['event_date'])
         end_date = session.get('end_date', None)
         if end_date is not None:
@@ -62,6 +63,8 @@ class SurveyProcessing(object):
         source = session.get("source", None)
         deleted = session.get("deleted", False)
         ignored = session.get("ignored", False)
+        apple_health_kit_id = session.get("apple_health_kit_id", [])
+        apple_health_kit_source_name = session.get("apple_health_kit_source_name", [])
         if end_date is not None:
             duration_health = round((end_date - event_date).seconds / 60, 2)
         else:
@@ -78,7 +81,9 @@ class SurveyProcessing(object):
                         "distance": distance,
                         "source": source,
                         "deleted": deleted,
-                        "ignored": ignored}
+                        "ignored": ignored,
+                        "apple_health_kit_id": apple_health_kit_id,
+                        "apple_health_kit_source_name": apple_health_kit_source_name}
         if 'post_session_survey' in session:
             survey = PostSurvey(event_date=session['post_session_survey']['event_date'],
                                 survey=session['post_session_survey'])
@@ -104,6 +109,8 @@ class SurveyProcessing(object):
                         self.athlete_stats.session_RPE = survey.RPE
                         self.athlete_stats.session_RPE_event_date = self.event_date
         session_obj = create_session(session_type, session_data)
+        if existing_session_id is not None:
+            session_obj.id = existing_session_id  # this is a merge case
         if 'hr_data' in session and len(session['hr_data']) > 0:
             heart_rate_processing = HeartRateProcessing(self.user_age)
             self.create_session_hr_data(session_obj, session['hr_data'])
