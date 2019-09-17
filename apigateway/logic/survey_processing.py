@@ -63,8 +63,8 @@ class SurveyProcessing(object):
         source = session.get("source", None)
         deleted = session.get("deleted", False)
         ignored = session.get("ignored", False)
-        apple_health_kit_id = session.get("apple_health_kit_id", [])
-        apple_health_kit_source_name = session.get("apple_health_kit_source_name", [])
+        apple_health_kit_ids = session.get("apple_health_kit_ids", [])
+        apple_health_kit_source_names = session.get("apple_health_kit_source_names", [])
         if end_date is not None:
             duration_health = round((end_date - event_date).seconds / 60, 2)
         else:
@@ -82,8 +82,8 @@ class SurveyProcessing(object):
                         "source": source,
                         "deleted": deleted,
                         "ignored": ignored,
-                        "apple_health_kit_id": apple_health_kit_id,
-                        "apple_health_kit_source_name": apple_health_kit_source_name}
+                        "apple_health_kit_ids": apple_health_kit_ids,
+                        "apple_health_kit_source_names": apple_health_kit_source_names}
         if 'post_session_survey' in session:
             survey = PostSurvey(event_date=session['post_session_survey']['event_date'],
                                 survey=session['post_session_survey'])
@@ -364,3 +364,31 @@ def cleanup_plan(plan, visualizations=True):
     del plan['daily_readiness_survey'], plan['user_id']
 
     return plan
+
+
+def add_hk_data_to_sessions(training_sessions, new_sessions):
+    for session in new_sessions:
+        session_found = False
+        for s in training_sessions:
+            if session.id == s.id:  # session already exists
+                if len(session.apple_health_kit_ids) > 0:
+
+                    if s.source != SessionSource.three_sensor:
+                        s.event_date = session.event_date
+                        s.end_date = session.end_date
+
+                    s.apple_health_kit_ids = session.apple_health_kit_ids
+                    s.sport_name = session.sport_name  # HK always wins at this point
+                    s.duration_health = session.duration_health
+                    s.calories = session.calories
+                    s.distance = session.distance
+                    s.apple_health_kit_source_names = session.apple_health_kit_source_names
+                    # HR data saved below
+
+                if s.post_session_survey is None and session.post_session_survey is not None:
+                    s.post_session_survey = session.post_session_survey
+
+                session_found = True
+
+        if not session_found:
+            training_sessions.append(session)

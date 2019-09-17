@@ -13,6 +13,7 @@ from models.asymmetry import Asymmetry
 from models.daily_plan import DailyPlan
 from models.stats import AthleteStats
 from routes.environments import is_fathom_environment
+from survey_processing import add_hk_data_to_sessions
 from utils import parse_datetime, format_date, format_datetime, get_timezone, get_local_time
 from config import get_mongo_collection
 from logic.survey_processing import SurveyProcessing, create_session, update_session, create_plan, cleanup_plan
@@ -84,28 +85,7 @@ def handle_session_create(user_id=None):
 
     # add sessions to plan and write to mongo
     plan.train_later = train_later
-    for session in survey_processor.sessions:
-        session_found = False
-        for s in plan.training_sessions:
-            if session.id == s.id:  # session already exists
-                if session.apple_health_kit_id is not None:
-                    if s.source != SessionSource.three_sensor:
-                        s.event_date = session.event_date
-                        s.end_date = session.end_date
-
-                    if s.post_session_survey is None:
-                        s.post_session_survey = session.post_session_survey
-
-                    s.apple_health_kit_id = session.apple_health_kit_id
-                    s.sport_name = session.sport_name  # HK always wins at this point
-                    s.duration_health = session.duration_health
-                    s.calories = session.calories
-                    s.distance = session.distance
-                    s.apple_health_kit_source_name = session.apple_health_kit_source_name
-                    # HR data saved below
-                    session_found = True
-        if not session_found:
-            plan.training_sessions.append(session)
+    plan.training_sessions = add_hk_data_to_sessions(plan.training_sessions, survey_processor.sessions)
     #plan.training_sessions.extend(survey_processor.sessions)
     daily_plan_datastore.put(plan)
 
