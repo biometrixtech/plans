@@ -59,6 +59,7 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
 
     def __init__(self):
         self.id = None
+        self.source_session_ids = []
         self.apple_health_kit_ids = []
         self.apple_health_kit_source_names = []
         self.sport_name = None
@@ -278,6 +279,7 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         ret = {
             'session_id': self.id,
             'apple_health_kit_ids': [a for a in self.apple_health_kit_ids],
+            'source_session_ids': [a for a in self.source_session_ids],
             'apple_health_kit_source_names': [a for a in self.apple_health_kit_source_names],
             'description': self.description,
             'session_type': session_type.value,
@@ -318,6 +320,7 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         session = SessionFactory().create(SessionType(input_dict['session_type']))
         session.id = input_dict["session_id"]
         session.apple_health_kit_ids = input_dict.get("apple_health_kit_ids", [])
+        session.source_session_ids = input_dict.get("source_session_ids", [])
         session.apple_health_kit_source_names = input_dict.get("apple_health_kit_source_names", [])
         attrs_from_mongo = ["description",
                             "sport_name",

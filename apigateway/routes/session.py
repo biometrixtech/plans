@@ -17,6 +17,7 @@ from utils import parse_datetime, format_date, format_datetime, get_timezone, ge
 from config import get_mongo_collection
 from logic.survey_processing import SurveyProcessing, create_session, update_session, create_plan, cleanup_plan, add_hk_data_to_sessions
 from logic.athlete_status_processing import AthleteStatusProcessing
+from logic.session_processing import SessionMergeProcessing
 
 datastore_collection = DatastoreCollection()
 athlete_stats_datastore = datastore_collection.athlete_stats_datastore
@@ -118,6 +119,72 @@ def handle_session_create(user_id=None):
                                                                                 endpoint=f"user/{user_id}",
                                                                                 body={"timezone": timezone,
                                                                                       "plans_api_version": Config.get('API_VERSION')})
+    return {'daily_plans': [plan]}, 201
+
+
+@app.route('/<uuid:user_id>/merge', methods=['POST'])
+@require.authenticated.any
+@require.body({'event_date': str, 'session_id': str, 'ids_to_merge': list})
+@xray_recorder.capture('routes.session.create')
+def handle_session_merge(user_id=None):
+
+    visualizations = is_fathom_environment()
+    event_date = parse_datetime(request.json['event_date'])
+
+    athlete_stats = athlete_stats_datastore.get(athlete_id=user_id)
+    if athlete_stats is None:
+        athlete_stats = AthleteStats(user_id)
+        athlete_stats.event_date = event_date
+    athlete_stats.api_version = Config.get('API_VERSION')
+
+    survey_processor = SurveyProcessing(user_id, event_date, athlete_stats=athlete_stats,
+                                        datastore_collection=datastore_collection)
+
+    plan_event_date = format_date(event_date)
+    if not _check_plan_exists(user_id, plan_event_date):
+        plan = DailyPlan(event_date=plan_event_date)
+        plan.user_id = user_id
+        plan.last_sensor_sync = daily_plan_datastore.get_last_sensor_sync(user_id, plan_event_date)
+    else:
+        plan = daily_plan_datastore.get(user_id, plan_event_date, plan_event_date)[0]
+
+    if 'hk_data' in request.json:
+        for session in request.json['hk_data']:
+            if session is None:
+                continue
+            survey_processor.create_session_from_survey(session)
+
+    destination_sessions = [s for s in plan.training_sessions if s.id == request.json['session_id']]
+    if len(destination_sessions) > 0:
+        destination_session = destination_sessions[0]
+    else:
+        destination_session = None
+
+    source_ids = request.json['ids_to_merge']
+    source_sessions = []
+    non_source_sessions = []
+    if source_ids is not None and len(source_ids) > 0:
+        source_sessions.extend([s for s in plan.training_sessions if s.id in source_ids])
+        non_source_sessions.extend([s for s in plan.training_sessions if s.id not in source_ids])
+    else:
+        non_source_sessions = plan.training_sessions
+
+    source_sessions.extend(survey_processor.sessions)
+
+    plan_sessions = []
+    plan_sessions.extend(non_source_sessions)
+
+    if destination_session is not None and len(source_sessions) > 0:
+        merge_processing = SessionMergeProcessing(source_sessions, destination_session)
+        merge_processing.merge_all_sessions()
+
+        plan_sessions.extend(merge_processing.source_sessions)
+        plan_sessions.append(merge_processing.destination_session)
+
+    plan.training_sessions = plan_sessions
+    daily_plan_datastore.put(plan)
+    plan = cleanup_plan(plan, visualizations)
+
     return {'daily_plans': [plan]}, 201
 
 

@@ -41,11 +41,11 @@ users = test_users.get_test_users()
 users.extend(test_users.get_three_sensor_test_users())
 users.extend(test_users.get_merged_users())
 
-environment = "dev"
+environment = "test"
 
 for user in users:
 
-    first_name = "test"
+    first_name = "beta"
     last_name = "tester"
 
     status_code = create_user(user, first_name, last_name, environment)

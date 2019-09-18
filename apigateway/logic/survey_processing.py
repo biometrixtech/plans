@@ -16,6 +16,8 @@ from logic.heart_rate_processing import HeartRateProcessing
 from logic.metrics_processing import MetricsProcessing
 from datastores.datastore_collection import DatastoreCollection
 from utils import parse_datetime, format_datetime, fix_early_survey_event_date, format_date
+from copy import deepcopy
+from datetime import datetime
 
 
 class SurveyProcessing(object):
@@ -120,6 +122,47 @@ class SurveyProcessing(object):
         self.sessions.append(session_obj)
         if historic_health_data:
             return session_obj
+
+    def get_max_number(self, value_a, value_b):
+
+        if value_a is not None and value_b is not None:
+            return max(value_a, value_b)
+        elif value_a is None:
+            return value_b
+        elif value_b is None:
+            return value_a
+        else:
+            return None
+
+    def merge_surveys(self, source_survey, destination_survey):
+
+        destination_survey.RPE = self.get_max_number(source_survey.RPE, destination_survey.RPE)
+        if len(source_survey.soreness) >= 0 and len(destination_survey.soreness) == 0:
+            destination_survey.soreness = source_survey.soreness
+        else:
+            new_soreness = [d for d in destination_survey.soreness if d not in source_survey.soreness]
+            for s in source_survey.soreness:
+                index = next((i for i, x in enumerate(destination_survey.soreness) if s.body_part.location == x.body_part.location and s.side == x.side), -1)
+                if index > -1:
+                    merged_soreness = deepcopy(destination_survey.soreness[index])
+                    merged_soreness.pain = max(s.pain, destination_survey.soreness[index].pain)
+                    merged_soreness.severity = max(s.severity, destination_survey.soreness[index].severity)
+                    merged_soreness.movement = max(s.movement, destination_survey.soreness[index].movement)
+                else:
+                    new_soreness.append(s)
+
+            destination_survey.soreness = new_soreness
+
+        return destination_survey
+
+    def merge_post_session_surveys(self, source_survey, destination_survey):
+
+        destination_survey.event_date_time = min(source_survey.event_date_time, destination_survey.event_date_time)
+        destination_survey.event_date = destination_survey.event_date_time.strftime("%Y-%m-%d")
+        destination_survey.session_id = source_survey.session_id
+        destination_survey.survey = self.merge_surveys(source_survey.survey, destination_survey.survey)
+
+        return destination_survey
 
     def patch_daily_and_historic_soreness(self, survey='readiness'):
 
