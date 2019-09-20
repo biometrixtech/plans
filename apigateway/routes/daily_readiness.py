@@ -15,8 +15,9 @@ from models.stats import AthleteStats
 from models.daily_plan import DailyPlan
 from models.sleep_data import DailySleepData, SleepEvent
 from routes.environments import is_fathom_environment
-from logic.survey_processing import SurveyProcessing, cleanup_sleep_data_from_api, create_plan, add_hk_data_to_sessions
+from logic.survey_processing import SurveyProcessing, cleanup_sleep_data_from_api, create_plan
 from logic.athlete_status_processing import AthleteStatusProcessing
+from logic.session_processing import merge_sessions
 from config import get_mongo_collection
 from utils import parse_datetime, format_date, format_datetime, fix_early_survey_event_date, get_timezone
 
@@ -87,11 +88,34 @@ def handle_daily_readiness_create(user_id):
     if _check_plan_exists(user_id, plan_event_date):
         plan = daily_plan_datastore.get(user_id, plan_event_date, plan_event_date)[0]
         plan.user_id = user_id
-        plan.training_sessions = add_hk_data_to_sessions(plan.training_sessions, survey_processor.sessions)
+        #plan.training_sessions.extend(survey_processor.sessions)
     else:
         plan = DailyPlan(event_date=plan_event_date)
         plan.user_id = user_id
-        plan.training_sessions = survey_processor.sessions
+        #plan.training_sessions = survey_processor.sessions
+    apple_ids_to_merge = None
+    session_ids_to_merge = None
+    destination_session_id = None
+    destination_session = None
+
+    if "apple_ids_to_merge" in request.json:
+        apple_ids_to_merge = request.json["apple_ids_to_merge"]
+
+    if "session_ids_to_merge" in request.json:
+        session_ids_to_merge = request.json["session_ids_to_merge"]
+
+    if "destination_session_id" in request.json:
+        destination_session_id = request.json["destination_session_id"]
+
+    if "destination_session" in request.json:
+        destination_session = request.json["destination_session"]
+
+    plan.training_sessions = merge_sessions(apple_ids_to_merge,
+                                            session_ids_to_merge,
+                                            destination_session_id,
+                                            destination_session,
+                                            survey_processor.sessions,
+                                            plan.training_sessions)
     plan.sessions_planned = sessions_planned
     plan.train_later = train_later
     if len(survey_processor.heart_rate_data) > 0:

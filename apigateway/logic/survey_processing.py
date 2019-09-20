@@ -36,7 +36,15 @@ class SurveyProcessing(object):
         self.datastore_collection = datastore_collection
 
     def create_session_from_survey(self, session, historic_health_data=False):
+        session_obj = self.convert_session(session, historic_health_data)
+        self.sessions.append(session_obj)
+        if historic_health_data:
+            return session_obj
+
+    def convert_session(self, session, historic_health_data=False):
         existing_session_id = session.get('id', None)
+        apple_health_kit_id = session.get('apple_health_kit_id', None)
+        apple_health_kit_source_name = session.get('apple_health_kit_source_name', None)
         event_date = parse_datetime(session['event_date'])
         end_date = session.get('end_date', None)
         if end_date is not None:
@@ -65,8 +73,8 @@ class SurveyProcessing(object):
         source = session.get("source", None)
         deleted = session.get("deleted", False)
         ignored = session.get("ignored", False)
-        apple_health_kit_ids = session.get("apple_health_kit_ids", [])
-        apple_health_kit_source_names = session.get("apple_health_kit_source_names", [])
+        apple_health_kit_ids = session.get("merged_apple_health_kit_ids", [])
+        apple_health_kit_source_names = session.get("merged_apple_health_kit_source_names", [])
         if end_date is not None:
             duration_health = round((end_date - event_date).seconds / 60, 2)
         else:
@@ -84,8 +92,10 @@ class SurveyProcessing(object):
                         "source": source,
                         "deleted": deleted,
                         "ignored": ignored,
-                        "apple_health_kit_ids": apple_health_kit_ids,
-                        "apple_health_kit_source_names": apple_health_kit_source_names}
+                        "merged_apple_health_kit_ids": apple_health_kit_ids,
+                        "merged_apple_health_kit_source_names": apple_health_kit_source_names,
+                        "apple_health_kit_id": apple_health_kit_id,
+                        "apple_health_kit_source_name": apple_health_kit_source_name}
         if 'post_session_survey' in session:
             survey = PostSurvey(event_date=session['post_session_survey']['event_date'],
                                 survey=session['post_session_survey'])
@@ -93,7 +103,8 @@ class SurveyProcessing(object):
             # if survey.event_date.hour < 3 and event_date.hour >= 3:
             #     session_data['event_date'] = format_datetime(event_date - datetime.timedelta(days=1))
             survey.event_date = fix_early_survey_event_date(survey.event_date)
-            if "clear_candidates" in session['post_session_survey'] and len(session['post_session_survey']['clear_candidates']) > 0:
+            if "clear_candidates" in session['post_session_survey'] and len(
+                    session['post_session_survey']['clear_candidates']) > 0:
                 self.process_clear_status_answers(session['post_session_survey']['clear_candidates'],
                                                   event_date,
                                                   survey.soreness)
@@ -119,9 +130,7 @@ class SurveyProcessing(object):
             session_obj.shrz = heart_rate_processing.get_shrz(self.heart_rate_data[0].hr_workout)
         if session_obj.post_session_survey is not None:
             self.soreness.extend(session_obj.post_session_survey.soreness)
-        self.sessions.append(session_obj)
-        if historic_health_data:
-            return session_obj
+        return session_obj
 
     def get_max_number(self, value_a, value_b):
 

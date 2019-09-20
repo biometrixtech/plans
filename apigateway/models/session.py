@@ -59,9 +59,11 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
 
     def __init__(self):
         self.id = None
+        self.apple_health_kit_id = None
+        self.apple_health_kit_source_name = None
         self.source_session_ids = []
-        self.apple_health_kit_ids = []
-        self.apple_health_kit_source_names = []
+        self.merged_apple_health_kit_ids = []
+        self.merged_apple_health_kit_source_names = []
         self.sport_name = None
         self.sport_type = None
         self.strength_and_conditioning_type = None
@@ -278,9 +280,11 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         session_type = self.session_type()
         ret = {
             'session_id': self.id,
-            'apple_health_kit_ids': [a for a in self.apple_health_kit_ids],
+            'apple_health_kit_id': self.apple_health_kit_id,
+            'apple_health_kit_source_name': self.apple_health_kit_source_name,
+            'merged_apple_health_kit_ids': [a for a in self.merged_apple_health_kit_ids],
             'source_session_ids': [a for a in self.source_session_ids],
-            'apple_health_kit_source_names': [a for a in self.apple_health_kit_source_names],
+            'merged_apple_health_kit_source_names': [a for a in self.merged_apple_health_kit_source_names],
             'description': self.description,
             'session_type': session_type.value,
             'sport_name': self.sport_name.value,
@@ -319,9 +323,11 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
     def json_deserialise(cls, input_dict):
         session = SessionFactory().create(SessionType(input_dict['session_type']))
         session.id = input_dict["session_id"]
-        session.apple_health_kit_ids = input_dict.get("apple_health_kit_ids", [])
+        session.apple_health_kit_id = input_dict.get("apple_health_kit_id")
+        session.apple_health_kit_source_name = input_dict.get("apple_health_kit_source_name")
+        session.merged_apple_health_kit_ids = input_dict.get("merged_apple_health_kit_ids", [])
         session.source_session_ids = input_dict.get("source_session_ids", [])
-        session.apple_health_kit_source_names = input_dict.get("apple_health_kit_source_names", [])
+        session.merged_apple_health_kit_source_names = input_dict.get("merged_apple_health_kit_source_names", [])
         attrs_from_mongo = ["description",
                             "sport_name",
                             "strength_and_conditioning_type",
