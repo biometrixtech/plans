@@ -195,7 +195,7 @@ class BodyPartFactory(object):
         elif location == BodyPartLocation.elbow:
             return self.get_elbow(sample)
         elif location == BodyPartLocation.erector_spinae:
-            return self.get_erector_spinea(sample)
+            return self.get_erector_spinae(sample)
         elif location == BodyPartLocation.foot:
             return self.get_foot(sample)
         elif location == BodyPartLocation.forearm:
@@ -499,7 +499,7 @@ class BodyPartFactory(object):
         part.add_muscle_groups([22, 23], [1], [24], [22, 23])
         return part
 
-    def get_erector_spinea(self, sample=True):
+    def get_erector_spinae(self, sample=True):
 
         part = BodyPart(BodyPartLocation.erector_spinae, None)
 
