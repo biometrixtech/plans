@@ -40,6 +40,8 @@ def get_session_data():
     session_data = {"event_date": "2019-01-12T10:23:08Z",
                     "end_date": "2019-01-12T10:43:08Z",
                     "session_type": 6,
+                    "apple_health_kit_id": "5324-AB-54HH-34T",
+                    "apple_health_kit_source_name": "Garmin",
                     "sport_name": 52,
                     "duration": 90.5,
                     "calories": 50,
@@ -262,6 +264,25 @@ def test_session_from_survey_historic_health_data():
     assert session_obj == survey_processor.sessions[0]
     assert session_obj.duration_health is not None
     assert session_obj.post_session_survey is None
+
+
+def test_session_from_survey_hk_id_and_source():
+    current_time = datetime.datetime.now()
+    athlete_stats = AthleteStats('test')
+    athlete_stats.event_date = current_time
+    survey_processor = SurveyProcessing('test', current_time, athlete_stats)
+    survey_processor.user_age = 25
+    session_data = get_session_data()
+    session_obj = survey_processor.create_session_from_survey(session_data, historic_health_data=True)
+
+    assert session_obj.sport_name.value == 52
+    assert len(survey_processor.sessions) == 1
+    assert len(survey_processor.heart_rate_data) == 1
+    assert len(survey_processor.soreness) == 0
+    assert survey_processor.athlete_stats.session_RPE is None
+    assert session_obj == survey_processor.sessions[0]
+    assert session_obj.apple_health_kit_id == "5324-AB-54HH-34T"
+    assert session_obj.apple_health_kit_source_name == "Garmin"
 
 
 def test_patch_daily_and_historic_soreness_no_existing_doms():
