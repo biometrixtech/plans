@@ -161,7 +161,7 @@ class BiomechanicsAPTChart(Serialisable):
 
         filtered_list = sorted(filtered_list, key=lambda x:x.event_date, reverse=True)
 
-        filtered_list = filtered_list[:7]
+        # filtered_list = filtered_list[:7]
 
         filtered_list = sorted(filtered_list, key=lambda x:x.event_date, reverse=False)
 
@@ -170,6 +170,7 @@ class BiomechanicsAPTChart(Serialisable):
             chart_data.add_session_data(f)
             if chart_data.asymmetry is not None:
                 self.sessions.append(chart_data)
+        self.sessions = self.sessions[:7]
 
     def json_serialise(self):
         ret = {
@@ -194,7 +195,7 @@ class BiomechanicsAnklePitchChart(Serialisable):
 
         filtered_list = sorted(filtered_list, key=lambda x:x.event_date, reverse=True)
 
-        filtered_list = filtered_list[:7]
+        # filtered_list = filtered_list[:7]
 
         filtered_list = sorted(filtered_list, key=lambda x:x.event_date, reverse=False)
 
@@ -203,6 +204,7 @@ class BiomechanicsAnklePitchChart(Serialisable):
             chart_data.add_session_data(f)
             if chart_data.asymmetry is not None:
                 self.sessions.append(chart_data)
+        self.sessions = self.sessions[:7]
 
     def json_serialise(self):
         ret = {
