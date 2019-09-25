@@ -45,10 +45,16 @@ def format_datetime(datetime_input):
 
 
 def parse_datetime(datetime_string):
-    try:
-        return datetime.datetime.strptime(datetime_string, "%Y-%m-%dT%H:%M:%SZ")
-    except ValueError:
-        raise InvalidSchemaException('date_time must be in ISO8601 format')
+    format_strings = [
+        "%Y-%m-%dT%H:%M:%SZ",
+        "%Y-%m-%dT%H:%M:%S.%fZ"
+    ]
+    for format_string in format_strings:
+        try:
+            return datetime.datetime.strptime(datetime_string, format_string)
+        except ValueError:
+            continue
+    raise InvalidSchemaException('date_time must be in ISO8601 format')
 
 
 def parse_date(date_string):

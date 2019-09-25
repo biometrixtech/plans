@@ -16,6 +16,8 @@ from logic.heart_rate_processing import HeartRateProcessing
 from logic.metrics_processing import MetricsProcessing
 from datastores.datastore_collection import DatastoreCollection
 from utils import parse_datetime, format_datetime, fix_early_survey_event_date, format_date
+from copy import deepcopy
+from datetime import datetime
 
 
 class SurveyProcessing(object):
@@ -34,6 +36,15 @@ class SurveyProcessing(object):
         self.datastore_collection = datastore_collection
 
     def create_session_from_survey(self, session, historic_health_data=False):
+        session_obj = self.convert_session(session, historic_health_data)
+        self.sessions.append(session_obj)
+        if historic_health_data:
+            return session_obj
+
+    def convert_session(self, session, historic_health_data=False):
+        existing_session_id = session.get('id', None)
+        apple_health_kit_id = session.get('apple_health_kit_id', None)
+        apple_health_kit_source_name = session.get('apple_health_kit_source_name', None)
         event_date = parse_datetime(session['event_date'])
         end_date = session.get('end_date', None)
         if end_date is not None:
@@ -62,10 +73,13 @@ class SurveyProcessing(object):
         source = session.get("source", None)
         deleted = session.get("deleted", False)
         ignored = session.get("ignored", False)
-        if end_date is not None:
-            duration_health = round((end_date - event_date).seconds / 60, 2)
-        else:
-            duration_health = None
+        apple_health_kit_ids = session.get("merged_apple_health_kit_ids", [])
+        apple_health_kit_source_names = session.get("merged_apple_health_kit_source_names", [])
+
+        duration_health = None
+        if source == 1:
+            if end_date is not None:
+                duration_health = round((end_date - event_date).seconds / 60, 2)
         session_data = {"sport_name": sport_name,
                         "strength_and_conditioning_type": strength_and_conditioning_type,
                         "description": description,
@@ -78,7 +92,11 @@ class SurveyProcessing(object):
                         "distance": distance,
                         "source": source,
                         "deleted": deleted,
-                        "ignored": ignored}
+                        "ignored": ignored,
+                        "merged_apple_health_kit_ids": apple_health_kit_ids,
+                        "merged_apple_health_kit_source_names": apple_health_kit_source_names,
+                        "apple_health_kit_id": apple_health_kit_id,
+                        "apple_health_kit_source_name": apple_health_kit_source_name}
         if 'post_session_survey' in session:
             survey = PostSurvey(event_date=session['post_session_survey']['event_date'],
                                 survey=session['post_session_survey'])
@@ -104,15 +122,56 @@ class SurveyProcessing(object):
                         self.athlete_stats.session_RPE = survey.RPE
                         self.athlete_stats.session_RPE_event_date = self.event_date
         session_obj = create_session(session_type, session_data)
+        if existing_session_id is not None:
+            session_obj.id = existing_session_id  # this is a merge case
         if 'hr_data' in session and len(session['hr_data']) > 0:
             heart_rate_processing = HeartRateProcessing(self.user_age)
             self.create_session_hr_data(session_obj, session['hr_data'])
             session_obj.shrz = heart_rate_processing.get_shrz(self.heart_rate_data[0].hr_workout)
         if session_obj.post_session_survey is not None:
             self.soreness.extend(session_obj.post_session_survey.soreness)
-        self.sessions.append(session_obj)
-        if historic_health_data:
-            return session_obj
+        return session_obj
+
+    def get_max_number(self, value_a, value_b):
+
+        if value_a is not None and value_b is not None:
+            return max(value_a, value_b)
+        elif value_a is None:
+            return value_b
+        elif value_b is None:
+            return value_a
+        else:
+            return None
+
+    def merge_surveys(self, source_survey, destination_survey):
+
+        destination_survey.RPE = self.get_max_number(source_survey.RPE, destination_survey.RPE)
+        if len(source_survey.soreness) >= 0 and len(destination_survey.soreness) == 0:
+            destination_survey.soreness = source_survey.soreness
+        else:
+            new_soreness = [d for d in destination_survey.soreness if d not in source_survey.soreness]
+            for s in source_survey.soreness:
+                index = next((i for i, x in enumerate(destination_survey.soreness) if s.body_part.location == x.body_part.location and s.side == x.side), -1)
+                if index > -1:
+                    merged_soreness = deepcopy(destination_survey.soreness[index])
+                    merged_soreness.pain = max(s.pain, destination_survey.soreness[index].pain)
+                    merged_soreness.severity = max(s.severity, destination_survey.soreness[index].severity)
+                    merged_soreness.movement = max(s.movement, destination_survey.soreness[index].movement)
+                else:
+                    new_soreness.append(s)
+
+            destination_survey.soreness = new_soreness
+
+        return destination_survey
+
+    def merge_post_session_surveys(self, source_survey, destination_survey):
+
+        destination_survey.event_date_time = min(source_survey.event_date_time, destination_survey.event_date_time)
+        destination_survey.event_date = destination_survey.event_date_time.strftime("%Y-%m-%d")
+        destination_survey.session_id = source_survey.session_id
+        destination_survey.survey = self.merge_surveys(source_survey.survey, destination_survey.survey)
+
+        return destination_survey
 
     def patch_daily_and_historic_soreness(self, survey='readiness'):
 
@@ -357,3 +416,31 @@ def cleanup_plan(plan, visualizations=True):
     del plan['daily_readiness_survey'], plan['user_id']
 
     return plan
+
+
+def add_hk_data_to_sessions(training_sessions, new_sessions):
+    for session in new_sessions:
+        session_found = False
+        for s in training_sessions:
+            if session.id == s.id:  # session already exists
+                if len(session.apple_health_kit_ids) > 0:
+
+                    if s.source != SessionSource.three_sensor:
+                        s.event_date = session.event_date
+                        s.end_date = session.end_date
+
+                    s.apple_health_kit_ids = session.apple_health_kit_ids
+                    s.sport_name = session.sport_name  # HK always wins at this point
+                    s.duration_health = session.duration_health
+                    s.calories = session.calories
+                    s.distance = session.distance
+                    s.apple_health_kit_source_names = session.apple_health_kit_source_names
+                    # HR data saved below
+
+                if s.post_session_survey is None and session.post_session_survey is not None:
+                    s.post_session_survey = session.post_session_survey
+
+                session_found = True
+
+        if not session_found:
+            training_sessions.append(session)

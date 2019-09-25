@@ -160,7 +160,7 @@ Numeric ID,Display Name,Exercise,PHASE,Muscle Group / Joint,Inhibit,Lengthen,Act
 159,Field Bounds,Field Bounds,,,,,,,,1,1,3,3,N,0,,,count,0,,30,,,Beginner,None,x,,,,x
 160,Plant & Cuts,Plant & Cuts,,,,,,,,1,1,3,3,N,0,,,count,0,,30,,,Beginner,None,x,,,,x
 161,Leg Swings,Leg Swings,,,,d,,,,1,1,10,15,Y,0,,,count,0,,3,,,Beginner,None,x,x,,,
-162,Running Arm Cricles,Running Arm Cricles,,,,d,,d,,1,1,10,15,N,0,,,yards,0,30,,,,Beginner,None,x,x,,,
+162,Running Arm Circles,Running Arm Circles,,,,d,,d,,1,1,10,15,N,0,,,yards,0,30,,,,Beginner,None,x,x,,,
 163,Low Lateral Squat,Low Lateral Squat,,,,d,,,,1,1,10,15,N,0,,,count,0,,3,,,Beginner,None,x,x,,,
 164,Lunge with Rotation,Lunge with Rotation,,,,d,,,,1,1,10,15,N,0,,,yards,0,60,,,,Beginner,None,x,x,,,
 165,Reverse Lunge with Reach,Reverse Lunge with Reach,,,,d,,,,1,1,10,15,N,0,,,yards,0,60,,,,Beginner,None,x,x,,,
