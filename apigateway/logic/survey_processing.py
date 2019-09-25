@@ -76,11 +76,10 @@ class SurveyProcessing(object):
         apple_health_kit_ids = session.get("merged_apple_health_kit_ids", [])
         apple_health_kit_source_names = session.get("merged_apple_health_kit_source_names", [])
 
+        duration_health = None
         if source == 1:
             if end_date is not None:
                 duration_health = round((end_date - event_date).seconds / 60, 2)
-            else:
-                duration_health = None
         session_data = {"sport_name": sport_name,
                         "strength_and_conditioning_type": strength_and_conditioning_type,
                         "description": description,
