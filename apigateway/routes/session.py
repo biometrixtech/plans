@@ -85,30 +85,31 @@ def handle_session_create(user_id=None):
 
     # add sessions to plan and write to mongo
     plan.train_later = train_later
+    plan.training_sessions.extend(survey_processor.sessions)
 
-    apple_ids_to_merge = None
-    session_ids_to_merge = None
-    destination_session_id = None
-    destination_session = None
+    # apple_ids_to_merge = None
+    # session_ids_to_merge = None
+    # destination_session_id = None
+    # destination_session = None
 
-    if "apple_ids_to_merge" in request.json:
-        apple_ids_to_merge = request.json["apple_ids_to_merge"]
+    # if "apple_ids_to_merge" in request.json:
+    #     apple_ids_to_merge = request.json["apple_ids_to_merge"]
 
-    if "session_ids_to_merge" in request.json:
-        session_ids_to_merge = request.json["session_ids_to_merge"]
+    # if "session_ids_to_merge" in request.json:
+    #     session_ids_to_merge = request.json["session_ids_to_merge"]
 
-    if "destination_session_id" in request.json:
-        destination_session_id = request.json["destination_session_id"]
+    # if "destination_session_id" in request.json:
+    #     destination_session_id = request.json["destination_session_id"]
 
-    if "destination_session" in request.json:
-        destination_session = request.json["destination_session"]
+    # if "destination_session" in request.json:
+    #     destination_session = request.json["destination_session"]
 
-    plan.training_sessions = merge_sessions(apple_ids_to_merge,
-                                            session_ids_to_merge,
-                                            destination_session_id,
-                                            destination_session,
-                                            survey_processor.sessions,
-                                            plan.training_sessions)
+    # plan.training_sessions = merge_sessions(apple_ids_to_merge,
+    #                                         session_ids_to_merge,
+    #                                         destination_session_id,
+    #                                         destination_session,
+    #                                         survey_processor.sessions,
+    #                                         plan.training_sessions)
 
     daily_plan_datastore.put(plan)
 

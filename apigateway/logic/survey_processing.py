@@ -103,8 +103,7 @@ class SurveyProcessing(object):
             # if survey.event_date.hour < 3 and event_date.hour >= 3:
             #     session_data['event_date'] = format_datetime(event_date - datetime.timedelta(days=1))
             survey.event_date = fix_early_survey_event_date(survey.event_date)
-            if "clear_candidates" in session['post_session_survey'] and len(
-                    session['post_session_survey']['clear_candidates']) > 0:
+            if "clear_candidates" in session['post_session_survey'] and len(session['post_session_survey']['clear_candidates']) > 0:
                 self.process_clear_status_answers(session['post_session_survey']['clear_candidates'],
                                                   event_date,
                                                   survey.soreness)
