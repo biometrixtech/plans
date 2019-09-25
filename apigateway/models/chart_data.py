@@ -526,7 +526,7 @@ class WorkoutChart(BaseChart, Serialisable):
             summary = WorkoutSummary()
             summary.sport_name = training_session.sport_name
             summary.source = training_session.source
-            if summary.source == SessionSource.user:
+            if summary.source == SessionSource.user or summary.source ==SessionSource.three_sensor:
                 summary.duration = training_session.duration_minutes
             else:
                 summary.duration = training_session.duration_health
