@@ -8,11 +8,11 @@ class PredictiveDatastore(object):
     def __init__(self, mongo_collection='athletestats'):
         self.mongo_collection = mongo_collection
 
-    @xray_recorder.capture('datastore.AthleteStatsDatastore.get')
+    @xray_recorder.capture('datastore.PredictiveDatastore.get')
     def get(self):
         return self._query_mongodb()
 
-    @xray_recorder.capture('datastore.AthleteStatsDatastore._query_mongodb')
+    @xray_recorder.capture('datastore.PredictiveDatastore._query_mongodb')
     def _query_mongodb(self):
         mongo_collection = get_mongo_collection(self.mongo_collection)
 
