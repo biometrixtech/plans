@@ -75,10 +75,11 @@ class SurveyProcessing(object):
         ignored = session.get("ignored", False)
         apple_health_kit_ids = session.get("merged_apple_health_kit_ids", [])
         apple_health_kit_source_names = session.get("merged_apple_health_kit_source_names", [])
-        if end_date is not None:
-            duration_health = round((end_date - event_date).seconds / 60, 2)
-        else:
-            duration_health = None
+
+        duration_health = None
+        if source == 1:
+            if end_date is not None:
+                duration_health = round((end_date - event_date).seconds / 60, 2)
         session_data = {"sport_name": sport_name,
                         "strength_and_conditioning_type": strength_and_conditioning_type,
                         "description": description,
@@ -103,8 +104,7 @@ class SurveyProcessing(object):
             # if survey.event_date.hour < 3 and event_date.hour >= 3:
             #     session_data['event_date'] = format_datetime(event_date - datetime.timedelta(days=1))
             survey.event_date = fix_early_survey_event_date(survey.event_date)
-            if "clear_candidates" in session['post_session_survey'] and len(
-                    session['post_session_survey']['clear_candidates']) > 0:
+            if "clear_candidates" in session['post_session_survey'] and len(session['post_session_survey']['clear_candidates']) > 0:
                 self.process_clear_status_answers(session['post_session_survey']['clear_candidates'],
                                                   event_date,
                                                   survey.soreness)

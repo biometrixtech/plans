@@ -85,30 +85,31 @@ def handle_session_create(user_id=None):
 
     # add sessions to plan and write to mongo
     plan.train_later = train_later
+    plan.training_sessions.extend(survey_processor.sessions)
 
-    apple_ids_to_merge = None
-    session_ids_to_merge = None
-    destination_session_id = None
-    destination_session = None
+    # apple_ids_to_merge = None
+    # session_ids_to_merge = None
+    # destination_session_id = None
+    # destination_session = None
 
-    if "apple_ids_to_merge" in request.json:
-        apple_ids_to_merge = request.json["apple_ids_to_merge"]
+    # if "apple_ids_to_merge" in request.json:
+    #     apple_ids_to_merge = request.json["apple_ids_to_merge"]
 
-    if "session_ids_to_merge" in request.json:
-        session_ids_to_merge = request.json["session_ids_to_merge"]
+    # if "session_ids_to_merge" in request.json:
+    #     session_ids_to_merge = request.json["session_ids_to_merge"]
 
-    if "destination_session_id" in request.json:
-        destination_session_id = request.json["destination_session_id"]
+    # if "destination_session_id" in request.json:
+    #     destination_session_id = request.json["destination_session_id"]
 
-    if "destination_session" in request.json:
-        destination_session = request.json["destination_session"]
+    # if "destination_session" in request.json:
+    #     destination_session = request.json["destination_session"]
 
-    plan.training_sessions = merge_sessions(apple_ids_to_merge,
-                                            session_ids_to_merge,
-                                            destination_session_id,
-                                            destination_session,
-                                            survey_processor.sessions,
-                                            plan.training_sessions)
+    # plan.training_sessions = merge_sessions(apple_ids_to_merge,
+    #                                         session_ids_to_merge,
+    #                                         destination_session_id,
+    #                                         destination_session,
+    #                                         survey_processor.sessions,
+    #                                         plan.training_sessions)
 
     daily_plan_datastore.put(plan)
 
@@ -317,14 +318,15 @@ def handle_session_three_sensor_data(user_id):
     session_id = request.json['session_id']
     asymmetry = request.json.get('asymmetry', {})
     duration = request.json.get('seconds_duration', 0)
-
+    duration_minutes = round(duration / 60, 2)
     session_obj = create_session(6, {'description': 'three_sensor_data',
                                      'event_date': event_date,
                                      'end_date': end_date,
                                      'completed_date_time': end_date,
                                      'sport_name': 17,
                                      'source': 3,
-                                     'duration_sensor': duration})
+                                     'duration_sensor': duration,
+                                     'duration_minutes': duration_minutes})
     # update other fields
     session_obj.id = session_id
     session_obj.asymmetry = Asymmetry.json_deserialise(asymmetry)
@@ -340,6 +342,7 @@ def handle_session_three_sensor_data(user_id):
             plan.training_sessions[s].sport_name = 17
             plan.training_sessions[s].source = 3
             plan.training_sessions[s].duration_sensor = duration
+            plan.training_sessions[s].duration_minutes = duration_minutes
             plan.training_sessions[s].asymmetry = session_obj.asymmetry
             found = True
             break
