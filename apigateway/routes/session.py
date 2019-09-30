@@ -343,6 +343,7 @@ def handle_session_three_sensor_data(user_id):
             plan.training_sessions[s].event_date = event_date
             plan.training_sessions[s].end_date = end_date
             plan.training_sessions[s].completed_date_time = end_date
+            plan.training_sessions[s].last_updated = updated_date
             plan.training_sessions[s].sport_name = 17
             plan.training_sessions[s].source = 3
             plan.training_sessions[s].duration_sensor = duration
