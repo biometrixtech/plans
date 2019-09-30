@@ -86,6 +86,7 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         self.completed_date_time = None
         self.event_date = None
         self.end_date = None
+        self.last_updated = None
         self.sensor_start_date_time = None
         self.sensor_end_date_time = None
         self.day_of_week = DayOfWeek.monday
@@ -115,7 +116,7 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         self.asymmetry = None
 
     def __setattr__(self, name, value):
-        if name in ['event_date', 'end_date', 'created_date', 'completed_date_time', 'sensor_start_date_time', 'sensor_end_date_time']:
+        if name in ['event_date', 'end_date', 'created_date', 'completed_date_time', 'sensor_start_date_time', 'sensor_end_date_time', 'last_updated']:
             if not isinstance(value, datetime.datetime) and value is not None:
                 value = parse_datetime(value)
         elif name == "sport_name" and not isinstance(value, SportName):
@@ -293,6 +294,7 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
             'completed_date_time': format_datetime(self.completed_date_time),
             'event_date': format_datetime(self.event_date),
             'end_date': format_datetime(self.end_date),
+            'last_updated': format_datetime(self.last_updated),
             'duration_minutes': self.duration_minutes,
             'data_transferred': self.data_transferred,
             'duration_sensor': self.duration_sensor,
@@ -335,6 +337,7 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
                             "completed_date_time",
                             "event_date",
                             "end_date",
+                            "last_updated",
                             "duration_minutes",
                             "data_transferred",
                             "duration_sensor",
