@@ -1,6 +1,7 @@
 from flask import request, Blueprint
 import os
 import copy
+import datetime
 
 from datastores.datastore_collection import DatastoreCollection
 from fathomapi.api.config import Config
@@ -307,6 +308,8 @@ def handle_session_three_sensor_data(user_id):
     if end_date is not None:
         end_date = parse_datetime(end_date)
         end_date = get_local_time(end_date, timezone)
+
+    updated_date = get_local_time(datetime.datetime.now(), timezone)
     plan_event_day = format_date(event_date)
     # update last_sensor_syc date
     if not _check_plan_exists(user_id, plan_event_day):
@@ -323,6 +326,7 @@ def handle_session_three_sensor_data(user_id):
                                      'event_date': event_date,
                                      'end_date': end_date,
                                      'completed_date_time': end_date,
+                                     'last_updated': updated_date,
                                      'sport_name': 17,
                                      'source': 3,
                                      'duration_sensor': duration,
@@ -339,6 +343,7 @@ def handle_session_three_sensor_data(user_id):
             plan.training_sessions[s].event_date = event_date
             plan.training_sessions[s].end_date = end_date
             plan.training_sessions[s].completed_date_time = end_date
+            plan.training_sessions[s].last_updated = updated_date
             plan.training_sessions[s].sport_name = 17
             plan.training_sessions[s].source = 3
             plan.training_sessions[s].duration_sensor = duration
