@@ -163,7 +163,7 @@ class BiomechanicsAPTChart(Serialisable):
 
         # filtered_list = filtered_list[:7]
 
-        filtered_list = sorted(filtered_list, key=lambda x:x.event_date, reverse=False)
+        #filtered_list = sorted(filtered_list, key=lambda x:x.event_date, reverse=False)
 
         for f in filtered_list:
             chart_data = BiomechanicsAPTChartData()
@@ -197,7 +197,7 @@ class BiomechanicsAnklePitchChart(Serialisable):
 
         # filtered_list = filtered_list[:7]
 
-        filtered_list = sorted(filtered_list, key=lambda x:x.event_date, reverse=False)
+        #filtered_list = sorted(filtered_list, key=lambda x:x.event_date, reverse=False)
 
         for f in filtered_list:
             chart_data = BiomechanicsAnklePitchChartData()
