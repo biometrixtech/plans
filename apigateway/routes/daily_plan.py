@@ -55,12 +55,11 @@ def handle_daily_plan_get(user_id=None):
                 if not need_plan_update:
                     # check if plan update is required because three sensor session updated with data after last plan update
                     for session in plan.training_sessions:
-                        print(session.last_updated, plan.last_updated, session.last_updated > parse_datetime(plan.last_updated))
                         if session.asymmetry is not None and session.last_updated is not None and session.last_updated > parse_datetime(plan.last_updated):
                             need_plan_update = True
                             break
 
-        if plan.event_date == format_date(event_date) and need_plan_update:
+        if plan.event_date == format_date(event_date) and need_plan_update:  # if update required for any reason, create new plan
             plan = create_plan(user_id, event_date, update_stats=True, visualizations=visualizations)
         else:
             plan = cleanup_plan(plan, visualizations=visualizations)
