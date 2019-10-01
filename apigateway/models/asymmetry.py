@@ -37,6 +37,7 @@ class TimeBlockAsymmetry(Serialisable):
         self.time_block = time_block
         self.anterior_pelvic_tilt = None
         self.ankle_pitch = None
+        self.hip_drop = None
         # self.left = left
         # self.right = right
         # self.significant = significant
@@ -46,18 +47,24 @@ class TimeBlockAsymmetry(Serialisable):
             return self.anterior_pelvic_tilt.left
         elif self.ankle_pitch is not None:
             return self.ankle_pitch.left
+        elif self.hip_drop is not None:
+            return self.hip_drop.left
 
     def get_right(self):
         if self.anterior_pelvic_tilt is not None:
             return self.anterior_pelvic_tilt.right
         elif self.ankle_pitch is not None:
             return self.ankle_pitch.right
+        elif self.hip_drop is not None:
+            return self.hip_drop.right
 
     def get_significant(self):
         if self.anterior_pelvic_tilt is not None:
             return int(self.anterior_pelvic_tilt.significant)
         elif self.ankle_pitch is not None:
             return int(self.ankle_pitch.significant)
+        elif self.hip_drop is not None:
+            return int(self.hip_drop.significant)
 
     def json_serialise(self, api=False):
         if api:
@@ -71,7 +78,8 @@ class TimeBlockAsymmetry(Serialisable):
             ret = {
                 'time_block': self.time_block,
                 'apt': self.anterior_pelvic_tilt.json_serialise(),
-                'ankle_pitch': self.ankle_pitch.json_serialise()
+                'ankle_pitch': self.ankle_pitch.json_serialise(),
+                'hip_drop': self.hip_drop.json_serialise()
             }
 
         return ret
@@ -97,6 +105,10 @@ class TimeBlockAsymmetry(Serialisable):
         if ankle_pitch is not None:
             asymmetry.ankle_pitch = TimeBlockDetail(ankle_pitch.get('left', 0), ankle_pitch.get('right', 0),
                                                     ankle_pitch.get('significant', False))
+        hip_drop = input_dict.get('hip_drop')
+        if hip_drop is not None:
+            asymmetry.hip_drop = TimeBlockDetail(hip_drop.get('left', 0), hip_drop.get('right', 0),
+                                                 hip_drop.get('significant', False))
 
         return asymmetry
 
@@ -108,6 +120,7 @@ class SessionAsymmetry(Serialisable):
         self.time_blocks = []
         self.anterior_pelvic_tilt = None
         self.ankle_pitch = None
+        self.hip_drop = None
         # self.left_apt = 0
         # self.right_apt = 0
         # self.percent_events_asymmetric = 0
@@ -173,12 +186,42 @@ class SessionAsymmetry(Serialisable):
                         }
                     }
                 }
+            elif self.hip_drop is not None:
+                symmetric_minutes = round(
+                    minutes - ((self.hip_drop.percent_events_asymmetric / float(100)) * minutes))
+                ret = {
+                    'session_id': self.session_id,
+                    'seconds_duration': self.seconds_duration,
+                    'asymmetry': {
+                        'hip_drop': {
+                            'detail_legend': [
+                                {
+                                    'color': [10, 4],
+                                    'text': 'Symmetric',
+                                },
+                                {
+                                    'color': [8, 9],
+                                    'text': 'Asymmetric',
+                                },
+                            ],
+                            'detail_data': [t.json_serialise(api) for t in self.time_blocks],
+                            'detail_text': self.hip_drop.get_detail_text(symmetric_minutes, minutes) if self.hip_drop is not None else '',
+                            #'detail_text': "Your Leg Extension was symmetric for " + str(
+                            #    symmetric_minutes) + " min of your " + str(minutes) + " min workout.",
+                            'detail_bold_text': [b.json_serialise() for b in
+                                                 self.hip_drop.get_detail_bold_text(symmetric_minutes) if
+                                                 self.hip_drop is not None],
+                            'detail_bold_side': self.hip_drop.get_detail_bold_side() if self.hip_drop is not None else ''
+                        }
+                    }
+                }
         else:
             ret = {
                 'session_id': self.session_id,
                 'event_date': format_datetime(self.event_date),
                 'ankle_pitch': self.ankle_pitch.json_serialise() if self.ankle_pitch is not None else None,
                 'apt': self.anterior_pelvic_tilt.json_serialise() if self.anterior_pelvic_tilt is not None else None,
+                'hip_drop': self.hip_drop.json_serialise() if self.hip_drop is not None else None,
                 'time_blocks': [t.json_serialise() for t in self.time_blocks],
             }
         return ret
@@ -200,6 +243,8 @@ class SessionAsymmetry(Serialisable):
                 input_dict['apt']) if input_dict.get('apt') is not None else None
         session.ankle_pitch = AnklePitch.json_deserialise(
                 input_dict['ankle_pitch']) if input_dict.get('ankle_pitch') is not None else None
+        session.hip_drop = HipDrop.json_deserialise(
+                input_dict['hip_drop']) if input_dict.get('hip_drop') is not None else None
         session.time_blocks = [TimeBlockAsymmetry.json_deserialise(tb) for tb in input_dict.get('time_blocks', [])]
         session.seconds_duration = input_dict.get('seconds_duration', 0)
 
@@ -235,6 +280,7 @@ class Asymmetry(object):
     def __init__(self):
         self.anterior_pelvic_tilt = None
         self.ankle_pitch = None
+        self.hip_drop = None
         # self.left_apt = left_apt
         # self.right_apt = right_apt
         # self.symmetric_events = 0
@@ -243,7 +289,8 @@ class Asymmetry(object):
     def json_serialise(self):
         ret = {
             "apt": self.anterior_pelvic_tilt.json_serialise() if self.anterior_pelvic_tilt is not None else None,
-            "ankle_pitch": self.ankle_pitch.json_serialise() if self.ankle_pitch is not None else None
+            "ankle_pitch": self.ankle_pitch.json_serialise() if self.ankle_pitch is not None else None,
+            "hip_drop": self.hip_drop.json_serialise() if self.hip_drop is not None else None,
         }
         return ret
 
@@ -261,6 +308,75 @@ class Asymmetry(object):
         else:
             asymmetry.anterior_pelvic_tilt = AnteriorPelvicTilt.json_deserialise(input_dict['apt']) if input_dict.get('apt') is not None else None
         asymmetry.ankle_pitch = AnklePitch.json_deserialise(input_dict['ankle_pitch']) if input_dict.get('ankle_pitch') is not None else None
+        asymmetry.hip_drop = HipDrop.json_deserialise(input_dict['hip_drop']) if input_dict.get(
+            'hip_drop') is not None else None
+        return asymmetry
+
+
+class HipDrop(object):
+    def __init__(self, left, right):
+        self.left = left
+        self.right = right
+        self.symmetric_events = 0
+        self.asymmetric_events = 0
+        self.percent_events_asymmetric = 0
+
+    def json_serialise(self):
+        ret = {
+            "left": self.left,
+            "right": self.right,
+            "asymmetric_events": self.asymmetric_events,
+            "symmetric_events": self.symmetric_events,
+            "percent_events_asymmetric": self.percent_events_asymmetric
+        }
+        return ret
+
+    def get_detail_text(self, symmetric_minutes, total_minutes):
+
+        if self.percent_events_asymmetric > 0:
+
+            if symmetric_minutes == 0:
+                return "Your Hip Drop was asymmetric throughout your whole session."
+            else:
+                return "Your Hip Drop was symmetric for " + str(
+                    symmetric_minutes) + " min of your " + str(total_minutes) + " min workout."
+
+        else:
+
+            return "No meaningful Hip Drop asymmetry found in this workout."
+
+    def get_detail_bold_text(self, minutes):
+
+        #if self.percent_events_asymmetric > 0:
+        if minutes > 0:
+
+            #percentage = self.percent_events_asymmetric
+            bold_text = BoldText()
+            bold_text.text = str(minutes) + " min"
+            return [bold_text]
+
+        else:
+            return []
+
+    def get_detail_bold_side(self):
+
+        if self.left > self.right > 0:
+
+            return "1"
+
+        elif self.right > self.left > 0:
+
+            return "2"
+
+        else:
+            return "0"
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        asymmetry = cls(input_dict.get('left', 0), input_dict.get('right', 0))
+        asymmetry.asymmetric_events = input_dict.get("asymmetric_events", 0)
+        asymmetry.symmetric_events = input_dict.get("symmetric_events", 0)
+        asymmetry.percent_events_asymmetric = input_dict.get("percent_events_asymmetric", 0)
         return asymmetry
 
 
