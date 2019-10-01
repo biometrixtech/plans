@@ -167,7 +167,7 @@ class BiomechanicsAPTChart(Serialisable):
             if chart_data.asymmetry is not None:
                 self.sessions.append(chart_data)
         self.sessions = self.sessions[:7]
-        self.sessions = sorted(self.sessions, key=lambda x:x.event_date, reverse=False)
+        self.sessions = sorted(self.sessions, key=lambda x:x.event_date_time, reverse=False)
 
     def json_serialise(self):
         ret = {
@@ -198,7 +198,7 @@ class BiomechanicsAnklePitchChart(Serialisable):
             if chart_data.asymmetry is not None:
                 self.sessions.append(chart_data)
         self.sessions = self.sessions[:7]
-        self.sessions = sorted(self.sessions, key=lambda x:x.event_date, reverse=False)
+        self.sessions = sorted(self.sessions, key=lambda x:x.event_date_time, reverse=False)
 
     def json_serialise(self):
         ret = {
