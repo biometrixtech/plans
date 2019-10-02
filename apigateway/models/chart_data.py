@@ -476,10 +476,10 @@ class BiomechanicsHipDropChartData(Serialisable):
 
         if session.asymmetry is not None and session.asymmetry.hip_drop is not None:
             if session.asymmetry.hip_drop.left > 0 or session.asymmetry.hip_drop.right > 0:
-                viz = VisualizedLeftRightAsymmetry(0, 0, session.asymmetry.hip_drop.left * 2,
-                                                   session.asymmetry.hip_drop.right * 2)
+                viz = VisualizedLeftRightAsymmetry(0, 0, session.asymmetry.hip_drop.left * 1.5,
+                                                   session.asymmetry.hip_drop.right * 1.5)
             else:
-                viz = VisualizedLeftRightAsymmetry(0, 0, 100, 100)
+                viz = VisualizedLeftRightAsymmetry(0, 0, 6,  6) # fake symmetry for front end
 
             summary_data = AsymmetrySummaryData()
             summary_data.summary_data = viz
