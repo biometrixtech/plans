@@ -134,6 +134,8 @@ class SessionAsymmetry(Serialisable):
             minutes = round(self.seconds_duration / 60)
             if self.anterior_pelvic_tilt is not None:
                 asymmetric_minutes = round((self.anterior_pelvic_tilt.percent_events_asymmetric / float(100)) * minutes)
+                if self.anterior_pelvic_tilt.percent_events_asymmetric > 0:
+                    asymmetric_minutes = max(1, asymmetric_minutes)
                 ret = {
                     'session_id': self.session_id,
                     'seconds_duration': self.seconds_duration,
@@ -159,6 +161,8 @@ class SessionAsymmetry(Serialisable):
                 }
             elif self.ankle_pitch is not None:
                 asymmetric_minutes = round((self.ankle_pitch.percent_events_asymmetric / float(100)) * minutes)
+                if self.ankle_pitch.percent_events_asymmetric > 0:
+                    asymmetric_minutes = max(1, asymmetric_minutes)
                 ret = {
                     'session_id': self.session_id,
                     'seconds_duration': self.seconds_duration,
@@ -187,6 +191,8 @@ class SessionAsymmetry(Serialisable):
                 }
             elif self.hip_drop is not None:
                 asymmetric_minutes = round((self.hip_drop.percent_events_asymmetric / float(100)) * minutes)
+                if self.hip_drop.percent_events_asymmetric > 0:
+                    asymmetric_minutes = max(1, asymmetric_minutes)
                 ret = {
                     'session_id': self.session_id,
                     'seconds_duration': self.seconds_duration,
