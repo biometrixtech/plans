@@ -278,11 +278,13 @@ class BiomechanicsAPTChartData(Serialisable):
 
         if session.asymmetry is not None and session.asymmetry.anterior_pelvic_tilt is not None:
             #viz = proc.get_visualized_left_right_asymmetry(session.asymmetry.anterior_pelvic_tilt.left, session.asymmetry.anterior_pelvic_tilt.right)
-            if session.asymmetry.anterior_pelvic_tilt.left > 0 or session.asymmetry.anterior_pelvic_tilt.right > 0:
+            #if session.asymmetry.anterior_pelvic_tilt.left > 0 or session.asymmetry.anterior_pelvic_tilt.right > 0:
+            if session.asymmetry.anterior_pelvic_tilt.percent_events_asymmetric > 0:
                 viz = VisualizedLeftRightAsymmetry(0, 0, session.asymmetry.anterior_pelvic_tilt.left,
                                                    session.asymmetry.anterior_pelvic_tilt.right, 15.0)
             else:
-                viz = VisualizedLeftRightAsymmetry(0, 0, 10, 10, 1.5)
+                average_symmetry = round((session.asymmetry.anterior_pelvic_tilt.left + session.asymmetry.anterior_pelvic_tilt.right)/float(2), 0)
+                viz = VisualizedLeftRightAsymmetry(0, 0, average_symmetry, average_symmetry, 15.0)
 
             summary_data = AsymmetrySummaryData()
             summary_data.summary_data = viz
@@ -290,44 +292,46 @@ class BiomechanicsAPTChartData(Serialisable):
             asymmetry_data = AsymmetryAPTData()
 
             body_side = 0
-            if session.asymmetry.anterior_pelvic_tilt.left > session.asymmetry.anterior_pelvic_tilt.right:
-                body_side = 1
+            if session.asymmetry.anterior_pelvic_tilt.percent_events_asymmetric > 0:
+                if session.asymmetry.anterior_pelvic_tilt.left > session.asymmetry.anterior_pelvic_tilt.right:
+                    body_side = 1
 
-                percentage = round((1 - ((session.asymmetry.anterior_pelvic_tilt.left - session.asymmetry.anterior_pelvic_tilt.right) / session.asymmetry.anterior_pelvic_tilt.left)) * 100)
-                summary_data.summary_percentage = str(percentage)
-                summary_data.summary_side = "1"
-                summary_data.summary_text = "Symmetry in Left & Right Pelvic Tilt ROM"
-                summary_data.summary_take_away_text = str(percentage) + "% Pelvic Tilt Symmetry in this workout."
-                # bold_text_1 = BoldText()
-                # bold_text_1.text = str(percentage) + "%"
-                bold_text_2 = BoldText()
-                bold_text_2.text = "left"
-                # summary_data.summary_bold_text.append(bold_text_1)
-                summary_data.summary_bold_text.append(bold_text_2)
-                bold_text_3 = BoldText()
-                bold_text_3.text = str(percentage) + "% more"
-                #bold_text_3.color = "successLight"
-                summary_data.summary_take_away_bold_text.append(bold_text_3)
+                    percentage = round((1 - ((session.asymmetry.anterior_pelvic_tilt.left - session.asymmetry.anterior_pelvic_tilt.right) / session.asymmetry.anterior_pelvic_tilt.left)) * 100)
+                    summary_data.summary_percentage = str(percentage)
+                    summary_data.summary_side = "1"
+                    summary_data.summary_text = "Symmetry in Left & Right Pelvic Tilt ROM"
+                    summary_data.summary_take_away_text = str(percentage) + "% Pelvic Tilt Symmetry in this workout."
+                    # bold_text_1 = BoldText()
+                    # bold_text_1.text = str(percentage) + "%"
+                    bold_text_2 = BoldText()
+                    bold_text_2.text = "left"
+                    # summary_data.summary_bold_text.append(bold_text_1)
+                    summary_data.summary_bold_text.append(bold_text_2)
+                    bold_text_3 = BoldText()
+                    bold_text_3.text = str(percentage) + "% more"
+                    #bold_text_3.color = "successLight"
+                    summary_data.summary_take_away_bold_text.append(bold_text_3)
 
-            elif session.asymmetry.anterior_pelvic_tilt.right > session.asymmetry.anterior_pelvic_tilt.left:
-                body_side = 2
-                percentage = round((1 - ((session.asymmetry.anterior_pelvic_tilt.right - session.asymmetry.anterior_pelvic_tilt.left) / session.asymmetry.anterior_pelvic_tilt.right)) * 100)
-                summary_data.summary_percentage = str(percentage)
-                summary_data.summary_side = "2"
-                summary_data.summary_text = "Symmetry in Left & Right Pelvic Tilt ROM"
-                summary_data.summary_take_away_text = str(
-                    percentage) + "% Pelvic Tilt Symmetry in this workout."
-                # bold_text_1 = BoldText()
-                # bold_text_1.text = str(percentage) + "%"
-                bold_text_2 = BoldText()
-                bold_text_2.text = "right"
+                #elif session.asymmetry.anterior_pelvic_tilt.right > session.asymmetry.anterior_pelvic_tilt.left:
+                else:
+                    body_side = 2
+                    percentage = round((1 - ((session.asymmetry.anterior_pelvic_tilt.right - session.asymmetry.anterior_pelvic_tilt.left) / session.asymmetry.anterior_pelvic_tilt.right)) * 100)
+                    summary_data.summary_percentage = str(percentage)
+                    summary_data.summary_side = "2"
+                    summary_data.summary_text = "Symmetry in Left & Right Pelvic Tilt ROM"
+                    summary_data.summary_take_away_text = str(
+                        percentage) + "% Pelvic Tilt Symmetry in this workout."
+                    # bold_text_1 = BoldText()
+                    # bold_text_1.text = str(percentage) + "%"
+                    bold_text_2 = BoldText()
+                    bold_text_2.text = "right"
 
-                # summary_data.summary_bold_text.append(bold_text_1)
-                summary_data.summary_bold_text.append(bold_text_2)
-                bold_text_3 = BoldText()
-                bold_text_3.text = str(percentage) + "% more"
-                #bold_text_3.color = "successLight"
-                summary_data.summary_take_away_bold_text.append(bold_text_3)
+                    # summary_data.summary_bold_text.append(bold_text_1)
+                    summary_data.summary_bold_text.append(bold_text_2)
+                    bold_text_3 = BoldText()
+                    bold_text_3.text = str(percentage) + "% more"
+                    #bold_text_3.color = "successLight"
+                    summary_data.summary_take_away_bold_text.append(bold_text_3)
             else:
                 summary_data.summary_text = "Symmetric Left & Right Pelvic Tilt ROM"
                 summary_data.summary_take_away_text = "Your average range of motion was balanced between left and right steps across this workout."
@@ -380,11 +384,12 @@ class BiomechanicsAnklePitchChartData(Serialisable):
 
         if session.asymmetry is not None and session.asymmetry.ankle_pitch is not None:
             #viz = proc.get_visualized_left_right_asymmetry(session.asymmetry.ankle_pitch.left, session.asymmetry.ankle_pitch.right)
-            if session.asymmetry.ankle_pitch.left > 0 or session.asymmetry.ankle_pitch.right > 0:
+            if session.asymmetry.ankle_pitch.percent_events_asymmetric > 0:
                 viz = VisualizedLeftRightAsymmetry(0, 0, session.asymmetry.ankle_pitch.left,
                                                    session.asymmetry.ankle_pitch.right, 1.0)
             else:
-                viz = VisualizedLeftRightAsymmetry(0, 0, 100, 100, 1.0)
+                average_symmetry = round((session.asymmetry.ankle_pitch.left + session.asymmetry.ankle_pitch.right)/float(2), 0)
+                viz = VisualizedLeftRightAsymmetry(0, 0, average_symmetry, average_symmetry, 1.0)
 
             summary_data = AsymmetrySummaryData()
             summary_data.summary_data = viz
@@ -392,44 +397,46 @@ class BiomechanicsAnklePitchChartData(Serialisable):
             asymmetry_data = AsymmetryAnklePitchData()
 
             body_side = 0
-            if session.asymmetry.ankle_pitch.left > session.asymmetry.ankle_pitch.right:
-                body_side = 1
+            if session.asymmetry.ankle_pitch.percent_events_asymmetric > 0:
+                if session.asymmetry.ankle_pitch.left > session.asymmetry.ankle_pitch.right:
+                    body_side = 1
 
-                percentage = round((1 - ((session.asymmetry.ankle_pitch.left - session.asymmetry.ankle_pitch.right) / session.asymmetry.ankle_pitch.left)) * 100)
-                summary_data.summary_percentage = str(percentage)
-                summary_data.summary_side = "1"
-                summary_data.summary_text = "Symmetry in Left & Right Leg Extension ROM"
-                summary_data.summary_take_away_text = str(percentage) + "% Leg Extension Symmetry in this workout."
-                # bold_text_1 = BoldText()
-                # bold_text_1.text = str(percentage) + "%"
-                bold_text_2 = BoldText()
-                bold_text_2.text = "left"
-                # summary_data.summary_bold_text.append(bold_text_1)
-                summary_data.summary_bold_text.append(bold_text_2)
-                bold_text_3 = BoldText()
-                bold_text_3.text = str(percentage) + "% more"
-                #bold_text_3.color = "successLight"
-                summary_data.summary_take_away_bold_text.append(bold_text_3)
+                    percentage = round((1 - ((session.asymmetry.ankle_pitch.left - session.asymmetry.ankle_pitch.right) / session.asymmetry.ankle_pitch.left)) * 100)
+                    summary_data.summary_percentage = str(percentage)
+                    summary_data.summary_side = "1"
+                    summary_data.summary_text = "Symmetry in Left & Right Leg Extension ROM"
+                    summary_data.summary_take_away_text = str(percentage) + "% Leg Extension Symmetry in this workout."
+                    # bold_text_1 = BoldText()
+                    # bold_text_1.text = str(percentage) + "%"
+                    bold_text_2 = BoldText()
+                    bold_text_2.text = "left"
+                    # summary_data.summary_bold_text.append(bold_text_1)
+                    summary_data.summary_bold_text.append(bold_text_2)
+                    bold_text_3 = BoldText()
+                    bold_text_3.text = str(percentage) + "% more"
+                    #bold_text_3.color = "successLight"
+                    summary_data.summary_take_away_bold_text.append(bold_text_3)
 
-            elif session.asymmetry.ankle_pitch.right > session.asymmetry.ankle_pitch.left:
-                body_side = 2
-                percentage = round((1 - ((session.asymmetry.ankle_pitch.right - session.asymmetry.ankle_pitch.left) / session.asymmetry.ankle_pitch.right)) * 100)
-                summary_data.summary_percentage = str(percentage)
-                summary_data.summary_side = "2"
-                summary_data.summary_text = "Symmetry in Left & Right Leg Extension ROM"
-                summary_data.summary_take_away_text = str(
-                    percentage) + "% Leg Extension Symmetry in this workout."
-                # bold_text_1 = BoldText()
-                # bold_text_1.text = str(percentage) + "%"
-                bold_text_2 = BoldText()
-                bold_text_2.text = "right"
+                #elif session.asymmetry.ankle_pitch.right > session.asymmetry.ankle_pitch.left:
+                else:
+                    body_side = 2
+                    percentage = round((1 - ((session.asymmetry.ankle_pitch.right - session.asymmetry.ankle_pitch.left) / session.asymmetry.ankle_pitch.right)) * 100)
+                    summary_data.summary_percentage = str(percentage)
+                    summary_data.summary_side = "2"
+                    summary_data.summary_text = "Symmetry in Left & Right Leg Extension ROM"
+                    summary_data.summary_take_away_text = str(
+                        percentage) + "% Leg Extension Symmetry in this workout."
+                    # bold_text_1 = BoldText()
+                    # bold_text_1.text = str(percentage) + "%"
+                    bold_text_2 = BoldText()
+                    bold_text_2.text = "right"
 
-                # summary_data.summary_bold_text.append(bold_text_1)
-                summary_data.summary_bold_text.append(bold_text_2)
-                bold_text_3 = BoldText()
-                bold_text_3.text = str(percentage) + "% more"
-                #bold_text_3.color = "successLight"
-                summary_data.summary_take_away_bold_text.append(bold_text_3)
+                    # summary_data.summary_bold_text.append(bold_text_1)
+                    summary_data.summary_bold_text.append(bold_text_2)
+                    bold_text_3 = BoldText()
+                    bold_text_3.text = str(percentage) + "% more"
+                    #bold_text_3.color = "successLight"
+                    summary_data.summary_take_away_bold_text.append(bold_text_3)
             else:
                 summary_data.summary_text = "Symmetric Left & Right Leg Extension ROM"
                 summary_data.summary_take_away_text = "Your average leg extension was balanced between left and right steps across this workout."
@@ -481,11 +488,12 @@ class BiomechanicsHipDropChartData(Serialisable):
         proc = AsymmetryProcessor()
 
         if session.asymmetry is not None and session.asymmetry.hip_drop is not None:
-            if session.asymmetry.hip_drop.left > 0 or session.asymmetry.hip_drop.right > 0:
+            if session.asymmetry.hip_drop.percent_events_asymmetric > 0:
                 viz = VisualizedLeftRightAsymmetry(0, 0, session.asymmetry.hip_drop.left,
                                                    session.asymmetry.hip_drop.right, 1.0)
             else:
-                viz = VisualizedLeftRightAsymmetry(0, 0, 6,  6, 1.0) # fake symmetry for front end
+                average_symmetry = round((session.asymmetry.hip_drop.left + session.asymmetry.hip_drop.right)/float(2), 0)
+                viz = VisualizedLeftRightAsymmetry(0, 0, average_symmetry, average_symmetry, 1.0)
 
             summary_data = AsymmetrySummaryData()
             summary_data.summary_data = viz
@@ -493,44 +501,46 @@ class BiomechanicsHipDropChartData(Serialisable):
             asymmetry_data = AsymmetryHipDropData()
 
             body_side = 0
-            if session.asymmetry.hip_drop.left > session.asymmetry.hip_drop.right:
-                body_side = 1
+            if session.asymmetry.hip_drop.percent_events_asymmetric > 0:
+                if session.asymmetry.hip_drop.left > session.asymmetry.hip_drop.right:
+                    body_side = 1
 
-                percentage = round((1 - ((session.asymmetry.hip_drop.left - session.asymmetry.hip_drop.right) / session.asymmetry.hip_drop.left)) * 100)
-                summary_data.summary_percentage = str(percentage)
-                summary_data.summary_side = "1"
-                summary_data.summary_text = "Symmetry in Left & Right Hip Drop ROM"
-                summary_data.summary_take_away_text = str(percentage) + "% Hip Drop Symmetry in this workout."
-                # bold_text_1 = BoldText()
-                # bold_text_1.text = str(percentage) + "%"
-                bold_text_2 = BoldText()
-                bold_text_2.text = "left"
-                # summary_data.summary_bold_text.append(bold_text_1)
-                summary_data.summary_bold_text.append(bold_text_2)
-                bold_text_3 = BoldText()
-                bold_text_3.text = str(percentage) + "% more"
-                #bold_text_3.color = "successLight"
-                summary_data.summary_take_away_bold_text.append(bold_text_3)
+                    percentage = round((1 - ((session.asymmetry.hip_drop.left - session.asymmetry.hip_drop.right) / session.asymmetry.hip_drop.left)) * 100)
+                    summary_data.summary_percentage = str(percentage)
+                    summary_data.summary_side = "1"
+                    summary_data.summary_text = "Symmetry in Left & Right Hip Drop ROM"
+                    summary_data.summary_take_away_text = str(percentage) + "% Hip Drop Symmetry in this workout."
+                    # bold_text_1 = BoldText()
+                    # bold_text_1.text = str(percentage) + "%"
+                    bold_text_2 = BoldText()
+                    bold_text_2.text = "left"
+                    # summary_data.summary_bold_text.append(bold_text_1)
+                    summary_data.summary_bold_text.append(bold_text_2)
+                    bold_text_3 = BoldText()
+                    bold_text_3.text = str(percentage) + "% more"
+                    #bold_text_3.color = "successLight"
+                    summary_data.summary_take_away_bold_text.append(bold_text_3)
 
-            elif session.asymmetry.hip_drop.right > session.asymmetry.hip_drop.left:
-                body_side = 2
-                percentage = round((1 - ((session.asymmetry.hip_drop.right - session.asymmetry.hip_drop.left) / session.asymmetry.hip_drop.right)) * 100)
-                summary_data.summary_percentage = str(percentage)
-                summary_data.summary_side = "2"
-                summary_data.summary_text = "Symmetry in Left & Right Hip Drop ROM"
-                summary_data.summary_take_away_text = str(
-                    percentage) + "% Hip Drop Symmetry in this workout."
-                # bold_text_1 = BoldText()
-                # bold_text_1.text = str(percentage) + "%"
-                bold_text_2 = BoldText()
-                bold_text_2.text = "right"
+                #elif session.asymmetry.hip_drop.right > session.asymmetry.hip_drop.left:
+                else:
+                    body_side = 2
+                    percentage = round((1 - ((session.asymmetry.hip_drop.right - session.asymmetry.hip_drop.left) / session.asymmetry.hip_drop.right)) * 100)
+                    summary_data.summary_percentage = str(percentage)
+                    summary_data.summary_side = "2"
+                    summary_data.summary_text = "Symmetry in Left & Right Hip Drop ROM"
+                    summary_data.summary_take_away_text = str(
+                        percentage) + "% Hip Drop Symmetry in this workout."
+                    # bold_text_1 = BoldText()
+                    # bold_text_1.text = str(percentage) + "%"
+                    bold_text_2 = BoldText()
+                    bold_text_2.text = "right"
 
-                # summary_data.summary_bold_text.append(bold_text_1)
-                summary_data.summary_bold_text.append(bold_text_2)
-                bold_text_3 = BoldText()
-                bold_text_3.text = str(percentage) + "% more"
-                #bold_text_3.color = "successLight"
-                summary_data.summary_take_away_bold_text.append(bold_text_3)
+                    # summary_data.summary_bold_text.append(bold_text_1)
+                    summary_data.summary_bold_text.append(bold_text_2)
+                    bold_text_3 = BoldText()
+                    bold_text_3.text = str(percentage) + "% more"
+                    #bold_text_3.color = "successLight"
+                    summary_data.summary_take_away_bold_text.append(bold_text_3)
             else:
                 summary_data.summary_text = "Symmetric Left & Right Hip Drop ROM"
                 summary_data.summary_take_away_text = "Your average hip drop was balanced between left and right steps across this workout."
