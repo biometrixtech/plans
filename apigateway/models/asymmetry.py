@@ -336,7 +336,7 @@ class HipDrop(object):
 
         if self.percent_events_asymmetric > 0:
 
-            if asymmetric_minutes == 0:
+            if self.percent_events_asymmetric == 100:
                 return "Your Hip Drop was asymmetric throughout your whole workout."
             else:
                 return "Your Hip Drop was asymmetric for " + str(
@@ -403,7 +403,7 @@ class AnklePitch(object):
 
         if self.percent_events_asymmetric > 0:
 
-            if asymmetric_minutes == 0:
+            if self.percent_events_asymmetric == 100:
                 return "Your Leg Extension was asymmetric throughout your whole workout."
             else:
                 return "Your Leg Extension was asymmetric for " + str(
@@ -470,7 +470,7 @@ class AnteriorPelvicTilt(object):
 
         if self.percent_events_asymmetric > 0:
 
-            if asymmetric_minutes == 0:
+            if self.percent_events_asymmetric == 100:
                 return "Your Pelvic Tilt was asymmetric throughout your whole workout."
             else:
                 return "Your Pelvic Tilt was asymmetric for " + str(

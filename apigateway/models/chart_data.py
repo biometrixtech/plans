@@ -301,16 +301,16 @@ class BiomechanicsAPTChartData(Serialisable):
                     summary_data.summary_side = "1"
                     summary_data.summary_text = "Symmetry in Left & Right Pelvic Tilt ROM"
                     summary_data.summary_take_away_text = str(percentage) + "% Pelvic Tilt Symmetry in this workout."
-                    # bold_text_1 = BoldText()
-                    # bold_text_1.text = str(percentage) + "%"
-                    bold_text_2 = BoldText()
-                    bold_text_2.text = "left"
-                    # summary_data.summary_bold_text.append(bold_text_1)
-                    summary_data.summary_bold_text.append(bold_text_2)
-                    bold_text_3 = BoldText()
-                    bold_text_3.text = str(percentage) + "% more"
+                    bold_text_1 = BoldText()
+                    bold_text_1.text = str(percentage) + "%"
+                    #bold_text_2 = BoldText()
+                    #bold_text_2.text = ""
+                    summary_data.summary_bold_text.append(bold_text_1)
+                    #summary_data.summary_bold_text.append(bold_text_2)
+                    #bold_text_3 = BoldText()
+                    #bold_text_3.text = str(percentage) + "%"
                     #bold_text_3.color = "successLight"
-                    summary_data.summary_take_away_bold_text.append(bold_text_3)
+                    #summary_data.summary_take_away_bold_text.append(bold_text_3)
 
                 #elif session.asymmetry.anterior_pelvic_tilt.right > session.asymmetry.anterior_pelvic_tilt.left:
                 else:
@@ -321,24 +321,24 @@ class BiomechanicsAPTChartData(Serialisable):
                     summary_data.summary_text = "Symmetry in Left & Right Pelvic Tilt ROM"
                     summary_data.summary_take_away_text = str(
                         percentage) + "% Pelvic Tilt Symmetry in this workout."
-                    # bold_text_1 = BoldText()
-                    # bold_text_1.text = str(percentage) + "%"
-                    bold_text_2 = BoldText()
-                    bold_text_2.text = "right"
+                    bold_text_1 = BoldText()
+                    bold_text_1.text = str(percentage) + "%"
+                    #bold_text_2 = BoldText()
+                    #bold_text_2.text = ""
 
-                    # summary_data.summary_bold_text.append(bold_text_1)
-                    summary_data.summary_bold_text.append(bold_text_2)
-                    bold_text_3 = BoldText()
-                    bold_text_3.text = str(percentage) + "% more"
+                    summary_data.summary_bold_text.append(bold_text_1)
+                    #summary_data.summary_bold_text.append(bold_text_2)
+                    #bold_text_3 = BoldText()
+                    #bold_text_3.text = str(percentage) + "%"
                     #bold_text_3.color = "successLight"
-                    summary_data.summary_take_away_bold_text.append(bold_text_3)
+                    #summary_data.summary_take_away_bold_text.append(bold_text_3)
             else:
                 summary_data.summary_text = "Symmetric Left & Right Pelvic Tilt ROM"
                 summary_data.summary_take_away_text = "Your average range of motion was balanced between left and right steps across this workout."
                 summary_data.summary_side = "0"
-                bold_text_1 = BoldText()
-                bold_text_1.text = "balanced"
-                summary_data.summary_take_away_bold_text.append(bold_text_1)
+                #bold_text_1 = BoldText()
+                #bold_text_1.text = ""
+                #summary_data.summary_take_away_bold_text.append(bold_text_1)
 
             asymmetry_data.body_side = body_side
             asymmetry_data.apt = summary_data
@@ -406,16 +406,16 @@ class BiomechanicsAnklePitchChartData(Serialisable):
                     summary_data.summary_side = "1"
                     summary_data.summary_text = "Symmetry in Left & Right Leg Extension ROM"
                     summary_data.summary_take_away_text = str(percentage) + "% Leg Extension Symmetry in this workout."
-                    # bold_text_1 = BoldText()
-                    # bold_text_1.text = str(percentage) + "%"
-                    bold_text_2 = BoldText()
-                    bold_text_2.text = "left"
-                    # summary_data.summary_bold_text.append(bold_text_1)
-                    summary_data.summary_bold_text.append(bold_text_2)
-                    bold_text_3 = BoldText()
-                    bold_text_3.text = str(percentage) + "% more"
+                    bold_text_1 = BoldText()
+                    bold_text_1.text = str(percentage) + "%"
+                    #bold_text_2 = BoldText()
+                    #bold_text_2.text = ""
+                    summary_data.summary_bold_text.append(bold_text_1)
+                    #summary_data.summary_bold_text.append(bold_text_2)
+                    #bold_text_3 = BoldText()
+                    #bold_text_3.text = str(percentage) + "%"
                     #bold_text_3.color = "successLight"
-                    summary_data.summary_take_away_bold_text.append(bold_text_3)
+                    #summary_data.summary_take_away_bold_text.append(bold_text_3)
 
                 #elif session.asymmetry.ankle_pitch.right > session.asymmetry.ankle_pitch.left:
                 else:
@@ -426,24 +426,24 @@ class BiomechanicsAnklePitchChartData(Serialisable):
                     summary_data.summary_text = "Symmetry in Left & Right Leg Extension ROM"
                     summary_data.summary_take_away_text = str(
                         percentage) + "% Leg Extension Symmetry in this workout."
-                    # bold_text_1 = BoldText()
-                    # bold_text_1.text = str(percentage) + "%"
-                    bold_text_2 = BoldText()
-                    bold_text_2.text = "right"
+                    bold_text_1 = BoldText()
+                    bold_text_1.text = str(percentage) + "%"
+                    #bold_text_2 = BoldText()
+                    #bold_text_2.text = ""
 
-                    # summary_data.summary_bold_text.append(bold_text_1)
-                    summary_data.summary_bold_text.append(bold_text_2)
-                    bold_text_3 = BoldText()
-                    bold_text_3.text = str(percentage) + "% more"
+                    summary_data.summary_bold_text.append(bold_text_1)
+                    #summary_data.summary_bold_text.append(bold_text_2)
+                    #bold_text_3 = BoldText()
+                    #bold_text_3.text = str(percentage) + "%"
                     #bold_text_3.color = "successLight"
-                    summary_data.summary_take_away_bold_text.append(bold_text_3)
+                    #summary_data.summary_take_away_bold_text.append(bold_text_3)
             else:
                 summary_data.summary_text = "Symmetric Left & Right Leg Extension ROM"
                 summary_data.summary_take_away_text = "Your average leg extension was balanced between left and right steps across this workout."
                 summary_data.summary_side = "0"
-                bold_text_1 = BoldText()
-                bold_text_1.text = "balanced"
-                summary_data.summary_take_away_bold_text.append(bold_text_1)
+                #bold_text_1 = BoldText()
+                #bold_text_1.text = ""
+                #summary_data.summary_take_away_bold_text.append(bold_text_1)
 
             asymmetry_data.body_side = body_side
             asymmetry_data.ankle_pitch = summary_data
@@ -510,16 +510,16 @@ class BiomechanicsHipDropChartData(Serialisable):
                     summary_data.summary_side = "1"
                     summary_data.summary_text = "Symmetry in Left & Right Hip Drop ROM"
                     summary_data.summary_take_away_text = str(percentage) + "% Hip Drop Symmetry in this workout."
-                    # bold_text_1 = BoldText()
-                    # bold_text_1.text = str(percentage) + "%"
-                    bold_text_2 = BoldText()
-                    bold_text_2.text = "left"
-                    # summary_data.summary_bold_text.append(bold_text_1)
-                    summary_data.summary_bold_text.append(bold_text_2)
-                    bold_text_3 = BoldText()
-                    bold_text_3.text = str(percentage) + "% more"
+                    bold_text_1 = BoldText()
+                    bold_text_1.text = str(percentage) + "%"
+                    #bold_text_2 = BoldText()
+                    #bold_text_2.text = ""
+                    summary_data.summary_bold_text.append(bold_text_1)
+                    #summary_data.summary_bold_text.append(bold_text_2)
+                    #bold_text_3 = BoldText()
+                    #bold_text_3.text = str(percentage) + "%"
                     #bold_text_3.color = "successLight"
-                    summary_data.summary_take_away_bold_text.append(bold_text_3)
+                    #summary_data.summary_take_away_bold_text.append(bold_text_3)
 
                 #elif session.asymmetry.hip_drop.right > session.asymmetry.hip_drop.left:
                 else:
@@ -530,24 +530,24 @@ class BiomechanicsHipDropChartData(Serialisable):
                     summary_data.summary_text = "Symmetry in Left & Right Hip Drop ROM"
                     summary_data.summary_take_away_text = str(
                         percentage) + "% Hip Drop Symmetry in this workout."
-                    # bold_text_1 = BoldText()
-                    # bold_text_1.text = str(percentage) + "%"
-                    bold_text_2 = BoldText()
-                    bold_text_2.text = "right"
+                    bold_text_1 = BoldText()
+                    bold_text_1.text = str(percentage) + "%"
+                    #bold_text_2 = BoldText()
+                    #bold_text_2.text = ""
 
-                    # summary_data.summary_bold_text.append(bold_text_1)
-                    summary_data.summary_bold_text.append(bold_text_2)
-                    bold_text_3 = BoldText()
-                    bold_text_3.text = str(percentage) + "% more"
+                    summary_data.summary_bold_text.append(bold_text_1)
+                    #summary_data.summary_bold_text.append(bold_text_2)
+                    #bold_text_3 = BoldText()
+                    #bold_text_3.text = str(percentage) + "%"
                     #bold_text_3.color = "successLight"
-                    summary_data.summary_take_away_bold_text.append(bold_text_3)
+                    #summary_data.summary_take_away_bold_text.append(bold_text_3)
             else:
                 summary_data.summary_text = "Symmetric Left & Right Hip Drop ROM"
                 summary_data.summary_take_away_text = "Your average hip drop was balanced between left and right steps across this workout."
                 summary_data.summary_side = "0"
-                bold_text_1 = BoldText()
-                bold_text_1.text = "balanced"
-                summary_data.summary_take_away_bold_text.append(bold_text_1)
+                #bold_text_1 = BoldText()
+                #bold_text_1.text = ""
+                #summary_data.summary_take_away_bold_text.append(bold_text_1)
 
             asymmetry_data.body_side = body_side
             asymmetry_data.hip_drop = summary_data
