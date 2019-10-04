@@ -13,6 +13,7 @@ tests/integration_tests/.pytest_cache/*
 tests/future_tests/.pytest_cache/*
 tests/mock_tests/.pytest_cache/*
 Tests/mock_users/.pytest_cache/*
+tests/predictive/*
 !apigateway/*.py
 apigateway/itsdangerous.py
 apigateway/flask_lambda.py
