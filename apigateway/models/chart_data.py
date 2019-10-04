@@ -277,14 +277,17 @@ class BiomechanicsAPTChartData(Serialisable):
         proc = AsymmetryProcessor()
 
         if session.asymmetry is not None and session.asymmetry.anterior_pelvic_tilt is not None:
-            #viz = proc.get_visualized_left_right_asymmetry(session.asymmetry.anterior_pelvic_tilt.left, session.asymmetry.anterior_pelvic_tilt.right)
+            transformed_viz = proc.get_visualized_left_right_asymmetry(session.asymmetry.anterior_pelvic_tilt.left, session.asymmetry.anterior_pelvic_tilt.right)
             #if session.asymmetry.anterior_pelvic_tilt.left > 0 or session.asymmetry.anterior_pelvic_tilt.right > 0:
             if session.asymmetry.anterior_pelvic_tilt.percent_events_asymmetric > 0:
                 viz = VisualizedLeftRightAsymmetry(0, 0, session.asymmetry.anterior_pelvic_tilt.left,
-                                                   session.asymmetry.anterior_pelvic_tilt.right, 15.0)
+                                                   session.asymmetry.anterior_pelvic_tilt.right, 1.5)
             else:
                 average_symmetry = round((session.asymmetry.anterior_pelvic_tilt.left + session.asymmetry.anterior_pelvic_tilt.right)/float(2), 0)
-                viz = VisualizedLeftRightAsymmetry(0, 0, average_symmetry, average_symmetry, 15.0)
+                viz = VisualizedLeftRightAsymmetry(0, 0, average_symmetry, average_symmetry, 1.5)
+
+            viz.left_y_transformed = transformed_viz.left_y
+            viz.right_y_transformed = transformed_viz.right_y
 
             summary_data = AsymmetrySummaryData()
             summary_data.summary_data = viz
