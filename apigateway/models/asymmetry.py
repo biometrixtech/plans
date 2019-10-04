@@ -261,18 +261,18 @@ class VisualizedLeftRightAsymmetry(object):
         self.right_start_angle = round(right_start_angle, 2)
         self.left_y = round(left_y, 2)
         self.right_y = round(right_y, 2)
-        self.left_y_transformed = self.left_y
-        self.right_y_transformed = self.right_y
+        self.left_y_legend = self.left_y
+        self.right_y_legend = self.right_y
         self.multiplier = multiplier
 
     def json_serialise(self):
         ret = {
             "left_start_angle": self.left_start_angle,
             "left_y": self.left_y,
-            "left_y_transformed": self.left_y_transformed,
+            "left_y_legend": self.left_y_legend,
             "right_start_angle": self.right_start_angle,
             "right_y": self.right_y,
-            "right_y_transformed": self.right_y_transformed,
+            "right_y_legend": self.right_y_legend,
             "multiplier": self.multiplier
         }
         return ret
@@ -284,8 +284,8 @@ class VisualizedLeftRightAsymmetry(object):
                       left_y=input_dict.get('left_y',0),
                       right_y=input_dict.get('right_y',0),
                       multiplier=input_dict.get('multiplier', 0))
-        data.left_y_transformed = input_dict.get('left_y_transformed', 0)
-        data.right_y_transformed = input_dict.get('right_y_transformed', 0)
+        data.left_y_legend = input_dict.get('left_y_legend', 0)
+        data.right_y_legend = input_dict.get('right_y_legend', 0)
         return data
 
 
