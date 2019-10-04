@@ -137,6 +137,7 @@ class AthleteStats(Serialisable):
         #self.biomechanics_chart = None
         self.biomechanics_apt_chart = None
         self.biomechanics_ankle_pitch_chart = None
+        self.biomechanics_hip_drop_chart = None
 
         self.eligible_for_high_load_trigger = False
 

@@ -27,6 +27,11 @@ def create_user(email, first_name, last_name, env="dev"):
                               "last_name": last_name,
                               "birth_date": "01/01/2006"
                               },
+            "biometric_data": {
+                "mass": {
+                    "kg": 76.203
+                }},
+            "plans_api_version": "4_5",
             #            "account_code": code,
             "first_time_experience": first_time_experience,
             "onboarding_status": onboarding_status,

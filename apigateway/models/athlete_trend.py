@@ -1,5 +1,5 @@
 from enum import Enum
-from models.chart_data import TrainingVolumeChartData, BodyResponseChartData, WorkoutChartData, PersonalizedRecoveryChartData, PreventionChartData, BiomechanicsAPTChart, CareTodayChartData, BiomechanicsAnklePitchChart
+from models.chart_data import TrainingVolumeChartData, BodyResponseChartData, WorkoutChartData, PersonalizedRecoveryChartData, PreventionChartData, BiomechanicsAPTChart, CareTodayChartData, BiomechanicsAnklePitchChart, BiomechanicsHipDropChart
 from models.insights import InsightType
 from models.soreness_base import BodyPartSide
 from models.sport import SportName
@@ -583,6 +583,7 @@ class AthleteTrends(object):
         #self.biomechanics_summary = None
         self.biomechanics_apt = None
         self.biomechanics_ankle_pitch = None
+        self.biomechanics_hip_drop = None
         self.body_response = TrendData()
         self.workload = TrendData()
         self.trend_categories = []
@@ -598,6 +599,7 @@ class AthleteTrends(object):
             'trend_categories': [trend_category.json_serialise(plan) for trend_category in self.trend_categories],
             'biomechanics_apt': self.biomechanics_apt.json_serialise() if self.biomechanics_apt is not None else None,
             'biomechanics_ankle_pitch': self.biomechanics_ankle_pitch.json_serialise() if self.biomechanics_ankle_pitch is not None else None,
+            'biomechanics_hip_drop': self.biomechanics_hip_drop.json_serialise() if self.biomechanics_hip_drop is not None else None,
         }
         return ret
 
@@ -622,6 +624,11 @@ class AthleteTrends(object):
 
         trends.biomechanics_ankle_pitch = BiomechanicsAnklePitchChart.json_deserialise(input_dict['biomechanics_ankle_pitch']) if input_dict.get(
             'biomechanics_ankle_pitch', None) is not None else None
+
+        trends.biomechanics_hip_drop = BiomechanicsHipDropChart.json_deserialise(
+            input_dict['biomechanics_hip_drop']) if input_dict.get(
+            'biomechanics_hip_drop', None) is not None else None
+
         return trends
 
     # def add_cta(self):
@@ -707,3 +714,4 @@ class AthleteTrends(object):
 
         self.biomechanics_apt = athlete_stats.biomechanics_apt_chart
         self.biomechanics_ankle_pitch = athlete_stats.biomechanics_ankle_pitch_chart
+        self.biomechanics_hip_drop = athlete_stats.biomechanics_hip_drop_chart
