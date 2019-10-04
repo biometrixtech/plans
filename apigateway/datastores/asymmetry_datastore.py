@@ -49,6 +49,15 @@ class AsymmetryDatastore(object):
                     if mongo_result.get('ankle_pitch') is not None:
                         session = SessionAsymmetry.json_deserialise(mongo_result)
                         ret.append(session)
+            elif data_type == 2:
+                projection = ['user_id', 'session_id', 'event_date', 'seconds_duration', 'hip_drop',
+                              'time_blocks.time_block', 'time_blocks.hip_drop']
+                mongo_cursor = mongo_collection.find(query, sort=[('event_date', -1)], limit=sessions,
+                                                     projection=projection)
+                for mongo_result in mongo_cursor:
+                    if mongo_result.get('hip_drop') is not None:
+                        session = SessionAsymmetry.json_deserialise(mongo_result)
+                        ret.append(session)
             return ret
 
 
