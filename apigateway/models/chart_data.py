@@ -282,7 +282,7 @@ class BiomechanicsAPTChartData(Serialisable):
             if session.asymmetry.anterior_pelvic_tilt.percent_events_asymmetric > 0:
                 viz = VisualizedLeftRightAsymmetry(0, 0, transformed_viz.left_y, transformed_viz.right_y, 1.0)
                 viz.left_y_legend = session.asymmetry.anterior_pelvic_tilt.left
-                viz.right_y_legend = session.asymmetry.anterior_pelvic_tilt.righ
+                viz.right_y_legend = session.asymmetry.anterior_pelvic_tilt.right
             else:
                 average_symmetry = round((session.asymmetry.anterior_pelvic_tilt.left + session.asymmetry.anterior_pelvic_tilt.right)/float(2), 0)
                 viz = VisualizedLeftRightAsymmetry(0, 0, transformed_viz.left_y, transformed_viz.right_y, 1.0)
