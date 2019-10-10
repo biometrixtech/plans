@@ -119,6 +119,7 @@ class Soreness(BaseSoreness, Serialisable):
 
         elif name == 'sharp' and value is not None:
             severity_sharp = get_pain_from_sharp_ache(value)
+            self.pain = True
             if self.severity is None:
                 self.severity = severity_sharp
             else:
