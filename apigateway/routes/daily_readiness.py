@@ -205,13 +205,13 @@ def validate_data():
             BodyPartLocation(soreness['body_part'])
         except ValueError:
             raise InvalidSchemaException('body_part not recognized')
-        try:
-            MuscleSorenessSeverity(soreness['severity'])
-        except ValueError:
-            raise InvalidSchemaException('severity not recognized')
-        # for valid ones, force values to be integer
+    #     try:
+    #         MuscleSorenessSeverity(soreness['severity'])
+    #     except ValueError:
+    #         raise InvalidSchemaException('severity not recognized')
+    #     # for valid ones, force values to be integer
         soreness['body_part'] = int(soreness['body_part'])
-        soreness['severity'] = int(soreness['severity'])
+    #     soreness['severity'] = int(soreness['severity'])
 
 
 def _check_plan_exists(user_id, event_date):
