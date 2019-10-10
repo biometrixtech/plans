@@ -33,17 +33,6 @@ class JointSorenessSeverity(IntEnum):
     inability_to_move = 5
 
 
-class InjuryCycleStatus(IntEnum):
-    healthy = 0
-    tissue_overload = 1
-    inflammation = 2
-    muscle_spasm = 3
-    adhesions = 4
-    altered_neuromuscular_control = 5
-    muscle_imbalance = 6
-    functional_inefficiency = 7
-
-
 class Soreness(BaseSoreness, Serialisable):
     def __init__(self):
         super().__init__()
@@ -65,7 +54,13 @@ class Soreness(BaseSoreness, Serialisable):
         self.cleared_date_time = None
         self.status_changed_date_time = None
         self.daily = True
-        self.injury_cycle_status = InjuryCycleStatus.healthy
+        self.tissue_overload = 0
+        self.inflammation = 0
+        self.muscle_spasm = 0
+        self.adhesions = 0
+        self.altered_neuromuscular_control = 0
+        self.muscle_imbalance = 0
+        self.functional_inefficiency = 0
         self.tight = None
         self.knots = None
         self.ache = None
@@ -94,7 +89,13 @@ class Soreness(BaseSoreness, Serialisable):
         soreness.knots = input_dict['knots']
         soreness.ache = input_dict['ache']
         soreness.sharp = input_dict['sharp']
-        soreness.injury_cycle_status = InjuryCycleStatus(input_dict.get('injury_cycle_status', 0))
+        soreness.tissue_overload = input_dict.get('tissue_overload', 0)
+        soreness.inflammation = input_dict.get('inflammation', 0)
+        soreness.muscle_spasm = input_dict.get('muscle_spasm', 0)
+        soreness.adhesions = input_dict.get('adhesions', 0)
+        soreness.altered_neuromuscular_control = input_dict.get('altered_neuromuscular_control', 0)
+        soreness.muscle_imbalance = input_dict.get('muscle_imbalance', 0)
+        soreness.functional_inefficiency = input_dict.get('functional_inefficiency', 0)
 
         return soreness
 
@@ -201,7 +202,13 @@ class Soreness(BaseSoreness, Serialisable):
                    'knots': self.knots,
                    'ache': self.ache,
                    'sharp': self.sharp,
-                   'injury_cycle_status': self.injury_cycle_status.value
+                   'tissue_overload': self.tissue_overload,
+                   'inflammation': self.inflammation,
+                   'muscle_spasm': self.muscle_spasm,
+                   'adhesions': self.adhesions,
+                   'altered_neuromuscular_control': self.altered_neuromuscular_control,
+                   'muscle_imbalance': self.muscle_imbalance,
+                   'functional_inefficiency': self.functional_inefficiency
                   }
         return ret
 

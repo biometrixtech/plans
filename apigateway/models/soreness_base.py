@@ -81,6 +81,41 @@ class BodyPartLocation(Enum):
     forearm = 24
     core_stabilizers = 25
     erector_spinae = 26
+
+    it_band = 27
+    adductor = 28
+
+    anterior_tibialis = 40
+    peroneals_longus = 41
+    posterior_tibialis = 42
+    soleus = 43
+    gastrocnemius = 44
+    bicep_femoris_long_head = 45
+    bicep_femoris_short_head = 46
+    semimembranosus = 47
+    semitendinosus = 48
+    adductor_longus = 49
+    adductor_magnus_anterior_fibers = 50
+    adductor_magnus_posterior_fibers = 51
+    adductor_brevis = 52
+    gracilis = 53
+    pectineus = 54
+    vastus_lateralis = 55
+    vastus_medialis = 56
+    vastus_intermedius = 57
+    rectus_femoris = 58
+    tensor_fascia_latae = 59
+    piriformis = 60
+    iliopsoas = 61
+    sartorius = 62
+    gluteus_medius_anterior_fibers = 63
+    gluteus_medius_posterior_fibers = 64
+    gluteus_minimus = 65
+    gluteus_maximus = 66
+    quadratus_femoris = 67
+    popliteus = 68
+    lateral_rotators = 69
+
     upper_body = 91
     lower_body = 92
     full_body = 93
