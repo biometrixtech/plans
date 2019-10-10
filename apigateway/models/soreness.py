@@ -33,6 +33,17 @@ class JointSorenessSeverity(IntEnum):
     inability_to_move = 5
 
 
+class InjuryCycleStatus(IntEnum):
+    healthy = 0
+    tissue_overload = 1
+    inflammation = 2
+    muscle_spasm = 3
+    adhesions = 4
+    altered_neuromuscular_control = 5
+    muscle_imbalance = 6
+    functional_inefficiency = 7
+
+
 class Soreness(BaseSoreness, Serialisable):
     def __init__(self):
         super().__init__()
@@ -54,6 +65,12 @@ class Soreness(BaseSoreness, Serialisable):
         self.cleared_date_time = None
         self.status_changed_date_time = None
         self.daily = True
+        self.injury_cycle_status = InjuryCycleStatus.healthy
+        self.tight = None
+        self.knots = None
+        self.ache = None
+        self.sharp = None
+
 
     @classmethod
     def json_deserialise(cls, input_dict):
@@ -73,6 +90,12 @@ class Soreness(BaseSoreness, Serialisable):
             soreness.status_changed_date_time = parse_datetime(input_dict['status_changed_date_time'])
         if input_dict.get('reported_date_time', None) is not None:
             soreness.reported_date_time = parse_datetime(input_dict['reported_date_time'])
+        soreness.tight = input_dict['tight']
+        soreness.knots = input_dict['knots']
+        soreness.ache = input_dict['ache']
+        soreness.sharp = input_dict['sharp']
+        soreness.injury_cycle_status = InjuryCycleStatus(input_dict.get('injury_cycle_status', 0))
+
         return soreness
 
     def __hash__(self):
@@ -173,7 +196,12 @@ class Soreness(BaseSoreness, Serialisable):
                    'pain': self.pain,
                    'severity': self.severity,
                    'movement': self.movement,
-                   'side': self.side
+                   'side': self.side,
+                   'tight': self.tight,
+                   'knots': self.knots,
+                   'ache': self.ache,
+                   'sharp': self.sharp,
+                   'injury_cycle_status': self.injury_cycle_status.value
                   }
         return ret
 
