@@ -42,11 +42,13 @@ class DailyReadiness(Serialisable):
         return ret
 
     def _soreness_from_dict(self, soreness_dict):
-        soreness = Soreness()
-        soreness.body_part = BodyPart(BodyPartLocation(soreness_dict['body_part']), None)
-        soreness.pain = soreness_dict.get('pain', False)
-        soreness.severity = soreness_dict['severity']
-        soreness.movement = soreness_dict.get('movement', None)
-        soreness.side = soreness_dict.get('side', None)
-        soreness.reported_date_time = self.event_date
+        soreness_dict['reported_date_time'] = self.event_date
+        soreness = Soreness().json_deserialise(soreness_dict)
+        print(soreness.json_serialise())
+        # soreness.body_part = BodyPart(BodyPartLocation(soreness_dict['body_part']), None)
+        # soreness.pain = soreness_dict.get('pain', False)
+        # soreness.severity = soreness_dict['severity']
+        # soreness.movement = soreness_dict.get('movement', None)
+        # soreness.side = soreness_dict.get('side', None)
+        # soreness.reported_date_time = self.event_date
         return soreness

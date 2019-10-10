@@ -1,6 +1,6 @@
 from enum import Enum, IntEnum
 
-from models.body_parts import BodyPart
+from models.body_parts import BodyPart, BodyPartFactory
 #from models.trigger import Trigger
 from models.goal import AthleteGoal
 from models.soreness_base import HistoricSorenessStatus, BaseSoreness, BodyPartLocation, BodyPartSide
@@ -89,12 +89,13 @@ class Soreness(BaseSoreness, Serialisable):
         if input_dict.get('status_changed_date_time', None) is not None:
             soreness.status_changed_date_time = parse_datetime(input_dict['status_changed_date_time'])
         if input_dict.get('reported_date_time', None) is not None:
-            soreness.reported_date_time = parse_datetime(input_dict['reported_date_time'])
-        soreness.tight = input_dict['tight']
-        soreness.knots = input_dict['knots']
-        soreness.ache = input_dict['ache']
-        soreness.sharp = input_dict['sharp']
+            soreness.reported_date_time = input_dict['reported_date_time']
+        soreness.tight = input_dict.get('tight')
+        soreness.knots = input_dict.get('knots')
+        soreness.ache = input_dict.get('ache')
+        soreness.sharp = input_dict.get('sharp')
         soreness.injury_cycle_status = InjuryCycleStatus(input_dict.get('injury_cycle_status', 0))
+        cls.get_symptoms_from_severity_movement(soreness)
 
         return soreness
 
@@ -112,7 +113,54 @@ class Soreness(BaseSoreness, Serialisable):
                     value = parse_datetime(value)
                 except InvalidSchemaException:
                     value = parse_date(value)
+        elif name in ['tight', 'knots'] and value is not None:
+            self.movement = get_movement_from_tight_knot(value)
+
+        elif name == 'sharp' and value is not None:
+            severity_sharp = get_pain_from_sharp_ache(value)
+            if self.severity is None:
+                self.severity = severity_sharp
+            else:
+                self.severity = max([self.severity, severity_sharp])
+        elif name == 'ache' and value is not None:
+            if BodyPartFactory().is_muscle(self.body_part):
+                severity_ache = get_soreness_from_ache(value)
+            else:
+                self.pain = True
+                severity_ache = get_pain_from_sharp_ache(value)
+            if self.severity is None:
+                self.severity = severity_ache
+            else:
+                self.severity = max([self.severity, severity_ache])
+
         super().__setattr__(name, value)
+
+
+    def get_symptoms_from_severity_movement(self):
+        if BodyPartFactory().is_muscle(self.body_part):
+            if self.severity is not None:
+                if self.pain:
+                    if self.sharp is None:
+                        self.sharp = get_sharp_ache_from_pain(self.severity)
+                else:
+                    if self.ache is None:
+                        self.ache = get_ache_from_soreness(self.severity)
+            if self.movement is not None:
+                if self.tight is None:
+                    self.tight = get_tight_knots_from_movement(self.movement)
+                if self.knots is None:
+                    self.knots = get_tight_knots_from_movement(self.movement)
+        else:
+            if self.severity is not None:
+                if self.ache is None:
+                    self.ache = get_sharp_ache_from_pain(self.severity)
+                if self.sharp is None:
+                    self.sharp = get_sharp_ache_from_pain(self.severity)
+            if self.movement is not None:
+                if self.tight is None:
+                    self.tight = get_tight_knots_from_movement(self.movement)
+
+
 
     '''deprecated
     def is_dormant_cleared(self):
@@ -275,3 +323,91 @@ class Alert(object):
         super().__setattr__(name, value)
 
 
+
+def get_movement_from_tight_knot(value):
+    if value == 0:
+        return 0
+    if value <= 1:
+        return 1
+    elif value <= 3:
+        return 2
+    elif value <= 4:
+        return 3
+    elif value <= 6:
+        return 4
+    else:
+        return 5
+
+
+def get_pain_from_sharp_ache(value):
+    if value == 0:
+        return 0
+    elif value <= 2:
+        return 1
+    elif value <= 3:
+        return 2
+    elif value <= 4:
+        return 3
+    elif value <= 5:
+        return 4
+    else:
+        return 5
+
+
+def get_soreness_from_ache(value):
+    if value == 0:
+        return 0
+    elif value <= 3:
+        return 1
+    elif value <= 4:
+        return 2
+    elif value <= 5:
+        return 3
+    elif value <= 6:
+        return 4
+    else:
+        return 5
+
+
+def get_sharp_ache_from_pain(value):
+    if value == 0:
+        return 0
+    elif value <= 1:
+        return 1
+    elif value <= 2:
+        return 3
+    elif value <= 3:
+        return 4
+    elif value <= 4:
+        return 5
+    else:
+        return 6
+
+
+def get_ache_from_soreness(value):
+    if value == 0:
+        return 0
+    elif value <= 1:
+        return 1
+    elif value <= 2:
+        return 4
+    elif value <= 3:
+        return 5
+    elif value <= 4:
+        return 6
+    else:
+        return 7
+
+def get_tight_knots_from_movement(value):
+    if value == 0:
+        return 0
+    elif value <= 1:
+        return 1
+    elif value <= 2:
+        return 2
+    elif value <= 3:
+        return 4
+    elif value <= 4:
+        return 5
+    else:
+        return 7

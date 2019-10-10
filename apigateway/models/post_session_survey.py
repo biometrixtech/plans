@@ -1,7 +1,7 @@
 from serialisable import Serialisable
 
 from models.soreness import Soreness
-from models.body_parts import BodyPart
+from models.body_parts import BodyPart, BodyPartFactory
 from models.soreness_base import BodyPartLocation
 # from models.session import SessionType
 import datetime
@@ -73,11 +73,13 @@ class PostSurvey(Serialisable):
 
     @staticmethod
     def _soreness_from_dict(soreness_dict, event_date):
-        soreness = Soreness()
-        soreness.body_part = BodyPart(BodyPartLocation(soreness_dict['body_part']), None)
-        soreness.pain = soreness_dict.get('pain', False)
-        soreness.severity = soreness_dict['severity']
-        soreness.movement = soreness_dict.get('movement', None)
-        soreness.side = soreness_dict.get('side', None)
-        soreness.reported_date_time = parse_datetime(event_date)
+        soreness_dict['reported_date_time'] = event_date
+        soreness = Soreness().json_deserialise(soreness_dict)
+        print(BodyPartFactory().is_muscle(soreness.body_part), soreness.json_serialise())
+        # soreness.body_part = BodyPart(BodyPartLocation(soreness_dict['body_part']), None)
+        # soreness.pain = soreness_dict.get('pain', False)
+        # soreness.severity = soreness_dict['severity']
+        # soreness.movement = soreness_dict.get('movement', None)
+        # soreness.side = soreness_dict.get('side', None)
+        # soreness.reported_date_time = parse_datetime(event_date)
         return soreness
