@@ -43,7 +43,7 @@ class TestUtilities(object):
             "tight": tight,
             "knots": knots,
             "ache": ache,
-            "shart": sharp
+            "sharp": sharp
         }
 
         return soreness

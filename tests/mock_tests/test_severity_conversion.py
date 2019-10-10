@@ -91,4 +91,19 @@ def test_joint_ache_to_pain():
     assert soreness.severity == 4
     assert soreness.movement is None
 
+def test_joint_ache_sharp_to_pain():
+    readiness_survey = get_readiness_survey(20, ache=5, sharp=3)
+    assert len(readiness_survey.soreness) == 1
+    soreness = readiness_survey.soreness[0]
+    assert soreness.pain
+    assert soreness.severity == 4
+    assert soreness.movement is None
 
+
+def test_muscle_ache_sharp_to_pain():
+    readiness_survey = get_readiness_survey(2, ache=5, sharp=10)
+    assert len(readiness_survey.soreness) == 1
+    soreness = readiness_survey.soreness[0]
+    assert soreness.pain
+    assert soreness.severity == 5
+    assert soreness.movement is None

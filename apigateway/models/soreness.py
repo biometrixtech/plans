@@ -139,28 +139,27 @@ class Soreness(BaseSoreness, Serialisable):
 
 
     def get_symptoms_from_severity_movement(self):
-        if BodyPartFactory().is_muscle(self.body_part):
-            if self.severity is not None:
-                if self.pain:
-                    if self.sharp is None:
+        if self.tight is None and self.knots is None and self.ache is None and self.sharp is None:
+            # only update if all are none, i.e. this is old data
+            if BodyPartFactory().is_muscle(self.body_part):
+                ## update for muscles
+                if self.severity is not None:
+                    if self.pain:  # if pain, set sharp
                         self.sharp = get_sharp_ache_from_pain(self.severity)
-                else:
-                    if self.ache is None:
+                    else:  # else set ache
                         self.ache = get_ache_from_soreness(self.severity)
-            if self.movement is not None:
-                if self.tight is None:
+                if self.movement is not None:
+                    # set same value for tight and knots if movement is available
                     self.tight = get_tight_knots_from_movement(self.movement)
-                if self.knots is None:
                     self.knots = get_tight_knots_from_movement(self.movement)
-        else:
-            self.pain = True
-            if self.severity is not None:
-                if self.ache is None:
+            else:
+                self.pain = True  # joint is always pain
+                if self.severity is not None:
+                    # set same severity value for ache and sharp
                     self.ache = get_sharp_ache_from_pain(self.severity)
-                if self.sharp is None:
                     self.sharp = get_sharp_ache_from_pain(self.severity)
-            if self.movement is not None:
-                if self.tight is None:
+                if self.movement is not None:
+                    # if movement is available, set tight
                     self.tight = get_tight_knots_from_movement(self.movement)
 
 
