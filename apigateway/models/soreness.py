@@ -153,6 +153,7 @@ class Soreness(BaseSoreness, Serialisable):
                 if self.knots is None:
                     self.knots = get_tight_knots_from_movement(self.movement)
         else:
+            self.pain = True
             if self.severity is not None:
                 if self.ache is None:
                     self.ache = get_sharp_ache_from_pain(self.severity)
