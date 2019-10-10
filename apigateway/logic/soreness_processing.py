@@ -39,7 +39,15 @@ class SorenessCalculator(object):
     def get_severity(cls, severity, movement):
 
         if severity is None:
-            return None
+            if movement is None:
+                return None
+            else:
+                if movement == 1:
+                    return 1
+                elif 1 < movement <= 3:
+                    return 2
+                else:
+                    return 3
         elif movement in [None, 0] or severity == 0:
             return severity
         elif severity == 1:
