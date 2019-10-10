@@ -37,7 +37,7 @@ class DailyReadiness(Serialisable):
             'sleep_quality': self.sleep_quality,
             'readiness': self.readiness,
             'wants_functional_strength': self.wants_functional_strength,
-            'sore_body_parts': [{"body_part": s.body_part.location.value, "side": s.side} for s in self.soreness if s.severity > 1]
+            'sore_body_parts': [{"body_part": s.body_part.location.value, "side": s.side} for s in self.soreness if s.severity is not None and s.severity > 1]
         }
         return ret
 
