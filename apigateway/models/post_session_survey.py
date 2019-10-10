@@ -75,7 +75,6 @@ class PostSurvey(Serialisable):
     def _soreness_from_dict(soreness_dict, event_date):
         soreness_dict['reported_date_time'] = event_date
         soreness = Soreness().json_deserialise(soreness_dict)
-        print(BodyPartFactory().is_muscle(soreness.body_part), soreness.json_serialise())
         # soreness.body_part = BodyPart(BodyPartLocation(soreness_dict['body_part']), None)
         # soreness.pain = soreness_dict.get('pain', False)
         # soreness.severity = soreness_dict['severity']

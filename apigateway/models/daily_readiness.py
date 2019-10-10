@@ -44,7 +44,6 @@ class DailyReadiness(Serialisable):
     def _soreness_from_dict(self, soreness_dict):
         soreness_dict['reported_date_time'] = self.event_date
         soreness = Soreness().json_deserialise(soreness_dict)
-        print(soreness.json_serialise())
         # soreness.body_part = BodyPart(BodyPartLocation(soreness_dict['body_part']), None)
         # soreness.pain = soreness_dict.get('pain', False)
         # soreness.severity = soreness_dict['severity']
