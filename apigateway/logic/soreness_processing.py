@@ -219,7 +219,7 @@ class BodyPartMapping(object):
     @staticmethod
     def get_soreness_type(body_part_location):
 
-        if (body_part_location == BodyPartLocation.hip_flexor or body_part_location == BodyPartLocation.knee
+        if (body_part_location == BodyPartLocation.hip or body_part_location == BodyPartLocation.knee
                 or body_part_location == BodyPartLocation.ankle or body_part_location == BodyPartLocation.foot
                 or body_part_location == BodyPartLocation.lower_back):
             return SorenessType.joint_related

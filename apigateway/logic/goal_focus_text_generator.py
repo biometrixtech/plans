@@ -94,13 +94,13 @@ class RecoveryTextGenerator(object):
             return side_text + "quad"
         elif body_part_location == BodyPartLocation.groin:
             return side_text + "groin"
-        elif body_part_location == BodyPartLocation.outer_thigh:
+        elif body_part_location == BodyPartLocation.it_band:
             return side_text + "outer thigh"
         elif body_part_location == BodyPartLocation.hamstrings:
             return side_text + "hamstring"
         elif body_part_location == BodyPartLocation.abdominals:
             return side_text + "abdominals"
-        elif body_part_location == BodyPartLocation.hip_flexor:
+        elif body_part_location == BodyPartLocation.hip:
             return side_text + "hip"
         elif body_part_location == BodyPartLocation.chest:
             return side_text + "pec"
@@ -160,13 +160,13 @@ class RecoveryTextGenerator(object):
             return side_text + "quads"
         elif body_part_location == BodyPartLocation.groin:
             return side_text + "groin"
-        elif body_part_location == BodyPartLocation.outer_thigh:
+        elif body_part_location == BodyPartLocation.it_band:
             return side_text + "outer thighs"
         elif body_part_location == BodyPartLocation.hamstrings:
             return side_text + "hamstrings"
         elif body_part_location == BodyPartLocation.abdominals:
             return side_text + "abdominals"
-        elif body_part_location == BodyPartLocation.hip_flexor:
+        elif body_part_location == BodyPartLocation.hip:
             return side_text + "hips"
         elif body_part_location == BodyPartLocation.chest:
             return side_text + "pecs"

@@ -131,7 +131,7 @@ class Soreness(BaseSoreness, Serialisable):
     
     def is_joint(self):
         if (self.body_part.location == BodyPartLocation.shoulder or
-                self.body_part.location == BodyPartLocation.hip_flexor or
+                self.body_part.location == BodyPartLocation.hip or
                 self.body_part.location == BodyPartLocation.knee or
                 self.body_part.location == BodyPartLocation.ankle or
                 self.body_part.location == BodyPartLocation.foot or
@@ -149,7 +149,7 @@ class Soreness(BaseSoreness, Serialisable):
                 self.body_part.location == BodyPartLocation.groin or
                 self.body_part.location == BodyPartLocation.quads or
                 self.body_part.location == BodyPartLocation.shin or
-                self.body_part.location == BodyPartLocation.outer_thigh or
+                self.body_part.location == BodyPartLocation.it_band or
                 self.body_part.location == BodyPartLocation.glutes or
                 self.body_part.location == BodyPartLocation.hamstrings or
                 self.body_part.location == BodyPartLocation.calves or
