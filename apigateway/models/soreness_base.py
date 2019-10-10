@@ -58,14 +58,14 @@ class BodyPartLocation(Enum):
     shoulder = 1
     chest = 2
     abdominals = 3
-    hip_flexor = 4
+    hip = 4
     groin = 5
     quads = 6
     knee = 7
     shin = 8
     ankle = 9
     foot = 10
-    outer_thigh = 11
+    it_band = 11
     lower_back = 12
     general = 13
     glutes = 14
@@ -82,8 +82,9 @@ class BodyPartLocation(Enum):
     core_stabilizers = 25
     erector_spinae = 26
 
-    it_band = 27
-    adductor = 28
+    it_band_lateral_knee = 27
+    hip_flexor = 28
+    deltoid = 29
 
     anterior_tibialis = 40
     peroneals_longus = 41
@@ -130,14 +131,14 @@ class BodyPartLocationText(object):
                           'shoulder': 'shoulder',
                           'chest': 'pecs',
                           'abdominals': 'abdominal',
-                          'hip_flexor': 'hip',
+                          'hip': 'hip',
                           'groin': 'groin',
                           'quads': 'quad',
                           'knee': 'knee',
                           'shin': 'shin',
                           'ankle': 'ankle',
                           'foot': 'foot',
-                          'outer_thigh': 'IT band',
+                          'it_band': 'IT band',
                           'lower_back': 'lower back',
                           'general': 'general',
                           'glutes': 'glute',

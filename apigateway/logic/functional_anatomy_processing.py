@@ -24,6 +24,8 @@ class FunctionalAnatomyProcessor(object):
             return [10]
         elif body_part_value == BodyPartLocation.peroneals_longus.value:
             return [9, 10]
+        elif body_part_value == BodyPartLocation.posterior_tibialis.value:
+            return [10]
         elif body_part_value in [BodyPartLocation.calves.value, BodyPartLocation.soleus.value, BodyPartLocation.gastrocnemius.value]:
             return [9, 10]
         elif body_part_value == BodyPartLocation.hamstrings.value:
@@ -34,7 +36,7 @@ class FunctionalAnatomyProcessor(object):
             return [7]
         elif body_part_value in [BodyPartLocation.semimembranosus.value, BodyPartLocation.semitendinosus.value]:
             return [4, 7, 12]
-        elif body_part_value in [BodyPartLocation.adductor.value,
+        elif body_part_value in [BodyPartLocation.groin.value,
                                  BodyPartLocation.adductor_longus.value,
                                  BodyPartLocation.adductor_magnus_anterior_fibers.value,
                                  BodyPartLocation.adductor_magnus_posterior_fibers.value,

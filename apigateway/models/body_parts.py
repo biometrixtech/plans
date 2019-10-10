@@ -13,7 +13,7 @@ class BodyPartFactory(object):
         location = self.get_body_part_location(body_part)
 
         if (location == BodyPartLocation.shoulder or
-                location == BodyPartLocation.hip_flexor or
+                location == BodyPartLocation.hip or
                 location == BodyPartLocation.knee or
                 location == BodyPartLocation.ankle or
                 location == BodyPartLocation.foot or
@@ -34,7 +34,7 @@ class BodyPartFactory(object):
                 location == BodyPartLocation.groin or
                 location == BodyPartLocation.quads or
                 location == BodyPartLocation.shin or
-                location == BodyPartLocation.outer_thigh or
+                location == BodyPartLocation.it_band or
                 location == BodyPartLocation.glutes or
                 location == BodyPartLocation.hamstrings or
                 location == BodyPartLocation.calves or
@@ -206,7 +206,7 @@ class BodyPartFactory(object):
             return self.get_groin(sample)
         elif location == BodyPartLocation.hamstrings:
             return self.get_hamstrings(sample)
-        elif location == BodyPartLocation.hip_flexor:
+        elif location == BodyPartLocation.hip:
             return self.get_hip(sample)
         elif location == BodyPartLocation.knee:
             return self.get_knee(sample)
@@ -214,7 +214,7 @@ class BodyPartFactory(object):
             return self.get_lats(sample)
         elif location == BodyPartLocation.lower_back:
             return self.get_lower_back(sample)
-        elif location == BodyPartLocation.outer_thigh:
+        elif location == BodyPartLocation.it_band:
             return self.get_outer_thigh(sample)
         elif location == BodyPartLocation.quads:
             return self.get_quads(sample)
@@ -630,7 +630,7 @@ class BodyPartFactory(object):
 
     def get_hip(self, sample=True):
 
-        hip = BodyPart(BodyPartLocation.hip_flexor, 2)
+        hip = BodyPart(BodyPartLocation.hip, 2)
 
         if sample:
             inhibit = self.get_exercise_dictionary([54])
@@ -718,7 +718,7 @@ class BodyPartFactory(object):
 
     def get_outer_thigh(self, sample=True):
 
-        outer_thigh = BodyPart(BodyPartLocation.outer_thigh, 6)
+        outer_thigh = BodyPart(BodyPartLocation.it_band, 6)
 
         if sample:
             inhibit = self.get_exercise_dictionary([4])
