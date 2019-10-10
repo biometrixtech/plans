@@ -72,7 +72,7 @@ class Soreness(BaseSoreness, Serialisable):
         soreness = cls()
         soreness.body_part = BodyPart(BodyPartLocation(input_dict['body_part']), None)
         soreness.pain = input_dict.get('pain', False)
-        soreness.severity = input_dict['severity']
+        soreness.severity = input_dict.get('severity', None)
         soreness.movement = input_dict.get('movement', None)
         soreness.side = input_dict.get('side', None)
         soreness.max_severity = input_dict.get('max_severity', None)
