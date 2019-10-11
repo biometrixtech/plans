@@ -12,14 +12,19 @@ class BodyPartFactory(object):
 
         location = self.get_body_part_location(body_part)
 
-        if (location == BodyPartLocation.shoulder or
-                location == BodyPartLocation.hip or
-                location == BodyPartLocation.knee or
-                location == BodyPartLocation.ankle or
-                location == BodyPartLocation.foot or
-                location == BodyPartLocation.lower_back or
-                location == BodyPartLocation.elbow or
-                location == BodyPartLocation.wrist):
+        if location in [
+                        BodyPartLocation.it_band,
+                        BodyPartLocation.it_band_lateral_knee,
+                        BodyPartLocation.achilles,
+                        BodyPartLocation.elbow,
+                        BodyPartLocation.wrist,
+                        BodyPartLocation.shoulder,
+                        BodyPartLocation.lower_back,
+                        BodyPartLocation.hip,
+                        BodyPartLocation.knee,
+                        BodyPartLocation.ankle,
+                        BodyPartLocation.foot
+                        ]:
             return True
         else:
             return False
@@ -28,26 +33,24 @@ class BodyPartFactory(object):
 
         location = self.get_body_part_location(body_part)
 
-        if (
-                location == BodyPartLocation.forearm or
-                location == BodyPartLocation.biceps or
-                location == BodyPartLocation.triceps or
-                location == BodyPartLocation.deltoid or
-                location == BodyPartLocation.chest or
-                location == BodyPartLocation.upper_back_neck or
-                location == BodyPartLocation.erector_spinae or
-                location == BodyPartLocation.lats or
-                location == BodyPartLocation.abdominals or
-                location == BodyPartLocation.core_stabilizers or
-                location == BodyPartLocation.glutes or
-                location == BodyPartLocation.hip_flexors or
-                location == BodyPartLocation.quads or
-                location == BodyPartLocation.groin or
-                location == BodyPartLocation.hamstrings or
-                location == BodyPartLocation.calves or
-                location == BodyPartLocation.shin or
-                location == BodyPartLocation.it_band
-                ):
+        if location in [BodyPartLocation.forearm,
+                        BodyPartLocation.biceps,
+                        BodyPartLocation.triceps,
+                        BodyPartLocation.deltoid,
+                        BodyPartLocation.chest,
+                        BodyPartLocation.upper_back_neck,
+                        BodyPartLocation.erector_spinae,
+                        BodyPartLocation.lats,
+                        BodyPartLocation.abdominals,
+                        BodyPartLocation.core_stabilizers,
+                        BodyPartLocation.glutes,
+                        BodyPartLocation.hip_flexor,
+                        BodyPartLocation.quads,
+                        BodyPartLocation.groin,
+                        BodyPartLocation.hamstrings,
+                        BodyPartLocation.calves,
+                        BodyPartLocation.shin
+                        ]:
             return True
         else:
             return False

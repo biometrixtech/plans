@@ -165,10 +165,10 @@ class RecoveryTextGenerator(object):
 
         # if body_part_location == BodyPartLocation.achilles:
         #     return side_text + "achilles"
-        elif body_part_location == BodyPartLocation.lower_back:
-            return side_text + "lower back"
-        elif body_part_location == BodyPartLocation.glutes:
-            return "glutes"
+        # elif body_part_location == BodyPartLocation.lower_back:
+        #     return side_text + "lower back"
+        # elif body_part_location == BodyPartLocation.glutes:
+        #     return "glutes"
         # elif body_part_location == BodyPartLocation.foot:
         #     return side_text + "feet"
         # elif body_part_location == BodyPartLocation.ankle:
