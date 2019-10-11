@@ -2,6 +2,7 @@ from models.sport import SportName
 from models.functional_anatomy import FunctionalAnatomy
 from models.soreness_base import BodyPartLocation
 
+
 class FunctionalAnatomyProcessor(object):
     def __init__(self):
         self.activity = SportName.distance_running

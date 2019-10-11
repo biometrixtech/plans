@@ -244,6 +244,29 @@ class BodyPartFactory(object):
         elif location == BodyPartLocation.full_body:
             return self.get_full_body()
 
+        else:
+            return self.get_base_body_part(location)
+
+    def get_bilateral(self, body_part_location):
+
+        if body_part_location in [BodyPartLocation.general,
+                                  BodyPartLocation.full_body,
+                                  BodyPartLocation.upper_body,
+                                  BodyPartLocation.lower_body,
+                                  BodyPartLocation.abdominals,
+                                  BodyPartLocation.lower_back,
+                                  BodyPartLocation.upper_back_neck]:
+            return False
+        else:
+            return True
+
+    def get_base_body_part(self, body_part_location):
+
+        part = BodyPart(body_part_location, None)
+        part.bilateral = part.bilateral = self.get_bilateral(part.location)
+
+        return part
+
     def get_constituent_exercises(self, primary_body_part, constituent_body_parts, soreness):
 
         for c in constituent_body_parts:
@@ -264,7 +287,7 @@ class BodyPartFactory(object):
         ##############
 
         general = BodyPart(BodyPartLocation.general, 23)
-        general.bilateral = False
+        general.bilateral = self.get_bilateral(general.location)
 
         #inhibit = self.get_exercise_dictionary([48, 3, 4, 54, 2, 44, 55])
         #lengthen = self.get_exercise_dictionary([9, 6, 28, 56, 7, 46, 103])
@@ -281,7 +304,7 @@ class BodyPartFactory(object):
     def get_upper_body(self):
 
         upper_body = BodyPart(BodyPartLocation.upper_body, 25)
-        upper_body.bilateral = False
+        upper_body.bilateral = self.get_bilateral(upper_body.location)
 
         dynamic_stretch = self.get_full_exercise_dictionary([164, 165, 179, 180, 181])
         dynamic_integrate = self.get_full_exercise_dictionary([145, 148, 149, 162, 169])
@@ -299,7 +322,7 @@ class BodyPartFactory(object):
     def get_lower_body(self):
 
         lower_body = BodyPart(BodyPartLocation.lower_body, 24)
-        lower_body.bilateral = False
+        lower_body.bilateral = self.get_bilateral(lower_body.location)
         dynamic_stretch = self.get_full_exercise_dictionary([139, 140, 141, 142, 143, 144, 161, 163, 164, 165, 176, 193])
         dynamic_integrate = self.get_full_exercise_dictionary([145, 146, 147, 148, 149, 150, 151, 182, 183, 203, 204])
         dynamic_integrate_with_speed = {}
@@ -317,7 +340,7 @@ class BodyPartFactory(object):
     def get_full_body(self):
 
         full_body = BodyPart(BodyPartLocation.full_body, 23)
-        full_body.bilateral = False
+        full_body.bilateral = self.get_bilateral(full_body.location)
         dynamic_stretch = self.get_full_exercise_dictionary([139, 140, 141, 144, 164, 165, 177, 178, 179, 180, 193])
         dynamic_integrate = self.get_full_exercise_dictionary([145, 146, 148, 149, 150, 151, 162, 169, 203, 204])
         dynamic_integrate_with_speed = {}
@@ -359,7 +382,7 @@ class BodyPartFactory(object):
     def get_abdominals(self, sample=True):
 
         part = BodyPart(BodyPartLocation.abdominals, 4)
-        part.bilateral = False
+        part.bilateral = self.get_bilateral(part.location)
 
         if sample:
             inhibit = self.get_exercise_dictionary([54])
@@ -704,7 +727,7 @@ class BodyPartFactory(object):
     def get_lower_back(self, sample=True):
 
         part = BodyPart(BodyPartLocation.lower_back, 1)
-        part.bilateral = False
+        part.bilateral = self.get_bilateral(part.location)
 
         if sample:
             inhibit = self.get_exercise_dictionary([44])
@@ -832,7 +855,7 @@ class BodyPartFactory(object):
     def get_upper_back_traps_neck(self, sample=True):
 
         part = BodyPart(BodyPartLocation.upper_back_neck, 13)
-        part.bilateral = False
+        part.bilateral = part.bilateral = self.get_bilateral(part.location)
 
         if sample:
             inhibit = self.get_exercise_dictionary([102, 125, 126])

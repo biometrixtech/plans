@@ -1,5 +1,7 @@
 from enum import IntEnum, Enum
 from models.sport import SportName
+from models.soreness_base import BodyPartSide, BodyPartLocation
+from models.body_parts import BodyPart, BodyPartFactory
 
 
 class FunctionalMovementType(Enum):
@@ -27,6 +29,115 @@ class FunctionalMovement(object):
         self.synergists = []
 
 
+class FunctionalMovementBodyPartSide(object):
+    def __init__(self, body_part_side):
+        self.body_part_side = body_part_side
+        self.concentric_volume = None
+        self.eccentric_volume = None
+        self.concentric_intensity = None
+        self.eccentric_intensity = None
+        self.concentric_ramp = None
+        self.eccentric_ramp = None
+        self.inhibited = 0
+        self.weak = 0
+        self.tight = 0
+        self.inflamed = 0
+        self.long = 0
+
+    def total_volume(self):
+
+        if self.concentric_volume is None:
+            concentric_volume = 0
+        else:
+            concentric_volume = self.concentric_volume
+        if self.eccentric_volume is None:
+            eccentric_volume = 0
+        else:
+            eccentric_volume = self.eccentric_volume
+
+        return concentric_volume + eccentric_volume
+
+    def __hash__(self):
+        return hash((self.body_part_side.body_part_location.value, self.body_part_side.side))
+
+    def __eq__(self, other):
+        return self.body_part_side.body_part_location == other.body_part_side.body_part_location and self.body_part_side.side == other.body_part_side.side
+
+    def __ne__(self, other):
+        # Not strictly necessary, but to avoid having both x==y and x!=y
+        # True at the same time
+        return not (self == other)
+
+
+class SessionFunctionalMovement(object):
+    def __init__(self, session):
+        self.body_parts = []
+        self.session = session
+        self.functional_movement_mappings = []
+
+    def process(self):
+        activity_factory = ActivityFunctionalMovementFactory()
+        movement_factory = FunctionalMovementFactory()
+
+        self.functional_movement_mappings = activity_factory.get_functional_movement_mappings(self.session.sport_name)
+        concentric_levels = [m.concentric_level for m in self.functional_movement_mappings]
+        highest_concentric_level = max(concentric_levels)
+        eccentric_levels = [m.eccentric_level for m in self.functional_movement_mappings]
+        highest_eccentric_level = max(eccentric_levels)
+        highest_concentric_eccentric_level = max(highest_concentric_level, highest_eccentric_level)
+
+        for m in self.functional_movement_mappings:
+            functional_movement = movement_factory.get_functional_movement(m.functional_movement_type)
+            for p in functional_movement.prime_movers:
+                body_part_side_list = self.get_body_part_side_list(p)
+                for b in body_part_side_list:
+                    functional_movement_body_part_side = FunctionalMovementBodyPartSide(b)
+                    m.prime_movers.append(functional_movement_body_part_side)
+
+            for a in functional_movement.antagonists:
+                body_part_side_list = self.get_body_part_side_list(a)
+                for b in body_part_side_list:
+                    functional_movement_body_part_side = FunctionalMovementBodyPartSide(b)
+                    m.antagonists.append(functional_movement_body_part_side)
+
+            m.attribute_training_volume(self.session.duration_minutes * self.session.session_RPE, highest_concentric_eccentric_level)
+            m.attribute_intensity(self.session.session_RPE, highest_concentric_eccentric_level)
+
+        self.aggregate_body_parts()
+
+    def aggregate_body_parts(self):
+
+        body_part_sides = {}
+
+        for m in self.functional_movement_mappings:
+            for p in m.prime_movers:
+                if p not in body_part_sides:
+                    body_part_sides[p] = p
+                else:
+                    body_part_sides[p].concentric_volume += p.concentric_volume
+                    body_part_sides[p].eccentric_volume += p.eccentric_volume
+                    body_part_sides[p].concentric_intensity = max(p.concentric_intensity, body_part_sides[p].concentric_intensity)
+                    body_part_sides[p].eccentric_intensity = max(p.eccentric_intensity, body_part_sides[p].eccentric_intensity)
+
+        self.body_parts = list(body_part_sides.values())
+
+    def get_body_part_side_list(self, body_part_enum):
+
+        body_part_side_list = []
+
+        body_part_factory = BodyPartFactory()
+        body_part = body_part_factory.get_body_part(BodyPart(BodyPartLocation(body_part_enum), None))
+        if not body_part.bilateral:
+            sides = [0]
+        else:
+            sides = [1, 2]
+        for side in sides:
+            body_part_side = BodyPartSide(BodyPartLocation(body_part_enum), side=side)
+            body_part_side_list.append(body_part_side)
+
+        return body_part_side_list
+
+
 class FunctionalMovementActivityMapping(object):
     def __init__(self, functional_movement_type, is_concentric, concentric_level, is_eccentric, eccentric_level):
         self.functional_movement_type = functional_movement_type
@@ -34,6 +145,44 @@ class FunctionalMovementActivityMapping(object):
         self.concentric_level = concentric_level
         self.is_eccentric = is_eccentric
         self.eccentric_level = eccentric_level
+        self.prime_movers = []
+        self.antagonists = []
+        self.synergists = []
+
+    def attribute_training_volume(self, training_volume, highest_concentric_eccentric_factor):
+
+        prime_mover_ratio = 0.8
+
+        for p in self.prime_movers:
+            compensating_for_others = self.other_body_parts_affected(p, self.prime_movers)
+            if compensating_for_others:
+                prime_mover_ratio = 1.0
+            attributed_concentric_volume = training_volume * (self.concentric_level / highest_concentric_eccentric_factor) * prime_mover_ratio
+            attributed_eccentric_volume = training_volume * (self.eccentric_level / highest_concentric_eccentric_factor) * prime_mover_ratio
+            p.concentric_volume = attributed_concentric_volume
+            p.eccentric_volume = attributed_eccentric_volume
+
+    def attribute_intensity(self, intensity, highest_concentric_eccentric_factor):
+
+        prime_mover_ratio = 0.8
+
+        for p in self.prime_movers:
+            compensating_for_others = self.other_body_parts_affected(p, self.prime_movers)
+            if compensating_for_others:
+                prime_mover_ratio = 1.0
+            attributed_concentric_intensity = intensity * (self.concentric_level / highest_concentric_eccentric_factor) * prime_mover_ratio
+            attributed_eccentric_intensity = intensity * (self.eccentric_level / highest_concentric_eccentric_factor) * prime_mover_ratio
+            p.concentric_intensity = attributed_concentric_intensity
+            p.eccentric_intensity = attributed_eccentric_intensity
+
+    def other_body_parts_affected(self, target_body_part, body_part_list):
+
+        filtered_list = [b for b in body_part_list if b.body_part_side.body_part_location != target_body_part.body_part_side.body_part_location and
+                         b.body_part_side.side != target_body_part.body_part_side.side]
+
+        affected_list = [f for f in filtered_list if f.inhibited > 0 or f.weak > 0 or f.tight > 0 or f.inflamed > 0 or f.long > 0]
+
+        return len(affected_list) > 0
 
 
 class ActivityFunctionalMovementFactory(object):
@@ -52,7 +201,7 @@ class ActivityFunctionalMovementFactory(object):
             mapping.append(
                 FunctionalMovementActivityMapping(FunctionalMovementType.eversion_of_the_foot, False, 0, True, 1))
             mapping.append(
-                FunctionalMovementActivityMapping(FunctionalMovementType.knee_flexion, True, 1, True, 1))
+                FunctionalMovementActivityMapping(FunctionalMovementType.knee_flexion, True, 0.5, True, 1))
             mapping.append(
                 FunctionalMovementActivityMapping(FunctionalMovementType.knee_extension, True, 1, False, 0))
             mapping.append(
