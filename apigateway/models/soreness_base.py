@@ -138,7 +138,7 @@ class BodyPartLocationText(object):
                           'shin': 'shin',
                           'ankle': 'ankle',
                           'foot': 'foot',
-                          'it_band': 'IT band',
+                          'it_band': 'outer thigh',
                           'lower_back': 'lower back',
                           'general': 'general',
                           'glutes': 'glute',
