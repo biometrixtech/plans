@@ -63,15 +63,16 @@ def test_muscle_pain_severity_to_sharp():
     assert soreness.knots == 7
 
 
-def test_joint_pain_severity_to_sharp():
+def test_joint_pain_severity_to_sharp_movement_to_tight():
     readiness_survey = get_readiness_survey(20, 3, 5, True)
     assert len(readiness_survey.soreness) == 1
     soreness = readiness_survey.soreness[0]
     assert soreness.severity == 3
     assert soreness.movement == 5
-    assert soreness.ache == 4
+    assert soreness.ache is None
     assert soreness.sharp == 4
     assert soreness.tight == 7
+    assert soreness.knots is None
 
 
 def test_joint_pain_severity_to_sharp_no_movement():
@@ -80,7 +81,7 @@ def test_joint_pain_severity_to_sharp_no_movement():
     soreness = readiness_survey.soreness[0]
     assert soreness.pain
     assert soreness.severity == 3
-    assert soreness.ache == 4
+    assert soreness.ache is None
     assert soreness.sharp == 4
 
 

@@ -145,7 +145,7 @@ class Soreness(BaseSoreness, Serialisable):
                 ## update for muscles
                 if self.severity is not None:
                     if self.pain:  # if pain, set sharp
-                        self.sharp = self.get_sharp_ache_from_pain(self.severity)
+                        self.sharp = self.get_sharp_from_pain(self.severity)
                     else:  # else set ache
                         self.ache = self.get_ache_from_soreness(self.severity)
                 if self.movement is not None:
@@ -156,8 +156,7 @@ class Soreness(BaseSoreness, Serialisable):
                 self.pain = True  # joint is always pain
                 if self.severity is not None:
                     # set same severity value for ache and sharp
-                    self.ache = self.get_sharp_ache_from_pain(self.severity)
-                    self.sharp = self.get_sharp_ache_from_pain(self.severity)
+                    self.sharp = self.get_sharp_from_pain(self.severity)
                 if self.movement is not None:
                     # if movement is available, set tight
                     self.tight = self.get_tight_knots_from_movement(self.movement)
@@ -214,7 +213,7 @@ class Soreness(BaseSoreness, Serialisable):
         # return mapping[value]
 
     @staticmethod
-    def get_sharp_ache_from_pain(value):
+    def get_sharp_from_pain(value):
         if value == 0:
             return 0
         elif value <= 1:
