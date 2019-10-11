@@ -129,10 +129,10 @@ class BodyPartLocationText(object):
     def value(self):
         body_part_text = {'head': 'head',
                           'shoulder': 'shoulder',
-                          'chest': 'pecs',
-                          'abdominals': 'abdominal',
+                          'chest': 'pec',
+                          'abdominals': 'abdominals',
                           'hip': 'hip',
-                          'groin': 'groin',
+                          'groin': 'adductor',
                           'quads': 'quad',
                           'knee': 'knee',
                           'shin': 'shin',
@@ -150,7 +150,13 @@ class BodyPartLocationText(object):
                           'wrist': 'wrist',
                           'lats': 'lat',
                           'biceps': 'biceps',
-                          'triceps': 'triceps'}
+                          'triceps': 'triceps',
+                          'deltoid': 'deltoid',
+                          'hip_flexor': 'hip flexor',
+                          'forearm': 'forearm',
+                          'erector_spinae': 'erector spinae',
+                          'core_stabilizers': 'core stabilizers',
+                          'it_band_lateral_knee': 'outside of knee'}
 
         return body_part_text[self.body_part_location.name]
 
