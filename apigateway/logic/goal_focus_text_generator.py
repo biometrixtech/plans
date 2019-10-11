@@ -148,7 +148,7 @@ class RecoveryTextGenerator(object):
 
         try:
             body_part_text = BodyPartLocationText(body_part_location).value()
-            no_plurals = [BodyPartLocation.achilles, BodyPartLocation.lower_back, BodyPartLocation.groin,
+            no_plurals = [BodyPartLocation.achilles, BodyPartLocation.lower_back,
                           BodyPartLocation.abdominals, BodyPartLocation.head, BodyPartLocation.upper_back_neck,
                           BodyPartLocation.triceps, BodyPartLocation.biceps, BodyPartLocation.core_stabilizers,
                           BodyPartLocation.erector_spinae]
