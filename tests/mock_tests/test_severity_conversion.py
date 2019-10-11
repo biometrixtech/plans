@@ -1,6 +1,7 @@
 import pytest
 import logic.soreness_processing as soreness_and_injury
 from models.soreness import Soreness
+from models.body_parts import BodyPart
 from models.soreness_base import BodyPartLocation
 from models.daily_readiness import DailyReadiness
 from models.post_session_survey import PostSessionSurvey, PostSurvey
@@ -107,3 +108,20 @@ def test_muscle_ache_sharp_to_pain():
     assert soreness.pain
     assert soreness.severity == 5
     assert soreness.movement is None
+
+
+def test_severity_update():
+    soreness = Soreness()
+    soreness.body_part = BodyPart(BodyPartLocation(2), None)
+    soreness.side = 2
+    soreness.ache = 2  # severity is 1
+    assert soreness.severity == 1
+    assert not soreness.pain
+
+    soreness.sharp = 3  # severity is 2
+    assert soreness.severity == 2
+    assert soreness.pain
+
+    soreness.ache = 3  # severity is 1
+    assert soreness.severity == 2
+    assert soreness.pain

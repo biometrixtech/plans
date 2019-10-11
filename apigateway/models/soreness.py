@@ -115,10 +115,10 @@ class Soreness(BaseSoreness, Serialisable):
                 except InvalidSchemaException:
                     value = parse_date(value)
         elif name in ['tight', 'knots'] and value is not None:
-            self.movement = get_movement_from_tight_knot(value)
+            self.movement = self.get_movement_from_tight_knot(value)
 
         elif name == 'sharp' and value is not None:
-            severity_sharp = get_pain_from_sharp_ache(value)
+            severity_sharp = self.get_pain_from_sharp_ache(value)
             self.pain = True
             if self.severity is None:
                 self.severity = severity_sharp
@@ -126,10 +126,10 @@ class Soreness(BaseSoreness, Serialisable):
                 self.severity = max([self.severity, severity_sharp])
         elif name == 'ache' and value is not None:
             if BodyPartFactory().is_muscle(self.body_part):
-                severity_ache = get_soreness_from_ache(value)
+                severity_ache = self.get_soreness_from_ache(value)
             else:
                 self.pain = True
-                severity_ache = get_pain_from_sharp_ache(value)
+                severity_ache = self.get_pain_from_sharp_ache(value)
             if self.severity is None:
                 self.severity = severity_ache
             else:
@@ -145,22 +145,124 @@ class Soreness(BaseSoreness, Serialisable):
                 ## update for muscles
                 if self.severity is not None:
                     if self.pain:  # if pain, set sharp
-                        self.sharp = get_sharp_ache_from_pain(self.severity)
+                        self.sharp = self.get_sharp_ache_from_pain(self.severity)
                     else:  # else set ache
-                        self.ache = get_ache_from_soreness(self.severity)
+                        self.ache = self.get_ache_from_soreness(self.severity)
                 if self.movement is not None:
                     # set same value for tight and knots if movement is available
-                    self.tight = get_tight_knots_from_movement(self.movement)
-                    self.knots = get_tight_knots_from_movement(self.movement)
+                    self.tight = self.get_tight_knots_from_movement(self.movement)
+                    self.knots = self.get_tight_knots_from_movement(self.movement)
             else:
                 self.pain = True  # joint is always pain
                 if self.severity is not None:
                     # set same severity value for ache and sharp
-                    self.ache = get_sharp_ache_from_pain(self.severity)
-                    self.sharp = get_sharp_ache_from_pain(self.severity)
+                    self.ache = self.get_sharp_ache_from_pain(self.severity)
+                    self.sharp = self.get_sharp_ache_from_pain(self.severity)
                 if self.movement is not None:
                     # if movement is available, set tight
-                    self.tight = get_tight_knots_from_movement(self.movement)
+                    self.tight = self.get_tight_knots_from_movement(self.movement)
+
+    @staticmethod
+    def get_movement_from_tight_knot(value):
+        if value == 0:
+            return 0
+        if value <= 1:
+            return 1
+        elif value <= 3:
+            return 2
+        elif value <= 4:
+            return 3
+        elif value <= 6:
+            return 4
+        else:
+            return 5
+        # mapping = {0:0, 1:1, 2:3, 3:2, 4:3, 5:4, 6:4, 7:5, 8:5, 9:5, 10:5}
+        # return mapping[value]
+
+    @staticmethod
+    def get_tight_knots_from_movement(value):
+        if value == 0:
+            return 0
+        elif value <= 1:
+            return 1
+        elif value <= 2:
+            return 2
+        elif value <= 3:
+            return 4
+        elif value <= 4:
+            return 5
+        else:
+            return 7
+        # mapping = {0:0, 1:1, 2:2, 3:4, 4:5, 5:7}
+        # return mapping[value]
+
+    @staticmethod
+    def get_pain_from_sharp_ache(value):
+        if value == 0:
+            return 0
+        elif value <= 2:
+            return 1
+        elif value <= 3:
+            return 2
+        elif value <= 4:
+            return 3
+        elif value <= 5:
+            return 4
+        else:
+            return 5
+        # mapping = {0:0, 1:1, 2:1, 3:2, 4:3, 5:4, 6:5, 7:5, 8:5, 9:5, 10:5}
+        # return mapping[value]
+
+    @staticmethod
+    def get_sharp_ache_from_pain(value):
+        if value == 0:
+            return 0
+        elif value <= 1:
+            return 1
+        elif value <= 2:
+            return 3
+        elif value <= 3:
+            return 4
+        elif value <= 4:
+            return 5
+        else:
+            return 6
+        # mapping = {0:0, 1:1, 2:3, 3:4, 4:5, 5:6}
+        # return mapping[value]
+
+    @staticmethod
+    def get_soreness_from_ache(value):
+        if value == 0:
+            return 0
+        elif value <= 3:
+            return 1
+        elif value <= 4:
+            return 2
+        elif value <= 5:
+            return 3
+        elif value <= 6:
+            return 4
+        else:
+            return 5
+        # mapping = {0:0, 1:1, 2:1, 3:1, 4:2, 5:3, 6:4, 7:5, 8:5, 9:5, 10:5}
+        # return mapping[value]
+
+    @staticmethod
+    def get_ache_from_soreness(value):
+        if value == 0:
+            return 0
+        elif value <= 1:
+            return 1
+        elif value <= 2:
+            return 4
+        elif value <= 3:
+            return 5
+        elif value <= 4:
+            return 6
+        else:
+            return 7
+        # mapping = {0:0, 1:1, 2:4, 3:5, 4:6, 5:7}
+        # return mapping[value]
 
 
 
@@ -329,93 +431,3 @@ class Alert(object):
         if name == "sport_name" and not isinstance(value, SportName) and value is not None:
             value = SportName(value)
         super().__setattr__(name, value)
-
-
-
-def get_movement_from_tight_knot(value):
-    if value == 0:
-        return 0
-    if value <= 1:
-        return 1
-    elif value <= 3:
-        return 2
-    elif value <= 4:
-        return 3
-    elif value <= 6:
-        return 4
-    else:
-        return 5
-
-
-def get_pain_from_sharp_ache(value):
-    if value == 0:
-        return 0
-    elif value <= 2:
-        return 1
-    elif value <= 3:
-        return 2
-    elif value <= 4:
-        return 3
-    elif value <= 5:
-        return 4
-    else:
-        return 5
-
-
-def get_soreness_from_ache(value):
-    if value == 0:
-        return 0
-    elif value <= 3:
-        return 1
-    elif value <= 4:
-        return 2
-    elif value <= 5:
-        return 3
-    elif value <= 6:
-        return 4
-    else:
-        return 5
-
-
-def get_sharp_ache_from_pain(value):
-    if value == 0:
-        return 0
-    elif value <= 1:
-        return 1
-    elif value <= 2:
-        return 3
-    elif value <= 3:
-        return 4
-    elif value <= 4:
-        return 5
-    else:
-        return 6
-
-
-def get_ache_from_soreness(value):
-    if value == 0:
-        return 0
-    elif value <= 1:
-        return 1
-    elif value <= 2:
-        return 4
-    elif value <= 3:
-        return 5
-    elif value <= 4:
-        return 6
-    else:
-        return 7
-
-def get_tight_knots_from_movement(value):
-    if value == 0:
-        return 0
-    elif value <= 1:
-        return 1
-    elif value <= 2:
-        return 2
-    elif value <= 3:
-        return 4
-    elif value <= 4:
-        return 5
-    else:
-        return 7
