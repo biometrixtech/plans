@@ -29,7 +29,69 @@ class FunctionalMovement(object):
         self.synergists = []
 
 
-class FunctionalMovementBodyPartSide(object):
+class BodyPartInjuryRisk(object):
+    def __init__(self):
+        self.concentric_volume_last_week = None
+        self.concentric_volume_this_week = None
+        self.concentric_volume_today = None
+        self.eccentric_volume_last_week = None
+        self.eccentric_volume_this_week = None
+        self.eccentric_volume_today = None
+        self.max_concentric_intensity_48_hours = None
+        self.max_eccentric_intensity_48_hours = None
+        self.concentric_volume_ramp = None
+        self.eccentric_volume_ramp = None
+        self.excessive_strain_48_hours = None
+        self.inhibited = 0
+
+        # ache
+        self.ache_count_last_0_10_days = 0
+        self.ache_count_last_3_10_days = 0
+        self.ache_count_last_3_20_days = 0
+        self.last_ache_date = None
+
+        # excessive strain
+        self.last_excessive_strain_date = None
+        self.last_non_functional_overreaching_date = None
+        self.last_functional_overreaching_date = None
+
+        # inflammation
+        self.last_inflammation_date = None
+
+        # muscle spasm
+        self.last_muscle_spasm_date = None
+
+        # adhesions
+        self.last_adhesions_date = None
+
+        # inhibited
+        self.last_inhibited_date = None
+
+        # long
+        self.last_long_date = None
+
+        # overactive / underactive
+        self.last_overactive_date = None
+        self.last_underactive_date = None
+
+        # sharp
+        self.sharp_count_last_0_10_days = 0
+        self.sharp_count_last_3_20_days = 0
+        self.last_sharp_date = None
+
+        # short
+        self.last_short_date = None
+
+        # tight
+        self.tight_count_last_3_20_days = 0
+        self.last_tight_date = None
+
+        # weak
+        self.last_weak_date = None
+
+
+
+class BodyPartFunctionalMovement(object):
     def __init__(self, body_part_side):
         self.body_part_side = body_part_side
         self.concentric_volume = None
@@ -43,19 +105,6 @@ class FunctionalMovementBodyPartSide(object):
         self.tight = 0
         self.inflamed = 0
         self.long = 0
-
-    def total_volume(self):
-
-        if self.concentric_volume is None:
-            concentric_volume = 0
-        else:
-            concentric_volume = self.concentric_volume
-        if self.eccentric_volume is None:
-            eccentric_volume = 0
-        else:
-            eccentric_volume = self.eccentric_volume
-
-        return concentric_volume + eccentric_volume
 
     def __hash__(self):
         return hash((self.body_part_side.body_part_location.value, self.body_part_side.side))
@@ -91,13 +140,13 @@ class SessionFunctionalMovement(object):
             for p in functional_movement.prime_movers:
                 body_part_side_list = self.get_body_part_side_list(p)
                 for b in body_part_side_list:
-                    functional_movement_body_part_side = FunctionalMovementBodyPartSide(b)
+                    functional_movement_body_part_side = BodyPartFunctionalMovement(b)
                     m.prime_movers.append(functional_movement_body_part_side)
 
             for a in functional_movement.antagonists:
                 body_part_side_list = self.get_body_part_side_list(a)
                 for b in body_part_side_list:
-                    functional_movement_body_part_side = FunctionalMovementBodyPartSide(b)
+                    functional_movement_body_part_side = BodyPartFunctionalMovement(b)
                     m.antagonists.append(functional_movement_body_part_side)
 
             m.attribute_training_volume(self.session.duration_minutes * self.session.session_RPE, highest_concentric_eccentric_level)
