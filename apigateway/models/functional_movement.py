@@ -2,6 +2,7 @@ from enum import IntEnum, Enum
 from models.sport import SportName
 from models.soreness_base import BodyPartSide, BodyPartLocation
 from models.body_parts import BodyPart, BodyPartFactory
+from datetime import timedelta
 
 
 class FunctionalMovementType(Enum):
@@ -39,10 +40,6 @@ class BodyPartInjuryRisk(object):
         self.eccentric_volume_today = None
         self.max_concentric_intensity_48_hours = None
         self.max_eccentric_intensity_48_hours = None
-        self.concentric_volume_ramp = None
-        self.eccentric_volume_ramp = None
-        self.excessive_strain_48_hours = None
-        self.inhibited = 0
 
         # ache
         self.ache_count_last_0_10_days = 0
@@ -89,6 +86,61 @@ class BodyPartInjuryRisk(object):
         # weak
         self.last_weak_date = None
 
+    def eccentric_volume_ramp(self):
+
+        this_weeks_volume = 0
+        if self.eccentric_volume_this_week is not None:
+            this_weeks_volume += self.eccentric_volume_this_week
+        if self.eccentric_volume_today is not None:
+            this_weeks_volume += self.eccentric_volume_today
+
+        if self.eccentric_volume_last_week is not None and self.eccentric_volume_last_week > 0:
+            if this_weeks_volume is not None:
+                return this_weeks_volume / self.eccentric_volume_last_week
+
+        return 0
+
+    def total_volume_last_week(self):
+
+        eccentric_volume_last_week = 0
+        concentric_volume_last_week = 0
+
+        if self.eccentric_volume_last_week is not None:
+            eccentric_volume_last_week = self.eccentric_volume_last_week
+
+        if self.concentric_volume_last_week is not None:
+            concentric_volume_last_week = self.concentric_volume_last_week
+
+        return eccentric_volume_last_week + concentric_volume_last_week
+
+    def total_volume_this_week(self):
+
+        eccentric_volume_this_week = 0
+        concentric_volume_this_week = 0
+
+        if self.eccentric_volume_this_week is not None:
+            eccentric_volume_this_week += self.eccentric_volume_this_week
+
+        if self.concentric_volume_this_week is not None:
+            concentric_volume_this_week += self.concentric_volume_this_week
+
+        if self.eccentric_volume_today is not None:
+            eccentric_volume_this_week += self.eccentric_volume_today
+
+        if self.concentric_volume_today is not None:
+            concentric_volume_this_week += self.concentric_volume_today
+
+        return concentric_volume_this_week + eccentric_volume_this_week
+
+    def total_volume_ramp(self):
+
+        total_volume_last_week = self.total_volume_last_week()
+
+        if total_volume_last_week > 0:
+            return self.total_volume_this_week() / total_volume_last_week
+
+        return 0
+
 class BodyPartFunctionalMovement(object):
     def __init__(self, body_part_side):
         self.body_part_side = body_part_side
@@ -103,6 +155,10 @@ class BodyPartFunctionalMovement(object):
         self.tight = 0
         self.inflamed = 0
         self.long = 0
+
+    def total_volume(self):
+
+        return self.concentric_volume + self.eccentric_volume
 
     def __hash__(self):
         return hash((self.body_part_side.body_part_location.value, self.body_part_side.side))
@@ -123,7 +179,7 @@ class SessionFunctionalMovement(object):
         self.functional_movement_mappings = []
         self.injury_risk_dict = injury_risk_dict
 
-    def process(self):
+    def process(self, event_date_time):
         activity_factory = ActivityFunctionalMovementFactory()
         movement_factory = FunctionalMovementFactory()
 
@@ -148,8 +204,8 @@ class SessionFunctionalMovement(object):
                     functional_movement_body_part_side = BodyPartFunctionalMovement(b)
                     m.antagonists.append(functional_movement_body_part_side)
 
-            m.attribute_training_volume(self.session.duration_minutes * self.session.session_RPE, highest_concentric_eccentric_level)
-            m.attribute_intensity(self.session.session_RPE, highest_concentric_eccentric_level)
+            m.attribute_training_volume(self.session.duration_minutes * self.session.session_RPE, highest_concentric_eccentric_level, self.injury_risk_dict, event_date_time)
+            m.attribute_intensity(self.session.session_RPE, highest_concentric_eccentric_level, self.injury_risk_dict, event_date_time)
 
         self.aggregate_body_parts()
 
@@ -197,25 +253,26 @@ class FunctionalMovementActivityMapping(object):
         self.antagonists = []
         self.synergists = []
 
-    def attribute_training_volume(self, training_volume, highest_concentric_eccentric_factor):
+    def attribute_training_volume(self, training_volume, highest_concentric_eccentric_factor, injury_risk_dict, event_date_time):
 
         prime_mover_ratio = 0.8
 
         for p in self.prime_movers:
-            compensating_for_others = self.other_body_parts_affected(p, self.prime_movers)
+            compensating_for_others = self.other_body_parts_affected(p, injury_risk_dict, event_date_time)
             if compensating_for_others:
                 prime_mover_ratio = 1.0
+            # TODO replace with new ratios
             attributed_concentric_volume = training_volume * (self.concentric_level / highest_concentric_eccentric_factor) * prime_mover_ratio
             attributed_eccentric_volume = training_volume * (self.eccentric_level / highest_concentric_eccentric_factor) * prime_mover_ratio
             p.concentric_volume = attributed_concentric_volume
             p.eccentric_volume = attributed_eccentric_volume
 
-    def attribute_intensity(self, intensity, highest_concentric_eccentric_factor):
+    def attribute_intensity(self, intensity, highest_concentric_eccentric_factor, injury_risk_dict, event_date_time):
 
         prime_mover_ratio = 0.8
 
         for p in self.prime_movers:
-            compensating_for_others = self.other_body_parts_affected(p, self.prime_movers)
+            compensating_for_others = self.other_body_parts_affected(p, injury_risk_dict, event_date_time)
             if compensating_for_others:
                 prime_mover_ratio = 1.0
             attributed_concentric_intensity = intensity * (self.concentric_level / highest_concentric_eccentric_factor) * prime_mover_ratio
@@ -223,14 +280,28 @@ class FunctionalMovementActivityMapping(object):
             p.concentric_intensity = attributed_concentric_intensity
             p.eccentric_intensity = attributed_eccentric_intensity
 
-    def other_body_parts_affected(self, target_body_part, body_part_list):
+    def other_body_parts_affected(self, target_body_part, injury_risk_dict, event_date_time):
+
+        # we want to look at both the prime movers and synergists
+        body_part_list = []
+        body_part_list.extend(self.prime_movers)
+        body_part_list.extend(self.synergists)
 
         filtered_list = [b for b in body_part_list if b.body_part_side.body_part_location != target_body_part.body_part_side.body_part_location and
                          b.body_part_side.side != target_body_part.body_part_side.side]
 
-        affected_list = [f for f in filtered_list if f.inhibited > 0 or f.weak > 0 or f.tight > 0 or f.inflamed > 0 or f.long > 0]
+        two_days_ago = event_date_time.date() - timedelta(days=1)
 
-        return len(affected_list) > 0
+        for f in filtered_list:
+            if f.body_part_side in injury_risk_dict:
+                if (f.last_weak_date.date() == event_date_time.date() or
+                f.last_tight_date.date() == event_date_time.date() or
+                f.last_long_date.date() == event_date_time.date() or
+                f.last_inhibited_date.date() >= two_days_ago or
+                f.last_inflammation_date.date() >= two_days_ago):
+                    return True
+
+        return False
 
 
 class ActivityFunctionalMovementFactory(object):

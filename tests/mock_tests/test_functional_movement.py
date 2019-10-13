@@ -38,7 +38,7 @@ def test_first_session_no_3s():
 
     for s in sessions:
         session_functional_movement = SessionFunctionalMovement(s, {})
-        session_functional_movement.process()
+        session_functional_movement.process(s.event_date)
 
 
     j=0
