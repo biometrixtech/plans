@@ -5,7 +5,7 @@ xray_recorder.begin_segment(name="test")
 from models.session import SportTrainingSession
 from datetime import datetime, timedelta
 from models.sport import SportName
-from models.functional_movement import ActivityFunctionalMovementFactory, FunctionalMovementFactory, FunctionalMovementBodyPartSide, SessionFunctionalMovement
+from models.functional_movement import ActivityFunctionalMovementFactory, FunctionalMovementFactory, BodyPartFunctionalMovement, SessionFunctionalMovement
 from logic.functional_anatomy_processing import FunctionalAnatomyProcessor
 
 
@@ -37,7 +37,7 @@ def test_first_session_no_3s():
     sessions = get_sessions(dates, rpes, durations, sport_names)
 
     for s in sessions:
-        session_functional_movement = SessionFunctionalMovement(s)
+        session_functional_movement = SessionFunctionalMovement(s, {})
         session_functional_movement.process()
 
 

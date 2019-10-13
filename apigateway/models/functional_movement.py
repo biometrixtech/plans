@@ -89,8 +89,6 @@ class BodyPartInjuryRisk(object):
         # weak
         self.last_weak_date = None
 
-
-
 class BodyPartFunctionalMovement(object):
     def __init__(self, body_part_side):
         self.body_part_side = body_part_side
@@ -119,10 +117,11 @@ class BodyPartFunctionalMovement(object):
 
 
 class SessionFunctionalMovement(object):
-    def __init__(self, session):
+    def __init__(self, session, injury_risk_dict):
         self.body_parts = []
         self.session = session
         self.functional_movement_mappings = []
+        self.injury_risk_dict = injury_risk_dict
 
     def process(self):
         activity_factory = ActivityFunctionalMovementFactory()
