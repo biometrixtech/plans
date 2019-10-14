@@ -45,6 +45,7 @@ class BodyPartInjuryRisk(object):
         self.ache_count_last_0_10_days = 0
         self.ache_count_last_3_10_days = 0
         self.ache_count_last_3_20_days = 0
+        self.last_ache_level = 0
         self.last_ache_date = None
 
         # excessive strain
@@ -54,6 +55,10 @@ class BodyPartInjuryRisk(object):
 
         # inflammation
         self.last_inflammation_date = None
+
+        # knots
+        self.last_knots_level = 0
+        self.last_knots_date = None
 
         # muscle spasm
         self.last_muscle_spasm_date = None
@@ -74,6 +79,7 @@ class BodyPartInjuryRisk(object):
         # sharp
         self.sharp_count_last_0_10_days = 0
         self.sharp_count_last_3_20_days = 0
+        self.last_sharp_level = 0
         self.last_sharp_date = None
 
         # short
@@ -81,6 +87,7 @@ class BodyPartInjuryRisk(object):
 
         # tight
         self.tight_count_last_3_20_days = 0
+        self.last_tight_level = 0
         self.last_tight_date = None
 
         # weak
@@ -141,6 +148,7 @@ class BodyPartInjuryRisk(object):
 
         return 0
 
+
 class BodyPartFunctionalMovement(object):
     def __init__(self, body_part_side):
         self.body_part_side = body_part_side
@@ -150,6 +158,7 @@ class BodyPartFunctionalMovement(object):
         self.eccentric_intensity = 0
         self.concentric_ramp = 0.0
         self.eccentric_ramp = 0.0
+        self.is_compensating = False
         self.inhibited = 0
         self.weak = 0
         self.tight = 0
@@ -267,6 +276,7 @@ class FunctionalMovementActivityMapping(object):
             attributed_eccentric_volume = training_volume * (self.eccentric_level / highest_concentric_eccentric_factor) * prime_mover_ratio
             p.concentric_volume = attributed_concentric_volume
             p.eccentric_volume = attributed_eccentric_volume
+            p.is_compensating = compensating_for_others
 
     def attribute_intensity(self, intensity, highest_concentric_eccentric_factor, injury_risk_dict, event_date_time):
 
@@ -282,6 +292,7 @@ class FunctionalMovementActivityMapping(object):
             attributed_eccentric_intensity = intensity * (self.eccentric_level / highest_concentric_eccentric_factor) * prime_mover_ratio
             p.concentric_intensity = attributed_concentric_intensity
             p.eccentric_intensity = attributed_eccentric_intensity
+            p.is_compensating = compensating_for_others
 
     def other_body_parts_affected(self, target_body_part, injury_risk_dict, event_date_time):
 
