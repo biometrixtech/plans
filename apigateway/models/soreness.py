@@ -125,7 +125,7 @@ class Soreness(BaseSoreness, Serialisable):
             else:
                 self.severity = max([self.severity, severity_sharp])
         elif name == 'ache' and value is not None:
-            if not BodyPartFactory().is_joint(self.body_part):
+            if BodyPartFactory().is_muscle(self.body_part):
                 severity_ache = self.get_soreness_from_ache(value)
             else:  # is joint
                 self.pain = True
@@ -141,7 +141,7 @@ class Soreness(BaseSoreness, Serialisable):
     def get_symptoms_from_severity_movement(self):
         if self.tight is None and self.knots is None and self.ache is None and self.sharp is None:
             # only update if all are none, i.e. this is old data
-            if not BodyPartFactory().is_joint(self.body_part):
+            if BodyPartFactory().is_muscle(self.body_part):
                 ## update for muscles
                 if self.severity is not None:
                     if self.pain:  # if pain, set sharp
