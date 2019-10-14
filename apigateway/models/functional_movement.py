@@ -295,13 +295,19 @@ class FunctionalMovementActivityMapping(object):
         two_days_ago = event_date_time.date() - timedelta(days=1)
 
         for f in filtered_list:
-            #if f.body_part_side.body_part_location != target_body_part.body_part_side.body_part_location and f.body_part_side.side != target_body_part.body_part_side.side:
+            # we are looking for recent statuses that we've determined, different than those reported in symptom intake
             if f.body_part_side in injury_risk_dict:
                 if (injury_risk_dict[f.body_part_side].last_weak_date is not None and
                         injury_risk_dict[f.body_part_side].last_weak_date == event_date_time.date()):
                     return True
-                if (injury_risk_dict[f.body_part_side].last_tight_date is not None and
-                        injury_risk_dict[f.body_part_side].last_tight_date == event_date_time.date()):
+                if (injury_risk_dict[f.body_part_side].last_muscle_spasm_date is not None and
+                        injury_risk_dict[f.body_part_side].last_muscle_spasm_date == event_date_time.date()):
+                    return True
+                if (injury_risk_dict[f.body_part_side].last_adhesions_date is not None and
+                        injury_risk_dict[f.body_part_side].last_adhesions_date == event_date_time.date()):
+                    return True
+                if (injury_risk_dict[f.body_part_side].last_short_date is not None and
+                        injury_risk_dict[f.body_part_side].last_short_date == event_date_time.date()):
                     return True
                 if (injury_risk_dict[f.body_part_side].last_long_date is not None and
                         injury_risk_dict[f.body_part_side].last_long_date == event_date_time.date()):
