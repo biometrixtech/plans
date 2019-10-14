@@ -191,10 +191,7 @@ class InjuryRiskProcessor(object):
 
     def process_todays_sessions(self, base_date, injury_risk_dict):
 
-        daily_sessions = [n for n in self.training_sessions if n.event_date_time.date() == base_date]
-
-        todays_eccentric_volume = 0
-        todays_concentric_volume = 0
+        daily_sessions = [n for n in self.training_sessions if n.event_date.date() == base_date.date()]
 
         for session in daily_sessions:
             session_functional_movement = SessionFunctionalMovement(session, injury_risk_dict)
@@ -204,14 +201,11 @@ class InjuryRiskProcessor(object):
                 if b.body_part_side not in injury_risk_dict:
                     injury_risk_dict[b.body_part_side] = BodyPartInjuryRisk()
 
-                todays_eccentric_volume += b.eccentric_volume
-                todays_concentric_volume += b.concentric_volume
+                injury_risk_dict[b.body_part_side].eccentric_volume_today += b.eccentric_volume
+                injury_risk_dict[b.body_part_side].concentric_volume_today += b.concentric_volume
 
-                injury_risk_dict[b.b.body_part_side].eccentric_volume_today = todays_eccentric_volume
-                injury_risk_dict[b.b.body_part_side].concentric_volume_today = todays_concentric_volume
-
-                eccentric_volume_ramp = injury_risk_dict[b.b.body_part_side].eccentric_volume_ramp()
-                total_volume_ramp = injury_risk_dict[b.b.body_part_side].total_volume_ramp()
+                eccentric_volume_ramp = injury_risk_dict[b.body_part_side].eccentric_volume_ramp()
+                total_volume_ramp = injury_risk_dict[b.body_part_side].total_volume_ramp()
 
                 if eccentric_volume_ramp > 1.0 or total_volume_ramp > 1.0:
                     injury_risk_dict[b.body_part_side].last_excessive_strain_date = base_date
@@ -230,11 +224,11 @@ class InjuryRiskProcessor(object):
 
     def process_todays_symptoms(self, base_date, injury_risk_dict):
 
-        todays_symptoms = [s for s in self.symptoms if s.event_date_time.date() == base_date.date()]
+        todays_symptoms = [s for s in self.symptoms if s.reported_date_time.date() == base_date.date()]
 
         for t in todays_symptoms:
 
-            related_joints = self.functional_anatomy_processor.get_related_joints(t.body_part.body_part_location.value)
+            related_joints = self.functional_anatomy_processor.get_related_joints(t.body_part.location.value)
 
             # Inflammation
             # TODO: make sure t is a muscle
@@ -259,13 +253,13 @@ class InjuryRiskProcessor(object):
 
         for r in related_joints:
             # are any already in our historical list? update if yes, add if not; keep track of counts for diagnosis
-            body_part_side = BodyPartSide(BodyPartLocation(r), target_symptom.body_part.side)
+            body_part_side = BodyPartSide(BodyPartLocation(r), target_symptom.side)
 
             todays_sharp_symptoms = [s for s in todays_symptoms
-                                     if s.body_part.body_part_location == body_part_side.body_part_location
+                                     if s.body_part.location == body_part_side.body_part_location
                                      and s.body_part.side == body_part_side.side and s.sharp > 0]
             todays_ache_symptoms = [s for s in todays_symptoms
-                                    if s.body_part.body_part_location == body_part_side.body_part_location
+                                    if s.body_part.location == body_part_side.body_part_location
                                     and s.body_part.side == body_part_side.side and s.ache > 0]
 
             if body_part_side in injury_risk_dict:
@@ -303,7 +297,7 @@ class InjuryRiskProcessor(object):
         if ((target_symptom.sharp is not None and target_symptom.sharp > 0) or (target_symptom.ache is not None and target_symptom.ache > 0) or
                 max_related_joint_sharp_count_last_10_days > 1 or max_related_joint_ache_count_last_10_days > 1):  # require a least two occurrences in last 10 days
             # update the injury risk dict accordingly
-            target_body_part_side = BodyPartSide(target_symptom.body_part.body_part_location, target_symptom.side)
+            target_body_part_side = BodyPartSide(target_symptom.body_part.location, target_symptom.side)
             if target_body_part_side in injury_risk_dict:
                 injury_risk_dict[target_body_part_side].last_inflammation_date = event_date_time.date()
                 injury_risk_dict[target_body_part_side].last_inhibited_date = event_date_time.date()
@@ -315,7 +309,9 @@ class InjuryRiskProcessor(object):
 
         # now treat everything with excessive strain in last 2 days as inflammation
         two_days_ago = event_date_time.date() - timedelta(days=1)
-        excessive_strain_body_parts = dict(filter(lambda elem: elem[1].last_excessive_strain_date >= two_days_ago, injury_risk_dict))
+        excessive_strain_body_parts = dict(filter(lambda elem: elem[1].last_excessive_strain_date is not None and
+                                                               elem[1].last_excessive_strain_date >= two_days_ago,
+                                                  injury_risk_dict.items()))
 
         for b, e in excessive_strain_body_parts.items():
             injury_risk_dict[b].last_inflammation_date = event_date_time.date()
@@ -329,22 +325,22 @@ class InjuryRiskProcessor(object):
         related_joint_ache = False
         reported_ache_3_10_days = False
 
-        target_body_part_side = BodyPartSide(target_symptom.body_part.body_part_location, target_symptom.side)
+        target_body_part_side = BodyPartSide(target_symptom.body_part.location, target_symptom.side)
 
         for r in related_joints:
             # are any already in our historical list? update if yes, add if not; keep track of counts for diagnosis
-            body_part_side = BodyPartSide(BodyPartLocation(r), target_symptom.body_part.side)
+            body_part_side = BodyPartSide(BodyPartLocation(r), target_symptom.side)
 
             todays_sharp_symptoms = [s for s in todays_symptoms
-                                     if s.body_part.body_part_location == body_part_side.body_part_location
+                                     if s.body_part.location == body_part_side.body_part_location
                                      and s.body_part.side == body_part_side.side and s.sharp > 0]
             todays_tight_symptoms = [s for s in todays_symptoms
-                                    if s.body_part.body_part_location == body_part_side.body_part_location
+                                    if s.body_part.location == body_part_side.body_part_location
                                     and s.body_part.side == body_part_side.side and s.tight > 0]
 
             # TODO: is moderate to high ache severity > 3?
             todays_ache_symptoms = [s for s in todays_symptoms
-                                     if s.body_part.body_part_location == body_part_side.body_part_location
+                                     if s.body_part.location == body_part_side.body_part_location
                                      and s.body_part.side == body_part_side.side and s.ache > 3]
 
             if len(todays_sharp_symptoms) > 0:
@@ -413,11 +409,11 @@ class InjuryRiskProcessor(object):
         reported_sharp_count = False
         reported_ache_count = False
 
-        target_body_part_side = BodyPartSide(target_symptom.body_part.body_part_location, target_symptom.side)
+        target_body_part_side = BodyPartSide(target_symptom.body_part.location, target_symptom.side)
 
         for r in related_joints:
             # are any already in our historical list? update if yes, add if not; keep track of counts for diagnosis
-            body_part_side = BodyPartSide(BodyPartLocation(r), target_symptom.body_part.side)
+            body_part_side = BodyPartSide(BodyPartLocation(r), target_symptom.side)
 
             if body_part_side in injury_risk_dict:
                 if injury_risk_dict[body_part_side].tight_count_last_3_20_days >= 3:

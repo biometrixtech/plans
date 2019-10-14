@@ -32,14 +32,14 @@ class FunctionalMovement(object):
 
 class BodyPartInjuryRisk(object):
     def __init__(self):
-        self.concentric_volume_last_week = None
-        self.concentric_volume_this_week = None
-        self.concentric_volume_today = None
-        self.eccentric_volume_last_week = None
-        self.eccentric_volume_this_week = None
-        self.eccentric_volume_today = None
-        self.max_concentric_intensity_48_hours = None
-        self.max_eccentric_intensity_48_hours = None
+        self.concentric_volume_last_week = 0
+        self.concentric_volume_this_week = 0
+        self.concentric_volume_today = 0
+        self.eccentric_volume_last_week = 0
+        self.eccentric_volume_this_week = 0
+        self.eccentric_volume_today = 0
+        self.max_concentric_intensity_48_hours = 0
+        self.max_eccentric_intensity_48_hours = 0
 
         # ache
         self.ache_count_last_0_10_days = 0
@@ -144,12 +144,12 @@ class BodyPartInjuryRisk(object):
 class BodyPartFunctionalMovement(object):
     def __init__(self, body_part_side):
         self.body_part_side = body_part_side
-        self.concentric_volume = None
-        self.eccentric_volume = None
-        self.concentric_intensity = None
-        self.eccentric_intensity = None
-        self.concentric_ramp = None
-        self.eccentric_ramp = None
+        self.concentric_volume = 0
+        self.eccentric_volume = 0
+        self.concentric_intensity = 0
+        self.eccentric_intensity = 0
+        self.concentric_ramp = 0.0
+        self.eccentric_ramp = 0.0
         self.inhibited = 0
         self.weak = 0
         self.tight = 0
@@ -204,6 +204,7 @@ class SessionFunctionalMovement(object):
                     functional_movement_body_part_side = BodyPartFunctionalMovement(b)
                     m.antagonists.append(functional_movement_body_part_side)
 
+            # TODO - change with total volume
             m.attribute_training_volume(self.session.duration_minutes * self.session.session_RPE, highest_concentric_eccentric_level, self.injury_risk_dict, event_date_time)
             m.attribute_intensity(self.session.session_RPE, highest_concentric_eccentric_level, self.injury_risk_dict, event_date_time)
 
@@ -271,6 +272,8 @@ class FunctionalMovementActivityMapping(object):
 
         prime_mover_ratio = 0.8
 
+        # TODO make sure we implement logic to test for high intensity on processing, esp for eccentric intensity
+
         for p in self.prime_movers:
             compensating_for_others = self.other_body_parts_affected(p, injury_risk_dict, event_date_time)
             if compensating_for_others:
@@ -287,20 +290,28 @@ class FunctionalMovementActivityMapping(object):
         body_part_list.extend(self.prime_movers)
         body_part_list.extend(self.synergists)
 
-        filtered_list = [b for b in body_part_list if b.body_part_side.body_part_location != target_body_part.body_part_side.body_part_location and
-                         b.body_part_side.side != target_body_part.body_part_side.side]
+        filtered_list = [b for b in body_part_list if b.body_part_side != target_body_part.body_part_side]
 
         two_days_ago = event_date_time.date() - timedelta(days=1)
 
         for f in filtered_list:
+            #if f.body_part_side.body_part_location != target_body_part.body_part_side.body_part_location and f.body_part_side.side != target_body_part.body_part_side.side:
             if f.body_part_side in injury_risk_dict:
-                if (f.last_weak_date.date() == event_date_time.date() or
-                f.last_tight_date.date() == event_date_time.date() or
-                f.last_long_date.date() == event_date_time.date() or
-                f.last_inhibited_date.date() >= two_days_ago or
-                f.last_inflammation_date.date() >= two_days_ago):
+                if (injury_risk_dict[f.body_part_side].last_weak_date is not None and
+                        injury_risk_dict[f.body_part_side].last_weak_date == event_date_time.date()):
                     return True
-
+                if (injury_risk_dict[f.body_part_side].last_tight_date is not None and
+                        injury_risk_dict[f.body_part_side].last_tight_date == event_date_time.date()):
+                    return True
+                if (injury_risk_dict[f.body_part_side].last_long_date is not None and
+                        injury_risk_dict[f.body_part_side].last_long_date == event_date_time.date()):
+                    return True
+                if (injury_risk_dict[f.body_part_side].last_inhibited_date is not None and
+                        injury_risk_dict[f.body_part_side].last_inhibited_date >= two_days_ago):
+                    return True
+                if (injury_risk_dict[f.body_part_side].last_inflammation_date is not None and
+                        injury_risk_dict[f.body_part_side].last_inflammation_date >= two_days_ago):
+                    return True
         return False
 
 
