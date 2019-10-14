@@ -73,7 +73,7 @@ def test_sharp_symptom_inflammation():
     now_date = datetime.now()
 
     soreness = Soreness()
-    soreness.body_part = BodyPart(BodyPartLocation(3), None)
+    soreness.body_part = BodyPart(BodyPartLocation(48), None)
     soreness.side = 1
     soreness.sharp = 3
     soreness.reported_date_time = now_date
@@ -81,7 +81,7 @@ def test_sharp_symptom_inflammation():
     proc = InjuryRiskProcessor(now_date, [soreness], [], {})
     injury_risk_dict = proc.process()
 
-    body_part_side = BodyPartSide(BodyPartLocation(3), 1)
+    body_part_side = BodyPartSide(BodyPartLocation(48), 1)
 
     assert injury_risk_dict[body_part_side].last_inflammation_date == now_date.date()
     assert injury_risk_dict[body_part_side].last_inhibited_date == now_date.date()
@@ -92,7 +92,7 @@ def test_ache_symptom_inflammation():
     now_date = datetime.now()
 
     soreness = Soreness()
-    soreness.body_part = BodyPart(BodyPartLocation(3), None)
+    soreness.body_part = BodyPart(BodyPartLocation(48), None)
     soreness.side = 1
     soreness.ache = 1
     soreness.reported_date_time = now_date
@@ -100,7 +100,7 @@ def test_ache_symptom_inflammation():
     proc = InjuryRiskProcessor(now_date, [soreness], [], {})
     injury_risk_dict = proc.process()
 
-    body_part_side = BodyPartSide(BodyPartLocation(3), 1)
+    body_part_side = BodyPartSide(BodyPartLocation(48), 1)
 
     assert injury_risk_dict[body_part_side].last_inflammation_date == now_date.date()
     assert injury_risk_dict[body_part_side].last_inhibited_date == now_date.date()
@@ -111,7 +111,7 @@ def test_tight_symptom_muscle_spasn():
     now_date = datetime.now()
 
     soreness = Soreness()
-    soreness.body_part = BodyPart(BodyPartLocation(3), None)
+    soreness.body_part = BodyPart(BodyPartLocation(48), None)
     soreness.side = 1
     soreness.tight = 1
     soreness.reported_date_time = now_date
@@ -119,11 +119,53 @@ def test_tight_symptom_muscle_spasn():
     proc = InjuryRiskProcessor(now_date, [soreness], [], {})
     injury_risk_dict = proc.process()
 
-    body_part_side = BodyPartSide(BodyPartLocation(3), 1)
+    body_part_side = BodyPartSide(BodyPartLocation(48), 1)
 
     assert injury_risk_dict[body_part_side].last_muscle_spasm_date == now_date.date()
     assert injury_risk_dict[body_part_side].last_inhibited_date is None
     assert injury_risk_dict[body_part_side].last_inflammation_date is None
+
+def test_muscle_deconstruction():
+
+    now_date = datetime.now()
+
+    soreness = Soreness()
+    soreness.body_part = BodyPart(BodyPartLocation(6), None)
+    soreness.side = 1
+    soreness.tight = 1
+    soreness.reported_date_time = now_date
+
+    soreness_2 = Soreness()
+    soreness_2.body_part = BodyPart(BodyPartLocation(7), None)
+    soreness_2.side = 1
+    soreness_2.sharp = 2
+    soreness_2.reported_date_time = now_date
+
+    proc = InjuryRiskProcessor(now_date, [soreness, soreness_2], [], {})
+    injury_risk_dict = proc.process()
+    body_parts = list(injury_risk_dict.keys())
+    assert len(injury_risk_dict) == 9
+
+def test_muscle_deconstruction_reconstruction():
+
+    now_date = datetime.now()
+
+    soreness = Soreness()
+    soreness.body_part = BodyPart(BodyPartLocation(6), None)
+    soreness.side = 1
+    soreness.tight = 1
+    soreness.reported_date_time = now_date
+
+    soreness_2 = Soreness()
+    soreness_2.body_part = BodyPart(BodyPartLocation(7), None)
+    soreness_2.side = 1
+    soreness_2.sharp = 2
+    soreness_2.reported_date_time = now_date
+
+    proc = InjuryRiskProcessor(now_date, [soreness, soreness_2], [], {})
+    injury_risk_dict = proc.process(aggregate_results=True)
+    body_parts = list(injury_risk_dict.keys())
+    assert len(injury_risk_dict) == 4
 
 def test_inflammation_affects_load():
     now_date = datetime.now()

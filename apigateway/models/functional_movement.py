@@ -93,6 +93,87 @@ class BodyPartInjuryRisk(object):
         # weak
         self.last_weak_date = None
 
+    def merge(self, body_part_injury_risk):
+
+        self.concentric_volume_last_week = max(self.concentric_volume_last_week, body_part_injury_risk.concentric_volume_last_week)
+        self.concentric_volume_this_week = max(self.concentric_volume_this_week, body_part_injury_risk.concentric_volume_this_week)
+        self.concentric_volume_today = max(self.concentric_volume_today, body_part_injury_risk.concentric_volume_today)
+        self.eccentric_volume_last_week = max(self.eccentric_volume_last_week, body_part_injury_risk.eccentric_volume_last_week)
+        self.eccentric_volume_this_week = max(self.eccentric_volume_this_week, body_part_injury_risk.eccentric_volume_this_week)
+        self.eccentric_volume_today = max(self.eccentric_volume_today, body_part_injury_risk.eccentric_volume_today)
+        self.max_concentric_intensity_48_hours = max(self.max_concentric_intensity_48_hours, body_part_injury_risk.max_concentric_intensity_48_hours)
+        self.max_eccentric_intensity_48_hours = max(self.max_eccentric_intensity_48_hours, body_part_injury_risk.max_eccentric_intensity_48_hours)
+
+        # ache
+        self.ache_count_last_0_10_days = max(self.ache_count_last_0_10_days, body_part_injury_risk.ache_count_last_0_10_days)
+        self.ache_count_last_3_10_days = max(self.ache_count_last_3_10_days, body_part_injury_risk.ache_count_last_3_10_days)
+        self.ache_count_last_3_20_days = max(self.ache_count_last_3_20_days, body_part_injury_risk.ache_count_last_3_20_days)
+        self.last_ache_level = max(self.last_ache_level, body_part_injury_risk.last_ache_level)
+        self.last_ache_date = self.merge_with_none(self.last_ache_date, body_part_injury_risk.last_ache_date)
+
+        # excessive strain
+        self.last_excessive_strain_date = self.merge_with_none(self.last_excessive_strain_date, body_part_injury_risk.last_excessive_strain_date)
+        self.last_non_functional_overreaching_date = self.merge_with_none(self.last_non_functional_overreaching_date, body_part_injury_risk.last_non_functional_overreaching_date)
+        self.last_functional_overreaching_date = self.merge_with_none(self.last_functional_overreaching_date, body_part_injury_risk.last_functional_overreaching_date)
+
+        # inflammation
+        self.last_inflammation_date = self.merge_with_none(self.last_inflammation_date, body_part_injury_risk.last_inflammation_date)
+
+        # knots
+        self.last_knots_level = max(self.last_knots_level, body_part_injury_risk.last_knots_level)
+        self.last_knots_date = self.merge_with_none(self.last_knots_date, body_part_injury_risk.last_knots_date)
+
+
+        # muscle spasm
+        self.last_muscle_spasm_date = self.merge_with_none(self.last_muscle_spasm_date, body_part_injury_risk.last_muscle_spasm_date)
+
+
+        # adhesions
+        self.last_adhesions_date = self.merge_with_none(self.last_adhesions_date, body_part_injury_risk.last_adhesions_date)
+
+
+        # inhibited
+        self.last_inhibited_date = self.merge_with_none(self.last_inhibited_date, body_part_injury_risk.last_inhibited_date)
+
+
+        # long
+        self.last_long_date = self.merge_with_none(self.last_long_date, body_part_injury_risk.last_long_date)
+
+
+        # overactive / underactive
+        self.last_overactive_date = self.merge_with_none(self.last_overactive_date, body_part_injury_risk.last_overactive_date)
+
+        self.last_underactive_date = self.merge_with_none(self.last_underactive_date, body_part_injury_risk.last_underactive_date)
+
+
+        # sharp
+        self.sharp_count_last_0_10_days = max(self.sharp_count_last_0_10_days, body_part_injury_risk.sharp_count_last_0_10_days)
+        self.sharp_count_last_3_20_days = max(self.sharp_count_last_3_20_days, body_part_injury_risk.sharp_count_last_3_20_days)
+        self.last_sharp_level = max(self.last_sharp_level, body_part_injury_risk.last_sharp_level)
+        self.last_sharp_date = self.merge_with_none(self.last_sharp_date, body_part_injury_risk.last_sharp_date)
+
+        # short
+        self.last_short_date = self.merge_with_none(self.last_short_date, body_part_injury_risk.last_short_date)
+
+        # tight
+        self.tight_count_last_3_20_days = max(self.tight_count_last_3_20_days, body_part_injury_risk.tight_count_last_3_20_days)
+        self.last_tight_level = max(self.last_tight_level, body_part_injury_risk.last_tight_level)
+        self.last_tight_date = self.merge_with_none(self.last_tight_date, body_part_injury_risk.last_tight_date)
+
+        # weak
+        self.last_weak_date = self.merge_with_none(self.last_weak_date, body_part_injury_risk.last_weak_date)
+
+    def merge_with_none(self, value_a, value_b):
+
+        if value_a is None and value_b is None:
+            return None
+        if value_a is not None and value_b is None:
+            return value_a
+        if value_b is not None and value_a is None:
+            return value_b
+        if value_a is not None and value_b is not None:
+            return max(value_a, value_b)
+
     def eccentric_volume_ramp(self):
 
         this_weeks_volume = 0

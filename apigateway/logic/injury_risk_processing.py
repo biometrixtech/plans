@@ -2,7 +2,8 @@ from datetime import datetime, timedelta
 from logic.functional_anatomy_processing import FunctionalAnatomyProcessor
 from models.soreness_base import BodyPartSide, BodyPartLocation
 from models.functional_movement import BodyPartInjuryRisk, SessionFunctionalMovement
-from models.body_parts import BodyPartFactory
+from models.body_parts import BodyPart, BodyPartFactory
+from copy import deepcopy
 
 
 class InjuryRiskProcessor(object):
@@ -19,13 +20,48 @@ class InjuryRiskProcessor(object):
         self.eccentric_volume_dict = {}
         self.concentric_volume_dict = {}
 
-    def process(self, update_historical_data=False):
+    def process(self, update_historical_data=False, aggregate_results=False):
+
+        # deconstruct symptoms to muscle level
+        detailed_symptoms = []
+        for s in self.symptoms:
+            muscles = BodyPartLocation.get_muscles_for_group(s.body_part.location)
+            if isinstance(muscles, list):
+                for m in muscles:
+                    symptom = deepcopy(s)
+                    symptom.body_part = BodyPart(m, None)
+                    detailed_symptoms.append(symptom)
+            else:
+                detailed_symptoms.append(s)
+
+        self.symptoms = detailed_symptoms
 
         if update_historical_data:
             self.update_historical_data()
         else:
             self.process_todays_symptoms(self.event_date_time, self.injury_risk_dict)
             self.process_todays_sessions(self.event_date_time, self.injury_risk_dict)
+
+        #reconstruct to group level
+        if aggregate_results:
+
+            aggregated_injury_hist_dict = {}
+
+            for body_part_side, body_part_injury_risk in self.injury_risk_dict.items():
+                if body_part_side not in aggregated_injury_hist_dict:
+                    muscle_group = BodyPartLocation.get_muscle_group(body_part_side.body_part_location)
+                    if isinstance(muscle_group, BodyPartLocation):
+                        new_body_part_side = BodyPartSide(muscle_group, body_part_side.side)
+                        if new_body_part_side not in aggregated_injury_hist_dict:
+                            aggregated_injury_hist_dict[new_body_part_side] = deepcopy(body_part_injury_risk)
+                        else:
+                            aggregated_injury_hist_dict[new_body_part_side].merge(self.injury_risk_dict[body_part_side])
+                    else:
+                        aggregated_injury_hist_dict[body_part_side] = deepcopy(self.injury_risk_dict[body_part_side])
+                else:
+                    aggregated_injury_hist_dict[body_part_side].merge(self.injury_risk_dict[body_part_side])
+
+            self.injury_risk_dict = aggregated_injury_hist_dict
 
         return self.injury_risk_dict
 
