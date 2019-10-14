@@ -126,3 +126,5 @@ def test_severity_update():
     soreness.ache = 3  # severity is 1
     assert soreness.severity == 2
     assert soreness.pain
+
+

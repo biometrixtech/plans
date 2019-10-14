@@ -13,9 +13,6 @@ class BodyPartFactory(object):
         location = self.get_body_part_location(body_part)
 
         if location in [
-                        BodyPartLocation.it_band,
-                        BodyPartLocation.it_band_lateral_knee,
-                        BodyPartLocation.achilles,
                         BodyPartLocation.elbow,
                         BodyPartLocation.wrist,
                         BodyPartLocation.shoulder,
@@ -29,31 +26,30 @@ class BodyPartFactory(object):
         else:
             return False
 
-    def is_muscle(self, body_part):
+    def is_ligament(self, body_part):
 
         location = self.get_body_part_location(body_part)
 
-        if location in [BodyPartLocation.forearm,
-                        BodyPartLocation.biceps,
-                        BodyPartLocation.triceps,
-                        BodyPartLocation.deltoid,
-                        BodyPartLocation.chest,
-                        BodyPartLocation.upper_back_neck,
-                        BodyPartLocation.erector_spinae,
-                        BodyPartLocation.lats,
-                        BodyPartLocation.abdominals,
-                        BodyPartLocation.core_stabilizers,
-                        BodyPartLocation.glutes,
-                        BodyPartLocation.hip_flexor,
-                        BodyPartLocation.quads,
-                        BodyPartLocation.groin,
-                        BodyPartLocation.hamstrings,
-                        BodyPartLocation.calves,
-                        BodyPartLocation.shin
+        if location in [
+                        BodyPartLocation.it_band,
+                        BodyPartLocation.it_band_lateral_knee,
+                        BodyPartLocation.achilles
                         ]:
             return True
         else:
             return False
+
+    def is_muscle(self, body_part):
+
+        location = self.get_body_part_location(body_part)
+        muscle_groups = BodyPartLocation.muscle_groups()
+        if location in muscle_groups.keys():  # is a muscle group
+            return True
+        else:
+            for key, value in muscle_groups.items():
+                if location in value:  # is a muscle
+                    return True
+        return False
 
     def get_body_part_location(self, body_part):
 
@@ -263,7 +259,7 @@ class BodyPartFactory(object):
     def get_base_body_part(self, body_part_location):
 
         part = BodyPart(body_part_location, None)
-        part.bilateral = part.bilateral = self.get_bilateral(part.location)
+        part.bilateral = self.get_bilateral(part.location)
 
         return part
 
