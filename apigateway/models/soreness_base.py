@@ -129,9 +129,9 @@ class BodyPartLocation(Enum):
     gluteus_minimus = 65
     gluteus_maximus = 66
 
-    quadratus_femoris = 67
-    popliteus = 68
-    lateral_rotators = 69
+    # quadratus_femoris = 67
+    # popliteus = 68
+    # lateral_rotators = 69
 
     upper_body = 91
     lower_body = 92
