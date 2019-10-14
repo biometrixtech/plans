@@ -1,5 +1,5 @@
 from models.sport import SportName
-from models.functional_anatomy import FunctionalAnatomy
+#from models.functional_anatomy import FunctionalAnatomy
 from models.soreness_base import BodyPartLocation
 
 
@@ -7,15 +7,15 @@ class FunctionalAnatomyProcessor(object):
     def __init__(self):
         self.activity = SportName.distance_running
 
-    def get_functional_anatomy_for_sport(self, sport_name):
-
-        functional_anatomy = FunctionalAnatomy(self.activity)
-
-        if sport_name is not None:
-            if sport_name == SportName.distance_running:
-                functional_anatomy = FunctionalAnatomy(SportName.distance_running)
-
-        return functional_anatomy
+    # def get_functional_anatomy_for_sport(self, sport_name):
+    #
+    #     functional_anatomy = FunctionalAnatomy(self.activity)
+    #
+    #     if sport_name is not None:
+    #         if sport_name == SportName.distance_running:
+    #             functional_anatomy = FunctionalAnatomy(SportName.distance_running)
+    #
+    #     return functional_anatomy
 
     # TODO: where this is called, make sure we handle bilateral vs unilateral
     def get_related_muscles_from_joints(self, joint_value):
