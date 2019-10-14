@@ -86,33 +86,49 @@ class BodyPartLocation(Enum):
     hip_flexor = 28
     deltoid = 29
 
+    # shin
     anterior_tibialis = 40
     peroneals_longus = 41
+
+    # calves
     posterior_tibialis = 42
     soleus = 43
     gastrocnemius = 44
+
+    # hamstrings
     bicep_femoris_long_head = 45
     bicep_femoris_short_head = 46
     semimembranosus = 47
     semitendinosus = 48
+
+    # groin
     adductor_longus = 49
     adductor_magnus_anterior_fibers = 50
     adductor_magnus_posterior_fibers = 51
     adductor_brevis = 52
     gracilis = 53
     pectineus = 54
+
+    # quads
     vastus_lateralis = 55
     vastus_medialis = 56
     vastus_intermedius = 57
     rectus_femoris = 58
+
+    # hip_flexor
     tensor_fascia_latae = 59
     piriformis = 60
+
+    # core_stabilizers
     iliopsoas = 61
     sartorius = 62
+
+    # glutes
     gluteus_medius_anterior_fibers = 63
     gluteus_medius_posterior_fibers = 64
     gluteus_minimus = 65
     gluteus_maximus = 66
+
     quadratus_femoris = 67
     popliteus = 68
     lateral_rotators = 69
@@ -120,6 +136,49 @@ class BodyPartLocation(Enum):
     upper_body = 91
     lower_body = 92
     full_body = 93
+    
+
+    @classmethod
+    def get_muscle_group(cls, muscle):
+        muscle_groups = cls.muscle_groups()
+
+        if muscle in muscle_groups.keys():  # is a muscle group, return itself
+            return muscle
+        else:
+            for key, value in muscle_groups.items():
+                if muscle in value:  # is a muscle, return the group
+                    return key
+        return False  # joint or ligament
+
+    @classmethod
+    def get_muscles_for_group(cls, muscle_group):
+        muscle_groups = cls.muscle_groups()
+        if muscle_group in muscle_groups.keys():
+            return muscle_groups[muscle_group]
+        return False
+
+    @classmethod
+    def muscle_groups(cls):
+        grouped_muscles = {
+            cls.shin: [cls.anterior_tibialis, cls.peroneals_longus],
+            cls.calves: [cls.posterior_tibialis, cls.soleus, cls.gastrocnemius],
+            cls.hamstrings: [cls.bicep_femoris_long_head, cls.bicep_femoris_short_head, cls.semimembranosus, cls.semitendinosus],
+            cls.groin: [cls.adductor_longus, cls.adductor_magnus_anterior_fibers, cls.adductor_magnus_posterior_fibers, cls.adductor_brevis, cls.gracilis, cls.pectineus],
+            cls.quads: [cls.vastus_lateralis, cls.vastus_medialis, cls.vastus_intermedius, cls.rectus_femoris],
+            cls.hip_flexor: [cls.tensor_fascia_latae, cls.piriformis],
+            cls.core_stabilizers: [cls.iliopsoas, cls.soleus, cls.sartorius],
+            cls.glutes: [cls.gluteus_medius_anterior_fibers, cls.gluteus_medius_posterior_fibers, cls.gluteus_minimus, cls.gluteus_maximus],
+            cls.forearm: [],
+            cls.biceps: [],
+            cls.triceps: [],
+            cls.deltoid: [],
+            cls.chest: [],
+            cls.upper_back_neck: [],
+            cls.erector_spinae: [],
+            cls.lats: [],
+            cls.abdominals: []
+        }
+        return grouped_muscles
 
 
 class BodyPartLocationText(object):
