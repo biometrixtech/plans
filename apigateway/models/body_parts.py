@@ -222,6 +222,8 @@ class BodyPartFactory(object):
             return self.get_lower_back(sample)
         elif location == BodyPartLocation.it_band:
             return self.get_outer_thigh(sample)
+        elif location == BodyPartLocation.it_band_lateral_knee:
+            return self.get_outer_knee(sample)
         elif location == BodyPartLocation.quads:
             return self.get_quads(sample)
         elif location == BodyPartLocation.shin:
