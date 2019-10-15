@@ -594,7 +594,7 @@ class BodyPartFactory(object):
 
         part.add_extended_exercise_phases(inhibit, static_stretch, active_stretch, dynamic_stretch, isolated_activation,
                                           {})
-        part.add_muscle_groups([], [], [], [])
+        part.add_muscle_groups([24], [22, 23], [1], [24])
         return part
 
     def get_glutes(self, sample=True):
@@ -789,6 +789,27 @@ class BodyPartFactory(object):
         outer_thigh.add_extended_exercise_phases(inhibit, static_stretch, active_stretch, dynamic_stretch, isolated_activation, {})
         outer_thigh.add_muscle_groups([11], [6, 4], [15], [5, 14])
         return outer_thigh
+
+    def get_outer_knee(self, sample=True):
+
+        outer_knee = BodyPart(BodyPartLocation.it_band_lateral_knee, 6)
+
+        if sample:
+            inhibit = self.get_exercise_dictionary([4])
+            static_stretch = self.get_exercise_dictionary([46, 56, 225, 224])
+            active_stretch = self.get_exercise_dictionary([272, 273, 274])
+            dynamic_stretch = {}
+            isolated_activation = self.get_exercise_dictionary([142, 143, 226, 227, 228, 232, 236])
+        else:
+            inhibit = self.get_full_exercise_dictionary([4], False)
+            static_stretch = self.get_full_exercise_dictionary([46, 56, 225, 224], False)
+            active_stretch = self.get_full_exercise_dictionary([272, 273, 274], False)
+            dynamic_stretch = {}
+            isolated_activation = self.get_full_exercise_dictionary([142, 143, 226, 227, 228, 232, 236], False)
+
+        outer_knee.add_extended_exercise_phases(inhibit, static_stretch, active_stretch, dynamic_stretch, isolated_activation, {})
+        outer_knee.add_muscle_groups([11], [6, 4], [15], [5, 14])
+        return outer_knee
 
     def get_quads(self, sample=True):
 
