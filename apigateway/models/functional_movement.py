@@ -52,6 +52,7 @@ class BodyPartInjuryRisk(object):
         self.last_excessive_strain_date = None
         self.last_non_functional_overreaching_date = None
         self.last_functional_overreaching_date = None
+        self.is_compensating = False
 
         # inflammation
         self.last_inflammation_date = None
@@ -115,6 +116,7 @@ class BodyPartInjuryRisk(object):
         self.last_excessive_strain_date = self.merge_with_none(self.last_excessive_strain_date, body_part_injury_risk.last_excessive_strain_date)
         self.last_non_functional_overreaching_date = self.merge_with_none(self.last_non_functional_overreaching_date, body_part_injury_risk.last_non_functional_overreaching_date)
         self.last_functional_overreaching_date = self.merge_with_none(self.last_functional_overreaching_date, body_part_injury_risk.last_functional_overreaching_date)
+        self.is_compensating = max(self.is_compensating, body_part_injury_risk.is_compensating)
 
         # inflammation
         self.last_inflammation_date = self.merge_with_none(self.last_inflammation_date, body_part_injury_risk.last_inflammation_date)
@@ -123,28 +125,22 @@ class BodyPartInjuryRisk(object):
         self.last_knots_level = max(self.last_knots_level, body_part_injury_risk.last_knots_level)
         self.last_knots_date = self.merge_with_none(self.last_knots_date, body_part_injury_risk.last_knots_date)
 
-
         # muscle spasm
         self.last_muscle_spasm_date = self.merge_with_none(self.last_muscle_spasm_date, body_part_injury_risk.last_muscle_spasm_date)
-
 
         # adhesions
         self.last_adhesions_date = self.merge_with_none(self.last_adhesions_date, body_part_injury_risk.last_adhesions_date)
 
-
         # inhibited
         self.last_inhibited_date = self.merge_with_none(self.last_inhibited_date, body_part_injury_risk.last_inhibited_date)
 
-
         # long
         self.last_long_date = self.merge_with_none(self.last_long_date, body_part_injury_risk.last_long_date)
-
 
         # overactive / underactive
         self.last_overactive_date = self.merge_with_none(self.last_overactive_date, body_part_injury_risk.last_overactive_date)
 
         self.last_underactive_date = self.merge_with_none(self.last_underactive_date, body_part_injury_risk.last_underactive_date)
-
 
         # sharp
         self.sharp_count_last_0_10_days = max(self.sharp_count_last_0_10_days, body_part_injury_risk.sharp_count_last_0_10_days)

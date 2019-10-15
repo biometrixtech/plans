@@ -240,6 +240,7 @@ class InjuryRiskProcessor(object):
 
                 injury_risk_dict[b.body_part_side].eccentric_volume_today += b.eccentric_volume
                 injury_risk_dict[b.body_part_side].concentric_volume_today += b.concentric_volume
+                injury_risk_dict[b.body_part_side].is_compensating = b.is_compensating
 
                 eccentric_volume_ramp = injury_risk_dict[b.body_part_side].eccentric_volume_ramp()
                 total_volume_ramp = injury_risk_dict[b.body_part_side].total_volume_ramp()

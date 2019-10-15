@@ -204,6 +204,8 @@ class ModalityBase(object):
 
     def set_plan_dosage(self, soreness_list, muscular_strain_high):
 
+        #TODO what are we going to do with this !?!?!
+
         care_for_pain_present = False
         pain_reported_today = False
         soreness_historic_status_present = False
@@ -238,7 +240,7 @@ class ModalityBase(object):
             else:
                 self.default_plan = "Comprehensive"
 
-    def copy_exercises(self, source_collection, target_collection, goal, priority, trigger, exercise_library,
+    def copy_exercises(self, source_collection, target_collection, goal, priority, last_severity, exercise_library,
                        sports=[]):
 
         position_order = 0
@@ -255,7 +257,7 @@ class ModalityBase(object):
 
             dosage = ExerciseDosage()
             dosage.priority = priority
-            dosage.soreness_source = trigger
+            dosage.last_severity = last_severity
             dosage.sports = sports
             dosage.goal = goal
             dosage = self.update_dosage(dosage, target_collection[s.exercise.id].exercise)
@@ -471,7 +473,7 @@ class ModalityBase(object):
 
         elif dosage.goal.goal_type == AthleteGoalType.corrective:  # table 2 corrective
 
-            if dosage.soreness_source.severity < 0.5:
+            if dosage.last_severity < 0.5:
 
                 if dosage.priority == "1":
                     dosage.default_efficient_reps_assigned = exercise.min_reps
@@ -486,7 +488,7 @@ class ModalityBase(object):
                     dosage.default_comprehensive_reps_assigned = exercise.max_reps
                     dosage.default_comprehensive_sets_assigned = 1
 
-            elif 0.5 <= dosage.soreness_source.severity < 1.5:
+            elif 0.5 <= dosage.last_severity < 1.5:
 
                 if dosage.priority == "1":
                     dosage.default_efficient_reps_assigned = exercise.min_reps
@@ -501,7 +503,7 @@ class ModalityBase(object):
                     dosage.default_comprehensive_reps_assigned = exercise.max_reps
                     dosage.default_comprehensive_sets_assigned = 1
 
-            elif 1.5 <= dosage.soreness_source.severity < 2.5:
+            elif 1.5 <= dosage.last_severity < 2.5:
 
                 if dosage.priority == "1":
                     dosage.default_efficient_reps_assigned = exercise.min_reps
@@ -516,7 +518,7 @@ class ModalityBase(object):
                     dosage.default_comprehensive_sets_assigned = 1
 
             # trial
-            elif 2.5 <= dosage.soreness_source.severity <= 5.0:
+            elif 2.5 <= dosage.last_severity <= 5.0:
                 dosage.default_efficient_reps_assigned = 0
                 dosage.default_efficient_sets_assigned = 0
                 dosage.default_complete_reps_assigned = 0
@@ -567,7 +569,7 @@ class ModalityBase(object):
                dosage.soreness_source.historic_soreness_status is HistoricSorenessStatus.doms) or
               # dosage.goal.goal_type == AthleteGoalType.preempt_personalized_sport or
               dosage.goal.goal_type == AthleteGoalType.preempt_corrective):  # table 1
-            if dosage.soreness_source.severity < 0.5:
+            if dosage.last_severity < 0.5:
                 if dosage.priority == "1":
                     dosage.efficient_reps_assigned = exercise.min_reps
                     dosage.efficient_sets_assigned = 1
@@ -585,7 +587,7 @@ class ModalityBase(object):
                     dosage.comprehensive_sets_assigned = 1
                     dosage.default_comprehensive_reps_assigned = exercise.min_reps
                     dosage.default_comprehensive_sets_assigned = 1
-            elif 0.5 <= dosage.soreness_source.severity < 1.5:
+            elif 0.5 <= dosage.last_severity < 1.5:
                 if dosage.priority == "1":
                     dosage.efficient_reps_assigned = exercise.min_reps
                     dosage.efficient_sets_assigned = 1
@@ -602,7 +604,7 @@ class ModalityBase(object):
                     dosage.comprehensive_sets_assigned = 1
                     dosage.default_comprehensive_reps_assigned = exercise.max_reps
                     dosage.default_comprehensive_sets_assigned = 1
-            elif 1.5 <= dosage.soreness_source.severity < 2.5:
+            elif 1.5 <= dosage.last_severity < 2.5:
                 if dosage.priority == "1":
                     dosage.efficient_reps_assigned = exercise.min_reps
                     dosage.efficient_sets_assigned = 1
@@ -618,7 +620,7 @@ class ModalityBase(object):
                 dosage.comprehensive_sets_assigned = 1
                 dosage.default_comprehensive_reps_assigned = exercise.min_reps
                 dosage.default_comprehensive_sets_assigned = 1
-            elif 2.5 <= dosage.soreness_source.severity < 3.5:
+            elif 2.5 <= dosage.last_severity < 3.5:
                 if dosage.priority == "1" or dosage.priority == "2":
                     dosage.efficient_reps_assigned = exercise.min_reps
                     dosage.efficient_sets_assigned = 1
@@ -633,7 +635,7 @@ class ModalityBase(object):
                 dosage.comprehensive_sets_assigned = 1
                 dosage.default_comprehensive_reps_assigned = exercise.max_reps
                 dosage.default_comprehensive_sets_assigned = 1
-            elif 3.5 <= dosage.soreness_source.severity < 4.5:
+            elif 3.5 <= dosage.last_severity < 4.5:
                 dosage.efficient_reps_assigned = exercise.min_reps
                 dosage.efficient_sets_assigned = 1
                 dosage.complete_reps_assigned = exercise.max_reps
@@ -646,7 +648,7 @@ class ModalityBase(object):
                 dosage.default_complete_sets_assigned = 1
                 dosage.default_comprehensive_reps_assigned = exercise.max_reps
                 dosage.default_comprehensive_sets_assigned = 2
-            elif dosage.soreness_source.severity >= 4.5:
+            elif dosage.last_severity >= 4.5:
                 dosage.efficient_reps_assigned = exercise.max_reps
                 dosage.efficient_sets_assigned = 1
 
@@ -663,7 +665,7 @@ class ModalityBase(object):
                 dosage.default_comprehensive_sets_assigned = 3
 
         else:  # table 2
-            if dosage.soreness_source.severity < 0.5:
+            if dosage.last_severity < 0.5:
                 if dosage.priority == "1":
                     dosage.efficient_reps_assigned = exercise.min_reps
                     dosage.efficient_sets_assigned = 1
@@ -680,7 +682,7 @@ class ModalityBase(object):
                     dosage.comprehensive_sets_assigned = 1
                     dosage.default_comprehensive_reps_assigned = exercise.max_reps
                     dosage.default_comprehensive_sets_assigned = 1
-            elif 0.5 <= dosage.soreness_source.severity < 1.5:
+            elif 0.5 <= dosage.last_severity < 1.5:
                 if dosage.priority == "1":
                     dosage.efficient_reps_assigned = exercise.min_reps
                     dosage.efficient_sets_assigned = 1
@@ -695,7 +697,7 @@ class ModalityBase(object):
                 dosage.comprehensive_sets_assigned = 1
                 dosage.default_comprehensive_reps_assigned = exercise.max_reps
                 dosage.default_comprehensive_sets_assigned = 1
-            elif 1.5 <= dosage.soreness_source.severity < 2.5:
+            elif 1.5 <= dosage.last_severity < 2.5:
                 if dosage.priority == "1" or dosage.priority == "2":
                     dosage.efficient_reps_assigned = exercise.min_reps
                     dosage.efficient_sets_assigned = 1
@@ -710,7 +712,7 @@ class ModalityBase(object):
                 dosage.default_comprehensive_reps_assigned = exercise.max_reps
                 dosage.default_comprehensive_sets_assigned = 1
 
-            elif 2.5 <= dosage.soreness_source.severity < 3.5:
+            elif 2.5 <= dosage.last_severity < 3.5:
 
                 dosage.efficient_reps_assigned = exercise.min_reps
                 dosage.efficient_sets_assigned = 1
@@ -724,7 +726,7 @@ class ModalityBase(object):
                 dosage.default_complete_sets_assigned = 1
                 dosage.default_comprehensive_reps_assigned = exercise.max_reps
                 dosage.default_comprehensive_sets_assigned = 2
-            elif 3.5 <= dosage.soreness_source.severity < 4.5:
+            elif 3.5 <= dosage.last_severity < 4.5:
                 dosage.efficient_reps_assigned = exercise.max_reps
                 dosage.efficient_sets_assigned = 1
 
@@ -739,7 +741,7 @@ class ModalityBase(object):
                 dosage.default_complete_sets_assigned = 2
                 dosage.default_comprehensive_reps_assigned = exercise.max_reps
                 dosage.default_comprehensive_sets_assigned = 3
-            elif dosage.soreness_source.severity >= 4.5:
+            elif dosage.last_severity >= 4.5:
                 dosage.efficient_reps_assigned = exercise.max_reps
                 dosage.efficient_sets_assigned = 1
 
@@ -793,19 +795,23 @@ class ActiveRest(ModalityBase):
     # def check_corrective_pain(self, trigger, event_date_time, exercise_library, max_severity):
     #     pass
     @abc.abstractmethod
-    def check_recovery_excessive_strain(self, body_part_side, body_part_injury_risk, exercise_library):
+    def check_recovery_excessive_strain(self, body_part_side, body_part_injury_risk, exercise_library, max_severity):
         pass
 
     @abc.abstractmethod
-    def check_care_inflammation(self, body_part_side, body_part_injury_risk, exercise_library):
+    def check_recovery_compensation(self, body_part_side, body_part_injury_risk, exercise_library, max_severity):
         pass
 
     @abc.abstractmethod
-    def check_care_muscle_spasm(self, body_part_side, body_part_injury_risk, exercise_library):
+    def check_care_inflammation(self, body_part_side, body_part_injury_risk, exercise_library, max_severity):
         pass
 
     @abc.abstractmethod
-    def check_prevention_adhesions(self, body_part_side, body_part_injury_risk, exercise_library):
+    def check_care_muscle_spasm(self, body_part_side, body_part_injury_risk, exercise_library, max_severity):
+        pass
+
+    @abc.abstractmethod
+    def check_prevention_adhesions(self, body_part_side, body_part_injury_risk, exercise_library, max_severity):
         pass
 
     def conditions_for_increased_sensitivity_met(self, soreness_list, muscular_strain_high):
@@ -824,33 +830,31 @@ class ActiveRest(ModalityBase):
 
     def fill_exercises(self, exercise_library, injury_hist_dict):
 
-        # TODO do we need a global max severity
-        # YES - today only, sharp, ache only - (will be double last round)
         max_severity = 0
-        # if trigger_list is not None:
-        #     max_severity_list = list(t.severity for t in trigger_list if t.severity is not None)
-        #     if len(max_severity_list) > 0:
-        #         max_severity = max(max_severity_list)
+        for body_part_side, body_part_injury_risk in injury_hist_dict.items():
+            if (body_part_injury_risk.last_sharp_level > 0 and body_part_injury_risk.last_sharp_date is not None
+                    and body_part_injury_risk.last_sharp_date == self.event_date_time.date()):
+                max_severity = max(max_severity, body_part_injury_risk.last_sharp_level)
+            if (body_part_injury_risk.last_ache_level > 0 and body_part_injury_risk.last_ache_date is not None
+                    and body_part_injury_risk.last_ache_date == self.event_date_time.date()):
+                max_severity = max(max_severity, body_part_injury_risk.last_ache_level)
 
         # TODO don't we still need this? - ASK DIPESH if get general is ok?
         if self.force_data:
             self.get_general_exercises(exercise_library, max_severity)
 
         for body_part_side, body_part_injury_risk in injury_hist_dict:
-            self.check_recovery_excessive_strain(body_part_side, body_part_injury_risk, exercise_library)
-            self.check_care_inflammation(body_part_side, body_part_injury_risk, exercise_library)
-            self.check_care_muscle_spasm(body_part_side, body_part_injury_risk, exercise_library)
-            self.check_prevention_adhesions(body_part_side, body_part_injury_risk, exercise_library)
+            self.check_recovery_excessive_strain(body_part_side, body_part_injury_risk, exercise_library, max_severity)
+            self.check_recovery_compensation(body_part_side, body_part_injury_risk, exercise_library, max_severity)
+            self.check_care_inflammation(body_part_side, body_part_injury_risk, exercise_library, max_severity)
+            self.check_care_muscle_spasm(body_part_side, body_part_injury_risk, exercise_library, max_severity)
+            self.check_prevention_adhesions(body_part_side, body_part_injury_risk, exercise_library, max_severity)
 
     def get_general_exercises(self, exercise_library, max_severity):
 
         pass
 
     def check_reactive_recover_from_sport_general(self, sports, exercise_library, goal, max_severity):
-
-        pass
-
-    def check_reactive_three_sensor(self, trigger_list, exercise_library):
 
         pass
 
@@ -1003,61 +1007,6 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
         self.reactivate_complete_corrective_goals_by_collection(self.static_integrate_exercises)
         self.reactivate_complete_corrective_goals_by_collection(self.isolated_activate_exercises)
 
-    def check_reactive_three_sensor(self, trigger_list, exercise_library):
-
-        if trigger_list is not None:
-            for t in trigger_list:
-                if TriggerType.movement_error_apt_asymmetry == t.trigger_type or TriggerType.movement_error_historic_apt_asymmetry == t.trigger_type:
-                    if TriggerType.movement_error_historic_apt_asymmetry == t.trigger_type:
-                        goal = AthleteGoal("Core Instability", 1, AthleteGoalType.asymmetric_pattern)
-                    else:
-                        goal = AthleteGoal("Asymmetric Stress", 1, AthleteGoalType.asymmetric_session)
-                    factory = MovementErrorFactory()
-                    movement_error = factory.get_movement_error(MovementErrorType.apt_asymmetry, None)
-
-                    body_part_factory = BodyPartFactory()
-
-                    for o1 in movement_error.overactive_tight_first:
-                        body_part = body_part_factory.get_body_part(BodyPart(BodyPartLocation(o1), None))
-
-                        self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1",
-                                            None, exercise_library)
-
-                        self.copy_exercises(body_part.static_stretch_exercises, self.static_stretch_exercises, goal,
-                                            "1",
-                                            None, exercise_library)
-
-                    for o2 in movement_error.overactive_tight_second:
-                        body_part = body_part_factory.get_body_part(BodyPart(BodyPartLocation(o2), None))
-
-                        self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "2",
-                                            None, exercise_library)
-
-                        self.copy_exercises(body_part.static_stretch_exercises, self.static_stretch_exercises, goal,
-                                            "2",
-                                            None, exercise_library)
-
-                    for e in movement_error.elevated_stress:
-                        body_part = body_part_factory.get_body_part(BodyPart(BodyPartLocation(e), None))
-
-                        self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "3",
-                                            None, exercise_library)
-
-                        self.copy_exercises(body_part.active_stretch_exercises, self.active_stretch_exercises, goal,
-                                            "3",
-                                            None, exercise_library)
-
-                    if TriggerType.movement_error_historic_apt_asymmetry == t.trigger_type:
-                        for e in movement_error.underactive_weak:
-                            body_part = body_part_factory.get_body_part(BodyPart(BodyPartLocation(e), None))
-
-                            self.copy_exercises(body_part.isolated_activate_exercises, self.isolated_activate_exercises,
-                                                goal, "1",
-                                                None, exercise_library)
-
-                        self.copy_exercises(movement_error.static_integrate_exercises, self.static_integrate_exercises,
-                                            goal, "1", None, exercise_library)
-
     def check_reactive_recover_from_sport_general(self, sports, exercise_library, goal, max_severity):
 
         body_part_factory = BodyPartFactory()
@@ -1152,7 +1101,7 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
             self.copy_exercises(body_part.static_integrate_exercises, self.static_integrate_exercises, goal, "1", None,
                                 exercise_library)
 
-    def check_recovery_excessive_strain(self, body_part_side, body_part_injury_risk, exercise_library):
+    def check_recovery_excessive_strain(self, body_part_side, body_part_injury_risk, exercise_library, max_severity):
 
         body_part_factory = BodyPartFactory()
 
@@ -1163,33 +1112,58 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
 
             body_part = body_part_factory.get_body_part(body_part_side)
 
-            goal = AthleteGoal("Recovery", 1, AthleteGoalType.sore)  #TODO - what is recovery goal type? (sport was HighLoad)
+            goal = AthleteGoal("Recovery", 1, AthleteGoalType.high_load)
 
             if body_part is not None:
 
-                max_severity = 0
-                #TODO verify that we want to look at today only for the level
+                last_severity = 0
+
+                # TODO verify these are the correct criteria and refactor to an external method
                 if (body_part_injury_risk.last_sharp_level > 0 and body_part_injury_risk.last_sharp_date is not None
                         and body_part_injury_risk.last_sharp_date == self.event_date_time.date()):
-                    max_severity = max(max_severity, body_part_injury_risk.last_sharp_level)
+                    last_severity = max(max_severity, body_part_injury_risk.last_sharp_level)
                 if (body_part_injury_risk.last_ache_level > 0 and body_part_injury_risk.last_ache_date is not None
                         and body_part_injury_risk.last_ache_date == self.event_date_time.date()):
-                    max_severity = max(max_severity, body_part_injury_risk.last_ache_level)
+                    last_severity = max(max_severity, body_part_injury_risk.last_ache_level)
 
-                self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1", None, exercise_library)
+                self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1", last_severity, exercise_library)
 
                 if max_severity < 7.0:
-                    # self.copy_exercises(body_part.static_stretch_exercises, self.static_stretch_exercises, goal, "1",
-                    #                     None, exercise_library)
                     self.copy_exercises(body_part.active_stretch_exercises, self.active_stretch_exercises, goal, "1",
-                                        None, exercise_library)
+                                        last_severity, exercise_library)
                 if max_severity < 5.0:
                     self.copy_exercises(body_part.isolated_activate_exercises, self.isolated_activate_exercises, goal, "1",
-                                        None, exercise_library)
+                                        last_severity, exercise_library)
 
-        # TODO should we also do compensating here?
+    def check_recovery_compensation(self, body_part_side, body_part_injury_risk, exercise_library, max_severity):
 
-    def check_care_inflammation(self, body_part_side, body_part_injury_risk, exercise_library):
+        body_part_factory = BodyPartFactory()
+
+        if body_part_injury_risk.is_compensating:
+
+            body_part = body_part_factory.get_body_part(body_part_side)
+
+            goal = AthleteGoal("Recovery", 1, AthleteGoalType.asymmetric_session)
+
+            if body_part is not None:
+
+                last_severity = 0
+
+                if (body_part_injury_risk.last_sharp_level > 0 and body_part_injury_risk.last_sharp_date is not None
+                        and body_part_injury_risk.last_sharp_date == self.event_date_time.date()):
+                    last_severity = max(max_severity, body_part_injury_risk.last_sharp_level)
+                if (body_part_injury_risk.last_ache_level > 0 and body_part_injury_risk.last_ache_date is not None
+                        and body_part_injury_risk.last_ache_date == self.event_date_time.date()):
+                    last_severity = max(max_severity, body_part_injury_risk.last_ache_level)
+
+                self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1", last_severity,
+                                    exercise_library)
+
+                if max_severity < 7.0:
+                    self.copy_exercises(body_part.active_stretch_exercises, self.active_stretch_exercises, goal,
+                                        "1", last_severity, exercise_library)
+
+    def check_care_inflammation(self, body_part_side, body_part_injury_risk, exercise_library, max_severity):
 
         body_part_factory = BodyPartFactory()
 
@@ -1198,27 +1172,26 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
 
             body_part = body_part_factory.get_body_part(body_part_side)
 
-            goal = AthleteGoal("Care", 1,
-                               AthleteGoalType.sore)  # TODO - what is goal type?
+            goal = AthleteGoal("Care", 1, AthleteGoalType.pain)
 
             if body_part is not None:
 
-                max_severity = 0
-                #TODO verify that we want to look at today only for the level
+                last_severity = 0
+
                 if (body_part_injury_risk.last_sharp_level > 0 and body_part_injury_risk.last_sharp_date is not None
                         and body_part_injury_risk.last_sharp_date == self.event_date_time.date()):
-                    max_severity = max(max_severity, body_part_injury_risk.last_sharp_level)
+                    last_severity = max(max_severity, body_part_injury_risk.last_sharp_level)
                 if (body_part_injury_risk.last_ache_level > 0 and body_part_injury_risk.last_ache_date is not None
                         and body_part_injury_risk.last_ache_date == self.event_date_time.date()):
-                    max_severity = max(max_severity, body_part_injury_risk.last_ache_level)
+                    last_severity = max(max_severity, body_part_injury_risk.last_ache_level)
 
-                self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1", None, exercise_library)
+                self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1", last_severity, exercise_library)
 
-                if max_severity < 3.5:  #TODO verify this threshold
+                if max_severity < 7.0:
                     self.copy_exercises(body_part.active_stretch_exercises, self.active_stretch_exercises, goal, "1",
-                                        None, exercise_library)
+                                        last_severity, exercise_library)
 
-    def check_care_muscle_spasm(self, body_part_side, body_part_injury_risk, exercise_library):
+    def check_care_muscle_spasm(self, body_part_side, body_part_injury_risk, exercise_library, max_severity):
 
         body_part_factory = BodyPartFactory()
 
@@ -1227,32 +1200,28 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
 
             body_part = body_part_factory.get_body_part(body_part_side)
 
-            goal = AthleteGoal("Care", 1,
-                               AthleteGoalType.sore)  # TODO - what is goal type?
+            goal = AthleteGoal("Care", 1, AthleteGoalType.sore)
 
             if body_part is not None:
 
-                max_severity = 0
-                #TODO verify that we want to look at today only for the level
+                last_severity = 0
+
                 if (body_part_injury_risk.last_sharp_level > 0 and body_part_injury_risk.last_sharp_date is not None
                         and body_part_injury_risk.last_sharp_date == self.event_date_time.date()):
-                    max_severity = max(max_severity, body_part_injury_risk.last_sharp_level)
-                if (body_part_injury_risk.last_tight_level > 0 and body_part_injury_risk.last_tight_date is not None
-                        and body_part_injury_risk.last_tight_date == self.event_date_time.date()):
-                    max_severity = max(max_severity, body_part_injury_risk.last_tight_level)
+                    last_severity = max(max_severity, body_part_injury_risk.last_sharp_level)
                 if (body_part_injury_risk.last_ache_level > 0 and body_part_injury_risk.last_ache_date is not None
                         and body_part_injury_risk.last_ache_date == self.event_date_time.date()):
-                    max_severity = max(max_severity, body_part_injury_risk.last_ache_level)
+                    last_severity = max(max_severity, body_part_injury_risk.last_ache_level)
 
-                self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1", None, exercise_library)
+                self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1", last_severity, exercise_library)
 
-                if max_severity < 3.5:  #TODO verify this threshold
+                if max_severity < 7.0:
                     self.copy_exercises(body_part.static_stretch_exercises, self.static_stretch_exercises, goal, "1",
-                                        None, exercise_library)
+                                        last_severity, exercise_library)
                     self.copy_exercises(body_part.active_stretch_exercises, self.active_stretch_exercises, goal, "1",
-                                        None, exercise_library)
+                                        last_severity, exercise_library)
 
-    def check_prevention_adhesions(self, body_part_side, body_part_injury_risk, exercise_library):
+    def check_prevention_adhesions(self, body_part_side, body_part_injury_risk, exercise_library, max_severity):
 
         body_part_factory = BodyPartFactory()
 
@@ -1261,25 +1230,26 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
 
             body_part = body_part_factory.get_body_part(body_part_side)
 
-            goal = AthleteGoal("Prevention", 1,
-                               AthleteGoalType.corrective)  # TODO - what is goal type?
+            goal = AthleteGoal("Prevention", 1, AthleteGoalType.corrective)
 
             if body_part is not None:
 
-                max_severity = 0
-                #TODO verify that we want to look at today only for the level
-                if (body_part_injury_risk.last_knots_level > 0 and body_part_injury_risk.last_knots_date is not None
-                        and body_part_injury_risk.last_knots_date == self.event_date_time.date()):
-                    max_severity = max(max_severity, body_part_injury_risk.last_knots_level)
-                #TODO how do we handle the other symptoms?
+                last_severity = 0
 
-                self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1", None, exercise_library)
+                if (body_part_injury_risk.last_sharp_level > 0 and body_part_injury_risk.last_sharp_date is not None
+                        and body_part_injury_risk.last_sharp_date == self.event_date_time.date()):
+                    last_severity = max(max_severity, body_part_injury_risk.last_sharp_level)
+                if (body_part_injury_risk.last_ache_level > 0 and body_part_injury_risk.last_ache_date is not None
+                        and body_part_injury_risk.last_ache_date == self.event_date_time.date()):
+                    last_severity = max(max_severity, body_part_injury_risk.last_ache_level)
 
-                if max_severity < 3.5:  #TODO verify this threshold
+                self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1", last_severity, exercise_library)
+
+                if max_severity < 7.0:
                     self.copy_exercises(body_part.static_stretch_exercises, self.static_stretch_exercises, goal, "1",
-                                        None, exercise_library)
+                                        last_severity, exercise_library)
                     self.copy_exercises(body_part.active_stretch_exercises, self.active_stretch_exercises, goal, "1",
-                                        None, exercise_library)
+                                        last_severity, exercise_library)
 
     def set_exercise_dosage_ranking(self):
         self.rank_dosages([self.inhibit_exercises,
@@ -1367,62 +1337,6 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
         self.reactivate_complete_corrective_goals_by_collection(self.static_stretch_exercises)
         self.reactivate_complete_corrective_goals_by_collection(self.static_integrate_exercises)
         self.reactivate_complete_corrective_goals_by_collection(self.isolated_activate_exercises)
-
-    def check_reactive_three_sensor(self, trigger_list, exercise_library):
-
-        if trigger_list is not None:
-
-            for t in trigger_list:
-                if TriggerType.movement_error_apt_asymmetry == t.trigger_type or TriggerType.movement_error_historic_apt_asymmetry == t.trigger_type:
-                    if TriggerType.movement_error_historic_apt_asymmetry == t.trigger_type:
-                        goal = AthleteGoal("Core Instability", 1, AthleteGoalType.asymmetric_pattern)
-                    else:
-                        goal = AthleteGoal("Asymmetric Stress", 1, AthleteGoalType.asymmetric_session)
-                    factory = MovementErrorFactory()
-                    movement_error = factory.get_movement_error(MovementErrorType.apt_asymmetry, None)
-
-                    body_part_factory = BodyPartFactory()
-
-                    for o1 in movement_error.overactive_tight_first:
-                        body_part = body_part_factory.get_body_part(BodyPart(BodyPartLocation(o1), None))
-
-                        self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1",
-                                            None, exercise_library)
-
-                        self.copy_exercises(body_part.static_stretch_exercises, self.static_stretch_exercises, goal,
-                                            "1",
-                                            None, exercise_library)
-
-                    for o2 in movement_error.overactive_tight_second:
-                        body_part = body_part_factory.get_body_part(BodyPart(BodyPartLocation(o2), None))
-
-                        self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "2",
-                                            None, exercise_library)
-
-                        self.copy_exercises(body_part.static_stretch_exercises, self.static_stretch_exercises, goal,
-                                            "2",
-                                            None, exercise_library)
-
-                    for e in movement_error.elevated_stress:
-                        body_part = body_part_factory.get_body_part(BodyPart(BodyPartLocation(e), None))
-
-                        self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "3",
-                                            None, exercise_library)
-
-                        self.copy_exercises(body_part.static_stretch_exercises, self.static_stretch_exercises, goal,
-                                            "3",
-                                            None, exercise_library)
-
-                    if TriggerType.movement_error_historic_apt_asymmetry == t.trigger_type:
-                        for e in movement_error.underactive_weak:
-                            body_part = body_part_factory.get_body_part(BodyPart(BodyPartLocation(e), None))
-
-                            self.copy_exercises(body_part.isolated_activate_exercises, self.isolated_activate_exercises,
-                                                goal, "1",
-                                                None, exercise_library)
-
-                        self.copy_exercises(movement_error.static_integrate_exercises, self.static_integrate_exercises,
-                                            goal, "1", None, exercise_library)
 
     def check_reactive_recover_from_sport_general(self, sports, exercise_library, goal, max_severity):
 
@@ -1517,234 +1431,162 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
             self.copy_exercises(body_part.static_integrate_exercises, self.static_integrate_exercises, goal, "1", None,
                                 exercise_library)
 
-    def check_recovery_excessive_strain(self, body_part_side, body_part_injury_risk, exercise_library):
-        pass
+    def check_recovery_excessive_strain(self, body_part_side, body_part_injury_risk, exercise_library, max_severity):
 
-    def check_care_inflammation(self, body_part_side, body_part_injury_risk, exercise_library):
-        pass
+        body_part_factory = BodyPartFactory()
 
-    def check_care_muscle_spasm(self, body_part_side, body_part_injury_risk, exercise_library):
-        pass
+        two_days_ago = self.event_date_time.date() - datetime.timedelta(days=2)
 
-    def check_prevention_adhesions(self, body_part_side, body_part_injury_risk, exercise_library):
-        pass
+        if (body_part_injury_risk.last_excessive_strain_date is not None and
+                body_part_injury_risk.last_excessive_strain_date >= two_days_ago):
+
+            body_part = body_part_factory.get_body_part(body_part_side)
+
+            goal = AthleteGoal("Recovery", 1, AthleteGoalType.high_load)
+
+            if body_part is not None:
+
+                last_severity = 0
+
+                if (body_part_injury_risk.last_sharp_level > 0 and body_part_injury_risk.last_sharp_date is not None
+                        and body_part_injury_risk.last_sharp_date == self.event_date_time.date()):
+                    last_severity = max(max_severity, body_part_injury_risk.last_sharp_level)
+                if (body_part_injury_risk.last_ache_level > 0 and body_part_injury_risk.last_ache_date is not None
+                        and body_part_injury_risk.last_ache_date == self.event_date_time.date()):
+                    last_severity = max(max_severity, body_part_injury_risk.last_ache_level)
+
+                self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1", last_severity,
+                                    exercise_library)
+
+                if max_severity < 7.0:
+                    self.copy_exercises(body_part.static_stretch_exercises, self.static_stretch_exercises, goal, "1",
+                                        last_severity, exercise_library)
+
+                if max_severity < 5.0:
+                    self.copy_exercises(body_part.isolated_activate_exercises, self.isolated_activate_exercises, goal,
+                                        "1",
+                                        last_severity, exercise_library)
+
+    def check_recovery_compensation(self, body_part_side, body_part_injury_risk, exercise_library, max_severity):
+
+        body_part_factory = BodyPartFactory()
+
+        if body_part_injury_risk.is_compensating:
+
+            body_part = body_part_factory.get_body_part(body_part_side)
+
+            goal = AthleteGoal("Recovery", 1, AthleteGoalType.asymmetric_session)
+
+            if body_part is not None:
+
+                last_severity = 0
+
+                if (body_part_injury_risk.last_sharp_level > 0 and body_part_injury_risk.last_sharp_date is not None
+                        and body_part_injury_risk.last_sharp_date == self.event_date_time.date()):
+                    last_severity = max(max_severity, body_part_injury_risk.last_sharp_level)
+                if (body_part_injury_risk.last_ache_level > 0 and body_part_injury_risk.last_ache_date is not None
+                        and body_part_injury_risk.last_ache_date == self.event_date_time.date()):
+                    last_severity = max(max_severity, body_part_injury_risk.last_ache_level)
+
+                self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1", last_severity,
+                                    exercise_library)
+
+                if max_severity < 7.0:
+                    self.copy_exercises(body_part.static_stretch_exercises, self.static_stretch_exercises, goal, "1",
+                                        last_severity, exercise_library)
+
+    def check_care_inflammation(self, body_part_side, body_part_injury_risk, exercise_library, max_severity):
+
+        body_part_factory = BodyPartFactory()
+
+        if (body_part_injury_risk.last_inflammation_date is not None and
+                body_part_injury_risk.last_inflammation_date == self.event_date_time.date()):
+
+            body_part = body_part_factory.get_body_part(body_part_side)
+
+            goal = AthleteGoal("Care", 1, AthleteGoalType.pain)
+
+            if body_part is not None:
+
+                last_severity = 0
+
+                if (body_part_injury_risk.last_sharp_level > 0 and body_part_injury_risk.last_sharp_date is not None
+                        and body_part_injury_risk.last_sharp_date == self.event_date_time.date()):
+                    last_severity = max(max_severity, body_part_injury_risk.last_sharp_level)
+                if (body_part_injury_risk.last_ache_level > 0 and body_part_injury_risk.last_ache_date is not None
+                        and body_part_injury_risk.last_ache_date == self.event_date_time.date()):
+                    last_severity = max(max_severity, body_part_injury_risk.last_ache_level)
+
+                self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1", last_severity,
+                                    exercise_library)
+
+                if max_severity < 7.0:
+                    self.copy_exercises(body_part.static_stretch_exercises, self.static_stretch_exercises, goal, "1",
+                                        last_severity, exercise_library)
+
+    def check_care_muscle_spasm(self, body_part_side, body_part_injury_risk, exercise_library, max_severity):
+
+        body_part_factory = BodyPartFactory()
+
+        if (body_part_injury_risk.last_muscle_spasm is not None and
+                body_part_injury_risk.last_muscle_spasm == self.event_date_time.date()):
+
+            body_part = body_part_factory.get_body_part(body_part_side)
+
+            goal = AthleteGoal("Care", 1, AthleteGoalType.sore)
+
+            if body_part is not None:
+
+                last_severity = 0
+
+                if (body_part_injury_risk.last_sharp_level > 0 and body_part_injury_risk.last_sharp_date is not None
+                        and body_part_injury_risk.last_sharp_date == self.event_date_time.date()):
+                    last_severity = max(max_severity, body_part_injury_risk.last_sharp_level)
+                if (body_part_injury_risk.last_ache_level > 0 and body_part_injury_risk.last_ache_date is not None
+                        and body_part_injury_risk.last_ache_date == self.event_date_time.date()):
+                    last_severity = max(max_severity, body_part_injury_risk.last_ache_level)
+
+                self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1", last_severity,
+                                    exercise_library)
+
+                if max_severity < 7.0:
+                    self.copy_exercises(body_part.static_stretch_exercises, self.static_stretch_exercises, goal, "1",
+                                        last_severity, exercise_library)
+
+    def check_prevention_adhesions(self, body_part_side, body_part_injury_risk, exercise_library, max_severity):
+
+        body_part_factory = BodyPartFactory()
+
+        if (body_part_injury_risk.last_adhesions_date is not None and
+                body_part_injury_risk.last_adhesions_date == self.event_date_time.date()):
+
+            body_part = body_part_factory.get_body_part(body_part_side)
+
+            goal = AthleteGoal("Prevention", 1, AthleteGoalType.corrective)
+
+            if body_part is not None:
+
+                last_severity = 0
+
+                if (body_part_injury_risk.last_sharp_level > 0 and body_part_injury_risk.last_sharp_date is not None
+                        and body_part_injury_risk.last_sharp_date == self.event_date_time.date()):
+                    last_severity = max(max_severity, body_part_injury_risk.last_sharp_level)
+                if (body_part_injury_risk.last_ache_level > 0 and body_part_injury_risk.last_ache_date is not None
+                        and body_part_injury_risk.last_ache_date == self.event_date_time.date()):
+                    last_severity = max(max_severity, body_part_injury_risk.last_ache_level)
+
+                self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1", last_severity,
+                                    exercise_library)
+
+                if max_severity < 7.0:
+                    self.copy_exercises(body_part.static_stretch_exercises, self.static_stretch_exercises, goal, "1",
+                                        last_severity, exercise_library)
 
     def set_exercise_dosage_ranking(self):
         self.rank_dosages([self.inhibit_exercises,
                            self.static_stretch_exercises,
                            self.isolated_activate_exercises,
                            self.static_integrate_exercises])
-
-
-class CoolDown(ModalityBase, Serialisable):
-    def __init__(self, high_relative_load_session, high_relative_intensity_logged, muscular_strain_high,
-                 event_date_time):
-        super().__init__(event_date_time)
-        # self.sport_name = sport_name
-        self.high_relative_volume_logged = high_relative_load_session
-        self.high_relative_intensity_logged = high_relative_intensity_logged
-        self.muscular_strain_high = muscular_strain_high
-        self.dynamic_stretch_exercises = {}
-        self.dynamic_integrate_exercises = {}
-
-    def get_total_exercises(self):
-        return len(self.dynamic_integrate_exercises) + \
-               len(self.dynamic_stretch_exercises)
-
-    def json_serialise(self):
-        ret = {
-            # 'sport_name': self.sport_name.value,
-            'high_relative_load_session': self.high_relative_volume_logged,
-            'high_relative_intensity_logged': self.high_relative_intensity_logged,
-            'muscular_strain_high': self.muscular_strain_high,
-            'dynamic_stretch_exercises': [p.json_serialise() for p in self.dynamic_stretch_exercises.values()],
-            'dynamic_integrate_exercises': [p.json_serialise() for p in self.dynamic_integrate_exercises.values()],
-            'start_date_time': format_datetime(self.start_date_time) if self.start_date_time is not None else None,
-            'completed_date_time': format_datetime(
-                self.completed_date_time) if self.completed_date_time is not None else None,
-            'event_date_time': format_datetime(self.event_date_time) if self.event_date_time is not None else None,
-            'completed': self.completed,
-            'active': self.active,
-            'alerts': [alert.json_serialise() for alert in self.alerts],
-            'goals': {str(goal_type.value): goal.json_serialise() for (goal_type, goal) in self.goals.items()},
-            'default_plan': self.default_plan
-        }
-        return ret
-
-    @classmethod
-    def json_deserialise(cls, input_dict):
-        cooldown = cls(  # sport_name=input_dict.get('sport_name', 0),
-            high_relative_load_session=input_dict.get('high_relative_load_session', False),
-            high_relative_intensity_logged=input_dict.get('high_relative_intensity_logged', False),
-            muscular_strain_high=input_dict.get('muscular_strain_high', False),
-            event_date_time=input_dict.get('event_date_time', None))
-        cooldown.dynamic_stretch_exercises = {s['library_id']: AssignedExercise.json_deserialise(s) for s in
-                                              input_dict['dynamic_stretch_exercises']}
-        cooldown.dynamic_integrate_exercises = {s['library_id']: AssignedExercise.json_deserialise(s) for s in
-                                                input_dict['dynamic_integrate_exercises']}
-        cooldown.start_date_time = input_dict.get('start_date_time', None)
-        cooldown.completed_date_time = input_dict.get('completed_date_time', None)
-        cooldown.completed = input_dict.get('completed', False)
-        cooldown.active = input_dict.get('active', True)
-        cooldown.alerts = [Alert.json_deserialise(alert) for alert in input_dict.get('alerts', [])]
-        cooldown.goals = {AthleteGoalType(int(goal_type)): ModalityGoal.json_deserialise(goal) for (goal_type, goal) in
-                          input_dict.get('goals', {}).items()}
-        cooldown.default_plan = input_dict.get('default_plan', 'Complete')
-
-        return cooldown
-
-    def scale_all_active_time(self):
-
-        self.scale_active_time(self.dynamic_stretch_exercises)
-        self.scale_active_time(self.dynamic_integrate_exercises)
-
-    def aggregate_dosages(self):
-
-        self.aggregate_dosage_by_severity_exercise_collection(self.dynamic_stretch_exercises)
-        self.aggregate_dosage_by_severity_exercise_collection(self.dynamic_integrate_exercises)
-
-    def conditions_for_increased_sensitivity_met(self, soreness_list, muscular_strain_high):
-
-        if self.muscular_strain_high:
-            return True
-        else:
-            for s in soreness_list:
-                if (s.first_reported_date_time is not None and
-                        (s.is_persistent_soreness() or
-                         s.historic_soreness_status == HistoricSorenessStatus.persistent_2_soreness)):
-                    days_sore = (self.event_date_time - s.first_reported_date_time).days
-                    if days_sore < 30:
-                        return True
-        return False
-
-    def set_exercise_dosage_ranking(self):
-        self.rank_dosages([self.dynamic_stretch_exercises])
-        self.rank_dosages([self.dynamic_integrate_exercises])
-
-    def check_recover_from_sport(self, trigger_list, sports, muscular_strain_high, exercise_library, max_severity):
-
-        # if muscular_strain_high:
-        #     goal = AthleteGoal(None, 1, AthleteGoalType.sport)
-        #     goal.trigger_type = TriggerType.overreaching_high_muscular_strain  # 8
-        #     alert = Alert(goal)
-        #     self.alerts.append(alert)
-
-        for t in range(0, len(trigger_list)):
-            # if trigger_list[t].trigger_type == TriggerType.overreaching_high_muscular_strain:  # 8
-            #    goal = AthleteGoal(None, 1, AthleteGoalType.sport)
-            #    trigger_list[t].goals.append(goal)
-            # elif trigger_list[t].trigger_type == TriggerType.hist_sore_less_30:  # 7
-            #    goal = AthleteGoal(None, 1, AthleteGoalType.sport)
-            #    trigger_list[t].goals.append(goal)
-
-            # hist_soreness = list(s for s in soreness_list if not s.is_dormant_cleared() and not s.pain and
-            #                      (s.is_persistent_soreness() or
-            #                       s.historic_soreness_status == HistoricSorenessStatus.persistent_2_soreness) and
-            #                      (self.event_date_time - s.first_reported_date_time).days < 30)
-            #
-            # if len(hist_soreness) > 0:
-            #     goal = AthleteGoal(None, 1, AthleteGoalType.sport)
-            #     goal.trigger_type = TriggerType.hist_sore_less_30  # 7
-            #     # if sport_name is not None:
-            #     for soreness in hist_soreness:
-            #         #for sport_name in sports:
-            #         alert = Alert(goal)
-            #         #alert.sport_name = sport_name
-            #         alert.body_part = BodyPartSide(soreness.body_part.location, soreness.side)
-            #         self.alerts.append(alert)
-
-            if trigger_list[t].trigger_type == TriggerType.high_volume_intensity and max_severity < 2.5:  # 0
-                goal = AthleteGoal("High Load", 1, AthleteGoalType.high_load)
-                # trigger_list[t].goals.append(goal)
-
-                # if max_severity < 2.5:  # note this is only a pain value for cooldown
-                #     if self.high_relative_volume_logged or self.high_relative_intensity_logged:
-                #         goal = AthleteGoal("Expedite tissue regeneration", 1, AthleteGoalType.sport)
-                #         #goal.trigger = "High Relative Volume or Intensity of Logged Session"
-                #         goal.trigger_type = TriggerType.high_volume_intensity  # 0
-                #         for sport_name in sports:
-                #             alert = Alert(goal)
-                #             alert.sport_name = sport_name
-                #             self.alerts.append(alert)
-
-                body_part_factory = BodyPartFactory()
-
-                body_part = body_part_factory.get_body_part_for_sports(sports)
-
-                # Note: this is just returning the primary mover related exercises for sport
-                if body_part is not None and max_severity < 3.5:
-                    self.copy_exercises(body_part.dynamic_stretch_exercises,
-                                        self.dynamic_stretch_exercises, goal, "1", None, exercise_library, sports)
-                    self.copy_exercises(body_part.dynamic_integrate_exercises,
-                                        self.dynamic_integrate_exercises, goal, "1", None, exercise_library, sports)
-
-    # def check_corrective(self, trigger, event_date_time, exercise_library):
-    #
-    #     # if soreness.historic_soreness_status is not None and soreness.first_reported_date_time is not None\
-    #     #         and not soreness.is_dormant_cleared() and soreness.historic_soreness_status is not HistoricSorenessStatus.doms:
-    #     #     days_sore = (event_date_time - soreness.first_reported_date_time).days
-    #     #     if soreness.is_acute_pain() or soreness.is_persistent_pain() or soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_pain:
-    #         if trigger.trigger_type == TriggerType.hist_pain:
-    #             goal = AthleteGoal("Increase prevention efficacy", 1, AthleteGoalType.preempt_corrective)
-    #             #goal.trigger_type = TriggerType.hist_pain
-    #             #trigger.goals.append(goal)
-    #             self.assign_exercises(trigger, goal, exercise_library)
-    #
-    #         #elif (soreness.is_persistent_soreness() or soreness.historic_soreness_status == HistoricSorenessStatus.persistent_2_soreness and days_sore >= 30):
-    #         elif trigger.trigger_type == TriggerType.hist_sore_greater_30:
-    #             goal = AthleteGoal("Increase prevention efficacy", 1, AthleteGoalType.preempt_corrective)
-    #             #goal.trigger_type = TriggerType.hist_sore_greater_30
-    #             #trigger.goals.append(goal)
-    #
-    #             self.assign_exercises(trigger, goal, exercise_library)
-
-    def fill_exercises(self, trigger_list, exercise_library, high_relative_load_session, high_relative_intensity_logged,
-                       muscular_strain_high, sports):
-
-        max_severity = 0
-
-        if trigger_list is not None:
-            max_severity_list = list(t for t in trigger_list if t.severity is not None)
-            if len(max_severity_list) > 0:
-                pain_list = list(t for t in max_severity_list if t.pain)
-                if len(pain_list) > 0:
-                    max_severity = max(list(s.severity for s in pain_list))
-
-        # for sport_name in sports:
-        self.check_recover_from_sport(trigger_list, sports, muscular_strain_high, exercise_library, max_severity)
-        # dynamic stretch not ready yet
-        # for s in soreness_list:
-        #    self.check_corrective(s, self.event_date_time, exercise_library)
-
-    def assign_exercises(self, trigger, goal, exercise_library):
-
-        body_part_factory = BodyPartFactory()
-
-        body_part = body_part_factory.get_body_part(trigger.body_part)
-
-        if body_part is not None:
-            # alert = Alert(goal)
-            # alert.body_part = trigger.body_part
-            # self.alerts.append(alert)
-
-            if trigger.severity < 3.5:
-                self.copy_exercises(body_part.dynamic_stretch_exercises, self.dynamic_stretch_exercises, goal,
-                                    "1", trigger,
-                                    exercise_library)
-                self.copy_exercises(body_part.dynamic_integrate_exercises, self.dynamic_integrate_exercises, goal,
-                                    "1", trigger,
-                                    exercise_library)
-
-            for y in body_part.synergists:
-                synergist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(y), None))
-                if synergist is not None:
-                    self.copy_exercises(synergist.dynamic_stretch_exercises, self.dynamic_stretch_exercises, goal, "2",
-                                        trigger,
-                                        exercise_library)
-                    self.copy_exercises(synergist.dynamic_integrate_exercises, self.dynamic_integrate_exercises, goal,
-                                        "2",
-                                        trigger,
-                                        exercise_library)
 
 
 class IceSession(Serialisable):
