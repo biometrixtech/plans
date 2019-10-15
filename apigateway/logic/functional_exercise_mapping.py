@@ -3,19 +3,19 @@ from models.functional_movement_modalities import ActiveRestBeforeTraining, Acti
 
 class ExerciseAssignmentCalculator(object):
 
-    def __init__(self, injury_hist_dict, exercise_library_datastore, completed_exercise_datastore, event_date_time):
+    def __init__(self, injury_risk_dict, exercise_library_datastore, completed_exercise_datastore, event_date_time):
 
         self.exercise_library_datastore = exercise_library_datastore
         self.completed_exercise_datastore = completed_exercise_datastore
         self.exercise_library = self.exercise_library_datastore.get()
-        self.injury_hist_dict = injury_hist_dict
+        self.injury_risk_dict = injury_risk_dict
         self.event_date_time = event_date_time
 
     def get_pre_active_rest(self, force_data=False):
 
-        if len(self.injury_hist_dict) > 0 or force_data:
+        if len(self.injury_risk_dict) > 0 or force_data:
             active_rest = ActiveRestBeforeTraining(self.event_date_time, force_data)
-            active_rest.fill_exercises(self.exercise_library, self.injury_hist_dict)
+            active_rest.fill_exercises(self.exercise_library, self.injury_risk_dict)
             #TODO : figure this out
             #active_rest.set_plan_dosage(self.soreness_list, self.muscular_strain_high)
             active_rest.set_exercise_dosage_ranking()
@@ -29,9 +29,9 @@ class ExerciseAssignmentCalculator(object):
 
     def get_post_active_rest(self, force_data=False):
 
-        if len(self.injury_hist_dict) > 0 or force_data:
+        if len(self.injury_risk_dict) > 0 or force_data:
             active_rest = ActiveRestAfterTraining(self.event_date_time, force_data)
-            active_rest.fill_exercises(self.exercise_library, self.injury_hist_dict)
+            active_rest.fill_exercises(self.exercise_library, self.injury_risk_dict)
             #TODO : figure this out
             #active_rest.set_plan_dosage(self.soreness_list, self.muscular_strain_high)
             active_rest.set_exercise_dosage_ranking()

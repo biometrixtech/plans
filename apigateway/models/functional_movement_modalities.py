@@ -563,10 +563,10 @@ class ModalityBase(object):
                 dosage.default_comprehensive_sets_assigned = 3
             '''
 
-        elif (dosage.goal.goal_type == AthleteGoalType.sore and
-              (dosage.soreness_source.historic_soreness_status is None or
-               dosage.soreness_source.is_dormant_cleared() or
-               dosage.soreness_source.historic_soreness_status is HistoricSorenessStatus.doms) or
+        elif (dosage.goal.goal_type == AthleteGoalType.sore or
+#              (dosage.soreness_source.historic_soreness_status is None or
+ #              dosage.soreness_source.is_dormant_cleared() or
+  #             dosage.soreness_source.historic_soreness_status is HistoricSorenessStatus.doms) or
               # dosage.goal.goal_type == AthleteGoalType.preempt_personalized_sport or
               dosage.goal.goal_type == AthleteGoalType.preempt_corrective):  # table 1
             if dosage.last_severity < 0.5:
@@ -828,10 +828,10 @@ class ActiveRest(ModalityBase):
                         return True
         return False
 
-    def fill_exercises(self, exercise_library, injury_hist_dict):
+    def fill_exercises(self, exercise_library, injury_risk_dict):
 
         max_severity = 0
-        for body_part_side, body_part_injury_risk in injury_hist_dict.items():
+        for body_part_side, body_part_injury_risk in injury_risk_dict.items():
             if (body_part_injury_risk.last_sharp_level > 0 and body_part_injury_risk.last_sharp_date is not None
                     and body_part_injury_risk.last_sharp_date == self.event_date_time.date()):
                 max_severity = max(max_severity, body_part_injury_risk.last_sharp_level)
@@ -843,7 +843,7 @@ class ActiveRest(ModalityBase):
         if self.force_data:
             self.get_general_exercises(exercise_library, max_severity)
 
-        for body_part_side, body_part_injury_risk in injury_hist_dict:
+        for body_part_side, body_part_injury_risk in injury_risk_dict.items():
             self.check_recovery_excessive_strain(body_part_side, body_part_injury_risk, exercise_library, max_severity)
             self.check_recovery_compensation(body_part_side, body_part_injury_risk, exercise_library, max_severity)
             self.check_care_inflammation(body_part_side, body_part_injury_risk, exercise_library, max_severity)
@@ -1195,8 +1195,8 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
 
         body_part_factory = BodyPartFactory()
 
-        if (body_part_injury_risk.last_muscle_spasm is not None and
-                body_part_injury_risk.last_muscle_spasm == self.event_date_time.date()):
+        if (body_part_injury_risk.last_muscle_spasm_date is not None and
+                body_part_injury_risk.last_muscle_spasm_date == self.event_date_time.date()):
 
             body_part = body_part_factory.get_body_part(body_part_side)
 
@@ -1528,8 +1528,8 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
 
         body_part_factory = BodyPartFactory()
 
-        if (body_part_injury_risk.last_muscle_spasm is not None and
-                body_part_injury_risk.last_muscle_spasm == self.event_date_time.date()):
+        if (body_part_injury_risk.last_muscle_spasm_date is not None and
+                body_part_injury_risk.last_muscle_spasm_date == self.event_date_time.date()):
 
             body_part = body_part_factory.get_body_part(body_part_side)
 
