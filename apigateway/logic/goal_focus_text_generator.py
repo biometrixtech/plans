@@ -1,6 +1,6 @@
 from models.exercise import Phase
 from models.soreness import SorenessType
-from models.soreness_base import BodyPartLocation
+from models.soreness_base import BodyPartLocation, BodyPartLocationText
 from logic.soreness_processing import BodyPartMapping
 
 
@@ -73,61 +73,67 @@ class RecoveryTextGenerator(object):
             side_text = "right "
         elif side is None or side == 0:
             side_text = ""
+        try:
+            body_part_text = BodyPartLocationText(body_part_location).value()
+            return side_text + body_part_text
 
-        if body_part_location == BodyPartLocation.achilles:
-            return side_text + "achilles"
-        elif body_part_location == BodyPartLocation.lower_back:
-            return side_text + "lower back"
-        elif body_part_location == BodyPartLocation.glutes:
-            return "glute"
-        elif body_part_location == BodyPartLocation.foot:
-            return side_text + "foot"
-        elif body_part_location == BodyPartLocation.ankle:
-            return side_text + "ankle"
-        elif body_part_location == BodyPartLocation.shin:
-            return side_text + "shin"
-        elif body_part_location == BodyPartLocation.calves:
-            return side_text + "calf"
-        elif body_part_location == BodyPartLocation.knee:
-            return side_text + "knee"
-        elif body_part_location == BodyPartLocation.quads:
-            return side_text + "quad"
-        elif body_part_location == BodyPartLocation.groin:
-            return side_text + "groin"
-        elif body_part_location == BodyPartLocation.outer_thigh:
-            return side_text + "outer thigh"
-        elif body_part_location == BodyPartLocation.hamstrings:
-            return side_text + "hamstring"
-        elif body_part_location == BodyPartLocation.abdominals:
-            return side_text + "abdominals"
-        elif body_part_location == BodyPartLocation.hip_flexor:
-            return side_text + "hip"
-        elif body_part_location == BodyPartLocation.chest:
-            return side_text + "pec"
-        elif body_part_location == BodyPartLocation.head:
-            return "head"
-        elif body_part_location == BodyPartLocation.shoulder:
-            return side_text + "shoulder"
-        elif body_part_location == BodyPartLocation.upper_back_neck:
-            return "upper back/neck"
-        elif body_part_location == BodyPartLocation.lats:
-            return side_text + "lat"
-        elif body_part_location == BodyPartLocation.wrist:
-            return side_text + "wrist"
-        elif body_part_location == BodyPartLocation.elbow:
-            return side_text + "elbow"
-        elif body_part_location == BodyPartLocation.triceps:
-            return side_text + "tricep"
-        elif body_part_location == BodyPartLocation.biceps:
-            return side_text + "bicep"
-        elif body_part_location == BodyPartLocation.forearm:
-            return side_text + "forearm"
-        elif body_part_location == BodyPartLocation.core_stabilizers:
-            return side_text + "core stabilizers"
-        elif body_part_location == BodyPartLocation.erector_spinae:
-            return side_text + "erector spinae"
-        else:
+        except:
             return ""
+
+        # if body_part_location == BodyPartLocation.achilles:
+        #     return side_text + "achilles"
+        # elif body_part_location == BodyPartLocation.lower_back:
+        #     return side_text + "lower back"
+        # elif body_part_location == BodyPartLocation.glutes:
+        #     return "glute"
+        # elif body_part_location == BodyPartLocation.foot:
+        #     return side_text + "foot"
+        # elif body_part_location == BodyPartLocation.ankle:
+        #     return side_text + "ankle"
+        # elif body_part_location == BodyPartLocation.shin:
+        #     return side_text + "shin"
+        # elif body_part_location == BodyPartLocation.calves:
+        #     return side_text + "calf"
+        # elif body_part_location == BodyPartLocation.knee:
+        #     return side_text + "knee"
+        # elif body_part_location == BodyPartLocation.quads:
+        #     return side_text + "quad"
+        # elif body_part_location == BodyPartLocation.groin:
+        #     return side_text + "groin"
+        # elif body_part_location == BodyPartLocation.it_band:
+        #     return side_text + "outer thigh"
+        # elif body_part_location == BodyPartLocation.hamstrings:
+        #     return side_text + "hamstring"
+        # elif body_part_location == BodyPartLocation.abdominals:
+        #     return side_text + "abdominals"
+        # elif body_part_location == BodyPartLocation.hip:
+        #     return side_text + "hip"
+        # elif body_part_location == BodyPartLocation.chest:
+        #     return side_text + "pec"
+        # elif body_part_location == BodyPartLocation.head:
+        #     return "head"
+        # elif body_part_location == BodyPartLocation.shoulder:
+        #     return side_text + "shoulder"
+        # elif body_part_location == BodyPartLocation.upper_back_neck:
+        #     return "upper back/neck"
+        # elif body_part_location == BodyPartLocation.lats:
+        #     return side_text + "lat"
+        # elif body_part_location == BodyPartLocation.wrist:
+        #     return side_text + "wrist"
+        # elif body_part_location == BodyPartLocation.elbow:
+        #     return side_text + "elbow"
+        # elif body_part_location == BodyPartLocation.triceps:
+        #     return side_text + "tricep"
+        # elif body_part_location == BodyPartLocation.biceps:
+        #     return side_text + "bicep"
+        # elif body_part_location == BodyPartLocation.forearm:
+        #     return side_text + "forearm"
+        # elif body_part_location == BodyPartLocation.core_stabilizers:
+        #     return side_text + "core stabilizers"
+        # elif body_part_location == BodyPartLocation.erector_spinae:
+        #     return side_text + "erector spinae"
+        # else:
+        #     return ""
 
     def get_body_part_text_plural(self, body_part_location, side=None):
 
@@ -140,58 +146,75 @@ class RecoveryTextGenerator(object):
         elif side is None or side == 0:
             side_text = ""
 
-        if body_part_location == BodyPartLocation.achilles:
-            return side_text + "achilles"
-        elif body_part_location == BodyPartLocation.lower_back:
-            return side_text + "lower back"
-        elif body_part_location == BodyPartLocation.glutes:
-            return "glutes"
-        elif body_part_location == BodyPartLocation.foot:
-            return side_text + "feet"
-        elif body_part_location == BodyPartLocation.ankle:
-            return side_text + "ankles"
-        elif body_part_location == BodyPartLocation.shin:
-            return side_text + "shins"
-        elif body_part_location == BodyPartLocation.calves:
-            return side_text + "calves"
-        elif body_part_location == BodyPartLocation.knee:
-            return side_text + "knees"
-        elif body_part_location == BodyPartLocation.quads:
-            return side_text + "quads"
-        elif body_part_location == BodyPartLocation.groin:
-            return side_text + "groin"
-        elif body_part_location == BodyPartLocation.outer_thigh:
-            return side_text + "outer thighs"
-        elif body_part_location == BodyPartLocation.hamstrings:
-            return side_text + "hamstrings"
-        elif body_part_location == BodyPartLocation.abdominals:
-            return side_text + "abdominals"
-        elif body_part_location == BodyPartLocation.hip_flexor:
-            return side_text + "hips"
-        elif body_part_location == BodyPartLocation.chest:
-            return side_text + "pecs"
-        elif body_part_location == BodyPartLocation.head:
-            return "head"
-        elif body_part_location == BodyPartLocation.shoulder:
-            return side_text + "shoulders"
-        elif body_part_location == BodyPartLocation.upper_back_neck:
-            return "upper back/neck"
-        elif body_part_location == BodyPartLocation.lats:
-            return side_text + "lats"
-        elif body_part_location == BodyPartLocation.wrist:
-            return side_text + "wrists"
-        elif body_part_location == BodyPartLocation.elbow:
-            return side_text + "elbows"
-        elif body_part_location == BodyPartLocation.triceps:
-            return side_text + "triceps"
-        elif body_part_location == BodyPartLocation.biceps:
-            return side_text + "biceps"
-        elif body_part_location == BodyPartLocation.forearm:
-            return side_text + "forearms"
-        elif body_part_location == BodyPartLocation.core_stabilizers:
-            return side_text + "core stabilizers"
-        elif body_part_location == BodyPartLocation.erector_spinae:
-            return  side_text + "erector spinae"
+        try:
+            body_part_text = BodyPartLocationText(body_part_location).value()
+            no_plurals = [BodyPartLocation.achilles, BodyPartLocation.lower_back,
+                          BodyPartLocation.abdominals, BodyPartLocation.head, BodyPartLocation.upper_back_neck,
+                          BodyPartLocation.triceps, BodyPartLocation.biceps, BodyPartLocation.core_stabilizers,
+                          BodyPartLocation.erector_spinae]
+            if body_part_location in no_plurals:
+                return side_text + body_part_text
+            elif body_part_location == BodyPartLocation.foot:
+                return side_text + "feet"
+            elif body_part_location == BodyPartLocation.calves:
+                return side_text + "calves"
+            else:
+                return side_text + body_part_text + "s"
+        except:
+            return ""
+
+        # if body_part_location == BodyPartLocation.achilles:
+        #     return side_text + "achilles"
+        # elif body_part_location == BodyPartLocation.lower_back:
+        #     return side_text + "lower back"
+        # elif body_part_location == BodyPartLocation.glutes:
+        #     return "glutes"
+        # elif body_part_location == BodyPartLocation.foot:
+        #     return side_text + "feet"
+        # elif body_part_location == BodyPartLocation.ankle:
+        #     return side_text + "ankles"
+        # elif body_part_location == BodyPartLocation.shin:
+        #     return side_text + "shins"
+        # elif body_part_location == BodyPartLocation.calves:
+        #     return side_text + "calves"
+        # elif body_part_location == BodyPartLocation.knee:
+        #     return side_text + "knees"
+        # elif body_part_location == BodyPartLocation.quads:
+        #     return side_text + "quads"
+        # elif body_part_location == BodyPartLocation.groin:
+        #     return side_text + "groin"
+        # elif body_part_location == BodyPartLocation.it_band:
+        #     return side_text + "outer thighs"
+        # elif body_part_location == BodyPartLocation.hamstrings:
+        #     return side_text + "hamstrings"
+        # elif body_part_location == BodyPartLocation.abdominals:
+        #     return side_text + "abdominals"
+        # elif body_part_location == BodyPartLocation.hip:
+        #     return side_text + "hips"
+        # elif body_part_location == BodyPartLocation.chest:
+        #     return side_text + "pecs"
+        # elif body_part_location == BodyPartLocation.head:
+        #     return "head"
+        # elif body_part_location == BodyPartLocation.shoulder:
+        #     return side_text + "shoulders"
+        # elif body_part_location == BodyPartLocation.upper_back_neck:
+        #     return "upper back/neck"
+        # elif body_part_location == BodyPartLocation.lats:
+        #     return side_text + "lats"
+        # elif body_part_location == BodyPartLocation.wrist:
+        #     return side_text + "wrists"
+        # elif body_part_location == BodyPartLocation.elbow:
+        #     return side_text + "elbows"
+        # elif body_part_location == BodyPartLocation.triceps:
+        #     return side_text + "triceps"
+        # elif body_part_location == BodyPartLocation.biceps:
+        #     return side_text + "biceps"
+        # elif body_part_location == BodyPartLocation.forearm:
+        #     return side_text + "forearms"
+        # elif body_part_location == BodyPartLocation.core_stabilizers:
+        #     return side_text + "core stabilizers"
+        # elif body_part_location == BodyPartLocation.erector_spinae:
+        #     return  side_text + "erector spinae"
 
     def get_soreness_4_text(self, body_part_text):
         return "Based on the discomfort reporting at your " + body_part_text + " we recommend you rest and " \

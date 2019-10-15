@@ -230,7 +230,7 @@ class HistoricSoreness(BaseSoreness, Serialisable):
 
     '''deprecated
     def is_joint(self):
-        if (self.body_part_location == BodyPartLocation.hip_flexor or
+        if (self.body_part_location == BodyPartLocation.hip or
                 self.body_part_location == BodyPartLocation.knee or
                 self.body_part_location == BodyPartLocation.ankle or
                 self.body_part_location == BodyPartLocation.foot or
@@ -248,7 +248,7 @@ class HistoricSoreness(BaseSoreness, Serialisable):
                 self.body_part_location == BodyPartLocation.groin or
                 self.body_part_location == BodyPartLocation.quads or
                 self.body_part_location == BodyPartLocation.shin or
-                self.body_part_location == BodyPartLocation.outer_thigh or
+                self.body_part_location == BodyPartLocation.it_band or
                 self.body_part_location == BodyPartLocation.lower_back or
                 self.body_part_location == BodyPartLocation.glutes or
                 self.body_part_location == BodyPartLocation.hamstrings or

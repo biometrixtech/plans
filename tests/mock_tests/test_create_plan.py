@@ -109,7 +109,7 @@ def create_no_soreness_plan():
 
 def test_active_rest_after_training_knee():
 
-    daily_plan = create_plan([7], [], [], [], train_later=False)
+    daily_plan = create_plan([14], [], [], [], train_later=False)
     assert len(daily_plan.post_active_rest[0].inhibit_exercises) > 0
     assert len(daily_plan.post_active_rest[0].static_stretch_exercises) > 0
     assert len(daily_plan.post_active_rest[0].isolated_activate_exercises) == 0
@@ -132,7 +132,7 @@ def test_active_rest_after_training_outer_thigh_hist_soreness_knee():
     historic_soreness.historic_soreness_status = HistoricSorenessStatus.acute_pain
     historic_soreness_list = [historic_soreness]
 
-    daily_plan = create_plan([11], [], [], [], historic_soreness_list, train_later=False)
+    daily_plan = create_plan([14], [], [], [], historic_soreness_list, train_later=False)
     assert len(daily_plan.post_active_rest[0].inhibit_exercises) > 0
     assert len(daily_plan.post_active_rest[0].static_stretch_exercises) > 0
     assert len(daily_plan.post_active_rest[0].isolated_activate_exercises) > 0
@@ -154,7 +154,7 @@ def test_active_rest_after_training_outer_thigh_hist_soreness_glutes():
     historic_soreness.historic_soreness_status = HistoricSorenessStatus.acute_pain
     historic_soreness_list = [historic_soreness]
 
-    daily_plan = create_plan([11], [], [], [], historic_soreness_list, train_later=False)
+    daily_plan = create_plan([14], [], [], [], historic_soreness_list, train_later=False)
     assert len(daily_plan.post_active_rest[0].inhibit_exercises) > 0
     assert len(daily_plan.post_active_rest[0].static_stretch_exercises) > 0
     assert len(daily_plan.post_active_rest[0].isolated_activate_exercises) > 0
@@ -185,7 +185,7 @@ def test_active_rest_after_training_various_hist_soreness_glutes():
 
     historic_soreness_list = [historic_soreness, historic_soreness_2, historic_soreness_3]
 
-    daily_plan = create_plan([6, 7, 11, 14, 16], [], [], [], historic_soreness_list, train_later=False)
+    daily_plan = create_plan([6, 14, 16], [], [], [], historic_soreness_list, train_later=False)
     assert len(daily_plan.post_active_rest[0].inhibit_exercises) > 0
     assert len(daily_plan.post_active_rest[0].static_stretch_exercises) > 0
     assert len(daily_plan.post_active_rest[0].isolated_activate_exercises) > 0

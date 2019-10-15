@@ -1,6 +1,6 @@
 from enum import Enum, IntEnum
 
-from models.body_parts import BodyPart
+from models.body_parts import BodyPart, BodyPartFactory
 #from models.trigger import Trigger
 from models.goal import AthleteGoal
 from models.soreness_base import HistoricSorenessStatus, BaseSoreness, BodyPartLocation, BodyPartSide
@@ -54,13 +54,18 @@ class Soreness(BaseSoreness, Serialisable):
         self.cleared_date_time = None
         self.status_changed_date_time = None
         self.daily = True
+        self.tight = None
+        self.knots = None
+        self.ache = None
+        self.sharp = None
+
 
     @classmethod
     def json_deserialise(cls, input_dict):
         soreness = cls()
         soreness.body_part = BodyPart(BodyPartLocation(input_dict['body_part']), None)
         soreness.pain = input_dict.get('pain', False)
-        soreness.severity = input_dict['severity']
+        soreness.severity = input_dict.get('severity', None)
         soreness.movement = input_dict.get('movement', None)
         soreness.side = input_dict.get('side', None)
         soreness.max_severity = input_dict.get('max_severity', None)
@@ -72,7 +77,13 @@ class Soreness(BaseSoreness, Serialisable):
         if input_dict.get('status_changed_date_time', None) is not None:
             soreness.status_changed_date_time = parse_datetime(input_dict['status_changed_date_time'])
         if input_dict.get('reported_date_time', None) is not None:
-            soreness.reported_date_time = parse_datetime(input_dict['reported_date_time'])
+            soreness.reported_date_time = input_dict['reported_date_time']
+        soreness.tight = input_dict.get('tight')
+        soreness.knots = input_dict.get('knots')
+        soreness.ache = input_dict.get('ache')
+        soreness.sharp = input_dict.get('sharp')
+        cls.get_symptoms_from_severity_movement(soreness)
+
         return soreness
 
     def __hash__(self):
@@ -89,7 +100,156 @@ class Soreness(BaseSoreness, Serialisable):
                     value = parse_datetime(value)
                 except InvalidSchemaException:
                     value = parse_date(value)
+        elif name in ['tight', 'knots'] and value is not None:
+            self.movement = self.get_movement_from_tight_knot(value)
+
+        elif name == 'sharp' and value is not None:
+            severity_sharp = self.get_pain_from_sharp_ache(value)
+            self.pain = True
+            if self.severity is None:
+                self.severity = severity_sharp
+            else:
+                self.severity = max([self.severity, severity_sharp])
+        elif name == 'ache' and value is not None:
+            if BodyPartFactory().is_muscle(self.body_part):
+                severity_ache = self.get_soreness_from_ache(value)
+            else:  # is joint
+                self.pain = True
+                severity_ache = self.get_pain_from_sharp_ache(value)
+            if self.severity is None:
+                self.severity = severity_ache
+            else:
+                self.severity = max([self.severity, severity_ache])
+
         super().__setattr__(name, value)
+
+
+    def get_symptoms_from_severity_movement(self):
+        if self.tight is None and self.knots is None and self.ache is None and self.sharp is None:
+            # only update if all are none, i.e. this is old data
+            if BodyPartFactory().is_muscle(self.body_part):
+                ## update for muscles
+                if self.severity is not None:
+                    if self.pain:  # if pain, set sharp
+                        self.sharp = self.get_sharp_from_pain(self.severity)
+                    else:  # else set ache
+                        self.ache = self.get_ache_from_soreness(self.severity)
+                if self.movement is not None:
+                    # set same value for tight and knots if movement is available
+                    self.tight = self.get_tight_knots_from_movement(self.movement)
+                    self.knots = self.get_tight_knots_from_movement(self.movement)
+            else:  # is joint or ligament
+                self.pain = True  # joint is always pain
+                if self.severity is not None:
+                    # set same severity value for ache and sharp
+                    self.sharp = self.get_sharp_from_pain(self.severity)
+                if self.movement is not None:
+                    # if movement is available, set tight
+                    self.tight = self.get_tight_knots_from_movement(self.movement)
+
+    @staticmethod
+    def get_movement_from_tight_knot(value):
+        if value == 0:
+            return 0
+        if value <= 1:
+            return 1
+        elif value <= 3:
+            return 2
+        elif value <= 4:
+            return 3
+        elif value <= 6:
+            return 4
+        else:
+            return 5
+        # mapping = {0:0, 1:1, 2:3, 3:2, 4:3, 5:4, 6:4, 7:5, 8:5, 9:5, 10:5}
+        # return mapping[value]
+
+    @staticmethod
+    def get_tight_knots_from_movement(value):
+        if value == 0:
+            return 0
+        elif value <= 1:
+            return 1
+        elif value <= 2:
+            return 2
+        elif value <= 3:
+            return 4
+        elif value <= 4:
+            return 5
+        else:
+            return 7
+        # mapping = {0:0, 1:1, 2:2, 3:4, 4:5, 5:7}
+        # return mapping[value]
+
+    @staticmethod
+    def get_pain_from_sharp_ache(value):
+        if value == 0:
+            return 0
+        elif value <= 2:
+            return 1
+        elif value <= 3:
+            return 2
+        elif value <= 4:
+            return 3
+        elif value <= 5:
+            return 4
+        else:
+            return 5
+        # mapping = {0:0, 1:1, 2:1, 3:2, 4:3, 5:4, 6:5, 7:5, 8:5, 9:5, 10:5}
+        # return mapping[value]
+
+    @staticmethod
+    def get_sharp_from_pain(value):
+        if value == 0:
+            return 0
+        elif value <= 1:
+            return 1
+        elif value <= 2:
+            return 3
+        elif value <= 3:
+            return 4
+        elif value <= 4:
+            return 5
+        else:
+            return 6
+        # mapping = {0:0, 1:1, 2:3, 3:4, 4:5, 5:6}
+        # return mapping[value]
+
+    @staticmethod
+    def get_soreness_from_ache(value):
+        if value == 0:
+            return 0
+        elif value <= 3:
+            return 1
+        elif value <= 4:
+            return 2
+        elif value <= 5:
+            return 3
+        elif value <= 6:
+            return 4
+        else:
+            return 5
+        # mapping = {0:0, 1:1, 2:1, 3:1, 4:2, 5:3, 6:4, 7:5, 8:5, 9:5, 10:5}
+        # return mapping[value]
+
+    @staticmethod
+    def get_ache_from_soreness(value):
+        if value == 0:
+            return 0
+        elif value <= 1:
+            return 1
+        elif value <= 2:
+            return 4
+        elif value <= 3:
+            return 5
+        elif value <= 4:
+            return 6
+        else:
+            return 7
+        # mapping = {0:0, 1:1, 2:4, 3:5, 4:6, 5:7}
+        # return mapping[value]
+
+
 
     '''deprecated
     def is_dormant_cleared(self):
@@ -107,7 +267,7 @@ class Soreness(BaseSoreness, Serialisable):
     
     def is_joint(self):
         if (self.body_part.location == BodyPartLocation.shoulder or
-                self.body_part.location == BodyPartLocation.hip_flexor or
+                self.body_part.location == BodyPartLocation.hip or
                 self.body_part.location == BodyPartLocation.knee or
                 self.body_part.location == BodyPartLocation.ankle or
                 self.body_part.location == BodyPartLocation.foot or
@@ -125,7 +285,7 @@ class Soreness(BaseSoreness, Serialisable):
                 self.body_part.location == BodyPartLocation.groin or
                 self.body_part.location == BodyPartLocation.quads or
                 self.body_part.location == BodyPartLocation.shin or
-                self.body_part.location == BodyPartLocation.outer_thigh or
+                self.body_part.location == BodyPartLocation.it_band or
                 self.body_part.location == BodyPartLocation.glutes or
                 self.body_part.location == BodyPartLocation.hamstrings or
                 self.body_part.location == BodyPartLocation.calves or
@@ -173,7 +333,11 @@ class Soreness(BaseSoreness, Serialisable):
                    'pain': self.pain,
                    'severity': self.severity,
                    'movement': self.movement,
-                   'side': self.side
+                   'side': self.side,
+                   'tight': self.tight,
+                   'knots': self.knots,
+                   'ache': self.ache,
+                   'sharp': self.sharp
                   }
         return ret
 
@@ -245,5 +409,3 @@ class Alert(object):
         if name == "sport_name" and not isinstance(value, SportName) and value is not None:
             value = SportName(value)
         super().__setattr__(name, value)
-
-
