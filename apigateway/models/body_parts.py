@@ -212,6 +212,8 @@ class BodyPartFactory(object):
             return self.get_hamstrings(sample)
         elif location == BodyPartLocation.hip:
             return self.get_hip(sample)
+        elif location == BodyPartLocation.hip_flexor:
+            return self.get_hip_flexor(sample)
         elif location == BodyPartLocation.knee:
             return self.get_knee(sample)
         elif location == BodyPartLocation.lats:
@@ -228,6 +230,8 @@ class BodyPartFactory(object):
             return self.get_triceps(sample)
         elif location == BodyPartLocation.shoulder:
             return self.get_shoulder(sample)
+        elif location == BodyPartLocation.deltoid:
+            return self.get_deltoid(sample)
         elif location == BodyPartLocation.upper_back_neck:
             return self.get_upper_back_traps_neck(sample)
         elif location == BodyPartLocation.wrist:
@@ -677,6 +681,27 @@ class BodyPartFactory(object):
         hip.add_muscle_groups([4], [15, 6], [5, 11], [14])
         return hip
 
+    def get_hip_flexor(self, sample=True):
+
+        hip_flexor = BodyPart(BodyPartLocation.hip_flexor, 2)
+
+        if sample:
+            inhibit = self.get_exercise_dictionary([54])
+            static_stretch = self.get_exercise_dictionary([6, 28, 49, 217, 224])
+            active_stretch = self.get_exercise_dictionary([277])
+            dynamic_stretch = {}
+            isolated_activation = self.get_exercise_dictionary([142, 143, 229, 228, 236, 232])
+        else:
+            inhibit = self.get_full_exercise_dictionary([54], False)
+            static_stretch = self.get_full_exercise_dictionary([6, 28, 49, 217, 224], False)
+            active_stretch = self.get_full_exercise_dictionary([277], False)
+            dynamic_stretch = {}
+            isolated_activation = self.get_full_exercise_dictionary([142, 143, 229, 228, 236, 232], False)
+
+        hip_flexor.add_extended_exercise_phases(inhibit, static_stretch, active_stretch, dynamic_stretch, isolated_activation, {})
+        hip_flexor.add_muscle_groups([4], [15, 6], [5, 11], [14])
+        return hip_flexor
+
     def get_knee(self, sample=True):
 
         knee = BodyPart(BodyPartLocation.knee, 9)
@@ -810,6 +835,27 @@ class BodyPartFactory(object):
     def get_shoulder(self, sample=True):
 
         part = BodyPart(BodyPartLocation.shoulder, 14)
+
+        if sample:
+            inhibit = self.get_exercise_dictionary([259])
+            static_stretch = self.get_exercise_dictionary([130, 246, 215])
+            active_stretch = self.get_exercise_dictionary([276])
+            dynamic_stretch = {}
+            isolated_activation = self.get_exercise_dictionary([239, 135, 136, 137, 241, 242])
+        else:
+            inhibit = self.get_full_exercise_dictionary([259], False)
+            static_stretch = self.get_full_exercise_dictionary([130, 246, 215], False)
+            active_stretch = self.get_full_exercise_dictionary([276], False)
+            dynamic_stretch = {}
+            isolated_activation = self.get_full_exercise_dictionary([239, 135, 136, 137, 241, 242], False)
+
+        part.add_extended_exercise_phases(inhibit, static_stretch, active_stretch, dynamic_stretch, isolated_activation, {})
+        part.add_muscle_groups([1], [21], [22], [2, 18])
+        return part
+
+    def get_deltoid(self, sample=True):
+
+        part = BodyPart(BodyPartLocation.deltoid, 14)
 
         if sample:
             inhibit = self.get_exercise_dictionary([259])
