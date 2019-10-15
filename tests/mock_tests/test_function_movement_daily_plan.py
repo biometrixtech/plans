@@ -41,12 +41,12 @@ def get_sessions(dates, rpes, durations, sport_names):
 
     return sessions
 
-def test_create_plan():
+def test_create_plan_no_session():
 
     now_date = datetime.now()
 
     soreness = Soreness()
-    soreness.body_part = BodyPart(BodyPartLocation(48), None)
+    soreness.body_part = BodyPart(BodyPartLocation(6), None)
     soreness.side = 1
     soreness.sharp = 3
     soreness.reported_date_time = now_date

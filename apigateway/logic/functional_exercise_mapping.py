@@ -16,8 +16,7 @@ class ExerciseAssignmentCalculator(object):
         if len(self.injury_risk_dict) > 0 or force_data:
             active_rest = ActiveRestBeforeTraining(self.event_date_time, force_data)
             active_rest.fill_exercises(self.exercise_library, self.injury_risk_dict)
-            #TODO : figure this out
-            #active_rest.set_plan_dosage(self.soreness_list, self.muscular_strain_high)
+            active_rest.set_plan_dosage()
             active_rest.set_exercise_dosage_ranking()
             active_rest.aggregate_dosages()
             active_rest.set_winners()
@@ -32,8 +31,7 @@ class ExerciseAssignmentCalculator(object):
         if len(self.injury_risk_dict) > 0 or force_data:
             active_rest = ActiveRestAfterTraining(self.event_date_time, force_data)
             active_rest.fill_exercises(self.exercise_library, self.injury_risk_dict)
-            #TODO : figure this out
-            #active_rest.set_plan_dosage(self.soreness_list, self.muscular_strain_high)
+            active_rest.set_plan_dosage()
             active_rest.set_exercise_dosage_ranking()
             active_rest.aggregate_dosages()
             active_rest.set_winners()

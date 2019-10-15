@@ -202,43 +202,42 @@ class ModalityBase(object):
         if dosage.comprehensive_reps_assigned > 0 and dosage.comprehensive_sets_assigned > 0:
             self.goals[dosage.goal.goal_type].comprehensive_active = True
 
-    def set_plan_dosage(self, soreness_list, muscular_strain_high):
+    def set_plan_dosage(self):
 
-        #TODO what are we going to do with this !?!?!
-
-        care_for_pain_present = False
-        pain_reported_today = False
-        soreness_historic_status_present = False
-        soreness_reported_today = False
-        severity_greater_than_2 = False
-
-        for s in soreness_list:
-            if s.pain and (s.historic_soreness_status is None or s.is_dormant_cleared()) and s.severity > 1:
-                care_for_pain_present = True
-            if s.pain:
-                pain_reported_today = True
-            if not s.pain and s.daily:
-                soreness_reported_today = True
-            if (not s.pain and s.historic_soreness_status is not None and not s.is_dormant_cleared() and
-                    s.historic_soreness_status is not HistoricSorenessStatus.doms):
-                soreness_historic_status_present = True
-            if s.severity >= 2:
-                severity_greater_than_2 = True
-
-        increased_sensitivity = self.conditions_for_increased_sensitivity_met(soreness_list, muscular_strain_high)
-
-        if care_for_pain_present:
-            self.default_plan = "Comprehensive"
-        elif not severity_greater_than_2 and not pain_reported_today and not soreness_historic_status_present and soreness_reported_today:
-            if not increased_sensitivity:
-                self.default_plan = "Efficient"
-            else:
-                self.default_plan = "Complete"
-        else:
-            if not increased_sensitivity:
-                self.default_plan = "Complete"
-            else:
-                self.default_plan = "Comprehensive"
+        # care_for_pain_present = False
+        # pain_reported_today = False
+        # soreness_historic_status_present = False
+        # soreness_reported_today = False
+        # severity_greater_than_2 = False
+        #
+        # for s in soreness_list:
+        #     if s.pain and (s.historic_soreness_status is None or s.is_dormant_cleared()) and s.severity > 1:
+        #         care_for_pain_present = True
+        #     if s.pain:
+        #         pain_reported_today = True
+        #     if not s.pain and s.daily:
+        #         soreness_reported_today = True
+        #     if (not s.pain and s.historic_soreness_status is not None and not s.is_dormant_cleared() and
+        #             s.historic_soreness_status is not HistoricSorenessStatus.doms):
+        #         soreness_historic_status_present = True
+        #     if s.severity >= 2:
+        #         severity_greater_than_2 = True
+        #
+        # increased_sensitivity = self.conditions_for_increased_sensitivity_met(soreness_list, muscular_strain_high)
+        #
+        # if care_for_pain_present:
+        #     self.default_plan = "Comprehensive"
+        # elif not severity_greater_than_2 and not pain_reported_today and not soreness_historic_status_present and soreness_reported_today:
+        #     if not increased_sensitivity:
+        #         self.default_plan = "Efficient"
+        #     else:
+        #         self.default_plan = "Complete"
+        # else:
+        #     if not increased_sensitivity:
+        #         self.default_plan = "Complete"
+        #     else:
+        #         self.default_plan = "Comprehensive"
+        self.default_plan = "Complete"
 
     def copy_exercises(self, source_collection, target_collection, goal, priority, last_severity, exercise_library,
                        sports=[]):
@@ -850,6 +849,25 @@ class ActiveRest(ModalityBase):
             self.check_care_muscle_spasm(body_part_side, body_part_injury_risk, exercise_library, max_severity)
             self.check_prevention_adhesions(body_part_side, body_part_injury_risk, exercise_library, max_severity)
 
+    def get_last_severity(self, body_part_injury_risk):
+
+        last_severity = 0
+
+        if (body_part_injury_risk.last_sharp_level > 0 and body_part_injury_risk.last_sharp_date is not None
+                and body_part_injury_risk.last_sharp_date == self.event_date_time.date()):
+            last_severity = max(last_severity, body_part_injury_risk.last_sharp_level)
+        if (body_part_injury_risk.last_ache_level > 0 and body_part_injury_risk.last_ache_date is not None
+                and body_part_injury_risk.last_ache_date == self.event_date_time.date()):
+            last_severity = max(last_severity, body_part_injury_risk.last_ache_level)
+        if (body_part_injury_risk.last_tight_level > 0 and body_part_injury_risk.last_tight_date is not None
+                and body_part_injury_risk.last_tight_date == self.event_date_time.date()):
+            last_severity = max(last_severity, body_part_injury_risk.last_tight_level)
+        if (body_part_injury_risk.last_knots_level > 0 and body_part_injury_risk.last_knots_date is not None
+                and body_part_injury_risk.last_knots_date == self.event_date_time.date()):
+            last_severity = max(last_severity, body_part_injury_risk.last_knots_level)
+
+        return last_severity
+
     def get_general_exercises(self, exercise_library, max_severity):
 
         pass
@@ -1116,15 +1134,7 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
 
             if body_part is not None:
 
-                last_severity = 0
-
-                # TODO verify these are the correct criteria and refactor to an external method
-                if (body_part_injury_risk.last_sharp_level > 0 and body_part_injury_risk.last_sharp_date is not None
-                        and body_part_injury_risk.last_sharp_date == self.event_date_time.date()):
-                    last_severity = max(max_severity, body_part_injury_risk.last_sharp_level)
-                if (body_part_injury_risk.last_ache_level > 0 and body_part_injury_risk.last_ache_date is not None
-                        and body_part_injury_risk.last_ache_date == self.event_date_time.date()):
-                    last_severity = max(max_severity, body_part_injury_risk.last_ache_level)
+                last_severity = self.get_last_severity(body_part_injury_risk)
 
                 self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1", last_severity, exercise_library)
 
@@ -1147,14 +1157,7 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
 
             if body_part is not None:
 
-                last_severity = 0
-
-                if (body_part_injury_risk.last_sharp_level > 0 and body_part_injury_risk.last_sharp_date is not None
-                        and body_part_injury_risk.last_sharp_date == self.event_date_time.date()):
-                    last_severity = max(max_severity, body_part_injury_risk.last_sharp_level)
-                if (body_part_injury_risk.last_ache_level > 0 and body_part_injury_risk.last_ache_date is not None
-                        and body_part_injury_risk.last_ache_date == self.event_date_time.date()):
-                    last_severity = max(max_severity, body_part_injury_risk.last_ache_level)
+                last_severity = self.get_last_severity(body_part_injury_risk)
 
                 self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1", last_severity,
                                     exercise_library)
@@ -1176,14 +1179,7 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
 
             if body_part is not None:
 
-                last_severity = 0
-
-                if (body_part_injury_risk.last_sharp_level > 0 and body_part_injury_risk.last_sharp_date is not None
-                        and body_part_injury_risk.last_sharp_date == self.event_date_time.date()):
-                    last_severity = max(max_severity, body_part_injury_risk.last_sharp_level)
-                if (body_part_injury_risk.last_ache_level > 0 and body_part_injury_risk.last_ache_date is not None
-                        and body_part_injury_risk.last_ache_date == self.event_date_time.date()):
-                    last_severity = max(max_severity, body_part_injury_risk.last_ache_level)
+                last_severity = self.get_last_severity(body_part_injury_risk)
 
                 self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1", last_severity, exercise_library)
 
@@ -1204,14 +1200,7 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
 
             if body_part is not None:
 
-                last_severity = 0
-
-                if (body_part_injury_risk.last_sharp_level > 0 and body_part_injury_risk.last_sharp_date is not None
-                        and body_part_injury_risk.last_sharp_date == self.event_date_time.date()):
-                    last_severity = max(max_severity, body_part_injury_risk.last_sharp_level)
-                if (body_part_injury_risk.last_ache_level > 0 and body_part_injury_risk.last_ache_date is not None
-                        and body_part_injury_risk.last_ache_date == self.event_date_time.date()):
-                    last_severity = max(max_severity, body_part_injury_risk.last_ache_level)
+                last_severity = self.get_last_severity(body_part_injury_risk)
 
                 self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1", last_severity, exercise_library)
 
@@ -1234,14 +1223,7 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
 
             if body_part is not None:
 
-                last_severity = 0
-
-                if (body_part_injury_risk.last_sharp_level > 0 and body_part_injury_risk.last_sharp_date is not None
-                        and body_part_injury_risk.last_sharp_date == self.event_date_time.date()):
-                    last_severity = max(max_severity, body_part_injury_risk.last_sharp_level)
-                if (body_part_injury_risk.last_ache_level > 0 and body_part_injury_risk.last_ache_date is not None
-                        and body_part_injury_risk.last_ache_date == self.event_date_time.date()):
-                    last_severity = max(max_severity, body_part_injury_risk.last_ache_level)
+                last_severity = self.get_last_severity(body_part_injury_risk)
 
                 self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1", last_severity, exercise_library)
 
@@ -1446,14 +1428,7 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
 
             if body_part is not None:
 
-                last_severity = 0
-
-                if (body_part_injury_risk.last_sharp_level > 0 and body_part_injury_risk.last_sharp_date is not None
-                        and body_part_injury_risk.last_sharp_date == self.event_date_time.date()):
-                    last_severity = max(max_severity, body_part_injury_risk.last_sharp_level)
-                if (body_part_injury_risk.last_ache_level > 0 and body_part_injury_risk.last_ache_date is not None
-                        and body_part_injury_risk.last_ache_date == self.event_date_time.date()):
-                    last_severity = max(max_severity, body_part_injury_risk.last_ache_level)
+                last_severity = self.get_last_severity(body_part_injury_risk)
 
                 self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1", last_severity,
                                     exercise_library)
@@ -1479,14 +1454,7 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
 
             if body_part is not None:
 
-                last_severity = 0
-
-                if (body_part_injury_risk.last_sharp_level > 0 and body_part_injury_risk.last_sharp_date is not None
-                        and body_part_injury_risk.last_sharp_date == self.event_date_time.date()):
-                    last_severity = max(max_severity, body_part_injury_risk.last_sharp_level)
-                if (body_part_injury_risk.last_ache_level > 0 and body_part_injury_risk.last_ache_date is not None
-                        and body_part_injury_risk.last_ache_date == self.event_date_time.date()):
-                    last_severity = max(max_severity, body_part_injury_risk.last_ache_level)
+                last_severity = self.get_last_severity(body_part_injury_risk)
 
                 self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1", last_severity,
                                     exercise_library)
@@ -1508,14 +1476,7 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
 
             if body_part is not None:
 
-                last_severity = 0
-
-                if (body_part_injury_risk.last_sharp_level > 0 and body_part_injury_risk.last_sharp_date is not None
-                        and body_part_injury_risk.last_sharp_date == self.event_date_time.date()):
-                    last_severity = max(max_severity, body_part_injury_risk.last_sharp_level)
-                if (body_part_injury_risk.last_ache_level > 0 and body_part_injury_risk.last_ache_date is not None
-                        and body_part_injury_risk.last_ache_date == self.event_date_time.date()):
-                    last_severity = max(max_severity, body_part_injury_risk.last_ache_level)
+                last_severity = self.get_last_severity(body_part_injury_risk)
 
                 self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1", last_severity,
                                     exercise_library)
@@ -1537,14 +1498,7 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
 
             if body_part is not None:
 
-                last_severity = 0
-
-                if (body_part_injury_risk.last_sharp_level > 0 and body_part_injury_risk.last_sharp_date is not None
-                        and body_part_injury_risk.last_sharp_date == self.event_date_time.date()):
-                    last_severity = max(max_severity, body_part_injury_risk.last_sharp_level)
-                if (body_part_injury_risk.last_ache_level > 0 and body_part_injury_risk.last_ache_date is not None
-                        and body_part_injury_risk.last_ache_date == self.event_date_time.date()):
-                    last_severity = max(max_severity, body_part_injury_risk.last_ache_level)
+                last_severity = self.get_last_severity(body_part_injury_risk)
 
                 self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1", last_severity,
                                     exercise_library)
@@ -1566,14 +1520,7 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
 
             if body_part is not None:
 
-                last_severity = 0
-
-                if (body_part_injury_risk.last_sharp_level > 0 and body_part_injury_risk.last_sharp_date is not None
-                        and body_part_injury_risk.last_sharp_date == self.event_date_time.date()):
-                    last_severity = max(max_severity, body_part_injury_risk.last_sharp_level)
-                if (body_part_injury_risk.last_ache_level > 0 and body_part_injury_risk.last_ache_date is not None
-                        and body_part_injury_risk.last_ache_date == self.event_date_time.date()):
-                    last_severity = max(max_severity, body_part_injury_risk.last_ache_level)
+                last_severity = self.get_last_severity(body_part_injury_risk)
 
                 self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1", last_severity,
                                     exercise_library)
