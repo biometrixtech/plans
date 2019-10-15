@@ -1015,7 +1015,7 @@ class TrendProcessor(object):
                     if len(body_part_text_2) == 0:
                         body_part_text_2 = "PRIME MOVER"
                     if body_part_text_2 not in recovery_body_parts:
-                        recovery_body_parts.add(body_part_text_1)
+                        recovery_body_parts.add(body_part_text_2)
                         tile_2.text = "Foam Roll & Stretch your " + body_part_text_2
                         tile_2.description = mobilize_suffix
                         bold_2 = BoldText()
@@ -1150,8 +1150,8 @@ class TrendProcessor(object):
                     bold_stat_text.text = str(weeks)
                     bold_statistic_text.append(bold_stat_text)
                 if not body_part_factory.is_joint(t.body_part):
+                    mobilize_suffix = "to correct imbalances exacerbating your pain"
                     if len(t.agonists) > 0:
-                        mobilize_suffix = "to correct imbalances exacerbating your pain"
                         tile_1 = TriggerTile()
                         body_part_text_1, is_plural_1 = self.get_title_text_for_body_parts(t.agonists, 0)
                         if len(body_part_text_1) == 0:
@@ -1272,8 +1272,8 @@ class TrendProcessor(object):
                     bold_stat_text.text = self.get_severity_descriptor(pain_body_part_severity[t.body_part.body_part_location])
                     bold_statistic_text.append(bold_stat_text)
                 if not body_part_factory.is_joint(t.body_part):
+                    mobilize_suffix = "to minimize effects of compensations resulting from pain"
                     if len(t.agonists) > 0:
-                        mobilize_suffix = "to minimize effects of compensations resulting from pain"
                         tile_1 = TriggerTile()
                         body_part_text_1, is_plural_1 = self.get_title_text_for_body_parts(t.agonists, 0)
                         if len(body_part_text_1) == 0:
@@ -1322,8 +1322,8 @@ class TrendProcessor(object):
                         tile_3.trigger_type = t.trigger_type
                         tiles.append(tile_3)
                 else:
+                    mobilize_suffix = "to minimize effects of compensations resulting from pain"
                     if len(t.synergists) > 0:
-                        mobilize_suffix = "to minimize effects of compensations resulting from pain"
                         tile_1 = TriggerTile()
                         body_part_text_1, is_plural_1 = self.get_title_text_for_body_parts(t.synergists, 0)
                         if len(body_part_text_1) == 0:
