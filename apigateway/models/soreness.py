@@ -54,13 +54,6 @@ class Soreness(BaseSoreness, Serialisable):
         self.cleared_date_time = None
         self.status_changed_date_time = None
         self.daily = True
-        self.tissue_overload = 0
-        self.inflammation = 0
-        self.muscle_spasm = 0
-        self.adhesions = 0
-        self.altered_neuromuscular_control = 0
-        self.muscle_imbalance = 0
-        self.functional_inefficiency = 0
         self.tight = None
         self.knots = None
         self.ache = None
@@ -89,13 +82,6 @@ class Soreness(BaseSoreness, Serialisable):
         soreness.knots = input_dict.get('knots')
         soreness.ache = input_dict.get('ache')
         soreness.sharp = input_dict.get('sharp')
-        soreness.tissue_overload = input_dict.get('tissue_overload', 0)
-        soreness.inflammation = input_dict.get('inflammation', 0)
-        soreness.muscle_spasm = input_dict.get('muscle_spasm', 0)
-        soreness.adhesions = input_dict.get('adhesions', 0)
-        soreness.altered_neuromuscular_control = input_dict.get('altered_neuromuscular_control', 0)
-        soreness.muscle_imbalance = input_dict.get('muscle_imbalance', 0)
-        soreness.functional_inefficiency = input_dict.get('functional_inefficiency', 0)
         cls.get_symptoms_from_severity_movement(soreness)
 
         return soreness
@@ -351,14 +337,7 @@ class Soreness(BaseSoreness, Serialisable):
                    'tight': self.tight,
                    'knots': self.knots,
                    'ache': self.ache,
-                   'sharp': self.sharp,
-                   'tissue_overload': self.tissue_overload,
-                   'inflammation': self.inflammation,
-                   'muscle_spasm': self.muscle_spasm,
-                   'adhesions': self.adhesions,
-                   'altered_neuromuscular_control': self.altered_neuromuscular_control,
-                   'muscle_imbalance': self.muscle_imbalance,
-                   'functional_inefficiency': self.functional_inefficiency
+                   'sharp': self.sharp
                   }
         return ret
 
