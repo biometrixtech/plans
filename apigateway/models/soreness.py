@@ -151,17 +151,17 @@ class Soreness(BaseSoreness, Serialisable):
     def get_movement_from_tight_knot(value):
         if value == 0:
             return 0
-        if value <= 1:
+        if value <= 2:
             return 1
-        elif value <= 3:
+        elif value <= 5:
             return 2
-        elif value <= 4:
+        elif value <= 7:
             return 3
-        elif value <= 6:
+        elif value <= 4:
             return 4
         else:
             return 5
-        # mapping = {0:0, 1:1, 2:3, 3:2, 4:3, 5:4, 6:4, 7:5, 8:5, 9:5, 10:5}
+        # mapping = {0:0, 1:1, 2:1, 3:2, 4:2, 5:2, 6:3, 7:3, 8:4, 9:4, 10:5}
         # return mapping[value]
 
     @staticmethod
@@ -171,14 +171,14 @@ class Soreness(BaseSoreness, Serialisable):
         elif value <= 1:
             return 1
         elif value <= 2:
-            return 2
+            return 3
         elif value <= 3:
-            return 4
+            return 6
         elif value <= 4:
-            return 5
+            return 8
         else:
-            return 7
-        # mapping = {0:0, 1:1, 2:2, 3:4, 4:5, 5:7}
+            return 10
+        # mapping = {0:0, 1:1, 2:3, 3:6, 4:8, 5:10}
         # return mapping[value]
 
     @staticmethod
@@ -187,15 +187,15 @@ class Soreness(BaseSoreness, Serialisable):
             return 0
         elif value <= 2:
             return 1
-        elif value <= 3:
-            return 2
         elif value <= 4:
+            return 2
+        elif value <= 6:
             return 3
-        elif value <= 5:
+        elif value <= 8:
             return 4
         else:
             return 5
-        # mapping = {0:0, 1:1, 2:1, 3:2, 4:3, 5:4, 6:5, 7:5, 8:5, 9:5, 10:5}
+        # mapping = {0:0, 1:1, 2:1, 3:2, 4:2, 5:3, 6:3, 7:4, 8:4, 9:5, 10:5}
         # return mapping[value]
 
     @staticmethod
@@ -207,29 +207,29 @@ class Soreness(BaseSoreness, Serialisable):
         elif value <= 2:
             return 3
         elif value <= 3:
-            return 4
-        elif value <= 4:
             return 5
+        elif value <= 4:
+            return 7
         else:
-            return 6
-        # mapping = {0:0, 1:1, 2:3, 3:4, 4:5, 5:6}
+            return 9
+        # mapping = {0:0, 1:1, 2:3, 3:5, 4:7, 5:9}
         # return mapping[value]
 
     @staticmethod
     def get_soreness_from_ache(value):
         if value == 0:
             return 0
-        elif value <= 3:
+        elif value <= 2:
             return 1
-        elif value <= 4:
-            return 2
         elif value <= 5:
+            return 2
+        elif value <= 7:
             return 3
-        elif value <= 6:
+        elif value <= 9:
             return 4
         else:
             return 5
-        # mapping = {0:0, 1:1, 2:1, 3:1, 4:2, 5:3, 6:4, 7:5, 8:5, 9:5, 10:5}
+        # mapping = {0:0, 1:1, 2:1, 3:2, 4:2, 5:2, 6:3, 7:3, 8:4, 9:4, 10:5}
         # return mapping[value]
 
     @staticmethod
@@ -239,14 +239,14 @@ class Soreness(BaseSoreness, Serialisable):
         elif value <= 1:
             return 1
         elif value <= 2:
-            return 4
+            return 3
         elif value <= 3:
-            return 5
-        elif value <= 4:
             return 6
+        elif value <= 4:
+            return 8
         else:
-            return 7
-        # mapping = {0:0, 1:1, 2:4, 3:5, 4:6, 5:7}
+            return 10
+        # mapping = {0:0, 1:1, 2:3, 3:6, 4:8, 5:10}
         # return mapping[value]
 
 
