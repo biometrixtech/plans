@@ -37,16 +37,17 @@ class DailyReadiness(Serialisable):
             'sleep_quality': self.sleep_quality,
             'readiness': self.readiness,
             'wants_functional_strength': self.wants_functional_strength,
-            'sore_body_parts': [{"body_part": s.body_part.location.value, "side": s.side} for s in self.soreness if s.severity > 1]
+            'sore_body_parts': [{"body_part": s.body_part.location.value, "side": s.side} for s in self.soreness if s.severity is not None and s.severity > 1]
         }
         return ret
 
     def _soreness_from_dict(self, soreness_dict):
-        soreness = Soreness()
-        soreness.body_part = BodyPart(BodyPartLocation(soreness_dict['body_part']), None)
-        soreness.pain = soreness_dict.get('pain', False)
-        soreness.severity = soreness_dict['severity']
-        soreness.movement = soreness_dict.get('movement', None)
-        soreness.side = soreness_dict.get('side', None)
-        soreness.reported_date_time = self.event_date
+        soreness_dict['reported_date_time'] = self.event_date
+        soreness = Soreness().json_deserialise(soreness_dict)
+        # soreness.body_part = BodyPart(BodyPartLocation(soreness_dict['body_part']), None)
+        # soreness.pain = soreness_dict.get('pain', False)
+        # soreness.severity = soreness_dict['severity']
+        # soreness.movement = soreness_dict.get('movement', None)
+        # soreness.side = soreness_dict.get('side', None)
+        # soreness.reported_date_time = self.event_date
         return soreness

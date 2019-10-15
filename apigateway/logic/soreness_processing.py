@@ -39,7 +39,15 @@ class SorenessCalculator(object):
     def get_severity(cls, severity, movement):
 
         if severity is None:
-            return None
+            if movement is None:
+                return None
+            else:
+                if movement == 1:
+                    return 1
+                elif 1 < movement <= 3:
+                    return 2
+                else:
+                    return 3
         elif movement in [None, 0] or severity == 0:
             return severity
         elif severity == 1:
@@ -219,7 +227,7 @@ class BodyPartMapping(object):
     @staticmethod
     def get_soreness_type(body_part_location):
 
-        if (body_part_location == BodyPartLocation.hip_flexor or body_part_location == BodyPartLocation.knee
+        if (body_part_location == BodyPartLocation.hip or body_part_location == BodyPartLocation.knee
                 or body_part_location == BodyPartLocation.ankle or body_part_location == BodyPartLocation.foot
                 or body_part_location == BodyPartLocation.lower_back):
             return SorenessType.joint_related

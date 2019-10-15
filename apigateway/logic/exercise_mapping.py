@@ -528,6 +528,7 @@ class ExerciseAssignmentCalculator(object):
 
         if (
                 body_part_location == BodyPartLocation.hip_flexor or
+                body_part_location == BodyPartLocation.hip or
                 body_part_location == BodyPartLocation.knee or
                 body_part_location == BodyPartLocation.ankle or
                 body_part_location == BodyPartLocation.foot or
@@ -535,7 +536,8 @@ class ExerciseAssignmentCalculator(object):
                 body_part_location == BodyPartLocation.groin or
                 body_part_location == BodyPartLocation.quads or
                 body_part_location == BodyPartLocation.shin or
-                body_part_location == BodyPartLocation.outer_thigh or
+                body_part_location == BodyPartLocation.it_band or
+                body_part_location == BodyPartLocation.it_band_lateral_knee or
                 body_part_location == BodyPartLocation.glutes or
                 body_part_location == BodyPartLocation.hamstrings or
                 body_part_location == BodyPartLocation.calves
