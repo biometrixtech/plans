@@ -157,7 +157,7 @@ class Soreness(BaseSoreness, Serialisable):
             return 2
         elif value <= 7:
             return 3
-        elif value <= 4:
+        elif value <= 9:
             return 4
         else:
             return 5
