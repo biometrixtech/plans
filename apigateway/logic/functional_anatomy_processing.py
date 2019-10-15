@@ -1,5 +1,5 @@
 from models.sport import SportName
-from models.functional_anatomy import FunctionalAnatomy
+#from models.functional_anatomy import FunctionalAnatomy
 from models.soreness_base import BodyPartLocation
 
 
@@ -7,15 +7,31 @@ class FunctionalAnatomyProcessor(object):
     def __init__(self):
         self.activity = SportName.distance_running
 
-    def get_functional_anatomy_for_sport(self, sport_name):
+    # def get_functional_anatomy_for_sport(self, sport_name):
+    #
+    #     functional_anatomy = FunctionalAnatomy(self.activity)
+    #
+    #     if sport_name is not None:
+    #         if sport_name == SportName.distance_running:
+    #             functional_anatomy = FunctionalAnatomy(SportName.distance_running)
+    #
+    #     return functional_anatomy
 
-        functional_anatomy = FunctionalAnatomy(self.activity)
+    # TODO: where this is called, make sure we handle bilateral vs unilateral
+    def get_related_muscles_from_joints(self, joint_value):
 
-        if sport_name is not None:
-            if sport_name == SportName.distance_running:
-                functional_anatomy = FunctionalAnatomy(SportName.distance_running)
-
-        return functional_anatomy
+        if joint_value == BodyPartLocation.foot.value:
+            return [40, 41, 42, 43, 44]
+        elif joint_value == BodyPartLocation.ankle.value:
+            return [41, 43, 44]
+        elif joint_value == BodyPartLocation.knee.value:
+            return [46, 47, 48, 55, 56, 57, 58, 62]
+        elif joint_value == BodyPartLocation.hip.value:
+            return [45, 47, 48, 49, 50, 51, 52, 53, 54, 58, 59, 60, 61, 62, 63, 64, 65, 66]
+        elif joint_value == BodyPartLocation.lower_back.value:
+            return [45, 47, 48, 49, 50, 51, 52, 53, 54, 58, 59, 60, 61, 62, 63, 64, 65, 66]
+        else:
+            return []
 
     def get_related_joints(self, body_part_value):
 

@@ -6,6 +6,7 @@ class ExerciseDosage(object):
     def __init__(self):
         self.goal = None
         self.priority = 0
+        self.last_severity = 0
         self.soreness_source = None
         self.sports = []
         self.efficient_reps_assigned = 0
@@ -24,7 +25,8 @@ class ExerciseDosage(object):
 
     def severity(self):
         if self.soreness_source is not None:
-            return self.soreness_source.severity
+            #return self.soreness_source.severity
+            return self.last_severity
         else:
             return 0.5
 
