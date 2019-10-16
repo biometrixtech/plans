@@ -1,4 +1,5 @@
 from enum import IntEnum, Enum
+from serialisable import Serialisable
 from models.sport import SportName
 from models.soreness_base import BodyPartSide, BodyPartLocation
 from models.body_parts import BodyPart, BodyPartFactory
@@ -28,6 +29,54 @@ class FunctionalMovement(object):
         self.prime_movers = []
         self.antagonists = []
         self.synergists = []
+
+
+class AptAnklePitchElasticity(Serialisable):
+    def __init__(self):
+        self.left_elasticity = 0.0
+        self.left_apt_adf = 0.0
+        self.right_elasticity = 0.0
+        self.right_apt_adf = 0.0
+
+    def json_serialise(self):
+        ret = {
+            'left_elasticity': self.left_elasticity,
+            'left_apt_adf': self.left_apt_adf,
+            'right_elasticity': self.right_elasticity,
+            'right_apt_adf': self.right_apt_adf
+        }
+
+        return ret
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        apt_ankle_pitch = cls()
+        left = input_dict.get("left")
+        if left is not None:
+            apt_ankle_pitch.left_elasticity = left.get("elasticity", 0.0)
+            apt_ankle_pitch.left_apt_adf = left.get("apt_adf", 0.0)
+        right = input_dict.get("right")
+        if right is not None:
+            apt_ankle_pitch.right_elasticity = right.get("elasticity", 0.0)
+            apt_ankle_pitch.right_apt_adf = right.get("apt_adf", 0.0)
+        return apt_ankle_pitch
+
+
+class MovementPatterns(Serialisable):
+    def __init__(self):
+        self.apt_ankle_pitch = None
+
+    def json_serialise(self):
+        ret = {
+            'apt_ankle_pitch': self.apt_ankle_pitch.json_serialise()
+        }
+
+        return ret
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        movement_patterns = cls()
+        movement_patterns.apt_ankle_pitch = AptAnklePitchElasticity.json_deserialise(input_dict['apt_ankle_pitch'])
 
 
 class BodyPartInjuryRisk(object):
