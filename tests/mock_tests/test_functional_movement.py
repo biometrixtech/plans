@@ -5,7 +5,7 @@ xray_recorder.begin_segment(name="test")
 from models.session import SportTrainingSession
 from datetime import datetime, timedelta
 from models.sport import SportName
-from models.functional_movement import ActivityFunctionalMovementFactory, FunctionalMovementFactory, BodyPartFunctionalMovement, SessionFunctionalMovement
+from models.functional_movement import ActivityFunctionalMovementFactory, FunctionalMovementFactory, BodyPartInjuryRisk, SessionFunctionalMovement, MovementPatterns, AptAnklePitchElasticity, Elasticity
 from logic.functional_anatomy_processing import FunctionalAnatomyProcessor
 from models.soreness import Soreness
 from models.body_parts import BodyPart
@@ -48,6 +48,106 @@ def test_body_parts_have_volume():
     assert len(session_functional_movement.body_parts) > 0
     for b in session_functional_movement.body_parts:
         assert b.concentric_volume > 0 or b.eccentric_volume > 0
+
+
+def test_body_parts_overactive():
+
+    dates = [datetime.now()]
+    rpes = [5]
+    durations = [100]
+    sport_names = [SportName.distance_running]
+
+    sessions = get_sessions(dates, rpes, durations, sport_names)
+
+    s = sessions[0]
+    s.movement_patterns = MovementPatterns()
+    s.movement_patterns.apt_ankle_pitch = AptAnklePitchElasticity()
+    s.movement_patterns.apt_ankle_pitch.left = Elasticity()
+    s.movement_patterns.apt_ankle_pitch.left.elasticity = .56
+
+    session_functional_movement = SessionFunctionalMovement(s, {})
+    session_functional_movement.process(s.event_date)
+
+    overactive = [i for i in session_functional_movement.injury_risk_dict.values() if i.last_overactive_date is not None]
+    underactive = [i for i in session_functional_movement.injury_risk_dict.values() if
+                  i.last_underactive_date is not None]
+    inhibited = [i for i in session_functional_movement.injury_risk_dict.values() if
+                  i.last_inhibited_date is not None]
+
+    assert len(overactive) > 0
+    assert len(underactive) > 0
+    assert len(inhibited) > 0
+
+
+def test_body_parts_overactive_weak():
+
+    dates = [datetime.now()]
+    rpes = [5]
+    durations = [100]
+    sport_names = [SportName.distance_running]
+
+    sessions = get_sessions(dates, rpes, durations, sport_names)
+
+    s = sessions[0]
+    s.movement_patterns = MovementPatterns()
+    s.movement_patterns.apt_ankle_pitch = AptAnklePitchElasticity()
+    s.movement_patterns.apt_ankle_pitch.left = Elasticity()
+    s.movement_patterns.apt_ankle_pitch.left.elasticity = .56
+    s.movement_patterns.apt_ankle_pitch.left.apt_adf = 3.0
+
+    session_functional_movement = SessionFunctionalMovement(s, {})
+    session_functional_movement.process(s.event_date)
+
+    overactive = [i for i in session_functional_movement.injury_risk_dict.values() if i.last_overactive_date is not None]
+    underactive = [i for i in session_functional_movement.injury_risk_dict.values() if
+                  i.last_underactive_date is not None]
+    weak = [i for i in session_functional_movement.injury_risk_dict.values() if
+                  i.last_weak_date is not None]
+
+    assert len(overactive) > 0
+    assert len(underactive) > 0
+    assert len(weak) > 0
+
+def test_body_parts_muscle_imbalance():
+
+    dates = [datetime.now()]
+    rpes = [5]
+    durations = [100]
+    sport_names = [SportName.distance_running]
+
+    sessions = get_sessions(dates, rpes, durations, sport_names)
+
+    s = sessions[0]
+    s.movement_patterns = MovementPatterns()
+    s.movement_patterns.apt_ankle_pitch = AptAnklePitchElasticity()
+    s.movement_patterns.apt_ankle_pitch.left = Elasticity()
+    s.movement_patterns.apt_ankle_pitch.left.elasticity = .56
+    s.movement_patterns.apt_ankle_pitch.left.apt_adf = 3.0
+
+    injury_risk_dict = {}
+    body_part_side = BodyPartSide(BodyPartLocation(58), 1)
+    injury_risk_dict[body_part_side] = BodyPartInjuryRisk()
+    injury_risk_dict[body_part_side].last_muscle_spasm_date = datetime.now().date()
+
+    session_functional_movement = SessionFunctionalMovement(s, injury_risk_dict)
+    session_functional_movement.process(s.event_date.date())
+
+    overactive = [i for i in session_functional_movement.injury_risk_dict.values() if i.last_overactive_date is not None]
+    underactive = [i for i in session_functional_movement.injury_risk_dict.values() if
+                  i.last_underactive_date is not None]
+    weak = [i for i in session_functional_movement.injury_risk_dict.values() if
+                  i.last_weak_date is not None]
+    short = [i for i in session_functional_movement.injury_risk_dict.values() if
+                  i.last_short_date is not None]
+    muscle_imbalance = [i for i in session_functional_movement.injury_risk_dict.values() if
+                  i.last_muscle_imbalance_date is not None]
+
+    assert len(overactive) == 0
+    assert len(underactive) == 0
+    assert len(weak) == 0
+    assert len(short) > 0
+    assert len(muscle_imbalance) > 0
+
 
 
 def test_body_parts_have_intensity():
