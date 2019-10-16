@@ -217,6 +217,9 @@ class BodyPartInjuryRisk(object):
 
                 # weak
                 "last_weak_date": format_date(self.last_weak_date),
+
+                # muscle imbalance
+                "last_muscle_imbalance_date": format_date(self.last_muscle_imbalance_date)
         }
 
     @classmethod
@@ -283,6 +286,9 @@ class BodyPartInjuryRisk(object):
 
         # weak
         injury_risk.last_weak_date = input_dict.get('last_weak_date')
+
+        # muscle imbalance
+        injury_risk.last_muscle_imbalance_date = input_dict.get('last_muscle_imbalance_date')
 
         return injury_risk
 
