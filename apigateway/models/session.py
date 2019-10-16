@@ -8,6 +8,7 @@ from models.sport import SportName, SportType, BaseballPosition, BasketballPosit
 from models.post_session_survey import PostSurvey
 from models.load_stats import LoadStats
 from models.asymmetry import Asymmetry
+from models.functional_movement import MovementPatterns
 
 
 class SessionType(Enum):
@@ -318,7 +319,8 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
             'calories': self.calories,
             'distance': self.distance,
             'source': self.source.value if self.source is not None else SessionSource.user.value,
-            'asymmetry': self.asymmetry.json_serialise() if self.asymmetry is not None else None
+            'asymmetry': self.asymmetry.json_serialise() if self.asymmetry is not None else None,
+            'movement_patterns': self.asymmetry.json_serialise() if self.movement_patterns is not None else None,
         }
         return ret
 
@@ -368,6 +370,8 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         else:
             session.post_session_survey = None
         session.asymmetry = Asymmetry.json_deserialise(input_dict['asymmetry']) if input_dict.get('asymmetry') is not None else None
+        session.movement_patterns = MovementPatterns.json_deserialise(input_dict['movement_patterns']) if input_dict.get(
+            'movement_patterns') is not None else None
 
         return session
 
