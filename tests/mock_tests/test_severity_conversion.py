@@ -45,10 +45,10 @@ def test_muscle_soreness_severity_to_ache():
     soreness = readiness_survey.soreness[0]
     assert soreness.severity == 3
     assert soreness.movement == 5
-    assert soreness.ache == 5
+    assert soreness.ache == 6
     assert soreness.sharp is None
-    assert soreness.tight == 7
-    assert soreness.knots == 7
+    assert soreness.tight == 10
+    assert soreness.knots == 10
 
 
 def test_muscle_pain_severity_to_sharp():
@@ -58,9 +58,9 @@ def test_muscle_pain_severity_to_sharp():
     assert soreness.severity == 3
     assert soreness.movement == 5
     assert soreness.ache is None
-    assert soreness.sharp == 4
-    assert soreness.tight == 7
-    assert soreness.knots == 7
+    assert soreness.sharp == 5
+    assert soreness.tight == 10
+    assert soreness.knots == 10
 
 
 def test_joint_pain_severity_to_sharp_movement_to_tight():
@@ -70,8 +70,8 @@ def test_joint_pain_severity_to_sharp_movement_to_tight():
     assert soreness.severity == 3
     assert soreness.movement == 5
     assert soreness.ache is None
-    assert soreness.sharp == 4
-    assert soreness.tight == 7
+    assert soreness.sharp == 5
+    assert soreness.tight == 10
     assert soreness.knots is None
 
 
@@ -82,7 +82,7 @@ def test_joint_pain_severity_to_sharp_no_movement():
     assert soreness.pain
     assert soreness.severity == 3
     assert soreness.ache is None
-    assert soreness.sharp == 4
+    assert soreness.sharp == 5
 
 
 def test_joint_ache_to_pain():
@@ -90,7 +90,7 @@ def test_joint_ache_to_pain():
     assert len(readiness_survey.soreness) == 1
     soreness = readiness_survey.soreness[0]
     assert soreness.pain
-    assert soreness.severity == 4
+    assert soreness.severity == 3
     assert soreness.movement is None
 
 def test_joint_ache_sharp_to_pain():
@@ -98,7 +98,7 @@ def test_joint_ache_sharp_to_pain():
     assert len(readiness_survey.soreness) == 1
     soreness = readiness_survey.soreness[0]
     assert soreness.pain
-    assert soreness.severity == 4
+    assert soreness.severity == 3
     assert soreness.movement is None
 
 
@@ -119,12 +119,12 @@ def test_severity_update():
     assert soreness.severity == 1
     assert not soreness.pain
 
-    soreness.sharp = 3  # severity is 2
-    assert soreness.severity == 2
+    soreness.sharp = 5  # severity is 3
+    assert soreness.severity == 3
     assert soreness.pain
 
-    soreness.ache = 3  # severity is 1
-    assert soreness.severity == 2
+    soreness.ache = 3  # severity is 2
+    assert soreness.severity == 3
     assert soreness.pain
 
 
