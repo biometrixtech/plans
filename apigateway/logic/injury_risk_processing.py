@@ -253,6 +253,7 @@ class InjuryRiskProcessor(object):
                 injury_risk_dict[b.body_part_side].eccentric_volume_today += b.eccentric_volume
                 injury_risk_dict[b.body_part_side].concentric_volume_today += b.concentric_volume
                 injury_risk_dict[b.body_part_side].is_compensating = b.is_compensating
+                injury_risk_dict[b.body_part_side].compensating_source = b.compensation_source
 
                 eccentric_volume_ramp = injury_risk_dict[b.body_part_side].eccentric_volume_ramp()
                 total_volume_ramp = injury_risk_dict[b.body_part_side].total_volume_ramp()
@@ -289,7 +290,6 @@ class InjuryRiskProcessor(object):
             injury_risk_dict = self.identify_muscle_spasm_today(base_date, t, injury_risk_dict)
 
             # Adhesions
-            # TODO make sure t is a muscle
             injury_risk_dict = self.identify_adhesions_today(base_date, t, injury_risk_dict)
 
         return injury_risk_dict
@@ -729,6 +729,3 @@ class InjuryRiskProcessor(object):
                         injury_risk_dict[body_part_side] = body_part_injury_risk
 
         return injury_risk_dict
-
-
-
