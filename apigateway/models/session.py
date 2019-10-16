@@ -114,6 +114,7 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
 
         # three sensor
         self.asymmetry = None
+        self.movement_patterns = None
 
     def __setattr__(self, name, value):
         if name in ['event_date', 'end_date', 'created_date', 'completed_date_time', 'sensor_start_date_time', 'sensor_end_date_time', 'last_updated']:

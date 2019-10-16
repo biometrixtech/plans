@@ -1499,6 +1499,66 @@ class PersonalizedRecoveryChartData(BaseOveractiveUnderactiveChartData, Serialis
             del(self.elevated_stress[d])
 
 
+class RecoveryChartData(BaseOveractiveUnderactiveChartData, Serialisable):
+    def __init__(self):
+        super().__init__()
+        self.low_elevated_stress = []
+        self.mod_elevated_stress = []
+        self.high_elevated_stress = []
+
+    def json_serialise(self):
+        ret = {
+            'low_elevated_stress': [a.json_serialise() for a in self.low_elevated_stress if self.low_elevated_stress is not None],
+            'mod_elevated_stress': [a.json_serialise() for a in self.mod_elevated_stress if self.mod_elevated_stress is not None],
+            'high_elevated_stress': [a.json_serialise() for a in self.high_elevated_stress if
+                                    self.high_elevated_stress is not None],
+        }
+        return ret
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        chart_data = cls()
+        chart_data.low_elevated_stress = [BodyPartSide.json_deserialise(a) for a in input_dict.get('low_elevated_stress', [])]
+        chart_data.mod_elevated_stress = [BodyPartSide.json_deserialise(a) for a in input_dict.get('mod_elevated_stress', [])]
+        chart_data.high_elevated_stress = [BodyPartSide.json_deserialise(a) for a in
+                                          input_dict.get('high_elevated_stress', [])]
+        return chart_data
+
+    def remove_duplicates(self):
+
+        self.low_elevated_stress = list(set(self.low_elevated_stress))
+        self.mod_elevated_stress = list(set(self.mod_elevated_stress))
+        self.high_elevated_stress = list(set(self.high_elevated_stress))
+
+        unc_delete = []
+        una_delete = []
+
+        id = 0
+        for u in self.low_elevated_stress:
+            index = next((i for i, x in enumerate(self.mod_elevated_stress) if u == x), -1)
+            index_2 = next((i for i, x in enumerate(self.high_elevated_stress) if u == x), -1)
+            if index > -1 or index_2 > -1:
+                unc_delete.append(id)
+            id += 1
+
+        unc_delete.sort(reverse=True)  # need to remove in reverse order so we don't mess up indexes along the way
+
+        for d in unc_delete:
+            del (self.low_elevated_stress[d])
+
+        id = 0
+        for u in self.mod_elevated_stress:
+            index = next((i for i, x in enumerate(self.high_elevated_stress) if u == x), -1)
+            if index > -1:
+                una_delete.append(id)
+            id += 1
+
+        una_delete.sort(reverse=True)
+
+        for d in una_delete:
+            del (self.mod_elevated_stress[d])
+
+
 
 
 

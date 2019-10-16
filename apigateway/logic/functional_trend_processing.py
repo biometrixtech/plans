@@ -2,7 +2,7 @@ from models.athlete_trend import TrendDashboardCategory, PlanAlert, Trend, Trend
     FirstTimeExperienceElement, CategoryFirstTimeExperienceModal
 from models.styles import BoldText, LegendColor, VisualizationType
 from models.trigger import TriggerType, Trigger
-from models.chart_data import PreventionChartData, PersonalizedRecoveryChartData, CareTodayChartData
+from models.chart_data import PreventionChartData, PersonalizedRecoveryChartData, CareTodayChartData, RecoveryChartData
 from models.insights import InsightType
 from models.body_parts import BodyPartFactory
 from models.soreness_base import BodyPartSide, BodyPartLocation
@@ -429,26 +429,30 @@ class TrendProcessor(object):
 
         two_days_ago = self.event_date_time.date() - timedelta(days=1)
 
-        excessive_strain = []
+        excessive_strain_fo = []
+        excessive_strain_nfo = []
         compensating = []
 
         for body_part_side, body_part_injury_risk in self.injury_hist_dict.items():
-            if body_part_injury_risk.last_excess_strain_date >- two_days_ago:
-                excessive_strain.append(body_part_side)
+            if body_part_injury_risk.last_excess_strain_date >= two_days_ago and body_part_injury_risk.last_non_functional_overreaching_date >= two_days_ago:
+                excessive_strain_nfo.append(body_part_side)
+            if body_part_injury_risk.last_excess_strain_date >= two_days_ago and body_part_injury_risk.last_functional_overreaching_date >= two_days_ago:
+                excessive_strain_fo.append(body_part_side)
             if body_part_injury_risk.is_compensating:
                 compensating.append(body_part_side)
 
-        triggers_load = list(t for t in self.trigger_list if t.trigger_type == TriggerType.high_volume_intensity)
-        for t in triggers_load:
-            t.priority = 1
-
-        triggers_110 = list(t for t in self.trigger_list if t.trigger_type == TriggerType.movement_error_apt_asymmetry)
-        for t in triggers_110:
-            t.priority = 4
+        # triggers_load = list(t for t in self.trigger_list if t.trigger_type == TriggerType.high_volume_intensity)
+        # for t in triggers_load:
+        #     t.priority = 1
+        #
+        # triggers_110 = list(t for t in self.trigger_list if t.trigger_type == TriggerType.movement_error_apt_asymmetry)
+        # for t in triggers_110:
+        #     t.priority = 4
 
         # since we're reverse sorting, 2 is a higher priority than 1
 
-        if len(triggers_110) > 0 or len(triggers_load) > 0:
+        #if len(triggers_110) > 0 or len(triggers_load) > 0:
+        if len(excessive_strain_nfo) > 0 or len(excessive_strain_fo) > 0 or len(compensating) > 0:
 
             #antagonists_7, synergists_7 = self.get_antagonists_syngergists(triggers_7)
 
@@ -457,25 +461,23 @@ class TrendProcessor(object):
             trend_data = TrendData()
             trend_data.visualization_type = VisualizationType.personalized_recovery
             trend_data.add_visualization_data()
-            recovery_data = PersonalizedRecoveryChartData()
+            recovery_data = RecoveryChartData()
             #recovery_data.tight.extend([t.body_part for t in triggers_7])
             #recovery_data.elevated_stress.extend([s for s in synergists_7])
 
-            for t in triggers_110:
-                recovery_data.tight.extend([a for a in t.overactive_tight_first])
-                recovery_data.elevated_stress.extend([s for s in t.elevated_stress])
-
-            for t in triggers_load:
-                recovery_data.elevated_stress.extend([a for a in t.agonists])
-                recovery_data.elevated_stress.extend([s for s in t.antagonists])
+            recovery_data.high_elevated_stress.extend(excessive_strain_nfo)
+            recovery_data.mod_elevated_stress.extend(compensating)
+            recovery_data.low_elevated_stress.extend(excessive_strain_fo)
 
             recovery_data.remove_duplicates()
             trend_data.data = [recovery_data]
 
             all_triggers = []
-            #all_triggers.extend(triggers_7)
-            all_triggers.extend(triggers_110)
-            all_triggers.extend(triggers_load)
+            all_triggers.extend(excessive_strain_nfo)
+            all_triggers.extend(compensating)
+            all_triggers.extend(excessive_strain_fo)
+
+            all_triggers = list(set(all_triggers))
 
             trend.trigger_tiles = self.get_trigger_tiles(all_triggers)
 
