@@ -48,13 +48,13 @@ merged_users = [
     # "two_pain_tread", #25c38e39-357a-456d-84b7-61547364a2ba
     # "full_fte_long", #024a6807-eef6-4556-b3b8-1c8639dd1758
     # "full_fte_tread", #33293741-bf30-479e-83e9-bc6b3a1cb7c2
-    "nc_long_2",  #8f6ff382-9314-43d2-9bb5-54bd8416a682
-    "nc_sore_tread_2",  #3f4bd8a2-c76b-4296-8c75-7302c31468c2
-    "ts_pain_long_2",  #5dd7a148-1c0e-4ddf-a1b1-020a99347069
-    "ts_tread_2",  #93b7a075-8168-4fad-961f-cfebdee392fc
-    "two_pain_tread_2",  #84a5e6fd-19f2-44ed-8bbd-ed2c03769ecf
-    "full_fte_long_2",  #24882bdf-69df-4043-b832-74d6c1f7052c
-    "full_fte_tread_2",  #703b5309-78cd-46b1-82ec-45e86b6d71de
+    # "nc_long_2",  #8f6ff382-9314-43d2-9bb5-54bd8416a682
+    # "nc_sore_tread_2",  #3f4bd8a2-c76b-4296-8c75-7302c31468c2
+    # "ts_pain_long_2",  #5dd7a148-1c0e-4ddf-a1b1-020a99347069
+    # "ts_tread_2",  #93b7a075-8168-4fad-961f-cfebdee392fc
+    # "two_pain_tread_2",  #84a5e6fd-19f2-44ed-8bbd-ed2c03769ecf
+    #"full_fte_long_2",  #24882bdf-69df-4043-b832-74d6c1f7052c
+    #"full_fte_tread_2",  #703b5309-78cd-46b1-82ec-45e86b6d71de
 
     # production only
     # "ivonna+demo1@fathomai.com",#82b1450c-9487-4573-86f7-a0dfeb612774
@@ -73,7 +73,7 @@ merged_users = [
     #102017ae-3a2e-4477-9cc6-6d1745ba6b3b
     #0676696d-709f-4a59-8301-62e1d3aa130e
     #214e0ed9-172c-4d94-8c94-1e34ed9eb141
-    #4b2f895e-a3b6-43b9-86b5-5cfc26190caa
+    "full_fte_long_2", #4b2f895e-a3b6-43b9-86b5-5cfc26190caa
     #f0bc5f88-2909-4f88-b839-5fbfcbeb8f0b
 ]
 
