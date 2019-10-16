@@ -89,6 +89,7 @@ class MovementPatterns(Serialisable):
     def json_deserialise(cls, input_dict):
         movement_patterns = cls()
         movement_patterns.apt_ankle_pitch = AptAnklePitchElasticity.json_deserialise(input_dict['apt_ankle_pitch']) if input_dict.get('apt_ankle_pitch') is not None else None
+        return movement_patterns
 
 
 class CompensationSource(Enum):
