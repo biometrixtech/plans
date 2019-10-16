@@ -53,14 +53,16 @@ class AptAnklePitchElasticity(Serialisable):
     @classmethod
     def json_deserialise(cls, input_dict):
         apt_ankle_pitch = cls()
-        left = input_dict.get("left")
-        if left is not None:
-            apt_ankle_pitch.left_elasticity = left.get("elasticity", 0.0)
-            apt_ankle_pitch.left_apt_adf = left.get("apt_adf", 0.0)
-        right = input_dict.get("right")
-        if right is not None:
-            apt_ankle_pitch.right_elasticity = right.get("elasticity", 0.0)
-            apt_ankle_pitch.right_apt_adf = right.get("apt_adf", 0.0)
+        apt_ankle_pitch_data = input_dict.get("apt_ankle_pitch")
+        if apt_ankle_pitch_data is not None:
+            left = apt_ankle_pitch_data.get("left")
+            if left is not None:
+                apt_ankle_pitch.left_elasticity = left.get("elasticity", 0.0)
+                apt_ankle_pitch.left_apt_adf = left.get("apt_adf", 0.0)
+            right = apt_ankle_pitch_data.get("right")
+            if right is not None:
+                apt_ankle_pitch.right_elasticity = right.get("elasticity", 0.0)
+                apt_ankle_pitch.right_apt_adf = right.get("apt_adf", 0.0)
         return apt_ankle_pitch
 
 
