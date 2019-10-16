@@ -33,19 +33,35 @@ class FunctionalMovement(object):
         self.synergists = []
 
 
-class AptAnklePitchElasticity(Serialisable):
+class Elasticity(Serialisable):
     def __init__(self):
-        self.left_elasticity = 0.0
-        self.left_apt_adf = 0.0
-        self.right_elasticity = 0.0
-        self.right_apt_adf = 0.0
+        self.elasticity = 0.0
+        self.apt_adf = 0.0
 
     def json_serialise(self):
         ret = {
-            'left_elasticity': self.left_elasticity,
-            'left_apt_adf': self.left_apt_adf,
-            'right_elasticity': self.right_elasticity,
-            'right_apt_adf': self.right_apt_adf
+            'elasticity': self.elasticity,
+            'apt_adf': self.apt_adf
+        }
+        return ret
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        elasticity_data = cls()
+        elasticity_data.elasticity = input_dict.get("elasticity", 0.0)
+        elasticity_data.apt_adf = input_dict.get("apt_adf", 0.0)
+        return elasticity_data
+
+
+class AptAnklePitchElasticity(Serialisable):
+    def __init__(self):
+        self.left = None
+        self.right = None
+
+    def json_serialise(self):
+        ret = {
+            'left': self.left.json_serialise() if self.left is not None else None,
+            'right': self.right.json_serialise() if self.right is not None else None
         }
 
         return ret
@@ -53,16 +69,8 @@ class AptAnklePitchElasticity(Serialisable):
     @classmethod
     def json_deserialise(cls, input_dict):
         apt_ankle_pitch = cls()
-        apt_ankle_pitch_data = input_dict.get("apt_ankle_pitch")
-        if apt_ankle_pitch_data is not None:
-            left = apt_ankle_pitch_data.get("left")
-            if left is not None:
-                apt_ankle_pitch.left_elasticity = left.get("elasticity", 0.0)
-                apt_ankle_pitch.left_apt_adf = left.get("apt_adf", 0.0)
-            right = apt_ankle_pitch_data.get("right")
-            if right is not None:
-                apt_ankle_pitch.right_elasticity = right.get("elasticity", 0.0)
-                apt_ankle_pitch.right_apt_adf = right.get("apt_adf", 0.0)
+        apt_ankle_pitch.left = Elasticity.json_serialise(input_dict["left"]) if input_dict.get("left") is not None else None
+        apt_ankle_pitch.right = Elasticity.json_serialise(input_dict["right"]) if input_dict.get("right") is not None else None
         return apt_ankle_pitch
 
 
@@ -80,9 +88,7 @@ class MovementPatterns(Serialisable):
     @classmethod
     def json_deserialise(cls, input_dict):
         movement_patterns = cls()
-        movement_patterns_data = input_dict.get('movement_patterns')
-        if movement_patterns_data is not None:
-            movement_patterns.apt_ankle_pitch = AptAnklePitchElasticity.json_deserialise(movement_patterns_data.get('apt_ankle_pitch'))
+        movement_patterns.apt_ankle_pitch = AptAnklePitchElasticity.json_deserialise(input_dict['apt_ankle_pitch']) if input_dict.get('apt_ankle_pitch') is not None else None
 
 
 class CompensationSource(Enum):
