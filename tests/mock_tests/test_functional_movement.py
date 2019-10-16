@@ -61,7 +61,7 @@ def test_body_parts_have_intensity():
 
     s = sessions[0]
     session_functional_movement = SessionFunctionalMovement(s, {})
-    session_functional_movement.process(s.event_date)
+    session_functional_movement.process(s.event_date.date())
 
     assert len(session_functional_movement.body_parts) > 0
     for b in session_functional_movement.body_parts:
