@@ -69,8 +69,8 @@ class AptAnklePitchElasticity(Serialisable):
     @classmethod
     def json_deserialise(cls, input_dict):
         apt_ankle_pitch = cls()
-        apt_ankle_pitch.left = Elasticity.json_serialise(input_dict["left"]) if input_dict.get("left") is not None else None
-        apt_ankle_pitch.right = Elasticity.json_serialise(input_dict["right"]) if input_dict.get("right") is not None else None
+        apt_ankle_pitch.left = Elasticity.json_deserialise(input_dict["left"]) if input_dict.get("left") is not None else None
+        apt_ankle_pitch.right = Elasticity.json_deserialise(input_dict["right"]) if input_dict.get("right") is not None else None
         return apt_ankle_pitch
 
 
