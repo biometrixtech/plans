@@ -2,7 +2,7 @@ from models.athlete_trend import TrendDashboardCategory, PlanAlert, Trend, Trend
     FirstTimeExperienceElement, CategoryFirstTimeExperienceModal
 from models.styles import BoldText, LegendColor, VisualizationType
 from models.trigger import TriggerType, Trigger
-from models.chart_data import PreventionChartData, PersonalizedRecoveryChartData, CareTodayChartData, RecoveryChartData
+from models.chart_data import Prevention3sChartData, RecoveryChartData, CareChartData
 from models.insights import InsightType
 from models.body_parts import BodyPartFactory
 from models.soreness_base import BodyPartSide, BodyPartLocation
@@ -277,9 +277,9 @@ class TrendProcessor(object):
         personalized_recovery_category_index = self.get_category_index(InsightType.personalized_recovery)
         prevention_category_index = self.get_category_index(InsightType.prevention)
         care_category_index = self.get_category_index(InsightType.care)
-        self.set_personalized_recovery(personalized_recovery_category_index)
+        self.set_recovery(personalized_recovery_category_index)
         self.set_prevention(prevention_category_index)
-        self.set_daily_care(care_category_index)
+        self.set_care(care_category_index)
 
         for c in range(0, len(self.athlete_trend_categories)):
             if len(self.athlete_trend_categories[c].trends) > 0:
@@ -421,11 +421,7 @@ class TrendProcessor(object):
         else:
             return None
 
-    def set_personalized_recovery(self, category_index):
-
-        # triggers_7 = list(t for t in self.trigger_list if t.trigger_type == TriggerType.hist_sore_less_30)
-        # for t in triggers_7:
-        #     t.priority = 3
+    def set_recovery(self, category_index):
 
         two_days_ago = self.event_date_time.date() - timedelta(days=1)
 
@@ -433,62 +429,58 @@ class TrendProcessor(object):
         excessive_strain_nfo = []
         compensating = []
 
+        last_date_time = two_days_ago.date()
+
         for body_part_side, body_part_injury_risk in self.injury_hist_dict.items():
-            if body_part_injury_risk.last_excess_strain_date >= two_days_ago and body_part_injury_risk.last_non_functional_overreaching_date >= two_days_ago:
+
+            if (body_part_injury_risk.last_excess_strain_date is not None and
+                    body_part_injury_risk.last_non_functional_overreaching_date is not None and
+                    body_part_injury_risk.last_excess_strain_date >= two_days_ago and
+                    body_part_injury_risk.last_non_functional_overreaching_date >= two_days_ago):
                 excessive_strain_nfo.append(body_part_side)
-            if body_part_injury_risk.last_excess_strain_date >= two_days_ago and body_part_injury_risk.last_functional_overreaching_date >= two_days_ago:
+                last_date_time = max(body_part_injury_risk.last_excess_strain_date, last_date_time)
+                last_date_time = max(body_part_injury_risk.last_non_functional_overreaching_date, last_date_time)
+            if (body_part_injury_risk.last_excess_strain_date is not None and
+                    body_part_injury_risk.last_functional_overreaching_date is not None and
+                    body_part_injury_risk.last_excess_strain_date >= two_days_ago and
+                    body_part_injury_risk.last_functional_overreaching_date >= two_days_ago):
                 excessive_strain_fo.append(body_part_side)
+                last_date_time = max(body_part_injury_risk.last_excess_strain_date, last_date_time)
+                last_date_time = max(body_part_injury_risk.last_functional_overreaching_date, last_date_time)
             if body_part_injury_risk.is_compensating:
                 compensating.append(body_part_side)
+                last_date_time = max(self.event_date_time, last_date_time)
 
-        # triggers_load = list(t for t in self.trigger_list if t.trigger_type == TriggerType.high_volume_intensity)
-        # for t in triggers_load:
-        #     t.priority = 1
-        #
-        # triggers_110 = list(t for t in self.trigger_list if t.trigger_type == TriggerType.movement_error_apt_asymmetry)
-        # for t in triggers_110:
-        #     t.priority = 4
-
-        # since we're reverse sorting, 2 is a higher priority than 1
-
-        #if len(triggers_110) > 0 or len(triggers_load) > 0:
         if len(excessive_strain_nfo) > 0 or len(excessive_strain_fo) > 0 or len(compensating) > 0:
-
-            #antagonists_7, synergists_7 = self.get_antagonists_syngergists(triggers_7)
 
             trend = self.get_personalized_recovery_trend(category_index)
 
             trend_data = TrendData()
-            trend_data.visualization_type = VisualizationType.personalized_recovery
+            trend_data.visualization_type = VisualizationType.recovery
             trend_data.add_visualization_data()
             recovery_data = RecoveryChartData()
-            #recovery_data.tight.extend([t.body_part for t in triggers_7])
-            #recovery_data.elevated_stress.extend([s for s in synergists_7])
 
-            recovery_data.high_elevated_stress.extend(excessive_strain_nfo)
-            recovery_data.mod_elevated_stress.extend(compensating)
-            recovery_data.low_elevated_stress.extend(excessive_strain_fo)
+            recovery_data.high_stress.extend(compensating)
+            recovery_data.moderate_stress.extend(excessive_strain_fo)
+            recovery_data.over_stressed.extend(excessive_strain_nfo)
 
             recovery_data.remove_duplicates()
             trend_data.data = [recovery_data]
 
-            all_triggers = []
-            all_triggers.extend(excessive_strain_nfo)
-            all_triggers.extend(compensating)
-            all_triggers.extend(excessive_strain_fo)
-
-            all_triggers = list(set(all_triggers))
-
-            trend.trigger_tiles = self.get_trigger_tiles(all_triggers)
+            trend.trigger_tiles.extend(self.get_trigger_tiles(excessive_strain_nfo))
+            trend.trigger_tiles.extend(self.get_trigger_tiles(compensating))
+            trend.trigger_tiles.extend(self.get_trigger_tiles(excessive_strain_fo))
 
             trend.trend_data = trend_data
 
             trend.visible = True
             trend.priority = 0
 
-            trend.triggers = all_triggers
+            #trend.triggers = all_triggers
 
-            trend.last_date_time = self.get_latest_trigger_date_time(all_triggers)
+            #TODO last_date_time is messed up and inconsistent with other date times
+            #trend.last_date_time = self.get_latest_trigger_date_time(all_triggers)
+            trend.last_date_time = last_date_time
 
             self.set_personalized_recovery_trend(category_index, trend)
 
@@ -601,68 +593,49 @@ class TrendProcessor(object):
 
         return body_part_side, body_part_text
 
-    def set_daily_care(self, category_index):
+    def set_care(self, category_index):
 
-        pain_triggers = [TriggerType.no_hist_pain_pain_today_severity_1_2,
-                         TriggerType.no_hist_pain_pain_today_high_severity_3_5,
-                         TriggerType.hist_pain_pain_today_severity_1_2,
-                         TriggerType.hist_pain_pain_today_severity_3_5]
-        triggers_pain = list(t for t in self.trigger_list if t.trigger_type in pain_triggers)
-        for t in triggers_pain:
-            t.priority = 3
+        inflamed = []
+        muscle_spasm_tight = []
 
-        sore_triggers = [TriggerType.sore_today_doms,
-                         TriggerType.hist_sore_less_30_sore_today,
-                         TriggerType.hist_sore_greater_30_sore_today]
+        for body_part_side, body_part_injury_risk in self.injury_hist_dict.items():
+            if body_part_injury_risk.last_inflammation_date == self.event_date_time.date():
+                inflamed.append(body_part_side)
+            # TODO - muscle spasm OR tight or just muscle spasm?
+            if body_part_injury_risk.last_muscle_spasm_date == self.event_date_time.date():
+                muscle_spasm_tight.append(body_part_side)
 
-        triggers_sore = list(t for t in self.trigger_list if t.trigger_type in sore_triggers)
-        for t in triggers_sore:
-            t.priority = 2
-
-        if len(triggers_pain) > 0 or len(triggers_sore) > 0:
+        if len(inflamed) > 0 or len(muscle_spasm_tight) > 0:
 
             trend = self.get_care_trend(category_index)
 
             trend_data = TrendData()
-            trend_data.visualization_type = VisualizationType.care_today
+            trend_data.visualization_type = VisualizationType.care
             trend_data.add_visualization_data()
-            care_data = CareTodayChartData()
+            care_data = CareChartData()
 
             body_part_factory = BodyPartFactory()
 
-            for t in triggers_pain:
-                care_data.pain.extend([t.body_part])
-                if body_part_factory.is_joint(t.body_part):
-                    care_data.elevated_stress.extend([a for a in t.agonists])
-                    care_data.elevated_stress.extend([a for a in t.antagonists])
-                    care_data.elevated_stress.extend([a for a in t.synergists])
-                else:
-                    care_data.elevated_stress.extend([s for s in t.agonists])  # should be prime movers
-                    care_data.elevated_stress.extend([s for s in t.synergists])
-
-            for t in triggers_sore:
-                care_data.soreness.extend([t.body_part])
-                care_data.elevated_stress.extend([s for s in t.synergists])
+            care_data.inflamed.extend(inflamed)
+            care_data.tight.extend(muscle_spasm_tight)
 
             care_data.remove_duplicates()
             trend_data.data = [care_data]
 
-            all_triggers = []
-            all_triggers.extend(triggers_pain)
-            all_triggers.extend(triggers_sore)
-
-            trend.trigger_tiles = self.get_trigger_tiles(all_triggers)
+            trend.trigger_tiles.extend(self.get_trigger_tiles(inflamed))
+            trend.trigger_tiles.extend(self.get_trigger_tiles(muscle_spasm_tight))
 
             # rank triggers
             #sorted_triggers = sorted(all_triggers, key=lambda x: (x.created_date_time, x.priority), reverse=True)
 
-            trend.triggers = all_triggers
+            #trend.triggers = all_triggers
 
             trend.trend_data = trend_data
             trend.visible = True
             trend.priority = 1
 
-            trend.last_date_time = self.get_latest_trigger_date_time(all_triggers)
+            #trend.last_date_time = self.get_latest_trigger_date_time(all_triggers)
+            trend.last_date_time = self.event_date_time
 
             self.set_care_trend(category_index, trend)
 
@@ -672,69 +645,75 @@ class TrendProcessor(object):
 
     def set_prevention(self, category_index):
 
-        triggers_19 = list(t for t in self.trigger_list if t.trigger_type == TriggerType.hist_sore_greater_30)
-        for t in triggers_19:
-            t.priority = 2
+        short_adhesions = []
+        short_non_adhesions = []
+        overactive = []
+        underactive_weak = []
+        underactive_inhibited = []
 
-        triggers_16 = list(t for t in self.trigger_list if t.trigger_type == TriggerType.hist_pain)
-        for t in triggers_16:
-            t.priority = 3
-
-        trigger_111 = list(t for t in self.trigger_list if t.trigger_type == TriggerType.movement_error_historic_apt_asymmetry)
-        for t in trigger_111:
-            t.priority = 4
+        for body_part_side, body_part_injury_risk in self.injury_hist_dict.items():
+            if (body_part_injury_risk.last_short_date is not None and
+                    body_part_injury_risk.last_adhesions_date is not None and
+                body_part_injury_risk.last_short_date == self.event_date_time.date() and
+                    body_part_injury_risk.last_adhesions_date == self.event_date_time.date()):
+                short_adhesions.append(body_part_side)
+            if (body_part_injury_risk.last_short_date is not None and
+                    body_part_injury_risk.last_muscle_spasm_date is not None and
+                    body_part_injury_risk.last_short_date == self.event_date_time.date() and
+                    body_part_injury_risk.last_muscle_spasm_date == self.event_date_time.date()):
+                short_non_adhesions.append(body_part_side)
+            if (body_part_injury_risk.last_overactice_date is not None and
+                    body_part_injury_risk.last_overactice_date == self.event_date_time.date()):
+                overactive.append(body_part_side)
+            if (body_part_injury_risk.last_underactive_date is not None and
+                    body_part_injury_risk.last_weak_date is not None and
+                    body_part_injury_risk.last_underactive_date == self.event_date_time.date() and
+                    body_part_injury_risk.last_weak_date == self.event_date_time.date()):
+                underactive_weak.append(body_part_side)
+            if (body_part_injury_risk.last_underactive_date is not None and
+                    body_part_injury_risk.last_inhibited_date is not None and
+                    body_part_injury_risk.last_underactive_date == self.event_date_time.date() and
+                    body_part_injury_risk.last_inhibited_date == self.event_date_time.date()):
+                underactive_inhibited.append(body_part_side)
 
         # since we're reverse sorting, 2 is a higher priority than 1
 
-        if len(triggers_19) > 0 or len(triggers_16) > 0 or len(trigger_111) > 0:
-
-            antagonists_19, synergists_19 = self.get_antagonists_syngergists(triggers_19)
+        if (len(short_adhesions) > 0 or len(short_non_adhesions) > 0 or len(overactive) > 0 or
+                len(underactive_weak) > 0 or len(underactive_inhibited) > 0):
 
             trend = self.get_prevention_trend(category_index)
 
             trend_data = TrendData()
-            trend_data.visualization_type = VisualizationType.prevention
+            trend_data.visualization_type = VisualizationType.prevention3s
             trend_data.add_visualization_data()
-            prevention_data = PreventionChartData()
+            prevention_data = Prevention3sChartData()
 
-            prevention_data.overactive.extend([t.body_part for t in triggers_19])
-            prevention_data.weak.extend([a for a in antagonists_19])
-
-            body_part_factory = BodyPartFactory()
-
-            for t in triggers_16:
-                if body_part_factory.is_joint(t.body_part):
-                    prevention_data.weak.extend([a for a in t.agonists])
-                    prevention_data.weak.extend([a for a in t.antagonists])
-                    prevention_data.pain.extend([t.body_part])
-                else:
-                    prevention_data.pain.extend([t.body_part])
-                    prevention_data.weak.extend([a for a in t.antagonists])
-
-            for t in trigger_111:
-                prevention_data.overactive.extend([o for o in t.overactive_tight_first])
-                prevention_data.weak.extend([u for u in t.underactive_weak])
+            prevention_data.overactive.extend(overactive)
+            prevention_data.short.extend(short_adhesions)
+            prevention_data.short.extend(short_non_adhesions)
+            prevention_data.weak.extend(underactive_weak)
+            prevention_data.weak.extend(underactive_inhibited)
 
             prevention_data.remove_duplicates()
             trend_data.data = [prevention_data]
 
-            all_triggers = []
-            all_triggers.extend(triggers_19)
-            all_triggers.extend(triggers_16)
-            all_triggers.extend(trigger_111)
-
-            trend.trigger_tiles = self.get_trigger_tiles(all_triggers)
+            trend.trigger_tiles.extend(self.get_trigger_tiles(underactive_weak))
+            trend.trigger_tiles.extend(self.get_trigger_tiles(underactive_inhibited))
+            trend.trigger_tiles.extend(self.get_trigger_tiles(overactive))
+            trend.trigger_tiles.extend(self.get_trigger_tiles(short_adhesions))
+            trend.trigger_tiles.extend(self.get_trigger_tiles(short_non_adhesions))
 
             # rank triggers
             #sorted_triggers = sorted(all_triggers, key=lambda x: (x.created_date_time, x.priority), reverse=True)
 
-            trend.triggers = all_triggers
+            #trend.triggers = all_triggers
 
             trend.trend_data = trend_data
             trend.visible = True
             trend.priority = 1
 
-            trend.last_date_time = self.get_latest_trigger_date_time(all_triggers)
+            #trend.last_date_time = self.get_latest_trigger_date_time(all_triggers)
+            trend.last_date_time = self.event_date_time
 
             self.set_prevention_trend(category_index, trend)
 

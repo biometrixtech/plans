@@ -34,10 +34,12 @@ class LegendColor(Enum):
     purple_light_opacity = 8
     splash_light_opacity = 9
     purple_light = 10
-    slate_ight = 11
+    slate_light = 11
     slate = 12
     success_light = 13
     splash_half = 14
+    splash_xx_light = 15
+    warning_x_light = 16
 
 
 class Legend(object):
@@ -84,6 +86,9 @@ class VisualizationType(Enum):
     personalized_recovery = 9
     prevention = 10
     care_today = 11
+    prevention3s = 12
+    recovery = 13
+    care = 14
     biomechanics = 20
 
 
