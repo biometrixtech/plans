@@ -81,6 +81,11 @@ class MovementPatterns(Serialisable):
         movement_patterns.apt_ankle_pitch = AptAnklePitchElasticity.json_deserialise(input_dict['apt_ankle_pitch'])
 
 
+class CompensationSource(Enum):
+    internal_processing = 0
+    movement_patterns_3s = 1
+
+
 class BodyPartInjuryRisk(object):
     def __init__(self):
         self.concentric_volume_last_week = 0
@@ -104,6 +109,7 @@ class BodyPartInjuryRisk(object):
         self.last_non_functional_overreaching_date = None
         self.last_functional_overreaching_date = None
         self.is_compensating = False
+        self.compensating_source = None
 
         # inflammation
         self.last_inflammation_date = None
@@ -144,6 +150,9 @@ class BodyPartInjuryRisk(object):
 
         # weak
         self.last_weak_date = None
+
+        # muscle_imbalance = None
+        self.last_muscle_imbalance_date = None
 
     def json_serialise(self):
         return {
@@ -427,6 +436,7 @@ class BodyPartFunctionalMovement(object):
         self.concentric_ramp = 0.0
         self.eccentric_ramp = 0.0
         self.is_compensating = False
+        self.compensation_source = None
         self.inhibited = 0
         self.weak = 0
         self.tight = 0
@@ -456,9 +466,107 @@ class SessionFunctionalMovement(object):
         self.functional_movement_mappings = []
         self.injury_risk_dict = injury_risk_dict
 
+    def process_anc_and_muscle_imbalance(self, event_date):
+
+        if self.session.movement_patterns is not None and self.session.movement_patterns.apt_ankle_pitch is not None:
+
+            # Left
+            self.process_apt_ankle_side(event_date, 1)
+
+            # Right
+            self.process_apt_ankle_side(event_date, 2)
+
+    def process_apt_ankle_side(self, event_date, side):
+
+        movement_factory = FunctionalMovementFactory()
+        apt_ankle = self.session.movement_patterns.apt_ankle_pitch
+
+        if side == 1:
+            key_elasticity_value = apt_ankle.left_elasticity
+            key_adf_value = apt_ankle.left_adf
+        else:
+            key_elasticity_value = apt_ankle.righ_elasticity
+            key_adf_value = apt_ankle.right_adf
+
+        if key_elasticity_value > 0:
+            pelvic_tilt_movement = movement_factory.get_functional_movement(FunctionalMovementType.pelvic_anterior_tilt)
+            # are any muscles associated with Pelvic Anterior Tilt considered to be short with adhesions or muscle spasm?
+            any_left_short_confirmed = False
+            for p in pelvic_tilt_movement.prime_movers:
+                body_part_side = BodyPartSide(BodyPartLocation(p), side)
+                if body_part_side in self.injury_risk_dict:
+                    if self.injury_risk_dict[body_part_side].last_adhesions_date is not None and \
+                            self.injury_risk_dict[body_part_side].last_adhesions_date == event_date:
+                        any_left_short_confirmed = True
+            if any_left_short_confirmed:  # mark all muscle imbalance and short
+                for p in pelvic_tilt_movement.prime_movers:
+                    body_part_side = BodyPartSide(BodyPartLocation(p), side)
+                    if body_part_side in self.injury_risk_dict:
+                        self.injury_risk_dict[body_part_side].last_short_date = event_date
+                        self.injury_risk_dict[body_part_side].last_muscle_imbalance_date = event_date
+                    else:
+                        body_part_injury_risk = BodyPartInjuryRisk()
+                        body_part_injury_risk.last_short_date = event_date
+                        body_part_injury_risk.last_muscle_imbalance_date = event_date
+                        self.injury_risk_dict[body_part_side] = body_part_injury_risk
+                    self.injury_risk_dict[body_part_side].compensation_source = CompensationSource.movement_patterns_3s
+            else:  # mark all muscles overactive
+                for p in pelvic_tilt_movement.prime_movers:
+                    body_part_side = BodyPartSide(BodyPartLocation(p), side)
+                    if body_part_side in self.injury_risk_dict:
+                        self.injury_risk_dict[body_part_side].last_overactive_date = event_date
+                    else:
+                        body_part_injury_risk = BodyPartInjuryRisk()
+                        body_part_injury_risk.last_overactive_date = event_date
+                        self.injury_risk_dict[body_part_side] = body_part_injury_risk
+                    self.injury_risk_dict[body_part_side].compensation_source = CompensationSource.movement_patterns_3s
+                # now mark specific muscles as underactive inhibited -- unless fatigue is present, then underactive weak
+                if key_adf_value != 0:
+                    for b in [61, 62, 63, 64, 66]:
+                        body_part_side = BodyPartSide(BodyPartLocation(b), side)
+                        if body_part_side in self.injury_risk_dict:
+                            self.injury_risk_dict[body_part_side].last_underactive_date = event_date
+                            self.injury_risk_dict[body_part_side].last_weak_date = event_date
+                        else:
+                            body_part_injury_risk = BodyPartInjuryRisk()
+                            body_part_injury_risk.last_underactive_date = event_date
+                            body_part_injury_risk.last_weak_date = event_date
+                            self.injury_risk_dict[body_part_side] = body_part_injury_risk
+                        self.injury_risk_dict[
+                            body_part_side].compensation_source = CompensationSource.movement_patterns_3s
+                else:
+                    for b in [61, 62, 63, 64, 66]:
+                        body_part_side = BodyPartSide(BodyPartLocation(b), side)
+                        if body_part_side in self.injury_risk_dict:
+                            self.injury_risk_dict[body_part_side].last_underactive_date = event_date
+                            self.injury_risk_dict[body_part_side].last_inhibited_date = event_date
+                        else:
+                            body_part_injury_risk = BodyPartInjuryRisk()
+                            body_part_injury_risk.last_underactive_date = event_date
+                            body_part_injury_risk.last_inhibited_date = event_date
+                            self.injury_risk_dict[body_part_side] = body_part_injury_risk
+                        self.injury_risk_dict[
+                            body_part_side].compensation_source = CompensationSource.movement_patterns_3s
+
+                # now mark a the hip extension muscles as compensating
+                hip_extension = movement_factory.get_functional_movement(
+                    FunctionalMovementType.hip_extension)
+                for m in hip_extension.prime_movers:
+                    body_part_side = BodyPartSide(BodyPartLocation(m), side)
+                    if body_part_side in self.injury_risk_dict:
+                        self.injury_risk_dict[body_part_side].is_compensationg = True
+                    else:
+                        body_part_injury_risk = BodyPartInjuryRisk()
+                        body_part_injury_risk.is_compensationg = True
+                        self.injury_risk_dict[body_part_side] = body_part_injury_risk
+                    self.injury_risk_dict[
+                        body_part_side].compensation_source = CompensationSource.movement_patterns_3s
+
     def process(self, event_date):
         activity_factory = ActivityFunctionalMovementFactory()
         movement_factory = FunctionalMovementFactory()
+
+        self.process_anc_and_muscle_imbalance(event_date)
 
         self.functional_movement_mappings = activity_factory.get_functional_movement_mappings(self.session.sport_name)
         concentric_levels = [m.concentric_level for m in self.functional_movement_mappings]
@@ -537,7 +645,7 @@ class FunctionalMovementActivityMapping(object):
 
         for p in self.prime_movers:
             compensating_for_others = self.other_body_parts_affected(p, injury_risk_dict, event_date)
-            if compensating_for_others:
+            if compensating_for_others or p.is_compensating:
                 prime_mover_ratio = 1.0
             # TODO replace with new ratios
             attributed_concentric_volume = training_volume * (self.concentric_level / highest_concentric_eccentric_factor) * prime_mover_ratio
@@ -545,6 +653,8 @@ class FunctionalMovementActivityMapping(object):
             p.concentric_volume = attributed_concentric_volume
             p.eccentric_volume = attributed_eccentric_volume
             p.is_compensating = compensating_for_others
+            if p.is_compensating and p.compensation_source is None:
+                p.compensation_source = CompensationSource.internal_processing
 
     def attribute_intensity(self, intensity, highest_concentric_eccentric_factor, injury_risk_dict, event_date):
 
@@ -554,13 +664,15 @@ class FunctionalMovementActivityMapping(object):
 
         for p in self.prime_movers:
             compensating_for_others = self.other_body_parts_affected(p, injury_risk_dict, event_date)
-            if compensating_for_others:
+            if compensating_for_others or p.is_compensating:
                 prime_mover_ratio = 1.0
             attributed_concentric_intensity = intensity * (self.concentric_level / highest_concentric_eccentric_factor) * prime_mover_ratio
             attributed_eccentric_intensity = intensity * (self.eccentric_level / highest_concentric_eccentric_factor) * prime_mover_ratio
             p.concentric_intensity = attributed_concentric_intensity
             p.eccentric_intensity = attributed_eccentric_intensity
             p.is_compensating = compensating_for_others
+            if p.is_compensating and p.compensation_source is None:
+                p.compensation_source = CompensationSource.internal_processing
 
     def other_body_parts_affected(self, target_body_part, injury_risk_dict, event_date):
 
