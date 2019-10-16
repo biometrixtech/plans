@@ -320,7 +320,7 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
             'distance': self.distance,
             'source': self.source.value if self.source is not None else SessionSource.user.value,
             'asymmetry': self.asymmetry.json_serialise() if self.asymmetry is not None else None,
-            'movement_patterns': self.asymmetry.json_serialise() if self.movement_patterns is not None else None,
+            'movement_patterns': self.movement_patterns.json_serialise() if self.movement_patterns is not None else None,
         }
         return ret
 
