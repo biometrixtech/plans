@@ -3,7 +3,8 @@ from serialisable import Serialisable
 from models.sport import SportName
 from models.soreness_base import BodyPartSide, BodyPartLocation
 from models.body_parts import BodyPart, BodyPartFactory
-from datetime import timedelta
+from datetime import timedelta, date
+from utils import format_date, parse_date
 
 
 class FunctionalMovementType(Enum):
@@ -143,6 +144,146 @@ class BodyPartInjuryRisk(object):
 
         # weak
         self.last_weak_date = None
+
+    def json_serialise(self):
+        return {
+                "concentric_volume_last_week": self.concentric_volume_last_week,
+                "concentric_volume_this_week": self.concentric_volume_this_week,
+                "concentric_volume_today": self.concentric_volume_today,
+                "eccentric_volume_last_week": self.eccentric_volume_last_week,
+                "eccentric_volume_this_week": self.eccentric_volume_this_week,
+                "eccentric_volume_today": self.eccentric_volume_today,
+                "max_concentric_intensity_48_hours": self.max_concentric_intensity_48_hours,
+                "max_eccentric_intensity_48_hours": self.max_eccentric_intensity_48_hours,
+
+                # ache
+                "ache_count_last_0_10_days": self.ache_count_last_0_10_days,
+                "ache_count_last_3_10_days": self.ache_count_last_3_10_days,
+                "ache_count_last_3_20_days": self.ache_count_last_3_20_days,
+                "last_ache_level": self.last_ache_level,
+                "last_ache_date": format_date(self.last_ache_date),
+
+                # excessive strain
+                "last_excessive_strain_date": format_date(self.last_excessive_strain_date),
+                "last_non_functional_overreaching_date": format_date(self.last_non_functional_overreaching_date),
+                "last_functional_overreaching_date": format_date(self.last_functional_overreaching_date),
+                "is_compensating": self.is_compensating,
+
+                # inflammation
+                "last_inflammation_date": format_date(self.last_inflammation_date),
+
+                # knots
+                "last_knots_level": self.last_knots_level,
+                "last_knots_date": format_date(self.last_knots_date),
+
+                # muscle spasm
+                "last_muscle_spasm_date": format_date(self.last_muscle_spasm_date),
+
+                # adhesions
+                "last_adhesions_date": format_date(self.last_adhesions_date),
+
+                # inhibited
+                "last_inhibited_date": format_date(self.last_inhibited_date),
+
+                # long
+                "last_long_date": format_date(self.last_long_date),
+
+                # overactive / underactive
+                "last_overactive_date": format_date(self.last_overactive_date),
+                "last_underactive_date": format_date(self.last_underactive_date),
+
+                # sharp
+                "sharp_count_last_0_10_days": self.sharp_count_last_0_10_days,
+                "sharp_count_last_3_20_days": self.sharp_count_last_3_20_days,
+                "last_sharp_level": self.last_sharp_level,
+                "last_sharp_date": format_date(self.last_sharp_date),
+
+                # short
+                "last_short_date": format_date(self.last_short_date),
+
+                # tight
+                "tight_count_last_3_20_days": self.tight_count_last_3_20_days,
+                "last_tight_level": self.last_tight_level,
+                "last_tight_date": format_date(self.last_tight_date),
+
+                # weak
+                "last_weak_date": format_date(self.last_weak_date),
+        }
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        injury_risk = cls()
+        injury_risk.concentric_volume_last_week = input_dict.get('concentric_volume_last_week', 0)
+        injury_risk.concentric_volume_this_week = input_dict.get('concentric_volume_this_week', 0)
+        injury_risk.concentric_volume_today = input_dict.get('concentric_volume_today', 0)
+        injury_risk.eccentric_volume_last_week = input_dict.get('eccentric_volume_last_week', 0)
+        injury_risk.eccentric_volume_this_week = input_dict.get('eccentric_volume_this_week', 0)
+        injury_risk.eccentric_volume_today = input_dict.get('eccentric_volume_today', 0)
+        injury_risk.max_concentric_intensity_48_hours = input_dict.get('max_concentric_intensity_48_hours', 0)
+        injury_risk.max_eccentric_intensity_48_hours = input_dict.get('max_eccentric_intensity_48_hours', 0)
+
+        # ache
+        injury_risk.ache_count_last_0_10_days = input_dict.get('ache_count_last_0_10_days', 0)
+        injury_risk.ache_count_last_3_10_days = input_dict.get('ache_count_last_3_10_days', 0)
+        injury_risk.ache_count_last_3_20_days = input_dict.get('ache_count_last_3_20_days', 0)
+        injury_risk.last_ache_level = input_dict.get('last_ache_level', 0)
+        injury_risk.last_ache_date = input_dict.get('last_ache_date')
+
+        # excessive strain
+        injury_risk.last_excessive_strain_date = input_dict.get('last_excessive_strain_date')
+        injury_risk.last_non_functional_overreaching_date = input_dict.get('last_non_functional_overreaching_date')
+        injury_risk.last_functional_overreaching_date = input_dict.get('last_functional_overreaching_date')
+        injury_risk.is_compensating = input_dict.get('is_compensating', False)
+
+        # inflammation
+        injury_risk.last_inflammation_date = input_dict.get('last_inflammation_date')
+
+        # knots
+        injury_risk.last_knots_level = input_dict.get('last_knots_level', 0)
+        injury_risk.last_knots_date = input_dict.get('last_knots_date')
+
+        # muscle spasm
+        injury_risk.last_muscle_spasm_date = input_dict.get('last_muscle_spasm_date')
+
+        # adhesions
+        injury_risk.last_adhesions_date = input_dict.get('last_adhesions_date')
+
+        # inhibited
+        injury_risk.last_inhibited_date = input_dict.get('last_inhibited_date')
+
+        # long
+        injury_risk.last_long_date = input_dict.get('last_long_date')
+
+        # overactive / underactive
+        injury_risk.last_overactive_date = input_dict.get('last_overactive_date')
+        injury_risk.last_underactive_date = input_dict.get('last_underactive_date')
+
+        # sharp
+        injury_risk.sharp_count_last_0_10_days = input_dict.get('sharp_count_last_0_10_days', 0)
+        injury_risk.sharp_count_last_3_20_days = input_dict.get('sharp_count_last_3_20_days', 0)
+        injury_risk.last_sharp_level = input_dict.get('last_sharp_level', 0)
+        injury_risk.last_sharp_date = input_dict.get('last_sharp_date')
+
+        # short
+        injury_risk.last_short_date = input_dict.get('last_short_date')
+
+        # tight
+        injury_risk.tight_count_last_3_20_days = input_dict.get('tight_count_last_3_20_days', 0)
+        injury_risk.last_tight_level = input_dict.get('last_tight_level', 0)
+        injury_risk.last_tight_date = input_dict.get('last_tight_date')
+
+        # weak
+        injury_risk.last_weak_date = input_dict.get('last_weak_date')
+
+        return injury_risk
+
+    def __setattr__(self, name, value):
+        if 'date' in name:
+            if value is not None and not isinstance(value, date):
+                value = parse_date(value)
+        super().__setattr__(name, value)
+
+
 
     def merge(self, body_part_injury_risk):
 

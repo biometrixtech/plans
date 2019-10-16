@@ -1,3 +1,5 @@
+import os
+os.environ['ENVIRONMENT'] = 'dev'
 from aws_xray_sdk.core import xray_recorder
 xray_recorder.configure(sampling=False)
 xray_recorder.begin_segment(name="test")
@@ -6,11 +8,9 @@ import pytest
 from models.session import SportTrainingSession
 from datetime import datetime, timedelta
 from models.sport import SportName
-from models.functional_movement import ActivityFunctionalMovementFactory, FunctionalMovementFactory, BodyPartFunctionalMovement, SessionFunctionalMovement
-from logic.functional_anatomy_processing import FunctionalAnatomyProcessor
 from models.soreness import Soreness
 from models.body_parts import BodyPart
-from models.soreness_base import BodyPartLocation, BodyPartSide
+from models.soreness_base import BodyPartLocation
 from logic.injury_risk_processing import InjuryRiskProcessor
 from logic.functional_exercise_mapping import ExerciseAssignmentCalculator
 from tests.mocks.mock_exercise_datastore import ExerciseLibraryDatastore
@@ -42,7 +42,7 @@ def get_sessions(dates, rpes, durations, sport_names):
     return sessions
 
 
-def test_update_stats():
+def test_historical_update_single_day_data():
 
     dates = [datetime.now()]
     rpes = [5]
@@ -65,15 +65,53 @@ def test_update_stats():
 
     proc = InjuryRiskProcessor(dates[0], [soreness, soreness_2], sessions, {})
     injury_risk_dict = proc.process(update_historical_data=True)
-    for body_part, injury_risk in injury_risk_dict.items():
-        print(body_part.json_serialise())
-    print('here')
+    assert len(injury_risk_dict) > 0
 
-    # calc = ExerciseAssignmentCalculator(injury_risk_dict, exercise_library_datastore, completed_exercise_datastore,
-    #                                     dates[0])
-    #
-    # active_rest = calc.get_pre_active_rest()
-    #
-    # assert len(active_rest[0].inhibit_exercises) > 0
-    # assert len(active_rest[0].static_stretch_exercises) >0
-    # assert len(active_rest[0].active_stretch_exercises) > 0
+
+def test_historical_update_multiple_day_data():
+    user_id = 'test'
+    now_date = datetime.now()
+    one_day_ago = now_date - timedelta(days=1)
+    ten_days_ago = now_date - timedelta(days=10)
+    dates = [ten_days_ago, one_day_ago, now_date]
+    rpes = [5, 5, 3]
+    durations = [100, 100, 100]
+    sport_names = [SportName.distance_running, SportName.distance_running, SportName.distance_running]
+
+    sessions = get_sessions(dates, rpes, durations, sport_names)
+
+    soreness = Soreness()
+    soreness.body_part = BodyPart(BodyPartLocation(6), None)
+    soreness.side = 1
+    soreness.tight = 1
+    soreness.reported_date_time = ten_days_ago
+
+    soreness_2 = Soreness()
+    soreness_2.body_part = BodyPart(BodyPartLocation(7), None)
+    soreness_2.side = 1
+    soreness_2.sharp = 2
+    soreness_2.reported_date_time = one_day_ago
+
+    soreness_3 = Soreness()
+    soreness_3.body_part = BodyPart(BodyPartLocation(7), None)
+    soreness_3.side = 1
+    soreness_3.sharp = 2
+    soreness_3.reported_date_time = now_date
+
+    # make historical update
+    proc = InjuryRiskProcessor(one_day_ago, [soreness, soreness_2], sessions[:2], {})
+    injury_risk_dict = proc.process(update_historical_data=True)
+
+    # update with new information
+    proc = InjuryRiskProcessor(now_date, [soreness_3], [sessions[2]], injury_risk_dict)
+    injury_risk_dict = proc.process(aggregate_results=True)
+
+    calc = ExerciseAssignmentCalculator(injury_risk_dict, exercise_library_datastore, completed_exercise_datastore,
+                                        dates[0])
+
+    active_rest = calc.get_pre_active_rest()
+
+    assert len(active_rest[0].inhibit_exercises) > 0
+    assert len(active_rest[0].active_stretch_exercises) > 0
+    assert len(active_rest[0].isolated_activate_exercises) > 0
+
