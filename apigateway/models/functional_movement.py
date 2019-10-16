@@ -306,7 +306,7 @@ class BodyPartInjuryRisk(object):
     def __setattr__(self, name, value):
         if 'date' in name:
             if value is not None and not isinstance(value, date):
-                value = parse_date(value)
+                value = parse_date(value).date()
         super().__setattr__(name, value)
 
 
@@ -599,9 +599,16 @@ class SessionFunctionalMovement(object):
 
         self.functional_movement_mappings = activity_factory.get_functional_movement_mappings(self.session.sport_name)
         concentric_levels = [m.concentric_level for m in self.functional_movement_mappings]
-        highest_concentric_level = max(concentric_levels)
+        if len(concentric_levels) > 0:
+            highest_concentric_level = max(concentric_levels)
+        else:
+            highest_concentric_level = 0
         eccentric_levels = [m.eccentric_level for m in self.functional_movement_mappings]
-        highest_eccentric_level = max(eccentric_levels)
+        if len(eccentric_levels) > 0:
+            highest_eccentric_level = max(eccentric_levels)
+        else:
+            highest_eccentric_level = 0
+
         highest_concentric_eccentric_level = max(highest_concentric_level, highest_eccentric_level)
 
         for m in self.functional_movement_mappings:
@@ -747,29 +754,30 @@ class ActivityFunctionalMovementFactory(object):
 
         mapping = []
 
-        if sport_name == SportName.distance_running:
-            mapping.append(
-                FunctionalMovementActivityMapping(FunctionalMovementType.ankle_dorsiflexion, True, 1, False, 0))
-            mapping.append(
-                FunctionalMovementActivityMapping(FunctionalMovementType.ankle_plantar_flexion, True, 1, True, 1))
-            mapping.append(
-                FunctionalMovementActivityMapping(FunctionalMovementType.inversion_of_the_foot, True, 1, False, 0))
-            mapping.append(
-                FunctionalMovementActivityMapping(FunctionalMovementType.eversion_of_the_foot, False, 0, True, 1))
-            mapping.append(
-                FunctionalMovementActivityMapping(FunctionalMovementType.knee_flexion, True, 0.5, True, 1))
-            mapping.append(
-                FunctionalMovementActivityMapping(FunctionalMovementType.knee_extension, True, 1, False, 0))
-            mapping.append(
-                FunctionalMovementActivityMapping(FunctionalMovementType.hip_adduction, True, 2, False, 0))
-            mapping.append(
-                FunctionalMovementActivityMapping(FunctionalMovementType.hip_abduction, False, 0, True, 1))
-            mapping.append(
-                FunctionalMovementActivityMapping(FunctionalMovementType.hip_extension, True, 5, False, 0))
-            mapping.append(
-                FunctionalMovementActivityMapping(FunctionalMovementType.hip_flexion, True, 2, True, 2))
+        # TODO: actually support sports
+        # if sport_name == SportName.distance_running:
+        mapping.append(
+            FunctionalMovementActivityMapping(FunctionalMovementType.ankle_dorsiflexion, True, 1, False, 0))
+        mapping.append(
+            FunctionalMovementActivityMapping(FunctionalMovementType.ankle_plantar_flexion, True, 1, True, 1))
+        mapping.append(
+            FunctionalMovementActivityMapping(FunctionalMovementType.inversion_of_the_foot, True, 1, False, 0))
+        mapping.append(
+            FunctionalMovementActivityMapping(FunctionalMovementType.eversion_of_the_foot, False, 0, True, 1))
+        mapping.append(
+            FunctionalMovementActivityMapping(FunctionalMovementType.knee_flexion, True, 0.5, True, 1))
+        mapping.append(
+            FunctionalMovementActivityMapping(FunctionalMovementType.knee_extension, True, 1, False, 0))
+        mapping.append(
+            FunctionalMovementActivityMapping(FunctionalMovementType.hip_adduction, True, 2, False, 0))
+        mapping.append(
+            FunctionalMovementActivityMapping(FunctionalMovementType.hip_abduction, False, 0, True, 1))
+        mapping.append(
+            FunctionalMovementActivityMapping(FunctionalMovementType.hip_extension, True, 5, False, 0))
+        mapping.append(
+            FunctionalMovementActivityMapping(FunctionalMovementType.hip_flexion, True, 2, True, 2))
 
-            return mapping
+        return mapping
 
 
 class FunctionalMovementFactory(object):
