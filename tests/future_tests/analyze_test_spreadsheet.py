@@ -6,12 +6,12 @@ unreportable_parts = [BodyPartLocation.upper_body, BodyPartLocation.lower_body,
                       BodyPartLocation.full_body, BodyPartLocation.general, BodyPartLocation.head,
                       BodyPartLocation.biceps, BodyPartLocation.triceps, BodyPartLocation.core_stabilizers,
                       BodyPartLocation.erector_spinae, BodyPartLocation.forearm]
-joints = [BodyPartLocation.wrist, BodyPartLocation.elbow, BodyPartLocation.hip_flexor, BodyPartLocation.knee,
+joints = [BodyPartLocation.wrist, BodyPartLocation.elbow, BodyPartLocation.hip, BodyPartLocation.knee,
           BodyPartLocation.ankle, BodyPartLocation.foot, BodyPartLocation.lower_back, BodyPartLocation.shoulder]
 no_side_parts = [BodyPartLocation.abdominals, BodyPartLocation.upper_back_neck, BodyPartLocation.lower_back]
-lower_body_parts = [BodyPartLocation.achilles, BodyPartLocation.ankle, BodyPartLocation.hip_flexor,
+lower_body_parts = [BodyPartLocation.achilles, BodyPartLocation.ankle, BodyPartLocation.hip,
                     BodyPartLocation.calves, BodyPartLocation.foot, BodyPartLocation.glutes, BodyPartLocation.groin,
-                    BodyPartLocation.hamstrings, BodyPartLocation.knee, BodyPartLocation.outer_thigh,
+                    BodyPartLocation.hamstrings, BodyPartLocation.knee, BodyPartLocation.it_band,
                     BodyPartLocation.quads, BodyPartLocation.shin]
 relevant_body_parts = [bpl for bpl in BodyPartLocation if bpl not in unreportable_parts]
 

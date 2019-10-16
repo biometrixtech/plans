@@ -27,55 +27,62 @@ class AthleteStatusProcessing(object):
         # self.completed_functional_strength_sessions = 0
 
     def get_previous_soreness(self):
-        # read plans from yesterday and today
-        daily_plans = self.daily_plan_store.get(self.user_id,
-                                                format_date(parse_date(self.event_date) - datetime.timedelta(days=1)),
-                                                self.event_date,
-                                                stats_processing=True)
-        # get soreness from readiness
-        readiness_surveys = [plan.daily_readiness_survey for plan in daily_plans if plan.daily_readiness_survey is not None]
-        for rs_survey in readiness_surveys:
-            self.sore_body_parts.extend([s for s in rs_survey.soreness if SorenessCalculator.get_severity(s.severity, s.movement) > 1])
-        # get soreness from post session survey
-        post_session_surveys = []
-        for plan in daily_plans:
-            post_session_surveys.extend([ts.post_session_survey for ts in plan.training_sessions if ts is not None and
-                                         ts.post_session_survey is not None])
-        post_session_surveys = [s for s in post_session_surveys if s is not None and
-                                self.soreness_start_time <= s.event_date < self.current_time]
-        for ps_survey in post_session_surveys:
-            self.sore_body_parts.extend([s for s in ps_survey.soreness if SorenessCalculator.get_severity(s.severity, s.movement) > 1])
-
-        # check for severe pain yesterday or today
-        severe_pain_dates = [s.reported_date_time for s in self.sore_body_parts if s.pain and
-                             SorenessCalculator.get_severity(s.severity, s.movement) >= 3 and
-                             s.reported_date_time > self.soreness_start_time + datetime.timedelta(days=1)]
-        if len(severe_pain_dates) > 0:
-            self.severe_pain_today_yesterday = True
-        self.cleaned_sore_body_parts = self.remove_duplicate_sore_body_parts()
-        # get athlete_stats
-        athlete_stats = self.athlete_stats_store.get(athlete_id=self.user_id)
-        if athlete_stats is not None:
-            # get historical soreness
-            self.hist_sore_status, self.clear_candidates, self.dormant_tipping_candidates = athlete_stats.get_q2_q3_list()
-            # get fs eligibility and sports
-            self.current_sport_name = athlete_stats.current_sport_name.value if athlete_stats.current_sport_name is not None else None
-            self.current_position = athlete_stats.current_position.value if athlete_stats.current_position is not None else None
-            # if (athlete_stats.functional_strength_eligible and (athlete_stats.next_functional_strength_eligible_date is None
-            #                                                    or parse_datetime(athlete_stats.next_functional_strength_eligible_date) < self.current_time) and
-            #        not self.severe_pain_today_yesterday):
-            #    self.functional_strength_eligible = True
-            # self.completed_functional_strength_sessions = athlete_stats.completed_functional_strength_sessions
-            self.remove_duplicates_sore_body_parts_historic_soreness()
         return (self.cleaned_sore_body_parts,
                 self.hist_sore_status,
                 self.clear_candidates,
                 self.dormant_tipping_candidates,
                 self.current_sport_name,
-                self.current_position,
-                # self.functional_strength_eligible,
-                # self.completed_functional_strength_sessions
+                self.current_position
                 )
+        # # read plans from yesterday and today
+        # daily_plans = self.daily_plan_store.get(self.user_id,
+        #                                         format_date(parse_date(self.event_date) - datetime.timedelta(days=1)),
+        #                                         self.event_date,
+        #                                         stats_processing=True)
+        # # get soreness from readiness
+        # readiness_surveys = [plan.daily_readiness_survey for plan in daily_plans if plan.daily_readiness_survey is not None]
+        # for rs_survey in readiness_surveys:
+        #     self.sore_body_parts.extend([s for s in rs_survey.soreness if SorenessCalculator.get_severity(s.severity, s.movement) > 1])
+        # # get soreness from post session survey
+        # post_session_surveys = []
+        # for plan in daily_plans:
+        #     post_session_surveys.extend([ts.post_session_survey for ts in plan.training_sessions if ts is not None and
+        #                                  ts.post_session_survey is not None])
+        # post_session_surveys = [s for s in post_session_surveys if s is not None and
+        #                         self.soreness_start_time <= s.event_date < self.current_time]
+        # for ps_survey in post_session_surveys:
+        #     self.sore_body_parts.extend([s for s in ps_survey.soreness if SorenessCalculator.get_severity(s.severity, s.movement) > 1])
+
+        # # check for severe pain yesterday or today
+        # severe_pain_dates = [s.reported_date_time for s in self.sore_body_parts if s.pain and
+        #                      SorenessCalculator.get_severity(s.severity, s.movement) >= 3 and
+        #                      s.reported_date_time > self.soreness_start_time + datetime.timedelta(days=1)]
+        # if len(severe_pain_dates) > 0:
+        #     self.severe_pain_today_yesterday = True
+        # self.cleaned_sore_body_parts = self.remove_duplicate_sore_body_parts()
+        # # get athlete_stats
+        # athlete_stats = self.athlete_stats_store.get(athlete_id=self.user_id)
+        # if athlete_stats is not None:
+        #     # get historical soreness
+        #     self.hist_sore_status, self.clear_candidates, self.dormant_tipping_candidates = athlete_stats.get_q2_q3_list()
+        #     # get fs eligibility and sports
+        #     self.current_sport_name = athlete_stats.current_sport_name.value if athlete_stats.current_sport_name is not None else None
+        #     self.current_position = athlete_stats.current_position.value if athlete_stats.current_position is not None else None
+        #     # if (athlete_stats.functional_strength_eligible and (athlete_stats.next_functional_strength_eligible_date is None
+        #     #                                                    or parse_datetime(athlete_stats.next_functional_strength_eligible_date) < self.current_time) and
+        #     #        not self.severe_pain_today_yesterday):
+        #     #    self.functional_strength_eligible = True
+        #     # self.completed_functional_strength_sessions = athlete_stats.completed_functional_strength_sessions
+        #     self.remove_duplicates_sore_body_parts_historic_soreness()
+        # return (self.cleaned_sore_body_parts,
+        #         self.hist_sore_status,
+        #         self.clear_candidates,
+        #         self.dormant_tipping_candidates,
+        #         self.current_sport_name,
+        #         self.current_position,
+        #         # self.functional_strength_eligible,
+        #         # self.completed_functional_strength_sessions
+        #         )
 
     def remove_duplicates_sore_body_parts_historic_soreness(self):
         q3_list = [{"body_part": q["body_part"], "side": q["side"]} for q in self.clear_candidates]

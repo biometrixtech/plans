@@ -35,7 +35,21 @@ class TestUtilities(object):
 
         return soreness
 
-    def body_part_pain(self, location_enum, severity, side, movement=None):
+    def body_part_symptoms(self, location_enum, side=0, tight=None, knots=None, ache=None, sharp=None):
+
+        soreness = {
+            "body_part": location_enum,
+            "side" : side,
+            "tight": tight,
+            "knots": knots,
+            "ache": ache,
+            "sharp": sharp
+        }
+
+        return soreness
+
+
+    def body_part_pain(self, location_enum, severity, side=0, movement=None):
 
         if movement is None:
             soreness = {
