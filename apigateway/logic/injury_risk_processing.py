@@ -64,7 +64,9 @@ class InjuryRiskProcessor(object):
 
             self.aggregated_injury_risk_dict = aggregated_injury_hist_dict
 
-        return self.aggregated_injury_risk_dict
+            return self.aggregated_injury_risk_dict
+        else:
+            return self.injury_risk_dict
 
     def reset_reported_symptoms(self, injury_risk_dict):
 
