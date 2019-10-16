@@ -1400,6 +1400,47 @@ class CareTodayChartData(BaseOveractiveUnderactiveChartData, Serialisable):
             del(self.soreness[d])
 
 
+class CareChartData(BaseOveractiveUnderactiveChartData, Serialisable):
+    def __init__(self):
+        super().__init__()
+        self.inflamed = []
+        self.tight = []
+
+    def json_serialise(self):
+        ret = {
+            'inflamed': [a.json_serialise() for a in self.inflamed if self.inflamed is not None],
+            'tight': [a.json_serialise() for a in self.tight if self.tight is not None],
+        }
+        return ret
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        chart_data = cls()
+        chart_data.inflamed = [BodyPartSide.json_deserialise(a) for a in input_dict.get('inflamed', [])]
+        chart_data.tight = [BodyPartSide.json_deserialise(a) for a in input_dict.get('tight', [])]
+        return chart_data
+
+    def remove_duplicates(self):
+
+        self.tight = list(set(self.tight))
+        self.inflamed = list(set(self.inflamed))
+
+        unc_delete = []
+
+        id = 0
+        for u in self.inflamed:
+            index = next((i for i, x in enumerate(self.tight) if u == x), -1)
+
+            if index > -1:
+                unc_delete.append(id)
+            id += 1
+
+        unc_delete.sort(reverse=True)  # need to remove in reverse order so we don't mess up indexes along the way
+
+        for d in unc_delete:
+            del (self.inflamed[d])
+
+
 class PreventionChartData(BaseOveractiveUnderactiveChartData, Serialisable):
     def __init__(self):
         super().__init__()

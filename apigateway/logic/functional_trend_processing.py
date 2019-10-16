@@ -2,7 +2,7 @@ from models.athlete_trend import TrendDashboardCategory, PlanAlert, Trend, Trend
     FirstTimeExperienceElement, CategoryFirstTimeExperienceModal
 from models.styles import BoldText, LegendColor, VisualizationType
 from models.trigger import TriggerType, Trigger
-from models.chart_data import PreventionChartData, PersonalizedRecoveryChartData, CareTodayChartData, RecoveryChartData
+from models.chart_data import PreventionChartData, RecoveryChartData, CareChartData
 from models.insights import InsightType
 from models.body_parts import BodyPartFactory
 from models.soreness_base import BodyPartSide, BodyPartLocation
@@ -277,9 +277,9 @@ class TrendProcessor(object):
         personalized_recovery_category_index = self.get_category_index(InsightType.personalized_recovery)
         prevention_category_index = self.get_category_index(InsightType.prevention)
         care_category_index = self.get_category_index(InsightType.care)
-        self.set_personalized_recovery(personalized_recovery_category_index)
+        self.set_recovery(personalized_recovery_category_index)
         self.set_prevention(prevention_category_index)
-        self.set_daily_care(care_category_index)
+        self.set_care(care_category_index)
 
         for c in range(0, len(self.athlete_trend_categories)):
             if len(self.athlete_trend_categories[c].trends) > 0:
@@ -421,7 +421,7 @@ class TrendProcessor(object):
         else:
             return None
 
-    def set_personalized_recovery(self, category_index):
+    def set_recovery(self, category_index):
 
         # triggers_7 = list(t for t in self.trigger_list if t.trigger_type == TriggerType.hist_sore_less_30)
         # for t in triggers_7:
@@ -434,9 +434,16 @@ class TrendProcessor(object):
         compensating = []
 
         for body_part_side, body_part_injury_risk in self.injury_hist_dict.items():
-            if body_part_injury_risk.last_excess_strain_date >= two_days_ago and body_part_injury_risk.last_non_functional_overreaching_date >= two_days_ago:
+
+            if (body_part_injury_risk.last_excess_strain_date is not None and
+                    body_part_injury_risk.last_non_functional_overreaching_date is not None and
+                    body_part_injury_risk.last_excess_strain_date >= two_days_ago and
+                    body_part_injury_risk.last_non_functional_overreaching_date >= two_days_ago):
                 excessive_strain_nfo.append(body_part_side)
-            if body_part_injury_risk.last_excess_strain_date >= two_days_ago and body_part_injury_risk.last_functional_overreaching_date >= two_days_ago:
+            if (body_part_injury_risk.last_excess_strain_date is not None and
+                    body_part_injury_risk.last_functional_overreaching_date is not None and
+                    body_part_injury_risk.last_excess_strain_date >= two_days_ago and
+                    body_part_injury_risk.last_functional_overreaching_date >= two_days_ago):
                 excessive_strain_fo.append(body_part_side)
             if body_part_injury_risk.is_compensating:
                 compensating.append(body_part_side)
@@ -601,55 +608,54 @@ class TrendProcessor(object):
 
         return body_part_side, body_part_text
 
-    def set_daily_care(self, category_index):
+    def set_care(self, category_index):
 
-        pain_triggers = [TriggerType.no_hist_pain_pain_today_severity_1_2,
-                         TriggerType.no_hist_pain_pain_today_high_severity_3_5,
-                         TriggerType.hist_pain_pain_today_severity_1_2,
-                         TriggerType.hist_pain_pain_today_severity_3_5]
-        triggers_pain = list(t for t in self.trigger_list if t.trigger_type in pain_triggers)
-        for t in triggers_pain:
-            t.priority = 3
+        inflamed = []
+        muscle_spasm_tight = []
 
-        sore_triggers = [TriggerType.sore_today_doms,
-                         TriggerType.hist_sore_less_30_sore_today,
-                         TriggerType.hist_sore_greater_30_sore_today]
+        for body_part_side, body_part_injury_risk in self.injury_hist_dict.items():
+            if body_part_injury_risk.last_inflammation_date == self.event_date_time.date():
+                inflamed.append(body_part_side)
+            # TODO - muscle spasm OR tight or just muscle spasm?
+            if body_part_injury_risk.last_muscle_spasm_date == self.event_date_time.date():
+                muscle_spasm_tight.append(body_part_side)
 
-        triggers_sore = list(t for t in self.trigger_list if t.trigger_type in sore_triggers)
-        for t in triggers_sore:
-            t.priority = 2
+        # pain_triggers = [TriggerType.no_hist_pain_pain_today_severity_1_2,
+        #                  TriggerType.no_hist_pain_pain_today_high_severity_3_5,
+        #                  TriggerType.hist_pain_pain_today_severity_1_2,
+        #                  TriggerType.hist_pain_pain_today_severity_3_5]
+        # triggers_pain = list(t for t in self.trigger_list if t.trigger_type in pain_triggers)
+        # for t in triggers_pain:
+        #     t.priority = 3
+        #
+        # sore_triggers = [TriggerType.sore_today_doms,
+        #                  TriggerType.hist_sore_less_30_sore_today,
+        #                  TriggerType.hist_sore_greater_30_sore_today]
+        #
+        # triggers_sore = list(t for t in self.trigger_list if t.trigger_type in sore_triggers)
+        # for t in triggers_sore:
+        #     t.priority = 2
 
-        if len(triggers_pain) > 0 or len(triggers_sore) > 0:
+        if len(inflamed) > 0 or len(muscle_spasm_tight) > 0:
 
             trend = self.get_care_trend(category_index)
 
             trend_data = TrendData()
             trend_data.visualization_type = VisualizationType.care_today
             trend_data.add_visualization_data()
-            care_data = CareTodayChartData()
+            care_data = CareChartData()
 
             body_part_factory = BodyPartFactory()
 
-            for t in triggers_pain:
-                care_data.pain.extend([t.body_part])
-                if body_part_factory.is_joint(t.body_part):
-                    care_data.elevated_stress.extend([a for a in t.agonists])
-                    care_data.elevated_stress.extend([a for a in t.antagonists])
-                    care_data.elevated_stress.extend([a for a in t.synergists])
-                else:
-                    care_data.elevated_stress.extend([s for s in t.agonists])  # should be prime movers
-                    care_data.elevated_stress.extend([s for s in t.synergists])
-
-            for t in triggers_sore:
-                care_data.soreness.extend([t.body_part])
-                care_data.elevated_stress.extend([s for s in t.synergists])
+            care_data.inflamed.extend(inflamed)
+            care_data.tight.extend(muscle_spasm_tight)
 
             care_data.remove_duplicates()
             trend_data.data = [care_data]
 
             all_triggers = []
-            all_triggers.extend(triggers_pain)
-            all_triggers.extend(triggers_sore)
+            all_triggers.extend(inflamed)
+            all_triggers.extend(muscle_spasm_tight)
 
             trend.trigger_tiles = self.get_trigger_tiles(all_triggers)
 
@@ -672,17 +678,31 @@ class TrendProcessor(object):
 
     def set_prevention(self, category_index):
 
-        triggers_19 = list(t for t in self.trigger_list if t.trigger_type == TriggerType.hist_sore_greater_30)
-        for t in triggers_19:
-            t.priority = 2
+        # triggers_19 = list(t for t in self.trigger_list if t.trigger_type == TriggerType.hist_sore_greater_30)
+        # for t in triggers_19:
+        #     t.priority = 2
+        #
+        # triggers_16 = list(t for t in self.trigger_list if t.trigger_type == TriggerType.hist_pain)
+        # for t in triggers_16:
+        #     t.priority = 3
+        #
+        # trigger_111 = list(t for t in self.trigger_list if t.trigger_type == TriggerType.movement_error_historic_apt_asymmetry)
+        # for t in trigger_111:
+        #     t.priority = 4
 
-        triggers_16 = list(t for t in self.trigger_list if t.trigger_type == TriggerType.hist_pain)
-        for t in triggers_16:
-            t.priority = 3
+        short_adhesions = []
+        short_non_adhesions = []
+        overactive = []
+        underactive_weak = []
+        underactive_inhibited = []
 
-        trigger_111 = list(t for t in self.trigger_list if t.trigger_type == TriggerType.movement_error_historic_apt_asymmetry)
-        for t in trigger_111:
-            t.priority = 4
+        for body_part_side, body_part_injury_risk in self.injury_hist_dict.items():
+            if body_part_injury_risk.last_excess_strain_date >= two_days_ago and body_part_injury_risk.last_non_functional_overreaching_date >= two_days_ago:
+                excessive_strain_nfo.append(body_part_side)
+            if body_part_injury_risk.last_excess_strain_date >= two_days_ago and body_part_injury_risk.last_functional_overreaching_date >= two_days_ago:
+                excessive_strain_fo.append(body_part_side)
+            if body_part_injury_risk.is_compensating:
+                compensating.append(body_part_side)
 
         # since we're reverse sorting, 2 is a higher priority than 1
 

@@ -21,6 +21,7 @@ class FunctionalMovementType(Enum):
     hip_external_rotation = 11
     hip_extension = 12
     hip_flexion = 13
+    pelvic_anterior_tilt = 14
 
 
 class FunctionalMovement(object):
@@ -619,4 +620,11 @@ class FunctionalMovementFactory(object):
         functional_movement = FunctionalMovement(FunctionalMovementType.hip_external_rotation)
         functional_movement.prime_movers = [51, 60, 61, 64, 66]
         functional_movement.antagonists = [49, 50, 52, 53, 54, 59, 62, 63, 65]
+        return functional_movement
+
+    def get_pelvic_anterior_tilt(self):
+
+        functional_movement = FunctionalMovement(FunctionalMovementType.pelvic_anterior_tilt)
+        functional_movement.prime_movers = [26, 58, 61]
+        functional_movement.antagonists = []
         return functional_movement
