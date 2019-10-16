@@ -314,7 +314,7 @@ class SessionFunctionalMovement(object):
         self.functional_movement_mappings = []
         self.injury_risk_dict = injury_risk_dict
 
-    def process(self, event_date_time):
+    def process(self, event_date):
         activity_factory = ActivityFunctionalMovementFactory()
         movement_factory = FunctionalMovementFactory()
 
@@ -340,8 +340,8 @@ class SessionFunctionalMovement(object):
                     m.antagonists.append(functional_movement_body_part_side)
 
             # TODO - change with total volume
-            m.attribute_training_volume(self.session.duration_minutes * self.session.session_RPE, highest_concentric_eccentric_level, self.injury_risk_dict, event_date_time)
-            m.attribute_intensity(self.session.session_RPE, highest_concentric_eccentric_level, self.injury_risk_dict, event_date_time)
+            m.attribute_training_volume(self.session.duration_minutes * self.session.session_RPE, highest_concentric_eccentric_level, self.injury_risk_dict, event_date)
+            m.attribute_intensity(self.session.session_RPE, highest_concentric_eccentric_level, self.injury_risk_dict, event_date)
 
         self.aggregate_body_parts()
 
@@ -389,12 +389,12 @@ class FunctionalMovementActivityMapping(object):
         self.antagonists = []
         self.synergists = []
 
-    def attribute_training_volume(self, training_volume, highest_concentric_eccentric_factor, injury_risk_dict, event_date_time):
+    def attribute_training_volume(self, training_volume, highest_concentric_eccentric_factor, injury_risk_dict, event_date):
 
         prime_mover_ratio = 0.8
 
         for p in self.prime_movers:
-            compensating_for_others = self.other_body_parts_affected(p, injury_risk_dict, event_date_time)
+            compensating_for_others = self.other_body_parts_affected(p, injury_risk_dict, event_date)
             if compensating_for_others:
                 prime_mover_ratio = 1.0
             # TODO replace with new ratios
@@ -404,14 +404,14 @@ class FunctionalMovementActivityMapping(object):
             p.eccentric_volume = attributed_eccentric_volume
             p.is_compensating = compensating_for_others
 
-    def attribute_intensity(self, intensity, highest_concentric_eccentric_factor, injury_risk_dict, event_date_time):
+    def attribute_intensity(self, intensity, highest_concentric_eccentric_factor, injury_risk_dict, event_date):
 
         prime_mover_ratio = 0.8
 
         # TODO make sure we implement logic to test for high intensity on processing, esp for eccentric intensity
 
         for p in self.prime_movers:
-            compensating_for_others = self.other_body_parts_affected(p, injury_risk_dict, event_date_time)
+            compensating_for_others = self.other_body_parts_affected(p, injury_risk_dict, event_date)
             if compensating_for_others:
                 prime_mover_ratio = 1.0
             attributed_concentric_intensity = intensity * (self.concentric_level / highest_concentric_eccentric_factor) * prime_mover_ratio
@@ -420,7 +420,7 @@ class FunctionalMovementActivityMapping(object):
             p.eccentric_intensity = attributed_eccentric_intensity
             p.is_compensating = compensating_for_others
 
-    def other_body_parts_affected(self, target_body_part, injury_risk_dict, event_date_time):
+    def other_body_parts_affected(self, target_body_part, injury_risk_dict, event_date):
 
         # we want to look at both the prime movers and synergists
         body_part_list = []
@@ -429,25 +429,25 @@ class FunctionalMovementActivityMapping(object):
 
         filtered_list = [b for b in body_part_list if b.body_part_side != target_body_part.body_part_side]
 
-        two_days_ago = event_date_time.date() - timedelta(days=1)
+        two_days_ago = event_date - timedelta(days=1)
 
         for f in filtered_list:
             # we are looking for recent statuses that we've determined, different than those reported in symptom intake
             if f.body_part_side in injury_risk_dict:
                 if (injury_risk_dict[f.body_part_side].last_weak_date is not None and
-                        injury_risk_dict[f.body_part_side].last_weak_date == event_date_time.date()):
+                        injury_risk_dict[f.body_part_side].last_weak_date == event_date):
                     return True
                 if (injury_risk_dict[f.body_part_side].last_muscle_spasm_date is not None and
-                        injury_risk_dict[f.body_part_side].last_muscle_spasm_date == event_date_time.date()):
+                        injury_risk_dict[f.body_part_side].last_muscle_spasm_date == event_date):
                     return True
                 if (injury_risk_dict[f.body_part_side].last_adhesions_date is not None and
-                        injury_risk_dict[f.body_part_side].last_adhesions_date == event_date_time.date()):
+                        injury_risk_dict[f.body_part_side].last_adhesions_date == event_date):
                     return True
                 if (injury_risk_dict[f.body_part_side].last_short_date is not None and
-                        injury_risk_dict[f.body_part_side].last_short_date == event_date_time.date()):
+                        injury_risk_dict[f.body_part_side].last_short_date == event_date):
                     return True
                 if (injury_risk_dict[f.body_part_side].last_long_date is not None and
-                        injury_risk_dict[f.body_part_side].last_long_date == event_date_time.date()):
+                        injury_risk_dict[f.body_part_side].last_long_date == event_date):
                     return True
                 if (injury_risk_dict[f.body_part_side].last_inhibited_date is not None and
                         injury_risk_dict[f.body_part_side].last_inhibited_date >= two_days_ago):
