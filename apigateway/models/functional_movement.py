@@ -110,8 +110,8 @@ class BodyPartInjuryRisk(object):
 
         # ache
         self.ache_count_last_0_10_days = 0
-        self.ache_count_last_3_10_days = 0
-        self.ache_count_last_3_20_days = 0
+        # self.ache_count_last_0_10_days = 0 # 0 to 10
+        self.ache_count_last_0_20_days = 0 # 0 to 20
         self.last_ache_level = 0
         self.last_ache_date = None
 
@@ -126,6 +126,7 @@ class BodyPartInjuryRisk(object):
         self.last_inflammation_date = None
 
         # knots
+        self.knots_count_last_0_20_days = 0
         self.last_knots_level = 0
         self.last_knots_date = None
 
@@ -146,8 +147,8 @@ class BodyPartInjuryRisk(object):
         self.last_underactive_date = None
 
         # sharp
-        self.sharp_count_last_0_10_days = 0
-        self.sharp_count_last_3_20_days = 0
+        self.sharp_count_last_0_10_days = 0  
+        self.sharp_count_last_0_20_days = 0  # 0-20
         self.last_sharp_level = 0
         self.last_sharp_date = None
 
@@ -155,7 +156,7 @@ class BodyPartInjuryRisk(object):
         self.last_short_date = None
 
         # tight
-        self.tight_count_last_3_20_days = 0
+        self.tight_count_last_0_20_days = 0  # 0-20
         self.last_tight_level = 0
         self.last_tight_date = None
 
@@ -178,8 +179,8 @@ class BodyPartInjuryRisk(object):
 
                 # ache
                 "ache_count_last_0_10_days": self.ache_count_last_0_10_days,
-                "ache_count_last_3_10_days": self.ache_count_last_3_10_days,
-                "ache_count_last_3_20_days": self.ache_count_last_3_20_days,
+                # "ache_count_last_0_10_days": self.ache_count_last_0_10_days,
+                "ache_count_last_0_20_days": self.ache_count_last_0_20_days,
                 "last_ache_level": self.last_ache_level,
                 "last_ache_date": format_date(self.last_ache_date),
 
@@ -194,6 +195,7 @@ class BodyPartInjuryRisk(object):
                 "last_inflammation_date": format_date(self.last_inflammation_date),
 
                 # knots
+                "knots_count_last_0_20_days": self.knots_count_last_0_20_days,
                 "last_knots_level": self.last_knots_level,
                 "last_knots_date": format_date(self.last_knots_date),
 
@@ -215,7 +217,7 @@ class BodyPartInjuryRisk(object):
 
                 # sharp
                 "sharp_count_last_0_10_days": self.sharp_count_last_0_10_days,
-                "sharp_count_last_3_20_days": self.sharp_count_last_3_20_days,
+                "sharp_count_last_0_20_days": self.sharp_count_last_0_20_days,
                 "last_sharp_level": self.last_sharp_level,
                 "last_sharp_date": format_date(self.last_sharp_date),
 
@@ -223,7 +225,7 @@ class BodyPartInjuryRisk(object):
                 "last_short_date": format_date(self.last_short_date),
 
                 # tight
-                "tight_count_last_3_20_days": self.tight_count_last_3_20_days,
+                "tight_count_last_0_20_days": self.tight_count_last_0_20_days,
                 "last_tight_level": self.last_tight_level,
                 "last_tight_date": format_date(self.last_tight_date),
 
@@ -248,8 +250,8 @@ class BodyPartInjuryRisk(object):
 
         # ache
         injury_risk.ache_count_last_0_10_days = input_dict.get('ache_count_last_0_10_days', 0)
-        injury_risk.ache_count_last_3_10_days = input_dict.get('ache_count_last_3_10_days', 0)
-        injury_risk.ache_count_last_3_20_days = input_dict.get('ache_count_last_3_20_days', 0)
+        # injury_risk.ache_count_last_0_10_days = input_dict.get('ache_count_last_0_10_days', 0)
+        injury_risk.ache_count_last_0_20_days = input_dict.get('ache_count_last_0_20_days', 0)
         injury_risk.last_ache_level = input_dict.get('last_ache_level', 0)
         injury_risk.last_ache_date = input_dict.get('last_ache_date')
 
@@ -264,6 +266,7 @@ class BodyPartInjuryRisk(object):
         injury_risk.last_inflammation_date = input_dict.get('last_inflammation_date')
 
         # knots
+        injury_risk.knots_count_last_0_20_days = input_dict.get('knots_count_last_0_20_days', 0)
         injury_risk.last_knots_level = input_dict.get('last_knots_level', 0)
         injury_risk.last_knots_date = input_dict.get('last_knots_date')
 
@@ -285,7 +288,7 @@ class BodyPartInjuryRisk(object):
 
         # sharp
         injury_risk.sharp_count_last_0_10_days = input_dict.get('sharp_count_last_0_10_days', 0)
-        injury_risk.sharp_count_last_3_20_days = input_dict.get('sharp_count_last_3_20_days', 0)
+        injury_risk.sharp_count_last_0_20_days = input_dict.get('sharp_count_last_0_20_days', 0)
         injury_risk.last_sharp_level = input_dict.get('last_sharp_level', 0)
         injury_risk.last_sharp_date = input_dict.get('last_sharp_date')
 
@@ -293,7 +296,7 @@ class BodyPartInjuryRisk(object):
         injury_risk.last_short_date = input_dict.get('last_short_date')
 
         # tight
-        injury_risk.tight_count_last_3_20_days = input_dict.get('tight_count_last_3_20_days', 0)
+        injury_risk.tight_count_last_0_20_days = input_dict.get('tight_count_last_0_20_days', 0)
         injury_risk.last_tight_level = input_dict.get('last_tight_level', 0)
         injury_risk.last_tight_date = input_dict.get('last_tight_date')
 
@@ -326,8 +329,8 @@ class BodyPartInjuryRisk(object):
 
         # ache
         self.ache_count_last_0_10_days = max(self.ache_count_last_0_10_days, body_part_injury_risk.ache_count_last_0_10_days)
-        self.ache_count_last_3_10_days = max(self.ache_count_last_3_10_days, body_part_injury_risk.ache_count_last_3_10_days)
-        self.ache_count_last_3_20_days = max(self.ache_count_last_3_20_days, body_part_injury_risk.ache_count_last_3_20_days)
+        self.ache_count_last_0_10_days = max(self.ache_count_last_0_10_days, body_part_injury_risk.ache_count_last_0_10_days)
+        self.ache_count_last_0_20_days = max(self.ache_count_last_0_20_days, body_part_injury_risk.ache_count_last_0_20_days)
         self.last_ache_level = max(self.last_ache_level, body_part_injury_risk.last_ache_level)
         self.last_ache_date = self.merge_with_none(self.last_ache_date, body_part_injury_risk.last_ache_date)
 
@@ -363,7 +366,7 @@ class BodyPartInjuryRisk(object):
 
         # sharp
         self.sharp_count_last_0_10_days = max(self.sharp_count_last_0_10_days, body_part_injury_risk.sharp_count_last_0_10_days)
-        self.sharp_count_last_3_20_days = max(self.sharp_count_last_3_20_days, body_part_injury_risk.sharp_count_last_3_20_days)
+        self.sharp_count_last_0_20_days = max(self.sharp_count_last_0_20_days, body_part_injury_risk.sharp_count_last_0_20_days)
         self.last_sharp_level = max(self.last_sharp_level, body_part_injury_risk.last_sharp_level)
         self.last_sharp_date = self.merge_with_none(self.last_sharp_date, body_part_injury_risk.last_sharp_date)
 
@@ -371,7 +374,7 @@ class BodyPartInjuryRisk(object):
         self.last_short_date = self.merge_with_none(self.last_short_date, body_part_injury_risk.last_short_date)
 
         # tight
-        self.tight_count_last_3_20_days = max(self.tight_count_last_3_20_days, body_part_injury_risk.tight_count_last_3_20_days)
+        self.tight_count_last_0_20_days = max(self.tight_count_last_0_20_days, body_part_injury_risk.tight_count_last_0_20_days)
         self.last_tight_level = max(self.last_tight_level, body_part_injury_risk.last_tight_level)
         self.last_tight_date = self.merge_with_none(self.last_tight_date, body_part_injury_risk.last_tight_date)
 
