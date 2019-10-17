@@ -1,5 +1,6 @@
 from enum import Enum
 from models.chart_data import TrainingVolumeChartData, BodyResponseChartData, WorkoutChartData, RecoveryChartData, Prevention3sChartData, BiomechanicsAPTChart, CareChartData, BiomechanicsAnklePitchChart, BiomechanicsHipDropChart
+from models.chart_data import PreventionChartData, CareTodayChartData, PersonalizedRecoveryChartData
 from models.insights import InsightType
 from models.soreness_base import BodyPartSide
 from models.sport import SportName
@@ -536,6 +537,14 @@ class TrendData(object):
             trend_data.data = [Prevention3sChartData.json_deserialise(data) for data in input_dict.get('data', [])]
         elif trend_data.visualization_type == VisualizationType.care:
             trend_data.data = [CareChartData.json_deserialise(data) for data in
+                               input_dict.get('data', [])]
+        # old visualizations types for backward compatibility
+        elif trend_data.visualization_type == VisualizationType.personalized_recovery:
+            trend_data.data = [PersonalizedRecoveryChartData.json_deserialise(data) for data in input_dict.get('data', [])]
+        elif trend_data.visualization_type == VisualizationType.prevention:
+            trend_data.data = [PreventionChartData.json_deserialise(data) for data in input_dict.get('data', [])]
+        elif trend_data.visualization_type == VisualizationType.care_today:
+            trend_data.data = [CareTodayChartData.json_deserialise(data) for data in
                                input_dict.get('data', [])]
 
         else:
