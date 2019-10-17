@@ -972,11 +972,11 @@ class ActiveRest(ModalityBase):
                     self.copy_exercises(body_part.inhibit_exercises,
                                         self.inhibit_exercises, goal, "1", trigger_list[t], exercise_library)
                     # if not prohibiting_soreness:
-                    if max_severity < 3.5:
+                    if max_severity < 7:
                         self.copy_exercises(body_part.static_stretch_exercises,
                                             self.static_stretch_exercises, goal, "1", trigger_list[t], exercise_library,
                                             sports)
-                    if max_severity < 2.5:
+                    if max_severity < 5:
                         self.copy_exercises(body_part.isolated_activate_exercises,
                                             self.isolated_activate_exercises, goal, "1", trigger_list[t],
                                             exercise_library, sports)
@@ -1084,11 +1084,11 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
                                     exercise_library)
                 # self.copy_exercises(agonist.static_stretch_exercises, self.static_stretch_exercises, goal, "1",
                 #                    None, exercise_library)
-                if max_severity < 3.5:
+                if max_severity < 7:
                     self.copy_exercises(agonist.active_stretch_exercises, self.active_stretch_exercises, goal, "1",
                                         None, exercise_library)
 
-        if max_severity < 2.5:
+        if max_severity < 5:
             for t in body_part.antagonists:
                 antagonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(t), None))
                 if antagonist is not None:
@@ -1096,7 +1096,7 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
                                         "1",
                                         None, exercise_library)
 
-        if max_severity < 2.5:
+        if max_severity < 5:
             self.copy_exercises(body_part.static_integrate_exercises, self.static_integrate_exercises, goal, "1", None,
                                 exercise_library)
 
@@ -1113,12 +1113,12 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
             if agonist is not None:
                 self.copy_exercises(agonist.inhibit_exercises, self.inhibit_exercises, goal, "1", None,
                                     exercise_library)
-                if max_severity < 3.5:
+                if max_severity < 7:
                     self.copy_exercises(agonist.static_stretch_exercises, self.static_stretch_exercises, goal, "1",
                                         None, exercise_library)
                     self.copy_exercises(agonist.active_stretch_exercises, self.active_stretch_exercises, goal, "1",
                                         None, exercise_library)
-                if max_severity < 2.5:
+                if max_severity < 5:
                     self.copy_exercises(agonist.isolated_activate_exercises, self.isolated_activate_exercises, goal,
                                         "1",
                                         None, exercise_library)
@@ -1140,10 +1140,10 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
             if synergist is not None:
                 self.copy_exercises(synergist.inhibit_exercises, self.inhibit_exercises, goal, "2", None,
                                     exercise_library)
-                if max_severity < 3.5:
+                if max_severity < 7:
                     self.copy_exercises(synergist.active_stretch_exercises, self.active_stretch_exercises, goal, "2",
                                         None, exercise_library)
-                if max_severity < 2.5:
+                if max_severity < 5:
                     self.copy_exercises(synergist.isolated_activate_exercises, self.isolated_activate_exercises, goal,
                                         "2",
                                         None, exercise_library)
@@ -1153,15 +1153,15 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
             if stabilizer is not None:
                 self.copy_exercises(stabilizer.inhibit_exercises, self.inhibit_exercises, goal, "3", None,
                                     exercise_library)
-                if max_severity < 3.5:
+                if max_severity < 7:
                     self.copy_exercises(stabilizer.active_stretch_exercises, self.active_stretch_exercises, goal, "3",
                                         None, exercise_library)
-                if max_severity < 2.5:
+                if max_severity < 5:
                     self.copy_exercises(stabilizer.isolated_activate_exercises, self.isolated_activate_exercises, goal,
                                         "3",
                                         None, exercise_library)
 
-        if max_severity < 2.5:
+        if max_severity < 5:
             self.copy_exercises(body_part.static_integrate_exercises, self.static_integrate_exercises, goal, "1", None,
                                 exercise_library)
 
@@ -1429,10 +1429,10 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
             if agonist is not None:
                 self.copy_exercises(agonist.inhibit_exercises, self.inhibit_exercises, goal, "1", None,
                                     exercise_library)
-                if max_severity < 3.5:
+                if max_severity < 7:
                     self.copy_exercises(agonist.static_stretch_exercises, self.static_stretch_exercises, goal, "1",
                                         None, exercise_library)
-                if max_severity < 2.5:
+                if max_severity < 5:
                     self.copy_exercises(agonist.isolated_activate_exercises, self.isolated_activate_exercises, goal,
                                         "1",
                                         None, exercise_library)
