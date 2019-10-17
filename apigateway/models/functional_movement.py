@@ -107,6 +107,12 @@ class BodyPartInjuryRisk(object):
         self.eccentric_volume_today = 0
         self.max_concentric_intensity_48_hours = 0
         self.max_eccentric_intensity_48_hours = 0
+        self.total_volume_obs = 0
+        self.total_stddev = 0
+        self.total_mean = 0
+        self.ecc_volume_obs = 0
+        self.ecc_stddev = 0
+        self.ecc_mean = 0
 
         # ache
         self.ache_count_last_0_10_days = 0
@@ -175,6 +181,12 @@ class BodyPartInjuryRisk(object):
                 "eccentric_volume_today": self.eccentric_volume_today,
                 "max_concentric_intensity_48_hours": self.max_concentric_intensity_48_hours,
                 "max_eccentric_intensity_48_hours": self.max_eccentric_intensity_48_hours,
+                "total_volume_obs": self.total_volume_obs,
+                "total_stddev": self.total_stddev,
+                "total_mean": self.total_mean,
+                "ecc_volume_obs": self.ecc_volume_obs,
+                "ecc_stddev": self.ecc_stddev,
+                "ecc_mean": self.ecc_mean,
 
                 # ache
                 "ache_count_last_0_10_days": self.ache_count_last_0_10_days,
@@ -245,6 +257,12 @@ class BodyPartInjuryRisk(object):
         injury_risk.eccentric_volume_today = input_dict.get('eccentric_volume_today', 0)
         injury_risk.max_concentric_intensity_48_hours = input_dict.get('max_concentric_intensity_48_hours', 0)
         injury_risk.max_eccentric_intensity_48_hours = input_dict.get('max_eccentric_intensity_48_hours', 0)
+        injury_risk.total_volume_obs = input_dict.get('total_volume_obs', 0)
+        injury_risk.total_stddev = input_dict.get('total_stddev', 0)
+        injury_risk.total_mean = input_dict.get('total_mean', 0)
+        injury_risk.ecc_volume_obs = input_dict.get('ecc_volume_obs', 0)
+        injury_risk.ecc_stddev = input_dict.get('ecc_stddev', 0)
+        injury_risk.ecc_mean = input_dict.get('ecc_mean', 0)
 
         # ache
         injury_risk.ache_count_last_0_10_days = input_dict.get('ache_count_last_0_10_days', 0)
@@ -314,6 +332,8 @@ class BodyPartInjuryRisk(object):
 
 
     def merge(self, body_part_injury_risk):
+
+        #TODO doesn't include stats as this doesn't get saved that ok?
 
         self.concentric_volume_last_week = max(self.concentric_volume_last_week, body_part_injury_risk.concentric_volume_last_week)
         self.concentric_volume_this_week = max(self.concentric_volume_this_week, body_part_injury_risk.concentric_volume_this_week)
