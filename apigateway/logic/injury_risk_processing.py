@@ -338,10 +338,12 @@ class InjuryRiskProcessor(object):
         body_part_factory = BodyPartFactory()
 
         is_muscle = body_part_factory.is_muscle(target_symptom.body_part)
+        is_ligament = body_part_factory.is_ligament(target_symptom.body_part)
 
         target_body_part_side = BodyPartSide(target_symptom.body_part.location, target_symptom.side)
 
-        if is_muscle:
+        # TODO: handle ligament differently
+        if is_muscle or is_ligament:
 
             if target_symptom.sharp is not None and target_symptom.sharp > 0:
                 if target_body_part_side in injury_risk_dict:
@@ -469,12 +471,15 @@ class InjuryRiskProcessor(object):
         body_part_factory = BodyPartFactory()
 
         is_muscle = body_part_factory.is_muscle(target_symptom.body_part)
+        is_ligament = body_part_factory.is_ligament(target_symptom.body_part)
+
 
         target_body_part_side = BodyPartSide(target_symptom.body_part.location, target_symptom.side)
 
         # TODO: is moderate to high ache severity > 3?
 
-        if is_muscle:
+        # TODO: handle ligament differently
+        if is_muscle or is_ligament:
 
             if target_symptom.sharp is not None and target_symptom.sharp > 0:
                 if target_body_part_side in injury_risk_dict:
@@ -635,10 +640,12 @@ class InjuryRiskProcessor(object):
         body_part_factory = BodyPartFactory()
 
         is_muscle = body_part_factory.is_muscle(target_symptom.body_part)
+        is_ligament = body_part_factory.is_ligament(target_symptom.body_part)
 
         target_body_part_side = BodyPartSide(target_symptom.body_part.location, target_symptom.side)
 
-        if is_muscle:
+        # TODO: handle ligament differently
+        if is_muscle or is_ligament:
 
             mark_adhesions = False
 
