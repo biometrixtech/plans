@@ -4,6 +4,8 @@ from models.soreness_base import BodyPartSide, BodyPartLocation
 from models.functional_movement import BodyPartInjuryRisk, SessionFunctionalMovement
 from models.body_parts import BodyPart, BodyPartFactory
 from copy import deepcopy
+import statistics
+import math
 
 
 class InjuryRiskProcessor(object):
@@ -217,6 +219,31 @@ class InjuryRiskProcessor(object):
 
                     current_week_concentric_volume = sum(current_week_concentric_volume_dict.values())
                     current_week_eccentric_volume = sum(current_week_eccentric_volume_dict.values())
+                    today_z = 0
+                    today_con_z = 0
+
+                    all_ecc_values = []
+                    all_ecc_values.extend(last_week_eccentric_volume_dict.values())
+                    all_ecc_values.extend(current_week_eccentric_volume_dict.values())
+                    if len(all_ecc_values) >= 5:
+                        current_ecc_std = statistics.stdev(all_ecc_values)
+                        current_ecc_avg = statistics.mean(all_ecc_values)
+                        if current_ecc_std > 0:
+                            today_z = (todays_eccentric_volume - current_ecc_avg) / (current_ecc_std/math.sqrt(len(all_ecc_values)))
+
+                    all_con_values = []
+                    all_con_values.extend(last_week_concentric_volume_dict.values())
+                    all_con_values.extend(current_week_concentric_volume_dict.values())
+                    if len(all_con_values) >= 5:
+                        current_con_std = statistics.stdev(all_con_values)
+                        current_con_avg = statistics.mean(all_con_values)
+                        if current_con_std > 0:
+                            today_con_z = (todays_concentric_volume - current_con_avg) / (current_con_std/math.sqrt(len(all_con_values)))
+                    if len(last_week_eccentric_volume_dict.values()) > 1:
+                        last_ecc_std = statistics.stdev(last_week_eccentric_volume_dict.values())
+                    if len(last_week_concentric_volume_dict.values()) > 1:
+                        last_con_std = statistics.stdev(last_week_concentric_volume_dict.values())
+
 
                     injury_risk_dict[b.body_part_side].eccentric_volume_this_week = current_week_eccentric_volume
                     injury_risk_dict[b.body_part_side].eccentric_volume_last_week = last_week_eccentric_volume
