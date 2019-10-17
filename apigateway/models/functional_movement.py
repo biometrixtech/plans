@@ -514,7 +514,7 @@ class SessionFunctionalMovement(object):
                     key_elasticity_value = 0.0
                     key_adf_value = 0.0
 
-            if key_elasticity_value > 0:
+            if key_elasticity_value != 0:
                 pelvic_tilt_movement = movement_factory.get_functional_movement(FunctionalMovementType.pelvic_anterior_tilt)
                 # are any muscles associated with Pelvic Anterior Tilt considered to be short with adhesions or muscle spasm?
                 any_short_confirmed = False
@@ -590,6 +590,21 @@ class SessionFunctionalMovement(object):
                             self.injury_risk_dict[body_part_side] = body_part_injury_risk
                         self.injury_risk_dict[
                             body_part_side].compensation_source = CompensationSource.movement_patterns_3s
+            elif key_adf_value != 0:
+                #TODO - make sure this is correct and no other paths need to be followed
+                for b in [61, 62, 63, 64, 66]:
+                    body_part_side = BodyPartSide(BodyPartLocation(b), side)
+                    if body_part_side in self.injury_risk_dict:
+                        self.injury_risk_dict[body_part_side].last_underactive_date = event_date
+                        self.injury_risk_dict[body_part_side].last_weak_date = event_date
+                    else:
+                        body_part_injury_risk = BodyPartInjuryRisk()
+                        body_part_injury_risk.last_underactive_date = event_date
+                        body_part_injury_risk.last_weak_date = event_date
+                        self.injury_risk_dict[body_part_side] = body_part_injury_risk
+                    self.injury_risk_dict[
+                        body_part_side].compensation_source = CompensationSource.movement_patterns_3s
+
 
     def process(self, event_date, load_stats):
         activity_factory = ActivityFunctionalMovementFactory()

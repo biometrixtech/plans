@@ -1175,7 +1175,7 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
 
             body_part = body_part_factory.get_body_part(body_part_side)
 
-            goal = AthleteGoal("Recovery", 1, AthleteGoalType.high_load)
+            goal = AthleteGoal("Compensations", 1, AthleteGoalType.high_load)
 
             if body_part is not None:
 
@@ -1198,7 +1198,7 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
 
             body_part = body_part_factory.get_body_part(body_part_side)
 
-            goal = AthleteGoal("Recovery", 1, AthleteGoalType.asymmetric_session)
+            goal = AthleteGoal("Elevated Stress", 1, AthleteGoalType.asymmetric_session)
 
             if body_part is not None:
 
@@ -1220,7 +1220,7 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
 
             body_part = body_part_factory.get_body_part(body_part_side)
 
-            goal = AthleteGoal("Care", 1, AthleteGoalType.pain)
+            goal = AthleteGoal("Inflammation", 1, AthleteGoalType.sore)
 
             if body_part is not None:
 
@@ -1241,7 +1241,7 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
 
             body_part = body_part_factory.get_body_part(body_part_side)
 
-            goal = AthleteGoal("Care", 1, AthleteGoalType.sore)
+            goal = AthleteGoal("Tightness", 1, AthleteGoalType.sore)
 
             if body_part is not None:
 
@@ -1261,8 +1261,6 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
 
         body_part = body_part_factory.get_body_part(body_part_side)
 
-        goal = AthleteGoal("Prevention", 1, AthleteGoalType.corrective)
-
         if body_part is not None:
             last_severity = self.get_last_severity(body_part_injury_risk)
 
@@ -1272,7 +1270,7 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
             is_underactive_inhibited = self.is_body_part_underactive_inhibited(body_part_injury_risk)
 
             if is_short:
-
+                goal = AthleteGoal("Shortened Tissues", 1, AthleteGoalType.corrective)
                 self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1", last_severity, exercise_library)
 
                 if max_severity < 7.0:
@@ -1283,6 +1281,7 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
 
             elif is_overactive:
 
+                goal = AthleteGoal("Overactive Muscles", 1, AthleteGoalType.corrective)
                 self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1", last_severity,
                                     exercise_library)
 
@@ -1291,6 +1290,8 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
                                         last_severity, exercise_library)
 
             if is_underactive_weak or is_underactive_inhibited:
+
+                goal = AthleteGoal("Strength Deficiencies", 1, AthleteGoalType.corrective)
 
                 if max_severity < 5.0:
                     self.copy_exercises(body_part.isolated_activate_exercises, self.isolated_activate_exercises, goal, "1",
@@ -1488,7 +1489,7 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
 
             body_part = body_part_factory.get_body_part(body_part_side)
 
-            goal = AthleteGoal("Recovery", 1, AthleteGoalType.high_load)
+            goal = AthleteGoal("Compensations", 1, AthleteGoalType.high_load)
 
             if body_part is not None:
 
@@ -1514,7 +1515,7 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
 
             body_part = body_part_factory.get_body_part(body_part_side)
 
-            goal = AthleteGoal("Recovery", 1, AthleteGoalType.asymmetric_session)
+            goal = AthleteGoal("Elevated Stress", 1, AthleteGoalType.asymmetric_session)
 
             if body_part is not None:
 
@@ -1536,7 +1537,7 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
 
             body_part = body_part_factory.get_body_part(body_part_side)
 
-            goal = AthleteGoal("Care", 1, AthleteGoalType.pain)
+            goal = AthleteGoal("Inflammation", 1, AthleteGoalType.sore)
 
             if body_part is not None:
 
@@ -1558,7 +1559,7 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
 
             body_part = body_part_factory.get_body_part(body_part_side)
 
-            goal = AthleteGoal("Care", 1, AthleteGoalType.sore)
+            goal = AthleteGoal("Tightness", 1, AthleteGoalType.pain)
 
             if body_part is not None:
 
@@ -1577,8 +1578,6 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
 
         body_part = body_part_factory.get_body_part(body_part_side)
 
-        goal = AthleteGoal("Prevention", 1, AthleteGoalType.corrective)
-
         if body_part is not None:
             last_severity = self.get_last_severity(body_part_injury_risk)
 
@@ -1589,6 +1588,8 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
 
             if is_short:
 
+                goal = AthleteGoal("Shortened Tissues", 1, AthleteGoalType.corrective)
+
                 self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1", last_severity, exercise_library)
 
                 if max_severity < 7.0:
@@ -1596,6 +1597,8 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
                                         last_severity, exercise_library)
 
             elif is_overactive:
+
+                goal = AthleteGoal("Overactive Muscles", 1, AthleteGoalType.corrective)
 
                 self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1", last_severity,
                                     exercise_library)
@@ -1605,6 +1608,8 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
                                         last_severity, exercise_library)
 
             if is_underactive_weak or is_underactive_inhibited:
+
+                goal = AthleteGoal("Strength Deficiencies", 1, AthleteGoalType.corrective)
 
                 if max_severity < 5.0:
                     self.copy_exercises(body_part.isolated_activate_exercises, self.isolated_activate_exercises, goal, "1",
