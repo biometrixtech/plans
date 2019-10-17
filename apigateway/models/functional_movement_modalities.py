@@ -262,7 +262,7 @@ class ModalityBase(object):
             dosage = self.update_dosage(dosage, target_collection[s.exercise.id].exercise)
             if dosage.get_total_dosage() > 0:
                 target_collection[s.exercise.id].dosages.append(dosage)
-                position_order += 1
+            position_order += 1
 
     def aggregate_dosages(self):
         pass
@@ -297,13 +297,13 @@ class ModalityBase(object):
 
                 if dosage.priority == "1":
                     self.calc_dosage_durations(1, a, dosage)
-                elif dosage.priority == "2" and dosage.severity() > 2:
+                elif dosage.priority == "2" and dosage.severity() > 4:
                     self.calc_dosage_durations(2, a, dosage)
-                elif dosage.priority == "2" and dosage.severity() <= 2:
+                elif dosage.priority == "2" and dosage.severity() <= 4:
                     self.calc_dosage_durations(3, a, dosage)
-                elif dosage.priority == "3" and dosage.severity() > 2:
+                elif dosage.priority == "3" and dosage.severity() > 4:
                     self.calc_dosage_durations(4, a, dosage)
-                elif dosage.priority == "3" and dosage.severity() <= 2:
+                elif dosage.priority == "3" and dosage.severity() <= 4:
                     self.calc_dosage_durations(5, a, dosage)
 
                 '''dep
@@ -384,7 +384,7 @@ class ModalityBase(object):
                                 d.efficient_sets_assigned = 0
                     elif self.efficient_winner == 2:
                         for d in a.dosages:
-                            if d.priority == '3' or (d.priority == '2' and d.severity() <= 2):
+                            if d.priority == '3' or (d.priority == '2' and d.severity() <= 4):
                                 d.efficient_reps_assigned = 0
                                 d.efficient_sets_assigned = 0
                     elif self.efficient_winner == 3:
@@ -394,7 +394,7 @@ class ModalityBase(object):
                                 d.efficient_sets_assigned = 0
                     elif self.efficient_winner == 4:
                         for d in a.dosages:
-                            if d.priority == '3' and d.severity() <= 2:
+                            if d.priority == '3' and d.severity() <= 4:
                                 d.efficient_reps_assigned = 0
                                 d.efficient_sets_assigned = 0
                     elif self.efficient_winner == 5:
