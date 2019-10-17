@@ -1175,7 +1175,7 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
 
             body_part = body_part_factory.get_body_part(body_part_side)
 
-            goal = AthleteGoal("Compensations", 1, AthleteGoalType.high_load)
+            goal = AthleteGoal("Elevated Stress", 1, AthleteGoalType.high_load)
 
             if body_part is not None:
 
@@ -1198,7 +1198,7 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
 
             body_part = body_part_factory.get_body_part(body_part_side)
 
-            goal = AthleteGoal("Elevated Stress", 1, AthleteGoalType.asymmetric_session)
+            goal = AthleteGoal("Compensations", 1, AthleteGoalType.asymmetric_session)
 
             if body_part is not None:
 
@@ -1220,7 +1220,7 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
 
             body_part = body_part_factory.get_body_part(body_part_side)
 
-            goal = AthleteGoal("Inflammation", 1, AthleteGoalType.sore)
+            goal = AthleteGoal("Inflammation", 1, AthleteGoalType.pain)
 
             if body_part is not None:
 
@@ -1489,7 +1489,7 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
 
             body_part = body_part_factory.get_body_part(body_part_side)
 
-            goal = AthleteGoal("Compensations", 1, AthleteGoalType.high_load)
+            goal = AthleteGoal("Elevated Stress", 1, AthleteGoalType.high_load)
 
             if body_part is not None:
 
@@ -1515,7 +1515,7 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
 
             body_part = body_part_factory.get_body_part(body_part_side)
 
-            goal = AthleteGoal("Elevated Stress", 1, AthleteGoalType.asymmetric_session)
+            goal = AthleteGoal("Compensating", 1, AthleteGoalType.asymmetric_session)
 
             if body_part is not None:
 
@@ -1537,7 +1537,7 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
 
             body_part = body_part_factory.get_body_part(body_part_side)
 
-            goal = AthleteGoal("Inflammation", 1, AthleteGoalType.sore)
+            goal = AthleteGoal("Inflammation", 1, AthleteGoalType.pain)
 
             if body_part is not None:
 
@@ -1559,7 +1559,7 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
 
             body_part = body_part_factory.get_body_part(body_part_side)
 
-            goal = AthleteGoal("Tightness", 1, AthleteGoalType.pain)
+            goal = AthleteGoal("Tightness", 1, AthleteGoalType.sore)
 
             if body_part is not None:
 

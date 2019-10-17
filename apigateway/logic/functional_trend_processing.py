@@ -75,7 +75,7 @@ class TrendProcessor(object):
     def get_care_trend(self, category_index):
 
         care_index = next((i for i, x in enumerate(self.athlete_trend_categories[category_index].trends) if
-                                 x.visualization_type == VisualizationType.care_today), -1)
+                                 x.visualization_type == VisualizationType.care), -1)
         if care_index == -1:
             care_trend = self.create_care_trend()
             self.athlete_trend_categories[category_index].trends.append(care_trend)
@@ -86,7 +86,7 @@ class TrendProcessor(object):
     def set_care_trend(self, category_index, care_trend):
 
         index = next((i for i, x in enumerate(self.athlete_trend_categories[category_index].trends) if
-                             x.visualization_type == VisualizationType.care_today), -1)
+                             x.visualization_type == VisualizationType.care), -1)
 
         if index == -1:
             self.athlete_trend_categories[category_index].trends.append(care_trend)
@@ -117,7 +117,7 @@ class TrendProcessor(object):
     def get_personalized_recovery_trend(self, category_index):
 
         muscle_index = next((i for i, x in enumerate(self.athlete_trend_categories[category_index].trends) if
-                             x.visualization_type == VisualizationType.personalized_recovery), -1)
+                             x.visualization_type == VisualizationType.recovery), -1)
         if muscle_index == -1:
             muscle_trend = self.create_personalized_recovery_trend()
             self.athlete_trend_categories[category_index].trends.append(muscle_trend)
@@ -128,7 +128,7 @@ class TrendProcessor(object):
     def set_personalized_recovery_trend(self, category_index, recovery_trend):
 
         muscle_index = next((i for i, x in enumerate(self.athlete_trend_categories[category_index].trends) if
-                             x.visualization_type == VisualizationType.personalized_recovery), -1)
+                             x.visualization_type == VisualizationType.recovery), -1)
 
         if muscle_index == -1:
             self.athlete_trend_categories[category_index].trends.append(recovery_trend)

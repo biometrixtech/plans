@@ -231,7 +231,7 @@ class InjuryRiskProcessor(object):
 
                     if eccentric_volume_ramp > 1.0 or total_volume_ramp > 1.0:
                         injury_risk_dict[b.body_part_side].last_excessive_strain_date = d
-                        injury_risk_dict[b.body_part_side].last_inflammation_date = d
+                        #injury_risk_dict[b.body_part_side].last_inflammation_date = d
                         injury_risk_dict[b.body_part_side].last_inhibited_date = d
 
                     if 1.0 < eccentric_volume_ramp <= 1.05:
@@ -267,7 +267,7 @@ class InjuryRiskProcessor(object):
 
                 if eccentric_volume_ramp > 1.0 or total_volume_ramp > 1.0:
                     injury_risk_dict[b.body_part_side].last_excessive_strain_date = base_date
-                    injury_risk_dict[b.body_part_side].last_inflammation_date = base_date
+                    #injury_risk_dict[b.body_part_side].last_inflammation_date = base_date
                     injury_risk_dict[b.body_part_side].last_inhibited_date = base_date
 
                 if 1.0 < eccentric_volume_ramp <= 1.05:
@@ -425,14 +425,15 @@ class InjuryRiskProcessor(object):
                             injury_risk_dict[body_part_side] = body_part_injury_risk
 
         # now treat everything with excessive strain in last 2 days as inflammation
-        two_days_ago = base_date - timedelta(days=1)
-        excessive_strain_body_parts = dict(filter(lambda elem: elem[1].last_excessive_strain_date is not None and
-                                                               elem[1].last_excessive_strain_date >= two_days_ago,
-                                                  injury_risk_dict.items()))
-
-        for b, e in excessive_strain_body_parts.items():
-            injury_risk_dict[b].last_inflammation_date = base_date
-            injury_risk_dict[b].last_inhibited_date = base_date
+        # #TODO right here GABBY
+        # two_days_ago = base_date - timedelta(days=1)
+        # excessive_strain_body_parts = dict(filter(lambda elem: elem[1].last_excessive_strain_date is not None and
+        #                                                        elem[1].last_excessive_strain_date >= two_days_ago,
+        #                                           injury_risk_dict.items()))
+        #
+        # for b, e in excessive_strain_body_parts.items():
+        #     injury_risk_dict[b].last_inflammation_date = base_date
+        #     injury_risk_dict[b].last_inhibited_date = base_date
 
         return injury_risk_dict
 
