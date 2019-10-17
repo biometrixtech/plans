@@ -188,17 +188,17 @@ class StatsProcessing(object):
             # persist all of soreness/pain and session_RPE
             current_athlete_stats.session_RPE = current_athlete_stats.session_RPE
             current_athlete_stats.session_RPE_event_date = current_athlete_stats.session_RPE_event_date
-        elif force_historical_process:
-            # New
-            historical_injury_risk_dict = self.injury_risk_datastore.get(self.athlete_id)
-            injury_risk_processor = InjuryRiskProcessor(self.event_date, soreness_list_25, sessions,
-                                                        historical_injury_risk_dict, current_athlete_stats.load_stats)
-            injury_risk_processor.process(update_historical_data=True)
+            if force_historical_process:
+                # New
+                historical_injury_risk_dict = self.injury_risk_datastore.get(self.athlete_id)
+                injury_risk_processor = InjuryRiskProcessor(self.event_date, soreness_list_25, sessions,
+                                                            historical_injury_risk_dict, current_athlete_stats.load_stats)
+                injury_risk_processor.process(update_historical_data=True)
 
-            athlete_injury_risk = AthleteInjuryRisk(self.athlete_id)
-            athlete_injury_risk.items = injury_risk_processor.injury_risk_dict
+                athlete_injury_risk = AthleteInjuryRisk(self.athlete_id)
+                athlete_injury_risk.items = injury_risk_processor.injury_risk_dict
 
-            self.injury_risk_datastore.put(athlete_injury_risk)
+                self.injury_risk_datastore.put(athlete_injury_risk)
 
         else:  # nightly process (first update for the day)
             # clear these if it's a new day

@@ -10,6 +10,7 @@ from logic.functional_anatomy_processing import FunctionalAnatomyProcessor
 from models.soreness import Soreness
 from models.body_parts import BodyPart
 from models.soreness_base import BodyPartLocation, BodyPartSide
+from models.load_stats import LoadStats
 from logic.injury_risk_processing import InjuryRiskProcessor
 
 
@@ -43,7 +44,7 @@ def test_body_parts_have_volume():
 
     s = sessions[0]
     session_functional_movement = SessionFunctionalMovement(s, {})
-    session_functional_movement.process(s.event_date)
+    session_functional_movement.process(s.event_date, LoadStats())
 
     assert len(session_functional_movement.body_parts) > 0
     for b in session_functional_movement.body_parts:
@@ -66,7 +67,7 @@ def test_body_parts_overactive():
     s.movement_patterns.apt_ankle_pitch.left.elasticity = .56
 
     session_functional_movement = SessionFunctionalMovement(s, {})
-    session_functional_movement.process(s.event_date)
+    session_functional_movement.process(s.event_date, LoadStats())
 
     overactive = [i for i in session_functional_movement.injury_risk_dict.values() if i.last_overactive_date is not None]
     underactive = [i for i in session_functional_movement.injury_risk_dict.values() if
@@ -96,7 +97,7 @@ def test_body_parts_overactive_weak():
     s.movement_patterns.apt_ankle_pitch.left.apt_adf = 3.0
 
     session_functional_movement = SessionFunctionalMovement(s, {})
-    session_functional_movement.process(s.event_date)
+    session_functional_movement.process(s.event_date, LoadStats())
 
     overactive = [i for i in session_functional_movement.injury_risk_dict.values() if i.last_overactive_date is not None]
     underactive = [i for i in session_functional_movement.injury_risk_dict.values() if
@@ -130,7 +131,7 @@ def test_body_parts_muscle_imbalance():
     injury_risk_dict[body_part_side].last_muscle_spasm_date = datetime.now().date()
 
     session_functional_movement = SessionFunctionalMovement(s, injury_risk_dict)
-    session_functional_movement.process(s.event_date.date())
+    session_functional_movement.process(s.event_date.date(), LoadStats())
 
     overactive = [i for i in session_functional_movement.injury_risk_dict.values() if i.last_overactive_date is not None]
     underactive = [i for i in session_functional_movement.injury_risk_dict.values() if
@@ -161,7 +162,7 @@ def test_body_parts_have_intensity():
 
     s = sessions[0]
     session_functional_movement = SessionFunctionalMovement(s, {})
-    session_functional_movement.process(s.event_date.date())
+    session_functional_movement.process(s.event_date.date(), LoadStats())
 
     assert len(session_functional_movement.body_parts) > 0
     for b in session_functional_movement.body_parts:
@@ -178,7 +179,7 @@ def test_sharp_symptom_inflammation():
     soreness.sharp = 3
     soreness.reported_date_time = now_date
 
-    proc = InjuryRiskProcessor(now_date, [soreness], [], {})
+    proc = InjuryRiskProcessor(now_date, [soreness], [], {}, LoadStats())
     injury_risk_dict = proc.process()
 
     body_part_side = BodyPartSide(BodyPartLocation(48), 1)
@@ -197,7 +198,7 @@ def test_ache_symptom_inflammation():
     soreness.ache = 1
     soreness.reported_date_time = now_date
 
-    proc = InjuryRiskProcessor(now_date, [soreness], [], {})
+    proc = InjuryRiskProcessor(now_date, [soreness], [], {}, LoadStats())
     injury_risk_dict = proc.process()
 
     body_part_side = BodyPartSide(BodyPartLocation(48), 1)
@@ -216,7 +217,7 @@ def test_tight_symptom_muscle_spasn():
     soreness.tight = 1
     soreness.reported_date_time = now_date
 
-    proc = InjuryRiskProcessor(now_date, [soreness], [], {})
+    proc = InjuryRiskProcessor(now_date, [soreness], [], {}, LoadStats())
     injury_risk_dict = proc.process()
 
     body_part_side = BodyPartSide(BodyPartLocation(48), 1)
@@ -241,7 +242,7 @@ def test_muscle_deconstruction():
     soreness_2.sharp = 2
     soreness_2.reported_date_time = now_date
 
-    proc = InjuryRiskProcessor(now_date, [soreness, soreness_2], [], {})
+    proc = InjuryRiskProcessor(now_date, [soreness, soreness_2], [], {}, LoadStats())
     injury_risk_dict = proc.process()
     body_parts = list(injury_risk_dict.keys())
     assert len(injury_risk_dict) == 9
@@ -262,7 +263,7 @@ def test_muscle_deconstruction_reconstruction():
     soreness_2.sharp = 2
     soreness_2.reported_date_time = now_date
 
-    proc = InjuryRiskProcessor(now_date, [soreness, soreness_2], [], {})
+    proc = InjuryRiskProcessor(now_date, [soreness, soreness_2], [], {}, LoadStats())
     injury_risk_dict = proc.process(aggregate_results=True)
     body_parts = list(injury_risk_dict.keys())
     assert len(injury_risk_dict) == 4
@@ -289,7 +290,7 @@ def test_inflammation_affects_load():
     # session_functional_movement = SessionFunctionalMovement(sessions[0], {})
     # session_functional_movement.process(sessions[0].event_date)
 
-    proc = InjuryRiskProcessor(now_date, [soreness], sessions, {})
+    proc = InjuryRiskProcessor(now_date, [soreness], sessions, {}, LoadStats())
     proc.process()
 
     # this is a section to better understand changes in volume

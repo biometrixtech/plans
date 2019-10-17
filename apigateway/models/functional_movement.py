@@ -188,6 +188,7 @@ class BodyPartInjuryRisk(object):
                 "last_non_functional_overreaching_date": format_date(self.last_non_functional_overreaching_date),
                 "last_functional_overreaching_date": format_date(self.last_functional_overreaching_date),
                 "is_compensating": self.is_compensating,
+                "compensating_source": self.compensating_source.value if self.compensating_source is not None else None,
 
                 # inflammation
                 "last_inflammation_date": format_date(self.last_inflammation_date),
@@ -257,6 +258,7 @@ class BodyPartInjuryRisk(object):
         injury_risk.last_non_functional_overreaching_date = input_dict.get('last_non_functional_overreaching_date')
         injury_risk.last_functional_overreaching_date = input_dict.get('last_functional_overreaching_date')
         injury_risk.is_compensating = input_dict.get('is_compensating', False)
+        injury_risk.compensating_source = CompensationSource(input_dict['compensating_source']) if input_dict.get("compensating_source") is not None else None
 
         # inflammation
         injury_risk.last_inflammation_date = input_dict.get('last_inflammation_date')
@@ -518,8 +520,13 @@ class SessionFunctionalMovement(object):
                 pelvic_tilt_movement = movement_factory.get_functional_movement(FunctionalMovementType.pelvic_anterior_tilt)
                 # are any muscles associated with Pelvic Anterior Tilt considered to be short with adhesions or muscle spasm?
                 any_short_confirmed = False
+                body_part_factory = BodyPartFactory()
                 for p in pelvic_tilt_movement.prime_movers:
-                    body_part_side = BodyPartSide(BodyPartLocation(p), side)
+                    bilateral = body_part_factory.get_bilateral(BodyPartLocation(p))
+                    if bilateral:
+                        body_part_side = BodyPartSide(BodyPartLocation(p), side)
+                    else:
+                        body_part_side = BodyPartSide(BodyPartLocation(p), 0)
                     if body_part_side in self.injury_risk_dict:
                         if self.injury_risk_dict[body_part_side].last_adhesions_date is not None and \
                                 self.injury_risk_dict[body_part_side].last_adhesions_date == event_date:
@@ -529,7 +536,11 @@ class SessionFunctionalMovement(object):
                             any_short_confirmed = True
                 if any_short_confirmed:  # mark all muscle imbalance and short
                     for p in pelvic_tilt_movement.prime_movers:
-                        body_part_side = BodyPartSide(BodyPartLocation(p), side)
+                        bilateral = body_part_factory.get_bilateral(BodyPartLocation(p))
+                        if bilateral:
+                            body_part_side = BodyPartSide(BodyPartLocation(p), side)
+                        else:
+                            body_part_side = BodyPartSide(BodyPartLocation(p), 0)
                         if body_part_side in self.injury_risk_dict:
                             self.injury_risk_dict[body_part_side].last_short_date = event_date
                             self.injury_risk_dict[body_part_side].last_muscle_imbalance_date = event_date
@@ -541,7 +552,11 @@ class SessionFunctionalMovement(object):
                         self.injury_risk_dict[body_part_side].compensation_source = CompensationSource.movement_patterns_3s
                 else:  # mark all muscles overactive
                     for p in pelvic_tilt_movement.prime_movers:
-                        body_part_side = BodyPartSide(BodyPartLocation(p), side)
+                        bilateral = body_part_factory.get_bilateral(BodyPartLocation(p))
+                        if bilateral:
+                            body_part_side = BodyPartSide(BodyPartLocation(p), side)
+                        else:
+                            body_part_side = BodyPartSide(BodyPartLocation(p), 0)
                         if body_part_side in self.injury_risk_dict:
                             self.injury_risk_dict[body_part_side].last_overactive_date = event_date
                         else:
@@ -581,7 +596,11 @@ class SessionFunctionalMovement(object):
                     hip_extension = movement_factory.get_functional_movement(
                         FunctionalMovementType.hip_extension)
                     for m in hip_extension.prime_movers:
-                        body_part_side = BodyPartSide(BodyPartLocation(m), side)
+                        bilateral = body_part_factory.get_bilateral(BodyPartLocation(m))
+                        if bilateral:
+                            body_part_side = BodyPartSide(BodyPartLocation(m), side)
+                        else:
+                            body_part_side = BodyPartSide(BodyPartLocation(m), 0)
                         if body_part_side in self.injury_risk_dict:
                             self.injury_risk_dict[body_part_side].is_compensationg = True
                         else:
@@ -670,8 +689,13 @@ class SessionFunctionalMovement(object):
         body_part_side_list = []
 
         body_part_factory = BodyPartFactory()
-        body_part = body_part_factory.get_body_part(BodyPart(BodyPartLocation(body_part_enum), None))
-        if not body_part.bilateral:
+        #body_part = body_part_factory.get_body_part(BodyPart(BodyPartLocation(body_part_enum), None))
+        bilateral = body_part_factory.get_bilateral(BodyPartLocation(body_part_enum))
+        # if bilateral:
+        #     body_part_side = BodyPartSide(BodyPartLocation(p), side)
+        # else:
+        #     body_part_side = BodyPartSide(BodyPartLocation(p), 0)
+        if not bilateral:
             sides = [0]
         else:
             sides = [1, 2]
