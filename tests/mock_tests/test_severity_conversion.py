@@ -128,3 +128,24 @@ def test_severity_update():
     assert soreness.pain
 
 
+def test_back_and_forth():
+    soreness = Soreness()
+    for movement in range(1, 6):
+        tight = soreness.get_tight_knots_from_movement(movement)
+        assert soreness.get_movement_from_tight_knot(tight) == movement
+
+    soreness.body_part = BodyPart(BodyPartLocation(2), None)
+    for severity in range(1, 6):
+        soreness.severity = severity
+        soreness_serialised = soreness.json_serialise()
+        soreness_deserialised = Soreness.json_deserialise(soreness_serialised)
+
+        assert soreness_deserialised.severity == severity
+
+    soreness.body_part = BodyPart(BodyPartLocation(7), None)
+    for severity in range(1, 6):
+        soreness.severity = severity
+        soreness_serialised = soreness.json_serialise()
+        soreness_deserialised = Soreness.json_deserialise(soreness_serialised)
+
+        assert soreness_deserialised.severity == severity
