@@ -234,7 +234,7 @@ class TrendProcessor(object):
 
         daily_trend.icon = "view3icon.png"
         daily_trend.video_url = "https://d2xll36aqjtmhz.cloudfront.net/view3context.mp4"
-        daily_trend.visualization_type = VisualizationType.care_today
+        daily_trend.visualization_type = VisualizationType.care
         daily_trend.visible = False
         daily_trend.first_time_experience = True
 
@@ -267,7 +267,7 @@ class TrendProcessor(object):
 
         muscle_trend.icon = "view1icon.png"
         muscle_trend.video_url = "https://d2xll36aqjtmhz.cloudfront.net/view1context.mp4"
-        muscle_trend.visualization_type = VisualizationType.personalized_recovery
+        muscle_trend.visualization_type = VisualizationType.recovery
         muscle_trend.visible = False
         muscle_trend.first_time_experience = True
         return muscle_trend
