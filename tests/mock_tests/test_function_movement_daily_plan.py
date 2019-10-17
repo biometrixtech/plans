@@ -11,6 +11,7 @@ from logic.functional_anatomy_processing import FunctionalAnatomyProcessor
 from models.soreness import Soreness
 from models.body_parts import BodyPart
 from models.soreness_base import BodyPartLocation, BodyPartSide
+from models.load_stats import LoadStats
 from logic.injury_risk_processing import InjuryRiskProcessor
 from logic.functional_exercise_mapping import ExerciseAssignmentCalculator
 from tests.mocks.mock_exercise_datastore import ExerciseLibraryDatastore
@@ -51,7 +52,7 @@ def test_create_plan_no_session():
     soreness.sharp = 3
     soreness.reported_date_time = now_date
 
-    proc = InjuryRiskProcessor(now_date, [soreness], [], {})
+    proc = InjuryRiskProcessor(now_date, [soreness], [], {}, LoadStats())
     injury_risk_dict = proc.process(aggregate_results=True)
 
     calc = ExerciseAssignmentCalculator(injury_risk_dict, exercise_library_datastore, completed_exercise_datastore, now_date)
@@ -82,7 +83,7 @@ def test_create_plan_with_session():
     soreness_2.sharp = 2
     soreness_2.reported_date_time = dates[0]
 
-    proc = InjuryRiskProcessor(dates[0], [soreness, soreness_2], sessions, {})
+    proc = InjuryRiskProcessor(dates[0], [soreness, soreness_2], sessions, {}, LoadStats())
     injury_risk_dict = proc.process(aggregate_results=True)
 
     calc = ExerciseAssignmentCalculator(injury_risk_dict, exercise_library_datastore, completed_exercise_datastore,

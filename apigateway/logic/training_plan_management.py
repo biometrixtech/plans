@@ -2,7 +2,8 @@ import datetime
 
 from fathomapi.utils.xray import xray_recorder
 # import logic.exercise_mapping as exercise_mapping
-from logic.trend_processing import TrendProcessor
+#from logic.trend_processing import TrendProcessor
+from logic.functional_trend_processing import TrendProcessor
 from logic.soreness_processing import SorenessCalculator
 from logic.alerts_processing import AlertsProcessing
 from logic.trigger_processing import TriggerFactory
@@ -90,19 +91,21 @@ class TrainingPlanManager(object):
         # trigger_factory = TriggerFactory(parse_date(event_date), self.athlete_stats, self.soreness_list, self.training_sessions)
         # trigger_factory.load_triggers()
         # self.athlete_stats.triggers = trigger_factory.triggers
+        historical_injury_risk_dict = self.injury_risk_datastore.get(self.athlete_id)
+        injury_risk_processor = InjuryRiskProcessor(date, self.soreness_list, self.daily_plan.training_sessions,
+                                                    historical_injury_risk_dict, self.athlete_stats.load_stats)
+        aggregated_injury_risk_dict = injury_risk_processor.process(aggregate_results=True)
 
-        # if visualizations:
-        #     trend_processor = TrendProcessor(trigger_factory.triggers, parse_date(event_date), athlete_trend_categories=self.athlete_stats.trend_categories)
-        #     trend_processor.process_triggers()
-        #     self.athlete_stats.trend_categories = trend_processor.athlete_trend_categories
+        if visualizations:
+            trend_processor = TrendProcessor(aggregated_injury_risk_dict, parse_date(event_date), athlete_trend_categories=self.athlete_stats.trend_categories)
+            trend_processor.process_triggers()
+            self.athlete_stats.trend_categories = trend_processor.athlete_trend_categories
 
         # calc = exercise_mapping.ExerciseAssignmentCalculator(trigger_factory, self.exercise_library_datastore,
         #                                                      self.completed_exercise_datastore,
         #                                                      self.training_sessions, self.soreness_list,
         #                                                      parse_date(event_date), historic_soreness)
-        historical_injury_risk_dict = self.injury_risk_datastore.get(self.athlete_id)
-        injury_risk_processor = InjuryRiskProcessor(date, self.soreness_list, self.daily_plan.training_sessions, historical_injury_risk_dict)
-        aggregated_injury_risk_dict = injury_risk_processor.process(aggregate_results=True)
+
 
         calc = ExerciseAssignmentCalculator(aggregated_injury_risk_dict, self.exercise_library_datastore, self.completed_exercise_datastore,
                                             date)
@@ -180,11 +183,11 @@ class TrainingPlanManager(object):
         #                                      athlete_stats=self.athlete_stats,
         #                                      trigger_date_time=self.trigger_date_time,)
         # alerts_processing.aggregate_alerts(alerts=alerts)
-        # if visualizations:
-        #     self.daily_plan.trends = AthleteTrends()
-        #     self.daily_plan.trends.trend_categories = trend_processor.athlete_trend_categories
-        #     self.daily_plan.trends.dashboard.trend_categories = trend_processor.dashboard_categories
-        #     self.daily_plan.trends.add_trend_data(self.athlete_stats)
+        if visualizations:
+            self.daily_plan.trends = AthleteTrends()
+            self.daily_plan.trends.trend_categories = trend_processor.athlete_trend_categories
+            self.daily_plan.trends.dashboard.trend_categories = trend_processor.dashboard_categories
+            self.daily_plan.trends.add_trend_data(self.athlete_stats)
 
         self.daily_plan_datastore.put(self.daily_plan)
         self.athlete_stats_datastore.put(self.athlete_stats)

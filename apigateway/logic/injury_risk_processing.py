@@ -7,10 +7,11 @@ from copy import deepcopy
 
 
 class InjuryRiskProcessor(object):
-    def __init__(self, event_date_time, symptoms_list, training_session_list, injury_risk_dict):
+    def __init__(self, event_date_time, symptoms_list, training_session_list, injury_risk_dict, load_stats):
         self.event_date_time = event_date_time
         self.symptoms = symptoms_list
         self.training_sessions = training_session_list
+        self.load_stats = load_stats
         self.injury_risk_dict = injury_risk_dict
         self.aggregated_injury_risk_dict = {}
         self.two_days_ago = self.event_date_time.date() - timedelta(days=1)
@@ -38,10 +39,10 @@ class InjuryRiskProcessor(object):
         self.symptoms = detailed_symptoms
 
         if update_historical_data:
-            self.injury_risk_dict = self.update_historical_data()
+            self.injury_risk_dict = self.update_historical_data(self.load_stats)
         else:
             self.process_todays_symptoms(self.event_date_time.date(), self.injury_risk_dict)
-            self.process_todays_sessions(self.event_date_time.date(), self.injury_risk_dict)
+            self.process_todays_sessions(self.event_date_time.date(), self.injury_risk_dict, self.load_stats)
 
         #reconstruct to group level
         if aggregate_results:
@@ -90,7 +91,7 @@ class InjuryRiskProcessor(object):
         last_20_days_symptoms = [s for s in self.symptoms if
                                  base_date >= s.reported_date_time.date() >= twenty_days_ago]
 
-        self.reset_reported_symptoms(injury_risk_dict)
+        #self.reset_reported_symptoms(injury_risk_dict)
 
         for s in last_20_days_symptoms:
             target_body_part_side = BodyPartSide(s.body_part.location, s.side)
@@ -124,7 +125,7 @@ class InjuryRiskProcessor(object):
 
         return injury_risk_dict
 
-    def update_historical_data(self):
+    def update_historical_data(self, load_stats):
 
         combined_dates = []
         combined_dates.extend([s.event_date.date() for s in self.training_sessions])
@@ -137,7 +138,7 @@ class InjuryRiskProcessor(object):
 
         #days_1_15 = [d for d in combined_dates if d < self.twenty_days_ago.date()]
 
-        injury_risk_dict = {}
+
 
         # for d in days_1_15:
         #     initial_sessions = [t for t in self.training_sessions if t.event_date_time.date() == d]
@@ -150,12 +151,14 @@ class InjuryRiskProcessor(object):
         #self.reset_reported_symptoms() # --> maybe start with brand new injury risk dict?
 
         #combined_dates = [d for d in combined_dates if d >= self.twenty_days_ago.date()]
+        injury_risk_dict = {}
 
         for d in combined_dates:
 
             seven_days_ago = d - timedelta(days=6)
             fourteeen_days_ago = d - timedelta(days=13)
 
+            injury_risk_dict = {}
             # first let's update our historical data
             injury_risk_dict = self.update_historical_symptoms(d, injury_risk_dict)
             # TODO - assign status to symptoms not today
@@ -165,7 +168,8 @@ class InjuryRiskProcessor(object):
 
             for session in daily_sessions:
                 session_functional_movement = SessionFunctionalMovement(session, injury_risk_dict)
-                session_functional_movement.process(d)
+                session_functional_movement.process(d, load_stats)
+
                 for b in session_functional_movement.body_parts:
 
                     if b.body_part_side not in injury_risk_dict:
@@ -241,13 +245,13 @@ class InjuryRiskProcessor(object):
                         injury_risk_dict[b.body_part_side].last_non_functional_overreaching_date = d
         return injury_risk_dict
 
-    def process_todays_sessions(self, base_date, injury_risk_dict):
+    def process_todays_sessions(self, base_date, injury_risk_dict, load_stats):
 
         daily_sessions = [n for n in self.training_sessions if n.event_date.date() == base_date]
 
         for session in daily_sessions:
             session_functional_movement = SessionFunctionalMovement(session, injury_risk_dict)
-            session_functional_movement.process(base_date)
+            session_functional_movement.process(base_date, load_stats)
             for b in session_functional_movement.body_parts:
 
                 if b.body_part_side not in injury_risk_dict:
@@ -400,15 +404,25 @@ class InjuryRiskProcessor(object):
                 related_muscles = self.functional_anatomy_processor.get_related_muscles_from_joints(target_body_part_side.body_part_location.value)
 
                 for r in related_muscles:
-                    body_part_side = BodyPartSide(BodyPartLocation(r), target_symptom.side)
-                    if body_part_side in injury_risk_dict:
-                        injury_risk_dict[body_part_side].last_inflammation_date = base_date
-                        injury_risk_dict[body_part_side].last_inhibited_date = base_date
+                    if target_body_part_side.side == 0:
+                        bilateral = body_part_factory.get_bilateral(BodyPartLocation(r))
+                        if bilateral:
+                            sides = [1, 2]
+                        else:
+                            sides = [0]
                     else:
-                        body_part_injury_risk = BodyPartInjuryRisk()
-                        body_part_injury_risk.last_inflammation_date = base_date
-                        body_part_injury_risk.last_inhibited_date = base_date
-                        injury_risk_dict[body_part_side] = body_part_injury_risk
+                        sides = [target_body_part_side.side]
+                    for sd in sides:
+                        body_part_side = BodyPartSide(BodyPartLocation(r), sd)
+                        #body_part_side = BodyPartSide(BodyPartLocation(r), target_symptom.side)
+                        if body_part_side in injury_risk_dict:
+                            injury_risk_dict[body_part_side].last_inflammation_date = base_date
+                            injury_risk_dict[body_part_side].last_inhibited_date = base_date
+                        else:
+                            body_part_injury_risk = BodyPartInjuryRisk()
+                            body_part_injury_risk.last_inflammation_date = base_date
+                            body_part_injury_risk.last_inhibited_date = base_date
+                            injury_risk_dict[body_part_side] = body_part_injury_risk
 
         # now treat everything with excessive strain in last 2 days as inflammation
         two_days_ago = base_date - timedelta(days=1)
@@ -566,15 +580,25 @@ class InjuryRiskProcessor(object):
             if mark_related_muscles:
                 related_muscles = self.functional_anatomy_processor.get_related_muscles_from_joints(
                     target_body_part_side.body_part_location.value)
+                body_part_factory = BodyPartFactory()
 
                 for r in related_muscles:
-                    body_part_side = BodyPartSide(BodyPartLocation(r), target_symptom.side)
-                    if body_part_side in injury_risk_dict:
-                        injury_risk_dict[body_part_side].last_muscle_spasm_date = base_date
+                    if target_body_part_side.side == 0:
+                        bilateral = body_part_factory.get_bilateral(BodyPartLocation(r))
+                        if bilateral:
+                            sides = [1, 2]
+                        else:
+                            sides = [0]
                     else:
-                        body_part_injury_risk = BodyPartInjuryRisk()
-                        body_part_injury_risk.last_muscle_spasm_date = base_date
-                        injury_risk_dict[body_part_side] = body_part_injury_risk
+                        sides = [target_body_part_side.side]
+                    for sd in sides:
+                        body_part_side = BodyPartSide(BodyPartLocation(r), sd)
+                        if body_part_side in injury_risk_dict:
+                            injury_risk_dict[body_part_side].last_muscle_spasm_date = base_date
+                        else:
+                            body_part_injury_risk = BodyPartInjuryRisk()
+                            body_part_injury_risk.last_muscle_spasm_date = base_date
+                            injury_risk_dict[body_part_side] = body_part_injury_risk
 
         return injury_risk_dict
 
@@ -723,12 +747,22 @@ class InjuryRiskProcessor(object):
                     target_body_part_side.body_part_location.value)
 
                 for r in related_muscles:
-                    body_part_side = BodyPartSide(BodyPartLocation(r), target_symptom.side)
-                    if body_part_side in injury_risk_dict:
-                        injury_risk_dict[body_part_side].last_adhesions_date = base_date
+                    if target_body_part_side.side == 0:
+                        bilateral = body_part_factory.get_bilateral(BodyPartLocation(r))
+                        if bilateral:
+                            sides = [1, 2]
+                        else:
+                            sides = [0]
                     else:
-                        body_part_injury_risk = BodyPartInjuryRisk()
-                        body_part_injury_risk.last_adhesions_date = base_date
-                        injury_risk_dict[body_part_side] = body_part_injury_risk
+                        sides = [target_body_part_side.side]
+                    for sd in sides:
+                        body_part_side = BodyPartSide(BodyPartLocation(r), sd)
+                        #body_part_side = BodyPartSide(BodyPartLocation(r), target_symptom.side)
+                        if body_part_side in injury_risk_dict:
+                            injury_risk_dict[body_part_side].last_adhesions_date = base_date
+                        else:
+                            body_part_injury_risk = BodyPartInjuryRisk()
+                            body_part_injury_risk.last_adhesions_date = base_date
+                            injury_risk_dict[body_part_side] = body_part_injury_risk
 
         return injury_risk_dict
