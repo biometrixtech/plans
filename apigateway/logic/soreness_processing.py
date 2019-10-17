@@ -3,6 +3,7 @@ from models.body_parts import BodyPart
 from models.soreness_base import BodyPartLocation
 from models.historic_soreness import CoOccurrence, SorenessCause
 from datetime import timedelta
+from utils import none_max
 
 
 class SorenessCalculator(object):
@@ -77,8 +78,12 @@ class SorenessCalculator(object):
             updated = False
             for r in soreness_list:
                 if r.body_part.location.value == s.body_part.location.value and r.side == s.side and r.pain == s.pain:
-                    r.severity = max([self.get_severity(r.severity, r.movement), self.get_severity(s.severity, s.movement)])
+                    r.severity = none_max([self.get_severity(r.severity, r.movement), self.get_severity(s.severity, s.movement)])
                     r.movement = None
+                    r.ache = none_max([r.ache, s.ache])
+                    r.knots = none_max([r.knots, s.knots])
+                    r.tight = none_max([r.tight, s.tight])
+                    r.sharp = none_max([r.sharp, s.sharp])
                     updated = True
             if not updated:
                 s.severity = self.get_severity(s.severity, s.movement)
