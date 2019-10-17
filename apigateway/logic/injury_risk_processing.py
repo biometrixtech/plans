@@ -28,12 +28,12 @@ class InjuryRiskProcessor(object):
         detailed_symptoms = []
         for s in self.symptoms:
             muscles = BodyPartLocation.get_muscles_for_group(s.body_part.location)
-            if isinstance(muscles, list):
+            if isinstance(muscles, list) and len(muscles) > 0:  # muscle groups that have constituent muscles defined
                 for m in muscles:
                     symptom = deepcopy(s)
                     symptom.body_part = BodyPart(m, None)
                     detailed_symptoms.append(symptom)
-            else:
+            else:  # joints, ligaments and muscle groups that do not have constituent muscles defined
                 detailed_symptoms.append(s)
 
         self.symptoms = detailed_symptoms
