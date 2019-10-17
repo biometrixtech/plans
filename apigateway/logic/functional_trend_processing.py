@@ -467,6 +467,11 @@ class TrendProcessor(object):
             recovery_data.remove_duplicates()
             trend_data.data = [recovery_data]
 
+            trend.trigger_tiles = []
+            trend.trigger_tiles.extend(self.get_compensation_trigger_tiles(compensating))
+            trend.trigger_tiles.extend(self.get_excessive_strain_trigger_tiles(excessive_strain_fo, True))
+            trend.trigger_tiles.extend(self.get_excessive_strain_trigger_tiles(excessive_strain_nfo, False))
+
             # trend.trigger_tiles.extend(self.get_trigger_tiles(excessive_strain_nfo))
             # trend.trigger_tiles.extend(self.get_trigger_tiles(compensating))
             # trend.trigger_tiles.extend(self.get_trigger_tiles(excessive_strain_fo))
@@ -622,6 +627,10 @@ class TrendProcessor(object):
             care_data.remove_duplicates()
             trend_data.data = [care_data]
 
+            trend.trigger_tiles = []
+            trend.trigger_tiles.extend(self.get_tight_muscle_spasm_trigger_tiles(muscle_spasm_tight))
+            trend.trigger_tiles.extend(self.get_inflamed_trigger_tiles(inflamed))
+
             # trend.trigger_tiles.extend(self.get_trigger_tiles(inflamed))
             # trend.trigger_tiles.extend(self.get_trigger_tiles(muscle_spasm_tight))
 
@@ -697,6 +706,18 @@ class TrendProcessor(object):
             prevention_data.remove_duplicates()
             trend_data.data = [prevention_data]
 
+            trend.trigger_tiles = []
+
+            trend.trigger_tiles.extend(self.get_short_adhesions_trigger_tiles(short_adhesions))
+            trend.trigger_tiles.extend(self.get_short_non_adhesions_trigger_tiles(short_non_adhesions))
+
+            underactive_list = []
+            underactive_list.extend(underactive_weak)
+            underactive_list.extend(underactive_inhibited)
+
+            underactive_list = list(set(underactive_list))
+            trend.trigger_tiles.extend(self.get_short_non_adhesions_trigger_tiles(underactive_list))
+
             # trend.trigger_tiles.extend(self.get_trigger_tiles(underactive_weak))
             # trend.trigger_tiles.extend(self.get_trigger_tiles(underactive_inhibited))
             # trend.trigger_tiles.extend(self.get_trigger_tiles(overactive))
@@ -737,6 +758,216 @@ class TrendProcessor(object):
         if len(body_part_location_set) > 1:
             trend_dashboard_category.body_part_text += " and more..."
         return trend_dashboard_category
+
+    def get_short_adhesions_trigger_tiles(self, body_part_sides):
+
+        care_fss_body_parts = set()
+        tiles = []
+        statistic_text = ""
+        bold_statistic_text = []
+        mobilize_suffix = "to lengthen tissues which show signs of shortening"
+
+        sideless_body_parts = [b.body_part_location for b in body_part_sides]
+        sideless_body_parts = list(set(sideless_body_parts))
+
+        for body_part_side in sideless_body_parts:
+            tile_1 = TriggerTile()
+            body_part_text_1, is_plural_1 = self.get_title_text_for_body_parts([body_part_side], 0)
+            if len(body_part_text_1) == 0:
+                body_part_text_1 = "PRIME MOVER"
+            if body_part_text_1 not in care_fss_body_parts:
+                care_fss_body_parts.add(body_part_text_1)
+                tile_1.text = "Foam Roll & Static Stretch your " + body_part_text_1
+                tile_1.description = mobilize_suffix
+                bold_1 = BoldText()
+                bold_1.text = "Foam Roll & Static Stretch"
+                bold_1.color = LegendColor.warning_x_light
+                tile_1.bold_text.append(bold_1)
+                tile_1.statistic_text = statistic_text
+                tile_1.bold_statistic_text = bold_statistic_text
+                #tile_1.trigger_type = t.trigger_type
+                tiles.append(tile_1)
+        return tiles
+
+    def get_short_non_adhesions_trigger_tiles(self, body_part_sides):
+
+        care_fss_body_parts = set()
+        tiles = []
+        statistic_text = ""
+        bold_statistic_text = []
+        mobilize_suffix = "to inhibit muscle overactivity causing biomechanical imbalances"
+        sideless_body_parts = [b.body_part_location for b in body_part_sides]
+        sideless_body_parts = list(set(sideless_body_parts))
+
+        for body_part_side in sideless_body_parts:
+            tile_1 = TriggerTile()
+            body_part_text_1, is_plural_1 = self.get_title_text_for_body_parts([body_part_side], 0)
+            if len(body_part_text_1) == 0:
+                body_part_text_1 = "PRIME MOVER"
+            if body_part_text_1 not in care_fss_body_parts:
+                care_fss_body_parts.add(body_part_text_1)
+                tile_1.text = "Foam Roll & Static Stretch your " + body_part_text_1
+                tile_1.description = mobilize_suffix
+                bold_1 = BoldText()
+                bold_1.text = "Foam Roll & Static Stretch"
+                bold_1.color = LegendColor.warning_light
+                tile_1.bold_text.append(bold_1)
+                tile_1.statistic_text = statistic_text
+                tile_1.bold_statistic_text = bold_statistic_text
+                # tile_1.trigger_type = t.trigger_type
+                tiles.append(tile_1)
+        return tiles
+
+    def get_weak_underactive_trigger_tiles(self, body_part_sides):
+
+        care_fss_body_parts = set()
+        tiles = []
+        statistic_text = ""
+        bold_statistic_text = []
+        mobilize_suffix = "to improve strength deficiencies indicated by your biomechanics"
+        sideless_body_parts = [b.body_part_location for b in body_part_sides]
+        sideless_body_parts = list(set(sideless_body_parts))
+
+        for body_part_side in sideless_body_parts:
+            tile_1 = TriggerTile()
+            body_part_text_1, is_plural_1 = self.get_title_text_for_body_parts([body_part_side], 0)
+            if len(body_part_text_1) == 0:
+                body_part_text_1 = "PRIME MOVER"
+            if body_part_text_1 not in care_fss_body_parts:
+                care_fss_body_parts.add(body_part_text_1)
+                tile_1.text = "Foam Roll & Static Stretch your " + body_part_text_1
+                tile_1.description = mobilize_suffix
+                bold_1 = BoldText()
+                bold_1.text = "Foam Roll & Static Stretch"
+                bold_1.color = LegendColor.splash_light
+                tile_1.bold_text.append(bold_1)
+                tile_1.statistic_text = statistic_text
+                tile_1.bold_statistic_text = bold_statistic_text
+                # tile_1.trigger_type = t.trigger_type
+                tiles.append(tile_1)
+        return tiles
+
+    def get_tight_muscle_spasm_trigger_tiles(self, body_part_sides):
+
+        care_fss_body_parts = set()
+        tiles = []
+        statistic_text = ""
+        bold_statistic_text = []
+        mobilize_suffix = "to improve tissue range of motion"
+        sideless_body_parts = [b.body_part_location for b in body_part_sides]
+        sideless_body_parts = list(set(sideless_body_parts))
+
+        for body_part_side in sideless_body_parts:
+            tile_1 = TriggerTile()
+            body_part_text_1, is_plural_1 = self.get_title_text_for_body_parts([body_part_side], 0)
+            if len(body_part_text_1) == 0:
+                body_part_text_1 = "PRIME MOVER"
+            if body_part_text_1 not in care_fss_body_parts:
+                care_fss_body_parts.add(body_part_text_1)
+                tile_1.text = "Foam Roll & Static Stretch your " + body_part_text_1
+                tile_1.description = mobilize_suffix
+                bold_1 = BoldText()
+                bold_1.text = "Foam Roll & Static Stretch"
+                bold_1.color = LegendColor.warning_x_light
+                tile_1.bold_text.append(bold_1)
+                tile_1.statistic_text = statistic_text
+                tile_1.bold_statistic_text = bold_statistic_text
+                # tile_1.trigger_type = t.trigger_type
+                tiles.append(tile_1)
+        return tiles
+
+    def get_compensation_trigger_tiles(self, body_part_sides):
+
+        care_fss_body_parts = set()
+        tiles = []
+        statistic_text = ""
+        bold_statistic_text = []
+        mobilize_suffix = "to address asymmetric stress resulting from compensations"
+        sideless_body_parts = [b.body_part_location for b in body_part_sides]
+        sideless_body_parts = list(set(sideless_body_parts))
+
+        for body_part_side in sideless_body_parts:
+            tile_1 = TriggerTile()
+            body_part_text_1, is_plural_1 = self.get_title_text_for_body_parts([body_part_side], 0)
+            if len(body_part_text_1) == 0:
+                body_part_text_1 = "PRIME MOVER"
+            if body_part_text_1 not in care_fss_body_parts:
+                care_fss_body_parts.add(body_part_text_1)
+                tile_1.text = "Foam Roll & Stretch your " + body_part_text_1
+                tile_1.description = mobilize_suffix
+                bold_2 = BoldText()
+                bold_2.text = "Foam Roll & Stretch"
+                bold_2.color = LegendColor.splash_x_light
+                tile_1.bold_text.append(bold_2)
+                tile_1.statistic_text = statistic_text
+                tile_1.bold_statistic_text = bold_statistic_text
+                #tile_1.trigger_type = t.trigger_type
+                tiles.append(tile_1)
+
+        return tiles
+
+    def get_inflamed_trigger_tiles(self, body_part_sides):
+
+        care_fss_body_parts = set()
+        tiles = []
+        statistic_text = ""
+        bold_statistic_text = []
+        mobilize_suffix = "to minimize compensations resulting from likely inflammation"
+        sideless_body_parts = [b.body_part_location for b in body_part_sides]
+        sideless_body_parts = list(set(sideless_body_parts))
+
+        for body_part_side in sideless_body_parts:
+            tile_1 = TriggerTile()
+            body_part_text_1, is_plural_1 = self.get_title_text_for_body_parts([body_part_side], 0)
+            if len(body_part_text_1) == 0:
+                body_part_text_1 = "PRIME MOVER"
+            if body_part_text_1 not in care_fss_body_parts:
+                care_fss_body_parts.add(body_part_text_1)
+                tile_1.text = "Foam Roll & Stretch your " + body_part_text_1
+                tile_1.description = mobilize_suffix
+                bold_2 = BoldText()
+                bold_2.text = "Foam Roll & Stretch"
+                bold_2.color = LegendColor.warning_light
+                tile_1.bold_text.append(bold_2)
+                tile_1.statistic_text = statistic_text
+                tile_1.bold_statistic_text = bold_statistic_text
+                #tile_1.trigger_type = t.trigger_type
+                tiles.append(tile_1)
+
+        return tiles
+
+    def get_excessive_strain_trigger_tiles(self, body_part_sides, is_moderate):
+
+        care_fss_body_parts = set()
+        tiles = []
+        statistic_text = ""
+        bold_statistic_text = []
+        mobilize_suffix = "to increase blood flow & expedite healing after unaccustomed loading"
+        sideless_body_parts = [b.body_part_location for b in body_part_sides]
+        sideless_body_parts = list(set(sideless_body_parts))
+
+        for body_part_side in sideless_body_parts:
+            tile_1 = TriggerTile()
+            body_part_text_1, is_plural_1 = self.get_title_text_for_body_parts([body_part_side], 0)
+            if len(body_part_text_1) == 0:
+                body_part_text_1 = "PRIME MOVER"
+            if body_part_text_1 not in care_fss_body_parts:
+                care_fss_body_parts.add(body_part_text_1)
+                tile_1.text = "Mobilize muscles used in " + body_part_text_1
+                tile_1.description = mobilize_suffix
+                bold_2 = BoldText()
+                bold_2.text = "Mobilize muscles"
+                if is_moderate:
+                    bold_2.color = LegendColor.splash_xx_light
+                else:
+                    bold_2.color = LegendColor.splash_light
+                tile_1.bold_text.append(bold_2)
+                tile_1.statistic_text = statistic_text
+                tile_1.bold_statistic_text = bold_statistic_text
+                # tile_1.trigger_type = t.trigger_type
+                tiles.append(tile_1)
+
+        return tiles
 
     def get_trigger_tiles(self, trigger_list):
 
