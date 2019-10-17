@@ -10,7 +10,7 @@ from models.athlete_trend import TriggerTile
 from models.sport import SportName
 from logic.goal_focus_text_generator import RecoveryTextGenerator
 from math import ceil
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 
 class TrendProcessor(object):
@@ -429,24 +429,24 @@ class TrendProcessor(object):
         excessive_strain_nfo = []
         compensating = []
 
-        last_date_time = two_days_ago.date()
+        last_date_time = self.event_date_time - timedelta(days=1)
 
         for body_part_side, body_part_injury_risk in self.injury_hist_dict.items():
 
-            if (body_part_injury_risk.last_excess_strain_date is not None and
+            if (body_part_injury_risk.last_excessive_strain_date is not None and
                     body_part_injury_risk.last_non_functional_overreaching_date is not None and
-                    body_part_injury_risk.last_excess_strain_date >= two_days_ago and
+                    body_part_injury_risk.last_excessive_strain_date >= two_days_ago and
                     body_part_injury_risk.last_non_functional_overreaching_date >= two_days_ago):
                 excessive_strain_nfo.append(body_part_side)
-                last_date_time = max(body_part_injury_risk.last_excess_strain_date, last_date_time)
-                last_date_time = max(body_part_injury_risk.last_non_functional_overreaching_date, last_date_time)
-            if (body_part_injury_risk.last_excess_strain_date is not None and
+                last_date_time = max(datetime.combine(body_part_injury_risk.last_excessive_strain_date, datetime.min.time()), last_date_time)
+                last_date_time = max(datetime.combine(body_part_injury_risk.last_non_functional_overreaching_date, datetime.min.time()), last_date_time)
+            if (body_part_injury_risk.last_excessive_strain_date is not None and
                     body_part_injury_risk.last_functional_overreaching_date is not None and
-                    body_part_injury_risk.last_excess_strain_date >= two_days_ago and
+                    body_part_injury_risk.last_excessive_strain_date >= two_days_ago and
                     body_part_injury_risk.last_functional_overreaching_date >= two_days_ago):
                 excessive_strain_fo.append(body_part_side)
-                last_date_time = max(body_part_injury_risk.last_excess_strain_date, last_date_time)
-                last_date_time = max(body_part_injury_risk.last_functional_overreaching_date, last_date_time)
+                last_date_time = max(datetime.combine(body_part_injury_risk.last_excessive_strain_date, datetime.min.time()), last_date_time)
+                last_date_time = max(datetime.combine(body_part_injury_risk.last_functional_overreaching_date, datetime.min.time()), last_date_time)
             if body_part_injury_risk.is_compensating:
                 compensating.append(body_part_side)
                 last_date_time = max(self.event_date_time, last_date_time)
@@ -467,9 +467,9 @@ class TrendProcessor(object):
             recovery_data.remove_duplicates()
             trend_data.data = [recovery_data]
 
-            trend.trigger_tiles.extend(self.get_trigger_tiles(excessive_strain_nfo))
-            trend.trigger_tiles.extend(self.get_trigger_tiles(compensating))
-            trend.trigger_tiles.extend(self.get_trigger_tiles(excessive_strain_fo))
+            # trend.trigger_tiles.extend(self.get_trigger_tiles(excessive_strain_nfo))
+            # trend.trigger_tiles.extend(self.get_trigger_tiles(compensating))
+            # trend.trigger_tiles.extend(self.get_trigger_tiles(excessive_strain_fo))
 
             trend.trend_data = trend_data
 
@@ -622,8 +622,8 @@ class TrendProcessor(object):
             care_data.remove_duplicates()
             trend_data.data = [care_data]
 
-            trend.trigger_tiles.extend(self.get_trigger_tiles(inflamed))
-            trend.trigger_tiles.extend(self.get_trigger_tiles(muscle_spasm_tight))
+            # trend.trigger_tiles.extend(self.get_trigger_tiles(inflamed))
+            # trend.trigger_tiles.extend(self.get_trigger_tiles(muscle_spasm_tight))
 
             # rank triggers
             #sorted_triggers = sorted(all_triggers, key=lambda x: (x.created_date_time, x.priority), reverse=True)
@@ -662,8 +662,8 @@ class TrendProcessor(object):
                     body_part_injury_risk.last_short_date == self.event_date_time.date() and
                     body_part_injury_risk.last_muscle_spasm_date == self.event_date_time.date()):
                 short_non_adhesions.append(body_part_side)
-            if (body_part_injury_risk.last_overactice_date is not None and
-                    body_part_injury_risk.last_overactice_date == self.event_date_time.date()):
+            if (body_part_injury_risk.last_overactive_date is not None and
+                    body_part_injury_risk.last_overactive_date == self.event_date_time.date()):
                 overactive.append(body_part_side)
             if (body_part_injury_risk.last_underactive_date is not None and
                     body_part_injury_risk.last_weak_date is not None and
@@ -697,11 +697,11 @@ class TrendProcessor(object):
             prevention_data.remove_duplicates()
             trend_data.data = [prevention_data]
 
-            trend.trigger_tiles.extend(self.get_trigger_tiles(underactive_weak))
-            trend.trigger_tiles.extend(self.get_trigger_tiles(underactive_inhibited))
-            trend.trigger_tiles.extend(self.get_trigger_tiles(overactive))
-            trend.trigger_tiles.extend(self.get_trigger_tiles(short_adhesions))
-            trend.trigger_tiles.extend(self.get_trigger_tiles(short_non_adhesions))
+            # trend.trigger_tiles.extend(self.get_trigger_tiles(underactive_weak))
+            # trend.trigger_tiles.extend(self.get_trigger_tiles(underactive_inhibited))
+            # trend.trigger_tiles.extend(self.get_trigger_tiles(overactive))
+            # trend.trigger_tiles.extend(self.get_trigger_tiles(short_adhesions))
+            # trend.trigger_tiles.extend(self.get_trigger_tiles(short_non_adhesions))
 
             # rank triggers
             #sorted_triggers = sorted(all_triggers, key=lambda x: (x.created_date_time, x.priority), reverse=True)

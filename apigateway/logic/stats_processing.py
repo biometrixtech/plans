@@ -15,6 +15,8 @@ from models.post_session_survey import PostSessionSurvey
 from models.data_series import DataSeries
 from models.asymmetry import HistoricAsymmetry, AsymmetryType
 from utils import parse_date, format_date
+from logic.injury_risk_processing import InjuryRiskProcessor
+from models.athlete_injury_risk import AthleteInjuryRisk
 
 
 class StatsProcessing(object):
@@ -25,6 +27,7 @@ class StatsProcessing(object):
         self.athlete_stats_datastore = datastore_collection.athlete_stats_datastore
         self.daily_plan_datastore = datastore_collection.daily_plan_datastore
         self.cleared_soreness_datastore = datastore_collection.cleared_soreness_datastore
+        self.injury_risk_datastore = datastore_collection.injury_risk_datastore
         self.start_date = None
         self.end_date = None
         self.start_date_time = None
@@ -84,7 +87,7 @@ class StatsProcessing(object):
         return True
 
     @xray_recorder.capture('logic.StatsProcessing.process_athlete_stats')
-    def process_athlete_stats(self, current_athlete_stats=None):
+    def process_athlete_stats(self, current_athlete_stats=None, force_historical_process=False):
         if self.start_date is None:
             self.set_start_end_times()
         self.load_historical_data()
@@ -185,6 +188,18 @@ class StatsProcessing(object):
             # persist all of soreness/pain and session_RPE
             current_athlete_stats.session_RPE = current_athlete_stats.session_RPE
             current_athlete_stats.session_RPE_event_date = current_athlete_stats.session_RPE_event_date
+        elif force_historical_process:
+            # New
+            historical_injury_risk_dict = self.injury_risk_datastore.get(self.athlete_id)
+            injury_risk_processor = InjuryRiskProcessor(self.event_date, soreness_list_25, sessions,
+                                                        historical_injury_risk_dict, current_athlete_stats.load_stats)
+            injury_risk_processor.process(update_historical_data=True)
+
+            athlete_injury_risk = AthleteInjuryRisk(self.athlete_id)
+            athlete_injury_risk.items = injury_risk_processor.injury_risk_dict
+
+            self.injury_risk_datastore.put(athlete_injury_risk)
+
         else:  # nightly process (first update for the day)
             # clear these if it's a new day
             current_athlete_stats.session_RPE = None
@@ -224,6 +239,17 @@ class StatsProcessing(object):
 
             if not found:
                 current_athlete_stats.muscular_strain.append(most_recent_muscular_strain)
+
+            # New
+            historical_injury_risk_dict = self.injury_risk_datastore.get(self.athlete_id)
+            injury_risk_processor = InjuryRiskProcessor(self.event_date, soreness_list_25, sessions,
+                                                        historical_injury_risk_dict, current_athlete_stats.load_stats)
+            injury_risk_processor.process(update_historical_data=True)
+
+            athlete_injury_risk = AthleteInjuryRisk(self.athlete_id)
+            athlete_injury_risk.items = injury_risk_processor.injury_risk_dict
+
+            self.injury_risk_datastore.put(athlete_injury_risk)
 
             # training_volume_processing.fill_load_monitoring_measures(self.all_daily_readiness_surveys, self.all_plans, parse_date(self.event_date))
             # current_athlete_stats.muscular_strain_increasing = training_volume_processing.muscular_strain_increasing()

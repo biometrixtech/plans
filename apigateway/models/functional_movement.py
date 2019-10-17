@@ -591,7 +591,7 @@ class SessionFunctionalMovement(object):
                         self.injury_risk_dict[
                             body_part_side].compensation_source = CompensationSource.movement_patterns_3s
 
-    def process(self, event_date):
+    def process(self, event_date, load_stats):
         activity_factory = ActivityFunctionalMovementFactory()
         movement_factory = FunctionalMovementFactory()
 
@@ -626,8 +626,11 @@ class SessionFunctionalMovement(object):
                     m.antagonists.append(functional_movement_body_part_side)
 
             # TODO - change with total volume
-            m.attribute_training_volume(self.session.duration_minutes * self.session.session_RPE, highest_concentric_eccentric_level, self.injury_risk_dict, event_date)
-            m.attribute_intensity(self.session.session_RPE, highest_concentric_eccentric_level, self.injury_risk_dict, event_date)
+            #m.attribute_training_volume(self.session.duration_minutes * self.session.session_RPE,
+            #                            highest_concentric_eccentric_level, self.injury_risk_dict, event_date)
+            m.attribute_training_volume(self.session.training_volume(load_stats), highest_concentric_eccentric_level, self.injury_risk_dict, event_date)
+            if self.session.session_RPE is not None:
+                m.attribute_intensity(self.session.session_RPE, highest_concentric_eccentric_level, self.injury_risk_dict, event_date)
 
         self.aggregate_body_parts()
 

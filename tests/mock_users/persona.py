@@ -66,11 +66,11 @@ class Persona(object):
                 print(today_date)
 
             event_date = event_date + datetime.timedelta(days=1)
-            if not end_today:
-                self.update_stats(event_date)
-            else:
-                if i < days - 1:
-                    self.update_stats(event_date)
+            # if not end_today:
+            #     self.update_stats(event_date)
+            # else:
+            #     if i < days - 1:
+            #         self.update_stats(event_date)
 
         # if not end_today:
         #     self.update_stats(event_date)
