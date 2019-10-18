@@ -28,8 +28,8 @@ class FunctionalAnatomyProcessor(object):
             return [46, 47, 48, 55, 56, 57, 58, 62]
         elif joint_value == BodyPartLocation.hip.value:
             return [45, 47, 48, 49, 50, 51, 52, 53, 54, 58, 59, 60, 61, 62, 63, 64, 65, 66]
-        elif joint_value == BodyPartLocation.lower_back.value:
-            return [45, 47, 48, 49, 50, 51, 52, 53, 54, 58, 59, 60, 61, 62, 63, 64, 65, 66]
+        # elif joint_value == BodyPartLocation.lower_back.value:
+        #     return [45, 47, 48, 49, 50, 51, 52, 53, 54, 58, 59, 60, 61, 62, 63, 64, 65, 66]
         else:
             return []
 
@@ -46,13 +46,13 @@ class FunctionalAnatomyProcessor(object):
         elif body_part_value in [BodyPartLocation.calves.value, BodyPartLocation.soleus.value, BodyPartLocation.gastrocnemius.value]:
             return [9, 10]
         elif body_part_value == BodyPartLocation.hamstrings.value:
-            return [4, 7, 12]
+            return [4, 7]
         elif body_part_value == BodyPartLocation.bicep_femoris_long_head.value:
-            return [4, 12]
+            return [4]
         elif body_part_value == BodyPartLocation.bicep_femoris_short_head.value:
             return [7]
         elif body_part_value in [BodyPartLocation.semimembranosus.value, BodyPartLocation.semitendinosus.value]:
-            return [4, 7, 12]
+            return [4, 7]
         elif body_part_value in [BodyPartLocation.groin.value,
                                  BodyPartLocation.adductor_longus.value,
                                  BodyPartLocation.adductor_magnus_anterior_fibers.value,
@@ -60,9 +60,9 @@ class FunctionalAnatomyProcessor(object):
                                  BodyPartLocation.adductor_brevis.value,
                                  BodyPartLocation.gracilis.value,
                                  BodyPartLocation.pectineus.value]:
-            return [4, 12]
+            return [4]
         elif body_part_value in [BodyPartLocation.quads.value, BodyPartLocation.rectus_femoris.value]:
-            return [4, 7, 12]
+            return [4, 7]
         elif body_part_value in [BodyPartLocation.vastus_lateralis.value,
                                  BodyPartLocation.vastus_medialis.value,
                                  BodyPartLocation.vastus_intermedius.value]:
@@ -70,16 +70,16 @@ class FunctionalAnatomyProcessor(object):
         elif body_part_value in [BodyPartLocation.hip_flexor.value,
                                  BodyPartLocation.tensor_fascia_latae.value,
                                  BodyPartLocation.piriformis.value]:
-            return [4, 12]
+            return [4]
         elif body_part_value in [BodyPartLocation.core_stabilizers.value, BodyPartLocation.sartorius.value]:
-            return [4, 7, 12]
+            return [4, 7]
         elif body_part_value == BodyPartLocation.iliopsoas.value:
-            return [4, 12]
+            return [4]
         elif body_part_value in [BodyPartLocation.glutes.value,
                                  BodyPartLocation.gluteus_medius_anterior_fibers.value,
                                  BodyPartLocation.gluteus_medius_posterior_fibers.value,
                                  BodyPartLocation.gluteus_minimus.value,
                                  BodyPartLocation.gluteus_maximus.value]:
-            return [4, 12]
+            return [4]
         else:
             return []

@@ -80,7 +80,6 @@ class BodyPartLocation(Enum):
     triceps = 23
     forearm = 24
     core_stabilizers = 25
-    erector_spinae = 26
 
     it_band_lateral_knee = 27
     hip_flexor = 28
@@ -133,6 +132,11 @@ class BodyPartLocation(Enum):
     # popliteus = 68
     # lateral_rotators = 69
 
+    # lower_back
+    quadratus_lumorum = 70
+    erector_spinae = 26
+
+
     upper_body = 91
     lower_body = 92
     full_body = 93
@@ -174,9 +178,10 @@ class BodyPartLocation(Enum):
             cls.deltoid: [],
             cls.chest: [],
             cls.upper_back_neck: [],
-            cls.erector_spinae: [],
+            # cls.erector_spinae: [],
             cls.lats: [],
-            cls.abdominals: []
+            cls.abdominals: [],
+            cls.lower_back: [cls.erector_spinae, cls.quadratus_lumorum]
         }
         return grouped_muscles
 
