@@ -4,9 +4,8 @@ from models.soreness_base import BodyPartSide, BodyPartLocation
 from models.functional_movement import BodyPartInjuryRisk, SessionFunctionalMovement
 from models.body_parts import BodyPart, BodyPartFactory
 from copy import deepcopy
-import statistics
-import math
-
+from datastores.session_datastore import SessionDatastore
+from utils import format_date
 
 class InjuryRiskProcessor(object):
     def __init__(self, event_date_time, symptoms_list, training_session_list, injury_risk_dict, load_stats, user_id):
@@ -99,7 +98,7 @@ class InjuryRiskProcessor(object):
         dates = []
         dates.extend([s.event_date.date() for s in last_20_days_sessions])
 
-        for body_part_side, body_part_injury_risk in injury_risk_dict:
+        for body_part_side, body_part_injury_risk in injury_risk_dict.items():
             injury_risk_dict[body_part_side].overactive_count_0_20_days = 0
             injury_risk_dict[body_part_side].underactive_inhibited_count_0_20_days = 0
             injury_risk_dict[body_part_side].underactive_weak_count_0_20_days = 0
@@ -234,8 +233,12 @@ class InjuryRiskProcessor(object):
             daily_sessions = [n for n in self.training_sessions if n.event_date.date() == d]
 
             for session in daily_sessions:
-                session_functional_movement = SessionFunctionalMovement(session, injury_risk_dict, self.user_id)
-                session_functional_movement.process(d, load_stats)
+                session_functional_movement = SessionFunctionalMovement(session, injury_risk_dict)
+                current_session = session_functional_movement.process(d, load_stats)
+
+                # save all updates from processing back to the session - TODO: make sure this is the best place/time to save this info
+                session_datastore = SessionDatastore()
+                session_datastore.update(current_session, self.user_id, format_date(d))
 
                 for b in session_functional_movement.body_parts:
 
@@ -325,22 +328,21 @@ class InjuryRiskProcessor(object):
         daily_sessions = [n for n in self.training_sessions if n.event_date.date() == base_date]
 
         #reset
-        for session in daily_sessions:
-            session_functional_movement = SessionFunctionalMovement(session, injury_risk_dict, self.user_id)
-            session_functional_movement.process(base_date, load_stats)
-            for b in session_functional_movement.body_parts:
+        for body_part_side, body_part_injury_risk in injury_risk_dict.items():
 
-                if b.body_part_side not in injury_risk_dict:
-                    injury_risk_dict[b.body_part_side] = BodyPartInjuryRisk()
-
-                injury_risk_dict[b.body_part_side].eccentric_volume_today =0
-                injury_risk_dict[b.body_part_side].concentric_volume_today =0
-                injury_risk_dict[b.body_part_side].is_compensating = False
-                injury_risk_dict[b.body_part_side].compensating_source = None
+            injury_risk_dict[body_part_side].eccentric_volume_today = 0
+            injury_risk_dict[body_part_side].concentric_volume_today = 0
+            injury_risk_dict[body_part_side].is_compensating = False
+            injury_risk_dict[body_part_side].compensating_source = None
 
         for session in daily_sessions:
-            session_functional_movement = SessionFunctionalMovement(session, injury_risk_dict, self.user_id)
-            session_functional_movement.process(base_date, load_stats)
+            session_functional_movement = SessionFunctionalMovement(session, injury_risk_dict)
+            current_session = session_functional_movement.process(base_date, load_stats)
+
+            # save all updates from processing back to the session - TODO: make sure this is the best place/time to save this info
+            session_datastore = SessionDatastore()
+            session_datastore.update(current_session, self.user_id, format_date(base_date))
+
             for b in session_functional_movement.body_parts:
 
                 if b.body_part_side not in injury_risk_dict:

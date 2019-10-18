@@ -832,11 +832,13 @@ class ActiveRest(ModalityBase):
 
         is_short = False
 
-        if (body_part_injury_risk.last_adhesions_date is not None and
-                body_part_injury_risk.last_adhesions_date == self.event_date_time.date()):
+        if body_part_injury_risk.knots_count_last_0_20_days >= 3:
             is_short = True
-        if (body_part_injury_risk.last_short_date is not None and
-                body_part_injury_risk.last_short_date == self.event_date_time.date()):
+        elif body_part_injury_risk.tight_count_last_0_20_days >= 3:
+            is_short = True
+        if body_part_injury_risk.sharp_count_last_0_20_days >= 3:
+            is_short = True
+        if body_part_injury_risk.ache_count_last_0_20_days >= 4:
             is_short = True
         return is_short
 
@@ -844,7 +846,7 @@ class ActiveRest(ModalityBase):
 
         is_overactive = False
 
-        if body_part_injury_risk.overactive_count_0_20_days >= 3:
+        if body_part_injury_risk.overactive_count_last_0_20_days >= 3:
             is_overactive = True
         return is_overactive
 
@@ -852,7 +854,7 @@ class ActiveRest(ModalityBase):
 
         is_underactive_weak = False
 
-        if body_part_injury_risk.underactive_weak_count_0_20_days >= 3:
+        if body_part_injury_risk.underactive_weak_count_last_0_20_days >= 3:
             is_underactive_weak = True
 
         return is_underactive_weak
@@ -861,7 +863,7 @@ class ActiveRest(ModalityBase):
 
         is_underactive_inhibited = False
 
-        if body_part_injury_risk.underactive_inhibited_count_0_20_days >= 3:
+        if body_part_injury_risk.underactive_inhibited_count_last_0_20_days >= 3:
             is_underactive_inhibited = True
 
         return is_underactive_inhibited

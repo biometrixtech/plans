@@ -5,7 +5,7 @@ from models.soreness_base import BodyPartSide, BodyPartLocation
 from models.body_parts import BodyPart, BodyPartFactory
 from datetime import timedelta, date
 from utils import format_date, parse_date
-from datastores.session_datastore import SessionDatastore
+
 
 class FunctionalMovementType(Enum):
     ankle_dorsiflexion = 0
@@ -496,12 +496,11 @@ class BodyPartFunctionalMovement(object):
 
 
 class SessionFunctionalMovement(object):
-    def __init__(self, session, injury_risk_dict, user_id):
+    def __init__(self, session, injury_risk_dict):
         self.body_parts = []
         self.session = session
         self.functional_movement_mappings = []
         self.injury_risk_dict = injury_risk_dict
-        self.user_id = user_id
 
     def process_anc_and_muscle_imbalance(self, event_date):
 
@@ -512,9 +511,6 @@ class SessionFunctionalMovement(object):
 
             # Right
             self.process_apt_ankle_side(event_date, 2)
-
-            session_datastore = SessionDatastore()
-            session_datastore.update(self.session, self.user_id, event_date)
 
     def process_apt_ankle_side(self, event_date, side):
 
@@ -728,6 +724,8 @@ class SessionFunctionalMovement(object):
                 m.attribute_intensity(self.session.session_RPE, highest_concentric_eccentric_level, self.injury_risk_dict, event_date)
 
         self.aggregate_body_parts()
+
+        return self.session
 
     def aggregate_body_parts(self):
 
