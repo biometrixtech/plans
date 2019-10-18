@@ -352,6 +352,7 @@ def handle_session_three_sensor_data(user_id):
             plan.training_sessions[s].duration_sensor = duration
             plan.training_sessions[s].duration_minutes = duration_minutes
             plan.training_sessions[s].asymmetry = session_obj.asymmetry
+            plan.training_sessions[s].movement_patterns = session_obj.movement_patterns
             found = True
             break
 
