@@ -167,6 +167,9 @@ class InjuryRiskProcessor(object):
 
         for d in combined_dates:
 
+            if d==self.event_date_time.date():
+                p=0
+
             seven_days_ago = d - timedelta(days=6)
             fourteeen_days_ago = d - timedelta(days=13)
 
@@ -209,6 +212,9 @@ class InjuryRiskProcessor(object):
                     concentric_volume_dict = self.concentric_volume_dict[b.body_part_side]
                     total_volume_dict = self.total_volume_dict[b.body_part_side]
 
+                    injury_risk_dict[b.body_part_side].is_compensating = b.is_compensating
+                    injury_risk_dict[b.body_part_side].compensating_source = b.compensation_source
+
                     last_week_eccentric_volume_dict = dict(
                         filter(lambda elem: fourteeen_days_ago <= elem[0] < seven_days_ago, eccentric_volume_dict.items()))
 
@@ -240,7 +246,7 @@ class InjuryRiskProcessor(object):
 
                     last_week_eccentric_volume = sum(last_week_eccentric_volume_dict.values())
                     last_week_concentric_volume = sum(last_week_concentric_volume_dict.values())
-                    ast_week_total_volume = sum(last_week_total_volume_dict.values())
+                    last_week_total_volume = sum(last_week_total_volume_dict.values())
 
                     todays_eccentric_volume = sum(today_eccentric_volume_dict.values())
                     todays_concentric_volume = sum(today_concentric_volume_dict.values())
@@ -252,29 +258,29 @@ class InjuryRiskProcessor(object):
                     ecc_t_score = 0
                     total_t_score = 0
 
-                    all_ecc_values = []
-                    all_ecc_values.extend(last_week_eccentric_volume_dict.values())
-                    all_ecc_values.extend(current_week_eccentric_volume_dict.values())
-                    all_ecc_values.append(todays_eccentric_volume)
-                    all_ecc_values = [a for a in all_ecc_values if a > 0]
-                    if len(all_ecc_values) >= 3:
-                        current_ecc_std = statistics.stdev(all_ecc_values)
-                        current_ecc_avg = statistics.mean(all_ecc_values)
-                        if current_ecc_std != 0:
-                            ecc_t_score = (todays_eccentric_volume - current_ecc_avg) / (current_ecc_std/math.sqrt(len(all_ecc_values)))
-                            injury_risk_dict[b.body_part_side].ecc_volume_obs = len(all_ecc_values)
-                            injury_risk_dict[b.body_part_side].ecc_stddev = current_ecc_std
-                            injury_risk_dict[b.body_part_side].ecc_mean = current_ecc_avg
-                            if ecc_t_score >= 2:
-                                j=0
-                            if self.is_1_significant(ecc_t_score, len(all_ecc_values)):
-                                injury_risk_dict[b.body_part_side].last_excessive_strain_date = d
-                                injury_risk_dict[b.body_part_side].last_inhibited_date = d
-                                injury_risk_dict[b.body_part_side].last_non_functional_overreaching_date = d
-                            elif self.is_2_significant(ecc_t_score, len(all_ecc_values)):
-                                injury_risk_dict[b.body_part_side].last_excessive_strain_date = d
-                                injury_risk_dict[b.body_part_side].last_inhibited_date = d
-                                injury_risk_dict[b.body_part_side].last_functional_overreaching_date = d
+                    # all_ecc_values = []
+                    # all_ecc_values.extend(last_week_eccentric_volume_dict.values())
+                    # all_ecc_values.extend(current_week_eccentric_volume_dict.values())
+                    # all_ecc_values.append(todays_eccentric_volume)
+                    # all_ecc_values = [a for a in all_ecc_values if a > 0]
+                    # if len(all_ecc_values) >= 3:
+                    #     current_ecc_std = statistics.stdev(all_ecc_values)
+                    #     current_ecc_avg = statistics.mean(all_ecc_values)
+                    #     if current_ecc_std != 0:
+                    #         #ecc_t_score = (todays_eccentric_volume - current_ecc_avg) / (current_ecc_std/math.sqrt(len(all_ecc_values)))
+                    #         ecc_t_score = (todays_eccentric_volume - current_ecc_avg) / current_ecc_std
+                    #
+                    #         injury_risk_dict[b.body_part_side].ecc_volume_obs = len(all_ecc_values)
+                    #         injury_risk_dict[b.body_part_side].ecc_stddev = current_ecc_std
+                    #         injury_risk_dict[b.body_part_side].ecc_mean = current_ecc_avg
+                    #         if ecc_t_score >= 2:
+                    #             injury_risk_dict[b.body_part_side].last_excessive_strain_date = d
+                    #             injury_risk_dict[b.body_part_side].last_inhibited_date = d
+                    #             injury_risk_dict[b.body_part_side].last_non_functional_overreaching_date = d
+                    #         elif ecc_t_score >= 1:
+                    #             injury_risk_dict[b.body_part_side].last_excessive_strain_date = d
+                    #             injury_risk_dict[b.body_part_side].last_inhibited_date = d
+                    #             injury_risk_dict[b.body_part_side].last_functional_overreaching_date = d
 
                     # all_total_values = []
                     # all_total_values.extend(last_week_total_volume_dict.values())
@@ -312,23 +318,23 @@ class InjuryRiskProcessor(object):
                     injury_risk_dict[b.body_part_side].concentric_volume_last_week = last_week_concentric_volume
                     injury_risk_dict[b.body_part_side].concentric_volume_today = todays_concentric_volume
 
-                    # eccentric_volume_ramp = injury_risk_dict[b.body_part_side].eccentric_volume_ramp()
-                    # total_volume_ramp = injury_risk_dict[b.body_part_side].total_volume_ramp()
+                    eccentric_volume_ramp = injury_risk_dict[b.body_part_side].eccentric_volume_ramp()
+                    total_volume_ramp = injury_risk_dict[b.body_part_side].total_volume_ramp()
 
-                    # if eccentric_volume_ramp > 1.0 or total_volume_ramp > 1.0:
-                    #     injury_risk_dict[b.body_part_side].last_excessive_strain_date = d
-                    #     #injury_risk_dict[b.body_part_side].last_inflammation_date = d
-                    #     injury_risk_dict[b.body_part_side].last_inhibited_date = d
-                    #
-                    # if 1.0 < eccentric_volume_ramp <= 1.05:
-                    #     injury_risk_dict[b.body_part_side].last_functional_overreaching_date = d
-                    # elif 1.05 < eccentric_volume_ramp:
-                    #     injury_risk_dict[b.body_part_side].last_non_functional_overreaching_date = d
-                    #
-                    # if 1.0 < total_volume_ramp <= 1.1:
-                    #     injury_risk_dict[b.body_part_side].last_functional_overreaching_date = d
-                    # elif 1.1 < total_volume_ramp:
-                    #     injury_risk_dict[b.body_part_side].last_non_functional_overreaching_date = d
+                    if eccentric_volume_ramp > 1.0 or total_volume_ramp > 1.0:
+                        injury_risk_dict[b.body_part_side].last_excessive_strain_date = d
+                        #injury_risk_dict[b.body_part_side].last_inflammation_date = d
+                        injury_risk_dict[b.body_part_side].last_inhibited_date = d
+
+                    if 1.0 < eccentric_volume_ramp <= 1.05:
+                        injury_risk_dict[b.body_part_side].last_functional_overreaching_date = d
+                    elif 1.05 < eccentric_volume_ramp:
+                        injury_risk_dict[b.body_part_side].last_non_functional_overreaching_date = d
+
+                    elif 1.0 < total_volume_ramp <= 1.1:
+                        injury_risk_dict[b.body_part_side].last_functional_overreaching_date = d
+                    elif 1.1 < total_volume_ramp:
+                        injury_risk_dict[b.body_part_side].last_non_functional_overreaching_date = d
         return injury_risk_dict
 
     def is_10_significant(self, t_stat, obs):
@@ -487,6 +493,20 @@ class InjuryRiskProcessor(object):
 
         daily_sessions = [n for n in self.training_sessions if n.event_date.date() == base_date]
 
+        #reset
+        for session in daily_sessions:
+            session_functional_movement = SessionFunctionalMovement(session, injury_risk_dict)
+            session_functional_movement.process(base_date, load_stats)
+            for b in session_functional_movement.body_parts:
+
+                if b.body_part_side not in injury_risk_dict:
+                    injury_risk_dict[b.body_part_side] = BodyPartInjuryRisk()
+
+                injury_risk_dict[b.body_part_side].eccentric_volume_today =0
+                injury_risk_dict[b.body_part_side].concentric_volume_today =0
+                injury_risk_dict[b.body_part_side].is_compensating = False
+                injury_risk_dict[b.body_part_side].compensating_source = None
+
         for session in daily_sessions:
             session_functional_movement = SessionFunctionalMovement(session, injury_risk_dict)
             session_functional_movement.process(base_date, load_stats)
@@ -500,21 +520,22 @@ class InjuryRiskProcessor(object):
                 injury_risk_dict[b.body_part_side].is_compensating = b.is_compensating
                 injury_risk_dict[b.body_part_side].compensating_source = b.compensation_source
 
-                if injury_risk_dict[b.body_part_side].ecc_volume_obs >= 2:
-                    if injury_risk_dict[b.body_part_side].ecc_stddev != 0:
-                        ecc_t_score = (injury_risk_dict[b.body_part_side].eccentric_volume_today - injury_risk_dict[b.body_part_side].ecc_mean) / (
-                                injury_risk_dict[b.body_part_side].ecc_stddev / math.sqrt(injury_risk_dict[b.body_part_side].ecc_volume_obs))
-
-                        if ecc_t_score >=2:
-                            k=0
-                        if self.is_1_significant(ecc_t_score, injury_risk_dict[b.body_part_side].ecc_volume_obs+1):
-                            injury_risk_dict[b.body_part_side].last_excessive_strain_date = base_date
-                            injury_risk_dict[b.body_part_side].last_inhibited_date = base_date
-                            injury_risk_dict[b.body_part_side].last_non_functional_overreaching_date = base_date
-                        elif self.is_2_significant(ecc_t_score, injury_risk_dict[b.body_part_side].ecc_volume_obs+1):
-                            injury_risk_dict[b.body_part_side].last_excessive_strain_date = base_date
-                            injury_risk_dict[b.body_part_side].last_inhibited_date = base_date
-                            injury_risk_dict[b.body_part_side].last_functional_overreaching_date = base_date
+                # if injury_risk_dict[b.body_part_side].ecc_volume_obs >= 2:
+                #     if injury_risk_dict[b.body_part_side].ecc_stddev != 0:
+                #         # ecc_t_score = (injury_risk_dict[b.body_part_side].eccentric_volume_today - injury_risk_dict[b.body_part_side].ecc_mean) / (
+                #         #         injury_risk_dict[b.body_part_side].ecc_stddev / math.sqrt(injury_risk_dict[b.body_part_side].ecc_volume_obs))
+                #         ecc_t_score = (injury_risk_dict[b.body_part_side].eccentric_volume_today - injury_risk_dict[
+                #             b.body_part_side].ecc_mean) / (
+                #                               injury_risk_dict[b.body_part_side].ecc_stddev)
+                #
+                #         if ecc_t_score >=2:
+                #             injury_risk_dict[b.body_part_side].last_excessive_strain_date = base_date
+                #             injury_risk_dict[b.body_part_side].last_inhibited_date = base_date
+                #             injury_risk_dict[b.body_part_side].last_non_functional_overreaching_date = base_date
+                #         elif ecc_t_score >=1:
+                #             injury_risk_dict[b.body_part_side].last_excessive_strain_date = base_date
+                #             injury_risk_dict[b.body_part_side].last_inhibited_date = base_date
+                #             injury_risk_dict[b.body_part_side].last_functional_overreaching_date = base_date
 
                 # if injury_risk_dict[b.body_part_side].total_stddev != 0:
                 #     total_volume_today = injury_risk_dict[b.body_part_side].eccentric_volume_today + injury_risk_dict[b.body_part_side].concentric_volume_today
@@ -530,23 +551,23 @@ class InjuryRiskProcessor(object):
                 #         injury_risk_dict[b.body_part_side].last_inhibited_date = base_date
                 #         injury_risk_dict[b.body_part_side].last_functional_overreaching_date = base_date
 
-                #eccentric_volume_ramp = injury_risk_dict[b.body_part_side].eccentric_volume_ramp()
-                #total_volume_ramp = injury_risk_dict[b.body_part_side].total_volume_ramp()
+                eccentric_volume_ramp = injury_risk_dict[b.body_part_side].eccentric_volume_ramp()
+                total_volume_ramp = injury_risk_dict[b.body_part_side].total_volume_ramp()
 
-                # if eccentric_volume_ramp > 1.0 or total_volume_ramp > 1.0:
-                #     injury_risk_dict[b.body_part_side].last_excessive_strain_date = base_date
-                #     #injury_risk_dict[b.body_part_side].last_inflammation_date = base_date
-                #     injury_risk_dict[b.body_part_side].last_inhibited_date = base_date
-                #
-                # if 1.0 < eccentric_volume_ramp <= 1.05:
-                #     injury_risk_dict[b.body_part_side].last_functional_overreaching_date = base_date
-                # elif 1.05 < eccentric_volume_ramp:
-                #     injury_risk_dict[b.body_part_side].last_non_functional_overreaching_date = base_date
-                #
-                # if 1.0 < total_volume_ramp <= 1.1:
-                #     injury_risk_dict[b.body_part_side].last_functional_overreaching_date = base_date
-                # elif 1.1 < total_volume_ramp:
-                #     injury_risk_dict[b.body_part_side].last_non_functional_overreaching_date = base_date
+                if eccentric_volume_ramp > 1.0 or total_volume_ramp > 1.0:
+                    injury_risk_dict[b.body_part_side].last_excessive_strain_date = base_date
+                    #injury_risk_dict[b.body_part_side].last_inflammation_date = base_date
+                    injury_risk_dict[b.body_part_side].last_inhibited_date = base_date
+
+                if 1.0 < eccentric_volume_ramp <= 1.05:
+                    injury_risk_dict[b.body_part_side].last_functional_overreaching_date = base_date
+                elif 1.05 < eccentric_volume_ramp:
+                    injury_risk_dict[b.body_part_side].last_non_functional_overreaching_date = base_date
+
+                elif 1.0 < total_volume_ramp <= 1.1:
+                    injury_risk_dict[b.body_part_side].last_functional_overreaching_date = base_date
+                elif 1.1 < total_volume_ramp:
+                    injury_risk_dict[b.body_part_side].last_non_functional_overreaching_date = base_date
 
     def process_todays_symptoms(self, base_date, injury_risk_dict):
 
