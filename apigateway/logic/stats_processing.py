@@ -1052,6 +1052,8 @@ class StatsProcessing(object):
 
         soreness_list.extend(readiness_survey_soreness_list)
         soreness_list.extend(ps_survey_soreness_list)
+        for soreness in soreness_list:
+            soreness.severity = SorenessCalculator.get_severity(soreness.severity, soreness.movement)
         #TODO merge within date
         return soreness_list
         # grouped_soreness = {}

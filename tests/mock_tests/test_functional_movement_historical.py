@@ -114,5 +114,4 @@ def test_historical_update_multiple_day_data():
 
     assert len(active_rest[0].inhibit_exercises) > 0
     assert len(active_rest[0].active_stretch_exercises) > 0
-    assert len(active_rest[0].isolated_activate_exercises) > 0
 
