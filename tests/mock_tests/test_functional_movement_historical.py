@@ -64,7 +64,7 @@ def test_historical_update_single_day_data():
     soreness_2.sharp = 2
     soreness_2.reported_date_time = dates[0]
 
-    proc = InjuryRiskProcessor(dates[0], [soreness, soreness_2], sessions, {}, LoadStats())
+    proc = InjuryRiskProcessor(dates[0], [soreness, soreness_2], sessions, {}, LoadStats(), "tester")
     injury_risk_dict = proc.process(update_historical_data=True)
     assert len(injury_risk_dict) > 0
 
@@ -100,11 +100,11 @@ def test_historical_update_multiple_day_data():
     soreness_3.reported_date_time = now_date
 
     # make historical update
-    proc = InjuryRiskProcessor(one_day_ago, [soreness, soreness_2], sessions[:2], {}, LoadStats())
+    proc = InjuryRiskProcessor(one_day_ago, [soreness, soreness_2], sessions[:2], {}, LoadStats(), "tester")
     injury_risk_dict = proc.process(update_historical_data=True)
 
     # update with new information
-    proc = InjuryRiskProcessor(now_date, [soreness_3], [sessions[2]], injury_risk_dict, LoadStats())
+    proc = InjuryRiskProcessor(now_date, [soreness_3], [sessions[2]], injury_risk_dict, LoadStats(), "tester")
     injury_risk_dict = proc.process(aggregate_results=True)
 
     calc = ExerciseAssignmentCalculator(injury_risk_dict, exercise_library_datastore, completed_exercise_datastore,

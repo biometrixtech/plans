@@ -844,8 +844,7 @@ class ActiveRest(ModalityBase):
 
         is_overactive = False
 
-        if (body_part_injury_risk.last_overactive_date is not None and
-                body_part_injury_risk.last_overactive_date == self.event_date_time.date()):
+        if body_part_injury_risk.overactive_count_0_20_days >= 3:
             is_overactive = True
         return is_overactive
 
@@ -853,11 +852,8 @@ class ActiveRest(ModalityBase):
 
         is_underactive_weak = False
 
-        if (body_part_injury_risk.last_underactive_date is not None and
-                body_part_injury_risk.last_underactive_date == self.event_date_time.date()):
-            if (body_part_injury_risk.last_weak_date is not None and
-                    body_part_injury_risk.last_weak_date == self.event_date_time.date()):
-                is_underactive_weak = True
+        if body_part_injury_risk.underactive_weak_count_0_20_days >= 3:
+            is_underactive_weak = True
 
         return is_underactive_weak
 
@@ -865,11 +861,8 @@ class ActiveRest(ModalityBase):
 
         is_underactive_inhibited = False
 
-        if (body_part_injury_risk.last_underactive_date is not None and
-                body_part_injury_risk.last_underactive_date == self.event_date_time.date()):
-            if (body_part_injury_risk.last_inhibited_date is not None and
-                    body_part_injury_risk.last_inhibited_date == self.event_date_time.date()):
-                is_underactive_inhibited = True
+        if body_part_injury_risk.underactive_inhibited_count_0_20_days >= 3:
+            is_underactive_inhibited = True
 
         return is_underactive_inhibited
 

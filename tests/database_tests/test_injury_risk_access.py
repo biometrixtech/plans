@@ -46,7 +46,7 @@ def test_write_injury_risk_dict():
     soreness.tight = 1
     soreness.reported_date_time = dates[0]
 
-    proc = InjuryRiskProcessor(dates[0], [soreness], sessions, {})
+    proc = InjuryRiskProcessor(dates[0], [soreness], sessions, {}, "tester")
     injury_risk_dict = proc.process(update_historical_data=True)
     athlete_injury_risk = AthleteInjuryRisk(user_id)
     athlete_injury_risk.items = injury_risk_dict

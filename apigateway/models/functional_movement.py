@@ -5,7 +5,7 @@ from models.soreness_base import BodyPartSide, BodyPartLocation
 from models.body_parts import BodyPart, BodyPartFactory
 from datetime import timedelta, date
 from utils import format_date, parse_date
-
+from datastores.session_datastore import SessionDatastore
 
 class FunctionalMovementType(Enum):
     ankle_dorsiflexion = 0
@@ -107,12 +107,6 @@ class BodyPartInjuryRisk(object):
         self.eccentric_volume_today = 0
         self.max_concentric_intensity_48_hours = 0
         self.max_eccentric_intensity_48_hours = 0
-        self.total_volume_obs = 0
-        self.total_stddev = 0
-        self.total_mean = 0
-        self.ecc_volume_obs = 0
-        self.ecc_stddev = 0
-        self.ecc_mean = 0
 
         # ache
         self.ache_count_last_0_10_days = 0
@@ -151,6 +145,9 @@ class BodyPartInjuryRisk(object):
         # overactive / underactive
         self.last_overactive_date = None
         self.last_underactive_date = None
+        self.overactive_count_last_0_20_days = 0
+        self.underactive_inhibited_count_last_0_20_days = 0
+        self.underactive_weak_count_last_0_20_days = 0
 
         # sharp
         self.sharp_count_last_0_10_days = 0  
@@ -160,6 +157,7 @@ class BodyPartInjuryRisk(object):
 
         # short
         self.last_short_date = None
+        self.short_count_last_0_20_days = 0
 
         # tight
         self.tight_count_last_0_20_days = 0  # 0-20
@@ -182,12 +180,6 @@ class BodyPartInjuryRisk(object):
                 "eccentric_volume_today": self.eccentric_volume_today,
                 "max_concentric_intensity_48_hours": self.max_concentric_intensity_48_hours,
                 "max_eccentric_intensity_48_hours": self.max_eccentric_intensity_48_hours,
-                "total_volume_obs": self.total_volume_obs,
-                "total_stddev": self.total_stddev,
-                "total_mean": self.total_mean,
-                "ecc_volume_obs": self.ecc_volume_obs,
-                "ecc_stddev": self.ecc_stddev,
-                "ecc_mean": self.ecc_mean,
 
                 # ache
                 "ache_count_last_0_10_days": self.ache_count_last_0_10_days,
@@ -226,6 +218,9 @@ class BodyPartInjuryRisk(object):
                 # overactive / underactive
                 "last_overactive_date": format_date(self.last_overactive_date),
                 "last_underactive_date": format_date(self.last_underactive_date),
+                'overactive_count_last_0_20_days': self.overactive_count_last_0_20_days,
+                'underactive_inhibited_count_last_0_20_days': self.underactive_inhibited_count_last_0_20_days,
+                'underactive_weak_count_last_0_20_days': self.underactive_weak_count_last_0_20_days,
 
                 # sharp
                 "sharp_count_last_0_10_days": self.sharp_count_last_0_10_days,
@@ -235,6 +230,7 @@ class BodyPartInjuryRisk(object):
 
                 # short
                 "last_short_date": format_date(self.last_short_date),
+                "short_count_last_0_20_days": self.short_count_last_0_20_days,
 
                 # tight
                 "tight_count_last_0_20_days": self.tight_count_last_0_20_days,
@@ -259,12 +255,6 @@ class BodyPartInjuryRisk(object):
         injury_risk.eccentric_volume_today = input_dict.get('eccentric_volume_today', 0)
         injury_risk.max_concentric_intensity_48_hours = input_dict.get('max_concentric_intensity_48_hours', 0)
         injury_risk.max_eccentric_intensity_48_hours = input_dict.get('max_eccentric_intensity_48_hours', 0)
-        injury_risk.total_volume_obs = input_dict.get('total_volume_obs', 0)
-        injury_risk.total_stddev = input_dict.get('total_stddev', 0)
-        injury_risk.total_mean = input_dict.get('total_mean', 0)
-        injury_risk.ecc_volume_obs = input_dict.get('ecc_volume_obs', 0)
-        injury_risk.ecc_stddev = input_dict.get('ecc_stddev', 0)
-        injury_risk.ecc_mean = input_dict.get('ecc_mean', 0)
 
         # ache
         injury_risk.ache_count_last_0_10_days = input_dict.get('ache_count_last_0_10_days', 0)
@@ -303,6 +293,9 @@ class BodyPartInjuryRisk(object):
         # overactive / underactive
         injury_risk.last_overactive_date = input_dict.get('last_overactive_date')
         injury_risk.last_underactive_date = input_dict.get('last_underactive_date')
+        injury_risk.overactive_count_last_0_20_days = input_dict.get('overactive_count_last_0_20_days',0)
+        injury_risk.underactive_inhibited_count_last_0_20_days = input_dict.get('underactive_inhibited_count_last_0_20_days', 0)
+        injury_risk.underactive_weak_count_last_0_20_days = input_dict.get('underactive_weak_count_last_0_20_days', 0)
 
         # sharp
         injury_risk.sharp_count_last_0_10_days = input_dict.get('sharp_count_last_0_10_days', 0)
@@ -312,6 +305,7 @@ class BodyPartInjuryRisk(object):
 
         # short
         injury_risk.last_short_date = input_dict.get('last_short_date')
+        injury_risk.short_count_last_0_20_days = input_dict.get('short_count_last_0_20_days', 0)
 
         # tight
         injury_risk.tight_count_last_0_20_days = input_dict.get('tight_count_last_0_20_days', 0)
@@ -332,11 +326,7 @@ class BodyPartInjuryRisk(object):
                 value = parse_date(value).date()
         super().__setattr__(name, value)
 
-
-
     def merge(self, body_part_injury_risk):
-
-        #TODO doesn't include stats as this doesn't get saved that ok?
 
         self.concentric_volume_last_week = max(self.concentric_volume_last_week, body_part_injury_risk.concentric_volume_last_week)
         self.concentric_volume_this_week = max(self.concentric_volume_this_week, body_part_injury_risk.concentric_volume_this_week)
@@ -381,8 +371,12 @@ class BodyPartInjuryRisk(object):
 
         # overactive / underactive
         self.last_overactive_date = self.merge_with_none(self.last_overactive_date, body_part_injury_risk.last_overactive_date)
-
         self.last_underactive_date = self.merge_with_none(self.last_underactive_date, body_part_injury_risk.last_underactive_date)
+        self.overactive_count_last_0_20_days = max(self.overactive_count_last_0_20_days, body_part_injury_risk.overactive_count_last_0_20_days)
+        self.underactive_inhibited_count_last_0_20_days = max(self.underactive_inhibited_count_last_0_20_days,
+                                                   body_part_injury_risk.underactive_inhibited_count_last_0_20_days)
+        self.underactive_weak_count_last_0_20_days = max(self.underactive_weak_count_last_0_20_days,
+                                                   body_part_injury_risk.underactive_weak_count_last_0_20_days)
 
         # sharp
         self.sharp_count_last_0_10_days = max(self.sharp_count_last_0_10_days, body_part_injury_risk.sharp_count_last_0_10_days)
@@ -502,11 +496,12 @@ class BodyPartFunctionalMovement(object):
 
 
 class SessionFunctionalMovement(object):
-    def __init__(self, session, injury_risk_dict):
+    def __init__(self, session, injury_risk_dict, user_id):
         self.body_parts = []
         self.session = session
         self.functional_movement_mappings = []
         self.injury_risk_dict = injury_risk_dict
+        self.user_id = user_id
 
     def process_anc_and_muscle_imbalance(self, event_date):
 
@@ -517,6 +512,9 @@ class SessionFunctionalMovement(object):
 
             # Right
             self.process_apt_ankle_side(event_date, 2)
+
+            session_datastore = SessionDatastore()
+            session_datastore.update(self.session, self.user_id, event_date)
 
     def process_apt_ankle_side(self, event_date, side):
 
@@ -557,6 +555,9 @@ class SessionFunctionalMovement(object):
                         if self.injury_risk_dict[body_part_side].last_muscle_spasm_date is not None and \
                                 self.injury_risk_dict[body_part_side].last_muscle_spasm_date == event_date:
                             any_short_confirmed = True
+
+                # TODO - have Gabby ask Barnett if this should be all or nothing for all prime movers in Pelvic Tilt
+
                 if any_short_confirmed:  # mark all muscle imbalance and short
                     for p in pelvic_tilt_movement.prime_movers:
                         bilateral = body_part_factory.get_bilateral(BodyPartLocation(p))
@@ -573,6 +574,9 @@ class SessionFunctionalMovement(object):
                             body_part_injury_risk.last_muscle_imbalance_date = event_date
                             self.injury_risk_dict[body_part_side] = body_part_injury_risk
                         self.injury_risk_dict[body_part_side].compensation_source = CompensationSource.movement_patterns_3s
+
+                    self.mark_hip_extension_compensating(side)
+
                 else:  # mark all muscles overactive
                     for p in pelvic_tilt_movement.prime_movers:
                         bilateral = body_part_factory.get_bilateral(BodyPartLocation(p))
@@ -581,72 +585,106 @@ class SessionFunctionalMovement(object):
                         else:
                             body_part_side = BodyPartSide(BodyPartLocation(p), 0)
                         if body_part_side in self.injury_risk_dict:
-                            self.injury_risk_dict[body_part_side].last_overactive_date = event_date
+                            if self.injury_risk_dict[body_part_side].last_overactive_date < event_date:
+                                self.injury_risk_dict[body_part_side].last_overactive_date = event_date
+                                self.injury_risk_dict[body_part_side].overactive_count_last_0_20_days += 1
+                                self.session.overactive_body_parts.append(body_part_side)
                         else:
                             body_part_injury_risk = BodyPartInjuryRisk()
                             body_part_injury_risk.last_overactive_date = event_date
+                            body_part_injury_risk.overactive_count_last_0_20_days += 1
                             self.injury_risk_dict[body_part_side] = body_part_injury_risk
+                            self.session.overactive_body_parts.append(body_part_side)
                         self.injury_risk_dict[body_part_side].compensation_source = CompensationSource.movement_patterns_3s
                     # now mark specific muscles as underactive inhibited -- unless fatigue is present, then underactive weak
                     if key_adf_value != 0:
                         for b in [61, 62, 63, 64, 66]:
                             body_part_side = BodyPartSide(BodyPartLocation(b), side)
                             if body_part_side in self.injury_risk_dict:
-                                self.injury_risk_dict[body_part_side].last_underactive_date = event_date
-                                self.injury_risk_dict[body_part_side].last_weak_date = event_date
+                                if self.injury_risk_dict[body_part_side].last_underactive_date < event_date:
+                                    self.injury_risk_dict[body_part_side].last_underactive_date = event_date
+                                    self.injury_risk_dict[body_part_side].underactive_weak_count_last_0_20_days += 1
+                                if self.injury_risk_dict[body_part_side].last_weak_date < event_date:
+                                    self.injury_risk_dict[body_part_side].last_weak_date = event_date
+                                self.session.underactive_body_parts.append(body_part_side)
                             else:
                                 body_part_injury_risk = BodyPartInjuryRisk()
                                 body_part_injury_risk.last_underactive_date = event_date
                                 body_part_injury_risk.last_weak_date = event_date
+                                body_part_injury_risk.underactive_weak_count_last_0_20_days += 1
                                 self.injury_risk_dict[body_part_side] = body_part_injury_risk
+                                self.session.underactive_body_parts.append(body_part_side)
                             self.injury_risk_dict[
                                 body_part_side].compensation_source = CompensationSource.movement_patterns_3s
+
+                        self.mark_hip_extension_compensating(side)
                     else:
                         for b in [61, 62, 63, 64, 66]:
                             body_part_side = BodyPartSide(BodyPartLocation(b), side)
                             if body_part_side in self.injury_risk_dict:
-                                self.injury_risk_dict[body_part_side].last_underactive_date = event_date
-                                self.injury_risk_dict[body_part_side].last_inhibited_date = event_date
+                                if self.injury_risk_dict[body_part_side].last_underactive_date < event_date:
+                                    self.injury_risk_dict[body_part_side].last_underactive_date = event_date
+                                    self.injury_risk_dict[body_part_side].underactive_inhibited_count_last_0_20_days += 1
+                                if self.injury_risk_dict[body_part_side].last_inhibited_date < event_date:
+                                    self.injury_risk_dict[body_part_side].last_inhibited_date = event_date
+                                self.session.underactive_body_parts.append(body_part_side)
                             else:
                                 body_part_injury_risk = BodyPartInjuryRisk()
                                 body_part_injury_risk.last_underactive_date = event_date
                                 body_part_injury_risk.last_inhibited_date = event_date
+                                body_part_injury_risk.underactive_inhibited_count_last_0_20_days += 1
                                 self.injury_risk_dict[body_part_side] = body_part_injury_risk
+                                self.session.underactive_body_parts.append(body_part_side)
                             self.injury_risk_dict[
                                 body_part_side].compensation_source = CompensationSource.movement_patterns_3s
 
-                    # now mark a the hip extension muscles as compensating
-                    hip_extension = movement_factory.get_functional_movement(
-                        FunctionalMovementType.hip_extension)
-                    for m in hip_extension.prime_movers:
-                        bilateral = body_part_factory.get_bilateral(BodyPartLocation(m))
-                        if bilateral:
-                            body_part_side = BodyPartSide(BodyPartLocation(m), side)
-                        else:
-                            body_part_side = BodyPartSide(BodyPartLocation(m), 0)
-                        if body_part_side in self.injury_risk_dict:
-                            self.injury_risk_dict[body_part_side].is_compensationg = True
-                        else:
-                            body_part_injury_risk = BodyPartInjuryRisk()
-                            body_part_injury_risk.is_compensationg = True
-                            self.injury_risk_dict[body_part_side] = body_part_injury_risk
-                        self.injury_risk_dict[
-                            body_part_side].compensation_source = CompensationSource.movement_patterns_3s
+                        self.mark_hip_extension_compensating(side)
+
             elif key_adf_value != 0:
                 #TODO - make sure this is correct and no other paths need to be followed
                 for b in [61, 62, 63, 64, 66]:
                     body_part_side = BodyPartSide(BodyPartLocation(b), side)
                     if body_part_side in self.injury_risk_dict:
-                        self.injury_risk_dict[body_part_side].last_underactive_date = event_date
-                        self.injury_risk_dict[body_part_side].last_weak_date = event_date
+                        if self.injury_risk_dict[body_part_side].last_underactive_date < event_date:
+                            self.injury_risk_dict[body_part_side].last_underactive_date = event_date
+                            self.injury_risk_dict[body_part_side].underactive_weak_count_last_0_20_days += 1
+                        if self.injury_risk_dict[body_part_side].last_weak_date < event_date:
+                            self.injury_risk_dict[body_part_side].last_weak_date = event_date
+                        self.session.underactive_body_parts.append(body_part_side)
                     else:
                         body_part_injury_risk = BodyPartInjuryRisk()
                         body_part_injury_risk.last_underactive_date = event_date
                         body_part_injury_risk.last_weak_date = event_date
+                        body_part_injury_risk.underactive_weak_count_last_0_20_days += 1
                         self.injury_risk_dict[body_part_side] = body_part_injury_risk
+                        self.session.underactive_body_parts.append(body_part_side)
                     self.injury_risk_dict[
                         body_part_side].compensation_source = CompensationSource.movement_patterns_3s
 
+                self.mark_hip_extension_compensating(side)
+
+    def mark_hip_extension_compensating(self, side):
+
+        movement_factory = FunctionalMovementFactory()
+
+        hip_extension = movement_factory.get_functional_movement(
+            FunctionalMovementType.hip_extension)
+        body_part_factory = BodyPartFactory()
+        for m in hip_extension.prime_movers:
+            bilateral = body_part_factory.get_bilateral(BodyPartLocation(m))
+            if bilateral:
+                body_part_side = BodyPartSide(BodyPartLocation(m), side)
+            else:
+                body_part_side = BodyPartSide(BodyPartLocation(m), 0)
+            if body_part_side in self.injury_risk_dict:
+                self.injury_risk_dict[body_part_side].is_compensationg = True
+            else:
+                body_part_injury_risk = BodyPartInjuryRisk()
+                body_part_injury_risk.is_compensationg = True
+                self.injury_risk_dict[body_part_side] = body_part_injury_risk
+            self.injury_risk_dict[
+                body_part_side].compensation_source = CompensationSource.movement_patterns_3s
+            self.session.compensating_body_parts.append(body_part_side)
 
     def process(self, event_date, load_stats):
         activity_factory = ActivityFunctionalMovementFactory()
@@ -682,10 +720,10 @@ class SessionFunctionalMovement(object):
                     functional_movement_body_part_side = BodyPartFunctionalMovement(b)
                     m.antagonists.append(functional_movement_body_part_side)
 
-            # TODO - change with total volume
             #m.attribute_training_volume(self.session.duration_minutes * self.session.session_RPE,
             #                            highest_concentric_eccentric_level, self.injury_risk_dict, event_date)
             m.attribute_training_volume(self.session.training_volume(load_stats), highest_concentric_eccentric_level, self.injury_risk_dict, event_date)
+            # TODO - ensure we're using the correct (and all) intensity measures
             if self.session.session_RPE is not None:
                 m.attribute_intensity(self.session.session_RPE, highest_concentric_eccentric_level, self.injury_risk_dict, event_date)
 

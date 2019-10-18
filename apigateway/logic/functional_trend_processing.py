@@ -483,7 +483,6 @@ class TrendProcessor(object):
 
             #trend.triggers = all_triggers
 
-            #TODO last_date_time is messed up and inconsistent with other date times
             #trend.last_date_time = self.get_latest_trigger_date_time(all_triggers)
             trend.last_date_time = last_date_time
 
