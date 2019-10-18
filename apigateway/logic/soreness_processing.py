@@ -236,7 +236,8 @@ class BodyPartMapping(object):
 
         if (body_part_location == BodyPartLocation.hip or body_part_location == BodyPartLocation.knee
                 or body_part_location == BodyPartLocation.ankle or body_part_location == BodyPartLocation.foot
-                or body_part_location == BodyPartLocation.lower_back):
+                # or body_part_location == BodyPartLocation.lower_back
+                ):
             return SorenessType.joint_related
         else:
             return SorenessType.muscle_related
