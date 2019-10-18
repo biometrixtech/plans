@@ -287,20 +287,24 @@ def test_inflammation_affects_load():
     sessions = get_sessions(dates, rpes, durations, sport_names)
 
     # running this with and without the symptoms
-    # session_functional_movement = SessionFunctionalMovement(sessions[0], {})
-    # session_functional_movement.process(sessions[0].event_date)
+    session_functional_movement = SessionFunctionalMovement(sessions[0], {})
+    session_functional_movement.process(sessions[0].event_date, LoadStats())
 
     proc = InjuryRiskProcessor(now_date, [soreness], sessions, {}, LoadStats())
     proc.process()
 
     # this is a section to better understand changes in volume
-    # for j in proc.injury_risk_dict.keys():
-    #     matching_parts = [b for b in session_functional_movement.body_parts if b.body_part_side == j]
-    #     if len(matching_parts) > 0:
-    #         if proc.injury_risk_dict[j].concentric_volume_today != matching_parts[0].concentric_volume:
-    #             k=0
-    #         if proc.injury_risk_dict[j].eccentric_volume_today != matching_parts[0].eccentric_volume:
-    #             k=0
+    for j in proc.injury_risk_dict.keys():
+        matching_parts = [b for b in session_functional_movement.body_parts if b.body_part_side == j]
+        if len(matching_parts) > 0:
+            if proc.injury_risk_dict[j].concentric_volume_today != matching_parts[0].concentric_volume:
+                k=0
+            elif proc.injury_risk_dict[j].concentric_volume_today == matching_parts[0].concentric_volume:
+                k=0
+            if proc.injury_risk_dict[j].eccentric_volume_today != matching_parts[0].eccentric_volume:
+                k=0
+            elif proc.injury_risk_dict[j].eccentric_volume_today == matching_parts[0].eccentric_volume:
+                k=0
 
     vastus_lateralis_1 = BodyPartSide(BodyPartLocation(55), 1)
     vastus_lateralis_2 = BodyPartSide(BodyPartLocation(55), 2)

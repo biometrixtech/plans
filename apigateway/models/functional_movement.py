@@ -107,6 +107,12 @@ class BodyPartInjuryRisk(object):
         self.eccentric_volume_today = 0
         self.max_concentric_intensity_48_hours = 0
         self.max_eccentric_intensity_48_hours = 0
+        self.total_volume_obs = 0
+        self.total_stddev = 0
+        self.total_mean = 0
+        self.ecc_volume_obs = 0
+        self.ecc_stddev = 0
+        self.ecc_mean = 0
 
         # ache
         self.ache_count_last_0_10_days = 0
@@ -176,6 +182,12 @@ class BodyPartInjuryRisk(object):
                 "eccentric_volume_today": self.eccentric_volume_today,
                 "max_concentric_intensity_48_hours": self.max_concentric_intensity_48_hours,
                 "max_eccentric_intensity_48_hours": self.max_eccentric_intensity_48_hours,
+                "total_volume_obs": self.total_volume_obs,
+                "total_stddev": self.total_stddev,
+                "total_mean": self.total_mean,
+                "ecc_volume_obs": self.ecc_volume_obs,
+                "ecc_stddev": self.ecc_stddev,
+                "ecc_mean": self.ecc_mean,
 
                 # ache
                 "ache_count_last_0_10_days": self.ache_count_last_0_10_days,
@@ -247,6 +259,12 @@ class BodyPartInjuryRisk(object):
         injury_risk.eccentric_volume_today = input_dict.get('eccentric_volume_today', 0)
         injury_risk.max_concentric_intensity_48_hours = input_dict.get('max_concentric_intensity_48_hours', 0)
         injury_risk.max_eccentric_intensity_48_hours = input_dict.get('max_eccentric_intensity_48_hours', 0)
+        injury_risk.total_volume_obs = input_dict.get('total_volume_obs', 0)
+        injury_risk.total_stddev = input_dict.get('total_stddev', 0)
+        injury_risk.total_mean = input_dict.get('total_mean', 0)
+        injury_risk.ecc_volume_obs = input_dict.get('ecc_volume_obs', 0)
+        injury_risk.ecc_stddev = input_dict.get('ecc_stddev', 0)
+        injury_risk.ecc_mean = input_dict.get('ecc_mean', 0)
 
         # ache
         injury_risk.ache_count_last_0_10_days = input_dict.get('ache_count_last_0_10_days', 0)
@@ -317,6 +335,8 @@ class BodyPartInjuryRisk(object):
 
 
     def merge(self, body_part_injury_risk):
+
+        #TODO doesn't include stats as this doesn't get saved that ok?
 
         self.concentric_volume_last_week = max(self.concentric_volume_last_week, body_part_injury_risk.concentric_volume_last_week)
         self.concentric_volume_this_week = max(self.concentric_volume_this_week, body_part_injury_risk.concentric_volume_this_week)
@@ -727,10 +747,10 @@ class FunctionalMovementActivityMapping(object):
         for p in self.prime_movers:
             compensating_for_others = self.other_body_parts_affected(p, injury_risk_dict, event_date)
             if compensating_for_others or p.is_compensating:
-                prime_mover_ratio = 1.0
+                prime_mover_ratio = 0.84
             # TODO replace with new ratios
-            attributed_concentric_volume = training_volume * (self.concentric_level / highest_concentric_eccentric_factor) * prime_mover_ratio
-            attributed_eccentric_volume = training_volume * (self.eccentric_level / highest_concentric_eccentric_factor) * prime_mover_ratio
+            attributed_concentric_volume = training_volume * self.concentric_level * prime_mover_ratio
+            attributed_eccentric_volume = training_volume * self.eccentric_level  * prime_mover_ratio
             p.concentric_volume = attributed_concentric_volume
             p.eccentric_volume = attributed_eccentric_volume
             p.is_compensating = compensating_for_others
@@ -746,9 +766,9 @@ class FunctionalMovementActivityMapping(object):
         for p in self.prime_movers:
             compensating_for_others = self.other_body_parts_affected(p, injury_risk_dict, event_date)
             if compensating_for_others or p.is_compensating:
-                prime_mover_ratio = 1.0
-            attributed_concentric_intensity = intensity * (self.concentric_level / highest_concentric_eccentric_factor) * prime_mover_ratio
-            attributed_eccentric_intensity = intensity * (self.eccentric_level / highest_concentric_eccentric_factor) * prime_mover_ratio
+                prime_mover_ratio = 0.84
+            attributed_concentric_intensity = intensity * self.concentric_level * prime_mover_ratio
+            attributed_eccentric_intensity = intensity * self.eccentric_level * prime_mover_ratio
             p.concentric_intensity = attributed_concentric_intensity
             p.eccentric_intensity = attributed_eccentric_intensity
             p.is_compensating = compensating_for_others
@@ -762,7 +782,8 @@ class FunctionalMovementActivityMapping(object):
         body_part_list.extend(self.prime_movers)
         body_part_list.extend(self.synergists)
 
-        filtered_list = [b for b in body_part_list if b.body_part_side != target_body_part.body_part_side]
+        filtered_list = [b for b in body_part_list if b.body_part_side.side == target_body_part.body_part_side.side]
+        filtered_list = [b for b in filtered_list if b.body_part_side != target_body_part.body_part_side]
 
         two_days_ago = event_date - timedelta(days=1)
 
