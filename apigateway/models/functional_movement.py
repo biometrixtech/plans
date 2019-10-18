@@ -747,10 +747,10 @@ class FunctionalMovementActivityMapping(object):
         for p in self.prime_movers:
             compensating_for_others = self.other_body_parts_affected(p, injury_risk_dict, event_date)
             if compensating_for_others or p.is_compensating:
-                prime_mover_ratio = 1.0
+                prime_mover_ratio = 0.84
             # TODO replace with new ratios
-            attributed_concentric_volume = training_volume * (self.concentric_level / highest_concentric_eccentric_factor) * prime_mover_ratio
-            attributed_eccentric_volume = training_volume * (self.eccentric_level / highest_concentric_eccentric_factor) * prime_mover_ratio
+            attributed_concentric_volume = training_volume * self.concentric_level * prime_mover_ratio
+            attributed_eccentric_volume = training_volume * self.eccentric_level  * prime_mover_ratio
             p.concentric_volume = attributed_concentric_volume
             p.eccentric_volume = attributed_eccentric_volume
             p.is_compensating = compensating_for_others
@@ -766,9 +766,9 @@ class FunctionalMovementActivityMapping(object):
         for p in self.prime_movers:
             compensating_for_others = self.other_body_parts_affected(p, injury_risk_dict, event_date)
             if compensating_for_others or p.is_compensating:
-                prime_mover_ratio = 1.0
-            attributed_concentric_intensity = intensity * (self.concentric_level / highest_concentric_eccentric_factor) * prime_mover_ratio
-            attributed_eccentric_intensity = intensity * (self.eccentric_level / highest_concentric_eccentric_factor) * prime_mover_ratio
+                prime_mover_ratio = 0.84
+            attributed_concentric_intensity = intensity * self.concentric_level * prime_mover_ratio
+            attributed_eccentric_intensity = intensity * self.eccentric_level * prime_mover_ratio
             p.concentric_intensity = attributed_concentric_intensity
             p.eccentric_intensity = attributed_eccentric_intensity
             p.is_compensating = compensating_for_others
@@ -782,7 +782,8 @@ class FunctionalMovementActivityMapping(object):
         body_part_list.extend(self.prime_movers)
         body_part_list.extend(self.synergists)
 
-        filtered_list = [b for b in body_part_list if b.body_part_side != target_body_part.body_part_side]
+        filtered_list = [b for b in body_part_list if b.body_part_side.side == target_body_part.body_part_side.side]
+        filtered_list = [b for b in filtered_list if b.body_part_side != target_body_part.body_part_side]
 
         two_days_ago = event_date - timedelta(days=1)
 

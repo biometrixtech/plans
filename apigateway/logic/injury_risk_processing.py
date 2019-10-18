@@ -265,6 +265,8 @@ class InjuryRiskProcessor(object):
                             injury_risk_dict[b.body_part_side].ecc_volume_obs = len(all_ecc_values)
                             injury_risk_dict[b.body_part_side].ecc_stddev = current_ecc_std
                             injury_risk_dict[b.body_part_side].ecc_mean = current_ecc_avg
+                            if ecc_t_score >= 2:
+                                j=0
                             if self.is_1_significant(ecc_t_score, len(all_ecc_values)):
                                 injury_risk_dict[b.body_part_side].last_excessive_strain_date = d
                                 injury_risk_dict[b.body_part_side].last_inhibited_date = d
@@ -503,6 +505,8 @@ class InjuryRiskProcessor(object):
                         ecc_t_score = (injury_risk_dict[b.body_part_side].eccentric_volume_today - injury_risk_dict[b.body_part_side].ecc_mean) / (
                                 injury_risk_dict[b.body_part_side].ecc_stddev / math.sqrt(injury_risk_dict[b.body_part_side].ecc_volume_obs))
 
+                        if ecc_t_score >=2:
+                            k=0
                         if self.is_1_significant(ecc_t_score, injury_risk_dict[b.body_part_side].ecc_volume_obs+1):
                             injury_risk_dict[b.body_part_side].last_excessive_strain_date = base_date
                             injury_risk_dict[b.body_part_side].last_inhibited_date = base_date

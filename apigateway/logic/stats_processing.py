@@ -1052,29 +1052,31 @@ class StatsProcessing(object):
 
         soreness_list.extend(readiness_survey_soreness_list)
         soreness_list.extend(ps_survey_soreness_list)
-
-        grouped_soreness = {}
-
-        ns = namedtuple("ns", ["location", "is_pain", "side", "reported_date_time"])
-
-        for s in soreness_list:
-            ns_new = ns(s.body_part.location, s.pain, s.side, s.reported_date_time)
-            if ns_new in grouped_soreness:
-                grouped_soreness[ns_new] = max(grouped_soreness[ns_new], SorenessCalculator.get_severity(s.severity, s.movement))
-            else:
-                grouped_soreness[ns_new] = SorenessCalculator.get_severity(s.severity, s.movement)
-
-        for r in grouped_soreness:
-
-            s = Soreness()
-            s.body_part = BodyPart(r.location, None)
-            s.side = r.side
-            s.reported_date_time = r.reported_date_time
-            s.severity = grouped_soreness[r]
-            s.pain = r.is_pain
-            merged_soreness_list.append(s)
-
-        return merged_soreness_list
+        #TODO merge within date
+        return soreness_list
+        # grouped_soreness = {}
+        #
+        # ns = namedtuple("ns", ["location", "is_pain", "side", "reported_date_time"])
+        #
+        # for s in soreness_list:
+        #     ns_new = ns(s.body_part.location, s.pain, s.side, s.reported_date_time)
+        #     if ns_new in grouped_soreness:
+        #         grouped_soreness[ns_new] = max(grouped_soreness[ns_new], SorenessCalculator.get_severity(s.severity, s.movement))
+        #     else:
+        #         grouped_soreness[ns_new] = SorenessCalculator.get_severity(s.severity, s.movement)
+        #
+        # for r in grouped_soreness:
+        #
+        #     s = Soreness()
+        #     s.body_part = BodyPart(r.location, None)
+        #     s.side = r.side
+        #     s.reported_date_time = r.reported_date_time
+        #     s.severity = grouped_soreness[r]
+        #     s.pain = r.is_pain
+        #
+        #     merged_soreness_list.append(s)
+        #
+        # return merged_soreness_list
 
     def get_hs_dictionary(self, soreness_list):
 
