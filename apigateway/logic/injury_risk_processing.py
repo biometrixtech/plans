@@ -405,8 +405,7 @@ class InjuryRiskProcessor(object):
 
         target_body_part_side = BodyPartSide(target_symptom.body_part.location, target_symptom.side)
 
-        # TODO: handle ligament differently
-        if is_muscle or is_ligament:
+        if is_muscle:
 
             if target_symptom.sharp is not None and target_symptom.sharp > 0:
                 if target_body_part_side in injury_risk_dict:
@@ -442,15 +441,14 @@ class InjuryRiskProcessor(object):
                     injury_risk_dict[target_body_part_side] = body_part_injury_risk
         else:
 
-            # assuming all non-muscles are joints (including ligaments)
-            # TODO: accommodate ligaments
+            # either joint or ligament
 
             sharp_count = 0
             ache_count = 0
 
-            if target_symptom.sharp is not None and target_symptom.sharp > 0:
+            # any sharp symptoms get marked inflammation
 
-                # first, let's check to see how often this has happened
+            if target_symptom.sharp is not None and target_symptom.sharp > 0:
 
                 if target_body_part_side in injury_risk_dict:
                     sharp_count = injury_risk_dict[target_body_part_side].sharp_count_last_0_10_days
@@ -458,12 +456,14 @@ class InjuryRiskProcessor(object):
                         injury_risk_dict[target_body_part_side].last_sharp_date = base_date
                         injury_risk_dict[target_body_part_side].sharp_count_last_0_10_days += 1
                         injury_risk_dict[target_body_part_side].last_sharp_level = target_symptom.sharp
+                        injury_risk_dict[target_body_part_side].last_inflammation_date = base_date
                         sharp_count = injury_risk_dict[target_body_part_side].sharp_count_last_0_10_days
                 else:
                     body_part_injury_risk = BodyPartInjuryRisk()
                     body_part_injury_risk.last_sharp_date = base_date
                     body_part_injury_risk.last_sharp_level = target_symptom.sharp
                     body_part_injury_risk.sharp_count_last_0_10_days += 1
+                    body_part_injury_risk.last_inflammation_date = base_date
                     injury_risk_dict[target_body_part_side] = body_part_injury_risk
 
             if target_symptom.ache is not None and target_symptom.ache > 0:
@@ -482,6 +482,11 @@ class InjuryRiskProcessor(object):
                     body_part_injury_risk.last_ache_level = target_symptom.ache
                     injury_risk_dict[target_body_part_side] = body_part_injury_risk
 
+                # moderate severity or 2 reports in last 10 days
+                # TODO: is moderate to high ache severity > 3?
+                if target_symptom.ache > 3 or ache_count >= 2:
+                    injury_risk_dict[target_body_part_side].last_inflammation_date = base_date
+
             # second, mark it inflamed, noting that joints cannot be inhibited as well
             # update the injury risk dict accordingly
             if sharp_count >= 2 or ache_count >= 2:
@@ -493,7 +498,12 @@ class InjuryRiskProcessor(object):
                     injury_risk_dict[target_body_part_side] = body_part_injury_risk
 
                 # third, mark all related muscles both inhibited and inflamed
-                related_muscles = self.functional_anatomy_processor.get_related_muscles_from_joints(target_body_part_side.body_part_location.value)
+                if is_ligament:
+                    related_muscles = self.functional_anatomy_processor.get_related_muscles_for_ligament(
+                        target_body_part_side.body_part_location.value)
+                else:
+                    related_muscles = self.functional_anatomy_processor.get_related_muscles_for_joint(
+                        target_body_part_side.body_part_location.value)
 
                 for r in related_muscles:
                     if target_body_part_side.side == 0:
@@ -506,7 +516,6 @@ class InjuryRiskProcessor(object):
                         sides = [target_body_part_side.side]
                     for sd in sides:
                         body_part_side = BodyPartSide(BodyPartLocation(r), sd)
-                        #body_part_side = BodyPartSide(BodyPartLocation(r), target_symptom.side)
                         if body_part_side in injury_risk_dict:
                             injury_risk_dict[body_part_side].last_inflammation_date = base_date
                             injury_risk_dict[body_part_side].last_inhibited_date = base_date
@@ -525,13 +534,11 @@ class InjuryRiskProcessor(object):
         is_muscle = body_part_factory.is_muscle(target_symptom.body_part)
         is_ligament = body_part_factory.is_ligament(target_symptom.body_part)
 
-
         target_body_part_side = BodyPartSide(target_symptom.body_part.location, target_symptom.side)
 
         # TODO: is moderate to high ache severity > 3?
 
-        # TODO: handle ligament differently
-        if is_muscle or is_ligament:
+        if is_muscle:
 
             if target_symptom.sharp is not None and target_symptom.sharp > 0:
                 if target_body_part_side in injury_risk_dict:
@@ -596,8 +603,6 @@ class InjuryRiskProcessor(object):
 
         else:
 
-            # assuming all non-muscles are joints (including ligaments)
-            # TODO: accommodate ligaments
             mark_related_muscles = False
 
             if target_symptom.sharp is not None and target_symptom.sharp > 0:
@@ -646,6 +651,10 @@ class InjuryRiskProcessor(object):
                     injury_risk_dict[target_body_part_side] = body_part_injury_risk
 
             if target_symptom.ache is not None and target_symptom.ache <= 3:
+
+                if is_ligament:
+                    mark_related_muscles = True  # related muscles of ligaments reported ache at any level should be muscle spasm
+
                 if target_body_part_side in injury_risk_dict:
                     if injury_risk_dict[target_body_part_side].ache_count_last_0_10_days >= 2:
                         mark_related_muscles = True
@@ -663,7 +672,7 @@ class InjuryRiskProcessor(object):
                     injury_risk_dict[target_body_part_side] = body_part_injury_risk
 
             if mark_related_muscles:
-                related_muscles = self.functional_anatomy_processor.get_related_muscles_from_joints(
+                related_muscles = self.functional_anatomy_processor.get_related_muscles_for_joint(
                     target_body_part_side.body_part_location.value)
                 body_part_factory = BodyPartFactory()
 
@@ -696,8 +705,7 @@ class InjuryRiskProcessor(object):
 
         target_body_part_side = BodyPartSide(target_symptom.body_part.location, target_symptom.side)
 
-        # TODO: handle ligament differently
-        if is_muscle or is_ligament:
+        if is_muscle:
 
             mark_adhesions = False
 
@@ -774,14 +782,20 @@ class InjuryRiskProcessor(object):
                     injury_risk_dict[target_body_part_side] = body_part_injury_risk
 
         else:
-            # assuming all non-muscles are joints (including ligaments)
-            # TODO: accommodate ligaments
+
             mark_related_muscles = False
 
             if target_symptom.tight is not None and target_symptom.tight > 0:
                 if target_body_part_side in injury_risk_dict:
                     if injury_risk_dict[target_body_part_side].tight_count_last_0_20_days >= 3:
                         mark_related_muscles = True
+                        if is_ligament:
+                            if injury_risk_dict[target_body_part_side].last_inflammation_date == base_date:
+                                injury_risk_dict[target_body_part_side].last_tendinopathy_date = base_date
+                            else:
+                                injury_risk_dict[target_body_part_side].last_tendinosis_date = base_date
+                        else:
+                            injury_risk_dict[target_body_part_side].last_altered_joint_arthokinematics_date = base_date
                     # just for tracking
                     if injury_risk_dict[target_body_part_side].last_tight_date is None or injury_risk_dict[target_body_part_side].last_tight_date < base_date:
                         injury_risk_dict[target_body_part_side].last_tight_date = base_date
@@ -799,6 +813,13 @@ class InjuryRiskProcessor(object):
                 if target_body_part_side in injury_risk_dict:
                     if injury_risk_dict[target_body_part_side].sharp_count_last_0_20_days >= 3:
                         mark_related_muscles = True
+                        if is_ligament:
+                            if injury_risk_dict[target_body_part_side].last_inflammation_date == base_date:
+                                injury_risk_dict[target_body_part_side].last_tendinopathy_date = base_date
+                            else:
+                                injury_risk_dict[target_body_part_side].last_tendinosis_date = base_date
+                        else:
+                            injury_risk_dict[target_body_part_side].last_altered_joint_arthokinematics_date = base_date
                     # just for tracking
                     if injury_risk_dict[target_body_part_side].last_sharp_date is None or injury_risk_dict[target_body_part_side].last_sharp_date < base_date:
                         injury_risk_dict[target_body_part_side].last_sharp_date = base_date
@@ -814,8 +835,19 @@ class InjuryRiskProcessor(object):
 
             if target_symptom.ache is not None and target_symptom.ache > 0:
                 if target_body_part_side in injury_risk_dict:
-                    if injury_risk_dict[target_body_part_side].ache_count_last_0_20_days >= 4:  # higher for ache
+                    if is_ligament:
+                        threshold = 3
+                    else:
+                        threshold = 4
+                    if injury_risk_dict[target_body_part_side].ache_count_last_0_20_days >= threshold:  # higher for ache - joint
                         mark_related_muscles = True
+                        if is_ligament:
+                            if injury_risk_dict[target_body_part_side].last_inflammation_date == base_date:
+                                injury_risk_dict[target_body_part_side].last_tendinopathy_date = base_date
+                            else:
+                                injury_risk_dict[target_body_part_side].last_tendinosis_date = base_date
+                        else:
+                            injury_risk_dict[target_body_part_side].last_altered_joint_arthokinematics_date = base_date
                     # just for tracking
                     if injury_risk_dict[target_body_part_side].last_ache_date is None or injury_risk_dict[target_body_part_side].last_ache_date < base_date:
                         injury_risk_dict[target_body_part_side].last_ache_date = base_date
@@ -830,7 +862,7 @@ class InjuryRiskProcessor(object):
                     injury_risk_dict[target_body_part_side] = body_part_injury_risk
 
             if mark_related_muscles:
-                related_muscles = self.functional_anatomy_processor.get_related_muscles_from_joints(
+                related_muscles = self.functional_anatomy_processor.get_related_muscles_for_joint(
                     target_body_part_side.body_part_location.value)
 
                 for r in related_muscles:

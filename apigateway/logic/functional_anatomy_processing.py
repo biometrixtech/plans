@@ -17,8 +17,7 @@ class FunctionalAnatomyProcessor(object):
     #
     #     return functional_anatomy
 
-    # TODO: where this is called, make sure we handle bilateral vs unilateral
-    def get_related_muscles_from_joints(self, joint_value):
+    def get_related_muscles_for_joint(self, joint_value):
 
         if joint_value == BodyPartLocation.foot.value:
             return [40, 41, 42, 43, 44]
@@ -32,6 +31,15 @@ class FunctionalAnatomyProcessor(object):
         #     return [45, 47, 48, 49, 50, 51, 52, 53, 54, 58, 59, 60, 61, 62, 63, 64, 65, 66]
         else:
             return []
+
+    def get_related_muscles_for_ligament(self, ligament_value):
+
+        if ligament_value == BodyPartLocation.it_band:
+            return [59]
+        elif ligament_value == BodyPartLocation.it_band_lateral_knee:
+            return [59]
+        elif ligament_value == BodyPartLocation.achilles:
+            return [43, 44]
 
     def get_related_joints(self, body_part_value):
 

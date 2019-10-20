@@ -170,6 +170,11 @@ class BodyPartInjuryRisk(object):
         # muscle_imbalance = None
         self.last_muscle_imbalance_date = None
 
+        # joints and ligaments
+        self.last_tendinopathy_date = None
+        self.last_tendinosis_date = None
+        self.last_altered_joint_arthokinematics_date = None
+
     def json_serialise(self):
         return {
                 "concentric_volume_last_week": self.concentric_volume_last_week,
@@ -241,7 +246,13 @@ class BodyPartInjuryRisk(object):
                 "last_weak_date": format_date(self.last_weak_date),
 
                 # muscle imbalance
-                "last_muscle_imbalance_date": format_date(self.last_muscle_imbalance_date)
+                "last_muscle_imbalance_date": format_date(self.last_muscle_imbalance_date),
+
+                # joints and ligaments
+                "last_tendinopathy_date": format_date(self.last_tendinopathy_date),
+                "last_tendinosis_date": format_date(self.last_tendinosis_date),
+                "last_altered_joint_arthokinematics_date": format_date(self.last_altered_joint_arthokinematics_date),
+
         }
 
     @classmethod
@@ -317,6 +328,11 @@ class BodyPartInjuryRisk(object):
 
         # muscle imbalance
         injury_risk.last_muscle_imbalance_date = input_dict.get('last_muscle_imbalance_date')
+
+        # joints and ligaments
+        injury_risk.last_tendinopathy_date = input_dict.get('last_tendinopathy_date')
+        injury_risk.last_tendinosis_date = input_dict.get('last_tendinosis_date')
+        injury_risk.last_altered_joint_arthokinematics_date = input_dict.get('last_altered_joint_arthokinematics_date')
 
         return injury_risk
 
@@ -394,6 +410,15 @@ class BodyPartInjuryRisk(object):
 
         # weak
         self.last_weak_date = self.merge_with_none(self.last_weak_date, body_part_injury_risk.last_weak_date)
+
+        # joints and ligaments
+        self.last_tendinopathy_date = self.merge_with_none(
+            self.last_tendinopathy_date, body_part_injury_risk.last_tendinopathy_date)
+        self.last_tendinosis_date = self.merge_with_none(
+            self.last_tendinosis_date, body_part_injury_risk.last_tendinosis_date)
+        self.last_altered_joint_arthokinematics_date = self.merge_with_none(
+            self.last_altered_joint_arthokinematics_date,
+            body_part_injury_risk.last_altered_joint_arthokinematics_date)
 
     def merge_with_none(self, value_a, value_b):
 
