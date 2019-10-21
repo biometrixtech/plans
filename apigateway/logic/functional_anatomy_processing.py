@@ -51,7 +51,7 @@ class FunctionalAnatomyProcessor(object):
             return [9, 10]
         elif body_part_value == BodyPartLocation.posterior_tibialis.value:
             return [10]
-        elif body_part_value in [BodyPartLocation.calves.value, BodyPartLocation.soleus.value, BodyPartLocation.gastrocnemius.value]:
+        elif body_part_value in [BodyPartLocation.calves.value, BodyPartLocation.soleus.value, BodyPartLocation.gastrocnemius_medial.value]:
             return [9, 10]
         elif body_part_value == BodyPartLocation.hamstrings.value:
             return [4, 7]

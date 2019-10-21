@@ -85,6 +85,8 @@ class BodyPartLocation(Enum):
     hip_flexor = 28
     deltoid = 29
 
+    deep_rotators_hip = 30
+
     # shin
     anterior_tibialis = 40
     peroneals_longus = 41
@@ -92,7 +94,8 @@ class BodyPartLocation(Enum):
     # calves
     posterior_tibialis = 42
     soleus = 43
-    gastrocnemius = 44
+    gastrocnemius_medial = 44
+    gastrocnemius_lateral = 75
 
     # hamstrings
     bicep_femoris_long_head = 45
@@ -113,14 +116,25 @@ class BodyPartLocation(Enum):
     vastus_medialis = 56
     vastus_intermedius = 57
     rectus_femoris = 58
+    sartorius = 62
 
     # hip_flexor
     tensor_fascia_latae = 59
+    psoas = 71
+    iliacus = 72
+
+    # deep rotators of the hip (30)
     piriformis = 60
+    quadratus_femoris = 67
 
     # core_stabilizers
-    iliopsoas = 61
-    sartorius = 62
+    iliopsoas = 61  # no longer used
+    transverse_abdominis = 73
+    internal_obliques = 74
+
+    # abdominals
+    rectus_abdominis = 75
+    external_obliques = 69
 
     # glutes
     gluteus_medius_anterior_fibers = 63
@@ -128,13 +142,28 @@ class BodyPartLocation(Enum):
     gluteus_minimus = 65
     gluteus_maximus = 66
 
-    # quadratus_femoris = 67
-    # popliteus = 68
-    # lateral_rotators = 69
+    # knee?
+    popliteus = 68
 
     # lower_back
     quadratus_lumorum = 70
     erector_spinae = 26
+
+    # upper back, traps, neck
+    upper_trapezius = 76
+    levator_scapulae = 77
+    middle_trapezius = 78
+    lower_trapezius = 79
+    rhomboids = 80
+
+    # chest
+    pectoralis_minor = 81
+    pectoralis_major = 82
+
+    # deltoid (29)
+    anterior_deltoid = 83
+    medial_deltoid = 84
+    posterior_deltoid = 85
 
 
     upper_body = 91
@@ -165,22 +194,23 @@ class BodyPartLocation(Enum):
     def muscle_groups(cls):
         grouped_muscles = {
             cls.shin: [cls.anterior_tibialis, cls.peroneals_longus],
-            cls.calves: [cls.posterior_tibialis, cls.soleus, cls.gastrocnemius],
+            cls.calves: [cls.posterior_tibialis, cls.soleus, cls.gastrocnemius_medial, cls.gastrocnemius_lateral],
             cls.hamstrings: [cls.bicep_femoris_long_head, cls.bicep_femoris_short_head, cls.semimembranosus, cls.semitendinosus],
             cls.groin: [cls.adductor_longus, cls.adductor_magnus_anterior_fibers, cls.adductor_magnus_posterior_fibers, cls.adductor_brevis, cls.gracilis, cls.pectineus],
-            cls.quads: [cls.vastus_lateralis, cls.vastus_medialis, cls.vastus_intermedius, cls.rectus_femoris],
-            cls.hip_flexor: [cls.tensor_fascia_latae, cls.piriformis],
-            cls.core_stabilizers: [cls.iliopsoas, cls.soleus, cls.sartorius],
+            cls.quads: [cls.vastus_lateralis, cls.vastus_medialis, cls.vastus_intermedius, cls.rectus_femoris, cls.sartorius],
+            cls.hip_flexor: [cls.tensor_fascia_latae, cls.psoas, cls.iliacus],
+            cls.deep_rotators_hip: [cls.piriformis, cls.quadratus_femoris],
+            cls.core_stabilizers: [cls.transverse_abdominis, cls.internal_obliques],
             cls.glutes: [cls.gluteus_medius_anterior_fibers, cls.gluteus_medius_posterior_fibers, cls.gluteus_minimus, cls.gluteus_maximus],
             cls.forearm: [],
             cls.biceps: [],
             cls.triceps: [],
-            cls.deltoid: [],
-            cls.chest: [],
-            cls.upper_back_neck: [],
+            cls.deltoid: [cls.anterior_deltoid, cls.medial_deltoid, cls.posterior_deltoid],
+            cls.chest: [cls.pectoralis_minor, cls.pectoralis_major],
+            cls.upper_back_neck: [cls.upper_trapezius, cls.levator_scapulae, cls.middle_trapezius, cls.lower_trapezius, cls.rhomboids],
             # cls.erector_spinae: [],
             cls.lats: [],
-            cls.abdominals: [],
+            cls.abdominals: [cls.rectus_abdominis, cls.external_obliques],
             cls.lower_back: [cls.erector_spinae, cls.quadratus_lumorum]
         }
         return grouped_muscles

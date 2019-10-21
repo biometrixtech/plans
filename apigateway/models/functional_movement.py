@@ -23,6 +23,13 @@ class FunctionalMovementType(Enum):
     hip_extension = 12
     hip_flexion = 13
     pelvic_anterior_tilt = 14
+    pelvic_posterior_tilt = 15
+    trunk_flexion = 16
+    trunk_extension = 17
+    trunk_lateral_flexion = 18
+    trunk_rotation = 19
+    trunk_flexion_and_rotation = 20
+    trunk_extension_with_rotation = 21
 
 
 class FunctionalMovement(object):
@@ -923,10 +930,10 @@ class FunctionalMovementFactory(object):
             return self.get_knee_flexion()
         elif movement_type == FunctionalMovementType.knee_extension:
             return self.get_knee_extension()
-        elif movement_type == FunctionalMovementType.tibial_external_rotation:
-            return self.get_tibial_external_rotation()
-        elif movement_type == FunctionalMovementType.tibial_internal_rotation:
-            return self.get_tibial_internal_rotation()
+        # elif movement_type == FunctionalMovementType.tibial_external_rotation:
+        #     return self.get_tibial_external_rotation()
+        # elif movement_type == FunctionalMovementType.tibial_internal_rotation:
+        #     return self.get_tibial_internal_rotation()
         elif movement_type == FunctionalMovementType.hip_adduction:
             return self.get_hip_adduction()
         elif movement_type == FunctionalMovementType.hip_abduction:
@@ -941,34 +948,40 @@ class FunctionalMovementFactory(object):
             return self.get_hip_flexion()
         elif movement_type == FunctionalMovementType.pelvic_anterior_tilt:
             return self.get_pelvic_anterior_tilt()
+        elif movement_type == FunctionalMovementType.pelvic_posterior_tilt:
+            return self.get_pelvic_posterior_tilt()
 
 
     def get_ankle_dorsiflexion(self):
 
         functional_movement = FunctionalMovement(FunctionalMovementType.ankle_dorsiflexion)
         functional_movement.prime_movers = [40]
-        functional_movement.antagonists = [41, 42, 43, 44]
+        functional_movement.antagonists = [41, 43, 44, 75]
+        functional_movement.synergists = []
         return functional_movement
 
     def get_ankle_plantar_flexion(self):
 
         functional_movement = FunctionalMovement(FunctionalMovementType.ankle_plantar_flexion)
-        functional_movement.prime_movers = [41, 42, 43, 44]
+        functional_movement.prime_movers = [43, 44, 75]
         functional_movement.antagonists = [40]
+        functional_movement.synergists = [41, 42]
         return functional_movement
 
     def get_inversion_of_the_foot(self):
 
         functional_movement = FunctionalMovement(FunctionalMovementType.inversion_of_the_foot)
         functional_movement.prime_movers = [40, 42]
-        functional_movement.antagonists = [41]
+        functional_movement.antagonists = [41, 43, 75]
+        functional_movement.synergists = [44]
         return functional_movement
 
     def get_eversion_of_the_foot(self):
 
         functional_movement = FunctionalMovement(FunctionalMovementType.eversion_of_the_foot)
         functional_movement.prime_movers = [41]
-        functional_movement.antagonists = [40, 42]
+        functional_movement.antagonists = [40, 42, 44]
+        functional_movement.synergists = [43, 75]
         return functional_movement
 
     def get_knee_flexion(self):
@@ -976,74 +989,96 @@ class FunctionalMovementFactory(object):
         functional_movement = FunctionalMovement(FunctionalMovementType.knee_flexion)
         functional_movement.prime_movers = [45, 46, 47, 48]
         functional_movement.antagonists = [55, 56, 57, 58]
+        functional_movement.synergists = [44, 75, 68, 53, 62]
         return functional_movement
 
     def get_knee_extension(self):
 
         functional_movement = FunctionalMovement(FunctionalMovementType.knee_extension)
         functional_movement.prime_movers = [55, 56, 57, 58]
-        functional_movement.antagonists = [45, 46, 47, 48]
+        functional_movement.antagonists = [44, 75, 68, 45, 46, 47, 48, 53, 62]
         return functional_movement
 
-    def get_tibial_external_rotation(self):
-
-        functional_movement = FunctionalMovement(FunctionalMovementType.tibial_external_rotation)
-        functional_movement.prime_movers = [45, 46]
-        functional_movement.antagonists = [47, 48]
-        return functional_movement
-
-    def get_tibial_internal_rotation(self):
-
-        functional_movement = FunctionalMovement(FunctionalMovementType.tibial_internal_rotation)
-        functional_movement.prime_movers = [47, 48]
-        functional_movement.antagonists = [45, 46, 53]
-        return functional_movement
+    #TODO - what happened to thses
+    # def get_tibial_external_rotation(self):
+    #
+    #     functional_movement = FunctionalMovement(FunctionalMovementType.tibial_external_rotation)
+    #     functional_movement.prime_movers = [45, 46]
+    #     functional_movement.antagonists = [47, 48]
+    #     return functional_movement
+    #
+    # def get_tibial_internal_rotation(self):
+    #
+    #     functional_movement = FunctionalMovement(FunctionalMovementType.tibial_internal_rotation)
+    #     functional_movement.prime_movers = [47, 48]
+    #     functional_movement.antagonists = [45, 46, 53]
+    #     return functional_movement
 
     def get_hip_extension(self):
 
         functional_movement = FunctionalMovement(FunctionalMovementType.hip_extension)
-        functional_movement.prime_movers = [45, 47, 48, 51, 60, 66]
-        functional_movement.antagonists = [49, 50, 52, 53, 54, 58, 59, 61, 62, 65]
+        functional_movement.prime_movers = [66]
+        functional_movement.antagonists = [50, 54, 58, 62, 59, 71]
+        functional_movement.synergists = [45, 47, 48, 51]
         return functional_movement
 
     def get_hip_flexion(self):
 
         functional_movement = FunctionalMovement(FunctionalMovementType.hip_flexion)
-        functional_movement.prime_movers = [49, 50, 52, 53, 54, 58, 59, 61, 62, 65]
-        functional_movement.antagonists = [47, 48, 51, 60, 66]
+        functional_movement.prime_movers = [54, 71]
+        functional_movement.antagonists = [45, 47, 48, 51, 66]
+        functional_movement.synergists = [49, 50, 52, 53, 58, 62, 59, 65]
         return functional_movement
 
     def get_hip_adduction(self):
 
         functional_movement = FunctionalMovement(FunctionalMovementType.hip_adduction)
-        functional_movement.prime_movers = [49, 50, 51, 52, 53, 54]
-        functional_movement.antagonists = [59, 60, 63, 64, 65]
+        functional_movement.prime_movers = [49, 50, 51, 52, 53]
+        functional_movement.antagonists = [55, 62, 59, 63, 64, 65]
+        functional_movement.synergists = [47, 48, 54, 67, 66]
         return functional_movement
 
     def get_hip_abduction(self):
 
         functional_movement = FunctionalMovement(FunctionalMovementType.hip_abduction)
-        functional_movement.prime_movers = [59, 60, 62, 63, 64, 65]
-        functional_movement.antagonists = [49, 50, 51, 52, 53, 54]
+        functional_movement.prime_movers = [63, 64]
+        functional_movement.antagonists = [49, 50, 51, 52, 53, 54, 67]
+        functional_movement.synergists = [55, 62, 59, 65, 66]
         return functional_movement
 
     def get_hip_internal_rotation(self):
 
         functional_movement = FunctionalMovement(FunctionalMovementType.hip_internal_rotation)
-        functional_movement.prime_movers = [49, 50, 52, 53, 54, 59, 63, 65]
-        functional_movement.antagonists = [51, 60, 61, 64, 66]
+        functional_movement.prime_movers = [54, 65]
+        functional_movement.antagonists = [45, 51, 62, 67, 64, 66]
+        functional_movement.synergists = [46, 47, 48, 49, 50, 52, 53, 59, 63]
         return functional_movement
 
     def get_hip_external_rotation(self):
 
         functional_movement = FunctionalMovement(FunctionalMovementType.hip_external_rotation)
-        functional_movement.prime_movers = [51, 60, 61, 64, 66]
-        functional_movement.antagonists = [49, 50, 52, 53, 54, 59, 62, 63, 65]
+        functional_movement.prime_movers = [60]
+        functional_movement.antagonists = [47, 48, 49, 50, 52, 53, 54, 59, 63, 65]
+        functional_movement.synergists = [45, 51, 62, 67, 64, 66]
         return functional_movement
 
     def get_pelvic_anterior_tilt(self):
 
         functional_movement = FunctionalMovement(FunctionalMovementType.pelvic_anterior_tilt)
-        functional_movement.prime_movers = [26, 58, 61]
-        functional_movement.antagonists = []
+        functional_movement.prime_movers = [58, 71, 72, 26, 70, 21]
+        functional_movement.antagonists = [74, 75]
+        functional_movement.synergists = [54, 62, 59]
         return functional_movement
+
+    def get_pelvic_posterior_tilt(self):
+
+        functional_movement = FunctionalMovement(FunctionalMovementType.pelvic_posterior_tilt)
+        functional_movement.prime_movers = [74, 75]
+        functional_movement.antagonists = [58, 71, 72, 26, 70, 21]
+        functional_movement.synergists = [45, 69]
+        return functional_movement
+
+    def get_trunk_flexion(self):
+
+        functional_movement = FunctionalMovement(FunctionalMovementType.trunk_flexion)
+        functional_movement.prime_movers = []
