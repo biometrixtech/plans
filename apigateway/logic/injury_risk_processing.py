@@ -104,6 +104,7 @@ class InjuryRiskProcessor(object):
             injury_risk_dict[body_part_side].underactive_weak_count_0_20_days = 0
             injury_risk_dict[body_part_side].compensating_count_0_20_days = 0
             injury_risk_dict[body_part_side].short_count_0_20_days = 0
+            injury_risk_dict[body_part_side].long_count_0_20_days = 0
 
         for d in dates:
             overactive_set = set()
@@ -111,6 +112,7 @@ class InjuryRiskProcessor(object):
             underactive_weak_set = set()
             compensating_set = set()
             short_set = set()
+            long_set = set()
 
             todays_sessions = [s for s in last_20_days_sessions if s.event_date.date() == d]
 
@@ -125,6 +127,8 @@ class InjuryRiskProcessor(object):
                     compensating_set.add(body_part_side)
                 for body_part_side in t.short_body_parts:
                     short_set.add(body_part_side)
+                for body_part_side in t.long_body_parts:
+                    long_set.add(body_part_side)
 
             for b in overactive_set:
                 injury_risk_dict[b].overactive_count_0_20_days += 1
@@ -140,6 +144,11 @@ class InjuryRiskProcessor(object):
 
             for b in short_set:
                 injury_risk_dict[b].short_count_0_20_days += 1
+
+            for b in long_set:
+                injury_risk_dict[b].long_count_last_0_20_days += 1
+
+        return injury_risk_dict
 
     def update_historical_symptoms(self, base_date, injury_risk_dict):
 
@@ -227,6 +236,8 @@ class InjuryRiskProcessor(object):
             injury_risk_dict = {}
             # first let's update our historical data
             injury_risk_dict = self.update_historical_symptoms(d, injury_risk_dict)
+
+            injury_risk_dict = self.update_historic_session_stats(d, injury_risk_dict)
 
             injury_risk_dict = self.process_todays_symptoms(d, injury_risk_dict)
             # now process todays sessions

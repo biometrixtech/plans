@@ -807,6 +807,10 @@ class ActiveRest(ModalityBase):
         pass
 
     @abc.abstractmethod
+    def check_care_movement_pattern(self, body_part_side, body_part_injury_risk, exercise_library, max_severity):
+        pass
+
+    @abc.abstractmethod
     def check_care_muscle_spasm(self, body_part_side, body_part_injury_risk, exercise_library, max_severity):
         pass
 
@@ -828,17 +832,59 @@ class ActiveRest(ModalityBase):
                         return True
         return False
 
+    def is_body_part_overactive_short(self, body_part_injury_risk):
+
+        is_short = self.is_body_part_short(body_part_injury_risk)
+
+        is_overactive = self.is_body_part_overactive(body_part_injury_risk)
+
+        return is_short and is_overactive
+
+    def is_body_part_underactive_long(self, body_part_injury_risk):
+
+        is_long = self.is_body_part_long(body_part_injury_risk)
+
+        is_underactive_inhibited = self.is_body_part_underactive_inhibited(body_part_injury_risk)
+
+        is_underactive_weak = self.is_body_part_underactive_weak(body_part_injury_risk)
+
+        is_underactive = is_underactive_inhibited or is_underactive_weak
+
+        return is_long and is_underactive
+
+    def is_body_part_underactive_short(self, body_part_injury_risk):
+
+        is_short = self.is_body_part_short(body_part_injury_risk)
+
+        is_underactive_inhibited = self.is_body_part_underactive_inhibited(body_part_injury_risk)
+
+        is_underactive_weak = self.is_body_part_underactive_weak(body_part_injury_risk)
+
+        is_underactive = is_underactive_inhibited or is_underactive_weak
+
+        return is_short and is_underactive
+
+    def is_body_part_long(self, body_part_injury_risk):
+
+        is_short = False
+
+        if body_part_injury_risk.long_count_last_0_20_days >= 3:
+            is_short = True
+        return is_short
+
     def is_body_part_short(self, body_part_injury_risk):
 
         is_short = False
 
         if body_part_injury_risk.knots_count_last_0_20_days >= 3:
             is_short = True
-        elif body_part_injury_risk.tight_count_last_0_20_days >= 3:
+        if body_part_injury_risk.tight_count_last_0_20_days >= 3:
             is_short = True
         if body_part_injury_risk.sharp_count_last_0_20_days >= 3:
             is_short = True
         if body_part_injury_risk.ache_count_last_0_20_days >= 4:
+            is_short = True
+        if body_part_injury_risk.short_count_last_0_20_days >= 3:
             is_short = True
         return is_short
 
@@ -893,7 +939,6 @@ class ActiveRest(ModalityBase):
                     and body_part_injury_risk.last_ache_date == self.event_date_time.date()):
                 max_severity = max(max_severity, body_part_injury_risk.last_ache_level)
 
-        # TODO don't we still need this? - ASK DIPESH if get general is ok?
         if self.force_data:
             self.get_general_exercises(exercise_library, max_severity)
 
@@ -902,6 +947,7 @@ class ActiveRest(ModalityBase):
             self.check_recovery_compensation(body_part_side, body_part_injury_risk, exercise_library, max_severity)
             self.check_care_inflammation(body_part_side, body_part_injury_risk, exercise_library, max_severity)
             self.check_care_muscle_spasm(body_part_side, body_part_injury_risk, exercise_library, max_severity)
+            self.check_care_movement_pattern(body_part_side, body_part_injury_risk, exercise_library, max_severity)
             self.check_prevention(body_part_side, body_part_injury_risk, exercise_library, max_severity)
 
     def get_last_severity(self, body_part_injury_risk):
@@ -1260,6 +1306,31 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
                     self.copy_exercises(body_part.active_stretch_exercises, self.active_stretch_exercises, goal, "1",
                                         last_severity, exercise_library)
 
+    def check_care_movement_pattern(self, body_part_side, body_part_injury_risk, exercise_library, max_severity):
+
+        body_part_factory = BodyPartFactory()
+
+        if (body_part_injury_risk.last_overactive_date is not None and
+                body_part_injury_risk.last_overactive_date == self.event_date_time.date() and
+                body_part_injury_risk.last_short_date is not None and
+                body_part_injury_risk.last_short_date == self.event_date_time.date()):
+
+            body_part = body_part_factory.get_body_part(body_part_side)
+
+            goal = AthleteGoal("Tightness", 1, AthleteGoalType.sore)
+
+            if body_part is not None:
+
+                last_severity = self.get_last_severity(body_part_injury_risk)
+
+                self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1", last_severity, exercise_library)
+
+                if max_severity < 7.0:
+                    self.copy_exercises(body_part.static_stretch_exercises, self.static_stretch_exercises, goal, "1",
+                                        last_severity, exercise_library)
+                    self.copy_exercises(body_part.active_stretch_exercises, self.active_stretch_exercises, goal, "1",
+                                        last_severity, exercise_library)
+
     def check_prevention(self, body_part_side, body_part_injury_risk, exercise_library, max_severity):
 
         body_part_factory = BodyPartFactory()
@@ -1273,28 +1344,36 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
             is_overactive = self.is_body_part_overactive(body_part_injury_risk)
             is_underactive_weak = self.is_body_part_underactive_weak(body_part_injury_risk)
             is_underactive_inhibited = self.is_body_part_underactive_inhibited(body_part_injury_risk)
+            is_overactive_short = self.is_body_part_overactive_short(body_part_injury_risk)
+            is_underactive_long = self.is_body_part_underactive_long(body_part_injury_risk)
+            is_underactive_short = self.is_body_part_underactive_short(body_part_injury_risk)
 
-            if is_short:
+            if is_overactive_short:
                 goal = AthleteGoal("Shortened Tissues", 1, AthleteGoalType.corrective)
                 self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1", last_severity, exercise_library)
 
                 if max_severity < 7.0:
                     self.copy_exercises(body_part.static_stretch_exercises, self.static_stretch_exercises, goal, "1",
                                         last_severity, exercise_library)
-                    self.copy_exercises(body_part.active_stretch_exercises, self.active_stretch_exercises, goal, "1",
-                                        last_severity, exercise_library)
+                    # self.copy_exercises(body_part.active_stretch_exercises, self.active_stretch_exercises, goal, "1",
+                    #                     last_severity, exercise_library)
 
-            elif is_overactive:
+            elif is_underactive_short:
 
-                goal = AthleteGoal("Overactive Muscles", 1, AthleteGoalType.corrective)
+                goal = AthleteGoal("Strength Deficiencies", 1, AthleteGoalType.corrective)
                 self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1", last_severity,
                                     exercise_library)
 
                 if max_severity < 7.0:
                     self.copy_exercises(body_part.static_stretch_exercises, self.static_stretch_exercises, goal, "1",
                                         last_severity, exercise_library)
+                    self.copy_exercises(body_part.active_stretch_exercises, self.active_stretch_exercises, goal, "1",
+                                        last_severity, exercise_library)
+                if max_severity < 5.0:
+                    self.copy_exercises(body_part.isolated_activate_exercises, self.isolated_activate_exercises, goal, "1",
+                                        last_severity, exercise_library)
 
-            if is_underactive_weak or is_underactive_inhibited:
+            elif is_underactive_long:
 
                 goal = AthleteGoal("Strength Deficiencies", 1, AthleteGoalType.corrective)
 
@@ -1572,6 +1651,30 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
                     self.copy_exercises(body_part.static_stretch_exercises, self.static_stretch_exercises, goal, "1",
                                         last_severity, exercise_library)
 
+    def check_care_movement_pattern(self, body_part_side, body_part_injury_risk, exercise_library, max_severity):
+
+        body_part_factory = BodyPartFactory()
+
+        if (body_part_injury_risk.last_overactive_date is not None and
+                body_part_injury_risk.last_overactive_date == self.event_date_time.date() and
+                body_part_injury_risk.last_short_date is not None and
+                body_part_injury_risk.last_short_date == self.event_date_time.date()):
+
+            body_part = body_part_factory.get_body_part(body_part_side)
+
+            goal = AthleteGoal("Tightness", 1, AthleteGoalType.sore)
+
+            if body_part is not None:
+
+                last_severity = self.get_last_severity(body_part_injury_risk)
+
+                self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1", last_severity, exercise_library)
+
+                if max_severity < 7.0:
+                    self.copy_exercises(body_part.static_stretch_exercises, self.static_stretch_exercises, goal, "1",
+                                        last_severity, exercise_library)
+
+
     def check_prevention(self, body_part_side, body_part_injury_risk, exercise_library, max_severity):
 
         body_part_factory = BodyPartFactory()
@@ -1581,12 +1684,11 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
         if body_part is not None:
             last_severity = self.get_last_severity(body_part_injury_risk)
 
-            is_short = self.is_body_part_short(body_part_injury_risk)
-            is_overactive = self.is_body_part_overactive(body_part_injury_risk)
-            is_underactive_weak = self.is_body_part_underactive_weak(body_part_injury_risk)
-            is_underactive_inhibited = self.is_body_part_underactive_inhibited(body_part_injury_risk)
+            is_overactive_short = self.is_body_part_overactive_short(body_part_injury_risk)
+            is_underactive_short = self.is_body_part_underactive_short(body_part_injury_risk)
+            is_underactive_long = self.is_body_part_underactive_long(body_part_injury_risk)
 
-            if is_short:
+            if is_overactive_short:
 
                 goal = AthleteGoal("Shortened Tissues", 1, AthleteGoalType.corrective)
 
@@ -1596,18 +1698,26 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
                     self.copy_exercises(body_part.static_stretch_exercises, self.static_stretch_exercises, goal, "1",
                                         last_severity, exercise_library)
 
-            elif is_overactive:
+            elif is_underactive_short:
 
-                goal = AthleteGoal("Overactive Muscles", 1, AthleteGoalType.corrective)
+                goal = AthleteGoal("Strength Deficiencies", 1, AthleteGoalType.corrective)
 
                 self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1", last_severity,
+
                                     exercise_library)
 
                 if max_severity < 7.0:
                     self.copy_exercises(body_part.static_stretch_exercises, self.static_stretch_exercises, goal, "1",
+
                                         last_severity, exercise_library)
 
-            if is_underactive_weak or is_underactive_inhibited:
+                if max_severity < 5.0:
+                    self.copy_exercises(body_part.isolated_activate_exercises, self.isolated_activate_exercises, goal,
+                                        "1",
+
+                                        last_severity, exercise_library)
+
+            elif is_underactive_long:
 
                 goal = AthleteGoal("Strength Deficiencies", 1, AthleteGoalType.corrective)
 

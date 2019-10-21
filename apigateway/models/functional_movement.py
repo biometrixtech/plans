@@ -146,6 +146,7 @@ class BodyPartInjuryRisk(object):
 
         # long
         self.last_long_date = None
+        self.long_count_last_0_20_days = 0
 
         # overactive / underactive
         self.last_overactive_date = None
@@ -222,6 +223,7 @@ class BodyPartInjuryRisk(object):
 
                 # long
                 "last_long_date": format_date(self.last_long_date),
+                "long_count_last_0_20_days": self.long_count_last_0_20_days,
 
                 # overactive / underactive
                 "last_overactive_date": format_date(self.last_overactive_date),
@@ -301,6 +303,7 @@ class BodyPartInjuryRisk(object):
 
         # long
         injury_risk.last_long_date = input_dict.get('last_long_date')
+        injury_risk.long_count_last_0_20_days = input_dict.get('long_count_last_0_20_days', 0)
 
         # overactive / underactive
         injury_risk.last_overactive_date = input_dict.get('last_overactive_date')
@@ -383,6 +386,7 @@ class BodyPartInjuryRisk(object):
 
         # long
         self.last_long_date = self.merge_with_none(self.last_long_date, body_part_injury_risk.last_long_date)
+        self.long_count_last_0_20_days = max(self.long_count_last_0_20_days, body_part_injury_risk.long_count_last_0_20_days)
 
         # overactive / underactive
         self.last_overactive_date = self.merge_with_none(self.last_overactive_date, body_part_injury_risk.last_overactive_date)
@@ -562,6 +566,27 @@ class SessionFunctionalMovement(object):
                 # are any muscles associated with Pelvic Anterior Tilt considered to be short with adhesions or muscle spasm?
                 any_short_confirmed = False
                 body_part_factory = BodyPartFactory()
+
+                # presence of elasticity indicates overactivity
+                for p in pelvic_tilt_movement.prime_movers:
+                    bilateral = body_part_factory.get_bilateral(BodyPartLocation(p))
+                    if bilateral:
+                        body_part_side = BodyPartSide(BodyPartLocation(p), side)
+                    else:
+                        body_part_side = BodyPartSide(BodyPartLocation(p), 0)
+                    if body_part_side in self.injury_risk_dict:
+                        if self.injury_risk_dict[body_part_side].last_overactive_date < event_date:
+                            self.injury_risk_dict[body_part_side].last_overactive_date = event_date
+                            self.injury_risk_dict[body_part_side].overactive_count_last_0_20_days += 1
+                            self.session.overactive_body_parts.append(body_part_side)
+                    else:
+                        body_part_injury_risk = BodyPartInjuryRisk()
+                        body_part_injury_risk.last_overactive_date = event_date
+                        body_part_injury_risk.overactive_count_last_0_20_days += 1
+                        self.injury_risk_dict[body_part_side] = body_part_injury_risk
+                        self.session.overactive_body_parts.append(body_part_side)
+                    self.injury_risk_dict[body_part_side].compensation_source = CompensationSource.movement_patterns_3s
+
                 for p in pelvic_tilt_movement.prime_movers:
                     bilateral = body_part_factory.get_bilateral(BodyPartLocation(p))
                     if bilateral:
@@ -572,11 +597,10 @@ class SessionFunctionalMovement(object):
                         if self.injury_risk_dict[body_part_side].last_adhesions_date is not None and \
                                 self.injury_risk_dict[body_part_side].last_adhesions_date == event_date:
                             any_short_confirmed = True
-                        if self.injury_risk_dict[body_part_side].last_muscle_spasm_date is not None and \
-                                self.injury_risk_dict[body_part_side].last_muscle_spasm_date == event_date:
-                            any_short_confirmed = True
-
-                # TODO - have Gabby ask Barnett if this should be all or nothing for all prime movers in Pelvic Tilt
+                        #
+                        # if self.injury_risk_dict[body_part_side].last_muscle_spasm_date is not None and \
+                        #         self.injury_risk_dict[body_part_side].last_muscle_spasm_date == event_date:
+                        #     any_short_confirmed = True
 
                 if any_short_confirmed:  # mark all muscle imbalance and short
                     for p in pelvic_tilt_movement.prime_movers:
@@ -594,94 +618,97 @@ class SessionFunctionalMovement(object):
                             body_part_injury_risk.last_muscle_imbalance_date = event_date
                             self.injury_risk_dict[body_part_side] = body_part_injury_risk
                         self.injury_risk_dict[body_part_side].compensation_source = CompensationSource.movement_patterns_3s
+                        self.session.short_body_parts.append(body_part_side)
 
                     self.mark_hip_extension_compensating(side)
 
-                else:  # mark all muscles overactive
-                    for p in pelvic_tilt_movement.prime_movers:
-                        bilateral = body_part_factory.get_bilateral(BodyPartLocation(p))
-                        if bilateral:
-                            body_part_side = BodyPartSide(BodyPartLocation(p), side)
-                        else:
-                            body_part_side = BodyPartSide(BodyPartLocation(p), 0)
+                # TODO - add long muscle imbalance (antagonists); not sure how to do it yet
+
+                # checking for underactive inhibited or weak
+                # check for evidence of short else assume and mark long (by muscle)
+                # adhesions reported or (63, 64, 66, 73, 74, 21) is short muscle imbalance
+                if key_adf_value != 0:
+                    for b in [63, 64, 66, 73, 74]:
+                        body_part_side = BodyPartSide(BodyPartLocation(b), side)
                         if body_part_side in self.injury_risk_dict:
-                            if self.injury_risk_dict[body_part_side].last_overactive_date < event_date:
-                                self.injury_risk_dict[body_part_side].last_overactive_date = event_date
-                                self.injury_risk_dict[body_part_side].overactive_count_last_0_20_days += 1
-                                self.session.overactive_body_parts.append(body_part_side)
+                            if self.injury_risk_dict[body_part_side].last_underactive_date < event_date:
+                                self.injury_risk_dict[body_part_side].last_underactive_date = event_date
+                                self.injury_risk_dict[body_part_side].underactive_weak_count_last_0_20_days += 1
+                            if self.injury_risk_dict[body_part_side].last_weak_date < event_date:
+                                self.injury_risk_dict[body_part_side].last_weak_date = event_date
+
+                            is_short = self.is_short_from_adhesions_or_muscle_imbalance(self.injury_risk_dict[body_part_side], event_date)
+
+                            if not is_short:
+                                self.injury_risk_dict[body_part_side].last_long_date = event_date
+                                self.session.long_body_parts.append(body_part_side)
+
+                            self.session.underactive_weak_body_parts.append(body_part_side)
                         else:
                             body_part_injury_risk = BodyPartInjuryRisk()
-                            body_part_injury_risk.last_overactive_date = event_date
-                            body_part_injury_risk.overactive_count_last_0_20_days += 1
+                            body_part_injury_risk.last_underactive_date = event_date
+                            body_part_injury_risk.last_weak_date = event_date
+                            body_part_injury_risk.underactive_weak_count_last_0_20_days += 1
+
+                            is_short = self.is_short_from_adhesions_or_muscle_imbalance(body_part_injury_risk, event_date)
+
+                            if not is_short:
+                                body_part_injury_risk.last_long_date = event_date
+                                self.session.long_body_parts.append(body_part_side)
+
                             self.injury_risk_dict[body_part_side] = body_part_injury_risk
-                            self.session.overactive_body_parts.append(body_part_side)
-                        self.injury_risk_dict[body_part_side].compensation_source = CompensationSource.movement_patterns_3s
-                    # now mark specific muscles as underactive inhibited -- unless fatigue is present, then underactive weak
-                    if key_adf_value != 0:
-                        for b in [61, 62, 63, 64, 66]:
-                            body_part_side = BodyPartSide(BodyPartLocation(b), side)
-                            if body_part_side in self.injury_risk_dict:
-                                if self.injury_risk_dict[body_part_side].last_underactive_date < event_date:
-                                    self.injury_risk_dict[body_part_side].last_underactive_date = event_date
-                                    self.injury_risk_dict[body_part_side].underactive_weak_count_last_0_20_days += 1
-                                if self.injury_risk_dict[body_part_side].last_weak_date < event_date:
-                                    self.injury_risk_dict[body_part_side].last_weak_date = event_date
-                                self.session.underactive_body_parts.append(body_part_side)
-                            else:
-                                body_part_injury_risk = BodyPartInjuryRisk()
-                                body_part_injury_risk.last_underactive_date = event_date
-                                body_part_injury_risk.last_weak_date = event_date
-                                body_part_injury_risk.underactive_weak_count_last_0_20_days += 1
-                                self.injury_risk_dict[body_part_side] = body_part_injury_risk
-                                self.session.underactive_body_parts.append(body_part_side)
-                            self.injury_risk_dict[
-                                body_part_side].compensation_source = CompensationSource.movement_patterns_3s
+                            self.session.underactive_weak_body_parts.append(body_part_side)
+                        self.injury_risk_dict[
+                            body_part_side].compensation_source = CompensationSource.movement_patterns_3s
 
-                        self.mark_hip_extension_compensating(side)
-                    else:
-                        for b in [61, 62, 63, 64, 66]:
-                            body_part_side = BodyPartSide(BodyPartLocation(b), side)
-                            if body_part_side in self.injury_risk_dict:
-                                if self.injury_risk_dict[body_part_side].last_underactive_date < event_date:
-                                    self.injury_risk_dict[body_part_side].last_underactive_date = event_date
-                                    self.injury_risk_dict[body_part_side].underactive_inhibited_count_last_0_20_days += 1
-                                if self.injury_risk_dict[body_part_side].last_inhibited_date < event_date:
-                                    self.injury_risk_dict[body_part_side].last_inhibited_date = event_date
-                                self.session.underactive_body_parts.append(body_part_side)
-                            else:
-                                body_part_injury_risk = BodyPartInjuryRisk()
-                                body_part_injury_risk.last_underactive_date = event_date
-                                body_part_injury_risk.last_inhibited_date = event_date
-                                body_part_injury_risk.underactive_inhibited_count_last_0_20_days += 1
-                                self.injury_risk_dict[body_part_side] = body_part_injury_risk
-                                self.session.underactive_body_parts.append(body_part_side)
-                            self.injury_risk_dict[
-                                body_part_side].compensation_source = CompensationSource.movement_patterns_3s
+                    self.mark_hip_extension_compensating(side)
+                else:
+                    for b in [63, 64, 66, 73, 74]:
+                        body_part_side = BodyPartSide(BodyPartLocation(b), side)
+                        if body_part_side in self.injury_risk_dict:
+                            if self.injury_risk_dict[body_part_side].last_underactive_date < event_date:
+                                self.injury_risk_dict[body_part_side].last_underactive_date = event_date
+                                self.injury_risk_dict[body_part_side].underactive_inhibited_count_last_0_20_days += 1
+                            if self.injury_risk_dict[body_part_side].last_inhibited_date < event_date:
+                                self.injury_risk_dict[body_part_side].last_inhibited_date = event_date
 
-                        self.mark_hip_extension_compensating(side)
+                            is_short = self.is_short_from_adhesions_or_muscle_imbalance(
+                                self.injury_risk_dict[body_part_side], event_date)
 
-            elif key_adf_value != 0:
-                #TODO - make sure this is correct and no other paths need to be followed
-                for b in [61, 62, 63, 64, 66]:
-                    body_part_side = BodyPartSide(BodyPartLocation(b), side)
-                    if body_part_side in self.injury_risk_dict:
-                        if self.injury_risk_dict[body_part_side].last_underactive_date < event_date:
-                            self.injury_risk_dict[body_part_side].last_underactive_date = event_date
-                            self.injury_risk_dict[body_part_side].underactive_weak_count_last_0_20_days += 1
-                        if self.injury_risk_dict[body_part_side].last_weak_date < event_date:
-                            self.injury_risk_dict[body_part_side].last_weak_date = event_date
-                        self.session.underactive_body_parts.append(body_part_side)
-                    else:
-                        body_part_injury_risk = BodyPartInjuryRisk()
-                        body_part_injury_risk.last_underactive_date = event_date
-                        body_part_injury_risk.last_weak_date = event_date
-                        body_part_injury_risk.underactive_weak_count_last_0_20_days += 1
-                        self.injury_risk_dict[body_part_side] = body_part_injury_risk
-                        self.session.underactive_body_parts.append(body_part_side)
-                    self.injury_risk_dict[
-                        body_part_side].compensation_source = CompensationSource.movement_patterns_3s
+                            if not is_short:
+                                self.injury_risk_dict[body_part_side].last_long_date = event_date
+                                self.session.long_body_parts.append(body_part_side)
 
-                self.mark_hip_extension_compensating(side)
+                            self.session.underactive_inhibited_body_parts.append(body_part_side)
+                        else:
+                            body_part_injury_risk = BodyPartInjuryRisk()
+                            body_part_injury_risk.last_underactive_date = event_date
+                            body_part_injury_risk.last_inhibited_date = event_date
+                            body_part_injury_risk.underactive_inhibited_count_last_0_20_days += 1
+
+                            is_short = self.is_short_from_adhesions_or_muscle_imbalance(body_part_injury_risk,
+                                                                                        event_date)
+
+                            if not is_short:
+                                body_part_injury_risk.last_long_date = event_date
+                                self.session.long_body_parts.append(body_part_side)
+
+                            self.injury_risk_dict[body_part_side] = body_part_injury_risk
+                            self.session.underactive_inhibited_body_parts.append(body_part_side)
+                        self.injury_risk_dict[
+                            body_part_side].compensation_source = CompensationSource.movement_patterns_3s
+
+                    self.mark_hip_extension_compensating(side)
+
+    def is_short_from_adhesions_or_muscle_imbalance(self, body_part_injury_risk, event_date):
+
+        is_short = False
+        if body_part_injury_risk.last_adhesions_date is not None and body_part_injury_risk.last_adhesions_date == event_date:
+            is_short = True
+        if body_part_injury_risk.last_short_date is not None and body_part_injury_risk.last_short_date == event_date:
+            is_short = True
+
+        return is_short
 
     def mark_hip_extension_compensating(self, side):
 

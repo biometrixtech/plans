@@ -121,6 +121,7 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         self.underactive_weak_body_parts = []
         self.compensating_body_parts = []
         self.short_body_parts = []
+        self.long_body_parts = []
 
     def __setattr__(self, name, value):
         if name in ['event_date', 'end_date', 'created_date', 'completed_date_time', 'sensor_start_date_time', 'sensor_end_date_time', 'last_updated']:
@@ -331,6 +332,7 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
             'underactive_weak_body_parts': [u.json_serialise() for u in self.underactive_weak_body_parts],
             'compensating_body_parts': [c.json_serialise() for c in self.compensating_body_parts],
             'short_body_parts': [c.json_serialise() for c in self.short_body_parts],
+            'long_body_parts': [c.json_serialise() for c in self.long_body_parts],
         }
         return ret
 
@@ -393,7 +395,8 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
                                          input_dict.get('compensating_body_parts') is not None]
         session.short_body_parts = [c.json_deserialize for c in input_dict['short_body_parts'] if
                                          input_dict.get('short_body_parts') is not None]
-
+        session.long_body_parts = [c.json_deserialize for c in input_dict['long_body_parts'] if
+                                         input_dict.get('long_body_parts') is not None]
         return session
 
     def internal_load(self):
