@@ -868,6 +868,20 @@ class ActiveRest(ModalityBase):
 
         return is_underactive_inhibited
 
+    def is_excessive_strain(self, body_part_injury_risk):
+
+        two_days_ago = self.event_date_time.date() - datetime.timedelta(days=2)
+
+        if (body_part_injury_risk.last_excessive_strain_date is not None and
+                body_part_injury_risk.last_excessive_strain_date == self.event_date_time.date()):
+            return True
+        elif (body_part_injury_risk.last_excessive_strain_date is not None and
+              body_part_injury_risk.last_non_functional_overreaching_date is not None and
+              body_part_injury_risk.last_non_functional_overreaching_date >= two_days_ago):
+            return True
+        else:
+            return False
+
     def fill_exercises(self, exercise_library, injury_risk_dict):
 
         max_severity = 0
@@ -1164,33 +1178,28 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
 
         body_part_factory = BodyPartFactory()
 
-        two_days_ago = self.event_date_time.date() - datetime.timedelta(days=2)
+        body_part = body_part_factory.get_body_part(body_part_side)
 
-        if (body_part_injury_risk.last_excessive_strain_date is not None and
-                body_part_injury_risk.last_excessive_strain_date >= two_days_ago):
+        goal = AthleteGoal("Elevated Stress", 1, AthleteGoalType.high_load)
 
-            body_part = body_part_factory.get_body_part(body_part_side)
+        if body_part is not None and self.is_excessive_strain(body_part_injury_risk):
 
-            goal = AthleteGoal("Elevated Stress", 1, AthleteGoalType.high_load)
+            last_severity = self.get_last_severity(body_part_injury_risk)
 
-            if body_part is not None:
+            self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1", last_severity, exercise_library)
 
-                last_severity = self.get_last_severity(body_part_injury_risk)
-
-                self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1", last_severity, exercise_library)
-
-                if max_severity < 7.0:
-                    self.copy_exercises(body_part.active_stretch_exercises, self.active_stretch_exercises, goal, "1",
-                                        last_severity, exercise_library)
-                if max_severity < 5.0:
-                    self.copy_exercises(body_part.isolated_activate_exercises, self.isolated_activate_exercises, goal, "1",
-                                        last_severity, exercise_library)
+            if max_severity < 7.0:
+                self.copy_exercises(body_part.active_stretch_exercises, self.active_stretch_exercises, goal, "1",
+                                    last_severity, exercise_library)
+            if max_severity < 5.0:
+                self.copy_exercises(body_part.isolated_activate_exercises, self.isolated_activate_exercises, goal, "1",
+                                    last_severity, exercise_library)
 
     def check_recovery_compensation(self, body_part_side, body_part_injury_risk, exercise_library, max_severity):
 
         body_part_factory = BodyPartFactory()
 
-        if body_part_injury_risk.is_compensating:
+        if body_part_injury_risk.last_compensation_date is not None and body_part_injury_risk.last_compensation_date == self.event_date_time.date():
 
             body_part = body_part_factory.get_body_part(body_part_side)
 
@@ -1478,36 +1487,31 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
 
         body_part_factory = BodyPartFactory()
 
-        two_days_ago = self.event_date_time.date() - datetime.timedelta(days=2)
+        body_part = body_part_factory.get_body_part(body_part_side)
 
-        if (body_part_injury_risk.last_excessive_strain_date is not None and
-                body_part_injury_risk.last_excessive_strain_date >= two_days_ago):
+        goal = AthleteGoal("Elevated Stress", 1, AthleteGoalType.high_load)
 
-            body_part = body_part_factory.get_body_part(body_part_side)
+        if body_part is not None and self.is_excessive_strain(body_part_injury_risk):
 
-            goal = AthleteGoal("Elevated Stress", 1, AthleteGoalType.high_load)
+            last_severity = self.get_last_severity(body_part_injury_risk)
 
-            if body_part is not None:
+            self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1", last_severity,
+                                exercise_library)
 
-                last_severity = self.get_last_severity(body_part_injury_risk)
+            if max_severity < 7.0:
+                self.copy_exercises(body_part.static_stretch_exercises, self.static_stretch_exercises, goal, "1",
+                                    last_severity, exercise_library)
 
-                self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1", last_severity,
-                                    exercise_library)
-
-                if max_severity < 7.0:
-                    self.copy_exercises(body_part.static_stretch_exercises, self.static_stretch_exercises, goal, "1",
-                                        last_severity, exercise_library)
-
-                if max_severity < 5.0:
-                    self.copy_exercises(body_part.isolated_activate_exercises, self.isolated_activate_exercises, goal,
-                                        "1",
-                                        last_severity, exercise_library)
+            if max_severity < 5.0:
+                self.copy_exercises(body_part.isolated_activate_exercises, self.isolated_activate_exercises, goal,
+                                    "1",
+                                    last_severity, exercise_library)
 
     def check_recovery_compensation(self, body_part_side, body_part_injury_risk, exercise_library, max_severity):
 
         body_part_factory = BodyPartFactory()
 
-        if body_part_injury_risk.is_compensating:
+        if body_part_injury_risk.last_compensation_date is not None and body_part_injury_risk.last_compensation_date == self.event_date_time.date():
 
             body_part = body_part_factory.get_body_part(body_part_side)
 

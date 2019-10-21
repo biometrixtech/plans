@@ -266,8 +266,9 @@ class InjuryRiskProcessor(object):
                     eccentric_volume_dict = self.eccentric_volume_dict[b.body_part_side]
                     concentric_volume_dict = self.concentric_volume_dict[b.body_part_side]
 
-                    injury_risk_dict[b.body_part_side].is_compensating = b.is_compensating
-                    injury_risk_dict[b.body_part_side].compensating_source = b.compensation_source
+                    if b.is_compensating:
+                        injury_risk_dict[b.body_part_side].last_compensation_date = d
+                        injury_risk_dict[b.body_part_side].compensating_source = b.compensation_source
 
                     last_week_eccentric_volume_dict = dict(
                         filter(lambda elem: fourteeen_days_ago <= elem[0] < seven_days_ago, eccentric_volume_dict.items()))
@@ -332,7 +333,7 @@ class InjuryRiskProcessor(object):
 
             injury_risk_dict[body_part_side].eccentric_volume_today = 0
             injury_risk_dict[body_part_side].concentric_volume_today = 0
-            injury_risk_dict[body_part_side].is_compensating = False
+            injury_risk_dict[body_part_side].last_compensation_date = None
             injury_risk_dict[body_part_side].compensating_source = None
 
         for session in daily_sessions:
@@ -350,8 +351,9 @@ class InjuryRiskProcessor(object):
 
                 injury_risk_dict[b.body_part_side].eccentric_volume_today += b.eccentric_volume
                 injury_risk_dict[b.body_part_side].concentric_volume_today += b.concentric_volume
-                injury_risk_dict[b.body_part_side].is_compensating = b.is_compensating
-                injury_risk_dict[b.body_part_side].compensating_source = b.compensation_source
+                if b.is_compensating:
+                    injury_risk_dict[b.body_part_side].last_compensation_date = base_date
+                    injury_risk_dict[b.body_part_side].compensating_source = b.compensation_source
 
                 eccentric_volume_ramp = injury_risk_dict[b.body_part_side].eccentric_volume_ramp()
                 total_volume_ramp = injury_risk_dict[b.body_part_side].total_volume_ramp()
