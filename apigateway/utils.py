@@ -47,7 +47,9 @@ def format_datetime(datetime_input):
 def parse_datetime(datetime_string):
     format_strings = [
         "%Y-%m-%dT%H:%M:%SZ",
-        "%Y-%m-%dT%H:%M:%S.%fZ"
+        "%Y-%m-%dT%H:%M:%S.%fZ",
+        "%Y-%m-%dT%H:%M:%S",
+        "%Y-%m-%dT%H:%M:%S.%f"
     ]
     for format_string in format_strings:
         try:
