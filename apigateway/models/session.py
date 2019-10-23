@@ -9,6 +9,7 @@ from models.post_session_survey import PostSurvey
 from models.load_stats import LoadStats
 from models.asymmetry import Asymmetry
 from models.functional_movement import MovementPatterns
+from models.soreness_base import BodyPartSide
 
 
 class SessionType(Enum):
@@ -384,18 +385,18 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         session.asymmetry = Asymmetry.json_deserialise(input_dict['asymmetry']) if input_dict.get('asymmetry') is not None else None
         session.movement_patterns = MovementPatterns.json_deserialise(input_dict['movement_patterns']) if input_dict.get(
             'movement_patterns') is not None else None
-        session.overactive_body_parts = [o.json_deserialize for o in input_dict['overactive_body_parts'] if
+        session.overactive_body_parts = [BodyPartSide.json_deserialise(o) for o in input_dict['overactive_body_parts'] if
                                          input_dict.get('overactive_body_parts') is not None]
-        session.underactive_inhibited_body_parts = [u.json_deserialize for u in input_dict['underactive_inhibited_body_parts'] if
+        session.underactive_inhibited_body_parts = [BodyPartSide.json_deserialise(u) for u in input_dict['underactive_inhibited_body_parts'] if
                                                     input_dict.get('underactive_inhibited_body_parts') is not None]
-        session.underactive_weak_body_parts = [u.json_deserialize for u in
+        session.underactive_weak_body_parts = [BodyPartSide.json_deserialise(u) for u in
                                                     input_dict['underactive_weak_body_parts'] if
                                                     input_dict.get('underactive_weak_body_parts') is not None]
-        session.compensating_body_parts = [c.json_deserialize for c in input_dict['compensating_body_parts'] if
+        session.compensating_body_parts = [BodyPartSide.json_deserialise(c) for c in input_dict['compensating_body_parts'] if
                                          input_dict.get('compensating_body_parts') is not None]
-        session.short_body_parts = [c.json_deserialize for c in input_dict['short_body_parts'] if
+        session.short_body_parts = [BodyPartSide.json_deserialise(c) for c in input_dict['short_body_parts'] if
                                          input_dict.get('short_body_parts') is not None]
-        session.long_body_parts = [c.json_deserialize for c in input_dict['long_body_parts'] if
+        session.long_body_parts = [BodyPartSide.json_deserialise(c) for c in input_dict['long_body_parts'] if
                                          input_dict.get('long_body_parts') is not None]
         return session
 

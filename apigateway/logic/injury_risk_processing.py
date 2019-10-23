@@ -7,6 +7,7 @@ from copy import deepcopy
 from datastores.session_datastore import SessionDatastore
 from utils import format_date
 
+
 class InjuryRiskProcessor(object):
     def __init__(self, event_date_time, symptoms_list, training_session_list, injury_risk_dict, load_stats, user_id):
         self.user_id = user_id
@@ -137,21 +138,33 @@ class InjuryRiskProcessor(object):
                     long_set.add(body_part_side)
 
             for b in overactive_set:
-                injury_risk_dict[b].overactive_count_0_20_days += 1
+                if b not in injury_risk_dict:
+                    injury_risk_dict[b] = BodyPartInjuryRisk()
+                injury_risk_dict[b].overactive_count_last_0_20_days += 1
 
             for b in underactive_inhibited_set:
-                injury_risk_dict[b].underactive_inhibited_count_0_20_days += 1
+                if b not in injury_risk_dict:
+                    injury_risk_dict[b] = BodyPartInjuryRisk()
+                injury_risk_dict[b].underactive_inhibited_count_last_0_20_days += 1
 
             for b in underactive_weak_set:
-                injury_risk_dict[b].underactive_weak_count_0_20_days += 1
+                if b not in injury_risk_dict:
+                    injury_risk_dict[b] = BodyPartInjuryRisk()
+                injury_risk_dict[b].underactive_weak_count_last_0_20_days += 1
 
             for b in compensating_set:
-                injury_risk_dict[b].compensating_count_0_20_days += 1
+                if b not in injury_risk_dict:
+                    injury_risk_dict[b] = BodyPartInjuryRisk()
+                injury_risk_dict[b].compensation_count_last_0_20_days += 1
 
             for b in short_set:
-                injury_risk_dict[b].short_count_0_20_days += 1
+                if b not in injury_risk_dict:
+                    injury_risk_dict[b] = BodyPartInjuryRisk()
+                injury_risk_dict[b].short_count_last_0_20_days += 1
 
             for b in long_set:
+                if b not in injury_risk_dict:
+                    injury_risk_dict[b] = BodyPartInjuryRisk()
                 injury_risk_dict[b].long_count_last_0_20_days += 1
 
         return injury_risk_dict
@@ -662,25 +675,26 @@ class InjuryRiskProcessor(object):
                     related_muscles = self.functional_anatomy_processor.get_related_muscles_for_joint(
                         target_body_part_side.body_part_location.value)
 
-                for r in related_muscles:
-                    if target_body_part_side.side == 0:
-                        bilateral = body_part_factory.get_bilateral(BodyPartLocation(r))
-                        if bilateral:
-                            sides = [1, 2]
+                if related_muscles is not None:
+                    for r in related_muscles:
+                        if target_body_part_side.side == 0:
+                            bilateral = body_part_factory.get_bilateral(BodyPartLocation(r))
+                            if bilateral:
+                                sides = [1, 2]
+                            else:
+                                sides = [0]
                         else:
-                            sides = [0]
-                    else:
-                        sides = [target_body_part_side.side]
-                    for sd in sides:
-                        body_part_side = BodyPartSide(BodyPartLocation(r), sd)
-                        if body_part_side in injury_risk_dict:
-                            injury_risk_dict[body_part_side].last_inflammation_date = base_date
-                            injury_risk_dict[body_part_side].last_inhibited_date = base_date
-                        else:
-                            body_part_injury_risk = BodyPartInjuryRisk()
-                            body_part_injury_risk.last_inflammation_date = base_date
-                            body_part_injury_risk.last_inhibited_date = base_date
-                            injury_risk_dict[body_part_side] = body_part_injury_risk
+                            sides = [target_body_part_side.side]
+                        for sd in sides:
+                            body_part_side = BodyPartSide(BodyPartLocation(r), sd)
+                            if body_part_side in injury_risk_dict:
+                                injury_risk_dict[body_part_side].last_inflammation_date = base_date
+                                injury_risk_dict[body_part_side].last_inhibited_date = base_date
+                            else:
+                                body_part_injury_risk = BodyPartInjuryRisk()
+                                body_part_injury_risk.last_inflammation_date = base_date
+                                body_part_injury_risk.last_inhibited_date = base_date
+                                injury_risk_dict[body_part_side] = body_part_injury_risk
 
         return injury_risk_dict
 
