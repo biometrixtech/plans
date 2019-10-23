@@ -249,7 +249,7 @@ class InjuryRiskProcessor(object):
 
         for d in combined_dates:
 
-            if d==self.event_date_time.date():
+            if d==datetime(2019,10,23).date():
                 j=0
 
             seven_days_ago = d - timedelta(days=6)
@@ -615,6 +615,7 @@ class InjuryRiskProcessor(object):
 
             sharp_count = 0
             ache_count = 0
+            ache_count_10_20 = 0
 
             # any sharp symptoms get marked inflammation
 
@@ -626,8 +627,8 @@ class InjuryRiskProcessor(object):
                         injury_risk_dict[target_body_part_side].last_sharp_date = base_date
                         injury_risk_dict[target_body_part_side].sharp_count_last_0_10_days += 1
                         injury_risk_dict[target_body_part_side].last_sharp_level = target_symptom.sharp
-                        injury_risk_dict[target_body_part_side].last_inflammation_date = base_date
                         sharp_count = injury_risk_dict[target_body_part_side].sharp_count_last_0_10_days
+                    injury_risk_dict[target_body_part_side].last_inflammation_date = base_date
                 else:
                     body_part_injury_risk = BodyPartInjuryRisk()
                     body_part_injury_risk.last_sharp_date = base_date
@@ -640,11 +641,13 @@ class InjuryRiskProcessor(object):
 
                 if target_body_part_side in injury_risk_dict:
                     ache_count = injury_risk_dict[target_body_part_side].ache_count_last_0_10_days
+                    ache_count_10_20 = injury_risk_dict[target_body_part_side].ache_count_last_0_20_days
                     if injury_risk_dict[target_body_part_side].last_ache_date < base_date is None or injury_risk_dict[target_body_part_side].last_ache_date < base_date:
                         injury_risk_dict[target_body_part_side].last_ache_date = base_date
                         injury_risk_dict[target_body_part_side].ache_count_last_0_10_days += 1
                         injury_risk_dict[target_body_part_side].last_ache_level = target_symptom.ache
                         ache_count = injury_risk_dict[target_body_part_side].ache_count_last_0_10_days
+                        ache_count_10_20 = injury_risk_dict[target_body_part_side].ache_count_last_0_20_days
                 else:
                     body_part_injury_risk = BodyPartInjuryRisk()
                     body_part_injury_risk.last_ache_date = base_date
@@ -654,12 +657,12 @@ class InjuryRiskProcessor(object):
 
                 # moderate severity or 2 reports in last 10 days
                 # TODO: is moderate to high ache severity > 3?
-                if target_symptom.ache > 3 or ache_count >= 2:
+                if target_symptom.ache > 3 or (ache_count >= 2 and ache_count == ache_count_10_20):
                     injury_risk_dict[target_body_part_side].last_inflammation_date = base_date
 
             # second, mark it inflamed, noting that joints cannot be inhibited as well
             # update the injury risk dict accordingly
-            if sharp_count >= 2 or ache_count >= 2:
+            if ache_count >= 2 and ache_count == ache_count_10_20:
                 if target_body_part_side in injury_risk_dict:
                     injury_risk_dict[target_body_part_side].last_inflammation_date = base_date
                 else:
@@ -843,8 +846,12 @@ class InjuryRiskProcessor(object):
                     injury_risk_dict[target_body_part_side] = body_part_injury_risk
 
             if mark_related_muscles:
-                related_muscles = self.functional_anatomy_processor.get_related_muscles_for_joint(
-                    target_body_part_side.body_part_location.value)
+                if is_ligament:
+                    related_muscles = self.functional_anatomy_processor.get_related_muscles_for_ligament(
+                        target_body_part_side.body_part_location.value)
+                else:
+                    related_muscles = self.functional_anatomy_processor.get_related_muscles_for_joint(
+                        target_body_part_side.body_part_location.value)
                 body_part_factory = BodyPartFactory()
 
                 for r in related_muscles:
@@ -1033,8 +1040,12 @@ class InjuryRiskProcessor(object):
                     injury_risk_dict[target_body_part_side] = body_part_injury_risk
 
             if mark_related_muscles:
-                related_muscles = self.functional_anatomy_processor.get_related_muscles_for_joint(
-                    target_body_part_side.body_part_location.value)
+                if is_ligament:
+                    related_muscles = self.functional_anatomy_processor.get_related_muscles_for_ligament(
+                        target_body_part_side.body_part_location.value)
+                else:
+                    related_muscles = self.functional_anatomy_processor.get_related_muscles_for_joint(
+                        target_body_part_side.body_part_location.value)
 
                 for r in related_muscles:
                     if target_body_part_side.side == 0:

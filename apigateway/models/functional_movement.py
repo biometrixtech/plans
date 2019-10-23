@@ -1050,6 +1050,8 @@ class FunctionalMovementActivityMapping(object):
         # TODO make sure we implement logic to test for high intensity on processing, esp for eccentric intensity
 
         for p in self.prime_movers:
+            if p.body_part_side.body_part_location in [BodyPartLocation.posterior_tibialis, BodyPartLocation.soleus, BodyPartLocation.gastrocnemius_medial, BodyPartLocation.gastrocnemius_lateral]:
+                k=0
             compensating_for_others = self.other_body_parts_affected(p, injury_risk_dict, event_date, True)
             if compensating_for_others or p.is_compensating:
                 prime_mover_ratio = 0.84
@@ -1062,6 +1064,8 @@ class FunctionalMovementActivityMapping(object):
                 p.compensation_source = CompensationSource.internal_processing
 
         for p in self.synergists:
+            if p.body_part_side.body_part_location in [BodyPartLocation.posterior_tibialis, BodyPartLocation.soleus, BodyPartLocation.gastrocnemius_medial, BodyPartLocation.gastrocnemius_lateral]:
+                k=0
             compensating_for_others = self.other_body_parts_affected(p, injury_risk_dict, event_date, False)
             if compensating_for_others or p.is_compensating:
                 synergist_ratio = 0.63
@@ -1227,14 +1231,14 @@ class FunctionalMovementFactory(object):
         functional_movement = FunctionalMovement(FunctionalMovementType.knee_flexion)
         functional_movement.prime_movers = [45, 46, 47, 48]
         functional_movement.antagonists = [55, 56, 57, 58]
-        functional_movement.synergists = [44, 75, 68, 53, 62]
+        functional_movement.synergists = [44, 75, 53]
         return functional_movement
 
     def get_knee_extension(self):
 
         functional_movement = FunctionalMovement(FunctionalMovementType.knee_extension)
         functional_movement.prime_movers = [55, 56, 57, 58]
-        functional_movement.antagonists = [44, 75, 68, 45, 46, 47, 48, 53, 62]
+        functional_movement.antagonists = [44, 75, 45, 46, 47, 48, 53]
         return functional_movement
 
     #TODO - what happened to thses
@@ -1256,7 +1260,7 @@ class FunctionalMovementFactory(object):
 
         functional_movement = FunctionalMovement(FunctionalMovementType.hip_extension)
         functional_movement.prime_movers = [66]
-        functional_movement.antagonists = [50, 54, 58, 62, 59, 71]
+        functional_movement.antagonists = [50, 54, 58, 59, 71]
         functional_movement.synergists = [45, 47, 48, 51]
         return functional_movement
 
@@ -1265,14 +1269,14 @@ class FunctionalMovementFactory(object):
         functional_movement = FunctionalMovement(FunctionalMovementType.hip_flexion)
         functional_movement.prime_movers = [54, 71]
         functional_movement.antagonists = [45, 47, 48, 51, 66]
-        functional_movement.synergists = [49, 50, 52, 53, 58, 62, 59, 65]
+        functional_movement.synergists = [49, 50, 52, 53, 58, 59, 65]
         return functional_movement
 
     def get_hip_adduction(self):
 
         functional_movement = FunctionalMovement(FunctionalMovementType.hip_adduction)
         functional_movement.prime_movers = [49, 50, 51, 52, 53]
-        functional_movement.antagonists = [55, 62, 59, 63, 64, 65]
+        functional_movement.antagonists = [55, 59, 63, 64, 65]
         functional_movement.synergists = [47, 48, 54, 67, 66]
         return functional_movement
 
@@ -1281,14 +1285,14 @@ class FunctionalMovementFactory(object):
         functional_movement = FunctionalMovement(FunctionalMovementType.hip_abduction)
         functional_movement.prime_movers = [63, 64]
         functional_movement.antagonists = [49, 50, 51, 52, 53, 54, 67]
-        functional_movement.synergists = [55, 62, 59, 65, 66]
+        functional_movement.synergists = [55, 59, 65, 66]
         return functional_movement
 
     def get_hip_internal_rotation(self):
 
         functional_movement = FunctionalMovement(FunctionalMovementType.hip_internal_rotation)
         functional_movement.prime_movers = [54, 65]
-        functional_movement.antagonists = [45, 51, 62, 67, 64, 66]
+        functional_movement.antagonists = [45, 51, 67, 64, 66]
         functional_movement.synergists = [46, 47, 48, 49, 50, 52, 53, 59, 63]
         return functional_movement
 
@@ -1297,7 +1301,7 @@ class FunctionalMovementFactory(object):
         functional_movement = FunctionalMovement(FunctionalMovementType.hip_external_rotation)
         functional_movement.prime_movers = [60]
         functional_movement.antagonists = [47, 48, 49, 50, 52, 53, 54, 59, 63, 65]
-        functional_movement.synergists = [45, 51, 62, 67, 64, 66]
+        functional_movement.synergists = [45, 51, 67, 64, 66]
         return functional_movement
 
     def get_pelvic_anterior_tilt(self):
@@ -1305,7 +1309,7 @@ class FunctionalMovementFactory(object):
         functional_movement = FunctionalMovement(FunctionalMovementType.pelvic_anterior_tilt)
         functional_movement.prime_movers = [58, 71, 72, 26, 70, 21]
         functional_movement.antagonists = [74, 75]
-        functional_movement.synergists = [54, 62, 59]
+        functional_movement.synergists = [54, 59]
         return functional_movement
 
     def get_pelvic_posterior_tilt(self):
