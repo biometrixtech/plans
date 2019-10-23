@@ -854,23 +854,24 @@ class InjuryRiskProcessor(object):
                         target_body_part_side.body_part_location.value)
                 body_part_factory = BodyPartFactory()
 
-                for r in related_muscles:
-                    if target_body_part_side.side == 0:
-                        bilateral = body_part_factory.get_bilateral(BodyPartLocation(r))
-                        if bilateral:
-                            sides = [1, 2]
+                if related_muscles is not None:
+                    for r in related_muscles:
+                        if target_body_part_side.side == 0:
+                            bilateral = body_part_factory.get_bilateral(BodyPartLocation(r))
+                            if bilateral:
+                                sides = [1, 2]
+                            else:
+                                sides = [0]
                         else:
-                            sides = [0]
-                    else:
-                        sides = [target_body_part_side.side]
-                    for sd in sides:
-                        body_part_side = BodyPartSide(BodyPartLocation(r), sd)
-                        if body_part_side in injury_risk_dict:
-                            injury_risk_dict[body_part_side].last_muscle_spasm_date = base_date
-                        else:
-                            body_part_injury_risk = BodyPartInjuryRisk()
-                            body_part_injury_risk.last_muscle_spasm_date = base_date
-                            injury_risk_dict[body_part_side] = body_part_injury_risk
+                            sides = [target_body_part_side.side]
+                        for sd in sides:
+                            body_part_side = BodyPartSide(BodyPartLocation(r), sd)
+                            if body_part_side in injury_risk_dict:
+                                injury_risk_dict[body_part_side].last_muscle_spasm_date = base_date
+                            else:
+                                body_part_injury_risk = BodyPartInjuryRisk()
+                                body_part_injury_risk.last_muscle_spasm_date = base_date
+                                injury_risk_dict[body_part_side] = body_part_injury_risk
 
         return injury_risk_dict
 
@@ -1047,23 +1048,24 @@ class InjuryRiskProcessor(object):
                     related_muscles = self.functional_anatomy_processor.get_related_muscles_for_joint(
                         target_body_part_side.body_part_location.value)
 
-                for r in related_muscles:
-                    if target_body_part_side.side == 0:
-                        bilateral = body_part_factory.get_bilateral(BodyPartLocation(r))
-                        if bilateral:
-                            sides = [1, 2]
+                if related_muscles is not None:
+                    for r in related_muscles:
+                        if target_body_part_side.side == 0:
+                            bilateral = body_part_factory.get_bilateral(BodyPartLocation(r))
+                            if bilateral:
+                                sides = [1, 2]
+                            else:
+                                sides = [0]
                         else:
-                            sides = [0]
-                    else:
-                        sides = [target_body_part_side.side]
-                    for sd in sides:
-                        body_part_side = BodyPartSide(BodyPartLocation(r), sd)
-                        #body_part_side = BodyPartSide(BodyPartLocation(r), target_symptom.side)
-                        if body_part_side in injury_risk_dict:
-                            injury_risk_dict[body_part_side].last_adhesions_date = base_date
-                        else:
-                            body_part_injury_risk = BodyPartInjuryRisk()
-                            body_part_injury_risk.last_adhesions_date = base_date
-                            injury_risk_dict[body_part_side] = body_part_injury_risk
+                            sides = [target_body_part_side.side]
+                        for sd in sides:
+                            body_part_side = BodyPartSide(BodyPartLocation(r), sd)
+                            #body_part_side = BodyPartSide(BodyPartLocation(r), target_symptom.side)
+                            if body_part_side in injury_risk_dict:
+                                injury_risk_dict[body_part_side].last_adhesions_date = base_date
+                            else:
+                                body_part_injury_risk = BodyPartInjuryRisk()
+                                body_part_injury_risk.last_adhesions_date = base_date
+                                injury_risk_dict[body_part_side] = body_part_injury_risk
 
         return injury_risk_dict
