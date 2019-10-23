@@ -32,6 +32,12 @@ class FunctionalMovementType(Enum):
     trunk_extension_with_rotation = 21
 
 
+class BodyPartFunction(Enum):
+    prime_mover = 0
+    antagonist = 1
+    synergist = 2
+
+
 class FunctionalMovement(object):
     def __init__(self, functional_movement_type):
         self.functional_movement_type = functional_movement_type
@@ -108,10 +114,28 @@ class BodyPartInjuryRisk(object):
     def __init__(self):
         self.concentric_volume_last_week = 0
         self.concentric_volume_this_week = 0
-        self.concentric_volume_today = 0
+        self.prime_mover_concentric_volume_last_week = 0
+        self.prime_mover_concentric_volume_this_week = 0
+        self.synergist_concentric_volume_last_week = 0
+        self.synergist_concentric_volume_this_week = 0
+
         self.eccentric_volume_last_week = 0
         self.eccentric_volume_this_week = 0
+        self.prime_mover_eccentric_volume_last_week = 0
+        self.prime_mover_eccentric_volume_this_week = 0
+        self.synergist_eccentric_volume_last_week = 0
+        self.synergist_eccentric_volume_this_week = 0
+
+        self.concentric_volume_today = 0
         self.eccentric_volume_today = 0
+
+        self.prime_mover_concentric_volume_today = 0
+        self.prime_mover_eccentric_volume_today = 0
+        self.prime_mover_total_volume_today = 0
+
+        self.synergist_concentric_volume_today = 0
+        self.synergist_eccentric_volume_today = 0
+        self.synergist_total_volume_today = 0
 
         # ache
         self.ache_count_last_0_10_days = 0
@@ -448,6 +472,34 @@ class BodyPartInjuryRisk(object):
 
         return 0
 
+    def prime_mover_eccentric_volume_ramp(self):
+
+        this_weeks_volume = 0
+        if self.prime_mover_eccentric_volume_this_week is not None:
+            this_weeks_volume += self.prime_mover_eccentric_volume_this_week
+        if self.prime_mover_eccentric_volume_today is not None:
+            this_weeks_volume += self.prime_mover_eccentric_volume_today
+
+        if self.prime_mover_eccentric_volume_last_week is not None and self.prime_mover_eccentric_volume_last_week > 0:
+            if this_weeks_volume is not None:
+                return this_weeks_volume / self.prime_mover_eccentric_volume_last_week
+
+        return 0
+
+    def synegist_eccentric_volume_ramp(self):
+
+        this_weeks_volume = 0
+        if self.synergist_eccentric_volume_this_week is not None:
+            this_weeks_volume += self.synergist_eccentric_volume_this_week
+        if self.synergist_eccentric_volume_today is not None:
+            this_weeks_volume += self.synergist_eccentric_volume_today
+
+        if self.synergist_eccentric_volume_last_week is not None and self.synergist_eccentric_volume_last_week > 0:
+            if this_weeks_volume is not None:
+                return this_weeks_volume / self.synergist_eccentric_volume_last_week
+
+        return 0
+
     def total_volume_last_week(self):
 
         eccentric_volume_last_week = 0
@@ -458,6 +510,32 @@ class BodyPartInjuryRisk(object):
 
         if self.concentric_volume_last_week is not None:
             concentric_volume_last_week = self.concentric_volume_last_week
+
+        return eccentric_volume_last_week + concentric_volume_last_week
+
+    def prime_mover_total_volume_last_week(self):
+
+        eccentric_volume_last_week = 0
+        concentric_volume_last_week = 0
+
+        if self.prime_mover_eccentric_volume_last_week is not None:
+            eccentric_volume_last_week = self.prime_mover_eccentric_volume_last_week
+
+        if self.prime_mover_concentric_volume_last_week is not None:
+            concentric_volume_last_week = self.prime_mover_concentric_volume_last_week
+
+        return eccentric_volume_last_week + concentric_volume_last_week
+
+    def synergist_total_volume_last_week(self):
+
+        eccentric_volume_last_week = 0
+        concentric_volume_last_week = 0
+
+        if self.synergist_eccentric_volume_last_week is not None:
+            eccentric_volume_last_week = self.synergist_eccentric_volume_last_week
+
+        if self.synergist_concentric_volume_last_week is not None:
+            concentric_volume_last_week = self.synergist_concentric_volume_last_week
 
         return eccentric_volume_last_week + concentric_volume_last_week
 
@@ -480,12 +558,68 @@ class BodyPartInjuryRisk(object):
 
         return concentric_volume_this_week + eccentric_volume_this_week
 
+    def prime_mover_total_volume_this_week(self):
+
+        eccentric_volume_this_week = 0
+        concentric_volume_this_week = 0
+
+        if self.prime_mover_eccentric_volume_this_week is not None:
+            eccentric_volume_this_week += self.prime_mover_eccentric_volume_this_week
+
+        if self.prime_mover_concentric_volume_this_week is not None:
+            concentric_volume_this_week += self.prime_mover_concentric_volume_this_week
+
+        if self.prime_mover_eccentric_volume_today is not None:
+            eccentric_volume_this_week += self.prime_mover_eccentric_volume_today
+
+        if self.prime_mover_concentric_volume_today is not None:
+            concentric_volume_this_week += self.prime_mover_concentric_volume_today
+
+        return concentric_volume_this_week + eccentric_volume_this_week
+
+    def synergist_total_volume_this_week(self):
+
+        eccentric_volume_this_week = 0
+        concentric_volume_this_week = 0
+
+        if self.synergist_eccentric_volume_this_week is not None:
+            eccentric_volume_this_week += self.synergist_eccentric_volume_this_week
+
+        if self.synergist_concentric_volume_this_week is not None:
+            concentric_volume_this_week += self.synergist_concentric_volume_this_week
+
+        if self.synergist_eccentric_volume_today is not None:
+            eccentric_volume_this_week += self.synergist_eccentric_volume_today
+
+        if self.synergist_concentric_volume_today is not None:
+            concentric_volume_this_week += self.synergist_concentric_volume_today
+
+        return concentric_volume_this_week + eccentric_volume_this_week
+
     def total_volume_ramp(self):
 
         total_volume_last_week = self.total_volume_last_week()
 
         if total_volume_last_week > 0:
             return self.total_volume_this_week() / total_volume_last_week
+
+        return 0
+
+    def prime_mover_total_volume_ramp(self):
+
+        total_volume_last_week = self.prime_mover_total_volume_last_week()
+
+        if total_volume_last_week > 0:
+            return self.prime_mover_total_volume_this_week() / total_volume_last_week
+
+        return 0
+
+    def synergist_total_volume_ramp(self):
+
+        total_volume_last_week = self.synergist_total_volume_last_week()
+
+        if total_volume_last_week > 0:
+            return self.synergist_total_volume_this_week() / total_volume_last_week
 
         return 0
 
@@ -501,6 +635,7 @@ class BodyPartFunctionalMovement(object):
         self.eccentric_ramp = 0.0
         self.is_compensating = False
         self.compensation_source = None
+        self.body_part_function = None
         self.inhibited = 0
         self.weak = 0
         self.tight = 0
@@ -761,11 +896,11 @@ class SessionFunctionalMovement(object):
                     functional_movement_body_part_side = BodyPartFunctionalMovement(b)
                     m.prime_movers.append(functional_movement_body_part_side)
 
-            for a in functional_movement.antagonists:
+            for a in functional_movement.synergists:
                 body_part_side_list = self.get_body_part_side_list(a)
                 for b in body_part_side_list:
                     functional_movement_body_part_side = BodyPartFunctionalMovement(b)
-                    m.antagonists.append(functional_movement_body_part_side)
+                    m.synergists.append(functional_movement_body_part_side)
 
             #m.attribute_training_volume(self.session.duration_minutes * self.session.session_RPE,
             #                            highest_concentric_eccentric_level, self.injury_risk_dict, event_date)
@@ -774,7 +909,7 @@ class SessionFunctionalMovement(object):
             if self.session.session_RPE is not None:
                 m.attribute_intensity(self.session.session_RPE, highest_concentric_eccentric_level, self.injury_risk_dict, event_date)
 
-        self.aggregate_body_parts()
+        #self.aggregate_body_parts()
 
         return self.session
 
@@ -839,6 +974,7 @@ class FunctionalMovementActivityMapping(object):
 
             attributed_concentric_volume = training_volume * self.concentric_level * prime_mover_ratio
             attributed_eccentric_volume = training_volume * self.eccentric_level  * prime_mover_ratio
+            p.body_part_function = BodyPartFunction.prime_mover
             p.concentric_volume = attributed_concentric_volume
             p.eccentric_volume = attributed_eccentric_volume
             p.is_compensating = compensating_for_others
@@ -852,6 +988,7 @@ class FunctionalMovementActivityMapping(object):
 
             attributed_concentric_volume = training_volume * self.concentric_level * synergist_ratio
             attributed_eccentric_volume = training_volume * self.eccentric_level * synergist_ratio
+            p.body_part_function = BodyPartFunction.synergist
             p.concentric_volume = attributed_concentric_volume
             p.eccentric_volume = attributed_eccentric_volume
             p.is_compensating = compensating_for_others
@@ -945,7 +1082,7 @@ class ActivityFunctionalMovementFactory(object):
         mapping.append(
             FunctionalMovementActivityMapping(FunctionalMovementType.ankle_dorsiflexion, True, .0025, False, 0))
         mapping.append(
-            FunctionalMovementActivityMapping(FunctionalMovementType.ankle_plantar_flexion, True, .0143, False, 0))
+            FunctionalMovementActivityMapping(FunctionalMovementType.ankle_plantar_flexion, True, .01425, False, 0))
         mapping.append(
             FunctionalMovementActivityMapping(FunctionalMovementType.inversion_of_the_foot, True, .019, False, 0))
         mapping.append(
