@@ -743,14 +743,14 @@ class SessionFunctionalMovement(object):
             if side == 1:
                 if apt_ankle.left is not None:
                     key_elasticity_value = apt_ankle.left.elasticity
-                    key_adf_value = apt_ankle.left.apt_adf
+                    key_adf_value = apt_ankle.left.y_adf
                 else:
                     key_elasticity_value = 0.0
                     key_adf_value = 0.0
             else:
                 if apt_ankle.right is not None:
                     key_elasticity_value = apt_ankle.right.elasticity
-                    key_adf_value = apt_ankle.right.apt_adf
+                    key_adf_value = apt_ankle.right.y_adf
                 else:
                     key_elasticity_value = 0.0
                     key_adf_value = 0.0
