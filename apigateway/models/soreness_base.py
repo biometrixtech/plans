@@ -197,7 +197,7 @@ class BodyPartLocation(Enum):
             cls.calves: [cls.posterior_tibialis, cls.soleus, cls.gastrocnemius_medial, cls.gastrocnemius_lateral],
             cls.hamstrings: [cls.bicep_femoris_long_head, cls.bicep_femoris_short_head, cls.semimembranosus, cls.semitendinosus],
             cls.groin: [cls.adductor_longus, cls.adductor_magnus_anterior_fibers, cls.adductor_magnus_posterior_fibers, cls.adductor_brevis, cls.gracilis, cls.pectineus],
-            cls.quads: [cls.vastus_lateralis, cls.vastus_medialis, cls.vastus_intermedius, cls.rectus_femoris, cls.sartorius],
+            cls.quads: [cls.vastus_lateralis, cls.vastus_medialis, cls.vastus_intermedius, cls.rectus_femoris],
             cls.hip_flexor: [cls.tensor_fascia_latae, cls.psoas, cls.iliacus],
             cls.deep_rotators_hip: [cls.piriformis, cls.quadratus_femoris],
             cls.core_stabilizers: [cls.transverse_abdominis, cls.internal_obliques],
