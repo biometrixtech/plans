@@ -1,4 +1,4 @@
-from body_parts import BodyPartFactory, BodyPartLocation, BodyPart
+from models.body_parts import BodyPartFactory, BodyPartLocation, BodyPart
 
 
 def test_lower_back_muscle():
