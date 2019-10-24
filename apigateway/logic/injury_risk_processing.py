@@ -6,6 +6,7 @@ from models.body_parts import BodyPart, BodyPartFactory
 from copy import deepcopy
 from datastores.session_datastore import SessionDatastore
 from utils import format_date
+from fathomapi.utils.exceptions import NoSuchEntityException
 
 
 class InjuryRiskProcessor(object):
@@ -273,7 +274,12 @@ class InjuryRiskProcessor(object):
 
                 # save all updates from processing back to the session - TODO: make sure this is the best place/time to save this info
                 session_datastore = SessionDatastore()
-                session_datastore.update(current_session, self.user_id, format_date(d))
+                try:
+                    session_datastore.update(current_session, self.user_id, format_date(d))
+                except NoSuchEntityException:
+                    session_datastore.update(current_session, self.user_id, format_date(d - timedelta(days=1)))
+                #TODO: continue if fails the second time
+
 
                 session_mapping_dict[current_session] = session_functional_movement.functional_movement_mappings
 
@@ -419,7 +425,11 @@ class InjuryRiskProcessor(object):
 
             # save all updates from processing back to the session - TODO: make sure this is the best place/time to save this info
             session_datastore = SessionDatastore()
-            session_datastore.update(current_session, self.user_id, format_date(base_date))
+            try:
+                session_datastore.update(current_session, self.user_id, format_date(base_date))
+            except NoSuchEntityException:
+                session_datastore.update(current_session, self.user_id, format_date(base_date - timedelta(days=1)))
+            # TODO: continue if fails the second time
 
             session_mapping_dict[current_session] = session_functional_movement.functional_movement_mappings
 
