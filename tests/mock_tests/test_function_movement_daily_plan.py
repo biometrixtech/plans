@@ -52,7 +52,7 @@ def test_create_plan_no_session():
     soreness.sharp = 3
     soreness.reported_date_time = now_date
 
-    proc = InjuryRiskProcessor(now_date, [soreness], [], {}, LoadStats())
+    proc = InjuryRiskProcessor(now_date, [soreness], [], {}, LoadStats(), "tester")
     injury_risk_dict = proc.process(aggregate_results=True)
 
     calc = ExerciseAssignmentCalculator(injury_risk_dict, exercise_library_datastore, completed_exercise_datastore, now_date)
@@ -83,7 +83,7 @@ def test_create_plan_with_session():
     soreness_2.sharp = 2
     soreness_2.reported_date_time = dates[0]
 
-    proc = InjuryRiskProcessor(dates[0], [soreness, soreness_2], sessions, {}, LoadStats())
+    proc = InjuryRiskProcessor(dates[0], [soreness, soreness_2], sessions, {}, LoadStats(), "tester")
     injury_risk_dict = proc.process(aggregate_results=True)
 
     calc = ExerciseAssignmentCalculator(injury_risk_dict, exercise_library_datastore, completed_exercise_datastore,

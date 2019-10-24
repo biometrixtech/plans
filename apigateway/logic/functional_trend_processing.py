@@ -442,12 +442,12 @@ class TrendProcessor(object):
                 last_date_time = max(datetime.combine(body_part_injury_risk.last_non_functional_overreaching_date, datetime.min.time()), last_date_time)
             if (body_part_injury_risk.last_excessive_strain_date is not None and
                     body_part_injury_risk.last_functional_overreaching_date is not None and
-                    body_part_injury_risk.last_excessive_strain_date >= two_days_ago and
-                    body_part_injury_risk.last_functional_overreaching_date >= two_days_ago):
+                    body_part_injury_risk.last_excessive_strain_date == self.event_date_time.date() and
+                    body_part_injury_risk.last_functional_overreaching_date == self.event_date_time.date()):
                 excessive_strain_fo.append(body_part_side)
                 last_date_time = max(datetime.combine(body_part_injury_risk.last_excessive_strain_date, datetime.min.time()), last_date_time)
                 last_date_time = max(datetime.combine(body_part_injury_risk.last_functional_overreaching_date, datetime.min.time()), last_date_time)
-            if body_part_injury_risk.is_compensating:
+            if body_part_injury_risk.last_compensation_date is not None and body_part_injury_risk.last_compensation_date == self.event_date_time.date():
                 compensating.append(body_part_side)
                 last_date_time = max(self.event_date_time, last_date_time)
 
@@ -483,7 +483,6 @@ class TrendProcessor(object):
 
             #trend.triggers = all_triggers
 
-            #TODO last_date_time is messed up and inconsistent with other date times
             #trend.last_date_time = self.get_latest_trigger_date_time(all_triggers)
             trend.last_date_time = last_date_time
 

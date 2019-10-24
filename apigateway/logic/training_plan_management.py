@@ -93,7 +93,7 @@ class TrainingPlanManager(object):
         # self.athlete_stats.triggers = trigger_factory.triggers
         historical_injury_risk_dict = self.injury_risk_datastore.get(self.athlete_id)
         injury_risk_processor = InjuryRiskProcessor(date, self.soreness_list, self.daily_plan.training_sessions,
-                                                    historical_injury_risk_dict, self.athlete_stats.load_stats)
+                                                    historical_injury_risk_dict, self.athlete_stats.load_stats, self.athlete_stats.athlete_id)
         aggregated_injury_risk_dict = injury_risk_processor.process(aggregate_results=True)
 
         if visualizations:
