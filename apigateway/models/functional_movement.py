@@ -97,11 +97,11 @@ class MovementPatterns(Serialisable):
 
     def json_serialise(self):
         ret = {
-            'apt_ankle_pitch': self.apt_ankle_pitch.json_serialise() if not None else None,
-            'hip_drop_apt': self.hip_drop_apt.json_serialise() if not None else None,
-            'hip_drop_pva': self.hip_drop_pva.json_serialise() if not None else None,
-            'knee_valgus_hip_drop': self.knee_valgus_hip_drop.json_serialise() if not None else None,
-            'knee_valgus_pva': self.knee_valgus_pva.json_serialise() if not None else None,
+            'apt_ankle_pitch': self.apt_ankle_pitch.json_serialise() if self.apt_ankle_pitch is not None else None,
+            'hip_drop_apt': self.hip_drop_apt.json_serialise() if self.hip_drop_apt is not None else None,
+            'hip_drop_pva': self.hip_drop_pva.json_serialise() if self.hip_drop_pva is not None else None,
+            'knee_valgus_hip_drop': self.knee_valgus_hip_drop.json_serialise() if self.knee_valgus_hip_drop is not None else None,
+            'knee_valgus_pva': self.knee_valgus_pva.json_serialise() if self.knee_valgus_pva is not None else None,
         }
 
         return ret
