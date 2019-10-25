@@ -5,7 +5,7 @@ xray_recorder.begin_segment(name="test")
 from models.session import SportTrainingSession
 from datetime import datetime, timedelta
 from models.sport import SportName
-from models.functional_movement import ActivityFunctionalMovementFactory, FunctionalMovementFactory, BodyPartInjuryRisk, SessionFunctionalMovement, MovementPatterns, AptAnklePitchElasticity, Elasticity
+from models.functional_movement import ActivityFunctionalMovementFactory, FunctionalMovementFactory, BodyPartInjuryRisk, SessionFunctionalMovement, MovementPatterns, LeftRightElasticity, Elasticity
 from logic.functional_anatomy_processing import FunctionalAnatomyProcessor
 from models.soreness import Soreness
 from models.body_parts import BodyPart
@@ -62,7 +62,7 @@ def test_body_parts_overactive():
 
     s = sessions[0]
     s.movement_patterns = MovementPatterns()
-    s.movement_patterns.apt_ankle_pitch = AptAnklePitchElasticity()
+    s.movement_patterns.apt_ankle_pitch = LeftRightElasticity()
     s.movement_patterns.apt_ankle_pitch.left = Elasticity()
     s.movement_patterns.apt_ankle_pitch.left.elasticity = .56
 
@@ -91,10 +91,10 @@ def test_body_parts_overactive_weak():
 
     s = sessions[0]
     s.movement_patterns = MovementPatterns()
-    s.movement_patterns.apt_ankle_pitch = AptAnklePitchElasticity()
+    s.movement_patterns.apt_ankle_pitch = LeftRightElasticity()
     s.movement_patterns.apt_ankle_pitch.left = Elasticity()
     s.movement_patterns.apt_ankle_pitch.left.elasticity = .56
-    s.movement_patterns.apt_ankle_pitch.left.apt_adf = 3.0
+    s.movement_patterns.apt_ankle_pitch.left.y_adf = 3.0
 
     session_functional_movement = SessionFunctionalMovement(s, {}, "tester")
     session_functional_movement.process(s.event_date, LoadStats())
@@ -120,10 +120,10 @@ def test_body_parts_muscle_imbalance():
 
     s = sessions[0]
     s.movement_patterns = MovementPatterns()
-    s.movement_patterns.apt_ankle_pitch = AptAnklePitchElasticity()
+    s.movement_patterns.apt_ankle_pitch = LeftRightElasticity()
     s.movement_patterns.apt_ankle_pitch.left = Elasticity()
     s.movement_patterns.apt_ankle_pitch.left.elasticity = .56
-    s.movement_patterns.apt_ankle_pitch.left.apt_adf = 3.0
+    s.movement_patterns.apt_ankle_pitch.left.y_adf = 3.0
 
     injury_risk_dict = {}
     body_part_side = BodyPartSide(BodyPartLocation(58), 1)

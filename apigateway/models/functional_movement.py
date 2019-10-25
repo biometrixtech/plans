@@ -49,12 +49,12 @@ class FunctionalMovement(object):
 class Elasticity(Serialisable):
     def __init__(self):
         self.elasticity = 0.0
-        self.apt_adf = 0.0
+        self.y_adf = 0.0
 
     def json_serialise(self):
         ret = {
             'elasticity': self.elasticity,
-            'apt_adf': self.apt_adf
+            'y_adf': self.y_adf
         }
         return ret
 
@@ -62,11 +62,11 @@ class Elasticity(Serialisable):
     def json_deserialise(cls, input_dict):
         elasticity_data = cls()
         elasticity_data.elasticity = input_dict.get("elasticity", 0.0)
-        elasticity_data.apt_adf = input_dict.get("apt_adf", 0.0)
+        elasticity_data.y_adf = input_dict.get("y_adf", 0.0)
         return elasticity_data
 
 
-class AptAnklePitchElasticity(Serialisable):
+class LeftRightElasticity(Serialisable):
     def __init__(self):
         self.left = None
         self.right = None
@@ -81,19 +81,27 @@ class AptAnklePitchElasticity(Serialisable):
 
     @classmethod
     def json_deserialise(cls, input_dict):
-        apt_ankle_pitch = cls()
-        apt_ankle_pitch.left = Elasticity.json_deserialise(input_dict["left"]) if input_dict.get("left") is not None else None
-        apt_ankle_pitch.right = Elasticity.json_deserialise(input_dict["right"]) if input_dict.get("right") is not None else None
-        return apt_ankle_pitch
+        left_right = cls()
+        left_right.left = Elasticity.json_deserialise(input_dict["left"]) if input_dict.get("left") is not None else None
+        left_right.right = Elasticity.json_deserialise(input_dict["right"]) if input_dict.get("right") is not None else None
+        return left_right
 
 
 class MovementPatterns(Serialisable):
     def __init__(self):
         self.apt_ankle_pitch = None
+        self.hip_drop_apt = None
+        self.hip_drop_pva = None
+        self.knee_valgus_hip_drop = None
+        self.knee_valgus_pva = None
 
     def json_serialise(self):
         ret = {
-            'apt_ankle_pitch': self.apt_ankle_pitch.json_serialise()
+            'apt_ankle_pitch': self.apt_ankle_pitch.json_serialise() if self.apt_ankle_pitch is not None else None,
+            'hip_drop_apt': self.hip_drop_apt.json_serialise() if self.hip_drop_apt is not None else None,
+            'hip_drop_pva': self.hip_drop_pva.json_serialise() if self.hip_drop_pva is not None else None,
+            'knee_valgus_hip_drop': self.knee_valgus_hip_drop.json_serialise() if self.knee_valgus_hip_drop is not None else None,
+            'knee_valgus_pva': self.knee_valgus_pva.json_serialise() if self.knee_valgus_pva is not None else None,
         }
 
         return ret
@@ -101,7 +109,16 @@ class MovementPatterns(Serialisable):
     @classmethod
     def json_deserialise(cls, input_dict):
         movement_patterns = cls()
-        movement_patterns.apt_ankle_pitch = AptAnklePitchElasticity.json_deserialise(input_dict['apt_ankle_pitch']) if input_dict.get('apt_ankle_pitch') is not None else None
+        movement_patterns.apt_ankle_pitch = LeftRightElasticity.json_deserialise(
+            input_dict['apt_ankle_pitch']) if input_dict.get('apt_ankle_pitch') is not None else None
+        movement_patterns.hip_drop_apt = LeftRightElasticity.json_deserialise(
+            input_dict['hip_drop_apt']) if input_dict.get('hip_drop_apt') is not None else None
+        movement_patterns.hip_drop_pva = LeftRightElasticity.json_deserialise(
+            input_dict['hip_drop_pva']) if input_dict.get('hip_drop_pva') is not None else None
+        movement_patterns.knee_valgus_hip_drop = LeftRightElasticity.json_deserialise(
+            input_dict['knee_valgus_hip_drop']) if input_dict.get('knee_valgus_hip_drop') is not None else None
+        movement_patterns.knee_valgus_pva = LeftRightElasticity.json_deserialise(
+            input_dict['knee_valgus_pva']) if input_dict.get('knee_valgus_pva') is not None else None
         return movement_patterns
 
 
@@ -726,14 +743,14 @@ class SessionFunctionalMovement(object):
             if side == 1:
                 if apt_ankle.left is not None:
                     key_elasticity_value = apt_ankle.left.elasticity
-                    key_adf_value = apt_ankle.left.apt_adf
+                    key_adf_value = apt_ankle.left.y_adf
                 else:
                     key_elasticity_value = 0.0
                     key_adf_value = 0.0
             else:
                 if apt_ankle.right is not None:
                     key_elasticity_value = apt_ankle.right.elasticity
-                    key_adf_value = apt_ankle.right.apt_adf
+                    key_adf_value = apt_ankle.right.y_adf
                 else:
                     key_elasticity_value = 0.0
                     key_adf_value = 0.0
