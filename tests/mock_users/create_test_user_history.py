@@ -78,7 +78,15 @@ if __name__ == '__main__':
             print(u + "=" + user_id)
             persona1 = Persona(user_id)
             persona1.soreness_history = soreness_history
-            persona1.create_history(days=history_length, suffix='')
+            if u in ["run_a@200.com"]:
+                rpes = [5, None, None, 5, None, 3, None,
+                        4, None, 6, None, 5, 5, None,
+                        None, 4, None, 3, 5, None, None,
+                        6, None, 5, None, 4, None, 3,
+                        5, None, 6, None, 5, 4, 6]
+                persona1.create_history(days=history_length, suffix='', end_today=True, rpes=rpes)
+            else:
+                persona1.create_history(days=history_length, suffix='')
             print(time.time() - start)
 
     for u in users:

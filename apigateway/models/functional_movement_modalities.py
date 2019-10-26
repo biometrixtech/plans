@@ -1319,7 +1319,7 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
 
             goal = AthleteGoal("Compensations", 1, AthleteGoalType.asymmetric_session)
 
-            if body_part_injury_risk.prime_mover_total_volume_today > body_part_injury_risk.synergist_total_volume_today:
+            if body_part_injury_risk.prime_mover_total_volume_today() > body_part_injury_risk.synergist_total_volume_today():
                 priority = "2"
             else:
                 priority = "1"
@@ -1690,7 +1690,7 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
 
             goal = AthleteGoal("Compensating", 1, AthleteGoalType.asymmetric_session)
 
-            if body_part_injury_risk.prime_mover_total_volume_today > body_part_injury_risk.synergist_total_volume_today:
+            if body_part_injury_risk.prime_mover_total_volume_today() > body_part_injury_risk.synergist_total_volume_today():
                 priority = "2"
             else:
                 priority = "1"

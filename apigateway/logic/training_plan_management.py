@@ -13,6 +13,7 @@ from logic.functional_exercise_mapping import ExerciseAssignmentCalculator
 from models.daily_plan import DailyPlan
 from models.athlete_trend import AthleteTrends
 from models.athlete_injury_risk import AthleteInjuryRisk
+from models.functional_movement_stats import FunctionalMovementSummary
 from utils import format_date, parse_datetime, parse_date
 import copy
 
@@ -96,16 +97,47 @@ class TrainingPlanManager(object):
                                                     historical_injury_risk_dict, self.athlete_stats.load_stats, self.athlete_stats.athlete_id)
         aggregated_injury_risk_dict = injury_risk_processor.process(aggregate_results=True)
 
+        functional_movement_stats = {}
+
+        detailed_dict = injury_risk_processor.injury_risk_dict
+
+        for body_part_side, body_part_inury_risk in detailed_dict.items():
+            functional_movement_stats[body_part_side] = FunctionalMovementSummary()
+
+        for body_part_side, body_part_inury_risk in detailed_dict.items():
+            today_volume_today = detailed_dict[body_part_side].total_volume_today()
+            if today_volume_today > 0:
+                functional_movement_stats[body_part_side].percent_total_volume_compensating = detailed_dict[body_part_side].compensating_volume_today() / today_volume_today
+            eccentric_volume_today = detailed_dict[body_part_side].eccentric_volume_today()
+            if eccentric_volume_today > 0:
+                functional_movement_stats[body_part_side].percent_eccentric_volume_compensating = detailed_dict[
+                                                                                                  body_part_side].compensating_volume_today() / eccentric_volume_today
+            for c in detailed_dict[body_part_side].compensating_causes_volume_today:
+                functional_movement_stats[c].caused_compensation_count += 1
+
+        percent_total_compensating_list = sorted(functional_movement_stats.items(), key=lambda x:x[1].percent_total_volume_compensating, reverse=True)
+        percent_eccentric_compensating_list = sorted(functional_movement_stats.items(), key=lambda x:x[1].percent_eccentric_volume_compensating, reverse=True)
+        compensation_count = sorted(functional_movement_stats.items(),
+                                                     key=lambda x: x[1].caused_compensation_count,
+                                                     reverse=True)
+        compensation_count_eccentric = sorted(functional_movement_stats.items(),
+                                    key=lambda x: (x[1].caused_compensation_count, x[1].percent_eccentric_volume_compensating),
+                                    reverse=True)
+
+        body_part_ranking = sorted(functional_movement_stats.items(),
+                                    key=lambda x: (x[0].body_part_location.value,x[0].side),
+                                    reverse=False)
+
+
         if visualizations:
-            trend_processor = TrendProcessor(aggregated_injury_risk_dict, parse_date(event_date), athlete_trend_categories=self.athlete_stats.trend_categories)
-            trend_processor.process_triggers()
-            self.athlete_stats.trend_categories = trend_processor.athlete_trend_categories
+                trend_processor = TrendProcessor(aggregated_injury_risk_dict, parse_date(event_date), athlete_trend_categories=self.athlete_stats.trend_categories)
+                trend_processor.process_triggers()
+                self.athlete_stats.trend_categories = trend_processor.athlete_trend_categories
 
-        # calc = exercise_mapping.ExerciseAssignmentCalculator(trigger_factory, self.exercise_library_datastore,
-        #                                                      self.completed_exercise_datastore,
-        #                                                      self.training_sessions, self.soreness_list,
-        #                                                      parse_date(event_date), historic_soreness)
-
+            # calc = exercise_mapping.ExerciseAssignmentCalculator(trigger_factory, self.exercise_library_datastore,
+            #                                                      self.completed_exercise_datastore,
+            #                                                      self.training_sessions, self.soreness_list,
+            #                                                      parse_date(event_date), historic_soreness)
 
         calc = ExerciseAssignmentCalculator(aggregated_injury_risk_dict, self.exercise_library_datastore, self.completed_exercise_datastore,
                                             date)
