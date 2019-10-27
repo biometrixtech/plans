@@ -1141,21 +1141,9 @@ class SessionFunctionalMovement(object):
         activity_factory = ActivityFunctionalMovementFactory()
         movement_factory = FunctionalMovementFactory()
 
-        self.process_anc_and_muscle_imbalance(event_date)
+        #self.process_anc_and_muscle_imbalance(event_date)
 
         self.functional_movement_mappings = activity_factory.get_functional_movement_mappings(self.session.sport_name)
-        # concentric_levels = [m.concentric_level for m in self.functional_movement_mappings]
-        # if len(concentric_levels) > 0:
-        #     highest_concentric_level = max(concentric_levels)
-        # else:
-        #     highest_concentric_level = 0
-        # eccentric_levels = [m.eccentric_level for m in self.functional_movement_mappings]
-        # if len(eccentric_levels) > 0:
-        #     highest_eccentric_level = max(eccentric_levels)
-        # else:
-        #     highest_eccentric_level = 0
-        #
-        # highest_concentric_eccentric_level = max(highest_concentric_level, highest_eccentric_level)
 
         for m in self.functional_movement_mappings:
             functional_movement = movement_factory.get_functional_movement(m.functional_movement_type)
@@ -1171,8 +1159,6 @@ class SessionFunctionalMovement(object):
                     functional_movement_body_part_side = BodyPartFunctionalMovement(b)
                     m.synergists.append(functional_movement_body_part_side)
 
-            #m.attribute_training_volume(self.session.duration_minutes * self.session.session_RPE,
-            #                            highest_concentric_eccentric_level, self.injury_risk_dict, event_date)
             m.attribute_training_volume(self.session.training_volume(load_stats), self.injury_risk_dict, event_date)
             # TODO - ensure we're using the correct (and all) intensity measures
             if self.session.session_RPE is not None:

@@ -6,6 +6,7 @@ from models.body_parts import BodyPart, BodyPartFactory
 from copy import deepcopy
 from datastores.session_datastore import SessionDatastore
 from utils import format_date
+from models.functional_movement_stats import InjuryCycleSummary, InjuryCycleSummaryProcessor
 from fathomapi.utils.exceptions import NoSuchEntityException
 
 
@@ -97,17 +98,20 @@ class InjuryRiskProcessor(object):
 
     def reset_reported_symptoms(self, injury_risk_dict):
 
-        for b in self.injury_risk_dict.keys():
-            injury_risk_dict[b].last_sharp_date = None
+        for b in injury_risk_dict.keys():
             injury_risk_dict[b].last_ache_date = None
             injury_risk_dict[b].last_tight_date = None
+            injury_risk_dict[b].last_knots_date = None
+            injury_risk_dict[b].last_sharp_date = None
             injury_risk_dict[b].sharp_count_last_0_20_days = 0
             injury_risk_dict[b].sharp_count_last_0_10_days = 0
             injury_risk_dict[b].ache_count_last_0_20_days = 0
             injury_risk_dict[b].ache_count_last_0_10_days = 0
-            injury_risk_dict[b].ache_count_last_0_10_days = 0
+
             injury_risk_dict[b].tight_count_last_0_20_days = 0
             injury_risk_dict[b].knots_count_last_0_20_days = 0
+            injury_risk_dict[b].long_count_last_0_20_days = 0
+            injury_risk_dict[b].short_count_last_0_20_days = 0
 
     def update_historic_session_stats(self, base_date, injury_risk_dict):
 
@@ -194,7 +198,8 @@ class InjuryRiskProcessor(object):
                                  base_date >= s.reported_date_time.date() >= twenty_days_ago]
 
         last_20_days_symptoms = sorted(last_20_days_symptoms, key=lambda k: k.reported_date_time)
-        #self.reset_reported_symptoms(injury_risk_dict)
+
+        self.reset_reported_symptoms(injury_risk_dict)
 
         for s in last_20_days_symptoms:
             target_body_part_side = BodyPartSide(s.body_part.location, s.side)
@@ -252,16 +257,12 @@ class InjuryRiskProcessor(object):
 
         for d in combined_dates:
 
-            if d==datetime(2019,10,23).date():
-                j=0
-            if d==datetime(2019,10,24).date():
-                j=0
-            if d == datetime(2019, 10, 25).date():
+            if d == datetime(2019, 10, 26).date():
                 j = 0
             seven_days_ago = d - timedelta(days=6)
             fourteeen_days_ago = d - timedelta(days=13)
 
-            injury_risk_dict = {}
+            #injury_risk_dict = {}
             # first let's update our historical data
             injury_risk_dict = self.update_historical_symptoms(d, injury_risk_dict)
 
@@ -276,6 +277,10 @@ class InjuryRiskProcessor(object):
             for session in daily_sessions:
                 session_functional_movement = SessionFunctionalMovement(session, injury_risk_dict)
                 current_session = session_functional_movement.process(d, load_stats)
+
+                injury_cycle_summary_dict = self.update_injury_cycle_summaries(current_session,
+                                                                               injury_cycle_summary_dict,
+                                                                               injury_risk_dict, d)
 
                 # save all updates from processing back to the session - TODO: make sure this is the best place/time to save this info
                 session_datastore = SessionDatastore()
@@ -312,12 +317,21 @@ class InjuryRiskProcessor(object):
                 current_week_eccentric_volume_dict = dict(
                     filter(lambda elem: d > elem[0] >= seven_days_ago, eccentric_volume_dict.items()))
 
-                last_week_eccentric_volume = sum(last_week_eccentric_volume_dict.values())
+                last_week_concentric_volume_dict = dict(
+                    filter(lambda elem: fourteeen_days_ago <= elem[0] < seven_days_ago, concentric_volume_dict.items()))
 
+                current_week_concentric_volume_dict = dict(
+                    filter(lambda elem: d > elem[0] >= seven_days_ago, concentric_volume_dict.items()))
+
+                last_week_eccentric_volume = sum(last_week_eccentric_volume_dict.values())
                 current_week_eccentric_volume = sum(current_week_eccentric_volume_dict.values())
+                last_week_concentric_volume = sum(last_week_concentric_volume_dict.values())
+                current_week_concentric_volume = sum(current_week_concentric_volume_dict.values())
 
                 injury_risk_dict[body_part_side].eccentric_volume_this_week = current_week_eccentric_volume
                 injury_risk_dict[body_part_side].eccentric_volume_last_week = last_week_eccentric_volume
+                injury_risk_dict[body_part_side].concentric_volume_this_week = current_week_concentric_volume
+                injury_risk_dict[body_part_side].concentric_volume_last_week = last_week_concentric_volume
 
                 injury_risk_dict[body_part_side].eccentric_volume_ramp_today = injury_risk_dict[body_part_side].eccentric_volume_ramp()
                 injury_risk_dict[body_part_side].total_volume_ramp_today = injury_risk_dict[body_part_side].total_volume_ramp()
@@ -336,6 +350,142 @@ class InjuryRiskProcessor(object):
                 elif 1.1 < injury_risk_dict[body_part_side].total_volume_ramp_today:
                     injury_risk_dict[body_part_side].last_non_functional_overreaching_date = d
         return injury_risk_dict
+
+    def get_movement_pattern_elasiticity_adf(self, movement_pattern, side):
+
+        if side == 1:
+            if movement_pattern.left is not None:
+                elasticity_value = movement_pattern.left.elasticity
+                adf_value = movement_pattern.left.y_adf
+            else:
+                elasticity_value = 0.0
+                adf_value = 0.0
+        else:
+            if movement_pattern.right is not None:
+                elasticity_value = movement_pattern.right.elasticity
+                adf_value = movement_pattern.right.y_adf
+            else:
+                elasticity_value = 0.0
+                adf_value = 0.0
+
+        return elasticity_value, adf_value
+
+    def update_injury_cycle_summaries(self, current_session, injury_cycle_summary_dict, injury_risk_dict, base_date):
+
+        sides = [1, 2]
+
+        summary_dict = {}
+
+        for side in sides:
+
+            apt_ankle_present = False
+            hip_drop_present = False
+            knee_valgus_present = False
+            hip_drop_pva_present = False
+            knee_valgus_pva_present = False
+
+            proc = InjuryCycleSummaryProcessor(injury_cycle_summary_dict, side)
+
+            if current_session.movement_patterns is not None and current_session.movement_patterns.apt_ankle_pitch is not None:
+
+                apt_ankle = current_session.movement_patterns.apt_ankle_pitch
+                apt_ankle_elasticity, apt_ankle_adf = self.get_movement_pattern_elasiticity_adf(apt_ankle, side)
+                if apt_ankle_elasticity != 0:
+                    proc.increment_overactive_short_by_list([21, 26, 70, 58, 61, 59, 55, 65, 49, 50, 52, 53, 54, 62])
+                    proc.increment_underactive_long_by_list([75, 74, 73, 66, 63, 64, 47, 48])
+                    apt_ankle_present = True
+
+            if current_session.movement_patterns is not None and current_session.movement_patterns.hip_drop_apt is not None:
+
+                hip_drop_apt = current_session.movement_patterns.hip_drop_apt
+                hip_drop_apt_elasticity, hip_drop_apt_adf = self.get_movement_pattern_elasiticity_adf(hip_drop_apt,
+                                                                                                      side)
+                if hip_drop_apt_elasticity != 0:
+                    proc.increment_overactive_short_by_list([59, 49, 50, 52, 53, 54])
+                    proc.increment_underactive_long_by_list([63, 64, 47, 48])
+
+                    hip_drop_present = True
+
+            if current_session.movement_patterns is not None and current_session.movement_patterns.knee_valgus_apt is not None:
+
+                knee_valgus_apt = current_session.movement_patterns.knee_valgus_apt
+                knee_valgus_apt_elasticity, knee_valgus_apt_adf = self.get_movement_pattern_elasiticity_adf(
+                    knee_valgus_apt, side)
+
+                if knee_valgus_apt_elasticity != 0:
+                    proc.increment_overactive_short_by_list([69, 49, 50, 52, 53, 54, 21, 66])
+                    proc.increment_underactive_long_by_list([21])
+
+                    knee_valgus_present = True
+
+            if hip_drop_present and knee_valgus_present:
+
+                if hip_drop_apt_elasticity == 0 and knee_valgus_apt_elasticity == 0:
+                    proc.increment_overactive_short_by_list([21, 26, 58, 61])
+                    proc.increment_underactive_long_by_list([75, 74, 73, 66])
+
+            if current_session.movement_patterns is not None and current_session.movement_patterns.hip_drop_pva is not None:
+
+                hip_drop_pva = current_session.movement_patterns.hip_drop_pva
+                hip_drop_pva_elasticity, hip_drop_pva_adf = self.get_movement_pattern_elasiticity_adf(hip_drop_pva,
+                                                                                                      side)
+                if hip_drop_pva_elasticity != 0:
+                    hip_drop_pva_present = True
+
+            # This isn't used yet
+            # if current_session.movement_patterns is not None and current_session.movement_patterns.knee_valgus_hip_drop is not None:
+            #
+            #     knee_valgus_hip_drop = current_session.movement_patterns.knee_valgus_hip_drop
+            #     knee_valgus_hip_drop_elasticity, knee_valgus_hip_drop_adf = self.get_movement_pattern_elasiticity_adf(
+            #         knee_valgus_hip_drop, side)
+
+            if current_session.movement_patterns is not None and current_session.movement_patterns.knee_valgus_pva is not None:
+
+                knee_valgus_pva = current_session.movement_patterns.knee_valgus_pva
+                knee_valgus_pva_elasticity, knee_valgus_pva_adf = self.get_movement_pattern_elasiticity_adf(knee_valgus_pva, side)
+
+                if knee_valgus_pva_elasticity != 0:
+                    proc.increment_overactive_short_by_list(
+                        [59, 55, 46, 75, 65, 59, 49, 50, 52, 53, 54])
+                    proc.increment_underactive_long_by_list([68, 53, 47, 48, 44, 63, 64, 66])
+                    knee_valgus_pva_present = True
+
+            if hip_drop_pva_present or knee_valgus_pva_present:
+
+                proc.increment_overactive_short_by_list([44, 75, 43, 41, 59, 55, 46, 65, 59, 49, 50, 52, 53, 54, 58, 62])
+                proc.increment_underactive_long_by_list([40, 42, 68, 53, 47, 48, 56, 63, 64, 66])
+
+            if apt_ankle_present and (hip_drop_pva_present or knee_valgus_pva_present):
+
+                proc.increment_overactive_short_by_list(
+                    [65, 59, 49, 50, 52, 53, 54, 58, 62, 59, 55, 46])
+                proc.increment_underactive_long_by_list([63,64, 66, 68, 53, 47, 48, 56])
+
+            if hip_drop_pva_present and knee_valgus_pva_present:
+
+                proc.increment_overactive_short_by_list(
+                    [44, 75, 43, 41, 59, 55, 46])
+                proc.increment_underactive_long_by_list([40, 42, 68, 53, 47, 48, 56])
+
+            summary_dict = proc.injury_cycle_summary_dict
+
+        two_days_ago = base_date - timedelta(days=1)
+
+        for body_part_side, body_part_injury_risk in injury_risk_dict.items():
+            proc = InjuryCycleSummaryProcessor(injury_cycle_summary_dict, body_part_side.side)
+            if body_part_injury_risk.last_muscle_spasm_date == base_date:
+
+                proc.increment_overactive_short(body_part_side.body_part_location.value)
+            if body_part_injury_risk.last_adhesions_date == base_date:
+                proc.increment_short(body_part_side.body_part_location.value)
+            if body_part_injury_risk.last_inflammation_date == base_date:
+                proc.increment_underactive(body_part_side.body_part_location.value)
+            if body_part_injury_risk.last_non_functional_overreaching_date is not None and body_part_injury_risk.last_non_functional_overreaching_date >= two_days_ago:
+                proc.increment_underactive(body_part_side.body_part_location.value)
+
+            summary_dict = proc.injury_cycle_summary_dict
+
+        return summary_dict
 
     def populate_volume_dictionaries(self, body_part_injury_risk, body_part_side, d):
         
