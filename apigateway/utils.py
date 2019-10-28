@@ -129,3 +129,10 @@ def _get_time_offset(timezone):
     else:
         minute_offset += hour_offset * 60
     return minute_offset
+
+def none_max(value_array):
+    filtered = [v for v in value_array if v is not None]
+    if len(filtered) > 0:
+        return max(filtered)
+    else:
+        return None

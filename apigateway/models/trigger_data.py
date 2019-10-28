@@ -204,6 +204,75 @@ visualization_data = {
                     }
                 ]
             },
+            12: {
+                'title': "",
+                'y_axis_1': "",
+                'y_axis_2': "",
+                'legend': [
+                    {
+                        'color': 4,
+                        'text': "Weak",
+                        'type': 0,
+                        'series': "weak"
+                    },
+                    {
+                        'color': 5,
+                        'text': "Overactive",
+                        'type': 0,
+                        'series': "overactive"
+                    },
+                    {
+                        'color': 16,
+                        'text': "Short",
+                        'type': 0,
+                        'series': "short"
+                    },
+                ]
+            },
+            13: {
+                'title': "",
+                'y_axis_1': "",
+                'y_axis_2': "",
+                'legend': [
+                    {
+                        'color': 4,
+                        'text': "Over-Stressed",
+                        'type': 0,
+                        'series': "over_stressed"
+                    },
+                    {
+                        'color': 7,
+                        'text': "High Stress",
+                        'type': 0,
+                        'series': "high_stress"
+                    },
+                    {
+                        'color': 15,
+                        'text': "Moderate Stress",
+                        'type': 0,
+                        'series': "moderate_stress"
+                    },
+                ]
+            },
+            14: {
+                'title': "",
+                'y_axis_1': "",
+                'y_axis_2': "",
+                'legend': [
+                    {
+                        'color': 5,
+                        'text': "Inflamed",
+                        'type': 0,
+                        'series': "inflamed"
+                    },
+                    {
+                        'color': 16,
+                        'text': "Tight",
+                        'type': 0,
+                        'series': "tight"
+                    },
+                ]
+            },
         }
 
 cta_data = {

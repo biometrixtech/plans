@@ -66,11 +66,11 @@ class Persona(object):
                 print(today_date)
 
             event_date = event_date + datetime.timedelta(days=1)
-            if not end_today:
-                self.update_stats(event_date)
-            else:
-                if i < days - 1:
-                    self.update_stats(event_date)
+            # if not end_today:
+            #     self.update_stats(event_date)
+            # else:
+            #     if i < days - 1:
+            #         self.update_stats(event_date)
 
         # if not end_today:
         #     self.update_stats(event_date)
@@ -83,12 +83,14 @@ class Persona(object):
         stats = get_mongo_collection('athletestats', suffix)
         exercises = get_mongo_collection('completedexercises', suffix)
         asymmetry = get_mongo_collection('asymmetry', suffix)
+        injuryrisk = get_mongo_collection('injuryrisk', suffix)
 
         readiness.delete_many({"user_id": self.user_id})
         daily_plan.delete_many({"user_id": self.user_id})
         exercises.delete_many({"athlete_id": self.user_id})
         stats.delete_one({"athlete_id": self.user_id})
         asymmetry.delete_many({"user_id": self.user_id})
+        injuryrisk.delete_one({"user_id": self.user_id})
 
     def create_plan(self, event_date, day_number, visualizations):
         self.daily_plan = DailyPlan(format_date(event_date))

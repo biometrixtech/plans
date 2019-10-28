@@ -19,6 +19,7 @@ from config import get_mongo_collection
 from logic.survey_processing import SurveyProcessing, create_session, update_session, create_plan, cleanup_plan
 from logic.athlete_status_processing import AthleteStatusProcessing
 from logic.session_processing import merge_sessions
+from models.functional_movement import MovementPatterns
 
 datastore_collection = DatastoreCollection()
 athlete_stats_datastore = datastore_collection.athlete_stats_datastore
@@ -320,6 +321,7 @@ def handle_session_three_sensor_data(user_id):
 
     session_id = request.json['session_id']
     asymmetry = request.json.get('asymmetry', {})
+    movement_patterns = request.json.get('movement_patterns', {})
     duration = request.json.get('seconds_duration', 0)
     duration_minutes = round(duration / 60, 2)
     session_obj = create_session(6, {'description': 'three_sensor_data',
@@ -334,6 +336,7 @@ def handle_session_three_sensor_data(user_id):
     # update other fields
     session_obj.id = session_id
     session_obj.asymmetry = Asymmetry.json_deserialise(asymmetry)
+    session_obj.movement_patterns = MovementPatterns.json_deserialise(movement_patterns)
 
     # does session already exist
     found = False
@@ -349,6 +352,7 @@ def handle_session_three_sensor_data(user_id):
             plan.training_sessions[s].duration_sensor = duration
             plan.training_sessions[s].duration_minutes = duration_minutes
             plan.training_sessions[s].asymmetry = session_obj.asymmetry
+            plan.training_sessions[s].movement_patterns = session_obj.movement_patterns
             found = True
             break
 
