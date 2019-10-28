@@ -15,12 +15,21 @@ class InjuryCycleSummary(object):
         self.underactive_short_count = 0
         self.underactive_long_count = 0
         self.weak_count = 0
+        self.last_updated_date_time = None
 
 
 class InjuryCycleSummaryProcessor(object):
-    def __init__(self, injury_cycle_summary_dict, side):
+    def __init__(self, injury_cycle_summary_dict, side, event_date_time):
         self.injury_cycle_summary_dict = injury_cycle_summary_dict
         self.side = side
+        self.event_date_time = event_date_time
+
+    def set_last_updated(self, body_part_enum, last_updated_date_time):
+
+        body_part_side = self.get_body_part_side(body_part_enum)
+        if body_part_side not in self.injury_cycle_summary_dict:
+            self.injury_cycle_summary_dict[body_part_side] = InjuryCycleSummary()
+        self.injury_cycle_summary_dict[body_part_side].last_updated_date_time = last_updated_date_time
 
     def get_body_part_side(self, body_part_info):
 
@@ -37,6 +46,7 @@ class InjuryCycleSummaryProcessor(object):
         if body_part_side not in self.injury_cycle_summary_dict:
             self.injury_cycle_summary_dict[body_part_side] = InjuryCycleSummary()
         self.injury_cycle_summary_dict[body_part_side].weak_count += 1
+        self.set_last_updated(body_part_enum, self.event_date_time)
 
     def increment_weak_by_list(self, body_part_enum_list):
 
@@ -49,6 +59,7 @@ class InjuryCycleSummaryProcessor(object):
         if body_part_side not in self.injury_cycle_summary_dict:
             self.injury_cycle_summary_dict[body_part_side] = InjuryCycleSummary()
         self.injury_cycle_summary_dict[body_part_side].overactive_short_count += 1
+        self.set_last_updated(body_part_enum, self.event_date_time)
 
     def increment_overactive_short_by_list(self, body_part_enum_list):
 
@@ -61,6 +72,7 @@ class InjuryCycleSummaryProcessor(object):
         if body_part_side not in self.injury_cycle_summary_dict:
             self.injury_cycle_summary_dict[body_part_side] = InjuryCycleSummary()
         self.injury_cycle_summary_dict[body_part_side].underactive_long_count += 1
+        self.set_last_updated(body_part_enum, self.event_date_time)
 
     def increment_underactive_long_by_list(self, body_part_enum_list):
 
@@ -74,6 +86,7 @@ class InjuryCycleSummaryProcessor(object):
             self.injury_cycle_summary_dict[body_part_side] = InjuryCycleSummary()
         self.injury_cycle_summary_dict[body_part_side].overactive_short_count += 1
         self.injury_cycle_summary_dict[body_part_side].underactive_short_count += 1
+        self.set_last_updated(body_part_enum, self.event_date_time)
 
     def increment_short_by_list(self, body_part_enum_list):
 
@@ -87,6 +100,7 @@ class InjuryCycleSummaryProcessor(object):
             self.injury_cycle_summary_dict[body_part_side] = InjuryCycleSummary()
         self.injury_cycle_summary_dict[body_part_side].underactive_long_count += 1
         self.injury_cycle_summary_dict[body_part_side].underactive_short_count += 1
+        self.set_last_updated(body_part_enum, self.event_date_time)
 
     def increment_underactive_by_list(self, body_part_enum_list):
 
