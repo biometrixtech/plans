@@ -1757,10 +1757,8 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
 
         body_part_factory = BodyPartFactory()
 
-        if (body_part_injury_risk.last_overactive_date is not None and
-                body_part_injury_risk.last_overactive_date == self.event_date_time.date() and
-                body_part_injury_risk.last_short_date is not None and
-                body_part_injury_risk.last_short_date == self.event_date_time.date()):
+        if (body_part_injury_risk.last_overactive_short_date is not None and
+                body_part_injury_risk.last_overactive_short_date == self.event_date_time.date()):
 
             body_part = body_part_factory.get_body_part(body_part_side)
 
