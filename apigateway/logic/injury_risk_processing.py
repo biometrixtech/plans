@@ -255,6 +255,8 @@ class InjuryRiskProcessor(object):
 
         injury_cycle_summary_dict = {}
 
+        twenty_days_ago = self.event_date_time.date() - timedelta(days=19)
+
         for d in combined_dates:
 
             if d == datetime(2019, 10, 26).date():
@@ -262,14 +264,13 @@ class InjuryRiskProcessor(object):
             seven_days_ago = d - timedelta(days=6)
             fourteeen_days_ago = d - timedelta(days=13)
 
-            #injury_risk_dict = {}
             # first let's update our historical data
             injury_risk_dict = self.update_historical_symptoms(d, injury_risk_dict)
 
-            injury_risk_dict = self.update_historic_session_stats(d, injury_risk_dict)
+            # injury_risk_dict = self.update_historic_session_stats(d, injury_risk_dict)
 
             injury_risk_dict = self.process_todays_symptoms(d, injury_risk_dict)
-            # now process todays sessions
+
             daily_sessions = [n for n in self.training_sessions if n.event_date.date() == d]
 
             session_mapping_dict = {}
@@ -282,19 +283,21 @@ class InjuryRiskProcessor(object):
                                                                                injury_cycle_summary_dict,
                                                                                injury_risk_dict, d)
 
-                # save all updates from processing back to the session - TODO: make sure this is the best place/time to save this info
-                session_datastore = SessionDatastore()
-                try:
-                    session_datastore.update(current_session, self.user_id, format_date(d))
-                except NoSuchEntityException:
-                    session_datastore.update(current_session, self.user_id, format_date(d - timedelta(days=1)))
-                #TODO: continue if fails the second time
+                if d >= twenty_days_ago:
+                    injury_risk_dict = self.mark_anc_muscle_imbalance(injury_cycle_summary_dict, injury_risk_dict, d)
+
+                # # save all updates from processing back to the session - TODO: make sure this is the best place/time to save this info
+                # session_datastore = SessionDatastore()
+                # try:
+                #     session_datastore.update(current_session, self.user_id, format_date(d))
+                # except NoSuchEntityException:
+                #     session_datastore.update(current_session, self.user_id, format_date(d - timedelta(days=1)))
+                # #TODO: continue if fails the second time
 
                 session_mapping_dict[current_session] = session_functional_movement.functional_movement_mappings
 
             daily_injury_risk_dict = self.merge_daily_sessions(d, session_mapping_dict, injury_risk_dict)
 
-            #for b in session_functional_movement.body_parts:
             for body_part_side, body_part_injury_risk in daily_injury_risk_dict.items():
 
                 if body_part_side not in injury_risk_dict:
@@ -395,6 +398,9 @@ class InjuryRiskProcessor(object):
                     proc.increment_underactive_long_by_list([75, 74, 73, 66, 63, 64, 47, 48])
                     apt_ankle_present = True
 
+                if apt_ankle_adf != 0 and current_session.duration_minutes >= 20:
+                    proc.increment_weak_by_list([73, 66])
+
             if current_session.movement_patterns is not None and current_session.movement_patterns.hip_drop_apt is not None:
 
                 hip_drop_apt = current_session.movement_patterns.hip_drop_apt
@@ -405,6 +411,9 @@ class InjuryRiskProcessor(object):
                     proc.increment_underactive_long_by_list([63, 64, 47, 48])
 
                     hip_drop_present = True
+
+                if hip_drop_apt_adf != 0 and current_session.movement_patterns >= 20:
+                    proc.increment_weak_by_list([56, 66])
 
             if current_session.movement_patterns is not None and current_session.movement_patterns.knee_valgus_apt is not None:
 
@@ -417,6 +426,9 @@ class InjuryRiskProcessor(object):
                     proc.increment_underactive_long_by_list([21])
 
                     knee_valgus_present = True
+
+                if knee_valgus_apt_adf != 0 and current_session.movement_patterns >= 20:
+                    proc.increment_weak_by_list([44, 42, 40, 41])
 
             if hip_drop_present and knee_valgus_present:
 
@@ -486,6 +498,55 @@ class InjuryRiskProcessor(object):
             summary_dict = proc.injury_cycle_summary_dict
 
         return summary_dict
+
+    def mark_anc_muscle_imbalance(self, injury_cycle_summary_dict, injury_risk_dict, base_date):
+
+        for body_part_side, injury_cycle_summary in injury_cycle_summary_dict.items():
+
+            if (injury_cycle_summary.overactive_short_count > injury_cycle_summary.overactive_long_count and
+                    injury_cycle_summary.overactive_short_count > injury_cycle_summary.underactive_short_count and
+                    injury_cycle_summary.overactive_short_count > injury_cycle_summary.underactive_long_count):
+                if body_part_side not in injury_risk_dict:
+                    injury_risk_dict[body_part_side] = BodyPartInjuryRisk()
+                if injury_risk_dict[body_part_side].last_overactive_short_date is None or injury_risk_dict[body_part_side].last_overactive_short_date < base_date:
+                    injury_risk_dict[body_part_side].last_overactive_short_date = base_date
+                    injury_risk_dict[body_part_side].overactive_short_count_last_0_20_days += 1
+
+            elif (injury_cycle_summary.overactive_long_count > injury_cycle_summary.overactive_short_count and
+                  injury_cycle_summary.overactive_long_count > injury_cycle_summary.underactive_short_count and
+                  injury_cycle_summary.overactive_long_count > injury_cycle_summary.underactive_long_count):
+                if body_part_side not in injury_risk_dict:
+                    injury_risk_dict[body_part_side] = BodyPartInjuryRisk()
+                if injury_risk_dict[body_part_side].last_overactive_long_date is None or injury_risk_dict[body_part_side].last_overactive_long_date < base_date:
+                    injury_risk_dict[body_part_side].last_overactive_long_date = base_date
+                    injury_risk_dict[body_part_side].overactive_long_count_last_0_20_days += 1
+
+            elif (injury_cycle_summary.underactive_short_count > injury_cycle_summary.overactive_short_count and
+                  injury_cycle_summary.underactive_short_count > injury_cycle_summary.overactive_long_count and
+                  injury_cycle_summary.underactive_short_count > injury_cycle_summary.underactive_long_count):
+                if body_part_side not in injury_risk_dict:
+                    injury_risk_dict[body_part_side] = BodyPartInjuryRisk()
+                if injury_risk_dict[body_part_side].last_underactive_short_date is None or injury_risk_dict[body_part_side].last_underactive_short_date < base_date:
+                    injury_risk_dict[body_part_side].last_underactive_short_date = base_date
+                    injury_risk_dict[body_part_side].underactive_short_count_last_0_20_days += 1
+
+            elif (injury_cycle_summary.underactive_long_count > injury_cycle_summary.overactive_short_count and
+                  injury_cycle_summary.underactive_long_count > injury_cycle_summary.overactive_long_count and
+                  injury_cycle_summary.underactive_long_count > injury_cycle_summary.underactive_short_count):
+                if body_part_side not in injury_risk_dict:
+                    injury_risk_dict[body_part_side] = BodyPartInjuryRisk()
+                if injury_risk_dict[body_part_side].last_underactive_long_date is None or injury_risk_dict[body_part_side].last_underactive_long_date < base_date:
+                    injury_risk_dict[body_part_side].last_underactive_long_date = base_date
+                    injury_risk_dict[body_part_side].underactive_long_count_last_0_20_days += 1
+
+            if injury_cycle_summary.weak_count > 0:
+                if body_part_side not in injury_risk_dict:
+                    injury_risk_dict[body_part_side] = BodyPartInjuryRisk()
+                if injury_risk_dict[body_part_side].last_weak_date is None or injury_risk_dict[body_part_side].last_weak_date < base_date:
+                    injury_risk_dict[body_part_side].last_weak_date = base_date
+                    injury_risk_dict[body_part_side].weak_count_last_0_20_days += 1
+
+        return injury_risk_dict
 
     def populate_volume_dictionaries(self, body_part_injury_risk, body_part_side, d):
         
@@ -656,8 +717,8 @@ class InjuryRiskProcessor(object):
 
             #injury_risk_dict[body_part_side].eccentric_volume_today = 0
             #injury_risk_dict[body_part_side].concentric_volume_today = 0
-            injury_risk_dict[body_part_side].last_compensation_date = None
-            injury_risk_dict[body_part_side].compensating_source = None
+            #injury_risk_dict[body_part_side].last_compensation_date = None
+            #injury_risk_dict[body_part_side].compensating_source = None
 
             injury_risk_dict[body_part_side].prime_mover_concentric_volume_today = 0
             injury_risk_dict[body_part_side].prime_mover_eccentric_volume_today = 0
@@ -667,35 +728,42 @@ class InjuryRiskProcessor(object):
             #injury_risk_dict[body_part_side].synergist_total_volume_today = 0
             injury_risk_dict[body_part_side].synergist_compensating_concentric_volume_today = 0
             injury_risk_dict[body_part_side].synergist_compensating_eccentric_volume_today = 0
-            injury_risk_dict[body_part_side].synergist_compensating_total_volume_today = 0
+            #injury_risk_dict[body_part_side].synergist_compensating_total_volume_today = 0
 
             #injury_risk_dict[body_part_side].concentric_intensity_today = 0
             #injury_risk_dict[body_part_side].eccentric_intensity_today = 0
 
             injury_risk_dict[body_part_side].prime_mover_concentric_intensity_today = 0
             injury_risk_dict[body_part_side].prime_mover_eccentric_intensity_today = 0
-            injury_risk_dict[body_part_side].prime_mover_total_intensity_today = 0
+            #injury_risk_dict[body_part_side].prime_mover_total_intensity_today = 0
 
             injury_risk_dict[body_part_side].synergist_concentric_intensity_today = 0
             injury_risk_dict[body_part_side].synergist_eccentric_intensity_today = 0
-            injury_risk_dict[body_part_side].synergist_total_intensity_today = 0
+            #injury_risk_dict[body_part_side].synergist_total_intensity_today = 0
             injury_risk_dict[body_part_side].synergist_compensating_concentric_intensity_today = 0
             injury_risk_dict[body_part_side].synergist_compensating_eccentric_intensity_today = 0
-            injury_risk_dict[body_part_side].synergist_compensating_total_intensity_today = 0
+            #injury_risk_dict[body_part_side].synergist_compensating_total_intensity_today = 0
 
         session_mapping_dict = {}
+        injury_cycle_summary_dict = {}
 
         for session in daily_sessions:
             session_functional_movement = SessionFunctionalMovement(session, injury_risk_dict)
             current_session = session_functional_movement.process(base_date, load_stats)
 
-            # save all updates from processing back to the session - TODO: make sure this is the best place/time to save this info
-            session_datastore = SessionDatastore()
-            try:
-                session_datastore.update(current_session, self.user_id, format_date(base_date))
-            except NoSuchEntityException:
-                session_datastore.update(current_session, self.user_id, format_date(base_date - timedelta(days=1)))
-            # TODO: continue if fails the second time
+            # # save all updates from processing back to the session
+            # session_datastore = SessionDatastore()
+            # try:
+            #     session_datastore.update(current_session, self.user_id, format_date(base_date))
+            # except NoSuchEntityException:
+            #     session_datastore.update(current_session, self.user_id, format_date(base_date - timedelta(days=1)))
+            # # TODO: continue if fails the second time
+
+            injury_cycle_summary_dict = self.update_injury_cycle_summaries(current_session,
+                                                                           injury_cycle_summary_dict,
+                                                                           injury_risk_dict, base_date)
+
+            injury_risk_dict = self.mark_anc_muscle_imbalance(injury_cycle_summary_dict, injury_risk_dict, base_date)
 
             session_mapping_dict[current_session] = session_functional_movement.functional_movement_mappings
 

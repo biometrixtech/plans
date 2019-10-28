@@ -866,43 +866,55 @@ class ActiveRest(ModalityBase):
 
     def is_body_part_overactive_short(self, body_part_injury_risk):
 
-        is_short = self.is_body_part_short(body_part_injury_risk)
+        #is_short = self.is_body_part_short(body_part_injury_risk)
 
-        is_overactive = self.is_body_part_overactive(body_part_injury_risk)
+        is_overactive_short = False
 
-        return is_short and is_overactive
+        if body_part_injury_risk.overactive_short_count_last_0_20_days >= 3:
+            is_overactive_short = True
+
+        return is_overactive_short
+
+    def is_body_part_overactive_long(self, body_part_injury_risk):
+
+        #is_short = self.is_body_part_short(body_part_injury_risk)
+
+        is_overactive_long = False
+
+        if body_part_injury_risk.overactive_long_count_last_0_20_days >= 3:
+            is_overactive_long = True
+
+        return is_overactive_long
 
     def is_body_part_underactive_long(self, body_part_injury_risk):
 
-        is_long = self.is_body_part_long(body_part_injury_risk)
+        #is_long = self.is_body_part_long(body_part_injury_risk)
 
-        is_underactive_inhibited = self.is_body_part_underactive_inhibited(body_part_injury_risk)
+        is_underactive_long = False
 
-        is_underactive_weak = self.is_body_part_underactive_weak(body_part_injury_risk)
+        if body_part_injury_risk.underactive_long_count_last_0_20_days >= 3:
+            is_underactive_long = True
 
-        is_underactive = is_underactive_inhibited or is_underactive_weak
-
-        return is_long and is_underactive
+        return is_underactive_long
 
     def is_body_part_underactive_short(self, body_part_injury_risk):
 
-        is_short = self.is_body_part_short(body_part_injury_risk)
+        #is_short = self.is_body_part_short(body_part_injury_risk)
 
-        is_underactive_inhibited = self.is_body_part_underactive_inhibited(body_part_injury_risk)
+        is_underactive_short = False
 
-        is_underactive_weak = self.is_body_part_underactive_weak(body_part_injury_risk)
+        if body_part_injury_risk.underactive_short_count_last_0_20_days >= 3:
+            is_underactive_short = True
 
-        is_underactive = is_underactive_inhibited or is_underactive_weak
+        return is_underactive_short
 
-        return is_short and is_underactive
-
-    def is_body_part_underactive_weak_short(self, body_part_injury_risk):
-
-        is_short = self.is_body_part_short(body_part_injury_risk)
-
-        is_underactive_weak = self.is_body_part_underactive_weak(body_part_injury_risk)
-
-        return is_short and is_underactive_weak
+    # def is_body_part_underactive_weak_short(self, body_part_injury_risk):
+    #
+    #     is_short = self.is_body_part_short(body_part_injury_risk)
+    #
+    #     is_underactive_weak = self.is_body_part_underactive_weak(body_part_injury_risk)
+    #
+    #     return is_short and is_underactive_weak
 
     def is_body_part_long(self, body_part_injury_risk):
 
@@ -928,31 +940,22 @@ class ActiveRest(ModalityBase):
             is_short = True
         return is_short
 
-    def is_body_part_overactive(self, body_part_injury_risk):
+    # def is_body_part_overactive(self, body_part_injury_risk):
+    #
+    #     is_overactive = False
+    #
+    #     if body_part_injury_risk.overactive_count_last_0_20_days >= 3:
+    #         is_overactive = True
+    #     return is_overactive
 
-        is_overactive = False
+    def is_body_part_weak(self, body_part_injury_risk):
 
-        if body_part_injury_risk.overactive_count_last_0_20_days >= 3:
-            is_overactive = True
-        return is_overactive
+        is_weak = False
 
-    def is_body_part_underactive_weak(self, body_part_injury_risk):
+        if body_part_injury_risk.weak_count_last_0_20_days >= 3:
+            is_weak = True
 
-        is_underactive_weak = False
-
-        if body_part_injury_risk.underactive_weak_count_last_0_20_days >= 3:
-            is_underactive_weak = True
-
-        return is_underactive_weak
-
-    def is_body_part_underactive_inhibited(self, body_part_injury_risk):
-
-        is_underactive_inhibited = False
-
-        if body_part_injury_risk.underactive_inhibited_count_last_0_20_days >= 3:
-            is_underactive_inhibited = True
-
-        return is_underactive_inhibited
+        return is_weak
 
     def is_functional_overreaching(self, body_part_injury_risk):
         if (body_part_injury_risk.last_functional_overreaching_date is not None and
@@ -1384,10 +1387,8 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
 
         body_part_factory = BodyPartFactory()
 
-        if (body_part_injury_risk.last_overactive_date is not None and
-                body_part_injury_risk.last_overactive_date == self.event_date_time.date() and
-                body_part_injury_risk.last_short_date is not None and
-                body_part_injury_risk.last_short_date == self.event_date_time.date()):
+        if (body_part_injury_risk.last_overactive_short_date is not None and
+                body_part_injury_risk.last_overactive_short_date == self.event_date_time.date()):
 
             body_part = body_part_factory.get_body_part(body_part_side)
 
@@ -1414,18 +1415,19 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
 
         if body_part is not None:
 
-            is_short = self.is_body_part_short(body_part_injury_risk)
-            is_overactive = self.is_body_part_overactive(body_part_injury_risk)
-            is_underactive_weak = self.is_body_part_underactive_weak(body_part_injury_risk)
-            is_underactive_inhibited = self.is_body_part_underactive_inhibited(body_part_injury_risk)
+            #is_short = self.is_body_part_short(body_part_injury_risk)
+            #is_overactive = self.is_body_part_overactive(body_part_injury_risk)
+            #is_underactive_weak = self.is_body_part_underactive_weak(body_part_injury_risk)
+            #is_underactive_inhibited = self.is_body_part_underactive_inhibited(body_part_injury_risk)
             is_overactive_short = self.is_body_part_overactive_short(body_part_injury_risk)
             is_underactive_long = self.is_body_part_underactive_long(body_part_injury_risk)
             is_underactive_short = self.is_body_part_underactive_short(body_part_injury_risk)
-            is_underactive_weak_short = self.is_body_part_underactive_weak_short(body_part_injury_risk)
+            is_weak = self.is_body_part_weak(body_part_injury_risk)
+            #is_underactive_weak_short = self.is_body_part_underactive_weak_short(body_part_injury_risk)
 
             #last_severity = self.get_last_severity(body_part_injury_risk)
             non_isolated_severity = 2.5
-            if is_underactive_weak_short:
+            if is_weak:
                 isolated_severity = 7.5
             else:
                 isolated_severity = 2.5
@@ -1786,11 +1788,11 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
             is_overactive_short = self.is_body_part_overactive_short(body_part_injury_risk)
             is_underactive_short = self.is_body_part_underactive_short(body_part_injury_risk)
             is_underactive_long = self.is_body_part_underactive_long(body_part_injury_risk)
-            is_underactive_weak_short = self.is_body_part_underactive_weak_short(body_part_injury_risk)
+            is_weak = self.is_body_part_weak(body_part_injury_risk)
 
             # last_severity = self.get_last_severity(body_part_injury_risk)
             last_severity = 2.5
-            if is_underactive_weak_short:
+            if is_weak:
                 underactive_short_severity = 7.5
             else:
                 underactive_short_severity = 2.5

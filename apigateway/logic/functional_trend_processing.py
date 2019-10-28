@@ -670,18 +670,14 @@ class TrendProcessor(object):
                     body_part_injury_risk.last_short_date == self.event_date_time.date() and
                     body_part_injury_risk.last_muscle_spasm_date == self.event_date_time.date()):
                 short_non_adhesions.append(body_part_side)
-            if (body_part_injury_risk.last_overactive_date is not None and
-                    body_part_injury_risk.last_overactive_date == self.event_date_time.date()):
+            if (body_part_injury_risk.last_overactive_short_date is not None and
+                    body_part_injury_risk.last_overactive_short_date == self.event_date_time.date()):
                 overactive.append(body_part_side)
-            if (body_part_injury_risk.last_underactive_date is not None and
-                    body_part_injury_risk.last_weak_date is not None and
-                    body_part_injury_risk.last_underactive_date == self.event_date_time.date() and
+            if (body_part_injury_risk.last_weak_date is not None and
                     body_part_injury_risk.last_weak_date == self.event_date_time.date()):
                 underactive_weak.append(body_part_side)
-            if (body_part_injury_risk.last_underactive_date is not None and
-                    body_part_injury_risk.last_inhibited_date is not None and
-                    body_part_injury_risk.last_underactive_date == self.event_date_time.date() and
-                    body_part_injury_risk.last_inhibited_date == self.event_date_time.date()):
+            if (body_part_injury_risk.last_underactive_short_date is not None and
+                    body_part_injury_risk.last_underactive_short_date == self.event_date_time.date()):
                 underactive_inhibited.append(body_part_side)
 
         # since we're reverse sorting, 2 is a higher priority than 1

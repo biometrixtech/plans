@@ -1,5 +1,6 @@
 from models.soreness_base import BodyPartSide, BodyPartLocation
 
+
 class FunctionalMovementSummary(object):
     def __init__(self):
         self.percent_total_volume_compensating = 0
@@ -13,6 +14,7 @@ class InjuryCycleSummary(object):
         self.overactive_long_count = 0
         self.underactive_short_count = 0
         self.underactive_long_count = 0
+        self.weak_count = 0
 
 
 class InjuryCycleSummaryProcessor(object):
@@ -28,6 +30,18 @@ class InjuryCycleSummaryProcessor(object):
             body_part_side = BodyPartSide(body_part_info, self.side)
 
         return body_part_side
+
+    def increment_weak(self, body_part_enum):
+
+        body_part_side = self.get_body_part_side(body_part_enum)
+        if body_part_side not in self.injury_cycle_summary_dict:
+            self.injury_cycle_summary_dict[body_part_side] = InjuryCycleSummary()
+        self.injury_cycle_summary_dict[body_part_side].weak_count += 1
+
+    def increment_weak_by_list(self, body_part_enum_list):
+
+        for b in body_part_enum_list:
+            self.increment_weak(b)
 
     def increment_overactive_short(self, body_part_enum):
 
