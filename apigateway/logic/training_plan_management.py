@@ -35,6 +35,7 @@ class TrainingPlanManager(object):
         self.training_sessions = []
         self.longitudinal_alerts = []
         self.soreness_list = []
+        self.symptoms = []
 
     def load_data(self, event_date):
         daily_plans = self.daily_plan_datastore.get(self.athlete_id, event_date, event_date)
@@ -53,6 +54,7 @@ class TrainingPlanManager(object):
 
         for c in plan_today:
             self.training_sessions.extend(c.training_sessions)
+            self.symptoms.extend(c.symptoms)
 
     @staticmethod
     def preserve_completed_modality(modalities):
@@ -87,7 +89,8 @@ class TrainingPlanManager(object):
         self.soreness_list = SorenessCalculator().get_soreness_summary_from_surveys(self.readiness_surveys,
                                                                                self.post_session_surveys,
                                                                                self.trigger_date_time,
-                                                                               historic_soreness)
+                                                                               historic_soreness,
+                                                                               self.symptoms)
 
         # trigger_factory = TriggerFactory(parse_date(event_date), self.athlete_stats, self.soreness_list, self.training_sessions)
         # trigger_factory.load_triggers()

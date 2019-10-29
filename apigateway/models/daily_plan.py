@@ -7,6 +7,7 @@ from models.modalities import ActiveRestBeforeTraining, ActiveRestAfterTraining,
 from models.insights import AthleteInsight
 from models.trigger import TriggerType
 from models.athlete_trend import AthleteTrends
+from models.soreness import Soreness
 
 
 class DailyPlan(Serialisable):
@@ -39,6 +40,7 @@ class DailyPlan(Serialisable):
         self.train_later = True
         self.insights = []
         self.trends = None
+        self.symptoms = []
 
     def get_id(self):
         return self.user_id
@@ -80,6 +82,7 @@ class DailyPlan(Serialisable):
                'train_later': self.train_later,
                'insights': [insight.json_serialise() for insight in self.insights],
                'trends': self.trends.json_serialise(plan=True) if self.trends is not None else None,
+               'symptoms': [soreness.json_serialise() for soreness in self.symptoms]
                }
 
         return ret
@@ -113,6 +116,7 @@ class DailyPlan(Serialisable):
         daily_plan.last_sensor_sync = input_dict.get('last_sensor_sync', None)
         daily_plan.sessions_planned = input_dict.get('sessions_planned', True)
         daily_plan.train_later = input_dict.get('train_later', True)
+        daily_plan.symptoms = [Soreness.json_deserialise(soreness) for soreness in input_dict.get('symptoms', [])]
 
         return daily_plan
 

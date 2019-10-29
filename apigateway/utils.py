@@ -2,6 +2,7 @@ import datetime
 import math
 import uuid
 from fathomapi.utils.exceptions import InvalidSchemaException
+from config import get_mongo_collection
 
 
 def format_date(date_input):
@@ -130,9 +131,15 @@ def _get_time_offset(timezone):
         minute_offset += hour_offset * 60
     return minute_offset
 
+
 def none_max(value_array):
     filtered = [v for v in value_array if v is not None]
     if len(filtered) > 0:
         return max(filtered)
     else:
         return None
+
+
+def _check_plan_exists(user_id, event_date):
+    mongo_collection = get_mongo_collection('dailyplan')
+    return mongo_collection.count({"user_id": user_id, "date": event_date}) == 1

@@ -34,6 +34,7 @@ class SurveyProcessing(object):
         self.plans = []
         self.stats_processor = None
         self.datastore_collection = datastore_collection
+        self.symptoms = []
 
     def create_session_from_survey(self, session, historic_health_data=False):
         session_obj = self.convert_session(session, historic_health_data)
@@ -316,6 +317,11 @@ class SurveyProcessing(object):
                     sport_name = session.sport_name
         self.athlete_stats.high_relative_load_session = high_relative_load_session_present
         self.athlete_stats.high_relative_load_session_sport_name = sport_name
+
+    def create_soreness_from_survey(self, soreness):
+        soreness['reported_date_time'] = self.event_date_time
+        soreness = Soreness().json_deserialise(soreness)
+        self.symptoms.append(soreness)
 
 
 def create_session(session_type, data):
