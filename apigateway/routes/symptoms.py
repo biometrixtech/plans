@@ -9,8 +9,7 @@ from fathomapi.utils.xray import xray_recorder
 from models.daily_plan import DailyPlan
 from models.stats import AthleteStats
 from routes.environments import is_fathom_environment
-from config import get_mongo_collection
-from utils import parse_datetime, format_date, get_timezone
+from utils import parse_datetime, format_date, get_timezone, _check_plan_exists
 from logic.survey_processing import SurveyProcessing, create_plan
 
 datastore_collection = DatastoreCollection()
@@ -84,12 +83,3 @@ def handle_session_create(user_id=None):
                                                                                 body={"timezone": timezone,
                                                                                       "plans_api_version": Config.get('API_VERSION')})
     return {'daily_plans': [plan]}, 201
-
-
-def _check_plan_exists(user_id, event_date):
-    mongo_collection = get_mongo_collection('dailyplan')
-    if mongo_collection.count({"user_id": user_id,
-                               "date": event_date}) == 1:
-        return True
-    else:
-        return False
