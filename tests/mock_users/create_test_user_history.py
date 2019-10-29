@@ -14,6 +14,7 @@ from persona import Persona
 import soreness_history as sh
 from utils import format_datetime
 from datetime import datetime, timedelta
+import movement_pattern_history as mph
 
 
 plans_version = "4_5"
@@ -61,9 +62,6 @@ def clear_plan_alerts(insight_type, jwt, plan_date_time):
     return response
 
 
-
-
-
 if __name__ == '__main__':
     start = time.time()
     history_length = 35
@@ -80,7 +78,12 @@ if __name__ == '__main__':
             soreness_history = []
             user_id, jwt = login_user(u)
             print(u + "=" + user_id)
+
+            history, session_details = mph.run_a_regressions()
+
             persona1 = Persona(user_id)
+            persona1.elasticity_adf_dictionary = history
+            persona1.three_session_history = session_details
             persona1.soreness_history = soreness_history
             if u in ["run_a@200.com"]:
                 rpes = [5, None, None, 5, None, 3, None,
@@ -88,7 +91,7 @@ if __name__ == '__main__':
                         None, 4, None, 3, 5, None, None,
                         6, None, 5, None, 4, None, 3,
                         5, None, 6, None, 5, 4, 6]
-                persona1.create_history(days=history_length, suffix='', end_today=True, rpes=rpes, log_output=True)
+                persona1.create_history(days=history_length, suffix='', end_today=True, rpes=rpes, log_output=True, jwt=jwt)
             else:
                 persona1.create_history(days=history_length, suffix='')
             print(time.time() - start)
