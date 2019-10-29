@@ -561,3 +561,15 @@ def test_soreness_low_severity_post_yesterday_high_severity_post_today():
 
     assert TestUtilities().body_part(9, 4).severity == soreness_list[0].severity
     assert TestUtilities().body_part(9, 4).body_part == soreness_list[0].body_part.location
+
+def test_soreness_1_body_part_from_2_readiness_survey_symptom_intake_1_day_only_diff_severity():
+    soreness_dict = TestUtilities().body_part_soreness(9, severity=2, side=0, movement=2)
+    soreness_item = Soreness.json_deserialise(soreness_dict)
+    soreness_item.reported_date_time = trigger_date_time()
+    soreness_list = soreness_calculator().get_soreness_summary_from_surveys([readiness_survey_12_hours_ankle(2)],
+                                                                            [],
+                                                                            trigger_date_time(), [], [soreness_item])
+    assert len(soreness_list) == 1
+    assert soreness_list[0].severity == 3
+    assert soreness_list[0].movement is None
+    assert soreness_list[0].body_part.location == TestUtilities().body_part(9, None).body_part
