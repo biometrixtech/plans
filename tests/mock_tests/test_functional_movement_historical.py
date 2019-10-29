@@ -108,7 +108,7 @@ def test_historical_update_multiple_day_data():
     injury_risk_dict = proc.process(aggregate_results=True)
 
     calc = ExerciseAssignmentCalculator(injury_risk_dict, exercise_library_datastore, completed_exercise_datastore,
-                                        dates[0])
+                                        dates[2])
 
     active_rest = calc.get_pre_active_rest()
 
