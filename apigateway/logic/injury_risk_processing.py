@@ -1046,7 +1046,7 @@ class InjuryRiskProcessor(object):
                 if target_body_part_side in injury_risk_dict:
                     ache_count = injury_risk_dict[target_body_part_side].ache_count_last_0_10_days
                     ache_count_10_20 = injury_risk_dict[target_body_part_side].ache_count_last_0_20_days
-                    if injury_risk_dict[target_body_part_side].last_ache_date < base_date is None or injury_risk_dict[target_body_part_side].last_ache_date < base_date:
+                    if injury_risk_dict[target_body_part_side].last_ache_date is None or injury_risk_dict[target_body_part_side].last_ache_date < base_date:
                         injury_risk_dict[target_body_part_side].last_ache_date = base_date
                         injury_risk_dict[target_body_part_side].ache_count_last_0_10_days += 1
                         injury_risk_dict[target_body_part_side].last_ache_level = target_symptom.ache

@@ -15,6 +15,7 @@ import soreness_history as sh
 from utils import format_datetime
 from datetime import datetime, timedelta
 
+
 plans_version = "4_5"
 
 
@@ -60,6 +61,9 @@ def clear_plan_alerts(insight_type, jwt, plan_date_time):
     return response
 
 
+
+
+
 if __name__ == '__main__':
     start = time.time()
     history_length = 35
@@ -84,7 +88,7 @@ if __name__ == '__main__':
                         None, 4, None, 3, 5, None, None,
                         6, None, 5, None, 4, None, 3,
                         5, None, 6, None, 5, 4, 6]
-                persona1.create_history(days=history_length, suffix='', end_today=True, rpes=rpes)
+                persona1.create_history(days=history_length, suffix='', end_today=True, rpes=rpes, log_output=True)
             else:
                 persona1.create_history(days=history_length, suffix='')
             print(time.time() - start)
