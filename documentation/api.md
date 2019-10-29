@@ -15,25 +15,18 @@
     - [Daily Readiness](#daily-readiness)
       - [Create](#create)
       - [Soreness/Typical Session history](#sorenesstypical-session-history)
-    - [Post-Session Survey (Deprecated)](#post-session-survey-deprecated)
-      - [Create](#create-1)
     - [Session](#session)
-      - [Create](#create-2)
-      - [Get Typical Sessions (Deprecated)](#get-typical-sessions-deprecated)
+      - [Create](#create-1)
       - [Mark no sessions planned](#mark-no-sessions-planned)
       - [Delete](#delete)
       - [Update](#update)
-      - [Send sensor data](#send-sensor-data)
+    - [Symptoms](#symptoms)
+      - [Submit](#submit)
     - [Active Recovery](#active-recovery)
       - [Mark Started (Exercise Modalities)](#mark-started-exercise-modalities)
       - [Mark Completed (Exercise Modalities)](#mark-completed-exercise-modalities)
       - [Mark Started (Body Part Modalities)](#mark-started-body-part-modalities)
       - [Mark Completed (Body Part Modalities)](#mark-completed-body-part-modalities)
-      - [Adjust active time (Deprecated)](#adjust-active-time-deprecated)
-    - [Functional Strength](#functional-strength)
-      - [Activate](#activate)
-      - [Mark Started](#mark-started)
-      - [Mark Completed](#mark-completed)
     - [Daily Plans](#daily-plans)
       - [Get daily plan](#get-daily-plan)
     - [Coach Dashboard](#coach-dashboard)
@@ -508,6 +501,52 @@ Authorization: eyJraWQ...ajBc4VQ
     "message": "success"
 }
 ```
+
+### Symptoms
+
+#### Submit
+
+This endpoint can be called to submit symptoms to receive a new plan without submitting a session.
+
+##### Query String
+ 
+The client __must__ submit a request to the endpoint `/plans/version/symptoms/{User UUID}`. The request method __must__ be `POST`.
+
+##### Request
+
+The client __must__ submit a request body containing a JSON object with the following schema:
+```
+{
+    "event_date": Datetime,
+    "soreness": [sore_part, sore_part]
+}
+```
+* `event_date` __should__  be a Datetime and reflect the local time that survey was taken
+* `soreness` __should__ reflect a list of body parts(`sore_part`) as defined in Readiness [Create](#create)
+
+
+```
+POST /plans/version/symptoms/{User UUID} HTTPS/1.1
+Host: apis.{env}.fathomai.com
+Content-Type: application/json
+Authorization: eyJraWQ...ajBc4VQ
+
+{
+    "event_date": "2019-10-29T17:45:24Z",
+    "soreness":[{"body_part": 18, "side": 0, "tight": 4, "knots": null, "sharp": null, "ache": null}],
+}
+```
+##### Responses
+ 
+ If the write was successful, the Service __will__ respond with HTTP Status `201 Created`, with a body with the following syntax:
+ 
+```
+{
+    "daily_plans": [daily_plan]
+}
+```
+* `daily_plan` will have the same structure as defined in output of [Get daily plan](#get-daily-plan) route.
+
 
 ### Active Recovery
 
