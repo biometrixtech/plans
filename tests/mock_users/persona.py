@@ -14,10 +14,15 @@ from datastores.completed_exercise_datastore import CompletedExerciseDatastore
 from datastores.session_datastore import SessionDatastore
 from datastores.datastore_collection import DatastoreCollection
 from utils import format_datetime, format_date, parse_datetime
+from tests.mock_users.output_injury_risk_dict import InjuryRiskDictOutputProcessor
+from tests.mock_users.three_sensor_api import ThreeSensorAPIRequestProcessor
+import os
+import json
+import requests
 
 
 class Persona(object):
-    def __init__(self, user_id):
+    def __init__(self, user_id, plans_version=4.5):
         self.user_id = user_id
         self.soreness_history = None
         self.session_history = None
@@ -25,8 +30,15 @@ class Persona(object):
         self.daily_readiness = None
         self.athlete_stats = None
         self.rpes = []
+        self.plans_version = plans_version
 
-    def create_history(self, days, suffix='', clear_history=True, start_date_time=datetime.datetime.now(), end_today=False, rpes=[], visualizations=True):
+    def create_history(self, days, suffix='', clear_history=True, start_date_time=datetime.datetime.now(), end_today=False, rpes=[], visualizations=True, log_output=False):
+
+        proc = InjuryRiskDictOutputProcessor('../../ird', 45, 1, self.user_id)
+
+        if log_output:
+            proc.write_headers()
+
         self.rpes = rpes
         if clear_history:
             self.clear_user(suffix)
@@ -63,6 +75,8 @@ class Persona(object):
                 if self.daily_plan.pre_active_rest is not None and len(self.daily_plan.pre_active_rest) > 0:
                     exercise_list = [ex.exercise.id for ex in self.daily_plan.pre_active_rest[0].inhibit_exercises.values()]
                     self.complete_exercises(exercise_list, format_datetime(event_date + datetime.timedelta(hours=1)))
+                if log_output:
+                    proc.write_day(today_date)
                 print(today_date)
 
             event_date = event_date + datetime.timedelta(days=1)
@@ -74,7 +88,8 @@ class Persona(object):
 
         # if not end_today:
         #     self.update_stats(event_date)
-
+        if log_output:
+            proc.close()
         return last_plan_date
 
     def clear_user(self, suffix=''):
@@ -148,3 +163,14 @@ class Persona(object):
             store = SessionDatastore()
             store.insert(session, self.user_id, format_date(event_date))
             self.daily_plan.training_sessions.append(session)
+
+    def send_three_sensor_data_to_plans(self, user_id, jwt, event_date, session_id, seconds_duration, end_date, asymmetry_patterns,
+                                        movement_patterns):
+        url = 'https://apis.{env}.fathomai.com/plans/4_5/session/{user_id}/three_sensor_data'.format(
+            env=os.environ['ENVIRONMENT'], user_id=user_id, version=self.plans_version)
+        proc = ThreeSensorAPIRequestProcessor(event_date, session_id, seconds_duration, end_date)
+        body = proc.get_body(asymmetry_patterns, movement_patterns)
+        headers = {"Content-Type": "application/json", "Authorization": jwt}
+        response = requests.post(url, data=json.dumps(body), headers=headers)
+
+        return response
