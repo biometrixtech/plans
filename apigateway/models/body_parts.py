@@ -258,7 +258,7 @@ class BodyPartFactory(object):
                                   BodyPartLocation.abdominals,
                                   BodyPartLocation.lower_back,
                                   BodyPartLocation.upper_back_neck,
-                                  BodyPartLocation.erector_spinae]:
+                                  BodyPartLocation.external_obliques]:
             return False
         else:
             return True

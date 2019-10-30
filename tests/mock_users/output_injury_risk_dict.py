@@ -4,13 +4,15 @@ import os
 
 
 class InjuryRiskDictOutputProcessor(object):
-    def __init__(self, file_location, body_part_enum, side, user_id):
+    def __init__(self, file_location, user_id, user_name='test'):
         self.file_location = file_location
         self.file = None
-        self.body_part_enum = body_part_enum
+        #self.body_part_enum = body_part_enum
         self.injury_risk_datastore = InjuryRiskDatastore()
-        self.side = side
+        #self.side = side
         self.user_id = user_id
+        self.user_name = user_name
+        self.injury_risk_dict = {}
         self.attribute_list = ['concentric_volume_last_week', 'concentric_volume_this_week', 'prime_mover_concentric_volume_last_week',
                 'prime_mover_concentric_volume_this_week', 'synergist_concentric_volume_last_week',
                 'synergist_concentric_volume_this_week', 'synergist_compensating_concentric_volume_last_week',
@@ -21,8 +23,10 @@ class InjuryRiskDictOutputProcessor(object):
                 'prime_mover_concentric_volume_today','prime_mover_eccentric_volume_today', 'synergist_concentric_volume_today',
                 'synergist_eccentric_volume_today', 'synergist_compensating_concentric_volume_today',
                 'synergist_compensating_eccentric_volume_today','total_volume_ramp_today', 'eccentric_volume_ramp_today',
+                'total_compensation_percent','eccentric_compensation_percent','total_compensation_percent_tier',
+                'eccentric_compensation_percent_tier','total_volume_percent_tier','eccentric_volume_percent_tier',
                 'compensating_causes_volume_today', 'last_compensation_date', 'compensation_count_last_0_20_days',
-                'ache_count_last_0_10_days','ache_count_last_0_10_days','ache_count_last_0_20_days','last_ache_level',
+                'ache_count_last_0_10_days','ache_count_last_0_20_days','last_ache_level',
                 'last_ache_date','last_excessive_strain_date','last_non_functional_overreaching_date',
                 'last_functional_overreaching_date','last_inflammation_date','knots_count_last_0_20_days','last_knots_level',
                 'last_knots_date','last_muscle_spasm_date','last_adhesions_date','last_inhibited_date','last_long_date',
@@ -34,24 +38,26 @@ class InjuryRiskDictOutputProcessor(object):
                 'last_muscle_imbalance_date','last_tendinopathy_date','last_tendinosis_date','last_altered_joint_arthokinematics_date']
 
     def write_headers(self):
-        if not os.path.exists(self.file_location+'/user_'+self.user_id):
-            os.mkdir(self.file_location+'/user_'+self.user_id)
-        self.file_location = self.file_location+'/user_'+self.user_id
+        #if not os.path.exists(self.file_location+'/user_'+self.user_id):
+        #    os.mkdir(self.file_location+'/user_'+self.user_id)
+        self.file_location = self.file_location + '/user_'+self.user_name
 
-        self.file = open(self.file_location + "/" + str(self.body_part_enum) + "_" + str(self.side) + '_injury_risk_dict.csv', 'w')
+        #self.file = open(self.file_location + "/" + str(self.body_part_enum) + "_" + str(self.side) + '_injury_risk_dict.csv', 'w')
+        self.file = open(
+            self.file_location + "_" + 'injury_risk_dict.csv', 'w')
         columns = ",".join(self.attribute_list)
-        line = ('date,'+ columns)
+        line = ('date,body_part,side,'+ columns)
         self.file.write(line + '\n')
 
     def write_day(self, date):
 
         injury_risk_dict = self.injury_risk_datastore.get(self.user_id)
 
-        body_part_side = BodyPartSide(BodyPartLocation(self.body_part_enum), self.side)
+        #body_part_side = BodyPartSide(BodyPartLocation(self.body_part_enum), self.side)
 
-        if body_part_side in injury_risk_dict:
-            body_part_injury_risk = injury_risk_dict[body_part_side]
-            line = str(date) + ',' + self.get_attribute_string(body_part_injury_risk)
+        for body_part_side, body_part_injury_risk in injury_risk_dict.items():
+            #body_part_injury_risk = injury_risk_dict[body_part_side]
+            line = str(date) + ',' + body_part_side.body_part_location.name + ',' + str(body_part_side.side) + ',' + self.get_attribute_string(body_part_injury_risk)
             self.file.write(line + '\n')
 
     def close(self):

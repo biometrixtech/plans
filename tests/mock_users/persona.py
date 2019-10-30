@@ -37,9 +37,9 @@ class Persona(object):
         self.elasticity_adf_dictionary = {}
         self.three_session_history = {}
 
-    def create_history(self, days, suffix='', clear_history=True, start_date_time=datetime.datetime.now(), end_today=False, rpes=[], jwt=None, visualizations=True, log_output=False):
+    def create_history(self, days, suffix='', clear_history=True, start_date_time=datetime.datetime.now(), end_today=False, rpes=[], jwt=None, visualizations=True, log_output=False, user_name='test'):
 
-        proc = InjuryRiskDictOutputProcessor('../../ird', 45, 1, self.user_id)
+        proc = InjuryRiskDictOutputProcessor('../../ird', self.user_id, user_name)
 
         if log_output:
             proc.write_headers()
@@ -86,6 +86,7 @@ class Persona(object):
                     body['movement_patterns'] = create_elastticity_adf(todays_regression_history)
 
                     self.send_three_sensor_data_to_plans(self.user_id,jwt,body)
+                    self.create_plan_light(event_date)
 
                 last_plan_date = event_date
                 if self.daily_plan.pre_active_rest is not None and len(self.daily_plan.pre_active_rest) > 0:
@@ -144,6 +145,13 @@ class Persona(object):
 
         plan_manager = TrainingPlanManager(self.user_id, DatastoreCollection(), )
         self.daily_plan = plan_manager.create_daily_plan(event_date=format_date(event_date), last_updated=format_datetime(event_date), athlete_stats=self.athlete_stats, visualizations=visualizations)
+
+    def create_plan_light(self, event_date):
+        plan_manager = TrainingPlanManager(self.user_id, DatastoreCollection(), )
+        self.daily_plan = plan_manager.create_daily_plan(event_date=format_date(event_date),
+                                                         last_updated=format_datetime(event_date),
+                                                         athlete_stats=self.athlete_stats,
+                                                         visualizations=False)
 
     def update_stats(self, event_date):
         self.athlete_stats = StatsProcessing(self.user_id, event_date=event_date, datastore_collection=DatastoreCollection()).process_athlete_stats()

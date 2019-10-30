@@ -195,6 +195,12 @@ class BodyPartInjuryRisk(object):
         self.synergist_compensating_concentric_intensity_today = 0
         self.synergist_compensating_eccentric_intensity_today = 0
         self.synergist_compensating_total_intensity_today = 0
+        self.total_compensation_percent = 0
+        self.eccentric_compensation_percent = 0
+        self.total_compensation_percent_tier = 0
+        self.eccentric_compensation_percent_tier = 0
+        self.total_volume_percent_tier = 0
+        self.eccentric_volume_percent_tier = 0
         
         self.compensating_causes_volume_today = []
         self.compensating_causes_intensity_today = []
@@ -304,6 +310,12 @@ class BodyPartInjuryRisk(object):
                 "synergist_eccentric_volume_today": self.synergist_eccentric_volume_today,
                 "synergist_compensating_concentric_volume_today": self.synergist_compensating_concentric_volume_today,
                 "synergist_compensating_eccentric_volume_today": self.synergist_compensating_eccentric_volume_today,
+                "total_compensation_percent": self.total_compensation_percent,
+                "eccentric_compensation_percent": self.eccentric_compensation_percent,
+                "total_compensation_percent_tier": self.total_compensation_percent_tier,
+                "eccentric_compensation_percent_tier": self.eccentric_compensation_percent_tier,
+                "total_volume_percent_tier": self.total_volume_percent_tier,
+                "eccentric_volume_percent_tier": self.eccentric_volume_percent_tier,
 
                 "total_volume_ramp_today": self.total_volume_ramp_today,
                 "eccentric_volume_ramp_today": self.eccentric_volume_ramp_today,
@@ -442,6 +454,12 @@ class BodyPartInjuryRisk(object):
         injury_risk.synergist_compensating_eccentric_volume_last_week = input_dict.get('synergist_compensating_eccentric_volume_last_week', 0)
         injury_risk.synergist_compensating_eccentric_volume_this_week = input_dict.get('synergist_compensating_eccentric_volume_this_week', 0)
         injury_risk.synergist_compensating_eccentric_volume_today = input_dict.get('synergist_compensating_eccentric_volume_today', 0)
+        injury_risk.total_compensation_percent = input_dict.get('total_compensation_percent', 0)
+        injury_risk.eccentric_compensation_percent = input_dict.get('eccentric_compensation_percent', 0)
+        injury_risk.total_compensation_percent_tier = input_dict.get('total_compensation_percent_tier', 0)
+        injury_risk.eccentric_compensation_percent_tier = input_dict.get('eccentric_compensation_percent_tier', 0)
+        injury_risk.total_volume_percent_tier = input_dict.get('total_volume_percent_tier', 0)
+        injury_risk.eccentric_volume_percent_tier = input_dict.get('eccentric_volume_percent_tier', 0)
 
         injury_risk.total_volume_ramp_today = input_dict.get('total_volume_ramp_today')
         injury_risk.eccentric_volume_ramp_today = input_dict.get('eccentric_volume_ramp_today')
@@ -666,6 +684,32 @@ class BodyPartInjuryRisk(object):
             self.last_altered_joint_arthokinematics_date,
             body_part_injury_risk.last_altered_joint_arthokinematics_date)
 
+        # update calcuations after new values are set
+        self.total_compensation_percent = self.percent_total_compensation()
+        self.eccentric_compensation_percent = self.percent_eccentric_compensation()
+        self.total_volume_ramp_today = self.total_volume_ramp()
+        self.eccentric_volume_ramp_today = self.eccentric_volume_ramp()
+
+        self.eccentric_volume_percent_tier = self.merge_tiers(self.eccentric_volume_percent_tier,
+                                                              body_part_injury_risk.eccentric_volume_percent_tier)
+        self.eccentric_compensation_percent_tier = self.merge_tiers(self.eccentric_compensation_percent_tier,
+                                                                    body_part_injury_risk.eccentric_compensation_percent_tier)
+        self.total_compensation_percent_tier = self.merge_tiers(self.total_compensation_percent_tier,
+                                                                body_part_injury_risk.total_compensation_percent_tier)
+        self.total_volume_percent_tier = self.merge_tiers(self.total_volume_percent_tier,
+                                                   body_part_injury_risk.total_volume_percent_tier)
+
+    def merge_tiers(self, value_a, value_b):
+
+        if value_a > 0 and value_b > 0:
+            return min(value_a, value_b)
+        elif value_a > 0 and value_b == 0:
+            return value_a
+        elif value_a == 0 and value_b > 0:
+            return value_b
+        else:
+            return 0
+
     def merge_with_none(self, value_a, value_b):
 
         if value_a is None and value_b is None:
@@ -689,6 +733,29 @@ class BodyPartInjuryRisk(object):
                 return this_weeks_volume / self.eccentric_volume_last_week
 
         return 0
+
+    def percent_eccentric_compensation(self):
+
+        percentage = 0
+
+        eccentric_volume_today = self.eccentric_volume_today()
+
+        if eccentric_volume_today > 0:
+            percentage = (self.synergist_compensating_eccentric_volume_today / float(eccentric_volume_today)) * 100
+
+        return percentage
+
+    def percent_total_compensation(self):
+
+        percentage = 0
+
+        total_volume_today = self.total_volume_today()
+
+        if total_volume_today > 0:
+            compensating_volume_today = self.synergist_compensating_eccentric_volume_today + self.synergist_compensating_concentric_volume_today
+            percentage = (compensating_volume_today / float(total_volume_today)) * 100
+
+        return percentage
 
     def eccentric_volume_today(self):
 
