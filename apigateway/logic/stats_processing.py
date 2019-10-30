@@ -65,6 +65,11 @@ class StatsProcessing(object):
         self.all_plans = []
         self.all_daily_readiness_surveys = []
         self.historic_data_loaded = False
+        self.acute_symptoms = []
+        self.chronic_symptoms = []
+        self.last_7_days_symptoms = []
+        self.days_8_14_symptoms = []
+        self.last_25_days_symptoms = []
 
     def set_start_end_times(self):
         # start_date = datetime.strptime(self.event_date, "%Y-%m-%d")
@@ -102,7 +107,8 @@ class StatsProcessing(object):
         current_athlete_stats = self.calc_survey_stats(current_athlete_stats)
         soreness_list_25 = self.merge_soreness_from_surveys(
             self.get_readiness_soreness_list(self.last_25_days_readiness_surveys),
-            self.get_ps_survey_soreness_list(self.last_25_days_ps_surveys)
+            self.get_ps_survey_soreness_list(self.last_25_days_ps_surveys),
+            self.last_25_days_symptoms
         )
 
         current_athlete_stats.historic_soreness = self.get_historic_soreness_list(soreness_list_25,
@@ -265,10 +271,12 @@ class StatsProcessing(object):
 
         acute_surveys = self.merge_soreness_from_surveys(
             self.get_readiness_soreness_list(self.acute_readiness_surveys),
-            self.get_ps_survey_soreness_list(self.acute_post_session_surveys))
+            self.get_ps_survey_soreness_list(self.acute_post_session_surveys),
+            self.acute_symptoms)
         chronic_surveys = self.merge_soreness_from_surveys(
             self.get_readiness_soreness_list(self.chronic_readiness_surveys),
-            self.get_ps_survey_soreness_list(self.chronic_post_session_surveys))
+            self.get_ps_survey_soreness_list(self.chronic_post_session_surveys),
+            self.chronic_symptoms)
         all_surveys = []
         all_surveys.extend(acute_surveys)
         all_surveys.extend(chronic_surveys)
@@ -386,15 +394,18 @@ class StatsProcessing(object):
             self.all_plans = self.daily_plan_datastore.get(self.athlete_id, self.start_date, self.end_date, stats_processing=True)
             self.all_daily_readiness_surveys = [plan.daily_readiness_survey for plan in self.all_plans if plan.daily_readiness_survey is not None]
         post_session_surveys = []
+        symptoms = []
         for plan in self.all_plans:
             post_surveys = \
                 [PostSessionSurvey.post_session_survey_from_training_session(session.post_session_survey, self.athlete_id, session.id, session.session_type().value, plan.event_date)
                  for session in plan.training_sessions if session is not None]
             post_session_surveys.extend([s for s in post_surveys if s is not None])
+            symptoms.extend(plan.symptoms)
         self.update_start_times(self.all_daily_readiness_surveys, post_session_surveys, self.all_plans)
         self.set_acute_chronic_periods()
         self.load_historical_readiness_surveys(self.all_daily_readiness_surveys)
         self.load_historical_post_session_surveys(post_session_surveys)
+        self.load_historical_symptoms(symptoms)
         self.load_historical_plans()
         self.historic_data_loaded = True
 
@@ -1045,13 +1056,14 @@ class StatsProcessing(object):
 
         return streak_soreness, streak_start_soreness
 
-    def merge_soreness_from_surveys(self, readiness_survey_soreness_list, ps_survey_soreness_list):
+    def merge_soreness_from_surveys(self, readiness_survey_soreness_list, ps_survey_soreness_list, symptoms):
 
         soreness_list = []
         merged_soreness_list = []
 
         soreness_list.extend(readiness_survey_soreness_list)
         soreness_list.extend(ps_survey_soreness_list)
+        soreness_list.extend(symptoms)
         for soreness in soreness_list:
             soreness.severity = SorenessCalculator.get_severity(soreness.severity, soreness.movement)
         #TODO merge within date
@@ -1394,6 +1406,27 @@ class StatsProcessing(object):
 
         self.days_8_14_ps_surveys = [p for p in post_session_surveys if self.last_week is not None
                                      and self.previous_week is not None and self.last_week > p.event_date_time >= self.previous_week]
+
+
+    def load_historical_symptoms(self, symptoms):
+
+        self.acute_symptoms = sorted([s for s in symptoms if self.acute_start_date_time is not None and
+                                      s.reported_date_time >= self.acute_start_date_time],
+                                     key=lambda x: x.reported_date_time)
+        self.chronic_symptoms = sorted([s for s in symptoms if self.acute_start_date_time is not None and
+                                        self.chronic_start_date_time is not None and
+                                        self.acute_start_date_time > s.reported_date_time >= self.chronic_start_date_time],
+                                       key=lambda x: x.reported_date_time)
+
+        self.last_7_days_symptoms = [s for s in symptoms if self.last_week is not None and
+                                     s.reported_date_time >= self.last_week]
+
+        self.last_25_days_symptoms = [s for s in symptoms if self.last_25_days is not None and
+                                      s.reported_date_time >= self.last_25_days]
+
+        self.days_8_14_symptoms = [s for s in symptoms if self.last_week is not None
+                                   and self.previous_week is not None and
+                                   self.last_week > s.reported_date_time >= self.previous_week]
 
     def update_start_times(self, daily_readiness_surveys, post_session_surveys, daily_plans):
 

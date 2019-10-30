@@ -339,7 +339,8 @@ class Soreness(BaseSoreness, Serialisable):
                    'tight': self.tight,
                    'knots': self.knots,
                    'ache': self.ache,
-                   'sharp': self.sharp
+                   'sharp': self.sharp,
+                   'reported_date_time': format_datetime(self.reported_date_time) if self.reported_date_time is not None else None
                   }
         return ret
 

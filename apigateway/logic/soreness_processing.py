@@ -12,7 +12,7 @@ class SorenessCalculator(object):
         self.surveys = []
 
     def get_soreness_summary_from_surveys(self, readiness_surveys, post_session_surveys,
-                                          trigger_date_time, historic_soreness):
+                                          trigger_date_time, historic_soreness, symptoms_today):
         """
         :param historic_soreness:
         :param readiness_surveys: DailyReadiness
@@ -32,6 +32,7 @@ class SorenessCalculator(object):
         for ps_survey in post_session_surveys:
             if (trigger_date_time.date() - ps_survey.event_date.date()).days < 2:
                 self.update_soreness_list(soreness_list, ps_survey.soreness)
+        self.update_soreness_list(soreness_list, symptoms_today)
 
         soreness_list = self.merge_current_historic_soreness(soreness_list, historic_soreness)
         return soreness_list
