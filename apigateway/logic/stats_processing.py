@@ -271,10 +271,12 @@ class StatsProcessing(object):
 
         acute_surveys = self.merge_soreness_from_surveys(
             self.get_readiness_soreness_list(self.acute_readiness_surveys),
-            self.get_ps_survey_soreness_list(self.acute_post_session_surveys))
+            self.get_ps_survey_soreness_list(self.acute_post_session_surveys),
+            self.acute_symptoms)
         chronic_surveys = self.merge_soreness_from_surveys(
             self.get_readiness_soreness_list(self.chronic_readiness_surveys),
-            self.get_ps_survey_soreness_list(self.chronic_post_session_surveys))
+            self.get_ps_survey_soreness_list(self.chronic_post_session_surveys),
+            self.chronic_symptoms)
         all_surveys = []
         all_surveys.extend(acute_surveys)
         all_surveys.extend(chronic_surveys)
