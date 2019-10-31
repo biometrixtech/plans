@@ -98,51 +98,51 @@ class TrainingPlanManager(object):
         # self.athlete_stats.triggers = trigger_factory.triggers
         historical_injury_risk_dict = self.injury_risk_datastore.get(self.athlete_id)
 
-        relative_load_level = 3
-        two_days_ago = (parse_date(event_date) - datetime.timedelta(days=1)).date()
-
-        # check workload for relative load level
-        if len(athlete_stats.high_relative_load_sessions) > 0:
-
-            max_percent = 49.9
-
-            relevant_high_load_sessions = [s for s in athlete_stats.high_relative_load_sessions if s.date.date()
-                                           >= two_days_ago]
-            if len(relevant_high_load_sessions) > 0:
-
-                for r in relevant_high_load_sessions:
-                    if r.percent_of_max is not None:
-                        max_percent = max(r.percent_of_max, max_percent)
-
-            if max_percent >= 75.0:
-                relative_load_level = 1
-            elif max_percent >= 50.0:
-                relative_load_level = 2
-
-         # check RPE for relative load level
-        # Low
-        # RPE <= 1 and self.ultra_high_intensity_session
-        # RPE <= 3 and not self.ultra_high_intensity_session():
-        # Mod
-        # RPE >= 3 and self.ultra_high_intensity_session
-        # RPE >= 5 and not self.ultra_high_intensity_session():
-        # High
-        # RPE >= 5 and self.ultra_high_intensity_session
-        # RPE >= 7 and not self.ultra_high_intensity_session():
-        relevant_training_sessions = [s for s in self.daily_plan.training_sessions if s.event_date.date()
-                                           >= two_days_ago]
-
-        for r in relevant_training_sessions:
-            high_intensity_session = r.ultra_high_intensity_session()
-            if r.session_RPE is not None:
-                if (r.session_RPE >= 5 and high_intensity_session) or (r.session_RPE >= 7 and not high_intensity_session):
-                    relative_load_level = 1
-                elif (r.session_RPE >= 3 and high_intensity_session) or (r.session_RPE >= 5 and not high_intensity_session):
-                    relative_load_level = 2
+        # relative_load_level = 3
+        # two_days_ago = (parse_date(event_date) - datetime.timedelta(days=1)).date()
+        #
+        # # check workload for relative load level
+        # if len(athlete_stats.high_relative_load_sessions) > 0:
+        #
+        #     max_percent = 49.9
+        #
+        #     relevant_high_load_sessions = [s for s in athlete_stats.high_relative_load_sessions if s.date.date()
+        #                                    >= two_days_ago]
+        #     if len(relevant_high_load_sessions) > 0:
+        #
+        #         for r in relevant_high_load_sessions:
+        #             if r.percent_of_max is not None:
+        #                 max_percent = max(r.percent_of_max, max_percent)
+        #
+        #     if max_percent >= 75.0:
+        #         relative_load_level = 1
+        #     elif max_percent >= 50.0:
+        #         relative_load_level = 2
+        #
+        #  # check RPE for relative load level
+        # # Low
+        # # RPE <= 1 and self.ultra_high_intensity_session
+        # # RPE <= 3 and not self.ultra_high_intensity_session():
+        # # Mod
+        # # RPE >= 3 and self.ultra_high_intensity_session
+        # # RPE >= 5 and not self.ultra_high_intensity_session():
+        # # High
+        # # RPE >= 5 and self.ultra_high_intensity_session
+        # # RPE >= 7 and not self.ultra_high_intensity_session():
+        # relevant_training_sessions = [s for s in self.daily_plan.training_sessions if s.event_date.date()
+        #                                    >= two_days_ago]
+        #
+        # for r in relevant_training_sessions:
+        #     high_intensity_session = r.ultra_high_intensity_session()
+        #     if r.session_RPE is not None:
+        #         if (r.session_RPE >= 5 and high_intensity_session) or (r.session_RPE >= 7 and not high_intensity_session):
+        #             relative_load_level = 1
+        #         elif (r.session_RPE >= 3 and high_intensity_session) or (r.session_RPE >= 5 and not high_intensity_session):
+        #             relative_load_level = 2
 
         injury_risk_processor = InjuryRiskProcessor(date, self.soreness_list, self.daily_plan.training_sessions,
-                                                    historical_injury_risk_dict, self.athlete_stats.load_stats,
-                                                    self.athlete_stats.athlete_id, relative_load_level)
+                                                    historical_injury_risk_dict, self.athlete_stats,
+                                                    self.athlete_stats.athlete_id)
         aggregated_injury_risk_dict = injury_risk_processor.process(aggregate_results=True)
 
         consolidated_injury_risk_dict = {}
@@ -200,7 +200,7 @@ class TrainingPlanManager(object):
             #                                                      parse_date(event_date), historic_soreness)
 
         calc = ExerciseAssignmentCalculator(consolidated_injury_risk_dict, self.exercise_library_datastore, self.completed_exercise_datastore,
-                                            date, relative_load_level)
+                                            date, injury_risk_processor.relative_load_level)
 
 
         # new modalities

@@ -11,14 +11,15 @@ from fathomapi.utils.exceptions import NoSuchEntityException
 from math import floor
 
 class InjuryRiskProcessor(object):
-    def __init__(self, event_date_time, symptoms_list, training_session_list, injury_risk_dict, load_stats, user_id, relative_load_level=3):
+    def __init__(self, event_date_time, symptoms_list, training_session_list, injury_risk_dict, athlete_stats, user_id):
         self.user_id = user_id
         self.event_date_time = event_date_time
         self.symptoms = symptoms_list
         self.training_sessions = training_session_list
-        self.load_stats = load_stats
+        self.load_stats = athlete_stats.load_stats
         self.injury_risk_dict = injury_risk_dict
-        self.relative_load_level = relative_load_level
+        self.relative_load_level = 3
+        self.high_relative_load_sessions = athlete_stats.high_relative_load_sessions
         self.aggregated_injury_risk_dict = {}
         self.two_days_ago = self.event_date_time.date() - timedelta(days=1)
         self.three_days_ago = self.event_date_time.date() - timedelta(days=2)
@@ -50,8 +51,53 @@ class InjuryRiskProcessor(object):
         self.synergist_compensating_concentric_intensity_dict = {}
         self.synergist_total_intensity_dict = {}
 
+    def initialize(self):
+
+        self.relative_load_level = 3
+        two_days_ago = (self.event_date_time - timedelta(days=1)).date()
+
+        # check workload for relative load level
+        if len(self.high_relative_load_sessions) > 0:
+
+            max_percent = 49.9
+
+            relevant_high_load_sessions = [s for s in self.high_relative_load_sessions if s.date.date()
+                                           >= two_days_ago]
+            if len(relevant_high_load_sessions) > 0:
+
+                for r in relevant_high_load_sessions:
+                    if r.percent_of_max is not None:
+                        max_percent = max(r.percent_of_max, max_percent)
+
+            if max_percent >= 75.0:
+                self.relative_load_level = 1
+            elif max_percent >= 50.0:
+                self.relative_load_level = 2
+
+         # check RPE for relative load level
+        # Low
+        # RPE <= 1 and self.ultra_high_intensity_session
+        # RPE <= 3 and not self.ultra_high_intensity_session():
+        # Mod
+        # RPE >= 3 and self.ultra_high_intensity_session
+        # RPE >= 5 and not self.ultra_high_intensity_session():
+        # High
+        # RPE >= 5 and self.ultra_high_intensity_session
+        # RPE >= 7 and not self.ultra_high_intensity_session():
+        relevant_training_sessions = [s for s in self.training_sessions if s.event_date.date()
+                                           >= two_days_ago]
+
+        for r in relevant_training_sessions:
+            high_intensity_session = r.ultra_high_intensity_session()
+            if r.session_RPE is not None:
+                if (r.session_RPE >= 5 and high_intensity_session) or (r.session_RPE >= 7 and not high_intensity_session):
+                    self.relative_load_level = 1
+                elif (r.session_RPE >= 3 and high_intensity_session) or (r.session_RPE >= 5 and not high_intensity_session):
+                    self.relative_load_level = 2
+
     def process(self, update_historical_data=False, aggregate_results=False):
 
+        self.initialize()
         # deconstruct symptoms to muscle level
         detailed_symptoms = []
         for s in self.symptoms:
@@ -72,7 +118,8 @@ class InjuryRiskProcessor(object):
             self.process_todays_symptoms(self.event_date_time.date(), self.injury_risk_dict)
             self.process_todays_sessions(self.event_date_time.date(), self.injury_risk_dict, self.load_stats)
 
-        self.injury_risk_dict = self.update_injury_risk_dict_rankings(self.injury_risk_dict)
+        # taking care of this elsewhere
+        #self.injury_risk_dict = self.update_injury_risk_dict_rankings(self.injury_risk_dict)
 
         #reconstruct to group level
         if aggregate_results:
@@ -176,6 +223,8 @@ class InjuryRiskProcessor(object):
                         body_part_injurk_risk.total_compensation_percent_tier = 3
                     elif body_part_injurk_risk.total_compensation_percent >= min_total_compensation:
                         body_part_injurk_risk.total_compensation_percent_tier = 4
+                else:
+                    body_part_injurk_risk.total_compensation_percent_tier = 0
 
                 if max_eccentric_compensation is not None:
                     if body_part_injurk_risk.eccentric_compensation_percent >= eccentric_compensation_tier_1:
@@ -186,6 +235,8 @@ class InjuryRiskProcessor(object):
                         body_part_injurk_risk.eccentric_compensation_percent_tier = 3
                     elif body_part_injurk_risk.eccentric_compensation_percent >= min_eccentric_compensation:
                         body_part_injurk_risk.eccentric_compensation_percent_tier = 4
+                else:
+                    body_part_injurk_risk.eccentric_compensation_percent_tier = 0
 
                 if max_total_volume is not None:
                     total_volume_today = body_part_injurk_risk.total_volume_today()
@@ -210,6 +261,8 @@ class InjuryRiskProcessor(object):
                         body_part_injurk_risk.total_volume_percent_tier = 3
                     elif total_volume_today >= min_total_volume:
                         body_part_injurk_risk.total_volume_percent_tier = 4
+                else:
+                    body_part_injurk_risk.total_volume_percent_tier = 0
 
                 if max_eccentric_volume is not None:
                     eccentric_volume_today = body_part_injurk_risk.eccentric_volume_today()
@@ -222,6 +275,8 @@ class InjuryRiskProcessor(object):
                         body_part_injurk_risk.eccentric_volume_percent_tier = 3
                     elif eccentric_volume_today >= min_eccentric_volume:
                         body_part_injurk_risk.eccentric_volume_percent_tier = 4
+                else:
+                    body_part_injurk_risk.eccentric_volume_percent_tier = 0
 
         return injury_risk_dict
     
@@ -373,7 +428,7 @@ class InjuryRiskProcessor(object):
 
         for d in combined_dates:
 
-            if d == datetime(2019, 10, 26).date():
+            if d == datetime(2019, 10, 31).date():
                 j = 0
             seven_days_ago = d - timedelta(days=6)
             fourteeen_days_ago = d - timedelta(days=13)
@@ -409,6 +464,8 @@ class InjuryRiskProcessor(object):
                 # except NoSuchEntityException:
                 #     session_datastore.update(current_session, self.user_id, format_date(d - timedelta(days=1)))
                 # #TODO: continue if fails the second time
+
+                injury_risk_dict = self.update_injury_risk_dict_rankings(injury_risk_dict)
 
                 session_mapping_dict[current_session] = session_functional_movement.functional_movement_mappings
 
@@ -472,6 +529,8 @@ class InjuryRiskProcessor(object):
                 #     injury_risk_dict[body_part_side].last_functional_overreaching_date = d
                 # elif 1.1 < injury_risk_dict[body_part_side].total_volume_ramp_today:
                 #     injury_risk_dict[body_part_side].last_non_functional_overreaching_date = d
+        injury_risk_dict = self.update_injury_risk_dict_rankings(injury_risk_dict)
+
         return injury_risk_dict
 
     def get_movement_pattern_elasiticity_adf(self, movement_pattern, side):
@@ -895,9 +954,13 @@ class InjuryRiskProcessor(object):
             injury_risk_dict = self.mark_anc_muscle_imbalance(injury_cycle_summary_dict, injury_risk_dict,
                                                               current_session.event_date)
 
+            injury_risk_dict = self.update_injury_risk_dict_rankings(injury_risk_dict)
+
             session_mapping_dict[current_session] = session_functional_movement.functional_movement_mappings
 
         injury_risk_dict = self.merge_daily_sessions(base_date, session_mapping_dict, injury_risk_dict)
+
+        injury_risk_dict = self.update_injury_risk_dict_rankings(injury_risk_dict)
 
             # for b in session_functional_movement.body_parts:
             #
@@ -1052,14 +1115,14 @@ class InjuryRiskProcessor(object):
             injury_risk_dict[body_part_side].total_volume_ramp_today = injury_risk_dict[
                 body_part_side].total_volume_ramp()
 
+            injury_risk_dict[body_part_side].total_compensation_percent = injury_risk_dict[
+                body_part_side].percent_total_compensation()
+            injury_risk_dict[body_part_side].eccentric_compensation_percent = injury_risk_dict[
+                body_part_side].percent_eccentric_compensation()
+
             # if injury_risk_dict[body_part_side].eccentric_volume_ramp_today > 1.0 or injury_risk_dict[body_part_side].total_volume_ramp_today > 1.0:
             #     injury_risk_dict[body_part_side].last_excessive_strain_date = base_date
             #     injury_risk_dict[body_part_side].last_inhibited_date = base_date
-            #
-            # injury_risk_dict[body_part_side].total_compensation_percent = injury_risk_dict[
-            #     body_part_side].percent_total_compensation()
-            # injury_risk_dict[body_part_side].eccentric_compensation_percent = injury_risk_dict[
-            #     body_part_side].percent_eccentric_compensation()
             #
             # if 1.0 < injury_risk_dict[body_part_side].eccentric_volume_ramp_today <= 1.05:
             #     injury_risk_dict[body_part_side].last_functional_overreaching_date = base_date

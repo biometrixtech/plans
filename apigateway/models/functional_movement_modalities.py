@@ -1398,7 +1398,9 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
 
         #body_part_factory = BodyPartFactory()
 
-        if body_part_injury_risk.last_compensation_date is not None and body_part_injury_risk.last_compensation_date == self.event_date_time.date():
+        if (body_part_injury_risk.last_compensation_date is not None
+                and body_part_injury_risk.last_compensation_date == self.event_date_time.date() and
+                body_part_injury_risk.total_compensation_percent_tier <= 3):
 
             #body_part = body_part_factory.get_body_part(body_part_side)
 
@@ -1799,11 +1801,13 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
 
         #body_part_factory = BodyPartFactory()
 
-        if body_part_injury_risk.last_compensation_date is not None and body_part_injury_risk.last_compensation_date == self.event_date_time.date():
+        if (body_part_injury_risk.last_compensation_date is not None
+                and body_part_injury_risk.last_compensation_date == self.event_date_time.date() and
+                body_part_injury_risk.total_compensation_percent_tier <= 3):
 
             #body_part = body_part_factory.get_body_part(body_part_side)
 
-            goal = AthleteGoal("Compensating", 1, AthleteGoalType.asymmetric_session)
+            goal = AthleteGoal("Compensations", 1, AthleteGoalType.asymmetric_session)
 
             # if body_part_injury_risk.prime_mover_total_volume_today() > body_part_injury_risk.synergist_total_volume_today():
             #     priority = "2"

@@ -198,7 +198,7 @@ class StatsProcessing(object):
                 # New
                 historical_injury_risk_dict = self.injury_risk_datastore.get(self.athlete_id)
                 injury_risk_processor = InjuryRiskProcessor(self.event_date, soreness_list_25, sessions,
-                                                            historical_injury_risk_dict, current_athlete_stats.load_stats, self.athlete_id)
+                                                            historical_injury_risk_dict, current_athlete_stats, self.athlete_id)
                 injury_risk_processor.process(update_historical_data=True)
 
                 athlete_injury_risk = AthleteInjuryRisk(self.athlete_id)
@@ -249,7 +249,7 @@ class StatsProcessing(object):
             # New
             historical_injury_risk_dict = self.injury_risk_datastore.get(self.athlete_id)
             injury_risk_processor = InjuryRiskProcessor(self.event_date, soreness_list_25, sessions,
-                                                        historical_injury_risk_dict, current_athlete_stats.load_stats, self.athlete_id)
+                                                        historical_injury_risk_dict, current_athlete_stats, self.athlete_id)
             injury_risk_processor.process(update_historical_data=True)
 
             athlete_injury_risk = AthleteInjuryRisk(self.athlete_id)
