@@ -142,7 +142,7 @@ class InjuryRiskProcessor(object):
 
             self.aggregated_injury_risk_dict = aggregated_injury_hist_dict
 
-            self.aggregated_injury_risk_dict = self.update_injury_risk_dict_rankings(self.aggregated_injury_risk_dict)
+            #self.aggregated_injury_risk_dict = self.update_injury_risk_dict_rankings(self.aggregated_injury_risk_dict)
 
             return self.aggregated_injury_risk_dict
         else:
@@ -245,17 +245,17 @@ class InjuryRiskProcessor(object):
                         body_part_injurk_risk.total_volume_percent_tier = 1
                         if self.relative_load_level == 1:
                             body_part_injurk_risk.last_excessive_strain_date = self.event_date_time.date()
-                            injury_risk_dict[body_part_side].last_inhibited_date = self.event_date_time.date()
+                            body_part_injurk_risk.last_inhibited_date = self.event_date_time.date()
                             body_part_injurk_risk.last_non_functional_overreaching_date = self.event_date_time.date()
                         elif self.relative_load_level == 2:
                             body_part_injurk_risk.last_excessive_strain_date = self.event_date_time.date()
-                            injury_risk_dict[body_part_side].last_inhibited_date = self.event_date_time.date()
+                            body_part_injurk_risk.last_inhibited_date = self.event_date_time.date()
                             body_part_injurk_risk.last_functional_overreaching_date = self.event_date_time.date()
                     elif total_volume_today >= total_volume_tier_2:
                         body_part_injurk_risk.total_volume_percent_tier = 2
                         if self.relative_load_level == 1:
                             body_part_injurk_risk.last_excessive_strain_date = self.event_date_time.date()
-                            injury_risk_dict[body_part_side].last_inhibited_date = self.event_date_time.date()
+                            body_part_injurk_risk.last_inhibited_date = self.event_date_time.date()
                             body_part_injurk_risk.last_functional_overreaching_date = self.event_date_time.date()
                     elif total_volume_today >= total_volume_tier_3:
                         body_part_injurk_risk.total_volume_percent_tier = 3

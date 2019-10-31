@@ -721,6 +721,52 @@ class BodyPartInjuryRisk(object):
         if value_a is not None and value_b is not None:
             return max(value_a, value_b)
 
+    def test_date(self, attribute, base_date):
+
+        if attribute is not None and attribute == base_date:
+            return True
+        else:
+            return False
+
+    def get_inflammation_severity(self, base_date):
+
+        max_severity = 0
+
+        if self.test_date(self.last_sharp_date, base_date):
+            max_severity = max(max_severity, self.last_sharp_level)
+        if self.test_date(self.last_ache_date, base_date):
+            max_severity = max(max_severity, self.last_ache_level)
+
+        return max_severity
+
+    def get_muscle_spasm_severity(self, base_date):
+
+        max_severity = 0
+
+        if self.test_date(self.last_tight_date, base_date):
+            max_severity = max(max_severity, self.last_tight_level)
+        if self.test_date(self.last_sharp_date, base_date):
+            max_severity = max(max_severity, self.last_sharp_level)
+        if self.test_date(self.last_ache_date, base_date):
+            max_severity = max(max_severity, self.last_ache_level)
+
+        return max_severity
+
+    def get_adhesions_severity(self, base_date):
+
+        max_severity = 0
+
+        if self.test_date(self.last_tight_date, base_date):
+            max_severity = max(max_severity, self.last_tight_level)
+        if self.test_date(self.last_sharp_date, base_date):
+            max_severity = max(max_severity, self.last_sharp_level)
+        if self.test_date(self.last_ache_date, base_date):
+            max_severity = max(max_severity, self.last_ache_level)
+        if self.test_date(self.last_knots_date, base_date):
+            max_severity = max(max_severity, self.last_knots_level)
+
+        return max_severity
+
     def eccentric_volume_ramp(self):
 
         this_weeks_volume = 0
