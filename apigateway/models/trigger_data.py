@@ -210,22 +210,16 @@ visualization_data = {
                 'y_axis_2': "",
                 'legend': [
                     {
-                        'color': 4,
-                        'text': "Weak",
-                        'type': 0,
-                        'series': "weak"
-                    },
-                    {
                         'color': 5,
-                        'text': "Overactive",
+                        'text': "Limited Mobility",
                         'type': 0,
-                        'series': "overactive"
+                        'series': "limited_mobility"
                     },
                     {
-                        'color': 16,
-                        'text': "Short",
+                        'color': 4,
+                        'text': "Underactive",
                         'type': 0,
-                        'series': "short"
+                        'series': "underactive"
                     },
                 ]
             },
@@ -235,22 +229,16 @@ visualization_data = {
                 'y_axis_2': "",
                 'legend': [
                     {
-                        'color': 4,
-                        'text': "Over-Stressed",
+                        'color': 5,
+                        'text': "Compensation Stress",
                         'type': 0,
-                        'series': "over_stressed"
+                        'series': "compensation_stress"
                     },
                     {
-                        'color': 7,
-                        'text': "High Stress",
+                        'color': 13,
+                        'text': "Training Stress",
                         'type': 0,
-                        'series': "high_stress"
-                    },
-                    {
-                        'color': 15,
-                        'text': "Moderate Stress",
-                        'type': 0,
-                        'series': "moderate_stress"
+                        'series': "training_stress"
                     },
                 ]
             },
@@ -260,13 +248,13 @@ visualization_data = {
                 'y_axis_2': "",
                 'legend': [
                     {
-                        'color': 5,
+                        'color': 6,
                         'text': "Inflamed",
                         'type': 0,
                         'series': "inflamed"
                     },
                     {
-                        'color': 16,
+                        'color': 5,
                         'text': "Tight",
                         'type': 0,
                         'series': "tight"

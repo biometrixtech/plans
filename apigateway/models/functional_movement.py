@@ -1359,12 +1359,23 @@ class FunctionalMovementActivityMapping(object):
 
         compensation_causing_prime_movers = self.get_compensating_body_parts(injury_risk_dict, event_date)
 
-        compensated_concentric_volume = training_volume * self.concentric_level * .04
-        compensated_eccentric_volume = training_volume * self.eccentric_level * .04
+        for c, severity in compensation_causing_prime_movers.items():
+            if severity <= 2:
+                factor = .04
+            elif 2 < severity <= 5:
+                factor = .08
+            elif 5 < severity <= 8:
+                factor = .16
+            else:
+                factor = .20
 
-        for c in compensation_causing_prime_movers:
+            compensated_concentric_volume = training_volume * self.concentric_level * factor
+            compensated_eccentric_volume = training_volume * self.eccentric_level * factor
+
             for s in self.synergists:
                 if c.side == s.body_part_side.side or c.side == 0 or s.body_part_side.side == 0:
+                    if factor != .04:
+                        p=0
                     synergist_compensated_concentric_volume = compensated_concentric_volume / float(len(self.synergists))
                     synergist_compensated_eccentric_volume = compensated_eccentric_volume / float(len(self.synergists))
                     s.body_part_function = BodyPartFunction.synergist
@@ -1396,10 +1407,19 @@ class FunctionalMovementActivityMapping(object):
 
         compensation_causing_prime_movers = self.get_compensating_body_parts(injury_risk_dict, event_date)
 
-        compensated_concentric_intensity = intensity * self.concentric_level * .04
-        compensated_eccentric_intensity = intensity * self.eccentric_level * .04
+        for c, severity in compensation_causing_prime_movers.items():
+            if severity <= 2:
+                factor = .04
+            elif 2 < severity <= 5:
+                factor = .08
+            elif 5 < severity <= 8:
+                factor = .16
+            else:
+                factor = .20
 
-        for c in compensation_causing_prime_movers:
+            compensated_concentric_intensity = intensity * self.concentric_level * factor
+            compensated_eccentric_intensity = intensity * self.eccentric_level * factor
+
             for s in self.synergists:
                 if c.side == s.body_part_side.side or c.side == 0 or s.body_part_side.side == 0:
                     synergist_compensated_concentric_intensity = compensated_concentric_intensity / float(len(self.synergists))
@@ -1474,7 +1494,7 @@ class FunctionalMovementActivityMapping(object):
 
     def get_compensating_body_parts(self, injury_risk_dict, event_date):
 
-        affected_list = []
+        affected_list = {}
 
         two_days_ago = event_date - timedelta(days=1)
 
@@ -1483,32 +1503,46 @@ class FunctionalMovementActivityMapping(object):
             if f.body_part_side in injury_risk_dict:
                 if (injury_risk_dict[f.body_part_side].last_weak_date is not None and
                         injury_risk_dict[f.body_part_side].last_weak_date == event_date):
-                    affected_list.append(f.body_part_side)
+                    if f.body_part_side not in affected_list:
+                        affected_list[f.body_part_side] = 0
                 if (injury_risk_dict[f.body_part_side].last_muscle_spasm_date is not None and
                         injury_risk_dict[f.body_part_side].last_muscle_spasm_date == event_date):
-                    affected_list.append(f.body_part_side)
+                    if f.body_part_side not in affected_list:
+                        affected_list[f.body_part_side] = 0
+                    affected_list[f.body_part_side] = max(affected_list[f.body_part_side],
+                                                          injury_risk_dict[f.body_part_side].get_muscle_spasm_severity(event_date))
                 if (injury_risk_dict[f.body_part_side].last_adhesions_date is not None and
                         injury_risk_dict[f.body_part_side].last_adhesions_date == event_date):
-                    affected_list.append(f.body_part_side)
+                    if f.body_part_side not in affected_list:
+                        affected_list[f.body_part_side] = 0
+                    affected_list[f.body_part_side] = max(affected_list[f.body_part_side],
+                                                          injury_risk_dict[f.body_part_side].get_adhesions_severity(event_date))
                 if (injury_risk_dict[f.body_part_side].last_short_date is not None and
                         injury_risk_dict[f.body_part_side].last_short_date == event_date):
-                    affected_list.append(f.body_part_side)
+                    if f.body_part_side not in affected_list:
+                        affected_list[f.body_part_side] = 0
                 if (injury_risk_dict[f.body_part_side].last_long_date is not None and
                         injury_risk_dict[f.body_part_side].last_long_date == event_date):
-                    affected_list.append(f.body_part_side)
+                    if f.body_part_side not in affected_list:
+                        affected_list[f.body_part_side] = 0
                 if (injury_risk_dict[f.body_part_side].last_inhibited_date is not None and
                         injury_risk_dict[f.body_part_side].last_inhibited_date == event_date):
-                    affected_list.append(f.body_part_side)
+                    if f.body_part_side not in affected_list:
+                        affected_list[f.body_part_side] = 0
                 if (injury_risk_dict[f.body_part_side].last_inflammation_date is not None and
                         injury_risk_dict[f.body_part_side].last_inflammation_date == event_date):
-                    affected_list.append(f.body_part_side)
+                    if f.body_part_side not in affected_list:
+                        affected_list[f.body_part_side] = 0
+                    affected_list[f.body_part_side] = max(affected_list[f.body_part_side],
+                                                          injury_risk_dict[f.body_part_side].get_inflammation_severity(event_date))
                 if (injury_risk_dict[f.body_part_side].last_excessive_strain_date is not None and
                         injury_risk_dict[f.body_part_side].last_non_functional_overreaching_date is not None and
                         injury_risk_dict[f.body_part_side].last_excessive_strain_date >= two_days_ago and
                         injury_risk_dict[f.body_part_side].last_non_functional_overreaching_date >= two_days_ago):
-                    affected_list.append(f.body_part_side)
+                    if f.body_part_side not in affected_list:
+                        affected_list[f.body_part_side] = 0
 
-        affected_list = list(set(affected_list))
+        #affected_list = list(set(affected_list))
 
         return affected_list
 

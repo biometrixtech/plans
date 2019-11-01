@@ -558,6 +558,12 @@ class InjuryRiskProcessor(object):
 
         summary_dict = {}
 
+        unilateral_1_handled = False
+        unilateral_2_handled = False
+        unilateral_3_handled = False
+        unilateral_4_handled = False
+        unilateral_5_handled = False
+
         for side in sides:
 
             apt_ankle_present = False
@@ -574,7 +580,11 @@ class InjuryRiskProcessor(object):
                 apt_ankle_elasticity, apt_ankle_adf = self.get_movement_pattern_elasiticity_adf(apt_ankle, side)
                 if apt_ankle_elasticity != 0:
                     proc.increment_overactive_short_by_list([21, 26, 70, 58, 71, 72, 59, 55, 65, 49, 50, 52, 53, 54, 62])
-                    proc.increment_underactive_long_by_list([75, 74, 73, 66, 63, 64, 47, 48])
+                    proc.increment_underactive_long_by_list([74, 73, 66, 63, 64, 47, 48])
+                    if not unilateral_1_handled: # handle unilateral parts
+                        uni_proc = InjuryCycleSummaryProcessor(injury_cycle_summary_dict, 0, current_session.event_date)
+                        uni_proc.increment_underactive_long_by_list([75])
+                        unilateral_1_handled = True
                     apt_ankle_present = True
 
                 if apt_ankle_adf != 0 and current_session.duration_minutes >= 20:
@@ -613,7 +623,11 @@ class InjuryRiskProcessor(object):
 
                 if hip_drop_apt_elasticity == 0 and knee_valgus_apt_elasticity == 0:
                     proc.increment_overactive_short_by_list([21, 26, 58, 71, 72])
-                    proc.increment_underactive_long_by_list([75, 74, 73, 66])
+                    proc.increment_underactive_long_by_list([74, 73, 66])
+                    if not unilateral_2_handled: # handle unilateral parts
+                        uni_proc = InjuryCycleSummaryProcessor(injury_cycle_summary_dict, 0, current_session.event_date)
+                        uni_proc.increment_underactive_long_by_list([75])
+                        unilateral_2_handled = True
 
             if current_session.movement_patterns is not None and current_session.movement_patterns.hip_drop_pva is not None:
 
@@ -637,14 +651,22 @@ class InjuryRiskProcessor(object):
 
                 if knee_valgus_pva_elasticity != 0:
                     proc.increment_overactive_short_by_list(
-                        [59, 55, 46, 75, 65, 59, 49, 50, 52, 53, 54])
+                        [59, 55, 46, 65, 59, 49, 50, 52, 53, 54])
                     proc.increment_underactive_long_by_list([68, 53, 47, 48, 44, 63, 64, 66])
                     knee_valgus_pva_present = True
+                    if unilateral_3_handled: # handle unilateral parts
+                        uni_proc = InjuryCycleSummaryProcessor(injury_cycle_summary_dict, 0, current_session.event_date)
+                        uni_proc.increment_overactive_short_by_list([75])
+                        unilateral_3_handled = True
 
             if hip_drop_pva_present or knee_valgus_pva_present:
 
-                proc.increment_overactive_short_by_list([44, 75, 43, 41, 59, 55, 46, 65, 59, 49, 50, 52, 53, 54, 58, 62])
+                proc.increment_overactive_short_by_list([44, 43, 41, 59, 55, 46, 65, 59, 49, 50, 52, 53, 54, 58, 62])
                 proc.increment_underactive_long_by_list([40, 42, 68, 53, 47, 48, 56, 63, 64, 66])
+                if unilateral_4_handled:  # handle unilateral parts
+                    uni_proc = InjuryCycleSummaryProcessor(injury_cycle_summary_dict, 0, current_session.event_date)
+                    uni_proc.increment_overactive_short_by_list([75])
+                    unilateral_4_handled = True
 
             if apt_ankle_present and (hip_drop_pva_present or knee_valgus_pva_present):
 
@@ -655,9 +677,12 @@ class InjuryRiskProcessor(object):
             if hip_drop_pva_present and knee_valgus_pva_present:
 
                 proc.increment_overactive_short_by_list(
-                    [44, 75, 43, 41, 59, 55, 46])
+                    [44, 43, 41, 59, 55, 46])
                 proc.increment_underactive_long_by_list([40, 42, 68, 53, 47, 48, 56])
-
+                if unilateral_5_handled:  # handle unilateral parts
+                    uni_proc = InjuryCycleSummaryProcessor(injury_cycle_summary_dict, 0, current_session.event_date)
+                    uni_proc.increment_overactive_short_by_list([75])
+                    unilateral_5_handled = True
 
             summary_dict = proc.injury_cycle_summary_dict
 
@@ -682,9 +707,6 @@ class InjuryRiskProcessor(object):
     def mark_anc_muscle_imbalance(self, injury_cycle_summary_dict, injury_risk_dict, event_date_time):
 
         for body_part_side, injury_cycle_summary in injury_cycle_summary_dict.items():
-
-            if body_part_side.body_part_location.value == 62:
-                j=0
 
             if injury_cycle_summary.last_updated_date_time is None or injury_cycle_summary.last_updated_date_time == event_date_time:
                 if (injury_cycle_summary.overactive_short_count > injury_cycle_summary.overactive_long_count and
@@ -1180,6 +1202,7 @@ class InjuryRiskProcessor(object):
                     if injury_risk_dict[target_body_part_side].last_sharp_date is None or injury_risk_dict[target_body_part_side].last_sharp_date < base_date:
                         injury_risk_dict[target_body_part_side].last_sharp_date = base_date
                         injury_risk_dict[target_body_part_side].sharp_count_last_0_10_days += 1
+                        injury_risk_dict[target_body_part_side].sharp_count_last_0_20_days += 1
                     injury_risk_dict[target_body_part_side].last_inflammation_date = base_date
                     injury_risk_dict[target_body_part_side].last_inhibited_date = base_date
                     injury_risk_dict[target_body_part_side].last_sharp_level = target_symptom.sharp
@@ -1189,6 +1212,8 @@ class InjuryRiskProcessor(object):
                     body_part_injury_risk.last_inhibited_date = base_date
                     body_part_injury_risk.last_sharp_date = base_date
                     body_part_injury_risk.last_sharp_level = target_symptom.sharp
+                    body_part_injury_risk.sharp_count_last_0_10_days += 1
+                    body_part_injury_risk.sharp_count_last_0_20_days += 1
                     injury_risk_dict[target_body_part_side] = body_part_injury_risk
 
             if target_symptom.ache is not None and target_symptom.ache > 0:
@@ -1196,6 +1221,7 @@ class InjuryRiskProcessor(object):
                     if injury_risk_dict[target_body_part_side].last_ache_date is None or injury_risk_dict[target_body_part_side].last_ache_date < base_date:
                         injury_risk_dict[target_body_part_side].last_ache_date = base_date
                         injury_risk_dict[target_body_part_side].ache_count_last_0_10_days += 1
+                        injury_risk_dict[target_body_part_side].ache_count_last_0_20_days += 1
                     injury_risk_dict[target_body_part_side].last_inflammation_date = base_date
                     injury_risk_dict[target_body_part_side].last_inhibited_date = base_date
                     injury_risk_dict[target_body_part_side].last_ache_level = target_symptom.ache
@@ -1206,6 +1232,7 @@ class InjuryRiskProcessor(object):
                     body_part_injury_risk.last_ache_date = base_date
                     body_part_injury_risk.last_ache_level = target_symptom.ache
                     body_part_injury_risk.ache_count_last_0_10_days += 1
+                    body_part_injury_risk.ache_count_last_0_20_days += 1
                     injury_risk_dict[target_body_part_side] = body_part_injury_risk
         else:
 
@@ -1224,6 +1251,7 @@ class InjuryRiskProcessor(object):
                     if injury_risk_dict[target_body_part_side].last_sharp_date is None or injury_risk_dict[target_body_part_side].last_sharp_date < base_date:
                         injury_risk_dict[target_body_part_side].last_sharp_date = base_date
                         injury_risk_dict[target_body_part_side].sharp_count_last_0_10_days += 1
+                        injury_risk_dict[target_body_part_side].sharp_count_last_0_20_days += 1
                         injury_risk_dict[target_body_part_side].last_sharp_level = target_symptom.sharp
                         sharp_count = injury_risk_dict[target_body_part_side].sharp_count_last_0_10_days
                     injury_risk_dict[target_body_part_side].last_inflammation_date = base_date
@@ -1232,6 +1260,7 @@ class InjuryRiskProcessor(object):
                     body_part_injury_risk.last_sharp_date = base_date
                     body_part_injury_risk.last_sharp_level = target_symptom.sharp
                     body_part_injury_risk.sharp_count_last_0_10_days += 1
+                    body_part_injury_risk.sharp_count_last_0_20_days += 1
                     body_part_injury_risk.last_inflammation_date = base_date
                     injury_risk_dict[target_body_part_side] = body_part_injury_risk
 
@@ -1243,6 +1272,7 @@ class InjuryRiskProcessor(object):
                     if injury_risk_dict[target_body_part_side].last_ache_date is None or injury_risk_dict[target_body_part_side].last_ache_date < base_date:
                         injury_risk_dict[target_body_part_side].last_ache_date = base_date
                         injury_risk_dict[target_body_part_side].ache_count_last_0_10_days += 1
+                        injury_risk_dict[target_body_part_side].ache_count_last_0_20_days += 1
                         injury_risk_dict[target_body_part_side].last_ache_level = target_symptom.ache
                         ache_count = injury_risk_dict[target_body_part_side].ache_count_last_0_10_days
                         ache_count_10_20 = injury_risk_dict[target_body_part_side].ache_count_last_0_20_days
@@ -1250,6 +1280,7 @@ class InjuryRiskProcessor(object):
                     body_part_injury_risk = BodyPartInjuryRisk()
                     body_part_injury_risk.last_ache_date = base_date
                     body_part_injury_risk.ache_count_last_0_10_days += 1
+                    body_part_injury_risk.ache_count_last_0_20_days += 1
                     body_part_injury_risk.last_ache_level = target_symptom.ache
                     injury_risk_dict[target_body_part_side] = body_part_injury_risk
 
@@ -1268,7 +1299,8 @@ class InjuryRiskProcessor(object):
                     body_part_injury_risk.last_inflammation_date = base_date
                     injury_risk_dict[target_body_part_side] = body_part_injury_risk
 
-                # third, mark all related muscles both inhibited and inflamed
+            # third, mark all related muscles both inhibited and inflamed
+            if ache_count >= 2 or sharp_count >= 2:
                 if is_ligament:
                     related_muscles = self.functional_anatomy_processor.get_related_muscles_for_ligament(
                         target_body_part_side.body_part_location.value)
@@ -1317,6 +1349,7 @@ class InjuryRiskProcessor(object):
                     if injury_risk_dict[target_body_part_side].last_sharp_date is None or injury_risk_dict[target_body_part_side].last_sharp_date < base_date:
                         injury_risk_dict[target_body_part_side].last_sharp_date = base_date
                         injury_risk_dict[target_body_part_side].sharp_count_last_0_10_days += 1
+                        injury_risk_dict[target_body_part_side].sharp_count_last_0_20_days += 1
                     injury_risk_dict[target_body_part_side].last_muscle_spasm_date = base_date
                     injury_risk_dict[target_body_part_side].last_sharp_level = target_symptom.sharp
                 else:
@@ -1325,19 +1358,21 @@ class InjuryRiskProcessor(object):
                     body_part_injury_risk.last_sharp_date = base_date
                     body_part_injury_risk.last_sharp_level = target_symptom.sharp
                     body_part_injury_risk.sharp_count_last_0_10_days += 1
+                    body_part_injury_risk.sharp_count_last_0_20_days += 1
                     injury_risk_dict[target_body_part_side] = body_part_injury_risk
 
             if target_symptom.tight is not None and target_symptom.tight > 0:
                 if target_body_part_side in injury_risk_dict:
                     if injury_risk_dict[target_body_part_side].last_tight_date is None or injury_risk_dict[target_body_part_side].last_tight_date < base_date:
                         injury_risk_dict[target_body_part_side].last_tight_date = base_date
-                        #injury_risk_dict[target_body_part_side].tight_count_last_0_10_days += 1  # not tracked
+                        injury_risk_dict[target_body_part_side].tight_count_last_0_20_days += 1  # 0_10 not tracked
                     injury_risk_dict[target_body_part_side].last_muscle_spasm_date = base_date
                     injury_risk_dict[target_body_part_side].last_tight_level = target_symptom.tight
                 else:
                     body_part_injury_risk = BodyPartInjuryRisk()
                     body_part_injury_risk.last_muscle_spasm_date = base_date
                     body_part_injury_risk.last_tight_date = base_date
+                    body_part_injury_risk.tight_count_last_0_20_days += 1
                     body_part_injury_risk.last_tight_level = target_symptom.tight
                     injury_risk_dict[target_body_part_side] = body_part_injury_risk
 
@@ -1346,6 +1381,7 @@ class InjuryRiskProcessor(object):
                     if injury_risk_dict[target_body_part_side].last_ache_date is None or injury_risk_dict[target_body_part_side].last_ache_date < base_date:
                         injury_risk_dict[target_body_part_side].last_ache_date = base_date
                         injury_risk_dict[target_body_part_side].ache_count_last_0_10_days += 1
+                        injury_risk_dict[target_body_part_side].ache_count_last_0_20_days += 1
                     injury_risk_dict[target_body_part_side].last_muscle_spasm_date = base_date
                     injury_risk_dict[target_body_part_side].last_ache_level = target_symptom.ache
                 else:
@@ -1354,6 +1390,7 @@ class InjuryRiskProcessor(object):
                     body_part_injury_risk.last_ache_date = base_date
                     body_part_injury_risk.last_ache_level = target_symptom.ache
                     body_part_injury_risk.ache_count_last_0_10_days += 1
+                    body_part_injury_risk.ache_count_last_0_20_days += 1
                     injury_risk_dict[target_body_part_side] = body_part_injury_risk
 
             if target_symptom.ache is not None and target_symptom.ache <= 3:
@@ -1364,13 +1401,14 @@ class InjuryRiskProcessor(object):
                     if injury_risk_dict[target_body_part_side].last_ache_date is None or injury_risk_dict[target_body_part_side].last_ache_date < base_date:
                         injury_risk_dict[target_body_part_side].last_ache_date = base_date
                         injury_risk_dict[target_body_part_side].ache_count_last_0_10_days += 1
+                        injury_risk_dict[target_body_part_side].ache_count_last_0_20_days += 1
                     injury_risk_dict[target_body_part_side].last_ache_level = target_symptom.ache
                 else:
                     body_part_injury_risk = BodyPartInjuryRisk()
-                    #body_part_injury_risk.last_muscle_spasm_date = event_date_time.date()  # not muscle spasm, just tracking
                     body_part_injury_risk.last_ache_date = base_date
                     body_part_injury_risk.last_ache_level = target_symptom.ache
                     body_part_injury_risk.ache_count_last_0_10_days += 1
+                    body_part_injury_risk.ache_count_last_0_20_days += 1
                     injury_risk_dict[target_body_part_side] = body_part_injury_risk
 
         else:
@@ -1384,6 +1422,7 @@ class InjuryRiskProcessor(object):
                     if injury_risk_dict[target_body_part_side].last_sharp_date is None or injury_risk_dict[target_body_part_side].last_sharp_date < base_date:
                         injury_risk_dict[target_body_part_side].last_sharp_date = base_date
                         injury_risk_dict[target_body_part_side].sharp_count_last_0_10_days += 1
+                        injury_risk_dict[target_body_part_side].sharp_count_last_0_20_days += 1
                     injury_risk_dict[target_body_part_side].last_sharp_level = target_symptom.sharp
 
                 else:
@@ -1391,6 +1430,7 @@ class InjuryRiskProcessor(object):
                     body_part_injury_risk.last_sharp_date = base_date
                     body_part_injury_risk.last_sharp_level = target_symptom.sharp
                     body_part_injury_risk.sharp_count_last_0_10_days += 1
+                    body_part_injury_risk.sharp_count_last_0_20_days += 1
                     injury_risk_dict[target_body_part_side] = body_part_injury_risk
 
             if target_symptom.tight is not None and target_symptom.tight > 0:
@@ -1399,13 +1439,14 @@ class InjuryRiskProcessor(object):
                 if target_body_part_side in injury_risk_dict:
                     if injury_risk_dict[target_body_part_side].last_tight_date is None or injury_risk_dict[target_body_part_side].last_tight_date < base_date:
                         injury_risk_dict[target_body_part_side].last_tight_date = base_date
-                        #injury_risk_dict[target_body_part_side].tight_count_last_0_10_days += 1  # not tracked
+                        injury_risk_dict[target_body_part_side].tight_count_last_0_20_days += 1  # 0_10 not tracked
 
                     injury_risk_dict[target_body_part_side].last_tight_level = target_symptom.tight
                 else:
                     body_part_injury_risk = BodyPartInjuryRisk()
                     body_part_injury_risk.last_tight_date = base_date
                     body_part_injury_risk.last_tight_level = target_symptom.tight
+                    body_part_injury_risk.tight_count_last_0_20_days += 1
                     injury_risk_dict[target_body_part_side] = body_part_injury_risk
 
             if target_symptom.ache is not None and target_symptom.ache > 3:
@@ -1414,12 +1455,14 @@ class InjuryRiskProcessor(object):
                     if injury_risk_dict[target_body_part_side].last_ache_date is None or injury_risk_dict[target_body_part_side].last_ache_date < base_date:
                         injury_risk_dict[target_body_part_side].last_ache_date = base_date
                         injury_risk_dict[target_body_part_side].ache_count_last_0_10_days += 1
+                        injury_risk_dict[target_body_part_side].ache_count_last_0_20_days += 1
                     injury_risk_dict[target_body_part_side].last_ache_level = target_symptom.ache
                 else:
                     body_part_injury_risk = BodyPartInjuryRisk()
                     body_part_injury_risk.last_ache_date = base_date
                     body_part_injury_risk.last_ache_level = target_symptom.ache
                     body_part_injury_risk.ache_count_last_0_10_days += 1
+                    body_part_injury_risk.ache_count_last_0_20_days += 1
                     injury_risk_dict[target_body_part_side] = body_part_injury_risk
 
             if target_symptom.ache is not None and target_symptom.ache <= 3:
@@ -1434,6 +1477,7 @@ class InjuryRiskProcessor(object):
                     if injury_risk_dict[target_body_part_side].last_ache_date is None or injury_risk_dict[target_body_part_side].last_ache_date < base_date:
                         injury_risk_dict[target_body_part_side].last_ache_date = base_date
                         injury_risk_dict[target_body_part_side].ache_count_last_0_10_days += 1
+                        injury_risk_dict[target_body_part_side].ache_count_last_0_20_days += 1
                     injury_risk_dict[target_body_part_side].last_ache_level = target_symptom.ache
                 else:
                     body_part_injury_risk = BodyPartInjuryRisk()
@@ -1441,6 +1485,7 @@ class InjuryRiskProcessor(object):
                     body_part_injury_risk.last_ache_date = base_date
                     body_part_injury_risk.last_ache_level = target_symptom.ache
                     body_part_injury_risk.ache_count_last_0_10_days += 1
+                    body_part_injury_risk.ache_count_last_0_20_days += 1
                     injury_risk_dict[target_body_part_side] = body_part_injury_risk
 
             if mark_related_muscles:
@@ -1491,7 +1536,7 @@ class InjuryRiskProcessor(object):
                 if target_body_part_side in injury_risk_dict:
                     if injury_risk_dict[target_body_part_side].last_knots_date is None or injury_risk_dict[target_body_part_side].last_knots_date < base_date:
                         injury_risk_dict[target_body_part_side].last_knots_date = base_date
-                        # injury_risk_dict[target_body_part_side].knots_count_last_0_20_days += 1
+                        injury_risk_dict[target_body_part_side].knots_count_last_0_20_days += 1
                     injury_risk_dict[target_body_part_side].last_adhesions_date = base_date
                     injury_risk_dict[target_body_part_side].last_short_date = base_date
                     injury_risk_dict[target_body_part_side].last_knots_level = target_symptom.knots
@@ -1501,7 +1546,7 @@ class InjuryRiskProcessor(object):
                     body_part_injury_risk.last_short_date = base_date
                     body_part_injury_risk.last_knots_date = base_date
                     body_part_injury_risk.last_knots_level = target_symptom.knots
-                    #body_part_injury_risk.knots_count_last_0_10_days += 1
+                    body_part_injury_risk.knots_count_last_0_20_days += 1
                     injury_risk_dict[target_body_part_side] = body_part_injury_risk
 
             if target_symptom.tight is not None and target_symptom.tight > 0:
@@ -1512,14 +1557,14 @@ class InjuryRiskProcessor(object):
                     # just for tracking
                     if injury_risk_dict[target_body_part_side].last_tight_date is None or injury_risk_dict[target_body_part_side].last_tight_date < base_date:
                         injury_risk_dict[target_body_part_side].last_tight_date = base_date
-                        #injury_risk_dict[target_body_part_side].tight_count_last_0_10_days += 1
+                        injury_risk_dict[target_body_part_side].tight_count_last_0_20_days += 1
                     injury_risk_dict[target_body_part_side].last_tight_level = target_symptom.tight
                 else:
                     # just for tracking
                     body_part_injury_risk = BodyPartInjuryRisk()
                     body_part_injury_risk.last_tight_date = base_date
                     body_part_injury_risk.last_tight_level = target_symptom.ache
-                    #body_part_injury_risk.tight_count_last_0_10_days += 1
+                    body_part_injury_risk.tight_count_last_0_20_days += 1
                     injury_risk_dict[target_body_part_side] = body_part_injury_risk
 
             if target_symptom.sharp is not None and target_symptom.sharp > 0:
@@ -1531,6 +1576,7 @@ class InjuryRiskProcessor(object):
                     if injury_risk_dict[target_body_part_side].last_sharp_date is None or injury_risk_dict[target_body_part_side].last_sharp_date < base_date:
                         injury_risk_dict[target_body_part_side].last_sharp_date = base_date
                         injury_risk_dict[target_body_part_side].sharp_count_last_0_10_days += 1
+                        injury_risk_dict[target_body_part_side].sharp_count_last_0_20_days += 1
                     injury_risk_dict[target_body_part_side].last_sharp_level = target_symptom.sharp
                 else:
                     # just for tracking
@@ -1538,6 +1584,7 @@ class InjuryRiskProcessor(object):
                     body_part_injury_risk.last_sharp_date = base_date
                     body_part_injury_risk.last_sharp_level = target_symptom.sharp
                     body_part_injury_risk.sharp_count_last_0_10_days += 1
+                    body_part_injury_risk.sharp_count_last_0_20_days += 1
                     injury_risk_dict[target_body_part_side] = body_part_injury_risk
 
             if target_symptom.ache is not None and target_symptom.ache > 0:
@@ -1549,6 +1596,7 @@ class InjuryRiskProcessor(object):
                     if injury_risk_dict[target_body_part_side].last_ache_date is None or injury_risk_dict[target_body_part_side].last_ache_date < base_date:
                         injury_risk_dict[target_body_part_side].last_ache_date = base_date
                         injury_risk_dict[target_body_part_side].ache_count_last_0_10_days += 1
+                        injury_risk_dict[target_body_part_side].ache_count_last_0_20_days += 1
                     injury_risk_dict[target_body_part_side].last_ache_level = target_symptom.ache
                 else:
                     # just for tracking
@@ -1556,6 +1604,7 @@ class InjuryRiskProcessor(object):
                     body_part_injury_risk.last_ache_date = base_date
                     body_part_injury_risk.last_ache_level = target_symptom.ache
                     body_part_injury_risk.ache_count_last_0_10_days += 1
+                    body_part_injury_risk.ache_count_last_0_20_days += 1
                     injury_risk_dict[target_body_part_side] = body_part_injury_risk
 
         else:
@@ -1576,14 +1625,14 @@ class InjuryRiskProcessor(object):
                     # just for tracking
                     if injury_risk_dict[target_body_part_side].last_tight_date is None or injury_risk_dict[target_body_part_side].last_tight_date < base_date:
                         injury_risk_dict[target_body_part_side].last_tight_date = base_date
-                        # injury_risk_dict[target_body_part_side].tight_count_last_0_10_days += 1
+                        injury_risk_dict[target_body_part_side].tight_count_last_0_20_days += 1
                     injury_risk_dict[target_body_part_side].last_tight_level = target_symptom.tight
                 else:
                     # just for tracking
                     body_part_injury_risk = BodyPartInjuryRisk()
                     body_part_injury_risk.last_tight_date = base_date
                     body_part_injury_risk.last_tight_level = target_symptom.ache
-                    # body_part_injury_risk.tight_count_last_0_10_days += 1
+                    body_part_injury_risk.tight_count_last_0_20_days += 1
                     injury_risk_dict[target_body_part_side] = body_part_injury_risk
 
             if target_symptom.sharp is not None and target_symptom.sharp > 0:
@@ -1601,6 +1650,7 @@ class InjuryRiskProcessor(object):
                     if injury_risk_dict[target_body_part_side].last_sharp_date is None or injury_risk_dict[target_body_part_side].last_sharp_date < base_date:
                         injury_risk_dict[target_body_part_side].last_sharp_date = base_date
                         injury_risk_dict[target_body_part_side].sharp_count_last_0_10_days += 1
+                        injury_risk_dict[target_body_part_side].sharp_count_last_0_20_days += 1
                     injury_risk_dict[target_body_part_side].last_sharp_level = target_symptom.sharp
                 else:
                     # just for tracking
@@ -1608,6 +1658,7 @@ class InjuryRiskProcessor(object):
                     body_part_injury_risk.last_sharp_date = base_date
                     body_part_injury_risk.last_sharp_level = target_symptom.sharp
                     body_part_injury_risk.sharp_count_last_0_10_days += 1
+                    body_part_injury_risk.sharp_count_last_0_20_days += 1
                     injury_risk_dict[target_body_part_side] = body_part_injury_risk
 
             if target_symptom.ache is not None and target_symptom.ache > 0:
@@ -1629,6 +1680,7 @@ class InjuryRiskProcessor(object):
                     if injury_risk_dict[target_body_part_side].last_ache_date is None or injury_risk_dict[target_body_part_side].last_ache_date < base_date:
                         injury_risk_dict[target_body_part_side].last_ache_date = base_date
                         injury_risk_dict[target_body_part_side].ache_count_last_0_10_days += 1
+                        injury_risk_dict[target_body_part_side].ache_count_last_0_20_days += 1
                     injury_risk_dict[target_body_part_side].last_ache_level = target_symptom.ache
                 else:
                     # just for tracking
@@ -1636,6 +1688,7 @@ class InjuryRiskProcessor(object):
                     body_part_injury_risk.last_ache_date = base_date
                     body_part_injury_risk.last_ache_level = target_symptom.ache
                     body_part_injury_risk.ache_count_last_0_10_days += 1
+                    body_part_injury_risk.ache_count_last_0_20_days += 1
                     injury_risk_dict[target_body_part_side] = body_part_injury_risk
 
             if mark_related_muscles:

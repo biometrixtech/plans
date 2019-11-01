@@ -85,7 +85,7 @@ if __name__ == '__main__':
             persona1.elasticity_adf_dictionary = history
             persona1.three_session_history = session_details
             persona1.soreness_history = soreness_history
-            if u in ["run_a@200.com"]:
+            if u in ["run_a@200.com", "run_a_2@200.com"]:
                 rpes = [5, None, None, 5, None, 3, None,
                         4, None, 6, None, 5, 5, None,
                         None, 4, None, 3, 5, None, None,

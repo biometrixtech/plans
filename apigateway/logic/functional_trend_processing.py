@@ -5,7 +5,7 @@ from models.trigger import TriggerType, Trigger
 from models.chart_data import Prevention3sChartData, RecoveryChartData, CareChartData
 from models.insights import InsightType
 from models.body_parts import BodyPartFactory
-from models.soreness_base import BodyPartSide, BodyPartLocation
+from models.soreness_base import BodyPartSide, BodyPartLocation, BodyPartSideViz
 from models.athlete_trend import TriggerTile
 from models.sport import SportName
 from logic.goal_focus_text_generator import RecoveryTextGenerator
@@ -425,33 +425,38 @@ class TrendProcessor(object):
 
         two_days_ago = self.event_date_time.date() - timedelta(days=1)
 
-        excessive_strain_fo = []
-        excessive_strain_nfo = []
+        training_stress = []
         compensating = []
 
         last_date_time = self.event_date_time - timedelta(days=1)
 
         for body_part_side, body_part_injury_risk in self.injury_hist_dict.items():
 
-            if (body_part_injury_risk.last_excessive_strain_date is not None and
-                    body_part_injury_risk.last_non_functional_overreaching_date is not None and
-                    body_part_injury_risk.last_excessive_strain_date >= two_days_ago and
-                    body_part_injury_risk.last_non_functional_overreaching_date >= two_days_ago):
-                excessive_strain_nfo.append(body_part_side)
-                last_date_time = max(datetime.combine(body_part_injury_risk.last_excessive_strain_date, datetime.min.time()), last_date_time)
-                last_date_time = max(datetime.combine(body_part_injury_risk.last_non_functional_overreaching_date, datetime.min.time()), last_date_time)
-            if (body_part_injury_risk.last_excessive_strain_date is not None and
-                    body_part_injury_risk.last_functional_overreaching_date is not None and
-                    body_part_injury_risk.last_excessive_strain_date == self.event_date_time.date() and
-                    body_part_injury_risk.last_functional_overreaching_date == self.event_date_time.date()):
-                excessive_strain_fo.append(body_part_side)
-                last_date_time = max(datetime.combine(body_part_injury_risk.last_excessive_strain_date, datetime.min.time()), last_date_time)
-                last_date_time = max(datetime.combine(body_part_injury_risk.last_functional_overreaching_date, datetime.min.time()), last_date_time)
-            if body_part_injury_risk.last_compensation_date is not None and body_part_injury_risk.last_compensation_date == self.event_date_time.date():
-                compensating.append(body_part_side)
-                last_date_time = max(self.event_date_time, last_date_time)
+            if 0 < body_part_injury_risk.total_volume_percent_tier < 4:
+                if body_part_injury_risk.total_volume_percent_tier == 1:
+                    body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
+                                                        LegendColor.warning_light)
+                elif body_part_injury_risk.total_volume_percent_tier == 2:
+                    body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
+                                                        LegendColor.warning_x_light)
+                else:
+                    body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
+                                                         LegendColor.warning_xx_light)
+                training_stress.append(body_part_side_viz)
 
-        if len(excessive_strain_nfo) > 0 or len(excessive_strain_fo) > 0 or len(compensating) > 0:
+            if body_part_injury_risk.last_compensation_date is not None and body_part_injury_risk.last_compensation_date == self.event_date_time.date():
+                if body_part_injury_risk.total_compensation_percent_tier == 1:
+                    body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
+                                                        LegendColor.success_light)
+                elif body_part_injury_risk.total_compensation_percent_tier == 2:
+                    body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
+                                                        LegendColor.success_x_light)
+                else:
+                    body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
+                                                         LegendColor.success_xx_light)
+                compensating.append(body_part_side_viz)
+
+        if len(training_stress) > 0 or len(compensating) > 0:
 
             trend = self.get_personalized_recovery_trend(category_index)
 
@@ -460,17 +465,15 @@ class TrendProcessor(object):
             trend_data.add_visualization_data()
             recovery_data = RecoveryChartData()
 
-            recovery_data.high_stress.extend(compensating)
-            recovery_data.moderate_stress.extend(excessive_strain_fo)
-            recovery_data.over_stressed.extend(excessive_strain_nfo)
+            recovery_data.training_stress.extend(training_stress)
+            recovery_data.compensation_stress.extend(compensating)
 
             recovery_data.remove_duplicates()
             trend_data.data = [recovery_data]
 
             trend.trigger_tiles = []
             trend.trigger_tiles.extend(self.get_compensation_trigger_tiles(compensating))
-            trend.trigger_tiles.extend(self.get_excessive_strain_trigger_tiles(excessive_strain_fo, True))
-            trend.trigger_tiles.extend(self.get_excessive_strain_trigger_tiles(excessive_strain_nfo, False))
+            trend.trigger_tiles.extend(self.get_excessive_strain_trigger_tiles(training_stress, True))
 
             # trend.trigger_tiles.extend(self.get_trigger_tiles(excessive_strain_nfo))
             # trend.trigger_tiles.extend(self.get_trigger_tiles(compensating))
@@ -484,7 +487,7 @@ class TrendProcessor(object):
             #trend.triggers = all_triggers
 
             #trend.last_date_time = self.get_latest_trigger_date_time(all_triggers)
-            trend.last_date_time = last_date_time
+            trend.last_date_time = self.event_date_time
 
             self.set_personalized_recovery_trend(category_index, trend)
 
@@ -604,10 +607,24 @@ class TrendProcessor(object):
 
         for body_part_side, body_part_injury_risk in self.injury_hist_dict.items():
             if body_part_injury_risk.last_inflammation_date == self.event_date_time.date():
-                inflamed.append(body_part_side)
+                inflammation_severity = body_part_injury_risk.get_inflammation_severity(self.event_date_time.date())
+                if inflammation_severity >= 7:
+                    body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
+                                                         LegendColor.error_light)
+                elif 4 <= inflammation_severity < 7:
+                    body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
+                                                         LegendColor.error_x_light)
+                else:
+                    body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
+                                                         LegendColor.error_xx_light)
+                inflamed.append(body_part_side_viz)
+
             # TODO - muscle spasm OR tight or just muscle spasm?
-            if body_part_injury_risk.last_muscle_spasm_date == self.event_date_time.date():
-                muscle_spasm_tight.append(body_part_side)
+            if (body_part_injury_risk.last_muscle_spasm_date == self.event_date_time.date() or
+                    body_part_injury_risk.last_adhesions_date == self.event_date_time.date()):
+                body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
+                                                     LegendColor.warning_light)
+                muscle_spasm_tight.append(body_part_side_viz)
 
         if len(inflamed) > 0 or len(muscle_spasm_tight) > 0:
 
@@ -664,21 +681,31 @@ class TrendProcessor(object):
                     body_part_injury_risk.last_adhesions_date is not None and
                 body_part_injury_risk.last_short_date == self.event_date_time.date() and
                     body_part_injury_risk.last_adhesions_date == self.event_date_time.date()):
-                short_adhesions.append(body_part_side)
+                body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
+                                                     LegendColor.warning_light)
+                short_adhesions.append(body_part_side_viz)
             if (body_part_injury_risk.last_short_date is not None and
                     body_part_injury_risk.last_muscle_spasm_date is not None and
                     body_part_injury_risk.last_short_date == self.event_date_time.date() and
                     body_part_injury_risk.last_muscle_spasm_date == self.event_date_time.date()):
-                short_non_adhesions.append(body_part_side)
+                body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
+                                                     LegendColor.warning_light)
+                short_non_adhesions.append(body_part_side_viz)
             if (body_part_injury_risk.last_overactive_short_date is not None and
                     body_part_injury_risk.last_overactive_short_date == self.event_date_time.date()):
-                overactive.append(body_part_side)
+                body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
+                                                     LegendColor.warning_light)
+                overactive.append(body_part_side_viz)
             if (body_part_injury_risk.last_weak_date is not None and
                     body_part_injury_risk.last_weak_date == self.event_date_time.date()):
-                underactive_weak.append(body_part_side)
+                body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
+                                                     LegendColor.splash_light)
+                underactive_weak.append(body_part_side_viz)
             if (body_part_injury_risk.last_underactive_short_date is not None and
                     body_part_injury_risk.last_underactive_short_date == self.event_date_time.date()):
-                underactive_inhibited.append(body_part_side)
+                body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
+                                                     LegendColor.splash_light)
+                underactive_inhibited.append(body_part_side_viz)
 
         # since we're reverse sorting, 2 is a higher priority than 1
 
@@ -692,11 +719,11 @@ class TrendProcessor(object):
             trend_data.add_visualization_data()
             prevention_data = Prevention3sChartData()
 
-            prevention_data.overactive.extend(overactive)
-            prevention_data.short.extend(short_adhesions)
-            prevention_data.short.extend(short_non_adhesions)
-            prevention_data.weak.extend(underactive_weak)
-            prevention_data.weak.extend(underactive_inhibited)
+            prevention_data.limited_mobility.extend(overactive)
+            prevention_data.limited_mobility.extend(short_adhesions)
+            prevention_data.limited_mobility.extend(short_non_adhesions)
+            prevention_data.underactive.extend(underactive_weak)
+            prevention_data.underactive.extend(underactive_inhibited)
 
             prevention_data.remove_duplicates()
             trend_data.data = [prevention_data]
