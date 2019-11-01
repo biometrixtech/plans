@@ -81,6 +81,8 @@ class BodyPartLocation(Enum):
     forearm = 24
     core_stabilizers = 25
 
+    erector_spinae = 26 # lower back
+
     it_band_lateral_knee = 27
     hip_flexor = 28
     deltoid = 29
@@ -95,7 +97,7 @@ class BodyPartLocation(Enum):
     posterior_tibialis = 42
     soleus = 43
     gastrocnemius_medial = 44
-    gastrocnemius_lateral = 75
+
 
     # hamstrings
     bicep_femoris_long_head = 45
@@ -116,25 +118,12 @@ class BodyPartLocation(Enum):
     vastus_medialis = 56
     vastus_intermedius = 57
     rectus_femoris = 58
-    sartorius = 62
 
-    # hip_flexor
-    tensor_fascia_latae = 59
-    psoas = 71
-    iliacus = 72
+    tensor_fascia_latae = 59 # hips
+    piriformis = 60 # deep rotator of hip
 
-    # deep rotators of the hip (30)
-    piriformis = 60
-    quadratus_femoris = 67
-
-    # core_stabilizers
-    iliopsoas = 61  # no longer used
-    transverse_abdominis = 73
-    internal_obliques = 74
-
-    # abdominals
-    rectus_abdominis = 75
-    external_obliques = 69
+    gastrocnemius_lateral = 61  # calves - was 75 but that was a duplicate
+    sartorius = 62  # quads
 
     # glutes
     gluteus_medius_anterior_fibers = 63
@@ -142,12 +131,28 @@ class BodyPartLocation(Enum):
     gluteus_minimus = 65
     gluteus_maximus = 66
 
+    # deep rotators of the hip (30)
+    quadratus_femoris = 67
+
     # knee?
     popliteus = 68
 
+    external_obliques = 69  # abdominal
+
     # lower_back
     quadratus_lumorum = 70
-    erector_spinae = 26
+
+    # hip_flexor
+    psoas = 71
+    iliacus = 72
+
+    # core_stabilizers
+    #iliopsoas = 61  # no longer used
+    transverse_abdominis = 73
+    internal_obliques = 74
+
+    # abdominals
+    rectus_abdominis = 75
 
     # upper back, traps, neck
     upper_trapezius = 76

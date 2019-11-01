@@ -11,7 +11,7 @@ from models.sport import SportName
 from models.soreness import Soreness
 from models.body_parts import BodyPart
 from models.soreness_base import BodyPartLocation
-from models.load_stats import LoadStats
+from models.stats import AthleteStats
 from logic.injury_risk_processing import InjuryRiskProcessor
 from logic.functional_exercise_mapping import ExerciseAssignmentCalculator
 from tests.mocks.mock_exercise_datastore import ExerciseLibraryDatastore
@@ -64,7 +64,7 @@ def test_historical_update_single_day_data():
     soreness_2.sharp = 2
     soreness_2.reported_date_time = dates[0]
 
-    proc = InjuryRiskProcessor(dates[0], [soreness, soreness_2], sessions, {}, LoadStats(), "tester")
+    proc = InjuryRiskProcessor(dates[0], [soreness, soreness_2], sessions, {}, AthleteStats(), "tester")
     injury_risk_dict = proc.process(update_historical_data=True)
     assert len(injury_risk_dict) > 0
 
@@ -100,11 +100,11 @@ def test_historical_update_multiple_day_data():
     soreness_3.reported_date_time = now_date
 
     # make historical update
-    proc = InjuryRiskProcessor(one_day_ago, [soreness, soreness_2], sessions[:2], {}, LoadStats(), "tester")
+    proc = InjuryRiskProcessor(one_day_ago, [soreness, soreness_2], sessions[:2], {}, AthleteStats(), "tester")
     injury_risk_dict = proc.process(update_historical_data=True)
 
     # update with new information
-    proc = InjuryRiskProcessor(now_date, [soreness_3], [sessions[2]], injury_risk_dict, LoadStats(), "tester")
+    proc = InjuryRiskProcessor(now_date, [soreness_3], [sessions[2]], injury_risk_dict, AthleteStats(), "tester")
     injury_risk_dict = proc.process(aggregate_results=True)
 
     calc = ExerciseAssignmentCalculator(injury_risk_dict, exercise_library_datastore, completed_exercise_datastore,
