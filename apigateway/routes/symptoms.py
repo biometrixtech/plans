@@ -19,7 +19,7 @@ heart_rate_datastore = datastore_collection.heart_rate_datastore
 session_datastore = datastore_collection.session_datastore
 
 
-app = Blueprint('three_sensor', __name__)
+app = Blueprint('symptoms', __name__)
 
 
 @app.route('/<uuid:user_id>/', methods=['POST'])

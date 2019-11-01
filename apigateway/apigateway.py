@@ -26,6 +26,7 @@ app.register_blueprint(misc_routes, url_prefix='/misc')
 app.register_blueprint(health_data_routes, url_prefix='/health_data')
 app.register_blueprint(insights_routes, url_prefix='/insights')
 app.register_blueprint(trend_routes, url_prefix='/trends')
+app.register_blueprint(three_sensor_routes, url_prefix='/three_sensor')
 app.register_blueprint(symptoms_routes, url_prefix='/symptoms')
 
 
