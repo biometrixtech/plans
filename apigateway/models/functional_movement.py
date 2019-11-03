@@ -280,6 +280,9 @@ class BodyPartInjuryRisk(object):
         self.last_tendinosis_date = None
         self.last_altered_joint_arthokinematics_date = None
 
+        # movement dysfunction
+        self.last_movement_dysfunction_stress_date = None
+
     def json_serialise(self):
         return {
                 "concentric_volume_last_week": self.concentric_volume_last_week,
@@ -424,6 +427,8 @@ class BodyPartInjuryRisk(object):
                 "last_tendinopathy_date": format_date(self.last_tendinopathy_date),
                 "last_tendinosis_date": format_date(self.last_tendinosis_date),
                 "last_altered_joint_arthokinematics_date": format_date(self.last_altered_joint_arthokinematics_date),
+
+                "last_movement_dysfunction_stress_date": format_date(self.last_movement_dysfunction_stress_date),
 
         }
 
@@ -576,6 +581,9 @@ class BodyPartInjuryRisk(object):
         injury_risk.last_tendinosis_date = input_dict.get('last_tendinosis_date')
         injury_risk.last_altered_joint_arthokinematics_date = input_dict.get('last_altered_joint_arthokinematics_date')
 
+        # movement dysfunction
+        injury_risk.last_movement_dysfunction_stress_date = input_dict.get('last_movement_dysfunction_stress_date')
+
         return injury_risk
 
     def __setattr__(self, name, value):
@@ -698,6 +706,9 @@ class BodyPartInjuryRisk(object):
                                                                 body_part_injury_risk.total_compensation_percent_tier)
         self.total_volume_percent_tier = self.merge_tiers(self.total_volume_percent_tier,
                                                    body_part_injury_risk.total_volume_percent_tier)
+
+        self.last_movement_dysfunction_stress_date = self.merge_with_none(self.last_movement_dysfunction_stress_date,
+                                                                          body_part_injury_risk.last_movement_dysfunction_stress_date)
 
     def merge_tiers(self, value_a, value_b):
 

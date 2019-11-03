@@ -552,6 +552,16 @@ class InjuryRiskProcessor(object):
 
         return elasticity_value, adf_value
 
+    def mark_resulting_elevated_stress_from_dysfunction(self, body_part_list, side, injury_risk_dict, stress_date):
+
+        for b in body_part_list:
+            body_part_side = BodyPartSide(BodyPartLocation(b), side)
+            if body_part_side not in injury_risk_dict:
+                injury_risk_dict[body_part_side] = BodyPartInjuryRisk()
+            injury_risk_dict[body_part_side].last_movement_dysfunction_stress_date = stress_date
+
+        return injury_risk_dict
+
     def update_injury_cycle_summaries(self, current_session, injury_cycle_summary_dict, injury_risk_dict, base_date):
 
         sides = [1, 2]
@@ -656,6 +666,8 @@ class InjuryRiskProcessor(object):
             if apt_ankle_present and not hip_drop_apt_present and not knee_valgus_apt_present and not hip_drop_pva_present and not knee_valgus_pva_present:
                 proc.increment_overactive_short_by_list([21, 26, 58, 71, 72])
                 proc.increment_underactive_long_by_list([66, 73, 74])
+                injury_risk_dict = self.mark_resulting_elevated_stress_from_dysfunction([26, 70, 45, 46, 47, 48], side,
+                                                                                        injury_risk_dict, base_date)
                 if not unilateral_1_handled:  # handle unilateral parts
                     uni_proc = InjuryCycleSummaryProcessor(injury_cycle_summary_dict, 0, current_session.event_date,
                                                            current_symptom_body_part_enums, historic_body_part_list)
@@ -665,38 +677,64 @@ class InjuryRiskProcessor(object):
             elif apt_ankle_present and (hip_drop_apt_present or hip_drop_pva_present) and not knee_valgus_apt_present and not knee_valgus_pva_present:
                 proc.increment_overactive_short_by_list([59, 49, 50, 52, 53, 54])
                 proc.increment_underactive_long_by_list([63, 64, 47, 48])
+                injury_risk_dict = self.mark_resulting_elevated_stress_from_dysfunction([26, 70, 45, 46, 47, 48, 11], side,
+                                                                                        injury_risk_dict, base_date)
 
             elif apt_ankle_present and (
                     hip_drop_apt_present or hip_drop_pva_present) and (knee_valgus_apt_present or knee_valgus_pva_present):
                 proc.increment_overactive_short_by_list([59, 49, 50, 52, 53, 54, 46, 55])
                 proc.increment_underactive_long_by_list([66, 63, 64, 47, 48, 53, 68, 44])
+                injury_risk_dict = self.mark_resulting_elevated_stress_from_dysfunction([26, 70, 45, 46, 47, 48, 11, 7], side,
+                                                                                        injury_risk_dict, base_date)
 
             elif not apt_ankle_present and hip_drop_pva_present and not knee_valgus_pva_present and not knee_valgus_hip_drop_present:
                 proc.increment_overactive_short_by_list([59, 49, 50, 52, 53, 54])
                 proc.increment_underactive_long_by_list([66, 63, 64])
+                injury_risk_dict = self.mark_resulting_elevated_stress_from_dysfunction([26, 70, 11, 7],
+                                                                                        side,
+                                                                                        injury_risk_dict, base_date)
 
             elif not apt_ankle_present and ((hip_drop_pva_present and knee_valgus_pva_present) or knee_valgus_hip_drop_present):
                 proc.increment_overactive_short_by_list([65, 59, 49, 50, 52, 53, 54, 55, 46])
                 proc.increment_underactive_long_by_list([66, 63, 64, 68, 53, 47, 48, 56])
+                injury_risk_dict = self.mark_resulting_elevated_stress_from_dysfunction([26, 70, 11, 7, 10],
+                                                                                        side,
+                                                                                        injury_risk_dict, base_date)
+                injury_risk_dict = self.mark_resulting_elevated_stress_from_dysfunction([75], 0,
+                                                                                        injury_risk_dict, base_date)
 
             elif not apt_ankle_present and not hip_drop_pva_present and knee_valgus_pva_present:
                 proc.increment_overactive_short_by_list(
                     [59, 55, 46, 44, 43, 41])
                 proc.increment_underactive_long_by_list([68, 53, 47, 48, 56, 44, 40, 42])
+                injury_risk_dict = self.mark_resulting_elevated_stress_from_dysfunction([11, 7, 10],
+                                                                                        side,
+                                                                                        injury_risk_dict, base_date)
+
                 if unilateral_3_handled:  # handle unilateral parts
                     uni_proc = InjuryCycleSummaryProcessor(injury_cycle_summary_dict, 0, current_session.event_date,
                                                            current_symptom_body_part_enums, historic_body_part_list)
                     uni_proc.increment_overactive_short_by_list([75])
+                    injury_risk_dict = self.mark_resulting_elevated_stress_from_dysfunction([75], 0,
+                                                                                            injury_risk_dict, base_date)
                     unilateral_3_handled = True
 
             if apt_ankle_fatigued:
                 proc.increment_weak_by_list([73, 66])
+                injury_risk_dict = self.mark_resulting_elevated_stress_from_dysfunction([26, 70, 45, 46, 47, 48], side, injury_risk_dict, base_date)
 
             if hip_drop_apt_fatigued:
                 proc.increment_weak_by_list([56, 66])
+                injury_risk_dict = self.mark_resulting_elevated_stress_from_dysfunction([59, 49, 50, 52, 53, 54, 11, 7], side,
+                                                                                        injury_risk_dict, base_date)
 
             if knee_valgus_apt_fatigued:
                 proc.increment_weak_by_list([44, 42, 40, 41])
+                injury_risk_dict = self.mark_resulting_elevated_stress_from_dysfunction([55, 46, 11, 7, 10],
+                                                                                        side,
+                                                                                        injury_risk_dict, base_date)
+                injury_risk_dict = self.mark_resulting_elevated_stress_from_dysfunction([75], 0,
+                                                                                        injury_risk_dict, base_date)
 
             summary_dict = proc.injury_cycle_summary_dict
 
