@@ -559,50 +559,63 @@ class InjuryRiskProcessor(object):
         summary_dict = {}
 
         unilateral_1_handled = False
-        unilateral_2_handled = False
         unilateral_3_handled = False
-        unilateral_4_handled = False
-        unilateral_5_handled = False
+
+        historic_symptom_body_part_enums = dict(filter(lambda elem: elem[1].ache_count_last_0_20_days >= 3 or
+                                                                    elem[1].knots_count_last_0_20_days >= 3 or
+                                                                    elem[1].sharp_count_last_0_20_days >= 3 or
+                                                                    elem[1].tight_count_last_0_20_days >= 3 or
+                                                                    elem[1].weak_count_last_0_20_days >= 3 or
+                                                                    elem[1].overactive_short_count_last_0_20_days >= 3 or
+                                                                    elem[1].overactive_long_count_last_0_20_days >= 3 or
+                                                                    elem[1].underactive_short_count_last_0_20_days >= 3 or
+                                                                    elem[1].underactive_long_count_last_0_20_days >= 3,
+                                                       injury_risk_dict.items()))
 
         for side in sides:
 
             apt_ankle_present = False
-            hip_drop_present = False
-            knee_valgus_present = False
+            apt_ankle_fatigued = False
+            hip_drop_apt_present = False
+            hip_drop_apt_fatigued = False
+            knee_valgus_apt_fatigued = False
             hip_drop_pva_present = False
             knee_valgus_pva_present = False
+            knee_valgus_apt_present = False
+            knee_valgus_hip_drop_present = False
 
-            proc = InjuryCycleSummaryProcessor(injury_cycle_summary_dict, side, current_session.event_date)
+            historic_body_part_list = [h.body_part_location.value for h in historic_symptom_body_part_enums.keys() if
+                                       h.side == side or h.side == 0]
+
+            current_symptom_body_part_enums = [s.body_part.location.value for s in self.symptoms
+                                               if (s.side == side or s.side == 0) and s.reported_date_time.date() == base_date]
+
+            current_symptom_body_part_enums = [c for c in current_symptom_body_part_enums if c not in historic_body_part_list]
+
+            proc = InjuryCycleSummaryProcessor(injury_cycle_summary_dict, side, current_session.event_date,
+                                               current_symptom_body_part_enums, historic_body_part_list)
 
             if current_session.movement_patterns is not None and current_session.movement_patterns.apt_ankle_pitch is not None:
 
                 apt_ankle = current_session.movement_patterns.apt_ankle_pitch
                 apt_ankle_elasticity, apt_ankle_adf = self.get_movement_pattern_elasiticity_adf(apt_ankle, side)
-                if apt_ankle_elasticity != 0:
-                    proc.increment_overactive_short_by_list([21, 26, 70, 58, 71, 72, 59, 55, 65, 49, 50, 52, 53, 54, 62])
-                    proc.increment_underactive_long_by_list([74, 73, 66, 63, 64, 47, 48])
-                    if not unilateral_1_handled: # handle unilateral parts
-                        uni_proc = InjuryCycleSummaryProcessor(injury_cycle_summary_dict, 0, current_session.event_date)
-                        uni_proc.increment_underactive_long_by_list([75])
-                        unilateral_1_handled = True
+
+                if apt_ankle_elasticity > 0:
                     apt_ankle_present = True
 
                 if apt_ankle_adf != 0 and current_session.duration_minutes >= 20:
-                    proc.increment_weak_by_list([73, 66])
+                    apt_ankle_fatigued = True
 
             if current_session.movement_patterns is not None and current_session.movement_patterns.hip_drop_apt is not None:
 
                 hip_drop_apt = current_session.movement_patterns.hip_drop_apt
                 hip_drop_apt_elasticity, hip_drop_apt_adf = self.get_movement_pattern_elasiticity_adf(hip_drop_apt,
                                                                                                       side)
-                if hip_drop_apt_elasticity != 0:
-                    proc.increment_overactive_short_by_list([59, 49, 50, 52, 53, 54])
-                    proc.increment_underactive_long_by_list([63, 64, 47, 48])
+                if hip_drop_apt_elasticity > 0:
+                    hip_drop_apt_present = True
 
-                    hip_drop_present = True
-
-                if hip_drop_apt_adf != 0 and current_session.movement_patterns >= 20:
-                    proc.increment_weak_by_list([56, 66])
+                if hip_drop_apt_adf != 0 and current_session.duration_minutes >= 20:
+                    hip_drop_apt_fatigued = True
 
             if current_session.movement_patterns is not None and current_session.movement_patterns.knee_valgus_apt is not None:
 
@@ -610,86 +623,114 @@ class InjuryRiskProcessor(object):
                 knee_valgus_apt_elasticity, knee_valgus_apt_adf = self.get_movement_pattern_elasiticity_adf(
                     knee_valgus_apt, side)
 
-                if knee_valgus_apt_elasticity != 0:
-                    proc.increment_overactive_short_by_list([69, 49, 50, 52, 53, 54, 21, 66])
-                    proc.increment_underactive_long_by_list([21])
+                if knee_valgus_apt_elasticity > 0:
+                    knee_valgus_apt_present = True
 
-                    knee_valgus_present = True
-
-                if knee_valgus_apt_adf != 0 and current_session.movement_patterns >= 20:
-                    proc.increment_weak_by_list([44, 42, 40, 41])
-
-            if hip_drop_present and knee_valgus_present:
-
-                if hip_drop_apt_elasticity == 0 and knee_valgus_apt_elasticity == 0:
-                    proc.increment_overactive_short_by_list([21, 26, 58, 71, 72])
-                    proc.increment_underactive_long_by_list([74, 73, 66])
-                    if not unilateral_2_handled: # handle unilateral parts
-                        uni_proc = InjuryCycleSummaryProcessor(injury_cycle_summary_dict, 0, current_session.event_date)
-                        uni_proc.increment_underactive_long_by_list([75])
-                        unilateral_2_handled = True
+                if knee_valgus_apt_adf != 0 and current_session.duration_minutes >= 20:
+                    knee_valgus_apt_fatigued = True
 
             if current_session.movement_patterns is not None and current_session.movement_patterns.hip_drop_pva is not None:
 
                 hip_drop_pva = current_session.movement_patterns.hip_drop_pva
                 hip_drop_pva_elasticity, hip_drop_pva_adf = self.get_movement_pattern_elasiticity_adf(hip_drop_pva,
                                                                                                       side)
-                if hip_drop_pva_elasticity != 0:
+                if hip_drop_pva_elasticity > 0:
                     hip_drop_pva_present = True
-
-            # This isn't used yet
-            # if current_session.movement_patterns is not None and current_session.movement_patterns.knee_valgus_hip_drop is not None:
-            #
-            #     knee_valgus_hip_drop = current_session.movement_patterns.knee_valgus_hip_drop
-            #     knee_valgus_hip_drop_elasticity, knee_valgus_hip_drop_adf = self.get_movement_pattern_elasiticity_adf(
-            #         knee_valgus_hip_drop, side)
 
             if current_session.movement_patterns is not None and current_session.movement_patterns.knee_valgus_pva is not None:
 
                 knee_valgus_pva = current_session.movement_patterns.knee_valgus_pva
                 knee_valgus_pva_elasticity, knee_valgus_pva_adf = self.get_movement_pattern_elasiticity_adf(knee_valgus_pva, side)
 
-                if knee_valgus_pva_elasticity != 0:
-                    proc.increment_overactive_short_by_list(
-                        [59, 55, 46, 65, 59, 49, 50, 52, 53, 54])
-                    proc.increment_underactive_long_by_list([68, 53, 47, 48, 44, 63, 64, 66])
+                if knee_valgus_pva_elasticity > 0:
                     knee_valgus_pva_present = True
-                    if unilateral_3_handled: # handle unilateral parts
-                        uni_proc = InjuryCycleSummaryProcessor(injury_cycle_summary_dict, 0, current_session.event_date)
-                        uni_proc.increment_overactive_short_by_list([75])
-                        unilateral_3_handled = True
 
-            if hip_drop_pva_present or knee_valgus_pva_present:
+            if current_session.movement_patterns is not None and current_session.movement_patterns.knee_valgus_hip_drop is not None:
 
-                proc.increment_overactive_short_by_list([44, 43, 41, 59, 55, 46, 65, 59, 49, 50, 52, 53, 54, 58, 62])
-                proc.increment_underactive_long_by_list([40, 42, 68, 53, 47, 48, 56, 63, 64, 66])
-                if unilateral_4_handled:  # handle unilateral parts
-                    uni_proc = InjuryCycleSummaryProcessor(injury_cycle_summary_dict, 0, current_session.event_date)
-                    uni_proc.increment_overactive_short_by_list([75])
-                    unilateral_4_handled = True
+                knee_valgus_hip_drop = current_session.movement_patterns.knee_valgus_pva
+                knee_valgus_hip_drop_elasticity, knee_valgus_pva_adf = self.get_movement_pattern_elasiticity_adf(knee_valgus_hip_drop, side)
 
-            if apt_ankle_present and (hip_drop_pva_present or knee_valgus_pva_present):
+                if knee_valgus_hip_drop_elasticity > 0:
+                    knee_valgus_hip_drop_present = True
 
+            if apt_ankle_present and not hip_drop_apt_present and not knee_valgus_apt_present and not hip_drop_pva_present and not knee_valgus_pva_present:
+                proc.increment_overactive_short_by_list([21, 26, 58, 71, 72])
+                proc.increment_underactive_long_by_list([66, 73, 74])
+                if not unilateral_1_handled:  # handle unilateral parts
+                    uni_proc = InjuryCycleSummaryProcessor(injury_cycle_summary_dict, 0, current_session.event_date,
+                                                           current_symptom_body_part_enums, historic_body_part_list)
+                    uni_proc.increment_underactive_long_by_list([75])
+                    unilateral_1_handled = True
+
+            elif apt_ankle_present and (hip_drop_apt_present or hip_drop_pva_present) and not knee_valgus_apt_present and not knee_valgus_pva_present:
+                proc.increment_overactive_short_by_list([59, 49, 50, 52, 53, 54])
+                proc.increment_underactive_long_by_list([63, 64, 47, 48])
+
+            elif apt_ankle_present and (
+                    hip_drop_apt_present or hip_drop_pva_present) and (knee_valgus_apt_present or knee_valgus_pva_present):
+                proc.increment_overactive_short_by_list([59, 49, 50, 52, 53, 54, 46, 55])
+                proc.increment_underactive_long_by_list([66, 63, 64, 47, 48, 53, 68, 44])
+
+            elif not apt_ankle_present and hip_drop_pva_present and not knee_valgus_pva_present and not knee_valgus_hip_drop_present:
+                proc.increment_overactive_short_by_list([59, 49, 50, 52, 53, 54])
+                proc.increment_underactive_long_by_list([66, 63, 64])
+
+            elif not apt_ankle_present and ((hip_drop_pva_present and knee_valgus_pva_present) or knee_valgus_hip_drop_present):
+                proc.increment_overactive_short_by_list([65, 59, 49, 50, 52, 53, 54, 55, 46])
+                proc.increment_underactive_long_by_list([66, 63, 64, 68, 53, 47, 48, 56])
+
+            elif not apt_ankle_present and not hip_drop_pva_present and knee_valgus_pva_present:
                 proc.increment_overactive_short_by_list(
-                    [65, 59, 49, 50, 52, 53, 54, 58, 62, 59, 55, 46])
-                proc.increment_underactive_long_by_list([63,64, 66, 68, 53, 47, 48, 56])
-
-            if hip_drop_pva_present and knee_valgus_pva_present:
-
-                proc.increment_overactive_short_by_list(
-                    [44, 43, 41, 59, 55, 46])
-                proc.increment_underactive_long_by_list([40, 42, 68, 53, 47, 48, 56])
-                if unilateral_5_handled:  # handle unilateral parts
-                    uni_proc = InjuryCycleSummaryProcessor(injury_cycle_summary_dict, 0, current_session.event_date)
+                    [59, 55, 46, 44, 43, 41])
+                proc.increment_underactive_long_by_list([68, 53, 47, 48, 56, 44, 40, 42])
+                if unilateral_3_handled:  # handle unilateral parts
+                    uni_proc = InjuryCycleSummaryProcessor(injury_cycle_summary_dict, 0, current_session.event_date,
+                                                           current_symptom_body_part_enums, historic_body_part_list)
                     uni_proc.increment_overactive_short_by_list([75])
-                    unilateral_5_handled = True
+                    unilateral_3_handled = True
+
+            if apt_ankle_fatigued:
+                proc.increment_weak_by_list([73, 66])
+
+            if hip_drop_apt_fatigued:
+                proc.increment_weak_by_list([56, 66])
+
+            if knee_valgus_apt_fatigued:
+                proc.increment_weak_by_list([44, 42, 40, 41])
 
             summary_dict = proc.injury_cycle_summary_dict
 
         two_days_ago = base_date - timedelta(days=1)
 
+        left_current_symptom_body_part_enums = [s.body_part.location.value for s in self.symptoms if
+                                                s.side == 1 and s.reported_date_time.date() == base_date]
+        right_current_symptom_body_part_enums = [s.body_part.location.value for s in self.symptoms if
+                                                 s.side == 2 and s.reported_date_time.date() == base_date]
+        unilateral_current_symptom_body_part_enums = [s.body_part.location.value for s in self.symptoms if
+                                                      s.side == 0 and s.reported_date_time.date() == base_date]
+        historic_body_part_list_left = [h.body_part_location.value for h in historic_symptom_body_part_enums.keys() if
+                                        h.side == 1]
+
+        historic_body_part_list_right = [h.body_part_location.value for h in historic_symptom_body_part_enums.keys() if
+                                        h.side == 2]
+
+        historic_body_part_list_uni = [h.body_part_location.value for h in historic_symptom_body_part_enums.keys() if
+                                        h.side == 0]
+
         for body_part_side, body_part_injury_risk in injury_risk_dict.items():
-            proc = InjuryCycleSummaryProcessor(injury_cycle_summary_dict, body_part_side.side, current_session.event_date)
+
+            if body_part_side.side == 1:
+                hist_list = historic_body_part_list_left
+                symptom_list = [l for l in left_current_symptom_body_part_enums if l not in historic_body_part_list_left]
+            elif body_part_side.side == 2:
+                hist_list = historic_body_part_list_right
+                symptom_list = [r for r in right_current_symptom_body_part_enums if r not in historic_body_part_list_right]
+            else:
+                hist_list = historic_body_part_list_uni
+                symptom_list = [u for u in unilateral_current_symptom_body_part_enums if u not in historic_body_part_list_uni]
+
+            proc = InjuryCycleSummaryProcessor(injury_cycle_summary_dict, body_part_side.side,
+                                               current_session.event_date, symptom_list, hist_list)
             if body_part_injury_risk.last_muscle_spasm_date == base_date:
 
                 proc.increment_overactive_short(body_part_side.body_part_location.value)
@@ -709,9 +750,9 @@ class InjuryRiskProcessor(object):
         for body_part_side, injury_cycle_summary in injury_cycle_summary_dict.items():
 
             if injury_cycle_summary.last_updated_date_time is None or injury_cycle_summary.last_updated_date_time == event_date_time:
-                if (injury_cycle_summary.overactive_short_count > injury_cycle_summary.overactive_long_count and
-                        injury_cycle_summary.overactive_short_count > injury_cycle_summary.underactive_short_count and
-                        injury_cycle_summary.overactive_short_count > injury_cycle_summary.underactive_long_count):
+                if (injury_cycle_summary.overactive_short_count >= 12 and
+                        injury_cycle_summary.is_highest_count("overactive_short_count")
+                        and injury_cycle_summary.get_percentage("overactive_short_count") >= 40.0):
                     if body_part_side not in injury_risk_dict:
                         injury_risk_dict[body_part_side] = BodyPartInjuryRisk()
                     if injury_risk_dict[body_part_side].last_overactive_short_date is None or injury_risk_dict[body_part_side].last_overactive_short_date < event_date_time.date():
@@ -719,27 +760,27 @@ class InjuryRiskProcessor(object):
                         # could be an additional session of the day and in this case, we want to consider it more than once
                         injury_risk_dict[body_part_side].overactive_short_count_last_0_20_days += 1
 
-                elif (injury_cycle_summary.overactive_long_count > injury_cycle_summary.overactive_short_count and
-                      injury_cycle_summary.overactive_long_count > injury_cycle_summary.underactive_short_count and
-                      injury_cycle_summary.overactive_long_count > injury_cycle_summary.underactive_long_count):
+                elif (injury_cycle_summary.overactive_long_count >= 12 and
+                        injury_cycle_summary.is_highest_count("overactive_long_count")
+                        and injury_cycle_summary.get_percentage("overactive_long_count") >= 40.0):
                     if body_part_side not in injury_risk_dict:
                         injury_risk_dict[body_part_side] = BodyPartInjuryRisk()
                     if injury_risk_dict[body_part_side].last_overactive_long_date is None or injury_risk_dict[body_part_side].last_overactive_long_date < event_date_time.date():
                         injury_risk_dict[body_part_side].last_overactive_long_date = event_date_time.date()
                         injury_risk_dict[body_part_side].overactive_long_count_last_0_20_days += 1
 
-                elif (injury_cycle_summary.underactive_short_count > injury_cycle_summary.overactive_short_count and
-                      injury_cycle_summary.underactive_short_count > injury_cycle_summary.overactive_long_count and
-                      injury_cycle_summary.underactive_short_count > injury_cycle_summary.underactive_long_count):
+                elif (injury_cycle_summary.underactive_short_count >= 12 and
+                        injury_cycle_summary.is_highest_count("underactive_short_count")
+                        and injury_cycle_summary.get_percentage("underactive_short_count") >= 40.0):
                     if body_part_side not in injury_risk_dict:
                         injury_risk_dict[body_part_side] = BodyPartInjuryRisk()
                     if injury_risk_dict[body_part_side].last_underactive_short_date is None or injury_risk_dict[body_part_side].last_underactive_short_date < event_date_time.date():
                         injury_risk_dict[body_part_side].last_underactive_short_date = event_date_time.date()
                         injury_risk_dict[body_part_side].underactive_short_count_last_0_20_days += 1
 
-                elif (injury_cycle_summary.underactive_long_count > injury_cycle_summary.overactive_short_count and
-                      injury_cycle_summary.underactive_long_count > injury_cycle_summary.overactive_long_count and
-                      injury_cycle_summary.underactive_long_count > injury_cycle_summary.underactive_short_count):
+                elif (injury_cycle_summary.underactive_long_count >= 12 and
+                        injury_cycle_summary.is_highest_count("underactive_long_count")
+                        and injury_cycle_summary.get_percentage("underactive_long_count") >= 40.0):
                     if body_part_side not in injury_risk_dict:
                         injury_risk_dict[body_part_side] = BodyPartInjuryRisk()
                     if injury_risk_dict[body_part_side].last_underactive_long_date is None or injury_risk_dict[body_part_side].last_underactive_long_date < event_date_time.date():

@@ -6,9 +6,9 @@ import test_users
 from models.athlete_trend import InsightType
 from models.styles import VisualizationType
 from aws_xray_sdk.core import xray_recorder
-os.environ['ENVIRONMENT'] = 'test'
+os.environ['ENVIRONMENT'] = 'dev'
 xray_recorder.configure(sampling=False)
-xray_recorder.begin_segment(name="test")
+xray_recorder.begin_segment(name="dev")
 
 from persona import Persona
 import soreness_history as sh
