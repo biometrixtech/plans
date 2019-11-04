@@ -26,7 +26,7 @@ class InjuryRiskDictOutputProcessor(object):
                 'total_compensation_percent','eccentric_compensation_percent','total_compensation_percent_tier',
                 'eccentric_compensation_percent_tier','total_volume_percent_tier','eccentric_volume_percent_tier',
                 'compensating_causes_volume_today', 'last_compensation_date', 'compensation_count_last_0_20_days',
-                'last_movement_dysfunction_stress_date',
+                'last_movement_dysfunction_stress_date','last_dysfunction_cause_date',
                 'ache_count_last_0_10_days','ache_count_last_0_20_days','last_ache_level',
                 'last_ache_date','last_excessive_strain_date','last_non_functional_overreaching_date',
                 'last_functional_overreaching_date','last_inflammation_date','knots_count_last_0_20_days','last_knots_level',

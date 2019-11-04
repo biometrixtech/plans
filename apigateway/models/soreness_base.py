@@ -310,9 +310,12 @@ class BodyPartSideViz(object):
         return {
             "body_part_location": self.body_part_location.value,
             "side": self.side,
-            "color": self.color.value
+            "color": self.color.value if self.color is not None else None
         }
 
     @classmethod
     def json_deserialise(cls, input_dict):
-        return cls(BodyPartLocation(input_dict['body_part_location']), input_dict['side'], LegendColor(input_dict['color']))
+        legend_color = input_dict.get('color')
+        if legend_color is not None:
+            legend_color = LegendColor(legend_color)
+        return cls(BodyPartLocation(input_dict['body_part_location']), input_dict['side'], legend_color)
