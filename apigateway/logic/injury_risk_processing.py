@@ -562,6 +562,18 @@ class InjuryRiskProcessor(object):
 
         return injury_risk_dict
 
+    def mark_cause_of_dysfunction(self, symptom_body_part_list, body_part_list, side, injury_risk_dict, stress_date):
+
+        dysfunction_list = [b for b in body_part_list if b in symptom_body_part_list]
+
+        for b in dysfunction_list:
+            body_part_side = BodyPartSide(BodyPartLocation(b), side)
+            if body_part_side not in injury_risk_dict:
+                injury_risk_dict[body_part_side] = BodyPartInjuryRisk()
+            injury_risk_dict[body_part_side].last_dysfunction_cause_date = stress_date
+
+        return injury_risk_dict
+
     def update_injury_cycle_summaries(self, current_session, injury_cycle_summary_dict, injury_risk_dict, base_date):
 
         sides = [1, 2]
@@ -664,10 +676,20 @@ class InjuryRiskProcessor(object):
                     knee_valgus_hip_drop_present = True
 
             if apt_ankle_present and not hip_drop_apt_present and not knee_valgus_apt_present and not hip_drop_pva_present and not knee_valgus_pva_present:
-                proc.increment_overactive_short_by_list([21, 26, 58, 71, 72])
-                proc.increment_underactive_long_by_list([66, 73, 74])
+                short_list = [21, 26, 58, 71, 72]
+                long_list = [66, 73, 74]
+                full_list = []
+                full_list.extend(short_list)
+                full_list.extend(long_list)
+
+                proc.increment_overactive_short_by_list(short_list)
+                proc.increment_underactive_long_by_list(long_list)
                 injury_risk_dict = self.mark_resulting_elevated_stress_from_dysfunction([26, 70, 45, 46, 47, 48], side,
                                                                                         injury_risk_dict, base_date)
+
+                injury_risk_dict = self.mark_cause_of_dysfunction(current_symptom_body_part_enums, full_list, side,
+                                                                  injury_risk_dict, base_date)
+
                 if not unilateral_1_handled:  # handle unilateral parts
                     uni_proc = InjuryCycleSummaryProcessor(injury_cycle_summary_dict, 0, current_session.event_date,
                                                            current_symptom_body_part_enums, historic_body_part_list)
@@ -675,41 +697,83 @@ class InjuryRiskProcessor(object):
                     unilateral_1_handled = True
 
             elif apt_ankle_present and (hip_drop_apt_present or hip_drop_pva_present) and not knee_valgus_apt_present and not knee_valgus_pva_present:
-                proc.increment_overactive_short_by_list([59, 49, 50, 52, 53, 54])
-                proc.increment_underactive_long_by_list([63, 64, 47, 48])
+                short_list = [59, 49, 50, 52, 53, 54]
+                long_list = [63, 64, 47, 48]
+                full_list = []
+                full_list.extend(short_list)
+                full_list.extend(long_list)
+
+                proc.increment_overactive_short_by_list(short_list)
+                proc.increment_underactive_long_by_list(long_list)
                 injury_risk_dict = self.mark_resulting_elevated_stress_from_dysfunction([26, 70, 45, 46, 47, 48, 11], side,
                                                                                         injury_risk_dict, base_date)
-
+                injury_risk_dict = self.mark_cause_of_dysfunction(current_symptom_body_part_enums, full_list, side,
+                                                                  injury_risk_dict, base_date)
             elif apt_ankle_present and (
                     hip_drop_apt_present or hip_drop_pva_present) and (knee_valgus_apt_present or knee_valgus_pva_present):
-                proc.increment_overactive_short_by_list([59, 49, 50, 52, 53, 54, 46, 55])
-                proc.increment_underactive_long_by_list([66, 63, 64, 47, 48, 53, 68, 44])
+                short_list = [59, 49, 50, 52, 53, 54, 46, 55]
+                long_list = [66, 63, 64, 47, 48, 53, 68, 44]
+                full_list = []
+                full_list.extend(short_list)
+                full_list.extend(long_list)
+
+                proc.increment_overactive_short_by_list(short_list)
+                proc.increment_underactive_long_by_list(long_list)
                 injury_risk_dict = self.mark_resulting_elevated_stress_from_dysfunction([26, 70, 45, 46, 47, 48, 11, 7], side,
                                                                                         injury_risk_dict, base_date)
 
+                injury_risk_dict = self.mark_cause_of_dysfunction(current_symptom_body_part_enums, full_list, side,
+                                                                  injury_risk_dict, base_date)
+
             elif not apt_ankle_present and hip_drop_pva_present and not knee_valgus_pva_present and not knee_valgus_hip_drop_present:
-                proc.increment_overactive_short_by_list([59, 49, 50, 52, 53, 54])
-                proc.increment_underactive_long_by_list([66, 63, 64])
+                short_list = [59, 49, 50, 52, 53, 54]
+                long_list = [66, 63, 64]
+                full_list = []
+                full_list.extend(short_list)
+                full_list.extend(long_list)
+
+                proc.increment_overactive_short_by_list(short_list)
+                proc.increment_underactive_long_by_list(long_list)
                 injury_risk_dict = self.mark_resulting_elevated_stress_from_dysfunction([26, 70, 11, 7],
                                                                                         side,
                                                                                         injury_risk_dict, base_date)
 
+                injury_risk_dict = self.mark_cause_of_dysfunction(current_symptom_body_part_enums, full_list, side,
+                                                                  injury_risk_dict, base_date)
+
             elif not apt_ankle_present and ((hip_drop_pva_present and knee_valgus_pva_present) or knee_valgus_hip_drop_present):
-                proc.increment_overactive_short_by_list([65, 59, 49, 50, 52, 53, 54, 55, 46])
-                proc.increment_underactive_long_by_list([66, 63, 64, 68, 53, 47, 48, 56])
+                short_list = [65, 59, 49, 50, 52, 53, 54, 55, 46]
+                long_list = [66, 63, 64, 68, 53, 47, 48, 56]
+                full_list = []
+                full_list.extend(short_list)
+                full_list.extend(long_list)
+
+                proc.increment_overactive_short_by_list(short_list)
+                proc.increment_underactive_long_by_list(long_list)
                 injury_risk_dict = self.mark_resulting_elevated_stress_from_dysfunction([26, 70, 11, 7, 10],
                                                                                         side,
                                                                                         injury_risk_dict, base_date)
                 injury_risk_dict = self.mark_resulting_elevated_stress_from_dysfunction([75], 0,
                                                                                         injury_risk_dict, base_date)
 
+                injury_risk_dict = self.mark_cause_of_dysfunction(current_symptom_body_part_enums, full_list, side,
+                                                                  injury_risk_dict, base_date)
+
             elif not apt_ankle_present and not hip_drop_pva_present and knee_valgus_pva_present:
-                proc.increment_overactive_short_by_list(
-                    [59, 55, 46, 44, 43, 41])
-                proc.increment_underactive_long_by_list([68, 53, 47, 48, 56, 44, 40, 42])
+                short_list = [59, 55, 46, 44, 43, 41]
+                long_list = [68, 53, 47, 48, 56, 44, 40, 42]
+                full_list = []
+                full_list.extend(short_list)
+                full_list.extend(long_list)
+
+                proc.increment_overactive_short_by_list(short_list)
+                proc.increment_underactive_long_by_list(long_list)
                 injury_risk_dict = self.mark_resulting_elevated_stress_from_dysfunction([11, 7, 10],
                                                                                         side,
                                                                                         injury_risk_dict, base_date)
+
+                injury_risk_dict = self.mark_cause_of_dysfunction(current_symptom_body_part_enums, full_list, side,
+                                                                  injury_risk_dict, base_date)
 
                 if unilateral_3_handled:  # handle unilateral parts
                     uni_proc = InjuryCycleSummaryProcessor(injury_cycle_summary_dict, 0, current_session.event_date,

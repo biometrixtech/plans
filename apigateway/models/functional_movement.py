@@ -282,6 +282,7 @@ class BodyPartInjuryRisk(object):
 
         # movement dysfunction
         self.last_movement_dysfunction_stress_date = None
+        self.last_dysfunction_cause_date = None
 
     def json_serialise(self):
         return {
@@ -429,6 +430,7 @@ class BodyPartInjuryRisk(object):
                 "last_altered_joint_arthokinematics_date": format_date(self.last_altered_joint_arthokinematics_date),
 
                 "last_movement_dysfunction_stress_date": format_date(self.last_movement_dysfunction_stress_date),
+                "last_dysfunction_cause_date": format_date(self.last_dysfunction_cause_date),
 
         }
 
@@ -583,6 +585,7 @@ class BodyPartInjuryRisk(object):
 
         # movement dysfunction
         injury_risk.last_movement_dysfunction_stress_date = input_dict.get('last_movement_dysfunction_stress_date')
+        injury_risk.last_dysfunction_cause_date = input_dict.get('last_dysfunction_cause_date')
 
         return injury_risk
 
@@ -709,6 +712,8 @@ class BodyPartInjuryRisk(object):
 
         self.last_movement_dysfunction_stress_date = self.merge_with_none(self.last_movement_dysfunction_stress_date,
                                                                           body_part_injury_risk.last_movement_dysfunction_stress_date)
+        self.last_dysfunction_cause_date = self.merge_with_none(self.last_dysfunction_cause_date,
+                                                                body_part_injury_risk.last_dysfunction_cause_date)
 
     def merge_tiers(self, value_a, value_b):
 
