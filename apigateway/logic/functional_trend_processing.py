@@ -452,7 +452,7 @@ class TrendProcessor(object):
                     body_part_injury_risk.last_movement_dysfunction_stress_date == self.event_date_time.date()):
                 is_elevated_stress = True
 
-            if is_compensating:
+            if is_elevated_stress:
                 if body_part_injury_risk.total_compensation_percent_tier == 1:
                     body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
                                                         LegendColor.success_light)
@@ -464,7 +464,7 @@ class TrendProcessor(object):
                                                          LegendColor.success_xx_light)
                 compensating.append(body_part_side_viz)
 
-            if not is_compensating and is_elevated_stress and not is_training_stress:
+            if is_compensating and not is_elevated_stress:
                 if body_part_injury_risk.total_compensation_percent_tier == 1:
                     body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
                                                         LegendColor.success_light)
@@ -661,7 +661,8 @@ class TrendProcessor(object):
                     body_part_injury_risk.last_knots_date == self.event_date_time.date()):
                 is_knots = True
 
-            if is_inflammation and not is_muscle_spasm and not is_knots:
+            #if is_inflammation and not is_muscle_spasm and not is_knots:
+            if is_inflammation:
                 inflammation_severity = body_part_injury_risk.get_inflammation_severity(self.event_date_time.date())
                 if inflammation_severity >= 7:
                     body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
@@ -674,20 +675,8 @@ class TrendProcessor(object):
                                                          LegendColor.error_xx_light)
                 inflamed.append(body_part_side_viz)
 
-            if not is_inflammation and is_muscle_spasm and not is_knots:
-                muscle_spasm_severity = body_part_injury_risk.get_muscle_spasm_severity(self.event_date_time.date())
-                if muscle_spasm_severity >= 7:
-                    body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
-                                                         LegendColor.warning_light)
-                elif 4 <= muscle_spasm_severity < 7:
-                    body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
-                                                         LegendColor.warning_x_light)
-                else:
-                    body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
-                                                         LegendColor.warning_xx_light)
-                muscle_spasm.append(body_part_side_viz)
-
-            if not is_inflammation and not is_muscle_spasm and is_knots:
+            #if not is_inflammation and not is_muscle_spasm and is_knots:
+            if not is_inflammation and is_knots:
                 tight_severity = body_part_injury_risk.last_knots_level
                 if tight_severity >= 7:
                     body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
@@ -699,6 +688,20 @@ class TrendProcessor(object):
                     body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
                                                          LegendColor.warning_xx_light)
                 knots.append(body_part_side_viz)
+
+            #if not is_inflammation and is_muscle_spasm and not is_knots:
+            if not is_inflammation and not is_knots and is_muscle_spasm:
+                muscle_spasm_severity = body_part_injury_risk.get_muscle_spasm_severity(self.event_date_time.date())
+                if muscle_spasm_severity >= 7:
+                    body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
+                                                         LegendColor.warning_light)
+                elif 4 <= muscle_spasm_severity < 7:
+                    body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
+                                                         LegendColor.warning_x_light)
+                else:
+                    body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
+                                                         LegendColor.warning_xx_light)
+                muscle_spasm.append(body_part_side_viz)
 
         if len(inflamed) > 0 or len(muscle_spasm) > 0 and len(knots) > 0:
 
@@ -772,6 +775,13 @@ class TrendProcessor(object):
             if body_part_injury_risk.overactive_short_count_last_0_20_days >= 3:
                 is_overactive_short = True
 
+            if body_part_injury_risk.underactive_long_count_last_0_20_days >= 3:
+                is_inhibited = True
+
+            if (body_part_injury_risk.last_weak_date is not None and
+                    body_part_injury_risk.weak_count_last_0_20_days >= 3):
+                is_weak = True
+
             if (body_part_injury_risk.last_altered_joint_arthokinematics_date is not None and
                     body_part_injury_risk.last_altered_joint_arthokinematics_date == self.event_date_time.date()):
                 is_joint_arthro = True
@@ -782,48 +792,35 @@ class TrendProcessor(object):
                      body_part_injury_risk.last_tendinosis_date == self.event_date_time.date())):
                 is_tendin = True
 
-            if (body_part_injury_risk.last_weak_date is not None and
-                    body_part_injury_risk.last_weak_date == self.event_date_time.date()):
-                is_weak = True
-
-            if body_part_injury_risk.underactive_long_count_last_0_20_days >= 3:
-                is_inhibited = True
-
-            if is_short:
+            if is_overactive_short and not is_joint_arthro and not is_tendin:
                 body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
-                                                     LegendColor.warning_light)
-                short.append(body_part_side_viz)
-
-            # if (body_part_injury_risk.last_short_date is not None and
-            #         body_part_injury_risk.last_muscle_spasm_date is not None and
-            #         body_part_injury_risk.last_short_date == self.event_date_time.date() and
-            #         body_part_injury_risk.last_muscle_spasm_date == self.event_date_time.date()):
-            #     body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
-            #                                          LegendColor.warning_light)
-            #     short_non_adhesions.append(body_part_side_viz)
-            if is_overactive_short and not is_short:
-                body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
-                                                     LegendColor.warning_light)
+                                                     LegendColor.warning_x_light)
                 overactive.append(body_part_side_viz)
 
-            if is_joint_arthro and not is_short and not is_overactive_short and not is_tendin:
+            if is_weak and not is_overactive_short and not is_joint_arthro and not is_tendin:
                 body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
-                                                     LegendColor.warning_light)
+                                                     LegendColor.splash_m_light)
+                underactive_weak.append(body_part_side_viz)
+
+            if not is_weak and is_inhibited and not is_overactive_short and not is_joint_arthro and not is_tendin:
+                body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
+                                                     LegendColor.splash_m_light)
+                underactive_inhibited.append(body_part_side_viz)
+
+            if is_short and not is_overactive_short and not is_weak and not is_inhibited and not is_joint_arthro and not is_tendin:
+                body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
+                                                     LegendColor.warning_x_light)
+                short.append(body_part_side_viz)
+
+            if is_joint_arthro and not is_tendin and not is_overactive_short and not is_weak and not is_inhibited and not is_short:
+                body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
+                                                     LegendColor.warning_x_light)
                 joint_artho.append(body_part_side_viz)
 
-            if not is_joint_arthro and not is_short and not is_overactive_short and is_tendin:
+            if is_tendin and not is_joint_arthro and not is_overactive_short and not is_weak and not is_inhibited and not is_short:
                 body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
-                                                     LegendColor.warning_light)
+                                                     LegendColor.warning_x_light)
                 tendin.append(body_part_side_viz)
-
-            if is_weak and not is_inhibited:
-                body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
-                                                     LegendColor.splash_light)
-                underactive_weak.append(body_part_side_viz)
-            if not is_weak and is_inhibited:
-                body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
-                                                     LegendColor.splash_light)
-                underactive_inhibited.append(body_part_side_viz)
 
         # since we're reverse sorting, 2 is a higher priority than 1
 

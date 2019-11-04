@@ -144,7 +144,11 @@ if __name__ == '__main__':
                         None, 4, None, 3, 5, None, None,
                         6, None, 5, None, 4, None, 3,
                         5, None, 6, None, 5, 4, 6]
-                last_plan_date_time = persona1.create_history(days=history_length, suffix='', end_today=True, rpes=rpes, log_output=True, jwt=jwt, user_name=u)
+                if u == "nc_long_2@200.com":
+                    last_plan_date_time = persona1.create_history(days=history_length, suffix='', end_today=False, rpes=rpes, log_output=True, jwt=jwt, user_name=u)
+                else:
+                    last_plan_date_time = persona1.create_history(days=history_length, suffix='', end_today=True, rpes=rpes,
+                                                                  log_output=True, jwt=jwt, user_name=u)
             else:
                 last_plan_date_time = persona1.create_history(days=history_length, suffix='')
                 clear_fte_category(InsightType.personalized_recovery, jwt, last_plan_date_time)
@@ -174,7 +178,11 @@ if __name__ == '__main__':
                     None, 4, None, 3, 5, None, None,
                     6, None, 5, None, 4, None, 3,
                     5, 5, 6, None, 5, 4, 6]
-            last_plan_date_time = persona1.create_history(days=history_length, suffix='', end_today=True, rpes=rpes, log_output=True, jwt=jwt, user_name=u)
+            if u == "ts_tread_2@200.com":
+                last_plan_date_time = persona1.create_history(days=history_length, suffix='', end_today=False, rpes=rpes,
+                                                              log_output=True, jwt=jwt, user_name=u)
+            else:
+                last_plan_date_time = persona1.create_history(days=history_length, suffix='', end_today=True, rpes=rpes, log_output=True, jwt=jwt, user_name=u)
 
             print(time.time() - start)
         elif u in ["ts_pain_long@200.com", "ts_pain_long_2@200.com"]:
@@ -204,7 +212,12 @@ if __name__ == '__main__':
                     None, 4, None, 3, 5, None, None,
                     6, None, 5, None, 4, None, 3,
                     5, 5, 6, None, 5, 4, 6]
-            last_plan_date_time = persona1.create_history(days=history_length, suffix='', end_today=True, rpes=rpes, log_output=True, jwt=jwt, user_name=u)
+            if u == "ts_pain_long_2@200.com":
+
+                last_plan_date_time = persona1.create_history(days=history_length, suffix='', end_today=False, rpes=rpes, log_output=True, jwt=jwt, user_name=u)
+            else:
+                last_plan_date_time = persona1.create_history(days=history_length, suffix='', end_today=True, rpes=rpes,
+                                                                log_output=True, jwt=jwt, user_name=u)
 
             print(time.time() - start)
         elif u in ["full_fte_long@200.com", "full_fte_long_2@200.com"]:
@@ -276,7 +289,11 @@ if __name__ == '__main__':
             persona1.elasticity_adf_dictionary = history
             persona1.three_session_history = session_details
             persona1.soreness_history = soreness_history
-            last_plan_date_time = persona1.create_history(days=history_length, suffix='', end_today=True, rpes=rpes, log_output=True, jwt=jwt, user_name=u)
+            if u == "nc_sore_tread_2@200.com":
+                last_plan_date_time = persona1.create_history(days=history_length, suffix='', end_today=False, rpes=rpes, log_output=True, jwt=jwt, user_name=u)
+            else:
+                last_plan_date_time = persona1.create_history(days=history_length, suffix='', end_today=True, rpes=rpes,
+                                                          log_output=True, jwt=jwt, user_name=u)
             # clear_fte_category(InsightType.personalized_recovery, jwt, last_plan_date_time)
             # clear_fte_category_view(InsightType.personalized_recovery,
             #                         VisualizationType.prevention, jwt, last_plan_date_time)
