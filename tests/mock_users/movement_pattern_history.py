@@ -86,11 +86,11 @@ def create_elastticity_adf(history):
 
 def run_fake_regressions_a():
     full_session_history = {}
-    full_session_history = pre_pad_with_nones(full_session_history, 26)
+    full_session_history = pre_pad_with_nones(full_session_history, 24)
 
     full_history = {}
-    full_history = pre_pad_with_nones(full_history, 26)
-    n = 26
+    full_history = pre_pad_with_nones(full_history, 24)
+    n = 24
 
     history = {}
     history["left_apt_ankle_pitch_elasticity"] = 0.26862678142297
@@ -140,7 +140,7 @@ def run_fake_regressions_a():
 
     history_2["left_hip_drop_apt_elasticity"] = 0.0
     history_2["left_hip_drop_apt_y_adf"] = 0.0
-    history_2["right_hip_drop_apt_elasticity"] = -0.293869832196777
+    history_2["right_hip_drop_apt_elasticity"] = 0.293869832196777
     history_2["right_hip_drop_apt_y_adf"] = 0.0
 
     history_2["left_hip_drop_pva_elasticity"] = 0.0798247205126612
@@ -155,12 +155,12 @@ def run_fake_regressions_a():
 
     history_2["left_knee_valgus_pva_elasticity"] = 0.0
     history_2["left_knee_valgus_pva_y_adf"] = 0.0
-    history_2["right_knee_valgus_pva_elasticity"] = -0.350647636838605
+    history_2["right_knee_valgus_pva_elasticity"] = 0.350647636838605
     history_2["right_knee_valgus_pva_y_adf"] = 0.0
 
     history_2["left_knee_valgus_apt_elasticity"] = 0.0
     history_2["left_knee_valgus_apt_y_adf"] = 0.0
-    history_2["right_knee_valgus_apt_elasticity"] = -0.211949329970997
+    history_2["right_knee_valgus_apt_elasticity"] = 0.211949329970997
     history_2["right_knee_valgus_apt_y_adf"] = 0.0
 
     session_details_2 = {}
@@ -200,7 +200,7 @@ def run_fake_regressions_a():
 
     history_3["left_knee_valgus_apt_elasticity"] = 0.0
     history_3["left_knee_valgus_apt_y_adf"] = 0.0
-    history_3["right_knee_valgus_apt_elasticity"] = -0.171639396375845
+    history_3["right_knee_valgus_apt_elasticity"] = 0.171639396375845
     history_3["right_knee_valgus_apt_y_adf"] = 0.0
 
     session_details_3 = {}
@@ -219,7 +219,7 @@ def run_fake_regressions_a():
     history_4["right_apt_ankle_pitch_elasticity"] = 0.71044788722549
     history_4["right_apt_ankle_pitch_y_adf"] = -6.20017183934644
 
-    history_4["left_hip_drop_apt_elasticity"] = -0.0880329043655969
+    history_4["left_hip_drop_apt_elasticity"] = 0.0880329043655969
     history_4["left_hip_drop_apt_y_adf"] = 0.0
     history_4["right_hip_drop_apt_elasticity"] = 0.0669797704603473
     history_4["right_hip_drop_apt_y_adf"] = 0.0
@@ -231,7 +231,7 @@ def run_fake_regressions_a():
 
     history_4["left_knee_valgus_hip_drop_elasticity"] = 0.00962908280374767
     history_4["left_knee_valgus_hip_drop_y_adf"] = 0.0
-    history_4["right_knee_valgus_hip_drop_elasticity"] = -0.0538153795962701
+    history_4["right_knee_valgus_hip_drop_elasticity"] = 0.0538153795962701
     history_4["right_knee_valgus_hip_drop_y_adf"] = 0.0
 
     history_4["left_knee_valgus_pva_elasticity"] = 0.121025513699043
@@ -280,9 +280,9 @@ def run_fake_regressions_a():
     history_5["right_knee_valgus_pva_elasticity"] = 0.0
     history_5["right_knee_valgus_pva_y_adf"] = 0.0
 
-    history_5["left_knee_valgus_apt_elasticity"] = -0.133339194910961
+    history_5["left_knee_valgus_apt_elasticity"] = 0.133339194910961
     history_5["left_knee_valgus_apt_y_adf"] = 0.0
-    history_5["right_knee_valgus_apt_elasticity"] = -0.159290632566094
+    history_5["right_knee_valgus_apt_elasticity"] = 0.159290632566094
     history_5["right_knee_valgus_apt_y_adf"] = 0.0
 
     session_details_5 = {}
@@ -291,6 +291,46 @@ def run_fake_regressions_a():
 
     full_history[n + 8] = history_5
     full_session_history[n + 8] = session_details_5
+    full_history[n + 9] = None
+    full_session_history[n + 9] = None
+
+    history_6 = {}
+    history_6["left_apt_ankle_pitch_elasticity"] = 0.429038632704596
+    history_6["left_apt_ankle_pitch_y_adf"] = -6.60672795200826
+    history_6["right_apt_ankle_pitch_elasticity"] = 0.0
+    history_6["right_apt_ankle_pitch_y_adf"] = -3.19917420441908
+
+    history_6["left_hip_drop_apt_elasticity"] = 0.0
+    history_6["left_hip_drop_apt_y_adf"] = 0.0
+    history_6["right_hip_drop_apt_elasticity"] = 0.058083362051412
+    history_6["right_hip_drop_apt_y_adf"] = 0.0
+
+    history_6["left_hip_drop_pva_elasticity"] = 0.229877359561652
+    history_6["left_hip_drop_pva_y_adf"] = 0.0
+    history_6["right_hip_drop_pva_elasticity"] = 0.0870156440654099
+    history_6["right_hip_drop_pva_y_adf"] = 0.0
+
+    history_6["left_knee_valgus_hip_drop_elasticity"] = 0.0
+    history_6["left_knee_valgus_hip_drop_y_adf"] = 0.0
+    history_6["right_knee_valgus_hip_drop_elasticity"] = 0.126430147448765
+    history_6["right_knee_valgus_hip_drop_y_adf"] = 0.0
+
+    history_6["left_knee_valgus_pva_elasticity"] = 0.0
+    history_6["left_knee_valgus_pva_y_adf"] = 0.0
+    history_6["right_knee_valgus_pva_elasticity"] = 0.0
+    history_6["right_knee_valgus_pva_y_adf"] = 0.0
+
+    history_6["left_knee_valgus_apt_elasticity"] = 0.0431147083237144
+    history_6["left_knee_valgus_apt_y_adf"] = 0.0
+    history_6["right_knee_valgus_apt_elasticity"] = 0.0768290349343447
+    history_6["right_knee_valgus_apt_y_adf"] = 0.0
+
+    session_details_6 = {}
+    session_details_6["seconds_duration"] = 1495
+    session_details_6["session_id"] = 'f78a9e26-6003-5ac7-8590-3ae4a421dac7'
+
+    full_history[n + 10] = history_6
+    full_session_history[n + 10] = session_details_6
 
     return full_history, full_session_history
 

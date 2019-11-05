@@ -284,6 +284,14 @@ class BodyPartInjuryRisk(object):
         self.last_movement_dysfunction_stress_date = None
         self.last_dysfunction_cause_date = None
 
+        #votes
+        self.overactive_short_vote_count = 0
+        self.overactive_long_vote_count = 0
+        self.underactive_short_vote_count = 0
+        self.underactive_long_vote_count = 0
+        self.weak_vote_count = 0
+        self.last_vote_updated_date_time = None
+
     def json_serialise(self):
         return {
                 "concentric_volume_last_week": self.concentric_volume_last_week,
@@ -431,6 +439,13 @@ class BodyPartInjuryRisk(object):
 
                 "last_movement_dysfunction_stress_date": format_date(self.last_movement_dysfunction_stress_date),
                 "last_dysfunction_cause_date": format_date(self.last_dysfunction_cause_date),
+
+                "overactive_short_vote_count": self.overactive_short_vote_count,
+                "overactive_long_vote_count": self.overactive_long_vote_count,
+                "underactive_short_vote_count": self.underactive_short_vote_count,
+                "underactive_long_vote_count": self.underactive_long_vote_count,
+                "weak_vote_count": self.weak_vote_count,
+                "last_vote_updated_date_time": self.last_vote_updated_date_time
 
         }
 
@@ -587,6 +602,13 @@ class BodyPartInjuryRisk(object):
         injury_risk.last_movement_dysfunction_stress_date = input_dict.get('last_movement_dysfunction_stress_date')
         injury_risk.last_dysfunction_cause_date = input_dict.get('last_dysfunction_cause_date')
 
+        injury_risk.overactive_short_vote_count = input_dict.get('overactive_short_vote_count',0)
+        injury_risk.overactive_long_vote_count = input_dict.get('overactive_long_vote_count',0)
+        injury_risk.underactive_short_vote_count = input_dict.get('underactive_short_vote_count',0)
+        injury_risk.underactive_long_vote_count = input_dict.get('underactive_long_vote_count',0)
+        injury_risk.weak_vote_count = input_dict.get('weak_vote_count', 0)
+        injury_risk.last_vote_updated_date_time = input_dict.get('last_vote_updated_date_time')
+
         return injury_risk
 
     def __setattr__(self, name, value):
@@ -715,6 +737,19 @@ class BodyPartInjuryRisk(object):
         self.last_dysfunction_cause_date = self.merge_with_none(self.last_dysfunction_cause_date,
                                                                 body_part_injury_risk.last_dysfunction_cause_date)
 
+        self.overactive_short_vote_count = max(self.overactive_short_vote_count, body_part_injury_risk.overactive_short_vote_count)
+        self.overactive_long_vote_count = max(self.overactive_long_vote_count,
+                                               body_part_injury_risk.overactive_long_vote_count)
+        self.underactive_short_vote_count = max(self.underactive_short_vote_count,
+                                               body_part_injury_risk.underactive_short_vote_count)
+        self.underactive_long_vote_count = max(self.underactive_long_vote_count,
+                                               body_part_injury_risk.overactive_short_vote_count)
+
+        self.weak_vote_count = max(self.weak_vote_count, body_part_injury_risk.weak_vote_count)
+
+        self.last_vote_updated_date_time = self.merge_with_none(self.last_vote_updated_date_time,
+                                                                body_part_injury_risk.last_vote_updated_date_time)
+
     def merge_tiers(self, value_a, value_b):
 
         if value_a > 0 and value_b > 0:
@@ -743,6 +778,38 @@ class BodyPartInjuryRisk(object):
             return True
         else:
             return False
+
+    def get_percentage(self, count_attribute):
+
+        attribute_list = ["overactive_short_vote_count", "overactive_long_vote_count", "underactive_short_vote_count", "underactive_long_vote_count"]
+
+        total_count = 0
+
+        for a in attribute_list:
+            total_count += getattr(self, a)
+
+        if total_count == 0:
+            return 0.0
+
+        percent = (getattr(self, count_attribute) / total_count) * 100
+
+        return percent
+
+    def is_highest_count(self, count_attribute):
+
+        attribute_list = ["overactive_short_vote_count", "overactive_long_vote_count", "underactive_short_vote_count",
+                          "underactive_long_vote_count"]
+
+        new_attribute_list = [a for a in attribute_list if a != count_attribute]
+
+        if getattr(self, count_attribute) == 0:
+            return False
+
+        for n in new_attribute_list:
+            if getattr(self, count_attribute) < getattr(self, n):
+                return False
+
+        return True
 
     def get_inflammation_severity(self, base_date):
 
@@ -1342,6 +1409,7 @@ class SessionFunctionalMovement(object):
         body_part_factory = BodyPartFactory()
         #body_part = body_part_factory.get_body_part(BodyPart(BodyPartLocation(body_part_enum), None))
         bilateral = body_part_factory.get_bilateral(BodyPartLocation(body_part_enum))
+
         # if bilateral:
         #     body_part_side = BodyPartSide(BodyPartLocation(p), side)
         # else:
@@ -1637,14 +1705,14 @@ class FunctionalMovementFactory(object):
 
         functional_movement = FunctionalMovement(FunctionalMovementType.ankle_dorsiflexion)
         functional_movement.prime_movers = [40]
-        functional_movement.antagonists = [41, 43, 44, 75]
+        functional_movement.antagonists = [41, 43, 44, 61]
         functional_movement.synergists = []
         return functional_movement
 
     def get_ankle_plantar_flexion(self):
 
         functional_movement = FunctionalMovement(FunctionalMovementType.ankle_plantar_flexion)
-        functional_movement.prime_movers = [43, 44, 75]
+        functional_movement.prime_movers = [43, 44, 61]
         functional_movement.antagonists = [40]
         functional_movement.synergists = [41, 42]
         return functional_movement
@@ -1653,7 +1721,7 @@ class FunctionalMovementFactory(object):
 
         functional_movement = FunctionalMovement(FunctionalMovementType.inversion_of_the_foot)
         functional_movement.prime_movers = [40, 42]
-        functional_movement.antagonists = [41, 43, 75]
+        functional_movement.antagonists = [41, 43, 61]
         functional_movement.synergists = [44]
         return functional_movement
 
@@ -1662,7 +1730,7 @@ class FunctionalMovementFactory(object):
         functional_movement = FunctionalMovement(FunctionalMovementType.eversion_of_the_foot)
         functional_movement.prime_movers = [41]
         functional_movement.antagonists = [40, 42, 44]
-        functional_movement.synergists = [43, 75]
+        functional_movement.synergists = [43, 61]
         return functional_movement
 
     def get_knee_flexion(self):
@@ -1670,14 +1738,14 @@ class FunctionalMovementFactory(object):
         functional_movement = FunctionalMovement(FunctionalMovementType.knee_flexion)
         functional_movement.prime_movers = [45, 46, 47, 48]
         functional_movement.antagonists = [55, 56, 57, 58]
-        functional_movement.synergists = [44, 75, 53]
+        functional_movement.synergists = [44, 61, 53]
         return functional_movement
 
     def get_knee_extension(self):
 
         functional_movement = FunctionalMovement(FunctionalMovementType.knee_extension)
         functional_movement.prime_movers = [55, 56, 57, 58]
-        functional_movement.antagonists = [44, 75, 45, 46, 47, 48, 53]
+        functional_movement.antagonists = [44, 61, 45, 46, 47, 48, 53]
         return functional_movement
 
     #TODO - what happened to thses
