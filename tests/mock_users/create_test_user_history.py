@@ -20,8 +20,8 @@ import movement_pattern_history as mph
 plans_version = "4_5"
 
 
-def login_user(email):
-    body = {"password": "Fathom123!", "personal_data": {"email": email}}
+def login_user(email, password="Fathom123!"):
+    body = {"password": password, "personal_data": {"email": email}}
     headers = {"Content-Type": "application/json"}
     url = "http://apis.{env}.fathomai.com/users/2_3/user/login".format(env=os.environ['ENVIRONMENT'])
     response = requests.post(url, data=json.dumps(body), headers=headers)
@@ -309,11 +309,21 @@ if __name__ == '__main__':
             soreness_history.append(right_it_band_no_question)
             # left_bicep_31_days_no_question = sh.create_body_part_history(sh.persistent_soreness_no_question_31_days(), 22, 1, False)
             # soreness_history.append(left_bicep_31_days_no_question)
-            user_id, jwt = login_user(u)
+            user_id, jwt = login_user(u, "Fathom123!")
             print(user_id)
+            history, session_details = mph.run_fake_regressions_a()
+
             persona1 = Persona(user_id)
+
+            persona1.elasticity_adf_dictionary = history
+            persona1.three_session_history = session_details
             persona1.soreness_history = soreness_history
-            last_plan_date_time = persona1.create_history(days=history_length, suffix='')
+            rpes = [None, None, 6, None, 5, None, 4,
+                    None, None, 6, None, 5, None, 4,
+                    None, None, 6, None, 5, None, 4,
+                    None, None, 6, None, 5, None, 4,
+                    None, None, 6, None, 5, None, 4]
+            last_plan_date_time = persona1.create_history(days=history_length, suffix='', end_today=False, rpes=rpes, log_output=True, jwt=jwt, user_name=u)
             clear_fte_category(InsightType.personalized_recovery, jwt, last_plan_date_time)
             clear_fte_category_view(InsightType.personalized_recovery,
                                     VisualizationType.prevention, jwt, last_plan_date_time)

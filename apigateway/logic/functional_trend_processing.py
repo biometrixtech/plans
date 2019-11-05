@@ -503,15 +503,15 @@ class TrendProcessor(object):
 
             trend.trigger_tiles = []
             if len(compensating) > 0:
-                trend.trigger_tiles.extend(self.get_body_part_list_trigger_tiles(compensating, "Symptom Reporting"))
+                trend.trigger_tiles.extend(self.get_body_part_list_trigger_tiles(compensating, "Symptom Reporting", LegendColor.warning_light))
             if len(movement_dysfunction) > 0:
-                trend.trigger_tiles.extend(self.get_body_part_list_trigger_tiles(movement_dysfunction, "Movement Dysfunction"))
+                trend.trigger_tiles.extend(self.get_body_part_list_trigger_tiles(movement_dysfunction, "Movement Dysfunction", LegendColor.warning_light))
             if len(high_stress) > 0:
-                trend.trigger_tiles.extend(self.get_body_part_list_trigger_tiles(high_stress, "Training - High"))
+                trend.trigger_tiles.extend(self.get_body_part_list_trigger_tiles(high_stress, "Training - High", LegendColor.success_light))
             if len(mod_stress) > 0:
-                trend.trigger_tiles.extend(self.get_body_part_list_trigger_tiles(mod_stress, "Training - Mod"))
+                trend.trigger_tiles.extend(self.get_body_part_list_trigger_tiles(mod_stress, "Training - Mod", LegendColor.success_light))
             if len(low_stress) > 0:
-                trend.trigger_tiles.extend(self.get_body_part_list_trigger_tiles(low_stress, "Training - Low"))
+                trend.trigger_tiles.extend(self.get_body_part_list_trigger_tiles(low_stress, "Training - Low", LegendColor.success_light))
 
             # trend.trigger_tiles.extend(self.get_trigger_tiles(excessive_strain_nfo))
             # trend.trigger_tiles.extend(self.get_trigger_tiles(compensating))
@@ -723,11 +723,11 @@ class TrendProcessor(object):
 
             trend.trigger_tiles = []
             if len(inflamed) > 0:
-                trend.trigger_tiles.extend(self.get_body_part_list_trigger_tiles(inflamed, "Inflamed"))
+                trend.trigger_tiles.extend(self.get_body_part_list_trigger_tiles(inflamed, "Inflamed", LegendColor.error_light))
             if len(muscle_spasm) > 0:
-                trend.trigger_tiles.extend(self.get_body_part_list_trigger_tiles(muscle_spasm, "Tight"))
+                trend.trigger_tiles.extend(self.get_body_part_list_trigger_tiles(muscle_spasm, "Tight", LegendColor.warning_light))
             if len(knots) > 0:
-                trend.trigger_tiles.extend(self.get_body_part_list_trigger_tiles(knots, "Tight"))
+                trend.trigger_tiles.extend(self.get_body_part_list_trigger_tiles(knots, "Tight", LegendColor.warning_light))
 
 
             # trend.trigger_tiles.extend(self.get_trigger_tiles(inflamed))
@@ -847,18 +847,18 @@ class TrendProcessor(object):
 
             trend.trigger_tiles = []
             if len(short) > 0:
-                trend.trigger_tiles.extend(self.get_body_part_list_trigger_tiles(short, "Short - Adhesions"))
+                trend.trigger_tiles.extend(self.get_body_part_list_trigger_tiles(short, "Short - Adhesions", LegendColor.warning_light))
             if len(overactive) > 0:
-                trend.trigger_tiles.extend(self.get_body_part_list_trigger_tiles(overactive, "Overactive"))
+                trend.trigger_tiles.extend(self.get_body_part_list_trigger_tiles(overactive, "Overactive", LegendColor.warning_light))
             if len(joint_artho) > 0:
-                trend.trigger_tiles.extend(self.get_body_part_list_trigger_tiles(joint_artho, "Altered Arthrokinematics"))
+                trend.trigger_tiles.extend(self.get_body_part_list_trigger_tiles(joint_artho, "Altered Arthrokinematics", LegendColor.warning_light))
             if len(tendin) > 0:
-                trend.trigger_tiles.extend(self.get_body_part_list_trigger_tiles(tendin, "Tendinopathy or Tendinosis"))
+                trend.trigger_tiles.extend(self.get_body_part_list_trigger_tiles(tendin, "Tendinopathy or Tendinosis", LegendColor.warning_light))
 
             if len(underactive_weak) > 0:
-                trend.trigger_tiles.extend(self.get_body_part_list_trigger_tiles(underactive_weak, "Weak"))
+                trend.trigger_tiles.extend(self.get_body_part_list_trigger_tiles(underactive_weak, "Weak", LegendColor.splash_light))
             if len(underactive_inhibited) > 0:
-                trend.trigger_tiles.extend(self.get_body_part_list_trigger_tiles(underactive_inhibited, "Inhibited"))
+                trend.trigger_tiles.extend(self.get_body_part_list_trigger_tiles(underactive_inhibited, "Inhibited", LegendColor.splash_light))
 
             # underactive_list = []
             # underactive_list.extend(underactive_weak)
@@ -1012,7 +1012,7 @@ class TrendProcessor(object):
                 tiles.append(tile_1)
         return tiles
 
-    def get_body_part_list_trigger_tiles(self, body_part_sides, title):
+    def get_body_part_list_trigger_tiles(self, body_part_sides, title, color):
 
         care_fss_body_parts = set()
         tiles = []
@@ -1046,10 +1046,10 @@ class TrendProcessor(object):
         # tile_1.text = "Foam Roll & Static Stretch your " + body_part_text_1
         tile_1.text = title
         tile_1.description = body_part_text_string
-        # bold_1 = BoldText()
-        # bold_1.text = "Foam Roll & Static Stretch"
-        # bold_1.color = LegendColor.warning_x_light
-        # tile_1.bold_text.append(bold_1)
+        bold_1 = BoldText()
+        bold_1.text = body_part_text_string
+        bold_1.color = LegendColor.warning_x_light
+        tile_1.bold_text.append(bold_1)
         # tile_1.statistic_text = statistic_text
         # tile_1.bold_statistic_text = bold_statistic_text
         ## tile_1.trigger_type = t.trigger_type
