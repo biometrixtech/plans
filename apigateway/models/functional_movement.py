@@ -280,6 +280,18 @@ class BodyPartInjuryRisk(object):
         self.last_tendinosis_date = None
         self.last_altered_joint_arthokinematics_date = None
 
+        # movement dysfunction
+        self.last_movement_dysfunction_stress_date = None
+        self.last_dysfunction_cause_date = None
+
+        #votes
+        self.overactive_short_vote_count = 0
+        self.overactive_long_vote_count = 0
+        self.underactive_short_vote_count = 0
+        self.underactive_long_vote_count = 0
+        self.weak_vote_count = 0
+        self.last_vote_updated_date_time = None
+
     def json_serialise(self):
         return {
                 "concentric_volume_last_week": self.concentric_volume_last_week,
@@ -424,6 +436,16 @@ class BodyPartInjuryRisk(object):
                 "last_tendinopathy_date": format_date(self.last_tendinopathy_date),
                 "last_tendinosis_date": format_date(self.last_tendinosis_date),
                 "last_altered_joint_arthokinematics_date": format_date(self.last_altered_joint_arthokinematics_date),
+
+                "last_movement_dysfunction_stress_date": format_date(self.last_movement_dysfunction_stress_date),
+                "last_dysfunction_cause_date": format_date(self.last_dysfunction_cause_date),
+
+                "overactive_short_vote_count": self.overactive_short_vote_count,
+                "overactive_long_vote_count": self.overactive_long_vote_count,
+                "underactive_short_vote_count": self.underactive_short_vote_count,
+                "underactive_long_vote_count": self.underactive_long_vote_count,
+                "weak_vote_count": self.weak_vote_count,
+                "last_vote_updated_date_time": self.last_vote_updated_date_time
 
         }
 
@@ -576,6 +598,17 @@ class BodyPartInjuryRisk(object):
         injury_risk.last_tendinosis_date = input_dict.get('last_tendinosis_date')
         injury_risk.last_altered_joint_arthokinematics_date = input_dict.get('last_altered_joint_arthokinematics_date')
 
+        # movement dysfunction
+        injury_risk.last_movement_dysfunction_stress_date = input_dict.get('last_movement_dysfunction_stress_date')
+        injury_risk.last_dysfunction_cause_date = input_dict.get('last_dysfunction_cause_date')
+
+        injury_risk.overactive_short_vote_count = input_dict.get('overactive_short_vote_count',0)
+        injury_risk.overactive_long_vote_count = input_dict.get('overactive_long_vote_count',0)
+        injury_risk.underactive_short_vote_count = input_dict.get('underactive_short_vote_count',0)
+        injury_risk.underactive_long_vote_count = input_dict.get('underactive_long_vote_count',0)
+        injury_risk.weak_vote_count = input_dict.get('weak_vote_count', 0)
+        injury_risk.last_vote_updated_date_time = input_dict.get('last_vote_updated_date_time')
+
         return injury_risk
 
     def __setattr__(self, name, value):
@@ -699,6 +732,24 @@ class BodyPartInjuryRisk(object):
         self.total_volume_percent_tier = self.merge_tiers(self.total_volume_percent_tier,
                                                    body_part_injury_risk.total_volume_percent_tier)
 
+        self.last_movement_dysfunction_stress_date = self.merge_with_none(self.last_movement_dysfunction_stress_date,
+                                                                          body_part_injury_risk.last_movement_dysfunction_stress_date)
+        self.last_dysfunction_cause_date = self.merge_with_none(self.last_dysfunction_cause_date,
+                                                                body_part_injury_risk.last_dysfunction_cause_date)
+
+        self.overactive_short_vote_count = max(self.overactive_short_vote_count, body_part_injury_risk.overactive_short_vote_count)
+        self.overactive_long_vote_count = max(self.overactive_long_vote_count,
+                                               body_part_injury_risk.overactive_long_vote_count)
+        self.underactive_short_vote_count = max(self.underactive_short_vote_count,
+                                               body_part_injury_risk.underactive_short_vote_count)
+        self.underactive_long_vote_count = max(self.underactive_long_vote_count,
+                                               body_part_injury_risk.overactive_short_vote_count)
+
+        self.weak_vote_count = max(self.weak_vote_count, body_part_injury_risk.weak_vote_count)
+
+        self.last_vote_updated_date_time = self.merge_with_none(self.last_vote_updated_date_time,
+                                                                body_part_injury_risk.last_vote_updated_date_time)
+
     def merge_tiers(self, value_a, value_b):
 
         if value_a > 0 and value_b > 0:
@@ -727,6 +778,38 @@ class BodyPartInjuryRisk(object):
             return True
         else:
             return False
+
+    def get_percentage(self, count_attribute):
+
+        attribute_list = ["overactive_short_vote_count", "overactive_long_vote_count", "underactive_short_vote_count", "underactive_long_vote_count"]
+
+        total_count = 0
+
+        for a in attribute_list:
+            total_count += getattr(self, a)
+
+        if total_count == 0:
+            return 0.0
+
+        percent = (getattr(self, count_attribute) / total_count) * 100
+
+        return percent
+
+    def is_highest_count(self, count_attribute):
+
+        attribute_list = ["overactive_short_vote_count", "overactive_long_vote_count", "underactive_short_vote_count",
+                          "underactive_long_vote_count"]
+
+        new_attribute_list = [a for a in attribute_list if a != count_attribute]
+
+        if getattr(self, count_attribute) == 0:
+            return False
+
+        for n in new_attribute_list:
+            if getattr(self, count_attribute) < getattr(self, n):
+                return False
+
+        return True
 
     def get_inflammation_severity(self, base_date):
 
@@ -1157,8 +1240,6 @@ class SessionFunctionalMovement(object):
     #
     #                 self.mark_hip_extension_compensating(side)
     #
-    #             # TODO - add long muscle imbalance (antagonists); not sure how to do it yet
-    #
     #             # checking for underactive inhibited or weak
     #             # check for evidence of short else assume and mark long (by muscle)
     #             # adhesions reported or (63, 64, 66, 73, 74, 21) is short muscle imbalance
@@ -1326,6 +1407,7 @@ class SessionFunctionalMovement(object):
         body_part_factory = BodyPartFactory()
         #body_part = body_part_factory.get_body_part(BodyPart(BodyPartLocation(body_part_enum), None))
         bilateral = body_part_factory.get_bilateral(BodyPartLocation(body_part_enum))
+
         # if bilateral:
         #     body_part_side = BodyPartSide(BodyPartLocation(p), side)
         # else:
@@ -1359,12 +1441,23 @@ class FunctionalMovementActivityMapping(object):
 
         compensation_causing_prime_movers = self.get_compensating_body_parts(injury_risk_dict, event_date)
 
-        compensated_concentric_volume = training_volume * self.concentric_level * .04
-        compensated_eccentric_volume = training_volume * self.eccentric_level * .04
+        for c, severity in compensation_causing_prime_movers.items():
+            if severity <= 2:
+                factor = .04
+            elif 2 < severity <= 5:
+                factor = .08
+            elif 5 < severity <= 8:
+                factor = .16
+            else:
+                factor = .20
 
-        for c in compensation_causing_prime_movers:
+            compensated_concentric_volume = training_volume * self.concentric_level * factor
+            compensated_eccentric_volume = training_volume * self.eccentric_level * factor
+
             for s in self.synergists:
                 if c.side == s.body_part_side.side or c.side == 0 or s.body_part_side.side == 0:
+                    if factor != .04:
+                        p=0
                     synergist_compensated_concentric_volume = compensated_concentric_volume / float(len(self.synergists))
                     synergist_compensated_eccentric_volume = compensated_eccentric_volume / float(len(self.synergists))
                     s.body_part_function = BodyPartFunction.synergist
@@ -1396,10 +1489,19 @@ class FunctionalMovementActivityMapping(object):
 
         compensation_causing_prime_movers = self.get_compensating_body_parts(injury_risk_dict, event_date)
 
-        compensated_concentric_intensity = intensity * self.concentric_level * .04
-        compensated_eccentric_intensity = intensity * self.eccentric_level * .04
+        for c, severity in compensation_causing_prime_movers.items():
+            if severity <= 2:
+                factor = .04
+            elif 2 < severity <= 5:
+                factor = .08
+            elif 5 < severity <= 8:
+                factor = .16
+            else:
+                factor = .20
 
-        for c in compensation_causing_prime_movers:
+            compensated_concentric_intensity = intensity * self.concentric_level * factor
+            compensated_eccentric_intensity = intensity * self.eccentric_level * factor
+
             for s in self.synergists:
                 if c.side == s.body_part_side.side or c.side == 0 or s.body_part_side.side == 0:
                     synergist_compensated_concentric_intensity = compensated_concentric_intensity / float(len(self.synergists))
@@ -1474,7 +1576,7 @@ class FunctionalMovementActivityMapping(object):
 
     def get_compensating_body_parts(self, injury_risk_dict, event_date):
 
-        affected_list = []
+        affected_list = {}
 
         two_days_ago = event_date - timedelta(days=1)
 
@@ -1483,32 +1585,46 @@ class FunctionalMovementActivityMapping(object):
             if f.body_part_side in injury_risk_dict:
                 if (injury_risk_dict[f.body_part_side].last_weak_date is not None and
                         injury_risk_dict[f.body_part_side].last_weak_date == event_date):
-                    affected_list.append(f.body_part_side)
+                    if f.body_part_side not in affected_list:
+                        affected_list[f.body_part_side] = 0
                 if (injury_risk_dict[f.body_part_side].last_muscle_spasm_date is not None and
                         injury_risk_dict[f.body_part_side].last_muscle_spasm_date == event_date):
-                    affected_list.append(f.body_part_side)
+                    if f.body_part_side not in affected_list:
+                        affected_list[f.body_part_side] = 0
+                    affected_list[f.body_part_side] = max(affected_list[f.body_part_side],
+                                                          injury_risk_dict[f.body_part_side].get_muscle_spasm_severity(event_date))
                 if (injury_risk_dict[f.body_part_side].last_adhesions_date is not None and
                         injury_risk_dict[f.body_part_side].last_adhesions_date == event_date):
-                    affected_list.append(f.body_part_side)
+                    if f.body_part_side not in affected_list:
+                        affected_list[f.body_part_side] = 0
+                    affected_list[f.body_part_side] = max(affected_list[f.body_part_side],
+                                                          injury_risk_dict[f.body_part_side].get_adhesions_severity(event_date))
                 if (injury_risk_dict[f.body_part_side].last_short_date is not None and
                         injury_risk_dict[f.body_part_side].last_short_date == event_date):
-                    affected_list.append(f.body_part_side)
+                    if f.body_part_side not in affected_list:
+                        affected_list[f.body_part_side] = 0
                 if (injury_risk_dict[f.body_part_side].last_long_date is not None and
                         injury_risk_dict[f.body_part_side].last_long_date == event_date):
-                    affected_list.append(f.body_part_side)
+                    if f.body_part_side not in affected_list:
+                        affected_list[f.body_part_side] = 0
                 if (injury_risk_dict[f.body_part_side].last_inhibited_date is not None and
                         injury_risk_dict[f.body_part_side].last_inhibited_date == event_date):
-                    affected_list.append(f.body_part_side)
+                    if f.body_part_side not in affected_list:
+                        affected_list[f.body_part_side] = 0
                 if (injury_risk_dict[f.body_part_side].last_inflammation_date is not None and
                         injury_risk_dict[f.body_part_side].last_inflammation_date == event_date):
-                    affected_list.append(f.body_part_side)
+                    if f.body_part_side not in affected_list:
+                        affected_list[f.body_part_side] = 0
+                    affected_list[f.body_part_side] = max(affected_list[f.body_part_side],
+                                                          injury_risk_dict[f.body_part_side].get_inflammation_severity(event_date))
                 if (injury_risk_dict[f.body_part_side].last_excessive_strain_date is not None and
                         injury_risk_dict[f.body_part_side].last_non_functional_overreaching_date is not None and
                         injury_risk_dict[f.body_part_side].last_excessive_strain_date >= two_days_ago and
                         injury_risk_dict[f.body_part_side].last_non_functional_overreaching_date >= two_days_ago):
-                    affected_list.append(f.body_part_side)
+                    if f.body_part_side not in affected_list:
+                        affected_list[f.body_part_side] = 0
 
-        affected_list = list(set(affected_list))
+        #affected_list = list(set(affected_list))
 
         return affected_list
 
@@ -1524,23 +1640,23 @@ class ActivityFunctionalMovementFactory(object):
         mapping.append(
             FunctionalMovementActivityMapping(FunctionalMovementType.ankle_dorsiflexion, True, .0025, False, 0))
         mapping.append(
-            FunctionalMovementActivityMapping(FunctionalMovementType.ankle_plantar_flexion, True, .01425, False, 0))
+            FunctionalMovementActivityMapping(FunctionalMovementType.ankle_plantar_flexion, True, .019, False, 0))
         mapping.append(
-            FunctionalMovementActivityMapping(FunctionalMovementType.inversion_of_the_foot, True, .019, False, 0))
+            FunctionalMovementActivityMapping(FunctionalMovementType.inversion_of_the_foot, True, .0253, False, 0))
         mapping.append(
-            FunctionalMovementActivityMapping(FunctionalMovementType.eversion_of_the_foot, False, 0, True, .0475))
+            FunctionalMovementActivityMapping(FunctionalMovementType.eversion_of_the_foot, False, 0, True, .03167))
         mapping.append(
-            FunctionalMovementActivityMapping(FunctionalMovementType.knee_flexion, True, 0.125, True, .1188))
+            FunctionalMovementActivityMapping(FunctionalMovementType.knee_flexion, True, 0.01, True, .079167))
         mapping.append(
-            FunctionalMovementActivityMapping(FunctionalMovementType.knee_extension, True, .1188, False, 0))
+            FunctionalMovementActivityMapping(FunctionalMovementType.knee_extension, True, .1583, False, 0))
         mapping.append(
-            FunctionalMovementActivityMapping(FunctionalMovementType.hip_adduction, False, 0, True, .0713))
+            FunctionalMovementActivityMapping(FunctionalMovementType.hip_adduction, False, 0, True, .0475))
         mapping.append(
-            FunctionalMovementActivityMapping(FunctionalMovementType.hip_abduction, True, .0380, False, 0))
+            FunctionalMovementActivityMapping(FunctionalMovementType.hip_abduction, True, .05067, False, 0))
         mapping.append(
-            FunctionalMovementActivityMapping(FunctionalMovementType.hip_extension, True, .2850, False, 0))
+            FunctionalMovementActivityMapping(FunctionalMovementType.hip_extension, True, .38, False, 0))
         mapping.append(
-            FunctionalMovementActivityMapping(FunctionalMovementType.hip_flexion, True, .0375, True, .2375))
+            FunctionalMovementActivityMapping(FunctionalMovementType.hip_flexion, True, .0375, True, .1583))
 
         return mapping
 
@@ -1587,14 +1703,14 @@ class FunctionalMovementFactory(object):
 
         functional_movement = FunctionalMovement(FunctionalMovementType.ankle_dorsiflexion)
         functional_movement.prime_movers = [40]
-        functional_movement.antagonists = [41, 43, 44, 75]
+        functional_movement.antagonists = [41, 43, 44, 61]
         functional_movement.synergists = []
         return functional_movement
 
     def get_ankle_plantar_flexion(self):
 
         functional_movement = FunctionalMovement(FunctionalMovementType.ankle_plantar_flexion)
-        functional_movement.prime_movers = [43, 44, 75]
+        functional_movement.prime_movers = [43, 44, 61]
         functional_movement.antagonists = [40]
         functional_movement.synergists = [41, 42]
         return functional_movement
@@ -1603,7 +1719,7 @@ class FunctionalMovementFactory(object):
 
         functional_movement = FunctionalMovement(FunctionalMovementType.inversion_of_the_foot)
         functional_movement.prime_movers = [40, 42]
-        functional_movement.antagonists = [41, 43, 75]
+        functional_movement.antagonists = [41, 43, 61]
         functional_movement.synergists = [44]
         return functional_movement
 
@@ -1612,7 +1728,7 @@ class FunctionalMovementFactory(object):
         functional_movement = FunctionalMovement(FunctionalMovementType.eversion_of_the_foot)
         functional_movement.prime_movers = [41]
         functional_movement.antagonists = [40, 42, 44]
-        functional_movement.synergists = [43, 75]
+        functional_movement.synergists = [43, 61]
         return functional_movement
 
     def get_knee_flexion(self):
@@ -1620,30 +1736,15 @@ class FunctionalMovementFactory(object):
         functional_movement = FunctionalMovement(FunctionalMovementType.knee_flexion)
         functional_movement.prime_movers = [45, 46, 47, 48]
         functional_movement.antagonists = [55, 56, 57, 58]
-        functional_movement.synergists = [44, 75, 53]
+        functional_movement.synergists = [44, 61, 53]
         return functional_movement
 
     def get_knee_extension(self):
 
         functional_movement = FunctionalMovement(FunctionalMovementType.knee_extension)
         functional_movement.prime_movers = [55, 56, 57, 58]
-        functional_movement.antagonists = [44, 75, 45, 46, 47, 48, 53]
+        functional_movement.antagonists = [44, 61, 45, 46, 47, 48, 53]
         return functional_movement
-
-    #TODO - what happened to thses
-    # def get_tibial_external_rotation(self):
-    #
-    #     functional_movement = FunctionalMovement(FunctionalMovementType.tibial_external_rotation)
-    #     functional_movement.prime_movers = [45, 46]
-    #     functional_movement.antagonists = [47, 48]
-    #     return functional_movement
-    #
-    # def get_tibial_internal_rotation(self):
-    #
-    #     functional_movement = FunctionalMovement(FunctionalMovementType.tibial_internal_rotation)
-    #     functional_movement.prime_movers = [47, 48]
-    #     functional_movement.antagonists = [45, 46, 53]
-    #     return functional_movement
 
     def get_hip_extension(self):
 

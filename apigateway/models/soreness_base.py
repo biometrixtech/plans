@@ -1,5 +1,7 @@
 from enum import IntEnum, Enum
 from datetime import datetime
+from models.styles import LegendColor
+
 
 class HistoricSorenessStatus(IntEnum):
     dormant_cleared = 0
@@ -285,3 +287,35 @@ class BodyPartSide(object):
     @classmethod
     def json_deserialise(cls, input_dict):
         return cls(BodyPartLocation(input_dict['body_part_location']), input_dict['side'])
+
+
+class BodyPartSideViz(object):
+    def __init__(self, body_part_location, side, color):
+        self.body_part_location = body_part_location
+        self.side = side
+        self.color = color
+
+    def __hash__(self):
+        return hash((self.body_part_location.value, self.side, self.color))
+
+    def __eq__(self, other):
+        return self.body_part_location == other.body_part_location and self.side == other.side and self.color == other.color
+
+    def __ne__(self, other):
+        # Not strictly necessary, but to avoid having both x==y and x!=y
+        # True at the same time
+        return not (self == other)
+
+    def json_serialise(self):
+        return {
+            "body_part_location": self.body_part_location.value,
+            "side": self.side,
+            "color": self.color.value if self.color is not None else None
+        }
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        legend_color = input_dict.get('color')
+        if legend_color is not None:
+            legend_color = LegendColor(legend_color)
+        return cls(BodyPartLocation(input_dict['body_part_location']), input_dict['side'], legend_color)

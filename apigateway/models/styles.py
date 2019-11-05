@@ -40,6 +40,14 @@ class LegendColor(Enum):
     splash_half = 14
     splash_xx_light = 15
     warning_x_light = 16
+    error_x_light = 17
+    error_xx_light = 18
+    splash_m_light = 19
+    success_x_light = 20
+    success_xx_light = 21
+    warning_xx_light = 22
+    yellow_x_light = 23
+    yellow_xx_light = 24
 
 
 class Legend(object):

@@ -40,11 +40,11 @@ class FunctionalAnatomyProcessor(object):
 
     def get_related_muscles_for_ligament(self, ligament_value):
 
-        if ligament_value == BodyPartLocation.it_band:
+        if ligament_value == BodyPartLocation.it_band.value:
             return [59]
-        elif ligament_value == BodyPartLocation.it_band_lateral_knee:
+        elif ligament_value == BodyPartLocation.it_band_lateral_knee.value:
             return [59]
-        elif ligament_value == BodyPartLocation.achilles:
+        elif ligament_value == BodyPartLocation.achilles.value:
             return [43, 44]
 
     #  This is not used and also became outdated

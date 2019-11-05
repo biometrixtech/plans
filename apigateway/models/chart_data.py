@@ -5,7 +5,7 @@ from fathomapi.utils.exceptions import InvalidSchemaException
 from models.styles import BoldText
 from models.soreness import Soreness
 from models.body_parts import BodyPart
-from models.soreness_base import BodyPartSide
+from models.soreness_base import BodyPartSide, BodyPartSideViz
 from models.sport import SportName
 from models.session import SportTrainingSession, SessionSource
 from models.asymmetry import VisualizedLeftRightAsymmetry
@@ -1416,8 +1416,8 @@ class CareChartData(BaseOveractiveUnderactiveChartData, Serialisable):
     @classmethod
     def json_deserialise(cls, input_dict):
         chart_data = cls()
-        chart_data.inflamed = [BodyPartSide.json_deserialise(a) for a in input_dict.get('inflamed', [])]
-        chart_data.tight = [BodyPartSide.json_deserialise(a) for a in input_dict.get('tight', [])]
+        chart_data.inflamed = [BodyPartSideViz.json_deserialise(a) for a in input_dict.get('inflamed', [])]
+        chart_data.tight = [BodyPartSideViz.json_deserialise(a) for a in input_dict.get('tight', [])]
         return chart_data
 
     def remove_duplicates(self):
@@ -1502,51 +1502,35 @@ class PreventionChartData(BaseOveractiveUnderactiveChartData, Serialisable):
 class Prevention3sChartData(BaseOveractiveUnderactiveChartData, Serialisable):
     def __init__(self):
         super().__init__()
-        self.overactive = []
-        self.weak = []
-        self.short = []
+        self.limited_mobility = []
+        self.underactive = []
 
     def json_serialise(self):
         ret = {
-            'overactive': [a.json_serialise() for a in self.overactive if self.overactive is not None],
-            'weak': [a.json_serialise() for a in self.weak if self.weak is not None],
-            'short': [a.json_serialise() for a in self.short if self.short is not None],
+            'limited_mobility': [a.json_serialise() for a in self.limited_mobility if self.limited_mobility is not None],
+            'underactive': [a.json_serialise() for a in self.underactive if self.underactive is not None],
         }
         return ret
 
     @classmethod
     def json_deserialise(cls, input_dict):
         chart_data = cls()
-        chart_data.overactive = [BodyPartSide.json_deserialise(a) for a in input_dict.get('overactive', [])]
-        chart_data.weak = [BodyPartSide.json_deserialise(a) for a in input_dict.get('weak', [])]
-        chart_data.short = [BodyPartSide.json_deserialise(a) for a in input_dict.get('short', [])]
+        chart_data.limited_mobility = [BodyPartSideViz.json_deserialise(a) for a in input_dict.get('limited_mobility', [])]
+        chart_data.underactive = [BodyPartSideViz.json_deserialise(a) for a in input_dict.get('underactive', [])]
+
         return chart_data
 
     def remove_duplicates(self):
 
-        self.weak = list(set(self.weak))
-        self.overactive = list(set(self.overactive))
-        self.short = list(set(self.short))
+        self.underactive = list(set(self.underactive))
+        self.limited_mobility = list(set(self.limited_mobility))
 
-        unc_delete = []
         una_delete = []
 
         id = 0
-        for u in self.short:
-            index = next((i for i, x in enumerate(self.overactive) if u == x), -1)
-            index_2 = next((i for i, x in enumerate(self.weak) if u == x), -1)
-            if index > -1 or index_2 > -1:
-                unc_delete.append(id)
-            id += 1
 
-        unc_delete.sort(reverse=True)  # need to remove in reverse order so we don't mess up indexes along the way
-
-        for d in unc_delete:
-            del(self.short[d])
-
-        id = 0
-        for u in self.overactive:
-            index = next((i for i, x in enumerate(self.weak) if u == x), -1)
+        for u in self.underactive:
+            index = next((i for i, x in enumerate(self.limited_mobility) if u == x), -1)
             if index > -1:
                 una_delete.append(id)
             id += 1
@@ -1554,8 +1538,7 @@ class Prevention3sChartData(BaseOveractiveUnderactiveChartData, Serialisable):
         una_delete.sort(reverse=True)
 
         for d in una_delete:
-            del(self.overactive[d])
-
+            del(self.underactive[d])
 
 
 class PersonalizedRecoveryChartData(BaseOveractiveUnderactiveChartData, Serialisable):
@@ -1602,53 +1585,34 @@ class PersonalizedRecoveryChartData(BaseOveractiveUnderactiveChartData, Serialis
 class RecoveryChartData(BaseOveractiveUnderactiveChartData, Serialisable):
     def __init__(self):
         super().__init__()
-        self.over_stressed = []
-        self.moderate_stress = []
-        self.high_stress = []
+        self.compensation_stress = []
+        self.training_stress = []
 
     def json_serialise(self):
         ret = {
-            'over_stressed': [a.json_serialise() for a in self.over_stressed if self.over_stressed is not None],
-            'moderate_stress': [a.json_serialise() for a in self.moderate_stress if self.moderate_stress is not None],
-            'high_stress': [a.json_serialise() for a in self.high_stress if
-                                     self.high_stress is not None],
+            'compensation_stress': [a.json_serialise() for a in self.compensation_stress if self.compensation_stress is not None],
+            'training_stress': [a.json_serialise() for a in self.training_stress if self.training_stress is not None],
         }
         return ret
 
     @classmethod
     def json_deserialise(cls, input_dict):
         chart_data = cls()
-        chart_data.over_stressed = [BodyPartSide.json_deserialise(a) for a in input_dict.get('over_stressed', [])]
-        chart_data.moderate_stress = [BodyPartSide.json_deserialise(a) for a in input_dict.get('moderate_stress', [])]
-        chart_data.high_stress = [BodyPartSide.json_deserialise(a) for a in
-                                  input_dict.get('high_stress', [])]
+        chart_data.compensation_stress = [BodyPartSideViz.json_deserialise(a) for a in input_dict.get('compensation_stress', [])]
+        chart_data.training_stress = [BodyPartSideViz.json_deserialise(a) for a in
+                                      input_dict.get('training_stress', [])]
         return chart_data
 
     def remove_duplicates(self):
 
-        self.over_stressed = list(set(self.over_stressed))
-        self.high_stress = list(set(self.high_stress))
-        self.moderate_stress = list(set(self.moderate_stress))
+        self.compensation_stress = list(set(self.compensation_stress))
+        self.training_stress = list(set(self.training_stress))
 
-        unc_delete = []
         una_delete = []
 
         id = 0
-        for u in self.moderate_stress:
-            index = next((i for i, x in enumerate(self.over_stressed) if u == x), -1)
-            index_2 = next((i for i, x in enumerate(self.high_stress) if u == x), -1)
-            if index > -1 or index_2 > -1:
-                unc_delete.append(id)
-            id += 1
-
-        unc_delete.sort(reverse=True)  # need to remove in reverse order so we don't mess up indexes along the way
-
-        for d in unc_delete:
-            del (self.moderate_stress[d])
-
-        id = 0
-        for u in self.high_stress:
-            index = next((i for i, x in enumerate(self.over_stressed) if u == x), -1)
+        for u in self.training_stress:
+            index = next((i for i, x in enumerate(self.compensation_stress) if u == x), -1)
             if index > -1:
                 una_delete.append(id)
             id += 1
@@ -1656,7 +1620,7 @@ class RecoveryChartData(BaseOveractiveUnderactiveChartData, Serialisable):
         una_delete.sort(reverse=True)
 
         for d in una_delete:
-            del (self.high_stress[d])
+            del (self.training_stress[d])
 
 
 

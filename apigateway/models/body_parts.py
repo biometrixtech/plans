@@ -260,7 +260,7 @@ class BodyPartFactory(object):
                                   BodyPartLocation.abdominals,
                                   BodyPartLocation.lower_back,
                                   BodyPartLocation.upper_back_neck,
-                                  BodyPartLocation.external_obliques]:
+                                  BodyPartLocation.rectus_abdominis]:
             return False
         else:
             return True

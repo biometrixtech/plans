@@ -919,9 +919,9 @@ class ActiveRest(ModalityBase):
     def check_care_knots(self, body_part_side, body_part_injury_risk, exercise_library, max_severity):
         pass
 
-    @abc.abstractmethod
-    def check_care_movement_pattern(self, body_part_side, body_part_injury_risk, exercise_library, max_severity):
-        pass
+    # @abc.abstractmethod
+    # def check_care_movement_pattern(self, body_part_side, body_part_injury_risk, exercise_library, max_severity):
+    #     pass
 
     @abc.abstractmethod
     def check_care_muscle_spasm(self, body_part_side, body_part_injury_risk, exercise_library, max_severity):
@@ -1089,7 +1089,7 @@ class ActiveRest(ModalityBase):
             self.check_care_inflammation(body_part, body_part_injury_risk, exercise_library, max_severity)
             self.check_care_muscle_spasm(body_part, body_part_injury_risk, exercise_library, max_severity)
             self.check_care_knots(body_part, body_part_injury_risk, exercise_library, max_severity)
-            self.check_care_movement_pattern(body_part, body_part_injury_risk, exercise_library, max_severity)
+            #self.check_care_movement_pattern(body_part, body_part_injury_risk, exercise_library, max_severity)
             self.check_prevention(body_part, body_part_injury_risk, exercise_library, max_severity)
 
     def get_last_severity(self, body_part_injury_risk):
@@ -1398,30 +1398,38 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
 
         #body_part_factory = BodyPartFactory()
 
-        if (body_part_injury_risk.last_compensation_date is not None
+        compensating = False
+
+        if (body_part_injury_risk.last_movement_dysfunction_stress_date is not None and
+            body_part_injury_risk.last_movement_dysfunction_stress_date == self.event_date_time.date()):
+            priority = "1"
+            compensating = True
+        elif (body_part_injury_risk.last_compensation_date is not None
                 and body_part_injury_risk.last_compensation_date == self.event_date_time.date() and
                 body_part_injury_risk.total_compensation_percent_tier <= 3):
+            priority = str(body_part_injury_risk.total_compensation_percent_tier)
+            compensating = True
 
-            #body_part = body_part_factory.get_body_part(body_part_side)
+        if compensating:
 
             goal = AthleteGoal("Compensations", 1, AthleteGoalType.asymmetric_session)
 
-            # if body_part_injury_risk.prime_mover_total_volume_today() > body_part_injury_risk.synergist_total_volume_today():
-            #     priority = "2"
-            # else:
-            #     priority = "1"
+        # if body_part_injury_risk.prime_mover_total_volume_today() > body_part_injury_risk.synergist_total_volume_today():
+        #     priority = "2"
+        # else:
+        #     priority = "1"
 
-            if body_part is not None:
+        #if body_part is not None:
 
-                #last_severity = self.get_last_severity(body_part_injury_risk)
-                last_severity = 2.5 # hacking this now
+            #last_severity = self.get_last_severity(body_part_injury_risk)
+            last_severity = 2.5 # hacking this now
 
-                self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, str(body_part_injury_risk.total_compensation_percent_tier), last_severity,
-                                    exercise_library)
+            self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, priority, last_severity,
+                                exercise_library)
 
-                if max_severity < 7.0:
-                    self.copy_exercises(body_part.active_stretch_exercises, self.active_stretch_exercises, goal,
-                                        str(body_part_injury_risk.total_compensation_percent_tier), last_severity, exercise_library)
+            if max_severity < 7.0:
+                self.copy_exercises(body_part.active_stretch_exercises, self.active_stretch_exercises, goal,
+                                    priority, last_severity, exercise_library)
 
     def check_care_inflammation(self, body_part, body_part_injury_risk, exercise_library, max_severity):
 
@@ -1436,7 +1444,8 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
 
             if body_part is not None:
 
-                last_severity = self.get_last_severity(body_part_injury_risk)
+                #last_severity = self.get_last_severity(body_part_injury_risk)
+                last_severity = body_part_injury_risk.get_inflammation_severity(self.event_date_time.date())
 
                 self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1", last_severity, exercise_library)
 
@@ -1457,7 +1466,8 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
 
             if body_part is not None:
 
-                last_severity = self.get_last_severity(body_part_injury_risk)
+                #last_severity = self.get_last_severity(body_part_injury_risk)
+                last_severity = body_part_injury_risk.get_muscle_spasm_severity(self.event_date_time.date())
 
                 self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1", last_severity, exercise_library)
 
@@ -1492,30 +1502,30 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
                     self.copy_exercises(body_part.active_stretch_exercises, self.active_stretch_exercises, goal, "1",
                                         last_severity, exercise_library)
 
-    def check_care_movement_pattern(self, body_part, body_part_injury_risk, exercise_library, max_severity):
-
-        #body_part_factory = BodyPartFactory()
-
-        if (body_part_injury_risk.last_overactive_short_date is not None and
-                body_part_injury_risk.last_overactive_short_date == self.event_date_time.date() and
-                body_part_injury_risk.overactive_short_count_last_0_20_days < 3):
-
-            #body_part = body_part_factory.get_body_part(body_part_side)
-
-            goal = AthleteGoal("Tightness", 1, AthleteGoalType.sore)
-
-            if body_part is not None:
-
-                #last_severity = self.get_last_severity(body_part_injury_risk)
-                last_severity = 2.5
-
-                self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1", last_severity, exercise_library)
-
-                if max_severity < 7.0:
-                    self.copy_exercises(body_part.static_stretch_exercises, self.static_stretch_exercises, goal, "1",
-                                        last_severity, exercise_library)
-                    self.copy_exercises(body_part.active_stretch_exercises, self.active_stretch_exercises, goal, "1",
-                                        last_severity, exercise_library)
+    # def check_care_movement_pattern(self, body_part, body_part_injury_risk, exercise_library, max_severity):
+    #
+    #     #body_part_factory = BodyPartFactory()
+    #
+    #     if (body_part_injury_risk.last_overactive_short_date is not None and
+    #             body_part_injury_risk.last_overactive_short_date == self.event_date_time.date() and
+    #             body_part_injury_risk.overactive_short_count_last_0_20_days < 3):
+    #
+    #         #body_part = body_part_factory.get_body_part(body_part_side)
+    #
+    #         goal = AthleteGoal("Tightness", 1, AthleteGoalType.sore)
+    #
+    #         if body_part is not None:
+    #
+    #             #last_severity = self.get_last_severity(body_part_injury_risk)
+    #             last_severity = 2.5
+    #
+    #             self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1", last_severity, exercise_library)
+    #
+    #             if max_severity < 7.0:
+    #                 self.copy_exercises(body_part.static_stretch_exercises, self.static_stretch_exercises, goal, "1",
+    #                                     last_severity, exercise_library)
+    #                 self.copy_exercises(body_part.active_stretch_exercises, self.active_stretch_exercises, goal, "1",
+    #                                     last_severity, exercise_library)
 
     def check_prevention(self, body_part, body_part_injury_risk, exercise_library, max_severity):
 
@@ -1801,11 +1811,19 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
 
         #body_part_factory = BodyPartFactory()
 
-        if (body_part_injury_risk.last_compensation_date is not None
-                and body_part_injury_risk.last_compensation_date == self.event_date_time.date() and
-                body_part_injury_risk.total_compensation_percent_tier <= 3):
+        compensating = False
 
-            #body_part = body_part_factory.get_body_part(body_part_side)
+        if (body_part_injury_risk.last_movement_dysfunction_stress_date is not None and
+                body_part_injury_risk.last_movement_dysfunction_stress_date == self.event_date_time.date()):
+            priority = "1"
+            compensating = True
+        elif (body_part_injury_risk.last_compensation_date is not None
+              and body_part_injury_risk.last_compensation_date == self.event_date_time.date() and
+              body_part_injury_risk.total_compensation_percent_tier <= 3):
+            priority = str(body_part_injury_risk.total_compensation_percent_tier)
+            compensating = True
+
+        if compensating:
 
             goal = AthleteGoal("Compensations", 1, AthleteGoalType.asymmetric_session)
 
@@ -1819,11 +1837,11 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
                 # last_severity = self.get_last_severity(body_part_injury_risk)
                 last_severity = 2.5  # hacking this now
 
-                self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, str(body_part_injury_risk.total_compensation_percent_tier), last_severity,
+                self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, priority, last_severity,
                                     exercise_library)
 
                 if max_severity < 7.0:
-                    self.copy_exercises(body_part.static_stretch_exercises, self.static_stretch_exercises, goal, str(body_part_injury_risk.total_compensation_percent_tier),
+                    self.copy_exercises(body_part.static_stretch_exercises, self.static_stretch_exercises, goal, priority,
                                         last_severity, exercise_library)
 
     def check_care_inflammation(self, body_part, body_part_injury_risk, exercise_library, max_severity):
@@ -1839,7 +1857,8 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
 
             if body_part is not None:
 
-                last_severity = self.get_last_severity(body_part_injury_risk)
+                #last_severity = self.get_last_severity(body_part_injury_risk)
+                last_severity = body_part_injury_risk.get_inflammation_severity(self.event_date_time.date())
 
                 self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1", last_severity,
                                     exercise_library)
@@ -1861,7 +1880,8 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
 
             if body_part is not None:
 
-                last_severity = self.get_last_severity(body_part_injury_risk)
+                #last_severity = self.get_last_severity(body_part_injury_risk)
+                last_severity = body_part_injury_risk.get_muscle_spasm_severity(self.event_date_time.date())
 
                 self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1", last_severity,
                                     exercise_library)
@@ -1892,28 +1912,28 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
                     self.copy_exercises(body_part.static_stretch_exercises, self.static_stretch_exercises, goal, "1",
                                         last_severity, exercise_library)
 
-    def check_care_movement_pattern(self, body_part, body_part_injury_risk, exercise_library, max_severity):
-
-        #body_part_factory = BodyPartFactory()
-
-        if (body_part_injury_risk.last_overactive_short_date is not None and
-                body_part_injury_risk.last_overactive_short_date == self.event_date_time.date() and
-                body_part_injury_risk.overactive_short_count_last_0_20_days < 3):
-
-            #body_part = body_part_factory.get_body_part(body_part_side)
-
-            goal = AthleteGoal("Tightness", 1, AthleteGoalType.sore)
-
-            if body_part is not None:
-
-                # last_severity = self.get_last_severity(body_part_injury_risk)
-                last_severity = 2.5
-
-                self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1", last_severity, exercise_library)
-
-                if max_severity < 7.0:
-                    self.copy_exercises(body_part.static_stretch_exercises, self.static_stretch_exercises, goal, "1",
-                                        last_severity, exercise_library)
+    # def check_care_movement_pattern(self, body_part, body_part_injury_risk, exercise_library, max_severity):
+    #
+    #     #body_part_factory = BodyPartFactory()
+    #
+    #     if (body_part_injury_risk.last_overactive_short_date is not None and
+    #             body_part_injury_risk.last_overactive_short_date == self.event_date_time.date() and
+    #             body_part_injury_risk.overactive_short_count_last_0_20_days < 3):
+    #
+    #         #body_part = body_part_factory.get_body_part(body_part_side)
+    #
+    #         goal = AthleteGoal("Tightness", 1, AthleteGoalType.sore)
+    #
+    #         if body_part is not None:
+    #
+    #             # last_severity = self.get_last_severity(body_part_injury_risk)
+    #             last_severity = 2.5
+    #
+    #             self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1", last_severity, exercise_library)
+    #
+    #             if max_severity < 7.0:
+    #                 self.copy_exercises(body_part.static_stretch_exercises, self.static_stretch_exercises, goal, "1",
+    #                                     last_severity, exercise_library)
 
     def check_prevention(self, body_part, body_part_injury_risk, exercise_library, max_severity):
 

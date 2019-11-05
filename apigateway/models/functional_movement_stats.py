@@ -1,5 +1,5 @@
 from models.soreness_base import BodyPartSide, BodyPartLocation
-
+from models.functional_movement import BodyPartInjuryRisk
 
 class FunctionalMovementSummary(object):
     def __init__(self):
@@ -17,19 +17,62 @@ class InjuryCycleSummary(object):
         self.weak_count = 0
         self.last_updated_date_time = None
 
+    def get_percentage(self, count_attribute):
+
+        attribute_list = ["overactive_short_count", "overactive_long_count", "underactive_short_count", "underactive_long_count"]
+
+        total_count = 0
+
+        for a in attribute_list:
+            total_count += getattr(self, a)
+
+        if total_count == 0:
+            return 0.0
+
+        percent = (getattr(self, count_attribute) / total_count) * 100
+
+        return percent
+
+    def is_highest_count(self, count_attribute):
+
+        attribute_list = ["overactive_short_count", "overactive_long_count", "underactive_short_count",
+                          "underactive_long_count"]
+
+        new_attribute_list = [a for a in attribute_list if a != count_attribute]
+
+        if getattr(self, count_attribute) == 0:
+            return False
+
+        for n in new_attribute_list:
+            if getattr(self, count_attribute) < getattr(self, n):
+                return False
+
+        return True
+
 
 class InjuryCycleSummaryProcessor(object):
-    def __init__(self, injury_cycle_summary_dict, side, event_date_time):
-        self.injury_cycle_summary_dict = injury_cycle_summary_dict
+    def __init__(self, injury_risk_dict, side, event_date_time, current_symptom_body_parts=[], historic_body_parts=[]):
+        self.injury_risk_dict = injury_risk_dict
         self.side = side
         self.event_date_time = event_date_time
+        self.current_symptom_body_parts = current_symptom_body_parts
+        self.historic_body_parts = historic_body_parts
+
+    def get_increment_level(self, target_body_parts):
+
+        matching_parts = [i for i in target_body_parts if i in self.current_symptom_body_parts]
+
+        if len(matching_parts) == 0:
+            return 2
+        else:
+            return 1
 
     def set_last_updated(self, body_part_enum, last_updated_date_time):
 
         body_part_side = self.get_body_part_side(body_part_enum)
-        if body_part_side not in self.injury_cycle_summary_dict:
-            self.injury_cycle_summary_dict[body_part_side] = InjuryCycleSummary()
-        self.injury_cycle_summary_dict[body_part_side].last_updated_date_time = last_updated_date_time
+        if body_part_side not in self.injury_risk_dict:
+            self.injury_risk_dict[body_part_side] = BodyPartInjuryRisk()
+        self.injury_risk_dict[body_part_side].last_vote_updated_date_time = last_updated_date_time
 
     def get_body_part_side(self, body_part_info):
 
@@ -40,69 +83,99 @@ class InjuryCycleSummaryProcessor(object):
 
         return body_part_side
 
-    def increment_weak(self, body_part_enum):
+    def increment_weak(self, body_part_enum, increment_amount=1):
 
-        body_part_side = self.get_body_part_side(body_part_enum)
-        if body_part_side not in self.injury_cycle_summary_dict:
-            self.injury_cycle_summary_dict[body_part_side] = InjuryCycleSummary()
-        self.injury_cycle_summary_dict[body_part_side].weak_count += 1
-        self.set_last_updated(body_part_enum, self.event_date_time)
+        if body_part_enum not in self.current_symptom_body_parts:
+            body_part_side = self.get_body_part_side(body_part_enum)
+            if body_part_side not in self.injury_risk_dict:
+                self.injury_risk_dict[body_part_side] = BodyPartInjuryRisk()
+            self.injury_risk_dict[body_part_side].weak_vote_count += increment_amount
+            self.set_last_updated(body_part_enum, self.event_date_time)
 
     def increment_weak_by_list(self, body_part_enum_list):
 
+        vote_level = self.get_increment_level(body_part_enum_list)
+
         for b in body_part_enum_list:
-            self.increment_weak(b)
+            if b in self.historic_body_parts:
+                self.increment_weak(b, 3)
+            else:
+                self.increment_weak(b, vote_level)
 
-    def increment_overactive_short(self, body_part_enum):
+    def increment_overactive_short(self, body_part_enum, increment_amount=1):
 
-        body_part_side = self.get_body_part_side(body_part_enum)
-        if body_part_side not in self.injury_cycle_summary_dict:
-            self.injury_cycle_summary_dict[body_part_side] = InjuryCycleSummary()
-        self.injury_cycle_summary_dict[body_part_side].overactive_short_count += 1
-        self.set_last_updated(body_part_enum, self.event_date_time)
+        if body_part_enum not in self.current_symptom_body_parts:
+            body_part_side = self.get_body_part_side(body_part_enum)
+            if body_part_side not in self.injury_risk_dict:
+                self.injury_risk_dict[body_part_side] = BodyPartInjuryRisk()
+            self.injury_risk_dict[body_part_side].overactive_short_vote_count += increment_amount
+            self.set_last_updated(body_part_enum, self.event_date_time)
 
     def increment_overactive_short_by_list(self, body_part_enum_list):
 
+        vote_level = self.get_increment_level(body_part_enum_list)
+
         for b in body_part_enum_list:
-            self.increment_overactive_short(b)
+            if b in self.historic_body_parts:
+                self.increment_overactive_short(b, 3)
+            else:
+                self.increment_overactive_short(b, vote_level)
 
-    def increment_underactive_long(self, body_part_enum):
+    def increment_underactive_long(self, body_part_enum, increment_amount=1):
 
-        body_part_side = self.get_body_part_side(body_part_enum)
-        if body_part_side not in self.injury_cycle_summary_dict:
-            self.injury_cycle_summary_dict[body_part_side] = InjuryCycleSummary()
-        self.injury_cycle_summary_dict[body_part_side].underactive_long_count += 1
-        self.set_last_updated(body_part_enum, self.event_date_time)
+        if body_part_enum not in self.current_symptom_body_parts:
+            body_part_side = self.get_body_part_side(body_part_enum)
+            if body_part_side not in self.injury_risk_dict:
+                self.injury_risk_dict[body_part_side] = BodyPartInjuryRisk()
+            self.injury_risk_dict[body_part_side].underactive_long_vote_count += increment_amount
+            self.set_last_updated(body_part_enum, self.event_date_time)
 
     def increment_underactive_long_by_list(self, body_part_enum_list):
 
+        vote_level = self.get_increment_level(body_part_enum_list)
+
         for b in body_part_enum_list:
-            self.increment_underactive_long(b)
+            if b in self.historic_body_parts:
+                self.increment_underactive_long(b, 3)
+            else:
+                self.increment_underactive_long(b, vote_level)
 
-    def increment_short(self, body_part_enum):
+    def increment_short(self, body_part_enum, increment_amount=1):
 
-        body_part_side = self.get_body_part_side(body_part_enum)
-        if body_part_side not in self.injury_cycle_summary_dict:
-            self.injury_cycle_summary_dict[body_part_side] = InjuryCycleSummary()
-        self.injury_cycle_summary_dict[body_part_side].overactive_short_count += 1
-        self.injury_cycle_summary_dict[body_part_side].underactive_short_count += 1
-        self.set_last_updated(body_part_enum, self.event_date_time)
+        if body_part_enum not in self.current_symptom_body_parts:
+            body_part_side = self.get_body_part_side(body_part_enum)
+            if body_part_side not in self.injury_risk_dict:
+                self.injury_risk_dict[body_part_side] = BodyPartInjuryRisk()
+            self.injury_risk_dict[body_part_side].overactive_short_vote_count += increment_amount
+            self.injury_risk_dict[body_part_side].underactive_short_vote_count += increment_amount
+            self.set_last_updated(body_part_enum, self.event_date_time)
 
     def increment_short_by_list(self, body_part_enum_list):
 
+        vote_level = self.get_increment_level(body_part_enum_list)
+
         for b in body_part_enum_list:
-            self.increment_short(b)
+            if b in self.historic_body_parts:
+                self.increment_short(b, 3)
+            else:
+                self.increment_short(b, vote_level)
 
-    def increment_underactive(self, body_part_enum):
+    def increment_underactive(self, body_part_enum, increment_amount=1):
 
-        body_part_side = self.get_body_part_side(body_part_enum)
-        if body_part_side not in self.injury_cycle_summary_dict:
-            self.injury_cycle_summary_dict[body_part_side] = InjuryCycleSummary()
-        self.injury_cycle_summary_dict[body_part_side].underactive_long_count += 1
-        self.injury_cycle_summary_dict[body_part_side].underactive_short_count += 1
-        self.set_last_updated(body_part_enum, self.event_date_time)
+        if body_part_enum not in self.current_symptom_body_parts:
+            body_part_side = self.get_body_part_side(body_part_enum)
+            if body_part_side not in self.injury_risk_dict:
+                self.injury_risk_dict[body_part_side] = BodyPartInjuryRisk()
+            self.injury_risk_dict[body_part_side].underactive_long_vote_count += increment_amount
+            self.injury_risk_dict[body_part_side].underactive_short_vote_count += increment_amount
+            self.set_last_updated(body_part_enum, self.event_date_time)
 
     def increment_underactive_by_list(self, body_part_enum_list):
 
+        vote_level = self.get_increment_level(body_part_enum_list)
+
         for b in body_part_enum_list:
-            self.increment_underactive(b)
+            if b in self.historic_body_parts:
+                self.increment_underactive(b, 3)
+            else:
+                self.increment_underactive(b, vote_level)
