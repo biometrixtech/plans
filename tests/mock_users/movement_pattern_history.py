@@ -86,11 +86,11 @@ def create_elastticity_adf(history):
 
 def run_fake_regressions_a():
     full_session_history = {}
-    full_session_history = pre_pad_with_nones(full_session_history, 24)
+    full_session_history = pre_pad_with_nones(full_session_history, 22)
 
     full_history = {}
-    full_history = pre_pad_with_nones(full_history, 24)
-    n = 24
+    full_history = pre_pad_with_nones(full_history, 22)
+    n = 22
 
     history = {}
     history["left_apt_ankle_pitch_elasticity"] = 0.26862678142297
@@ -331,6 +331,46 @@ def run_fake_regressions_a():
 
     full_history[n + 10] = history_6
     full_session_history[n + 10] = session_details_6
+    full_history[n + 11] = None
+    full_session_history[n + 11] = None
+    
+    history_7 = {}
+    history_7["left_apt_ankle_pitch_elasticity"] = 0.429038632704596
+    history_7["left_apt_ankle_pitch_y_adf"] = -6.60672795200826
+    history_7["right_apt_ankle_pitch_elasticity"] = 0.0
+    history_7["right_apt_ankle_pitch_y_adf"] = -3.19917420441908
+
+    history_7["left_hip_drop_apt_elasticity"] = 0.0
+    history_7["left_hip_drop_apt_y_adf"] = 0.0
+    history_7["right_hip_drop_apt_elasticity"] = 0.058083362051412
+    history_7["right_hip_drop_apt_y_adf"] = 0.0
+
+    history_7["left_hip_drop_pva_elasticity"] = 0.229877359561652
+    history_7["left_hip_drop_pva_y_adf"] = 0.0
+    history_7["right_hip_drop_pva_elasticity"] = 0.0870156440654099
+    history_7["right_hip_drop_pva_y_adf"] = 0.0
+
+    history_7["left_knee_valgus_hip_drop_elasticity"] = 0.0
+    history_7["left_knee_valgus_hip_drop_y_adf"] = 0.0
+    history_7["right_knee_valgus_hip_drop_elasticity"] = 0.126430147448765
+    history_7["right_knee_valgus_hip_drop_y_adf"] = 0.0
+
+    history_7["left_knee_valgus_pva_elasticity"] = 0.0
+    history_7["left_knee_valgus_pva_y_adf"] = 0.0
+    history_7["right_knee_valgus_pva_elasticity"] = 0.0
+    history_7["right_knee_valgus_pva_y_adf"] = 0.0
+
+    history_7["left_knee_valgus_apt_elasticity"] = 0.0431147083237144
+    history_7["left_knee_valgus_apt_y_adf"] = 0.0
+    history_7["right_knee_valgus_apt_elasticity"] = 0.0768290349343447
+    history_7["right_knee_valgus_apt_y_adf"] = 0.0
+
+    session_details_7 = {}
+    session_details_7["seconds_duration"] = 242
+    session_details_7["session_id"] = '2f26eee8-455a-5678-a384-ed5a14c6e54a'
+
+    full_history[n + 12] = history_7
+    full_session_history[n + 12] = session_details_7
 
     return full_history, full_session_history
 

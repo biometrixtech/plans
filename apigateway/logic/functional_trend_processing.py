@@ -293,7 +293,6 @@ class TrendProcessor(object):
 
                 if len(full_dates) > 0:
                     full_dates = sorted(full_dates, key=lambda x: (x.last_date_time, x.priority), reverse=True)
-                    # TODO: this doesn't seem necessary
                     # if len(plan_alert_short_title) == 0:
                     #     plan_alert_short_title = full_dates[0].plan_alert_short_title
                     # for f in full_dates:

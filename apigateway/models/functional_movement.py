@@ -1240,8 +1240,6 @@ class SessionFunctionalMovement(object):
     #
     #                 self.mark_hip_extension_compensating(side)
     #
-    #             # TODO - add long muscle imbalance (antagonists); not sure how to do it yet
-    #
     #             # checking for underactive inhibited or weak
     #             # check for evidence of short else assume and mark long (by muscle)
     #             # adhesions reported or (63, 64, 66, 73, 74, 21) is short muscle imbalance
@@ -1642,23 +1640,23 @@ class ActivityFunctionalMovementFactory(object):
         mapping.append(
             FunctionalMovementActivityMapping(FunctionalMovementType.ankle_dorsiflexion, True, .0025, False, 0))
         mapping.append(
-            FunctionalMovementActivityMapping(FunctionalMovementType.ankle_plantar_flexion, True, .01425, False, 0))
+            FunctionalMovementActivityMapping(FunctionalMovementType.ankle_plantar_flexion, True, .019, False, 0))
         mapping.append(
-            FunctionalMovementActivityMapping(FunctionalMovementType.inversion_of_the_foot, True, .019, False, 0))
+            FunctionalMovementActivityMapping(FunctionalMovementType.inversion_of_the_foot, True, .0253, False, 0))
         mapping.append(
-            FunctionalMovementActivityMapping(FunctionalMovementType.eversion_of_the_foot, False, 0, True, .0475))
+            FunctionalMovementActivityMapping(FunctionalMovementType.eversion_of_the_foot, False, 0, True, .03167))
         mapping.append(
-            FunctionalMovementActivityMapping(FunctionalMovementType.knee_flexion, True, 0.125, True, .1188))
+            FunctionalMovementActivityMapping(FunctionalMovementType.knee_flexion, True, 0.01, True, .079167))
         mapping.append(
-            FunctionalMovementActivityMapping(FunctionalMovementType.knee_extension, True, .1188, False, 0))
+            FunctionalMovementActivityMapping(FunctionalMovementType.knee_extension, True, .1583, False, 0))
         mapping.append(
-            FunctionalMovementActivityMapping(FunctionalMovementType.hip_adduction, False, 0, True, .0713))
+            FunctionalMovementActivityMapping(FunctionalMovementType.hip_adduction, False, 0, True, .0475))
         mapping.append(
-            FunctionalMovementActivityMapping(FunctionalMovementType.hip_abduction, True, .0380, False, 0))
+            FunctionalMovementActivityMapping(FunctionalMovementType.hip_abduction, True, .05067, False, 0))
         mapping.append(
-            FunctionalMovementActivityMapping(FunctionalMovementType.hip_extension, True, .2850, False, 0))
+            FunctionalMovementActivityMapping(FunctionalMovementType.hip_extension, True, .38, False, 0))
         mapping.append(
-            FunctionalMovementActivityMapping(FunctionalMovementType.hip_flexion, True, .0375, True, .2375))
+            FunctionalMovementActivityMapping(FunctionalMovementType.hip_flexion, True, .0375, True, .1583))
 
         return mapping
 
@@ -1747,21 +1745,6 @@ class FunctionalMovementFactory(object):
         functional_movement.prime_movers = [55, 56, 57, 58]
         functional_movement.antagonists = [44, 61, 45, 46, 47, 48, 53]
         return functional_movement
-
-    #TODO - what happened to thses
-    # def get_tibial_external_rotation(self):
-    #
-    #     functional_movement = FunctionalMovement(FunctionalMovementType.tibial_external_rotation)
-    #     functional_movement.prime_movers = [45, 46]
-    #     functional_movement.antagonists = [47, 48]
-    #     return functional_movement
-    #
-    # def get_tibial_internal_rotation(self):
-    #
-    #     functional_movement = FunctionalMovement(FunctionalMovementType.tibial_internal_rotation)
-    #     functional_movement.prime_movers = [47, 48]
-    #     functional_movement.antagonists = [45, 46, 53]
-    #     return functional_movement
 
     def get_hip_extension(self):
 

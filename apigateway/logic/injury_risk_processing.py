@@ -457,14 +457,6 @@ class InjuryRiskProcessor(object):
                     injury_risk_dict = self.mark_anc_muscle_imbalance(injury_risk_dict,
                                                                       current_session.event_date)
 
-                # # save all updates from processing back to the session - TODO: make sure this is the best place/time to save this info
-                # session_datastore = SessionDatastore()
-                # try:
-                #     session_datastore.update(current_session, self.user_id, format_date(d))
-                # except NoSuchEntityException:
-                #     session_datastore.update(current_session, self.user_id, format_date(d - timedelta(days=1)))
-                # #TODO: continue if fails the second time
-
                 injury_risk_dict = self.update_injury_risk_dict_rankings(injury_risk_dict)
 
                 session_mapping_dict[current_session] = session_functional_movement.functional_movement_mappings
@@ -1105,14 +1097,6 @@ class InjuryRiskProcessor(object):
         for session in daily_sessions:
             session_functional_movement = SessionFunctionalMovement(session, injury_risk_dict)
             current_session = session_functional_movement.process(base_date, load_stats)
-
-            # # save all updates from processing back to the session
-            # session_datastore = SessionDatastore()
-            # try:
-            #     session_datastore.update(current_session, self.user_id, format_date(base_date))
-            # except NoSuchEntityException:
-            #     session_datastore.update(current_session, self.user_id, format_date(base_date - timedelta(days=1)))
-            # # TODO: continue if fails the second time
 
             injury_cycle_summary_dict = self.update_injury_cycle_summaries(current_session,
                                                                            injury_risk_dict, base_date)
