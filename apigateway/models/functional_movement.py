@@ -4,7 +4,7 @@ from models.sport import SportName
 from models.soreness_base import BodyPartSide, BodyPartLocation
 from models.body_parts import BodyPart, BodyPartFactory
 from datetime import timedelta, date
-from utils import format_date, parse_date
+from utils import format_date, parse_date, format_datetime, parse_datetime
 
 
 class FunctionalMovementType(Enum):
@@ -445,7 +445,7 @@ class BodyPartInjuryRisk(object):
                 "underactive_short_vote_count": self.underactive_short_vote_count,
                 "underactive_long_vote_count": self.underactive_long_vote_count,
                 "weak_vote_count": self.weak_vote_count,
-                "last_vote_updated_date_time": self.last_vote_updated_date_time
+                "last_vote_updated_date_time": format_datetime(self.last_vote_updated_date_time)
 
         }
 
@@ -612,7 +612,10 @@ class BodyPartInjuryRisk(object):
         return injury_risk
 
     def __setattr__(self, name, value):
-        if 'date' in name:
+        if 'date_time' in name:
+            if value is not None and not isinstance(value, date):
+                value = parse_datetime(value)
+        elif 'date' in name:
             if value is not None and not isinstance(value, date):
                 value = parse_date(value).date()
         super().__setattr__(name, value)

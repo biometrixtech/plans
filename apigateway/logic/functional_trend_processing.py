@@ -462,47 +462,47 @@ class TrendProcessor(object):
             if is_elevated_stress:
                 if body_part_injury_risk.total_compensation_percent_tier == 1:
                     body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
-                                                        LegendColor.success_light)
+                                                        LegendColor.yellow_light)
                 elif body_part_injury_risk.total_compensation_percent_tier == 2:
                     body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
-                                                        LegendColor.success_x_light)
+                                                        LegendColor.yellow_x_light)
                 else:
                     body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
-                                                         LegendColor.success_xx_light)
+                                                         LegendColor.yellow_xx_light)
                 compensating.append(body_part_side_viz)
 
             if is_compensating and not is_elevated_stress:
                 if body_part_injury_risk.total_compensation_percent_tier == 1:
                     body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
-                                                        LegendColor.success_light)
+                                                        LegendColor.yellow_light)
                     movement_dysfunction.append(body_part_side_viz)
 
             if not is_compensating and not is_elevated_stress and is_training_stress:
                 if body_part_injury_risk.total_volume_percent_tier == 1:
                     if is_non_functional_overreaching:
                         body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
-                                                            LegendColor.warning_light)
+                                                            LegendColor.success_light)
                         high_stress.append(body_part_side_viz)
                     elif is_functional_overreaching:
                         body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
-                                                             LegendColor.warning_x_light)
+                                                             LegendColor.success_x_light)
                         mod_stress.append(body_part_side_viz)
                     else:
                         body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
-                                                             LegendColor.warning_xx_light)
+                                                             LegendColor.success_xx_light)
                         low_stress.append(body_part_side_viz)
                 elif body_part_injury_risk.total_volume_percent_tier == 2:
                     if is_functional_overreaching:
                         body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
-                                                             LegendColor.warning_x_light)
+                                                             LegendColor.success_x_light)
                         mod_stress.append(body_part_side_viz)
                     else:
                         body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
-                                                             LegendColor.warning_xx_light)
+                                                             LegendColor.success_xx_light)
                         low_stress.append(body_part_side_viz)
                 else:
                     body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
-                                                         LegendColor.warning_xx_light)
+                                                         LegendColor.success_xx_light)
                     low_stress.append(body_part_side_viz)
                 training_stress.append(body_part_side_viz)
 
@@ -524,9 +524,9 @@ class TrendProcessor(object):
 
             trend.trigger_tiles = []
             if len(compensating) > 0:
-                trend.trigger_tiles.extend(self.get_body_part_list_trigger_tiles(compensating, "Symptom Reporting", LegendColor.warning_light))
+                trend.trigger_tiles.extend(self.get_body_part_list_trigger_tiles(compensating, "Symptom Reporting", LegendColor.yellow_light))
             if len(movement_dysfunction) > 0:
-                trend.trigger_tiles.extend(self.get_body_part_list_trigger_tiles(movement_dysfunction, "Movement Dysfunction", LegendColor.warning_light))
+                trend.trigger_tiles.extend(self.get_body_part_list_trigger_tiles(movement_dysfunction, "Movement Dysfunction", LegendColor.yellow_light))
             if len(high_stress) > 0:
                 trend.trigger_tiles.extend(self.get_body_part_list_trigger_tiles(high_stress, "Training - High", LegendColor.success_light))
             if len(mod_stress) > 0:

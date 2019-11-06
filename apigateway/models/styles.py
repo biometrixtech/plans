@@ -46,8 +46,9 @@ class LegendColor(Enum):
     success_x_light = 20
     success_xx_light = 21
     warning_xx_light = 22
-    yellow_x_light = 23
-    yellow_xx_light = 24
+    yellow_light = 23
+    yellow_x_light = 24
+    yellow_xx_light = 25
 
 
 class Legend(object):
