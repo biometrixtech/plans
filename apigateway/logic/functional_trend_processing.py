@@ -449,10 +449,10 @@ class TrendProcessor(object):
             if 0 < body_part_injury_risk.total_volume_percent_tier < 4:
                 is_training_stress = True
 
-            if body_part_injury_risk.last_functional_overreaching_date == self.event_date_time.date():
+            if body_part_injury_risk.last_functional_overreaching_date is not None and body_part_injury_risk.last_functional_overreaching_date == self.event_date_time.date():
                 is_functional_overreaching = True
 
-            if body_part_injury_risk.last_non_functional_overreaching_date >= two_days_ago:
+            if body_part_injury_risk.last_non_functional_overreaching_date is not None and body_part_injury_risk.last_non_functional_overreaching_date >= two_days_ago:
                 is_non_functional_overreaching = True
 
             if (body_part_injury_risk.last_movement_dysfunction_stress_date is not None and
