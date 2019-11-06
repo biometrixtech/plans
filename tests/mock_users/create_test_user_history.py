@@ -14,12 +14,14 @@ from persona import Persona
 import soreness_history as sh
 from utils import format_datetime
 from datetime import datetime, timedelta
+import movement_pattern_history as mph
+
 
 plans_version = "4_5"
 
 
-def login_user(email):
-    body = {"password": "Fathom123!", "personal_data": {"email": email}}
+def login_user(email, password="Fathom123!"):
+    body = {"password": password, "personal_data": {"email": email}}
     headers = {"Content-Type": "application/json"}
     url = "http://apis.{env}.fathomai.com/users/2_3/user/login".format(env=os.environ['ENVIRONMENT'])
     response = requests.post(url, data=json.dumps(body), headers=headers)
@@ -76,9 +78,22 @@ if __name__ == '__main__':
             soreness_history = []
             user_id, jwt = login_user(u)
             print(u + "=" + user_id)
+
+            history, session_details = mph.run_a_regressions()
+
             persona1 = Persona(user_id)
+            persona1.elasticity_adf_dictionary = history
+            persona1.three_session_history = session_details
             persona1.soreness_history = soreness_history
-            persona1.create_history(days=history_length, suffix='')
+            if u in ["run_a@200.com", "run_a_2@200.com"]:
+                rpes = [5, None, None, 5, None, 3, None,
+                        4, None, 6, None, 5, 5, None,
+                        None, 4, None, 3, 5, None, None,
+                        6, None, 5, None, 4, None, 3,
+                        5, None, 6, None, 5, 4, 6]
+                persona1.create_history(days=history_length, suffix='', end_today=True, rpes=rpes, log_output=True, jwt=jwt, user_name=u)
+            else:
+                persona1.create_history(days=history_length, suffix='')
             print(time.time() - start)
 
     for u in users:
@@ -118,13 +133,22 @@ if __name__ == '__main__':
             print(user_id)
             persona1 = Persona(user_id)
             persona1.soreness_history = soreness_history
-            if u in ["nc_long@200.com", "nc_long_2g@200.com", "ivonna+demo2@fathomai.com"]:
+            if u in ["nc_long@200.com", "nc_long_2@200.com", "ivonna+demo2@fathomai.com"]:
+                history, session_details = mph.long_regressions()
+
+                persona1.elasticity_adf_dictionary = history
+                persona1.three_session_history = session_details
+
                 rpes = [5, None, None, 5, None, 3, None,
                         4, None, 6, None, 5, 5, None,
                         None, 4, None, 3, 5, None, None,
                         6, None, 5, None, 4, None, 3,
                         5, None, 6, None, 5, 4, 6]
-                last_plan_date_time = persona1.create_history(days=history_length, suffix='', end_today=True, rpes=rpes)
+                if u == "nc_long_2@200.com":
+                    last_plan_date_time = persona1.create_history(days=history_length, suffix='', end_today=False, rpes=rpes, log_output=True, jwt=jwt, user_name=u)
+                else:
+                    last_plan_date_time = persona1.create_history(days=history_length, suffix='', end_today=True, rpes=rpes,
+                                                                  log_output=True, jwt=jwt, user_name=u)
             else:
                 last_plan_date_time = persona1.create_history(days=history_length, suffix='')
                 clear_fte_category(InsightType.personalized_recovery, jwt, last_plan_date_time)
@@ -142,14 +166,23 @@ if __name__ == '__main__':
 
             user_id, jwt = login_user(u)
             print(user_id)
+            history, session_details = mph.tread_regressions()
+
             persona1 = Persona(user_id)
+
+            persona1.elasticity_adf_dictionary = history
+            persona1.three_session_history = session_details
             persona1.soreness_history = soreness_history
             rpes = [5, None, None, 5, None, 3, None,
                     4, None, 6, None, 5, 5, None,
                     None, 4, None, 3, 5, None, None,
                     6, None, 5, None, 4, None, 3,
                     5, 5, 6, None, 5, 4, 6]
-            last_plan_date_time = persona1.create_history(days=history_length, suffix='', end_today=True, rpes=rpes)
+            if u == "ts_tread_2@200.com":
+                last_plan_date_time = persona1.create_history(days=history_length, suffix='', end_today=False, rpes=rpes,
+                                                              log_output=True, jwt=jwt, user_name=u)
+            else:
+                last_plan_date_time = persona1.create_history(days=history_length, suffix='', end_today=True, rpes=rpes, log_output=True, jwt=jwt, user_name=u)
 
             print(time.time() - start)
         elif u in ["ts_pain_long@200.com", "ts_pain_long_2@200.com"]:
@@ -165,14 +198,26 @@ if __name__ == '__main__':
 
             user_id, jwt = login_user(u)
             print(user_id)
+
+            history, session_details = mph.long_regressions()
+
             persona1 = Persona(user_id)
+
+            persona1.elasticity_adf_dictionary = history
+            persona1.three_session_history = session_details
+
             persona1.soreness_history = soreness_history
             rpes = [5, None, None, 5, None, 3, None,
                     4, None, 6, None, 5, 5, None,
                     None, 4, None, 3, 5, None, None,
                     6, None, 5, None, 4, None, 3,
                     5, 5, 6, None, 5, 4, 6]
-            last_plan_date_time = persona1.create_history(days=history_length, suffix='', end_today=True, rpes=rpes)
+            if u == "ts_pain_long_2@200.com":
+
+                last_plan_date_time = persona1.create_history(days=history_length, suffix='', end_today=False, rpes=rpes, log_output=True, jwt=jwt, user_name=u)
+            else:
+                last_plan_date_time = persona1.create_history(days=history_length, suffix='', end_today=True, rpes=rpes,
+                                                                log_output=True, jwt=jwt, user_name=u)
 
             print(time.time() - start)
         elif u in ["full_fte_long@200.com", "full_fte_long_2@200.com"]:
@@ -237,9 +282,18 @@ if __name__ == '__main__':
                     None, None, 6, None, 5, None, 4,
                     None, None, 6, None, 5, None, 4]
             print(user_id)
+            history, session_details = mph.tread_regressions()
+
             persona1 = Persona(user_id)
+
+            persona1.elasticity_adf_dictionary = history
+            persona1.three_session_history = session_details
             persona1.soreness_history = soreness_history
-            last_plan_date_time = persona1.create_history(days=history_length, suffix='', end_today=True, rpes=rpes)
+            if u == "nc_sore_tread_2@200.com":
+                last_plan_date_time = persona1.create_history(days=history_length, suffix='', end_today=False, rpes=rpes, log_output=True, jwt=jwt, user_name=u)
+            else:
+                last_plan_date_time = persona1.create_history(days=history_length, suffix='', end_today=True, rpes=rpes,
+                                                          log_output=True, jwt=jwt, user_name=u)
             # clear_fte_category(InsightType.personalized_recovery, jwt, last_plan_date_time)
             # clear_fte_category_view(InsightType.personalized_recovery,
             #                         VisualizationType.prevention, jwt, last_plan_date_time)
@@ -255,11 +309,21 @@ if __name__ == '__main__':
             soreness_history.append(right_it_band_no_question)
             # left_bicep_31_days_no_question = sh.create_body_part_history(sh.persistent_soreness_no_question_31_days(), 22, 1, False)
             # soreness_history.append(left_bicep_31_days_no_question)
-            user_id, jwt = login_user(u)
+            user_id, jwt = login_user(u, "Fathom123!")
             print(user_id)
+            history, session_details = mph.run_fake_regressions_a()
+
             persona1 = Persona(user_id)
+
+            persona1.elasticity_adf_dictionary = history
+            persona1.three_session_history = session_details
             persona1.soreness_history = soreness_history
-            last_plan_date_time = persona1.create_history(days=history_length, suffix='')
+            rpes = [None, None, 6, None, 5, None, 4,
+                    None, None, 6, None, 5, None, 4,
+                    None, None, 6, None, 5, None, 4,
+                    None, None, 6, None, 5, None, 4,
+                    None, None, 6, None, 5, None, 4]
+            last_plan_date_time = persona1.create_history(days=history_length, suffix='', end_today=True, rpes=rpes, log_output=True, jwt=jwt, user_name=u)
             clear_fte_category(InsightType.personalized_recovery, jwt, last_plan_date_time)
             clear_fte_category_view(InsightType.personalized_recovery,
                                     VisualizationType.prevention, jwt, last_plan_date_time)

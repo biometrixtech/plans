@@ -73,7 +73,8 @@ class PostSurvey(Serialisable):
 
     @staticmethod
     def _soreness_from_dict(soreness_dict, event_date):
-        soreness_dict['reported_date_time'] = event_date
+        if soreness_dict.get('reported_date_time') is None:
+            soreness_dict['reported_date_time'] = event_date
         soreness = Soreness().json_deserialise(soreness_dict)
         # soreness.body_part = BodyPart(BodyPartLocation(soreness_dict['body_part']), None)
         # soreness.pain = soreness_dict.get('pain', False)

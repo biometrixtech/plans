@@ -4,7 +4,7 @@ from models.soreness import Soreness
 from models.body_parts import BodyPart
 from models.soreness_base import BodyPartLocation
 from models.daily_readiness import DailyReadiness
-from models.post_session_survey import PostSessionSurvey, PostSurvey
+# from models.post_session_survey import PostSessionSurvey, PostSurvey
 from tests.testing_utilities import TestUtilities
 import datetime
 
@@ -93,6 +93,7 @@ def test_joint_ache_to_pain():
     assert soreness.severity == 3
     assert soreness.movement is None
 
+
 def test_joint_ache_sharp_to_pain():
     readiness_survey = get_readiness_survey(20, ache=5, sharp=3)
     assert len(readiness_survey.soreness) == 1
@@ -108,6 +109,15 @@ def test_muscle_ache_sharp_to_pain():
     soreness = readiness_survey.soreness[0]
     assert soreness.pain
     assert soreness.severity == 5
+    assert soreness.movement is None
+
+
+def test_lower_back_sharp_to_pain():
+    readiness_survey = get_readiness_survey(12, ache=5)
+    assert len(readiness_survey.soreness) == 1
+    soreness = readiness_survey.soreness[0]
+    assert not soreness.pain
+    assert soreness.severity == 2
     assert soreness.movement is None
 
 
@@ -128,3 +138,24 @@ def test_severity_update():
     assert soreness.pain
 
 
+def test_back_and_forth():
+    soreness = Soreness()
+    for movement in range(1, 6):
+        tight = soreness.get_tight_knots_from_movement(movement)
+        assert soreness.get_movement_from_tight_knot(tight) == movement
+
+    soreness.body_part = BodyPart(BodyPartLocation(2), None)
+    for severity in range(1, 6):
+        soreness.severity = severity
+        soreness_serialised = soreness.json_serialise()
+        soreness_deserialised = Soreness.json_deserialise(soreness_serialised)
+
+        assert soreness_deserialised.severity == severity
+
+    soreness.body_part = BodyPart(BodyPartLocation(7), None)
+    for severity in range(1, 6):
+        soreness.severity = severity
+        soreness_serialised = soreness.json_serialise()
+        soreness_deserialised = Soreness.json_deserialise(soreness_serialised)
+
+        assert soreness_deserialised.severity == severity

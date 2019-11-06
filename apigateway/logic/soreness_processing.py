@@ -3,6 +3,7 @@ from models.body_parts import BodyPart
 from models.soreness_base import BodyPartLocation
 from models.historic_soreness import CoOccurrence, SorenessCause
 from datetime import timedelta
+from utils import none_max
 
 
 class SorenessCalculator(object):
@@ -11,7 +12,7 @@ class SorenessCalculator(object):
         self.surveys = []
 
     def get_soreness_summary_from_surveys(self, readiness_surveys, post_session_surveys,
-                                          trigger_date_time, historic_soreness):
+                                          trigger_date_time, historic_soreness, symptoms_today):
         """
         :param historic_soreness:
         :param readiness_surveys: DailyReadiness
@@ -31,6 +32,7 @@ class SorenessCalculator(object):
         for ps_survey in post_session_surveys:
             if (trigger_date_time.date() - ps_survey.event_date.date()).days < 2:
                 self.update_soreness_list(soreness_list, ps_survey.soreness)
+        self.update_soreness_list(soreness_list, symptoms_today)
 
         soreness_list = self.merge_current_historic_soreness(soreness_list, historic_soreness)
         return soreness_list
@@ -77,12 +79,18 @@ class SorenessCalculator(object):
             updated = False
             for r in soreness_list:
                 if r.body_part.location.value == s.body_part.location.value and r.side == s.side and r.pain == s.pain:
-                    r.severity = max([self.get_severity(r.severity, r.movement), self.get_severity(s.severity, s.movement)])
+                    r.severity = none_max([self.get_severity(r.severity, r.movement), self.get_severity(s.severity, s.movement)])
+                    r.severity_combined = True
                     r.movement = None
+                    r.ache = none_max([r.ache, s.ache])
+                    r.knots = none_max([r.knots, s.knots])
+                    r.tight = none_max([r.tight, s.tight])
+                    r.sharp = none_max([r.sharp, s.sharp])
                     updated = True
             if not updated:
                 s.severity = self.get_severity(s.severity, s.movement)
                 s.movement = None
+                s.severity_combined = True
                 soreness_list.append(s)
         return soreness_list
 
@@ -229,7 +237,8 @@ class BodyPartMapping(object):
 
         if (body_part_location == BodyPartLocation.hip or body_part_location == BodyPartLocation.knee
                 or body_part_location == BodyPartLocation.ankle or body_part_location == BodyPartLocation.foot
-                or body_part_location == BodyPartLocation.lower_back):
+                # or body_part_location == BodyPartLocation.lower_back
+                ):
             return SorenessType.joint_related
         else:
             return SorenessType.muscle_related
