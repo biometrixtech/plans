@@ -3,7 +3,7 @@ from serialisable import Serialisable
 from models.sport import SportName
 from models.soreness_base import BodyPartSide, BodyPartLocation
 from models.body_parts import BodyPart, BodyPartFactory
-from datetime import timedelta, date
+from datetime import timedelta, date, datetime
 from utils import format_date, parse_date, format_datetime, parse_datetime
 
 
@@ -613,7 +613,7 @@ class BodyPartInjuryRisk(object):
 
     def __setattr__(self, name, value):
         if 'date_time' in name:
-            if value is not None and not isinstance(value, date):
+            if value is not None and not isinstance(value, datetime):
                 value = parse_datetime(value)
         elif 'date' in name:
             if value is not None and not isinstance(value, date):
