@@ -1563,6 +1563,14 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
                     # self.copy_exercises(body_part.active_stretch_exercises, self.active_stretch_exercises, goal, "1",
                     #                     last_severity, exercise_library)
 
+            elif is_underactive_long or is_weak:
+
+                goal = AthleteGoal("Strength Deficiencies", 1, AthleteGoalType.corrective)
+
+                if max_severity < 5.0:
+                    self.copy_exercises(body_part.isolated_activate_exercises, self.isolated_activate_exercises, goal, "1",
+                                        isolated_severity, exercise_library)
+
             elif is_overactive_long:
                 goal = AthleteGoal("Shortened Tissue", 1, AthleteGoalType.corrective)
                 self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1", non_isolated_severity, exercise_library)
@@ -1582,13 +1590,7 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
                     self.copy_exercises(body_part.isolated_activate_exercises, self.isolated_activate_exercises, goal, "1",
                                         isolated_severity, exercise_library)
 
-            elif is_underactive_long:
 
-                goal = AthleteGoal("Strength Deficiencies", 1, AthleteGoalType.corrective)
-
-                if max_severity < 5.0:
-                    self.copy_exercises(body_part.isolated_activate_exercises, self.isolated_activate_exercises, goal, "1",
-                                        non_isolated_severity, exercise_library)
 
 
     def set_exercise_dosage_ranking(self):
@@ -1952,9 +1954,9 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
             # last_severity = self.get_last_severity(body_part_injury_risk)
             last_severity = 2.5
             if is_weak:
-                underactive_short_severity = 7.5
+                isolated_severity = 7.5
             else:
-                underactive_short_severity = 2.5
+                isolated_severity = 2.5
 
             if is_overactive_short:
 
@@ -1965,6 +1967,14 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
                 if max_severity < 7.0:
                     self.copy_exercises(body_part.static_stretch_exercises, self.static_stretch_exercises, goal, "1",
                                         last_severity, exercise_library)
+
+            elif is_underactive_long or is_weak:
+
+                goal = AthleteGoal("Strength Deficiencies", 1, AthleteGoalType.corrective)
+
+                if max_severity < 5.0:
+                    self.copy_exercises(body_part.isolated_activate_exercises, self.isolated_activate_exercises, goal, "1",
+                                        isolated_severity, exercise_library)
 
             elif is_overactive_long:
 
@@ -1989,15 +1999,9 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
                     self.copy_exercises(body_part.isolated_activate_exercises, self.isolated_activate_exercises, goal,
                                         "1",
 
-                                        underactive_short_severity, exercise_library)
+                                        isolated_severity, exercise_library)
 
-            elif is_underactive_long:
 
-                goal = AthleteGoal("Strength Deficiencies", 1, AthleteGoalType.corrective)
-
-                if max_severity < 5.0:
-                    self.copy_exercises(body_part.isolated_activate_exercises, self.isolated_activate_exercises, goal, "1",
-                                        last_severity, exercise_library)
 
     def set_exercise_dosage_ranking(self):
         self.rank_dosages([self.inhibit_exercises,

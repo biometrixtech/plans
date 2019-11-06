@@ -438,6 +438,8 @@ class TrendProcessor(object):
             is_training_stress = False
             is_compensating = False
             is_elevated_stress = False
+            is_functional_overreaching = False
+            is_non_functional_overreaching = False
 
             if (body_part_injury_risk.last_compensation_date is not None and
                     body_part_injury_risk.last_compensation_date == self.event_date_time.date() and
@@ -446,6 +448,12 @@ class TrendProcessor(object):
 
             if 0 < body_part_injury_risk.total_volume_percent_tier < 4:
                 is_training_stress = True
+
+            if body_part_injury_risk.last_functional_overreaching_date == self.event_date_time.date():
+                is_functional_overreaching = True
+
+            if body_part_injury_risk.last_non_functional_overreaching_date == self.event_date_time.date():
+                is_non_functional_overreaching = True
 
             if (body_part_injury_risk.last_movement_dysfunction_stress_date is not None and
                     body_part_injury_risk.last_movement_dysfunction_stress_date == self.event_date_time.date()):
@@ -471,13 +479,27 @@ class TrendProcessor(object):
 
             if not is_compensating and not is_elevated_stress and is_training_stress:
                 if body_part_injury_risk.total_volume_percent_tier == 1:
-                    body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
-                                                        LegendColor.warning_light)
-                    high_stress.append(body_part_side_viz)
+                    if is_non_functional_overreaching:
+                        body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
+                                                            LegendColor.warning_light)
+                        high_stress.append(body_part_side_viz)
+                    elif is_functional_overreaching:
+                        body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
+                                                             LegendColor.warning_x_light)
+                        mod_stress.append(body_part_side_viz)
+                    else:
+                        body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
+                                                             LegendColor.warning_xx_light)
+                        low_stress.append(body_part_side_viz)
                 elif body_part_injury_risk.total_volume_percent_tier == 2:
-                    body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
-                                                        LegendColor.warning_x_light)
-                    mod_stress.append(body_part_side_viz)
+                    if is_functional_overreaching:
+                        body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
+                                                             LegendColor.warning_x_light)
+                        mod_stress.append(body_part_side_viz)
+                    else:
+                        body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
+                                                             LegendColor.warning_xx_light)
+                        low_stress.append(body_part_side_viz)
                 else:
                     body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
                                                          LegendColor.warning_xx_light)
