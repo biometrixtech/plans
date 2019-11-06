@@ -423,14 +423,12 @@ class InjuryRiskProcessor(object):
 
         injury_risk_dict = {}
 
-        injury_cycle_summary_dict = {}
-
-        twenty_days_ago = self.event_date_time.date() - timedelta(days=19)
+        #twenty_days_ago = self.event_date_time.date() - timedelta(days=19)
 
         for d in combined_dates:
 
-            if d == datetime(2019, 10, 31).date():
-                j = 0
+            # if d == datetime(2019, 10, 31).date():
+            #     j = 0
             seven_days_ago = d - timedelta(days=6)
             fourteeen_days_ago = d - timedelta(days=13)
 
@@ -453,7 +451,7 @@ class InjuryRiskProcessor(object):
                 injury_cycle_summary_dict = self.update_injury_cycle_summaries(current_session,
                                                                                injury_risk_dict, d)
 
-                if d >= twenty_days_ago:
+                if d >= self.twenty_days_ago:
                     injury_risk_dict = self.mark_anc_muscle_imbalance(injury_risk_dict,
                                                                       current_session.event_date)
 
@@ -1374,7 +1372,7 @@ class InjuryRiskProcessor(object):
 
             sharp_count = 0
             ache_count = 0
-            ache_count_10_20 = 0
+            ache_count_0_20 = 0
 
             # any sharp symptoms get marked inflammation
 
@@ -1402,14 +1400,14 @@ class InjuryRiskProcessor(object):
 
                 if target_body_part_side in injury_risk_dict:
                     ache_count = injury_risk_dict[target_body_part_side].ache_count_last_0_10_days
-                    ache_count_10_20 = injury_risk_dict[target_body_part_side].ache_count_last_0_20_days
+                    ache_count_0_20 = injury_risk_dict[target_body_part_side].ache_count_last_0_20_days
                     if injury_risk_dict[target_body_part_side].last_ache_date is None or injury_risk_dict[target_body_part_side].last_ache_date < base_date:
                         injury_risk_dict[target_body_part_side].last_ache_date = base_date
                         injury_risk_dict[target_body_part_side].ache_count_last_0_10_days += 1
                         injury_risk_dict[target_body_part_side].ache_count_last_0_20_days += 1
                         injury_risk_dict[target_body_part_side].last_ache_level = target_symptom.ache
                         ache_count = injury_risk_dict[target_body_part_side].ache_count_last_0_10_days
-                        ache_count_10_20 = injury_risk_dict[target_body_part_side].ache_count_last_0_20_days
+                        ache_count_0_20 = injury_risk_dict[target_body_part_side].ache_count_last_0_20_days
                 else:
                     body_part_injury_risk = BodyPartInjuryRisk()
                     body_part_injury_risk.last_ache_date = base_date
@@ -1420,12 +1418,12 @@ class InjuryRiskProcessor(object):
 
                 # moderate severity or 2 reports in last 10 days
                 # TODO: is moderate to high ache severity > 3?
-                if target_symptom.ache > 3 or (ache_count >= 2 and ache_count == ache_count_10_20):
+                if target_symptom.ache > 3 or (ache_count >= 2 and ache_count == ache_count_0_20):
                     injury_risk_dict[target_body_part_side].last_inflammation_date = base_date
 
             # second, mark it inflamed, noting that joints cannot be inhibited as well
             # update the injury risk dict accordingly
-            if ache_count >= 2 and ache_count == ache_count_10_20:
+            if ache_count >= 2 and ache_count == ache_count_0_20:
                 if target_body_part_side in injury_risk_dict:
                     injury_risk_dict[target_body_part_side].last_inflammation_date = base_date
                 else:

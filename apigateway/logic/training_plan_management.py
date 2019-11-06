@@ -152,9 +152,9 @@ class TrainingPlanManager(object):
         for body_part_side, body_part_injury_risk in aggregated_injury_risk_dict.items():
             body_part = body_part_factory.get_body_part(body_part_side)
             if body_part not in consolidated_injury_risk_dict:
-                consolidated_injury_risk_dict[body_part] = body_part_injury_risk
+                consolidated_injury_risk_dict[body_part] = copy.deepcopy(body_part_injury_risk)
             else:
-                consolidated_injury_risk_dict[body_part].merge(body_part_injury_risk)
+                consolidated_injury_risk_dict[body_part].merge(copy.deepcopy(body_part_injury_risk))
 
         # save this for later
         #

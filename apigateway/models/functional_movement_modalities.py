@@ -1047,7 +1047,7 @@ class ActiveRest(ModalityBase):
 
     def is_non_functional_overreaching(self, body_part_injury_risk):
 
-        two_days_ago = self.event_date_time.date() - datetime.timedelta(days=2)
+        two_days_ago = self.event_date_time.date() - datetime.timedelta(days=1)
 
         if (body_part_injury_risk.last_non_functional_overreaching_date is not None and
               body_part_injury_risk.last_non_functional_overreaching_date >= two_days_ago):
@@ -1057,7 +1057,7 @@ class ActiveRest(ModalityBase):
 
     def is_excessive_strain(self, body_part_injury_risk):
 
-        two_days_ago = self.event_date_time.date() - datetime.timedelta(days=2)
+        two_days_ago = self.event_date_time.date() - datetime.timedelta(days=1)
 
         if (body_part_injury_risk.last_excessive_strain_date is not None and
                 body_part_injury_risk.last_excessive_strain_date == self.event_date_time.date()):
