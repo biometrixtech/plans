@@ -374,7 +374,8 @@ def match_sessions(user_sessions, health_session):
     return health_session
 
 
-def create_plan(user_id, event_date, update_stats=True, athlete_stats=None, stats_processor=None, datastore_collection=None, force_data=False, mobilize_only=False, visualizations=True):
+def create_plan(user_id, event_date, update_stats=True, athlete_stats=None, stats_processor=None, datastore_collection=None,
+                force_data=False, mobilize_only=False, visualizations=True, hist_update=False):
     if datastore_collection is None:
         datastore_collection = DatastoreCollection()
     if update_stats:
@@ -384,7 +385,7 @@ def create_plan(user_id, event_date, update_stats=True, athlete_stats=None, stat
                                               # event_date=format_date(event_date),
                                               event_date=event_date,
                                               datastore_collection=datastore_collection)
-        athlete_stats = stats_processor.process_athlete_stats(current_athlete_stats=athlete_stats)
+        athlete_stats = stats_processor.process_athlete_stats(current_athlete_stats=athlete_stats, force_historical_process=hist_update)
         # update metrics
         metrics = MetricsProcessing().get_athlete_metrics_from_stats(athlete_stats=athlete_stats,
                                                                      event_date=format_date(event_date))

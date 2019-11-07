@@ -41,12 +41,15 @@ def handle_session_create(user_id=None):
     timezone = get_timezone(event_date)
     plan_update_required = False
     train_later = False
+    hist_update = False
     if 'sessions_planned' in request.json and request.json['sessions_planned']:
         train_later = True
     athlete_stats = athlete_stats_datastore.get(athlete_id=user_id)
     if athlete_stats is None:
         athlete_stats = AthleteStats(user_id)
         athlete_stats.event_date = event_date
+    if athlete_stats.api_version in [None, '4_4', '4_5']:
+        hist_update = True
     athlete_stats.api_version = Config.get('API_VERSION')
     athlete_stats.timezone = timezone
 
@@ -131,7 +134,8 @@ def handle_session_create(user_id=None):
                            athlete_stats=survey_processor.athlete_stats,
                            stats_processor=survey_processor.stats_processor,
                            datastore_collection=datastore_collection,
-                           visualizations=visualizations)
+                           visualizations=visualizations,
+                           hist_update=hist_update)
     else:
         plan = cleanup_plan(plan, visualizations)
 
@@ -385,7 +389,7 @@ def handle_get_typical_sessions(user_id=None):
 def handle_no_sessions_planned(user_id=None):
     #user_id = principal_id
     event_date = parse_datetime(request.json['event_date'])
-
+    hist_update = False
     plan_event_date = format_date(event_date)
     if not _check_plan_exists(user_id, plan_event_date):
         plan = DailyPlan(event_date=plan_event_date)
@@ -399,12 +403,15 @@ def handle_no_sessions_planned(user_id=None):
     plan.train_later = False
     daily_plan_datastore.put(plan)
     athlete_stats = athlete_stats_datastore.get(athlete_id=user_id)
+    if athlete_stats.api_version in [None, '4_4', '4_5']:
+        hist_update = True
     plan = create_plan(user_id,
                        event_date,
                        athlete_stats=athlete_stats,
                        update_stats=True,
                        datastore_collection=datastore_collection,
-                       visualizations=visualizations)
+                       visualizations=visualizations,
+                       hist_update=hist_update)
 
     return {'daily_plans': [plan]}, 200
 
