@@ -176,8 +176,10 @@ def handle_request_mobilize(user_id=None):
             force_data = True
         else:
             force_data = False
-
+    hist_update = False
     athlete_stats = athlete_stats_datastore.get(user_id)
+    if athlete_stats.api_version in [None, '4_4', '4_5']:
+        hist_update = True
     plan = create_plan(user_id,
                        event_date,
                        update_stats=True,
@@ -185,7 +187,8 @@ def handle_request_mobilize(user_id=None):
                        datastore_collection=datastore_collection,
                        force_data=force_data,
                        mobilize_only=True,
-                       visualizations=visualizations)
+                       visualizations=visualizations,
+                       hist_update=hist_update)
 
     # plan = cleanup_plan(plan, visualizations=visualizations)
 

@@ -1,3 +1,4 @@
+from fathomapi.utils.xray import xray_recorder
 from datetime import datetime, timedelta
 from logic.functional_anatomy_processing import FunctionalAnatomyProcessor
 from models.soreness_base import BodyPartSide, BodyPartLocation
@@ -497,6 +498,7 @@ class InjuryRiskProcessor(object):
 
         return injury_risk_dict
 
+    @xray_recorder.capture('logic.InjuryRiskProcessor.update_historical_data')
     def update_historical_data(self, load_stats):
 
         combined_dates = []

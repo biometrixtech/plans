@@ -17,6 +17,10 @@ from logic.functional_exercise_mapping import ExerciseAssignmentCalculator
 from tests.mocks.mock_exercise_datastore import ExerciseLibraryDatastore
 from tests.mocks.mock_completed_exercise_datastore import CompletedExerciseDatastore
 
+
+from models.body_parts import BodyPartFactory
+import copy
+
 exercise_library_datastore = ExerciseLibraryDatastore()
 completed_exercise_datastore = CompletedExerciseDatastore()
 
@@ -64,7 +68,7 @@ def test_historical_update_single_day_data():
     soreness_2.sharp = 2
     soreness_2.reported_date_time = dates[0]
 
-    proc = InjuryRiskProcessor(dates[0], [soreness, soreness_2], sessions, {}, AthleteStats(), "tester")
+    proc = InjuryRiskProcessor(dates[0], [soreness, soreness_2], sessions, {}, AthleteStats('tester'), "tester")
     injury_risk_dict = proc.process(update_historical_data=True)
     assert len(injury_risk_dict) > 0
 
@@ -100,14 +104,26 @@ def test_historical_update_multiple_day_data():
     soreness_3.reported_date_time = now_date
 
     # make historical update
-    proc = InjuryRiskProcessor(one_day_ago, [soreness, soreness_2], sessions[:2], {}, AthleteStats(), "tester")
+    proc = InjuryRiskProcessor(one_day_ago, [soreness, soreness_2], sessions[:2], {}, AthleteStats('tester'), "tester")
     injury_risk_dict = proc.process(update_historical_data=True)
 
     # update with new information
-    proc = InjuryRiskProcessor(now_date, [soreness_3], [sessions[2]], injury_risk_dict, AthleteStats(), "tester")
+    proc = InjuryRiskProcessor(now_date, [soreness_3], [sessions[2]], injury_risk_dict, AthleteStats('tester'), "tester")
     injury_risk_dict = proc.process(aggregate_results=True)
 
-    calc = ExerciseAssignmentCalculator(injury_risk_dict, exercise_library_datastore, completed_exercise_datastore,
+    consolidated_injury_risk_dict = {}
+
+    body_part_factory = BodyPartFactory()
+
+    for body_part_side, body_part_injury_risk in injury_risk_dict.items():
+        body_part = body_part_factory.get_body_part(body_part_side)
+        if body_part not in consolidated_injury_risk_dict:
+            consolidated_injury_risk_dict[body_part] = copy.deepcopy(body_part_injury_risk)
+        else:
+            consolidated_injury_risk_dict[body_part].merge(copy.deepcopy(body_part_injury_risk))
+
+
+    calc = ExerciseAssignmentCalculator(consolidated_injury_risk_dict, exercise_library_datastore, completed_exercise_datastore,
                                         dates[2])
 
     active_rest = calc.get_pre_active_rest()

@@ -57,6 +57,8 @@ class TrendProcessor(object):
         if care_index == -1:
             care_category = self.create_care_category()
             self.athlete_trend_categories.append(care_category)
+        else:
+            self.remove_old_trends(care_index, VisualizationType.care_today)
 
         prevention_index = next(
             (i for i, x in enumerate(self.athlete_trend_categories) if InsightType.prevention == x.insight_type), -1)
@@ -64,6 +66,8 @@ class TrendProcessor(object):
         if prevention_index == -1:
             prevention_category = self.create_prevention_category()
             self.athlete_trend_categories.append(prevention_category)
+        else:
+            self.remove_old_trends(prevention_index, VisualizationType.prevention)
 
         recovery_index = next(
             (i for i, x in enumerate(self.athlete_trend_categories) if InsightType.personalized_recovery == x.insight_type), -1)
@@ -71,6 +75,18 @@ class TrendProcessor(object):
         if recovery_index == -1:
             personalized_recovery_category = self.create_personalized_recovery_category()
             self.athlete_trend_categories.append(personalized_recovery_category)
+        else:
+            self.remove_old_trends(recovery_index, VisualizationType.personalized_recovery)
+
+    def remove_old_trends(self, cat_index, viz_type):
+        del_list = []
+        trends = self.athlete_trend_categories[cat_index].trends
+        for t in range(len(trends)):
+            if trends[t].visualization_type == viz_type:
+                del_list.append(t)
+        del_list.sort(reverse=True)
+        for d in del_list:
+            del trends[d]
 
     def get_care_trend(self, category_index):
 
