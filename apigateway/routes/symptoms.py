@@ -29,11 +29,13 @@ app = Blueprint('symptoms', __name__)
 def handle_session_create(user_id=None):
     event_date = parse_datetime(request.json['event_date'])
     timezone = get_timezone(event_date)
-
+    hist_update = False
     athlete_stats = athlete_stats_datastore.get(athlete_id=user_id)
     if athlete_stats is None:
         athlete_stats = AthleteStats(user_id)
         athlete_stats.event_date = event_date
+    if athlete_stats.api_version in [None, '4_4', '4_5']:
+        hist_update = True
     athlete_stats.api_version = Config.get('API_VERSION')
     athlete_stats.timezone = timezone
 
@@ -74,7 +76,8 @@ def handle_session_create(user_id=None):
                        athlete_stats=survey_processor.athlete_stats,
                        stats_processor=survey_processor.stats_processor,
                        datastore_collection=datastore_collection,
-                       visualizations=visualizations)
+                       visualizations=visualizations,
+                       hist_update=hist_update)
 
     # update users database if health data received
     if is_fathom_environment():

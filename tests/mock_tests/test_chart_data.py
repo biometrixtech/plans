@@ -256,10 +256,10 @@ def test_doms_chart():
 
     acute_surveys = stats_processing.merge_soreness_from_surveys(
         stats_processing.get_readiness_soreness_list(stats_processing.acute_readiness_surveys),
-        stats_processing.get_ps_survey_soreness_list(stats_processing.acute_post_session_surveys))
+        stats_processing.get_ps_survey_soreness_list(stats_processing.acute_post_session_surveys), [])
     chronic_surveys = stats_processing.merge_soreness_from_surveys(
         stats_processing.get_readiness_soreness_list(stats_processing.chronic_readiness_surveys),
-        stats_processing.get_ps_survey_soreness_list(stats_processing.chronic_post_session_surveys))
+        stats_processing.get_ps_survey_soreness_list(stats_processing.chronic_post_session_surveys), [])
     all_soreness = []
     all_soreness.extend(acute_surveys)
     all_soreness.extend(chronic_surveys)
@@ -312,10 +312,10 @@ def test_body_part_collection():
 
     acute_surveys = stats_processing.merge_soreness_from_surveys(
         stats_processing.get_readiness_soreness_list(stats_processing.acute_readiness_surveys),
-        stats_processing.get_ps_survey_soreness_list(stats_processing.acute_post_session_surveys))
+        stats_processing.get_ps_survey_soreness_list(stats_processing.acute_post_session_surveys), [])
     chronic_surveys = stats_processing.merge_soreness_from_surveys(
         stats_processing.get_readiness_soreness_list(stats_processing.chronic_readiness_surveys),
-        stats_processing.get_ps_survey_soreness_list(stats_processing.chronic_post_session_surveys))
+        stats_processing.get_ps_survey_soreness_list(stats_processing.chronic_post_session_surveys), [])
     all_soreness = []
     all_soreness.extend(acute_surveys)
     all_soreness.extend(chronic_surveys)
@@ -366,10 +366,10 @@ def test_body_response():
 
     acute_surveys = stats_processing.merge_soreness_from_surveys(
         stats_processing.get_readiness_soreness_list(stats_processing.acute_readiness_surveys),
-        stats_processing.get_ps_survey_soreness_list(stats_processing.acute_post_session_surveys))
+        stats_processing.get_ps_survey_soreness_list(stats_processing.acute_post_session_surveys), [])
     chronic_surveys = stats_processing.merge_soreness_from_surveys(
         stats_processing.get_readiness_soreness_list(stats_processing.chronic_readiness_surveys),
-        stats_processing.get_ps_survey_soreness_list(stats_processing.chronic_post_session_surveys))
+        stats_processing.get_ps_survey_soreness_list(stats_processing.chronic_post_session_surveys), [])
     all_soreness = []
     all_soreness.extend(acute_surveys)
     all_soreness.extend(chronic_surveys)
