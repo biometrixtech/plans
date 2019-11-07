@@ -212,7 +212,8 @@ class SurveyProcessing(object):
             self.stats_processor.load_historical_data()
         soreness_list_25 = self.stats_processor.merge_soreness_from_surveys(
             self.stats_processor.get_readiness_soreness_list(self.stats_processor.last_25_days_readiness_surveys),
-            self.stats_processor.get_ps_survey_soreness_list(self.stats_processor.last_25_days_ps_surveys)
+            self.stats_processor.get_ps_survey_soreness_list(self.stats_processor.last_25_days_ps_surveys),
+            self.stats_processor.last_25_days_symptoms
             )
         for q3_response in clear_candidates:
             body_part_location = BodyPartLocation(q3_response['body_part'])
