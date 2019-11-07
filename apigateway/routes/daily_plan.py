@@ -23,7 +23,7 @@ app = Blueprint('daily_plan', __name__)
 @xray_recorder.capture('routes.daily_plan.get')
 def handle_daily_plan_get(user_id=None):
     validate_input()
-    #user_id = principal_id
+    # user_id = principal_id
     event_date = request.json.get('event_date', format_datetime(datetime.datetime.utcnow()))
     event_date = parse_datetime(event_date)
 
@@ -39,6 +39,7 @@ def handle_daily_plan_get(user_id=None):
     need_soreness_sessions = False
     for plan in items:
         need_plan_update = False
+        hist_update = False
         survey_complete = plan.daily_readiness_survey_completed()
         if plan.event_date == format_date(event_date):
             if not survey_complete:
@@ -58,9 +59,17 @@ def handle_daily_plan_get(user_id=None):
                         if session.asymmetry is not None and session.last_updated is not None and session.last_updated > parse_datetime(plan.last_updated):
                             need_plan_update = True
                             break
+                # check if plan update is required because of swtich from pre 4_6 to 4_6 and beyond
+                viz_types = set()
+                if plan.trends is not None and plan.trends.trend_categories is not None:
+                    for tc in plan.trends.trend_categories:
+                        viz_types.update([trend.visualization_type.value for trend in tc.trends])
+                if not ({12, 13, 14} & viz_types):  # new viz types are not present, update hist and create plan
+                    hist_update = True
+                    need_plan_update = True
 
         if plan.event_date == format_date(event_date) and need_plan_update:  # if update required for any reason, create new plan
-            plan = create_plan(user_id, event_date, update_stats=True, visualizations=visualizations)
+            plan = create_plan(user_id, event_date, update_stats=True, visualizations=visualizations, hist_update=hist_update)
         else:
             plan = cleanup_plan(plan, visualizations=visualizations)
         daily_plans.append(plan)
