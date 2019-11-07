@@ -291,6 +291,8 @@ class BodyPartInjuryRisk(object):
         self.underactive_long_vote_count = 0
         self.weak_vote_count = 0
         self.last_vote_updated_date_time = None
+        self.limited_mobility_tier = 0
+        self.underactive_weak_tier = 0
 
     def json_serialise(self):
         return {
@@ -445,7 +447,9 @@ class BodyPartInjuryRisk(object):
                 "underactive_short_vote_count": self.underactive_short_vote_count,
                 "underactive_long_vote_count": self.underactive_long_vote_count,
                 "weak_vote_count": self.weak_vote_count,
-                "last_vote_updated_date_time": format_datetime(self.last_vote_updated_date_time)
+                "last_vote_updated_date_time": format_datetime(self.last_vote_updated_date_time),
+                "limited_mobility_tier": self.limited_mobility_tier,
+                "underactive_weak_tier": self.underactive_weak_tier,
 
         }
 
@@ -608,6 +612,8 @@ class BodyPartInjuryRisk(object):
         injury_risk.underactive_long_vote_count = input_dict.get('underactive_long_vote_count',0)
         injury_risk.weak_vote_count = input_dict.get('weak_vote_count', 0)
         injury_risk.last_vote_updated_date_time = input_dict.get('last_vote_updated_date_time')
+        injury_risk.limited_mobility_tier = input_dict.get('limited_mobility_tier', 0)
+        injury_risk.underactive_weak_tier = input_dict.get('underactive_weak_tier', 0)
 
         return injury_risk
 
@@ -752,6 +758,9 @@ class BodyPartInjuryRisk(object):
 
         self.last_vote_updated_date_time = self.merge_with_none(self.last_vote_updated_date_time,
                                                                 body_part_injury_risk.last_vote_updated_date_time)
+        self.limited_mobility_tier = self.merge_tiers(self.limited_mobility_tier, body_part_injury_risk.limited_mobility_tier)
+        self.underactive_weak_tier = self.merge_tiers(self.underactive_weak_tier,
+                                                      body_part_injury_risk.underactive_weak_tier)
 
     def merge_tiers(self, value_a, value_b):
 
