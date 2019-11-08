@@ -47,9 +47,12 @@ def test_body_parts_have_volume():
     session_functional_movement = SessionFunctionalMovement(s, {})
     session_functional_movement.process(s.event_date, LoadStats())
 
-    assert len(session_functional_movement.body_parts) > 0
-    for b in session_functional_movement.body_parts:
-        assert b.concentric_volume > 0 or b.eccentric_volume > 0
+    assert len(session_functional_movement.functional_movement_mappings) > 0
+    for c in session_functional_movement.functional_movement_mappings:
+        for b in c.prime_movers:
+            assert b.concentric_volume > 0 or b.eccentric_volume > 0
+        for b in c.synergists:
+            assert b.concentric_volume > 0 or b.eccentric_volume > 0
 
 
 def test_body_parts_overactive():
@@ -165,9 +168,12 @@ def test_body_parts_have_intensity():
     session_functional_movement = SessionFunctionalMovement(s, {}, )
     session_functional_movement.process(s.event_date.date(), LoadStats())
 
-    assert len(session_functional_movement.body_parts) > 0
-    for b in session_functional_movement.body_parts:
-        assert b.concentric_intensity > 0 or b.eccentric_intensity > 0
+    assert len(session_functional_movement.functional_movement_mappings) > 0
+    for c in session_functional_movement.functional_movement_mappings:
+        for b in c.prime_movers:
+            assert b.concentric_intensity > 0 or b.eccentric_intensity > 0
+        for b in c.synergists:
+            assert b.concentric_intensity > 0 or b.eccentric_intensity > 0
 
 
 def test_sharp_symptom_inflammation():
@@ -180,7 +186,8 @@ def test_sharp_symptom_inflammation():
     soreness.sharp = 3
     soreness.reported_date_time = now_date
 
-    proc = InjuryRiskProcessor(now_date, [soreness], [], {}, LoadStats())
+    proc = InjuryRiskProcessor(now_date, [soreness], [], {},  AthleteStats("Tester"), "tester")
+
     injury_risk_dict = proc.process()
 
     body_part_side = BodyPartSide(BodyPartLocation(48), 1)
@@ -199,7 +206,7 @@ def test_ache_symptom_inflammation():
     soreness.ache = 1
     soreness.reported_date_time = now_date
 
-    proc = InjuryRiskProcessor(now_date, [soreness], [], {}, AthleteStats(), "tester")
+    proc = InjuryRiskProcessor(now_date, [soreness], [], {}, AthleteStats("Tester"), "tester")
     injury_risk_dict = proc.process()
 
     body_part_side = BodyPartSide(BodyPartLocation(48), 1)
@@ -218,7 +225,7 @@ def test_tight_symptom_muscle_spasn():
     soreness.tight = 1
     soreness.reported_date_time = now_date
 
-    proc = InjuryRiskProcessor(now_date, [soreness], [], {}, AthleteStats(), "tester")
+    proc = InjuryRiskProcessor(now_date, [soreness], [], {}, AthleteStats("tester"), "tester")
     injury_risk_dict = proc.process()
 
     body_part_side = BodyPartSide(BodyPartLocation(48), 1)
@@ -243,7 +250,7 @@ def test_muscle_deconstruction():
     soreness_2.sharp = 2
     soreness_2.reported_date_time = now_date
 
-    proc = InjuryRiskProcessor(now_date, [soreness, soreness_2], [], {}, AthleteStats(), "tester")
+    proc = InjuryRiskProcessor(now_date, [soreness, soreness_2], [], {}, AthleteStats("tester"), "tester")
     injury_risk_dict = proc.process()
     body_parts = list(injury_risk_dict.keys())
     assert len(injury_risk_dict) == 9
@@ -264,7 +271,7 @@ def test_muscle_deconstruction_reconstruction():
     soreness_2.sharp = 2
     soreness_2.reported_date_time = now_date
 
-    proc = InjuryRiskProcessor(now_date, [soreness, soreness_2], [], {}, AthleteStats(), "tester")
+    proc = InjuryRiskProcessor(now_date, [soreness, soreness_2], [], {}, AthleteStats("Tester"), "tester")
     injury_risk_dict = proc.process(aggregate_results=True)
     body_parts = list(injury_risk_dict.keys())
     assert len(injury_risk_dict) == 4
@@ -291,12 +298,12 @@ def test_inflammation_affects_load():
     session_functional_movement = SessionFunctionalMovement(sessions[0], {})
     session_functional_movement.process(sessions[0].event_date, LoadStats())
 
-    proc = InjuryRiskProcessor(now_date, [soreness], sessions, {}, AthleteStats(), "tester")
+    proc = InjuryRiskProcessor(now_date, [soreness], sessions, {}, AthleteStats("Tester"), "tester")
     proc.process()
 
     # this is a section to better understand changes in volume
     for j in proc.injury_risk_dict.keys():
-        matching_parts = [b for b in session_functional_movement.body_parts if b.body_part_side == j]
+        matching_parts = [b for b in session_functional_movement.functional_movement_mappings if b.body_part_side == j]
         if len(matching_parts) > 0:
             if proc.injury_risk_dict[j].concentric_volume_today != matching_parts[0].concentric_volume:
                 k=0
