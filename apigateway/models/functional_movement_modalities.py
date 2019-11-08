@@ -1368,21 +1368,23 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
         #
         # body_part = body_part_factory.get_body_part(body_part_side)
 
-        goal = AthleteGoal("Elevated Stress", 1, AthleteGoalType.high_load)
-
         if body_part is not None:
 
             assign_exercises = False
 
-            if self.is_non_functional_overreaching(body_part_injury_risk):
+            goal = AthleteGoal("Elevated Stress", 1, AthleteGoalType.high_load)
 
-                last_severity = 7.5
+            if 0 < body_part_injury_risk.total_volume_percent_tier < 4:
+
                 assign_exercises = True
 
-            elif self.is_functional_overreaching(body_part_injury_risk):
+                if body_part_injury_risk.total_volume_percent_tier == 1:
 
-                last_severity = 2.5
-                assign_exercises = True
+                    last_severity = 7.5
+
+                else:
+
+                    last_severity = 2.5
 
             if assign_exercises:
                 self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, str(body_part_injury_risk.total_volume_percent_tier), last_severity, exercise_library)
@@ -1553,8 +1555,11 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
             else:
                 isolated_severity = 2.5
 
+            tier_one = False
+
             if is_overactive_short:
                 goal = AthleteGoal("Shortened Tissue", 1, AthleteGoalType.corrective)
+                tier_one = True
                 self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1", non_isolated_severity, exercise_library)
 
                 if max_severity < 7.0:
@@ -1566,6 +1571,7 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
             elif is_underactive_long or is_weak:
 
                 goal = AthleteGoal("Strength Deficiencies", 1, AthleteGoalType.corrective)
+                tier_one = True
 
                 if max_severity < 5.0:
                     self.copy_exercises(body_part.isolated_activate_exercises, self.isolated_activate_exercises, goal, "1",
@@ -1573,11 +1579,13 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
 
             elif is_overactive_long:
                 goal = AthleteGoal("Shortened Tissue", 1, AthleteGoalType.corrective)
+                tier_one = True
                 self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1", non_isolated_severity, exercise_library)
 
             elif is_underactive_short:
 
                 goal = AthleteGoal("Strength Deficiencies", 1, AthleteGoalType.corrective)
+                tier_one = True
                 self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1", non_isolated_severity,
                                     exercise_library)
 
@@ -1590,7 +1598,30 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
                     self.copy_exercises(body_part.isolated_activate_exercises, self.isolated_activate_exercises, goal, "1",
                                         isolated_severity, exercise_library)
 
+            if not tier_one and body_part_injury_risk.limited_mobility_tier == 2 or body_part_injury_risk.limited_mobility_tier == 3:
+                goal = AthleteGoal("Shortened Tissue", 1, AthleteGoalType.corrective)
 
+                priority = str(body_part_injury_risk.limited_mobility_tier)
+
+                self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, priority,
+                                    non_isolated_severity, exercise_library)
+
+                if max_severity < 7.0:
+                    self.copy_exercises(body_part.static_stretch_exercises, self.static_stretch_exercises, goal, priority,
+                                        non_isolated_severity, exercise_library)
+                    # self.copy_exercises(body_part.active_stretch_exercises, self.active_stretch_exercises, goal, "1",
+                    #                     last_severity, exercise_library)
+
+            if not tier_one and body_part_injury_risk.underactive_weak_tier == 2 or body_part_injury_risk.underactive_weak_tier == 3:
+
+                goal = AthleteGoal("Strength Deficiencies", 1, AthleteGoalType.corrective)
+
+                priority = str(body_part_injury_risk.underactive_weak_tier)
+
+                if max_severity < 5.0:
+                    self.copy_exercises(body_part.isolated_activate_exercises, self.isolated_activate_exercises, goal,
+                                        priority,
+                                        isolated_severity, exercise_library)
 
 
     def set_exercise_dosage_ranking(self):
@@ -1773,27 +1804,25 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
             self.copy_exercises(body_part.static_integrate_exercises, self.static_integrate_exercises, goal, "1", None,
                                 exercise_library)
 
-    def check_recovery_excessive_strain(self, body_part_side, body_part_injury_risk, exercise_library, max_severity):
+    def check_recovery_excessive_strain(self, body_part, body_part_injury_risk, exercise_library, max_severity):
 
-        body_part_factory = BodyPartFactory()
-
-        body_part = body_part_factory.get_body_part(body_part_side)
-
-        goal = AthleteGoal("Elevated Stress", 1, AthleteGoalType.high_load)
-
-        if body_part is not None and self.is_excessive_strain(body_part_injury_risk):
+        if body_part is not None:
 
             assign_exercises = False
 
-            if self.is_non_functional_overreaching(body_part_injury_risk):
+            goal = AthleteGoal("Elevated Stress", 1, AthleteGoalType.high_load)
 
-                last_severity = 7.5
+            if 0 < body_part_injury_risk.total_volume_percent_tier < 4:
+
                 assign_exercises = True
 
-            elif self.is_functional_overreaching(body_part_injury_risk):
+                if body_part_injury_risk.total_volume_percent_tier == 1:
 
-                last_severity = 2.5
-                assign_exercises = True
+                    last_severity = 7.5
+
+                else:
+
+                    last_severity = 2.5
 
             if assign_exercises:
 
@@ -1958,10 +1987,12 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
             else:
                 isolated_severity = 2.5
 
+            tier_one = False
+
             if is_overactive_short:
 
                 goal = AthleteGoal("Shortened Tissue", 1, AthleteGoalType.corrective)
-
+                tier_one = True
                 self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1", last_severity, exercise_library)
 
                 if max_severity < 7.0:
@@ -1971,7 +2002,7 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
             elif is_underactive_long or is_weak:
 
                 goal = AthleteGoal("Strength Deficiencies", 1, AthleteGoalType.corrective)
-
+                tier_one = True
                 if max_severity < 5.0:
                     self.copy_exercises(body_part.isolated_activate_exercises, self.isolated_activate_exercises, goal, "1",
                                         isolated_severity, exercise_library)
@@ -1979,13 +2010,13 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
             elif is_overactive_long:
 
                 goal = AthleteGoal("Shortened Tissue", 1, AthleteGoalType.corrective)
-
+                tier_one = True
                 self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1", last_severity, exercise_library)
 
             elif is_underactive_short:
 
                 goal = AthleteGoal("Strength Deficiencies", 1, AthleteGoalType.corrective)
-
+                tier_one = True
                 self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, "1", last_severity,
 
                                     exercise_library)
@@ -2001,7 +2032,29 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
 
                                         isolated_severity, exercise_library)
 
+            if not tier_one and body_part_injury_risk.limited_mobility_tier == 2 or body_part_injury_risk.limited_mobility_tier == 3:
 
+                goal = AthleteGoal("Shortened Tissue", 1, AthleteGoalType.corrective)
+
+                priority = str(body_part_injury_risk.limited_mobility_tier)
+
+                self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, priority, last_severity,
+                                    exercise_library)
+
+                if max_severity < 7.0:
+                    self.copy_exercises(body_part.static_stretch_exercises, self.static_stretch_exercises, goal, priority,
+                                        last_severity, exercise_library)
+
+            if not tier_one and body_part_injury_risk.underactive_weak_tier == 2 or body_part_injury_risk.underactive_weak_tier == 3:
+
+                goal = AthleteGoal("Strength Deficiencies", 1, AthleteGoalType.corrective)
+
+                priority = str(body_part_injury_risk.underactive_weak_tier)
+
+                if max_severity < 5.0:
+                    self.copy_exercises(body_part.isolated_activate_exercises, self.isolated_activate_exercises, goal,
+                                        priority,
+                                        isolated_severity, exercise_library)
 
     def set_exercise_dosage_ranking(self):
         self.rank_dosages([self.inhibit_exercises,

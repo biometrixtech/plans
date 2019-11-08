@@ -38,7 +38,9 @@ class InjuryRiskDictOutputProcessor(object):
                 'tight_count_last_0_20_days','last_tight_level','last_tight_date','last_weak_date','weak_count_last_0_20_days',
                 'last_muscle_imbalance_date','last_tendinopathy_date','last_tendinosis_date','last_altered_joint_arthokinematics_date',
                 'overactive_short_vote_count','overactive_long_vote_count','underactive_short_vote_count',
-                'underactive_long_vote_count', 'weak_vote_count', 'last_vote_updated_date_time']
+                'underactive_long_vote_count', 'weak_vote_count', 'last_vote_updated_date_time',
+                'limited_mobility_tier','underactive_weak_tier'
+        ]
 
     def write_headers(self):
         #if not os.path.exists(self.file_location+'/user_'+self.user_id):

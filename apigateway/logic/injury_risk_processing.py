@@ -213,72 +213,159 @@ class InjuryRiskProcessor(object):
             eccentric_volume_tier_2 = max_eccentric_volume - (2 * eccentric_volume_tier)
             eccentric_volume_tier_3 = max_eccentric_volume - (3 * eccentric_volume_tier)
 
+        for body_part_side, body_part_injury_risk in injury_risk_dict.items():
+            body_part_injury_risk.total_compensation_percent_tier = 0
+            body_part_injury_risk.eccentric_compensation_percent_tier = 0
+            body_part_injury_risk.total_volume_percent_tier = 0
+            body_part_injury_risk.eccentric_volume_percent_tier = 0
+            body_part_injury_risk.limited_mobility_tier = 0
+            body_part_injury_risk.underactive_weak_tier = 0
+
         if max_total_compensation is not None or max_eccentric_compensation is not None or max_total_volume is not None or max_eccentric_volume is not None:
 
-            for body_part_side, body_part_injurk_risk in injury_risk_dict.items():
+            for body_part_side, body_part_injury_risk in injury_risk_dict.items():
                 if max_total_compensation is not None:
-                    if body_part_injurk_risk.total_compensation_percent >= total_compensation_tier_1:
-                        body_part_injurk_risk.total_compensation_percent_tier = 1
-                    elif body_part_injurk_risk.total_compensation_percent >= total_compensation_tier_2:
-                        body_part_injurk_risk.total_compensation_percent_tier = 2
-                    elif body_part_injurk_risk.total_compensation_percent >= total_compensation_tier_3:
-                        body_part_injurk_risk.total_compensation_percent_tier = 3
-                    elif body_part_injurk_risk.total_compensation_percent >= min_total_compensation:
-                        body_part_injurk_risk.total_compensation_percent_tier = 4
+                    if body_part_injury_risk.total_compensation_percent >= total_compensation_tier_1:
+                        body_part_injury_risk.total_compensation_percent_tier = 1
+                    elif body_part_injury_risk.total_compensation_percent >= total_compensation_tier_2:
+                        body_part_injury_risk.total_compensation_percent_tier = 2
+                    elif body_part_injury_risk.total_compensation_percent >= total_compensation_tier_3:
+                        body_part_injury_risk.total_compensation_percent_tier = 3
+                    elif body_part_injury_risk.total_compensation_percent >= min_total_compensation:
+                        body_part_injury_risk.total_compensation_percent_tier = 4
                 else:
-                    body_part_injurk_risk.total_compensation_percent_tier = 0
+                    body_part_injury_risk.total_compensation_percent_tier = 0
 
                 if max_eccentric_compensation is not None:
-                    if body_part_injurk_risk.eccentric_compensation_percent >= eccentric_compensation_tier_1:
-                        body_part_injurk_risk.eccentric_compensation_percent_tier = 1
-                    elif body_part_injurk_risk.eccentric_compensation_percent >= eccentric_compensation_tier_2:
-                        body_part_injurk_risk.eccentric_compensation_percent_tier = 2
-                    elif body_part_injurk_risk.eccentric_compensation_percent >= eccentric_compensation_tier_3:
-                        body_part_injurk_risk.eccentric_compensation_percent_tier = 3
-                    elif body_part_injurk_risk.eccentric_compensation_percent >= min_eccentric_compensation:
-                        body_part_injurk_risk.eccentric_compensation_percent_tier = 4
+                    if body_part_injury_risk.eccentric_compensation_percent >= eccentric_compensation_tier_1:
+                        body_part_injury_risk.eccentric_compensation_percent_tier = 1
+                    elif body_part_injury_risk.eccentric_compensation_percent >= eccentric_compensation_tier_2:
+                        body_part_injury_risk.eccentric_compensation_percent_tier = 2
+                    elif body_part_injury_risk.eccentric_compensation_percent >= eccentric_compensation_tier_3:
+                        body_part_injury_risk.eccentric_compensation_percent_tier = 3
+                    elif body_part_injury_risk.eccentric_compensation_percent >= min_eccentric_compensation:
+                        body_part_injury_risk.eccentric_compensation_percent_tier = 4
                 else:
-                    body_part_injurk_risk.eccentric_compensation_percent_tier = 0
+                    body_part_injury_risk.eccentric_compensation_percent_tier = 0
 
                 if max_total_volume is not None:
-                    total_volume_today = body_part_injurk_risk.total_volume_today()
+                    total_volume_today = body_part_injury_risk.total_volume_today()
 
-                    if total_volume_today >= total_volume_tier_1:
-                        body_part_injurk_risk.total_volume_percent_tier = 1
-                        if self.relative_load_level == 1:
-                            body_part_injurk_risk.last_excessive_strain_date = self.event_date_time.date()
-                            body_part_injurk_risk.last_inhibited_date = self.event_date_time.date()
-                            body_part_injurk_risk.last_non_functional_overreaching_date = self.event_date_time.date()
-                        elif self.relative_load_level == 2:
-                            body_part_injurk_risk.last_excessive_strain_date = self.event_date_time.date()
-                            body_part_injurk_risk.last_inhibited_date = self.event_date_time.date()
-                            body_part_injurk_risk.last_functional_overreaching_date = self.event_date_time.date()
-                    elif total_volume_today >= total_volume_tier_2:
-                        body_part_injurk_risk.total_volume_percent_tier = 2
-                        if self.relative_load_level == 1:
-                            body_part_injurk_risk.last_excessive_strain_date = self.event_date_time.date()
-                            body_part_injurk_risk.last_inhibited_date = self.event_date_time.date()
-                            body_part_injurk_risk.last_functional_overreaching_date = self.event_date_time.date()
-                    elif total_volume_today >= total_volume_tier_3:
-                        body_part_injurk_risk.total_volume_percent_tier = 3
-                    elif total_volume_today >= min_total_volume:
-                        body_part_injurk_risk.total_volume_percent_tier = 4
+                    if self.relative_load_level == 1:
+
+                        if total_volume_today >= total_volume_tier_1:
+                            body_part_injury_risk.total_volume_percent_tier = 1
+                            body_part_injury_risk.last_excessive_strain_date = self.event_date_time.date()
+                            body_part_injury_risk.last_inhibited_date = self.event_date_time.date()
+                            body_part_injury_risk.last_non_functional_overreaching_date = self.event_date_time.date()
+
+                        elif total_volume_today >= total_volume_tier_2:
+                            body_part_injury_risk.total_volume_percent_tier = 2
+                            body_part_injury_risk.last_excessive_strain_date = self.event_date_time.date()
+                            body_part_injury_risk.last_inhibited_date = self.event_date_time.date()
+                            body_part_injury_risk.last_functional_overreaching_date = self.event_date_time.date()
+
+                        elif total_volume_today >= total_volume_tier_3:
+                            body_part_injury_risk.total_volume_percent_tier = 3
+
+                        elif total_volume_today >= min_total_volume:
+                            body_part_injury_risk.total_volume_percent_tier = 0
+
+                    elif self.relative_load_level == 2:
+                        if total_volume_today >= total_volume_tier_1:
+                            body_part_injury_risk.total_volume_percent_tier = 2
+                            body_part_injury_risk.last_excessive_strain_date = self.event_date_time.date()
+                            body_part_injury_risk.last_inhibited_date = self.event_date_time.date()
+                            body_part_injury_risk.last_functional_overreaching_date = self.event_date_time.date()
+
+                        elif total_volume_today >= total_volume_tier_2:
+                            body_part_injury_risk.total_volume_percent_tier = 3
+
+                        elif total_volume_today >= total_volume_tier_3:
+                            body_part_injury_risk.total_volume_percent_tier = 0
+
+                        elif total_volume_today >= min_total_volume:
+                            body_part_injury_risk.total_volume_percent_tier = 0
+
+                    else:
+                        if total_volume_today >= total_volume_tier_1:
+                            body_part_injury_risk.total_volume_percent_tier = 3
+
+                        elif total_volume_today >= total_volume_tier_2:
+                            body_part_injury_risk.total_volume_percent_tier = 0
+
+                        elif total_volume_today >= total_volume_tier_3:
+                            body_part_injury_risk.total_volume_percent_tier = 0
+
+                        elif total_volume_today >= min_total_volume:
+                            body_part_injury_risk.total_volume_percent_tier = 0
+
                 else:
-                    body_part_injurk_risk.total_volume_percent_tier = 0
+                    if body_part_injury_risk.last_non_functional_overreaching_date == self.two_days_ago:
+                        body_part_injury_risk.total_volume_percent_tier = 3
+                    else:
+                        body_part_injury_risk.total_volume_percent_tier = 0
 
                 if max_eccentric_volume is not None:
-                    eccentric_volume_today = body_part_injurk_risk.eccentric_volume_today()
+                    eccentric_volume_today = body_part_injury_risk.eccentric_volume_today()
 
                     if eccentric_volume_today >= eccentric_volume_tier_1:
-                        body_part_injurk_risk.eccentric_volume_percent_tier = 1
+                        body_part_injury_risk.eccentric_volume_percent_tier = 1
                     elif eccentric_volume_today >= eccentric_volume_tier_2:
-                        body_part_injurk_risk.eccentric_volume_percent_tier = 2
+                        body_part_injury_risk.eccentric_volume_percent_tier = 2
                     elif eccentric_volume_today >= eccentric_volume_tier_3:
-                        body_part_injurk_risk.eccentric_volume_percent_tier = 3
+                        body_part_injury_risk.eccentric_volume_percent_tier = 3
                     elif eccentric_volume_today >= min_eccentric_volume:
-                        body_part_injurk_risk.eccentric_volume_percent_tier = 4
+                        body_part_injury_risk.eccentric_volume_percent_tier = 4
                 else:
-                    body_part_injurk_risk.eccentric_volume_percent_tier = 0
+                    body_part_injury_risk.eccentric_volume_percent_tier = 0
+
+                # add prevention ranking
+                if (body_part_injury_risk.overactive_long_count_last_0_20_days >= 3 or
+                        body_part_injury_risk.overactive_short_count_last_0_20_days >= 3 or
+                        body_part_injury_risk.underactive_short_count_last_0_20_days >= 3):
+                    # create tier 1
+                    body_part_injury_risk.limited_mobility_tier = 1
+                elif (body_part_injury_risk.overactive_long_count_last_0_20_days < 3 and
+                        body_part_injury_risk.overactive_short_count_last_0_20_days < 3 and
+                        body_part_injury_risk.underactive_short_count_last_0_20_days < 3):
+                    if (body_part_injury_risk.overactive_long_count_last_0_20_days > 0 or
+                            body_part_injury_risk.overactive_short_count_last_0_20_days > 0 or
+                            body_part_injury_risk.underactive_short_count_last_0_20_days > 0):
+                        # create tier two
+                        body_part_injury_risk.limited_mobility_tier = 2
+                    elif (body_part_injury_risk.overactive_long_vote_count > 0 or
+                            body_part_injury_risk.overactive_short_vote_count > 0 or
+                            body_part_injury_risk.underactive_short_vote_count > 0):
+                        # create tier 3
+                        body_part_injury_risk.limited_mobility_tier = 3
+
+                # include joint and ligament issues
+                if (body_part_injury_risk.last_altered_joint_arthokinematics_date is not None and
+                        body_part_injury_risk.last_altered_joint_arthokinematics_date == self.event_date_time.date()):
+                    body_part_injury_risk.limited_mobility_tier = 1
+
+                if ((body_part_injury_risk.last_tendinopathy_date is not None and
+                     body_part_injury_risk.last_tendinopathy_date == self.event_date_time.date()) or
+                        (body_part_injury_risk.last_tendinosis_date is not None and
+                         body_part_injury_risk.last_tendinosis_date == self.event_date_time.date())):
+                    body_part_injury_risk.limited_mobility_tier = 1
+
+                # add prevention ranking
+                if (body_part_injury_risk.underactive_long_count_last_0_20_days >= 3 or
+                        body_part_injury_risk.weak_count_last_0_20_days >= 3):
+                    # create tier 1
+                    body_part_injury_risk.underactive_weak_tier = 1
+                elif (body_part_injury_risk.underactive_long_count_last_0_20_days < 3 and
+                        body_part_injury_risk.weak_count_last_0_20_days < 3):
+                    if (body_part_injury_risk.underactive_long_count_last_0_20_days > 0 or
+                            body_part_injury_risk.weak_count_last_0_20_days > 0):
+                        # create tier two
+                        body_part_injury_risk.underactive_weak_tier = 2
+                    elif (body_part_injury_risk.underactive_long_vote_count > 0 or
+                            body_part_injury_risk.weak_vote_count > 0):
+                        # create tier 3
+                        body_part_injury_risk.underactive_weak_tier = 3
 
         return injury_risk_dict
     

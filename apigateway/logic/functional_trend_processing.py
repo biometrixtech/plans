@@ -670,11 +670,11 @@ class TrendProcessor(object):
 
         for body_part_side, body_part_injury_risk in self.injury_hist_dict.items():
 
-            is_training_stress = False
+            is_training_stress_today = False
             is_compensating = False
             is_elevated_stress = False
-            is_functional_overreaching = False
-            is_non_functional_overreaching = False
+            # is_functional_overreaching_today = False
+            # is_non_functional_overreaching = False
 
             if (body_part_injury_risk.last_compensation_date is not None and
                     body_part_injury_risk.last_compensation_date == self.event_date_time.date() and
@@ -682,13 +682,13 @@ class TrendProcessor(object):
                 is_compensating = True
 
             if 0 < body_part_injury_risk.total_volume_percent_tier < 4:
-                is_training_stress = True
+                is_training_stress_today = True
 
-            if body_part_injury_risk.last_functional_overreaching_date is not None and body_part_injury_risk.last_functional_overreaching_date == self.event_date_time.date():
-                is_functional_overreaching = True
-
-            if body_part_injury_risk.last_non_functional_overreaching_date is not None and body_part_injury_risk.last_non_functional_overreaching_date >= two_days_ago:
-                is_non_functional_overreaching = True
+            # if body_part_injury_risk.last_functional_overreaching_date is not None and body_part_injury_risk.last_functional_overreaching_date == self.event_date_time.date():
+            #     is_functional_overreaching_today = True
+            #
+            # if body_part_injury_risk.last_non_functional_overreaching_date is not None and body_part_injury_risk.last_non_functional_overreaching_date >= two_days_ago:
+            #     is_non_functional_overreaching = True
 
             if (body_part_injury_risk.last_movement_dysfunction_stress_date is not None and
                     body_part_injury_risk.last_movement_dysfunction_stress_date == self.event_date_time.date()):
@@ -712,29 +712,17 @@ class TrendProcessor(object):
                                                         LegendColor.yellow_light)
                     movement_dysfunction.append(body_part_side_viz)
 
-            if not is_compensating and not is_elevated_stress and is_training_stress:
+            if not is_compensating and not is_elevated_stress and is_training_stress_today:
                 if body_part_injury_risk.total_volume_percent_tier == 1:
-                    if is_non_functional_overreaching:
-                        body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
+                    body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
                                                             LegendColor.success_light)
-                        high_stress.append(body_part_side_viz)
-                    elif is_functional_overreaching:
-                        body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
-                                                             LegendColor.success_x_light)
-                        mod_stress.append(body_part_side_viz)
-                    else:
-                        body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
-                                                             LegendColor.success_xx_light)
-                        low_stress.append(body_part_side_viz)
+                    high_stress.append(body_part_side_viz)
+
                 elif body_part_injury_risk.total_volume_percent_tier == 2:
-                    if is_functional_overreaching:
-                        body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
+                    body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
                                                              LegendColor.success_x_light)
-                        mod_stress.append(body_part_side_viz)
-                    else:
-                        body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
-                                                             LegendColor.success_xx_light)
-                        low_stress.append(body_part_side_viz)
+                    mod_stress.append(body_part_side_viz)
+
                 else:
                     body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
                                                          LegendColor.success_xx_light)
@@ -797,6 +785,10 @@ class TrendProcessor(object):
         tendin = []
         underactive_weak = []
         underactive_inhibited = []
+        limited_mobility_2 = []
+        limited_mobility_3 = []
+        underactive_weak_2 = []
+        underactive_weak_3 = []
 
         for body_part_side, body_part_injury_risk in self.injury_hist_dict.items():
 
@@ -832,38 +824,58 @@ class TrendProcessor(object):
 
             if is_overactive_short and not is_joint_arthro and not is_tendin:
                 body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
-                                                     LegendColor.warning_x_light)
+                                                     LegendColor.warning_light)
                 overactive.append(body_part_side_viz)
 
             if is_weak and not is_overactive_short and not is_joint_arthro and not is_tendin:
                 body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
-                                                     LegendColor.splash_m_light)
+                                                     LegendColor.splash_light)
                 underactive_weak.append(body_part_side_viz)
 
             if not is_weak and is_inhibited and not is_overactive_short and not is_joint_arthro and not is_tendin:
                 body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
-                                                     LegendColor.splash_m_light)
+                                                     LegendColor.splash_light)
                 underactive_inhibited.append(body_part_side_viz)
 
             if is_short and not is_overactive_short and not is_weak and not is_inhibited and not is_joint_arthro and not is_tendin:
                 body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
-                                                     LegendColor.warning_x_light)
+                                                     LegendColor.warning_light)
                 short.append(body_part_side_viz)
 
             if is_joint_arthro and not is_tendin and not is_overactive_short and not is_weak and not is_inhibited and not is_short:
                 body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
-                                                     LegendColor.warning_x_light)
+                                                     LegendColor.warning_light)
                 joint_artho.append(body_part_side_viz)
 
             if is_tendin and not is_joint_arthro and not is_overactive_short and not is_weak and not is_inhibited and not is_short:
                 body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
-                                                     LegendColor.warning_x_light)
+                                                     LegendColor.warning_light)
                 tendin.append(body_part_side_viz)
+
+            if body_part_injury_risk.limited_mobility_tier == 2:
+                body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
+                                                     LegendColor.warning_x_light)
+                limited_mobility_2.append(body_part_side_viz)
+            elif body_part_injury_risk.limited_mobility_tier == 3:
+                body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
+                                                     LegendColor.warning_xx_light)
+                limited_mobility_3.append(body_part_side_viz)
+
+            if body_part_injury_risk.underactive_weak_tier == 2:
+                body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
+                                                     LegendColor.splash_m_light)
+                underactive_weak_2.append(body_part_side_viz)
+            elif body_part_injury_risk.underactive_weak_tier == 3:
+                body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
+                                                     LegendColor.splash_xx_light)
+                underactive_weak_3.append(body_part_side_viz)
 
         # since we're reverse sorting, 2 is a higher priority than 1
 
         if (len(short) > 0 or len(joint_artho) > 0 or len(overactive) > 0 or len(tendin) > 0 or
-                len(underactive_weak) > 0 or len(underactive_inhibited) > 0):
+                len(underactive_weak) > 0 or len(underactive_inhibited) > 0 or
+                len(limited_mobility_2) > 0 or len(limited_mobility_3) > 0 or
+                len(underactive_weak_2) > 0 or len(underactive_weak_3) > 0):
 
             trend = self.get_prevention_trend(category_index)
 
@@ -876,9 +888,13 @@ class TrendProcessor(object):
             prevention_data.limited_mobility.extend(short)
             prevention_data.limited_mobility.extend(joint_artho)
             prevention_data.limited_mobility.extend(tendin)
+            prevention_data.limited_mobility.extend(limited_mobility_2)
+            prevention_data.limited_mobility.extend(limited_mobility_3)
 
             prevention_data.underactive.extend(underactive_weak)
             prevention_data.underactive.extend(underactive_inhibited)
+            prevention_data.underactive.extend(underactive_weak_2)
+            prevention_data.underactive.extend(underactive_weak_3)
 
             prevention_data.remove_duplicates()
             trend_data.data = [prevention_data]
@@ -892,11 +908,21 @@ class TrendProcessor(object):
                 trend.trigger_tiles.extend(self.get_body_part_list_trigger_tiles(joint_artho, "Altered Arthrokinematics", LegendColor.warning_light))
             if len(tendin) > 0:
                 trend.trigger_tiles.extend(self.get_body_part_list_trigger_tiles(tendin, "Tendinopathy or Tendinosis", LegendColor.warning_light))
+            if len(limited_mobility_2) > 0:
+                trend.trigger_tiles.extend(self.get_body_part_list_trigger_tiles(limited_mobility_2, "Signs of Pattern", LegendColor.warning_light))
+            if len(limited_mobility_3) > 0:
+                trend.trigger_tiles.extend(
+                    self.get_body_part_list_trigger_tiles(limited_mobility_3, "Tracking for Pattern", LegendColor.warning_light))
 
             if len(underactive_weak) > 0:
                 trend.trigger_tiles.extend(self.get_body_part_list_trigger_tiles(underactive_weak, "Weak", LegendColor.splash_light))
             if len(underactive_inhibited) > 0:
                 trend.trigger_tiles.extend(self.get_body_part_list_trigger_tiles(underactive_inhibited, "Inhibited", LegendColor.splash_light))
+            if len(underactive_weak_2) > 0:
+                trend.trigger_tiles.extend(self.get_body_part_list_trigger_tiles(underactive_weak_2, "Signs of Pattern", LegendColor.splash_light))
+            if len(underactive_weak_3) > 0:
+                trend.trigger_tiles.extend(
+                    self.get_body_part_list_trigger_tiles(underactive_weak_3, "Tracking for Pattern", LegendColor.splash_light))
 
             # underactive_list = []
             # underactive_list.extend(underactive_weak)
@@ -981,7 +1007,7 @@ class TrendProcessor(object):
         tile_1.description = body_part_text_string
         bold_1 = BoldText()
         bold_1.text = body_part_text_string
-        bold_1.color = LegendColor.warning_x_light
+        bold_1.color = color
         tile_1.bold_text.append(bold_1)
         # tile_1.statistic_text = statistic_text
         # tile_1.bold_statistic_text = bold_statistic_text
