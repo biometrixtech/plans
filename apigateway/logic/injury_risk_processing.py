@@ -23,6 +23,7 @@ class InjuryRiskProcessor(object):
         self.relative_load_level = 3
         self.high_relative_load_sessions = athlete_stats.high_relative_load_sessions
         self.aggregated_injury_risk_dict = {}
+        self.viz_aggregated_injury_risk_dict = {}
         self.two_days_ago = self.event_date_time.date() - timedelta(days=1)
         self.three_days_ago = self.event_date_time.date() - timedelta(days=2)
         self.ten_days_ago = self.event_date_time.date() - timedelta(days=9)
@@ -112,7 +113,7 @@ class InjuryRiskProcessor(object):
 
         return consolidated_injury_risk_dict
 
-    def process(self, update_historical_data=False, aggregate_results=False):
+    def process(self, update_historical_data=False, aggregate_results=False, aggregate_for_viz=False):
 
         self.initialize()
         # deconstruct symptoms to muscle level
@@ -159,9 +160,30 @@ class InjuryRiskProcessor(object):
 
             self.aggregated_injury_risk_dict = aggregated_injury_hist_dict
 
-            #self.aggregated_injury_risk_dict = self.update_injury_risk_dict_rankings(self.aggregated_injury_risk_dict)
-
             return self.aggregated_injury_risk_dict
+
+        elif aggregate_for_viz:
+
+            aggregated_injury_hist_dict = {}
+
+            for body_part_side, body_part_injury_risk in self.injury_risk_dict.items():
+                if body_part_side not in aggregated_injury_hist_dict:
+                    muscle_group = BodyPartLocation.get_viz_muscle_group(body_part_side.body_part_location)
+                    if isinstance(muscle_group, BodyPartLocation):
+                        new_body_part_side = BodyPartSide(muscle_group, body_part_side.side)
+                        if new_body_part_side not in aggregated_injury_hist_dict:
+                            aggregated_injury_hist_dict[new_body_part_side] = deepcopy(body_part_injury_risk)
+                        else:
+                            aggregated_injury_hist_dict[new_body_part_side].merge(self.injury_risk_dict[body_part_side])
+                    else:
+                        aggregated_injury_hist_dict[body_part_side] = deepcopy(self.injury_risk_dict[body_part_side])
+                else:
+                    aggregated_injury_hist_dict[body_part_side].merge(self.injury_risk_dict[body_part_side])
+
+            self.viz_aggregated_injury_risk_dict = aggregated_injury_hist_dict
+
+            return self.viz_aggregated_injury_risk_dict
+
         else:
             return self.injury_risk_dict
 

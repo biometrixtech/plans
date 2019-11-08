@@ -17,7 +17,7 @@ from datetime import datetime, timedelta
 import movement_pattern_history as mph
 
 
-plans_version = "4_5"
+plans_version = "4_6"
 
 
 def login_user(email, password="Fathom123!"):

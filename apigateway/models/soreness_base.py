@@ -211,6 +211,25 @@ class BodyPartLocation(Enum):
         return False
 
     @classmethod
+    def get_viz_muscle_group(cls, muscle):
+        muscle_groups = cls.muscle_groups_viz()
+
+        if muscle in muscle_groups.keys():  # is a muscle group, return itself
+            return muscle
+        else:
+            for key, value in muscle_groups.items():
+                if muscle in value:  # is a muscle, return the group
+                    return key
+        return False  # joint or ligament
+
+    @classmethod
+    def get_viz_muscles_for_group(cls, muscle_group):
+        muscle_groups = cls.muscle_groups_viz()
+        if muscle_group in muscle_groups.keys():
+            return muscle_groups[muscle_group]
+        return False
+
+    @classmethod
     def muscle_groups_viz(cls):
         grouped_muscles = {
             cls.semimembranosus_semitendinosus: [cls.semimembranosus, cls.semitendinosus],

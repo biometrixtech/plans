@@ -984,7 +984,14 @@ class TrendProcessor(object):
         statistic_text = ""
         bold_statistic_text = []
         # mobilize_suffix = "to improve tissue range of motion"
-        sideless_body_parts = [b.body_part_location for b in body_part_sides]
+        # aggregate to muscle group level
+        muscle_groups = []
+        for b in body_part_sides:
+            muscle_group = b.body_part_location.get_muscle_group(b.body_part_location)
+            muscle_groups.append(muscle_group)
+
+        #sideless_body_parts = [b.body_part_location for b in body_part_sides]
+        sideless_body_parts = [b for b in muscle_groups]
         sideless_body_parts = list(set(sideless_body_parts))
 
         body_part_text_string = ''

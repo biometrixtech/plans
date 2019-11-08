@@ -143,7 +143,7 @@ class TrainingPlanManager(object):
         injury_risk_processor = InjuryRiskProcessor(date, self.soreness_list, self.daily_plan.training_sessions,
                                                     historical_injury_risk_dict, self.athlete_stats,
                                                     self.athlete_stats.athlete_id)
-        aggregated_injury_risk_dict = injury_risk_processor.process(aggregate_results=True)
+        aggregated_injury_risk_dict = injury_risk_processor.process(aggregate_for_viz=True)
 
         consolidated_injury_risk_dict = injury_risk_processor.get_consolidated_dict()
 
