@@ -296,10 +296,13 @@ class BodyPartSideViz(object):
         self.color = color
 
     def __hash__(self):
-        return hash((self.body_part_location.value, self.side, self.color))
+        #return hash((self.body_part_location.value, self.side, self.color))
+        return hash((self.body_part_location.value, self.side))
 
     def __eq__(self, other):
-        return self.body_part_location == other.body_part_location and self.side == other.side and self.color == other.color
+        #return self.body_part_location == other.body_part_location and self.side == other.side and self.color == other.color
+
+        return self.body_part_location == other.body_part_location and self.side == other.side
 
     def __ne__(self, other):
         # Not strictly necessary, but to avoid having both x==y and x!=y

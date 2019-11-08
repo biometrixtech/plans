@@ -258,8 +258,8 @@ class BodyPartFactory(object):
                                   BodyPartLocation.upper_body,
                                   BodyPartLocation.lower_body,
                                   BodyPartLocation.abdominals,
-                                  BodyPartLocation.lower_back,
-                                  BodyPartLocation.upper_back_neck,
+                                  #BodyPartLocation.lower_back,
+                                  #BodyPartLocation.upper_back_neck,
                                   BodyPartLocation.rectus_abdominis]:
             return False
         else:

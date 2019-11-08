@@ -97,6 +97,21 @@ class InjuryRiskProcessor(object):
                 elif (r.session_RPE >= 3 and high_intensity_session) or (r.session_RPE >= 5 and not high_intensity_session):
                     self.relative_load_level = 2
 
+    def get_consolidated_dict(self):
+
+        consolidated_injury_risk_dict = {}
+
+        body_part_factory = BodyPartFactory()
+
+        for body_part_side, body_part_injury_risk in self.aggregated_injury_risk_dict.items():
+            body_part = body_part_factory.get_body_part(body_part_side)
+            if body_part not in consolidated_injury_risk_dict:
+                consolidated_injury_risk_dict[body_part] = deepcopy(body_part_injury_risk)
+            else:
+                consolidated_injury_risk_dict[body_part].merge(deepcopy(body_part_injury_risk))
+
+        return consolidated_injury_risk_dict
+
     def process(self, update_historical_data=False, aggregate_results=False):
 
         self.initialize()
@@ -791,7 +806,7 @@ class InjuryRiskProcessor(object):
             elif apt_ankle_present and (
                     hip_drop_apt_present or hip_drop_pva_present) and (knee_valgus_apt_present or knee_valgus_pva_present):
                 short_list = [59, 49, 50, 52, 53, 54, 46, 55]
-                long_list = [66, 63, 64, 47, 48, 53, 68, 44]
+                long_list = [66, 63, 64, 47, 48, 44]
                 full_list = []
                 full_list.extend(short_list)
                 full_list.extend(long_list)
@@ -822,7 +837,7 @@ class InjuryRiskProcessor(object):
 
             elif not apt_ankle_present and ((hip_drop_pva_present and knee_valgus_pva_present) or knee_valgus_hip_drop_present):
                 short_list = [65, 59, 49, 50, 52, 53, 54, 55, 46]
-                long_list = [66, 63, 64, 68, 53, 47, 48, 56]
+                long_list = [66, 63, 64, 53, 47, 48, 56]
                 full_list = []
                 full_list.extend(short_list)
                 full_list.extend(long_list)
@@ -840,7 +855,7 @@ class InjuryRiskProcessor(object):
 
             elif not apt_ankle_present and not hip_drop_pva_present and knee_valgus_pva_present:
                 short_list = [59, 55, 46, 61, 43, 41]
-                long_list = [68, 53, 47, 48, 56, 44, 40, 42]
+                long_list = [53, 47, 48, 56, 44, 40, 42]
                 full_list = []
                 full_list.extend(short_list)
                 full_list.extend(long_list)

@@ -52,10 +52,11 @@ def test_create_plan_no_session():
     soreness.sharp = 3
     soreness.reported_date_time = now_date
 
-    proc = InjuryRiskProcessor(now_date, [soreness], [], {}, AthleteStats(), "tester")
+    proc = InjuryRiskProcessor (now_date, [soreness], [], {}, AthleteStats("tester"), "tester")
     injury_risk_dict = proc.process(aggregate_results=True)
+    consolidated_injury_risk_dict = proc.get_consolidated_dict()
 
-    calc = ExerciseAssignmentCalculator(injury_risk_dict, exercise_library_datastore, completed_exercise_datastore, now_date)
+    calc = ExerciseAssignmentCalculator(consolidated_injury_risk_dict, exercise_library_datastore, completed_exercise_datastore, now_date)
 
     active_rest = calc.get_pre_active_rest()
     assert len(active_rest[0].inhibit_exercises) > 0
@@ -83,10 +84,11 @@ def test_create_plan_with_session():
     soreness_2.sharp = 2
     soreness_2.reported_date_time = dates[0]
 
-    proc = InjuryRiskProcessor(dates[0], [soreness, soreness_2], sessions, {}, AthleteStats(), "tester")
+    proc = InjuryRiskProcessor(dates[0], [soreness, soreness_2], sessions, {}, AthleteStats("tester"), "tester")
     injury_risk_dict = proc.process(aggregate_results=True)
+    consolidated_injury_risk_dict = proc.get_consolidated_dict()
 
-    calc = ExerciseAssignmentCalculator(injury_risk_dict, exercise_library_datastore, completed_exercise_datastore,
+    calc = ExerciseAssignmentCalculator(consolidated_injury_risk_dict, exercise_library_datastore, completed_exercise_datastore,
                                         dates[0])
 
     active_rest = calc.get_pre_active_rest()

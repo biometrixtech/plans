@@ -704,13 +704,19 @@ class TrendProcessor(object):
                 else:
                     body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
                                                          LegendColor.yellow_xx_light)
-                compensating.append(body_part_side_viz)
+                movement_dysfunction.append(body_part_side_viz)
 
             if is_compensating and not is_elevated_stress:
                 if body_part_injury_risk.total_compensation_percent_tier == 1:
                     body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
                                                         LegendColor.yellow_light)
-                    movement_dysfunction.append(body_part_side_viz)
+                elif body_part_injury_risk.total_compensation_percent_tier == 2:
+                    body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
+                                                        LegendColor.yellow_x_light)
+                else:
+                    body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
+                                                         LegendColor.yellow_xx_light)
+                compensating.append(body_part_side_viz)
 
             if not is_compensating and not is_elevated_stress and is_training_stress_today:
                 if body_part_injury_risk.total_volume_percent_tier == 1:
@@ -867,7 +873,7 @@ class TrendProcessor(object):
                 underactive_weak_2.append(body_part_side_viz)
             elif body_part_injury_risk.underactive_weak_tier == 3:
                 body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
-                                                     LegendColor.splash_xx_light)
+                                                     LegendColor.splash_x_light)
                 underactive_weak_3.append(body_part_side_viz)
 
         # since we're reverse sorting, 2 is a higher priority than 1
