@@ -371,6 +371,9 @@ class TrendProcessor(object):
                 body_part.treatment_priority = 99
             converted_body_parts.append(body_part)
 
+            if body_part.location is None:
+                h=0
+
         if side == 0:
             converted_body_parts = set(converted_body_parts)
 
@@ -988,7 +991,10 @@ class TrendProcessor(object):
         muscle_groups = []
         for b in body_part_sides:
             muscle_group = b.body_part_location.get_muscle_group(b.body_part_location)
-            muscle_groups.append(muscle_group)
+            if isinstance(muscle_group, bool):
+                muscle_groups.append(b.body_part_location)
+            else:
+                muscle_groups.append(muscle_group)
 
         #sideless_body_parts = [b.body_part_location for b in body_part_sides]
         sideless_body_parts = [b for b in muscle_groups]
