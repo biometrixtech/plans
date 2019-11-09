@@ -550,6 +550,9 @@ class TrendProcessor(object):
         inflamed = []
         muscle_spasm = []
         knots = []
+        inflamed_low = []
+        inflamed_mod = []
+        inflamed_high = []
 
         for body_part_side, body_part_injury_risk in self.injury_hist_dict.items():
             is_inflammation = False
@@ -574,12 +577,15 @@ class TrendProcessor(object):
                 if inflammation_severity >= 7:
                     body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
                                                          LegendColor.error_light)
+                    inflamed_high.append(body_part_side_viz)
                 elif 4 <= inflammation_severity < 7:
                     body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
                                                          LegendColor.error_x_light)
+                    inflamed_mod.append(body_part_side_viz)
                 else:
                     body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
                                                          LegendColor.error_xx_light)
+                    inflamed_low.append(body_part_side_viz)
                 inflamed.append(body_part_side_viz)
 
             #if not is_inflammation and not is_muscle_spasm and is_knots:
@@ -629,12 +635,16 @@ class TrendProcessor(object):
             trend_data.data = [care_data]
 
             trend.trigger_tiles = []
-            if len(inflamed) > 0:
-                trend.trigger_tiles.extend(self.get_body_part_list_trigger_tiles(inflamed, "Inflamed", LegendColor.error_light))
+            if len(inflamed_high) > 0:
+                trend.trigger_tiles.extend(self.get_body_part_list_trigger_tiles(inflamed_high, "Inflamed - High", LegendColor.error_light))
+            if len(inflamed_mod) > 0:
+                trend.trigger_tiles.extend(self.get_body_part_list_trigger_tiles(inflamed_mod, "Inflamed - Mod", LegendColor.error_light))
+            if len(inflamed_low) > 0:
+                trend.trigger_tiles.extend(self.get_body_part_list_trigger_tiles(inflamed_low, "Inflamed - Low", LegendColor.error_light))
             if len(muscle_spasm) > 0:
-                trend.trigger_tiles.extend(self.get_body_part_list_trigger_tiles(muscle_spasm, "Tight", LegendColor.warning_light))
+                trend.trigger_tiles.extend(self.get_body_part_list_trigger_tiles(muscle_spasm, "Tight - Muscle Spasms", LegendColor.warning_light))
             if len(knots) > 0:
-                trend.trigger_tiles.extend(self.get_body_part_list_trigger_tiles(knots, "Tight", LegendColor.warning_light))
+                trend.trigger_tiles.extend(self.get_body_part_list_trigger_tiles(knots, "Tight - Adhesions", LegendColor.warning_light))
 
 
             # trend.trigger_tiles.extend(self.get_trigger_tiles(inflamed))
@@ -847,8 +857,9 @@ class TrendProcessor(object):
                 underactive_inhibited.append(body_part_side_viz)
 
             if is_short and not is_overactive_short and not is_weak and not is_inhibited and not is_joint_arthro and not is_tendin:
+                # making this priority 2 (mod)
                 body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
-                                                     LegendColor.warning_light)
+                                                     LegendColor.warning_x_light)
                 short.append(body_part_side_viz)
 
             if is_joint_arthro and not is_tendin and not is_overactive_short and not is_weak and not is_inhibited and not is_short:
