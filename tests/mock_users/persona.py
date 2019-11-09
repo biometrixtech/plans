@@ -189,7 +189,7 @@ class Persona(object):
             self.daily_plan.training_sessions.append(session)
 
     def send_three_sensor_data_to_plans(self, user_id, jwt, body):
-        url = 'https://apis.{env}.fathomai.com/plans/4_5/session/{user_id}/three_sensor_data'.format(
+        url = 'https://apis.{env}.fathomai.com/plans/4_6/session/{user_id}/three_sensor_data'.format(
             env=os.environ['ENVIRONMENT'], user_id=user_id, version=self.plans_version)
         # proc = ThreeSensorAPIRequestProcessor(event_date, session_id, seconds_duration, end_date)
         # body = proc.get_body(asymmetry_patterns, movement_patterns)

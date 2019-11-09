@@ -158,11 +158,13 @@ class InjuryRiskProcessor(object):
                         if new_body_part_side not in aggregated_injury_hist_dict:
                             aggregated_injury_hist_dict[new_body_part_side] = deepcopy(body_part_injury_risk)
                         else:
-                            aggregated_injury_hist_dict[new_body_part_side].merge(self.injury_risk_dict[body_part_side])
+                            existing_body_part_injury_risk = deepcopy(self.injury_risk_dict[body_part_side])
+                            aggregated_injury_hist_dict[new_body_part_side].merge(existing_body_part_injury_risk)
                     else:
                         aggregated_injury_hist_dict[body_part_side] = deepcopy(self.injury_risk_dict[body_part_side])
                 else:
-                    aggregated_injury_hist_dict[body_part_side].merge(self.injury_risk_dict[body_part_side])
+                    existing_body_part_injury_risk = deepcopy(self.injury_risk_dict[body_part_side])
+                    aggregated_injury_hist_dict[body_part_side].merge(existing_body_part_injury_risk)
 
             self.viz_aggregated_injury_risk_dict = aggregated_injury_hist_dict
 
@@ -181,11 +183,13 @@ class InjuryRiskProcessor(object):
                     if new_body_part_side not in aggregated_injury_hist_dict:
                         aggregated_injury_hist_dict[new_body_part_side] = deepcopy(body_part_injury_risk)
                     else:
-                        aggregated_injury_hist_dict[new_body_part_side].merge(self.injury_risk_dict[body_part_side])
+                        existing_body_part_injury_risk = deepcopy(self.injury_risk_dict[body_part_side])
+                        aggregated_injury_hist_dict[new_body_part_side].merge(existing_body_part_injury_risk)
                 else:
                     aggregated_injury_hist_dict[body_part_side] = deepcopy(self.injury_risk_dict[body_part_side])
             else:
-                aggregated_injury_hist_dict[body_part_side].merge(self.injury_risk_dict[body_part_side])
+                existing_body_part_injury_risk = deepcopy(self.injury_risk_dict[body_part_side])
+                aggregated_injury_hist_dict[body_part_side].merge(existing_body_part_injury_risk)
         self.aggregated_injury_risk_dict = aggregated_injury_hist_dict
 
         return self.aggregated_injury_risk_dict
@@ -360,52 +364,53 @@ class InjuryRiskProcessor(object):
                 else:
                     body_part_injury_risk.eccentric_volume_percent_tier = 0
 
-                # add prevention ranking
-                if (body_part_injury_risk.overactive_long_count_last_0_20_days >= 3 or
-                        body_part_injury_risk.overactive_short_count_last_0_20_days >= 3 or
-                        body_part_injury_risk.underactive_short_count_last_0_20_days >= 3):
-                    # create tier 1
-                    body_part_injury_risk.limited_mobility_tier = 1
-                elif (body_part_injury_risk.overactive_long_count_last_0_20_days < 3 and
-                        body_part_injury_risk.overactive_short_count_last_0_20_days < 3 and
-                        body_part_injury_risk.underactive_short_count_last_0_20_days < 3):
-                    if (body_part_injury_risk.overactive_long_count_last_0_20_days > 0 or
-                            body_part_injury_risk.overactive_short_count_last_0_20_days > 0 or
-                            body_part_injury_risk.underactive_short_count_last_0_20_days > 0):
-                        # create tier two
-                        body_part_injury_risk.limited_mobility_tier = 2
-                    elif (body_part_injury_risk.overactive_long_vote_count > 0 or
-                            body_part_injury_risk.overactive_short_vote_count > 0 or
-                            body_part_injury_risk.underactive_short_vote_count > 0):
-                        # create tier 3
-                        body_part_injury_risk.limited_mobility_tier = 3
+        # add prevention ranking
+        for body_part_side, body_part_injury_risk in injury_risk_dict.items():
+            if (body_part_injury_risk.overactive_long_count_last_0_20_days >= 3 or
+                    body_part_injury_risk.overactive_short_count_last_0_20_days >= 3 or
+                    body_part_injury_risk.underactive_short_count_last_0_20_days >= 3):
+                # create tier 1
+                body_part_injury_risk.limited_mobility_tier = 1
+            elif (body_part_injury_risk.overactive_long_count_last_0_20_days < 3 and
+                    body_part_injury_risk.overactive_short_count_last_0_20_days < 3 and
+                    body_part_injury_risk.underactive_short_count_last_0_20_days < 3):
+                if (body_part_injury_risk.overactive_long_count_last_0_20_days > 0 or
+                        body_part_injury_risk.overactive_short_count_last_0_20_days > 0 or
+                        body_part_injury_risk.underactive_short_count_last_0_20_days > 0):
+                    # create tier two
+                    body_part_injury_risk.limited_mobility_tier = 2
+                elif (body_part_injury_risk.overactive_long_vote_count > 0 or
+                        body_part_injury_risk.overactive_short_vote_count > 0 or
+                        body_part_injury_risk.underactive_short_vote_count > 0):
+                    # create tier 3
+                    body_part_injury_risk.limited_mobility_tier = 3
 
-                # include joint and ligament issues
-                if (body_part_injury_risk.last_altered_joint_arthokinematics_date is not None and
-                        body_part_injury_risk.last_altered_joint_arthokinematics_date == self.event_date_time.date()):
-                    body_part_injury_risk.limited_mobility_tier = 1
+            # include joint and ligament issues
+            if (body_part_injury_risk.last_altered_joint_arthokinematics_date is not None and
+                    body_part_injury_risk.last_altered_joint_arthokinematics_date == self.event_date_time.date()):
+                body_part_injury_risk.limited_mobility_tier = 1
 
-                if ((body_part_injury_risk.last_tendinopathy_date is not None and
-                     body_part_injury_risk.last_tendinopathy_date == self.event_date_time.date()) or
-                        (body_part_injury_risk.last_tendinosis_date is not None and
-                         body_part_injury_risk.last_tendinosis_date == self.event_date_time.date())):
-                    body_part_injury_risk.limited_mobility_tier = 1
+            if ((body_part_injury_risk.last_tendinopathy_date is not None and
+                 body_part_injury_risk.last_tendinopathy_date == self.event_date_time.date()) or
+                    (body_part_injury_risk.last_tendinosis_date is not None and
+                     body_part_injury_risk.last_tendinosis_date == self.event_date_time.date())):
+                body_part_injury_risk.limited_mobility_tier = 1
 
-                # add prevention ranking
-                if (body_part_injury_risk.underactive_long_count_last_0_20_days >= 3 or
-                        body_part_injury_risk.weak_count_last_0_20_days >= 3):
-                    # create tier 1
-                    body_part_injury_risk.underactive_weak_tier = 1
-                elif (body_part_injury_risk.underactive_long_count_last_0_20_days < 3 and
-                        body_part_injury_risk.weak_count_last_0_20_days < 3):
-                    if (body_part_injury_risk.underactive_long_count_last_0_20_days > 0 or
-                            body_part_injury_risk.weak_count_last_0_20_days > 0):
-                        # create tier two
-                        body_part_injury_risk.underactive_weak_tier = 2
-                    elif (body_part_injury_risk.underactive_long_vote_count > 0 or
-                            body_part_injury_risk.weak_vote_count > 0):
-                        # create tier 3
-                        body_part_injury_risk.underactive_weak_tier = 3
+            # add prevention ranking
+            if (body_part_injury_risk.underactive_long_count_last_0_20_days >= 3 or
+                    body_part_injury_risk.weak_count_last_0_20_days >= 3):
+                # create tier 1
+                body_part_injury_risk.underactive_weak_tier = 1
+            elif (body_part_injury_risk.underactive_long_count_last_0_20_days < 3 and
+                    body_part_injury_risk.weak_count_last_0_20_days < 3):
+                if (body_part_injury_risk.underactive_long_count_last_0_20_days > 0 or
+                        body_part_injury_risk.weak_count_last_0_20_days > 0):
+                    # create tier two
+                    body_part_injury_risk.underactive_weak_tier = 2
+                elif (body_part_injury_risk.underactive_long_vote_count > 0 or
+                        body_part_injury_risk.weak_vote_count > 0):
+                    # create tier 3
+                    body_part_injury_risk.underactive_weak_tier = 3
 
         return injury_risk_dict
     
