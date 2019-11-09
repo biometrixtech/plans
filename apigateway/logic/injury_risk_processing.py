@@ -100,6 +100,8 @@ class InjuryRiskProcessor(object):
 
     def get_consolidated_dict(self):
 
+        self.aggregate_ird()
+
         consolidated_injury_risk_dict = {}
 
         body_part_factory = BodyPartFactory()
@@ -142,25 +144,7 @@ class InjuryRiskProcessor(object):
         #reconstruct to group level
         if aggregate_results:
 
-            aggregated_injury_hist_dict = {}
-
-            for body_part_side, body_part_injury_risk in self.injury_risk_dict.items():
-                if body_part_side not in aggregated_injury_hist_dict:
-                    muscle_group = BodyPartLocation.get_muscle_group(body_part_side.body_part_location)
-                    if isinstance(muscle_group, BodyPartLocation):
-                        new_body_part_side = BodyPartSide(muscle_group, body_part_side.side)
-                        if new_body_part_side not in aggregated_injury_hist_dict:
-                            aggregated_injury_hist_dict[new_body_part_side] = deepcopy(body_part_injury_risk)
-                        else:
-                            aggregated_injury_hist_dict[new_body_part_side].merge(self.injury_risk_dict[body_part_side])
-                    else:
-                        aggregated_injury_hist_dict[body_part_side] = deepcopy(self.injury_risk_dict[body_part_side])
-                else:
-                    aggregated_injury_hist_dict[body_part_side].merge(self.injury_risk_dict[body_part_side])
-
-            self.aggregated_injury_risk_dict = aggregated_injury_hist_dict
-
-            return self.aggregated_injury_risk_dict
+            return self.aggregate_ird()
 
         elif aggregate_for_viz:
 
@@ -186,6 +170,25 @@ class InjuryRiskProcessor(object):
 
         else:
             return self.injury_risk_dict
+
+    def aggregate_ird(self):
+        aggregated_injury_hist_dict = {}
+        for body_part_side, body_part_injury_risk in self.injury_risk_dict.items():
+            if body_part_side not in aggregated_injury_hist_dict:
+                muscle_group = BodyPartLocation.get_muscle_group(body_part_side.body_part_location)
+                if isinstance(muscle_group, BodyPartLocation):
+                    new_body_part_side = BodyPartSide(muscle_group, body_part_side.side)
+                    if new_body_part_side not in aggregated_injury_hist_dict:
+                        aggregated_injury_hist_dict[new_body_part_side] = deepcopy(body_part_injury_risk)
+                    else:
+                        aggregated_injury_hist_dict[new_body_part_side].merge(self.injury_risk_dict[body_part_side])
+                else:
+                    aggregated_injury_hist_dict[body_part_side] = deepcopy(self.injury_risk_dict[body_part_side])
+            else:
+                aggregated_injury_hist_dict[body_part_side].merge(self.injury_risk_dict[body_part_side])
+        self.aggregated_injury_risk_dict = aggregated_injury_hist_dict
+
+        return self.aggregated_injury_risk_dict
 
     def reset_reported_symptoms(self, injury_risk_dict):
 
