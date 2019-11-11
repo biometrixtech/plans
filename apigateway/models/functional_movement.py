@@ -1468,8 +1468,6 @@ class FunctionalMovementActivityMapping(object):
 
             for s in self.synergists:
                 if c.side == s.body_part_side.side or c.side == 0 or s.body_part_side.side == 0:
-                    if factor != .04:
-                        p=0
                     synergist_compensated_concentric_volume = compensated_concentric_volume / float(len(self.synergists))
                     synergist_compensated_eccentric_volume = compensated_eccentric_volume / float(len(self.synergists))
                     s.body_part_function = BodyPartFunction.synergist
@@ -1496,8 +1494,6 @@ class FunctionalMovementActivityMapping(object):
 
         prime_mover_ratio = 0.8
         synergist_ratio = 0.6
-
-        # TODO make sure we implement logic to test for high intensity on processing, esp for eccentric intensity
 
         compensation_causing_prime_movers = self.get_compensating_body_parts(injury_risk_dict, event_date)
 

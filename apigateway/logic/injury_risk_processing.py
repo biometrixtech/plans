@@ -606,7 +606,6 @@ class InjuryRiskProcessor(object):
                 concentric_volume_dict = self.concentric_volume_dict[body_part_side]
                 total_volume_dict = self.total_volume_dict[body_part_side]
 
-                # TODO: calc ramp, etc for intensity
                 # self.populate_intensity_dictionaries(body_part_injury_risk, body_part_side, d)
                 # eccentric_intensity_dict = self.eccentric_intensity_dict[body_part_side]
                 # concentric_intensity_dict = self.concentric_intensity_dict[body_part_side]
@@ -1551,7 +1550,6 @@ class InjuryRiskProcessor(object):
                     injury_risk_dict[target_body_part_side] = body_part_injury_risk
 
                 # moderate severity or 2 reports in last 10 days
-                # TODO: is moderate to high ache severity > 3?
                 if target_symptom.ache > 3 or (ache_count >= 2 and ache_count == ache_count_0_20):
                     injury_risk_dict[target_body_part_side].last_inflammation_date = base_date
 

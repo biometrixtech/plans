@@ -450,11 +450,10 @@ class ModalityBase(object):
                     dosage.default_complete_reps_assigned = exercise.min_reps
                     dosage.default_complete_sets_assigned = 1
 
-                if dosage.priority == "1" or dosage.priority == "2":
-                    dosage.comprehensive_reps_assigned = exercise.max_reps
-                    dosage.comprehensive_sets_assigned = 1
-                    dosage.default_comprehensive_reps_assigned = exercise.max_reps
-                    dosage.default_comprehensive_sets_assigned = 1
+                dosage.comprehensive_reps_assigned = exercise.max_reps
+                dosage.comprehensive_sets_assigned = 1
+                dosage.default_comprehensive_reps_assigned = exercise.max_reps
+                dosage.default_comprehensive_sets_assigned = 1
 
             elif self.relative_load_level == 2:
                 if dosage.priority == "1":
@@ -469,11 +468,10 @@ class ModalityBase(object):
                     dosage.default_complete_reps_assigned = exercise.min_reps
                     dosage.default_complete_sets_assigned = 1
 
-                if dosage.priority == "1" or dosage.priority == "2" or dosage.priority == "3":
-                    dosage.comprehensive_reps_assigned = exercise.min_reps
-                    dosage.comprehensive_sets_assigned = 1
-                    dosage.default_comprehensive_reps_assigned = exercise.min_reps
-                    dosage.default_comprehensive_sets_assigned = 1
+                dosage.comprehensive_reps_assigned = exercise.min_reps
+                dosage.comprehensive_sets_assigned = 1
+                dosage.default_comprehensive_reps_assigned = exercise.min_reps
+                dosage.default_comprehensive_sets_assigned = 1
 
             elif self.relative_load_level == 1:
                 if dosage.priority == "1":
@@ -488,11 +486,10 @@ class ModalityBase(object):
                     dosage.default_complete_reps_assigned = exercise.max_reps
                     dosage.default_complete_sets_assigned = 1
 
-                if dosage.priority == "1" or dosage.priority == "2" or dosage.priority == "3":
-                    dosage.comprehensive_reps_assigned = exercise.max_reps
-                    dosage.comprehensive_sets_assigned = 1
-                    dosage.default_comprehensive_reps_assigned = exercise.max_reps
-                    dosage.default_comprehensive_sets_assigned = 1
+                dosage.comprehensive_reps_assigned = exercise.max_reps
+                dosage.comprehensive_sets_assigned = 1
+                dosage.default_comprehensive_reps_assigned = exercise.max_reps
+                dosage.default_comprehensive_sets_assigned = 1
 
         if dosage.goal.goal_type == AthleteGoalType.corrective:
             if dosage.priority == "1":
@@ -507,11 +504,10 @@ class ModalityBase(object):
                 dosage.default_complete_reps_assigned = exercise.max_reps
                 dosage.default_complete_sets_assigned = 1
 
-            if dosage.priority == "1" or dosage.priority == "2":
-                dosage.comprehensive_reps_assigned = exercise.max_reps
-                dosage.comprehensive_sets_assigned = 2
-                dosage.default_comprehensive_reps_assigned = exercise.max_reps
-                dosage.default_comprehensive_sets_assigned = 2
+            dosage.comprehensive_reps_assigned = exercise.max_reps
+            dosage.comprehensive_sets_assigned = 2
+            dosage.default_comprehensive_reps_assigned = exercise.max_reps
+            dosage.default_comprehensive_sets_assigned = 2
 
         if dosage.goal.goal_type == AthleteGoalType.pain or dosage.goal.goal_type == AthleteGoalType.sore:
             if dosage.last_severity <= 5:
@@ -579,7 +575,6 @@ class ModalityBase(object):
             dosage.default_comprehensive_reps_assigned = exercise.min_reps
             dosage.default_comprehensive_sets_assigned = 1
 
-        # TODO add in recovery compensating logic
 #         elif dosage.goal.goal_type == AthleteGoalType.corrective:  # table 2 corrective
 #
 #             if dosage.last_severity < 1:

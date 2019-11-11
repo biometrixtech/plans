@@ -91,7 +91,11 @@ if __name__ == '__main__':
                         None, 4, None, 3, 5, None, None,
                         6, None, 5, None, 4, None, 3,
                         5, None, 6, None, 5, 4, 6]
-                persona1.create_history(days=history_length, suffix='', end_today=True, rpes=rpes, log_output=True, jwt=jwt, user_name=u)
+                if u == "run_a_2@200.com":
+                    end_today = False
+                else:
+                    end_today = True
+                persona1.create_history(days=history_length, suffix='', end_today=end_today, rpes=rpes, log_output=True, jwt=jwt, user_name=u)
             else:
                 persona1.create_history(days=history_length, suffix='')
             print(time.time() - start)
