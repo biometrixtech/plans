@@ -9,6 +9,23 @@ from logic.text_generator import TextGenerator
 from utils import format_datetime, parse_datetime
 
 
+class Insight(object):
+    def __init__(self):
+        self.active = False
+        self.body_parts = []
+        self.data = []
+
+
+class InsightData(object):
+    def __init__(self):
+        self.active = False
+        self.body_parts = []
+        self.color = None
+        self.title = ''
+        self.trigger_tiles = []
+        self.visualization_data = []
+
+
 class AthleteInsight(Serialisable):
     def __init__(self, trigger_type):
         self.trigger_type = trigger_type

@@ -341,6 +341,7 @@ class TrendCategory(Serialisable):
         # self.alerts = []
         self.title = ""
         self.trends = []
+        self.trend_data = None  # new insights structure - will contain an Insight object which has a collection of InisightData for each data series in legend
         self.plan_alerts = []
         self.visible = False
         self.first_time_experience = False

@@ -7,6 +7,7 @@ from models.insights import InsightType
 from models.body_parts import BodyPartFactory
 from models.soreness_base import BodyPartSide, BodyPartLocation, BodyPartSideViz
 from models.athlete_trend import TriggerTile
+from models.insights import Insight, InsightData
 from models.sport import SportName
 from logic.goal_focus_text_generator import RecoveryTextGenerator
 from math import ceil
@@ -14,27 +15,13 @@ from datetime import datetime, timedelta
 
 
 class TrendProcessor(object):
-    def __init__(self, injury_hist_dict, event_date_time, athlete_trend_categories=None, dashboard_categories=None):
+    def __init__(self, injury_hist_dict, event_date_time, athlete_trend_categories=None, dashboard_categories=None, athlete_insight_categories=None):
+        self.athlete_insight_categories = [] if athlete_insight_categories is None else athlete_insight_categories
         self.athlete_trend_categories = [] if athlete_trend_categories is None else athlete_trend_categories
         self.injury_hist_dict = injury_hist_dict
         self.dashboard_categories = [] if dashboard_categories is None else dashboard_categories
         self.event_date_time = event_date_time
         self.initialize_trend_categories()
-
-    # def get_antagonists_syngergists(self, triggers, use_agonists=False):
-    #
-    #     antagonists = []
-    #     synergists = []
-    #
-    #     body_part_factory = BodyPartFactory()
-    #
-    #     for t in triggers:
-    #         if body_part_factory.is_joint(t.body_part) and use_agonists:
-    #             antagonists.extend(t.agonists)
-    #         antagonists.extend(t.antagonists)
-    #         synergists.extend(t.synergists)
-    #
-    #     return antagonists, synergists
 
     def initialize_trend_categories(self):
 
@@ -169,6 +156,8 @@ class TrendProcessor(object):
         muscle_trend = self.create_personalized_recovery_trend()
         trend_category.trends.append(muscle_trend)
 
+        trend_category.trend_data = Insight()
+
         modal = CategoryFirstTimeExperienceModal()
         modal.title = "Personalized Recovery - FTE"
         modal.body = ("We monitor your data for signs of imbalances in  muscle activation, range of motion and more.\n\n" +
@@ -193,6 +182,8 @@ class TrendProcessor(object):
 
         limitation_trend = self.create_prevention_trend()
         trend_category.trends.append(limitation_trend)
+
+        trend_category.trend_data = Insight()
 
         modal = CategoryFirstTimeExperienceModal()
         modal.title = "Prevention - FTE"
@@ -219,6 +210,8 @@ class TrendProcessor(object):
 
         daily_trend = self.create_care_trend()
         trend_category.trends.append(daily_trend)
+
+        trend_category.trend_data = Insight()
 
         modal = CategoryFirstTimeExperienceModal()
         modal.title = "Care - FTE"
