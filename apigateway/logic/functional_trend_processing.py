@@ -7,9 +7,10 @@ from models.insights import InsightType
 from models.body_parts import BodyPartFactory
 from models.soreness_base import BodyPartSide, BodyPartLocation, BodyPartSideViz
 from models.athlete_trend import TriggerTile
-from models.insights import Insight, InsightData
+from models.insights import Insight, InsightData, PlotLegend, InsightVisualizationData
 from models.sport import SportName
 from logic.goal_focus_text_generator import RecoveryTextGenerator
+from copy import deepcopy
 from math import ceil
 from datetime import datetime, timedelta
 
@@ -43,7 +44,9 @@ class TrendProcessor(object):
 
         if care_index == -1:
             care_category = self.create_care_category()
+            care_insight_category = deepcopy(care_category)
             self.athlete_trend_categories.append(care_category)
+            self.athlete_insight_categories.append(care_insight_category)
         else:
             self.remove_old_trends(care_index, VisualizationType.care_today)
 
@@ -52,7 +55,9 @@ class TrendProcessor(object):
 
         if prevention_index == -1:
             prevention_category = self.create_prevention_category()
+            prevention_insight_category = deepcopy(prevention_category)
             self.athlete_trend_categories.append(prevention_category)
+            self.athlete_insight_categories.append(prevention_insight_category)
         else:
             self.remove_old_trends(prevention_index, VisualizationType.prevention)
 
@@ -61,7 +66,9 @@ class TrendProcessor(object):
 
         if recovery_index == -1:
             personalized_recovery_category = self.create_personalized_recovery_category()
+            recovery_insight_category = deepcopy(personalized_recovery_category)
             self.athlete_trend_categories.append(personalized_recovery_category)
+            self.athlete_insight_categories.append(recovery_insight_category)
         else:
             self.remove_old_trends(recovery_index, VisualizationType.personalized_recovery)
 
@@ -145,6 +152,16 @@ class TrendProcessor(object):
         if category_index == -1:
             trend_category = self.create_personalized_recovery_category()
             self.athlete_trend_categories.append(trend_category)
+            category_index = len(self.athlete_trend_categories) - 1
+        return category_index
+
+    def get_insight_category_index(self, insight_type):
+
+        category_index = next((i for i, x in enumerate(self.athlete_insight_categories) if
+                               x.insight_type == insight_type), -1)
+        if category_index == -1:
+            trend_category = self.create_personalized_recovery_category()
+            self.athlete_insight_categories.append(trend_category)
             category_index = len(self.athlete_trend_categories) - 1
         return category_index
 
@@ -613,12 +630,37 @@ class TrendProcessor(object):
 
             trend = self.get_care_trend(category_index)
 
+            care_index = self.get_insight_category_index(InsightType.care)
+
+            insight_category = self.athlete_insight_categories[care_index]
+            insight_category.active = True
+
+            inflamed_list = []
+            inflamed_list.extend(inflamed_high)
+            inflamed_list.extend(inflamed_mod)
+            inflamed_high.extend(inflamed_low)
+
+            tight_list = []
+            tight_list.extend(muscle_spasm)
+            tight_list.extend(knots)
+
+            inflamed_list, tight_list = self.remove_duplicates_two_lists(inflamed_list, tight_list)
+            inflamed_high = [i for i in inflamed_high if i in inflamed_list]
+            inflamed_mod = [i for i in inflamed_mod if i in inflamed_list]
+            inflamed_low = [i for i in inflamed_low if i in inflamed_list]
+            muscle_spasm = [m for m in muscle_spasm if m in tight_list]
+            knots = [k for k in knots if k in tight_list]
+
+            inflamed_data = self.get_inflamed_insight_data(inflamed_high, inflamed_low, inflamed_mod)
+            tight_data = self.get_tight_insight_data(muscle_spasm, knots)
+
+            insight_category.trend_data.data.append(inflamed_data)
+            insight_category.trend_data.data.append(tight_data)
+
             trend_data = TrendData()
             trend_data.visualization_type = VisualizationType.care
             trend_data.add_visualization_data()
             care_data = CareChartData()
-
-            body_part_factory = BodyPartFactory()
 
             care_data.inflamed.extend(inflamed)
             care_data.tight.extend(muscle_spasm)
@@ -660,6 +702,128 @@ class TrendProcessor(object):
         else:
             trend = self.create_care_trend()
             self.set_care_trend(category_index, trend)
+
+    def get_inflamed_insight_data(self, inflamed_high, inflamed_low, inflamed_mod):
+
+        inflamed_data = InsightData()
+        inflamed_data.title = 'inflamed'
+        inflamed_data.active = True
+        inflamed_data.color = LegendColor.error_light
+        low_plot_legend = PlotLegend(LegendColor.error_xx_light, 'Low', 0)
+        mod_plot_legend = PlotLegend(LegendColor.error_x_light, 'Mod', 1)
+        high_plot_legend = PlotLegend(LegendColor.error_light, 'High', 2)
+        inflamed_viz_data = InsightVisualizationData()
+        inflamed_viz_data.plot_legends = [high_plot_legend, mod_plot_legend, low_plot_legend]
+        inflamed_data.visualization_data = inflamed_viz_data
+        if len(inflamed_high) == 0 and len(inflamed_mod) == 0 and len(inflamed_low) == 0:
+            empty_trigger_tile = TriggerTile()
+            title_text = "No Signs of Inflammation"
+            empty_trigger_tile.title = title_text
+            empty_trigger_tile.text = "You haven't reported any symptoms which indicate tissue inflammation."
+            bold_1 = BoldText()
+            bold_1.text = title_text
+            bold_1.color = LegendColor.slate_light
+            empty_trigger_tile.bold_text.append(bold_1)
+        if len(inflamed_high) > 0:
+            high_trigger_tile = TriggerTile()
+            high_trigger_tile.body_parts = inflamed_high
+            title_text = "Severe Inflammation"
+            high_trigger_tile.title = title_text
+            high_trigger_tile.text = "Severe pain & soreness are signs of inflammation and tissue damage. To help reduce inflammation, give these areas some rest, do your 'Care' activities, and avoid any movements that cause pain."
+            bold_1 = BoldText()
+            bold_1.text = title_text
+            bold_1.color = LegendColor.error_light
+            high_trigger_tile.bold_text.append(bold_1)
+            inflamed_data.trigger_tiles.append(high_trigger_tile)
+        if len(inflamed_mod) > 0:
+            mod_trigger_tile = TriggerTile()
+            mod_trigger_tile.body_parts = inflamed_mod
+            title_text = "Moderate Inflammation"
+            mod_trigger_tile.title = title_text
+            mod_trigger_tile.text = "These tissues have signs of inflammation and shortening which can restrict mobility and alter muscle activation. This leads to movement compensations in training which elevate injury risk and recovery need."
+            bold_1 = BoldText()
+            bold_1.text = title_text
+            bold_1.color = LegendColor.error_light
+            mod_trigger_tile.bold_text.append(bold_1)
+            inflamed_data.trigger_tiles.append(mod_trigger_tile)
+        if len(inflamed_low) > 0:
+            low_trigger_tile = TriggerTile()
+            low_trigger_tile.body_parts = inflamed_low
+            title_text = "Mild Inflammation"
+            low_trigger_tile.title = title_text
+            low_trigger_tile.color = LegendColor.error_light
+            low_trigger_tile.text = "These tissues likely have mild inflammation. For optimal movement efficiency, reduce this inflammation with the foam rolling and stretching activities created for you in your 'Care' plan."
+            bold_1 = BoldText()
+            bold_1.text = title_text
+            bold_1.color = LegendColor.error_xx_light
+            low_trigger_tile.bold_text.append(bold_1)
+            inflamed_data.trigger_tiles.append(low_trigger_tile)
+        return inflamed_data
+
+    def get_tight_insight_data(self, tight_spasm, tight_adhesions):
+
+        tight_data = InsightData()
+        tight_data.title = 'tight'
+        tight_data.active = True
+        tight_data.color = LegendColor.warning_light
+        low_plot_legend = PlotLegend(LegendColor.warning_xx_light, 'Low', 0)
+        mod_plot_legend = PlotLegend(LegendColor.warning_x_light, 'Mod', 1)
+        high_plot_legend = PlotLegend(LegendColor.warning_light, 'High', 2)
+        tight_viz_data = InsightVisualizationData()
+        tight_viz_data.plot_legends = [high_plot_legend, mod_plot_legend, low_plot_legend]
+        tight_data.visualization_data = tight_viz_data
+        if len(tight_spasm) == 0 and len(tight_adhesions) == 0:
+            empty_trigger_tile = TriggerTile()
+            title_text = "No Signs of Tightness"
+            empty_trigger_tile.title = title_text
+            empty_trigger_tile.text = "You haven't reported any symptoms which indicate tissue tightness."
+            bold_1 = BoldText()
+            bold_1.text = title_text
+            bold_1.color = LegendColor.slate_light
+            empty_trigger_tile.bold_text.append(bold_1)
+        if len(tight_spasm) > 0:
+            high_trigger_tile = TriggerTile()
+            high_trigger_tile.body_parts = tight_spasm
+            title_text = "Muscle Spasm"
+            high_trigger_tile.title = title_text
+            high_trigger_tile.text = "Tightness in a tissue can change the way you move, causing compensations during training. Your 'Care' activities help 'release' this tightness."
+            bold_1 = BoldText()
+            bold_1.text = title_text
+            bold_1.color = LegendColor.warning_light
+            high_trigger_tile.bold_text.append(bold_1)
+            tight_data.trigger_tiles.append(high_trigger_tile)
+        if len(tight_adhesions) > 0:
+            mod_trigger_tile = TriggerTile()
+            mod_trigger_tile.body_parts = tight_adhesions
+            title_text = "Tightness Causing Damage"
+            mod_trigger_tile.title = title_text
+            mod_trigger_tile.text = "Chronic tightness and inflammation leads to muscles forming knots which decrease the tissue's ability to produce and absorb force. Training in this condition further damages the muscle and diverts stress to other tissues- elevating the risk of injury."
+            bold_1 = BoldText()
+            bold_1.text = title_text
+            bold_1.color = LegendColor.warning_light
+            mod_trigger_tile.bold_text.append(bold_1)
+            tight_data.trigger_tiles.append(mod_trigger_tile)
+
+        return tight_data
+
+    def remove_duplicates_two_lists(self, list_high, list_low):
+
+        unc_delete = []
+
+        id = 0
+        for u in list_low:
+            index = next((i for i, x in enumerate(list_high) if u == x), -1)
+
+            if index > -1:
+                unc_delete.append(id)
+            id += 1
+
+        unc_delete.sort(reverse=True)  # need to remove in reverse order so we don't mess up indexes along the way
+
+        for d in unc_delete:
+            del (list_low[d])
+
+        return list_high, list_low
 
     def set_recovery(self, category_index):
 

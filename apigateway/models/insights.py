@@ -26,6 +26,18 @@ class InsightData(object):
         self.visualization_data = []
 
 
+class PlotLegend(object):
+    def __init__(self, color, text, type):
+        self.color = color
+        self.text = text
+        self.type = type
+
+
+class InsightVisualizationData(object):
+    def __init__(self):
+        self.plot_legends = []
+
+
 class AthleteInsight(Serialisable):
     def __init__(self, trigger_type):
         self.trigger_type = trigger_type

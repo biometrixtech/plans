@@ -308,7 +308,8 @@ class BodyPartLocationText(object):
                           'erector_spinae': 'erector spinae',
                           'core_stabilizers': 'core stabilizers',
                           'it_band_lateral_knee': 'outer knee',
-                          'obliques': 'obliques'}
+                          'obliques': 'obliques',
+                          'deep_rotators_hip': 'deep rotators of the hip'}
 
         return body_part_text[self.body_part_location.name]
 

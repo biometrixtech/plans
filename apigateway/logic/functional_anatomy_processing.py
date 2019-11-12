@@ -45,7 +45,7 @@ class FunctionalAnatomyProcessor(object):
         elif ligament_value == BodyPartLocation.it_band_lateral_knee.value:
             return [59]
         elif ligament_value == BodyPartLocation.achilles.value:
-            return [43, 44]
+            return [43, 44, 61]
 
     #  This is not used and also became outdated
     # def get_related_joints(self, body_part_value):

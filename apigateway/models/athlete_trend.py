@@ -458,9 +458,12 @@ class DataStatus(object):
 
 class TriggerTile(Serialisable):
     def __init__(self):
-        self.text = ""
-        self.description = ""
+        self.body_parts = []
         self.bold_text = []
+        self.bold_title = []
+        self.text = ""
+        self.title = ""
+        self.description = ""
         self.statistic_text = ""
         self.bold_statistic_text = []
         self.trigger_type = None
