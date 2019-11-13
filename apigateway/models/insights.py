@@ -1,41 +1,12 @@
 import datetime
 from enum import Enum
 from serialisable import Serialisable
-from models.soreness_base import BodyPartSide
+from models.soreness_base import BodyPartSide, BodyPartSideViz
 from models.trigger import TriggerType
 from models.trigger_data import TriggerData
 from models.sport import SportName
 from logic.text_generator import TextGenerator
 from utils import format_datetime, parse_datetime
-
-
-class Insight(object):
-    def __init__(self):
-        self.active = False
-        self.body_parts = []
-        self.data = []
-
-
-class InsightData(object):
-    def __init__(self):
-        self.active = False
-        self.body_parts = []
-        self.color = None
-        self.title = ''
-        self.trigger_tiles = []
-        self.visualization_data = []
-
-
-class PlotLegend(object):
-    def __init__(self, color, text, type):
-        self.color = color
-        self.text = text
-        self.type = type
-
-
-class InsightVisualizationData(object):
-    def __init__(self):
-        self.plot_legends = []
 
 
 class AthleteInsight(Serialisable):
