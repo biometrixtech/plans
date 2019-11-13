@@ -524,46 +524,58 @@ class TrendCategory(Serialisable):
 class InsightCategory(Serialisable):
     def __init__(self, insight_type):
         self.insight_type = insight_type
-        self.title = ""
+        self.header = ""
         self.trend_data = None
-        self.visible = False
+        self.active = False
         self.first_time_experience = False
         self.first_time_experience_modal = None
         self.icon = ""
         self.image = ""
-        self.context_sensors_enabled = ""
-        self.context_sensors_not_enabled = ""
-        self.cta = ""
+        self.context_text = ""
+        self.context_bold_text = []
+        self.empty_state_header = ""
+        self.empty_state_image = ""
+        self.empty_context_sensors_enabled = ""
+        self.empty_context_sensors_not_enabled = ""
+        self.empty_state_cta = ""
 
     def json_serialise(self):
         ret = {
             'insight_type': self.insight_type.value,
-            'title': self.title,
+            'header': self.header,
             'trend_data': self.trend_data.json_serialise() if self.trend_data is not None else None,
-            'visible': self.visible,
+            'active': self.active,
             'first_time_experience': self.first_time_experience,
             'first_time_experience_modal': self.first_time_experience_modal.json_serialise() if self.first_time_experience_modal is not None else None,
             'icon': self.icon,
             'image': self.image,
-            'context_sensors_enabled': self.context_sensors_enabled,
-            'context_sensors_not_enabled': self.context_sensors_not_enabled,
-            'cta': self.cta
+            'context_text': self.context_text,
+            'context_bold_text': [b.json_serialise() for b in self.context_bold_text],
+            'empty_state_header': self.empty_state_header,
+            "empty_state_image": self.empty_state_image,
+            'empty_context_sensors_enabled': self.empty_context_sensors_enabled,
+            'empty_context_sensors_not_enabled': self.empty_context_sensors_not_enabled,
+            'empty_state_cta': self.empty_state_cta
         }
         return ret
 
     @classmethod
     def json_deserialise(cls, input_dict):
         insight_category = cls(InsightType(input_dict['insight_type']))
-        insight_category.title = input_dict.get('title', "")
+        insight_category.header = input_dict.get('header', "")
         insight_category.trend_data = Insight.json_deserialise(input_dict['trend_data']) if input_dict.get('trend_data') is not None else None
-        insight_category.visible = input_dict.get('visible', False)
+        insight_category.active = input_dict.get('active', False)
         insight_category.first_time_experience = input_dict.get('first_time_experience', False)
         insight_category.first_time_experience_modal = CategoryFirstTimeExperienceModal.json_deserialise(input_dict['first_time_experience_modal']) if input_dict.get('first_time_experience_modal') is not None else None
         insight_category.icon = input_dict.get('icon','')
         insight_category.image = input_dict.get('image', '')
-        insight_category.context_sensors_enabled = input_dict.get('context_sensors_enabled', '')
-        insight_category.context_sensors_not_enabled = input_dict.get('context_sensors_not_enabled', '')
-        insight_category.cta = input_dict.get('cta', '')
+        insight_category.context_text = input_dict.get('context_text', '')
+        insight_category.context_bold_text = [BoldText.json_deserialise(b) for b in input_dict.get('context_bold_text', [])]
+        insight_category.empty_state_header = input_dict.get('empty_state_header', '')
+        insight_category.empty_state_image = input_dict.get('empty_state_image', '')
+        insight_category.empty_context_sensors_enabled = input_dict.get('empty_context_sensors_enabled', '')
+        insight_category.empty_context_sensors_not_enabled = input_dict.get('empty_context_sensors_not_enabled', '')
+        insight_category.empty_state_cta = input_dict.get('empty_state_cta', '')
         return insight_category
 
 

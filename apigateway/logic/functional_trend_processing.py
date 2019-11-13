@@ -220,12 +220,17 @@ class TrendProcessor(object):
     def create_insight_recovery_category(self):
 
         insight_category = InsightCategory(InsightType.personalized_recovery)
-        insight_category.title = "Searching for Recovery Insights"
+        insight_category.header = "Recovery Insights"
+        insight_category.context_text = "Given your training & symptom data, these areas have likely experienced elevates stress in training & require proactive recovery.\n\nTap on each category for more information."
+        bold_category_text = BoldText()
+        bold_category_text.text = "Tap on each category for more information."
+        insight_category.context_bold_text.append(bold_category_text)
+        insight_category.empty_state_header = "Searching for Recovery Insights"
         insight_category.icon = "recovery.png"
-        insight_category.image = "recovery-FTE-empty.png"
-        insight_category.context_sensors_enabled = "Log your training & symptoms regularly and use the PRO sensors to help us learn how your body responds to training to optimize your tissue regeneration."
-        insight_category.context_sensors_not_enabled = "Log your training & symptoms regularly and use the PRO sensors to help us learn how your body responds to training to optimize your tissue regeneration."
-        insight_category.cta = "Log Training"
+        insight_category.empty_state_image = "recovery-FTE-empty.png"
+        insight_category.empty_context_sensors_enabled = "Log your training & symptoms regularly and use the PRO sensors to help us learn how your body responds to training to optimize your tissue regeneration."
+        insight_category.empty_context_sensors_not_enabled = "Log your training & symptoms regularly and use the PRO sensors to help us learn how your body responds to training to optimize your tissue regeneration."
+        insight_category.empty_state_cta = "Log Training"
 
         insight_category.first_time_experience = True
 
@@ -277,12 +282,17 @@ class TrendProcessor(object):
     def create_insight_prevention_category(self):
 
         insight_category = InsightCategory(InsightType.prevention)
-        insight_category.title = "Searching for Prevention Insights"
+        insight_category.header = "Prevention Insights"
+        insight_category.context_text = "Patterns in your data indicate imbalances affecting tissue mobility & muscle activation which may elevate your injury risks.\n\nTap on each category for more information."
+        bold_category_text = BoldText()
+        bold_category_text.text = "Tap on each category for more information."
+        insight_category.context_bold_text.append(bold_category_text)
+        insight_category.empty_state_header = "Searching for Prevention Insights"
         insight_category.icon = "prevention.png"
-        insight_category.image = "prevention-FTE-empty.png"
-        insight_category.context_sensors_enabled = "Wear your PRO sensors and log your symptoms regularly to identify and correct underlying imbalances, dysfunctions, and other injury risk factors. It typically takes 1 to 3 weeks to derive prevention needs."
-        insight_category.context_sensors_not_enabled = "Upgrade to Fathom PRO- our advanced, wearable biomechanics tracking system- to begin identifying and correcting imbalances and dysfunctions which lead to chronic injury."
-        insight_category.cta = ""
+        insight_category.empty_state_image = "prevention-FTE-empty.png"
+        insight_category.empty_context_sensors_enabled = "Wear your PRO sensors and log your symptoms regularly to identify and correct underlying imbalances, dysfunctions, and other injury risk factors. It typically takes 1 to 3 weeks to derive prevention needs."
+        insight_category.empty_context_sensors_not_enabled = "Upgrade to Fathom PRO- our advanced, wearable biomechanics tracking system- to begin identifying and correcting imbalances and dysfunctions which lead to chronic injury."
+        insight_category.empty_state_cta = ""
 
         insight_category.first_time_experience = True
 
@@ -335,12 +345,17 @@ class TrendProcessor(object):
     def create_insight_care_category(self):
 
         insight_category = InsightCategory(InsightType.care)
-        insight_category.title = "Searching for Care Insights"
+        insight_category.header = "Care Insights"
+        insight_category.context_text = "Pain & soreness change how your distribute force and can lead to elevated stress in other tissues during training.\n\nTap on each category for more information."
+        bold_category_text = BoldText()
+        bold_category_text.text = "Tap on each category for more information."
+        insight_category.context_bold_text.append(bold_category_text)
+        insight_category.empty_state_header = "Searching for Care Insights"
         insight_category.icon = "care.png"
-        insight_category.image = "care-FTE-empty.png"
-        insight_category.context_sensors_enabled = "Update your tightness, soreness, and pain symptoms to inform optimal activity recommendations to care for your body and prepare for movement."
-        insight_category.context_sensors_not_enabled = "Update your tightness, soreness, and pain symptoms to inform optimal activity recommendations to care for your body and prepare for movement."
-        insight_category.cta = "Log Symptoms"
+        insight_category.empty_state_image = "care-FTE-empty.png"
+        insight_category.empty_context_sensors_enabled = "Update your tightness, soreness, and pain symptoms to inform optimal activity recommendations to care for your body and prepare for movement."
+        insight_category.empty_context_sensors_not_enabled = "Update your tightness, soreness, and pain symptoms to inform optimal activity recommendations to care for your body and prepare for movement."
+        insight_category.empty_state_cta = "Log Symptoms"
         insight_category.first_time_experience = True
 
         insight_category.trend_data = Insight()
@@ -769,6 +784,11 @@ class TrendProcessor(object):
             inflamed_data = self.get_inflamed_insight_data(inflamed_high, inflamed_low, inflamed_mod)
             tight_data = self.get_tight_insight_data(muscle_spasm, knots)
 
+            if not inflamed_data.active and not tight_data.active:
+                insight_category.active = False
+            else:
+                insight_category.active = True
+
             body_parts = []
             body_parts.extend(inflamed_data.body_parts)
             body_parts.extend(tight_data.body_parts)
@@ -856,6 +876,7 @@ class TrendProcessor(object):
             bold_1.color = LegendColor.slate_light
             empty_trigger_tile.bold_title.append(bold_1)
             inflamed_data.trigger_tiles.append(empty_trigger_tile)
+            inflamed_data.active = False
         if len(inflamed_high) > 0:
             high_trigger_tile = TriggerTile()
             high_trigger_tile.body_parts = inflamed_high
@@ -921,6 +942,7 @@ class TrendProcessor(object):
             bold_1.color = LegendColor.slate_light
             empty_trigger_tile.bold_title.append(bold_1)
             tight_data.trigger_tiles.append(empty_trigger_tile)
+            tight_data.active = False
         if len(tight_spasm) > 0:
             high_trigger_tile = TriggerTile()
             high_trigger_tile.body_parts = tight_spasm
@@ -1073,6 +1095,11 @@ class TrendProcessor(object):
             compensating_data = self.get_compensating_insight_data(movement_dysfunction, compensating)
             training_data = self.get_training_stress_insight_data(high_stress, low_stress, mod_stress)
 
+            if not compensating_data.active and not training_data.active:
+                insight_category.active = False
+            else:
+                insight_category.active = True
+
             body_parts = []
             body_parts.extend(compensating_data.body_parts)
             body_parts.extend(training_data.body_parts)
@@ -1157,6 +1184,7 @@ class TrendProcessor(object):
             bold_1.color = LegendColor.slate_light
             empty_trigger_tile.bold_title.append(bold_1)
             compensating_data.trigger_tiles.append(empty_trigger_tile)
+            compensating_data.active = False
         if len(movement_dysfunction) > 0:
             high_trigger_tile = TriggerTile()
             high_trigger_tile.body_parts = movement_dysfunction
@@ -1213,6 +1241,7 @@ class TrendProcessor(object):
             bold_1.color = LegendColor.slate_light
             empty_trigger_tile.bold_title.append(bold_1)
             stress_data.trigger_tiles.append(empty_trigger_tile)
+            stress_data.active = False
         if len(stress_high) > 0:
             high_trigger_tile = TriggerTile()
             high_trigger_tile.body_parts = stress_high
@@ -1385,6 +1414,11 @@ class TrendProcessor(object):
             limited_mobility_data = self.get_limited_mobility_insight_data(short, joint_artho, tendin, overactive, limited_mobility_2, limited_mobility_3)
             underactive_weak_data = self.get_underactive_insight_data(underactive_weak, underactive_inhibited, underactive_weak_2, underactive_weak_3)
 
+            if not limited_mobility_data.active and not underactive_weak_data.active:
+                insight_category.active = False
+            else:
+                insight_category.active = True
+
             body_parts = []
             body_parts.extend(limited_mobility_data.body_parts)
             body_parts.extend(underactive_weak_data.body_parts)
@@ -1505,6 +1539,7 @@ class TrendProcessor(object):
             bold_1.color = LegendColor.slate_light
             empty_trigger_tile.bold_title.append(bold_1)
             limited_mobility_data.trigger_tiles.append(empty_trigger_tile)
+            limited_mobility_data.active = False
         if len(short) > 0:
             high_trigger_tile = TriggerTile()
             high_trigger_tile.body_parts = short
@@ -1605,6 +1640,7 @@ class TrendProcessor(object):
             bold_1.color = LegendColor.slate_light
             empty_trigger_tile.bold_title.append(bold_1)
             underactive_data.trigger_tiles.append(empty_trigger_tile)
+            underactive_data.active = False
         if len(underactive_weak) > 0:
             high_trigger_tile = TriggerTile()
             high_trigger_tile.body_parts = underactive_weak
