@@ -1713,11 +1713,19 @@ class TrendProcessor(object):
         # aggregate to muscle group level
         muscle_groups = []
         for b in body_part_sides:
-            muscle_group = b.body_part_location.get_muscle_group(b.body_part_location)
+            muscle_group = b.body_part_location.get_viz_muscle_group(b.body_part_location)
             if isinstance(muscle_group, bool):
-                muscle_groups.append(b.body_part_location)
+                muscle_group = b.body_part_location.get_muscle_group(b.body_part_location)
+                if isinstance(muscle_group, bool):
+                    muscle_groups.append(b.body_part_location)
+                else:
+                    muscle_groups.append(muscle_group)
             else:
-                muscle_groups.append(muscle_group)
+                muscle_group_2 = b.body_part_location.get_muscle_group_for_viz_group(muscle_group)
+                if isinstance(muscle_group_2, bool):
+                    muscle_groups.append(muscle_group)
+                else:
+                    muscle_groups.append(muscle_group_2)
 
         #sideless_body_parts = [b.body_part_location for b in body_part_sides]
         sideless_body_parts = [b for b in muscle_groups]

@@ -223,11 +223,39 @@ class BodyPartLocation(Enum):
         return False  # joint or ligament
 
     @classmethod
+    def get_muscle_group_for_viz_group(cls, muscle):
+        muscle_groups = cls.viz_groups_to_muscle_groups()
+
+        if muscle in muscle_groups.keys():  # is a muscle group, return itself
+            return muscle
+        else:
+            for key, value in muscle_groups.items():
+                if muscle in value:  # is a muscle, return the group
+                    return key
+        return False  # joint or ligament
+
+    @classmethod
     def get_viz_muscles_for_group(cls, muscle_group):
         muscle_groups = cls.muscle_groups_viz()
         if muscle_group in muscle_groups.keys():
             return muscle_groups[muscle_group]
         return False
+
+    @classmethod
+    def viz_groups_to_muscle_groups(cls):
+        grouped_muscles = {
+            cls.hamstrings: [cls.semimembranosus_semitendinosus],
+            cls.groin: [cls.anterior_adductors],
+            cls.quads: [cls.rectus_femoris_vastus_intermedius],
+            cls.hip_flexor: [cls.hip_flexor_merge],
+            cls.deep_rotators_hip: [cls.quadratus_femoris],
+            cls.glutes: [cls.glute_med],
+            cls.obliques: [cls.internal_obliques, cls.external_obliques],
+            cls.upper_back_neck: [cls.upper_traps_levator_scapulae, cls.middle_traps_rhomboids],
+            cls.chest: [cls.pec_major_minor]
+
+        }
+        return grouped_muscles
 
     @classmethod
     def muscle_groups_viz(cls):
